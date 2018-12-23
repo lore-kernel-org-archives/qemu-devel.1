@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52603)
+Received: from eggs.gnu.org ([208.118.235.92]:52650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkE-0008MG-Ex
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:09 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkH-0008O3-Dx
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkC-0003PU-63
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:06 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33259)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkG-0003df-27
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:09 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45127)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAkB-0003M8-Rs
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:04 -0500
-Received: by mail-wm1-x343.google.com with SMTP id r24so18059798wmh.0
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:03 -0800 (PST)
+	id 1gbAkF-0003WH-OC
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:07 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t6so10091170wrr.12
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:06 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:16 +0100
-Message-Id: <3fa7d671ea0bf769c6c7c1d30bb7031f6031eb2f.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:52:20 +0100
+Message-Id: <03189c11f5216339f472d06925582a8e20e7b21b.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 40/52] audio: remove hw->samples,
- buffer_size_in/out pcm_ops
+Subject: [Qemu-devel] [PATCH v2 44/52] audio: make mixeng optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,602 +33,226 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-This patch removes the samples member from HWVoiceIn and HWVoiceOut.
-Backends can specify buffer size via the newly added buffer_size_in and
-buffer_size_out functions in audio_pcm_ops.  They are optional, if not
-defined qemu will fall back to some built-in constant.
+Implementation of the previously added mixeng option.
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
-
 ---
+ audio/audio.c          | 70 ++++++++++++++++++++++++++++++++++++++----
+ audio/audio_template.h | 46 ++++++++++++++++-----------
+ 2 files changed, 92 insertions(+), 24 deletions(-)
 
-Not sure if this is necessary.  At first it seemed like a good idea to
-have a function so that backends can compute the size on demand when
-needed and things like that, but currently it's just a burden.  The only
-good feature is that it allows a backend to not define a function and
-let the audio subsystem choose a default value, but the same could be
-achieved by specifying that hw->samples = 0 means use a default value.
-
-So if you guys agree, I'll remove this patch.  Maybe add an -audiodev
-parameter to change it, overriding whatever the backends supplies.
----
- audio/alsaaudio.c       | 20 ++++++++++++++++++--
- audio/audio.c           |  2 --
- audio/audio_int.h       |  5 +++--
- audio/audio_template.h  | 24 +++++++++++++++---------
- audio/coreaudio.c       | 10 +++++++++-
- audio/dsound_template.h |  8 +++++++-
- audio/dsoundaudio.c     |  4 ++++
- audio/noaudio.c         |  2 --
- audio/ossaudio.c        | 22 +++++++++++++++++++---
- audio/paaudio.c         | 21 +++++++++++++++++----
- audio/sdlaudio.c        | 10 +++++++++-
- audio/spiceaudio.c      | 14 ++++++++++++--
- audio/wavaudio.c        |  1 -
- 13 files changed, 113 insertions(+), 30 deletions(-)
-
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index 56271b1174..672803e5c2 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -45,6 +45,7 @@ struct pollhlp {
- typedef struct ALSAVoiceOut {
-     HWVoiceOut hw;
-     snd_pcm_t *handle;
-+    size_t samples;
-     struct pollhlp pollhlp;
-     Audiodev *dev;
- } ALSAVoiceOut;
-@@ -52,6 +53,7 @@ typedef struct ALSAVoiceOut {
- typedef struct ALSAVoiceIn {
-     HWVoiceIn hw;
-     snd_pcm_t *handle;
-+    size_t samples;
-     struct pollhlp pollhlp;
-     Audiodev *dev;
- } ALSAVoiceIn;
-@@ -696,7 +698,7 @@ static int alsa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     obt_as.endianness = obt.endianness;
- 
-     audio_pcm_init_info (&hw->info, &obt_as);
--    hw->samples = obt.samples;
-+    alsa->samples = obt.samples;
- 
-     alsa->pollhlp.s = hw->s;
-     alsa->handle = handle;
-@@ -704,6 +706,12 @@ static int alsa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     return 0;
- }
- 
-+static size_t alsa_buffer_size_out(HWVoiceOut *hw)
-+{
-+    ALSAVoiceOut *alsa = (ALSAVoiceOut *) hw;
-+    return alsa->samples;
-+}
-+
- #define VOICE_CTL_PAUSE 0
- #define VOICE_CTL_PREPARE 1
- #define VOICE_CTL_START 2
-@@ -790,7 +798,7 @@ static int alsa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     obt_as.endianness = obt.endianness;
- 
-     audio_pcm_init_info (&hw->info, &obt_as);
--    hw->samples = obt.samples;
-+    alsa->samples = obt.samples;
- 
-     alsa->pollhlp.s = hw->s;
-     alsa->handle = handle;
-@@ -798,6 +806,12 @@ static int alsa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     return 0;
- }
- 
-+static size_t alsa_buffer_size_in(HWVoiceIn *hw)
-+{
-+    ALSAVoiceIn *alsa = (ALSAVoiceIn *) hw;
-+    return alsa->samples;
-+}
-+
- static void alsa_fini_in (HWVoiceIn *hw)
- {
-     ALSAVoiceIn *alsa = (ALSAVoiceIn *) hw;
-@@ -915,11 +929,13 @@ static void alsa_audio_fini (void *opaque)
- static struct audio_pcm_ops alsa_pcm_ops = {
-     .init_out = alsa_init_out,
-     .fini_out = alsa_fini_out,
-+    .buffer_size_out = alsa_buffer_size_out,
-     .write    = alsa_write,
-     .ctl_out  = alsa_ctl_out,
- 
-     .init_in  = alsa_init_in,
-     .fini_in  = alsa_fini_in,
-+    .buffer_size_in = alsa_buffer_size_in,
-     .read     = alsa_read,
-     .ctl_in   = alsa_ctl_in,
- };
 diff --git a/audio/audio.c b/audio/audio.c
-index f195d8eb95..7db183b357 100644
+index 7ba939560a..26ce25989f 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -1742,8 +1742,6 @@ CaptureVoiceOut *AUD_add_capture(
-         QLIST_INIT (&hw->sw_head);
-         QLIST_INIT (&cap->cb_head);
+@@ -840,32 +840,46 @@ static void audio_timer (void *opaque)
+  */
+ size_t AUD_write(SWVoiceOut *sw, void *buf, size_t size)
+ {
++    HWVoiceOut *hw;
++
+     if (!sw) {
+         /* XXX: Consider options */
+         return size;
+     }
++    hw = sw->hw;
  
--        /* XXX find a more elegant way */
--        hw->samples = 4096 * 4;
-         audio_pcm_hw_alloc_resources_out(hw);
+-    if (!sw->hw->enabled) {
++    if (!hw->enabled) {
+         dolog ("Writing to disabled voice %s\n", SW_NAME (sw));
+         return 0;
+     }
  
-         audio_pcm_init_info (&hw->info, as);
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index a5add3c2b8..598038d999 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -70,7 +70,6 @@ typedef struct HWVoiceOut {
-     void *buf_emul;
-     size_t pos_emul, pending_emul, size_emul;
+-    return audio_pcm_sw_write(sw, buf, size);
++    if (hw->s->dev->out->mixeng) {
++        return audio_pcm_sw_write(sw, buf, size);
++    } else {
++        return hw->pcm_ops->write(hw, buf, size);
++    }
+ }
  
--    size_t samples;
-     QLIST_HEAD (sw_out_listhead, SWVoiceOut) sw_head;
-     QLIST_HEAD (sw_cap_listhead, SWVoiceCap) cap_head;
-     int ctl_caps;
-@@ -93,7 +92,6 @@ typedef struct HWVoiceIn {
-     void *buf_emul;
-     size_t pos_emul, pending_emul, size_emul;
+ size_t AUD_read(SWVoiceIn *sw, void *buf, size_t size)
+ {
++    HWVoiceIn *hw;
++
+     if (!sw) {
+         /* XXX: Consider options */
+         return size;
+     }
++    hw = sw->hw;
  
--    size_t samples;
-     QLIST_HEAD (sw_in_listhead, SWVoiceIn) sw_head;
-     int ctl_caps;
-     struct audio_pcm_ops *pcm_ops;
-@@ -155,6 +153,8 @@ struct audio_pcm_ops {
-     int    (*init_out)(HWVoiceOut *hw, audsettings *as, void *drv_opaque);
-     void   (*fini_out)(HWVoiceOut *hw);
-     size_t (*write)   (HWVoiceOut *hw, void *buf, size_t size);
-+    /* get the optimal buffer size in samples; optional */
-+    size_t (*buffer_size_out)(HWVoiceOut *hw);
-     /*
-      * get a buffer that after later can be passed to put_buffer_out; optional
-      * returns the buffer, and writes it's size to size (in bytes)
-@@ -172,6 +172,7 @@ struct audio_pcm_ops {
-     int    (*init_in) (HWVoiceIn *hw, audsettings *as, void *drv_opaque);
-     void   (*fini_in) (HWVoiceIn *hw);
-     size_t (*read)    (HWVoiceIn *hw, void *buf, size_t size);
-+    size_t (*buffer_size_in)(HWVoiceIn *hw);
-     void  *(*get_buffer_in)(HWVoiceIn *hw, size_t *size);
-     void   (*put_buffer_in)(HWVoiceIn *hw, void *buf, size_t size);
-     int    (*ctl_in)  (HWVoiceIn *hw, int cmd, ...);
+-    if (!sw->hw->enabled) {
++    if (!hw->enabled) {
+         dolog ("Reading from disabled voice %s\n", SW_NAME (sw));
+         return 0;
+     }
+ 
+-    return audio_pcm_sw_read(sw, buf, size);
++    if (hw->s->dev->in->mixeng) {
++        return audio_pcm_sw_read(sw, buf, size);
++    } else {
++        return hw->pcm_ops->read(hw, buf, size);
++    }
+ }
+ 
+ int AUD_get_buffer_size_out (SWVoiceOut *sw)
+@@ -1087,6 +1101,26 @@ static void audio_run_out (AudioState *s)
+     HWVoiceOut *hw = NULL;
+     SWVoiceOut *sw;
+ 
++    if (!s->dev->out->mixeng) {
++        while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
++            /* there is exactly 1 sw for each hw with no mixeng */
++            sw = hw->sw_head.lh_first;
++
++            if (hw->pending_disable) {
++                hw->enabled = 0;
++                hw->pending_disable = 0;
++                if (hw->pcm_ops->enable_out) {
++                    hw->pcm_ops->enable_out(hw, false);
++                }
++            }
++
++            if (sw->active) {
++                sw->callback.fn(sw->callback.opaque, INT_MAX);
++            }
++        }
++        return;
++    }
++
+     while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
+         size_t played, live, prev_rpos, free;
+         int nb_live, cleanup_required;
+@@ -1224,6 +1258,17 @@ static void audio_run_in (AudioState *s)
+ {
+     HWVoiceIn *hw = NULL;
+ 
++    if (!s->dev->in->mixeng) {
++        while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
++            /* there is exactly 1 sw for each hw with no mixeng */
++            SWVoiceIn *sw = hw->sw_head.lh_first;
++            if (sw->active) {
++                sw->callback.fn(sw->callback.opaque, INT_MAX);
++            }
++        }
++        return;
++    }
++
+     while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
+         SWVoiceIn *sw;
+         size_t captured = 0, min;
+@@ -1717,6 +1762,11 @@ CaptureVoiceOut *AUD_add_capture(
+         s = audio_init(NULL, NULL);
+     }
+ 
++    if (!s->dev->out->mixeng) {
++        dolog("Can't capture with mixeng disabled\n");
++        goto err0;
++    }
++
+     if (audio_validate_settings (as)) {
+         dolog ("Invalid settings were passed when trying to add capture\n");
+         audio_print_settings (as);
+@@ -1875,9 +1925,13 @@ QemuOptsList qemu_audiodev_opts = {
+ static void validate_per_direction_opts(AudiodevPerDirectionOptions *pdo,
+                                         Error **errp)
+ {
++    if (!pdo->has_mixeng) {
++        pdo->has_mixeng = true;
++        pdo->mixeng = true;
++    }
+     if (!pdo->has_fixed_settings) {
+         pdo->has_fixed_settings = true;
+-        pdo->fixed_settings = true;
++        pdo->fixed_settings = pdo->mixeng;
+     }
+     if (!pdo->fixed_settings &&
+         (pdo->has_frequency || pdo->has_channels || pdo->has_format)) {
+@@ -1885,6 +1939,10 @@ static void validate_per_direction_opts(AudiodevPerDirectionOptions *pdo,
+                    "You can't use frequency, channels or format with fixed-settings=off");
+         return;
+     }
++    if (!pdo->mixeng && pdo->fixed_settings) {
++        error_setg(errp, "You can't use fixed-settings without mixeng");
++        return;
++    }
+ 
+     if (!pdo->has_frequency) {
+         pdo->has_frequency = true;
+@@ -1896,7 +1954,7 @@ static void validate_per_direction_opts(AudiodevPerDirectionOptions *pdo,
+     }
+     if (!pdo->has_voices) {
+         pdo->has_voices = true;
+-        pdo->voices = 1;
++        pdo->voices = pdo->mixeng ? 1 : INT_MAX;
+     }
+     if (!pdo->has_format) {
+         pdo->has_format = true;
 diff --git a/audio/audio_template.h b/audio/audio_template.h
-index 83ffc62183..07ce9ce51f 100644
+index 9ec565fc48..e5a4d6fa40 100644
 --- a/audio/audio_template.h
 +++ b/audio/audio_template.h
-@@ -78,7 +78,20 @@ static void glue (audio_pcm_hw_free_resources_, TYPE) (HW *hw)
+@@ -78,26 +78,32 @@ static void glue (audio_pcm_hw_free_resources_, TYPE) (HW *hw)
  
  static void glue(audio_pcm_hw_alloc_resources_, TYPE)(HW *hw)
  {
--    size_t samples = hw->samples;
-+    size_t samples;
-+    if (!hw->pcm_ops) {
-+        /*
-+         * We should only end up here when using wavcapture hmp command (and not
-+         * the wavcapture audio backend).
-+         * It needs a lot of samples, otherwise you'll end up with "Could not
-+         * mix X bytes into a capture buffer" warnings and a garbled capture.
-+         */
-+        samples = 4096 * 4;
-+    } else if (hw->pcm_ops->glue(buffer_size_, TYPE)) {
-+        samples = hw->pcm_ops->glue(buffer_size_, TYPE)(hw);
-+    } else {
-+        samples = 1024; /* todo better default */
-+    }
-     if (audio_bug(__func__, samples == 0)) {
-         dolog("Attempted to allocate empty buffer\n");
+-    size_t samples;
+-    if (!hw->pcm_ops) {
+-        /*
+-         * We should only end up here when using wavcapture hmp command (and not
+-         * the wavcapture audio backend).
+-         * It needs a lot of samples, otherwise you'll end up with "Could not
+-         * mix X bytes into a capture buffer" warnings and a garbled capture.
+-         */
+-        samples = 4096 * 4;
+-    } else if (hw->pcm_ops->glue(buffer_size_, TYPE)) {
+-        samples = hw->pcm_ops->glue(buffer_size_, TYPE)(hw);
++    if (hw->s->dev->TYPE->mixeng) {
++        size_t samples;
++        if (!hw->pcm_ops) {
++            /*
++             * We should only end up here when using wavcapture hmp command (and
++             * not the wavcapture audio backend).
++             * It needs a lot of samples, otherwise you'll end up with "Could
++             * not mix X bytes into a capture buffer" warnings and a garbled
++             * capture.
++             */
++            samples = 4096 * 4;
++        } else if (hw->pcm_ops->glue(buffer_size_, TYPE)) {
++            samples = hw->pcm_ops->glue(buffer_size_, TYPE)(hw);
++        } else {
++            samples = 1024; /* todo better default */
++        }
++
++        if (audio_bug(__func__, samples == 0)) {
++            dolog("Attempted to allocate empty buffer\n");
++        }
++
++        HWBUF = g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * samples);
++        HWBUF->size = samples;
+     } else {
+-        samples = 1024; /* todo better default */
++        HWBUF = NULL;
      }
-@@ -264,11 +277,6 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioState *s,
-         goto err0;
-     }
- 
--    if (audio_bug(__func__, hw->samples <= 0)) {
--        dolog("hw->samples=%zd\n", hw->samples);
--        goto err1;
+-    if (audio_bug(__func__, samples == 0)) {
+-        dolog("Attempted to allocate empty buffer\n");
 -    }
 -
- #ifdef DAC
-     hw->clip = mixeng_clip
- #else
-@@ -288,9 +296,7 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioState *s,
- #endif
-     return hw;
- 
-- err1:
--    glue (hw->pcm_ops->fini_, TYPE) (hw);
-- err0:
-+err0:
-     g_free (hw);
-     return NULL;
- }
-diff --git a/audio/coreaudio.c b/audio/coreaudio.c
-index a532e862dd..f4210d5784 100644
---- a/audio/coreaudio.c
-+++ b/audio/coreaudio.c
-@@ -43,6 +43,7 @@ typedef struct coreaudioVoiceOut {
-     UInt32 audioDevicePropertyBufferFrameSize;
-     AudioStreamBasicDescription outputStreamBasicDescription;
-     AudioDeviceIOProcID ioprocid;
-+    size_t samples;
- } coreaudioVoiceOut;
- 
- #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-@@ -557,7 +558,7 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
-                            "Could not get device buffer frame size\n");
-         return -1;
-     }
--    hw->samples = (pdo->has_buffer_count ? pdo->buffer_count : 4) *
-+    core->samples = (pdo->has_buffer_count ? pdo->buffer_count : 4) *
-         core->audioDevicePropertyBufferFrameSize;
- 
-     /* get StreamFormat */
-@@ -617,6 +618,12 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
-     return 0;
+-    HWBUF = g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * samples);
+-    HWBUF->size = samples;
  }
  
-+static size_t coreaudio_buffer_size_out(HWVoiceOut *hw)
-+{
-+    coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;
-+    return core->samples;
-+}
-+
- static void coreaudio_fini_out (HWVoiceOut *hw)
+ static void glue (audio_pcm_sw_free_resources_, TYPE) (SW *sw)
+@@ -116,6 +122,10 @@ static int glue (audio_pcm_sw_alloc_resources_, TYPE) (SW *sw)
  {
-     OSStatus status;
-@@ -693,6 +700,7 @@ static struct audio_pcm_ops coreaudio_pcm_ops = {
-     .init_out = coreaudio_init_out,
-     .fini_out = coreaudio_fini_out,
-     .write    = coreaudio_write,
-+    .buffer_size_out = coreaudio_buffer_size_out,
-     .get_buffer_out = coreaudio_get_buffer_out,
-     .put_buffer_out = coreaudio_put_buffer_out_nowrite,
-     .ctl_out  = coreaudio_ctl_out
-diff --git a/audio/dsound_template.h b/audio/dsound_template.h
-index ff5a1f85fd..6a10b6751b 100644
---- a/audio/dsound_template.h
-+++ b/audio/dsound_template.h
-@@ -254,7 +254,7 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-             );
-     }
-     hw->size_emul = bc.dwBufferBytes;
--    hw->samples = bc.dwBufferBytes >> hw->info.shift;
-+    ds->samples = bc.dwBufferBytes >> hw->info.shift;
-     ds->s = s;
+     int samples;
  
- #ifdef DEBUG_DSOUND
-@@ -268,6 +268,12 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-     return -1;
- }
- 
-+static size_t glue(dsound_buffer_size_, TYPE)(HWVOICE *hw)
-+{
-+    DSOUNDVOICE *ds = (DSOUNDVOICE *) hw;
-+    return ds->samples;
-+}
++    if (!sw->s->dev->TYPE->mixeng) {
++        return 0;
++    }
 +
- #undef NAME
- #undef NAME2
- #undef TYPE
-diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
-index 7b3266aaf3..be6b8d8889 100644
---- a/audio/dsoundaudio.c
-+++ b/audio/dsoundaudio.c
-@@ -54,12 +54,14 @@ typedef struct {
-     HWVoiceOut hw;
-     LPDIRECTSOUNDBUFFER dsound_buffer;
-     dsound *s;
-+    size_t samples;
- } DSoundVoiceOut;
+     samples = ((int64_t) sw->HWBUF->size << 32) / sw->ratio;
  
- typedef struct {
-     HWVoiceIn hw;
-     LPDIRECTSOUNDCAPTUREBUFFER dsound_capture_buffer;
-     dsound *s;
-+    size_t samples;
- } DSoundVoiceIn;
- 
- static void dsound_log_hresult (HRESULT hr)
-@@ -672,6 +674,7 @@ static struct audio_pcm_ops dsound_pcm_ops = {
-     .init_out = dsound_init_out,
-     .fini_out = dsound_fini_out,
-     .write    = audio_generic_write,
-+    .buffer_size_out = dsound_buffer_size_out,
-     .get_buffer_out = dsound_get_buffer_out,
-     .put_buffer_out = dsound_put_buffer_out,
-     .ctl_out  = dsound_ctl_out,
-@@ -679,6 +682,7 @@ static struct audio_pcm_ops dsound_pcm_ops = {
-     .init_in  = dsound_init_in,
-     .fini_in  = dsound_fini_in,
-     .read     = audio_generic_read,
-+    .buffer_size_in = dsound_buffer_size_in,
-     .get_buffer_in = dsound_get_buffer_in,
-     .put_buffer_in = dsound_put_buffer_in,
-     .ctl_in   = dsound_ctl_in
-diff --git a/audio/noaudio.c b/audio/noaudio.c
-index 6a3a1c418b..9b1dfb551d 100644
---- a/audio/noaudio.c
-+++ b/audio/noaudio.c
-@@ -58,7 +58,6 @@ static size_t no_write(HWVoiceOut *hw, void *buf, size_t len)
- static int no_init_out(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque)
- {
-     audio_pcm_init_info (&hw->info, as);
--    hw->samples = 1024;
-     return 0;
- }
- 
-@@ -77,7 +76,6 @@ static int no_ctl_out (HWVoiceOut *hw, int cmd, ...)
- static int no_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
- {
-     audio_pcm_init_info (&hw->info, as);
--    hw->samples = 1024;
-     return 0;
- }
- 
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index 08fe047f91..bc34e12de4 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -44,6 +44,7 @@ typedef struct OSSVoiceOut {
-     int nfrags;
-     int fragsize;
-     int mmapped;
-+    size_t samples;
-     Audiodev *dev;
- } OSSVoiceOut;
- 
-@@ -52,6 +53,7 @@ typedef struct OSSVoiceIn {
-     int fd;
-     int nfrags;
-     int fragsize;
-+    size_t samples;
-     Audiodev *dev;
- } OSSVoiceIn;
- 
-@@ -511,11 +513,11 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
-                obt.nfrags * obt.fragsize, hw->info.align + 1);
-     }
- 
--    hw->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
-+    oss->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
- 
-     oss->mmapped = 0;
-     if (oopts->has_try_mmap && oopts->try_mmap) {
--        hw->size_emul = hw->samples << hw->info.shift;
-+        hw->size_emul = oss->samples << hw->info.shift;
-         hw->buf_emul = mmap (
-             NULL,
-             hw->size_emul,
-@@ -563,6 +565,12 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
-     return 0;
- }
- 
-+static size_t oss_buffer_size_out(HWVoiceOut *hw)
-+{
-+    OSSVoiceOut *oss = (OSSVoiceOut *) hw;
-+    return oss->samples;
-+}
-+
- static int oss_ctl_out (HWVoiceOut *hw, int cmd, ...)
- {
-     int trig;
-@@ -658,13 +666,19 @@ static int oss_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-                obt.nfrags * obt.fragsize, hw->info.align + 1);
-     }
- 
--    hw->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
-+    oss->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
- 
-     oss->fd = fd;
-     oss->dev = dev;
-     return 0;
- }
- 
-+static size_t oss_buffer_size_in(HWVoiceIn *hw)
-+{
-+    OSSVoiceIn *oss = (OSSVoiceIn *) hw;
-+    return oss->samples;
-+}
-+
- static void oss_fini_in (HWVoiceIn *hw)
- {
-     OSSVoiceIn *oss = (OSSVoiceIn *) hw;
-@@ -753,6 +767,7 @@ static struct audio_pcm_ops oss_pcm_ops = {
-     .init_out = oss_init_out,
-     .fini_out = oss_fini_out,
-     .write    = oss_write,
-+    .buffer_size_out = oss_buffer_size_out,
-     .get_buffer_out = oss_get_buffer_out,
-     .put_buffer_out = oss_put_buffer_out,
-     .ctl_out  = oss_ctl_out,
-@@ -760,6 +775,7 @@ static struct audio_pcm_ops oss_pcm_ops = {
-     .init_in  = oss_init_in,
-     .fini_in  = oss_fini_in,
-     .read     = oss_read,
-+    .buffer_size_in = oss_buffer_size_in,
-     .ctl_in   = oss_ctl_in
- };
- 
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 392225c875..7cab3cff97 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -355,8 +355,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     }
- 
-     audio_pcm_init_info (&hw->info, &obt_as);
--    hw->samples = pa->samples = audio_buffer_samples(g->dev->out, &obt_as,
--                                                     46440);
-+    pa->samples = audio_buffer_samples(g->dev->out, &obt_as, 46440);
- 
-     return 0;
- 
-@@ -364,6 +363,13 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     return -1;
- }
- 
-+static size_t qpa_buffer_size_out(HWVoiceOut *hw)
-+{
-+    PAVoiceOut *pa = (PAVoiceOut *) hw;
-+    return pa->samples;
-+}
-+
-+
- static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
- {
-     int error;
-@@ -397,8 +403,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     }
- 
-     audio_pcm_init_info (&hw->info, &obt_as);
--    hw->samples = pa->samples = audio_buffer_samples(g->dev->in, &obt_as,
--                                                     46440);
-+    pa->samples = audio_buffer_samples(g->dev->in, &obt_as, 46440);
- 
-     return 0;
- 
-@@ -406,6 +411,12 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     return -1;
- }
- 
-+static size_t qpa_buffer_size_in(HWVoiceIn *hw)
-+{
-+    PAVoiceIn *pa = (PAVoiceIn *) hw;
-+    return pa->samples;
-+}
-+
- static void qpa_simple_disconnect(PAConnection *c, pa_stream *stream)
- {
-     int err;
-@@ -683,11 +694,13 @@ static struct audio_pcm_ops qpa_pcm_ops = {
-     .init_out = qpa_init_out,
-     .fini_out = qpa_fini_out,
-     .write    = qpa_write,
-+    .buffer_size_out = qpa_buffer_size_out,
-     .ctl_out  = qpa_ctl_out,
- 
-     .init_in  = qpa_init_in,
-     .fini_in  = qpa_fini_in,
-     .read     = qpa_read,
-+    .buffer_size_in = qpa_buffer_size_in,
-     .ctl_in   = qpa_ctl_in
- };
- 
-diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
-index 685cbc83b8..4df35ce31a 100644
---- a/audio/sdlaudio.c
-+++ b/audio/sdlaudio.c
-@@ -42,6 +42,7 @@
- 
- typedef struct SDLVoiceOut {
-     HWVoiceOut hw;
-+    size_t samples;
- } SDLVoiceOut;
- 
- static struct SDLAudioState {
-@@ -363,7 +364,7 @@ static int sdl_init_out(HWVoiceOut *hw, struct audsettings *as,
-     obt_as.endianness = endianness;
- 
-     audio_pcm_init_info (&hw->info, &obt_as);
--    hw->samples = obt.samples;
-+    sdl->samples = obt.samples;
- 
-     s->initialized = 1;
-     s->exit = 0;
-@@ -371,6 +372,12 @@ static int sdl_init_out(HWVoiceOut *hw, struct audsettings *as,
-     return 0;
- }
- 
-+static size_t sdl_buffer_size_out(HWVoiceOut *hw)
-+{
-+    SDLVoiceOut *sdl = (SDLVoiceOut *) hw;
-+    return sdl->samples;
-+}
-+
- static int sdl_ctl_out (HWVoiceOut *hw, int cmd, ...)
- {
-     (void) hw;
-@@ -439,6 +446,7 @@ static struct audio_pcm_ops sdl_pcm_ops = {
-     .init_out = sdl_init_out,
-     .fini_out = sdl_fini_out,
-     .write    = sdl_write,
-+    .buffer_size_out = sdl_buffer_size_out,
-     .get_buffer_out = sdl_get_buffer_out,
-     .put_buffer_out = sdl_put_buffer_out_nowrite,
-     .ctl_out  = sdl_ctl_out,
-diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index d1605d3939..709245e453 100644
---- a/audio/spiceaudio.c
-+++ b/audio/spiceaudio.c
-@@ -133,7 +133,6 @@ static int line_out_init(HWVoiceOut *hw, struct audsettings *as,
-     settings.endianness = AUDIO_HOST_ENDIANNESS;
- 
-     audio_pcm_init_info (&hw->info, &settings);
--    hw->samples = LINE_OUT_SAMPLES;
-     out->active = 0;
- 
-     out->sin.base.sif = &playback_sif.base;
-@@ -144,6 +143,11 @@ static int line_out_init(HWVoiceOut *hw, struct audsettings *as,
-     return 0;
- }
- 
-+static size_t line_out_buffer_size(HWVoiceOut *hw)
-+{
-+    return LINE_OUT_SAMPLES;
-+}
-+
- static void line_out_fini (HWVoiceOut *hw)
- {
-     SpiceVoiceOut *out = container_of (hw, SpiceVoiceOut, hw);
-@@ -248,7 +252,6 @@ static int line_in_init(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     settings.endianness = AUDIO_HOST_ENDIANNESS;
- 
-     audio_pcm_init_info (&hw->info, &settings);
--    hw->samples = LINE_IN_SAMPLES;
-     in->active = 0;
- 
-     in->sin.base.sif = &record_sif.base;
-@@ -259,6 +262,11 @@ static int line_in_init(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     return 0;
- }
- 
-+static size_t line_in_buffer_size(HWVoiceIn *hw)
-+{
-+    return LINE_IN_SAMPLES;
-+}
-+
- static void line_in_fini (HWVoiceIn *hw)
- {
-     SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
-@@ -329,6 +337,7 @@ static struct audio_pcm_ops audio_callbacks = {
-     .init_out = line_out_init,
-     .fini_out = line_out_fini,
-     .write    = audio_generic_write,
-+    .buffer_size_out = line_out_buffer_size,
-     .get_buffer_out = line_out_get_buffer,
-     .put_buffer_out = line_out_put_buffer,
-     .ctl_out  = line_out_ctl,
-@@ -336,6 +345,7 @@ static struct audio_pcm_ops audio_callbacks = {
-     .init_in  = line_in_init,
-     .fini_in  = line_in_fini,
-     .read     = line_in_read,
-+    .buffer_size_in = line_in_buffer_size,
-     .ctl_in   = line_in_ctl,
- };
- 
-diff --git a/audio/wavaudio.c b/audio/wavaudio.c
-index 31db03aadb..0a0e76d2d9 100644
---- a/audio/wavaudio.c
-+++ b/audio/wavaudio.c
-@@ -110,7 +110,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
-     wav_as.endianness = 0;
-     audio_pcm_init_info (&hw->info, &wav_as);
- 
--    hw->samples = 1024;
-     le_store (hdr + 22, hw->info.nchannels, 2);
-     le_store (hdr + 24, hw->info.freq, 4);
-     le_store (hdr + 28, hw->info.freq << (bits16 + stereo), 4);
+     sw->buf = audio_calloc(__func__, samples, sizeof(struct st_sample));
 -- 
 2.20.1
