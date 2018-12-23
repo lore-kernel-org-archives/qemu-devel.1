@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gb1oz-0002mN-Jq
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:21:26 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26M-0000jq-0H
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gb1ow-0002RC-Ez
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:21:25 -0500
-Resent-Message-Id: <E1gb1ow-0002RC-Ez@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gb1ow-0002PM-4U
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:21:22 -0500
-In-Reply-To: <20181214165657.749-1-rkagan@virtuozzo.com>
-Message-ID: <154556313749.18047.12433695608940809202@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 23 Dec 2018 03:05:39 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH 0/5] expose negotiated virtio features
- in r/o properties
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26J-0008Vi-JC
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:21 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Sun, 23 Dec 2018 11:38:56 +0000
+Message-Id: <20181223113859.3675-4-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20181223113859.3675-1-mark.cave-ayland@ilande.co.uk>
+References: <20181223113859.3675-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 3/6] target/ppc: rework vmul{e, o}{s, u}{b, h,
+ w} instructions to use Vsr* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +20,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rkagan@virtuozzo.com
-Cc: fam@euphon.net, qemu-devel@nongnu.orgfam@euphon.net, mst@redhat.com, amit@kernel.org, armbru@redhat.com, pbonzini@redhat.com, afaerber@suse.de
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxNDE2NTY1Ny43NDkt
-MS1ya2FnYW5AdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxODEyMTQxNjU2NTcuNzQ5LTEtcmthZ2FuQHZpcnR1
-b3p6by5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIFBBVENIIDAv
-NV0gZXhwb3NlIG5lZ290aWF0ZWQgdmlydGlvIGZlYXR1cmVzIGluIHIvbyBwcm9wZXJ0aWVzCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFs
-PSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29t
-bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4g
-JGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxv
-ZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9
-ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAg
-ICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQg
-JGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CmE3ODZiN2IgdmlydGlvOiBleHBvc2UgbmVnb3RpYXRlZCBmZWF0dXJlcyBpbiByL28gcHJvcGVy
-dGllcwowYzZiZjM4IHZpcnRpbzogZHJvcCBERUZJTkVfVklSVElPX0NPTU1PTl9GRUFUVVJFUwoz
-MmU4MzJkIHFkZXYtcHJvcGVydGllczogYWRkIHIvbyA2NGJpdCBiaXRmaWVsZCBwcm9wZXJ0eQo4
-NjQ3NWNmIHFtcDogZnVydGhlciBjb25zb2xpZGF0ZSBsaXN0aW5nIG9mIGRldmljZSBhbmQgb2Jq
-ZWN0IHByb3BlcnRpZXMKMDlmMTE2OSBxb206IHByZXNlcnZlIGdldC9zZXQgcHJlc2VuY2UgaW4g
-YWxpYXNlZCBwcm9wZXJ0aWVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
-LzU6IHFvbTogcHJlc2VydmUgZ2V0L3NldCBwcmVzZW5jZSBpbiBhbGlhc2VkIHByb3BlcnRpZXMu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMi81OiBxbXA6IGZ1cnRoZXIgY29uc29saWRhdGUgbGlzdGluZyBv
-ZiBkZXZpY2UgYW5kIG9iamVjdCBwcm9wZXJ0aWVzLi4uCkNoZWNraW5nIFBBVENIIDMvNTogcWRl
-di1wcm9wZXJ0aWVzOiBhZGQgci9vIDY0Yml0IGJpdGZpZWxkIHByb3BlcnR5Li4uCkNoZWNraW5n
-IFBBVENIIDQvNTogdmlydGlvOiBkcm9wIERFRklORV9WSVJUSU9fQ09NTU9OX0ZFQVRVUkVTLi4u
-CkNoZWNraW5nIFBBVENIIDUvNTogdmlydGlvOiBleHBvc2UgbmVnb3RpYXRlZCBmZWF0dXJlcyBp
-biByL28gcHJvcGVydGllcy4uLgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hv
-dWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMyMTg6IEZJTEU6IGluY2x1ZGUvaHcvdmly
-dGlvL3ZpcnRpby5oOjI2MToKKyNkZWZpbmUgREVGSU5FX1ZJUlRJT19GRUFUVVJFX0JJVChfbmFt
-ZSwgX3N0YXRlLCBfZmllbGQsIF9iaXQsIF9kZWZ2YWwpIFwKKyAgICBERUZJTkVfUFJPUF9CSVQ2
-NChfbmFtZSwgX3N0YXRlLCBfZmllbGQsIF9iaXQsIF9kZWZ2YWwpLCAgICAgICAgICAgIFwKKyAg
-ICBERUZJTkVfVklSVElPX0ZFQVRVUkVfQklUX05FR09USUFURUQoX25hbWUsIF9iaXQpCgp0b3Rh
-bDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE2NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE4MTIxNDE2NTY1Ny43NDktMS1ya2FnYW5AdmlydHVvenpv
-LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+The current implementations make use of the endian-specific macros HI_IDX and
+LO_IDX directly to calculate array offsets.
+
+Rework the implementation to use the Vsr* macros so that these per-endian
+references can be removed.
+
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ target/ppc/int_helper.c | 48 +++++++++++++++++++++++++++---------------------
+ 1 file changed, 27 insertions(+), 21 deletions(-)
+
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index f084a706ee..dc5c9fb8d8 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -1118,33 +1118,39 @@ void helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+     }
+ }
+ 
+-#define VMUL_DO(name, mul_element, prod_element, cast, evenp)           \
++#define VMUL_DO_EVN(name, mul_element, mul_access, prod_access, cast)   \
+     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
+     {                                                                   \
+         int i;                                                          \
+                                                                         \
+-        VECTOR_FOR_INORDER_I(i, prod_element) {                         \
+-            if (evenp) {                                                \
+-                r->prod_element[i] =                                    \
+-                    (cast)a->mul_element[i * 2 + HI_IDX] *              \
+-                    (cast)b->mul_element[i * 2 + HI_IDX];               \
+-            } else {                                                    \
+-                r->prod_element[i] =                                    \
+-                    (cast)a->mul_element[i * 2 + LO_IDX] *              \
+-                    (cast)b->mul_element[i * 2 + LO_IDX];               \
+-            }                                                           \
++        for (i = 0; i < ARRAY_SIZE(r->mul_element); i += 2) {           \
++            r->prod_access(i >> 1) = (cast)a->mul_access(i) *           \
++                                     (cast)b->mul_access(i);            \
++        }                                                               \
++    }
++
++#define VMUL_DO_ODD(name, mul_element, mul_access, prod_access, cast)   \
++    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
++    {                                                                   \
++        int i;                                                          \
++                                                                        \
++        for (i = 0; i < ARRAY_SIZE(r->mul_element); i += 2) {           \
++            r->prod_access(i >> 1) = (cast)a->mul_access(i + 1) *       \
++                                     (cast)b->mul_access(i + 1);        \
+         }                                                               \
+     }
+-#define VMUL(suffix, mul_element, prod_element, cast)            \
+-    VMUL_DO(mule##suffix, mul_element, prod_element, cast, 1)    \
+-    VMUL_DO(mulo##suffix, mul_element, prod_element, cast, 0)
+-VMUL(sb, s8, s16, int16_t)
+-VMUL(sh, s16, s32, int32_t)
+-VMUL(sw, s32, s64, int64_t)
+-VMUL(ub, u8, u16, uint16_t)
+-VMUL(uh, u16, u32, uint32_t)
+-VMUL(uw, u32, u64, uint64_t)
+-#undef VMUL_DO
++
++#define VMUL(suffix, mul_element, mul_access, prod_access, cast)       \
++    VMUL_DO_EVN(mule##suffix, mul_element, mul_access, prod_access, cast)  \
++    VMUL_DO_ODD(mulo##suffix, mul_element, mul_access, prod_access, cast)
++VMUL(sb, s8, VsrSB, VsrSH, int16_t)
++VMUL(sh, s16, VsrSH, VsrSW, int32_t)
++VMUL(sw, s32, VsrSW, VsrSD, int64_t)
++VMUL(ub, u8, VsrB, VsrH, uint16_t)
++VMUL(uh, u16, VsrH, VsrW, uint32_t)
++VMUL(uw, u32, VsrW, VsrD, uint64_t)
++#undef VMUL_DO_EVN
++#undef VMUL_DO_ODD
+ #undef VMUL
+ 
+ void helper_vperm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b,
+-- 
+2.11.0
