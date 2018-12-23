@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52688)
+Received: from eggs.gnu.org ([208.118.235.92]:52536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkJ-0008Sg-U1
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:12 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkA-0008CS-QB
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkJ-0003qO-5H
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:11 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36985)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk9-0003G0-H4
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:02 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:50633)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAkI-0003gk-Ll
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:10 -0500
-Received: by mail-wr1-x444.google.com with SMTP id s12so10091412wrt.4
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:09 -0800 (PST)
+	id 1gbAk9-0003DS-A4
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:01 -0500
+Received: by mail-wm1-x336.google.com with SMTP id n190so9881731wmd.0
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:01 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:24 +0100
-Message-Id: <62b2383050d51d0901322a10ea70eda298d60a5a.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:52:13 +0100
+Message-Id: <4a336338eda1c3f6b8d27003d840373ada76a099.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 48/52] audio: basic support for multichannel
- audio
+Subject: [Qemu-devel] [PATCH v2 37/52] wavaudio: port to the new audio
+ backend api
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,45 +34,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Which currently only means removing some checks.  Old code won't require
-more than two channels, but new code will need it.
-
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/alsaaudio.c | 7 -------
- audio/audio.c     | 2 +-
- 2 files changed, 1 insertion(+), 8 deletions(-)
+ audio/wavaudio.c | 54 ++++++++----------------------------------------
+ 1 file changed, 9 insertions(+), 45 deletions(-)
 
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index 418b888a57..063531b743 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -498,13 +498,6 @@ static int alsa_open(bool in, struct alsa_params_req *req,
-         goto err;
-     }
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index 58300663ff..31db03aadb 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -34,52 +34,28 @@ typedef struct WAVVoiceOut {
+     HWVoiceOut hw;
+     FILE *f;
+     int64_t old_ticks;
+-    void *pcm_buf;
+     int total_samples;
+ } WAVVoiceOut;
  
--    if (nchannels != 1 && nchannels != 2) {
--        alsa_logerr2 (err, typ,
--                      "Can not handle obtained number of channels %d\n",
--                      nchannels);
--        goto err;
+-static int wav_run_out (HWVoiceOut *hw, int live)
++static size_t wav_write_out(HWVoiceOut *hw, void *buf, size_t len)
+ {
+     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
+-    int rpos, decr, samples;
+-    uint8_t *dst;
+-    struct st_sample *src;
+     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     int64_t ticks = now - wav->old_ticks;
+     int64_t bytes =
+         muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
+ 
+-    if (bytes > INT_MAX) {
+-        samples = INT_MAX >> hw->info.shift;
+-    }
+-    else {
+-        samples = bytes >> hw->info.shift;
 -    }
 -
-     if (pdo->buffer_count) {
-         if (pdo->buffer_len) {
-             int64_t req = pdo->buffer_len * pdo->buffer_count;
-diff --git a/audio/audio.c b/audio/audio.c
-index ee508c1f15..782e4ed1c7 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -241,7 +241,7 @@ static int audio_validate_settings (struct audsettings *as)
- {
-     int invalid;
++    bytes = MIN(bytes, len);
++    bytes = bytes >> hw->info.shift << hw->info.shift;
+     wav->old_ticks = now;
+-    decr = MIN (live, samples);
+-    samples = decr;
+-    rpos = hw->rpos;
+-    while (samples) {
+-        int left_till_end_samples = hw->samples - rpos;
+-        int convert_samples = MIN (samples, left_till_end_samples);
  
--    invalid = as->nchannels != 1 && as->nchannels != 2;
-+    invalid = as->nchannels < 1;
-     invalid |= as->endianness != 0 && as->endianness != 1;
+-        src = hw->mix_buf + rpos;
+-        dst = advance (wav->pcm_buf, rpos << hw->info.shift);
+-
+-        hw->clip (dst, src, convert_samples);
+-        if (fwrite (dst, convert_samples << hw->info.shift, 1, wav->f) != 1) {
+-            dolog ("wav_run_out: fwrite of %d bytes failed\nReaons: %s\n",
+-                   convert_samples << hw->info.shift, strerror (errno));
+-        }
+-
+-        rpos = (rpos + convert_samples) % hw->samples;
+-        samples -= convert_samples;
+-        wav->total_samples += convert_samples;
++    if (bytes && fwrite(buf, bytes, 1, wav->f) != 1) {
++        dolog("wav_write_out: fwrite of %zu bytes failed\nReaons: %s\n",
++              bytes, strerror(errno));
+     }
  
-     switch (as->fmt) {
+-    hw->rpos = rpos;
+-    return decr;
++    wav->total_samples += bytes >> hw->info.shift;
++    return bytes;
+ }
+ 
+ /* VICE code: Store number as little endian. */
+@@ -135,13 +111,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+     audio_pcm_init_info (&hw->info, &wav_as);
+ 
+     hw->samples = 1024;
+-    wav->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+-    if (!wav->pcm_buf) {
+-        dolog("Could not allocate buffer (%zu bytes)\n",
+-              hw->samples << hw->info.shift);
+-        return -1;
+-    }
+-
+     le_store (hdr + 22, hw->info.nchannels, 2);
+     le_store (hdr + 24, hw->info.freq, 4);
+     le_store (hdr + 28, hw->info.freq << (bits16 + stereo), 4);
+@@ -151,8 +120,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+     if (!wav->f) {
+         dolog ("Failed to open wave file `%s'\nReason: %s\n",
+                wav_path, strerror(errno));
+-        g_free (wav->pcm_buf);
+-        wav->pcm_buf = NULL;
+         return -1;
+     }
+ 
+@@ -206,9 +173,6 @@ static void wav_fini_out (HWVoiceOut *hw)
+                wav->f, strerror (errno));
+     }
+     wav->f = NULL;
+-
+-    g_free (wav->pcm_buf);
+-    wav->pcm_buf = NULL;
+ }
+ 
+ static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
+@@ -232,7 +196,7 @@ static void wav_audio_fini (void *opaque)
+ static struct audio_pcm_ops wav_pcm_ops = {
+     .init_out = wav_init_out,
+     .fini_out = wav_fini_out,
+-    .run_out  = wav_run_out,
++    .write    = wav_write_out,
+     .ctl_out  = wav_ctl_out,
+ };
+ 
 -- 
 2.20.1
