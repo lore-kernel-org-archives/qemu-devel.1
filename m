@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52748)
+Received: from eggs.gnu.org ([208.118.235.92]:35150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAka-0000ZI-Gu
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:29 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gbDUi-0000li-Pb
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 18:49:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkY-0004ni-K4
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:27 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38256)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gbDUa-0000C0-Na
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 18:49:14 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32954)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAkV-0003t7-8E
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:25 -0500
-Received: by mail-wr1-x442.google.com with SMTP id v13so10103762wrw.5
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:12 -0800 (PST)
-From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
-	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:28 +0100
-Message-Id: <1415d73f73787a48532cc6cdd3c2a5a0c2e02e2f.1545598229.git.DirtY.iCE.hu@gmail.com>
-In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gbDUZ-0000AZ-10
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 18:49:07 -0500
+Received: by mail-wr1-x441.google.com with SMTP id c14so10309014wrr.0
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 15:49:06 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
+	<11a6562f583531e5a5473716bea44ee3ae7be120.1545598229.git.DirtY.iCE.hu@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <66e793ef-dd32-eb81-14f5-cf59ca8c73bb@amsat.org>
+Date: Mon, 24 Dec 2018 00:49:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <11a6562f583531e5a5473716bea44ee3ae7be120.1545598229.git.DirtY.iCE.hu@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 52/52] usbaudio: change playback counters to
- 64 bit
+Subject: Re: [Qemu-devel] [PATCH v2 23/52] audio: remove audio_MIN, audio_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>
 
-With stereo playback, they need about 375 minutes of continuous audio
-playback to overflow, which is usually not a problem (as stopping and
-later resuming playback resets the counters).  But with 7.1 audio, they
-only need about 95 minutes to overflow.
+Hi Zoltán,
 
-After the overflow, the buf->prod % USBAUDIO_PACKET_SIZE(channels)
-assertion no longer holds true, which will result in overflowing the
-buffer.  With 64 bit variables, it would take about 762000 years to
-overflow.
+On 12/23/18 9:51 PM, Kővágó, Zoltán wrote:
+> There's already a MIN and MAX macro in include/qemu/osdep.h, use them
+> instead.
+> 
+> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
+> 
+> ---
+> 
+> Changes from v1:
+> * removed audio_MIN, audio_MAX macros
+> ---
+[...]>
+> diff --git a/audio/audio.h b/audio/audio.h
+> index ccfef9e10a..bcbe56d639 100644
+> --- a/audio/audio.h
+> +++ b/audio/audio.h
+> @@ -148,23 +148,6 @@ static inline void *advance (void *p, int incr)
+>      return (d + incr);
+>  }
+>  
+> -#ifdef __GNUC__
+> -#define audio_MIN(a, b) ( __extension__ ({      \
+> -    __typeof (a) ta = a;                        \
+> -    __typeof (b) tb = b;                        \
+> -    ((ta)>(tb)?(tb):(ta));                      \
+> -}))
+> -
+> -#define audio_MAX(a, b) ( __extension__ ({      \
+> -    __typeof (a) ta = a;                        \
+> -    __typeof (b) tb = b;                        \
+> -    ((ta)<(tb)?(tb):(ta));                      \
+> -}))
+> -#else
+> -#define audio_MIN(a, b) ((a)>(b)?(b):(a))
+> -#define audio_MAX(a, b) ((a)<(b)?(b):(a))
+> -#endif
+> -
 
-Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
----
- hw/usb/dev-audio.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Those MIN/MAX are smarter than the ones in "qemu/osdep.h", I'd keep them
+moving them there.
 
-diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
-index 29475a2b70..45ffc3ebb3 100644
---- a/hw/usb/dev-audio.c
-+++ b/hw/usb/dev-audio.c
-@@ -577,9 +577,9 @@ static const USBDesc desc_audio_multi = {
- 
- struct streambuf {
-     uint8_t *data;
--    uint32_t size;
--    uint32_t prod;
--    uint32_t cons;
-+    size_t size;
-+    uint64_t prod;
-+    uint64_t cons;
- };
- 
- static void streambuf_init(struct streambuf *buf, uint32_t size,
-@@ -600,12 +600,14 @@ static void streambuf_fini(struct streambuf *buf)
- 
- static int streambuf_put(struct streambuf *buf, USBPacket *p, uint32_t channels)
- {
--    uint32_t free = buf->size - (buf->prod - buf->cons);
-+    uint64_t free = buf->size - (buf->prod - buf->cons);
- 
-     if (free < USBAUDIO_PACKET_SIZE(channels)) {
-         return 0;
-     }
- 
-+    /* can happen if prod overflows */
-+    assert(buf->prod % USBAUDIO_PACKET_SIZE(channels) == 0);
-     usb_packet_copy(p, buf->data + (buf->prod % buf->size),
-                     USBAUDIO_PACKET_SIZE(channels));
-     buf->prod += USBAUDIO_PACKET_SIZE(channels);
-@@ -614,7 +616,7 @@ static int streambuf_put(struct streambuf *buf, USBPacket *p, uint32_t channels)
- 
- static uint8_t *streambuf_get(struct streambuf *buf, size_t *len)
- {
--    uint32_t used = buf->prod - buf->cons;
-+    uint64_t used = buf->prod - buf->cons;
-     uint8_t *data;
- 
-     if (!used) {
--- 
-2.20.1
+Regards,
+
+Phil.
