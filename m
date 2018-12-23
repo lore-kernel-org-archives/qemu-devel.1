@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52650)
+Received: from eggs.gnu.org ([208.118.235.92]:52657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkH-0008O3-Dx
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:10 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkI-0008P0-0i
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkG-0003df-27
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkG-0003ew-C8
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:09 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45127)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34912)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAkF-0003WH-OC
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:07 -0500
-Received: by mail-wr1-x441.google.com with SMTP id t6so10091170wrr.12
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:06 -0800 (PST)
+	id 1gbAkG-0003bb-2s
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:08 -0500
+Received: by mail-wr1-x441.google.com with SMTP id 96so10115297wrb.2
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:08 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:20 +0100
-Message-Id: <03189c11f5216339f472d06925582a8e20e7b21b.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:52:22 +0100
+Message-Id: <6f033fb593404b7c292cf626242e34559c3e7905.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 44/52] audio: make mixeng optional
+Subject: [Qemu-devel] [PATCH v2 46/52] audio: support more than two channels
+ in volume setting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,226 +34,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Implementation of the previously added mixeng option.
-
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio.c          | 70 ++++++++++++++++++++++++++++++++++++++----
- audio/audio_template.h | 46 ++++++++++++++++-----------
- 2 files changed, 92 insertions(+), 24 deletions(-)
+ audio/audio.c      | 28 ++++++++++++++++++++--------
+ audio/audio.h      | 10 ++++++++++
+ audio/audio_int.h  |  4 ++--
+ audio/paaudio.c    | 20 ++++++++++++--------
+ audio/spiceaudio.c | 14 ++++++++------
+ 5 files changed, 52 insertions(+), 24 deletions(-)
 
 diff --git a/audio/audio.c b/audio/audio.c
-index 7ba939560a..26ce25989f 100644
+index 26ce25989f..71744fa2c8 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -840,32 +840,46 @@ static void audio_timer (void *opaque)
-  */
- size_t AUD_write(SWVoiceOut *sw, void *buf, size_t size)
- {
-+    HWVoiceOut *hw;
-+
-     if (!sw) {
-         /* XXX: Consider options */
-         return size;
-     }
-+    hw = sw->hw;
- 
--    if (!sw->hw->enabled) {
-+    if (!hw->enabled) {
-         dolog ("Writing to disabled voice %s\n", SW_NAME (sw));
-         return 0;
-     }
- 
--    return audio_pcm_sw_write(sw, buf, size);
-+    if (hw->s->dev->out->mixeng) {
-+        return audio_pcm_sw_write(sw, buf, size);
-+    } else {
-+        return hw->pcm_ops->write(hw, buf, size);
-+    }
+@@ -1880,31 +1880,43 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
  }
  
- size_t AUD_read(SWVoiceIn *sw, void *buf, size_t size)
- {
-+    HWVoiceIn *hw;
+ void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol)
++{
++    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
++    audio_set_volume_out(sw, &vol);
++}
 +
-     if (!sw) {
-         /* XXX: Consider options */
-         return size;
-     }
-+    hw = sw->hw;
++void audio_set_volume_out(SWVoiceOut *sw, Volume *vol)
+ {
+     if (sw) {
+         HWVoiceOut *hw = sw->hw;
  
--    if (!sw->hw->enabled) {
-+    if (!hw->enabled) {
-         dolog ("Reading from disabled voice %s\n", SW_NAME (sw));
-         return 0;
-     }
+-        sw->vol.mute = mute;
+-        sw->vol.l = nominal_volume.l * lvol / 255;
+-        sw->vol.r = nominal_volume.r * rvol / 255;
++        sw->vol.mute = vol->mute;
++        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
++        sw->vol.r = nominal_volume.l * vol->vol[vol->channels > 1 ? 1 : 0] / 255;
  
--    return audio_pcm_sw_read(sw, buf, size);
-+    if (hw->s->dev->in->mixeng) {
-+        return audio_pcm_sw_read(sw, buf, size);
-+    } else {
-+        return hw->pcm_ops->read(hw, buf, size);
-+    }
+         if (hw->pcm_ops->volume_out) {
+-            hw->pcm_ops->volume_out(hw, &sw->vol);
++            hw->pcm_ops->volume_out(hw, vol);
+         }
+     }
  }
  
- int AUD_get_buffer_size_out (SWVoiceOut *sw)
-@@ -1087,6 +1101,26 @@ static void audio_run_out (AudioState *s)
-     HWVoiceOut *hw = NULL;
-     SWVoiceOut *sw;
- 
-+    if (!s->dev->out->mixeng) {
-+        while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
-+            /* there is exactly 1 sw for each hw with no mixeng */
-+            sw = hw->sw_head.lh_first;
+ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
++{
++    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
++    audio_set_volume_in(sw, &vol);
++}
 +
-+            if (hw->pending_disable) {
-+                hw->enabled = 0;
-+                hw->pending_disable = 0;
-+                if (hw->pcm_ops->enable_out) {
-+                    hw->pcm_ops->enable_out(hw, false);
-+                }
-+            }
-+
-+            if (sw->active) {
-+                sw->callback.fn(sw->callback.opaque, INT_MAX);
-+            }
-+        }
-+        return;
-+    }
-+
-     while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
-         size_t played, live, prev_rpos, free;
-         int nb_live, cleanup_required;
-@@ -1224,6 +1258,17 @@ static void audio_run_in (AudioState *s)
++void audio_set_volume_in(SWVoiceIn *sw, Volume *vol)
  {
-     HWVoiceIn *hw = NULL;
+     if (sw) {
+         HWVoiceIn *hw = sw->hw;
  
-+    if (!s->dev->in->mixeng) {
-+        while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
-+            /* there is exactly 1 sw for each hw with no mixeng */
-+            SWVoiceIn *sw = hw->sw_head.lh_first;
-+            if (sw->active) {
-+                sw->callback.fn(sw->callback.opaque, INT_MAX);
-+            }
-+        }
-+        return;
-+    }
-+
-     while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
-         SWVoiceIn *sw;
-         size_t captured = 0, min;
-@@ -1717,6 +1762,11 @@ CaptureVoiceOut *AUD_add_capture(
-         s = audio_init(NULL, NULL);
-     }
+-        sw->vol.mute = mute;
+-        sw->vol.l = nominal_volume.l * lvol / 255;
+-        sw->vol.r = nominal_volume.r * rvol / 255;
++        sw->vol.mute = vol->mute;
++        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
++        sw->vol.r = nominal_volume.r * vol->vol[vol->channels > 1 ? 1 : 0] / 255;
  
-+    if (!s->dev->out->mixeng) {
-+        dolog("Can't capture with mixeng disabled\n");
-+        goto err0;
-+    }
-+
-     if (audio_validate_settings (as)) {
-         dolog ("Invalid settings were passed when trying to add capture\n");
-         audio_print_settings (as);
-@@ -1875,9 +1925,13 @@ QemuOptsList qemu_audiodev_opts = {
- static void validate_per_direction_opts(AudiodevPerDirectionOptions *pdo,
-                                         Error **errp)
- {
-+    if (!pdo->has_mixeng) {
-+        pdo->has_mixeng = true;
-+        pdo->mixeng = true;
-+    }
-     if (!pdo->has_fixed_settings) {
-         pdo->has_fixed_settings = true;
--        pdo->fixed_settings = true;
-+        pdo->fixed_settings = pdo->mixeng;
+         if (hw->pcm_ops->volume_in) {
+-            hw->pcm_ops->volume_in(hw, &sw->vol);
++            hw->pcm_ops->volume_in(hw, vol);
+         }
      }
-     if (!pdo->fixed_settings &&
-         (pdo->has_frequency || pdo->has_channels || pdo->has_format)) {
-@@ -1885,6 +1939,10 @@ static void validate_per_direction_opts(AudiodevPerDirectionOptions *pdo,
-                    "You can't use frequency, channels or format with fixed-settings=off");
-         return;
-     }
-+    if (!pdo->mixeng && pdo->fixed_settings) {
-+        error_setg(errp, "You can't use fixed-settings without mixeng");
-+        return;
-+    }
+ }
+diff --git a/audio/audio.h b/audio/audio.h
+index bfb12e7531..911365cebd 100644
+--- a/audio/audio.h
++++ b/audio/audio.h
+@@ -125,6 +125,16 @@ uint64_t AUD_get_elapsed_usec_out (SWVoiceOut *sw, QEMUAudioTimeStamp *ts);
+ void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol);
+ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol);
  
-     if (!pdo->has_frequency) {
-         pdo->has_frequency = true;
-@@ -1896,7 +1954,7 @@ static void validate_per_direction_opts(AudiodevPerDirectionOptions *pdo,
-     }
-     if (!pdo->has_voices) {
-         pdo->has_voices = true;
--        pdo->voices = 1;
-+        pdo->voices = pdo->mixeng ? 1 : INT_MAX;
-     }
-     if (!pdo->has_format) {
-         pdo->has_format = true;
-diff --git a/audio/audio_template.h b/audio/audio_template.h
-index 9ec565fc48..e5a4d6fa40 100644
---- a/audio/audio_template.h
-+++ b/audio/audio_template.h
-@@ -78,26 +78,32 @@ static void glue (audio_pcm_hw_free_resources_, TYPE) (HW *hw)
++#define AUDIO_MAX_CHANNELS 16
++typedef struct Volume {
++    bool mute;
++    int channels;
++    uint8_t vol[AUDIO_MAX_CHANNELS];
++} Volume;
++
++void audio_set_volume_out(SWVoiceOut *sw, Volume *vol);
++void audio_set_volume_in(SWVoiceIn *sw, Volume *vol);
++
+ SWVoiceIn *AUD_open_in (
+     QEMUSoundCard *card,
+     SWVoiceIn *sw,
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index a5ead07998..c2f6da5cc2 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -165,7 +165,7 @@ struct audio_pcm_ops {
+      */
+     size_t (*put_buffer_out)(HWVoiceOut *hw, void *buf, size_t size);
+     void   (*enable_out)(HWVoiceOut *hw, bool enable);
+-    void   (*volume_out)(HWVoiceOut *hw, struct mixeng_volume *vol);
++    void   (*volume_out)(HWVoiceOut *hw, Volume *vol);
  
- static void glue(audio_pcm_hw_alloc_resources_, TYPE)(HW *hw)
- {
--    size_t samples;
--    if (!hw->pcm_ops) {
--        /*
--         * We should only end up here when using wavcapture hmp command (and not
--         * the wavcapture audio backend).
--         * It needs a lot of samples, otherwise you'll end up with "Could not
--         * mix X bytes into a capture buffer" warnings and a garbled capture.
--         */
--        samples = 4096 * 4;
--    } else if (hw->pcm_ops->glue(buffer_size_, TYPE)) {
--        samples = hw->pcm_ops->glue(buffer_size_, TYPE)(hw);
-+    if (hw->s->dev->TYPE->mixeng) {
-+        size_t samples;
-+        if (!hw->pcm_ops) {
-+            /*
-+             * We should only end up here when using wavcapture hmp command (and
-+             * not the wavcapture audio backend).
-+             * It needs a lot of samples, otherwise you'll end up with "Could
-+             * not mix X bytes into a capture buffer" warnings and a garbled
-+             * capture.
-+             */
-+            samples = 4096 * 4;
-+        } else if (hw->pcm_ops->glue(buffer_size_, TYPE)) {
-+            samples = hw->pcm_ops->glue(buffer_size_, TYPE)(hw);
-+        } else {
-+            samples = 1024; /* todo better default */
-+        }
-+
-+        if (audio_bug(__func__, samples == 0)) {
-+            dolog("Attempted to allocate empty buffer\n");
-+        }
-+
-+        HWBUF = g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * samples);
-+        HWBUF->size = samples;
-     } else {
--        samples = 1024; /* todo better default */
-+        HWBUF = NULL;
+     int    (*init_in) (HWVoiceIn *hw, audsettings *as, void *drv_opaque);
+     void   (*fini_in) (HWVoiceIn *hw);
+@@ -174,7 +174,7 @@ struct audio_pcm_ops {
+     void  *(*get_buffer_in)(HWVoiceIn *hw, size_t *size);
+     void   (*put_buffer_in)(HWVoiceIn *hw, void *buf, size_t size);
+     void   (*enable_in)(HWVoiceIn *hw, bool enable);
+-    void   (*volume_in)(HWVoiceIn *hw, struct mixeng_volume *vol);
++    void   (*volume_in)(HWVoiceIn *hw, Volume *vol);
+ };
+ 
+ void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size);
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index e8556e7a9d..3b4b29b38f 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -537,20 +537,22 @@ static void qpa_fini_in (HWVoiceIn *hw)
      }
--    if (audio_bug(__func__, samples == 0)) {
--        dolog("Attempted to allocate empty buffer\n");
--    }
--
--    HWBUF = g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * samples);
--    HWBUF->size = samples;
  }
  
- static void glue (audio_pcm_sw_free_resources_, TYPE) (SW *sw)
-@@ -116,6 +122,10 @@ static int glue (audio_pcm_sw_alloc_resources_, TYPE) (SW *sw)
+-static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
++static void qpa_volume_out(HWVoiceOut *hw, Volume *vol)
  {
-     int samples;
+     PAVoiceOut *pa = (PAVoiceOut *) hw;
+     pa_operation *op;
+     pa_cvolume v;
+     PAConnection *c = pa->g->conn;
++    int i;
  
-+    if (!sw->s->dev->TYPE->mixeng) {
-+        return 0;
+ #ifdef PA_CHECK_VERSION    /* macro is present in 0.9.16+ */
+     pa_cvolume_init (&v);  /* function is present in 0.9.13+ */
+ #endif
+ 
+-    v.channels = 2;
+-    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
+-    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
++    v.channels = vol->channels;
++    for (i = 0; i < vol->channels; ++i) {
++        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
 +    }
-+
-     samples = ((int64_t) sw->HWBUF->size << 32) / sw->ratio;
  
-     sw->buf = audio_calloc(__func__, samples, sizeof(struct st_sample));
+     pa_threaded_mainloop_lock(c->mainloop);
+ 
+@@ -577,20 +579,22 @@ static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
+     pa_threaded_mainloop_unlock(c->mainloop);
+ }
+ 
+-static void qpa_volume_in(HWVoiceIn *hw, struct mixeng_volume *vol)
++static void qpa_volume_in(HWVoiceIn *hw, Volume *vol)
+ {
+     PAVoiceIn *pa = (PAVoiceIn *) hw;
+     pa_operation *op;
+     pa_cvolume v;
+     PAConnection *c = pa->g->conn;
++    int i;
+ 
+ #ifdef PA_CHECK_VERSION
+     pa_cvolume_init (&v);
+ #endif
+ 
+-    v.channels = 2;
+-    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
+-    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
++    v.channels = vol->channels;
++    for (i = 0; i < vol->channels; ++i) {
++        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
++    }
+ 
+     pa_threaded_mainloop_lock(c->mainloop);
+ 
+diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
+index 771ecacf27..b26d10434b 100644
+--- a/audio/spiceaudio.c
++++ b/audio/spiceaudio.c
+@@ -179,13 +179,14 @@ static void line_out_enable(HWVoiceOut *hw, bool enable)
+ }
+ 
+ #if ((SPICE_INTERFACE_PLAYBACK_MAJOR >= 1) && (SPICE_INTERFACE_PLAYBACK_MINOR >= 2))
+-static void line_out_volume(HWVoiceOut *hw, struct mixeng_volume *vol)
++static void line_out_volume(HWVoiceOut *hw, Volume *vol)
+ {
+     SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
+     uint16_t svol[2];
+ 
+-    svol[0] = vol->l / ((1ULL << 16) + 1);
+-    svol[1] = vol->r / ((1ULL << 16) + 1);
++    assert(vol->channels == 2);
++    svol[0] = vol->vol[0] * 257;
++    svol[1] = vol->vol[1] * 257;
+     spice_server_playback_set_volume(&out->sin, 2, svol);
+     spice_server_playback_set_mute(&out->sin, vol->mute);
+ }
+@@ -266,13 +267,14 @@ static void line_in_enable(HWVoiceIn *hw, bool enable)
+ }
+ 
+ #if ((SPICE_INTERFACE_RECORD_MAJOR >= 2) && (SPICE_INTERFACE_RECORD_MINOR >= 2))
+-static void line_in_volume(HWVoiceIn *hw, struct mixeng_volume *vol)
++static void line_in_volume(HWVoiceIn *hw, Volume *vol)
+ {
+     SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
+     uint16_t svol[2];
+ 
+-    svol[0] = vol->l / ((1ULL << 16) + 1);
+-    svol[1] = vol->r / ((1ULL << 16) + 1);
++    assert(vol->channels == 2);
++    svol[0] = vol->vol[0] * 257;
++    svol[1] = vol->vol[1] * 257;
+     spice_server_record_set_volume(&in->sin, 2, svol);
+     spice_server_record_set_mute(&in->sin, vol->mute);
+ }
 -- 
 2.20.1
