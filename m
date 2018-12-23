@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26O-0000kT-0z
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:25 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26V-0000qk-Ly
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26K-00005K-2p
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:23 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26T-0000GN-S4
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:31 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 23 Dec 2018 11:38:57 +0000
-Message-Id: <20181223113859.3675-5-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 23 Dec 2018 11:38:59 +0000
+Message-Id: <20181223113859.3675-7-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20181223113859.3675-1-mark.cave-ayland@ilande.co.uk>
 References: <20181223113859.3675-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 4/6] target/ppc: eliminate use of HI_IDX and
- LO_IDX macros from int_helper.c
+Subject: [Qemu-devel] [PATCH 6/6] target/ppc: remove various
+ HOST_WORDS_BIGENDIAN hacks in int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,478 +22,413 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
-The original purpose of these macros was to correctly reference the high and low
-parts of the VSRs regardless of the host endianness.
-
-Replace these direct references to high and low parts with the relevant VsrD
-macro instead, and completely remove the now-unused HI_IDX and LO_IDX macros.
+Following on from the previous work, there are numerous endian-related hacks
+in int_helper.c that can now be replaced with Vsr* macros.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- target/ppc/int_helper.c | 180 +++++++++++++++++++++++-------------------------
- 1 file changed, 85 insertions(+), 95 deletions(-)
+ target/ppc/int_helper.c | 205 +++++++++++++++++-------------------------------
+ 1 file changed, 70 insertions(+), 135 deletions(-)
 
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index dc5c9fb8d8..addbe54c21 100644
+index 4cc7fdfd25..0d97eb9383 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -389,14 +389,6 @@ target_ulong helper_602_mfrom(target_ulong arg)
- /*****************************************************************************/
- /* Altivec extension helpers */
- #if defined(HOST_WORDS_BIGENDIAN)
--#define HI_IDX 0
--#define LO_IDX 1
--#else
--#define HI_IDX 1
--#define LO_IDX 0
--#endif
--
+@@ -443,8 +443,8 @@ void helper_lvsl(ppc_avr_t *r, target_ulong sh)
+ {
+     int i, j = (sh & 0xf);
+ 
+-    VECTOR_FOR_INORDER_I(i, u8) {
+-        r->u8[i] = j++;
++    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
++        r->VsrB(i) = j++;
+     }
+ }
+ 
+@@ -452,18 +452,14 @@ void helper_lvsr(ppc_avr_t *r, target_ulong sh)
+ {
+     int i, j = 0x10 - (sh & 0xf);
+ 
+-    VECTOR_FOR_INORDER_I(i, u8) {
+-        r->u8[i] = j++;
++    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
++        r->VsrB(i) = j++;
+     }
+ }
+ 
+ void helper_mtvscr(CPUPPCState *env, ppc_avr_t *r)
+ {
 -#if defined(HOST_WORDS_BIGENDIAN)
- #define VECTOR_FOR_INORDER_I(index, element)                    \
-     for (index = 0; index < ARRAY_SIZE(r->element); index++)
- #else
-@@ -514,8 +506,8 @@ void helper_vprtybq(ppc_avr_t *r, ppc_avr_t *b)
-     res ^= res >> 32;
-     res ^= res >> 16;
-     res ^= res >> 8;
--    r->u64[LO_IDX] = res & 1;
--    r->u64[HI_IDX] = 0;
-+    r->VsrD(1) = res & 1;
-+    r->VsrD(0) = 0;
+-    env->vscr = r->u32[3];
+-#else
+-    env->vscr = r->u32[0];
+-#endif
++    env->vscr = r->VsrW(3);
+     set_flush_to_zero(vscr_nj, &env->vec_status);
  }
  
- #define VARITH_DO(name, op, element)                                    \
-@@ -1243,8 +1235,8 @@ void helper_vbpermq(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+@@ -870,8 +866,8 @@ target_ulong helper_vclzlsbb(ppc_avr_t *r)
+ {
+     target_ulong count = 0;
+     int i;
+-    VECTOR_FOR_INORDER_I(i, u8) {
+-        if (r->u8[i] & 0x01) {
++    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
++        if (r->VsrB(i) & 0x01) {
+             break;
+         }
+         count++;
+@@ -883,12 +879,8 @@ target_ulong helper_vctzlsbb(ppc_avr_t *r)
+ {
+     target_ulong count = 0;
+     int i;
+-#if defined(HOST_WORDS_BIGENDIAN)
+     for (i = ARRAY_SIZE(r->u8) - 1; i >= 0; i--) {
+-#else
+-    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
+-#endif
+-        if (r->u8[i] & 0x01) {
++        if (r->VsrB(i) & 0x01) {
+             break;
+         }
+         count++;
+@@ -1151,18 +1143,14 @@ void helper_vperm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b,
+     ppc_avr_t result;
+     int i;
+ 
+-    VECTOR_FOR_INORDER_I(i, u8) {
+-        int s = c->u8[i] & 0x1f;
+-#if defined(HOST_WORDS_BIGENDIAN)
++    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
++        int s = c->VsrB(i) & 0x1f;
+         int index = s & 0xf;
+-#else
+-        int index = 15 - (s & 0xf);
+-#endif
+ 
+         if (s & 0x10) {
+-            result.u8[i] = b->u8[index];
++            result.VsrB(i) = b->VsrB(index);
+         } else {
+-            result.u8[i] = a->u8[index];
++            result.VsrB(i) = a->VsrB(index);
          }
      }
+     *r = result;
+@@ -1174,18 +1162,14 @@ void helper_vpermr(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b,
+     ppc_avr_t result;
+     int i;
  
--    r->u64[HI_IDX] = perm;
--    r->u64[LO_IDX] = 0;
-+    r->VsrD(0) = perm;
-+    r->VsrD(1) = 0;
- }
+-    VECTOR_FOR_INORDER_I(i, u8) {
+-        int s = c->u8[i] & 0x1f;
+-#if defined(HOST_WORDS_BIGENDIAN)
++    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
++        int s = c->VsrB(i) & 0x1f;
+         int index = 15 - (s & 0xf);
+-#else
+-        int index = s & 0xf;
+-#endif
  
- #undef VBPERMQ_INDEX
-@@ -1573,25 +1565,25 @@ void helper_vpmsumd(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-     ppc_avr_t prod[2];
- 
-     VECTOR_FOR_INORDER_I(i, u64) {
--        prod[i].u64[LO_IDX] = prod[i].u64[HI_IDX] = 0;
-+        prod[i].VsrD(1) = prod[i].VsrD(0) = 0;
-         for (j = 0; j < 64; j++) {
-             if (a->u64[i] & (1ull<<j)) {
-                 ppc_avr_t bshift;
-                 if (j == 0) {
--                    bshift.u64[HI_IDX] = 0;
--                    bshift.u64[LO_IDX] = b->u64[i];
-+                    bshift.VsrD(0) = 0;
-+                    bshift.VsrD(1) = b->u64[i];
-                 } else {
--                    bshift.u64[HI_IDX] = b->u64[i] >> (64-j);
--                    bshift.u64[LO_IDX] = b->u64[i] << j;
-+                    bshift.VsrD(0) = b->u64[i] >> (64 - j);
-+                    bshift.VsrD(1) = b->u64[i] << j;
-                 }
--                prod[i].u64[LO_IDX] ^= bshift.u64[LO_IDX];
--                prod[i].u64[HI_IDX] ^= bshift.u64[HI_IDX];
-+                prod[i].VsrD(1) ^= bshift.VsrD(1);
-+                prod[i].VsrD(0) ^= bshift.VsrD(0);
-             }
+         if (s & 0x10) {
+-            result.u8[i] = a->u8[index];
++            result.VsrB(i) = a->VsrB(index);
+         } else {
+-            result.u8[i] = b->u8[index];
++            result.VsrB(i) = b->VsrB(index);
          }
      }
+     *r = result;
+@@ -1882,25 +1866,14 @@ void helper_vsldoi(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t shift)
+     int i;
+     ppc_avr_t result;
  
--    r->u64[LO_IDX] = prod[0].u64[LO_IDX] ^ prod[1].u64[LO_IDX];
--    r->u64[HI_IDX] = prod[0].u64[HI_IDX] ^ prod[1].u64[HI_IDX];
-+    r->VsrD(1) = prod[0].VsrD(1) ^ prod[1].VsrD(1);
-+    r->VsrD(0) = prod[0].VsrD(0) ^ prod[1].VsrD(0);
- #endif
+-#if defined(HOST_WORDS_BIGENDIAN)
+     for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
+         int index = sh + i;
+         if (index > 0xf) {
+-            result.u8[i] = b->u8[index - 0x10];
+-        } else {
+-            result.u8[i] = a->u8[index];
+-        }
+-    }
+-#else
+-    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
+-        int index = (16 - sh) + i;
+-        if (index > 0xf) {
+-            result.u8[i] = a->u8[index - 0x10];
++            result.VsrB(i) = b->VsrB(index - 0x10);
+         } else {
+-            result.u8[i] = b->u8[index];
++            result.VsrB(i) = a->VsrB(index);
+         }
+     }
+-#endif
+     *r = result;
  }
  
-@@ -1809,7 +1801,7 @@ VEXTU_X_DO(vextuwrx, 32, 0)
- #define VSHIFT(suffix, leftp)                                           \
-     void helper_vs##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)    \
+@@ -1919,25 +1892,20 @@ void helper_vslo(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+ 
+ /* Experimental testing shows that hardware masks the immediate.  */
+ #define _SPLAT_MASKED(element) (splat & (ARRAY_SIZE(r->element) - 1))
+-#if defined(HOST_WORDS_BIGENDIAN)
+ #define SPLAT_ELEMENT(element) _SPLAT_MASKED(element)
+-#else
+-#define SPLAT_ELEMENT(element)                                  \
+-    (ARRAY_SIZE(r->element) - 1 - _SPLAT_MASKED(element))
+-#endif
+-#define VSPLT(suffix, element)                                          \
++#define VSPLT(suffix, element, access)                                  \
+     void helper_vsplt##suffix(ppc_avr_t *r, ppc_avr_t *b, uint32_t splat) \
      {                                                                   \
--        int shift = b->u8[LO_IDX*15] & 0x7;                             \
-+        int shift = b->VsrB(15) & 0x7;                                  \
-         int doit = 1;                                                   \
+-        uint32_t s = b->element[SPLAT_ELEMENT(element)];                \
++        uint32_t s = b->access(SPLAT_ELEMENT(element));                 \
          int i;                                                          \
                                                                          \
-@@ -1820,15 +1812,15 @@ VEXTU_X_DO(vextuwrx, 32, 0)
-             if (shift == 0) {                                           \
-                 *r = *a;                                                \
-             } else if (leftp) {                                         \
--                uint64_t carry = a->u64[LO_IDX] >> (64 - shift);        \
-+                uint64_t carry = a->VsrD(1) >> (64 - shift);            \
-                                                                         \
--                r->u64[HI_IDX] = (a->u64[HI_IDX] << shift) | carry;     \
--                r->u64[LO_IDX] = a->u64[LO_IDX] << shift;               \
-+                r->VsrD(0) = (a->VsrD(0) << shift) | carry;             \
-+                r->VsrD(1) = a->VsrD(1) << shift;                       \
-             } else {                                                    \
--                uint64_t carry = a->u64[HI_IDX] << (64 - shift);        \
-+                uint64_t carry = a->VsrD(0) << (64 - shift);            \
-                                                                         \
--                r->u64[LO_IDX] = (a->u64[LO_IDX] >> shift) | carry;     \
--                r->u64[HI_IDX] = a->u64[HI_IDX] >> shift;               \
-+                r->VsrD(1) = (a->VsrD(1) >> shift) | carry;             \
-+                r->VsrD(0) = a->VsrD(0) >> shift;                       \
-             }                                                           \
+         for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
+-            r->element[i] = s;                                          \
++            r->access(i) = s;                                           \
          }                                                               \
      }
-@@ -1914,7 +1906,7 @@ void helper_vsldoi(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t shift)
+-VSPLT(b, u8)
+-VSPLT(h, u16)
+-VSPLT(w, u32)
++VSPLT(b, u8, VsrB)
++VSPLT(h, u16, VsrH)
++VSPLT(w, u32, VsrW)
+ #undef VSPLT
+ #undef SPLAT_ELEMENT
+ #undef _SPLAT_MASKED
+@@ -1998,17 +1966,10 @@ void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
+     getVSR(xbn, &xb, env);
+     memset(&xt, 0, sizeof(xt));
  
- void helper_vslo(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
- {
--    int sh = (b->u8[LO_IDX*0xf] >> 3) & 0xf;
-+    int sh = (b->VsrB(0xf) >> 3) & 0xf;
+-#if defined(HOST_WORDS_BIGENDIAN)
+     ext_index = index;
+     for (i = 0; i < es; i++, ext_index++) {
+-        xt.u8[8 - es + i] = xb.u8[ext_index % 16];
+-    }
+-#else
+-    ext_index = 15 - index;
+-    for (i = es - 1; i >= 0; i--, ext_index--) {
+-        xt.u8[8 + i] = xb.u8[ext_index % 16];
++        xt.VsrB(8 - es + i) = xb.VsrB(ext_index % 16);
+     }
+-#endif
  
- #if defined(HOST_WORDS_BIGENDIAN)
-     memmove(&r->u8[0], &a->u8[sh], 16 - sh);
-@@ -2110,7 +2102,7 @@ VSR(d, u64, 0x3F)
+     putVSR(xtn, &xt, env);
+ }
+@@ -2023,46 +1984,39 @@ void helper_xxinsertw(CPUPPCState *env, target_ulong xtn,
+     getVSR(xbn, &xb, env);
+     getVSR(xtn, &xt, env);
  
- void helper_vsro(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
- {
--    int sh = (b->u8[LO_IDX * 0xf] >> 3) & 0xf;
-+    int sh = (b->VsrB(0xf) >> 3) & 0xf;
+-#if defined(HOST_WORDS_BIGENDIAN)
+     ins_index = index;
+     for (i = 0; i < es && ins_index < 16; i++, ins_index++) {
+-        xt.u8[ins_index] = xb.u8[8 - es + i];
+-    }
+-#else
+-    ins_index = 15 - index;
+-    for (i = es - 1; i >= 0 && ins_index >= 0; i--, ins_index--) {
+-        xt.u8[ins_index] = xb.u8[8 + i];
++        xt.VsrB(ins_index) = xb.VsrB(8 - es + i);
+     }
+-#endif
  
- #if defined(HOST_WORDS_BIGENDIAN)
-     memmove(&r->u8[sh], &a->u8[0], 16 - sh);
-@@ -2366,13 +2358,13 @@ static inline void avr_qw_not(ppc_avr_t *t, ppc_avr_t a)
- 
- static int avr_qw_cmpu(ppc_avr_t a, ppc_avr_t b)
- {
--    if (a.u64[HI_IDX] < b.u64[HI_IDX]) {
-+    if (a.VsrD(0) < b.VsrD(0)) {
-         return -1;
--    } else if (a.u64[HI_IDX] > b.u64[HI_IDX]) {
-+    } else if (a.VsrD(0) > b.VsrD(0)) {
-         return 1;
--    } else if (a.u64[LO_IDX] < b.u64[LO_IDX]) {
-+    } else if (a.VsrD(1) < b.VsrD(1)) {
-         return -1;
--    } else if (a.u64[LO_IDX] > b.u64[LO_IDX]) {
-+    } else if (a.VsrD(1) > b.VsrD(1)) {
-         return 1;
-     } else {
-         return 0;
-@@ -2381,17 +2373,17 @@ static int avr_qw_cmpu(ppc_avr_t a, ppc_avr_t b)
- 
- static void avr_qw_add(ppc_avr_t *t, ppc_avr_t a, ppc_avr_t b)
- {
--    t->u64[LO_IDX] = a.u64[LO_IDX] + b.u64[LO_IDX];
--    t->u64[HI_IDX] = a.u64[HI_IDX] + b.u64[HI_IDX] +
--                     (~a.u64[LO_IDX] < b.u64[LO_IDX]);
-+    t->VsrD(1) = a.VsrD(1) + b.VsrD(1);
-+    t->VsrD(0) = a.VsrD(0) + b.VsrD(0) +
-+                     (~a.VsrD(1) < b.VsrD(1));
+     putVSR(xtn, &xt, env);
  }
  
- static int avr_qw_addc(ppc_avr_t *t, ppc_avr_t a, ppc_avr_t b)
- {
-     ppc_avr_t not_a;
--    t->u64[LO_IDX] = a.u64[LO_IDX] + b.u64[LO_IDX];
--    t->u64[HI_IDX] = a.u64[HI_IDX] + b.u64[HI_IDX] +
--                     (~a.u64[LO_IDX] < b.u64[LO_IDX]);
-+    t->VsrD(1) = a.VsrD(1) + b.VsrD(1);
-+    t->VsrD(0) = a.VsrD(0) + b.VsrD(0) +
-+                     (~a.VsrD(1) < b.VsrD(1));
-     avr_qw_not(&not_a, a);
-     return avr_qw_cmpu(not_a, b) < 0;
+-#define VEXT_SIGNED(name, element, mask, cast, recast)              \
++#define VEXT_SIGNED(name, element, access, mask, cast, recast)      \
+ void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
+ {                                                                   \
+     int i;                                                          \
+-    VECTOR_FOR_INORDER_I(i, element) {                              \
+-        r->element[i] = (recast)((cast)(b->element[i] & mask));     \
++    for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
++        r->access(i) = (recast)((cast)(b->access(i) & mask));       \
+     }                                                               \
  }
-@@ -2413,11 +2405,11 @@ void helper_vaddeuqm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-     r->u128 = a->u128 + b->u128 + (c->u128 & 1);
- #else
+-VEXT_SIGNED(vextsb2w, s32, UINT8_MAX, int8_t, int32_t)
+-VEXT_SIGNED(vextsb2d, s64, UINT8_MAX, int8_t, int64_t)
+-VEXT_SIGNED(vextsh2w, s32, UINT16_MAX, int16_t, int32_t)
+-VEXT_SIGNED(vextsh2d, s64, UINT16_MAX, int16_t, int64_t)
+-VEXT_SIGNED(vextsw2d, s64, UINT32_MAX, int32_t, int64_t)
++VEXT_SIGNED(vextsb2w, s32, VsrSW, UINT8_MAX, int8_t, int32_t)
++VEXT_SIGNED(vextsb2d, s64, VsrSD, UINT8_MAX, int8_t, int64_t)
++VEXT_SIGNED(vextsh2w, s32, VsrSW, UINT16_MAX, int16_t, int32_t)
++VEXT_SIGNED(vextsh2d, s64, VsrSD, UINT16_MAX, int16_t, int64_t)
++VEXT_SIGNED(vextsw2d, s64, VsrSD, UINT32_MAX, int32_t, int64_t)
+ #undef VEXT_SIGNED
  
--    if (c->u64[LO_IDX] & 1) {
-+    if (c->VsrD(1) & 1) {
-         ppc_avr_t tmp;
- 
--        tmp.u64[HI_IDX] = 0;
--        tmp.u64[LO_IDX] = c->u64[LO_IDX] & 1;
-+        tmp.VsrD(0) = 0;
-+        tmp.VsrD(1) = c->VsrD(1) & 1;
-         avr_qw_add(&tmp, *a, tmp);
-         avr_qw_add(r, tmp, *b);
-     } else {
-@@ -2435,8 +2427,8 @@ void helper_vaddcuq(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
- 
-     avr_qw_not(&not_a, *a);
- 
--    r->u64[HI_IDX] = 0;
--    r->u64[LO_IDX] = (avr_qw_cmpu(not_a, *b) < 0);
-+    r->VsrD(0) = 0;
-+    r->VsrD(1) = (avr_qw_cmpu(not_a, *b) < 0);
- #endif
+-#define VNEG(name, element)                                         \
++#define VNEG(name, element, access)                                 \
+ void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
+ {                                                                   \
+     int i;                                                          \
+-    VECTOR_FOR_INORDER_I(i, element) {                              \
+-        r->element[i] = -b->element[i];                             \
++    for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
++        r->access(i) = -b->access(i);                               \
+     }                                                               \
  }
+-VNEG(vnegw, s32)
+-VNEG(vnegd, s64)
++VNEG(vnegw, s32, VsrSW)
++VNEG(vnegd, s64, VsrSD)
+ #undef VNEG
  
-@@ -2451,7 +2443,7 @@ void helper_vaddecuq(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-     r->u128 = carry_out;
- #else
+ #define VSPLTI(suffix, element, splat_type)                     \
+@@ -2129,17 +2083,13 @@ void helper_vsumsws(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+     ppc_avr_t result;
+     int sat = 0;
  
--    int carry_in = c->u64[LO_IDX] & 1;
-+    int carry_in = c->VsrD(1) & 1;
-     int carry_out = 0;
-     ppc_avr_t tmp;
- 
-@@ -2461,8 +2453,8 @@ void helper_vaddecuq(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-         ppc_avr_t one = QW_ONE;
-         carry_out = avr_qw_addc(&tmp, tmp, one);
+-#if defined(HOST_WORDS_BIGENDIAN)
+-    upper = ARRAY_SIZE(r->s32)-1;
+-#else
+-    upper = 0;
+-#endif
+-    t = (int64_t)b->s32[upper];
++    upper = ARRAY_SIZE(r->s32) - 1;
++    t = (int64_t)b->VsrSW(upper);
+     for (i = 0; i < ARRAY_SIZE(r->s32); i++) {
+-        t += a->s32[i];
+-        result.s32[i] = 0;
++        t += a->VsrSW(i);
++        result.VsrSW(i) = 0;
      }
--    r->u64[HI_IDX] = 0;
--    r->u64[LO_IDX] = carry_out;
-+    r->VsrD(0) = 0;
-+    r->VsrD(1) = carry_out;
- #endif
- }
+-    result.s32[upper] = cvtsdsw(t, &sat);
++    result.VsrSW(upper) = cvtsdsw(t, &sat);
+     *r = result;
  
-@@ -2490,8 +2482,8 @@ void helper_vsubeuqm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-     avr_qw_not(&tmp, *b);
-     avr_qw_add(&sum, *a, tmp);
+     if (sat) {
+@@ -2153,19 +2103,15 @@ void helper_vsum2sws(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+     ppc_avr_t result;
+     int sat = 0;
  
--    tmp.u64[HI_IDX] = 0;
--    tmp.u64[LO_IDX] = c->u64[LO_IDX] & 1;
-+    tmp.VsrD(0) = 0;
-+    tmp.VsrD(1) = c->VsrD(1) & 1;
-     avr_qw_add(r, sum, tmp);
- #endif
- }
-@@ -2507,10 +2499,10 @@ void helper_vsubcuq(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-         ppc_avr_t tmp;
-         avr_qw_not(&tmp, *b);
-         avr_qw_add(&tmp, *a, tmp);
--        carry = ((tmp.s64[HI_IDX] == -1ull) && (tmp.s64[LO_IDX] == -1ull));
-+        carry = ((tmp.VsrSD(0) == -1ull) && (tmp.VsrSD(1) == -1ull));
-     }
--    r->u64[HI_IDX] = 0;
--    r->u64[LO_IDX] = carry;
-+    r->VsrD(0) = 0;
-+    r->VsrD(1) = carry;
- #endif
- }
+-#if defined(HOST_WORDS_BIGENDIAN)
+     upper = 1;
+-#else
+-    upper = 0;
+-#endif
+     for (i = 0; i < ARRAY_SIZE(r->u64); i++) {
+-        int64_t t = (int64_t)b->s32[upper + i * 2];
++        int64_t t = (int64_t)b->VsrSW(upper + i * 2);
  
-@@ -2521,17 +2513,17 @@ void helper_vsubecuq(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-         (~a->u128 < ~b->u128) ||
-         ((c->u128 & 1) && (a->u128 + ~b->u128 == (__uint128_t)-1));
- #else
--    int carry_in = c->u64[LO_IDX] & 1;
-+    int carry_in = c->VsrD(1) & 1;
-     int carry_out = (avr_qw_cmpu(*a, *b) > 0);
-     if (!carry_out && carry_in) {
-         ppc_avr_t tmp;
-         avr_qw_not(&tmp, *b);
-         avr_qw_add(&tmp, *a, tmp);
--        carry_out = ((tmp.u64[HI_IDX] == -1ull) && (tmp.u64[LO_IDX] == -1ull));
-+        carry_out = ((tmp.VsrD(0) == -1ull) && (tmp.VsrD(1) == -1ull));
-     }
- 
--    r->u64[HI_IDX] = 0;
--    r->u64[LO_IDX] = carry_out;
-+    r->VsrD(0) = 0;
-+    r->VsrD(1) = carry_out;
- #endif
- }
- 
-@@ -2629,7 +2621,7 @@ static bool bcd_is_valid(ppc_avr_t *bcd)
- 
- static int bcd_cmp_zero(ppc_avr_t *bcd)
- {
--    if (bcd->u64[HI_IDX] == 0 && (bcd->u64[LO_IDX] >> 4) == 0) {
-+    if (bcd->VsrD(0) == 0 && (bcd->VsrD(1) >> 4) == 0) {
-         return CRF_EQ;
-     } else {
-         return (bcd_get_sgn(bcd) == 1) ? CRF_GT : CRF_LT;
-@@ -2749,7 +2741,7 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     }
- 
-     if (unlikely(invalid)) {
--        result.u64[HI_IDX] = result.u64[LO_IDX] = -1;
-+        result.VsrD(0) = result.VsrD(1) = -1;
-         cr = CRF_SO;
-     } else if (overflow) {
-         cr |= CRF_SO;
-@@ -2818,7 +2810,7 @@ uint32_t helper_bcdctn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     int invalid = (sgnb == 0);
-     ppc_avr_t ret = { .u64 = { 0, 0 } };
- 
--    int ox_flag = (b->u64[HI_IDX] != 0) || ((b->u64[LO_IDX] >> 32) != 0);
-+    int ox_flag = (b->VsrD(0) != 0) || ((b->VsrD(1) >> 32) != 0);
- 
-     for (i = 1; i < 8; i++) {
-         set_national_digit(&ret, 0x30 + bcd_get_digit(b, i, &invalid), i);
-@@ -2898,7 +2890,7 @@ uint32_t helper_bcdctz(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     int invalid = (sgnb == 0);
-     ppc_avr_t ret = { .u64 = { 0, 0 } };
- 
--    int ox_flag = ((b->u64[HI_IDX] >> 4) != 0);
-+    int ox_flag = ((b->VsrD(0) >> 4) != 0);
- 
-     for (i = 0; i < 16; i++) {
-         digit = bcd_get_digit(b, i + 1, &invalid);
-@@ -2939,13 +2931,13 @@ uint32_t helper_bcdcfsq(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     uint64_t hi_value;
-     ppc_avr_t ret = { .u64 = { 0, 0 } };
- 
--    if (b->s64[HI_IDX] < 0) {
--        lo_value = -b->s64[LO_IDX];
--        hi_value = ~b->u64[HI_IDX] + !lo_value;
-+    if (b->VsrSD(0) < 0) {
-+        lo_value = -b->VsrSD(1);
-+        hi_value = ~b->VsrD(0) + !lo_value;
-         bcd_put_digit(&ret, 0xD, 0);
-     } else {
--        lo_value = b->u64[LO_IDX];
--        hi_value = b->u64[HI_IDX];
-+        lo_value = b->VsrD(1);
-+        hi_value = b->VsrD(0);
-         bcd_put_digit(&ret, bcd_preferred_sgn(0, ps), 0);
-     }
- 
-@@ -2993,11 +2985,11 @@ uint32_t helper_bcdctsq(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     }
- 
-     if (sgnb == -1) {
--        r->s64[LO_IDX] = -lo_value;
--        r->s64[HI_IDX] = ~hi_value + !r->s64[LO_IDX];
-+        r->VsrSD(1) = -lo_value;
-+        r->VsrSD(0) = ~hi_value + !r->VsrSD(1);
-     } else {
--        r->s64[LO_IDX] = lo_value;
--        r->s64[HI_IDX] = hi_value;
-+        r->VsrSD(1) = lo_value;
-+        r->VsrSD(0) = hi_value;
-     }
- 
-     cr = bcd_cmp_zero(b);
-@@ -3057,7 +3049,7 @@ uint32_t helper_bcds(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     bool ox_flag = false;
-     int sgnb = bcd_get_sgn(b);
-     ppc_avr_t ret = *b;
--    ret.u64[LO_IDX] &= ~0xf;
-+    ret.VsrD(1) &= ~0xf;
- 
-     if (bcd_is_valid(b) == false) {
-         return CRF_SO;
-@@ -3070,9 +3062,9 @@ uint32_t helper_bcds(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     }
- 
-     if (i > 0) {
--        ulshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4, &ox_flag);
-+        ulshift(&ret.VsrD(1), &ret.VsrD(0), i * 4, &ox_flag);
-     } else {
--        urshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], -i * 4);
-+        urshift(&ret.VsrD(1), &ret.VsrD(0), -i * 4);
-     }
-     bcd_put_digit(&ret, bcd_preferred_sgn(sgnb, ps), 0);
- 
-@@ -3109,13 +3101,13 @@ uint32_t helper_bcdus(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
- #endif
-     if (i >= 32) {
-         ox_flag = true;
--        ret.u64[LO_IDX] = ret.u64[HI_IDX] = 0;
-+        ret.VsrD(1) = ret.VsrD(0) = 0;
-     } else if (i <= -32) {
--        ret.u64[LO_IDX] = ret.u64[HI_IDX] = 0;
-+        ret.VsrD(1) = ret.VsrD(0) = 0;
-     } else if (i > 0) {
--        ulshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4, &ox_flag);
-+        ulshift(&ret.VsrD(1), &ret.VsrD(0), i * 4, &ox_flag);
-     } else {
--        urshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], -i * 4);
-+        urshift(&ret.VsrD(1), &ret.VsrD(0), -i * 4);
-     }
-     *r = ret;
- 
-@@ -3135,7 +3127,7 @@ uint32_t helper_bcdsr(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     bool ox_flag = false;
-     int sgnb = bcd_get_sgn(b);
-     ppc_avr_t ret = *b;
--    ret.u64[LO_IDX] &= ~0xf;
-+    ret.VsrD(1) &= ~0xf;
- 
- #if defined(HOST_WORDS_BIGENDIAN)
-     int i = a->s8[7];
-@@ -3156,9 +3148,9 @@ uint32_t helper_bcdsr(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     }
- 
-     if (i > 0) {
--        ulshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4, &ox_flag);
-+        ulshift(&ret.VsrD(1), &ret.VsrD(0), i * 4, &ox_flag);
-     } else {
--        urshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], -i * 4);
-+        urshift(&ret.VsrD(1), &ret.VsrD(0), -i * 4);
- 
-         if (bcd_get_digit(&ret, 0, &invalid) >= 5) {
-             bcd_add_mag(&ret, &ret, &bcd_one, &invalid, &unused);
-@@ -3192,19 +3184,19 @@ uint32_t helper_bcdtrunc(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
- 
-     if (i > 16 && i < 32) {
-         mask = (uint64_t)-1 >> (128 - i * 4);
--        if (ret.u64[HI_IDX] & ~mask) {
-+        if (ret.VsrD(0) & ~mask) {
-             ox_flag = CRF_SO;
+-        result.u64[i] = 0;
++        result.VsrW(i) = 0;
+         for (j = 0; j < ARRAY_SIZE(r->u64); j++) {
+-            t += a->s32[2 * i + j];
++            t += a->VsrSW(2 * i + j);
          }
- 
--        ret.u64[HI_IDX] &= mask;
-+        ret.VsrD(0) &= mask;
-     } else if (i >= 0 && i <= 16) {
-         mask = (uint64_t)-1 >> (64 - i * 4);
--        if (ret.u64[HI_IDX] || (ret.u64[LO_IDX] & ~mask)) {
-+        if (ret.VsrD(0) || (ret.VsrD(1) & ~mask)) {
-             ox_flag = CRF_SO;
-         }
- 
--        ret.u64[LO_IDX] &= mask;
--        ret.u64[HI_IDX] = 0;
-+        ret.VsrD(1) &= mask;
-+        ret.VsrD(0) = 0;
-     }
-     bcd_put_digit(&ret, bcd_preferred_sgn(bcd_get_sgn(b), ps), 0);
-     *r = ret;
-@@ -3235,28 +3227,28 @@ uint32_t helper_bcdutrunc(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
- #endif
-     if (i > 16 && i < 33) {
-         mask = (uint64_t)-1 >> (128 - i * 4);
--        if (ret.u64[HI_IDX] & ~mask) {
-+        if (ret.VsrD(0) & ~mask) {
-             ox_flag = CRF_SO;
-         }
- 
--        ret.u64[HI_IDX] &= mask;
-+        ret.VsrD(0) &= mask;
-     } else if (i > 0 && i <= 16) {
-         mask = (uint64_t)-1 >> (64 - i * 4);
--        if (ret.u64[HI_IDX] || (ret.u64[LO_IDX] & ~mask)) {
-+        if (ret.VsrD(0) || (ret.VsrD(1) & ~mask)) {
-             ox_flag = CRF_SO;
-         }
- 
--        ret.u64[LO_IDX] &= mask;
--        ret.u64[HI_IDX] = 0;
-+        ret.VsrD(1) &= mask;
-+        ret.VsrD(0) = 0;
-     } else if (i == 0) {
--        if (ret.u64[HI_IDX] || ret.u64[LO_IDX]) {
-+        if (ret.VsrD(0) || ret.VsrD(1)) {
-             ox_flag = CRF_SO;
-         }
--        ret.u64[HI_IDX] = ret.u64[LO_IDX] = 0;
-+        ret.VsrD(0) = ret.VsrD(1) = 0;
+-        result.s32[upper + i * 2] = cvtsdsw(t, &sat);
++        result.VsrSW(upper + i * 2) = cvtsdsw(t, &sat);
      }
  
-     *r = ret;
--    if (r->u64[HI_IDX] == 0 && r->u64[LO_IDX] == 0) {
-+    if (r->VsrD(0) == 0 && r->VsrD(1) == 0) {
-         return ox_flag | CRF_EQ;
+     *r = result;
+@@ -2285,13 +2231,13 @@ VUPK(lsw, s64, s32, UPKLO)
+ #undef UPKHI
+ #undef UPKLO
+ 
+-#define VGENERIC_DO(name, element)                                      \
++#define VGENERIC_DO(name, element, access)                              \
+     void helper_v##name(ppc_avr_t *r, ppc_avr_t *b)                     \
+     {                                                                   \
+         int i;                                                          \
+                                                                         \
+-        VECTOR_FOR_INORDER_I(i, element) {                              \
+-            r->element[i] = name(b->element[i]);                        \
++        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
++            r->access(i) = name(b->access(i));                          \
+         }                                                               \
      }
  
-@@ -3428,8 +3420,6 @@ void helper_vpermxor(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
+@@ -2300,10 +2246,10 @@ VUPK(lsw, s64, s32, UPKLO)
+ #define clzw(v) clz32((v))
+ #define clzd(v) clz64((v))
+ 
+-VGENERIC_DO(clzb, u8)
+-VGENERIC_DO(clzh, u16)
+-VGENERIC_DO(clzw, u32)
+-VGENERIC_DO(clzd, u64)
++VGENERIC_DO(clzb, u8, VsrB)
++VGENERIC_DO(clzh, u16, VsrH)
++VGENERIC_DO(clzw, u32, VsrW)
++VGENERIC_DO(clzd, u64, VsrD)
+ 
+ #undef clzb
+ #undef clzh
+@@ -2315,10 +2261,10 @@ VGENERIC_DO(clzd, u64)
+ #define ctzw(v) ctz32((v))
+ #define ctzd(v) ctz64((v))
+ 
+-VGENERIC_DO(ctzb, u8)
+-VGENERIC_DO(ctzh, u16)
+-VGENERIC_DO(ctzw, u32)
+-VGENERIC_DO(ctzd, u64)
++VGENERIC_DO(ctzb, u8, VsrB)
++VGENERIC_DO(ctzh, u16, VsrH)
++VGENERIC_DO(ctzw, u32, VsrW)
++VGENERIC_DO(ctzd, u64, VsrD)
+ 
+ #undef ctzb
+ #undef ctzh
+@@ -2330,10 +2276,10 @@ VGENERIC_DO(ctzd, u64)
+ #define popcntw(v) ctpop32(v)
+ #define popcntd(v) ctpop64(v)
+ 
+-VGENERIC_DO(popcntb, u8)
+-VGENERIC_DO(popcnth, u16)
+-VGENERIC_DO(popcntw, u32)
+-VGENERIC_DO(popcntd, u64)
++VGENERIC_DO(popcntb, u8, VsrB)
++VGENERIC_DO(popcnth, u16, VsrH)
++VGENERIC_DO(popcntw, u32, VsrW)
++VGENERIC_DO(popcntd, u64, VsrD)
+ 
+ #undef popcntb
+ #undef popcnth
+@@ -2630,20 +2576,12 @@ static int bcd_cmp_zero(ppc_avr_t *bcd)
+ 
+ static uint16_t get_national_digit(ppc_avr_t *reg, int n)
+ {
+-#if defined(HOST_WORDS_BIGENDIAN)
+-    return reg->u16[7 - n];
+-#else
+-    return reg->u16[n];
+-#endif
++    return reg->VsrH(7 - n);
  }
  
- #undef VECTOR_FOR_INORDER_I
--#undef HI_IDX
--#undef LO_IDX
+ static void set_national_digit(ppc_avr_t *reg, uint8_t val, int n)
+ {
+-#if defined(HOST_WORDS_BIGENDIAN)
+-    reg->u16[7 - n] = val;
+-#else
+-    reg->u16[n] = val;
+-#endif
++    reg->VsrH(7 - n) = val;
+ }
  
- /*****************************************************************************/
- /* SPE extension helpers */
+ static int bcd_cmp_mag(ppc_avr_t *a, ppc_avr_t *b)
+@@ -3395,14 +3333,11 @@ void helper_vpermxor(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
+     ppc_avr_t result;
+     int i;
+ 
+-    VECTOR_FOR_INORDER_I(i, u8) {
+-        int indexA = c->u8[i] >> 4;
+-        int indexB = c->u8[i] & 0xF;
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        result.u8[i] = a->u8[indexA] ^ b->u8[indexB];
+-#else
+-        result.u8[i] = a->u8[15-indexA] ^ b->u8[15-indexB];
+-#endif
++    for (i = 0; i < ARRAY_SIZE(r->u8); i++) {
++        int indexA = c->VsrB(i) >> 4;
++        int indexB = c->VsrB(i) & 0xF;
++
++        result.VsrB(i) = a->VsrB(indexA) ^ b->VsrB(indexB);
+     }
+     *r = result;
+ }
 -- 
 2.11.0
