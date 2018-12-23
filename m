@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50542)
+Received: from eggs.gnu.org ([208.118.235.92]:41213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26Q-0000mS-0R
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:30 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gb4nv-0005bx-1V
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 09:32:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gb26J-0008Vc-Ij
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 06:39:25 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 23 Dec 2018 11:38:55 +0000
-Message-Id: <20181223113859.3675-3-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20181223113859.3675-1-mark.cave-ayland@ilande.co.uk>
-References: <20181223113859.3675-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 2/6] target/ppc: rework vmrg{l, h}{b, h,
- w} instructions to use Vsr* macros
+	(envelope-from <no-reply@patchew.org>) id 1gb4lw-0004mB-5t
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 09:31:12 -0500
+Resent-Message-Id: <E1gb4lw-0004mB-5t@eggs.gnu.org>
+In-Reply-To: <20181214231512.5295-1-jsnow@redhat.com>
+Message-ID: <154557529251.18047.4398293307933286743@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 23 Dec 2018 06:28:14 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] bitmaps: remove x- prefix from QMP
+ api
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,91 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
+To: jsnow@redhat.com
+Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com, mreitz@redhat.com
 
-The current implementations make use of the endian-specific macros MRGLO/MRGHI
-and also reference HI_IDX and LO_IDX directly to calculate array offsets.
-
-Rework the implementation to use the Vsr* macros so that these per-endian
-references can be removed.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- target/ppc/int_helper.c | 52 ++++++++++++++++++++++++-------------------------
- 1 file changed, 25 insertions(+), 27 deletions(-)
-
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 598731d47a..f084a706ee 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -976,43 +976,41 @@ void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-     }
- }
- 
--#define VMRG_DO(name, element, highp)                                   \
-+#define VMRG_DOLO(name, element, access)                                \
-     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
-     {                                                                   \
-         ppc_avr_t result;                                               \
-         int i;                                                          \
--        size_t n_elems = ARRAY_SIZE(r->element);                        \
-+        int m = ARRAY_SIZE(r->element) - 1;                             \
-                                                                         \
--        for (i = 0; i < n_elems / 2; i++) {                             \
--            if (highp) {                                                \
--                result.element[i*2+HI_IDX] = a->element[i];             \
--                result.element[i*2+LO_IDX] = b->element[i];             \
--            } else {                                                    \
--                result.element[n_elems - i * 2 - (1 + HI_IDX)] =        \
--                    b->element[n_elems - i - 1];                        \
--                result.element[n_elems - i * 2 - (1 + LO_IDX)] =        \
--                    a->element[n_elems - i - 1];                        \
--            }                                                           \
-+        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
-+            result.access(m - i) = (i & 1) ? a->access(m - (i >> 1))    \
-+                                           : b->access(m - (i >> 1));   \
-         }                                                               \
-         *r = result;                                                    \
-     }
--#if defined(HOST_WORDS_BIGENDIAN)
--#define MRGHI 0
--#define MRGLO 1
--#else
--#define MRGHI 1
--#define MRGLO 0
--#endif
--#define VMRG(suffix, element)                   \
--    VMRG_DO(mrgl##suffix, element, MRGHI)       \
--    VMRG_DO(mrgh##suffix, element, MRGLO)
--VMRG(b, u8)
--VMRG(h, u16)
--VMRG(w, u32)
-+
-+#define VMRG_DOHI(name, element, access)                                \
-+    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
-+    {                                                                   \
-+        ppc_avr_t result;                                               \
-+        int i;                                                          \
-+                                                                        \
-+        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
-+            result.access(i) = (i & 1) ? b->access(i >> 1)              \
-+                                       : a->access(i >> 1);             \
-+        }                                                               \
-+        *r = result;                                                    \
-+    }
-+
-+#define VMRG(suffix, element, access)                  \
-+    VMRG_DOLO(mrgl##suffix, element, access)           \
-+    VMRG_DOHI(mrgh##suffix, element, access)
-+VMRG(b, u8, VsrB)
-+VMRG(h, u16, VsrH)
-+VMRG(w, u32, VsrW)
- #undef VMRG_DO
- #undef VMRG
--#undef MRGHI
--#undef MRGLO
- 
- void helper_vmsummbm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
-                      ppc_avr_t *b, ppc_avr_t *c)
--- 
-2.11.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxNDIzMTUxMi41Mjk1
+LTEtanNub3dAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxODEyMTQyMzE1MTIuNTI5NS0xLWpzbm93QHJlZGhhdC5j
+b20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC83XSBiaXRt
+YXBzOiByZW1vdmUgeC0gcHJlZml4IGZyb20gUU1QIGFwaQoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
+ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
+cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
+byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
+YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
+Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyNDMzNGM5IGlvdGVzdHM6IGFk
+ZCBpb3Rlc3QgMjM2IGZvciB0ZXN0aW5nIGJpdG1hcCBtZXJnZQo0YTZhNTFmIGlvdGVzdHM6IGFs
+bG93IHByZXR0eS1wcmludCBmb3IgcW1wX2xvZwoxOTZjOTIyIGlvdGVzdHM6IGFkZCBmaWx0ZXJf
+Z2VuZXJhdGVkX25vZGVfaWRzCmVhZTI5NTMgaW90ZXN0cy5weTogZG9uJ3QgYWJvcnQgaWYgSU1H
+S0VZU0VDUkVUIGlzIHVuZGVmaW5lZAo2YWFhYWZhIGJsb2NrOiByZW1vdmUgJ3gnIHByZWZpeCBm
+cm9tIGV4cGVyaW1lbnRhbCBiaXRtYXAgQVBJcwoxNGMzZWUxIGJsb2NrZGV2OiBuLWFyeSBiaXRt
+YXAgbWVyZ2UKMjRkNTUyOCBibG9ja2RldjogYWJvcnQgdHJhbnNhY3Rpb25zIGluIHJldmVyc2Ug
+b3JkZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogYmxvY2tkZXY6
+IGFib3J0IHRyYW5zYWN0aW9ucyBpbiByZXZlcnNlIG9yZGVyLi4uCkNoZWNraW5nIFBBVENIIDIv
+NzogYmxvY2tkZXY6IG4tYXJ5IGJpdG1hcCBtZXJnZS4uLgpFUlJPUjogZXh0ZXJucyBzaG91bGQg
+YmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMjg6IEZJTEU6IGJsb2NrZGV2LmM6MjEyNToKK3ZvaWQg
+ZG9fYmxvY2tfZGlydHlfYml0bWFwX21lcmdlKGNvbnN0IGNoYXIgKm5vZGUsIGNvbnN0IGNoYXIg
+KnRhcmdldCwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTQ3IGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMv
+NzogYmxvY2s6IHJlbW92ZSAneCcgcHJlZml4IGZyb20gZXhwZXJpbWVudGFsIGJpdG1hcCBBUElz
+Li4uCkNoZWNraW5nIFBBVENIIDQvNzogaW90ZXN0cy5weTogZG9uJ3QgYWJvcnQgaWYgSU1HS0VZ
+U0VDUkVUIGlzIHVuZGVmaW5lZC4uLgpDaGVja2luZyBQQVRDSCA1Lzc6IGlvdGVzdHM6IGFkZCBm
+aWx0ZXJfZ2VuZXJhdGVkX25vZGVfaWRzLi4uCkNoZWNraW5nIFBBVENIIDYvNzogaW90ZXN0czog
+YWxsb3cgcHJldHR5LXByaW50IGZvciBxbXBfbG9nLi4uCkNoZWNraW5nIFBBVENIIDcvNzogaW90
+ZXN0czogYWRkIGlvdGVzdCAyMzYgZm9yIHRlc3RpbmcgYml0bWFwIG1lcmdlLi4uCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
+b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTgxMjE0MjMxNTEy
+LjUyOTUtMS1qc25vd0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
+ZWRoYXQuY29t
