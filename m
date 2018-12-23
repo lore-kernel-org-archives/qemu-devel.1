@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52657)
+Received: from eggs.gnu.org ([208.118.235.92]:52688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkI-0008P0-0i
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkJ-0008Sg-U1
 	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkG-0003ew-C8
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:09 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34912)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkJ-0003qO-5H
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:11 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36985)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAkG-0003bb-2s
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:08 -0500
-Received: by mail-wr1-x441.google.com with SMTP id 96so10115297wrb.2
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:08 -0800 (PST)
+	id 1gbAkI-0003gk-Ll
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:10 -0500
+Received: by mail-wr1-x444.google.com with SMTP id s12so10091412wrt.4
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:09 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:22 +0100
-Message-Id: <6f033fb593404b7c292cf626242e34559c3e7905.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:52:24 +0100
+Message-Id: <62b2383050d51d0901322a10ea70eda298d60a5a.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 46/52] audio: support more than two channels
- in volume setting
+Subject: [Qemu-devel] [PATCH v2 48/52] audio: basic support for multichannel
+ audio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,211 +34,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+Which currently only means removing some checks.  Old code won't require
+more than two channels, but new code will need it.
+
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio.c      | 28 ++++++++++++++++++++--------
- audio/audio.h      | 10 ++++++++++
- audio/audio_int.h  |  4 ++--
- audio/paaudio.c    | 20 ++++++++++++--------
- audio/spiceaudio.c | 14 ++++++++------
- 5 files changed, 52 insertions(+), 24 deletions(-)
+ audio/alsaaudio.c | 7 -------
+ audio/audio.c     | 2 +-
+ 2 files changed, 1 insertion(+), 8 deletions(-)
 
+diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
+index 418b888a57..063531b743 100644
+--- a/audio/alsaaudio.c
++++ b/audio/alsaaudio.c
+@@ -498,13 +498,6 @@ static int alsa_open(bool in, struct alsa_params_req *req,
+         goto err;
+     }
+ 
+-    if (nchannels != 1 && nchannels != 2) {
+-        alsa_logerr2 (err, typ,
+-                      "Can not handle obtained number of channels %d\n",
+-                      nchannels);
+-        goto err;
+-    }
+-
+     if (pdo->buffer_count) {
+         if (pdo->buffer_len) {
+             int64_t req = pdo->buffer_len * pdo->buffer_count;
 diff --git a/audio/audio.c b/audio/audio.c
-index 26ce25989f..71744fa2c8 100644
+index ee508c1f15..782e4ed1c7 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -1880,31 +1880,43 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
- }
- 
- void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol)
-+{
-+    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
-+    audio_set_volume_out(sw, &vol);
-+}
-+
-+void audio_set_volume_out(SWVoiceOut *sw, Volume *vol)
+@@ -241,7 +241,7 @@ static int audio_validate_settings (struct audsettings *as)
  {
-     if (sw) {
-         HWVoiceOut *hw = sw->hw;
+     int invalid;
  
--        sw->vol.mute = mute;
--        sw->vol.l = nominal_volume.l * lvol / 255;
--        sw->vol.r = nominal_volume.r * rvol / 255;
-+        sw->vol.mute = vol->mute;
-+        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
-+        sw->vol.r = nominal_volume.l * vol->vol[vol->channels > 1 ? 1 : 0] / 255;
+-    invalid = as->nchannels != 1 && as->nchannels != 2;
++    invalid = as->nchannels < 1;
+     invalid |= as->endianness != 0 && as->endianness != 1;
  
-         if (hw->pcm_ops->volume_out) {
--            hw->pcm_ops->volume_out(hw, &sw->vol);
-+            hw->pcm_ops->volume_out(hw, vol);
-         }
-     }
- }
- 
- void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
-+{
-+    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
-+    audio_set_volume_in(sw, &vol);
-+}
-+
-+void audio_set_volume_in(SWVoiceIn *sw, Volume *vol)
- {
-     if (sw) {
-         HWVoiceIn *hw = sw->hw;
- 
--        sw->vol.mute = mute;
--        sw->vol.l = nominal_volume.l * lvol / 255;
--        sw->vol.r = nominal_volume.r * rvol / 255;
-+        sw->vol.mute = vol->mute;
-+        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
-+        sw->vol.r = nominal_volume.r * vol->vol[vol->channels > 1 ? 1 : 0] / 255;
- 
-         if (hw->pcm_ops->volume_in) {
--            hw->pcm_ops->volume_in(hw, &sw->vol);
-+            hw->pcm_ops->volume_in(hw, vol);
-         }
-     }
- }
-diff --git a/audio/audio.h b/audio/audio.h
-index bfb12e7531..911365cebd 100644
---- a/audio/audio.h
-+++ b/audio/audio.h
-@@ -125,6 +125,16 @@ uint64_t AUD_get_elapsed_usec_out (SWVoiceOut *sw, QEMUAudioTimeStamp *ts);
- void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol);
- void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol);
- 
-+#define AUDIO_MAX_CHANNELS 16
-+typedef struct Volume {
-+    bool mute;
-+    int channels;
-+    uint8_t vol[AUDIO_MAX_CHANNELS];
-+} Volume;
-+
-+void audio_set_volume_out(SWVoiceOut *sw, Volume *vol);
-+void audio_set_volume_in(SWVoiceIn *sw, Volume *vol);
-+
- SWVoiceIn *AUD_open_in (
-     QEMUSoundCard *card,
-     SWVoiceIn *sw,
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index a5ead07998..c2f6da5cc2 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -165,7 +165,7 @@ struct audio_pcm_ops {
-      */
-     size_t (*put_buffer_out)(HWVoiceOut *hw, void *buf, size_t size);
-     void   (*enable_out)(HWVoiceOut *hw, bool enable);
--    void   (*volume_out)(HWVoiceOut *hw, struct mixeng_volume *vol);
-+    void   (*volume_out)(HWVoiceOut *hw, Volume *vol);
- 
-     int    (*init_in) (HWVoiceIn *hw, audsettings *as, void *drv_opaque);
-     void   (*fini_in) (HWVoiceIn *hw);
-@@ -174,7 +174,7 @@ struct audio_pcm_ops {
-     void  *(*get_buffer_in)(HWVoiceIn *hw, size_t *size);
-     void   (*put_buffer_in)(HWVoiceIn *hw, void *buf, size_t size);
-     void   (*enable_in)(HWVoiceIn *hw, bool enable);
--    void   (*volume_in)(HWVoiceIn *hw, struct mixeng_volume *vol);
-+    void   (*volume_in)(HWVoiceIn *hw, Volume *vol);
- };
- 
- void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size);
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index e8556e7a9d..3b4b29b38f 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -537,20 +537,22 @@ static void qpa_fini_in (HWVoiceIn *hw)
-     }
- }
- 
--static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
-+static void qpa_volume_out(HWVoiceOut *hw, Volume *vol)
- {
-     PAVoiceOut *pa = (PAVoiceOut *) hw;
-     pa_operation *op;
-     pa_cvolume v;
-     PAConnection *c = pa->g->conn;
-+    int i;
- 
- #ifdef PA_CHECK_VERSION    /* macro is present in 0.9.16+ */
-     pa_cvolume_init (&v);  /* function is present in 0.9.13+ */
- #endif
- 
--    v.channels = 2;
--    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
--    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
-+    v.channels = vol->channels;
-+    for (i = 0; i < vol->channels; ++i) {
-+        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
-+    }
- 
-     pa_threaded_mainloop_lock(c->mainloop);
- 
-@@ -577,20 +579,22 @@ static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
-     pa_threaded_mainloop_unlock(c->mainloop);
- }
- 
--static void qpa_volume_in(HWVoiceIn *hw, struct mixeng_volume *vol)
-+static void qpa_volume_in(HWVoiceIn *hw, Volume *vol)
- {
-     PAVoiceIn *pa = (PAVoiceIn *) hw;
-     pa_operation *op;
-     pa_cvolume v;
-     PAConnection *c = pa->g->conn;
-+    int i;
- 
- #ifdef PA_CHECK_VERSION
-     pa_cvolume_init (&v);
- #endif
- 
--    v.channels = 2;
--    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
--    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
-+    v.channels = vol->channels;
-+    for (i = 0; i < vol->channels; ++i) {
-+        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
-+    }
- 
-     pa_threaded_mainloop_lock(c->mainloop);
- 
-diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index 771ecacf27..b26d10434b 100644
---- a/audio/spiceaudio.c
-+++ b/audio/spiceaudio.c
-@@ -179,13 +179,14 @@ static void line_out_enable(HWVoiceOut *hw, bool enable)
- }
- 
- #if ((SPICE_INTERFACE_PLAYBACK_MAJOR >= 1) && (SPICE_INTERFACE_PLAYBACK_MINOR >= 2))
--static void line_out_volume(HWVoiceOut *hw, struct mixeng_volume *vol)
-+static void line_out_volume(HWVoiceOut *hw, Volume *vol)
- {
-     SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
-     uint16_t svol[2];
- 
--    svol[0] = vol->l / ((1ULL << 16) + 1);
--    svol[1] = vol->r / ((1ULL << 16) + 1);
-+    assert(vol->channels == 2);
-+    svol[0] = vol->vol[0] * 257;
-+    svol[1] = vol->vol[1] * 257;
-     spice_server_playback_set_volume(&out->sin, 2, svol);
-     spice_server_playback_set_mute(&out->sin, vol->mute);
- }
-@@ -266,13 +267,14 @@ static void line_in_enable(HWVoiceIn *hw, bool enable)
- }
- 
- #if ((SPICE_INTERFACE_RECORD_MAJOR >= 2) && (SPICE_INTERFACE_RECORD_MINOR >= 2))
--static void line_in_volume(HWVoiceIn *hw, struct mixeng_volume *vol)
-+static void line_in_volume(HWVoiceIn *hw, Volume *vol)
- {
-     SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
-     uint16_t svol[2];
- 
--    svol[0] = vol->l / ((1ULL << 16) + 1);
--    svol[1] = vol->r / ((1ULL << 16) + 1);
-+    assert(vol->channels == 2);
-+    svol[0] = vol->vol[0] * 257;
-+    svol[1] = vol->vol[1] * 257;
-     spice_server_record_set_volume(&in->sin, 2, svol);
-     spice_server_record_set_mute(&in->sin, vol->mute);
- }
+     switch (as->fmt) {
 -- 
 2.20.1
