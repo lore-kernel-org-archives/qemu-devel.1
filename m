@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52587)
+Received: from eggs.gnu.org ([208.118.235.92]:52463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkD-0008Jw-LV
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:09 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk7-00087C-1E
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAkB-0003Ms-Df
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:05 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33258)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbAk4-0002vC-Fw
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:58 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbAkB-0003Je-3i
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:53:03 -0500
-Received: by mail-wm1-x342.google.com with SMTP id r24so18059780wmh.0
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:53:03 -0800 (PST)
+	id 1gbAk4-0002sC-8r
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 15:52:56 -0500
+Received: by mail-wm1-x342.google.com with SMTP id d15so9848907wmb.3
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 12:52:56 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Sun, 23 Dec 2018 21:52:15 +0100
-Message-Id: <43f81a1d655afec17dc6602ea0ce60ab29e3dd97.1545598229.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 23 Dec 2018 21:52:06 +0100
+Message-Id: <913694ede1eaa88edbe2be55ed0969f3f14f105d.1545598229.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 39/52] audio: unify input and output mixeng
- buffer management
+Subject: [Qemu-devel] [PATCH v2 30/52] coreaudio: port to the new audio
+ backend api
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,491 +34,203 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Usage notes: hw->samples became hw->{mix,conv}_buf->size, except before
-initialization (audio_pcm_hw_alloc_resources_*), hw->samples gives the
-initial size of the STSampleBuffer.  The next commit tries to fix this
-inconsistency.
-
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio.c          | 130 ++++++++++++++++++++---------------------
- audio/audio_int.h      |  12 ++--
- audio/audio_template.h |  19 +++---
- audio/ossaudio.c       |   2 +-
- 4 files changed, 80 insertions(+), 83 deletions(-)
+ audio/coreaudio.c | 130 ++++++++++++++++++++++++----------------------
+ 1 file changed, 69 insertions(+), 61 deletions(-)
 
-diff --git a/audio/audio.c b/audio/audio.c
-index 4c33e057d7..f195d8eb95 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -546,8 +546,8 @@ static size_t audio_pcm_hw_find_min_in (HWVoiceIn *hw)
- static size_t audio_pcm_hw_get_live_in(HWVoiceIn *hw)
- {
-     size_t live = hw->total_samples_captured - audio_pcm_hw_find_min_in (hw);
--    if (audio_bug(__func__, live > hw->samples)) {
--        dolog("live=%zu hw->samples=%zu\n", live, hw->samples);
-+    if (audio_bug(__func__, live > hw->conv_buf->size)) {
-+        dolog("live=%zu hw->conv_buf->size=%zu\n", live, hw->conv_buf->size);
-         return 0;
-     }
-     return live;
-@@ -556,17 +556,17 @@ static size_t audio_pcm_hw_get_live_in(HWVoiceIn *hw)
- static void audio_pcm_hw_clip_out(HWVoiceOut *hw, void *pcm_buf, size_t len)
- {
-     size_t clipped = 0;
--    size_t pos = hw->rpos;
-+    size_t pos = hw->mix_buf->pos;
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+index abbbb45d69..a532e862dd 100644
+--- a/audio/coreaudio.c
++++ b/audio/coreaudio.c
+@@ -43,9 +43,6 @@ typedef struct coreaudioVoiceOut {
+     UInt32 audioDevicePropertyBufferFrameSize;
+     AudioStreamBasicDescription outputStreamBasicDescription;
+     AudioDeviceIOProcID ioprocid;
+-    int live;
+-    int decr;
+-    int rpos;
+ } coreaudioVoiceOut;
  
-     while (len) {
--        st_sample *src = hw->mix_buf + pos;
-+        st_sample *src = hw->mix_buf->samples + pos;
-         uint8_t *dst = advance (pcm_buf, clipped << hw->info.shift);
--        size_t samples_till_end_of_buf = hw->samples - pos;
-+        size_t samples_till_end_of_buf = hw->mix_buf->size - pos;
-         size_t samples_to_clip = MIN(len, samples_till_end_of_buf);
- 
-         hw->clip (dst, src, samples_to_clip);
- 
--        pos = (pos + samples_to_clip) % hw->samples;
-+        pos = (pos + samples_to_clip) % hw->mix_buf->size;
-         len -= samples_to_clip;
-         clipped += samples_to_clip;
-     }
-@@ -581,17 +581,17 @@ static size_t audio_pcm_sw_get_rpos_in(SWVoiceIn *sw)
-     ssize_t live = hw->total_samples_captured - sw->total_hw_samples_acquired;
-     ssize_t rpos;
- 
--    if (audio_bug(__func__, live < 0 || live > hw->samples)) {
--        dolog("live=%zu hw->samples=%zu\n", live, hw->samples);
-+    if (audio_bug(__func__, live < 0 || live > hw->conv_buf->size)) {
-+        dolog("live=%zu hw->conv_buf->size=%zu\n", live, hw->conv_buf->size);
-         return 0;
-     }
- 
--    rpos = hw->wpos - live;
-+    rpos = hw->conv_buf->pos - live;
-     if (rpos >= 0) {
-         return rpos;
-     }
-     else {
--        return hw->samples + rpos;
-+        return hw->conv_buf->size + rpos;
-     }
+ #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+@@ -397,31 +394,29 @@ static int coreaudio_unlock (coreaudioVoiceOut *core, const char *fn_name)
+     return 0;
  }
  
-@@ -601,11 +601,11 @@ static size_t audio_pcm_sw_read(SWVoiceIn *sw, void *buf, size_t size)
-     size_t samples, live, ret = 0, swlim, isamp, osamp, rpos, total = 0;
-     struct st_sample *src, *dst = sw->buf;
- 
--    rpos = audio_pcm_sw_get_rpos_in (sw) % hw->samples;
-+    rpos = audio_pcm_sw_get_rpos_in(sw) % hw->conv_buf->size;
- 
-     live = hw->total_samples_captured - sw->total_hw_samples_acquired;
--    if (audio_bug(__func__, live > hw->samples)) {
--        dolog("live_in=%zu hw->samples=%zu\n", live, hw->samples);
-+    if (audio_bug(__func__, live > hw->conv_buf->size)) {
-+        dolog("live_in=%zu hw->conv_buf->size=%zu\n", live, hw->conv_buf->size);
-         return 0;
-     }
- 
-@@ -618,11 +618,11 @@ static size_t audio_pcm_sw_read(SWVoiceIn *sw, void *buf, size_t size)
-     swlim = MIN (swlim, samples);
- 
-     while (swlim) {
--        src = hw->conv_buf + rpos;
--        if (hw->wpos > rpos) {
--            isamp = hw->wpos - rpos;
-+        src = hw->conv_buf->samples + rpos;
-+        if (hw->conv_buf->pos > rpos) {
-+            isamp = hw->conv_buf->pos - rpos;
-         } else {
--            isamp = hw->samples - rpos;
-+            isamp = hw->conv_buf->size - rpos;
-         }
- 
-         if (!isamp) {
-@@ -632,7 +632,7 @@ static size_t audio_pcm_sw_read(SWVoiceIn *sw, void *buf, size_t size)
- 
-         st_rate_flow (sw->rate, src, dst, &isamp, &osamp);
-         swlim -= osamp;
--        rpos = (rpos + isamp) % hw->samples;
-+        rpos = (rpos + isamp) % hw->conv_buf->size;
-         dst += osamp;
-         ret += osamp;
-         total += isamp;
-@@ -680,8 +680,8 @@ static size_t audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
-     if (nb_live1) {
-         size_t live = smin;
- 
--        if (audio_bug(__func__, live > hw->samples)) {
--            dolog("live=%zu hw->samples=%zu\n", live, hw->samples);
-+        if (audio_bug(__func__, live > hw->mix_buf->size)) {
-+            dolog("live=%zu hw->mix_buf->size=%zu\n", live, hw->mix_buf->size);
-             return 0;
-         }
-         return live;
-@@ -701,11 +701,11 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void *buf, size_t size)
-         return size;
-     }
- 
--    hwsamples = sw->hw->samples;
-+    hwsamples = sw->hw->mix_buf->size;
- 
-     live = sw->total_hw_samples_mixed;
-     if (audio_bug(__func__, live > hwsamples)) {
--        dolog("live=%zu hw->samples=%zu\n", live, hwsamples);
-+        dolog("live=%zu hw->mix_buf->size=%zu\n", live, hwsamples);
-         return 0;
-     }
- 
-@@ -716,7 +716,7 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void *buf, size_t size)
-         return 0;
-     }
- 
--    wpos = (sw->hw->rpos + live) % hwsamples;
-+    wpos = (sw->hw->mix_buf->pos + live) % hwsamples;
-     samples = size >> sw->info.shift;
- 
-     dead = hwsamples - live;
-@@ -742,7 +742,7 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void *buf, size_t size)
-         st_rate_flow_mix (
-             sw->rate,
-             sw->buf + pos,
--            sw->hw->mix_buf + wpos,
-+            sw->hw->mix_buf->samples + wpos,
-             &isamp,
-             &osamp
-             );
-@@ -870,7 +870,7 @@ size_t AUD_read(SWVoiceIn *sw, void *buf, size_t size)
- 
- int AUD_get_buffer_size_out (SWVoiceOut *sw)
- {
--    return sw->hw->samples << sw->hw->info.shift;
-+    return sw->hw->mix_buf->size << sw->hw->info.shift;
- }
- 
- void AUD_set_active_out (SWVoiceOut *sw, int on)
-@@ -971,8 +971,9 @@ static size_t audio_get_avail (SWVoiceIn *sw)
-     }
- 
-     live = sw->hw->total_samples_captured - sw->total_hw_samples_acquired;
--    if (audio_bug(__func__, live > sw->hw->samples)) {
--        dolog("live=%zu sw->hw->samples=%zu\n", live, sw->hw->samples);
-+    if (audio_bug(__func__, live > sw->hw->conv_buf->size)) {
-+        dolog("live=%zu sw->hw->conv_buf->size=%zu\n", live,
-+              sw->hw->conv_buf->size);
-         return 0;
-     }
- 
-@@ -995,12 +996,13 @@ static size_t audio_get_free(SWVoiceOut *sw)
- 
-     live = sw->total_hw_samples_mixed;
- 
--    if (audio_bug(__func__, live > sw->hw->samples)) {
--        dolog("live=%zu sw->hw->samples=%zu\n", live, sw->hw->samples);
-+    if (audio_bug(__func__, live > sw->hw->mix_buf->size)) {
-+        dolog("live=%zu sw->hw->mix_buf->size=%zu\n", live,
-+              sw->hw->mix_buf->size);
-         return 0;
-     }
- 
--    dead = sw->hw->samples - live;
-+    dead = sw->hw->mix_buf->size - live;
- 
- #ifdef DEBUG_OUT
-     dolog ("%s: get_free live %d dead %d ret %" PRId64 "\n",
-@@ -1025,12 +1027,12 @@ static void audio_capture_mix_and_clear(HWVoiceOut *hw, size_t rpos,
- 
-             n = samples;
-             while (n) {
--                size_t till_end_of_hw = hw->samples - rpos2;
-+                size_t till_end_of_hw = hw->mix_buf->size - rpos2;
-                 size_t to_write = MIN(till_end_of_hw, n);
-                 size_t bytes = to_write << hw->info.shift;
-                 size_t written;
- 
--                sw->buf = hw->mix_buf + rpos2;
-+                sw->buf = hw->mix_buf->samples + rpos2;
-                 written = audio_pcm_sw_write (sw, NULL, bytes);
-                 if (written - bytes) {
-                     dolog("Could not mix %zu bytes into a capture "
-@@ -1039,14 +1041,14 @@ static void audio_capture_mix_and_clear(HWVoiceOut *hw, size_t rpos,
-                     break;
-                 }
-                 n -= to_write;
--                rpos2 = (rpos2 + to_write) % hw->samples;
-+                rpos2 = (rpos2 + to_write) % hw->mix_buf->size;
-             }
-         }
-     }
- 
--    n = MIN(samples, hw->samples - rpos);
--    mixeng_clear(hw->mix_buf + rpos, n);
--    mixeng_clear(hw->mix_buf, samples - n);
-+    n = MIN(samples, hw->mix_buf->size - rpos);
-+    mixeng_clear(hw->mix_buf->samples + rpos, n);
-+    mixeng_clear(hw->mix_buf->samples, samples - n);
- }
- 
- static size_t audio_pcm_hw_run_out(HWVoiceOut *hw, size_t live)
-@@ -1064,7 +1066,7 @@ static size_t audio_pcm_hw_run_out(HWVoiceOut *hw, size_t live)
- 
-         live -= proc;
-         clipped += proc;
--        hw->rpos = (hw->rpos + proc) % hw->samples;
-+        hw->mix_buf->pos = (hw->mix_buf->pos + proc) % hw->mix_buf->size;
- 
-         if (proc == 0 || proc < decr) {
-             break;
-@@ -1088,8 +1090,8 @@ static void audio_run_out (AudioState *s)
-             live = 0;
-         }
- 
--        if (audio_bug(__func__, live > hw->samples)) {
--            dolog ("live=%zu hw->samples=%zu\n", live, hw->samples);
-+        if (audio_bug(__func__, live > hw->mix_buf->size)) {
-+            dolog ("live=%zu hw->mix_buf->size=%zu\n", live, hw->mix_buf->size);
-             continue;
-         }
- 
-@@ -1120,13 +1122,13 @@ static void audio_run_out (AudioState *s)
-             continue;
-         }
- 
--        prev_rpos = hw->rpos;
-+        prev_rpos = hw->mix_buf->pos;
-         played = audio_pcm_hw_run_out(hw, live);
-         replay_audio_out(&played);
--        if (audio_bug(__func__, hw->rpos >= hw->samples)) {
--            dolog("hw->rpos=%zu hw->samples=%zu played=%zu\n",
--                  hw->rpos, hw->samples, played);
--            hw->rpos = 0;
-+        if (audio_bug(__func__, hw->mix_buf->pos >= hw->mix_buf->size)) {
-+            dolog("hw->mix_buf->pos=%zu hw->mix_buf->size=%zu played=%zu\n",
-+                  hw->mix_buf->pos, hw->mix_buf->size, played);
-+            hw->mix_buf->pos = 0;
-         }
- 
- #ifdef DEBUG_OUT
-@@ -1183,6 +1185,7 @@ static void audio_run_out (AudioState *s)
- static size_t audio_pcm_hw_run_in(HWVoiceIn *hw, size_t samples)
- {
-     size_t conv = 0;
-+    STSampleBuffer *conv_buf = hw->conv_buf;
- 
-     while (samples) {
-         size_t proc;
-@@ -1196,10 +1199,10 @@ static size_t audio_pcm_hw_run_in(HWVoiceIn *hw, size_t samples)
-         }
- 
-         proc = MIN(size >> hw->info.shift,
--                   hw->samples - hw->wpos);
-+                   conv_buf->size - conv_buf->pos);
- 
--        hw->conv(hw->conv_buf + hw->wpos, buf, proc);
--        hw->wpos = (hw->wpos + proc) % hw->samples;
-+        hw->conv(conv_buf->samples + conv_buf->pos, buf, proc);
-+        conv_buf->pos = (conv_buf->pos + proc) % conv_buf->size;
- 
-         samples -= proc;
-         conv += proc;
-@@ -1219,9 +1222,10 @@ static void audio_run_in (AudioState *s)
- 
-         if (replay_mode != REPLAY_MODE_PLAY) {
-             captured = audio_pcm_hw_run_in(
--                hw, hw->samples - audio_pcm_hw_get_live_in(hw));
-+                hw, hw->conv_buf->size - audio_pcm_hw_get_live_in(hw));
-         }
--        replay_audio_in(&captured, hw->conv_buf, &hw->wpos, hw->samples);
-+        replay_audio_in(&captured, hw->conv_buf->samples, &hw->conv_buf->pos,
-+                        hw->conv_buf->size);
- 
-         min = audio_pcm_hw_find_min_in (hw);
-         hw->total_samples_captured += captured - min;
-@@ -1252,14 +1256,14 @@ static void audio_run_capture (AudioState *s)
-         SWVoiceOut *sw;
- 
-         captured = live = audio_pcm_hw_get_live_out (hw, NULL);
--        rpos = hw->rpos;
-+        rpos = hw->mix_buf->pos;
-         while (live) {
--            size_t left = hw->samples - rpos;
-+            size_t left = hw->mix_buf->size - rpos;
-             size_t to_capture = MIN(live, left);
-             struct st_sample *src;
-             struct capture_callback *cb;
- 
--            src = hw->mix_buf + rpos;
-+            src = hw->mix_buf->samples + rpos;
-             hw->clip (cap->buf, src, to_capture);
-             mixeng_clear (src, to_capture);
- 
-@@ -1267,10 +1271,10 @@ static void audio_run_capture (AudioState *s)
-                 cb->ops.capture (cb->opaque, cap->buf,
-                                  to_capture << hw->info.shift);
-             }
--            rpos = (rpos + to_capture) % hw->samples;
-+            rpos = (rpos + to_capture) % hw->mix_buf->size;
-             live -= to_capture;
-         }
--        hw->rpos = rpos;
-+        hw->mix_buf->pos = rpos;
- 
-         for (sw = hw->sw_head.lh_first; sw; sw = sw->entries.le_next) {
-             if (!sw->active && sw->empty) {
-@@ -1318,7 +1322,7 @@ void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size)
-     ssize_t start;
- 
-     if (unlikely(!hw->buf_emul)) {
--        size_t calc_size = hw->samples << hw->info.shift;
-+        size_t calc_size = hw->conv_buf->size << hw->info.shift;
-         hw->buf_emul = g_malloc(calc_size);
-         hw->size_emul = calc_size;
-         hw->pos_emul = hw->pending_emul = 0;
-@@ -1354,7 +1358,7 @@ void audio_generic_put_buffer_in(HWVoiceIn *hw, void *buf, size_t size)
- void *audio_generic_get_buffer_out(HWVoiceOut *hw, size_t *size)
- {
-     if (unlikely(!hw->buf_emul)) {
--        size_t calc_size = hw->samples << hw->info.shift;
-+        size_t calc_size = hw->mix_buf->size << hw->info.shift;
- 
-         hw->buf_emul = g_malloc(calc_size);
-         hw->size_emul = calc_size;
-@@ -1740,21 +1744,16 @@ CaptureVoiceOut *AUD_add_capture(
- 
-         /* XXX find a more elegant way */
-         hw->samples = 4096 * 4;
--        hw->mix_buf = audio_calloc(__func__, hw->samples,
--                                   sizeof(struct st_sample));
--        if (!hw->mix_buf) {
--            dolog("Could not allocate capture mix buffer (%zu samples)\n",
--                  hw->samples);
--            goto err2;
--        }
-+        audio_pcm_hw_alloc_resources_out(hw);
- 
-         audio_pcm_init_info (&hw->info, as);
- 
--        cap->buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
-+        cap->buf = audio_calloc(__func__, hw->mix_buf->size,
-+                                1 << hw->info.shift);
-         if (!cap->buf) {
-             dolog ("Could not allocate capture buffer "
-                    "(%zu samples, each %d bytes)\n",
--                   hw->samples, 1 << hw->info.shift);
-+                   hw->mix_buf->size, 1 << hw->info.shift);
-             goto err3;
-         }
- 
-@@ -1774,7 +1773,6 @@ CaptureVoiceOut *AUD_add_capture(
- 
-     err3:
-         g_free (cap->hw.mix_buf);
--    err2:
-         g_free (cap);
-     err1:
-         g_free (cb);
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index cca7efaa05..a5add3c2b8 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -51,6 +51,11 @@ struct audio_pcm_info {
- 
- typedef struct SWVoiceCap SWVoiceCap;
- 
-+typedef struct STSampleBuffer {
-+    size_t pos, size;
-+    st_sample samples[];
-+} STSampleBuffer;
-+
- typedef struct HWVoiceOut {
-     AudioState *s;
-     int enabled;
-@@ -59,11 +64,9 @@ typedef struct HWVoiceOut {
-     struct audio_pcm_info info;
- 
-     f_sample *clip;
+-static int coreaudio_run_out (HWVoiceOut *hw, int live)
+-{
+-    int decr;
+-    coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;
 -
--    size_t rpos;
-     uint64_t ts_helper;
+-    if (coreaudio_lock (core, "coreaudio_run_out")) {
+-        return 0;
++#define COREAUDIO_WRAPPER_FUNC(name, ret_type, args_decl, args) \
++    static ret_type glue(coreaudio_, name)args_decl             \
++    {                                                           \
++        coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;     \
++        ret_type ret;                                           \
++                                                                \
++        if (coreaudio_lock(core, "coreaudio_" #name)) {         \
++            return 0;                                           \
++        }                                                       \
++                                                                \
++        ret = glue(audio_generic_, name)args;                   \
++                                                                \
++        coreaudio_unlock(core, "coreaudio_" #name);             \
++        return ret;                                             \
+     }
+-
+-    if (core->decr > live) {
+-        ldebug ("core->decr %d live %d core->live %d\n",
+-                core->decr,
+-                live,
+-                core->live);
+-    }
+-
+-    decr = MIN (core->decr, live);
+-    core->decr -= decr;
+-
+-    core->live = live - decr;
+-    hw->rpos = core->rpos;
+-
+-    coreaudio_unlock (core, "coreaudio_run_out");
+-    return decr;
+-}
++COREAUDIO_WRAPPER_FUNC(get_buffer_out, void *, (HWVocieOut *hw, size_t *size),
++                       (hw, size))
++COREAUDIO_WRAPPER_FUNC(put_buffer_out_nowrite, size_t,
++                       (HWVoiceOut *hw, void *buf, size_t size),
++                       (hw, buf, size))
++COREAUDIO_WRAPPER_FUNC(write, size_t, (HWVoiceOut *hw, void *buf, size_t size),
++                       (hw, buf, size))
++#undef COREAUDIO_WRAPPER_FUNC
  
--    struct st_sample *mix_buf;
-+    STSampleBuffer *mix_buf;
-     void *buf_emul;
-     size_t pos_emul, pending_emul, size_emul;
- 
-@@ -83,11 +86,10 @@ typedef struct HWVoiceIn {
- 
-     t_sample *conv;
- 
--    size_t wpos;
-     size_t total_samples_captured;
-     uint64_t ts_helper;
- 
--    struct st_sample *conv_buf;
-+    STSampleBuffer *conv_buf;
-     void *buf_emul;
-     size_t pos_emul, pending_emul, size_emul;
- 
-diff --git a/audio/audio_template.h b/audio/audio_template.h
-index 33cdb66d7f..83ffc62183 100644
---- a/audio/audio_template.h
-+++ b/audio/audio_template.h
-@@ -76,16 +76,15 @@ static void glue (audio_pcm_hw_free_resources_, TYPE) (HW *hw)
-     HWBUF = NULL;
- }
- 
--static int glue (audio_pcm_hw_alloc_resources_, TYPE) (HW *hw)
-+static void glue(audio_pcm_hw_alloc_resources_, TYPE)(HW *hw)
+ /* callback to feed audiooutput buffer */
+ static OSStatus audioDeviceIOProc(
+@@ -433,19 +428,11 @@ static OSStatus audioDeviceIOProc(
+     const AudioTimeStamp* inOutputTime,
+     void* hwptr)
  {
--    HWBUF = audio_calloc(__func__, hw->samples, sizeof(struct st_sample));
--    if (!HWBUF) {
--        dolog("Could not allocate " NAME " buffer (%zu samples)\n",
--              hw->samples);
--        return -1;
-+    size_t samples = hw->samples;
-+    if (audio_bug(__func__, samples == 0)) {
-+        dolog("Attempted to allocate empty buffer\n");
+-    UInt32 frame, frameCount;
+-    float *out = outOutputData->mBuffers[0].mData;
++    UInt32 frameCount, pending_frames;
++    void *out = outOutputData->mBuffers[0].mData;
+     HWVoiceOut *hw = hwptr;
+     coreaudioVoiceOut *core = (coreaudioVoiceOut *) hwptr;
+-    int rpos, live;
+-    struct st_sample *src;
+-#ifndef FLOAT_MIXENG
+-#ifdef RECIPROCAL
+-    const float scale = 1.f / UINT_MAX;
+-#else
+-    const float scale = UINT_MAX;
+-#endif
+-#endif
++    size_t len;
+ 
+     if (coreaudio_lock (core, "audioDeviceIOProc")) {
+         inInputTime = 0;
+@@ -453,42 +440,51 @@ static OSStatus audioDeviceIOProc(
      }
  
--    return 0;
-+    HWBUF = g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * samples);
-+    HWBUF->size = samples;
+     frameCount = core->audioDevicePropertyBufferFrameSize;
+-    live = core->live;
++    pending_frames = hw->pending_emul >> hw->info.shift;
+ 
+     /* if there are not enough samples, set signal and return */
+-    if (live < frameCount) {
++    if (pending_frames < frameCount) {
+         inInputTime = 0;
+         coreaudio_unlock (core, "audioDeviceIOProc(empty)");
+         return 0;
+     }
+ 
+-    rpos = core->rpos;
+-    src = hw->mix_buf + rpos;
++    len = frameCount << hw->info.shift;
++    while (len) {
++        size_t write_len;
++        ssize_t start = ((ssize_t) hw->pos_emul) - hw->pending_emul;
++        if (start < 0) {
++            start += hw->size_emul;
++        }
++        assert(start >= 0 && start < hw->size_emul);
+ 
+-    /* fill buffer */
+-    for (frame = 0; frame < frameCount; frame++) {
+-#ifdef FLOAT_MIXENG
+-        *out++ = src[frame].l; /* left channel */
+-        *out++ = src[frame].r; /* right channel */
+-#else
+-#ifdef RECIPROCAL
+-        *out++ = src[frame].l * scale; /* left channel */
+-        *out++ = src[frame].r * scale; /* right channel */
+-#else
+-        *out++ = src[frame].l / scale; /* left channel */
+-        *out++ = src[frame].r / scale; /* right channel */
+-#endif
+-#endif
++        write_len = MIN(MIN(hw->pending_emul, len),
++                        hw->size_emul - start);
++
++        memcpy(out, hw->buf_emul + start, write_len);
++        hw->pending_emul -= write_len;
++        len -= write_len;
++        out += write_len;
+     }
+ 
+-    rpos = (rpos + frameCount) % hw->samples;
+-    core->decr += frameCount;
+-    core->rpos = rpos;
+-
+     coreaudio_unlock (core, "audioDeviceIOProc");
+     return 0;
  }
  
- static void glue (audio_pcm_sw_free_resources_, TYPE) (SW *sw)
-@@ -104,7 +103,7 @@ static int glue (audio_pcm_sw_alloc_resources_, TYPE) (SW *sw)
++static UInt32 coreaudio_get_flags(struct audio_pcm_info *info,
++                                  struct audsettings *as)
++{
++    UInt32 flags = info->sign ? kAudioFormatFlagIsSignedInteger : 0;
++    if (as->endianness) { /* 0 = little, 1 = big */
++        flags |= kAudioFormatFlagIsBigEndian;
++    }
++
++    if (flags == 0) { /* must not be 0 */
++        flags = kAudioFormatFlagsAreAllClear;
++    }
++    return flags;
++}
++
+ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+                               void *drv_opaque)
  {
-     int samples;
+@@ -576,6 +572,16 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
  
--    samples = ((int64_t) sw->hw->samples << 32) / sw->ratio;
-+    samples = ((int64_t) sw->HWBUF->size << 32) / sw->ratio;
+     /* set Samplerate */
+     core->outputStreamBasicDescription.mSampleRate = (Float64) as->freq;
++    core->outputStreamBasicDescription.mFormatID = kAudioFormatLinearPCM;
++    core->outputStreamBasicDescription.mFormatFlags =
++        coreaudio_get_flags(hw->info, as);
++    core->outputStreamBasicDescription.mBytesPerPacket =
++        core->outputStreamBasicDescription.mBytesPerFrame =
++        hw->info.nchannels * hw->info.bits / 8;
++    core->outputStreamBasicDescription.mFramesPerPacket = 1;
++    core->outputStreamBasicDescription.mChannelsPerFrame = hw->info.nchannels;
++    core->outputStreamBasicDescription.mBitsPerChannel = hw->info.bits;
++
+     status = coreaudio_set_streamformat(core->outputDeviceID,
+                                         &core->outputStreamBasicDescription);
+     if (status != kAudioHardwareNoError) {
+@@ -686,7 +692,9 @@ static void coreaudio_audio_fini (void *opaque)
+ static struct audio_pcm_ops coreaudio_pcm_ops = {
+     .init_out = coreaudio_init_out,
+     .fini_out = coreaudio_fini_out,
+-    .run_out  = coreaudio_run_out,
++    .write    = coreaudio_write,
++    .get_buffer_out = coreaudio_get_buffer_out,
++    .put_buffer_out = coreaudio_put_buffer_out_nowrite,
+     .ctl_out  = coreaudio_ctl_out
+ };
  
-     sw->buf = audio_calloc(__func__, samples, sizeof(struct st_sample));
-     if (!sw->buf) {
-@@ -280,9 +279,7 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioState *s,
-         [hw->info.swap_endianness]
-         [audio_bits_to_index (hw->info.bits)];
- 
--    if (glue (audio_pcm_hw_alloc_resources_, TYPE) (hw)) {
--        goto err1;
--    }
-+    glue(audio_pcm_hw_alloc_resources_, TYPE)(hw);
- 
-     QLIST_INSERT_HEAD (&s->glue (hw_head_, TYPE), hw, entries);
-     glue (s->nb_hw_voices_, TYPE) -= 1;
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index f1b57c87b4..08fe047f91 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -585,7 +585,7 @@ static int oss_ctl_out (HWVoiceOut *hw, int cmd, ...)
-                 return 0;
-             }
- 
--            audio_pcm_info_clear_buf(&hw->info, hw->buf_emul, hw->samples);
-+            audio_pcm_info_clear_buf(&hw->info, hw->buf_emul, hw->mix_buf->size);
-             trig = PCM_ENABLE_OUTPUT;
-             if (ioctl (oss->fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0) {
-                 oss_logerr (
 -- 
 2.20.1
