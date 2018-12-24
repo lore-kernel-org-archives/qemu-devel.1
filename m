@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:58857)
+Received: from eggs.gnu.org ([208.118.235.92]:58892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gbSUy-0003Qx-82
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:50:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1gbSV5-0003VG-7c
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:50:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gbSUx-0005Xx-9U
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:50:32 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 24 Dec 2018 15:50:01 +0000
-Message-ID: <320758d6-012b-0b17-2467-f73bf8f4dcb2@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <435F839C195C714C9BA3B5DDC623ECB4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1gbSV0-0005fd-CU
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:50:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52754)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gbSV0-0005el-16
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:50:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gbSUz-0005CZ-1s
+	for <qemu-devel@nongnu.org>; Mon, 24 Dec 2018 15:50:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F31652E80C9
+	for <qemu-devel@nongnu.org>; Mon, 24 Dec 2018 15:50:32 +0000 (UTC)
 MIME-Version: 1.0
-Subject: [Qemu-devel] do not lseek in qcow2 block_status
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 24 Dec 2018 15:44:23 -0000
+From: Saverio Miroddi <1809665@bugs.launchpad.net>
+Reply-To: Bug 1809665 <1809665@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154566626385.25910.12711983515604457304.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809665] [NEW] Xbox One controller USB
+ passthrough disconnections and stops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +36,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
 
-SGkgYWxsIQ0KDQpiZHJ2X2NvX2Jsb2NrX3N0YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlv
-bmFsLCBtb3JlIGFjY3VyYXRlIHNlYXJjaCBmb3IgaG9sZQ0KaW5zaWRlIHJlZ2lvbiwgcmVwb3J0
-ZWQgYXMgREFUQSBieSBicyBzaW5jZSBsb25nLWFnbw0KDQogICBjb21taXQgNWRhYTc0YTZlYmNl
-NzU0M2FhYWQxNzhjNDA2MWRjMDg3YmI0YzcwNQ0KICAgQXV0aG9yOiBQYW9sbyBCb256aW5pIDxw
-Ym9uemluaUByZWRoYXQuY29tPg0KICAgRGF0ZTogICBXZWQgU2VwIDQgMTk6MDA6MzggMjAxMyAr
-MDIwMA0KDQogICAgICAgYmxvY2s6IGxvb2sgZm9yIHplcm8gYmxvY2tzIGluIGJzLT5maWxlDQoN
-ClRoaXMgYWNjdXJhY3kgaXMgbm90IGZyZWU6IGFzc3VtZSB3ZSBoYXZlIHFjb3cyIGRpc2suIEFj
-dHVhbGx5LCBxY293MiBrbm93cywNCndoZXJlIGFyZSBob2xlcyBhbmQgd2hlcmUgaXMgZGF0YS4g
-QnV0IGV2ZXJ5IGJsb2NrX3N0YXR1cyByZXF1ZXN0IGNhbGxzIGxzZWVrDQphZGRpdGlvbmFsbHku
-IFJlY2VudGx5IChhbmQgbm90IHRoZSBmaXJzdCB0aW1lKSB3ZSBoYXZlIGZhY2VkIHRoZSBzaXR1
-YXRpb24sDQp3aGVuIGxzZWVrIHdvcmtzIHNsb3cuIE9mIGNvdXJzZSwgaXQgaXMgbW9yZSBhYm91
-dCBrZXJuZWwgaW1wbGVtZW50YXRpb24gb2YgaXQsDQpidXQgd2h5IHRvIGludm9sdmUgbHNlZWsg
-YXQgYWxsLCBpZiB3ZSBoYXZlIHRoZSBpbmZvcm1hdGlvbiBvbiBxY293MiBsZXZlbD8NCkFzc3Vt
-ZSBhIGJpZyBkaXNrLCBmdWxsIG9mIGRhdGEsIGluIGFueSBpdGVyYXRpdmUgY29weWluZyBibG9j
-ayBqb2IgKG9yIGltZw0KY29udmVydCkgd2UnbGwgY2FsbCBsc2VlayhIT0xFKSBvbiBldmVyeSBp
-dGVyYXRpb24sIGFuZCBlYWNoIG9mIHRoZXNlIGxzZWVrcw0Kd2lsbCBoYXZlIHRvIGl0ZXJhdGUg
-dGhyb3VnaCBhbGwgbWV0YWRhdGEgdXAgdG8gdGhlIGVuZCBvZiBmaWxlLiBJdCdzIG9idmlvdXNs
-eQ0KaW5lZmZlY3RpdmUgYmVoYXZpb3IuDQoNCkknbSB0aGlua2luZyBhYm91dCwgaG93IHRvIHBy
-b3Blcmx5IHdvcmthcm91bmQgdGhpcyB0aGluZywgYW5kIEkgaGF2ZSBzb21lDQpxdWVzdGlvbnMu
-DQoNCldoYXQgYXJlIHRoZSBjYXNlcywgd2hlbiB3ZSByZWFsbHkgbmVlZCBkaWdnaW5nIGZvciB6
-ZXJvcyBpbiBicy0+ZmlsZT8NCg0KV2h5IGluIG1pcnJvciB3ZSBjYXJlIGFib3V0IGRpc2NhcmQg
-dnMgd3JpdGVfemVyb3MsIGtlZXBpbmcgaW4gbWluZCwgdGhhdA0KYmxvY2tfc3RhdHVzIHdpbGwg
-cmV0dXJuIFpFUk8gaW5zdGVhZCBmb3IgdW5hbGxvY2F0ZWQgcmVnaW9ucyBpbiBzb21lIGNhc2Vz
-LCBub3QNCnJlbGF0ZWQgdG8gZ3Vlc3QgdmlldyBvZiBkaXNrIChiZHJ2X3VuYWxsb2NhdGVkX2Js
-b2Nrc19hcmVfemVybywgYmFja2luZyBmaWxlIGlzDQpzbWFsbGVyIHRoYW4gcmVxdWVzdC5zdGFy
-dCk/DQoNCkFuZCBmaW5hbGx5LCB3aGF0IHRvIGRvIHdpdGggdGhlIHByb2JsZW0/DQoNCk9idmlv
-dXNseSwgdGhlIHNpbXBsZXN0IHRoaW5nIGlzIGp1c3QgcmV2ZXJ0IDVkYWE3NGEuIFdoYXQgd2ls
-bCBpdCBicmVhaz8NCg0KT3RoZXJ3aXNlLCBJIG5lZWQgdG8gInJldmVydCIgaXQgaW4gc29tZSBj
-YXNlcywgYW5kLCBtYXkgYmUsIGl0IHNob3VsZCBiZSBhDQp1c2VyLWRlZmluZWQgcGFyYW1ldGVy
-Li4gU2hvdWxkIGl0PyAgQW5kIHdoYXQgYXJlIHRoZSBjYXNlcz8gV2UgbmVlZCB0byAiZnJlZSIN
-Cm9mIDVkYWE3NGEgYXQgbGVhc3QgcWNvdzIuLiBCdXQgYWdhaW4sIHNob3VsZCBpdCBiZSBmb3Jt
-YXQtc3BlY2lmaWMgb3B0aW9uLCBvcg0Kc29tZXRoaW5nIG1vcmUgZ2VuZXJpYz8NCg0KVGhlbiwg
-aWYgaXQgd291bGQgYmUgc2VwYXJhdGUgcGFyYW1ldGVyLCBob3cgc2hvdWxkIGl0IGludGVyZmVy
-ZSB3aXRoDQp3YW50X3plcm9zLCBvciBldmVuLCBzaG91bGQgaXQgYmUgd2FudF96ZXJvcywgcmV3
-b3JrZWQgYSBiaXQgdG8gYmUgd2FudF9sc2Vlaz8NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFk
-aW1pcg0K
+Public bug reported:
+
+I can't properly passthrough my Xbox One controller to a virtual
+machine; it causes USB disconnections on the host, ultimately preventing
+it to work (at all) on the guest
+
+I've seen a few other cases reported in other websites, which show the
+same symptoms:
+
+- https://www.reddit.com/r/VFIO/comments/97dhbw/qemu_w10_xbox_one_controller
+- https://unix.stackexchange.com/questions/452751/how-can-i-pass-through-an=
+-xbox-one-controller-to-a-windows-vm-on-ubuntu
+
+This is sample:
+
+    libusb: error [udev_hotplug_event] ignoring udev action bind
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try ag=
+ain
+    libusb: error [_get_usbfs_fd] libusb couldn't open USB device
+        /dev/bus/usb/003/016: No such file or directory
+
+I think this is a quite long-standing issue, as I've been experiencing
+through several versions, including the current one (3.1).
+
+I can reproduce this 100% of the times, on multiple host O/S
+distributions (the current one being based on Ubuntu 18.04 x86-64).
+
+I compile QEMU directly from source, and execute it via commandline; the
+command is very long, however, the relevant part is standard (I think):
+
+    -usb \
+    -device usb-tablet \
+    -device usb-host,vendorid=3D0x$VGAPT_XBOX_PAD_VEND_ID,productid=3D0x$VG=
+APT_XBOX_PAD_PROD_ID \
+
+The guest is Windows 10 64bit.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809665
+
+Title:
+  Xbox One controller USB passthrough disconnections and stops
+
+Status in QEMU:
+  New
+
+Bug description:
+  I can't properly passthrough my Xbox One controller to a virtual
+  machine; it causes USB disconnections on the host, ultimately
+  preventing it to work (at all) on the guest
+
+  I've seen a few other cases reported in other websites, which show the
+  same symptoms:
+
+  - https://www.reddit.com/r/VFIO/comments/97dhbw/qemu_w10_xbox_one_control=
+ler
+  - https://unix.stackexchange.com/questions/452751/how-can-i-pass-through-=
+an-xbox-one-controller-to-a-windows-vm-on-ubuntu
+
+  This is sample:
+
+      libusb: error [udev_hotplug_event] ignoring udev action bind
+      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+      libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try =
+again
+      libusb: error [_get_usbfs_fd] libusb couldn't open USB device
+          /dev/bus/usb/003/016: No such file or directory
+
+  I think this is a quite long-standing issue, as I've been experiencing
+  through several versions, including the current one (3.1).
+
+  I can reproduce this 100% of the times, on multiple host O/S
+  distributions (the current one being based on Ubuntu 18.04 x86-64).
+
+  I compile QEMU directly from source, and execute it via commandline;
+  the command is very long, however, the relevant part is standard (I
+  think):
+
+      -usb \
+      -device usb-tablet \
+      -device usb-host,vendorid=3D0x$VGAPT_XBOX_PAD_VEND_ID,productid=3D0x$=
+VGAPT_XBOX_PAD_PROD_ID \
+
+  The guest is Windows 10 64bit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809665/+subscriptions
