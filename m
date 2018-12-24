@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:45908)
+Received: from eggs.gnu.org ([208.118.235.92]:54599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gbOms-0002xv-Tv
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 06:52:47 -0500
+	(envelope-from <remy.noel@blade-group.com>) id 1gbPV8-0004hl-6O
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 07:38:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gbOmn-0001VY-RH
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 06:52:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51160)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gbOmn-0001TK-JS
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 06:52:41 -0500
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Date: Mon, 24 Dec 2018 06:52:34 -0500
-Message-Id: <20181224115235.16881-1-wainersm@redhat.com>
+	(envelope-from <remy.noel@blade-group.com>) id 1gbPV7-0002Yb-Fw
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 07:38:30 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40773)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <remy.noel@blade-group.com>)
+	id 1gbPV7-0002Xc-6o
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 07:38:29 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f188so11680118wmf.5
+	for <qemu-devel@nongnu.org>; Mon, 24 Dec 2018 04:38:28 -0800 (PST)
+References: <20181220152030.28035-1-remy.noel@blade-group.com>
+	<20181220163738.GA5662@stefanha-x1.localdomain>
+	<44649c49-6d9f-a839-32f1-1cce9766da17@redhat.com>
+From: Remy NOEL <remy.noel@blade-group.com>
+Message-ID: <ffd3e660-9704-9522-2660-bc8b850c953d@blade-group.com>
+Date: Mon, 24 Dec 2018 13:38:47 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 0/1] qom-get access to kernel-irqchip
- property
+In-Reply-To: <44649c49-6d9f-a839-32f1-1cce9766da17@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+Subject: Re: [Qemu-devel] [QEMU-devel][PATCH v4 0/2] Fix concurrent
+ aio_poll/set_fd_handler.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +33,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-On preparing to test Peter Xu's "q35: change defaults for kernel irqchip =
-and
-IR" patch [1] I realized that kernel-irqchip property of the Machine
-Class object cannot be read via qom-get api.
+On 12/21/18 12:34 PM, Paolo Bonzini wrote:
 
-Actually there isn't such as kernel_irqchip property, rather it is
-a compound of kernel_irqchip_allowed, kernel_irqchip_required, and
-kernel_irqchip_split. Maybe that is the reason why a getter for
-kernel-irqchip was not implemented. Thus, as I don't have all the context=
-,
-I prefer to submit this a RFC implementation.
+> FWIW, I had missed the early version that used RCU, but lockcnt is
+> already very RCU-like, so not using RCU is the right thing to do.  The
+> difference between lockcnt and RCU is that cleanup is done by the reader
+> instead of a separate thread.  Because we know that reader/writer
+> concurrency is very rare for AioContext handlers, the tradeoffs favor
+> lockcnt over RCU.
 
-It was tested using the following code that I don't think is worth to
-merge with this series, although I would like to keep it here as a
-reference:
+Indeed, i forgot to CC you in the first batch (get_maintainer.pl was not 
+finding you).
 
-from avocado_qemu import Test
+Thanks for the RCU hints, i though the performance hit was due to the 
+RCU being global to qemu.
 
-class MachineKernelIrqChip(Test):
-    """
-    :avocado: enable
-    """
-    def get_kernel_irqchip(self):
-        return self.vm.command('qom-get', path=3D'/machine',
-                                          property=3D'kernel-irqchip')
-    def test_default(self):
-        self.vm.add_args('-M', 'q35,accel=3Dkvm')
-        self.vm.launch()
-        self.assertEqual(self.get_kernel_irqchip(), 'off')
 
-    def test_off(self):
-        self.vm.add_args('-M', 'q35,accel=3Dkvm,kernel-irqchip=3Doff')
-        self.vm.launch()
-        self.assertEqual(self.get_kernel_irqchip(), 'off')
-
-    def test_on(self):
-        self.vm.add_args('-M', 'q35,accel=3Dkvm,kernel-irqchip=3Don')
-        self.vm.launch()
-        self.assertEqual(self.get_kernel_irqchip(), 'on')
-
-    def test_split(self):
-        self.vm.add_args('-M', 'q35,accel=3Dkvm,kernel-irqchip=3Dsplit')
-        self.vm.launch()
-        self.assertEqual(self.get_kernel_irqchip(), 'split')
-
-References:
-[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg582840.html
-
-Wainer dos Santos Moschetta (1):
-  hw/core: add qom getter for kernel-irqchip property
-
- hw/core/machine.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
-
---=20
-2.19.2
+Remy
