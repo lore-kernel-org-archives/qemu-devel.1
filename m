@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50628)
+Received: from eggs.gnu.org ([208.118.235.92]:34783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gbHzm-0000VR-OB
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 23:37:39 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gbIgv-00006P-PG
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 00:22:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1gbHzm-0007es-0h
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 23:37:38 -0500
-Message-ID: <1545626239.44118.14.camel@linux.intel.com>
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Mon, 24 Dec 2018 12:37:19 +0800
-In-Reply-To: <588440e5-7fb2-7404-935e-f61c22c83b16@redhat.com>
-References: <20181221063002.7570-1-pbonzini@redhat.com>
-	<cb7a9fc9-cded-7ca5-dbb9-8ffde9670fa7@redhat.com>
-	<faa89439-18ae-931b-54c7-212b7dea0e48@redhat.com>
-	<1545440514.44118.11.camel@linux.intel.com>
-	<588440e5-7fb2-7404-935e-f61c22c83b16@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] i386: remove the 'INTEL_PT' CPUID bit from
- named CPU models
+	(envelope-from <no-reply@patchew.org>) id 1gbIgs-0000zo-K3
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 00:22:13 -0500
+Resent-Message-Id: <E1gbIgs-0000zo-K3@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21789)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gbIgs-0000tS-C1
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 00:22:10 -0500
+In-Reply-To: <20181217150116.10446-1-alex.bennee@linaro.org>
+Message-ID: <154562889614.18047.12486083658889107906@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 23 Dec 2018 21:21:37 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH  v1 0/4] de-macrofy softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, luwei.kang@intel.com
-Cc: robert.hu@intel.com, robert.hu@linux.intel.com, qemu-stable@nongnu.org
+To: alex.bennee@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, cota@braap.org
 
-On Sat, 2018-12-22 at 10:13 +0100, Paolo Bonzini wrote:
-> On 22/12/18 02:01, Robert Hoo wrote:
-> > On Fri, 2018-12-21 at 16:27 +0100, Paolo Bonzini wrote:
-> > > On 21/12/18 16:22, Philippe Mathieu-Daudé wrote:
-> > > > Hi Paolo,
-> > > > 
-> > > > On 12/21/18 7:30 AM, Paolo Bonzini wrote:
-> > > > > From: Robert Hoo <robert.hu@linux.intel.com>
-> > > > > 
-> > > > > Processor tracing is not yet implemented for KVM and it will
-> > > > > be
-> > > > > an
-> > > > > opt in feature requiring a special module parameter.
-> > > > > Disable it, because it is wrong to enable it by default and
-> > > > > it is impossible that no one has ever used it.
-> > > > > 
-> > > > > Cc: qemu-stable@nongnu.org
-> > > > 
-> > > > Does this patch misses Robert S-o-b?
-> > > > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> > 
-> > Paolo's right. It didn't come from me.
-> > > 
-> > > No, the author is wrong, it should be me.  "git commit -c"
-> > > apparently
-> > > copies the author from the original commit.
-> > > 
-> > > Paolo
-> > 
-> > Hi Paolo, would you hold on INTEL_PT removal for a moment? I think
-> > I
-> > need Luwei's double confirm.
-> 
-> I'm aware of Luwei's patches, they will be in 4.21.  As mentioned in
-> the
-> commit message, they will be an opt-in feature, not enabled by
-> default;
-> the default is system-wide tracing and no INTEL_PT CPUID bit
-> available
-> in the guest.
-> 
-OK, synced with Luwei, agree with you.
-
-> Paolo
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxNzE1MDExNi4xMDQ0
+Ni0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
+ZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
+IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
+YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0Bm
+ZWRvcmEgU0hPV19FTlY9MSBKPTgKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICB4
+ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9jcHUubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUv
+dGFyZ2V0L2kzODYvZ2Ric3R1Yi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYmxvY2sv
+dmlydGlvLWJsay5vCi90bXAvcWVtdS10ZXN0L3NyYy9hY2NlbC90Y2cvc29mdG1tdS5jOjIwNzox
+OiBlcnJvcjogY29uZmxpY3RpbmcgdHlwZXMgZm9yICdoZWxwZXJfbGVfbGRxX21tdScKIGhlbHBl
+cl9sZV9sZHFfbW11KENQVUFyY2hTdGF0ZSAqZW52LCB0YXJnZXRfdWxvbmcgYWRkciwgVENHTWVt
+T3BJZHggb2ksCiBefn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9x
+ZW11LXRlc3Qvc3JjL2luY2x1ZGUvZXhlYy9jcHVfbGRzdC5oOjEyNzowLAotLS0KL3RtcC9xZW11
+LXRlc3Qvc3JjL3RjZy90Y2cuaDoxMzA3OjEwOiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBv
+ZiAnaGVscGVyX2xlX2xkcV9tbXUnIHdhcyBoZXJlCiB1aW50NjRfdCBoZWxwZXJfbGVfbGRxX21t
+dShDUFVBcmNoU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nIGFkZHIsCiAgICAgICAgICBefn5+fn5+
+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvYWNjZWwvdGNnL3NvZnRtbXUuYzoyMTQ6MTog
+ZXJyb3I6IGNvbmZsaWN0aW5nIHR5cGVzIGZvciAnaGVscGVyX2JlX2xkcV9tbXUnCiBoZWxwZXJf
+YmVfbGRxX21tdShDUFVBcmNoU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nIGFkZHIsIFRDR01lbU9w
+SWR4IG9pLAogXn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC90bXAvcWVt
+dS10ZXN0L3NyYy9pbmNsdWRlL2V4ZWMvY3B1X2xkc3QuaDoxMjc6MCwKLS0tCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9vbWFwX3RhcC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
+bXUvaHcvbWlzYy9iY20yODM1X21ib3gubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21p
+c2MvYmNtMjgzNV9wcm9wZXJ0eS5vCi90bXAvcWVtdS10ZXN0L3NyYy9hY2NlbC90Y2cvc29mdG1t
+dS5jOjIwNzoxOiBlcnJvcjogY29uZmxpY3RpbmcgdHlwZXMgZm9yICdoZWxwZXJfbGVfbGRxX21t
+dScKIGhlbHBlcl9sZV9sZHFfbW11KENQVUFyY2hTdGF0ZSAqZW52LCB0YXJnZXRfdWxvbmcgYWRk
+ciwgVENHTWVtT3BJZHggb2ksCiBefn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZy
+b20gL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvZXhlYy9jcHVfbGRzdC5oOjEyNzowLAotLS0K
+L3RtcC9xZW11LXRlc3Qvc3JjL3RjZy90Y2cuaDoxMzA3OjEwOiBub3RlOiBwcmV2aW91cyBkZWNs
+YXJhdGlvbiBvZiAnaGVscGVyX2xlX2xkcV9tbXUnIHdhcyBoZXJlCiB1aW50NjRfdCBoZWxwZXJf
+bGVfbGRxX21tdShDUFVBcmNoU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nIGFkZHIsCiAgICAgICAg
+ICBefn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvYWNjZWwvdGNnL3NvZnRtbXUu
+YzoyMTQ6MTogZXJyb3I6IGNvbmZsaWN0aW5nIHR5cGVzIGZvciAnaGVscGVyX2JlX2xkcV9tbXUn
+CiBoZWxwZXJfYmVfbGRxX21tdShDUFVBcmNoU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nIGFkZHIs
+IFRDR01lbU9wSWR4IG9pLAogXn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9t
+IC90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL2V4ZWMvY3B1X2xkc3QuaDoxMjc6MCwKCgpUaGUg
+ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTgxMjE3
+MTUwMTE2LjEwNDQ2LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZy90ZXN0aW5nLmRvY2tlci1taW5n
+d0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
