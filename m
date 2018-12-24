@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:35064)
+Received: from eggs.gnu.org ([208.118.235.92]:55360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zach_turing@outlook.com>) id 1gbGA6-0003eI-VM
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:40:12 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gbLL8-0000nn-Ow
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 03:11:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zach_turing@outlook.com>) id 1gbGA3-00007E-HM
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:40:10 -0500
-Received: from mail-oln040092253091.outbound.protection.outlook.com
-	([40.92.253.91]:8497
-	helo=APC01-SG2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zach_turing@outlook.com>)
-	id 1gbGA3-0008Sm-06
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:40:07 -0500
-From: ? ? <zach_turing@outlook.com>
-Date: Mon, 24 Dec 2018 02:40:02 +0000
-Message-ID: <SG2PR03MB3594A9080D305565DE9FB4E380BB0@SG2PR03MB3594.apcprd03.prod.outlook.com>
-Content-Language: zh-CN
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gbLL5-0003Yk-KZ
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 03:11:54 -0500
+Received: from mga04.intel.com ([192.55.52.120]:10092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1gbLL5-0003SU-AI
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 03:11:51 -0500
+Date: Mon, 24 Dec 2018 16:11:43 +0800
+From: Yi Zhang <yi.z.zhang@linux.intel.com>
+Message-ID: <20181224081142.GA6477@tiger-server>
+References: <5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
+	<20181218085249-mutt-send-email-mst@kernel.org>
+	<20181219091017.GA35378@tiger-server>
+	<20181219105555-mutt-send-email-mst@kernel.org>
+	<20181220030312.GA70591@tiger-server>
+	<20181219223700-mutt-send-email-mst@kernel.org>
+	<20181220053739.GB70591@tiger-server>
+	<20181220090435-mutt-send-email-mst@kernel.org>
+	<20181221031817.GA77135@tiger-server>
+	<20181221112902-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] live migration
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181221112902-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,12 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
 
-
-Hello, I have a question I would like to ask.
-If I add the -incoming parameter when starting the qemu virtual machine, th=
-e virtual machine will block all the time, waiting for the migration connec=
-tion request to arrive.
-I want to modify the time of this blocking wait, how should I modify the so=
-urce code?
+On 2018-12-21 at 11:36:07 -0500, Michael S. Tsirkin wrote:
+> On Fri, Dec 21, 2018 at 11:18:18AM +0800, Yi Zhang wrote:
+> > On 2018-12-20 at 09:06:41 -0500, Michael S. Tsirkin wrote:
+> > > On Thu, Dec 20, 2018 at 01:37:40PM +0800, Yi Zhang wrote:
+> > > > On 2018-12-19 at 22:42:07 -0500, Michael S. Tsirkin wrote:
+> > > > > On Thu, Dec 20, 2018 at 11:03:12AM +0800, Yi Zhang wrote:
+> > > > > > On 2018-12-19 at 10:59:10 -0500, Michael S. Tsirkin wrote:
+> > > > > > > On Wed, Dec 19, 2018 at 05:10:18PM +0800, Yi Zhang wrote:
+> > > > > > > > > > +
+> > > > > > > > > > + - 'sync' option of memory-backend-file is not 'off', and
+> > > > > > > > > > +
+> > > > > > > > > > + - 'share' option of memory-backend-file is 'on'.
+> > > > > > > > > > +
+> > > > > > > > > > + - 'pmem' option of memory-backend-file is 'on'
+> > > > > > > > > > +
+> > > > > > > > > 
+> > > > > > > > > Wait isn't this what pmem was supposed to do?
+> > > > > > > > > Doesn't it mean "persistent memory"?
+> > > > > > > > pmem is a option for memory-backend-file, user should know the backend
+> > > > > > > > is in host persistent memory, with this flags on, while there is a host crash
+> > > > > > > > or a power failures.
+> > > > > > > > 
+> > > > > > > > [1] Qemu will take necessary operations to guarantee the persistence.
+> > > > > > > > https://patchwork.ozlabs.org/cover/944749/ 
+> > > > > > > > 
+> > > > > > > > [2] Host kernel also take opretions to consistent filesystem metadata.
+> > > > > > > > Add MAP_SYNC flags.
+> > > > > > > 
+> > > > > > > OK so I'm a user. Can you educate me please?  
+> > > > > > We suppose an administrator should know it, what is the back-end region coming from,
+> > > > > > is it persistent? what is the font-end device is? a volatile dimm or an
+> > > > > > nonvolatile dimm? then they can choice put the pmem=on[off] and sync=on[off].
+> > > > > > If he didn't, we encourage that don't set these 2 flags.
+> > > > > > 
+> > > > > > > When should MAP_SYNC not
+> > > > > > > be set? Are there any disadvantages (e.g.  performance?)?
+> > > > > > Not only the performance, sometimes like the front-end device is an
+> > > > > > volatile ram, we don't wanna set such option although the backend is a
+> > > > > > novolatile memory, if power lose, all of thing should lose in this ram.
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > I am not sure how does above answer the questions. If I don't know,
+> > > > > neither will the hypothetical administrator. Looks like a better
+> > > > > interface is needed to make the choice on behalf of the user.
+> > > > > 
+> > > > By default, we have already ignore the 2 flags, unless the administrator
+> > > > know how to make that use. By-now, seems we don't have a better way to detect what
+> > > > memory-backend-file is, a persistent memory or not.
+> > > 
+> > > In that case how about an interface where user tells QEMU "this backend
+> > > is in persistent memory"?
+> > 
+> > Actually, [pmem=on] already did this, we can get the backend memory type from:
+> > 
+> > file_memory_backend_get_pmem(),
+> > 
+> > That is already being used in the memory_region_init_ram_from_file. that
+> > is why I reuse the RAM_PMEM to identify the region coming from a
+> > persitent memory? correct me if something I misunderstood? 
+> 
+> Right and thus my question: why not set SYNC unconditionally with pmem=on?
+A case is that we set pmem but don't wanna sync in a /dev/dax backend,
+which is direct mapping to physical nvdimm device without filesystem aware,
+SYNC is useless in this condition.
+> 
+> > 
+> > > 
+> > > 
+> > > 
+> > > > > 
+> > > > > > > 
+> > > > > > > -- 
+> > > > > > > MST
+> > > > > > > 
+> > > > > 
+> > > 
+> 
