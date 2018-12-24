@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:45761)
+Received: from eggs.gnu.org ([208.118.235.92]:54509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mahaocong@didiglobal.com>) id 1gbMcn-0004OY-QZ
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 04:34:14 -0500
+	(envelope-from <jcfaracco@gmail.com>) id 1gbS87-00027D-Pq
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:26:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mahaocong@didiglobal.com>) id 1gbMci-0007T3-7e
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 04:34:11 -0500
-Received: from mx2.didiglobal.com ([111.202.154.82]:20766
-	helo=bsf01.didichuxing.com) by eggs.gnu.org with smtp (Exim 4.71)
-	(envelope-from <mahaocong@didiglobal.com>) id 1gbMcd-0007GO-Sr
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 04:34:06 -0500
-From: =?utf-8?B?6ams5piK6aqiKOa7tOa7tOS6kSk=?= <mahaocong@didiglobal.com>
-Date: Mon, 24 Dec 2018 09:33:50 +0000
-Message-ID: <5587158D-EAA3-443A-9224-F651314F8122@didichuxing.com>
-References: <20181219065020.81256-1-mahaocong_work@163.com>
-	<20181219065020.81256-2-mahaocong_work@163.com>
-	<ea116c05-43c3-cb11-e492-b32a8f918bec@redhat.com>
-In-Reply-To: <ea116c05-43c3-cb11-e492-b32a8f918bec@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <137585367C1F4E48BED8C442715CE277@didichuxing.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jcfaracco@gmail.com>) id 1gbS87-0000FS-3F
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:26:55 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1] migration: add incremental mode on
- drive-mirror
+References: <20181223025939.15775-1-npes87184@gmail.com>
+In-Reply-To: <20181223025939.15775-1-npes87184@gmail.com>
+From: Julio Faracco <jcfaracco@gmail.com>
+Date: Mon, 24 Dec 2018 13:26:42 -0200
+Message-ID: <CAENf94J0DefrRC6sNk3Ko=kmu2YW1GTwKy+r_5bZRJR8BfgNgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/3] dmg: fixing reading in
+ dmg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: yuchenlin <npes87184@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-SSByZWRlc2NyaWJlIGRldGFpbHMgb24gY292ZXIgbGV0dGVyIGFuZCBzZW5kIGEgbmV3IG1haWwg
-aW4gRGVjZW1iZXIgMjAsIDIwMTguIA0KUGxlYXNlIGhlbHAgbWUgcmV2aWV3IGFnYWluLCB0aGFu
-ayB5b3UuDQoNCuWcqCAyMDE4LzEyLzE5IOS4i+WNiDEwOjQ477yM4oCcRXJpYyBCbGFrZeKAnTxl
-Ymxha2VAcmVkaGF0LmNvbT4g5YaZ5YWlOg0KDQogICAgT24gMTIvMTkvMTggMTI6NTAgQU0sIG1h
-aGFvY29uZyB3cm90ZToNCiAgICA+IEZyb206IG1haGFvY29uZyA8bWFoYW9jb25nQGRpZGljaHV4
-aW5nLmNvbT4NCiAgICA+IA0KICAgID4gU2lnbmVkLW9mZi1ieTogbWFoYW9jb25nIDxtYWhhb2Nv
-bmdAZGlkaWNodXhpbmcuY29tPg0KICAgIA0KICAgIFRoZSBzdWJqZWN0IGxpbmUgdGVsbHMgIndo
-YXQiLCBidXQgeW91IGFyZSBtaXNzaW5nIGEgY29tbWl0IG1lc3NhZ2UgYm9keSANCiAgICB0aGF0
-IGdpdmVzIHRoZSAid2h5Ii4gIERldGFpbHMgYWJvdXQgdGhlIG5ldyBmZWF0dXJlLCBhbmQgaG93
-IGl0IGlzIA0KICAgIHVzZWZ1bCwgZ28gYSBsb25nIHdheSB0byBtYWtpbmcgdGhlIGNvZGUgZWFz
-aWVyIHRvIHJldmlldy4gIEhvdyBtdWNoIG9mIA0KICAgIHlvdXIgY292ZXIgbGV0dGVyIHNob3Vs
-ZCBiZSBoZXJlIGFzIHdlbGw/DQogICAgDQogICAgQXQgYSBmaXJzdCBnbGFuY2UsIEknbSBqdXN0
-IGdvaW5nIHRvIGZvY3VzIG9uIHRoZSBpbnRlcmZhY2U6DQogICAgDQogICAgPiAtLS0NCiAgICA+
-ICAgYmxvY2svZGlydHktYml0bWFwLmMgICAgICAgICB8IDE0ICsrKysrKysrKysNCiAgICA+ICAg
-YmxvY2svbWlycm9yLmMgICAgICAgICAgICAgICB8IDYzICsrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrLS0tLS0tLS0tDQogICAgPiAgIGJsb2NrZGV2LmMgICAgICAgICAgICAgICAg
-ICAgfCAzNiArKysrKysrKysrKysrKysrKysrKysrKy0tDQogICAgPiAgIGluY2x1ZGUvYmxvY2sv
-YmxvY2tfaW50LmggICAgfCAgMyArKy0NCiAgICA+ICAgaW5jbHVkZS9ibG9jay9kaXJ0eS1iaXRt
-YXAuaCB8ICAzICsrKw0KICAgID4gICBpbmNsdWRlL3FlbXUvaGJpdG1hcC5oICAgICAgIHwgIDIg
-KysNCiAgICA+ICAgcWFwaS9ibG9jay1jb3JlLmpzb24gICAgICAgICB8ICA0ICsrLQ0KICAgID4g
-ICB1dGlsL2hiaXRtYXAuYyAgICAgICAgICAgICAgIHwgMjggKysrKysrKysrKysrKysrKysrKysN
-CiAgICA+ICAgOCBmaWxlcyBjaGFuZ2VkLCAxMzYgaW5zZXJ0aW9ucygrKSwgMTcgZGVsZXRpb25z
-KC0pDQogICAgPiANCiAgICANCiAgICA+ICsrKyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQogICAg
-PiBAQCAtMTcyNyw2ICsxNzI3LDggQEANCiAgICA+ICAgIyAgICAgICAgKGFsbCB0aGUgZGlzaywg
-b25seSB0aGUgc2VjdG9ycyBhbGxvY2F0ZWQgaW4gdGhlIHRvcG1vc3QgaW1hZ2UsIG9yDQogICAg
-PiAgICMgICAgICAgIG9ubHkgbmV3IEkvTykuDQogICAgPiAgICMNCiAgICA+ICsjIEBiaXRtYXAt
-bmFtZTogdGhlIGJpdG1hcCB0byBiZSB1c2VkIGluIGluY3JlbWVudGFsIG1vZGUuDQogICAgDQog
-ICAgTWlzc2luZyBhICcoc2luY2UgNC4wKScgdGFnLiAgQW5kIGRvZXNuJ3QgcmVhbGx5IGV4cGxh
-aW4gd2hhdCANCiAgICBpbmNyZW1lbnRhbCBtb2RlIGluIGEgbWlycm9yaW5nIG9wZXJhdGlvbiBh
-Y3R1YWxseSBtZWFucy4NCiAgICANCiAgICA+ICsjDQogICAgPiAgICMgQGdyYW51bGFyaXR5OiBn
-cmFudWxhcml0eSBvZiB0aGUgZGlydHkgYml0bWFwLCBkZWZhdWx0IGlzIDY0Sw0KICAgID4gICAj
-ICAgICAgICAgICAgICAgaWYgdGhlIGltYWdlIGZvcm1hdCBkb2Vzbid0IGhhdmUgY2x1c3RlcnMs
-IDRLIGlmIHRoZSBjbHVzdGVycw0KICAgID4gICAjICAgICAgICAgICAgICAgYXJlIHNtYWxsZXIg
-dGhhbiB0aGF0LCBlbHNlIHRoZSBjbHVzdGVyIHNpemUuICBNdXN0IGJlIGENCiAgICA+IEBAIC0x
-NzY4LDcgKzE3NzAsNyBAQA0KICAgID4gICB7ICdzdHJ1Y3QnOiAnRHJpdmVNaXJyb3InLA0KICAg
-ID4gICAgICdkYXRhJzogeyAnKmpvYi1pZCc6ICdzdHInLCAnZGV2aWNlJzogJ3N0cicsICd0YXJn
-ZXQnOiAnc3RyJywNCiAgICA+ICAgICAgICAgICAgICAgJypmb3JtYXQnOiAnc3RyJywgJypub2Rl
-LW5hbWUnOiAnc3RyJywgJypyZXBsYWNlcyc6ICdzdHInLA0KICAgID4gLSAgICAgICAgICAgICdz
-eW5jJzogJ01pcnJvclN5bmNNb2RlJywgJyptb2RlJzogJ05ld0ltYWdlTW9kZScsDQogICAgPiAr
-ICAgICAgICAgICAgJ3N5bmMnOiAnTWlycm9yU3luY01vZGUnLCAnKmJpdG1hcC1uYW1lJzogJ3N0
-cicsICcqbW9kZSc6ICdOZXdJbWFnZU1vZGUnLA0KICAgIA0KICAgIENhbiB0aGlzIGJlIG5hbWVk
-IGp1c3QgJ2JpdG1hcCcsIGluc3RlYWQgb2YgdGhlIGxvbmdlciAnYml0bWFwLW5hbWUnPw0KICAg
-IA0KICAgID4gICAgICAgICAgICAgICAnKnNwZWVkJzogJ2ludCcsICcqZ3JhbnVsYXJpdHknOiAn
-dWludDMyJywNCiAgICA+ICAgICAgICAgICAgICAgJypidWYtc2l6ZSc6ICdpbnQnLCAnKm9uLXNv
-dXJjZS1lcnJvcic6ICdCbG9ja2Rldk9uRXJyb3InLA0KICAgID4gICAgICAgICAgICAgICAnKm9u
-LXRhcmdldC1lcnJvcic6ICdCbG9ja2Rldk9uRXJyb3InLA0KICAgID4gZGlmZiAtLWdpdCBhL3V0
-aWwvaGJpdG1hcC5jIGIvdXRpbC9oYml0bWFwLmMNCiAgICA+IGluZGV4IDhkNDAyYzUuLjdhZTJm
-YzIgMTAwNjQ0DQogICAgPiAtLS0gYS91dGlsL2hiaXRtYXAuYw0KICAgIA0KICAgIA0KICAgIC0t
-IA0KICAgIEVyaWMgQmxha2UsIFByaW5jaXBhbCBTb2Z0d2FyZSBFbmdpbmVlcg0KICAgIFJlZCBI
-YXQsIEluYy4gICAgICAgICAgICsxLTkxOS0zMDEtMzI2Ng0KICAgIFZpcnR1YWxpemF0aW9uOiAg
-cWVtdS5vcmcgfCBsaWJ2aXJ0Lm9yZw0KICAgIA0KDQo=
+The series looks good to me.
+
+I tested with existing DMGs and DMGs that I created by myself.
+Both are working fine now.
+
+Reviewed-by: Julio Faracco <jcfaracco@gmail.com>
+
+Em dom, 23 de dez de 2018 =C3=A0s 01:01, yuchenlin <npes87184@gmail.com>
+escreveu:
+
+> There are two bugs in dmg reading.
+>
+> First, it may hang in binary search. this problem is solved by patch 1.
+> Second, because of lacking zero chunk table, reading zero sector will
+> return EIO. thie problem is solved by patch 2 and 3.
+>
+> Thanks
+>
+> v1 - >v2:
+> * fix typos in patch 1
+> * add patch 2 and patch 3
+>
+> yuchenlin (3):
+>   dmg: fix binary search
+>   dmg: use enumeration type instead of hard coding number
+>   dmg: don't skip zero chunk
+>
+>  block/dmg.c | 25 +++++++++++++++----------
+>  1 file changed, 15 insertions(+), 10 deletions(-)
+>
+> --
+> 2.17.1
+>
+>
+>
