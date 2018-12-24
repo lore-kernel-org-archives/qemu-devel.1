@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52020)
+Received: from eggs.gnu.org ([208.118.235.92]:53509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbFmn-0004CZ-F5
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:16:07 -0500
+	(envelope-from <13824125580@163.com>) id 1gbFqz-0006uT-Ov
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:20:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbFmm-0003qs-MV
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:16:05 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37025)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gbFmm-0003oA-Du
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:16:04 -0500
-Received: by mail-wr1-x442.google.com with SMTP id s12so10418899wrt.4
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 18:16:04 -0800 (PST)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
-	<11a6562f583531e5a5473716bea44ee3ae7be120.1545598229.git.DirtY.iCE.hu@gmail.com>
-	<66e793ef-dd32-eb81-14f5-cf59ca8c73bb@amsat.org>
-Message-ID: <980b862a-9c2d-8ab7-2937-846524399148@gmail.com>
-Date: Mon, 24 Dec 2018 03:16:01 +0100
+	(envelope-from <13824125580@163.com>) id 1gbFqw-0001gw-Gn
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:20:25 -0500
+Received: from m13-128.163.com ([220.181.13.128]:15905)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <13824125580@163.com>) id 1gbFqv-0001di-JV
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:20:22 -0500
+Date: Mon, 24 Dec 2018 10:19:53 +0800 (CST)
+From: tugouxp  <13824125580@163.com>
+In-Reply-To: <8736qr9db1.fsf@linaro.org>
+References: <76d14474.f850.167cb46b4d9.Coremail.13824125580@163.com>
+	<87d0pw9y7m.fsf@linaro.org>
+	<19e6128e.27e9.167ce041690.Coremail.13824125580@163.com>
+	<874lb79ru9.fsf@linaro.org>
+	<744a1829.ff89.167d091062b.Coremail.13824125580@163.com>
+	<8736qr9db1.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <66e793ef-dd32-eb81-14f5-cf59ca8c73bb@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 23/52] audio: remove audio_MIN, audio_MAX
+Message-ID: <1a35b929.577b.167de02f0b6.Coremail.13824125580@163.com>
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] did the qemu can emulate the whole system with the
+ processor that without support the "virtulization and kvm"?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>
+To: =?GBK?Q?Alex_Benn=A8=A6e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Hi Phil,
-
-On 2018-12-24 00:49, Philippe Mathieu-Daudé wrote:
-> Hi Zoltán,
-> 
-> On 12/23/18 9:51 PM, Kővágó, Zoltán wrote:
->> There's already a MIN and MAX macro in include/qemu/osdep.h, use them
->> instead.
->>
->> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
->>
->> ---
->>
->> Changes from v1:
->> * removed audio_MIN, audio_MAX macros
->> ---
-> [...]>
->> diff --git a/audio/audio.h b/audio/audio.h
->> index ccfef9e10a..bcbe56d639 100644
->> --- a/audio/audio.h
->> +++ b/audio/audio.h
->> @@ -148,23 +148,6 @@ static inline void *advance (void *p, int incr)
->>      return (d + incr);
->>  }
->>  
->> -#ifdef __GNUC__
->> -#define audio_MIN(a, b) ( __extension__ ({      \
->> -    __typeof (a) ta = a;                        \
->> -    __typeof (b) tb = b;                        \
->> -    ((ta)>(tb)?(tb):(ta));                      \
->> -}))
->> -
->> -#define audio_MAX(a, b) ( __extension__ ({      \
->> -    __typeof (a) ta = a;                        \
->> -    __typeof (b) tb = b;                        \
->> -    ((ta)<(tb)?(tb):(ta));                      \
->> -}))
->> -#else
->> -#define audio_MIN(a, b) ((a)>(b)?(b):(a))
->> -#define audio_MAX(a, b) ((a)<(b)?(b):(a))
->> -#endif
->> -
-> 
-> Those MIN/MAX are smarter than the ones in "qemu/osdep.h", I'd keep them
-> moving them there.
-
-Yes, but only when using gcc (or clang when it emulates gcc).
-Unfortunately, they work differently when one of the expressions has
-side effects, which is a disaster waiting to happen (when some poor folk
-finally tries to compile it with a non-gcc compiler).
-
-Or do we support any compilers beside gcc and clang? Because if not,
-sure, do it, just remove the #ifdef and keep only the gcc version.
-
-Regards,
-Zoltan
+CgoKdGhhbmsgdS4KCgo+dCBjYW4gZWl0aGVyIHVzZSBUQ0cgb3IgYSBIVyBiYXNlZCBhY2NlbGVy
+YXRpb24KPmxpa2UgS1ZNLiBIVyBiYXNlZCBhY2NlbGVyYXRpb24gaXMgb25seSBhdmFpbGFibGUg
+b24gdGhlIHNhbWUgbWFjaGluZQo+dHlwZS4KCkJUVywgaWYgdXNlIHRoZSBIVyBhY2NlbGVyYXRp
+b24gbGlrZSBLVk0sIG5vIFRDRyB0cmFuc2xhdGlvbiBiZXR3ZWVuIHRhcmdldCBpbnN0cnVjdGlv
+biBhbmQgaG9zdCBpbnN0cnVjdGlvbiBoYXBwZW5lZCwgcmlnaHQ/Cgp0aGFua3MhCgoKCgoKCgoK
+QXQgMjAxOC0xMi0yMSAyMjoxNDo1OCwgIkFsZXggQmVubqimZSIgPGFsZXguYmVubmVlQGxpbmFy
+by5vcmc+IHdyb3RlOgo+Cj50dWdvdXhwIDwxMzgyNDEyNTU4MEAxNjMuY29tPiB3cml0ZXM6Cj4K
+Pj4gdGhhbmsgeW91Lgo+Pgo+PiBpIGp1c3Qgd2FudCB0byBjb25maXJtIG9uZSB0aGluZywgIHRo
+YXQgaXMgd2hldGhlciB0aGUgcWVtdSBjYW4gZW11bGF0ZSBhIHdob2xlIG9wZXJhdGlvbiBzeXN0
+ZW0ganVzdCBieSBhbmFseXNpcyBpbnN0cnVjdGlvbnMgYnkgaW5zdHJ1Y3Rpb25zIG1hbnVhbGx5
+ICB3aXRob3V0IHRoZSBzdXBwb3J0IG9mIEtWTS4KPj4gc28gZnJvbSB0aGUgYW5zd2VyIHlvdSBn
+aXZlIHRvIG1lLCBpdCBpcyBmZWFzaWJsZSwgcmlnaHQ/Cj4KPlllcyAtIGlmIHlvdSBydW4gcWVt
+dS1zeXN0ZW0tJChBUkNIKSB5b3UgYXJlIGVtdWxhdGluZyBhIGZ1bGwgbWFjaGluZQo+d2l0aCBo
+YXJkd2FyZSBhdHRhY2hlZC4gSXQgY2FuIGVpdGhlciB1c2UgVENHIG9yIGEgSFcgYmFzZWQgYWNj
+ZWxlcmF0aW9uCj5saWtlIEtWTS4gSFcgYmFzZWQgYWNjZWxlcmF0aW9uIGlzIG9ubHkgYXZhaWxh
+YmxlIG9uIHRoZSBzYW1lIG1hY2hpbmUKPnR5cGUuCj4KPlRoZXJlIGlzIGEgdGhpcmQgdHlwZSAt
+IHFlbXUtJChBUkNIKSB3aGljaCBpcyBvZnRlbiBjYWxsZWQgbGludXgtdXNlcgo+bW9kZS4gSGVy
+ZSB0aGUgdHJhbnNsYXRpb24gZW5naW5lIG9ubHkgdHJhbnNsYXRlcyBpbnN0cnVjdGlvbiBmcm9t
+IGd1ZXN0Cj50byB0aGUgaG9zdCBhbmQgdGhlbiBtYXBzIHN5c3RlbSBjYWxscyB0byB0aGUgaG9z
+dCBzeXN0ZW0uIFRoaXMgaXMgaXNuJ3QKPmVtdWxhdGluZyBhIHdob2xlIHN5c3RlbSBidXQgYWxs
+b3dzIHlvdSB0byBydW4gYmluYXJpZXMgZnJvbSBvbmUKPmFyY2hpdGVjdHVyZSBvbiBhbm90aGVy
+Lgo+Cj4+Cj4+Cj4+Cj4+IHRoYW5rcyB2ZXJ5IG11Y2ghCj4+Cj4+Cj4+Cj4+Cj4+Cj4+Cj4+Cj4+
+Cj4+Cj4+IEF0IDIwMTgtMTItMjEgMTc6MDE6MDIsICJBbGV4IEJlbm6opmUiIDxhbGV4LmJlbm5l
+ZUBsaW5hcm8ub3JnPiB3cm90ZToKPj4+Cj4+PnR1Z291eHAgPDEzODI0MTI1NTgwQDE2My5jb20+
+IHdyaXRlczoKPj4+Cj4+Pj4gSGkgYWxleDoKPj4+PiAgICAgbm93IG15IGhvc3QgbWFjaGluZSBk
+aWQgbm90IGhhdmUgdGhlICIvZGV2L2t2bSIgbm9kZXMgYW5kIG5vIGNoYW5jZSB0byBtYWtlIGl0
+IGV4aXN0cy4KPj4+PiBzbyBpIHdhbnQgdG8ga25vdyB3aGV0aGVyIHRoZSAiL2Rldi9rdm0iIGlz
+ICBtYW5kYXRvcnkgIGZvciBxZW11IHRvIGVtdWxhdGUgdGhlIHdob2xlIHN5c3RlbS4KPj4+PiBz
+byBpIGNhbiBtYWtlIHRoZSBlbXVsYXRpb24gd2l0aG91dCB0aGUgc3VwcG9ydCBvZiBrdm0gbWVj
+aGFuaXNtLgo+Pj4KPj4+UUVNVSBydW5zIGluIHR3byBtb2RlcyAtIGZ1bGwgc3lzdGVtIGVtdWxh
+dGlvbiB3aXRoIFRDRyBkb2Vzbid0IHJlcXVpcmUKPj4+S1ZNIGFsdGhvdWdoIGl0IGlzIHJlbGF0
+aXZlbHkgc2xvdy4gT24gc3lzdGVtcyB3aGVyZSB0aGVyZSBndWVzdAo+Pj5hcmNoaXRlY3R1cmUg
+aXMgdGhlIHNhbWUgYXMgdGhlIGhvc3QgYXJjaGl0ZWN0dXJlIHlvdSBjYW4gcnVuIHdpdGggS01W
+Cj4+PihvciBIQVgvV0hQWC9IVkYpIGFjY2VsZXJhdG9ycyBhdCBuZWFyIG5hdGl2ZSBzcGVlZHMu
+Cj4+Pgo+Pj5UaGUgcmVhc29ucyBmb3Igbm90IGhhdmluZyBhIC9kZXYva3ZtIGNhbiB2YXJ5IGJ1
+dCB5b3UgaGF2ZW4ndCBzYWlkIHdoYXQKPj4+eW91ciBob3N0IGFyY2hpdGVjdHVyZSBpcyBhbmQg
+d2hhdCBPUyB5b3UgYXJlIHJ1bm5pbmcgc28gaXQncyBoYXJkIHRvCj4+Pm9mZmVyIGFkdmljZSBo
+ZXJlLgo+Pj4KPj4+LS0KPj4+QWxleCBCZW5uqKZlCj4KPgo+LS0KPkFsZXggQmVubqimZQo=
