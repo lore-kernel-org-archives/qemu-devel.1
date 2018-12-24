@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51553)
+Received: from eggs.gnu.org ([208.118.235.92]:52020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gbFlZ-0003Jx-Bm
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:14:50 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbFmn-0004CZ-F5
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:16:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gbFlV-00028h-CA
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:14:49 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:15830
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gbFlV-00021m-1L
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:14:45 -0500
-References: <1544063533-10139-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1544063533-10139-3-git-send-email-lizhijian@cn.fujitsu.com>
-	<20181221111136-mutt-send-email-mst@kernel.org>
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <a04239e5-8b87-6b90-f8c7-e9c893acceac@cn.fujitsu.com>
-Date: Mon, 24 Dec 2018 10:14:38 +0800
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gbFmm-0003qs-MV
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:16:05 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37025)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1gbFmm-0003oA-Du
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 21:16:04 -0500
+Received: by mail-wr1-x442.google.com with SMTP id s12so10418899wrt.4
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 18:16:04 -0800 (PST)
+From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
+References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
+	<11a6562f583531e5a5473716bea44ee3ae7be120.1545598229.git.DirtY.iCE.hu@gmail.com>
+	<66e793ef-dd32-eb81-14f5-cf59ca8c73bb@amsat.org>
+Message-ID: <980b862a-9c2d-8ab7-2937-846524399148@gmail.com>
+Date: Mon, 24 Dec 2018 03:16:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181221111136-mutt-send-email-mst@kernel.org>
+In-Reply-To: <66e793ef-dd32-eb81-14f5-cf59ca8c73bb@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 2/4] refactor load_image_size
+Subject: Re: [Qemu-devel] [PATCH v2 23/52] audio: remove audio_MIN, audio_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: peter.maydell@linaro.org, zhijianx.li@intel.com, philmd@redhat.com, qemu-devel@nongnu.org, philip.li@intel.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>
 
+Hi Phil,
 
-On 12/22/18 00:12, Michael S. Tsirkin wrote:
-> On Thu, Dec 06, 2018 at 10:32:11AM +0800, Li Zhijian wrote:
->> Don't expect read(2) can always read as many as it's told.
+On 2018-12-24 00:49, Philippe Mathieu-Daudé wrote:
+> Hi Zoltán,
+> 
+> On 12/23/18 9:51 PM, Kővágó, Zoltán wrote:
+>> There's already a MIN and MAX macro in include/qemu/osdep.h, use them
+>> instead.
 >>
->> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> This is more a theoretical bugfix than a refactoring right?
-
-Yes， it does.
-
-how about change the title to : "enhance reading on load_image_size()" or such
-
-Thanks
-Zhijian
-
-
->
->> ---
->> V4: add reviewed-by tag
->> ---
->>   hw/core/loader.c | 11 +++++------
->>   1 file changed, 5 insertions(+), 6 deletions(-)
+>> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 >>
->> diff --git a/hw/core/loader.c b/hw/core/loader.c
->> index fa41842..9cbceab 100644
->> --- a/hw/core/loader.c
->> +++ b/hw/core/loader.c
->> @@ -77,21 +77,20 @@ int64_t get_image_size(const char *filename)
->>   ssize_t load_image_size(const char *filename, void *addr, size_t size)
->>   {
->>       int fd;
->> -    ssize_t actsize;
->> +    ssize_t actsize, l = 0;
->>   
->>       fd = open(filename, O_RDONLY | O_BINARY);
->>       if (fd < 0) {
->>           return -1;
->>       }
->>   
->> -    actsize = read(fd, addr, size);
->> -    if (actsize < 0) {
->> -        close(fd);
->> -        return -1;
->> +    while ((actsize = read(fd, addr + l, size - l)) > 0) {
->> +        l += actsize;
->>       }
->> +
->>       close(fd);
->>   
->> -    return actsize;
->> +    return actsize < 0 ? -1 : l;
->>   }
->>   
->>   /* read()-like version */
->> -- 
->> 2.7.4
->
->
->
--- 
-Best regards.
-Li Zhijian (8528)
+>> ---
+>>
+>> Changes from v1:
+>> * removed audio_MIN, audio_MAX macros
+>> ---
+> [...]>
+>> diff --git a/audio/audio.h b/audio/audio.h
+>> index ccfef9e10a..bcbe56d639 100644
+>> --- a/audio/audio.h
+>> +++ b/audio/audio.h
+>> @@ -148,23 +148,6 @@ static inline void *advance (void *p, int incr)
+>>      return (d + incr);
+>>  }
+>>  
+>> -#ifdef __GNUC__
+>> -#define audio_MIN(a, b) ( __extension__ ({      \
+>> -    __typeof (a) ta = a;                        \
+>> -    __typeof (b) tb = b;                        \
+>> -    ((ta)>(tb)?(tb):(ta));                      \
+>> -}))
+>> -
+>> -#define audio_MAX(a, b) ( __extension__ ({      \
+>> -    __typeof (a) ta = a;                        \
+>> -    __typeof (b) tb = b;                        \
+>> -    ((ta)<(tb)?(tb):(ta));                      \
+>> -}))
+>> -#else
+>> -#define audio_MIN(a, b) ((a)>(b)?(b):(a))
+>> -#define audio_MAX(a, b) ((a)<(b)?(b):(a))
+>> -#endif
+>> -
+> 
+> Those MIN/MAX are smarter than the ones in "qemu/osdep.h", I'd keep them
+> moving them there.
+
+Yes, but only when using gcc (or clang when it emulates gcc).
+Unfortunately, they work differently when one of the expressions has
+side effects, which is a disaster waiting to happen (when some poor folk
+finally tries to compile it with a non-gcc compiler).
+
+Or do we support any compilers beside gcc and clang? Because if not,
+sure, do it, just remove the #ifdef and keep only the gcc version.
+
+Regards,
+Zoltan
