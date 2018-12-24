@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54701)
+Received: from eggs.gnu.org ([208.118.235.92]:54866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gbS90-0002eI-Ip
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:27:55 -0500
+	(envelope-from <jcfaracco@gmail.com>) id 1gbS9U-0003Kt-17
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:28:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gbS8z-0001DO-QU
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:27:50 -0500
+	(envelope-from <jcfaracco@gmail.com>) id 1gbS9T-0001pE-4O
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:28:20 -0500
 MIME-Version: 1.0
 References: <20181223025939.15775-1-npes87184@gmail.com>
-	<20181223025939.15775-2-npes87184@gmail.com>
-In-Reply-To: <20181223025939.15775-2-npes87184@gmail.com>
+	<20181223025939.15775-3-npes87184@gmail.com>
+In-Reply-To: <20181223025939.15775-3-npes87184@gmail.com>
 From: Julio Faracco <jcfaracco@gmail.com>
-Date: Mon, 24 Dec 2018 13:27:38 -0200
-Message-ID: <CAENf94KwPCMqT2kbakgG27JQ13c9299Ok5F0xT7ik1wQwe1+0A@mail.gmail.com>
+Date: Mon, 24 Dec 2018 13:28:07 -0200
+Message-ID: <CAENf94La_5m2sn-KiRauOgLoq04hMGMAU2E+bXoob7KMPM8j5A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] dmg: fix binary search
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] dmg: use enumeration type instead
+ of hard coding number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +31,47 @@ Looks good to me.
 
 Reviewed-by: Julio Faracco <jcfaracco@gmail.com>
 
-Em dom, 23 de dez de 2018 =C3=A0s 01:04, yuchenlin <npes87184@gmail.com>
+Em dom, 23 de dez de 2018 =C3=A0s 01:03, yuchenlin <npes87184@gmail.com>
 escreveu:
 
-> There is a possible hang in original binary search implementation. That i=
-s
-> if chunk1 =3D 4, chunk2 =3D 5, chunk3 =3D 4, and we go else case.
->
-> The chunk1 will be still 4, and so on.
->
 > Signed-off-by: yuchenlin <npes87184@gmail.com>
 > ---
->  block/dmg.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  block/dmg.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
 > diff --git a/block/dmg.c b/block/dmg.c
-> index 50e91aef6d..0e05702f5d 100644
+> index 0e05702f5d..6b0a057bf8 100644
 > --- a/block/dmg.c
 > +++ b/block/dmg.c
-> @@ -572,14 +572,14 @@ static inline uint32_t search_chunk(BDRVDMGState *s=
-,
-> uint64_t sector_num)
->  {
->      /* binary search */
->      uint32_t chunk1 =3D 0, chunk2 =3D s->n_chunks, chunk3;
-> -    while (chunk1 !=3D chunk2) {
-> +    while (chunk1 <=3D chunk2) {
->          chunk3 =3D (chunk1 + chunk2) / 2;
->          if (s->sectors[chunk3] > sector_num) {
-> -            chunk2 =3D chunk3;
-> +            chunk2 =3D chunk3 - 1;
->          } else if (s->sectors[chunk3] + s->sectorcounts[chunk3] >
-> sector_num) {
->              return chunk3;
->          } else {
-> -            chunk1 =3D chunk3;
-> +            chunk1 =3D chunk3 + 1;
+> @@ -267,7 +267,7 @@ static int dmg_read_mish_block(BDRVDMGState *s,
+> DmgHeaderState *ds,
+>
+>          /* all-zeroes sector (type 2) does not need to be "uncompressed"
+> and can
+>           * therefore be unbounded. */
+> -        if (s->types[i] !=3D 2 && s->sectorcounts[i] >
+> DMG_SECTORCOUNTS_MAX) {
+> +        if (s->types[i] !=3D UDIG && s->sectorcounts[i] >
+> DMG_SECTORCOUNTS_MAX) {
+>              error_report("sector count %" PRIu64 " for chunk %" PRIu32
+>                           " is larger than max (%u)",
+>                           s->sectorcounts[i], i, DMG_SECTORCOUNTS_MAX);
+> @@ -706,7 +706,7 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset,
+> uint64_t bytes,
+>          /* Special case: current chunk is all zeroes. Do not perform a
+> memcpy as
+>           * s->uncompressed_chunk may be too small to cover the large
+> all-zeroes
+>           * section. dmg_read_chunk is called to find s->current_chunk */
+> -        if (s->types[s->current_chunk] =3D=3D 2) { /* all zeroes block e=
+ntry
+> */
+> +        if (s->types[s->current_chunk] =3D=3D UDIG) { /* all zeroes bloc=
+k
+> entry */
+>              qemu_iovec_memset(qiov, i * 512, 0, 512);
+>              continue;
 >          }
->      }
->      return s->n_chunks; /* error */
 > --
 > 2.17.1
 >
