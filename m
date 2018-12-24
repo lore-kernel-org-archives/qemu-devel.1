@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54007)
+Received: from eggs.gnu.org ([208.118.235.92]:45910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <13824125580@163.com>) id 1gbNBv-00037S-CC
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 05:10:32 -0500
+	(envelope-from <wainersm@redhat.com>) id 1gbOms-0002xw-Ua
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 06:52:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <13824125580@163.com>) id 1gbNBr-0001XQ-Ex
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 05:10:31 -0500
-Received: from m13-21.163.com ([220.181.13.21]:12333)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <13824125580@163.com>) id 1gbNBl-0001NE-BG
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 05:10:24 -0500
-Date: Mon, 24 Dec 2018 18:10:15 +0800 (CST)
-From: tugouxp <13824125580@163.com>
+	(envelope-from <wainersm@redhat.com>) id 1gbOmn-0001VC-O7
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 06:52:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gbOmn-0001TX-GN
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 06:52:41 -0500
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Date: Mon, 24 Dec 2018 06:52:35 -0500
+Message-Id: <20181224115235.16881-2-wainersm@redhat.com>
+In-Reply-To: <20181224115235.16881-1-wainersm@redhat.com>
+References: <20181224115235.16881-1-wainersm@redhat.com>
 MIME-Version: 1.0
-Message-ID: <1bd5a622.e60b.167dfb192d3.Coremail.13824125580@163.com>
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] what is the behavier precisely if a tb was interrupted
- by a interrupt or signal?
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH 1/1] hw/core: add qom getter for
+ kernel-irqchip property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,13 +27,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, peterx@redhat.com
 
-aGkgZm9sa3M6CgoKIHRoaW5rIGFib3V0IHRoZSBzY2VuYXJpbyBsaWtlIHRoYXQsIGEgdGIgYmxv
-Y2sgY29udGFpbiAgOSBuYXRpdmUgaW5zdHJ1Y3Rpb25zICBleGVjdXRlIHNlcXVlbnRpYWxseQoK
-IGlmIGEgaW50ZXJydXB0IG9yIGEgc2lnbmFsIGhhcHBlbnMgIGJlZm9yZSBpbnN0cnVjdGlvbiA2
-IGV4ZWN1dGVkLCAgZGlkIHRoZSB0YiAgYmUgZmluaXNoZWQgYmVmb3JlIHJlc3BvbnNlIHRvIHRo
-ZSBpbnRlcnJ1cHQgIG9yCgp0aGUgIGV4aXRlZCBhdCBvbmNlIHRvIHJlc3BvbnNlIHRoZSBpbnRl
-cnJ1cHQ/CgoKCnRiIHN0YXJ0Ogpob3N0IGluc3RydWN0aW9uIDEKaG9zdCBpbnN0cnVjdGlvbiAy
-Cmhvc3QgaW5zdHJ1Y3Rpb24gNApob3N0IGluc3RydWN0aW9uIDUKCmhvc3QgaW5zdHJ1Y3Rpb24g
-NiAgIDwtLS0tLS0tLSBpbnRlcnJ1cHQgb3Igc2lnbmFsIGhlcmUKCmhvc3QgaW5zdHJ1Y3Rpb24g
-Nwpob3N0IGluc3RydWN0aW9uIDgKaG9zdCBpbnN0cnVjdGlvbiA5CmV4aXQgdGIK
+Allows to access the kernel-irqchip property of a Machine
+Class object via QOM get method.
+
+Before this patch the property cannot be read although it is
+listed by qom-list:
+
+qemu-system-x86_64 -M q35,accel=3Dkvm,kernel-irqchip=3Dsplit (...)
+-> {"execute": "qom-list", "arguments": {"path": "/machine"}}
+<- {"return": [{"name": "type", "type": "string"}, (...) , {"name": "kern=
+el-irqchip", "type": "on|off|split"} (...)}
+-> {"execute": "qom-get", "arguments": {"path": "/machine", "property": "=
+kernel-irqchip"}}
+<- {"error": {"class": "GenericError", "desc": "Insufficient permission t=
+o perform this operation"}}
+
+It is implemented the machine_get_kernel_irqchip() method,
+which evaluates the kernel_irqchip_allowed, *_required, and
+*_split fields to determine the value of kernel-irqchip. Note: we
+assume there is not inconsistency on the value of those fields.
+
+Then with this change in place, it works as expected:
+
+qemu-system-x86_64 -M q35,accel=3Dkvm,kernel-irqchip=3Dsplit (...)
+-> {"execute": "qom-get", "arguments": {"path": "/machine", "property": "=
+kernel-irqchip"}}
+<- {"return": "split"}
+
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+---
+ hw/core/machine.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index c51423b647..f61003f8f2 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -37,6 +37,21 @@ static void machine_set_accel(Object *obj, const char =
+*value, Error **errp)
+     ms->accel =3D g_strdup(value);
+ }
+=20
++static void machine_get_kernel_irqchip(Object *obj, Visitor *v,
++                                       const char *name, void *opaque,
++                                       Error **errp)
++{
++    MachineState *ms =3D MACHINE(obj);
++    OnOffSplit mode;
++
++    if (ms->kernel_irqchip_split) {
++        mode =3D ON_OFF_SPLIT_SPLIT;
++    } else {
++        mode =3D (ms->kernel_irqchip_allowed && ms->kernel_irqchip_requi=
+red) ?
++                ON_OFF_SPLIT_ON : ON_OFF_SPLIT_OFF;
++    }
++    visit_type_OnOffSplit(v, name, &mode, errp);
++}
+ static void machine_set_kernel_irqchip(Object *obj, Visitor *v,
+                                        const char *name, void *opaque,
+                                        Error **errp)
+@@ -540,7 +555,7 @@ static void machine_class_init(ObjectClass *oc, void =
+*data)
+         "Accelerator list", &error_abort);
+=20
+     object_class_property_add(oc, "kernel-irqchip", "on|off|split",
+-        NULL, machine_set_kernel_irqchip,
++        machine_get_kernel_irqchip, machine_set_kernel_irqchip,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, "kernel-irqchip",
+         "Configure KVM in-kernel irqchip", &error_abort);
+--=20
+2.19.2
