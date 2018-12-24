@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:35150)
+Received: from eggs.gnu.org ([208.118.235.92]:34747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gbDUi-0000li-Pb
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 18:49:20 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1gbEjc-000166-V4
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 20:08:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gbDUa-0000C0-Na
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 18:49:14 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32954)
+	(envelope-from <liq3ea@gmail.com>) id 1gbEjc-0000B1-2T
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 20:08:44 -0500
+Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:53819)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gbDUZ-0000AZ-10
-	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 18:49:07 -0500
-Received: by mail-wr1-x441.google.com with SMTP id c14so10309014wrr.0
-	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 15:49:06 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
-	<11a6562f583531e5a5473716bea44ee3ae7be120.1545598229.git.DirtY.iCE.hu@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <66e793ef-dd32-eb81-14f5-cf59ca8c73bb@amsat.org>
-Date: Mon, 24 Dec 2018 00:49:01 +0100
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gbEjb-0000An-Tg
+	for qemu-devel@nongnu.org; Sun, 23 Dec 2018 20:08:44 -0500
+Received: by mail-it1-x142.google.com with SMTP id g85so14254050ita.3
+	for <qemu-devel@nongnu.org>; Sun, 23 Dec 2018 17:08:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <11a6562f583531e5a5473716bea44ee3ae7be120.1545598229.git.DirtY.iCE.hu@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 23/52] audio: remove audio_MIN, audio_MAX
+References: <20181215120353.82786-1-liq3ea@163.com>
+In-Reply-To: <20181215120353.82786-1-liq3ea@163.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 24 Dec 2018 09:08:08 +0800
+Message-ID: <CAKXe6S+TfxVKq_YToc6mpJe3ozO4j5oXAd261G7O5ruSZGwPHg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] vhost-user-test fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>
+To: Li Qiang <liq3ea@163.com>
+Cc: Thomas Huth <thuth@redhat.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Peter Maydell <peter.maydell@linaro.org>, marcandre lureau <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-Hi Zoltán,
+Ping..
 
-On 12/23/18 9:51 PM, Kővágó, Zoltán wrote:
-> There's already a MIN and MAX macro in include/qemu/osdep.h, use them
-> instead.
-> 
-> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
-> 
-> ---
-> 
-> Changes from v1:
-> * removed audio_MIN, audio_MAX macros
-> ---
-[...]>
-> diff --git a/audio/audio.h b/audio/audio.h
-> index ccfef9e10a..bcbe56d639 100644
-> --- a/audio/audio.h
-> +++ b/audio/audio.h
-> @@ -148,23 +148,6 @@ static inline void *advance (void *p, int incr)
->      return (d + incr);
->  }
->  
-> -#ifdef __GNUC__
-> -#define audio_MIN(a, b) ( __extension__ ({      \
-> -    __typeof (a) ta = a;                        \
-> -    __typeof (b) tb = b;                        \
-> -    ((ta)>(tb)?(tb):(ta));                      \
-> -}))
-> -
-> -#define audio_MAX(a, b) ( __extension__ ({      \
-> -    __typeof (a) ta = a;                        \
-> -    __typeof (b) tb = b;                        \
-> -    ((ta)<(tb)?(tb):(ta));                      \
-> -}))
-> -#else
-> -#define audio_MIN(a, b) ((a)>(b)?(b):(a))
-> -#define audio_MAX(a, b) ((a)<(b)?(b):(a))
-> -#endif
-> -
+Li Qiang <liq3ea@163.com> =E4=BA=8E2018=E5=B9=B412=E6=9C=8815=E6=97=A5=E5=
+=91=A8=E5=85=AD =E4=B8=8B=E5=8D=888:06=E5=86=99=E9=81=93=EF=BC=9A
 
-Those MIN/MAX are smarter than the ones in "qemu/osdep.h", I'd keep them
-moving them there.
-
-Regards,
-
-Phil.
+> Currently, the vhost-user-test is not correct.
+> When in qtest mode, the accel is qtest, not kvm.
+> So when the client side of vhost-user-test send
+> 'VHOST_USER_SET_VRING_CALL' msg, the 'fd' will
+> no be added in 'fds' in 'vhost_set_vring_file'.
+> In 'chr_read' of the server side in the
+> vhost-user-test, it calls 'qemu_chr_fe_get_msgfds'
+> to get the fd in 'VHOST_USER_SET_VRING_CALL'. Though
+> there is no fd returned, but as the 'fd' is not initialized
+> so 'fd' maybe valid, and 'qemu_set_nonblock' will be success.
+> Even worse, 'qemu_set_nonblock' doesn't check the return value
+> of fcntl.
+>
+> So this cause the interesting bug here: there are three issues,
+> but they combined and will bypass the qtest.
+>
+> This patchset tries to address these issue.
+>
+> v2: Change the second patch per Paolo's review
+>
+> Li Qiang (3):
+>   tests: vhost-user-test: initialize 'fd' in chr_read
+>   vhost-user: fix ioeventfd_enabled
+>   util: check the return value of fcntl in qemu_set_{block,nonblock}
+>
+>  hw/virtio/vhost-user.c  | 2 +-
+>  tests/vhost-user-test.c | 2 +-
+>  util/oslib-posix.c      | 8 ++++++--
+>  3 files changed, 8 insertions(+), 4 deletions(-)
+>
+> --
+> 2.17.1
+>
+>
+>
