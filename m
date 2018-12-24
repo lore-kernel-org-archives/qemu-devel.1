@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:35542)
+Received: from eggs.gnu.org ([208.118.235.92]:45761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiaoguangrong@tencent.com>) id 1gbQPD-00055J-S2
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 08:36:28 -0500
+	(envelope-from <mahaocong@didiglobal.com>) id 1gbMcn-0004OY-QZ
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 04:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiaoguangrong@tencent.com>) id 1gbQP9-0007zN-Nd
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 08:36:27 -0500
-Received: from mail2.tencent.com ([163.177.67.195]:43358)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiaoguangrong@tencent.com>) id 1gbQP9-0007vg-AP
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 08:36:23 -0500
-From: "xiaoguangrong(Xiao Guangrong)" <xiaoguangrong@tencent.com>
-Date: Mon, 24 Dec 2018 13:36:14 +0000
-Message-ID: <019819C6E743904A88B43F7DDEED99BBA7E71370@EXMBX-SZMAIL008.tencent.com>
-References: <20181213075727.23540-1-xiaoguangrong@tencent.com>
-	<20181221081055.GD2996@xz-x1>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mahaocong@didiglobal.com>) id 1gbMci-0007T3-7e
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 04:34:11 -0500
+Received: from mx2.didiglobal.com ([111.202.154.82]:20766
+	helo=bsf01.didichuxing.com) by eggs.gnu.org with smtp (Exim 4.71)
+	(envelope-from <mahaocong@didiglobal.com>) id 1gbMcd-0007GO-Sr
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 04:34:06 -0500
+From: =?utf-8?B?6ams5piK6aqiKOa7tOa7tOS6kSk=?= <mahaocong@didiglobal.com>
+Date: Mon, 24 Dec 2018 09:33:50 +0000
+Message-ID: <5587158D-EAA3-443A-9224-F651314F8122@didichuxing.com>
+References: <20181219065020.81256-1-mahaocong_work@163.com>
+	<20181219065020.81256-2-mahaocong_work@163.com>
+	<ea116c05-43c3-cb11-e492-b32a8f918bec@redhat.com>
+In-Reply-To: <ea116c05-43c3-cb11-e492-b32a8f918bec@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <137585367C1F4E48BED8C442715CE277@didichuxing.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/2] optimize waiting for free thread to do
- compression(Internet mail)
+Subject: Re: [Qemu-devel] [PATCH v1] migration: add incremental mode on
+ drive-mirror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "guangrong.xiao@gmail.com" <guangrong.xiao@gmail.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "wei.w.wang@intel.com" <wei.w.wang@intel.com>, "eblake@redhat.com" <eblake@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "cota@braap.org" <cota@braap.org>
+To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 12/21/18 4:11 PM, Peter Xu wrote:=0A=
-> On Thu, Dec 13, 2018 at 03:57:25PM +0800, guangrong.xiao@gmail.com wrote:=
-=0A=
->> From: Xiao Guangrong <xiaoguangrong@tencent.com>=0A=
->>=0A=
->> Currently we have two behaviors if all threads are busy to do compressio=
-n,=0A=
->> the main thread mush wait one of them becoming free if @compress-wait-th=
-read=0A=
->> set to on or the main thread can directly return without wait and post=
-=0A=
->> the page out as normal one=0A=
->>=0A=
->> Both of them have its profits and short-comes, however, if the bandwidth=
- is=0A=
->> not limited extremely so that compression can not use out all of it band=
-width,=0A=
->> at the same time, the migration process is easily throttled if we posted=
- too=0A=
->> may pages as normal pages. None of them can work properly under this cas=
-e=0A=
->>=0A=
->> In order to use the bandwidth more effectively, we introduce the third=
-=0A=
->> behavior, compress-wait-thread-adaptive, which make the main thread wait=
-=0A=
->> if there is no bandwidth left or let the page go out as normal page if t=
-here=0A=
->> has enough bandwidth to make sure the migration process will not be=0A=
->> throttled=0A=
->>=0A=
->> Another patch introduces a new statistic, pages-per-second, as bandwidth=
-=0A=
->> or mbps is not enough to measure the performance of posting pages out as=
-=0A=
->> we have compression, xbzrle, which can significantly reduce the amount o=
-f=0A=
->> the data size, instead, pages-per-second if the one we want=0A=
->>=0A=
->> Performance data=0A=
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=0A=
->> We have limited the bandwidth to 300=0A=
->>=0A=
->>                                  Used Bandwidth     Pages-per-Second=0A=
->> compress-wait-thread =3D on         951.66 mbps         131784=0A=
->>=0A=
->> compress-wait-thread =3D off        2491.74 mbps        93495=0A=
->> compress-wait-thread-adaptive     1982.94 mbps        162529=0A=
->>     =3D on=0A=
-> =0A=
-> Sounds reasonable to me, though it looks like there're only three=0A=
-> options: on, off, adaptive.  Should we squash the two parameters?=0A=
-=0A=
-Thanks for your review, Peter!=0A=
-=0A=
-That's good to me, if other guys do not have objects, i will do it in the=
-=0A=
-next version.=0A=
+SSByZWRlc2NyaWJlIGRldGFpbHMgb24gY292ZXIgbGV0dGVyIGFuZCBzZW5kIGEgbmV3IG1haWwg
+aW4gRGVjZW1iZXIgMjAsIDIwMTguIA0KUGxlYXNlIGhlbHAgbWUgcmV2aWV3IGFnYWluLCB0aGFu
+ayB5b3UuDQoNCuWcqCAyMDE4LzEyLzE5IOS4i+WNiDEwOjQ477yM4oCcRXJpYyBCbGFrZeKAnTxl
+Ymxha2VAcmVkaGF0LmNvbT4g5YaZ5YWlOg0KDQogICAgT24gMTIvMTkvMTggMTI6NTAgQU0sIG1h
+aGFvY29uZyB3cm90ZToNCiAgICA+IEZyb206IG1haGFvY29uZyA8bWFoYW9jb25nQGRpZGljaHV4
+aW5nLmNvbT4NCiAgICA+IA0KICAgID4gU2lnbmVkLW9mZi1ieTogbWFoYW9jb25nIDxtYWhhb2Nv
+bmdAZGlkaWNodXhpbmcuY29tPg0KICAgIA0KICAgIFRoZSBzdWJqZWN0IGxpbmUgdGVsbHMgIndo
+YXQiLCBidXQgeW91IGFyZSBtaXNzaW5nIGEgY29tbWl0IG1lc3NhZ2UgYm9keSANCiAgICB0aGF0
+IGdpdmVzIHRoZSAid2h5Ii4gIERldGFpbHMgYWJvdXQgdGhlIG5ldyBmZWF0dXJlLCBhbmQgaG93
+IGl0IGlzIA0KICAgIHVzZWZ1bCwgZ28gYSBsb25nIHdheSB0byBtYWtpbmcgdGhlIGNvZGUgZWFz
+aWVyIHRvIHJldmlldy4gIEhvdyBtdWNoIG9mIA0KICAgIHlvdXIgY292ZXIgbGV0dGVyIHNob3Vs
+ZCBiZSBoZXJlIGFzIHdlbGw/DQogICAgDQogICAgQXQgYSBmaXJzdCBnbGFuY2UsIEknbSBqdXN0
+IGdvaW5nIHRvIGZvY3VzIG9uIHRoZSBpbnRlcmZhY2U6DQogICAgDQogICAgPiAtLS0NCiAgICA+
+ICAgYmxvY2svZGlydHktYml0bWFwLmMgICAgICAgICB8IDE0ICsrKysrKysrKysNCiAgICA+ICAg
+YmxvY2svbWlycm9yLmMgICAgICAgICAgICAgICB8IDYzICsrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrLS0tLS0tLS0tDQogICAgPiAgIGJsb2NrZGV2LmMgICAgICAgICAgICAgICAg
+ICAgfCAzNiArKysrKysrKysrKysrKysrKysrKysrKy0tDQogICAgPiAgIGluY2x1ZGUvYmxvY2sv
+YmxvY2tfaW50LmggICAgfCAgMyArKy0NCiAgICA+ICAgaW5jbHVkZS9ibG9jay9kaXJ0eS1iaXRt
+YXAuaCB8ICAzICsrKw0KICAgID4gICBpbmNsdWRlL3FlbXUvaGJpdG1hcC5oICAgICAgIHwgIDIg
+KysNCiAgICA+ICAgcWFwaS9ibG9jay1jb3JlLmpzb24gICAgICAgICB8ICA0ICsrLQ0KICAgID4g
+ICB1dGlsL2hiaXRtYXAuYyAgICAgICAgICAgICAgIHwgMjggKysrKysrKysrKysrKysrKysrKysN
+CiAgICA+ICAgOCBmaWxlcyBjaGFuZ2VkLCAxMzYgaW5zZXJ0aW9ucygrKSwgMTcgZGVsZXRpb25z
+KC0pDQogICAgPiANCiAgICANCiAgICA+ICsrKyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQogICAg
+PiBAQCAtMTcyNyw2ICsxNzI3LDggQEANCiAgICA+ICAgIyAgICAgICAgKGFsbCB0aGUgZGlzaywg
+b25seSB0aGUgc2VjdG9ycyBhbGxvY2F0ZWQgaW4gdGhlIHRvcG1vc3QgaW1hZ2UsIG9yDQogICAg
+PiAgICMgICAgICAgIG9ubHkgbmV3IEkvTykuDQogICAgPiAgICMNCiAgICA+ICsjIEBiaXRtYXAt
+bmFtZTogdGhlIGJpdG1hcCB0byBiZSB1c2VkIGluIGluY3JlbWVudGFsIG1vZGUuDQogICAgDQog
+ICAgTWlzc2luZyBhICcoc2luY2UgNC4wKScgdGFnLiAgQW5kIGRvZXNuJ3QgcmVhbGx5IGV4cGxh
+aW4gd2hhdCANCiAgICBpbmNyZW1lbnRhbCBtb2RlIGluIGEgbWlycm9yaW5nIG9wZXJhdGlvbiBh
+Y3R1YWxseSBtZWFucy4NCiAgICANCiAgICA+ICsjDQogICAgPiAgICMgQGdyYW51bGFyaXR5OiBn
+cmFudWxhcml0eSBvZiB0aGUgZGlydHkgYml0bWFwLCBkZWZhdWx0IGlzIDY0Sw0KICAgID4gICAj
+ICAgICAgICAgICAgICAgaWYgdGhlIGltYWdlIGZvcm1hdCBkb2Vzbid0IGhhdmUgY2x1c3RlcnMs
+IDRLIGlmIHRoZSBjbHVzdGVycw0KICAgID4gICAjICAgICAgICAgICAgICAgYXJlIHNtYWxsZXIg
+dGhhbiB0aGF0LCBlbHNlIHRoZSBjbHVzdGVyIHNpemUuICBNdXN0IGJlIGENCiAgICA+IEBAIC0x
+NzY4LDcgKzE3NzAsNyBAQA0KICAgID4gICB7ICdzdHJ1Y3QnOiAnRHJpdmVNaXJyb3InLA0KICAg
+ID4gICAgICdkYXRhJzogeyAnKmpvYi1pZCc6ICdzdHInLCAnZGV2aWNlJzogJ3N0cicsICd0YXJn
+ZXQnOiAnc3RyJywNCiAgICA+ICAgICAgICAgICAgICAgJypmb3JtYXQnOiAnc3RyJywgJypub2Rl
+LW5hbWUnOiAnc3RyJywgJypyZXBsYWNlcyc6ICdzdHInLA0KICAgID4gLSAgICAgICAgICAgICdz
+eW5jJzogJ01pcnJvclN5bmNNb2RlJywgJyptb2RlJzogJ05ld0ltYWdlTW9kZScsDQogICAgPiAr
+ICAgICAgICAgICAgJ3N5bmMnOiAnTWlycm9yU3luY01vZGUnLCAnKmJpdG1hcC1uYW1lJzogJ3N0
+cicsICcqbW9kZSc6ICdOZXdJbWFnZU1vZGUnLA0KICAgIA0KICAgIENhbiB0aGlzIGJlIG5hbWVk
+IGp1c3QgJ2JpdG1hcCcsIGluc3RlYWQgb2YgdGhlIGxvbmdlciAnYml0bWFwLW5hbWUnPw0KICAg
+IA0KICAgID4gICAgICAgICAgICAgICAnKnNwZWVkJzogJ2ludCcsICcqZ3JhbnVsYXJpdHknOiAn
+dWludDMyJywNCiAgICA+ICAgICAgICAgICAgICAgJypidWYtc2l6ZSc6ICdpbnQnLCAnKm9uLXNv
+dXJjZS1lcnJvcic6ICdCbG9ja2Rldk9uRXJyb3InLA0KICAgID4gICAgICAgICAgICAgICAnKm9u
+LXRhcmdldC1lcnJvcic6ICdCbG9ja2Rldk9uRXJyb3InLA0KICAgID4gZGlmZiAtLWdpdCBhL3V0
+aWwvaGJpdG1hcC5jIGIvdXRpbC9oYml0bWFwLmMNCiAgICA+IGluZGV4IDhkNDAyYzUuLjdhZTJm
+YzIgMTAwNjQ0DQogICAgPiAtLS0gYS91dGlsL2hiaXRtYXAuYw0KICAgIA0KICAgIA0KICAgIC0t
+IA0KICAgIEVyaWMgQmxha2UsIFByaW5jaXBhbCBTb2Z0d2FyZSBFbmdpbmVlcg0KICAgIFJlZCBI
+YXQsIEluYy4gICAgICAgICAgICsxLTkxOS0zMDEtMzI2Ng0KICAgIFZpcnR1YWxpemF0aW9uOiAg
+cWVtdS5vcmcgfCBsaWJ2aXJ0Lm9yZw0KICAgIA0KDQo=
