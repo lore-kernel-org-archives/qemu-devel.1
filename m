@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54948)
+Received: from eggs.gnu.org ([208.118.235.92]:56991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gbS9w-000456-JQ
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:28:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1gbSLW-00005r-Mt
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:40:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcfaracco@gmail.com>) id 1gbS9r-00025V-EA
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:28:45 -0500
+	(envelope-from <bounces@canonical.com>) id 1gbSLT-0000Bg-J4
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:40:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gbSLT-0000Ab-Dd
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 10:40:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gbSLR-0004we-RS
+	for <qemu-devel@nongnu.org>; Mon, 24 Dec 2018 15:40:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CB28C2E8019
+	for <qemu-devel@nongnu.org>; Mon, 24 Dec 2018 15:40:41 +0000 (UTC)
 MIME-Version: 1.0
-References: <20181223025939.15775-1-npes87184@gmail.com>
-	<20181223025939.15775-4-npes87184@gmail.com>
-In-Reply-To: <20181223025939.15775-4-npes87184@gmail.com>
-From: Julio Faracco <jcfaracco@gmail.com>
-Date: Mon, 24 Dec 2018 13:28:28 -0200
-Message-ID: <CAENf94JoO5VgF_Z17Hth3Ozg2n9-hvawGuCpe0wpS+ay0+eeEg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] dmg: don't skip zero chunk
+Date: Mon, 24 Dec 2018 15:31:29 -0000
+From: Julio Faracco <jcfaracco@gmail.com>
+Reply-To: Bug 1809304 <1809304@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154533506483.19401.8849680441407310900.malonedeb@soybean.canonical.com>
+Message-Id: <154566548994.25356.4367525075647582581.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809304] Re: qemu-img convert is freezing for
+ some DMG files.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,143 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuchenlin <npes87184@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-Looks good to me.
+Hi Yu-Chen.
 
-Reviewed-by: Julio Faracco <jcfaracco@gmail.com>
+The series looks good. It fixed the problems related to zero chunk. Nice
+work!
 
-Em dom, 23 de dez de 2018 =C3=A0s 01:03, yuchenlin <npes87184@gmail.com>
-escreveu:
+I added a comment that I reviewed your patch considering my scenarios
+here. At least, It contributes to merge your changes.
 
-> The dmg file has many tables which describe: "start from sector XXX to
-> sector XXX, the compression method is XXX and where the compressed data
-> resides on".
->
-> Each sector in the expanded file should be covered by a table. The table
-> will describe the offset of compressed data (or raw depends on the type)
-> in the dmg.
->
-> For example:
->
-> [-----------The expanded file------------]
-> [---bzip table ---]/* zeros */[---zlib---]
->     ^
->     | if we want to read this sector.
->
-> we will find bzip table which contains this sector, and get the
-> compressed data offset, read it from dmg, uncompress it, finally write to
-> expanded file.
->
-> If we skip zero chunk (table), some sector cannot find the table which
-> will cause search_chunk() return s->n_chunks, dmg_read_chunk() return -1
-> and finally causing dmg_co_preadv() return EIO.
->
-> See:
->
-> [-----------The expanded file------------]
-> [---bzip table ---]/* zeros */[---zlib---]
->                     ^
->                     | if we want to read this sector.
->
-> Oops, we cannot find the table contains it...
->
-> In the original implementation, we don't have zero table. When we try to
-> read sector inside the zero chunk. We will get EIO, and skip reading.
->
-> After this patch, we treat zero chunk the same as ignore chunk, it will
-> directly write zero and avoid some sector may not find the table.
->
-> After this patch:
->
-> [-----------The expanded file------------]
-> [---bzip table ---][--zeros--][---zlib---]
->
-> Signed-off-by: yuchenlin <npes87184@gmail.com>
-> ---
->  block/dmg.c | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
->
-> diff --git a/block/dmg.c b/block/dmg.c
-> index 6b0a057bf8..137fe9c1ff 100644
-> --- a/block/dmg.c
-> +++ b/block/dmg.c
-> @@ -130,7 +130,8 @@ static void update_max_chunk_size(BDRVDMGState *s,
-> uint32_t chunk,
->      case UDRW: /* copy */
->          uncompressed_sectors =3D DIV_ROUND_UP(s->lengths[chunk], 512);
->          break;
-> -    case UDIG: /* zero */
-> +    case UDZE: /* zero */
-> +    case UDIG: /* ignore */
->          /* as the all-zeroes block may be large, it is treated specially=
-:
-> the
->           * sector is not copied from a large buffer, a simple memset is
-> used
->           * instead. Therefore uncompressed_sectors does not need to be
-> set. */
-> @@ -199,8 +200,9 @@ typedef struct DmgHeaderState {
->  static bool dmg_is_known_block_type(uint32_t entry_type)
->  {
->      switch (entry_type) {
-> +    case UDZE:    /* zeros */
->      case UDRW:    /* uncompressed */
-> -    case UDIG:    /* zeroes */
-> +    case UDIG:    /* ignore */
->      case UDZO:    /* zlib */
->          return true;
->      case UDBZ:    /* bzip2 */
-> @@ -265,9 +267,10 @@ static int dmg_read_mish_block(BDRVDMGState *s,
-> DmgHeaderState *ds,
->          /* sector count */
->          s->sectorcounts[i] =3D buff_read_uint64(buffer, offset + 0x10);
->
-> -        /* all-zeroes sector (type 2) does not need to be "uncompressed"
-> and can
-> -         * therefore be unbounded. */
-> -        if (s->types[i] !=3D UDIG && s->sectorcounts[i] >
-> DMG_SECTORCOUNTS_MAX) {
-> +        /* all-zeroes sector (type UDZE and UDIG) does not need to be
-> +         * "uncompressed" and can therefore be unbounded. */
-> +        if (s->types[i] !=3D UDZE && s->types[i] !=3D UDIG
-> +            && s->sectorcounts[i] > DMG_SECTORCOUNTS_MAX) {
->              error_report("sector count %" PRIu64 " for chunk %" PRIu32
->                           " is larger than max (%u)",
->                           s->sectorcounts[i], i, DMG_SECTORCOUNTS_MAX);
-> @@ -671,7 +674,8 @@ static inline int dmg_read_chunk(BlockDriverState *bs=
-,
-> uint64_t sector_num)
->                  return -1;
->              }
->              break;
-> -        case UDIG: /* zero */
-> +        case UDZE: /* zeros */
-> +        case UDIG: /* ignore */
->              /* see dmg_read, it is treated specially. No buffer needs to
-> be
->               * pre-filled, the zeroes can be set directly. */
->              break;
-> @@ -706,7 +710,8 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset,
-> uint64_t bytes,
->          /* Special case: current chunk is all zeroes. Do not perform a
-> memcpy as
->           * s->uncompressed_chunk may be too small to cover the large
-> all-zeroes
->           * section. dmg_read_chunk is called to find s->current_chunk */
-> -        if (s->types[s->current_chunk] =3D=3D UDIG) { /* all zeroes bloc=
-k
-> entry */
-> +        if (s->types[s->current_chunk] =3D=3D UDZE
-> +            || s->types[s->current_chunk] =3D=3D UDIG) { /* all zeroes b=
-lock
-> entry */
->              qemu_iovec_memset(qiov, i * 512, 0, 512);
->              continue;
->          }
-> --
-> 2.17.1
->
->
->
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809304
+
+Title:
+  qemu-img convert is freezing for some DMG files.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Recently, I created a file using hdiutil from MacOS (using Zlib
+  compression):
+
+  $ hdiutil create -volname MyVolName -srcfolder /path/to/my/vol/ -ov
+  -format UDZO myvolname.dmg
+
+  But, when I try to convert this volume using qemu-img convert, this
+  command is freezing.
+
+  I'm using the upstream version to test it.
+
+  It is freezing inside the binary search method to retrieve the chunk.
+
+  But, I still don't know why.
+
+  I'm attaching the file as an example.
+
+  It can be mounted using MacOS or other Linux apps like hfsleuth and
+  darling-dmg.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809304/+subscriptions
