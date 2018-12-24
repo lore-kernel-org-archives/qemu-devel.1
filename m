@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55360)
+Received: from eggs.gnu.org ([208.118.235.92]:57983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gbLL8-0000nn-Ow
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 03:11:55 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gbLUs-00049H-CH
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 03:22:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gbLL5-0003Yk-KZ
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 03:11:54 -0500
-Received: from mga04.intel.com ([192.55.52.120]:10092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gbLL5-0003SU-AI
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 03:11:51 -0500
-Date: Mon, 24 Dec 2018 16:11:43 +0800
-From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20181224081142.GA6477@tiger-server>
-References: <5eb87eb9a389242772375dd52bd97c17564a0829.1545120100.git.yi.z.zhang@linux.intel.com>
-	<20181218085249-mutt-send-email-mst@kernel.org>
-	<20181219091017.GA35378@tiger-server>
-	<20181219105555-mutt-send-email-mst@kernel.org>
-	<20181220030312.GA70591@tiger-server>
-	<20181219223700-mutt-send-email-mst@kernel.org>
-	<20181220053739.GB70591@tiger-server>
-	<20181220090435-mutt-send-email-mst@kernel.org>
-	<20181221031817.GA77135@tiger-server>
-	<20181221112902-mutt-send-email-mst@kernel.org>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gbLUq-00049G-HA
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 03:21:58 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Mon, 24 Dec 2018 08:21:37 +0000
+Message-ID: <10e878e2-e4a2-a3e5-1e81-538817db7acd@virtuozzo.com>
+References: <20181218075707.12006-1-anton.nefedov@virtuozzo.com>
+	<20181218075707.12006-10-anton.nefedov@virtuozzo.com>
+	<057e2117-d03a-8733-9926-83b99901d478@virtuozzo.com>
+In-Reply-To: <057e2117-d03a-8733-9926-83b99901d478@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DBC32C91974158478726CFCE619983E7@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181221112902-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH V7 6/6] hostmem-file: add 'sync' option
+Subject: Re: [Qemu-devel] [PATCH v11 09/10] qcow2: skip writing zero buffers
+ to empty COW areas
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,84 +27,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: peter.maydell@linaro.org, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, crosthwaite.peter@gmail.com, richard.henderson@linaro.org, xiaoguangrong.eric@gmail.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-On 2018-12-21 at 11:36:07 -0500, Michael S. Tsirkin wrote:
-> On Fri, Dec 21, 2018 at 11:18:18AM +0800, Yi Zhang wrote:
-> > On 2018-12-20 at 09:06:41 -0500, Michael S. Tsirkin wrote:
-> > > On Thu, Dec 20, 2018 at 01:37:40PM +0800, Yi Zhang wrote:
-> > > > On 2018-12-19 at 22:42:07 -0500, Michael S. Tsirkin wrote:
-> > > > > On Thu, Dec 20, 2018 at 11:03:12AM +0800, Yi Zhang wrote:
-> > > > > > On 2018-12-19 at 10:59:10 -0500, Michael S. Tsirkin wrote:
-> > > > > > > On Wed, Dec 19, 2018 at 05:10:18PM +0800, Yi Zhang wrote:
-> > > > > > > > > > +
-> > > > > > > > > > + - 'sync' option of memory-backend-file is not 'off', and
-> > > > > > > > > > +
-> > > > > > > > > > + - 'share' option of memory-backend-file is 'on'.
-> > > > > > > > > > +
-> > > > > > > > > > + - 'pmem' option of memory-backend-file is 'on'
-> > > > > > > > > > +
-> > > > > > > > > 
-> > > > > > > > > Wait isn't this what pmem was supposed to do?
-> > > > > > > > > Doesn't it mean "persistent memory"?
-> > > > > > > > pmem is a option for memory-backend-file, user should know the backend
-> > > > > > > > is in host persistent memory, with this flags on, while there is a host crash
-> > > > > > > > or a power failures.
-> > > > > > > > 
-> > > > > > > > [1] Qemu will take necessary operations to guarantee the persistence.
-> > > > > > > > https://patchwork.ozlabs.org/cover/944749/ 
-> > > > > > > > 
-> > > > > > > > [2] Host kernel also take opretions to consistent filesystem metadata.
-> > > > > > > > Add MAP_SYNC flags.
-> > > > > > > 
-> > > > > > > OK so I'm a user. Can you educate me please?  
-> > > > > > We suppose an administrator should know it, what is the back-end region coming from,
-> > > > > > is it persistent? what is the font-end device is? a volatile dimm or an
-> > > > > > nonvolatile dimm? then they can choice put the pmem=on[off] and sync=on[off].
-> > > > > > If he didn't, we encourage that don't set these 2 flags.
-> > > > > > 
-> > > > > > > When should MAP_SYNC not
-> > > > > > > be set? Are there any disadvantages (e.g.  performance?)?
-> > > > > > Not only the performance, sometimes like the front-end device is an
-> > > > > > volatile ram, we don't wanna set such option although the backend is a
-> > > > > > novolatile memory, if power lose, all of thing should lose in this ram.
-> > > > > 
-> > > > > 
-> > > > > 
-> > > > > I am not sure how does above answer the questions. If I don't know,
-> > > > > neither will the hypothetical administrator. Looks like a better
-> > > > > interface is needed to make the choice on behalf of the user.
-> > > > > 
-> > > > By default, we have already ignore the 2 flags, unless the administrator
-> > > > know how to make that use. By-now, seems we don't have a better way to detect what
-> > > > memory-backend-file is, a persistent memory or not.
-> > > 
-> > > In that case how about an interface where user tells QEMU "this backend
-> > > is in persistent memory"?
-> > 
-> > Actually, [pmem=on] already did this, we can get the backend memory type from:
-> > 
-> > file_memory_backend_get_pmem(),
-> > 
-> > That is already being used in the memory_region_init_ram_from_file. that
-> > is why I reuse the RAM_PMEM to identify the region coming from a
-> > persitent memory? correct me if something I misunderstood? 
-> 
-> Right and thus my question: why not set SYNC unconditionally with pmem=on?
-A case is that we set pmem but don't wanna sync in a /dev/dax backend,
-which is direct mapping to physical nvdimm device without filesystem aware,
-SYNC is useless in this condition.
-> 
-> > 
-> > > 
-> > > 
-> > > 
-> > > > > 
-> > > > > > > 
-> > > > > > > -- 
-> > > > > > > MST
-> > > > > > > 
-> > > > > 
-> > > 
-> 
+T24gMjEvMTIvMjAxOCA3OjE2IFBNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
+Og0KPiAxOC4xMi4yMDE4IDEwOjU3LCBBbnRvbiBOZWZlZG92IHdyb3RlOg0KPj4gSWYgQ09XIGFy
+ZWFzIG9mIHRoZSBuZXdseSBhbGxvY2F0ZWQgY2x1c3RlcnMgYXJlIHplcm9lcyBvbiB0aGUgYmFj
+a2luZyBpbWFnZSwNCj4+IGVmZmljaWVudCBiZHJ2X3dyaXRlX3plcm9lcyhmbGFncz1CRFJWX1JF
+UV9BTExPQ0FURSkgY2FuIGJlIHVzZWQgb24gdGhlIHdob2xlDQo+PiBjbHVzdGVyIGluc3RlYWQg
+b2Ygd3JpdGluZyBleHBsaWNpdCB6ZXJvIGJ1ZmZlcnMgbGF0ZXIgaW4gcGVyZm9ybV9jb3coKS4N
+Cj4+DQo+PiBpb3Rlc3QgMDYwOg0KPj4gd3JpdGUgdG8gdGhlIGRpc2NhcmRlZCBjbHVzdGVyIGRv
+ZXMgbm90IHRyaWdnZXIgQ09XIGFueW1vcmUuDQo+PiBVc2UgYSBiYWNraW5nIGltYWdlIGluc3Rl
+YWQuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2
+aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgICBxYXBpL2Jsb2NrLWNvcmUuanNvbiAgICAgICB8
+ICA0ICstDQo+PiAgICBibG9jay9xY293Mi5oICAgICAgICAgICAgICB8ICA2ICsrKw0KPj4gICAg
+YmxvY2svcWNvdzItY2x1c3Rlci5jICAgICAgfCAgMiArLQ0KPj4gICAgYmxvY2svcWNvdzIuYyAg
+ICAgICAgICAgICAgfCA4OSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0K
+Pj4gICAgYmxvY2svdHJhY2UtZXZlbnRzICAgICAgICAgfCAgMSArDQo+PiAgICB0ZXN0cy9xZW11
+LWlvdGVzdHMvMDYwICAgICB8ICA3ICsrLQ0KPj4gICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzA2MC5v
+dXQgfCAgNSArKy0NCj4+ICAgIDcgZmlsZXMgY2hhbmdlZCwgMTA4IGluc2VydGlvbnMoKyksIDYg
+ZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIv
+cWFwaS9ibG9jay1jb3JlLmpzb24NCj4+IGluZGV4IDc2MjAwMGYzMWYuLjIwNDUyOGIzZjYgMTAw
+NjQ0DQo+PiAtLS0gYS9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4gKysrIGIvcWFwaS9ibG9jay1j
+b3JlLmpzb24NCj4+IEBAIC0zMDA5LDYgKzMwMDksOCBAQA0KPj4gICAgIw0KPj4gICAgIyBAY29y
+X3dyaXRlOiBhIHdyaXRlIGR1ZSB0byBjb3B5LW9uLXJlYWQgKHNpbmNlIDIuMTEpDQo+PiAgICAj
+DQo+PiArIyBAY2x1c3Rlcl9hbGxvY19zcGFjZTogYW4gYWxsb2NhdGlvbiBvZiBmaWxlIHNwYWNl
+IGZvciBhIGNsdXN0ZXIgKHNpbmNlIDQuMCkNCj4+ICsjDQo+PiAgICAjIFNpbmNlOiAyLjkNCj4+
+ICAgICMjDQo+PiAgICB7ICdlbnVtJzogJ0Jsa2RlYnVnRXZlbnQnLCAncHJlZml4JzogJ0JMS0RC
+RycsDQo+PiBAQCAtMzAyNyw3ICszMDI5LDcgQEANCj4+ICAgICAgICAgICAgICAgICdwd3JpdGV2
+X3Jtd190YWlsJywgJ3B3cml0ZXZfcm13X2FmdGVyX3RhaWwnLCAncHdyaXRldicsDQo+PiAgICAg
+ICAgICAgICAgICAncHdyaXRldl96ZXJvJywgJ3B3cml0ZXZfZG9uZScsICdlbXB0eV9pbWFnZV9w
+cmVwYXJlJywNCj4+ICAgICAgICAgICAgICAgICdsMV9zaHJpbmtfd3JpdGVfdGFibGUnLCAnbDFf
+c2hyaW5rX2ZyZWVfbDJfY2x1c3RlcnMnLA0KPj4gLSAgICAgICAgICAgICdjb3Jfd3JpdGUnXSB9
+DQo+PiArICAgICAgICAgICAgJ2Nvcl93cml0ZScsICdjbHVzdGVyX2FsbG9jX3NwYWNlJ10gfQ0K
+Pj4gICAgDQo+PiAgICAjIw0KPj4gICAgIyBAQmxrZGVidWdJbmplY3RFcnJvck9wdGlvbnM6DQo+
+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzIuaCBiL2Jsb2NrL3Fjb3cyLmgNCj4+IGluZGV4IGE5
+OGQyNDUwMGIuLjMyZDJjMDRiZmEgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xY293Mi5oDQo+PiAr
+KysgYi9ibG9jay9xY293Mi5oDQo+PiBAQCAtMzg2LDYgKzM4NiwxMiBAQCB0eXBlZGVmIHN0cnVj
+dCBRQ293TDJNZXRhDQo+PiAgICAgICAgICovDQo+PiAgICAgICAgUWNvdzJDT1dSZWdpb24gY293
+X2VuZDsNCj4+ICAgIA0KPj4gKyAgICAvKg0KPj4gKyAgICAgKiBJbmRpY2F0ZXMgdGhhdCBDT1cg
+cmVnaW9ucyBhcmUgYWxyZWFkeSBoYW5kbGVkIGFuZCBkbyBub3QgcmVxdWlyZQ0KPj4gKyAgICAg
+KiBhbnkgbW9yZSBwcm9jZXNzaW5nLg0KPj4gKyAgICAgKi8NCj4+ICsgICAgYm9vbCBza2lwX2Nv
+dzsNCj4+ICsNCj4+ICAgICAgICAvKioNCj4gDQo+IGhtbSwgYXJvdW5kIGl0LCBhbGwgY29tbWVu
+dHMgc3RhcnRzIGZyb20gJy8qKicsIHNvLCBJIHRoaW5rLCB5b3VycyBzaG91bGQgdG9vLg0KPiAo
+dGhpcyBub3RlIGRvZXNuJ3QgdG91Y2ggeW91ciBvdGhlciBjb21tZW50cykNCj4gDQoNCnRoYXQg
+dHJpZ2dlcnMgYSB3YXJuaW5nIGluIGNoZWNrcGF0Y2gucGwNCg0KICAgV0FSTklORzogQmxvY2sg
+Y29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUNCg0KPj4gICAgICAg
+ICAqIFRoZSBJL08gdmVjdG9yIHdpdGggdGhlIGRhdGEgZnJvbSB0aGUgYWN0dWFsIGd1ZXN0IHdy
+aXRlIHJlcXVlc3QuDQo+PiAgICAgICAgICogSWYgbm9uLU5VTEwsIHRoaXMgaXMgbWVhbnQgdG8g
+YmUgbWVyZ2VkIHRvZ2V0aGVyIHdpdGggdGhlIGRhdGENCj4+IGRpZmYgLS1naXQgYS9ibG9jay9x
+Y293Mi1jbHVzdGVyLmMgYi9ibG9jay9xY293Mi1jbHVzdGVyLmMNCj4+IGluZGV4IGUyNzM3NDI5
+ZjUuLjIzZTA3MDIwMjcgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xY293Mi1jbHVzdGVyLmMNCj4+
+ICsrKyBiL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYw0KPj4gQEAgLTgwNiw3ICs4MDYsNyBAQCBzdGF0
+aWMgaW50IHBlcmZvcm1fY293KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBRQ293TDJNZXRhICptKQ0K
+Pj4gICAgICAgIGFzc2VydChzdGFydC0+b2Zmc2V0ICsgc3RhcnQtPm5iX2J5dGVzIDw9IGVuZC0+
+b2Zmc2V0KTsNCj4+ICAgICAgICBhc3NlcnQoIW0tPmRhdGFfcWlvdiB8fCBtLT5kYXRhX3Fpb3Yt
+PnNpemUgPT0gZGF0YV9ieXRlcyk7DQo+PiAgICANCj4+IC0gICAgaWYgKHN0YXJ0LT5uYl9ieXRl
+cyA9PSAwICYmIGVuZC0+bmJfYnl0ZXMgPT0gMCkgew0KPj4gKyAgICBpZiAoKHN0YXJ0LT5uYl9i
+eXRlcyA9PSAwICYmIGVuZC0+bmJfYnl0ZXMgPT0gMCkgfHwgbS0+c2tpcF9jb3cpIHsNCj4+ICAg
+ICAgICAgICAgcmV0dXJuIDA7DQo+PiAgICAgICAgfQ0KPj4gICAgDQo+PiBkaWZmIC0tZ2l0IGEv
+YmxvY2svcWNvdzIuYyBiL2Jsb2NrL3Fjb3cyLmMNCj4+IGluZGV4IDQ4OTdhYmFlNWUuLjE2MWI5
+MzU5NjIgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xY293Mi5jDQo+PiArKysgYi9ibG9jay9xY293
+Mi5jDQo+PiBAQCAtMjAyMSw2ICsyMDIxLDExIEBAIHN0YXRpYyBib29sIG1lcmdlX2Nvdyh1aW50
+NjRfdCBvZmZzZXQsIHVuc2lnbmVkIGJ5dGVzLA0KPj4gICAgICAgICAgICAgICAgY29udGludWU7
+DQo+PiAgICAgICAgICAgIH0NCj4+ICAgIA0KPj4gKyAgICAgICAgLyogSWYgQ09XIHJlZ2lvbnMg
+YXJlIGhhbmRsZWQgYWxyZWFkeSwgc2tpcCB0aGlzIHRvbyAqLw0KPj4gKyAgICAgICAgaWYgKG0t
+PnNraXBfY293KSB7DQo+PiArICAgICAgICAgICAgY29udGludWU7DQo+PiArICAgICAgICB9DQo+
+PiArDQo+PiAgICAgICAgICAgIC8qIFRoZSBkYXRhIChtaWRkbGUpIHJlZ2lvbiBtdXN0IGJlIGlt
+bWVkaWF0ZWx5IGFmdGVyIHRoZQ0KPj4gICAgICAgICAgICAgKiBzdGFydCByZWdpb24gKi8NCj4+
+ICAgICAgICAgICAgaWYgKGwybWV0YV9jb3dfc3RhcnQobSkgKyBtLT5jb3dfc3RhcnQubmJfYnl0
+ZXMgIT0gb2Zmc2V0KSB7DQo+PiBAQCAtMjA0Niw2ICsyMDUxLDc3IEBAIHN0YXRpYyBib29sIG1l
+cmdlX2Nvdyh1aW50NjRfdCBvZmZzZXQsIHVuc2lnbmVkIGJ5dGVzLA0KPj4gICAgICAgIHJldHVy
+biBmYWxzZTsNCj4+ICAgIH0NCj4+ICAgIA0KPj4gK3N0YXRpYyBib29sIGlzX3VuYWxsb2NhdGVk
+KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBpbnQ2NF90IG9mZnNldCwgaW50NjRfdCBieXRlcykNCj4+
+ICt7DQo+PiArICAgIGludDY0X3QgbnI7DQo+PiArICAgIHJldHVybiAhYnl0ZXMgfHwNCj4+ICsg
+ICAgICAgICghYmRydl9pc19hbGxvY2F0ZWRfYWJvdmUoYnMsIE5VTEwsIG9mZnNldCwgYnl0ZXMs
+ICZucikgJiYgbnIgPT0gYnl0ZXMpOw0KPj4gK30NCj4+ICsNCj4+ICtzdGF0aWMgYm9vbCBpc196
+ZXJvX2NvdyhCbG9ja0RyaXZlclN0YXRlICpicywgUUNvd0wyTWV0YSAqbSkNCj4+ICt7DQo+PiAr
+ICAgIC8qDQo+PiArICAgICAqIFRoaXMgY2hlY2sgaXMgZGVzaWduZWQgZm9yIG9wdGltaXphdGlv
+biBzaG9ydGN1dCBzbyBpdCBtdXN0IGJlDQo+PiArICAgICAqIGVmZmljaWVudC4NCj4+ICsgICAg
+ICogSW5zdGVhZCBvZiBpc196ZXJvKCksIHVzZSBpc191bmFsbG9jYXRlZCgpIGFzIGl0IGlzIGZh
+c3RlciAoYnV0IG5vdA0KPj4gKyAgICAgKiBhcyBhY2N1cmF0ZSBhbmQgY2FuIHJlc3VsdCBpbiBm
+YWxzZSBuZWdhdGl2ZXMpLg0KPj4gKyAgICAgKi8NCj4+ICsgICAgcmV0dXJuIGlzX3VuYWxsb2Nh
+dGVkKGJzLCBtLT5vZmZzZXQgKyBtLT5jb3dfc3RhcnQub2Zmc2V0LA0KPiANCj4gaGVyZSB5b3Ug
+YWRkIG0tPmNvd19zdGFydC5vZmZzZXQgLi4uWzFdDQo+IA0KPj4gKyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgbS0+Y293X3N0YXJ0Lm5iX2J5dGVzKSAmJg0KPj4gKyAgICAgICAgICAgaXNfdW5h
+bGxvY2F0ZWQoYnMsIG0tPm9mZnNldCArIG0tPmNvd19lbmQub2Zmc2V0LA0KPj4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgbS0+Y293X2VuZC5uYl9ieXRlcyk7DQo+PiArfQ0KPj4gKw0KPj4g
+K3N0YXRpYyBpbnQgaGFuZGxlX2FsbG9jX3NwYWNlKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBRQ293
+TDJNZXRhICpsMm1ldGEpDQo+PiArew0KPj4gKyAgICBCRFJWUWNvdzJTdGF0ZSAqcyA9IGJzLT5v
+cGFxdWU7DQo+PiArICAgIFFDb3dMMk1ldGEgKm07DQo+PiArDQo+PiArICAgIGlmICghKGJzLT5m
+aWxlLT5icy0+c3VwcG9ydGVkX3plcm9fZmxhZ3MgJiBCRFJWX1JFUV9BTExPQ0FURSkpIHsNCj4+
+ICsgICAgICAgIHJldHVybiAwOw0KPj4gKyAgICB9DQo+PiArDQo+PiArICAgIGlmIChicy0+ZW5j
+cnlwdGVkKSB7DQo+PiArICAgICAgICByZXR1cm4gMDsNCj4+ICsgICAgfQ0KPj4gKw0KPj4gKyAg
+ICBmb3IgKG0gPSBsMm1ldGE7IG0gIT0gTlVMTDsgbSA9IG0tPm5leHQpIHsNCj4+ICsgICAgICAg
+IGludCByZXQ7DQo+PiArDQo+PiArICAgICAgICBpZiAoIW0tPmNvd19zdGFydC5uYl9ieXRlcyAm
+JiAhbS0+Y293X2VuZC5uYl9ieXRlcykgew0KPj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPj4g
+KyAgICAgICAgfQ0KPj4gKw0KPj4gKyAgICAgICAgaWYgKCFpc196ZXJvX2NvdyhicywgbSkpIHsN
+Cj4+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4+ICsgICAgICAgIH0NCj4+ICsNCj4+ICsgICAg
+ICAgIC8qDQo+PiArICAgICAgICAgKiBDb252ZW50aW9uYWwgcGxhY2UgZm9yIHFjb3cyX3ByZV93
+cml0ZV9vdmVybGFwX2NoZWNrKCkgYnV0IGluIHRoaXMNCj4+ICsgICAgICAgICAqIGNhc2UgaXQg
+aXMgYWxyZWFkeSBkb25lIGZvciB0aGVzZSBjbHVzdGVycw0KPj4gKyAgICAgICAgICovDQo+IA0K
+PiB0byBiZSBob25lc3QsIGNoZWNrIGlzIGRvbmUgZm9yIG9yaWdpbmFsIHJlcXVlc3Qgbm90LCBu
+b3QgZm9yIGNvd19yZWdpb25zLCBhbmQsDQo+IG9uIHRoZSBvdGhlciBoYW5kLA0KPiBkb19wZXJm
+b3JtX2Nvd193cml0ZSBfZG9lc18gdGhlIGNoZWNrLg0KPiANCj4gU28sIEkgc2VlIHR3byBjb25z
+aXN0ZW50IHdheXM6DQo+IDEuIHlvdSBqdXN0IGFkZCBjaGVjayBoZXJlLCBsaWtlIGluIGRvX3Bl
+cmZvcm1fY293X3dyaXRlDQo+IDIuIGltcHJvdmUgY2hlY2sgaW4gcWNvdzJfY29fcHdyaXRldiB0
+byBjb3ZlciB0aGUgd2hvbGUgYXJlYSwgYW5kIGRyb3AgY2hlY2tzIGZyb20NCj4gICAgICBwZXJm
+b3JtX2Nvdy4NCj4gDQo+IEkgcHJlZmVyIDEsIGFzIGl0IG1vcmUgaGVscGZ1bCBpbiBjYXNlIG9m
+IGJ1Z3MgaW4gdGhlIGNvZGUgKGp1c3QgY2hlY2sgZXhhY3RseSB3aGF0DQo+IHlvdSBhcmUgZ29p
+bmcgdG8gd3JpdGUgaW4gdGhlIG5leHQgd3JpdGUpLg0KPiANCg0Kb2sNCg0KZGlmZiAtLWdpdCBh
+L2Jsb2NrL3Fjb3cyLmMgYi9ibG9jay9xY293Mi5jDQppbmRleCAxNjFiOTM1OTYyLi4wNWE3Y2Jl
+YmJkIDEwMDY0NA0KLS0tIGEvYmxvY2svcWNvdzIuYw0KKysrIGIvYmxvY2svcWNvdzIuYw0KQEAg
+LTIwOTYsMTYgKzIwOTYsMTggQEAgc3RhdGljIGludCBoYW5kbGVfYWxsb2Nfc3BhY2UoQmxvY2tE
+cml2ZXJTdGF0ZSANCipicywgUUNvd0wyTWV0YSAqbDJtZXRhKQ0KICAgICAgICAgICAgICBjb250
+aW51ZTsNCiAgICAgICAgICB9DQoNCi0gICAgICAgIC8qDQotICAgICAgICAgKiBDb252ZW50aW9u
+YWwgcGxhY2UgZm9yIHFjb3cyX3ByZV93cml0ZV9vdmVybGFwX2NoZWNrKCkgYnV0IA0KaW4gdGhp
+cw0KLSAgICAgICAgICogY2FzZSBpdCBpcyBhbHJlYWR5IGRvbmUgZm9yIHRoZXNlIGNsdXN0ZXJz
+DQotICAgICAgICAgKi8NCi0NCi0gICAgICAgIEJMS0RCR19FVkVOVChicy0+ZmlsZSwgQkxLREJH
+X0NMVVNURVJfQUxMT0NfU1BBQ0UpOw0KICAgICAgICAgIC8qDQogICAgICAgICAgICogaW5zdGVh
+ZCBvZiB3cml0aW5nIHplcm8gQ09XIGJ1ZmZlcnMsDQogICAgICAgICAgICogZWZmaWNpZW50bHkg
+emVybyBvdXQgdGhlIHdob2xlIGNsdXN0ZXJzDQogICAgICAgICAgICovDQorDQorICAgICAgICBy
+ZXQgPSBxY293Ml9wcmVfd3JpdGVfb3ZlcmxhcF9jaGVjayhicywgMCwgbS0+YWxsb2Nfb2Zmc2V0
+LA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbS0+bmJfY2x1
+c3RlcnMgKiANCnMtPmNsdXN0ZXJfc2l6ZSk7DQorICAgICAgICBpZiAocmV0IDwgMCkgew0KKyAg
+ICAgICAgICAgIHJldHVybiByZXQ7DQorICAgICAgICB9DQorDQorICAgICAgICBCTEtEQkdfRVZF
+TlQoYnMtPmZpbGUsIEJMS0RCR19DTFVTVEVSX0FMTE9DX1NQQUNFKTsNCiAgICAgICAgICByZXQg
+PSBiZHJ2X2NvX3B3cml0ZV96ZXJvZXMoYnMtPmZpbGUsIG0tPmFsbG9jX29mZnNldCwNCiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbS0+bmJfY2x1c3RlcnMgKiBzLT5jbHVz
+dGVyX3NpemUsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJEUlZfUkVR
+X0FMTE9DQVRFKTsNCg0KPj4gKw0KPj4gKyAgICAgICAgQkxLREJHX0VWRU5UKGJzLT5maWxlLCBC
+TEtEQkdfQ0xVU1RFUl9BTExPQ19TUEFDRSk7DQo+PiArICAgICAgICAvKg0KPj4gKyAgICAgICAg
+ICogaW5zdGVhZCBvZiB3cml0aW5nIHplcm8gQ09XIGJ1ZmZlcnMsDQo+PiArICAgICAgICAgKiBl
+ZmZpY2llbnRseSB6ZXJvIG91dCB0aGUgd2hvbGUgY2x1c3RlcnMNCj4+ICsgICAgICAgICAqLw0K
+Pj4gKyAgICAgICAgcmV0ID0gYmRydl9jb19wd3JpdGVfemVyb2VzKGJzLT5maWxlLCBtLT5hbGxv
+Y19vZmZzZXQsDQo+IA0KPiBbMV0uLi4gYW5kIGhlcmUgLSBub3QuDQo+IEFuZCBwZXJmb3JtX2Nv
+dyB1c2VzIHN0YXJ0IHRvby4NCj4gaG1tLi4NCj4gDQo+IE9uIHRoZSBvdGhlciBoYW5kLCBoZXJl
+IHdlIGp1c3Qgd2FudCB0byB6ZXJvIGFsbCBhbGxvY2F0ZWQgY2x1c3RlcnMsIGl0IGlzIG5vdCBy
+ZWxhdGVkDQo+IHRvIGNvdyByZWdpb25zLiBTbywgb2suDQo+IA0KPj4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIG0tPm5iX2NsdXN0ZXJzICogcy0+Y2x1c3Rlcl9zaXplLA0K
+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJEUlZfUkVRX0FMTE9DQVRF
+KTsNCj4+ICsgICAgICAgIGlmIChyZXQgPCAwKSB7DQo+PiArICAgICAgICAgICAgaWYgKHJldCAh
+PSAtRU5PVFNVUCAmJiByZXQgIT0gLUVBR0FJTikgew0KPj4gKyAgICAgICAgICAgICAgICByZXR1
+cm4gcmV0Ow0KPj4gKyAgICAgICAgICAgIH0NCj4+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4+
+ICsgICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgIHRyYWNlX3Fjb3cyX3NraXBfY293KHFlbXVf
+Y29yb3V0aW5lX3NlbGYoKSwgbS0+b2Zmc2V0LCBtLT5uYl9jbHVzdGVycyk7DQo+PiArICAgICAg
+ICBtLT5za2lwX2NvdyA9IHRydWU7DQo+PiArICAgIH0NCj4+ICsgICAgcmV0dXJuIDA7DQo+PiAr
+fQ0KPj4gKw0KPiANCj4gWy4uLl0NCj4gDQo+IA0KPiB3aXRoIHByZS13cml0ZS1jaGVjayBhZGRl
+ZDoNCj4gUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRz
+b3ZAdmlydHVvenpvLmNvbT4NCj4gDQo+IA0KPiANCg==
