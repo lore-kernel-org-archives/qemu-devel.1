@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:49918)
+Received: from eggs.gnu.org ([208.118.235.92]:32980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gbrWN-0008R4-R3
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 13:33:41 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gbsTo-0005tB-He
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 14:35:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gbrWI-0001HE-I8
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 13:33:39 -0500
-Resent-Message-Id: <E1gbrWI-0001HE-I8@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21767)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gbrWH-00018p-Pd
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 13:33:34 -0500
-In-Reply-To: <20181219120904.17643-1-kraxel@redhat.com>
-Message-ID: <154572040861.18047.1546820225065133237@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1gbsTk-0000F2-Jc
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 14:35:04 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33610)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gbsTk-0000Ec-5g
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 14:35:00 -0500
+Received: by mail-pf1-x443.google.com with SMTP id c123so7045394pfb.0
+	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 11:34:59 -0800 (PST)
+References: <20181217200444.14812-1-aleksandar.markovic@rt-rk.com>
+	<20181217200444.14812-6-aleksandar.markovic@rt-rk.com>
+	<CAL1e-=gUE7KPL+MwBOd_sb2KocHox-4Davo_SN2fwozBoOa20Q@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <eface3ff-cafd-da6f-3f6d-30496f168cd9@linaro.org>
+Date: Wed, 26 Dec 2018 06:34:48 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 24 Dec 2018 22:46:49 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] ui: add generic keyboard state
- tracker, fix keymap
+In-Reply-To: <CAL1e-=gUE7KPL+MwBOd_sb2KocHox-4Davo_SN2fwozBoOa20Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/6] target/mips: MXU: Add handlers for
+ max/min instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +33,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: Stefan Markovic <smarkovic@wavecomp.com>, qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>, "Janeczek, Craig" <jancraig@amazon.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIxOTEyMDkwNC4xNzY0
-My0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRv
-czcgU0hPV19FTlY9MSBKPTgKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCmxpYnBtZW0gc3VwcG9y
-dCAgIG5vCmxpYnVkZXYgICAgICAgICAgIG5vCgpXQVJOSU5HOiBVc2Ugb2YgU0RMIDEuMiBpcyBk
-ZXByZWNhdGVkIGFuZCB3aWxsIGJlIHJlbW92ZWQgaW4KV0FSTklORzogZnV0dXJlIHJlbGVhc2Vz
-LiBQbGVhc2Ugc3dpdGNoIHRvIHVzaW5nIFNETCAyLjAKCk5PVEU6IGNyb3NzLWNvbXBpbGVycyBl
-bmFibGVkOiAgJ2NjJwogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFr
-LnRtcAotLS0KICBDQyAgICAgIGNoYXJkZXYvY2hhci5vCiAgQ0MgICAgICBjaGFyZGV2L2NoYXIt
-ZmQubwovdG1wL3FlbXUtdGVzdC9zcmMvdWkvc2RsLmM6IEluIGZ1bmN0aW9uICdzZGxfa2V5ZXZl
-bnRfdG9fa2V5Y29kZV9nZW5lcmljJzoKL3RtcC9xZW11LXRlc3Qvc3JjL3VpL3NkbC5jOjIxODoy
-ODogZXJyb3I6IGluY29tcGF0aWJsZSB0eXBlIGZvciBhcmd1bWVudCAzIG9mICdrZXlzeW0yc2Nh
-bmNvZGUnCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBzaGlmdCwgYWx0Z3IsIGN0cmwpICYg
-U0NBTkNPREVfS0VZTUFTSzsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KSW4gZmlsZSBp
-bmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy91aS9zZGxfa2V5c3ltLmg6MjowLAotLS0K
-L3RtcC9xZW11LXRlc3Qvc3JjL3VpL2tleW1hcHMuaDo1ODo1OiBub3RlOiBleHBlY3RlZCAnc3Ry
-dWN0IEtiZFN0YXRlIConIGJ1dCBhcmd1bWVudCBpcyBvZiB0eXBlICdfQm9vbCcKIGludCBrZXlz
-eW0yc2NhbmNvZGUoa2JkX2xheW91dF90ICprLCBpbnQga2V5c3ltLAogICAgIF4KL3RtcC9xZW11
-LXRlc3Qvc3JjL3VpL3NkbC5jOjIxODoyODogZXJyb3I6IHRvbyBtYW55IGFyZ3VtZW50cyB0byBm
-dW5jdGlvbiAna2V5c3ltMnNjYW5jb2RlJwogICAgICAgICAgICAgICAgICAgICAgICAgICAgc2hp
-ZnQsIGFsdGdyLCBjdHJsKSAmIFNDQU5DT0RFX0tFWU1BU0s7CiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBeCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvdWkvc2Rs
-X2tleXN5bS5oOjI6MCwKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
-aGV3Lm9yZy9sb2dzLzIwMTgxMjE5MTIwOTA0LjE3NjQzLTEta3JheGVsQHJlZGhhdC5jb20vdGVz
-dGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Sorry I missed the original post, but:
+
+> +    } else if (unlikely((XRb == 0) && (XRc == 0))) {
+> +        /* both operands zero registers -> just set destination to zero */
+> +        tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
+> +    } else if (unlikely((XRb == 0) || (XRc == 0))) {
+> +        /* exactly one operand is zero register - find which one is not...*/
+> +        uint32_t XRx = XRb ? XRb : XRc;
+> +        /* ...and do max/min operation with one operand 0 */
+> +        if (opc == OPC_MXU_S32MAX) {
+> +            tcg_gen_smax_i32(mxu_gpr[XRa - 1], mxu_gpr[XRx - 1], 0);
+> +        } else {
+> +            tcg_gen_smin_i32(mxu_gpr[XRa - 1], mxu_gpr[XRx - 1], 0);
+> +        }
+> +    } else if (unlikely(XRb == XRc)) {
+> +        /* both operands same -> just set destination to one of them */
+> +        tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
+
+You should not special case unlikely events, especially when ...
+
+> +    } else {
+> +        /* the most general case */
+> +        if (opc == OPC_MXU_S32MAX) {
+> +            tcg_gen_smax_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1],
+> +                                               mxu_gpr[XRc - 1]);
+> +        } else {
+> +            tcg_gen_smin_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1],
+> +                                               mxu_gpr[XRc - 1]);
+> +        }
+
+... the normal case will handle those special cases just fine.
