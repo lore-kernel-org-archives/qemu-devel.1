@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50305)
+Received: from eggs.gnu.org ([208.118.235.92]:50356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtmb-0006ST-5h
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:58:33 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtml-0006eh-Tt
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:58:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtmZ-0000Oh-I3
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:58:32 -0500
-Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:44002)
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtmk-0000Zo-1q
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:58:43 -0500
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:46318)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gbtmY-0000NM-Ke
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:58:31 -0500
-Received: by mail-pf1-x42d.google.com with SMTP id w73so7068947pfk.10
-	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:58:30 -0800 (PST)
+	id 1gbtmj-0000WK-SJ
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:58:41 -0500
+Received: by mail-pl1-x62d.google.com with SMTP id t13so6794664ply.13
+	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:58:38 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 26 Dec 2018 07:55:09 +1100
-Message-Id: <20181225205529.10874-23-richard.henderson@linaro.org>
+Date: Wed, 26 Dec 2018 07:55:10 +1100
+Message-Id: <20181225205529.10874-24-richard.henderson@linaro.org>
 In-Reply-To: <20181225205529.10874-1-richard.henderson@linaro.org>
 References: <20181225205529.10874-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 22/42] disas: Add RISC-V support
+Subject: [Qemu-devel] [PULL 23/42] configure: Add support for building
+ RISC-V host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +35,55 @@ From: Alistair Francis <Alistair.Francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <caa478c8987d6042434bb9582017cdf0ea192208.1545246859.git.alistair.francis@wdc.com>
+Message-Id: <52160afacecc5b109dc43a412fa3e74ddd6277fb.1545246859.git.alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- disas.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ configure | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/disas.c b/disas.c
-index f9c517b358..d9aa713a40 100644
---- a/disas.c
-+++ b/disas.c
-@@ -522,8 +522,14 @@ void disas(FILE *out, void *code, unsigned long size)
- # ifdef _ARCH_PPC64
-     s.info.cap_mode = CS_MODE_64;
- # endif
--#elif defined(__riscv__)
--    print_insn = print_insn_riscv;
-+#elif defined(__riscv) && defined(CONFIG_RISCV_DIS)
-+#if defined(_ILP32) || (__riscv_xlen == 32)
-+    print_insn = print_insn_riscv32;
-+#elif defined(_LP64)
-+    print_insn = print_insn_riscv64;
-+#else
-+#error unsupported RISC-V ABI
-+#endif
- #elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
-     print_insn = print_insn_arm_a64;
-     s.info.cap_arch = CS_ARCH_ARM64;
+diff --git a/configure b/configure
+index 224d3071ac..79375affc1 100755
+--- a/configure
++++ b/configure
+@@ -710,6 +710,12 @@ elif check_define __s390__ ; then
+   else
+     cpu="s390"
+   fi
++elif check_define __riscv ; then
++  if check_define _LP64 ; then
++    cpu="riscv64"
++  else
++    cpu="riscv32"
++  fi
+ elif check_define __arm__ ; then
+   cpu="arm"
+ elif check_define __aarch64__ ; then
+@@ -722,7 +728,7 @@ ARCH=
+ # Normalise host CPU name and set ARCH.
+ # Note that this case should only have supported host CPUs, not guests.
+ case "$cpu" in
+-  ppc|ppc64|s390|s390x|sparc64|x32)
++  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
+     cpu="$cpu"
+     supported_cpu="yes"
+     eval "cross_cc_${cpu}=\$host_cc"
+@@ -6937,6 +6943,8 @@ elif test "$ARCH" = "x86_64" -o "$ARCH" = "x32" ; then
+   QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
+ elif test "$ARCH" = "ppc64" ; then
+   QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
++elif test "$ARCH" = "riscv32" -o "$ARCH" = "riscv64" ; then
++  QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/riscv $QEMU_INCLUDES"
+ else
+   QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
+ fi
+@@ -7433,7 +7441,7 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   ppc*)
+     disas_config "PPC"
+   ;;
+-  riscv)
++  riscv*)
+     disas_config "RISCV"
+   ;;
+   s390*)
 -- 
 2.17.2
