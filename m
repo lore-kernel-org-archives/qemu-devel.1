@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:40827)
+Received: from eggs.gnu.org ([208.118.235.92]:51598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1gbi0T-0005cH-Sl
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 03:24:06 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gbjHE-0003Td-VH
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 04:45:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luwei.kang@intel.com>) id 1gbi0Q-0005Yg-NY
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 03:24:05 -0500
-From: "Kang, Luwei" <luwei.kang@intel.com>
-Date: Tue, 25 Dec 2018 08:23:49 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E172C97D77@SHSMSX101.ccr.corp.intel.com>
-References: <20181221124410.11920-1-pbonzini@redhat.com>
-In-Reply-To: <20181221124410.11920-1-pbonzini@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gbjHC-0003vU-Rf
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 04:45:28 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 25 Dec 2018 09:45:14 +0000
+Message-ID: <359b482e-8be6-49b4-e2de-c2498af10127@virtuozzo.com>
+References: <320758d6-012b-0b17-2467-f73bf8f4dcb2@virtuozzo.com>
+	<CAMRbyytAWPgKJFLfSjq4FD-G0dsTB4mJC8sspMx3ApMJ8rGdVw@mail.gmail.com>
+In-Reply-To: <CAMRbyytAWPgKJFLfSjq4FD-G0dsTB4mJC8sspMx3ApMJ8rGdVw@mail.gmail.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0085C69DA1BAED4AA469F44CEE1AF7B3@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] i386: mark the 'INTEL_PT' CPUID bit as
- unmigratable
+Subject: Re: [Qemu-devel] [Qemu-block] do not lseek in qcow2 block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+To: Nir Soffer <nsoffer@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-> From: Qemu-devel [mailto:qemu-devel-bounces+luwei.kang=3Dintel.com@nongnu=
-.org] On Behalf Of Paolo Bonzini
-> Sent: Friday, December 21, 2018 8:44 PM
-> To: qemu-devel@nongnu.org
-> Cc: ehabkost@redhat.com; qemu-stable@nongnu.org
-> Subject: [Qemu-devel] [PATCH] i386: mark the 'INTEL_PT' CPUID bit as unmi=
-gratable
->=20
-> Marshaling of processor tracing MSRs is not yet implemented in QEMU, mark=
- the feature as unmigratable.
-
-Hi Paolo,
-    I think Intel PT has supported live migration. I don't understand what =
-you mean.
-
-    commit b77146e9a129bcdb60edc23639211679ae846a92
-    Author: Chao Peng <chao.p.peng@linux.intel.com>
-    Date:   Mon Mar 5 00:48:36 2018 +0800
-    i386: Add support to get/set/migrate Intel Processor Trace feature
-
-Thanks,
-Luwei Kang
-
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  target/i386/cpu.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c index 9c54c41e7a..a6a5=
-97d2bf 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1012,6 +1012,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WO=
-RDS] =3D {
->              .needs_ecx =3D true, .ecx =3D 0,
->              .reg =3D R_EBX,
->          },
-> +        .unmigratable_features =3D CPUID_7_0_EBX_INTEL_PT,
->          .tcg_features =3D TCG_7_0_EBX_FEATURES,
->      },
->      [FEAT_7_0_ECX] =3D {
-> --
-> 2.20.1
->=20
+MjQuMTIuMjAxOCAyMzo0MiwgTmlyIFNvZmZlciB3cm90ZToNCj4gT24gTW9uLCBEZWMgMjQsIDIw
+MTggYXQgNTo1MCBQTSBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZp
+cnR1b3p6by5jb20gPG1haWx0bzp2c2VtZW50c292QHZpcnR1b3p6by5jb20+PiB3cm90ZToNCj4g
+DQo+ICAgICBIaSBhbGwhDQo+IA0KPiAgICAgYmRydl9jb19ibG9ja19zdGF0dXMgZGlncyBicy0+
+ZmlsZSBmb3IgYWRkaXRpb25hbCwgbW9yZSBhY2N1cmF0ZSBzZWFyY2ggZm9yIGhvbGUNCj4gICAg
+IGluc2lkZSByZWdpb24sIHJlcG9ydGVkIGFzIERBVEEgYnkgYnMgc2luY2UgbG9uZy1hZ28NCj4g
+DQo+ICAgICAgwqAgwqBjb21taXQgNWRhYTc0YTZlYmNlNzU0M2FhYWQxNzhjNDA2MWRjMDg3YmI0
+YzcwNQ0KPiAgICAgIMKgIMKgQXV0aG9yOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQu
+Y29tIDxtYWlsdG86cGJvbnppbmlAcmVkaGF0LmNvbT4+DQo+ICAgICAgwqAgwqBEYXRlOsKgIMKg
+V2VkIFNlcCA0IDE5OjAwOjM4IDIwMTMgKzAyMDANCj4gDQo+ICAgICAgwqAgwqAgwqAgwqBibG9j
+azogbG9vayBmb3IgemVybyBibG9ja3MgaW4gYnMtPmZpbGUNCj4gDQo+ICAgICBUaGlzIGFjY3Vy
+YWN5IGlzIG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2ZSBxY293MiBkaXNrLiBBY3R1YWxseSwgcWNv
+dzIga25vd3MsDQo+ICAgICB3aGVyZSBhcmUgaG9sZXMgYW5kIHdoZXJlIGlzIGRhdGEuIEJ1dCBl
+dmVyeSBibG9ja19zdGF0dXMgcmVxdWVzdCBjYWxscyBsc2Vlaw0KPiAgICAgYWRkaXRpb25hbGx5
+LiBSZWNlbnRseSAoYW5kIG5vdCB0aGUgZmlyc3QgdGltZSkgd2UgaGF2ZSBmYWNlZCB0aGUgc2l0
+dWF0aW9uLA0KPiAgICAgd2hlbiBsc2VlayB3b3JrcyBzbG93LiBPZiBjb3Vyc2UsIGl0IGlzIG1v
+cmUgYWJvdXQga2VybmVsIGltcGxlbWVudGF0aW9uIG9mIGl0LA0KPiAgICAgYnV0IHdoeSB0byBp
+bnZvbHZlIGxzZWVrIGF0IGFsbCwgaWYgd2UgaGF2ZSB0aGUgaW5mb3JtYXRpb24gb24gcWNvdzIg
+bGV2ZWw/DQo+ICAgICBBc3N1bWUgYSBiaWcgZGlzaywgZnVsbCBvZiBkYXRhLCBpbiBhbnkgaXRl
+cmF0aXZlIGNvcHlpbmcgYmxvY2sgam9iIChvciBpbWcNCj4gICAgIGNvbnZlcnQpIHdlJ2xsIGNh
+bGwgbHNlZWsoSE9MRSkgb24gZXZlcnkgaXRlcmF0aW9uLCBhbmQgZWFjaCBvZiB0aGVzZSBsc2Vl
+a3MNCj4gICAgIHdpbGwgaGF2ZSB0byBpdGVyYXRlIHRocm91Z2ggYWxsIG1ldGFkYXRhIHVwIHRv
+IHRoZSBlbmQgb2YgZmlsZS4gSXQncyBvYnZpb3VzbHkNCj4gICAgIGluZWZmZWN0aXZlIGJlaGF2
+aW9yLg0KPiANCj4gICAgIEknbSB0aGlua2luZyBhYm91dCwgaG93IHRvIHByb3Blcmx5IHdvcmth
+cm91bmQgdGhpcyB0aGluZywgYW5kIEkgaGF2ZSBzb21lDQo+ICAgICBxdWVzdGlvbnMuDQo+IA0K
+PiAgICAgV2hhdCBhcmUgdGhlIGNhc2VzLCB3aGVuIHdlIHJlYWxseSBuZWVkIGRpZ2dpbmcgZm9y
+IHplcm9zIGluIGJzLT5maWxlPw0KPiANCj4gICAgIFdoeSBpbiBtaXJyb3Igd2UgY2FyZSBhYm91
+dCBkaXNjYXJkIHZzIHdyaXRlX3plcm9zLCBrZWVwaW5nIGluIG1pbmQsIHRoYXQNCj4gICAgIGJs
+b2NrX3N0YXR1cyB3aWxsIHJldHVybiBaRVJPIGluc3RlYWQgZm9yIHVuYWxsb2NhdGVkIHJlZ2lv
+bnMgaW4gc29tZSBjYXNlcywgbm90DQo+ICAgICByZWxhdGVkIHRvIGd1ZXN0IHZpZXcgb2YgZGlz
+ayAoYmRydl91bmFsbG9jYXRlZF9ibG9ja3NfYXJlX3plcm8sIGJhY2tpbmcgZmlsZSBpcw0KPiAg
+ICAgc21hbGxlciB0aGFuIHJlcXVlc3Quc3RhcnQpPw0KPiANCj4gICAgIEFuZCBmaW5hbGx5LCB3
+aGF0IHRvIGRvIHdpdGggdGhlIHByb2JsZW0/DQo+IA0KPiAgICAgT2J2aW91c2x5LCB0aGUgc2lt
+cGxlc3QgdGhpbmcgaXMganVzdCByZXZlcnQgNWRhYTc0YS4gV2hhdCB3aWxsIGl0IGJyZWFrPw0K
+PiANCj4gICAgIE90aGVyd2lzZSwgSSBuZWVkIHRvICJyZXZlcnQiIGl0IGluIHNvbWUgY2FzZXMs
+IGFuZCwgbWF5IGJlLCBpdCBzaG91bGQgYmUgYQ0KPiAgICAgdXNlci1kZWZpbmVkIHBhcmFtZXRl
+ci4uIFNob3VsZCBpdD/CoCBBbmQgd2hhdCBhcmUgdGhlIGNhc2VzPyBXZSBuZWVkIHRvICJmcmVl
+Ig0KPiAgICAgb2YgNWRhYTc0YSBhdCBsZWFzdCBxY293Mi4uIEJ1dCBhZ2Fpbiwgc2hvdWxkIGl0
+IGJlIGZvcm1hdC1zcGVjaWZpYyBvcHRpb24sIG9yDQo+ICAgICBzb21ldGhpbmcgbW9yZSBnZW5l
+cmljPw0KPiANCj4gICAgIFRoZW4sIGlmIGl0IHdvdWxkIGJlIHNlcGFyYXRlIHBhcmFtZXRlciwg
+aG93IHNob3VsZCBpdCBpbnRlcmZlcmUgd2l0aA0KPiAgICAgd2FudF96ZXJvcywgb3IgZXZlbiwg
+c2hvdWxkIGl0IGJlIHdhbnRfemVyb3MsIHJld29ya2VkIGEgYml0IHRvIGJlIHdhbnRfbHNlZWs/
+DQo+IA0KPiANCj4gSG93IGFib3V0IGhhdmluZyAyIHBhc3NlczoNCj4gMS4gc2VlayBEQVRBL0hP
+TEUgZm9yIGVudGlyZSBpbWFnZSwga2VlcCByZXN1bHQgaW4gbWVtb3J5DQo+IDIuIHVzZSB0aGUg
+cmVzdWx0IHdoZW4gbW9kaWZ5aW5nIHJhbmdlcw0KWWVzIEkgdGhpbmsgdGhpcyBpcyBwb3NzaWJs
+ZSwgYnV0IGluIGNhc2Ugb2YgcWNvdzIsIGFnYWluLCB3ZSBkb24ndCBuZWVkIGxzZWVrIGF0IGFs
+bCwNCmFuZCBtb3N0IG9wdGltYWwgd2F5IGlzIG5vdCBjYWxsIGl0Lg0KDQo+IA0KPiBUaGlzIGNh
+biBhbHNvIGhlbHAgYWxsb2NhdGlvbiBvZiBjbHVzdGVycyBpbiBhIGRlc3RpbmF0aW9uIGltYWdl
+Og0KPiAxLiBzZWVrIERBVEEvSE9MRSBpbiBzb3VyY2UgaW1hZ2UNCj4gMi4gYWxsb2NhdGUgYmxv
+Y2tzIGluIGRlc3RpbmF0aW9uDQo+IDMuIGNvbnZlcnQgdXNpbmcgb3V0IG9mIG9yZGVyIHdyaXRl
+cyAqd2l0aG91dCogY2F1c2luZyBmcmFnbWVudGF0aW9uIGluIHRoZSBkZXN0aW5hdGlvbiBpbWFn
+ZS4NCg0KSW50ZXJlc3RpbmcgaWRlYSwgSSd2ZSB0aG91Z2h0IGFib3V0IHNvbWV0aGluZyBsaWtl
+IHRoaXMgdG9vLiBJdCBzaG91bGQgd29yayBmb3IgaW1nIGNvbnZlcnQsIGFzDQpkaXNrIGlzIHN0
+YXRpYywgYnV0IG5vdCBmb3IgbWlycm9yLi4NCg0KT2ssIGZvciBub3Qgc3RhdGljIGRpc2ssIHdl
+IGNhbiBpbXBsZW1lbnQgY2FjaGUgZmlsdGVyIGRyaXZlciBmb3IgY2FjaGluZyBibG9ja19zdGF0
+dXMgcmVzdWx0cw0KKGFuZCB0byBjYWNoZSBsc2VlayByZXN1bHRzLCB3ZSBuZWVkIHRvIGFsbG93
+IGJsb2NrX3N0YXR1cyByZXR1cm4gbW9yZSBpbmZvcm1hdGlvbiB0aGFuIHJlcXVlc3RlZCwNCmxp
+a2Ugd2UgZG8gaW4gTkJEIHByb3RvY29sKSwgYnV0IGFnYWluLCBmb3IgcWNvdzIgd2UgYWxyZWFk
+eSBoYXZlIGFkZGl0aW9uYWwgbWV0YWRhdGEgbGF5ZXIgd2hpY2gNCmlzIHFjb3cyIGl0c2VsZiwg
+c28gbHNlZWsgaXMgcmVkdW5kYW50Lg0KDQo+IA0KPiBIZXJlIGlzIGFuIGV4YW1wbGUgdXNpbmcg
+dGhpcyBhcHByb2FjaCB3aGVuIGNvcHlpbmcgaW1hZ2VzIHRvIHFlbS1uYmQuIFRoaXMgaXMgYSBw
+cmV0dHkNCj4gc2ltcGxpc3RpYyBzaW5nbGUgdGhyZWFkZWQgaW1wbGVtZW50YXRpb24gaW4gcHl0
+aG9uLCB1c2luZyAicWVtdS1pbWcgbWFwIiB0byBmaW5kIHRoZSBkYXRhDQo+IGFuZCB6ZXJvIHJh
+bmdlcy4gSXQgaXMgZmFzdGVyIHRoYW4gcWVtdS1pbWcgY29udmVydCA6LSkNCj4gDQo+IGh0dHBz
+Oi8vZ2l0aHViLmNvbS9vVmlydC9vdmlydC1pbWFnZWlvL2Jsb2IvbWFzdGVyL2V4YW1wbGVzL25i
+ZC1jbGllbnQNCj4gaHR0cHM6Ly9naXRodWIuY29tL29WaXJ0L292aXJ0LWltYWdlaW8vY29tbWl0
+L2JlYzdjYjY3N2UzM2M2ZDBhNzY0NWMzNjdhZjNkNTZiNzBiNjY2ZGINCj4gDQo+IE5pcg0KDQoN
+Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
