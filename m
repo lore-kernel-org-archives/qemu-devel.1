@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46099)
+Received: from eggs.gnu.org ([208.118.235.92]:46653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liebrecht@grossmann-venter.com>) id 1gbvT2-000578-9Y
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:46:29 -0500
+	(envelope-from <admin@grossmann-venter.com>) id 1gbvVS-0006K8-3Y
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:48:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liebrecht@grossmann-venter.com>) id 1gbvSw-0006w8-LP
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:46:27 -0500
-Received: from server54-2.web-hosting.com ([198.54.126.118]:48683)
+	(envelope-from <admin@grossmann-venter.com>) id 1gbvVN-0000pW-3A
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:48:58 -0500
+Received: from server54-2.web-hosting.com ([198.54.126.118]:34533)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liebrecht@grossmann-venter.com>)
-	id 1gbvSv-0006sH-BL
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:46:22 -0500
-Received: from [::1] (port=60430 helo=server54.web-hosting.com)
+	(Exim 4.71) (envelope-from <admin@grossmann-venter.com>)
+	id 1gbvVM-0000nT-UE
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:48:53 -0500
+Received: from [::1] (port=37472 helo=server54.web-hosting.com)
 	by server54.web-hosting.com with esmtpa (Exim 4.91)
-	(envelope-from <liebrecht@grossmann-venter.com>) id 1gbvSr-002pDg-Jg
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:46:18 -0500
+	(envelope-from <admin@grossmann-venter.com>) id 1gbvVK-002qLi-8j
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:48:50 -0500
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date: Tue, 25 Dec 2018 17:46:17 -0500
+Date: Tue, 25 Dec 2018 17:48:50 -0500
 From: liebrecht@grossmann-venter.com
-Message-ID: <b0d70556767952dc739454d074bdab52@grossmann-venter.com>
+Message-ID: <51912a3cd93dc66e03425eba04ae041d@grossmann-venter.com>
 Subject: [Qemu-devel] Qemu  the right way.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
