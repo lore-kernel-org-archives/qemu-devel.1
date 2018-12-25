@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46653)
+Received: from eggs.gnu.org ([208.118.235.92]:56560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gbvVS-0006K8-3Y
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:48:58 -0500
+	(envelope-from <makren67@gmail.com>) id 1gbwMO-0001bB-0y
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 18:43:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gbvVN-0000pW-3A
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:48:58 -0500
-Received: from server54-2.web-hosting.com ([198.54.126.118]:34533)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <admin@grossmann-venter.com>)
-	id 1gbvVM-0000nT-UE
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:48:53 -0500
-Received: from [::1] (port=37472 helo=server54.web-hosting.com)
-	by server54.web-hosting.com with esmtpa (Exim 4.91)
-	(envelope-from <admin@grossmann-venter.com>) id 1gbvVK-002qLi-8j
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 17:48:50 -0500
+	(envelope-from <makren67@gmail.com>) id 1gbwMN-0003vl-46
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 18:43:39 -0500
+Received: from mail-yb1-xb36.google.com ([2607:f8b0:4864:20::b36]:39223)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <makren67@gmail.com>) id 1gbwMN-0003vO-0R
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 18:43:39 -0500
+Received: by mail-yb1-xb36.google.com with SMTP id n187so2190402yba.6
+	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 15:43:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 25 Dec 2018 17:48:50 -0500
-From: liebrecht@grossmann-venter.com
-Message-ID: <51912a3cd93dc66e03425eba04ae041d@grossmann-venter.com>
-Subject: [Qemu-devel] Qemu  the right way.
+From: Nick Renieris <makren67@gmail.com>
+Date: Wed, 26 Dec 2018 01:43:11 +0200
+Message-ID: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] AVX support for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +28,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I have been using Qemu in the past about 8 years ago or so to run legacy 
-windows software.
+Hello,
 
-I installed the latest qemu and noticed a lot changed and cant find 
-conclusive answers online.
+What's the current status on AVX support for TCG? Is there anyone working o=
+n it?
+Is there interest for it?
 
-I am writing this post to find what is the right way to start to set up 
-qemu with a windows 7 pro guest. I want to try and eliminate the 
-iterations and find out what is really possible for the guest.
+Effort was put into making 'TCGv_vec', as elaborated in this talk:
 
-Hardware used"
-24 Core AMD rackserver.
-Host OS Debian 9 Stretch
-Guest Windows 7 Pro 32 bit
+"[2017] Vectoring in on QEMU's TCG Engine by Alex Benn=C3=A9e"
+(https://www.youtube.com/watch?v=3DIYHTwnde0g8)
 
-Requirements:
-1) I need to be able to run at least 4 processors in the guest. Is this 
-possible with qemu as hosts ?
-2) I need to at least have sound working from applications in the guest 
-with pulseaudio on the Debian host. Is it  possible ?
-3) USB, what is the level of support 2.0 3.0 ?
-( However windo$ 7 cannot really do USB3. so usb-3 is moot anyway)
-4) What kind of devices can be run through usb ?
+,yet there doesn't seem to be a front-end (except for VEX prefix
+parsing) nor a backend for AVX, a pretty common x86 extension.
 
-The answers to 1-4 will be really helpful to decide if I should even be 
-using it. The documentation is schetchy about all this.
-I tried Virtualbox, but it is just a nice looking empty promisebox 
-yielding nothing. Since Qemu helped me a lot in the past I will have 
-better chances here.
+I'd appreciate any info on this,
 
-5) I am currently installing win7pro guest with command
-$] qemu-system-x86_64 -boot c -cdrom /dev/cdrom -m 2048M
-
-and left out all the network card and sound driver switches as I have no 
-clue what I should choose.
-Can they be configured afterwards ?
-
-Thanks
+Regards,
+Nick Renieris.
