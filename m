@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:40320)
+Received: from eggs.gnu.org ([208.118.235.92]:46080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <13824125580@163.com>) id 1gbeEg-0004zO-KD
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 23:22:36 -0500
+	(envelope-from <peterx@redhat.com>) id 1gbf8b-0007qD-Mc
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 00:20:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <13824125580@163.com>) id 1gbeEc-0004j7-Ml
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 23:22:30 -0500
-Received: from m13-153.163.com ([220.181.13.153]:50857)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <13824125580@163.com>) id 1gbeEb-0004eW-Jd
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 23:22:26 -0500
-Date: Tue, 25 Dec 2018 12:06:41 +0800 (CST)
-From: tugouxp  <13824125580@163.com>
-In-Reply-To: <CAFEAcA8TOPHViUG0B0KAnDCpuoygkn51KVXNniQvjdcEf2R9ng@mail.gmail.com>
-References: <1bd5a622.e60b.167dfb192d3.Coremail.13824125580@163.com>
-	<CAFEAcA8TOPHViUG0B0KAnDCpuoygkn51KVXNniQvjdcEf2R9ng@mail.gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1gbf8Y-0005z8-Ia
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 00:20:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:63316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gbf8Y-0005xr-DG
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 00:20:14 -0500
+Date: Tue, 25 Dec 2018 13:20:05 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181225052005.GB12850@xz-x1>
+References: <20181224115235.16881-1-wainersm@redhat.com>
+	<20181224115235.16881-2-wainersm@redhat.com>
 MIME-Version: 1.0
-Message-ID: <55c3b715.72b5.167e38b1206.Coremail.13824125580@163.com>
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] what is the behavier precisely if a tb was
- interrupted by a interrupt or signal?
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181224115235.16881-2-wainersm@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] hw/core: add qom getter for
+ kernel-irqchip property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, marcel.apfelbaum@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
 
-dGhhbmsgeW91LgoKCmlmIHNvICx0aGUgaW50ZXJydXB0ICBncmFudWxhcml0eSBjYW50IGJlIGlu
-c3RydWN0aW9ucyBwcmVjaXNlbHksIGJ1dCB0YiBwcmVjaXNlbHksICBmb3IgcWVtdSBjYW50IGNo
-ZWNrIHRoZSBpbnRlcnJ1cHQgYXQgZWFjaCBpbnN0cnVjdGlvbnMgZXhlY3V0aW9uIHN0YWdlLCBy
-aWdodD8KCgoKCgoKCkF0IDIwMTgtMTItMjQgMjE6NDk6MDcsICJQZXRlciBNYXlkZWxsIiA8cGV0
-ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPiB3cm90ZToKPk9uIE1vbiwgMjQgRGVjIDIwMTggYXQgMTA6
-MTEsIHR1Z291eHAgPDEzODI0MTI1NTgwQDE2My5jb20+IHdyb3RlOgo+PiAgdGhpbmsgYWJvdXQg
-dGhlIHNjZW5hcmlvIGxpa2UgdGhhdCwgYSB0YiBibG9jayBjb250YWluICA5IG5hdGl2ZSBpbnN0
-cnVjdGlvbnMgIGV4ZWN1dGUgc2VxdWVudGlhbGx5Cj4+Cj4+ICBpZiBhIGludGVycnVwdCBvciBh
-IHNpZ25hbCBoYXBwZW5zICBiZWZvcmUgaW5zdHJ1Y3Rpb24gNiBleGVjdXRlZCwgIGRpZCB0aGUg
-dGIgIGJlIGZpbmlzaGVkIGJlZm9yZSByZXNwb25zZSB0byB0aGUgaW50ZXJydXB0ICBvcgo+Pgo+
-PiB0aGUgIGV4aXRlZCBhdCBvbmNlIHRvIHJlc3BvbnNlIHRoZSBpbnRlcnJ1cHQ/Cj4KPldlIGRv
-bid0IGNoZWNrIGluIHRoZSBtaWRkbGUgb2YgYSBUQiBmb3IgY29uZGl0aW9ucyBsaWtlCj5pbnRl
-cnJ1cHRzLiBUaGUgb25seSB0aGluZyB0aGF0IGNhbiBjYXVzZSBhIFRCIHRvIHN0b3AKPmV4ZWN1
-dGlvbiBoYWxmd2F5IHRocm91Z2ggaXMgaWYgaXQgZG9lcyBzb21ldGhpbmcgdGhhdAo+cHJvdm9r
-ZXMgYSBzeW5jaHJvbm91cyBleGNlcHRpb24gKGZvciBpbnN0YW5jZSwgaWYgaXQKPmRvZXMgYSBn
-dWVzdCBtZW1vcnkgYWNjZXNzIHRoYXQgdHJpZ2dlcnMgYSBndWVzdCBDUFUKPnBhZ2UgZmF1bHQs
-IG9yIGlmIGl0IGVtdWxhdGVzIGEgZ3Vlc3QgaW5zdHJ1Y3Rpb24gdGhhdAo+aXMgcmVxdWlyZWQg
-dG8gdHJhcCkuIFRob3NlIHdlIGVtdWxhdGUgYnkgbG9uZ2p1bXBpbmcgb3V0Cj5mcm9tIHRoZSBn
-ZW5lcmF0ZWQgY29kZSB0byB0aGUgdG9wIGxldmVsIGxvb3AuCj5Bc3luY2hyb25vdXMgZXZlbnRz
-IGxpa2UgZW11bGF0ZWQgaW50ZXJydXB0cyB3ZSBvbmx5Cj5jaGVjayBhdCB0aGUgYmVnaW5uaW5n
-IG9mIHRoZSBUQjogd2UgZW1pdCBjb2RlIHdoaWNoCj50ZXN0cyBhIGZsYWcgYW5kIHJldHVybnMg
-ZWFybHkuCj4KPnRoYW5rcwo+LS0gUE1NCg==
+On Mon, Dec 24, 2018 at 06:52:35AM -0500, Wainer dos Santos Moschetta wrote:
+> Allows to access the kernel-irqchip property of a Machine
+> Class object via QOM get method.
+> 
+> Before this patch the property cannot be read although it is
+> listed by qom-list:
+> 
+> qemu-system-x86_64 -M q35,accel=kvm,kernel-irqchip=split (...)
+> -> {"execute": "qom-list", "arguments": {"path": "/machine"}}
+> <- {"return": [{"name": "type", "type": "string"}, (...) , {"name": "kernel-irqchip", "type": "on|off|split"} (...)}
+> -> {"execute": "qom-get", "arguments": {"path": "/machine", "property": "kernel-irqchip"}}
+> <- {"error": {"class": "GenericError", "desc": "Insufficient permission to perform this operation"}}
+> 
+> It is implemented the machine_get_kernel_irqchip() method,
+> which evaluates the kernel_irqchip_allowed, *_required, and
+> *_split fields to determine the value of kernel-irqchip. Note: we
+> assume there is not inconsistency on the value of those fields.
+> 
+> Then with this change in place, it works as expected:
+> 
+> qemu-system-x86_64 -M q35,accel=kvm,kernel-irqchip=split (...)
+> -> {"execute": "qom-get", "arguments": {"path": "/machine", "property": "kernel-irqchip"}}
+> <- {"return": "split"}
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>  hw/core/machine.c | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index c51423b647..f61003f8f2 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -37,6 +37,21 @@ static void machine_set_accel(Object *obj, const char *value, Error **errp)
+>      ms->accel = g_strdup(value);
+>  }
+>  
+> +static void machine_get_kernel_irqchip(Object *obj, Visitor *v,
+> +                                       const char *name, void *opaque,
+> +                                       Error **errp)
+> +{
+> +    MachineState *ms = MACHINE(obj);
+> +    OnOffSplit mode;
+> +
+> +    if (ms->kernel_irqchip_split) {
+> +        mode = ON_OFF_SPLIT_SPLIT;
+> +    } else {
+> +        mode = (ms->kernel_irqchip_allowed && ms->kernel_irqchip_required) ?
+> +                ON_OFF_SPLIT_ON : ON_OFF_SPLIT_OFF;
+
+Hi, Wainer,
+
+The new interface seems to be a good thing, though the implementation
+might be incorrect here.  AFAIU these parameters only decide "how we
+want to choose the kernel-irqchip parameter" rather than the real
+result, which could depend on more (e.g., whether KVM is used).
+
+IMHO you should simply fetch the results from kvm_irqchip_in_kernel()
+and kvm_irqchip_is_split() where the real results are stored.
+
+Regards,
+
+-- 
+Peter Xu
