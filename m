@@ -1,33 +1,36 @@
-Received: from eggs.gnu.org ([208.118.235.92]:41212)
+Received: from eggs.gnu.org ([208.118.235.92]:54143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gbZkw-0000kO-IA
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 18:35:34 -0500
+	(envelope-from <kevin.tian@intel.com>) id 1gbc0B-0000F4-L4
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 20:59:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gbZks-0007fn-Lp
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 18:35:30 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gbZks-0007f4-GH
-	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 18:35:26 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gbZkr-0005HF-6g
-	for <qemu-devel@nongnu.org>; Mon, 24 Dec 2018 23:35:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 22C912E80D0
-	for <qemu-devel@nongnu.org>; Mon, 24 Dec 2018 23:35:25 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <kevin.tian@intel.com>) id 1gbc06-0005zW-Ml
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 20:59:23 -0500
+Received: from mga12.intel.com ([192.55.52.136]:15718)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1gbc05-0005vm-12
+	for qemu-devel@nongnu.org; Mon, 24 Dec 2018 20:59:17 -0500
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Tue, 25 Dec 2018 01:59:07 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19BEBDB0C@SHSMSX101.ccr.corp.intel.com>
+References: <20181218134540.2q43v6fpvzbsam6h@linux.intel.com>
+	<20181218094527-mutt-send-email-mst@kernel.org>
+	<20181219034006.d4drqoz5b6r6h3mn@linux.intel.com>
+	<20181218233451-mutt-send-email-mst@kernel.org>
+	<20181219055743.okeszdqlqkg7tagk@linux.intel.com>
+	<20181219100355-mutt-send-email-mst@kernel.org>
+	<20181220054921.sk5wnmlo2vvjgcs6@linux.intel.com>
+	<20181220132644-mutt-send-email-mst@kernel.org>
+	<20181221161920.45fnlmcp7aqu6ibi@linux.intel.com>
+	<20181221120657-mutt-send-email-mst@kernel.org>
+	<20181221173401.cb5vgokgxopnnpes@linux.intel.com>
+In-Reply-To: <20181221173401.cb5vgokgxopnnpes@linux.intel.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 24 Dec 2018 23:26:15 -0000
-From: Timothy Pearson <kb9vqf@pearsoncomputing.net>
-Reply-To: Bug 1809684 <1809684@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154569397586.26258.18132613460124027534.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1809684] [NEW] amdgpu passthrough on POWER9
- (ppc64el) not working
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] intel-iommu: extend VTD emulation
+ to allow 57-bit IOVA address width.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,100 +39,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Yu Zhang <yu.c.zhang@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, "Liu, Yi L" <yi.l.liu@intel.com>
 
-Public bug reported:
-
-When attempting to pass a Vega 56 GPU to a virtualized guest using QEMU
-3.1 on ppc64el (POWER9), the guest is unable to initialize the GPU.
-Further digging reveals the driver attempting to allocate a large BAR,
-which then fails:
-
-[    6.058544] [drm] PCI I/O BAR is not found.
-<snip uninteresting bits>
-[    6.679193] amdgpu 0000:00:03.0: BAR 2: releasing [mem 0x210400000000-0x=
-2104001fffff pref]
-[    6.679306] amdgpu 0000:00:03.0: BAR 0: releasing [mem 0x210200000000-0x=
-2103ffffffff pref]
-[    6.679361] amdgpu 0000:00:03.0: BAR 0: no space for [mem size 0x2000000=
-00 pref]
-[    6.679403] amdgpu 0000:00:03.0: BAR 0: failed to assign [mem size 0x200=
-000000 pref]
-[    6.679444] amdgpu 0000:00:03.0: BAR 2: assigned [mem 0x200080200000-0x2=
-000803fffff pref]
-[    6.681420] amdgpu 0000:00:03.0: VRAM: 8176M 0x000000F400000000 - 0x0000=
-00F5FEFFFFFF (8176M used)
-[    6.681507] amdgpu 0000:00:03.0: GART: 512M 0x0000000000000000 - 0x00000=
-0001FFFFFFF
-[    6.681594] amdgpu 0000:00:03.0: AGP: 267419648M 0x000000F800000000 - 0x=
-0000FFFFFFFFFFFF
-[    6.681653] [drm] Detected VRAM RAM=3D8176M, BAR=3D0M
-[    6.681688] [drm] RAM width 2048bits HBM
-[    6.681885] [TTM] Zone  kernel: Available graphics memory: 4176288 kiB
-[    6.681978] [TTM] Zone   dma32: Available graphics memory: 2097152 kiB
-[    6.682043] [TTM] Initializing pool allocator
-[    6.682159] [drm] amdgpu: 8176M of VRAM memory ready
-[    6.682249] [drm] amdgpu: 6117M of GTT memory ready.
-[    6.682387] [drm] GART: num cpu pages 8192, num gpu pages 131072
-[    6.682466] amdgpu 0000:00:03.0: (-22) kernel bo map failed
-[    6.682539] [drm:amdgpu_device_init [amdgpu]] *ERROR* amdgpu_vram_scratc=
-h_init failed -22
-[    6.682592] amdgpu 0000:00:03.0: amdgpu_device_ip_init failed
-[    6.682636] amdgpu 0000:00:03.0: Fatal error during GPU init
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1809684
-
-Title:
-  amdgpu passthrough on POWER9 (ppc64el) not working
-
-Status in QEMU:
-  New
-
-Bug description:
-  When attempting to pass a Vega 56 GPU to a virtualized guest using
-  QEMU 3.1 on ppc64el (POWER9), the guest is unable to initialize the
-  GPU.  Further digging reveals the driver attempting to allocate a
-  large BAR, which then fails:
-
-  [    6.058544] [drm] PCI I/O BAR is not found.
-  <snip uninteresting bits>
-  [    6.679193] amdgpu 0000:00:03.0: BAR 2: releasing [mem 0x210400000000-=
-0x2104001fffff pref]
-  [    6.679306] amdgpu 0000:00:03.0: BAR 0: releasing [mem 0x210200000000-=
-0x2103ffffffff pref]
-  [    6.679361] amdgpu 0000:00:03.0: BAR 0: no space for [mem size 0x20000=
-0000 pref]
-  [    6.679403] amdgpu 0000:00:03.0: BAR 0: failed to assign [mem size 0x2=
-00000000 pref]
-  [    6.679444] amdgpu 0000:00:03.0: BAR 2: assigned [mem 0x200080200000-0=
-x2000803fffff pref]
-  [    6.681420] amdgpu 0000:00:03.0: VRAM: 8176M 0x000000F400000000 - 0x00=
-0000F5FEFFFFFF (8176M used)
-  [    6.681507] amdgpu 0000:00:03.0: GART: 512M 0x0000000000000000 - 0x000=
-000001FFFFFFF
-  [    6.681594] amdgpu 0000:00:03.0: AGP: 267419648M 0x000000F800000000 - =
-0x0000FFFFFFFFFFFF
-  [    6.681653] [drm] Detected VRAM RAM=3D8176M, BAR=3D0M
-  [    6.681688] [drm] RAM width 2048bits HBM
-  [    6.681885] [TTM] Zone  kernel: Available graphics memory: 4176288 kiB
-  [    6.681978] [TTM] Zone   dma32: Available graphics memory: 2097152 kiB
-  [    6.682043] [TTM] Initializing pool allocator
-  [    6.682159] [drm] amdgpu: 8176M of VRAM memory ready
-  [    6.682249] [drm] amdgpu: 6117M of GTT memory ready.
-  [    6.682387] [drm] GART: num cpu pages 8192, num gpu pages 131072
-  [    6.682466] amdgpu 0000:00:03.0: (-22) kernel bo map failed
-  [    6.682539] [drm:amdgpu_device_init [amdgpu]] *ERROR* amdgpu_vram_scra=
-tch_init failed -22
-  [    6.682592] amdgpu 0000:00:03.0: amdgpu_device_ip_init failed
-  [    6.682636] amdgpu 0000:00:03.0: Fatal error during GPU init
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1809684/+subscriptions
+PiBGcm9tOiBZdSBaaGFuZw0KPiBTZW50OiBTYXR1cmRheSwgRGVjZW1iZXIgMjIsIDIwMTggMToz
+NCBBTQ0KPiANClsuLi5dDQo+ID4NCj4gPiA+IEFzIHRvIHRoZSBjaGVjayBhZ2FpbnN0IGhhcmR3
+YXJlIElPTU1VLCBQZXRlciBvbmNlIGhhZCBhIHByb3Bvc2FsIGluDQo+ID4gPiBodHRwOi8vbGlz
+dHMubm9uZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LQ0KPiAxMS9tc2cwMjI4
+MS5odG1sDQo+ID4gPg0KPiA+ID4gRG8geW91IGhhdmUgYW55IGNvbW1lbnQgb3Igc3VnZ2VzdGlv
+biBvbiBQZXRlcidzIHByb3Bvc2FsPw0KPiA+DQo+ID4gU291bmRzIHJlYXNvbmFibGUgdG8gbWUu
+IERvIHdlIGRvIGl0IG9uIHZmaW8gYXR0YWNoIG9yIHVuY29uZGl0aW9uYWxseT8NCj4gPg0KPiAN
+Cj4gSSBndWVzcyBvbiB2ZmlvIGF0dGFjaD8gV2lsbCBuZWVkIG1vcmUgdGhpbmtpbmcgaW4gaXQu
+DQo+IA0KDQplaXRoZXIgd2F5IGlzIG5vdCBwZXJmZWN0LiBVbmNvbmRpdGlvbmFsIGNoZWNrIGRv
+ZXNuJ3QgbWFrZSBzZW5zZSBpZg0KdGhlcmUgaXMgbm8gdmZpbyBkZXZpY2UgYXR0YWNoZWQsIHdo
+aWxlIHZmaW8gYXR0YWNoIG1pZ2h0IGhhcHBlbiBsYXRlDQooZS5nLiBob3RwbHVnKSBhZnRlciB2
+SU9NTVUgaXMgaW5pdGlhbGl6ZWQuLi4NCg0KQmFzaWNhbGx5IHRoZXJlIGFyZSB0d28gY2hlY2tz
+IHRvIGJlIGNvbmNlcm5lZC4gT25lIGlzIHRoZSBjaGVjayBhdCANCmJvb3QgdGltZSwgd2hpY2gg
+ZGVjaWRlcyB2SU9NTVUgY2FwYWJpbGl0aWVzLiBUaGUgb3RoZXIgaXMgdGhlIGNoZWNrIA0KYXQg
+dmZpbyBhdHRhY2gsIHdoaWNoIGRlY2lkZXMgd2hldGhlciBhdHRhY2htZW50IGNhbiBzdWNjZWVk
+IChpLmUuDQp3aGV0aGVyIHRoZSB2SU9NTVUgY2FwYWJpbGl0aWVzIHdoaWNoIGFyZSB1c2VkIGJ5
+IGRldmljZSBhcmUgaW5kZWVkDQpzdXBwb3J0ZWQgYnkgaGFyZHdhcmUpLiANCg0KUG9zc2libHkg
+d2UgY2FuIG1ha2UgYm9vdC10aW1lIGNoZWNrIGNvbmZpZ3VyYWJsZS4gDQoNCklmIGJvb3QtdGlt
+ZSBjaGVjayBpcyB0dXJuZWQgb24sIHZJT01NVSBjYXBhYmlsaXRpZXMgYXJlIGFsd2F5cyBhIA0K
+c3Vic2V0IG9mIHBJT01NVSByZWdhcmRsZXNzIG9mIHdoZXRoZXIgdmZpbyBkZXZpY2UgaXMgYXR0
+YWNoZWQuIA0KY2hlY2sgb24gdmZpbyBhdHRhY2ggbWF5IGJlIHNraXBwZWQgc2luY2UgaXQgd2ls
+bCBhbHdheXMgcGFzcy4gdmlydHVhbCANCmRldmljZXMgYWxzbyBiZWFyIHdpdGggc2FtZSBsaW1p
+dGF0aW9uIG9mIHBJT01NVS4gDQoNCklmIGJvb3QtdGltZSBjaGVjayBpcyBvZmYsIHZJT01NVSBj
+YXBhYmlsaXRpZXMgYXJlIGFsd2F5cyBzcGVjaWZpZWQgDQpieSBlbmQgdXNlciwgd2hpY2ggbWln
+aHQgYmUgZGlmZmVyZW50IGZyb20gcElPTU1VLiB2aXJ0dWFsIGRldmljZXMgDQpjYW4gdXNlIGFu
+eSBjYXBhYmlsaXR5LCBidXQgdmZpbyBhdHRhY2ggbWF5IGZhaWwgaWYgcmVxdWlyZWQgdklPTU1V
+DQpjYXBhYmlsaXRpZXMgYXJlIG5vdCBzdXBwb3J0ZWQgYnkgcElPTU1VLg0KDQpidHcgNSBsZXZl
+bCBpcyBqdXN0IG9uZSBleGFtcGxlIG9mIGRlbWFuZGluZyBjaGVjayB3aXRoIHBJT01NVS4gDQpU
+aGVyZSBhcmUgbW9yZSB3aGVuIGVtdWxhdGluZyBWVC1kIHNjYWxhYmxlIG1vZGUgKCtZaSkuDQoN
+ClRoYW5rcw0KS2V2aW4NCg==
