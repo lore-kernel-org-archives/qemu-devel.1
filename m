@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:49892)
+Received: from eggs.gnu.org ([208.118.235.92]:49955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtlL-00053N-Q3
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:57:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtlY-0005Hd-Jf
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:57:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtlI-0007iJ-Jj
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:57:15 -0500
-Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:35860)
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtlX-0007yp-M9
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:57:28 -0500
+Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:40551)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gbtlI-0007hT-DK
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:57:12 -0500
-Received: by mail-pf1-x42f.google.com with SMTP id b85so7082652pfc.3
-	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:57:12 -0800 (PST)
+	id 1gbtlX-0007xa-Fr
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:57:27 -0500
+Received: by mail-pl1-x62f.google.com with SMTP id u18so6802375plq.7
+	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:57:27 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 26 Dec 2018 07:54:59 +1100
-Message-Id: <20181225205529.10874-13-richard.henderson@linaro.org>
+Date: Wed, 26 Dec 2018 07:55:01 +1100
+Message-Id: <20181225205529.10874-15-richard.henderson@linaro.org>
 In-Reply-To: <20181225205529.10874-1-richard.henderson@linaro.org>
 References: <20181225205529.10874-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 12/42] tcg/riscv: Add the extract instructions
+Subject: [Qemu-devel] [PULL 14/42] tcg/riscv: Add the add2 and sub2
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +28,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, Michael Clark <mjc@sifive.com>
+Cc: peter.maydell@linaro.org, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>
 
 From: Alistair Francis <Alistair.Francis@wdc.com>
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <c4d2afba46efefa9388cf3205fcedbb9a5fa411f.1545246859.git.alistair.francis@wdc.com>
+Message-Id: <5665a57809e32b35775e8e98fdab898853af37b8.1545246859.git.alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/riscv/tcg-target.inc.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ tcg/riscv/tcg-target.inc.c | 55 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index 01b4443d6d..48399480b2 100644
+index 65718df7ad..5da850b957 100644
 --- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -596,3 +596,37 @@ static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
-     tcg_out_opc_upper(s, OPC_AUIPC, rd, 0);
-     tcg_out_opc_imm(s, OPC_LD, rd, rd, 0);
+@@ -695,3 +695,58 @@ static bool tcg_out_sti(TCGContext *s, TCGType type, TCGArg val,
+     }
+     return false;
  }
 +
-+static void tcg_out_ext8u(TCGContext *s, TCGReg ret, TCGReg arg)
++static void tcg_out_addsub2(TCGContext *s,
++                            TCGReg rl, TCGReg rh,
++                            TCGReg al, TCGReg ah,
++                            TCGArg bl, TCGArg bh,
++                            bool cbl, bool cbh, bool is_sub, bool is32bit)
 +{
-+    tcg_out_opc_imm(s, OPC_ANDI, ret, arg, 0xff);
-+}
++    const RISCVInsn opc_add = is32bit ? OPC_ADDW : OPC_ADD;
++    const RISCVInsn opc_addi = is32bit ? OPC_ADDIW : OPC_ADDI;
++    const RISCVInsn opc_sub = is32bit ? OPC_SUBW : OPC_SUB;
++    TCGReg th = TCG_REG_TMP1;
 +
-+static void tcg_out_ext16u(TCGContext *s, TCGReg ret, TCGReg arg)
-+{
-+    tcg_out_opc_imm(s, OPC_SLLIW, ret, arg, 16);
-+    tcg_out_opc_imm(s, OPC_SRLIW, ret, ret, 16);
-+}
++    /* If we have a negative constant such that negating it would
++       make the high part zero, we can (usually) eliminate one insn.  */
++    if (cbl && cbh && bh == -1 && bl != 0) {
++        bl = -bl;
++        bh = 0;
++        is_sub = !is_sub;
++    }
 +
-+static void tcg_out_ext32u(TCGContext *s, TCGReg ret, TCGReg arg)
-+{
-+    tcg_out_opc_imm(s, OPC_SLLI, ret, arg, 32);
-+    tcg_out_opc_imm(s, OPC_SRLI, ret, ret, 32);
-+}
++    /* By operating on the high part first, we get to use the final
++       carry operation to move back from the temporary.  */
++    if (!cbh) {
++        tcg_out_opc_reg(s, (is_sub ? opc_sub : opc_add), th, ah, bh);
++    } else if (bh != 0 || ah == rl) {
++        tcg_out_opc_imm(s, opc_addi, th, ah, (is_sub ? -bh : bh));
++    } else {
++        th = ah;
++    }
 +
-+static void tcg_out_ext8s(TCGContext *s, TCGReg ret, TCGReg arg)
-+{
-+    tcg_out_opc_imm(s, OPC_SLLIW, ret, arg, 24);
-+    tcg_out_opc_imm(s, OPC_SRAIW, ret, ret, 24);
-+}
-+
-+static void tcg_out_ext16s(TCGContext *s, TCGReg ret, TCGReg arg)
-+{
-+    tcg_out_opc_imm(s, OPC_SLLIW, ret, arg, 16);
-+    tcg_out_opc_imm(s, OPC_SRAIW, ret, ret, 16);
-+}
-+
-+static void tcg_out_ext32s(TCGContext *s, TCGReg ret, TCGReg arg)
-+{
-+    tcg_out_opc_imm(s, OPC_ADDIW, ret, arg, 0);
++    /* Note that tcg optimization should eliminate the bl == 0 case.  */
++    if (is_sub) {
++        if (cbl) {
++            tcg_out_opc_imm(s, OPC_SLTIU, TCG_REG_TMP0, al, bl);
++            tcg_out_opc_imm(s, opc_addi, rl, al, -bl);
++        } else {
++            tcg_out_opc_reg(s, OPC_SLTU, TCG_REG_TMP0, al, bl);
++            tcg_out_opc_reg(s, opc_sub, rl, al, bl);
++        }
++        tcg_out_opc_reg(s, opc_sub, rh, th, TCG_REG_TMP0);
++    } else {
++        if (cbl) {
++            tcg_out_opc_imm(s, opc_addi, rl, al, bl);
++            tcg_out_opc_imm(s, OPC_SLTIU, TCG_REG_TMP0, rl, bl);
++        } else if (rl == al && rl == bl) {
++            tcg_out_opc_imm(s, OPC_SLTI, TCG_REG_TMP0, al, 0);
++            tcg_out_opc_reg(s, opc_addi, rl, al, bl);
++        } else {
++            tcg_out_opc_reg(s, opc_add, rl, al, bl);
++            tcg_out_opc_reg(s, OPC_SLTU, TCG_REG_TMP0,
++                            rl, (rl == bl ? al : bl));
++        }
++        tcg_out_opc_reg(s, opc_add, rh, th, TCG_REG_TMP0);
++    }
 +}
 -- 
 2.17.2
