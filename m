@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50476)
+Received: from eggs.gnu.org ([208.118.235.92]:50514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtn7-0007Ca-Gk
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:59:06 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtnB-0007In-5A
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:59:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtn5-0000sT-CG
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:59:05 -0500
-Received: from mail-pl1-x632.google.com ([2607:f8b0:4864:20::632]:33765)
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtn8-0000vG-8b
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:59:09 -0500
+Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:41896)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gbtn3-0000pR-9Q
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:59:03 -0500
-Received: by mail-pl1-x632.google.com with SMTP id z23so6817811plo.0
-	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:59:00 -0800 (PST)
+	id 1gbtn8-0000uP-26
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:59:06 -0500
+Received: by mail-pl1-x631.google.com with SMTP id u6so6801994plm.8
+	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:59:05 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 26 Dec 2018 07:55:14 +1100
-Message-Id: <20181225205529.10874-28-richard.henderson@linaro.org>
+Date: Wed, 26 Dec 2018 07:55:15 +1100
+Message-Id: <20181225205529.10874-29-richard.henderson@linaro.org>
 In-Reply-To: <20181225205529.10874-1-richard.henderson@linaro.org>
 References: <20181225205529.10874-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 27/42] tcg: Add TCG_CALL_NO_RETURN
+Subject: [Qemu-devel] [PULL 28/42] tcg: Reference count labels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +29,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Remember which helpers have been marked noreturn.
+Increment when adding branches, and decrement when removing them.
 
 Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/helper-head.h | 13 +++++++++++++
- include/exec/helper-tcg.h  | 21 ++++++++++++++-------
- tcg/tcg.h                  |  2 ++
- 3 files changed, 29 insertions(+), 7 deletions(-)
+ tcg/tcg-op.h |  1 +
+ tcg/tcg.h    |  3 ++-
+ tcg/tcg-op.c |  2 ++
+ tcg/tcg.c    | 20 ++++++++++++++++++++
+ 4 files changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/include/exec/helper-head.h b/include/exec/helper-head.h
-index 276dd5afce..ab4f8b6623 100644
---- a/include/exec/helper-head.h
-+++ b/include/exec/helper-head.h
-@@ -108,6 +108,19 @@
- #define dh_is_signed_env dh_is_signed_ptr
- #define dh_is_signed(t) dh_is_signed_##t
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index db4e9188f4..7007ec0d4d 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -260,6 +260,7 @@ static inline void gen_set_label(TCGLabel *l)
  
-+#define dh_callflag_i32  0
-+#define dh_callflag_s32  0
-+#define dh_callflag_int  0
-+#define dh_callflag_i64  0
-+#define dh_callflag_s64  0
-+#define dh_callflag_f16  0
-+#define dh_callflag_f32  0
-+#define dh_callflag_f64  0
-+#define dh_callflag_ptr  0
-+#define dh_callflag_void 0
-+#define dh_callflag_noreturn TCG_CALL_NO_RETURN
-+#define dh_callflag(t) glue(dh_callflag_, dh_alias(t))
-+
- #define dh_sizemask(t, n) \
-   ((dh_is_64bit(t) << (n*2)) | (dh_is_signed(t) << (n*2+1)))
+ static inline void tcg_gen_br(TCGLabel *l)
+ {
++    l->refs++;
+     tcg_gen_op1(INDEX_op_br, label_arg(l));
+ }
  
-diff --git a/include/exec/helper-tcg.h b/include/exec/helper-tcg.h
-index b3bdb0c399..268e0f804b 100644
---- a/include/exec/helper-tcg.h
-+++ b/include/exec/helper-tcg.h
-@@ -11,36 +11,43 @@
- #define str(s) #s
- 
- #define DEF_HELPER_FLAGS_0(NAME, FLAGS, ret) \
--  { .func = HELPER(NAME), .name = str(NAME), .flags = FLAGS, \
-+  { .func = HELPER(NAME), .name = str(NAME), \
-+    .flags = FLAGS | dh_callflag(ret), \
-     .sizemask = dh_sizemask(ret, 0) },
- 
- #define DEF_HELPER_FLAGS_1(NAME, FLAGS, ret, t1) \
--  { .func = HELPER(NAME), .name = str(NAME), .flags = FLAGS, \
-+  { .func = HELPER(NAME), .name = str(NAME), \
-+    .flags = FLAGS | dh_callflag(ret), \
-     .sizemask = dh_sizemask(ret, 0) | dh_sizemask(t1, 1) },
- 
- #define DEF_HELPER_FLAGS_2(NAME, FLAGS, ret, t1, t2) \
--  { .func = HELPER(NAME), .name = str(NAME), .flags = FLAGS, \
-+  { .func = HELPER(NAME), .name = str(NAME), \
-+    .flags = FLAGS | dh_callflag(ret), \
-     .sizemask = dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
-     | dh_sizemask(t2, 2) },
- 
- #define DEF_HELPER_FLAGS_3(NAME, FLAGS, ret, t1, t2, t3) \
--  { .func = HELPER(NAME), .name = str(NAME), .flags = FLAGS, \
-+  { .func = HELPER(NAME), .name = str(NAME), \
-+    .flags = FLAGS | dh_callflag(ret), \
-     .sizemask = dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
-     | dh_sizemask(t2, 2) | dh_sizemask(t3, 3) },
- 
- #define DEF_HELPER_FLAGS_4(NAME, FLAGS, ret, t1, t2, t3, t4) \
--  { .func = HELPER(NAME), .name = str(NAME), .flags = FLAGS, \
-+  { .func = HELPER(NAME), .name = str(NAME), \
-+    .flags = FLAGS | dh_callflag(ret), \
-     .sizemask = dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
-     | dh_sizemask(t2, 2) | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) },
- 
- #define DEF_HELPER_FLAGS_5(NAME, FLAGS, ret, t1, t2, t3, t4, t5) \
--  { .func = HELPER(NAME), .name = str(NAME), .flags = FLAGS, \
-+  { .func = HELPER(NAME), .name = str(NAME), \
-+    .flags = FLAGS | dh_callflag(ret), \
-     .sizemask = dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
-     | dh_sizemask(t2, 2) | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) \
-     | dh_sizemask(t5, 5) },
- 
- #define DEF_HELPER_FLAGS_6(NAME, FLAGS, ret, t1, t2, t3, t4, t5, t6) \
--  { .func = HELPER(NAME), .name = str(NAME), .flags = FLAGS, \
-+  { .func = HELPER(NAME), .name = str(NAME), \
-+    .flags = FLAGS | dh_callflag(ret), \
-     .sizemask = dh_sizemask(ret, 0) | dh_sizemask(t1, 1) \
-     | dh_sizemask(t2, 2) | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) \
-     | dh_sizemask(t5, 5) | dh_sizemask(t6, 6) },
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index d9b101e2f8..492d8dcf10 100644
+index 492d8dcf10..db2d91867f 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
-@@ -467,6 +467,8 @@ typedef TCGv_ptr TCGv_env;
- #define TCG_CALL_NO_WRITE_GLOBALS   0x0002
- /* Helper can be safely suppressed if the return value is not used. */
- #define TCG_CALL_NO_SIDE_EFFECTS    0x0004
-+/* Helper is QEMU_NORETURN.  */
-+#define TCG_CALL_NO_RETURN          0x0008
+@@ -244,7 +244,8 @@ typedef struct TCGRelocation {
  
- /* convenience version of most used call flags */
- #define TCG_CALL_NO_RWG         TCG_CALL_NO_READ_GLOBALS
+ typedef struct TCGLabel {
+     unsigned has_value : 1;
+-    unsigned id : 31;
++    unsigned id : 15;
++    unsigned refs : 16;
+     union {
+         uintptr_t value;
+         tcg_insn_unit *value_ptr;
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 38652db32c..1bd7ef24af 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -240,6 +240,7 @@ void tcg_gen_brcond_i32(TCGCond cond, TCGv_i32 arg1, TCGv_i32 arg2, TCGLabel *l)
+     if (cond == TCG_COND_ALWAYS) {
+         tcg_gen_br(l);
+     } else if (cond != TCG_COND_NEVER) {
++        l->refs++;
+         tcg_gen_op4ii_i32(INDEX_op_brcond_i32, arg1, arg2, cond, label_arg(l));
+     }
+ }
+@@ -1405,6 +1406,7 @@ void tcg_gen_brcond_i64(TCGCond cond, TCGv_i64 arg1, TCGv_i64 arg2, TCGLabel *l)
+     if (cond == TCG_COND_ALWAYS) {
+         tcg_gen_br(l);
+     } else if (cond != TCG_COND_NEVER) {
++        l->refs++;
+         if (TCG_TARGET_REG_BITS == 32) {
+             tcg_gen_op6ii_i32(INDEX_op_brcond2_i32, TCGV_LOW(arg1),
+                               TCGV_HIGH(arg1), TCGV_LOW(arg2),
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 963cb37892..99afc65126 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -2171,6 +2171,26 @@ static void process_op_defs(TCGContext *s)
+ 
+ void tcg_op_remove(TCGContext *s, TCGOp *op)
+ {
++    TCGLabel *label;
++
++    switch (op->opc) {
++    case INDEX_op_br:
++        label = arg_label(op->args[0]);
++        label->refs--;
++        break;
++    case INDEX_op_brcond_i32:
++    case INDEX_op_brcond_i64:
++        label = arg_label(op->args[3]);
++        label->refs--;
++        break;
++    case INDEX_op_brcond2_i32:
++        label = arg_label(op->args[5]);
++        label->refs--;
++        break;
++    default:
++        break;
++    }
++
+     QTAILQ_REMOVE(&s->ops, op, link);
+     QTAILQ_INSERT_TAIL(&s->free_ops, op, link);
+     s->nb_ops--;
 -- 
 2.17.2
