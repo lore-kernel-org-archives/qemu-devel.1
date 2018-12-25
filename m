@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:49645)
+Received: from eggs.gnu.org ([208.118.235.92]:49667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtkl-0004MN-JA
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:40 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtkp-0004Ro-NG
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtki-00074S-5B
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:39 -0500
-Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:37252)
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtko-0007Ap-U4
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:43 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44256)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gbtkh-00073c-Vy
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:36 -0500
-Received: by mail-pf1-x436.google.com with SMTP id y126so7080818pfb.4
-	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:56:35 -0800 (PST)
+	id 1gbtko-0007A0-NH
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:42 -0500
+Received: by mail-pl1-x642.google.com with SMTP id e11so6796824plt.11
+	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:56:42 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 26 Dec 2018 07:54:54 +1100
-Message-Id: <20181225205529.10874-8-richard.henderson@linaro.org>
+Date: Wed, 26 Dec 2018 07:54:55 +1100
+Message-Id: <20181225205529.10874-9-richard.henderson@linaro.org>
 In-Reply-To: <20181225205529.10874-1-richard.henderson@linaro.org>
 References: <20181225205529.10874-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 07/42] tcg/riscv: Add support for the constraints
+Subject: [Qemu-devel] [PULL 08/42] tcg/riscv: Add the immediate encoders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,187 +34,109 @@ From: Alistair Francis <Alistair.Francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <dba7315e4e20e879933f72d47ccf98f1cc612b8a.1545246859.git.alistair.francis@wdc.com>
+Message-Id: <d54dc56303fd1b0d7ed53869de2dbb59b111c7ca.1545246859.git.alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/riscv/tcg-target.inc.c | 168 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 168 insertions(+)
+ tcg/riscv/tcg-target.inc.c | 90 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index 6c969e3973..f853d01803 100644
+index f853d01803..08838027cd 100644
 --- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -116,3 +116,171 @@ static const int tcg_target_call_oarg_regs[] = {
-     TCG_REG_A0,
-     TCG_REG_A1,
- };
-+
-+#define TCG_CT_CONST_ZERO  0x100
-+#define TCG_CT_CONST_S12   0x200
-+#define TCG_CT_CONST_N12   0x400
-+#define TCG_CT_CONST_M12   0x800
-+
-+static inline tcg_target_long sextreg(tcg_target_long val, int pos, int len)
-+{
-+    if (TCG_TARGET_REG_BITS == 32) {
-+        return sextract32(val, pos, len);
-+    } else {
-+        return sextract64(val, pos, len);
-+    }
-+}
-+
-+/* parse target specific constraints */
-+static const char *target_parse_constraint(TCGArgConstraint *ct,
-+                                           const char *ct_str, TCGType type)
-+{
-+    switch (*ct_str++) {
-+    case 'r':
-+        ct->ct |= TCG_CT_REG;
-+        ct->u.regs = 0xffffffff;
-+        break;
-+    case 'L':
-+        /* qemu_ld/qemu_st constraint */
-+        ct->ct |= TCG_CT_REG;
-+        ct->u.regs = 0xffffffff;
-+        /* qemu_ld/qemu_st uses TCG_REG_TMP0 */
-+#if defined(CONFIG_SOFTMMU)
-+        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[0]);
-+        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[1]);
-+        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[2]);
-+        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[3]);
-+        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[4]);
-+#endif
-+        break;
-+    case 'I':
-+        ct->ct |= TCG_CT_CONST_S12;
-+        break;
-+    case 'N':
-+        ct->ct |= TCG_CT_CONST_N12;
-+        break;
-+    case 'M':
-+        ct->ct |= TCG_CT_CONST_M12;
-+        break;
-+    case 'Z':
-+        /* we can use a zero immediate as a zero register argument. */
-+        ct->ct |= TCG_CT_CONST_ZERO;
-+        break;
-+    default:
-+        return NULL;
-+    }
-+    return ct_str;
-+}
-+
-+/* test if a constant matches the constraint */
-+static int tcg_target_const_match(tcg_target_long val, TCGType type,
-+                                  const TCGArgConstraint *arg_ct)
-+{
-+    int ct = arg_ct->ct;
-+    if (ct & TCG_CT_CONST) {
-+        return 1;
-+    }
-+    if ((ct & TCG_CT_CONST_ZERO) && val == 0) {
-+        return 1;
-+    }
-+    if ((ct & TCG_CT_CONST_S12) && val == sextreg(val, 0, 12)) {
-+        return 1;
-+    }
-+    if ((ct & TCG_CT_CONST_N12) && -val == sextreg(-val, 0, 12)) {
-+        return 1;
-+    }
-+    if ((ct & TCG_CT_CONST_M12) && val >= -0xfff && val <= 0xfff) {
-+        return 1;
-+    }
-+    return 0;
-+}
+@@ -284,3 +284,93 @@ typedef enum {
+ 
+     OPC_FENCE = 0x0000000f,
+ } RISCVInsn;
 +
 +/*
-+ * RISC-V Base ISA opcodes (IM)
++ * RISC-V immediate and instruction encoders (excludes 16-bit RVC)
 + */
 +
-+typedef enum {
-+    OPC_ADD = 0x33,
-+    OPC_ADDI = 0x13,
-+    OPC_AND = 0x7033,
-+    OPC_ANDI = 0x7013,
-+    OPC_AUIPC = 0x17,
-+    OPC_BEQ = 0x63,
-+    OPC_BGE = 0x5063,
-+    OPC_BGEU = 0x7063,
-+    OPC_BLT = 0x4063,
-+    OPC_BLTU = 0x6063,
-+    OPC_BNE = 0x1063,
-+    OPC_DIV = 0x2004033,
-+    OPC_DIVU = 0x2005033,
-+    OPC_JAL = 0x6f,
-+    OPC_JALR = 0x67,
-+    OPC_LB = 0x3,
-+    OPC_LBU = 0x4003,
-+    OPC_LD = 0x3003,
-+    OPC_LH = 0x1003,
-+    OPC_LHU = 0x5003,
-+    OPC_LUI = 0x37,
-+    OPC_LW = 0x2003,
-+    OPC_LWU = 0x6003,
-+    OPC_MUL = 0x2000033,
-+    OPC_MULH = 0x2001033,
-+    OPC_MULHSU = 0x2002033,
-+    OPC_MULHU = 0x2003033,
-+    OPC_OR = 0x6033,
-+    OPC_ORI = 0x6013,
-+    OPC_REM = 0x2006033,
-+    OPC_REMU = 0x2007033,
-+    OPC_SB = 0x23,
-+    OPC_SD = 0x3023,
-+    OPC_SH = 0x1023,
-+    OPC_SLL = 0x1033,
-+    OPC_SLLI = 0x1013,
-+    OPC_SLT = 0x2033,
-+    OPC_SLTI = 0x2013,
-+    OPC_SLTIU = 0x3013,
-+    OPC_SLTU = 0x3033,
-+    OPC_SRA = 0x40005033,
-+    OPC_SRAI = 0x40005013,
-+    OPC_SRL = 0x5033,
-+    OPC_SRLI = 0x5013,
-+    OPC_SUB = 0x40000033,
-+    OPC_SW = 0x2023,
-+    OPC_XOR = 0x4033,
-+    OPC_XORI = 0x4013,
++/* Type-R */
 +
-+#if TCG_TARGET_REG_BITS == 64
-+    OPC_ADDIW = 0x1b,
-+    OPC_ADDW = 0x3b,
-+    OPC_DIVUW = 0x200503b,
-+    OPC_DIVW = 0x200403b,
-+    OPC_MULW = 0x200003b,
-+    OPC_REMUW = 0x200703b,
-+    OPC_REMW = 0x200603b,
-+    OPC_SLLIW = 0x101b,
-+    OPC_SLLW = 0x103b,
-+    OPC_SRAIW = 0x4000501b,
-+    OPC_SRAW = 0x4000503b,
-+    OPC_SRLIW = 0x501b,
-+    OPC_SRLW = 0x503b,
-+    OPC_SUBW = 0x4000003b,
-+#else
-+    /* Simplify code throughout by defining aliases for RV32.  */
-+    OPC_ADDIW = OPC_ADDI,
-+    OPC_ADDW = OPC_ADD,
-+    OPC_DIVUW = OPC_DIVU,
-+    OPC_DIVW = OPC_DIV,
-+    OPC_MULW = OPC_MUL,
-+    OPC_REMUW = OPC_REMU,
-+    OPC_REMW = OPC_REM,
-+    OPC_SLLIW = OPC_SLLI,
-+    OPC_SLLW = OPC_SLL,
-+    OPC_SRAIW = OPC_SRAI,
-+    OPC_SRAW = OPC_SRA,
-+    OPC_SRLIW = OPC_SRLI,
-+    OPC_SRLW = OPC_SRL,
-+    OPC_SUBW = OPC_SUB,
-+#endif
++static int32_t encode_r(RISCVInsn opc, TCGReg rd, TCGReg rs1, TCGReg rs2)
++{
++    return opc | (rd & 0x1f) << 7 | (rs1 & 0x1f) << 15 | (rs2 & 0x1f) << 20;
++}
 +
-+    OPC_FENCE = 0x0000000f,
-+} RISCVInsn;
++/* Type-I */
++
++static int32_t encode_imm12(uint32_t imm)
++{
++    return (imm & 0xfff) << 20;
++}
++
++static int32_t encode_i(RISCVInsn opc, TCGReg rd, TCGReg rs1, uint32_t imm)
++{
++    return opc | (rd & 0x1f) << 7 | (rs1 & 0x1f) << 15 | encode_imm12(imm);
++}
++
++/* Type-S */
++
++static int32_t encode_simm12(uint32_t imm)
++{
++    int32_t ret = 0;
++
++    ret |= (imm & 0xFE0) << 20;
++    ret |= (imm & 0x1F) << 7;
++
++    return ret;
++}
++
++static int32_t encode_s(RISCVInsn opc, TCGReg rs1, TCGReg rs2, uint32_t imm)
++{
++    return opc | (rs1 & 0x1f) << 15 | (rs2 & 0x1f) << 20 | encode_simm12(imm);
++}
++
++/* Type-SB */
++
++static int32_t encode_sbimm12(uint32_t imm)
++{
++    int32_t ret = 0;
++
++    ret |= (imm & 0x1000) << 19;
++    ret |= (imm & 0x7e0) << 20;
++    ret |= (imm & 0x1e) << 7;
++    ret |= (imm & 0x800) >> 4;
++
++    return ret;
++}
++
++static int32_t encode_sb(RISCVInsn opc, TCGReg rs1, TCGReg rs2, uint32_t imm)
++{
++    return opc | (rs1 & 0x1f) << 15 | (rs2 & 0x1f) << 20 | encode_sbimm12(imm);
++}
++
++/* Type-U */
++
++static int32_t encode_uimm20(uint32_t imm)
++{
++    return imm & 0xfffff000;
++}
++
++static int32_t encode_u(RISCVInsn opc, TCGReg rd, uint32_t imm)
++{
++    return opc | (rd & 0x1f) << 7 | encode_uimm20(imm);
++}
++
++/* Type-UJ */
++
++static int32_t encode_ujimm20(uint32_t imm)
++{
++    int32_t ret = 0;
++
++    ret |= (imm & 0x0007fe) << (21 - 1);
++    ret |= (imm & 0x000800) << (20 - 11);
++    ret |= (imm & 0x0ff000) << (12 - 12);
++    ret |= (imm & 0x100000) << (31 - 20);
++
++    return ret;
++}
++
++static int32_t encode_uj(RISCVInsn opc, TCGReg rd, uint32_t imm)
++{
++    return opc | (rd & 0x1f) << 7 | encode_ujimm20(imm);
++}
 -- 
 2.17.2
