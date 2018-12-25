@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:49606)
+Received: from eggs.gnu.org ([208.118.235.92]:49645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtkb-0004Cp-Dg
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:30 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtkl-0004MN-JA
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gbtka-0006wa-GT
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:29 -0500
-Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:42543)
+	(envelope-from <richard.henderson@linaro.org>) id 1gbtki-00074S-5B
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:39 -0500
+Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:37252)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gbtka-0006vf-AV
-	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:28 -0500
-Received: by mail-pl1-x635.google.com with SMTP id y1so6795524plp.9
-	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:56:28 -0800 (PST)
+	id 1gbtkh-00073c-Vy
+	for qemu-devel@nongnu.org; Tue, 25 Dec 2018 15:56:36 -0500
+Received: by mail-pf1-x436.google.com with SMTP id y126so7080818pfb.4
+	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 12:56:35 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 26 Dec 2018 07:54:53 +1100
-Message-Id: <20181225205529.10874-7-richard.henderson@linaro.org>
+Date: Wed, 26 Dec 2018 07:54:54 +1100
+Message-Id: <20181225205529.10874-8-richard.henderson@linaro.org>
 In-Reply-To: <20181225205529.10874-1-richard.henderson@linaro.org>
 References: <20181225205529.10874-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 06/42] tcg/riscv: Add the tcg target registers
+Subject: [Qemu-devel] [PULL 07/42] tcg/riscv: Add support for the constraints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,136 +34,187 @@ From: Alistair Francis <Alistair.Francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <6e43abaa64361d57b9bc9439820d0e7701f2d47e.1545246859.git.alistair.francis@wdc.com>
+Message-Id: <dba7315e4e20e879933f72d47ccf98f1cc612b8a.1545246859.git.alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/riscv/tcg-target.inc.c | 118 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 118 insertions(+)
- create mode 100644 tcg/riscv/tcg-target.inc.c
+ tcg/riscv/tcg-target.inc.c | 168 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 168 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-new file mode 100644
-index 0000000000..6c969e3973
---- /dev/null
+index 6c969e3973..f853d01803 100644
+--- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -0,0 +1,118 @@
+@@ -116,3 +116,171 @@ static const int tcg_target_call_oarg_regs[] = {
+     TCG_REG_A0,
+     TCG_REG_A1,
+ };
++
++#define TCG_CT_CONST_ZERO  0x100
++#define TCG_CT_CONST_S12   0x200
++#define TCG_CT_CONST_N12   0x400
++#define TCG_CT_CONST_M12   0x800
++
++static inline tcg_target_long sextreg(tcg_target_long val, int pos, int len)
++{
++    if (TCG_TARGET_REG_BITS == 32) {
++        return sextract32(val, pos, len);
++    } else {
++        return sextract64(val, pos, len);
++    }
++}
++
++/* parse target specific constraints */
++static const char *target_parse_constraint(TCGArgConstraint *ct,
++                                           const char *ct_str, TCGType type)
++{
++    switch (*ct_str++) {
++    case 'r':
++        ct->ct |= TCG_CT_REG;
++        ct->u.regs = 0xffffffff;
++        break;
++    case 'L':
++        /* qemu_ld/qemu_st constraint */
++        ct->ct |= TCG_CT_REG;
++        ct->u.regs = 0xffffffff;
++        /* qemu_ld/qemu_st uses TCG_REG_TMP0 */
++#if defined(CONFIG_SOFTMMU)
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[0]);
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[1]);
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[2]);
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[3]);
++        tcg_regset_reset_reg(ct->u.regs, tcg_target_call_iarg_regs[4]);
++#endif
++        break;
++    case 'I':
++        ct->ct |= TCG_CT_CONST_S12;
++        break;
++    case 'N':
++        ct->ct |= TCG_CT_CONST_N12;
++        break;
++    case 'M':
++        ct->ct |= TCG_CT_CONST_M12;
++        break;
++    case 'Z':
++        /* we can use a zero immediate as a zero register argument. */
++        ct->ct |= TCG_CT_CONST_ZERO;
++        break;
++    default:
++        return NULL;
++    }
++    return ct_str;
++}
++
++/* test if a constant matches the constraint */
++static int tcg_target_const_match(tcg_target_long val, TCGType type,
++                                  const TCGArgConstraint *arg_ct)
++{
++    int ct = arg_ct->ct;
++    if (ct & TCG_CT_CONST) {
++        return 1;
++    }
++    if ((ct & TCG_CT_CONST_ZERO) && val == 0) {
++        return 1;
++    }
++    if ((ct & TCG_CT_CONST_S12) && val == sextreg(val, 0, 12)) {
++        return 1;
++    }
++    if ((ct & TCG_CT_CONST_N12) && -val == sextreg(-val, 0, 12)) {
++        return 1;
++    }
++    if ((ct & TCG_CT_CONST_M12) && val >= -0xfff && val <= 0xfff) {
++        return 1;
++    }
++    return 0;
++}
++
 +/*
-+ * Tiny Code Generator for QEMU
-+ *
-+ * Copyright (c) 2018 SiFive, Inc
-+ * Copyright (c) 2008-2009 Arnaud Patard <arnaud.patard@rtp-net.org>
-+ * Copyright (c) 2009 Aurelien Jarno <aurelien@aurel32.net>
-+ * Copyright (c) 2008 Fabrice Bellard
-+ *
-+ * Based on i386/tcg-target.c and mips/tcg-target.c
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
++ * RISC-V Base ISA opcodes (IM)
 + */
 +
-+#include "tcg-pool.inc.c"
++typedef enum {
++    OPC_ADD = 0x33,
++    OPC_ADDI = 0x13,
++    OPC_AND = 0x7033,
++    OPC_ANDI = 0x7013,
++    OPC_AUIPC = 0x17,
++    OPC_BEQ = 0x63,
++    OPC_BGE = 0x5063,
++    OPC_BGEU = 0x7063,
++    OPC_BLT = 0x4063,
++    OPC_BLTU = 0x6063,
++    OPC_BNE = 0x1063,
++    OPC_DIV = 0x2004033,
++    OPC_DIVU = 0x2005033,
++    OPC_JAL = 0x6f,
++    OPC_JALR = 0x67,
++    OPC_LB = 0x3,
++    OPC_LBU = 0x4003,
++    OPC_LD = 0x3003,
++    OPC_LH = 0x1003,
++    OPC_LHU = 0x5003,
++    OPC_LUI = 0x37,
++    OPC_LW = 0x2003,
++    OPC_LWU = 0x6003,
++    OPC_MUL = 0x2000033,
++    OPC_MULH = 0x2001033,
++    OPC_MULHSU = 0x2002033,
++    OPC_MULHU = 0x2003033,
++    OPC_OR = 0x6033,
++    OPC_ORI = 0x6013,
++    OPC_REM = 0x2006033,
++    OPC_REMU = 0x2007033,
++    OPC_SB = 0x23,
++    OPC_SD = 0x3023,
++    OPC_SH = 0x1023,
++    OPC_SLL = 0x1033,
++    OPC_SLLI = 0x1013,
++    OPC_SLT = 0x2033,
++    OPC_SLTI = 0x2013,
++    OPC_SLTIU = 0x3013,
++    OPC_SLTU = 0x3033,
++    OPC_SRA = 0x40005033,
++    OPC_SRAI = 0x40005013,
++    OPC_SRL = 0x5033,
++    OPC_SRLI = 0x5013,
++    OPC_SUB = 0x40000033,
++    OPC_SW = 0x2023,
++    OPC_XOR = 0x4033,
++    OPC_XORI = 0x4013,
 +
-+#ifdef CONFIG_DEBUG_TCG
-+static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] = {
-+    "zero",
-+    "ra",
-+    "sp",
-+    "gp",
-+    "tp",
-+    "t0",
-+    "t1",
-+    "t2",
-+    "s0",
-+    "s1",
-+    "a0",
-+    "a1",
-+    "a2",
-+    "a3",
-+    "a4",
-+    "a5",
-+    "a6",
-+    "a7",
-+    "s2",
-+    "s3",
-+    "s4",
-+    "s5",
-+    "s6",
-+    "s7",
-+    "s8",
-+    "s9",
-+    "s10",
-+    "s11",
-+    "t3",
-+    "t4",
-+    "t5",
-+    "t6"
-+};
++#if TCG_TARGET_REG_BITS == 64
++    OPC_ADDIW = 0x1b,
++    OPC_ADDW = 0x3b,
++    OPC_DIVUW = 0x200503b,
++    OPC_DIVW = 0x200403b,
++    OPC_MULW = 0x200003b,
++    OPC_REMUW = 0x200703b,
++    OPC_REMW = 0x200603b,
++    OPC_SLLIW = 0x101b,
++    OPC_SLLW = 0x103b,
++    OPC_SRAIW = 0x4000501b,
++    OPC_SRAW = 0x4000503b,
++    OPC_SRLIW = 0x501b,
++    OPC_SRLW = 0x503b,
++    OPC_SUBW = 0x4000003b,
++#else
++    /* Simplify code throughout by defining aliases for RV32.  */
++    OPC_ADDIW = OPC_ADDI,
++    OPC_ADDW = OPC_ADD,
++    OPC_DIVUW = OPC_DIVU,
++    OPC_DIVW = OPC_DIV,
++    OPC_MULW = OPC_MUL,
++    OPC_REMUW = OPC_REMU,
++    OPC_REMW = OPC_REM,
++    OPC_SLLIW = OPC_SLLI,
++    OPC_SLLW = OPC_SLL,
++    OPC_SRAIW = OPC_SRAI,
++    OPC_SRAW = OPC_SRA,
++    OPC_SRLIW = OPC_SRLI,
++    OPC_SRLW = OPC_SRL,
++    OPC_SUBW = OPC_SUB,
 +#endif
 +
-+static const int tcg_target_reg_alloc_order[] = {
-+    /* Call saved registers */
-+    /* TCG_REG_S0 reservered for TCG_AREG0 */
-+    TCG_REG_S1,
-+    TCG_REG_S2,
-+    TCG_REG_S3,
-+    TCG_REG_S4,
-+    TCG_REG_S5,
-+    TCG_REG_S6,
-+    TCG_REG_S7,
-+    TCG_REG_S8,
-+    TCG_REG_S9,
-+    TCG_REG_S10,
-+    TCG_REG_S11,
-+
-+    /* Call clobbered registers */
-+    TCG_REG_T0,
-+    TCG_REG_T1,
-+    TCG_REG_T2,
-+    TCG_REG_T3,
-+    TCG_REG_T4,
-+    TCG_REG_T5,
-+    TCG_REG_T6,
-+
-+    /* Argument registers */
-+    TCG_REG_A0,
-+    TCG_REG_A1,
-+    TCG_REG_A2,
-+    TCG_REG_A3,
-+    TCG_REG_A4,
-+    TCG_REG_A5,
-+    TCG_REG_A6,
-+    TCG_REG_A7,
-+};
-+
-+static const int tcg_target_call_iarg_regs[] = {
-+    TCG_REG_A0,
-+    TCG_REG_A1,
-+    TCG_REG_A2,
-+    TCG_REG_A3,
-+    TCG_REG_A4,
-+    TCG_REG_A5,
-+    TCG_REG_A6,
-+    TCG_REG_A7,
-+};
-+
-+static const int tcg_target_call_oarg_regs[] = {
-+    TCG_REG_A0,
-+    TCG_REG_A1,
-+};
++    OPC_FENCE = 0x0000000f,
++} RISCVInsn;
 -- 
 2.17.2
