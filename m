@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50689)
+Received: from eggs.gnu.org ([208.118.235.92]:51347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <weijiang.yang@intel.com>) id 1gc4RL-0005nO-3V
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 03:21:19 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gc4UL-0000Q7-IC
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 03:24:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <weijiang.yang@intel.com>) id 1gc4RJ-0005rz-5j
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 03:21:19 -0500
-Received: from mga06.intel.com ([134.134.136.31]:14744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <weijiang.yang@intel.com>)
-	id 1gc4RH-0005p1-9t
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 03:21:17 -0500
-From: Yang Weijiang <weijiang.yang@intel.com>
-Date: Wed, 26 Dec 2018 16:25:20 +0800
-Message-Id: <b3b315a59c56582e2c4fd5f3e262f5d38b4b8985.1545806972.git.weijiang.yang@intel.com>
-In-Reply-To: <cover.1545806972.git.weijiang.yang@intel.com>
-References: <cover.1545806972.git.weijiang.yang@intel.com>
-In-Reply-To: <cover.1545806972.git.weijiang.yang@intel.com>
-References: <cover.1545806972.git.weijiang.yang@intel.com>
-Subject: [Qemu-devel] [PATCH 4/4] Report CPUID xsave area support for CET.
+	(envelope-from <no-reply@patchew.org>) id 1gc4UH-0007qf-Jc
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 03:24:25 -0500
+Resent-Message-Id: <E1gc4UH-0007qf-Jc@eggs.gnu.org>
+In-Reply-To: <20181221124410.11920-1-pbonzini@redhat.com>
+Message-ID: <154581264856.18047.14025269685634947747@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 26 Dec 2018 00:24:09 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] i386: mark the 'INTEL_PT' CPUID bit as
+ unmigratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, rkrcmar@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, mst@redhat.com, yu-cheng.yu@intel.com, yi.z.zhang@intel.com, hjl.tools@gmail.com
-Cc: Yang Weijiang <weijiang.yang@intel.com>, Zhang Yi <yi.z.zhang@linux.intel.com>
+To: pbonzini@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, ehabkost@redhat.com, qemu-stable@nongnu.org
 
-CPUID bit definition as below:
-CPUID.(EAX=d, ECX=1):ECX.CET_U(bit 11): user mode state
-CPUID.(EAX=d, ECX=1):ECX.CET_S(bit 12): kernel mode state
-
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- target/i386/cpu.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index cf4f2798dc..78994bfa1d 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4396,12 +4396,22 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *ebx = xsave_area_size(env->xcr0);
-         } else if (count == 1) {
-             *eax = env->features[FEAT_XSAVE];
-+            *ecx = env->features[FEAT_XSAVE_SV_LO];
-+            *edx = env->features[FEAT_XSAVE_SV_HI];
-+            *ebx = xsave_area_size_compat(x86_cpu_xsave_components(cpu) |
-+                    x86_cpu_xsave_sv_components(cpu));
-         } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
-             if ((x86_cpu_xsave_components(cpu) >> count) & 1) {
-                 const ExtSaveArea *esa = &x86_ext_save_areas[count];
-                 *eax = esa->size;
-                 *ebx = esa->offset;
-             }
-+            if ((x86_cpu_xsave_sv_components(cpu) >> count) & 1) {
-+                const ExtSaveArea *esa_sv = &x86_ext_save_areas[count];
-+                *eax = esa_sv->size;
-+                *ebx = esa_sv->offset;
-+                *ecx = 1;
-+            }
-         }
-         break;
-     }
--- 
-2.17.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIyMTEyNDQxMC4xMTky
+MC0xLXBib256aW5pQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
+b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
+bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2Vu
+dG9zNyBTSE9XX0VOVj0xIEo9OAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKbGlicG1lbSBzdXBw
+b3J0ICAgbm8KbGlidWRldiAgICAgICAgICAgbm8KCldBUk5JTkc6IFVzZSBvZiBTREwgMS4yIGlz
+IGRlcHJlY2F0ZWQgYW5kIHdpbGwgYmUgcmVtb3ZlZCBpbgpXQVJOSU5HOiBmdXR1cmUgcmVsZWFz
+ZXMuIFBsZWFzZSBzd2l0Y2ggdG8gdXNpbmcgU0RMIDIuMAoKTk9URTogY3Jvc3MtY29tcGlsZXJz
+IGVuYWJsZWQ6ICAnY2MnCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5t
+YWsudG1wCi0tLQogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vdHJhbnNsYXRl
+Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90YXJnZXQvYXJtL29wX2hlbHBlci5vCiAgQ0Mg
+ICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9oZWxwZXIubwovdG1wL3FlbXUtdGVzdC9z
+cmMvdGFyZ2V0L2kzODYvY3B1LmM6MTAxNTo5OiBlcnJvcjogdW5rbm93biBmaWVsZCAndW5taWdy
+YXRhYmxlX2ZlYXR1cmVzJyBzcGVjaWZpZWQgaW4gaW5pdGlhbGl6ZXIKICAgICAgICAgLnVubWln
+cmF0YWJsZV9mZWF0dXJlcyA9IENQVUlEXzdfMF9FQlhfSU5URUxfUFQsCiAgICAgICAgIF4KbWFr
+ZVsxXTogKioqIFt0YXJnZXQvaTM4Ni9jcHUub10gRXJyb3IgMQoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxODEyMjExMjQ0MTAuMTE5MjAt
+MS1wYm9uemluaUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9
+bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
