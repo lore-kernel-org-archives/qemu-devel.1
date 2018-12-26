@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48274)
+Received: from eggs.gnu.org ([208.118.235.92]:41050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gcCrb-0004bV-LX
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:21:00 -0500
+	(envelope-from <plaes@plaes.org>) id 1gcEXm-0004VN-Nh
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 14:08:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gcCrZ-00081n-KZ
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:59 -0500
-Received: from mail-qt1-x833.google.com ([2607:f8b0:4864:20::833]:34801)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gcCrZ-0007rW-C0
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:57 -0500
-Received: by mail-qt1-x833.google.com with SMTP id r14so17897998qtp.1
-	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 09:20:37 -0800 (PST)
-Date: Wed, 26 Dec 2018 09:20:04 -0800
-Message-Id: <20181226172005.26990-14-palmer@sifive.com>
-In-Reply-To: <20181226172005.26990-1-palmer@sifive.com>
-References: <20181226172005.26990-1-palmer@sifive.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 13/14] riscv/cpu: use
- device_class_set_parent_realize
+	(envelope-from <plaes@plaes.org>) id 1gcEXl-0000Et-An
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 14:08:38 -0500
+From: Priit Laes <plaes@plaes.org>
+Date: Wed, 26 Dec 2018 21:07:02 +0200
+Message-Id: <20181226190702.403-1-plaes@plaes.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH] stm32f103: Add initial skeleton of STM32
+ F103 SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +20,347 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: Priit Laes <plaes@plaes.org>
 
-From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Initial barebone SoC implementation for STM32F103
+with "Blue Pill" board source for testing.
 
-Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Code is based on both nrf51/microbit and stm32f205.
+
+Although code loads and seems to be at the right
+addresses it does not yet run:
+
+./arm-softmmu/qemu-system-arm -nographic \
+	-machine stm32bluepill \
+	-kernel \
+	libopencm3-miniblink/bin/stm32/bluepill.bin
+QEMU 3.1.50 monitor - type 'help' for more information
+(qemu) QEMU 3.1.50 monitor - type 'help' for more information
+(qemu) gdbserver
+Waiting for gdb connection on device 'tcp::1234'
+
+$ arm-none-eabi-gdb \
+	libopencm3-miniblink/bin/stm32/bluepill.elf
+(gdb) target remote tcp::1234
+Remote debugging using tcp::1234
+blocking_handler () at ../../cm3/vector.c:103
+103	{
+(gdb) bt
+Backtrace stopped: previous frame identical to this frame (corrupt stack?=
+)
+(gdb) info line
+Line 103 of "../../cm3/vector.c" starts at address 0x8000380 \
+	<blocking_handler> and ends at 0x8000382 <null_handler>.
+
+Any ideas?
+
+Signed-off-by: Priit Laes <plaes@plaes.org>
 ---
- target/riscv/cpu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ default-configs/arm-softmmu.mak |  1 +
+ hw/arm/Makefile.objs            |  1 +
+ hw/arm/stm32f103_blue_pill.c    | 78 ++++++++++++++++++++++++++++
+ hw/arm/stm32f103_soc.c          | 92 +++++++++++++++++++++++++++++++++
+ include/hw/arm/stm32f103_soc.h  | 54 +++++++++++++++++++
+ 5 files changed, 226 insertions(+)
+ create mode 100644 hw/arm/stm32f103_blue_pill.c
+ create mode 100644 hw/arm/stm32f103_soc.c
+ create mode 100644 include/hw/arm/stm32f103_soc.h
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index a025a0a3baac..5e8a2cb2ba61 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -330,8 +330,8 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
-     CPUClass *cc = CPU_CLASS(c);
-     DeviceClass *dc = DEVICE_CLASS(c);
- 
--    mcc->parent_realize = dc->realize;
--    dc->realize = riscv_cpu_realize;
-+    device_class_set_parent_realize(dc, riscv_cpu_realize,
-+                                    &mcc->parent_realize);
- 
-     mcc->parent_reset = cc->reset;
-     cc->reset = riscv_cpu_reset;
--- 
-2.18.1
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
+u.mak
+index 2420491aac..7a55e523e1 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -95,6 +95,7 @@ CONFIG_RASPI=3Dy
+ CONFIG_REALVIEW=3Dy
+ CONFIG_ZAURUS=3Dy
+ CONFIG_ZYNQ=3Dy
++CONFIG_STM32F103_SOC=3Dy
+ CONFIG_STM32F2XX_TIMER=3Dy
+ CONFIG_STM32F2XX_USART=3Dy
+ CONFIG_STM32F2XX_SYSCFG=3Dy
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 50c7b4a927..7f59a9349d 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -24,6 +24,7 @@ obj-$(CONFIG_OMAP) +=3D omap1.o omap2.o
+ obj-$(CONFIG_STRONGARM) +=3D strongarm.o
+ obj-$(CONFIG_ALLWINNER_A10) +=3D allwinner-a10.o cubieboard.o
+ obj-$(CONFIG_RASPI) +=3D bcm2835_peripherals.o bcm2836.o raspi.o
++obj-$(CONFIG_STM32F103_SOC) +=3D stm32f103_soc.o stm32f103_blue_pill.o
+ obj-$(CONFIG_STM32F205_SOC) +=3D stm32f205_soc.o
+ obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zynqmp.o xlnx-zcu102.o
+ obj-$(CONFIG_XLNX_VERSAL) +=3D xlnx-versal.o xlnx-versal-virt.o
+diff --git a/hw/arm/stm32f103_blue_pill.c b/hw/arm/stm32f103_blue_pill.c
+new file mode 100644
+index 0000000000..09dd69aa71
+--- /dev/null
++++ b/hw/arm/stm32f103_blue_pill.c
+@@ -0,0 +1,78 @@
++/*
++ * STM32F103C8 Blue Pill development board Machine Model
++ *
++ * Copyright (c) 2018 Priit Laes <plaes@plaes.org>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/boards.h"
++#include "hw/arm/arm.h"
++#include "exec/address-spaces.h"
++
++#include "hw/arm/stm32f103_soc.h"
++
++typedef struct {
++    MachineState parent;
++
++    STM32F103State stm32f103;
++} STM32BluePillMachineState;
++
++#define TYPE_STM32BLUEPILL_MACHINE MACHINE_TYPE_NAME("stm32bluepill")
++
++#define STM32BLUEPILL_MACHINE(obj) \
++    OBJECT_CHECK(STM32BluePillMachineState, obj, TYPE_STM32BLUEPILL_MACH=
+INE)
++
++static void stm32bluepill_init(MachineState *machine)
++{
++    STM32BluePillMachineState *s =3D STM32BLUEPILL_MACHINE(machine);
++    Object *soc =3D OBJECT(&s->stm32f103);
++
++    sysbus_init_child_obj(OBJECT(machine), "stm32f103-soc", soc,
++                          sizeof(s->stm32f103), TYPE_STM32F103_SOC);
++    object_property_set_bool(soc, true, "realized", &error_fatal);
++
++    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
++                       FLASH_SIZE);
++}
++
++static void stm32bluepill_machine_class_init(ObjectClass *oc, void *data=
+)
++{
++    MachineClass *mc =3D MACHINE_CLASS(oc);
++
++    mc->desc =3D "STM32F103 Blue Pill development board";
++    mc->init =3D stm32bluepill_init;
++    mc->max_cpus =3D 1;
++}
++
++static const TypeInfo stm32bluepill_info =3D {
++    .name =3D TYPE_STM32BLUEPILL_MACHINE,
++    .parent =3D TYPE_MACHINE,
++    .instance_size =3D sizeof(STM32BluePillMachineState),
++    .class_init =3D stm32bluepill_machine_class_init,
++};
++
++static void stm32bluepill_machine_init(void)
++{
++    type_register_static(&stm32bluepill_info);
++}
++
++type_init(stm32bluepill_machine_init);
+diff --git a/hw/arm/stm32f103_soc.c b/hw/arm/stm32f103_soc.c
+new file mode 100644
+index 0000000000..3093bce4ea
+--- /dev/null
++++ b/hw/arm/stm32f103_soc.c
+@@ -0,0 +1,92 @@
++/*
++ * STM32 F103 SoC (or MCU)
++ *
++ * Copyright 2018 Priit Laes <plaes@plaes.org>
++ *
++ * This code is licensed under the GPL version 2 or later.  See
++ * the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/sysbus.h"
++#include "exec/address-spaces.h"
++
++#include "hw/arm/stm32f103_soc.h"
++
++#define FLASH_BASE      0x08000000
++#define SRAM_BASE       0x20000000
++
++static void stm32f103_soc_init(Object *obj)
++{
++    STM32F103State *s =3D STM32F103_SOC(obj);
++
++    sysbus_init_child_obj(obj, "armv7m", &s->cpu, sizeof(s->cpu),
++                      TYPE_ARMV7M);
++}
++
++static void stm32f103_soc_realize(DeviceState *dev_soc, Error **errp)
++{
++    STM32F103State *s =3D STM32F103_SOC(dev_soc);
++    Error *err =3D NULL;
++
++    /*
++     * XXX: Region 0x1FFF F000 - 0x1FFF F7FF is called "System Memory"
++     * containing boot loader used to reprogram flash by using USART1.
++     */
++    MemoryRegion *system_memory =3D get_system_memory();
++
++    memory_region_init_rom(&s->flash, NULL, "stm32.flash", FLASH_SIZE,
++                           &error_fatal);
++    memory_region_add_subregion(system_memory, FLASH_BASE, &s->flash);
++    /*
++     * TODO: based on BOOT pin, 0x00000000 - 0x0007FFFF is aliased to
++     * either Flash or system memory. We currently hardcode it to flash.
++     */
++    memory_region_init_alias(&s->flash_alias, NULL, "stm32.flash_alias",
++                             &s->flash, 0, FLASH_SIZE);
++    memory_region_add_subregion(system_memory, 0, &s->flash_alias);
++
++    memory_region_init_ram(&s->sram, NULL, "stm32.sram", SRAM_SIZE,
++                           &error_fatal);
++    memory_region_add_subregion(system_memory, SRAM_BASE, &s->sram);
++
++    qdev_prop_set_bit(DEVICE(&s->cpu), "enable-bitband", true);
++    qdev_prop_set_uint32(DEVICE(&s->cpu), "num-irq", 80);
++    qdev_prop_set_string(DEVICE(&s->cpu), "cpu-type", ARM_CPU_TYPE_NAME(=
+"cortex-m3"));
++
++    object_property_set_link(OBJECT(&s->cpu), OBJECT(system_memory),
++                                    "memory", &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
++    if (err !=3D NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++}
++
++static Property stm32f103_soc_properties[] =3D {
++    DEFINE_PROP_UINT32("flash-size", STM32F103State, flash_size, FLASH_S=
+IZE),
++    DEFINE_PROP_UINT32("sram-size", STM32F103State, sram_size, SRAM_SIZE=
+),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void stm32f103_soc_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->props   =3D stm32f103_soc_properties;
++    dc->realize =3D stm32f103_soc_realize;
++}
++
++static const TypeInfo stm32f103_soc_info =3D {
++    .name          =3D TYPE_STM32F103_SOC,
++    .parent        =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(STM32F103State),
++    .instance_init =3D stm32f103_soc_init,
++    .class_init    =3D stm32f103_soc_class_init,
++};
++
++static void stm32f103_soc_types(void)
++{
++    type_register_static(&stm32f103_soc_info);
++}
++type_init(stm32f103_soc_types)
+diff --git a/include/hw/arm/stm32f103_soc.h b/include/hw/arm/stm32f103_so=
+c.h
+new file mode 100644
+index 0000000000..d6b2eb9c57
+--- /dev/null
++++ b/include/hw/arm/stm32f103_soc.h
+@@ -0,0 +1,54 @@
++/*
++ * STM32 F103 SoC (or MCU)
++ *
++ * Copyright (c) 2018 Priit Laes <plaes@plaes.org>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_ARM_STM32F103_SOC_H
++#define HW_ARM_STM32F103_SOC_H
++
++#include "hw/arm/armv7m.h"
++
++#define TYPE_STM32F103_SOC "stm32f103-soc"
++#define STM32F103_SOC(obj) \
++    OBJECT_CHECK(STM32F103State, (obj), TYPE_STM32F103_SOC)
++
++/* TODO: flash/sram sizes are for STM32F103C8 part. */
++#define FLASH_SIZE     (64 * 1024)
++#define SRAM_SIZE      (20 * 1024)
++
++typedef struct STM32F103State {
++    SysBusDevice parent_obj;
++
++    ARMv7MState cpu;
++
++    uint32_t sram_size;
++    uint32_t flash_size;
++    MemoryRegion sram;
++    MemoryRegion flash;
++    /* XXX: find better name */
++    MemoryRegion flash_alias;
++
++    /* TODO: Peripherals */
++
++} STM32F103State;
++
++#endif /* HW_ARM_STM32F103_SOC_H */
+--=20
+2.20.1
