@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47965)
+Received: from eggs.gnu.org ([208.118.235.92]:47964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gcCrL-0004Bo-EL
+	(envelope-from <palmer@sifive.com>) id 1gcCrL-0004Bn-E4
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gcCrE-0007qw-0n
+	(envelope-from <palmer@sifive.com>) id 1gcCrE-0007r1-2I
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:39 -0500
-Received: from mail-qt1-x82d.google.com ([2607:f8b0:4864:20::82d]:42597)
+Received: from mail-qt1-x835.google.com ([2607:f8b0:4864:20::835]:37446)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gcCrD-0007dk-Ld
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gcCrD-0007nT-MV
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:35 -0500
-Received: by mail-qt1-x82d.google.com with SMTP id d19so17815522qtq.9
-	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 09:20:15 -0800 (PST)
-Date: Wed, 26 Dec 2018 09:19:52 -0800
-Message-Id: <20181226172005.26990-2-palmer@sifive.com>
+Received: by mail-qt1-x835.google.com with SMTP id t33so17841233qtt.4
+	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 09:20:32 -0800 (PST)
+Date: Wed, 26 Dec 2018 09:20:01 -0800
+Message-Id: <20181226172005.26990-11-palmer@sifive.com>
 In-Reply-To: <20181226172005.26990-1-palmer@sifive.com>
 References: <20181226172005.26990-1-palmer@sifive.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 01/14] hw/riscv/virt: Increase the number of
- interrupts
+Subject: [Qemu-devel] [PULL 10/14] RISC-V: Enable second UART on sifive_e
+ and sifive_u
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +27,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>
 
-From: Alistair Francis <Alistair.Francis@wdc.com>
+From: Michael Clark <mjc@sifive.com>
 
-Increase the number of interrupts to match the HiFive Unleashed board.
+Previously the second UARTs on the sifive_e and sifive_u machines
+where disabled due to check-qtest-riscv32 and check-qtest-riscv64
+failures. Recent changes in the QEMU core serial code have
+resolved these failures so the second UARTs can be instantiated.
 
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Tested-by: Guenter Roeck <linux@roeck-us.net>
-Tested-by: Andrea Bolognani <abologna@redhat.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- include/hw/riscv/virt.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/riscv/sifive_e.c | 5 ++---
+ hw/riscv/sifive_u.c | 5 ++---
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-index 91163d6cbfe8..2b2e6dd4ea6b 100644
---- a/include/hw/riscv/virt.h
-+++ b/include/hw/riscv/virt.h
-@@ -45,7 +45,7 @@ enum {
-     UART0_IRQ = 10,
-     VIRTIO_IRQ = 1, /* 1 to 8 */
-     VIRTIO_COUNT = 8,
--    VIRTIO_NDEV = 10
-+    VIRTIO_NDEV = 0x35 /* Arbitrary maximum number of interrupts */
- };
- 
- enum {
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index cb513cc3bb50..5d9d65ff29ab 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -192,9 +192,8 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
+         memmap[SIFIVE_E_QSPI0].base, memmap[SIFIVE_E_QSPI0].size);
+     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm0",
+         memmap[SIFIVE_E_PWM0].base, memmap[SIFIVE_E_PWM0].size);
+-    /* sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
+-        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic),
+-                                       SIFIVE_E_UART1_IRQ)); */
++    sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
++        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_E_UART1_IRQ));
+     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi1",
+         memmap[SIFIVE_E_QSPI1].base, memmap[SIFIVE_E_QSPI1].size);
+     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm1",
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 849fa2e6311a..3bd3b67507f8 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -368,9 +368,8 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+         memmap[SIFIVE_U_PLIC].size);
+     sifive_uart_create(system_memory, memmap[SIFIVE_U_UART0].base,
+         serial_hd(0), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART0_IRQ));
+-    /* sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
+-        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic),
+-                                       SIFIVE_U_UART1_IRQ)); */
++    sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
++        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART1_IRQ));
+     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
+         memmap[SIFIVE_U_CLINT].size, smp_cpus,
+         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
 -- 
 2.18.1
