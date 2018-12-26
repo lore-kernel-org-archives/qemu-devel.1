@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57094)
+Received: from eggs.gnu.org ([208.118.235.92]:57098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72f-00085T-4h
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72f-00085W-5D
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:08:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72b-0001uu-PN
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72c-0001vH-0L
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:08:01 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:54670 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:54669 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gc72b-0001oF-HM
+	id 1gc72b-0001oH-OO
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:07:57 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 26 Dec 2018 12:06:24 +0100
-Message-Id: <1545822388-10911-17-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 26 Dec 2018 12:06:23 +0100
+Message-Id: <1545822388-10911-16-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1545822388-10911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1545822388-10911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 16/20] disas: nanoMIPS: Comment the decoder
+Subject: [Qemu-devel] [PATCH v5 15/20] disas: nanoMIPS: Rename the decoder
  of 'gpr3.src.store' gpr encoding type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,69 +30,76 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Comment the decoder of 'gpr3.src.store' gpr encoding type in nanoMIPS
+Rename the decoder of 'gpr3.src.store' gpr encoding type in nanoMIPS
 disassembler.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- disas/nanomips.cpp | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ disas/nanomips.cpp | 10 +++++-----
+ disas/nanomips.h   |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index 14e5866..9464b1e 100644
+index 7b50e24..14e5866 100644
 --- a/disas/nanomips.cpp
 +++ b/disas/nanomips.cpp
-@@ -348,6 +348,38 @@ uint64 NMD::decode_gpr_gpr3(uint64 d)
+@@ -348,7 +348,7 @@ uint64 NMD::decode_gpr_gpr3(uint64 d)
  }
-=20
-=20
-+/*
-+ * NMD::decode_gpr_gpr3_src_store() - decoder for 'gpr3.src.store' gpr e=
-ncoding
-+ *     type
-+ *
-+ *   Map a 3-bit code to the 5-bit register space according to this patt=
-ern:
-+ *
-+ *                            7 6 5 4 3 2 1 0
-+ *                            | | | | | | | |
-+ *                            | | | | | | | =E2=94=94-------------------=
-----=E2=94=90
-+ *                            | | | =E2=94=94-----------------------=E2=94=
-=90       |
-+ *                            | | =E2=94=94-----------------------=E2=94=
-=90 |       |
-+ *                            | =E2=94=94-----------------------=E2=94=90=
- | |       |
-+ *                            =E2=94=94-----------------------=E2=94=90 =
-| | |       |
-+ *                                    | | |           | | | |       |
-+ *                            =E2=94=8C-------=E2=94=98 | |           | =
-| | |       |
-+ *                            | =E2=94=8C-------=E2=94=98 |           | =
-| | |       |
-+ *                            | | =E2=94=8C-------=E2=94=98           | =
-| | |       |
-+ *                            | | |                   | | | |       |
-+ *                            | | |                   | | | |       |
-+ *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *      3                   2                   1                   0
-+ *
-+ *   This pattern is the same one used for 'gpr3' gpr encoding type, exc=
-ept for
-+ * the input value 0, that is mapped to the output value 0 instead of 16=
-.
-+ *
-+ *   Used in handling following instructions:
-+ *
-+ *     - SB[16]
-+ *     - SH[16]
-+ *     - SW[16]
-+ *     - SW[GP16]
-+ */
- uint64 NMD::decode_gpr_gpr3_src_store(uint64 d)
+ 
+ 
+-uint64 NMD::encode_gpr3_store(uint64 d)
++uint64 NMD::decode_gpr_gpr3_src_store(uint64 d)
  {
-     static uint64 register_list[] =3D {  0, 17, 18, 19,  4,  5,  6,  7 }=
-;
---=20
+     static uint64 register_list[] = {  0, 17, 18, 19,  4,  5,  6,  7 };
+     return renumber_registers(d, register_list,
+@@ -12779,7 +12779,7 @@ std::string NMD::SB_16_(uint64 instruction)
+     uint64 rs3_value = extract_rs3_6_5_4(instruction);
+     uint64 u_value = extract_u_1_0(instruction);
+ 
+-    std::string rtz3 = GPR(encode_gpr3_store(rtz3_value));
++    std::string rtz3 = GPR(decode_gpr_gpr3_src_store(rtz3_value));
+     std::string u = IMMEDIATE(copy(u_value));
+     std::string rs3 = GPR(decode_gpr_gpr3(rs3_value));
+ 
+@@ -13625,7 +13625,7 @@ std::string NMD::SH_16_(uint64 instruction)
+     uint64 rs3_value = extract_rs3_6_5_4(instruction);
+     uint64 u_value = extract_u_2_1__s1(instruction);
+ 
+-    std::string rtz3 = GPR(encode_gpr3_store(rtz3_value));
++    std::string rtz3 = GPR(decode_gpr_gpr3_src_store(rtz3_value));
+     std::string u = IMMEDIATE(copy(u_value));
+     std::string rs3 = GPR(decode_gpr_gpr3(rs3_value));
+ 
+@@ -15199,7 +15199,7 @@ std::string NMD::SW_16_(uint64 instruction)
+     uint64 rs3_value = extract_rs3_6_5_4(instruction);
+     uint64 u_value = extract_u_3_2_1_0__s2(instruction);
+ 
+-    std::string rtz3 = GPR(encode_gpr3_store(rtz3_value));
++    std::string rtz3 = GPR(decode_gpr_gpr3_src_store(rtz3_value));
+     std::string u = IMMEDIATE(copy(u_value));
+     std::string rs3 = GPR(decode_gpr_gpr3(rs3_value));
+ 
+@@ -15246,7 +15246,7 @@ std::string NMD::SW_GP16_(uint64 instruction)
+     uint64 u_value = extract_u_6_5_4_3_2_1_0__s2(instruction);
+     uint64 rtz3_value = extract_rtz3_9_8_7(instruction);
+ 
+-    std::string rtz3 = GPR(encode_gpr3_store(rtz3_value));
++    std::string rtz3 = GPR(decode_gpr_gpr3_src_store(rtz3_value));
+     std::string u = IMMEDIATE(copy(u_value));
+ 
+     return img::format("SW %s, %s($%d)", rtz3, u, 28);
+diff --git a/disas/nanomips.h b/disas/nanomips.h
+index ec750cc..bb66c5f 100644
+--- a/disas/nanomips.h
++++ b/disas/nanomips.h
+@@ -106,7 +106,7 @@ private:
+     uint64 renumber_registers(uint64 index, uint64 *register_list,
+                               size_t register_list_size);
+     uint64 decode_gpr_gpr3(uint64 d);
+-    uint64 encode_gpr3_store(uint64 d);
++    uint64 decode_gpr_gpr3_src_store(uint64 d);
+     uint64 encode_rd1_from_rd(uint64 d);
+     uint64 encode_gpr4_zero(uint64 d);
+     uint64 encode_gpr4(uint64 d);
+-- 
 2.7.4
