@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57107)
+Received: from eggs.gnu.org ([208.118.235.92]:57093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72f-00085Z-7f
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:08:03 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72f-00085S-4M
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:08:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72a-0001tr-3x
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72d-0001wG-5u
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:08:01 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:53966 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:54707 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gc72Z-0001Fp-Og
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:07:56 -0500
+	id 1gc72c-0001ov-U6
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:07:59 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 26 Dec 2018 12:06:10 +0100
-Message-Id: <1545822388-10911-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 26 Dec 2018 12:06:27 +0100
+Message-Id: <1545822388-10911-20-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1545822388-10911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1545822388-10911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v5 02/20] disas: nanoMIPS: Remove functions
- that are not used
+Subject: [Qemu-devel] [PATCH v5 19/20] disas: nanoMIPS: Rename the decoder
+ of 'gpr4.zero' gpr encoding type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,418 +30,69 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Some functions were not used at all. Compiler doesn't complain
-since they are class memebers. Remove them - no future usage is
-planned.
+Rename the decoder of 'gpr4.zero' gpr encoding type in nanoMIPS
+disassembler.
 
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- disas/nanomips.cpp | 208 -----------------------------------------------------
- disas/nanomips.h   |  25 -------
- 2 files changed, 233 deletions(-)
+ disas/nanomips.cpp | 10 +++++-----
+ disas/nanomips.h   |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index f9ef0a2..935c2de 100644
+index c1db153..969c48b 100644
 --- a/disas/nanomips.cpp
 +++ b/disas/nanomips.cpp
-@@ -852,23 +852,6 @@ uint64 NMD::extract_stripe_6(uint64 instruction)
+@@ -396,7 +396,7 @@ uint64 NMD::encode_rd1_from_rd(uint64 d)
  }
  
  
--uint64 NMD::extr_xil17il0bs1Fmsb0(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 17, 1);
--    return value;
--}
--
--
--uint64 NMD::extr_xil2il0bs1_il15il0bs1Fmsb0(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 2, 1);
--    value |= extract_bits(instruction, 15, 1);
--    return value;
--}
--
--
- uint64 NMD::extract_ac_13_12(uint64 instruction)
+-uint64 NMD::encode_gpr4_zero(uint64 d)
++uint64 NMD::decode_gpr_gpr4_zero(uint64 d)
  {
-     uint64 value = 0;
-@@ -919,14 +902,6 @@ uint64 NMD::extract_shift_5_4_3_2_1_0(uint64 instruction)
- }
+     static uint64 register_list[] = {  8,  9, 10,  0,  4,  5,  6,  7,
+                                       16, 17, 18, 19, 20, 21, 22, 23 };
+@@ -10392,7 +10392,7 @@ std::string NMD::MOVE_BALC(uint64 instruction)
+     int64 s_value = extract_s__se21_0_20_to_1_s1(instruction);
  
+     std::string rd1 = GPR(encode_rd1_from_rd(rd1_value));
+-    std::string rtz4 = GPR(encode_gpr4_zero(rtz4_value));
++    std::string rtz4 = GPR(decode_gpr_gpr4_zero(rtz4_value));
+     std::string s = ADDRESS(encode_s_from_address(s_value), 4);
  
--uint64 NMD::extr_xil10il0bs6Fmsb5(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 10, 6);
--    return value;
--}
--
--
- uint64 NMD::extract_count_19_18_17_16(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -943,15 +918,6 @@ uint64 NMD::extract_code_2_1_0(uint64 instruction)
- }
+     return img::format("MOVE.BALC %s, %s, %s", rd1, rtz4, s);
+@@ -10418,8 +10418,8 @@ std::string NMD::MOVEP(uint64 instruction)
+     std::string rd2 = GPR(encode_rd2_reg1(rd2_value));
+     std::string re2 = GPR(encode_rd2_reg2(rd2_value));
+     /* !!!!!!!!!! - no conversion function */
+-    std::string rsz4 = GPR(encode_gpr4_zero(rsz4_value));
+-    std::string rtz4 = GPR(encode_gpr4_zero(rtz4_value));
++    std::string rsz4 = GPR(decode_gpr_gpr4_zero(rsz4_value));
++    std::string rtz4 = GPR(decode_gpr_gpr4_zero(rtz4_value));
  
+     return img::format("MOVEP %s, %s, %s, %s", rd2, re2, rsz4, rtz4);
+     /* hand edited */
+@@ -15281,7 +15281,7 @@ std::string NMD::SW_4X4_(uint64 instruction)
+     uint64 rs4_value = extract_rs4_4_2_1_0(instruction);
+     uint64 u_value = extract_u_3_8__s2(instruction);
  
--uint64 NMD::extr_xil10il0bs4_il22il0bs4Fmsb3(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 10, 4);
--    value |= extract_bits(instruction, 22, 4);
--    return value;
--}
--
--
- uint64 NMD::extract_u_11_10_9_8_7_6_5_4_3_2_1_0(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -976,14 +942,6 @@ uint64 NMD::extr_uil3il3bs18Fmsb20(uint64 instruction)
- }
+-    std::string rtz4 = GPR(encode_gpr4_zero(rtz4_value));
++    std::string rtz4 = GPR(decode_gpr_gpr4_zero(rtz4_value));
+     std::string u = IMMEDIATE(copy(u_value));
+     std::string rs4 = GPR(decode_gpr_gpr4(rs4_value));
  
- 
--uint64 NMD::extr_xil12il0bs1Fmsb0(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 12, 1);
--    return value;
--}
--
--
- uint64 NMD::extr_uil0il2bs4Fmsb5(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1008,14 +966,6 @@ uint64 NMD::extr_uil0il2bs3Fmsb4(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil10il0bs1Fmsb0(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 10, 1);
--    return value;
--}
--
--
- uint64 NMD::extract_rd3_3_2_1(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1048,22 +998,6 @@ uint64 NMD::extract_ru_7_6_5_4_3(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil21il0bs5Fmsb4(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 21, 5);
--    return value;
--}
--
--
--uint64 NMD::extr_xil9il0bs3Fmsb2(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 9, 3);
--    return value;
--}
--
--
- uint64 NMD::extract_u_17_to_0(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1072,15 +1006,6 @@ uint64 NMD::extract_u_17_to_0(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil14il0bs1_il15il0bs1Fmsb0(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 14, 1);
--    value |= extract_bits(instruction, 15, 1);
--    return value;
--}
--
--
- uint64 NMD::extract_rsz4_4_2_1_0(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1090,14 +1015,6 @@ uint64 NMD::extract_rsz4_4_2_1_0(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil24il0bs1Fmsb0(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 24, 1);
--    return value;
--}
--
--
- int64 NMD::extr_sil0il21bs1_il1il1bs20Tmsb21(uint64 instruction)
- {
-     int64 value = 0;
-@@ -1150,15 +1067,6 @@ int64 NMD::extract_shift_21_20_19_18_17_16(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil6il0bs3_il10il0bs1Fmsb2(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 6, 3);
--    value |= extract_bits(instruction, 10, 1);
--    return value;
--}
--
--
- uint64 NMD::extract_rd2_3_8(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1168,14 +1076,6 @@ uint64 NMD::extract_rd2_3_8(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil16il0bs5Fmsb4(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 16, 5);
--    return value;
--}
--
--
- uint64 NMD::extract_code_17_to_0(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1184,14 +1084,6 @@ uint64 NMD::extract_code_17_to_0(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil0il0bs12Fmsb11(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 0, 12);
--    return value;
--}
--
--
- uint64 NMD::extract_size_20_19_18_17_16(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1260,15 +1152,6 @@ uint64 NMD::extract_hs_20_19_18_17_16(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil10il0bs1_il14il0bs2Fmsb1(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 10, 1);
--    value |= extract_bits(instruction, 14, 2);
--    return value;
--}
--
--
- uint64 NMD::extract_sel_13_12_11(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1285,14 +1168,6 @@ uint64 NMD::extract_lsb_4_3_2_1_0(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil14il0bs2Fmsb1(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 14, 2);
--    return value;
--}
--
--
- uint64 NMD::extract_gp_2(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1333,14 +1208,6 @@ uint64 NMD::extract_cs_20_19_18_17_16(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil16il0bs10Fmsb9(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 16, 10);
--    return value;
--}
--
--
- uint64 NMD::extract_rt4_9_7_6_5(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1366,14 +1233,6 @@ uint64 NMD::extr_uil0il2bs6Fmsb7(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil17il0bs9Fmsb8(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 17, 9);
--    return value;
--}
--
--
- uint64 NMD::extract_sa_15_14_13(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1464,15 +1323,6 @@ uint64 NMD::extract_bit_16_15_14_13_12_11(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil10il0bs1_il11il0bs5Fmsb4(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 10, 1);
--    value |= extract_bits(instruction, 11, 5);
--    return value;
--}
--
--
- uint64 NMD::extract_mask_20_19_18_17_16_15_14(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1533,22 +1383,6 @@ uint64 NMD::extract_u_20_19_18_17_16_15_14_13(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil15il0bs1Fmsb0(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 15, 1);
--    return value;
--}
--
--
--uint64 NMD::extr_xil11il0bs5Fmsb4(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 11, 5);
--    return value;
--}
--
--
- uint64 NMD::extr_uil2il2bs16Fmsb17(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1591,15 +1425,6 @@ int64 NMD::extr_sil0il25bs1_il1il1bs24Tmsb25(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil0il0bs3_il4il0bs1Fmsb2(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 0, 3);
--    value |= extract_bits(instruction, 4, 1);
--    return value;
--}
--
--
- uint64 NMD::extract_u_1_0(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1617,15 +1442,6 @@ uint64 NMD::extr_uil3il3bs1_il8il2bs1Fmsb3(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil9il0bs3_il16il0bs5Fmsb4(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 9, 3);
--    value |= extract_bits(instruction, 16, 5);
--    return value;
--}
--
--
- uint64 NMD::extract_fd_10_9_8_7_6(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1634,14 +1450,6 @@ uint64 NMD::extract_fd_10_9_8_7_6(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil6il0bs3Fmsb2(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 6, 3);
--    return value;
--}
--
--
- uint64 NMD::extr_uil0il2bs5Fmsb6(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1675,14 +1483,6 @@ uint64 NMD::extract_ct_25_24_23_22_21(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil11il0bs1Fmsb0(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 11, 1);
--    return value;
--}
--
--
- uint64 NMD::extr_uil2il2bs19Fmsb20(uint64 instruction)
- {
-     uint64 value = 0;
-@@ -1709,14 +1509,6 @@ uint64 NMD::extr_uil0il1bs4Fmsb4(uint64 instruction)
- }
- 
- 
--uint64 NMD::extr_xil9il0bs2Fmsb1(uint64 instruction)
--{
--    uint64 value = 0;
--    value |= extract_bits(instruction, 9, 2);
--    return value;
--}
--
--
- 
- bool NMD::ADDIU_32__cond(uint64 instruction)
- {
 diff --git a/disas/nanomips.h b/disas/nanomips.h
-index 3df138d..611eeeb 100644
+index 0734844..917f33e 100644
 --- a/disas/nanomips.h
 +++ b/disas/nanomips.h
-@@ -245,31 +245,6 @@ private:
-     uint64 extr_uil3il3bs1_il8il2bs1Fmsb3(uint64 instruction);
-     uint64 extr_uil3il3bs9Fmsb11(uint64 instruction);
-     uint64 extr_uil4il4bs4Fmsb7(uint64 instruction);
--    uint64 extr_xil0il0bs12Fmsb11(uint64 instruction);
--    uint64 extr_xil0il0bs3_il4il0bs1Fmsb2(uint64 instruction);
--    uint64 extr_xil10il0bs1Fmsb0(uint64 instruction);
--    uint64 extr_xil10il0bs1_il11il0bs5Fmsb4(uint64 instruction);
--    uint64 extr_xil10il0bs1_il14il0bs2Fmsb1(uint64 instruction);
--    uint64 extr_xil10il0bs4_il22il0bs4Fmsb3(uint64 instruction);
--    uint64 extr_xil10il0bs6Fmsb5(uint64 instruction);
--    uint64 extr_xil11il0bs1Fmsb0(uint64 instruction);
--    uint64 extr_xil11il0bs5Fmsb4(uint64 instruction);
--    uint64 extr_xil12il0bs1Fmsb0(uint64 instruction);
--    uint64 extr_xil14il0bs1_il15il0bs1Fmsb0(uint64 instruction);
--    uint64 extr_xil14il0bs2Fmsb1(uint64 instruction);
--    uint64 extr_xil15il0bs1Fmsb0(uint64 instruction);
--    uint64 extr_xil16il0bs10Fmsb9(uint64 instruction);
--    uint64 extr_xil16il0bs5Fmsb4(uint64 instruction);
--    uint64 extr_xil17il0bs1Fmsb0(uint64 instruction);
--    uint64 extr_xil17il0bs9Fmsb8(uint64 instruction);
--    uint64 extr_xil21il0bs5Fmsb4(uint64 instruction);
--    uint64 extr_xil24il0bs1Fmsb0(uint64 instruction);
--    uint64 extr_xil2il0bs1_il15il0bs1Fmsb0(uint64 instruction);
--    uint64 extr_xil6il0bs3Fmsb2(uint64 instruction);
--    uint64 extr_xil6il0bs3_il10il0bs1Fmsb2(uint64 instruction);
--    uint64 extr_xil9il0bs2Fmsb1(uint64 instruction);
--    uint64 extr_xil9il0bs3Fmsb2(uint64 instruction);
--    uint64 extr_xil9il0bs3_il16il0bs5Fmsb4(uint64 instruction);
- 
-     bool ADDIU_32__cond(uint64 instruction);
-     bool ADDIU_RS5__cond(uint64 instruction);
+@@ -108,7 +108,7 @@ private:
+     uint64 decode_gpr_gpr3(uint64 d);
+     uint64 decode_gpr_gpr3_src_store(uint64 d);
+     uint64 encode_rd1_from_rd(uint64 d);
+-    uint64 encode_gpr4_zero(uint64 d);
++    uint64 decode_gpr_gpr4_zero(uint64 d);
+     uint64 decode_gpr_gpr4(uint64 d);
+     uint64 encode_rd2_reg1(uint64 d);
+     uint64 encode_rd2_reg2(uint64 d);
 -- 
 2.7.4
