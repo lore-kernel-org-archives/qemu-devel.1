@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57101)
+Received: from eggs.gnu.org ([208.118.235.92]:57094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72f-00085Y-5Y
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:08:02 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72f-00085T-4h
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:08:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72b-0001vB-Uz
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gc72b-0001uu-PN
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:08:01 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:54673 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:54670 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gc72b-0001oK-NO
+	id 1gc72b-0001oF-HM
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 06:07:57 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 26 Dec 2018 12:06:26 +0100
-Message-Id: <1545822388-10911-19-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 26 Dec 2018 12:06:24 +0100
+Message-Id: <1545822388-10911-17-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1545822388-10911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1545822388-10911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 18/20] disas: nanoMIPS: Comment the decoder
- of 'gpr4' gpr encoding type
+Subject: [Qemu-devel] [PATCH v5 16/20] disas: nanoMIPS: Comment the decoder
+ of 'gpr3.src.store' gpr encoding type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +33,69 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Comment the decoder of 'gpr4' gpr encoding type in nanoMIPS
+Comment the decoder of 'gpr3.src.store' gpr encoding type in nanoMIPS
 disassembler.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- disas/nanomips.cpp | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ disas/nanomips.cpp | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index 67be70a..c1db153 100644
+index 14e5866..9464b1e 100644
 --- a/disas/nanomips.cpp
 +++ b/disas/nanomips.cpp
-@@ -405,6 +405,32 @@ uint64 NMD::encode_gpr4_zero(uint64 d)
+@@ -348,6 +348,38 @@ uint64 NMD::decode_gpr_gpr3(uint64 d)
  }
 =20
 =20
 +/*
-+ * NMD::decode_gpr_gpr4() - decoder for 'gpr4' gpr encoding type
++ * NMD::decode_gpr_gpr3_src_store() - decoder for 'gpr3.src.store' gpr e=
+ncoding
++ *     type
 + *
-+ *   Map a 4-bit code to the 5-bit register space according to this patt=
++ *   Map a 3-bit code to the 5-bit register space according to this patt=
 ern:
 + *
-+ *                              1                   0
-+ *                    5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *                    | | | | | | | | | | | | | | | |
-+ *                    | | | | | | | | | | | | | | | |
-+ *                    | | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90
-+ *                    | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90 |
-+ *                    | | | | | | | | | =E2=94=94---------------=E2=94=90=
- | |
-+ *                    | | | | | | | | =E2=94=94---------------=E2=94=90 =
-| | |
-+ *                    | | | | | | | |         | | | | | | | |
-+ *                    | | | | | | | |         | | | | | | | |
++ *                            7 6 5 4 3 2 1 0
++ *                            | | | | | | | |
++ *                            | | | | | | | =E2=94=94-------------------=
+----=E2=94=90
++ *                            | | | =E2=94=94-----------------------=E2=94=
+=90       |
++ *                            | | =E2=94=94-----------------------=E2=94=
+=90 |       |
++ *                            | =E2=94=94-----------------------=E2=94=90=
+ | |       |
++ *                            =E2=94=94-----------------------=E2=94=90 =
+| | |       |
++ *                                    | | |           | | | |       |
++ *                            =E2=94=8C-------=E2=94=98 | |           | =
+| | |       |
++ *                            | =E2=94=8C-------=E2=94=98 |           | =
+| | |       |
++ *                            | | =E2=94=8C-------=E2=94=98           | =
+| | |       |
++ *                            | | |                   | | | |       |
++ *                            | | |                   | | | |       |
 + *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
 + *      3                   2                   1                   0
 + *
++ *   This pattern is the same one used for 'gpr3' gpr encoding type, exc=
+ept for
++ * the input value 0, that is mapped to the output value 0 instead of 16=
+.
++ *
 + *   Used in handling following instructions:
 + *
-+ *     - ADDU[4X4]
-+ *     - LW[4X4]
-+ *     - MOVEP[REV]
-+ *     - MUL[4X4]
-+ *     - SW[4X4]
++ *     - SB[16]
++ *     - SH[16]
++ *     - SW[16]
++ *     - SW[GP16]
 + */
- uint64 NMD::decode_gpr_gpr4(uint64 d)
+ uint64 NMD::decode_gpr_gpr3_src_store(uint64 d)
  {
-     static uint64 register_list[] =3D {  8,  9, 10, 11,  4,  5,  6,  7,
+     static uint64 register_list[] =3D {  0, 17, 18, 19,  4,  5,  6,  7 }=
+;
 --=20
 2.7.4
