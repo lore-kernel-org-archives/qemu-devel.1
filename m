@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36154)
+Received: from eggs.gnu.org ([208.118.235.92]:39817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gc32T-0004N2-Iz
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 01:51:37 -0500
+	(envelope-from <thuth@redhat.com>) id 1gc3Ok-0000mg-Gu
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 02:14:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gc32P-0003VK-94
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 01:51:33 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45224)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gc32O-0003IR-RB
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 01:51:29 -0500
-Received: by mail-pf1-x441.google.com with SMTP id g62so7510296pfd.12
-	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 22:51:14 -0800 (PST)
-References: <20181214174233.18027-1-cota@braap.org>
-	<20181214174233.18027-3-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <319ebe3d-7035-cf19-013c-114fcef8ccb1@linaro.org>
-Date: Wed, 26 Dec 2018 17:51:06 +1100
+	(envelope-from <thuth@redhat.com>) id 1gc3Og-0003XP-EM
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 02:14:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60276)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gc3Og-0003Vp-5y
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 02:14:30 -0500
+References: <b0d70556767952dc739454d074bdab52@grossmann-venter.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
+Date: Wed, 26 Dec 2018 08:14:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181214174233.18027-3-cota@braap.org>
+In-Reply-To: <b0d70556767952dc739454d074bdab52@grossmann-venter.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] tcg: introduce dynamic TLB sizing
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Qemu the right way.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: liebrecht@grossmann-venter.com, qemu-devel@nongnu.org
 
-On 12/15/18 4:42 AM, Emilio G. Cota wrote:
-> +#if TCG_TARGET_IMPLEMENTS_DYN_TLB
-> +#define CPU_TLB_DYN_MIN_BITS 6
-> +#define CPU_TLB_DYN_DEFAULT_BITS 8
-> +/*
-> + * Assuming TARGET_PAGE_BITS==12, with 2**22 entries we can cover 2**(22+12) ==
-> + * 2**34 == 16G of address space. This is roughly what one would expect a
-> + * TLB to cover in a modern (as of 2018) x86_64 CPU. For instance, Intel
-> + * Skylake's Level-2 STLB has 16 1G entries.
-> + */
-> +#define CPU_TLB_DYN_MAX_BITS 22
+On 2018-12-25 23:46, liebrecht@grossmann-venter.com wrote:
+> I have been using Qemu in the past about 8 years ago or so to run legac=
+y
+> windows software.
+>=20
+> I installed the latest qemu and noticed a lot changed and cant find
+> conclusive answers online.
+>=20
+> I am writing this post to find what is the right way to start to set up
+> qemu with a windows 7 pro guest. I want to try and eliminate the
+> iterations and find out what is really possible for the guest.
+>=20
+> Hardware used"
+> 24 Core AMD rackserver.
+> Host OS Debian 9 Stretch
+> Guest Windows 7 Pro 32 bit
+>=20
+> Requirements:
+> 1) I need to be able to run at least 4 processors in the guest. Is this
+> possible with qemu as hosts ?
 
-For 32-bit hosts, we need to limit this to (32 - TARGET_PAGE_BITS) so that we
-do not require a double-word shift when implementing the tlb load.  We probably
-want to restrict it even further because a 32-bit host may well not have 2**27
-bytes of available memory.
+Try to run QEMU with "-smp 4".
 
-For 64-bit hosts, we should limit this to (TARGET_VIRT_ADDR_SPACE_BITS -
-TARGET_PAGE_BITS) so that we do not grow the tlb past the guest's address space.
+> 2) I need to at least have sound working from applications in the guest
+> with pulseaudio on the Debian host. Is it=C2=A0 possible ?
 
-> +    env->tlb_table[mmu_idx] = g_new(CPUTLBEntry, new_size);
-> +    env->iotlb[mmu_idx] = g_new(CPUIOTLBEntry, new_size);
+Should be possible. Run the configure script before compiling with
 
-For 32-bit hosts, we should probably be prepared for this to fail; see above re
-large tlb sizes.  If it fails, we should be able to go back to the previous tlb
-size, since we just freed that memory.
+ --audio-drv-list=3Dpa
 
+and then make sure to give a soundcard to the guest (e.g. with the
+-soundhw option).
 
-r~
+> 3) USB, what is the level of support 2.0 3.0 ?
+> ( However windo$ 7 cannot really do USB3. so usb-3 is moot anyway)
+
+QEMU supports both, e.g. with "-device usb-ehci" for a USB 2.0
+controller or with "-device nec-usb-xhci" for a USB 3.0 controller.
+
+> 4) What kind of devices can be run through usb ?
+
+Do you mean emulated devices? You can get a list with:
+
+ qemu-system-x86_64 -device help | grep usb
+
+Or do you want to pass-through a real device from the host?
+
+> The answers to 1-4 will be really helpful to decide if I should even be
+> using it. The documentation is schetchy about all this.
+> I tried Virtualbox, but it is just a nice looking empty promisebox
+> yielding nothing. Since Qemu helped me a lot in the past I will have
+> better chances here.
+>=20
+> 5) I am currently installing win7pro guest with command
+> $] qemu-system-x86_64 -boot c -cdrom /dev/cdrom -m 2048M
+>=20
+> and left out all the network card and sound driver switches as I have n=
+o
+> clue what I should choose.
+> Can they be configured afterwards ?
+
+I don't have much clue about Windows, but I think you can change it
+afterwards - it's like you're changing PCI cards of a real system in
+that case.
+
+ HTH,
+  Thomas
