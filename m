@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48194)
+Received: from eggs.gnu.org ([208.118.235.92]:48192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gcCrZ-0004Y1-G7
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:58 -0500
+	(envelope-from <palmer@sifive.com>) id 1gcCrZ-0004Xt-FI
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gcCrX-0007zw-G6
+	(envelope-from <palmer@sifive.com>) id 1gcCrX-0007ye-3f
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:57 -0500
-Received: from mail-qk1-x732.google.com ([2607:f8b0:4864:20::732]:40296)
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:32880)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gcCrX-0007l3-8j
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:55 -0500
-Received: by mail-qk1-x732.google.com with SMTP id y16so9621685qki.7
-	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 09:20:26 -0800 (PST)
-Date: Wed, 26 Dec 2018 09:19:58 -0800
-Message-Id: <20181226172005.26990-8-palmer@sifive.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gcCrW-0007gV-OK
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:54 -0500
+Received: by mail-qk1-x741.google.com with SMTP id o89so9644860qko.0
+	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 09:20:20 -0800 (PST)
+Date: Wed, 26 Dec 2018 09:19:54 -0800
+Message-Id: <20181226172005.26990-4-palmer@sifive.com>
 In-Reply-To: <20181226172005.26990-1-palmer@sifive.com>
 References: <20181226172005.26990-1-palmer@sifive.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL 07/14] RISC-V: Add hartid and \n to interrupt
- logging
+Subject: [Qemu-devel] [PULL 03/14] hw/riscv/virt: Connect the gpex PCIe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +26,278 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, Logan Gunthorpe <logang@deltatee.com>, Palmer Dabbelt <palmer@sifive.com>
 
-From: Michael Clark <mjc@sifive.com>
+From: Alistair Francis <Alistair.Francis@wdc.com>
 
-Add carriage return that was erroneously removed
-when converting to qemu_log. Change hard coded
-core number to the actual hartid.
+Connect the gpex PCIe device based on the device tree included in the
+HiFive Unleashed ROM.
 
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Palmer Dabbelt <palmer@sifive.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+Tested-by: Guenter Roeck <linux@roeck-us.net>
+Tested-by: Andrea Bolognani <abologna@redhat.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/cpu_helper.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ default-configs/riscv32-softmmu.mak |   5 +-
+ default-configs/riscv64-softmmu.mak |   5 +-
+ hw/riscv/virt.c                     | 131 +++++++++++++++++++++++++++-
+ include/hw/riscv/virt.h             |  13 ++-
+ 4 files changed, 150 insertions(+), 4 deletions(-)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 86f9f4730c88..0234c2d52886 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -445,11 +445,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-     if (RISCV_DEBUG_INTERRUPT) {
-         int log_cause = cs->exception_index & RISCV_EXCP_INT_MASK;
-         if (cs->exception_index & RISCV_EXCP_INT_FLAG) {
--            qemu_log_mask(LOG_TRACE, "core   0: trap %s, epc 0x" TARGET_FMT_lx,
--                riscv_intr_names[log_cause], env->pc);
-+            qemu_log_mask(LOG_TRACE, "core "
-+                TARGET_FMT_ld ": trap %s, epc 0x" TARGET_FMT_lx "\n",
-+                env->mhartid, riscv_intr_names[log_cause], env->pc);
-         } else {
--            qemu_log_mask(LOG_TRACE, "core   0: intr %s, epc 0x" TARGET_FMT_lx,
--                riscv_excp_names[log_cause], env->pc);
-+            qemu_log_mask(LOG_TRACE, "core "
-+                TARGET_FMT_ld ": intr %s, epc 0x" TARGET_FMT_lx "\n",
-+                env->mhartid, riscv_excp_names[log_cause], env->pc);
-         }
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+index 7937c69e2247..c5ea36cba597 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -1,7 +1,10 @@
+ # Default configuration for riscv-softmmu
+ 
++include pci.mak
++
+ CONFIG_SERIAL=y
+ CONFIG_VIRTIO_MMIO=y
+-include virtio.mak
+ 
+ CONFIG_CADENCE=y
++
++CONFIG_PCI_GENERIC=y
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+index 7937c69e2247..c5ea36cba597 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -1,7 +1,10 @@
+ # Default configuration for riscv-softmmu
+ 
++include pci.mak
++
+ CONFIG_SERIAL=y
+ CONFIG_VIRTIO_MMIO=y
+-include virtio.mak
+ 
+ CONFIG_CADENCE=y
++
++CONFIG_PCI_GENERIC=y
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 6b6fa39aaa38..e7f0716fb667 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -39,6 +39,8 @@
+ #include "sysemu/arch_init.h"
+ #include "sysemu/device_tree.h"
+ #include "exec/address-spaces.h"
++#include "hw/pci/pci.h"
++#include "hw/pci-host/gpex.h"
+ #include "elf.h"
+ 
+ #include <libfdt.h>
+@@ -55,6 +57,9 @@ static const struct MemmapEntry {
+     [VIRT_UART0] =       { 0x10000000,         0x100 },
+     [VIRT_VIRTIO] =      { 0x10001000,        0x1000 },
+     [VIRT_DRAM] =        { 0x80000000,           0x0 },
++    [VIRT_PCIE_MMIO] =   { 0x40000000,    0x40000000 },
++    [VIRT_PCIE_PIO] =    { 0x03000000,    0x00010000 },
++    [VIRT_PCIE_ECAM] =   { 0x30000000,    0x10000000 },
+ };
+ 
+ static uint64_t load_kernel(const char *kernel_filename)
+@@ -98,6 +103,51 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
+     return *start + size;
+ }
+ 
++static void create_pcie_irq_map(void *fdt, char *nodename,
++                                uint32_t plic_phandle)
++{
++    int pin, dev;
++    uint32_t
++        full_irq_map[GPEX_NUM_IRQS * GPEX_NUM_IRQS * FDT_INT_MAP_WIDTH] = {};
++    uint32_t *irq_map = full_irq_map;
++
++    /* This code creates a standard swizzle of interrupts such that
++     * each device's first interrupt is based on it's PCI_SLOT number.
++     * (See pci_swizzle_map_irq_fn())
++     *
++     * We only need one entry per interrupt in the table (not one per
++     * possible slot) seeing the interrupt-map-mask will allow the table
++     * to wrap to any number of devices.
++     */
++    for (dev = 0; dev < GPEX_NUM_IRQS; dev++) {
++        int devfn = dev * 0x8;
++
++        for (pin = 0; pin < GPEX_NUM_IRQS; pin++) {
++            int irq_nr = PCIE_IRQ + ((pin + PCI_SLOT(devfn)) % GPEX_NUM_IRQS);
++            int i = 0;
++
++            irq_map[i] = cpu_to_be32(devfn << 8);
++
++            i += FDT_PCI_ADDR_CELLS;
++            irq_map[i] = cpu_to_be32(pin + 1);
++
++            i += FDT_PCI_INT_CELLS;
++            irq_map[i++] = cpu_to_be32(plic_phandle);
++
++            i += FDT_PLIC_ADDR_CELLS;
++            irq_map[i] = cpu_to_be32(irq_nr);
++
++            irq_map += FDT_INT_MAP_WIDTH;
++        }
++    }
++
++    qemu_fdt_setprop(fdt, nodename, "interrupt-map",
++                     full_irq_map, sizeof(full_irq_map));
++
++    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-map-mask",
++                           0x1800, 0, 0, 0x7);
++}
++
+ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+     uint64_t mem_size, const char *cmdline)
+ {
+@@ -203,7 +253,10 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+     nodename = g_strdup_printf("/soc/interrupt-controller@%lx",
+         (long)memmap[VIRT_PLIC].base);
+     qemu_fdt_add_subnode(fdt, nodename);
+-    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 1);
++    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells",
++                           FDT_PLIC_ADDR_CELLS);
++    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
++                          FDT_PLIC_INT_CELLS);
+     qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
+     qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
+     qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+@@ -233,6 +286,33 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         g_free(nodename);
      }
  
-@@ -511,8 +513,8 @@ void riscv_cpu_do_interrupt(CPUState *cs)
++    nodename = g_strdup_printf("/soc/pci@%lx",
++        (long) memmap[VIRT_PCIE_ECAM].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells",
++                           FDT_PCI_ADDR_CELLS);
++    qemu_fdt_setprop_cells(fdt, nodename, "#interrupt-cells",
++                           FDT_PCI_INT_CELLS);
++    qemu_fdt_setprop_cells(fdt, nodename, "#size-cells", 0x2);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible",
++                            "pci-host-ecam-generic");
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
++    qemu_fdt_setprop_cell(fdt, nodename, "linux,pci-domain", 0);
++    qemu_fdt_setprop_cells(fdt, nodename, "bus-range", 0,
++                           memmap[VIRT_PCIE_ECAM].base /
++                               PCIE_MMCFG_SIZE_MIN - 1);
++    qemu_fdt_setprop(fdt, nodename, "dma-coherent", NULL, 0);
++    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0, memmap[VIRT_PCIE_ECAM].base,
++                           0, memmap[VIRT_PCIE_ECAM].size);
++    qemu_fdt_setprop_sized_cells(fdt, nodename, "ranges",
++        1, FDT_PCI_RANGE_IOPORT, 2, 0,
++        2, memmap[VIRT_PCIE_PIO].base, 2, memmap[VIRT_PCIE_PIO].size,
++        1, FDT_PCI_RANGE_MMIO,
++        2, memmap[VIRT_PCIE_MMIO].base,
++        2, memmap[VIRT_PCIE_MMIO].base, 2, memmap[VIRT_PCIE_MMIO].size);
++    create_pcie_irq_map(fdt, nodename, plic_phandle);
++    g_free(nodename);
++
+     nodename = g_strdup_printf("/test@%lx",
+         (long)memmap[VIRT_TEST].base);
+     qemu_fdt_add_subnode(fdt, nodename);
+@@ -263,6 +343,47 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+     return fdt;
+ }
  
-         if (hasbadaddr) {
-             if (RISCV_DEBUG_INTERRUPT) {
--                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld
--                    ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->badaddr);
-+                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld ": badaddr 0x"
-+                    TARGET_FMT_lx "\n", env->mhartid, env->badaddr);
-             }
-             env->sbadaddr = env->badaddr;
-         } else {
-@@ -536,8 +538,8 @@ void riscv_cpu_do_interrupt(CPUState *cs)
++
++static inline DeviceState *gpex_pcie_init(MemoryRegion *sys_mem,
++                                          hwaddr ecam_base, hwaddr ecam_size,
++                                          hwaddr mmio_base, hwaddr mmio_size,
++                                          hwaddr pio_base,
++                                          DeviceState *plic, bool link_up)
++{
++    DeviceState *dev;
++    MemoryRegion *ecam_alias, *ecam_reg;
++    MemoryRegion *mmio_alias, *mmio_reg;
++    qemu_irq irq;
++    int i;
++
++    dev = qdev_create(NULL, TYPE_GPEX_HOST);
++
++    qdev_init_nofail(dev);
++
++    ecam_alias = g_new0(MemoryRegion, 1);
++    ecam_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
++    memory_region_init_alias(ecam_alias, OBJECT(dev), "pcie-ecam",
++                             ecam_reg, 0, ecam_size);
++    memory_region_add_subregion(get_system_memory(), ecam_base, ecam_alias);
++
++    mmio_alias = g_new0(MemoryRegion, 1);
++    mmio_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
++    memory_region_init_alias(mmio_alias, OBJECT(dev), "pcie-mmio",
++                             mmio_reg, mmio_base, mmio_size);
++    memory_region_add_subregion(get_system_memory(), mmio_base, mmio_alias);
++
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 2, pio_base);
++
++    for (i = 0; i < GPEX_NUM_IRQS; i++) {
++        irq = qdev_get_gpio_in(plic, PCIE_IRQ + i);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, irq);
++        gpex_set_irq_num(GPEX_HOST(dev), i, PCIE_IRQ + i);
++    }
++
++    return dev;
++}
++
+ static void riscv_virt_board_init(MachineState *machine)
+ {
+     const struct MemmapEntry *memmap = virt_memmap;
+@@ -385,6 +506,14 @@ static void riscv_virt_board_init(MachineState *machine)
+             qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
+     }
  
-         if (hasbadaddr) {
-             if (RISCV_DEBUG_INTERRUPT) {
--                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld
--                    ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->badaddr);
-+                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld ": badaddr 0x"
-+                    TARGET_FMT_lx "\n", env->mhartid, env->badaddr);
-             }
-             env->mbadaddr = env->badaddr;
-         } else {
++    gpex_pcie_init(system_memory,
++                         memmap[VIRT_PCIE_ECAM].base,
++                         memmap[VIRT_PCIE_ECAM].size,
++                         memmap[VIRT_PCIE_MMIO].base,
++                         memmap[VIRT_PCIE_MMIO].size,
++                         memmap[VIRT_PCIE_PIO].base,
++                         DEVICE(s->plic), true);
++
+     serial_mm_init(system_memory, memmap[VIRT_UART0].base,
+         0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
+         serial_hd(0), DEVICE_LITTLE_ENDIAN);
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 2b2e6dd4ea6b..f12deaebd697 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -38,13 +38,17 @@ enum {
+     VIRT_PLIC,
+     VIRT_UART0,
+     VIRT_VIRTIO,
+-    VIRT_DRAM
++    VIRT_DRAM,
++    VIRT_PCIE_MMIO,
++    VIRT_PCIE_PIO,
++    VIRT_PCIE_ECAM
+ };
+ 
+ enum {
+     UART0_IRQ = 10,
+     VIRTIO_IRQ = 1, /* 1 to 8 */
+     VIRTIO_COUNT = 8,
++    PCIE_IRQ = 0x20, /* 32 to 35 */
+     VIRTIO_NDEV = 0x35 /* Arbitrary maximum number of interrupts */
+ };
+ 
+@@ -62,6 +66,13 @@ enum {
+ #define VIRT_PLIC_CONTEXT_BASE 0x200000
+ #define VIRT_PLIC_CONTEXT_STRIDE 0x1000
+ 
++#define FDT_PCI_ADDR_CELLS    3
++#define FDT_PCI_INT_CELLS     1
++#define FDT_PLIC_ADDR_CELLS   0
++#define FDT_PLIC_INT_CELLS    1
++#define FDT_INT_MAP_WIDTH     (FDT_PCI_ADDR_CELLS + FDT_PCI_INT_CELLS + 1 + \
++                               FDT_PLIC_ADDR_CELLS + FDT_PLIC_INT_CELLS)
++
+ #if defined(TARGET_RISCV32)
+ #define VIRT_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
+ #elif defined(TARGET_RISCV64)
 -- 
 2.18.1
