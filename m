@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53331)
+Received: from eggs.gnu.org ([208.118.235.92]:36154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gc2Fu-0003La-Ej
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 01:01:26 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gc32T-0004N2-Iz
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 01:51:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gc2Fq-0007tG-9D
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 01:01:22 -0500
-Received: from mga02.intel.com ([134.134.136.20]:64941)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
-	id 1gc2Fp-0007nK-VM
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 01:01:18 -0500
-Date: Wed, 26 Dec 2018 13:58:00 +0800
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-Message-ID: <20181226055800.52gwpncvif33a7fd@linux.intel.com>
-References: <20181219055743.okeszdqlqkg7tagk@linux.intel.com>
-	<20181219100355-mutt-send-email-mst@kernel.org>
-	<20181220054921.sk5wnmlo2vvjgcs6@linux.intel.com>
-	<20181220132644-mutt-send-email-mst@kernel.org>
-	<20181221161920.45fnlmcp7aqu6ibi@linux.intel.com>
-	<20181221120657-mutt-send-email-mst@kernel.org>
-	<20181221173401.cb5vgokgxopnnpes@linux.intel.com>
-	<20181221130713-mutt-send-email-mst@kernel.org>
-	<20181222004137.b7hj623kmzsq5ttv@linux.intel.com>
-	<20181225115658-mutt-send-email-mst@kernel.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1gc32P-0003VK-94
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 01:51:33 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gc32O-0003IR-RB
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 01:51:29 -0500
+Received: by mail-pf1-x441.google.com with SMTP id g62so7510296pfd.12
+	for <qemu-devel@nongnu.org>; Tue, 25 Dec 2018 22:51:14 -0800 (PST)
+References: <20181214174233.18027-1-cota@braap.org>
+	<20181214174233.18027-3-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <319ebe3d-7035-cf19-013c-114fcef8ccb1@linaro.org>
+Date: Wed, 26 Dec 2018 17:51:06 +1100
 MIME-Version: 1.0
+In-Reply-To: <20181214174233.18027-3-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181225115658-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] intel-iommu: extend VTD emulation
- to allow 57-bit IOVA address width.
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] tcg: introduce dynamic TLB sizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,91 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Tue, Dec 25, 2018 at 12:00:08PM -0500, Michael S. Tsirkin wrote:
-> On Sat, Dec 22, 2018 at 08:41:37AM +0800, Yu Zhang wrote:
-> > On Fri, Dec 21, 2018 at 01:10:13PM -0500, Michael S. Tsirkin wrote:
-> > > On Sat, Dec 22, 2018 at 01:34:01AM +0800, Yu Zhang wrote:
-> > > > On Fri, Dec 21, 2018 at 12:15:26PM -0500, Michael S. Tsirkin wrote:
-> > > > > On Sat, Dec 22, 2018 at 12:19:20AM +0800, Yu Zhang wrote:
-> > > > > > > I'd like to avoid poking at the CPU from VTD code. That's all.
-> > > > > > 
-> > > > > > OK. So for the short term，how about I remove the check of host cpu, and add a TODO
-> > > > > > in the comments in vtd_decide_config()? 
-> > > > > 
-> > > > > My question would be what happens on an incorrect use?
-> > > > 
-> > > > I believe the vfio_dma_map will return failure for an incorrect use.
-> > > > 
-> > > > > And how does user figure out which values to set?
-> > > > 
-> > > > Well, for now I don't think user can figure out. E.g. if we expose a vIOMMU with
-> > > > 48-bit IOVA capability, yet host only supports 39-bit IOVA, vfio shall return failure,
-> > > > but the user does not know whose fault it is.
-> > > > > 
-> > > > > > As to the check against hardware IOMMU, Peter once had a proposal in
-> > > > > > http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg02281.html
-> > > > > > 
-> > > > > > Do you have any comment or suggestion on Peter's proposal?
-> > > > > 
-> > > > > Sounds reasonable to me. Do we do it on vfio attach or unconditionally?
-> > > > > 
-> > > > 
-> > > > I guess on vfio attach? Will need more thinking in it.
-> > > 
-> > > 
-> > > Things like live migration (e.g. after hot removal of the vfio device)
-> > > are also concerns.
-> > 
-> > Sorry, why live migration shall be a problem? I mean, if the DMA address
-> > width of vIOMMU does not match the host IOMMU's, we can just stop creating
-> > the VM, there's no live migration. 
-> 
-> I don't see code like this though.
-> 
-> Also management needs to somehow be able to figure out that migration
-> will fail. It's not nice to transfer all memory and then have it fail
-> when viommu is migrated.  So from that POV a flag is better. It can be
-> validated agains host capabilities.
-> 
-> We can still have something like aw=host just like cpu host.
+On 12/15/18 4:42 AM, Emilio G. Cota wrote:
+> +#if TCG_TARGET_IMPLEMENTS_DYN_TLB
+> +#define CPU_TLB_DYN_MIN_BITS 6
+> +#define CPU_TLB_DYN_DEFAULT_BITS 8
+> +/*
+> + * Assuming TARGET_PAGE_BITS==12, with 2**22 entries we can cover 2**(22+12) ==
+> + * 2**34 == 16G of address space. This is roughly what one would expect a
+> + * TLB to cover in a modern (as of 2018) x86_64 CPU. For instance, Intel
+> + * Skylake's Level-2 STLB has 16 1G entries.
+> + */
+> +#define CPU_TLB_DYN_MAX_BITS 22
 
-Well, I think vIOMMU's requirement is kind of different:
-1> the vIOMMU could be an emulated one, and there can be no physical
-IOMMU underneath. And the emulated device can still use this vIOMMU;
-2> there might be multiple physical IOMMUs on one platform, I am not
-sure if all these IOMMUs will have the same capability setting.
+For 32-bit hosts, we need to limit this to (32 - TARGET_PAGE_BITS) so that we
+do not require a double-word shift when implementing the tlb load.  We probably
+want to restrict it even further because a 32-bit host may well not have 2**27
+bytes of available memory.
 
-So I think we should have a more generic solution, to check the host
-capability, e.g. like Kevin's and Peter's suggestion. It's not just
-about 5-level vIOMMU, existing 4-level vIOMMU and future virtual SVM
-have similar requirement. :)
+For 64-bit hosts, we should limit this to (TARGET_VIRT_ADDR_SPACE_BITS -
+TARGET_PAGE_BITS) so that we do not grow the tlb past the guest's address space.
 
-> 
-> > > 
-> > > > > 
-> > > > > > I still do not quite know
-> > > > > > how to do it for now...
-> > > > > > 
-> > > > > > [...]
-> > > > > > 
-> > > > > > 
-> > > > > > B.R.
-> > > > > > Yu
-> > > > > 
-> > > > > 
-> > > > > 
-> > > > > -- 
-> > > > > MST
-> > > > 
-> > > > B.R.
-> > > > Yu
-> > 
-> > B.R.
-> > Yu
-> 
+> +    env->tlb_table[mmu_idx] = g_new(CPUTLBEntry, new_size);
+> +    env->iotlb[mmu_idx] = g_new(CPUIOTLBEntry, new_size);
 
-B.R.
-Yu
+For 32-bit hosts, we should probably be prepared for this to fail; see above re
+large tlb sizes.  If it fails, we should be able to go back to the previous tlb
+size, since we just freed that memory.
+
+
+r~
