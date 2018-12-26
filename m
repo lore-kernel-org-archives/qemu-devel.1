@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51347)
+Received: from eggs.gnu.org ([208.118.235.92]:51957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gc4UL-0000Q7-IC
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 03:24:26 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gc4Wk-0003Wq-CO
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 03:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gc4UH-0007qf-Jc
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 03:24:25 -0500
-Resent-Message-Id: <E1gc4UH-0007qf-Jc@eggs.gnu.org>
+	(envelope-from <no-reply@patchew.org>) id 1gc4Wh-0001Sq-8c
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 03:26:54 -0500
+Resent-Message-Id: <E1gc4Wh-0001Sq-8c@eggs.gnu.org>
 In-Reply-To: <20181221124410.11920-1-pbonzini@redhat.com>
-Message-ID: <154581264856.18047.14025269685634947747@02a1dbf831e2>
+Message-ID: <154581279696.18047.281866084588342317@02a1dbf831e2>
 Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 From: no-reply@patchew.org
-Date: Wed, 26 Dec 2018 00:24:09 -0800 (PST)
+Date: Wed, 26 Dec 2018 00:26:38 -0800 (PST)
 Subject: Re: [Qemu-devel] [PATCH] i386: mark the 'INTEL_PT' CPUID bit as
  unmigratable
 List-Id: <qemu-devel.nongnu.org>
@@ -29,24 +29,21 @@ Cc: fam@euphon.net, qemu-devel@nongnu.org, ehabkost@redhat.com, qemu-stable@nong
 
 UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIyMTEyNDQxMC4xMTky
 MC0xLXBib256aW5pQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
-b2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
-b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
-bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2Vu
-dG9zNyBTSE9XX0VOVj0xIEo9OAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKbGlicG1lbSBzdXBw
-b3J0ICAgbm8KbGlidWRldiAgICAgICAgICAgbm8KCldBUk5JTkc6IFVzZSBvZiBTREwgMS4yIGlz
-IGRlcHJlY2F0ZWQgYW5kIHdpbGwgYmUgcmVtb3ZlZCBpbgpXQVJOSU5HOiBmdXR1cmUgcmVsZWFz
-ZXMuIFBsZWFzZSBzd2l0Y2ggdG8gdXNpbmcgU0RMIDIuMAoKTk9URTogY3Jvc3MtY29tcGlsZXJz
-IGVuYWJsZWQ6ICAnY2MnCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5t
-YWsudG1wCi0tLQogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vdHJhbnNsYXRl
-Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90YXJnZXQvYXJtL29wX2hlbHBlci5vCiAgQ0Mg
-ICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9oZWxwZXIubwovdG1wL3FlbXUtdGVzdC9z
-cmMvdGFyZ2V0L2kzODYvY3B1LmM6MTAxNTo5OiBlcnJvcjogdW5rbm93biBmaWVsZCAndW5taWdy
-YXRhYmxlX2ZlYXR1cmVzJyBzcGVjaWZpZWQgaW4gaW5pdGlhbGl6ZXIKICAgICAgICAgLnVubWln
-cmF0YWJsZV9mZWF0dXJlcyA9IENQVUlEXzdfMF9FQlhfSU5URUxfUFQsCiAgICAgICAgIF4KbWFr
-ZVsxXTogKioqIFt0YXJnZXQvaTM4Ni9jcHUub10gRXJyb3IgMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxODEyMjExMjQ0MTAuMTE5MjAt
-MS1wYm9uemluaUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9
-bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
+cmEgU0hPV19FTlY9MSBKPTgKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvaHcvbWlzYy9jYnVzLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L3RyYWNl
+L2dlbmVyYXRlZC1oZWxwZXJzLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2V4
+eW5vczQyMTBfcG11Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9pMzg2L2NwdS5jOjEwMTU6
+MTA6IGVycm9yOiAnRmVhdHVyZVdvcmRJbmZvIHtha2Egc3RydWN0IEZlYXR1cmVXb3JkSW5mb30n
+IGhhcyBubyBtZW1iZXIgbmFtZWQgJ3VubWlncmF0YWJsZV9mZWF0dXJlcyc7IGRpZCB5b3UgbWVh
+biAndW5taWdyYXRhYmxlX2ZsYWdzJz8KICAgICAgICAgLnVubWlncmF0YWJsZV9mZWF0dXJlcyA9
+IENQVUlEXzdfMF9FQlhfSU5URUxfUFQsCiAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn4K
+ICAgICAgICAgIHVubWlncmF0YWJsZV9mbGFncwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
+YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxODEyMjExMjQ0MTAuMTE5MjAtMS1wYm9uemlu
+aUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
