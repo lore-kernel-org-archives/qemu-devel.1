@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47742)
+Received: from eggs.gnu.org ([208.118.235.92]:47805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gcCqw-0003k2-E0
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:19 -0500
+	(envelope-from <palmer@sifive.com>) id 1gcCrB-00040l-F0
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gcCqs-0007cr-HR
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:17 -0500
-Received: from mail-qt1-x82d.google.com ([2607:f8b0:4864:20::82d]:44713)
+	(envelope-from <palmer@sifive.com>) id 1gcCrA-0007nh-JC
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:33 -0500
+Received: from mail-qt1-x833.google.com ([2607:f8b0:4864:20::833]:36336)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gcCqs-0007cE-By
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:14 -0500
-Received: by mail-qt1-x82d.google.com with SMTP id n32so17801551qte.11
-	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 09:20:13 -0800 (PST)
-Date: Wed, 26 Dec 2018 09:19:51 -0800
-Message-Id: <20181226172005.26990-1-palmer@sifive.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gcCr2-0007hJ-FN
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:20:27 -0500
+Received: by mail-qt1-x833.google.com with SMTP id t13so17843971qtn.3
+	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 09:20:21 -0800 (PST)
+Date: Wed, 26 Dec 2018 09:19:55 -0800
+Message-Id: <20181226172005.26990-5-palmer@sifive.com>
+In-Reply-To: <20181226172005.26990-1-palmer@sifive.com>
+References: <20181226172005.26990-1-palmer@sifive.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Subject: [Qemu-devel] [PULL] RISC-V Changes for 3.2, Part 1
+Subject: [Qemu-devel] [PULL 04/14] riscv: Enable VGA and PCIE_VGA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +26,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>
 
-The following changes since commit b72566a4ffaddbc0c0c1f6f5ee91b42ab13ff429:
+From: Alistair Francis <Alistair.Francis@wdc.com>
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-patches-pull-request' into staging (2018-12-19 15:31:02 +0000)
+Enable compile support for VGA devices. This allows the user to conenct
+a display by adding '-device bochs-display -display sdl' to their
+command line argument.
 
-are available in the Git repository at:
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+Tested-by: Andrea Bolognani <abologna@redhat.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ default-configs/riscv32-softmmu.mak | 3 +++
+ default-configs/riscv64-softmmu.mak | 3 +++
+ 2 files changed, 6 insertions(+)
 
-  git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-3.2-part1
-
-for you to fetch changes up to 7b91ae7d7944056c5e8045342e4039e978e43c82:
-
-  MAINTAINERS: Mark RISC-V as Supported (2018-12-21 07:57:15 -0800)
-
-----------------------------------------------------------------
-RISC-V Changes for 3.2, Part 1
-
-This pull request contains the first set of RISC-V patches I'd like to
-target for the 3.2 development cycle.  It's really just a collection of
-bug fixes with one major new feature: PCIe can now be attached to RISC-V
-guests.
-
-This has passed my usual test of booting the latest Linux RC into a
-Fedora disk image on the virt machine.
-
-----------------------------------------------------------------
-Alistair Francis (4):
-      hw/riscv/virt: Increase the number of interrupts
-      hw/riscv/virt: Adjust memory layout spacing
-      hw/riscv/virt: Connect the gpex PCIe
-      riscv: Enable VGA and PCIE_VGA
-
-Anup Patel (3):
-      sifive_u: Add clock DT node for GEM ethernet
-      sifive_u: Set 'clock-frequency' DT property for SiFive UART
-      target/riscv/pmp.c: Fix pmp_decode_napot()
-
-Mao Zhongyi (1):
-      riscv/cpu: use device_class_set_parent_realize
-
-Michael Clark (4):
-      RISC-V: Add hartid and \n to interrupt logging
-      RISC-V: Fix CLINT timecmp low 32-bit writes
-      RISC-V: Fix PLIC pending bitfield reads
-      RISC-V: Enable second UART on sifive_e and sifive_u
-
-Nathaniel Graff (1):
-      sifive_uart: Implement interrupt pending register
-
-Palmer Dabbelt (1):
-      MAINTAINERS: Mark RISC-V as Supported
-
- MAINTAINERS                         |   2 +-
- default-configs/riscv32-softmmu.mak |   8 +-
- default-configs/riscv64-softmmu.mak |   8 +-
- hw/riscv/sifive_clint.c             |   8 +-
- hw/riscv/sifive_e.c                 |   5 +-
- hw/riscv/sifive_plic.c              |   2 +-
- hw/riscv/sifive_u.c                 |  25 +++++-
- hw/riscv/sifive_uart.c              |  24 ++++--
- hw/riscv/virt.c                     | 147 +++++++++++++++++++++++++++++++++---
- include/hw/riscv/sifive_u.h         |   3 +-
- include/hw/riscv/sifive_uart.h      |   3 +
- include/hw/riscv/virt.h             |  15 +++-
- target/riscv/cpu.c                  |   4 +-
- target/riscv/cpu_helper.c           |  18 +++--
- target/riscv/pmp.c                  |   2 +-
- 15 files changed, 231 insertions(+), 43 deletions(-)
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+index c5ea36cba597..dbc93982848a 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -8,3 +8,6 @@ CONFIG_VIRTIO_MMIO=y
+ CONFIG_CADENCE=y
+ 
+ CONFIG_PCI_GENERIC=y
++
++CONFIG_VGA=y
++CONFIG_VGA_PCI=y
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+index c5ea36cba597..dbc93982848a 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -8,3 +8,6 @@ CONFIG_VIRTIO_MMIO=y
+ CONFIG_CADENCE=y
+ 
+ CONFIG_PCI_GENERIC=y
++
++CONFIG_VGA=y
++CONFIG_VGA_PCI=y
+-- 
+2.18.1
