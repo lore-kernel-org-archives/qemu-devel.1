@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51373)
+Received: from eggs.gnu.org ([208.118.235.92]:56378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gc8jj-0005r8-KI
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 07:56:36 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gcBJj-0007LI-9P
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 10:41:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gc8jg-0007DW-Fh
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 07:56:35 -0500
-Received: from mail-wm1-f44.google.com ([209.85.128.44]:52301)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gc8jg-0007BU-8c
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 07:56:32 -0500
-Received: by mail-wm1-f44.google.com with SMTP id m1so14515417wml.2
-	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 04:56:31 -0800 (PST)
-References: <20181226003722.31257-1-plaes@plaes.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8d71a38b-f907-c959-0bb5-aed5b62f5652@redhat.com>
-Date: Wed, 26 Dec 2018 13:56:28 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gcBJe-0000Nn-Bq
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 10:41:55 -0500
+Resent-Message-Id: <E1gcBJe-0000Nn-Bq@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21751)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gcBJe-0000KF-2r
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 10:41:50 -0500
+In-Reply-To: <cover.1545425136.git.yaroslav.isakov@gmail.com>
+Message-ID: <154583888573.18047.18142191213508130030@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20181226003722.31257-1-plaes@plaes.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] qom: Include qemu/fprintf-fn.h in cpu.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 26 Dec 2018 07:41:26 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/3] Allow hw/audio drivers to pass raw DB
+ values to audio/ drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Priit Laes <plaes@plaes.org>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: yaroslav.isakov@gmail.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-On 12/26/18 1:37 AM, Priit Laes wrote:
-> QOM cpu.h uses fprintf_function which requires Qemu's
-> qemu/fprintf-fn.h header. Include it.
-> 
-> Signed-off-by: Priit Laes <plaes@plaes.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  include/qom/cpu.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 1396f53e5b..6d1ba53d72 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -26,6 +26,7 @@
->  #include "exec/memattrs.h"
->  #include "qapi/qapi-types-run-state.h"
->  #include "qemu/bitmap.h"
-> +#include "qemu/fprintf-fn.h"
->  #include "qemu/rcu_queue.h"
->  #include "qemu/queue.h"
->  #include "qemu/thread.h"
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTQ1NDI1MTM2Lmdp
+dC55YXJvc2xhdi5pc2Frb3ZAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpNZXNzYWdlLWlkOiBjb3Zlci4xNTQ1NDI1MTM2LmdpdC55YXJvc2xh
+di5pc2Frb3ZAZ21haWwuY29tClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BB
+VENIIDAvM10gQWxsb3cgaHcvYXVkaW8gZHJpdmVycyB0byBwYXNzIHJhdyBEQiB2YWx1ZXMgdG8g
+YXVkaW8vIGRyaXZlcnMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
+U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
+aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
+QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
+LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
+c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
+bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
+ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKYTU4MWZhYSBJZiByYXcgREIgdmFsdWVzIGFyZSBrbm93biwgdXNl
+IHRoZW0gaW4gcGFhdWRpbwpkZTc4MjMwIFBhc3MgcmF3IERCIHZhbHVlcyBmcm9tIGhkYS1jb2Rl
+Yy5jIHRvIGF1ZGlvIGRyaXZlcgo0YmJjMTZhIEFsbG93IGF1ZGlvIGRyaXZlciB0byBwYXNzIERC
+IHZhbHVlIHRvIHVuZGVybHlpbmcgZHJpdmVycwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
+bmcgUEFUQ0ggMS8zOiBBbGxvdyBhdWRpbyBkcml2ZXIgdG8gcGFzcyBEQiB2YWx1ZSB0byB1bmRl
+cmx5aW5nIGRyaXZlcnMuLi4KRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJzsnIChj
+dHg6VnhWKQojOTU6IEZJTEU6IGF1ZGlvL21peGVuZy5oOjM1OgorICAgICAgICAgICAgICAgICAg
+ICAgICBib29sIGRiX2tub3duOyBkb3VibGUgcl9kYjsgZG91YmxlIGxfZGI7fTsKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
+dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxOTMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8zOiBQYXNzIHJh
+dyBEQiB2YWx1ZXMgZnJvbSBoZGEtY29kZWMuYyB0byBhdWRpbyBkcml2ZXIuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMy8zOiBJZiByYXcgREIgdmFsdWVzIGFyZSBrbm93biwgdXNlIHRoZW0gaW4gcGFhdWRp
+by4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzIzOiBGSUxFOiBhdWRpby9wYWF1
+ZGlvLmM6NzMxOgorICAgICAgICAgICAgICAgIHYudmFsdWVzWzBdID0gKChQQV9WT0xVTUVfTk9S
+TSAtIFBBX1ZPTFVNRV9NVVRFRCkgKiBzdy0+dm9sLmwpIC8gVUlOVDMyX01BWDsKCkVSUk9SOiBs
+aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IGF1ZGlvL3BhYXVkaW8uYzo3MzI6Cisg
+ICAgICAgICAgICAgICAgdi52YWx1ZXNbMV0gPSAoKFBBX1ZPTFVNRV9OT1JNIC0gUEFfVk9MVU1F
+X01VVEVEKSAqIHN3LT52b2wucikgLyBVSU5UMzJfTUFYOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdh
+cm5pbmdzLCAxNSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy9jb3Zlci4xNTQ1NDI1MTM2LmdpdC55YXJvc2xhdi5pc2Frb3ZAZ21haWwuY29tL3Rlc3Rpbmcu
+Y2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
