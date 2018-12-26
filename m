@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46614)
+Received: from eggs.gnu.org ([208.118.235.92]:46619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcCmT-0006dT-Gt
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcCmT-0006dX-P1
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:15:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcCmQ-0004mN-Ne
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcCmP-0004lX-H3
 	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:15:41 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:39453 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:39303 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gcCmQ-0004l2-BN
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:15:38 -0500
+	id 1gcCmP-0004jh-6k
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 12:15:37 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Wed, 26 Dec 2018 18:15:12 +0100
-Message-Id: <1545844514-1854-3-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1545844514-1854-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1545844514-1854-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/4] MAINTAINERS: target/mips: Add filter
- for mips in email subjects
+Date: Wed, 26 Dec 2018 18:15:10 +0100
+Message-Id: <1545844514-1854-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] MAINTAINERS: Clean up MIPS sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,26 +27,28 @@ Cc: aurelien@aurel32.net, pburton@wavecomp.com, hpoussin@reactos.org, jhogan@ker
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add ability to redirect mails (sent to qemu-devel) containing
-"mips" in the subject line to MIPS maintainers and reviewers.
+Clean up main target/mips section. Add some new files, add email
+filter, and reorder items. Also, add Aleksandar Rikalo as a reviewer
+for all MIPS content.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+v2->v3:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 374e4c2..bf82eb3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -221,6 +221,7 @@ F: tests/tcg/mips/
- F: disas/mips.c
- F: disas/nanomips.h
- F: disas/nanomips.cpp
-+K: ^Subject:.*(?i)mips
-=20
- Moxie
- M: Anthony Green <green@moxielogic.com>
---=20
+  - add patch on new MIPS reviewer Aleksandar Rikalo
+
+v1->v2:
+
+  - fixed typo in a commit message
+  - removed unnecessary "?" in a line for filtering email subjects
+
+Aleksandar Markovic (4):
+  MAINTAINERS: target/mips: Add MIPS files under default-configs
+    directory
+  MAINTAINERS: target/mips: Add filter for mips in email subjects
+  MAINTAINERS: target/mips: Reorder items alphabetically
+  MAINTAINERS: Add Aleksandar Rikalo as a reviewer for MIPS content
+
+ MAINTAINERS | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+-- 
 2.7.4
