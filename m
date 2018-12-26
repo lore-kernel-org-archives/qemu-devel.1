@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:49540)
+Received: from eggs.gnu.org ([208.118.235.92]:37481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gcI5j-0006kU-NI
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 17:55:56 -0500
+	(envelope-from <liebrecht@grossmann-venter.com>) id 1gcIos-0001SM-Rq
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 18:42:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gcI5e-0001aM-Jw
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 17:55:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gcI5e-0001ME-Dm
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 17:55:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gcI5a-0006YG-VT
-	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 22:55:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D7E802E80CB
-	for <qemu-devel@nongnu.org>; Wed, 26 Dec 2018 22:55:46 +0000 (UTC)
+	(envelope-from <liebrecht@grossmann-venter.com>) id 1gcIop-0005Bi-M1
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 18:42:34 -0500
+Received: from server54-2.web-hosting.com ([198.54.126.118]:34024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liebrecht@grossmann-venter.com>)
+	id 1gcIop-0004wr-Be
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 18:42:31 -0500
+Received: from [::1] (port=51784 helo=server54.web-hosting.com)
+	by server54.web-hosting.com with esmtpa (Exim 4.91)
+	(envelope-from <liebrecht@grossmann-venter.com>) id 1gcIoa-000qvC-DY
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 18:42:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Dec 2018 22:50:15 -0000
-From: Rob Maskell <1798451@bugs.launchpad.net>
-Reply-To: Bug 1798451 <1798451@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153980387714.3465.12419240219281347614.malonedeb@soybean.canonical.com>
-Message-Id: <154586461575.24592.1123993607220490494.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1798451] Re: MMX emulation is missing on HVF
- Acceleration
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Wed, 26 Dec 2018 18:42:16 -0500
+From: liebrecht@grossmann-venter.com
+In-Reply-To: <665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
+References: <b0d70556767952dc739454d074bdab52@grossmann-venter.com>
+	<665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
+Message-ID: <15cf371c804f36f0b03e008f08d356d8@grossmann-venter.com>
+Subject: Re: [Qemu-devel] Qemu the right way.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,55 +35,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Still an issue on 3.1.0 and now Mojave
 
--- =
+> 
+> Try to run QEMU with "-smp 4".
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1798451
+Thomas thank you for your reply.
+I will try each of your suggestions in turn.
 
-Title:
-  MMX emulation is missing on HVF Acceleration
+-smp 4 did help and this time i could configure 2 cpus in windows.
 
-Status in QEMU:
-  New
+Now for a very important question.
+If hardware virtualization was not switched on in bios will qemu refuse 
+to create more cpus? I just want to know if there are not bogus software 
+cpus or cores created by qemu and that it actually checks it can get 
+real cores from the machine and make it available to the host.
 
-Bug description:
-  Robs-MacBook-Pro-2:~ robmaskell$ qemu-system-x86_64 --version
-  QEMU emulator version 3.0.0
+Second question. In the past qemu was lightning fast. However with this 
+newer qemu windows 7 is very slow. It takes about 1 minute to open an 
+application. What can slow it dow so much ? This happens with or without 
+the smp switch. It seems there is some polling botlleneck if i move the 
+mouse in circles in the windows guest, it would freeze for four seconds 
+and then work for about 6 seconds then freeze again etc. What is that 
+about.?
 
-  Host: MacOS - 10.13.6
-    Model Name:	MacBook Pro
-    Model Identifier:	MacBookPro14,3
-    Processor Name:	Intel Core i7
-    Processor Speed:	2.8 GHz
-    Number of Processors:	1
-    Total Number of Cores:	4
-    L2 Cache (per Core):	256 KB
-    L3 Cache:	6 MB
-    Memory:	16 GB
-
-  Guest OS: Elementary Linux Loki 0.4.1, patched up to date
-
-  Command used to start QEMU:
-
-  qemu-system-x86_64 \
-    -name ElementaryLokiDev \
-    -machine pc,accel=3Dhvf \
-    -cpu max \
-    -smp cpus=3D2,sockets=3D2,cores=3D1,threads=3D1,maxcpus=3D2 \
-    -numa node,nodeid=3D0 \
-    -numa cpu,node-id=3D0,socket-id=3D0 -numa cpu,node-id=3D0,socket-id=3D1=
- \
-    -m 8G \
-    -vga vmware \
-    -hda e4.qcow2
-
-  Symptoms: Started without the -smp / -numa commands to install the OS,
-  then added -smp / -numa and the machine boots and lscpu reports extra
-  cpu as expected. Restart VM and it hangs on startup. Remove -smp /
-  -numa and machine starts again.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1798451/+subscriptions
+What is the official posting rules in this forum, top post or bottom 
+post ? Thanks
