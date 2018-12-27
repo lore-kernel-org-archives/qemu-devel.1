@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53316)
+Received: from eggs.gnu.org ([208.118.235.92]:55838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gcbG3-0001z1-5A
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 14:23:54 -0500
+	(envelope-from <prvs=8921f0682=jancraig@amazon.com>)
+	id 1gcbTa-0006QG-QM
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 14:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gcbFy-0002oX-U5
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 14:23:51 -0500
-Received: from mail-eopbgr710133.outbound.protection.outlook.com
-	([40.107.71.133]:15501
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gcbFy-0002n0-JN
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 14:23:46 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 27 Dec 2018 19:23:25 +0000
-Message-ID: <BN6PR2201MB12515E6A3326FD0F6A769E06C6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(envelope-from <prvs=8921f0682=jancraig@amazon.com>)
+	id 1gcbTX-0000cS-8V
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 14:37:50 -0500
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:55630)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=8921f0682=jancraig@amazon.com>)
+	id 1gcbTW-0000XF-Sm
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 14:37:47 -0500
+From: "Janeczek, Craig" <jancraig@amazon.com>
+Date: Thu, 27 Dec 2018 19:37:40 +0000
+Message-ID: <e23100879dcf440180ca19debf324d37@EX13D12UEA003.ant.amazon.com>
 References: <20181217200444.14812-1-aleksandar.markovic@rt-rk.com>
 	<20181217200444.14812-2-aleksandar.markovic@rt-rk.com>
 	<48756599-1566-8b46-b742-40cea97bce15@wavecomp.com>,
 	<32edc91d04374cfd8fb50bc26c9bd320@EX13D12UEA003.ant.amazon.com>
 	<BN6PR2201MB1251B2C0C45E6E2BE91E60EEC6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>,
 	<8a875112d29047afbf2d5f83a96d6230@EX13D12UEA003.ant.amazon.com>
-In-Reply-To: <8a875112d29047afbf2d5f83a96d6230@EX13D12UEA003.ant.amazon.com>
+	<BN6PR2201MB12515E6A3326FD0F6A769E06C6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <BN6PR2201MB12515E6A3326FD0F6A769E06C6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="koi8-r"
 Content-Transfer-Encoding: quoted-printable
@@ -36,7 +37,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Janeczek, Craig" <jancraig@amazon.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+
+Yes, both the comment and enum should be updated.
+
+-----Original Message-----
+From: Aleksandar Markovic <amarkovic@wavecomp.com>=20
+Sent: Thursday, December 27, 2018 2:23 PM
+To: Janeczek, Craig <jancraig@amazon.com>; Stefan Markovic <smarkovic@wavec=
+omp.com>; Aleksandar Markovic <aleksandar.markovic@rt-rk.com>; qemu-devel@n=
+ongnu.org
+Subject: Re: [PATCH 1/6] target/mips: MXU: Add missing opcodes/decoding for=
+ LX* instructions
 
 > From: Janeczek, Craig <jancraig@amazon.com>
 > Sent: Thursday, December 27, 2018 7:50 PM
