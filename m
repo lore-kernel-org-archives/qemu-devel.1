@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38251)
+Received: from eggs.gnu.org ([208.118.235.92]:39467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gcKGH-0008MK-5P
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 20:14:57 -0500
+	(envelope-from <tao3.xu@intel.com>) id 1gcLfF-0004S8-Pu
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 21:44:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gcKGG-0000vy-Gp
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 20:14:57 -0500
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Wed, 26 Dec 2018 20:14:53 -0500
-From: liebrecht@grossmann-venter.com
-In-Reply-To: <665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
-References: <b0d70556767952dc739454d074bdab52@grossmann-venter.com>
-	<665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
-Message-ID: <96b5e642f1641df04a2c3f8b5b12bd6a@grossmann-venter.com>
-Subject: Re: [Qemu-devel] Qemu the right way.
+	(envelope-from <tao3.xu@intel.com>) id 1gcLfC-00049G-Ig
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 21:44:49 -0500
+Received: from mga14.intel.com ([192.55.52.115]:35523)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1gcLfC-0003lu-58
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 21:44:46 -0500
+From: Tao Xu <tao3.xu@intel.com>
+Date: Thu, 27 Dec 2018 10:43:02 +0800
+Message-Id: <20181227024304.12182-1-tao3.xu@intel.com>
+Subject: [Qemu-devel] [PATCH 0/2] Add MSR based features on Cascadelake CPU
+ model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +22,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Qemu-devel <qemu-devel-bounces+admin=grossmann-venter.com@nongnu.org>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: qemu-devel@nongnu.org, tao3.xu@intel.com, robert.hu@linux.intel.com, mark.kanda@oracle.com
 
-On 2018-12-26 02:14, Thomas Huth wrote:
+These patches update the stepping and add some MSR based features 
+enumerated by ARCH_CAPABILITIES on Cascadelake-Server CPU model.
 
-> 
->> 2) I need to at least have sound working from applications in the 
->> guest
->> with pulseaudio on the Debian host. Is it  possible ?
-> 
-> Should be possible. Run the configure script before compiling with
-> 
->  --audio-drv-list=pa
-> 
-> and then make sure to give a soundcard to the guest (e.g. with the
-> -soundhw option).
-> 
+Tao Xu (2):
+  i386: Update stepping of Cascadelake-Server
+  i386: Add some MSR based features on Cascadelake-Server CPU model
 
+ include/hw/i386/pc.h | 20 ++++++++++++++++++++
+ target/i386/cpu.c    |  8 ++++++--
+ 2 files changed, 26 insertions(+), 2 deletions(-)
 
-I now move on to sound.
-
-I could get sound working as you instructed. I chose to load all sound 
-cards and see if I can find one that works.
-
-Sound does work but it ios very intermittent, seemingly the same as what 
-happens to the mouse as if there is a timeshare going on.
-
-Any idea what that can be.
-
-Please not that I am running AVLinux which has a real time kernel as I 
-can remember. Maybe qemu has trouble with realtime kernels ? Or what can 
-the reason be for the intermittent sound. Sound on for 2 seconds off for 
-a seconds etc,
-Note that I did not compile a new version yet and just used the deb 
-version. I will do that now
-
-Is the sound problems due to not following your advice below ? What does
---audio-drv-list=pa actually do  ???
-
-
-For reference
-My string now looks as follows.
-
-qemu-system-x86_64 -soundhw all  -smp 4 -m 2048M -boot d -cdrom 
-/dev/cdrom -drive format=raw,file=hd.img
+-- 
+2.17.1
