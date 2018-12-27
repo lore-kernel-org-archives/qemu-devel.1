@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48145)
+Received: from eggs.gnu.org ([208.118.235.92]:48141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gcWaJ-0002AA-4h
+	(envelope-from <imammedo@redhat.com>) id 1gcWaJ-0002A7-3t
 	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gcWaE-0003Vb-JE
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51862)
+	(envelope-from <imammedo@redhat.com>) id 1gcWaE-0003UE-2n
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49226)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gcWaE-0003U4-BN
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:22 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gcWaD-0003PS-EC
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:21 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 27 Dec 2018 15:13:33 +0100
-Message-Id: <1545920014-114011-8-git-send-email-imammedo@redhat.com>
+Date: Thu, 27 Dec 2018 15:13:32 +0100
+Message-Id: <1545920014-114011-7-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1545920014-114011-1-git-send-email-imammedo@redhat.com>
 References: <1545920014-114011-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 7/8] tests: acpi: squash
- sanitize_fadt_ptrs() into test_acpi_fadt_table()
+Subject: [Qemu-devel] [PATCH v2 6/8] tests: smbios: fetch whole table in one
+ step instead of reading it step by step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +27,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, wainersm@redhat.com
 
-some parts of sanitize_fadt_ptrs() do redundant job
-  - locating FADT
-  - checking original checksum
-
-There is no need to do it as test_acpi_fadt_table() already does that,
-so drop duplicate code and move remaining fixup code into
-test_acpi_fadt_table().
+replace a bunch of ACPI_READ_ARRAY/ACPI_READ_FIELD macro, that read
+SMBIOS table field by field with one memread() to fetch whole table
+at once and drop no longer used ACPI_READ_ARRAY/ACPI_READ_FIELD macro.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/bios-tables-test.c | 39 ++++++++++-----------------------------
- 1 file changed, 10 insertions(+), 29 deletions(-)
+V2:
+  rebase: s/memread/qtest_memread/
+---
+ tests/acpi-utils.h       | 17 -----------------
+ tests/bios-tables-test.c | 15 +--------------
+ 2 files changed, 1 insertion(+), 31 deletions(-)
 
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index 1aa00db..cb7183e 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -30,23 +30,6 @@ typedef struct {
+     bool tmp_files_retain;   /* do not delete the temp asl/aml */
+ } AcpiSdtTable;
+ 
+-#define ACPI_READ_FIELD(qts, field, addr)                \
+-    do {                                                 \
+-        qtest_memread(qts, addr, &field, sizeof(field)); \
+-        addr += sizeof(field);                           \
+-    } while (0)
+-
+-#define ACPI_READ_ARRAY_PTR(qts, arr, length, addr)      \
+-    do {                                                 \
+-        int idx;                                         \
+-        for (idx = 0; idx < length; ++idx) {             \
+-            ACPI_READ_FIELD(qts, arr[idx], addr);        \
+-        }                                                \
+-    } while (0)
+-
+-#define ACPI_READ_ARRAY(qts, arr, addr)                                 \
+-    ACPI_READ_ARRAY_PTR(qts, arr, sizeof(arr) / sizeof(arr[0]), addr)
+-
+ #define ACPI_ASSERT_CMP(actual, expected) do { \
+     char ACPI_ASSERT_CMP_str[5] = {}; \
+     memcpy(ACPI_ASSERT_CMP_str, &actual, 4); \
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index dcd6be8..9139dec 100644
+index 8fdd1c1..dcd6be8 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -128,6 +128,7 @@ static void test_acpi_fadt_table(test_data *data)
-     /* FADT table is 1st */
-     AcpiSdtTable table = g_array_index(data->tables, typeof(table), 0);
-     uint8_t *fadt_aml = table.aml;
-+    uint32_t fadt_len = table.aml_len;
+@@ -406,32 +406,19 @@ static bool smbios_ep_table_ok(test_data *data)
+     struct smbios_21_entry_point *ep_table = &data->smbios_ep_table;
+     uint32_t addr = data->smbios_ep_addr;
  
-     ACPI_ASSERT_CMP(table.header->signature, "FACP");
- 
-@@ -139,35 +140,17 @@ static void test_acpi_fadt_table(test_data *data)
-     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
-                      fadt_aml + 40 /* DSDT */, "DSDT", true);
-     g_array_append_val(data->tables, table);
--}
--
--static void sanitize_fadt_ptrs(test_data *data)
--{
--    /* fixup pointers in FADT */
--    int i;
--
--    for (i = 0; i < data->tables->len; i++) {
--        AcpiSdtTable *sdt = &g_array_index(data->tables, AcpiSdtTable, i);
--
--        if (memcmp(&sdt->header->signature, "FACP", 4)) {
--            continue;
--        }
- 
--        /* check original FADT checksum before sanitizing table */
--        g_assert(!acpi_calc_checksum(sdt->aml, sdt->aml_len));
--
--        memset(sdt->aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
--        memset(sdt->aml + 40, 0, 4); /* sanitize DSDT ptr */
--        if (sdt->header->revision >= 3) {
--            memset(sdt->aml + 132, 0, 8); /* sanitize X_FIRMWARE_CTRL ptr */
--            memset(sdt->aml + 140, 0, 8); /* sanitize X_DSDT ptr */
--        }
--
--        /* update checksum */
--        sdt->header->checksum = 0;
--        sdt->header->checksum -= acpi_calc_checksum(sdt->aml, sdt->aml_len);
--        break;
-+    memset(fadt_aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
-+    memset(fadt_aml + 40, 0, 4); /* sanitize DSDT ptr */
-+    if (fadt_aml[8 /* FADT Major Version */] >= 3) {
-+        memset(fadt_aml + 132, 0, 8); /* sanitize X_FIRMWARE_CTRL ptr */
-+        memset(fadt_aml + 140, 0, 8); /* sanitize X_DSDT ptr */
+-    ACPI_READ_ARRAY(data->qts, ep_table->anchor_string, addr);
++    qtest_memread(data->qts, addr, ep_table, sizeof(*ep_table));
+     if (memcmp(ep_table->anchor_string, "_SM_", 4)) {
+         return false;
      }
-+
-+    /* update checksum */
-+    fadt_aml[9 /* Checksum */] = 0;
-+    fadt_aml[9 /* Checksum */] -= acpi_calc_checksum(fadt_aml, fadt_len);
- }
- 
- static void dump_aml_files(test_data *data, bool rebuild)
-@@ -541,8 +524,6 @@ static void test_acpi_one(const char *params, test_data *data)
-     test_acpi_rsdt_table(data);
-     test_acpi_fadt_table(data);
- 
--    sanitize_fadt_ptrs(data);
--
-     if (iasl) {
-         if (getenv(ACPI_REBUILD_EXPECTED_AML)) {
-             dump_aml_files(data, true);
+-    ACPI_READ_FIELD(data->qts, ep_table->checksum, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->length, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->smbios_major_version, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->smbios_minor_version, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->max_structure_size, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->entry_point_revision, addr);
+-    ACPI_READ_ARRAY(data->qts, ep_table->formatted_area, addr);
+-    ACPI_READ_ARRAY(data->qts, ep_table->intermediate_anchor_string, addr);
+     if (memcmp(ep_table->intermediate_anchor_string, "_DMI_", 5)) {
+         return false;
+     }
+-    ACPI_READ_FIELD(data->qts, ep_table->intermediate_checksum, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->structure_table_length, addr);
+     if (ep_table->structure_table_length == 0) {
+         return false;
+     }
+-    ACPI_READ_FIELD(data->qts, ep_table->structure_table_address, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->number_of_structures, addr);
+     if (ep_table->number_of_structures == 0) {
+         return false;
+     }
+-    ACPI_READ_FIELD(data->qts, ep_table->smbios_bcd_revision, addr);
+     if (acpi_calc_checksum((uint8_t *)ep_table, sizeof *ep_table) ||
+         acpi_calc_checksum((uint8_t *)ep_table + 0x10,
+                            sizeof *ep_table - 0x10)) {
 -- 
 2.7.4
