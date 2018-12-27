@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54963)
+Received: from eggs.gnu.org ([208.118.235.92]:54982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gcPGn-0003UR-PP
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:53 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gcPGo-0003Vg-Mm
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gcPGj-0004ob-Ms
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:49 -0500
-Received: from mga11.intel.com ([192.55.52.93]:57851)
+	(envelope-from <yang.zhong@intel.com>) id 1gcPGk-0004rD-Dl
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:50 -0500
+Received: from mga11.intel.com ([192.55.52.93]:57867)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gcPGi-00041J-ES
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:45 -0500
+	id 1gcPGj-0004Bd-Ox
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:46 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Thu, 27 Dec 2018 14:34:07 +0800
-Message-Id: <20181227063419.12981-14-yang.zhong@intel.com>
+Date: Thu, 27 Dec 2018 14:34:10 +0800
+Message-Id: <20181227063419.12981-17-yang.zhong@intel.com>
 In-Reply-To: <20181227063419.12981-1-yang.zhong@intel.com>
 References: <20181227063419.12981-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH 13/25] scsi: express dependencies with
+Subject: [Qemu-devel] [RFC PATCH 16/25] i386: express dependencies with
  Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,78 +30,257 @@ Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.mayde
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-This lets you disable SCSI altogether with "CONFIG_SCSI=n".
+This way, the default-configs file only need to specify the boards
+and any optional devices.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- hw/scsi/Kconfig       | 11 ++++++++++-
- hw/scsi/Makefile.objs |  2 +-
- 2 files changed, 11 insertions(+), 2 deletions(-)
+ default-configs/i386-softmmu.mak | 32 +++++----------------
+ hw/acpi/Kconfig                  |  3 ++
+ hw/display/Kconfig               |  1 +
+ hw/i2c/Makefile.objs             |  4 +--
+ hw/i386/Kconfig                  | 48 ++++++++++++++++++++++++++++----
+ hw/isa/Kconfig                   |  1 +
+ hw/pci-host/Kconfig              |  7 +++++
+ hw/tpm/Kconfig                   |  5 +++-
+ 8 files changed, 67 insertions(+), 34 deletions(-)
 
-diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
-index 6e7575397f..d669a4824e 100644
---- a/hw/scsi/Kconfig
-+++ b/hw/scsi/Kconfig
-@@ -5,24 +5,29 @@ config LSI_SCSI_PCI
-     bool
-     default y
-     depends on PCI
-+    select SCSI
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index d664329ac1..d2e58edd17 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -1,10 +1,6 @@
+ # Default configuration for i386-softmmu
  
- config MPTSAS_SCSI_PCI
-     bool
-     default y
-     depends on PCI
-+    select SCSI
+-CONFIG_PCI=y
+-CONFIG_ISA=y
+ include hyperv.mak
+-CONFIG_VGA_ISA=y
+-CONFIG_VMWARE_VGA=y
+ CONFIG_VMXNET3_PCI=y
+ CONFIG_VIRTIO_VGA=y
+ CONFIG_IPMI=y
+@@ -12,39 +8,21 @@ CONFIG_IPMI_LOCAL=y
+ CONFIG_IPMI_EXTERN=y
+ CONFIG_ISA_IPMI_KCS=y
+ CONFIG_ISA_IPMI_BT=y
+-CONFIG_I8254=y
+-CONFIG_ACPI=y
+-CONFIG_ACPI_X86=y
+-CONFIG_ACPI_X86_ICH=y
+-CONFIG_ACPI_MEMORY_HOTPLUG=y
+-CONFIG_ACPI_CPU_HOTPLUG=y
+-CONFIG_APM=y
+-CONFIG_I8257=y
+-CONFIG_IDE_ISA=y
+-CONFIG_IDE_PIIX=y
++
++# Optional devices:
++#
+ CONFIG_HPET=y
+ CONFIG_APPLESMC=y
+-CONFIG_I8259=y
+ CONFIG_PFLASH_CFI01=y
+-CONFIG_MC146818RTC=y
+-CONFIG_PCI_PIIX=y
+-CONFIG_ISA_DEBUG=y
+ CONFIG_ISA_TESTDEV=y
+ CONFIG_VMPORT=y
+ CONFIG_SGA=y
+-CONFIG_LPC_ICH9=y
+-CONFIG_PCI_Q35=y
+-CONFIG_APIC=y
+-CONFIG_IOAPIC=y
+ CONFIG_PVPANIC=y
+ CONFIG_MEM_DEVICE=y
+ CONFIG_DIMM=y
+ CONFIG_NVDIMM=y
+ CONFIG_ACPI_NVDIMM=y
+ CONFIG_PCIE_PORT=y
+-CONFIG_XIO3130=y
+-CONFIG_IOH3420=y
+-CONFIG_I82801B11=y
+ CONFIG_SMBIOS=y
+ CONFIG_PXB=y
+ CONFIG_ACPI_VMGENID=y
+@@ -53,5 +31,9 @@ CONFIG_I2C=y
+ CONFIG_SEV=$(CONFIG_KVM)
+ CONFIG_VTD=y
+ CONFIG_AMD_IOMMU=y
++
++# Boards:
++#
++CONFIG_ISAPC=y
+ CONFIG_I440FX=y
+ CONFIG_Q35=y
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index 2f4871c10a..98bb3539e1 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -3,15 +3,18 @@ config ACPI
  
- config MEGASAS_SCSI_PCI
+ config ACPI_X86
      bool
-     default y
-     depends on PCI
-+    select SCSI
++    select ACPI
  
- config VMW_PVSCSI_SCSI_PCI
+ config ACPI_X86_ICH
      bool
-     default y
-     depends on PCI
-+    select SCSI
++    select ACPI_X86
  
- config ESP
+ config ACPI_CPU_HOTPLUG
      bool
-+    select SCSI
  
- config ESP_PCI
+ config ACPI_MEMORY_HOTPLUG
      bool
-@@ -30,11 +35,15 @@ config ESP_PCI
-     depends on PCI
-     select ESP
++    select MEM_DEVICE
  
--config PSERIES
-+config SPAPR_VSCSI
+ config ACPI_NVDIMM
      bool
-+    select SCSI
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index e0d7919a06..8ce968bfff 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -82,6 +82,7 @@ config VGA
  
- config VIRTIO_SCSI
+ config QXL
+     bool
++    default y if PC
+     depends on SPICE && PCI
+     select VGA
+ 
+diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
+index 37cacde978..48f7760379 100644
+--- a/hw/i2c/Makefile.objs
++++ b/hw/i2c/Makefile.objs
+@@ -1,8 +1,8 @@
+ common-obj-$(CONFIG_I2C) += core.o smbus.o smbus_eeprom.o
+ common-obj-$(CONFIG_DDC) += i2c-ddc.o
+ common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
+-common-obj-$(CONFIG_ACPI_X86) += smbus_ich9.o
+-common-obj-$(CONFIG_APM) += pm_smbus.o
++common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
++common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
+ common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
+ common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
+ common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index 68a9064558..f53a788a95 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -1,21 +1,57 @@
+ config KVM
+     bool
+ 
+-config I440FX
++config PC
+     bool
+-    select QXL if SPICE
++    select ISA_DEBUG
++    select I8259
++    select I8254
++    select PCSPK
++    select I82374
++    select I8257
++    select MC146818RTC
+     select TPM_TIS if TPM
+-    select XEN_I386 if XEN
++
++config PC_PCI
++    bool
++    select APIC
++    select IOAPIC
++    select APM
++    select PC
++
++config PC_ACPI
++    bool
++    select ACPI_X86
++    select ACPI_CPU_HOTPLUG
++    select ACPI_MEMORY_HOTPLUG
++    depends on ACPI_SMBUS
++
++config I440FX
++    bool
++    select PC_PCI
++    select PC_ACPI
++    select ACPI_SMBUS
++    select PCI_PIIX
++    select FDC
++    select IDE_PIIX
+ 
+ config ISAPC
+     bool
+     select ISA_BUS
++    select PC
++    select IDE_ISA
++    select VGA_ISA
++    # FIXME: it is in the same file as i440fx, and does not compile
++    # if separated
++    depends on I440FX
+ 
+ config Q35
+     bool
+-    select QXL if SPICE
+-    select TPM_TIS if TPM
+-    select XEN_I386 if XEN
++    select PC_PCI
++    select PC_ACPI
++    select PCI_Q35
++    select LPC_ICH9
++    select AHCI
+ 
+ config VTD
+     bool
+diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
+index 3f451ef006..bf72e4fef2 100644
+--- a/hw/isa/Kconfig
++++ b/hw/isa/Kconfig
+@@ -25,4 +25,5 @@ config SMC37C669
+ config LPC_ICH9
+     bool
+     select ISA_BUS
++    select ACPI_SMBUS
+     select ACPI_X86_ICH
+diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+index 359df1d239..9d57c6cac9 100644
+--- a/hw/pci-host/Kconfig
++++ b/hw/pci-host/Kconfig
+@@ -21,9 +21,16 @@ config PCI_SABRE
+ 
+ config PCI_PIIX
+     bool
++    select PAM
++    select PCI
+ 
+ config PCI_Q35
+     bool
++    select PAM
++    select PCI
++    select XIO3130
++    select IOH3420
++    select I82801B11
+ 
+ config PCI_GENERIC
+     bool
+diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
+index da4bb5b6c7..28acdb745e 100644
+--- a/hw/tpm/Kconfig
++++ b/hw/tpm/Kconfig
+@@ -3,10 +3,13 @@ config TPM
+ 
+ config TPM_TIS
+     bool
+-    depends on TPM
++    default y
++    depends on TPM && PC
+ 
+ config TPM_CRB
      bool
 +    default y
-+    depends on VIRTIO
-+    select SCSI
++    depends on TPM && PC
  
- config VHOST_USER_SCSI
+ config TPM_PASSTHROUGH
      bool
-diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
-index 45167baeaf..54b36ed8b1 100644
---- a/hw/scsi/Makefile.objs
-+++ b/hw/scsi/Makefile.objs
-@@ -6,7 +6,7 @@ common-obj-$(CONFIG_MEGASAS_SCSI_PCI) += megasas.o
- common-obj-$(CONFIG_VMW_PVSCSI_SCSI_PCI) += vmw_pvscsi.o
- common-obj-$(CONFIG_ESP) += esp.o
- common-obj-$(CONFIG_ESP_PCI) += esp-pci.o
--obj-$(CONFIG_PSERIES) += spapr_vscsi.o
-+obj-$(CONFIG_SPAPR_VSCSI) += spapr_vscsi.o
- 
- ifeq ($(CONFIG_VIRTIO_SCSI),y)
- obj-y += virtio-scsi.o virtio-scsi-dataplane.o
 -- 
 2.17.1
