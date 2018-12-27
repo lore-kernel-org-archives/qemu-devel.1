@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37876)
+Received: from eggs.gnu.org ([208.118.235.92]:38251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gcKFP-0007kJ-DR
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 20:14:04 -0500
+	(envelope-from <admin@grossmann-venter.com>) id 1gcKGH-0008MK-5P
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 20:14:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <admin@grossmann-venter.com>) id 1gcKFM-0007iY-6y
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 20:14:03 -0500
-Received: from server54-2.web-hosting.com ([198.54.126.118]:43617)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <admin@grossmann-venter.com>)
-	id 1gcKFL-0007bk-PL
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 20:14:00 -0500
-Received: from [::1] (port=56604 helo=server54.web-hosting.com)
-	by server54.web-hosting.com with esmtpa (Exim 4.91)
-	(envelope-from <admin@grossmann-venter.com>) id 1gcKFH-001khs-FZ
-	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 20:13:56 -0500
+	(envelope-from <admin@grossmann-venter.com>) id 1gcKGG-0000vy-Gp
+	for qemu-devel@nongnu.org; Wed, 26 Dec 2018 20:14:57 -0500
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date: Wed, 26 Dec 2018 20:13:55 -0500
+Date: Wed, 26 Dec 2018 20:14:53 -0500
 From: liebrecht@grossmann-venter.com
 In-Reply-To: <665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
 References: <b0d70556767952dc739454d074bdab52@grossmann-venter.com>
 	<665ec250-c4a5-18ba-ad71-90966a1b9e12@redhat.com>
-Message-ID: <f39430c06bbd7ce4007c0bd3a02e20a4@grossmann-venter.com>
+Message-ID: <96b5e642f1641df04a2c3f8b5b12bd6a@grossmann-venter.com>
 Subject: Re: [Qemu-devel] Qemu the right way.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,30 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Qemu-devel <qemu-devel-bounces+admin=grossmann-venter.com@nongnu.org>
+
+On 2018-12-26 02:14, Thomas Huth wrote:
 
 > 
-> Try to run QEMU with "-smp 4".
+>> 2) I need to at least have sound working from applications in the 
+>> guest
+>> with pulseaudio on the Debian host. Is it  possible ?
+> 
+> Should be possible. Run the configure script before compiling with
+> 
+>  --audio-drv-list=pa
+> 
+> and then make sure to give a soundcard to the guest (e.g. with the
+> -soundhw option).
 > 
 
-Thomas thank you for your reply.
-I will try each of your suggestions in turn.
 
--smp 4 did help and this time i could configure 2 cpus in windows.
+I now move on to sound.
 
-Now for a very important question.
-If hardware virtualization was not switched on in bios will qemu refuse 
-to create more cpus? I just want to know if there are not bogus software 
-cpus or cores created by qemu and that it actually checks it can get 
-real cores from the machine and make it available to the host.
+I could get sound working as you instructed. I chose to load all sound 
+cards and see if I can find one that works.
 
-Second question. In the past qemu was lightning fast. However with this 
-newer qemu windows 7 is very slow. It takes about 1 minute to open an 
-application. What can slow it dow so much ? This happens with or without 
-the smp switch. It seems there is some polling botlleneck if i move the 
-mouse in circles in the windows guest, it would freeze for four seconds 
-and then work for about 6 seconds then freeze again etc. What is that 
-about.?
+Sound does work but it ios very intermittent, seemingly the same as what 
+happens to the mouse as if there is a timeshare going on.
 
-What is the official posting rules in this forum, top post or bottom 
-post ? Thanks
+Any idea what that can be.
+
+Please not that I am running AVLinux which has a real time kernel as I 
+can remember. Maybe qemu has trouble with realtime kernels ? Or what can 
+the reason be for the intermittent sound. Sound on for 2 seconds off for 
+a seconds etc,
+Note that I did not compile a new version yet and just used the deb 
+version. I will do that now
+
+Is the sound problems due to not following your advice below ? What does
+--audio-drv-list=pa actually do  ???
+
+
+For reference
+My string now looks as follows.
+
+qemu-system-x86_64 -soundhw all  -smp 4 -m 2048M -boot d -cdrom 
+/dev/cdrom -drive format=raw,file=hd.img
