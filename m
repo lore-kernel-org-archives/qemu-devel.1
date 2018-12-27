@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46662)
+Received: from eggs.gnu.org ([208.118.235.92]:50356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gcaed-0002SG-Og
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 13:45:15 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gcayE-0000rd-Bo
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 14:05:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gcaZj-0005xz-Qq
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 13:40:11 -0500
-Received: from mail-eopbgr780113.outbound.protection.outlook.com
-	([40.107.78.113]:60048
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gcaZj-0005sq-IC
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 13:40:07 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 27 Dec 2018 18:40:01 +0000
-Message-ID: <BN6PR2201MB12510FBB987EE71995240442C6A60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20181210152829.29271-1-alex.bennee@linaro.org>,
-	<20181210152829.29271-6-alex.bennee@linaro.org>
-In-Reply-To: <20181210152829.29271-6-alex.bennee@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gcawv-0006il-EQ
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 14:04:09 -0500
+Received: from mail-yb1-f194.google.com ([209.85.219.194]:37787)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gcawv-0006hs-Ab
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 14:04:05 -0500
+Received: by mail-yb1-f194.google.com with SMTP id 2so5717066ybw.4
+	for <qemu-devel@nongnu.org>; Thu, 27 Dec 2018 11:04:05 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 05/13] tests/tcg/mips: enable mips64
- system tests (WIP)
+References: <e0d6e64a5f4b3ed436bb91aa3428986a06a0f1f1.1545911443.git.public@hansmi.ch>
+In-Reply-To: <e0d6e64a5f4b3ed436bb91aa3428986a06a0f1f1.1545911443.git.public@hansmi.ch>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 27 Dec 2018 20:03:53 +0100
+Message-ID: <CAAdtpL5L-BgsUJ_yNkGQBPvPhyneN=csQMaRxqiaZDx-XZzaag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] smbus_eeprom: Limit data writes to 255
+ bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?gb2312?B?QWxleCBCZW5uqKZl?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "edgar.iglesias@gmail.com" <edgar.iglesias@gmail.com>, "michael@walle.cc" <michael@walle.cc>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "shorne@gmail.com" <shorne@gmail.com>, "jcmvbkbc@gmail.com" <jcmvbkbc@gmail.com>, Stefan Markovic <smarkovic@wavecomp.com>
+To: Michael Hanselmann <public@hansmi.ch>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-PiA+IEBAIC0xNjYzLDEyICsxNjYzLDIxIEBAIGVudW0gew0KPiA+ICAgICogICAgICAgICAgqaYg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMjAuLjE4DQo+ID4gICAgKiAgICAgICAgICCp
-wKmkIDEwMDExMSCppCBPUENfTVhVX19QT09MMTYgqaSp0KmkIDAwMCCppCBPUENfTVhVX0QzMlNB
-UlcNCj4gPiAgICAqICAgICAgICAgIKmmICAgICAgICAgICAgICAgICAgICAgICAgICAgIKnAqaQg
-MDAxIKmkIE9QQ19NWFVfUzMyQUxODQo+ID4gLSAqICAgICAgICAgIKnAqaQgMTAxMDAwIKmkIE9Q
-Q19NWFVfTFhCICAgICAgqcCppCAwMTAgqaQgT1BDX01YVV9TMzJBTE5JDQo+ID4gLSAqICAgICAg
-ICAgIKnAqaQgMTAxMDAxIKmkIDxub3QgYXNzaWduZWQ+ICAgqcCppCAwMTEgqaQgT1BDX01YVV9T
-MzJOT1INCj4gPiAtICogICAgICAgICAgqcCppCAxMDEwMTAgqaQgT1BDX01YVV9TMTZMREQgICCp
-wKmkIDEwMCCppCBPUENfTVhVX1MzMkFORA0KPiA+IC0gKiAgICAgICAgICCpwKmkIDEwMTAxMSCp
-pCBPUENfTVhVX1MxNlNURCAgIKnAqaQgMTAxIKmkIE9QQ19NWFVfUzMyT1INCj4gPiAtICogICAg
-ICAgICAgqcCppCAxMDExMDAgqaQgT1BDX01YVV9TMTZMREkgICCpwKmkIDExMCCppCBPUENfTVhV
-X1MzMlhPUg0KPiA+IC0gKiAgICAgICAgICCpwKmkIDEwMTEwMSCppCBPUENfTVhVX1MxNlNESSAg
-IKm4qaQgMTExIKmkIE9QQ19NWFVfUzMyTFVJDQo+ID4gKyAqICAgICAgICAgIKmmICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIKnAqaQgMDEwIKmkIE9QQ19NWFVfUzMyQUxOSQ0KPiA+ICsgKiAg
-ICAgICAgICCppiAgICAgICAgICAgICAgICAgICAgICAgICAgICCpwKmkIDAxMSCppCBPUENfTVhV
-X1MzMk5PUg0KPiA+ICsgKiAgICAgICAgICCppiAgICAgICAgICAgICAgICAgICAgICAgICAgICCp
-wKmkIDEwMCCppCBPUENfTVhVX1MzMkFORA0KPiA+ICsgKiAgICAgICAgICCppiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICCpwKmkIDEwMSCppCBPUENfTVhVX1MzMk9SDQo+ID4gKyAqICAgICAg
-ICAgIKmmICAgICAgICAgICAgICAgICAgICAgICAgICAgIKnAqaQgMTEwIKmkIE9QQ19NWFVfUzMy
-WE9SDQo+ID4gKyAqICAgICAgICAgIKmmICAgICAgICAgICAgICAgICAgICAgICAgICAgIKm4qaQg
-MTExIKmkIE9QQ19NWFVfUzMyTFVJDQo+IFRoZSBvcGNvZGVzIGZvciBwb29sIDE2IGRvIG5vdCBs
-b29rIGNvcnJlY3QuIEkgdGhpbmsgdGhlIG1pbm9yIGJpdHMgc2hvdWxkIGxvb2sgbGlrZSB0aGUg
-Zm9sbG93aW5nLg0KPiANCj4gqdCppCAwMDAgqaQgT1BDX01YVV9EMzJTQVJXDQo+IKnAqaQgMDAx
-IKmkIE9QQ19NWFVfUzMyQUxODQo+IKnAqaQgMDEwIKmkIE9QQ19NWFVfUzMyQUxOSQ0KPiCpwKmk
-IDAxMSCppCBPUENfTVhVX1MzMkxVSQ0KPiCpwKmkIDEwMCCppCBPUENfTVhVX1MzMk5PUg0KPiCp
-wKmkIDEwMSCppCBPUENfTVhVX1MzMkFORA0KPiCpwKmkIDExMCCppCBPUENfTVhVX1MzMk9SDQo+
-IKm4qaQgMTExIKmkIE9QQ19NWFVfUzMyWE9SDQo+IA0KDQpIaSwgQ3JhaWchDQoNCk15IHByaW1h
-cnkgc291cmNlIGZvciBvcGNvZGVzIHdhcyB0aGUgbGF0ZXN0IEluZ2VuaWMgZG9jdW1lbnRhdGlv
-biwgZnJvbQ0KSW5nZW5pYydzIHNpdGU6IChkYXRlZCBKdW5lIDIwMTcpDQoNCmZ0cDovL2Z0cC5p
-bmdlbmljLmNvbS9TT0MvTTIwMC9YMTAwMF9NMjAwX1hCdXJzdF9JU0FfTVhVX1BNLnBkZg0KDQph
-bmQgb24gcGFnZSAxMDkgdGhlcmUgaXMgYSB0YWJsZSBpbiB0aGUgbWlkZGxlIG9mIHRoZSBwYWdl
-IHRoYXQgY29udGFpbnMNCmNvZGVzIHRoYXQgYXJlIGluIGFncmVlbWVudCB3aXRoIHdoYXQgaXMg
-Y3VycmVudGx5IGluIFFFTVUuDQoNCkhvd2V2ZXIsIEkgc2VhcmNoZWQgbW9yZSwgYW5kIGluIGEg
-cmVwb3NpdG9yeSB0aGF0IHNlZW1zIHRvIGJlIGRlcml2ZWQgZnJvbQ0KQW5kcm9pZCBOREsgcjlk
-IGJpbnV0aWxzIHRyZWUsIGluIGZpbGUNCg0KaHR0cHM6Ly9naXRodWIuY29tL2FwcG9ydGFibGUv
-YmludXRpbHMvYmxvYi9tYXN0ZXIvb3Bjb2Rlcy9teHUtb3BjLmMNCg0Kb3Bjb2RlcyBhcmUgYXMg
-eW91IHNhaWQuDQoNCkkgZ3Vlc3MgdGhlIGRlZmluaXRpdmUgYW5zd2VyIHdvdWxkIGJlIHRvIGlu
-dm9sdmUgdGVzdHMgb24gaGFyZHdhcmUsIG5vPw0KDQpUaGFua3MgZm9yIGJyaW5naW5nIHRoaXMg
-dXAhDQoNCkFsZWtzYW5kYXINCg0KDQo+ID4gKyAqICAgICAgICAgIKmmDQo+ID4gKyAqICAgICAg
-ICAgIKmmICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDcuLjUNCj4gPiArICogICAgICAg
-ICAgqcCppCAxMDEwMDAgqaQgT1BDX01YVV9fUE9PTDE3IKmkqdCppCAwMDAgqaQgT1BDX01YVV9M
-WEINCj4gPiArICogICAgICAgICAgqaYgICAgICAgICAgICAgICAgICAgICAgICAgICAgqcCppCAw
-MDEgqaQgT1BDX01YVV9MWEgNCj4gPiArICogICAgICAgICAgqcCppCAxMDEwMDEgqaQgPG5vdCBh
-c3NpZ25lZD4gICCpwKmkIDAxMSCppCBPUENfTVhVX0xYVw0KPiA+ICsgKiAgICAgICAgICCpwKmk
-IDEwMTAxMCCppCBPUENfTVhVX1MxNkxERCAgIKnAqaQgMTAwIKmkIE9QQ19NWFVfTFhCVQ0KPiA+
-ICsgKiAgICAgICAgICCpwKmkIDEwMTAxMSCppCBPUENfTVhVX1MxNlNURCAgIKm4qaQgMTAxIKmk
-IE9QQ19NWFVfTFhIVQ0KPiA+ICsgKiAgICAgICAgICCpwKmkIDEwMTEwMCCppCBPUENfTVhVX1Mx
-NkxESQ0KPiA+ICsgKiAgICAgICAgICCpwKmkIDEwMTEwMSCppCBPUENfTVhVX1MxNlNESQ0KPiA+
-ICAgICogICAgICAgICAgqcCppCAxMDExMTAgqaQgT1BDX01YVV9TMzJNMkkNCj4gPiAgICAqICAg
-ICAgICAgIKnAqaQgMTAxMTExIKmkIE9QQ19NWFVfUzMySTJNDQo+ID4gICAgKiAgICAgICAgICCp
-wKmkIDExMDAwMCCppCBPUENfTVhVX0QzMlNMTA0K
+Hi Michael,
+
+On Thu, Dec 27, 2018 at 12:53 PM Michael Hanselmann <public@hansmi.ch> wrote:
+&gt; The "eeprom_write_data" function in "smbus_eeprom.c" had no provisions
+&gt; to limit the length of data written. If a caller were able to manipulate
+&gt; the "len" parameter they could potentially write before or after the
+&gt; target buffer.
+
+You forgot to sign your commit:
+"Signed-off-by: Michael Hanselmann <public@hansmi.ch>"
+
+(See https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/SubmittingPatches?id=f6f94e2ab1b33f0082ac22d71f66385a60d8157f#n297)
+
+> ---
+>  hw/i2c/smbus_eeprom.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+> index f18aa3de35..74fa1c328c 100644
+> --- a/hw/i2c/smbus_eeprom.c
+> +++ b/hw/i2c/smbus_eeprom.c
+> @@ -76,6 +76,7 @@ static void eeprom_write_data(SMBusDevice *dev, uint8_t cmd, uint8_t *buf, int l
+>         It is a block write without a length byte.  Fortunately we
+>         get the full block anyway.  */
+>      /* TODO: Should this set the current location?  */
+> +    len &= 0xff;
+>      if (cmd + len > 256)
+
+Corey Minyard sent a cleanup series [1] because this device model is
+known to be unsafe and need rewrite.
+There is a particular patch [2] which add the SMBUS_EEPROM_SIZE definition.
+He also provided a intent at cleaning this problem here [3] where
+Peter suggested to split it in fewer patches.
+
+Regards,
+
+Phil.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05293.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05295.html
+[3] https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05298.html
+
+>          n = 256 - cmd;
+>      else
+> --
+> 2.11.0
+>
+>
