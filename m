@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48144)
+Received: from eggs.gnu.org ([208.118.235.92]:48037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gcWaJ-0002A9-4i
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:28 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcWaA-0001zL-CU
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gcWaH-0003bj-Tx
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52966)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcWa3-0002yY-O1
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:18 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51639 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gcWaG-0003XE-1A
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:24 -0500
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 27 Dec 2018 15:13:34 +0100
-Message-Id: <1545920014-114011-9-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1545920014-114011-1-git-send-email-imammedo@redhat.com>
-References: <1545920014-114011-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 8/8] tests: acpi: use AcpiSdtTable::aml
- instead of AcpiSdtTable::header::signature
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gcWa3-0002PA-EY
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:24:11 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Thu, 27 Dec 2018 15:23:04 +0100
+Message-Id: <1545920586-17815-25-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1545920586-17815-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1545920586-17815-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 24/26] disas: nanoMIPS: Comment the decoder
+ of 'gpr1' gpr encoding type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +29,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, wainersm@redhat.com
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, arikalo@wavecomp.com
 
-AcpiSdtTable::header::signature is the only remained field from
-AcpiTableHeader structure used by tests. Instead of using packed
-structure to access signature, just read it directly from table
-blob and remove no longer used AcpiSdtTable::header / union and
-keep only AcpiSdtTable::aml byte array.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Comment the decoder of 'gpr1' gpr encoding type in nanoMIPS
+disassembler.
+
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/acpi-utils.h       |  6 +-----
- tests/bios-tables-test.c | 20 +++++++++-----------
- 2 files changed, 10 insertions(+), 16 deletions(-)
+ disas/nanomips.cpp | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index cb7183e..ef388bb 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -13,15 +13,11 @@
- #ifndef TEST_ACPI_UTILS_H
- #define TEST_ACPI_UTILS_H
- 
--#include "hw/acpi/acpi-defs.h"
- #include "libqtest.h"
- 
- /* DSDT and SSDTs format */
- typedef struct {
--    union {
--        AcpiTableHeader *header;
--        uint8_t *aml;            /* aml bytecode from guest */
--    };
-+    uint8_t *aml;            /* aml bytecode from guest */
-     uint32_t aml_len;
-     gchar *aml_file;
-     gchar *asl;            /* asl code generated from aml */
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 9139dec..0bf7164 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -44,6 +44,11 @@ static const char *iasl = stringify(CONFIG_IASL);
- static const char *iasl;
- #endif
- 
-+static bool compare_signature(const AcpiSdtTable *sdt, const char *signature)
-+{
-+   return !memcmp(sdt->aml, signature, 4);
-+}
-+
- static void cleanup_table_descriptor(AcpiSdtTable *table)
- {
-     g_free(table->aml);
-@@ -130,7 +135,7 @@ static void test_acpi_fadt_table(test_data *data)
-     uint8_t *fadt_aml = table.aml;
-     uint32_t fadt_len = table.aml_len;
- 
--    ACPI_ASSERT_CMP(table.header->signature, "FACP");
-+    g_assert(compare_signature(&table, "FACP"));
- 
-     /* Since DSDT/FACS isn't in RSDT, add them to ASL test list manually */
-     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
-@@ -169,7 +174,7 @@ static void dump_aml_files(test_data *data, bool rebuild)
- 
-         if (rebuild) {
-             aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
--                                       (gchar *)&sdt->header->signature, ext);
-+                                       sdt->aml, ext);
-             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
-                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
-         } else {
-@@ -187,11 +192,6 @@ static void dump_aml_files(test_data *data, bool rebuild)
-     }
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index ec223e8..e55361c 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -388,6 +388,27 @@ uint64 NMD::decode_gpr_gpr3_src_store(uint64 d)
  }
- 
--static bool compare_signature(AcpiSdtTable *sdt, const char *signature)
--{
--   return !memcmp(&sdt->header->signature, signature, 4);
--}
--
- static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+=20
+=20
++/*
++ * NMD::decode_gpr_gpr1() - decoder for 'gpr1' gpr encoding type
++ *
++ *   Map a 1-bit code to the 5-bit register space according to this patt=
+ern:
++ *
++ *                                  1 0
++ *                                  | |
++ *                                  | |
++ *                                  | =E2=94=94---------------------=E2=94=
+=90
++ *                                  =E2=94=94---------------------=E2=94=
+=90 |
++ *                                                        | |
++ *                                                        | |
++ *                                                        | |
++ *                                                        | |
++ *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
++ *      3                   2                   1                   0
++ *
++ *   Used in handling following instruction:
++ *
++ *     - MOVE.BALC
++ */
+ uint64 NMD::decode_gpr_gpr1(uint64 d)
  {
-     AcpiSdtTable *temp;
-@@ -290,7 +290,7 @@ static GArray *load_expected_aml(test_data *data)
- 
- try_again:
-         aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
--                                   (gchar *)&sdt->header->signature, ext);
-+                                   sdt->aml, ext);
-         if (getenv("V")) {
-             fprintf(stderr, "Looking for expected file '%s'\n", aml_file);
-         }
-@@ -350,14 +350,12 @@ static void test_acpi_asl(test_data *data)
-                 fprintf(stderr,
-                         "Warning! iasl couldn't parse the expected aml\n");
-             } else {
--                uint32_t signature = cpu_to_le32(exp_sdt->header->signature);
-                 sdt->tmp_files_retain = true;
-                 exp_sdt->tmp_files_retain = true;
-                 fprintf(stderr,
-                         "acpi-test: Warning! %.4s mismatch. "
-                         "Actual [asl:%s, aml:%s], Expected [asl:%s, aml:%s].\n",
--                        (gchar *)&signature,
--                        sdt->asl_file, sdt->aml_file,
-+                        exp_sdt->aml, sdt->asl_file, sdt->aml_file,
-                         exp_sdt->asl_file, exp_sdt->aml_file);
-                 if (getenv("V")) {
-                     const char *diff_cmd = getenv("DIFF");
--- 
+     static uint64 register_list[] =3D {  4,  5 };
+--=20
 2.7.4
