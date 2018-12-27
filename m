@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47553)
+Received: from eggs.gnu.org ([208.118.235.92]:47606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcWZP-0001Fi-C1
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:23:32 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcWZW-0001Jr-75
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:23:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcWZK-0000z6-Es
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:23:31 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51021 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcWZS-0001EL-IL
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:23:38 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51075 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gcWZK-0000ws-2M
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:23:26 -0500
+	id 1gcWZS-0001CL-As
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:23:34 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 27 Dec 2018 15:22:40 +0100
-Message-Id: <1545920586-17815-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v6 00/26] disas: nanoMIPS: Clean up several
- issues
+Date: Thu, 27 Dec 2018 15:22:41 +0100
+Message-Id: <1545920586-17815-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1545920586-17815-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1545920586-17815-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v6 01/26] disas: nanoMIPS: Fix preamble text in
+ nanomips.* files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +30,73 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, arikal
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Clean up several misc issues in nanoMIPS disassembler. There are
-more issues to be cleaned, and this is meant to be just the first
-phase. Complete cleanup should happen over the course of next
-few months.
+Fix several mistakes in preambles of nanomips disassembler source
+files.
 
-All these changes should not and do not affect any functionality.
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ disas/nanomips.cpp | 7 ++++---
+ disas/nanomips.h   | 7 ++++---
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-v5->v6:
-
-  - patches that deal with adding format specifiers [16] and [49]
-    removed, until we determine what is the most appropriate form,
-    and how to be more in sync with objdump output and inline
-    assembler allowed formats
-  - added 14 patches on reformating grp decoders
-  - added a patch that adds documentation as reference
-
-v4->v5:
-
-  - renamed patch "Fix comments for 48-bit instructions" to
-      "Clean up handling of 48-bit instructions"
-  - added patch "Clean up handling of 16-bit logic instructions"
-  - added eight patches on improving gpr decoders
-  - minor addition to patch "Fix order of more invocations"
-  - minor cleanups of previous commit messages
-
-v3->v4:
-
-  - added patch "Name more functions in a more descriptive way"
-  - added patch "Fix order of more invocations"
-  - added patch "Fix comments for 48-bit instructions"
-  - minor cleanups of previous commit messages
-
-v2->v3:
-
-  - added three patches that fix function misnomers.
-  - minor changes in commit messages.
-
-v1->v2:
-
-  - patch 5 was somehow lost in v1, now should be fine.
-
-Aleksandar Markovic (26):
-  disas: nanoMIPS: Fix preamble text in nanomips.* files
-  disas: nanoMIPS: Remove functions that are not used
-  disas: nanoMIPS: Fix a function misnomer
-  disas: nanoMIPS: Fix order of some invocations
-  disas: nanoMIPS: Name some functions in a more descriptive way
-  disas: nanoMIPS: Fix an FP-related misnomer 1
-  disas: nanoMIPS: Fix an FP-related misnomer 2
-  disas: nanoMIPS: Fix an FP-related misnomer 3
-  disas: nanoMIPS: Name more functions in a more descriptive way
-  disas: nanoMIPS: Fix order of more invocations
-  disas: nanoMIPS: Rename the decoder of 'gpr3' gpr encoding type
-  disas: nanoMIPS: Comment the decoder of 'gpr3' gpr encoding type
-  disas: nanoMIPS: Rename the decoder of 'gpr3.src.store' gpr encoding
-    type
-  disas: nanoMIPS: Comment the decoder of 'gpr3.src.store' gpr encoding
-    type
-  disas: nanoMIPS: Rename the decoder of 'gpr4' gpr encoding type
-  disas: nanoMIPS: Comment the decoder of 'gpr4' gpr encoding type
-  disas: nanoMIPS: Rename the decoder of 'gpr4.zero' gpr encoding type
-  disas: nanoMIPS: Comment the decoder of 'gpr4.zero' gpr encoding type
-  disas: nanoMIPS: Rename the decoder of 'gpr2.reg1' gpr encoding type
-  disas: nanoMIPS: Comment the decoder of 'gpr2.reg1' gpr encoding type
-  disas: nanoMIPS: Rename the decoder of 'gpr2.reg2' gpr encoding type
-  disas: nanoMIPS: Comment the decoder of 'gpr2.reg2' gpr encoding type
-  disas: nanoMIPS: Rename the decoder of 'gpr1' gpr encoding type
-  disas: nanoMIPS: Comment the decoder of 'gpr1' gpr encoding type
-  disas: nanoMIPS: Reorder declarations and definitions of gpr decoders
-  disas: nanoMIPS: Add a note on documentation
-
- disas/nanomips.cpp | 2135 ++++++++++++++++++++++++++--------------------------
- disas/nanomips.h   |  115 ++-
- 2 files changed, 1111 insertions(+), 1139 deletions(-)
-
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index 1238c2f..f9ef0a2 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -1,13 +1,13 @@
+ /*
+  *  Source file for nanoMIPS disassembler component of QEMU
+  *
+- *  Copyright (C) 2018  Wave Computing
++ *  Copyright (C) 2018  Wave Computing, Inc.
+  *  Copyright (C) 2018  Matthew Fortune <matthew.fortune@mips.com>
+- *  Copyright (C) 2018  Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
+  *
+  *  This program is free software: you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation, either version 3 of the License, or
++ *  the Free Software Foundation, either version 2 of the License, or
+  *  (at your option) any later version.
+  *
+  *  This program is distributed in the hope that it will be useful,
+@@ -17,6 +17,7 @@
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
+  */
+ 
+ extern "C" {
+diff --git a/disas/nanomips.h b/disas/nanomips.h
+index 84cc9a6..3df138d 100644
+--- a/disas/nanomips.h
++++ b/disas/nanomips.h
+@@ -1,13 +1,13 @@
+ /*
+  *  Header file for nanoMIPS disassembler component of QEMU
+  *
+- *  Copyright (C) 2018  Wave Computing
++ *  Copyright (C) 2018  Wave Computing, Inc.
+  *  Copyright (C) 2018  Matthew Fortune <matthew.fortune@mips.com>
+- *  Copyright (C) 2018  Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
+  *
+  *  This program is free software: you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation, either version 3 of the License, or
++ *  the Free Software Foundation, either version 2 of the License, or
+  *  (at your option) any later version.
+  *
+  *  This program is distributed in the hope that it will be useful,
+@@ -17,6 +17,7 @@
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
+  */
+ 
+ #ifndef NANOMIPS_DISASSEMBLER_H
 -- 
 2.7.4
