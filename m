@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55050)
+Received: from eggs.gnu.org ([208.118.235.92]:55048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gcPGy-0003fU-Cb
+	(envelope-from <yang.zhong@intel.com>) id 1gcPGy-0003fE-Ae
 	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:36:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gcPGu-0005EV-A7
+	(envelope-from <yang.zhong@intel.com>) id 1gcPGu-0005EP-9L
 	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:36:00 -0500
-Received: from mga11.intel.com ([192.55.52.93]:57858)
+Received: from mga11.intel.com ([192.55.52.93]:57851)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gcPGt-0004B3-Ti
+	id 1gcPGt-00041J-US
 	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:56 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Thu, 27 Dec 2018 14:34:11 +0800
-Message-Id: <20181227063419.12981-18-yang.zhong@intel.com>
+Date: Thu, 27 Dec 2018 14:34:12 +0800
+Message-Id: <20181227063419.12981-19-yang.zhong@intel.com>
 In-Reply-To: <20181227063419.12981-1-yang.zhong@intel.com>
 References: <20181227063419.12981-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH 17/25] i2c: express dependencies with
+Subject: [Qemu-devel] [RFC PATCH 18/25] ptimer: express dependencies with
  Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,211 +33,82 @@ From: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- hw/Makefile.objs     | 2 +-
- hw/audio/Kconfig     | 1 +
- hw/display/Kconfig   | 3 +++
- hw/gpio/Kconfig      | 1 +
- hw/i2c/Kconfig       | 6 ++++++
- hw/i2c/Makefile.objs | 3 ++-
- hw/i386/Kconfig      | 1 +
- hw/input/Kconfig     | 1 +
- hw/isa/Kconfig       | 1 +
- hw/misc/Kconfig      | 4 ++++
- hw/timer/Kconfig     | 3 +++
- 11 files changed, 24 insertions(+), 2 deletions(-)
+ hw/Kconfig       | 2 ++
+ hw/net/Kconfig   | 2 ++
+ hw/timer/Kconfig | 6 ++++++
+ 3 files changed, 10 insertions(+)
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index b95b0c74a1..920086b182 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -10,7 +10,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += display/
- devices-dirs-$(CONFIG_SOFTMMU) += dma/
- devices-dirs-$(CONFIG_SOFTMMU) += gpio/
- devices-dirs-$(CONFIG_HYPERV) += hyperv/
--devices-dirs-$(CONFIG_SOFTMMU) += i2c/
-+devices-dirs-$(CONFIG_I2C) += i2c/
- devices-dirs-$(CONFIG_SOFTMMU) += ide/
- devices-dirs-$(CONFIG_SOFTMMU) += input/
- devices-dirs-$(CONFIG_SOFTMMU) += intc/
-diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
-index 350f2d4359..5cb7118e44 100644
---- a/hw/audio/Kconfig
-+++ b/hw/audio/Kconfig
-@@ -40,6 +40,7 @@ config PCSPK
+diff --git a/hw/Kconfig b/hw/Kconfig
+index b27290d332..27ac668584 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -43,6 +43,8 @@ source i386/Kconfig
+ # Symbols used by multiple targets
+ config XILINX
+     bool
++    select PTIMER # for hw/timer/xilinx_timer.c
  
- config WM8750
+ config XILINX_AXI
      bool
-+    depends on I2C
++    select PTIMER # for hw/dma/xilinx_axidma.c
+diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+index b7585cbe55..b50a8a4368 100644
+--- a/hw/net/Kconfig
++++ b/hw/net/Kconfig
+@@ -45,6 +45,7 @@ config SMC91C111
  
- config PL041
+ config LAN9118
      bool
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index 8ce968bfff..8ddce09ead 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -24,9 +24,11 @@ config PL110
++    select PTIMER
  
- config SII9022
+ config NE2000_ISA
      bool
-+    depends on I2C
+@@ -96,6 +97,7 @@ config VIRTIO_NET
  
- config SSD0303
+ config ETSEC
      bool
-+    depends on I2C
++    select PTIMER
  
- config SSD0323
+ config ROCKER
      bool
-@@ -70,6 +72,7 @@ config MILKYMIST_TMU2
- 
- config SM501
-     bool
-+    depends on I2C
- 
- config TCX
-     bool
-diff --git a/hw/gpio/Kconfig b/hw/gpio/Kconfig
-index d0a4abf93f..9227cb5598 100644
---- a/hw/gpio/Kconfig
-+++ b/hw/gpio/Kconfig
-@@ -1,5 +1,6 @@
- config MAX7310
-     bool
-+    depends on I2C
- 
- config PL061
-     bool
-diff --git a/hw/i2c/Kconfig b/hw/i2c/Kconfig
-index d6d4402608..74c9328729 100644
---- a/hw/i2c/Kconfig
-+++ b/hw/i2c/Kconfig
-@@ -3,18 +3,24 @@ config I2C
- 
- config SMBUS_EEPROM
-     bool
-+    depends on I2C
- 
- config DDC
-     bool
-+    depends on I2C
- 
- config VERSATILE_I2C
-     bool
-+    select I2C
- 
- config ACPI_SMBUS
-     bool
-+    select I2C
- 
- config BITBANG_I2C
-     bool
-+    select I2C
- 
- config IMX_I2C
-     bool
-+    select I2C
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-index 48f7760379..ff22aa6541 100644
---- a/hw/i2c/Makefile.objs
-+++ b/hw/i2c/Makefile.objs
-@@ -1,4 +1,5 @@
--common-obj-$(CONFIG_I2C) += core.o smbus.o smbus_eeprom.o
-+common-obj-$(CONFIG_I2C) += core.o smbus.o
-+common-obj-$(CONFIG_SMBUS_EEPROM) += smbus_eeprom.o
- common-obj-$(CONFIG_DDC) += i2c-ddc.o
- common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
- common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index f53a788a95..695a67f88d 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -24,6 +24,7 @@ config PC_ACPI
-     select ACPI_X86
-     select ACPI_CPU_HOTPLUG
-     select ACPI_MEMORY_HOTPLUG
-+    select SMBUS_EEPROM
-     depends on ACPI_SMBUS
- 
- config I440FX
-diff --git a/hw/input/Kconfig b/hw/input/Kconfig
-index 01805ed17b..5d64e07fc6 100644
---- a/hw/input/Kconfig
-+++ b/hw/input/Kconfig
-@@ -3,6 +3,7 @@ config ADB
- 
- config LM832X
-     bool
-+    depends on I2C
- 
- config PCKBD
-     bool
-diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-index bf72e4fef2..82eaf183b1 100644
---- a/hw/isa/Kconfig
-+++ b/hw/isa/Kconfig
-@@ -18,6 +18,7 @@ config PIIX4
- config VT82C686
-     bool
-     select ISA_BUS
-+    select ACPI_SMBUS
- 
- config SMC37C669
-     bool
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index e6df7480c6..0a87b52ec7 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -7,9 +7,11 @@ config MAX111X
- 
- config TMP105
-     bool
-+    depends on I2C
- 
- config TMP421
-     bool
-+    depends on I2C
- 
- config ISA_DEBUG
-     bool
-@@ -34,6 +36,7 @@ config EDU
- 
- config PCA9552
-     bool
-+    depends on I2C
- 
- config PL310
-     bool
-@@ -100,3 +103,4 @@ config PVPANIC
- 
- config AUX
-     bool
-+    depends on I2C
 diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index 7dbc1211ab..e1a6e7469b 100644
+index e1a6e7469b..a021c742de 100644
 --- a/hw/timer/Kconfig
 +++ b/hw/timer/Kconfig
-@@ -9,6 +9,7 @@ config A9_GTIMER
- 
- config DS1338
+@@ -1,8 +1,10 @@
+ config ARM_TIMER
      bool
-+    depends on I2C
++    select PTIMER
  
- config HPET
+ config ARM_MPTIMER
      bool
-@@ -18,6 +19,7 @@ config I8254
++    select PTIMER
  
- config M41T80
+ config A9_GTIMER
      bool
-+    depends on I2C
+@@ -36,12 +38,14 @@ config XLNX_ZYNQMP
  
- config M48T59
+ config ALTERA_TIMER
      bool
-@@ -27,6 +29,7 @@ config PL031
++    select PTIMER
  
- config TWL92230
+ config MC146818RTC
      bool
-+    depends on I2C
  
- config XLNX_ZYNQMP
+ config ALLWINNER_A10_PIT
      bool
++    select PTIMER
+ 
+ config STM32F2XX_TIMER
+     bool
+@@ -51,6 +55,8 @@ config SUN4V_RTC
+ 
+ config CMSDK_APB_TIMER
+     bool
++    select PTIMER
+ 
+ config CMSDK_APB_DUALTIMER
+     bool
++    select PTIMER
 -- 
 2.17.1
