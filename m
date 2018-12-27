@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52235)
+Received: from eggs.gnu.org ([208.118.235.92]:52427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1gcUoe-0001nb-Dl
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 07:31:09 -0500
+	(envelope-from <dongli.zhang@oracle.com>) id 1gcUq7-0002qY-K4
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 07:32:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1gcUob-0005Dd-5W
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 07:31:08 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:44834)
+	(envelope-from <dongli.zhang@oracle.com>) id 1gcUq4-0007K5-Ex
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 07:32:39 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:34900)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dongli.zhang@oracle.com>)
-	id 1gcUoa-0005Cl-Rn
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 07:31:05 -0500
+	id 1gcUq4-0007JU-8z
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 07:32:36 -0500
 References: <099db937-3fa3-465e-9a23-a900df9adb7c@default>
 	<20181201122937.222f66da@x1.home>
 	<8f06611d-7b1e-5934-648c-f4cd7626fe63@oracle.com>
 From: Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <55d8a52e-7c0e-aa5b-ced2-176619e5c661@oracle.com>
-Date: Thu, 27 Dec 2018 20:30:48 +0800
+Message-ID: <77542c37-1c3d-6dfb-e615-8cb6a4e8cbb2@oracle.com>
+Date: Thu, 27 Dec 2018 20:32:27 +0800
 MIME-Version: 1.0
 In-Reply-To: <8f06611d-7b1e-5934-648c-f4cd7626fe63@oracle.com>
 Content-Type: text/plain; charset=windows-1252
