@@ -1,27 +1,26 @@
 Received: from eggs.gnu.org ([208.118.235.92]:46662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gcads-0002SG-VY
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 13:44:29 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gcaed-0002SG-Og
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 13:45:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gcaca-0001kH-Qe
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 13:43:09 -0500
-Received: from mail-eopbgr750120.outbound.protection.outlook.com
-	([40.107.75.120]:31072
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	(envelope-from <amarkovic@wavecomp.com>) id 1gcaZj-0005xz-Qq
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 13:40:11 -0500
+Received: from mail-eopbgr780113.outbound.protection.outlook.com
+	([40.107.78.113]:60048
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gcaca-0001jq-40
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 13:43:04 -0500
+	id 1gcaZj-0005sq-IC
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 13:40:07 -0500
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 27 Dec 2018 18:42:59 +0000
-Message-ID: <BN6PR2201MB125153121BA745CD12255DB3C6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Date: Thu, 27 Dec 2018 18:40:01 +0000
+Message-ID: <BN6PR2201MB12510FBB987EE71995240442C6A60@BN6PR2201MB1251.namprd22.prod.outlook.com>
 References: <20181210152829.29271-1-alex.bennee@linaro.org>,
-	<20181210152829.29271-6-alex.bennee@linaro.org>,
-	<BN6PR2201MB12510FBB987EE71995240442C6A60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB12510FBB987EE71995240442C6A60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181210152829.29271-6-alex.bennee@linaro.org>
+In-Reply-To: <20181210152829.29271-6-alex.bennee@linaro.org>
 Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [RFC PATCH 05/13] tests/tcg/mips: enable mips64
  system tests (WIP)
@@ -33,10 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?gb2312?B?QWxleCBCZW5uqKZl?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "edgar.iglesias@gmail.com" <edgar.iglesias@gmail.com>, "michael@walle.cc" <michael@walle.cc>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "shorne@gmail.com" <shorne@gmail.com>, "jcmvbkbc@gmail.com" <jcmvbkbc@gmail.com>, Stefan Markovic <smarkovic@wavecomp.com>
 
-Sorry, my last message involving this thread was sent in error. It was mean=
-t to be a a response to another, unrelated, message. Please discard it.
-
-Aleksandar
+PiA+IEBAIC0xNjYzLDEyICsxNjYzLDIxIEBAIGVudW0gew0KPiA+ICAgICogICAgICAgICAgqaYg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMjAuLjE4DQo+ID4gICAgKiAgICAgICAgICCp
+wKmkIDEwMDExMSCppCBPUENfTVhVX19QT09MMTYgqaSp0KmkIDAwMCCppCBPUENfTVhVX0QzMlNB
+UlcNCj4gPiAgICAqICAgICAgICAgIKmmICAgICAgICAgICAgICAgICAgICAgICAgICAgIKnAqaQg
+MDAxIKmkIE9QQ19NWFVfUzMyQUxODQo+ID4gLSAqICAgICAgICAgIKnAqaQgMTAxMDAwIKmkIE9Q
+Q19NWFVfTFhCICAgICAgqcCppCAwMTAgqaQgT1BDX01YVV9TMzJBTE5JDQo+ID4gLSAqICAgICAg
+ICAgIKnAqaQgMTAxMDAxIKmkIDxub3QgYXNzaWduZWQ+ICAgqcCppCAwMTEgqaQgT1BDX01YVV9T
+MzJOT1INCj4gPiAtICogICAgICAgICAgqcCppCAxMDEwMTAgqaQgT1BDX01YVV9TMTZMREQgICCp
+wKmkIDEwMCCppCBPUENfTVhVX1MzMkFORA0KPiA+IC0gKiAgICAgICAgICCpwKmkIDEwMTAxMSCp
+pCBPUENfTVhVX1MxNlNURCAgIKnAqaQgMTAxIKmkIE9QQ19NWFVfUzMyT1INCj4gPiAtICogICAg
+ICAgICAgqcCppCAxMDExMDAgqaQgT1BDX01YVV9TMTZMREkgICCpwKmkIDExMCCppCBPUENfTVhV
+X1MzMlhPUg0KPiA+IC0gKiAgICAgICAgICCpwKmkIDEwMTEwMSCppCBPUENfTVhVX1MxNlNESSAg
+IKm4qaQgMTExIKmkIE9QQ19NWFVfUzMyTFVJDQo+ID4gKyAqICAgICAgICAgIKmmICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIKnAqaQgMDEwIKmkIE9QQ19NWFVfUzMyQUxOSQ0KPiA+ICsgKiAg
+ICAgICAgICCppiAgICAgICAgICAgICAgICAgICAgICAgICAgICCpwKmkIDAxMSCppCBPUENfTVhV
+X1MzMk5PUg0KPiA+ICsgKiAgICAgICAgICCppiAgICAgICAgICAgICAgICAgICAgICAgICAgICCp
+wKmkIDEwMCCppCBPUENfTVhVX1MzMkFORA0KPiA+ICsgKiAgICAgICAgICCppiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICCpwKmkIDEwMSCppCBPUENfTVhVX1MzMk9SDQo+ID4gKyAqICAgICAg
+ICAgIKmmICAgICAgICAgICAgICAgICAgICAgICAgICAgIKnAqaQgMTEwIKmkIE9QQ19NWFVfUzMy
+WE9SDQo+ID4gKyAqICAgICAgICAgIKmmICAgICAgICAgICAgICAgICAgICAgICAgICAgIKm4qaQg
+MTExIKmkIE9QQ19NWFVfUzMyTFVJDQo+IFRoZSBvcGNvZGVzIGZvciBwb29sIDE2IGRvIG5vdCBs
+b29rIGNvcnJlY3QuIEkgdGhpbmsgdGhlIG1pbm9yIGJpdHMgc2hvdWxkIGxvb2sgbGlrZSB0aGUg
+Zm9sbG93aW5nLg0KPiANCj4gqdCppCAwMDAgqaQgT1BDX01YVV9EMzJTQVJXDQo+IKnAqaQgMDAx
+IKmkIE9QQ19NWFVfUzMyQUxODQo+IKnAqaQgMDEwIKmkIE9QQ19NWFVfUzMyQUxOSQ0KPiCpwKmk
+IDAxMSCppCBPUENfTVhVX1MzMkxVSQ0KPiCpwKmkIDEwMCCppCBPUENfTVhVX1MzMk5PUg0KPiCp
+wKmkIDEwMSCppCBPUENfTVhVX1MzMkFORA0KPiCpwKmkIDExMCCppCBPUENfTVhVX1MzMk9SDQo+
+IKm4qaQgMTExIKmkIE9QQ19NWFVfUzMyWE9SDQo+IA0KDQpIaSwgQ3JhaWchDQoNCk15IHByaW1h
+cnkgc291cmNlIGZvciBvcGNvZGVzIHdhcyB0aGUgbGF0ZXN0IEluZ2VuaWMgZG9jdW1lbnRhdGlv
+biwgZnJvbQ0KSW5nZW5pYydzIHNpdGU6IChkYXRlZCBKdW5lIDIwMTcpDQoNCmZ0cDovL2Z0cC5p
+bmdlbmljLmNvbS9TT0MvTTIwMC9YMTAwMF9NMjAwX1hCdXJzdF9JU0FfTVhVX1BNLnBkZg0KDQph
+bmQgb24gcGFnZSAxMDkgdGhlcmUgaXMgYSB0YWJsZSBpbiB0aGUgbWlkZGxlIG9mIHRoZSBwYWdl
+IHRoYXQgY29udGFpbnMNCmNvZGVzIHRoYXQgYXJlIGluIGFncmVlbWVudCB3aXRoIHdoYXQgaXMg
+Y3VycmVudGx5IGluIFFFTVUuDQoNCkhvd2V2ZXIsIEkgc2VhcmNoZWQgbW9yZSwgYW5kIGluIGEg
+cmVwb3NpdG9yeSB0aGF0IHNlZW1zIHRvIGJlIGRlcml2ZWQgZnJvbQ0KQW5kcm9pZCBOREsgcjlk
+IGJpbnV0aWxzIHRyZWUsIGluIGZpbGUNCg0KaHR0cHM6Ly9naXRodWIuY29tL2FwcG9ydGFibGUv
+YmludXRpbHMvYmxvYi9tYXN0ZXIvb3Bjb2Rlcy9teHUtb3BjLmMNCg0Kb3Bjb2RlcyBhcmUgYXMg
+eW91IHNhaWQuDQoNCkkgZ3Vlc3MgdGhlIGRlZmluaXRpdmUgYW5zd2VyIHdvdWxkIGJlIHRvIGlu
+dm9sdmUgdGVzdHMgb24gaGFyZHdhcmUsIG5vPw0KDQpUaGFua3MgZm9yIGJyaW5naW5nIHRoaXMg
+dXAhDQoNCkFsZWtzYW5kYXINCg0KDQo+ID4gKyAqICAgICAgICAgIKmmDQo+ID4gKyAqICAgICAg
+ICAgIKmmICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDcuLjUNCj4gPiArICogICAgICAg
+ICAgqcCppCAxMDEwMDAgqaQgT1BDX01YVV9fUE9PTDE3IKmkqdCppCAwMDAgqaQgT1BDX01YVV9M
+WEINCj4gPiArICogICAgICAgICAgqaYgICAgICAgICAgICAgICAgICAgICAgICAgICAgqcCppCAw
+MDEgqaQgT1BDX01YVV9MWEgNCj4gPiArICogICAgICAgICAgqcCppCAxMDEwMDEgqaQgPG5vdCBh
+c3NpZ25lZD4gICCpwKmkIDAxMSCppCBPUENfTVhVX0xYVw0KPiA+ICsgKiAgICAgICAgICCpwKmk
+IDEwMTAxMCCppCBPUENfTVhVX1MxNkxERCAgIKnAqaQgMTAwIKmkIE9QQ19NWFVfTFhCVQ0KPiA+
+ICsgKiAgICAgICAgICCpwKmkIDEwMTAxMSCppCBPUENfTVhVX1MxNlNURCAgIKm4qaQgMTAxIKmk
+IE9QQ19NWFVfTFhIVQ0KPiA+ICsgKiAgICAgICAgICCpwKmkIDEwMTEwMCCppCBPUENfTVhVX1Mx
+NkxESQ0KPiA+ICsgKiAgICAgICAgICCpwKmkIDEwMTEwMSCppCBPUENfTVhVX1MxNlNESQ0KPiA+
+ICAgICogICAgICAgICAgqcCppCAxMDExMTAgqaQgT1BDX01YVV9TMzJNMkkNCj4gPiAgICAqICAg
+ICAgICAgIKnAqaQgMTAxMTExIKmkIE9QQ19NWFVfUzMySTJNDQo+ID4gICAgKiAgICAgICAgICCp
+wKmkIDExMDAwMCCppCBPUENfTVhVX0QzMlNMTA0K
