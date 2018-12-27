@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54648)
+Received: from eggs.gnu.org ([208.118.235.92]:54684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gcPG5-0002ku-V3
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:12 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gcPGM-0002sb-7B
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gcPG1-0003x2-FI
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:05 -0500
-Received: from mga11.intel.com ([192.55.52.93]:57846)
+	(envelope-from <yang.zhong@intel.com>) id 1gcPG5-00047L-CH
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:14 -0500
+Received: from mga11.intel.com ([192.55.52.93]:57851)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gcPG1-0003ov-0B
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:01 -0500
+	id 1gcPG4-00041J-Om
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:35:05 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Thu, 27 Dec 2018 14:33:56 +0800
-Message-Id: <20181227063419.12981-3-yang.zhong@intel.com>
+Date: Thu, 27 Dec 2018 14:33:58 +0800
+Message-Id: <20181227063419.12981-5-yang.zhong@intel.com>
 In-Reply-To: <20181227063419.12981-1-yang.zhong@intel.com>
 References: <20181227063419.12981-1-yang.zhong@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 02/25] hw/i386/Makefile.objs: Build
- pc_piix* and pc_q35 boards
+Subject: [Qemu-devel] [RFC PATCH 04/25] minikconfig: add AST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +25,205 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, yang.zhong@intel.com, =?UTF-8?q?=C3=81kos=20Kov=C3=A1cs?= <akoskovacs@gmx.com>
+Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, yang.zhong@intel.com
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-CONFIG_PIIX and CONFIG_Q35 created for the pc board object files. These
-are enabled automatically at default-configs/i386-softmmu.mak and
-default-configs/x86_64-softmmu.mak
+Add Python classes that represent the Kconfig abstract syntax tree.
+The abstract syntax tree is stored as a list of clauses.  For example:
 
-Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
+    config FOO
+        depends on BAR
+        select BAZ
+
+is represented as three clauses:
+
+    FOO depends on BAR
+    FOO default n
+    select BAZ if FOO
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/i386-softmmu.mak | 2 ++
- hw/i386/Makefile.objs            | 4 +++-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ scripts/minikconf.py | 116 ++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 98 insertions(+), 18 deletions(-)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 64c998c4c8..65ef98be18 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -67,3 +67,5 @@ CONFIG_I2C=y
- CONFIG_SEV=$(CONFIG_KVM)
- CONFIG_VTD=y
- CONFIG_AMD_IOMMU=y
-+CONFIG_I440FX=y
-+CONFIG_Q35=y
-diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-index fa87a14152..3de7ca2bb9 100644
---- a/hw/i386/Makefile.objs
-+++ b/hw/i386/Makefile.objs
-@@ -1,6 +1,8 @@
- obj-$(CONFIG_KVM) += kvm/
- obj-y += multiboot.o
--obj-y += pc.o pc_piix.o pc_q35.o
-+obj-y += pc.o
-+obj-$(CONFIG_I440FX) += pc_piix.o
-+obj-$(CONFIG_Q35) += pc_q35.o
- obj-y += pc_sysfw.o
- obj-$(CONFIG_VTD) += x86-iommu.o intel_iommu.o
- obj-$(CONFIG_AMD_IOMMU) += x86-iommu.o amd_iommu.o
+diff --git a/scripts/minikconf.py b/scripts/minikconf.py
+index 9e33d80514..f1851c3570 100644
+--- a/scripts/minikconf.py
++++ b/scripts/minikconf.py
+@@ -26,11 +26,84 @@ __all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser' ]
+ # -------------------------------------------
+ 
+ class KconfigData:
++    class Expr:
++        def __and__(self, rhs):
++            return KconfigData.AND(self, rhs)
++        def __or__(self, rhs):
++            return KconfigData.OR(self, rhs)
++        def __invert__(self):
++            return KconfigData.NOT(self)
++
++    class AND(Expr):
++        def __init__(self, lhs, rhs):
++            self.lhs = lhs
++            self.rhs = rhs
++        def __str__(self):
++            return "(%s && %s)" % (self.lhs, self.rhs)
++
++    class OR(Expr):
++        def __init__(self, lhs, rhs):
++            self.lhs = lhs
++            self.rhs = rhs
++        def __str__(self):
++            return "(%s || %s)" % (self.lhs, self.rhs)
++
++    class NOT(Expr):
++        def __init__(self, lhs):
++            self.lhs = lhs
++        def __str__(self):
++            return "!%s" % (self.lhs)
++
++    class Var(Expr):
++        def __init__(self, name):
++            self.name = name
++            self.value = None
++        def __str__(self):
++            return self.name
++
++    class Clause:
++        def __init__(self, dest):
++            self.dest = dest
++
++    class AssignmentClause(Clause):
++        def __init__(self, dest, value):
++            KconfigData.Clause.__init__(self, dest)
++            self.value = value
++        def __str__(self):
++            return "%s=%s" % (self.dest, 'y' if self.value else 'n')
++
++    class DefaultClause(Clause):
++        def __init__(self, dest, value, cond=None):
++            KconfigData.Clause.__init__(self, dest)
++            self.value = value
++            self.cond = cond
++        def __str__(self):
++            value = 'y' if self.value else 'n'
++            if self.cond is None:
++                return "config %s default %s" % (self.dest, value)
++            else:
++                return "config %s default %s if %s" % (self.dest, value, self.cond)
++
++    class DependsOnClause(Clause):
++        def __init__(self, dest, expr):
++            KconfigData.Clause.__init__(self, dest)
++            self.expr = expr
++        def __str__(self):
++            return "config %s depends on %s" % (self.dest, self.expr)
++
++    class SelectClause(Clause):
++        def __init__(self, dest, cond):
++            KconfigData.Clause.__init__(self, dest)
++            self.cond = cond
++        def __str__(self):
++            return "select %s if %s" % (self.dest, self.cond)
++
+     def __init__(self):
+         self.previously_included = []
+         self.incl_info = None
+         self.defined_vars = set()
+-        self.referenced_vars = set()
++        self.referenced_vars = dict()
++        self.clauses = list()
+ 
+     # semantic analysis -------------
+ 
+@@ -48,26 +121,28 @@ class KconfigData:
+         if (var in self.defined_vars):
+             raise Exception('variable "' + var + '" defined twice')
+ 
+-        self.defined_vars.add(var)
++        self.defined_vars.add(var.name)
+ 
+     # var is a string with the variable's name.
+-    #
+-    # For now this just returns the variable's name itself.
+     def do_var(self, var):
+-        self.referenced_vars.add(var)
+-        return var
++        if (var in self.referenced_vars):
++            return self.referenced_vars[var]
++
++        var_obj = self.referenced_vars[var] = KconfigData.Var(var)
++        return var_obj
+ 
+     def do_assignment(self, var, val):
+-        pass
++        self.clauses.append(KconfigData.AssignmentClause(var, val))
+ 
+     def do_default(self, var, val, cond=None):
+-        pass
++        self.clauses.append(KconfigData.DefaultClause(var, val, cond))
+ 
+     def do_depends_on(self, var, expr):
+-        pass
++        self.clauses.append(KconfigData.DependsOnClause(var, expr))
+ 
+     def do_select(self, var, symbol, cond=None):
+-        pass
++        cond = (cond & var) if not (cond is None) else var
++        self.clauses.append(KconfigData.SelectClause(symbol, cond))
+ 
+ # -------------------------------------------
+ # KconfigParser implements a recursive descent parser for (simplified)
+@@ -229,31 +304,34 @@ class KconfigParser:
+     def parse_primary(self):
+         if self.tok == TOK_NOT:
+             self.get_token()
+-            self.parse_primary()
++            val = ~self.parse_primary()
+         elif self.tok == TOK_LPAREN:
+             self.get_token()
+-            self.parse_expr()
++            val = self.parse_expr()
+             if self.tok != TOK_RPAREN:
+                 raise KconfigParserError(self, 'Expected ")"')
+             self.get_token()
+         elif self.tok == TOK_ID:
+-            self.parse_var()
++            val = self.parse_var()
+         else:
+             raise KconfigParserError(self, 'Expected "!" or "(" or identifier')
++        return val
+ 
+     # disj: primary (OR primary)*
+     def parse_disj(self):
+-        self.parse_primary()
++        lhs = self.parse_primary()
+         while self.tok == TOK_OR:
+             self.get_token()
+-            self.parse_primary()
++            lhs = lhs | self.parse_primary()
++        return lhs
+ 
+     # expr: disj (AND disj)*
+     def parse_expr(self):
+-        self.parse_disj()
++        lhs = self.parse_disj()
+         while self.tok == TOK_AND:
+             self.get_token()
+-            self.parse_disj()
++            lhs = lhs & self.parse_disj()
++        return lhs
+ 
+     # condition: IF expr
+     #       | empty
+@@ -422,4 +500,6 @@ class KconfigParser:
+ 
+ if __name__ == '__main__':
+     fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
+-    KconfigParser.parse(open(fname, 'r'))
++    data = KconfigParser.parse(open(fname, 'r'))
++    for i in data.clauses:
++        print i
 -- 
 2.17.1
