@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55386)
+Received: from eggs.gnu.org ([208.118.235.92]:55868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gcPHb-0004OR-DL
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:36:43 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gcPIP-0005JP-L4
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:37:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gcPHV-0005t8-PV
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:36:39 -0500
-Received: from mga11.intel.com ([192.55.52.93]:57858)
+	(envelope-from <imammedo@redhat.com>) id 1gcPIM-0006ku-BE
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:37:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gcPHV-0004B3-5c
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:36:33 -0500
-From: Yang Zhong <yang.zhong@intel.com>
-Date: Thu, 27 Dec 2018 14:34:17 +0800
-Message-Id: <20181227063419.12981-24-yang.zhong@intel.com>
-In-Reply-To: <20181227063419.12981-1-yang.zhong@intel.com>
-References: <20181227063419.12981-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH 23/25] x86_64-softmmu.mak: remove
- i386-softmmu.mak include
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gcPII-0006ay-Bj
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 01:37:24 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DA9F98E3E6
+	for <qemu-devel@nongnu.org>; Thu, 27 Dec 2018 06:37:18 +0000 (UTC)
+Date: Thu, 27 Dec 2018 07:37:11 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181227073711.25a70b38@Igors-MacBook-Pro.local>
+In-Reply-To: <20181221090410.27250-8-marcandre.lureau@redhat.com>
+References: <20181221090410.27250-1-marcandre.lureau@redhat.com>
+	<20181221090410.27250-8-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 07/28] compat: replace PC_COMPAT_3_0 &
+ HW_COMPAT_3_0 macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,29 +34,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, yang.zhong@intel.com
+To: =?UTF-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
 
-Only keep same boards definitions as i386-softmmu.mak in
-x86_64-softmmu.mak.
+On Fri, 21 Dec 2018 13:03:49 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
----
- default-configs/x86_64-softmmu.mak | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+> Use static arrays instead.
+>=20
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 64b2ee2960..0c69c2930c 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -1,3 +1,7 @@
- # Default configuration for x86_64-softmmu
- 
--include i386-softmmu.mak
-+# Boards:
-+#
-+CONFIG_ISAPC=y
-+CONFIG_I440FX=y
-+CONFIG_Q35=y
--- 
-2.17.1
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  include/hw/boards.h        |  3 +++
+>  include/hw/compat.h        |  3 ---
+>  include/hw/i386/pc.h       | 17 ++---------------
+>  hw/arm/virt.c              |  6 +-----
+>  hw/core/machine.c          |  3 +++
+>  hw/i386/pc.c               | 17 +++++++++++++++++
+>  hw/i386/pc_piix.c          |  7 ++-----
+>  hw/i386/pc_q35.c           |  7 ++-----
+>  hw/ppc/spapr.c             |  5 +----
+>  hw/s390x/s390-virtio-ccw.c |  5 +----
+>  10 files changed, 32 insertions(+), 41 deletions(-)
+>=20
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index dc8c748c62..6b94d36d6a 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -290,4 +290,7 @@ struct MachineState {
+>  extern GlobalProperty hw_compat_3_1[];
+>  extern const size_t hw_compat_3_1_len;
+> =20
+> +extern GlobalProperty hw_compat_3_0[];
+> +extern const size_t hw_compat_3_0_len;
+> +
+>  #endif
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 6f4d5fc647..c08f4040bb 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -1,9 +1,6 @@
+>  #ifndef HW_COMPAT_H
+>  #define HW_COMPAT_H
+> =20
+> -#define HW_COMPAT_3_0 \
+> -    /* empty */
+> -
+>  #define HW_COMPAT_2_12 \
+>      {\
+>          .driver   =3D "migration",\
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index dd1d6fd0f3..197131ff9a 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -297,21 +297,8 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint6=
+4_t *);
+>  extern GlobalProperty pc_compat_3_1[];
+>  extern const size_t pc_compat_3_1_len;
+> =20
+> -#define PC_COMPAT_3_0 \
+> -    HW_COMPAT_3_0 \
+> -    {\
+> -        .driver   =3D TYPE_X86_CPU,\
+> -        .property =3D "x-hv-synic-kvm-only",\
+> -        .value    =3D "on",\
+> -    },{\
+> -        .driver   =3D "Skylake-Server" "-" TYPE_X86_CPU,\
+> -        .property =3D "pku",\
+> -        .value    =3D "off",\
+> -    },{\
+> -        .driver   =3D "Skylake-Server-IBRS" "-" TYPE_X86_CPU,\
+> -        .property =3D "pku",\
+> -        .value    =3D "off",\
+> -    },
+> +extern GlobalProperty pc_compat_3_0[];
+> +extern const size_t pc_compat_3_0_len;
+> =20
+>  #define PC_COMPAT_2_12 \
+>      HW_COMPAT_2_12 \
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index b1ecccfaab..d226e7922e 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1881,12 +1881,8 @@ DEFINE_VIRT_MACHINE(3, 1)
+> =20
+>  static void virt_machine_3_0_options(MachineClass *mc)
+>  {
+> -    static GlobalProperty compat[] =3D {
+> -        HW_COMPAT_3_0
+> -    };
+> -
+>      virt_machine_3_1_options(mc);
+> -    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+> +    compat_props_add(mc->compat_props, hw_compat_3_0, hw_compat_3_0_len);
+>  }
+>  DEFINE_VIRT_MACHINE(3, 0)
+> =20
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index bdeeda68e4..cd55366f2e 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -25,6 +25,9 @@
+>  GlobalProperty hw_compat_3_1[] =3D {};
+>  const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
+> =20
+> +GlobalProperty hw_compat_3_0[] =3D {};
+> +const size_t hw_compat_3_0_len =3D G_N_ELEMENTS(hw_compat_3_0);
+> +
+>  static char *machine_get_accel(Object *obj, Error **errp)
+>  {
+>      MachineState *ms =3D MACHINE(obj);
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 74d8a82f64..7b9271a7ff 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -112,6 +112,23 @@ struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8=
+_MAX};
+>  GlobalProperty pc_compat_3_1[] =3D {};
+>  const size_t pc_compat_3_1_len =3D G_N_ELEMENTS(pc_compat_3_1);
+> =20
+> +GlobalProperty pc_compat_3_0[] =3D {
+> +    {
+> +        .driver   =3D TYPE_X86_CPU,
+> +        .property =3D "x-hv-synic-kvm-only",
+> +        .value    =3D "on",
+> +    },{
+> +        .driver   =3D "Skylake-Server" "-" TYPE_X86_CPU,
+> +        .property =3D "pku",
+> +        .value    =3D "off",
+> +    },{
+> +        .driver   =3D "Skylake-Server-IBRS" "-" TYPE_X86_CPU,
+> +        .property =3D "pku",
+> +        .value    =3D "off",
+> +    },
+> +};
+> +const size_t pc_compat_3_0_len =3D G_N_ELEMENTS(pc_compat_3_0);
+> +
+>  void gsi_handler(void *opaque, int n, int level)
+>  {
+>      GSIState *s =3D opaque;
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 5342019d83..c1a9a10911 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -452,12 +452,9 @@ DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
+> =20
+>  static void pc_i440fx_3_0_machine_options(MachineClass *m)
+>  {
+> -    static GlobalProperty compat[] =3D {
+> -        PC_COMPAT_3_0
+> -    };
+> -
+>      pc_i440fx_3_1_machine_options(m);
+> -    compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
+> +    compat_props_add(m->compat_props, hw_compat_3_0, hw_compat_3_0_len);
+> +    compat_props_add(m->compat_props, pc_compat_3_0, pc_compat_3_0_len);
+>  }
+> =20
+>  DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 1eb1e82b25..231b1269d1 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -333,12 +333,9 @@ DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
+> =20
+>  static void pc_q35_3_0_machine_options(MachineClass *m)
+>  {
+> -    static GlobalProperty compat[] =3D {
+> -        PC_COMPAT_3_0
+> -    };
+> -
+>      pc_q35_3_1_machine_options(m);
+> -    compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
+> +    compat_props_add(m->compat_props, hw_compat_3_0, hw_compat_3_0_len);
+> +    compat_props_add(m->compat_props, pc_compat_3_0, pc_compat_3_0_len);
+>  }
+> =20
+>  DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 038d1859a6..5c4c6be22f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3978,12 +3978,9 @@ DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+>  static void spapr_machine_3_0_class_options(MachineClass *mc)
+>  {
+>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> -    static GlobalProperty compat[] =3D {
+> -        HW_COMPAT_3_0
+> -    };
+> =20
+>      spapr_machine_3_1_class_options(mc);
+> -    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+> +    compat_props_add(mc->compat_props, hw_compat_3_0, hw_compat_3_0_len);
+> =20
+>      smc->legacy_irq_allocation =3D true;
+>      smc->irq =3D &spapr_irq_xics_legacy;
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 5e8b48e75b..e54e6f6dd0 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -680,13 +680,10 @@ static void ccw_machine_3_0_instance_options(Machin=
+eState *machine)
+>  static void ccw_machine_3_0_class_options(MachineClass *mc)
+>  {
+>      S390CcwMachineClass *s390mc =3D S390_MACHINE_CLASS(mc);
+> -    static GlobalProperty compat[] =3D {
+> -        HW_COMPAT_3_0
+> -    };
+> =20
+>      s390mc->hpage_1m_allowed =3D false;
+>      ccw_machine_3_1_class_options(mc);
+> -    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+> +    compat_props_add(mc->compat_props, hw_compat_3_0, hw_compat_3_0_len);
+>  }
+>  DEFINE_CCW_MACHINE(3_0, "3.0", false);
+> =20
