@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56173)
+Received: from eggs.gnu.org ([208.118.235.92]:57278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gcdjx-0006aQ-JE
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 17:02:54 -0500
+	(envelope-from <liebrecht@grossmann-venter.com>) id 1gcdns-0002GF-Va
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 17:06:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gcdju-0008Ph-Et
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 17:02:53 -0500
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:36970)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gcdjs-00083k-GC
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 17:02:49 -0500
-Received: by mail-ed1-x543.google.com with SMTP id h15so16240199edb.4
-	for <qemu-devel@nongnu.org>; Thu, 27 Dec 2018 14:02:37 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1545916380-12816-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ffea8de2-2bc7-da9f-61d0-62c6baa90efc@amsat.org>
-Date: Thu, 27 Dec 2018 23:02:33 +0100
+	(envelope-from <liebrecht@grossmann-venter.com>) id 1gcdnp-0000GW-TH
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 17:06:56 -0500
+Received: from server54-2.web-hosting.com ([198.54.126.118]:42930)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liebrecht@grossmann-venter.com>)
+	id 1gcdnp-0000Em-Lx
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 17:06:53 -0500
+Received: from [::1] (port=38266 helo=server54.web-hosting.com)
+	by server54.web-hosting.com with esmtpa (Exim 4.91)
+	(envelope-from <liebrecht@grossmann-venter.com>) id 1gcdnm-001wF0-H1
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 17:06:52 -0500
 MIME-Version: 1.0
-In-Reply-To: <1545916380-12816-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] tests: Reorganize MIPS TCG directories
- and files
+Date: Thu, 27 Dec 2018 17:06:50 -0500
+From: liebrecht@grossmann-venter.com
+In-Reply-To: <201812270613.51558.randrianasulu@gmail.com>
+References: <201812270613.51558.randrianasulu@gmail.com>
+Message-ID: <859085189a65d5c9b612dc942313f46f@grossmann-venter.com>
+Subject: Re: [Qemu-devel] Qemu the right way.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: noring@nocrew.org, smarkovic@wavecomp.com, arikalo@wavecomp.com, amarkovic@wavecomp.com, alex.bennee@linaro.org, aurelien@aurel32.net
+To: qemu-devel@nongnu.org
 
-Hi Aleksandar,
+I resolved it by removing the nic driver detected  by windows and 
+rebooted.
+It seems llike the first thing to do after the startup string is 
+complete is to remove all drivers and then let windows find them again 
+according to what is available from the startup string switches.
 
-On 12/27/18 2:12 PM, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+The nic problem is solved.
+Thanks all for the kind help
+
+On 2018-12-26 22:13, Andrew Randrianasulu wrote:
+> re:
 > 
-> Reorganize MIPS TCG directories and files. The file movement is done
-> using "git mv" command, so "git blame" will still display the original
-> information, regardles of the new names and locations of involved
-> files.
+> The network switch used above fails with
+> qemu-system-x86_64: -nic: invalid option
 > 
-> Aleksandar Markovic (2):
->   tests: tcg: mips: Move source files to new location
->   tests: tcg: mips: Remove old directories after reorganization
-
-It seems the list ate your patch 1/2...
-
-See https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg06009.html
-
-Regards,
-
-Phil.
+> Cant figure out why as it is what is used in the manual as is!
+> 
+> ----------------
+> 
+> May be because your qemu is not as new as documentation (documentation 
+> describe
+> current stable qemu - v 3.1.0) ?
+> 
+> I tried this line
+> 
+> qemu-system-x86_64 -nic user,ipv6=off,model=e1000,mac=52:54:98:76:54:32 
+> -cdrom
+> ~/Downloads/ISO/slax-English-US-7.0.8-x86_64.iso -m 1999 -enable-kvm 
+> -cpu
+> host -smp 4
+> 
+> and it worked for me (obviosly with Linux guest), browser in this 
+> specific
+> live-cd was too old for youtube, but at least it showed previews and 
+> error
+> messages.
+> 
+> My qemu is self-compiled and sort-of behind the times:
+> 
+> qemu-system-x86_64 --version
+> QEMU emulator version 3.0.50 (v3.0.0-1559-g179f9ac887-dirty)
+> Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
