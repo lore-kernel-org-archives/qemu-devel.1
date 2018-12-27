@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46615)
+Received: from eggs.gnu.org ([208.118.235.92]:47553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gcWWN-0008NX-Eg
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:20:27 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcWZP-0001Fi-C1
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:23:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gcWWI-0004Kt-BA
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:20:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48456)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcWZK-0000z6-Es
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:23:31 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51021 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gcWWI-0004Fu-37
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:20:18 -0500
-Date: Thu, 27 Dec 2018 07:20:13 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181227072013.53edabbf@x1.home>
-In-Reply-To: <55d8a52e-7c0e-aa5b-ced2-176619e5c661@oracle.com>
-References: <099db937-3fa3-465e-9a23-a900df9adb7c@default>
-	<20181201122937.222f66da@x1.home>
-	<8f06611d-7b1e-5934-648c-f4cd7626fe63@oracle.com>
-	<55d8a52e-7c0e-aa5b-ced2-176619e5c661@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] vfio failure with intel 760p 128GB nvme
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gcWZK-0000ws-2M
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:23:26 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Thu, 27 Dec 2018 15:22:40 +0100
+Message-Id: <1545920586-17815-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v6 00/26] disas: nanoMIPS: Clean up several
+ issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,145 +23,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: keith.busch@intel.com, qemu-devel@nongnu.org, coffmaker@gmail.com, maximlevitsky@gmail.com
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, arikalo@wavecomp.com
 
-On Thu, 27 Dec 2018 20:30:48 +0800
-Dongli Zhang <dongli.zhang@oracle.com> wrote:
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-> Hi Alex,
-> 
-> On 12/02/2018 09:29 AM, Dongli Zhang wrote:
-> > Hi Alex,
-> > 
-> > On 12/02/2018 03:29 AM, Alex Williamson wrote:  
-> >> On Sat, 1 Dec 2018 10:52:21 -0800 (PST)
-> >> Dongli Zhang <dongli.zhang@oracle.com> wrote:
-> >>  
-> >>> Hi,
-> >>>
-> >>> I obtained below error when assigning an intel 760p 128GB nvme to guest via
-> >>> vfio on my desktop:
-> >>>
-> >>> qemu-system-x86_64: -device vfio-pci,host=0000:01:00.0: vfio 0000:01:00.0: failed to add PCI capability 0x11[0x50]@0xb0: table & pba overlap, or they don't fit in BARs, or don't align
-> >>>
-> >>>
-> >>> This is because the msix table is overlapping with pba. According to below
-> >>> 'lspci -vv' from host, the distance between msix table offset and pba offset is
-> >>> only 0x100, although there are 22 entries supported (22 entries need 0x160).
-> >>> Looks qemu supports at most 0x800.
-> >>>
-> >>> # sudo lspci -vv
-> >>> ... ...
-> >>> 01:00.0 Non-Volatile memory controller: Intel Corporation Device f1a6 (rev 03) (prog-if 02 [NVM Express])
-> >>> 	Subsystem: Intel Corporation Device 390b
-> >>> ... ...
-> >>> 	Capabilities: [b0] MSI-X: Enable- Count=22 Masked-
-> >>> 		Vector table: BAR=0 offset=00002000
-> >>> 		PBA: BAR=0 offset=00002100
-> >>>
-> >>>
-> >>>
-> >>> A patch below could workaround the issue and passthrough nvme successfully.
-> >>>
-> >>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> >>> index 5c7bd96..54fc25e 100644
-> >>> --- a/hw/vfio/pci.c
-> >>> +++ b/hw/vfio/pci.c
-> >>> @@ -1510,6 +1510,11 @@ static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
-> >>>      msix->pba_offset = pba & ~PCI_MSIX_FLAGS_BIRMASK;
-> >>>      msix->entries = (ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
-> >>>  
-> >>> +    if (msix->table_bar == msix->pba_bar &&
-> >>> +        msix->table_offset + msix->entries * PCI_MSIX_ENTRY_SIZE > msix->pba_offset) {
-> >>> +        msix->entries = (msix->pba_offset - msix->table_offset) / PCI_MSIX_ENTRY_SIZE;
-> >>> +    }
-> >>> +
-> >>>      /*
-> >>>       * Test the size of the pba_offset variable and catch if it extends outside
-> >>>       * of the specified BAR. If it is the case, we need to apply a hardware
-> >>>
-> >>>
-> >>> Would you please help confirm if this can be regarded as bug in qemu, or issue
-> >>> with nvme hardware? Should we fix thin in qemu, or we should never use such buggy
-> >>> hardware with vfio?  
-> >>
-> >> It's a hardware bug, is there perhaps a firmware update for the device
-> >> that resolves it?  It's curious that a vector table size of 0x100 gives
-> >> us 16 entries and 22 in hex is 0x16 (table size would be reported as
-> >> 0x15 for the N-1 algorithm).  I wonder if there's a hex vs decimal
-> >> mismatch going on.  We don't really know if the workaround above is
-> >> correct, are there really 16 entries or maybe does the PBA actually
-> >> start at a different offset?  We wouldn't want to generically assume
-> >> one or the other.  I think we need Intel to tell us in which way their
-> >> hardware is broken and whether it can or is already fixed in a firmware
-> >> update.  Thanks,  
-> > 
-> > Thank you very much for the confirmation.
-> > 
-> > Just realized looks this would make trouble to my desktop as well when 17
-> > vectors are used.
-> > 
-> > I will report to intel and confirm how this can happen and if there is any
-> > firmware update available for this issue.
-> >   
-> 
-> I found there is similar issue reported to kvm:
-> 
-> https://bugzilla.kernel.org/show_bug.cgi?id=202055
-> 
-> 
-> I confirmed with my env again. By default, the msi-x count is 16.
-> 
-> 	Capabilities: [b0] MSI-X: Enable+ Count=16 Masked-
-> 		Vector table: BAR=0 offset=00002000
-> 		PBA: BAR=0 offset=00002100
-> 
-> 
-> The count is still 16 after the device is assigned to vfio (Enable- now):
-> 
-> # echo 0000:01:00.0 > /sys/bus/pci/devices/0000\:01\:00.0/driver/unbind
-> # echo "8086 f1a6" > /sys/bus/pci/drivers/vfio-pci/new_id
-> 
-> Capabilities: [b0] MSI-X: Enable- Count=16 Masked-
-> 		Vector table: BAR=0 offset=00002000
-> 		PBA: BAR=0 offset=00002100
-> 
-> 
-> After I boot qemu with "-device vfio-pci,host=0000:01:00.0", count becomes 22.
-> 
-> Capabilities: [b0] MSI-X: Enable- Count=22 Masked-
-> 		Vector table: BAR=0 offset=00002000
-> 		PBA: BAR=0 offset=00002100
-> 
-> 
-> 
-> Another interesting observation is, vfio-based userspace nvme also changes count
-> from 16 to 22.
-> 
-> I reboot host and the count is reset to 16. Then I boot VM with "-drive
-> file=nvme://0000:01:00.0/1,if=none,id=nvmedrive0 -device
-> virtio-blk,drive=nvmedrive0,id=nvmevirtio0". As userspace nvme uses different
-> vfio path, it boots successfully without issue.
-> 
-> However, the count becomes 22 then:
-> 
-> Capabilities: [b0] MSI-X: Enable- Count=22 Masked-
-> 		Vector table: BAR=0 offset=00002000
-> 		PBA: BAR=0 offset=00002100
-> 
-> 
-> Both vfio and userspace nvme (based on vfio) would change the count from 16 to 22.
+Clean up several misc issues in nanoMIPS disassembler. There are
+more issues to be cleaned, and this is meant to be just the first
+phase. Complete cleanup should happen over the course of next
+few months.
 
-Yes, we've found in the bz you mention that it's resetting the device
-via FLR that causes the device to report a bogus interrupt count.  The
-vfio-pci driver will always perform an FLR on the device before
-providing it to the user, so whether it's directly assigned with
-vfio-pci in QEMU or exposed as an nvme drive via nvme://, it will go
-through the same FLR path.  It looks like we need yet another device
-specific reset for nvme.  Ideally we could figure out how to recover
-the device after an FLR, but potentially we could reset the nvme
-controller rather than the PCI interface.  This is becoming a problem
-that so many nvme controllers have broken FLRs.  Thanks,
+All these changes should not and do not affect any functionality.
 
-Alex
+v5->v6:
+
+  - patches that deal with adding format specifiers [16] and [49]
+    removed, until we determine what is the most appropriate form,
+    and how to be more in sync with objdump output and inline
+    assembler allowed formats
+  - added 14 patches on reformating grp decoders
+  - added a patch that adds documentation as reference
+
+v4->v5:
+
+  - renamed patch "Fix comments for 48-bit instructions" to
+      "Clean up handling of 48-bit instructions"
+  - added patch "Clean up handling of 16-bit logic instructions"
+  - added eight patches on improving gpr decoders
+  - minor addition to patch "Fix order of more invocations"
+  - minor cleanups of previous commit messages
+
+v3->v4:
+
+  - added patch "Name more functions in a more descriptive way"
+  - added patch "Fix order of more invocations"
+  - added patch "Fix comments for 48-bit instructions"
+  - minor cleanups of previous commit messages
+
+v2->v3:
+
+  - added three patches that fix function misnomers.
+  - minor changes in commit messages.
+
+v1->v2:
+
+  - patch 5 was somehow lost in v1, now should be fine.
+
+Aleksandar Markovic (26):
+  disas: nanoMIPS: Fix preamble text in nanomips.* files
+  disas: nanoMIPS: Remove functions that are not used
+  disas: nanoMIPS: Fix a function misnomer
+  disas: nanoMIPS: Fix order of some invocations
+  disas: nanoMIPS: Name some functions in a more descriptive way
+  disas: nanoMIPS: Fix an FP-related misnomer 1
+  disas: nanoMIPS: Fix an FP-related misnomer 2
+  disas: nanoMIPS: Fix an FP-related misnomer 3
+  disas: nanoMIPS: Name more functions in a more descriptive way
+  disas: nanoMIPS: Fix order of more invocations
+  disas: nanoMIPS: Rename the decoder of 'gpr3' gpr encoding type
+  disas: nanoMIPS: Comment the decoder of 'gpr3' gpr encoding type
+  disas: nanoMIPS: Rename the decoder of 'gpr3.src.store' gpr encoding
+    type
+  disas: nanoMIPS: Comment the decoder of 'gpr3.src.store' gpr encoding
+    type
+  disas: nanoMIPS: Rename the decoder of 'gpr4' gpr encoding type
+  disas: nanoMIPS: Comment the decoder of 'gpr4' gpr encoding type
+  disas: nanoMIPS: Rename the decoder of 'gpr4.zero' gpr encoding type
+  disas: nanoMIPS: Comment the decoder of 'gpr4.zero' gpr encoding type
+  disas: nanoMIPS: Rename the decoder of 'gpr2.reg1' gpr encoding type
+  disas: nanoMIPS: Comment the decoder of 'gpr2.reg1' gpr encoding type
+  disas: nanoMIPS: Rename the decoder of 'gpr2.reg2' gpr encoding type
+  disas: nanoMIPS: Comment the decoder of 'gpr2.reg2' gpr encoding type
+  disas: nanoMIPS: Rename the decoder of 'gpr1' gpr encoding type
+  disas: nanoMIPS: Comment the decoder of 'gpr1' gpr encoding type
+  disas: nanoMIPS: Reorder declarations and definitions of gpr decoders
+  disas: nanoMIPS: Add a note on documentation
+
+ disas/nanomips.cpp | 2135 ++++++++++++++++++++++++++--------------------------
+ disas/nanomips.h   |  115 ++-
+ 2 files changed, 1111 insertions(+), 1139 deletions(-)
+
+-- 
+2.7.4
