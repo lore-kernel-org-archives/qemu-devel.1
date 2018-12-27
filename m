@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59415)
+Received: from eggs.gnu.org ([208.118.235.92]:59902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1gcXMN-0005I5-9T
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 10:14:10 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gcXMi-0005ni-Qo
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 10:14:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1gcX7x-0002mc-IL
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:59:16 -0500
-Received: from mail-eopbgr690100.outbound.protection.outlook.com
-	([40.107.69.100]:29472
-	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
-	id 1gcX7x-0002lT-7o
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 09:59:13 -0500
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
-Date: Thu, 27 Dec 2018 14:59:10 +0000
-Message-ID: <DM5PR22MB1658F8BCF997BDADAE070FD8D2B60@DM5PR22MB1658.namprd22.prod.outlook.com>
-References: <1545920586-17815-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1545920586-17815-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
+	(envelope-from <ehabkost@redhat.com>) id 1gcXMf-0003zZ-2g
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 10:14:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43958)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gcXMe-0003yM-QJ
+	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 10:14:24 -0500
+Date: Thu, 27 Dec 2018 13:14:11 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181227151411.GZ19442@habkost.net>
+References: <20181219114037.5550a562@redhat.com>
+	<20181220211801.GR19442@habkost.net>
+	<20181221151325.39b64733@redhat.com>
+	<20181221160944.65c5skjhkel3of7y@linux.intel.com>
+	<20181221120320-mutt-send-email-mst@kernel.org>
+	<20181221173758.4ohku43as4dkb355@linux.intel.com>
+	<20181221140016-mutt-send-email-mst@kernel.org>
+	<20181222011126.fdse6h4pl2n7yacl@linux.intel.com>
+	<20181225114552-mutt-send-email-mst@kernel.org>
+	<20181226053000.kdakfnwhqj5ngaq5@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/26] disas: nanoMIPS: Clean up several
- issues
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181226053000.kdakfnwhqj5ngaq5@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
+ address width from IOVA address width.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,96 +36,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>
+To: Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Thursday, December 27, 2018 3:22 PM
-> To: qemu-devel@nongnu.org
-> Cc: aurelien@aurel32.net; Aleksandar Markovic; Stefan Markovic; Aleksanda=
-r Rikalo
-> Subject: [PATCH v6 00/26] disas: nanoMIPS: Clean up several issues
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> Clean up several misc issues in nanoMIPS disassembler. There are
-> more issues to be cleaned, and this is meant to be just the first
-> phase. Complete cleanup should happen over the course of next
-> few months.
->
-> All these changes should not and do not affect any functionality.
+On Wed, Dec 26, 2018 at 01:30:00PM +0800, Yu Zhang wrote:
+> On Tue, Dec 25, 2018 at 11:56:19AM -0500, Michael S. Tsirkin wrote:
+> > On Sat, Dec 22, 2018 at 09:11:26AM +0800, Yu Zhang wrote:
+> > > On Fri, Dec 21, 2018 at 02:02:28PM -0500, Michael S. Tsirkin wrote:
+> > > > On Sat, Dec 22, 2018 at 01:37:58AM +0800, Yu Zhang wrote:
+> > > > > On Fri, Dec 21, 2018 at 12:04:49PM -0500, Michael S. Tsirkin wrote:
+> > > > > > On Sat, Dec 22, 2018 at 12:09:44AM +0800, Yu Zhang wrote:
+> > > > > > > Well, my understanding of the vt-d spec is that the address limitation in
+> > > > > > > DMAR are referring to the same concept of CPUID.MAXPHYSADDR. I do not think
+> > > > > > > there's any different in the native scenario. :)
+> > > > > > 
+> > > > > > I think native machines exist on which the two values are different.
+> > > > > > Is that true?
+> > > > > 
+> > > > > I think the answer is not. My understanding is that HAW(host address wdith) is
+> > > > > the maximum physical address width a CPU can detects(by cpuid.0x80000008).
+> > > > > 
+> > > > > I agree there are some addresses the CPU does not touch, but they are still in
+> > > > > the physical address space, and there's only one physical address space...
+> > > > > 
+> > > > > B.R.
+> > > > > Yu
+> > > > 
+> > > > Ouch I thought we are talking about the virtual address size.
+> > > > I think I did have a box where VTD's virtual address size was
+> > > > smaller than CPU's.
+> > > > For physical one - we just need to make it as big as max supported
+> > > > memory right?
+> > > 
+> > > Well, my understanding of the physical one is the maximum physical address
+> > > width. Sorry, this explain seems nonsense... I mean, it's not just about
+> > > the max supported memory, but also covers MMIO. It shall be detectable
+> > > from cpuid, or ACPI's DMAR table, instead of calculated by the max memory
+> > > size. One common usage of this value is to tell the paging structure entries(
+> > > CPU's or IOMMU's) which bits shall be reserved. There are also some registers
+> > > e.g. apic base reg etc, whose contents are physical addresses, therefore also
+> > > need to follow the similar requirement for the reserved bits.
+> > > 
+> > > So I think the correct direction might be to define this property in the
+> > > machine status level, instead of the CPU level. Is this reasonable to you?
+> > 
+> > At that level yes. But isn't this already specified by "pci-hole64-end"?
+> 
+> But this value is set by guest firmware? Will PCI hotplug change this address?
+> 
+> @Eduardo, do you have any plan to calculate the phys-bits by "pci-hole64-end"?
+> Or introduce another property, say "max-phys-bits" in machine status?
 
-For the whole series:
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+I agree it may make sense to make the machine code control
+phys-bits instead of the CPU object.  A machine property sounds
+like the simplest solution.
 
-> v5->v6:
->
->   - patches that deal with adding format specifiers [16] and [49]
->     removed, until we determine what is the most appropriate form,
->     and how to be more in sync with objdump output and inline
->     assembler allowed formats
->   - added 14 patches on reformating grp decoders
->   - added a patch that adds documentation as reference
->
-> v4->v5:
->
->   - renamed patch "Fix comments for 48-bit instructions" to
->       "Clean up handling of 48-bit instructions"
->   - added patch "Clean up handling of 16-bit logic instructions"
->   - added eight patches on improving gpr decoders
->   - minor addition to patch "Fix order of more invocations"
->   - minor cleanups of previous commit messages
->
-> v3->v4:
->
->   - added patch "Name more functions in a more descriptive way"
->   - added patch "Fix order of more invocations"
->   - added patch "Fix comments for 48-bit instructions"
->   - minor cleanups of previous commit messages
->
-> v2->v3:
->
->   - added three patches that fix function misnomers.
->   - minor changes in commit messages.
->
-> v1->v2:
->
->   - patch 5 was somehow lost in v1, now should be fine.
->
-> Aleksandar Markovic (26):
->   disas: nanoMIPS: Fix preamble text in nanomips.* files
->   disas: nanoMIPS: Remove functions that are not used
->   disas: nanoMIPS: Fix a function misnomer
->   disas: nanoMIPS: Fix order of some invocations
->   disas: nanoMIPS: Name some functions in a more descriptive way
->   disas: nanoMIPS: Fix an FP-related misnomer 1
->   disas: nanoMIPS: Fix an FP-related misnomer 2
->   disas: nanoMIPS: Fix an FP-related misnomer 3
->   disas: nanoMIPS: Name more functions in a more descriptive way
->   disas: nanoMIPS: Fix order of more invocations
->   disas: nanoMIPS: Rename the decoder of 'gpr3' gpr encoding type
->   disas: nanoMIPS: Comment the decoder of 'gpr3' gpr encoding type
->   disas: nanoMIPS: Rename the decoder of 'gpr3.src.store' gpr encoding
->     type
->   disas: nanoMIPS: Comment the decoder of 'gpr3.src.store' gpr encoding
->     type
->   disas: nanoMIPS: Rename the decoder of 'gpr4' gpr encoding type
->   disas: nanoMIPS: Comment the decoder of 'gpr4' gpr encoding type
->   disas: nanoMIPS: Rename the decoder of 'gpr4.zero' gpr encoding type
->   disas: nanoMIPS: Comment the decoder of 'gpr4.zero' gpr encoding type
->   disas: nanoMIPS: Rename the decoder of 'gpr2.reg1' gpr encoding type
->   disas: nanoMIPS: Comment the decoder of 'gpr2.reg1' gpr encoding type
->   disas: nanoMIPS: Rename the decoder of 'gpr2.reg2' gpr encoding type
->   disas: nanoMIPS: Comment the decoder of 'gpr2.reg2' gpr encoding type
->   disas: nanoMIPS: Rename the decoder of 'gpr1' gpr encoding type
->   disas: nanoMIPS: Comment the decoder of 'gpr1' gpr encoding type
->   disas: nanoMIPS: Reorder declarations and definitions of gpr decoders
->   disas: nanoMIPS: Add a note on documentation
->
->  disas/nanomips.cpp | 2135 ++++++++++++++++++++++++++--------------------=
-------
->  disas/nanomips.h   |  115 ++-
->  2 files changed, 1111 insertions(+), 1139 deletions(-)
->
-> --
-> 2.7.4
+But I don't think we can have a meaningful discussion about
+implementation if we don't agree about the command-line
+interface.  We must decide what will happen to the CPU and iommu
+physical address width in cases like:
+
+  $QEMU -device intel-iommu
+  $QEMU -cpu ...,phys-bits=50 -device intel-iommu
+  $QEMU -cpu ...,host-phys-bits=on -device intel-iommu
+  $QEMU -machine phys-bits=50 -device intel-iommu
+  $QEMU -machine phys-bits=50 -cpu ...,phys-bits=48 -device intel-iommu
+
+-- 
+Eduardo
