@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46699)
+Received: from eggs.gnu.org ([208.118.235.92]:46792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gcsrP-0007ik-MX
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:11:37 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gcsrg-0007rH-Fs
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:11:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gcsZI-0006gD-VM
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:52:55 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 28 Dec 2018 13:52:29 +0000
-Message-Id: <20181228135235.6859-3-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
-References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v2 2/8] target/ppc: rework vmrg{l, h}{b, h,
- w} instructions to use Vsr* macros
+	(envelope-from <pbonzini@redhat.com>) id 1gcsYu-0006Mk-UH
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:52:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gcsYu-0006Kj-KW
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:52:28 -0500
+References: <e0d6e64a5f4b3ed436bb91aa3428986a06a0f1f1.1545911443.git.public@hansmi.ch>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <62ec6c1d-4ed8-11ad-f8a6-dd85f4fe53ab@redhat.com>
+Date: Fri, 28 Dec 2018 14:52:19 +0100
+MIME-Version: 1.0
+In-Reply-To: <e0d6e64a5f4b3ed436bb91aa3428986a06a0f1f1.1545911443.git.public@hansmi.ch>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] smbus_eeprom: Limit data writes to 255
+ bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,91 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
+To: Michael Hanselmann <public@hansmi.ch>, qemu-devel@nongnu.org
+Cc: mst@redhat.com
 
-The current implementations make use of the endian-specific macros MRGLO/MRGHI
-and also reference HI_IDX and LO_IDX directly to calculate array offsets.
+On 27/12/18 12:51, Michael Hanselmann wrote:
+> The "eeprom_write_data" function in "smbus_eeprom.c" had no provisions
+> to limit the length of data written. If a caller were able to manipulate
+> the "len" parameter they could potentially write before or after the
+> target buffer.
+> ---
+>  hw/i2c/smbus_eeprom.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+> index f18aa3de35..74fa1c328c 100644
+> --- a/hw/i2c/smbus_eeprom.c
+> +++ b/hw/i2c/smbus_eeprom.c
+> @@ -76,6 +76,7 @@ static void eeprom_write_data(SMBusDevice *dev, uint8_t cmd, uint8_t *buf, int l
+>         It is a block write without a length byte.  Fortunately we
+>         get the full block anyway.  */
+>      /* TODO: Should this set the current location?  */
+> +    len &= 0xff;
+>      if (cmd + len > 256)
+>          n = 256 - cmd;
+>      else
+> 
 
-Rework the implementation to use the Vsr* macros so that these per-endian
-references can be removed.
+Note that len is limited to 33 bytes (smbus_do_write and smbus_i2c_send).
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- target/ppc/int_helper.c | 52 ++++++++++++++++++++++++-------------------------
- 1 file changed, 25 insertions(+), 27 deletions(-)
-
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 598731d47a..f084a706ee 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -976,43 +976,41 @@ void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-     }
- }
- 
--#define VMRG_DO(name, element, highp)                                   \
-+#define VMRG_DOLO(name, element, access)                                \
-     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
-     {                                                                   \
-         ppc_avr_t result;                                               \
-         int i;                                                          \
--        size_t n_elems = ARRAY_SIZE(r->element);                        \
-+        int m = ARRAY_SIZE(r->element) - 1;                             \
-                                                                         \
--        for (i = 0; i < n_elems / 2; i++) {                             \
--            if (highp) {                                                \
--                result.element[i*2+HI_IDX] = a->element[i];             \
--                result.element[i*2+LO_IDX] = b->element[i];             \
--            } else {                                                    \
--                result.element[n_elems - i * 2 - (1 + HI_IDX)] =        \
--                    b->element[n_elems - i - 1];                        \
--                result.element[n_elems - i * 2 - (1 + LO_IDX)] =        \
--                    a->element[n_elems - i - 1];                        \
--            }                                                           \
-+        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
-+            result.access(m - i) = (i & 1) ? a->access(m - (i >> 1))    \
-+                                           : b->access(m - (i >> 1));   \
-         }                                                               \
-         *r = result;                                                    \
-     }
--#if defined(HOST_WORDS_BIGENDIAN)
--#define MRGHI 0
--#define MRGLO 1
--#else
--#define MRGHI 1
--#define MRGLO 0
--#endif
--#define VMRG(suffix, element)                   \
--    VMRG_DO(mrgl##suffix, element, MRGHI)       \
--    VMRG_DO(mrgh##suffix, element, MRGLO)
--VMRG(b, u8)
--VMRG(h, u16)
--VMRG(w, u32)
-+
-+#define VMRG_DOHI(name, element, access)                                \
-+    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
-+    {                                                                   \
-+        ppc_avr_t result;                                               \
-+        int i;                                                          \
-+                                                                        \
-+        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
-+            result.access(i) = (i & 1) ? b->access(i >> 1)              \
-+                                       : a->access(i >> 1);             \
-+        }                                                               \
-+        *r = result;                                                    \
-+    }
-+
-+#define VMRG(suffix, element, access)                  \
-+    VMRG_DOLO(mrgl##suffix, element, access)           \
-+    VMRG_DOHI(mrgh##suffix, element, access)
-+VMRG(b, u8, VsrB)
-+VMRG(h, u16, VsrH)
-+VMRG(w, u32, VsrW)
- #undef VMRG_DO
- #undef VMRG
--#undef MRGHI
--#undef MRGLO
- 
- void helper_vmsummbm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
-                      ppc_avr_t *b, ppc_avr_t *c)
--- 
-2.11.0
+Paolo
