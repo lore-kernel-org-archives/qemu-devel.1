@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:34930)
+Received: from eggs.gnu.org ([208.118.235.92]:35505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <makren67@gmail.com>) id 1gcvzD-0004kP-BL
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:31:52 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gcw06-0005ro-VA
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:32:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <makren67@gmail.com>) id 1gcvnX-00028W-Lo
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:19:49 -0500
-Received: from mail-yw1-xc35.google.com ([2607:f8b0:4864:20::c35]:44367)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <makren67@gmail.com>) id 1gcvnX-000256-Gu
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:19:47 -0500
-Received: by mail-yw1-xc35.google.com with SMTP id b63so7273064ywc.11
-	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 09:19:46 -0800 (PST)
-MIME-Version: 1.0
-References: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
-	<945511ac-d99a-d483-12a2-e6ad4dda09c2@linaro.org>
-	<CAObpvQktCHp-9V40z7kDaTU2CwRWSq8ZVS1PxRg3WK01TFXCzQ@mail.gmail.com>
-	<b4cdc06a-8114-48d2-2c0a-9fea876fee4a@linaro.org>
-	<CAObpvQmejWBh+RNz2vhk16-kcY_QveM_pSmM5ZeWqWv1d8AJzQ@mail.gmail.com>
-	<CAFEAcA-9McUUWsG2o_o6fm1S1k-PpMyo54=dmoN9vMwpxfsu0A@mail.gmail.com>
-	<CAObpvQ=WZ4APrRhCpF8BG1gAeFs3OrJ660kCvGEjNXmZJQj-aQ@mail.gmail.com>
-	<CAFEAcA_OV8=ThCRi_PuqgeqGfXquL13HrXXURX6LuPTF0HG2Dw@mail.gmail.com>
-In-Reply-To: <CAFEAcA_OV8=ThCRi_PuqgeqGfXquL13HrXXURX6LuPTF0HG2Dw@mail.gmail.com>
-From: Nick Renieris <makren67@gmail.com>
-Date: Fri, 28 Dec 2018 19:19:18 +0200
-Message-ID: <CAObpvQkX3Yq_a=zTCKndKF17k+j3nWJ3TdqOFw6KQ2R-WFcCOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <amarkovic@wavecomp.com>) id 1gcvzz-0000dU-S2
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:32:46 -0500
+Received: from mail-eopbgr800137.outbound.protection.outlook.com
+	([40.107.80.137]:2697
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gcvzz-0000bG-IS
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:32:39 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 28 Dec 2018 17:32:33 +0000
+Message-ID: <BN6PR2201MB1251659DC25FE3A8741F50ECC6B70@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20181210152829.29271-1-alex.bennee@linaro.org>
+	<20181210152829.29271-5-alex.bennee@linaro.org>
+	<CAL1e-=hfFv1TsG_viYi6-0z0qN8GnTP-70ZLMrDMmLVz9iBWQA@mail.gmail.com>
+	<87imzpa4gx.fsf@linaro.org>
+	<CAL1e-=hyKFR=9PHSnNdqFd=XFo2PoQK7qVrtM9GNM3V47V=2Mg@mail.gmail.com>,
+	<878t0aq728.fsf@linaro.org>
+In-Reply-To: <878t0aq728.fsf@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] AVX support for TCG
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC PATCH 04/13] tests/tcg/mips: enable
+ mips32-dsp/mips32-dspr2/mipsr5900 linux-user (WIP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +36,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: "shorne@gmail.com" <shorne@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, "edgar.iglesias@gmail.com" <edgar.iglesias@gmail.com>, "jcmvbkbc@gmail.com" <jcmvbkbc@gmail.com>, "michael@walle.cc" <michael@walle.cc>, Stefan Markovic <smarkovic@wavecomp.com>
 
-=CE=A3=CF=84=CE=B9=CF=82 =CE=A0=CE=B1=CF=81, 28 =CE=94=CE=B5=CE=BA 2018 =CF=
-=83=CF=84=CE=B9=CF=82 4:39 =CE=BC.=CE=BC., =CE=BF/=CE=B7 Peter Maydell
-<peter.maydell@linaro.org> =CE=AD=CE=B3=CF=81=CE=B1=CF=88=CE=B5:
-> If your editor can't show multiple views onto one file with
-> the same simplicity and UI as it has for multiple different
-> files then I would suggest getting a better editor :-)
+> Will you be testing the build as is with the current Makefiles?
 
-Apparently I just didn't know how to use my editor :) In my defense,
-I've never had to do this before.
+I will, but they should be replaced with your versions - in new directories=
+.
 
-> Unless you want to restrict all your files to 100 lines or
-> shorter then you need to be able to see multiple parts of them
-> at once -- one 10,000 line file is no worse than 4 2500 line
-> files for this.
+v1 of my reorganization series seems to be broken on the list for some reas=
+on, but I will send v2 (hopefully more complete and improved) after New Yea=
+r.
 
-As you mention below, logical separation is key here, I definitely
-didn't mean that there should be arbitrary LoC limits for each file.
+Thanks!!
+Happy holidays!
 
-> There are definitely improvements that could be made to
-> the x86 code, and where splitting of files makes conceptual
-> sense it's certainly worthwhile. The trick is finding the
-> right logical splitting points.
-
-Agreed, though it's not something I can personally help on, unless I
-spend quite a long time getting acquainted with _this_ code first.
-
-I'd like to get some answers to my previous question about estimates
-of the total amount of work required before considering diving into
-it.
+Aleksandar
