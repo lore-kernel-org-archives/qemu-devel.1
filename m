@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57178)
+Received: from eggs.gnu.org ([208.118.235.92]:57775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcpBr-0007Mm-UY
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 05:16:34 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcpBy-0008E9-SS
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 05:16:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcosv-0007qV-Pt
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:56:56 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:49731 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcosL-0006v8-DL
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:56:20 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:49662 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gcoPO-0003KB-IX
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:22 -0500
+	id 1gcoPN-0003IM-Az
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:21 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 28 Dec 2018 10:25:47 +0100
-Message-Id: <1545989148-13582-41-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 28 Dec 2018 10:25:41 +0100
+Message-Id: <1545989148-13582-35-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 40/41] tests/tcg: mips: Test R5900 three-operand
- MADDU
+Subject: [Qemu-devel] [PULL 34/41] disas: nanoMIPS: Rename the decoder of
+ 'gpr1' gpr encoding type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +28,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Fredrik Noring <noring@nocrew.org>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Test R5900 three-operand MADDU.
+Rename the decoder of 'gpr1' gpr encoding type in nanoMIPS
+disassembler.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- tests/tcg/mips/mipsr5900/Makefile |  1 +
- tests/tcg/mips/mipsr5900/maddu.c  | 37 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
- create mode 100644 tests/tcg/mips/mipsr5900/maddu.c
+ disas/nanomips.cpp | 4 ++--
+ disas/nanomips.h   | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
-index 97ca2a6..27ee5d5 100644
---- a/tests/tcg/mips/mipsr5900/Makefile
-+++ b/tests/tcg/mips/mipsr5900/Makefile
-@@ -11,6 +11,7 @@ CFLAGS  = -Wall -mabi=32 -march=r5900 -static
- TESTCASES = div1.tst
- TESTCASES += divu1.tst
- TESTCASES += madd.tst
-+TESTCASES += maddu.tst
- TESTCASES += mflohi1.tst
- TESTCASES += mtlohi1.tst
- TESTCASES += mult.tst
-diff --git a/tests/tcg/mips/mipsr5900/maddu.c b/tests/tcg/mips/mipsr5900/maddu.c
-new file mode 100644
-index 0000000..e4e5521
---- /dev/null
-+++ b/tests/tcg/mips/mipsr5900/maddu.c
-@@ -0,0 +1,37 @@
-+/*
-+ * Test R5900-specific three-operand MADDU.
-+ */
-+
-+#include <stdio.h>
-+#include <inttypes.h>
-+#include <assert.h>
-+
-+uint64_t maddu(uint64_t a, uint32_t rs, uint32_t rt)
-+{
-+    uint32_t lo = a;
-+    uint32_t hi = a >> 32;
-+    uint32_t rd;
-+    uint64_t r;
-+
-+    __asm__ __volatile__ (
-+            "    mtlo  %5\n"
-+            "    mthi  %6\n"
-+            "    maddu %0, %3, %4\n"
-+            "    mflo  %1\n"
-+            "    mfhi  %2\n"
-+            : "=r" (rd), "=r" (lo), "=r" (hi)
-+            : "r" (rs), "r" (rt), "r" (lo), "r" (hi));
-+    r = ((uint64_t)hi << 32) | (uint32_t)lo;
-+
-+    assert(a + (uint64_t)rs * rt == r);
-+    assert(rd == lo);
-+
-+    return r;
-+}
-+
-+int main()
-+{
-+    assert(maddu(13, 17, 19) == 336);
-+
-+    return 0;
-+}
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index fe0c4af..6f15821 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -389,7 +389,7 @@ uint64 NMD::decode_gpr_gpr3_src_store(uint64 d)
+ }
+ 
+ 
+-uint64 NMD::encode_rd1_from_rd(uint64 d)
++uint64 NMD::decode_gpr_gpr1(uint64 d)
+ {
+     static uint64 register_list[] = {  4,  5 };
+     return renumber_registers(d, register_list,
+@@ -10465,7 +10465,7 @@ std::string NMD::MOVE_BALC(uint64 instruction)
+     uint64 rd1_value = extract_rdl_25_24(instruction);
+     int64 s_value = extract_s__se21_0_20_to_1_s1(instruction);
+ 
+-    std::string rd1 = GPR(encode_rd1_from_rd(rd1_value));
++    std::string rd1 = GPR(decode_gpr_gpr1(rd1_value));
+     std::string rtz4 = GPR(decode_gpr_gpr4_zero(rtz4_value));
+     std::string s = ADDRESS(encode_s_from_address(s_value), 4);
+ 
+diff --git a/disas/nanomips.h b/disas/nanomips.h
+index 9df1ab2..d6a6e3f 100644
+--- a/disas/nanomips.h
++++ b/disas/nanomips.h
+@@ -107,7 +107,7 @@ private:
+                               size_t register_list_size);
+     uint64 decode_gpr_gpr3(uint64 d);
+     uint64 decode_gpr_gpr3_src_store(uint64 d);
+-    uint64 encode_rd1_from_rd(uint64 d);
++    uint64 decode_gpr_gpr1(uint64 d);
+     uint64 decode_gpr_gpr4_zero(uint64 d);
+     uint64 decode_gpr_gpr4(uint64 d);
+     uint64 decode_gpr_gpr2_reg1(uint64 d);
 -- 
 2.7.4
