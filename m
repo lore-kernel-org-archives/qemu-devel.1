@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57178)
+Received: from eggs.gnu.org ([208.118.235.92]:57134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gcpB7-0007Mm-VP
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 05:15:46 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcpBD-0007MK-2t
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 05:15:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gcp0P-0000jp-89
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 05:04:42 -0500
-Received: from mail-eopbgr680116.outbound.protection.outlook.com
-	([40.107.68.116]:62240
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gcoSE-0005Zg-LQ
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:29:18 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 28 Dec 2018 09:29:14 +0000
-Message-ID: <BN6PR2201MB1251956475B96D2377A336B7C6B70@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1545916380-12816-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<ffea8de2-2bc7-da9f-61d0-62c6baa90efc@amsat.org>
-In-Reply-To: <ffea8de2-2bc7-da9f-61d0-62c6baa90efc@amsat.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/2] tests: Reorganize MIPS TCG directories
- and files
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcozu-0000OK-Dd
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 05:04:10 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:49645 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gcoPM-0003Hz-P7
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:20 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Fri, 28 Dec 2018 10:25:37 +0100
+Message-Id: <1545989148-13582-31-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL 30/41] disas: nanoMIPS: Rename the decoder of
+ 'gpr2.reg1' gpr encoding type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "noring@nocrew.org" <noring@nocrew.org>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-> From: Philippe Mathieu-Daud=E9 <philippe.mathieu.daude@gmail.com> on beha=
-lf of Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Subject: Re: [Qemu-devel] [PATCH 0/2] tests: Reorganize MIPS TCG director=
-ies and files
->=20
-> Hi Aleksandar,
->
-> It seems the list ate your patch 1/2...
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Thanks for bringing this to my attention, but not a big deal, I will anyway=
- send better v2 after New Year.
+Rename the decoder of 'gpr2.reg1' gpr encoding type in nanoMIPS
+disassembler.
 
-Aleksandar=
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ disas/nanomips.cpp | 6 +++---
+ disas/nanomips.h   | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index de96125..b0d0cf8 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -468,7 +468,7 @@ uint64 NMD::decode_gpr_gpr4(uint64 d)
+ }
+ 
+ 
+-uint64 NMD::encode_rd2_reg1(uint64 d)
++uint64 NMD::decode_gpr_gpr2_reg1(uint64 d)
+ {
+     static uint64 register_list[] = {  4,  5,  6,  7 };
+     return renumber_registers(d, register_list,
+@@ -10445,7 +10445,7 @@ std::string NMD::MOVEP(uint64 instruction)
+     uint64 rd2_value = extract_rd2_3_8(instruction);
+     uint64 rsz4_value = extract_rsz4_4_2_1_0(instruction);
+ 
+-    std::string rd2 = GPR(encode_rd2_reg1(rd2_value));
++    std::string rd2 = GPR(decode_gpr_gpr2_reg1(rd2_value));
+     std::string re2 = GPR(encode_rd2_reg2(rd2_value));
+     /* !!!!!!!!!! - no conversion function */
+     std::string rsz4 = GPR(decode_gpr_gpr4_zero(rsz4_value));
+@@ -10474,7 +10474,7 @@ std::string NMD::MOVEP_REV_(uint64 instruction)
+ 
+     std::string rs4 = GPR(decode_gpr_gpr4(rs4_value));
+     std::string rt4 = GPR(decode_gpr_gpr4(rt4_value));
+-    std::string rd2 = GPR(encode_rd2_reg1(rd2_value));
++    std::string rd2 = GPR(decode_gpr_gpr2_reg1(rd2_value));
+     std::string rs2 = GPR(encode_rd2_reg2(rd2_value));
+     /* !!!!!!!!!! - no conversion function */
+ 
+diff --git a/disas/nanomips.h b/disas/nanomips.h
+index c1d3a3b..d928757 100644
+--- a/disas/nanomips.h
++++ b/disas/nanomips.h
+@@ -110,7 +110,7 @@ private:
+     uint64 encode_rd1_from_rd(uint64 d);
+     uint64 decode_gpr_gpr4_zero(uint64 d);
+     uint64 decode_gpr_gpr4(uint64 d);
+-    uint64 encode_rd2_reg1(uint64 d);
++    uint64 decode_gpr_gpr2_reg1(uint64 d);
+     uint64 encode_rd2_reg2(uint64 d);
+ 
+     uint64 copy(uint64 d);
+-- 
+2.7.4
