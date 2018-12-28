@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57740)
+Received: from eggs.gnu.org ([208.118.235.92]:58094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcpBs-0008Aa-J5
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcpBs-0000JN-Oy
 	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 05:16:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcosu-0007m7-2w
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:56:52 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:49723 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcosp-0007cV-Tm
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:56:48 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:49733 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gcoPO-0003KA-Js
+	id 1gcoPO-0003KE-Ju
 	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:22 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 28 Dec 2018 10:25:44 +0100
-Message-Id: <1545989148-13582-38-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 28 Dec 2018 10:25:46 +0100
+Message-Id: <1545989148-13582-40-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 37/41] disas: nanoMIPS: Add a note on
- documentation
+Subject: [Qemu-devel] [PULL 39/41] tests/tcg: mips: Test R5900 three-operand
+ MADD1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +28,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Fredrik Noring <noring@nocrew.org>
 
-Add "nanoMIPS32 Instruction Set Technical Reference Manual" as
-a reference.
+Test R5900 three-operand MADD1.
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- disas/nanomips.cpp | 7 +++++++
- 1 file changed, 7 insertions(+)
+ tests/tcg/mips/mipsr5900/madd.c | 43 ++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 38 insertions(+), 5 deletions(-)
 
-diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index d6632bb..17f4c22 100644
---- a/disas/nanomips.cpp
-+++ b/disas/nanomips.cpp
-@@ -20,6 +20,13 @@
-  *
+diff --git a/tests/tcg/mips/mipsr5900/madd.c b/tests/tcg/mips/mipsr5900/madd.c
+index 9ad2ea6..f6f215e 100644
+--- a/tests/tcg/mips/mipsr5900/madd.c
++++ b/tests/tcg/mips/mipsr5900/madd.c
+@@ -1,5 +1,5 @@
+ /*
+- * Test R5900-specific three-operand MADD.
++ * Test R5900-specific three-operand MADD and MADD1.
   */
-=20
-+/*
-+ *  Documentation used while implementing this component:
-+ *
-+ *  [1] "MIPS=C2=AE Architecture Base: nanoMIPS32(tm) Instruction Set Te=
-chnical
-+ *      Reference Manual", Revision 01.01, April 27, 2018
-+ */
+ 
+ #include <stdio.h>
+@@ -29,12 +29,45 @@ int64_t madd(int64_t a, int32_t rs, int32_t rt)
+     return r;
+ }
+ 
++int64_t madd1(int64_t a, int32_t rs, int32_t rt)
++{
++    int32_t lo = a;
++    int32_t hi = a >> 32;
++    int32_t rd;
++    int64_t r;
 +
- extern "C" {
- #include "qemu/osdep.h"
- #include "disas/bfd.h"
---=20
++    __asm__ __volatile__ (
++            "    mtlo1 %5\n"
++            "    mthi1 %6\n"
++            "    madd1 %0, %3, %4\n"
++            "    mflo1 %1\n"
++            "    mfhi1 %2\n"
++            : "=r" (rd), "=r" (lo), "=r" (hi)
++            : "r" (rs), "r" (rt), "r" (lo), "r" (hi));
++    r = ((int64_t)hi << 32) | (uint32_t)lo;
++
++    assert(a + (int64_t)rs * rt == r);
++    assert(rd == lo);
++
++    return r;
++}
++
++static int64_t madd_variants(int64_t a, int32_t rs, int32_t rt)
++{
++    int64_t rd  = madd(a, rs, rt);
++    int64_t rd1 = madd1(a, rs, rt);
++
++    assert(rd == rd1);
++
++    return rd;
++}
++
+ static void verify_madd(int64_t a, int32_t rs, int32_t rt, int64_t expected)
+ {
+-    assert(madd(a, rs, rt) == expected);
+-    assert(madd(a, -rs, rt) == a + a - expected);
+-    assert(madd(a, rs, -rt) == a + a - expected);
+-    assert(madd(a, -rs, -rt) == expected);
++    assert(madd_variants(a, rs, rt) == expected);
++    assert(madd_variants(a, -rs, rt) == a + a - expected);
++    assert(madd_variants(a, rs, -rt) == a + a - expected);
++    assert(madd_variants(a, -rs, -rt) == expected);
+ }
+ 
+ int main()
+-- 
 2.7.4
