@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48006)
+Received: from eggs.gnu.org ([208.118.235.92]:48019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcoPH-0000pW-Bq
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:42 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcoPH-0000q6-Pe
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcoPB-0003Hj-Gl
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcoPB-0003Hq-HM
 	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:15 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:49210 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:49212 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gcoPB-00034j-2K
+	id 1gcoPB-00034p-3W
 	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:09 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 28 Dec 2018 10:25:15 +0100
-Message-Id: <1545989148-13582-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 28 Dec 2018 10:25:20 +0100
+Message-Id: <1545989148-13582-14-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/41] target/mips: MXU: Improve the comment
- containing MXU overview
+Subject: [Qemu-devel] [PULL 13/41] disas: nanoMIPS: Remove functions that
+ are not used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,166 +30,419 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Improve textual description of MXU extension. These are mostly
-comment formatting changes.
+Some functions were not used at all. Compiler doesn't complain
+since they are class memebers. Remove them - no future usage is
+planned.
 
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 74 +++++++++++++++++++++++++++++--------------=
-------
- 1 file changed, 44 insertions(+), 30 deletions(-)
+ disas/nanomips.cpp | 208 -----------------------------------------------------
+ disas/nanomips.h   |  25 -------
+ 2 files changed, 233 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 74d16ce..e3a5a73 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1399,10 +1399,12 @@ enum {
-=20
-=20
- /*
-- *    AN OVERVIEW OF MXU EXTENSION INSTRUCTION SET
-- *    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  *
-- * MXU (full name: MIPS eXtension/enhanced Unit) is an SIMD extension of=
- MIPS32
-+ *       AN OVERVIEW OF MXU EXTENSION INSTRUCTION SET
-+ *       =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+ *
-+ *
-+ * MXU (full name: MIPS eXtension/enhanced Unit) is a SIMD extension of =
-MIPS32
-  * instructions set. It is designed to fit the needs of signal, graphica=
-l and
-  * video processing applications. MXU instruction set is used in Xburst =
-family
-  * of microprocessors by Ingenic.
-@@ -1410,39 +1412,31 @@ enum {
-  * MXU unit contains 17 registers called X0-X16. X0 is always zero, and =
-X16 is
-  * the control register.
-  *
-- * The notation used in MXU assembler mnemonics
-- * --------------------------------------------
-  *
-- *  Registers:
-+ *     The notation used in MXU assembler mnemonics
-+ *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+ *
-+ *  Register operands:
-  *
-  *   XRa, XRb, XRc, XRd - MXU registers
-  *   Rb, Rc, Rd, Rs, Rt - general purpose MIPS registers
-  *
-- *  Subfields:
-+ *  Non-register operands:
-  *
-- *   aptn1              - 1-bit accumulate add/subtract pattern
-- *   aptn2              - 2-bit accumulate add/subtract pattern
-- *   eptn2              - 2-bit execute add/subtract pattern
-- *   optn2              - 2-bit operand pattern
-- *   optn3              - 3-bit operand pattern
-- *   sft4               - 4-bit shift amount
-- *   strd2              - 2-bit stride amount
-+ *   aptn1 - 1-bit accumulate add/subtract pattern
-+ *   aptn2 - 2-bit accumulate add/subtract pattern
-+ *   eptn2 - 2-bit execute add/subtract pattern
-+ *   optn2 - 2-bit operand pattern
-+ *   optn3 - 3-bit operand pattern
-+ *   sft4  - 4-bit shift amount
-+ *   strd2 - 2-bit stride amount
-  *
-  *  Prefixes:
-  *
-- *   <Operation parallel level><Operand size>
-- *     S                         32
-- *     D                         16
-- *     Q                          8
-- *
-- *  Suffixes:
-- *
-- *   E - Expand results
-- *   F - Fixed point multiplication
-- *   L - Low part result
-- *   R - Doing rounding
-- *   V - Variable instead of immediate
-- *   W - Combine above L and V
-+ *   Level of parallelism:                Operand size:
-+ *    S - single operation at a time       32 - word
-+ *    D - two operations in parallel       16 - half word
-+ *    Q - four operations in parallel       8 - byte
-  *
-  *  Operations:
-  *
-@@ -1486,6 +1480,19 @@ enum {
-  *   SCOP  - Calculate x=E2=80=99s scope (-1, means x<0; 0, means x=3D=3D=
-0; 1, means x>0)
-  *   XOR   - Logical bitwise 'exclusive or' operation
-  *
-+ *  Suffixes:
-+ *
-+ *   E - Expand results
-+ *   F - Fixed point multiplication
-+ *   L - Low part result
-+ *   R - Doing rounding
-+ *   V - Variable instead of immediate
-+ *   W - Combine above L and V
-+ *
-+ *
-+ *     The list of MXU instructions grouped by functionality
-+ *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+ *
-  * Load/Store instructions           Multiplication instructions
-  * -----------------------           ---------------------------
-  *
-@@ -1563,6 +1570,13 @@ enum {
-  *  Q16SAT XRa, XRb, XRc              S32I2M XRa, Rb
-  *
-  *
-+ *     The opcode organization of MXU instructions
-+ *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+ *
-+ * The bits 31..26 of all MXU instructions are equal to 0x1C (also refer=
-red
-+ * as opcode SPECIAL2 in the base MIPS ISA). The organization and meanin=
-g of
-+ * other bits up to the instruction level is as follows:
-+ *
-  *              bits
-  *             05..00
-  *
-@@ -1700,7 +1714,7 @@ enum {
-  *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
-=E2=94=80 OPC_MXU_D16MOVZ
-  *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
-=E2=94=80 OPC_MXU_D16MOVN
-  *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
-=E2=94=80 OPC_MXU_S32MOVZ
-- *          =E2=94=82                            =E2=94=94=E2=94=80 101 =
-=E2=94=80 OPC_MXU_S32MOV
-+ *          =E2=94=82                            =E2=94=94=E2=94=80 101 =
-=E2=94=80 OPC_MXU_S32MOVN
-  *          =E2=94=82
-  *          =E2=94=82                               23..22
-  *          =E2=94=9C=E2=94=80 111010 =E2=94=80 OPC_MXU__POOL21 =E2=94=80=
-=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MAC
-@@ -1712,10 +1726,10 @@ enum {
-  *          =E2=94=94=E2=94=80 111111 =E2=94=80 <not assigned>   (overla=
-ps with SDBBP)
-  *
-  *
-- *   Compiled after:
-+ * Compiled after:
-  *
-  *   "XBurst=C2=AE Instruction Set Architecture MIPS eXtension/enhanced =
-Unit
-- *   Programming Manual", Ingenic Semiconductor Co, Ltd., 2017
-+ *   Programming Manual", Ingenic Semiconductor Co, Ltd., revision June =
-2, 2017
-  */
-=20
- enum {
---=20
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index e082a3f..4784530 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -856,23 +856,6 @@ uint64 NMD::extract_stripe_6(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil17il0bs1Fmsb0(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 17, 1);
+-    return value;
+-}
+-
+-
+-uint64 NMD::extr_xil2il0bs1_il15il0bs1Fmsb0(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 2, 1);
+-    value |= extract_bits(instruction, 15, 1);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_ac_13_12(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -923,14 +906,6 @@ uint64 NMD::extract_shift_5_4_3_2_1_0(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil10il0bs6Fmsb5(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 10, 6);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_count_19_18_17_16(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -947,15 +922,6 @@ uint64 NMD::extract_code_2_1_0(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil10il0bs4_il22il0bs4Fmsb3(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 10, 4);
+-    value |= extract_bits(instruction, 22, 4);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_u_11_10_9_8_7_6_5_4_3_2_1_0(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -980,14 +946,6 @@ uint64 NMD::extr_uil3il3bs18Fmsb20(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil12il0bs1Fmsb0(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 12, 1);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extr_uil0il2bs4Fmsb5(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1012,14 +970,6 @@ uint64 NMD::extr_uil0il2bs3Fmsb4(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil10il0bs1Fmsb0(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 10, 1);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_rd3_3_2_1(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1052,22 +1002,6 @@ uint64 NMD::extract_ru_7_6_5_4_3(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil21il0bs5Fmsb4(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 21, 5);
+-    return value;
+-}
+-
+-
+-uint64 NMD::extr_xil9il0bs3Fmsb2(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 9, 3);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_u_17_to_0(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1076,15 +1010,6 @@ uint64 NMD::extract_u_17_to_0(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil14il0bs1_il15il0bs1Fmsb0(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 14, 1);
+-    value |= extract_bits(instruction, 15, 1);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_rsz4_4_2_1_0(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1094,14 +1019,6 @@ uint64 NMD::extract_rsz4_4_2_1_0(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil24il0bs1Fmsb0(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 24, 1);
+-    return value;
+-}
+-
+-
+ int64 NMD::extr_sil0il21bs1_il1il1bs20Tmsb21(uint64 instruction)
+ {
+     int64 value = 0;
+@@ -1154,15 +1071,6 @@ int64 NMD::extract_shift_21_20_19_18_17_16(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil6il0bs3_il10il0bs1Fmsb2(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 6, 3);
+-    value |= extract_bits(instruction, 10, 1);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_rd2_3_8(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1172,14 +1080,6 @@ uint64 NMD::extract_rd2_3_8(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil16il0bs5Fmsb4(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 16, 5);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_code_17_to_0(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1188,14 +1088,6 @@ uint64 NMD::extract_code_17_to_0(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil0il0bs12Fmsb11(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 0, 12);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_size_20_19_18_17_16(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1264,15 +1156,6 @@ uint64 NMD::extract_hs_20_19_18_17_16(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil10il0bs1_il14il0bs2Fmsb1(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 10, 1);
+-    value |= extract_bits(instruction, 14, 2);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_sel_13_12_11(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1289,14 +1172,6 @@ uint64 NMD::extract_lsb_4_3_2_1_0(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil14il0bs2Fmsb1(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 14, 2);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_gp_2(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1337,14 +1212,6 @@ uint64 NMD::extract_cs_20_19_18_17_16(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil16il0bs10Fmsb9(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 16, 10);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_rt4_9_7_6_5(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1370,14 +1237,6 @@ uint64 NMD::extr_uil0il2bs6Fmsb7(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil17il0bs9Fmsb8(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 17, 9);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_sa_15_14_13(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1468,15 +1327,6 @@ uint64 NMD::extract_bit_16_15_14_13_12_11(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil10il0bs1_il11il0bs5Fmsb4(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 10, 1);
+-    value |= extract_bits(instruction, 11, 5);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_mask_20_19_18_17_16_15_14(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1537,22 +1387,6 @@ uint64 NMD::extract_u_20_19_18_17_16_15_14_13(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil15il0bs1Fmsb0(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 15, 1);
+-    return value;
+-}
+-
+-
+-uint64 NMD::extr_xil11il0bs5Fmsb4(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 11, 5);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extr_uil2il2bs16Fmsb17(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1595,15 +1429,6 @@ int64 NMD::extr_sil0il25bs1_il1il1bs24Tmsb25(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil0il0bs3_il4il0bs1Fmsb2(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 0, 3);
+-    value |= extract_bits(instruction, 4, 1);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_u_1_0(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1621,15 +1446,6 @@ uint64 NMD::extr_uil3il3bs1_il8il2bs1Fmsb3(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil9il0bs3_il16il0bs5Fmsb4(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 9, 3);
+-    value |= extract_bits(instruction, 16, 5);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extract_fd_10_9_8_7_6(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1638,14 +1454,6 @@ uint64 NMD::extract_fd_10_9_8_7_6(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil6il0bs3Fmsb2(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 6, 3);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extr_uil0il2bs5Fmsb6(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1679,14 +1487,6 @@ uint64 NMD::extract_ct_25_24_23_22_21(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil11il0bs1Fmsb0(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 11, 1);
+-    return value;
+-}
+-
+-
+ uint64 NMD::extr_uil2il2bs19Fmsb20(uint64 instruction)
+ {
+     uint64 value = 0;
+@@ -1713,14 +1513,6 @@ uint64 NMD::extr_uil0il1bs4Fmsb4(uint64 instruction)
+ }
+ 
+ 
+-uint64 NMD::extr_xil9il0bs2Fmsb1(uint64 instruction)
+-{
+-    uint64 value = 0;
+-    value |= extract_bits(instruction, 9, 2);
+-    return value;
+-}
+-
+-
+ 
+ bool NMD::ADDIU_32__cond(uint64 instruction)
+ {
+diff --git a/disas/nanomips.h b/disas/nanomips.h
+index c7477c2..4defd35 100644
+--- a/disas/nanomips.h
++++ b/disas/nanomips.h
+@@ -245,31 +245,6 @@ private:
+     uint64 extr_uil3il3bs1_il8il2bs1Fmsb3(uint64 instruction);
+     uint64 extr_uil3il3bs9Fmsb11(uint64 instruction);
+     uint64 extr_uil4il4bs4Fmsb7(uint64 instruction);
+-    uint64 extr_xil0il0bs12Fmsb11(uint64 instruction);
+-    uint64 extr_xil0il0bs3_il4il0bs1Fmsb2(uint64 instruction);
+-    uint64 extr_xil10il0bs1Fmsb0(uint64 instruction);
+-    uint64 extr_xil10il0bs1_il11il0bs5Fmsb4(uint64 instruction);
+-    uint64 extr_xil10il0bs1_il14il0bs2Fmsb1(uint64 instruction);
+-    uint64 extr_xil10il0bs4_il22il0bs4Fmsb3(uint64 instruction);
+-    uint64 extr_xil10il0bs6Fmsb5(uint64 instruction);
+-    uint64 extr_xil11il0bs1Fmsb0(uint64 instruction);
+-    uint64 extr_xil11il0bs5Fmsb4(uint64 instruction);
+-    uint64 extr_xil12il0bs1Fmsb0(uint64 instruction);
+-    uint64 extr_xil14il0bs1_il15il0bs1Fmsb0(uint64 instruction);
+-    uint64 extr_xil14il0bs2Fmsb1(uint64 instruction);
+-    uint64 extr_xil15il0bs1Fmsb0(uint64 instruction);
+-    uint64 extr_xil16il0bs10Fmsb9(uint64 instruction);
+-    uint64 extr_xil16il0bs5Fmsb4(uint64 instruction);
+-    uint64 extr_xil17il0bs1Fmsb0(uint64 instruction);
+-    uint64 extr_xil17il0bs9Fmsb8(uint64 instruction);
+-    uint64 extr_xil21il0bs5Fmsb4(uint64 instruction);
+-    uint64 extr_xil24il0bs1Fmsb0(uint64 instruction);
+-    uint64 extr_xil2il0bs1_il15il0bs1Fmsb0(uint64 instruction);
+-    uint64 extr_xil6il0bs3Fmsb2(uint64 instruction);
+-    uint64 extr_xil6il0bs3_il10il0bs1Fmsb2(uint64 instruction);
+-    uint64 extr_xil9il0bs2Fmsb1(uint64 instruction);
+-    uint64 extr_xil9il0bs3Fmsb2(uint64 instruction);
+-    uint64 extr_xil9il0bs3_il16il0bs5Fmsb4(uint64 instruction);
+ 
+     bool ADDIU_32__cond(uint64 instruction);
+     bool ADDIU_RS5__cond(uint64 instruction);
+-- 
 2.7.4
