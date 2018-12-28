@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53019)
+Received: from eggs.gnu.org ([208.118.235.92]:38878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1gcrKs-0005El-9W
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 07:33:59 -0500
+	(envelope-from <makren67@gmail.com>) id 1gcsRJ-0007Rv-Q8
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:44:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1gcr8X-0007EQ-V3
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 07:21:14 -0500
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:45304)
+	(envelope-from <makren67@gmail.com>) id 1gcsRD-0002Ge-1V
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:44:31 -0500
+Received: from mail-yb1-xb29.google.com ([2607:f8b0:4864:20::b29]:40409)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <adhemerval.zanella@linaro.org>)
-	id 1gcr8X-0007Cx-LJ
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 07:21:09 -0500
-Received: by mail-qk1-x744.google.com with SMTP id y78so12437447qka.12
-	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 04:21:09 -0800 (PST)
-References: <87bm56vqg4.fsf@mid.deneb.enyo.de>
-	<957967d7-5717-8ada-fb30-dfdf19898b6b@linaro.org>
-	<87pntmu9iw.fsf@mid.deneb.enyo.de>
-	<ae0530c9-5c46-5560-9734-1eacaf173b8d@linaro.org>
-	<87k1jtvp8u.fsf@mid.deneb.enyo.de> <87ftuhvp08.fsf@mid.deneb.enyo.de>
-From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
-Message-ID: <4ee7419d-6537-8683-bf40-175cbdc6b484@linaro.org>
-Date: Fri, 28 Dec 2018 10:21:03 -0200
+	(Exim 4.71) (envelope-from <makren67@gmail.com>) id 1gcsRC-0002Ds-Sr
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:44:30 -0500
+Received: by mail-yb1-xb29.google.com with SMTP id x201so4559952ybg.7
+	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 05:44:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87ftuhvp08.fsf@mid.deneb.enyo.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] d_off field in struct dirent and 32-on-64 emulation
+References: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
+	<945511ac-d99a-d483-12a2-e6ad4dda09c2@linaro.org>
+	<CAObpvQktCHp-9V40z7kDaTU2CwRWSq8ZVS1PxRg3WK01TFXCzQ@mail.gmail.com>
+	<b4cdc06a-8114-48d2-2c0a-9fea876fee4a@linaro.org>
+In-Reply-To: <b4cdc06a-8114-48d2-2c0a-9fea876fee4a@linaro.org>
+From: Nick Renieris <makren67@gmail.com>
+Date: Fri, 28 Dec 2018 15:43:59 +0200
+Message-ID: <CAObpvQmejWBh+RNz2vhk16-kcY_QveM_pSmM5ZeWqWv1d8AJzQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] AVX support for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Florian Weimer <fw@deneb.enyo.de>
-Cc: linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, v9fs-developer@lists.sourceforge.net, libc-alpha@sourceware.org, qemu-devel@nongnu.org, ericvh@gmail.com, lucho@ionkov.net, hpa@zytor.com, arnd@arndb.de
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
+>> Do you think this could work as a GSoC project? I'm potentially
+>> interested in working on it this summer.
 
+>Could be.  My first guess is something like 4 months work for this.
 
-On 28/12/2018 10:01, Florian Weimer wrote:
-> * Florian Weimer:
-> 
->> * Adhemerval Zanella:
->>
->>> On 27/12/2018 16:09, Florian Weimer wrote:
->>>> * Adhemerval Zanella:
->>>>
->>>>> Also for glibc standpoint, although reverting it back to use getdents 
->>>>> syscall for non-LFS mode might fix this issue for architectures that
->>>>> provides non-LFS getdents syscall it won't be a fix for architectures 
->>>>> that still provides off_t different than off64_t *and* only provides 
->>>>> getdents64 syscall.
->>>>>
->>>>> Currently we only have nios2 and csky (unfortunately).  But since generic 
->>>>> definition for off_t and off64_t still assumes non-LFS support, all new
->>>>> 32-bits ports potentially might carry the issue.
->>>>
->>>> For csky, we could still change the type of the non-standard d_off
->>>> field to long long int.  This way, only telldir would have to fail
->>>> when truncation is necessary, as mentioned below:
->>>
->>> I think it makes no sense to continue making non-LFS as default for
->>> newer 32 bits ports, the support will be emulated with LFS syscalls.
->>
->> Sorry, I don't see how this matters.  seekdir and telldir are NOT
->> affected by LFS.
-> 
-> Ah, right.  If struct dirent is 64-bit only, then the d_off member
-> will be 64 bits as well.  But it is unclear whether you can use that
-> with lseek (probably yes, in its 64-bit variant), and it's unlikely
-> it's going to work with seekdir because of the POSIX-required long int
-> type.
-> 
+Four months full-time? If so I would say it's not viable for a GSoC
+project (it's 3 months), I've done the 12-hours-a-day-crunch thing for
+a week or so in GSoC 2017 and it was _not_ fun.
+Also, I hope you meant four months for me, not for you - I'm
+completely new to the QEMU codebase. I expect it will take me weeks
+just to understand x86's 'translate.c' (who thought it'd be a good
+idea to put all this stuff in _one_ file?).
 
-I was referring to all other API that uses off_t as well (pread for
-instance), where new ports will have non-LFS variants that will call
-only LFS variants.
+Another question, are there existing discussions about this
+refactoring effort or specifically AVX? I asked a similar question on
+IRC a few days ago and got no answers.
+
+=CE=A3=CF=84=CE=B9=CF=82 =CE=A4=CE=B5=CF=84, 26 =CE=94=CE=B5=CE=BA 2018 =CF=
+=83=CF=84=CE=B9=CF=82 4:12 =CF=80.=CE=BC., =CE=BF/=CE=B7 Richard Henderson
+<richard.henderson@linaro.org> =CE=AD=CE=B3=CF=81=CE=B1=CF=88=CE=B5:
+>
+> On 12/26/18 12:28 PM, Nick Renieris wrote:
+> > Hi Richard,
+> >
+> > I did know about https://github.com/andikleen/qemu-avx but didn't
+> > mention it as it seems abandoned and quite old (also it doesn't use
+> > `TCGv_vec`).
+>
+> Yep.  Mine pre-dates tcg-op-gvec.h as well.
+>
+> > Do you think this could work as a GSoC project? I'm potentially
+> > interested in working on it this summer.
+>
+> Could be.  My first guess is something like 4 months work for this.
+>
+>
+> r~
