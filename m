@@ -1,17 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:39697)
+Received: from eggs.gnu.org ([208.118.235.92]:43871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gcyEt-0007Dk-OQ
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 14:56:14 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gcycu-0004OE-4c
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 15:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gcy3x-0003U0-0N
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 14:44:57 -0500
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Date: Fri, 28 Dec 2018 14:44:42 -0500
-Message-Id: <20181228194442.3506-1-wainersm@redhat.com>
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gcyNu-0001M9-JW
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 15:05:31 -0500
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:44243)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1gcyNu-0001JH-Cf
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 15:05:30 -0500
+Received: by mail-ed1-x543.google.com with SMTP id y56so18263312edd.11
+	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 12:05:29 -0800 (PST)
+From: "=?UTF-8?B?S8WRdsOhZ8OzIFpvbHTDoW4=?=" <dirty.ice.hu@gmail.com>
+References: <mailman.31873.1545598364.1282.qemu-devel@nongnu.org>
+	<E04FDC0A-1912-4402-9CF5-755914945754@gmail.com>
+	<e87c0056-4150-0d5e-e049-d71750da1f17@gmail.com>
+	<228BFF97-3D85-4A30-89E1-18570472D119@gmail.com>
+Message-ID: <335c7f56-d3e0-0be8-d416-484eb181038e@gmail.com>
+Date: Fri, 28 Dec 2018 21:05:26 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qmp: Add examples to qom list, get,
- and set commands
+In-Reply-To: <228BFF97-3D85-4A30-89E1-18570472D119@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: hu-HU
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/52] Audio 5.1 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,78 +33,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, eblake@redhat.com, armbru@redhat.com
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-Added examples for the qom-list, qom-get, and qom-set
-commands in qapi misc JSON file.
+On 2018-12-28 01:46, Programmingkid wrote:
+> 
+>> On Dec 27, 2018, at 8:33 AM, Kővágó Zoltán <dirty.ice.hu@gmail.com> wrote:
+>>
+>> Hi,
+>>
+>> I've pushed it to my github (modulo some random fixes not yet on the
+>> mailing list):
+>> https://github.com/DirtYiCE/qemu/tree/audio-51-2018
+>>
+>> I don't have a mac so I have no idea whether it works or not.
+>>
+>> Regards,
+>> Zoltan
+>>
+>> On 2018-12-26 12:24, Programmingkid wrote:
+>>>
+>>>> On Dec 23, 2018, at 3:52 PM, qemu-devel-request@nongnu.org wrote:
+>>>>
+>>>> Message: 4
+>>>> Date: Sun, 23 Dec 2018 21:51:36 +0100
+>>>> From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
+>>>> 	<dirty.ice.hu@gmail.com>
+>>>> To: qemu-devel@nongnu.org
+>>>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>>>> Subject: [Qemu-devel] [PATCH v2 00/52] Audio 5.1 patches
+>>>> Message-ID: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
+>>>> Content-Type: text/plain; charset=UTF-8
+>>>>
+>>>> Hi,
+>>>>
+>>>> I've updated my audio patchset to the current git master. Other than that not
+>>>> much happened since my last update [1], fixed a few small problems that I
+>>>> noticed while rebasing my patches.
+>>>>
+>>>> Please review.
+>>>
+>>> <snip>
+>>>
+>>> Hi I would like to run your patches. Do you have a repository that I may clone? 
+>>>
+>>> Also have you been able to test these patches using a Mac OS X guest yet? 
+>>>
+>>> Thank you.
+>>>
+>>
+> 
+> Hi, thanks for the link. This is what I did:
+> 
+>  - git clone https://github.com/DirtYiCE/qemu.git
+>  - git checkout audio-51-2018
+>  - ./configure --target-list=ppc-softmmu
+>  - make -j 4
+> 
+> The result was unfortunately some errors:
+> 
+>   CC      audio/coreaudio.o
+> audio/coreaudio.c:413:49: error: unknown type name 'HWVocieOut'; did you mean
+>       'HWVoiceOut'?
+> COREAUDIO_WRAPPER_FUNC(get_buffer_out, void *, (HWVocieOut *hw, size_t *size),
+>                                                 ^~~~~~~~~~
+>                                                 HWVoiceOut
+> 
+> 
+> audio/coreaudio.c:578:29: error: passing 'struct audio_pcm_info' to parameter of
+>       incompatible type 'struct audio_pcm_info *'; take the address with &
+>         coreaudio_get_flags(hw->info, as);
+>                             ^~~~~~~~
+>                             &
+> 
+> 
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
----
- qapi/misc.json | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+Hi,
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 24d20a880a..426274ecf8 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1380,6 +1380,16 @@
- #          object.
- #
- # Since: 1.2
-+#
-+# Example:
-+#
-+# -> { "execute": "qom-list",
-+#      "arguments": { "path": "/chardevs" } }
-+# <- { "return": [ { "name": "type", "type": "string" },
-+#                  { "name": "parallel0", "type": "child<chardev-vc>" },
-+#                  { "name": "serial0", "type": "child<chardev-vc>" },
-+#                  { "name": "mon0", "type": "child<chardev-stdio>" } ] =
-}
-+#
- ##
- { 'command': 'qom-list',
-   'data': { 'path': 'str' },
-@@ -1417,6 +1427,23 @@
- #          returned as #int.
- #
- # Since: 1.2
-+#
-+# Example:
-+#
-+# 1. Use absolute path
-+#
-+# -> { "execute": "qom-get",
-+#      "arguments": { "path": "/machine/unattached/device[0]",
-+#                     "property": "hotplugged" } }
-+# <- { "return": false }
-+#
-+# 2. Use partial path
-+#
-+# -> { "execute": "qom-get",
-+#      "arguments": { "path": "unattached/sysbus",
-+#                     "property": "type" } }
-+# <- { "return": "System" }
-+#
- ##
- { 'command': 'qom-get',
-   'data': { 'path': 'str', 'property': 'str' },
-@@ -1436,6 +1463,15 @@
- #         for a description of type mapping.
- #
- # Since: 1.2
-+#
-+# Example:
-+#
-+# -> { "execute": "qom-set",
-+#      "arguments": { "path": "/machine",
-+#                     "property": "graphics",
-+#                     "value": false } }
-+# <- { "return": {} }
-+#
- ##
- { 'command': 'qom-set',
-   'data': { 'path': 'str', 'property': 'str', 'value': 'any' },
---=20
-2.19.2
+I pushed an updated version, it should fix the compile errors (hopefully).
+
+Regards,
+Zoltan
