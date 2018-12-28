@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48021)
+Received: from eggs.gnu.org ([208.118.235.92]:48023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcoPH-0000qJ-Ui
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:57 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcoPI-0000qd-4Q
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcoPD-0003JF-Cz
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:15 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:49277 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gcoPD-0003J6-CG
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:16 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:49275 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gcoPC-000373-Mr
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:11 -0500
+	id 1gcoPC-00036w-Ki
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 04:26:10 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri, 28 Dec 2018 10:25:32 +0100
-Message-Id: <1545989148-13582-26-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 28 Dec 2018 10:25:30 +0100
+Message-Id: <1545989148-13582-24-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1545989148-13582-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 25/41] disas: nanoMIPS: Comment the decoder of
- 'gpr3.src.store' gpr encoding type
+Subject: [Qemu-devel] [PULL 23/41] disas: nanoMIPS: Comment the decoder of
+ 'gpr3' gpr encoding type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,70 +33,88 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Comment the decoder of 'gpr3.src.store' gpr encoding type in nanoMIPS
+Comment the decoder of 'gpr3' gpr encoding type in nanoMIPS
 disassembler.
 
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- disas/nanomips.cpp | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ disas/nanomips.cpp | 51 ++++++++++++++++++++++++++++++++++++++++++++++++=
+---
+ 1 file changed, 48 insertions(+), 3 deletions(-)
 
 diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index 7c56162..1c313f3 100644
+index 2856645..30988f8 100644
 --- a/disas/nanomips.cpp
 +++ b/disas/nanomips.cpp
-@@ -349,6 +349,38 @@ uint64 NMD::decode_gpr_gpr3(uint64 d)
- }
+@@ -292,9 +292,54 @@ uint64 NMD::renumber_registers(uint64 index, uint64 =
+*register_list,
 =20
 =20
-+/*
-+ * NMD::decode_gpr_gpr3_src_store() - decoder for 'gpr3.src.store' gpr e=
-ncoding
-+ *     type
+ /*
+- * these functions should be decode functions but the json does not have
+- * decode sections so they are based on the encode, the equivalent decod=
+e
+- * functions need writing eventually.
++ * NMD::decode_gpr_gpr3() - decoder for 'gpr3' gpr encoding type
 + *
 + *   Map a 3-bit code to the 5-bit register space according to this patt=
 ern:
 + *
 + *                            7 6 5 4 3 2 1 0
 + *                            | | | | | | | |
-+ *                            | | | | | | | =E2=94=94-------------------=
-----=E2=94=90
++ *                            | | | | | | | |
 + *                            | | | =E2=94=94-----------------------=E2=94=
-=90       |
+=90
 + *                            | | =E2=94=94-----------------------=E2=94=
-=90 |       |
+=90 |
 + *                            | =E2=94=94-----------------------=E2=94=90=
- | |       |
+ | |
 + *                            =E2=94=94-----------------------=E2=94=90 =
-| | |       |
-+ *                                    | | |           | | | |       |
-+ *                            =E2=94=8C-------=E2=94=98 | |           | =
-| | |       |
-+ *                            | =E2=94=8C-------=E2=94=98 |           | =
-| | |       |
-+ *                            | | =E2=94=8C-------=E2=94=98           | =
-| | |       |
-+ *                            | | |                   | | | |       |
-+ *                            | | |                   | | | |       |
+| | |
++ *                                    | | | |         | | | |
++ *                            =E2=94=8C-------=E2=94=98 | | |         | =
+| | |
++ *                            | =E2=94=8C-------=E2=94=98 | |         | =
+| | |
++ *                            | | =E2=94=8C-------=E2=94=98 |         | =
+| | |
++ *                            | | | =E2=94=8C-------=E2=94=98         | =
+| | |
++ *                            | | | |                 | | | |
 + *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
 + *      3                   2                   1                   0
 + *
-+ *   This pattern is the same one used for 'gpr3' gpr encoding type, exc=
-ept for
-+ * the input value 0, that is mapped to the output value 0 instead of 16=
-.
-+ *
 + *   Used in handling following instructions:
 + *
++ *     - ADDIU[R1.SP]
++ *     - ADDIU[R2]
++ *     - ADDU[16]
++ *     - AND[16]
++ *     - ANDI[16]
++ *     - BEQC[16]
++ *     - BEQZC[16]
++ *     - BNEC[16]
++ *     - BNEZC[16]
++ *     - LB[16]
++ *     - LBU[16]
++ *     - LH[16]
++ *     - LHU[16]
++ *     - LI[16]
++ *     - LW[16]
++ *     - LW[GP16]
++ *     - LWXS[16]
++ *     - NOT[16]
++ *     - OR[16]
 + *     - SB[16]
 + *     - SH[16]
++ *     - SLL[16]
++ *     - SRL[16]
++ *     - SUBU[16]
 + *     - SW[16]
-+ *     - SW[GP16]
-+ */
- uint64 NMD::decode_gpr_gpr3_src_store(uint64 d)
++ *     - XOR[16]
+  */
+ uint64 NMD::decode_gpr_gpr3(uint64 d)
  {
-     static uint64 register_list[] =3D {  0, 17, 18, 19,  4,  5,  6,  7 }=
-;
 --=20
 2.7.4
