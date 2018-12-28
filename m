@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:33427)
+Received: from eggs.gnu.org ([208.118.235.92]:42756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gctzQ-0005nm-Qh
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 10:23:59 -0500
+	(envelope-from <groug@kaod.org>) id 1gcujW-0008Du-EY
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 11:11:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gcthk-00054g-FY
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 10:05:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57174)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gcthk-00053k-8X
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 10:05:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gcthj-00022m-GT
-	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 15:05:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7352B2E80C7
-	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 15:05:39 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1gcuhz-0007Ly-Kx
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 11:10:02 -0500
+Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:59503)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gcuhz-0007KB-EW
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 11:09:59 -0500
+Received: from player755.ha.ovh.net (unknown [10.109.143.225])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 0858010B370
+	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 17:09:56 +0100 (CET)
+Date: Fri, 28 Dec 2018 17:09:50 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181228170950.21b47426@bahia.lan>
+In-Reply-To: <20181213210057.3676-17-quintela@redhat.com>
+References: <20181213210057.3676-1-quintela@redhat.com>
+	<20181213210057.3676-17-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 28 Dec 2018 15:00:08 -0000
-From: LukeShu <lukeshu@lukeshu.com>
-Reply-To: Bug 1795100 <1795100@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153818746845.29396.3425570709275982365.malonedeb@soybean.canonical.com>
-Message-Id: <154600920899.26182.8813360720812578961.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1795100] Re: unix-domain socket unlink()ed
- prematurely
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 16/16] virtio: virtio 9p really requires
+ CONFIG_VIRTFS to work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
-This is still a problem with 3.1.0.
+On Thu, 13 Dec 2018 22:00:57 +0100
+Juan Quintela <quintela@redhat.com> wrote:
 
-** Summary changed:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
 
-- unix-domain socket unlink()ed prematurely
-+ VNC unix-domain socket unlink()ed prematurely
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1795100
-
-Title:
-  VNC unix-domain socket unlink()ed prematurely
-
-Status in QEMU:
-  New
-
-Bug description:
-  With qemu 3.0.0 (I don't believe this happened with previous
-  versions), if I tell it `-vnc unix:/path/to/vnc.sock`, qemu will
-  unlink() that file when the first client disconnects, meaning that
-  once I disconnect, I can't ever reconnect without restarting the VM.
-
-  A stupid testcase demonstrating the issue:
-
-  In terminal A:
-
-      $ qemu-system-x86_64 -vnc unix:$PWD/vnc.sock
-
-  In terminal B:
-
-      $ ls vnc.sock
-      vnc.sock
-      $ socat STDIO UNIX-CONNECT:vnc.sock <<<''
-      RFB 003.008
-      $ ls vnc.sock
-      ls: cannot access 'vnc.sock': No such file or directory
-
-  I have determined that the offending unlink() call is the one in
-  io/channel-socket.c:qio_channel_socket_close().  That call was first
-  introduced in commit d66f78e1eaa832f73c771d9df1b606fe75d52a50, which
-  first appeared in version 3.0.0.
-
-  This type of premature unlink() does not happen on monitor.sock with
-  `-monitor unix:/path/to/monitor.sock,server,nowait`.
-
-  I am not familiar enough with the QIO subsystem to suggest a fix that
-  fixes VNC, but preserves the QMP fix targeted in the offending commit.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1795100/+subscriptions
+>  default-configs/virtio.mak | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+> index 5ae4a61018..ecb4420e74 100644
+> --- a/default-configs/virtio.mak
+> +++ b/default-configs/virtio.mak
+> @@ -1,7 +1,7 @@
+>  CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+>  CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+>  CONFIG_VIRTIO=y
+> -CONFIG_VIRTIO_9P=y
+> +CONFIG_VIRTIO_9P=$(CONFIG_VIRTFS)
+>  CONFIG_VIRTIO_BALLOON=y
+>  CONFIG_VIRTIO_BLK=y
+>  CONFIG_VIRTIO_CRYPTO=y
