@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57864)
+Received: from eggs.gnu.org ([208.118.235.92]:60405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhijianx.li@intel.com>) id 1gcmVV-0002UZ-SZ
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 02:24:37 -0500
+	(envelope-from <fw@deneb.enyo.de>) id 1gcmsd-0006zr-Lt
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 02:48:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhijianx.li@intel.com>) id 1gcmS3-0004IF-V1
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 02:21:03 -0500
-Received: from mga18.intel.com ([134.134.136.126]:23462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zhijianx.li@intel.com>)
-	id 1gcmS1-00043w-CT
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 02:20:58 -0500
-References: <1544063533-10139-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1544063533-10139-5-git-send-email-lizhijian@cn.fujitsu.com>
-	<20181221110913-mutt-send-email-mst@kernel.org>
-	<20181227203118.GA19442@habkost.net>
-From: Li Zhijian <zhijianx.li@intel.com>
-Message-ID: <45189e76-3ae0-34ab-bbef-50ab066d957e@intel.com>
-Date: Fri, 28 Dec 2018 15:20:43 +0800
+	(envelope-from <fw@deneb.enyo.de>) id 1gcmqx-00076s-G8
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 02:46:46 -0500
+Received: from albireo.enyo.de ([5.158.152.32]:59072)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fw@deneb.enyo.de>) id 1gcmqx-00070z-8E
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 02:46:43 -0500
+From: Florian Weimer <fw@deneb.enyo.de>
+References: <87bm56vqg4.fsf@mid.deneb.enyo.de>
+	<20181228022338.GA27992@altlinux.org>
+Date: Fri, 28 Dec 2018 08:38:17 +0100
+In-Reply-To: <20181228022338.GA27992@altlinux.org> (Dmitry V. Levin's message
+	of "Fri, 28 Dec 2018 05:23:39 +0300")
+Message-ID: <87bm56w17a.fsf@mid.deneb.enyo.de>
 MIME-Version: 1.0
-In-Reply-To: <20181227203118.GA19442@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 4/4] i386: allow to load initrd
- below 4G for recent linux
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] d_off field in struct dirent and 32-on-64 emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, philip.li@intel.com, philmd@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: "Dmitry V. Levin" <ldv@altlinux.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, v9fs-developer@lists.sourceforge.net, libc-alpha@sourceware.org, qemu-devel@nongnu.org, ericvh@gmail.com, rminnich@sandia.gov, lucho@ionkov.net, hpa@zytor.com, arnd@arndb.de
 
+* Dmitry V. Levin:
 
-On 12/28/2018 4:31 AM, Eduardo Habkost wrote:
-> On Fri, Dec 21, 2018 at 11:10:30AM -0500, Michael S. Tsirkin wrote:
->> On Thu, Dec 06, 2018 at 10:32:13AM +0800, Li Zhijian wrote:
->>>   
->>>       /* highest address for loading the initrd */
->>> -    if (protocol >= 0x203) {
->>> +    if (protocol >= 0x20c &&
->>> +        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
->>> +        /*
->>> +         * Although kernel allows initrd loading to above 4G,
->>> +         * it just makes it as large as possible while still staying below 4G
->>> +         * since current BIOS always loads initrd below pcms->below_4g_mem_size
->>> +         */
->>> +        initrd_max = UINT32_MAX;
->>> +    } else if (protocol >= 0x203) {
->>>           initrd_max = ldl_p(header+0x22c);
->>>       } else {
->>>           initrd_max = 0x37ffffff;
->>
->> I still have trouble understanding the above.
->> Anyone else wants to comment / help rephrase the comment
->> and commit log so it's readable?
+> On Thu, Dec 27, 2018 at 06:18:19PM +0100, Florian Weimer wrote:
+>> We have a bit of an interesting problem with respect to the d_off
+>> field in struct dirent.
+>> 
+>> When running a 64-bit kernel on certain file systems, notably ext4,
+>> this field uses the full 63 bits even for small directories (strace -v
+>> output, wrapped here for readability):
+>> 
+>> getdents(3, [
+>>   {d_ino=1494304, d_off=3901177228673045825, d_reclen=40,
+>> d_name="authorized_keys", d_type=DT_REG},
+>>   {d_ino=1494277, d_off=7491915799041650922, d_reclen=24,
+>> d_name=".", d_type=DT_DIR},
+>>   {d_ino=1314655, d_off=9223372036854775807, d_reclen=24,
+>> d_name="..", d_type=DT_DIR}
+>> ], 32768) = 88
+>> 
+>> When running in 32-bit compat mode, this value is somehow truncated to
+>> 31 bits, for both the getdents and the getdents64 (!) system call (at
+>> least on i386).
 >
-> The comment seems to contradict what I see on the code:
->
-> | Although kernel allows initrd loading to above 4G,
->
-> Sounds correct.
->
->
-> | it just makes it as large as possible while still staying below 4G
->
-> I'm not a native English speaker, but I believe "it" here should
-> be interpreted as "the kernel", which would be incorrect.  It's
-> this QEMU function that limits initrd_max to a uint32 value, not
-> the kernel.
->
->
-> | since current BIOS always loads initrd below pcms->below_4g_mem_size
->
-> I don't know why the BIOS is mentioned here.  The
-> below_4g_mem_size limit comes from these 2 lines inside
-> load_linux():
->
->      if (initrd_max >= pcms->below_4g_mem_size - pcmc->acpi_data_size) {
->          initrd_max = pcms->below_4g_mem_size - pcmc->acpi_data_size - 1;
->      }
-> In addition to that, initrd_max is uint32_t simply because QEMU
-> doesn't support the 64-bit boot protocol (specifically the
-> ext_ramdisk_image field),
+> Why getdents64 system call is affected by this truncation,
+> isn't it a kernel bug that has to be fixed in the kernel instead?
 
-Thanks for explaining this :), i'm not clear before.
-
-
-
-> so all talk about below_4g_mem_size
-> seems to be just a distraction.
->
-> All that said, I miss one piece of information here: is
-> XLF_CAN_BE_LOADED_ABOVE_4G really supposed to override
-> header+0x22c?  linux/Documentation/x86/boot.txt isn't clear about
-> that.  Is there any reference that can help us confirm this?
-
-Good question.
-
-Since i'm not familiar with boot protocol, at the beginning, i also CCed to LKML for helps
-https://lkml.org/lkml/2018/11/10/82
-
-Ingo said:
->> > If XLF_CAN_BE_LOADED_ABOVE_4G is not > set, then you most likely 
->> are on a 32-bit kernel and there are more > fundamental limits (even 
->> if you were to load it above the 2 GB mark, you > would be limited by 
->> the size of kernel memory.) > > So, in case you are wondering: the 
->> bootloader that broke when setting > the initrd_max field above 2 GB 
->> was, of course, Grub. > > So just use XLF_CAN_BE_LOADED_ABOVE_4G. 
->> There is no need for a new flag > or new field. That's nice, and 
->> that's the best solution!
-
-that make me to believe that if XLF_CAN_BE_LOADED_ABOVE_4G is set, BELOW_4G is allowed too.
-
-if above is credible, might be we can update the comments like:
--------
-QEMU doesn't support the 64-bit boot protocol (specifically the
-ext_ramdisk_image field).
-
-In addition, kernel allows to load initrd above 4G if XLF_CAN_BE_LOADED_ABOVE_4G is set,
-so we believe that load initrd below 4G is allowed too.
-
-For simplicity, so just set initrd_max to UINT32_MAX is enough and safe.
--------
-  
-Thanks
-Zhijian
+It's required because POSIX specifies that telldir and seekdir use
+long int (and not off_t) as the seek offset.  If the kernel does not
+truncate while keeping a useful value, these functions would turn
+unusable.
