@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50431)
+Received: from eggs.gnu.org ([208.118.235.92]:34715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <public@hansmi.ch>) id 1gcvAX-0007hK-Hn
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 11:40:22 -0500
+	(envelope-from <public@hansmi.ch>) id 1gcvyj-0004f1-CC
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:31:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <public@hansmi.ch>) id 1gcvA2-0000rB-S8
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 11:39:29 -0500
-Received: from relay9-d.mail.gandi.net ([217.70.183.199]:50943)
+	(envelope-from <public@hansmi.ch>) id 1gcvh7-0001A9-Vl
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:13:56 -0500
+Received: from relay5-d.mail.gandi.net ([217.70.183.197]:42361)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <public@hansmi.ch>) id 1gcvA0-0000iR-Uh
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 11:38:58 -0500
-From: Michael Hanselmann <public@hansmi.ch>
+	(Exim 4.71) (envelope-from <public@hansmi.ch>) id 1gcvHM-0001CX-7F
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 11:46:32 -0500
 References: <e0d6e64a5f4b3ed436bb91aa3428986a06a0f1f1.1545911443.git.public@hansmi.ch>
-	<CAAdtpL5L-BgsUJ_yNkGQBPvPhyneN=csQMaRxqiaZDx-XZzaag@mail.gmail.com>
-Message-ID: <8344cc5b-b06a-200d-d31c-2967a9055269@msgid.hansmi.ch>
-Date: Fri, 28 Dec 2018 17:38:37 +0100
+	<62ec6c1d-4ed8-11ad-f8a6-dd85f4fe53ab@redhat.com>
+From: Michael Hanselmann <public@hansmi.ch>
+Message-ID: <b7a71557-88c2-f9eb-4292-3feb68f31156@msgid.hansmi.ch>
+Date: Fri, 28 Dec 2018 17:46:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAAdtpL5L-BgsUJ_yNkGQBPvPhyneN=csQMaRxqiaZDx-XZzaag@mail.gmail.com>
+In-Reply-To: <62ec6c1d-4ed8-11ad-f8a6-dd85f4fe53ab@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha512;
 	protocol="application/pgp-signature";
-	boundary="aV5Zz91YVyjfuiWyXbmtfxvwf9NmxweND"
+	boundary="gR8XmQC1J80WOVaMwzIgjDpmxaF4j62t5"
 Subject: Re: [Qemu-devel] [PATCH] smbus_eeprom: Limit data writes to 255
  bytes
 List-Id: <qemu-devel.nongnu.org>
@@ -29,45 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aV5Zz91YVyjfuiWyXbmtfxvwf9NmxweND
+--gR8XmQC1J80WOVaMwzIgjDpmxaF4j62t5
 From: Michael Hanselmann <public@hansmi.ch>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Corey Minyard <cminyard@mvista.com>
-Message-ID: <8344cc5b-b06a-200d-d31c-2967a9055269@msgid.hansmi.ch>
-Subject: Re: [Qemu-devel] [PATCH] smbus_eeprom: Limit data writes to 255 bytes
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com
+Message-ID: <b7a71557-88c2-f9eb-4292-3feb68f31156@msgid.hansmi.ch>
+Subject: Re: [PATCH] smbus_eeprom: Limit data writes to 255 bytes
 References: <e0d6e64a5f4b3ed436bb91aa3428986a06a0f1f1.1545911443.git.public@hansmi.ch>
- <CAAdtpL5L-BgsUJ_yNkGQBPvPhyneN=csQMaRxqiaZDx-XZzaag@mail.gmail.com>
-In-Reply-To: <CAAdtpL5L-BgsUJ_yNkGQBPvPhyneN=csQMaRxqiaZDx-XZzaag@mail.gmail.com>
+ <62ec6c1d-4ed8-11ad-f8a6-dd85f4fe53ab@redhat.com>
+In-Reply-To: <62ec6c1d-4ed8-11ad-f8a6-dd85f4fe53ab@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Philippe
+Hi Paolo
 
-On 27.12.18 20:03, Philippe Mathieu-Daud=C3=A9 wrote:
-> On Thu, Dec 27, 2018 at 12:53 PM Michael Hanselmann <public@hansmi.ch> =
-wrote:
-> &gt; The "eeprom_write_data" function in "smbus_eeprom.c" had no provis=
-ions
-> &gt; to limit the length of data written. If a caller were able to mani=
-pulate
-> &gt; the "len" parameter they could potentially write before or after t=
-he
-> &gt; target buffer.
->=20
-> You forgot to sign your commit:
-> "Signed-off-by: Michael Hanselmann <public@hansmi.ch>"
+On 28.12.18 14:52, Paolo Bonzini wrote:
+> On 27/12/18 12:51, Michael Hanselmann wrote:
+>> The "eeprom_write_data" function in "smbus_eeprom.c" had no provisions=
 
-Indeed I did and I'm sorry.
-
-Signed-off-by: Michael Hanselmann <public@hansmi.ch>
-
+>> to limit the length of data written. If a caller were able to manipula=
+te
+>> the "len" parameter they could potentially write before or after the
+>> target buffer.
+>> ---
+>>  hw/i2c/smbus_eeprom.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
 >> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
 >> index f18aa3de35..74fa1c328c 100644
 >> --- a/hw/i2c/smbus_eeprom.c
@@ -79,42 +70,52 @@ Signed-off-by: Michael Hanselmann <public@hansmi.ch>
 >>      /* TODO: Should this set the current location?  */
 >> +    len &=3D 0xff;
 >>      if (cmd + len > 256)
+>>          n =3D 256 - cmd;
+>>      else
+>>
 >=20
-> Corey Minyard sent a cleanup series [1] because this device model is
-> known to be unsafe and need rewrite.
-> There is a particular patch [2] which add the SMBUS_EEPROM_SIZE definit=
-ion.
-> He also provided a intent at cleaning this problem here [3] where
-> Peter suggested to split it in fewer patches.
+> Note that len is limited to 33 bytes (smbus_do_write and smbus_i2c_send=
+).
 
-I agree with the assessment that the code as-is has room for
-improvement, especially when it comes to the hardcoded sizes. My patch
-is purely on top of the master branch (ca. QEMU 3.1.0).
+In practice it turns out to be the case. I thought I had discovered an
+out-of-bounds write because hw/i2c/smbus.c:smbus_i2c_recv increases
+dev->data_len unconditionally. The I2C controller implemented in
+hw/i2c/aspeed_i2c.c and used by certain ARM board emulations allows
+fine-grained control of the communication which allowed me to increase
+data_len easily (up to and beyond an overflow if intended). It was only
+the state machine in smbus.c which made it impossible to actually get to
+a usable point in my experiment (increasing data_len requires
+SMBUS_WRITE_DATA->SMBUS_READ_DATA, then the communication must be
+stopped via NACK to avoid resetting data_len in I2C_FINISH, but there's
+no way from SMBUS_DONE to SMBUS_WRITE_DATA).
+
+Adding bitwise-and for 0xff defuses this particular situation regardless
+of what state an attacker can bring the emulated devices into.
 
 Best regards,
 Michael
 
 
---aV5Zz91YVyjfuiWyXbmtfxvwf9NmxweND
+--gR8XmQC1J80WOVaMwzIgjDpmxaF4j62t5
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEENEVC6w7lpobWh8t0Yy8zJpbbY3YFAlwmUZEACgkQYy8zJpbb
-Y3ZAUBAAmjspyBx5Tub23KzbCfhNPbqHIDcbWoFIoUXsLKQSrFjhPlemFNnLUn15
-dcTX7p/CacP4lKchxKW+1kyi5N3hiNkU0Kz+LnsxO8GzjiFnX9M2w5VOnypmgYcY
-ERrjy6ElM+QQXT0AJr0FNghWUo6MoFpQjTarCeNLrqQQyjnTtl+trGQO/gNRQiDn
-zmuEwQTMQ3dRCiutYe28odbajpn1YhzyEBDqK7OrTQMKSQzx4QnsVmuALFSxLUbp
-sYWS7I4ODPzxumwfQ01lPp4IPo0UWS/ElSKy/iBewTfptmu7VX7Mawzp1tgfsDGz
-I+deHBceJvtngok/oR00x/9otKf+vPrJbOlDQZdSJq3TTJYig73+W5yxX9sYQ5G+
-uWxaec3H8zDG+pk9QRmweA1oEqS9OqAIjcaKkPa1PLJzGCZX2cpe4zmPzQQjS1RO
-k929TaQQCeAD+Bj/ai5q1WleleIb+pJ5lrWo6Y+uPxipUxIXEL1aTFqhrOei+hDk
-GDKzKMzSOxcT68eGAWjp8J7a4Lh1a7xu3AlF8+uoLLhG0YLStMqVW4jU6cXyqYMv
-28WKa8o6g0L+xJsK+qW/MXebB4p4+96+i3LmXwWg4AlCxQJI1SybTdMZ9nNubgji
-6F7ngawefVJTKfEziMgbw8PDK1vBOLalI2Apunk6W4rCdBvE3vI=
-=JLi5
+iQIzBAEBCgAdFiEENEVC6w7lpobWh8t0Yy8zJpbbY3YFAlwmU18ACgkQYy8zJpbb
+Y3ZrahAArgdi+Xe4E5cYOl5aU1H5qc88IS/kLdk1UzQ9Wu+7ZSxEkqC9JjwrOetK
+kCQVra6tJI0s7Rn4ojLnhotUcq9T5fMxfXNNswZTHSIhadUQyeLef8aTIOhlF9Oy
+srqBtTYP3NH/+1L+UMmh3A7ecrU/hrzPi6YzJSk5OB6kPTdyH2S3ckMo+X1XDM5m
+DvEkiBBAwm1io/xJskYtfiAXw8jVtCqaFC74pFn0GievldNTjUKV5n5UnSWvpz6O
+nl8CHJhdiQRYR13Td16WM4aoBwd8o6oWJGhSTNyGGWulUim7lwrDMMxKYsKwL+R0
+p+JQ3/+04VeiCbmubeerymRDstlbZx/+n9hI33+hVt+Pf2Ubm0UWtAkZZDAoN7RD
+TYt1Q97Psjh+efGnD78ekTRvsxIPlRFvpkolIsTf+n8ZDu0Nd1pxdKZdTWo24A+j
+PWgwGqdJzNtIEixY7m+/PxBDe44JsgmF1DgRVEivZdXVen73YjP4h0FR3CxKzvJs
+JbAnnb41qXqW1cWcU1I+fWTpqP/2lYf6Aps+/d4d52fG/FKA/QovS1/9jDTqY9ji
+WmhwFBewE1REpI78FtW+5/ZGjHB+CXTfO56dSP1K6uNhMKSWYp69uMH8aMbm1QvL
+xtuQ4NX5k1BhXWPDFXzFJb9uYo6g/ulefbdnMlLzOc3iiBtAETM=
+=7t/z
 -----END PGP SIGNATURE-----
 
---aV5Zz91YVyjfuiWyXbmtfxvwf9NmxweND--
+--gR8XmQC1J80WOVaMwzIgjDpmxaF4j62t5--
