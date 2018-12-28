@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52079)
+Received: from eggs.gnu.org ([208.118.235.92]:57864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <adilger@dilger.ca>) id 1gcfxG-0006SX-EE
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 19:24:49 -0500
+	(envelope-from <zhijianx.li@intel.com>) id 1gcmVV-0002UZ-SZ
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 02:24:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <adilger@dilger.ca>) id 1gcfw4-0007sL-2S
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 19:23:35 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35347)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <adilger@dilger.ca>) id 1gcfw3-0007qV-Qg
-	for qemu-devel@nongnu.org; Thu, 27 Dec 2018 19:23:32 -0500
-Received: by mail-pf1-x444.google.com with SMTP id z9so9743446pfi.2
-	for <qemu-devel@nongnu.org>; Thu, 27 Dec 2018 16:23:31 -0800 (PST)
-From: Andreas Dilger <adilger@dilger.ca>
-Message-Id: <9C6A7D45-CF53-4C61-B5DD-12CA0D419972@dilger.ca>
-Content-Type: multipart/signed;
-	boundary="Apple-Mail=_6F3080DD-1C91-40F7-84C8-6E083D782885";
-	protocol="application/pgp-signature"; micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Thu, 27 Dec 2018 17:23:28 -0700
-In-Reply-To: <CAFEAcA92m4vhzjJ+B=mP_o6Wfhx1XSKo3uWxah3osh=u5UXFuw@mail.gmail.com>
-References: <87bm56vqg4.fsf@mid.deneb.enyo.de>
-	<CAFEAcA92m4vhzjJ+B=mP_o6Wfhx1XSKo3uWxah3osh=u5UXFuw@mail.gmail.com>
-Subject: Re: [Qemu-devel] d_off field in struct dirent and 32-on-64 emulation
+	(envelope-from <zhijianx.li@intel.com>) id 1gcmS3-0004IF-V1
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 02:21:03 -0500
+Received: from mga18.intel.com ([134.134.136.126]:23462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zhijianx.li@intel.com>)
+	id 1gcmS1-00043w-CT
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 02:20:58 -0500
+References: <1544063533-10139-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1544063533-10139-5-git-send-email-lizhijian@cn.fujitsu.com>
+	<20181221110913-mutt-send-email-mst@kernel.org>
+	<20181227203118.GA19442@habkost.net>
+From: Li Zhijian <zhijianx.li@intel.com>
+Message-ID: <45189e76-3ae0-34ab-bbef-50ab066d957e@intel.com>
+Date: Fri, 28 Dec 2018 15:20:43 +0800
+MIME-Version: 1.0
+In-Reply-To: <20181227203118.GA19442@habkost.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 4/4] i386: allow to load initrd
+ below 4G for recent linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,125 +32,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Florian Weimer <fw@deneb.enyo.de>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, lucho@ionkov.net, libc-alpha@sourceware.org, Arnd Bergmann <arnd@arndb.de>, ericvh@gmail.com, hpa@zytor.com, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, rminnich@sandia.gov, v9fs-developer@lists.sourceforge.net
+To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, philip.li@intel.com, philmd@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
 
---Apple-Mail=_6F3080DD-1C91-40F7-84C8-6E083D782885
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+On 12/28/2018 4:31 AM, Eduardo Habkost wrote:
+> On Fri, Dec 21, 2018 at 11:10:30AM -0500, Michael S. Tsirkin wrote:
+>> On Thu, Dec 06, 2018 at 10:32:13AM +0800, Li Zhijian wrote:
+>>>   
+>>>       /* highest address for loading the initrd */
+>>> -    if (protocol >= 0x203) {
+>>> +    if (protocol >= 0x20c &&
+>>> +        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
+>>> +        /*
+>>> +         * Although kernel allows initrd loading to above 4G,
+>>> +         * it just makes it as large as possible while still staying below 4G
+>>> +         * since current BIOS always loads initrd below pcms->below_4g_mem_size
+>>> +         */
+>>> +        initrd_max = UINT32_MAX;
+>>> +    } else if (protocol >= 0x203) {
+>>>           initrd_max = ldl_p(header+0x22c);
+>>>       } else {
+>>>           initrd_max = 0x37ffffff;
+>>
+>> I still have trouble understanding the above.
+>> Anyone else wants to comment / help rephrase the comment
+>> and commit log so it's readable?
+>
+> The comment seems to contradict what I see on the code:
+>
+> | Although kernel allows initrd loading to above 4G,
+>
+> Sounds correct.
+>
+>
+> | it just makes it as large as possible while still staying below 4G
+>
+> I'm not a native English speaker, but I believe "it" here should
+> be interpreted as "the kernel", which would be incorrect.  It's
+> this QEMU function that limits initrd_max to a uint32 value, not
+> the kernel.
+>
+>
+> | since current BIOS always loads initrd below pcms->below_4g_mem_size
+>
+> I don't know why the BIOS is mentioned here.  The
+> below_4g_mem_size limit comes from these 2 lines inside
+> load_linux():
+>
+>      if (initrd_max >= pcms->below_4g_mem_size - pcmc->acpi_data_size) {
+>          initrd_max = pcms->below_4g_mem_size - pcmc->acpi_data_size - 1;
+>      }
+> In addition to that, initrd_max is uint32_t simply because QEMU
+> doesn't support the 64-bit boot protocol (specifically the
+> ext_ramdisk_image field),
 
-On Dec 27, 2018, at 10:41 AM, Peter Maydell <peter.maydell@linaro.org> =
-wrote:
->=20
-> On Thu, 27 Dec 2018 at 17:19, Florian Weimer <fw@deneb.enyo.de> wrote:
->> We have a bit of an interesting problem with respect to the d_off
->> field in struct dirent.
->>=20
->> When running a 64-bit kernel on certain file systems, notably ext4,
->> this field uses the full 63 bits even for small directories (strace =
--v
->> output, wrapped here for readability):
->>=20
->> getdents(3, [
->>  {d_ino=3D1494304, d_off=3D3901177228673045825, d_reclen=3D40, =
-d_name=3D"authorized_keys", d_type=3DDT_REG},
->>  {d_ino=3D1494277, d_off=3D7491915799041650922, d_reclen=3D24, =
-d_name=3D".", d_type=3DDT_DIR},
->>  {d_ino=3D1314655, d_off=3D9223372036854775807, d_reclen=3D24, =
-d_name=3D"..", d_type=3DDT_DIR}
->> ], 32768) =3D 88
->>=20
->> When running in 32-bit compat mode, this value is somehow truncated =
-to
->> 31 bits, for both the getdents and the getdents64 (!) system call (at
->> least on i386).
->=20
-> Yes -- look for hash2pos() and friends in fs/ext4/dir.c.
-> The ext4 code in the kernel uses a 32 bit hash if (a) the kernel
-> is 32 bit (b) this is a compat syscall (b) some other bit of
-> the kernel asked it to via the FMODE_32BITHASH flag (currently only
-> NFS does that I think).
->=20
-> As you note, this causes breakage for userspace programs which
-> need to implement an API/ABI with 32-bit offset but which only
-> have access to the kernel's 64-bit offset API/ABI.
-
-This is (IMHO) a bit of an oxymoron, isn't it?  Applications using
-the 64-bit API, but storing the value in a 32-bit field?  The same
-problem would exist for filesystems with 64-bit inodes or 64-bit
-file offsets trying to store these values in 32-bit variables.
-It might work most of the time, but it can also break randomly.
-
-> I think the best fix for this would be for the kernel to either
-> (a) consistently use a 32-bit hash or (b) to provide an API
-> so that userspace can use the FMODE_32BITHASH flag the way
-> that kernel-internal users already can.
-
-It would be relatively straight forward to add a "32bitapi" mount
-option to return a 32-bit directory hash to userspace for operations
-on that mountpoint (ext4 doesn't have 64-bit inode numbers yet).
-However, I can't think of an easy way to do this on a per-process
-basis without just having it call the 32-bit API directly.
-
-> I couldn't think of or find any existing way for userspace
-> to get the right results here, which is why
-> 32-bit-guest-on-64-bit-host QEMU doesn't work on these filesystems
-> (depending on what exactly the guest's libc etc do).
->=20
->> the 32-bit getdents system call emulation in a 64-bit qemu-user
->> process would just silently truncate the d_off field as part of
->> the translation, not reporting an error.
->> [...]
->> This truncation has always been a bug; it breaks telldir/seekdir
->> at least in some cases.
->=20
-> Yes; you can't fit a quart into a pint pot, so if the guest
-> only handles 32-bit offsets then truncation is about all we
-> can do. This works fine if offsets are offsets, assuming the
-> directory isn't so enormous it would have broken the guest
-> anyway. I'm not aware of any issues with this other than the
-> oddball ext4 offsets-are-hashes situation -- could you expand
-> on the telldir/seekdir issue? (I suppose we should probably
-> make QEMU's syscall emulation layer return "no more entries"
-> rather than entries with truncated hashes.)
-
-For ext4 at least, you could just shift the high 32-bit part of
-the 64-bit hash down into a 32-bit value in telldir(), and
-shift it back up when seekdir() is called.
-
-Cheers, Andreas
+Thanks for explaining this :), i'm not clear before.
 
 
 
+> so all talk about below_4g_mem_size
+> seems to be just a distraction.
+>
+> All that said, I miss one piece of information here: is
+> XLF_CAN_BE_LOADED_ABOVE_4G really supposed to override
+> header+0x22c?  linux/Documentation/x86/boot.txt isn't clear about
+> that.  Is there any reference that can help us confirm this?
 
+Good question.
 
+Since i'm not familiar with boot protocol, at the beginning, i also CCed to LKML for helps
+https://lkml.org/lkml/2018/11/10/82
 
---Apple-Mail=_6F3080DD-1C91-40F7-84C8-6E083D782885
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
+Ingo said:
+>> > If XLF_CAN_BE_LOADED_ABOVE_4G is not > set, then you most likely 
+>> are on a 32-bit kernel and there are more > fundamental limits (even 
+>> if you were to load it above the 2 GB mark, you > would be limited by 
+>> the size of kernel memory.) > > So, in case you are wondering: the 
+>> bootloader that broke when setting > the initrd_max field above 2 GB 
+>> was, of course, Grub. > > So just use XLF_CAN_BE_LOADED_ABOVE_4G. 
+>> There is no need for a new flag > or new field. That's nice, and 
+>> that's the best solution!
 
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
+that make me to believe that if XLF_CAN_BE_LOADED_ABOVE_4G is set, BELOW_4G is allowed too.
 
-iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAlwlbQEACgkQcqXauRfM
-H+DTmRAAtE1K8llCpAAh6pb9XLbHF5UY+Ku7sXMR9kxGgLgoV2aU7jgT/kPCwR+p
-wHucd80Rfr4pA57R7H53zrUZ23p4yY+vYil+TMYp17KOb0YoO6QJHI93D9dta7sg
-hV0+v1Xf1BpEfhtEhAj3WGgsPVE5rvCQDCGABF/ZmiN6/nLRIe73LaJbdxVdCh4G
-bTsX8V+oaEvR0GEzjoGwoXB2id8RemUWX6Md7gWUdmmNDeF5Ic11YYqvX/R83F/r
-JGgqh5P4p9L/LbbfYDIBVMX+VHZTaUrE45OeULR6dPP9I//zk57NWB2fjTLEyUVL
-VMTxU7l4SNBGIXkaRiE/mwe8cWRpM4aIZOT3UVId7f4Urjk3n/92GQ3dHK4b7rda
-YeOff8Cgni60CSXw6kjzaivSwce2DM3hWpwKRITS9+ast+Av6X/VcrmETCKQ5Orx
-Vt7kh9O8+RjApPBPTpB45e23439pKbv4oiPWG9vyLQjkO00R6KzVnYRXyy5XHH/g
-julO83BrEcmA2/ZyK6yp49AbUdRcxNxarx/YbphtyOBKrmnjMa5lD8clnickveHO
-A3GWDZwA2T1zH+ymZK5K4QdlFjDMg7RE95P9mQYFdV6k3rWhD4OVr2dVvZ7t+ZET
-whSDJ7dvGGG1j0Px27FsUhhXCHnD20j0TvyOyxAr7oj/1e+Utrg=
-=JCC9
------END PGP SIGNATURE-----
+if above is credible, might be we can update the comments like:
+-------
+QEMU doesn't support the 64-bit boot protocol (specifically the
+ext_ramdisk_image field).
 
---Apple-Mail=_6F3080DD-1C91-40F7-84C8-6E083D782885--
+In addition, kernel allows to load initrd above 4G if XLF_CAN_BE_LOADED_ABOVE_4G is set,
+so we believe that load initrd below 4G is allowed too.
+
+For simplicity, so just set initrd_max to UINT32_MAX is enough and safe.
+-------
+  
+Thanks
+Zhijian
