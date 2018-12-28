@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43056)
+Received: from eggs.gnu.org ([208.118.235.92]:46497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gcqGP-0007wi-Hd
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 06:25:14 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gcqbI-00040H-6X
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 06:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gcq9v-0004pR-Qk
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 06:18:33 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38296)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gcq9v-0004oT-5E
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 06:18:31 -0500
-Received: by mail-oi1-x241.google.com with SMTP id a77so17126767oii.5
-	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 03:18:30 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gcqXR-0004eO-Bh
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 06:42:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55808)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gcqXI-0004ND-RQ
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 06:42:44 -0500
+Date: Fri, 28 Dec 2018 12:42:22 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181228124222.70689e60@Igors-MacBook-Pro.local>
+In-Reply-To: <20181227145402.GY19442@habkost.net>
+References: <1544619939-18102-1-git-send-email-yu.c.zhang@linux.intel.com>
+	<1544619939-18102-2-git-send-email-yu.c.zhang@linux.intel.com>
+	<20181217141740.16ccfaa1@Igors-MacBook-Pro.local>
+	<20181218092723.yhaerzm4vlzgef65@linux.intel.com>
+	<20181218155536.2b35a037@Igors-MacBook-Pro.local>
+	<20181219025717.6m72hq73p2haexkv@linux.intel.com>
+	<20181219114037.5550a562@redhat.com>
+	<20181220211801.GR19442@habkost.net>
+	<20181221151325.39b64733@redhat.com>
+	<20181227145402.GY19442@habkost.net>
 MIME-Version: 1.0
-References: <87bm56vqg4.fsf@mid.deneb.enyo.de>
-	<CAFEAcA92m4vhzjJ+B=mP_o6Wfhx1XSKo3uWxah3osh=u5UXFuw@mail.gmail.com>
-	<9C6A7D45-CF53-4C61-B5DD-12CA0D419972@dilger.ca>
-In-Reply-To: <9C6A7D45-CF53-4C61-B5DD-12CA0D419972@dilger.ca>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 28 Dec 2018 11:18:18 +0000
-Message-ID: <CAFEAcA9W+JK7_TrtTnL1P2ES1knNPJX9wcUvhfLwxLq9augq1w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] d_off field in struct dirent and 32-on-64 emulation
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel-iommu: differentiate host
+ address width from IOVA address width.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +36,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Dilger <adilger@dilger.ca>
-Cc: Florian Weimer <fw@deneb.enyo.de>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, lucho@ionkov.net, libc-alpha@sourceware.org, Arnd Bergmann <arnd@arndb.de>, ericvh@gmail.com, hpa@zytor.com, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, rminnich@sandia.gov, v9fs-developer@lists.sourceforge.net
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, 28 Dec 2018 at 00:23, Andreas Dilger <adilger@dilger.ca> wrote:
-> On Dec 27, 2018, at 10:41 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > As you note, this causes breakage for userspace programs which
-> > need to implement an API/ABI with 32-bit offset but which only
-> > have access to the kernel's 64-bit offset API/ABI.
->
-> This is (IMHO) a bit of an oxymoron, isn't it?  Applications using
-> the 64-bit API, but storing the value in a 32-bit field?
+On Thu, 27 Dec 2018 12:54:02 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-I didn't say "which choose to store the value in a 32-bit field",
-I said "which have to implement an API/ABI which has 32-bit fields".
-In QEMU's case, we use the host kernel's ABI, which has 64-bit
-offset fields. We implement a syscall ABI for the guest binary
-we are running under emulation, which may have 32-bit offset fields
-(for instance if we are running a 32-bit Arm binary.) Both of
-these ABIs are fixed -- QEMU doesn't have a choice here, it
-just has to make the best effort it can with what the host kernel
-provides it, to provide the semantics the guest binary needs.
-My suggestion in this thread is that the host kernel provides
-a wider range of facilities so that QEMU can do the job it's
-trying to do.
+> On Fri, Dec 21, 2018 at 03:13:25PM +0100, Igor Mammedov wrote:
+> > On Thu, 20 Dec 2018 19:18:01 -0200
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > 
+> > > On Wed, Dec 19, 2018 at 11:40:37AM +0100, Igor Mammedov wrote:
+> > > > On Wed, 19 Dec 2018 10:57:17 +0800
+> > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> > > >   
+> > > > > On Tue, Dec 18, 2018 at 03:55:36PM +0100, Igor Mammedov wrote:  
+> > > > > > On Tue, 18 Dec 2018 17:27:23 +0800
+> > > > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> > > > > >     
+> > > > > > > On Mon, Dec 17, 2018 at 02:17:40PM +0100, Igor Mammedov wrote:    
+> > > > > > > > On Wed, 12 Dec 2018 21:05:38 +0800
+> > > > > > > > Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> > > > > > > >     
+> > > > > > > > > Currently, vIOMMU is using the value of IOVA address width, instead of
+> > > > > > > > > the host address width(HAW) to calculate the number of reserved bits in
+> > > > > > > > > data structures such as root entries, context entries, and entries of
+> > > > > > > > > DMA paging structures etc.
+> > > > > > > > > 
+> > > > > > > > > However values of IOVA address width and of the HAW may not equal. For
+> > > > > > > > > example, a 48-bit IOVA can only be mapped to host addresses no wider than
+> > > > > > > > > 46 bits. Using 48, instead of 46 to calculate the reserved bit may result
+> > > > > > > > > in an invalid IOVA being accepted.
+> > > > > > > > > 
+> > > > > > > > > To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
+> > > > > > > > > whose value is initialized based on the maximum physical address set to
+> > > > > > > > > guest CPU.    
+> > > > > > > >     
+> > > > > > > > > Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
+> > > > > > > > > to clarify.
+> > > > > > > > > 
+> > > > > > > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > > > > > > > > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > > > > > > > > ---    
+> > > > > > > > [...]
+> > > > > > > >     
+> > > > > > > > > @@ -3100,6 +3104,8 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+> > > > > > > > >  static void vtd_init(IntelIOMMUState *s)
+> > > > > > > > >  {
+> > > > > > > > >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
+> > > > > > > > > +    CPUState *cs = first_cpu;
+> > > > > > > > > +    X86CPU *cpu = X86_CPU(cs);
+> > > > > > > > >  
+> > > > > > > > >      memset(s->csr, 0, DMAR_REG_SIZE);
+> > > > > > > > >      memset(s->wmask, 0, DMAR_REG_SIZE);
+> > > > > > > > > @@ -3119,23 +3125,24 @@ static void vtd_init(IntelIOMMUState *s)
+> > > > > > > > >      s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
+> > > > > > > > >               VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
+> > > > > > > > >               VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
+> > > > > > > > > -    if (s->aw_bits == VTD_HOST_AW_48BIT) {
+> > > > > > > > > +    if (s->aw_bits == VTD_AW_48BIT) {
+> > > > > > > > >          s->cap |= VTD_CAP_SAGAW_48bit;
+> > > > > > > > >      }
+> > > > > > > > >      s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
+> > > > > > > > > +    s->haw_bits = cpu->phys_bits;    
+> > > > > > > > Is it possible to avoid accessing CPU fields directly or cpu altogether
+> > > > > > > > and set phys_bits when iommu is created?    
+> > > > > > > 
+> > > > > > > Thanks for your comments, Igor.
+> > > > > > > 
+> > > > > > > Well, I guess you prefer not to query the CPU capabilities while deciding
+> > > > > > > the vIOMMU features. But to me, they are not that irrelevant.:)
+> > > > > > > 
+> > > > > > > Here the hardware address width in vt-d, and the one in cpuid.MAXPHYSADDR
+> > > > > > > are referring to the same concept. In VM, both are the maximum guest physical
+> > > > > > > address width. If we do not check the CPU field here, we will still have to
+> > > > > > > check the CPU field in other places such as build_dmar_q35(), and reset the
+> > > > > > > s->haw_bits again.
+> > > > > > > 
+> > > > > > > Is this explanation convincing enough? :)    
+> > > > > > current build_dmar_q35() doesn't do it, it's all new code in this series that
+> > > > > > contains not acceptable direct access from one device (iommu) to another (cpu).   
+> > > > > > Proper way would be for the owner of iommu to fish limits from somewhere and set
+> > > > > > values during iommu creation.    
+> > > > > 
+> > > > > Well, current build_dmar_q35() doesn't do it, because it is using the incorrect value. :)
+> > > > > According to the spec, the host address width is the maximum physical address width,
+> > > > > yet current implementation is using the DMA address width. For me, this is not only
+> > > > > wrong, but also unsecure. For this point, I think we all agree this need to be fixed.
+> > > > > 
+> > > > > As to how to fix it - should we query the cpu fields, I still do not understand why
+> > > > > this is not acceptable. :)
+> > > > > 
+> > > > > I had thought of other approaches before, yet I did not choose:
+> > > > >   
+> > > > > 1> Introduce a new parameter, say, "x-haw-bits" which is used for iommu to limit its    
+> > > > > physical address width(similar to the "x-aw-bits" for IOVA). But what should we check
+> > > > > this parameter or not? What if this parameter is set to sth. different than the "phys-bits"
+> > > > > or not?
+> > > > >   
+> > > > > 2> Another choice I had thought of is, to query the physical iommu. I abandoned this    
+> > > > > idea because my understanding is that vIOMMU is not a passthrued device, it is emulated.  
+> > > >   
+> > > > > So Igor, may I ask why you think checking against the cpu fields so not acceptable? :)  
+> > > > Because accessing private fields of device from another random device is not robust
+> > > > and a subject to breaking in unpredictable manner when field meaning or initialization
+> > > > order changes. (analogy to baremetal: one does not solder wire to a CPU die to let
+> > > > access some piece of data from random device).
+> > > >   
+> > > 
+> > > With either the solution below or the one I proposed, we still
+> > > have a ordering problem: if we want "-cpu ...,phys-bits=..." to
+> > As Michael said, it's questionable if iommu should rely on guest's
+> > phys-bits at all,
+> 
+> Agreed, this is not clear.  I don't know yet if we really want to
+> make "-cpu" affect other devices.  Probably not.
+> 
+> >                   but that aside we should use proper interfaces
+> > and hierarchy to initialize devices, see below why I dislike
+> > simplistic pc_max_phys_bits().
+> 
+> What do you mean by proper interfaces and hierarchy?
+set properties on created iommu object by one of it's parents
+(SysBus or machine)
 
->  The same
-> problem would exist for filesystems with 64-bit inodes or 64-bit
-> file offsets trying to store these values in 32-bit variables.
-> It might work most of the time, but it can also break randomly.
+> 
+> pc_max_phys_bits() is simple, and that's supposed to be a good
+> thing.
+first_cpu->phys_bits even simpler, shouldn't we use it then?
 
-In general inodes and offsets start from 0 and work up --
-so almost all of the time they don't actually overflow.
-The problem with ext4 directory hash "offsets" is that they
-overflow all the time and immediately, so instead of "works
-unless you have a weird edge case" like all the other filesystems,
-it's "never works".
+it only seems simple, but with this approach one would end up
+creating a bunch of custom APIs for every little thing then try
+to generalize them to share with other machine types pushing APIs
+to generic machine where it is irrelevant for the most machines.
+So one end ups with a lot hard to manage APIs that are called at
+random times by devices.
 
-> > I think the best fix for this would be for the kernel to either
-> > (a) consistently use a 32-bit hash or (b) to provide an API
-> > so that userspace can use the FMODE_32BITHASH flag the way
-> > that kernel-internal users already can.
->
-> It would be relatively straight forward to add a "32bitapi" mount
-> option to return a 32-bit directory hash to userspace for operations
-> on that mountpoint (ext4 doesn't have 64-bit inode numbers yet).
-> However, I can't think of an easy way to do this on a per-process
-> basis without just having it call the 32-bit API directly.
+> > > affect the IOMMU device, we will need the CPU objects to be
+> > > created before IOMMU realize.
+> > > 
+> > > At least both proposals make the initialization ordering
+> > > explicitly a responsibility of the machine code.  In either case,
+> > > I don't think we will start creating all CPU objects after device
+> > > realize any time soon.
+> > > 
+> > > 
+> > > > I've looked at intel-iommu code and how it's created so here is a way to do the thing
+> > > > you need using proper interfaces:
+> > > > 
+> > > > 1. add x-haw_bits property
+> > > > 2. include in your series patch
+> > > >     '[Qemu-devel] [PATCH] qdev: let machine hotplug handler to override  bus hotplug handler'
+> > > > 3. add your iommu to pc_get_hotpug_handler() to redirect plug flow to
+> > > >    machine and let _pre_plug handler to check and set x-haw_bits for machine level  
+> > > 
+> > > Wow, that's a very complex way to pass a single integer from
+> > > machine code to device code.  If this is the only way to do that,
+> > > we really need to take a step back and rethink our API design.
+> > > 
+> > > What's wrong with having a simple
+> > >   uint32_t pc_max_phys_bits(PCMachineState*)
+> > > function?
+> > As suggested, it would be only aesthetic change for accessing first_cpu from
+> > random device at random time. IOMMU would still access cpu instance directly
+> > no matter how much wrappers one would use so it's still the same hack.
+> > If phys_bits were changing during VM lifecycle and iommu needed to use
+> > updated value then using pc_max_phys_bits() might be justified as
+> > we don't have interfaces to handle that but that's not the case here.
+> 
+> I don't understand what you mean here.  Which "interfaces to
+> handle that" you are talking about?
+There is HotplugHandler and its pre_plug() handler to initialize
+being created device before it's realize() method is called.
+In iommu case, I suggest machine to set iommu::phys_bits property
+when device is created at pre_plug() time and fail gracefully if it's
+not possible. It's a bit more complex than pc_max_phys_bits() but
+follows QOM device life-cycle just as expected without unnecessary
+relations.
 
-The problem is that there is no 32-bit API in some cases
-(unless I have misunderstood the kernel code) -- not all
-host architectures implement compat syscalls or allow them
-to be called from 64-bit processes or implement all the older
-syscall variants that had smaller offets. If there was a guaranteed
-"this syscall always exists and always gives me 32-bit offsets"
-we could use it.
+> > I suggested a typical way (albeit a bit complex) to handle device
+> > initialization in cases where bus plug handler is not sufficient.
+> > It follows proper hierarchy without any layer violations and can fail
+> > gracefully even if we start creating CPUs later using only '-device cpufoo'
+> > without need to fix iommu code to handle that (it would fail creating
+> > iommu with clear error that CPU isn't available and all user have to
+> > do is to fix CLI to make sure that CPU is created before iommu).
+> 
+> What do you mean by "proper hierarchy" and "layer violations"?
 
-> For ext4 at least, you could just shift the high 32-bit part of
-> the 64-bit hash down into a 32-bit value in telldir(), and
-> shift it back up when seekdir() is called.
+it means that an object shouldn't reach to the parent to fetch 
+a random bit of configuration (ideally child shouldn't be aware of
+parent's existence at all), and then it's responsibility of parent
+to configure child during it's creation and set all necessary
+properties/resources for the child to function properly.
 
-Yes, that has been suggested, but it seemed a bit dubious
-to bake in knowledge of ext4's internal implementation details.
-Can we rely on this as an ABI promise that will always work
-for all versions of all file systems going forwards?
+That model was used in qdev and it's still true with QOM device
+models we use now. Difference is that instead of configuring
+device fields directly, QOM device approach uses more unified
+object_new/set properties/realize work-flow.
 
-thanks
--- PMM
+> What exactly is wrong with having device code talking to the
+> machine object?
+
+it breaks device abstraction boundaries and introduces unnecessary
+relationship between devices instead of reusing existing device
+initialization framework.
+
+It will also be a problem if we start isolating device models/backends
+into separate processes as one would have to add/maintain/secure ABIs
+for 'simple' APIs where property setting ABI would be sufficient. 
+
+
+> You do have a point about "-device cpufoo": making "-cpu" affect
+> iommu phys-bits is probably not a good idea after all.
+> 
+> > 
+> > So I'd prefer if we used exiting pattern for device initialization
+> > instead of hacks whenever it is possible.
+> 
+> Why do you describe it as a hack?  It's just C code calling a C
+> function.  I don't see any problem in having device code talking
+> to the machine code to get a bit of information.
+
+(Well, we can get rid of a bunch of properties and query QemuOpts
+directly from each device whenever configuration info is needed,
+it's just a C code calling C functions after all)
+
+Writing and calling random set of C functions at random time is fine
+if we give up on modeling devices as QOM objects (QEMU was like that
+at some point), but that becomes unmanageable as complexity grows.
+ 
+ 
+> > > > 4. you probably can use phys-bits/host-phys-bits properties to get data that you need
+> > > >    also see how ms->possible_cpus, that's how you can get access to CPU from machine
+> > > >    layer.
+> > > >   
+> > > [...]
+> > > 
+> > PS:
+> > Another thing I'd like to draw your attention to (since you recently looked at
+> > phys-bits) is about host/guest phys_bits and if it's safe from migration pov
+> > between hosts with different limits.
+> > 
+> > 
+> 
