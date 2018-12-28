@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46458)
+Received: from eggs.gnu.org ([208.118.235.92]:47710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gcwi9-0006zF-4w
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 13:18:21 -0500
+	(envelope-from <philmd@redhat.com>) id 1gcwl0-0001GL-Fa
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 13:22:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gcwU9-0005VJ-26
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 13:03:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58106)
+	(envelope-from <philmd@redhat.com>) id 1gcwkI-0006zZ-Br
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 13:21:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gcw1Z-0001W7-1k
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:34:20 -0500
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gcw1j-0001Wc-G3
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 12:34:30 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 28 Dec 2018 18:33:51 +0100
-Message-Id: <20181228173356.15359-1-philmd@redhat.com>
+Date: Fri, 28 Dec 2018 18:33:52 +0100
+Message-Id: <20181228173356.15359-2-philmd@redhat.com>
+In-Reply-To: <20181228173356.15359-1-philmd@redhat.com>
+References: <20181228173356.15359-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/5] Fix strncpy() warnings for GCC8 new
- -Wstringop-truncation
+Subject: [Qemu-devel] [PATCH v4 1/5] qemu/compiler: Define QEMU_NONSTRING
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +29,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: David Hildenbrand <david@redhat.com>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-GCC 8 new warning prevents builds to success since quite some time.
-First report on the mailing list is in July 2018:
-https://lists.gnu.org/archive/html/qemu-devel/2018-07/msg03723.html
+GCC 8 introduced the -Wstringop-truncation checker to detect truncation b=
+y
+the strncat and strncpy functions (closely related to -Wstringop-overflow=
+,
+which detect buffer overflow by string-modifying functions declared in
+<string.h>).
 
-Since v3:
-- patch 1: make sens of description (eblake)
-- patch 2: append QEMU_NONSTRING instead of prepending it (mst)
-- patch 3: rebased (imammedo), intented
-- patch 4: replaced by Marc-Andr=C3=A9 first attempt, improved doc
-- patch 5: add assert() and NUL-terminate the buffer (mst)
+In tandem of -Wstringop-truncation, the "nonstring" attribute was added:
 
-Various intents has been sent to fix this:
-- Incorrectly using g_strlcpy()
-  https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03705.html
-  https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03706.html
-- Using assert() and strpadcpy()
-  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03938.html
-  This was the approch taken by the previous v2:
-  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04405.html
-- Use #pragma GCC diagnostic ignored "-Wstringop-truncation"
-  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
-- adding an inline wrapper with said pragma in there
-  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
-- -Wno-stringop-truncation is the makefile
-  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04261.html
-- Use the 'nonstring' attribute
-  https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04493.html
+  The nonstring variable attribute specifies that an object or member
+  declaration with type array of char, signed char, or unsigned char,
+  or pointer to such a type is intended to store character arrays that
+  do not necessarily contain a terminating NUL. This is useful in detecti=
+ng
+  uses of such arrays or pointers with functions that expect NUL-terminat=
+ed
+  strings, and to avoid warnings when such an array or pointer is used as
+  an argument to a bounded string manipulation function such as strncpy.
 
-This series add the QEMU_NONSTRING definition and use it.
+  From the GCC manual: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable=
+-Attributes.html#index-nonstring-variable-attribute
 
-Regards,
+Add the QEMU_NONSTRING macro which checks if the compiler supports this
+attribute.
 
-Phil.
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+v4: reordered the commit description to make sens (eblake)
 
-Marc-Andr=C3=A9 Lureau (1):
-  migration: Fix stringop-truncation warning
+Note this trigger the following checkpatch warning (patchew):
 
-Philippe Mathieu-Daud=C3=A9 (4):
-  qemu/compiler: Define QEMU_NONSTRING
-  block/sheepdog: Use QEMU_NONSTRING for non NUL-terminated arrays
-  hw/acpi: Use QEMU_NONSTRING for non NUL-terminated arrays
-  migration: Use strnlen() for fixed-size string
+  WARNING: architecture specific defines should be avoided
+  #50: FILE: include/qemu/compiler.h:163:
+  +#if __has_attribute(nonstring)
+---
+ include/qemu/compiler.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
- block/sheepdog.c            |  2 +-
- hw/acpi/core.c              | 12 ++++++++----
- include/hw/acpi/acpi-defs.h | 13 ++++++++-----
- include/qemu/compiler.h     | 15 +++++++++++++++
- migration/global_state.c    | 14 +++++++++++++-
- 5 files changed, 45 insertions(+), 11 deletions(-)
-
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 261842beae..2d8f507c73 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -151,6 +151,21 @@
+ # define QEMU_ERROR(X)
+ #endif
+=20
++/*
++ * The nonstring variable attribute specifies that an object or member
++ * declaration with type array of char or pointer to char is intended
++ * to store character arrays that do not necessarily contain a terminati=
+ng
++ * NUL character. This is useful in detecting uses of such arrays or poi=
+nters
++ * with functions that expect NUL-terminated strings, and to avoid warni=
+ngs
++ * when such an array or pointer is used as an argument to a bounded str=
+ing
++ * manipulation function such as strncpy.
++ */
++#if __has_attribute(nonstring)
++# define QEMU_NONSTRING __attribute__((nonstring))
++#else
++# define QEMU_NONSTRING
++#endif
++
+ /* Implement C11 _Generic via GCC builtins.  Example:
+  *
+  *    QEMU_GENERIC(x, (float, sinf), (long double, sinl), sin) (x)
 --=20
 2.17.2
