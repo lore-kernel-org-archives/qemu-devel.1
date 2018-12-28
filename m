@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46582)
+Received: from eggs.gnu.org ([208.118.235.92]:46699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gcsrJ-0007Fo-97
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:11:34 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gcsrP-0007ik-MX
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:11:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gcsZK-0006jF-DX
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:52:56 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gcsZI-0006gD-VM
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:52:55 -0500
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 28 Dec 2018 13:52:30 +0000
-Message-Id: <20181228135235.6859-4-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 28 Dec 2018 13:52:29 +0000
+Message-Id: <20181228135235.6859-3-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
 References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v2 3/8] target/ppc: rework vmul{e, o}{s, u}{b, h,
+Subject: [Qemu-devel] [PATCH v2 2/8] target/ppc: rework vmrg{l, h}{b, h,
  w} instructions to use Vsr* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -22,82 +22,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
 
-The current implementations make use of the endian-specific macros HI_IDX and
-LO_IDX directly to calculate array offsets.
+The current implementations make use of the endian-specific macros MRGLO/MRGHI
+and also reference HI_IDX and LO_IDX directly to calculate array offsets.
 
 Rework the implementation to use the Vsr* macros so that these per-endian
 references can be removed.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/int_helper.c | 48 +++++++++++++++++++++++++++---------------------
- 1 file changed, 27 insertions(+), 21 deletions(-)
+ target/ppc/int_helper.c | 52 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 25 insertions(+), 27 deletions(-)
 
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index f084a706ee..dc5c9fb8d8 100644
+index 598731d47a..f084a706ee 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -1118,33 +1118,39 @@ void helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+@@ -976,43 +976,41 @@ void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
      }
  }
  
--#define VMUL_DO(name, mul_element, prod_element, cast, evenp)           \
-+#define VMUL_DO_EVN(name, mul_element, mul_access, prod_access, cast)   \
+-#define VMRG_DO(name, element, highp)                                   \
++#define VMRG_DOLO(name, element, access)                                \
      void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
      {                                                                   \
+         ppc_avr_t result;                                               \
          int i;                                                          \
+-        size_t n_elems = ARRAY_SIZE(r->element);                        \
++        int m = ARRAY_SIZE(r->element) - 1;                             \
                                                                          \
--        VECTOR_FOR_INORDER_I(i, prod_element) {                         \
--            if (evenp) {                                                \
--                r->prod_element[i] =                                    \
--                    (cast)a->mul_element[i * 2 + HI_IDX] *              \
--                    (cast)b->mul_element[i * 2 + HI_IDX];               \
+-        for (i = 0; i < n_elems / 2; i++) {                             \
+-            if (highp) {                                                \
+-                result.element[i*2+HI_IDX] = a->element[i];             \
+-                result.element[i*2+LO_IDX] = b->element[i];             \
 -            } else {                                                    \
--                r->prod_element[i] =                                    \
--                    (cast)a->mul_element[i * 2 + LO_IDX] *              \
--                    (cast)b->mul_element[i * 2 + LO_IDX];               \
+-                result.element[n_elems - i * 2 - (1 + HI_IDX)] =        \
+-                    b->element[n_elems - i - 1];                        \
+-                result.element[n_elems - i * 2 - (1 + LO_IDX)] =        \
+-                    a->element[n_elems - i - 1];                        \
 -            }                                                           \
-+        for (i = 0; i < ARRAY_SIZE(r->mul_element); i += 2) {           \
-+            r->prod_access(i >> 1) = (cast)a->mul_access(i) *           \
-+                                     (cast)b->mul_access(i);            \
-+        }                                                               \
-+    }
++        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
++            result.access(m - i) = (i & 1) ? a->access(m - (i >> 1))    \
++                                           : b->access(m - (i >> 1));   \
+         }                                                               \
+         *r = result;                                                    \
+     }
+-#if defined(HOST_WORDS_BIGENDIAN)
+-#define MRGHI 0
+-#define MRGLO 1
+-#else
+-#define MRGHI 1
+-#define MRGLO 0
+-#endif
+-#define VMRG(suffix, element)                   \
+-    VMRG_DO(mrgl##suffix, element, MRGHI)       \
+-    VMRG_DO(mrgh##suffix, element, MRGLO)
+-VMRG(b, u8)
+-VMRG(h, u16)
+-VMRG(w, u32)
 +
-+#define VMUL_DO_ODD(name, mul_element, mul_access, prod_access, cast)   \
++#define VMRG_DOHI(name, element, access)                                \
 +    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
 +    {                                                                   \
++        ppc_avr_t result;                                               \
 +        int i;                                                          \
 +                                                                        \
-+        for (i = 0; i < ARRAY_SIZE(r->mul_element); i += 2) {           \
-+            r->prod_access(i >> 1) = (cast)a->mul_access(i + 1) *       \
-+                                     (cast)b->mul_access(i + 1);        \
-         }                                                               \
-     }
--#define VMUL(suffix, mul_element, prod_element, cast)            \
--    VMUL_DO(mule##suffix, mul_element, prod_element, cast, 1)    \
--    VMUL_DO(mulo##suffix, mul_element, prod_element, cast, 0)
--VMUL(sb, s8, s16, int16_t)
--VMUL(sh, s16, s32, int32_t)
--VMUL(sw, s32, s64, int64_t)
--VMUL(ub, u8, u16, uint16_t)
--VMUL(uh, u16, u32, uint32_t)
--VMUL(uw, u32, u64, uint64_t)
--#undef VMUL_DO
++        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
++            result.access(i) = (i & 1) ? b->access(i >> 1)              \
++                                       : a->access(i >> 1);             \
++        }                                                               \
++        *r = result;                                                    \
++    }
 +
-+#define VMUL(suffix, mul_element, mul_access, prod_access, cast)       \
-+    VMUL_DO_EVN(mule##suffix, mul_element, mul_access, prod_access, cast)  \
-+    VMUL_DO_ODD(mulo##suffix, mul_element, mul_access, prod_access, cast)
-+VMUL(sb, s8, VsrSB, VsrSH, int16_t)
-+VMUL(sh, s16, VsrSH, VsrSW, int32_t)
-+VMUL(sw, s32, VsrSW, VsrSD, int64_t)
-+VMUL(ub, u8, VsrB, VsrH, uint16_t)
-+VMUL(uh, u16, VsrH, VsrW, uint32_t)
-+VMUL(uw, u32, VsrW, VsrD, uint64_t)
-+#undef VMUL_DO_EVN
-+#undef VMUL_DO_ODD
- #undef VMUL
++#define VMRG(suffix, element, access)                  \
++    VMRG_DOLO(mrgl##suffix, element, access)           \
++    VMRG_DOHI(mrgh##suffix, element, access)
++VMRG(b, u8, VsrB)
++VMRG(h, u16, VsrH)
++VMRG(w, u32, VsrW)
+ #undef VMRG_DO
+ #undef VMRG
+-#undef MRGHI
+-#undef MRGLO
  
- void helper_vperm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b,
+ void helper_vmsummbm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+                      ppc_avr_t *b, ppc_avr_t *c)
 -- 
 2.11.0
