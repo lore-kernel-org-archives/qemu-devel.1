@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48330)
+Received: from eggs.gnu.org ([208.118.235.92]:54022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jimw@sifive.com>) id 1gd0U7-0004zz-Sn
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 17:20:05 -0500
+	(envelope-from <bounces@canonical.com>) id 1gd0rC-0006FH-54
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 17:43:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jimw@sifive.com>) id 1gd0Gf-00056h-Cl
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 17:06:10 -0500
-Received: from mail-vs1-xe44.google.com ([2607:f8b0:4864:20::e44]:40852)
+	(envelope-from <bounces@canonical.com>) id 1gd0eW-0001MJ-Vm
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 17:30:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jimw@sifive.com>) id 1gd0Ge-00056K-VX
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 17:06:09 -0500
-Received: by mail-vs1-xe44.google.com with SMTP id z3so13702652vsf.7
-	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 14:06:08 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gd0eR-0001AE-MR
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 17:30:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gd0eQ-0006qK-5Z
+	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 22:30:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 249962E804F
+	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 22:30:42 +0000 (UTC)
 MIME-Version: 1.0
-From: Jim Wilson <jimw@sifive.com>
-Date: Fri, 28 Dec 2018 14:05:57 -0800
-Message-ID: <CAFyWVaai=5K7j8w+Abpk9jxGyKuo4v9w2BgmDbY=_29+Q++Jyw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [PATCH 0/5 v2] RISC-V: Add gdb xml files and gdbstub
- support.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 28 Dec 2018 22:25:06 -0000
+From: PH <1810000@bugs.launchpad.net>
+Reply-To: Bug 1810000 <1810000@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154603590627.5548.1380267988808710453.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1810000] [NEW] qemu system emulator crashed with
+ the attachment of usb-bt-dongle device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +37,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-riscv@nongnu.org, Jim Wilson <jimw@sifive.com>
 
-This is the second version of the patch set.  I haven't gotten any bug
-reports for the patches in the several weeks that they have been
-available, and no review yet, so the only significant difference from
-the first version is that I ran them through checkpatch to fix style
-issues, and I sent them to the right mailing list this time.
+Public bug reported:
 
-With these patches, I can run system qemu with -s -S, connect to it
-with gdb, and then print any integer, FP, or CSR register.  This
-support is currently broken.
+I am testing usb-bt-dongle device on xchi host controller, and found
+that the qemu crashed directly with an assertion failer.
 
-The first two patches in the series are just dropping in xml files
-from gdb unchanged, with configure support to point at them.  The next
-two patches are the inconvenient stuff.  The gdb CSR files are in
-documentation order not numerical order, so I need an array to map the
-gdb numbers to the actual hardware numbers.  The gdb files should
-probably be improved, but I don't know when that will happen.  That is
-the third patch.  The fourth patch is to disable all of the illegal
-instruction checks when accessing CSRs from the debugger, as it needs
-to be able to access them without traps.  The last patch adds the
-gdbstub support to use the new xml files which is pretty simple,
-though there is an unanswered question in there about what to do with
-the FP registers.  Should we try to configure them based on the
-target?  Right now I just always enable them which is the simple
-solution.  I'm not sure if enabling them based on the target will even
-work with gdb or not.
+Here is the information to reproduce the crash:
 
-Jim
+Qemu git revision: 9b2e891ec5ccdb4a7d583b77988848282606fdea
+System emulator: qemu-x86_64
+VM image: https://people.debian.org/~aurel32/qemu/amd64/debian_squeeze_amd6=
+4_desktop.qcow2
+CommandLine: qemu-system-x86_64 -M q35 -device qemu-xhci,id=3Dxhci -enable-=
+kvm -device usb-bt-dongle  -hda ./debian_wheezy_amd64_standard.qcow2
+
+Error message:
+
+qemu-system-x86_64: /build/qemu-Eap4uc/qemu-2.11+dfsg/hw/usb/core.c:592:
+usb_packet_copy: Assertion `p->actual_length + bytes <=3D iov->size'
+failed.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1810000
+
+Title:
+  qemu system emulator crashed with the attachment of usb-bt-dongle
+  device
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am testing usb-bt-dongle device on xchi host controller, and found
+  that the qemu crashed directly with an assertion failer.
+
+  Here is the information to reproduce the crash:
+
+  Qemu git revision: 9b2e891ec5ccdb4a7d583b77988848282606fdea
+  System emulator: qemu-x86_64
+  VM image: https://people.debian.org/~aurel32/qemu/amd64/debian_squeeze_am=
+d64_desktop.qcow2
+  CommandLine: qemu-system-x86_64 -M q35 -device qemu-xhci,id=3Dxhci -enabl=
+e-kvm -device usb-bt-dongle  -hda ./debian_wheezy_amd64_standard.qcow2
+
+  Error message:
+
+  qemu-system-x86_64: /build/qemu-
+  Eap4uc/qemu-2.11+dfsg/hw/usb/core.c:592: usb_packet_copy: Assertion
+  `p->actual_length + bytes <=3D iov->size' failed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1810000/+subscriptions
