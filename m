@@ -1,17 +1,22 @@
 Received: from eggs.gnu.org ([208.118.235.92]:45619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gcspD-0005Wu-GL
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:09:24 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gcsqD-0005Wu-Pd
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:10:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gcsZH-0006eJ-WA
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:52:55 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 28 Dec 2018 13:52:28 +0000
-Message-Id: <20181228135235.6859-2-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
-References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v2 1/8] target/ppc: implement complete set of
- Vsr* macros
+	(envelope-from <pbonzini@redhat.com>) id 1gcsdA-0002rz-4j
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:56:52 -0500
+References: <320758d6-012b-0b17-2467-f73bf8f4dcb2@virtuozzo.com>
+	<CAMRbyytAWPgKJFLfSjq4FD-G0dsTB4mJC8sspMx3ApMJ8rGdVw@mail.gmail.com>
+	<359b482e-8be6-49b4-e2de-c2498af10127@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6c3b9c7e-5926-24a4-59a5-3fcf06319f50@redhat.com>
+Date: Fri, 28 Dec 2018 14:56:34 +0100
+MIME-Version: 1.0
+In-Reply-To: <359b482e-8be6-49b4-e2de-c2498af10127@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] do not lseek in qcow2 block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +25,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org, david@gibson.dropbear.id.au
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Nir Soffer <nsoffer@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This prepares us for eliminating the use of direct array access within the VMX
-instruction implementations.
+On 25/12/18 10:45, Vladimir Sementsov-Ogievskiy wrote:
+>>
+>>     What are the cases, when we really need digging for zeros in bs->file?
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/internal.h | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+It's needed for preallocation=metadata.
 
-diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index c7c0f77dd6..f26a71ffcf 100644
---- a/target/ppc/internal.h
-+++ b/target/ppc/internal.h
-@@ -206,16 +206,23 @@ EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
- 
- #if defined(HOST_WORDS_BIGENDIAN)
- #define VsrB(i) u8[i]
-+#define VsrSB(i) s8[i]
- #define VsrH(i) u16[i]
-+#define VsrSH(i) s16[i]
- #define VsrW(i) u32[i]
-+#define VsrSW(i) s32[i]
- #define VsrD(i) u64[i]
-+#define VsrSD(i) s64[i]
- #else
- #define VsrB(i) u8[15 - (i)]
-+#define VsrSB(i) s8[15 - (i)]
- #define VsrH(i) u16[7 - (i)]
-+#define VsrSH(i) s16[7 - (i)]
- #define VsrW(i) u32[3 - (i)]
-+#define VsrSW(i) s32[3 - (i)]
- #define VsrD(i) u64[1 - (i)]
-+#define VsrSD(i) s64[1 - (i)]
- #endif
--
- static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
- {
-     vsr->VsrD(0) = env->vsr[n].u64[0];
--- 
-2.11.0
+Paolo
