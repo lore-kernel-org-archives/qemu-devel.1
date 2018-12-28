@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46792)
+Received: from eggs.gnu.org ([208.118.235.92]:51152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gcsrg-0007rH-Fs
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:11:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gctDF-0005jr-UX
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:34:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gcsYu-0006Mk-UH
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:52:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46810)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gcsYu-0006Kj-KW
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 08:52:28 -0500
-References: <e0d6e64a5f4b3ed436bb91aa3428986a06a0f1f1.1545911443.git.public@hansmi.ch>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <62ec6c1d-4ed8-11ad-f8a6-dd85f4fe53ab@redhat.com>
-Date: Fri, 28 Dec 2018 14:52:19 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gct9P-0001iL-B8
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:30:12 -0500
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:37014)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gcstG-0001Sy-27
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 09:13:30 -0500
+Received: by mail-ot1-x331.google.com with SMTP id 40so18729754oth.4
+	for <qemu-devel@nongnu.org>; Fri, 28 Dec 2018 06:13:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <e0d6e64a5f4b3ed436bb91aa3428986a06a0f1f1.1545911443.git.public@hansmi.ch>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] smbus_eeprom: Limit data writes to 255
- bytes
+References: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
+	<945511ac-d99a-d483-12a2-e6ad4dda09c2@linaro.org>
+	<CAObpvQktCHp-9V40z7kDaTU2CwRWSq8ZVS1PxRg3WK01TFXCzQ@mail.gmail.com>
+	<b4cdc06a-8114-48d2-2c0a-9fea876fee4a@linaro.org>
+	<CAObpvQmejWBh+RNz2vhk16-kcY_QveM_pSmM5ZeWqWv1d8AJzQ@mail.gmail.com>
+In-Reply-To: <CAObpvQmejWBh+RNz2vhk16-kcY_QveM_pSmM5ZeWqWv1d8AJzQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 28 Dec 2018 14:13:13 +0000
+Message-ID: <CAFEAcA-9McUUWsG2o_o6fm1S1k-PpMyo54=dmoN9vMwpxfsu0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] AVX support for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Hanselmann <public@hansmi.ch>, qemu-devel@nongnu.org
-Cc: mst@redhat.com
+To: Nick Renieris <makren67@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 27/12/18 12:51, Michael Hanselmann wrote:
-> The "eeprom_write_data" function in "smbus_eeprom.c" had no provisions
-> to limit the length of data written. If a caller were able to manipulate
-> the "len" parameter they could potentially write before or after the
-> target buffer.
-> ---
->  hw/i2c/smbus_eeprom.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-> index f18aa3de35..74fa1c328c 100644
-> --- a/hw/i2c/smbus_eeprom.c
-> +++ b/hw/i2c/smbus_eeprom.c
-> @@ -76,6 +76,7 @@ static void eeprom_write_data(SMBusDevice *dev, uint8_t cmd, uint8_t *buf, int l
->         It is a block write without a length byte.  Fortunately we
->         get the full block anyway.  */
->      /* TODO: Should this set the current location?  */
-> +    len &= 0xff;
->      if (cmd + len > 256)
->          n = 256 - cmd;
->      else
-> 
+On Fri, 28 Dec 2018 at 13:45, Nick Renieris <makren67@gmail.com> wrote:
+> Also, I hope you meant four months for me, not for you - I'm
+> completely new to the QEMU codebase. I expect it will take me weeks
+> just to understand x86's 'translate.c' (who thought it'd be a good
+> idea to put all this stuff in _one_ file?).
 
-Note that len is limited to 33 bytes (smbus_do_write and smbus_i2c_send).
+x86 suffers from being one of the first and oldest frontends,
+and on top of that from not having had a great deal of active
+attention. So it has a lot of remnants from older styles of
+implementation, as well as the kind of "one big function in
+one huge file" that organic growth of a codebase tends to give you.
+It doesn't make that much difference whether you have one file
+or several, though -- target/arm/translate-a64.c is pretty
+well structured and easy (IMHO) to comprehend, but it's
+5000 lines longer than target/i386/translate.c. The comprehensibility
+improvements come from better breakdown into separate functions
+and much clearer commenting of the extent of the decode at any
+particular point (plus not having any legacy baggage to deal with).
 
-Paolo
+thanks
+-- PMM
