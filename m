@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43183)
+Received: from eggs.gnu.org ([208.118.235.92]:43552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv0-0002w7-QX
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:54 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv3-00036f-KT
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcC-0007v8-9l
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcB-0007tp-LK
 	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:21:26 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 29 Dec 2018 15:20:22 +0300
-Message-Id: <20181229122027.42245-7-vsementsov@virtuozzo.com>
+Date: Sat, 29 Dec 2018 15:20:20 +0300
+Message-Id: <20181229122027.42245-5-vsementsov@virtuozzo.com>
 In-Reply-To: <20181229122027.42245-1-vsementsov@virtuozzo.com>
 References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 06/11] iotests: prepare 055 to graph changes
- during backup job
+Subject: [Qemu-devel] [PATCH v5 04/11] iotests: handle -f argument correctly
+ for qemu_io_silent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +23,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-Backup will append fleecing-hook node above source node, so, we can't
-resume by device name (because resume don't search recursively through
-backing chain).
+Correctly rewrite default argument. After the patch, the function can
+be used for other (not only default test-chosen) image format.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/055 | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/iotests.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index 3437c11507..be5451e1c5 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -48,7 +48,8 @@ class TestSingleDrive(iotests.QMPTestCase):
-     def setUp(self):
-         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 9595429fea..76877ad584 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -139,7 +139,12 @@ def qemu_io(*args):
  
--        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
-+        self.vm = iotests.VM().add_drive('blkdebug::' + test_img,
-+                                         'node-name=source')
-         self.vm.add_drive(blockdev_target_img, interface="none")
-         if iotests.qemu_default_machine == 'pc':
-             self.vm.add_drive(None, 'media=cdrom', 'ide')
-@@ -69,7 +70,7 @@ class TestSingleDrive(iotests.QMPTestCase):
-         result = self.vm.qmp(cmd, device='drive0', target=target, sync='full')
-         self.assert_qmp(result, 'return', {})
- 
--        event = self.cancel_and_wait(resume=True)
-+        event = self.cancel_and_wait(resume=True, resume_node='source')
-         self.assert_qmp(event, 'data/type', 'backup')
- 
-     def test_cancel_drive_backup(self):
-@@ -87,7 +88,7 @@ class TestSingleDrive(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return', {})
- 
-         self.pause_job('drive0', wait=False)
--        self.vm.resume_drive('drive0')
-+        self.vm.resume_drive('source')
-         self.pause_wait('drive0')
- 
-         result = self.vm.qmp('query-block-jobs')
-@@ -165,7 +166,8 @@ class TestSetSpeed(iotests.QMPTestCase):
-     def setUp(self):
-         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
- 
--        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
-+        self.vm = iotests.VM().add_drive('blkdebug::' + test_img,
-+                                         'node-name=source')
-         self.vm.add_drive(blockdev_target_img, interface="none")
-         self.vm.launch()
- 
-@@ -197,7 +199,7 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return[0]/device', 'drive0')
-         self.assert_qmp(result, 'return[0]/speed', 8 * 1024 * 1024)
- 
--        event = self.cancel_and_wait(resume=True)
-+        event = self.cancel_and_wait(resume=True, resume_node='source')
-         self.assert_qmp(event, 'data/type', 'backup')
- 
-         # Check setting speed option works
-@@ -210,7 +212,7 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return[0]/device', 'drive0')
-         self.assert_qmp(result, 'return[0]/speed', 4 * 1024 * 1024)
- 
--        event = self.cancel_and_wait(resume=True)
-+        event = self.cancel_and_wait(resume=True, resume_node='source')
-         self.assert_qmp(event, 'data/type', 'backup')
- 
-     def test_set_speed_drive_backup(self):
-@@ -236,7 +238,7 @@ class TestSetSpeed(iotests.QMPTestCase):
-         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=-1)
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
--        event = self.cancel_and_wait(resume=True)
-+        event = self.cancel_and_wait(resume=True, resume_node='source')
-         self.assert_qmp(event, 'data/type', 'backup')
- 
-     def test_set_speed_invalid_drive_backup(self):
-@@ -464,7 +466,8 @@ class TestDriveCompression(iotests.QMPTestCase):
-             pass
- 
-     def do_prepare_drives(self, fmt, args, attach_target):
--        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
-+        self.vm = iotests.VM().add_drive('blkdebug::' + test_img,
-+                                         'node-name=source')
- 
-         qemu_img('create', '-f', fmt, blockdev_target_img,
-                  str(TestDriveCompression.image_len), *args)
-@@ -507,7 +510,7 @@ class TestDriveCompression(iotests.QMPTestCase):
-         result = self.vm.qmp(cmd, device='drive0', sync='full', compress=True, **args)
-         self.assert_qmp(result, 'return', {})
- 
--        event = self.cancel_and_wait(resume=True)
-+        event = self.cancel_and_wait(resume=True, resume_node='source')
-         self.assert_qmp(event, 'data/type', 'backup')
- 
-         self.vm.shutdown()
-@@ -532,7 +535,7 @@ class TestDriveCompression(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return', {})
- 
-         self.pause_job('drive0', wait=False)
--        self.vm.resume_drive('drive0')
-+        self.vm.resume_drive('source')
-         self.pause_wait('drive0')
- 
-         result = self.vm.qmp('query-block-jobs')
+ def qemu_io_silent(*args):
+     '''Run qemu-io and return the exit code, suppressing stdout'''
+-    args = qemu_io_args + list(args)
++    if '-f' in qemu_io_args and '-f' in args:
++        ind = qemu_io_args.index('-f')
++        args = qemu_io_args[:ind] + qemu_io_args[ind+2:] + list(args)
++    else:
++        args = qemu_io_args + list(args)
++
+     exitcode = subprocess.call(args, stdout=open('/dev/null', 'w'))
+     if exitcode < 0:
+         sys.stderr.write('qemu-io received signal %i: %s\n' %
 -- 
 2.18.0
