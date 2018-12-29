@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42417)
+Received: from eggs.gnu.org ([208.118.235.92]:43448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ptsneves@gmail.com>) id 1gdBwF-0006Ek-SK
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 05:33:56 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDuv-00035F-1O
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ptsneves@gmail.com>) id 1gdBf4-0007zG-M5
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 05:16:07 -0500
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:43100)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ptsneves@gmail.com>) id 1gdBf4-0007yp-EA
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 05:16:06 -0500
-Received: by mail-lj1-x244.google.com with SMTP id q2-v6so20459975lji.10
-	for <qemu-devel@nongnu.org>; Sat, 29 Dec 2018 02:16:06 -0800 (PST)
-From: Paulo Neves <ptsneves@gmail.com>
-Date: Sat, 29 Dec 2018 11:15:51 +0100
-Message-Id: <1546078551-6109-2-git-send-email-ptsneves@gmail.com>
-In-Reply-To: <1546078551-6109-1-git-send-email-ptsneves@gmail.com>
-References: <1546078551-6109-1-git-send-email-ptsneves@gmail.com>
-Subject: [Qemu-devel] [PATCH] chardev: Allow for pty path passing.
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDei-0004wp-Of
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:23:53 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Sat, 29 Dec 2018 12:23:45 +0000
+Message-ID: <625b593a-e18b-ae70-6a37-985b70f6c466@virtuozzo.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F42B7727B67F554B8333BEAB1CEA76BC@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: [Qemu-devel] ping3 Re: [PATCH v4 00/10] NBD reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,159 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paulo Neves <ptsneves@gmail.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-If a user requires a virtual serial device like provided
-by the pty char device, the user needs to accept the
-returned device name. This makes the program need to
-have smarts to parse or communicate with qemu to get the
-pty device.
-With this patch the program can pass the path where
-a symlink to the pty device will be, removing the
-need for 2 way communication or smarts.
----
- chardev/char-pty.c | 38 ++++++++++++++++++++++++++++++++++++--
- chardev/char.c     |  6 +++++-
- qapi/char.json     |  4 ++--
- 3 files changed, 43 insertions(+), 5 deletions(-)
-
-diff --git a/chardev/char-pty.c b/chardev/char-pty.c
-index 761ae6d..b465263 100644
---- a/chardev/char-pty.c
-+++ b/chardev/char-pty.c
-@@ -38,6 +38,7 @@
- typedef struct {
-     Chardev parent;
-     QIOChannel *ioc;
-+    char *link_name;
-     int read_bytes;
- 
-     /* Protected by the Chardev chr_write_lock.  */
-@@ -231,6 +232,11 @@ static void char_pty_finalize(Object *obj)
-     qemu_mutex_lock(&chr->chr_write_lock);
-     pty_chr_state(chr, 0);
-     object_unref(OBJECT(s->ioc));
-+
-+    if (s->link_name) {
-+        unlink(s->link_name);
-+    }
-+
-     if (s->timer_tag) {
-         g_source_remove(s->timer_tag);
-         s->timer_tag = 0;
-@@ -244,8 +250,9 @@ static void char_pty_open(Chardev *chr,
-                           bool *be_opened,
-                           Error **errp)
- {
-+    ChardevHostdev *opts = backend->u.pty.data;
-     PtyChardev *s;
--    int master_fd, slave_fd;
-+    int master_fd, slave_fd, symlink_ret;
-     char pty_name[PATH_MAX];
-     char *name;
- 
-@@ -256,13 +263,23 @@ static void char_pty_open(Chardev *chr,
-     }
- 
-     close(slave_fd);
-+
-+    s = PTY_CHARDEV(chr);
-+    s->link_name = opts->device;
-+    symlink_ret = symlink(pty_name, s->link_name);
-+
-+    if (symlink_ret < 0) {
-+        close(master_fd);
-+        error_setg_errno(errp, errno, "Failed to create symlink to PTY");
-+        return;
-+    }
-+
-     qemu_set_nonblock(master_fd);
- 
-     chr->filename = g_strdup_printf("pty:%s", pty_name);
-     error_report("char device redirected to %s (label %s)",
-                  pty_name, chr->label);
- 
--    s = PTY_CHARDEV(chr);
-     s->ioc = QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
-     name = g_strdup_printf("chardev-pty-%s", chr->label);
-     qio_channel_set_name(QIO_CHANNEL(s->ioc), name);
-@@ -271,6 +288,22 @@ static void char_pty_open(Chardev *chr,
-     *be_opened = false;
- }
- 
-+static void char_pty_parse(QemuOpts *opts, ChardevBackend *backend,
-+                                Error **errp)
-+{
-+    const char *symlink_path = qemu_opt_get(opts, "path");
-+    if(symlink_path == NULL) {
-+        error_setg(errp, "chardev: pty symlink: no device path given");
-+        return;
-+
-+    }
-+    ChardevHostdev *dev;
-+
-+    backend->type = CHARDEV_BACKEND_KIND_PTY;
-+    dev = backend->u.pipe.data = g_new0(ChardevHostdev, 1);
-+    qemu_chr_parse_common(opts, qapi_ChardevHostdev_base(dev));
-+    dev->device = g_strdup(symlink_path);
-+}
- static void char_pty_class_init(ObjectClass *oc, void *data)
- {
-     ChardevClass *cc = CHARDEV_CLASS(oc);
-@@ -279,6 +312,7 @@ static void char_pty_class_init(ObjectClass *oc, void *data)
-     cc->chr_write = char_pty_chr_write;
-     cc->chr_update_read_handler = pty_chr_update_read_handler;
-     cc->chr_add_watch = pty_chr_add_watch;
-+    cc->parse = char_pty_parse;
- }
- 
- static const TypeInfo char_pty_type_info = {
-diff --git a/chardev/char.c b/chardev/char.c
-index 5d52cd5..e4c5371 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -357,7 +357,6 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename)
-     }
- 
-     if (strcmp(filename, "null")    == 0 ||
--        strcmp(filename, "pty")     == 0 ||
-         strcmp(filename, "msmouse") == 0 ||
-         strcmp(filename, "wctablet") == 0 ||
-         strcmp(filename, "braille") == 0 ||
-@@ -402,6 +401,11 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename)
-         qemu_opt_set(opts, "path", p, &error_abort);
-         return opts;
-     }
-+    if (strstart(filename, "pty:", &p)) {
-+        qemu_opt_set(opts, "backend", "pty", &error_abort);
-+        qemu_opt_set(opts, "path", p, &error_abort);
-+        return opts;
-+    }
-     if (strstart(filename, "tcp:", &p) ||
-         strstart(filename, "telnet:", &p) ||
-         strstart(filename, "tn3270:", &p)) {
-diff --git a/qapi/char.json b/qapi/char.json
-index 6de0f29..dae4231 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -224,7 +224,7 @@
- ##
- # @ChardevHostdev:
- #
--# Configuration info for device and pipe chardevs.
-+# Configuration info for device, pty and pipe chardevs.
- #
- # @device: The name of the special file for the device,
- #          i.e. /dev/ttyS0 on Unix or COM1: on Windows
-@@ -380,7 +380,7 @@
-                                        'pipe'   : 'ChardevHostdev',
-                                        'socket' : 'ChardevSocket',
-                                        'udp'    : 'ChardevUdp',
--                                       'pty'    : 'ChardevCommon',
-+                                       'pty'    : 'ChardevHostdev',
-                                        'null'   : 'ChardevCommon',
-                                        'mux'    : 'ChardevMux',
-                                        'msmouse': 'ChardevCommon',
--- 
-2.7.4
+cGluZw0KDQozMS4wNy4yMDE4IDIwOjMwLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
+b3RlOg0KPiBIaSBhbGwuDQo+IA0KPiBIZXJlIGlzIE5CRCByZWNvbm5lY3QuIFByZXZpb3VzbHks
+IGlmIGNvbm5lY3Rpb24gZmFpbGVkIGFsbCBjdXJyZW50DQo+IGFuZCBmdXR1cmUgcmVxdWVzdHMg
+d2lsbCBmYWlsLiBBZnRlciB0aGUgc2VyaWVzLCBuYmQtY2xpZW50IGRyaXZlcg0KPiB3aWxsIHRy
+eSB0byByZWNvbm5lY3QgdW5saW1pdGVkIHRpbWVzLiBEdXJpbmcgZmlyc3QgQHJlY29ubmVjdC1k
+ZWxheQ0KPiBzZWNvbmRzIG9mIHJlY29ubmVjdGluZyBhbGwgcmVxdWVzdHMgd2lsbCB3YWl0IGZv
+ciB0aGUgY29ubmVjdGlvbiwNCj4gYW5kIGlmIGl0IGlzIGVzdGFibGlzaGVkIHJlcXVlc3RzIHdp
+bGwgYmUgcmVzZW50LiBBZnRlcg0KPiBAcmVjb25uZWN0LWRlbGF5IHBlcmlvZCBhbGwgcmVxdWVz
+dHMgd2lsbCBiZSBmYWlsZWQgKHVudGlsIHN1Y2Nlc3NmdWwNCj4gcmVjb25uZWN0KS4NCj4gDQo+
+IHY0OiAtIGFkZCBFcmljJ3Mgci1iIHRvIDAxLg0KPiAgICAgIC0gZHJvcCBDT05ORUNUSU5HX0lO
+SVQgbW9kZSwgZG9uJ3QgcmVjb25uZWN0IG9uIF9vcGVuLg0KPiAgICAgIC0gbmV3IGFwaTogb25s
+eSBvbmUgcGFyYW1ldGVyIEByZWNvbm5lY3QtZGVsYXkNCj4gICAgICAtIG5ldyBpbnRlcnZhbCBz
+Y2hlbWUgYmV0d2VlbiByZWNvbm5lY3QgYXR0ZW1wdHMNCj4gICAgICAgICAgKDEgLSAyIC0gNCAt
+IDggLSAxNiAtIDE2IC4uLiBzZWNvbmRzKQ0KPiAgICAgIC0gZml4ZXMgYW5kIHJlZmFjdG9yaW5n
+cyBpbiBtYWluIHBhdGNoICgwOSksIGluY2x1ZGluZyBtZXJnZSB3aXRoDQo+ICAgICAgICBvbGQg
+MDggcGF0Y2gNCj4gICAgICANCj4gDQo+IHYzOg0KPiAwNjogZml4IGJ1aWxkIGVycm9yIGluIGZ1
+bmN0aW9uICduYmRfY29fc2VuZF9yZXF1ZXN0JzoNCj4gICAgICAgZXJyb3I6ICdpJyBtYXkgYmUg
+dXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rpb24NCj4gDQo+IHYyIG5vdGVzOg0KPiBI
+ZXJlIGlzIHYyIG9mIE5CRCByZWNvbm5lY3QsIGJ1dCBpdCBpcyB2ZXJ5IHZlcnkgZGlmZmVyZW50
+IGZyb20gdjEsIHNvLA0KPiBmb3JnZXQgYWJvdXQgdjEuDQo+IFRoZSBzZXJpZXMgaW5jbHVkZXMg
+bXkgIk5CRCByZWNvbm5lY3Q6IHByZWxpbWluYXJ5IHJlZmFjdG9yaW5nIiwgd2l0aA0KPiBjaGFu
+Z2VzIGluIDA1OiBsZWF2ZSBhc3NlcnRzIChFcmljKS4NCj4gDQo+IFZsYWRpbWlyIFNlbWVudHNv
+di1PZ2lldnNraXkgKDEwKToNCj4gICAgYmxvY2svbmJkLWNsaWVudDogc3BsaXQgY2hhbm5lbCBl
+cnJvcnMgZnJvbSBleHBvcnQgZXJyb3JzDQo+ICAgIGJsb2NrL25iZDogbW92ZSBjb25uZWN0aW9u
+IGNvZGUgZnJvbSBibG9jay9uYmQgdG8gYmxvY2svbmJkLWNsaWVudA0KPiAgICBibG9jay9uYmQt
+Y2xpZW50OiBzcGxpdCBjb25uZWN0aW9uIGZyb20gaW5pdGlhbGl6YXRpb24NCj4gICAgYmxvY2sv
+bmJkLWNsaWVudDogZml4IG5iZF9yZXBseV9jaHVua19pdGVyX3JlY2VpdmUNCj4gICAgYmxvY2sv
+bmJkLWNsaWVudDogZG9uJ3QgY2hlY2sgaW9jDQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IG1vdmUg
+ZnJvbSBxdWl0IHRvIHN0YXRlDQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IHJlbmFtZSByZWFkX3Jl
+cGx5X2NvIHRvIGNvbm5lY3Rpb25fY28NCj4gICAgYmxvY2svbmJkOiBhZGQgY21kbGluZSBhbmQg
+cWFwaSBwYXJhbWV0ZXIgcmVjb25uZWN0LWRlbGF5DQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IG5i
+ZCByZWNvbm5lY3QNCj4gICAgaW90ZXN0czogdGVzdCBuYmQgcmVjb25uZWN0DQo+IA0KPiAgIHFh
+cGkvYmxvY2stY29yZS5qc29uICAgICAgICAgIHwgIDEyICstDQo+ICAgYmxvY2svbmJkLWNsaWVu
+dC5oICAgICAgICAgICAgfCAgMjAgKy0NCj4gICBibG9jay9uYmQtY2xpZW50LmMgICAgICAgICAg
+ICB8IDUxNSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0NCj4gICBi
+bG9jay9uYmQuYyAgICAgICAgICAgICAgICAgICB8ICA1NiArKy0tLQ0KPiAgIHRlc3RzL3FlbXUt
+aW90ZXN0cy8yMjAgICAgICAgIHwgIDY3ICsrKysrKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8y
+MjAub3V0ICAgIHwgICA3ICsNCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvZ3JvdXAgICAgICB8ICAg
+MSArDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgfCAgIDQgKw0KPiAgIDggZmls
+ZXMgY2hhbmdlZCwgNTEyIGluc2VydGlvbnMoKyksIDE3MCBkZWxldGlvbnMoLSkNCj4gICBjcmVh
+dGUgbW9kZSAxMDA3NTUgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMA0KPiAgIGNyZWF0ZSBtb2RlIDEw
+MDY0NCB0ZXN0cy9xZW11LWlvdGVzdHMvMjIwLm91dA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJk
+cywNClZsYWRpbWlyDQo=
