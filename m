@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43448)
+Received: from eggs.gnu.org ([208.118.235.92]:43497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv4-00035F-Dr
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv4-00036F-Vp
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:41:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcB-0007th-JW
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcB-0007tT-Gq
 	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:21:21 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 29 Dec 2018 15:20:24 +0300
-Message-Id: <20181229122027.42245-9-vsementsov@virtuozzo.com>
+Date: Sat, 29 Dec 2018 15:20:17 +0300
+Message-Id: <20181229122027.42245-2-vsementsov@virtuozzo.com>
 In-Reply-To: <20181229122027.42245-1-vsementsov@virtuozzo.com>
 References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 08/11] block/io: refactor
- wait_serialising_requests
+Subject: [Qemu-devel] [PATCH v5 01/11] block/backup: simplify
+ backup_incremental_init_copy_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +23,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-Split out do_wait_serialising_requests with additional possibility to
-not actually wait but just check, that there is something to wait for.
+Simplify backup_incremental_init_copy_bitmap using the function
+bdrv_dirty_bitmap_next_dirty_area.
+
+Note: move to job->len instead of bitmap size: it should not matter but
+less code.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/io.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ block/backup.c | 40 ++++++++++++----------------------------
+ 1 file changed, 12 insertions(+), 28 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index bd9d688f8b..b87c11a6ec 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -720,12 +720,13 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
-     bdrv_wakeup(bs);
- }
- 
--static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-+static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
-+                                                      bool wait)
+diff --git a/block/backup.c b/block/backup.c
+index 435414e964..fbe7ce19e1 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -406,43 +406,27 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+ /* init copy_bitmap from sync_bitmap */
+ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
  {
-     BlockDriverState *bs = self->bs;
-     BdrvTrackedRequest *req;
-     bool retry;
--    bool waited = false;
-+    bool found = false;
+-    BdrvDirtyBitmapIter *dbi;
+-    int64_t offset;
+-    int64_t end = DIV_ROUND_UP(bdrv_dirty_bitmap_size(job->sync_bitmap),
+-                               job->cluster_size);
+-
+-    dbi = bdrv_dirty_iter_new(job->sync_bitmap);
+-    while ((offset = bdrv_dirty_iter_next(dbi)) != -1) {
+-        int64_t cluster = offset / job->cluster_size;
+-        int64_t next_cluster;
+-
+-        offset += bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+-        if (offset >= bdrv_dirty_bitmap_size(job->sync_bitmap)) {
+-            hbitmap_set(job->copy_bitmap, cluster, end - cluster);
+-            break;
+-        }
++    uint64_t offset = 0;
++    uint64_t bytes = job->len;
  
-     if (!atomic_read(&bs->serialising_in_flight)) {
-         return false;
-@@ -751,11 +752,13 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-                  * will wait for us as soon as it wakes up, then just go on
-                  * (instead of producing a deadlock in the former case). */
-                 if (!req->waiting_for) {
--                    self->waiting_for = req;
--                    qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
--                    self->waiting_for = NULL;
--                    retry = true;
--                    waited = true;
-+                    found = true;
-+                    if (wait) {
-+                        self->waiting_for = req;
-+                        qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
-+                        self->waiting_for = NULL;
-+                        retry = true;
-+                    }
-                     break;
-                 }
-             }
-@@ -763,7 +766,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-         qemu_co_mutex_unlock(&bs->reqs_lock);
-     } while (retry);
+-        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset,
+-                                             UINT64_MAX);
+-        if (offset == -1) {
+-            hbitmap_set(job->copy_bitmap, cluster, end - cluster);
+-            break;
+-        }
++    while (bdrv_dirty_bitmap_next_dirty_area(job->sync_bitmap,
++                                             &offset, &bytes))
++    {
++        uint64_t cluster = offset / job->cluster_size;
++        uint64_t last_cluster = (offset + bytes) / job->cluster_size;
  
--    return waited;
-+    return found;
-+}
+-        next_cluster = DIV_ROUND_UP(offset, job->cluster_size);
+-        hbitmap_set(job->copy_bitmap, cluster, next_cluster - cluster);
+-        if (next_cluster >= end) {
++        hbitmap_set(job->copy_bitmap, cluster, last_cluster - cluster + 1);
 +
-+static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-+{
-+    return do_wait_serialising_requests(self, true);
++        offset = (last_cluster + 1) * job->cluster_size;
++        if (offset >= job->len) {
+             break;
+         }
+-
+-        bdrv_set_dirty_iter(dbi, next_cluster * job->cluster_size);
++        bytes = job->len - offset;
+     }
+ 
+     /* TODO job_progress_set_remaining() would make more sense */
+     job_progress_update(&job->common.job,
+         job->len - hbitmap_count(job->copy_bitmap) * job->cluster_size);
+-
+-    bdrv_dirty_iter_free(dbi);
  }
  
- static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
+ static int coroutine_fn backup_run(Job *job, Error **errp)
 -- 
 2.18.0
