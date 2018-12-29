@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43012)
+Received: from eggs.gnu.org ([208.118.235.92]:43042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv0-0002uv-Bt
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv0-0002vB-Jl
 	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcC-0007w9-Tp
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcD-0007x9-BD
 	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:21:26 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 29 Dec 2018 15:20:18 +0300
-Message-Id: <20181229122027.42245-3-vsementsov@virtuozzo.com>
+Date: Sat, 29 Dec 2018 15:20:25 +0300
+Message-Id: <20181229122027.42245-10-vsementsov@virtuozzo.com>
 In-Reply-To: <20181229122027.42245-1-vsementsov@virtuozzo.com>
 References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 02/11] block/backup: move to copy_bitmap
- with granularity
+Subject: [Qemu-devel] [PATCH v5 09/11] block: add lock/unlock range functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,182 +22,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-We are going to share this bitmap between backup and backup-top filter
-driver, so let's share something more meaningful. It also simplifies
-some calculations.
+From: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Introduce lock/unlock range functionality, based on serialized
+requests. This is needed to refactor backup, dropping local
+tracked-request-like synchronization.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
 ---
- block/backup.c | 48 +++++++++++++++++++++++-------------------------
- 1 file changed, 23 insertions(+), 25 deletions(-)
+ include/block/block_int.h |  4 ++++
+ block/io.c                | 45 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 48 insertions(+), 1 deletion(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index fbe7ce19e1..0b3fddeb6c 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -114,7 +114,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-     int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-     int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f605622216..3475ee5360 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -64,6 +64,7 @@ enum BdrvTrackedRequestType {
+     BDRV_TRACKED_WRITE,
+     BDRV_TRACKED_DISCARD,
+     BDRV_TRACKED_TRUNCATE,
++    BDRV_TRACKED_LOCK,
+ };
  
--    hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
-+    assert(QEMU_IS_ALIGNED(start, job->cluster_size));
-+    hbitmap_reset(job->copy_bitmap, start, job->cluster_size);
-     nbytes = MIN(job->cluster_size, job->len - start);
-     if (!*bounce_buffer) {
-         *bounce_buffer = blk_blockalign(blk, job->cluster_size);
-@@ -150,7 +151,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
+ typedef struct BdrvTrackedRequest {
+@@ -856,6 +857,9 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
++void *coroutine_fn bdrv_co_try_lock(BdrvChild *child,
++                                    int64_t offset, unsigned int bytes);
++void coroutine_fn bdrv_co_unlock(void *opaque);
  
-     return nbytes;
- fail:
--    hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
-+    hbitmap_set(job->copy_bitmap, start, job->cluster_size);
-     return ret;
- 
+ extern unsigned int bdrv_drain_all_count;
+ void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_parent);
+diff --git a/block/io.c b/block/io.c
+index b87c11a6ec..38a63d16f1 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -720,6 +720,15 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
+     bdrv_wakeup(bs);
  }
-@@ -170,16 +171,15 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
-     int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
  
-     assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
-+    assert(QEMU_IS_ALIGNED(start, job->cluster_size));
-     nbytes = MIN(job->copy_range_size, end - start);
-     nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
--    hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
--                  nr_clusters);
-+    hbitmap_reset(job->copy_bitmap, start, job->cluster_size * nr_clusters);
-     ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
-                             read_flags, write_flags);
-     if (ret < 0) {
-         trace_backup_do_cow_copy_range_fail(job, start, ret);
--        hbitmap_set(job->copy_bitmap, start / job->cluster_size,
--                    nr_clusters);
-+        hbitmap_set(job->copy_bitmap, start, job->cluster_size * nr_clusters);
-         return ret;
-     }
- 
-@@ -207,7 +207,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-     cow_request_begin(&cow_request, job, start, end);
- 
-     while (start < end) {
--        if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
-+        if (!hbitmap_get(job->copy_bitmap, start)) {
-             trace_backup_do_cow_skip(job, start);
-             start += job->cluster_size;
-             continue; /* already copied */
-@@ -303,6 +303,11 @@ static void backup_clean(Job *job)
-     assert(s->target);
-     blk_unref(s->target);
-     s->target = NULL;
++static bool ignore_intersection(BdrvTrackedRequest *a, BdrvTrackedRequest *b)
++{
++    return a == b || (!a->serialising && !b->serialising) ||
++        (a->type == BDRV_TRACKED_LOCK && b->type == BDRV_TRACKED_READ &&
++         !b->serialising) ||
++        (b->type == BDRV_TRACKED_LOCK && a->type == BDRV_TRACKED_READ &&
++         !a->serialising);
++}
 +
-+    if (s->copy_bitmap) {
-+        hbitmap_free(s->copy_bitmap);
-+        s->copy_bitmap = NULL;
-+    }
- }
- 
- static void backup_attached_aio_context(BlockJob *job, AioContext *aio_context)
-@@ -315,7 +320,6 @@ static void backup_attached_aio_context(BlockJob *job, AioContext *aio_context)
- void backup_do_checkpoint(BlockJob *job, Error **errp)
+ static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
+                                                       bool wait)
  {
-     BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
--    int64_t len;
- 
-     assert(block_job_driver(job) == &backup_job_driver);
- 
-@@ -325,8 +329,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
-         return;
-     }
- 
--    len = DIV_ROUND_UP(backup_job->len, backup_job->cluster_size);
--    hbitmap_set(backup_job->copy_bitmap, 0, len);
-+    hbitmap_set(backup_job->copy_bitmap, 0, backup_job->len);
- }
- 
- static void backup_drain(BlockJob *job)
-@@ -381,16 +384,16 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
- {
-     int ret;
-     bool error_is_read;
--    int64_t cluster;
-+    int64_t offset;
-     HBitmapIter hbi;
- 
-     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
--    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
-+    while ((offset = hbitmap_iter_next(&hbi)) != -1) {
-         do {
-             if (yield_and_check(job)) {
-                 return 0;
+@@ -736,7 +745,7 @@ static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
+         retry = false;
+         qemu_co_mutex_lock(&bs->reqs_lock);
+         QLIST_FOREACH(req, &bs->tracked_requests, list) {
+-            if (req == self || (!req->serialising && !self->serialising)) {
++            if (ignore_intersection(self, req)) {
+                 continue;
              }
--            ret = backup_do_cow(job, cluster * job->cluster_size,
-+            ret = backup_do_cow(job, offset,
-                                 job->cluster_size, &error_is_read, false);
-             if (ret < 0 && backup_error_action(job, error_is_read, -ret) ==
-                            BLOCK_ERROR_ACTION_REPORT)
-@@ -412,12 +415,9 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
-     while (bdrv_dirty_bitmap_next_dirty_area(job->sync_bitmap,
-                                              &offset, &bytes))
-     {
--        uint64_t cluster = offset / job->cluster_size;
--        uint64_t last_cluster = (offset + bytes) / job->cluster_size;
-+        hbitmap_set(job->copy_bitmap, offset, bytes);
- 
--        hbitmap_set(job->copy_bitmap, cluster, last_cluster - cluster + 1);
--
--        offset = (last_cluster + 1) * job->cluster_size;
-+        offset += bytes;
-         if (offset >= job->len) {
-             break;
-         }
-@@ -426,30 +426,27 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
- 
-     /* TODO job_progress_set_remaining() would make more sense */
-     job_progress_update(&job->common.job,
--        job->len - hbitmap_count(job->copy_bitmap) * job->cluster_size);
-+        job->len - hbitmap_count(job->copy_bitmap));
+             if (tracked_request_overlaps(req, self->overlap_offset,
+@@ -774,6 +783,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+     return do_wait_serialising_requests(self, true);
  }
  
- static int coroutine_fn backup_run(Job *job, Error **errp)
- {
-     BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
-     BlockDriverState *bs = blk_bs(s->common.blk);
--    int64_t offset, nb_clusters;
-+    int64_t offset;
-     int ret = 0;
- 
-     QLIST_INIT(&s->inflight_reqs);
-     qemu_co_rwlock_init(&s->flush_rwlock);
- 
--    nb_clusters = DIV_ROUND_UP(s->len, s->cluster_size);
-     job_progress_set_remaining(job, s->len);
- 
--    s->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
-     if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
-         backup_incremental_init_copy_bitmap(s);
-     } else {
--        hbitmap_set(s->copy_bitmap, 0, nb_clusters);
-+        hbitmap_set(s->copy_bitmap, 0, s->len);
-     }
- 
--
-     s->before_write.notify = backup_before_write_notify;
-     bdrv_add_before_write_notifier(bs, &s->before_write);
- 
-@@ -530,7 +527,6 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
-     /* wait until pending backup_do_cow() calls have completed */
-     qemu_co_rwlock_wrlock(&s->flush_rwlock);
-     qemu_co_rwlock_unlock(&s->flush_rwlock);
--    hbitmap_free(s->copy_bitmap);
- 
-     return ret;
- }
-@@ -681,6 +677,8 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     } else {
-         job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
-     }
++static bool coroutine_fn should_wait_serialising_requests(
++        BdrvTrackedRequest *self)
++{
++    return do_wait_serialising_requests(self, false);
++}
 +
-+    job->copy_bitmap = hbitmap_alloc(len, ctz32(job->cluster_size));
-     job->use_copy_range = true;
-     job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
-                                         blk_get_max_transfer(job->target));
+ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
+                                    size_t size)
+ {
+@@ -3250,3 +3265,31 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
+ 
+     return tco.ret;
+ }
++
++void *coroutine_fn bdrv_co_try_lock(BdrvChild *child,
++                                    int64_t offset, unsigned int bytes)
++{
++    BlockDriverState *bs = child->bs;
++    BdrvTrackedRequest *req = g_new(BdrvTrackedRequest, 1);
++
++    tracked_request_begin(req, bs, offset, bytes, BDRV_TRACKED_LOCK);
++    mark_request_serialising(req, bdrv_get_cluster_size(bs));
++
++    if (should_wait_serialising_requests(req)) {
++        tracked_request_end(req);
++        g_free(req);
++        return NULL;
++    }
++
++    return req;
++}
++
++void coroutine_fn bdrv_co_unlock(void *opaque)
++{
++    BdrvTrackedRequest *req = opaque;
++
++    assert(req->type == BDRV_TRACKED_LOCK);
++
++    tracked_request_end(req);
++    g_free(req);
++}
 -- 
 2.18.0
