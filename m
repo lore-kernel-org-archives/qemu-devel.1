@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54056)
+Received: from eggs.gnu.org ([208.118.235.92]:36875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gdLDK-0003qB-I8
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 15:28:09 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gdLyE-0007dL-Fv
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 16:16:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gdL66-0007c4-Sf
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 15:20:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38068)
+	(envelope-from <richard.henderson@linaro.org>) id 1gdLwH-0005c4-6E
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 16:14:36 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44950)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gdL66-0007YN-Md
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 15:20:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gdL64-0008Md-Vj
-	for <qemu-devel@nongnu.org>; Sat, 29 Dec 2018 20:20:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E2CBA2E8074
-	for <qemu-devel@nongnu.org>; Sat, 29 Dec 2018 20:20:36 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gdLwG-0005Zg-Vj
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 16:14:33 -0500
+Received: by mail-pf1-x443.google.com with SMTP id u6so11825029pfh.11
+	for <qemu-devel@nongnu.org>; Sat, 29 Dec 2018 13:14:32 -0800 (PST)
+References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
+	<20181228135235.6859-7-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f99e36e2-ad04-88cc-88c8-3f8fcafcb108@linaro.org>
+Date: Sun, 30 Dec 2018 08:14:25 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 29 Dec 2018 20:12:54 -0000
-From: PH <1810000@bugs.launchpad.net>
-Reply-To: Bug 1810000 <1810000@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154603590627.5548.1380267988808710453.malonedeb@wampee.canonical.com>
-Message-Id: <154611437550.26182.13131803987967769662.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810000] Re: qemu system emulator crashed with
- the attachment of usb-bt-dongle device
+In-Reply-To: <20181228135235.6859-7-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] target/ppc: simplify VEXT_SIGNED
+ macro in int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-** Description changed:
+On 12/29/18 12:52 AM, Mark Cave-Ayland wrote:
+> As pointed out by Richard: it does not need the mask argument, nor does it need
+> the recast argument. The masking is implied by the cast argument, and the
+> recast is implied by the assignment.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  target/ppc/int_helper.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 
--- =
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810000
 
-Title:
-  qemu system emulator crashed with the attachment of usb-bt-dongle
-  device
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am testing usb-bt-dongle device on xchi host controller, and found
-  that the qemu crashed directly with an assertion failer.
-
-  Here is the information to reproduce the crash:
-
-  Qemu git revision: 9b2e891ec5ccdb4a7d583b77988848282606fdea
-  System emulator: qemu-x86_64
-  VM image: https://people.debian.org/~aurel32/qemu/amd64/debian_squeeze_am=
-d64_desktop.qcow2
-  CommandLine: qemu-system-x86_64 -M q35 -device qemu-xhci,id=3Dxhci -enabl=
-e-kvm -device usb-bt-dongle  -hda ./debian_wheezy_amd64_standard.qcow2
-
-  Error message:
-
-  qemu-system-x86_64: /build/qemu-
-  Eap4uc/qemu-2.11+dfsg/hw/usb/core.c:592: usb_packet_copy: Assertion
-  `p->actual_length + bytes <=3D iov->size' failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810000/+subscriptions
+r~
