@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38584)
+Received: from eggs.gnu.org ([208.118.235.92]:39008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fangying1@huawei.com>) id 1gd8BM-0008Cc-9t
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 01:33:17 -0500
+	(envelope-from <fangying1@huawei.com>) id 1gd8C4-0000JQ-2f
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 01:33:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fangying1@huawei.com>) id 1gd88R-00046z-0s
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 01:30:16 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3115 helo=huawei.com)
+	(envelope-from <fangying1@huawei.com>) id 1gd8By-00005c-8K
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 01:33:56 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:47733 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <fangying1@huawei.com>)
-	id 1gd88M-0003xh-Gv
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 01:30:10 -0500
+	id 1gd8Bp-0008KH-Rq
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 01:33:48 -0500
 From: Ying Fang <fangying1@huawei.com>
-Message-ID: <6759b421-f5df-8990-6131-c1a1ee7b8525@huawei.com>
-Date: Sat, 29 Dec 2018 14:29:49 +0800
+Message-ID: <9af4a3f8-3095-61dc-77fa-17a877e48a02@huawei.com>
+Date: Sat, 29 Dec 2018 14:33:18 +0800
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="------------B35C531E681DA1AA6BA2ABC6"
+Content-Type: multipart/mixed; boundary="------------046B700EFEFDC48F19A54653"
 Content-Language: en-US
 Subject: [Qemu-devel] [RFC] Questions on the I/O performance of emulated
  host cdrom device
@@ -27,10 +27,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mreitz@redhat.com, kwolf@redhat.com
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jianjay.zhou@huawei.com; dengkai1@huawei.com; fengtiantian@huawei.com;
-	wangxinxin.wang"@huawei.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, jianjay.zhou@huawei.com, dengkai1@huawei.com
 
---------------B35C531E681DA1AA6BA2ABC6
+--------------046B700EFEFDC48F19A54653
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
@@ -70,7 +69,7 @@ So here is my question.
 (2) Can we drop some check point in the code path to improve the performance?
 Thanks.
 
---------------B35C531E681DA1AA6BA2ABC6
+--------------046B700EFEFDC48F19A54653
 Content-Type: image/svg+xml; name="cdrom.svg"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="cdrom.svg"
@@ -7745,4 +7744,4 @@ NS4zIiBoZWlnaHQ9IjE1LjAiIGZpbGw9InJnYigyMjQsMTU4LDMpIiByeD0iMiIgcnk9IjIi
 IC8+Cjx0ZXh0IHRleHQtYW5jaG9yPSIiIHg9Ijc3Ni43OCIgeT0iMTI2My41IiBmb250LXNp
 emU9IjEyIiBmb250LWZhbWlseT0iVmVyZGFuYSIgZmlsbD0icmdiKDAsMCwwKSIgID48L3Rl
 eHQ+CjwvZz4KPC9zdmc+Cg==
---------------B35C531E681DA1AA6BA2ABC6--
+--------------046B700EFEFDC48F19A54653--
