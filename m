@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43042)
+Received: from eggs.gnu.org ([208.118.235.92]:43183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv0-0002vB-Jl
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:53 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv0-0002w7-QX
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcD-0007x9-BD
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcC-0007v8-9l
 	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:21:26 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 29 Dec 2018 15:20:25 +0300
-Message-Id: <20181229122027.42245-10-vsementsov@virtuozzo.com>
+Date: Sat, 29 Dec 2018 15:20:22 +0300
+Message-Id: <20181229122027.42245-7-vsementsov@virtuozzo.com>
 In-Reply-To: <20181229122027.42245-1-vsementsov@virtuozzo.com>
 References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 09/11] block: add lock/unlock range functions
+Subject: [Qemu-devel] [PATCH v5 06/11] iotests: prepare 055 to graph changes
+ during backup job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,113 +23,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-From: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
+Backup will append fleecing-hook node above source node, so, we can't
+resume by device name (because resume don't search recursively through
+backing chain).
 
-Introduce lock/unlock range functionality, based on serialized
-requests. This is needed to refactor backup, dropping local
-tracked-request-like synchronization.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/block_int.h |  4 ++++
- block/io.c                | 45 ++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 48 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/055 | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index f605622216..3475ee5360 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -64,6 +64,7 @@ enum BdrvTrackedRequestType {
-     BDRV_TRACKED_WRITE,
-     BDRV_TRACKED_DISCARD,
-     BDRV_TRACKED_TRUNCATE,
-+    BDRV_TRACKED_LOCK,
- };
+diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
+index 3437c11507..be5451e1c5 100755
+--- a/tests/qemu-iotests/055
++++ b/tests/qemu-iotests/055
+@@ -48,7 +48,8 @@ class TestSingleDrive(iotests.QMPTestCase):
+     def setUp(self):
+         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
  
- typedef struct BdrvTrackedRequest {
-@@ -856,6 +857,9 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
- int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
-     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
-     BdrvRequestFlags flags);
-+void *coroutine_fn bdrv_co_try_lock(BdrvChild *child,
-+                                    int64_t offset, unsigned int bytes);
-+void coroutine_fn bdrv_co_unlock(void *opaque);
+-        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
++        self.vm = iotests.VM().add_drive('blkdebug::' + test_img,
++                                         'node-name=source')
+         self.vm.add_drive(blockdev_target_img, interface="none")
+         if iotests.qemu_default_machine == 'pc':
+             self.vm.add_drive(None, 'media=cdrom', 'ide')
+@@ -69,7 +70,7 @@ class TestSingleDrive(iotests.QMPTestCase):
+         result = self.vm.qmp(cmd, device='drive0', target=target, sync='full')
+         self.assert_qmp(result, 'return', {})
  
- extern unsigned int bdrv_drain_all_count;
- void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_parent);
-diff --git a/block/io.c b/block/io.c
-index b87c11a6ec..38a63d16f1 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -720,6 +720,15 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
-     bdrv_wakeup(bs);
- }
+-        event = self.cancel_and_wait(resume=True)
++        event = self.cancel_and_wait(resume=True, resume_node='source')
+         self.assert_qmp(event, 'data/type', 'backup')
  
-+static bool ignore_intersection(BdrvTrackedRequest *a, BdrvTrackedRequest *b)
-+{
-+    return a == b || (!a->serialising && !b->serialising) ||
-+        (a->type == BDRV_TRACKED_LOCK && b->type == BDRV_TRACKED_READ &&
-+         !b->serialising) ||
-+        (b->type == BDRV_TRACKED_LOCK && a->type == BDRV_TRACKED_READ &&
-+         !a->serialising);
-+}
-+
- static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
-                                                       bool wait)
- {
-@@ -736,7 +745,7 @@ static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
-         retry = false;
-         qemu_co_mutex_lock(&bs->reqs_lock);
-         QLIST_FOREACH(req, &bs->tracked_requests, list) {
--            if (req == self || (!req->serialising && !self->serialising)) {
-+            if (ignore_intersection(self, req)) {
-                 continue;
-             }
-             if (tracked_request_overlaps(req, self->overlap_offset,
-@@ -774,6 +783,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-     return do_wait_serialising_requests(self, true);
- }
+     def test_cancel_drive_backup(self):
+@@ -87,7 +88,7 @@ class TestSingleDrive(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return', {})
  
-+static bool coroutine_fn should_wait_serialising_requests(
-+        BdrvTrackedRequest *self)
-+{
-+    return do_wait_serialising_requests(self, false);
-+}
-+
- static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
-                                    size_t size)
- {
-@@ -3250,3 +3265,31 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
+         self.pause_job('drive0', wait=False)
+-        self.vm.resume_drive('drive0')
++        self.vm.resume_drive('source')
+         self.pause_wait('drive0')
  
-     return tco.ret;
- }
-+
-+void *coroutine_fn bdrv_co_try_lock(BdrvChild *child,
-+                                    int64_t offset, unsigned int bytes)
-+{
-+    BlockDriverState *bs = child->bs;
-+    BdrvTrackedRequest *req = g_new(BdrvTrackedRequest, 1);
-+
-+    tracked_request_begin(req, bs, offset, bytes, BDRV_TRACKED_LOCK);
-+    mark_request_serialising(req, bdrv_get_cluster_size(bs));
-+
-+    if (should_wait_serialising_requests(req)) {
-+        tracked_request_end(req);
-+        g_free(req);
-+        return NULL;
-+    }
-+
-+    return req;
-+}
-+
-+void coroutine_fn bdrv_co_unlock(void *opaque)
-+{
-+    BdrvTrackedRequest *req = opaque;
-+
-+    assert(req->type == BDRV_TRACKED_LOCK);
-+
-+    tracked_request_end(req);
-+    g_free(req);
-+}
+         result = self.vm.qmp('query-block-jobs')
+@@ -165,7 +166,8 @@ class TestSetSpeed(iotests.QMPTestCase):
+     def setUp(self):
+         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
+ 
+-        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
++        self.vm = iotests.VM().add_drive('blkdebug::' + test_img,
++                                         'node-name=source')
+         self.vm.add_drive(blockdev_target_img, interface="none")
+         self.vm.launch()
+ 
+@@ -197,7 +199,7 @@ class TestSetSpeed(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return[0]/device', 'drive0')
+         self.assert_qmp(result, 'return[0]/speed', 8 * 1024 * 1024)
+ 
+-        event = self.cancel_and_wait(resume=True)
++        event = self.cancel_and_wait(resume=True, resume_node='source')
+         self.assert_qmp(event, 'data/type', 'backup')
+ 
+         # Check setting speed option works
+@@ -210,7 +212,7 @@ class TestSetSpeed(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return[0]/device', 'drive0')
+         self.assert_qmp(result, 'return[0]/speed', 4 * 1024 * 1024)
+ 
+-        event = self.cancel_and_wait(resume=True)
++        event = self.cancel_and_wait(resume=True, resume_node='source')
+         self.assert_qmp(event, 'data/type', 'backup')
+ 
+     def test_set_speed_drive_backup(self):
+@@ -236,7 +238,7 @@ class TestSetSpeed(iotests.QMPTestCase):
+         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=-1)
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+-        event = self.cancel_and_wait(resume=True)
++        event = self.cancel_and_wait(resume=True, resume_node='source')
+         self.assert_qmp(event, 'data/type', 'backup')
+ 
+     def test_set_speed_invalid_drive_backup(self):
+@@ -464,7 +466,8 @@ class TestDriveCompression(iotests.QMPTestCase):
+             pass
+ 
+     def do_prepare_drives(self, fmt, args, attach_target):
+-        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
++        self.vm = iotests.VM().add_drive('blkdebug::' + test_img,
++                                         'node-name=source')
+ 
+         qemu_img('create', '-f', fmt, blockdev_target_img,
+                  str(TestDriveCompression.image_len), *args)
+@@ -507,7 +510,7 @@ class TestDriveCompression(iotests.QMPTestCase):
+         result = self.vm.qmp(cmd, device='drive0', sync='full', compress=True, **args)
+         self.assert_qmp(result, 'return', {})
+ 
+-        event = self.cancel_and_wait(resume=True)
++        event = self.cancel_and_wait(resume=True, resume_node='source')
+         self.assert_qmp(event, 'data/type', 'backup')
+ 
+         self.vm.shutdown()
+@@ -532,7 +535,7 @@ class TestDriveCompression(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return', {})
+ 
+         self.pause_job('drive0', wait=False)
+-        self.vm.resume_drive('drive0')
++        self.vm.resume_drive('source')
+         self.pause_wait('drive0')
+ 
+         result = self.vm.qmp('query-block-jobs')
 -- 
 2.18.0
