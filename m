@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59779)
+Received: from eggs.gnu.org ([208.118.235.92]:36285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gd3Y5-0008AH-Ec
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 20:36:22 -0500
+	(envelope-from <willy@infradead.org>) id 1gd3vo-0005Pa-OO
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 21:00:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gd3QC-0000hq-Tq
-	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 20:28:16 -0500
-Date: Fri, 28 Dec 2018 23:28:05 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181229012805.GB6817@habkost.net>
-References: <20181221124410.11920-1-pbonzini@redhat.com>
-	<82D7661F83C1A047AF7DC287873BF1E172C97D77@SHSMSX101.ccr.corp.intel.com>
-	<ed344ef0-c519-1c71-c0ad-fb523a5dc516@redhat.com>
+	(envelope-from <willy@infradead.org>) id 1gd3qW-0002O7-1W
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 20:55:25 -0500
+Received: from bombadil.infradead.org ([2607:7c80:54:e::133]:56290)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1gd3qU-0001Z3-0a
+	for qemu-devel@nongnu.org; Fri, 28 Dec 2018 20:55:23 -0500
+Date: Fri, 28 Dec 2018 17:54:54 -0800
+From: Matthew Wilcox <willy@infradead.org>
+Message-ID: <20181229015453.GA6310@bombadil.infradead.org>
+References: <87bm56vqg4.fsf@mid.deneb.enyo.de>
+	<CAFEAcA92m4vhzjJ+B=mP_o6Wfhx1XSKo3uWxah3osh=u5UXFuw@mail.gmail.com>
+	<9C6A7D45-CF53-4C61-B5DD-12CA0D419972@dilger.ca>
+	<CAFEAcA9W+JK7_TrtTnL1P2ES1knNPJX9wcUvhfLwxLq9augq1w@mail.gmail.com>
+	<1EF1B31A-83D8-4642-BEBF-F56E45485223@dilger.ca>
+	<CAFEAcA8Yq=CEyAUer1TcaSzuzcdNi3OUi4c67B6e+OkhmcKvbg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ed344ef0-c519-1c71-c0ad-fb523a5dc516@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] i386: mark the 'INTEL_PT' CPUID bit as
- unmigratable
+In-Reply-To: <CAFEAcA8Yq=CEyAUer1TcaSzuzcdNi3OUi4c67B6e+OkhmcKvbg@mail.gmail.com>
+Subject: Re: [Qemu-devel] d_off field in struct dirent and 32-on-64 emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Kang, Luwei" <luwei.kang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andreas Dilger <adilger@dilger.ca>, Florian Weimer <fw@deneb.enyo.de>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, libc-alpha@sourceware.org, Arnd Bergmann <arnd@arndb.de>, Eric Van Hensbergen <ericvh@gmail.com>, hpa@zytor.com, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, rminnich@sandia.gov, v9fs-developer@lists.sourceforge.net
 
-On Fri, Dec 28, 2018 at 02:53:22PM +0100, Paolo Bonzini wrote:
-> On 25/12/18 09:23, Kang, Luwei wrote:
-> >> From: Qemu-devel [mailto:qemu-devel-bounces+luwei.kang=intel.com@nongnu.org] On Behalf Of Paolo Bonzini
-> >> Sent: Friday, December 21, 2018 8:44 PM
-> >> To: qemu-devel@nongnu.org
-> >> Cc: ehabkost@redhat.com; qemu-stable@nongnu.org
-> >> Subject: [Qemu-devel] [PATCH] i386: mark the 'INTEL_PT' CPUID bit as unmigratable
-> >>
-> >> Marshaling of processor tracing MSRs is not yet implemented in QEMU, mark the feature as unmigratable.
-> > 
-> > Hi Paolo,
-> >     I think Intel PT has supported live migration. I don't understand what you mean.
-> > 
-> >     commit b77146e9a129bcdb60edc23639211679ae846a92
-> >     Author: Chao Peng <chao.p.peng@linux.intel.com>
-> >     Date:   Mon Mar 5 00:48:36 2018 +0800
-> >     i386: Add support to get/set/migrate Intel Processor Trace feature
+On Sat, Dec 29, 2018 at 12:12:27AM +0000, Peter Maydell wrote:
+> On Fri, 28 Dec 2018 at 23:16, Andreas Dilger <adilger@dilger.ca> wrot
+> > On Dec 28, 2018, at 4:18 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > The problem is that there is no 32-bit API in some cases
+> > > (unless I have misunderstood the kernel code) -- not all
+> > > host architectures implement compat syscalls or allow them
+> > > to be called from 64-bit processes or implement all the older
+> > > syscall variants that had smaller offets. If there was a guaranteed
+> > > "this syscall always exists and always gives me 32-bit offsets"
+> > > we could use it.
+> >
+> > The "32bitapi" mount option would use 32-bit hash for seekdir
+> > and telldir, regardless of what kernel API was used.  That would
+> > just set the FMODE_32BITHASH flag in the file->f_mode for all files.
 > 
-> Indeed.  I had forgotten this patch because it was committed so long
-> before the kernel parts (which really should not happen, but Eduardo and
-> I miscommunicated on it).  Can you check that it still works?
+> A mount option wouldn't be much use to QEMU -- we can't tell
+> our users how to mount their filesystems, which they're
+> often doing lots of other things with besides running QEMU.
+> (Otherwise we could just tell them "don't use ext4", which
+> would also solve the problem :-)) We need something we can
+> use at the individual-syscall level.
 
-My mistake, sorry.  I should have checked the status of the
-kernel code before merging the original series, or waited for
-your review.
-
-I'm re-reading the code now and I'm worried about two things:
-
-The code will break if GET_SUPPORTED_CPUID returns INTEL_PT, but
-the MSR emulation code is not present yet.  Maybe it won't be an
-issue in practice because it happens only between the two Linux
-commits (commit 86f5201df0d3 "KVM: x86: Add Intel Processor Trace
-cpuid emulation" and commit bf8c55d8dc09 "KVM: x86: Implement
-Intel PT MSRs read/write emulation") and shipping a kernel with
-the CPUID code without the MSR commit seems pointless.
-
-The kvm_arch_get_supported_cpuid() call inside kvm_get_msrs()
-looks suspicious.  What should happen if we try to migrate to a
-host that returns a smaller number on
-kvm_arch_get_supported_cpuid(0x14, 1, R_EAX)?
-
--- 
-Eduardo
+Could you use a prctl to set whether you were running in 32 or 64 bit
+mode?  Or do you change which kind of task you're emulating too often
+to make this a good idea?
