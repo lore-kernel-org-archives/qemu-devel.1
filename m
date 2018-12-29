@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43448)
+Received: from eggs.gnu.org ([208.118.235.92]:43429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDuv-00035F-1O
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:46 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDuz-00035C-QI
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDei-0004wp-Of
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:23:53 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcH-00085h-Ay
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:21:31 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 29 Dec 2018 12:23:45 +0000
-Message-ID: <625b593a-e18b-ae70-6a37-985b70f6c466@virtuozzo.com>
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F42B7727B67F554B8333BEAB1CEA76BC@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: [Qemu-devel] ping3 Re: [PATCH v4 00/10] NBD reconnect
+Date: Sat, 29 Dec 2018 15:20:23 +0300
+Message-Id: <20181229122027.42245-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v5 07/11] block: introduce backup-top filter
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +20,412 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-cGluZw0KDQozMS4wNy4yMDE4IDIwOjMwLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiBIaSBhbGwuDQo+IA0KPiBIZXJlIGlzIE5CRCByZWNvbm5lY3QuIFByZXZpb3VzbHks
-IGlmIGNvbm5lY3Rpb24gZmFpbGVkIGFsbCBjdXJyZW50DQo+IGFuZCBmdXR1cmUgcmVxdWVzdHMg
-d2lsbCBmYWlsLiBBZnRlciB0aGUgc2VyaWVzLCBuYmQtY2xpZW50IGRyaXZlcg0KPiB3aWxsIHRy
-eSB0byByZWNvbm5lY3QgdW5saW1pdGVkIHRpbWVzLiBEdXJpbmcgZmlyc3QgQHJlY29ubmVjdC1k
-ZWxheQ0KPiBzZWNvbmRzIG9mIHJlY29ubmVjdGluZyBhbGwgcmVxdWVzdHMgd2lsbCB3YWl0IGZv
-ciB0aGUgY29ubmVjdGlvbiwNCj4gYW5kIGlmIGl0IGlzIGVzdGFibGlzaGVkIHJlcXVlc3RzIHdp
-bGwgYmUgcmVzZW50LiBBZnRlcg0KPiBAcmVjb25uZWN0LWRlbGF5IHBlcmlvZCBhbGwgcmVxdWVz
-dHMgd2lsbCBiZSBmYWlsZWQgKHVudGlsIHN1Y2Nlc3NmdWwNCj4gcmVjb25uZWN0KS4NCj4gDQo+
-IHY0OiAtIGFkZCBFcmljJ3Mgci1iIHRvIDAxLg0KPiAgICAgIC0gZHJvcCBDT05ORUNUSU5HX0lO
-SVQgbW9kZSwgZG9uJ3QgcmVjb25uZWN0IG9uIF9vcGVuLg0KPiAgICAgIC0gbmV3IGFwaTogb25s
-eSBvbmUgcGFyYW1ldGVyIEByZWNvbm5lY3QtZGVsYXkNCj4gICAgICAtIG5ldyBpbnRlcnZhbCBz
-Y2hlbWUgYmV0d2VlbiByZWNvbm5lY3QgYXR0ZW1wdHMNCj4gICAgICAgICAgKDEgLSAyIC0gNCAt
-IDggLSAxNiAtIDE2IC4uLiBzZWNvbmRzKQ0KPiAgICAgIC0gZml4ZXMgYW5kIHJlZmFjdG9yaW5n
-cyBpbiBtYWluIHBhdGNoICgwOSksIGluY2x1ZGluZyBtZXJnZSB3aXRoDQo+ICAgICAgICBvbGQg
-MDggcGF0Y2gNCj4gICAgICANCj4gDQo+IHYzOg0KPiAwNjogZml4IGJ1aWxkIGVycm9yIGluIGZ1
-bmN0aW9uICduYmRfY29fc2VuZF9yZXF1ZXN0JzoNCj4gICAgICAgZXJyb3I6ICdpJyBtYXkgYmUg
-dXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rpb24NCj4gDQo+IHYyIG5vdGVzOg0KPiBI
-ZXJlIGlzIHYyIG9mIE5CRCByZWNvbm5lY3QsIGJ1dCBpdCBpcyB2ZXJ5IHZlcnkgZGlmZmVyZW50
-IGZyb20gdjEsIHNvLA0KPiBmb3JnZXQgYWJvdXQgdjEuDQo+IFRoZSBzZXJpZXMgaW5jbHVkZXMg
-bXkgIk5CRCByZWNvbm5lY3Q6IHByZWxpbWluYXJ5IHJlZmFjdG9yaW5nIiwgd2l0aA0KPiBjaGFu
-Z2VzIGluIDA1OiBsZWF2ZSBhc3NlcnRzIChFcmljKS4NCj4gDQo+IFZsYWRpbWlyIFNlbWVudHNv
-di1PZ2lldnNraXkgKDEwKToNCj4gICAgYmxvY2svbmJkLWNsaWVudDogc3BsaXQgY2hhbm5lbCBl
-cnJvcnMgZnJvbSBleHBvcnQgZXJyb3JzDQo+ICAgIGJsb2NrL25iZDogbW92ZSBjb25uZWN0aW9u
-IGNvZGUgZnJvbSBibG9jay9uYmQgdG8gYmxvY2svbmJkLWNsaWVudA0KPiAgICBibG9jay9uYmQt
-Y2xpZW50OiBzcGxpdCBjb25uZWN0aW9uIGZyb20gaW5pdGlhbGl6YXRpb24NCj4gICAgYmxvY2sv
-bmJkLWNsaWVudDogZml4IG5iZF9yZXBseV9jaHVua19pdGVyX3JlY2VpdmUNCj4gICAgYmxvY2sv
-bmJkLWNsaWVudDogZG9uJ3QgY2hlY2sgaW9jDQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IG1vdmUg
-ZnJvbSBxdWl0IHRvIHN0YXRlDQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IHJlbmFtZSByZWFkX3Jl
-cGx5X2NvIHRvIGNvbm5lY3Rpb25fY28NCj4gICAgYmxvY2svbmJkOiBhZGQgY21kbGluZSBhbmQg
-cWFwaSBwYXJhbWV0ZXIgcmVjb25uZWN0LWRlbGF5DQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IG5i
-ZCByZWNvbm5lY3QNCj4gICAgaW90ZXN0czogdGVzdCBuYmQgcmVjb25uZWN0DQo+IA0KPiAgIHFh
-cGkvYmxvY2stY29yZS5qc29uICAgICAgICAgIHwgIDEyICstDQo+ICAgYmxvY2svbmJkLWNsaWVu
-dC5oICAgICAgICAgICAgfCAgMjAgKy0NCj4gICBibG9jay9uYmQtY2xpZW50LmMgICAgICAgICAg
-ICB8IDUxNSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0NCj4gICBi
-bG9jay9uYmQuYyAgICAgICAgICAgICAgICAgICB8ICA1NiArKy0tLQ0KPiAgIHRlc3RzL3FlbXUt
-aW90ZXN0cy8yMjAgICAgICAgIHwgIDY3ICsrKysrKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8y
-MjAub3V0ICAgIHwgICA3ICsNCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvZ3JvdXAgICAgICB8ICAg
-MSArDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgfCAgIDQgKw0KPiAgIDggZmls
-ZXMgY2hhbmdlZCwgNTEyIGluc2VydGlvbnMoKyksIDE3MCBkZWxldGlvbnMoLSkNCj4gICBjcmVh
-dGUgbW9kZSAxMDA3NTUgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMA0KPiAgIGNyZWF0ZSBtb2RlIDEw
-MDY0NCB0ZXN0cy9xZW11LWlvdGVzdHMvMjIwLm91dA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQo=
+Backup-top filter does copy-before-write operation. It should be
+inserted above active disk and has a target node for CBW, like the
+following:
+
+    +-------+
+    | Guest |
+    +---+---+
+        |r,w
+        v
+    +---+-----------+  target   +---------------+
+    | backup_top    |---------->| target(qcow2) |
+    +---+-----------+   CBW     +---+-----------+
+        |
+backing |r,w
+        v
+    +---+---------+
+    | Active disk |
+    +-------------+
+
+The driver will be used in backup instead of write-notifiers.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/backup-top.h  |  43 +++++++
+ block/backup-top.c  | 306 ++++++++++++++++++++++++++++++++++++++++++++
+ block/Makefile.objs |   2 +
+ 3 files changed, 351 insertions(+)
+ create mode 100644 block/backup-top.h
+ create mode 100644 block/backup-top.c
+
+diff --git a/block/backup-top.h b/block/backup-top.h
+new file mode 100644
+index 0000000000..abe4dda574
+--- /dev/null
++++ b/block/backup-top.h
+@@ -0,0 +1,43 @@
++/*
++ * backup-top filter driver
++ *
++ * The driver performs Copy-Before-Write (CBW) operation: it is injected above
++ * some node, and before each write it copies _old_ data to the target node.
++ *
++ * Copyright (c) 2018 Virtuozzo International GmbH. All rights reserved.
++ *
++ * Author:
++ *  Sementsov-Ogievskiy Vladimir <vsementsov@virtuozzo.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program. If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++
++#include "block/block_int.h"
++
++typedef struct BDRVBackupTopState {
++    HBitmap *copy_bitmap; /* what should be copied to @target on guest write. */
++    BdrvChild *target;
++
++    uint64_t bytes_copied;
++} BDRVBackupTopState;
++
++void bdrv_backup_top_drop(BlockDriverState *bs);
++uint64_t bdrv_backup_top_progress(BlockDriverState *bs);
++
++BlockDriverState *bdrv_backup_top_append(BlockDriverState *source,
++                                         BlockDriverState *target,
++                                         HBitmap *copy_bitmap,
++                                         Error **errp);
+diff --git a/block/backup-top.c b/block/backup-top.c
+new file mode 100644
+index 0000000000..0e7b3e3142
+--- /dev/null
++++ b/block/backup-top.c
+@@ -0,0 +1,306 @@
++/*
++ * backup-top filter driver
++ *
++ * The driver performs Copy-Before-Write (CBW) operation: it is injected above
++ * some node, and before each write it copies _old_ data to the target node.
++ *
++ * Copyright (c) 2018 Virtuozzo International GmbH. All rights reserved.
++ *
++ * Author:
++ *  Sementsov-Ogievskiy Vladimir <vsementsov@virtuozzo.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program. If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++
++#include "qemu/cutils.h"
++#include "qapi/error.h"
++#include "block/block_int.h"
++#include "block/qdict.h"
++
++#include "block/backup-top.h"
++
++static coroutine_fn int backup_top_co_preadv(
++        BlockDriverState *bs, uint64_t offset, uint64_t bytes,
++        QEMUIOVector *qiov, int flags)
++{
++    /*
++     * Features to be implemented:
++     * F1. COR. save read data to fleecing target for fast access
++     *     (to reduce reads). This possibly may be done with use of copy-on-read
++     *     filter, but we need an ability to make COR requests optional: for
++     *     example, if target is a ram-cache, and if it is full now, we should
++     *     skip doing COR request, as it is actually not necessary.
++     *
++     * F2. Feature for guest: read from fleecing target if data is in ram-cache
++     *     and is unchanged
++     */
++
++    return bdrv_co_preadv(bs->backing, offset, bytes, qiov, flags);
++}
++
++static coroutine_fn int backup_top_cbw(BlockDriverState *bs, uint64_t offset,
++                                          uint64_t bytes)
++{
++    int ret = 0;
++    BDRVBackupTopState *s = bs->opaque;
++    uint64_t gran = 1UL << hbitmap_granularity(s->copy_bitmap);
++    uint64_t end = QEMU_ALIGN_UP(offset + bytes, gran);
++    uint64_t off = QEMU_ALIGN_DOWN(offset, gran), len;
++    size_t align = MAX(bdrv_opt_mem_align(bs->backing->bs),
++                       bdrv_opt_mem_align(s->target->bs));
++    struct iovec iov = {
++        .iov_base = qemu_memalign(align, end - off),
++        .iov_len = end - off
++    };
++    QEMUIOVector qiov;
++
++    qemu_iovec_init_external(&qiov, &iov, 1);
++
++    /*
++     * Features to be implemented:
++     * F3. parallelize copying loop
++     * F4. detect zeros
++     * F5. use block_status ?
++     * F6. don't copy clusters which are already cached by COR [see F1]
++     * F7. if target is ram-cache and it is full, there should be a possibility
++     *     to drop not necessary data (cached by COR [see F1]) to handle CBW
++     *     fast.
++     */
++
++    len = end - off;
++    while (hbitmap_next_dirty_area(s->copy_bitmap, &off, &len)) {
++        iov.iov_len = qiov.size = len;
++
++        hbitmap_reset(s->copy_bitmap, off, len);
++
++        ret = bdrv_co_preadv(bs->backing, off, len, &qiov,
++                             BDRV_REQ_NO_SERIALISING);
++        if (ret < 0) {
++            hbitmap_set(s->copy_bitmap, off, len);
++            goto finish;
++        }
++
++        ret = bdrv_co_pwritev(s->target, off, len, &qiov, BDRV_REQ_SERIALISING);
++        if (ret < 0) {
++            hbitmap_set(s->copy_bitmap, off, len);
++            goto finish;
++        }
++
++        s->bytes_copied += len;
++        off += len;
++        if (off >= end) {
++            break;
++        }
++        len = end - off;
++    }
++
++finish:
++    qemu_vfree(iov.iov_base);
++
++    /*
++     * F8. we fail guest request in case of error. We can alter it by
++     * possibility to fail copying process instead, or retry several times, or
++     * may be guest pause, etc.
++     */
++    return ret;
++}
++
++static int coroutine_fn backup_top_co_pdiscard(BlockDriverState *bs,
++                                                  int64_t offset, int bytes)
++{
++    int ret = backup_top_cbw(bs, offset, bytes);
++    if (ret < 0) {
++        return ret;
++    }
++
++    /*
++     * Features to be implemented:
++     * F9. possibility of lazy discard: just defer the discard after fleecing
++     *     completion. If write (or new discard) occurs to the same area, just
++     *     drop deferred discard.
++     */
++
++    return bdrv_co_pdiscard(bs->backing, offset, bytes);
++}
++
++static int coroutine_fn backup_top_co_pwrite_zeroes(BlockDriverState *bs,
++        int64_t offset, int bytes, BdrvRequestFlags flags)
++{
++    int ret = backup_top_cbw(bs, offset, bytes);
++    if (ret < 0) {
++        return ret;
++    }
++
++    return bdrv_co_pwrite_zeroes(bs->backing, offset, bytes, flags);
++}
++
++static coroutine_fn int backup_top_co_pwritev(BlockDriverState *bs,
++                                                 uint64_t offset,
++                                                 uint64_t bytes,
++                                                 QEMUIOVector *qiov, int flags)
++{
++    int ret = backup_top_cbw(bs, offset, bytes);
++    if (ret < 0) {
++        return ret;
++    }
++
++    return bdrv_co_pwritev(bs->backing, offset, bytes, qiov, flags);
++}
++
++static int coroutine_fn backup_top_co_flush(BlockDriverState *bs)
++{
++    if (!bs->backing) {
++        return 0;
++    }
++
++    return bdrv_co_flush(bs->backing->bs);
++}
++
++static void backup_top_refresh_filename(BlockDriverState *bs, QDict *opts)
++{
++    if (bs->backing == NULL) {
++        /*
++         * we can be here after failed bdrv_attach_child in
++         * bdrv_set_backing_hd
++         */
++        return;
++    }
++    bdrv_refresh_filename(bs->backing->bs);
++    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
++            bs->backing->bs->filename);
++}
++
++static void backup_top_child_perm(BlockDriverState *bs, BdrvChild *c,
++                                       const BdrvChildRole *role,
++                                       BlockReopenQueue *reopen_queue,
++                                       uint64_t perm, uint64_t shared,
++                                       uint64_t *nperm, uint64_t *nshared)
++{
++    bdrv_filter_default_perms(bs, c, role, reopen_queue, perm, shared, nperm,
++                              nshared);
++
++    if (role == &child_file) {
++        /*
++         * share write to target, to not interfere guest writes to it's disk
++         * which will be in target backing chain
++         */
++        *nshared = *nshared | BLK_PERM_WRITE;
++        *nperm = *nperm | BLK_PERM_WRITE;
++    } else {
++        *nperm = *nperm | BLK_PERM_CONSISTENT_READ;
++    }
++}
++
++BlockDriver bdrv_backup_top_filter = {
++    .format_name = "backup-top",
++    .instance_size = sizeof(BDRVBackupTopState),
++
++    .bdrv_co_preadv             = backup_top_co_preadv,
++    .bdrv_co_pwritev            = backup_top_co_pwritev,
++    .bdrv_co_pwrite_zeroes      = backup_top_co_pwrite_zeroes,
++    .bdrv_co_pdiscard           = backup_top_co_pdiscard,
++    .bdrv_co_flush              = backup_top_co_flush,
++
++    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
++
++    .bdrv_refresh_filename      = backup_top_refresh_filename,
++
++    .bdrv_child_perm            = backup_top_child_perm,
++
++    .is_filter = true,
++};
++
++BlockDriverState *bdrv_backup_top_append(BlockDriverState *source,
++                                         BlockDriverState *target,
++                                         HBitmap *copy_bitmap,
++                                         Error **errp)
++{
++    Error *local_err = NULL;
++    BDRVBackupTopState *state;
++    BlockDriverState *top = bdrv_new_open_driver(&bdrv_backup_top_filter,
++                                                 NULL, BDRV_O_RDWR, errp);
++
++    if (!top) {
++        return NULL;
++    }
++
++    top->implicit = true;
++    top->total_sectors = source->total_sectors;
++    top->opaque = state = g_new0(BDRVBackupTopState, 1);
++    state->copy_bitmap = copy_bitmap;
++
++    bdrv_ref(target);
++    state->target = bdrv_attach_child(top, target, "target", &child_file, errp);
++    if (!state->target) {
++        bdrv_unref(target);
++        bdrv_unref(top);
++        return NULL;
++    }
++
++    bdrv_set_aio_context(top, bdrv_get_aio_context(source));
++    bdrv_set_aio_context(target, bdrv_get_aio_context(source));
++
++    bdrv_drained_begin(source);
++
++    bdrv_ref(top);
++    bdrv_append(top, source, &local_err);
++
++    if (local_err) {
++        bdrv_unref(top);
++    }
++
++    bdrv_drained_end(source);
++
++    if (local_err) {
++        bdrv_unref_child(top, state->target);
++        bdrv_unref(top);
++        error_propagate(errp, local_err);
++        return NULL;
++    }
++
++    return top;
++}
++
++void bdrv_backup_top_drop(BlockDriverState *bs)
++{
++    BDRVBackupTopState *s = bs->opaque;
++
++    AioContext *aio_context = bdrv_get_aio_context(bs);
++
++    aio_context_acquire(aio_context);
++
++    bdrv_drained_begin(bs);
++
++    bdrv_child_try_set_perm(bs->backing, 0, BLK_PERM_ALL, &error_abort);
++    bdrv_replace_node(bs, backing_bs(bs), &error_abort);
++    bdrv_set_backing_hd(bs, NULL, &error_abort);
++
++    bdrv_drained_end(bs);
++
++    if (s->target) {
++        bdrv_unref_child(bs, s->target);
++    }
++    bdrv_unref(bs);
++
++    aio_context_release(aio_context);
++}
++
++uint64_t bdrv_backup_top_progress(BlockDriverState *bs)
++{
++    BDRVBackupTopState *s = bs->opaque;
++
++    return s->bytes_copied;
++}
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 7a81892a52..9072115c09 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -40,6 +40,8 @@ block-obj-y += throttle.o copy-on-read.o
+ 
+ block-obj-y += crypto.o
+ 
++block-obj-y += backup-top.o
++
+ common-obj-y += stream.o
+ 
+ nfs.o-libs         := $(LIBNFS_LIBS)
+-- 
+2.18.0
