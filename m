@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42738)
+Received: from eggs.gnu.org ([208.118.235.92]:43448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv3-0002hB-Fg
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:56 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDv4-00035F-Dr
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:40:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcE-0007ym-8i
-	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:21:26 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gdDcB-0007th-JW
+	for qemu-devel@nongnu.org; Sat, 29 Dec 2018 07:21:21 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat, 29 Dec 2018 15:20:19 +0300
-Message-Id: <20181229122027.42245-4-vsementsov@virtuozzo.com>
+Date: Sat, 29 Dec 2018 15:20:24 +0300
+Message-Id: <20181229122027.42245-9-vsementsov@virtuozzo.com>
 In-Reply-To: <20181229122027.42245-1-vsementsov@virtuozzo.com>
 References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 03/11] block: improve should_update_child
+Subject: [Qemu-devel] [PATCH v5 08/11] block/io: refactor
+ wait_serialising_requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,76 +23,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-As it already said in the comment, we don't want to create loops in
-parent->child relations. So, when we try to append @to to @c, we should
-check that @c is not in @to children subtree, and we should check it
-recursively, not only the first level. The patch provides BFS-based
-search, to check the relations.
-
-This is needed for further fleecing-hook filter usage: we need to
-append it to source, when the hook is already a parent of target, and
-source may be in a backing chain of target (fleecing-scheme). So, on
-appending, the hook should not became a child (direct or through
-children subtree) of the target.
+Split out do_wait_serialising_requests with additional possibility to
+not actually wait but just check, that there is something to wait for.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block.c | 33 ++++++++++++++++++++++++++++-----
- 1 file changed, 28 insertions(+), 5 deletions(-)
+ block/io.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/block.c b/block.c
-index 4f5ff2cc12..8f04f293da 100644
---- a/block.c
-+++ b/block.c
-@@ -3536,7 +3536,7 @@ void bdrv_close_all(void)
- 
- static bool should_update_child(BdrvChild *c, BlockDriverState *to)
- {
--    BdrvChild *to_c;
-+    GList *queue = NULL, *pos;
- 
-     if (c->role->stay_at_node) {
-         return false;
-@@ -3572,13 +3572,36 @@ static bool should_update_child(BdrvChild *c, BlockDriverState *to)
-      * if A is a child of B, that means we cannot replace A by B there
-      * because that would create a loop.  Silently detaching A from B
-      * is also not really an option.  So overall just leaving A in
--     * place there is the most sensible choice. */
--    QLIST_FOREACH(to_c, &to->children, next) {
--        if (to_c == c) {
--            return false;
-+     * place there is the most sensible choice.
-+     *
-+     * We would also create a loop in any cases where @c is only
-+     * indirectly referenced by @to. Prevent this by returning false
-+     * if @c is found (by breadth-first search) anywhere in the whole
-+     * subtree of @to.
-+     */
-+
-+    pos = queue = g_list_append(queue, to);
-+    while (pos) {
-+        BlockDriverState *v = pos->data;
-+        BdrvChild *c2;
-+
-+        QLIST_FOREACH(c2, &v->children, next) {
-+            if (c2 == c) {
-+                g_list_free(queue);
-+                return false;
-+            }
-+
-+            if (g_list_find(queue, c2->bs)) {
-+                continue;
-+            }
-+
-+            queue = g_list_append(queue, c2->bs);
-         }
-+
-+        pos = pos->next;
-     }
- 
-+    g_list_free(queue);
-     return true;
+diff --git a/block/io.c b/block/io.c
+index bd9d688f8b..b87c11a6ec 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -720,12 +720,13 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
+     bdrv_wakeup(bs);
  }
  
+-static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
++static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
++                                                      bool wait)
+ {
+     BlockDriverState *bs = self->bs;
+     BdrvTrackedRequest *req;
+     bool retry;
+-    bool waited = false;
++    bool found = false;
+ 
+     if (!atomic_read(&bs->serialising_in_flight)) {
+         return false;
+@@ -751,11 +752,13 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+                  * will wait for us as soon as it wakes up, then just go on
+                  * (instead of producing a deadlock in the former case). */
+                 if (!req->waiting_for) {
+-                    self->waiting_for = req;
+-                    qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
+-                    self->waiting_for = NULL;
+-                    retry = true;
+-                    waited = true;
++                    found = true;
++                    if (wait) {
++                        self->waiting_for = req;
++                        qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
++                        self->waiting_for = NULL;
++                        retry = true;
++                    }
+                     break;
+                 }
+             }
+@@ -763,7 +766,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
+         qemu_co_mutex_unlock(&bs->reqs_lock);
+     } while (retry);
+ 
+-    return waited;
++    return found;
++}
++
++static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
++{
++    return do_wait_serialising_requests(self, true);
+ }
+ 
+ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
 -- 
 2.18.0
