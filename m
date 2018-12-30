@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:60598)
+Received: from eggs.gnu.org ([208.118.235.92]:39880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jimw@sifive.com>) id 1gdgfH-0000eN-Eo
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 14:22:24 -0500
+	(envelope-from <jimw@sifive.com>) id 1gdhCd-0007i8-MU
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 14:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jimw@sifive.com>) id 1gdgfG-0002Iy-PL
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 14:22:23 -0500
-Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:44068)
+	(envelope-from <jimw@sifive.com>) id 1gdhCc-0007VN-TN
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 14:56:51 -0500
+Received: from mail-ua1-x941.google.com ([2607:f8b0:4864:20::941]:34140)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jimw@sifive.com>) id 1gdgfG-0002IL-Kc
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 14:22:22 -0500
-Received: by mail-ua1-x943.google.com with SMTP id d19so8203498uaq.11
-	for <qemu-devel@nongnu.org>; Sun, 30 Dec 2018 11:22:22 -0800 (PST)
+	(Exim 4.71) (envelope-from <jimw@sifive.com>) id 1gdhCc-0007Up-OG
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 14:56:50 -0500
+Received: by mail-ua1-x941.google.com with SMTP id c24so8232949uak.1
+	for <qemu-devel@nongnu.org>; Sun, 30 Dec 2018 11:56:50 -0800 (PST)
 MIME-Version: 1.0
 References: <CAFyWVaai=5K7j8w+Abpk9jxGyKuo4v9w2BgmDbY=_29+Q++Jyw@mail.gmail.com>
-	<20181228220951.4962-1-jimw@sifive.com>
-	<f3e26863-4624-2c8f-5a9d-f3e76b7e6f0e@linaro.org>
-In-Reply-To: <f3e26863-4624-2c8f-5a9d-f3e76b7e6f0e@linaro.org>
+	<20181228220731.4753-1-jimw@sifive.com>
+	<bcf78767-a96e-8ba4-52da-97b34b3cb3ba@linaro.org>
+In-Reply-To: <bcf78767-a96e-8ba4-52da-97b34b3cb3ba@linaro.org>
 From: Jim Wilson <jimw@sifive.com>
-Date: Sun, 30 Dec 2018 11:22:10 -0800
-Message-ID: <CAFyWVaYnSCDnX7j3XugT8zMw-wC=EdXiEJevb1pJkvzfD_qfGg@mail.gmail.com>
+Date: Sun, 30 Dec 2018 11:56:39 -0800
+Message-ID: <CAFyWVaaTk_0cimE1z3p6vyT9hCvC4bF46KkooedFkz-QKP6g=w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 3/5 v2] RISC-V: Map gdb CSR reg numbers to
- hw reg numbers.
+Subject: Re: [Qemu-devel] [PATCH 1/5 v2] RISC-V: Add 32-bit gdb xml files.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,31 +32,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 
-On Sat, Dec 29, 2018 at 2:23 PM Richard Henderson
+On Sat, Dec 29, 2018 at 2:20 PM Richard Henderson
 <richard.henderson@linaro.org> wrote:
-> On 12/29/18 9:09 AM, Jim Wilson wrote:
-> > +int csr_register_map[] = {
->
-> static const?
+> On 12/29/18 9:07 AM, Jim Wilson wrote:
+> Don't the csr's vary between priv-1.9.1 and priv-1.10?
 
-If I add static const here, then I get a build error if this patch is
-applied to the tree but the following patch #5 that uses the variable
-is not applied.  Though I suppose I could fix that if I put the static
-const in patch 5.  That would look a little funny but would work.
+There are a few csr's that disappear in 1.10, but there is no known
+hardware that implements them.  There are a few csr's new in 1.10, but
+I don't know of any 1.9.1 systems that can run the software that
+requires the new registers.  There are a few that change name; the
+toolchain supports both the old and new names.  On the toolchain side,
+currently, none of the tools care about the privilege spec version.
+And the linux kernel doesn't care about the priv spec version either.
+This will eventually have to change, maybe with 1.11, but so far it
+hasn't been an issue with any software I've seen.
 
-> Putting an initialized variable in a header file doesn't seem right.  Is this
-> supposed to be a declaration that is shared between c files?
+qemu has an option to specify the priv spec version.  But looking at
+the csr's, this affects two of the registers that disappeared, which
+were never implemented in hardware, and aren't supported by gdb.  This
+also affects a few registers that have new fields in 1.10, but gdb
+doesn't know about those internal register fields, so this doesn't
+affect gdb either.
 
-I did it this way for two reasons.  It makes it easier to keep the
-register mapping consistent with the gdb csr file, if the gdb csr file
-happens to change in the future.  We can just do a line by line
-comparison of the gdb csr file against the csr-map.h file to verify
-that the csr names match.  And it makes for a cleaner patch if the gdb
-csr file register numbering gets fixed in the future, in that case we
-can just delete this file and change a few lines to stop using this
-variable.
+> I wonder if it would be better to auto-generate these, via the
+> gdb_get_dynamic_xml hook.  That way you don't need near identical copies for
+> 32-bit vs 64-bit.
 
-This variable is only meant to be used in one file, the
-target/riscv/gdbstubs.c file.
+I haven't tried looking at this, but I don't see a convenient list of
+implemented csr's.  This list would be every csr that the
+csr_read_helper function in target/riscv/op_helper.c supports  That
+function requires some machine state that includes the register
+values, so it doesn't look convenient to use, unless we add more
+hackery to it.
+
+Long term, it would be useful to have target specific csr register
+lists.  Most csr's are optional, and most hardware only implements a
+subset of them.  This is somewhat orthogonal to what I'm trying to do
+here, but this would require a list of supported csr's in the target
+hardware file, then this would have to be fed back into
+csr_read_helper somehow, and then we could also use this to generate
+an appropriate xml csr register file for that target for use with gdb.
+Openocd already does something like this for a few supported targets.
 
 Jim
