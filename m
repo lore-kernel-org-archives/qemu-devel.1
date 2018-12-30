@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44449)
+Received: from eggs.gnu.org ([208.118.235.92]:60598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gdfWj-0004oj-4p
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 13:09:29 -0500
+	(envelope-from <jimw@sifive.com>) id 1gdgfH-0000eN-Eo
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 14:22:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gdfWi-000153-E6
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 13:09:29 -0500
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Date: Sun, 30 Dec 2018 18:09:12 +0000
-Message-Id: <20181230180912.14614-2-rjones@redhat.com>
-In-Reply-To: <20181230180912.14614-1-rjones@redhat.com>
-References: <20181230180912.14614-1-rjones@redhat.com>
+	(envelope-from <jimw@sifive.com>) id 1gdgfG-0002Iy-PL
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 14:22:23 -0500
+Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:44068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jimw@sifive.com>) id 1gdgfG-0002IL-Kc
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 14:22:22 -0500
+Received: by mail-ua1-x943.google.com with SMTP id d19so8203498uaq.11
+	for <qemu-devel@nongnu.org>; Sun, 30 Dec 2018 11:22:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qemu-io: Reinitialize optind correctly before
- parsing inner command.
+References: <CAFyWVaai=5K7j8w+Abpk9jxGyKuo4v9w2BgmDbY=_29+Q++Jyw@mail.gmail.com>
+	<20181228220951.4962-1-jimw@sifive.com>
+	<f3e26863-4624-2c8f-5a9d-f3e76b7e6f0e@linaro.org>
+In-Reply-To: <f3e26863-4624-2c8f-5a9d-f3e76b7e6f0e@linaro.org>
+From: Jim Wilson <jimw@sifive.com>
+Date: Sun, 30 Dec 2018 11:22:10 -0800
+Message-ID: <CAFyWVaYnSCDnX7j3XugT8zMw-wC=EdXiEJevb1pJkvzfD_qfGg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 3/5 v2] RISC-V: Map gdb CSR reg numbers to
+ hw reg numbers.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,72 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 
-On FreeBSD 11.2:
+On Sat, Dec 29, 2018 at 2:23 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 12/29/18 9:09 AM, Jim Wilson wrote:
+> > +int csr_register_map[] = {
+>
+> static const?
 
-  $ ./qemu-io -f raw -c "aio_write 0 512" "nbd:localhost:10809"
-  Parsing error: non-numeric argument, or extraneous/unrecognized suffix =
--- aio_write
+If I add static const here, then I get a build error if this patch is
+applied to the tree but the following patch #5 that uses the variable
+is not applied.  Though I suppose I could fix that if I put the static
+const in patch 5.  That would look a little funny but would work.
 
-After main option parsing, we reinitialize optind so we can parse each
-command.  The error happens when parsing the aio_write command.  After
-the aio_write getopt loop, optind =3D=3D 0 and argv[optind] points to the
-command name ("aio_write" in this case).  The code fails because it
-tries to parse argv[optind] (which it thinks is the first argument) as
-an integer.
+> Putting an initialized variable in a header file doesn't seem right.  Is this
+> supposed to be a declaration that is shared between c files?
 
-In fact optind _starts_ the loop as 0, because we set it to 0.
+I did it this way for two reasons.  It makes it easier to keep the
+register mapping consistent with the gdb csr file, if the gdb csr file
+happens to change in the future.  We can just do a line by line
+comparison of the gdb csr file against the csr-map.h file to verify
+that the csr names match.  And it makes for a cleaner patch if the gdb
+csr file register numbering gets fixed in the future, in that case we
+can just delete this file and change a few lines to stop using this
+variable.
 
-The FreeBSD manual page says:
+This variable is only meant to be used in one file, the
+target/riscv/gdbstubs.c file.
 
-  In order to use getopt() to evaluate multiple sets of arguments, or to
-  evaluate a single set of arguments multiple times, the variable optrese=
-t
-  must be set to 1 before the second and each additional set of calls to
-  getopt(), and the variable optind must be reinitialized.
-
-(From the rest of the man page it is clear that optind must be
-reinitialized to 1).
-
-Unfortunately this conflicts with the glibc man page which says:
-
-  A program that scans multiple argument vectors,  or  rescans  the  same
-  vector  more than once, and wants to make use of GNU extensions such as
-  '+' and '-' at  the  start  of  optstring,  or  changes  the  value  of
-  POSIXLY_CORRECT  between scans, must reinitialize getopt() by resetting
-  optind to 0, rather than the traditional value of 1.  (Resetting  to  0
-  forces  the  invocation  of  an  internal  initialization  routine that
-  rechecks POSIXLY_CORRECT and checks for GNU extensions in optstring.)
-
-Reinitialize optind to either 0 or 1 depending on whether we're using
-glibc or not.
-
-I didn't set optreset - it's not present in glibc and it doesn't seem
-to make any difference on FreeBSD.
-
-Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
----
- qemu-io-cmds.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 2c39124036..ca4e258579 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -114,7 +114,11 @@ static int command(BlockBackend *blk, const cmdinfo_=
-t *ct, int argc,
-         }
-     }
-=20
-+#ifdef __GNU_LIBRARY__
-     optind =3D 0;
-+#else
-+    optind =3D 1;
-+#endif
-     return ct->cfunc(blk, argc, argv);
- }
-=20
---=20
-2.19.2
+Jim
