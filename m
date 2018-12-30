@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43331)
+Received: from eggs.gnu.org ([208.118.235.92]:43339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gdhOq-0001fz-KN
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 15:09:30 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gdhOq-0001g4-LI
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 15:09:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gdhOn-0008Ez-Jg
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gdhOn-0008FJ-OC
 	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 15:09:28 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Sun, 30 Dec 2018 23:09:13 +0300
-Message-Id: <1546200557-774583-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Sun, 30 Dec 2018 23:09:17 +0300
+Message-Id: <1546200557-774583-7-git-send-email-andrey.shinkevich@virtuozzo.com>
 In-Reply-To: <1546200557-774583-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1546200557-774583-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 2/6] Discard blocks while copy-on-read
+Subject: [Qemu-devel] [PATCH v5 6/6] iotests: 030 with block-stream discard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,338 +22,424 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-Discards the block duplicated in an intermediate backing file
-after the block have been copied into the active layer during
-QMP block-stream operation.
-It saves the disk space while merging external snapshots.
+The classes that set tests for the block-stream command with discard
+option on are inherited from the existent classes in the 030 file.
+Some QMP commands do not have the optional 'discard' argument because
+the WRITE permission is not being granted when the filter is inserted.
+For instance, it is true while streaming into an inactive layer.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/stream.c | 207 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 195 insertions(+), 12 deletions(-)
+ tests/qemu-iotests/030     | 143 ++++++++++++++++++++++++++++++++++-----------
+ tests/qemu-iotests/030.out |   4 +-
+ 2 files changed, 111 insertions(+), 36 deletions(-)
 
-diff --git a/block/stream.c b/block/stream.c
-index 20e768e..af2eebf 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -12,6 +12,7 @@
-  */
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 5d148b0..eba2fff 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -29,6 +29,7 @@ test_img = os.path.join(iotests.test_dir, 'test.img')
  
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "trace.h"
- #include "block/block_int.h"
- #include "block/blockjob_int.h"
-@@ -37,14 +38,68 @@ typedef struct StreamBlockJob {
-     char *backing_file_str;
-     bool bs_read_only;
-     BlockDriverState *cor_filter_bs;
-+    bool discard;
-+    GSList *im_nodes;
- } StreamBlockJob;
+ class TestSingleDrive(iotests.QMPTestCase):
+     image_len = 1 * 1024 * 1024 # MB
++    do_discard = False
  
-+typedef struct IntermediateNode {
-+    BlockBackend *blk;
-+    bool bs_read_only;
-+} IntermediateNode;
-+
- static BlockDriverState *child_file_bs(BlockDriverState *bs)
- {
-     return bs->file ? bs->file->bs : NULL;
- }
+     def setUp(self):
+         iotests.create_image(backing_img, TestSingleDrive.image_len)
+@@ -49,7 +50,8 @@ class TestSingleDrive(iotests.QMPTestCase):
+     def test_stream(self):
+         self.assert_no_active_block_jobs()
  
--static int coroutine_fn stream_populate(BlockBackend *blk,
-+static void restore_all_im_nodes(StreamBlockJob *s)
-+{
-+    GSList *l;
-+    BlockDriverState *bs_active;
-+    BlockDriverState *bs_im;
-+    IntermediateNode *im_node;
-+    QDict *opts;
-+    BlockReopenQueue *queue = NULL;
-+    Error *local_err = NULL;
-+
-+    assert(s->cor_filter_bs);
-+    bs_active = child_file_bs(s->cor_filter_bs);
-+    assert(bs_active && backing_bs(bs_active));
-+
-+    bdrv_subtree_drained_begin(backing_bs(bs_active));
-+
-+    for (l = s->im_nodes; l; l = l->next) {
-+        im_node = l->data;
-+        if (im_node->blk) {
-+            bs_im = blk_bs(im_node->blk);
-+
-+            if (im_node->bs_read_only && bs_im && !bdrv_is_read_only(bs_im)) {
-+                opts = qdict_new();
-+                qdict_put_bool(opts, BDRV_OPT_READ_ONLY, true);
-+                queue = bdrv_reopen_queue(queue, bs_im, opts);
-+            }
-+            /* Give up write permissions before making it read-only */
-+            blk_set_perm(im_node->blk, 0, BLK_PERM_ALL, &error_abort);
-+            blk_unref(im_node->blk);
-+            bdrv_unref(bs_im);
-+        }
-+        g_free(im_node);
-+    }
-+    g_slist_free(s->im_nodes);
-+    s->im_nodes = NULL;
-+
-+    if (queue) {
-+        bdrv_reopen_multiple(bdrv_get_aio_context(bs_active), queue,
-+                             &local_err);
-+        if (local_err != NULL) {
-+            error_report_err(local_err);
-+        }
-+    }
-+
-+    bdrv_subtree_drained_end(backing_bs(bs_active));
-+}
-+
-+static int coroutine_fn stream_populate(const StreamBlockJob *s,
-                                         int64_t offset, uint64_t bytes,
-                                         void *buf)
- {
-@@ -53,12 +108,28 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
-         .iov_len  = bytes,
-     };
-     QEMUIOVector qiov;
-+    GSList *l;
-+    IntermediateNode *im_node;
-+    int ret;
+-        result = self.vm.qmp('block-stream', device='drive0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0')
+         self.assert_qmp(result, 'return', {})
  
-+    assert(s);
-     assert(bytes < SIZE_MAX);
-     qemu_iovec_init_external(&qiov, &iov, 1);
+         self.wait_until_completed()
+@@ -84,7 +86,8 @@ class TestSingleDrive(iotests.QMPTestCase):
+         self.assert_no_active_block_jobs()
  
-     /* Copy-on-read the unallocated clusters */
--    return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
-+    ret = blk_co_preadv(s->common.blk, offset, qiov.size, &qiov,
-+                        BDRV_REQ_COPY_ON_READ);
-+
-+    if (ret < 0 || !s->discard) {
-+        return ret;
-+    }
-+
-+    for (l = s->im_nodes; l; l = l->next) {
-+        im_node = l->data;
-+        blk_co_pdiscard(im_node->blk, offset, bytes);
-+    }
-+
-+    return ret;
- }
+         self.vm.pause_drive('drive0')
+-        result = self.vm.qmp('block-stream', device='drive0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0')
+         self.assert_qmp(result, 'return', {})
  
- static int stream_change_backing_file(Job *job)
-@@ -109,6 +180,8 @@ static void stream_exit(Job *job)
-     if (s->cor_filter_bs == NULL) {
-         return;
-     }
-+    /* Reopen intermediate images back in read-only mode */
-+    restore_all_im_nodes(s);
-     /* Remove the filter driver from the graph */
-     remove_filter(s->cor_filter_bs);
-     s->cor_filter_bs = NULL;
-@@ -145,7 +218,6 @@ static void stream_clean(Job *job)
- static int coroutine_fn stream_run(Job *job, Error **errp)
- {
-     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
--    BlockBackend *blk = s->common.blk;
-     BlockDriverState *bs = child_file_bs(s->cor_filter_bs);
-     BlockDriverState *base = s->base;
-     int64_t len;
-@@ -209,7 +281,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-         }
-         trace_stream_one_iteration(s, offset, n, ret);
-         if (copy) {
--            ret = stream_populate(blk, offset, n, buf);
-+            ret = stream_populate(s, offset, n, buf);
-         }
-         if (ret < 0) {
-             BlockErrorAction action =
-@@ -250,22 +322,27 @@ out:
-     return ret;
- }
+         self.pause_job('drive0', wait=False)
+@@ -117,7 +120,8 @@ class TestSingleDrive(iotests.QMPTestCase):
+         empty_map = qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', test_img)
  
--static BlockDriverState *create_filter_node(BlockDriverState *bs, Error **errp)
-+static BlockDriverState *create_filter_node(BlockDriverState *bs, bool discard,
-+                                            Error **errp)
- {
-     QDict *opts = qdict_new();
+         # This is a no-op: no data should ever be copied from the base image
+-        result = self.vm.qmp('block-stream', device='drive0', base=mid_img)
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0', base=mid_img)
+         self.assert_qmp(result, 'return', {})
  
-     qdict_put_str(opts, "driver", "copy-on-read");
-     qdict_put_str(opts, "file", bdrv_get_node_name(bs));
-+    if (discard) {
-+        qdict_put_bool(opts, "driver.discard", true);
-+    }
+         self.wait_until_completed()
+@@ -131,7 +135,8 @@ class TestSingleDrive(iotests.QMPTestCase):
+     def test_stream_partial(self):
+         self.assert_no_active_block_jobs()
  
-     return bdrv_open(NULL, NULL, opts, BDRV_O_RDWR, errp);
- }
+-        result = self.vm.qmp('block-stream', device='drive0', base=backing_img)
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0', base=backing_img)
+         self.assert_qmp(result, 'return', {})
  
--static BlockDriverState *insert_filter(BlockDriverState *bs, Error **errp)
-+static BlockDriverState *insert_filter(BlockDriverState *bs, bool discard,
-+                                       Error **errp)
- {
-     BlockDriverState *cor_filter_bs;
-     Error *local_err = NULL;
+         self.wait_until_completed()
+@@ -144,11 +149,13 @@ class TestSingleDrive(iotests.QMPTestCase):
+                          'image file map does not match backing file after streaming')
  
--    cor_filter_bs = create_filter_node(bs, errp);
-+    cor_filter_bs = create_filter_node(bs, discard, errp);
-     if (cor_filter_bs == NULL) {
-         error_prepend(errp, "Could not create filter node: ");
-         return NULL;
-@@ -286,6 +363,92 @@ static BlockDriverState *insert_filter(BlockDriverState *bs, Error **errp)
-     return cor_filter_bs;
- }
+     def test_device_not_found(self):
+-        result = self.vm.qmp('block-stream', device='nonexistent')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='nonexistent')
+         self.assert_qmp(result, 'error/class', 'GenericError')
  
-+/* Makes intermediate block chain writable */
-+static int init_intermediate_nodes(StreamBlockJob *s,
-+                                   BlockDriverState *bs,
-+                                   BlockDriverState *base, Error **errp)
-+{
-+    BlockDriverState *iter;
-+    bool bs_read_only;
-+    IntermediateNode *im_node;
-+    BlockBackend *blk;
-+    QDict *opts;
-+    BlockReopenQueue *queue = NULL;
-+    Error *local_err = NULL;
-+    int ret;
-+
-+    /* Sanity check */
-+    if (!backing_bs(bs)) {
-+        error_setg(errp, "Top BDS does not have a backing file.");
-+        return -EINVAL;
-+    }
-+    if (base && !bdrv_chain_contains(bs, base)) {
-+        error_setg(errp, "The backing chain does not contain the base file.");
-+        return -EINVAL;
-+    }
-+
-+    /* Reopen intermediate images in read-write mode */
-+    bdrv_subtree_drained_begin(backing_bs(bs));
-+
-+    for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
-+        bs_read_only = bdrv_is_read_only(iter);
-+        im_node = g_new0(IntermediateNode, 1);
-+        im_node->blk = NULL;
-+        im_node->bs_read_only = bs_read_only;
-+        bdrv_ref(iter);
-+        s->im_nodes = g_slist_prepend(s->im_nodes, im_node);
-+
-+        if (bs_read_only) {
-+            opts = qdict_new();
-+            qdict_put_bool(opts, BDRV_OPT_READ_ONLY, false);
-+            queue = bdrv_reopen_queue(queue, iter, opts);
-+        }
-+    }
-+
-+    if (queue) {
-+        ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, &local_err);
-+        if (local_err != NULL) {
-+            error_propagate(errp, local_err);
-+            bdrv_subtree_drained_end(backing_bs(bs));
-+            restore_all_im_nodes(s);
-+            return -1;
-+        }
-+    }
-+
-+    bdrv_subtree_drained_end(backing_bs(bs));
-+
-+    s->im_nodes = g_slist_reverse(s->im_nodes);
-+    GSList *l = s->im_nodes;
-+
-+    for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
-+        blk = blk_new(BLK_PERM_WRITE, BLK_PERM_CONSISTENT_READ |
-+                      BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED |
-+                      BLK_PERM_GRAPH_MOD);
-+        if (!blk) {
-+            error_setg(errp,
-+                       "Block Stream: failed to create new Block Backend.");
-+            goto fail;
-+        }
-+
-+        ret = blk_insert_bs(blk, iter, errp);
-+        if (ret < 0) {
-+            goto fail;
-+        }
-+
-+        assert(l);
-+        im_node = l->data;
-+        im_node->blk = blk;
-+        l = l->next;
-+    }
-+
-+    return 0;
-+
-+fail:
-+    restore_all_im_nodes(s);
-+
-+    return -1;
-+}
-+
- static const BlockJobDriver stream_job_driver = {
-     .job_driver = {
-         .instance_size = sizeof(StreamBlockJob),
-@@ -308,6 +471,9 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     StreamBlockJob *s;
-     BlockDriverState *iter;
-     bool bs_read_only;
-+    const bool discard = false;
-+    int node_shared_flags = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED;
-+    int ret;
+     def test_job_id_missing(self):
+-        result = self.vm.qmp('block-stream', device='mid')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='mid')
+         self.assert_qmp(result, 'error/class', 'GenericError')
  
-     /* Make sure that the image is opened in read-write mode */
-     bs_read_only = bdrv_is_read_only(bs);
-@@ -330,21 +496,34 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-         goto fail;
-     }
  
--    /* Block all intermediate nodes between bs and base, because they will
-+    /*
-+     * Block all intermediate nodes between bs and base, because they will
-      * disappear from the chain after this operation. The streaming job reads
--     * every block only once, assuming that it doesn't change, so block writes
--     * and resizes. */
-+     * every block only once, assuming that it doesn't change, so forbid writes
-+     * and resizes. Allow writing in case of discard.
-+     */
-+    if (discard) {
-+        node_shared_flags |= BLK_PERM_WRITE;
-+    }
-     for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
-         block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
--                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED,
-+                           node_shared_flags,
-                            &error_abort);
-     }
+@@ -157,6 +164,7 @@ class TestParallelOps(iotests.QMPTestCase):
+     num_imgs = num_ops * 2 + 1
+     image_len = num_ops * 512 * 1024
+     imgs = []
++    do_discard = False
  
--    s->cor_filter_bs = insert_filter(bs, errp);
-+    s->cor_filter_bs = insert_filter(bs, discard, errp);
-     if (s->cor_filter_bs == NULL) {
-         goto fail;
-     }
+     def setUp(self):
+         opts = []
+@@ -241,13 +249,16 @@ class TestParallelOps(iotests.QMPTestCase):
+         result = self.vm.qmp('block-stream', device='node4', job_id='stream-node4', base=self.imgs[1], speed=1024*1024)
+         self.assert_qmp(result, 'return', {})
  
-+    if (discard) {
-+        ret = init_intermediate_nodes(s, bs, base, errp);
-+        if (ret < 0) {
-+            goto fail;
-+        }
-+    }
+-        result = self.vm.qmp('block-stream', device='node5', job_id='stream-node5', base=self.imgs[2])
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node5', job_id='stream-node5', base=self.imgs[2])
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+-        result = self.vm.qmp('block-stream', device='node3', job_id='stream-node3', base=self.imgs[2])
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node3', job_id='stream-node3', base=self.imgs[2])
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+-        result = self.vm.qmp('block-stream', device='node4', job_id='stream-node4-v2')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node4', job_id='stream-node4-v2')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+         # block-commit should also fail if it touches nodes used by the stream job
+@@ -274,20 +285,29 @@ class TestParallelOps(iotests.QMPTestCase):
+         result = self.vm.qmp('block-commit', device='drive0', top=self.imgs[5], base=self.imgs[3], job_id='commit-node3', speed=1024*1024)
+         self.assert_qmp(result, 'return', {})
+ 
+-        result = self.vm.qmp('block-stream', device='node3', job_id='stream-node3')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node3', job_id='stream-node3')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+-        result = self.vm.qmp('block-stream', device='node6', base=self.imgs[2], job_id='stream-node6')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node6', base=self.imgs[2],
++                             job_id='stream-node6')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+-        result = self.vm.qmp('block-stream', device='node4', base=self.imgs[2], job_id='stream-node4')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node4', base=self.imgs[2],
++                             job_id='stream-node4')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+-        result = self.vm.qmp('block-stream', device='node6', base=self.imgs[4], job_id='stream-node6-v2')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node6', base=self.imgs[4],
++                             job_id='stream-node6-v2')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+         # This fails because block-commit currently blocks the active layer even if it's not used
+-        result = self.vm.qmp('block-stream', device='drive0', base=self.imgs[5], job_id='stream-drive0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0', base=self.imgs[5],
++                             job_id='stream-drive0')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+         self.wait_until_completed(drive='commit-node3')
+@@ -302,7 +322,9 @@ class TestParallelOps(iotests.QMPTestCase):
+         result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[3], job_id='commit-drive0', speed=1024*1024)
+         self.assert_qmp(result, 'return', {})
+ 
+-        result = self.vm.qmp('block-stream', device='node5', base=self.imgs[3], job_id='stream-node6')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node5', base=self.imgs[3],
++                             job_id='stream-node6')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+         event = self.vm.event_wait(name='BLOCK_JOB_READY')
+@@ -389,19 +411,24 @@ class TestParallelOps(iotests.QMPTestCase):
+                             'image file map matches backing file before streaming')
+ 
+         # Error: the base node does not exist
+-        result = self.vm.qmp('block-stream', device='node4', base_node='none', job_id='stream')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node4', base_node='none', job_id='stream')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+         # Error: the base node is not a backing file of the top node
+-        result = self.vm.qmp('block-stream', device='node4', base_node='node6', job_id='stream')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node4',base_node='node6', job_id='stream')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+         # Error: the base node is the same as the top node
+-        result = self.vm.qmp('block-stream', device='node4', base_node='node4', job_id='stream')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node4',base_node='node4', job_id='stream')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+         # Error: cannot specify 'base' and 'base-node' at the same time
+-        result = self.vm.qmp('block-stream', device='node4', base=self.imgs[2], base_node='node2', job_id='stream')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node4', base=self.imgs[2],
++                             base_node='node2', job_id='stream')
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+         # Success: the base node is a backing file of the top node
+@@ -421,6 +448,7 @@ class TestQuorum(iotests.QMPTestCase):
+     num_children = 3
+     children = []
+     backing = []
++    do_discard = False
+ 
+     def setUp(self):
+         opts = ['driver=quorum', 'vote-threshold=2']
+@@ -446,10 +474,12 @@ class TestQuorum(iotests.QMPTestCase):
+ 
+     def tearDown(self):
+         self.vm.shutdown()
+-        for img in self.children:
++        for img in self.children[:]:
+             os.remove(img)
+-        for img in self.backing:
++            self.children.remove(img)
++        for img in self.backing[:]:
+             os.remove(img)
++            self.backing.remove(img)
+ 
+     def test_stream_quorum(self):
+         if not iotests.supports_quorum():
+@@ -461,7 +491,8 @@ class TestQuorum(iotests.QMPTestCase):
+ 
+         self.assert_no_active_block_jobs()
+ 
+-        result = self.vm.qmp('block-stream', device='node0', job_id='stream-node0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='node0', job_id='stream-node0')
+         self.assert_qmp(result, 'return', {})
+ 
+         self.wait_until_completed(drive='stream-node0')
+@@ -476,6 +507,7 @@ class TestQuorum(iotests.QMPTestCase):
+ class TestSmallerBackingFile(iotests.QMPTestCase):
+     backing_len = 1 * 1024 * 1024 # MB
+     image_len = 2 * backing_len
++    do_discard = False
+ 
+     def setUp(self):
+         iotests.create_image(backing_img, self.backing_len)
+@@ -488,7 +520,8 @@ class TestSmallerBackingFile(iotests.QMPTestCase):
+     def test_stream(self):
+         self.assert_no_active_block_jobs()
+ 
+-        result = self.vm.qmp('block-stream', device='drive0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+         self.wait_until_completed()
+@@ -526,6 +559,8 @@ new_state = "1"
+         file.close()
+ 
+ class TestEIO(TestErrors):
++    do_discard = False
 +
-+    s->discard = discard;
-     s->base = base;
-     s->backing_file_str = g_strdup(backing_file_str);
-     s->bs_read_only = bs_read_only;
-@@ -355,6 +534,10 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     return;
+     def setUp(self):
+         self.blkdebug_file = backing_img + ".blkdebug"
+         iotests.create_image(backing_img, TestErrors.image_len)
+@@ -546,7 +581,8 @@ class TestEIO(TestErrors):
+     def test_report(self):
+         self.assert_no_active_block_jobs()
  
- fail:
-+    if (s && s->cor_filter_bs) {
-+        remove_filter(s->cor_filter_bs);
-+        job_early_fail(&s->common.job);
-+    }
-     if (bs_read_only) {
-         bdrv_reopen_set_read_only(bs, true, NULL);
-     }
+-        result = self.vm.qmp('block-stream', device='drive0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+         completed = False
+@@ -574,7 +610,8 @@ class TestEIO(TestErrors):
+     def test_ignore(self):
+         self.assert_no_active_block_jobs()
+ 
+-        result = self.vm.qmp('block-stream', device='drive0', on_error='ignore')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0', on_error='ignore')
+         self.assert_qmp(result, 'return', {})
+ 
+         error = False
+@@ -607,7 +644,8 @@ class TestEIO(TestErrors):
+     def test_stop(self):
+         self.assert_no_active_block_jobs()
+ 
+-        result = self.vm.qmp('block-stream', device='drive0', on_error='stop')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0', on_error='stop')
+         self.assert_qmp(result, 'return', {})
+ 
+         error = False
+@@ -650,7 +688,8 @@ class TestEIO(TestErrors):
+     def test_enospc(self):
+         self.assert_no_active_block_jobs()
+ 
+-        result = self.vm.qmp('block-stream', device='drive0', on_error='enospc')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0', on_error='enospc')
+         self.assert_qmp(result, 'return', {})
+ 
+         completed = False
+@@ -676,6 +715,8 @@ class TestEIO(TestErrors):
+         self.vm.shutdown()
+ 
+ class TestENOSPC(TestErrors):
++    do_discard = False
++
+     def setUp(self):
+         self.blkdebug_file = backing_img + ".blkdebug"
+         iotests.create_image(backing_img, TestErrors.image_len)
+@@ -696,7 +737,8 @@ class TestENOSPC(TestErrors):
+     def test_enospc(self):
+         self.assert_no_active_block_jobs()
+ 
+-        result = self.vm.qmp('block-stream', device='drive0', on_error='enospc')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0', on_error='enospc')
+         self.assert_qmp(result, 'return', {})
+ 
+         error = False
+@@ -738,6 +780,7 @@ class TestENOSPC(TestErrors):
+ 
+ class TestStreamStop(iotests.QMPTestCase):
+     image_len = 8 * 1024 * 1024 * 1024 # GB
++    do_discard = False
+ 
+     def setUp(self):
+         qemu_img('create', backing_img, str(TestStreamStop.image_len))
+@@ -757,7 +800,8 @@ class TestStreamStop(iotests.QMPTestCase):
+         self.assert_no_active_block_jobs()
+ 
+         self.vm.pause_drive('drive0')
+-        result = self.vm.qmp('block-stream', device='drive0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+         time.sleep(0.1)
+@@ -770,6 +814,7 @@ class TestStreamStop(iotests.QMPTestCase):
+ 
+ class TestSetSpeed(iotests.QMPTestCase):
+     image_len = 80 * 1024 * 1024 # MB
++    do_discard = False
+ 
+     def setUp(self):
+         qemu_img('create', backing_img, str(TestSetSpeed.image_len))
+@@ -790,7 +835,8 @@ class TestSetSpeed(iotests.QMPTestCase):
+     def perf_test_throughput(self):
+         self.assert_no_active_block_jobs()
+ 
+-        result = self.vm.qmp('block-stream', device='drive0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=8 * 1024 * 1024)
+@@ -804,7 +850,8 @@ class TestSetSpeed(iotests.QMPTestCase):
+         self.assert_no_active_block_jobs()
+ 
+         self.vm.pause_drive('drive0')
+-        result = self.vm.qmp('block-stream', device='drive0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+         # Default speed is 0
+@@ -824,7 +871,8 @@ class TestSetSpeed(iotests.QMPTestCase):
+         self.vm.pause_drive('drive0')
+ 
+         # Check setting speed in block-stream works
+-        result = self.vm.qmp('block-stream', device='drive0', speed=4 * 1024 * 1024)
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0', speed=4 * 1024 * 1024)
+         self.assert_qmp(result, 'return', {})
+ 
+         result = self.vm.qmp('query-block-jobs')
+@@ -836,13 +884,15 @@ class TestSetSpeed(iotests.QMPTestCase):
+     def test_set_speed_invalid(self):
+         self.assert_no_active_block_jobs()
+ 
+-        result = self.vm.qmp('block-stream', device='drive0', speed=-1)
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0', speed=-1)
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+         self.assert_no_active_block_jobs()
+ 
+         self.vm.pause_drive('drive0')
+-        result = self.vm.qmp('block-stream', device='drive0')
++        result = self.vm.qmp('block-stream', discard=self.do_discard,
++                             device='drive0')
+         self.assert_qmp(result, 'return', {})
+ 
+         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=-1)
+@@ -851,5 +901,30 @@ class TestSetSpeed(iotests.QMPTestCase):
+         self.cancel_and_wait(resume=True, resume_node='source')
+ 
+ 
++class TestSingleDriveDiscard(TestSingleDrive):
++    do_discard = True
++
++class TestParallelOpsDiscard(TestParallelOps):
++    do_discard = True
++
++class TestQuorumDiscard(TestQuorum):
++    do_discard = True
++
++class TestSmallerBackingFileDiscard(TestSmallerBackingFile):
++    do_discard = True
++
++class TestEIODiscard(TestEIO):
++    do_discard = True
++
++class TestENOSPCDiscard(TestENOSPC):
++    do_discard = True
++
++class TestStreamStopDiscard(TestStreamStop):
++    do_discard = True
++
++class TestSetSpeedDiscard(TestSetSpeed):
++    do_discard = True
++
++
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2', 'qed'])
+diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
+index 42314e9..dea5c5a 100644
+--- a/tests/qemu-iotests/030.out
++++ b/tests/qemu-iotests/030.out
+@@ -1,5 +1,5 @@
+-........................
++................................................
+ ----------------------------------------------------------------------
+-Ran 24 tests
++Ran 48 tests
+ 
+ OK
 -- 
 1.8.3.1
