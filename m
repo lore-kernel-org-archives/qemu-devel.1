@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:49904)
+Received: from eggs.gnu.org ([208.118.235.92]:44443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gdbcp-0006DL-6f
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 08:59:31 -0500
+	(envelope-from <rjones@redhat.com>) id 1gdfWi-0004oi-Qz
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 13:09:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gdbco-00009z-FD
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 08:59:31 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43016)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gdbco-00009N-Am
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 08:59:30 -0500
-Received: by mail-ot1-x343.google.com with SMTP id a11so21948883otr.10
-	for <qemu-devel@nongnu.org>; Sun, 30 Dec 2018 05:59:29 -0800 (PST)
+	(envelope-from <rjones@redhat.com>) id 1gdfWi-00014N-7f
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 13:09:28 -0500
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Sun, 30 Dec 2018 18:09:11 +0000
+Message-Id: <20181230180912.14614-1-rjones@redhat.com>
 MIME-Version: 1.0
-References: <87bm56vqg4.fsf@mid.deneb.enyo.de>
-	<CAFEAcA92m4vhzjJ+B=mP_o6Wfhx1XSKo3uWxah3osh=u5UXFuw@mail.gmail.com>
-	<9C6A7D45-CF53-4C61-B5DD-12CA0D419972@dilger.ca>
-	<CAFEAcA9W+JK7_TrtTnL1P2ES1knNPJX9wcUvhfLwxLq9augq1w@mail.gmail.com>
-	<1EF1B31A-83D8-4642-BEBF-F56E45485223@dilger.ca>
-	<CAFEAcA8Yq=CEyAUer1TcaSzuzcdNi3OUi4c67B6e+OkhmcKvbg@mail.gmail.com>
-	<20181229015453.GA6310@bombadil.infradead.org>
-	<CALCETrUJn4cV+o3scP1EzYS=JA--5KUXvjuxZDbsnhXra1vrwA@mail.gmail.com>
-In-Reply-To: <CALCETrUJn4cV+o3scP1EzYS=JA--5KUXvjuxZDbsnhXra1vrwA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 30 Dec 2018 13:59:17 +0000
-Message-ID: <CAFEAcA_gV734EAxDii8XBOPr82kLYtsZmW5jYfQnT_DEpGOkpQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] d_off field in struct dirent and 32-on-64 emulation
+Subject: [Qemu-devel] [PATCH] qemu-io: Reinitialize optind correctly before
+ parsing inner command.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +20,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andy Lutomirski <luto@kernel.org>
-Cc: Matthew Wilcox <willy@infradead.org>, Andreas Dilger <adilger@dilger.ca>, Florian Weimer <fw@deneb.enyo.de>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>, Ext4 Developers List <linux-ext4@vger.kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, libc-alpha <libc-alpha@sourceware.org>, Arnd Bergmann <arnd@arndb.de>, Eric Van Hensbergen <ericvh@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, Ron Minnich <rminnich@sandia.gov>, V9FS Developers <v9fs-developer@lists.sourceforge.net>
+To: eblake@redhat.com
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Sat, 29 Dec 2018 at 16:49, Andy Lutomirski <luto@kernel.org> wrote:
-> > Could you use a prctl to set whether you were running in 32 or 64 bit
-> > mode?  Or do you change which kind of task you're emulating too often
-> > to make this a good idea?
+checkpatch says:
 
-QEMU's linux-user mode always only runs the single process,
-which is a fixed guest architecture. But it also wants to
-make system calls on its own behalf, as well as the ones it
-is passing through from the guest, and I suspect it would
-confuse the host libc if we changed the semantics of those
-under its feet.
+  WARNING: architecture specific defines should be avoided
+  #60: FILE: qemu-io-cmds.c:117:
+  +#ifdef __GNU_LIBRARY__
 
-> How would this work?  We already have the separate
-> COMPAT_DEFINE_SYSCALL entries *and* in_compat_syscall(). Now we=E2=80=99d=
- have
-> a third degree of freedom.
->
-> Either the arches people care about should add reasonable ways to
-> issue 32-bit syscalls from 64-bit mode or there should be an explicit
-> way to ask for the 32-bit directory offsets.
+However I don't know a better way to fix this.
 
-The first of those is not sufficient for QEMU if done
-as a per-architecture thing, because there may not even be
-a 32-bit syscall interface on the host kernel. The second
-sounds better -- there's nothing conceptually architecture
-specific about what we want to do or which is tied to the
-idea of whether there's a 32-bit compat mode in the host
-architecture or not.
-
-thanks
--- PMM
+Rich.
