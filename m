@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43339)
+Received: from eggs.gnu.org ([208.118.235.92]:45008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gdhOq-0001g4-LI
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 15:09:31 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gdhW7-00004v-Pr
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 15:17:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gdhOn-0008FJ-OC
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 15:09:28 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gdhW6-0000Yx-Ch
+	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 15:16:59 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Sun, 30 Dec 2018 23:09:17 +0300
-Message-Id: <1546200557-774583-7-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1546200557-774583-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1546200557-774583-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v5 6/6] iotests: 030 with block-stream discard
+Date: Sun, 30 Dec 2018 20:16:47 +0000
+Message-ID: <16347e39-e14d-d71a-a0b7-5c700ff5ae55@virtuozzo.com>
+References: <1544698788-52893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1544698788-52893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E87F62DCC754E04A93C9D63ED8BB6036@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v7] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,427 +25,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-The classes that set tests for the block-stream command with discard
-option on are inherited from the existent classes in the 030 file.
-Some QMP commands do not have the optional 'discard' argument because
-the WRITE permission is not being granted when the filter is inserted.
-For instance, it is true while streaming into an inactive layer.
-
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/030     | 143 ++++++++++++++++++++++++++++++++++-----------
- tests/qemu-iotests/030.out |   4 +-
- 2 files changed, 111 insertions(+), 36 deletions(-)
-
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 5d148b0..eba2fff 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -29,6 +29,7 @@ test_img = os.path.join(iotests.test_dir, 'test.img')
- 
- class TestSingleDrive(iotests.QMPTestCase):
-     image_len = 1 * 1024 * 1024 # MB
-+    do_discard = False
- 
-     def setUp(self):
-         iotests.create_image(backing_img, TestSingleDrive.image_len)
-@@ -49,7 +50,8 @@ class TestSingleDrive(iotests.QMPTestCase):
-     def test_stream(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0')
-         self.assert_qmp(result, 'return', {})
- 
-         self.wait_until_completed()
-@@ -84,7 +86,8 @@ class TestSingleDrive(iotests.QMPTestCase):
-         self.assert_no_active_block_jobs()
- 
-         self.vm.pause_drive('drive0')
--        result = self.vm.qmp('block-stream', device='drive0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0')
-         self.assert_qmp(result, 'return', {})
- 
-         self.pause_job('drive0', wait=False)
-@@ -117,7 +120,8 @@ class TestSingleDrive(iotests.QMPTestCase):
-         empty_map = qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', test_img)
- 
-         # This is a no-op: no data should ever be copied from the base image
--        result = self.vm.qmp('block-stream', device='drive0', base=mid_img)
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0', base=mid_img)
-         self.assert_qmp(result, 'return', {})
- 
-         self.wait_until_completed()
-@@ -131,7 +135,8 @@ class TestSingleDrive(iotests.QMPTestCase):
-     def test_stream_partial(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0', base=backing_img)
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0', base=backing_img)
-         self.assert_qmp(result, 'return', {})
- 
-         self.wait_until_completed()
-@@ -144,11 +149,13 @@ class TestSingleDrive(iotests.QMPTestCase):
-                          'image file map does not match backing file after streaming')
- 
-     def test_device_not_found(self):
--        result = self.vm.qmp('block-stream', device='nonexistent')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='nonexistent')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-     def test_job_id_missing(self):
--        result = self.vm.qmp('block-stream', device='mid')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='mid')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
- 
-@@ -157,6 +164,7 @@ class TestParallelOps(iotests.QMPTestCase):
-     num_imgs = num_ops * 2 + 1
-     image_len = num_ops * 512 * 1024
-     imgs = []
-+    do_discard = False
- 
-     def setUp(self):
-         opts = []
-@@ -241,13 +249,16 @@ class TestParallelOps(iotests.QMPTestCase):
-         result = self.vm.qmp('block-stream', device='node4', job_id='stream-node4', base=self.imgs[1], speed=1024*1024)
-         self.assert_qmp(result, 'return', {})
- 
--        result = self.vm.qmp('block-stream', device='node5', job_id='stream-node5', base=self.imgs[2])
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node5', job_id='stream-node5', base=self.imgs[2])
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
--        result = self.vm.qmp('block-stream', device='node3', job_id='stream-node3', base=self.imgs[2])
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node3', job_id='stream-node3', base=self.imgs[2])
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
--        result = self.vm.qmp('block-stream', device='node4', job_id='stream-node4-v2')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node4', job_id='stream-node4-v2')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-         # block-commit should also fail if it touches nodes used by the stream job
-@@ -274,20 +285,29 @@ class TestParallelOps(iotests.QMPTestCase):
-         result = self.vm.qmp('block-commit', device='drive0', top=self.imgs[5], base=self.imgs[3], job_id='commit-node3', speed=1024*1024)
-         self.assert_qmp(result, 'return', {})
- 
--        result = self.vm.qmp('block-stream', device='node3', job_id='stream-node3')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node3', job_id='stream-node3')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
--        result = self.vm.qmp('block-stream', device='node6', base=self.imgs[2], job_id='stream-node6')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node6', base=self.imgs[2],
-+                             job_id='stream-node6')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
--        result = self.vm.qmp('block-stream', device='node4', base=self.imgs[2], job_id='stream-node4')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node4', base=self.imgs[2],
-+                             job_id='stream-node4')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
--        result = self.vm.qmp('block-stream', device='node6', base=self.imgs[4], job_id='stream-node6-v2')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node6', base=self.imgs[4],
-+                             job_id='stream-node6-v2')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-         # This fails because block-commit currently blocks the active layer even if it's not used
--        result = self.vm.qmp('block-stream', device='drive0', base=self.imgs[5], job_id='stream-drive0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0', base=self.imgs[5],
-+                             job_id='stream-drive0')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-         self.wait_until_completed(drive='commit-node3')
-@@ -302,7 +322,9 @@ class TestParallelOps(iotests.QMPTestCase):
-         result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[3], job_id='commit-drive0', speed=1024*1024)
-         self.assert_qmp(result, 'return', {})
- 
--        result = self.vm.qmp('block-stream', device='node5', base=self.imgs[3], job_id='stream-node6')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node5', base=self.imgs[3],
-+                             job_id='stream-node6')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-         event = self.vm.event_wait(name='BLOCK_JOB_READY')
-@@ -389,19 +411,24 @@ class TestParallelOps(iotests.QMPTestCase):
-                             'image file map matches backing file before streaming')
- 
-         # Error: the base node does not exist
--        result = self.vm.qmp('block-stream', device='node4', base_node='none', job_id='stream')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node4', base_node='none', job_id='stream')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-         # Error: the base node is not a backing file of the top node
--        result = self.vm.qmp('block-stream', device='node4', base_node='node6', job_id='stream')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node4',base_node='node6', job_id='stream')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-         # Error: the base node is the same as the top node
--        result = self.vm.qmp('block-stream', device='node4', base_node='node4', job_id='stream')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node4',base_node='node4', job_id='stream')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-         # Error: cannot specify 'base' and 'base-node' at the same time
--        result = self.vm.qmp('block-stream', device='node4', base=self.imgs[2], base_node='node2', job_id='stream')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node4', base=self.imgs[2],
-+                             base_node='node2', job_id='stream')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-         # Success: the base node is a backing file of the top node
-@@ -421,6 +448,7 @@ class TestQuorum(iotests.QMPTestCase):
-     num_children = 3
-     children = []
-     backing = []
-+    do_discard = False
- 
-     def setUp(self):
-         opts = ['driver=quorum', 'vote-threshold=2']
-@@ -446,10 +474,12 @@ class TestQuorum(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        for img in self.children:
-+        for img in self.children[:]:
-             os.remove(img)
--        for img in self.backing:
-+            self.children.remove(img)
-+        for img in self.backing[:]:
-             os.remove(img)
-+            self.backing.remove(img)
- 
-     def test_stream_quorum(self):
-         if not iotests.supports_quorum():
-@@ -461,7 +491,8 @@ class TestQuorum(iotests.QMPTestCase):
- 
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='node0', job_id='stream-node0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='node0', job_id='stream-node0')
-         self.assert_qmp(result, 'return', {})
- 
-         self.wait_until_completed(drive='stream-node0')
-@@ -476,6 +507,7 @@ class TestQuorum(iotests.QMPTestCase):
- class TestSmallerBackingFile(iotests.QMPTestCase):
-     backing_len = 1 * 1024 * 1024 # MB
-     image_len = 2 * backing_len
-+    do_discard = False
- 
-     def setUp(self):
-         iotests.create_image(backing_img, self.backing_len)
-@@ -488,7 +520,8 @@ class TestSmallerBackingFile(iotests.QMPTestCase):
-     def test_stream(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0')
-         self.assert_qmp(result, 'return', {})
- 
-         self.wait_until_completed()
-@@ -526,6 +559,8 @@ new_state = "1"
-         file.close()
- 
- class TestEIO(TestErrors):
-+    do_discard = False
-+
-     def setUp(self):
-         self.blkdebug_file = backing_img + ".blkdebug"
-         iotests.create_image(backing_img, TestErrors.image_len)
-@@ -546,7 +581,8 @@ class TestEIO(TestErrors):
-     def test_report(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0')
-         self.assert_qmp(result, 'return', {})
- 
-         completed = False
-@@ -574,7 +610,8 @@ class TestEIO(TestErrors):
-     def test_ignore(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0', on_error='ignore')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0', on_error='ignore')
-         self.assert_qmp(result, 'return', {})
- 
-         error = False
-@@ -607,7 +644,8 @@ class TestEIO(TestErrors):
-     def test_stop(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0', on_error='stop')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0', on_error='stop')
-         self.assert_qmp(result, 'return', {})
- 
-         error = False
-@@ -650,7 +688,8 @@ class TestEIO(TestErrors):
-     def test_enospc(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0', on_error='enospc')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0', on_error='enospc')
-         self.assert_qmp(result, 'return', {})
- 
-         completed = False
-@@ -676,6 +715,8 @@ class TestEIO(TestErrors):
-         self.vm.shutdown()
- 
- class TestENOSPC(TestErrors):
-+    do_discard = False
-+
-     def setUp(self):
-         self.blkdebug_file = backing_img + ".blkdebug"
-         iotests.create_image(backing_img, TestErrors.image_len)
-@@ -696,7 +737,8 @@ class TestENOSPC(TestErrors):
-     def test_enospc(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0', on_error='enospc')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0', on_error='enospc')
-         self.assert_qmp(result, 'return', {})
- 
-         error = False
-@@ -738,6 +780,7 @@ class TestENOSPC(TestErrors):
- 
- class TestStreamStop(iotests.QMPTestCase):
-     image_len = 8 * 1024 * 1024 * 1024 # GB
-+    do_discard = False
- 
-     def setUp(self):
-         qemu_img('create', backing_img, str(TestStreamStop.image_len))
-@@ -757,7 +800,8 @@ class TestStreamStop(iotests.QMPTestCase):
-         self.assert_no_active_block_jobs()
- 
-         self.vm.pause_drive('drive0')
--        result = self.vm.qmp('block-stream', device='drive0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0')
-         self.assert_qmp(result, 'return', {})
- 
-         time.sleep(0.1)
-@@ -770,6 +814,7 @@ class TestStreamStop(iotests.QMPTestCase):
- 
- class TestSetSpeed(iotests.QMPTestCase):
-     image_len = 80 * 1024 * 1024 # MB
-+    do_discard = False
- 
-     def setUp(self):
-         qemu_img('create', backing_img, str(TestSetSpeed.image_len))
-@@ -790,7 +835,8 @@ class TestSetSpeed(iotests.QMPTestCase):
-     def perf_test_throughput(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0')
-         self.assert_qmp(result, 'return', {})
- 
-         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=8 * 1024 * 1024)
-@@ -804,7 +850,8 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.assert_no_active_block_jobs()
- 
-         self.vm.pause_drive('drive0')
--        result = self.vm.qmp('block-stream', device='drive0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0')
-         self.assert_qmp(result, 'return', {})
- 
-         # Default speed is 0
-@@ -824,7 +871,8 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.vm.pause_drive('drive0')
- 
-         # Check setting speed in block-stream works
--        result = self.vm.qmp('block-stream', device='drive0', speed=4 * 1024 * 1024)
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0', speed=4 * 1024 * 1024)
-         self.assert_qmp(result, 'return', {})
- 
-         result = self.vm.qmp('query-block-jobs')
-@@ -836,13 +884,15 @@ class TestSetSpeed(iotests.QMPTestCase):
-     def test_set_speed_invalid(self):
-         self.assert_no_active_block_jobs()
- 
--        result = self.vm.qmp('block-stream', device='drive0', speed=-1)
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0', speed=-1)
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
-         self.assert_no_active_block_jobs()
- 
-         self.vm.pause_drive('drive0')
--        result = self.vm.qmp('block-stream', device='drive0')
-+        result = self.vm.qmp('block-stream', discard=self.do_discard,
-+                             device='drive0')
-         self.assert_qmp(result, 'return', {})
- 
-         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=-1)
-@@ -851,5 +901,30 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.cancel_and_wait(resume=True, resume_node='source')
- 
- 
-+class TestSingleDriveDiscard(TestSingleDrive):
-+    do_discard = True
-+
-+class TestParallelOpsDiscard(TestParallelOps):
-+    do_discard = True
-+
-+class TestQuorumDiscard(TestQuorum):
-+    do_discard = True
-+
-+class TestSmallerBackingFileDiscard(TestSmallerBackingFile):
-+    do_discard = True
-+
-+class TestEIODiscard(TestEIO):
-+    do_discard = True
-+
-+class TestENOSPCDiscard(TestENOSPC):
-+    do_discard = True
-+
-+class TestStreamStopDiscard(TestStreamStop):
-+    do_discard = True
-+
-+class TestSetSpeedDiscard(TestSetSpeed):
-+    do_discard = True
-+
-+
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'])
-diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
-index 42314e9..dea5c5a 100644
---- a/tests/qemu-iotests/030.out
-+++ b/tests/qemu-iotests/030.out
-@@ -1,5 +1,5 @@
--........................
-+................................................
- ----------------------------------------------------------------------
--Ran 24 tests
-+Ran 48 tests
- 
- OK
--- 
-1.8.3.1
+UGluZyAvIE5vdGUNCg0KRGVhciBjb2xsZWFndWVzLA0KS2luZGx5IHJlbWluZCB5b3UgdG8gY29t
+cGxldGUgcmV2aWV3aW5nIG9mIHRoaXMgc2ltcGxlIHNlcmllcy4NCg0KSGFwcHkgTmV3IFllYXIh
+DQoNCg0KT24gMTMvMTIvMjAxOCAxMzo1OSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IElu
+IHRoZSAnRm9ybWF0IHNwZWNpZmljIGluZm9ybWF0aW9uJyBzZWN0aW9uIG9mIHRoZSAncWVtdS1p
+bWcgaW5mbycNCj4gY29tbWFuZCBvdXRwdXQsIHRoZSBzdXBwbGVtZW50YWwgaW5mb3JtYXRpb24g
+YWJvdXQgZXhpc3RpbmcgUUNPVzINCj4gYml0bWFwcyB3aWxsIGJlIHNob3duLCBzdWNoIGFzIGEg
+Yml0bWFwIG5hbWUsIGZsYWdzIGFuZCBncmFudWxhcml0eToNCj4gDQo+IGltYWdlOiAvdnovdm1w
+cml2YXRlL1ZNMS9oYXJkZGlzay5oZGQNCj4gZmlsZSBmb3JtYXQ6IHFjb3cyDQo+IHZpcnR1YWwg
+c2l6ZTogNjRHICg2ODcxOTQ3NjczNiBieXRlcykNCj4gZGlzayBzaXplOiAzLjBNDQo+IGNsdXN0
+ZXJfc2l6ZTogMTA0ODU3Ng0KPiBGb3JtYXQgc3BlY2lmaWMgaW5mb3JtYXRpb246DQo+ICAgICAg
+Y29tcGF0OiAxLjENCj4gICAgICBsYXp5IHJlZmNvdW50czogdHJ1ZQ0KPiAgICAgIGJpdG1hcHM6
+DQo+ICAgICAgICAgIFswXToNCj4gICAgICAgICAgICAgIGZsYWdzOg0KPiAgICAgICAgICAgICAg
+ICAgIFswXTogaW4tdXNlDQo+ICAgICAgICAgICAgICAgICAgWzFdOiBhdXRvDQo+ICAgICAgICAg
+ICAgICBuYW1lOiBiYWNrLXVwMQ0KPiAgICAgICAgICAgICAgdW5rbm93biBmbGFnczogNA0KPiAg
+ICAgICAgICAgICAgZ3JhbnVsYXJpdHk6IDY1NTM2DQo+ICAgICAgICAgIFsxXToNCj4gICAgICAg
+ICAgICAgIGZsYWdzOg0KPiAgICAgICAgICAgICAgICAgIFswXTogaW4tdXNlDQo+ICAgICAgICAg
+ICAgICAgICAgWzFdOiBhdXRvDQo+ICAgICAgICAgICAgICBuYW1lOiBiYWNrLXVwMg0KPiAgICAg
+ICAgICAgICAgdW5rbm93biBmbGFnczogOA0KPiAgICAgICAgICAgICAgZ3JhbnVsYXJpdHk6IDY1
+NTM2DQo+ICAgICAgcmVmY291bnQgYml0czogMTYNCj4gICAgICBjb3JydXB0OiBmYWxzZQ0KPiAN
+Cj4gU2lnbmVkLW9mZi1ieTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlua2V2aWNoQHZp
+cnR1b3p6by5jb20+DQo+IFJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
+IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+IFJldmlld2VkLWJ5OiBFcmljIEJsYWtlIDxl
+Ymxha2VAcmVkaGF0LmNvbT4NCj4gLS0tDQo+IHY3Og0KPiBBIGRlc2NyaXB0aW9uIHdhcyBhZGRl
+ZCB0byB0aGUgZnVuY3Rpb24gcWNvdzJfZ2V0X2JpdG1hcF9pbmZvX2xpc3QoKS4NCj4gSW4gdGhl
+IGZ1bmN0aW9uIHFjb3cyX2dldF9zcGVjaWZpY19pbmZvKCksIHRoZSBjb21tZW50IHdhcyBtb2Rp
+ZmllZA0KPiBzbyB0aGF0IHdlIGlnbm9yZSBhbnkgZXJyb3IgaW4gb2J0YWluaW5nIHRoZSBsaXN0
+IG9mIGJpdG1hcHMgdG8NCj4gcGFzcyB0aGUgcmVzdCBvZiBRQ09XMiBzcGVjaWZpYyBpbmZvcm1h
+dGlvbiB0byBhIGNhbGxlci4NCj4gDQo+IHY2Og0KPiAnW1BBVENIIHY2XSBxZW11LWltZyBpbmZv
+IGxpc3RzIGJpdG1hcCBkaXJlY3RvcnkgZW50cmllcycuDQo+IFRoZSBlcnJvciBoYW5kbGluZyBs
+b2dpYyBmb3IgdGhlIGJpdG1hcHMgZW1wdHkgbGlzdCB3YXMgcmV2ZXJzZWQuDQo+IA0KPiB2NToN
+Cj4gJ1tQQVRDSCB2NV0gcWVtdS1pbWcgaW5mbyBsaXN0cyBiaXRtYXAgZGlyZWN0b3J5IGVudHJp
+ZXMnLg0KPiBUaGUgZXJyb3IgaGFuZGxpbmcgbG9naWMgZm9yIHRoZSBiaXRtYXBzIGVtcHR5IGxp
+c3Qgd2FzIGZpeGVkIGFuZCBkb2N1bWVudGVkLg0KPiANCj4gdjQ6DQo+ICdbUEFUQ0ggdjRdIHFl
+bXUtaW1nIGluZm8gbGlzdHMgYml0bWFwIGRpcmVjdG9yeSBlbnRyaWVzJy4NCj4gVW5rbm93biBm
+bGFncyBhcmUgY2hlY2tlZCB3aXRoIHRoZSBtYXNrIEJNRV9SRVNFUlZFRF9GTEFHUy4NCj4gVGhl
+IGNvZGUgbWlub3IgcmVmYWN0b3Jpbmcgd2FzIG1hZGUuDQo+IA0KPiB2MzoNCj4gJ1tQQVRDSCB2
+M10gcWVtdS1pbWcgaW5mbyBsaXN0cyBiaXRtYXAgZGlyZWN0b3J5IGVudHJpZXMnLg0KPiBOb3cs
+IHFjb3cyX2dldF9iaXRtYXBfaW5mb19saXN0KCkgaXMgaW52b2tlZCB1bmRlciB0aGUgY29uZGl0
+aW9uIG9mIFFDT1cNCj4gdmVyc2lvbiAjMyB0byBhdm9pZCBtZW1vcnkgbGVha3MgaW4gY2FzZSBv
+ZiBRQ09XIHZlcnNpb24gIzIuDQo+IEZ1cnRoZXJtb3JlLCBxY293Ml9nZXRfYml0bWFwX2luZm9f
+bGlzdCgpIGNoZWNrcyB0aGUgbnVtYmVyIG9mIGV4aXN0aW5nIGJpdG1hcHMuDQo+IFNvLCBpZiBu
+byBiaXRtYXAgZXhpc3RzLCBubyBiaXRtYXAgZXJyb3IgbWVzc2FnZSBpcyBwcmludGVkIGluIHRo
+ZSBvdXRwdXQuDQo+IFRoZSBkYXRhIHR5cGUgb2YgdGhlIGJpdG1hcCAnZ3JhbnVsYXJpdHknIHBh
+cmFtZXRlciB3YXMgbGVmdCBhcyAndWludDMyJw0KPiBiZWNhdXNlIGJpdG1hcF9saXN0X2xvYWQo
+KSByZXR1cm5zIGVycm9yIGlmIGdyYW51bGFyaXR5X2JpdHMgaXMgZ3JhdGVyIHRoYW4gMzEuDQo+
+IA0KPiB2MjoNCj4gJ1tQQVRDSCB2Ml0gcWVtdS1pbWcgaW5mbyBsaXN0cyBiaXRtYXAgZGlyZWN0
+b3J5IGVudHJpZXMnLg0KPiBUaGUgdGFyZ2V0ZWQgdmVyc2lvbiBvZiB0aGUgcmVsZWFzZSBhdCAn
+U2luY2UnIHdvcmQgb2YgdGhlIGNvbW1lbnRzIHRvIHRoZSBuZXcNCj4gc3RydWN0dXJlcyBjaGFu
+Z2VkIHRvIDQuMCBpbiB0aGUgZmlsZSBxYXBpL2Jsb2NrLWNvcmUuanNvbi4NCj4gQSBjb21tZW50
+IHRvIHRoZSAnYml0bWFwcycgbmV3IG1lbWJlciB3YXMgc3VwcGxpZWQuDQo+IFRoZSAndW5rbm93
+biBmbGFncycgcGFyYW1ldGVyIHdhcyBpbnRyb2R1Y2VkIHRvIGluZGljYXRlIHByZXNlbmNlIG9m
+IFFDT1cyDQo+IGJpdG1hcCB1bmtub3duIGZsYWdzLCBpZiBhbnkuDQo+IFRoZSB3b3JkICdkaXJ0
+eScgd2FzIHJlbW92ZWQgZnJvbSB0aGUgY29kZSBhbmQgZnJvbSB0aGUgY29tbWVudHMgYXMgd2Ug
+bGlzdCBhbGwNCj4gdGhlIGJpdG1hcHMuDQo+IFRoZSAnYml0bWFwcycgcHJpbnRlZCBwYXJhbWV0
+ZXIgd2FzIHJlbW92ZWQgZm9yIHRoZSByZWxlYXNlIHZlcnNpb25zIGVhcmxpZXINCj4gdGhhbiAz
+LnguDQo+IFRoZSBleGFtcGxlIG9mIHRoZSBvdXRwdXQgd2FzIG1vdmVkIGFib3ZlIHRoZSAnU2ln
+bmVkLW9mZi1ieScgbGluZS4NCj4gDQo+IFRoZSBmaXJzdCB2ZXJzaW9uIHdhcyAnW1BBVENIXSBx
+ZW11LWltZyBpbmZvIGxpc3RzIGJpdG1hcCBkaXJlY3RvcnkgZW50cmllcycuDQo+IA0KPiAgIGJs
+b2NrL3Fjb3cyLWJpdG1hcC5jIHwgNjMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKw0KPiAgIGJsb2NrL3Fjb3cyLmMgICAgICAgIHwgIDkgKysrKysr
+KysNCj4gICBibG9jay9xY293Mi5oICAgICAgICB8ICAyICsrDQo+ICAgcWFwaS9ibG9jay1jb3Jl
+Lmpzb24gfCA0MiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPiAgIHFlbXUt
+aW1nLmMgICAgICAgICAgIHwgIDUgKysrKysNCj4gICA1IGZpbGVzIGNoYW5nZWQsIDEyMCBpbnNl
+cnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzIt
+Yml0bWFwLmMgYi9ibG9jay9xY293Mi1iaXRtYXAuYw0KPiBpbmRleCBhY2NlYmVmLi44YWVkZGRj
+IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi1iaXRtYXAuYw0KPiArKysgYi9ibG9jay9xY293
+Mi1iaXRtYXAuYw0KPiBAQCAtMTAwOCw2ICsxMDA4LDY5IEBAIGZhaWw6DQo+ICAgICAgIHJldHVy
+biBmYWxzZTsNCj4gICB9DQo+ICAgDQo+ICtzdGF0aWMgUWNvdzJCaXRtYXBJbmZvRmxhZ3NMaXN0
+ICpnZXRfYml0bWFwX2luZm9fZmxhZ3ModWludDMyX3QgZmxhZ3MpDQo+ICt7DQo+ICsgICAgUWNv
+dzJCaXRtYXBJbmZvRmxhZ3NMaXN0ICpsaXN0ID0gTlVMTDsNCj4gKyAgICBRY293MkJpdG1hcElu
+Zm9GbGFnc0xpc3QgKipwbGlzdCA9ICZsaXN0Ow0KPiArDQo+ICsgICAgaWYgKGZsYWdzICYgQk1F
+X0ZMQUdfSU5fVVNFKSB7DQo+ICsgICAgICAgIFFjb3cyQml0bWFwSW5mb0ZsYWdzTGlzdCAqZW50
+cnkgPSBnX25ldzAoUWNvdzJCaXRtYXBJbmZvRmxhZ3NMaXN0LCAxKTsNCj4gKyAgICAgICAgZW50
+cnktPnZhbHVlID0gUUNPVzJfQklUTUFQX0lORk9fRkxBR1NfSU5fVVNFOw0KPiArICAgICAgICAq
+cGxpc3QgPSBlbnRyeTsNCj4gKyAgICAgICAgcGxpc3QgPSAmZW50cnktPm5leHQ7DQo+ICsgICAg
+fQ0KPiArICAgIGlmIChmbGFncyAmIEJNRV9GTEFHX0FVVE8pIHsNCj4gKyAgICAgICAgUWNvdzJC
+aXRtYXBJbmZvRmxhZ3NMaXN0ICplbnRyeSA9IGdfbmV3MChRY293MkJpdG1hcEluZm9GbGFnc0xp
+c3QsIDEpOw0KPiArICAgICAgICBlbnRyeS0+dmFsdWUgPSBRQ09XMl9CSVRNQVBfSU5GT19GTEFH
+U19BVVRPOw0KPiArICAgICAgICAqcGxpc3QgPSBlbnRyeTsNCj4gKyAgICB9DQo+ICsgICAgcmV0
+dXJuIGxpc3Q7DQo+ICt9DQo+ICsNCj4gKy8qIHFjb3cyX2dldF9iaXRtYXBfaW5mb19saXN0KCkN
+Cj4gKyAqIFJldHVybnMgYSBsaXN0IG9mIFFDT1cyIGJpdG1hcCBkZXRhaWxzLg0KPiArICogSW4g
+Y2FzZSBvZiBubyBiaXRtYXBzLCB0aGUgZnVuY3Rpb24gcmV0dXJucyBOVUxMIGFuZA0KPiArICog
+dGhlIEBlcnJwIHBhcmFtZXRlciBpcyBub3Qgc2V0IChmb3IgYSAwLWxlbmd0aCBsaXN0IGluIHRo
+ZSBRTVApLg0KPiArICogV2hlbiBiaXRtYXAgaW5mb3JtYXRpb24gY2FuIG5vdCBiZSBvYnRhaW5l
+ZCwgdGhlIGZ1bmN0aW9uIHJldHVybnMNCj4gKyAqIE5VTEwgYW5kIHRoZSBAZXJycCBwYXJhbWV0
+ZXIgaXMgc2V0IChmb3Igb21pdHRpbmcgdGhlIGxpc3QgaW4gUU1QKS4NCj4gKyAqLw0KPiArUWNv
+dzJCaXRtYXBJbmZvTGlzdCAqcWNvdzJfZ2V0X2JpdG1hcF9pbmZvX2xpc3QoQmxvY2tEcml2ZXJT
+dGF0ZSAqYnMsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBFcnJvciAqKmVycnApDQo+ICt7DQo+ICsgICAgQkRSVlFjb3cyU3RhdGUgKnMgPSBicy0+
+b3BhcXVlOw0KPiArICAgIFFjb3cyQml0bWFwTGlzdCAqYm1fbGlzdDsNCj4gKyAgICBRY293MkJp
+dG1hcCAqYm07DQo+ICsgICAgUWNvdzJCaXRtYXBJbmZvTGlzdCAqbGlzdCA9IE5VTEw7DQo+ICsg
+ICAgUWNvdzJCaXRtYXBJbmZvTGlzdCAqKnBsaXN0ID0gJmxpc3Q7DQo+ICsNCj4gKyAgICBpZiAo
+cy0+bmJfYml0bWFwcyA9PSAwKSB7DQo+ICsgICAgICAgIHJldHVybiBOVUxMOw0KPiArICAgIH0N
+Cj4gKw0KPiArICAgIGJtX2xpc3QgPSBiaXRtYXBfbGlzdF9sb2FkKGJzLCBzLT5iaXRtYXBfZGly
+ZWN0b3J5X29mZnNldCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5iaXRt
+YXBfZGlyZWN0b3J5X3NpemUsIGVycnApOw0KPiArICAgIGlmIChibV9saXN0ID09IE5VTEwpIHsN
+Cj4gKyAgICAgICAgcmV0dXJuIE5VTEw7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgUVNJTVBMRVFf
+Rk9SRUFDSChibSwgYm1fbGlzdCwgZW50cnkpIHsNCj4gKyAgICAgICAgUWNvdzJCaXRtYXBJbmZv
+ICppbmZvID0gZ19uZXcwKFFjb3cyQml0bWFwSW5mbywgMSk7DQo+ICsgICAgICAgIFFjb3cyQml0
+bWFwSW5mb0xpc3QgKm9iaiA9IGdfbmV3MChRY293MkJpdG1hcEluZm9MaXN0LCAxKTsNCj4gKyAg
+ICAgICAgaW5mby0+Z3JhbnVsYXJpdHkgPSAxVSA8PCBibS0+Z3JhbnVsYXJpdHlfYml0czsNCj4g
+KyAgICAgICAgaW5mby0+bmFtZSA9IGdfc3RyZHVwKGJtLT5uYW1lKTsNCj4gKyAgICAgICAgaW5m
+by0+ZmxhZ3MgPSBnZXRfYml0bWFwX2luZm9fZmxhZ3MoYm0tPmZsYWdzKTsNCj4gKyAgICAgICAg
+aW5mby0+dW5rbm93bl9mbGFncyA9IGJtLT5mbGFncyAmIEJNRV9SRVNFUlZFRF9GTEFHUzsNCj4g
+KyAgICAgICAgaW5mby0+aGFzX3Vua25vd25fZmxhZ3MgPSAhIWluZm8tPnVua25vd25fZmxhZ3M7
+DQo+ICsgICAgICAgIG9iai0+dmFsdWUgPSBpbmZvOw0KPiArICAgICAgICAqcGxpc3QgPSBvYmo7
+DQo+ICsgICAgICAgIHBsaXN0ID0gJm9iai0+bmV4dDsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICBi
+aXRtYXBfbGlzdF9mcmVlKGJtX2xpc3QpOw0KPiArDQo+ICsgICAgcmV0dXJuIGxpc3Q7DQo+ICt9
+DQo+ICsNCj4gICBpbnQgcWNvdzJfcmVvcGVuX2JpdG1hcHNfcndfaGludChCbG9ja0RyaXZlclN0
+YXRlICpicywgYm9vbCAqaGVhZGVyX3VwZGF0ZWQsDQo+ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPiAgIHsNCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fj
+b3cyLmMgYi9ibG9jay9xY293Mi5jDQo+IGluZGV4IDk5MWQ2YWMuLmQ3OWY2NjcgMTAwNjQ0DQo+
+IC0tLSBhL2Jsb2NrL3Fjb3cyLmMNCj4gKysrIGIvYmxvY2svcWNvdzIuYw0KPiBAQCAtNDI3MCw2
+ICs0MjcwLDEwIEBAIHN0YXRpYyBJbWFnZUluZm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmlj
+X2luZm8oQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgICAgICAgICAgLnJlZmNvdW50X2Jp
+dHMgICAgICA9IHMtPnJlZmNvdW50X2JpdHMsDQo+ICAgICAgICAgICB9Ow0KPiAgICAgICB9IGVs
+c2UgaWYgKHMtPnFjb3dfdmVyc2lvbiA9PSAzKSB7DQo+ICsgICAgICAgIFFjb3cyQml0bWFwSW5m
+b0xpc3QgKmJpdG1hcHM7DQo+ICsgICAgICAgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0KPiAr
+DQo+ICsgICAgICAgIGJpdG1hcHMgPSBxY293Ml9nZXRfYml0bWFwX2luZm9fbGlzdChicywgJmxv
+Y2FsX2Vycik7DQo+ICAgICAgICAgICAqc3BlY19pbmZvLT51LnFjb3cyLmRhdGEgPSAoSW1hZ2VJ
+bmZvU3BlY2lmaWNRQ293Mil7DQo+ICAgICAgICAgICAgICAgLmNvbXBhdCAgICAgICAgICAgICA9
+IGdfc3RyZHVwKCIxLjEiKSwNCj4gICAgICAgICAgICAgICAubGF6eV9yZWZjb3VudHMgICAgID0g
+cy0+Y29tcGF0aWJsZV9mZWF0dXJlcyAmDQo+IEBAIC00Mjc5LDcgKzQyODMsMTIgQEAgc3RhdGlj
+IEltYWdlSW5mb1NwZWNpZmljICpxY293Ml9nZXRfc3BlY2lmaWNfaW5mbyhCbG9ja0RyaXZlclN0
+YXRlICpicykNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgUUNPVzJfSU5D
+T01QQVRfQ09SUlVQVCwNCj4gICAgICAgICAgICAgICAuaGFzX2NvcnJ1cHQgICAgICAgID0gdHJ1
+ZSwNCj4gICAgICAgICAgICAgICAucmVmY291bnRfYml0cyAgICAgID0gcy0+cmVmY291bnRfYml0
+cywNCj4gKyAgICAgICAgICAgIC5oYXNfYml0bWFwcyAgICAgICAgPSAhbG9jYWxfZXJyLA0KPiAr
+ICAgICAgICAgICAgLmJpdG1hcHMgICAgICAgICAgICA9IGJpdG1hcHMsDQo+ICAgICAgICAgICB9
+Ow0KPiArICAgICAgICAvKiBJZiBhbiBlcnJvciBvY2N1cnMgaW4gb2J0YWluaW5nIGJpdG1hcHMs
+IGlnbm9yZQ0KPiArICAgICAgICAgKiBpdCB0byBzaG93IG90aGVyIFFDT1cyIHNwZWNpZmljIGlu
+Zm9ybWF0aW9uLiAqLw0KPiArICAgICAgICBlcnJvcl9mcmVlKGxvY2FsX2Vycik7DQo+ICAgICAg
+IH0gZWxzZSB7DQo+ICAgICAgICAgICAvKiBpZiB0aGlzIGFzc2VydGlvbiBmYWlscywgdGhpcyBw
+cm9iYWJseSBtZWFucyBhIG5ldyB2ZXJzaW9uIHdhcw0KPiAgICAgICAgICAgICogYWRkZWQgd2l0
+aG91dCBoYXZpbmcgaXQgY292ZXJlZCBoZXJlICovDQo+IGRpZmYgLS1naXQgYS9ibG9jay9xY293
+Mi5oIGIvYmxvY2svcWNvdzIuaA0KPiBpbmRleCA4NjYyYjY4Li4wZWMyYjNkIDEwMDY0NA0KPiAt
+LS0gYS9ibG9jay9xY293Mi5oDQo+ICsrKyBiL2Jsb2NrL3Fjb3cyLmgNCj4gQEAgLTY4NSw2ICs2
+ODUsOCBAQCBpbnQgcWNvdzJfY2hlY2tfYml0bWFwc19yZWZjb3VudHMoQmxvY2tEcml2ZXJTdGF0
+ZSAqYnMsIEJkcnZDaGVja1Jlc3VsdCAqcmVzLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICB2b2lkICoqcmVmY291bnRfdGFibGUsDQo+ICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIGludDY0X3QgKnJlZmNvdW50X3RhYmxlX3NpemUpOw0KPiAgIGJvb2wg
+cWNvdzJfbG9hZF9kaXJ0eV9iaXRtYXBzKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBFcnJvciAqKmVy
+cnApOw0KPiArUWNvdzJCaXRtYXBJbmZvTGlzdCAqcWNvdzJfZ2V0X2JpdG1hcF9pbmZvX2xpc3Qo
+QmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApOw0KPiAgIGludCBxY293Ml9yZW9wZW5fYml0
+bWFwc19yd19oaW50KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBib29sICpoZWFkZXJfdXBkYXRlZCwN
+Cj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApOw0KPiAg
+IGludCBxY293Ml9yZW9wZW5fYml0bWFwc19ydyhCbG9ja0RyaXZlclN0YXRlICpicywgRXJyb3Ig
+KiplcnJwKTsNCj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9j
+ay1jb3JlLmpzb24NCj4gaW5kZXggZDRmZTcxMC4uOTg5OGJhYSAxMDA2NDQNCj4gLS0tIGEvcWFw
+aS9ibG9jay1jb3JlLmpzb24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTY5
+LDYgKzY5LDEwIEBADQo+ICAgIyBAZW5jcnlwdDogZGV0YWlscyBhYm91dCBlbmNyeXB0aW9uIHBh
+cmFtZXRlcnM7IG9ubHkgc2V0IGlmIGltYWdlDQo+ICAgIyAgICAgICAgICAgaXMgZW5jcnlwdGVk
+IChzaW5jZSAyLjEwKQ0KPiAgICMNCj4gKyMgQGJpdG1hcHM6IEEgbGlzdCBvZiBxY293MiBiaXRt
+YXAgZGV0YWlscyAocG9zc2libHkgZW1wdHksIHN1Y2ggYXMgZm9yDQo+ICsjICAgICAgICAgICB2
+MiBpbWFnZXMgd2hpY2ggZG8gbm90IHN1cHBvcnQgYml0bWFwcyk7IGFic2VudCBpZiBiaXRtYXAN
+Cj4gKyMgICAgICAgICAgIGluZm9ybWF0aW9uIGNvdWxkIG5vdCBiZSBvYnRhaW5lZCAoc2luY2Ug
+NC4wKQ0KPiArIw0KPiAgICMgU2luY2U6IDEuNw0KPiAgICMjDQo+ICAgeyAnc3RydWN0JzogJ0lt
+YWdlSW5mb1NwZWNpZmljUUNvdzInLA0KPiBAQCAtNzcsNyArODEsOCBAQA0KPiAgICAgICAgICcq
+bGF6eS1yZWZjb3VudHMnOiAnYm9vbCcsDQo+ICAgICAgICAgJypjb3JydXB0JzogJ2Jvb2wnLA0K
+PiAgICAgICAgICdyZWZjb3VudC1iaXRzJzogJ2ludCcsDQo+IC0gICAgICAnKmVuY3J5cHQnOiAn
+SW1hZ2VJbmZvU3BlY2lmaWNRQ293MkVuY3J5cHRpb24nDQo+ICsgICAgICAnKmVuY3J5cHQnOiAn
+SW1hZ2VJbmZvU3BlY2lmaWNRQ293MkVuY3J5cHRpb24nLA0KPiArICAgICAgJypiaXRtYXBzJzog
+WydRY293MkJpdG1hcEluZm8nXQ0KPiAgICAgfSB9DQo+ICAgDQo+ICAgIyMNCj4gQEAgLTQ1NCw2
+ICs0NTksNDEgQEANCj4gICAgICAgICAgICAgICdzdGF0dXMnOiAnRGlydHlCaXRtYXBTdGF0dXMn
+fSB9DQo+ICAgDQo+ICAgIyMNCj4gKyMgQFFjb3cyQml0bWFwSW5mb0ZsYWdzOg0KPiArIw0KPiAr
+IyBBbiBlbnVtZXJhdGlvbiBvZiBmbGFncyB0aGF0IGEgYml0bWFwIGNhbiByZXBvcnQgdG8gdGhl
+IHVzZXIuDQo+ICsjDQo+ICsjIEBpbi11c2U6IFRoZSBiaXRtYXAgd2FzIG5vdCBzYXZlZCBjb3Jy
+ZWN0bHkgYW5kIG1heSBiZSBpbmNvbnNpc3RlbnQuDQo+ICsjDQo+ICsjIEBhdXRvOiBUaGUgYml0
+bWFwIG11c3QgcmVmbGVjdCBhbGwgY2hhbmdlcyBvZiB0aGUgdmlydHVhbCBkaXNrIGJ5IGFueQ0K
+PiArIyAgICAgICAgYXBwbGljYXRpb24gdGhhdCB3b3VsZCB3cml0ZSB0byB0aGlzIHFjb3cyIGZp
+bGUuDQo+ICsjDQo+ICsjIFNpbmNlOiA0LjANCj4gKyMjDQo+ICt7ICdlbnVtJzogJ1Fjb3cyQml0
+bWFwSW5mb0ZsYWdzJywNCj4gKyAgJ2RhdGEnOiBbJ2luLXVzZScsICdhdXRvJ10gfQ0KPiArDQo+
+ICsjIw0KPiArIyBAUWNvdzJCaXRtYXBJbmZvOg0KPiArIw0KPiArIyBRY293MiBiaXRtYXAgaW5m
+b3JtYXRpb24uDQo+ICsjDQo+ICsjIEBuYW1lOiB0aGUgbmFtZSBvZiB0aGUgYml0bWFwDQo+ICsj
+DQo+ICsjIEBncmFudWxhcml0eTogZ3JhbnVsYXJpdHkgb2YgdGhlIGJpdG1hcCBpbiBieXRlcw0K
+PiArIw0KPiArIyBAZmxhZ3M6IGZsYWdzIG9mIHRoZSBiaXRtYXANCj4gKyMNCj4gKyMgQHVua25v
+d24tZmxhZ3M6IHVuc3BlY2lmaWVkIGZsYWdzIGlmIGRldGVjdGVkDQo+ICsjDQo+ICsjIFNpbmNl
+OiA0LjANCj4gKyMjDQo+ICt7ICdzdHJ1Y3QnOiAnUWNvdzJCaXRtYXBJbmZvJywNCj4gKyAgJ2Rh
+dGEnOiB7J25hbWUnOiAnc3RyJywgJ2dyYW51bGFyaXR5JzogJ3VpbnQzMicsDQo+ICsgICAgICAg
+ICAgICdmbGFncyc6IFsnUWNvdzJCaXRtYXBJbmZvRmxhZ3MnXSwNCj4gKyAgICAgICAgICAgJyp1
+bmtub3duLWZsYWdzJzogJ3VpbnQzMicgfSB9DQo+ICsNCj4gKyMjDQo+ICAgIyBAQmxvY2tMYXRl
+bmN5SGlzdG9ncmFtSW5mbzoNCj4gICAjDQo+ICAgIyBCbG9jayBsYXRlbmN5IGhpc3RvZ3JhbS4N
+Cj4gZGlmZiAtLWdpdCBhL3FlbXUtaW1nLmMgYi9xZW11LWltZy5jDQo+IGluZGV4IGFkMDRmNTku
+LjE0NGQ3YjggMTAwNjQ0DQo+IC0tLSBhL3FlbXUtaW1nLmMNCj4gKysrIGIvcWVtdS1pbWcuYw0K
+PiBAQCAtMjYwMSw2ICsyNjAxLDExIEBAIHN0YXRpYyBJbWFnZUluZm9MaXN0ICpjb2xsZWN0X2lt
+YWdlX2luZm9fbGlzdChib29sIGltYWdlX29wdHMsDQo+ICAgICAgICAgICAgICAgYmxrX3VucmVm
+KGJsayk7DQo+ICAgICAgICAgICAgICAgZ290byBlcnI7DQo+ICAgICAgICAgICB9DQo+ICsgICAg
+ICAgIGlmIChpbmZvLT5mb3JtYXRfc3BlY2lmaWMgJiYNCj4gKyAgICAgICAgICAgIGluZm8tPmZv
+cm1hdF9zcGVjaWZpYy0+dHlwZSA9PSBJTUFHRV9JTkZPX1NQRUNJRklDX0tJTkRfUUNPVzIgJiYN
+Cj4gKyAgICAgICAgICAgIGluZm8tPmZvcm1hdF9zcGVjaWZpYy0+dS5xY293Mi5kYXRhLT5oYXNf
+Yml0bWFwcyA9PSBmYWxzZSkgew0KPiArICAgICAgICAgICAgd2Fybl9yZXBvcnQoIkZhaWxlZCB0
+byBsb2FkIGJpdG1hcCBsaXN0Iik7DQo+ICsgICAgICAgIH0NCj4gICANCj4gICAgICAgICAgIGVs
+ZW0gPSBnX25ldzAoSW1hZ2VJbmZvTGlzdCwgMSk7DQo+ICAgICAgICAgICBlbGVtLT52YWx1ZSA9
+IGluZm87DQo+IA0KDQotLSANCldpdGggdGhlIGJlc3QgcmVnYXJkcywNCkFuZHJleSBTaGlua2V2
+aWNoDQo=
