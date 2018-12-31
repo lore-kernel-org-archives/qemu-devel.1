@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50610)
+Received: from eggs.gnu.org ([208.118.235.92]:57068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gdykf-0000dK-EC
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:41:10 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0w-0005Se-Pc
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gdykY-0005pL-L0
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:41:07 -0500
-Received: from mail-eopbgr750125.outbound.protection.outlook.com
-	([40.107.75.125]:23787
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gdykU-0005cl-P1
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:40:59 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 31 Dec 2018 14:40:44 +0000
-Message-ID: <BN6PR2201MB1251EB3052B10C95BE09D99DC6B20@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20181217200444.14812-1-aleksandar.markovic@rt-rk.com>,
-	<BN6PR2201MB1251D10E47C4B6103334BF3CC6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB1251D10E47C4B6103334BF3CC6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0t-0003lk-6V
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:58 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:57103 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gdz0s-0002SH-PE
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:55 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Mon, 31 Dec 2018 15:55:57 +0100
+Message-Id: <1546268200-26966-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/6] target/mips: Amend MXU support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 01/44] MAINTAINERS: target/mips: Add MIPS
+ files under default-configs directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jancraig@amazon.com" <jancraig@amazon.com>, Stefan Markovic <smarkovic@wavecomp.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-> From: Aleksandar Markovic
-> Subject: Re: [PATCH 0/6] target/mips: Amend MXU support
->=20
-> > From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> > Subject: [PATCH 0/6] target/mips: Amend MXU support
-> >
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > Various updates to MXU ASE support.
-> >
-> > Aleksandar Markovic (6):
-> >  target/mips: MXU: Add missing opcodes/decoding for LX* instructions
-> >  target/mips: MXU: Add generic naming for optn2 constants
-> >  target/mips: MXU: Improve textual description
-> >  target/mips: MXU: Add handlers for logic instructions
-> >  target/mips: MXU: Add handlers for max/min instructions
-> >  target/mips: MXU: Add handlers for an align instruction
->=20
-> If there is no objection, to get things going a little, I am going to int=
-egrate patches 1, 2, and 3 into next MIPS > pull request (scheduled shortly=
-), while it looks other patches need more time for review.
->=20
-> (patch 1 is about "pool 17", issues around "pool 16" will be covered in a=
- separate patch in v2)
->=20
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-I was told that comparing test runs on hardware and emulation
-didn't point to any issue other than those mentioned in previous
-responses (by Craig). I may try to integrate remaining three
-patches too (with fixes for discovered issues).
+Add following files as maintained within the main MIPS target
+section in MAINTAINERS:
 
-> Thanks to everyone,
-> Aleksandar
+default-configs/mips64el-linux-user.mak
+default-configs/mips64-linux-user.mak
+default-configs/mipsn32el-linux-user.mak
+default-configs/mipsn32-linux-user.mak
+default-configs/mipsel-linux-user.mak
+default-configs/mips-linux-user.mak
+default-configs/mips64el-softmmu.mak
+default-configs/mips64-softmmu.mak
+default-configs/mipsel-softmmu.mak
+default-configs/mips-softmmu.mak
+default-configs/mips-softmmu-common.mak
+
+Future nanoMIPS user mode will also have its .mak file, and
+because of that "*mips*" was used instead of "mips*" as a
+shorthand in the new item in MAINTAINERS.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 180695f..374e4c2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -208,6 +208,7 @@ M: Aleksandar Markovic <amarkovic@wavecomp.com>
+ R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: target/mips/
++F: default-configs/*mips*
+ F: hw/mips/
+ F: hw/misc/mips_*
+ F: hw/intc/mips_gic.c
+--=20
+2.7.4
