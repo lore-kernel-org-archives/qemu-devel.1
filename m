@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57212)
+Received: from eggs.gnu.org ([208.118.235.92]:57231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz17-0005eE-16
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:09 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz18-0005g0-6v
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz13-0003yj-Q3
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:08 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:57122 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz17-00042K-4q
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:10 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:60616 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gdz13-0002Sf-J3
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:05 -0500
+	id 1gdz16-0003os-Tl
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:09 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 31 Dec 2018 15:56:00 +0100
-Message-Id: <1546268200-26966-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 31 Dec 2018 15:56:11 +0100
+Message-Id: <1546268200-26966-16-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 04/44] MAINTAINERS: Add Aleksandar Rikalo as
- a reviewer for MIPS content
+Subject: [Qemu-devel] [PULL v2 15/44] disas: nanoMIPS: Fix preamble text in
+ nanomips.* files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,91 +30,74 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add Aleksandar Rikalo as a reviewer for MIPS content. Aleksandar
-brings to us more than six years of experience in working on a variety
-of development tools for MIPS architectures, and will greatly help
-QEMU community understand and support intricacies of MIPS better.
+Fix several mistakes in preambles of nanomips disassembler source
+files.
 
-Acked-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ disas/nanomips.cpp | 7 ++++---
+ disas/nanomips.h   | 7 ++++---
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 39fb1ae..b06f534 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -205,6 +205,7 @@ F: disas/microblaze.c
- MIPS
- M: Aurelien Jarno <aurelien@aurel32.net>
- M: Aleksandar Markovic <amarkovic@wavecomp.com>
-+R: Aleksandar Rikalo <arikalo@wavecomp.com>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: target/mips/
-@@ -362,6 +363,7 @@ F: target/arm/kvm.c
-=20
- MIPS
- M: James Hogan <jhogan@kernel.org>
-+R: Aleksandar Rikalo <arikalo@wavecomp.com>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: target/mips/kvm.c
-@@ -871,6 +873,7 @@ MIPS Machines
- -------------
- Jazz
- M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-+R: Aleksandar Rikalo <arikalo@wavecomp.com>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: hw/mips/mips_jazz.c
-@@ -879,12 +882,14 @@ F: hw/dma/rc4030.c
-=20
- Malta
- M: Aurelien Jarno <aurelien@aurel32.net>
-+R: Aleksandar Rikalo <arikalo@wavecomp.com>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: hw/mips/mips_malta.c
-=20
- Mipssim
- M: Aleksandar Markovic <amarkovic@wavecomp.com>
-+R: Aleksandar Rikalo <arikalo@wavecomp.com>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Odd Fixes
- F: hw/mips/mips_mipssim.c
-@@ -892,12 +897,14 @@ F: hw/net/mipsnet.c
-=20
- R4000
- M: Aurelien Jarno <aurelien@aurel32.net>
-+R: Aleksandar Rikalo <arikalo@wavecomp.com>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: hw/mips/mips_r4k.c
-=20
- Fulong 2E
- M: Aleksandar Markovic <amarkovic@wavecomp.com>
-+R: Aleksandar Rikalo <arikalo@wavecomp.com>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Odd Fixes
- F: hw/mips/mips_fulong2e.c
-@@ -907,6 +914,7 @@ F: include/hw/isa/vt82c686.h
-=20
- Boston
- M: Paul Burton <pburton@wavecomp.com>
-+R: Aleksandar Rikalo <arikalo@wavecomp.com>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: hw/core/loader-fit.c
-@@ -2163,6 +2171,7 @@ F: disas/i386.c
-=20
- MIPS target
- M: Aurelien Jarno <aurelien@aurel32.net>
-+R: Aleksandar Rikalo <arikalo@wavecomp.com>
- R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: tcg/mips/
---=20
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index 28d78d6..e082a3f 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -1,13 +1,13 @@
+ /*
+  *  Source file for nanoMIPS disassembler component of QEMU
+  *
+- *  Copyright (C) 2018  Wave Computing
++ *  Copyright (C) 2018  Wave Computing, Inc.
+  *  Copyright (C) 2018  Matthew Fortune <matthew.fortune@mips.com>
+- *  Copyright (C) 2018  Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
+  *
+  *  This program is free software: you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation, either version 3 of the License, or
++ *  the Free Software Foundation, either version 2 of the License, or
+  *  (at your option) any later version.
+  *
+  *  This program is distributed in the hope that it will be useful,
+@@ -17,6 +17,7 @@
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
+  */
+ 
+ extern "C" {
+diff --git a/disas/nanomips.h b/disas/nanomips.h
+index 71428b3..c7477c2 100644
+--- a/disas/nanomips.h
++++ b/disas/nanomips.h
+@@ -1,13 +1,13 @@
+ /*
+  *  Header file for nanoMIPS disassembler component of QEMU
+  *
+- *  Copyright (C) 2018  Wave Computing
++ *  Copyright (C) 2018  Wave Computing, Inc.
+  *  Copyright (C) 2018  Matthew Fortune <matthew.fortune@mips.com>
+- *  Copyright (C) 2018  Aleksandar Markovic <aleksandar.markovic@wavecomp.com>
++ *  Copyright (C) 2018  Aleksandar Markovic <amarkovic@wavecomp.com>
+  *
+  *  This program is free software: you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation, either version 3 of the License, or
++ *  the Free Software Foundation, either version 2 of the License, or
+  *  (at your option) any later version.
+  *
+  *  This program is distributed in the hope that it will be useful,
+@@ -17,6 +17,7 @@
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
+  */
+ 
+ #ifndef NANOMIPS_DISASSEMBLER_H
+-- 
 2.7.4
