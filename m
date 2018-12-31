@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57695)
+Received: from eggs.gnu.org ([208.118.235.92]:52399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1e-0006Kx-MN
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:45 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gdzq9-0006T2-Of
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 10:50:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1c-0004hv-5P
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:42 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60647 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gdz1b-00045w-D8
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:39 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 31 Dec 2018 15:56:35 +0100
-Message-Id: <1546268200-26966-40-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gdzq7-0000SK-MG
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 10:50:53 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39265)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1gdzq6-0000RR-CH
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 10:50:51 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f81so24547816wmd.4
+	for <qemu-devel@nongnu.org>; Mon, 31 Dec 2018 07:50:50 -0800 (PST)
+From: "=?UTF-8?B?S8WRdsOhZ8OzIFpvbHTDoW4=?=" <dirty.ice.hu@gmail.com>
+References: <mailman.31873.1545598364.1282.qemu-devel@nongnu.org>
+	<E04FDC0A-1912-4402-9CF5-755914945754@gmail.com>
+	<e87c0056-4150-0d5e-e049-d71750da1f17@gmail.com>
+	<228BFF97-3D85-4A30-89E1-18570472D119@gmail.com>
+	<335c7f56-d3e0-0be8-d416-484eb181038e@gmail.com>
+	<15778293-4038-4D3A-982A-20DFA333E179@gmail.com>
+	<78f4f24e-6fe0-9da2-8ac7-01dbd70a3739@gmail.com>
+	<06BEE403-8294-4764-AFE6-91701E325F1A@gmail.com>
+Message-ID: <d6966a53-3e5e-83c4-7900-38784969744a@gmail.com>
+Date: Mon, 31 Dec 2018 16:50:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 39/44] disas: nanoMIPS: Reorder declarations
- and definitions of gpr decoders
+In-Reply-To: <06BEE403-8294-4764-AFE6-91701E325F1A@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/52] Audio 5.1 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,306 +37,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 2018-12-29 01:49, Programmingkid wrote:
+> 
+>> On Dec 28, 2018, at 7:19 PM, Zoltán Kővágó <dirty.ice.hu@gmail.com> wrote:
+>>
+>> On 2018-12-29 01:12, Programmingkid wrote:
+>>>
+>>>> On Dec 28, 2018, at 3:05 PM, Kővágó Zoltán <dirty.ice.hu@gmail.com> wrote:
+>>>>
+>>>> On 2018-12-28 01:46, Programmingkid wrote:
+>>>>>
+>>>>>> On Dec 27, 2018, at 8:33 AM, Kővágó Zoltán <dirty.ice.hu@gmail.com> wrote:
+>>>>>>
+>>>>>> Hi,
+>>>>>>
+>>>>>> I've pushed it to my github (modulo some random fixes not yet on the
+>>>>>> mailing list):
+>>>>>> https://github.com/DirtYiCE/qemu/tree/audio-51-2018
+>>>>>>
+>>>>>> I don't have a mac so I have no idea whether it works or not.
+>>>>>>
+>>>>>> Regards,
+>>>>>> Zoltan
+>>>>>>
+>>>>>> On 2018-12-26 12:24, Programmingkid wrote:
+>>>>>>>
+>>>>>>>> On Dec 23, 2018, at 3:52 PM, qemu-devel-request@nongnu.org wrote:
+>>>>>>>>
+>>>>>>>> Message: 4
+>>>>>>>> Date: Sun, 23 Dec 2018 21:51:36 +0100
+>>>>>>>> From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
+>>>>>>>> 	<dirty.ice.hu@gmail.com>
+>>>>>>>> To: qemu-devel@nongnu.org
+>>>>>>>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>>>>>>>> Subject: [Qemu-devel] [PATCH v2 00/52] Audio 5.1 patches
+>>>>>>>> Message-ID: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
+>>>>>>>> Content-Type: text/plain; charset=UTF-8
+>>>>>>>>
+>>>>>>>> Hi,
+>>>>>>>>
+>>>>>>>> I've updated my audio patchset to the current git master. Other than that not
+>>>>>>>> much happened since my last update [1], fixed a few small problems that I
+>>>>>>>> noticed while rebasing my patches.
+>>>>>>>>
+>>>>>>>> Please review.
+>>>>>>>
+>>>>>>> <snip>
+>>>>>>>
+>>>>>>> Hi I would like to run your patches. Do you have a repository that I may clone? 
+>>>>>>>
+>>>>>>> Also have you been able to test these patches using a Mac OS X guest yet? 
+>>>>>>>
+>>>>>>> Thank you.
+>>>>>>>
+>>>>>>
+>>>>>
+>>>>> Hi, thanks for the link. This is what I did:
+>>>>>
+>>>>> - git clone https://github.com/DirtYiCE/qemu.git
+>>>>> - git checkout audio-51-2018
+>>>>> - ./configure --target-list=ppc-softmmu
+>>>>> - make -j 4
+>>>>>
+>>>>> The result was unfortunately some errors:
+>>>>>
+>>>>> CC      audio/coreaudio.o
+>>>>> audio/coreaudio.c:413:49: error: unknown type name 'HWVocieOut'; did you mean
+>>>>>     'HWVoiceOut'?
+>>>>> COREAUDIO_WRAPPER_FUNC(get_buffer_out, void *, (HWVocieOut *hw, size_t *size),
+>>>>>                                               ^~~~~~~~~~
+>>>>>                                               HWVoiceOut
+>>>>>
+>>>>>
+>>>>> audio/coreaudio.c:578:29: error: passing 'struct audio_pcm_info' to parameter of
+>>>>>     incompatible type 'struct audio_pcm_info *'; take the address with &
+>>>>>       coreaudio_get_flags(hw->info, as);
+>>>>>                           ^~~~~~~~
+>>>>>                           &
+>>>>>
+>>>>>
+>>>>
+>>>> Hi,
+>>>>
+>>>> I pushed an updated version, it should fix the compile errors (hopefully).
+>>>>
+>>>> Regards,
+>>>> Zoltan
+>>>
+>>> Thank you for the update. I tested this series using a Mac OS 10.4 and Windows 2000 guest. Both were using a USB sound card. The sound that comes out of my speakers is demonic! It is the loudest, scariest sound I have ever heard. I'm sorry but this patch series ruins the USB sound card.
+>>>
+>>> I am happy to test out any future updates that you make this patch series. 
+>>>
+>>> Thank you.
+>>>
+>>
+>> I'm sorry to hear that. Could you please test it with some other card,
+>> like the hda? Even though usb works fine for me on Linux with alsa so
+>> the problem is probably with the coreaudio backend.
+>>
+>> Regards,
+>> Zoltan
+> 
+> I tried ac97 with a Windows 2000 guest in qemu-system-i386 - same demonic sound.
+> With the above configuration but with an es1370 sound card I heard the same sound. I kept seeing "es1370: warning: non looping mode" being printed in the terminal. This problem might need its own patch.
+> Using the sb16 sound card I heard the same unsettling sound.
+> 
+> I could not test the HDA driver due to problems with my Windows 7 VM.  
+> 
 
-Reorder declarations and definitions of gpr decoders by number of
-input bits of corresponding encoding type.
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- disas/nanomips.cpp | 200 ++++++++++++++++++++++++++---------------------=
-------
- disas/nanomips.h   |   7 +-
- 2 files changed, 104 insertions(+), 103 deletions(-)
+I have a feeling that bf870a0cf5e2c2dd7438e65473b4fca1fb0ca5d1
+(coreaudio: port to the new audio backend api) is the commit which
+breaks it, but without a mac I don't know how could I debug it. The way
+it initializes coreaudio changed a bit, that can cause problems.
+Could you please test whether this commit is the culprit or not?
 
-diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index 23556b4..d6632bb 100644
---- a/disas/nanomips.cpp
-+++ b/disas/nanomips.cpp
-@@ -292,6 +292,77 @@ uint64 NMD::renumber_registers(uint64 index, uint64 =
-*register_list,
-=20
-=20
- /*
-+ * NMD::decode_gpr_gpr4() - decoder for 'gpr4' gpr encoding type
-+ *
-+ *   Map a 4-bit code to the 5-bit register space according to this patt=
-ern:
-+ *
-+ *                              1                   0
-+ *                    5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *                    | | | | | | | | | | | | | | | |
-+ *                    | | | | | | | | | | | | | | | |
-+ *                    | | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90
-+ *                    | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90 |
-+ *                    | | | | | | | | | =E2=94=94---------------=E2=94=90=
- | |
-+ *                    | | | | | | | | =E2=94=94---------------=E2=94=90 =
-| | |
-+ *                    | | | | | | | |         | | | | | | | |
-+ *                    | | | | | | | |         | | | | | | | |
-+ *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *      3                   2                   1                   0
-+ *
-+ *   Used in handling following instructions:
-+ *
-+ *     - ADDU[4X4]
-+ *     - LW[4X4]
-+ *     - MOVEP[REV]
-+ *     - MUL[4X4]
-+ *     - SW[4X4]
-+ */
-+uint64 NMD::decode_gpr_gpr4(uint64 d)
-+{
-+    static uint64 register_list[] =3D {  8,  9, 10, 11,  4,  5,  6,  7,
-+                                      16, 17, 18, 19, 20, 21, 22, 23 };
-+    return renumber_registers(d, register_list,
-+               sizeof(register_list) / sizeof(register_list[0]));
-+}
-+
-+
-+/*
-+ * NMD::decode_gpr_gpr4_zero() - decoder for 'gpr4.zero' gpr encoding ty=
-pe
-+ *
-+ *   Map a 4-bit code to the 5-bit register space according to this patt=
-ern:
-+ *
-+ *                              1                   0
-+ *                    5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *                    | | | | | | | | | | | | | | | |
-+ *                    | | | | | | | | | | | | =E2=94=94-----------------=
-----=E2=94=90
-+ *                    | | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90       |
-+ *                    | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90 |       |
-+ *                    | | | | | | | | | =E2=94=94---------------=E2=94=90=
- | |       |
-+ *                    | | | | | | | | =E2=94=94---------------=E2=94=90 =
-| | |       |
-+ *                    | | | | | | | |           | | | | | | |       |
-+ *                    | | | | | | | |           | | | | | | |       |
-+ *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *      3                   2                   1                   0
-+ *
-+ *   This pattern is the same one used for 'gpr4' gpr encoding type, exc=
-ept for
-+ * the input value 3, that is mapped to the output value 0 instead of 11=
-.
-+ *
-+ *   Used in handling following instructions:
-+ *
-+ *     - MOVE.BALC
-+ *     - MOVEP
-+ *     - SW[4X4]
-+ */
-+uint64 NMD::decode_gpr_gpr4_zero(uint64 d)
-+{
-+    static uint64 register_list[] =3D {  8,  9, 10,  0,  4,  5,  6,  7,
-+                                      16, 17, 18, 19, 20, 21, 22, 23 };
-+    return renumber_registers(d, register_list,
-+               sizeof(register_list) / sizeof(register_list[0]));
-+}
-+
-+
-+/*
-  * NMD::decode_gpr_gpr3() - decoder for 'gpr3' gpr encoding type
-  *
-  *   Map a 3-bit code to the 5-bit register space according to this patt=
-ern:
-@@ -390,106 +461,6 @@ uint64 NMD::decode_gpr_gpr3_src_store(uint64 d)
-=20
-=20
- /*
-- * NMD::decode_gpr_gpr1() - decoder for 'gpr1' gpr encoding type
-- *
-- *   Map a 1-bit code to the 5-bit register space according to this patt=
-ern:
-- *
-- *                                  1 0
-- *                                  | |
-- *                                  | |
-- *                                  | =E2=94=94---------------------=E2=94=
-=90
-- *                                  =E2=94=94---------------------=E2=94=
-=90 |
-- *                                                        | |
-- *                                                        | |
-- *                                                        | |
-- *                                                        | |
-- *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-- *      3                   2                   1                   0
-- *
-- *   Used in handling following instruction:
-- *
-- *     - MOVE.BALC
-- */
--uint64 NMD::decode_gpr_gpr1(uint64 d)
--{
--    static uint64 register_list[] =3D {  4,  5 };
--    return renumber_registers(d, register_list,
--               sizeof(register_list) / sizeof(register_list[0]));
--}
--
--
--/*
-- * NMD::decode_gpr_gpr4_zero() - decoder for 'gpr4.zero' gpr encoding ty=
-pe
-- *
-- *   Map a 4-bit code to the 5-bit register space according to this patt=
-ern:
-- *
-- *                              1                   0
-- *                    5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-- *                    | | | | | | | | | | | | | | | |
-- *                    | | | | | | | | | | | | =E2=94=94-----------------=
-----=E2=94=90
-- *                    | | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90       |
-- *                    | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90 |       |
-- *                    | | | | | | | | | =E2=94=94---------------=E2=94=90=
- | |       |
-- *                    | | | | | | | | =E2=94=94---------------=E2=94=90 =
-| | |       |
-- *                    | | | | | | | |           | | | | | | |       |
-- *                    | | | | | | | |           | | | | | | |       |
-- *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-- *      3                   2                   1                   0
-- *
-- *   This pattern is the same one used for 'gpr4' gpr encoding type, exc=
-ept for
-- * the input value 3, that is mapped to the output value 0 instead of 11=
-.
-- *
-- *   Used in handling following instructions:
-- *
-- *     - MOVE.BALC
-- *     - MOVEP
-- *     - SW[4X4]
-- */
--uint64 NMD::decode_gpr_gpr4_zero(uint64 d)
--{
--    static uint64 register_list[] =3D {  8,  9, 10,  0,  4,  5,  6,  7,
--                                      16, 17, 18, 19, 20, 21, 22, 23 };
--    return renumber_registers(d, register_list,
--               sizeof(register_list) / sizeof(register_list[0]));
--}
--
--
--/*
-- * NMD::decode_gpr_gpr4() - decoder for 'gpr4' gpr encoding type
-- *
-- *   Map a 4-bit code to the 5-bit register space according to this patt=
-ern:
-- *
-- *                              1                   0
-- *                    5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-- *                    | | | | | | | | | | | | | | | |
-- *                    | | | | | | | | | | | | | | | |
-- *                    | | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90
-- *                    | | | | | | | | | | =E2=94=94---------------=E2=94=
-=90 |
-- *                    | | | | | | | | | =E2=94=94---------------=E2=94=90=
- | |
-- *                    | | | | | | | | =E2=94=94---------------=E2=94=90 =
-| | |
-- *                    | | | | | | | |         | | | | | | | |
-- *                    | | | | | | | |         | | | | | | | |
-- *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-- *      3                   2                   1                   0
-- *
-- *   Used in handling following instructions:
-- *
-- *     - ADDU[4X4]
-- *     - LW[4X4]
-- *     - MOVEP[REV]
-- *     - MUL[4X4]
-- *     - SW[4X4]
-- */
--uint64 NMD::decode_gpr_gpr4(uint64 d)
--{
--    static uint64 register_list[] =3D {  8,  9, 10, 11,  4,  5,  6,  7,
--                                      16, 17, 18, 19, 20, 21, 22, 23 };
--    return renumber_registers(d, register_list,
--               sizeof(register_list) / sizeof(register_list[0]));
--}
--
--
--/*
-  * NMD::decode_gpr_gpr2_reg1() - decoder for 'gpr2.reg1' gpr encoding ty=
-pe
-  *
-  *   Map a 2-bit code to the 5-bit register space according to this patt=
-ern:
-@@ -549,6 +520,35 @@ uint64 NMD::decode_gpr_gpr2_reg2(uint64 d)
- }
-=20
-=20
-+/*
-+ * NMD::decode_gpr_gpr1() - decoder for 'gpr1' gpr encoding type
-+ *
-+ *   Map a 1-bit code to the 5-bit register space according to this patt=
-ern:
-+ *
-+ *                                  1 0
-+ *                                  | |
-+ *                                  | |
-+ *                                  | =E2=94=94---------------------=E2=94=
-=90
-+ *                                  =E2=94=94---------------------=E2=94=
-=90 |
-+ *                                                        | |
-+ *                                                        | |
-+ *                                                        | |
-+ *                                                        | |
-+ *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *      3                   2                   1                   0
-+ *
-+ *   Used in handling following instruction:
-+ *
-+ *     - MOVE.BALC
-+ */
-+uint64 NMD::decode_gpr_gpr1(uint64 d)
-+{
-+    static uint64 register_list[] =3D {  4,  5 };
-+    return renumber_registers(d, register_list,
-+               sizeof(register_list) / sizeof(register_list[0]));
-+}
-+
-+
- uint64 NMD::copy(uint64 d)
- {
-     return d;
-diff --git a/disas/nanomips.h b/disas/nanomips.h
-index d6a6e3f..6482eda 100644
---- a/disas/nanomips.h
-+++ b/disas/nanomips.h
-@@ -105,13 +105,14 @@ private:
-=20
-     uint64 renumber_registers(uint64 index, uint64 *register_list,
-                               size_t register_list_size);
-+
-+    uint64 decode_gpr_gpr4(uint64 d);
-+    uint64 decode_gpr_gpr4_zero(uint64 d);
-     uint64 decode_gpr_gpr3(uint64 d);
-     uint64 decode_gpr_gpr3_src_store(uint64 d);
--    uint64 decode_gpr_gpr1(uint64 d);
--    uint64 decode_gpr_gpr4_zero(uint64 d);
--    uint64 decode_gpr_gpr4(uint64 d);
-     uint64 decode_gpr_gpr2_reg1(uint64 d);
-     uint64 decode_gpr_gpr2_reg2(uint64 d);
-+    uint64 decode_gpr_gpr1(uint64 d);
-=20
-     uint64 copy(uint64 d);
-     int64 copy(int64 d);
---=20
-2.7.4
+Regards,
+Zoltan
