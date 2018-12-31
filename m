@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57065)
+Received: from eggs.gnu.org ([208.118.235.92]:57134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0w-0005Sb-PT
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:59 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0y-0005T4-Nv
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0t-0003lf-5s
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:58 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:57118 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0x-0003qp-8s
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:00 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:60614 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gdz0s-0002SX-PC
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:55 -0500
+	id 1gdz0w-0003or-VO
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:59 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 31 Dec 2018 15:55:59 +0100
-Message-Id: <1546268200-26966-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 31 Dec 2018 15:56:10 +0100
+Message-Id: <1546268200-26966-15-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 03/44] MAINTAINERS: target/mips: Reorder
- items alphabetically
+Subject: [Qemu-devel] [PULL v2 14/44] disas: nanoMIPS: Fix types and format
+ strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +28,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Stefan Weil <sw@weilnetz.de>
 
-Reorder items alphabetically for better visibility.
+Use POSIX types and format strings.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
 ---
- MAINTAINERS | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ disas/nanomips.cpp | 20 ++++++++++++--------
+ disas/nanomips.h   | 10 +++++-----
+ 2 files changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bf82eb3..39fb1ae 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -209,18 +209,18 @@ R: Stefan Markovic <smarkovic@wavecomp.com>
- S: Maintained
- F: target/mips/
- F: default-configs/*mips*
-+F: disas/mips.c
-+F: disas/nanomips.cpp
-+F: disas/nanomips.h
-+F: hw/intc/mips_gic.c
- F: hw/mips/
- F: hw/misc/mips_*
--F: hw/intc/mips_gic.c
- F: hw/timer/mips_gictimer.c
-+F: include/hw/intc/mips_gic.h
- F: include/hw/mips/
- F: include/hw/misc/mips_*
--F: include/hw/intc/mips_gic.h
- F: include/hw/timer/mips_gictimer.h
- F: tests/tcg/mips/
--F: disas/mips.c
--F: disas/nanomips.h
--F: disas/nanomips.cpp
- K: ^Subject:.*(?i)mips
-=20
- Moxie
---=20
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index 1238c2f..28d78d6 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -258,7 +258,7 @@ namespace img
+ std::string to_string(img::address a)
+ {
+     char buffer[256];
+-    sprintf(buffer, "0x%08llx", a);
++    sprintf(buffer, "0x%" PRIx64, a);
+     return buffer;
+ }
+ 
+@@ -284,7 +284,8 @@ uint64 NMD::renumber_registers(uint64 index, uint64 *register_list,
+     }
+ 
+     throw std::runtime_error(img::format(
+-                   "Invalid register mapping index %d, size of list = %d",
++                   "Invalid register mapping index %" PRIu64
++                   ", size of list = %zu",
+                    index, register_list_size));
+ }
+ 
+@@ -501,7 +502,8 @@ std::string NMD::GPR(uint64 reg)
+         return gpr_reg[reg];
+     }
+ 
+-    throw std::runtime_error(img::format("Invalid GPR register index %d", reg));
++    throw std::runtime_error(img::format("Invalid GPR register index %" PRIu64,
++                                         reg));
+ }
+ 
+ 
+@@ -518,7 +520,8 @@ std::string NMD::FPR(uint64 reg)
+         return fpr_reg[reg];
+     }
+ 
+-    throw std::runtime_error(img::format("Invalid FPR register index %d", reg));
++    throw std::runtime_error(img::format("Invalid FPR register index %" PRIu64,
++                                         reg));
+ }
+ 
+ 
+@@ -532,26 +535,27 @@ std::string NMD::AC(uint64 reg)
+         return ac_reg[reg];
+     }
+ 
+-    throw std::runtime_error(img::format("Invalid AC register index %d", reg));
++    throw std::runtime_error(img::format("Invalid AC register index %" PRIu64,
++                                         reg));
+ }
+ 
+ 
+ std::string NMD::IMMEDIATE(uint64 value)
+ {
+-    return img::format("0x%x", value);
++    return img::format("0x%" PRIx64, value);
+ }
+ 
+ 
+ std::string NMD::IMMEDIATE(int64 value)
+ {
+-    return img::format("%d", value);
++    return img::format("%" PRId64, value);
+ }
+ 
+ 
+ std::string NMD::CPR(uint64 reg)
+ {
+     /* needs more work */
+-    return img::format("CP%d", reg);
++    return img::format("CP%" PRIu64, reg);
+ }
+ 
+ 
+diff --git a/disas/nanomips.h b/disas/nanomips.h
+index 84cc9a6..71428b3 100644
+--- a/disas/nanomips.h
++++ b/disas/nanomips.h
+@@ -24,14 +24,14 @@
+ 
+ #include <string>
+ 
+-typedef unsigned short uint16;
+-typedef unsigned int uint32;
+-typedef long long int64;
+-typedef unsigned long long uint64;
++typedef int64_t int64;
++typedef uint64_t uint64;
++typedef uint32_t uint32;
++typedef uint16_t uint16;
+ 
+ namespace img
+ {
+-    typedef unsigned long long address;
++    typedef uint64_t address;
+ }
+ 
+ 
+-- 
 2.7.4
