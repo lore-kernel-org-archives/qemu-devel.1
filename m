@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57553)
+Received: from eggs.gnu.org ([208.118.235.92]:57557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1Y-0006EE-TI
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1Y-0006EN-VY
 	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1W-0004ZB-PN
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1W-0004Z3-On
 	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:36 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60644 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:60650 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gdz1T-00045F-0p
+	id 1gdz1S-00046W-Us
 	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:32 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 31 Dec 2018 15:56:32 +0100
-Message-Id: <1546268200-26966-37-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 31 Dec 2018 15:56:39 +0100
+Message-Id: <1546268200-26966-44-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 36/44] disas: nanoMIPS: Comment the decoder
- of 'gpr2.reg2' gpr encoding type
+Subject: [Qemu-devel] [PULL v2 43/44] tests/tcg: mips: Test R5900
+ three-operand MADDU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +28,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Fredrik Noring <noring@nocrew.org>
 
-Comment the decoder of 'gpr2.reg2' gpr encoding type in nanoMIPS
-disassembler.
+Test R5900 three-operand MADDU.
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- disas/nanomips.cpp | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ tests/tcg/mips/mipsr5900/Makefile |  1 +
+ tests/tcg/mips/mipsr5900/maddu.c  | 37 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
+ create mode 100644 tests/tcg/mips/mipsr5900/maddu.c
 
-diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index 06d2400..fe0c4af 100644
---- a/disas/nanomips.cpp
-+++ b/disas/nanomips.cpp
-@@ -498,6 +498,28 @@ uint64 NMD::decode_gpr_gpr2_reg1(uint64 d)
- }
-=20
-=20
+diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
+index 97ca2a6..27ee5d5 100644
+--- a/tests/tcg/mips/mipsr5900/Makefile
++++ b/tests/tcg/mips/mipsr5900/Makefile
+@@ -11,6 +11,7 @@ CFLAGS  = -Wall -mabi=32 -march=r5900 -static
+ TESTCASES = div1.tst
+ TESTCASES += divu1.tst
+ TESTCASES += madd.tst
++TESTCASES += maddu.tst
+ TESTCASES += mflohi1.tst
+ TESTCASES += mtlohi1.tst
+ TESTCASES += mult.tst
+diff --git a/tests/tcg/mips/mipsr5900/maddu.c b/tests/tcg/mips/mipsr5900/maddu.c
+new file mode 100644
+index 0000000..e4e5521
+--- /dev/null
++++ b/tests/tcg/mips/mipsr5900/maddu.c
+@@ -0,0 +1,37 @@
 +/*
-+ * NMD::decode_gpr_gpr2_reg2() - decoder for 'gpr2.reg2' gpr encoding ty=
-pe
-+ *
-+ *   Map a 2-bit code to the 5-bit register space according to this patt=
-ern:
-+ *
-+ *                                3 2 1 0
-+ *                                | | | |
-+ *                                | | | |
-+ *                                | | | =E2=94=94-----------------=E2=94=
-=90
-+ *                                | | =E2=94=94-----------------=E2=94=90=
- |
-+ *                                | =E2=94=94-----------------=E2=94=90 =
-| |
-+ *                                =E2=94=94-----------------=E2=94=90 | =
-| |
-+ *                                                  | | | |
-+ *                                                  | | | |
-+ *    1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *      3                   2                   1                   0
-+ *
-+ *   Used in handling following instructions:
-+ *
-+ *     - MOVEP
-+ *     - MOVEP[REV]
++ * Test R5900-specific three-operand MADDU.
 + */
- uint64 NMD::decode_gpr_gpr2_reg2(uint64 d)
- {
-     static uint64 register_list[] =3D {  5,  6,  7,  8 };
---=20
++
++#include <stdio.h>
++#include <inttypes.h>
++#include <assert.h>
++
++uint64_t maddu(uint64_t a, uint32_t rs, uint32_t rt)
++{
++    uint32_t lo = a;
++    uint32_t hi = a >> 32;
++    uint32_t rd;
++    uint64_t r;
++
++    __asm__ __volatile__ (
++            "    mtlo  %5\n"
++            "    mthi  %6\n"
++            "    maddu %0, %3, %4\n"
++            "    mflo  %1\n"
++            "    mfhi  %2\n"
++            : "=r" (rd), "=r" (lo), "=r" (hi)
++            : "r" (rs), "r" (rt), "r" (lo), "r" (hi));
++    r = ((uint64_t)hi << 32) | (uint32_t)lo;
++
++    assert(a + (uint64_t)rs * rt == r);
++    assert(rd == lo);
++
++    return r;
++}
++
++int main()
++{
++    assert(maddu(13, 17, 19) == 336);
++
++    return 0;
++}
+-- 
 2.7.4
