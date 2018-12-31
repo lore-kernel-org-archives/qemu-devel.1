@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36262)
+Received: from eggs.gnu.org ([208.118.235.92]:50610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gdmr1-00034u-Lt
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 20:58:56 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gdykf-0000dK-EC
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:41:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gdmqy-0007gn-Gp
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 20:58:55 -0500
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:34345)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gdmqy-0007aO-2e
-	for qemu-devel@nongnu.org; Sun, 30 Dec 2018 20:58:52 -0500
-Received: by mail-pf1-x429.google.com with SMTP id h3so12719044pfg.1
-	for <qemu-devel@nongnu.org>; Sun, 30 Dec 2018 17:58:51 -0800 (PST)
-References: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
-	<945511ac-d99a-d483-12a2-e6ad4dda09c2@linaro.org>
-	<CAObpvQktCHp-9V40z7kDaTU2CwRWSq8ZVS1PxRg3WK01TFXCzQ@mail.gmail.com>
-	<b4cdc06a-8114-48d2-2c0a-9fea876fee4a@linaro.org>
-	<CAObpvQmejWBh+RNz2vhk16-kcY_QveM_pSmM5ZeWqWv1d8AJzQ@mail.gmail.com>
-	<aeeb8c50-0293-e37b-9f9f-5d392b7e10f6@linaro.org>
-	<CAObpvQkjXLmXjB61w0Ecu8QfbA4+qBxLUVMjnDUD4dchOp+duA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <38b906b7-56a6-a0dc-95f3-365452b59099@linaro.org>
-Date: Mon, 31 Dec 2018 12:58:43 +1100
-MIME-Version: 1.0
-In-Reply-To: <CAObpvQkjXLmXjB61w0Ecu8QfbA4+qBxLUVMjnDUD4dchOp+duA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1gdykY-0005pL-L0
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:41:07 -0500
+Received: from mail-eopbgr750125.outbound.protection.outlook.com
+	([40.107.75.125]:23787
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gdykU-0005cl-P1
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:40:59 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 31 Dec 2018 14:40:44 +0000
+Message-ID: <BN6PR2201MB1251EB3052B10C95BE09D99DC6B20@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20181217200444.14812-1-aleksandar.markovic@rt-rk.com>,
+	<BN6PR2201MB1251D10E47C4B6103334BF3CC6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <BN6PR2201MB1251D10E47C4B6103334BF3CC6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] AVX support for TCG
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/6] target/mips: Amend MXU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,67 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nick Renieris <makren67@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jancraig@amazon.com" <jancraig@amazon.com>, Stefan Markovic <smarkovic@wavecomp.com>
 
-On 12/31/18 7:51 AM, Nick Renieris wrote:
-> The PS4's APU doesn't support AVX2 or AVX-512 so I'd be fine if I
-> didn't have enough time to implement them.
+> From: Aleksandar Markovic
+> Subject: Re: [PATCH 0/6] target/mips: Amend MXU support
+>=20
+> > From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> > Subject: [PATCH 0/6] target/mips: Amend MXU support
+> >
+> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> >
+> > Various updates to MXU ASE support.
+> >
+> > Aleksandar Markovic (6):
+> >  target/mips: MXU: Add missing opcodes/decoding for LX* instructions
+> >  target/mips: MXU: Add generic naming for optn2 constants
+> >  target/mips: MXU: Improve textual description
+> >  target/mips: MXU: Add handlers for logic instructions
+> >  target/mips: MXU: Add handlers for max/min instructions
+> >  target/mips: MXU: Add handlers for an align instruction
+>=20
+> If there is no objection, to get things going a little, I am going to int=
+egrate patches 1, 2, and 3 into next MIPS > pull request (scheduled shortly=
+), while it looks other patches need more time for review.
+>=20
+> (patch 1 is about "pool 17", issues around "pool 16" will be covered in a=
+ separate patch in v2)
+>=20
 
-Fair enough.  A goal like this is a good thing.
+I was told that comparing test runs on hardware and emulation
+didn't point to any issue other than those mentioned in previous
+responses (by Craig). I may try to integrate remaining three
+patches too (with fixes for discovered issues).
 
->> The tcg-op-gvec.h infrastructure allows for the different modes that avx+mmx
->> allows:
->>
->> (1) 64-bit operations,
->> (2) 128-bit operations, modifying only the low 128 bits,
->> (3) 128-bit operations, zeroing bits beyond the first 128,
->> (4) N*128-bit operations, zeroing bits beyond the first N*128.
-> 
-> I assume you mean 256-bit ops on (2) and (3), and N*256 on (4)? Low
-> 128 bits of a 128-bit number is just the number.
-
-No, I mean
-
- 0FFCC8   	paddb	%mm0, %mm1		(1)
- 660FFCC8 	paddb	%xmm0, %xmm1		(2)
- C5F1FCC8 	vpaddb	%xmm0, %xmm1, %xmm1	(3)
- C5F5FCC8 	vpaddb	%ymm0, %ymm1, %ymm1	(4)
- 62F17548FCC8 	vpaddb	%zmm0, %zmm1, %zmm1	(4)
-
-On a system that supports AVX, (2) and (3), while computing 128-bit inputs and
-producing a 128-bit output, have different effects on the rest of the 256-bit
-register.
-
-
-> So, I would need to implement every SSE instruction that isn't
-> SSE_SPECIAL at the moment, using tcg-op-gvec.h? Or more instructions
-> than that?
-
-You'd want to do all of the SSE instructions, SSE_SPECIAL and otherwise.
-
-I believe that we want to eliminate sse_op_table* and implement all insns
-within a switch statement, like SSE_SPECIAL.  Note that this does not mean one
-gigantic 5000 line function; appropriate use of helper functions should make
-the code for each switch entry fairly small.
-
-You'd want to re-organize the code generated by ops_sse.h using the (ptr, ptr,
-..., desc) signature of gen_helper_gvec_{2,2i,3,...} and expand them using
-tcg_gen_gvec_{2,2i,3,...}_ool.
-
-Examples of these are in accel/tcg/tcg-runtime-gvec.c and
-target/arm/vec_helper.c.  Use simd_oprsz to find out how much data should be
-operated upon.  The clear_high function should be moved somewhere that it can
-be shared.
-
-Once all of this has been done for SSE, then AVX is implemented simply
-adjusting the oprsz and maxsz arguments to tcg_gen_gvec_*.
-
-> Assuming I do this for SSE and AVX, I would not need to touch anything
-> else like the TCG back-end, as every gvec/vec op is already
-> implemented for i386, correct?
-
-Correct.
-
-
-r~
+> Thanks to everyone,
+> Aleksandar
