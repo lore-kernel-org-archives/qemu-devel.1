@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57137)
+Received: from eggs.gnu.org ([208.118.235.92]:57073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0y-0005T5-Pv
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:02 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0x-0003qv-98
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0w-0005Sg-VU
 	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:00 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60611 helo=mail.rt-rk.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz0v-0003oT-7j
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:58 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:60598 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gdz0w-0003oe-Qh
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:59 -0500
+	id 1gdz0u-0003mc-QY
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:57:57 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 31 Dec 2018 15:56:07 +0100
-Message-Id: <1546268200-26966-12-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 31 Dec 2018 15:56:04 +0100
+Message-Id: <1546268200-26966-9-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 11/44] target/mips: MXU: Add handler for an
- align instruction
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 08/44] target/mips: MXU: Improve the comment
+ containing MXU overview
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,228 +33,166 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add translation handler for S32ALNI MXU instruction.
+Improve textual description of MXU extension. These are mostly
+comment formatting changes.
 
 Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 197 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 194 insertions(+), 3 deletions(-)
+ target/mips/translate.c | 74 +++++++++++++++++++++++++++++--------------=
+------
+ 1 file changed, 44 insertions(+), 30 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 3b94521..4dcab34 100644
+index 74d16ce..e3a5a73 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -25098,6 +25098,199 @@ static void gen_mxu_Q8MAX_Q8MIN(DisasContext *ctx)
- 
- 
+@@ -1399,10 +1399,12 @@ enum {
+=20
+=20
  /*
-+ *                 MXU instruction category: align
-+ *                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- *    AN OVERVIEW OF MXU EXTENSION INSTRUCTION SET
+- *    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  *
+- * MXU (full name: MIPS eXtension/enhanced Unit) is an SIMD extension of=
+ MIPS32
++ *       AN OVERVIEW OF MXU EXTENSION INSTRUCTION SET
++ *       =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 + *
-+ *                       S32ALN     S32ALNI
-+ */
-+
-+/*
-+ *  S32ALNI XRc, XRb, XRa, optn3
-+ *    Arrange bytes from XRb and XRc according to one of five sets of
-+ *    rules determined by optn3, and place the result in XRa.
 + *
-+ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *  +-----------+-----+---+-----+-------+-------+-------+-----------+
-+ *  |  SPECIAL2 |optn3|0 0|x x x|  XRc  |  XRb  |  XRa  |MXU__POOL16|
-+ *  +-----------+-----+---+-----+-------+-------+-------+-----------+
++ * MXU (full name: MIPS eXtension/enhanced Unit) is a SIMD extension of =
+MIPS32
+  * instructions set. It is designed to fit the needs of signal, graphica=
+l and
+  * video processing applications. MXU instruction set is used in Xburst =
+family
+  * of microprocessors by Ingenic.
+@@ -1410,39 +1412,31 @@ enum {
+  * MXU unit contains 17 registers called X0-X16. X0 is always zero, and =
+X16 is
+  * the control register.
+  *
+- * The notation used in MXU assembler mnemonics
+- * --------------------------------------------
+  *
+- *  Registers:
++ *     The notation used in MXU assembler mnemonics
++ *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 + *
-+ */
-+static void gen_mxu_S32ALNI(DisasContext *ctx)
-+{
-+    uint32_t optn3, pad, XRc, XRb, XRa;
-+
-+    optn3 = extract32(ctx->opcode,  23, 3);
-+    pad   = extract32(ctx->opcode,  21, 2);
-+    XRc   = extract32(ctx->opcode, 14, 4);
-+    XRb   = extract32(ctx->opcode, 10, 4);
-+    XRa   = extract32(ctx->opcode,  6, 4);
-+
-+    if (unlikely(pad != 0)) {
-+        /* opcode padding incorrect -> do nothing */
-+    } else if (unlikely(XRa == 0)) {
-+        /* destination is zero register -> do nothing */
-+    } else if (unlikely((XRb == 0) && (XRc == 0))) {
-+        /* both operands zero registers -> just set destination to all 0s */
-+        tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
-+    } else if (unlikely(XRb == 0)) {
-+        /* XRb zero register -> just appropriatelly shift XRc into XRa */
-+        switch (optn3) {
-+        case MXU_OPTN3_PTN0:
-+            tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
-+            break;
-+        case MXU_OPTN3_PTN1:
-+        case MXU_OPTN3_PTN2:
-+        case MXU_OPTN3_PTN3:
-+            tcg_gen_shri_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1],
-+                             8 * (4 - optn3));
-+            break;
-+        case MXU_OPTN3_PTN4:
-+            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1]);
-+            break;
-+        }
-+    } else if (unlikely(XRc == 0)) {
-+        /* XRc zero register -> just appropriatelly shift XRb into XRa */
-+        switch (optn3) {
-+        case MXU_OPTN3_PTN0:
-+            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
-+            break;
-+        case MXU_OPTN3_PTN1:
-+        case MXU_OPTN3_PTN2:
-+        case MXU_OPTN3_PTN3:
-+            tcg_gen_shri_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1], 8 * optn3);
-+            break;
-+        case MXU_OPTN3_PTN4:
-+            tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
-+            break;
-+        }
-+    } else if (unlikely(XRb == XRc)) {
-+        /* both operands same -> just rotation or moving from any of them */
-+        switch (optn3) {
-+        case MXU_OPTN3_PTN0:
-+        case MXU_OPTN3_PTN4:
-+            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
-+            break;
-+        case MXU_OPTN3_PTN1:
-+        case MXU_OPTN3_PTN2:
-+        case MXU_OPTN3_PTN3:
-+            tcg_gen_rotli_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1], 8 * optn3);
-+            break;
-+        }
-+    } else {
-+        /* the most general case */
-+        switch (optn3) {
-+        case MXU_OPTN3_PTN0:
-+            {
-+                /*                                         */
-+                /*         XRb                XRc          */
-+                /*  +---------------+                      */
-+                /*  | A   B   C   D |    E   F   G   H     */
-+                /*  +-------+-------+                      */
-+                /*          |                              */
-+                /*         XRa                             */
-+                /*                                         */
-+
-+                tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
-+            }
-+            break;
-+        case MXU_OPTN3_PTN1:
-+            {
-+                /*                                         */
-+                /*         XRb                 XRc         */
-+                /*      +-------------------+              */
-+                /*    A | B   C   D       E | F   G   H    */
-+                /*      +---------+---------+              */
-+                /*                |                        */
-+                /*               XRa                       */
-+                /*                                         */
-+
-+                TCGv_i32 t0 = tcg_temp_new();
-+                TCGv_i32 t1 = tcg_temp_new();
-+
-+                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x00FFFFFF);
-+                tcg_gen_shli_i32(t0, t0, 8);
-+
-+                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFF000000);
-+                tcg_gen_shri_i32(t1, t1, 24);
-+
-+                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
-+
-+                tcg_temp_free(t1);
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case MXU_OPTN3_PTN2:
-+            {
-+                /*                                         */
-+                /*         XRb                 XRc         */
-+                /*          +-------------------+          */
-+                /*    A   B | C   D       E   F | G   H    */
-+                /*          +---------+---------+          */
-+                /*                    |                    */
-+                /*                   XRa                   */
-+                /*                                         */
-+
-+                TCGv_i32 t0 = tcg_temp_new();
-+                TCGv_i32 t1 = tcg_temp_new();
-+
-+                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x0000FFFF);
-+                tcg_gen_shli_i32(t0, t0, 16);
-+
-+                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFF0000);
-+                tcg_gen_shri_i32(t1, t1, 16);
-+
-+                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
-+
-+                tcg_temp_free(t1);
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case MXU_OPTN3_PTN3:
-+            {
-+                /*                                         */
-+                /*         XRb                 XRc         */
-+                /*              +-------------------+      */
-+                /*    A   B   C | D       E   F   G | H    */
-+                /*              +---------+---------+      */
-+                /*                        |                */
-+                /*                       XRa               */
-+                /*                                         */
-+
-+                TCGv_i32 t0 = tcg_temp_new();
-+                TCGv_i32 t1 = tcg_temp_new();
-+
-+                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x000000FF);
-+                tcg_gen_shli_i32(t0, t0, 24);
-+
-+                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFFFF00);
-+                tcg_gen_shri_i32(t1, t1, 8);
-+
-+                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
-+
-+                tcg_temp_free(t1);
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case MXU_OPTN3_PTN4:
-+            {
-+                /*                                         */
-+                /*         XRb                 XRc         */
-+                /*                     +---------------+   */
-+                /*    A   B   C   D    | E   F   G   H |   */
-+                /*                     +-------+-------+   */
-+                /*                             |           */
-+                /*                            XRa          */
-+                /*                                         */
-+
-+                tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1]);
-+            }
-+            break;
-+        }
-+    }
-+}
-+
-+
-+/*
-  * Decoding engine for MXU
-  * =======================
++ *  Register operands:
+  *
+  *   XRa, XRb, XRc, XRd - MXU registers
+  *   Rb, Rc, Rd, Rs, Rt - general purpose MIPS registers
+  *
+- *  Subfields:
++ *  Non-register operands:
+  *
+- *   aptn1              - 1-bit accumulate add/subtract pattern
+- *   aptn2              - 2-bit accumulate add/subtract pattern
+- *   eptn2              - 2-bit execute add/subtract pattern
+- *   optn2              - 2-bit operand pattern
+- *   optn3              - 3-bit operand pattern
+- *   sft4               - 4-bit shift amount
+- *   strd2              - 2-bit stride amount
++ *   aptn1 - 1-bit accumulate add/subtract pattern
++ *   aptn2 - 2-bit accumulate add/subtract pattern
++ *   eptn2 - 2-bit execute add/subtract pattern
++ *   optn2 - 2-bit operand pattern
++ *   optn3 - 3-bit operand pattern
++ *   sft4  - 4-bit shift amount
++ *   strd2 - 2-bit stride amount
+  *
+  *  Prefixes:
+  *
+- *   <Operation parallel level><Operand size>
+- *     S                         32
+- *     D                         16
+- *     Q                          8
+- *
+- *  Suffixes:
+- *
+- *   E - Expand results
+- *   F - Fixed point multiplication
+- *   L - Low part result
+- *   R - Doing rounding
+- *   V - Variable instead of immediate
+- *   W - Combine above L and V
++ *   Level of parallelism:                Operand size:
++ *    S - single operation at a time       32 - word
++ *    D - two operations in parallel       16 - half word
++ *    Q - four operations in parallel       8 - byte
+  *
+  *  Operations:
+  *
+@@ -1486,6 +1480,19 @@ enum {
+  *   SCOP  - Calculate x=E2=80=99s scope (-1, means x<0; 0, means x=3D=3D=
+0; 1, means x>0)
+  *   XOR   - Logical bitwise 'exclusive or' operation
+  *
++ *  Suffixes:
++ *
++ *   E - Expand results
++ *   F - Fixed point multiplication
++ *   L - Low part result
++ *   R - Doing rounding
++ *   V - Variable instead of immediate
++ *   W - Combine above L and V
++ *
++ *
++ *     The list of MXU instructions grouped by functionality
++ *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++ *
+  * Load/Store instructions           Multiplication instructions
+  * -----------------------           ---------------------------
+  *
+@@ -1563,6 +1570,13 @@ enum {
+  *  Q16SAT XRa, XRb, XRc              S32I2M XRa, Rb
+  *
+  *
++ *     The opcode organization of MXU instructions
++ *     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++ *
++ * The bits 31..26 of all MXU instructions are equal to 0x1C (also refer=
+red
++ * as opcode SPECIAL2 in the base MIPS ISA). The organization and meanin=
+g of
++ * other bits up to the instruction level is as follows:
++ *
+  *              bits
+  *             05..00
+  *
+@@ -1700,7 +1714,7 @@ enum {
+  *          =E2=94=82                            =E2=94=9C=E2=94=80 010 =
+=E2=94=80 OPC_MXU_D16MOVZ
+  *          =E2=94=82                            =E2=94=9C=E2=94=80 011 =
+=E2=94=80 OPC_MXU_D16MOVN
+  *          =E2=94=82                            =E2=94=9C=E2=94=80 100 =
+=E2=94=80 OPC_MXU_S32MOVZ
+- *          =E2=94=82                            =E2=94=94=E2=94=80 101 =
+=E2=94=80 OPC_MXU_S32MOV
++ *          =E2=94=82                            =E2=94=94=E2=94=80 101 =
+=E2=94=80 OPC_MXU_S32MOVN
+  *          =E2=94=82
+  *          =E2=94=82                               23..22
+  *          =E2=94=9C=E2=94=80 111010 =E2=94=80 OPC_MXU__POOL21 =E2=94=80=
+=E2=94=AC=E2=94=80 00 =E2=94=80 OPC_MXU_Q8MAC
+@@ -1712,10 +1726,10 @@ enum {
+  *          =E2=94=94=E2=94=80 111111 =E2=94=80 <not assigned>   (overla=
+ps with SDBBP)
+  *
+  *
+- *   Compiled after:
++ * Compiled after:
+  *
+  *   "XBurst=C2=AE Instruction Set Architecture MIPS eXtension/enhanced =
+Unit
+- *   Programming Manual", Ingenic Semiconductor Co, Ltd., 2017
++ *   Programming Manual", Ingenic Semiconductor Co, Ltd., revision June =
+2, 2017
   */
-@@ -25759,9 +25952,7 @@ static void decode_opc_mxu__pool16(CPUMIPSState *env, DisasContext *ctx)
-         generate_exception_end(ctx, EXCP_RI);
-         break;
-     case OPC_MXU_S32ALNI:
--        /* TODO: Implement emulation of S32ALNI instruction. */
--        MIPS_INVAL("OPC_MXU_S32ALNI");
--        generate_exception_end(ctx, EXCP_RI);
-+        gen_mxu_S32ALNI(ctx);
-         break;
-     case OPC_MXU_S32LUI:
-         /* TODO: Implement emulation of S32LUI instruction. */
--- 
+=20
+ enum {
+--=20
 2.7.4
