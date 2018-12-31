@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57613)
+Received: from eggs.gnu.org ([208.118.235.92]:57688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1c-0006HR-0g
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:42 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1e-0006Kq-Ib
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1a-0004du-Tr
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:39 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60640 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1c-0004hc-2e
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:42 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:60649 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gdz1Y-00043I-Nj
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:36 -0500
+	id 1gdz1b-00046O-IF
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:39 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 31 Dec 2018 15:56:29 +0100
-Message-Id: <1546268200-26966-34-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 31 Dec 2018 15:56:38 +0100
+Message-Id: <1546268200-26966-43-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 33/44] disas: nanoMIPS: Rename the decoder of
- 'gpr2.reg1' gpr encoding type
+Subject: [Qemu-devel] [PULL v2 42/44] tests/tcg: mips: Test R5900
+ three-operand MADD1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +28,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Fredrik Noring <noring@nocrew.org>
 
-Rename the decoder of 'gpr2.reg1' gpr encoding type in nanoMIPS
-disassembler.
+Test R5900 three-operand MADD1.
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- disas/nanomips.cpp | 6 +++---
- disas/nanomips.h   | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ tests/tcg/mips/mipsr5900/madd.c | 43 ++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 38 insertions(+), 5 deletions(-)
 
-diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index de96125..b0d0cf8 100644
---- a/disas/nanomips.cpp
-+++ b/disas/nanomips.cpp
-@@ -468,7 +468,7 @@ uint64 NMD::decode_gpr_gpr4(uint64 d)
+diff --git a/tests/tcg/mips/mipsr5900/madd.c b/tests/tcg/mips/mipsr5900/madd.c
+index 9ad2ea6..f6f215e 100644
+--- a/tests/tcg/mips/mipsr5900/madd.c
++++ b/tests/tcg/mips/mipsr5900/madd.c
+@@ -1,5 +1,5 @@
+ /*
+- * Test R5900-specific three-operand MADD.
++ * Test R5900-specific three-operand MADD and MADD1.
+  */
+ 
+ #include <stdio.h>
+@@ -29,12 +29,45 @@ int64_t madd(int64_t a, int32_t rs, int32_t rt)
+     return r;
  }
  
- 
--uint64 NMD::encode_rd2_reg1(uint64 d)
-+uint64 NMD::decode_gpr_gpr2_reg1(uint64 d)
++int64_t madd1(int64_t a, int32_t rs, int32_t rt)
++{
++    int32_t lo = a;
++    int32_t hi = a >> 32;
++    int32_t rd;
++    int64_t r;
++
++    __asm__ __volatile__ (
++            "    mtlo1 %5\n"
++            "    mthi1 %6\n"
++            "    madd1 %0, %3, %4\n"
++            "    mflo1 %1\n"
++            "    mfhi1 %2\n"
++            : "=r" (rd), "=r" (lo), "=r" (hi)
++            : "r" (rs), "r" (rt), "r" (lo), "r" (hi));
++    r = ((int64_t)hi << 32) | (uint32_t)lo;
++
++    assert(a + (int64_t)rs * rt == r);
++    assert(rd == lo);
++
++    return r;
++}
++
++static int64_t madd_variants(int64_t a, int32_t rs, int32_t rt)
++{
++    int64_t rd  = madd(a, rs, rt);
++    int64_t rd1 = madd1(a, rs, rt);
++
++    assert(rd == rd1);
++
++    return rd;
++}
++
+ static void verify_madd(int64_t a, int32_t rs, int32_t rt, int64_t expected)
  {
-     static uint64 register_list[] = {  4,  5,  6,  7 };
-     return renumber_registers(d, register_list,
-@@ -10445,7 +10445,7 @@ std::string NMD::MOVEP(uint64 instruction)
-     uint64 rd2_value = extract_rd2_3_8(instruction);
-     uint64 rsz4_value = extract_rsz4_4_2_1_0(instruction);
+-    assert(madd(a, rs, rt) == expected);
+-    assert(madd(a, -rs, rt) == a + a - expected);
+-    assert(madd(a, rs, -rt) == a + a - expected);
+-    assert(madd(a, -rs, -rt) == expected);
++    assert(madd_variants(a, rs, rt) == expected);
++    assert(madd_variants(a, -rs, rt) == a + a - expected);
++    assert(madd_variants(a, rs, -rt) == a + a - expected);
++    assert(madd_variants(a, -rs, -rt) == expected);
+ }
  
--    std::string rd2 = GPR(encode_rd2_reg1(rd2_value));
-+    std::string rd2 = GPR(decode_gpr_gpr2_reg1(rd2_value));
-     std::string re2 = GPR(encode_rd2_reg2(rd2_value));
-     /* !!!!!!!!!! - no conversion function */
-     std::string rsz4 = GPR(decode_gpr_gpr4_zero(rsz4_value));
-@@ -10474,7 +10474,7 @@ std::string NMD::MOVEP_REV_(uint64 instruction)
- 
-     std::string rs4 = GPR(decode_gpr_gpr4(rs4_value));
-     std::string rt4 = GPR(decode_gpr_gpr4(rt4_value));
--    std::string rd2 = GPR(encode_rd2_reg1(rd2_value));
-+    std::string rd2 = GPR(decode_gpr_gpr2_reg1(rd2_value));
-     std::string rs2 = GPR(encode_rd2_reg2(rd2_value));
-     /* !!!!!!!!!! - no conversion function */
- 
-diff --git a/disas/nanomips.h b/disas/nanomips.h
-index c1d3a3b..d928757 100644
---- a/disas/nanomips.h
-+++ b/disas/nanomips.h
-@@ -110,7 +110,7 @@ private:
-     uint64 encode_rd1_from_rd(uint64 d);
-     uint64 decode_gpr_gpr4_zero(uint64 d);
-     uint64 decode_gpr_gpr4(uint64 d);
--    uint64 encode_rd2_reg1(uint64 d);
-+    uint64 decode_gpr_gpr2_reg1(uint64 d);
-     uint64 encode_rd2_reg2(uint64 d);
- 
-     uint64 copy(uint64 d);
+ int main()
 -- 
 2.7.4
