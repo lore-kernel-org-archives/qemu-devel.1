@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57688)
+Received: from eggs.gnu.org ([208.118.235.92]:57693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1e-0006Kq-Ib
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1e-0006Kv-Lp
 	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1c-0004hc-2e
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1b-0004fm-Ix
 	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:42 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60649 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:60648 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gdz1b-00046O-IF
+	id 1gdz1b-00046E-52
 	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:39 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 31 Dec 2018 15:56:38 +0100
-Message-Id: <1546268200-26966-43-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 31 Dec 2018 15:56:37 +0100
+Message-Id: <1546268200-26966-42-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 42/44] tests/tcg: mips: Test R5900
- three-operand MADD1
+Subject: [Qemu-devel] [PULL v2 41/44] tests/tcg: mips: Test R5900
+ three-operand MADD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +30,44 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-Test R5900 three-operand MADD1.
+Test R5900 three-operand MADD.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- tests/tcg/mips/mipsr5900/madd.c | 43 ++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 38 insertions(+), 5 deletions(-)
+ tests/tcg/mips/mipsr5900/Makefile |  1 +
+ tests/tcg/mips/mipsr5900/madd.c   | 45 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
+ create mode 100644 tests/tcg/mips/mipsr5900/madd.c
 
+diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
+index a1c388b..97ca2a6 100644
+--- a/tests/tcg/mips/mipsr5900/Makefile
++++ b/tests/tcg/mips/mipsr5900/Makefile
+@@ -10,6 +10,7 @@ CFLAGS  = -Wall -mabi=32 -march=r5900 -static
+ 
+ TESTCASES = div1.tst
+ TESTCASES += divu1.tst
++TESTCASES += madd.tst
+ TESTCASES += mflohi1.tst
+ TESTCASES += mtlohi1.tst
+ TESTCASES += mult.tst
 diff --git a/tests/tcg/mips/mipsr5900/madd.c b/tests/tcg/mips/mipsr5900/madd.c
-index 9ad2ea6..f6f215e 100644
---- a/tests/tcg/mips/mipsr5900/madd.c
+new file mode 100644
+index 0000000..9ad2ea6
+--- /dev/null
 +++ b/tests/tcg/mips/mipsr5900/madd.c
-@@ -1,5 +1,5 @@
- /*
-- * Test R5900-specific three-operand MADD.
-+ * Test R5900-specific three-operand MADD and MADD1.
-  */
- 
- #include <stdio.h>
-@@ -29,12 +29,45 @@ int64_t madd(int64_t a, int32_t rs, int32_t rt)
-     return r;
- }
- 
-+int64_t madd1(int64_t a, int32_t rs, int32_t rt)
+@@ -0,0 +1,45 @@
++/*
++ * Test R5900-specific three-operand MADD.
++ */
++
++#include <stdio.h>
++#include <inttypes.h>
++#include <assert.h>
++
++int64_t madd(int64_t a, int32_t rs, int32_t rt)
 +{
 +    int32_t lo = a;
 +    int32_t hi = a >> 32;
@@ -62,11 +75,11 @@ index 9ad2ea6..f6f215e 100644
 +    int64_t r;
 +
 +    __asm__ __volatile__ (
-+            "    mtlo1 %5\n"
-+            "    mthi1 %6\n"
-+            "    madd1 %0, %3, %4\n"
-+            "    mflo1 %1\n"
-+            "    mfhi1 %2\n"
++            "    mtlo %5\n"
++            "    mthi %6\n"
++            "    madd %0, %3, %4\n"
++            "    mflo %1\n"
++            "    mfhi %2\n"
 +            : "=r" (rd), "=r" (lo), "=r" (hi)
 +            : "r" (rs), "r" (rt), "r" (lo), "r" (hi));
 +    r = ((int64_t)hi << 32) | (uint32_t)lo;
@@ -77,28 +90,19 @@ index 9ad2ea6..f6f215e 100644
 +    return r;
 +}
 +
-+static int64_t madd_variants(int64_t a, int32_t rs, int32_t rt)
++static void verify_madd(int64_t a, int32_t rs, int32_t rt, int64_t expected)
 +{
-+    int64_t rd  = madd(a, rs, rt);
-+    int64_t rd1 = madd1(a, rs, rt);
-+
-+    assert(rd == rd1);
-+
-+    return rd;
++    assert(madd(a, rs, rt) == expected);
++    assert(madd(a, -rs, rt) == a + a - expected);
++    assert(madd(a, rs, -rt) == a + a - expected);
++    assert(madd(a, -rs, -rt) == expected);
 +}
 +
- static void verify_madd(int64_t a, int32_t rs, int32_t rt, int64_t expected)
- {
--    assert(madd(a, rs, rt) == expected);
--    assert(madd(a, -rs, rt) == a + a - expected);
--    assert(madd(a, rs, -rt) == a + a - expected);
--    assert(madd(a, -rs, -rt) == expected);
-+    assert(madd_variants(a, rs, rt) == expected);
-+    assert(madd_variants(a, -rs, rt) == a + a - expected);
-+    assert(madd_variants(a, rs, -rt) == a + a - expected);
-+    assert(madd_variants(a, -rs, -rt) == expected);
- }
- 
- int main()
++int main()
++{
++    verify_madd(13, 17, 19, 336);
++
++    return 0;
++}
 -- 
 2.7.4
