@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57512)
+Received: from eggs.gnu.org ([208.118.235.92]:57613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1W-0006BI-Qv
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:40 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1c-0006HR-0g
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1R-0004Rn-WC
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:34 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60643 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1a-0004du-Tr
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:39 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:60640 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gdz1J-00043l-Ai
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:22 -0500
+	id 1gdz1Y-00043I-Nj
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:36 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 31 Dec 2018 15:56:31 +0100
-Message-Id: <1546268200-26966-36-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 31 Dec 2018 15:56:29 +0100
+Message-Id: <1546268200-26966-34-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 35/44] disas: nanoMIPS: Rename the decoder of
- 'gpr2.reg2' gpr encoding type
+Subject: [Qemu-devel] [PULL v2 33/44] disas: nanoMIPS: Rename the decoder of
+ 'gpr2.reg1' gpr encoding type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,7 +30,7 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Rename the decoder of 'gpr2.reg2' gpr encoding type in nanoMIPS
+Rename the decoder of 'gpr2.reg1' gpr encoding type in nanoMIPS
 disassembler.
 
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
@@ -41,48 +41,48 @@ Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index c3b2bec..06d2400 100644
+index de96125..b0d0cf8 100644
 --- a/disas/nanomips.cpp
 +++ b/disas/nanomips.cpp
-@@ -498,7 +498,7 @@ uint64 NMD::decode_gpr_gpr2_reg1(uint64 d)
+@@ -468,7 +468,7 @@ uint64 NMD::decode_gpr_gpr4(uint64 d)
  }
  
  
--uint64 NMD::encode_rd2_reg2(uint64 d)
-+uint64 NMD::decode_gpr_gpr2_reg2(uint64 d)
+-uint64 NMD::encode_rd2_reg1(uint64 d)
++uint64 NMD::decode_gpr_gpr2_reg1(uint64 d)
  {
-     static uint64 register_list[] = {  5,  6,  7,  8 };
+     static uint64 register_list[] = {  4,  5,  6,  7 };
      return renumber_registers(d, register_list,
-@@ -10468,7 +10468,7 @@ std::string NMD::MOVEP(uint64 instruction)
+@@ -10445,7 +10445,7 @@ std::string NMD::MOVEP(uint64 instruction)
+     uint64 rd2_value = extract_rd2_3_8(instruction);
      uint64 rsz4_value = extract_rsz4_4_2_1_0(instruction);
  
-     std::string rd2 = GPR(decode_gpr_gpr2_reg1(rd2_value));
--    std::string re2 = GPR(encode_rd2_reg2(rd2_value));
-+    std::string re2 = GPR(decode_gpr_gpr2_reg2(rd2_value));
+-    std::string rd2 = GPR(encode_rd2_reg1(rd2_value));
++    std::string rd2 = GPR(decode_gpr_gpr2_reg1(rd2_value));
+     std::string re2 = GPR(encode_rd2_reg2(rd2_value));
      /* !!!!!!!!!! - no conversion function */
      std::string rsz4 = GPR(decode_gpr_gpr4_zero(rsz4_value));
-     std::string rtz4 = GPR(decode_gpr_gpr4_zero(rtz4_value));
-@@ -10497,7 +10497,7 @@ std::string NMD::MOVEP_REV_(uint64 instruction)
+@@ -10474,7 +10474,7 @@ std::string NMD::MOVEP_REV_(uint64 instruction)
+ 
      std::string rs4 = GPR(decode_gpr_gpr4(rs4_value));
      std::string rt4 = GPR(decode_gpr_gpr4(rt4_value));
-     std::string rd2 = GPR(decode_gpr_gpr2_reg1(rd2_value));
--    std::string rs2 = GPR(encode_rd2_reg2(rd2_value));
-+    std::string rs2 = GPR(decode_gpr_gpr2_reg2(rd2_value));
+-    std::string rd2 = GPR(encode_rd2_reg1(rd2_value));
++    std::string rd2 = GPR(decode_gpr_gpr2_reg1(rd2_value));
+     std::string rs2 = GPR(encode_rd2_reg2(rd2_value));
      /* !!!!!!!!!! - no conversion function */
  
-     return img::format("MOVEP %s, %s, %s, %s", rs4, rt4, rd2, rs2);
 diff --git a/disas/nanomips.h b/disas/nanomips.h
-index d928757..9df1ab2 100644
+index c1d3a3b..d928757 100644
 --- a/disas/nanomips.h
 +++ b/disas/nanomips.h
-@@ -111,7 +111,7 @@ private:
+@@ -110,7 +110,7 @@ private:
+     uint64 encode_rd1_from_rd(uint64 d);
      uint64 decode_gpr_gpr4_zero(uint64 d);
      uint64 decode_gpr_gpr4(uint64 d);
-     uint64 decode_gpr_gpr2_reg1(uint64 d);
--    uint64 encode_rd2_reg2(uint64 d);
-+    uint64 decode_gpr_gpr2_reg2(uint64 d);
+-    uint64 encode_rd2_reg1(uint64 d);
++    uint64 decode_gpr_gpr2_reg1(uint64 d);
+     uint64 encode_rd2_reg2(uint64 d);
  
      uint64 copy(uint64 d);
-     int64 copy(int64 d);
 -- 
 2.7.4
