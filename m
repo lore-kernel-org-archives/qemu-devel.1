@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57693)
+Received: from eggs.gnu.org ([208.118.235.92]:57686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1e-0006Kv-Lp
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:44 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1e-0006Kn-Hm
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1b-0004fm-Ix
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gdz1b-0004fx-KV
 	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:42 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60648 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:60646 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gdz1b-00046E-52
+	id 1gdz1b-00045d-6l
 	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 09:58:39 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 31 Dec 2018 15:56:37 +0100
-Message-Id: <1546268200-26966-42-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 31 Dec 2018 15:56:36 +0100
+Message-Id: <1546268200-26966-41-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 41/44] tests/tcg: mips: Test R5900
- three-operand MADD
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 40/44] disas: nanoMIPS: Add a note on
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +31,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Fredrik Noring <noring@nocrew.org>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Test R5900 three-operand MADD.
+Add "nanoMIPS32 Instruction Set Technical Reference Manual" as
+a reference.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- tests/tcg/mips/mipsr5900/Makefile |  1 +
- tests/tcg/mips/mipsr5900/madd.c   | 45 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 46 insertions(+)
- create mode 100644 tests/tcg/mips/mipsr5900/madd.c
+ disas/nanomips.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/tests/tcg/mips/mipsr5900/Makefile b/tests/tcg/mips/mipsr5900/Makefile
-index a1c388b..97ca2a6 100644
---- a/tests/tcg/mips/mipsr5900/Makefile
-+++ b/tests/tcg/mips/mipsr5900/Makefile
-@@ -10,6 +10,7 @@ CFLAGS  = -Wall -mabi=32 -march=r5900 -static
- 
- TESTCASES = div1.tst
- TESTCASES += divu1.tst
-+TESTCASES += madd.tst
- TESTCASES += mflohi1.tst
- TESTCASES += mtlohi1.tst
- TESTCASES += mult.tst
-diff --git a/tests/tcg/mips/mipsr5900/madd.c b/tests/tcg/mips/mipsr5900/madd.c
-new file mode 100644
-index 0000000..9ad2ea6
---- /dev/null
-+++ b/tests/tcg/mips/mipsr5900/madd.c
-@@ -0,0 +1,45 @@
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index d6632bb..17f4c22 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -20,6 +20,13 @@
+  *
+  */
+=20
 +/*
-+ * Test R5900-specific three-operand MADD.
++ *  Documentation used while implementing this component:
++ *
++ *  [1] "MIPS=C2=AE Architecture Base: nanoMIPS32(tm) Instruction Set Te=
+chnical
++ *      Reference Manual", Revision 01.01, April 27, 2018
 + */
 +
-+#include <stdio.h>
-+#include <inttypes.h>
-+#include <assert.h>
-+
-+int64_t madd(int64_t a, int32_t rs, int32_t rt)
-+{
-+    int32_t lo = a;
-+    int32_t hi = a >> 32;
-+    int32_t rd;
-+    int64_t r;
-+
-+    __asm__ __volatile__ (
-+            "    mtlo %5\n"
-+            "    mthi %6\n"
-+            "    madd %0, %3, %4\n"
-+            "    mflo %1\n"
-+            "    mfhi %2\n"
-+            : "=r" (rd), "=r" (lo), "=r" (hi)
-+            : "r" (rs), "r" (rt), "r" (lo), "r" (hi));
-+    r = ((int64_t)hi << 32) | (uint32_t)lo;
-+
-+    assert(a + (int64_t)rs * rt == r);
-+    assert(rd == lo);
-+
-+    return r;
-+}
-+
-+static void verify_madd(int64_t a, int32_t rs, int32_t rt, int64_t expected)
-+{
-+    assert(madd(a, rs, rt) == expected);
-+    assert(madd(a, -rs, rt) == a + a - expected);
-+    assert(madd(a, rs, -rt) == a + a - expected);
-+    assert(madd(a, -rs, -rt) == expected);
-+}
-+
-+int main()
-+{
-+    verify_madd(13, 17, 19, 336);
-+
-+    return 0;
-+}
--- 
+ extern "C" {
+ #include "qemu/osdep.h"
+ #include "disas/bfd.h"
+--=20
 2.7.4
