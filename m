@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50240)
+Received: from eggs.gnu.org ([208.118.235.92]:50916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1geBXb-0000rW-Ge
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 23:20:32 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1geBbi-000261-CU
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 23:24:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1geBXW-0000y4-KN
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 23:20:31 -0500
-Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:36642)
+	(envelope-from <programmingkidx@gmail.com>) id 1geBbf-000263-8I
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 23:24:46 -0500
+Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:50686)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1geBXW-0000vx-Bp
-	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 23:20:26 -0500
-Received: by mail-it1-x141.google.com with SMTP id c9so35452709itj.1
-	for <qemu-devel@nongnu.org>; Mon, 31 Dec 2018 20:20:25 -0800 (PST)
-Received: from [192.168.0.2] (d14-69-20-184.try.wideopenwest.com.
-	[69.14.184.20]) by smtp.gmail.com with ESMTPSA id
-	18sm20046652itk.28.2018.12.31.20.20.23 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 31 Dec 2018 20:20:24 -0800 (PST)
+	id 1geBbf-00024Z-3V
+	for qemu-devel@nongnu.org; Mon, 31 Dec 2018 23:24:43 -0500
+Received: by mail-it1-x144.google.com with SMTP id z7so37451428iti.0
+	for <qemu-devel@nongnu.org>; Mon, 31 Dec 2018 20:24:43 -0800 (PST)
 From: Programmingkid <programmingkidx@gmail.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Mon, 31 Dec 2018 23:20:24 -0500
-References: <mailman.167.1546275635.22013.qemu-devel@nongnu.org>
-In-Reply-To: <mailman.167.1546275635.22013.qemu-devel@nongnu.org>
-Message-Id: <B4B164B9-DCEE-41B2-ACF5-81D4FCBFF23B@gmail.com>
-Subject: Re: [Qemu-devel] Qemu-devel Digest, Vol 189, Issue 424
+Date: Mon, 31 Dec 2018 23:24:41 -0500
+References: <B4B164B9-DCEE-41B2-ACF5-81D4FCBFF23B@gmail.com>
+Message-Id: <EB385199-ACC7-4B87-97E7-4C13610AA28F@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/52] Audio 5.1 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,7 +28,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?us-ascii?B?PT9VVEYtOD9CP1M4V1Jkc09oWjhPeklGcHZiSFREb1c0PT89?= <dirty.ice.hu@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
 
 > On Dec 31, 2018, at 12:00 PM, qemu-devel-request@nongnu.org wrote:
@@ -127,20 +122,20 @@ guest yet?=20
 >>>>>> CC      audio/coreaudio.o
 >>>>>> audio/coreaudio.c:413:49: error: unknown type name 'HWVocieOut'; =
 did you mean
->>>>>>    'HWVoiceOut'?
+>>>>>>   'HWVoiceOut'?
 >>>>>> COREAUDIO_WRAPPER_FUNC(get_buffer_out, void *, (HWVocieOut *hw, =
 size_t *size),
->>>>>>                                              ^~~~~~~~~~
->>>>>>                                              HWVoiceOut
+>>>>>>                                             ^~~~~~~~~~
+>>>>>>                                             HWVoiceOut
 >>>>>>=20
 >>>>>>=20
 >>>>>> audio/coreaudio.c:578:29: error: passing 'struct audio_pcm_info' =
 to parameter of
->>>>>>    incompatible type 'struct audio_pcm_info *'; take the address =
+>>>>>>   incompatible type 'struct audio_pcm_info *'; take the address =
 with &
->>>>>>      coreaudio_get_flags(hw->info, as);
->>>>>>                          ^~~~~~~~
->>>>>>                          &
+>>>>>>     coreaudio_get_flags(hw->info, as);
+>>>>>>                         ^~~~~~~~
+>>>>>>                         &
 >>>>>>=20
 >>>>>>=20
 >>>>>=20
@@ -196,5 +191,5 @@ way
 > Zoltan
 
 
-Hi how do you want me to test your theory? Revert the patch? If I did =
-would QEMU still compile?=20
+Hi how do you want me to test your theory? Revert the patch? If I did I =
+don't think QEMU would still compile.=20
