@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54718)
+Received: from eggs.gnu.org ([208.118.235.92]:55186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1geeZt-0004wb-Q5
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:20:52 -0500
+	(envelope-from <andrew@aj.id.au>) id 1geebT-0005xP-2v
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:22:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1geeZl-0002Nk-4C
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:20:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34348)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1geeZj-0002La-76
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:20:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1geeZh-0001Qe-9S
-	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 11:20:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 409D32E80C7
-	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 11:20:37 +0000 (UTC)
+	(envelope-from <andrew@aj.id.au>) id 1geebN-0003FE-Tj
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:22:25 -0500
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:47001)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <andrew@aj.id.au>) id 1geebN-0003EM-EU
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:22:21 -0500
+Message-Id: <1546428136.1511068.1623418624.167C3723@webmail.messagingengine.com>
+From: Andrew Jeffery <andrew@aj.id.au>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 02 Jan 2019 11:08:33 -0000
-From: Thomas Huth <1810000@bugs.launchpad.net>
-Reply-To: Bug 1810000 <1810000@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154603590627.5548.1380267988808710453.malonedeb@wampee.canonical.com>
-Message-Id: <154642731349.4953.17413195003535364372.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810000] Re: qemu system emulator crashed with
- the attachment of usb-bt-dongle device
+Date: Wed, 02 Jan 2019 21:52:16 +1030
+In-Reply-To: <20190102110612.20387-1-joel@jms.id.au>
+References: <20190102110612.20387-1-joel@jms.id.au>
+Subject: Re: [Qemu-devel] [PATCH] gitdm: Add other IBMers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Joel Stanley <joel@jms.id.au>, =?utf-8?Q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
-Thanks for the bug report! Unfortunately, the bluetooth code in QEMU is
-completely unmaintained and quite bit-rotten already, so it is already
-marked as deprecated and will be removed soon unless somebody steps up
-and volunteers to maintain it:
+On Wed, 2 Jan 2019, at 21:36, Joel Stanley wrote:
+> Here are some IBMers who use their personal addresses when submitting
+> patches.
+> 
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
 
- https://qemu.weilnetz.de/doc/qemu-doc.html#bluetooth-_0028since-
-3_002e1_0029
+For the addition of my address:
 
-For the time being, you likely have to use "-device pci-ohci" instead of
-"-device qemu-xhci" if you want to try to use it...
+Acked-by: Andrew Jeffery <andrew@aj.id.au>
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810000
-
-Title:
-  qemu system emulator crashed with the attachment of usb-bt-dongle
-  device
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am testing usb-bt-dongle device on xchi host controller, and found
-  that the qemu crashed directly with an assertion failer.
-
-  Here is the information to reproduce the crash:
-
-  Qemu git revision: 9b2e891ec5ccdb4a7d583b77988848282606fdea
-  System emulator: qemu-x86_64
-  VM image: https://people.debian.org/~aurel32/qemu/amd64/debian_squeeze_am=
-d64_desktop.qcow2
-  CommandLine: qemu-system-x86_64 -M q35 -device qemu-xhci,id=3Dxhci -enabl=
-e-kvm -device usb-bt-dongle  -hda ./debian_wheezy_amd64_standard.qcow2
-
-  Error message:
-
-  qemu-system-x86_64: /build/qemu-
-  Eap4uc/qemu-2.11+dfsg/hw/usb/core.c:592: usb_packet_copy: Assertion
-  `p->actual_length + bytes <=3D iov->size' failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810000/+subscriptions
+> ---
+>  contrib/gitdm/group-map-ibm | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/contrib/gitdm/group-map-ibm b/contrib/gitdm/group-map-ibm
+> index b66db5f4a825..6c0570107d65 100644
+> --- a/contrib/gitdm/group-map-ibm
+> +++ b/contrib/gitdm/group-map-ibm
+> @@ -2,5 +2,10 @@
+>  # Some IBM contributors submit via another domain
+>  #
+>  
+> +aik@ozlabs.ru
+> +andrew@aj.id.au
+> +benh@kernel.crashing.org
+>  clg@kaod.org
+>  groug@kaod.org
+> +joel@jms.id.au
+> +sjitindarsingh@gmail.com
+> -- 
+> 2.19.1
+> 
