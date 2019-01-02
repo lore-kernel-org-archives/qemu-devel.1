@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57751)
+Received: from eggs.gnu.org ([208.118.235.92]:57744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geYK2-0001i7-IS
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 23:40:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1geYK2-0001hq-Az
+	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 23:40:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geYK1-0007oP-6O
+	(envelope-from <dgibson@ozlabs.org>) id 1geYK1-0007oJ-5t
 	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 23:40:02 -0500
-Date: Wed, 2 Jan 2019 15:09:00 +1100
+Date: Wed, 2 Jan 2019 15:17:31 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190102040900.GL27457@umbus.fritz.box>
+Message-ID: <20190102041731.GP27457@umbus.fritz.box>
 References: <cover.1546394798.git.balaton@eik.bme.hu>
-	<fc40f941cf84750609e1093eca98fd9248a0981e.1546394798.git.balaton@eik.bme.hu>
+	<fa4665529f65d02a924437b18e90686b173676f6.1546394798.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="umrsQkkrw7viUWFs"
+	protocol="application/pgp-signature"; boundary="bvgsfYmVhxWy/2TA"
 Content-Disposition: inline
-In-Reply-To: <fc40f941cf84750609e1093eca98fd9248a0981e.1546394798.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH 1/8] smbus: Add a helper to generate SPD
- EEPROM data
+In-Reply-To: <fa4665529f65d02a924437b18e90686b173676f6.1546394798.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH 6/8] ppc4xx: Pass array index to function
+ instead of pointer into the array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,202 +26,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---umrsQkkrw7viUWFs
+--bvgsfYmVhxWy/2TA
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, Jan 02, 2019 at 03:06:38AM +0100, BALATON Zoltan wrote:
-> There are several boards with SPD EEPROMs that are now using
-> duplicated or slightly different hard coded data. Add a helper to
-> generate SPD data for a memory module of given type and size that
-> could be used by these boards (either as is or with further changes if
-> needed) which should help cleaning this up and avoid further duplication.
+> The sdram_set_bcr() function in ppc440_uc.c takes a pointer into an
+> array then calculates its index from that. It's simpler and easier to
+> just pass the index which simplifies both the function and its callers.
 >=20
 > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  hw/i2c/smbus_eeprom.c  | 128 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  include/hw/i2c/smbus.h |   3 ++
->  2 files changed, 131 insertions(+)
+>  hw/ppc/ppc440_uc.c | 36 ++++++++++++++++--------------------
+>  1 file changed, 16 insertions(+), 20 deletions(-)
 >=20
-> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-> index f18aa3de35..a1f51eb921 100644
-> --- a/hw/i2c/smbus_eeprom.c
-> +++ b/hw/i2c/smbus_eeprom.c
-> @@ -23,6 +23,8 @@
->   */
+> diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+> index e46f59fba8..60dbb35eee 100644
+> --- a/hw/ppc/ppc440_uc.c
+> +++ b/hw/ppc/ppc440_uc.c
+> @@ -564,28 +564,26 @@ static target_ulong sdram_size(uint32_t bcr)
+>      return size;
+>  }
 > =20
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/units.h"
->  #include "hw/hw.h"
->  #include "hw/i2c/i2c.h"
->  #include "hw/i2c/smbus.h"
-> @@ -162,3 +164,129 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
->          smbus_eeprom_init_one(smbus, 0x50 + i, eeprom_buf + (i * 256));
+> -static void sdram_set_bcr(ppc440_sdram_t *sdram,
+> -                          uint32_t *bcrp, uint32_t bcr, int enabled)
+> +static void sdram_set_bcr(ppc440_sdram_t *sdram, int i,
+> +                          uint32_t bcr, int enabled)
+>  {
+> -    unsigned n =3D bcrp - sdram->bcr;
+> -
+> -    if (*bcrp & 1) {
+> -        /* Unmap RAM */
+> +    if (sdram->bcr[i] & 1) {
+> +        /* First unmap RAM if enabled */
+>          memory_region_del_subregion(get_system_memory(),
+> -                                    &sdram->containers[n]);
+> -        memory_region_del_subregion(&sdram->containers[n],
+> -                                    &sdram->ram_memories[n]);
+> -        object_unparent(OBJECT(&sdram->containers[n]));
+> +                                    &sdram->containers[i]);
+> +        memory_region_del_subregion(&sdram->containers[i],
+> +                                    &sdram->ram_memories[i]);
+> +        object_unparent(OBJECT(&sdram->containers[i]));
+>      }
+> -    *bcrp =3D bcr & 0xFFDEE001;
+> +    sdram->bcr[i] =3D bcr & 0xFFDEE001;
+>      if (enabled && (bcr & 1)) {
+> -        memory_region_init(&sdram->containers[n], NULL, "sdram-container=
+s",
+> +        memory_region_init(&sdram->containers[i], NULL, "sdram-container=
+s",
+>                             sdram_size(bcr));
+> -        memory_region_add_subregion(&sdram->containers[n], 0,
+> -                                    &sdram->ram_memories[n]);
+> +        memory_region_add_subregion(&sdram->containers[i], 0,
+> +                                    &sdram->ram_memories[i]);
+>          memory_region_add_subregion(get_system_memory(),
+>                                      sdram_base(bcr),
+> -                                    &sdram->containers[n]);
+> +                                    &sdram->containers[i]);
 >      }
 >  }
-> +
-> +/* Generate SDRAM SPD EEPROM data describing a module of type and size */
-> +uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size)
-> +{
-> +    uint8_t *spd;
-> +    uint8_t nbanks;
-> +    uint16_t density;
-> +    uint32_t size;
-> +    int min_log2, max_log2, sz_log2;
-> +    int i;
-> +
-> +    switch (type) {
-> +    case SDR:
-> +        min_log2 =3D 2;
-> +        max_log2 =3D 9;
-> +        break;
-> +    case DDR:
-> +        min_log2 =3D 5;
-> +        max_log2 =3D 12;
-> +        break;
-> +    case DDR2:
-> +        min_log2 =3D 7;
-> +        max_log2 =3D 14;
-> +        break;
-> +    default:
-> +        error_report("Unknown SDRAM type");
-> +        abort();
-
-The error handling might work a little cleaner if you give this
-function an Error ** parameter, then just pass in &error_abort from
-the callers.
-
-> +    }
-> +    size =3D ram_size >> 20; /* work in terms of megabytes */
-> +    if (size < 4) {
-> +        error_report("SDRAM size is too small");
-> +        return NULL;
-> +    }
-> +    sz_log2 =3D 31 - clz32(size);
-> +    size =3D 1U << sz_log2;
-> +    if (ram_size > size * MiB) {
-> +        warn_report("SDRAM size 0x"RAM_ADDR_FMT" is not a power of 2, "
-> +                    "truncating to %u MB", ram_size, size);
-> +    }
-> +    if (sz_log2 < min_log2) {
-> +        warn_report("Memory size is too small for SDRAM type, adjusting =
-type");
-> +        if (size >=3D 32) {
-> +            type =3D DDR;
-> +            min_log2 =3D 5;
-> +            max_log2 =3D 12;
-> +        } else {
-> +            type =3D SDR;
-> +            min_log2 =3D 2;
-> +            max_log2 =3D 9;
-> +        }
-
-What do these various fall back cases represent?  Are they bugs in the
-callers, or a user configuration error?
-
-If the first, we should just assert or abort.  If the second I think
-we should still die with a fatal error - allowing broken
-configurations to work with just a warning is kind of begging to
-maintain nasty compatiliby cruft in the future.
-
-> +    }
-> +
-> +    nbanks =3D 1;
-> +    while (sz_log2 > max_log2 && nbanks < 8) {
-> +        sz_log2--;
-> +        nbanks++;
-> +    }
-> +
-> +    if (size > (1ULL << sz_log2) * nbanks) {
-> +        warn_report("Memory size is too big for SDRAM, truncating");
-> +    }
-> +
-> +    /* split to 2 banks if possible to avoid a bug in MIPS Malta firmwar=
-e */
-> +    if (nbanks =3D=3D 1 && sz_log2 > min_log2) {
-> +        sz_log2--;
-> +        nbanks++;
-> +    }
-> +
-> +    density =3D 1ULL << (sz_log2 - 2);
-> +    switch (type) {
-> +    case DDR2:
-> +        density =3D (density & 0xe0) | (density >> 8 & 0x1f);
-> +        break;
-> +    case DDR:
-> +        density =3D (density & 0xf8) | (density >> 8 & 0x07);
-> +        break;
-> +    case SDR:
-> +    default:
-> +        density &=3D 0xff;
-> +        break;
-> +    }
-> +
-> +    spd =3D g_malloc0(256);
-> +    spd[0] =3D 128;   /* data bytes in EEPROM */
-> +    spd[1] =3D 8;     /* log2 size of EEPROM */
-> +    spd[2] =3D type;
-> +    spd[3] =3D 13;    /* row address bits */
-> +    spd[4] =3D 10;    /* column address bits */
-> +    spd[5] =3D (type =3D=3D DDR2 ? nbanks - 1 : nbanks);
-> +    spd[6] =3D 64;    /* module data width */
-> +                    /* reserved / data width high */
-> +    spd[8] =3D 4;     /* interface voltage level */
-> +    spd[9] =3D 0x25;  /* highest CAS latency */
-> +    spd[10] =3D 1;    /* access time */
-> +                    /* DIMM configuration 0 =3D non-ECC */
-> +    spd[12] =3D 0x82; /* refresh requirements */
-> +    spd[13] =3D 8;    /* primary SDRAM width */
-> +                    /* ECC SDRAM width */
-> +    spd[15] =3D (type =3D=3D DDR2 ? 0 : 1); /* reserved / delay for rand=
-om col rd */
-> +    spd[16] =3D 12;   /* burst lengths supported */
-> +    spd[17] =3D 4;    /* banks per SDRAM device */
-> +    spd[18] =3D 12;   /* ~CAS latencies supported */
-> +    spd[19] =3D (type =3D=3D DDR2 ? 0 : 1); /* reserved / ~CS latencies =
-supported */
-> +    spd[20] =3D 2;    /* DIMM type / ~WE latencies */
-> +                    /* module features */
-> +                    /* memory chip features */
-> +    spd[23] =3D 0x12; /* clock cycle time @ medium CAS latency */
-> +                    /* data access time */
-> +                    /* clock cycle time @ short CAS latency */
-> +                    /* data access time */
-> +    spd[27] =3D 20;   /* min. row precharge time */
-> +    spd[28] =3D 15;   /* min. row active row delay */
-> +    spd[29] =3D 20;   /* min. ~RAS to ~CAS delay */
-> +    spd[30] =3D 45;   /* min. active to precharge time */
-> +    spd[31] =3D density;
-> +    spd[32] =3D 20;   /* addr/cmd setup time */
-> +    spd[33] =3D 8;    /* addr/cmd hold time */
-> +    spd[34] =3D 20;   /* data input setup time */
-> +    spd[35] =3D 8;    /* data input hold time */
-> +
-> +    /* checksum */
-> +    for (i =3D 0; i < 63; i++) {
-> +        spd[63] +=3D spd[i];
-> +    }
-> +    return spd;
-> +}
-> diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
-> index d8b1b9ee81..0adc2991b5 100644
-> --- a/include/hw/i2c/smbus.h
-> +++ b/include/hw/i2c/smbus.h
-> @@ -93,4 +93,7 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t addre=
-ss, uint8_t *eeprom_buf);
->  void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
->                         const uint8_t *eeprom_spd, int size);
 > =20
-> +enum sdram_type { SDR =3D 0x4, DDR =3D 0x7, DDR2 =3D 0x8 };
-> +uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t size);
-> +
->  #endif
+> @@ -595,12 +593,10 @@ static void sdram_map_bcr(ppc440_sdram_t *sdram)
+> =20
+>      for (i =3D 0; i < sdram->nbanks; i++) {
+>          if (sdram->ram_sizes[i] !=3D 0) {
+> -            sdram_set_bcr(sdram,
+> -                          &sdram->bcr[i],
+> -                          sdram_bcr(sdram->ram_bases[i], sdram->ram_size=
+s[i]),
+> -                          1);
+> +            sdram_set_bcr(sdram, i, sdram_bcr(sdram->ram_bases[i],
+> +                                              sdram->ram_sizes[i]), 1);
+>          } else {
+> -            sdram_set_bcr(sdram, &sdram->bcr[i], 0, 0);
+> +            sdram_set_bcr(sdram, i, 0, 0);
+>          }
+>      }
+>  }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -229,24 +119,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---umrsQkkrw7viUWFs
+--bvgsfYmVhxWy/2TA
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwsOVoACgkQbDjKyiDZ
-s5K7yg//ciwBLDkO6sxqKPmTFZ13EstOKF7s41LXHpxo0fyUXGvlqpbgueiNkFLR
-lqW52D40j6o72OBr1+n+pN5WOKtU6UPp+8dCoQsKNlxHCEAMH+7y8UbWLJ1fN5G6
-iVcwog9w4HePc/ryjuV7O7tOWse4wYq/lQVbhgHpSO7qjnkG10UBBeTpVlOhbz7Q
-AFSS3dQ4RiT98IiPZhY04eKCxdZTO5Yl+mu99ilKFb4+1bVFkTkVQHbc+TQe/NnG
-DiTVzRzNgeMSleNkEUCX8lqkddUbtteKqvXtpdwSOOLbyzBGQL7e+CKO5Zf6AT9b
-jA/uhKlqDwALh7TAK38XbQy1QjQWmurHoryRyS+3bqzynBVf5KGfvB82KWaAq7vD
-5JhZYE8yL3siwE7hSTdWjAH8Mki6V222HS9e5ND+ZTwyFgmTo5XJlSH7u84JA1kn
-D2AvGGm2VnIOGxgRJOtKdbtZOt2w/xm0dx0wnUbvE0dB5qiSk5Nfd/OEzAYhfY6k
-Yi3mDEJ7H2L5XqJqLieYJfbK+ZfwJTt8vPoc5Ww0Fkh0jbscK1YUK125mtPlXrs+
-3O7ltk7wsVtvFK4/cE2iMEpvEm6i96BVedhV0f512GobWqf0Qttk1ZZfaRctICVx
-c4MUjYnJ24fGMEpHbIcBBtNzWppl0Q6WWT7Q+ZdRrthLkaX0+9s=
-=oVno
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwsO1sACgkQbDjKyiDZ
+s5JPKRAAqm0XHoC3UxWvf7KqiB35G0iPeWuZK7AIzfYD6+Yg/T/mOAKXboOY+hTp
+JKu60ifs27uhjPLVRLOwmz+k1iDqEaymI1n5z/yap4JpOR+shK5nj2a0NrxRhzHw
+yXcWsbc6rQtebHg7PbFpUPHEoSyi5bi9rIAfNtrF+/+ehcIN7yWAsio1Sg8C3ih2
+22ogFFE3D5DgebWNIcA5srPiuHj80mUc00mc4KLbMPPoE+U1fiXk52DK1+qlodMA
+VEruRRvXAyN/Q9ztyY00D4wnn1cBUNb48rGqIf2qtPJgC2yS053z6o24MdJl6G8o
+p7nLqgDjImr4b4/qSjYePSV4YasnOYoMDTVSL+PVwul7/g4doWUfki4p2FlMUnaD
+JYoWiVGS9wbAIFUV1IoRWzjxGxCncNutpzautR6Mx6STZjx63yvCyTadAoxAWEjA
+7psxBJZO554eUfGt59FZPASyPCWGrP4fNcvwVlrGZhObYMWRbe2qVqNJ6pDMfIkw
+fKN9GpbhtPehrD2L6NKlsIx55hlnG8P5byudQKyYJQlQb0WkcJQ1R41/IEwhxJxQ
+W8wmAtX9qR8GjxD6kVBtBtx5JNC4aIm58uNwUMMqClU/y/mdb0RBBGpqNkXQlAOe
+uRFYw7NswAWYQFiHMqO5jIgangfp9bdLSTKgNpAbZp7lYt3xs3k=
+=Y2b+
 -----END PGP SIGNATURE-----
 
---umrsQkkrw7viUWFs--
+--bvgsfYmVhxWy/2TA--
