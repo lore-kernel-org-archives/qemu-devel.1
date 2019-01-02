@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48286)
+Received: from eggs.gnu.org ([208.118.235.92]:50622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gehDM-0000De-S4
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:09:45 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gehJk-0002lO-Oh
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:16:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gehDL-0004x5-Us
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:09:44 -0500
-Date: Wed, 2 Jan 2019 14:09:36 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190102140936.GT24009@stefanha-x1.localdomain>
-References: <20181228145055.18039-1-jcfaracco@gmail.com>
+	(envelope-from <lvivier@redhat.com>) id 1gehJf-0005nW-4j
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:16:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53546)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gehJa-0005jT-Q2
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:16:11 -0500
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Wed,  2 Jan 2019 15:16:03 +0100
+Message-Id: <20190102141603.3681-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ceuyUbi+oA5bUa/n"
-Content-Disposition: inline
-In-Reply-To: <20181228145055.18039-1-jcfaracco@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] dmg: Fixing wrong dmg block type value for
- block terminator.
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] cpus: ignore ESRCH in qemu_cpu_kick_thread()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julio Faracco <jcfaracco@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
+We can have a race condition between qemu_cpu_kick_thread() and
+qemu_kvm_cpu_thread_fn() when we hotunplug a CPU. In this case,
+qemu_cpu_kick_thread() can try to kick a thread that is exiting.
+pthread_kill() returns an error and qemu is stopped by an exit(1).
 
---ceuyUbi+oA5bUa/n
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+   qemu:qemu_cpu_kick_thread: No such process
 
-On Fri, Dec 28, 2018 at 12:50:55PM -0200, Julio Faracco wrote:
-> This is a trivial patch to fix a wrong value for block terminator.
-> The old value was 0x7fffffff which is wrong. It was not affecting the
-> code because QEMU dmg block is not handling block terminator right now.
-> Neverthless, it should be fixed.
->=20
-> Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
-> ---
->  block/dmg.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+We can ignore safely this error.
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ cpus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Stefan
-
---ceuyUbi+oA5bUa/n
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcLMYgAAoJEJykq7OBq3PISnUIAIREEpoX4A1LE+QgN2ivsCUO
-DsRuyzOVfOmJQ2vj255xL664ZW/9F3/GLGVthRIJ6oBN40vLH4d0ZhBNFmmb1dvU
-Wk4ffsNHwxA+RoVjMrsSqKz9x1YtZlE+zatEKfX4pcmeL9O+KpzetoluW0q+0Dtm
-NhpIWT4D6dTadtsaYs56gedMjKOb1EO/HsQdUS2YE4mCp6OFH+QHitTTcUL8OM6G
-+Ip26+gaCTmhKRIMd/M0SFyr96W/QGMcaH4RTnoVH4oDUxeg8YL12/q0HAK2Ube4
-v0M8WiXd/zQX8+cUL2R6QQPEUh7o/Eo2GMI6Afvr0KKTw4KNIM5OmbxnK2ZlYh0=
-=MllY
------END PGP SIGNATURE-----
-
---ceuyUbi+oA5bUa/n--
+diff --git a/cpus.c b/cpus.c
+index 0ddeeefc14..4717490bd0 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1778,7 +1778,7 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
+     }
+     cpu->thread_kicked =3D true;
+     err =3D pthread_kill(cpu->thread->thread, SIG_IPI);
+-    if (err) {
++    if (err && err !=3D ESRCH) {
+         fprintf(stderr, "qemu:%s: %s", __func__, strerror(err));
+         exit(1);
+     }
+--=20
+2.20.1
