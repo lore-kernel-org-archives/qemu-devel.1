@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:34509)
+Received: from eggs.gnu.org ([208.118.235.92]:42087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gehwL-0004Os-8x
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:56:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1geiK6-0006Yt-RN
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:20:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gehw6-0004MB-IW
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:56:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:17090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gehw6-0004LL-6a
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:55:58 -0500
-Date: Wed, 2 Jan 2019 09:55:41 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190102095527-mutt-send-email-mst@kernel.org>
-References: <20181215120353.82786-1-liq3ea@163.com>
-	<20181215120353.82786-4-liq3ea@163.com>
-	<ed598a9a-ea9d-044e-1677-679a658676b0@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1geiK1-0008Jf-Pn
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:20:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1geiK1-0008Io-Ji
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:20:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1geiK0-00030p-Jw
+	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 15:20:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 957922E80C9
+	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 15:20:40 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed598a9a-ea9d-044e-1677-679a658676b0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] util: check the return value of
- fcntl in qemu_set_{block, nonblock}
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 02 Jan 2019 15:09:46 -0000
+From: Saverio Miroddi <1809665@bugs.launchpad.net>
+Reply-To: Bug 1809665 <1809665@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154566626385.25910.12711983515604457304.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154644178607.25119.8068492874125341562.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809665] Re: Xbox One controller USB passthrough
+ disconnections and stops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +37,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Li Qiang <liq3ea@163.com>, lvivier@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, marcandre.lureau@redhat.com, berrange@redhat.com, jasowang@redhat.com, liq3ea@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Wed, Jan 02, 2019 at 03:07:24PM +0100, Thomas Huth wrote:
-> On 2018-12-15 13:03, Li Qiang wrote:
-> > Assert that the return value is not an error. This is like commit
-> > 7e6478e7d4f for qemu_set_cloexec.
-> > 
-> > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > ---
-> >  util/oslib-posix.c | 8 ++++++--
-> >  1 file changed, 6 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> > index c1bee2a581..4ce1ba9ca4 100644
-> > --- a/util/oslib-posix.c
-> > +++ b/util/oslib-posix.c
-> > @@ -233,14 +233,18 @@ void qemu_set_block(int fd)
-> >  {
-> >      int f;
-> >      f = fcntl(fd, F_GETFL);
-> > -    fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
-> > +    assert(f != -1);
-> > +    f = fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
-> > +    assert(f != -1);
-> >  }
-> >  
-> >  void qemu_set_nonblock(int fd)
-> >  {
-> >      int f;
-> >      f = fcntl(fd, F_GETFL);
-> > -    fcntl(fd, F_SETFL, f | O_NONBLOCK);
-> > +    assert(f != -1);
-> > +    f = fcntl(fd, F_SETFL, f | O_NONBLOCK);
-> > +    assert(f != -1);
-> >  }
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
-> Michael, could you take this patch series through your vhost tree? Or
-> shall I pick them up for the qtests tree? In the latter case, please
-> provide an ACK for the second patch.
+So! These are the options and respective logs; they still don't make the
+controller work - it doesn't work at all.
 
-Pls go ahead and merge it.
+# option 1
 
--- 
-MST
+  -device nec-usb-xhci \
+  -device usb-tablet \
+  -device usb-host,vendorid=3D0x$VGAPT_XBOX_PAD_VEND_ID,productid=3D0x$VGAP=
+T_XBOX_PAD_PROD_ID \
+
+# log
+
+    libusb: error [udev_hotplug_event] ignoring udev action bind
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/1-10/bConfig=
+urationValue failed ret=3D-1 errno=3D2
+    libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try ag=
+ain
+    libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/=
+usb/001/019: No such file or directory
+    libusb: error [udev_hotplug_event] ignoring udev action bind
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/1-10/bConfig=
+urationValue failed ret=3D-1 errno=3D2
+    libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try ag=
+ain
+    libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/=
+usb/001/020: No such file or directory
+    libusb: error [udev_hotplug_event] ignoring udev action bind
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+    libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/1-10/bConfig=
+urationValue failed ret=3D-1 errno=3D2
+    libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try ag=
+ain
+    libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/=
+usb/001/021: No such file or directory
+    libusb: error [udev_hotplug_event] ignoring udev action bind
+
+# option 2
+
+    -device usb-ehci \
+    -device usb-tablet \
+    -device usb-host,vendorid=3D0x$VGAPT_XBOX_PAD_VEND_ID,productid=3D0x$VG=
+APT_XBOX_PAD_PROD_ID \
+
+# log
+
+    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
+ "Controller" (full speed) to bus "usb-bus.0", port "2" (high speed)
+    libusb: error [udev_hotplug_event] ignoring udev action bind
+    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
+ "Controller" (full speed) to bus "usb-bus.0", port "2" (high speed)
+    libusb: error [udev_hotplug_event] ignoring udev action bind
+    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
+ "Controller" (full speed) to bus "usb-bus.0", port "2" (high speed)
+    libusb: error [udev_hotplug_event] ignoring udev action bind
+
+I've tried another game controller with the second option:
+
+# option 2b
+
+    -device usb-ehci \
+    -device usb-tablet \
+    -device usb-host,vendorid=3D0x$VGAPT_ARCADE_STICK_VEND_ID,productid=3D0=
+x$VGAPT_ARCADE_STICK_PROD_ID \
+
+# log
+
+    libusb: error [udev_hotplug_event] ignoring udev action bind
+    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
+ "Arcade Fight Stick" (full speed) to bus "usb-bus.0", port "3" (high speed)
+    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
+ "Arcade Fight Stick" (full speed) to bus "usb-bus.0", port "3" (high speed)
+    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
+ "Arcade Fight Stick" (full speed) to bus "usb-bus.0", port "3" (high speed)
+
+and in this configuration, it doesn't work (it does with `-usb`).
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809665
+
+Title:
+  Xbox One controller USB passthrough disconnections and stops
+
+Status in QEMU:
+  New
+
+Bug description:
+  I can't properly passthrough my Xbox One controller to a virtual
+  machine; it causes USB disconnections on the host, ultimately
+  preventing it to work (at all) on the guest
+
+  I've seen a few other cases reported in other websites, which show the
+  same symptoms:
+
+  - https://www.reddit.com/r/VFIO/comments/97dhbw/qemu_w10_xbox_one_control=
+ler
+  - https://unix.stackexchange.com/questions/452751/how-can-i-pass-through-=
+an-xbox-one-controller-to-a-windows-vm-on-ubuntu
+
+  This is sample:
+
+      libusb: error [udev_hotplug_event] ignoring udev action bind
+      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+      libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try =
+again
+      libusb: error [_get_usbfs_fd] libusb couldn't open USB device
+          /dev/bus/usb/003/016: No such file or directory
+
+  I think this is a quite long-standing issue, as I've been experiencing
+  through several versions, including the current one (3.1).
+
+  I can reproduce this 100% of the times, on multiple host O/S
+  distributions (the current one being based on Ubuntu 18.04 x86-64).
+
+  I compile QEMU directly from source, and execute it via commandline;
+  the command is very long, however, the relevant part is standard (I
+  think):
+
+      -usb \
+      -device usb-tablet \
+      -device usb-host,vendorid=3D0x$VGAPT_XBOX_PAD_VEND_ID,productid=3D0x$=
+VGAPT_XBOX_PAD_PROD_ID \
+
+  The guest is Windows 10 64bit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809665/+subscriptions
