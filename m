@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52296)
+Received: from eggs.gnu.org ([208.118.235.92]:53743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gehOZ-0007Az-Dz
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:21:22 -0500
+	(envelope-from <philmd@redhat.com>) id 1gehVE-00012a-Ht
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:28:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gehOV-0000em-AA
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:21:19 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58258)
+	(envelope-from <philmd@redhat.com>) id 1gehVB-0005Q9-50
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:28:12 -0500
+Received: from mail-wr1-f49.google.com ([209.85.221.49]:45810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gehOV-0000dQ-4f
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:21:15 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gehOS-00022S-Rp
-	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 14:21:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D051C2E80D3
-	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 14:21:12 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gehVA-0005Pk-V2
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:28:09 -0500
+Received: by mail-wr1-f49.google.com with SMTP id t6so30633833wrr.12
+	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 06:28:08 -0800 (PST)
+References: <20190102141603.3681-1-lvivier@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c976232a-47a6-966d-4ab9-807e20525e31@redhat.com>
+Date: Wed, 2 Jan 2019 15:28:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 02 Jan 2019 14:13:15 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1795100 <1795100@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153818746845.29396.3425570709275982365.malonedeb@soybean.canonical.com>
-Message-Id: <154643839549.5596.5401722339840807959.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1795100] Re: VNC unix-domain socket unlink()ed
- prematurely
+In-Reply-To: <20190102141603.3681-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] cpus: ignore ESRCH in
+ qemu_cpu_kick_thread()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Added Daniel to the bug.
+On 1/2/19 3:16 PM, Laurent Vivier wrote:
+> We can have a race condition between qemu_cpu_kick_thread() and
+> qemu_kvm_cpu_thread_fn() when we hotunplug a CPU. In this case,
+> qemu_cpu_kick_thread() can try to kick a thread that is exiting.
+> pthread_kill() returns an error and qemu is stopped by an exit(1).
+> 
+>    qemu:qemu_cpu_kick_thread: No such process
+> 
+> We can ignore safely this error.
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
--- =
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1795100
-
-Title:
-  VNC unix-domain socket unlink()ed prematurely
-
-Status in QEMU:
-  New
-
-Bug description:
-  With qemu 3.0.0 (I don't believe this happened with previous
-  versions), if I tell it `-vnc unix:/path/to/vnc.sock`, qemu will
-  unlink() that file when the first client disconnects, meaning that
-  once I disconnect, I can't ever reconnect without restarting the VM.
-
-  A stupid testcase demonstrating the issue:
-
-  In terminal A:
-
-      $ qemu-system-x86_64 -vnc unix:$PWD/vnc.sock
-
-  In terminal B:
-
-      $ ls vnc.sock
-      vnc.sock
-      $ socat STDIO UNIX-CONNECT:vnc.sock <<<''
-      RFB 003.008
-      $ ls vnc.sock
-      ls: cannot access 'vnc.sock': No such file or directory
-
-  I have determined that the offending unlink() call is the one in
-  io/channel-socket.c:qio_channel_socket_close().  That call was first
-  introduced in commit d66f78e1eaa832f73c771d9df1b606fe75d52a50, which
-  first appeared in version 3.0.0.
-
-  This type of premature unlink() does not happen on monitor.sock with
-  `-monitor unix:/path/to/monitor.sock,server,nowait`.
-
-  I am not familiar enough with the QIO subsystem to suggest a fix that
-  fixes VNC, but preserves the QMP fix targeted in the offending commit.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1795100/+subscriptions
+> ---
+>  cpus.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/cpus.c b/cpus.c
+> index 0ddeeefc14..4717490bd0 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1778,7 +1778,7 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
+>      }
+>      cpu->thread_kicked = true;
+>      err = pthread_kill(cpu->thread->thread, SIG_IPI);
+> -    if (err) {
+> +    if (err && err != ESRCH) {
+>          fprintf(stderr, "qemu:%s: %s", __func__, strerror(err));
+>          exit(1);
+>      }
+> 
