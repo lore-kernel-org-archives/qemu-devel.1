@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:41246)
+Received: from eggs.gnu.org ([208.118.235.92]:44655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gee3H-0007nj-2E
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 05:47:07 -0500
+	(envelope-from <philmd@redhat.com>) id 1gee9G-000127-To
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 05:53:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gee3G-0005BB-Et
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 05:47:07 -0500
-Date: Wed, 2 Jan 2019 10:46:59 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190102104659.GG24009@stefanha-x1.localdomain>
-References: <20181221135803.9583-1-npes87184@gmail.com>
+	(envelope-from <philmd@redhat.com>) id 1gee8u-0000sR-6C
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 05:53:16 -0500
+Received: from mail-wr1-f41.google.com ([209.85.221.41]:35499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gee8t-0000Zq-Fs
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 05:52:55 -0500
+Received: by mail-wr1-f41.google.com with SMTP id 96so30096225wrb.2
+	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 02:52:46 -0800 (PST)
+References: <97851db5-df50-723b-6eb2-e591a31c3519@redhat.com>
+	<06856593-683C-45DC-A2FC-D8DD860BA85A@euphon.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b5593418-caa2-0f9c-8a00-6f1b52767f0f@redhat.com>
+Date: Wed, 2 Jan 2019 11:52:43 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xjyYRNSh/RebjC6o"
-Content-Disposition: inline
-In-Reply-To: <20181221135803.9583-1-npes87184@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] dmg: fix binary search
+In-Reply-To: <06856593-683C-45DC-A2FC-D8DD860BA85A@euphon.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Patchew down?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuchenlin <npes87184@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-trivial@nongnu.org
+To: Fam Zheng <fam@euphon.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 1/2/19 2:17 AM, Fam Zheng wrote:
+>> On Dec 30, 2018, at 08:09, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>
+>> I think patchew is having some trouble since at least 1 week:
+>> new series aren't added.
+> 
+> Thanks for the reminder, Phil. I fixed https on patches.org but forgot to switch the importer back from http. Now it’s back to work.
 
---xjyYRNSh/RebjC6o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The patches queue isn't even lost, awesome!
 
-On Fri, Dec 21, 2018 at 09:58:03PM +0800, yuchenlin wrote:
-> There is a possible hang in original binary searsh implemtation. That is
-> if chunk1 =3D 4, chunk2 =3D 5, chunk3 =3D 4, and we go else case.
->=20
-> The chunk1 will be still 4, and so on.
->=20
-> Signed-off-by: yuchenlin <npes87184@gmail.com>
-> ---
->  block/dmg.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Thanks :)
 
-Do you have an example dmg file that triggers this bug?
-
-> diff --git a/block/dmg.c b/block/dmg.c
-> index 50e91aef6d..0e05702f5d 100644
-> --- a/block/dmg.c
-> +++ b/block/dmg.c
-> @@ -572,14 +572,14 @@ static inline uint32_t search_chunk(BDRVDMGState *s=
-, uint64_t sector_num)
->  {
->      /* binary search */
->      uint32_t chunk1 =3D 0, chunk2 =3D s->n_chunks, chunk3;
-> -    while (chunk1 !=3D chunk2) {
-> +    while (chunk1 <=3D chunk2) {
->          chunk3 =3D (chunk1 + chunk2) / 2;
->          if (s->sectors[chunk3] > sector_num) {
-> -            chunk2 =3D chunk3;
-> +            chunk2 =3D chunk3 - 1;
-
-What if chunk1 =3D 0 and chunk2 =3D 1?  chunk3 =3D 0 and the new chunk2 val=
-ue
-would be 0xffffffff so the loop continues with out-of-bounds sectors[]
-accesses!
-
---xjyYRNSh/RebjC6o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcLJajAAoJEJykq7OBq3PIJw4H/Rm/gU4yon7+M0pl4VuikjjH
-K8DAKBg81jx8k7MJ9ps5YYEBruRUzbW3XszcuF8GW4JsXZdLCm61NuPwGsQeyL8r
-CgetPXdolvE5DUvyE7OtGZLhz5jlAn4jIc3AB5arwAdM75jvWmXR1SA9CzYAE1X3
-DozqOlxjqc2W0ld/a15tDaTCUpmnRf3DnxuwE8ukNyl7DmnbcHs7WP+Za/swQX6C
-r4GhtK0GUGT60X+/Gs8dQjxIfKR7Y8FXT5Yr2A8zlflamLXE2QDkuoXTozgJK8z1
-1FebUJaEy47r4N9vNQf1ZGE/GnAdFUkNxrz0hFutEMSSz1cjdQUZlUXtolzoG6c=
-=Oskr
------END PGP SIGNATURE-----
-
---xjyYRNSh/RebjC6o--
+Phil.
