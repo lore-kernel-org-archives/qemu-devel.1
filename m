@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47170)
+Received: from eggs.gnu.org ([208.118.235.92]:47620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1geh9c-0006LZ-0X
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:05:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1gehBG-0007gn-Bn
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:07:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1geh9Z-0001A9-1Q
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:05:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58758)
+	(envelope-from <thuth@redhat.com>) id 1gehBF-0002FN-KK
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:07:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1geh9U-00015F-4F
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:05:44 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2BCAAC06512E
-	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 14:05:39 +0000 (UTC)
-Received: from natto.ory.fergeau.eu (unknown [10.41.1.13])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id F1DEE1019632
-	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 14:05:38 +0000 (UTC)
-From: Christophe Fergeau <cfergeau@redhat.com>
-Date: Wed,  2 Jan 2019 15:05:35 +0100
-Message-Id: <20190102140535.11512-1-cfergeau@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gehBF-0002EQ-Cy
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:07:33 -0500
+References: <20181215120353.82786-1-liq3ea@163.com>
+	<20181215120353.82786-4-liq3ea@163.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ed598a9a-ea9d-044e-1677-679a658676b0@redhat.com>
+Date: Wed, 2 Jan 2019 15:07:24 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
+In-Reply-To: <20181215120353.82786-4-liq3ea@163.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] util: check the return value of
+ fcntl in qemu_set_{block, nonblock}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Li Qiang <liq3ea@163.com>, mst@redhat.com
+Cc: lvivier@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, marcandre.lureau@redhat.com, berrange@redhat.com, jasowang@redhat.com, liq3ea@gmail.com, qemu-devel@nongnu.org
 
-commit 8bca4613 added support for %% in json strings when interpolating,
-but in doing so, this broke handling of % when not interpolating as the
-'%' is skipped in both cases.
-This commit ensures we only try to handle %% when interpolating.
+On 2018-12-15 13:03, Li Qiang wrote:
+> Assert that the return value is not an error. This is like commit
+> 7e6478e7d4f for qemu_set_cloexec.
+> 
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>  util/oslib-posix.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index c1bee2a581..4ce1ba9ca4 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -233,14 +233,18 @@ void qemu_set_block(int fd)
+>  {
+>      int f;
+>      f = fcntl(fd, F_GETFL);
+> -    fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
+> +    assert(f != -1);
+> +    f = fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
+> +    assert(f != -1);
+>  }
+>  
+>  void qemu_set_nonblock(int fd)
+>  {
+>      int f;
+>      f = fcntl(fd, F_GETFL);
+> -    fcntl(fd, F_SETFL, f | O_NONBLOCK);
+> +    assert(f != -1);
+> +    f = fcntl(fd, F_SETFL, f | O_NONBLOCK);
+> +    assert(f != -1);
+>  }
 
-Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
----
- qobject/json-parser.c | 10 ++++++----
- tests/check-qjson.c   |  5 +++++
- 2 files changed, 11 insertions(+), 4 deletions(-)
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 7a7ae9e8d1..d8eb210c0c 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -208,11 +208,13 @@ static QString *parse_string(JSONParserContext *ctx=
-t, JSONToken *token)
-             }
-             break;
-         case '%':
--            if (ctxt->ap && ptr[1] !=3D '%') {
--                parse_error(ctxt, token, "can't interpolate into string"=
-);
--                goto out;
-+            if (ctxt->ap) {
-+                if (ptr[1] !=3D '%') {
-+                    parse_error(ctxt, token, "can't interpolate into str=
-ing");
-+                    goto out;
-+                }
-+                ptr++;
-             }
--            ptr++;
-             /* fall through */
-         default:
-             cp =3D mod_utf8_codepoint(ptr, 6, &end);
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index d876a7a96e..fa2afccb0a 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -175,6 +175,11 @@ static void utf8_string(void)
-             "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
-             "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
-             "\\u03BA\\u1F79\\u03C3\\u03BC\\u03B5",
-+        },
-+            /* '%' character when not interpolating */
-+        {
-+            "100%",
-+            "100%",
-         },
-         /* 2  Boundary condition test cases */
-         /* 2.1  First possible sequence of a certain length */
---=20
-2.20.1
+Michael, could you take this patch series through your vhost tree? Or
+shall I pick them up for the qtests tree? In the latter case, please
+provide an ACK for the second patch.
