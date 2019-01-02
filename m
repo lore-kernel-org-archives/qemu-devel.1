@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57807)
+Received: from eggs.gnu.org ([208.118.235.92]:57814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geYK4-0001jt-Ek
+	(envelope-from <dgibson@ozlabs.org>) id 1geYK4-0001kI-Sj
 	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 23:40:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geYK1-0007o2-5E
+	(envelope-from <dgibson@ozlabs.org>) id 1geYK3-0007r1-SP
 	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 23:40:04 -0500
-Date: Wed, 2 Jan 2019 15:15:29 +1100
+Date: Wed, 2 Jan 2019 15:27:30 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190102041529.GO27457@umbus.fritz.box>
+Message-ID: <20190102042730.GQ27457@umbus.fritz.box>
 References: <cover.1546394798.git.balaton@eik.bme.hu>
-	<1d0a75ac8b76ba8d070c3c1c01bad04ca2b13e26.1546394798.git.balaton@eik.bme.hu>
+	<7cb0f9796d26f5d47d55710c32e0ecaf4f139aa9.1546394798.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9DptZICXTlJ7FQ09"
+	protocol="application/pgp-signature"; boundary="WZLuFERxa6Y0cbOt"
 Content-Disposition: inline
-In-Reply-To: <1d0a75ac8b76ba8d070c3c1c01bad04ca2b13e26.1546394798.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH 5/8] ppc4xx: Rename ppc4xx_sdram_t in
- ppc440_uc.c to ppc440_sdram_t
+In-Reply-To: <7cb0f9796d26f5d47d55710c32e0ecaf4f139aa9.1546394798.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH 3/8] ppc4xx: Disable debug logging by
+ default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +29,37 @@ To: BALATON Zoltan <balaton@eik.bme.hu>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---9DptZICXTlJ7FQ09
+--WZLuFERxa6Y0cbOt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, Jan 02, 2019 at 03:06:38AM +0100, BALATON Zoltan wrote:
-> There's already a struct with the same name in ppc4xx_devs.c. They are
-> not used outside their files so don't clash but they are also not
-> identical so rename the ppc440 specific one to distinguish them.
+> Debug logs were left enabled in ppc4xx_devs.c whereas in other files
+> these are normally not enabled. Disable it here as well.
 >=20
 > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Applied, thanks.
 
 > ---
->  hw/ppc/ppc440_uc.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+>  hw/ppc/ppc4xx_devs.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >=20
-> diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
-> index 9360f781ce..e46f59fba8 100644
-> --- a/hw/ppc/ppc440_uc.c
-> +++ b/hw/ppc/ppc440_uc.c
-> @@ -481,7 +481,7 @@ void ppc4xx_sdr_init(CPUPPCState *env)
+> diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+> index 8c6f3c9577..9b6e4c60fa 100644
+> --- a/hw/ppc/ppc4xx_devs.c
+> +++ b/hw/ppc/ppc4xx_devs.c
+> @@ -32,8 +32,7 @@
+>  #include "exec/address-spaces.h"
+>  #include "qemu/error-report.h"
 > =20
->  /***********************************************************************=
-******/
->  /* SDRAM controller */
-> -typedef struct ppc4xx_sdram_t {
-> +typedef struct ppc440_sdram_t {
->      uint32_t addr;
->      int nbanks;
->      MemoryRegion containers[4]; /* used for clipping */
-> @@ -489,7 +489,7 @@ typedef struct ppc4xx_sdram_t {
->      hwaddr ram_bases[4];
->      hwaddr ram_sizes[4];
->      uint32_t bcr[4];
-> -} ppc4xx_sdram_t;
-> +} ppc440_sdram_t;
+> -#define DEBUG_UIC
+> -
+> +/*#define DEBUG_UIC*/
 > =20
->  enum {
->      SDRAM0_CFGADDR =3D 0x10,
-> @@ -564,7 +564,7 @@ static target_ulong sdram_size(uint32_t bcr)
->      return size;
->  }
-> =20
-> -static void sdram_set_bcr(ppc4xx_sdram_t *sdram,
-> +static void sdram_set_bcr(ppc440_sdram_t *sdram,
->                            uint32_t *bcrp, uint32_t bcr, int enabled)
->  {
->      unsigned n =3D bcrp - sdram->bcr;
-> @@ -589,7 +589,7 @@ static void sdram_set_bcr(ppc4xx_sdram_t *sdram,
->      }
->  }
-> =20
-> -static void sdram_map_bcr(ppc4xx_sdram_t *sdram)
-> +static void sdram_map_bcr(ppc440_sdram_t *sdram)
->  {
->      int i;
-> =20
-> @@ -607,7 +607,7 @@ static void sdram_map_bcr(ppc4xx_sdram_t *sdram)
-> =20
->  static uint32_t dcr_read_sdram(void *opaque, int dcrn)
->  {
-> -    ppc4xx_sdram_t *sdram =3D opaque;
-> +    ppc440_sdram_t *sdram =3D opaque;
->      uint32_t ret =3D 0;
-> =20
->      switch (dcrn) {
-> @@ -658,7 +658,7 @@ static uint32_t dcr_read_sdram(void *opaque, int dcrn)
-> =20
->  static void dcr_write_sdram(void *opaque, int dcrn, uint32_t val)
->  {
-> -    ppc4xx_sdram_t *sdram =3D opaque;
-> +    ppc440_sdram_t *sdram =3D opaque;
-> =20
->      switch (dcrn) {
->      case SDRAM_R0BAS:
-> @@ -689,7 +689,7 @@ static void dcr_write_sdram(void *opaque, int dcrn, u=
-int32_t val)
-> =20
->  static void sdram_reset(void *opaque)
->  {
-> -    ppc4xx_sdram_t *sdram =3D opaque;
-> +    ppc440_sdram_t *sdram =3D opaque;
-> =20
->      sdram->addr =3D 0;
->  }
-> @@ -699,7 +699,7 @@ void ppc440_sdram_init(CPUPPCState *env, int nbanks,
->                         hwaddr *ram_bases, hwaddr *ram_sizes,
->                         int do_init)
->  {
-> -    ppc4xx_sdram_t *sdram;
-> +    ppc440_sdram_t *sdram;
-> =20
->      sdram =3D g_malloc0(sizeof(*sdram));
->      sdram->nbanks =3D nbanks;
+>  #ifdef DEBUG_UIC
+>  #  define LOG_UIC(...) qemu_log_mask(CPU_LOG_INT, ## __VA_ARGS__)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -132,24 +67,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---9DptZICXTlJ7FQ09
+--WZLuFERxa6Y0cbOt
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwsOuAACgkQbDjKyiDZ
-s5LyTQ/+Ok+vltqIEhCqiHr1jW06XPQHxyLOw/vyI5z42eE/7EhU5wZumAjXTnpn
-FVdGE1YGtjrClvV2gcTX6+30FKG6seDOM7qEdh8MEDlof7ysKGAyOEMAdUmk83yA
-cDJuJeVypUBUZcnGytZzDcNoKU+1H+/KXIrSgtMulOjZYiyyvqWkIIwHGdcOfcU7
-8hV5YvcYVl9YLBOQlFuuzHYCnMnlEwGujiHce6lAg3n7bwKVPY5HUg0qb2aBJqY8
-cxbq2HdddoJSHE5ycDcG3/ZXIs1c+KwqzK/JXSxAnNi68Sc5mf1I9WMnAT9+Nubl
-Unfh4lm/iYBN1h0KEUVkYE4C8TT2XxTm2yJECfHZTPUE6d5X9C0BwNbeRvbTnIun
-/fJnUX2zjlLSeGsmFCQclVrIgLKJJloauP7dhkIdPG0TeqYPEY2c/jRwU7pl21wS
-6dr8ivBOWMFn8kvjN9h8kfH2oBfNFKWJIvbhqqZc/9RRn/mCFj9zoNTsy+Jlon+2
-5mP8ds3CxhodgOq0PADXW6i4WfvGuqaQBRCzqq8SL5JZYipdfhfdJn0JYPqKZZl7
-6hqJcKMqtyh/ZcERTSY78KccK01X0m6SJoeeQ/DvpiJigBLrh8wH2dY/TAaKty7k
-ja89j9NidV8YtBZHcP/TufU5hnNpOzcS/wx60+a3LLhSMnDoRF4=
-=oFFr
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwsPbIACgkQbDjKyiDZ
+s5LcwBAAoIzC3YXMEHOfTHka7TLjvFG0mWmvmD37VpVxWy13KGWTGBbjKb8vo6SO
+ZF9+TzhkBvlqDVtc+fPRlBtIPBU9eEyyTdZz/vR4L1J6sC81MJcUJLbfvlgppwQr
+IIfqLSY6/5+wc0TvSVbGOkullQlUaDFvErJFlCplyVaUCteWRVBFdEvuIMJC5+dj
+OwMBp6AkFIMRkNeUwjfjzs7QXRxgMPDw6XMR0VGeJa18NQdArwzU5QhGeMQSGsXt
+Z/XSFpUI/dcCdVNU7H9Pj0Cs9KZzGkoAirypciJx8ZhlmJBVdn6iWPK5ZhauRMal
+31rIwL1K3TeVbYO0flNou2DhGJNZoA+A6nZkSAz7qhAGmpX/RcBsNnwCSByTrn1l
+mrN9tCcip6jt29vqqd6RgdKNPLYjljiQ5ldKlOVLqzAqXmGEBAEF67DGDrZdevnq
+9zYN+T49z0T1qv+/tBk+j1Frvwxlmq2R522h38NLy1euWI9EvRcIqmdm2AjLw4io
+wcQcGYq9GrL3hHFoyRg+joHN1d5OLgQuv/A8WX5v/wpgwr8CHJhCNUs8QbQo7RyK
+5UYzt78iM9VTmraVaP+jzLy6ugNnrqhQRPUsxouNU7vNC7bqZ6L5zDgc8bQzSOKs
+q0eC2BRWykRLNJykhbGNPzH/a/HisD9p0yMgSxvmIFqJnMxN+0g=
+=8NI1
 -----END PGP SIGNATURE-----
 
---9DptZICXTlJ7FQ09--
+--WZLuFERxa6Y0cbOt--
