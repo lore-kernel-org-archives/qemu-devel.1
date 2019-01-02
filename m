@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48552)
+Received: from eggs.gnu.org ([208.118.235.92]:48602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1geZXc-0002dH-9u
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:09 -0500
+	(envelope-from <clg@kaod.org>) id 1geZXh-0002hq-0r
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1geZXZ-0005w9-42
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:08 -0500
-Received: from 7.mo3.mail-out.ovh.net ([46.105.57.200]:37395)
+	(envelope-from <clg@kaod.org>) id 1geZXd-0005yP-Rc
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:12 -0500
+Received: from 7.mo179.mail-out.ovh.net ([46.105.61.94]:32920)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1geZXY-0005sy-Tu
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:05 -0500
-Received: from player773.ha.ovh.net (unknown [10.109.159.140])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 525171EA250
-	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 06:57:56 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1geZXd-0005vM-LK
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:09 -0500
+Received: from player773.ha.ovh.net (unknown [10.109.160.143])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id F3EC610D019
+	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 06:58:01 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed,  2 Jan 2019 06:57:33 +0100
-Message-Id: <20190102055743.5052-1-clg@kaod.org>
+Date: Wed,  2 Jan 2019 06:57:34 +0100
+Message-Id: <20190102055743.5052-2-clg@kaod.org>
+In-Reply-To: <20190102055743.5052-1-clg@kaod.org>
+References: <20190102055743.5052-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 00/10] spapr: introduce the 'dual' interrupt
- mode XICS/XIVE
+Subject: [Qemu-devel] [PATCH 01/10] spapr: modify the prototype of the
+ cpu_intc_create() method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +33,199 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello,
+Today, the interrupt presenter is linked to a CPU using the
+cpu_intc_create() method of the sPAPR IRQ backend. The resulting
+object is assigned to the PowerPCCPU 'intc' pointer whatever the
+interrupt mode, XICS or XIVE.
 
-This series adds a new sPAPR IRQ backend called 'dual' which supports
-both interrupt mode, the XIVE native exploitation mode and the legacy
-compatibility mode (XICS).
+To support the 'dual' interrupt mode, we will need to distinguish
+between the two presenter objects and for that, we plan to introduce a
+second interrupt presenter object pointer under the PowerPCCPU. The
+modifications below move the assignment of the presenter object under
+the cpu_intc_create() method to prepare ground for the future changes.
 
-The machine operates with the legacy mode by default and lets CAS
-negotiate a new interrupt mode. If a new mode is selected, it is
-activated after a machine reset to take into account the required
-changes. These impact the device tree layout, the interrupt presenter
-object and the exposed MMIO regions in the case of XIVE.
+Both sPAPR and PowerNV machines are impacted.
 
-The preliminary changes for this new IRQ backend are the introduction
-of a second interrupt presenter object under the PowerPCCPU to support
-XIVE. The qemu_irq array of each interrupt controller model is also
-made common and moved under the machine.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/hw/ppc/pnv.h       |  2 +-
+ include/hw/ppc/spapr_irq.h |  4 ++--
+ hw/ppc/pnv.c               | 23 ++++++++++++++++-------
+ hw/ppc/pnv_core.c          |  2 +-
+ hw/ppc/spapr_cpu_core.c    |  2 +-
+ hw/ppc/spapr_irq.c         | 34 ++++++++++++++++++++++++++--------
+ 6 files changed, 47 insertions(+), 20 deletions(-)
 
-
-GitHub trees available here :
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 86d5f54e5459..6b65397b7ebf 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -98,7 +98,7 @@ typedef struct PnvChipClass {
+     DeviceRealize parent_realize;
 =20
-QEMU sPAPR:
-
-  https://github.com/legoater/qemu/commits/xive-next
- =20
-QEMU PowerNV:
-
-  https://github.com/legoater/qemu/commits/powernv-3.1
-
-Linux/KVM:
-
-  https://github.com/legoater/linux/commits/xive-4.20
-
-OPAL:
-
-  https://github.com/legoater/skiboot/commits/xive
-
-Best wishes for 2019 !=20
-
-C.
-
-
-
-C=C3=A9dric Le Goater (10):
-  spapr: modify the prototype of the cpu_intc_create() method
-  ppc/xive: introduce a XiveTCTX pointer under PowerPCCPU
-  ppc: replace the 'Object *intc' by a 'ICPState *icp' pointer under the
-    CPU
-  spapr/xive: simplify the sPAPR IRQ qirq method for XIVE
-  ppc: export the XICS and XIVE set_irq handlers
-  pnv/psi: move the ICSState qemu_irq array under the PSI device model
-  spapr: move the ICSState qemu_irq array under the machine
-  ppc/xics: allow ICSState to have an offset 0
-  spapr: introduce a new sPAPR IRQ backend supporting XIVE and XICS
-  spapr: enable XIVE MMIOs at reset
-
- include/hw/ppc/pnv.h        |   2 +-
- include/hw/ppc/pnv_psi.h    |   1 +
- include/hw/ppc/spapr.h      |   1 +
- include/hw/ppc/spapr_irq.h  |   6 +-
- include/hw/ppc/spapr_xive.h |   2 +-
- include/hw/ppc/xics.h       |   6 +-
- include/hw/ppc/xive.h       |   9 +-
- target/ppc/cpu.h            |   5 +-
- hw/intc/spapr_xive.c        |  23 ++-
- hw/intc/xics.c              |   4 +-
- hw/intc/xics_kvm.c          |   3 +-
- hw/intc/xics_spapr.c        |  10 +-
- hw/intc/xive.c              |  11 +-
- hw/ppc/pnv.c                |  27 ++--
- hw/ppc/pnv_core.c           |   4 +-
- hw/ppc/pnv_psi.c            |   7 +-
- hw/ppc/spapr.c              |  12 +-
- hw/ppc/spapr_cpu_core.c     |   9 +-
- hw/ppc/spapr_hcall.c        |  11 ++
- hw/ppc/spapr_irq.c          | 270 ++++++++++++++++++++++++++++++++++--
- 20 files changed, 342 insertions(+), 81 deletions(-)
-
+     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+-    Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
++    void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
+     ISABus *(*isa_create)(PnvChip *chip, Error **errp);
+ } PnvChipClass;
+=20
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index b34d5a00381b..d03d4d7ce687 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -42,8 +42,8 @@ typedef struct sPAPRIrq {
+     void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
+     void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers,
+                         void *fdt, uint32_t phandle);
+-    Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
+-                               Error **errp);
++    void (*cpu_intc_create)(sPAPRMachineState *spapr, PowerPCCPU *cpu,
++                            Error **errp);
+     int (*post_load)(sPAPRMachineState *spapr, int version_id);
+     void (*reset)(sPAPRMachineState *spapr, Error **errp);
+ } sPAPRIrq;
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 346f5e7aedb5..8e83be54fca1 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -668,11 +668,20 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip,=
+ uint32_t core_id)
+     return (chip->chip_id << 7) | (core_id << 3);
+ }
+=20
+-static Object *pnv_chip_power8_intc_create(PnvChip *chip, Object *child,
+-                                           Error **errp)
++static void pnv_chip_power8_intc_create(PnvChip *chip, PowerPCCPU *cpu,
++                                        Error **errp)
+ {
+-    return icp_create(child, TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine(=
+)),
+-                      errp);
++    Error *local_err =3D NULL;
++    Object *obj;
++
++    obj =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, XICS_FABRIC(qdev_get_m=
+achine()),
++                     &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    cpu->intc =3D obj;
+ }
+=20
+ /*
+@@ -690,10 +699,10 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip,=
+ uint32_t core_id)
+     return (chip->chip_id << 8) | (core_id << 2);
+ }
+=20
+-static Object *pnv_chip_power9_intc_create(PnvChip *chip, Object *child,
+-                                           Error **errp)
++static void pnv_chip_power9_intc_create(PnvChip *chip, PowerPCCPU *cpu,
++                                        Error **errp)
+ {
+-    return NULL;
++    return;
+ }
+=20
+ /* Allowed core identifiers on a POWER8 Processor Chip :
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index ad1bcc79904f..120273774874 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -114,7 +114,7 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip=
+ *chip, Error **errp)
+         return;
+     }
+=20
+-    cpu->intc =3D pcc->intc_create(chip, OBJECT(cpu), &local_err);
++    pcc->intc_create(chip, cpu, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 82666436e9b4..2739b2a4b818 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -232,7 +232,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPR=
+MachineState *spapr,
+     qemu_register_reset(spapr_cpu_reset, cpu);
+     spapr_cpu_reset(cpu);
+=20
+-    cpu->intc =3D spapr->irq->cpu_intc_create(spapr, OBJECT(cpu), &local=
+_err);
++    spapr->irq->cpu_intc_create(spapr, cpu, &local_err);
+     if (local_err) {
+         goto error_unregister;
+     }
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 7b3b5afec212..2d2e17b66533 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -190,10 +190,20 @@ static void spapr_irq_print_info_xics(sPAPRMachineS=
+tate *spapr, Monitor *mon)
+     ics_pic_print_info(spapr->ics, mon);
+ }
+=20
+-static Object *spapr_irq_cpu_intc_create_xics(sPAPRMachineState *spapr,
+-                                              Object *cpu, Error **errp)
++static void spapr_irq_cpu_intc_create_xics(sPAPRMachineState *spapr,
++                                           PowerPCCPU *cpu, Error **errp=
+)
+ {
+-    return icp_create(cpu, spapr->icp_type, XICS_FABRIC(spapr), errp);
++    Error *local_err =3D NULL;
++    Object *obj;
++
++    obj =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(spapr),
++                     &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    cpu->intc =3D obj;
+ }
+=20
+ static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int versio=
+n_id)
+@@ -301,17 +311,25 @@ static void spapr_irq_print_info_xive(sPAPRMachineS=
+tate *spapr,
+     spapr_xive_pic_print_info(spapr->xive, mon);
+ }
+=20
+-static Object *spapr_irq_cpu_intc_create_xive(sPAPRMachineState *spapr,
+-                                              Object *cpu, Error **errp)
++static void spapr_irq_cpu_intc_create_xive(sPAPRMachineState *spapr,
++                                           PowerPCCPU *cpu, Error **errp=
+)
+ {
+-    Object *obj =3D xive_tctx_create(cpu, XIVE_ROUTER(spapr->xive), errp=
+);
++    Error *local_err =3D NULL;
++    Object *obj;
++
++    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(spapr->xive), &loc=
+al_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    cpu->intc =3D obj;
+=20
+     /*
+      * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
+-     * don't benificiate from the reset of the XIVE IRQ backend
++     * don't beneficiate from the reset of the XIVE IRQ backend
+      */
+     spapr_xive_set_tctx_os_cam(XIVE_TCTX(obj));
+-    return obj;
+ }
+=20
+ static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int versio=
+n_id)
 --=20
 2.20.1
