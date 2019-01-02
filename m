@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:34812)
+Received: from eggs.gnu.org ([208.118.235.92]:35301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1gegO9-0008J9-4g
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:16:50 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gegQ8-0000rZ-Cy
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <adhemerval.zanella@linaro.org>) id 1gegO4-0004xb-GX
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:16:49 -0500
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:38015)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <adhemerval.zanella@linaro.org>)
-	id 1gegO4-0004wt-Ak
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:16:44 -0500
-Received: by mail-qk1-x741.google.com with SMTP id a1so17798233qkc.5
-	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 05:16:44 -0800 (PST)
-References: <87bm56vqg4.fsf@mid.deneb.enyo.de>
-	<957967d7-5717-8ada-fb30-dfdf19898b6b@linaro.org>
-	<87pntmu9iw.fsf@mid.deneb.enyo.de>
-	<ae0530c9-5c46-5560-9734-1eacaf173b8d@linaro.org>
-	<alpine.DEB.2.21.1812311657050.27287@digraph.polyomino.org.uk>
-From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
-Message-ID: <a5092631-2ddf-1790-5f27-777646ef3d34@linaro.org>
-Date: Wed, 2 Jan 2019 11:16:37 -0200
+	(envelope-from <stefanha@redhat.com>) id 1gegQ3-0007cc-Ci
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:18:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gegQ3-0007bz-6i
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:18:47 -0500
+Date: Wed, 2 Jan 2019 13:18:41 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190102131841.GO24009@stefanha-x1.localdomain>
+References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
+	<1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.1812311657050.27287@digraph.polyomino.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] d_off field in struct dirent and 32-on-64 emulation
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jozmn01XJZjDjM3N"
+Content-Disposition: inline
+In-Reply-To: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
+Subject: Re: [Qemu-devel] [RFC v2 4/4] pvh: Boot uncompressed kernel using
+ direct boot ABI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joseph Myers <joseph@codesourcery.com>
-Cc: Florian Weimer <fw@deneb.enyo.de>, linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, v9fs-developer@lists.sourceforge.net, libc-alpha@sourceware.org, qemu-devel@nongnu.org, ericvh@gmail.com, rminnich@sandia.gov, lucho@ionkov.net, hpa@zytor.com, arnd@arndb.de
+To: Liam Merwick <liam.merwick@oracle.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net, xen-devel@lists.xenproject.org, sgarzare@redhat.com, mst@redhat.com, maran.wilson@oracle.com, george.kennedy@oracle.com, boris.ostrovsky@oracle.com
 
 
+--jozmn01XJZjDjM3N
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 31/12/2018 15:03, Joseph Myers wrote:
-> On Fri, 28 Dec 2018, Adhemerval Zanella wrote:
-> 
->>>> Currently we only have nios2 and csky (unfortunately).  But since generic 
->>>> definition for off_t and off64_t still assumes non-LFS support, all new
->>>> 32-bits ports potentially might carry the issue.
->>>
->>> For csky, we could still change the type of the non-standard d_off
->>> field to long long int.  This way, only telldir would have to fail
->>> when truncation is necessary, as mentioned below:
->>
->> I think it makes no sense to continue making non-LFS as default for
->> newer 32 bits ports, the support will be emulated with LFS syscalls.
-> 
-> Any new 32-bit port that uses 64-bit time_t will also use 64-bit offsets 
-> (because we don't have any glibc configurations that support the 
-> combination of 64-bit time with 32-bit offsets, and don't want to add 
-> them).  That should apply for RISC-V 32-bit at least.
-> 
-> I've filed <https://sourceware.org/bugzilla/show_bug.cgi?id=24050> for 
-> missing overflow checks in telldir when the default off_t is wider than 
-> long int (currently just applies to x32; not sure why we don't see glibc 
-> test failures on x32 resulting from the quiet truncation, as the issue is 
-> certainly there in the source code).
-> 
+On Fri, Dec 21, 2018 at 08:03:52PM +0000, Liam Merwick wrote:
+> @@ -1336,7 +1470,7 @@ void pc_memory_init(PCMachineState *pcms,
+>      int linux_boot, i;
+>      MemoryRegion *ram, *option_rom_mr;
+>      MemoryRegion *ram_below_4g, *ram_above_4g;
+> -    FWCfgState *fw_cfg;
+> +    FWCfgState *fw_cfg = NULL;
 
-What about csky? Should we still make it use 32-bit offsets as default
-configuration even when kernel does not support it natively?
+What is the purpose of this change?
+
+--jozmn01XJZjDjM3N
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcLLoxAAoJEJykq7OBq3PI7ZcH/2EvpccwgtnKmMLzxe6vNcJz
+Hxc6hpJuTHeya07m711EZ80pJNcbCWPp3SwVDgH2eYI+ZkiqP9Ld80C7824jAn9h
+UgTrsaf+8k7rHBHSv59PgbUMlRALORpUKDQaQZceg/6jmu3YONpjNTyAyxALV+OT
+E9rVse1kbVBSIFB+Y/jq5kYZapadlpIOgpYa978ZNZFbuVFjNm6lNWmz4EAqyFot
+fwwln5fdHNzB7U5RNOebGfidNYHuAr07/D2hG/8R6v4/3z3PL/0EXLkh6LpHBlCy
+AjDkuEo9fZi7OELW+ypYEteZiUImvIaen8OOT4uqpT3F+BJ6WV+QPXo5QESvjdU=
+=JSAl
+-----END PGP SIGNATURE-----
+
+--jozmn01XJZjDjM3N--
