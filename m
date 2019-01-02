@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55140)
+Received: from eggs.gnu.org ([208.118.235.92]:39214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gemI2-0004Cv-8H
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 14:34:55 -0500
+	(envelope-from <salvatore.bonaccorso@gmail.com>) id 1gen0N-00066t-Ue
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 15:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gemHx-0002Xd-AP
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 14:34:54 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40442)
+	(envelope-from <salvatore.bonaccorso@gmail.com>) id 1gen0I-0004JK-SZ
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 15:20:43 -0500
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:34028)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gemHx-0002XA-4Z
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 14:34:49 -0500
-Received: by mail-wr1-f65.google.com with SMTP id p4so31560387wrt.7
-	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 11:34:49 -0800 (PST)
-References: <1546443980-26779-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c2648f00-c44f-7f8e-8673-501b88f1e125@redhat.com>
-Date: Wed, 2 Jan 2019 20:34:46 +0100
+	(Exim 4.71) (envelope-from <salvatore.bonaccorso@gmail.com>)
+	id 1gen0I-0004GY-JW
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 15:20:38 -0500
+Received: by mail-ed1-x543.google.com with SMTP id b3so27301517ede.1
+	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 12:20:36 -0800 (PST)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Date: Wed, 2 Jan 2019 21:20:32 +0100
+From: Salvatore Bonaccorso <carnil@debian.org>
+Message-ID: <20190102202032.GA1034@eldamar.local>
+References: <20180719205545.16512-1-pasha.tatashin@oracle.com>
+	<20180719205545.16512-24-pasha.tatashin@oracle.com>
+	<20181106054212.GA31768@nautica>
+	<95c3920e-bf80-0c7e-7854-01a1c3189c23@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <1546443980-26779-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add some missing
- SPARC-related files
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <95c3920e-bf80-0c7e-7854-01a1c3189c23@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v15 23/26] sched: early boot clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +33,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+To: Steven Sistare <steven.sistare@oracle.com>
+Cc: Dominique Martinet <asmadeus@codewreck.org>, Pavel Tatashin <pavel.tatashin@microsoft.com>, daniel.m.jordan@oracle.com, linux@armlinux.org.uk, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, john.stultz@linaro.org, sboyd@codeaurora.org, x86@kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de, hpa@zytor.com, douly.fnst@cn.fujitsu.com, peterz@infradead.org, prarit@redhat.com, feng.tang@intel.com, pmladek@suse.com, gnomes@lxorguk.ukuu.org.uk, linux-s390@vger.kernel.org, boris.ostrovsky@oracle.com, jgross@suse.com, pbonzini@redhat.com, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
 
-Hi Thomas,
+Hi,
 
-On 1/2/19 4:46 PM, Thomas Huth wrote:
-> These files / devices are only used by SPARC machines, so we can sort
-> them into the corresponding categories in the MAINTAINERS file.
+On Tue, Nov 06, 2018 at 06:35:36AM -0500, Steven Sistare wrote:
+> Pavel has a new email address, cc'd - steve
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  MAINTAINERS | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b6c2645..e897963 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1069,9 +1069,11 @@ M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->  S: Maintained
->  F: hw/sparc/sun4m.c
->  F: hw/sparc/sun4m_iommu.c
-> +F: hw/display/cg3.c
-> +F: hw/display/tcx.c
->  F: hw/dma/sparc32_dma.c
->  F: hw/misc/eccmemctl.c
-> -F: hw/misc/slavio_misc.c
-> +F: hw/*/slavio_*.c
->  F: include/hw/sparc/sparc32_dma.h
->  F: pc-bios/openbios-sparc32
->  F: include/hw/sparc/sun4m_iommu.h
-> @@ -1083,6 +1085,8 @@ F: hw/sparc64/sun4u.c
->  F: pc-bios/openbios-sparc64
->  F: hw/pci-host/sabre.c
->  F: include/hw/pci-host/sabre.h
-> +F: include/hw/sparc/sun4u_iommu.h
+> On 11/6/2018 12:42 AM, Dominique Martinet wrote:
+> > (added various kvm/virtualization lists in Cc as well as qemu as I don't
+> > know who's "wrong" here)
+> > 
+> > Pavel Tatashin wrote on Thu, Jul 19, 2018:
+> >> Allow sched_clock() to be used before schec_clock_init() is called.
+> >> This provides with a way to get early boot timestamps on machines with
+> >> unstable clocks.
+> > 
+> > This isn't something I understand, but bisect tells me this patch
+> > (landed as 857baa87b64 ("sched/clock: Enable sched clock early")) makes
+> > a VM running with kvmclock take a step in uptime/printk timer early in
+> > boot sequence as illustrated below. The step seems to be related to the
+> > amount of time the host was suspended while qemu was running before the
+> > reboot.
+> > 
+> > $ dmesg
+> > ...
+> > [    0.000000] SMBIOS 2.8 present.
+> > [    0.000000] DMI: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20180724_192412-buildhw-07.phx2.fedoraproject.org-1.fc29 04/01/2014
+> > [    0.000000] Hypervisor detected: KVM
+> > [    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
+> > [283120.529821] kvm-clock: cpu 0, msr 321a8001, primary cpu clock
+> > [283120.529822] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+> > [283120.529824] tsc: Detected 2592.000 MHz processor
+> > ...
+> > 
+> > (The VM is x86_64 on x86_64, I can provide my .config on request but
+> > don't think it's related)
+> > 
+> > 
+> > It's rather annoying for me as I often reboot VMs and rely on the
+> > 'uptime' command to check if I did just reboot or not as I have the
+> > attention span of a goldfish; I'd rather not have to find something else
+> > to check if I did just reboot or not.
+> > 
+> > Note that if the qemu process is restarted, there is no offset anymore.
+> > 
+> > I unfortunately just did that so cannot say with confidence (putting my
+> > laptop to sleep for 30s only led to a 2s offset and I do not want to
+> > wait longer right now), but it looks like the clock is still mostly
+> > correct after reboot after disabling my VM's ntp client. Will infirm
+> > that tomorrow if I was wrong.
+> > 
+> > 
+> > Happy to try to help fixing this in any way, as written above the quote
+> > I'm not even actually sure who is wrong here.
 
-I sent a patch to trivial@ with other sun4u changes, reviewed by Mark:
-https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04467.html
+A user in Debian reported the same/similar issue (with 4.19.13):
 
-Neither mine nor your are complete :)
-Can I include your patch when respining the series? (Not sure I need to
-respin although).
+https://bugs.debian.org/918036
 
-> +F: include/hw/nvram/sun_nvram.h
-
-sun_nvram.h is also used by sun4m (the previous section this patch updates).
-
->  
->  Sun4v
->  M: Artyom Tarasenko <atar4qemu@gmail.com>
-> 
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Regards,
+Salvatore
