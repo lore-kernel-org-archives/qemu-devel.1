@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50622)
+Received: from eggs.gnu.org ([208.118.235.92]:51597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gehJk-0002lO-Oh
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:16:21 -0500
+	(envelope-from <jcfaracco@gmail.com>) id 1gehMn-0005Hg-TK
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:19:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gehJf-0005nW-4j
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:16:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53546)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gehJa-0005jT-Q2
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:16:11 -0500
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Wed,  2 Jan 2019 15:16:03 +0100
-Message-Id: <20190102141603.3681-1-lvivier@redhat.com>
+	(envelope-from <jcfaracco@gmail.com>) id 1gehMm-0007zF-VZ
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:19:29 -0500
 MIME-Version: 1.0
+References: <20181221135803.9583-1-npes87184@gmail.com>
+	<20190102104659.GG24009@stefanha-x1.localdomain>
+In-Reply-To: <20190102104659.GG24009@stefanha-x1.localdomain>
+From: Julio Faracco <jcfaracco@gmail.com>
+Date: Wed, 2 Jan 2019 12:19:12 -0200
+Message-ID: <CAENf94JObEbH6tm53itn8zMZsJak3JUD9TkkSqzgeEwnjRDQUw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] cpus: ignore ESRCH in qemu_cpu_kick_thread()
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] dmg: fix binary search
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,35 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: yuchenlin <npes87184@gmail.com>, qemu-trivial@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 
-We can have a race condition between qemu_cpu_kick_thread() and
-qemu_kvm_cpu_thread_fn() when we hotunplug a CPU. In this case,
-qemu_cpu_kick_thread() can try to kick a thread that is exiting.
-pthread_kill() returns an error and qemu is stopped by an exit(1).
+Hi Stefan,
 
-   qemu:qemu_cpu_kick_thread: No such process
+I created a simple DMG file from MacOS to reproduce the problem:
+https://bugs.launchpad.net/qemu/+bug/1809304
 
-We can ignore safely this error.
+Em qua, 2 de jan de 2019 =C3=A0s 08:47, Stefan Hajnoczi <stefanha@redhat.co=
+m>
+escreveu:
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- cpus.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/cpus.c b/cpus.c
-index 0ddeeefc14..4717490bd0 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1778,7 +1778,7 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
-     }
-     cpu->thread_kicked =3D true;
-     err =3D pthread_kill(cpu->thread->thread, SIG_IPI);
--    if (err) {
-+    if (err && err !=3D ESRCH) {
-         fprintf(stderr, "qemu:%s: %s", __func__, strerror(err));
-         exit(1);
-     }
---=20
-2.20.1
+> On Fri, Dec 21, 2018 at 09:58:03PM +0800, yuchenlin wrote:
+> > There is a possible hang in original binary searsh implemtation. That i=
+s
+> > if chunk1 =3D 4, chunk2 =3D 5, chunk3 =3D 4, and we go else case.
+> >
+> > The chunk1 will be still 4, and so on.
+> >
+> > Signed-off-by: yuchenlin <npes87184@gmail.com>
+> > ---
+> >  block/dmg.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> Do you have an example dmg file that triggers this bug?
+>
+> > diff --git a/block/dmg.c b/block/dmg.c
+> > index 50e91aef6d..0e05702f5d 100644
+> > --- a/block/dmg.c
+> > +++ b/block/dmg.c
+> > @@ -572,14 +572,14 @@ static inline uint32_t search_chunk(BDRVDMGState
+> *s, uint64_t sector_num)
+> >  {
+> >      /* binary search */
+> >      uint32_t chunk1 =3D 0, chunk2 =3D s->n_chunks, chunk3;
+> > -    while (chunk1 !=3D chunk2) {
+> > +    while (chunk1 <=3D chunk2) {
+> >          chunk3 =3D (chunk1 + chunk2) / 2;
+> >          if (s->sectors[chunk3] > sector_num) {
+> > -            chunk2 =3D chunk3;
+> > +            chunk2 =3D chunk3 - 1;
+>
+> What if chunk1 =3D 0 and chunk2 =3D 1?  chunk3 =3D 0 and the new chunk2 v=
+alue
+> would be 0xffffffff so the loop continues with out-of-bounds sectors[]
+> accesses!
+>
