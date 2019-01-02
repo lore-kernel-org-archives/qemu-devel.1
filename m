@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46077)
+Received: from eggs.gnu.org ([208.118.235.92]:46296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1geh5h-00044n-7J
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:01:50 -0500
+	(envelope-from <no-reply@patchew.org>) id 1geh6X-0004YR-2X
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:02:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1geh5d-0005KH-1G
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:01:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35820)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1geh5c-0005I4-Nb
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:01:44 -0500
-Date: Wed, 2 Jan 2019 14:01:39 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190102140139.GR24009@stefanha-x1.localdomain>
-References: <20180404103440.19546-1-stefanha@redhat.com>
-	<008ac6e8-1e68-b0f6-7e75-77453721d031@virtuozzo.com>
-	<20180410020823.GB11203@stefanha-x1.localdomain>
-	<fefd54c0-d5f2-dc31-ff3c-24eb29fd2101@simark.ca>
-	<788e662d-0fb6-8db8-a049-3714eaa32869@redhat.com>
-	<0ebf0044-d45c-74b4-d323-2391daa12a0c@virtuozzo.com>
+	(envelope-from <no-reply@patchew.org>) id 1geh6U-0006CM-DW
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:02:41 -0500
+Resent-Message-Id: <E1geh6U-0006CM-DW@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21713)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1geh6U-000663-5Z
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:02:38 -0500
+In-Reply-To: <20181225140449.15786-1-fli@suse.com>
+Message-ID: <154643680857.9907.2563926974140301260@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7L9kolmstoDTZ4pm"
-Content-Disposition: inline
-In-Reply-To: <0ebf0044-d45c-74b4-d323-2391daa12a0c@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] scripts/qemugdb: support coroutine
- backtrace in coredumps
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 2 Jan 2019 05:46:49 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 00/16] qemu_thread_create:
+ propagate the error to callers to handle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,95 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Pedro Alves <palves@redhat.com>, Simon Marchi <simark@simark.ca>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "gdb@sourceware.org" <gdb@sourceware.org>
+To: fli@suse.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com
 
-
---7L9kolmstoDTZ4pm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Dec 27, 2018 at 05:36:04PM +0000, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> 23.04.2018 16:28, Pedro Alves wrote:
-> > On 04/23/2018 02:37 AM, Simon Marchi wrote:
-> >> On 2018-04-09 10:08 PM, Stefan Hajnoczi wrote:
-> >>> I wonder what the point of select-frame is then...
-> >>>
-> >>> I have CCed the GDB mailing list.  Maybe someone can help us.  Contex=
-t:
-> >>>
-> >>> QEMU implements coroutines using jmpbuf.  We'd like to print coroutine
-> >>> call stacks in GDB and have a script that works when a process is bei=
-ng
-> >>> debugged (it sets the registers).
-> >>>
-> >>> Now we'd like to extend the script to work on core dumps where it's n=
-ot
-> >>> possible to set registers (since there is no process being debugged).
-> >>>
-> >>> Is there a way to backtrace an arbitrary call stack in a core dump?
-> >>
-> >> Not that I know of.  The "frame <stack-addr> <pc-addr>" form of the fr=
-ame
-> >> command sounds like it should be usable to achieve that, but it doesn't
-> >> seem to work in that way.  I really wonder if it's working as it was
-> >> intended initially.  I guess using that form of the frame command shou=
-ld
-> >> override/mask the real current values of $sp and $pc?
-> >=20
-> > Yeah, "frame <args>" has a lot of problems.
-> >=20
-> > This series was working toward sorting out the "frame" command:
-> >=20
-> >    https://sourceware.org/ml/gdb-patches/2015-09/msg00248.html
-> >=20
-> > Follow the urls there for more background.
-> >=20
-> > To me, the important questions to answer are here:
-> >   https://sourceware.org/ml/gdb-patches/2015-09/msg00658.html
-> >=20
-> > Unfortunately, I don't think the series moved past that point.
-> >=20
-> > Thanks,
-> > Pedro Alves
-> >=20
->=20
->=20
-> Hi Pedro!
->=20
-> Hmm, returned to this topic. I've spent this day digging in gdb code, and=
- found it much
-> more difficult than qemu)..
->=20
-> I've failed to find something like
->=20
-> create_frame_with_registers, or create_thread_with_registers.. Looks like=
- registers comes
-> from some register caches, backed by different sources of registers or so=
-mething like this.
->=20
-> So, I'd like to ask several questions:
->=20
-> 1. Any news on the topic since April?
-
-Not on my side, sorry.
-
-Stefan
-
---7L9kolmstoDTZ4pm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcLMRDAAoJEJykq7OBq3PIzr0H/3JgxuOiiDz1UQqFYGH0k/Uk
-2h78ERlQku+DoQJOZGOnip/btanxeFAUHEAdRK5Dr68wx/3rcDzQc/xW8Eq5TvIY
-D0aiZItMluSJjhXS002k9otMZcrpcKnma4ztGFdJjlnrjq7+5dV/iAqKj7hulmTR
-xkV6lnzsvNE1XxMWJmVxWxGA4mD9F0NI/j4nlh92qKQvdmigjlCyn4qfVGQifTYc
-T70Pdm15XayROMuE0+f+9K+LecTrOJhHUAWDL3C5R9OpJRCzCar5DX6f9j6pIBAT
-2CE6Kn0IYldoSIqcNgP7JgLwtzLRUKZmx7CuOZsiwt2g3u2o3+Rk2SjwDhu97h4=
-=1cbv
------END PGP SIGNATURE-----
-
---7L9kolmstoDTZ4pm--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIyNTE0MDQ0OS4xNTc4
+Ni0xLWZsaUBzdXNlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tlci1x
+dWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRz
+IGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlv
+dSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNI
+T1dfRU5WPTEgSj04Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpsaWJwbWVtIHN1cHBvcnQgICBu
+bwpsaWJ1ZGV2ICAgICAgICAgICBubwoKV0FSTklORzogVXNlIG9mIFNETCAxLjIgaXMgZGVwcmVj
+YXRlZCBhbmQgd2lsbCBiZSByZW1vdmVkIGluCldBUk5JTkc6IGZ1dHVyZSByZWxlYXNlcy4gUGxl
+YXNlIHN3aXRjaCB0byB1c2luZyBTREwgMi4wCgpOT1RFOiBjcm9zcy1jb21waWxlcnMgZW5hYmxl
+ZDogICdjYycKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1kZXZpY2VzLm1hay50bXAK
+LS0tCiAgQ0MgICAgICBody91c2IvaG9zdC1zdHViLm8KICBDQyAgICAgIGh3L3ZpcnRpby92aXJ0
+aW8tYnVzLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3VzYi9jY2lkLWNhcmQtZW11bGF0ZWQuYzog
+SW4gZnVuY3Rpb24gJ2luaXRfZXZlbnRfbm90aWZpZXInOgovdG1wL3FlbXUtdGVzdC9zcmMvaHcv
+dXNiL2NjaWQtY2FyZC1lbXVsYXRlZC5jOjQwNDo5OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRp
+b24gb2YgZnVuY3Rpb24gJ2Vycm9yX3NldGcnIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRl
+Y2xhcmF0aW9uXQogICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJjY2lkLWNhcmQtZW11bDogZXZl
+bnQgbm90aWZpZXIgY3JlYXRpb24gZmFpbGVkIik7CiAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qv
+c3JjL2h3L3VzYi9jY2lkLWNhcmQtZW11bGF0ZWQuYzo0MDQ6OTogZXJyb3I6IG5lc3RlZCBleHRl
+cm4gZGVjbGFyYXRpb24gb2YgJ2Vycm9yX3NldGcnIFstV2Vycm9yPW5lc3RlZC1leHRlcm5zXQov
+dG1wL3FlbXUtdGVzdC9zcmMvaHcvdXNiL2NjaWQtY2FyZC1lbXVsYXRlZC5jOiBJbiBmdW5jdGlv
+biAnZW11bGF0ZWRfcmVhbGl6ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody91c2IvY2NpZC1jYXJk
+LWVtdWxhdGVkLmM6NTEzOjEzOiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rp
+b24gJ2Vycm9yX2FwcGVuZF9oaW50JyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJh
+dGlvbl0KICAgICAgICAgICAgIGVycm9yX2FwcGVuZF9oaW50KGVycnAsICIlc1xuIiwgcHRhYmxl
+LT5uYW1lKTsKICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3VzYi9jY2lkLWNh
+cmQtZW11bGF0ZWQuYzo1MTM6MTM6IGVycm9yOiBuZXN0ZWQgZXh0ZXJuIGRlY2xhcmF0aW9uIG9m
+ICdlcnJvcl9hcHBlbmRfaGludCcgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNdCi90bXAvcWVtdS10
+ZXN0L3NyYy9ody91c2IvY2NpZC1jYXJkLWVtdWxhdGVkLmM6IEF0IHRvcCBsZXZlbDoKY2MxOiBl
+cnJvcjogdW5yZWNvZ25pemVkIGNvbW1hbmQgbGluZSBvcHRpb24gIi1Xbm8tZm9ybWF0LXRydW5j
+YXRpb24iIFstV2Vycm9yXQpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9y
+cwptYWtlOiAqKiogW2h3L3VzYi9jY2lkLWNhcmQtZW11bGF0ZWQub10gRXJyb3IgMQptYWtlOiAq
+KiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
+bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxODEyMjUxNDA0NDkuMTU3ODYtMS1m
+bGlAc3VzZS5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
