@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:49217)
+Received: from eggs.gnu.org ([208.118.235.92]:51070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1geeGg-00069w-Hf
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:00:59 -0500
+	(envelope-from <joel.stan@gmail.com>) id 1geeMJ-0008U7-6L
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:06:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1geeGe-0007kE-LJ
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:00:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59984)
+	(envelope-from <joel.stan@gmail.com>) id 1geeMG-0005eg-2r
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:06:47 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34678)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1geeGe-0007jg-E2
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:00:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1geeGd-0008AJ-2f
-	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 11:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 12F452E80C8
-	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 11:00:55 +0000 (UTC)
+	(Exim 4.71) (envelope-from <joel.stan@gmail.com>) id 1geeMF-0005eA-TI
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:06:44 -0500
+Received: by mail-pf1-x442.google.com with SMTP id h3so15068814pfg.1
+	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 03:06:43 -0800 (PST)
+Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Wed,  2 Jan 2019 21:36:12 +1030
+Message-Id: <20190102110612.20387-1-joel@jms.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 02 Jan 2019 10:49:17 -0000
-From: Thomas Huth <1793275@bugs.launchpad.net>
-Reply-To: Bug 1793275 <1793275@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153734706849.11874.4653304097344263662.malonedeb@gac.canonical.com>
-Message-Id: <154642615751.25797.10007262513935182733.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1793275] Re: Hosts fail to start after update to
- QEMU 3.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] gitdm: Add other IBMers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,74 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Andrew Jeffery <andrew@aj.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
-Ok, thanks for the update. Closing this bug since it seems to be fixed
-in 3.1.
+Here are some IBMers who use their personal addresses when submitting
+patches.
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+ contrib/gitdm/group-map-ibm | 5 +++++
+ 1 file changed, 5 insertions(+)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1793275
-
-Title:
-  Hosts fail to start after update to QEMU 3.0
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Host OS: Archlinux
-  Host Architecture: AMD64
-  Guest OS: FreeBSD-11.2 (x2) and Archlinux (x1)
-  Guest Architecture: AMD64
-
-  I have been using QEMU 2.x without issue for a number of years but
-  since updating to QEMU 3.0 my guests do not complete startup.
-
-  FreeBSD 11.2 guest failure symptom:
-  The two FreeBSD-11.2 guests output repeated messages of "unexpected cache=
- type 4". This appears to be an internal error message and I've not found a=
-ny instances of it through Google search.
-
-  Archlinux guest failure symptom:
-  The single Archlinux guest gets no further than the message "uncompressin=
-g initial ramdisk".
-
-  The guests are started by a qemu-kvm invokation. No virtual machine
-  managers are used. The command lines used (from ps awx) to launch the
-  VMs are:
-
-  [neil@optimus ~]$ ps awx |grep qemu
-   1492 ?        Sl     3:19 /usr/bin/qemu-system-x86_64 -daemonize -pidfil=
-e /run/qemu_vps1.pid -enable-kvm -cpu host -smp 2 -k en-gb -boot order=3Dc =
--drive file=3D/dev/system/vps1,cache=3Dnone,format=3Draw,if=3Dvirtio,index=
-=3D0,media=3Ddisk -m 1024 -name FreeBSD_1 -net nic,macaddr=3D52:54:AD:86:64=
-:00,model=3Dvirtio -net vde,sock=3D/run/vde_switch-tap0.sock -monitor telne=
-t:127.0.0.2:23,server,nowait -vnc 192.168.0.1:0
-   1510 ?        Sl     0:54 /usr/bin/qemu-system-x86_64 -daemonize -pidfil=
-e /run/qemu_vps2.pid -enable-kvm -cpu host -smp 2 -k en-gb -boot order=3Dc =
--drive file=3D/dev/system/vps2,cache=3Dnone,format=3Draw,if=3Dvirtio,index=
-=3D0,media=3Ddisk -m 1024 -name Archlinux -net nic,macaddr=3D52:54:AD:86:64=
-:01,model=3Dvirtio -net vde,sock=3D/run/vde_switch-tap0.sock -monitor telne=
-t:127.0.0.3:23,server,nowait -vnc 192.168.0.1:1
-   1529 ?        Sl     3:07 /usr/bin/qemu-system-x86_64 -daemonize -pidfil=
-e /run/qemu_vps3.pid -enable-kvm -cpu host -smp 2 -k en-gb -boot order=3Dc =
--drive file=3D/dev/system/vps3,cache=3Dnone,format=3Draw,if=3Dvirtio,index=
-=3D0,media=3Ddisk -m 1024 -name FreeBSD_2 -net nic,macaddr=3D52:54:AD:86:64=
-:02,model=3Dvirtio -net vde,sock=3D/run/vde_switch-tap0.sock -monitor telne=
-t:127.0.0.4:23,server,nowait -vnc 192.168.0.1:2
-
-  The VMs were installed to LVM volumes on the host machine (hence the
-  /dev/system/vpsN device names). Networking is over a Linux tap
-  interface connected to a VDE2 virtual network switch.
-
-  Currently working version of QEMU: qemu-headless 2.12.1-1
-  Failing version of QEMU: qemu-headless-3.0.0-1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1793275/+subscriptions
+diff --git a/contrib/gitdm/group-map-ibm b/contrib/gitdm/group-map-ibm
+index b66db5f4a825..6c0570107d65 100644
+--- a/contrib/gitdm/group-map-ibm
++++ b/contrib/gitdm/group-map-ibm
+@@ -2,5 +2,10 @@
+ # Some IBM contributors submit via another domain
+ #
+ 
++aik@ozlabs.ru
++andrew@aj.id.au
++benh@kernel.crashing.org
+ clg@kaod.org
+ groug@kaod.org
++joel@jms.id.au
++sjitindarsingh@gmail.com
+-- 
+2.19.1
