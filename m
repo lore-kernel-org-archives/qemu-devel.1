@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46296)
+Received: from eggs.gnu.org ([208.118.235.92]:47170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1geh6X-0004YR-2X
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:02:43 -0500
+	(envelope-from <cfergeau@redhat.com>) id 1geh9c-0006LZ-0X
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:05:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1geh6U-0006CM-DW
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:02:41 -0500
-Resent-Message-Id: <E1geh6U-0006CM-DW@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21713)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1geh6U-000663-5Z
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:02:38 -0500
-In-Reply-To: <20181225140449.15786-1-fli@suse.com>
-Message-ID: <154643680857.9907.2563926974140301260@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cfergeau@redhat.com>) id 1geh9Z-0001A9-1Q
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:05:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1geh9U-00015F-4F
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 09:05:44 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2BCAAC06512E
+	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 14:05:39 +0000 (UTC)
+Received: from natto.ory.fergeau.eu (unknown [10.41.1.13])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id F1DEE1019632
+	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 14:05:38 +0000 (UTC)
+From: Christophe Fergeau <cfergeau@redhat.com>
+Date: Wed,  2 Jan 2019 15:05:35 +0100
+Message-Id: <20190102140535.11512-1-cfergeau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 2 Jan 2019 05:46:49 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 00/16] qemu_thread_create:
- propagate the error to callers to handle
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: fli@suse.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com
+To: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIyNTE0MDQ0OS4xNTc4
-Ni0xLWZsaUBzdXNlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tlci1x
-dWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRz
-IGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlv
-dSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNI
-T1dfRU5WPTEgSj04Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpsaWJwbWVtIHN1cHBvcnQgICBu
-bwpsaWJ1ZGV2ICAgICAgICAgICBubwoKV0FSTklORzogVXNlIG9mIFNETCAxLjIgaXMgZGVwcmVj
-YXRlZCBhbmQgd2lsbCBiZSByZW1vdmVkIGluCldBUk5JTkc6IGZ1dHVyZSByZWxlYXNlcy4gUGxl
-YXNlIHN3aXRjaCB0byB1c2luZyBTREwgMi4wCgpOT1RFOiBjcm9zcy1jb21waWxlcnMgZW5hYmxl
-ZDogICdjYycKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1kZXZpY2VzLm1hay50bXAK
-LS0tCiAgQ0MgICAgICBody91c2IvaG9zdC1zdHViLm8KICBDQyAgICAgIGh3L3ZpcnRpby92aXJ0
-aW8tYnVzLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3VzYi9jY2lkLWNhcmQtZW11bGF0ZWQuYzog
-SW4gZnVuY3Rpb24gJ2luaXRfZXZlbnRfbm90aWZpZXInOgovdG1wL3FlbXUtdGVzdC9zcmMvaHcv
-dXNiL2NjaWQtY2FyZC1lbXVsYXRlZC5jOjQwNDo5OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRp
-b24gb2YgZnVuY3Rpb24gJ2Vycm9yX3NldGcnIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRl
-Y2xhcmF0aW9uXQogICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJjY2lkLWNhcmQtZW11bDogZXZl
-bnQgbm90aWZpZXIgY3JlYXRpb24gZmFpbGVkIik7CiAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qv
-c3JjL2h3L3VzYi9jY2lkLWNhcmQtZW11bGF0ZWQuYzo0MDQ6OTogZXJyb3I6IG5lc3RlZCBleHRl
-cm4gZGVjbGFyYXRpb24gb2YgJ2Vycm9yX3NldGcnIFstV2Vycm9yPW5lc3RlZC1leHRlcm5zXQov
-dG1wL3FlbXUtdGVzdC9zcmMvaHcvdXNiL2NjaWQtY2FyZC1lbXVsYXRlZC5jOiBJbiBmdW5jdGlv
-biAnZW11bGF0ZWRfcmVhbGl6ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody91c2IvY2NpZC1jYXJk
-LWVtdWxhdGVkLmM6NTEzOjEzOiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rp
-b24gJ2Vycm9yX2FwcGVuZF9oaW50JyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJh
-dGlvbl0KICAgICAgICAgICAgIGVycm9yX2FwcGVuZF9oaW50KGVycnAsICIlc1xuIiwgcHRhYmxl
-LT5uYW1lKTsKICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3VzYi9jY2lkLWNh
-cmQtZW11bGF0ZWQuYzo1MTM6MTM6IGVycm9yOiBuZXN0ZWQgZXh0ZXJuIGRlY2xhcmF0aW9uIG9m
-ICdlcnJvcl9hcHBlbmRfaGludCcgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNdCi90bXAvcWVtdS10
-ZXN0L3NyYy9ody91c2IvY2NpZC1jYXJkLWVtdWxhdGVkLmM6IEF0IHRvcCBsZXZlbDoKY2MxOiBl
-cnJvcjogdW5yZWNvZ25pemVkIGNvbW1hbmQgbGluZSBvcHRpb24gIi1Xbm8tZm9ybWF0LXRydW5j
-YXRpb24iIFstV2Vycm9yXQpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9y
-cwptYWtlOiAqKiogW2h3L3VzYi9jY2lkLWNhcmQtZW11bGF0ZWQub10gRXJyb3IgMQptYWtlOiAq
-KiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
-bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxODEyMjUxNDA0NDkuMTU3ODYtMS1m
-bGlAc3VzZS5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
-YXQuY29t
+commit 8bca4613 added support for %% in json strings when interpolating,
+but in doing so, this broke handling of % when not interpolating as the
+'%' is skipped in both cases.
+This commit ensures we only try to handle %% when interpolating.
+
+Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+---
+ qobject/json-parser.c | 10 ++++++----
+ tests/check-qjson.c   |  5 +++++
+ 2 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 7a7ae9e8d1..d8eb210c0c 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -208,11 +208,13 @@ static QString *parse_string(JSONParserContext *ctx=
+t, JSONToken *token)
+             }
+             break;
+         case '%':
+-            if (ctxt->ap && ptr[1] !=3D '%') {
+-                parse_error(ctxt, token, "can't interpolate into string"=
+);
+-                goto out;
++            if (ctxt->ap) {
++                if (ptr[1] !=3D '%') {
++                    parse_error(ctxt, token, "can't interpolate into str=
+ing");
++                    goto out;
++                }
++                ptr++;
+             }
+-            ptr++;
+             /* fall through */
+         default:
+             cp =3D mod_utf8_codepoint(ptr, 6, &end);
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index d876a7a96e..fa2afccb0a 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -175,6 +175,11 @@ static void utf8_string(void)
+             "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
+             "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
+             "\\u03BA\\u1F79\\u03C3\\u03BC\\u03B5",
++        },
++            /* '%' character when not interpolating */
++        {
++            "100%",
++            "100%",
+         },
+         /* 2  Boundary condition test cases */
+         /* 2.1  First possible sequence of a certain length */
+--=20
+2.20.1
