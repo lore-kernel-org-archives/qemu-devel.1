@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47586)
+Received: from eggs.gnu.org ([208.118.235.92]:47590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geXXl-0004lo-D5
+	(envelope-from <dgibson@ozlabs.org>) id 1geXXl-0004mS-Mz
 	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 22:50:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geXXh-00063G-CR
+	(envelope-from <dgibson@ozlabs.org>) id 1geXXk-00066l-C5
 	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 22:50:09 -0500
-Date: Wed, 2 Jan 2019 13:59:04 +1100
+Date: Wed, 2 Jan 2019 14:18:30 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190102025904.GH27457@umbus.fritz.box>
-References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20190102031830.GI27457@umbus.fritz.box>
+References: <20181219163541.13979-1-lvivier@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tcC6YSqBgqqkz7Sb"
+	protocol="application/pgp-signature"; boundary="3U8TY7m7wOx7RL1F"
 Content-Disposition: inline
-In-Reply-To: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH v2 0/8] target/ppc: remove various endian
- hacks from int_helper.c
+In-Reply-To: <20181219163541.13979-1-lvivier@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] spapr: Add H-Call
+ H_HOME_NODE_ASSOCIATIVITY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +24,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>
 
 
---tcC6YSqBgqqkz7Sb
+--3U8TY7m7wOx7RL1F
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 28, 2018 at 01:52:27PM +0000, Mark Cave-Ayland wrote:
-> >From working on the TCG vector operations patchset, it is apparent that =
-there
-> are a large number of endian-based hacks in int_helper.c which can be rem=
-oved by
-> making use of the various Vsr* macros.
+On Wed, Dec 19, 2018 at 05:35:41PM +0100, Laurent Vivier wrote:
+> H_HOME_NODE_ASSOCIATIVITY H-Call returns the associativity domain
+> designation associated with the identifier input parameter
 >=20
-> Patch 1 is simple enough, and implements the complete set of Vsr* macros =
-for
-> both big endian and little endian hosts.
+> This fixes a crash when we try to hotplug a CPU in memory-less and
+> CPU-less numa node. In this case, the kernel tries to online the
+> node, but without the information provided by this h-call, the node id,
+> it cannot and the CPU is started while the node is not onlined.
 >=20
-> Patches 2 and 3 rework the vector merge and multiply algorithms so that t=
-hey
-> no longer require the endian-dependent HI_IDX and LO_IDX macros.
+> It also removes the warning message from the kernel:
+>   VPHN is not supported. Disabling polling..
 >=20
-> Patches 4 and 5 then completely remove the HI_IDX/LO_IDX and EL_IDX macro=
-s by
-> replacing the element accesses with their equivalent Vsr* macro instead.
->=20
-> Patches 6 and 7 tidy up the VEXT_SIGNED macro and fix a potential shift b=
-ug
-> in the ROTRu32 and ROTRu64 macros pointed out by Richard during the revie=
-w of
-> v1.
->=20
-> Finally patch 8 is an inspection-based removal of other HOST_WORDS_BIGEND=
-IAN
-> hacks in int_helper.c, again replacing accesses with the relevant Vsr* ma=
-cro
-> instead.
->=20
-> Note that there are still some endian hacks left in int_helper.c after th=
-is
-> patchset: in particular the delightfully evil VECTOR_FOR_INORDER_I macro =
-still
-> remains in places where the index variable was used for purposes other th=
-an
-> accessing elements within the vector.
->=20
-> There were also some parts where additional conversion could be done, but=
- I
-> wasn't confident enough to make the change without access to PPC64 test i=
-mages
-> or real big-endian host hardware.
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
 Applied to ppc-for-4.0, thanks.
 
+> ---
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Based-on: <20181223111525.581-1-mark.cave-ayland@ilande.co.uk> "target/pp=
-c: prepare for conversion to TCG vector operations"
+> Notes:
+>     v3:
+>       add parentheses around a and b
+>    =20
+>     v2:
+>       add hcall-vphn to ibm,hypertas-functions
+>       correctly check flags
+>       return H_FUNCTION rather than H_PARAMETER
+>       update description
 >=20
+>  hw/ppc/spapr.c         |  1 +
+>  hw/ppc/spapr_hcall.c   | 40 ++++++++++++++++++++++++++++++++++++++++
+>  include/hw/ppc/spapr.h |  1 +
+>  3 files changed, 42 insertions(+)
 >=20
-> v2:
-> - Add R-B tags from Richard
-> - Add patches 6 and 7 to simplify the VEXT_SIGNED macro and fix a potenti=
-al
->   shift bug in the ROTRu32 and ROTRu64 macros
-> - Don't require ordered access for VNEG and VGENERIC_DO macros as pointed=
- out
->   by Richard
->=20
->=20
-> Mark Cave-Ayland (8):
->   target/ppc: implement complete set of Vsr* macros
->   target/ppc: rework vmrg{l,h}{b,h,w} instructions to use Vsr* macros
->   target/ppc: rework vmul{e,o}{s,u}{b,h,w} instructions to use Vsr*
->     macros
->   target/ppc: eliminate use of HI_IDX and LO_IDX macros from
->     int_helper.c
->   target/ppc: eliminate use of EL_IDX macros from int_helper.c
->   target/ppc: simplify VEXT_SIGNED macro in int_helper.c
->   target/ppc: remove ROTRu32 and ROTRu64 macros from int_helper.c
->   target/ppc: remove various HOST_WORDS_BIGENDIAN hacks in int_helper.c
->=20
->  target/ppc/int_helper.c | 521 ++++++++++++++++++++----------------------=
-------
->  target/ppc/internal.h   |   9 +-
->  2 files changed, 223 insertions(+), 307 deletions(-)
->=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 7a0ab2da54..d961272c8a 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1049,6 +1049,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr,=
+ void *fdt)
+>      add_str(hypertas, "hcall-sprg0");
+>      add_str(hypertas, "hcall-copy");
+>      add_str(hypertas, "hcall-debug");
+> +    add_str(hypertas, "hcall-vphn");
+>      add_str(qemu_hypertas, "hcall-memop1");
+> =20
+>      if (!kvm_enabled() || kvmppc_spapr_use_multitce()) {
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 78fecc8fe9..1ae3e6ff5e 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1663,6 +1663,42 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+>      return H_SUCCESS;
+>  }
+> =20
+> +static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+> +                                              sPAPRMachineState *spapr,
+> +                                              target_ulong opcode,
+> +                                              target_ulong *args)
+> +{
+> +    target_ulong flags =3D args[0];
+> +    target_ulong procno =3D args[1];
+> +    PowerPCCPU *tcpu;
+> +    int idx;
+> +
+> +    /* only support procno from H_REGISTER_VPA */
+> +    if (flags !=3D 0x1) {
+> +        return H_FUNCTION;
+> +    }
+> +
+> +    tcpu =3D spapr_find_cpu(procno);
+> +    if (tcpu =3D=3D NULL) {
+> +        return H_P2;
+> +    }
+> +
+> +    /* sequence is the same as in the "ibm,associativity" property */
+> +
+> +    idx =3D 0;
+> +#define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
+> +                             ((uint64_t)(b) & 0xffffffff))
+> +    args[idx++] =3D ASSOCIATIVITY(0, 0);
+> +    args[idx++] =3D ASSOCIATIVITY(0, tcpu->node_id);
+> +    args[idx++] =3D ASSOCIATIVITY(procno, -1);
+> +    for ( ; idx < 6; idx++) {
+> +        args[idx] =3D -1;
+> +    }
+> +#undef ASSOCIATIVITY
+> +
+> +    return H_SUCCESS;
+> +}
+> +
+>  static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+>                                                sPAPRMachineState *spapr,
+>                                                target_ulong opcode,
+> @@ -1864,6 +1900,10 @@ static void hypercall_register_types(void)
+>      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support=
+);
+> =20
+>      spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
+> +
+> +    /* Virtual Processor Home Node */
+> +    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
+> +                             h_home_node_associativity);
+>  }
+> =20
+>  type_init(hypercall_register_types)
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index b1a2515107..eb13e2b614 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -447,6 +447,7 @@ struct sPAPRMachineState {
+>  #define H_GET_EM_PARMS          0x2B8
+>  #define H_SET_MPP               0x2D0
+>  #define H_GET_MPP               0x2D4
+> +#define H_HOME_NODE_ASSOCIATIVITY 0x2EC
+>  #define H_XIRR_X                0x2FC
+>  #define H_RANDOM                0x300
+>  #define H_SET_MODE              0x31C
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -120,24 +158,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---tcC6YSqBgqqkz7Sb
+--3U8TY7m7wOx7RL1F
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwsKPgACgkQbDjKyiDZ
-s5KG6g/8CTH9AXZQl+/SjxBT0SKKfXHWTqqId/8pfpny48C/RkylCaTyGCql7xpU
-7zW7IotDiok/pGwWf8SNKZm29AINE6UlaaRmfiK6CHROehLfqytskrCkeTe83GDA
-TIaN9q7P9itLCXphYQ+2eKiCT9kGxcKEvZffg97s9eRCxyWURPBTfIcbyKMm/+16
-o/6QCvnBsIL1z7L9CJUiqpZ5Zx2Z2YjuM12gUR1lLTtAZ4IKkReWjmi6n9X8zXip
-FFQKvNpcyosZNKkO+lhS7cbYs7B4TMz5jhRQcKPnKV6gHVO0KuvCIqra4QStIyFg
-R4Uc7Cjv/d4NyQNHe8QKvl40rzqr/7bE0f2rbDuXt8MP6Q6zHet1dHZRYHwPk1QE
-vSkJX0x4GehbNepZJUrv9JGKlNNo/YEV4MJvGXXtIyKaLty+AuQYQqygyApGshNj
-3AzcUw2x8U+sePM5FI/IeQtzmSdVBQiNiAg7/rWEHlsS5+kUubPYZCm4oK6AieDB
-IeWyXlnwCATc96f8u8p6OBUQGVfx8PuaS2x8NJDSLRd84ylvHQRsg32bDW6Eveiv
-34PlWI+3EFfEKnzRaE4Q2iPS9hgK3+LyMjU2DW0wVf301ztwQsRr4mWLler8Nx0C
-KcnpCvbgvb1bPkX2/WpqOzidvH/OHiw/AX13tFUeO83H8E0paC8=
-=bU8n
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwsLYMACgkQbDjKyiDZ
+s5LrQQ//YPetdKHWvqIYcW9m0hshNmLTarBvseytm5g3UIw0CNLXCYwdHF7fwTye
+Wvi0Rw+T5A9S70ueM6oQosw0N1Uhbf1YJcSl/qmJwyf051y2Lck5QEkS68LWeGX8
+ZvyfH2peBKT/teZcRTWdCIL9UpbIjZvlDvi+nNtkHE09736/kMmYDmsQGcgUseAL
+JTos0JbfM8J1zmHkMff4uTvoY9RK7GA5sEG5OPkfFgwPZhfetBapVu2h9/Ih6iKM
+G5VFQZILluaHfeb9477g4mb2hCMczPv+v2End8tLmlcSOW4s9P42SWjEJ/RM9cAZ
+HOmpaUrnurFGYY/OH4YGbZn0tcPGivwHH3ZhaFgWrr31rEca+CbBUGs+7SWctF31
+7NR/CgKWGvGejwDUNkYz89QGOVzAPgP6hkOpNMrv03tlphfz5jJkuW7erDEAxCBm
+zy0a2XJ6FkYibDG3wjFKV0bXNnxscH37D4J8PIePVUNL2KgrPrU8l0oTryXQ6kvA
+3WygPO1n+d7EIMyxvM86KWC5UQtOOol4jEYTk+N0BDYIcrsZ2G+hPHAIMf/f5Xq3
+TPpzb0TJYeeIdDBBimyBMvdmnZ+ZNUCcF099pliW+in7bQfKo4M3aaWeSpAQWiVM
+wvtsYyb1U3Mdv9OTh2gzwrknE6sFUmwTzlPOEcCAKTJ/ZIeTJJU=
+=3SO4
 -----END PGP SIGNATURE-----
 
---tcC6YSqBgqqkz7Sb--
+--3U8TY7m7wOx7RL1F--
