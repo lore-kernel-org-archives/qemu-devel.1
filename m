@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51751)
+Received: from eggs.gnu.org ([208.118.235.92]:54340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1geiaH-0005tL-ER
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:37:30 -0500
+	(envelope-from <thuth@redhat.com>) id 1geij0-0000iI-QH
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:46:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1geiaD-0006tC-9Z
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:37:29 -0500
-Resent-Message-Id: <E1geiaD-0006tC-9Z@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21747)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1geiaC-0006rf-D9
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:37:25 -0500
-In-Reply-To: <20181228173356.15359-1-philmd@redhat.com>
-Message-ID: <154644248841.9907.3575860441558700867@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 2 Jan 2019 07:21:30 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] Fix strncpy() warnings for GCC8 new
- -Wstringop-truncation
+	(envelope-from <thuth@redhat.com>) id 1geiiz-0003HX-Kt
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:46:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44036)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1geiiz-0003GC-Fi
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:46:29 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed,  2 Jan 2019 16:46:20 +0100
+Message-Id: <1546443980-26779-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add some missing SPARC-related
+ files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, thuth@redhat.com, quintela@redhat.com, david@redhat.com, dgilbert@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com, mst@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIyODE3MzM1Ni4xNTM1
-OS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODEyMjgxNzMzNTYuMTUzNTkt
-MS1waGlsbWRAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvNV0g
-Rml4IHN0cm5jcHkoKSB3YXJuaW5ncyBmb3IgR0NDOCBuZXcgLVdzdHJpbmdvcC10cnVuY2F0aW9u
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
-dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoK
-Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
-aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
-IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
-YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
-ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
-aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCjdhZmVjMTUgbWlncmF0aW9uOiBVc2Ugc3RybmxlbigpIGZvciBmaXhlZC1zaXplIHN0cmlu
-ZwozZjBkODc4IG1pZ3JhdGlvbjogRml4IHN0cmluZ29wLXRydW5jYXRpb24gd2FybmluZwpmNmIx
-YjUyIGh3L2FjcGk6IFVzZSBRRU1VX05PTlNUUklORyBmb3Igbm9uIE5VTC10ZXJtaW5hdGVkIGFy
-cmF5cwoxNmU1Y2U4IGJsb2NrL3NoZWVwZG9nOiBVc2UgUUVNVV9OT05TVFJJTkcgZm9yIG5vbiBO
-VUwtdGVybWluYXRlZCBhcnJheXMKZjRhYzU4YSBxZW11L2NvbXBpbGVyOiBEZWZpbmUgUUVNVV9O
-T05TVFJJTkcKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogcWVtdS9j
-b21waWxlcjogRGVmaW5lIFFFTVVfTk9OU1RSSU5HLi4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBz
-cGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM1MzogRklMRTogaW5jbHVkZS9xZW11
-L2NvbXBpbGVyLmg6MTYzOgorI2lmIF9faGFzX2F0dHJpYnV0ZShub25zdHJpbmcpCgp0b3RhbDog
-MCBlcnJvcnMsIDEgd2FybmluZ3MsIDIxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi81OiBibG9jay9zaGVlcGRvZzog
-VXNlIFFFTVVfTk9OU1RSSU5HIGZvciBub24gTlVMLXRlcm1pbmF0ZWQgYXJyYXlzLi4uCkNoZWNr
-aW5nIFBBVENIIDMvNTogaHcvYWNwaTogVXNlIFFFTVVfTk9OU1RSSU5HIGZvciBub24gTlVMLXRl
-cm1pbmF0ZWQgYXJyYXlzLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNx
-dWFyZSBicmFja2V0ICdbJwojODI6IEZJTEU6IGluY2x1ZGUvaHcvYWNwaS9hY3BpLWRlZnMuaDo2
-MDoKKyAgICB1aW50OF90ICBvZW1faWQgWzZdIFwKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVz
-ZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM4MzogRklMRTogaW5jbHVkZS9ody9h
-Y3BpL2FjcGktZGVmcy5oOjYxOgorICAgICAgICAgICAgICAgICBRRU1VX05PTlNUUklORzsgICAg
-IC8qIE9FTSBpZGVudGlmaWNhdGlvbiAqLyBcCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZv
-cmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzg0OiBGSUxFOiBpbmNsdWRlL2h3L2FjcGkvYWNw
-aS1kZWZzLmg6NjI6CisgICAgdWludDhfdCAgb2VtX3RhYmxlX2lkIFs4XSBcCgpXQVJOSU5HOiBC
-bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojODU6IEZJ
-TEU6IGluY2x1ZGUvaHcvYWNwaS9hY3BpLWRlZnMuaDo2MzoKKyAgICAgICAgICAgICAgICAgUUVN
-VV9OT05TVFJJTkc7ICAgICAvKiBPRU0gdGFibGUgaWRlbnRpZmljYXRpb24gKi8gXAoKRVJST1I6
-IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4ODogRklM
-RTogaW5jbHVkZS9ody9hY3BpL2FjcGktZGVmcy5oOjY1OgorICAgIHVpbnQ4X3QgIGFzbF9jb21w
-aWxlcl9pZCBbNF0gXAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBv
-biBhIHNlcGFyYXRlIGxpbmUKIzg5OiBGSUxFOiBpbmNsdWRlL2h3L2FjcGkvYWNwaS1kZWZzLmg6
-NjY6CisgICAgICAgICAgICAgICAgIFFFTVVfTk9OU1RSSU5HOyAgICAgLyogQVNMIGNvbXBpbGVy
-IHZlbmRvciBJRCAqLyBcCgp0b3RhbDogMyBlcnJvcnMsIDMgd2FybmluZ3MsIDQ4IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
-VENIIDQvNTogbWlncmF0aW9uOiBGaXggc3RyaW5nb3AtdHJ1bmNhdGlvbiB3YXJuaW5nLi4uCkNo
-ZWNraW5nIFBBVENIIDUvNTogbWlncmF0aW9uOiBVc2Ugc3RybmxlbigpIGZvciBmaXhlZC1zaXpl
-IHN0cmluZy4uLgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEg
-c2VwYXJhdGUgbGluZQojNDk6IEZJTEU6IG1pZ3JhdGlvbi9nbG9iYWxfc3RhdGUuYzo5NDoKKyAg
-ICAgICAgLyogVGhpcyBjb25kaXRpb24gc2hvdWxkIG5ldmVyIGhhcHBlbiBkdXJpbmcgbWlncmF0
-aW9uLCBiZWNhdXNlCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI1IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxODEyMjgxNzMzNTYuMTUzNTkt
-MS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+These files / devices are only used by SPARC machines, so we can sort
+them into the corresponding categories in the MAINTAINERS file.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b6c2645..e897963 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1069,9 +1069,11 @@ M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+ S: Maintained
+ F: hw/sparc/sun4m.c
+ F: hw/sparc/sun4m_iommu.c
++F: hw/display/cg3.c
++F: hw/display/tcx.c
+ F: hw/dma/sparc32_dma.c
+ F: hw/misc/eccmemctl.c
+-F: hw/misc/slavio_misc.c
++F: hw/*/slavio_*.c
+ F: include/hw/sparc/sparc32_dma.h
+ F: pc-bios/openbios-sparc32
+ F: include/hw/sparc/sun4m_iommu.h
+@@ -1083,6 +1085,8 @@ F: hw/sparc64/sun4u.c
+ F: pc-bios/openbios-sparc64
+ F: hw/pci-host/sabre.c
+ F: include/hw/pci-host/sabre.h
++F: include/hw/sparc/sun4u_iommu.h
++F: include/hw/nvram/sun_nvram.h
+ 
+ Sun4v
+ M: Artyom Tarasenko <atar4qemu@gmail.com>
+-- 
+1.8.3.1
