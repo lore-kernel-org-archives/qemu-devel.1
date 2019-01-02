@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47403)
+Received: from eggs.gnu.org ([208.118.235.92]:48120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1geVAj-0006Og-ED
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 20:18:14 -0500
+	(envelope-from <tao3.xu@intel.com>) id 1geVEP-0008QI-2E
+	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 20:22:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tao3.xu@intel.com>) id 1geVAe-0005Px-C3
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 20:18:13 -0500
-Received: from mga05.intel.com ([192.55.52.43]:47565)
+	(envelope-from <tao3.xu@intel.com>) id 1geVEL-00013Z-OX
+	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 20:22:00 -0500
+Received: from mga18.intel.com ([134.134.136.126]:40345)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1geVAe-0005OZ-40
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 20:18:08 -0500
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1geVEL-0000xj-GH
+	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 20:21:57 -0500
 References: <20181227024304.12182-1-tao3.xu@intel.com>
 From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <6546f59f-4395-15f8-e17f-24003d424293@intel.com>
-Date: Wed, 2 Jan 2019 09:16:37 +0800
+Message-ID: <a608166f-c00e-0699-839e-165b30855c9e@intel.com>
+Date: Wed, 2 Jan 2019 09:20:27 +0800
 MIME-Version: 1.0
 In-Reply-To: <20181227024304.12182-1-tao3.xu@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -33,7 +33,7 @@ Cc: qemu-devel@nongnu.org, robert.hu@linux.intel.com, mark.kanda@oracle.com
 
 Hi Eduardo/Paolo,
 
-Do you have any comments about these patches ?
+Do you have any comments about these patches?
 
 Thanks
 Tao
