@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47546)
+Received: from eggs.gnu.org ([208.118.235.92]:47586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geXXi-0004ja-Lq
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 22:50:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1geXXl-0004lo-D5
+	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 22:50:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geXXh-00063J-CQ
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 22:50:06 -0500
-Date: Wed, 2 Jan 2019 13:31:44 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1geXXh-00063G-CR
+	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 22:50:09 -0500
+Date: Wed, 2 Jan 2019 13:59:04 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190102023144.GB27457@umbus.fritz.box>
-References: <20181223111525.581-1-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20190102025904.GH27457@umbus.fritz.box>
+References: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hQiwHBbRI9kgIhsi"
+	protocol="application/pgp-signature"; boundary="tcC6YSqBgqqkz7Sb"
 Content-Disposition: inline
-In-Reply-To: <20181223111525.581-1-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH v4 0/9] target/ppc: prepare for conversion
- to TCG vector operations
+In-Reply-To: <20181228135235.6859-1-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] target/ppc: remove various endian
+ hacks from int_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,128 +28,90 @@ To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, richard.henderson@linaro.org
 
 
---hQiwHBbRI9kgIhsi
+--tcC6YSqBgqqkz7Sb
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 23, 2018 at 11:15:16AM +0000, Mark Cave-Ayland wrote:
-> This patchset is an attempt at trying to improve the VMX (Altivec) instru=
-ction
-> performance by laying the groundwork for use of the new TCG vector operat=
-ions.
+On Fri, Dec 28, 2018 at 01:52:27PM +0000, Mark Cave-Ayland wrote:
+> >From working on the TCG vector operations patchset, it is apparent that =
+there
+> are a large number of endian-based hacks in int_helper.c which can be rem=
+oved by
+> making use of the various Vsr* macros.
 >=20
-> Patches 1 and 2 fix a sign-extension error discovered in EXTRACT_SHELPER =
-and an
-> associated typo in the SIMM5 macro which were discovered whilst testing R=
-ichard's
-> follow-on TCG vector improvements patchset.
+> Patch 1 is simple enough, and implements the complete set of Vsr* macros =
+for
+> both big endian and little endian hosts.
 >=20
-> In order to use TCG vector operations, the registers must be accessible f=
-rom cpu_env
-> whilst currently they are accessed via arrays of static TCG globals. Patc=
-hes 3-5
-> are therefore mechanical patches which introduce access helpers for FPR, =
-AVR and VSR
-> registers using the supplied TCGv_i64 parameter.
+> Patches 2 and 3 rework the vector merge and multiply algorithms so that t=
+hey
+> no longer require the endian-dependent HI_IDX and LO_IDX macros.
 >=20
-> Once this is done, patch 6 enables us to remove the static TCG global arr=
-ays and updates
-> the access helpers to read/write to the relevant fields in cpu_env direct=
-ly.
+> Patches 4 and 5 then completely remove the HI_IDX/LO_IDX and EL_IDX macro=
+s by
+> replacing the element accesses with their equivalent Vsr* macro instead.
 >=20
-> Patches 7 and 8 perform the legwork required to enable VSX instructions t=
-o be converted
-> to use TCG vector operations in future by rearranging the FP, VMX and VSX=
- registers into
-> a single aligned VSR register array (the scope of this patchset is VMX on=
-ly).
+> Patches 6 and 7 tidy up the VEXT_SIGNED macro and fix a potential shift b=
+ug
+> in the ROTRu32 and ROTRu64 macros pointed out by Richard during the revie=
+w of
+> v1.
 >=20
-> Patch 9 removes the AVR* macros and replaces them with the corresponding =
-Vsr* macros
-> since they are equivalent.
+> Finally patch 8 is an inspection-based removal of other HOST_WORDS_BIGEND=
+IAN
+> hacks in int_helper.c, again replacing accesses with the relevant Vsr* ma=
+cro
+> instead.
 >=20
-> Finally thanks to Richard for taking the time to answer some of my (mostl=
-y beginner)
-> questions related to TCG.
+> Note that there are still some endian hacks left in int_helper.c after th=
+is
+> patchset: in particular the delightfully evil VECTOR_FOR_INORDER_I macro =
+still
+> remains in places where the index variable was used for purposes other th=
+an
+> accessing elements within the vector.
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> There were also some parts where additional conversion could be done, but=
+ I
+> wasn't confident enough to make the change without access to PPC64 test i=
+mages
+> or real big-endian host hardware.
 
 Applied to ppc-for-4.0, thanks.
 
 >=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Based-on: <20181223111525.581-1-mark.cave-ayland@ilande.co.uk> "target/pp=
+c: prepare for conversion to TCG vector operations"
 >=20
-> v4:
-> - Rebase onto master
-> - Add extra R-B tags from Richard
-> - Leave HI_IDX/LO_IDX in int_helper.c in patch 9 (similarly named macros =
-are also
->   used in other files so let's ensure there is no confusion)
-> - Add cpu_fpr_ptr(), cpu_vsrl_ptr() and cpu_avr_ptr() as suggested by Ric=
-hard in
->   patch 8
->=20
-> v3:
-> - Rebase onto master, drop RFC prefix, alter subject line
-> - Add A-B tags from David
-> - Add SIMM5/EXTRACT_HELPER macro fix patches to the start of the series
-> - Drop patch 4 from previous patchset (delay AVR register writeback) as i=
-t should
->   not be required.
-> - Remove extra get_fpr() accidentally added to GEN_FLOAT macros in patch 3
-> - Fix temporary leak when VMX/VSX not enabled in patches 4 and 5
-> - Add patch to remove AVR* macros, replacing them with Vsr* macros
-> - Drop patches converting logical, add and sub instructions to TCG vector=
- ops (let
->   Richard incorporate this into his TCG vector improvements patchset)
 >=20
 > v2:
-> - Rebase onto master
-> - Add comment explaining rationale for FPR helpers in description for pat=
-ch 1
 > - Add R-B tags from Richard
-> - Add patch 3 to delay AVR register writeback as spotted by Richard
-> - Add patches 6 and 7 to merge FPR, VMX and VSX registers into the vsr ar=
-ray
->   to facilitate conversion of VSX instructions to vector operations later
-> - Fix accidental bug whereby the conversion of get_vsr()/set_vsr() to acc=
-ess
->   data from cpu_env was incorrectly squashed into patch 3
-> - Move set_fpr() further down in gen_fsqrts() and gen_frsqrtes() in patch=
- 1
+> - Add patches 6 and 7 to simplify the VEXT_SIGNED macro and fix a potenti=
+al
+>   shift bug in the ROTRu32 and ROTRu64 macros
+> - Don't require ordered access for VNEG and VGENERIC_DO macros as pointed=
+ out
+>   by Richard
 >=20
-> Mark Cave-Ayland (9):
->   target/ppc: fix typo in SIMM5 extraction helper
->   target/ppc: switch EXTRACT_HELPER macros over to use
->     sextract32/extract32
->   target/ppc: introduce get_fpr() and set_fpr() helpers for FP register
->     access
->   target/ppc: introduce get_avr64() and set_avr64() helpers for VMX
->     register access
->   target/ppc: introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}()
->     helpers for VSR register access
->   target/ppc: switch FPR, VMX and VSX helpers to access data directly
->     from cpu_env
->   target/ppc: merge ppc_vsr_t and ppc_avr_t union types
->   target/ppc: move FP and VMX registers into aligned vsr register array
->   target/ppc: replace AVR* macros with Vsr* macros
 >=20
->  linux-user/ppc/signal.c             |  28 +-
->  target/ppc/arch_dump.c              |  15 +-
->  target/ppc/cpu.h                    |  42 +-
->  target/ppc/gdbstub.c                |   8 +-
->  target/ppc/int_helper.c             |  86 ++--
->  target/ppc/internal.h               |  39 +-
->  target/ppc/machine.c                |  72 ++-
->  target/ppc/monitor.c                |   4 +-
->  target/ppc/translate.c              |  73 ++-
->  target/ppc/translate/dfp-impl.inc.c |   2 +-
->  target/ppc/translate/fp-impl.inc.c  | 486 +++++++++++++++-----
->  target/ppc/translate/vmx-impl.inc.c | 154 +++++--
->  target/ppc/translate/vsx-impl.inc.c | 862 ++++++++++++++++++++++++++----=
+> Mark Cave-Ayland (8):
+>   target/ppc: implement complete set of Vsr* macros
+>   target/ppc: rework vmrg{l,h}{b,h,w} instructions to use Vsr* macros
+>   target/ppc: rework vmul{e,o}{s,u}{b,h,w} instructions to use Vsr*
+>     macros
+>   target/ppc: eliminate use of HI_IDX and LO_IDX macros from
+>     int_helper.c
+>   target/ppc: eliminate use of EL_IDX macros from int_helper.c
+>   target/ppc: simplify VEXT_SIGNED macro in int_helper.c
+>   target/ppc: remove ROTRu32 and ROTRu64 macros from int_helper.c
+>   target/ppc: remove various HOST_WORDS_BIGENDIAN hacks in int_helper.c
+>=20
+>  target/ppc/int_helper.c | 521 ++++++++++++++++++++----------------------=
 ------
->  target/ppc/translate_init.inc.c     |  26 +-
->  14 files changed, 1360 insertions(+), 537 deletions(-)
+>  target/ppc/internal.h   |   9 +-
+>  2 files changed, 223 insertions(+), 307 deletions(-)
 >=20
 
 --=20
@@ -158,24 +120,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hQiwHBbRI9kgIhsi
+--tcC6YSqBgqqkz7Sb
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwsIpAACgkQbDjKyiDZ
-s5L+kw/9Fmexm8+7ItVNo1uFTsA30q1vjHuT/81qJb24E14sXXXREC3ntSOxtTNK
-GyAKd0PEn6Vw3d944ByyN/SgxMtIZNZYTMeyCv8GSJ8/bvW5/taTlbVkAvXhKDtd
-HpCD6EEr1Awj0WuNl9DgnVNKyfWQXvkNBKRUQVahqYgj/SwAGAZQT14B0BK6Us/D
-++F0DFlayvXD21BZLo6iYutxe4CO9/03z/Em+P/MpTjFF8dhmrCr8KKR9ddCXExA
-+JQvbr/oaZK23f8F2GfBbATinPlr/wA69qjhNAPPezW05CNL6RQxu+294NzgeUuI
-7TmO5fl9Uy85ucrCGl9Zps6zMsz7MMtGfM44Y1fLkw/3hiiJyzyQQt/9+DG5OtTK
-eLEI5jNLI0/yMuIYS/+RqajLI3qG0tF2ysfCRPmIKlzIKFYVpdRLmzrES1dPhd61
-BJ6MEg0Vv5Og9Gdr90f15+HCLcIB8O05xp5dDTdrrpAhoBrGmHykZF99n4IOnhWN
-84kOTZyGUTkoiZiN9co4lp/JrsZC62TV+Hjg7e/5+MhLRk7UFeaDN7+dRAn+Scd0
-PGN7/f3+7Nb7uPgCNuyP4xORR39UJYIJVJVfVBHCY0kj66WQ80yfDvEhGjO83dJB
-mNSl6w3rYWGR8P/3d0De4HIPzCIJzUDV96k6mWBTEFlIQzJ5ykQ=
-=fuoS
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwsKPgACgkQbDjKyiDZ
+s5KG6g/8CTH9AXZQl+/SjxBT0SKKfXHWTqqId/8pfpny48C/RkylCaTyGCql7xpU
+7zW7IotDiok/pGwWf8SNKZm29AINE6UlaaRmfiK6CHROehLfqytskrCkeTe83GDA
+TIaN9q7P9itLCXphYQ+2eKiCT9kGxcKEvZffg97s9eRCxyWURPBTfIcbyKMm/+16
+o/6QCvnBsIL1z7L9CJUiqpZ5Zx2Z2YjuM12gUR1lLTtAZ4IKkReWjmi6n9X8zXip
+FFQKvNpcyosZNKkO+lhS7cbYs7B4TMz5jhRQcKPnKV6gHVO0KuvCIqra4QStIyFg
+R4Uc7Cjv/d4NyQNHe8QKvl40rzqr/7bE0f2rbDuXt8MP6Q6zHet1dHZRYHwPk1QE
+vSkJX0x4GehbNepZJUrv9JGKlNNo/YEV4MJvGXXtIyKaLty+AuQYQqygyApGshNj
+3AzcUw2x8U+sePM5FI/IeQtzmSdVBQiNiAg7/rWEHlsS5+kUubPYZCm4oK6AieDB
+IeWyXlnwCATc96f8u8p6OBUQGVfx8PuaS2x8NJDSLRd84ylvHQRsg32bDW6Eveiv
+34PlWI+3EFfEKnzRaE4Q2iPS9hgK3+LyMjU2DW0wVf301ztwQsRr4mWLler8Nx0C
+KcnpCvbgvb1bPkX2/WpqOzidvH/OHiw/AX13tFUeO83H8E0paC8=
+=bU8n
 -----END PGP SIGNATURE-----
 
---hQiwHBbRI9kgIhsi--
+--tcC6YSqBgqqkz7Sb--
