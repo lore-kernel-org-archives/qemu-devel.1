@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:35301)
+Received: from eggs.gnu.org ([208.118.235.92]:35398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gegQ8-0000rZ-Cy
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:18:53 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gegQh-0001DR-5c
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:19:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gegQ3-0007cc-Ci
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:18:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36796)
+	(envelope-from <dgilbert@redhat.com>) id 1gegQZ-0008OU-Lj
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:19:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gegQ3-0007bz-6i
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:18:47 -0500
-Date: Wed, 2 Jan 2019 13:18:41 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190102131841.GO24009@stefanha-x1.localdomain>
-References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
-	<1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gegQU-0008LD-7I
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 08:19:16 -0500
+Date: Wed, 2 Jan 2019 13:19:10 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190102131909.GA2781@work-vm>
+References: <SG2PR03MB3594A9080D305565DE9FB4E380BB0@SG2PR03MB3594.apcprd03.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="jozmn01XJZjDjM3N"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
-Subject: Re: [Qemu-devel] [RFC v2 4/4] pvh: Boot uncompressed kernel using
- direct boot ABI
+In-Reply-To: <SG2PR03MB3594A9080D305565DE9FB4E380BB0@SG2PR03MB3594.apcprd03.prod.outlook.com>
+Subject: Re: [Qemu-devel] live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <liam.merwick@oracle.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net, xen-devel@lists.xenproject.org, sgarzare@redhat.com, mst@redhat.com, maran.wilson@oracle.com, george.kennedy@oracle.com, boris.ostrovsky@oracle.com
+To: ? ? <zach_turing@outlook.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
+* ? ? (zach_turing@outlook.com) wrote:
+> 
+> Hello, I have a question I would like to ask.
+> If I add the -incoming parameter when starting the qemu virtual machine, the virtual machine will block all the time, waiting for the migration connection request to arrive.
+> I want to modify the time of this blocking wait, how should I modify the source code?
 
---jozmn01XJZjDjM3N
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+It's not a timeout; it's a permanent wait for an incoming VM image.
 
-On Fri, Dec 21, 2018 at 08:03:52PM +0000, Liam Merwick wrote:
-> @@ -1336,7 +1470,7 @@ void pc_memory_init(PCMachineState *pcms,
->      int linux_boot, i;
->      MemoryRegion *ram, *option_rom_mr;
->      MemoryRegion *ram_below_4g, *ram_above_4g;
-> -    FWCfgState *fw_cfg;
-> +    FWCfgState *fw_cfg = NULL;
+What are you trying to do, and what would you like it to do if
+it were to time out?
 
-What is the purpose of this change?
+Dave
 
---jozmn01XJZjDjM3N
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcLLoxAAoJEJykq7OBq3PI7ZcH/2EvpccwgtnKmMLzxe6vNcJz
-Hxc6hpJuTHeya07m711EZ80pJNcbCWPp3SwVDgH2eYI+ZkiqP9Ld80C7824jAn9h
-UgTrsaf+8k7rHBHSv59PgbUMlRALORpUKDQaQZceg/6jmu3YONpjNTyAyxALV+OT
-E9rVse1kbVBSIFB+Y/jq5kYZapadlpIOgpYa978ZNZFbuVFjNm6lNWmz4EAqyFot
-fwwln5fdHNzB7U5RNOebGfidNYHuAr07/D2hG/8R6v4/3z3PL/0EXLkh6LpHBlCy
-AjDkuEo9fZi7OELW+ypYEteZiUImvIaen8OOT4uqpT3F+BJ6WV+QPXo5QESvjdU=
-=JSAl
------END PGP SIGNATURE-----
-
---jozmn01XJZjDjM3N--
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
