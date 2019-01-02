@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48048)
+Received: from eggs.gnu.org ([208.118.235.92]:49205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1geeCb-0004Ig-Nj
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 05:56:46 -0500
+	(envelope-from <bounces@canonical.com>) id 1geeGe-00069l-LN
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1geeCV-0004JL-D2
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 05:56:45 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52233)
+	(envelope-from <bounces@canonical.com>) id 1geeGZ-0007iN-PC
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:00:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59824)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1geeCV-0004H9-6T
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 05:56:39 -0500
-Received: by mail-wm1-f66.google.com with SMTP id m1so26334899wml.2
-	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 02:56:37 -0800 (PST)
-References: <20190102102243.28822-1-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7c055c4c-075a-8c32-110a-e88afa81b074@redhat.com>
-Date: Wed, 2 Jan 2019 11:56:35 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1geeGZ-0007hX-JG
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:00:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1geeGY-00087z-Dj
+	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 11:00:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 64FC82E80C7
+	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 11:00:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190102102243.28822-1-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: add qemu_vga.ndrv file entry
- for Mac machines
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 02 Jan 2019 10:53:57 -0000
+From: Thomas Huth <1809665@bugs.launchpad.net>
+Reply-To: Bug 1809665 <1809665@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154566626385.25910.12711983515604457304.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154642643767.24519.10955671248068508181.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1809665] Re: Xbox One controller USB passthrough
+ disconnections and stops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-On 1/2/19 11:22 AM, Mark Cave-Ayland wrote:
-> The VGA driver built from Ben's QemuMacDrivers repository is used exclusively
-> by the Mac machines.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Do you get a different behavior if you use "-device usb-ehci" or
+"-device nec-usb-xhci" instead of the "-usb" parameter?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+-- =
 
-> ---
->  MAINTAINERS | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 344cb2d7fd..3da3d103b1 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -965,6 +965,7 @@ F: include/hw/misc/macio/
->  F: include/hw/misc/mos6522.h
->  F: include/hw/ppc/mac_dbdma.h
->  F: include/hw/pci-host/uninorth.h
-> +F: pc-bios/qemu_vga.ndrv
->  
->  Old World
->  M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> @@ -976,6 +977,7 @@ F: hw/pci-host/grackle.c
->  F: hw/misc/macio/
->  F: hw/intc/heathrow_pic.c
->  F: include/hw/intc/heathrow_pic.h
-> +F: pc-bios/qemu_vga.ndrv
->  
->  PReP
->  M: Hervé Poussineau <hpoussin@reactos.org>
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1809665
+
+Title:
+  Xbox One controller USB passthrough disconnections and stops
+
+Status in QEMU:
+  New
+
+Bug description:
+  I can't properly passthrough my Xbox One controller to a virtual
+  machine; it causes USB disconnections on the host, ultimately
+  preventing it to work (at all) on the guest
+
+  I've seen a few other cases reported in other websites, which show the
+  same symptoms:
+
+  - https://www.reddit.com/r/VFIO/comments/97dhbw/qemu_w10_xbox_one_control=
+ler
+  - https://unix.stackexchange.com/questions/452751/how-can-i-pass-through-=
+an-xbox-one-controller-to-a-windows-vm-on-ubuntu
+
+  This is sample:
+
+      libusb: error [udev_hotplug_event] ignoring udev action bind
+      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
+      libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try =
+again
+      libusb: error [_get_usbfs_fd] libusb couldn't open USB device
+          /dev/bus/usb/003/016: No such file or directory
+
+  I think this is a quite long-standing issue, as I've been experiencing
+  through several versions, including the current one (3.1).
+
+  I can reproduce this 100% of the times, on multiple host O/S
+  distributions (the current one being based on Ubuntu 18.04 x86-64).
+
+  I compile QEMU directly from source, and execute it via commandline;
+  the command is very long, however, the relevant part is standard (I
+  think):
+
+      -usb \
+      -device usb-tablet \
+      -device usb-host,vendorid=3D0x$VGAPT_XBOX_PAD_VEND_ID,productid=3D0x$=
+VGAPT_XBOX_PAD_PROD_ID \
+
+  The guest is Windows 10 64bit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1809665/+subscriptions
