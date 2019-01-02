@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:60052)
+Received: from eggs.gnu.org ([208.118.235.92]:55140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gekqE-0003XN-An
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 13:02:07 -0500
+	(envelope-from <philmd@redhat.com>) id 1gemI2-0004Cv-8H
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 14:34:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gekqA-0005wK-RK
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 13:02:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gekqA-0005vQ-Gj
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 13:02:02 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 36658C7C1C
-	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 18:02:00 +0000 (UTC)
-Date: Wed, 2 Jan 2019 19:01:58 +0100
-From: Christophe Fergeau <cfergeau@redhat.com>
-Message-ID: <20190102180158.GA6015@natto.ory.fergeau.eu>
-References: <20190102140535.11512-1-cfergeau@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gemHx-0002Xd-AP
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 14:34:54 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40442)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gemHx-0002XA-4Z
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 14:34:49 -0500
+Received: by mail-wr1-f65.google.com with SMTP id p4so31560387wrt.7
+	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 11:34:49 -0800 (PST)
+References: <1546443980-26779-1-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c2648f00-c44f-7f8e-8673-501b88f1e125@redhat.com>
+Date: Wed, 2 Jan 2019 20:34:46 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
-Content-Disposition: inline
-In-Reply-To: <20190102140535.11512-1-cfergeau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
+In-Reply-To: <1546443980-26779-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add some missing
+ SPARC-related files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,95 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
 
+Hi Thomas,
 
---UugvWAfsgieZRqgk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Adding Markus to cc: list, I forgot to do it when sending the patch.
-
-Christophe
-
-On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
-> commit 8bca4613 added support for %% in json strings when interpolating,
-> but in doing so, this broke handling of % when not interpolating as the
-> '%' is skipped in both cases.
-> This commit ensures we only try to handle %% when interpolating.
->=20
-> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+On 1/2/19 4:46 PM, Thomas Huth wrote:
+> These files / devices are only used by SPARC machines, so we can sort
+> them into the corresponding categories in the MAINTAINERS file.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  qobject/json-parser.c | 10 ++++++----
->  tests/check-qjson.c   |  5 +++++
->  2 files changed, 11 insertions(+), 4 deletions(-)
->=20
-> diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-> index 7a7ae9e8d1..d8eb210c0c 100644
-> --- a/qobject/json-parser.c
-> +++ b/qobject/json-parser.c
-> @@ -208,11 +208,13 @@ static QString *parse_string(JSONParserContext *ctx=
-t, JSONToken *token)
->              }
->              break;
->          case '%':
-> -            if (ctxt->ap && ptr[1] !=3D '%') {
-> -                parse_error(ctxt, token, "can't interpolate into string"=
-);
-> -                goto out;
-> +            if (ctxt->ap) {
-> +                if (ptr[1] !=3D '%') {
-> +                    parse_error(ctxt, token, "can't interpolate into str=
-ing");
-> +                    goto out;
-> +                }
-> +                ptr++;
->              }
-> -            ptr++;
->              /* fall through */
->          default:
->              cp =3D mod_utf8_codepoint(ptr, 6, &end);
-> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-> index d876a7a96e..fa2afccb0a 100644
-> --- a/tests/check-qjson.c
-> +++ b/tests/check-qjson.c
-> @@ -175,6 +175,11 @@ static void utf8_string(void)
->              "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
->              "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
->              "\\u03BA\\u1F79\\u03C3\\u03BC\\u03B5",
-> +        },
-> +            /* '%' character when not interpolating */
-> +        {
-> +            "100%",
-> +            "100%",
->          },
->          /* 2  Boundary condition test cases */
->          /* 2.1  First possible sequence of a certain length */
-> --=20
-> 2.20.1
->=20
->=20
+>  MAINTAINERS | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index b6c2645..e897963 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1069,9 +1069,11 @@ M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>  S: Maintained
+>  F: hw/sparc/sun4m.c
+>  F: hw/sparc/sun4m_iommu.c
+> +F: hw/display/cg3.c
+> +F: hw/display/tcx.c
+>  F: hw/dma/sparc32_dma.c
+>  F: hw/misc/eccmemctl.c
+> -F: hw/misc/slavio_misc.c
+> +F: hw/*/slavio_*.c
+>  F: include/hw/sparc/sparc32_dma.h
+>  F: pc-bios/openbios-sparc32
+>  F: include/hw/sparc/sun4m_iommu.h
+> @@ -1083,6 +1085,8 @@ F: hw/sparc64/sun4u.c
+>  F: pc-bios/openbios-sparc64
+>  F: hw/pci-host/sabre.c
+>  F: include/hw/pci-host/sabre.h
+> +F: include/hw/sparc/sun4u_iommu.h
 
---UugvWAfsgieZRqgk
-Content-Type: application/pgp-signature; name="signature.asc"
+I sent a patch to trivial@ with other sun4u changes, reviewed by Mark:
+https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04467.html
 
------BEGIN PGP SIGNATURE-----
+Neither mine nor your are complete :)
+Can I include your patch when respining the series? (Not sure I need to
+respin although).
 
-iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlws/JYACgkQqdjCFCms
-bILCJBAAgJ0m4pXRG3fvhNNBv5OQmouXOD/fJCAZ7AxVQp6JlK4ZXXunIw4A9Q3U
-31Rnpo3iFpT8DmZESeF7a+VAg3s4WmXDAdHlbNcCjylJ6Uix7XRYvp3YhGLDFJX1
-CgUyazbpTZFVgWARpJ4XLgji48fUF3DmuA1izHWxJcCKjbP+2rM8hLxy0XSqVeNc
-d3gNY4i4GkAb6qRL34G5qOTrKbh+tEylYznKASCrSBQKt3O57MPMgQPFLF0zLpPJ
-A5hBGp1JHJzBTssYD2myC5LvcgbwqOk4e7/0VcaPu//weOzvmggT3aJLBRjKC4YA
-WRwUyjikL6GBo0hWlpnzZk6RwUrdez1ABojzVPkTwP+H7mp/WrPyMMleh4nA2Ut+
-8DiOk5hul+DLQ5qPU0rcQeYYB0QLx6j+5CnHQ0TtUuYMprsqMCWi1h7LCLtoGVqG
-+ry2IDxKLdbhjDfw9zNm0wVJkx60CYTQhngh6Alfok5AACTcu8SNTB17c2995Fyg
-9B6X8sOAUby0PWsHKBUWCSHFKWWNc/2cudlr2Kq1hgNNFZr8hBMkkhe+li+PDksJ
-7/VuWZmKBlVV9si7eZ2qiI7Hs1pe5pJwZzJvnQYxA3h8FggFjI0IfMnG4tLDkaK5
-CxKsBHDYXpwD58iziBxoixiAJzC4FL+xI1kVCt8Jk83TosHlxHg=
-=hfDt
------END PGP SIGNATURE-----
+> +F: include/hw/nvram/sun_nvram.h
 
---UugvWAfsgieZRqgk--
+sun_nvram.h is also used by sun4m (the previous section this patch updates).
+
+>  
+>  Sun4v
+>  M: Artyom Tarasenko <atar4qemu@gmail.com>
+> 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
