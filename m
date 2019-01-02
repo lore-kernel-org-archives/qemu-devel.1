@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48706)
+Received: from eggs.gnu.org ([208.118.235.92]:48754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1geZXx-0002zE-Di
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:32 -0500
+	(envelope-from <clg@kaod.org>) id 1geZY5-00035n-S1
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1geZXs-00066P-Du
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:29 -0500
-Received: from 8.mo177.mail-out.ovh.net ([46.105.61.98]:40041)
+	(envelope-from <clg@kaod.org>) id 1geZY1-0006AN-Qo
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:37 -0500
+Received: from 14.mo1.mail-out.ovh.net ([178.32.97.215]:44991)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1geZXr-00065i-JB
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:24 -0500
-Received: from player773.ha.ovh.net (unknown [10.109.160.62])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 0819AD881C
-	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 06:58:21 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1geZY0-00068T-Np
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:58:33 -0500
+Received: from player773.ha.ovh.net (unknown [10.109.143.18])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 39C9314B971
+	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 06:58:29 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed,  2 Jan 2019 06:57:36 +0100
-Message-Id: <20190102055743.5052-4-clg@kaod.org>
+Date: Wed,  2 Jan 2019 06:57:37 +0100
+Message-Id: <20190102055743.5052-5-clg@kaod.org>
 In-Reply-To: <20190102055743.5052-1-clg@kaod.org>
 References: <20190102055743.5052-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 03/10] ppc: replace the 'Object *intc' by a
- 'ICPState *icp' pointer under the CPU
+Subject: [Qemu-devel] [PATCH 04/10] spapr/xive: simplify the sPAPR IRQ qirq
+ method for XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,207 +33,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Now that the 'intc' pointer is only used by the XICS interrupt mode,
-let's make things clear and use a XICS type and name.
+The qirq routines of the XiveSource and the sPAPRXive model are only
+used under the sPAPR IRQ backend. Simplify the overall call stack and
+gather all the code under spapr_qirq_xive(). It will ease future
+changes.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/cpu.h        |  3 ++-
- hw/intc/xics_spapr.c    | 10 +++++-----
- hw/ppc/pnv.c            |  6 +++---
- hw/ppc/pnv_core.c       |  2 +-
- hw/ppc/spapr.c          |  2 +-
- hw/ppc/spapr_cpu_core.c |  4 ++--
- hw/ppc/spapr_irq.c      |  6 +++---
- 7 files changed, 17 insertions(+), 16 deletions(-)
+ include/hw/ppc/spapr_xive.h |  1 -
+ include/hw/ppc/xive.h       |  6 ------
+ hw/intc/spapr_xive.c        | 14 --------------
+ hw/ppc/spapr_irq.c          | 12 +++++++++++-
+ 4 files changed, 11 insertions(+), 22 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index c76036985623..757606bcb2e2 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1178,6 +1178,7 @@ do {                                            \
- typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
- typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
- typedef struct XiveTCTX XiveTCTX;
-+typedef struct ICPState ICPState;
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 728735dbcfbe..9ee524fdb218 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -40,7 +40,6 @@ typedef struct sPAPRXive {
+ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
+ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
+ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+-qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
 =20
- /**
-  * PowerPCCPU:
-@@ -1196,7 +1197,7 @@ struct PowerPCCPU {
-     int vcpu_id;
-     uint32_t compat_pvr;
-     PPCVirtualHypervisor *vhyp;
--    Object *intc;
-+    ICPState *icp;
-     XiveTCTX *tctx;
-     void *machine_data;
-     int32_t node_id; /* NUMA node this CPU belongs to */
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index f67d3c80bf3a..9c1a90d7094b 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -44,7 +44,7 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
+ typedef struct sPAPRMachineState sPAPRMachineState;
+=20
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 18cd114eb244..b05fe88b5b82 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -278,12 +278,6 @@ uint8_t xive_source_esb_set(XiveSource *xsrc, uint32=
+_t srcno, uint8_t pq);
+ void xive_source_pic_print_info(XiveSource *xsrc, uint32_t offset,
+                                 Monitor *mon);
+=20
+-static inline qemu_irq xive_source_qirq(XiveSource *xsrc, uint32_t srcno=
+)
+-{
+-    assert(srcno < xsrc->nr_irqs);
+-    return xsrc->qirqs[srcno];
+-}
+-
+ static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint32_t src=
+no)
  {
-     target_ulong cppr =3D args[0];
-=20
--    icp_set_cppr(ICP(cpu->intc), cppr);
-+    icp_set_cppr(cpu->icp, cppr);
-     return H_SUCCESS;
+     assert(srcno < xsrc->nr_irqs);
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 0e39c90cbd07..eea28337e807 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -488,20 +488,6 @@ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t l=
+isn)
+     return true;
  }
 =20
-@@ -65,7 +65,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachine=
-State *spapr,
- static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
--    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
-+    uint32_t xirr =3D icp_accept(cpu->icp);
-=20
-     args[0] =3D xirr;
-     return H_SUCCESS;
-@@ -74,7 +74,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
- static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                              target_ulong opcode, target_ulong *args)
- {
--    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
-+    uint32_t xirr =3D icp_accept(cpu->icp);
-=20
-     args[0] =3D xirr;
-     args[1] =3D cpu_get_host_ticks();
-@@ -86,7 +86,7 @@ static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachine=
-State *spapr,
- {
-     target_ulong xirr =3D args[0];
-=20
--    icp_eoi(ICP(cpu->intc), xirr);
-+    icp_eoi(cpu->icp, xirr);
-     return H_SUCCESS;
- }
-=20
-@@ -94,7 +94,7 @@ static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
-                             target_ulong opcode, target_ulong *args)
- {
-     uint32_t mfrr;
--    uint32_t xirr =3D icp_ipoll(ICP(cpu->intc), &mfrr);
-+    uint32_t xirr =3D icp_ipoll(cpu->icp, &mfrr);
-=20
-     args[0] =3D xirr;
-     args[1] =3D mfrr;
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 8e83be54fca1..d84acef55b69 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -681,7 +681,7 @@ static void pnv_chip_power8_intc_create(PnvChip *chip=
-, PowerPCCPU *cpu,
-         return;
-     }
-=20
--    cpu->intc =3D obj;
-+    cpu->icp =3D ICP(obj);
- }
-=20
+-qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn)
+-{
+-    XiveSource *xsrc =3D &xive->source;
+-
+-    if (lisn >=3D xive->nr_irqs) {
+-        return NULL;
+-    }
+-
+-    /* The sPAPR machine/device should have claimed the IRQ before */
+-    assert(xive_eas_is_valid(&xive->eat[lisn]));
+-
+-    return xive_source_qirq(xsrc, lisn);
+-}
+-
  /*
-@@ -1099,7 +1099,7 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int pi=
-r)
- {
-     PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
-=20
--    return cpu ? ICP(cpu->intc) : NULL;
-+    return cpu ? cpu->icp : NULL;
- }
-=20
- static void pnv_pic_print_info(InterruptStatsProvider *obj,
-@@ -1112,7 +1112,7 @@ static void pnv_pic_print_info(InterruptStatsProvid=
-er *obj,
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
--        icp_pic_print_info(ICP(cpu->intc), mon);
-+        icp_pic_print_info(cpu->icp, mon);
-     }
-=20
-     for (i =3D 0; i < pnv->num_chips; i++) {
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 120273774874..b98f277f1e02 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -190,7 +190,7 @@ err:
- static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
- {
-     qemu_unregister_reset(pnv_cpu_reset, cpu);
--    object_unparent(cpu->intc);
-+    object_unparent(OBJECT(cpu->icp));
-     cpu_remove_sync(CPU(cpu));
-     object_unparent(OBJECT(cpu));
- }
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 19a07c5c9dd8..5e8ffda47372 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3841,7 +3841,7 @@ static ICPState *spapr_icp_get(XICSFabric *xi, int =
-vcpu_id)
- {
-     PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
-=20
--    return cpu ? ICP(cpu->intc) : NULL;
-+    return cpu ? cpu->icp : NULL;
- }
-=20
- static void spapr_pic_print_info(InterruptStatsProvider *obj,
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 1473ef853336..0405306d1e59 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -194,8 +194,8 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, sPA=
-PRCPUCore *sc)
-         vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_=
-data);
-     }
-     qemu_unregister_reset(spapr_cpu_reset, cpu);
--    if (cpu->intc) {
--        object_unparent(cpu->intc);
-+    if (cpu->icp) {
-+        object_unparent(OBJECT(cpu->icp));
-     }
-     if (cpu->tctx) {
-         object_unparent(OBJECT(cpu->tctx));
+  * XIVE hcalls
+  *
 diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 8d028db44ff4..50e767120d21 100644
+index 50e767120d21..b875065ef86b 100644
 --- a/hw/ppc/spapr_irq.c
 +++ b/hw/ppc/spapr_irq.c
-@@ -184,7 +184,7 @@ static void spapr_irq_print_info_xics(sPAPRMachineSta=
-te *spapr, Monitor *mon)
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+@@ -294,7 +294,17 @@ static void spapr_irq_free_xive(sPAPRMachineState *s=
+papr, int irq, int num)
 =20
--        icp_pic_print_info(ICP(cpu->intc), mon);
-+        icp_pic_print_info(cpu->icp, mon);
-     }
-=20
-     ics_pic_print_info(spapr->ics, mon);
-@@ -203,7 +203,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMachi=
-neState *spapr,
-         return;
-     }
-=20
--    cpu->intc =3D obj;
-+    cpu->icp =3D ICP(obj);
+ static qemu_irq spapr_qirq_xive(sPAPRMachineState *spapr, int irq)
+ {
+-    return spapr_xive_qirq(spapr->xive, irq);
++    sPAPRXive *xive =3D spapr->xive;
++    XiveSource *xsrc =3D &xive->source;
++
++    if (irq >=3D xive->nr_irqs) {
++        return NULL;
++    }
++
++    /* The sPAPR machine/device should have claimed the IRQ before */
++    assert(xive_eas_is_valid(&xive->eat[irq]));
++
++    return xsrc->qirqs[irq];
  }
 =20
- static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int versio=
-n_id)
-@@ -212,7 +212,7 @@ static int spapr_irq_post_load_xics(sPAPRMachineState=
- *spapr, int version_id)
-         CPUState *cs;
-         CPU_FOREACH(cs) {
-             PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--            icp_resend(ICP(cpu->intc));
-+            icp_resend(cpu->icp);
-         }
-     }
-     return 0;
+ static void spapr_irq_print_info_xive(sPAPRMachineState *spapr,
 --=20
 2.20.1
