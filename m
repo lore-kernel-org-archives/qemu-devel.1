@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55550)
+Received: from eggs.gnu.org ([208.118.235.92]:60052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gekWb-0007lm-AU
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 12:41:51 -0500
+	(envelope-from <cfergeau@redhat.com>) id 1gekqE-0003XN-An
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 13:02:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gekWX-0008Ux-Bk
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 12:41:49 -0500
-Resent-Message-Id: <E1gekWX-0008Ux-Bk@eggs.gnu.org>
-In-Reply-To: <20181226171538.21984-1-philmd@redhat.com>
-Message-ID: <154645087925.9907.8533035759502851896@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cfergeau@redhat.com>) id 1gekqA-0005wK-RK
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 13:02:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gekqA-0005vQ-Gj
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 13:02:02 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 36658C7C1C
+	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 18:02:00 +0000 (UTC)
+Date: Wed, 2 Jan 2019 19:01:58 +0100
+From: Christophe Fergeau <cfergeau@redhat.com>
+Message-ID: <20190102180158.GA6015@natto.ory.fergeau.eu>
+References: <20190102140535.11512-1-cfergeau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 2 Jan 2019 09:41:21 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/3] cutils: Cleanup, improve documentation
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
+Content-Disposition: inline
+In-Reply-To: <20190102140535.11512-1-cfergeau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, david@redhat.com, qemu-trivial@nongnu.org, cohuck@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, kraxel@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIyNjE3MTUzOC4yMTk4
-NC0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODEyMjYxNzE1MzguMjE5ODQt
-MS1waGlsbWRAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvM10gY3V0
-aWxzOiBDbGVhbnVwLCBpbXByb3ZlIGRvY3VtZW50YXRpb24KCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGlu
-ZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1m
-b3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVj
-aG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMg
-JGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9j
-aGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAg
-ZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNWFjMzY1ZCB1dGlsL2N1dGls
-czogTW92ZSBmdW5jdGlvbiBkb2N1bWVudGF0aW9ucyB0byB0aGUgaGVhZGVyCjFkNGI0OTYgdXRp
-bC9jdXRpbHM6IE1vdmUgY3R5cGUgbWFjcm9zIHRvICJjdXRpbHMuaCIKNzBkYjcxMyB1dGlsL2N1
-dGlsczogTW92ZSBzaXplX3RvX3N0cigpIGZyb20gInFlbXUtY29tbW9uLmgiIHRvICJjdXRpbHMu
-aCIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogdXRpbC9jdXRpbHM6
-IE1vdmUgc2l6ZV90b19zdHIoKSBmcm9tICJxZW11LWNvbW1vbi5oIiB0byAiY3V0aWxzLmgiLi4u
-CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBs
-aW5lCiM0MjogRklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5oOjE2MDoKKy8qKgoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCA0OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDIvMzogdXRpbC9jdXRpbHM6IE1vdmUg
-Y3R5cGUgbWFjcm9zIHRvICJjdXRpbHMuaCIuLi4KV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
-IGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzEwMDogRklMRTogaW5jbHVkZS9xZW11
-L2N1dGlscy5oOjY6CisvKiogdW5zaWduZWQgY3R5cGUgbWFjcm9zOgoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTA4OiBGSUxFOiBpbmNsdWRlL3FlbXUvY3V0aWxz
-Lmg6MTQ6CisjZGVmaW5lIHFlbXVfaXNhbG51bShjKV5JXklpc2FsbnVtKCh1bnNpZ25lZCBjaGFy
-KShjKSkkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMDk6IEZJ
-TEU6IGluY2x1ZGUvcWVtdS9jdXRpbHMuaDoxNToKKyNkZWZpbmUgcWVtdV9pc2FscGhhKGMpXkle
-SWlzYWxwaGEoKHVuc2lnbmVkIGNoYXIpKGMpKSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzExMDogRklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5oOjE2OgorI2Rl
-ZmluZSBxZW11X2lzY250cmwoYyleSV5JaXNjbnRybCgodW5zaWduZWQgY2hhcikoYykpJAoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTExOiBGSUxFOiBpbmNsdWRl
-L3FlbXUvY3V0aWxzLmg6MTc6CisjZGVmaW5lIHFlbXVfaXNkaWdpdChjKV5JXklpc2RpZ2l0KCh1
-bnNpZ25lZCBjaGFyKShjKSkkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
-YWJzCiMxMTI6IEZJTEU6IGluY2x1ZGUvcWVtdS9jdXRpbHMuaDoxODoKKyNkZWZpbmUgcWVtdV9p
-c2dyYXBoKGMpXkleSWlzZ3JhcGgoKHVuc2lnbmVkIGNoYXIpKGMpKSQKCkVSUk9SOiBjb2RlIGlu
-ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzExMzogRklMRTogaW5jbHVkZS9xZW11L2N1dGls
-cy5oOjE5OgorI2RlZmluZSBxZW11X2lzbG93ZXIoYyleSV5JaXNsb3dlcigodW5zaWduZWQgY2hh
-cikoYykpJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTE0OiBG
-SUxFOiBpbmNsdWRlL3FlbXUvY3V0aWxzLmg6MjA6CisjZGVmaW5lIHFlbXVfaXNwcmludChjKV5J
-Xklpc3ByaW50KCh1bnNpZ25lZCBjaGFyKShjKSkkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiMxMTU6IEZJTEU6IGluY2x1ZGUvcWVtdS9jdXRpbHMuaDoyMToKKyNk
-ZWZpbmUgcWVtdV9pc3B1bmN0KGMpXkleSWlzcHVuY3QoKHVuc2lnbmVkIGNoYXIpKGMpKSQKCkVS
-Uk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzExNjogRklMRTogaW5jbHVk
-ZS9xZW11L2N1dGlscy5oOjIyOgorI2RlZmluZSBxZW11X2lzc3BhY2UoYyleSV5JaXNzcGFjZSgo
-dW5zaWduZWQgY2hhcikoYykpJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
-dGFicwojMTE3OiBGSUxFOiBpbmNsdWRlL3FlbXUvY3V0aWxzLmg6MjM6CisjZGVmaW5lIHFlbXVf
-aXN1cHBlcihjKV5JXklpc3VwcGVyKCh1bnNpZ25lZCBjaGFyKShjKSkkCgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMTg6IEZJTEU6IGluY2x1ZGUvcWVtdS9jdXRp
-bHMuaDoyNDoKKyNkZWZpbmUgcWVtdV9pc3hkaWdpdChjKV5JaXN4ZGlnaXQoKHVuc2lnbmVkIGNo
-YXIpKGMpKSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzExOTog
-RklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5oOjI1OgorI2RlZmluZSBxZW11X3RvbG93ZXIoYyle
-SV5JdG9sb3dlcigodW5zaWduZWQgY2hhcikoYykpJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
-ZCBuZXZlciB1c2UgdGFicwojMTIwOiBGSUxFOiBpbmNsdWRlL3FlbXUvY3V0aWxzLmg6MjY6Cisj
-ZGVmaW5lIHFlbXVfdG91cHBlcihjKV5JXkl0b3VwcGVyKCh1bnNpZ25lZCBjaGFyKShjKSkkCgpF
-UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMjE6IEZJTEU6IGluY2x1
-ZGUvcWVtdS9jdXRpbHMuaDoyNzoKKyNkZWZpbmUgcWVtdV9pc2FzY2lpKGMpXkleSWlzYXNjaWko
-KHVuc2lnbmVkIGNoYXIpKGMpKSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
-IHRhYnMKIzEyMjogRklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5oOjI4OgorI2RlZmluZSBxZW11
-X3RvYXNjaWkoYyleSV5JdG9hc2NpaSgodW5zaWduZWQgY2hhcikoYykpJAoKdG90YWw6IDE1IGVy
-cm9ycywgMSB3YXJuaW5ncywgMTI2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvMzogdXRpbC9jdXRpbHM6IE1vdmUg
-ZnVuY3Rpb24gZG9jdW1lbnRhdGlvbnMgdG8gdGhlIGhlYWRlci4uLgpXQVJOSU5HOiBCbG9jayBj
-b21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNzM6IEZJTEU6IGlu
-Y2x1ZGUvcWVtdS9jdXRpbHMuaDoxNTY6CisvKioKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVz
-ZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM5NTogRklMRTogaW5jbHVkZS9xZW11
-L2N1dGlscy5oOjE3OToKKy8qKgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGlu
-ZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzEyNDogRklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5o
-OjIwODoKKy8qKgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
-IHNlcGFyYXRlIGxpbmUKIzE1NDogRklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5oOjIzODoKKy8q
-KgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRl
-IGxpbmUKIzE4MzogRklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5oOjI2NzoKKy8qKgoKV0FSTklO
-RzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzIx
-NDogRklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5oOjI5ODoKKy8qKgoKV0FSTklORzogQmxvY2sg
-Y29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzIyNTogRklMRTog
-aW5jbHVkZS9xZW11L2N1dGlscy5oOjMwOToKKy8qKgoKV0FSTklORzogQmxvY2sgY29tbWVudHMg
-dXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzIzNTogRklMRTogaW5jbHVkZS9x
-ZW11L2N1dGlscy5oOjMxOToKKy8qKgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVh
-ZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzI2MzogRklMRTogaW5jbHVkZS9xZW11L2N1dGls
-cy5oOjM0NzoKKy8qKgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBv
-biBhIHNlcGFyYXRlIGxpbmUKIzI3MzogRklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5oOjM1NzoK
-Ky8qKgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFy
-YXRlIGxpbmUKIzMwNDogRklMRTogaW5jbHVkZS9xZW11L2N1dGlscy5oOjM4ODoKKy8qKgoKdG90
-YWw6IDAgZXJyb3JzLCAxMSB3YXJuaW5ncywgNTQ0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
-bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
-cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxODEyMjYxNzE1MzguMjE5ODQtMS1waGlsbWRAcmVkaGF0
-LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+--UugvWAfsgieZRqgk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Adding Markus to cc: list, I forgot to do it when sending the patch.
+
+Christophe
+
+On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
+> commit 8bca4613 added support for %% in json strings when interpolating,
+> but in doing so, this broke handling of % when not interpolating as the
+> '%' is skipped in both cases.
+> This commit ensures we only try to handle %% when interpolating.
+>=20
+> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+> ---
+>  qobject/json-parser.c | 10 ++++++----
+>  tests/check-qjson.c   |  5 +++++
+>  2 files changed, 11 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+> index 7a7ae9e8d1..d8eb210c0c 100644
+> --- a/qobject/json-parser.c
+> +++ b/qobject/json-parser.c
+> @@ -208,11 +208,13 @@ static QString *parse_string(JSONParserContext *ctx=
+t, JSONToken *token)
+>              }
+>              break;
+>          case '%':
+> -            if (ctxt->ap && ptr[1] !=3D '%') {
+> -                parse_error(ctxt, token, "can't interpolate into string"=
+);
+> -                goto out;
+> +            if (ctxt->ap) {
+> +                if (ptr[1] !=3D '%') {
+> +                    parse_error(ctxt, token, "can't interpolate into str=
+ing");
+> +                    goto out;
+> +                }
+> +                ptr++;
+>              }
+> -            ptr++;
+>              /* fall through */
+>          default:
+>              cp =3D mod_utf8_codepoint(ptr, 6, &end);
+> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+> index d876a7a96e..fa2afccb0a 100644
+> --- a/tests/check-qjson.c
+> +++ b/tests/check-qjson.c
+> @@ -175,6 +175,11 @@ static void utf8_string(void)
+>              "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
+>              "\xCE\xBA\xE1\xBD\xB9\xCF\x83\xCE\xBC\xCE\xB5",
+>              "\\u03BA\\u1F79\\u03C3\\u03BC\\u03B5",
+> +        },
+> +            /* '%' character when not interpolating */
+> +        {
+> +            "100%",
+> +            "100%",
+>          },
+>          /* 2  Boundary condition test cases */
+>          /* 2.1  First possible sequence of a certain length */
+> --=20
+> 2.20.1
+>=20
+>=20
+
+--UugvWAfsgieZRqgk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlws/JYACgkQqdjCFCms
+bILCJBAAgJ0m4pXRG3fvhNNBv5OQmouXOD/fJCAZ7AxVQp6JlK4ZXXunIw4A9Q3U
+31Rnpo3iFpT8DmZESeF7a+VAg3s4WmXDAdHlbNcCjylJ6Uix7XRYvp3YhGLDFJX1
+CgUyazbpTZFVgWARpJ4XLgji48fUF3DmuA1izHWxJcCKjbP+2rM8hLxy0XSqVeNc
+d3gNY4i4GkAb6qRL34G5qOTrKbh+tEylYznKASCrSBQKt3O57MPMgQPFLF0zLpPJ
+A5hBGp1JHJzBTssYD2myC5LvcgbwqOk4e7/0VcaPu//weOzvmggT3aJLBRjKC4YA
+WRwUyjikL6GBo0hWlpnzZk6RwUrdez1ABojzVPkTwP+H7mp/WrPyMMleh4nA2Ut+
+8DiOk5hul+DLQ5qPU0rcQeYYB0QLx6j+5CnHQ0TtUuYMprsqMCWi1h7LCLtoGVqG
++ry2IDxKLdbhjDfw9zNm0wVJkx60CYTQhngh6Alfok5AACTcu8SNTB17c2995Fyg
+9B6X8sOAUby0PWsHKBUWCSHFKWWNc/2cudlr2Kq1hgNNFZr8hBMkkhe+li+PDksJ
+7/VuWZmKBlVV9si7eZ2qiI7Hs1pe5pJwZzJvnQYxA3h8FggFjI0IfMnG4tLDkaK5
+CxKsBHDYXpwD58iziBxoixiAJzC4FL+xI1kVCt8Jk83TosHlxHg=
+=hfDt
+-----END PGP SIGNATURE-----
+
+--UugvWAfsgieZRqgk--
