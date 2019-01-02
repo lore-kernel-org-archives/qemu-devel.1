@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:33303)
+Received: from eggs.gnu.org ([208.118.235.92]:35577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gecDv-0007QU-H8
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 03:50:02 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gecKK-0000s9-B6
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 03:56:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1gecDs-0003l0-DY
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 03:49:58 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gecKF-0002WA-BS
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 03:56:36 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:41106)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gecKF-0002V0-3o
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 03:56:31 -0500
+Received: by mail-oi1-f195.google.com with SMTP id j21so24576234oii.8
+	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 00:56:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Wed, 02 Jan 2019 16:49:30 +0800
-From: yuchenlin <yuchenlin@synology.com>
-In-Reply-To: <20181228145055.18039-1-jcfaracco@gmail.com>
-References: <20181228145055.18039-1-jcfaracco@gmail.com>
-Message-ID: <ed671ae893c52d3ff94c849ab18f2857@synology.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] dmg: Fixing wrong dmg block
- type value for block terminator.
+References: <20181226171538.21984-1-philmd@redhat.com>
+	<20181226171538.21984-3-philmd@redhat.com>
+In-Reply-To: <20181226171538.21984-3-philmd@redhat.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Wed, 2 Jan 2019 09:56:18 +0100
+Message-ID: <CAGxU2F60pcF88j7MYqAKYyvDOYJN0qJF487fCvgEO_CFWpsnSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] util/cutils: Move ctype macros to
+ "cutils.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +30,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julio Faracco <jcfaracco@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, Qemu-block <qemu-block-bounces+yuchenlin=synology.com@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "open list:S390" <qemu-s390x@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 2018-12-28 22:50, Julio Faracco wrote:
-> This is a trivial patch to fix a wrong value for block terminator.
-> The old value was 0x7fffffff which is wrong. It was not affecting the
-> code because QEMU dmg block is not handling block terminator right now.
-> Neverthless, it should be fixed.
-> 
-> Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
-
-Reviewed-by: yuchenlin <yuchenlin@synology.com>
-
+On Wed, Dec 26, 2018 at 6:25 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> Introduced in cd390083ad1, these macros don't need to be in
+> a generic header.
+> Add documentation to justify their use.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  block/dmg.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/dmg.c b/block/dmg.c
-> index 50e91aef6d..2c806e3389 100644
-> --- a/block/dmg.c
-> +++ b/block/dmg.c
-> @@ -54,7 +54,7 @@ enum {
->      UDBZ,
->      ULFO,
->      UDCM = 0x7ffffffe, /* Comments */
-> -    UDLE               /* Last Entry */
-> +    UDLE = 0xffffffff  /* Last Entry */
->  };
-> 
->  static int dmg_probe(const uint8_t *buf, int buf_size, const char 
-> *filename)
+>  hw/core/bus.c              |  2 +-
+>  hw/core/qdev-properties.c  |  1 +
+>  hw/s390x/s390-virtio-ccw.c |  1 +
+>  hw/scsi/scsi-generic.c     |  2 +-
+>  include/qemu-common.h      | 16 ----------------
+>  include/qemu/cutils.h      | 24 ++++++++++++++++++++++++
+>  qapi/qapi-util.c           |  2 +-
+>  qobject/json-parser.c      |  1 -
+>  target/ppc/monitor.c       |  1 +
+>  ui/keymaps.c               |  1 +
+>  util/id.c                  |  2 +-
+>  util/readline.c            |  1 -
+>  12 files changed, 32 insertions(+), 22 deletions(-)
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+>
+> diff --git a/hw/core/bus.c b/hw/core/bus.c
+> index 4651f24486..dceb144075 100644
+> --- a/hw/core/bus.c
+> +++ b/hw/core/bus.c
+> @@ -18,7 +18,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include "qemu-common.h"
+> +#include "qemu/cutils.h"
+>  #include "hw/qdev.h"
+>  #include "qapi/error.h"
+>
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 943dc2654b..3bdebac361 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -1,4 +1,5 @@
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  #include "net/net.h"
+>  #include "hw/qdev.h"
+>  #include "qapi/error.h"
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index fd9d0b0542..ed23bb7b3a 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -11,6 +11,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  #include "qapi/error.h"
+>  #include "cpu.h"
+>  #include "hw/boards.h"
+> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+> index 7237b4162e..86f65fd474 100644
+> --- a/hw/scsi/scsi-generic.c
+> +++ b/hw/scsi/scsi-generic.c
+> @@ -12,8 +12,8 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  #include "qapi/error.h"
+> -#include "qemu-common.h"
+>  #include "qemu/error-report.h"
+>  #include "hw/scsi/scsi.h"
+>  #include "hw/scsi/emulation.h"
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index 760527294f..ed43ae286d 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -33,22 +33,6 @@ int qemu_main(int argc, char **argv, char **envp);
+>  void qemu_get_timedate(struct tm *tm, int offset);
+>  int qemu_timedate_diff(struct tm *tm);
+>
+> -#define qemu_isalnum(c)                isalnum((unsigned char)(c))
+> -#define qemu_isalpha(c)                isalpha((unsigned char)(c))
+> -#define qemu_iscntrl(c)                iscntrl((unsigned char)(c))
+> -#define qemu_isdigit(c)                isdigit((unsigned char)(c))
+> -#define qemu_isgraph(c)                isgraph((unsigned char)(c))
+> -#define qemu_islower(c)                islower((unsigned char)(c))
+> -#define qemu_isprint(c)                isprint((unsigned char)(c))
+> -#define qemu_ispunct(c)                ispunct((unsigned char)(c))
+> -#define qemu_isspace(c)                isspace((unsigned char)(c))
+> -#define qemu_isupper(c)                isupper((unsigned char)(c))
+> -#define qemu_isxdigit(c)       isxdigit((unsigned char)(c))
+> -#define qemu_tolower(c)                tolower((unsigned char)(c))
+> -#define qemu_toupper(c)                toupper((unsigned char)(c))
+> -#define qemu_isascii(c)                isascii((unsigned char)(c))
+> -#define qemu_toascii(c)                toascii((unsigned char)(c))
+> -
+>  void *qemu_oom_check(void *ptr);
+>
+>  ssize_t qemu_write_full(int fd, const void *buf, size_t count)
+> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+> index 9ee40470e3..cb06a5adab 100644
+> --- a/include/qemu/cutils.h
+> +++ b/include/qemu/cutils.h
+> @@ -3,6 +3,30 @@
+>
+>  #include "qemu/fprintf-fn.h"
+>
+> +/** unsigned ctype macros:
+> + *
+> + * The standards require that the argument for these functions
+> + * is either EOF or a value that is representable in the type
+> + * unsigned char. If the argument is of type char, it must be
+> + * cast to unsigned char. This is what these macros do,
+> + * avoiding 'signed to unsigned' conversion warnings.
+> + */
+> +#define qemu_isalnum(c)                isalnum((unsigned char)(c))
+> +#define qemu_isalpha(c)                isalpha((unsigned char)(c))
+> +#define qemu_iscntrl(c)                iscntrl((unsigned char)(c))
+> +#define qemu_isdigit(c)                isdigit((unsigned char)(c))
+> +#define qemu_isgraph(c)                isgraph((unsigned char)(c))
+> +#define qemu_islower(c)                islower((unsigned char)(c))
+> +#define qemu_isprint(c)                isprint((unsigned char)(c))
+> +#define qemu_ispunct(c)                ispunct((unsigned char)(c))
+> +#define qemu_isspace(c)                isspace((unsigned char)(c))
+> +#define qemu_isupper(c)                isupper((unsigned char)(c))
+> +#define qemu_isxdigit(c)       isxdigit((unsigned char)(c))
+> +#define qemu_tolower(c)                tolower((unsigned char)(c))
+> +#define qemu_toupper(c)                toupper((unsigned char)(c))
+> +#define qemu_isascii(c)                isascii((unsigned char)(c))
+> +#define qemu_toascii(c)                toascii((unsigned char)(c))
+> +
+>  /**
+>   * pstrcpy:
+>   * @buf: buffer to copy string into
+> diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+> index e9b266bb70..ea93ae05d9 100644
+> --- a/qapi/qapi-util.c
+> +++ b/qapi/qapi-util.c
+> @@ -11,8 +11,8 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  #include "qapi/error.h"
+> -#include "qemu-common.h"
+>
+>  const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+>  {
+> diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+> index 7a7ae9e8d1..06316f3a53 100644
+> --- a/qobject/json-parser.c
+> +++ b/qobject/json-parser.c
+> @@ -15,7 +15,6 @@
+>  #include "qemu/cutils.h"
+>  #include "qemu/unicode.h"
+>  #include "qapi/error.h"
+> -#include "qemu-common.h"
+>  #include "qapi/qmp/qbool.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qlist.h"
+> diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
+> index 14915119fc..dbcb921231 100644
+> --- a/target/ppc/monitor.c
+> +++ b/target/ppc/monitor.c
+> @@ -22,6 +22,7 @@
+>   * THE SOFTWARE.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  #include "cpu.h"
+>  #include "monitor/monitor.h"
+>  #include "monitor/hmp-target.h"
+> diff --git a/ui/keymaps.c b/ui/keymaps.c
+> index 085889b555..00b52a6db3 100644
+> --- a/ui/keymaps.c
+> +++ b/ui/keymaps.c
+> @@ -23,6 +23,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  #include "keymaps.h"
+>  #include "sysemu/sysemu.h"
+>  #include "trace.h"
+> diff --git a/util/id.c b/util/id.c
+> index 6141352955..ca21a77522 100644
+> --- a/util/id.c
+> +++ b/util/id.c
+> @@ -11,7 +11,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include "qemu-common.h"
+> +#include "qemu/cutils.h"
+>  #include "qemu/id.h"
+>
+>  bool id_wellformed(const char *id)
+> diff --git a/util/readline.c b/util/readline.c
+> index ec91ee0fea..f3d8b0698a 100644
+> --- a/util/readline.c
+> +++ b/util/readline.c
+> @@ -23,7 +23,6 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include "qemu-common.h"
+>  #include "qemu/readline.h"
+>  #include "qemu/cutils.h"
+>
+> --
+> 2.17.2
+>
+>
+
+
+--
+Stefano Garzarella
+Red Hat
