@@ -1,29 +1,18 @@
-Received: from eggs.gnu.org ([208.118.235.92]:60447)
+Received: from eggs.gnu.org ([208.118.235.92]:35859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@redhat.com>) id 1geWI7-0000EO-Kd
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 21:29:56 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1geWgT-0004Op-SB
+	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 21:55:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@redhat.com>) id 1geWI4-0004i5-F3
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 21:29:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43288)
+	(envelope-from <balaton@eik.bme.hu>) id 1geWgR-0005RU-M9
+	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 21:55:05 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:60314)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@redhat.com>) id 1geWI4-0004hk-9v
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 21:29:52 -0500
-Date: Wed, 2 Jan 2019 13:29:41 +1100
-From: David Gibson <dgibson@redhat.com>
-Message-ID: <20190102132941.0b887a22@umbus.fritz.box>
-In-Reply-To: <87k1k5lv96.fsf@dusky.pond.sub.org>
-References: <20181211095057.14623-1-fli@suse.com>
-	<20181211095057.14623-7-fli@suse.com>
-	<87y38tc2fb.fsf@dusky.pond.sub.org>
-	<20181214112447.510e4691@umbus.fritz.box>
-	<87k1k5lv96.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/403t/VmrCqaCjJYSdUS=F4_";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v8 6/7] qemu_thread_create:
- propagate the error to callers to handle
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1geWgR-0005Qq-7N
+	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 21:55:03 -0500
+Message-Id: <cover.1546394798.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Wed, 2 Jan 2019 03:06:38 +0100
+Subject: [Qemu-devel] [PATCH 0/8] Misc sam460ex related patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +21,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Fei Li <fli@suse.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
---Sig_/403t/VmrCqaCjJYSdUS=F4_
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The last code patch in this series fixes memory size larger than 1GB
+for sam460ex, other patches are just clean ups I've made along the way.
 
-On Wed, 19 Dec 2018 10:29:41 +0100
-Markus Armbruster <armbru@redhat.com> wrote:
+The first patch is intended to be generic and may be useful for other
+boards which currently have their own SPD EEPROM data or don't yet
+generate any SPD data just have TODO comments instead. These are MIPS
+malta and fulong2e, ARM integratorcp and maybe aspeed, and the PIIX
+and Q35 pc machines. I did not try to change these as I have no way to
+test them throughly. Patch 2 converts sam460ex to use this function.
 
-> David Gibson <dgibson@redhat.com> writes:
->=20
->  [...] =20
->  [...] =20
->  [...] =20
->  [...] =20
->  [...] =20
->  [...] =20
->  [...] =20
->  [...] =20
->=20
-> Double-checking: is it okay to report some failures of this function
-> (one of two H_RESOURCE failures, to be precise), but not others?
+Other patches are misc cleanups. The very last patch is administrative
+and adds some more files to sam460ex section in MAINTAINERS as was
+discussed before.
 
-Yes.  The distinction is whether the failure is likely to be of
-relevance to the *host* administrator, or just to the guest.
+Regards,
+BALATON Zoltan
 
-Although.. come to think of it possibly that reported failure should be
-H_HARDWARE to the guest, rather than H_RESOURCE.
+BALATON Zoltan (8):
+  smbus: Add a helper to generate SPD EEPROM data
+  sam460ex: Clean up SPD EEPROM creation
+  ppc4xx: Disable debug logging by default
+  ppc4xx: Use ram_addr_t in ppc4xx_sdram_adjust()
+  ppc4xx: Rename ppc4xx_sdram_t in ppc440_uc.c to ppc440_sdram_t
+  ppc4xx: Pass array index to function instead of pointer into the array
+  sam460ex: Fix support for memory larger than 1GB
+  MAINTAINERS: Add more files to sam460ex
 
---=20
-David Gibson <dgibson@redhat.com>
-Principal Software Engineer, Virtualization, Red Hat
+ MAINTAINERS             |   6 ++
+ hw/i2c/smbus_eeprom.c   | 128 ++++++++++++++++++++++++++++++++++
+ hw/ppc/ppc440_bamboo.c  |   2 +-
+ hw/ppc/ppc440_uc.c      |  70 ++++++++++---------
+ hw/ppc/ppc4xx_devs.c    |   7 +-
+ hw/ppc/sam460ex.c       | 177 ++++++------------------------------------------
+ include/hw/i2c/smbus.h  |   3 +
+ include/hw/ppc/ppc4xx.h |   2 +-
+ 8 files changed, 197 insertions(+), 198 deletions(-)
 
---Sig_/403t/VmrCqaCjJYSdUS=F4_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwsIhUACgkQbDjKyiDZ
-s5LRHw//aIRZPGbzMwWNNjxKyU8rm3eDTK2mybf/FszzhguRTnQ6nHcIPn+QI0pi
-j577NaQU9nu4d7K2kkMAO4H0IUnBN5hqC8biy3edUr8xXtZbBcuMfMmTgTfs1HHb
-7pLrHeEYvtOjk5WoLhkJsU5vNm34Vl78KZpMC2yPScdOCUwkEr8y4MmmU9y+egFZ
-Rmw3uLCs8dntdbN3KiHxZEDwVRuq1jg8wghGeCAwY7YX17Jv20sM7oME628usZ2g
-WVuM4MvexR6+LLr6UjToExatH4SY7F+5fWHmgF/jwNnQkuEaa/o5WrprGhyzkxII
-/kC7VmbQlsDfy+YuZP5IEUXeLxb0wlxpvxo+qIaLsDEf6Llg4v0cXvvOpDlt3BZV
-6WI2p5Fm0ZZVgkv0fyf2iRUPsqiwSWUu0Jxu5fZPhtww/+nuM+GQARhTd6QXzWCl
-TdOmYcMt6Etrp0xTO21skfJjxo5tmi0dIEkuqUcSDYop3Gajo/I4u5ijU1BvtMWW
-sTJ/UjHPnur+6XWeHbM6k9Mp80eBasDYKHOnvmqYzjriTvN4/A9tcXE0MkOo5N0m
-0Tv91ocoFLH3WzMItSJj3pqK2ijNNT3dyAngQfYgHM1/YFpmDnM/06KwHFSh8GvB
-yxW6e3On3eEpjZbPXCDemGkgmj9FjVpaOKdYTzukb6lc4K4Ukdk=
-=UTdW
------END PGP SIGNATURE-----
-
---Sig_/403t/VmrCqaCjJYSdUS=F4_--
+-- 
+2.13.7
