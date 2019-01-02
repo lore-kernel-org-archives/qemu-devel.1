@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59689)
+Received: from eggs.gnu.org ([208.118.235.92]:39221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1geYPw-0008TB-S6
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 23:46:10 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1geZ1v-0000m2-FG
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:25:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1geYPt-0006kz-EX
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 23:46:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35676)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1geZ1s-0003lc-Bo
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:25:23 -0500
+Received: from mga14.intel.com ([192.55.52.115]:34686)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1geYPt-0006k6-5n
-	for qemu-devel@nongnu.org; Tue, 01 Jan 2019 23:46:05 -0500
-Date: Wed, 2 Jan 2019 12:44:32 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20190102044432.GA28550@wei-ubt>
-References: <20181213210057.3676-1-quintela@redhat.com>
-	<20181213210057.3676-13-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181213210057.3676-13-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 12/16] virtio: split virtio net bits rom
- virtio-pci
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1geZ1q-0003h4-Qh
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 00:25:19 -0500
+From: Zhang Yi <yi.z.zhang@linux.intel.com>
+Date: Wed,  2 Jan 2019 13:25:21 +0800
+Message-Id: <cover.1546399191.git.yi.z.zhang@linux.intel.com>
+Subject: [Qemu-devel] [PATCH V8 0/5] support MAP_SYNC for memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,276 +22,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, mst@redhat.com
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com, ehabkost@redhat.com, Zhang Yi <yi.z.zhang@linux.intel.com>
 
-On Thu, Dec 13, 2018 at 10:00:53PM +0100, Juan Quintela wrote:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  hw/virtio/Makefile.objs    |  1 +
->  hw/virtio/virtio-net-pci.c | 96 ++++++++++++++++++++++++++++++++++++++
->  hw/virtio/virtio-pci.c     | 57 ----------------------
->  hw/virtio/virtio-pci.h     | 14 ------
->  tests/Makefile.include     |  2 +-
->  5 files changed, 98 insertions(+), 72 deletions(-)
->  create mode 100644 hw/virtio/virtio-net-pci.c
-> 
-> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-> index 557ad06231..4c31acb017 100644
-> --- a/hw/virtio/Makefile.objs
-> +++ b/hw/virtio/Makefile.objs
-> @@ -23,6 +23,7 @@ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
->  obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
->  obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
->  obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
-> +obj-$(CONFIG_VIRTIO_NET) += virtio-net-pci.o
->  endif
->  endif
+Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+files on ext4/xfs file system mounted with '-o dax').
 
-s/rom/from/ in the subject for patch 10, 11, 12 and 13.
+A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+    https://patchwork.kernel.org/patch/10028151/
 
-Reviewed-by: Wei Xu <wexu@redhat.com>
+In order to make sure that the file metadata is in sync after a fault 
+while we are writing a shared DAX supporting backend files, this
+patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
 
->  
-> diff --git a/hw/virtio/virtio-net-pci.c b/hw/virtio/virtio-net-pci.c
-> new file mode 100644
-> index 0000000000..0b676f078d
-> --- /dev/null
-> +++ b/hw/virtio/virtio-net-pci.c
-> @@ -0,0 +1,96 @@
-> +/*
-> + * Virtio net PCI Bindings
-> + *
-> + * Copyright IBM, Corp. 2007
-> + * Copyright (c) 2009 CodeSourcery
-> + *
-> + * Authors:
-> + *  Anthony Liguori   <aliguori@us.ibm.com>
-> + *  Paul Brook        <paul@codesourcery.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-> + *
-> + * Contributions after 2012-01-13 are licensed under the terms of the
-> + * GNU GPL, version 2 or (at your option) any later version.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "hw/virtio/virtio-net.h"
-> +#include "virtio-pci.h"
-> +#include "qapi/error.h"
-> +
-> +typedef struct VirtIONetPCI VirtIONetPCI;
-> +
-> +/*
-> + * virtio-net-pci: This extends VirtioPCIProxy.
-> + */
-> +#define TYPE_VIRTIO_NET_PCI "virtio-net-pci"
-> +#define VIRTIO_NET_PCI(obj) \
-> +        OBJECT_CHECK(VirtIONetPCI, (obj), TYPE_VIRTIO_NET_PCI)
-> +
-> +struct VirtIONetPCI {
-> +    VirtIOPCIProxy parent_obj;
-> +    VirtIONet vdev;
-> +};
-> +
-> +static Property virtio_net_properties[] = {
-> +    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
-> +                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
-> +    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void virtio_net_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> +{
-> +    DeviceState *qdev = DEVICE(vpci_dev);
-> +    VirtIONetPCI *dev = VIRTIO_NET_PCI(vpci_dev);
-> +    DeviceState *vdev = DEVICE(&dev->vdev);
-> +
-> +    virtio_net_set_netclient_name(&dev->vdev, qdev->id,
-> +                                  object_get_typename(OBJECT(qdev)));
-> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-> +}
-> +
-> +static void virtio_net_pci_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> +    VirtioPCIClass *vpciklass = VIRTIO_PCI_CLASS(klass);
-> +
-> +    k->romfile = "efi-virtio.rom";
-> +    k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-> +    k->device_id = PCI_DEVICE_ID_VIRTIO_NET;
-> +    k->revision = VIRTIO_PCI_ABI_VERSION;
-> +    k->class_id = PCI_CLASS_NETWORK_ETHERNET;
-> +    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-> +    dc->props = virtio_net_properties;
-> +    vpciklass->realize = virtio_net_pci_realize;
-> +}
-> +
-> +static void virtio_net_pci_instance_init(Object *obj)
-> +{
-> +    VirtIONetPCI *dev = VIRTIO_NET_PCI(obj);
-> +
-> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-> +                                TYPE_VIRTIO_NET);
-> +    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-> +                              "bootindex", &error_abort);
-> +}
-> +
-> +static const TypeInfo virtio_net_pci_info = {
-> +    .name          = TYPE_VIRTIO_NET_PCI,
-> +    .parent        = TYPE_VIRTIO_PCI,
-> +    .instance_size = sizeof(VirtIONetPCI),
-> +    .instance_init = virtio_net_pci_instance_init,
-> +    .class_init    = virtio_net_pci_class_init,
-> +};
-> +
-> +static void virtio_net_pci_register(void)
-> +{
-> +    type_register_static(&virtio_net_pci_info);
-> +}
-> +
-> +type_init(virtio_net_pci_register)
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index 4fe71a56c8..cb03bfa597 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -19,7 +19,6 @@
->  
->  #include "standard-headers/linux/virtio_pci.h"
->  #include "hw/virtio/virtio.h"
-> -#include "hw/virtio/virtio-net.h"
->  #include "hw/virtio/virtio-serial.h"
->  #include "hw/pci/pci.h"
->  #include "qapi/error.h"
-> @@ -1966,61 +1965,6 @@ static const TypeInfo virtio_serial_pci_info = {
->      .class_init    = virtio_serial_pci_class_init,
->  };
->  
-> -/* virtio-net-pci */
-> -
-> -static Property virtio_net_properties[] = {
-> -    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
-> -                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
-> -    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
-> -    DEFINE_PROP_END_OF_LIST(),
-> -};
-> -
-> -static void virtio_net_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> -{
-> -    DeviceState *qdev = DEVICE(vpci_dev);
-> -    VirtIONetPCI *dev = VIRTIO_NET_PCI(vpci_dev);
-> -    DeviceState *vdev = DEVICE(&dev->vdev);
-> -
-> -    virtio_net_set_netclient_name(&dev->vdev, qdev->id,
-> -                                  object_get_typename(OBJECT(qdev)));
-> -    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-> -    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-> -}
-> -
-> -static void virtio_net_pci_class_init(ObjectClass *klass, void *data)
-> -{
-> -    DeviceClass *dc = DEVICE_CLASS(klass);
-> -    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> -    VirtioPCIClass *vpciklass = VIRTIO_PCI_CLASS(klass);
-> -
-> -    k->romfile = "efi-virtio.rom";
-> -    k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-> -    k->device_id = PCI_DEVICE_ID_VIRTIO_NET;
-> -    k->revision = VIRTIO_PCI_ABI_VERSION;
-> -    k->class_id = PCI_CLASS_NETWORK_ETHERNET;
-> -    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-> -    dc->props = virtio_net_properties;
-> -    vpciklass->realize = virtio_net_pci_realize;
-> -}
-> -
-> -static void virtio_net_pci_instance_init(Object *obj)
-> -{
-> -    VirtIONetPCI *dev = VIRTIO_NET_PCI(obj);
-> -
-> -    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-> -                                TYPE_VIRTIO_NET);
-> -    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-> -                              "bootindex", &error_abort);
-> -}
-> -
-> -static const TypeInfo virtio_net_pci_info = {
-> -    .name          = TYPE_VIRTIO_NET_PCI,
-> -    .parent        = TYPE_VIRTIO_PCI,
-> -    .instance_size = sizeof(VirtIONetPCI),
-> -    .instance_init = virtio_net_pci_instance_init,
-> -    .class_init    = virtio_net_pci_class_init,
-> -};
-> -
->  /* virtio-pci-bus */
->  
->  static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
-> @@ -2071,7 +2015,6 @@ static void virtio_pci_register_types(void)
->      type_register_static(&virtio_pci_bus_info);
->      type_register_static(&virtio_pci_info);
->      type_register_static(&virtio_serial_pci_info);
-> -    type_register_static(&virtio_net_pci_info);
->  }
->  
->  type_init(virtio_pci_register_types)
-> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-> index 3c9bbf9287..ab0c7907e4 100644
-> --- a/hw/virtio/virtio-pci.h
-> +++ b/hw/virtio/virtio-pci.h
-> @@ -16,7 +16,6 @@
->  #define QEMU_VIRTIO_PCI_H
->  
->  #include "hw/pci/msi.h"
-> -#include "hw/virtio/virtio-net.h"
->  #include "hw/virtio/virtio-serial.h"
->  #include "hw/virtio/virtio-bus.h"
->  #include "hw/virtio/virtio-gpu.h"
-> @@ -24,7 +23,6 @@
->  
->  typedef struct VirtIOPCIProxy VirtIOPCIProxy;
->  typedef struct VirtIOSerialPCI VirtIOSerialPCI;
-> -typedef struct VirtIONetPCI VirtIONetPCI;
->  typedef struct VirtIOGPUPCI VirtIOGPUPCI;
->  typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
->  
-> @@ -195,18 +193,6 @@ struct VirtIOSerialPCI {
->      VirtIOSerial vdev;
->  };
->  
-> -/*
-> - * virtio-net-pci: This extends VirtioPCIProxy.
-> - */
-> -#define TYPE_VIRTIO_NET_PCI "virtio-net-pci"
-> -#define VIRTIO_NET_PCI(obj) \
-> -        OBJECT_CHECK(VirtIONetPCI, (obj), TYPE_VIRTIO_NET_PCI)
-> -
-> -struct VirtIONetPCI {
-> -    VirtIOPCIProxy parent_obj;
-> -    VirtIONet vdev;
-> -};
-> -
->  /*
->   * virtio-input-pci: This extends VirtioPCIProxy.
->   */
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 78d7cf2fde..770df63d88 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -145,7 +145,7 @@ check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
->  
->  check-qtest-virtioserial-y += tests/virtio-console-test$(EXESUF)
->  
-> -check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
-> +check-qtest-virtio-$(CONFIG_VIRTIO_NET) += tests/virtio-net-test$(EXESUF)
->  check-qtest-virtio-$(CONFIG_VIRTIO_BALLOON) += tests/virtio-balloon-test$(EXESUF)
->  check-qtest-virtio-$(CONFIG_VIRTIO_BLK) += tests/virtio-blk-test$(EXESUF)
->  check-qtest-virtio-$(CONFIG_VIRTIO_RNG) += tests/virtio-rng-test$(EXESUF)
-> -- 
-> 2.19.2
-> 
-> 
+As the DAX vs DMA truncated issue was solved, we refined the code and
+send out this feature for the v5 version.
+
+A new on/off option 'sync' is added to memory-backend-file:
+ - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+        'share=off' or 'pmem=off', QEMU will not pass this flag to mmap(2)
+ - off: (default) never pass MAP_SYNC to mmap(2)
+
+Changes in v8:
+ * Micheal: 3/5, remove the duplicated define in the os_dep.h
+ * Micheal: 2/5, make type define safety.
+ * Micheal: 2/5, fixed the incorrect define MAP_SHARE on qemu_anon_ram_alloc.
+ * 4/6 removed, we remove the on/off/auto define of sync,  as by now,
+   MAP_SYNC only worked with pmem=on.
+ * @Micheal, I still reuse the RAM_SYNC flag, it is much straightforward to parse 
+   all the flags in one parameter.
+
+Changes in v7:
+ * Micheal: [3,4,6]/6 limited the "sync" flag only on a nvdimm backend.(pmem=on)
+
+Changes in v6:
+ * Pankaj: 3/7 are squashed with 2/7
+ * Pankaj: 7/7 update comments to "consistent filesystem metadata".
+ * Pankaj, Igor: 1/7 Added Reviewed-by in patch-1/7
+ * Stefan, 4/7 move the include header from "/linux/mman.h" to "osdep.h"
+ * Stefan, 5/7 Add missing "munmap"
+ * Stefan, 2/7 refine the shared/flag.
+
+Changes in v5:
+ * Add patch 1 to fix a memory leak issue.
+ * Refine the patch 4-6
+ * Remove the patch 3 as we already change the parameter from "shared" to
+   "flags"
+
+Changes in v4:
+ * Add patch 1-3 to switch some functions to a single 'flags'
+   parameters. (Michael S. Tsirkin)
+ * v3 patch 1-3 become v4 patch 4-6.
+ * Patch 4: move definitions of MAP_SYNC and MAP_SHARED_VALIDATE to a
+   new header file under include/standard-headers/linux/. (Michael S. Tsirkin)
+ * Patch 6: refine the description of the 'sync' option. (Michael S. Tsirkin)
+
+Changes in v3:
+ * Patch 1: add MAP_SHARED_VALIDATE in both sync=on and sync=auto
+   cases, and add back the retry mechanism. MAP_SYNC will be ignored
+   by Linux kernel 4.15 if MAP_SHARED_VALIDATE is missed.
+ * Patch 1: define MAP_SYNC and MAP_SHARED_VALIDATE as 0 on non-Linux
+   platforms in order to make qemu_ram_mmap() compile on those platforms.
+ * Patch 2&3: include more information in error messages of
+   memory-backend in hope to help user to identify the error.
+   (Dr. David Alan Gilbert)
+ * Patch 3: fix typo in the commit message. (Dr. David Alan Gilbert)
+
+Changes in v2:
+ * Add 'sync' option to control the use of MAP_SYNC. (Eduardo Habkost)
+ * Remove the unnecessary set of MAP_SHARED_VALIDATE in some cases and
+   the retry mechanism in qemu_ram_mmap(). (Michael S. Tsirkin)
+ * Move OS dependent definitions of MAP_SYNC and MAP_SHARED_VALIDATE
+   to osdep.h. (Michael S. Tsirkin)
+
+Zhang Yi (5):
+  numa: Fixed the memory leak of numa error message
+  util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
+  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+  hostmem: add more information in error messages
+  hostmem-file: add 'sync' option
+
+ backends/hostmem-file.c   | 34 ++++++++++++++++++++++++++++++++--
+ backends/hostmem.c        |  8 +++++---
+ docs/nvdimm.txt           | 23 ++++++++++++++++++++++-
+ exec.c                    |  9 +++++----
+ include/exec/memory.h     | 26 ++++++++++++++++++++------
+ include/exec/ram_addr.h   |  1 +
+ include/qemu/mmap-alloc.h | 20 +++++++++++++++++++-
+ include/qemu/osdep.h      | 16 ++++++++++++++++
+ numa.c                    |  1 +
+ qemu-options.hx           | 19 ++++++++++++++++++-
+ util/mmap-alloc.c         | 20 ++++++++++++++++----
+ util/oslib-posix.c        |  9 ++++++++-
+ 12 files changed, 163 insertions(+), 23 deletions(-)
+
+-- 
+2.7.4
