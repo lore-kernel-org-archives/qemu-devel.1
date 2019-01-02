@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42087)
+Received: from eggs.gnu.org ([208.118.235.92]:51751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1geiK6-0006Yt-RN
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:20:47 -0500
+	(envelope-from <no-reply@patchew.org>) id 1geiaH-0005tL-ER
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:37:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1geiK1-0008Jf-Pn
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:20:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52044)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1geiK1-0008Io-Ji
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:20:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1geiK0-00030p-Jw
-	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 15:20:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 957922E80C9
-	for <qemu-devel@nongnu.org>; Wed,  2 Jan 2019 15:20:40 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1geiaD-0006tC-9Z
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:37:29 -0500
+Resent-Message-Id: <E1geiaD-0006tC-9Z@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21747)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1geiaC-0006rf-D9
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 10:37:25 -0500
+In-Reply-To: <20181228173356.15359-1-philmd@redhat.com>
+Message-ID: <154644248841.9907.3575860441558700867@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 02 Jan 2019 15:09:46 -0000
-From: Saverio Miroddi <1809665@bugs.launchpad.net>
-Reply-To: Bug 1809665 <1809665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154566626385.25910.12711983515604457304.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154644178607.25119.8068492874125341562.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1809665] Re: Xbox One controller USB passthrough
- disconnections and stops
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 2 Jan 2019 07:21:30 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] Fix strncpy() warnings for GCC8 new
+ -Wstringop-truncation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,147 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: philmd@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, thuth@redhat.com, quintela@redhat.com, david@redhat.com, dgilbert@redhat.com, armbru@redhat.com, marcandre.lureau@redhat.com, mst@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 
-So! These are the options and respective logs; they still don't make the
-controller work - it doesn't work at all.
-
-# option 1
-
-  -device nec-usb-xhci \
-  -device usb-tablet \
-  -device usb-host,vendorid=3D0x$VGAPT_XBOX_PAD_VEND_ID,productid=3D0x$VGAP=
-T_XBOX_PAD_PROD_ID \
-
-# log
-
-    libusb: error [udev_hotplug_event] ignoring udev action bind
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/1-10/bConfig=
-urationValue failed ret=3D-1 errno=3D2
-    libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try ag=
-ain
-    libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/=
-usb/001/019: No such file or directory
-    libusb: error [udev_hotplug_event] ignoring udev action bind
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/1-10/bConfig=
-urationValue failed ret=3D-1 errno=3D2
-    libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try ag=
-ain
-    libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/=
-usb/001/020: No such file or directory
-    libusb: error [udev_hotplug_event] ignoring udev action bind
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-    libusb: error [_open_sysfs_attr] open /sys/bus/usb/devices/1-10/bConfig=
-urationValue failed ret=3D-1 errno=3D2
-    libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try ag=
-ain
-    libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/=
-usb/001/021: No such file or directory
-    libusb: error [udev_hotplug_event] ignoring udev action bind
-
-# option 2
-
-    -device usb-ehci \
-    -device usb-tablet \
-    -device usb-host,vendorid=3D0x$VGAPT_XBOX_PAD_VEND_ID,productid=3D0x$VG=
-APT_XBOX_PAD_PROD_ID \
-
-# log
-
-    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
- "Controller" (full speed) to bus "usb-bus.0", port "2" (high speed)
-    libusb: error [udev_hotplug_event] ignoring udev action bind
-    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
- "Controller" (full speed) to bus "usb-bus.0", port "2" (high speed)
-    libusb: error [udev_hotplug_event] ignoring udev action bind
-    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
- "Controller" (full speed) to bus "usb-bus.0", port "2" (high speed)
-    libusb: error [udev_hotplug_event] ignoring udev action bind
-
-I've tried another game controller with the second option:
-
-# option 2b
-
-    -device usb-ehci \
-    -device usb-tablet \
-    -device usb-host,vendorid=3D0x$VGAPT_ARCADE_STICK_VEND_ID,productid=3D0=
-x$VGAPT_ARCADE_STICK_PROD_ID \
-
-# log
-
-    libusb: error [udev_hotplug_event] ignoring udev action bind
-    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
- "Arcade Fight Stick" (full speed) to bus "usb-bus.0", port "3" (high speed)
-    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
- "Arcade Fight Stick" (full speed) to bus "usb-bus.0", port "3" (high speed)
-    qemu-system-x86_64: Warning: speed mismatch trying to attach usb device=
- "Arcade Fight Stick" (full speed) to bus "usb-bus.0", port "3" (high speed)
-
-and in this configuration, it doesn't work (it does with `-usb`).
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1809665
-
-Title:
-  Xbox One controller USB passthrough disconnections and stops
-
-Status in QEMU:
-  New
-
-Bug description:
-  I can't properly passthrough my Xbox One controller to a virtual
-  machine; it causes USB disconnections on the host, ultimately
-  preventing it to work (at all) on the guest
-
-  I've seen a few other cases reported in other websites, which show the
-  same symptoms:
-
-  - https://www.reddit.com/r/VFIO/comments/97dhbw/qemu_w10_xbox_one_control=
-ler
-  - https://unix.stackexchange.com/questions/452751/how-can-i-pass-through-=
-an-xbox-one-controller-to-a-windows-vm-on-ubuntu
-
-  This is sample:
-
-      libusb: error [udev_hotplug_event] ignoring udev action bind
-      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-      qemu-system-x86_64: libusb_release_interface: -4 [NO_DEVICE]
-      libusb: error [_get_usbfs_fd] File doesn't exist, wait 10 ms and try =
-again
-      libusb: error [_get_usbfs_fd] libusb couldn't open USB device
-          /dev/bus/usb/003/016: No such file or directory
-
-  I think this is a quite long-standing issue, as I've been experiencing
-  through several versions, including the current one (3.1).
-
-  I can reproduce this 100% of the times, on multiple host O/S
-  distributions (the current one being based on Ubuntu 18.04 x86-64).
-
-  I compile QEMU directly from source, and execute it via commandline;
-  the command is very long, however, the relevant part is standard (I
-  think):
-
-      -usb \
-      -device usb-tablet \
-      -device usb-host,vendorid=3D0x$VGAPT_XBOX_PAD_VEND_ID,productid=3D0x$=
-VGAPT_XBOX_PAD_PROD_ID \
-
-  The guest is Windows 10 64bit.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1809665/+subscriptions
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIyODE3MzM1Ni4xNTM1
+OS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxODEyMjgxNzMzNTYuMTUzNTkt
+MS1waGlsbWRAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvNV0g
+Rml4IHN0cm5jcHkoKSB3YXJuaW5ncyBmb3IgR0NDOCBuZXcgLVdzdHJpbmdvcC10cnVuY2F0aW9u
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
+dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoK
+Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
+aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
+IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
+YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
+ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
+aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCjdhZmVjMTUgbWlncmF0aW9uOiBVc2Ugc3RybmxlbigpIGZvciBmaXhlZC1zaXplIHN0cmlu
+ZwozZjBkODc4IG1pZ3JhdGlvbjogRml4IHN0cmluZ29wLXRydW5jYXRpb24gd2FybmluZwpmNmIx
+YjUyIGh3L2FjcGk6IFVzZSBRRU1VX05PTlNUUklORyBmb3Igbm9uIE5VTC10ZXJtaW5hdGVkIGFy
+cmF5cwoxNmU1Y2U4IGJsb2NrL3NoZWVwZG9nOiBVc2UgUUVNVV9OT05TVFJJTkcgZm9yIG5vbiBO
+VUwtdGVybWluYXRlZCBhcnJheXMKZjRhYzU4YSBxZW11L2NvbXBpbGVyOiBEZWZpbmUgUUVNVV9O
+T05TVFJJTkcKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogcWVtdS9j
+b21waWxlcjogRGVmaW5lIFFFTVVfTk9OU1RSSU5HLi4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBz
+cGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM1MzogRklMRTogaW5jbHVkZS9xZW11
+L2NvbXBpbGVyLmg6MTYzOgorI2lmIF9faGFzX2F0dHJpYnV0ZShub25zdHJpbmcpCgp0b3RhbDog
+MCBlcnJvcnMsIDEgd2FybmluZ3MsIDIxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi81OiBibG9jay9zaGVlcGRvZzog
+VXNlIFFFTVVfTk9OU1RSSU5HIGZvciBub24gTlVMLXRlcm1pbmF0ZWQgYXJyYXlzLi4uCkNoZWNr
+aW5nIFBBVENIIDMvNTogaHcvYWNwaTogVXNlIFFFTVVfTk9OU1RSSU5HIGZvciBub24gTlVMLXRl
+cm1pbmF0ZWQgYXJyYXlzLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNx
+dWFyZSBicmFja2V0ICdbJwojODI6IEZJTEU6IGluY2x1ZGUvaHcvYWNwaS9hY3BpLWRlZnMuaDo2
+MDoKKyAgICB1aW50OF90ICBvZW1faWQgWzZdIFwKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVz
+ZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM4MzogRklMRTogaW5jbHVkZS9ody9h
+Y3BpL2FjcGktZGVmcy5oOjYxOgorICAgICAgICAgICAgICAgICBRRU1VX05PTlNUUklORzsgICAg
+IC8qIE9FTSBpZGVudGlmaWNhdGlvbiAqLyBcCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZv
+cmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzg0OiBGSUxFOiBpbmNsdWRlL2h3L2FjcGkvYWNw
+aS1kZWZzLmg6NjI6CisgICAgdWludDhfdCAgb2VtX3RhYmxlX2lkIFs4XSBcCgpXQVJOSU5HOiBC
+bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojODU6IEZJ
+TEU6IGluY2x1ZGUvaHcvYWNwaS9hY3BpLWRlZnMuaDo2MzoKKyAgICAgICAgICAgICAgICAgUUVN
+VV9OT05TVFJJTkc7ICAgICAvKiBPRU0gdGFibGUgaWRlbnRpZmljYXRpb24gKi8gXAoKRVJST1I6
+IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM4ODogRklM
+RTogaW5jbHVkZS9ody9hY3BpL2FjcGktZGVmcy5oOjY1OgorICAgIHVpbnQ4X3QgIGFzbF9jb21w
+aWxlcl9pZCBbNF0gXAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBv
+biBhIHNlcGFyYXRlIGxpbmUKIzg5OiBGSUxFOiBpbmNsdWRlL2h3L2FjcGkvYWNwaS1kZWZzLmg6
+NjY6CisgICAgICAgICAgICAgICAgIFFFTVVfTk9OU1RSSU5HOyAgICAgLyogQVNMIGNvbXBpbGVy
+IHZlbmRvciBJRCAqLyBcCgp0b3RhbDogMyBlcnJvcnMsIDMgd2FybmluZ3MsIDQ4IGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
+VENIIDQvNTogbWlncmF0aW9uOiBGaXggc3RyaW5nb3AtdHJ1bmNhdGlvbiB3YXJuaW5nLi4uCkNo
+ZWNraW5nIFBBVENIIDUvNTogbWlncmF0aW9uOiBVc2Ugc3RybmxlbigpIGZvciBmaXhlZC1zaXpl
+IHN0cmluZy4uLgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEg
+c2VwYXJhdGUgbGluZQojNDk6IEZJTEU6IG1pZ3JhdGlvbi9nbG9iYWxfc3RhdGUuYzo5NDoKKyAg
+ICAgICAgLyogVGhpcyBjb25kaXRpb24gc2hvdWxkIG5ldmVyIGhhcHBlbiBkdXJpbmcgbWlncmF0
+aW9uLCBiZWNhdXNlCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI1IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxODEyMjgxNzMzNTYuMTUzNTkt
+MS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
+Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
+LmNvbQ==
