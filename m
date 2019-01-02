@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51070)
+Received: from eggs.gnu.org ([208.118.235.92]:51854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1geeMJ-0008U7-6L
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:06:47 -0500
+	(envelope-from <lbloch@janustech.com>) id 1geeOY-0001Hm-UT
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:09:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1geeMG-0005eg-2r
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:06:47 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <joel.stan@gmail.com>) id 1geeMF-0005eA-TI
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:06:44 -0500
-Received: by mail-pf1-x442.google.com with SMTP id h3so15068814pfg.1
-	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 03:06:43 -0800 (PST)
-Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Wed,  2 Jan 2019 21:36:12 +1030
-Message-Id: <20190102110612.20387-1-joel@jms.id.au>
+	(envelope-from <lbloch@janustech.com>) id 1geeOV-00087f-R7
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 06:09:06 -0500
+From: Leonid Bloch <lbloch@janustech.com>
+Date: Wed, 2 Jan 2019 11:08:56 +0000
+Message-ID: <20190102110804.18155-1-lbloch@janustech.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] gitdm: Add other IBMers
+Subject: [Qemu-devel] [PATCH 0/1] include: Auto-generate the sizes lookup
+ table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +22,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Andrew Jeffery <andrew@aj.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Leonid Bloch <lbloch@janustech.com>, Alberto Garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>
 
-Here are some IBMers who use their personal addresses when submitting
-patches.
+Following the conversations here:
+https://patchwork.kernel.org/patch/10665157
+and here:
+https://patchwork.kernel.org/patch/10666975
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
- contrib/gitdm/group-map-ibm | 5 +++++
- 1 file changed, 5 insertions(+)
+Making the lookup table for power-of-two sizes auto-generated, instead
+of being hard-coded into the units.h file.
 
-diff --git a/contrib/gitdm/group-map-ibm b/contrib/gitdm/group-map-ibm
-index b66db5f4a825..6c0570107d65 100644
---- a/contrib/gitdm/group-map-ibm
-+++ b/contrib/gitdm/group-map-ibm
-@@ -2,5 +2,10 @@
- # Some IBM contributors submit via another domain
- #
- 
-+aik@ozlabs.ru
-+andrew@aj.id.au
-+benh@kernel.crashing.org
- clg@kaod.org
- groug@kaod.org
-+joel@jms.id.au
-+sjitindarsingh@gmail.com
--- 
-2.19.1
+I'm not sure if the changes I've made to Makefile here are "standard".
+Please correct me if that's not the case.
+
+Sorry it took so much time - I was busy with something completely
+different.
+
+
+Regards,
+Leonid.
+
+Leonid Bloch (1):
+  include: Auto-generate the sizes lookup table
+
+ .gitignore           |  1 +
+ Makefile             |  5 +++
+ block/qcow2.h        |  2 +-
+ block/vdi.c          |  1 +
+ include/qemu/units.h | 73 --------------------------------------------
+ scripts/gen-sizes.sh | 66 +++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 74 insertions(+), 74 deletions(-)
+ create mode 100755 scripts/gen-sizes.sh
+
+--=20
+2.20.1
