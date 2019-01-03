@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36187)
+Received: from eggs.gnu.org ([208.118.235.92]:36224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf7mE-0008Vk-2f
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:31:31 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf7mF-00004x-3i
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:31:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf7mC-0007LM-8y
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:31:29 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34465)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gf7mB-0007Hi-JN
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:31:28 -0500
-Received: by mail-ot1-x341.google.com with SMTP id t5so30194097otk.1
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 10:31:25 -0800 (PST)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf7mC-0007Ke-1h
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:31:30 -0500
+References: <20181218063911.2112-1-richard.henderson@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <76c13216-a9a1-4d5f-f74c-cc654e2390c7@ilande.co.uk>
+Date: Thu, 3 Jan 2019 18:31:09 +0000
 MIME-Version: 1.0
-References: <20180908182205.GB409@mornington.dcs.gla.ac.uk>
-In-Reply-To: <20180908182205.GB409@mornington.dcs.gla.ac.uk>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 Jan 2019 18:31:13 +0000
-Message-ID: <CAFEAcA83dVVyQLsADoNBN7feFxnWcVr5r0SPA8PffaG2140yPw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: write(fd, NULL,
- 0) parity with linux's treatment of same
+In-Reply-To: <20181218063911.2112-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 00/34] tcg, target/ppc vector improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +23,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Garnock-Jones <tony.garnock-jones@glasgow.ac.uk>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-stable <qemu-stable@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On Sat, 8 Sep 2018 at 22:04, Tony Garnock-Jones
-<tony.garnock-jones@glasgow.ac.uk> wrote:
->
-> Bring linux-user write(2) handling into line with linux for the case
-> of a 0-byte write with a NULL buffer. Based on a patch originally
-> written by Zhuowei Zhang.
->
-> Addresses https://bugs.launchpad.net/qemu/+bug/1716292.
->
-> From Zhuowei Zhang's patch (https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg08073.html):
->
->     Linux returns success for the special case of calling write with a
->     zero-length NULL buffer: compiling and running
->
->     int main() {
->        ssize_t ret = write(STDOUT_FILENO, NULL, 0);
->        fprintf(stderr, "write returned %ld\n", ret);
->        return 0;
->     }
->
->     gives "write returned 0" when run directly, but "write returned
->     -1" in QEMU.
->
->     This commit checks for this situation and returns success if
->     found.
->
-> Subsequent discussion raised the following questions (and my answers):
->
->  - Q. Should TARGET_NR_read pass through to safe_read in this
->       situation too?
->    A. I'm wary of changing unrelated code to the specific problem I'm
->       addressing. TARGET_NR_read is already consistent with Linux for
->       this case.
->
->  - Q. Do pread64/pwrite64 need to be changed similarly?
->    A. Experiment suggests not: both linux and linux-user yield -1 for
->       NULL 0-length reads/writes.
+On 18/12/2018 06:38, Richard Henderson wrote:
 
-Hi; following up on this, we've just had
-https://bugs.launchpad.net/qemu/+bug/1810433 which is
-a report of the same NULL/0 bug for pwrite64. Looking at the
-kernel code I see that both the write and pwrite64 syscalls
-go through the same vfs_write() common function, so their
-behaviour for NULL/0 should be identical. Experimentally,
-stracing the 1810433 test program gives
- pwrite64(3, NULL, 0, 0)                 = 0
-so we do indeed need to special case NULL/0 there as well
-as in write().
+> This implements some of the things that I talked about with Mark
+> this morning / yesterday.  In particular:
+> 
+> (0) Implement expanders for nand, nor, eqv logical operations.
+> 
+> (1) Implement saturating arithmetic for the tcg backend.
+> 
+>     While I had expanders for these, they always went to helpers.
+>     It's easy enough to expand byte and half-word operations for x86.
+>     Beyond that, 32 and 64-bit operations can be expanded with integers.
+> 
+> (2) Implement minmax arithmetic for the tcg backend.
+> 
+>     While I had integral minmax operations, I had not yet added
+>     any vector expanders for this.  (The integral stuff came in
+>     for atomic minmax.)
+> 
+> (3) Trivial conversions to minmax for target/arm.
+> 
+> (4) Patches 11-18 are identical to Mark's.
+> 
+> (5) Patches 19-25 implement splat and logicals for VMX and VSX.
+> 
+>     VSX is no more difficult than VMX for these.  It does seem to be
+>     just about everything that we can do for VSX at the momement.
+> 
+> (6) Patches 26-33 implement saturating arithmetic for VMX.
+> 
+> (7) Patch 34 implements minmax arithmetic for VMX.
+> 
+> I've tested the new operations via aarch64 guest, as that's the set
+> of risu test cases I've got handy.  The rest is untested so far.
 
-The extra fix should be straightforward -- does anybody
-feel like writing up a patch for it?
+I've taken my previous PPC patchsets below:
 
-thanks
--- PMM
+[PATCH v5 0/9] target/ppc: prepare for conversion to TCG vector operations
+https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00063.html
+
+[PATCH v2 0/8] target/ppc: remove various endian hacks from int_helper.c
+https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg06149.html
+
+and then rebased this patchset on top of them (including a squash of the vsplt fix
+posted earlier today at
+https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00287.html) and pushed the
+result to https://github.com/mcayland/qemu/tree/ppc-altivec-v5.5-rth.
+
+Fixing the vsplt instruction now gives a readable display in my MacOS tests, but I'm
+still seeing "shadows" such as https://www.ilande.co.uk/tmp/qemu/badapple4.png which
+I've bisected down to:
+
+
+commit 71f229eb331e979971a0a79e5a2fcdfb9380bd06
+Author: Richard Henderson <richard.henderson@linaro.org>
+Date:   Mon Dec 17 22:39:10 2018 -0800
+
+    target/ppc: convert vadd*s and vsub*s to vector operations
+
+    Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+So looks like there's something still not quite right with the saturation flag/vector
+saturation implementation.
+
+
+ATB,
+
+Mark.
