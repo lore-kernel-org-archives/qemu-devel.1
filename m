@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54706)
+Received: from eggs.gnu.org ([208.118.235.92]:56140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gf4OX-000555-OO
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:54:50 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf4Sd-0006Py-EC
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:59:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gf4OU-0002NT-AF
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:54:49 -0500
-Date: Thu, 3 Jan 2019 15:54:38 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190103155438.68d6afe3.cohuck@redhat.com>
-In-Reply-To: <20190103140246.50791-1-liq3ea@163.com>
-References: <20190103140246.50791-1-liq3ea@163.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf4Sc-0005AT-FJ
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:59:03 -0500
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <20181218063911.2112-1-richard.henderson@linaro.org>
+	<2175cdb6-bc52-5c0a-f767-23a08ae4384f@ilande.co.uk>
+Message-ID: <0bad51a5-21ab-d613-44f2-b6b7f7d4e688@ilande.co.uk>
+Date: Thu, 3 Jan 2019 14:58:37 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390: avoid potential null dereference in
- s390_pcihost_unplug()
+In-Reply-To: <2175cdb6-bc52-5c0a-f767-23a08ae4384f@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 00/34] tcg, target/ppc vector improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>
-Cc: walling@linux.ibm.com, rth@twiddle.net, david@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, Pierre Morel <pmorel@linux.ibm.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On Thu,  3 Jan 2019 06:02:46 -0800
-Li Qiang <liq3ea@163.com> wrote:
+On 18/12/2018 09:49, Mark Cave-Ayland wrote:
 
-> When getting the 'pbdev', the if...else has no default branch.
-> From Coverity, the 'pbdev' maybe null when the 'dev' is not
-> the TYPE_PCI_BRIDGE/TYPE_PCI_DEVICE/TYPE_S390_PCI_DEVICE.
-> 
-> Spotted by Coverity: CID 1398593
-> 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 15759b6514..b3122268a3 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -956,6 +956,10 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
->          pbdev = S390_PCI_DEVICE(dev);
->          pci_dev = pbdev->pdev;
-> +    } else {
-> +        error_setg(errp, "s390: device unplug for not supported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +        return;
+> Following on from this, the next patch "target/ppc: convert vsplt[bhw] to use vector
+> operations" causes corruption of the OS X splash screen
+> (https://www.ilande.co.uk/tmp/qemu/badapple2.png) in a way that suggests there may be
+> an endian issue.
 
-I think that is something that really Should Not Happen. However,
-looking at s390_pcihost_plug, we just do nothing if the plugged device
-does not match any of the expected three values. Maybe we should also
-set an error in that case there?
+After some more digging I've found out what's going on here by dumping out the AVR
+registers before and after:
 
->      }
->  
->      switch (pbdev->state) {
+Before the patch:
+
+BEFORE:
+uimm: 0  size: 2
+sreg: 99 @ 0x7f54fd7157a0 - 1 6a 1 d9 1 15 fd 63 0 0 0 0 0 0 0 0
+dreg: 99 @ 0x7f54fd715870 - 7f ff de ad 7f ff de ad 7f ff de ad 7f ff de ad
+AFTER:
+dreg: 99 @ 0x7f54fd715870 - 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a
+
+BEFORE:
+uimm: 1  size: 2
+sreg: 99 @ 0x7f54fd7157a0 - 1 6a 1 d9 1 15 fd 63 0 0 0 0 0 0 0 0
+dreg: 99 @ 0x7f54fd715870 - 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a
+AFTER:
+dreg: 99 @ 0x7f54fd715870 - 1 d9 1 d9 1 d9 1 d9 1 d9 1 d9 1 d9 1 d9
+
+
+After the patch:
+
+BEFORE:
+uimm: 0  size: 2
+sreg: 5 @ 0x7fe5a0c4a7a0 - 1 6a 1 d9 1 15 fd 63 0 0 0 0 0 0 0 0
+dreg: 18 @ 0x7fe5a0c4a870 - 7f ff de ad 7f ff de ad 7f ff de ad 7f ff de ad
+AFTER:
+dreg: 18 @ 0x7fe5a0c4a870 - 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1
+
+BEFORE:
+uimm: 1  size: 2
+sreg: 5 @ 0x7fe5a0c4a7a0 - 1 6a 1 d9 1 15 fd 63 0 0 0 0 0 0 0 0
+dreg: 18 @ 0x7fe5a0c4a870 - 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1
+AFTER:
+dreg: 18 @ 0x7fe5a0c4a870 - 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1
+
+
+As you can see vsplth splat is one byte off with this patch applied and the cause is
+the xor in the #ifndef HOST_WORDS_BIGENDIAN block: before the xor is applied, bofs is
+aligned to 2 bytes and with bofs ^ 15 the LSB is set to 1 again, introducing the 1
+byte error.
+
+Applying the following patch to mask bofs based upon the size of vece seems to fix
+the issue here for me on little-endian Intel:
+
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index 59d3bc6e02..41ddbd879f 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -815,6 +815,7 @@ static void gen_vsplt(DisasContext *ctx, int vece)
+     bofs += (uimm << vece) & 15;
+ #ifndef HOST_WORDS_BIGENDIAN
+     bofs ^= 15;
++    bofs &= ~((1 << vece) - 1);
+ #endif
+
+     tcg_gen_gvec_dup_mem(vece, dofs, bofs, 16, 16);
+
+
+ATB,
+
+Mark.
