@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52120)
+Received: from eggs.gnu.org ([208.118.235.92]:53918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gez4B-000462-RR
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:13:28 -0500
+	(envelope-from <pmathieu@redhat.com>) id 1gez9L-0001Wg-1D
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:18:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gez49-0006vl-EE
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:13:27 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu,  3 Jan 2019 09:11:19 +0000
-Message-Id: <20190103091119.9367-12-stefanha@redhat.com>
-In-Reply-To: <20190103091119.9367-1-stefanha@redhat.com>
-References: <20190103091119.9367-1-stefanha@redhat.com>
+	(envelope-from <pmathieu@redhat.com>) id 1gez9H-0001tl-Ls
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:18:46 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35115)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1gez9H-0001s0-Dm
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:18:43 -0500
+Received: by mail-wr1-f68.google.com with SMTP id 96so32938813wrb.2
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 01:18:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <154645087925.9907.8533035759502851896@02a1dbf831e2>
+	<e122954c-760c-47ac-3858-1c25e0b2f9ff@redhat.com>
+In-Reply-To: <e122954c-760c-47ac-3858-1c25e0b2f9ff@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 3 Jan 2019 10:18:30 +0100
+Message-ID: <CAP+75-X27ep7r5oeg9HQY6T4h0TF3YSHHdw--O5Kb-vAADtnJg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 11/11] arm: Add Clock peripheral stub to NRF51
- SOC
+Subject: Re: [Qemu-devel] [PATCH 0/3] cutils: Cleanup, improve documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>, Paolo Bonzini <pbonzini@redhat.com>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, David Hildenbrand <david@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+Cc'ing Markus and Thomas who reviewed commit 8c06fbdf36b.
 
-This stubs enables the microbit-micropython firmware to run
-on the microbit machine.
+On Thu, Jan 3, 2019 at 10:04 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+> On 1/2/19 6:41 PM, no-reply@patchew.org wrote:
+> > Patchew URL: https://patchew.org/QEMU/20181226171538.21984-1-philmd@red=
+hat.com/
+> [...]> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> > Checking PATCH 1/3: util/cutils: Move size_to_str() from "qemu-common.h=
+" to "cutils.h"...
+> > WARNING: Block comments use a leading /* on a separate line
+> > #42: FILE: include/qemu/cutils.h:160:
+> > +/**
+>
+> I believe this warning is incorrect, since we use the /** marking for
+> Doxygen generated documentation. The offending comment is:
+>
+>   /**
+>    * size_to_str:
+>    *
+>    * Return human readable string for size @val.
+>    * Use IEC binary units like KiB, MiB, and so forth.
+>    *
+>    * @val: The value to format.
+>    *       Can be anything that uint64_t allows (no more than "16 EiB").
+>    *
+>    * Caller is responsible for passing it to g_free().
+>    */
+>    char *size_to_str(uint64_t val);
+>
+> Am I missing something?
 
-Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/hw/arm/nrf51_soc.h |  1 +
- hw/arm/nrf51_soc.c         | 26 ++++++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+I had a quick look at scripts/checkpatch.pl:
 
-diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
-index 39e613e1c9..e06f0304b4 100644
---- a/include/hw/arm/nrf51_soc.h
-+++ b/include/hw/arm/nrf51_soc.h
-@@ -38,6 +38,7 @@ typedef struct NRF51State {
-     MemoryRegion iomem;
-     MemoryRegion sram;
-     MemoryRegion flash;
-+    MemoryRegion clock;
-=20
-     uint32_t sram_size;
-     uint32_t flash_size;
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index ef70bd62fa..1630c27594 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -34,6 +34,26 @@
-=20
- #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
-=20
-+static uint64_t clock_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
-+                  __func__, addr, size);
-+    return 1;
-+}
-+
-+static void clock_write(void *opaque, hwaddr addr, uint64_t data,
-+                        unsigned int size)
-+{
-+    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " [%=
-u]\n",
-+                  __func__, addr, data, size);
-+}
-+
-+static const MemoryRegionOps clock_ops =3D {
-+    .read =3D clock_read,
-+    .write =3D clock_write
-+};
-+
-+
- static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
- {
-     NRF51State *s =3D NRF51_SOC(dev_soc);
-@@ -130,6 +150,12 @@ static void nrf51_soc_realize(DeviceState *dev_soc, =
-Error **errp)
-                                             BASE_TO_IRQ(base_addr)));
-     }
-=20
-+    /* STUB Peripherals */
-+    memory_region_init_io(&s->clock, NULL, &clock_ops, NULL,
-+                          "nrf51_soc.clock", 0x1000);
-+    memory_region_add_subregion_overlap(&s->container,
-+                                        NRF51_IOMEM_BASE, &s->clock, -1)=
-;
-+
-     create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
-                                 NRF51_IOMEM_SIZE);
-     create_unimplemented_device("nrf51_soc.ficr", NRF51_FICR_BASE,
---=20
-2.19.2
+  # Block comment styles
+
+      # Block comments use /* on a line of its own
+      if ($rawline !~ m@^\+.*/\*.*\*/[ \t]*$@ &&    #inline /*...*/
+          $rawline =3D~ m@^\+.*/\*\*?[ \t]*.+[ \t]*$@) { # /* or /** non-bl=
+ank
+          WARN("Block comments use a leading /* on a separate line\n"
+. $herecurr);
+      }
+
+I am confused because the comment says it allow blank /**, which is
+the case here.
