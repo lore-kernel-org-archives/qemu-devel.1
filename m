@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46885)
+Received: from eggs.gnu.org ([208.118.235.92]:51365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gf18K-00022W-B9
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:25:53 -0500
+	(envelope-from <npes87184@gmail.com>) id 1gf1Mm-0006Bo-7G
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:40:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gf18F-0005Uy-EV
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:25:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47202)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gf18F-0005Ue-67
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:25:47 -0500
-Date: Thu, 3 Jan 2019 11:25:39 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190103112538.GF2316@work-vm>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-6-fli@suse.com>
+	(envelope-from <npes87184@gmail.com>) id 1gf1Ml-0000Y7-9r
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:40:48 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181225140449.15786-6-fli@suse.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 05/16] migration: unify error
- handling for process_incoming_migration_co
+References: <20181223025939.15775-1-npes87184@gmail.com>
+	<20181223025939.15775-2-npes87184@gmail.com>
+	<20190102114919.GJ24009@stefanha-x1.localdomain>
+	<CAPTqjH1K3RYH1A2Q8Fhkh5x6hOE5CU9qTqRtjFC8WLk3UBNFOA@mail.gmail.com>
+	<20190103100923.GC7733@stefanha-x1.localdomain>
+In-Reply-To: <20190103100923.GC7733@stefanha-x1.localdomain>
+From: Yu-Chen Lin <npes87184@gmail.com>
+Date: Thu, 3 Jan 2019 19:40:10 +0800
+Message-ID: <CAPTqjH1x+ZJ9HnsaZ61KQGv-qksHuSm6KDy0P0-zW633tT8ttQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] dmg: fix binary search
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-* Fei Li (fli@suse.com) wrote:
-> In the current code, if process_incoming_migration_co() fails we do
-> the same error handing: set the error state, close the source file,
-> do the cleanup for multifd, and then exit(EXIT_FAILURE). To make the
-> code clearer, add a "goto fail" to unify the error handling.
-> 
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Fei Li <fli@suse.com>
-> ---
->  migration/migration.c | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 5d322eb9d6..ded151b1bf 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -438,15 +438,13 @@ static void process_incoming_migration_co(void *opaque)
->          /* Make sure all file formats flush their mutable metadata */
->          bdrv_invalidate_cache_all(&local_err);
->          if (local_err) {
-> -            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-> -                    MIGRATION_STATUS_FAILED);
->              error_report_err(local_err);
-> -            exit(EXIT_FAILURE);
-> +            goto fail;
->          }
->  
->          if (colo_init_ram_cache() < 0) {
->              error_report("Init ram cache failed");
-> -            exit(EXIT_FAILURE);
-> +            goto fail;
->          }
->  
->          qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
-> @@ -461,20 +459,22 @@ static void process_incoming_migration_co(void *opaque)
->      }
->  
->      if (ret < 0) {
-> -        Error *local_err = NULL;
-> -
-> -        migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-> -                          MIGRATION_STATUS_FAILED);
->          error_report("load of migration failed: %s", strerror(-ret));
-> -        qemu_fclose(mis->from_src_file);
-> -        if (multifd_load_cleanup(&local_err) != 0) {
-> -            error_report_err(local_err);
-> -        }
-> -        exit(EXIT_FAILURE);
-> +        goto fail;
->      }
->      mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
->      qemu_bh_schedule(mis->bh);
->      mis->migration_incoming_co = NULL;
-> +    return;
-> +fail:
-> +    local_err = NULL;
-> +    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-> +                      MIGRATION_STATUS_FAILED);
-> +    qemu_fclose(mis->from_src_file);
-> +    if (multifd_load_cleanup(&local_err) != 0) {
-> +        error_report_err(local_err);
-> +    }
-> +    exit(EXIT_FAILURE);
->  }
->  
->  static void migration_incoming_setup(QEMUFile *f)
+Stefan Hajnoczi <stefanha@redhat.com> =E6=96=BC 2019=E5=B9=B41=E6=9C=883=E6=
+=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=886:09=E5=AF=AB=E9=81=93=EF=BC=9A
 
-OK, so this is really unifying the normal error case and the two
-colo-incoming error cases; so I think that's fine.
+> On Wed, Jan 02, 2019 at 08:20:54PM +0800, =E6=9E=97=E8=82=B2=E8=BE=B0 wro=
+te:
+> > This series is focus on fixing bug #1809304 (see:
+> > https://bugs.launchpad.net/qemu/+bug/1809304).
+> > There is an example dmg file in #1809304 which will trigger this bug.
+>
+> Thanks.  It would be great to include a tiny dmg file in
+> tests/qemu-iotests/sample_images/ and add a test case for it.
+>
+> The file should be small (kilobytes, not megabytes) and must be
+> redistributable (no proprietary content or even GPL software, which
+> requires distributing source code).
+>
+> Do you have time to do that?
+>
+
+Sure!
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+> > About your case, I think we can simply check whether chunk3 is zero
+> before
+> > we decrease it.
+> > if s->sectors[chunk3] > sector_num and chunk3 is zero (i.e.
+> s->sectors[0] >
+> > sector_num), it means we cannot find the table contains sector_num.
+> > We can return s->n_chunks (error) directly.
+> >
+> > What do you think?
+>
+> Sounds good.  We have to assume that the file contents are invalid and
+> handle all cases.
+>
+> I'll review the next revision of your patch.  Thanks!
+>
 
-> -- 
-> 2.13.7
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks!
+
+Yu-Chen Lin
+
+
+> Stefan
+>
