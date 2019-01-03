@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36656)
+Received: from eggs.gnu.org ([208.118.235.92]:37216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf2Bs-0008Tm-KV
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:33:39 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gf2Ds-0001Gs-4u
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:35:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf2Bp-0004Kf-Ct
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:33:36 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:35882
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gf2Bp-00044u-06
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:33:33 -0500
-References: <20190103093704.32635-1-ppandit@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <cd325b25-15ee-46e4-896e-e5904340b1bf@ilande.co.uk>
-Date: Thu, 3 Jan 2019 12:33:09 +0000
+	(envelope-from <dgilbert@redhat.com>) id 1gf2Do-0006gV-VO
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:35:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gf2Do-0006el-Iw
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:35:36 -0500
+Date: Thu, 3 Jan 2019 12:35:25 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190103123525.GG2316@work-vm>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-14-fli@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <20190103093704.32635-1-ppandit@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] sun4u: add power_mem_read routine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20181225140449.15786-14-fli@suse.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 13/16] qemu_thread: supplement
+ error handling for migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +29,294 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
 
-On 03/01/2019 09:37, P J P wrote:
-
-> From: Prasad J Pandit <pjp@fedoraproject.org>
-> 
-> Define skeleton 'power_mem_read' routine. Avoid NULL dereference.
-> 
-> Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+* Fei Li (fli@suse.com) wrote:
+> Update qemu_thread_create()'s callers by
+> - setting an error on qemu_thread_create() failure for callers that
+>   set an error on failure;
+> - reporting the error and returning failure for callers that return
+>   an error code on failure;
+> - reporting the error and setting some state for callers that just
+>   report errors and choose not to continue on.
+>=20
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Fei Li <fli@suse.com>
 > ---
->  hw/sparc64/sun4u.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index f76b19e4e9..cbdb2bb411 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -214,6 +214,11 @@ typedef struct PowerDevice {
->  } PowerDevice;
->  
->  /* Power */
-> +static uint64_t power_mem_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    return 0xffffffff;
-> +}
-> +
->  static void power_mem_write(void *opaque, hwaddr addr,
->                              uint64_t val, unsigned size)
+>  migration/migration.c    | 33 ++++++++++++++++++++++-----------
+>  migration/postcopy-ram.c | 16 ++++++++++++----
+>  migration/ram.c          | 44 ++++++++++++++++++++++++++++++------------=
+--
+>  migration/savevm.c       | 12 ++++++++----
+>  4 files changed, 72 insertions(+), 33 deletions(-)
+>=20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ea5839ff0d..9654bde101 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -447,10 +447,13 @@ static void process_incoming_migration_co(void *opa=
+que)
+>              goto fail;
+>          }
+> =20
+> -        /* TODO: let the further caller handle the error instead of abor=
+t() */
+> -        qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+> -                           colo_process_incoming_thread, mis,
+> -                           QEMU_THREAD_JOINABLE, &error_abort);
+> +        if (!qemu_thread_create(&mis->colo_incoming_thread, "COLO incomi=
+ng",
+> +                                colo_process_incoming_thread, mis,
+> +                                QEMU_THREAD_JOINABLE, &local_err)) {
+> +            error_reportf_err(local_err, "failed to create "
+> +                              "colo_process_incoming_thread: ");
+> +            goto fail;
+> +        }
+>          mis->have_colo_incoming_thread =3D true;
+>          qemu_coroutine_yield();
+
+OK
+
+> @@ -2347,6 +2350,7 @@ out:
+>  static int open_return_path_on_source(MigrationState *ms,
+>                                        bool create_thread)
 >  {
-> @@ -224,6 +229,7 @@ static void power_mem_write(void *opaque, hwaddr addr,
+> +    Error *local_err =3D NULL;
+> =20
+>      ms->rp_state.from_dst_file =3D qemu_file_get_return_path(ms->to_dst_=
+file);
+>      if (!ms->rp_state.from_dst_file) {
+> @@ -2360,10 +2364,13 @@ static int open_return_path_on_source(MigrationSt=
+ate *ms,
+>          return 0;
+>      }
+> =20
+> -    /* TODO: let the further caller handle the error instead of abort() =
+here */
+> -    qemu_thread_create(&ms->rp_state.rp_thread, "return path",
+> -                       source_return_path_thread, ms,
+> -                       QEMU_THREAD_JOINABLE, &error_abort);
+> +    if (!qemu_thread_create(&ms->rp_state.rp_thread, "return path",
+> +                            source_return_path_thread, ms,
+> +                            QEMU_THREAD_JOINABLE, &local_err)) {
+> +        error_reportf_err(local_err,
+> +                          "failed to create source_return_path_thread: "=
+);
+> +        return -1;
+> +     }
+
+I think that has to close the from_dst_file and set the
+=66rom_dst_file=3DNULL.  That file is owned by the thread, and it's normally
+the thread that cleans it up.
+
+I think other than that missing close it's fine; and we can do that as a
+fix later, so:
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> =20
+>      trace_open_return_path_on_source_continue();
+> =20
+> @@ -3193,9 +3200,13 @@ void migrate_fd_connect(MigrationState *s, Error *=
+error_in)
+>          migrate_fd_cleanup(s);
+>          return;
+>      }
+> -    /* TODO: let the further caller handle the error instead of abort() =
+here */
+> -    qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+> -                       QEMU_THREAD_JOINABLE, &error_abort);
+> +    if (!qemu_thread_create(&s->thread, "live_migration", migration_thre=
+ad, s,
+> +                            QEMU_THREAD_JOINABLE, &error_in)) {
+> +        error_reportf_err(error_in, "failed to create migration_thread: =
+");
+> +        migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
+> +        migrate_fd_cleanup(s);
+> +        return;
+> +    }
+
+OK
+
+>      s->migration_thread_running =3D true;
 >  }
->  
->  static const MemoryRegionOps power_mem_ops = {
-> +    .read = power_mem_read,
->      .write = power_mem_write,
->      .endianness = DEVICE_NATIVE_ENDIAN,
->      .valid = {
+> =20
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 221ea24919..80bfa9c4a2 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -1083,6 +1083,8 @@ retry:
+> =20
+>  int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>  {
+> +    Error *local_err =3D NULL;
+> +
+>      /* Open the fd for the kernel to give us userfaults */
+>      mis->userfault_fd =3D syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLO=
+CK);
+>      if (mis->userfault_fd =3D=3D -1) {
+> @@ -1109,10 +1111,16 @@ int postcopy_ram_enable_notify(MigrationIncomingS=
+tate *mis)
+>      }
+> =20
+>      qemu_sem_init(&mis->fault_thread_sem, 0);
+> -    /* TODO: let the further caller handle the error instead of abort() =
+here */
+> -    qemu_thread_create(&mis->fault_thread, "postcopy/fault",
+> -                       postcopy_ram_fault_thread, mis,
+> -                       QEMU_THREAD_JOINABLE, &error_abort);
+> +    if (!qemu_thread_create(&mis->fault_thread, "postcopy/fault",
+> +                            postcopy_ram_fault_thread, mis,
+> +                            QEMU_THREAD_JOINABLE, &local_err)) {
+> +        error_reportf_err(local_err,
+> +                          "failed to create postcopy_ram_fault_thread: "=
+);
+> +        close(mis->userfault_event_fd);
+> +        close(mis->userfault_fd);
+> +        qemu_sem_destroy(&mis->fault_thread_sem);
+> +        return -1;
+> +    }
+>      qemu_sem_wait(&mis->fault_thread_sem);
+>      qemu_sem_destroy(&mis->fault_thread_sem);
+>      mis->have_fault_thread =3D true;
 
-Certainly the addition of the missing read function is valid, although I see that
-you've defaulted reads to returning 0xffffffff - can you point me towards the source
-that indicates that this behaviour matches that of real Ultra-5 hardware?
+OK
 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index eed1daf302..1e24a78eaa 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -473,6 +473,7 @@ static void compress_threads_save_cleanup(void)
+>  static int compress_threads_save_setup(void)
+>  {
+>      int i, thread_count;
+> +    Error *local_err =3D NULL;
+> =20
+>      if (!migrate_use_compression()) {
+>          return 0;
+> @@ -502,10 +503,12 @@ static int compress_threads_save_setup(void)
+>          comp_param[i].quit =3D false;
+>          qemu_mutex_init(&comp_param[i].mutex);
+>          qemu_cond_init(&comp_param[i].cond);
+> -        /* TODO: let the further caller handle the error instead of abor=
+t() */
+> -        qemu_thread_create(compress_threads + i, "compress",
+> -                           do_data_compress, comp_param + i,
+> -                           QEMU_THREAD_JOINABLE, &error_abort);
+> +        if (!qemu_thread_create(compress_threads + i, "compress",
+> +                                do_data_compress, comp_param + i,
+> +                                QEMU_THREAD_JOINABLE, &local_err)) {
+> +            error_reportf_err(local_err, "failed to create do_data_compr=
+ess: ");
+> +            goto exit;
+> +        }
 
-ATB,
+OK
 
-Mark.
+>      }
+>      return 0;
+> =20
+> @@ -1076,9 +1079,14 @@ static void multifd_new_send_channel_async(QIOTask=
+ *task, gpointer opaque)
+>          p->c =3D QIO_CHANNEL(sioc);
+>          qio_channel_set_delay(p->c, false);
+>          p->running =3D true;
+> -        /* TODO: let the further caller handle the error instead of abor=
+t() */
+> -        qemu_thread_create(&p->thread, p->name, multifd_send_thread, p,
+> -                           QEMU_THREAD_JOINABLE, &error_abort);
+> +        if (!qemu_thread_create(&p->thread, p->name, multifd_send_thread=
+, p,
+> +                                QEMU_THREAD_JOINABLE, &local_err)) {
+> +            migrate_set_error(migrate_get_current(), local_err);
+> +            error_reportf_err(local_err,
+> +                              "failed to create multifd_send_thread: ");
+> +            multifd_save_cleanup();
+> +            return;
+> +        }
+> =20
+>          atomic_inc(&multifd_send_state->count);
+>      }
+> @@ -1357,9 +1365,13 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Err=
+or **errp)
+>      p->num_packets =3D 1;
+> =20
+>      p->running =3D true;
+> -    /* TODO: let the further caller handle the error instead of abort() =
+here */
+> -    qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+> -                       QEMU_THREAD_JOINABLE, &error_abort);
+> +    if (!qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+> +                            QEMU_THREAD_JOINABLE, &local_err)) {
+> +        error_propagate_prepend(errp, local_err,
+> +                                "failed to create multifd_recv_thread: "=
+);
+> +        multifd_recv_terminate_threads(local_err);
+> +        return false;
+> +    }
+>      atomic_inc(&multifd_recv_state->count);
+>      return atomic_read(&multifd_recv_state->count) =3D=3D
+>             migrate_multifd_channels();
+> @@ -3625,6 +3637,7 @@ static void compress_threads_load_cleanup(void)
+>  static int compress_threads_load_setup(QEMUFile *f)
+>  {
+>      int i, thread_count;
+> +    Error *local_err =3D NULL;
+> =20
+>      if (!migrate_use_compression()) {
+>          return 0;
+> @@ -3646,10 +3659,13 @@ static int compress_threads_load_setup(QEMUFile *=
+f)
+>          qemu_cond_init(&decomp_param[i].cond);
+>          decomp_param[i].done =3D true;
+>          decomp_param[i].quit =3D false;
+> -        /* TODO: let the further caller handle the error instead of abor=
+t() */
+> -        qemu_thread_create(decompress_threads + i, "decompress",
+> -                           do_data_decompress, decomp_param + i,
+> -                           QEMU_THREAD_JOINABLE, &error_abort);
+> +        if (!qemu_thread_create(decompress_threads + i, "decompress",
+> +                                do_data_decompress, decomp_param + i,
+> +                                QEMU_THREAD_JOINABLE, &local_err)) {
+> +            error_reportf_err(local_err,
+> +                              "failed to create do_data_decompress: ");
+> +            goto exit;
+> +        }
+>      }
+>      return 0;
+>  exit:
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 46ce7af239..b8bdcde5d8 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1747,10 +1747,14 @@ static int loadvm_postcopy_handle_listen(Migratio=
+nIncomingState *mis)
+>      mis->have_listen_thread =3D true;
+>      /* Start up the listening thread and wait for it to signal ready */
+>      qemu_sem_init(&mis->listen_thread_sem, 0);
+> -    /* TODO: let the further caller handle the error instead of abort() =
+here */
+> -    qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+> -                       postcopy_ram_listen_thread, NULL,
+> -                       QEMU_THREAD_DETACHED, &error_abort);
+> +    if (!qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+> +                            postcopy_ram_listen_thread, NULL,
+> +                            QEMU_THREAD_DETACHED, &local_err)) {
+> +        error_reportf_err(local_err,
+> +                          "failed to create postcopy_ram_listen_thread: =
+");
+> +        qemu_sem_destroy(&mis->listen_thread_sem);
+> +        return -1;
+> +    }
+>      qemu_sem_wait(&mis->listen_thread_sem);
+>      qemu_sem_destroy(&mis->listen_thread_sem);
+> =20
+> --=20
+> 2.13.7
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
