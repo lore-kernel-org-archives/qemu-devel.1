@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56140)
+Received: from eggs.gnu.org ([208.118.235.92]:56997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf4Sd-0006Py-EC
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:59:04 -0500
+	(envelope-from <pmathieu@redhat.com>) id 1gf4VN-0007lC-3O
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:01:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf4Sc-0005AT-FJ
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:59:03 -0500
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-References: <20181218063911.2112-1-richard.henderson@linaro.org>
-	<2175cdb6-bc52-5c0a-f767-23a08ae4384f@ilande.co.uk>
-Message-ID: <0bad51a5-21ab-d613-44f2-b6b7f7d4e688@ilande.co.uk>
-Date: Thu, 3 Jan 2019 14:58:37 +0000
+	(envelope-from <pmathieu@redhat.com>) id 1gf4VH-0007Zp-HG
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:01:53 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44363)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1gf4VH-0007Us-9s
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:01:47 -0500
+Received: by mail-wr1-f65.google.com with SMTP id z5so33834228wrt.11
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 07:01:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <2175cdb6-bc52-5c0a-f767-23a08ae4384f@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 00/34] tcg, target/ppc vector improvements
+References: <20190103142919.30090-1-philmd@redhat.com>
+	<20190103142919.30090-3-philmd@redhat.com>
+In-Reply-To: <20190103142919.30090-3-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Thu, 3 Jan 2019 16:01:31 +0100
+Message-ID: <CAP+75-VZhMYFXZczP1-9i11dn-W1e2YPf=tDoN949m9NZSJb6Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] tests: Disable qht-bench parallel test
+ when using gprof
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: "Emilio G . Cota" <cota@braap.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 18/12/2018 09:49, Mark Cave-Ayland wrote:
+On Thu, Jan 3, 2019 at 3:29 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om> wrote:
+> This test is failing on the Travis CI [*] since some time now,
+> disable it until it get fixed.
+>
+> [*] https://travis-ci.org/qemu/qemu/builds/474821674
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  tests/Makefile.include | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 3f5a1d0c30..e764d8d2cb 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -88,7 +88,8 @@ check-unit-y +=3D tests/test-rcu-simpleq$(EXESUF)
+>  check-unit-y +=3D tests/test-rcu-tailq$(EXESUF)
+>  check-unit-y +=3D tests/test-qdist$(EXESUF)
+>  check-unit-y +=3D tests/test-qht$(EXESUF)
+> -check-unit-y +=3D tests/test-qht-par$(EXESUF)
+> +# FIXME: {test-qht-par + gprof} often break on Travis CI
+> +check-unit-$(call lnot,$(TARGET_GPROF)) +=3D tests/test-qht-par$(EXESUF)
 
-> Following on from this, the next patch "target/ppc: convert vsplt[bhw] to use vector
-> operations" causes corruption of the OS X splash screen
-> (https://www.ilande.co.uk/tmp/qemu/badapple2.png) in a way that suggests there may be
-> an endian issue.
+Oops this is incorrect because check-unit isn't target but host, so
+TARGET_GPROF can't be used.
 
-After some more digging I've found out what's going on here by dumping out the AVR
-registers before and after:
-
-Before the patch:
-
-BEFORE:
-uimm: 0  size: 2
-sreg: 99 @ 0x7f54fd7157a0 - 1 6a 1 d9 1 15 fd 63 0 0 0 0 0 0 0 0
-dreg: 99 @ 0x7f54fd715870 - 7f ff de ad 7f ff de ad 7f ff de ad 7f ff de ad
-AFTER:
-dreg: 99 @ 0x7f54fd715870 - 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a
-
-BEFORE:
-uimm: 1  size: 2
-sreg: 99 @ 0x7f54fd7157a0 - 1 6a 1 d9 1 15 fd 63 0 0 0 0 0 0 0 0
-dreg: 99 @ 0x7f54fd715870 - 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a
-AFTER:
-dreg: 99 @ 0x7f54fd715870 - 1 d9 1 d9 1 d9 1 d9 1 d9 1 d9 1 d9 1 d9
-
-
-After the patch:
-
-BEFORE:
-uimm: 0  size: 2
-sreg: 5 @ 0x7fe5a0c4a7a0 - 1 6a 1 d9 1 15 fd 63 0 0 0 0 0 0 0 0
-dreg: 18 @ 0x7fe5a0c4a870 - 7f ff de ad 7f ff de ad 7f ff de ad 7f ff de ad
-AFTER:
-dreg: 18 @ 0x7fe5a0c4a870 - 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1
-
-BEFORE:
-uimm: 1  size: 2
-sreg: 5 @ 0x7fe5a0c4a7a0 - 1 6a 1 d9 1 15 fd 63 0 0 0 0 0 0 0 0
-dreg: 18 @ 0x7fe5a0c4a870 - 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1 5d 1
-AFTER:
-dreg: 18 @ 0x7fe5a0c4a870 - 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1 6a 1
-
-
-As you can see vsplth splat is one byte off with this patch applied and the cause is
-the xor in the #ifndef HOST_WORDS_BIGENDIAN block: before the xor is applied, bofs is
-aligned to 2 bytes and with bofs ^ 15 the LSB is set to 1 again, introducing the 1
-byte error.
-
-Applying the following patch to mask bofs based upon the size of vece seems to fix
-the issue here for me on little-endian Intel:
-
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 59d3bc6e02..41ddbd879f 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -815,6 +815,7 @@ static void gen_vsplt(DisasContext *ctx, int vece)
-     bofs += (uimm << vece) & 15;
- #ifndef HOST_WORDS_BIGENDIAN
-     bofs ^= 15;
-+    bofs &= ~((1 << vece) - 1);
- #endif
-
-     tcg_gen_gvec_dup_mem(vece, dofs, bofs, 16, 16);
-
-
-ATB,
-
-Mark.
+>  check-unit-y +=3D tests/test-bitops$(EXESUF)
+>  check-unit-y +=3D tests/test-bitcnt$(EXESUF)
+>  check-unit-y +=3D tests/test-qdev-global-props$(EXESUF)
+> --
+> 2.17.2
+>
