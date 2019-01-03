@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:58445)
+Received: from eggs.gnu.org ([208.118.235.92]:58457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gf65B-0000jD-5H
+	(envelope-from <balaton@eik.bme.hu>) id 1gf65B-0000jJ-Df
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:42:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gf656-0007ho-Fg
+	(envelope-from <balaton@eik.bme.hu>) id 1gf656-0007ha-E1
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:42:57 -0500
-Message-Id: <5f1b75acc87703ffb6866ccb8c2b1b929d5059f5.1546532844.git.balaton@eik.bme.hu>
+Message-Id: <cbf1a249da96b354c44a07c9af40e025fa64a8cd.1546532844.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1546532844.git.balaton@eik.bme.hu>
 References: <cover.1546532844.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Thu, 03 Jan 2019 17:27:24 +0100
-Subject: [Qemu-devel] [PATCH v3 3/6] ppc4xx: Use ram_addr_t in
- ppc4xx_sdram_adjust()
+Subject: [Qemu-devel] [PATCH v3 5/6] ppc4xx: Pass array index to function
+ instead of pointer into the array
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +23,171 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>
 
-To avoid overflow if larger values are added later use ram_addr_t for
-the sdram_bank_sizes parameter to match ram_size to which it is compared.
+The sdram_set_bcr() function in ppc440_uc.c takes a pointer into an
+array then calculates its index from that. It's simpler and easier to
+just pass the index which simplifies both the function and its callers.
+Do similar cleanup in ppc4xx_devs.c to similar function.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
-v2: No change. Review comment suggested ram_size should be hwaddr too
-    but it's ram_addr_t in MachineState now so this should do until
-    someone decides to clean that up in a separate patch.
+v3: Also do similar cleanup in ppc4xx_devs.c
 
- hw/ppc/ppc440_bamboo.c  | 2 +-
- hw/ppc/ppc4xx_devs.c    | 4 ++--
- hw/ppc/sam460ex.c       | 2 +-
- include/hw/ppc/ppc4xx.h | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ hw/ppc/ppc440_uc.c   | 36 ++++++++++++++++--------------------
+ hw/ppc/ppc4xx_devs.c | 44 ++++++++++++++++++++------------------------
+ 2 files changed, 36 insertions(+), 44 deletions(-)
 
-diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-index b8aa55d526..8277c0f784 100644
---- a/hw/ppc/ppc440_bamboo.c
-+++ b/hw/ppc/ppc440_bamboo.c
-@@ -49,7 +49,7 @@
+diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+index e46f59fba8..60dbb35eee 100644
+--- a/hw/ppc/ppc440_uc.c
++++ b/hw/ppc/ppc440_uc.c
+@@ -564,28 +564,26 @@ static target_ulong sdram_size(uint32_t bcr)
+     return size;
+ }
  
- #define PPC440EP_SDRAM_NR_BANKS 4
+-static void sdram_set_bcr(ppc440_sdram_t *sdram,
+-                          uint32_t *bcrp, uint32_t bcr, int enabled)
++static void sdram_set_bcr(ppc440_sdram_t *sdram, int i,
++                          uint32_t bcr, int enabled)
+ {
+-    unsigned n = bcrp - sdram->bcr;
+-
+-    if (*bcrp & 1) {
+-        /* Unmap RAM */
++    if (sdram->bcr[i] & 1) {
++        /* First unmap RAM if enabled */
+         memory_region_del_subregion(get_system_memory(),
+-                                    &sdram->containers[n]);
+-        memory_region_del_subregion(&sdram->containers[n],
+-                                    &sdram->ram_memories[n]);
+-        object_unparent(OBJECT(&sdram->containers[n]));
++                                    &sdram->containers[i]);
++        memory_region_del_subregion(&sdram->containers[i],
++                                    &sdram->ram_memories[i]);
++        object_unparent(OBJECT(&sdram->containers[i]));
+     }
+-    *bcrp = bcr & 0xFFDEE001;
++    sdram->bcr[i] = bcr & 0xFFDEE001;
+     if (enabled && (bcr & 1)) {
+-        memory_region_init(&sdram->containers[n], NULL, "sdram-containers",
++        memory_region_init(&sdram->containers[i], NULL, "sdram-containers",
+                            sdram_size(bcr));
+-        memory_region_add_subregion(&sdram->containers[n], 0,
+-                                    &sdram->ram_memories[n]);
++        memory_region_add_subregion(&sdram->containers[i], 0,
++                                    &sdram->ram_memories[i]);
+         memory_region_add_subregion(get_system_memory(),
+                                     sdram_base(bcr),
+-                                    &sdram->containers[n]);
++                                    &sdram->containers[i]);
+     }
+ }
  
--static const unsigned int ppc440ep_sdram_bank_sizes[] = {
-+static const ram_addr_t ppc440ep_sdram_bank_sizes[] = {
-     256 * MiB, 128 * MiB, 64 * MiB, 32 * MiB, 16 * MiB, 8 * MiB, 0
- };
+@@ -595,12 +593,10 @@ static void sdram_map_bcr(ppc440_sdram_t *sdram)
  
+     for (i = 0; i < sdram->nbanks; i++) {
+         if (sdram->ram_sizes[i] != 0) {
+-            sdram_set_bcr(sdram,
+-                          &sdram->bcr[i],
+-                          sdram_bcr(sdram->ram_bases[i], sdram->ram_sizes[i]),
+-                          1);
++            sdram_set_bcr(sdram, i, sdram_bcr(sdram->ram_bases[i],
++                                              sdram->ram_sizes[i]), 1);
+         } else {
+-            sdram_set_bcr(sdram, &sdram->bcr[i], 0, 0);
++            sdram_set_bcr(sdram, i, 0, 0);
+         }
+     }
+ }
 diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
-index 9b6e4c60fa..9418478575 100644
+index 9418478575..fdfeb67e65 100644
 --- a/hw/ppc/ppc4xx_devs.c
 +++ b/hw/ppc/ppc4xx_devs.c
-@@ -679,12 +679,12 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
-                                MemoryRegion ram_memories[],
-                                hwaddr ram_bases[],
-                                hwaddr ram_sizes[],
--                               const unsigned int sdram_bank_sizes[])
-+                               const ram_addr_t sdram_bank_sizes[])
+@@ -405,36 +405,34 @@ static target_ulong sdram_size (uint32_t bcr)
+     return size;
+ }
+ 
+-static void sdram_set_bcr(ppc4xx_sdram_t *sdram,
+-                          uint32_t *bcrp, uint32_t bcr, int enabled)
++static void sdram_set_bcr(ppc4xx_sdram_t *sdram, int i,
++                          uint32_t bcr, int enabled)
  {
-     MemoryRegion *ram = g_malloc0(sizeof(*ram));
-     ram_addr_t size_left = ram_size;
-     ram_addr_t base = 0;
--    unsigned int bank_size;
-+    ram_addr_t bank_size;
-     int i;
-     int j;
+-    unsigned n = bcrp - sdram->bcr;
+-
+-    if (*bcrp & 0x00000001) {
++    if (sdram->bcr[i] & 0x00000001) {
+         /* Unmap RAM */
+ #ifdef DEBUG_SDRAM
+         printf("%s: unmap RAM area " TARGET_FMT_plx " " TARGET_FMT_lx "\n",
+-               __func__, sdram_base(*bcrp), sdram_size(*bcrp));
++               __func__, sdram_base(sdram->bcr[i]), sdram_size(sdram->bcr[i]));
+ #endif
+         memory_region_del_subregion(get_system_memory(),
+-                                    &sdram->containers[n]);
+-        memory_region_del_subregion(&sdram->containers[n],
+-                                    &sdram->ram_memories[n]);
+-        object_unparent(OBJECT(&sdram->containers[n]));
++                                    &sdram->containers[i]);
++        memory_region_del_subregion(&sdram->containers[i],
++                                    &sdram->ram_memories[i]);
++        object_unparent(OBJECT(&sdram->containers[i]));
+     }
+-    *bcrp = bcr & 0xFFDEE001;
++    sdram->bcr[i] = bcr & 0xFFDEE001;
+     if (enabled && (bcr & 0x00000001)) {
+ #ifdef DEBUG_SDRAM
+         printf("%s: Map RAM area " TARGET_FMT_plx " " TARGET_FMT_lx "\n",
+                __func__, sdram_base(bcr), sdram_size(bcr));
+ #endif
+-        memory_region_init(&sdram->containers[n], NULL, "sdram-containers",
++        memory_region_init(&sdram->containers[i], NULL, "sdram-containers",
+                            sdram_size(bcr));
+-        memory_region_add_subregion(&sdram->containers[n], 0,
+-                                    &sdram->ram_memories[n]);
++        memory_region_add_subregion(&sdram->containers[i], 0,
++                                    &sdram->ram_memories[i]);
+         memory_region_add_subregion(get_system_memory(),
+                                     sdram_base(bcr),
+-                                    &sdram->containers[n]);
++                                    &sdram->containers[i]);
+     }
+ }
  
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index b99aed26e0..233f81bb56 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -77,7 +77,7 @@
- #define SDRAM_NR_BANKS 4
+@@ -444,12 +442,10 @@ static void sdram_map_bcr (ppc4xx_sdram_t *sdram)
  
- /* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
--static const unsigned int ppc460ex_sdram_bank_sizes[] = {
-+static const ram_addr_t ppc460ex_sdram_bank_sizes[] = {
-     1 * GiB, 512 * MiB, 256 * MiB, 128 * MiB, 64 * MiB, 32 * MiB, 0
- };
- 
-diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
-index 3a2a04c8ce..39a7ba1ce6 100644
---- a/include/hw/ppc/ppc4xx.h
-+++ b/include/hw/ppc/ppc4xx.h
-@@ -43,7 +43,7 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
-                                MemoryRegion ram_memories[],
-                                hwaddr ram_bases[],
-                                hwaddr ram_sizes[],
--                               const unsigned int sdram_bank_sizes[]);
-+                               const ram_addr_t sdram_bank_sizes[]);
- 
- void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
-                         MemoryRegion ram_memories[],
+     for (i = 0; i < sdram->nbanks; i++) {
+         if (sdram->ram_sizes[i] != 0) {
+-            sdram_set_bcr(sdram,
+-                          &sdram->bcr[i],
+-                          sdram_bcr(sdram->ram_bases[i], sdram->ram_sizes[i]),
+-                          1);
++            sdram_set_bcr(sdram, i, sdram_bcr(sdram->ram_bases[i],
++                                              sdram->ram_sizes[i]), 1);
+         } else {
+-            sdram_set_bcr(sdram, &sdram->bcr[i], 0x00000000, 0);
++            sdram_set_bcr(sdram, i, 0x00000000, 0);
+         }
+     }
+ }
+@@ -589,16 +585,16 @@ static void dcr_write_sdram (void *opaque, int dcrn, uint32_t val)
+             sdram->pmit = (val & 0xF8000000) | 0x07C00000;
+             break;
+         case 0x40: /* SDRAM_B0CR */
+-            sdram_set_bcr(sdram, &sdram->bcr[0], val, sdram->cfg & 0x80000000);
++            sdram_set_bcr(sdram, 0, val, sdram->cfg & 0x80000000);
+             break;
+         case 0x44: /* SDRAM_B1CR */
+-            sdram_set_bcr(sdram, &sdram->bcr[1], val, sdram->cfg & 0x80000000);
++            sdram_set_bcr(sdram, 1, val, sdram->cfg & 0x80000000);
+             break;
+         case 0x48: /* SDRAM_B2CR */
+-            sdram_set_bcr(sdram, &sdram->bcr[2], val, sdram->cfg & 0x80000000);
++            sdram_set_bcr(sdram, 2, val, sdram->cfg & 0x80000000);
+             break;
+         case 0x4C: /* SDRAM_B3CR */
+-            sdram_set_bcr(sdram, &sdram->bcr[3], val, sdram->cfg & 0x80000000);
++            sdram_set_bcr(sdram, 3, val, sdram->cfg & 0x80000000);
+             break;
+         case 0x80: /* SDRAM_TR */
+             sdram->tr = val & 0x018FC01F;
 -- 
 2.13.7
