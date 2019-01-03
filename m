@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38288)
+Received: from eggs.gnu.org ([208.118.235.92]:38286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6UA-0004Zu-KG
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6UA-0004Zs-Jl
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6U7-0007ds-EN
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6U7-0007eS-Ky
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:46 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:46154 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:46152 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gf6U7-0007Od-1X
+	id 1gf6U7-0007Oc-3e
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:43 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu,  3 Jan 2019 18:07:47 +0100
-Message-Id: <1546535297-11040-15-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  3 Jan 2019 18:07:44 +0100
+Message-Id: <1546535297-11040-12-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 14/44] disas: nanoMIPS: Fix types and format
- strings
+Subject: [Qemu-devel] [PULL v3 11/44] target/mips: MXU: Add handler for an
+ align instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +28,230 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Stefan Weil <sw@weilnetz.de>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Use POSIX types and format strings.
+Add translation handler for S32ALNI MXU instruction.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
 ---
- disas/nanomips.cpp | 20 ++++++++++++--------
- disas/nanomips.h   | 10 +++++-----
- 2 files changed, 17 insertions(+), 13 deletions(-)
+ target/mips/translate.c | 197 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 194 insertions(+), 3 deletions(-)
 
-diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
-index 1238c2f..28d78d6 100644
---- a/disas/nanomips.cpp
-+++ b/disas/nanomips.cpp
-@@ -258,7 +258,7 @@ namespace img
- std::string to_string(img::address a)
- {
-     char buffer[256];
--    sprintf(buffer, "0x%08llx", a);
-+    sprintf(buffer, "0x%" PRIx64, a);
-     return buffer;
- }
- 
-@@ -284,7 +284,8 @@ uint64 NMD::renumber_registers(uint64 index, uint64 *register_list,
-     }
- 
-     throw std::runtime_error(img::format(
--                   "Invalid register mapping index %d, size of list = %d",
-+                   "Invalid register mapping index %" PRIu64
-+                   ", size of list = %zu",
-                    index, register_list_size));
- }
- 
-@@ -501,7 +502,8 @@ std::string NMD::GPR(uint64 reg)
-         return gpr_reg[reg];
-     }
- 
--    throw std::runtime_error(img::format("Invalid GPR register index %d", reg));
-+    throw std::runtime_error(img::format("Invalid GPR register index %" PRIu64,
-+                                         reg));
- }
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 44142ea..c79f988 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -25100,6 +25100,199 @@ static void gen_mxu_Q8MAX_Q8MIN(DisasContext *ctx)
  
  
-@@ -518,7 +520,8 @@ std::string NMD::FPR(uint64 reg)
-         return fpr_reg[reg];
-     }
- 
--    throw std::runtime_error(img::format("Invalid FPR register index %d", reg));
-+    throw std::runtime_error(img::format("Invalid FPR register index %" PRIu64,
-+                                         reg));
- }
- 
- 
-@@ -532,26 +535,27 @@ std::string NMD::AC(uint64 reg)
-         return ac_reg[reg];
-     }
- 
--    throw std::runtime_error(img::format("Invalid AC register index %d", reg));
-+    throw std::runtime_error(img::format("Invalid AC register index %" PRIu64,
-+                                         reg));
- }
- 
- 
- std::string NMD::IMMEDIATE(uint64 value)
- {
--    return img::format("0x%x", value);
-+    return img::format("0x%" PRIx64, value);
- }
- 
- 
- std::string NMD::IMMEDIATE(int64 value)
- {
--    return img::format("%d", value);
-+    return img::format("%" PRId64, value);
- }
- 
- 
- std::string NMD::CPR(uint64 reg)
- {
-     /* needs more work */
--    return img::format("CP%d", reg);
-+    return img::format("CP%" PRIu64, reg);
- }
- 
- 
-diff --git a/disas/nanomips.h b/disas/nanomips.h
-index 84cc9a6..71428b3 100644
---- a/disas/nanomips.h
-+++ b/disas/nanomips.h
-@@ -24,14 +24,14 @@
- 
- #include <string>
- 
--typedef unsigned short uint16;
--typedef unsigned int uint32;
--typedef long long int64;
--typedef unsigned long long uint64;
-+typedef int64_t int64;
-+typedef uint64_t uint64;
-+typedef uint32_t uint32;
-+typedef uint16_t uint16;
- 
- namespace img
- {
--    typedef unsigned long long address;
-+    typedef uint64_t address;
- }
- 
- 
+ /*
++ *                 MXU instruction category: align
++ *                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++ *
++ *                       S32ALN     S32ALNI
++ */
++
++/*
++ *  S32ALNI XRc, XRb, XRa, optn3
++ *    Arrange bytes from XRb and XRc according to one of five sets of
++ *    rules determined by optn3, and place the result in XRa.
++ *
++ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
++ *  +-----------+-----+---+-----+-------+-------+-------+-----------+
++ *  |  SPECIAL2 |optn3|0 0|x x x|  XRc  |  XRb  |  XRa  |MXU__POOL16|
++ *  +-----------+-----+---+-----+-------+-------+-------+-----------+
++ *
++ */
++static void gen_mxu_S32ALNI(DisasContext *ctx)
++{
++    uint32_t optn3, pad, XRc, XRb, XRa;
++
++    optn3 = extract32(ctx->opcode,  23, 3);
++    pad   = extract32(ctx->opcode,  21, 2);
++    XRc   = extract32(ctx->opcode, 14, 4);
++    XRb   = extract32(ctx->opcode, 10, 4);
++    XRa   = extract32(ctx->opcode,  6, 4);
++
++    if (unlikely(pad != 0)) {
++        /* opcode padding incorrect -> do nothing */
++    } else if (unlikely(XRa == 0)) {
++        /* destination is zero register -> do nothing */
++    } else if (unlikely((XRb == 0) && (XRc == 0))) {
++        /* both operands zero registers -> just set destination to all 0s */
++        tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
++    } else if (unlikely(XRb == 0)) {
++        /* XRb zero register -> just appropriatelly shift XRc into XRa */
++        switch (optn3) {
++        case MXU_OPTN3_PTN0:
++            tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
++            break;
++        case MXU_OPTN3_PTN1:
++        case MXU_OPTN3_PTN2:
++        case MXU_OPTN3_PTN3:
++            tcg_gen_shri_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1],
++                             8 * (4 - optn3));
++            break;
++        case MXU_OPTN3_PTN4:
++            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1]);
++            break;
++        }
++    } else if (unlikely(XRc == 0)) {
++        /* XRc zero register -> just appropriatelly shift XRb into XRa */
++        switch (optn3) {
++        case MXU_OPTN3_PTN0:
++            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
++            break;
++        case MXU_OPTN3_PTN1:
++        case MXU_OPTN3_PTN2:
++        case MXU_OPTN3_PTN3:
++            tcg_gen_shri_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1], 8 * optn3);
++            break;
++        case MXU_OPTN3_PTN4:
++            tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
++            break;
++        }
++    } else if (unlikely(XRb == XRc)) {
++        /* both operands same -> just rotation or moving from any of them */
++        switch (optn3) {
++        case MXU_OPTN3_PTN0:
++        case MXU_OPTN3_PTN4:
++            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
++            break;
++        case MXU_OPTN3_PTN1:
++        case MXU_OPTN3_PTN2:
++        case MXU_OPTN3_PTN3:
++            tcg_gen_rotli_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1], 8 * optn3);
++            break;
++        }
++    } else {
++        /* the most general case */
++        switch (optn3) {
++        case MXU_OPTN3_PTN0:
++            {
++                /*                                         */
++                /*         XRb                XRc          */
++                /*  +---------------+                      */
++                /*  | A   B   C   D |    E   F   G   H     */
++                /*  +-------+-------+                      */
++                /*          |                              */
++                /*         XRa                             */
++                /*                                         */
++
++                tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
++            }
++            break;
++        case MXU_OPTN3_PTN1:
++            {
++                /*                                         */
++                /*         XRb                 XRc         */
++                /*      +-------------------+              */
++                /*    A | B   C   D       E | F   G   H    */
++                /*      +---------+---------+              */
++                /*                |                        */
++                /*               XRa                       */
++                /*                                         */
++
++                TCGv_i32 t0 = tcg_temp_new();
++                TCGv_i32 t1 = tcg_temp_new();
++
++                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x00FFFFFF);
++                tcg_gen_shli_i32(t0, t0, 8);
++
++                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFF000000);
++                tcg_gen_shri_i32(t1, t1, 24);
++
++                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
++
++                tcg_temp_free(t1);
++                tcg_temp_free(t0);
++            }
++            break;
++        case MXU_OPTN3_PTN2:
++            {
++                /*                                         */
++                /*         XRb                 XRc         */
++                /*          +-------------------+          */
++                /*    A   B | C   D       E   F | G   H    */
++                /*          +---------+---------+          */
++                /*                    |                    */
++                /*                   XRa                   */
++                /*                                         */
++
++                TCGv_i32 t0 = tcg_temp_new();
++                TCGv_i32 t1 = tcg_temp_new();
++
++                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x0000FFFF);
++                tcg_gen_shli_i32(t0, t0, 16);
++
++                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFF0000);
++                tcg_gen_shri_i32(t1, t1, 16);
++
++                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
++
++                tcg_temp_free(t1);
++                tcg_temp_free(t0);
++            }
++            break;
++        case MXU_OPTN3_PTN3:
++            {
++                /*                                         */
++                /*         XRb                 XRc         */
++                /*              +-------------------+      */
++                /*    A   B   C | D       E   F   G | H    */
++                /*              +---------+---------+      */
++                /*                        |                */
++                /*                       XRa               */
++                /*                                         */
++
++                TCGv_i32 t0 = tcg_temp_new();
++                TCGv_i32 t1 = tcg_temp_new();
++
++                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x000000FF);
++                tcg_gen_shli_i32(t0, t0, 24);
++
++                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFFFF00);
++                tcg_gen_shri_i32(t1, t1, 8);
++
++                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
++
++                tcg_temp_free(t1);
++                tcg_temp_free(t0);
++            }
++            break;
++        case MXU_OPTN3_PTN4:
++            {
++                /*                                         */
++                /*         XRb                 XRc         */
++                /*                     +---------------+   */
++                /*    A   B   C   D    | E   F   G   H |   */
++                /*                     +-------+-------+   */
++                /*                             |           */
++                /*                            XRa          */
++                /*                                         */
++
++                tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1]);
++            }
++            break;
++        }
++    }
++}
++
++
++/*
+  * Decoding engine for MXU
+  * =======================
+  */
+@@ -25761,9 +25954,7 @@ static void decode_opc_mxu__pool16(CPUMIPSState *env, DisasContext *ctx)
+         generate_exception_end(ctx, EXCP_RI);
+         break;
+     case OPC_MXU_S32ALNI:
+-        /* TODO: Implement emulation of S32ALNI instruction. */
+-        MIPS_INVAL("OPC_MXU_S32ALNI");
+-        generate_exception_end(ctx, EXCP_RI);
++        gen_mxu_S32ALNI(ctx);
+         break;
+     case OPC_MXU_S32LUI:
+         /* TODO: Implement emulation of S32LUI instruction. */
 -- 
 2.7.4
