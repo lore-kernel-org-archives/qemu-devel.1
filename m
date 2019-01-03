@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44044)
+Received: from eggs.gnu.org ([208.118.235.92]:44107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gf05k-00042M-ET
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:09 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gf05m-000449-KV
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gf05i-0002ir-De
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:08 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42173)
+	(envelope-from <elohimes@gmail.com>) id 1gf05k-0002kB-M3
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:10 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:36140)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gf05g-0002gu-CH
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:06 -0500
-Received: by mail-pf1-x444.google.com with SMTP id 64so16489607pfr.9
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 02:19:03 -0800 (PST)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gf05k-0002j9-CZ
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:08 -0500
+Received: by mail-pg1-x541.google.com with SMTP id n2so15833961pgm.3
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 02:19:07 -0800 (PST)
 From: elohimes@gmail.com
-Date: Thu,  3 Jan 2019 18:18:13 +0800
-Message-Id: <20190103101819.7418-2-xieyongji@baidu.com>
+Date: Thu,  3 Jan 2019 18:18:14 +0800
+Message-Id: <20190103101819.7418-3-xieyongji@baidu.com>
 In-Reply-To: <20190103101819.7418-1-xieyongji@baidu.com>
 References: <20190103101819.7418-1-xieyongji@baidu.com>
-Subject: [Qemu-devel] [PATCH v3 for-4.0 1/7] char-socket: Enable "nowait"
- option on client sockets
+Subject: [Qemu-devel] [PATCH v3 for-4.0 2/7] vhost-user: Support providing
+ shared memory to backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,138 +31,442 @@ Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.c
 
 From: Xie Yongji <xieyongji@baidu.com>
 
-Enable "nowait" option to make QEMU not do a connect
-on client sockets during initialization of the chardev.
-Then we can use qemu_chr_fe_wait_connected() to connect
-when necessary. Now it would be used for unix domain
-socket of vhost-user-blk device to support reconnect.
+This patch introduces two new messages VHOST_USER_GET_SHM_SIZE
+and VHOST_USER_SET_SHM_FD to support providing shared
+memory to backend.
+
+Firstly, qemu uses VHOST_USER_GET_SHM_SIZE to get the
+required size of shared memory from backend. Then, qemu
+allocates memory and sends them back to backend through
+VHOST_USER_SET_SHM_FD.
+
+Note that the shared memory should be used to record
+inflight I/O by backend. Qemu will clear it when vm reset.
 
 Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+Signed-off-by: Chai Wen <chaiwen@baidu.com>
 Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
 ---
- chardev/char-socket.c | 56 +++++++++++++++++++++----------------------
- qapi/char.json        |  3 +--
- qemu-options.hx       |  9 ++++---
- 3 files changed, 35 insertions(+), 33 deletions(-)
+ docs/interop/vhost-user.txt       |  41 +++++++++++
+ hw/virtio/vhost-user.c            |  86 ++++++++++++++++++++++
+ hw/virtio/vhost.c                 | 117 ++++++++++++++++++++++++++++++
+ include/hw/virtio/vhost-backend.h |   9 +++
+ include/hw/virtio/vhost.h         |  19 +++++
+ 5 files changed, 272 insertions(+)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index eaa8e8b68f..f803f4f7d3 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -1072,37 +1072,37 @@ static void qmp_chardev_open_socket(Chardev *chr,
-         s->reconnect_time = reconnect;
-     }
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index c2194711d9..5ee9c28ab0 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -142,6 +142,19 @@ Depending on the request type, payload can be:
+    Offset: a 64-bit offset of this area from the start of the
+        supplied file descriptor
  
--    if (s->reconnect_time) {
--        tcp_chr_connect_async(chr);
--    } else {
--        if (s->is_listen) {
--            char *name;
--            s->listener = qio_net_listener_new();
-+    if (s->is_listen) {
-+        char *name;
-+        s->listener = qio_net_listener_new();
++ * Shm description
++   -----------------------------------
++   | mmap_size | mmap_offset | dev_size | vq_size | align | version |
++   -----------------------------------
++
++   Mmap_size: a 64-bit size of the shared memory
++   Mmap_offset: a 64-bit offset of the shared memory from the start
++                of the supplied file descriptor
++   Dev_size: a 32-bit size of device region in shared memory
++   Vq_size: a 32-bit size of each virtqueue region in shared memory
++   Align: a 32-bit align of each region in shared memory
++   Version: a 32-bit version of this shared memory
++
+ In QEMU the vhost-user message is implemented with the following struct:
  
--            name = g_strdup_printf("chardev-tcp-listener-%s", chr->label);
--            qio_net_listener_set_name(s->listener, name);
--            g_free(name);
-+        name = g_strdup_printf("chardev-tcp-listener-%s", chr->label);
-+        qio_net_listener_set_name(s->listener, name);
-+        g_free(name);
+ typedef struct VhostUserMsg {
+@@ -157,6 +170,7 @@ typedef struct VhostUserMsg {
+         struct vhost_iotlb_msg iotlb;
+         VhostUserConfig config;
+         VhostUserVringArea area;
++        VhostUserShm shm;
+     };
+ } QEMU_PACKED VhostUserMsg;
  
--            if (qio_net_listener_open_sync(s->listener, s->addr, errp) < 0) {
--                object_unref(OBJECT(s->listener));
--                s->listener = NULL;
--                goto error;
--            }
-+        if (qio_net_listener_open_sync(s->listener, s->addr, errp) < 0) {
-+            object_unref(OBJECT(s->listener));
-+            s->listener = NULL;
-+            goto error;
-+        }
+@@ -175,6 +189,7 @@ the ones that do:
+  * VHOST_USER_GET_PROTOCOL_FEATURES
+  * VHOST_USER_GET_VRING_BASE
+  * VHOST_USER_SET_LOG_BASE (if VHOST_USER_PROTOCOL_F_LOG_SHMFD)
++ * VHOST_USER_GET_SHM_SIZE (if VHOST_USER_PROTOCOL_F_SLAVE_SHMFD)
  
--            qapi_free_SocketAddress(s->addr);
--            s->addr = socket_local_address(s->listener->sioc[0]->fd, errp);
--            update_disconnected_filename(s);
-+        qapi_free_SocketAddress(s->addr);
-+        s->addr = socket_local_address(s->listener->sioc[0]->fd, errp);
-+        update_disconnected_filename(s);
+ [ Also see the section on REPLY_ACK protocol extension. ]
  
--            if (is_waitconnect &&
--                qemu_chr_wait_connected(chr, errp) < 0) {
--                return;
--            }
--            if (!s->ioc) {
--                qio_net_listener_set_client_func_full(s->listener,
--                                                      tcp_chr_accept,
--                                                      chr, NULL,
--                                                      chr->gcontext);
--            }
-+        if (is_waitconnect &&
-+            qemu_chr_wait_connected(chr, errp) < 0) {
-+            return;
-+        }
-+        if (!s->ioc) {
-+            qio_net_listener_set_client_func_full(s->listener,
-+                                                  tcp_chr_accept,
-+                                                  chr, NULL,
-+                                                  chr->gcontext);
-+        }
-+    } else if (is_waitconnect) {
-+        if (s->reconnect_time) {
-+            tcp_chr_connect_async(chr);
-         } else if (qemu_chr_wait_connected(chr, errp) < 0) {
-             goto error;
-         }
-@@ -1120,7 +1120,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-                                   Error **errp)
+@@ -188,6 +203,7 @@ in the ancillary data:
+  * VHOST_USER_SET_VRING_CALL
+  * VHOST_USER_SET_VRING_ERR
+  * VHOST_USER_SET_SLAVE_REQ_FD
++ * VHOST_USER_SET_SHM_FD (if VHOST_USER_PROTOCOL_F_SLAVE_SHMFD)
+ 
+ If Master is unable to send the full message or receives a wrong reply it will
+ close the connection. An optional reconnection mechanism can be implemented.
+@@ -397,6 +413,7 @@ Protocol features
+ #define VHOST_USER_PROTOCOL_F_CONFIG         9
+ #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
+ #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
++#define VHOST_USER_PROTOCOL_F_SLAVE_SHMFD 12
+ 
+ Master message types
+ --------------------
+@@ -761,6 +778,30 @@ Master message types
+       was previously sent.
+       The value returned is an error indication; 0 is success.
+ 
++ * VHOST_USER_GET_SHM_SIZE
++      Id: 31
++      Equivalent ioctl: N/A
++      Master payload: shm description
++
++      When VHOST_USER_PROTOCOL_F_SLAVE_SHMFD protocol feature has been
++      successfully negotiated, master need to provide a shared memory to
++      slave. This message is used by master to get required size from slave.
++      The shared memory contains one region for device and several regions
++      for virtqueue. The size of those two kinds of regions is specified
++      by dev_size field and vq_size filed. The align field specify the alignment
++      of those regions.
++
++ * VHOST_USER_SET_SHM_FD
++      Id: 32
++      Equivalent ioctl: N/A
++      Master payload: shm description
++
++      When VHOST_USER_PROTOCOL_F_SLAVE_SHMFD protocol feature has been
++      successfully negotiated, master uses this message to set shared memory
++      for slave. The memory fd is passed in the ancillary data. The shared
++      memory should be used to record inflight I/O by slave. And master will
++      clear it when vm reset.
++
+ Slave message types
+ -------------------
+ 
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index e09bed0e4a..8cdf3b5121 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -52,6 +52,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_CONFIG = 9,
+     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
+     VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
++    VHOST_USER_PROTOCOL_F_SLAVE_SHMFD = 12,
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+ 
+@@ -89,6 +90,8 @@ typedef enum VhostUserRequest {
+     VHOST_USER_POSTCOPY_ADVISE  = 28,
+     VHOST_USER_POSTCOPY_LISTEN  = 29,
+     VHOST_USER_POSTCOPY_END     = 30,
++    VHOST_USER_GET_SHM_SIZE = 31,
++    VHOST_USER_SET_SHM_FD = 32,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+ 
+@@ -147,6 +150,15 @@ typedef struct VhostUserVringArea {
+     uint64_t offset;
+ } VhostUserVringArea;
+ 
++typedef struct VhostUserShm {
++    uint64_t mmap_size;
++    uint64_t mmap_offset;
++    uint32_t dev_size;
++    uint32_t vq_size;
++    uint32_t align;
++    uint32_t version;
++} VhostUserShm;
++
+ typedef struct {
+     VhostUserRequest request;
+ 
+@@ -169,6 +181,7 @@ typedef union {
+         VhostUserConfig config;
+         VhostUserCryptoSession session;
+         VhostUserVringArea area;
++        VhostUserShm shm;
+ } VhostUserPayload;
+ 
+ typedef struct VhostUserMsg {
+@@ -1739,6 +1752,77 @@ static bool vhost_user_mem_section_filter(struct vhost_dev *dev,
+     return result;
+ }
+ 
++static int vhost_user_get_shm_size(struct vhost_dev *dev,
++                                   struct vhost_shm *shm)
++{
++    VhostUserMsg msg = {
++        .hdr.request = VHOST_USER_GET_SHM_SIZE,
++        .hdr.flags = VHOST_USER_VERSION,
++        .hdr.size = sizeof(msg.payload.shm),
++    };
++
++    if (!virtio_has_feature(dev->protocol_features,
++                            VHOST_USER_PROTOCOL_F_SLAVE_SHMFD)) {
++        shm->dev_size = 0;
++        shm->vq_size = 0;
++        return 0;
++    }
++
++    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
++        return -1;
++    }
++
++    if (vhost_user_read(dev, &msg) < 0) {
++        return -1;
++    }
++
++    if (msg.hdr.request != VHOST_USER_GET_SHM_SIZE) {
++        error_report("Received unexpected msg type. "
++                     "Expected %d received %d",
++                     VHOST_USER_GET_SHM_SIZE, msg.hdr.request);
++        return -1;
++    }
++
++    if (msg.hdr.size != sizeof(msg.payload.shm)) {
++        error_report("Received bad msg size.");
++        return -1;
++    }
++
++    shm->dev_size = msg.payload.shm.dev_size;
++    shm->vq_size = msg.payload.shm.vq_size;
++    shm->align = msg.payload.shm.align;
++    shm->version = msg.payload.shm.version;
++
++    return 0;
++}
++
++static int vhost_user_set_shm_fd(struct vhost_dev *dev,
++                                 struct vhost_shm *shm)
++{
++    VhostUserMsg msg = {
++        .hdr.request = VHOST_USER_SET_SHM_FD,
++        .hdr.flags = VHOST_USER_VERSION,
++        .payload.shm.mmap_size = shm->mmap_size,
++        .payload.shm.mmap_offset = 0,
++        .payload.shm.dev_size = shm->dev_size,
++        .payload.shm.vq_size = shm->vq_size,
++        .payload.shm.align = shm->align,
++        .payload.shm.version = shm->version,
++        .hdr.size = sizeof(msg.payload.shm),
++    };
++
++    if (!virtio_has_feature(dev->protocol_features,
++                            VHOST_USER_PROTOCOL_F_SLAVE_SHMFD)) {
++        return 0;
++    }
++
++    if (vhost_user_write(dev, &msg, &shm->fd, 1) < 0) {
++        return -1;
++    }
++
++    return 0;
++}
++
+ VhostUserState *vhost_user_init(void)
  {
-     bool is_listen      = qemu_opt_get_bool(opts, "server", false);
--    bool is_waitconnect = is_listen && qemu_opt_get_bool(opts, "wait", true);
-+    bool is_waitconnect = qemu_opt_get_bool(opts, "wait", true);
-     bool is_telnet      = qemu_opt_get_bool(opts, "telnet", false);
-     bool is_tn3270      = qemu_opt_get_bool(opts, "tn3270", false);
-     bool is_websock     = qemu_opt_get_bool(opts, "websocket", false);
-diff --git a/qapi/char.json b/qapi/char.json
-index 77ed847972..6a3b5bcd71 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -249,8 +249,7 @@
- #        or connect to (server=false)
- # @tls-creds: the ID of the TLS credentials object (since 2.6)
- # @server: create server socket (default: true)
--# @wait: wait for incoming connection on server
--#        sockets (default: false).
-+# @wait: wait for being connected or connecting to (default: false)
- # @nodelay: set TCP_NODELAY socket option (default: false)
- # @telnet: enable telnet protocol on server
- #          sockets (default: false)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index df42116ecc..66d99c6e83 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2556,8 +2556,9 @@ undefined if TCP options are specified for a unix socket.
+     VhostUserState *user = g_new0(struct VhostUserState, 1);
+@@ -1790,4 +1874,6 @@ const VhostOps user_ops = {
+         .vhost_crypto_create_session = vhost_user_crypto_create_session,
+         .vhost_crypto_close_session = vhost_user_crypto_close_session,
+         .vhost_backend_mem_section_filter = vhost_user_mem_section_filter,
++        .vhost_get_shm_size = vhost_user_get_shm_size,
++        .vhost_set_shm_fd = vhost_user_set_shm_fd,
+ };
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 569c4053ea..7a38fed50f 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -1481,6 +1481,123 @@ void vhost_dev_set_config_notifier(struct vhost_dev *hdev,
+     hdev->config_ops = ops;
+ }
  
- @option{server} specifies that the socket shall be a listening socket.
++void vhost_dev_reset_shm(struct vhost_shm *shm)
++{
++    if (shm->addr) {
++        memset(shm->addr, 0, shm->mmap_size);
++    }
++}
++
++void vhost_dev_free_shm(struct vhost_shm *shm)
++{
++    if (shm->addr) {
++        qemu_memfd_free(shm->addr, shm->mmap_size, shm->fd);
++        shm->addr = NULL;
++        shm->fd = -1;
++    }
++}
++
++int vhost_dev_alloc_shm(struct vhost_shm *shm)
++{
++    Error *err = NULL;
++    int fd = -1;
++    void *addr = qemu_memfd_alloc("vhost-shm", shm->mmap_size,
++                                  F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL_SEAL,
++                                  &fd, &err);
++    if (err) {
++        error_report_err(err);
++        return -1;
++    }
++
++    shm->addr = addr;
++    shm->fd = fd;
++
++    return 0;
++}
++
++void vhost_dev_save_shm(struct vhost_shm *shm, QEMUFile *f)
++{
++    if (shm->addr) {
++        qemu_put_be64(f, shm->mmap_size);
++        qemu_put_be32(f, shm->dev_size);
++        qemu_put_be32(f, shm->vq_size);
++        qemu_put_be32(f, shm->align);
++        qemu_put_be32(f, shm->version);
++        qemu_put_buffer(f, shm->addr, shm->mmap_size);
++    } else {
++        qemu_put_be64(f, 0);
++    }
++}
++
++int vhost_dev_load_shm(struct vhost_shm *shm, QEMUFile *f)
++{
++    uint64_t mmap_size;
++
++    mmap_size = qemu_get_be64(f);
++    if (!mmap_size) {
++        return 0;
++    }
++
++    vhost_dev_free_shm(shm);
++
++    shm->mmap_size = mmap_size;
++    shm->dev_size = qemu_get_be32(f);
++    shm->vq_size = qemu_get_be32(f);
++    shm->align = qemu_get_be32(f);
++    shm->version = qemu_get_be32(f);
++
++    if (vhost_dev_alloc_shm(shm)) {
++        return -ENOMEM;
++    }
++
++    qemu_get_buffer(f, shm->addr, mmap_size);
++
++    return 0;
++}
++
++int vhost_dev_set_shm(struct vhost_dev *dev, struct vhost_shm *shm)
++{
++    int r;
++
++    if (dev->vhost_ops->vhost_set_shm_fd && shm->addr) {
++        r = dev->vhost_ops->vhost_set_shm_fd(dev, shm);
++        if (r) {
++            VHOST_OPS_DEBUG("vhost_set_vring_shm_fd failed");
++            return -errno;
++        }
++    }
++
++    return 0;
++}
++
++int vhost_dev_init_shm(struct vhost_dev *dev, struct vhost_shm *shm)
++{
++    int r;
++
++    if (dev->vhost_ops->vhost_get_shm_size) {
++        r = dev->vhost_ops->vhost_get_shm_size(dev, shm);
++        if (r) {
++            VHOST_OPS_DEBUG("vhost_get_vring_shm_size failed");
++            return -errno;
++        }
++
++        if (!shm->dev_size && !shm->vq_size) {
++            return 0;
++        }
++
++        shm->mmap_size = QEMU_ALIGN_UP(shm->dev_size, shm->align) +
++                         dev->nvqs * QEMU_ALIGN_UP(shm->vq_size, shm->align);
++
++        if (vhost_dev_alloc_shm(shm)) {
++            return -ENOMEM;
++        }
++
++        vhost_dev_reset_shm(shm);
++    }
++
++    return 0;
++}
++
+ /* Host notifiers must be enabled at this point. */
+ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+ {
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index 81283ec50f..4e7f13c9e9 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -25,6 +25,7 @@ typedef enum VhostSetConfigType {
+     VHOST_SET_CONFIG_TYPE_MIGRATION = 1,
+ } VhostSetConfigType;
  
--@option{nowait} specifies that QEMU should not block waiting for a client to
--connect to a listening socket.
-+@option{nowait} specifies that QEMU should not wait for being connected on
-+server sockets or try to do a sync/async connect on client sockets during
-+initialization of the chardev.
++struct vhost_shm;
+ struct vhost_dev;
+ struct vhost_log;
+ struct vhost_memory;
+@@ -104,6 +105,12 @@ typedef int (*vhost_crypto_close_session_op)(struct vhost_dev *dev,
+ typedef bool (*vhost_backend_mem_section_filter_op)(struct vhost_dev *dev,
+                                                 MemoryRegionSection *section);
  
- @option{telnet} specifies that traffic on the socket should interpret telnet
- escape sequences.
-@@ -3093,7 +3094,9 @@ I/O to a location or wait for a connection from a location.  By default
- the TCP Net Console is sent to @var{host} at the @var{port}.  If you use
- the @var{server} option QEMU will wait for a client socket application
- to connect to the port before continuing, unless the @code{nowait}
--option was specified.  The @code{nodelay} option disables the Nagle buffering
-+option was specified. And the @code{nowait} option could also be
-+used when @var{noserver} is set to disallow QEMU to connect during
-+initialization.  The @code{nodelay} option disables the Nagle buffering
- algorithm.  The @code{reconnect} option only applies if @var{noserver} is
- set, if the connection goes down it will attempt to reconnect at the
- given interval.  If @var{host} is omitted, 0.0.0.0 is assumed. Only
++typedef int (*vhost_get_shm_size_op)(struct vhost_dev *dev,
++                                     struct vhost_shm *shm);
++
++typedef int (*vhost_set_shm_fd_op)(struct vhost_dev *dev,
++                                   struct vhost_shm *shm);
++
+ typedef struct VhostOps {
+     VhostBackendType backend_type;
+     vhost_backend_init vhost_backend_init;
+@@ -142,6 +149,8 @@ typedef struct VhostOps {
+     vhost_crypto_create_session_op vhost_crypto_create_session;
+     vhost_crypto_close_session_op vhost_crypto_close_session;
+     vhost_backend_mem_section_filter_op vhost_backend_mem_section_filter;
++    vhost_get_shm_size_op vhost_get_shm_size;
++    vhost_set_shm_fd_op vhost_set_shm_fd;
+ } VhostOps;
+ 
+ extern const VhostOps user_ops;
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index a7f449fa87..b6e3d6ab56 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -7,6 +7,17 @@
+ #include "exec/memory.h"
+ 
+ /* Generic structures common for any vhost based device. */
++
++struct vhost_shm {
++    void *addr;
++    uint64_t mmap_size;
++    uint32_t dev_size;
++    uint32_t vq_size;
++    uint32_t align;
++    uint32_t version;
++    int fd;
++};
++
+ struct vhost_virtqueue {
+     int kick;
+     int call;
+@@ -120,4 +131,12 @@ int vhost_dev_set_config(struct vhost_dev *dev, const uint8_t *data,
+  */
+ void vhost_dev_set_config_notifier(struct vhost_dev *dev,
+                                    const VhostDevConfigOps *ops);
++
++void vhost_dev_reset_shm(struct vhost_shm *shm);
++void vhost_dev_free_shm(struct vhost_shm *shm);
++int vhost_dev_alloc_shm(struct vhost_shm *shm);
++void vhost_dev_save_shm(struct vhost_shm *shm, QEMUFile *f);
++int vhost_dev_load_shm(struct vhost_shm *shm, QEMUFile *f);
++int vhost_dev_set_shm(struct vhost_dev *dev, struct vhost_shm *shm);
++int vhost_dev_init_shm(struct vhost_dev *dev, struct vhost_shm *shm);
+ #endif
 -- 
 2.17.1
