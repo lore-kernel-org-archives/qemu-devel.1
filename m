@@ -1,31 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47292)
+Received: from eggs.gnu.org ([208.118.235.92]:54091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfBUZ-0005U0-H6
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 17:29:35 -0500
+	(envelope-from <antonynpavlov@gmail.com>) id 1gfBuy-0004Nv-Px
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 17:56:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfBUU-0000bF-PT
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 17:29:31 -0500
-Received: from mail-it1-x134.google.com ([2607:f8b0:4864:20::134]:40746)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gfBUU-00087c-K1
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 17:29:26 -0500
-Received: by mail-it1-x134.google.com with SMTP id h193so44674803ita.5
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 14:29:10 -0800 (PST)
-References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<CAFEAcA8Xb1DeTTus7vwfQXDGC8ETR5a9Egg4nVN=+cLy0xm2dQ@mail.gmail.com>
-	<a08068ab-88ae-4068-d4d6-3a3c4a968893@redhat.com>
-	<5be74ec4-8a56-a479-85b0-49817a4aaf9c@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8d78fe10-c72c-0cff-21e9-27f33ca882b6@linaro.org>
-Date: Fri, 4 Jan 2019 08:29:00 +1000
-MIME-Version: 1.0
-In-Reply-To: <5be74ec4-8a56-a479-85b0-49817a4aaf9c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v2 00/44] MIPS pull request for December
- 2018 - v2
+	(envelope-from <antonynpavlov@gmail.com>) id 1gfBuv-0008Pa-Lo
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 17:56:48 -0500
+Date: Fri, 4 Jan 2019 01:56:41 +0300
+From: Antony Pavlov <antonynpavlov@gmail.com>
+Message-Id: <20190104015641.e6d525f098c5e272694faa62@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] barebox on Canon A1100
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +20,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Sascha Hauer <s.hauer@pengutronix.de>
+Cc: Barebox List <barebox@lists.infradead.org>, Marc Kleine-Budde <mkl@pengutronix.de>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 1/4/19 12:06 AM, Thomas Huth wrote:
-> Maybe we could / should enforce compiling with -std=gnu11 now? That
-> would also fix the problem with the duplicated typedefs on older
-> compilers, see e.g.:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+Hi Sascha!
 
-I'm all for it.
+I have some good news and some bad news.
 
+First the good news.
 
-r~
+Barebox was used for Day 18 of QEMU 2018 advent (https://www.qemu-advent-ca=
+lendar.org/2018/).
+
+Here is a quote:
+
+  > This is an image for QEMU's emulated Canon A1100 Arm machine:
+  > Play 2048 in the Barebox firmware environment.
+
+The bad news.
+
+Current master branch barebox for Canon A1100 does not work under qemu,
+barebox v2017.02.0 was used for qemu advent.
+
+Thomas Huth reported the problem in the qemu-devel mailing
+list two months ago. Please see https://www.mail-archive.com/qemu-devel@non=
+gnu.org/msg571887.html
+for details.
+
+The commit a43e2bbc468a71 breaks barebox for Canon A1100:
+
+  > commit a43e2bbc468a71fb8825e8acafb7fac7ad7c6dad
+  > Author: Sascha Hauer <s.hauer@pengutronix.de>
+  > Date:   Wed Mar 7 10:04:07 2018 +0100
+  >
+  >    ARM: return positive offset in get_runtime_offset()
+
+Any suggestion?
+
+--=20
+Best regards,
+=A0 Antony Pavlov
