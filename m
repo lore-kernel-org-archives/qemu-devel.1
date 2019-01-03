@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:32947)
+Received: from eggs.gnu.org ([208.118.235.92]:33601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gf7ZP-0004S1-OT
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:18:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1gf7bq-00068f-5C
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:20:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gf7ZL-0007CZ-Ug
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:18:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49482)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gf7ZL-0007CE-MO
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:18:11 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F34DC2C9776
-	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 18:18:10 +0000 (UTC)
-Date: Thu, 3 Jan 2019 13:18:09 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190103130406-mutt-send-email-mst@kernel.org>
-References: <20190103175113.18196-1-pbonzini@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gf7bn-0008VP-0d
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:20:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59412)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gf7bm-0008Ut-9T
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:20:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gf7bl-0000Ij-D9
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 18:20:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5463B2E80C3
+	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 18:20:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190103175113.18196-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] include: update Linux headers to 4.21/5.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 03 Jan 2019 18:13:46 -0000
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Reply-To: Bug 1750229 <1750229@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151895395027.16252.6709701353823193410.malonedeb@wampee.canonical.com>
+Message-Id: <154653922632.25392.17989757366337433672.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1750229] Re: virtio-blk-pci regression: softlock
+ in guest kernel at module loading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,128 +37,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, cohuck@redhat.com
+To: qemu-devel@nongnu.org
 
-On Thu, Jan 03, 2019 at 06:51:13PM +0100, Paolo Bonzini wrote:
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Note that in the past we just updated what we needed.
-That approach has some advantages as linux doesn't
-stand in place, so whatever renames we handle now
-just might have to get undone down the road.
-And, it allows cherry-picking headers from netdev-next etc.
-
-So maybe include a bit of motivation in the commit log.
-E.g. do you plan to do this every linux release from now on?
-
-> ---
->  include/standard-headers/drm/drm_fourcc.h     |   63 +
->  include/standard-headers/linux/ethtool.h      |   19 +-
->  .../linux/input-event-codes.h                 |   17 +
->  include/standard-headers/linux/pci_regs.h     |    1 +
->  include/standard-headers/linux/vhost_types.h  |  128 ++
->  .../standard-headers/linux/virtio_balloon.h   |    8 +
->  include/standard-headers/linux/virtio_blk.h   |   54 +
->  .../standard-headers/linux/virtio_config.h    |    3 +
->  include/standard-headers/linux/virtio_gpu.h   |   18 +
->  include/standard-headers/linux/virtio_ring.h  |   52 +
->  linux-headers/asm-arm/unistd-common.h         |    1 +
->  linux-headers/asm-arm64/unistd.h              |    1 +
->  linux-headers/asm-generic/unistd.h            |   10 +-
->  linux-headers/asm-mips/sgidefs.h              |    8 -
->  linux-headers/asm-mips/unistd.h               | 1074 +----------------
->  linux-headers/asm-mips/unistd_n32.h           |  338 ++++++
->  linux-headers/asm-mips/unistd_n64.h           |  334 +++++
->  linux-headers/asm-mips/unistd_o32.h           |  374 ++++++
->  linux-headers/asm-powerpc/unistd.h            |  389 +-----
->  linux-headers/asm-powerpc/unistd_32.h         |  381 ++++++
->  linux-headers/asm-powerpc/unistd_64.h         |  372 ++++++
->  linux-headers/linux/kvm.h                     |   29 +
->  linux-headers/linux/vfio.h                    |   92 ++
->  linux-headers/linux/vhost.h                   |  113 +-
->  linux-headers/linux/vhost_types.h             |    1 +
->  scripts/update-linux-headers.sh               |   11 +
->  26 files changed, 2302 insertions(+), 1589 deletions(-)
->  create mode 100644 include/standard-headers/linux/vhost_types.h
->  create mode 100644 linux-headers/asm-mips/unistd_n32.h
->  create mode 100644 linux-headers/asm-mips/unistd_n64.h
->  create mode 100644 linux-headers/asm-mips/unistd_o32.h
->  create mode 100644 linux-headers/asm-powerpc/unistd_32.h
->  create mode 100644 linux-headers/asm-powerpc/unistd_64.h
->  create mode 100644 linux-headers/linux/vhost_types.h
-
-I'd prefer the shell script part and the new vhost_types header which
-are actually reviewable to be split out to a separate patch.
-And maybe split out unistd stuff that just happened to be there
-since it's mostly just a jumbo list of numbers.
+This has been fixed in the kernel
 
 
-> diff --git a/linux-headers/linux/vhost_types.h b/linux-headers/linux/vhost_types.h
-> new file mode 100644
-> index 0000000000..473e3c0d81
-> --- /dev/null
-> +++ b/linux-headers/linux/vhost_types.h
-> @@ -0,0 +1 @@
-> +#include "standard-headers/linux/vhost_types.h"
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-Maybe add a comment here explaining where this came from and why?
+-- =
 
-BTW it can't hurt to add a preamble to each header we import that
-says "this came from pdate-linux-headers.sh" - as it is once
-in a while we have people try to edit these headers directly.
-Doesn't need to be done right now naturally.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1750229
 
-> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-> index 0a964fe240..c933489cbc 100755
-> --- a/scripts/update-linux-headers.sh
-> +++ b/scripts/update-linux-headers.sh
-> @@ -101,6 +101,13 @@ for arch in $ARCHLIST; do
->  
->      if [ $arch = mips ]; then
->          cp "$tmpdir/include/asm/sgidefs.h" "$output/linux-headers/asm-mips/"
-> +        cp "$tmpdir/include/asm/unistd_o32.h" "$output/linux-headers/asm-mips/"
-> +        cp "$tmpdir/include/asm/unistd_n32.h" "$output/linux-headers/asm-mips/"
-> +        cp "$tmpdir/include/asm/unistd_n64.h" "$output/linux-headers/asm-mips/"
-> +    fi
-> +    if [ $arch = powerpc ]; then
-> +        cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-powerpc/"
-> +        cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-powerpc/"
->      fi
->  
->      rm -rf "$output/include/standard-headers/asm-$arch"
+Title:
+  virtio-blk-pci regression: softlock in guest kernel at module loading
 
-A bit of an explanation about what happened here can't hurt.
+Status in QEMU:
+  Fix Released
 
-> @@ -162,6 +169,9 @@ EOF
->  cat <<EOF >$output/linux-headers/linux/virtio_ring.h
->  #include "standard-headers/linux/virtio_ring.h"
->  EOF
-> +cat <<EOF >$output/linux-headers/linux/vhost_types.h
-> +#include "standard-headers/linux/vhost_types.h"
-> +EOF
+Bug description:
+  Hello,
 
-I guess this is because we want vhost_types.h on non-linux systems,
-but vhost.h only on linux systems? The disadvantage to this
-approach is that one can use #include <linux/vhost_types.h> by mistake
-and it will only break on non-linux.
-An alternative is to replace #include <linux/vhost_types.h> with
-#include "standard-headers/linux/vhost_types.h"
-when we are importing vhost.h
+  I am running qemu from master git branch on x86_64 host with kernel is
+  4.4.114. I've found that commit
 
-Not a big deal, but I thought I'd mention this.
+      9a4c0e220d8a "hw/virtio-pci: fix virtio behaviour"
 
+  introduces an regression with the following command:
 
->  
->  rm -rf "$output/include/standard-headers/linux"
->  mkdir -p "$output/include/standard-headers/linux"
-> @@ -171,6 +181,7 @@ for i in "$tmpdir"/include/linux/*virtio*.h \
->           "$tmpdir/include/linux/input-event-codes.h" \
->           "$tmpdir/include/linux/pci_regs.h" \
->           "$tmpdir/include/linux/ethtool.h" "$tmpdir/include/linux/kernel.h" \
-> +         "$tmpdir/include/linux/vhost_types.h" \
->           "$tmpdir/include/linux/sysinfo.h"; do
->      cp_portable "$i" "$output/include/standard-headers/linux"
->  done
-> -- 
-> 2.20.1
+      qemu-system-x86_64 -enable-kvm -nodefaults -no-reboot -nographic
+  -vga none -runas qemu -kernel .build.kernel.kvm -initrd
+  .build.initrd.kvm -append 'panic=3D1 softlockup_panic=3D1 no-kvmclock
+  nmi_watchdog=3D0 console=3DttyS0 root=3D/dev/disk/by-id/virtio-0' -m 2048
+  -drive file=3D./root,format=3Draw,if=3Dnone,id=3Ddisk,serial=3D0,cache=3D=
+unsafe
+  -device virtio-blk-pci,drive=3Ddisk -serial stdio -smp 2
+
+  Starting from this commit to master the following happens with a wide
+  variety of guest kernels (4.4 to 4.15):
+
+  [   62.428107] BUG: workqueue lockup - pool cpus=3D0 node=3D0 flags=3D0x0=
+ nice=3D-20 stuck for 59s!
+  [   62.437426] Showing busy workqueues and worker pools:
+  [   62.443117] workqueue events: flags=3D0x0
+  [   62.447512]   pwq 0: cpus=3D0 node=3D0 flags=3D0x0 nice=3D0 active=3D1=
+/256
+  [   62.448161]     pending: check_corruption
+  [   62.458570] workqueue kblockd: flags=3D0x18
+  [   62.463082]   pwq 1: cpus=3D0 node=3D0 flags=3D0x0 nice=3D-20 active=
+=3D3/256
+  [   62.463082]     in-flight: 4:blk_mq_run_work_fn
+  [   62.463082]     pending: blk_mq_run_work_fn, blk_mq_timeout_work
+  [   62.474831] pool 1: cpus=3D0 node=3D0 flags=3D0x0 nice=3D-20 hung=3D59=
+s workers=3D2 idle: 214
+  [   62.492121] INFO: rcu_preempt detected stalls on CPUs/tasks:
+  [   62.492121]  Tasks blocked on level-0 rcu_node (CPUs 0-1): P4
+  [   62.492121]  (detected by 0, t=3D15002 jiffies, g=3D-130, c=3D-131, q=
+=3D32)
+  [   62.492121] kworker/0:0H    R  running task        0     4      2 0x80=
+000000
+  [   62.492121] Workqueue: kblockd blk_mq_run_work_fn
+  [   62.492121] Call Trace:
+  [   62.492121]  <IRQ>
+  [   62.492121]  sched_show_task+0xdf/0x100
+  [   62.492121]  rcu_print_detail_task_stall_rnp+0x48/0x69
+  [   62.492121]  rcu_check_callbacks+0x93d/0x9d0
+  [   62.492121]  ? tick_sched_do_timer+0x40/0x40
+  [   62.492121]  update_process_times+0x28/0x50
+  [   62.492121]  tick_sched_handle+0x22/0x70
+  [   62.492121]  tick_sched_timer+0x34/0x70
+  [   62.492121]  __hrtimer_run_queues+0xcc/0x250
+  [   62.492121]  hrtimer_interrupt+0xab/0x1f0
+  [   62.492121]  smp_apic_timer_interrupt+0x62/0x150
+  [   62.492121]  apic_timer_interrupt+0xa2/0xb0
+  [   62.492121]  </IRQ>
+  [   62.492121] RIP: 0010:iowrite16+0x1d/0x30
+  [   62.492121] RSP: 0018:ffffa477c034fcc8 EFLAGS: 00010292 ORIG_RAX: ffff=
+ffffffffff11
+  [   62.492121] RAX: ffffffffa24fbdb0 RBX: ffff92a1f8f82000 RCX: 000000000=
+0000001
+  [   62.492121] RDX: ffffa477c0371000 RSI: ffffa477c0371000 RDI: 000000000=
+0000000
+  [   62.492121] RBP: 0000000000000001 R08: 0000000000000000 R09: 000000000=
+1080020
+  [   62.492121] R10: ffffdc7cc1e4fc00 R11: 0000000000000000 R12: 000000000=
+0000000
+  [   62.492121] R13: 0000000000000000 R14: ffff92a1f93f0000 R15: ffff92a1f=
+8e1aa80
+  [   62.492121]  ? vp_synchronize_vectors+0x60/0x60
+  [   62.492121]  vp_notify+0x12/0x20
+  [   62.492121]  virtqueue_notify+0x18/0x30
+  [   62.492121]  virtio_queue_rq+0x2f5/0x300 [virtio_blk]
+  [   62.492121]  blk_mq_dispatch_rq_list+0x7e/0x4a0
+  [   62.492121]  blk_mq_do_dispatch_sched+0x4a/0xd0
+  [   62.492121]  blk_mq_sched_dispatch_requests+0x106/0x170
+  [   62.492121]  __blk_mq_run_hw_queue+0x80/0x90
+  [   62.492121]  process_one_work+0x1e3/0x420
+  [   62.492121]  worker_thread+0x2b/0x3d0
+  [   62.492121]  ? process_one_work+0x420/0x420
+  [   62.492121]  kthread+0x113/0x130
+  [   62.492121]  ? kthread_create_worker_on_cpu+0x50/0x50
+  [   62.492121]  ret_from_fork+0x3a/0x50
+  [   62.492121] kworker/0:0H    R  running task        0     4      2 0x80=
+000000
+  [   62.492121] Workqueue: kblockd blk_mq_run_work_fn
+  [   62.492121] Call Trace:
+  [   62.492121]  <IRQ>
+  [   62.492121]  sched_show_task+0xdf/0x100
+  [   62.492121]  rcu_print_detail_task_stall_rnp+0x48/0x69
+  [   62.492121]  rcu_check_callbacks+0x972/0x9d0
+  [   62.492121]  ? tick_sched_do_timer+0x40/0x40
+  [   62.492121]  update_process_times+0x28/0x50
+  [   62.492121]  tick_sched_handle+0x22/0x70
+  [   62.492121]  tick_sched_timer+0x34/0x70
+  [   62.492121]  __hrtimer_run_queues+0xcc/0x250
+  [   62.492121]  hrtimer_interrupt+0xab/0x1f0
+  [   62.492121]  smp_apic_timer_interrupt+0x62/0x150
+  [   62.492121]  apic_timer_interrupt+0xa2/0xb0
+  [   62.492121]  </IRQ>
+  [   62.492121] RIP: 0010:iowrite16+0x1d/0x30
+  [   62.492121] RSP: 0018:ffffa477c034fcc8 EFLAGS: 00010292 ORIG_RAX: ffff=
+ffffffffff11
+  [   62.492121] RAX: ffffffffa24fbdb0 RBX: ffff92a1f8f82000 RCX: 000000000=
+0000001
+  [   62.492121] RDX: ffffa477c0371000 RSI: ffffa477c0371000 RDI: 000000000=
+0000000
+  [   62.492121] RBP: 0000000000000001 R08: 0000000000000000 R09: 000000000=
+1080020
+  [   62.492121] R10: ffffdc7cc1e4fc00 R11: 0000000000000000 R12: 000000000=
+0000000
+  [   62.492121] R13: 0000000000000000 R14: ffff92a1f93f0000 R15: ffff92a1f=
+8e1aa80
+  [   62.492121]  ? vp_synchronize_vectors+0x60/0x60
+  [   62.492121]  vp_notify+0x12/0x20
+  [   62.492121]  virtqueue_notify+0x18/0x30
+  [   62.492121]  virtio_queue_rq+0x2f5/0x300 [virtio_blk]
+  [   62.492121]  blk_mq_dispatch_rq_list+0x7e/0x4a0
+  [   62.492121]  blk_mq_do_dispatch_sched+0x4a/0xd0
+  [   62.492121]  blk_mq_sched_dispatch_requests+0x106/0x170
+  [   62.492121]  __blk_mq_run_hw_queue+0x80/0x90
+  [   62.492121]  process_one_work+0x1e3/0x420
+  [   62.492121]  worker_thread+0x2b/0x3d0
+  [   62.492121]  ? process_one_work+0x420/0x420
+  [   62.492121]  kthread+0x113/0x130
+  [   62.492121]  ? kthread_create_worker_on_cpu+0x50/0x50
+  [   62.492121]  ret_from_fork+0x3a/0x50
+
+  Another important thing is that the commit works well on other
+  hardware with the same setup (same host kernel, same qemu command line
+  and host kernel binaries). How could I try to find the issue reason?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1750229/+subscriptions
