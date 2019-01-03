@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47284)
+Received: from eggs.gnu.org ([208.118.235.92]:42191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf5W1-0007cs-Hi
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:06:38 -0500
+	(envelope-from <clabbe.montjoie@gmail.com>) id 1gf5EJ-0003qO-OM
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:48:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf5W0-0005iK-M2
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:06:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37792)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gf5W0-0005hc-EU
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:06:36 -0500
-References: <20181227063419.12981-1-yang.zhong@intel.com>
-	<20181227063419.12981-11-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <00c0eea5-aa0d-118f-3c78-5851fd5eae9d@redhat.com>
-Date: Thu, 3 Jan 2019 17:06:32 +0100
+	(envelope-from <clabbe.montjoie@gmail.com>) id 1gf5EH-0004hm-QZ
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:48:19 -0500
+Received: from mail-ed1-x536.google.com ([2a00:1450:4864:20::536]:44839)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <clabbe.montjoie@gmail.com>)
+	id 1gf5EG-0004VB-4U
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:48:17 -0500
+Received: by mail-ed1-x536.google.com with SMTP id y56so29304265edd.11
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 07:48:14 -0800 (PST)
+Date: Thu, 3 Jan 2019 16:48:10 +0100
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Message-ID: <20190103154810.GB32032@Red>
 MIME-Version: 1.0
-In-Reply-To: <20181227063419.12981-11-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 10/25] build: convert pci.mak to Kconfig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] sparc: crash when using initrd > 5M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,169 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org
+To: sparclinux@vger.kernel.org, qemu-devel@nongnu.org
 
-On 2018-12-27 07:34, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
->=20
-> Instead of including the same list of devices for each target,
-> set CONFIG_PCI to true, and make the devices default to present
-> whenever PCI is available.
->=20
-> Done mostly with the following script:
->=20
->   while read i; do
->      i=3D${i%=3Dy}; i=3D${i#CONFIG_}
->      sed -i -e'/^config '$i'$/!b' -en \
->             -e'a\' -e'    default y\' -e'    depends on PCI' \
->           `grep -lw $i hw/*/Kconfig`
->   done < default-configs/pci.mak
->=20
-> followed by replacing a few "depends on" clauses with "select"
-> whenever the symbol is not really related to PCI.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  default-configs/i386-softmmu.mak |  2 +-
->  default-configs/pci.mak          | 47 --------------------------------
->  hw/audio/Kconfig                 |  6 ++++
->  hw/block/Kconfig                 |  2 ++
->  hw/char/Kconfig                  |  2 ++
->  hw/display/Kconfig               | 12 +++++++-
->  hw/ide/Kconfig                   |  6 ++++
->  hw/ipack/Kconfig                 |  2 ++
->  hw/misc/Kconfig                  |  4 +++
->  hw/net/Kconfig                   | 19 +++++++++++++
->  hw/scsi/Kconfig                  | 11 ++++++++
->  hw/sd/Kconfig                    |  3 ++
->  hw/usb/Kconfig                   | 10 +++++++
->  hw/virtio/Kconfig                |  3 ++
->  hw/watchdog/Kconfig              |  2 ++
->  15 files changed, 82 insertions(+), 49 deletions(-)
->  delete mode 100644 default-configs/pci.mak
->=20
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-so=
-ftmmu.mak
-> index 560250c998..61f19e5231 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -1,6 +1,6 @@
->  # Default configuration for i386-softmmu
-[...]
-> diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
-> index 091f3a81c9..0f25b27163 100644
-> --- a/hw/ide/Kconfig
-> +++ b/hw/ide/Kconfig
-> @@ -7,6 +7,7 @@ config IDE_QDEV
-> =20
->  config IDE_PCI
->      bool
-> +    depends on PCI
->      select IDE_CORE
-> =20
->  config IDE_ISA
-> @@ -15,10 +16,12 @@ config IDE_ISA
-> =20
->  config IDE_PIIX
->      bool
-> +    depends on PCI
->      select IDE_QDEV
-> =20
->  config IDE_CMD646
->      bool
-> +    select IDE_PCI
->      select IDE_QDEV
+Hello
 
-Why "select" here and not "depends on" like in the previous cases?
+When using an initrd > 5M, I hit the following kernel crash:
+qemu-system-sparc -kernel vmlinux -initrd rootfs.cpio.gz -nographic
+Configuration device id QEMU version 1 machine id 32
+Probing SBus slot 0 offset 0
+Probing SBus slot 1 offset 0
+Probing SBus slot 2 offset 0
+Probing SBus slot 3 offset 0
+Probing SBus slot 4 offset 0
+Probing SBus slot 5 offset 0
+Invalid FCode start byte
+CPUs: 1 x FMI,MB86904
+UUID: 00000000-0000-0000-0000-000000000000
+Welcome to OpenBIOS v1.1 built on Oct 5 2018 08:20
+  Type 'help' for detailed information
+[sparc] Kernel already loaded
+switching to new context:
+PROMLIB: obio_ranges 1
+[    0.000000] PROMLIB: Sun Boot Prom Version 3 Revision 2
+[    0.000000] Linux version 4.20.0-next-20190102+ (compile@Red) (gcc version 7.3.0 (Gentoo 7.3.0-r3 p1.4)) #148 Thu Jan 3 16:17:08 CET 2019
+[    0.000000] printk: bootconsole [earlyprom0] enabled
+[    0.000000] ARCH: SUN4M
+[    0.000000] TYPE: SPARCstation 5
+[    0.000000] Ethernet address: 52:54:00:12:34:56
+[    0.000000] Unable to handle kernel NULL pointer dereference
+[    0.000000] tsk->{mm,active_mm}->context = ffffffff
+[    0.000000] tsk->{mm,active_mm}->pgd = 00000000
+[    0.000000]               \|/ ____ \|/
+[    0.000000]               "@'/ ,. \`@"
+[    0.000000]               /_| \__/ |_\
+[    0.000000]                  \__U_/
+[    0.000000] swapper(0): Oops [#1]
+[    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 4.20.0-next-20190102+ #148
+[    0.000000] PSR: 04001fc0 PC: f0010ef0 NPC: f0010ef4 Y: 00000000    Not tainted
+[    0.000000] PC: <do_sparc_fault+0x158/0x404>
+[    0.000000] %G: 0000000a 000003c4  f05ece08 f05ecc00  00000000 00e00000  f05d4000 00000001
+[    0.000000] %O: 00000000 00e00000  00800000 00e00000  00000000 00000002  f05d5bb8 f00bba58
+[    0.000000] RPC: <memblock_reserve+0x38/0x68>
+[    0.000000] %L: 00000040 f05dfaf8  f05d5c68 00000001  0003ffff 006951e0  f05ed014 f0674ab4
+[    0.000000] %I: f05d5c80 00000000  00000002 f1000000  ffffffff 00000000  f05d5c20 f0007fd8
+[    0.000000] Disabling lock debugging due to kernel taint
+[    0.000000] Caller[f0007fd8]: srmmu_fault+0x58/0x68
+[    0.000000] Caller[f0618598]: memblock_alloc_try_nid+0xb8/0xc8
+[    0.000000] Caller[f0611094]: srmmu_paging_init+0x174/0xaf8
+[    0.000000] Caller[f06106a8]: paging_init+0x4/0x24
+[    0.000000] Caller[f060e4f0]: setup_arch+0x3e8/0x480
+[    0.000000] Caller[f060ab50]: start_kernel+0x48/0x460
+[    0.000000] Caller[f060a43c]: continue_boot+0x324/0x334
+[    0.000000] Caller[00000000]:   (null)
+[    0.000000] Instruction DUMP:
+[    0.000000]  c800a024 
+[    0.000000]  83286002 
+[    0.000000]  073c17b3 
+[    0.000000] <c4010001>
+[    0.000000]  c600e22c 
+[    0.000000]  8a08a003 
+[    0.000000]  80a16001 
+[    0.000000]  0280003b 
+[    0.000000]  c600c001 
+[    0.000000] 
+[    0.000000] Kernel panic - not syncing: Attempted to kill the idle task!
+[    0.000000] Press Stop-A (L1-A) from sun keyboard or send break
+[    0.000000] twice on console to return to the boot prom
+[    0.000000] ---[ end Kernel panic - not syncing: Attempted to kill the idle task! ]---
+qemu-system-sparc: terminating on signal 15 from pid 13043 (killall)
 
->  config IDE_MACIO
-> @@ -31,6 +34,7 @@ config IDE_MMIO
-> =20
->  config IDE_VIA
->      bool
-> +    select IDE_PCI
->      select IDE_QDEV
+The NULL ptr dereference is done by memset() in srmmu_nocache_init() and memblock_alloc_try_nid().
+If I comment both memset, the boot pass
 
-dito
+But since nothing explain the NULL ptr deref in memset(), I suspect something is overriden by the initrd
 
->  config MICRODRIVE
-> @@ -39,6 +43,8 @@ config MICRODRIVE
-> =20
->  config AHCI
->      bool
-> +    default y
-> +    depends on PCI
->      select IDE_QDEV
-> =20
->  config IDE_SII3112
-
-I think the SII3112 needs a "depends on PCI", too?
-
-> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-> index 6b2ec971b5..c87375ee52 100644
-> --- a/hw/net/Kconfig
-> +++ b/hw/net/Kconfig
-> @@ -3,27 +3,42 @@ config DP8393X
-> =20
->  config NE2000_PCI
->      bool
-> +    default y
-> +    depends on PCI
-> =20
->  config EEPRO100_PCI
->      bool
-> +    default y
-> +    depends on PCI
-> =20
->  config PCNET_PCI
->      bool
-> +    default y
-> +    depends on PCI
-> +    select PCNET_COMMON
-> =20
->  config PCNET_COMMON
->      bool
-> =20
->  config E1000_PCI
->      bool
-> +    default y
-> +    depends on PCI
-> =20
->  config E1000E_PCI
->      bool
-> +    default y
-> +    depends on PCI
-> =20
->  config RTL8139_PCI
->      bool
-> +    default y
-> +    depends on PCI
-> =20
->  config VMXNET3_PCI
->      bool
-> +    default y
-> +    depends on PCI
-> =20
->  config SMC91C111
->      bool
-> @@ -81,12 +96,16 @@ config ETSEC
-> =20
->  config ROCKER
->      bool
-> +    default y
-> +    depends on PCI
-> =20
->  config CAN_BUS
->      bool
-> =20
->  config CAN_PCI
->      bool
-> +    default y
-> +    depends on PCI
-
-Do we need a "select CAN_BUS" here? (Well, maybe that's rather something
-for a later patch instead...)
-
- Thomas
+Regards
