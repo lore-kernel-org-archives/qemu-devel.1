@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57612)
+Received: from eggs.gnu.org ([208.118.235.92]:58085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gf3bd-0007u8-Ra
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:04:18 -0500
+	(envelope-from <thuth@redhat.com>) id 1gf3dp-0001se-7k
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:06:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gf3bd-0005m8-3F
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:04:17 -0500
-From: Li Qiang <liq3ea@163.com>
-Date: Thu,  3 Jan 2019 06:02:46 -0800
-Message-Id: <20190103140246.50791-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH] s390: avoid potential null dereference in
- s390_pcihost_unplug()
+	(envelope-from <thuth@redhat.com>) id 1gf3dl-0006j7-Vc
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:06:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42952)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gf3dl-0006il-OM
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:06:29 -0500
+References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<CAFEAcA8Xb1DeTTus7vwfQXDGC8ETR5a9Egg4nVN=+cLy0xm2dQ@mail.gmail.com>
+	<a08068ab-88ae-4068-d4d6-3a3c4a968893@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5be74ec4-8a56-a479-85b0-49817a4aaf9c@redhat.com>
+Date: Thu, 3 Jan 2019 15:06:23 +0100
+MIME-Version: 1.0
+In-Reply-To: <a08068ab-88ae-4068-d4d6-3a3c4a968893@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/44] MIPS pull request for December
+ 2018 - v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,34 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: walling@linux.ibm.com, rth@twiddle.net, david@redhat.com, cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, Li Qiang <liq3ea@163.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 
-When getting the 'pbdev', the if...else has no default branch.
->From Coverity, the 'pbdev' maybe null when the 'dev' is not
-the TYPE_PCI_BRIDGE/TYPE_PCI_DEVICE/TYPE_S390_PCI_DEVICE.
+On 2019-01-03 14:32, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/3/19 2:23 PM, Peter Maydell wrote:
+>> On Mon, 31 Dec 2018 at 14:56, Aleksandar Markovic
+>> <aleksandar.markovic@rt-rk.com> wrote:
+>>> MIPS queue for December 2018 - v2
+> [...]
+>> Hi; I'm afraid this doesn't build on all my test hosts:
+>>
+>> target/mips/translate.c: In function =E2=80=98gen_mxu_Q8MAX_Q8MIN=E2=80=
+=99:
+>> target/mips/translate.c:25092:9: error: =E2=80=98for=E2=80=99 loop ini=
+tial
+>> declarations are only allowed in C99 mode
+>>          for (int i =3D 2; i >=3D 0; i--) {
+>>          ^
+>> target/mips/translate.c:25092:9: note: use option -std=3Dc99 or
+>> -std=3Dgnu99 to compile your code
+>> target/mips/translate.c:25129:9: error: =E2=80=98for=E2=80=99 loop ini=
+tial
+>> declarations are only allowed in C99 mode
+>>          for (int i =3D 2; i >=3D 0; i--) {
+>>          ^
+>>
+>> (This probably only shows up on builds with older versions
+>> of gcc which don't default to c99.)
+>>
+>> We don't use variable-declaration-in-for-loop.
+>=20
+> Hmmm I wonder if we shouldn't relax that now than all supported
+> compilers do support C99.
 
-Spotted by Coverity: CID 1398593
+Maybe we could / should enforce compiling with -std=3Dgnu11 now? That
+would also fix the problem with the duplicated typedefs on older
+compilers, see e.g.:
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- hw/s390x/s390-pci-bus.c | 4 ++++
- 1 file changed, 4 insertions(+)
+https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 15759b6514..b3122268a3 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -956,6 +956,10 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
-         pbdev = S390_PCI_DEVICE(dev);
-         pci_dev = pbdev->pdev;
-+    } else {
-+        error_setg(errp, "s390: device unplug for not supported device"
-+                   " type: %s", object_get_typename(OBJECT(dev)));
-+        return;
-     }
- 
-     switch (pbdev->state) {
--- 
-2.17.1
+ Thomas
