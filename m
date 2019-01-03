@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38115)
+Received: from eggs.gnu.org ([208.118.235.92]:43221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf7sN-0005EX-OW
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:37:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1gf8Ed-0002Tk-1F
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:00:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf7sM-00045N-T8
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:37:51 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38615)
+	(envelope-from <bounces@canonical.com>) id 1gf8EY-0002o7-2y
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:00:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39360)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gf7sM-000445-EZ
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:37:50 -0500
-Received: by mail-oi1-x242.google.com with SMTP id a77so28450325oii.5
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 10:37:50 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gf8EX-0002ne-TK
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:00:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gf8EW-0003td-HO
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 19:00:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 67A412E80CB
+	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 19:00:44 +0000 (UTC)
 MIME-Version: 1.0
-References: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA9FwFg9zsg3xLhOs9C=XJHjAo+ACd1=g22YtPaax6N0YQ@mail.gmail.com>
-	<42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
-In-Reply-To: <42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 Jan 2019 18:37:38 +0000
-Message-ID: <CAFEAcA9UqiaiKa_4EWfBHbRS0H=trHfJiArHOJkW6=vKoGvRpQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-21
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 03 Jan 2019 18:51:10 -0000
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Reply-To: Bug 1810433 <1810433@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154653873624.24628.7091357257162393259.malonedeb@gac.canonical.com>
+Message-Id: <154654147088.24666.5899969540161253275.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1810433] Re: aarch64-linux-user master:
+ inconsistent pwrite behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +37,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Sat, 22 Dec 2018 at 08:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 21/12/18 22:09, Peter Maydell wrote:
-> > I don't really understand what's going on here, or why
-> > it only happens with this one system (my main x86-64
-> > Linux Ubuntu 16.04.5 box) and not the various others I'm
-> > running test builds on. But it does seem to be 100%
-> > reliable with any of these pullreqs with the new test
-> > driver in them :-(
->
-> I'm afraid something in your setup is causing make's stdout to have
-> O_NONBLOCK set.  Make doesn't use O_NONBLOCK at all, so it must be
-> something above it.  I also checked Perl with strace and, at least here,
-> it doesn't set O_NONBLOCK.
+Do you know how to fix it?
 
-Interestingly, I have today run into "make: write error: stdout"
-with the existing make check infrastructure. It seems to
-only happen if I run 'make check' in a loop like this:
-  while make -C build/x86 -j8 V=1 check; do true; done
-Adding strace to this shows that although the first
-invocation of 'make' starts with stdout not O_NONBLOCK,
-something in that run results in stdout being set O_NONBLOCK,
-and then that persists into the second run of make,
-which then may fail as a result. (This is make 4.1, which
-will write output with fputs() unless a --sync-output option
-is used, and thus doesn't retry on EINTR.) When the 'while'
-loop finishes, something in the shell results in stdout
-being set back to blocking again.
+-- =
 
-I presume that something in one of the tests we're running,
-likely QEMU itself, ends up setting stdout to non-blocking.
-This while rune *used* to be entirely reliable, so maybe
-something recent has changed ?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1810433
 
-thanks
--- PMM
+Title:
+  aarch64-linux-user master: inconsistent pwrite behaviour
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  I am running aarch64-linux-user from master, commit
+  20d6c7312f1b812bb9c750f4087f69ac8485cc90
+
+  And I've found the following inconsistent emulation of pwrite() call when=
+ buf=3D=3DNULL and len=3D0.
+  Minimal reproducible sample is the following:
+
+  #define _GNU_SOURCE
+  #include <stdlib.h>
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <string.h>
+
+  /*
+  =C2=A0System                  | Result
+  -------------------------+----------------
+  =C2=A0Native x86_64 4.12.14   | pwrite ret =3D 0
+  =C2=A0Native aarch64 4.4.159  | pwrite ret =3D 0
+  =C2=A0qemu-aarch64 at x86_64  | pwrite ret =3D -1
+  =C2=A0=C2=A0=C2=A0( 20d6c7312f1b8 )     |
+  */
+
+  int main(int argc, char** argv) {
+  =C2=A0int fd =3D open("test.dat", O_CREAT | O_RDWR, 0644);
+  =C2=A0if (fd < 0) {
+  =C2=A0=C2=A0perror("open");
+  =C2=A0=C2=A0return 1;
+  =C2=A0}
+
+  =C2=A0int ret =3D fallocate(fd, 0, 0, 1000);
+  =C2=A0if (ret < 0) {
+  =C2=A0=C2=A0perror("fallocate");
+  =C2=A0=C2=A0return 1;
+  =C2=A0}
+
+  =C2=A0ssize_t ret_pwrite =3D pwrite(fd, NULL, 0, 0);
+  =C2=A0printf("pwrite ret =3D %ld\n", ret_pwrite);
+
+  =C2=A0close(fd);
+
+  =C2=A0return 0;
+  }
+
+  =
+
+  Please note, that the same binary executable prints different output at n=
+ative aarch64 platform and under aarch64-linux-user
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1810433/+subscriptions
