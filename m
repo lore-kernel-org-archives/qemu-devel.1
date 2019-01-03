@@ -1,42 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:41379)
+Received: from eggs.gnu.org ([208.118.235.92]:42690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gezwW-0007C6-V0
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:09:37 -0500
+	(envelope-from <thuth@redhat.com>) id 1gf01y-0001QV-6r
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gezwS-0006vy-VW
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:09:36 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40818)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gezwR-0006VI-1A
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:09:32 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x03A9Isx028651
-	for <qemu-devel@nongnu.org>; Thu, 3 Jan 2019 05:09:21 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2psf1537da-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 05:09:21 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Thu, 3 Jan 2019 10:09:13 -0000
-Reply-To: pmorel@linux.ibm.com
-References: <1545224225-24267-1-git-send-email-pmorel@linux.ibm.com>
-	<1545224225-24267-2-git-send-email-pmorel@linux.ibm.com>
-	<20181219152249.487e2bdf.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Thu, 3 Jan 2019 11:09:08 +0100
+	(envelope-from <thuth@redhat.com>) id 1gf01v-0006yI-36
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:15:14 -0500
+From: Thomas Huth <thuth@redhat.com>
+References: <20181205195704.17605-1-ehabkost@redhat.com>
+	<20181205195704.17605-3-ehabkost@redhat.com>
+	<a28d196a-e2fe-a013-a6e2-99ac260f6279@redhat.com>
+Message-ID: <6d25cdc7-60f9-a0e0-b3be-d78da86752b5@redhat.com>
+Date: Thu, 3 Jan 2019 11:14:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181219152249.487e2bdf.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <a28d196a-e2fe-a013-a6e2-99ac260f6279@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <97eea5fc-ccbf-3d93-ccef-40d0ac92a376@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5] s390x/pci: add common function
- measurement block
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 2/2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,62 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: walling@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>, qemu-s390x@nongnu.org, Markus Armbruster <armbru@redhat.com>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Max Reitz <mreitz@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
-On 19/12/2018 15:22, Cornelia Huck wrote:
-> On Wed, 19 Dec 2018 13:57:05 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
->=20
->> From: Yi Min Zhao <zyimin@linux.ibm.com>
+On 2019-01-03 10:38, Thomas Huth wrote:
+> On 2018-12-05 20:57, Eduardo Habkost wrote:
+>> Many of the current virtio-*-pci device types actually represent
+>> 3 different types of devices:
+>> * virtio 1.0 non-transitional devices
+>> * virtio 1.0 transitional devices
+>> * virtio 0.9 ("legacy device" in virtio 1.0 terminology)
 >>
->> Common function measurement block is used to report zPCI internal
->> counters of successful pcilg/stg/stb and rpcit instructions to
->> a memory location provided by the program.
+>> That would be just an annoyance if it didn't break our device/bus
+>> compatibility QMP interfaces.  With these multi-purpose device
+>> types, there's no way to tell management software that
+>> transitional devices and legacy devices require a Conventional
+>> PCI bus.
 >>
->> This patch introduces a new ZpciFmb structure and schedules a timer
->> callback to copy the zPCI measures to the FMB in the guest memory
->> at an interval time set to 4s.
+>> The multi-purpose device types would also prevent us from telling
+>> management software what's the PCI vendor/device ID for them,
+>> because their PCI IDs change at runtime depending on the bus
+>> where they were plugged.
 >>
->> An error while attemping to update the FMB, would generate an error
->> event to the guest.
+>> This patch adds separate device types for each of those virtio
+>> device flavors:
 >>
->> The pcilg/stg/stb and rpcit interception handlers increase the
->> related counter on a successful call.
->> The guest shall pass a null FMBA (FMB address) in the FIB (Function
->> Information Block) when it issues a Modify PCI Function Control
->> instruction to switch off FMB and stop the corresponding timer.
+>> - virtio-*-pci: the existing multi-purpose device types
+>>   - Configurable using `disable-legacy` and `disable-modern`
+>>     properties
+>>   - Legacy driver support is automatically enabled/disabled
+>>     depending on the bus where it is plugged
+>>   - Supports Conventional PCI and PCI Express buses
+>>     (but Conventional PCI is incompatible with
+>>     disable-legacy=off)
+>>   - Changes PCI vendor/device IDs at runtime
+>> - virtio-*-pci-transitional: virtio-1.0 device supporting legacy drivers
+>>   - Supports Conventional PCI buses only, because
+>>     it has a PIO BAR
+>> - virtio-*-pci-non-transitional: modern-only
+>>   - Supports both Conventional PCI and PCI Express buses
 >>
->> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   hw/s390x/s390-pci-bus.c  |   4 +-
->>   hw/s390x/s390-pci-bus.h  |  29 +++++++++++
->>   hw/s390x/s390-pci-inst.c | 129 +++++++++++++++++++++++++++++++++++++=
-++++++++--
->>   hw/s390x/s390-pci-inst.h |   1 +
->>   4 files changed, 159 insertions(+), 4 deletions(-)
+>> The existing TYPE_* macros for these types will point to an
+>> abstract base type, so existing casts in the code will keep
+>> working for all variants.
 >>
->=20
->> +static void fmb_update(void *opaque)
->> +{
->> +    S390PCIBusDevice *pbdev =3D opaque;
->> +    int64_t t =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
->> +    int i;
->> +
->> +    /* Update U bit */
->> +    pbdev->fmb.last_update *=3D 2;
->> +    pbdev->fmb.last_update |=3D UPDATE_U_BIT;
->> +    if (fmb_do_update(pbdev, offsetof(ZpciFmb, last_update),
->> +                      pbdev->fmb.last_update, sizeof(uint64_t))) {
->=20
-> Uh... the size of the last_update field would make more sense here...
-> Also for the other fields below. Is there a reason that does not work?
+>> A simple test script (tests/acceptance/virtio_version.py) is
+>> included, to check if the new device types are equivalent to
+>> using the `disable-legacy` and `disable-modern` options.
+>>
+>> Acked-by: Andrea Bolognani <abologna@redhat.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+>  Hi Eduardo,
+> 
+> with these new devices, I can trigger an abort on s390x:
+> 
+> $ qemu-system-s390x -M s390-ccw-virtio-2.5 -monitor stdio -no-shutdown
+> QEMU 3.1.50 monitor - type 'help' for more information
+> (qemu) device_add vhost-scsi-pci-non-transitional
+> qemu-system-s390x: hw/core/qdev-properties.c:1236:
+> qdev_prop_set_globals: Assertion `prop->user_provided' failed.
+> Aborted (core dumped)
+FWIW, it happens with x86, too:
 
-None, I send a v6 :)
+$ qemu-system-x86_64 -M pc-i440fx-2.6 -monitor stdio
+QEMU 3.1.50 monitor - type 'help' for more information
+(qemu) device_add vhost-scsi-pci-non-transitional
+qemu-system-x86_64: hw/core/qdev-properties.c:1236:
+qdev_prop_set_globals: Assertion `prop->user_provided' failed.
+Aborted (core dumped)
 
+Only machine types newer than 2.7 seem to be OK.
 
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+ Thomas
