@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38082)
+Received: from eggs.gnu.org ([208.118.235.92]:38090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6Tz-0004Of-G9
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6Tz-0004Oi-Or
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6Tw-0007Pw-T8
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6Tx-0007Qc-4t
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:35 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:46146 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:46145 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gf6Tw-0007Nc-Lj
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:32 -0500
+	id 1gf6Tw-0007Nd-TE
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:33 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu,  3 Jan 2019 18:07:40 +0100
-Message-Id: <1546535297-11040-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  3 Jan 2019 18:07:38 +0100
+Message-Id: <1546535297-11040-6-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 07/44] target/mips: MXU: Add generic naming
- for optn2 constants
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 05/44] atomics: Set ATOMIC_REG_SIZE=8 for
+ MIPS n32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +31,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Paul Burton <pburton@wavecomp.com>
 
-Add generic naming involving generig suffixes OPTN0, OPTN1, OPTN2,
-OPTN3 for four optn2 constants. Existing suffixes WW, LW, HW, XW
-are not quite appropriate for some instructions using optn2.
+ATOMIC_REG_SIZE is currently defined as the default sizeof(void *) for
+all MIPS host builds, including those using the n32 ABI. n32 is the
+MIPS64 ILP32 ABI and as such tcg/mips/tcg-target.h defines
+TCG_TARGET_REG_BITS as 64 for n32 builds. If we attempt to build QEMU
+for an n32 host with support for a 64b target architecture then
+TCG_OVERSIZED_GUEST is 0 and accel/tcg/cputlb.c attempts to use
+atomic_* functions. This fails because ATOMIC_REG_SIZE is 4, causing
+the calls to QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE) in the
+various atomic_* functions to generate errors.
 
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+Fix this by defining ATOMIC_REG_SIZE as 8 for all MIPS64 builds, which
+will cover both n32 (ILP32) & n64 (LP64) ABIs in much the same was as
+we already do for x86_64/x32.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Paul Burton <pburton@wavecomp.com>
 ---
- target/mips/translate.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/qemu/atomic.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e0c8d8c..74d16ce 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -24238,6 +24238,11 @@ static void decode_opc_special(CPUMIPSState *env, DisasContext *ctx)
- #define MXU_EPTN2_SS    3
- 
- /* MXU operand getting pattern 'optn2' */
-+#define MXU_OPTN2_PTN0  0
-+#define MXU_OPTN2_PTN1  1
-+#define MXU_OPTN2_PTN2  2
-+#define MXU_OPTN2_PTN3  3
-+/* alternative naming scheme for 'optn2' */
- #define MXU_OPTN2_WW    0
- #define MXU_OPTN2_LW    1
- #define MXU_OPTN2_HW    2
--- 
+diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
+index f6993a8..a6ac188 100644
+--- a/include/qemu/atomic.h
++++ b/include/qemu/atomic.h
+@@ -99,9 +99,10 @@
+  * those few cases by hand.
+  *
+  * Note that x32 is fully detected with __x86_64__ + _ILP32, and that fo=
+r
+- * Sparc we always force the use of sparcv9 in configure.
++ * Sparc we always force the use of sparcv9 in configure. MIPS n32 (ILP3=
+2) &
++ * n64 (LP64) ABIs are both detected using __mips64.
+  */
+-#if defined(__x86_64__) || defined(__sparc__)
++#if defined(__x86_64__) || defined(__sparc__) || defined(__mips64)
+ # define ATOMIC_REG_SIZE  8
+ #else
+ # define ATOMIC_REG_SIZE  sizeof(void *)
+--=20
 2.7.4
