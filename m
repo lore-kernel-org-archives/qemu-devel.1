@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([208.118.235.92]:60338)
+Received: from eggs.gnu.org ([208.118.235.92]:60335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gf7Ws-0002AD-1o
+	(envelope-from <bounces@canonical.com>) id 1gf7Ws-0002AC-1U
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:15:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gf7Wo-0005jv-Sa
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:15:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58996)
+	(envelope-from <bounces@canonical.com>) id 1gf7Wp-0005kP-BX
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:15:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58976)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gf7Wo-0005jN-Mh
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:15:34 -0500
+	id 1gf7Wp-0005jI-4u
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:15:35 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gf7Wn-0008PA-KW
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 18:15:33 +0000
+	id 1gf7Wm-0008ON-Oh
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 18:15:32 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 930FC2E80C3
-	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 18:15:33 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id B22B82E80C3
+	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 18:15:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 03 Jan 2019 18:06:39 -0000
+Date: Thu, 03 Jan 2019 18:05:36 -0000
 From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
 Reply-To: Bug 1810433 <1810433@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <154653873624.24628.7091357257162393259.malonedeb@gac.canonical.com>
-Message-Id: <154653879997.20055.11903232269152063513.malone@soybean.canonical.com>
+Message-Id: <154653873624.24628.7091357257162393259.malonedeb@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810433] Re: aarch64-linux-user master:
+Subject: [Qemu-devel] [Bug 1810433] [NEW] aarch64-linux-user master:
  inconsistent pwrite behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,93 +38,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "Test case source file"
-   https://bugs.launchpad.net/qemu/+bug/1810433/+attachment/5226714/+files/=
-main.c
+Public bug reported:
 
-** Description changed:
+Hello,
 
-  Hello,
-  =
+I am running aarch64-linux-user from master, commit
+20d6c7312f1b812bb9c750f4087f69ac8485cc90
 
-  I am running aarch64-linux-user from master, commit
-  20d6c7312f1b812bb9c750f4087f69ac8485cc90
-  =
+And I've found the following inconsistent emulation of pwrite() call when b=
+uf=3D=3DNULL and len=3D0.
+Minimal reproducible sample is the following:
 
-  And I've found the following inconsistent emulation of pwrite() call when=
- buf=3D=3DNULL and len=3D0.
-  Minimal reproducible sample is the following:
-  =
+#define _GNU_SOURCE
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
 
-  #define _GNU_SOURCE
-  #include <stdlib.h>
-  #include <stdio.h>
-  #include <unistd.h>
-  #include <sys/types.h>
-  #include <sys/stat.h>
-  #include <fcntl.h>
-  #include <string.h>
-  =
+/*
+=C2=A0System                  | Result
+-------------------------+----------------
+=C2=A0Native x86_64 4.12.14   | pwrite ret =3D 0
+=C2=A0Native aarch64 4.4.159  | pwrite ret =3D 0
+=C2=A0qemu-aarch64 at x86_64  | pwrite ret =3D -1
+=C2=A0=C2=A0=C2=A0( 20d6c7312f1b8 )     |
+*/
 
-  /*
--  System                  | Result
-+ =C2=A0System                  | Result
-  -------------------------+----------------
--  Native x86_64 4.12.14   | pwrite ret =3D 0
--  Native aarch64 4.4.159  | pwrite ret =3D 0
--  qemu-aarch64 at x86_64  | pwrite ret =3D -1
--    ( 20d6c7312f1b8 )     |
-+ =C2=A0Native x86_64 4.12.14   | pwrite ret =3D 0
-+ =C2=A0Native aarch64 4.4.159  | pwrite ret =3D 0
-+ =C2=A0qemu-aarch64 at x86_64  | pwrite ret =3D -1
-+ =C2=A0=C2=A0=C2=A0( 20d6c7312f1b8 )     |
-  */
-  =
+int main(int argc, char** argv) {
+=C2=A0int fd =3D open("test.dat", O_CREAT | O_RDWR, 0644);
+=C2=A0if (fd < 0) {
+=C2=A0=C2=A0perror("open");
+=C2=A0=C2=A0return 1;
+=C2=A0}
 
-  int main(int argc, char** argv) {
-- 	int fd =3D open("test.dat", O_CREAT | O_RDWR, 0644);
-- 	if (fd < 0) {
-- 		perror("open");
-- 		return 1;
-- 	}
-+ =C2=A0int fd =3D open("test.dat", O_CREAT | O_RDWR, 0644);
-+ =C2=A0if (fd < 0) {
-+ =C2=A0=C2=A0perror("open");
-+ =C2=A0=C2=A0return 1;
-+ =C2=A0}
-  =
+=C2=A0int ret =3D fallocate(fd, 0, 0, 1000);
+=C2=A0if (ret < 0) {
+=C2=A0=C2=A0perror("fallocate");
+=C2=A0=C2=A0return 1;
+=C2=A0}
 
-- 	int ret =3D fallocate(fd, 0, 0, 1000);
-- 	if (ret < 0) {
-- 		perror("fallocate");
-- 		return 1;
-- 	}
-+ =C2=A0int ret =3D fallocate(fd, 0, 0, 1000);
-+ =C2=A0if (ret < 0) {
-+ =C2=A0=C2=A0perror("fallocate");
-+ =C2=A0=C2=A0return 1;
-+ =C2=A0}
-  =
+=C2=A0ssize_t ret_pwrite =3D pwrite(fd, NULL, 0, 0);
+=C2=A0printf("pwrite ret =3D %ld\n", ret_pwrite);
 
-- 	ssize_t ret_pwrite =3D pwrite(fd, NULL, 0, 0);
-- 	printf("pwrite ret =3D %ld\n", ret_pwrite);
-+ =C2=A0ssize_t ret_pwrite =3D pwrite(fd, NULL, 0, 0);
-+ =C2=A0printf("pwrite ret =3D %ld\n", ret_pwrite);
-  =
+=C2=A0close(fd);
 
--         close(fd);
-+ =C2=A0close(fd);
-  =
+=C2=A0return 0;
+}
 
-- 	return 0;
-+ =C2=A0return 0;
-  }
-+ =
 
-+ =
+Please note, that the same binary executable prints different output at nat=
+ive aarch64 platform and under aarch64-linux-user
 
-+ Please note, that the same binary executable prints different output at n=
-ative aarch64 platform and under aarch64-linux-user
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 -- =
 
