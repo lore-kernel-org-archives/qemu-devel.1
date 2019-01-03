@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:39591)
+Received: from eggs.gnu.org ([208.118.235.92]:39612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf0t2-0003Ie-2X
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:07 -0500
+	(envelope-from <thuth@redhat.com>) id 1gf0t4-0003Kz-Be
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf0sx-0001xi-Rw
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46134)
+	(envelope-from <thuth@redhat.com>) id 1gf0t2-000211-9m
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gf0sx-0001wY-Bg
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:09:59 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gf0t1-00020J-UN
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:04 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  3 Jan 2019 12:09:50 +0100
-Message-Id: <1546513792-17773-2-git-send-email-thuth@redhat.com>
+Date: Thu,  3 Jan 2019 12:09:51 +0100
+Message-Id: <1546513792-17773-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1546513792-17773-1-git-send-email-thuth@redhat.com>
 References: <1546513792-17773-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] tests/endianesss: Make test independent of
+Subject: [Qemu-devel] [PATCH 2/3] tests/boot-order: Make test independent of
  global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,411 +27,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Pass around the test state explicitly, to be able to use the qtest_in*()
-and qtest_out*() function in this test.
+Pass around the QTestState from function to function, so that we can finally
+get rid of the out-of-favor global_qtest variable in this file, too.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/endianness-test.c | 329 ++++++++++++++++++++++++------------------------
- 1 file changed, 166 insertions(+), 163 deletions(-)
+ tests/boot-order-test.c | 59 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 29 insertions(+), 30 deletions(-)
 
-diff --git a/tests/endianness-test.c b/tests/endianness-test.c
-index 48680cd..5852795 100644
---- a/tests/endianness-test.c
-+++ b/tests/endianness-test.c
-@@ -48,65 +48,68 @@ static const TestCase test_cases[] = {
-     {}
- };
+diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
+index c60ebcf..a725bce 100644
+--- a/tests/boot-order-test.c
++++ b/tests/boot-order-test.c
+@@ -17,7 +17,7 @@
+ #include "standard-headers/linux/qemu_fw_cfg.h"
  
--static uint8_t isa_inb(const TestCase *test, uint16_t addr)
-+static uint8_t isa_inb(QTestState *qts, const TestCase *test, uint16_t addr)
- {
-     uint8_t value;
-     if (test->isa_base == -1) {
--        value = inb(addr);
-+        value = qtest_inb(qts, addr);
-     } else {
--        value = readb(test->isa_base + addr);
-+        value = qtest_readb(qts, test->isa_base + addr);
-     }
-     return value;
- }
+ /* TODO actually test the results and get rid of this */
+-#define qmp_discard_response(...) qobject_unref(qmp(__VA_ARGS__))
++#define qmp_discard_response(qs, ...) qobject_unref(qtest_qmp(qs, __VA_ARGS__))
  
--static uint16_t isa_inw(const TestCase *test, uint16_t addr)
-+static uint16_t isa_inw(QTestState *qts, const TestCase *test, uint16_t addr)
- {
-     uint16_t value;
-     if (test->isa_base == -1) {
--        value = inw(addr);
-+        value = qtest_inw(qts, addr);
-     } else {
--        value = readw(test->isa_base + addr);
-+        value = qtest_readw(qts, test->isa_base + addr);
-     }
-     return test->bswap ? bswap16(value) : value;
- }
+ typedef struct {
+     const char *args;
+@@ -27,31 +27,30 @@ typedef struct {
  
--static uint32_t isa_inl(const TestCase *test, uint16_t addr)
-+static uint32_t isa_inl(QTestState *qts, const TestCase *test, uint16_t addr)
+ static void test_a_boot_order(const char *machine,
+                               const char *test_args,
+-                              uint64_t (*read_boot_order)(void),
++                              uint64_t (*read_boot_order)(QTestState *),
+                               uint64_t expected_boot,
+                               uint64_t expected_reboot)
  {
-     uint32_t value;
-     if (test->isa_base == -1) {
--        value = inl(addr);
-+        value = qtest_inl(qts, addr);
-     } else {
--        value = readl(test->isa_base + addr);
-+        value = qtest_readl(qts, test->isa_base + addr);
-     }
-     return test->bswap ? bswap32(value) : value;
- }
- 
--static void isa_outb(const TestCase *test, uint16_t addr, uint8_t value)
-+static void isa_outb(QTestState *qts, const TestCase *test, uint16_t addr,
-+                     uint8_t value)
- {
-     if (test->isa_base == -1) {
--        outb(addr, value);
-+        qtest_outb(qts, addr, value);
-     } else {
--        writeb(test->isa_base + addr, value);
-+        qtest_writeb(qts, test->isa_base + addr, value);
-     }
- }
- 
--static void isa_outw(const TestCase *test, uint16_t addr, uint16_t value)
-+static void isa_outw(QTestState *qts, const TestCase *test, uint16_t addr,
-+                     uint16_t value)
- {
-     value = test->bswap ? bswap16(value) : value;
-     if (test->isa_base == -1) {
--        outw(addr, value);
-+        qtest_outw(qts, addr, value);
-     } else {
--        writew(test->isa_base + addr, value);
-+        qtest_writew(qts, test->isa_base + addr, value);
-     }
- }
- 
--static void isa_outl(const TestCase *test, uint16_t addr, uint32_t value)
-+static void isa_outl(QTestState *qts, const TestCase *test, uint16_t addr,
-+                     uint32_t value)
- {
-     value = test->bswap ? bswap32(value) : value;
-     if (test->isa_base == -1) {
--        outl(addr, value);
-+        qtest_outl(qts, addr, value);
-     } else {
--        writel(test->isa_base + addr, value);
-+        qtest_writel(qts, test->isa_base + addr, value);
-     }
- }
- 
-@@ -114,161 +117,161 @@ static void isa_outl(const TestCase *test, uint16_t addr, uint32_t value)
- static void test_endianness(gconstpointer data)
- {
-     const TestCase *test = data;
--
--    global_qtest = qtest_initf("-M %s%s%s -device pc-testdev",
--                               test->machine,
--                               test->superio ? " -device " : "",
--                               test->superio ?: "");
--    isa_outl(test, 0xe0, 0x87654321);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654321);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4321);
--    g_assert_cmphex(isa_inb(test, 0xe3), ==, 0x87);
--    g_assert_cmphex(isa_inb(test, 0xe2), ==, 0x65);
--    g_assert_cmphex(isa_inb(test, 0xe1), ==, 0x43);
--    g_assert_cmphex(isa_inb(test, 0xe0), ==, 0x21);
--
--    isa_outw(test, 0xe2, 0x8866);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x88664321);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8866);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4321);
--    g_assert_cmphex(isa_inb(test, 0xe3), ==, 0x88);
--    g_assert_cmphex(isa_inb(test, 0xe2), ==, 0x66);
--    g_assert_cmphex(isa_inb(test, 0xe1), ==, 0x43);
--    g_assert_cmphex(isa_inb(test, 0xe0), ==, 0x21);
--
--    isa_outw(test, 0xe0, 0x4422);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x88664422);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8866);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4422);
--    g_assert_cmphex(isa_inb(test, 0xe3), ==, 0x88);
--    g_assert_cmphex(isa_inb(test, 0xe2), ==, 0x66);
--    g_assert_cmphex(isa_inb(test, 0xe1), ==, 0x44);
--    g_assert_cmphex(isa_inb(test, 0xe0), ==, 0x22);
--
--    isa_outb(test, 0xe3, 0x87);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87664422);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8766);
--    g_assert_cmphex(isa_inb(test, 0xe3), ==, 0x87);
--    g_assert_cmphex(isa_inb(test, 0xe2), ==, 0x66);
--    g_assert_cmphex(isa_inb(test, 0xe1), ==, 0x44);
--    g_assert_cmphex(isa_inb(test, 0xe0), ==, 0x22);
--
--    isa_outb(test, 0xe2, 0x65);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654422);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4422);
--    g_assert_cmphex(isa_inb(test, 0xe3), ==, 0x87);
--    g_assert_cmphex(isa_inb(test, 0xe2), ==, 0x65);
--    g_assert_cmphex(isa_inb(test, 0xe1), ==, 0x44);
--    g_assert_cmphex(isa_inb(test, 0xe0), ==, 0x22);
--
--    isa_outb(test, 0xe1, 0x43);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654322);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4322);
--    g_assert_cmphex(isa_inb(test, 0xe3), ==, 0x87);
--    g_assert_cmphex(isa_inb(test, 0xe2), ==, 0x65);
--    g_assert_cmphex(isa_inb(test, 0xe1), ==, 0x43);
--    g_assert_cmphex(isa_inb(test, 0xe0), ==, 0x22);
--
--    isa_outb(test, 0xe0, 0x21);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654321);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4321);
--    g_assert_cmphex(isa_inb(test, 0xe3), ==, 0x87);
--    g_assert_cmphex(isa_inb(test, 0xe2), ==, 0x65);
--    g_assert_cmphex(isa_inb(test, 0xe1), ==, 0x43);
--    g_assert_cmphex(isa_inb(test, 0xe0), ==, 0x21);
--    qtest_quit(global_qtest);
+     uint64_t actual;
 +    QTestState *qts;
-+
-+    qts = qtest_initf("-M %s%s%s -device pc-testdev", test->machine,
-+                      test->superio ? " -device " : "",
-+                      test->superio ?: "");
-+    isa_outl(qts, test, 0xe0, 0x87654321);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87654321);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4321);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe3), ==, 0x87);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe2), ==, 0x65);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe1), ==, 0x43);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe0), ==, 0x21);
-+
-+    isa_outw(qts, test, 0xe2, 0x8866);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x88664321);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8866);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4321);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe3), ==, 0x88);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe2), ==, 0x66);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe1), ==, 0x43);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe0), ==, 0x21);
-+
-+    isa_outw(qts, test, 0xe0, 0x4422);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x88664422);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8866);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4422);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe3), ==, 0x88);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe2), ==, 0x66);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe1), ==, 0x44);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe0), ==, 0x22);
-+
-+    isa_outb(qts, test, 0xe3, 0x87);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87664422);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8766);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe3), ==, 0x87);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe2), ==, 0x66);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe1), ==, 0x44);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe0), ==, 0x22);
-+
-+    isa_outb(qts, test, 0xe2, 0x65);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87654422);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4422);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe3), ==, 0x87);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe2), ==, 0x65);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe1), ==, 0x44);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe0), ==, 0x22);
-+
-+    isa_outb(qts, test, 0xe1, 0x43);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87654322);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4322);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe3), ==, 0x87);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe2), ==, 0x65);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe1), ==, 0x43);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe0), ==, 0x22);
-+
-+    isa_outb(qts, test, 0xe0, 0x21);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87654321);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4321);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe3), ==, 0x87);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe2), ==, 0x65);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe1), ==, 0x43);
-+    g_assert_cmphex(isa_inb(qts, test, 0xe0), ==, 0x21);
+ 
+-    global_qtest = qtest_initf("-nodefaults%s%s %s",
+-                               machine ? " -M " : "",
+-                               machine ?: "",
+-                               test_args);
+-    actual = read_boot_order();
++    qts = qtest_initf("-nodefaults%s%s %s", machine ? " -M " : "",
++                      machine ?: "", test_args);
++    actual = read_boot_order(qts);
+     g_assert_cmphex(actual, ==, expected_boot);
+-    qmp_discard_response("{ 'execute': 'system_reset' }");
++    qmp_discard_response(qts, "{ 'execute': 'system_reset' }");
+     /*
+      * system_reset only requests reset.  We get a RESET event after
+      * the actual reset completes.  Need to wait for that.
+      */
+-    qmp_eventwait("RESET");
+-    actual = read_boot_order();
++    qtest_qmp_eventwait(qts, "RESET");
++    actual = read_boot_order(qts);
+     g_assert_cmphex(actual, ==, expected_reboot);
+-    qtest_quit(global_qtest);
 +    qtest_quit(qts);
  }
  
- static void test_endianness_split(gconstpointer data)
+ static void test_boot_orders(const char *machine,
+-                             uint64_t (*read_boot_order)(void),
++                             uint64_t (*read_boot_order)(QTestState *),
+                              const boot_order_test *tests)
  {
-     const TestCase *test = data;
--
--    global_qtest = qtest_initf("-M %s%s%s -device pc-testdev",
--                               test->machine,
--                               test->superio ? " -device " : "",
--                               test->superio ?: "");
--    isa_outl(test, 0xe8, 0x87654321);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654321);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4321);
--
--    isa_outw(test, 0xea, 0x8866);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x88664321);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8866);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4321);
--
--    isa_outw(test, 0xe8, 0x4422);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x88664422);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8866);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4422);
--
--    isa_outb(test, 0xeb, 0x87);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87664422);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8766);
--
--    isa_outb(test, 0xea, 0x65);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654422);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4422);
--
--    isa_outb(test, 0xe9, 0x43);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654322);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4322);
--
--    isa_outb(test, 0xe8, 0x21);
--    g_assert_cmphex(isa_inl(test, 0xe0), ==, 0x87654321);
--    g_assert_cmphex(isa_inw(test, 0xe2), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe0), ==, 0x4321);
--    qtest_quit(global_qtest);
-+    QTestState *qts;
-+
-+    qts = qtest_initf("-M %s%s%s -device pc-testdev", test->machine,
-+                      test->superio ? " -device " : "",
-+                      test->superio ?: "");
-+    isa_outl(qts, test, 0xe8, 0x87654321);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87654321);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4321);
-+
-+    isa_outw(qts, test, 0xea, 0x8866);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x88664321);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8866);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4321);
-+
-+    isa_outw(qts, test, 0xe8, 0x4422);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x88664422);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8866);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4422);
-+
-+    isa_outb(qts, test, 0xeb, 0x87);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87664422);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8766);
-+
-+    isa_outb(qts, test, 0xea, 0x65);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87654422);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4422);
-+
-+    isa_outb(qts, test, 0xe9, 0x43);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87654322);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4322);
-+
-+    isa_outb(qts, test, 0xe8, 0x21);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe0), ==, 0x87654321);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe2), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe0), ==, 0x4321);
-+    qtest_quit(qts);
+     int i;
+@@ -64,16 +63,16 @@ static void test_boot_orders(const char *machine,
+     }
  }
  
- static void test_endianness_combine(gconstpointer data)
+-static uint8_t read_mc146818(uint16_t port, uint8_t reg)
++static uint8_t read_mc146818(QTestState *qts, uint16_t port, uint8_t reg)
  {
-     const TestCase *test = data;
--
--    global_qtest = qtest_initf("-M %s%s%s -device pc-testdev",
--                               test->machine,
--                               test->superio ? " -device " : "",
--                               test->superio ?: "");
--    isa_outl(test, 0xe0, 0x87654321);
--    g_assert_cmphex(isa_inl(test, 0xe8), ==, 0x87654321);
--    g_assert_cmphex(isa_inw(test, 0xea), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe8), ==, 0x4321);
--
--    isa_outw(test, 0xe2, 0x8866);
--    g_assert_cmphex(isa_inl(test, 0xe8), ==, 0x88664321);
--    g_assert_cmphex(isa_inw(test, 0xea), ==, 0x8866);
--    g_assert_cmphex(isa_inw(test, 0xe8), ==, 0x4321);
--
--    isa_outw(test, 0xe0, 0x4422);
--    g_assert_cmphex(isa_inl(test, 0xe8), ==, 0x88664422);
--    g_assert_cmphex(isa_inw(test, 0xea), ==, 0x8866);
--    g_assert_cmphex(isa_inw(test, 0xe8), ==, 0x4422);
--
--    isa_outb(test, 0xe3, 0x87);
--    g_assert_cmphex(isa_inl(test, 0xe8), ==, 0x87664422);
--    g_assert_cmphex(isa_inw(test, 0xea), ==, 0x8766);
--
--    isa_outb(test, 0xe2, 0x65);
--    g_assert_cmphex(isa_inl(test, 0xe8), ==, 0x87654422);
--    g_assert_cmphex(isa_inw(test, 0xea), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe8), ==, 0x4422);
--
--    isa_outb(test, 0xe1, 0x43);
--    g_assert_cmphex(isa_inl(test, 0xe8), ==, 0x87654322);
--    g_assert_cmphex(isa_inw(test, 0xea), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe8), ==, 0x4322);
--
--    isa_outb(test, 0xe0, 0x21);
--    g_assert_cmphex(isa_inl(test, 0xe8), ==, 0x87654321);
--    g_assert_cmphex(isa_inw(test, 0xea), ==, 0x8765);
--    g_assert_cmphex(isa_inw(test, 0xe8), ==, 0x4321);
--    qtest_quit(global_qtest);
-+    QTestState *qts;
-+
-+    qts = qtest_initf("-M %s%s%s -device pc-testdev", test->machine,
-+                      test->superio ? " -device " : "",
-+                      test->superio ?: "");
-+    isa_outl(qts, test, 0xe0, 0x87654321);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe8), ==, 0x87654321);
-+    g_assert_cmphex(isa_inw(qts, test, 0xea), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe8), ==, 0x4321);
-+
-+    isa_outw(qts, test, 0xe2, 0x8866);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe8), ==, 0x88664321);
-+    g_assert_cmphex(isa_inw(qts, test, 0xea), ==, 0x8866);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe8), ==, 0x4321);
-+
-+    isa_outw(qts, test, 0xe0, 0x4422);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe8), ==, 0x88664422);
-+    g_assert_cmphex(isa_inw(qts, test, 0xea), ==, 0x8866);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe8), ==, 0x4422);
-+
-+    isa_outb(qts, test, 0xe3, 0x87);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe8), ==, 0x87664422);
-+    g_assert_cmphex(isa_inw(qts, test, 0xea), ==, 0x8766);
-+
-+    isa_outb(qts, test, 0xe2, 0x65);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe8), ==, 0x87654422);
-+    g_assert_cmphex(isa_inw(qts, test, 0xea), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe8), ==, 0x4422);
-+
-+    isa_outb(qts, test, 0xe1, 0x43);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe8), ==, 0x87654322);
-+    g_assert_cmphex(isa_inw(qts, test, 0xea), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe8), ==, 0x4322);
-+
-+    isa_outb(qts, test, 0xe0, 0x21);
-+    g_assert_cmphex(isa_inl(qts, test, 0xe8), ==, 0x87654321);
-+    g_assert_cmphex(isa_inw(qts, test, 0xea), ==, 0x8765);
-+    g_assert_cmphex(isa_inw(qts, test, 0xe8), ==, 0x4321);
-+    qtest_quit(qts);
+-    outb(port, reg);
+-    return inb(port + 1);
++    qtest_outb(qts, port, reg);
++    return qtest_inb(qts, port + 1);
  }
  
- int main(int argc, char **argv)
+-static uint64_t read_boot_order_pc(void)
++static uint64_t read_boot_order_pc(QTestState *qts)
+ {
+-    uint8_t b1 = read_mc146818(0x70, 0x38);
+-    uint8_t b2 = read_mc146818(0x70, 0x3d);
++    uint8_t b1 = read_mc146818(qts, 0x70, 0x38);
++    uint8_t b2 = read_mc146818(qts, 0x70, 0x3d);
+ 
+     return b1 | (b2 << 8);
+ }
+@@ -109,16 +108,16 @@ static void test_pc_boot_order(void)
+     test_boot_orders(NULL, read_boot_order_pc, test_cases_pc);
+ }
+ 
+-static uint8_t read_m48t59(uint64_t addr, uint16_t reg)
++static uint8_t read_m48t59(QTestState *qts, uint64_t addr, uint16_t reg)
+ {
+-    writeb(addr, reg & 0xff);
+-    writeb(addr + 1, reg >> 8);
+-    return readb(addr + 3);
++    qtest_writeb(qts, addr, reg & 0xff);
++    qtest_writeb(qts, addr + 1, reg >> 8);
++    return qtest_readb(qts, addr + 3);
+ }
+ 
+-static uint64_t read_boot_order_prep(void)
++static uint64_t read_boot_order_prep(QTestState *qts)
+ {
+-    return read_m48t59(0x80000000 + 0x74, 0x34);
++    return read_m48t59(qts, 0x80000000 + 0x74, 0x34);
+ }
+ 
+ static const boot_order_test test_cases_prep[] = {
+@@ -133,9 +132,9 @@ static void test_prep_boot_order(void)
+     test_boot_orders("prep", read_boot_order_prep, test_cases_prep);
+ }
+ 
+-static uint64_t read_boot_order_pmac(void)
++static uint64_t read_boot_order_pmac(QTestState *qts)
+ {
+-    QFWCFG *fw_cfg = mm_fw_cfg_init(global_qtest, 0xf0000510);
++    QFWCFG *fw_cfg = mm_fw_cfg_init(qts, 0xf0000510);
+ 
+     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
+ }
+@@ -158,9 +157,9 @@ static void test_pmac_newworld_boot_order(void)
+     test_boot_orders("mac99", read_boot_order_pmac, test_cases_fw_cfg);
+ }
+ 
+-static uint64_t read_boot_order_sun4m(void)
++static uint64_t read_boot_order_sun4m(QTestState *qts)
+ {
+-    QFWCFG *fw_cfg = mm_fw_cfg_init(global_qtest, 0xd00000510ULL);
++    QFWCFG *fw_cfg = mm_fw_cfg_init(qts, 0xd00000510ULL);
+ 
+     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
+ }
+@@ -170,9 +169,9 @@ static void test_sun4m_boot_order(void)
+     test_boot_orders("SS-5", read_boot_order_sun4m, test_cases_fw_cfg);
+ }
+ 
+-static uint64_t read_boot_order_sun4u(void)
++static uint64_t read_boot_order_sun4u(QTestState *qts)
+ {
+-    QFWCFG *fw_cfg = io_fw_cfg_init(global_qtest, 0x510);
++    QFWCFG *fw_cfg = io_fw_cfg_init(qts, 0x510);
+ 
+     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
+ }
 -- 
 1.8.3.1
