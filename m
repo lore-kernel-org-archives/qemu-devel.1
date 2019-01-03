@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:33616)
+Received: from eggs.gnu.org ([208.118.235.92]:35851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gf1zQ-0003Lr-T3
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:20:45 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf291-0006Tj-U5
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:30:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gf1zN-0002KM-PV
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:20:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gf1zN-0002Jp-JY
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:20:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gf1zM-0007kv-7m
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 12:20:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 324AA2E806E
-	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 12:20:40 +0000 (UTC)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gf28y-000131-PT
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:30:39 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:35875
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gf28y-0000nG-JC
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:30:36 -0500
+References: <1546443980-26779-1-git-send-email-thuth@redhat.com>
+	<c2648f00-c44f-7f8e-8673-501b88f1e125@redhat.com>
+	<17ed4887-1784-960e-d82e-ec90d98efc82@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <e6074237-548f-9330-df19-00064e68d300@ilande.co.uk>
+Date: Thu, 3 Jan 2019 12:30:13 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 03 Jan 2019 12:11:44 -0000
-From: David <1810405@bugs.launchpad.net>
-Reply-To: Bug 1810405 <1810405@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154651750421.25988.5720567987776657968.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810405] [NEW] source tarball has errors when
- untarring
+In-Reply-To: <17ed4887-1784-960e-d82e-ec90d98efc82@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add some missing
+ SPARC-related files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,77 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
 
-Public bug reported:
+On 03/01/2019 07:19, Thomas Huth wrote:
+> On 2019-01-02 20:34, Philippe Mathieu-Daudé wrote:
+>> Hi Thomas,
+>>
+>> On 1/2/19 4:46 PM, Thomas Huth wrote:
+>>> These files / devices are only used by SPARC machines, so we can sort
+>>> them into the corresponding categories in the MAINTAINERS file.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  MAINTAINERS | 6 +++++-
+>>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index b6c2645..e897963 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -1069,9 +1069,11 @@ M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>>  S: Maintained
+>>>  F: hw/sparc/sun4m.c
+>>>  F: hw/sparc/sun4m_iommu.c
+>>> +F: hw/display/cg3.c
+>>> +F: hw/display/tcx.c
+>>>  F: hw/dma/sparc32_dma.c
+>>>  F: hw/misc/eccmemctl.c
+>>> -F: hw/misc/slavio_misc.c
+>>> +F: hw/*/slavio_*.c
+>>>  F: include/hw/sparc/sparc32_dma.h
+>>>  F: pc-bios/openbios-sparc32
+>>>  F: include/hw/sparc/sun4m_iommu.h
+>>> @@ -1083,6 +1085,8 @@ F: hw/sparc64/sun4u.c
+>>>  F: pc-bios/openbios-sparc64
+>>>  F: hw/pci-host/sabre.c
+>>>  F: include/hw/pci-host/sabre.h
+>>> +F: include/hw/sparc/sun4u_iommu.h
+>>
+>> I sent a patch to trivial@ with other sun4u changes, reviewed by Mark:
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04467.html
+> 
+> Oh, right, sorry!
+> 
+>> Neither mine nor your are complete :)
+>> Can I include your patch when respining the series? (Not sure I need to
+>> respin although).
+> 
+> Sure!
 
-If you download qemu-2.10.0.tar.xv and/or qemu-2.10.1.tar.xv, and follow
-the directions at https://www.qemu.org/download/, you get a tar error.
+Certainly these extra files look correct to me - Philippe, I think I already gave R-B
+tags for these, so feel free to keep them when you re-post the series with Thomas's
+changes.
 
 
-To repro:
-$ wget  https://download.qemu.org/qemu-2.10.0.tar.xz
-$ tar  xJf qemu-2.10.0.tar.xz =
+ATB,
 
-tar: qemu-2.10.0/roms/u-boot/scripts/Kconfig: Cannot open: File exists
-tar: Exiting with failure status due to previous errors
-
-$ tar --version
-tar (GNU tar) 1.29
-Copyright (C) 2015 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.htm=
-l>.
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-
-Written by John Gilmore and Jay Fenlason.
-
-
-Apologies if I'm being an idiot here.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810405
-
-Title:
-  source tarball has errors when untarring
-
-Status in QEMU:
-  New
-
-Bug description:
-  If you download qemu-2.10.0.tar.xv and/or qemu-2.10.1.tar.xv, and
-  follow the directions at https://www.qemu.org/download/, you get a tar
-  error.
-
-  =
-
-  To repro:
-  $ wget  https://download.qemu.org/qemu-2.10.0.tar.xz
-  $ tar  xJf qemu-2.10.0.tar.xz =
-
-  tar: qemu-2.10.0/roms/u-boot/scripts/Kconfig: Cannot open: File exists
-  tar: Exiting with failure status due to previous errors
-
-  $ tar --version
-  tar (GNU tar) 1.29
-  Copyright (C) 2015 Free Software Foundation, Inc.
-  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
-tml>.
-  This is free software: you are free to change and redistribute it.
-  There is NO WARRANTY, to the extent permitted by law.
-
-  Written by John Gilmore and Jay Fenlason.
-
-  =
-
-  Apologies if I'm being an idiot here.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810405/+subscriptions
+Mark.
