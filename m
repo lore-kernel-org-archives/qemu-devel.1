@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38286)
+Received: from eggs.gnu.org ([208.118.235.92]:38287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6UA-0004Zs-Jl
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6UA-0004Zt-Jn
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6U7-0007eS-Ky
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf6U7-0007eO-KX
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:46 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:46152 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:46153 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gf6U7-0007Oc-3e
+	id 1gf6U7-0007Of-2Q
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:08:43 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu,  3 Jan 2019 18:07:44 +0100
-Message-Id: <1546535297-11040-12-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  3 Jan 2019 18:07:45 +0100
+Message-Id: <1546535297-11040-13-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 11/44] target/mips: MXU: Add handler for an
- align instruction
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 12/44] target/mips: Support R5900
+ three-operand MADD and MADDU instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,230 +31,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Add translation handler for S32ALNI MXU instruction.
+The three-operand MADD and MADDU are specific to Sony R5900 core,
+and Toshiba TX19/TX39/TX79 cores as well.
 
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+The "32-Bit TX System RISC TX39 Family Architecture manual"
+is available at https://wiki.qemu.org/File:DSAE0022432.pdf
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9<f4bug@amsat.org>
+Signed-off-by: Fredrik Noring <noring@nocrew.org>
+Tested-by: Fredrik Noring <noring@nocrew.org>
 ---
- target/mips/translate.c | 197 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 194 insertions(+), 3 deletions(-)
+ target/mips/translate.c | 58 +++++++++++++++++++++++++++++++++++++++++++=
++-----
+ 1 file changed, 53 insertions(+), 5 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 44142ea..c79f988 100644
+index c79f988..0a49926 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -25100,6 +25100,199 @@ static void gen_mxu_Q8MAX_Q8MIN(DisasContext *ctx)
- 
- 
+@@ -5033,8 +5033,8 @@ static void gen_muldiv(DisasContext *ctx, uint32_t =
+opc,
+ }
+=20
  /*
-+ *                 MXU instruction category: align
-+ *                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- * These MULT and MULTU instructions implemented in for example the
+- * Toshiba/Sony R5900 and the Toshiba TX19, TX39 and TX79 core
++ * These MULT[U] and MADD[U] instructions implemented in for example
++ * the Toshiba/Sony R5900 and the Toshiba TX19, TX39 and TX79 core
+  * architectures are special three-operand variants with the syntax
+  *
+  *     MULT[U][1] rd, rs, rt
+@@ -5043,6 +5043,14 @@ static void gen_muldiv(DisasContext *ctx, uint32_t=
+ opc,
+  *
+  *     (rd, LO, HI) <- rs * rt
+  *
++ * and
 + *
-+ *                       S32ALN     S32ALNI
-+ */
-+
-+/*
-+ *  S32ALNI XRc, XRb, XRa, optn3
-+ *    Arrange bytes from XRb and XRc according to one of five sets of
-+ *    rules determined by optn3, and place the result in XRa.
++ *     MADD[U]    rd, rs, rt
 + *
-+ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-+ *  +-----------+-----+---+-----+-------+-------+-------+-----------+
-+ *  |  SPECIAL2 |optn3|0 0|x x x|  XRc  |  XRb  |  XRa  |MXU__POOL16|
-+ *  +-----------+-----+---+-----+-------+-------+-------+-----------+
++ * such that
 + *
-+ */
-+static void gen_mxu_S32ALNI(DisasContext *ctx)
-+{
-+    uint32_t optn3, pad, XRc, XRb, XRa;
++ *     (rd, LO, HI) <- (LO, HI) + rs * rt
++ *
+  * where the low-order 32-bits of the result is placed into both the
+  * GPR rd and the special register LO. The high-order 32-bits of the
+  * result is placed into the special register HI.
+@@ -5099,8 +5107,48 @@ static void gen_mul_txx9(DisasContext *ctx, uint32=
+_t opc,
+             tcg_temp_free_i32(t3);
+         }
+         break;
++    case MMI_OPC_MADD:
++        {
++            TCGv_i64 t2 =3D tcg_temp_new_i64();
++            TCGv_i64 t3 =3D tcg_temp_new_i64();
 +
-+    optn3 = extract32(ctx->opcode,  23, 3);
-+    pad   = extract32(ctx->opcode,  21, 2);
-+    XRc   = extract32(ctx->opcode, 14, 4);
-+    XRb   = extract32(ctx->opcode, 10, 4);
-+    XRa   = extract32(ctx->opcode,  6, 4);
-+
-+    if (unlikely(pad != 0)) {
-+        /* opcode padding incorrect -> do nothing */
-+    } else if (unlikely(XRa == 0)) {
-+        /* destination is zero register -> do nothing */
-+    } else if (unlikely((XRb == 0) && (XRc == 0))) {
-+        /* both operands zero registers -> just set destination to all 0s */
-+        tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
-+    } else if (unlikely(XRb == 0)) {
-+        /* XRb zero register -> just appropriatelly shift XRc into XRa */
-+        switch (optn3) {
-+        case MXU_OPTN3_PTN0:
-+            tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
-+            break;
-+        case MXU_OPTN3_PTN1:
-+        case MXU_OPTN3_PTN2:
-+        case MXU_OPTN3_PTN3:
-+            tcg_gen_shri_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1],
-+                             8 * (4 - optn3));
-+            break;
-+        case MXU_OPTN3_PTN4:
-+            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1]);
-+            break;
++            tcg_gen_ext_tl_i64(t2, t0);
++            tcg_gen_ext_tl_i64(t3, t1);
++            tcg_gen_mul_i64(t2, t2, t3);
++            tcg_gen_concat_tl_i64(t3, cpu_LO[acc], cpu_HI[acc]);
++            tcg_gen_add_i64(t2, t2, t3);
++            tcg_temp_free_i64(t3);
++            gen_move_low32(cpu_LO[acc], t2);
++            gen_move_high32(cpu_HI[acc], t2);
++            if (rd) {
++                gen_move_low32(cpu_gpr[rd], t2);
++            }
++            tcg_temp_free_i64(t2);
 +        }
-+    } else if (unlikely(XRc == 0)) {
-+        /* XRc zero register -> just appropriatelly shift XRb into XRa */
-+        switch (optn3) {
-+        case MXU_OPTN3_PTN0:
-+            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
-+            break;
-+        case MXU_OPTN3_PTN1:
-+        case MXU_OPTN3_PTN2:
-+        case MXU_OPTN3_PTN3:
-+            tcg_gen_shri_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1], 8 * optn3);
-+            break;
-+        case MXU_OPTN3_PTN4:
-+            tcg_gen_movi_i32(mxu_gpr[XRa - 1], 0);
-+            break;
++        break;
++    case MMI_OPC_MADDU:
++        {
++            TCGv_i64 t2 =3D tcg_temp_new_i64();
++            TCGv_i64 t3 =3D tcg_temp_new_i64();
++
++            tcg_gen_ext32u_tl(t0, t0);
++            tcg_gen_ext32u_tl(t1, t1);
++            tcg_gen_extu_tl_i64(t2, t0);
++            tcg_gen_extu_tl_i64(t3, t1);
++            tcg_gen_mul_i64(t2, t2, t3);
++            tcg_gen_concat_tl_i64(t3, cpu_LO[acc], cpu_HI[acc]);
++            tcg_gen_add_i64(t2, t2, t3);
++            tcg_temp_free_i64(t3);
++            gen_move_low32(cpu_LO[acc], t2);
++            gen_move_high32(cpu_HI[acc], t2);
++            if (rd) {
++                gen_move_low32(cpu_gpr[rd], t2);
++            }
++            tcg_temp_free_i64(t2);
 +        }
-+    } else if (unlikely(XRb == XRc)) {
-+        /* both operands same -> just rotation or moving from any of them */
-+        switch (optn3) {
-+        case MXU_OPTN3_PTN0:
-+        case MXU_OPTN3_PTN4:
-+            tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
-+            break;
-+        case MXU_OPTN3_PTN1:
-+        case MXU_OPTN3_PTN2:
-+        case MXU_OPTN3_PTN3:
-+            tcg_gen_rotli_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1], 8 * optn3);
-+            break;
-+        }
-+    } else {
-+        /* the most general case */
-+        switch (optn3) {
-+        case MXU_OPTN3_PTN0:
-+            {
-+                /*                                         */
-+                /*         XRb                XRc          */
-+                /*  +---------------+                      */
-+                /*  | A   B   C   D |    E   F   G   H     */
-+                /*  +-------+-------+                      */
-+                /*          |                              */
-+                /*         XRa                             */
-+                /*                                         */
-+
-+                tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRb - 1]);
-+            }
-+            break;
-+        case MXU_OPTN3_PTN1:
-+            {
-+                /*                                         */
-+                /*         XRb                 XRc         */
-+                /*      +-------------------+              */
-+                /*    A | B   C   D       E | F   G   H    */
-+                /*      +---------+---------+              */
-+                /*                |                        */
-+                /*               XRa                       */
-+                /*                                         */
-+
-+                TCGv_i32 t0 = tcg_temp_new();
-+                TCGv_i32 t1 = tcg_temp_new();
-+
-+                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x00FFFFFF);
-+                tcg_gen_shli_i32(t0, t0, 8);
-+
-+                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFF000000);
-+                tcg_gen_shri_i32(t1, t1, 24);
-+
-+                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
-+
-+                tcg_temp_free(t1);
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case MXU_OPTN3_PTN2:
-+            {
-+                /*                                         */
-+                /*         XRb                 XRc         */
-+                /*          +-------------------+          */
-+                /*    A   B | C   D       E   F | G   H    */
-+                /*          +---------+---------+          */
-+                /*                    |                    */
-+                /*                   XRa                   */
-+                /*                                         */
-+
-+                TCGv_i32 t0 = tcg_temp_new();
-+                TCGv_i32 t1 = tcg_temp_new();
-+
-+                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x0000FFFF);
-+                tcg_gen_shli_i32(t0, t0, 16);
-+
-+                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFF0000);
-+                tcg_gen_shri_i32(t1, t1, 16);
-+
-+                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
-+
-+                tcg_temp_free(t1);
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case MXU_OPTN3_PTN3:
-+            {
-+                /*                                         */
-+                /*         XRb                 XRc         */
-+                /*              +-------------------+      */
-+                /*    A   B   C | D       E   F   G | H    */
-+                /*              +---------+---------+      */
-+                /*                        |                */
-+                /*                       XRa               */
-+                /*                                         */
-+
-+                TCGv_i32 t0 = tcg_temp_new();
-+                TCGv_i32 t1 = tcg_temp_new();
-+
-+                tcg_gen_andi_i32(t0, mxu_gpr[XRb - 1], 0x000000FF);
-+                tcg_gen_shli_i32(t0, t0, 24);
-+
-+                tcg_gen_andi_i32(t1, mxu_gpr[XRc - 1], 0xFFFFFF00);
-+                tcg_gen_shri_i32(t1, t1, 8);
-+
-+                tcg_gen_or_i32(mxu_gpr[XRa - 1], t0, t1);
-+
-+                tcg_temp_free(t1);
-+                tcg_temp_free(t0);
-+            }
-+            break;
-+        case MXU_OPTN3_PTN4:
-+            {
-+                /*                                         */
-+                /*         XRb                 XRc         */
-+                /*                     +---------------+   */
-+                /*    A   B   C   D    | E   F   G   H |   */
-+                /*                     +-------+-------+   */
-+                /*                             |           */
-+                /*                            XRa          */
-+                /*                                         */
-+
-+                tcg_gen_mov_i32(mxu_gpr[XRa - 1], mxu_gpr[XRc - 1]);
-+            }
-+            break;
-+        }
-+    }
-+}
-+
-+
-+/*
-  * Decoding engine for MXU
-  * =======================
-  */
-@@ -25761,9 +25954,7 @@ static void decode_opc_mxu__pool16(CPUMIPSState *env, DisasContext *ctx)
++        break;
+     default:
+-        MIPS_INVAL("mul TXx9");
++        MIPS_INVAL("mul/madd TXx9");
          generate_exception_end(ctx, EXCP_RI);
+         goto out;
+     }
+@@ -27320,6 +27368,8 @@ static void decode_mmi(CPUMIPSState *env, DisasCo=
+ntext *ctx)
          break;
-     case OPC_MXU_S32ALNI:
--        /* TODO: Implement emulation of S32ALNI instruction. */
--        MIPS_INVAL("OPC_MXU_S32ALNI");
--        generate_exception_end(ctx, EXCP_RI);
-+        gen_mxu_S32ALNI(ctx);
+     case MMI_OPC_MULT1:
+     case MMI_OPC_MULTU1:
++    case MMI_OPC_MADD:
++    case MMI_OPC_MADDU:
+         gen_mul_txx9(ctx, opc, rd, rs, rt);
          break;
-     case OPC_MXU_S32LUI:
-         /* TODO: Implement emulation of S32LUI instruction. */
--- 
+     case MMI_OPC_DIV1:
+@@ -27334,8 +27384,6 @@ static void decode_mmi(CPUMIPSState *env, DisasCo=
+ntext *ctx)
+     case MMI_OPC_MFHI1:
+         gen_HILO1_tx79(ctx, opc, rd);
+         break;
+-    case MMI_OPC_MADD:          /* TODO: MMI_OPC_MADD */
+-    case MMI_OPC_MADDU:         /* TODO: MMI_OPC_MADDU */
+     case MMI_OPC_PLZCW:         /* TODO: MMI_OPC_PLZCW */
+     case MMI_OPC_MADD1:         /* TODO: MMI_OPC_MADD1 */
+     case MMI_OPC_MADDU1:        /* TODO: MMI_OPC_MADDU1 */
+--=20
 2.7.4
