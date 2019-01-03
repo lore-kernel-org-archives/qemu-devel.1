@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53855)
+Received: from eggs.gnu.org ([208.118.235.92]:53848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geugM-0003Xn-9g
+	(envelope-from <dgibson@ozlabs.org>) id 1geugM-0003Xl-0B
 	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 23:32:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geugK-0005ei-Qc
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 23:32:34 -0500
-Date: Thu, 3 Jan 2019 14:57:26 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1geugK-0005eK-N6
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 23:32:33 -0500
+Received: from ozlabs.org ([203.11.71.1]:51899)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1geug6-0005FM-L7
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 23:32:21 -0500
+Date: Thu, 3 Jan 2019 14:43:06 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190103035726.GR10853@umbus.fritz.box>
-References: <20190102055743.5052-1-clg@kaod.org>
-	<20190102055743.5052-3-clg@kaod.org>
+Message-ID: <20190103034305.GQ10853@umbus.fritz.box>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-11-fli@suse.com>
+	<20190102023609.GC27457@umbus.fritz.box>
+	<2c10669c-2f43-6b98-ef02-c4b2edbd21ad@126.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Bi+HF1AHjw0mn3zx"
+	protocol="application/pgp-signature"; boundary="i13qRg9tmWEwo36p"
 Content-Disposition: inline
-In-Reply-To: <20190102055743.5052-3-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 02/10] ppc/xive: introduce a XiveTCTX
- pointer under PowerPCCPU
+In-Reply-To: <2c10669c-2f43-6b98-ef02-c4b2edbd21ad@126.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 10/16] qemu_thread: supplement
+ error handling for h_resize_hpt_prepare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,157 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?utf-8?B?5p2O6I+y?= <lifei1214@126.com>
+Cc: Fei Li <fli@suse.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com, Markus Armbruster <armbru@redhat.com>
 
 
---Bi+HF1AHjw0mn3zx
-Content-Type: text/plain; charset=iso-8859-1
+--i13qRg9tmWEwo36p
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 02, 2019 at 06:57:35AM +0100, C=E9dric Le Goater wrote:
-> which will be used by the machine only when the XIVE interrupt mode is
-> in use.
-
-I don't love the idea of putting a hook this specific into the
-PowerPCCPU structure, though it might be the easiest path in the short
-term.
-
-A couple of approaches: 1) revisit my changes to allow for a pointer
-to machine-defined per-cpu data.  or 2) do we actually need a cpu to
-tctx pointer.
-
-Expanding on (2) - here you use the pointer to find the right TIMA
-state to access, but that could also be handled by having different
-TIMA IO instances and mapping those individually to cpu_as.  On the
-interrupt delivery side I think a tctx to cpu link will suffice.  For
-sPAPR there might be complications with translating cpu numbers in
-hcalls to the right tctx.
-
+On Wed, Jan 02, 2019 at 02:44:17PM +0800, =E6=9D=8E=E8=8F=B2 wrote:
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  target/ppc/cpu.h        | 2 ++
->  hw/intc/xive.c          | 6 +++---
->  hw/ppc/spapr_cpu_core.c | 7 ++++++-
->  hw/ppc/spapr_irq.c      | 8 ++++----
->  4 files changed, 15 insertions(+), 8 deletions(-)
+> =E5=9C=A8 2019/1/2 =E4=B8=8A=E5=8D=8810:36, David Gibson =E5=86=99=E9=81=
+=93:
+> > On Tue, Dec 25, 2018 at 10:04:43PM +0800, Fei Li wrote:
+> > > Add a local_err to hold the error, and return the corresponding
+> > > error code to replace the temporary &error_abort.
+> > >=20
+> > > Cc: Markus Armbruster <armbru@redhat.com>
+> > > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > > Signed-off-by: Fei Li <fli@suse.com>
+> > This looks like a good change, but it no longer applies due to a
+> > change in the qemu_thread_create() signature.
+> Sorry that I am not sure whether I understand. Do you mean using
+> &error_abort is more suitable for this handling, rather than report
+> the &local_err & return a failure reason?
+
+No, I just mean that context has been altered by a global change and
+the patch will need to be fixed up to cope with that.
+
+> >=20
+> > > ---
+> > >   hw/ppc/spapr_hcall.c | 12 ++++++++----
+> > >   1 file changed, 8 insertions(+), 4 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> > > index 5bc2cf4540..7c16ade04a 100644
+> > > --- a/hw/ppc/spapr_hcall.c
+> > > +++ b/hw/ppc/spapr_hcall.c
+> > > @@ -478,6 +478,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCC=
+PU *cpu,
+> > >       sPAPRPendingHPT *pending =3D spapr->pending_hpt;
+> > >       uint64_t current_ram_size;
+> > >       int rc;
+> > > +    Error *local_err =3D NULL;
+> > >       if (spapr->resize_hpt =3D=3D SPAPR_RESIZE_HPT_DISABLED) {
+> > >           return H_AUTHORITY;
+> > > @@ -538,10 +539,13 @@ static target_ulong h_resize_hpt_prepare(PowerP=
+CCPU *cpu,
+> > >       pending->shift =3D shift;
+> > >       pending->ret =3D H_HARDWARE;
+> > > -    /* TODO: let the further caller handle the error instead of abor=
+t() here */
+> > > -    qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
+> > > -                       hpt_prepare_thread, pending,
+> > > -                       QEMU_THREAD_DETACHED, &error_abort);
+> > > +    if (!qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
+> > > +                            hpt_prepare_thread, pending,
+> > > +                            QEMU_THREAD_DETACHED, &local_err)) {
+> > > +        error_reportf_err(local_err, "failed to create hpt_prepare_t=
+hread: ");
+> > > +        g_free(pending);
+> > > +        return H_RESOURCE;
+> > I also think H_HARDWARE would be a better choice here.  Although the
+> > failure is due to a resource constraint, it's not because the guest
+> > asked for too much, just because the host is in dire straits.  From
+> > the guest's point of view it's basically a hardware failure.
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index d5f99f1fc7b9..c76036985623 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1177,6 +1177,7 @@ do {                                            \
-> =20
->  typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
->  typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
-> +typedef struct XiveTCTX XiveTCTX;
-> =20
->  /**
->   * PowerPCCPU:
-> @@ -1196,6 +1197,7 @@ struct PowerPCCPU {
->      uint32_t compat_pvr;
->      PPCVirtualHypervisor *vhyp;
->      Object *intc;
-> +    XiveTCTX *tctx;
->      void *machine_data;
->      int32_t node_id; /* NUMA node this CPU belongs to */
->      PPCHash64Options *hash64_opts;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index ea33494338dc..410c53278a11 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -321,7 +321,7 @@ static void xive_tm_write(void *opaque, hwaddr offset,
->                            uint64_t value, unsigned size)
->  {
->      PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-> -    XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-> +    XiveTCTX *tctx =3D cpu->tctx;
->      const XiveTmOp *xto;
-> =20
->      /*
-> @@ -360,7 +360,7 @@ static void xive_tm_write(void *opaque, hwaddr offset,
->  static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
->  {
->      PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-> -    XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-> +    XiveTCTX *tctx =3D cpu->tctx;
->      const XiveTmOp *xto;
-> =20
->      /*
-> @@ -1186,7 +1186,7 @@ static bool xive_presenter_match(XiveRouter *xrtr, =
-uint8_t format,
-> =20
->      CPU_FOREACH(cs) {
->          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> -        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-> +        XiveTCTX *tctx =3D cpu->tctx;
->          int ring;
-> =20
->          /*
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 2739b2a4b818..1473ef853336 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -194,7 +194,12 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, sP=
-APRCPUCore *sc)
->          vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_=
-data);
->      }
->      qemu_unregister_reset(spapr_cpu_reset, cpu);
-> -    object_unparent(cpu->intc);
-> +    if (cpu->intc) {
-> +        object_unparent(cpu->intc);
-> +    }
-> +    if (cpu->tctx) {
-> +        object_unparent(OBJECT(cpu->tctx));
-> +    }
->      cpu_remove_sync(CPU(cpu));
->      object_unparent(OBJECT(cpu));
->  }
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 2d2e17b66533..8d028db44ff4 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -305,7 +305,7 @@ static void spapr_irq_print_info_xive(sPAPRMachineSta=
-te *spapr,
->      CPU_FOREACH(cs) {
->          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> =20
-> -        xive_tctx_pic_print_info(XIVE_TCTX(cpu->intc), mon);
-> +        xive_tctx_pic_print_info(cpu->tctx, mon);
->      }
-> =20
->      spapr_xive_pic_print_info(spapr->xive, mon);
-> @@ -323,13 +323,13 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRMac=
-hineState *spapr,
->          return;
->      }
-> =20
-> -    cpu->intc =3D obj;
-> +    cpu->tctx =3D XIVE_TCTX(obj);
-> =20
->      /*
->       * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
->       * don't beneficiate from the reset of the XIVE IRQ backend
->       */
-> -    spapr_xive_set_tctx_os_cam(XIVE_TCTX(obj));
-> +    spapr_xive_set_tctx_os_cam(cpu->tctx);
->  }
-> =20
->  static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int versio=
-n_id)
-> @@ -345,7 +345,7 @@ static void spapr_irq_reset_xive(sPAPRMachineState *s=
-papr, Error **errp)
->          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> =20
->          /* (TCG) Set the OS CAM line of the thread interrupt context. */
-> -        spapr_xive_set_tctx_os_cam(XIVE_TCTX(cpu->intc));
-> +        spapr_xive_set_tctx_os_cam(cpu->tctx);
->      }
->  }
-> =20
+> Ok, thanks. Will use H_HARDWARE instead.
+>=20
+> Have a nice day, thanks for the review. :)
+> Fei
+> >=20
+> > > +    }
+> > >       spapr->pending_hpt =3D pending;
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -183,24 +113,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Bi+HF1AHjw0mn3zx
+--i13qRg9tmWEwo36p
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwtiCMACgkQbDjKyiDZ
-s5IQbw//STXxOW+gO6NprpiOOIy7jmfvgHyohJd50+A9+9I4eZ2jN1BWdIo9gcJG
-i+85TLWlce7+klZA1xr30IfRmB+D4qFDQSjRJMI+chwndwKB72ymPnA+/JrgvjUl
-f4zeCFqEd21JjiA3F/k/cxgdNIuNQnPL1cg+DxMXy7vIjnT6yie4OgvW2x1OZJrN
-+TucerFE3LBPpfFHTJZNtW2VIwoWu/itrMRIt1QVBAlmHiQC5KmM+NmkcbC6LSeG
-gXRxS1CbtogwWGQ07blXM4hObJG6/lNx8LRQWXOLsC1SEkpak0TVXMcJpADWxu/c
-cB1+15uugEtpy4RD3hli+GIDo4Es9BI+hsJrGJuf/WzsTB/73tz8+xfw+8Qq/rtg
-vRRjZY+5h0oPhkGrz8Cfm66Jli5787VK/PzDWBaeyhJaftknJAO6lG5sP2rowbss
-jQfzhjbTGiUgYi5QMOO3NOC3R1ZsghlFWc2nSY/jt12Z3/pZ5Amz71p9cR28KovW
-uAi2bLL0rU0indYgCIUwcDUtEYhFFKdNjFUOtf4613sfzmUxBcP2GPsG4tNu/lX+
-ZTPNtxq3oTjI+ESK2xAv+spwfOrXZ6wz9GBnPau90BF6i3LKacb0M+Jd03+RXwIS
-bjIorUeqYCpjkq+2oDnArqpNs5OpqqEU6oxJ5RnmSgIMat1bhk4=
-=Wtwp
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwthMkACgkQbDjKyiDZ
+s5JNDRAA0Q76STP+svYyBCaV+bhd6UjdS+9f1HY2T9GTskFDLxphyi7x+lG2t2Zr
+IFcOZz36h31bPPPyuMsFBeQMSzOhFiIJmcQzWpm5mjP121pSwFeaYxR4cIp5NAxR
+oGFqx3IBtiPAX36hrLyXFwRULH+KJmtPWytp4rXnxMJ/Rp34CIeG0AsyJuzUU8/y
+vxsTEPgMOceVo/sfuchMP9xMfHX07diGDGCo9TMjyRxezqdhaHjWJg9mBDa9Kc59
+1pgikmtrYJUuYWIxcaE2/1p1XTLK0ATGgtS+XCS4RNcuuhvTFTwJdsxMh2OWK4h8
+qE5DTEFuUUmG2eeI0K/hYOPsKGDjqQnHtI+//Y2+2JL+Dnyp6ONyS9PQo2Bf2zfg
+L8eXbysjablZboUdh3R93quC8vKqqtm2OD4qRi3CihlITHuutcrfji4WMzAtIuG0
+SGtIdghCaGVvNhYMirkQ4Oz1b8PJC804LDBcn4h5niHDPzHRWF6xx1IdpGFG8V4K
+g2R82I1t41KxLMimtQfPilJW21T46Atxh0N7ym5+FfF8YqoD56H46pWumfKPviVp
+h1LgknJ47D/Q3V7thAP4+wr5u9UA3X3jML0OtmpTgoUpxL2pUY88kdRbatbklRQj
+he6VxfKfOnj/iF0xFczWu74v1WL5/wfaQ/nPxcJi90vzs1BqcIU=
+=9A+2
 -----END PGP SIGNATURE-----
 
---Bi+HF1AHjw0mn3zx--
+--i13qRg9tmWEwo36p--
