@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36225)
+Received: from eggs.gnu.org ([208.118.235.92]:39575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gf0pB-0001Ui-4J
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:06:06 -0500
+	(envelope-from <thuth@redhat.com>) id 1gf0t0-0003H0-Rg
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gf0p7-0006GJ-Sq
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:06:05 -0500
-Received: from mail-wm1-f49.google.com ([209.85.128.49]:55843)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gf0p5-0006A4-KF
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:06:01 -0500
-Received: by mail-wm1-f49.google.com with SMTP id y139so28775253wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 03:05:57 -0800 (PST)
-References: <ddc7219f-98c3-28be-084f-64606452e49b@suse.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e51bd6dc-e135-b66a-189d-8b79bc5f7e49@redhat.com>
-Date: Thu, 3 Jan 2019 12:05:54 +0100
-MIME-Version: 1.0
-In-Reply-To: <ddc7219f-98c3-28be-084f-64606452e49b@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Can I have someone's feedback on [bug 1809075]
- Concurrency bug on keyboard events: capslock LED messing up keycode streams
- causes character misses at guest kernel
+	(envelope-from <thuth@redhat.com>) id 1gf0sx-0001xY-Pe
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37010)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gf0sx-0001vG-4t
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:09:59 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu,  3 Jan 2019 12:09:49 +0100
+Message-Id: <1546513792-17773-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] Kill global_qtest in endianess,
+ boot-order and pnv-xscom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +22,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gao Zhiyuan <zgao@suse.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Cc'ing Marc-André & Gerd.
+It's very cumbersome to run multiple instances of QEMU in tests where this is
+required (e.g. in migration tests) when the test state is tracked in a
+global variable, so  we should get rid of global_qtest in the long run.
+This series removes the dependency on this unwanted global_qtest variable
+in the endianess-test, boot-order-test and pnv-xscom-test.
 
-On 12/19/18 10:31 AM, Gao Zhiyuan wrote:
-> Hi everyone.
-> 
-> Can I please have someone's feedback on this bug?
-> https://bugs.launchpad.net/qemu/+bug/1809075
-> Briefly, guest OS loses characters sent to it via vnc. And I spot the
-> bug in relation to ps2 driver.
-> 
-> I'm thinking of possible fixes and I might want to use a memory barrier.
-> But I would really like to have some suggestion from a qemu developer
-> first. For example, can we brutally drop capslock LED key events in ps2
-> queue?
-> 
-> It is actually relevant to openQA, an automated QA tool for openSUSE.
-> And this bug blocks a few test cases for us.
-> 
-> Thank you in advance!
-> 
-> Kind regards,
-> Gao Zhiyuan
-> 
+Thomas Huth (3):
+  tests/endianesss: Make test independent of global_qtest
+  tests/boot-order: Make test independent of global_qtest
+  tests/pnv-xscom: Make test independent of global_qtest
+
+ tests/boot-order-test.c |  59 +++++----
+ tests/endianness-test.c | 329 ++++++++++++++++++++++++------------------------
+ tests/pnv-xscom-test.c  |  29 ++---
+ 3 files changed, 210 insertions(+), 207 deletions(-)
+
+-- 
+1.8.3.1
