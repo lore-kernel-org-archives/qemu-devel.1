@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:33999)
+Received: from eggs.gnu.org ([208.118.235.92]:51531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1getfZ-0007xY-UG
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 22:27:43 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1geuYZ-0001kh-7k
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 23:24:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1getfW-0006Wa-KG
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 22:27:41 -0500
-Date: Wed, 2 Jan 2019 22:27:14 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190102222703-mutt-send-email-mst@kernel.org>
-References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
-	<154535253055.862554.10471167343589360987.stgit@bahia.lan>
-	<20181221111904-mutt-send-email-mst@kernel.org>
-	<20190103003632.GG10853@umbus.fritz.box>
+	(envelope-from <liq3ea@gmail.com>) id 1geuYX-0002QV-Kg
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 23:24:31 -0500
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:43721)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1geuYX-0002HC-8U
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 23:24:29 -0500
+Received: by mail-io1-xd43.google.com with SMTP id b23so5231459ios.10
+	for <qemu-devel@nongnu.org>; Wed, 02 Jan 2019 20:24:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190103003632.GG10853@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH 03/15] pci: allow cleanup/unregistration of
- PCI root buses
+References: <20181215120353.82786-1-liq3ea@163.com>
+	<20181215120353.82786-2-liq3ea@163.com>
+	<96f02ace-df12-4788-bc03-336bf610898c@redhat.com>
+In-Reply-To: <96f02ace-df12-4788-bc03-336bf610898c@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 3 Jan 2019 12:23:45 +0800
+Message-ID: <CAKXe6SJG+iQVLbMBu8+5BB2857_7+6F_tBQMZG5Hj0dV2bpshg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] tests: vhost-user-test: initialize
+ 'fd' in chr_read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,153 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Li Qiang <liq3ea@163.com>, lvivier@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Peter Maydell <peter.maydell@linaro.org>, marcandre lureau <marcandre.lureau@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-On Thu, Jan 03, 2019 at 11:36:33AM +1100, David Gibson wrote:
-> On Fri, Dec 21, 2018 at 11:19:18AM -0500, Michael S. Tsirkin wrote:
-> > On Fri, Dec 21, 2018 at 01:35:30AM +0100, Greg Kurz wrote:
-> > > From: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > > 
-> > > This adds cleanup counterparts to pci_register_root_bus(),
-> > > pci_root_bus_new(), and pci_bus_irqs().
-> > > 
-> > > These cleanup routines are needed in the case of hotpluggable
-> > > PCIHostBridge implementations. Currently we can rely on the
-> > > object_unparent()'ing of the PCIHostState recursively unparenting
-> > > and cleaning up it's child buses, but we need explicit calls
-> > > to also:
-> > > 
-> > >   1) remove the PCIHostState from pci_host_bridges global list.
-> > >      otherwise, we risk accessing freed memory when we access
-> > >      the list later
-> > >   2) clean up memory allocated in pci_bus_irqs()
-> > > 
-> > > Both are handled outside the context of any particular bus or
-> > > host bridge's init/realize functions, making it difficult to
-> > > avoid the need for explicit cleanup functions without remodeling
-> > > how PCIHostBridges are created. So keep it simple and just add
-> > > them for now.
-> > > 
-> > > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > 
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> I've applied this tentatively to ppc-for-4.0.  Let me know, Michael,
-> if you'd prefer to take it through your tree.
+Thomas Huth <thuth@redhat.com> =E4=BA=8E2019=E5=B9=B41=E6=9C=882=E6=97=A5=
+=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=889:50=E5=86=99=E9=81=93=EF=BC=9A
+
+> On 2018-12-15 13:03, Li Qiang wrote:
+> > Currently when processing VHOST_USER_SET_VRING_CALL
+> > if 'qemu_chr_fe_get_msgfds' get no fd, the 'fd' will
+> > be a stack uninitialized value.
+> >
+> > Signed-off-by: Li Qiang <liq3ea@163.com>
+> > ---
+> >  tests/vhost-user-test.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+> > index 45d58d8ea2..86039e61e0 100644
+> > --- a/tests/vhost-user-test.c
+> > +++ b/tests/vhost-user-test.c
+> > @@ -309,7 +309,7 @@ static void chr_read(void *opaque, const uint8_t
+> *buf, int size)
+> >      CharBackend *chr =3D &s->chr;
+> >      VhostUserMsg msg;
+> >      uint8_t *p =3D (uint8_t *) &msg;
+> > -    int fd;
+> > +    int fd =3D -1;
+> >
+> >      if (s->test_fail) {
+> >          qemu_chr_fe_disconnect(chr);
+> >
+>
+> Shouldn't we also rather check the return code of
+> qemu_chr_fe_get_msgfds() ?
 
 
-I think your tree makes sense for this.
+Agree, there are several places need to do this. I will send out a patch
+later.
 
-> > 
-> > > ---
-> > >  hw/pci/pci.c         |   33 +++++++++++++++++++++++++++++++++
-> > >  include/hw/pci/pci.h |    3 +++
-> > >  2 files changed, 36 insertions(+)
-> > > 
-> > > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > > index efb5ce196ffb..16354f91206c 100644
-> > > --- a/hw/pci/pci.c
-> > > +++ b/hw/pci/pci.c
-> > > @@ -333,6 +333,13 @@ static void pci_host_bus_register(DeviceState *host)
-> > >      QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
-> > >  }
-> > >  
-> > > +static void pci_host_bus_unregister(DeviceState *host)
-> > > +{
-> > > +    PCIHostState *host_bridge = PCI_HOST_BRIDGE(host);
-> > > +
-> > > +    QLIST_REMOVE(host_bridge, next);
-> > > +}
-> > > +
-> > >  PCIBus *pci_device_root_bus(const PCIDevice *d)
-> > >  {
-> > >      PCIBus *bus = pci_get_bus(d);
-> > > @@ -379,6 +386,11 @@ static void pci_root_bus_init(PCIBus *bus, DeviceState *parent,
-> > >      pci_host_bus_register(parent);
-> > >  }
-> > >  
-> > > +static void pci_bus_uninit(PCIBus *bus)
-> > > +{
-> > > +    pci_host_bus_unregister(BUS(bus)->parent);
-> > > +}
-> > > +
-> > >  bool pci_bus_is_express(PCIBus *bus)
-> > >  {
-> > >      return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
-> > > @@ -413,6 +425,12 @@ PCIBus *pci_root_bus_new(DeviceState *parent, const char *name,
-> > >      return bus;
-> > >  }
-> > >  
-> > > +void pci_root_bus_cleanup(PCIBus *bus)
-> > > +{
-> > > +    pci_bus_uninit(bus);
-> > > +    object_unparent(OBJECT(bus));
-> > > +}
-> > > +
-> > >  void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
-> > >                    void *irq_opaque, int nirq)
-> > >  {
-> > > @@ -423,6 +441,15 @@ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
-> > >      bus->irq_count = g_malloc0(nirq * sizeof(bus->irq_count[0]));
-> > >  }
-> > >  
-> > > +void pci_bus_irqs_cleanup(PCIBus *bus)
-> > > +{
-> > > +    bus->set_irq = NULL;
-> > > +    bus->map_irq = NULL;
-> > > +    bus->irq_opaque = NULL;
-> > > +    bus->nirq = 0;
-> > > +    g_free(bus->irq_count);
-> > > +}
-> > > +
-> > >  PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
-> > >                                pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
-> > >                                void *irq_opaque,
-> > > @@ -439,6 +466,12 @@ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
-> > >      return bus;
-> > >  }
-> > >  
-> > > +void pci_unregister_root_bus(PCIBus *bus)
-> > > +{
-> > > +    pci_bus_irqs_cleanup(bus);
-> > > +    pci_root_bus_cleanup(bus);
-> > > +}
-> > > +
-> > >  int pci_bus_num(PCIBus *s)
-> > >  {
-> > >      return PCI_BUS_GET_CLASS(s)->bus_num(s);
-> > > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> > > index e6514bba23aa..8998e3be3390 100644
-> > > --- a/include/hw/pci/pci.h
-> > > +++ b/include/hw/pci/pci.h
-> > > @@ -405,8 +405,10 @@ PCIBus *pci_root_bus_new(DeviceState *parent, const char *name,
-> > >                           MemoryRegion *address_space_mem,
-> > >                           MemoryRegion *address_space_io,
-> > >                           uint8_t devfn_min, const char *typename);
-> > > +void pci_root_bus_cleanup(PCIBus *bus);
-> > >  void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn map_irq,
-> > >                    void *irq_opaque, int nirq);
-> > > +void pci_bus_irqs_cleanup(PCIBus *bus);
-> > >  int pci_bus_get_irq_level(PCIBus *bus, int irq_num);
-> > >  /* 0 <= pin <= 3 0 = INTA, 1 = INTB, 2 = INTC, 3 = INTD */
-> > >  int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin);
-> > > @@ -417,6 +419,7 @@ PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
-> > >                                MemoryRegion *address_space_io,
-> > >                                uint8_t devfn_min, int nirq,
-> > >                                const char *typename);
-> > > +void pci_unregister_root_bus(PCIBus *bus);
-> > >  void pci_bus_set_route_irq_fn(PCIBus *, pci_route_irq_fn);
-> > >  PCIINTxRoute pci_device_route_intx_to_irq(PCIDevice *dev, int pin);
-> > >  bool pci_intx_route_changed(PCIINTxRoute *old, PCIINTxRoute *new);
-> > 
-> 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+Thanks,
+Li Qiang
+
+
+> Anyway, initializing fd to -1 here sounds
+> like a good idea, so:
+>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>
