@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37660)
+Received: from eggs.gnu.org ([208.118.235.92]:54625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geqr6-000558-6M
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 19:27:25 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1gerqM-0001bd-JW
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 20:30:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1geqr1-0005Fh-DH
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 19:27:24 -0500
-Date: Thu, 3 Jan 2019 10:45:44 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190102234544.GC10853@umbus.fritz.box>
-References: <20190102102243.28822-1-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <arei.gonglei@huawei.com>) id 1gerqJ-0002Re-6h
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 20:30:42 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2749 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1gerqI-0002Df-Pn
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 20:30:39 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Thu, 3 Jan 2019 01:30:18 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB1EBE93@dggeml531-mbs.china.huawei.com>
+References: <33183CC9F5247A488A2544077AF19020DB1D65E6@dggeml531-mbs.china.huawei.com>
+	<20190102112953.GC2446@work-vm>
+In-Reply-To: <20190102112953.GC2446@work-vm>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FsscpQKzF/jJk6ya"
-Content-Disposition: inline
-In-Reply-To: <20190102102243.28822-1-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: add qemu_vga.ndrv file entry
- for Mac machines
+Subject: Re: [Qemu-devel] About live migration rollback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +29,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "pbonzini@redhat.com
+	peterx@redhat.com" <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liujinsong (Paul)" <liu.jinsong@huawei.com>
 
+Hi,
 
---FsscpQKzF/jJk6ya
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jan 02, 2019 at 10:22:43AM +0000, Mark Cave-Ayland wrote:
-> The VGA driver built from Ben's QemuMacDrivers repository is used exclusi=
-vely
-> by the Mac machines.
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Applied, thanks.
-
-> ---
->  MAINTAINERS | 2 ++
->  1 file changed, 2 insertions(+)
+> * Gonglei (Arei) (arei.gonglei@huawei.com) wrote:
+> > Hi Dave,
+> >
+> > We discussed some live migration fallback scenarios in this year's KVM =
+forum,
+> > and now I can provide another scenario, perhaps the upstream should
+> consider rolling
+> > back for this situation.
+> >
+> > Environments information:
+> >
+> > host A: cpu E5620(model WestmereEP without flag xsave)
+> > host B: cpu E5-2643(model SandyBridgeEP with flag xsave)
+> >
+> > The reproduce steps is :
+> > 1. Start a windows 2008 vm with -cpu host(which means host-passthrough)=
+.
 >=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 344cb2d7fd..3da3d103b1 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -965,6 +965,7 @@ F: include/hw/misc/macio/
->  F: include/hw/misc/mos6522.h
->  F: include/hw/ppc/mac_dbdma.h
->  F: include/hw/pci-host/uninorth.h
-> +F: pc-bios/qemu_vga.ndrv
-> =20
->  Old World
->  M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> @@ -976,6 +977,7 @@ F: hw/pci-host/grackle.c
->  F: hw/misc/macio/
->  F: hw/intc/heathrow_pic.c
->  F: include/hw/intc/heathrow_pic.h
-> +F: pc-bios/qemu_vga.ndrv
-> =20
->  PReP
->  M: Herv=E9 Poussineau <hpoussin@reactos.org>
+> Well we don't guarantee migration across -cpu host - does this problem
+> go away if both qemu's are started with matching CPU flags
+> (corresponding to the Westmere) ?
+>=20
+Sorry, we didn't test other cpu model scenarios since we should assure
+that the live migration support from lower generation CPUs to higher
+generation CPUs. :(
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---FsscpQKzF/jJk6ya
-Content-Type: application/pgp-signature; name="signature.asc"
+> > 2. Migrate the vm to host B when cr4.OSXSAVE=3D0.
+> > 3. Vm runs on host B for a while so that cr4.OSXSAVE changes to 1.
+> > 4. Then migrate the vm to host A successfully, but vm was paused, and q=
+emu
+> printed log as followed:
+> >
+> > KVM: entry failed, hardware error 0x80000021
+> >
+> > If you're running a guest on an Intel machine without unrestricted mode
+> > support, the failure can be most likely due to the guest entering an in=
+valid
+> > state for Intel VT. For example, the guest maybe running in big real mo=
+de
+> > which is not supported on less recent Intel processors.
+> >
+> > EAX=3D019b3bb0 EBX=3D01a3ae80 ECX=3D01a61ce8 EDX=3D00000000
+> > ESI=3D01a62000 EDI=3D00000000 EBP=3D00000000 ESP=3D01718b20
+> > EIP=3D0185d982 EFL=3D00000286 [--S--P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 =
+HLT=3D0
+> > ES =3D0000 00000000 0000ffff 00009300
+> > CS =3Df000 ffff0000 0000ffff 00009b00
+> > SS =3D0000 00000000 0000ffff 00009300
+> > DS =3D0000 00000000 0000ffff 00009300
+> > FS =3D0000 00000000 0000ffff 00009300
+> > GS =3D0000 00000000 0000ffff 00009300
+> > LDT=3D0000 00000000 0000ffff 00008200
+> > TR =3D0000 00000000 0000ffff 00008b00
+> > GDT=3D     00000000 0000ffff
+> > IDT=3D     00000000 0000ffff
+> > CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+> > DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
+> DR3=3D0000000000000000
+> > DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+> > EFER=3D0000000000000000
+> > Code=3D00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 <00>=
+ 00 00
+> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
+0 00
+> 00
+> >
+> > Problem happened when kvm_put_sregs returns err -22(called by
+> kvm_arch_put_registers(qemu)).
+> >
+> > Because kvm_arch_vcpu_ioctl_set_sregs(kvm module) checked that
+> > guest_cpuid_has no X86_FEATURE_XSAVE but cr4.OSXSAVE=3D1.
+> > We should cancel migration if kvm_arch_put_registers returns error.
+>=20
+> Do you have a backtrace of when the kvm_arch_put_registers is called
+> when it fails?
 
------BEGIN PGP SIGNATURE-----
+The main backtrace is below:
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwtTScACgkQbDjKyiDZ
-s5I67BAAq1paFctLz47PY3huMIuyj2dlJWqThE71gD3TxunMHoDLGPDEpBYq2kXE
-HYNLhmQLZO2CsE2MDIXUlB3YgGa9T3VPRaT0/EN5RLpILOQ0H8gpjvOxgPTCgyVY
-BbGNDNYu5/4FURRLPCFnrHEmuXgpzar4xMpg0X5Zs2Q7PkSuMoWAPogfs2oPJjnJ
-zlMcJUhzZhUooqiMzL5hRYpBUdcGgsdnr0cWYJh1l2wR6Z7iIdmSlvrIF+1ogcXQ
-16aBOYkQgN2Sf2Ao6kok54ITPmUB/tyqbBf6aGb2Bekby8MktKZppdWiHtENt5aB
-gmgkRc/yUTsELRj1P+Ug7/44cyt1cv/c9hol29uknUXzLBsV444KCotIisvlDY13
-0X6mqyeTfffgNMPcr8VahX/L2VSrTNanYzp4exDlOwXqHl+R9VhTdXluFK2y577/
-xIM6Z/sLsulGyFWflx+CZkdqDKNbazpuaK1TC/FTExn64kR/krcPbSfrERrguDHF
-81ZA3n+EuigBhIA+0FlKRBzN9Tav7M7EWsExcqSyXHleISxh2W0y5SNradf5LOUx
-kIxC0DF1SQ2yfWS7oPiWurz6ucF56dx68U2bo7DG2yTVw7QdLmXXf7wBGLh4xfIu
-F5HBpWuL40c7a6cIhkPP61Eci5Rydh3y+4TpikJwt6D9o+RaiKg=
-=CZw0
------END PGP SIGNATURE-----
+ qemu_loadvm_state
+     cpu_synchronize_all_post_init    --> w/o return value
+         cpu_synchronize_post_init   --> w/o return value
+             kvm_cpu_synchronize_post_init  --> w/o return value
+				run_on_cpu  ---> w/o return value
+				   do_kvm_cpu_synchronize_post_init  --> w/o return value
+                      kvm_arch_put_registers  --> w/ return value
 
---FsscpQKzF/jJk6ya--
+Root cause is some functions don't have return values, the migration thread
+can't detect those failures. Paolo?
+
+> If it's called during the loading of the device state then we should be
+> able to detect it and fail the migration; however if it's only failing
+> after the CPU is restarted after the migration then it's a bit too late.
+>=20
+Actually the CPUs haven't started in this scenario.
+
+Thanks,
+-Gonglei
