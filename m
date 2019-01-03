@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56610)
+Received: from eggs.gnu.org ([208.118.235.92]:56686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gf3Xs-0003rD-Lg
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:00:25 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gf3Xw-0003vS-Mz
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:00:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gf3Xk-0003YJ-Sw
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:00:24 -0500
-Message-Id: <d79b61452538fde1e572796b4a0c167beaacfd83.1546522545.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1gf3Xu-0003di-NG
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:00:28 -0500
+Message-Id: <1d87c82ab0505823f736b62d09a71c6f267e8ff1.1546522545.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1546522545.git.balaton@eik.bme.hu>
 References: <cover.1546522545.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Thu, 03 Jan 2019 14:35:45 +0100
-Subject: [Qemu-devel] [PATCH v2 4/6] ppc4xx: Rename ppc4xx_sdram_t in
- ppc440_uc.c to ppc440_sdram_t
+Subject: [Qemu-devel] [PATCH v2 3/6] ppc4xx: Use ram_addr_t in
+ ppc4xx_sdram_adjust()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +23,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>
 
-There's already a struct with the same name in ppc4xx_devs.c. They are
-not used outside their files so don't clash but they are also not
-identical so rename the ppc440 specific one to distinguish them.
+To avoid overflow if larger values are added later use ram_addr_t for
+the sdram_bank_sizes parameter to match ram_size to which it is compared.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc440_uc.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+v2: No change. Review comment suggested ram_size should be hwaddr too
+    but it's ram_addr_t in MachineState now so this should do until
+    someone decides to clean that up in a separate patch.
 
-diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
-index 9360f781ce..e46f59fba8 100644
---- a/hw/ppc/ppc440_uc.c
-+++ b/hw/ppc/ppc440_uc.c
-@@ -481,7 +481,7 @@ void ppc4xx_sdr_init(CPUPPCState *env)
+ hw/ppc/ppc440_bamboo.c  | 2 +-
+ hw/ppc/ppc4xx_devs.c    | 4 ++--
+ hw/ppc/sam460ex.c       | 2 +-
+ include/hw/ppc/ppc4xx.h | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index b8aa55d526..8277c0f784 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -49,7 +49,7 @@
  
- /*****************************************************************************/
- /* SDRAM controller */
--typedef struct ppc4xx_sdram_t {
-+typedef struct ppc440_sdram_t {
-     uint32_t addr;
-     int nbanks;
-     MemoryRegion containers[4]; /* used for clipping */
-@@ -489,7 +489,7 @@ typedef struct ppc4xx_sdram_t {
-     hwaddr ram_bases[4];
-     hwaddr ram_sizes[4];
-     uint32_t bcr[4];
--} ppc4xx_sdram_t;
-+} ppc440_sdram_t;
+ #define PPC440EP_SDRAM_NR_BANKS 4
  
- enum {
-     SDRAM0_CFGADDR = 0x10,
-@@ -564,7 +564,7 @@ static target_ulong sdram_size(uint32_t bcr)
-     return size;
- }
+-static const unsigned int ppc440ep_sdram_bank_sizes[] = {
++static const ram_addr_t ppc440ep_sdram_bank_sizes[] = {
+     256 * MiB, 128 * MiB, 64 * MiB, 32 * MiB, 16 * MiB, 8 * MiB, 0
+ };
  
--static void sdram_set_bcr(ppc4xx_sdram_t *sdram,
-+static void sdram_set_bcr(ppc440_sdram_t *sdram,
-                           uint32_t *bcrp, uint32_t bcr, int enabled)
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index 9b6e4c60fa..9418478575 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -679,12 +679,12 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
+                                MemoryRegion ram_memories[],
+                                hwaddr ram_bases[],
+                                hwaddr ram_sizes[],
+-                               const unsigned int sdram_bank_sizes[])
++                               const ram_addr_t sdram_bank_sizes[])
  {
-     unsigned n = bcrp - sdram->bcr;
-@@ -589,7 +589,7 @@ static void sdram_set_bcr(ppc4xx_sdram_t *sdram,
-     }
- }
- 
--static void sdram_map_bcr(ppc4xx_sdram_t *sdram)
-+static void sdram_map_bcr(ppc440_sdram_t *sdram)
- {
+     MemoryRegion *ram = g_malloc0(sizeof(*ram));
+     ram_addr_t size_left = ram_size;
+     ram_addr_t base = 0;
+-    unsigned int bank_size;
++    ram_addr_t bank_size;
      int i;
+     int j;
  
-@@ -607,7 +607,7 @@ static void sdram_map_bcr(ppc4xx_sdram_t *sdram)
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index b99aed26e0..233f81bb56 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -77,7 +77,7 @@
+ #define SDRAM_NR_BANKS 4
  
- static uint32_t dcr_read_sdram(void *opaque, int dcrn)
- {
--    ppc4xx_sdram_t *sdram = opaque;
-+    ppc440_sdram_t *sdram = opaque;
-     uint32_t ret = 0;
+ /* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
+-static const unsigned int ppc460ex_sdram_bank_sizes[] = {
++static const ram_addr_t ppc460ex_sdram_bank_sizes[] = {
+     1 * GiB, 512 * MiB, 256 * MiB, 128 * MiB, 64 * MiB, 32 * MiB, 0
+ };
  
-     switch (dcrn) {
-@@ -658,7 +658,7 @@ static uint32_t dcr_read_sdram(void *opaque, int dcrn)
+diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+index 3a2a04c8ce..39a7ba1ce6 100644
+--- a/include/hw/ppc/ppc4xx.h
++++ b/include/hw/ppc/ppc4xx.h
+@@ -43,7 +43,7 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
+                                MemoryRegion ram_memories[],
+                                hwaddr ram_bases[],
+                                hwaddr ram_sizes[],
+-                               const unsigned int sdram_bank_sizes[]);
++                               const ram_addr_t sdram_bank_sizes[]);
  
- static void dcr_write_sdram(void *opaque, int dcrn, uint32_t val)
- {
--    ppc4xx_sdram_t *sdram = opaque;
-+    ppc440_sdram_t *sdram = opaque;
- 
-     switch (dcrn) {
-     case SDRAM_R0BAS:
-@@ -689,7 +689,7 @@ static void dcr_write_sdram(void *opaque, int dcrn, uint32_t val)
- 
- static void sdram_reset(void *opaque)
- {
--    ppc4xx_sdram_t *sdram = opaque;
-+    ppc440_sdram_t *sdram = opaque;
- 
-     sdram->addr = 0;
- }
-@@ -699,7 +699,7 @@ void ppc440_sdram_init(CPUPPCState *env, int nbanks,
-                        hwaddr *ram_bases, hwaddr *ram_sizes,
-                        int do_init)
- {
--    ppc4xx_sdram_t *sdram;
-+    ppc440_sdram_t *sdram;
- 
-     sdram = g_malloc0(sizeof(*sdram));
-     sdram->nbanks = nbanks;
+ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
+                         MemoryRegion ram_memories[],
 -- 
 2.13.7
