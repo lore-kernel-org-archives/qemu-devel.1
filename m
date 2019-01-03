@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:33444)
+Received: from eggs.gnu.org ([208.118.235.92]:34653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf3mq-0004Cd-LD
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:15:53 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gf3pz-0007sx-8Q
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:19:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf3mm-0003Kd-CW
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:15:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59872)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gf3mm-0003Jh-4E
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:15:48 -0500
-References: <20181227063419.12981-1-yang.zhong@intel.com>
-	<20181227063419.12981-2-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <5bd93d20-08a3-e382-94a1-bf6529a5944c@redhat.com>
-Date: Thu, 3 Jan 2019 15:15:44 +0100
+	(envelope-from <stefanha@gmail.com>) id 1gf3py-0005vW-H2
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:19:07 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181227063419.12981-2-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 01/25] build: actually use CONFIG_PAM
+References: <20181214145152.27250-1-stefanha@redhat.com>
+	<CAFEAcA9OwKJQ0iWtuxMJrNPL5r_qtuZz57H=Dtcr6X45XqQ3TQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9OwKJQ0iWtuxMJrNPL5r_qtuZz57H=Dtcr6X45XqQ3TQ@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 3 Jan 2019 14:18:53 +0000
+Message-ID: <CAJSP0QWEVr=0XaYbd10-_4_9Vm_9tfKTw3Paj2QR_Wb1ev416g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] microbit: make -kernel optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jim Mussared <jim@groklearning.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
 
- Hi,
+On Thu, Jan 3, 2019 at 1:07 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+> On Fri, 14 Dec 2018 at 14:51, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > ARMv7M machine types support -kernel for ELF and raw image files.
+> > Microbit programs are typically in Intel HEX (.hex) format.  The generic
+> > loader supports .hex files but it doesn't work as expected:
+> >
+> >   $ qemu-system-arm -M microbit -device loader,file=microbit.hex
+> >   Guest image must be specified (using -kernel)
+> >
+> > This error comes from armv7m_load_kernel() but we don't have -kernel in
+> > this case.
+> >
+> > This patch makes -kernel optional since most of the time we'll want to
+> > use -device loader instead.
+> >
+> > Note that we need to register the reset handler that
+> > armv7m_load_kernel() used to register for us.
+> >
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>
+> Hi, Stefan. (Happy new year :-))
+>
+> Looking at this, I think I'd prefer it if we handled
+> this in the armv7m_load_kernel() code, since having to register
+> your own reset handler to reset the CPU is a weird thing for
+> board level code to have to do. That then means the M-profile
+> kernel load code is in line with the A-profile load code, which
+> if it has no kernel to load will still register the reset handler,
+> and let the machine run however it ends up running.
+>
+> I think this basically amounts to "remove the 'insist that
+> kernel_filename is not NULL' check from armv7m_load_kernel()",
+> aka "revert commit 01fd41ab3fb69971". That commit's commit
+> message is correct that the behaviour if the user didn't
+> specify anything to run is a bit unhelpful, but it predates
+> the generic loader so it's no longer necessarily true that
+> a kernel must be specified, either for this or for any other
+> M-profile machine. (There's also the case of "board has a
+> flash device that was populated via a -pflash or -drive
+> option".)
 
-On 2018-12-27 07:33, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Do not link it unconditionally into all binaries.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/pci-host/Makefile.objs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-> index 6d6597c065..9d7e7cd1b8 100644
-> --- a/hw/pci-host/Makefile.objs
-> +++ b/hw/pci-host/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -common-obj-y += pam.o
-> +common-obj-$(CONFIG_PAM) += pam.o
+Happy New Year!
 
-CONFIG_PAM has been removed in the default-configs with commit
+That makes sense.  I will send a patch.
 
-  a3b6e2bb71e6495a44f24e2296ab4feb4b6d4818
-   default-configs: remove CONFIG_PAM
-
-... so if you want to use it now, you've got to revert that commit, too.
-
- Thomas
+Stefan
