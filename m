@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:45157)
+Received: from eggs.gnu.org ([208.118.235.92]:47396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gfA3u-0005pv-PA
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 15:57:55 -0500
+	(envelope-from <eblake@redhat.com>) id 1gfAAW-0001Ib-Jt
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 16:04:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gfA3u-0007Tn-3c
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 15:57:54 -0500
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Thu, 3 Jan 2019 20:57:45 +0000
-Message-ID: <9df1a9a8-284b-573b-98aa-fd77edb0cd65@janustech.com>
+	(envelope-from <eblake@redhat.com>) id 1gfAAV-0007Gu-P3
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 16:04:44 -0500
 References: <20190102110804.18155-1-lbloch@janustech.com>
 	<20190102110804.18155-2-lbloch@janustech.com>
 	<w51h8eqdroh.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51h8eqdroh.fsf@maestria.local.igalia.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <33CC8D65B9DE4548BEA4DCD34D875C6B@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<9df1a9a8-284b-573b-98aa-fd77edb0cd65@janustech.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1ab08459-6635-acc2-0ba2-961c7a0e5704@redhat.com>
+Date: Thu, 3 Jan 2019 15:04:25 -0600
 MIME-Version: 1.0
+In-Reply-To: <9df1a9a8-284b-573b-98aa-fd77edb0cd65@janustech.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="uzfqdGN7l56hR7672mAiUGmHdv663fFVx"
 Subject: Re: [Qemu-devel] [PATCH 1/1] include: Auto-generate the sizes
  lookup table
 List-Id: <qemu-devel.nongnu.org>
@@ -27,26 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Leonid Bloch <lbloch@janustech.com>, Alberto Garcia <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
-SGkgQmVydG8sDQoNCk9uIDEvMy8xOSAxMjoxOSBQTSwgQWxiZXJ0byBHYXJjaWEgd3JvdGU6DQo+
-IE9uIFdlZCAwMiBKYW4gMjAxOSAxMjowOTowNSBQTSBDRVQsIExlb25pZCBCbG9jaCB3cm90ZToN
-Cj4+ICtwcmludF9zaXplcygpIHsNCj4+ICsgICAgbG9jYWwgcD0xMA0KPj4gKyAgICB3aGlsZSBb
-ICR7cH0gLWx0IDY0IF0NCj4+ICsgICAgZG8NCj4+ICsgICAgICAgIGxvY2FsIHBhZD0nICcNCj4+
-ICsgICAgICAgIGxvY2FsIG49JCgocCAlIDEwKSkNCj4+ICsgICAgICAgIG49JCgoMSA8PCBuKSkN
-Cj4+ICsgICAgICAgIFsgJCgobiAvIDEwMCkpIC1lcSAwIF0gJiYgcGFkPScgICcNCj4+ICsgICAg
-ICAgIFsgJCgobiAvIDEwKSkgLWVxIDAgXSAmJiBwYWQ9JyAgICcNCj4+ICsgICAgICAgIGxvY2Fs
-IHN1ZmY9JCgocCAvIDEwKSkNCj4+ICsgICAgICAgIHByaW50ZiAiI2RlZmluZSBTXyV1JXMlcyUy
-MHVcbiIgJHtufSAiJChzaXplX3N1ZmZpeCAke3N1ZmZ9KSIgXA0KPj4gKyAgICAgICAgICAgICIk
-e3BhZH0iICQoKDEgPDwgcCkpDQo+PiArICAgICAgICBwPSQoKHAgKyAxKSkNCj4+ICsgICAgZG9u
-ZQ0KPj4gK30NCj4gDQo+IEkgaGF2ZSB0byBzYXkgdGhhdCBJJ20gbm90IHZlcnkgY29udmluY2Vk
-IG9mIHRoZSBiZW5lZml0cyBvZiByZXBsYWNpbmcgYQ0KPiBzZXQgb2YgdHJpdmlhbCBudW1lcmlj
-IG1hY3JvcyB3aXRoIGEgbG9uZ2VyIGFuZCBoYXJkZXIgdG8gcmVhZCBzaGVsbA0KPiBzY3JpcHQg
-YWNjb21wYW5pZWQgYnkgY2hhbmdlcyB0byB0aGUgYnVpbGQgc3lzdGVtLg0KDQpJIHRoaW5rIHRo
-YXQgdGhlIGJlbmVmaXQgaXMgdGhhdCB0aGUgc2NyaXB0IGlzIGVhc2lseSB2ZXJpZmlhYmxlLCAN
-CndoZXJlYXMgaWYgc29tZW9uZSB3b3VsZCBsaWtlIHRvIHZlcmlmeSB0aGUgdGFibGUsIHRoZXkg
-d2lsbCBuZWVkIHRvIA0KZ2VuZXJhdGUgaXQgdGhlbXNlbHZlcy4gQWxzbywgdGhpcyB0YWJsZSBp
-cyBhdXRvbWF0aWNhbGx5IGdlbmVyYXRlZCANCmFueXdheSwgc28gaXQgb25seSBtYWtlcyBzZW5z
-ZSB0byBnZW5lcmF0ZSBpdCBkdXJpbmcgdGhlIGJ1aWxkLg0KDQoNCkxlb25pZC4NCg0KPiANCj4g
-QmVydG8NCj4gDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uzfqdGN7l56hR7672mAiUGmHdv663fFVx
+From: Eric Blake <eblake@redhat.com>
+To: Leonid Bloch <lbloch@janustech.com>, Alberto Garcia <berto@igalia.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil
+ <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>
+Message-ID: <1ab08459-6635-acc2-0ba2-961c7a0e5704@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] include: Auto-generate the sizes lookup
+ table
+References: <20190102110804.18155-1-lbloch@janustech.com>
+ <20190102110804.18155-2-lbloch@janustech.com>
+ <w51h8eqdroh.fsf@maestria.local.igalia.com>
+ <9df1a9a8-284b-573b-98aa-fd77edb0cd65@janustech.com>
+In-Reply-To: <9df1a9a8-284b-573b-98aa-fd77edb0cd65@janustech.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/3/19 2:57 PM, Leonid Bloch wrote:
+
+>> I have to say that I'm not very convinced of the benefits of replacing=
+ a
+>> set of trivial numeric macros with a longer and harder to read shell
+>> script accompanied by changes to the build system.
+>=20
+> I think that the benefit is that the script is easily verifiable,=20
+> whereas if someone would like to verify the table, they will need to=20
+> generate it themselves. Also, this table is automatically generated=20
+> anyway, so it only makes sense to generate it during the build.
+
+But no one is submitting patches to active modify the table.  The work
+has already been done once to generate it, and the reviewers have
+already verified it; at this point, no further changes are likely to
+happen (other than my pipe dream of entirely getting rid of the table in
+favor of using runtime generation of human-friendly default strings is
+added to QemuOpts instead).  If the table were not already in git, then
+generating it at build time might make sense; but at this stage in the
+game, you're slowing down every build to regenerate something that is
+already correct.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--uzfqdGN7l56hR7672mAiUGmHdv663fFVx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwueNkACgkQ3g5py3or
+ov3HIQgAjZ9d+Prcg0X8CeHmKc8h8CnjXaZXfkI0VlXHWJXs++H3FqoD2E8M0xZO
+KCHzXMeu+NsvNNbpicwE+1YE29R7XkQwtUliMTLd/rxiAKJr7KYvKkfSfD9nOuih
+BuFx4f/vKaV1IlkW753TCQwEGfh08ydpCEsrDnhmKpQNRrJIkHTppSWz8jG/RUJX
+TsgRGMm2HJ7O0yhSkRR1kXQVvnEKo9fQ0XyQMGMrp2E1oagIJu8W4dzhmMSGjLhi
+Xp+9eknEde8gtovbVwUx9WkvRtAI1dxQj+WTEA279bEBQQ5MQKqtDXmzDbKe6TJF
+mpPB4dtMRXFtk61jtkaVoztjPezOtQ==
+=TiUl
+-----END PGP SIGNATURE-----
+
+--uzfqdGN7l56hR7672mAiUGmHdv663fFVx--
