@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42690)
+Received: from eggs.gnu.org ([208.118.235.92]:43200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf01y-0001QV-6r
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:15:19 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gf03r-0002Z3-Kq
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:17:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf01v-0006yI-36
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:15:14 -0500
-From: Thomas Huth <thuth@redhat.com>
-References: <20181205195704.17605-1-ehabkost@redhat.com>
-	<20181205195704.17605-3-ehabkost@redhat.com>
-	<a28d196a-e2fe-a013-a6e2-99ac260f6279@redhat.com>
-Message-ID: <6d25cdc7-60f9-a0e0-b3be-d78da86752b5@redhat.com>
-Date: Thu, 3 Jan 2019 11:14:44 +0100
-MIME-Version: 1.0
-In-Reply-To: <a28d196a-e2fe-a013-a6e2-99ac260f6279@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 2/2] virtio: Provide
- version-specific variants of virtio PCI devices
+	(envelope-from <pmorel@linux.ibm.com>) id 1gf03o-0008Ja-Al
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:17:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50210
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gf03o-0008JI-5T
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:17:08 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x03AETJ5080220
+	for <qemu-devel@nongnu.org>; Thu, 3 Jan 2019 05:17:07 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2psd1w7vyt-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 05:17:07 -0500
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Thu, 3 Jan 2019 10:17:06 -0000
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Thu,  3 Jan 2019 11:16:59 +0100
+Message-Id: <1546510620-6707-1-git-send-email-pmorel@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v6] s390x/pci: add common fmb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +36,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>, qemu-s390x@nongnu.org, Markus Armbruster <armbru@redhat.com>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Max Reitz <mreitz@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: walling@linux.ibm.com
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
 
-On 2019-01-03 10:38, Thomas Huth wrote:
-> On 2018-12-05 20:57, Eduardo Habkost wrote:
->> Many of the current virtio-*-pci device types actually represent
->> 3 different types of devices:
->> * virtio 1.0 non-transitional devices
->> * virtio 1.0 transitional devices
->> * virtio 0.9 ("legacy device" in virtio 1.0 terminology)
->>
->> That would be just an annoyance if it didn't break our device/bus
->> compatibility QMP interfaces.  With these multi-purpose device
->> types, there's no way to tell management software that
->> transitional devices and legacy devices require a Conventional
->> PCI bus.
->>
->> The multi-purpose device types would also prevent us from telling
->> management software what's the PCI vendor/device ID for them,
->> because their PCI IDs change at runtime depending on the bus
->> where they were plugged.
->>
->> This patch adds separate device types for each of those virtio
->> device flavors:
->>
->> - virtio-*-pci: the existing multi-purpose device types
->>   - Configurable using `disable-legacy` and `disable-modern`
->>     properties
->>   - Legacy driver support is automatically enabled/disabled
->>     depending on the bus where it is plugged
->>   - Supports Conventional PCI and PCI Express buses
->>     (but Conventional PCI is incompatible with
->>     disable-legacy=off)
->>   - Changes PCI vendor/device IDs at runtime
->> - virtio-*-pci-transitional: virtio-1.0 device supporting legacy drivers
->>   - Supports Conventional PCI buses only, because
->>     it has a PIO BAR
->> - virtio-*-pci-non-transitional: modern-only
->>   - Supports both Conventional PCI and PCI Express buses
->>
->> The existing TYPE_* macros for these types will point to an
->> abstract base type, so existing casts in the code will keep
->> working for all variants.
->>
->> A simple test script (tests/acceptance/virtio_version.py) is
->> included, to check if the new device types are equivalent to
->> using the `disable-legacy` and `disable-modern` options.
->>
->> Acked-by: Andrea Bolognani <abologna@redhat.com>
->> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
->  Hi Eduardo,
-> 
-> with these new devices, I can trigger an abort on s390x:
-> 
-> $ qemu-system-s390x -M s390-ccw-virtio-2.5 -monitor stdio -no-shutdown
-> QEMU 3.1.50 monitor - type 'help' for more information
-> (qemu) device_add vhost-scsi-pci-non-transitional
-> qemu-system-s390x: hw/core/qdev-properties.c:1236:
-> qdev_prop_set_globals: Assertion `prop->user_provided' failed.
-> Aborted (core dumped)
-FWIW, it happens with x86, too:
+After the last review round I corrected the commit message
+and use the sizeof of the target entries in the fmb_di_update()
+function instead of the uint definition.
 
-$ qemu-system-x86_64 -M pc-i440fx-2.6 -monitor stdio
-QEMU 3.1.50 monitor - type 'help' for more information
-(qemu) device_add vhost-scsi-pci-non-transitional
-qemu-system-x86_64: hw/core/qdev-properties.c:1236:
-qdev_prop_set_globals: Assertion `prop->user_provided' failed.
-Aborted (core dumped)
+Regards,
+Pierre
 
-Only machine types newer than 2.7 seem to be OK.
 
- Thomas
+Yi Min Zhao (1):
+  s390x/pci: add common function measurement block
+
+ hw/s390x/s390-pci-bus.c  |   4 +-
+ hw/s390x/s390-pci-bus.h  |  29 +++++++++++
+ hw/s390x/s390-pci-inst.c | 133 +++++++++++++++++++++++++++++++++++++++++++++--
+ hw/s390x/s390-pci-inst.h |   1 +
+ 4 files changed, 163 insertions(+), 4 deletions(-)
+
+-- 
+2.7.4
+
+
+Changelog:
+
+from v5:
+- let the compiler calculate the sizeof target entry.
+
+from v4:
+- commit message
+- use sizeof target of the fmb_do_update
+
+from v3:
+- changed commit message according to Conny's comments
+
+In s390-pci-inst.c
+- simplify the fmb_do_update() to handle
+  all cases from byte to quad. (Conny)
+
+from v2:
+In s390-pci-bus:
+- Initialize the FMB Format.
+
+In s390-pci-bus.h
+- re-organization of the internal counters, having a table for the
+  internal counters.
+
+In s390-pci-inst.c
+- Internal counters update (LD/ST/STB/RPCIT) is done always.
+  even if the FMB if fmb_addr is NULL.
+  AFAIU this respect the documentation which only states that FMB
+  update is stopped.
+- in mpcifc_service_call(), moved the setting of fmb_addr after
+  the timer has been stopped.
+- fmb_update((), use address_space_stq_be() to handle endianness
+  when storing the FMB.
+- define the format with 32 bits instead of one char and reserved
+  chars, this is easier to handle the FMB copy.
+- No update of the DMA fields inside the FMB, as stipulated by the
+  documentation when format32 is 0.
