@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52213)
+Received: from eggs.gnu.org ([208.118.235.92]:55308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gf8mH-0003Vs-0M
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:35:41 -0500
+	(envelope-from <eblake@redhat.com>) id 1gf8x7-0006dI-P2
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gf8mC-0005L9-Ha
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:35:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50680)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gf8mC-0005Dd-9q
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:35:32 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gf8m4-0008Jh-Ng
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 19:35:24 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 955D62E80C9
-	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 19:35:24 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1gf8x6-0006sM-VG
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:46:49 -0500
+References: <20190103094728.31747-1-rjones@redhat.com>
+	<20190103094728.31747-2-rjones@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <73d061a2-18d0-e696-2ebf-d78f9e763a13@redhat.com>
+Date: Thu, 3 Jan 2019 13:46:29 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 03 Jan 2019 19:27:46 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1810433 <1810433@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154653873624.24628.7091357257162393259.malonedeb@gac.canonical.com>
-Message-Id: <154654366681.4791.5995198070879033250.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810433] Re: aarch64-linux-user master:
- inconsistent pwrite behaviour
+In-Reply-To: <20190103094728.31747-2-rjones@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bTH2YQvhwjGWAusdcuG5VlzKX2qlKtHFK"
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: Reinitialize optind to 1 (not
+ 0) before parsing inner command.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,78 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-It should be a patch pretty similar to commit 58cfa6c2e6eb51b23cc98f8,
-but in the pwrite64 codepath. Slightly complicated by needing to deal
-with the offset possibly being in two input arguments, but basically the
-same thing.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bTH2YQvhwjGWAusdcuG5VlzKX2qlKtHFK
+From: Eric Blake <eblake@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Message-ID: <73d061a2-18d0-e696-2ebf-d78f9e763a13@redhat.com>
+Subject: Re: [PATCH v2] qemu-io: Reinitialize optind to 1 (not 0) before
+ parsing inner command.
+References: <20190103094728.31747-1-rjones@redhat.com>
+ <20190103094728.31747-2-rjones@redhat.com>
+In-Reply-To: <20190103094728.31747-2-rjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 1/3/19 3:47 AM, Richard W.M. Jones wrote:
+> On FreeBSD 11.2:
+>=20
+>   $ nbdkit memory size=3D1M --run './qemu-io -f raw -c "aio_write 0 512=
+" $nbd'
+>   Parsing error: non-numeric argument, or extraneous/unrecognized suffi=
+x -- aio_write
+>=20
+> After main option parsing, we reinitialize optind so we can parse each
+> command.  However reinitializing optind to 0 does not work on FreeBSD.
+> What happens when you do this is optind remains 0 after the option
+> parsing loop, and the result is we try to parse argv[optind] =3D=3D
+> argv[0] =3D=3D "aio_write" as if it was the first parameter.
+>=20
+> The FreeBSD manual page says:
+>=20
+>   In order to use getopt() to evaluate multiple sets of arguments, or t=
+o
+>   evaluate a single set of arguments multiple times, the variable optre=
+set
+>   must be set to 1 before the second and each additional set of calls t=
+o
+>   getopt(), and the variable optind must be reinitialized.
+>=20
+> (From the rest of the man page it is clear that optind must be
+> reinitialized to 1).
+>=20
+> The glibc man page says:
+>=20
+>   A program that scans multiple argument vectors,  or  rescans  the  sa=
+me
+>   vector  more than once, and wants to make use of GNU extensions such =
+as
+>   '+' and '-' at  the  start  of  optstring,  or  changes  the  value  =
+of
+>   POSIXLY_CORRECT  between scans, must reinitialize getopt() by resetti=
+ng
+>   optind to 0, rather than the traditional value of 1.  (Resetting  to =
+ 0
+>   forces  the  invocation  of  an  internal  initialization  routine th=
+at
+>   rechecks POSIXLY_CORRECT and checks for GNU extensions in optstring.)=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810433
+>=20
+> Note I didn't set optreset.  It's not present in glibc and the "hard
+> reset" is not necessary in this context.
+>=20
+> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+> ---
+>  qemu-io-cmds.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Title:
-  aarch64-linux-user master: inconsistent pwrite behaviour
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Status in QEMU:
-  New
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Bug description:
-  Hello,
 
-  I am running aarch64-linux-user from master, commit
-  20d6c7312f1b812bb9c750f4087f69ac8485cc90
+--bTH2YQvhwjGWAusdcuG5VlzKX2qlKtHFK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  And I've found the following inconsistent emulation of pwrite() call when=
- buf=3D=3DNULL and len=3D0.
-  Minimal reproducible sample is the following:
+-----BEGIN PGP SIGNATURE-----
 
-  #define _GNU_SOURCE
-  #include <stdlib.h>
-  #include <stdio.h>
-  #include <unistd.h>
-  #include <sys/types.h>
-  #include <sys/stat.h>
-  #include <fcntl.h>
-  #include <string.h>
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwuZpUACgkQ3g5py3or
+ov0KxQf/R0uvQUyIVJ5bZoBDuys31H1KxUT83F2jqHFDmD3dNu5zc9YyozKGO7W3
+7op28BQ3csj0gYmCf1lCjLUtgxkwRe1PXAvk/Tr8X96Otu18cFcheWhe5OuU/U1C
+3DrTI44kBvkYRcEDBAaw7mhm7w8ewVkkQ9E+ydqQFScKD8ekFtOqK3ejOveqITAW
++Scw7ktBhEU/bvNHPf6vHPauk++vwpcM/nxvKEd6NUJMb0Tx6ChbBxwasEYdtNDF
+wCLBRjQZwxjWODEqqZJ3jIHI2fdYXNg6RZHleA7SZZqdLByPlt5if0ExzXJx8j4K
+VY/iKn7KP9QxZREqLMK3YxWdSUsb7A==
+=321C
+-----END PGP SIGNATURE-----
 
-  /*
-  =C2=A0System                  | Result
-  -------------------------+----------------
-  =C2=A0Native x86_64 4.12.14   | pwrite ret =3D 0
-  =C2=A0Native aarch64 4.4.159  | pwrite ret =3D 0
-  =C2=A0qemu-aarch64 at x86_64  | pwrite ret =3D -1
-  =C2=A0=C2=A0=C2=A0( 20d6c7312f1b8 )     |
-  */
-
-  int main(int argc, char** argv) {
-  =C2=A0int fd =3D open("test.dat", O_CREAT | O_RDWR, 0644);
-  =C2=A0if (fd < 0) {
-  =C2=A0=C2=A0perror("open");
-  =C2=A0=C2=A0return 1;
-  =C2=A0}
-
-  =C2=A0int ret =3D fallocate(fd, 0, 0, 1000);
-  =C2=A0if (ret < 0) {
-  =C2=A0=C2=A0perror("fallocate");
-  =C2=A0=C2=A0return 1;
-  =C2=A0}
-
-  =C2=A0ssize_t ret_pwrite =3D pwrite(fd, NULL, 0, 0);
-  =C2=A0printf("pwrite ret =3D %ld\n", ret_pwrite);
-
-  =C2=A0close(fd);
-
-  =C2=A0return 0;
-  }
-
-  =
-
-  Please note, that the same binary executable prints different output at n=
-ative aarch64 platform and under aarch64-linux-user
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810433/+subscriptions
+--bTH2YQvhwjGWAusdcuG5VlzKX2qlKtHFK--
