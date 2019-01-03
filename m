@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47699)
+Received: from eggs.gnu.org ([208.118.235.92]:50099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1geyp9-0003nB-9u
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 03:57:58 -0500
+	(envelope-from <philmd@redhat.com>) id 1geyvh-00015I-Ny
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:04:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1geyp3-0001gk-MH
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 03:57:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35221)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1geyp1-0001eW-Ku
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 03:57:49 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B64E8142BEF
-	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 08:57:44 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Thu,  3 Jan 2019 09:56:38 +0100
-Message-Id: <20190103085638.17600-6-philmd@redhat.com>
-In-Reply-To: <20190103085638.17600-1-philmd@redhat.com>
-References: <20190103085638.17600-1-philmd@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1geyvd-0008N7-IC
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:04:41 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:40110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1geyvd-0008Ml-Ae
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:04:37 -0500
+Received: by mail-wm1-f68.google.com with SMTP id f188so29613214wmf.5
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 01:04:37 -0800 (PST)
+References: <154645087925.9907.8533035759502851896@02a1dbf831e2>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e122954c-760c-47ac-3858-1c25e0b2f9ff@redhat.com>
+Date: Thu, 3 Jan 2019 10:04:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 5/5] migration: Use strnlen() for fixed-size
- string
+In-Reply-To: <154645087925.9907.8533035759502851896@02a1dbf831e2>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] cutils: Cleanup, improve documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: fam@euphon.net, david@redhat.com, qemu-trivial@nongnu.org, cohuck@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, kraxel@redhat.com, pbonzini@redhat.com
 
-GCC 8 introduced the -Wstringop-overflow, which detect buffer overflow
-by string-modifying functions declared in <string.h>, such strncpy(),
-used in global_state_store_running().
+On 1/2/19 6:41 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20181226171538.21984-1-philmd@redhat.com/
+[...]> === OUTPUT BEGIN ===
+> Checking PATCH 1/3: util/cutils: Move size_to_str() from "qemu-common.h" to "cutils.h"...
+> WARNING: Block comments use a leading /* on a separate line
+> #42: FILE: include/qemu/cutils.h:160:
+> +/**
 
-GCC indeed found an incorrect use of strlen(), because this array
-is loaded by VMSTATE_BUFFER(runstate, GlobalState) then parsed
-using qapi_enum_parse which does not get the buffer length.
+I believe this warning is incorrect, since we use the /** marking for
+Doxygen generated documentation. The offending comment is:
 
-Use strnlen() which returns sizeof(s->runstate) if the array is not
-NUL-terminated, assert the size is within range, and enforce the array
-to be NUL-terminated to avoid an overflow in qapi_enum_parse().
+  /**
+   * size_to_str:
+   *
+   * Return human readable string for size @val.
+   * Use IEC binary units like KiB, MiB, and so forth.
+   *
+   * @val: The value to format.
+   *       Can be anything that uint64_t allows (no more than "16 EiB").
+   *
+   * Caller is responsible for passing it to g_free().
+   */
+   char *size_to_str(uint64_t val);
 
-This fixes:
+Am I missing something?
 
-    CC      migration/global_state.o
-  qemu/migration/global_state.c: In function 'global_state_pre_save':
-  qemu/migration/global_state.c:109:15: error: 'strlen' argument 1 declar=
-ed attribute 'nonstring' [-Werror=3Dstringop-overflow=3D]
-       s->size =3D strlen((char *)s->runstate) + 1;
-                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-  qemu/migration/global_state.c:24:13: note: argument 'runstate' declared=
- here
-       uint8_t runstate[100] QEMU_NONSTRING;
-               ^~~~~~~~
-  cc1: all warnings being treated as errors
-  make: *** [qemu/rules.mak:69: migration/global_state.o] Error 1
+> Checking PATCH 2/3: util/cutils: Move ctype macros to "cutils.h"...
+> WARNING: Block comments use a leading /* on a separate line
+> #100: FILE: include/qemu/cutils.h:6:
+> +/** unsigned ctype macros:
+> 
+> ERROR: code indent should never use tabs
+> #108: FILE: include/qemu/cutils.h:14:
+> +#define qemu_isalnum(c)^I^Iisalnum((unsigned char)(c))$
 
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v5: Use Linux-kernel-style multiline comments
----
- migration/global_state.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+OK, this is code movement I forgot to fix :/
 
-diff --git a/migration/global_state.c b/migration/global_state.c
-index 01805c567a..2c8c447239 100644
---- a/migration/global_state.c
-+++ b/migration/global_state.c
-@@ -89,6 +89,17 @@ static int global_state_post_load(void *opaque, int ve=
-rsion_id)
-     s->received =3D true;
-     trace_migrate_global_state_post_load(runstate);
-=20
-+    if (strnlen((char *)s->runstate,
-+                sizeof(s->runstate)) =3D=3D sizeof(s->runstate)) {
-+        /*
-+         * This condition should never happen during migration, because
-+         * all runstate names are shorter than 100 bytes (the size of
-+         * s->runstate). However, a malicious stream could overflow
-+         * the qapi_enum_parse() call, so we force the last character
-+         * to a NUL byte.
-+         */
-+        s->runstate[sizeof(s->runstate) - 1] =3D '\0';
-+    }
-     r =3D qapi_enum_parse(&RunState_lookup, runstate, -1, &local_err);
-=20
-     if (r =3D=3D -1) {
-@@ -107,7 +118,8 @@ static int global_state_pre_save(void *opaque)
-     GlobalState *s =3D opaque;
-=20
-     trace_migrate_global_state_pre_save((char *)s->runstate);
--    s->size =3D strlen((char *)s->runstate) + 1;
-+    s->size =3D strnlen((char *)s->runstate, sizeof(s->runstate)) + 1;
-+    assert(s->size <=3D sizeof(s->runstate));
-=20
-     return 0;
- }
---=20
-2.17.2
+> Checking PATCH 3/3: util/cutils: Move function documentations to the header...
+> WARNING: Block comments use a leading /* on a separate line
+> #73: FILE: include/qemu/cutils.h:156:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #95: FILE: include/qemu/cutils.h:179:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #124: FILE: include/qemu/cutils.h:208:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #154: FILE: include/qemu/cutils.h:238:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #183: FILE: include/qemu/cutils.h:267:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #214: FILE: include/qemu/cutils.h:298:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #225: FILE: include/qemu/cutils.h:309:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #235: FILE: include/qemu/cutils.h:319:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #263: FILE: include/qemu/cutils.h:347:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #273: FILE: include/qemu/cutils.h:357:
+> +/**
+> 
+> WARNING: Block comments use a leading /* on a separate line
+> #304: FILE: include/qemu/cutils.h:388:
+> +/**
