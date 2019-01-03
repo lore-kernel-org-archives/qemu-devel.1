@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38339)
+Received: from eggs.gnu.org ([208.118.235.92]:38342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gesZi-0002au-Rh
+	(envelope-from <dgibson@ozlabs.org>) id 1gesZj-0002bb-6t
 	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 21:17:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gesZg-00059w-J0
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 21:17:34 -0500
-Date: Thu, 3 Jan 2019 11:36:33 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gesZh-0005Bb-8D
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 21:17:35 -0500
+Date: Thu, 3 Jan 2019 13:13:44 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190103003632.GG10853@umbus.fritz.box>
+Message-ID: <20190103021344.GM10853@umbus.fritz.box>
 References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
-	<154535253055.862554.10471167343589360987.stgit@bahia.lan>
-	<20181221111904-mutt-send-email-mst@kernel.org>
+	<154537411408.891668.13796612948399384908.stgit@bahia.lan>
+	<285a22ed-c71b-b9de-e01a-f0ada3ca6ae4@kaod.org>
+	<20181221105313.119c021a@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XaUbO9McV5wPQijU"
+	protocol="application/pgp-signature"; boundary="pP0ycGQONqsnqIMP"
 Content-Disposition: inline
-In-Reply-To: <20181221111904-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH 03/15] pci: allow cleanup/unregistration of
- PCI root buses
+In-Reply-To: <20181221105313.119c021a@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 14/15] spapr: Expose the name of the
+ interrupt controller node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,161 +27,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
 
 
---XaUbO9McV5wPQijU
-Content-Type: text/plain; charset=us-ascii
+--pP0ycGQONqsnqIMP
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 21, 2018 at 11:19:18AM -0500, Michael S. Tsirkin wrote:
-> On Fri, Dec 21, 2018 at 01:35:30AM +0100, Greg Kurz wrote:
-> > From: Michael Roth <mdroth@linux.vnet.ibm.com>
-> >=20
-> > This adds cleanup counterparts to pci_register_root_bus(),
-> > pci_root_bus_new(), and pci_bus_irqs().
-> >=20
-> > These cleanup routines are needed in the case of hotpluggable
-> > PCIHostBridge implementations. Currently we can rely on the
-> > object_unparent()'ing of the PCIHostState recursively unparenting
-> > and cleaning up it's child buses, but we need explicit calls
-> > to also:
-> >=20
-> >   1) remove the PCIHostState from pci_host_bridges global list.
-> >      otherwise, we risk accessing freed memory when we access
-> >      the list later
-> >   2) clean up memory allocated in pci_bus_irqs()
-> >=20
-> > Both are handled outside the context of any particular bus or
-> > host bridge's init/realize functions, making it difficult to
-> > avoid the need for explicit cleanup functions without remodeling
-> > how PCIHostBridges are created. So keep it simple and just add
-> > them for now.
-> >=20
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
+On Fri, Dec 21, 2018 at 10:53:13AM +0100, Greg Kurz wrote:
+> On Fri, 21 Dec 2018 09:12:24 +0100
+> C=E9dric Le Goater <clg@kaod.org> wrote:
 >=20
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > On 12/21/18 7:35 AM, Greg Kurz wrote:
+> > > This will be needed by PHB hotplug in order to access the phandle pro=
+perty.
+> > >=20
+> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
+> >=20
+> > I would have used the prefix 'spapr_dt_', but it's minor.
+> >=20
+>=20
+> I guess there might be a v2. I'll do the change.
 
-I've applied this tentatively to ppc-for-4.0.  Let me know, Michael,
-if you'd prefer to take it through your tree.
+Actually, don't.  I'm standardizing on spapr_dt_* for functions which
+generate pieces of the device tree.  This helper is related, but
+doesn't really fit that pattern.
 
 >=20
-> > ---
-> >  hw/pci/pci.c         |   33 +++++++++++++++++++++++++++++++++
-> >  include/hw/pci/pci.h |    3 +++
-> >  2 files changed, 36 insertions(+)
+> > Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
 > >=20
-> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > index efb5ce196ffb..16354f91206c 100644
-> > --- a/hw/pci/pci.c
-> > +++ b/hw/pci/pci.c
-> > @@ -333,6 +333,13 @@ static void pci_host_bus_register(DeviceState *hos=
-t)
-> >      QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
-> >  }
-> > =20
-> > +static void pci_host_bus_unregister(DeviceState *host)
-> > +{
-> > +    PCIHostState *host_bridge =3D PCI_HOST_BRIDGE(host);
-> > +
-> > +    QLIST_REMOVE(host_bridge, next);
-> > +}
-> > +
-> >  PCIBus *pci_device_root_bus(const PCIDevice *d)
-> >  {
-> >      PCIBus *bus =3D pci_get_bus(d);
-> > @@ -379,6 +386,11 @@ static void pci_root_bus_init(PCIBus *bus, DeviceS=
-tate *parent,
-> >      pci_host_bus_register(parent);
-> >  }
-> > =20
-> > +static void pci_bus_uninit(PCIBus *bus)
-> > +{
-> > +    pci_host_bus_unregister(BUS(bus)->parent);
-> > +}
-> > +
-> >  bool pci_bus_is_express(PCIBus *bus)
-> >  {
-> >      return object_dynamic_cast(OBJECT(bus), TYPE_PCIE_BUS);
-> > @@ -413,6 +425,12 @@ PCIBus *pci_root_bus_new(DeviceState *parent, cons=
-t char *name,
-> >      return bus;
-> >  }
-> > =20
-> > +void pci_root_bus_cleanup(PCIBus *bus)
-> > +{
-> > +    pci_bus_uninit(bus);
-> > +    object_unparent(OBJECT(bus));
-> > +}
-> > +
-> >  void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn =
-map_irq,
-> >                    void *irq_opaque, int nirq)
-> >  {
-> > @@ -423,6 +441,15 @@ void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_=
-irq, pci_map_irq_fn map_irq,
-> >      bus->irq_count =3D g_malloc0(nirq * sizeof(bus->irq_count[0]));
-> >  }
-> > =20
-> > +void pci_bus_irqs_cleanup(PCIBus *bus)
-> > +{
-> > +    bus->set_irq =3D NULL;
-> > +    bus->map_irq =3D NULL;
-> > +    bus->irq_opaque =3D NULL;
-> > +    bus->nirq =3D 0;
-> > +    g_free(bus->irq_count);
-> > +}
-> > +
-> >  PCIBus *pci_register_root_bus(DeviceState *parent, const char *name,
-> >                                pci_set_irq_fn set_irq, pci_map_irq_fn m=
-ap_irq,
-> >                                void *irq_opaque,
-> > @@ -439,6 +466,12 @@ PCIBus *pci_register_root_bus(DeviceState *parent,=
- const char *name,
-> >      return bus;
-> >  }
-> > =20
-> > +void pci_unregister_root_bus(PCIBus *bus)
-> > +{
-> > +    pci_bus_irqs_cleanup(bus);
-> > +    pci_root_bus_cleanup(bus);
-> > +}
-> > +
-> >  int pci_bus_num(PCIBus *s)
-> >  {
-> >      return PCI_BUS_GET_CLASS(s)->bus_num(s);
-> > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> > index e6514bba23aa..8998e3be3390 100644
-> > --- a/include/hw/pci/pci.h
-> > +++ b/include/hw/pci/pci.h
-> > @@ -405,8 +405,10 @@ PCIBus *pci_root_bus_new(DeviceState *parent, cons=
-t char *name,
-> >                           MemoryRegion *address_space_mem,
-> >                           MemoryRegion *address_space_io,
-> >                           uint8_t devfn_min, const char *typename);
-> > +void pci_root_bus_cleanup(PCIBus *bus);
-> >  void pci_bus_irqs(PCIBus *bus, pci_set_irq_fn set_irq, pci_map_irq_fn =
-map_irq,
-> >                    void *irq_opaque, int nirq);
-> > +void pci_bus_irqs_cleanup(PCIBus *bus);
-> >  int pci_bus_get_irq_level(PCIBus *bus, int irq_num);
-> >  /* 0 <=3D pin <=3D 3 0 =3D INTA, 1 =3D INTB, 2 =3D INTC, 3 =3D INTD */
-> >  int pci_swizzle_map_irq_fn(PCIDevice *pci_dev, int pin);
-> > @@ -417,6 +419,7 @@ PCIBus *pci_register_root_bus(DeviceState *parent, =
-const char *name,
-> >                                MemoryRegion *address_space_io,
-> >                                uint8_t devfn_min, int nirq,
-> >                                const char *typename);
-> > +void pci_unregister_root_bus(PCIBus *bus);
-> >  void pci_bus_set_route_irq_fn(PCIBus *, pci_route_irq_fn);
-> >  PCIINTxRoute pci_device_route_intx_to_irq(PCIDevice *dev, int pin);
-> >  bool pci_intx_route_changed(PCIINTxRoute *old, PCIINTxRoute *new);
+>=20
+> Thanks!
+>=20
+> > Thanks,
+> >=20
+> > C.
+> >=20
+> > > ---
+> > >  hw/intc/spapr_xive.c        |    9 +++++++--
+> > >  hw/intc/xics_spapr.c        |    9 ++++++++-
+> > >  hw/ppc/spapr_irq.c          |    3 +++
+> > >  include/hw/ppc/spapr_irq.h  |    1 +
+> > >  include/hw/ppc/spapr_xive.h |    1 +
+> > >  include/hw/ppc/xics.h       |    1 +
+> > >  6 files changed, 21 insertions(+), 3 deletions(-)
+> > >=20
+> > > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> > > index 87424de26c1c..0540aac88d2a 100644
+> > > --- a/hw/intc/spapr_xive.c
+> > > +++ b/hw/intc/spapr_xive.c
+> > > @@ -1410,6 +1410,12 @@ void spapr_xive_hcall_init(sPAPRMachineState *=
+spapr)
+> > >      spapr_register_hypercall(H_INT_RESET, h_int_reset);
+> > >  }
+> > > =20
+> > > +gchar *spapr_xive_get_nodename(sPAPRMachineState *spapr)
+> > > +{
+> > > +    return g_strdup_printf("interrupt-controller@%" PRIx64,
+> > > +                    spapr->xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
+ TM_SHIFT));
+> > > +}
+> > > +
+> > >  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, vo=
+id *fdt,
+> > >                     uint32_t phandle)
+> > >  {
+> > > @@ -1444,8 +1450,7 @@ void spapr_dt_xive(sPAPRMachineState *spapr, ui=
+nt32_t nr_servers, void *fdt,
+> > >                             XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
+> > >      timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
+> > > =20
+> > > -    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
+> > > -                           xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
+ TM_SHIFT));
+> > > +    nodename =3D spapr_xive_get_nodename(spapr);
+> > >      _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
+> > >      g_free(nodename);
+> > > =20
+> > > diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> > > index f67d3c80bf3a..75d40daf518d 100644
+> > > --- a/hw/intc/xics_spapr.c
+> > > +++ b/hw/intc/xics_spapr.c
+> > > @@ -244,6 +244,13 @@ void xics_spapr_init(sPAPRMachineState *spapr)
+> > >      spapr_register_hypercall(H_IPOLL, h_ipoll);
+> > >  }
+> > > =20
+> > > +#define NODENAME "interrupt-controller"
+> > > +
+> > > +gchar *spapr_xics_get_nodename(sPAPRMachineState *spapr)
+> > > +{
+> > > +    return g_strdup(NODENAME);
+> > > +}
+> > > +
+> > >  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, vo=
+id *fdt,
+> > >                     uint32_t phandle)
+> > >  {
+> > > @@ -252,7 +259,7 @@ void spapr_dt_xics(sPAPRMachineState *spapr, uint=
+32_t nr_servers, void *fdt,
+> > >      };
+> > >      int node;
+> > > =20
+> > > -    _FDT(node =3D fdt_add_subnode(fdt, 0, "interrupt-controller"));
+> > > +    _FDT(node =3D fdt_add_subnode(fdt, 0, NODENAME));
+> > > =20
+> > >      _FDT(fdt_setprop_string(fdt, node, "device_type",
+> > >                              "PowerPC-External-Interrupt-Presentation=
+"));
+> > > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > > index 0999a2b2d69c..703c3a3c20d5 100644
+> > > --- a/hw/ppc/spapr_irq.c
+> > > +++ b/hw/ppc/spapr_irq.c
+> > > @@ -223,6 +223,7 @@ sPAPRIrq spapr_irq_xics =3D {
+> > >      .qirq        =3D spapr_qirq_xics,
+> > >      .print_info  =3D spapr_irq_print_info_xics,
+> > >      .dt_populate =3D spapr_dt_xics,
+> > > +    .get_nodename =3D spapr_xics_get_nodename,
+> > >      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+> > >      .post_load   =3D spapr_irq_post_load_xics,
+> > >  };
+> > > @@ -349,6 +350,7 @@ sPAPRIrq spapr_irq_xive =3D {
+> > >      .qirq        =3D spapr_qirq_xive,
+> > >      .print_info  =3D spapr_irq_print_info_xive,
+> > >      .dt_populate =3D spapr_dt_xive,
+> > > +    .get_nodename =3D spapr_xive_get_nodename,
+> > >      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
+> > >      .post_load   =3D spapr_irq_post_load_xive,
+> > >      .reset       =3D spapr_irq_reset_xive,
+> > > @@ -462,6 +464,7 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
+> > >      .qirq        =3D spapr_qirq_xics,
+> > >      .print_info  =3D spapr_irq_print_info_xics,
+> > >      .dt_populate =3D spapr_dt_xics,
+> > > +    .get_nodename =3D spapr_xics_get_nodename,
+> > >      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+> > >      .post_load   =3D spapr_irq_post_load_xics,
+> > >  };
+> > > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> > > index b34d5a00381b..59a1cf8bbc1d 100644
+> > > --- a/include/hw/ppc/spapr_irq.h
+> > > +++ b/include/hw/ppc/spapr_irq.h
+> > > @@ -42,6 +42,7 @@ typedef struct sPAPRIrq {
+> > >      void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
+> > >      void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_server=
+s,
+> > >                          void *fdt, uint32_t phandle);
+> > > +    gchar *(*get_nodename)(sPAPRMachineState *spapr);
+> > >      Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
+> > >                                 Error **errp);
+> > >      int (*post_load)(sPAPRMachineState *spapr, int version_id);
+> > > diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> > > index 728735dbcfbe..d280310ed587 100644
+> > > --- a/include/hw/ppc/spapr_xive.h
+> > > +++ b/include/hw/ppc/spapr_xive.h
+> > > @@ -47,6 +47,7 @@ typedef struct sPAPRMachineState sPAPRMachineState;
+> > >  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
+> > >  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, vo=
+id *fdt,
+> > >                     uint32_t phandle);
+> > > +gchar *spapr_xive_get_nodename(sPAPRMachineState *spapr);
+> > >  void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+> > > =20
+> > >  #endif /* PPC_SPAPR_XIVE_H */
+> > > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> > > index 14afda198cdb..eafb6428787f 100644
+> > > --- a/include/hw/ppc/xics.h
+> > > +++ b/include/hw/ppc/xics.h
+> > > @@ -204,6 +204,7 @@ typedef struct sPAPRMachineState sPAPRMachineStat=
+e;
+> > > =20
+> > >  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, vo=
+id *fdt,
+> > >                     uint32_t phandle);
+> > > +gchar *spapr_xics_get_nodename(sPAPRMachineState *spapr);
+> > >  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
+> > >  void xics_spapr_init(sPAPRMachineState *spapr);
+> > > =20
+> > >  =20
+> >=20
 >=20
 
 --=20
@@ -189,24 +214,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---XaUbO9McV5wPQijU
+--pP0ycGQONqsnqIMP
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwtWRAACgkQbDjKyiDZ
-s5Kwlg/+L+u6ht/1GoYjtvHgc/8m4G3CcJuV2JJwkBufEiGcd4XYXdAgY6UE3pEC
-G/jY31xmiBlz/fGS/XrsEBJ/ypXdm4OxzaKRbh+tYHsI/U+PsKCtexnPjqKH4giF
-tjC+AFFtjrAinvQkx55U23/P2H36KBw1T1pu51kaxMg5au0+DBmTcff7FRbHo6kx
-moP9AxLdbqlhxV92R3Is8EtZjeDoDPDOKwPVsmqDWu7D6DrCu1JMuFFrZcw+ldla
-xXnwsQAtTrVF8oahfkCIYAyMoFkqbXK3B5fENMjtF2ZZ/tUDW53dHnqcBuuJZ92t
-ZlllqWSrZzwFGzydOzOmANGtgzYRQtxdKdS85N9O04u1luijusiqLHNgt5UmV4FJ
-P0BpZW22H1uGSesGYclGIET43vdYnTqKueNC29TJEvYkG1/T4MD7biWYnSsh3+Yj
-CLc7PEQm62kh7Fi8cJvwfs1mFqGhXm+4VpdnfffmVeH4+81p7IxUp5UQorBpy95z
-tGW/3q05tgk6QIRupM7EcMA0LZIXKjWpF6BgzNConejmQ91X5T/PU9HA5Xtl4eIJ
-w+qqeLEySMAEnXKJJg/CjXIfUaAbV04e9OwL9yO30JtCd0YtCcax+9ivTrigIIQ6
-iJTnDOdEr4aUnY6+sErYr/KC0nl41NTXP/bPZgr/u9gjzMAc4YQ=
-=RsSK
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwtb9gACgkQbDjKyiDZ
+s5Lg7w//W9RWBt0uwTggqfn0WRir38VaqoDlvb1NYlmIlHWhLquXGBXegVinVmGY
+TDVTO+3iE9s+GsR2TI5s1MCqutT76jQs9YyzZ9JbZ0ogYgzMfiHT5wPFAsJAdoyF
+/jOm8vqGQ3jXFyay5hqF5aaWE7W2DblBzDtX2o0/2P9iTF3vmlmECXjaPONfIO4f
+32+coHNCvySHMwMU/n3DFuv3l4JVWQdRT92zWWfRoZbYYjliZDpLZMOUyKWOGPI2
+qAIRIXj40BWj6z9M34uo7DotwDIpkpdIVADMkAlIpXVu7ti0BjfRVZzMmS5L+aq8
+SHTb7UNcJ6DZMLyyXtGETCSTPA66JvxFpQnUOadjDCWO1ibl0NVlH4923gXkbO02
+xw9a/eLXpzvYsOANoTswdg91/pBAiATfqa91yxwCd6hjLCUwwrrCmp0bl+csR/8a
+CsofKHWFy3Gm65V4hk9G7ui8ZdfYzqFfUUPGsmNsqmHcoUpfohLsmtcxkjvIBRMJ
+iWuQ3TLUWmUN4GixPIotFB27xOy08ej61/Ol3IhP3+3qVhNX6jUhBXP6SqYcoT55
+4GbaVA1Iy8HldieG02lDqwHoM7G06RxhzsZ3V1p6BWTSJM2wUnNPRmmAee6DVe8d
+t1ZT7hhR/jLmpxo/JEHuto3F72CPj86QdO91OQlDqlJ5xxqh+X4=
+=JT6K
 -----END PGP SIGNATURE-----
 
---XaUbO9McV5wPQijU--
+--pP0ycGQONqsnqIMP--
