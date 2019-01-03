@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51359)
+Received: from eggs.gnu.org ([208.118.235.92]:51394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gf36h-0005Pe-Be
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:32:20 -0500
+	(envelope-from <liq3ea@163.com>) id 1gf36y-0005Wz-IU
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:32:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gf36c-0008QS-By
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:32:19 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54935)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gf36c-0008Nx-67
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:32:14 -0500
-Received: by mail-wm1-f65.google.com with SMTP id a62so29304113wmh.4
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 05:32:13 -0800 (PST)
-References: <1546268200-26966-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<CAFEAcA8Xb1DeTTus7vwfQXDGC8ETR5a9Egg4nVN=+cLy0xm2dQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a08068ab-88ae-4068-d4d6-3a3c4a968893@redhat.com>
-Date: Thu, 3 Jan 2019 14:32:11 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Xb1DeTTus7vwfQXDGC8ETR5a9Egg4nVN=+cLy0xm2dQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL v2 00/44] MIPS pull request for December
- 2018 - v2
+	(envelope-from <liq3ea@163.com>) id 1gf36t-0000Hr-Io
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:32:36 -0500
+Received: from m12-16.163.com ([220.181.12.16]:46269)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>) id 1gf36t-0000HZ-0E
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:32:31 -0500
+From: Li Qiang <liq3ea@163.com>
+Date: Thu,  3 Jan 2019 05:31:13 -0800
+Message-Id: <20190103133113.49599-1-liq3ea@163.com>
+Subject: [Qemu-devel] [PATCH] usb: dev-mtp: close fd in
+ usb_mtp_object_readdir()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +22,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: kraxel@redhat.com
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, Li Qiang <liq3ea@163.com>
 
-On 1/3/19 2:23 PM, Peter Maydell wrote:
-> On Mon, 31 Dec 2018 at 14:56, Aleksandar Markovic
-> <aleksandar.markovic@rt-rk.com> wrote:
->> MIPS queue for December 2018 - v2
-[...]
-> Hi; I'm afraid this doesn't build on all my test hosts:
-> 
-> target/mips/translate.c: In function ‘gen_mxu_Q8MAX_Q8MIN’:
-> target/mips/translate.c:25092:9: error: ‘for’ loop initial
-> declarations are only allowed in C99 mode
->          for (int i = 2; i >= 0; i--) {
->          ^
-> target/mips/translate.c:25092:9: note: use option -std=c99 or
-> -std=gnu99 to compile your code
-> target/mips/translate.c:25129:9: error: ‘for’ loop initial
-> declarations are only allowed in C99 mode
->          for (int i = 2; i >= 0; i--) {
->          ^
-> 
-> (This probably only shows up on builds with older versions
-> of gcc which don't default to c99.)
-> 
-> We don't use variable-declaration-in-for-loop.
+Spotted by Coverity: CID 1397070
 
-Hmmm I wonder if we shouldn't relax that now than all supported
-compilers do support C99.
-Rational is having cleaner function declarations lead to easier reviews.
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ hw/usb/dev-mtp.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index b19b576278..666bafd9e8 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -666,6 +666,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
+     }
+     dir = fdopendir(fd);
+     if (!dir) {
++        close(fd);
+         return;
+     }
+ #ifdef CONFIG_INOTIFY1
+@@ -682,6 +683,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
+         usb_mtp_add_child(s, o, entry->d_name);
+     }
+     closedir(dir);
++    close(fd);
+ }
+ 
+ /* ----------------------------------------------------------------------- */
+-- 
+2.17.1
