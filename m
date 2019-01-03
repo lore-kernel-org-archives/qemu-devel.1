@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:39659)
+Received: from eggs.gnu.org ([208.118.235.92]:46885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf0tA-0003TT-8B
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:15 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gf18K-00022W-B9
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:25:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gf0t7-00024H-68
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46202)
+	(envelope-from <dgilbert@redhat.com>) id 1gf18F-0005Uy-EV
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:25:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gf0t6-00022t-Ua
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:10:09 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  3 Jan 2019 12:09:52 +0100
-Message-Id: <1546513792-17773-4-git-send-email-thuth@redhat.com>
-In-Reply-To: <1546513792-17773-1-git-send-email-thuth@redhat.com>
-References: <1546513792-17773-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] tests/pnv-xscom: Make test independent of
- global_qtest
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gf18F-0005Ue-67
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:25:47 -0500
+Date: Thu, 3 Jan 2019 11:25:39 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190103112538.GF2316@work-vm>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-6-fli@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181225140449.15786-6-fli@suse.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 05/16] migration: unify error
+ handling for process_incoming_migration_co
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
 
-Pass around the QTestState, so that we can finally get rid of the
-out-of-favor global_qtest variable in this file, too.
+* Fei Li (fli@suse.com) wrote:
+> In the current code, if process_incoming_migration_co() fails we do
+> the same error handing: set the error state, close the source file,
+> do the cleanup for multifd, and then exit(EXIT_FAILURE). To make the
+> code clearer, add a "goto fail" to unify the error handling.
+> 
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Fei Li <fli@suse.com>
+> ---
+>  migration/migration.c | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 5d322eb9d6..ded151b1bf 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -438,15 +438,13 @@ static void process_incoming_migration_co(void *opaque)
+>          /* Make sure all file formats flush their mutable metadata */
+>          bdrv_invalidate_cache_all(&local_err);
+>          if (local_err) {
+> -            migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> -                    MIGRATION_STATUS_FAILED);
+>              error_report_err(local_err);
+> -            exit(EXIT_FAILURE);
+> +            goto fail;
+>          }
+>  
+>          if (colo_init_ram_cache() < 0) {
+>              error_report("Init ram cache failed");
+> -            exit(EXIT_FAILURE);
+> +            goto fail;
+>          }
+>  
+>          qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+> @@ -461,20 +459,22 @@ static void process_incoming_migration_co(void *opaque)
+>      }
+>  
+>      if (ret < 0) {
+> -        Error *local_err = NULL;
+> -
+> -        migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> -                          MIGRATION_STATUS_FAILED);
+>          error_report("load of migration failed: %s", strerror(-ret));
+> -        qemu_fclose(mis->from_src_file);
+> -        if (multifd_load_cleanup(&local_err) != 0) {
+> -            error_report_err(local_err);
+> -        }
+> -        exit(EXIT_FAILURE);
+> +        goto fail;
+>      }
+>      mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
+>      qemu_bh_schedule(mis->bh);
+>      mis->migration_incoming_co = NULL;
+> +    return;
+> +fail:
+> +    local_err = NULL;
+> +    migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+> +                      MIGRATION_STATUS_FAILED);
+> +    qemu_fclose(mis->from_src_file);
+> +    if (multifd_load_cleanup(&local_err) != 0) {
+> +        error_report_err(local_err);
+> +    }
+> +    exit(EXIT_FAILURE);
+>  }
+>  
+>  static void migration_incoming_setup(QEMUFile *f)
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/pnv-xscom-test.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+OK, so this is really unifying the normal error case and the two
+colo-incoming error cases; so I think that's fine.
 
-diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
-index 70f4c84..974f8da 100644
---- a/tests/pnv-xscom-test.c
-+++ b/tests/pnv-xscom-test.c
-@@ -63,14 +63,15 @@ static uint64_t pnv_xscom_addr(const PnvChip *chip, uint32_t pcba)
-     return addr;
- }
- 
--static uint64_t pnv_xscom_read(const PnvChip *chip, uint32_t pcba)
-+static uint64_t pnv_xscom_read(QTestState *qts, const PnvChip *chip,
-+                               uint32_t pcba)
- {
--    return readq(pnv_xscom_addr(chip, pcba));
-+    return qtest_readq(qts, pnv_xscom_addr(chip, pcba));
- }
- 
--static void test_xscom_cfam_id(const PnvChip *chip)
-+static void test_xscom_cfam_id(QTestState *qts, const PnvChip *chip)
- {
--    uint64_t f000f = pnv_xscom_read(chip, 0xf000f);
-+    uint64_t f000f = pnv_xscom_read(qts, chip, 0xf000f);
- 
-     g_assert_cmphex(f000f, ==, chip->cfam_id);
- }
-@@ -78,11 +79,11 @@ static void test_xscom_cfam_id(const PnvChip *chip)
- static void test_cfam_id(const void *data)
- {
-     const PnvChip *chip = data;
-+    QTestState *qts;
- 
--    global_qtest = qtest_initf("-M powernv,accel=tcg -cpu %s",
--                               chip->cpu_model);
--    test_xscom_cfam_id(chip);
--    qtest_quit(global_qtest);
-+    qts = qtest_initf("-M powernv,accel=tcg -cpu %s", chip->cpu_model);
-+    test_xscom_cfam_id(qts, chip);
-+    qtest_quit(qts);
- }
- 
- 
-@@ -94,7 +95,7 @@ static void test_cfam_id(const void *data)
- 
- #define PNV_XSCOM_EX_DTS_RESULT0     0x50000
- 
--static void test_xscom_core(const PnvChip *chip)
-+static void test_xscom_core(QTestState *qts, const PnvChip *chip)
- {
-     uint32_t first_core_dts0 = PNV_XSCOM_EX_DTS_RESULT0;
-     uint64_t dts0;
-@@ -105,7 +106,7 @@ static void test_xscom_core(const PnvChip *chip)
-         first_core_dts0 |= PNV_XSCOM_P9_EC_BASE(chip->first_core);
-     }
- 
--    dts0 = pnv_xscom_read(chip, first_core_dts0);
-+    dts0 = pnv_xscom_read(qts, chip, first_core_dts0);
- 
-     g_assert_cmphex(dts0, ==, 0x26f024f023f0000ull);
- }
-@@ -113,11 +114,11 @@ static void test_xscom_core(const PnvChip *chip)
- static void test_core(const void *data)
- {
-     const PnvChip *chip = data;
-+    QTestState *qts;
- 
--    global_qtest = qtest_initf("-M powernv,accel=tcg -cpu %s",
--                               chip->cpu_model);
--    test_xscom_core(chip);
--    qtest_quit(global_qtest);
-+    qts = qtest_initf("-M powernv,accel=tcg -cpu %s", chip->cpu_model);
-+    test_xscom_core(qts, chip);
-+    qtest_quit(qts);
- }
- 
- static void add_test(const char *name, void (*test)(const void *data))
--- 
-1.8.3.1
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> -- 
+> 2.13.7
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
