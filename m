@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36577)
+Received: from eggs.gnu.org ([208.118.235.92]:37412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gf7nK-00011I-2s
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:32:39 -0500
+	(envelope-from <bounces@canonical.com>) id 1gf7qE-0003Hr-41
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:35:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gf7nG-0008GW-RS
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:32:37 -0500
-Date: Thu, 3 Jan 2019 16:32:06 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190103183206.GA4157@habkost.net>
-References: <20181205195704.17605-1-ehabkost@redhat.com>
-	<20181205195704.17605-3-ehabkost@redhat.com>
-	<a28d196a-e2fe-a013-a6e2-99ac260f6279@redhat.com>
-	<6d25cdc7-60f9-a0e0-b3be-d78da86752b5@redhat.com>
-	<20190103114837.66429dbb.cohuck@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gf7qA-0001vR-Oa
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:35:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33610)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gf7qA-0001ub-6T
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 13:35:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gf7q8-0001WO-8v
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 18:35:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3949C2E80C9
+	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 18:35:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190103114837.66429dbb.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 2/2] virtio: Provide
- version-specific variants of virtio PCI devices
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 03 Jan 2019 18:23:33 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1810433 <1810433@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154653873624.24628.7091357257162393259.malonedeb@gac.canonical.com>
+Message-Id: <154653981365.25950.12848458886141079268.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1810433] Re: aarch64-linux-user master:
+ inconsistent pwrite behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>, qemu-s390x@nongnu.org, Markus Armbruster <armbru@redhat.com>, Jason Wang <jasowang@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Max Reitz <mreitz@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Jan 03, 2019 at 11:48:37AM +0100, Cornelia Huck wrote:
-> On Thu, 3 Jan 2019 11:14:44 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
-> > On 2019-01-03 10:38, Thomas Huth wrote:
-> > > On 2018-12-05 20:57, Eduardo Habkost wrote:  
-> > >> Many of the current virtio-*-pci device types actually represent
-> > >> 3 different types of devices:
-> > >> * virtio 1.0 non-transitional devices
-> > >> * virtio 1.0 transitional devices
-> > >> * virtio 0.9 ("legacy device" in virtio 1.0 terminology)
-> > >>
-> > >> That would be just an annoyance if it didn't break our device/bus
-> > >> compatibility QMP interfaces.  With these multi-purpose device
-> > >> types, there's no way to tell management software that
-> > >> transitional devices and legacy devices require a Conventional
-> > >> PCI bus.
-> > >>
-> > >> The multi-purpose device types would also prevent us from telling
-> > >> management software what's the PCI vendor/device ID for them,
-> > >> because their PCI IDs change at runtime depending on the bus
-> > >> where they were plugged.
-> > >>
-> > >> This patch adds separate device types for each of those virtio
-> > >> device flavors:
-> > >>
-> > >> - virtio-*-pci: the existing multi-purpose device types
-> > >>   - Configurable using `disable-legacy` and `disable-modern`
-> > >>     properties
-> > >>   - Legacy driver support is automatically enabled/disabled
-> > >>     depending on the bus where it is plugged
-> > >>   - Supports Conventional PCI and PCI Express buses
-> > >>     (but Conventional PCI is incompatible with
-> > >>     disable-legacy=off)
-> > >>   - Changes PCI vendor/device IDs at runtime
-> > >> - virtio-*-pci-transitional: virtio-1.0 device supporting legacy drivers
-> > >>   - Supports Conventional PCI buses only, because
-> > >>     it has a PIO BAR
-> > >> - virtio-*-pci-non-transitional: modern-only
-> > >>   - Supports both Conventional PCI and PCI Express buses
-> > >>
-> > >> The existing TYPE_* macros for these types will point to an
-> > >> abstract base type, so existing casts in the code will keep
-> > >> working for all variants.
-> > >>
-> > >> A simple test script (tests/acceptance/virtio_version.py) is
-> > >> included, to check if the new device types are equivalent to
-> > >> using the `disable-legacy` and `disable-modern` options.
-> > >>
-> > >> Acked-by: Andrea Bolognani <abologna@redhat.com>
-> > >> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> > >> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>  
-> > > 
-> > >  Hi Eduardo,
-> > > 
-> > > with these new devices, I can trigger an abort on s390x:
-> > > 
-> > > $ qemu-system-s390x -M s390-ccw-virtio-2.5 -monitor stdio -no-shutdown
-> > > QEMU 3.1.50 monitor - type 'help' for more information
-> > > (qemu) device_add vhost-scsi-pci-non-transitional
-> > > qemu-system-s390x: hw/core/qdev-properties.c:1236:
-> > > qdev_prop_set_globals: Assertion `prop->user_provided' failed.
-> > > Aborted (core dumped)  
-> > FWIW, it happens with x86, too:
-> > 
-> > $ qemu-system-x86_64 -M pc-i440fx-2.6 -monitor stdio
-> > QEMU 3.1.50 monitor - type 'help' for more information
-> > (qemu) device_add vhost-scsi-pci-non-transitional
-> > qemu-system-x86_64: hw/core/qdev-properties.c:1236:
-> > qdev_prop_set_globals: Assertion `prop->user_provided' failed.
-> > Aborted (core dumped)
-> > 
-> > Only machine types newer than 2.7 seem to be OK.
-> 
-> It also fails for vhost-scsi-pci-transitional on 2.6 and older machines.
-> 
-> The problem is that HW_COMPAT_2_6 tries to set the disable_modern
-> property, which the version-specific variants of virtio-pci do not have.
-> 
-> Not sure how to fix this. The version-specific devices cannot really
-> work on the compat machine.
+This seems related to commit 58cfa6c2e6eb51b23cc98f8, where this was
+fixed for the write() syscall. In that commit message the author writes
+"Q. Do pread64/pwrite64 need to be changed similarly? A. Experiment
+suggests not: both linux and linux-user yield -1 for NULL 0-length
+reads/writes." That doesn't match your results, though, and looking at
+the source both write and pwrite syscalls go through the vfs_write()
+function, so their behaviour for a NULL/0 buffer should be identical.
 
-Oops.
+-- =
 
-My patch broke the assumption that every virtio-pci subclass is a
-generic legacy/modern device.  The good news is that HW_COMPAT_2_6
-needs to affect only devices that existed in QEMU
-2.6 (not every subclass of virtio-pci).
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1810433
 
-I see 3 possible ways to address this:
+Title:
+  aarch64-linux-user master: inconsistent pwrite behaviour
 
-1) Making disable-legacy and disable-modern available on all
-virtio-pci subclasses again.
+Status in QEMU:
+  New
 
-This is simple to implement, but I would like to avoid that.  I'd
-prefer to keep the legacy/modern logic complexity restricted to
-the old generic virtio devices.
+Bug description:
+  Hello,
 
+  I am running aarch64-linux-user from master, commit
+  20d6c7312f1b812bb9c750f4087f69ac8485cc90
 
-2) Creating a virtio-pci-generic or virtio-pci-hybrid interface
-type, add it to generic_type_info at virtio_pci_types_register(),
-and use it on HW_COMPAT_2_6 instead of "virtio-pci".
+  And I've found the following inconsistent emulation of pwrite() call when=
+ buf=3D=3DNULL and len=3D0.
+  Minimal reproducible sample is the following:
 
-This is simple to implement, but I'm wary.  I'm already bothered
-by the complexity of our PCI and virtio type hierarchies.  We
-have multiple overlapping sets of virtio-pci devices (depending
-which way you look), and specifying exactly which set we want to
-affect is tricky.
+  #define _GNU_SOURCE
+  #include <stdlib.h>
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <string.h>
 
+  /*
+  =C2=A0System                  | Result
+  -------------------------+----------------
+  =C2=A0Native x86_64 4.12.14   | pwrite ret =3D 0
+  =C2=A0Native aarch64 4.4.159  | pwrite ret =3D 0
+  =C2=A0qemu-aarch64 at x86_64  | pwrite ret =3D -1
+  =C2=A0=C2=A0=C2=A0( 20d6c7312f1b8 )     |
+  */
 
-3) Replacing "virtio-pci" on HW_COMPAT_2_6 with an explicit list
-of concrete virtio-pci types that existed when QEMU 2.6 was
-released.  This will make HW_COMPAT_2_6 grow, but reduce
-complexity of the whole system.  I'm inclined to implement this
-solution.
+  int main(int argc, char** argv) {
+  =C2=A0int fd =3D open("test.dat", O_CREAT | O_RDWR, 0644);
+  =C2=A0if (fd < 0) {
+  =C2=A0=C2=A0perror("open");
+  =C2=A0=C2=A0return 1;
+  =C2=A0}
 
--- 
-Eduardo
+  =C2=A0int ret =3D fallocate(fd, 0, 0, 1000);
+  =C2=A0if (ret < 0) {
+  =C2=A0=C2=A0perror("fallocate");
+  =C2=A0=C2=A0return 1;
+  =C2=A0}
+
+  =C2=A0ssize_t ret_pwrite =3D pwrite(fd, NULL, 0, 0);
+  =C2=A0printf("pwrite ret =3D %ld\n", ret_pwrite);
+
+  =C2=A0close(fd);
+
+  =C2=A0return 0;
+  }
+
+  =
+
+  Please note, that the same binary executable prints different output at n=
+ative aarch64 platform and under aarch64-linux-user
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1810433/+subscriptions
