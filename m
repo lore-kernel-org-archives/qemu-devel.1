@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44124)
+Received: from eggs.gnu.org ([208.118.235.92]:44182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gf05n-00045x-W4
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:12 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gf05z-0004Iq-Bs
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gf05m-0002ml-T7
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:11 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42058)
+	(envelope-from <elohimes@gmail.com>) id 1gf05x-0002uJ-DS
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:23 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33839)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gf05m-0002lq-Ks
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:10 -0500
-Received: by mail-pl1-x643.google.com with SMTP id y1so15726219plp.9
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 02:19:10 -0800 (PST)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gf05v-0002sG-EE
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:19:20 -0500
+Received: by mail-pf1-x444.google.com with SMTP id h3so16508060pfg.1
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 02:19:17 -0800 (PST)
 From: elohimes@gmail.com
-Date: Thu,  3 Jan 2019 18:18:15 +0800
-Message-Id: <20190103101819.7418-4-xieyongji@baidu.com>
+Date: Thu,  3 Jan 2019 18:18:17 +0800
+Message-Id: <20190103101819.7418-6-xieyongji@baidu.com>
 In-Reply-To: <20190103101819.7418-1-xieyongji@baidu.com>
 References: <20190103101819.7418-1-xieyongji@baidu.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 for-4.0 3/7] libvhost-user: Introduce
- vu_queue_map_desc()
+Subject: [Qemu-devel] [PATCH v3 for-4.0 5/7] vhost-user-blk: Add support to
+ provide shared memory to backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,140 +31,106 @@ Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.c
 
 From: Xie Yongji <xieyongji@baidu.com>
 
-Introduce vu_queue_map_desc() which should be
-independent with vu_queue_pop();
+This patch add supports for vhost-user-blk device to provide
+shared memory to backend.
 
 Signed-off-by: Xie Yongji <xieyongji@baidu.com>
 Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 88 ++++++++++++++++-----------
- 1 file changed, 51 insertions(+), 37 deletions(-)
+ hw/block/vhost-user-blk.c          | 26 ++++++++++++++++++++++++++
+ include/hw/virtio/vhost-user-blk.h |  1 +
+ 2 files changed, 27 insertions(+)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index a6b46cdc03..23bd52264c 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -1853,49 +1853,20 @@ virtqueue_alloc_element(size_t sz,
-     return elem;
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 1451940845..27028cf996 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -126,6 +126,13 @@ static void vhost_user_blk_start(VirtIODevice *vdev)
+     }
+ 
+     s->dev.acked_features = vdev->guest_features;
++
++    ret = vhost_dev_set_shm(&s->dev, s->shm);
++    if (ret < 0) {
++        error_report("Error set shared memory: %d", -ret);
++        goto err_guest_notifiers;
++    }
++
+     ret = vhost_dev_start(&s->dev, vdev);
+     if (ret < 0) {
+         error_report("Error starting vhost: %d", -ret);
+@@ -245,6 +252,13 @@ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+     }
  }
  
--void *
--vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
-+static void *
-+vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
- {
--    unsigned int i, head, max, desc_len;
-+    struct vring_desc *desc = vq->vring.desc;
-     uint64_t desc_addr, read_len;
-+    unsigned int desc_len;
-+    unsigned int max = vq->vring.num;
-+    unsigned int i = idx;
-     VuVirtqElement *elem;
--    unsigned out_num, in_num;
-+    unsigned int out_num = 0, in_num = 0;
-     struct iovec iov[VIRTQUEUE_MAX_SIZE];
-     struct vring_desc desc_buf[VIRTQUEUE_MAX_SIZE];
--    struct vring_desc *desc;
-     int rc;
- 
--    if (unlikely(dev->broken) ||
--        unlikely(!vq->vring.avail)) {
--        return NULL;
--    }
--
--    if (vu_queue_empty(dev, vq)) {
--        return NULL;
--    }
--    /* Needed after virtio_queue_empty(), see comment in
--     * virtqueue_num_heads(). */
--    smp_rmb();
--
--    /* When we start there are none of either input nor output. */
--    out_num = in_num = 0;
--
--    max = vq->vring.num;
--    if (vq->inuse >= vq->vring.num) {
--        vu_panic(dev, "Virtqueue size exceeded");
--        return NULL;
--    }
--
--    if (!virtqueue_get_head(dev, vq, vq->last_avail_idx++, &head)) {
--        return NULL;
--    }
--
--    if (vu_has_feature(dev, VIRTIO_RING_F_EVENT_IDX)) {
--        vring_set_avail_event(vq, vq->last_avail_idx);
--    }
--
--    i = head;
--    desc = vq->vring.desc;
-     if (desc[i].flags & VRING_DESC_F_INDIRECT) {
-         if (desc[i].len % sizeof(struct vring_desc)) {
-             vu_panic(dev, "Invalid size for indirect buffer table");
-@@ -1947,12 +1918,13 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
-     } while (rc == VIRTQUEUE_READ_DESC_MORE);
- 
-     if (rc == VIRTQUEUE_READ_DESC_ERROR) {
-+        vu_panic(dev, "read descriptor error");
-         return NULL;
-     }
- 
-     /* Now copy what we have collected and mapped */
-     elem = virtqueue_alloc_element(sz, out_num, in_num);
--    elem->index = head;
-+    elem->index = idx;
-     for (i = 0; i < out_num; i++) {
-         elem->out_sg[i] = iov[i];
-     }
-@@ -1960,6 +1932,48 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
-         elem->in_sg[i] = iov[out_num + i];
-     }
- 
-+    return elem;
++static void vhost_user_blk_reset(VirtIODevice *vdev)
++{
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++
++    vhost_dev_reset_shm(s->shm);
 +}
 +
-+void *
-+vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
-+{
-+    unsigned int head;
-+    VuVirtqElement *elem;
-+
-+    if (unlikely(dev->broken) ||
-+        unlikely(!vq->vring.avail)) {
-+        return NULL;
-+    }
-+
-+    if (vu_queue_empty(dev, vq)) {
-+        return NULL;
-+    }
-+    /*
-+     * Needed after virtio_queue_empty(), see comment in
-+     * virtqueue_num_heads().
-+     */
-+    smp_rmb();
-+
-+    if (vq->inuse >= vq->vring.num) {
-+        vu_panic(dev, "Virtqueue size exceeded");
-+        return NULL;
-+    }
-+
-+    if (!virtqueue_get_head(dev, vq, vq->last_avail_idx++, &head)) {
-+        return NULL;
-+    }
-+
-+    if (vu_has_feature(dev, VIRTIO_RING_F_EVENT_IDX)) {
-+        vring_set_avail_event(vq, vq->last_avail_idx);
-+    }
-+
-+    elem = vu_queue_map_desc(dev, vq, head, sz);
-+
-+    if (!elem) {
-+        return NULL;
-+    }
-+
-     vq->inuse++;
+ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -284,6 +298,8 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+                          vhost_user_blk_handle_output);
+     }
  
-     return elem;
++    s->shm = g_new0(struct vhost_shm, 1);
++
+     s->dev.nvqs = s->num_queues;
+     s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
+     s->dev.vq_index = 0;
+@@ -309,12 +325,19 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+         s->blkcfg.num_queues = s->num_queues;
+     }
+ 
++    ret = vhost_dev_init_shm(&s->dev, s->shm);
++    if (ret < 0) {
++        error_setg(errp, "vhost-user-blk: init shared memory failed");
++        goto vhost_err;
++    }
++
+     return;
+ 
+ vhost_err:
+     vhost_dev_cleanup(&s->dev);
+ virtio_err:
+     g_free(s->dev.vqs);
++    g_free(s->shm);
+     virtio_cleanup(vdev);
+ 
+     vhost_user_cleanup(user);
+@@ -329,7 +352,9 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
+ 
+     vhost_user_blk_set_status(vdev, 0);
+     vhost_dev_cleanup(&s->dev);
++    vhost_dev_free_shm(s->shm);
+     g_free(s->dev.vqs);
++    g_free(s->shm);
+     virtio_cleanup(vdev);
+ 
+     if (s->vhost_user) {
+@@ -379,6 +404,7 @@ static void vhost_user_blk_class_init(ObjectClass *klass, void *data)
+     vdc->set_config = vhost_user_blk_set_config;
+     vdc->get_features = vhost_user_blk_get_features;
+     vdc->set_status = vhost_user_blk_set_status;
++    vdc->reset = vhost_user_blk_reset;
+ }
+ 
+ static const TypeInfo vhost_user_blk_info = {
+diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
+index d52944aeeb..bb706d70b3 100644
+--- a/include/hw/virtio/vhost-user-blk.h
++++ b/include/hw/virtio/vhost-user-blk.h
+@@ -36,6 +36,7 @@ typedef struct VHostUserBlk {
+     uint32_t queue_size;
+     uint32_t config_wce;
+     struct vhost_dev dev;
++    struct vhost_shm *shm;
+     VhostUserState *vhost_user;
+ } VHostUserBlk;
+ 
 -- 
 2.17.1
