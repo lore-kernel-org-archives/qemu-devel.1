@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55308)
+Received: from eggs.gnu.org ([208.118.235.92]:60003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gf8x7-0006dI-P2
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:46:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1gf9Fw-0002RI-Vp
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 15:06:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gf8x6-0006sM-VG
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 14:46:49 -0500
-References: <20190103094728.31747-1-rjones@redhat.com>
-	<20190103094728.31747-2-rjones@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gf9Fs-0001gS-Tw
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 15:06:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gf9Fs-0001bI-LT
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 15:06:12 -0500
+References: <1545916380-12816-1-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <73d061a2-18d0-e696-2ebf-d78f9e763a13@redhat.com>
-Date: Thu, 3 Jan 2019 13:46:29 -0600
+Message-ID: <02d090d3-a486-7945-cc7d-43e24b281356@redhat.com>
+Date: Thu, 3 Jan 2019 14:06:08 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190103094728.31747-2-rjones@redhat.com>
+In-Reply-To: <1545916380-12816-1-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="bTH2YQvhwjGWAusdcuG5VlzKX2qlKtHFK"
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: Reinitialize optind to 1 (not
- 0) before parsing inner command.
+	boundary="MuccpPUBQDox5sm8syh92gUMBPUlck8kn"
+Subject: Re: [Qemu-devel] [PATCH 0/2] tests: Reorganize MIPS TCG directories
+ and files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: noring@nocrew.org, smarkovic@wavecomp.com, arikalo@wavecomp.com, amarkovic@wavecomp.com, alex.bennee@linaro.org, aurelien@aurel32.net
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bTH2YQvhwjGWAusdcuG5VlzKX2qlKtHFK
+--MuccpPUBQDox5sm8syh92gUMBPUlck8kn
 From: Eric Blake <eblake@redhat.com>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Message-ID: <73d061a2-18d0-e696-2ebf-d78f9e763a13@redhat.com>
-Subject: Re: [PATCH v2] qemu-io: Reinitialize optind to 1 (not 0) before
- parsing inner command.
-References: <20190103094728.31747-1-rjones@redhat.com>
- <20190103094728.31747-2-rjones@redhat.com>
-In-Reply-To: <20190103094728.31747-2-rjones@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: noring@nocrew.org, smarkovic@wavecomp.com, arikalo@wavecomp.com,
+ amarkovic@wavecomp.com, alex.bennee@linaro.org, aurelien@aurel32.net
+Message-ID: <02d090d3-a486-7945-cc7d-43e24b281356@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] tests: Reorganize MIPS TCG directories
+ and files
+References: <1545916380-12816-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1545916380-12816-1-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 1/3/19 3:47 AM, Richard W.M. Jones wrote:
-> On FreeBSD 11.2:
+On 12/27/18 7:12 AM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 >=20
->   $ nbdkit memory size=3D1M --run './qemu-io -f raw -c "aio_write 0 512=
-" $nbd'
->   Parsing error: non-numeric argument, or extraneous/unrecognized suffi=
-x -- aio_write
+> Reorganize MIPS TCG directories and files. The file movement is done
+> using "git mv" command, so "git blame" will still display the original
+> information, regardles of the new names and locations of involved
+> files.
 >=20
-> After main option parsing, we reinitialize optind so we can parse each
-> command.  However reinitializing optind to 0 does not work on FreeBSD.
-> What happens when you do this is optind remains 0 after the option
-> parsing loop, and the result is we try to parse argv[optind] =3D=3D
-> argv[0] =3D=3D "aio_write" as if it was the first parameter.
+> Aleksandar Markovic (2):
+>   tests: tcg: mips: Move source files to new location
+>   tests: tcg: mips: Remove old directories after reorganization
 >=20
-> The FreeBSD manual page says:
->=20
->   In order to use getopt() to evaluate multiple sets of arguments, or t=
-o
->   evaluate a single set of arguments multiple times, the variable optre=
-set
->   must be set to 1 before the second and each additional set of calls t=
-o
->   getopt(), and the variable optind must be reinitialized.
->=20
-> (From the rest of the man page it is clear that optind must be
-> reinitialized to 1).
->=20
-> The glibc man page says:
->=20
->   A program that scans multiple argument vectors,  or  rescans  the  sa=
-me
->   vector  more than once, and wants to make use of GNU extensions such =
-as
->   '+' and '-' at  the  start  of  optstring,  or  changes  the  value  =
-of
->   POSIXLY_CORRECT  between scans, must reinitialize getopt() by resetti=
-ng
->   optind to 0, rather than the traditional value of 1.  (Resetting  to =
- 0
->   forces  the  invocation  of  an  internal  initialization  routine th=
-at
->   rechecks POSIXLY_CORRECT and checks for GNU extensions in optstring.)=
+>  tests/tcg/mips/mips32-dsp/Makefile                 | 136 ---------
 
->=20
-> Note I didn't set optreset.  It's not present in glibc and the "hard
-> reset" is not necessary in this context.
->=20
-> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
-> ---
->  qemu-io-cmds.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tests/tcg/mips/mipsr5900/multu.c                   |  68 -----
+>  .../mips/system/ase/dsp/test_64_dsp_r1_absq_s_ob.c |  63 +++++
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+>  tests/tcg/mips/user/isa/r5900/test_r5900_multu.c   |  68 +++++
+>  976 files changed, 19288 insertions(+), 20087 deletions(-)
+
+You also need to turn on git rename detection before sending your v2, so
+that your mail will be MUCH smaller (showing only lines that changed
+between file renames, rather than a much larger patch of deleting the
+old file and creating a new file).  More patch submission hints,
+including the git config setup for rename detection, can be found at
+https://wiki.qemu.org/Contribute/SubmitAPatch
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -103,21 +78,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---bTH2YQvhwjGWAusdcuG5VlzKX2qlKtHFK
+--MuccpPUBQDox5sm8syh92gUMBPUlck8kn
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwuZpUACgkQ3g5py3or
-ov0KxQf/R0uvQUyIVJ5bZoBDuys31H1KxUT83F2jqHFDmD3dNu5zc9YyozKGO7W3
-7op28BQ3csj0gYmCf1lCjLUtgxkwRe1PXAvk/Tr8X96Otu18cFcheWhe5OuU/U1C
-3DrTI44kBvkYRcEDBAaw7mhm7w8ewVkkQ9E+ydqQFScKD8ekFtOqK3ejOveqITAW
-+Scw7ktBhEU/bvNHPf6vHPauk++vwpcM/nxvKEd6NUJMb0Tx6ChbBxwasEYdtNDF
-wCLBRjQZwxjWODEqqZJ3jIHI2fdYXNg6RZHleA7SZZqdLByPlt5if0ExzXJx8j4K
-VY/iKn7KP9QxZREqLMK3YxWdSUsb7A==
-=321C
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwuazAACgkQ3g5py3or
+ov1gAQf/ZhgEJRt0SzVaiFuZjurny59mw4DB7iDQNlhE+R3MFZv5tYedy/yw3yh0
+ulI7QNn/PUKCY6Zvzk5DypyPtWyIsDlSS6nT/ESSHvTTStZSld+NbF2gADPCw68+
+N5XrHW9nZC4hQ9nV2JnqjCm1qhGbopwIs/9gjSDV/2SRHOWh7PG80HdvyfjGbvCM
+5sLFxYQQ4YqYYevk2uiUDBFJy2uX6D98xIr3yhA7M+rXVP+E2AeVv5Lqu9izSts7
+DMrN4gLyZr06G7s30cDWZj2F4juszKBEVvW99rGlgrYG1l2YPdz6EvhLzMJ9prlC
+Q/knKBDEqJzn8Rs8l9vP7wfvYZtGVg==
+=yia9
 -----END PGP SIGNATURE-----
 
---bTH2YQvhwjGWAusdcuG5VlzKX2qlKtHFK--
+--MuccpPUBQDox5sm8syh92gUMBPUlck8kn--
