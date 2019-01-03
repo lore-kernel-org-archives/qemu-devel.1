@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38342)
+Received: from eggs.gnu.org ([208.118.235.92]:38380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gesZj-0002bb-6t
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 21:17:36 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gesZn-0002h7-1x
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 21:17:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gesZh-0005Bb-8D
-	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 21:17:35 -0500
-Date: Thu, 3 Jan 2019 13:13:44 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gesZg-00059G-Fm
+	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 21:17:37 -0500
+Date: Thu, 3 Jan 2019 13:17:03 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190103021344.GM10853@umbus.fritz.box>
+Message-ID: <20190103021702.GN10853@umbus.fritz.box>
 References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
-	<154537411408.891668.13796612948399384908.stgit@bahia.lan>
-	<285a22ed-c71b-b9de-e01a-f0ada3ca6ae4@kaod.org>
-	<20181221105313.119c021a@bahia.lan>
+	<154537417263.891798.7533381599337392867.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pP0ycGQONqsnqIMP"
+	protocol="application/pgp-signature"; boundary="hNG1vEeyG8BCaHbQ"
 Content-Disposition: inline
-In-Reply-To: <20181221105313.119c021a@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 14/15] spapr: Expose the name of the
- interrupt controller node
+In-Reply-To: <154537417263.891798.7533381599337392867.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 15/15] spapr: add hotplug hooks for PHB
+ hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,184 +26,310 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Greg Kurz <groug@kaod.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
 
 
---pP0ycGQONqsnqIMP
-Content-Type: text/plain; charset=iso-8859-1
+--hNG1vEeyG8BCaHbQ
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 21, 2018 at 10:53:13AM +0100, Greg Kurz wrote:
-> On Fri, 21 Dec 2018 09:12:24 +0100
-> C=E9dric Le Goater <clg@kaod.org> wrote:
+On Fri, Dec 21, 2018 at 07:36:12AM +0100, Greg Kurz wrote:
+> From: Michael Roth <mdroth@linux.vnet.ibm.com>
 >=20
-> > On 12/21/18 7:35 AM, Greg Kurz wrote:
-> > > This will be needed by PHB hotplug in order to access the phandle pro=
-perty.
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
-> >=20
-> > I would have used the prefix 'spapr_dt_', but it's minor.
-> >=20
+> Hotplugging PHBs is a machine-level operation, but PHBs reside on the
+> main system bus, so we register spapr machine as the handler for the
+> main system bus.
 >=20
-> I guess there might be a v2. I'll do the change.
-
-Actually, don't.  I'm standardizing on spapr_dt_* for functions which
-generate pieces of the device tree.  This helper is related, but
-doesn't really fit that pattern.
-
+> We re-get the phandle of the interrupt controller systematically for
+> simplicity.
 >=20
-> > Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
-> >=20
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/ppc/spapr.c         |  147 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/ppc/spapr_drc.c     |    1=20
+>  hw/ppc/spapr_pci.c     |   16 -----
+>  include/hw/ppc/spapr.h |    1=20
+>  4 files changed, 149 insertions(+), 16 deletions(-)
 >=20
-> Thanks!
->=20
-> > Thanks,
-> >=20
-> > C.
-> >=20
-> > > ---
-> > >  hw/intc/spapr_xive.c        |    9 +++++++--
-> > >  hw/intc/xics_spapr.c        |    9 ++++++++-
-> > >  hw/ppc/spapr_irq.c          |    3 +++
-> > >  include/hw/ppc/spapr_irq.h  |    1 +
-> > >  include/hw/ppc/spapr_xive.h |    1 +
-> > >  include/hw/ppc/xics.h       |    1 +
-> > >  6 files changed, 21 insertions(+), 3 deletions(-)
-> > >=20
-> > > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> > > index 87424de26c1c..0540aac88d2a 100644
-> > > --- a/hw/intc/spapr_xive.c
-> > > +++ b/hw/intc/spapr_xive.c
-> > > @@ -1410,6 +1410,12 @@ void spapr_xive_hcall_init(sPAPRMachineState *=
-spapr)
-> > >      spapr_register_hypercall(H_INT_RESET, h_int_reset);
-> > >  }
-> > > =20
-> > > +gchar *spapr_xive_get_nodename(sPAPRMachineState *spapr)
-> > > +{
-> > > +    return g_strdup_printf("interrupt-controller@%" PRIx64,
-> > > +                    spapr->xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
- TM_SHIFT));
-> > > +}
-> > > +
-> > >  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, vo=
-id *fdt,
-> > >                     uint32_t phandle)
-> > >  {
-> > > @@ -1444,8 +1450,7 @@ void spapr_dt_xive(sPAPRMachineState *spapr, ui=
-nt32_t nr_servers, void *fdt,
-> > >                             XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
-> > >      timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
-> > > =20
-> > > -    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
-> > > -                           xive->tm_base + XIVE_TM_USER_PAGE * (1 <<=
- TM_SHIFT));
-> > > +    nodename =3D spapr_xive_get_nodename(spapr);
-> > >      _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
-> > >      g_free(nodename);
-> > > =20
-> > > diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> > > index f67d3c80bf3a..75d40daf518d 100644
-> > > --- a/hw/intc/xics_spapr.c
-> > > +++ b/hw/intc/xics_spapr.c
-> > > @@ -244,6 +244,13 @@ void xics_spapr_init(sPAPRMachineState *spapr)
-> > >      spapr_register_hypercall(H_IPOLL, h_ipoll);
-> > >  }
-> > > =20
-> > > +#define NODENAME "interrupt-controller"
-> > > +
-> > > +gchar *spapr_xics_get_nodename(sPAPRMachineState *spapr)
-> > > +{
-> > > +    return g_strdup(NODENAME);
-> > > +}
-> > > +
-> > >  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, vo=
-id *fdt,
-> > >                     uint32_t phandle)
-> > >  {
-> > > @@ -252,7 +259,7 @@ void spapr_dt_xics(sPAPRMachineState *spapr, uint=
-32_t nr_servers, void *fdt,
-> > >      };
-> > >      int node;
-> > > =20
-> > > -    _FDT(node =3D fdt_add_subnode(fdt, 0, "interrupt-controller"));
-> > > +    _FDT(node =3D fdt_add_subnode(fdt, 0, NODENAME));
-> > > =20
-> > >      _FDT(fdt_setprop_string(fdt, node, "device_type",
-> > >                              "PowerPC-External-Interrupt-Presentation=
-"));
-> > > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> > > index 0999a2b2d69c..703c3a3c20d5 100644
-> > > --- a/hw/ppc/spapr_irq.c
-> > > +++ b/hw/ppc/spapr_irq.c
-> > > @@ -223,6 +223,7 @@ sPAPRIrq spapr_irq_xics =3D {
-> > >      .qirq        =3D spapr_qirq_xics,
-> > >      .print_info  =3D spapr_irq_print_info_xics,
-> > >      .dt_populate =3D spapr_dt_xics,
-> > > +    .get_nodename =3D spapr_xics_get_nodename,
-> > >      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
-> > >      .post_load   =3D spapr_irq_post_load_xics,
-> > >  };
-> > > @@ -349,6 +350,7 @@ sPAPRIrq spapr_irq_xive =3D {
-> > >      .qirq        =3D spapr_qirq_xive,
-> > >      .print_info  =3D spapr_irq_print_info_xive,
-> > >      .dt_populate =3D spapr_dt_xive,
-> > > +    .get_nodename =3D spapr_xive_get_nodename,
-> > >      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
-> > >      .post_load   =3D spapr_irq_post_load_xive,
-> > >      .reset       =3D spapr_irq_reset_xive,
-> > > @@ -462,6 +464,7 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
-> > >      .qirq        =3D spapr_qirq_xics,
-> > >      .print_info  =3D spapr_irq_print_info_xics,
-> > >      .dt_populate =3D spapr_dt_xics,
-> > > +    .get_nodename =3D spapr_xics_get_nodename,
-> > >      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
-> > >      .post_load   =3D spapr_irq_post_load_xics,
-> > >  };
-> > > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> > > index b34d5a00381b..59a1cf8bbc1d 100644
-> > > --- a/include/hw/ppc/spapr_irq.h
-> > > +++ b/include/hw/ppc/spapr_irq.h
-> > > @@ -42,6 +42,7 @@ typedef struct sPAPRIrq {
-> > >      void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
-> > >      void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_server=
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 5c405a5fafca..065c9f19700e 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2923,6 +2923,10 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+>      register_savevm_live(NULL, "spapr/htab", -1, 1,
+>                           &savevm_htab_handlers, spapr);
+> =20
+> +    if (smc->dr_phb_enabled) {
+> +        qbus_set_hotplug_handler(sysbus_get_default(), OBJECT(machine), =
+NULL);
+> +    }
+> +
+>      qemu_register_boot_set(spapr_boot_set, spapr);
+> =20
+>      if (kvm_enabled()) {
+> @@ -3716,6 +3720,135 @@ out:
+>      error_propagate(errp, local_err);
+>  }
+> =20
+> +static void spapr_phb_pre_plug(HotplugHandler *hotplug_dev, DeviceState =
+*dev,
+> +                               Error **errp)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
+> +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    const unsigned windows_supported =3D spapr_phb_windows_supported(sph=
+b);
+> +
+> +    if (sphb->index =3D=3D (uint32_t)-1) {
+> +        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * This will check that sphb->index doesn't exceed the maximum numbe=
+r of
+> +     * PHBs for the current machine type.
+> +     */
+> +    smc->phb_placement(spapr, sphb->index,
+> +                       &sphb->buid, &sphb->io_win_addr,
+> +                       &sphb->mem_win_addr, &sphb->mem64_win_addr,
+> +                       windows_supported, sphb->dma_liobn, errp);
+> +}
+> +
+> +static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                           Error **errp)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> +    void *fdt =3D NULL;
+> +    int fdt_start_offset;
+> +    int fdt_size;
+> +    Error *local_err =3D NULL;
+> +    sPAPRDRConnector *drc;
+> +    int ret;
+> +    bool hotplugged =3D spapr_drc_hotplugged(dev);
+> +    int offset, phandle =3D 0;
+> +    gchar *nodename =3D NULL;
+> +
+> +    if (!smc->dr_phb_enabled) {
+> +        return;
+> +    }
+> +
+> +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->index);
+> +    /* hotplug hooks should check it's enabled before getting this far */
+> +    assert(drc);
+> +
+> +    if (hotplugged) {
+> +        if (spapr->fdt_blob) {
+> +            /*
+> +             * SLOF might have pushed an updated FDT with new phandle va=
+lues.
+> +             * Re-get the one of our interrupt controller.
+> +             */
+> +            nodename =3D spapr->irq->get_nodename(spapr);
+> +
+> +            offset =3D fdt_subnode_offset(spapr->fdt_blob, 0, nodename);
+> +            if (offset < 0) {
+> +                error_setg(errp, "Can't find node \"%s\": %s",
+> +                           nodename, fdt_strerror(offset));
+> +                goto out;
+> +            }
+> +
+> +            phandle =3D fdt_get_phandle(spapr->fdt_blob, offset);
+> +            if (phandle < 0) {
+> +                error_setg(errp, "Can't get phandle of node \"%s\": %s",
+> +                           nodename, fdt_strerror(offset));
+> +                goto out;
+> +            }
+> +        }
+> +        DEVICE_GET_CLASS(dev)->reset(dev);
+> +    }
+> +
+> +    /* For cold-plugged at initial boot and fallback for hotplug */
+> +    if (!phandle) {
+> +        phandle =3D PHANDLE_XICP;
+> +    }
+> +
+> +    fdt =3D create_device_tree(&fdt_size);
+> +    ret =3D spapr_populate_pci_dt(sphb, phandle, fdt, spapr->irq->nr_msi=
 s,
-> > >                          void *fdt, uint32_t phandle);
-> > > +    gchar *(*get_nodename)(sPAPRMachineState *spapr);
-> > >      Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
-> > >                                 Error **errp);
-> > >      int (*post_load)(sPAPRMachineState *spapr, int version_id);
-> > > diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> > > index 728735dbcfbe..d280310ed587 100644
-> > > --- a/include/hw/ppc/spapr_xive.h
-> > > +++ b/include/hw/ppc/spapr_xive.h
-> > > @@ -47,6 +47,7 @@ typedef struct sPAPRMachineState sPAPRMachineState;
-> > >  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
-> > >  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, vo=
-id *fdt,
-> > >                     uint32_t phandle);
-> > > +gchar *spapr_xive_get_nodename(sPAPRMachineState *spapr);
-> > >  void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
-> > > =20
-> > >  #endif /* PPC_SPAPR_XIVE_H */
-> > > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> > > index 14afda198cdb..eafb6428787f 100644
-> > > --- a/include/hw/ppc/xics.h
-> > > +++ b/include/hw/ppc/xics.h
-> > > @@ -204,6 +204,7 @@ typedef struct sPAPRMachineState sPAPRMachineStat=
-e;
-> > > =20
-> > >  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, vo=
-id *fdt,
-> > >                     uint32_t phandle);
-> > > +gchar *spapr_xics_get_nodename(sPAPRMachineState *spapr);
-> > >  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-> > >  void xics_spapr_init(sPAPRMachineState *spapr);
-> > > =20
-> > >  =20
-> >=20
+> +                                &fdt_start_offset);
+> +    if (ret < 0) {
+> +        error_setg(&local_err, "unable to create FDT for %sPHB",
+> +                   dev->hotplugged ? "hotplugged " : "");
+> +        goto out;
+> +    }
+> +
+> +    if (hotplugged) {
+> +        /* generally SLOF creates these, for hotplug it's up to QEMU */
+> +        _FDT(fdt_setprop_string(fdt, fdt_start_offset, "name", "pci"));
+> +    }
+> +
+> +    spapr_drc_attach(drc, DEVICE(dev), fdt, fdt_start_offset, &local_err=
+);
+> +
+> +out:
+> +    g_free(nodename);
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        g_free(fdt);
+> +        return;
+> +    }
+> +
+> +    if (hotplugged) {
+> +        spapr_hotplug_req_add_by_index(drc);
+> +    } else if (drc) {
+> +        spapr_drc_reset(drc);
+> +    }
+> +}
+> +
+> +void spapr_phb_release(DeviceState *dev)
+> +{
+> +    object_unparent(OBJECT(dev));
+> +}
+> +
+> +static void spapr_phb_unplug_request(HotplugHandler *hotplug_dev,
+> +                                     DeviceState *dev, Error **errp)
+> +{
+> +    sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(dev);
+> +    sPAPRDRConnector *drc;
+> +
+> +    drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PHB, sphb->index);
+> +    assert(drc);
+> +
+> +    if (!spapr_drc_unplug_requested(drc)) {
+> +        spapr_drc_detach(drc);
+> +        spapr_hotplug_req_remove_by_index(drc);
+> +    }
+> +}
+> +
+>  static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+>                                        DeviceState *dev, Error **errp)
+>  {
+> @@ -3723,6 +3856,8 @@ static void spapr_machine_device_plug(HotplugHandle=
+r *hotplug_dev,
+>          spapr_memory_plug(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+>          spapr_core_plug(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRID=
+GE)) {
+> +        spapr_phb_plug(hotplug_dev, dev, errp);
+>      }
+>  }
+> =20
+> @@ -3741,6 +3876,7 @@ static void spapr_machine_device_unplug_request(Hot=
+plugHandler *hotplug_dev,
+>  {
+>      sPAPRMachineState *sms =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
+>      MachineClass *mc =3D MACHINE_GET_CLASS(sms);
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> =20
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>          if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
+> @@ -3760,6 +3896,12 @@ static void spapr_machine_device_unplug_request(Ho=
+tplugHandler *hotplug_dev,
+>              return;
+>          }
+>          spapr_core_unplug_request(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRID=
+GE)) {
+> +        if (!smc->dr_phb_enabled) {
+> +            error_setg(errp, "PHB hot unplug not supported on this machi=
+ne");
+> +            return;
+> +        }
+> +        spapr_phb_unplug_request(hotplug_dev, dev, errp);
+>      }
+>  }
+> =20
+> @@ -3770,6 +3912,8 @@ static void spapr_machine_device_pre_plug(HotplugHa=
+ndler *hotplug_dev,
+>          spapr_memory_pre_plug(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+>          spapr_core_pre_plug(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRID=
+GE)) {
+> +        spapr_phb_pre_plug(hotplug_dev, dev, errp);
+>      }
+>  }
+> =20
+> @@ -3777,7 +3921,8 @@ static HotplugHandler *spapr_get_hotplug_handler(Ma=
+chineState *machine,
+>                                                   DeviceState *dev)
+>  {
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
+> -        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE) ||
+> +        object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
+>          return HOTPLUG_HANDLER(machine);
+>      }
+>      return NULL;
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 189ee681062a..7a2676716364 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -703,6 +703,7 @@ static void spapr_drc_phb_class_init(ObjectClass *k, =
+void *data)
+>      drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
+>      drck->typename =3D "PHB";
+>      drck->drc_name_prefix =3D "PHB ";
+> +    drck->release =3D spapr_phb_release;
+>  }
+> =20
+>  static const TypeInfo spapr_dr_connector_info =3D {
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 688cca83ef2f..5bc912aa0028 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1627,21 +1627,7 @@ static void spapr_phb_realize(DeviceState *dev, Er=
+ror **errp)
+>          return;
+>      }
+> =20
+> -    if (sphb->index !=3D (uint32_t)-1) {
+> -        Error *local_err =3D NULL;
+> -
+> -        smc->phb_placement(spapr, sphb->index,
+> -                           &sphb->buid, &sphb->io_win_addr,
+> -                           &sphb->mem_win_addr, &sphb->mem64_win_addr,
+> -                           windows_supported, sphb->dma_liobn, &local_er=
+r);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            return;
+> -        }
+> -    } else {
+> -        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
+> -        return;
+> -    }
+> +    assert(sphb->index !=3D (uint32_t)-1); /* checked in spapr_phb_pre_p=
+lug() */
+
+Could this cause an unexpected assert if you're using an older machine
+type that doesn't install the hotplug handler, then don't supply an
+index on the command line?
+
+>      if (sphb->mem64_win_size !=3D 0) {
+>          if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index e96deefa30de..eff479b0a019 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -764,6 +764,7 @@ int spapr_max_server_number(sPAPRMachineState *spapr);
+>  /* CPU and LMB DRC release callbacks. */
+>  void spapr_core_release(DeviceState *dev);
+>  void spapr_lmb_release(DeviceState *dev);
+> +void spapr_phb_release(DeviceState *dev);
+> =20
+>  void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
+>  int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
 >=20
 
 --=20
@@ -214,24 +338,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---pP0ycGQONqsnqIMP
+--hNG1vEeyG8BCaHbQ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwtb9gACgkQbDjKyiDZ
-s5Lg7w//W9RWBt0uwTggqfn0WRir38VaqoDlvb1NYlmIlHWhLquXGBXegVinVmGY
-TDVTO+3iE9s+GsR2TI5s1MCqutT76jQs9YyzZ9JbZ0ogYgzMfiHT5wPFAsJAdoyF
-/jOm8vqGQ3jXFyay5hqF5aaWE7W2DblBzDtX2o0/2P9iTF3vmlmECXjaPONfIO4f
-32+coHNCvySHMwMU/n3DFuv3l4JVWQdRT92zWWfRoZbYYjliZDpLZMOUyKWOGPI2
-qAIRIXj40BWj6z9M34uo7DotwDIpkpdIVADMkAlIpXVu7ti0BjfRVZzMmS5L+aq8
-SHTb7UNcJ6DZMLyyXtGETCSTPA66JvxFpQnUOadjDCWO1ibl0NVlH4923gXkbO02
-xw9a/eLXpzvYsOANoTswdg91/pBAiATfqa91yxwCd6hjLCUwwrrCmp0bl+csR/8a
-CsofKHWFy3Gm65V4hk9G7ui8ZdfYzqFfUUPGsmNsqmHcoUpfohLsmtcxkjvIBRMJ
-iWuQ3TLUWmUN4GixPIotFB27xOy08ej61/Ol3IhP3+3qVhNX6jUhBXP6SqYcoT55
-4GbaVA1Iy8HldieG02lDqwHoM7G06RxhzsZ3V1p6BWTSJM2wUnNPRmmAee6DVe8d
-t1ZT7hhR/jLmpxo/JEHuto3F72CPj86QdO91OQlDqlJ5xxqh+X4=
-=JT6K
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwtcJ4ACgkQbDjKyiDZ
+s5JgxRAAj2GxR6uLJmY5IlMfjww6eDceKm6hOr/Vnop29XMGwrfhLqhhgzlB5491
+0qt7z83ehkW1JZHhM0Vw6DBOpAFTHzvo7lHi3gkRyqvD8cY6cNtLKD64jM96GFRn
+OmsvW+5fs7SkDlSJqdvPM0z2d0hCXFZSN436+3v8EHY9erhKKmbSagkxXfPcgKOR
+S0hUac9LHYbXjpWTQPYDRISn9XE7MFVuBeL7YuRmIroz/Qph5U0t5hpEbjjxlvH3
+bv3JRd6xVzzmEU7WjiEpSLQF9xXFk/07RBzs8CzpgyiP9tq/Lx++7wKAIpn1H9Ur
+8xhTiCQ8VBFmdKbhsslgB0IUB+q2bGF+SfwuRkH/BdILBndcbWaIN7s2rTwakVhF
+3c4b5cZ8KGZtfyDnf6pZwBLWBA5+RtRTgh7GtlIWzVXfySnPsPL0gDNeT2Etf6hM
+/Ah4e78l0qk0+Qe+HjOMxbp8K90PRJyMhy2+HX1dYcX6Zg4XFUEB3JFPb5J+J2c9
+XlaKCdKCQtckfqpcL5xJklgwwM2Qb5iL5oeae+p0tg1qGP2f6KXTl6Ho2LG0knVl
+DmIyHiIUjEwUFfktaUmZYC3BPsu+fXCsApWZCE8fQlfwGDNt68bIYpiqVPlabn3L
+v/7aHNSjE327n20IthUBGFlUuYvmYPh34qwGPBKgPROdWeT4ACY=
+=jE4h
 -----END PGP SIGNATURE-----
 
---pP0ycGQONqsnqIMP--
+--hNG1vEeyG8BCaHbQ--
