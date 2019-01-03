@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47533)
+Received: from eggs.gnu.org ([208.118.235.92]:47591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1geyoa-0003Fr-NB
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 03:57:21 -0500
+	(envelope-from <philmd@redhat.com>) id 1geyoh-0003Mp-QE
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 03:57:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1geyoZ-0001Cs-P5
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 03:57:20 -0500
+	(envelope-from <philmd@redhat.com>) id 1geyof-0001Jy-2o
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 03:57:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49708)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1geyoe-0001Ii-QJ
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 03:57:24 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 23F4FC04BE30
+	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 08:57:24 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Thu,  3 Jan 2019 09:56:35 +0100
-Message-Id: <20190103085638.17600-3-philmd@redhat.com>
+Date: Thu,  3 Jan 2019 09:56:36 +0100
+Message-Id: <20190103085638.17600-4-philmd@redhat.com>
 In-Reply-To: <20190103085638.17600-1-philmd@redhat.com>
 References: <20190103085638.17600-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 2/5] block/sheepdog: Use QEMU_NONSTRING for
- non NUL-terminated arrays
+Subject: [Qemu-devel] [PATCH v5 3/5] hw/acpi: Use QEMU_NONSTRING for non
+ NUL-terminated arrays
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,7 +34,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Sheepdog" <qemu-block@nongnu.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
 GCC 8 added a -Wstringop-truncation warning:
 
@@ -35,48 +45,102 @@ GCC 8 added a -Wstringop-truncation warning:
 
 This new warning leads to compilation failures:
 
-    CC      block/sheepdog.o
-  qemu/block/sheepdog.c: In function 'find_vdi_name':
-  qemu/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equa=
-ls destination size [-Werror=3Dstringop-truncation]
-       strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  make: *** [qemu/rules.mak:69: block/sheepdog.o] Error 1
+    CC      hw/acpi/core.o
+  In function 'acpi_table_install', inlined from 'acpi_table_add' at qemu=
+/hw/acpi/core.c:296:5:
+  qemu/hw/acpi/core.c:184:9: error: 'strncpy' specified bound 4 equals de=
+stination size [-Werror=3Dstringop-truncation]
+           strncpy(ext_hdr->sig, hdrs->sig, sizeof ext_hdr->sig);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  make: *** [qemu/rules.mak:69: hw/acpi/core.o] Error 1
 
-As described previous to the strncpy() calls, the use of strncpy() is
-correct here:
-
-    /* This pair of strncpy calls ensures that the buffer is zero-filled,
-     * which is desirable since we'll soon be sending those bytes, and
-     * don't want the send_req to read uninitialized data.
-     */
-    strncpy(buf, filename, SD_MAX_VDI_LEN);
-    strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-
-Use the QEMU_NONSTRING attribute, since this array is intended to store
-character arrays that do not necessarily contain a terminating NUL.
+Use the QEMU_NONSTRING attribute, since ACPI tables don't require the
+strings to be NUL-terminated.
 
 Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- block/sheepdog.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v4: rebased
+v5: Fix checkpatch error: space prohibited before open square bracket '['
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 0125df9d49..5cd9618432 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1224,7 +1224,7 @@ static int find_vdi_name(BDRVSheepdogState *s, cons=
-t char *filename,
-     SheepdogVdiReq hdr;
-     SheepdogVdiRsp *rsp =3D (SheepdogVdiRsp *)&hdr;
-     unsigned int wlen, rlen =3D 0;
--    char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN];
-+    char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN] QEMU_NONSTRING;
+Note this triggers the following checkpatch warning (patchew),
+which is incorrect because this is a multi-line macro,
+thus we can not use Linux-kernel-style multiline comments here:
+
+  WARNING: Block comments use a leading /* on a separate line
+  #83: FILE: include/hw/acpi/acpi-defs.h:61:
+  +                 QEMU_NONSTRING;     /* OEM identification */ \
+---
+ hw/acpi/core.c              | 12 ++++++++----
+ include/hw/acpi/acpi-defs.h | 13 ++++++++-----
+ 2 files changed, 16 insertions(+), 9 deletions(-)
+
+diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+index d6f0709691..47877c0ec1 100644
+--- a/hw/acpi/core.c
++++ b/hw/acpi/core.c
+@@ -35,14 +35,18 @@
+ struct acpi_table_header {
+     uint16_t _length;         /* our length, not actual part of the hdr =
+*/
+                               /* allows easier parsing for fw_cfg client=
+s */
+-    char sig[4];              /* ACPI signature (4 ASCII characters) */
++    char sig[4]
++             QEMU_NONSTRING;  /* ACPI signature (4 ASCII characters) */
+     uint32_t length;          /* Length of table, in bytes, including he=
+ader */
+     uint8_t revision;         /* ACPI Specification minor version # */
+     uint8_t checksum;         /* To make sum of entire table =3D=3D 0 */
+-    char oem_id[6];           /* OEM identification */
+-    char oem_table_id[8];     /* OEM table identification */
++    char oem_id[6]
++             QEMU_NONSTRING;  /* OEM identification */
++    char oem_table_id[8]
++             QEMU_NONSTRING;  /* OEM table identification */
+     uint32_t oem_revision;    /* OEM revision number */
+-    char asl_compiler_id[4];  /* ASL compiler vendor ID */
++    char asl_compiler_id[4]
++             QEMU_NONSTRING;  /* ASL compiler vendor ID */
+     uint32_t asl_compiler_revision; /* ASL compiler revision number */
+ } QEMU_PACKED;
 =20
-     fd =3D connect_to_sdog(s, errp);
-     if (fd < 0) {
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 5021cb9e79..4ed160afae 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -41,8 +41,8 @@ enum {
+ };
+=20
+ typedef struct AcpiRsdpData {
+-    uint8_t oem_id[6]; /* OEM identification */
+-    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
++    uint8_t oem_id[6] QEMU_NONSTRING; /* OEM identification */
++    uint8_t revision;                 /* Must be 0 for 1.0, 2 for 2.0 */
+=20
+     unsigned *rsdt_tbl_offset;
+     unsigned *xsdt_tbl_offset;
+@@ -57,10 +57,13 @@ typedef struct AcpiRsdpData {
+     uint32_t length;                 /* Length of table, in bytes, inclu=
+ding header */ \
+     uint8_t  revision;               /* ACPI Specification minor version=
+ # */ \
+     uint8_t  checksum;               /* To make sum of entire table =3D=3D=
+ 0 */ \
+-    uint8_t  oem_id [6];             /* OEM identification */ \
+-    uint8_t  oem_table_id [8];       /* OEM table identification */ \
++    uint8_t  oem_id[6] \
++                 QEMU_NONSTRING;     /* OEM identification */ \
++    uint8_t  oem_table_id[8] \
++                 QEMU_NONSTRING;     /* OEM table identification */ \
+     uint32_t oem_revision;           /* OEM revision number */ \
+-    uint8_t  asl_compiler_id [4];    /* ASL compiler vendor ID */ \
++    uint8_t  asl_compiler_id[4] \
++                 QEMU_NONSTRING;     /* ASL compiler vendor ID */ \
+     uint32_t asl_compiler_revision;  /* ASL compiler revision number */
+=20
+=20
 --=20
 2.17.2
