@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56444)
+Received: from eggs.gnu.org ([208.118.235.92]:33616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf1ez-000662-1k
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:59:37 -0500
+	(envelope-from <bounces@canonical.com>) id 1gf1zQ-0003Lr-T3
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:20:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf1ey-0002Lv-5g
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:59:37 -0500
-Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:33282)
+	(envelope-from <bounces@canonical.com>) id 1gf1zN-0002KM-PV
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:20:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57356)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gf1ey-0002Kn-08
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 06:59:36 -0500
-Received: by mail-oi1-x230.google.com with SMTP id c206so27527961oib.0
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 03:59:34 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gf1zN-0002Jp-JY
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 07:20:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gf1zM-0007kv-7m
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 12:20:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 324AA2E806E
+	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 12:20:40 +0000 (UTC)
 MIME-Version: 1.0
-References: <20181225205529.10874-1-richard.henderson@linaro.org>
-In-Reply-To: <20181225205529.10874-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 Jan 2019 11:59:23 +0000
-Message-ID: <CAFEAcA_vkH_Go=HvOUJ1E=sFhPTEDKmtYqVs0dirstKD4tj9Rg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/42] tcg queued patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 03 Jan 2019 12:11:44 -0000
+From: David <1810405@bugs.launchpad.net>
+Reply-To: Bug 1810405 <1810405@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154651750421.25988.5720567987776657968.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1810405] [NEW] source tarball has errors when
+ untarring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +36,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Tue, 25 Dec 2018 at 20:55, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The following changes since commit 9b2e891ec5ccdb4a7d583b77988848282606fdea:
->
->   Merge remote-tracking branch 'remotes/marcel/tags/rdma-pull-request' into staging (2018-12-22 11:25:31 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20181226
->
-> for you to fetch changes up to 4250da10923347c9ee907f8d72bd93dfa5ee8742:
->
->   tcg: Improve call argument loading (2018-12-26 06:58:43 +1100)
->
-> ----------------------------------------------------------------
-> Host support for riscv64.
-> Dead code elimination pass.
-> Register allocation improvements.
->
+Public bug reported:
 
-Applied, thanks.
+If you download qemu-2.10.0.tar.xv and/or qemu-2.10.1.tar.xv, and follow
+the directions at https://www.qemu.org/download/, you get a tar error.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
 
--- PMM
+To repro:
+$ wget  https://download.qemu.org/qemu-2.10.0.tar.xz
+$ tar  xJf qemu-2.10.0.tar.xz =
+
+tar: qemu-2.10.0/roms/u-boot/scripts/Kconfig: Cannot open: File exists
+tar: Exiting with failure status due to previous errors
+
+$ tar --version
+tar (GNU tar) 1.29
+Copyright (C) 2015 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.htm=
+l>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by John Gilmore and Jay Fenlason.
+
+
+Apologies if I'm being an idiot here.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1810405
+
+Title:
+  source tarball has errors when untarring
+
+Status in QEMU:
+  New
+
+Bug description:
+  If you download qemu-2.10.0.tar.xv and/or qemu-2.10.1.tar.xv, and
+  follow the directions at https://www.qemu.org/download/, you get a tar
+  error.
+
+  =
+
+  To repro:
+  $ wget  https://download.qemu.org/qemu-2.10.0.tar.xz
+  $ tar  xJf qemu-2.10.0.tar.xz =
+
+  tar: qemu-2.10.0/roms/u-boot/scripts/Kconfig: Cannot open: File exists
+  tar: Exiting with failure status due to previous errors
+
+  $ tar --version
+  tar (GNU tar) 1.29
+  Copyright (C) 2015 Free Software Foundation, Inc.
+  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
+tml>.
+  This is free software: you are free to change and redistribute it.
+  There is NO WARRANTY, to the extent permitted by law.
+
+  Written by John Gilmore and Jay Fenlason.
+
+  =
+
+  Apologies if I'm being an idiot here.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1810405/+subscriptions
