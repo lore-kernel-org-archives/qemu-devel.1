@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44265)
+Received: from eggs.gnu.org ([208.118.235.92]:46881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf6mK-0001mL-SR
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:27:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1gf6uP-00038X-2M
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:35:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf6mJ-00014q-F6
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:27:32 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40213)
+	(envelope-from <bounces@canonical.com>) id 1gf6uK-0002To-NX
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:35:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52158)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gf6mJ-00013p-7s
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:27:31 -0500
-Received: by mail-ot1-x341.google.com with SMTP id s5so29963492oth.7
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 09:27:31 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gf6uD-0002H1-7v
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:35:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gf6u6-0005JD-BH
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 17:35:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 543B52E80CD
+	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 17:35:34 +0000 (UTC)
 MIME-Version: 1.0
-References: <975b9131-9937-cfea-3b5d-ef36d0c2b761@gmail.com>
-	<CAFEAcA-2tWtEqd-Z0xqNMeocf4rns+FihrAPudiQGz+85HFjJg@mail.gmail.com>
-	<7b61db39-7059-6286-2282-b90f45a85faf@gmail.com>
-In-Reply-To: <7b61db39-7059-6286-2282-b90f45a85faf@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 Jan 2019 17:27:18 +0000
-Message-ID: <CAFEAcA9HkBC4M8vNsHd9M0YrAEYPb=3vd9jj8zkPruMKrtP=mA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] Support u-boot noload images for arm as
- used by, NetBSD/evbarm GENERIC kernel.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 03 Jan 2019 17:26:22 -0000
+From: Adam Williamson <awilliam@redhat.com>
+Reply-To: Bug 1738283 <1738283@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151328724563.26325.11755910452939969450.malonedeb@wampee.canonical.com>
+Message-Id: <154653638226.5073.9283018935362326109.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1738283] Re: 'Less than' (<), 'more than' (>),
+ and 'pipe' (|) can't be typed via VNC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nick Hudson <nicholas.a.hudson@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Thu, 3 Jan 2019 at 16:50, Nick Hudson <nicholas.a.hudson@gmail.com> wrote:
-> On 03/01/2019 16:20, Peter Maydell wrote:
-> > On Tue, 11 Dec 2018 at 12:27, Nick Hudson <nicholas.a.hudson@gmail.com> wrote:
-> >> --- a/hw/arm/boot.c
-> >> +++ b/hw/arm/boot.c
-> >> @@ -30,8 +30,9 @@
-> >>     * Documentation/arm/Booting and Documentation/arm64/booting.txt
-> >>     * They have different preferred image load offsets from system RAM base.
-> >>     */
-> >> -#define KERNEL_ARGS_ADDR 0x100
-> >> -#define KERNEL_LOAD_ADDR 0x00010000
-> >> +#define KERNEL_ARGS_ADDR   0x100
-> >> +#define KERNEL_NOLOAD_ADDR 0x00000000
-> >
-> > If I'm reading the code right, this requests that noload images
-> > are loaded at offset zero into RAM, yes ?
->
-> Not quite.
->
-> They're loaded as if the full noload image (including uboot header)
-> was loaded at offset zero, but as load_uboot_image doesn't load the
-> header then the image body (minus the header) is loaded at offset
-> zero + the size of the u-boot header, i.e. 0x40.
->
-> > That's not a great
-> > choice, because we put our little mini bootloader at offset 0,
-> > and so the two will clash.
->
-> Fortuntately, the bootloader fits in the space that the uboot header would
-> have occupied.
->
-> My commit message has
->
-> "The bootloader fits in the space that the uboot header would have occupied."
->
-> to try and described this. I could add more of a description if required?
+I'm not subscribed there, so will note here: I tried the proposed
+changes - the commits from https://lists.gnu.org/archive/html/qemu-
+devel/2018-12/msg04819.html , backported to 3.0.0 - and that seems to
+work. A test which would previously have hit this bug ran OK, without
+the changes to the en-us keymap.
 
-Ah, I missed that. This seems very fragile to me -- 0x40
-is only 64 bytes, which is 16 instructions. Currently
-our boot loader code is less than that, but only by four
-insns or so, so it's very plausible that some future
-enhancement to the loader code would take it over the 0x40
-boundary, at which point handling of noload images will
-silently fail. At a minimum we should have an assertion
-that we stay below 0x40; but I'm not keen on restricting
-ourselves to 16-instruction bootloaders.
+-- =
 
-Will a noload image ever in practice also be a Linux kernel
-(ie hdr->ih_os == IH_OS_LINUX) ? If not, then we don't lose
-anything by not allowing those to be loaded. (And if anybody
-does in future complain that their image doesn't work, we
-could make it supported by allowing the mini-bootloader to
-be placed elsewhere in RAM.)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1738283
 
-thanks
--- PMM
+Title:
+  'Less than' (<), 'more than' (>), and 'pipe' (|) can't be typed via
+  VNC
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  If I start QEMU 2.11 (from
+  https://build.opensuse.org/package/show/Virtualization/qemu) VM with
+  VNC, I am unable to type following three characters: 'less than' (<),
+  'more than' (>), and 'pipe' (|) on en_US QWERTY keyboard. Other
+  characters work fine. QEMu version 2.10.1 worked fine.
+
+  /usr/bin/qemu-kvm -m 2048 -cpu kvm64 -drive
+  media=3Dcdrom,if=3Dnone,id=3Dcd0,format=3Draw,file=3DOI-hipster-
+  minimal-20171031.iso -device ide-cd,drive=3Dcd0 -boot once=3Dd,menu=3Don
+  ,splash-time=3D5000 -device usb-ehci -device usb-tablet -smp 1 -enable-
+  kvm -vnc :91,share=3Dforce-shared
+
+  The ISO can be downloaded here: https://www.openindiana.org/download/
+
+  Also tried Fedora-Server-dvd-x86_64-25-1.3.iso and it's the same
+  situation.
+
+  If I run the same command without '-vnc :91,share=3Dforce-shared',
+  everything works just fine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1738283/+subscriptions
