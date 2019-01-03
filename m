@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59000)
+Received: from eggs.gnu.org ([208.118.235.92]:59001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@trasno.org>) id 1gf3ha-0005ju-Rt
+	(envelope-from <quintela@trasno.org>) id 1gf3ha-0005k9-S8
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@trasno.org>) id 1gf3hX-0008Q3-J5
+	(envelope-from <quintela@trasno.org>) id 1gf3hZ-0008QW-3f
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:26 -0500
-Received: from trasno.trasno.org ([83.165.45.250]:43068 helo=mail.trasno.org)
+Received: from trasno.trasno.org ([83.165.45.250]:43096 helo=mail.trasno.org)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@trasno.org>) id 1gf3hX-0008PE-BI
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:23 -0500
+	(Exim 4.71) (envelope-from <quintela@trasno.org>) id 1gf3hY-0008QK-T4
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:25 -0500
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  3 Jan 2019 15:09:57 +0100
-Message-Id: <20190103141013.18019-1-quintela@redhat.com>
+Date: Thu,  3 Jan 2019 15:09:59 +0100
+Message-Id: <20190103141013.18019-3-quintela@redhat.com>
+In-Reply-To: <20190103141013.18019-1-quintela@redhat.com>
+References: <20190103141013.18019-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 00/16] Virtio devices split from virtio-pci
+Subject: [Qemu-devel] [PATCH v4 02/16] virtio: split virtio input host bits
+ from virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +27,169 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Juan Quintela <quintela@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-Hi
+For consistency with other devices, rename
+virtio_host_{initfn,pci_info} to virtio_input_host_{initfn,info}.
 
-v4:
-- rebase to master (have conflict with other changes)
-
-v3:
-- rebase to master
-- only compile them if CONFIG_PCI is set (thomas)
-
-Please review.
-
-Later, Juan.
-
-V2:
-
-- Rebase on top of master
-
-Please review.
-
-Later, Juan.
-
-[v1]
->From previous verision (in the middle of make check tests):
-- split also the bits of virtio-pci.h (mst suggestion)
-- add gpu, crypt and gpg bits
-- more cleanups
-- fix all the copyrights (the ones not changed have been there
-  foverever)
-- be consistent with naming, vhost-* or virtio-*
-
-Please review, Juan.
-
-Juan Quintela (16):
-  virtio: split vhost vsock bits from virtio-pci
-  virtio: split virtio input host bits from virtio-pci
-  virtio: split virtio input bits from virtio-pci
-  virtio: split virtio rng bits from virtio-pci
-  virtio: split virtio balloon bits from virtio-pci
-  virtio: split virtio 9p bits from virtio-pci
-  virtio: split vhost user blk bits from virtio-pci
-  virtio: split vhost user scsi bits from virtio-pci
-  virtio: split vhost scsi bits from virtio-pci
-  virtio: split virtio scsi bits from virtio-pci
-  virtio: split virtio blk bits rom virtio-pci
-  virtio: split virtio net bits rom virtio-pci
-  virtio: split virtio serial bits rom virtio-pci
-  virtio: split virtio gpu bits rom virtio-pci.h
-  virtio: split virtio crypto bits rom virtio-pci.h
-  virtio: virtio 9p really requires CONFIG_VIRTFS to work
-
- default-configs/virtio.mak        |   3 +-
- hw/display/virtio-gpu-pci.c       |  14 +
- hw/display/virtio-vga.c           |   1 +
- hw/virtio/Makefile.objs           |  15 +
- hw/virtio/vhost-scsi-pci.c        |  97 ++++
- hw/virtio/vhost-user-blk-pci.c    | 103 ++++
- hw/virtio/vhost-user-scsi-pci.c   | 103 ++++
- hw/virtio/vhost-vsock-pci.c       |  86 ++++
- hw/virtio/virtio-9p-pci.c         |  88 ++++
- hw/virtio/virtio-balloon-pci.c    |  95 ++++
- hw/virtio/virtio-blk-pci.c        | 100 ++++
- hw/virtio/virtio-crypto-pci.c     |  14 +
- hw/virtio/virtio-input-host-pci.c |  48 ++
- hw/virtio/virtio-input-pci.c      | 157 ++++++
- hw/virtio/virtio-net-pci.c        |  98 ++++
- hw/virtio/virtio-pci.c            | 811 +-----------------------------
- hw/virtio/virtio-pci.h            | 234 ---------
- hw/virtio/virtio-rng-pci.c        |  88 ++++
- hw/virtio/virtio-scsi-pci.c       | 107 ++++
- hw/virtio/virtio-serial-pci.c     | 115 +++++
- tests/Makefile.include            |  20 +-
- 21 files changed, 1342 insertions(+), 1055 deletions(-)
- create mode 100644 hw/virtio/vhost-scsi-pci.c
- create mode 100644 hw/virtio/vhost-user-blk-pci.c
- create mode 100644 hw/virtio/vhost-user-scsi-pci.c
- create mode 100644 hw/virtio/vhost-vsock-pci.c
- create mode 100644 hw/virtio/virtio-9p-pci.c
- create mode 100644 hw/virtio/virtio-balloon-pci.c
- create mode 100644 hw/virtio/virtio-blk-pci.c
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ default-configs/virtio.mak        |  1 +
+ hw/virtio/Makefile.objs           |  1 +
+ hw/virtio/virtio-input-host-pci.c | 48 +++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c            | 23 ---------------
+ hw/virtio/virtio-pci.h            | 14 ---------
+ 5 files changed, 50 insertions(+), 37 deletions(-)
  create mode 100644 hw/virtio/virtio-input-host-pci.c
- create mode 100644 hw/virtio/virtio-input-pci.c
- create mode 100644 hw/virtio/virtio-net-pci.c
- create mode 100644 hw/virtio/virtio-rng-pci.c
- create mode 100644 hw/virtio/virtio-scsi-pci.c
- create mode 100644 hw/virtio/virtio-serial-pci.c
 
+diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+index 1304849018..5ae4a61018 100644
+--- a/default-configs/virtio.mak
++++ b/default-configs/virtio.mak
+@@ -12,3 +12,4 @@ CONFIG_VIRTIO_RNG=y
+ CONFIG_SCSI=y
+ CONFIG_VIRTIO_SCSI=y
+ CONFIG_VIRTIO_SERIAL=y
++CONFIG_VIRTIO_INPUT_HOST=$(CONFIG_LINUX)
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 39884c5f7b..a6b850ed09 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -13,6 +13,7 @@ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+ ifeq ($(CONFIG_PCI),y)
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
++obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+ endif
+ endif
+ 
+diff --git a/hw/virtio/virtio-input-host-pci.c b/hw/virtio/virtio-input-host-pci.c
+new file mode 100644
+index 0000000000..725a51ad30
+--- /dev/null
++++ b/hw/virtio/virtio-input-host-pci.c
+@@ -0,0 +1,48 @@
++/*
++ * Virtio input host PCI Bindings
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "virtio-pci.h"
++#include "hw/virtio/virtio-input.h"
++
++typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
++
++#define TYPE_VIRTIO_INPUT_HOST_PCI "virtio-input-host-pci-base"
++#define VIRTIO_INPUT_HOST_PCI(obj) \
++        OBJECT_CHECK(VirtIOInputHostPCI, (obj), TYPE_VIRTIO_INPUT_HOST_PCI)
++
++struct VirtIOInputHostPCI {
++    VirtIOPCIProxy parent_obj;
++    VirtIOInputHost vdev;
++};
++
++static void virtio_host_initfn(Object *obj)
++{
++    VirtIOInputHostPCI *dev = VIRTIO_INPUT_HOST_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_INPUT_HOST);
++}
++
++static const VirtioPCIDeviceTypeInfo virtio_input_host_pci_info = {
++    .base_name             = TYPE_VIRTIO_INPUT_HOST_PCI,
++    .generic_name          = "virtio-input-host-pci",
++    .transitional_name     = "virtio-input-host-pci-transitional",
++    .non_transitional_name = "virtio-input-host-pci-non-transitional",
++    .parent        = TYPE_VIRTIO_INPUT_PCI,
++    .instance_size = sizeof(VirtIOInputHostPCI),
++    .instance_init = virtio_host_initfn,
++};
++
++static void virtio_input_host_pci_register(void)
++{
++    virtio_pci_types_register(&virtio_input_host_pci_info);
++}
++
++type_init(virtio_input_host_pci_register)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 4312d95fe9..d951f278a2 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2707,26 +2707,6 @@ static const VirtioPCIDeviceTypeInfo virtio_tablet_pci_info = {
+     .instance_init = virtio_tablet_initfn,
+ };
+ 
+-#ifdef CONFIG_LINUX
+-static void virtio_host_initfn(Object *obj)
+-{
+-    VirtIOInputHostPCI *dev = VIRTIO_INPUT_HOST_PCI(obj);
+-
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VIRTIO_INPUT_HOST);
+-}
+-
+-static const VirtioPCIDeviceTypeInfo virtio_host_pci_info = {
+-    .base_name             = TYPE_VIRTIO_INPUT_HOST_PCI,
+-    .generic_name          = "virtio-input-host-pci",
+-    .transitional_name     = "virtio-input-host-pci-transitional",
+-    .non_transitional_name = "virtio-input-host-pci-non-transitional",
+-    .parent        = TYPE_VIRTIO_INPUT_PCI,
+-    .instance_size = sizeof(VirtIOInputHostPCI),
+-    .instance_init = virtio_host_initfn,
+-};
+-#endif
+-
+ /* virtio-pci-bus */
+ 
+ static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
+@@ -2785,9 +2765,6 @@ static void virtio_pci_register_types(void)
+     virtio_pci_types_register(&virtio_keyboard_pci_info);
+     virtio_pci_types_register(&virtio_mouse_pci_info);
+     virtio_pci_types_register(&virtio_tablet_pci_info);
+-#ifdef CONFIG_LINUX
+-    virtio_pci_types_register(&virtio_host_pci_info);
+-#endif
+ #ifdef CONFIG_VIRTFS
+     virtio_pci_types_register(&virtio_9p_pci_info);
+ #endif
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 2109d002df..fb10afe160 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -50,7 +50,6 @@ typedef struct VHostUserBlkPCI VHostUserBlkPCI;
+ typedef struct VirtIORngPCI VirtIORngPCI;
+ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+-typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
+ typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+ typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
+ 
+@@ -359,19 +358,6 @@ struct VirtIOInputHIDPCI {
+     VirtIOInputHID vdev;
+ };
+ 
+-#ifdef CONFIG_LINUX
+-
+-#define TYPE_VIRTIO_INPUT_HOST_PCI "virtio-input-host-pci-base"
+-#define VIRTIO_INPUT_HOST_PCI(obj) \
+-        OBJECT_CHECK(VirtIOInputHostPCI, (obj), TYPE_VIRTIO_INPUT_HOST_PCI)
+-
+-struct VirtIOInputHostPCI {
+-    VirtIOPCIProxy parent_obj;
+-    VirtIOInputHost vdev;
+-};
+-
+-#endif
+-
+ /*
+  * virtio-gpu-pci: This extends VirtioPCIProxy.
+  */
 -- 
 2.20.1
