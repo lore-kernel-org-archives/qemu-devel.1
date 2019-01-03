@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53416)
+Received: from eggs.gnu.org ([208.118.235.92]:55244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gfAQt-0001LS-VD
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 16:21:43 -0500
+	(envelope-from <pasha.tatashin@soleen.com>) id 1gfAYD-00030r-I6
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 16:29:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gfAQr-00035H-I8
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 16:21:39 -0500
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Thu, 3 Jan 2019 21:21:16 +0000
-Message-ID: <472c0a97-283b-ac81-c07d-11843edd2488@janustech.com>
-References: <20190102110804.18155-1-lbloch@janustech.com>
-	<20190102110804.18155-2-lbloch@janustech.com>
-	<w51h8eqdroh.fsf@maestria.local.igalia.com>
-	<9df1a9a8-284b-573b-98aa-fd77edb0cd65@janustech.com>
-	<1ab08459-6635-acc2-0ba2-961c7a0e5704@redhat.com>
-In-Reply-To: <1ab08459-6635-acc2-0ba2-961c7a0e5704@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <386B1F2100638143B10281BE5DBF4EC9@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pasha.tatashin@soleen.com>) id 1gfAYA-0000Tj-Pa
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 16:29:13 -0500
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:39419)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pasha.tatashin@soleen.com>)
+	id 1gfAY9-0000RA-Qy
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 16:29:10 -0500
+Received: by mail-ed1-x543.google.com with SMTP id b14so30175887edt.6
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 13:29:08 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/1] include: Auto-generate the sizes
- lookup table
+References: <20180719205545.16512-1-pasha.tatashin@oracle.com>
+	<20180719205545.16512-24-pasha.tatashin@oracle.com>
+	<20181106054212.GA31768@nautica>
+	<95c3920e-bf80-0c7e-7854-01a1c3189c23@oracle.com>
+	<20190102202032.GA1034@eldamar.local>
+In-Reply-To: <20190102202032.GA1034@eldamar.local>
+From: Pavel Tatashin <pasha.tatashin@soleen.com>
+Date: Thu, 3 Jan 2019 16:28:56 -0500
+Message-ID: <CA+CK2bC70pnL0Wimb0xt99J4nNfi8W3zuUHgAk-jsPuOP9jpHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v15 23/26] sched: early boot clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+To: Salvatore Bonaccorso <carnil@debian.org>
+Cc: Steven Sistare <steven.sistare@oracle.com>, Dominique Martinet <asmadeus@codewreck.org>, Pavel Tatashin <pavel.tatashin@microsoft.com>, Daniel Jordan <daniel.m.jordan@oracle.com>, linux@armlinux.org.uk, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, john.stultz@linaro.org, sboyd@codeaurora.org, x86@kernel.org, LKML <linux-kernel@vger.kernel.org>, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, hpa@zytor.com, douly.fnst@cn.fujitsu.com, Peter Zijlstra <peterz@infradead.org>, prarit@redhat.com, feng.tang@intel.com, pmladek@suse.com, gnomes@lxorguk.ukuu.org.uk, linux-s390@vger.kernel.org, boris.ostrovsky@oracle.com, jgross@suse.com, pbonzini@redhat.com, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
 
-SGksDQoNCk9uIDEvNC8xOSAxMjowNCBBTSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8zLzE5
-IDI6NTcgUE0sIExlb25pZCBCbG9jaCB3cm90ZToNCj4gDQo+Pj4gSSBoYXZlIHRvIHNheSB0aGF0
-IEknbSBub3QgdmVyeSBjb252aW5jZWQgb2YgdGhlIGJlbmVmaXRzIG9mIHJlcGxhY2luZyBhDQo+
-Pj4gc2V0IG9mIHRyaXZpYWwgbnVtZXJpYyBtYWNyb3Mgd2l0aCBhIGxvbmdlciBhbmQgaGFyZGVy
-IHRvIHJlYWQgc2hlbGwNCj4+PiBzY3JpcHQgYWNjb21wYW5pZWQgYnkgY2hhbmdlcyB0byB0aGUg
-YnVpbGQgc3lzdGVtLg0KPj4NCj4+IEkgdGhpbmsgdGhhdCB0aGUgYmVuZWZpdCBpcyB0aGF0IHRo
-ZSBzY3JpcHQgaXMgZWFzaWx5IHZlcmlmaWFibGUsDQo+PiB3aGVyZWFzIGlmIHNvbWVvbmUgd291
-bGQgbGlrZSB0byB2ZXJpZnkgdGhlIHRhYmxlLCB0aGV5IHdpbGwgbmVlZCB0bw0KPj4gZ2VuZXJh
-dGUgaXQgdGhlbXNlbHZlcy4gQWxzbywgdGhpcyB0YWJsZSBpcyBhdXRvbWF0aWNhbGx5IGdlbmVy
-YXRlZA0KPj4gYW55d2F5LCBzbyBpdCBvbmx5IG1ha2VzIHNlbnNlIHRvIGdlbmVyYXRlIGl0IGR1
-cmluZyB0aGUgYnVpbGQuDQo+IA0KPiBCdXQgbm8gb25lIGlzIHN1Ym1pdHRpbmcgcGF0Y2hlcyB0
-byBhY3RpdmUgbW9kaWZ5IHRoZSB0YWJsZS4gIFRoZSB3b3JrDQo+IGhhcyBhbHJlYWR5IGJlZW4g
-ZG9uZSBvbmNlIHRvIGdlbmVyYXRlIGl0LCBhbmQgdGhlIHJldmlld2VycyBoYXZlDQo+IGFscmVh
-ZHkgdmVyaWZpZWQgaXQ7IGF0IHRoaXMgcG9pbnQsIG5vIGZ1cnRoZXIgY2hhbmdlcyBhcmUgbGlr
-ZWx5IHRvDQo+IGhhcHBlbiAob3RoZXIgdGhhbiBteSBwaXBlIGRyZWFtIG9mIGVudGlyZWx5IGdl
-dHRpbmcgcmlkIG9mIHRoZSB0YWJsZSBpbg0KPiBmYXZvciBvZiB1c2luZyBydW50aW1lIGdlbmVy
-YXRpb24gb2YgaHVtYW4tZnJpZW5kbHkgZGVmYXVsdCBzdHJpbmdzIGlzDQo+IGFkZGVkIHRvIFFl
-bXVPcHRzIGluc3RlYWQpLiAgSWYgdGhlIHRhYmxlIHdlcmUgbm90IGFscmVhZHkgaW4gZ2l0LCB0
-aGVuDQo+IGdlbmVyYXRpbmcgaXQgYXQgYnVpbGQgdGltZSBtaWdodCBtYWtlIHNlbnNlOyBidXQg
-YXQgdGhpcyBzdGFnZSBpbiB0aGUNCj4gZ2FtZSwgeW91J3JlIHNsb3dpbmcgZG93biBldmVyeSBi
-dWlsZCB0byByZWdlbmVyYXRlIHNvbWV0aGluZyB0aGF0IGlzDQo+IGFscmVhZHkgY29ycmVjdC4N
-Cj4gDQoNCk9LLCB0aGF0J3MgYSBnb29kIHBvaW50LiBCdXQgc3RpbGwsIEkgdGhpbmsgdGhhdCB5
-b3UgYWdyZWUgdGhhdCBpdCB3b3VsZCANCmJlIG1vcmUgY29ycmVjdCB0byBnZW5lcmF0ZSBpdCBk
-dXJpbmcgdGhlIGJ1aWxkLCByaWdodD8gU28gbm93IGl0IGlzIA0KdGhlcmUgYWxyZWFkeSBhbmQg
-aXQgd29ya3MuIEJ1dCBpc24ndCBpdCB3b3J0aCBpdCB0byBtYWtlIGl0IG1vcmUgY29ycmVjdD8N
-Cg0KTGVvbmlkLg0K
+Could you please send the config file and qemu arguments that were
+used to reproduce this problem.
+
+Thank you,
+Pasha
+
+On Wed, Jan 2, 2019 at 3:20 PM Salvatore Bonaccorso <carnil@debian.org> wrote:
+>
+> Hi,
+>
+> On Tue, Nov 06, 2018 at 06:35:36AM -0500, Steven Sistare wrote:
+> > Pavel has a new email address, cc'd - steve
+> >
+> > On 11/6/2018 12:42 AM, Dominique Martinet wrote:
+> > > (added various kvm/virtualization lists in Cc as well as qemu as I don't
+> > > know who's "wrong" here)
+> > >
+> > > Pavel Tatashin wrote on Thu, Jul 19, 2018:
+> > >> Allow sched_clock() to be used before schec_clock_init() is called.
+> > >> This provides with a way to get early boot timestamps on machines with
+> > >> unstable clocks.
+> > >
+> > > This isn't something I understand, but bisect tells me this patch
+> > > (landed as 857baa87b64 ("sched/clock: Enable sched clock early")) makes
+> > > a VM running with kvmclock take a step in uptime/printk timer early in
+> > > boot sequence as illustrated below. The step seems to be related to the
+> > > amount of time the host was suspended while qemu was running before the
+> > > reboot.
+> > >
+> > > $ dmesg
+> > > ...
+> > > [    0.000000] SMBIOS 2.8 present.
+> > > [    0.000000] DMI: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20180724_192412-buildhw-07.phx2.fedoraproject.org-1.fc29 04/01/2014
+> > > [    0.000000] Hypervisor detected: KVM
+> > > [    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
+> > > [283120.529821] kvm-clock: cpu 0, msr 321a8001, primary cpu clock
+> > > [283120.529822] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+> > > [283120.529824] tsc: Detected 2592.000 MHz processor
+> > > ...
+> > >
+> > > (The VM is x86_64 on x86_64, I can provide my .config on request but
+> > > don't think it's related)
+> > >
+> > >
+> > > It's rather annoying for me as I often reboot VMs and rely on the
+> > > 'uptime' command to check if I did just reboot or not as I have the
+> > > attention span of a goldfish; I'd rather not have to find something else
+> > > to check if I did just reboot or not.
+> > >
+> > > Note that if the qemu process is restarted, there is no offset anymore.
+> > >
+> > > I unfortunately just did that so cannot say with confidence (putting my
+> > > laptop to sleep for 30s only led to a 2s offset and I do not want to
+> > > wait longer right now), but it looks like the clock is still mostly
+> > > correct after reboot after disabling my VM's ntp client. Will infirm
+> > > that tomorrow if I was wrong.
+> > >
+> > >
+> > > Happy to try to help fixing this in any way, as written above the quote
+> > > I'm not even actually sure who is wrong here.
+>
+> A user in Debian reported the same/similar issue (with 4.19.13):
+>
+> https://bugs.debian.org/918036
+>
+> Regards,
+> Salvatore
