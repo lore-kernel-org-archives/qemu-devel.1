@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:58627)
+Received: from eggs.gnu.org ([208.118.235.92]:46820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gewJv-0007Gr-Ce
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 01:17:32 -0500
+	(envelope-from <thuth@redhat.com>) id 1gexHy-0007aO-T3
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 02:19:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gewJr-0006D9-80
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 01:17:31 -0500
-Resent-Message-Id: <E1gewJr-0006D9-80@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21702)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gewJq-0006B7-Ux
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 01:17:27 -0500
-In-Reply-To: <20190102100415.24680-1-mahaocong_work@163.com>
-Message-ID: <154649530529.9907.8399167356060571321@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <thuth@redhat.com>) id 1gexHu-0008GN-42
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 02:19:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gexHl-0008Aw-4Z
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 02:19:25 -0500
+References: <1546443980-26779-1-git-send-email-thuth@redhat.com>
+	<c2648f00-c44f-7f8e-8673-501b88f1e125@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <17ed4887-1784-960e-d82e-ec90d98efc82@redhat.com>
+Date: Thu, 3 Jan 2019 08:19:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 2 Jan 2019 22:01:46 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/1] drive-mirror: add incremental mode
+In-Reply-To: <c2648f00-c44f-7f8e-8673-501b88f1e125@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add some missing
+ SPARC-related files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mahaocong_work@163.com
-Cc: fam@euphon.net, qemu-block@nongnu.org, kwolf@redhat.com, jcody@redhat.com, mahaocong@didichuxing.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEwMjEwMDQxNS4yNDY4
-MC0xLW1haGFvY29uZ193b3JrQDE2My5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
-ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
-dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tA
-Y2VudG9zNyBTSE9XX0VOVj0xIEo9OAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKbGlicG1lbSBz
-dXBwb3J0ICAgbm8KbGlidWRldiAgICAgICAgICAgbm8KCldBUk5JTkc6IFVzZSBvZiBTREwgMS4y
-IGlzIGRlcHJlY2F0ZWQgYW5kIHdpbGwgYmUgcmVtb3ZlZCBpbgpXQVJOSU5HOiBmdXR1cmUgcmVs
-ZWFzZXMuIFBsZWFzZSBzd2l0Y2ggdG8gdXNpbmcgU0RMIDIuMAoKTk9URTogY3Jvc3MtY29tcGls
-ZXJzIGVuYWJsZWQ6ICAnY2MnCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNl
-cy5tYWsudG1wCi0tLQogIENDICAgICAgYmxvY2svaW8ubwogIENDICAgICAgYmxvY2svY3JlYXRl
-Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL21pcnJvci5jOiBJbiBmdW5jdGlvbiAnbWlycm9y
-X2RpcnR5X2luaXRfaW5jcmVtZW50YWwnOgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svbWlycm9y
-LmM6ODMyOjU6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnYmRydl9j
-b3B5X2RpcnR5X2JpdG1hcCcgWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25d
-CiAgICAgaWYgKCFiZHJ2X2NvcHlfZGlydHlfYml0bWFwKHNyYywgZGVzdCwgTlVMTCkpIHsKICAg
-ICBeCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9taXJyb3IuYzo4MzI6NTogZXJyb3I6IG5lc3Rl
-ZCBleHRlcm4gZGVjbGFyYXRpb24gb2YgJ2JkcnZfY29weV9kaXJ0eV9iaXRtYXAnIFstV2Vycm9y
-PW5lc3RlZC1leHRlcm5zXQovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svbWlycm9yLmM6IEF0IHRv
-cCBsZXZlbDoKY2MxOiBlcnJvcjogdW5yZWNvZ25pemVkIGNvbW1hbmQgbGluZSBvcHRpb24gIi1X
-bm8tZm9ybWF0LXRydW5jYXRpb24iIFstV2Vycm9yXQpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0
-cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogW2Jsb2NrL21pcnJvci5vXSBFcnJvciAxCm1ha2U6
-ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
-YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDEwMjEwMDQxNS4yNDY4MC0x
-LW1haGFvY29uZ193b3JrQDE2My5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlw
-ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+On 2019-01-02 20:34, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 1/2/19 4:46 PM, Thomas Huth wrote:
+>> These files / devices are only used by SPARC machines, so we can sort
+>> them into the corresponding categories in the MAINTAINERS file.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  MAINTAINERS | 6 +++++-
+>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index b6c2645..e897963 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -1069,9 +1069,11 @@ M: Mark Cave-Ayland <mark.cave-ayland@ilande.co=
+.uk>
+>>  S: Maintained
+>>  F: hw/sparc/sun4m.c
+>>  F: hw/sparc/sun4m_iommu.c
+>> +F: hw/display/cg3.c
+>> +F: hw/display/tcx.c
+>>  F: hw/dma/sparc32_dma.c
+>>  F: hw/misc/eccmemctl.c
+>> -F: hw/misc/slavio_misc.c
+>> +F: hw/*/slavio_*.c
+>>  F: include/hw/sparc/sparc32_dma.h
+>>  F: pc-bios/openbios-sparc32
+>>  F: include/hw/sparc/sun4m_iommu.h
+>> @@ -1083,6 +1085,8 @@ F: hw/sparc64/sun4u.c
+>>  F: pc-bios/openbios-sparc64
+>>  F: hw/pci-host/sabre.c
+>>  F: include/hw/pci-host/sabre.h
+>> +F: include/hw/sparc/sun4u_iommu.h
+>=20
+> I sent a patch to trivial@ with other sun4u changes, reviewed by Mark:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04467.html
+
+Oh, right, sorry!
+
+> Neither mine nor your are complete :)
+> Can I include your patch when respining the series? (Not sure I need to
+> respin although).
+
+Sure!
+
+>> +F: include/hw/nvram/sun_nvram.h
+>=20
+> sun_nvram.h is also used by sun4m (the previous section this patch upda=
+tes).
+
+Right. So it should maybe be listed twice... (but since the maintainer
+of sun4u and sun4m is the same, it likely does not really matter)
+
+ Thomas
