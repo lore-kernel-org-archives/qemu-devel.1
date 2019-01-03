@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57407)
+Received: from eggs.gnu.org ([208.118.235.92]:58451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gf61y-0005hs-P3
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:39:39 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gf65B-0000jI-6D
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:42:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gf61t-0003Vi-Rn
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:39:38 -0500
-Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:36276)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gf61t-0003PV-Lx
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:39:33 -0500
-Received: from player157.ha.ovh.net (unknown [10.109.146.5])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 448351EF5C5
-	for <qemu-devel@nongnu.org>; Thu,  3 Jan 2019 17:39:25 +0100 (CET)
-References: <20181221054606.22007-1-david@gibson.dropbear.id.au>
-	<CAFEAcA9PRoG6i_v10XXa4Jb-Y0Dyf280q0PNqNSuoGbaT9Uh+g@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <13677734-ebbf-bb7e-6812-e025859fbe85@kaod.org>
-Date: Thu, 3 Jan 2019 17:39:16 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9PRoG6i_v10XXa4Jb-Y0Dyf280q0PNqNSuoGbaT9Uh+g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 00/40] ppc-for-4.0 queue 20181221
+	(envelope-from <balaton@eik.bme.hu>) id 1gf656-0007hV-DY
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:42:57 -0500
+Message-Id: <0fe1ed9a6a7c7f3c2156ed14cc4c53bf439702a8.1546532844.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1546532844.git.balaton@eik.bme.hu>
+References: <cover.1546532844.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Thu, 03 Jan 2019 17:27:24 +0100
+Subject: [Qemu-devel] [PATCH v3 6/6] sam460ex: Fix support for memory larger
+ than 1GB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,17 +20,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, gkurz@redhat.com, Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>
 
-[ ... ] 
+Fix the encoding of larger memory modules in the SoC registers which
+allows specifying more than 1GB memory for sam460ex. Well, only 2GB
+due to SoC and firmware restrictions which was the only missing value
+compared to what the real hardware supports. The SoC should support up
+to 4GB but when setting that the firmware hangs during memory test.
+This may be an overflow bug in the firmware which I did not try to
+debug but this may affect real hardware as well.
 
-> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-> for any user-visible changes.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+v2: lower case hex constants to match others around it
 
-Are the machine properties documented any where else than in 
-"-machine pseries,?" ?
+ hw/ppc/ppc440_uc.c | 22 ++++++++++++----------
+ hw/ppc/sam460ex.c  |  6 ++++--
+ 2 files changed, 16 insertions(+), 12 deletions(-)
 
-Thanks, 
-
-C.
+diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+index 60dbb35eee..c489368905 100644
+--- a/hw/ppc/ppc440_uc.c
++++ b/hw/ppc/ppc440_uc.c
+@@ -2,7 +2,7 @@
+  * QEMU PowerPC 440 embedded processors emulation
+  *
+  * Copyright (c) 2012 François Revol
+- * Copyright (c) 2016-2018 BALATON Zoltan
++ * Copyright (c) 2016-2019 BALATON Zoltan
+  *
+  * This work is licensed under the GNU GPL license version 2 or later.
+  *
+@@ -505,10 +505,6 @@ enum {
+     SDRAM_PLBADDUHB = 0x50,
+ };
+ 
+-/* XXX: TOFIX: some patches have made this code become inconsistent:
+- *      there are type inconsistencies, mixing hwaddr, target_ulong
+- *      and uint32_t
+- */
+ static uint32_t sdram_bcr(hwaddr ram_base, hwaddr ram_size)
+ {
+     uint32_t bcr;
+@@ -538,11 +534,17 @@ static uint32_t sdram_bcr(hwaddr ram_base, hwaddr ram_size)
+     case (1 * GiB):
+         bcr = 0xe000;
+         break;
++    case (2 * GiB):
++        bcr = 0xc000;
++        break;
++    case (4 * GiB):
++        bcr = 0x8000;
++        break;
+     default:
+         error_report("invalid RAM size " TARGET_FMT_plx, ram_size);
+         return 0;
+     }
+-    bcr |= ram_base & 0xFF800000;
++    bcr |= ram_base >> 2 & 0xffe00000;
+     bcr |= 1;
+ 
+     return bcr;
+@@ -550,12 +552,12 @@ static uint32_t sdram_bcr(hwaddr ram_base, hwaddr ram_size)
+ 
+ static inline hwaddr sdram_base(uint32_t bcr)
+ {
+-    return bcr & 0xFF800000;
++    return (bcr & 0xffe00000) << 2;
+ }
+ 
+-static target_ulong sdram_size(uint32_t bcr)
++static uint64_t sdram_size(uint32_t bcr)
+ {
+-    target_ulong size;
++    uint64_t size;
+     int sh;
+ 
+     sh = 1024 - ((bcr >> 6) & 0x3ff);
+@@ -575,7 +577,7 @@ static void sdram_set_bcr(ppc440_sdram_t *sdram, int i,
+                                     &sdram->ram_memories[i]);
+         object_unparent(OBJECT(&sdram->containers[i]));
+     }
+-    sdram->bcr[i] = bcr & 0xFFDEE001;
++    sdram->bcr[i] = bcr & 0xffe0ffc1;
+     if (enabled && (bcr & 1)) {
+         memory_region_init(&sdram->containers[i], NULL, "sdram-containers",
+                            sdram_size(bcr));
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 233f81bb56..ac575be813 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -76,9 +76,11 @@
+ #define UART_FREQ 11059200
+ #define SDRAM_NR_BANKS 4
+ 
+-/* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
++/* The SoC could also handle 4 GiB but firmware does not work with that. */
++/* Maybe it overflows a signed 32 bit number somewhere? */
+ static const ram_addr_t ppc460ex_sdram_bank_sizes[] = {
+-    1 * GiB, 512 * MiB, 256 * MiB, 128 * MiB, 64 * MiB, 32 * MiB, 0
++    2 * GiB, 1 * GiB, 512 * MiB, 256 * MiB, 128 * MiB, 64 * MiB,
++    32 * MiB, 0
+ };
+ 
+ struct boot_info {
+-- 
+2.13.7
