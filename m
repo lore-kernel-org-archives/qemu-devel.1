@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44977)
+Received: from eggs.gnu.org ([208.118.235.92]:46521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf2i9-0000v0-0d
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:06:57 -0500
+	(envelope-from <yuri.benditovich@daynix.com>) id 1gf2nj-0003Ao-NB
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:12:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gf2i8-0005mL-8V
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:06:57 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:44748)
+	(envelope-from <yuri.benditovich@daynix.com>) id 1gf2ni-0003B1-GL
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:12:43 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43275)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gf2i7-0005lt-V8
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:06:56 -0500
-Received: by mail-oi1-x242.google.com with SMTP id m6so27581006oig.11
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 05:06:55 -0800 (PST)
-MIME-Version: 1.0
-References: <20181214145152.27250-1-stefanha@redhat.com>
-In-Reply-To: <20181214145152.27250-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 Jan 2019 13:06:43 +0000
-Message-ID: <CAFEAcA9OwKJQ0iWtuxMJrNPL5r_qtuZz57H=Dtcr6X45XqQ3TQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] microbit: make -kernel optional
+	(Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
+	id 1gf2ni-0003AD-9H
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 08:12:42 -0500
+Received: by mail-wr1-x442.google.com with SMTP id r10so33497783wrs.10
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 05:12:42 -0800 (PST)
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+Date: Thu,  3 Jan 2019 15:12:30 +0200
+Message-Id: <20190103131230.24934-3-yuri.benditovich@daynix.com>
+In-Reply-To: <20190103131230.24934-1-yuri.benditovich@daynix.com>
+References: <20190103131230.24934-1-yuri.benditovich@daynix.com>
+Subject: [Qemu-devel] [PATCH v4 2/2] virtio-net: changed
+ VIRTIO_NET_F_RSC_EXT to be 61
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Julia Suvorova <jusual@mail.ru>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, qemu-arm <qemu-arm@nongnu.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: mst@redhat.com, jasowang@redhat.com, dmitry.fleytman@gmail.com, qemu-devel@nongnu.org
+Cc: yan@daynix.com
 
-On Fri, 14 Dec 2018 at 14:51, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> ARMv7M machine types support -kernel for ELF and raw image files.
-> Microbit programs are typically in Intel HEX (.hex) format.  The generic
-> loader supports .hex files but it doesn't work as expected:
->
->   $ qemu-system-arm -M microbit -device loader,file=microbit.hex
->   Guest image must be specified (using -kernel)
->
-> This error comes from armv7m_load_kernel() but we don't have -kernel in
-> this case.
->
-> This patch makes -kernel optional since most of the time we'll want to
-> use -device loader instead.
->
-> Note that we need to register the reset handler that
-> armv7m_load_kernel() used to register for us.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Allocated feature bit changed in spec draft per TC request.
 
-Hi, Stefan. (Happy new year :-))
+Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+---
+ hw/net/virtio-net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Looking at this, I think I'd prefer it if we handled
-this in the armv7m_load_kernel() code, since having to register
-your own reset handler to reset the CPU is a weird thing for
-board level code to have to do. That then means the M-profile
-kernel load code is in line with the A-profile load code, which
-if it has no kernel to load will still register the reset handler,
-and let the machine run however it ends up running.
-
-I think this basically amounts to "remove the 'insist that
-kernel_filename is not NULL' check from armv7m_load_kernel()",
-aka "revert commit 01fd41ab3fb69971". That commit's commit
-message is correct that the behaviour if the user didn't
-specify anything to run is a bit unhelpful, but it predates
-the generic loader so it's no longer necessarily true that
-a kernel must be specified, either for this or for any other
-M-profile machine. (There's also the case of "board has a
-flash device that was populated via a -pflash or -drive
-option".)
-
-thanks
--- PMM
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 5a3952f84b..2db80e1f71 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -66,7 +66,7 @@
+ #if !defined(VIRTIO_NET_HDR_F_RSC_INFO)
+ 
+ #define VIRTIO_NET_HDR_F_RSC_INFO  4 /* rsc_ext data in csum_ fields */
+-#define VIRTIO_NET_F_RSC_EXT       38
++#define VIRTIO_NET_F_RSC_EXT       61
+ 
+ static inline __virtio16 *virtio_net_rsc_ext_num_packets(
+     struct virtio_net_hdr *hdr)
+-- 
+2.17.1
