@@ -1,23 +1,42 @@
-Received: from eggs.gnu.org ([208.118.235.92]:41381)
+Received: from eggs.gnu.org ([208.118.235.92]:41379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gezwW-0007C9-V9
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:09:38 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gezwW-0007C6-V0
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:09:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gezwU-0006yW-Qk
+	(envelope-from <pmorel@linux.ibm.com>) id 1gezwS-0006vy-VW
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:09:36 -0500
-Date: Thu, 3 Jan 2019 10:09:23 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190103100923.GC7733@stefanha-x1.localdomain>
-References: <20181223025939.15775-1-npes87184@gmail.com>
-	<20181223025939.15775-2-npes87184@gmail.com>
-	<20190102114919.GJ24009@stefanha-x1.localdomain>
-	<CAPTqjH1K3RYH1A2Q8Fhkh5x6hOE5CU9qTqRtjFC8WLk3UBNFOA@mail.gmail.com>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40818)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gezwR-0006VI-1A
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:09:32 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x03A9Isx028651
+	for <qemu-devel@nongnu.org>; Thu, 3 Jan 2019 05:09:21 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2psf1537da-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 05:09:21 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Thu, 3 Jan 2019 10:09:13 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <1545224225-24267-1-git-send-email-pmorel@linux.ibm.com>
+	<1545224225-24267-2-git-send-email-pmorel@linux.ibm.com>
+	<20181219152249.487e2bdf.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Thu, 3 Jan 2019 11:09:08 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xesSdrSSBC0PokLI"
-Content-Disposition: inline
-In-Reply-To: <CAPTqjH1K3RYH1A2Q8Fhkh5x6hOE5CU9qTqRtjFC8WLk3UBNFOA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] dmg: fix binary search
+In-Reply-To: <20181219152249.487e2bdf.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <97eea5fc-ccbf-3d93-ccef-40d0ac92a376@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5] s390x/pci: add common function
+ measurement block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +45,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?5p6X6IKy6L6w?= <npes87184@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: walling@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
 
-
---xesSdrSSBC0PokLI
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jan 02, 2019 at 08:20:54PM +0800, =E6=9E=97=E8=82=B2=E8=BE=B0 wrote:
-> This series is focus on fixing bug #1809304 (see:
-> https://bugs.launchpad.net/qemu/+bug/1809304).
-> There is an example dmg file in #1809304 which will trigger this bug.
-
-Thanks.  It would be great to include a tiny dmg file in
-tests/qemu-iotests/sample_images/ and add a test case for it.
-
-The file should be small (kilobytes, not megabytes) and must be
-redistributable (no proprietary content or even GPL software, which
-requires distributing source code).
-
-Do you have time to do that?
-
-> About your case, I think we can simply check whether chunk3 is zero before
-> we decrease it.
-> if s->sectors[chunk3] > sector_num and chunk3 is zero (i.e. s->sectors[0]=
- >
-> sector_num), it means we cannot find the table contains sector_num.
-> We can return s->n_chunks (error) directly.
+On 19/12/2018 15:22, Cornelia Huck wrote:
+> On Wed, 19 Dec 2018 13:57:05 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 >=20
-> What do you think?
+>> From: Yi Min Zhao <zyimin@linux.ibm.com>
+>>
+>> Common function measurement block is used to report zPCI internal
+>> counters of successful pcilg/stg/stb and rpcit instructions to
+>> a memory location provided by the program.
+>>
+>> This patch introduces a new ZpciFmb structure and schedules a timer
+>> callback to copy the zPCI measures to the FMB in the guest memory
+>> at an interval time set to 4s.
+>>
+>> An error while attemping to update the FMB, would generate an error
+>> event to the guest.
+>>
+>> The pcilg/stg/stb and rpcit interception handlers increase the
+>> related counter on a successful call.
+>> The guest shall pass a null FMBA (FMB address) in the FIB (Function
+>> Information Block) when it issues a Modify PCI Function Control
+>> instruction to switch off FMB and stop the corresponding timer.
+>>
+>> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   hw/s390x/s390-pci-bus.c  |   4 +-
+>>   hw/s390x/s390-pci-bus.h  |  29 +++++++++++
+>>   hw/s390x/s390-pci-inst.c | 129 +++++++++++++++++++++++++++++++++++++=
+++++++++--
+>>   hw/s390x/s390-pci-inst.h |   1 +
+>>   4 files changed, 159 insertions(+), 4 deletions(-)
+>>
+>=20
+>> +static void fmb_update(void *opaque)
+>> +{
+>> +    S390PCIBusDevice *pbdev =3D opaque;
+>> +    int64_t t =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+>> +    int i;
+>> +
+>> +    /* Update U bit */
+>> +    pbdev->fmb.last_update *=3D 2;
+>> +    pbdev->fmb.last_update |=3D UPDATE_U_BIT;
+>> +    if (fmb_do_update(pbdev, offsetof(ZpciFmb, last_update),
+>> +                      pbdev->fmb.last_update, sizeof(uint64_t))) {
+>=20
+> Uh... the size of the last_update field would make more sense here...
+> Also for the other fields below. Is there a reason that does not work?
 
-Sounds good.  We have to assume that the file contents are invalid and
-handle all cases.
+None, I send a v6 :)
 
-I'll review the next revision of your patch.  Thanks!
 
-Stefan
 
---xesSdrSSBC0PokLI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcLd9TAAoJEJykq7OBq3PIcucH/AjgEFRUj35gmDhLZuj5qMl8
-pBYx+Hin9DW/VfBach7c7s4F4E5BBzROJUBaMEDBhjJCzPh2wpJi/NQwBcOvRU98
-bcmgQTMp3t9GZd/DABKrgK84EgEpR5DcE+I4GBtziOXk7hmT2l89BVqk2iWOV+JR
-rgHF99RYh37d3wyjKv7x5wLC+9116NQfsKSrvmJaZsgRWJhZnpFKb83uySlAWDIO
-LG8OLKtrS/Cxh5SoMfll87N8AOZ+j/b8+4VchwNlaLeDoDu8Y59KsBzGJt05aIst
-bJew9qF27hGjVb6ywWDwQ0XU/2r5gf8X4QeKjsRvguap/w5XN+z9HXIJHYbUWpc=
-=LdzW
------END PGP SIGNATURE-----
-
---xesSdrSSBC0PokLI--
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
