@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59085)
+Received: from eggs.gnu.org ([208.118.235.92]:59103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@trasno.org>) id 1gf3ho-00065g-JG
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:41 -0500
+	(envelope-from <quintela@trasno.org>) id 1gf3hs-0006B4-R4
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@trasno.org>) id 1gf3hn-0008V4-7V
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:40 -0500
-Received: from trasno.trasno.org ([83.165.45.250]:43192 helo=mail.trasno.org)
+	(envelope-from <quintela@trasno.org>) id 1gf3hp-0008Vp-I6
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:44 -0500
+Received: from trasno.trasno.org ([83.165.45.250]:43208 helo=mail.trasno.org)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@trasno.org>) id 1gf3hn-0008Uk-0T
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:39 -0500
+	(Exim 4.71) (envelope-from <quintela@trasno.org>) id 1gf3hp-0008VT-9d
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:41 -0500
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  3 Jan 2019 15:10:05 +0100
-Message-Id: <20190103141013.18019-9-quintela@redhat.com>
+Date: Thu,  3 Jan 2019 15:10:06 +0100
+Message-Id: <20190103141013.18019-10-quintela@redhat.com>
 In-Reply-To: <20190103141013.18019-1-quintela@redhat.com>
 References: <20190103141013.18019-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 08/16] virtio: split vhost user scsi bits
- from virtio-pci
+Subject: [Qemu-devel] [PATCH v4 09/16] virtio: split vhost scsi bits from
+ virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +32,40 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Go
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/virtio/Makefile.objs         |   1 +
- hw/virtio/vhost-user-scsi-pci.c | 103 ++++++++++++++++++++++++++++++++
- hw/virtio/virtio-pci.c          |  60 -------------------
- hw/virtio/virtio-pci.h          |  11 ----
- 4 files changed, 104 insertions(+), 71 deletions(-)
- create mode 100644 hw/virtio/vhost-user-scsi-pci.c
+ hw/virtio/Makefile.objs    |  1 +
+ hw/virtio/vhost-scsi-pci.c | 97 ++++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c     | 61 ------------------------
+ hw/virtio/virtio-pci.h     | 19 --------
+ 4 files changed, 98 insertions(+), 80 deletions(-)
+ create mode 100644 hw/virtio/vhost-scsi-pci.c
 
 diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 35b7698446..f851a6f2b5 100644
+index f851a6f2b5..0a56946c1a 100644
 --- a/hw/virtio/Makefile.objs
 +++ b/hw/virtio/Makefile.objs
-@@ -14,6 +14,7 @@ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
- ifeq ($(CONFIG_PCI),y)
+@@ -15,6 +15,7 @@ ifeq ($(CONFIG_PCI),y)
  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
  obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
-+obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
+ obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
++obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-pci.o
  obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
-diff --git a/hw/virtio/vhost-user-scsi-pci.c b/hw/virtio/vhost-user-scsi-pci.c
+diff --git a/hw/virtio/vhost-scsi-pci.c b/hw/virtio/vhost-scsi-pci.c
 new file mode 100644
-index 0000000000..46f7193cc7
+index 0000000000..523f7cb3ce
 --- /dev/null
-+++ b/hw/virtio/vhost-user-scsi-pci.c
-@@ -0,0 +1,103 @@
++++ b/hw/virtio/vhost-scsi-pci.c
+@@ -0,0 +1,97 @@
 +/*
-+ * Vhost user scsi PCI Bindings
++ * Vhost scsi PCI bindings
 + *
-+ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
++ * Copyright IBM, Corp. 2011
 + *
-+ * Author:
-+ *  Felipe Franciosi <felipe@nutanix.com>
++ * Authors:
++ *  Stefan Hajnoczi   <stefanha@linux.vnet.ibm.com>
 + *
-+ * This work is largely based on the "vhost-scsi" implementation by:
-+ *  Stefan Hajnoczi    <stefanha@linux.vnet.ibm.com>
++ * Changes for QEMU mainline + tcm_vhost kernel upstream:
 + *  Nicholas Bellinger <nab@risingtidesystems.com>
 + *
 + * This work is licensed under the terms of the GNU LGPL, version 2 or later.
@@ -77,38 +76,33 @@ index 0000000000..46f7193cc7
 +#include "qemu/osdep.h"
 +
 +#include "standard-headers/linux/virtio_pci.h"
-+#include "hw/virtio/vhost-user-scsi.h"
-+#include "hw/virtio/virtio.h"
-+#include "hw/virtio/virtio-scsi.h"
-+#include "hw/pci/pci.h"
++#include "hw/virtio/vhost-scsi.h"
 +#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "hw/pci/msi.h"
-+#include "hw/pci/msix.h"
-+#include "hw/loader.h"
-+#include "sysemu/kvm.h"
 +#include "virtio-pci.h"
 +
-+typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
++typedef struct VHostSCSIPCI VHostSCSIPCI;
 +
-+#define TYPE_VHOST_USER_SCSI_PCI "vhost-user-scsi-pci-base"
-+#define VHOST_USER_SCSI_PCI(obj) \
-+        OBJECT_CHECK(VHostUserSCSIPCI, (obj), TYPE_VHOST_USER_SCSI_PCI)
++/*
++ * vhost-scsi-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VHOST_SCSI_PCI "vhost-scsi-pci-base"
++#define VHOST_SCSI_PCI(obj) \
++        OBJECT_CHECK(VHostSCSIPCI, (obj), TYPE_VHOST_SCSI_PCI)
 +
-+struct VHostUserSCSIPCI {
++struct VHostSCSIPCI {
 +    VirtIOPCIProxy parent_obj;
-+    VHostUserSCSI vdev;
++    VHostSCSI vdev;
 +};
 +
-+static Property vhost_user_scsi_pci_properties[] = {
++static Property vhost_scsi_pci_properties[] = {
 +    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
 +                       DEV_NVECTORS_UNSPECIFIED),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void vhost_user_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++static void vhost_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 +{
-+    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(vpci_dev);
++    VHostSCSIPCI *dev = VHOST_SCSI_PCI(vpci_dev);
 +    DeviceState *vdev = DEVICE(&dev->vdev);
 +    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
 +
@@ -120,65 +114,66 @@ index 0000000000..46f7193cc7
 +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 +}
 +
-+static void vhost_user_scsi_pci_class_init(ObjectClass *klass, void *data)
++static void vhost_scsi_pci_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
 +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-+    k->realize = vhost_user_scsi_pci_realize;
++    k->realize = vhost_scsi_pci_realize;
 +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    dc->props = vhost_user_scsi_pci_properties;
++    dc->props = vhost_scsi_pci_properties;
 +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
 +    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
 +    pcidev_k->revision = 0x00;
 +    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
 +}
 +
-+static void vhost_user_scsi_pci_instance_init(Object *obj)
++static void vhost_scsi_pci_instance_init(Object *obj)
 +{
-+    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(obj);
++    VHostSCSIPCI *dev = VHOST_SCSI_PCI(obj);
 +
 +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VHOST_USER_SCSI);
++                                TYPE_VHOST_SCSI);
 +    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
 +                              "bootindex", &error_abort);
 +}
 +
-+static const VirtioPCIDeviceTypeInfo vhost_user_scsi_pci_info = {
-+    .base_name             = TYPE_VHOST_USER_SCSI_PCI,
-+    .generic_name          = "vhost-user-scsi-pci",
-+    .transitional_name     = "vhost-user-scsi-pci-transitional",
-+    .non_transitional_name = "vhost-user-scsi-pci-non-transitional",
-+    .instance_size = sizeof(VHostUserSCSIPCI),
-+    .instance_init = vhost_user_scsi_pci_instance_init,
-+    .class_init    = vhost_user_scsi_pci_class_init,
++static const VirtioPCIDeviceTypeInfo vhost_scsi_pci_info = {
++    .base_name             = TYPE_VHOST_SCSI_PCI,
++    .generic_name          = "vhost-scsi-pci",
++    .transitional_name     = "vhost-scsi-pci-transitional",
++    .non_transitional_name = "vhost-scsi-pci-non-transitional",
++    .instance_size = sizeof(VHostSCSIPCI),
++    .instance_init = vhost_scsi_pci_instance_init,
++    .class_init    = vhost_scsi_pci_class_init,
 +};
 +
-+static void vhost_user_scsi_pci_register(void)
++static void vhost_scsi_pci_register(void)
 +{
-+    virtio_pci_types_register(&vhost_user_scsi_pci_info);
++    virtio_pci_types_register(&vhost_scsi_pci_info);
 +}
 +
-+type_init(vhost_user_scsi_pci_register)
++type_init(vhost_scsi_pci_register)
 diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 44cc022a28..13cb13274e 100644
+index 13cb13274e..b2ed6b3942 100644
 --- a/hw/virtio/virtio-pci.c
 +++ b/hw/virtio/virtio-pci.c
-@@ -2188,63 +2188,6 @@ static const VirtioPCIDeviceTypeInfo vhost_scsi_pci_info = {
+@@ -2130,64 +2130,6 @@ static const VirtioPCIDeviceTypeInfo virtio_scsi_pci_info = {
+     .class_init    = virtio_scsi_pci_class_init,
  };
- #endif
  
--#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
--/* vhost-user-scsi-pci */
--static Property vhost_user_scsi_pci_properties[] = {
+-/* vhost-scsi-pci */
+-
+-#ifdef CONFIG_VHOST_SCSI
+-static Property vhost_scsi_pci_properties[] = {
 -    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
 -                       DEV_NVECTORS_UNSPECIFIED),
 -    DEFINE_PROP_END_OF_LIST(),
 -};
 -
--static void vhost_user_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+-static void vhost_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 -{
--    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(vpci_dev);
+-    VHostSCSIPCI *dev = VHOST_SCSI_PCI(vpci_dev);
 -    DeviceState *vdev = DEVICE(&dev->vdev);
 -    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
 -
@@ -190,86 +185,92 @@ index 44cc022a28..13cb13274e 100644
 -    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 -}
 -
--static void vhost_user_scsi_pci_class_init(ObjectClass *klass, void *data)
+-static void vhost_scsi_pci_class_init(ObjectClass *klass, void *data)
 -{
 -    DeviceClass *dc = DEVICE_CLASS(klass);
 -    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
 -    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
--    k->realize = vhost_user_scsi_pci_realize;
+-    k->realize = vhost_scsi_pci_realize;
 -    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
--    dc->props = vhost_user_scsi_pci_properties;
+-    dc->props = vhost_scsi_pci_properties;
 -    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
 -    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
 -    pcidev_k->revision = 0x00;
 -    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
 -}
 -
--static void vhost_user_scsi_pci_instance_init(Object *obj)
+-static void vhost_scsi_pci_instance_init(Object *obj)
 -{
--    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(obj);
+-    VHostSCSIPCI *dev = VHOST_SCSI_PCI(obj);
 -
 -    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VHOST_USER_SCSI);
+-                                TYPE_VHOST_SCSI);
 -    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
 -                              "bootindex", &error_abort);
 -}
 -
--static const VirtioPCIDeviceTypeInfo vhost_user_scsi_pci_info = {
--    .base_name             = TYPE_VHOST_USER_SCSI_PCI,
--    .generic_name          = "vhost-user-scsi-pci",
--    .transitional_name     = "vhost-user-scsi-pci-transitional",
--    .non_transitional_name = "vhost-user-scsi-pci-non-transitional",
--    .instance_size = sizeof(VHostUserSCSIPCI),
--    .instance_init = vhost_user_scsi_pci_instance_init,
--    .class_init    = vhost_user_scsi_pci_class_init,
+-static const VirtioPCIDeviceTypeInfo vhost_scsi_pci_info = {
+-    .base_name             = TYPE_VHOST_SCSI_PCI,
+-    .generic_name          = "vhost-scsi-pci",
+-    .transitional_name     = "vhost-scsi-pci-transitional",
+-    .non_transitional_name = "vhost-scsi-pci-non-transitional",
+-    .instance_size = sizeof(VHostSCSIPCI),
+-    .instance_init = vhost_scsi_pci_instance_init,
+-    .class_init    = vhost_scsi_pci_class_init,
 -};
 -#endif
 -
  /* virtio-serial-pci */
  
  static void virtio_serial_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-@@ -2436,9 +2379,6 @@ static void virtio_pci_register_types(void)
- #ifdef CONFIG_VHOST_SCSI
-     virtio_pci_types_register(&vhost_scsi_pci_info);
- #endif
--#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
--    virtio_pci_types_register(&vhost_user_scsi_pci_info);
+@@ -2376,9 +2318,6 @@ static void virtio_pci_register_types(void)
+     virtio_pci_types_register(&virtio_scsi_pci_info);
+     virtio_pci_types_register(&virtio_serial_pci_info);
+     virtio_pci_types_register(&virtio_net_pci_info);
+-#ifdef CONFIG_VHOST_SCSI
+-    virtio_pci_types_register(&vhost_scsi_pci_info);
 -#endif
  }
  
  type_init(virtio_pci_register_types)
 diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index acbbe5c4e8..ce6c194f1c 100644
+index ce6c194f1c..b14d83a454 100644
 --- a/hw/virtio/virtio-pci.h
 +++ b/hw/virtio/virtio-pci.h
-@@ -23,7 +23,6 @@
- #include "hw/virtio/virtio-bus.h"
+@@ -24,16 +24,11 @@
  #include "hw/virtio/virtio-gpu.h"
  #include "hw/virtio/virtio-crypto.h"
--#include "hw/virtio/vhost-user-scsi.h"
  
- #ifdef CONFIG_VHOST_SCSI
- #include "hw/virtio/vhost-scsi.h"
-@@ -35,7 +34,6 @@ typedef struct VirtIOSCSIPCI VirtIOSCSIPCI;
+-#ifdef CONFIG_VHOST_SCSI
+-#include "hw/virtio/vhost-scsi.h"
+-#endif
+-
+ typedef struct VirtIOPCIProxy VirtIOPCIProxy;
+ typedef struct VirtIOBlkPCI VirtIOBlkPCI;
+ typedef struct VirtIOSCSIPCI VirtIOSCSIPCI;
  typedef struct VirtIOSerialPCI VirtIOSerialPCI;
  typedef struct VirtIONetPCI VirtIONetPCI;
- typedef struct VHostSCSIPCI VHostSCSIPCI;
--typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
+-typedef struct VHostSCSIPCI VHostSCSIPCI;
  typedef struct VirtIOGPUPCI VirtIOGPUPCI;
  typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
  
-@@ -220,15 +218,6 @@ struct VHostSCSIPCI {
+@@ -204,20 +199,6 @@ struct VirtIOSCSIPCI {
+     VirtIOSCSI vdev;
  };
- #endif
  
--#define TYPE_VHOST_USER_SCSI_PCI "vhost-user-scsi-pci-base"
--#define VHOST_USER_SCSI_PCI(obj) \
--        OBJECT_CHECK(VHostUserSCSIPCI, (obj), TYPE_VHOST_USER_SCSI_PCI)
+-#ifdef CONFIG_VHOST_SCSI
+-/*
+- * vhost-scsi-pci: This extends VirtioPCIProxy.
+- */
+-#define TYPE_VHOST_SCSI_PCI "vhost-scsi-pci-base"
+-#define VHOST_SCSI_PCI(obj) \
+-        OBJECT_CHECK(VHostSCSIPCI, (obj), TYPE_VHOST_SCSI_PCI)
 -
--struct VHostUserSCSIPCI {
+-struct VHostSCSIPCI {
 -    VirtIOPCIProxy parent_obj;
--    VHostUserSCSI vdev;
+-    VHostSCSI vdev;
 -};
+-#endif
 -
  /*
   * virtio-blk-pci: This extends VirtioPCIProxy.
