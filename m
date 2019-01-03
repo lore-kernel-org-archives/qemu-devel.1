@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55921)
+Received: from eggs.gnu.org ([208.118.235.92]:55972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf5y1-0001Jg-E3
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:34 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf5y6-0001Lg-Of
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf5xx-0007qA-W2
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:33 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:41592 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf5y5-0007xw-Op
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:38 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:40396 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gf5xx-0007oO-Je
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:29 -0500
+	id 1gf5y5-0006vn-DC
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:37 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu,  3 Jan 2019 17:34:09 +0100
-Message-Id: <1546533252-26601-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  3 Jan 2019 17:34:05 +0100
+Message-Id: <1546533252-26601-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 5/8] target/mips: Provide R/W access to SAARI
- and SAAR CP0 registers
+Subject: [Qemu-devel] [PATCH 1/8] target/mips: Move comment containing
+ summary of CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,268 +28,199 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, arikalo@wavecomp.com
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Provide R/W access to SAARI and SAAR CP0 registers.
+Move comment containing summary of CP0 registers. Checkpatch
+script reported some tabs in the resutling diff, so convert
+these tabs to spaces too.
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  1 +
- target/mips/helper.h    |  6 +++++
- target/mips/internal.h  |  1 +
- target/mips/op_helper.c | 50 +++++++++++++++++++++++++++++++++++++
- target/mips/translate.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++---
- 5 files changed, 120 insertions(+), 4 deletions(-)
+ target/mips/cpu.h | 165 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 84 insertions(+), 81 deletions(-)
 
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 1c2c682..185702d 100644
+index 03c03fd..6c2a7e4 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -901,6 +901,7 @@ struct CPUMIPSState {
-     uint32_t CP0_Status_rw_bitmask; /* Read/write bits in CP0_Status */
-     uint32_t CP0_TCStatus_rw_bitmask; /* Read/write bits in CP0_TCStatus */
-     uint64_t insn_flags; /* Supported instruction set */
-+    int saarp;
+@@ -123,87 +123,6 @@ typedef struct mips_def_t mips_def_t;
+ #define MIPS_KSCRATCH_NUM 6
+ #define MIPS_MAAR_MAX 16 /* Must be an even number. */
  
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index c23e4e5..8872c46 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -65,6 +65,8 @@ DEF_HELPER_1(mftc0_tcschedule, tl, env)
- DEF_HELPER_1(mfc0_tcschefback, tl, env)
- DEF_HELPER_1(mftc0_tcschefback, tl, env)
- DEF_HELPER_1(mfc0_count, tl, env)
-+DEF_HELPER_1(mfc0_saar, tl, env)
-+DEF_HELPER_1(mfhc0_saar, tl, env)
- DEF_HELPER_1(mftc0_entryhi, tl, env)
- DEF_HELPER_1(mftc0_status, tl, env)
- DEF_HELPER_1(mftc0_cause, tl, env)
-@@ -87,6 +89,7 @@ DEF_HELPER_1(dmfc0_tcschefback, tl, env)
- DEF_HELPER_1(dmfc0_lladdr, tl, env)
- DEF_HELPER_1(dmfc0_maar, tl, env)
- DEF_HELPER_2(dmfc0_watchlo, tl, env, i32)
-+DEF_HELPER_1(dmfc0_saar, tl, env)
- #endif /* TARGET_MIPS64 */
+-typedef struct TCState TCState;
+-struct TCState {
+-    target_ulong gpr[32];
+-    target_ulong PC;
+-    target_ulong HI[MIPS_DSP_ACC];
+-    target_ulong LO[MIPS_DSP_ACC];
+-    target_ulong ACX[MIPS_DSP_ACC];
+-    target_ulong DSPControl;
+-    int32_t CP0_TCStatus;
+-#define CP0TCSt_TCU3	31
+-#define CP0TCSt_TCU2	30
+-#define CP0TCSt_TCU1	29
+-#define CP0TCSt_TCU0	28
+-#define CP0TCSt_TMX	27
+-#define CP0TCSt_RNST	23
+-#define CP0TCSt_TDS	21
+-#define CP0TCSt_DT	20
+-#define CP0TCSt_DA	15
+-#define CP0TCSt_A	13
+-#define CP0TCSt_TKSU	11
+-#define CP0TCSt_IXMT	10
+-#define CP0TCSt_TASID	0
+-    int32_t CP0_TCBind;
+-#define CP0TCBd_CurTC	21
+-#define CP0TCBd_TBE	17
+-#define CP0TCBd_CurVPE	0
+-    target_ulong CP0_TCHalt;
+-    target_ulong CP0_TCContext;
+-    target_ulong CP0_TCSchedule;
+-    target_ulong CP0_TCScheFBack;
+-    int32_t CP0_Debug_tcstatus;
+-    target_ulong CP0_UserLocal;
+-
+-    int32_t msacsr;
+-
+-#define MSACSR_FS       24
+-#define MSACSR_FS_MASK  (1 << MSACSR_FS)
+-#define MSACSR_NX       18
+-#define MSACSR_NX_MASK  (1 << MSACSR_NX)
+-#define MSACSR_CEF      2
+-#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
+-#define MSACSR_RM       0
+-#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
+-#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK | MSACSR_NX_MASK | \
+-        MSACSR_FS_MASK)
+-
+-    float_status msa_fp_status;
+-
+-#define NUMBER_OF_MXU_REGISTERS 16
+-    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
+-    target_ulong mxu_cr;
+-#define MXU_CR_LC       31
+-#define MXU_CR_RC       30
+-#define MXU_CR_BIAS     2
+-#define MXU_CR_RD_EN    1
+-#define MXU_CR_MXU_EN   0
+-
+-};
+-
+-typedef struct CPUMIPSState CPUMIPSState;
+-struct CPUMIPSState {
+-    TCState active_tc;
+-    CPUMIPSFPUContext active_fpu;
+-
+-    uint32_t current_tc;
+-    uint32_t current_fpu;
+-
+-    uint32_t SEGBITS;
+-    uint32_t PABITS;
+-#if defined(TARGET_MIPS64)
+-# define PABITS_BASE 36
+-#else
+-# define PABITS_BASE 32
+-#endif
+-    target_ulong SEGMask;
+-    uint64_t PAMask;
+-#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
+-
+-    int32_t msair;
+-#define MSAIR_ProcID    8
+-#define MSAIR_Rev       0
  
- DEF_HELPER_2(mtc0_index, void, env, tl)
-@@ -131,6 +134,9 @@ DEF_HELPER_2(mtc0_srsconf4, void, env, tl)
- DEF_HELPER_2(mtc0_hwrena, void, env, tl)
- DEF_HELPER_2(mtc0_pwctl, void, env, tl)
- DEF_HELPER_2(mtc0_count, void, env, tl)
-+DEF_HELPER_2(mtc0_saari, void, env, tl)
-+DEF_HELPER_2(mtc0_saar, void, env, tl)
-+DEF_HELPER_2(mthc0_saar, void, env, tl)
- DEF_HELPER_2(mtc0_entryhi, void, env, tl)
- DEF_HELPER_2(mttc0_entryhi, void, env, tl)
- DEF_HELPER_2(mtc0_compare, void, env, tl)
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index 8b1b245..8f6fc91 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -61,6 +61,7 @@ struct mips_def_t {
-     target_ulong CP0_EBaseWG_rw_bitmask;
-     uint64_t insn_flags;
-     enum mips_mmu_types mmu_type;
-+    int32_t SAARP;
- };
- 
- extern const struct mips_def_t mips_defs[];
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index d1f1d1a..409c136 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -938,6 +938,22 @@ target_ulong helper_mfc0_count(CPUMIPSState *env)
-     return count;
- }
- 
-+target_ulong helper_mfc0_saar(CPUMIPSState *env)
-+{
-+    if ((env->CP0_SAARI & 0x3f) < 2) {
-+        return (int32_t) env->CP0_SAAR[env->CP0_SAARI & 0x3f];
-+    }
-+    return 0;
-+}
+ /*
+  *     Summary of CP0 registers
+@@ -314,6 +233,90 @@ struct CPUMIPSState {
+  * 7   TagLo             TagHi                               KScratch<n>
+  *
+  */
 +
-+target_ulong helper_mfhc0_saar(CPUMIPSState *env)
-+{
-+    if ((env->CP0_SAARI & 0x3f) < 2) {
-+        return env->CP0_SAAR[env->CP0_SAARI & 0x3f] >> 32;
-+    }
-+    return 0;
-+}
 +
- target_ulong helper_mftc0_entryhi(CPUMIPSState *env)
- {
-     int other_tc = env->CP0_VPEControl & (0xff << CP0VPECo_TargTC);
-@@ -1059,6 +1075,14 @@ target_ulong helper_dmfc0_watchlo(CPUMIPSState *env, uint32_t sel)
- {
-     return env->CP0_WatchLo[sel];
- }
++typedef struct TCState TCState;
++struct TCState {
++    target_ulong gpr[32];
++    target_ulong PC;
++    target_ulong HI[MIPS_DSP_ACC];
++    target_ulong LO[MIPS_DSP_ACC];
++    target_ulong ACX[MIPS_DSP_ACC];
++    target_ulong DSPControl;
++    int32_t CP0_TCStatus;
++#define CP0TCSt_TCU3    31
++#define CP0TCSt_TCU2    30
++#define CP0TCSt_TCU1    29
++#define CP0TCSt_TCU0    28
++#define CP0TCSt_TMX     27
++#define CP0TCSt_RNST    23
++#define CP0TCSt_TDS     21
++#define CP0TCSt_DT      20
++#define CP0TCSt_DA      15
++#define CP0TCSt_A       13
++#define CP0TCSt_TKSU    11
++#define CP0TCSt_IXMT    10
++#define CP0TCSt_TASID   0
++    int32_t CP0_TCBind;
++#define CP0TCBd_CurTC   21
++#define CP0TCBd_TBE     17
++#define CP0TCBd_CurVPE  0
++    target_ulong CP0_TCHalt;
++    target_ulong CP0_TCContext;
++    target_ulong CP0_TCSchedule;
++    target_ulong CP0_TCScheFBack;
++    int32_t CP0_Debug_tcstatus;
++    target_ulong CP0_UserLocal;
 +
-+target_ulong helper_dmfc0_saar(CPUMIPSState *env)
-+{
-+    if ((env->CP0_SAARI & 0x3f) < 2) {
-+        return env->CP0_SAAR[env->CP0_SAARI & 0x3f];
-+    }
-+    return 0;
-+}
- #endif /* TARGET_MIPS64 */
- 
- void helper_mtc0_index(CPUMIPSState *env, target_ulong arg1)
-@@ -1598,6 +1622,32 @@ void helper_mtc0_count(CPUMIPSState *env, target_ulong arg1)
-     qemu_mutex_unlock_iothread();
- }
- 
-+void helper_mtc0_saari(CPUMIPSState *env, target_ulong arg1)
-+{
-+    uint32_t target = arg1 & 0x3f;
-+    if (target <= 1) {
-+        env->CP0_SAARI = target;
-+    }
-+}
++    int32_t msacsr;
 +
-+void helper_mtc0_saar(CPUMIPSState *env, target_ulong arg1)
-+{
-+    uint32_t target = env->CP0_SAARI & 0x3f;
-+    if (target < 2) {
-+        env->CP0_SAAR[target] = arg1 & 0x00000ffffffff03fULL;
-+    }
-+}
++#define MSACSR_FS       24
++#define MSACSR_FS_MASK  (1 << MSACSR_FS)
++#define MSACSR_NX       18
++#define MSACSR_NX_MASK  (1 << MSACSR_NX)
++#define MSACSR_CEF      2
++#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
++#define MSACSR_RM       0
++#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
++#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK | MSACSR_NX_MASK | \
++        MSACSR_FS_MASK)
 +
-+void helper_mthc0_saar(CPUMIPSState *env, target_ulong arg1)
-+{
-+    uint32_t target = env->CP0_SAARI & 0x3f;
-+    if (target < 2) {
-+        env->CP0_SAAR[target] =
-+            (((uint64_t) arg1 << 32) & 0x00000fff00000000ULL) |
-+            (env->CP0_SAAR[target] & 0x00000000ffffffffULL);
-+    }
-+}
++    float_status msa_fp_status;
 +
- void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
- {
-     target_ulong old, val, mask;
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 6af292f..b0b926f 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -2501,6 +2501,7 @@ typedef struct DisasContext {
-     bool mrp;
-     bool nan2008;
-     bool abs2008;
-+    bool saar;
- } DisasContext;
- 
- #define DISAS_STOP       DISAS_TARGET_0
-@@ -6498,6 +6499,17 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             goto cp0_unimplemented;
-         }
-         break;
-+    case CPO_REGISTER_09:
-+        switch (sel) {
-+        case 7:
-+            CP0_CHECK(ctx->saar);
-+            gen_helper_mfhc0_saar(arg, cpu_env);
-+            rn = "SAAR";
-+            break;
-+        default:
-+            goto cp0_unimplemented;
-+        }
-+        break;
-     case CPO_REGISTER_17:
-         switch (sel) {
-         case 0:
-@@ -6568,6 +6580,16 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             goto cp0_unimplemented;
-         }
-         break;
-+    case CPO_REGISTER_09:
-+        switch (sel) {
-+        case 7:
-+            CP0_CHECK(ctx->saar);
-+            gen_helper_mthc0_saar(cpu_env, arg);
-+            rn = "SAAR";
-+            break;
-+        default:
-+            goto cp0_unimplemented;
-+        }
-     case CPO_REGISTER_17:
-         switch (sel) {
-         case 0:
-@@ -6954,7 +6976,16 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             ctx->base.is_jmp = DISAS_EXIT;
-             rn = "Count";
-             break;
--        /* 6,7 are implementation dependent */
-+        case 6:
-+            CP0_CHECK(ctx->saar);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SAARI));
-+            rn = "SAARI";
-+            break;
-+        case 7:
-+            CP0_CHECK(ctx->saar);
-+            gen_helper_mfc0_saar(arg, cpu_env);
-+            rn = "SAAR";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -7659,7 +7690,16 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             gen_helper_mtc0_count(cpu_env, arg);
-             rn = "Count";
-             break;
--        /* 6,7 are implementation dependent */
-+        case 6:
-+            CP0_CHECK(ctx->saar);
-+            gen_helper_mtc0_saari(cpu_env, arg);
-+            rn = "SAARI";
-+            break;
-+        case 7:
-+            CP0_CHECK(ctx->saar);
-+            gen_helper_mtc0_saar(cpu_env, arg);
-+            rn = "SAAR";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -8404,7 +8444,16 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             ctx->base.is_jmp = DISAS_EXIT;
-             rn = "Count";
-             break;
--        /* 6,7 are implementation dependent */
-+        case 6:
-+            CP0_CHECK(ctx->saar);
-+            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SAARI));
-+            rn = "SAARI";
-+            break;
-+        case 7:
-+            CP0_CHECK(ctx->saar);
-+            gen_helper_dmfc0_saar(arg, cpu_env);
-+            rn = "SAAR";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
-@@ -9092,7 +9141,16 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             gen_helper_mtc0_count(cpu_env, arg);
-             rn = "Count";
-             break;
--        /* 6,7 are implementation dependent */
-+        case 6:
-+            CP0_CHECK(ctx->saar);
-+            gen_helper_mtc0_saari(cpu_env, arg);
-+            rn = "SAARI";
-+            break;
-+        case 7:
-+            CP0_CHECK(ctx->saar);
-+            gen_helper_mtc0_saar(cpu_env, arg);
-+            rn = "SAAR";
-+            break;
-         default:
-             goto cp0_unimplemented;
-         }
++#define NUMBER_OF_MXU_REGISTERS 16
++    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
++    target_ulong mxu_cr;
++#define MXU_CR_LC       31
++#define MXU_CR_RC       30
++#define MXU_CR_BIAS     2
++#define MXU_CR_RD_EN    1
++#define MXU_CR_MXU_EN   0
++
++};
++
++typedef struct CPUMIPSState CPUMIPSState;
++struct CPUMIPSState {
++    TCState active_tc;
++    CPUMIPSFPUContext active_fpu;
++
++    uint32_t current_tc;
++    uint32_t current_fpu;
++
++    uint32_t SEGBITS;
++    uint32_t PABITS;
++#if defined(TARGET_MIPS64)
++# define PABITS_BASE 36
++#else
++# define PABITS_BASE 32
++#endif
++    target_ulong SEGMask;
++    uint64_t PAMask;
++#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
++
++    int32_t msair;
++#define MSAIR_ProcID    8
++#define MSAIR_Rev       0
++
+ /*
+  * CP0 Register 0
+  */
 -- 
 2.7.4
