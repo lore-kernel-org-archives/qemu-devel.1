@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56586)
+Received: from eggs.gnu.org ([208.118.235.92]:56581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gf3Xq-0003oy-ON
+	(envelope-from <balaton@eik.bme.hu>) id 1gf3Xq-0003ow-Nf
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:00:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gf3Xk-0003YA-S5
+	(envelope-from <balaton@eik.bme.hu>) id 1gf3Xk-0003YU-TD
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:00:22 -0500
-Message-Id: <cover.1546522545.git.balaton@eik.bme.hu>
+Message-Id: <0277da57808f8d24a5dc0cdf7715661c3649c282.1546522545.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1546522545.git.balaton@eik.bme.hu>
+References: <cover.1546522545.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Thu, 3 Jan 2019 14:35:45 +0100
 Date: Thu, 03 Jan 2019 14:35:45 +0100
-Subject: [Qemu-devel] [PATCH v2 0/6] Misc sam460ex related patches
+Subject: [Qemu-devel] [PATCH v2 6/6] sam460ex: Fix support for memory larger
+ than 1GB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,40 +21,109 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
 
-The last code patch in this series fixes memory size larger than 1GB
-for sam460ex, other patches are just clean ups I've made along the way.
+Fix the encoding of larger memory modules in the SoC registers which
+allows specifying more than 1GB memory for sam460ex. Well, only 2GB
+due to SoC and firmware restrictions which was the only missing value
+compared to what the real hardware supports. The SoC should support up
+to 4GB but when setting that the firmware hangs during memory test.
+This may be an overflow bug in the firmware which I did not try to
+debug but this may affect real hardware as well.
 
-The first patch is intended to be generic and may be useful for other
-boards which currently have their own SPD EEPROM data or don't yet
-generate any SPD data just have TODO comments instead. These are MIPS
-malta and fulong2e, ARM integratorcp and maybe aspeed, and the PIIX
-and Q35 pc machines. I did not try to change these as I have no way to
-test them throughly. Patch 2 converts sam460ex to use this function.
-Other patches are misc cleanups.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+v2: lower case hex constants to match others around it
 
-Regards,
-BALATON Zoltan
+ hw/ppc/ppc440_uc.c | 22 ++++++++++++----------
+ hw/ppc/sam460ex.c  |  6 ++++--
+ 2 files changed, 16 insertions(+), 12 deletions(-)
 
-v2: Address review comments, omitting patches already merged
-
-BALATON Zoltan (6):
-  smbus: Add a helper to generate SPD EEPROM data
-  sam460ex: Clean up SPD EEPROM creation
-  ppc4xx: Use ram_addr_t in ppc4xx_sdram_adjust()
-  ppc4xx: Rename ppc4xx_sdram_t in ppc440_uc.c to ppc440_sdram_t
-  ppc4xx: Pass array index to function instead of pointer into the array
-  sam460ex: Fix support for memory larger than 1GB
-
- hw/i2c/smbus_eeprom.c   | 130 ++++++++++++++++++++++++++++++++++
- hw/ppc/ppc440_bamboo.c  |   2 +-
- hw/ppc/ppc440_uc.c      |  70 +++++++++----------
- hw/ppc/ppc4xx_devs.c    |   4 +-
- hw/ppc/sam460ex.c       | 181 +++++++-----------------------------------------
- include/hw/i2c/smbus.h  |   3 +
- include/hw/ppc/ppc4xx.h |   2 +-
- 7 files changed, 196 insertions(+), 196 deletions(-)
-
+diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+index 60dbb35eee..c489368905 100644
+--- a/hw/ppc/ppc440_uc.c
++++ b/hw/ppc/ppc440_uc.c
+@@ -2,7 +2,7 @@
+  * QEMU PowerPC 440 embedded processors emulation
+  *
+  * Copyright (c) 2012 François Revol
+- * Copyright (c) 2016-2018 BALATON Zoltan
++ * Copyright (c) 2016-2019 BALATON Zoltan
+  *
+  * This work is licensed under the GNU GPL license version 2 or later.
+  *
+@@ -505,10 +505,6 @@ enum {
+     SDRAM_PLBADDUHB = 0x50,
+ };
+ 
+-/* XXX: TOFIX: some patches have made this code become inconsistent:
+- *      there are type inconsistencies, mixing hwaddr, target_ulong
+- *      and uint32_t
+- */
+ static uint32_t sdram_bcr(hwaddr ram_base, hwaddr ram_size)
+ {
+     uint32_t bcr;
+@@ -538,11 +534,17 @@ static uint32_t sdram_bcr(hwaddr ram_base, hwaddr ram_size)
+     case (1 * GiB):
+         bcr = 0xe000;
+         break;
++    case (2 * GiB):
++        bcr = 0xc000;
++        break;
++    case (4 * GiB):
++        bcr = 0x8000;
++        break;
+     default:
+         error_report("invalid RAM size " TARGET_FMT_plx, ram_size);
+         return 0;
+     }
+-    bcr |= ram_base & 0xFF800000;
++    bcr |= ram_base >> 2 & 0xffe00000;
+     bcr |= 1;
+ 
+     return bcr;
+@@ -550,12 +552,12 @@ static uint32_t sdram_bcr(hwaddr ram_base, hwaddr ram_size)
+ 
+ static inline hwaddr sdram_base(uint32_t bcr)
+ {
+-    return bcr & 0xFF800000;
++    return (bcr & 0xffe00000) << 2;
+ }
+ 
+-static target_ulong sdram_size(uint32_t bcr)
++static uint64_t sdram_size(uint32_t bcr)
+ {
+-    target_ulong size;
++    uint64_t size;
+     int sh;
+ 
+     sh = 1024 - ((bcr >> 6) & 0x3ff);
+@@ -575,7 +577,7 @@ static void sdram_set_bcr(ppc440_sdram_t *sdram, int i,
+                                     &sdram->ram_memories[i]);
+         object_unparent(OBJECT(&sdram->containers[i]));
+     }
+-    sdram->bcr[i] = bcr & 0xFFDEE001;
++    sdram->bcr[i] = bcr & 0xffe0ffc1;
+     if (enabled && (bcr & 1)) {
+         memory_region_init(&sdram->containers[i], NULL, "sdram-containers",
+                            sdram_size(bcr));
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 233f81bb56..ac575be813 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -76,9 +76,11 @@
+ #define UART_FREQ 11059200
+ #define SDRAM_NR_BANKS 4
+ 
+-/* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
++/* The SoC could also handle 4 GiB but firmware does not work with that. */
++/* Maybe it overflows a signed 32 bit number somewhere? */
+ static const ram_addr_t ppc460ex_sdram_bank_sizes[] = {
+-    1 * GiB, 512 * MiB, 256 * MiB, 128 * MiB, 64 * MiB, 32 * MiB, 0
++    2 * GiB, 1 * GiB, 512 * MiB, 256 * MiB, 128 * MiB, 64 * MiB,
++    32 * MiB, 0
+ };
+ 
+ struct boot_info {
 -- 
 2.13.7
