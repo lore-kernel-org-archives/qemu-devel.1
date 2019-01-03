@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:33371)
+Received: from eggs.gnu.org ([208.118.235.92]:36434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gf4lI-0003in-CO
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:18:21 -0500
+	(envelope-from <berto@igalia.com>) id 1gf4vH-00027g-UR
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:28:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gf4lE-0007aV-PO
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:18:20 -0500
-From: Li Qiang <liq3ea@163.com>
-Date: Thu,  3 Jan 2019 07:16:12 -0800
-Message-Id: <20190103151612.51399-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH v2] s390: avoid potential null dereference in
- s390_pcihost_unplug()
+	(envelope-from <berto@igalia.com>) id 1gf4vE-0004DS-SJ
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:28:39 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181211164317.32893-4-vsementsov@virtuozzo.com>
+References: <20181211164317.32893-1-vsementsov@virtuozzo.com>
+	<20181211164317.32893-4-vsementsov@virtuozzo.com>
+Date: Thu, 03 Jan 2019 16:28:33 +0100
+Message-ID: <w51bm4xep5q.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 3/8] qcow2-threads: use
+ thread_pool_submit_co
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,47 +23,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: walling@linux.ibm.com, rth@twiddle.net, david@redhat.com, cohuck@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, Li Qiang <liq3ea@163.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, berrange@redhat.com, den@openvz.org
 
-When getting the 'pbdev', the if...else has no default branch.
->From Coverity, the 'pbdev' maybe null when the 'dev' is not
-the TYPE_PCI_BRIDGE/TYPE_PCI_DEVICE/TYPE_S390_PCI_DEVICE.
-This patch adds a default branch for device plug and unplug.
+On Tue 11 Dec 2018 05:43:12 PM CET, Vladimir Sementsov-Ogievskiy wrote:
+> Use thread_pool_submit_co, instead of reinventing it here. Note, that
+> thread_pool_submit_aio() never returns an error, so checking it was an
+> extra thing.
 
-Spotted by Coverity: CID 1398593
+"never returns NULL" is perhaps a bit more explicit.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
-Adds a default branch for device plug per Cornelia's review.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
- hw/s390x/s390-pci-bus.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 15759b6514..fe48a36ff6 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -912,6 +912,9 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         pbdev->fh = pbdev->idx;
-         QTAILQ_INSERT_TAIL(&s->zpci_devs, pbdev, link);
-         g_hash_table_insert(s->zpci_table, &pbdev->idx, pbdev);
-+    } else {
-+        error_setg(errp, "s390: device plug request for not supported device"
-+                   " type: %s", object_get_typename(OBJECT(dev)));
-     }
- }
- 
-@@ -956,6 +959,10 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
-         pbdev = S390_PCI_DEVICE(dev);
-         pci_dev = pbdev->pdev;
-+    } else {
-+        error_setg(errp, "s390: device unplug request for not supported device"
-+                   " type: %s", object_get_typename(OBJECT(dev)));
-+        return;
-     }
- 
-     switch (pbdev->state) {
--- 
-2.17.1
+Berto
