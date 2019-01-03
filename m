@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55920)
+Received: from eggs.gnu.org ([208.118.235.92]:55925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf5y1-0001Jf-Dw
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf5y1-0001Ji-El
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf5xz-0007sI-B3
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gf5xx-0007pk-PE
 	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:33 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:41614 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:41591 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gf5xz-0007qE-33
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:31 -0500
+	id 1gf5xx-0007oM-H8
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:35:29 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu,  3 Jan 2019 17:34:12 +0100
-Message-Id: <1546533252-26601-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  3 Jan 2019 17:34:10 +0100
+Message-Id: <1546533252-26601-7-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 8/8] target/mips: Update ITU to handle bus
- errors
+Subject: [Qemu-devel] [PATCH 6/8] target/mips: Add field and R/W access to
+ ITU control register ICR0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +30,78 @@ Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, arikal
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Update ITU to handle bus errors.
+Add field and R/W access to ITU control register ICR0.
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- hw/misc/mips_itu.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ hw/misc/mips_itu.c         | 22 +++++++++++++++++++++-
+ include/hw/misc/mips_itu.h |  4 ++++
+ 2 files changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/hw/misc/mips_itu.c b/hw/misc/mips_itu.c
-index 5c49bdd..e8860dc 100644
+index 43bbec4..4801958 100644
 --- a/hw/misc/mips_itu.c
 +++ b/hw/misc/mips_itu.c
-@@ -375,6 +375,12 @@ static void view_pv_try_write(ITCStorageCell *c)
-     view_pv_common_write(c);
- }
+@@ -55,9 +55,17 @@ typedef enum ITCView {
+     ITCVIEW_EF_SYNC = 2,
+     ITCVIEW_EF_TRY  = 3,
+     ITCVIEW_PV_SYNC = 4,
+-    ITCVIEW_PV_TRY  = 5
++    ITCVIEW_PV_TRY  = 5,
++    ITCVIEW_PV_ICR0 = 15,
+ } ITCView;
  
-+static void raise_exception(int excp)
-+{
-+    current_cpu->exception_index = excp;
-+    cpu_loop_exit(current_cpu);
-+}
++#define ITC_ICR0_CELL_NUM        16
++#define ITC_ICR0_BLK_GRAIN       8
++#define ITC_ICR0_BLK_GRAIN_MASK  0x7
++#define ITC_ICR0_ERR_AXI         2
++#define ITC_ICR0_ERR_PARITY      1
++#define ITC_ICR0_ERR_EXEC        0
 +
- static uint64_t itc_storage_read(void *opaque, hwaddr addr, unsigned size)
+ MemoryRegion *mips_itu_get_tag_region(MIPSITUState *itu)
  {
-     MIPSITUState *s = (MIPSITUState *)opaque;
-@@ -382,6 +388,14 @@ static uint64_t itc_storage_read(void *opaque, hwaddr addr, unsigned size)
-     ITCView view = get_itc_view(addr);
-     uint64_t ret = -1;
- 
-+    switch (size) {
-+    case 1:
-+    case 2:
-+        s->icr0 |= 1 << ITC_ICR0_ERR_AXI;
-+        raise_exception(EXCP_DBE);
-+        return 0;
-+    }
+     return &itu->tag_io;
+@@ -382,6 +390,9 @@ static uint64_t itc_storage_read(void *opaque, hwaddr addr, unsigned size)
+     case ITCVIEW_PV_TRY:
+         ret = view_pv_try_read(cell);
+         break;
++    case ITCVIEW_PV_ICR0:
++        ret = s->icr0;
++        break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "itc_storage_read: Bad ITC View %d\n", (int)view);
+@@ -417,6 +428,15 @@ static void itc_storage_write(void *opaque, hwaddr addr, uint64_t data,
+     case ITCVIEW_PV_TRY:
+         view_pv_try_write(cell);
+         break;
++    case ITCVIEW_PV_ICR0:
++        if (data & 0x7) {
++            /* clear ERROR bits */
++            s->icr0 &= ~(data & 0x7);
++        }
++        /* set BLK_GRAIN */
++        s->icr0 &= ~0x700;
++        s->icr0 |= data & 0x700;
++        break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "itc_storage_write: Bad ITC View %d\n", (int)view);
+diff --git a/include/hw/misc/mips_itu.h b/include/hw/misc/mips_itu.h
+index 030eb4a..45a0c51 100644
+--- a/include/hw/misc/mips_itu.h
++++ b/include/hw/misc/mips_itu.h
+@@ -66,6 +66,10 @@ typedef struct MIPSITUState {
+     /* ITC Configuration Tags */
+     uint64_t ITCAddressMap[ITC_ADDRESSMAP_NUM];
+     MemoryRegion tag_io;
 +
-     switch (view) {
-     case ITCVIEW_BYPASS:
-         ret = view_bypass_read(cell);
-@@ -420,6 +434,14 @@ static void itc_storage_write(void *opaque, hwaddr addr, uint64_t data,
-     ITCStorageCell *cell = get_cell(s, addr);
-     ITCView view = get_itc_view(addr);
- 
-+    switch (size) {
-+    case 1:
-+    case 2:
-+        s->icr0 |= 1 << ITC_ICR0_ERR_AXI;
-+        raise_exception(EXCP_DBE);
-+        return;
-+    }
++    /* ITU Control Register */
++    uint64_t icr0;
 +
-     switch (view) {
-     case ITCVIEW_BYPASS:
-         view_bypass_write(cell, data);
+ } MIPSITUState;
+ 
+ /* Get ITC Configuration Tag memory region. */
 -- 
 2.7.4
