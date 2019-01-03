@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:38217)
+Received: from eggs.gnu.org ([208.118.235.92]:38222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gesZb-0002XZ-4X
+	(envelope-from <dgibson@ozlabs.org>) id 1gesZb-0002Xc-5V
 	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 21:17:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gesZT-0004rI-PM
+	(envelope-from <dgibson@ozlabs.org>) id 1gesZX-0004vU-Gi
 	for qemu-devel@nongnu.org; Wed, 02 Jan 2019 21:17:26 -0500
-Date: Thu, 3 Jan 2019 12:54:12 +1100
+Date: Thu, 3 Jan 2019 11:32:34 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190103015412.GH10853@umbus.fritz.box>
-References: <cover.1546394798.git.balaton@eik.bme.hu>
-	<fc40f941cf84750609e1093eca98fd9248a0981e.1546394798.git.balaton@eik.bme.hu>
-	<20190102040900.GL27457@umbus.fritz.box>
-	<alpine.BSF.2.21.9999.1901021306120.78010@zero.eik.bme.hu>
+Message-ID: <20190103003234.GE10853@umbus.fritz.box>
+References: <154535246529.862554.6113740443866753456.stgit@bahia.lan>
+	<154535248827.862554.14664931152289972599.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="54u2kuW9sGWg/X+X"
+	protocol="application/pgp-signature"; boundary="T6xhMxlHU34Bk0ad"
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.9999.1901021306120.78010@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH 1/8] smbus: Add a helper to generate SPD
- EEPROM data
+In-Reply-To: <154535248827.862554.14664931152289972599.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 01/15] ppc/spapr: Receive and store device
+ tree blob from SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,169 +25,277 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
 
 
---54u2kuW9sGWg/X+X
+--T6xhMxlHU34Bk0ad
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 02, 2019 at 01:36:04PM +0100, BALATON Zoltan wrote:
-> On Wed, 2 Jan 2019, David Gibson wrote:
-> > On Wed, Jan 02, 2019 at 03:06:38AM +0100, BALATON Zoltan wrote:
-> > > There are several boards with SPD EEPROMs that are now using
-> > > duplicated or slightly different hard coded data. Add a helper to
-> > > generate SPD data for a memory module of given type and size that
-> > > could be used by these boards (either as is or with further changes if
-> > > needed) which should help cleaning this up and avoid further duplicat=
-ion.
-> > >=20
-> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> > > ---
-> > >  hw/i2c/smbus_eeprom.c  | 128 +++++++++++++++++++++++++++++++++++++++=
-++++++++++
-> > >  include/hw/i2c/smbus.h |   3 ++
-> > >  2 files changed, 131 insertions(+)
-> > >=20
-> > > diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-> > > index f18aa3de35..a1f51eb921 100644
-> > > --- a/hw/i2c/smbus_eeprom.c
-> > > +++ b/hw/i2c/smbus_eeprom.c
-> > > @@ -23,6 +23,8 @@
-> > >   */
-> > >=20
-> > >  #include "qemu/osdep.h"
-> > > +#include "qemu/error-report.h"
-> > > +#include "qemu/units.h"
-> > >  #include "hw/hw.h"
-> > >  #include "hw/i2c/i2c.h"
-> > >  #include "hw/i2c/smbus.h"
-> > > @@ -162,3 +164,129 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_ee=
-prom,
-> > >          smbus_eeprom_init_one(smbus, 0x50 + i, eeprom_buf + (i * 256=
-));
-> > >      }
-> > >  }
-> > > +
-> > > +/* Generate SDRAM SPD EEPROM data describing a module of type and si=
-ze */
-> > > +uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size)
-> > > +{
-> > > +    uint8_t *spd;
-> > > +    uint8_t nbanks;
-> > > +    uint16_t density;
-> > > +    uint32_t size;
-> > > +    int min_log2, max_log2, sz_log2;
-> > > +    int i;
-> > > +
-> > > +    switch (type) {
-> > > +    case SDR:
-> > > +        min_log2 =3D 2;
-> > > +        max_log2 =3D 9;
-> > > +        break;
-> > > +    case DDR:
-> > > +        min_log2 =3D 5;
-> > > +        max_log2 =3D 12;
-> > > +        break;
-> > > +    case DDR2:
-> > > +        min_log2 =3D 7;
-> > > +        max_log2 =3D 14;
-> > > +        break;
-> > > +    default:
-> > > +        error_report("Unknown SDRAM type");
-> > > +        abort();
-> >=20
-> > The error handling might work a little cleaner if you give this
-> > function an Error ** parameter, then just pass in &error_abort from
-> > the callers.
+On Fri, Dec 21, 2018 at 01:34:48AM +0100, Greg Kurz wrote:
+> From: Alexey Kardashevskiy <aik@ozlabs.ru>
 >=20
-> Good idea but I'm not sure it's needed. This is the only fatal error here
-> (apart from g_malloc0 failing which should also abort) and in practice th=
-is
-> could only happen if a caller specifies wrong type which is quite unlikely
-> given that it's an enum so value outside of that would fail to compile wi=
-th
-> a warning (promoted to error by default). So this default case is only
-> really here to please the compiler.
+> SLOF receives a device tree and updates it with various properties
+> before switching to the guest kernel and QEMU is not aware of any changes
+> made by SLOF. Since there is no real RTAS (QEMU implements it), it makes
+> sense to pass the SLOF final device tree to QEMU to let it implement
+> RTAS related tasks better, such as PCI host bus adapter hotplug.
+>=20
+> Specifially, now QEMU can find out the actual XICS phandle (for PHB
+> hotplug) and the RTAS linux,rtas-entry/base properties (for firmware
+> assisted NMI - FWNMI).
+>=20
+> This stores the initial DT blob in the sPAPR machine and replaces it
+> in the KVMPPC_H_UPDATE_DT (new private hypercall) handler.
+>=20
+> This adds an @update_dt_enabled machine property to allow backward
+> migration.
+>=20
+> SLOF already has a hypercall since
+> https://github.com/aik/SLOF/commit/e6fc84652c9c0073f9183
+>=20
+> This makes use of the new fdt_check_full() helper. In order to allow
+> the configure script to pick the correct DTC version, this adjusts
+> the DTC presense test.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Ok.  If the only reason you'd hit the default case is a bug in the
-caller, then just use a g_assert_not_reached() rather than
-error_report().  As a rule of thumb use asserts or aborts for things
-that have to be bugs in the code, error_report() for things that
-indicate a user or configuration error.
+I've applied this again.  Last time it seemed to create a mysterious
+crash in the arm target, but I can't reproduce it any more, so fingers
+crossed.
 
-> > > +    }
-> > > +    size =3D ram_size >> 20; /* work in terms of megabytes */
-> > > +    if (size < 4) {
-> > > +        error_report("SDRAM size is too small");
-> > > +        return NULL;
-> > > +    }
-> > > +    sz_log2 =3D 31 - clz32(size);
-> > > +    size =3D 1U << sz_log2;
-> > > +    if (ram_size > size * MiB) {
-> > > +        warn_report("SDRAM size 0x"RAM_ADDR_FMT" is not a power of 2=
-, "
-> > > +                    "truncating to %u MB", ram_size, size);
-> > > +    }
-> > > +    if (sz_log2 < min_log2) {
-> > > +        warn_report("Memory size is too small for SDRAM type, adjust=
-ing type");
-> > > +        if (size >=3D 32) {
-> > > +            type =3D DDR;
-> > > +            min_log2 =3D 5;
-> > > +            max_log2 =3D 12;
-> > > +        } else {
-> > > +            type =3D SDR;
-> > > +            min_log2 =3D 2;
-> > > +            max_log2 =3D 9;
-> > > +        }
-> >=20
-> > What do these various fall back cases represent?  Are they bugs in the
-> > callers, or a user configuration error?
+> ---
+>  configure              |    2 +-
+>  hw/ppc/spapr.c         |   43 ++++++++++++++++++++++++++++++++++++++++++-
+>  hw/ppc/spapr_hcall.c   |   42 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/ppc/trace-events    |    3 +++
+>  include/hw/ppc/spapr.h |    7 ++++++-
+>  5 files changed, 94 insertions(+), 3 deletions(-)
 >=20
-> The memory size is given by the user so it can be a config error (like wh=
-en
-> board has DDR2 but user sets memory size to 64MB).
+> diff --git a/configure b/configure
+> index 224d3071ac61..baeeabc29f56 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3916,7 +3916,7 @@ if test "$fdt" !=3D "no" ; then
+>    cat > $TMPC << EOF
+>  #include <libfdt.h>
+>  #include <libfdt_env.h>
+> -int main(void) { fdt_first_subnode(0, 0); return 0; }
+> +int main(void) { fdt_check_full(NULL, 0); return 0; }
+>  EOF
+>    if compile_prog "" "$fdt_libs" ; then
+>      # system DTC is good - use it
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 17ad84396b31..8ea680fcde1e 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1668,7 +1668,10 @@ static void spapr_machine_reset(void)
+>      /* Load the fdt */
+>      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+>      cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
+> -    g_free(fdt);
+> +    g_free(spapr->fdt_blob);
+> +    spapr->fdt_size =3D fdt_totalsize(fdt);
+> +    spapr->fdt_initial_size =3D spapr->fdt_size;
+> +    spapr->fdt_blob =3D fdt;
+> =20
+>      /* Set up the entry state */
+>      spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, fdt_addr=
+);
+> @@ -1919,6 +1922,39 @@ static const VMStateDescription vmstate_spapr_irq_=
+map =3D {
+>      },
+>  };
+> =20
+> +static bool spapr_dtb_needed(void *opaque)
+> +{
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(opaque);
+> +
+> +    return smc->update_dt_enabled;
+> +}
+> +
+> +static int spapr_dtb_pre_load(void *opaque)
+> +{
+> +    sPAPRMachineState *spapr =3D (sPAPRMachineState *)opaque;
+> +
+> +    g_free(spapr->fdt_blob);
+> +    spapr->fdt_blob =3D NULL;
+> +    spapr->fdt_size =3D 0;
+> +
+> +    return 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_dtb =3D {
+> +    .name =3D "spapr_dtb",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_dtb_needed,
+> +    .pre_load =3D spapr_dtb_pre_load,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT32(fdt_initial_size, sPAPRMachineState),
+> +        VMSTATE_UINT32(fdt_size, sPAPRMachineState),
+> +        VMSTATE_VBUFFER_ALLOC_UINT32(fdt_blob, sPAPRMachineState, 0, NUL=
+L,
+> +                                     fdt_size),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static const VMStateDescription vmstate_spapr =3D {
+>      .name =3D "spapr",
+>      .version_id =3D 3,
+> @@ -1948,6 +1984,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>          &vmstate_spapr_cap_ibs,
+>          &vmstate_spapr_irq_map,
+>          &vmstate_spapr_cap_nested_kvm_hv,
+> +        &vmstate_spapr_dtb,
+>          NULL
+>      }
+>  };
+> @@ -3929,6 +3966,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>      hc->unplug =3D spapr_machine_device_unplug;
+> =20
+>      smc->dr_lmb_enabled =3D true;
+> +    smc->update_dt_enabled =3D true;
+>      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
+>      mc->has_hotpluggable_cpus =3D true;
+>      smc->resize_hpt_default =3D SPAPR_RESIZE_HPT_ENABLED;
+> @@ -4024,9 +4062,12 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+> =20
+>  static void spapr_machine_3_1_class_options(MachineClass *mc)
+>  {
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> +
+>      spapr_machine_4_0_class_options(mc);
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
+>      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
+> +    smc->update_dt_enabled =3D false;
+>  }
+> =20
+>  DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index ae913d070f50..78fecc8fe906 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1717,6 +1717,46 @@ static target_ulong h_get_cpu_characteristics(Powe=
+rPCCPU *cpu,
+> =20
+>      args[0] =3D characteristics;
+>      args[1] =3D behaviour;
+> +    return H_SUCCESS;
+> +}
+> +
+> +static target_ulong h_update_dt(PowerPCCPU *cpu, sPAPRMachineState *spap=
+r,
+> +                                target_ulong opcode, target_ulong *args)
+> +{
+> +    target_ulong dt =3D ppc64_phys_to_real(args[0]);
+> +    struct fdt_header hdr =3D { 0 };
+> +    unsigned cb;
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    void *fdt;
+> +
+> +    cpu_physical_memory_read(dt, &hdr, sizeof(hdr));
+> +    cb =3D fdt32_to_cpu(hdr.totalsize);
+> +
+> +    if (!smc->update_dt_enabled) {
+> +        return H_SUCCESS;
+> +    }
+> +
+> +    /* Check that the fdt did not grow out of proportion */
+> +    if (cb > spapr->fdt_initial_size * 2) {
+> +        trace_spapr_update_dt_failed_size(spapr->fdt_initial_size, cb,
+> +                                          fdt32_to_cpu(hdr.magic));
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    fdt =3D g_malloc0(cb);
+> +    cpu_physical_memory_read(dt, fdt, cb);
+> +
+> +    /* Check the fdt consistency */
+> +    if (fdt_check_full(fdt, cb)) {
+> +        trace_spapr_update_dt_failed_check(spapr->fdt_initial_size, cb,
+> +                                           fdt32_to_cpu(hdr.magic));
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    g_free(spapr->fdt_blob);
+> +    spapr->fdt_size =3D cb;
+> +    spapr->fdt_blob =3D fdt;
+> +    trace_spapr_update_dt(cb);
+> =20
+>      return H_SUCCESS;
+>  }
+> @@ -1822,6 +1862,8 @@ static void hypercall_register_types(void)
+> =20
+>      /* ibm,client-architecture-support support */
+>      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support=
+);
+> +
+> +    spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
+>  }
+> =20
+>  type_init(hypercall_register_types)
+> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> index dc5e65aee96d..0af155ed323d 100644
+> --- a/hw/ppc/trace-events
+> +++ b/hw/ppc/trace-events
+> @@ -22,6 +22,9 @@ spapr_cas_pvr_try(uint32_t pvr) "0x%x"
+>  spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "=
+current=3D0x%x, explicit_match=3D%u, new=3D0x%x"
+>  spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=3D0x%"=
+PRIx64", shift=3D%"PRIu64
+>  spapr_h_resize_hpt_commit(uint64_t flags, uint64_t shift) "flags=3D0x%"P=
+RIx64", shift=3D%"PRIu64
+> +spapr_update_dt(unsigned cb) "New blob %u bytes"
+> +spapr_update_dt_failed_size(unsigned cbold, unsigned cbnew, unsigned mag=
+ic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+> +spapr_update_dt_failed_check(unsigned cbold, unsigned cbnew, unsigned ma=
+gic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
+> =20
+>  # hw/ppc/spapr_iommu.c
+>  spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t re=
+t) "liobn=3D0x%"PRIx64" ioba=3D0x%"PRIx64" tce=3D0x%"PRIx64" ret=3D%"PRId64
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 2c77a8ba8810..36033b89d31a 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -103,6 +103,7 @@ struct sPAPRMachineClass {
+> =20
+>      /*< public >*/
+>      bool dr_lmb_enabled;       /* enable dynamic-reconfig/hotplug of LMB=
+s */
+> +    bool update_dt_enabled;    /* enable KVMPPC_H_UPDATE_DT */
+>      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
+>      bool pre_2_10_has_unused_icps;
+>      bool legacy_irq_allocation;
+> @@ -139,6 +140,9 @@ struct sPAPRMachineState {
+>      int vrma_adjust;
+>      ssize_t rtas_size;
+>      void *rtas_blob;
+> +    uint32_t fdt_size;
+> +    uint32_t fdt_initial_size;
+> +    void *fdt_blob;
+>      long kernel_size;
+>      bool kernel_le;
+>      uint32_t initrd_base;
+> @@ -480,7 +484,8 @@ struct sPAPRMachineState {
+>  #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
+>  /* Client Architecture support */
+>  #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
+> -#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
+> +#define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
+> +#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
+> =20
+>  typedef struct sPAPRDeviceTreeUpdateHeader {
+>      uint32_t version_id;
 >=20
-> > If the first, we should just assert or abort.  If the second I think
-> > we should still die with a fatal error - allowing broken
-> > configurations to work with just a warning is kind of begging to
-> > maintain nasty compatiliby cruft in the future.
->=20
-> I'd leave that to the caller to decide and not abort in this
-> function.
-
-Right.  The obvious way to do that is to have this function take an
-Error *, and use error_setg() where you have explicit warns now.  The
-caller can pass &error_fatal if it just wants to treat that as a user
-error, and do something else if it wants to implement a fallback.
-
-> It
-> will warn user that config is unexpected for the board but does not preve=
-nt
-> it and try to give something that might still work (e.g. DDR instead of
-> DDR2). Then the caller can check the returned data and abort if it insists
-> that only DDR2 will work for the machine. Otherwise we'd make it impossib=
-le
-> to use non-standard memory sizes for cases when it would still work (like
-> when the OS does not check SPD EEPROMs and would happily use whatever mem=
-ory
-> size). I think it's already possible to start machines with odd memory si=
-zes
-> so that's not new and I did not want to prevent this if SPD EEPROMs are
-> added (just SPD can't describe all memory in that case which may only be a
-> problem for firmware but not when directly booting a kernel for example).
->=20
-> The idea of this function is to generate some data to start from instead =
-of
-> the static data some boards now have. which is often sufficient for the
-> board as is but it could be checked or modified further to fit the specif=
-ic
-> needs of the board. As those needs can be widely different I did not atte=
-mpt
-> to handle all of them in this function to keep it generic.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -197,24 +303,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---54u2kuW9sGWg/X+X
+--T6xhMxlHU34Bk0ad
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwta0EACgkQbDjKyiDZ
-s5L3jw//amH6s2D+TPXdVPwCWgpbN1Adi3+QhQXGu9b/JBfRiQ34jDIF1YSfHtK2
-GJhsVAL7IOH7ZfTXaQ0pIv3cP8y+ja76UIM5jLTP2kKKG4obBpAE2+WVB+UmtY3T
-iEPEzAAKprqSMvteHNCz4Vpofp6hwn9trrLnKFOAonDKFluoQOFla/p7HOkEcSCN
-I0t5rUFhrfTHO8Lb4CTBhLyKMtWmc62EdByuUEw9bJ4rjuRuXdzZAOnzlRj3xKSZ
-77jyZOvu2mkF2d5UATJ9MsolNMRwrPTV3iXrNyWBCVdKiIG5ZylpM2fxUSPB1C5i
-FiXrxTPoTv2fnHeVphdr9v/ubgHGNjkeNodjoQR4U0xZf8z4mI+T/IhGlb1yO6WI
-D0f/Pss2dLff17O+2L/EndStJsacuAHKGqXujWvIbHiXcir5OILAGrDmT5aC5U13
-+7etgV9YXnSYVWXp7rJ7iMech6Rxcy+HEXZzfj8jEbzs8tzS7k8YYbIB2/85KYLS
-X1ZX2Mc6fUlMWMAKU4uCjPljhns/ZvOQMSO8tlQtqrnm4jowQkMljLuxYJ2RjJkK
-nP1c/q9EuPlBMYROBdE/aFsUOU5Cy0dbm9w6qe4ZaGcoOgBm5LuXATNAd79t/0Zk
-zc+stHzU9rbYhCzHUrjblRMpujD9Sd0y6jnCf3YeVrZKKTwplY8=
-=TIo3
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwtWCIACgkQbDjKyiDZ
+s5Ls7RAAgZL+S4upkWMH0eRtB26mF5BOw2kysjIXKbe6AXUvX6VUTrLQ1GlkrOxJ
+3T5tuM3vmUp/Ss7X8puhDGIci8WcqV4FLx0ir/AAWdRuSiZdU8bNoss3JNzqvd9d
+m6jgMKvEvuNTtMrsHFjSfvcj0Y/GmSpb6IUGHsX+aC6vRqd5VewQqaEb+URYktjP
+b3HWnBwOu+HR+6VaJbNhOuh9/TsCxxWUCbD9u0/JXTo6nldzA4kLsTpM4FigphUQ
+8JlsXf8Wi0Kr0YqhCl5OXuwq5sSyekb3cmTlNgy6SXpjOfOsdR1ujxlmMUj/UT+4
+aj9C1iqlwffI74KBqnA9i0iPkenHoIU9LI+DAzTjH+IRoi2zy60lUQ+GevfcHi7l
+WyklOegHPE3/p/AeQXE+YGgfRuPBi/3TrweUFGz03i03P8MugNJ+/OSU9GYFzqON
+oO8M1hicmA5sdXgjOe1OPU3Rlbfl0PUwa3LM9xhWHCKuwZjEvTy9CN6g0xVhYsts
+Z3yFvXE4J0Kw1jDc/kWW8jPH7GUCnR1uoiFPz54KvzhQ1Dgb3ug+Z12fIklt12ns
+x12y3KSzlHZ0YDJg3gOoBg3gGOesDZpM2PHc1MvrUiYBTpS05aFBw0pNsuBgDfUc
+r7tpsKMkY2XkTpxaqNfo8AEDse0D8rvClJ6mG+momLrCqhVW448=
+=CcA7
 -----END PGP SIGNATURE-----
 
---54u2kuW9sGWg/X+X--
+--T6xhMxlHU34Bk0ad--
