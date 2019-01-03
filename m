@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42191)
+Received: from eggs.gnu.org ([208.118.235.92]:50916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clabbe.montjoie@gmail.com>) id 1gf5EJ-0003qO-OM
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:48:20 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gf5jf-0004ZJ-Dv
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clabbe.montjoie@gmail.com>) id 1gf5EH-0004hm-QZ
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:48:19 -0500
-Received: from mail-ed1-x536.google.com ([2a00:1450:4864:20::536]:44839)
+	(envelope-from <peter.maydell@linaro.org>) id 1gf5je-0003WP-0t
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:20:43 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36771)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <clabbe.montjoie@gmail.com>)
-	id 1gf5EG-0004VB-4U
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:48:17 -0500
-Received: by mail-ed1-x536.google.com with SMTP id y56so29304265edd.11
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 07:48:14 -0800 (PST)
-Date: Thu, 3 Jan 2019 16:48:10 +0100
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Message-ID: <20190103154810.GB32032@Red>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gf5jd-0003Vw-RW
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 11:20:41 -0500
+Received: by mail-ot1-x344.google.com with SMTP id k98so29799612otk.3
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 08:20:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] sparc: crash when using initrd > 5M
+References: <975b9131-9937-cfea-3b5d-ef36d0c2b761@gmail.com>
+In-Reply-To: <975b9131-9937-cfea-3b5d-ef36d0c2b761@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 Jan 2019 16:20:29 +0000
+Message-ID: <CAFEAcA-2tWtEqd-Z0xqNMeocf4rns+FihrAPudiQGz+85HFjJg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3] Support u-boot noload images for arm as
+ used by, NetBSD/evbarm GENERIC kernel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +29,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sparclinux@vger.kernel.org, qemu-devel@nongnu.org
+To: Nick Hudson <nicholas.a.hudson@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Hello
+On Tue, 11 Dec 2018 at 12:27, Nick Hudson <nicholas.a.hudson@gmail.com> wrote:
+>
+>
+> noload kernels are loaded with the u-boot image header and as a result
+> the header size needs adding to the entry point.  Fake up a hdr so the
+> kernel image is loaded at the right address and the entry point is
+> adjusted appropriately.
+>
+> The bootloader fits in the space that the uboot header would have occupied.
+>
+> Clarify the load_uimage API to state the passing of a load address when an
+> image doesn't specify one, or when loading a ramdisk is expected.
+>
+> Adjust callers of load_uimage, etc.
+>
+> Signed-off-by: Nick Hudson<skrll@netbsd.org>
+>
+> ---
+>   hw/arm/boot.c          |  8 +++++---
+>   hw/core/loader.c       | 19 ++++++++++++++++---
+>   hw/core/uboot_image.h  |  1 +
+>   hw/microblaze/boot.c   |  2 +-
+>   hw/nios2/boot.c        |  2 +-
+>   hw/ppc/e500.c          |  1 +
+>   hw/ppc/ppc440_bamboo.c |  2 +-
+>   hw/ppc/sam460ex.c      |  2 +-
+>   include/hw/loader.h    |  7 ++++++-
+>   9 files changed, 33 insertions(+), 11 deletions(-)
 
-When using an initrd > 5M, I hit the following kernel crash:
-qemu-system-sparc -kernel vmlinux -initrd rootfs.cpio.gz -nographic
-Configuration device id QEMU version 1 machine id 32
-Probing SBus slot 0 offset 0
-Probing SBus slot 1 offset 0
-Probing SBus slot 2 offset 0
-Probing SBus slot 3 offset 0
-Probing SBus slot 4 offset 0
-Probing SBus slot 5 offset 0
-Invalid FCode start byte
-CPUs: 1 x FMI,MB86904
-UUID: 00000000-0000-0000-0000-000000000000
-Welcome to OpenBIOS v1.1 built on Oct 5 2018 08:20
-  Type 'help' for detailed information
-[sparc] Kernel already loaded
-switching to new context:
-PROMLIB: obio_ranges 1
-[    0.000000] PROMLIB: Sun Boot Prom Version 3 Revision 2
-[    0.000000] Linux version 4.20.0-next-20190102+ (compile@Red) (gcc version 7.3.0 (Gentoo 7.3.0-r3 p1.4)) #148 Thu Jan 3 16:17:08 CET 2019
-[    0.000000] printk: bootconsole [earlyprom0] enabled
-[    0.000000] ARCH: SUN4M
-[    0.000000] TYPE: SPARCstation 5
-[    0.000000] Ethernet address: 52:54:00:12:34:56
-[    0.000000] Unable to handle kernel NULL pointer dereference
-[    0.000000] tsk->{mm,active_mm}->context = ffffffff
-[    0.000000] tsk->{mm,active_mm}->pgd = 00000000
-[    0.000000]               \|/ ____ \|/
-[    0.000000]               "@'/ ,. \`@"
-[    0.000000]               /_| \__/ |_\
-[    0.000000]                  \__U_/
-[    0.000000] swapper(0): Oops [#1]
-[    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 4.20.0-next-20190102+ #148
-[    0.000000] PSR: 04001fc0 PC: f0010ef0 NPC: f0010ef4 Y: 00000000    Not tainted
-[    0.000000] PC: <do_sparc_fault+0x158/0x404>
-[    0.000000] %G: 0000000a 000003c4  f05ece08 f05ecc00  00000000 00e00000  f05d4000 00000001
-[    0.000000] %O: 00000000 00e00000  00800000 00e00000  00000000 00000002  f05d5bb8 f00bba58
-[    0.000000] RPC: <memblock_reserve+0x38/0x68>
-[    0.000000] %L: 00000040 f05dfaf8  f05d5c68 00000001  0003ffff 006951e0  f05ed014 f0674ab4
-[    0.000000] %I: f05d5c80 00000000  00000002 f1000000  ffffffff 00000000  f05d5c20 f0007fd8
-[    0.000000] Disabling lock debugging due to kernel taint
-[    0.000000] Caller[f0007fd8]: srmmu_fault+0x58/0x68
-[    0.000000] Caller[f0618598]: memblock_alloc_try_nid+0xb8/0xc8
-[    0.000000] Caller[f0611094]: srmmu_paging_init+0x174/0xaf8
-[    0.000000] Caller[f06106a8]: paging_init+0x4/0x24
-[    0.000000] Caller[f060e4f0]: setup_arch+0x3e8/0x480
-[    0.000000] Caller[f060ab50]: start_kernel+0x48/0x460
-[    0.000000] Caller[f060a43c]: continue_boot+0x324/0x334
-[    0.000000] Caller[00000000]:   (null)
-[    0.000000] Instruction DUMP:
-[    0.000000]  c800a024 
-[    0.000000]  83286002 
-[    0.000000]  073c17b3 
-[    0.000000] <c4010001>
-[    0.000000]  c600e22c 
-[    0.000000]  8a08a003 
-[    0.000000]  80a16001 
-[    0.000000]  0280003b 
-[    0.000000]  c600c001 
-[    0.000000] 
-[    0.000000] Kernel panic - not syncing: Attempted to kill the idle task!
-[    0.000000] Press Stop-A (L1-A) from sun keyboard or send break
-[    0.000000] twice on console to return to the boot prom
-[    0.000000] ---[ end Kernel panic - not syncing: Attempted to kill the idle task! ]---
-qemu-system-sparc: terminating on signal 15 from pid 13043 (killall)
+Hi; I tried applying your patch, but unfortunately it looks like
+your email client has mangled it to the point that it can't
+be applied:
+ * it is format=flowed, so long lines have been wrapped
+ * some whitespace has been turned into UTF-8 non-breaking space characters
+I tried to manually fix these up, but didn't succeed.
 
-The NULL ptr dereference is done by memset() in srmmu_nocache_init() and memblock_alloc_try_nid().
-If I comment both memset, the boot pass
+It looks like you're using Thunderbird -- the kernel docs
+have some config setting suggestions that might help:
+https://www.kernel.org/doc/html/v4.11/process/email-clients.html#thunderbird-gui
+or you could try switching to 'git send-email'.
 
-But since nothing explain the NULL ptr deref in memset(), I suspect something is overriden by the initrd
+I've reviewed the patch for content and it's mostly good:
+I just have a couple more questions below.
 
-Regards
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index 586baa9b64..450267566a 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -30,8 +30,9 @@
+>    * Documentation/arm/Booting and Documentation/arm64/booting.txt
+>    * They have different preferred image load offsets from system RAM base.
+>    */
+> -#define KERNEL_ARGS_ADDR 0x100
+> -#define KERNEL_LOAD_ADDR 0x00010000
+> +#define KERNEL_ARGS_ADDR   0x100
+> +#define KERNEL_NOLOAD_ADDR 0x00000000
+
+If I'm reading the code right, this requests that noload images
+are loaded at offset zero into RAM, yes ? That's not a great
+choice, because we put our little mini bootloader at offset 0,
+and so the two will clash. Can we put them somewhere else
+(above BOOTLOADER_MAX_SIZE, probably at a 64K page boundary) ?
+
+If they must go at offset 0 then we'd need to refuse to load
+noload images if they set is_linux to true. (We only load the
+mini bootloader if is_linux is true, so that's the only case where
+there's a clash.)
+
+> +#define KERNEL_LOAD_ADDR   0x00010000
+>   #define KERNEL64_LOAD_ADDR 0x00080000
+>
+>   #define ARM64_TEXT_OFFSET_OFFSET    8
+> @@ -1078,7 +1079,8 @@ void arm_load_kernel(ARMCPU *cpu, struct
+> arm_boot_info *info)
+>       }
+>       entry = elf_entry;
+>       if (kernel_size < 0) {
+> -        kernel_size = load_uimage_as(info->kernel_filename, &entry, NULL,
+> +        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
+> +        kernel_size = load_uimage_as(info->kernel_filename, &entry,
+> &loadaddr,
+>                                        &is_linux, NULL, NULL, as);
+>       }
+>       if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index aa0b3fc867..7362197162 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -638,13 +638,26 @@ static int load_uboot_image(const char *filename,
+> hwaddr *ep, hwaddr *loadaddr,
+>           goto out;
+>
+>       if (hdr->ih_type != image_type) {
+> -        fprintf(stderr, "Wrong image type %d, expected %d\n", hdr->ih_type,
+> -                image_type);
+> -        goto out;
+> +        if (image_type != IH_TYPE_KERNEL &&
+> +            hdr->ih_type != IH_TYPE_KERNEL_NOLOAD) {
+
+I think you have this condition wrong. Suppose we are
+trying to load image_type == IH_TYPE_KERNEL and we are
+passed a hdr->ih_type == IH_TYPE_RAMDISK. With this change
+we'll stop rejecting that as an error.
+I think you want:
+    if (!(image_type == IH_TYPE_KERNEL &&
+          hdr->ih_type == IH_TYPE_KERNEL_NOLOAD)) {
+
+because the only kind of mismatch we want to accept is
+"we're looking for KERNEL and we got KERNEL_NOLOAD".
+
+> +            fprintf(stderr, "Wrong image type %d, expected %d\n",
+> hdr->ih_type,
+> +                    image_type);
+> +            goto out;
+> +        }
+>       }
+
+> index f5720f979e..70428b1865 100644
+> --- a/hw/ppc/ppc440_bamboo.c
+> +++ b/hw/ppc/ppc440_bamboo.c
+> @@ -180,7 +180,7 @@ static void bamboo_init(MachineState *machine)
+>       CPUPPCState *env;
+>       uint64_t elf_entry;
+>       uint64_t elf_lowaddr;
+> -    hwaddr loadaddr = 0;
+> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>       target_long initrd_size = 0;
+>       DeviceState *dev;
+>       int success;
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index 5aac58f36e..2d6d5c4402 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -402,7 +402,7 @@ static void sam460ex_init(MachineState *machine)
+>       CPUPPCState *env;
+>       PPC4xxI2CState *i2c[2];
+>       hwaddr entry = UBOOT_ENTRY;
+> -    hwaddr loadaddr = 0;
+> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>       target_long initrd_size = 0;
+>       DeviceState *dev;
+>       SysBusDevice *sbdev;
+
+In both of these cases we could in fact remove the 'loadaddr'
+variable entirely (and pass NULL to the load_uimage() 3rd
+argument) because the code doesn't ever read the loadaddr value
+that is set. But this is the simple minimal change so it's OK:
+we can do the cleanup later (or not at all).
+
+thanks
+-- PMM
