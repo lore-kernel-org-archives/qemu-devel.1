@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50099)
+Received: from eggs.gnu.org ([208.118.235.92]:51751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1geyvh-00015I-Ny
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:04:42 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gez3V-0003HG-Hy
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:12:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1geyvd-0008N7-IC
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:04:41 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:40110)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1geyvd-0008Ml-Ae
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:04:37 -0500
-Received: by mail-wm1-f68.google.com with SMTP id f188so29613214wmf.5
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 01:04:37 -0800 (PST)
-References: <154645087925.9907.8533035759502851896@02a1dbf831e2>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e122954c-760c-47ac-3858-1c25e0b2f9ff@redhat.com>
-Date: Thu, 3 Jan 2019 10:04:29 +0100
+	(envelope-from <stefanha@redhat.com>) id 1gez3U-0006Ts-O1
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 04:12:45 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Thu,  3 Jan 2019 09:11:08 +0000
+Message-Id: <20190103091119.9367-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <154645087925.9907.8533035759502851896@02a1dbf831e2>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] cutils: Cleanup, improve documentation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 00/11] arm: Core nRF51 Devices and Microbit
+ Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +21,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: fam@euphon.net, david@redhat.com, qemu-trivial@nongnu.org, cohuck@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, kraxel@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>, Paolo Bonzini <pbonzini@redhat.com>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 1/2/19 6:41 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20181226171538.21984-1-philmd@redhat.com/
-[...]> === OUTPUT BEGIN ===
-> Checking PATCH 1/3: util/cutils: Move size_to_str() from "qemu-common.h" to "cutils.h"...
-> WARNING: Block comments use a leading /* on a separate line
-> #42: FILE: include/qemu/cutils.h:160:
-> +/**
+Steffen has been busy so I picked up "[PATCH v5 00/14] arm: nRF51 Devices=
+ and
+Microbit Support".  This series includes the core devices needed to boot =
+basic
+guest software on the "microbit" board.
 
-I believe this warning is incorrect, since we use the /** marking for
-Doxygen generated documentation. The offending comment is:
+This series includes Steffen's random number generator, GPIO, timer, and =
+a
+stubbed clock.  Also, this series adds the tests/microbit-test.c qtest.
 
-  /**
-   * size_to_str:
-   *
-   * Return human readable string for size @val.
-   * Use IEC binary units like KiB, MiB, and so forth.
-   *
-   * @val: The value to format.
-   *       Can be anything that uint64_t allows (no more than "16 EiB").
-   *
-   * Caller is responsible for passing it to g_free().
-   */
-   char *size_to_str(uint64_t val);
+Changes from Steffen's series:
+ * Made timer tickless [Peter]
+ * Dropped non-volatile memory controller.  More work is needed there and=
+ I
+   don't want to hold back other devices in this series that are ready fo=
+r
+   merge.
+ * Rebased and re-tested with make check and real micro:bit programs
+   (requires out-of-tree -kernel and stub TWI device patches)
 
-Am I missing something?
+Steffen G=C3=B6rtz (11):
+  qtest: Add set_irq_in command to set IRQ/GPIO level
+  arm: Add header to host common definition for nRF51 SOC peripherals
+  hw/misc/nrf51_rng: Add NRF51 random number generator peripheral
+  arm: Instantiate NRF51 random number generator
+  hw/gpio/nrf51_gpio: Add nRF51 GPIO peripheral
+  arm: Instantiate NRF51 general purpose I/O
+  tests/microbit-test: Add Tests for nRF51 GPIO
+  hw/timer/nrf51_timer: Add nRF51 Timer peripheral
+  arm: Instantiate NRF51 Timers
+  tests/microbit-test: Add Tests for nRF51 Timer
+  arm: Add Clock peripheral stub to NRF51 SOC
 
-> Checking PATCH 2/3: util/cutils: Move ctype macros to "cutils.h"...
-> WARNING: Block comments use a leading /* on a separate line
-> #100: FILE: include/qemu/cutils.h:6:
-> +/** unsigned ctype macros:
-> 
-> ERROR: code indent should never use tabs
-> #108: FILE: include/qemu/cutils.h:14:
-> +#define qemu_isalnum(c)^I^Iisalnum((unsigned char)(c))$
+ Makefile.objs                  |   1 +
+ hw/gpio/Makefile.objs          |   1 +
+ hw/misc/Makefile.objs          |   1 +
+ hw/timer/Makefile.objs         |   1 +
+ tests/Makefile.include         |   2 +
+ include/hw/arm/nrf51.h         |  45 ++++
+ include/hw/arm/nrf51_soc.h     |   9 +
+ include/hw/char/nrf51_uart.h   |   1 -
+ include/hw/gpio/nrf51_gpio.h   |  69 ++++++
+ include/hw/misc/nrf51_rng.h    |  83 +++++++
+ include/hw/timer/nrf51_timer.h |  80 +++++++
+ tests/libqtest.h               |  13 ++
+ hw/arm/nrf51_soc.c             | 117 ++++++++--
+ hw/gpio/nrf51_gpio.c           | 300 +++++++++++++++++++++++++
+ hw/misc/nrf51_rng.c            | 262 ++++++++++++++++++++++
+ hw/timer/nrf51_timer.c         | 393 +++++++++++++++++++++++++++++++++
+ qtest.c                        |  43 ++++
+ tests/libqtest.c               |  10 +
+ tests/microbit-test.c          | 255 +++++++++++++++++++++
+ hw/gpio/trace-events           |   7 +
+ hw/timer/trace-events          |   5 +
+ 21 files changed, 1676 insertions(+), 22 deletions(-)
+ create mode 100644 include/hw/arm/nrf51.h
+ create mode 100644 include/hw/gpio/nrf51_gpio.h
+ create mode 100644 include/hw/misc/nrf51_rng.h
+ create mode 100644 include/hw/timer/nrf51_timer.h
+ create mode 100644 hw/gpio/nrf51_gpio.c
+ create mode 100644 hw/misc/nrf51_rng.c
+ create mode 100644 hw/timer/nrf51_timer.c
+ create mode 100644 tests/microbit-test.c
+ create mode 100644 hw/gpio/trace-events
 
-OK, this is code movement I forgot to fix :/
-
-> Checking PATCH 3/3: util/cutils: Move function documentations to the header...
-> WARNING: Block comments use a leading /* on a separate line
-> #73: FILE: include/qemu/cutils.h:156:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #95: FILE: include/qemu/cutils.h:179:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #124: FILE: include/qemu/cutils.h:208:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #154: FILE: include/qemu/cutils.h:238:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #183: FILE: include/qemu/cutils.h:267:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #214: FILE: include/qemu/cutils.h:298:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #225: FILE: include/qemu/cutils.h:309:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #235: FILE: include/qemu/cutils.h:319:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #263: FILE: include/qemu/cutils.h:347:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #273: FILE: include/qemu/cutils.h:357:
-> +/**
-> 
-> WARNING: Block comments use a leading /* on a separate line
-> #304: FILE: include/qemu/cutils.h:388:
-> +/**
+--=20
+2.19.2
