@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42805)
+Received: from eggs.gnu.org ([208.118.235.92]:42839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gf6hR-0003mw-0t
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:22:30 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gf6hT-0003td-Jc
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:22:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gf6hQ-0004ok-3v
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:22:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gf6hP-0004U6-Tm
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:22:28 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Thu,  3 Jan 2019 18:21:51 +0100
-Message-Id: <20190103172151.24706-1-philmd@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1gf6hQ-0004p7-GW
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:22:31 -0500
+References: <CALvuzg6x2NjiJR=fPkgEmW2fCn6Uzy+rLAPHsC6Qn-S6hiNoqQ@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <cfd7963a-d93f-1977-b7c5-ddf1b80a09ab@vivier.eu>
+Date: Thu, 3 Jan 2019 18:22:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] docker: Use stable git tag for virglrenderer
+In-Reply-To: <CALvuzg6x2NjiJR=fPkgEmW2fCn6Uzy+rLAPHsC6Qn-S6hiNoqQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] Whitespace cleanup:
+ target/ppc/translate_init.inc.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Jon Diekema <jon.diekema@gmail.com>
+Cc: qemu-trivial@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Use a stable tag instead of some random commit from mainstream
-development, to avoid unexpected build failures.
+Hi,
 
-This fixes:
+your patch is corrupted: please generate it with "git format-patch" and
+send it with "git send-email" (you can also use git-publish)
 
-    CC       virglrenderer.lo
-  virglrenderer.c: In function 'virgl_has_gl_colorspace':
-  virglrenderer.c:208:11: error: implicit declaration of function 'virgl_=
-has_egl_khr_gl_colorspace' [-Werror=3Dimplicit-function-declaration]
-             virgl_has_egl_khr_gl_colorspace(egl_info));
-             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  virglrenderer.c:208:43: error: 'egl_info' undeclared (first use in this=
- function)
-             virgl_has_egl_khr_gl_colorspace(egl_info));
-                                             ^~~~~~~~
-  virglrenderer.c:208:43: note: each undeclared identifier is reported on=
-ly once for each function it appears in
-  cc1: some warnings being treated as errors
+Thanks,
+Laurent
 
-As of this commit 'git virglrenderer-0.7.0' is the last stable tag.
-(virglrenderer commit breaking: fb4f7577f7ef)
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- tests/docker/dockerfiles/debian-amd64.docker | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/=
-dockerfiles/debian-amd64.docker
-index 24b113b76f..47a30adbdb 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -24,7 +24,8 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
-         libegl1-mesa-dev \
-         libepoxy-dev \
-         libgbm-dev
--RUN git clone https://anongit.freedesktop.org/git/virglrenderer.git /usr=
-/src/virglrenderer
-+RUN git clone https://anongit.freedesktop.org/git/virglrenderer.git /usr=
-/src/virglrenderer && \
-+    cd /usr/src/virglrenderer && git checkout virglrenderer-0.7.0
- RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --with-glx =
---disable-tests && make install
-=20
- # netmap
---=20
-2.17.2
+Le 25/12/2018 à 10:57, Jon Diekema a écrit :
+> From b9c6caf3913487f05997144a940db0b900b17f05 Mon Sep 17 00:00:00 2001
+> From: Jon Diekema <jon.diekema@ge.com <mailto:jon.diekema@ge.com>>
+> Date: Tue, 25 Dec 2018 04:03:04 -0500
+> Subject: Whitespace cleanup: target/ppc/translate_init.inc.c
+> 
+> Signed-off-by: Jon Diekema <jon.diekema@ge.com <mailto:jon.diekema@ge.com>>
+> ---
+>  target/ppc/translate_init.inc.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/ppc/translate_init.inc.c
+> b/target/ppc/translate_init.inc.c
+> index 03f1d34a97..ac186845d0 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -5245,7 +5245,7 @@ static void init_proc_601(CPUPPCState *env)
+>                   0x00000000);
+>      /* Memory management */
+>      init_excp_601(env);
+> -    /* XXX: beware that dcache line size is 64 
+> +    /* XXX: beware that dcache line size is 64
+>       *      but dcbz uses 32 bytes "sectors"
+>       * XXX: this breaks clcs instruction !
+>       */
+> @@ -10493,7 +10493,7 @@ static void ppc_cpu_class_init(ObjectClass *oc,
+> void *data)
+>      cc->tcg_initialize = ppc_translate_init;
+>  #endif
+>      cc->disas_set_info = ppc_disas_set_info;
+> - 
+> +
+>      dc->fw_name = "PowerPC,UNKNOWN";
+>  }
+>  
+> -- 
+> 2.20.1.3.gf17a2b179
+> 
