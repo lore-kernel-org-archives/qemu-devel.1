@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59023)
+Received: from eggs.gnu.org ([208.118.235.92]:59040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@trasno.org>) id 1gf3hd-0005nh-B2
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:30 -0500
+	(envelope-from <quintela@trasno.org>) id 1gf3hf-0005qs-1M
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@trasno.org>) id 1gf3hb-0008Ra-K3
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:29 -0500
-Received: from trasno.trasno.org ([83.165.45.250]:43112 helo=mail.trasno.org)
+	(envelope-from <quintela@trasno.org>) id 1gf3hd-0008SF-RN
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:31 -0500
+Received: from trasno.trasno.org ([83.165.45.250]:43128 helo=mail.trasno.org)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@trasno.org>) id 1gf3hb-0008Qy-9N
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:27 -0500
+	(Exim 4.71) (envelope-from <quintela@trasno.org>) id 1gf3hd-0008Rw-KY
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 09:10:29 -0500
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu,  3 Jan 2019 15:10:00 +0100
-Message-Id: <20190103141013.18019-4-quintela@redhat.com>
+Date: Thu,  3 Jan 2019 15:10:01 +0100
+Message-Id: <20190103141013.18019-5-quintela@redhat.com>
 In-Reply-To: <20190103141013.18019-1-quintela@redhat.com>
 References: <20190103141013.18019-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 03/16] virtio: split virtio input bits from
+Subject: [Qemu-devel] [PATCH v4 04/16] virtio: split virtio rng bits from
  virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,34 +31,159 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Go
 
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
+
 ---
- hw/virtio/Makefile.objs      |   1 +
- hw/virtio/virtio-input-pci.c | 157 +++++++++++++++++++++++++++++++++++
- hw/virtio/virtio-pci.c       | 113 -------------------------
- hw/virtio/virtio-pci.h       |  22 -----
- 4 files changed, 158 insertions(+), 135 deletions(-)
- create mode 100644 hw/virtio/virtio-input-pci.c
+
+Remove the "contributions after" clause.  This is based on
+
+commit 59ccd20a9ac719cff82180429458728f03ec612f
+Author: KONRAD Frederic <fred.konrad@greensocs.com>
+Date:   Wed Apr 24 10:07:56 2013 +0200
+
+Fix duplicated test entry (lvivier)
+---
+ hw/virtio/Makefile.objs    |  1 +
+ hw/virtio/virtio-pci.c     | 54 -----------------------
+ hw/virtio/virtio-pci.h     | 14 ------
+ hw/virtio/virtio-rng-pci.c | 88 ++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include     |  2 +-
+ 5 files changed, 90 insertions(+), 69 deletions(-)
+ create mode 100644 hw/virtio/virtio-rng-pci.c
 
 diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index a6b850ed09..c61bcd106b 100644
+index c61bcd106b..032ba2ff0e 100644
 --- a/hw/virtio/Makefile.objs
 +++ b/hw/virtio/Makefile.objs
-@@ -14,6 +14,7 @@ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
- ifeq ($(CONFIG_PCI),y)
+@@ -15,6 +15,7 @@ ifeq ($(CONFIG_PCI),y)
  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
  obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
-+obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
+ obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
++obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
  endif
  endif
  
-diff --git a/hw/virtio/virtio-input-pci.c b/hw/virtio/virtio-input-pci.c
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 185db53bc0..2e3eafd8b2 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2546,59 +2546,6 @@ static const VirtioPCIDeviceTypeInfo virtio_net_pci_info = {
+     .class_init    = virtio_net_pci_class_init,
+ };
+ 
+-/* virtio-rng-pci */
+-
+-static void virtio_rng_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+-{
+-    VirtIORngPCI *vrng = VIRTIO_RNG_PCI(vpci_dev);
+-    DeviceState *vdev = DEVICE(&vrng->vdev);
+-    Error *err = NULL;
+-
+-    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+-    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+-
+-    object_property_set_link(OBJECT(vrng),
+-                             OBJECT(vrng->vdev.conf.rng), "rng",
+-                             NULL);
+-}
+-
+-static void virtio_rng_pci_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+-    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+-
+-    k->realize = virtio_rng_pci_realize;
+-    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+-
+-    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+-    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_RNG;
+-    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
+-    pcidev_k->class_id = PCI_CLASS_OTHERS;
+-}
+-
+-static void virtio_rng_initfn(Object *obj)
+-{
+-    VirtIORngPCI *dev = VIRTIO_RNG_PCI(obj);
+-
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VIRTIO_RNG);
+-}
+-
+-static const VirtioPCIDeviceTypeInfo virtio_rng_pci_info = {
+-    .base_name             = TYPE_VIRTIO_RNG_PCI,
+-    .generic_name          = "virtio-rng-pci",
+-    .transitional_name     = "virtio-rng-pci-transitional",
+-    .non_transitional_name = "virtio-rng-pci-non-transitional",
+-    .instance_size = sizeof(VirtIORngPCI),
+-    .instance_init = virtio_rng_initfn,
+-    .class_init    = virtio_rng_pci_class_init,
+-};
+-
+ /* virtio-pci-bus */
+ 
+ static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
+@@ -2651,7 +2598,6 @@ static void virtio_pci_register_types(void)
+     type_register_static(&virtio_pci_info);
+ 
+     /* Implementations: */
+-    virtio_pci_types_register(&virtio_rng_pci_info);
+ #ifdef CONFIG_VIRTFS
+     virtio_pci_types_register(&virtio_9p_pci_info);
+ #endif
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index f1c75b0a89..a8b2e491c8 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -18,7 +18,6 @@
+ #include "hw/pci/msi.h"
+ #include "hw/virtio/virtio-blk.h"
+ #include "hw/virtio/virtio-net.h"
+-#include "hw/virtio/virtio-rng.h"
+ #include "hw/virtio/virtio-serial.h"
+ #include "hw/virtio/virtio-scsi.h"
+ #include "hw/virtio/virtio-balloon.h"
+@@ -46,7 +45,6 @@ typedef struct VirtIONetPCI VirtIONetPCI;
+ typedef struct VHostSCSIPCI VHostSCSIPCI;
+ typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
+ typedef struct VHostUserBlkPCI VHostUserBlkPCI;
+-typedef struct VirtIORngPCI VirtIORngPCI;
+ typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+ typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
+ 
+@@ -319,18 +317,6 @@ typedef struct V9fsPCIState {
+ 
+ #endif
+ 
+-/*
+- * virtio-rng-pci: This extends VirtioPCIProxy.
+- */
+-#define TYPE_VIRTIO_RNG_PCI "virtio-rng-pci-base"
+-#define VIRTIO_RNG_PCI(obj) \
+-        OBJECT_CHECK(VirtIORngPCI, (obj), TYPE_VIRTIO_RNG_PCI)
+-
+-struct VirtIORngPCI {
+-    VirtIOPCIProxy parent_obj;
+-    VirtIORNG vdev;
+-};
+-
+ /*
+  * virtio-input-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/hw/virtio/virtio-rng-pci.c b/hw/virtio/virtio-rng-pci.c
 new file mode 100644
-index 0000000000..2c1397842b
+index 0000000000..6cc6374289
 --- /dev/null
-+++ b/hw/virtio/virtio-input-pci.c
-@@ -0,0 +1,157 @@
++++ b/hw/virtio/virtio-rng-pci.c
+@@ -0,0 +1,88 @@
 +/*
-+ * Virtio input PCI Bindings
++ * Virtio rng PCI Bindings
++ *
++ * Copyright 2012 Red Hat, Inc.
++ * Copyright 2012 Amit Shah <amit.shah@redhat.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or
 + * (at your option) any later version.  See the COPYING file in the
@@ -68,339 +193,92 @@ index 0000000000..2c1397842b
 +#include "qemu/osdep.h"
 +
 +#include "virtio-pci.h"
-+#include "hw/virtio/virtio-input.h"
++#include "hw/virtio/virtio-rng.h"
++#include "qapi/error.h"
 +
-+typedef struct VirtIOInputPCI VirtIOInputPCI;
-+typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
++typedef struct VirtIORngPCI VirtIORngPCI;
 +
 +/*
-+ * virtio-input-pci: This extends VirtioPCIProxy.
++ * virtio-rng-pci: This extends VirtioPCIProxy.
 + */
-+#define VIRTIO_INPUT_PCI(obj) \
-+        OBJECT_CHECK(VirtIOInputPCI, (obj), TYPE_VIRTIO_INPUT_PCI)
++#define TYPE_VIRTIO_RNG_PCI "virtio-rng-pci-base"
++#define VIRTIO_RNG_PCI(obj) \
++        OBJECT_CHECK(VirtIORngPCI, (obj), TYPE_VIRTIO_RNG_PCI)
 +
-+struct VirtIOInputPCI {
++struct VirtIORngPCI {
 +    VirtIOPCIProxy parent_obj;
-+    VirtIOInput vdev;
++    VirtIORNG vdev;
 +};
 +
-+#define TYPE_VIRTIO_INPUT_HID_PCI "virtio-input-hid-pci"
-+#define TYPE_VIRTIO_KEYBOARD_PCI  "virtio-keyboard-pci"
-+#define TYPE_VIRTIO_MOUSE_PCI     "virtio-mouse-pci"
-+#define TYPE_VIRTIO_TABLET_PCI    "virtio-tablet-pci"
-+#define VIRTIO_INPUT_HID_PCI(obj) \
-+        OBJECT_CHECK(VirtIOInputHIDPCI, (obj), TYPE_VIRTIO_INPUT_HID_PCI)
-+
-+struct VirtIOInputHIDPCI {
-+    VirtIOPCIProxy parent_obj;
-+    VirtIOInputHID vdev;
-+};
-+
-+static Property virtio_input_pci_properties[] = {
-+    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 2),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virtio_input_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++static void virtio_rng_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 +{
-+    VirtIOInputPCI *vinput = VIRTIO_INPUT_PCI(vpci_dev);
-+    DeviceState *vdev = DEVICE(&vinput->vdev);
++    VirtIORngPCI *vrng = VIRTIO_RNG_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&vrng->vdev);
++    Error *err = NULL;
 +
 +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-+    virtio_pci_force_virtio_1(vpci_dev);
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    object_property_set_link(OBJECT(vrng),
++                             OBJECT(vrng->vdev.conf.rng), "rng",
++                             NULL);
 +}
 +
-+static void virtio_input_pci_class_init(ObjectClass *klass, void *data)
++static void virtio_rng_pci_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
 +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
 +
-+    dc->props = virtio_input_pci_properties;
-+    k->realize = virtio_input_pci_realize;
-+    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
++    k->realize = virtio_rng_pci_realize;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
 +
-+    pcidev_k->class_id = PCI_CLASS_INPUT_OTHER;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_RNG;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = PCI_CLASS_OTHERS;
 +}
 +
-+static void virtio_input_hid_kbd_pci_class_init(ObjectClass *klass, void *data)
++static void virtio_rng_initfn(Object *obj)
 +{
-+    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-+
-+    pcidev_k->class_id = PCI_CLASS_INPUT_KEYBOARD;
-+}
-+
-+static void virtio_input_hid_mouse_pci_class_init(ObjectClass *klass,
-+                                                  void *data)
-+{
-+    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-+
-+    pcidev_k->class_id = PCI_CLASS_INPUT_MOUSE;
-+}
-+
-+static void virtio_keyboard_initfn(Object *obj)
-+{
-+    VirtIOInputHIDPCI *dev = VIRTIO_INPUT_HID_PCI(obj);
++    VirtIORngPCI *dev = VIRTIO_RNG_PCI(obj);
 +
 +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_KEYBOARD);
++                                TYPE_VIRTIO_RNG);
 +}
 +
-+static void virtio_mouse_initfn(Object *obj)
++static const VirtioPCIDeviceTypeInfo virtio_rng_pci_info = {
++    .base_name             = TYPE_VIRTIO_RNG_PCI,
++    .generic_name          = "virtio-rng-pci",
++    .transitional_name     = "virtio-rng-pci-transitional",
++    .non_transitional_name = "virtio-rng-pci-non-transitional",
++    .instance_size = sizeof(VirtIORngPCI),
++    .instance_init = virtio_rng_initfn,
++    .class_init    = virtio_rng_pci_class_init,
++};
++
++static void virtio_rng_pci_register(void)
 +{
-+    VirtIOInputHIDPCI *dev = VIRTIO_INPUT_HID_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_MOUSE);
++    virtio_pci_types_register(&virtio_rng_pci_info);
 +}
 +
-+static void virtio_tablet_initfn(Object *obj)
-+{
-+    VirtIOInputHIDPCI *dev = VIRTIO_INPUT_HID_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_TABLET);
-+}
-+
-+static const TypeInfo virtio_input_pci_info = {
-+    .name          = TYPE_VIRTIO_INPUT_PCI,
-+    .parent        = TYPE_VIRTIO_PCI,
-+    .instance_size = sizeof(VirtIOInputPCI),
-+    .class_init    = virtio_input_pci_class_init,
-+    .abstract      = true,
-+};
-+
-+static const TypeInfo virtio_input_hid_pci_info = {
-+    .name          = TYPE_VIRTIO_INPUT_HID_PCI,
-+    .parent        = TYPE_VIRTIO_INPUT_PCI,
-+    .instance_size = sizeof(VirtIOInputHIDPCI),
-+    .abstract      = true,
-+};
-+
-+static const VirtioPCIDeviceTypeInfo virtio_keyboard_pci_info = {
-+    .generic_name  = TYPE_VIRTIO_KEYBOARD_PCI,
-+    .parent        = TYPE_VIRTIO_INPUT_HID_PCI,
-+    .class_init    = virtio_input_hid_kbd_pci_class_init,
-+    .instance_size = sizeof(VirtIOInputHIDPCI),
-+    .instance_init = virtio_keyboard_initfn,
-+};
-+
-+static const VirtioPCIDeviceTypeInfo virtio_mouse_pci_info = {
-+    .generic_name  = TYPE_VIRTIO_MOUSE_PCI,
-+    .parent        = TYPE_VIRTIO_INPUT_HID_PCI,
-+    .class_init    = virtio_input_hid_mouse_pci_class_init,
-+    .instance_size = sizeof(VirtIOInputHIDPCI),
-+    .instance_init = virtio_mouse_initfn,
-+};
-+
-+static const VirtioPCIDeviceTypeInfo virtio_tablet_pci_info = {
-+    .generic_name  = TYPE_VIRTIO_TABLET_PCI,
-+    .parent        = TYPE_VIRTIO_INPUT_HID_PCI,
-+    .instance_size = sizeof(VirtIOInputHIDPCI),
-+    .instance_init = virtio_tablet_initfn,
-+};
-+
-+static void virtio_pci_input_register(void)
-+{
-+    /* Base types: */
-+    type_register_static(&virtio_input_pci_info);
-+    type_register_static(&virtio_input_hid_pci_info);
-+
-+    /* Implementations: */
-+    virtio_pci_types_register(&virtio_keyboard_pci_info);
-+    virtio_pci_types_register(&virtio_mouse_pci_info);
-+    virtio_pci_types_register(&virtio_tablet_pci_info);
-+}
-+
-+type_init(virtio_pci_input_register)
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index d951f278a2..185db53bc0 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -24,7 +24,6 @@
- #include "hw/virtio/virtio-serial.h"
- #include "hw/virtio/virtio-scsi.h"
- #include "hw/virtio/virtio-balloon.h"
--#include "hw/virtio/virtio-input.h"
- #include "hw/pci/pci.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
-@@ -2600,113 +2599,6 @@ static const VirtioPCIDeviceTypeInfo virtio_rng_pci_info = {
-     .class_init    = virtio_rng_pci_class_init,
- };
- 
--/* virtio-input-pci */
--
--static Property virtio_input_pci_properties[] = {
--    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 2),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void virtio_input_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
--{
--    VirtIOInputPCI *vinput = VIRTIO_INPUT_PCI(vpci_dev);
--    DeviceState *vdev = DEVICE(&vinput->vdev);
--
--    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
--    virtio_pci_force_virtio_1(vpci_dev);
--    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
--}
--
--static void virtio_input_pci_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
--    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
--
--    dc->props = virtio_input_pci_properties;
--    k->realize = virtio_input_pci_realize;
--    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
--
--    pcidev_k->class_id = PCI_CLASS_INPUT_OTHER;
--}
--
--static void virtio_input_hid_kbd_pci_class_init(ObjectClass *klass, void *data)
--{
--    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
--
--    pcidev_k->class_id = PCI_CLASS_INPUT_KEYBOARD;
--}
--
--static void virtio_input_hid_mouse_pci_class_init(ObjectClass *klass,
--                                                  void *data)
--{
--    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
--
--    pcidev_k->class_id = PCI_CLASS_INPUT_MOUSE;
--}
--
--static void virtio_keyboard_initfn(Object *obj)
--{
--    VirtIOInputHIDPCI *dev = VIRTIO_INPUT_HID_PCI(obj);
--
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_KEYBOARD);
--}
--
--static void virtio_mouse_initfn(Object *obj)
--{
--    VirtIOInputHIDPCI *dev = VIRTIO_INPUT_HID_PCI(obj);
--
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_MOUSE);
--}
--
--static void virtio_tablet_initfn(Object *obj)
--{
--    VirtIOInputHIDPCI *dev = VIRTIO_INPUT_HID_PCI(obj);
--
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_TABLET);
--}
--
--static const TypeInfo virtio_input_pci_info = {
--    .name          = TYPE_VIRTIO_INPUT_PCI,
--    .parent        = TYPE_VIRTIO_PCI,
--    .instance_size = sizeof(VirtIOInputPCI),
--    .class_init    = virtio_input_pci_class_init,
--    .abstract      = true,
--};
--
--static const TypeInfo virtio_input_hid_pci_info = {
--    .name          = TYPE_VIRTIO_INPUT_HID_PCI,
--    .parent        = TYPE_VIRTIO_INPUT_PCI,
--    .instance_size = sizeof(VirtIOInputHIDPCI),
--    .abstract      = true,
--};
--
--static const VirtioPCIDeviceTypeInfo virtio_keyboard_pci_info = {
--    .generic_name  = TYPE_VIRTIO_KEYBOARD_PCI,
--    .parent        = TYPE_VIRTIO_INPUT_HID_PCI,
--    .class_init    = virtio_input_hid_kbd_pci_class_init,
--    .instance_size = sizeof(VirtIOInputHIDPCI),
--    .instance_init = virtio_keyboard_initfn,
--};
--
--static const VirtioPCIDeviceTypeInfo virtio_mouse_pci_info = {
--    .generic_name  = TYPE_VIRTIO_MOUSE_PCI,
--    .parent        = TYPE_VIRTIO_INPUT_HID_PCI,
--    .class_init    = virtio_input_hid_mouse_pci_class_init,
--    .instance_size = sizeof(VirtIOInputHIDPCI),
--    .instance_init = virtio_mouse_initfn,
--};
--
--static const VirtioPCIDeviceTypeInfo virtio_tablet_pci_info = {
--    .generic_name  = TYPE_VIRTIO_TABLET_PCI,
--    .parent        = TYPE_VIRTIO_INPUT_HID_PCI,
--    .instance_size = sizeof(VirtIOInputHIDPCI),
--    .instance_init = virtio_tablet_initfn,
--};
--
- /* virtio-pci-bus */
- 
- static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
-@@ -2757,14 +2649,9 @@ static void virtio_pci_register_types(void)
-     /* Base types: */
-     type_register_static(&virtio_pci_bus_info);
-     type_register_static(&virtio_pci_info);
--    type_register_static(&virtio_input_pci_info);
--    type_register_static(&virtio_input_hid_pci_info);
- 
-     /* Implementations: */
-     virtio_pci_types_register(&virtio_rng_pci_info);
--    virtio_pci_types_register(&virtio_keyboard_pci_info);
--    virtio_pci_types_register(&virtio_mouse_pci_info);
--    virtio_pci_types_register(&virtio_tablet_pci_info);
- #ifdef CONFIG_VIRTFS
-     virtio_pci_types_register(&virtio_9p_pci_info);
- #endif
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index fb10afe160..f1c75b0a89 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -23,7 +23,6 @@
- #include "hw/virtio/virtio-scsi.h"
- #include "hw/virtio/virtio-balloon.h"
- #include "hw/virtio/virtio-bus.h"
--#include "hw/virtio/virtio-input.h"
- #include "hw/virtio/virtio-gpu.h"
- #include "hw/virtio/virtio-crypto.h"
- #include "hw/virtio/vhost-user-scsi.h"
-@@ -48,8 +47,6 @@ typedef struct VHostSCSIPCI VHostSCSIPCI;
- typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
- typedef struct VHostUserBlkPCI VHostUserBlkPCI;
- typedef struct VirtIORngPCI VirtIORngPCI;
--typedef struct VirtIOInputPCI VirtIOInputPCI;
--typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
- typedef struct VirtIOGPUPCI VirtIOGPUPCI;
- typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
- 
-@@ -338,25 +335,6 @@ struct VirtIORngPCI {
-  * virtio-input-pci: This extends VirtioPCIProxy.
-  */
- #define TYPE_VIRTIO_INPUT_PCI "virtio-input-pci"
--#define VIRTIO_INPUT_PCI(obj) \
--        OBJECT_CHECK(VirtIOInputPCI, (obj), TYPE_VIRTIO_INPUT_PCI)
--
--struct VirtIOInputPCI {
--    VirtIOPCIProxy parent_obj;
--    VirtIOInput vdev;
--};
--
--#define TYPE_VIRTIO_INPUT_HID_PCI "virtio-input-hid-pci"
--#define TYPE_VIRTIO_KEYBOARD_PCI  "virtio-keyboard-pci"
--#define TYPE_VIRTIO_MOUSE_PCI     "virtio-mouse-pci"
--#define TYPE_VIRTIO_TABLET_PCI    "virtio-tablet-pci"
--#define VIRTIO_INPUT_HID_PCI(obj) \
--        OBJECT_CHECK(VirtIOInputHIDPCI, (obj), TYPE_VIRTIO_INPUT_HID_PCI)
--
--struct VirtIOInputHIDPCI {
--    VirtIOPCIProxy parent_obj;
--    VirtIOInputHID vdev;
--};
- 
- /*
-  * virtio-gpu-pci: This extends VirtioPCIProxy.
++type_init(virtio_rng_pci_register)
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3f5a1d0c30..800f109d5c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -148,7 +148,7 @@ check-qtest-virtioserial-y += tests/virtio-console-test$(EXESUF)
+ check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
+ check-qtest-virtio-y += tests/virtio-balloon-test$(EXESUF)
+ check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
+-check-qtest-virtio-y += tests/virtio-rng-test$(EXESUF)
++check-qtest-virtio-$(CONFIG_VIRTIO_RNG) += tests/virtio-rng-test$(EXESUF)
+ check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
+ ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
+ check-qtest-virtio-y += tests/virtio-9p-test$(EXESUF)
 -- 
 2.20.1
