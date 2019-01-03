@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47790)
+Received: from eggs.gnu.org ([208.118.235.92]:48237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gf6wb-0005i2-Rq
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:38:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gf6xb-0006uQ-AP
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gf6wY-0005kx-8c
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:38:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52110)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gf6wX-0005g8-Sc
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:38:06 -0500
-Date: Thu, 3 Jan 2019 17:37:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190103173753.GJ2316@work-vm>
-References: <20181214025849.84274-1-aik@ozlabs.ru>
-	<8727c6e5-006c-20e5-cb6b-be525154e184@redhat.com>
-	<bda42f7c-9068-3c4d-d839-7f6c52561cc9@ozlabs.ru>
-	<69a29694-b777-721a-eafd-4ff38c457f6d@redhat.com>
-	<db36d006-3bdc-47fe-9987-519440446c4e@ozlabs.ru>
+	(envelope-from <peter.maydell@linaro.org>) id 1gf6xa-00078R-IQ
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:39:11 -0500
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:35321)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gf6xa-00077y-E6
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 12:39:10 -0500
+Received: by mail-ot1-x335.google.com with SMTP id 81so30002286otj.2
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 09:39:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <db36d006-3bdc-47fe-9987-519440446c4e@ozlabs.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu v2] hmp: Print if memory section is
- registered with an accelerator
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 Jan 2019 17:38:58 +0000
+Message-ID: <CAFEAcA_-wNGz_ftDziARUwzL2Lc+1kkoMTo0OxV4UVwbTr8EaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] can we update QEMU's version of u-boot.e500 ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,241 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb413@gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-* Alexey Kardashevskiy (aik@ozlabs.ru) wrote:
->=20
->=20
-> On 17/12/2018 23:47, Philippe Mathieu-Daud=E9 wrote:
-> > On 12/17/18 2:27 AM, Alexey Kardashevskiy wrote:
-> >> On 14/12/2018 22:07, Philippe Mathieu-Daud=E9 wrote:
-> >>> Hi Alexey,
-> >>>
-> >>> On 12/14/18 3:58 AM, Alexey Kardashevskiy wrote:
-> >>>> This adds an accelerator name to the "into mtree -f" to tell the u=
-ser if
-> >>>> a particular memory section is registered with the accelerator;
-> >>>> the primary user for this is KVM and such information is useful
-> >>>> for debugging purposes.
-> >>>>
-> >>>> This adds a has_memory() callback to the accelerator class allowin=
-g any
-> >>>> accelerator to have a label in that memory tree dump.
-> >>>>
-> >>>> Since memory sections are passed to memory listeners and get regis=
-tered
-> >>>> in accelerators (rather than memory regions), this only prints new=
- labels
-> >>>> for flatviews attached to the system address space.
-> >>>>
-> >>>> An example:
-> >>>>  Root memory region: system
-> >>>>   0000000000000000-0000002fffffffff (prio 0, ram): /objects/mem0 k=
-vm
-> >>>>   0000003000000000-0000005fffffffff (prio 0, ram): /objects/mem1 k=
-vm
-> >>>>   0000200000000020-000020000000003f (prio 1, i/o): virtio-pci
-> >>>>   0000200080000000-000020008000003f (prio 0, i/o): capabilities
-> >>>>
-> >>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >>>> ---
-> >>>>
-> >>>> This supercedes "[PATCH qemu] hmp: Print if memory section is regi=
-stered in KVM"
-> >>>>
-> >>>> ---
-> >>>> Changes:
-> >>>> v2:
-> >>>> * added an accelerator callback instead of hardcoding it to kvm on=
-ly
-> >>>> ---
-> >>>>  include/sysemu/accel.h |  2 ++
-> >>>>  accel/kvm/kvm-all.c    | 10 ++++++++++
-> >>>>  memory.c               | 22 ++++++++++++++++++++++
-> >>>>  3 files changed, 34 insertions(+)
-> >>>>
-> >>>> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-> >>>> index 637358f..30b456d 100644
-> >>>> --- a/include/sysemu/accel.h
-> >>>> +++ b/include/sysemu/accel.h
-> >>>> @@ -25,6 +25,7 @@
-> >>>> =20
-> >>>>  #include "qom/object.h"
-> >>>>  #include "hw/qdev-properties.h"
-> >>>> +#include "exec/hwaddr.h"
-> >>>> =20
-> >>>>  typedef struct AccelState {
-> >>>>      /*< private >*/
-> >>>> @@ -41,6 +42,7 @@ typedef struct AccelClass {
-> >>>>      int (*available)(void);
-> >>>>      int (*init_machine)(MachineState *ms);
-> >>>>      void (*setup_post)(MachineState *ms, AccelState *accel);
-> >>>> +    bool (*has_memory)(MachineState *ms, hwaddr start_addr, hwadd=
-r size);
-> >>>>      bool *allowed;
-> >>>>      /*
-> >>>>       * Array of global properties that would be applied when spec=
-ific
-> >>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> >>>> index 4880a05..634f386 100644
-> >>>> --- a/accel/kvm/kvm-all.c
-> >>>> +++ b/accel/kvm/kvm-all.c
-> >>>> @@ -2589,11 +2589,21 @@ int kvm_get_one_reg(CPUState *cs, uint64_t=
- id, void *target)
-> >>>>      return r;
-> >>>>  }
-> >>>> =20
-> >>>> +static bool kvm_accel_has_memory(MachineState *ms, hwaddr start_a=
-ddr,
-> >>>> +                                 hwaddr size)
-> >>>> +{
-> >>>> +    KVMState *kvm =3D KVM_STATE(ms->accelerator);
-> >>>> +    KVMMemoryListener *kml =3D &kvm->memory_listener;
-> >>>> +
-> >>>> +    return NULL !=3D kvm_lookup_matching_slot(kml, start_addr, si=
-ze);
-> >>>> +}
-> >>>> +
-> >>>>  static void kvm_accel_class_init(ObjectClass *oc, void *data)
-> >>>>  {
-> >>>>      AccelClass *ac =3D ACCEL_CLASS(oc);
-> >>>>      ac->name =3D "KVM";
-> >>>>      ac->init_machine =3D kvm_init;
-> >>>> +    ac->has_memory =3D kvm_accel_has_memory;
-> >>>>      ac->allowed =3D &kvm_allowed;
-> >>>>  }
-> >>>> =20
-> >>>> diff --git a/memory.c b/memory.c
-> >>>> index d14c6de..61e758a 100644
-> >>>> --- a/memory.c
-> >>>> +++ b/memory.c
-> >>>> @@ -29,7 +29,9 @@
-> >>>>  #include "exec/ram_addr.h"
-> >>>>  #include "sysemu/kvm.h"
-> >>>>  #include "sysemu/sysemu.h"
-> >>>> +#include "sysemu/accel.h"
-> >>>>  #include "hw/qdev-properties.h"
-> >>>> +#include "hw/boards.h"
-> >>>>  #include "migration/vmstate.h"
-> >>>> =20
-> >>>>  //#define DEBUG_UNASSIGNED
-> >>>> @@ -2924,6 +2926,8 @@ struct FlatViewInfo {
-> >>>>      int counter;
-> >>>>      bool dispatch_tree;
-> >>>>      bool owner;
-> >>>> +    AccelClass *ac;
-> >>>> +    const char *ac_name;
-> >>>>  };
-> >>>> =20
-> >>>>  static void mtree_print_flatview(gpointer key, gpointer value,
-> >>>> @@ -2939,6 +2943,7 @@ static void mtree_print_flatview(gpointer ke=
-y, gpointer value,
-> >>>>      int n =3D view->nr;
-> >>>>      int i;
-> >>>>      AddressSpace *as;
-> >>>> +    bool system_as =3D false;
-> >>>> =20
-> >>>>      p(f, "FlatView #%d\n", fvi->counter);
-> >>>>      ++fvi->counter;
-> >>>> @@ -2950,6 +2955,9 @@ static void mtree_print_flatview(gpointer ke=
-y, gpointer value,
-> >>>>              p(f, ", alias %s", memory_region_name(as->root->alias=
-));
-> >>>>          }
-> >>>>          p(f, "\n");
-> >>>> +        if (as =3D=3D &address_space_memory) {
-> >>>> +            system_as =3D true;
-> >>>> +        }
-> >>>>      }
-> >>>> =20
-> >>>>      p(f, " Root memory region: %s\n",
-> >>>> @@ -2985,6 +2993,13 @@ static void mtree_print_flatview(gpointer k=
-ey, gpointer value,
-> >>>>          if (fvi->owner) {
-> >>>>              mtree_print_mr_owner(p, f, mr);
-> >>>>          }
-> >>>> +
-> >>>> +        if (system_as && fvi->ac &&
-> >>>> +            fvi->ac->has_memory(current_machine,
-> >>>> +                                int128_get64(range->addr.start),
-> >>>> +                                MR_SIZE(range->addr.size) + 1)) {
-> >>>> +            p(f, " %s", fvi->ac_name);
-> >>>
-> >>> Why not simply display fvi->ac->name?
-> >>> You could avoid to add the ac_name field.
-> >>
-> >>
-> >> Well, I thought I better print whatever the user passed via the comm=
-and
-> >> line (which is current_machine->accel and equals to "kvm" in my case=
-)
-> >> rather than robotic, dry and excessive "kvm-accel".
-> >=20
-> > I have no hit for 'kvm-accel':
-> >=20
-> > $ git grep kvm-accel
-> > $
-> >=20
-> > Names looks human friendly:
->=20
->=20
-> Ah, I confused with object_class_get_name(). Anyway, I'd still show the
-> user provided accelerator name than some internal name.
+Hi; currently we ship with a u-boot.e500 which is from u-boot
+v2017.07. It would be nice to move that forward, specifically
+to at least v2017.11, which contains upstream u-boot's part of the
+fix for https://bugs.launchpad.net/qemu/+bug/1714750 .
+(There are more recent releases than that; it's just the first
+that contains the fix.)
 
-Aren't they exactly the same? I think the accel=3D thing from the user is
-parsed by comparing it with the ACCEL_CLASS_NAME declarations:
+Then we could remove the workaround in scripts/make-release and
+close out the bug.
 
-./target/i386/whpx-all.c:    .name =3D ACCEL_CLASS_NAME("whpx"),
-./target/i386/hax-all.c:    .name =3D ACCEL_CLASS_NAME("hax"),
-./hw/xen/xen-common.c:#define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
-./qtest.c:#define TYPE_QTEST_ACCEL ACCEL_CLASS_NAME("qtest")
-./accel/tcg/tcg-all.c:#define TYPE_TCG_ACCEL ACCEL_CLASS_NAME("tcg")
-./include/sysemu/hvf.h:#define TYPE_HVF_ACCEL ACCEL_CLASS_NAME("hvf")
-./include/sysemu/kvm_int.h:#define TYPE_KVM_ACCEL ACCEL_CLASS_NAME("kvm")
+I've cc'd David as the current maintainer of pc-bios/u-boot.e500
+and Alex as the last person who did an update.
 
-and the code in accel/accel.c accel_find
-
-Dave
-
->=20
-> >=20
-> > $ git grep 'ac->name =3D'
-> > accel/kvm/kvm-all.c:2595:    ac->name =3D "KVM";
-> > accel/tcg/tcg-all.c:74:    ac->name =3D "tcg";
-> > hw/xen/xen-common.c:184:    ac->name =3D "Xen";
-> > target/i386/hax-all.c:1088:    ac->name =3D "HAX";
-> > target/i386/hvf/hvf.c:959:    ac->name =3D "HVF";
-> > target/i386/whpx-all.c:1477:    ac->name =3D "WHPX";
-> > qtest.c:755:    ac->name =3D "QTest";
-> >=20
-> >>>
-> >>>> +        }
-> >>>>          p(f, "\n");
-> >>>>          range++;
-> >>>>      }
-> >>>> @@ -3028,6 +3043,13 @@ void mtree_info(fprintf_function mon_printf=
-, void *f, bool flatview,
-> >>>>          };
-> >>>>          GArray *fv_address_spaces;
-> >>>>          GHashTable *views =3D g_hash_table_new(g_direct_hash, g_d=
-irect_equal);
-> >>>> +        AccelClass *ac =3D ACCEL_GET_CLASS(current_machine->accel=
-erator);
-> >>>> +
-> >>>> +        if (ac->has_memory) {
-> >>>> +            fvi.ac =3D ac;
-> >>>> +            fvi.ac_name =3D current_machine->accel ? current_mach=
-ine->accel :
-> >>>> +                object_class_get_name(OBJECT_CLASS(ac));
-> >>>> +        }
-> >>>> =20
-> >>>>          /* Gather all FVs in one table */
-> >>>>          QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) =
-{
-> >>>>
->=20
-> --=20
-> Alexey
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
