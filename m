@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52354)
+Received: from eggs.gnu.org ([208.118.235.92]:53557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gf0Uv-00026m-G1
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:45:13 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gf0Ym-0003dq-JX
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:49:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gf0Ur-0002Ey-Mu
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:45:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34281)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gf0Uq-0002Dm-Vo
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:45:05 -0500
-Date: Thu, 3 Jan 2019 10:44:50 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190103104450.GE2316@work-vm>
-References: <20181126200435.23408-1-minyard@acm.org>
-	<20181126200435.23408-15-minyard@acm.org>
-	<20181129132939.GH2333@work-vm>
-	<64256efc-d0e4-1828-bf67-81c46984f387@acm.org>
+	(envelope-from <cohuck@redhat.com>) id 1gf0Yi-0005WI-Mn
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 05:49:08 -0500
+Date: Thu, 3 Jan 2019 11:48:37 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190103114837.66429dbb.cohuck@redhat.com>
+In-Reply-To: <6d25cdc7-60f9-a0e0-b3be-d78da86752b5@redhat.com>
+References: <20181205195704.17605-1-ehabkost@redhat.com>
+	<20181205195704.17605-3-ehabkost@redhat.com>
+	<a28d196a-e2fe-a013-a6e2-99ac260f6279@redhat.com>
+	<6d25cdc7-60f9-a0e0-b3be-d78da86752b5@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <64256efc-d0e4-1828-bf67-81c46984f387@acm.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 14/16] i2c:smbus_eeprom: Add vmstate
- handling to the smbus eeprom
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 2/2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,172 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, "Michael
+	S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Amit Shah <amit@kernel.org>, qemu-s390x@nongnu.org, Markus Armbruster <armbru@redhat.com>, Jason Wang <jasowang@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Max Reitz <mreitz@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Laine Stump <laine@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 
-* Corey Minyard (minyard@acm.org) wrote:
-> On 11/29/18 7:29 AM, Dr. David Alan Gilbert wrote:
-> > * minyard@acm.org (minyard@acm.org) wrote:
-> > > From: Corey Minyard <cminyard@mvista.com>
-> > >=20
-> > > Transfer the state of the EEPROM on a migration.  This way the
-> > > data remains consistent on migration.
-> > >=20
-> > > This required moving the actual data to a separate array and
-> > > using the data provided in the init function as a separate
-> > > initialization array, since a pointer property has to be a
-> > > void * and the array needs to be uint8_t[].
-> > So I think I'm OK with this, but I'd like other peoples comments as
-> > well; see comments.
->=20
->=20
-> Well, no comments so far.
->=20
-> I have a question on this.=A0 If this particular device were modified t=
-o be
-> able
-> to support different size eeproms, would this need a new version of the
-> vmstate structure?=A0 I know the vmstate structure itself would have to
-> change to have an array size, but would it have to change in such a
-> way that the array size would need to be transmitted?
->=20
-> I ask because someday, someone might need an eeprom of a different
-> size, and it would be nice if it could be done now in a way that avoide=
-d
-> creating a new version.
+On Thu, 3 Jan 2019 11:14:44 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-That depends; for example one way to do it would be to keep the existing
-structure for cases where the PROM was the current default size, and
-then add the extra data in a subsection that was only transmitted for a
-PROM that was a different size.
+> On 2019-01-03 10:38, Thomas Huth wrote:
+> > On 2018-12-05 20:57, Eduardo Habkost wrote:  
+> >> Many of the current virtio-*-pci device types actually represent
+> >> 3 different types of devices:
+> >> * virtio 1.0 non-transitional devices
+> >> * virtio 1.0 transitional devices
+> >> * virtio 0.9 ("legacy device" in virtio 1.0 terminology)
+> >>
+> >> That would be just an annoyance if it didn't break our device/bus
+> >> compatibility QMP interfaces.  With these multi-purpose device
+> >> types, there's no way to tell management software that
+> >> transitional devices and legacy devices require a Conventional
+> >> PCI bus.
+> >>
+> >> The multi-purpose device types would also prevent us from telling
+> >> management software what's the PCI vendor/device ID for them,
+> >> because their PCI IDs change at runtime depending on the bus
+> >> where they were plugged.
+> >>
+> >> This patch adds separate device types for each of those virtio
+> >> device flavors:
+> >>
+> >> - virtio-*-pci: the existing multi-purpose device types
+> >>   - Configurable using `disable-legacy` and `disable-modern`
+> >>     properties
+> >>   - Legacy driver support is automatically enabled/disabled
+> >>     depending on the bus where it is plugged
+> >>   - Supports Conventional PCI and PCI Express buses
+> >>     (but Conventional PCI is incompatible with
+> >>     disable-legacy=off)
+> >>   - Changes PCI vendor/device IDs at runtime
+> >> - virtio-*-pci-transitional: virtio-1.0 device supporting legacy drivers
+> >>   - Supports Conventional PCI buses only, because
+> >>     it has a PIO BAR
+> >> - virtio-*-pci-non-transitional: modern-only
+> >>   - Supports both Conventional PCI and PCI Express buses
+> >>
+> >> The existing TYPE_* macros for these types will point to an
+> >> abstract base type, so existing casts in the code will keep
+> >> working for all variants.
+> >>
+> >> A simple test script (tests/acceptance/virtio_version.py) is
+> >> included, to check if the new device types are equivalent to
+> >> using the `disable-legacy` and `disable-modern` options.
+> >>
+> >> Acked-by: Andrea Bolognani <abologna@redhat.com>
+> >> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> >> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>  
+> > 
+> >  Hi Eduardo,
+> > 
+> > with these new devices, I can trigger an abort on s390x:
+> > 
+> > $ qemu-system-s390x -M s390-ccw-virtio-2.5 -monitor stdio -no-shutdown
+> > QEMU 3.1.50 monitor - type 'help' for more information
+> > (qemu) device_add vhost-scsi-pci-non-transitional
+> > qemu-system-s390x: hw/core/qdev-properties.c:1236:
+> > qdev_prop_set_globals: Assertion `prop->user_provided' failed.
+> > Aborted (core dumped)  
+> FWIW, it happens with x86, too:
+> 
+> $ qemu-system-x86_64 -M pc-i440fx-2.6 -monitor stdio
+> QEMU 3.1.50 monitor - type 'help' for more information
+> (qemu) device_add vhost-scsi-pci-non-transitional
+> qemu-system-x86_64: hw/core/qdev-properties.c:1236:
+> qdev_prop_set_globals: Assertion `prop->user_provided' failed.
+> Aborted (core dumped)
+> 
+> Only machine types newer than 2.7 seem to be OK.
 
-However, it's probably simpler - the size of the eprom comes from the
-configuration from the command line etc - it's not a dynamic thing;
-So you'd probably end up going back to a void *data, making sure that's
-allocated before thefields are loaded, and then replacing the
-VMSTATE_UINT8_ARRAY by a VMSTATE_BUFFER;  note that if the sizes don't
-match on source/destination then that would fail rather messily
-where as the subsection would fail cleanly.
+It also fails for vhost-scsi-pci-transitional on 2.6 and older machines.
 
-Dave
+The problem is that HW_COMPAT_2_6 tries to set the disable_modern
+property, which the version-specific variants of virtio-pci do not have.
 
-> Thanks,
->=20
-> -corey
->=20
-> > > Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > > ---
-> > >   hw/i2c/smbus_eeprom.c | 34 ++++++++++++++++++++++++++++++++--
-> > >   1 file changed, 32 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-> > > index 8e9b734c09..942057dc10 100644
-> > > --- a/hw/i2c/smbus_eeprom.c
-> > > +++ b/hw/i2c/smbus_eeprom.c
-> > > @@ -24,6 +24,7 @@
-> > >   #include "qemu/osdep.h"
-> > >   #include "hw/hw.h"
-> > > +#include "hw/boards.h"
-> > >   #include "hw/i2c/i2c.h"
-> > >   #include "hw/i2c/smbus_slave.h"
-> > >   #include "hw/i2c/smbus_eeprom.h"
-> > > @@ -39,8 +40,10 @@
-> > >   typedef struct SMBusEEPROMDevice {
-> > >       SMBusDevice smbusdev;
-> > > -    void *data;
-> > > +    uint8_t data[SMBUS_EEPROM_SIZE];
-> > > +    void *init_data;
-> > >       uint8_t offset;
-> > > +    bool accessed;
-> > >   } SMBusEEPROMDevice;
-> > >   static uint8_t eeprom_receive_byte(SMBusDevice *dev)
-> > > @@ -49,6 +52,7 @@ static uint8_t eeprom_receive_byte(SMBusDevice *d=
-ev)
-> > >       uint8_t *data =3D eeprom->data;
-> > >       uint8_t val =3D data[eeprom->offset++];
-> > > +    eeprom->accessed =3D true;
-> > >   #ifdef DEBUG
-> > >       printf("eeprom_receive_byte: addr=3D0x%02x val=3D0x%02x\n",
-> > >              dev->i2c.address, val);
-> > > @@ -61,6 +65,7 @@ static int eeprom_write_data(SMBusDevice *dev, ui=
-nt8_t *buf, uint8_t len)
-> > >       SMBusEEPROMDevice *eeprom =3D SMBUS_EEPROM(dev);
-> > >       uint8_t *data =3D eeprom->data;
-> > > +    eeprom->accessed =3D true;
-> > >   #ifdef DEBUG
-> > >       printf("eeprom_write_byte: addr=3D0x%02x cmd=3D0x%02x val=3D0=
-x%02x\n",
-> > >              dev->i2c.address, cmd, buf[0]);
-> > > @@ -78,15 +83,39 @@ static int eeprom_write_data(SMBusDevice *dev, =
-uint8_t *buf, uint8_t len)
-> > >       return 0;
-> > >   }
-> > > +static bool smbus_eeprom_vmstate_needed(void *opaque)
-> > > +{
-> > > +    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
-> > > +    SMBusEEPROMDevice *eeprom =3D opaque;
-> > > +
-> > > +    return (eeprom->accessed || smbus_vmstate_needed(&eeprom->smbu=
-sdev)) &&
-> > > +        !mc->smbus_no_migration_support;
-> > That's a little complx, but OK.
-> >=20
-> > > +}
-> > > +
-> > > +static const VMStateDescription vmstate_smbus_eeprom =3D {
-> > > +    .name =3D "smbus-eeprom",
-> > > +    .version_id =3D 1,
-> > > +    .minimum_version_id =3D 1,
-> > > +    .needed =3D smbus_eeprom_vmstate_needed,
-> > > +    .fields      =3D (VMStateField[]) {
-> > > +        VMSTATE_SMBUS_DEVICE(smbusdev, SMBusEEPROMDevice),
-> > > +        VMSTATE_UINT8_ARRAY(data, SMBusEEPROMDevice, SMBUS_EEPROM_=
-SIZE),
-> > > +        VMSTATE_UINT8(offset, SMBusEEPROMDevice),
-> > > +        VMSTATE_BOOL(accessed, SMBusEEPROMDevice),
-> > OK, good - including 'accessed' means that if we migrate a->b->c and
-> > it's not changed while it's on b, then 'c' still gets the updated
-> > version.
-> >=20
-> > > +        VMSTATE_END_OF_LIST()
-> > > +    }
-> > > +};
-> > > +
-> > >   static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
-> > >   {
-> > >       SMBusEEPROMDevice *eeprom =3D SMBUS_EEPROM(dev);
-> > > +    memcpy(eeprom->data, eeprom->init_data, SMBUS_EEPROM_SIZE);
-> > >       eeprom->offset =3D 0;
-> > >   }
-> > >   static Property smbus_eeprom_properties[] =3D {
-> > > -    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, data),
-> > > +    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
-> > >       DEFINE_PROP_END_OF_LIST(),
-> > >   };
-> > > @@ -99,6 +128,7 @@ static void smbus_eeprom_class_initfn(ObjectClas=
-s *klass, void *data)
-> > >       sc->receive_byte =3D eeprom_receive_byte;
-> > >       sc->write_data =3D eeprom_write_data;
-> > >       dc->props =3D smbus_eeprom_properties;
-> > > +    dc->vmsd =3D &vmstate_smbus_eeprom;
-> > >       /* Reason: pointer property "data" */
-> > >       dc->user_creatable =3D false;
-> > >   }
-> > so from migration side:
-> >=20
-> >=20
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >=20
-> > > --=20
-> > > 2.17.1
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Not sure how to fix this. The version-specific devices cannot really
+work on the compat machine.
