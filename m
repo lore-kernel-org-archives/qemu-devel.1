@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37809)
+Received: from eggs.gnu.org ([208.118.235.92]:41983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gf4zx-0003lq-62
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:33:30 -0500
+	(envelope-from <thuth@redhat.com>) id 1gf5DE-00036E-Cq
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:47:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gf4zt-0007Rh-Hj
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:33:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57706)
+	(envelope-from <thuth@redhat.com>) id 1gf5D9-0002Pp-Dm
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:47:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40154)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gf4zs-0007Qr-2b
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:33:24 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu,  3 Jan 2019 15:33:20 +0000
-Message-Id: <20190103153320.21687-1-stefanha@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gf5D9-0002FK-69
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 10:47:07 -0500
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+	<20181227063419.12981-10-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <026da2df-387b-d434-fcfd-0eec798e54c4@redhat.com>
+Date: Thu, 3 Jan 2019 16:47:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [qemu-web RFC] Add GSoC/Outreachy 2018 retrospective
- blog post
+In-Reply-To: <20181227063419.12981-10-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 09/25] ide: express dependencies with
+ Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jim@groklearning.com, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@euphon.net>, joel@jms.id.au, kraxel@redhat.com, airlied@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-Dear mentors,
-Let's post an overview of what was achieved in GSoC/Outreachy 2018.  I
-have populated a blog post with information available to me, but I'm
-sure it can be improved to explain how the project went and the current
-status.
+On 2018-12-27 07:34, Yang Zhong wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+[...]
+> diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
+> index 5ec449525f..091f3a81c9 100644
+> --- a/hw/ide/Kconfig
+> +++ b/hw/ide/Kconfig
+> @@ -3,33 +3,44 @@ config IDE_CORE
+>  
+>  config IDE_QDEV
+>      bool
+> +    select IDE_CORE
+>  
+>  config IDE_PCI
+>      bool
+> +    select IDE_CORE
+>  
+>  config IDE_ISA
+>      bool
+> +    select IDE_QDEV
+>  
+>  config IDE_PIIX
+>      bool
+> +    select IDE_QDEV
+>  
+>  config IDE_CMD646
+>      bool
+> +    select IDE_QDEV
 
-Please let me know what should be changed, thanks!
----
- _posts/2019-01-03-internships-wrapup.md | 61 +++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
- create mode 100644 _posts/2019-01-03-internships-wrapup.md
+PIIX and CMD646 seem to be derived from TYPE_PCI_IDE, so shouldn't these
+switches rather select IDE_PCI instead? (Or depend on IDE_PCI?)
 
-diff --git a/_posts/2019-01-03-internships-wrapup.md b/_posts/2019-01-03-=
-internships-wrapup.md
-new file mode 100644
-index 0000000..ec245e6
---- /dev/null
-+++ b/_posts/2019-01-03-internships-wrapup.md
-@@ -0,0 +1,61 @@
-+---
-+layout: post
-+title:  "GSoC and Outreachy 2018 retrospective"
-+date:   2019-01-03 07:50:00 +0100
-+categories: [gsoc, outreachy, internships]
-+---
-+QEMU participates in open source internship programs including Google Su=
-mmer of
-+Code (GSoC) and Outreachy.  These full-time remote work opportunities al=
-low
-+talented new developers to get involved in our community.  This post hig=
-hlights
-+what our interns achieved in 2018.
-+
-+## micro:bit board emulation
-+
-+Julia Suvorova (Outreachy) and Steffen G=C3=B6rtz (GSoC) tackled adding =
-emulation
-+support for the [micro:bit ARM board](https://microbit.org/).  Although =
-QEMU
-+already has plenty of ARM emulation code, the Cortex-M0 CPU used in the
-+micro:bit was not yet implemented and the nRF51 system-on-chip was also
-+missing.
-+
-+The goal of this project was to run micro:bit programs (usually created =
-with
-+the [MicroPython](https://python.microbit.org/v/1.1) or
-+[Javascript/Blocks](https://makecode.microbit.org/) IDEs) with a core se=
-t of
-+emulated devices, including the serial port, pushbuttons, and LEDs.
-+
-+QEMU 3.1 already shipped the groundwork for the new `qemu-system-arm -M
-+microbit` machine type.  Enough functionality to run basic micro:bit pro=
-grams
-+is expected in the next QEMU release.
-+
-+## Patchew REST API improvements
-+
-+Shubham Jain (GSoC) created a REST API for the Patchew continuous integr=
-ation
-+system that is at the heart of QEMU's development process.  The previous=
- API
-+was not RESTful and exposed database schema internals.
-+
-+## Qtest Driver Framework
-+
-+Emanuele Esposito (GSoC) enhanced QEMU's test infrastructure with an eng=
-ine
-+that starts tests with all variants of devices that they are capable of
-+driving.
-+
-+This is a complicated task in QEMU since certain devices and busses are
-+available in an architecture-specific way on each emulation target, maki=
-ng it
-+hard to write test cases without lots of hardcoded dependencies - and to=
- keep
-+them up-to-date!
-+
-+The qgraph framework that Emanuele created eliminates the need to hardco=
-de each
-+variant into the test.
-+
-+## Vulkan-izing VirGL
-+
-+Nathan Gau=C3=ABr (GSoC) improved VirGL, which provides an OpenGL path w=
-ell
-+supported on Linux guests. On the host, QEMU offers several console back=
--ends,
-+from EGL to SDL. Adding a Vulkan path will require to change the current=
- VirGL
-+API, write new guest drivers, and also offer a way to display the output=
-. This
-+is a huge task, which can be split in several sub-projects. Expending th=
-e
-+current VirGL API to support Vulkan is the first step.
-+
-+## Stay tuned for 2019 internships!
-+
-+QEMU will apply to Google Summer of Code and Outreachy again in 2019.  W=
-e hope
-+to offer more great open source internship opportunities for new develop=
-ers.
---=20
-2.20.1
+>  config IDE_MACIO
+>      bool
+> +    select IDE_QDEV
+>  
+>  config IDE_MMIO
+>      bool
+> +    select IDE_QDEV
+>  
+>  config IDE_VIA
+>      bool
+> +    select IDE_QDEV
+
+dito, VIA is a PCI device, too.
+
+>  config MICRODRIVE
+>      bool
+> +    select IDE_QDEV
+>  
+>  config AHCI
+>      bool
+> +    select IDE_QDEV
+>  
+>  config IDE_SII3112
+>      bool
+> +    select IDE_QDEV
+> 
+
+dito, SII3112 is a PCI device.
+
+ Thomas
