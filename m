@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47984)
+Received: from eggs.gnu.org ([208.118.235.92]:51899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfP8z-0002lU-J7
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:04:11 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gfPND-0000lc-OS
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfP8y-0004rl-LO
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:04:09 -0500
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:43495)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gfPNA-0005Dm-Kv
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:18:51 -0500
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:33791)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfP8y-0004pp-8k
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:04:08 -0500
-Received: by mail-ot1-x32e.google.com with SMTP id a11so32003254otr.10
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 05:04:07 -0800 (PST)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1gfPNA-0005DY-D9
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:18:48 -0500
+Received: by mail-lj1-x241.google.com with SMTP id v1-v6so32462472ljd.0
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 05:18:48 -0800 (PST)
+Date: Fri, 4 Jan 2019 14:18:45 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20190104131845.GQ1148@toto>
+References: <20181210175630.30643-1-peter.maydell@linaro.org>
+	<CAFEAcA8eFk79oTXmwMd0s8gVBQjf8XSaUptRkYJrgGgvdZJBcA@mail.gmail.com>
+	<CAFEAcA8n1g4CFkOYt9+L9CmgVeE7V7BhD+K8hR0X0tQ4GJoLOg@mail.gmail.com>
 MIME-Version: 1.0
-References: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA9FwFg9zsg3xLhOs9C=XJHjAo+ACd1=g22YtPaax6N0YQ@mail.gmail.com>
-	<42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
-	<CAFEAcA9UqiaiKa_4EWfBHbRS0H=trHfJiArHOJkW6=vKoGvRpQ@mail.gmail.com>
-	<bc564647-0550-df53-7a17-7760489b8c45@redhat.com>
-In-Reply-To: <bc564647-0550-df53-7a17-7760489b8c45@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 13:03:55 +0000
-Message-ID: <CAFEAcA97LKhk_FxPbPGG3C2FpSRTpVyez77xjCJah6Gqh=bjsg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-21
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8n1g4CFkOYt9+L9CmgVeE7V7BhD+K8hR0X0tQ4GJoLOg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC] target/microblaze: Switch to
+ transaction_failed hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,109 +32,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Fri, 4 Jan 2019 at 07:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> I don't know... I tried running make check under "strace -e fcntl" and I
-> didn't find any occurrences of fcntl(1, O_SETFL, ...|O_NONBLOCK).
+On Mon, Dec 10, 2018 at 06:32:49PM +0000, Peter Maydell wrote:
+> On Mon, 10 Dec 2018 at 18:31, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Mon, 10 Dec 2018 at 17:57, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > >
+> > > Switch the microblaze target from the old unassigned_access hook
+> > > to the transaction_failed hook.
+> > >
+> > > The notable difference is that rather than it being called
+> > > for all physical memory accesses which fail (including
+> > > those made by DMA devices or by the gdbstub), it is only
+> > > called for those made by the CPU via its MMU. For
+> > > microblaze this makes no difference because none of the
+> > > target CPU code needs to make loads or stores by physical
+> > > address.
 
-I found this strace command worked to track down some possible
-culprits:
-strace -o /tmp/strace.log -e fcntl,execve,clone -e signal=none -f make
--C build/x86 V=1 check
+Hi again,
 
-Extracts from the logs:
+I just noticed a small typo
 
-29251 execve("tests/test-char", ["tests/test-char", "-q", "-p",
-"/char/stdio/subprocess", "--GTestSubprocess", "--GTestLogFD", "4"],
-[/* 66 vars */] <unfinished ...>
-29251 <... execve resumed> )            = 0
-29251 fcntl(3, F_GETFD)                 = 0
-29251 fcntl(3, F_SETFD, FD_CLOEXEC)     = 0
-29251 clone(child_stack=0x7f43946addf0,
-flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,
-parent_tidptr=0x7f43946ae9d0, tls=0x7f43946ae700,
-child_tidptr=0x7f43946ae9d0) = 29254
-29251 fcntl(4, F_GETFD)                 = 0
-29251 fcntl(4, F_SETFD, FD_CLOEXEC)     = 0
-29251 fcntl(4, F_GETFL)                 = 0x2 (flags O_RDWR)
-29251 fcntl(4, F_SETFL, O_RDWR|O_NONBLOCK) = 0
-29251 fcntl(0, F_GETFL)                 = 0x8000 (flags O_RDONLY|O_LARGEFILE)
-29251 fcntl(0, F_GETFL)                 = 0x8000 (flags O_RDONLY|O_LARGEFILE)
-29251 fcntl(0, F_SETFL, O_RDONLY|O_NONBLOCK|O_LARGEFILE) = 0
-29251 fcntl(1, F_GETFL)                 = 0x1 (flags O_WRONLY)
-29251 fcntl(1, F_SETFL, O_WRONLY|O_NONBLOCK) = 0
-29251 fcntl(0, F_SETFL, O_RDONLY|O_LARGEFILE) = 0
-29251 fcntl(0, F_SETFL, O_RDONLY|O_LARGEFILE) = -1 EBADF (Bad file descriptor)
-29254 +++ exited with 0 +++
-29251 +++ exited with 0 +++
 
-(the attempt to F_SETFL a closed stdin is also interesting).
 
-and
+> > >
+> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > > ---
+> > > A straightforward conversion, but tagged RFC because I don't have
+> > > any microblaze test images and have tested only with "make check".
+> > >
+> > >  target/microblaze/cpu.h       |  7 ++++---
+> > >  target/microblaze/cpu.c       |  2 +-
+> > >  target/microblaze/op_helper.c | 20 ++++++++++----------
+> > >  3 files changed, 15 insertions(+), 14 deletions(-)
+> > >
+> > > diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+> > > index 3c4e0ba80ac..03ca91007d5 100644
+> > > --- a/target/microblaze/cpu.h
+> > > +++ b/target/microblaze/cpu.h
+> > > @@ -388,9 +388,10 @@ static inline void cpu_get_tb_cpu_state(CPUMBState *env, target_ulong *pc,
+> > >  }
+> > >
+> > >  #if !defined(CONFIG_USER_ONLY)
+> > > -void mb_cpu_unassigned_access(CPUState *cpu, hwaddr addr,
+> > > -                              bool is_write, bool is_exec, int is_asi,
+> > > -                              unsigned size);
+> > > +void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+> > > +                               unsigned size, MMUAccessType access_type,
+> > > +                               int mmu_idx, MemTxAttrs attrs,
+> > > +                               MemTxResult response, uintptr_t retaddr);
+> > >  #endif
+> > >
+> > >  #endif
+> > > diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> > > index 9b546a2c18e..49876b19b38 100644
+> > > --- a/target/microblaze/cpu.c
+> > > +++ b/target/microblaze/cpu.c
+> > > @@ -297,7 +297,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
+> > >  #ifdef CONFIG_USER_ONLY
+> > >      cc->handle_mmu_fault = mb_cpu_handle_mmu_fault;
+> > >  #else
+> > > -    cc->do_unassigned_access = mb_cpu_unassigned_access;
+> > > +    cc->do_transaction_failed = mb_cpu_transaction_failed;
+> > >      cc->get_phys_page_debug = mb_cpu_get_phys_page_debug;
+> > >  #endif
+> > >      dc->vmsd = &vmstate_mb_cpu;
+> > > diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
+> > > index 7cdbbcccaef..d25d3b626c8 100644
+> > > --- a/target/microblaze/op_helper.c
+> > > +++ b/target/microblaze/op_helper.c
+> > > @@ -486,18 +486,18 @@ void helper_mmu_write(CPUMBState *env, uint32_t ext, uint32_t rn, uint32_t v)
+> > >      mmu_write(env, ext, rn, v);
+> > >  }
+> > >
+> > > -void mb_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+> > > -                              bool is_write, bool is_exec, int is_asi,
+> > > -                              unsigned size)
+> > > +void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+> > > +                               unsigned size, MMUAccessType access_type,
+> > > +                               int mmu_idx, MemTxAttrs attrs,
+> > > +                               MemTxResult response, uintptr_t retaddr)
+> > >  {
+> > >      MicroBlazeCPU *cpu;
+> > >      CPUMBState *env;
+> > > -
+> > > -    qemu_log_mask(CPU_LOG_INT, "Unassigned " TARGET_FMT_plx " wr=%d exe=%d\n",
+> > > -             addr, is_write ? 1 : 0, is_exec ? 1 : 0);
+> > > -    if (cs == NULL) {
+> > > -        return;
+> > > -    }
+> > > +    qemu_log_mask(CPU_LOG_INT, "Transaction failed: vaddr 0x%" VADDR_PRIx
+> > > +                  " physaddr 0x" TARGET_FMT_plx "size %d access type %s\n",
+                                                       ^^^
 
-30300 execve("tests/hexloader-test", ["tests/hexloader-test",
-"--quiet", "--keep-going", "-m
-=quick", "--GTestLogFD=6"], [/* 68 vars */]) = 0
-30300 fcntl(3, F_GETFD)                 = 0
-30300 fcntl(3, F_SETFD, FD_CLOEXEC)     = 0
-30300 fcntl(4, F_GETFD)                 = 0
-30300 fcntl(4, F_SETFD, FD_CLOEXEC)     = 0
-30300 clone(child_stack=0,
-flags=CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID|SIGCHLD,
-child_tidptr=0x7f26bdc09a10) = 30301
-30301 execve("/bin/sh", ["sh", "-c", "exec
-arm-softmmu/qemu-system-arm"...], [/* 69 vars */]) = 0
-30301 execve("arm-softmmu/qemu-system-arm",
-["arm-softmmu/qemu-system-arm", "-qtest",
-"unix:/tmp/qtest-30300.sock,nowai"..., "-qtest-log", "/dev/null",
-"-chardev", "socket,path=/tmp/qtest-30300.qmp"..., "-mon",
-"chardev=char0,mode=control", "-machine", "accel=qtest", "-display",
-"none", "-M", "vexpress-a9", "-nographic", ...], [/* 69 vars */]) = 0
-30301 fcntl(3, F_GETFD)                 = 0
-30301 fcntl(3, F_SETFD, FD_CLOEXEC)     = 0
-30301 clone(child_stack=0x7f84f7614730,
-flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,
-parent_tidptr=0x7f84f76179d0, tls=0x7f84f7617700,
-child_tidptr=0x7f84f76179d0) = 30302
-30301 fcntl(7, F_GETFD)                 = 0
-30301 fcntl(7, F_SETFD, FD_CLOEXEC)     = 0
-30301 fcntl(7, F_GETFL)                 = 0x2 (flags O_RDWR)
-30301 fcntl(7, F_SETFL, O_RDWR|O_NONBLOCK) = 0
-30301 fcntl(11, F_GETFL)                = 0x2 (flags O_RDWR)
-30301 fcntl(11, F_SETFL, O_RDWR|O_NONBLOCK) = 0
-30301 fcntl(12, F_GETFL)                = 0x2 (flags O_RDWR)
-30301 fcntl(12, F_SETFL, O_RDWR|O_NONBLOCK) = 0
-30301 clone(child_stack=0x7f84f6e13730,
-flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,
-parent_tidptr=0x7f84f6e169d0, tls=0x7f84f6e16700,
-child_tidptr=0x7f84f6e169d0) = 30303
-30301 fcntl(0, F_GETFL)                 = 0x8000 (flags O_RDONLY|O_LARGEFILE)
-30301 fcntl(0, F_GETFL)                 = 0x8000 (flags O_RDONLY|O_LARGEFILE)
-30301 fcntl(0, F_SETFL, O_RDONLY|O_NONBLOCK|O_LARGEFILE) = 0
-30301 fcntl(1, F_GETFL)                 = 0x8402 (flags
-O_RDWR|O_APPEND|O_LARGEFILE)
-30301 fcntl(1, F_SETFL, O_RDWR|O_APPEND|O_NONBLOCK|O_LARGEFILE) = 0
-30301 clone(child_stack=0x7f84f6612730,
-flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,
-parent_tidptr=0x7f84f66159d0, tls=0x7f84f6615700,
-child_tidptr=0x7f84f66159d0) = 30304
-30303 +++ exited with 0 +++
-30301 fcntl(0, F_SETFL, O_RDONLY|O_LARGEFILE) = 0
-30301 fcntl(0, F_SETFL, O_RDONLY|O_LARGEFILE) = -1 EBADF (Bad file descriptor)
-30302 +++ exited with 0 +++
-30301 +++ exited with 0 +++
+We'd want a space before size here.
 
-where tests/hexloader-test starts a QEMU process which
-makes stdin/stdout non-blocking.
+Cheers,
+Edgar
 
-I didn't try to also track dup/dup2/dup3 use to see whether fd 0/1/2
-were duped to other fds and then set O_NONBLOCK via those, or
-open to see if they were reopened with other contents.
 
-(Test run is still in-progress, I'll update if there are any more
-interesting bits of logging.)
 
-thanks
--- PMM
+> > > +                  addr, physaddr, size,
+> > > +                  access_type == MMU_INST_FETCH ? "INST_FETCH" :
+> > > +                  (access_type == MMU_DATA_LOAD ? "DATA_LOAD" : "DATA_STORE"));
+> > >      cpu = MICROBLAZE_CPU(cs);
+> > >      env = &cpu->env;
+> 
+> Oops. Here there should be
+> 
+>     cpu_restore_state(cs, retaddr, true);
+> 
+> > >      if (!(env->sregs[SR_MSR] & MSR_EE)) {
+> > > @@ -505,7 +505,7 @@ void mb_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+> > >      }
+> > >
+> > >      env->sregs[SR_EAR] = addr;
+> > > -    if (is_exec) {
+> > > +    if (access_type == MMU_INST_FETCH) {
+> > >          if ((env->pvr.regs[2] & PVR2_IOPB_BUS_EXC_MASK)) {
+> > >              env->sregs[SR_ESR] = ESR_EC_INSN_BUS;
+> > >              helper_raise_exception(env, EXCP_HW_EXCP);
+> > > --
+> > > 2.19.2
+> 
+> thanks
+> -- PMM
