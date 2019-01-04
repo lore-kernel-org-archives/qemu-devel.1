@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53234)
+Received: from eggs.gnu.org ([208.118.235.92]:56599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfToE-0006pB-EA
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:03:04 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfTxS-00021z-Dv
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:12:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfToD-0006MO-Jw
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:03:02 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfTxQ-0003Au-68
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:12:34 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri,  4 Jan 2019 18:58:47 +0100
-Message-Id: <20190104175847.6290-17-philmd@redhat.com>
-In-Reply-To: <20190104175847.6290-1-philmd@redhat.com>
-References: <20190104175847.6290-1-philmd@redhat.com>
+Date: Fri,  4 Jan 2019 19:12:06 +0100
+Message-Id: <20190104181208.7809-2-philmd@redhat.com>
+In-Reply-To: <20190104181208.7809-1-philmd@redhat.com>
+References: <20190104181208.7809-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 16/16] RFC hw/net/smc91c111: Convert init
- helper into an inline function
+Subject: [Qemu-devel] [PATCH v2 1/3] util/cutils: Move size_to_str() from
+ "qemu-common.h" to "cutils.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,88 +23,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Magnus Damm <magnus.damm@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, Michael Walle <michael@walle.cc>, Richard Henderson <rth@twiddle.net>, Jan Kiszka <jan.kiszka@web.de>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Rob Herring <robh@kernel.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Stefano Garzarella <sgarzare@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+
+The size_to_str() function doesn't need to be in a generic header.
+
+It makes also sens to find this function in the same header than
+the opposite string to size functions: qemu_strtosz*().
+Note than this function is already implemented in util/cutils.c.
+
+Since we introduce a new function in a header, we document it,
+using the previous comment from the source file.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-As init helper in "hw/char/pl011.h"
----
- hw/net/smc91c111.c         | 17 -----------------
- include/hw/net/smc91c111.h | 25 ++++++++++++++++++++++++-
- 2 files changed, 24 insertions(+), 18 deletions(-)
+ include/qemu-common.h        |  1 -
+ include/qemu/cutils.h        | 13 +++++++++++++
+ qapi/string-output-visitor.c |  2 +-
+ util/cutils.c                |  6 ------
+ 4 files changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
-index d19ea0750d..3472852270 100644
---- a/hw/net/smc91c111.c
-+++ b/hw/net/smc91c111.c
-@@ -18,7 +18,6 @@
- /* Number of 2k memory pages available.  */
- #define NUM_PACKETS 4
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index ed60ba251d..760527294f 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -153,7 +153,6 @@ void qemu_hexdump(const char *buf, FILE *fp, const ch=
+ar *prefix, size_t size);
+ int parse_debug_env(const char *name, int max, int initial);
 =20
--#define TYPE_SMC91C111 "smc91c111"
- #define SMC91C111(obj) OBJECT_CHECK(smc91c111_state, (obj), TYPE_SMC91C1=
-11)
+ const char *qemu_ether_ntoa(const MACAddr *mac);
+-char *size_to_str(uint64_t val);
+ void page_size_init(void);
 =20
- typedef struct {
-@@ -809,20 +808,4 @@ static void smc91c111_register_types(void)
-     type_register_static(&smc91c111_info);
+ /* returns non-zero if dump is in progress, otherwise zero is
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index d2dad3057c..9ee40470e3 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -157,6 +157,19 @@ int qemu_strtosz(const char *nptr, const char **end,=
+ uint64_t *result);
+ int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *resul=
+t);
+ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *re=
+sult);
+=20
++/**
++ * size_to_str:
++ *
++ * Return human readable string for size @val.
++ * Use IEC binary units like KiB, MiB, and so forth.
++ *
++ * @val: The value to format.
++ *       Can be anything that uint64_t allows (no more than "16 EiB").
++ *
++ * Caller is responsible for passing it to g_free().
++ */
++char *size_to_str(uint64_t val);
++
+ /* used to print char* safely */
+ #define STR_OR_NULL(str) ((str) ? (str) : "null")
+=20
+diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
+index 7ab64468d9..edf268b373 100644
+--- a/qapi/string-output-visitor.c
++++ b/qapi/string-output-visitor.c
+@@ -11,9 +11,9 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qapi/string-output-visitor.h"
+ #include "qapi/visitor-impl.h"
++#include "qemu/cutils.h"
+ #include "qemu/host-utils.h"
+ #include <math.h>
+ #include "qemu/range.h"
+diff --git a/util/cutils.c b/util/cutils.c
+index e098debdc0..a8a3a3ba3b 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -816,12 +816,6 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
+     return ret;
  }
 =20
--/* Legacy helper function.  Should go away when machine config files are
--   implemented.  */
--void smc91c111_init(NICInfo *nd, uint32_t base, qemu_irq irq)
--{
--    DeviceState *dev;
--    SysBusDevice *s;
--
--    qemu_check_nic_model(nd, "smc91c111");
--    dev =3D qdev_create(NULL, TYPE_SMC91C111);
--    qdev_set_nic_properties(dev, nd);
--    qdev_init_nofail(dev);
--    s =3D SYS_BUS_DEVICE(dev);
--    sysbus_mmio_map(s, 0, base);
--    sysbus_connect_irq(s, 0, irq);
--}
--
- type_init(smc91c111_register_types)
-diff --git a/include/hw/net/smc91c111.h b/include/hw/net/smc91c111.h
-index 46f7d9a5d4..0a1097ddd2 100644
---- a/include/hw/net/smc91c111.h
-+++ b/include/hw/net/smc91c111.h
-@@ -10,9 +10,32 @@
- #ifndef HW_NET_SMC91C111_H
- #define HW_NET_SMC91C111_H
-=20
-+#include "hw/qdev.h"
- #include "hw/irq.h"
-+#include "hw/sysbus.h"
- #include "net/net.h"
-=20
--void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
-+#define TYPE_SMC91C111 "smc91c111"
-+
-+/*
-+ * Legacy helper function.  Should go away when machine config files are
-+ * implemented.
-+ */
-+static inline DeviceState *smc91c111_init(NICInfo *nd,
-+                                          uint32_t base, qemu_irq irq)
-+{
-+    DeviceState *dev;
-+    SysBusDevice *s;
-+
-+    qemu_check_nic_model(nd, "smc91c111");
-+    dev =3D qdev_create(NULL, TYPE_SMC91C111);
-+    qdev_set_nic_properties(dev, nd);
-+    qdev_init_nofail(dev);
-+    s =3D SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(s, 0, base);
-+    sysbus_connect_irq(s, 0, irq);
-+
-+    return dev;
-+}
-=20
- #endif
+-/*
+- * Return human readable string for size @val.
+- * @val can be anything that uint64_t allows (no more than "16 EiB").
+- * Use IEC binary units like KiB, MiB, and so forth.
+- * Caller is responsible for passing it to g_free().
+- */
+ char *size_to_str(uint64_t val)
+ {
+     static const char *suffixes[] =3D { "", "Ki", "Mi", "Gi", "Ti", "Pi"=
+, "Ei" };
 --=20
 2.17.2
