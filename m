@@ -1,29 +1,29 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:55082 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:55099 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY0O-00031k-Ay
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:53 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gfY0Q-00036k-O7
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY0N-00029c-Fz
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:52 -0500
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:36634)
+	(envelope-from <richard.henderson@linaro.org>) id 1gfY0P-0002GI-RK
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:54 -0500
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:42690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gfY0N-00029C-B6
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:51 -0500
-Received: by mail-io1-xd43.google.com with SMTP id m19so30708174ioh.3
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:31:51 -0800 (PST)
+	id 1gfY0P-0002F0-Mz
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:53 -0500
+Received: by mail-io1-xd42.google.com with SMTP id x6so30675046ioa.9
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:31:53 -0800 (PST)
 Received: from cloudburst.twiddle.net ([172.56.12.23])
 	by smtp.gmail.com with ESMTPSA id
-	t6sm27793259ioc.87.2019.01.04.14.31.48 for <qemu-devel@nongnu.org>
+	t6sm27793259ioc.87.2019.01.04.14.31.50 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 04 Jan 2019 14:31:49 -0800 (PST)
+	Fri, 04 Jan 2019 14:31:52 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  5 Jan 2019 08:31:15 +1000
-Message-Id: <20190104223116.14037-10-richard.henderson@linaro.org>
+Date: Sat,  5 Jan 2019 08:31:16 +1000
+Message-Id: <20190104223116.14037-11-richard.henderson@linaro.org>
 In-Reply-To: <20190104223116.14037-1-richard.henderson@linaro.org>
 References: <20190104223116.14037-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 09/10] tcg/aarch64: Implement vector
- saturating arithmetic
+Subject: [Qemu-devel] [PATCH v2 10/10] tcg/aarch64: Implement vector minmax
+ arithmetic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,71 +41,73 @@ Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
  2 files changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index 545a6eec75..a1884543d0 100644
+index a1884543d0..2d93cf404e 100644
 --- a/tcg/aarch64/tcg-target.h
 +++ b/tcg/aarch64/tcg-target.h
-@@ -135,7 +135,7 @@ typedef enum {
- #define TCG_TARGET_HAS_shv_vec          0
+@@ -136,7 +136,7 @@ typedef enum {
  #define TCG_TARGET_HAS_cmp_vec          1
  #define TCG_TARGET_HAS_mul_vec          1
--#define TCG_TARGET_HAS_sat_vec          0
-+#define TCG_TARGET_HAS_sat_vec          1
- #define TCG_TARGET_HAS_minmax_vec       0
+ #define TCG_TARGET_HAS_sat_vec          1
+-#define TCG_TARGET_HAS_minmax_vec       0
++#define TCG_TARGET_HAS_minmax_vec       1
  
  #define TCG_TARGET_DEFAULT_MO (0)
+ #define TCG_TARGET_HAS_MEMORY_BSWAP     1
 diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index 0562e0aa40..b2b011f130 100644
+index b2b011f130..ee0d5819af 100644
 --- a/tcg/aarch64/tcg-target.inc.c
 +++ b/tcg/aarch64/tcg-target.inc.c
-@@ -528,6 +528,10 @@ typedef enum {
+@@ -528,8 +528,12 @@ typedef enum {
      I3616_CMHI      = 0x2e203400,
      I3616_CMHS      = 0x2e203c00,
      I3616_CMEQ      = 0x2e208c00,
-+    I3616_SQADD     = 0x0e200c00,
-+    I3616_SQSUB     = 0x0e202c00,
-+    I3616_UQADD     = 0x2e200c00,
-+    I3616_UQSUB     = 0x2e202c00,
++    I3616_SMAX      = 0x0e206400,
++    I3616_SMIN      = 0x0e206c00,
+     I3616_SQADD     = 0x0e200c00,
+     I3616_SQSUB     = 0x0e202c00,
++    I3616_UMAX      = 0x2e206400,
++    I3616_UMIN      = 0x2e206c00,
+     I3616_UQADD     = 0x2e200c00,
+     I3616_UQSUB     = 0x2e202c00,
  
-     /* AdvSIMD two-reg misc.  */
-     I3617_CMGT0     = 0x0e208800,
-@@ -2137,6 +2141,18 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_orc_vec:
-         tcg_out_insn(s, 3616, ORN, is_q, 0, a0, a1, a2);
+@@ -2153,6 +2157,18 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+     case INDEX_op_ussub_vec:
+         tcg_out_insn(s, 3616, UQSUB, is_q, vece, a0, a1, a2);
          break;
-+    case INDEX_op_ssadd_vec:
-+        tcg_out_insn(s, 3616, SQADD, is_q, vece, a0, a1, a2);
++    case INDEX_op_smax_vec:
++        tcg_out_insn(s, 3616, SMAX, is_q, vece, a0, a1, a2);
 +        break;
-+    case INDEX_op_sssub_vec:
-+        tcg_out_insn(s, 3616, SQSUB, is_q, vece, a0, a1, a2);
++    case INDEX_op_smin_vec:
++        tcg_out_insn(s, 3616, SMIN, is_q, vece, a0, a1, a2);
 +        break;
-+    case INDEX_op_usadd_vec:
-+        tcg_out_insn(s, 3616, UQADD, is_q, vece, a0, a1, a2);
++    case INDEX_op_umax_vec:
++        tcg_out_insn(s, 3616, UMAX, is_q, vece, a0, a1, a2);
 +        break;
-+    case INDEX_op_ussub_vec:
-+        tcg_out_insn(s, 3616, UQSUB, is_q, vece, a0, a1, a2);
++    case INDEX_op_umin_vec:
++        tcg_out_insn(s, 3616, UMIN, is_q, vece, a0, a1, a2);
 +        break;
      case INDEX_op_not_vec:
          tcg_out_insn(s, 3617, NOT, is_q, 0, a0, a1);
          break;
-@@ -2207,6 +2223,10 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
-     case INDEX_op_shli_vec:
-     case INDEX_op_shri_vec:
-     case INDEX_op_sari_vec:
-+    case INDEX_op_ssadd_vec:
-+    case INDEX_op_sssub_vec:
-+    case INDEX_op_usadd_vec:
-+    case INDEX_op_ussub_vec:
+@@ -2227,6 +2243,10 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
+     case INDEX_op_sssub_vec:
+     case INDEX_op_usadd_vec:
+     case INDEX_op_ussub_vec:
++    case INDEX_op_smax_vec:
++    case INDEX_op_smin_vec:
++    case INDEX_op_umax_vec:
++    case INDEX_op_umin_vec:
          return 1;
      case INDEX_op_mul_vec:
          return vece < MO_64;
-@@ -2386,6 +2406,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_xor_vec:
-     case INDEX_op_andc_vec:
-     case INDEX_op_orc_vec:
-+    case INDEX_op_ssadd_vec:
-+    case INDEX_op_sssub_vec:
-+    case INDEX_op_usadd_vec:
-+    case INDEX_op_ussub_vec:
+@@ -2410,6 +2430,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_sssub_vec:
+     case INDEX_op_usadd_vec:
+     case INDEX_op_ussub_vec:
++    case INDEX_op_smax_vec:
++    case INDEX_op_smin_vec:
++    case INDEX_op_umax_vec:
++    case INDEX_op_umin_vec:
          return &w_w_w;
      case INDEX_op_not_vec:
      case INDEX_op_neg_vec:
