@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:36772)
+Received: from eggs.gnu.org ([208.118.235.92]:43932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gfRaV-0004pI-1p
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:40:43 -0500
+	(envelope-from <bounces@canonical.com>) id 1gfRym-0004GH-20
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:05:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gfRaQ-0003yd-5M
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:40:43 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37167)
+	(envelope-from <bounces@canonical.com>) id 1gfRyh-0001xO-QT
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:05:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54186)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gfRaP-0003yQ-VM
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:40:38 -0500
-Received: by mail-wm1-x343.google.com with SMTP id g67so1583067wmd.2
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 07:40:37 -0800 (PST)
-Date: Fri, 4 Jan 2019 15:40:34 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190104154034.GK30381@stefanha-x1.localdomain>
-References: <20181214105642.673-1-cfergeau@redhat.com>
-	<20190103105425.GF7733@stefanha-x1.localdomain>
-	<20190103141455.GP20900@natto.ory.fergeau.eu>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gfRyh-0001vO-KF
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:05:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gfRyg-0004ew-BC
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 16:05:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5384A2E8058
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 16:05:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="uuKVzAmB+c+zQlhu"
-Content-Disposition: inline
-In-Reply-To: <20190103141455.GP20900@natto.ory.fergeau.eu>
-Subject: Re: [Qemu-devel] [PATCH v4] log: Make glib logging go through QEMU
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 Jan 2019 15:57:24 -0000
+From: Stefan Ring <1701835@bugs.launchpad.net>
+Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
+Message-Id: <154661744431.4791.17510197536854869432.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
+ qemu-alpha
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +37,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Fergeau <cfergeau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+This is likely expected/correct behavior. You should try building with
+-mieee.
 
---uuKVzAmB+c+zQlhu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-On Thu, Jan 03, 2019 at 03:14:55PM +0100, Christophe Fergeau wrote:
-> Hey,
->=20
-> On Thu, Jan 03, 2019 at 10:54:25AM +0000, Stefan Hajnoczi wrote:
-> > On Fri, Dec 14, 2018 at 11:56:42AM +0100, Christophe Fergeau wrote:
-> > > +static void qemu_log_func(const gchar *log_domain,
-> > > +                          GLogLevelFlags log_level,
-> > > +                          const gchar *message,
-> > > +                          gpointer user_data)
-> > > +{
-> > > +    switch (log_level & G_LOG_LEVEL_MASK) {
-> > > +    case G_LOG_LEVEL_DEBUG:
-> > > +        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disable=
- debug
-> > > +         * messages
-> > > +         */
-> > > +        if (qemu_glog_domains =3D=3D NULL) {
-> > > +            break;
-> > > +        }
-> > > +        if (strcmp(qemu_glog_domains, "all") !=3D 0 &&
-> > > +          (log_domain =3D=3D NULL || !strstr(qemu_glog_domains, log_=
-domain))) {
-> > > +            break;
-> > > +        }
-> > > +        /* Fall through */
-> > > +    case G_LOG_LEVEL_INFO:
-> > > +        /* Fall through */
-> > > +    case G_LOG_LEVEL_MESSAGE:
-> > > +        info_report("%s: %s", log_domain, message);
-> >=20
-> > QEMU itself uses glib, so what happens if *_report() emit more log
-> > messages?  Can this result in an infinite loop?
->=20
-> If *_report try to output messages through the g_log API, glib will
-> catch it and will abort, so not an infinite loop, but not a
-> desirable outcome either.
->=20
-> Some low-level logging functions which are going to dump the message
-> without glib (or using g_log_default_handler()) are needed.
-> The timestamping/prepending of 'error:', 'warning:' to the error message
-> is done right below *_report (in vreport) so this looked like a good
-> place for that.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701835
 
-If you're confident that QEMU will never (indirectly) emit a glib log
-message from the *_report() code path, then I'm happy.
+Title:
+  floating-point operation bugs in qemu-alpha
 
-Stefan
+Status in QEMU:
+  New
 
---uuKVzAmB+c+zQlhu
-Content-Type: application/pgp-signature; name="signature.asc"
+Bug description:
+  When running the gnulib testsuite, I'm seeing test failures in the tests =
+for libm functions
+    cbrt
+    cbrtf
+    ceil
+    ceilf
+    coshf
+    exp2
+    exp2f
+    floor
+    floorf
+    fma
+    fmaf
+    fmal
+    frexp
+    frexpf
+    hypot
+    hypotf
+    hypotl
+    ilogb
+    ilogbf
+    isfinite
+    isinf
+    isnan
+    isnand
+    isnanf
+    ldexp
+    ldexpf
+    ldexpl
+    log1p
+    log1pf
+    log2
+    log2f
+    logb
+    logbf
+    logbl
+    rint
+    rintf
+    rintl
+    signbit
+    sqrt
+    sqrtf
+    strtod
+  that I don't see when running the same (statically linked) executables in=
+ a VM, through qemu-system-alpha.
 
------BEGIN PGP SIGNATURE-----
+  How to reproduce:
+  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
+h --single-configure cbrt cbrtf ceil ceilf coshf exp2 exp2f float floor flo=
+orf fma fmaf fmal frexp frexpf hypot hypotf hypotl ilogb ilogbf isfinite is=
+inf isnan isnand isnanf ldexp ldexpf ldexpl log1p log1pf log2 log2f logb lo=
+gbf logbl math printf-frexp rint rintf rintl round roundf signbit sqrt sqrt=
+f strtod trunc truncf
+  - Copy the resulting directory to a VM running Linux 2.6.26 with qemu-sys=
+tem-alpha.
+  - There, configure and build the package:
+    mkdir build-native-static; cd build-native-static; ../configure CPPFLAG=
+S=3D"-Wall" LDFLAGS=3D"-static"; make; make check
+    Only 4 tests fail.
+  - Copy the resulting binaries back to the original x86_64 machine.
+  - Set environment variables for using qemu-alpha.
+  - Here, 50 tests fail that did not fail originally:
 
-iQEcBAEBAgAGBQJcL35yAAoJEJykq7OBq3PIstwIAKzJVWbAJkVOuPAYwQR7inQc
-a7Cl3ny+MFP91EUgKPDz1W5qHq76qu0vkMapAnIDo8mHUctwAfy21q7WYY/hdHEI
-PNBMoq9U1BYzqSEn3uC+Xe4W5KBxNtWQWPqulxtWLmgTjWIlsHWVsKV2Wh8cQEsy
-jYtgo3ft5qE7Fyvrf25FlsByiWBzgnWu1K7qB4Ccr1DEMjFjbTVEfAmBv/KchCXe
-ziNAOsHE6dBPes4wz+CLMzhWqHKR4H1rpHh3YydgqLl0jEl1TiDkVmXta2qjfWux
-7bhh/CPjMGtiwExFXbP5sL0aLE2X2ujQt2Gk05jI0O/SOOzkbiKgsbU2G3hIIPI=
-=iMAC
------END PGP SIGNATURE-----
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-cbrt
+  ../../gltests/test-cbrt.h:39: assertion 'err > - L_(4.0) * L_(16.0) / TWO=
+_MANT_DIG && err < L_(4.0) * L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-coshf =
 
---uuKVzAmB+c+zQlhu--
+  ../../gltests/test-coshf.c:37: assertion 'y >=3D 1.1854652f && y <=3D 1.1=
+854653f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-float
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma1   =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmal2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypot =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotl
+  ../../gltests/test-hypot.h:41: assertion 'z =3D=3D HUGEVAL' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isfinite
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isinf   =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnan
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexp =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpl
+  ../../gltests/test-ldexp.h:99: assertion 'y =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1p =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1pf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2  =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2f
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-math =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-printf-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rint        =
+
+  ../../gltests/test-rint.c:63: assertion 'rint (0.7) =3D=3D 1.0' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintf
+  ../../gltests/test-rintf.c:63: assertion 'rintf (0.7f) =3D=3D 1.0f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintl
+  ../../gltests/test-rintl.c:68: assertion 'rintl (0.7L) =3D=3D 1.0L' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-round1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-roundf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-signbit
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-sqrt   =
+
+  ../../gltests/test-sqrt.h:40: assertion 'err > - L_(16.0) / TWO_MANT_DIG =
+&& err < L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-trunc1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-truncf1
+  Floating point exception (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701835/+subscriptions
