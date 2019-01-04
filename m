@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54442)
+Received: from eggs.gnu.org ([208.118.235.92]:57054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfNhJ-0000SJ-9e
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:31:30 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gfNrv-0002vb-Tg
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:42:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfNhH-0004d3-6w
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:31:28 -0500
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:45978)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gfNrs-0007jU-C7
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:42:26 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40852)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfNhF-0004Ym-9L
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:31:26 -0500
-Received: by mail-oi1-x22c.google.com with SMTP id y1so30132687oie.12
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 03:31:23 -0800 (PST)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gfNrq-0007hx-G3
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:42:22 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f188so928776wmf.5
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 03:42:21 -0800 (PST)
 MIME-Version: 1.0
-References: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA9FwFg9zsg3xLhOs9C=XJHjAo+ACd1=g22YtPaax6N0YQ@mail.gmail.com>
-	<42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
-	<CAFEAcA9UqiaiKa_4EWfBHbRS0H=trHfJiArHOJkW6=vKoGvRpQ@mail.gmail.com>
-	<bc564647-0550-df53-7a17-7760489b8c45@redhat.com>
-	<CAFEAcA9tiqHEiCdUXWcD+SvzUzZPG4sTqiTSR57N=qYM49eykw@mail.gmail.com>
-	<d8bb4435-7b69-04e9-2b4a-4cfdd439ecea@redhat.com>
-In-Reply-To: <d8bb4435-7b69-04e9-2b4a-4cfdd439ecea@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 11:31:11 +0000
-Message-ID: <CAFEAcA9QKYc89Fknmz-MGSGv11eSTuvNYjsf+-sqsAGT=ZYQ3g@mail.gmail.com>
+References: <20181221090410.27250-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20181221090410.27250-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 4 Jan 2019 15:42:08 +0400
+Message-ID: <CAJ+F1CKwA3hL4xA5De8VEqaOXqgN5LNouxj727q4WVaTUUt3Gg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-21
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 00/28] Generalize machine compatibility
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +30,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: QEMU <qemu-devel@nongnu.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Fri, 4 Jan 2019 at 11:01, Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hi
+
+On Fri, Dec 21, 2018 at 1:04 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
 >
-> On 04/01/19 11:06, Peter Maydell wrote:
-> > On Fri, 4 Jan 2019 at 07:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 03/01/19 19:37, Peter Maydell wrote:
-> >>> On Sat, 22 Dec 2018 at 08:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>> Interestingly, I have today run into "make: write error: stdout"
-> >>> with the existing make check infrastructure. [...]
-> >>> I presume that something in one of the tests we're running,
-> >>> likely QEMU itself, ends up setting stdout to non-blocking.
-> >>> This while rune *used* to be entirely reliable, so maybe
-> >>> something recent has changed ?
-> >>
-> >> I don't know... I tried running make check under "strace -e fcntl" and I
-> >> didn't find any occurrences of fcntl(1, O_SETFL, ...|O_NONBLOCK).
-> >> Perhaps you can add a check after every invocation of a test executable.
-> >
-> >> Are you going to apply the pull request since the bug is preexisting?
-> >
-> > The pull request takes the problem from "occasionally shows up
-> > in by-hand running of make check in a while loop" to "reliably
-> > causes my automated tests to fail every time". I can't apply
-> > a pullreq that does that, so we need to find at least a workaround.
+> Hi,
 >
-> The certain workaround is to clear O_NONBLOCK before invoking make,
-> possibly by placing a wrapper in ~/bin:
+> During "[PATCH v2 05/10] qom/globals: generalize
+> object_property_set_globals()" review, Eduardo suggested to rework the
+> GlobalProperty handling, so that -global is limited to QDev only and
+> we avoid mixing the machine compats and the user-provided -global
+> properties (instead of generalizing -global to various object kinds,
+> like I proposed in v2).
 >
->     import os
->     from fcntl import *
->     fcntl(1, F_SETFL, fcntl(1, F_GETFL) & ~os.O_NONBLOCK)
+> "qdev: do not mix compat props with global props" patch decouples a
+> bit user-provided -global from machine compat properties. This allows
+> to get rid of "user_provided" and "errp" fields in following patches.
+>
+> A new compat property "x-use-canonical-path-for-ramblock-id" is added
+> to hostmem for legacy canonical path names, set to true for -file and
+> -memfd with qemu < 4.0.
+>
+> (this series was initially titled "[PATCH v2 00/10] hostmem: use
+> object "id" for memory region name with >=3D 3.1", but its focus is more
+> in refactoring the global and compatilibity properties handling now)
+>
 
-I'll give this a go, but I think this will not necessarily be
-sufficient if some program invoked by make sets the O_NONBLOCK flag,
-and then make later in the same run tries to output and gets EINTR.
-Perhaps it would be better to put it in the test harness that
-invokes test binaries, so as to clear the flag as soon
-as possible? It could also then in theory print a warning
-if a test case had put stdin/stdout into non-blocking mode.
+Beside the rebase conflicts, and added comment in patch 25, all
+patches have been reviewed-by. I have pushed the rebased version on
+github: https://github.com/elmarco/qemu/tree/props
 
-(The semantics of O_NONBLOCK here seem to me to be completely
-broken. But they are what they are...)
+Eduardo, Igor, who is making the pullreq? I could also send it, if you are =
+okay.
 
-thanks
--- PMM
+Thanks
+
+> v7:
+> - rebased (s390 conflicts)
+> - rename self/backend in last patch
+> - add some r-b tags
+>
+> v6:
+> - split "hw: apply machine compat properties without touching globals"
+> - replace PC_COMPAT_* and HW_COMPAT_* defines with static arrays
+> - add ARMCPUInfo *info in ARMCPUClass for "arm: replace
+>   instance_post_init()" patch
+> - rebased, commit message updates, add some r-b tags
+>
+> v5:
+> - replace the SET_COMPAT macros, use normal function instead
+>   (suggested by Eduardo)
+> - replace the TYPE_COMPAT_PROPS interface approach for explicit
+>   object_apply_compat_props(), solving post-init ordering issues.
+> - get back to coupling compat properties with machine, in qdev
+>   (although there is still some discussion how to improve this, it
+>    can be changed later)
+> - mark the "arm: replace instance_post_init()" as RFC, since it is not
+>   longer required for this series
+> - change machines version from 3.2 to 4.0
+> - add some r-b tags
+>
+> v4:
+> - fix accel/machine compat props apply order inversion
+> - split "qdev: do not mix compat props with global props": replace
+>   using current_machine by new compat_props global, introduce
+>   SET_COMPAT() macro, use GPtrArray.
+> - add a comment about "qdev-props: call object_apply_global_props()"
+>   error reporting
+> - add "arm: replace instance_post_init()", to solve the post-init
+>   ordering issue
+> - add "hw/arm/virt: add virt-3.2 machine type" for completeness
+> - commit message improvements
+> - rebased, add r-b tags
+>
+> v3:
+> - GlobalProperties improvements/cleanups
+> - drop generalizing the -global idea
+> - "replace" the set_globals flag with a TYPE_COMPAT_PROPS interface
+> - update hw/i386 machine version to 3.2
+> - add "qom: make interface types abstract" interface cleanup
+>
+> v2:
+> - replace "qom/user-creatable: add a few helper macros" patch for a
+>   more optimized "qom: make user_creatable_complete() specific to
+>   UserCreatable"
+> - rename register_global_list() to register_global_properties()
+> - call object_property_set_globals() after post-init
+> - add and use a ObjectClass.set_globals flag, instead of dynamically
+>   check object class in object_property_set_globals()
+> - use object "id" in >=3D 3.1 instead of canonical path, add compat
+>   property "x-use-canonical-path-for-ramblock-id" in base hostmem
+>   class.
+>
+> Marc-Andr=C3=A9 Lureau (28):
+>   hw: apply accel compat properties without touching globals
+>   machines: replace COMPAT define with a static array
+>   hw: apply machine compat properties without touching globals
+>   machine: move compat properties out of globals
+>   hw: remove SET_MACHINE_COMPAT
+>   compat: replace PC_COMPAT_3_1 & HW_COMPAT_3_1 macros
+>   compat: replace PC_COMPAT_3_0 & HW_COMPAT_3_0 macros
+>   compat: replace PC_COMPAT_2_12 & HW_COMPAT_2_12 macros
+>   compat: replace PC_COMPAT_2_11 & HW_COMPAT_2_11 macros
+>   compat: replace PC_COMPAT_2_10 & HW_COMPAT_2_10 macros
+>   compat: replace PC_COMPAT_2_9 & HW_COMPAT_2_9 macros
+>   compat: replace PC_COMPAT_2_8 & HW_COMPAT_2_8 macros
+>   compat: replace PC_COMPAT_2_7 & HW_COMPAT_2_7 macros
+>   compat: replace PC_COMPAT_2_6 & HW_COMPAT_2_6 macros
+>   compat: replace PC_COMPAT_2_5 & HW_COMPAT_2_5 macros
+>   compat: replace PC_COMPAT_2_4 & HW_COMPAT_2_4 macros
+>   compat: replace PC_COMPAT_2_3 & HW_COMPAT_2_3 macros
+>   compat: replace PC_COMPAT_2_2 & HW_COMPAT_2_2 macros
+>   compat: replace PC_COMPAT_2_1 & HW_COMPAT_2_1 macros
+>   include: remove compat.h
+>   compat: remove remaining PC_COMPAT macros
+>   qdev: make a separate helper function to apply compat properties
+>   qdev: all globals are now user-provided
+>   qdev-props: convert global_props to GPtrArray
+>   qdev-props: remove errp from GlobalProperty
+>   qdev-props: call object_apply_global_props()
+>   arm: replace instance_post_init()
+>   hostmem: use object id for memory region name with >=3D 4.0
+>
+>  include/hw/boards.h            |  59 ++-
+>  include/hw/compat.h            | 291 --------------
+>  include/hw/i386/pc.h           | 684 +++------------------------------
+>  include/hw/qdev-core.h         |  21 +-
+>  include/qom/object.h           |   3 +
+>  include/sysemu/accel.h         |   4 +-
+>  include/sysemu/hostmem.h       |   3 +-
+>  target/arm/cpu-qom.h           |   3 +
+>  target/arm/cpu.h               |   2 +
+>  accel/accel.c                  |  12 -
+>  backends/hostmem-file.c        |   8 +-
+>  backends/hostmem-memfd.c       |   2 +-
+>  backends/hostmem-ram.c         |   9 +-
+>  backends/hostmem.c             |  36 ++
+>  hw/arm/virt.c                  |  46 +--
+>  hw/core/machine.c              | 339 +++++++++++++++-
+>  hw/core/qdev-properties.c      |  49 +--
+>  hw/core/qdev.c                 |  15 +
+>  hw/i386/pc.c                   | 668 ++++++++++++++++++++++++++++++++
+>  hw/i386/pc_piix.c              | 603 +++++++++++++++--------------
+>  hw/i386/pc_q35.c               |  36 +-
+>  hw/ppc/spapr.c                 | 207 +++++-----
+>  hw/s390x/s390-virtio-ccw.c     | 196 +++++-----
+>  hw/xen/xen-common.c            |  41 +-
+>  qom/cpu.c                      |   1 -
+>  qom/object.c                   |  35 ++
+>  target/arm/cpu.c               |  30 +-
+>  target/arm/cpu64.c             |  24 +-
+>  target/i386/cpu.c              |   1 -
+>  target/sparc/cpu.c             |   1 -
+>  tests/test-qdev-global-props.c |  57 +--
+>  vl.c                           |   4 -
+>  32 files changed, 1818 insertions(+), 1672 deletions(-)
+>  delete mode 100644 include/hw/compat.h
+>
+> --
+> 2.20.1.2.gb21ebb671b
+>
+>
+
+
+--
+Marc-Andr=C3=A9 Lureau
