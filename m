@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:35260)
+Received: from eggs.gnu.org ([208.118.235.92]:36382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfRXA-0001ag-EU
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:37:17 -0500
+	(envelope-from <thuth@redhat.com>) id 1gfRYW-00033t-QI
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:38:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfRX7-0000iG-Eu
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:37:14 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41489)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfRX6-0000aV-Ey
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:37:12 -0500
-Received: by mail-oi1-x241.google.com with SMTP id j21so30636591oii.8
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 07:37:11 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gfRYT-0002o2-If
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:38:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56334)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gfRYT-0002nb-9S
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:38:37 -0500
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+	<20181227063419.12981-21-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b29d2a27-f558-1d15-761b-2cc2f256cd5c@redhat.com>
+Date: Fri, 4 Jan 2019 16:38:34 +0100
 MIME-Version: 1.0
-References: <20181207155911.12710-1-peter.maydell@linaro.org>
-In-Reply-To: <20181207155911.12710-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 15:36:59 +0000
-Message-ID: <CAFEAcA9mUWKVuQ-Oi9uNoc4dtMrh6ORy3A9_Ee-0iM-=Yr7X+Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] cpus.c: Fix race condition in
- cpu_stop_current()
+In-Reply-To: <20181227063419.12981-21-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 20/25] hyperv: express dependencies
+ with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jaap Crezee <jaap@jcz.nl>, "patches@linaro.org" <patches@linaro.org>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org
 
-On Fri, 7 Dec 2018 at 16:00, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> We use cpu_stop_current() to ensure the current CPU has stopped
-> from places like qemu_system_reset_request(). Unfortunately its
-> current implementation has a race. It calls qemu_cpu_stop(),
-> which sets cpu->stopped to true even though the CPU hasn't
-> actually stopped yet. The main thread will look at the flags
-> set by qemu_system_reset_request() and call pause_all_vcpus().
-> pause_all_vcpus() waits for every cpu to have cpu->stopped true,
-> so it can continue (and we will start the system reset operation)
-> before the vcpu thread has got back to its top level loop.
->
-> Instead, just set cpu->stop and call cpu_exit(). This will
-> cause the vcpu to exit back to the top level loop, and there
-> (as part of the wait_io_event code) it will call qemu_cpu_stop().
->
-> This fixes bugs where the reset request appeared to be ignored
-> or the CPU misbehaved because the reset operation started
-> to change vcpu state while the vcpu thread was still using it.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 2018-12-27 07:34, Yang Zhong wrote:
+> remove default-configs/hyperv.mak and make dependencies
+> with Kconfig.
+> 
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  default-configs/hyperv.mak       | 2 --
+>  default-configs/i386-softmmu.mak | 1 -
+>  hw/hyperv/Kconfig                | 1 +
+>  hw/i386/Kconfig                  | 2 ++
+>  4 files changed, 3 insertions(+), 3 deletions(-)
+>  delete mode 100644 default-configs/hyperv.mak
+> 
+> diff --git a/default-configs/hyperv.mak b/default-configs/hyperv.mak
+> deleted file mode 100644
+> index 5d0d9fd830..0000000000
+> --- a/default-configs/hyperv.mak
+> +++ /dev/null
+> @@ -1,2 +0,0 @@
+> -CONFIG_HYPERV=$(CONFIG_KVM)
+> -CONFIG_HYPERV_TESTDEV=y
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> index d2e58edd17..eb2d22de3c 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -1,6 +1,5 @@
+>  # Default configuration for i386-softmmu
+>  
+> -include hyperv.mak
+>  CONFIG_VMXNET3_PCI=y
+>  CONFIG_VIRTIO_VGA=y
+>  CONFIG_IPMI=y
+> diff --git a/hw/hyperv/Kconfig b/hw/hyperv/Kconfig
+> index be724b7f8b..632c3a675b 100644
+> --- a/hw/hyperv/Kconfig
+> +++ b/hw/hyperv/Kconfig
+> @@ -1,5 +1,6 @@
+>  config HYPERV
+>      bool
+> +    depends on KVM
+>  
+>  config HYPERV_TESTDEV
+>      bool
 
-I'm going to put this in via target-arm.next, unless anybody
-would like to suggest another route.
+Should HYPERV_TESTDEV maybe get a "depends on HYPERV", too?
 
-thanks
--- PMM
+> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+> index 695a67f88d..af4b81bae1 100644
+> --- a/hw/i386/Kconfig
+> +++ b/hw/i386/Kconfig
+> @@ -11,6 +11,8 @@ config PC
+>      select I8257
+>      select MC146818RTC
+>      select TPM_TIS if TPM
+> +    select HYPERV
+> +    select HYPERV_TESTDEV
+>  
+>  config PC_PCI
+>      bool
+> 
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
