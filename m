@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53796)
+Received: from eggs.gnu.org ([208.118.235.92]:54147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfSI4-0005K3-JP
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:25:45 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfSIq-0005uI-85
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:26:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfSI4-0002Kh-0X
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:25:44 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfSI3-0002KO-SQ
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:25:43 -0500
-Received: by mail-oi1-x244.google.com with SMTP id y23so30763391oia.4
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 08:25:43 -0800 (PST)
+	(envelope-from <philmd@redhat.com>) id 1gfSIn-0002sD-AM
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:26:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38550)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gfSIn-0002kP-2b
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:26:29 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Fri,  4 Jan 2019 17:25:56 +0100
+Message-Id: <20190104162559.20760-2-philmd@redhat.com>
+In-Reply-To: <20190104162559.20760-1-philmd@redhat.com>
+References: <20190104162559.20760-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20181214052410.11863-1-richard.henderson@linaro.org>
-	<20181214052410.11863-2-richard.henderson@linaro.org>
-In-Reply-To: <20181214052410.11863-2-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 16:25:32 +0000
-Message-ID: <CAFEAcA-EO-vB5mFO+G2hqLcyRQ4-cMPHL-1qkLa-xPpmFa8zsQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 01/27] target/arm: Add state for the
- ARMv8.3-PAuth extension
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/4] fw_cfg: Improve error message when can't
+ load splash file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=83=C2=A9?= <philmd@redhat.com>, Li Qiang <liq3ea@gmail.com>
 
-On Fri, 14 Dec 2018 at 05:24, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Add storage space for the 5 encryption keys.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ----
-> v2: Remove pointless double migration.
->     Use a struct to make it clear which half is which.
-> ---
+From: Li Qiang <liq3ea@gmail.com>
 
+read_splashfile() reports "failed to read splash file" without
+further details. Get the details from g_file_get_contents(), and
+include them in the error message. Also remove unnecessary 'res'
+variable.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <1541052148-28752-1-git-send-email-liq3ea@gmail.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/nvram/fw_cfg.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-thanks
--- PMM
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 3cb726ff68..9c4409be5e 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -68,15 +68,14 @@ static char *read_splashfile(char *filename, gsize *f=
+ile_sizep,
+                              int *file_typep)
+ {
+     GError *err =3D NULL;
+-    gboolean res;
+     gchar *content;
+     int file_type;
+     unsigned int filehead;
+     int bmp_bpp;
+=20
+-    res =3D g_file_get_contents(filename, &content, file_sizep, &err);
+-    if (res =3D=3D FALSE) {
+-        error_report("failed to read splash file '%s'", filename);
++    if (!g_file_get_contents(filename, &content, file_sizep, &err)) {
++        error_report("failed to read splash file '%s': %s",
++                     filename, err->message);
+         g_error_free(err);
+         return NULL;
+     }
+--=20
+2.17.2
