@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([208.118.235.92]:58179)
+Received: from eggs.gnu.org ([208.118.235.92]:59986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gfRQJ-0005AH-VA
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:30:13 -0500
+	(envelope-from <thuth@redhat.com>) id 1gfRSf-0006Ql-Id
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:32:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gfRQG-00027H-Si
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:30:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51860)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gfRQG-00026n-Kg
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:30:08 -0500
-References: <20181227063419.12981-1-yang.zhong@intel.com>
-	<20181227063419.12981-18-yang.zhong@intel.com>
+	(envelope-from <thuth@redhat.com>) id 1gfRSc-0004MZ-FA
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:32:37 -0500
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ac00d820-95b3-5e36-f971-0f0d5f305209@redhat.com>
-Date: Fri, 4 Jan 2019 16:30:01 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181227063419.12981-18-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 17/25] i2c: express dependencies with
- Kconfig
+Date: Fri,  4 Jan 2019 16:32:23 +0100
+Message-Id: <1546615943-16274-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] trivial: Don't include isa.h if it is not
+ really necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +18,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On 2018-12-27 07:34, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
-[...]
-> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-> index 8ce968bfff..8ddce09ead 100644
-> --- a/hw/display/Kconfig
-> +++ b/hw/display/Kconfig
-> @@ -24,9 +24,11 @@ config PL110
-> =20
->  config SII9022
->      bool
-> +    depends on I2C
-> =20
->  config SSD0303
->      bool
-> +    depends on I2C
-> =20
->  config SSD0323
->      bool
-> @@ -70,6 +72,7 @@ config MILKYMIST_TMU2
-> =20
->  config SM501
->      bool
-> +    depends on I2C
-> =20
->  config TCX
->      bool
+These files don't seem to do anything related to ISA directly, so
+there is no need to include isa.h here.
 
-I think XLNX_ZYNQMP_ARM likely needs "depends on I2C" nowadays, too ?
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/display/ramfb-standalone.c | 1 -
+ hw/ide/pci.c                  | 1 -
+ hw/ide/piix.c                 | 1 -
+ hw/ide/via.c                  | 1 -
+ hw/misc/macio/mac_dbdma.c     | 1 -
+ hw/moxie/moxiesim.c           | 1 -
+ hw/nvram/fw_cfg.c             | 1 -
+ hw/sparc/sun4m.c              | 1 -
+ hw/timer/i8254.c              | 1 -
+ 9 files changed, 9 deletions(-)
 
- Thomas
+diff --git a/hw/display/ramfb-standalone.c b/hw/display/ramfb-standalone.c
+index c0d241b..da3229a 100644
+--- a/hw/display/ramfb-standalone.c
++++ b/hw/display/ramfb-standalone.c
+@@ -1,7 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/loader.h"
+-#include "hw/isa/isa.h"
+ #include "hw/display/ramfb.h"
+ #include "ui/console.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/ide/pci.c b/hw/ide/pci.c
+index fe1ceeb..b75154f 100644
+--- a/hw/ide/pci.c
++++ b/hw/ide/pci.c
+@@ -25,7 +25,6 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+-#include "hw/isa/isa.h"
+ #include "sysemu/dma.h"
+ #include "qemu/error-report.h"
+ #include "hw/ide/pci.h"
+diff --git a/hw/ide/piix.c b/hw/ide/piix.c
+index a3afe1f..885c16e 100644
+--- a/hw/ide/piix.c
++++ b/hw/ide/piix.c
+@@ -26,7 +26,6 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+-#include "hw/isa/isa.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/blockdev.h"
+diff --git a/hw/ide/via.c b/hw/ide/via.c
+index 238f038..987d99c 100644
+--- a/hw/ide/via.c
++++ b/hw/ide/via.c
+@@ -26,7 +26,6 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+-#include "hw/isa/isa.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/dma.h"
+ 
+diff --git a/hw/misc/macio/mac_dbdma.c b/hw/misc/macio/mac_dbdma.c
+index 87ae246..e5917d8 100644
+--- a/hw/misc/macio/mac_dbdma.c
++++ b/hw/misc/macio/mac_dbdma.c
+@@ -38,7 +38,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "hw/isa/isa.h"
+ #include "hw/ppc/mac_dbdma.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/log.h"
+diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+index 4b0ce09..c6b6f72 100644
+--- a/hw/moxie/moxiesim.c
++++ b/hw/moxie/moxiesim.c
+@@ -31,7 +31,6 @@
+ #include "cpu.h"
+ #include "hw/sysbus.h"
+ #include "hw/hw.h"
+-#include "hw/isa/isa.h"
+ #include "net/net.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/boards.h"
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 3cb726f..62e9464 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -27,7 +27,6 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/dma.h"
+ #include "hw/boards.h"
+-#include "hw/isa/isa.h"
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/sysbus.h"
+ #include "trace.h"
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 639906c..709ee37 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -37,7 +37,6 @@
+ #include "net/net.h"
+ #include "hw/boards.h"
+ #include "hw/scsi/esp.h"
+-#include "hw/isa/isa.h"
+ #include "hw/nvram/sun_nvram.h"
+ #include "hw/nvram/chrp_nvram.h"
+ #include "hw/nvram/fw_cfg.h"
+diff --git a/hw/timer/i8254.c b/hw/timer/i8254.c
+index 1057850..20f834e 100644
+--- a/hw/timer/i8254.c
++++ b/hw/timer/i8254.c
+@@ -23,7 +23,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "hw/isa/isa.h"
+ #include "qemu/timer.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/timer/i8254_internal.h"
+-- 
+1.8.3.1
