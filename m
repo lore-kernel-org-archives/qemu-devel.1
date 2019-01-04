@@ -1,23 +1,22 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:43863 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:44423 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfZBv-00038G-VC
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:47:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1gfZEc-0005AL-21
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:50:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfZBv-0005qG-6E
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:47:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1gfZEb-00071K-8f
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:50:38 -0500
 References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-5-eblake@redhat.com>
-	<20181215141305.GT27120@redhat.com>
-	<09763ed2-ec13-c159-879a-0f081a229280@redhat.com>
+	<20181215135324.152629-8-eblake@redhat.com>
+	<b91e2cff-2d5c-f5dd-e8cc-7a8944c93de4@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <f23060ca-7656-4b6c-3936-9bb0b2a0c3b0@redhat.com>
-Date: Fri, 4 Jan 2019 17:47:41 -0600
+Message-ID: <048303ff-cdc2-d0b6-a990-1453df29626b@redhat.com>
+Date: Fri, 4 Jan 2019 17:50:27 -0600
 MIME-Version: 1.0
-In-Reply-To: <09763ed2-ec13-c159-879a-0f081a229280@redhat.com>
+In-Reply-To: <b91e2cff-2d5c-f5dd-e8cc-7a8944c93de4@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="hAox2pnpJTSdz5Cwx3c5zlN61NiHKWbGz"
-Subject: Re: [Qemu-devel] [PATCH v2 04/22] qemu-nbd: Enhance man page
+	boundary="qT5LB1aZst7GFKgAQv3S1xnDWQemmQPQS"
+Subject: Re: [Qemu-devel] [PATCH v2 07/22] qemu-nbd: Avoid strtol open-coding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: nsoffer@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hAox2pnpJTSdz5Cwx3c5zlN61NiHKWbGz
+--qT5LB1aZst7GFKgAQv3S1xnDWQemmQPQS
 From: Eric Blake <eblake@redhat.com>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: nsoffer@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <f23060ca-7656-4b6c-3936-9bb0b2a0c3b0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 04/22] qemu-nbd: Enhance man page
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com"
+ <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Message-ID: <048303ff-cdc2-d0b6-a990-1453df29626b@redhat.com>
+Subject: Re: [PATCH v2 07/22] qemu-nbd: Avoid strtol open-coding
 References: <20181215135324.152629-1-eblake@redhat.com>
- <20181215135324.152629-5-eblake@redhat.com>
- <20181215141305.GT27120@redhat.com>
- <09763ed2-ec13-c159-879a-0f081a229280@redhat.com>
-In-Reply-To: <09763ed2-ec13-c159-879a-0f081a229280@redhat.com>
+ <20181215135324.152629-8-eblake@redhat.com>
+ <b91e2cff-2d5c-f5dd-e8cc-7a8944c93de4@virtuozzo.com>
+In-Reply-To: <b91e2cff-2d5c-f5dd-e8cc-7a8944c93de4@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 12/17/18 9:19 AM, Eric Blake wrote:
-
+On 12/18/18 9:11 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 15.12.2018 16:53, Eric Blake wrote:
+>> Our copy-and-pasted open-coding of strtol handling forgot to
+>> handle overflow conditions.  Use qemu_strto*() instead.
 >>
->>> +@c man begin EXAMPLES
->>> +Start a server listening on port 10809 that exposes only the
->>> +guest-visible contents of a qcow2 file, with no TLS encryption, and
->>> +with the default export name (an empty string). The command will blo=
-ck
->>> +until the first successful client disconnects:
+>> In the case of --partition, since we insist on a user-supplied
+>> partition to be non-zero, we can use 0 rather than -1 for our
+>> initial value to distinguish when a partition is not being
+>> served, for slightly more optimal code.
 >>
->> TBH I'd always include the -t option in every example.=C2=A0 I don't
->> understand (except for backwards compatibility) why it isn't the
->> default since it's something I always trip over when using qemu-nbd.
+>> The error messages for out-of-bounds values are less specific,
+>> but should not be a terrible loss in quality.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> ---
+>> v2: Retitle, catch more uses of strtol
+>> [Hmm - this depends on int64_t and off_t being compatible; if they
+>> aren't that way on all platforms, I'll need a temporary variable]
 >=20
-> I'd still like one example without -t, to call out specifically that it=
+> hmm, as I understand, even if this compatibility exists, it's not a par=
+t
+> of standard and nothing about off_t size in POSIX..
 
-> creates a one-shot server that goes away after the first client, but
-> don't mind fixing the rest of the examples to use -t.
+off_t allows you to run on older systems with 32-bit offsets and newer
+systems with 64-bit offsets; but these days, even on 32-bit systems, we
+compile qemu to always ask for 64-bit off_t.  Using off_t instead of
+int64_t is probably a separate cleanup, but one that may be worth making
+prior to this patch, so I'll defer this one to my v3.
+
 >=20
-> Using -e for read-only connections makes sense, using -e for writable
-> exports is a bit more questionable - we _don't_ advertise the
-> NBD_FLAG_CAN_MULTI_CONN which states that caches are kept consistent
-> between simultaneous write connections, although maybe we should see if=
-
-> qemu-nbd can start promising multi-write consistency in future patches?=
-
-
-And I see you've just posted patches for nbdkit to start advertising
-CAN_MULTI_CONN - so I really need to spend some time figuring out when
-it makes sense for qemu to advertise the flag.
+> Moreover: what is the reason for using off_t in NBD code? We don't have=
+ it
+> in NBD protocol, we don't have it in generic block layer interface. Isn=
+'t it
+> always casted to int64_t or like this?
+>=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -82,21 +89,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---hAox2pnpJTSdz5Cwx3c5zlN61NiHKWbGz
+--qT5LB1aZst7GFKgAQv3S1xnDWQemmQPQS
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwv8J0ACgkQ3g5py3or
-ov07EAf/cYPgpRCmIcD6WYwVDgM/8bHu6nT9Ez6PurntqLePNRnQ4G4iFh6Aop35
-RL2F/XAlXMFMdeu0zqj+4kI9Gnoi9ejpzZUuGv7SnsriXfltMKDFrVbTWfLlZbGT
-H84VOJZNidh2B0+RKlw6LInomQHaZHWiITYv6gcEureta4o6HskfmBmLaFClAJ5w
-coSS5ebj1ztQREg0u0gK+kes5lz9pI0gi0PmGl6aLolWyR+4bxzuqWG1beUujsi6
-wMP8NAyLxGCp7jM5VEvkCSG9ByDrTpaganeEr3SGNhFvGY/KSwN7BvVxnYnJMU7B
-EXj64zTD9FE4UOvXH6vSiN/+2/Zd8w==
-=+0T1
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwv8UMACgkQ3g5py3or
+ov0f0Qf+IlFcb3Vty3fmjYDvANVpx4XEdpedq6FKgV80ah0zCWc9tolqnJoMIADA
+gBIJInsBNeLVNIMgqB9e2N59UTmi/zCih2ty4qUzKB01TREuXww2xsF4ZlIYjqsR
+8cR5S1emNwFZPHVVn9MGpocNiQEhx/GU5poJap7b5dlAFVgH0FMLotAQwloRy4RE
+zjGytqCB+RHigPT/KRxZb06euHc+GyM2/GqTZAqd8MgwHw3XT+KFNDDcbCyIP1Jz
+Wt0t7pNk2elOnPRMWcHqpK2iPzUTaPmOb4Pin1zsicMWhLLYun69w/mWPxnc4egU
+ZOComT9BadtHGbUI0TmovVR772PMLw==
+=Rl8r
 -----END PGP SIGNATURE-----
 
---hAox2pnpJTSdz5Cwx3c5zlN61NiHKWbGz--
+--qT5LB1aZst7GFKgAQv3S1xnDWQemmQPQS--
