@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51975)
+Received: from eggs.gnu.org ([208.118.235.92]:52151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfTlS-0003aY-Nz
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:00:11 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfTm4-0004Of-Gd
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:00:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfTlR-0004d3-Mp
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:00:10 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfTm2-0004xb-Vv
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:00:48 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri,  4 Jan 2019 18:58:36 +0100
-Message-Id: <20190104175847.6290-6-philmd@redhat.com>
+Date: Fri,  4 Jan 2019 18:58:37 +0100
+Message-Id: <20190104175847.6290-7-philmd@redhat.com>
 In-Reply-To: <20190104175847.6290-1-philmd@redhat.com>
 References: <20190104175847.6290-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 05/16] hw/devices: Move Blizzard declarations
- into a new header
+Subject: [Qemu-devel] [PATCH 06/16] hw/devices: Move CBus declarations into
+ a new header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +28,85 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Edgar E. Igles
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- MAINTAINERS                   |  1 +
- hw/arm/nseries.c              |  1 +
- hw/display/blizzard.c         |  2 +-
- include/hw/devices.h          |  7 -------
- include/hw/display/blizzard.h | 21 +++++++++++++++++++++
- 5 files changed, 24 insertions(+), 8 deletions(-)
- create mode 100644 include/hw/display/blizzard.h
+ MAINTAINERS            |  1 +
+ hw/arm/nseries.c       |  1 +
+ hw/misc/cbus.c         |  2 +-
+ include/hw/devices.h   | 14 --------------
+ include/hw/misc/cbus.h | 31 +++++++++++++++++++++++++++++++
+ 5 files changed, 34 insertions(+), 15 deletions(-)
+ create mode 100644 include/hw/misc/cbus.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index dff4b98401..156ce9a698 100644
+index 156ce9a698..63ed6636ef 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -640,6 +640,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
+@@ -641,6 +641,7 @@ L: qemu-arm@nongnu.org
  S: Odd Fixes
  F: hw/arm/nseries.c
-+F: include/hw/display/blizzard.h
+ F: include/hw/display/blizzard.h
++F: include/hw/misc/cbus.h
 =20
  Palm
  M: Andrzej Zaborowski <balrogg@gmail.com>
 diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-index 906b7ca22d..9521be1cef 100644
+index 9521be1cef..ac876b5878 100644
 --- a/hw/arm/nseries.c
 +++ b/hw/arm/nseries.c
-@@ -31,6 +31,7 @@
- #include "hw/boards.h"
+@@ -32,6 +32,7 @@
  #include "hw/i2c/i2c.h"
  #include "hw/devices.h"
-+#include "hw/display/blizzard.h"
+ #include "hw/display/blizzard.h"
++#include "hw/misc/cbus.h"
  #include "hw/block/flash.h"
  #include "hw/hw.h"
  #include "hw/bt.h"
-diff --git a/hw/display/blizzard.c b/hw/display/blizzard.c
-index 291abe6fca..471bd0ed99 100644
---- a/hw/display/blizzard.c
-+++ b/hw/display/blizzard.c
-@@ -21,7 +21,7 @@
+diff --git a/hw/misc/cbus.c b/hw/misc/cbus.c
+index 25e337ea77..16ee704bca 100644
+--- a/hw/misc/cbus.c
++++ b/hw/misc/cbus.c
+@@ -23,7 +23,7 @@
  #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "ui/console.h"
+ #include "hw/hw.h"
+ #include "hw/irq.h"
 -#include "hw/devices.h"
-+#include "hw/display/blizzard.h"
- #include "ui/pixel_ops.h"
++#include "hw/misc/cbus.h"
+ #include "sysemu/sysemu.h"
 =20
- typedef void (*blizzard_fn_t)(uint8_t *, const uint8_t *, unsigned int);
+ //#define DEBUG
 diff --git a/include/hw/devices.h b/include/hw/devices.h
-index 5ad134232c..25f895b330 100644
+index 25f895b330..8b649541b1 100644
 --- a/include/hw/devices.h
 +++ b/include/hw/devices.h
-@@ -28,13 +28,6 @@ void tsc2005_set_transform(void *opaque, MouseTransfor=
+@@ -28,18 +28,4 @@ void tsc2005_set_transform(void *opaque, MouseTransfor=
 mInfo *info);
  /* stellaris_input.c */
  void stellaris_gamepad_init(int n, qemu_irq *irq, const int *keycode);
 =20
--/* blizzard.c */
--void *s1d13745_init(qemu_irq gpio_int);
--void s1d13745_write(void *opaque, int dc, uint16_t value);
--void s1d13745_write_block(void *opaque, int dc,
--                void *buf, size_t len, int pitch);
--uint16_t s1d13745_read(void *opaque, int dc);
+-/* cbus.c */
+-typedef struct {
+-    qemu_irq clk;
+-    qemu_irq dat;
+-    qemu_irq sel;
+-} CBus;
+-CBus *cbus_init(qemu_irq dat_out);
+-void cbus_attach(CBus *bus, void *slave_opaque);
 -
- /* cbus.c */
- typedef struct {
-     qemu_irq clk;
-diff --git a/include/hw/display/blizzard.h b/include/hw/display/blizzard.=
-h
+-void *retu_init(qemu_irq irq, int vilma);
+-void *tahvo_init(qemu_irq irq, int betty);
+-
+-void retu_key_event(void *retu, int state);
+-
+ #endif
+diff --git a/include/hw/misc/cbus.h b/include/hw/misc/cbus.h
 new file mode 100644
-index 0000000000..8132557da1
+index 0000000000..1ce1855ccf
 --- /dev/null
-+++ b/include/hw/display/blizzard.h
-@@ -0,0 +1,21 @@
++++ b/include/hw/misc/cbus.h
+@@ -0,0 +1,31 @@
 +/*
-+ * Epson S1D13744/S1D13745 (Blizzard/Hailstorm/Tornado) LCD/TV controlle=
-r.
++ * CBUS three-pin bus and the Retu / Betty / Tahvo / Vilma / Avilma /
++ * Hinku / Vinku / Ahne / Pihi chips used in various Nokia platforms.
++ * Based on reverse-engineering of a linux driver.
 + *
 + * Copyright (C) 2008 Nokia Corporation
 + * Written by Andrzej Zaborowski <andrew@openedhand.com>
@@ -110,16 +115,24 @@ r.
 ter.
 + * See the COPYING file in the top-level directory.
 + */
-+#ifndef HW_DISPLAY_BLIZZARD_H
-+#define HW_DISPLAY_BLIZZARD_H
++#ifndef HW_MISC_CBUS_H
++#define HW_MISC_CBUS_H
 +
 +#include "hw/irq.h"
 +
-+void *s1d13745_init(qemu_irq gpio_int);
-+void s1d13745_write(void *opaque, int dc, uint16_t value);
-+void s1d13745_write_block(void *opaque, int dc,
-+                          void *buf, size_t len, int pitch);
-+uint16_t s1d13745_read(void *opaque, int dc);
++typedef struct {
++    qemu_irq clk;
++    qemu_irq dat;
++    qemu_irq sel;
++} CBus;
++
++CBus *cbus_init(qemu_irq dat_out);
++void cbus_attach(CBus *bus, void *slave_opaque);
++
++void *retu_init(qemu_irq irq, int vilma);
++void *tahvo_init(qemu_irq irq, int betty);
++
++void retu_key_event(void *retu, int state);
 +
 +#endif
 --=20
