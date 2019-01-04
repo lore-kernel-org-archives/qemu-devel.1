@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46600)
+Received: from eggs.gnu.org ([208.118.235.92]:47858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gfLpI-0006G1-KP
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:31:37 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gfLvC-0008Vr-GK
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:37:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gfLpE-0002W4-Mx
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:31:36 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <3797d82c-a6a6-eb97-be0c-67316ee55e22@redhat.com>
-References: <20190102110804.18155-1-lbloch@janustech.com>
-	<20190102110804.18155-2-lbloch@janustech.com>
-	<w51h8eqdroh.fsf@maestria.local.igalia.com>
-	<9df1a9a8-284b-573b-98aa-fd77edb0cd65@janustech.com>
-	<1ab08459-6635-acc2-0ba2-961c7a0e5704@redhat.com>
-	<472c0a97-283b-ac81-c07d-11843edd2488@janustech.com>
-	<3797d82c-a6a6-eb97-be0c-67316ee55e22@redhat.com>
-Date: Fri, 04 Jan 2019 10:31:11 +0100
-Message-ID: <w51y3806a74.fsf@maestria.local.igalia.com>
+	(envelope-from <cohuck@redhat.com>) id 1gfLv8-00073N-Hy
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:37:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35054)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gfLv8-0006us-CQ
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:37:38 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CC811C07EFE1
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 09:37:13 +0000 (UTC)
+Date: Fri, 4 Jan 2019 10:37:08 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190104103708.4d91b342.cohuck@redhat.com>
+In-Reply-To: <20190103232012-mutt-send-email-mst@kernel.org>
+References: <20190104032226.21428-1-ehabkost@redhat.com>
+	<20190103232012-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/1] include: Auto-generate the sizes
- lookup table
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] compat: Use explicit type names on
+ HW_COMPAT_2_6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +34,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Leonid Bloch <lbloch@janustech.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Ma?= =?utf-8?Q?thieu-Daud=C3=A9?= <philmd@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu 03 Jan 2019 10:42:30 PM CET, Eric Blake wrote:
+On Thu, 3 Jan 2019 23:23:45 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> In my view, code generators make sense when used on code that is
-> expected to change over time (a good example is QAPI because we add
-> new commands every release; other places might be a generator to help
-> deal with syscall handlers since newer kernels can add a syscall; or
-> even the fact that we have used some powerful GNU make textual
-> processing to make it easy to add files to particular subsets of the
-> build with as few lines edited as possible), where the goal is that
-> the generator gives you both a compact representation that is easier
-> to edit, and that the expansion from the generator ensures that
-> repetitive boilerplate is formed without typos.  In short, if a
-> generator results in a net reduction in lines of edited source in
-> relation to the lines it produces, AND if the source that gets
-> regenerated is likely to change, then it makes total sense to spend
-> time on the generator.  But when the amount of effort to write a
-> generator costs as much as just hard-coding the list outright,
-> especially when the list is not going to change (there really aren't
-> any other powers of 2 within 64 bits), I'm not sure a generator adds
-> any value.
+> On Fri, Jan 04, 2019 at 01:22:26AM -0200, Eduardo Habkost wrote:
+> > The virtio-pci entries in HW_COMPAT_2_6 had an implicit
+> > assumption: that all virtio-pci subclasses support the
+> > disable-legacy and disable-modern options.
+> > 
+> > That assumption was broken by commit f6e501a28ef9 ("virtio:
+> > Provide version-specific variants of virtio PCI devices").  This
+> > caused QEMU to crash if using the new -non-transitional or
+> > -transitional device types:
+> > 
+> >   $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
+> >     -device virtio-net-pci-non-transitional
+> >   Unexpected error in object_property_find() at qom/object.c:1092:
+> >   qemu-system-x86_64: -device virtio-net-pci-non-transitional: can't apply \
+> >   global virtio-pci.disable-modern=on: Property '.disable-modern' not found
+> >   Aborted (core dumped)
+> > 
+> > Replace the virtio-pci.disable-legacy=off and
+> > virtio-pci.disable-modern=on entries on HW_COMPAT_2_6 with
+> > explicit entries for each generic virtio device type.
+> > 
+> > The full list of generic virtio device types was extracted by
+> > just grepping for ".generic_name".  Note that we don't need to
+> > worry about listing new virtio-pci devices in HW_COMPAT_2_6 in
+> > the future, because new devices won't require QEMU 2.6
+> > compatibility.  
+> 
+> I fully expect that e.g. packed ring support will need
+> to affect all virtio devices too. And it's likely
+> that we'll have some new virtio-pci transport features too.
 
-I agree with Eric.
+Yes, but as this post-dates the introduction of the version-specific
+devices, it will all go into the base class and therefore not be
+problematic.
 
-Berto
+> 
+> > This makes the compat entries annoyingly verbose, but is simpler
+> > than the alternative of making the virtio-pci type inheritance
+> > rules even more complex.  
+> 
+> God forbid we forgot something, the only way to notice is to
+> run a cross version migration with an old qemu.
+> I think we need to come up with something less verbose and fragile.
+
+I'd rather prefer to do this change now, so that we don't need to drag
+around some complicated infrastructure forever.
+
+As Eduardo said, we don't need to care about new devices, so this
+grep-based approach sounds like it would catch everything.
+
+> 
+> 
+> > Reported-by: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> > ---
+> >  include/hw/compat.h | 140 +++++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 138 insertions(+), 2 deletions(-)
