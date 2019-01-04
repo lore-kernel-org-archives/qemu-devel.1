@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54957)
+Received: from eggs.gnu.org ([208.118.235.92]:56158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gfVUH-0005pJ-Mn
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:50:34 -0500
+	(envelope-from <thuth@redhat.com>) id 1gfVYf-0007oO-TG
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:55:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gfVUC-0003cc-5g
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:50:33 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33657)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gfVUA-0003Xc-QB
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:50:28 -0500
-Received: by mail-wr1-f65.google.com with SMTP id c14so37620406wrr.0
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 11:50:24 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gfVYb-0007N0-76
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:55:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48642)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gfVYa-0007LK-Cv
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:55:00 -0500
 References: <20181227063419.12981-1-yang.zhong@intel.com>
-	<20181227063419.12981-21-yang.zhong@intel.com>
-	<b29d2a27-f558-1d15-761b-2cc2f256cd5c@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a8965a62-df89-c324-33dd-787d4cadda75@redhat.com>
-Date: Fri, 4 Jan 2019 20:50:23 +0100
+	<20181227063419.12981-22-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <71bf251a-461e-8967-8b92-1bbca638f6a9@redhat.com>
+Date: Fri, 4 Jan 2019 20:54:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <b29d2a27-f558-1d15-761b-2cc2f256cd5c@redhat.com>
+In-Reply-To: <20181227063419.12981-22-yang.zhong@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 20/25] hyperv: express dependencies
- with kconfig
+Subject: Re: [Qemu-devel] [RFC PATCH 21/25] virtio: make virtio dependencies
+ with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org
 
-On 04/01/19 16:38, Thomas Huth wrote:
-> On 2018-12-27 07:34, Yang Zhong wrote:
->> remove default-configs/hyperv.mak and make dependencies
->> with Kconfig.
->>
->> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
->> ---
->>  default-configs/hyperv.mak       | 2 --
->>  default-configs/i386-softmmu.mak | 1 -
->>  hw/hyperv/Kconfig                | 1 +
->>  hw/i386/Kconfig                  | 2 ++
->>  4 files changed, 3 insertions(+), 3 deletions(-)
->>  delete mode 100644 default-configs/hyperv.mak
->>
->> diff --git a/default-configs/hyperv.mak b/default-configs/hyperv.mak
->> deleted file mode 100644
->> index 5d0d9fd830..0000000000
->> --- a/default-configs/hyperv.mak
->> +++ /dev/null
->> @@ -1,2 +0,0 @@
->> -CONFIG_HYPERV=$(CONFIG_KVM)
->> -CONFIG_HYPERV_TESTDEV=y
->> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
->> index d2e58edd17..eb2d22de3c 100644
->> --- a/default-configs/i386-softmmu.mak
->> +++ b/default-configs/i386-softmmu.mak
->> @@ -1,6 +1,5 @@
->>  # Default configuration for i386-softmmu
->>  
->> -include hyperv.mak
->>  CONFIG_VMXNET3_PCI=y
->>  CONFIG_VIRTIO_VGA=y
->>  CONFIG_IPMI=y
->> diff --git a/hw/hyperv/Kconfig b/hw/hyperv/Kconfig
->> index be724b7f8b..632c3a675b 100644
->> --- a/hw/hyperv/Kconfig
->> +++ b/hw/hyperv/Kconfig
->> @@ -1,5 +1,6 @@
->>  config HYPERV
->>      bool
->> +    depends on KVM
->>  
->>  config HYPERV_TESTDEV
->>      bool
+On 2018-12-27 07:34, Yang Zhong wrote:
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  default-configs/i386-softmmu.mak |  1 -
+>  hw/9pfs/Kconfig                  |  2 ++
+>  hw/block/Kconfig                 |  2 ++
+>  hw/char/Kconfig                  |  2 ++
+>  hw/display/Kconfig               |  5 +++++
+>  hw/input/Kconfig                 |  2 ++
+>  hw/net/Kconfig                   |  2 ++
+>  hw/pci-host/Kconfig              |  2 ++
+>  hw/virtio/Kconfig                | 10 +++++++++-
+>  9 files changed, 26 insertions(+), 2 deletions(-)
+
+Shouldn't this patch also get rid of default-configs/virtio.mak ?
+
+[...]
+> diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
+> index aabd6d4d96..9127daed5e 100644
+> --- a/hw/virtio/Kconfig
+> +++ b/hw/virtio/Kconfig
+> @@ -3,18 +3,26 @@ config VIRTIO
+>  
+>  config VIRTIO_RNG
+>      bool
+> +    default y
+> +    depends on VIRTIO
+>  
+>  config VIRTIO_PCI
+>      bool
+>      default y
+>      depends on PCI
+> -    select VIRTIO
+> +    depends on VIRTIO
+>  
+>  config VIRTIO_MMIO
+>      bool
+> +    default y
+> +    depends on VIRTIO
+
+I don't think we should enable VIRTIO_MMIO by default - it's only used
+on arm and riscv, but not on x86 and the other architectures.
+
+>  config VIRTIO_BALLOON
+>      bool
+> +    default y
+> +    depends on VIRTIO
+>  
+>  config VIRTIO_CRYPTO
+>      bool
+> +    default y
+> +    depends on VIRTIO
 > 
-> Should HYPERV_TESTDEV maybe get a "depends on HYPERV", too?
 
-Yes, and also a "default y if PC".  That makes the "select
-HYPERV_TESTDEV" unnecessary below.
-
-Paolo
-
->> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
->> index 695a67f88d..af4b81bae1 100644
->> --- a/hw/i386/Kconfig
->> +++ b/hw/i386/Kconfig
->> @@ -11,6 +11,8 @@ config PC
->>      select I8257
->>      select MC146818RTC
->>      select TPM_TIS if TPM
->> +    select HYPERV
->> +    select HYPERV_TESTDEV
->>  
->>  config PC_PCI
->>      bool
->>
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
+ Thomas
