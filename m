@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56759)
+Received: from eggs.gnu.org ([208.118.235.92]:56779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gfVam-0000lM-1a
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:57:16 -0500
+	(envelope-from <farosas@linux.ibm.com>) id 1gfVao-0000np-3V
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:57:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gfVai-0000dy-06
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:57:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36364
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <farosas@linux.ibm.com>) id 1gfVai-0000ey-Hj
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:57:17 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51816)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gfVaf-0000bN-Tu
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:57:11 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x04JsXts127612
-	for <qemu-devel@nongnu.org>; Fri, 4 Jan 2019 14:57:09 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ptd492mrf-1
+	id 1gfVai-0000dU-8W
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:57:12 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x04Jrv6D096897
+	for <qemu-devel@nongnu.org>; Fri, 4 Jan 2019 14:57:11 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ptafua3gx-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:57:09 -0500
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:57:11 -0500
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Fri, 4 Jan 2019 19:57:08 -0000
+	Fri, 4 Jan 2019 19:57:09 -0000
 From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Fri,  4 Jan 2019 17:56:53 -0200
+Date: Fri,  4 Jan 2019 17:56:54 -0200
 In-Reply-To: <20190104195654.19976-1-farosas@linux.ibm.com>
 References: <20190104195654.19976-1-farosas@linux.ibm.com>
-Message-Id: <20190104195654.19976-3-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/3] target/ppc: Add GDB callbacks for SPRs
+Message-Id: <20190104195654.19976-4-farosas@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH 3/3] target/ppc: Enable reporting of SPRs to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,79 +40,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-These will be used to let GDB know about PPC's Special Purpose
-Registers (SPR).
+This allows reading and writing of SPRs via GDB:
 
-They take an index based on the order the registers appear in the XML
-file sent by QEMU to GDB. This index does not match the actual
-location of the registers in the env->spr array so the
-gdb_find_spr_idx function does that conversion.
+(gdb) p/x $srr1
+$1 = 0x8000000002803033
+
+(gdb) p/x $pvr
+$2 = 0x4b0201
+(gdb) set $pvr=0x4b0000
+(gdb) p/x $pvr
+$3 = 0x4b0000
+
+They can also be shown as a group:
+(gdb) info reg spr
 
 Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 ---
- target/ppc/translate_init.inc.c | 50 +++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ target/ppc/translate_init.inc.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 03f1d34a97..f10a3637d9 100644
+index f10a3637d9..5771ef5386 100644
 --- a/target/ppc/translate_init.inc.c
 +++ b/target/ppc/translate_init.inc.c
-@@ -9483,6 +9483,56 @@ static bool avr_need_swap(CPUPPCState *env)
- #endif
- }
- 
-+#if !defined(CONFIG_USER_ONLY)
-+static int gdb_find_spr_idx(CPUPPCState *env, int n)
-+{
-+    int idx = -1;
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
-+        ppc_spr_t *spr = &env->spr_cb[i];
-+
-+        if (spr->name && ++idx == n) {
-+            break;
-+        }
-+    }
-+    return i;
-+}
-+
-+static int gdb_get_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
-+{
-+    int reg;
-+    int len;
-+
-+    reg = gdb_find_spr_idx(env, n);
-+    if (!reg) {
-+        return 0;
-+    }
-+
-+    len = TARGET_LONG_SIZE;
-+    stn_p(mem_buf, len, env->spr[reg]);
-+    ppc_maybe_bswap_register(env, mem_buf, len);
-+    return len;
-+}
-+
-+static int gdb_set_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
-+{
-+    int reg;
-+    int len;
-+
-+    reg = gdb_find_spr_idx(env, n);
-+    if (!reg) {
-+        return 0;
-+    }
-+
-+    len = TARGET_LONG_SIZE;
-+    ppc_maybe_bswap_register(env, mem_buf, len);
-+    env->spr[reg] = ldn_p(mem_buf, len);
-+
-+    return len;
-+}
+@@ -9760,7 +9760,10 @@ static void ppc_cpu_realize(DeviceState *dev, Error **errp)
+         gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
+                                  32, "power-vsx.xml", 0);
+     }
+-
++#ifndef CONFIG_USER_ONLY
++    gdb_register_coprocessor(cs, gdb_get_spr_reg, gdb_set_spr_reg,
++                             ppc_gdb_gen_spr_xml(cs), "power-spr.xml", 0);
 +#endif
-+
- static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
- {
-     if (n < 32) {
+     qemu_init_vcpu(cs);
+ 
+     pcc->parent_realize(dev, errp);
+@@ -10523,7 +10526,9 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+ #endif
+ 
+     cc->gdb_num_core_regs = 71;
+-
++#ifndef CONFIG_USER_ONLY
++    cc->gdb_get_dynamic_xml = ppc_gdb_get_dynamic_xml;
++#endif
+ #ifdef USE_APPLE_GDB
+     cc->gdb_read_register = ppc_cpu_gdb_read_register_apple;
+     cc->gdb_write_register = ppc_cpu_gdb_write_register_apple;
 -- 
 2.17.1
