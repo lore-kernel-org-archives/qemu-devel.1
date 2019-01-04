@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53333)
+Received: from eggs.gnu.org ([208.118.235.92]:53508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfRD3-0005Rj-1l
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:16:29 -0500
+	(envelope-from <mst@redhat.com>) id 1gfRDn-0005xt-3o
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:17:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfRD1-0006IV-Fa
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:16:28 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36774)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfRD1-0006GT-AI
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:16:27 -0500
-Received: by mail-oi1-x242.google.com with SMTP id x23so30602808oix.3
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 07:16:25 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gfRDj-00078M-W3
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:17:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58128)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gfRDj-00077l-Mx
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:17:11 -0500
+Date: Fri, 4 Jan 2019 10:17:09 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190104101326-mutt-send-email-mst@kernel.org>
+References: <20190103175113.18196-1-pbonzini@redhat.com>
+	<20190103130406-mutt-send-email-mst@kernel.org>
+	<CAFEAcA9T4YE8pgkccRRwFTm35LVLv_sfPFc00UY6L4FA-gB5fg@mail.gmail.com>
+	<714a115f-835b-0041-426b-d16f9439ebc1@redhat.com>
 MIME-Version: 1.0
-References: <20190103144124.18917-1-stefanha@redhat.com>
-In-Reply-To: <20190103144124.18917-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 15:16:13 +0000
-Message-ID: <CAFEAcA-B_T9E3ezWFXg-wp3RotMjv3-z3qY7hSJZEoqFBqCWnQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Revert "armv7m: Guard against no -kernel
- argument"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <714a115f-835b-0041-426b-d16f9439ebc1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] include: update Linux headers to 4.21/5.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Steffen Gortz <qemu.ml@steffen-goertz.de>, Joel Stanley <joel@jms.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 3 Jan 2019 at 14:41, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> This reverts commit 01fd41ab3fb69971c24a69ed49cde96086d81278.
->
-> The generic loader device (-device loader,file=kernel.bin) can be used
-> to load a kernel instead of the -kernel option.  Some boards have flash
-> memory (pflash) that is set via the -pflash or -drive options.
->
-> Allow starting QEMU without the -kernel option to accommodate these
-> scenarios.
->
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Fri, Jan 04, 2019 at 09:07:23AM +0100, Paolo Bonzini wrote:
+> On 03/01/19 20:26, Peter Maydell wrote:
+> > On Thu, 3 Jan 2019 at 18:19, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >>
+> >> On Thu, Jan 03, 2019 at 06:51:13PM +0100, Paolo Bonzini wrote:
+> >>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> >>
+> >> Note that in the past we just updated what we needed.
+> > 
+> > Not if I noticed it -- our copies of the Linux headers
+> > are supposed to always be synchronized entirely from
+> > a commit of Linux upstream master. Ad-hoc cherry-picked
+> > changes can easily be accidentally undone by a later sync
+> > by somebody else. This is why we have an automatic
+> > script to do header synchronization, so we don't have
+> > to manually write and review header updates.
+> 
+> I agree, and shortlog seems to agree too in general.  Most commits look like
+> 
+>       linux-headers: Update to v3.10-rc5
+>       linux-headers: update to 3.11
+>       linux-headers: Update to 4.2-rc1
+>       linux-headers: sync against v4.14-rc1
+>       linux-headers: update to 3.12-rc1
+>       linux-headers: update to 3.18-rc5
+>       update linux headers to kvm/next
+>       synchronize Linux headers to 4.0-rc3
+>       linux-headers: update to 4.13-rc0
+>       linux header sync against v4.13-rc1
+> 
+> and so on.
+> 
+> 
+> >> I'd prefer the shell script part and the new vhost_types header which
+> >> are actually reviewable to be split out to a separate patch.
+> > 
+> > I agree that shell script changes should be their own patch.
+> > My view is that a header-update commit should be entirely
+> > and nothing but the automatically generated results of
+> > running scripts/update-linux-headers.sh, with a commit
+> > message that says "Generated by running update-linux-headers.sh
+> > on upstream kernel commit xxxx".
+> 
+> The problem with this approach is that the old script does not work with
+> the new commit and the new script does not work with the old commit.
+
+I would do
+
+update-linux-headers.sh: add support for Linux 4.21-rc1
+
+Since 4.21-rc1 header abc moved from foo/ to bar/ update
+script accordingly.
+
+---
+
+linux-headers: update to 4.21-rc1
+
+Generated by running update-linux-headers.sh on upstream kernel commit xxxx
 
 
 
-Applied to target-arm.next, thanks.
-
--- PMM
+> Doing the update in the same commit as the script update means that it's
+> clear from the commit message on which Linux commit you should run it
+> (though in this case I should have specified 4.21-rc1 or 5.0-rc1).
+> 
+> Another way would be to make Linux a submodule.  Then you'd upgrade the
+> submodule and the script in one commit, and then generate the headers at
+> compile-time or release-time.  This however wouldn't be as nice for
+> users of the git repo.  That's the reason why I went for the single
+> commit, but of course I can split it and will in v2.
+> 
+> Paolo
+> 
+> > Doing by-hand updates to the headers is quite a common
+> > error; I'm not sure if we can automatically catch it
+> > with checkpatch. ("Any change to include/standard-headers
+> > or linux-headers/ must be a commit that touches only files
+> > in those subdirectories and whose commit message is in
+> > a standard format", perhaps.)
+> > 
+> > thanks
+> > -- PMM
+> > 
