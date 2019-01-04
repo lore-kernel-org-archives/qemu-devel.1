@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52426)
+Received: from eggs.gnu.org ([208.118.235.92]:52905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfR9E-0002z2-5R
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:12:32 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gfRBJ-0004LR-Uv
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:14:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfR9C-0003Gm-UJ
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:12:32 -0500
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:41992)
+	(envelope-from <stefanha@gmail.com>) id 1gfRBG-00054A-Sq
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:14:41 -0500
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:53354)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfR9C-00031p-QP
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:12:30 -0500
-Received: by mail-ot1-x336.google.com with SMTP id v23so32312554otk.9
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 07:12:22 -0800 (PST)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gfRBG-00053O-Lv
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:14:38 -0500
+Received: by mail-wm1-x32a.google.com with SMTP id d15so1420894wmb.3
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 07:14:38 -0800 (PST)
+Date: Fri, 4 Jan 2019 15:14:35 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190104151435.GJ30381@stefanha-x1.localdomain>
+References: <51912a3cd93dc66e03425eba04ae041d@grossmann-venter.com>
 MIME-Version: 1.0
-References: <20181207090135.7651-1-luc.michel@greensocs.com>
-In-Reply-To: <20181207090135.7651-1-luc.michel@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 15:12:10 +0000
-Message-ID: <CAFEAcA9F2q6fQV13EDWFzuPYiFTDvqSCx_4P9aD=zP2RR5Kp0g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v8 00/16] gdbstub: support for the
- multiprocess extension
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="fU0UwhtRbpo05rnG"
+Content-Disposition: inline
+In-Reply-To: <51912a3cd93dc66e03425eba04ae041d@grossmann-venter.com>
+Subject: Re: [Qemu-devel] Qemu  the right way.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Mark Burton <mark.burton@greensocs.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: liebrecht@grossmann-venter.com
+Cc: qemu-devel@nongnu.org
 
-On Fri, 7 Dec 2018 at 09:01, Luc Michel <luc.michel@greensocs.com> wrote:
-> This series adds support for the multiprocess extension of the GDB
-> remote protocol in the QEMU GDB stub.
->
-> This extension is useful to split QEMU emulated CPUs in different
-> processes from the point of view of the GDB client. It adds the
-> possibility to debug different kind of processors (e.g. an AArch64 and
-> an ARMv7 CPU) at the same time (it is not possible otherwise since GDB
-> expects an SMP view at the thread granularity.
 
-I've applied this patchset to target-arm.next, thanks.
-(I fixed up a few checkpatch nits about block comment style.)
+--fU0UwhtRbpo05rnG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> To test this patchset, you can use the following commands:
->
-> (Note that this requires a recent enough GDB, I think GDB 7.2 is OK.
-> Also, it must be compiled to support both ARM and AArch64 architectures)
->
-> Run QEMU: (-smp 6 in xlnx-zcu102 enables both cortex-a53 and cortex-r5
-> CPUs)
->
-> qemu-system-aarch64 -M xlnx-zcu102 -gdb tcp::1234 -S -smp 6
->
-> Run the following commands in GDB:
->
-> target extended :1234
-> add-inferior
-> inferior 2
-> attach 2
-> info threads
+On Tue, Dec 25, 2018 at 05:48:50PM -0500, liebrecht@grossmann-venter.com wr=
+ote:
+> I have been using Qemu in the past about 8 years ago or so to run legacy
+> windows software.
+>=20
+> I installed the latest qemu and noticed a lot changed and cant find
+> conclusive answers online.
+>=20
+> I am writing this post to find what is the right way to start to set up q=
+emu
+> with a windows 7 pro guest. I want to try and eliminate the iterations and
+> find out what is really possible for the guest.
+>=20
+> Hardware used"
+> 24 Core AMD rackserver.
+> Host OS Debian 9 Stretch
+> Guest Windows 7 Pro 32 bit
+>=20
+> Requirements:
+> 1) I need to be able to run at least 4 processors in the guest. Is this
+> possible with qemu as hosts ?
+> 2) I need to at least have sound working from applications in the guest w=
+ith
+> pulseaudio on the Debian host. Is it  possible ?
+> 3) USB, what is the level of support 2.0 3.0 ?
+> ( However windo$ 7 cannot really do USB3. so usb-3 is moot anyway)
+> 4) What kind of devices can be run through usb ?
+>=20
+> The answers to 1-4 will be really helpful to decide if I should even be
+> using it. The documentation is schetchy about all this.
+> I tried Virtualbox, but it is just a nice looking empty promisebox yieldi=
+ng
+> nothing. Since Qemu helped me a lot in the past I will have better chances
+> here.
+>=20
+> 5) I am currently installing win7pro guest with command
+> $] qemu-system-x86_64 -boot c -cdrom /dev/cdrom -m 2048M
+>=20
+> and left out all the network card and sound driver switches as I have no
+> clue what I should choose.
+> Can they be configured afterwards ?
 
-This seems a bit clumsy -- is it just the limitations of
-gdb here? I was expecting that just connecting to the
-remote would cause gdb to interrogate it and attach to
-all the inferior processes that it had.
+Running QEMU manually is pretty complex.  It's often used as a component
+underneath libvirt - with nicer GUIs on top.
 
-thanks
--- PMM
+Have you tried virt-manager (https://virt-manager.org/) or GNOME Boxes
+(https://wiki.gnome.org/Apps/Boxes)?
+
+That way you don't need to learn all the details of QEMU command-line
+options (and there are many!).
+
+Stefan
+
+--fU0UwhtRbpo05rnG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcL3hbAAoJEJykq7OBq3PIZ9QH/16UXXRHyRtt1C3Pg/Dypb+o
+hKXCunlkjiuh85Gfwu1YU9zc4O1dx6ifGXtddsLcjj8ydFNDFh0zZy0CJLvTaXEy
+7wj/auIzi2PzrZP3fNsfZtHTT/8fhX9u8aKndaCWB6UBxv699h2wRm6Xfk17eABJ
+k6tYIK59iVMlVBEuWbDn2M4wJktNbJC95T9Vk9GYGpd9qiyPseuwYGrD91W242eJ
+1/gqznt1XgyHC0dhWbmhtN6yzUep8BeCkK7yo+6USTv8nbiPieeGx4+8gFVI9VmW
+cGQx1Odr59TOYNrLxTqMwqhAMkB72b2C/5DLLZnb87H1Esm7fD6jK6W9Wu/Mlc0=
+=IHR4
+-----END PGP SIGNATURE-----
+
+--fU0UwhtRbpo05rnG--
