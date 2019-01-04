@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54607)
+Received: from eggs.gnu.org ([208.118.235.92]:54634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gfPZU-00075q-5h
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:31:33 -0500
+	(envelope-from <clg@kaod.org>) id 1gfPZW-00075v-HY
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:31:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gfPZR-000265-0P
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:31:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50506)
+	(envelope-from <clg@kaod.org>) id 1gfPZT-00028b-7R
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:31:34 -0500
+Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:47893)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gfPZP-00022U-D7
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:31:27 -0500
-References: <20181227063419.12981-1-yang.zhong@intel.com>
-	<20181227063419.12981-13-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <af35eca8-9c8e-1dc8-2de7-fa654da85089@redhat.com>
-Date: Fri, 4 Jan 2019 14:31:18 +0100
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gfPZR-00021B-6v
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:31:29 -0500
+Received: from player692.ha.ovh.net (unknown [10.109.143.183])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id D7FCD178CAB
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 14:31:09 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Fri,  4 Jan 2019 14:30:50 +0100
+Message-Id: <20190104133050.7468-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20181227063419.12981-13-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 12/25] build: convert usb.mak to Kconfig
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] spapr: return from post_load method when
+ RTC import fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On 2018-12-27 07:34, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Instead of including the same list of devices for each target,
-> let the host controllers select CONFIG_USB and make the devices
-> default to present whenever USB is available.
-> 
-> Done with the following script:
->   while read i; do
->      i=${i%=y}; i=${i#CONFIG_}
->      sed -i -e'/^config '$i'$/!b' -en \
->             -e'a\' -e'    default y\' -e'    depends on USB' \
->           `grep -lw $i hw/*/Kconfig`
->   done < default-configs/usb.mak
-> 
-> followed by adding "select USB" on the host controllers.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  default-configs/i386-softmmu.mak |  1 -
->  default-configs/usb.mak          | 11 -----------
->  hw/usb/Kconfig                   | 26 ++++++++++++++++++++++++++
->  3 files changed, 26 insertions(+), 12 deletions(-)
->  delete mode 100644 default-configs/usb.mak
+The error value can be squashed by the section handling radix migration.
+Simply bail out if an error occurs when the RTC offset is imported.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+This fixes the Coverity issue CID 1398591.
+
+Fixes: d39c90f5f3ae ("spapr: Fix migration of Radix guests")
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+
+ Changes since v1 :
+
+ - Added Coverity issue CID
+
+ hw/ppc/spapr.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f1725313e979..64397ee91ef0 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1748,12 +1748,17 @@ static int spapr_post_load(void *opaque, int vers=
+ion_id)
+         return err;
+     }
+=20
+-    /* In earlier versions, there was no separate qdev for the PAPR
++    /*
++     * In earlier versions, there was no separate qdev for the PAPR
+      * RTC, so the RTC offset was stored directly in sPAPREnvironment.
+      * So when migrating from those versions, poke the incoming offset
+-     * value into the RTC device */
++     * value into the RTC device
++     */
+     if (version_id < 3) {
+         err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
++        if (err) {
++            return err;
++        }
+     }
+=20
+     if (kvm_enabled() && spapr->patb_entry) {
+--=20
+2.20.1
