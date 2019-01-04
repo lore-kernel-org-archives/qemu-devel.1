@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50428)
+Received: from eggs.gnu.org ([208.118.235.92]:51698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gfTgH-0006Gn-GW
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:54:50 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfTkb-0002Oe-CV
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:59:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gfTgE-0001sV-C0
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:54:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gfTgE-0001oI-4l
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:54:46 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2DC0A85A07
-	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 17:54:45 +0000 (UTC)
-Date: Fri, 4 Jan 2019 15:54:39 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190104175439.GH4157@habkost.net>
-References: <20190104032226.21428-1-ehabkost@redhat.com>
-	<20190103232012-mutt-send-email-mst@kernel.org>
-	<20190104101200.GA2494@work-vm>
+	(envelope-from <philmd@redhat.com>) id 1gfTka-0004Dp-DO
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:59:17 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Fri,  4 Jan 2019 18:58:31 +0100
+Message-Id: <20190104175847.6290-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190104101200.GA2494@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] compat: Use explicit type names on
- HW_COMPAT_2_6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 00/16] hw: Remove "hw/devices.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,68 +20,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Magnus Damm <magnus.damm@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, Michael Walle <michael@walle.cc>, Richard Henderson <rth@twiddle.net>, Jan Kiszka <jan.kiszka@web.de>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Rob Herring <robh@kernel.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Fri, Jan 04, 2019 at 10:12:00AM +0000, Dr. David Alan Gilbert wrote:
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > On Fri, Jan 04, 2019 at 01:22:26AM -0200, Eduardo Habkost wrote:
-> > > The virtio-pci entries in HW_COMPAT_2_6 had an implicit
-> > > assumption: that all virtio-pci subclasses support the
-> > > disable-legacy and disable-modern options.
-> > > 
-> > > That assumption was broken by commit f6e501a28ef9 ("virtio:
-> > > Provide version-specific variants of virtio PCI devices").  This
-> > > caused QEMU to crash if using the new -non-transitional or
-> > > -transitional device types:
-> > > 
-> > >   $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
-> > >     -device virtio-net-pci-non-transitional
-> > >   Unexpected error in object_property_find() at qom/object.c:1092:
-> > >   qemu-system-x86_64: -device virtio-net-pci-non-transitional: can't apply \
-> > >   global virtio-pci.disable-modern=on: Property '.disable-modern' not found
-> > >   Aborted (core dumped)
-> > > 
-> > > Replace the virtio-pci.disable-legacy=off and
-> > > virtio-pci.disable-modern=on entries on HW_COMPAT_2_6 with
-> > > explicit entries for each generic virtio device type.
-> > > 
-> > > The full list of generic virtio device types was extracted by
-> > > just grepping for ".generic_name".  Note that we don't need to
-> > > worry about listing new virtio-pci devices in HW_COMPAT_2_6 in
-> > > the future, because new devices won't require QEMU 2.6
-> > > compatibility.
-> > 
-> > I fully expect that e.g. packed ring support will need
-> > to affect all virtio devices too. And it's likely
-> > that we'll have some new virtio-pci transport features too.
-> > 
-> > > This makes the compat entries annoyingly verbose, but is simpler
-> > > than the alternative of making the virtio-pci type inheritance
-> > > rules even more complex.
-> > 
-> > God forbid we forgot something, the only way to notice is to
-> > run a cross version migration with an old qemu.
-> > I think we need to come up with something less verbose and fragile.
-> 
-> I guess we could use a script like tests/acceptance/virtio_version.py to
-> do a check?
+Hi,
 
-That's a good idea.  On test code we can try additional tricks to
-detect the hybrid virtio devices without increasing the
-complexity of QEMU code.  I'll give it a try.
+As the first comment describes, the "hw/devices.h" contains declarations
+for "Devices that have nowhere better to go."
+This series remove it, creating new headers for devices covered there.
+MAINTAINERS is updated.
+I also included 2 cleanups while working on this, in "qemu/typedefs.h"
+and "hw/net/ne2000-isa.h" header guard.
 
-> 
-> As for something less verbose, I guess something is doable with a few
-> macros (more complex but less verbose); or I guess you could add these
-> properties to the other devices but just refuse to operate when they
-> were set the wrong way.
+Please review.
 
-Adding the properties to all virtio-pci devices is the kind of
-complexity I would like to avoid.  If we need to define rules for
-when disable-modern/disable-legacy is set to unexpected values,
-we'll have to maintain the code that implement those rules
-forever.
+Phil.
 
--- 
-Eduardo
+Philippe Mathieu-Daud=C3=A9 (16):
+  hw/arm/aspeed: Use TYPE_TMP105/TYPE_PCA9552 instead of hardcoded
+    string
+  hw: Remove unused 'hw/devices.h' include
+  hw/devices: Remove unused TC6393XB_RAM definition
+  hw/devices: Move TC6393XB declarations into a new header
+  hw/devices: Move Blizzard declarations into a new header
+  hw/devices: Move CBus declarations into a new header
+  hw/devices: Move Gamepad declarations into a new header
+  MAINTAINERS: Add missing entries for the TI touchscreen devices
+  hw/devices: Move TI touchscreen declarations into a new header
+  typedefs: Remove MouseTransformInfo
+  typedefs: Remove PS2State
+  hw/devices: Move LAN9118 declarations into a new header
+  hw/net/ne2000-isa: Add guards to the header
+  hw/net/lan9118: Export TYPE_LAN9118 and use it instead of hardcoded
+    string
+  hw/devices: Move SMSC 91C111 declaration into a new header
+  RFC hw/net/smc91c111: Convert init helper into an inline function
+
+ MAINTAINERS                              |  8 +++
+ hw/alpha/typhoon.c                       |  1 -
+ hw/arm/allwinner-a10.c                   |  1 -
+ hw/arm/aspeed.c                          | 13 +++--
+ hw/arm/collie.c                          |  1 -
+ hw/arm/cubieboard.c                      |  1 -
+ hw/arm/exynos4_boards.c                  |  3 +-
+ hw/arm/gumstix.c                         |  2 +-
+ hw/arm/highbank.c                        |  1 -
+ hw/arm/integratorcp.c                    |  2 +-
+ hw/arm/kzm.c                             |  2 +-
+ hw/arm/mainstone.c                       |  2 +-
+ hw/arm/mps2-tz.c                         |  4 +-
+ hw/arm/mps2.c                            |  2 +-
+ hw/arm/musicpal.c                        |  1 -
+ hw/arm/nrf51_soc.c                       |  1 -
+ hw/arm/nseries.c                         |  4 +-
+ hw/arm/palm.c                            |  2 +-
+ hw/arm/realview.c                        |  3 +-
+ hw/arm/spitz.c                           |  1 -
+ hw/arm/stellaris.c                       |  2 +-
+ hw/arm/tosa.c                            |  2 +-
+ hw/arm/versatilepb.c                     |  2 +-
+ hw/arm/vexpress.c                        |  2 +-
+ hw/arm/virt.c                            |  1 -
+ hw/arm/z2.c                              |  1 -
+ hw/display/blizzard.c                    |  2 +-
+ hw/display/sm501.c                       |  1 -
+ hw/display/tc6393xb.c                    |  2 +-
+ hw/hppa/dino.c                           |  1 -
+ hw/input/stellaris_input.c               |  2 +-
+ hw/input/tsc2005.c                       |  2 +-
+ hw/input/tsc210x.c                       |  4 +-
+ hw/intc/allwinner-a10-pic.c              |  1 -
+ hw/lm32/lm32_boards.c                    |  1 -
+ hw/lm32/milkymist.c                      |  1 -
+ hw/microblaze/petalogix_ml605_mmu.c      |  1 -
+ hw/microblaze/petalogix_s3adsp1800_mmu.c |  1 -
+ hw/misc/cbus.c                           |  2 +-
+ hw/net/dp8393x.c                         |  1 -
+ hw/net/lan9118.c                         |  3 +-
+ hw/net/smc91c111.c                       | 19 +-------
+ hw/ppc/virtex_ml507.c                    |  1 -
+ hw/sh4/r2d.c                             |  1 -
+ hw/tricore/tricore_testboard.c           |  1 -
+ hw/usb/tusb6010.c                        |  1 -
+ include/hw/arm/omap.h                    |  6 +--
+ include/hw/devices.h                     | 62 ------------------------
+ include/hw/display/blizzard.h            | 21 ++++++++
+ include/hw/display/tc6393xb.h            | 25 ++++++++++
+ include/hw/input/gamepad.h               | 11 +++++
+ include/hw/input/ps2.h                   |  2 +
+ include/hw/input/ti_uwire_tsc.h          | 28 +++++++++++
+ include/hw/misc/cbus.h                   | 31 ++++++++++++
+ include/hw/net/lan9118.h                 | 23 +++++++++
+ include/hw/net/ne2000-isa.h              |  6 +++
+ include/hw/net/smc91c111.h               | 41 ++++++++++++++++
+ include/qemu/typedefs.h                  |  3 --
+ include/ui/console.h                     |  4 +-
+ 59 files changed, 236 insertions(+), 140 deletions(-)
+ delete mode 100644 include/hw/devices.h
+ create mode 100644 include/hw/display/blizzard.h
+ create mode 100644 include/hw/display/tc6393xb.h
+ create mode 100644 include/hw/input/gamepad.h
+ create mode 100644 include/hw/input/ti_uwire_tsc.h
+ create mode 100644 include/hw/misc/cbus.h
+ create mode 100644 include/hw/net/lan9118.h
+ create mode 100644 include/hw/net/smc91c111.h
+
+--=20
+2.17.2
