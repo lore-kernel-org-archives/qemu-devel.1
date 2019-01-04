@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:33331)
+Received: from eggs.gnu.org ([208.118.235.92]:33411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gfUF5-0008D7-Oi
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:30:48 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfUFa-00007r-Ay
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:31:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gfUF0-0003ha-Ur
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:30:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:53734)
+	(envelope-from <philmd@redhat.com>) id 1gfUFX-0003wm-83
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:31:18 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37682)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gfUF0-0003gy-P6
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:30:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gfUEy-0004r1-Hu
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 18:30:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 445202E80D3
-	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 18:30:39 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gfUFX-0003vf-24
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:31:15 -0500
+Received: by mail-wr1-f67.google.com with SMTP id s12so37354654wrt.4
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 10:31:13 -0800 (PST)
+References: <20190104182057.8778-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8176371f-6dff-adee-84d1-5758ed74700c@redhat.com>
+Date: Fri, 4 Jan 2019 19:31:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 04 Jan 2019 18:21:31 -0000
-From: Stefan Ring <1810545@bugs.launchpad.net>
-Reply-To: Bug 1810545 <1810545@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154662609174.25797.11037697007951339169.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810545] [NEW] [alpha] Strange exception address
- reported
+In-Reply-To: <20190104182057.8778-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/char/stm32f2xx_usart: Do not update
+ data register when device is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,99 +31,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>
 
-Public bug reported:
+On 1/4/19 7:20 PM, Philippe Mathieu-Daudé wrote:
+> When the device is disable, the internal circuitry keep the data
 
-For some reason the SIGILL handler receives a different address under
-qemu than it used to on real hardware. I don't know specifics about the
-hardware used back then =E2=80=93 it was some sort of 21264a somewhere betw=
-een
-600-800 MHz =E2=80=93, and I cannot say anything about the kernel as well, =
-but I
-know that it delivered the faulting address +4, while under qemu it
-receives +8. I know because CACAO, an early Java JIT compiler extracts
-the address from the SIGILL handler and inspects the code at the
-faulting site, and it has substracted 4 from the handler address since
-the dawn of time, and this used to produce the desired result on the
-Alpha hardware. It actually ran on two different Alpha machines over the
-years, and both behaved identically.
+"keep" -> "keeps"
 
-The handler looks like this:
-void handler_sigill(int sig, siginfo_t *siginfo, void *_p)
-{
-  uintptr_t trap_address =3D (uintptr_t) (((ucontext_t*) _p)->uc_mcontext.s=
-c_pc) - 4;
-}
-
-(paraphrasing, the actual code is here: https://bitbucket.org/cacaovm
-/cacao-
-staging/src/c8d3fbab864c3243f97629fcfa8d84ba71f38157/src/vm/jit/alpha/linux
-/md-os.cpp?at=3Ddefault&fileviewer=3Dfile-view-default#md-os.cpp-65)
-
-I don't know much about the qemu source code and cannot say where this
-is coming from at first glance. The gen_invalid function uses pc_next,
-which sounds like the next instruction, not the next-to-next ;). In
-theory it could actually be the kernel's fault, although I consider this
-unlikely.
-
-This is qemu-system-alpha with apparently the last Debian which existed
-for Alpha (lenny). The kernel is 2.6.26-2-alpha-generic (Debian
-2.6.26-29). Observed with qemu git 1b3e80082b, but I guess it is the
-same with any version.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810545
-
-Title:
-  [alpha] Strange exception address reported
-
-Status in QEMU:
-  New
-
-Bug description:
-  For some reason the SIGILL handler receives a different address under
-  qemu than it used to on real hardware. I don't know specifics about
-  the hardware used back then =E2=80=93 it was some sort of 21264a somewhere
-  between 600-800 MHz =E2=80=93, and I cannot say anything about the kernel=
- as
-  well, but I know that it delivered the faulting address +4, while
-  under qemu it receives +8. I know because CACAO, an early Java JIT
-  compiler extracts the address from the SIGILL handler and inspects the
-  code at the faulting site, and it has substracted 4 from the handler
-  address since the dawn of time, and this used to produce the desired
-  result on the Alpha hardware. It actually ran on two different Alpha
-  machines over the years, and both behaved identically.
-
-  The handler looks like this:
-  void handler_sigill(int sig, siginfo_t *siginfo, void *_p)
-  {
-    uintptr_t trap_address =3D (uintptr_t) (((ucontext_t*) _p)->uc_mcontext=
-.sc_pc) - 4;
-  }
-
-  (paraphrasing, the actual code is here: https://bitbucket.org/cacaovm
-  /cacao-
-  staging/src/c8d3fbab864c3243f97629fcfa8d84ba71f38157/src/vm/jit/alpha/lin=
-ux
-  /md-os.cpp?at=3Ddefault&fileviewer=3Dfile-view-default#md-os.cpp-65)
-
-  I don't know much about the qemu source code and cannot say where this
-  is coming from at first glance. The gen_invalid function uses pc_next,
-  which sounds like the next instruction, not the next-to-next ;). In
-  theory it could actually be the kernel's fault, although I consider
-  this unlikely.
-
-  This is qemu-system-alpha with apparently the last Debian which
-  existed for Alpha (lenny). The kernel is 2.6.26-2-alpha-generic
-  (Debian 2.6.26-29). Observed with qemu git 1b3e80082b, but I guess it
-  is the same with any version.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810545/+subscriptions
+> register loaded and doesn't update it.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/char/stm32f2xx_usart.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
+> index f3363a2952..10392c70e2 100644
+> --- a/hw/char/stm32f2xx_usart.c
+> +++ b/hw/char/stm32f2xx_usart.c
+> @@ -53,14 +53,13 @@ static void stm32f2xx_usart_receive(void *opaque, const uint8_t *buf, int size)
+>  {
+>      STM32F2XXUsartState *s = opaque;
+>  
+> -    s->usart_dr = *buf;
+> -
+>      if (!(s->usart_cr1 & USART_CR1_UE && s->usart_cr1 & USART_CR1_RE)) {
+>          /* USART not enabled - drop the chars */
+>          DB_PRINT("Dropping the chars\n");
+>          return;
+>      }
+>  
+> +    s->usart_dr = *buf;
+>      s->usart_sr |= USART_SR_RXNE;
+>  
+>      if (s->usart_cr1 & USART_CR1_RXNEIE) {
+> 
