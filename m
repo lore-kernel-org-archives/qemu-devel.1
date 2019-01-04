@@ -1,38 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50769)
+Received: from eggs.gnu.org ([208.118.235.92]:51596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gfR2U-0000LN-W1
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:05:35 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gfR6V-0001pW-OD
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:09:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gfR2Q-0004S5-0r
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:05:34 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37088)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gfR2L-0004Gc-Iz
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:05:27 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x04Ex1xt064742
-	for <qemu-devel@nongnu.org>; Fri, 4 Jan 2019 10:05:24 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pt6yerr57-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 10:05:23 -0500
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Fri, 4 Jan 2019 15:05:21 -0000
-Date: Fri, 4 Jan 2019 16:05:15 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <20190104151005.42b6f111.cohuck@redhat.com>
-References: <20190103151612.51399-1-liq3ea@163.com>
-	<20190104151005.42b6f111.cohuck@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1gfR6S-00007I-MA
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:09:43 -0500
+Date: Fri, 4 Jan 2019 15:09:32 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190104150932.GI30381@stefanha-x1.localdomain>
+References: <1545474448-24488-1-git-send-email-wangjian161@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20190104160515.1b4a6dc1@oc2783563651>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] s390: avoid potential null
- dereference in s390_pcihost_unplug()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="k9xkV0rc9XGsukaG"
+Content-Disposition: inline
+In-Reply-To: <1545474448-24488-1-git-send-email-wangjian161@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v2] qemu: avoid memory leak while remove
+ disk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,68 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Li Qiang <liq3ea@163.com>, peter.maydell@linaro.org, walling@linux.ibm.com, david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+To: mst@redhat.com
+Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, w00426999 <wangjian161@huawei.com>
 
-On Fri, 4 Jan 2019 15:10:05 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> On Thu,  3 Jan 2019 07:16:12 -0800
-> Li Qiang <liq3ea@163.com> wrote:
-> 
-> > When getting the 'pbdev', the if...else has no default branch.
-> > From Coverity, the 'pbdev' maybe null when the 'dev' is not
-> > the TYPE_PCI_BRIDGE/TYPE_PCI_DEVICE/TYPE_S390_PCI_DEVICE.
-> > This patch adds a default branch for device plug and unplug.
-> > 
-> > Spotted by Coverity: CID 1398593
-> > 
-> > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > ---
-> > Adds a default branch for device plug per Cornelia's review.
-> > 
-> >  hw/s390x/s390-pci-bus.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> > index 15759b6514..fe48a36ff6 100644
-> > --- a/hw/s390x/s390-pci-bus.c
-> > +++ b/hw/s390x/s390-pci-bus.c
-> > @@ -912,6 +912,9 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >          pbdev->fh = pbdev->idx;
-> >          QTAILQ_INSERT_TAIL(&s->zpci_devs, pbdev, link);
-> >          g_hash_table_insert(s->zpci_table, &pbdev->idx, pbdev);
-> > +    } else {
-> > +        error_setg(errp, "s390: device plug request for not supported device"
-> > +                   " type: %s", object_get_typename(OBJECT(dev)));
-> 
-> Maybe make this "s390/pci: plugging device type <%s> is not supported"?
-> 
+--k9xkV0rc9XGsukaG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Under what circumstances could/does this happen? I mean how can this
-be triggered by the user?
+On Sat, Dec 22, 2018 at 06:27:28PM +0800, w00426999 wrote:
+> Memset vhost_dev to zero in the vhost_dev_cleanup function.
+> This causes dev.vqs to be NULL, so that
+> vqs does not free up space when calling the g_free function.
+> This will result in a memory leak. But you can't release vqs
+> directly in the vhost_dev_cleanup function, because vhost_net
+> will also call this function, and vhost_net's vqs is assigned by array.
+> In order to solve this problem, we first save the pointer of vqs,
+> and release the space of vqs after vhost_dev_cleanup is called.
+>=20
+> Signed-off-by: Jian Wang <wangjian161@huawei.com>
+> ---
+>  hw/block/vhost-user-blk.c | 7 +++++--
+>  hw/scsi/vhost-scsi.c      | 3 ++-
+>  hw/scsi/vhost-user-scsi.c | 3 ++-
+>  3 files changed, 9 insertions(+), 4 deletions(-)
 
-Regards,
-Halil
+This patch can go through Michael's tree.
 
-> >      }
-> >  }
-> >  
-> > @@ -956,6 +959,10 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
-> >          pbdev = S390_PCI_DEVICE(dev);
-> >          pci_dev = pbdev->pdev;
-> > +    } else {
-> > +        error_setg(errp, "s390: device unplug request for not supported device"
-> > +                   " type: %s", object_get_typename(OBJECT(dev)));
-> 
-> Halil has a point when he suggests an assert here. If we fence the
-> device type in the plug function, I can't think of a way we would end
-> up here.
-> 
-> > +        return;
-> >      }
-> >  
-> >      switch (pbdev->state) {
-> 
-> 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--k9xkV0rc9XGsukaG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcL3csAAoJEJykq7OBq3PIRc4H/3+96c/gp2pjih5ENhgRwKhi
+ZnC07WjV9r1EWM+LJtVVkxSavHdUI+vWlXiqirOVFj9ZMeKktNDstXnrgopDI1/F
+2fQwgbDtA63YmVnQUwgW2MH2T+EOPB/M4vKiyXARGymXHAyElWZIbYKjmCV1ITIA
+LbRuCP5a5DQoGp+OLmWSpFcTPFDcZiSb0iUhGSbhiJ5RnF4t3z8pR2TFZ4BzbweK
+VQwtxJvckoGMU35nMTGp7bdiPvSdpM7ma30qufYQxxqYbfrJJvZC45u9I3Yp6ZRe
+Zyd25AyxtY2cLAjSTqXiFjm8aSXXkBWRucpCYtEq55RqDACWEM2KnG+muPe7Rbg=
+=R1lK
+-----END PGP SIGNATURE-----
+
+--k9xkV0rc9XGsukaG--
