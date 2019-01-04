@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:34070)
+Received: from eggs.gnu.org ([208.118.235.92]:34792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gfQ1d-0007mI-0v
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:00:37 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gfQ3a-00011O-Cf
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:02:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gfQ1Z-0007Ed-Rk
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:00:36 -0500
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:40725)
+	(envelope-from <pbonzini@redhat.com>) id 1gfQ3X-000143-8q
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:02:38 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37736)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1gfQ1Z-000737-JC
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:00:33 -0500
-Received: by mail-lf1-x142.google.com with SMTP id v5so25456248lfe.7
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 06:00:20 -0800 (PST)
-Date: Fri, 4 Jan 2019 15:00:18 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20190104140018.GS1148@toto>
-References: <20181210152829.29271-1-alex.bennee@linaro.org>
-	<20181210152829.29271-12-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gfQ3X-00012M-1t
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:02:35 -0500
+Received: by mail-wr1-f66.google.com with SMTP id s12so36655151wrt.4
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 06:02:34 -0800 (PST)
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dbed296d-eab2-80d7-e3f7-40050bf7f247@redhat.com>
+Date: Fri, 4 Jan 2019 15:02:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181210152829.29271-12-alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 11/13] tests/tcg/cris: comment out the
- ccs test
+In-Reply-To: <20181227063419.12981-1-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 00/25] Support Kconfig in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +29,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, michael@walle.cc, aurelien@aurel32.net, amarkovic@wavecomp.com, shorne@gmail.com, jcmvbkbc@gmail.com
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, thuth@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com
 
-On Mon, Dec 10, 2018 at 03:28:27PM +0000, Alex Bennée wrote:
-> Evidently upstream gcc doesn't like this opcode.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On 27/12/18 07:33, Yang Zhong wrote:
+> (*) defconfig
+>     "randconfig" build has some issues, which are mostly related
+>     with CONFIG* in Kconfig.host abd configure. In randconfig mode,
+>     some CONFIG* has different setting value in config-host.mak and
+>     %/config-device.mak, which make QEMU build failure.
 
+I'll look into this once you fix the other issue from the review of this
+RFC.  Thanks for updating the patches!
 
-Hi Alex, this is probably an example of missmatching CRISv10 vs CRISv32 versions in toolchain usage.
-
-Cheers,
-Edgar
-
-
-> ---
->  tests/tcg/cris/system/check_btst.s | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tests/tcg/cris/system/check_btst.s b/tests/tcg/cris/system/check_btst.s
-> index e39fc8f4d6..485deb2006 100644
-> --- a/tests/tcg/cris/system/check_btst.s
-> +++ b/tests/tcg/cris/system/check_btst.s
-> @@ -85,12 +85,12 @@
->   checkr3 1111
->  
->   ; check that X gets cleared and that only the NZ flags are touched.
-> - move.d	0xff, $r0
-> - move $r0, $ccs
-> - btst r3,r3
-> - move $ccs, $r0
-> - and.d 0xff, $r0
-> - cmp.d	0xe3, $r0
-> - test_cc 0 1 0 0
-> + ;; move.d	0xff, $r0
-> + ;; move $r0, $ccs
-> + ;; btst r3,r3
-> + ;; move $ccs, $r0
-> + ;; and.d 0xff, $r0
-> + ;; cmp.d	0xe3, $r0
-> + ;; test_cc 0 1 0 0
->  
->   quit
-> -- 
-> 2.17.1
-> 
+Paolo
