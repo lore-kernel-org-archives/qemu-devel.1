@@ -1,28 +1,26 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:54833 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:54788 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY07-0002hZ-Tc
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:38 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gfY02-0002dQ-KF
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY06-0001Qa-VI
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:35 -0500
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:33666)
+	(envelope-from <richard.henderson@linaro.org>) id 1gfXzz-0001Cm-GO
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:30 -0500
+Received: from mail-it1-x12c.google.com ([2607:f8b0:4864:20::12c]:35506)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gfY06-0001NY-Qp
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:34 -0500
-Received: by mail-it1-x143.google.com with SMTP id m8so2327407itk.0
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:31:34 -0800 (PST)
+	id 1gfXzz-0001Bk-C0
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:27 -0500
+Received: by mail-it1-x12c.google.com with SMTP id p197so3463998itp.0
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:31:27 -0800 (PST)
 Received: from cloudburst.twiddle.net ([172.56.12.23])
 	by smtp.gmail.com with ESMTPSA id
-	t6sm27793259ioc.87.2019.01.04.14.31.31 for <qemu-devel@nongnu.org>
+	t6sm27793259ioc.87.2019.01.04.14.31.23 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 04 Jan 2019 14:31:33 -0800 (PST)
+	Fri, 04 Jan 2019 14:31:25 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  5 Jan 2019 08:31:09 +1000
-Message-Id: <20190104223116.14037-4-richard.henderson@linaro.org>
-In-Reply-To: <20190104223116.14037-1-richard.henderson@linaro.org>
-References: <20190104223116.14037-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 03/10] tcg: Add write_aofs to GVecGen4
+Date: Sat,  5 Jan 2019 08:31:06 +1000
+Message-Id: <20190104223116.14037-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 00/10] tcg vector improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,121 +31,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This allows writing 2 output, 3 input operations.
+I've split this out from the target/ppc patch set in which
+it was developed.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg-op-gvec.h |  2 ++
- tcg/tcg-op-gvec.c | 27 +++++++++++++++++++--------
- 2 files changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-index d65b9d9d4c..2cb447112e 100644
---- a/tcg/tcg-op-gvec.h
-+++ b/tcg/tcg-op-gvec.h
-@@ -181,6 +181,8 @@ typedef struct {
-     uint8_t vece;
-     /* Prefer i64 to v64.  */
-     bool prefer_i64;
-+    /* Write aofs as a 2nd dest operand.  */
-+    bool write_aofs;
- } GVecGen4;
- 
- void tcg_gen_gvec_2(uint32_t dofs, uint32_t aofs,
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 81689d02f7..c10d3d7b26 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -665,7 +665,7 @@ static void expand_3_i32(uint32_t dofs, uint32_t aofs,
- 
- /* Expand OPSZ bytes worth of three-operand operations using i32 elements.  */
- static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
--                         uint32_t cofs, uint32_t oprsz,
-+                         uint32_t cofs, uint32_t oprsz, bool write_aofs,
-                          void (*fni)(TCGv_i32, TCGv_i32, TCGv_i32, TCGv_i32))
- {
-     TCGv_i32 t0 = tcg_temp_new_i32();
-@@ -680,6 +680,9 @@ static void expand_4_i32(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-         tcg_gen_ld_i32(t3, cpu_env, cofs + i);
-         fni(t0, t1, t2, t3);
-         tcg_gen_st_i32(t0, cpu_env, dofs + i);
-+        if (write_aofs) {
-+            tcg_gen_st_i32(t1, cpu_env, aofs + i);
-+        }
-     }
-     tcg_temp_free_i32(t3);
-     tcg_temp_free_i32(t2);
-@@ -769,7 +772,7 @@ static void expand_3_i64(uint32_t dofs, uint32_t aofs,
- 
- /* Expand OPSZ bytes worth of three-operand operations using i64 elements.  */
- static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
--                         uint32_t cofs, uint32_t oprsz,
-+                         uint32_t cofs, uint32_t oprsz, bool write_aofs,
-                          void (*fni)(TCGv_i64, TCGv_i64, TCGv_i64, TCGv_i64))
- {
-     TCGv_i64 t0 = tcg_temp_new_i64();
-@@ -784,6 +787,9 @@ static void expand_4_i64(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-         tcg_gen_ld_i64(t3, cpu_env, cofs + i);
-         fni(t0, t1, t2, t3);
-         tcg_gen_st_i64(t0, cpu_env, dofs + i);
-+        if (write_aofs) {
-+            tcg_gen_st_i64(t1, cpu_env, aofs + i);
-+        }
-     }
-     tcg_temp_free_i64(t3);
-     tcg_temp_free_i64(t2);
-@@ -880,7 +886,7 @@ static void expand_3_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
- /* Expand OPSZ bytes worth of four-operand operations using host vectors.  */
- static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-                          uint32_t bofs, uint32_t cofs, uint32_t oprsz,
--                         uint32_t tysz, TCGType type,
-+                         uint32_t tysz, TCGType type, bool write_aofs,
-                          void (*fni)(unsigned, TCGv_vec, TCGv_vec,
-                                      TCGv_vec, TCGv_vec))
- {
-@@ -896,6 +902,9 @@ static void expand_4_vec(unsigned vece, uint32_t dofs, uint32_t aofs,
-         tcg_gen_ld_vec(t3, cpu_env, cofs + i);
-         fni(vece, t0, t1, t2, t3);
-         tcg_gen_st_vec(t0, cpu_env, dofs + i);
-+        if (write_aofs) {
-+            tcg_gen_st_vec(t1, cpu_env, aofs + i);
-+        }
-     }
-     tcg_temp_free_vec(t3);
-     tcg_temp_free_vec(t2);
-@@ -1187,7 +1196,7 @@ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
-          */
-         some = QEMU_ALIGN_DOWN(oprsz, 32);
-         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, some,
--                     32, TCG_TYPE_V256, g->fniv);
-+                     32, TCG_TYPE_V256, g->write_aofs, g->fniv);
-         if (some == oprsz) {
-             break;
-         }
-@@ -1200,18 +1209,20 @@ void tcg_gen_gvec_4(uint32_t dofs, uint32_t aofs, uint32_t bofs, uint32_t cofs,
-         /* fallthru */
-     case TCG_TYPE_V128:
-         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
--                     16, TCG_TYPE_V128, g->fniv);
-+                     16, TCG_TYPE_V128, g->write_aofs, g->fniv);
-         break;
-     case TCG_TYPE_V64:
-         expand_4_vec(g->vece, dofs, aofs, bofs, cofs, oprsz,
--                     8, TCG_TYPE_V64, g->fniv);
-+                     8, TCG_TYPE_V64, g->write_aofs, g->fniv);
-         break;
- 
-     case 0:
-         if (g->fni8 && check_size_impl(oprsz, 8)) {
--            expand_4_i64(dofs, aofs, bofs, cofs, oprsz, g->fni8);
-+            expand_4_i64(dofs, aofs, bofs, cofs, oprsz,
-+                         g->write_aofs, g->fni8);
-         } else if (g->fni4 && check_size_impl(oprsz, 4)) {
--            expand_4_i32(dofs, aofs, bofs, cofs, oprsz, g->fni4);
-+            expand_4_i32(dofs, aofs, bofs, cofs, oprsz,
-+                         g->write_aofs, g->fni4);
-         } else {
-             assert(g->fno != NULL);
-             tcg_gen_gvec_4_ool(dofs, aofs, bofs, cofs,
+r~
+
+
+Richard Henderson (10):
+  tcg: Add logical simplifications during gvec expand
+  tcg: Add gvec expanders for nand, nor, eqv
+  tcg: Add write_aofs to GVecGen4
+  tcg: Add opcodes for vector saturated arithmetic
+  tcg: Add opcodes for vector minmax arithmetic
+  tcg/i386: Split subroutines out of tcg_expand_vec_op
+  tcg/i386: Implement vector saturating arithmetic
+  tcg/i386: Implement vector minmax arithmetic
+  tcg/aarch64: Implement vector saturating arithmetic
+  tcg/aarch64: Implement vector minmax arithmetic
+
+ accel/tcg/tcg-runtime.h      |  23 ++
+ tcg/aarch64/tcg-target.h     |   2 +
+ tcg/i386/tcg-target.h        |   2 +
+ tcg/tcg-op-gvec.h            |  18 ++
+ tcg/tcg-op.h                 |  11 +
+ tcg/tcg-opc.h                |   8 +
+ tcg/tcg.h                    |   2 +
+ accel/tcg/tcg-runtime-gvec.c | 257 ++++++++++++++++
+ tcg/aarch64/tcg-target.inc.c |  48 +++
+ tcg/i386/tcg-target.inc.c    | 580 +++++++++++++++++++++--------------
+ tcg/tcg-op-gvec.c            | 305 ++++++++++++++++--
+ tcg/tcg-op-vec.c             |  75 ++++-
+ tcg/tcg.c                    |  10 +
+ 13 files changed, 1078 insertions(+), 263 deletions(-)
+
 -- 
 2.17.2
