@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43757)
+Received: from eggs.gnu.org ([208.118.235.92]:44485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfOpT-0003OP-Ua
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 07:44:00 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gfOsD-0005H3-E1
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 07:46:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfOpT-00012y-Ab
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 07:43:59 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41681)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfOpT-0000yA-3k
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 07:43:59 -0500
-Received: by mail-oi1-x242.google.com with SMTP id j21so30250482oii.8
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 04:43:58 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1gfOs6-00071G-Pj
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 07:46:47 -0500
+Resent-Message-Id: <E1gfOs6-00071G-Pj@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gfOrz-0006vf-Rx
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 07:46:37 -0500
+In-Reply-To: <20190103122323.1273034-1-basil@daynix.com>
+Message-ID: <154657801249.24874.13243032508942247996@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <20190104090610.652-1-clg@kaod.org>
-	<CAFEAcA9qKgxY=u4YdymWz3oEDx8Fu-Z5_PfSaznxuWWY-m+=ZA@mail.gmail.com>
-	<12292c86-0e43-f969-311b-0eaa83254767@kaod.org>
-In-Reply-To: <12292c86-0e43-f969-311b-0eaa83254767@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 12:43:47 +0000
-Message-ID: <CAFEAcA-cawceysk6Yx+FTU5tyiUGRjtrrDATa4Jhh+pDAdZSAQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr: return from post_load method when
- RTC import fails
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 3 Jan 2019 21:00:15 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] QGA - Win fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: basil@daynix.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, yan@daynix.com, bishara@daynix.com
 
-On Fri, 4 Jan 2019 at 12:31, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> On 1/4/19 11:08 AM, Peter Maydell wrote:
-> > On Fri, 4 Jan 2019 at 09:07, C=C3=A9dric Le Goater <clg@kaod.org> wrote=
-:
-> >>
-> >> The error value can be squashed by the section handling radix migratio=
-n.
-> >> Simply bail out if an error occurs when the RTC offset is imported.
-> >>
-> >> Fixes: d39c90f5f3ae ("spapr: Fix migration of Radix guests")
-> >
-> > You could also mention that this fixes the Coverity
-> > issue CID 1398591.
->
-> ok. I will in a v2.
->
-> Is there a tag for it ?
->
-> or adding a comment "this fixes the Coverity issue CID 1398591."
-> is considered sufficient ?
-
-
-No, we don't have a formal tag for that kind of thing.
-
-thanks
--- PMM
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEwMzEyMjMyMy4xMjcz
+MDM0LTEtYmFzaWxAZGF5bml4LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwMTAzMTIyMzIzLjEyNzMw
+MzQtMS1iYXNpbEBkYXluaXguY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSBR
+R0EgLSBXaW4gZml4ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
+U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
+aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
+QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
+LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
+c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
+bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
+ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKZTI0ZmRhNyBxZ2Etd2luOiBIYW5kbGUgVlNTX0VfUFJPVklERVJf
+QUxSRUFEWV9SRUdJU1RFUkVEIGVycm9yCjYyYWMxMmEgcWdhOiBJbnN0YWxsZXI6IFdhaXQgZm9y
+IGluc3RhbGxhdGlvbiB0byBmaW5pc2gKMGNiM2U2ZSBxZ2E6IGZpeCBzZW5kX3Jlc3BvbnNlIGVy
+cm9yIGhhbmRsaW5nCjU4OWFmN2MgcWdhLXdpbjogcHJldmVudCBjcmFzaCB3aGVuIGV4ZWN1dGlu
+ZyBndWVzdC1maWxlLXJlYWQgd2l0aCBsYXJnZSBjb3VudAoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
+Q2hlY2tpbmcgUEFUQ0ggMS80OiBxZ2Etd2luOiBwcmV2ZW50IGNyYXNoIHdoZW4gZXhlY3V0aW5n
+IGd1ZXN0LWZpbGUtcmVhZCB3aXRoIGxhcmdlIGNvdW50Li4uCkNoZWNraW5nIFBBVENIIDIvNDog
+cWdhOiBmaXggc2VuZF9yZXNwb25zZSBlcnJvciBoYW5kbGluZy4uLgpDaGVja2luZyBQQVRDSCAz
+LzQ6IHFnYTogSW5zdGFsbGVyOiBXYWl0IGZvciBpbnN0YWxsYXRpb24gdG8gZmluaXNoLi4uCkNo
+ZWNraW5nIFBBVENIIDQvNDogcWdhLXdpbjogSGFuZGxlIFZTU19FX1BST1ZJREVSX0FMUkVBRFlf
+UkVHSVNURVJFRCBlcnJvci4uLgpFUlJPUjogdGhhdCBvcGVuIGJyYWNlIHsgc2hvdWxkIGJlIG9u
+IHRoZSBwcmV2aW91cyBsaW5lCiMyMTogRklMRTogcWdhL3Zzcy13aW4zMi9pbnN0YWxsLmNwcDo0
+NDY6CisgICAgaWYgKGhyID09IChsb25nIGludCkgVlNTX0VfUFJPVklERVJfQUxSRUFEWV9SRUdJ
+U1RFUkVEKQorICAgIHsKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChj
+dHg6VnhPKQojMjU6IEZJTEU6IHFnYS92c3Mtd2luMzIvaW5zdGFsbC5jcHA6NDUwOgorICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb25zdF9jYXN0PFdDSEFSKj4oUUdB
+X1BST1ZJREVSX0xOQU1FKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF4KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMy
+NzogRklMRTogcWdhL3Zzcy13aW4zMi9pbnN0YWxsLmNwcDo0NTI6CisgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0X2Nhc3Q8V0NIQVIqPihRR0FfUFJPVklERVJf
+VkVSU0lPTiksCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4
+TykKIzI3OiBGSUxFOiBxZ2EvdnNzLXdpbjMyL2luc3RhbGwuY3BwOjQ1MjoKKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3RfY2FzdDxXQ0hBUio+KFFHQV9QUk9W
+SURFUl9WRVJTSU9OKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAzIGVycm9ycywgMSB3YXJuaW5ncywgMTYgbGluZXMg
+Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
+ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMDMxMjIzMjMu
+MTI3MzAzNC0xLWJhc2lsQGRheW5peC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
+Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QHJlZGhhdC5jb20=
