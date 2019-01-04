@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:45467)
+Received: from eggs.gnu.org ([208.118.235.92]:45769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gfLkw-0003L8-Ii
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:27:07 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gfLlt-0004O2-OR
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gfLks-0006vW-En
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:27:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43716)
+	(envelope-from <cohuck@redhat.com>) id 1gfLlp-0007ro-QY
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:28:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36450)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gfLks-0006ui-9Z
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:27:02 -0500
-Date: Fri, 4 Jan 2019 10:26:55 +0100
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gfLlp-0007r4-L8
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 04:28:01 -0500
+Date: Fri, 4 Jan 2019 10:27:55 +0100
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190104102655.3bf599f5.cohuck@redhat.com>
-In-Reply-To: <20190104082731.24967-2-pbonzini@redhat.com>
+Message-ID: <20190104102755.4e7f47fd.cohuck@redhat.com>
+In-Reply-To: <20190104082731.24967-3-pbonzini@redhat.com>
 References: <20190104082731.24967-1-pbonzini@redhat.com>
-	<20190104082731.24967-2-pbonzini@redhat.com>
+	<20190104082731.24967-3-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] scripts/update-linux-headers.sh:
- adjust for Linux 4.21-rc1 (or 5.0-rc1)
+Subject: Re: [Qemu-devel] [PATCH 2/2] include: update Linux headers to
+ 4.21-rc1/5.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +31,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org
 
-On Fri,  4 Jan 2019 09:27:30 +0100
+On Fri,  4 Jan 2019 09:27:31 +0100
 Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> There are three new indirect inclusions: vhost_types.h, which we'll
-> shortly put to use as a portable header and thus is copied to
-> standard-headers; and new per-subtarget versions of MIPS unistd.h
-> and PowerPC unistd.h.
-> 
-> Because vhost.h includes vhost_types.h, we also need a proxy include
-> from linux/vhost.h to standard-headers.
+> This is simply running the newly-updated script on Linux, in
+> order to obtain the new header files and all the other updates
+> from the recent Linux merge window.
 > 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  scripts/update-linux-headers.sh | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  include/standard-headers/drm/drm_fourcc.h     |   63 +
+>  include/standard-headers/linux/ethtool.h      |   19 +-
+>  .../linux/input-event-codes.h                 |   17 +
+>  include/standard-headers/linux/pci_regs.h     |    1 +
+>  include/standard-headers/linux/vhost_types.h  |  128 ++
+>  .../standard-headers/linux/virtio_balloon.h   |    8 +
+>  include/standard-headers/linux/virtio_blk.h   |   54 +
+>  .../standard-headers/linux/virtio_config.h    |    3 +
+>  include/standard-headers/linux/virtio_gpu.h   |   18 +
+>  include/standard-headers/linux/virtio_ring.h  |   52 +
+>  linux-headers/asm-arm/unistd-common.h         |    1 +
+>  linux-headers/asm-arm64/unistd.h              |    1 +
+>  linux-headers/asm-generic/unistd.h            |   10 +-
+>  linux-headers/asm-mips/sgidefs.h              |    8 -
+>  linux-headers/asm-mips/unistd.h               | 1074 +----------------
+>  linux-headers/asm-mips/unistd_n32.h           |  338 ++++++
+>  linux-headers/asm-mips/unistd_n64.h           |  334 +++++
+>  linux-headers/asm-mips/unistd_o32.h           |  374 ++++++
+>  linux-headers/asm-powerpc/unistd.h            |  389 +-----
+>  linux-headers/asm-powerpc/unistd_32.h         |  381 ++++++
+>  linux-headers/asm-powerpc/unistd_64.h         |  372 ++++++
+>  linux-headers/linux/kvm.h                     |   29 +
+>  linux-headers/linux/vfio.h                    |   92 ++
+>  linux-headers/linux/vhost.h                   |  113 +-
+>  linux-headers/linux/vhost_types.h             |    1 +
+>  25 files changed, 2291 insertions(+), 1589 deletions(-)
+>  create mode 100644 include/standard-headers/linux/vhost_types.h
+>  create mode 100644 linux-headers/asm-mips/unistd_n32.h
+>  create mode 100644 linux-headers/asm-mips/unistd_n64.h
+>  create mode 100644 linux-headers/asm-mips/unistd_o32.h
+>  create mode 100644 linux-headers/asm-powerpc/unistd_32.h
+>  create mode 100644 linux-headers/asm-powerpc/unistd_64.h
+>  create mode 100644 linux-headers/linux/vhost_types.h
 
-I still think we could squash this change (and the description :) with
-the headers update, but I don't object to a separate change, either.
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
