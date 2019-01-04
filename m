@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:40426)
+Received: from eggs.gnu.org ([208.118.235.92]:42025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1gfCfi-0003Db-Bv
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 18:45:07 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gfFH1-0003vR-6L
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 21:31:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1gfCff-0001Gr-8Q
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 18:45:06 -0500
-Received: from mx2.suse.de ([195.135.220.15]:53580 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1gfCfe-0001G3-Un
-	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 18:45:03 -0500
-References: <CAFEAcA_-wNGz_ftDziARUwzL2Lc+1kkoMTo0OxV4UVwbTr8EaQ@mail.gmail.com>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <9b211327-06a8-9739-e984-4b05557c12b4@suse.de>
-Date: Fri, 4 Jan 2019 00:44:59 +0100
+	(envelope-from <elohimes@gmail.com>) id 1gfFH0-0003Qn-9u
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 21:31:47 -0500
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:43478)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gfFH0-0003Qf-4w
+	for qemu-devel@nongnu.org; Thu, 03 Jan 2019 21:31:46 -0500
+Received: by mail-yb1-xb44.google.com with SMTP id t16so12548639ybk.10
+	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 18:31:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_-wNGz_ftDziARUwzL2Lc+1kkoMTo0OxV4UVwbTr8EaQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] can we update QEMU's version of u-boot.e500 ?
+References: <20190103101819.7418-1-xieyongji@baidu.com>
+	<20190103101819.7418-3-xieyongji@baidu.com>
+	<20190103115512-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190103115512-mutt-send-email-mst@kernel.org>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Fri, 4 Jan 2019 10:31:34 +0800
+Message-ID: <CAONzpcaD6DeDfhjxm_3-ZSrfTXJAenYWN1LC78nU-fovCpuGqQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 for-4.0 2/7] vhost-user: Support
+ providing shared memory to backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
+	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
+On Fri, 4 Jan 2019 at 01:02, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, Jan 03, 2019 at 06:18:14PM +0800, elohimes@gmail.com wrote:
+> > From: Xie Yongji <xieyongji@baidu.com>
+> >
+> > This patch introduces two new messages VHOST_USER_GET_SHM_SIZE
+> > and VHOST_USER_SET_SHM_FD to support providing shared
+> > memory to backend.
+>
+> So this seems a bit vague. Since we are going to use it
+> for tracking in-flight I/O I would prefer it that we
+> actually call it that.
+>
+>
 
+So how about VHOST_USER_GET_INFLIGHT_SIZE and VHOST_USER_SET_INFLIHGT_FD?
 
-On 03.01.19 18:38, Peter Maydell wrote:
-> Hi; currently we ship with a u-boot.e500 which is from u-boot
-> v2017.07. It would be nice to move that forward, specifically
-> to at least v2017.11, which contains upstream u-boot's part of the
-> fix for https://bugs.launchpad.net/qemu/+bug/1714750 .
-> (There are more recent releases than that; it's just the first
-> that contains the fix.)
-> 
-> Then we could remove the workaround in scripts/make-release and
-> close out the bug.
-> 
-> I've cc'd David as the current maintainer of pc-bios/u-boot.e500
-> and Alex as the last person who did an update.
+> >
+> > Firstly, qemu uses VHOST_USER_GET_SHM_SIZE to get the
+> > required size of shared memory from backend. Then, qemu
+> > allocates memory and sends them
+>
+> s/them/it/ ?
+>
 
-I think it's a great idea to update it.
+Will fix it in v4.
 
-David, do you want to do that or rather have me send a patch?
+> > back to backend through
+> > VHOST_USER_SET_SHM_FD.
+> >
+> > Note that the shared memory should be used to record
+> > inflight I/O by backend. Qemu will clear it when vm reset.
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+> > Signed-off-by: Chai Wen <chaiwen@baidu.com>
+> > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+> > ---
+> >  docs/interop/vhost-user.txt       |  41 +++++++++++
+> >  hw/virtio/vhost-user.c            |  86 ++++++++++++++++++++++
+> >  hw/virtio/vhost.c                 | 117 ++++++++++++++++++++++++++++++
+> >  include/hw/virtio/vhost-backend.h |   9 +++
+> >  include/hw/virtio/vhost.h         |  19 +++++
+> >  5 files changed, 272 insertions(+)
+> >
+> > diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> > index c2194711d9..5ee9c28ab0 100644
+> > --- a/docs/interop/vhost-user.txt
+> > +++ b/docs/interop/vhost-user.txt
+> > @@ -142,6 +142,19 @@ Depending on the request type, payload can be:
+> >     Offset: a 64-bit offset of this area from the start of the
+> >         supplied file descriptor
+> >
+> > + * Shm description
+> > +   -----------------------------------
+> > +   | mmap_size | mmap_offset | dev_size | vq_size | align | version |
+> > +   -----------------------------------
+> > +
+> > +   Mmap_size: a 64-bit size of the shared memory
+> > +   Mmap_offset: a 64-bit offset of the shared memory from the start
+> > +                of the supplied file descriptor
+> > +   Dev_size: a 32-bit size of device region in shared memory
+> > +   Vq_size: a 32-bit size of each virtqueue region in shared memory
+> > +   Align: a 32-bit align of each region in shared memory
+> > +   Version: a 32-bit version of this shared memory
+> > +
+>
+> This is an informal description so please avoid _ in field
+> names, just put a space in there. See e.g. log description.
+>
+>
+Got it!
 
+> >  In QEMU the vhost-user message is implemented with the following struct:
+> >
+> >  typedef struct VhostUserMsg {
+>
+>
+> For things to work, in-flight format must not change when
+> backend reconnects.
+>
 
-Alex
+I'm not sure whether there will be some cases that we want to add some fields to
+the inflight area without stopping vm.
+
+> To encourage consistency, how about including a recommended format for
+> this buffer in this document?
+>
+>
+
+Sure. Will add it in v4.
+
+Thanks,
+Yongji
