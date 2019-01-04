@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:58713)
+Received: from eggs.gnu.org ([208.118.235.92]:59318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gfKn0-0001Tb-1Y
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:25:10 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gfKpJ-0002U0-MN
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:27:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gfKmw-0003P4-13
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:25:10 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:38621
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gfKmv-0003MT-RF
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:25:05 -0500
-References: <20190103093704.32635-1-ppandit@redhat.com>
-	<cd325b25-15ee-46e4-896e-e5904340b1bf@ilande.co.uk>
-	<nycvar.YSQ.7.76.1901041111410.31402@xnncv>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <fcb58ca9-5019-5c46-24f8-3c09961ddd56@ilande.co.uk>
-Date: Fri, 4 Jan 2019 08:24:56 +0000
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gfKpI-0004po-Qj
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:27:33 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45616)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gfKpI-0004pI-K2
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:27:32 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t6so35842815wrr.12
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 00:27:32 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri,  4 Jan 2019 09:27:29 +0100
+Message-Id: <20190104082731.24967-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.76.1901041111410.31402@xnncv>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] sun4u: add power_mem_read routine
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/2] include: update Linux headers to
+ 4.21-rc1/5.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, cohuck@redhat.com, peter.maydell@linaro.org
 
-On 04/01/2019 05:47, P J P wrote:
+This is the same patch I've sent, except that scripts/update-linux-headers.sh
+changes are split to a separate commit.
 
->   Hello Mark,
-> 
-> +-- On Thu, 3 Jan 2019, Mark Cave-Ayland wrote --+
-> | >  /* Power */
-> | > +static uint64_t power_mem_read(void *opaque, hwaddr addr, unsigned size)
-> | > +{
-> | > +    return 0xffffffff;
-> | > +}
-> | > +
-> | >  
-> | >  static const MemoryRegionOps power_mem_ops = {
-> | > +    .read = power_mem_read,
-> | >      .write = power_mem_write,
-> | >      .endianness = DEVICE_NATIVE_ENDIAN,
-> | >      .valid = {
-> | 
-> | Certainly the addition of the missing read function is valid, although I see that
-> | you've defaulted reads to returning 0xffffffff - can you point me towards the source
-> | that indicates that this behaviour matches that of real Ultra-5 hardware?
-> 
->  -> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02787.html
-> 
-> I haven't checked Ultra-5 h/w spec, return value was chosen similar to above 
-> one, thinking unimplemented .read need not return success.
-> 
-> Thank you.
+Paolo
 
-I asked someone with real Ultra-5 hardware to check this for me, and they've sent me
-back the following output:
+Paolo Bonzini (2):
+  scripts/update-linux-headers.sh: adjust for Linux 4.21-rc1 (or
+    5.0-rc1)
+  include: update Linux headers to 4.21-rc1/5.0-rc1
 
-ok .properties
-address                  fffb8000
-button
-interrupts               00000001
-reg                      00000014 00724000 00000004
-name                     power
-ok fffb8000 l@ u.
-0
+ include/standard-headers/drm/drm_fourcc.h     |   63 +
+ include/standard-headers/linux/ethtool.h      |   19 +-
+ .../linux/input-event-codes.h                 |   17 +
+ include/standard-headers/linux/pci_regs.h     |    1 +
+ include/standard-headers/linux/vhost_types.h  |  128 ++
+ .../standard-headers/linux/virtio_balloon.h   |    8 +
+ include/standard-headers/linux/virtio_blk.h   |   54 +
+ .../standard-headers/linux/virtio_config.h    |    3 +
+ include/standard-headers/linux/virtio_gpu.h   |   18 +
+ include/standard-headers/linux/virtio_ring.h  |   52 +
+ linux-headers/asm-arm/unistd-common.h         |    1 +
+ linux-headers/asm-arm64/unistd.h              |    1 +
+ linux-headers/asm-generic/unistd.h            |   10 +-
+ linux-headers/asm-mips/sgidefs.h              |    8 -
+ linux-headers/asm-mips/unistd.h               | 1074 +----------------
+ linux-headers/asm-mips/unistd_n32.h           |  338 ++++++
+ linux-headers/asm-mips/unistd_n64.h           |  334 +++++
+ linux-headers/asm-mips/unistd_o32.h           |  374 ++++++
+ linux-headers/asm-powerpc/unistd.h            |  389 +-----
+ linux-headers/asm-powerpc/unistd_32.h         |  381 ++++++
+ linux-headers/asm-powerpc/unistd_64.h         |  372 ++++++
+ linux-headers/linux/kvm.h                     |   29 +
+ linux-headers/linux/vfio.h                    |   92 ++
+ linux-headers/linux/vhost.h                   |  113 +-
+ linux-headers/linux/vhost_types.h             |    1 +
+ scripts/update-linux-headers.sh               |   11 +
+ 26 files changed, 2302 insertions(+), 1589 deletions(-)
+ create mode 100644 include/standard-headers/linux/vhost_types.h
+ create mode 100644 linux-headers/asm-mips/unistd_n32.h
+ create mode 100644 linux-headers/asm-mips/unistd_n64.h
+ create mode 100644 linux-headers/asm-mips/unistd_o32.h
+ create mode 100644 linux-headers/asm-powerpc/unistd_32.h
+ create mode 100644 linux-headers/asm-powerpc/unistd_64.h
+ create mode 100644 linux-headers/linux/vhost_types.h
 
-Looks like the read value should be all 0s rather than all 1s. Can you resubmit the
-patch with this change?
-
-
-ATB,
-
-Mark.
+-- 
+2.20.1
