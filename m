@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54081)
+Received: from eggs.gnu.org ([208.118.235.92]:54465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfVQK-00020q-2U
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:46:30 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gfVSA-000431-8Z
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:48:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfVQF-0008Ie-D5
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:46:28 -0500
-References: <20190104181208.7809-1-philmd@redhat.com>
-	<20190104181208.7809-2-philmd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8227c1e9-4a27-d01d-b9e4-fd52560b51b3@redhat.com>
-Date: Fri, 4 Jan 2019 13:45:59 -0600
+	(envelope-from <alistair23@gmail.com>) id 1gfVS1-0001sX-PK
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:48:17 -0500
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:46869)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1gfVS0-0001qa-9V
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:48:12 -0500
+Received: by mail-lf1-x141.google.com with SMTP id y14so7222231lfg.13
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 11:48:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190104181208.7809-2-philmd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6VHf3FOFsqmXTuVguluWI6monROqnxeoL"
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] util/cutils: Move size_to_str()
- from "qemu-common.h" to "cutils.h"
+References: <20190104182057.8778-1-philmd@redhat.com>
+	<8176371f-6dff-adee-84d1-5758ed74700c@redhat.com>
+In-Reply-To: <8176371f-6dff-adee-84d1-5758ed74700c@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 4 Jan 2019 11:47:43 -0800
+Message-ID: <CAKmqyKON+qf_+8sGYtaudLLcccdDz96SkiCNn_XztnJr8_m7bA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/char/stm32f2xx_usart: Do not update
+ data register when device is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6VHf3FOFsqmXTuVguluWI6monROqnxeoL
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella
- <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
-Message-ID: <8227c1e9-4a27-d01d-b9e4-fd52560b51b3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] util/cutils: Move size_to_str() from
- "qemu-common.h" to "cutils.h"
-References: <20190104181208.7809-1-philmd@redhat.com>
- <20190104181208.7809-2-philmd@redhat.com>
-In-Reply-To: <20190104181208.7809-2-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jan 4, 2019 at 10:31 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 1/4/19 7:20 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > When the device is disable, the internal circuitry keep the data
+>
+> "keep" -> "keeps"
+>
+> > register loaded and doesn't update it.
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-On 1/4/19 12:12 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> The size_to_str() function doesn't need to be in a generic header.
->=20
-> It makes also sens to find this function in the same header than
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-s/sens/sense/ s/than/as/
+Alistair
 
-> the opposite string to size functions: qemu_strtosz*().
-> Note than this function is already implemented in util/cutils.c.
-
-s/than/that/
-
->=20
-> Since we introduce a new function in a header, we document it,
-> using the previous comment from the source file.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---6VHf3FOFsqmXTuVguluWI6monROqnxeoL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwvt/cACgkQ3g5py3or
-ov3EVgf/TXmVsEb/9wAm7M/SxJRe7BjiEDY/q8GAQ0ST3pV78xqkwf1kZhhC3ScT
-dCFvSyFDmpLrSb1V1dkGZDS9WhCLCS327FVvIy346lUmYH5eegEMEDxxVlg2xHQj
-LofuIJmWoisr5d8Ff9S37vg4JeN54YAhmXmVwY/EXlPF3lTqRWm4AKnIbQ6m4buu
-hW9FkgdYyFefGsmpNcSRYiq0Ous/GJqM/PCN8CMK20k5Xahs2cN6P16g1sEtwMEb
-6CaylRw2DdOM0Unw1+ClNt5H8U46rKM4IMhB53mr3pKqAYh5gR5FCtri3eIyhNzp
-+WRzkJhGrcdTqbSSnRSA4Xn9jmgQ3A==
-=45Vt
------END PGP SIGNATURE-----
-
---6VHf3FOFsqmXTuVguluWI6monROqnxeoL--
+> > ---
+> >  hw/char/stm32f2xx_usart.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> >
+> > diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
+> > index f3363a2952..10392c70e2 100644
+> > --- a/hw/char/stm32f2xx_usart.c
+> > +++ b/hw/char/stm32f2xx_usart.c
+> > @@ -53,14 +53,13 @@ static void stm32f2xx_usart_receive(void *opaque, c=
+onst uint8_t *buf, int size)
+> >  {
+> >      STM32F2XXUsartState *s =3D opaque;
+> >
+> > -    s->usart_dr =3D *buf;
+> > -
+> >      if (!(s->usart_cr1 & USART_CR1_UE && s->usart_cr1 & USART_CR1_RE))=
+ {
+> >          /* USART not enabled - drop the chars */
+> >          DB_PRINT("Dropping the chars\n");
+> >          return;
+> >      }
+> >
+> > +    s->usart_dr =3D *buf;
+> >      s->usart_sr |=3D USART_SR_RXNE;
+> >
+> >      if (s->usart_cr1 & USART_CR1_RXNEIE) {
+> >
+>
