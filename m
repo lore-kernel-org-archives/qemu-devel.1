@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46486)
+Received: from eggs.gnu.org ([208.118.235.92]:47687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfQnp-0001gg-Vt
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:50:27 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gfQsQ-0003BR-Sd
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:55:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfQnm-0007FD-Nd
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:50:25 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39498)
+	(envelope-from <peter.maydell@linaro.org>) id 1gfQsP-00056O-VX
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:55:10 -0500
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:41902)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfQnm-0007B5-DC
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:50:22 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t27so36813768wra.6
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 06:50:22 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  4 Jan 2019 14:50:18 +0000
-Message-Id: <20190104145018.16950-1-peter.maydell@linaro.org>
+	id 1gfQsP-00055l-QG
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:55:09 -0500
+Received: by mail-oi1-x22c.google.com with SMTP id j21so30530763oii.8
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 06:55:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] tests/hexloader-test: Don't pass -nographic to
- the QEMU under test
+References: <20190104112145.12413-1-stefanha@redhat.com>
+In-Reply-To: <20190104112145.12413-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Jan 2019 14:54:58 +0000
+Message-ID: <CAFEAcA_jNbE1uue8uoYrmzooPL_oAbav0MX+jSEcAO=RQGW3Ag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Su Hang <suhang16@mails.ucas.ac.cn>, Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>
 
-The hexloader test invokes QEMU with the -nographic argument. This
-is unnecessary, because the qtest_initf() function will pass it
--display none, which suffices to disable the graphical window.
-It also means that the QEMU process will make the stdin/stdout
-O_NONBLOCK. Since O_NONBLOCK is not per-file descriptor but per
-"file description", this non-blocking behaviour is then shared
-with any other process that's using the stdin/stdout of the
-'make check' run, including make itself. This can result in make
-falling over with "make: write error: stdout" because it got
-an unexpected EINTR trying to write output messages to the terminal.
-This is particularly noticable if running 'make check' in a loop with
-  while make check; do true; done
-(It does not affect single make check runs so much because the
-shell will remove the O_NONBLOCK status before it reads the
-terminal for interactive input.)
+On Fri, 4 Jan 2019 at 11:21, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> The following changes since commit 20d6c7312f1b812bb9c750f4087f69ac8485cc90:
+>
+>   Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3.2-part1' into staging (2019-01-03 13:26:30 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 39a0408e768cd00142f5b57d27ab234282bf4df5:
+>
+>   dmg: don't skip zero chunk (2019-01-04 11:15:09 +0000)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> Bug fixes for the .dmg image file format.
+>
+> ----------------------------------------------------------------
 
-Remove the unwanted -nographic argument.
+Applied, thanks.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This seems to be sufficient to resolve my "make falls over"
-issues with the current test harness and a build done for
-arm targets; I haven't checked whether other test cases which
-are specific to other target architectures might have similar
-accidental O_NONBLOCK behaviour.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
- tests/hexloader-test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
-index 834ed52c22b..8b7aa2d72d0 100644
---- a/tests/hexloader-test.c
-+++ b/tests/hexloader-test.c
-@@ -23,7 +23,7 @@ static void hex_loader_test(void)
-     const unsigned int base_addr = 0x00010000;
- 
-     QTestState *s = qtest_initf(
--        "-M vexpress-a9 -nographic -device loader,file=tests/data/hex-loader/test.hex");
-+        "-M vexpress-a9 -device loader,file=tests/data/hex-loader/test.hex");
- 
-     for (i = 0; i < 256; ++i) {
-         uint8_t val = qtest_readb(s, base_addr + i);
--- 
-2.19.2
+-- PMM
