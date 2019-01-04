@@ -1,30 +1,36 @@
-Received: from [208.118.235.92] (port=60330 helo=eggs.gnu.org)
+Received: from [208.118.235.92] (port=33537 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gfXQ3-000545-6e
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 16:54:20 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gfXWc-0007zM-9C
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:01:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gfXPw-0001NZ-BG
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 16:54:13 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53224)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gfXPw-0001Hf-4n
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 16:54:12 -0500
-Received: by mail-wm1-x343.google.com with SMTP id m1so2327654wml.2
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 13:54:11 -0800 (PST)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-References: <B4B164B9-DCEE-41B2-ACF5-81D4FCBFF23B@gmail.com>
-	<EB385199-ACC7-4B87-97E7-4C13610AA28F@gmail.com>
-	<148c959b-c2cf-bf80-b8ec-6f0365b914af@gmail.com>
-	<9DD59E5E-C84B-498C-A020-BADDAE9DD9A8@gmail.com>
-Message-ID: <999942c1-6655-da1e-63c1-836ed18d003c@gmail.com>
-Date: Fri, 4 Jan 2019 22:54:09 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gfXWT-00081G-3w
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:01:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37520)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gfXWS-00080Z-SY
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:00:57 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 988B1C050DEE
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 22:00:55 +0000 (UTC)
+Date: Fri, 4 Jan 2019 20:00:50 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190104220050.GK4157@habkost.net>
+References: <20190104032226.21428-1-ehabkost@redhat.com>
+	<20190103232012-mutt-send-email-mst@kernel.org>
+	<20190104101200.GA2494@work-vm> <20190104175439.GH4157@habkost.net>
+	<20190104200952.GI4157@habkost.net>
+	<20190104154723-mutt-send-email-mst@kernel.org>
+	<20190104210656.GJ4157@habkost.net>
+	<20190104161217-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <9DD59E5E-C84B-498C-A020-BADDAE9DD9A8@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: hu-HU
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/52] Audio 5.1 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190104161217-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] compat: Use explicit type names on
+ HW_COMPAT_2_6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +39,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-On 2019-01-01 17:17, Programmingkid wrote:
+On Fri, Jan 04, 2019 at 04:13:15PM -0500, Michael S. Tsirkin wrote:
+> On Fri, Jan 04, 2019 at 07:06:56PM -0200, Eduardo Habkost wrote:
+> > On Fri, Jan 04, 2019 at 03:48:02PM -0500, Michael S. Tsirkin wrote:
+> > > On Fri, Jan 04, 2019 at 06:09:52PM -0200, Eduardo Habkost wrote:
+> > > > On Fri, Jan 04, 2019 at 03:54:39PM -0200, Eduardo Habkost wrote:
+> > > > > On Fri, Jan 04, 2019 at 10:12:00AM +0000, Dr. David Alan Gilbert wrote:
+> > > > > > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > > > > > > On Fri, Jan 04, 2019 at 01:22:26AM -0200, Eduardo Habkost wrote:
+> > > > > > > > The virtio-pci entries in HW_COMPAT_2_6 had an implicit
+> > > > > > > > assumption: that all virtio-pci subclasses support the
+> > > > > > > > disable-legacy and disable-modern options.
+> > > > > > > > 
+> > > > > > > > That assumption was broken by commit f6e501a28ef9 ("virtio:
+> > > > > > > > Provide version-specific variants of virtio PCI devices").  This
+> > > > > > > > caused QEMU to crash if using the new -non-transitional or
+> > > > > > > > -transitional device types:
+> > > > > > > > 
+> > > > > > > >   $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
+> > > > > > > >     -device virtio-net-pci-non-transitional
+> > > > > > > >   Unexpected error in object_property_find() at qom/object.c:1092:
+> > > > > > > >   qemu-system-x86_64: -device virtio-net-pci-non-transitional: can't apply \
+> > > > > > > >   global virtio-pci.disable-modern=on: Property '.disable-modern' not found
+> > > > > > > >   Aborted (core dumped)
+> > > > > > > > 
+> > > > > > > > Replace the virtio-pci.disable-legacy=off and
+> > > > > > > > virtio-pci.disable-modern=on entries on HW_COMPAT_2_6 with
+> > > > > > > > explicit entries for each generic virtio device type.
+> > > > > > > > 
+> > > > > > > > The full list of generic virtio device types was extracted by
+> > > > > > > > just grepping for ".generic_name".  Note that we don't need to
+> > > > > > > > worry about listing new virtio-pci devices in HW_COMPAT_2_6 in
+> > > > > > > > the future, because new devices won't require QEMU 2.6
+> > > > > > > > compatibility.
+> > > > > > > 
+> > > > > > > I fully expect that e.g. packed ring support will need
+> > > > > > > to affect all virtio devices too. And it's likely
+> > > > > > > that we'll have some new virtio-pci transport features too.
+> > > > > > > 
+> > > > > > > > This makes the compat entries annoyingly verbose, but is simpler
+> > > > > > > > than the alternative of making the virtio-pci type inheritance
+> > > > > > > > rules even more complex.
+> > > > > > > 
+> > > > > > > God forbid we forgot something, the only way to notice is to
+> > > > > > > run a cross version migration with an old qemu.
+> > > > > > > I think we need to come up with something less verbose and fragile.
+> > > > > > 
+> > > > > > I guess we could use a script like tests/acceptance/virtio_version.py to
+> > > > > > do a check?
+> > > > > 
+> > > > > That's a good idea.  On test code we can try additional tricks to
+> > > > > detect the hybrid virtio devices without increasing the
+> > > > > complexity of QEMU code.  I'll give it a try.
+> > > > 
+> > > > I did it but I'm not happy with the result: many of the virtio
+> > > > devices can't be tested without extra arguments.  Some of them
+> > > > (like vhost-*) require extra privileges on the host that might be
+> > > > unavailable.
+> > > > 
+> > > > Anyway, while writing this I noticed another issue: many of the
+> > > > virtio devices in QEMU 2.6 were already modern-only!
+> > > > 
+> > > > Setting disable-modern=off on modern-only devices like virtio-vga
+> > > > or virtio-tablet-pci doesn't make sense.  This means setting
+> > > > virtio-pci.disable-modern=off on HW_COMPAT_2_6 was incorrect even
+> > > > before the -non-transitional and -transitional device types were
+> > > > introduced.
+> > > 
+> > > 
+> > > It did create an opportunity to create non working devices.
+> > > 
+> > > Whether that's incorrect as such I'm not sure.
+> > 
+> > This is not just creating the opportunity for an user to
+> > disable-modern=on.  HW_COMPAT_2_6 is actually setting
+> > disable-modern=on on virtio-vga and other modern-only devices.
+> > Sounds like a mistake to me.
+> > 
+> > Luckily those modern-only devices silently ignore the
+> > disable-modern/disable-legacy properties, but this might change
+> > in the future.
 > 
->> On Jan 1, 2019, at 7:27 AM, Zoltán Kővágó <dirty.ice.hu@gmail.com> wrote:
->>
->> On 2019-01-01 05:24, Programmingkid wrote:
->>>> On 2018-12-29 01:49, Programmingkid wrote:
->> [snip]
->>>>>
->>>>> I tried ac97 with a Windows 2000 guest in qemu-system-i386 - same demonic sound.
->>>>> With the above configuration but with an es1370 sound card I heard the same sound. I kept seeing "es1370: warning: non looping mode" being printed in the terminal. This problem might need its own patch.
->>>>> Using the sb16 sound card I heard the same unsettling sound.
->>>>>
->>>>> I could not test the HDA driver due to problems with my Windows 7 VM.  
->>>>>
->>>>
->>>>
->>>> I have a feeling that bf870a0cf5e2c2dd7438e65473b4fca1fb0ca5d1
->>>> (coreaudio: port to the new audio backend api) is the commit which
->>>> breaks it, but without a mac I don't know how could I debug it. The way
->>>> it initializes coreaudio changed a bit, that can cause problems.
->>>> Could you please test whether this commit is the culprit or not?
->>>>
->>>> Regards,
->>>> Zoltan
->>>
->>>
->>> Hi how do you want me to test your theory? Revert the patch? If I did I don't think QEMU would still compile. 
->>
->> No, don't revert it, that would generate too many conflicts. Just
->>
->> git checkout bf870a0c
-> 
-> This causes the very disturbing sound to play.
-> 
->>
->> and
->>
->> git checkout bf870a0c~
-> 
-> This also causes the very disturbing sound to play.
-> 
->>
->> should give you two versions that you can compare.
->>
->> Regards,
->> Zoltan
-> 
-> Thank you.
-> 
+> Worry about it then?
 
-That's worrying, since before that commit I didn't really do any big
-refactoring on coreaudio itself, and without a Mac I have no idea how
-could I debug it.
-Could you at least try a git bisect and figure out which commit broke it?
+Right, we don't need to worry about it today.  But if a solution
+to the crash reported by Thomas will make the problem go away,
+that's even better.
 
-Thanks,
-Zoltan
+-- 
+Eduardo
