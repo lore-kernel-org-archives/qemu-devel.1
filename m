@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53804)
+Received: from eggs.gnu.org ([208.118.235.92]:53860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gfREm-000723-Tm
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:18:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gfREw-0007FA-93
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:18:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gfREj-0007rC-Ra
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:18:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:64274)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gfREj-0007qe-MM
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:18:13 -0500
-Date: Fri, 4 Jan 2019 10:18:12 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190104101753-mutt-send-email-mst@kernel.org>
-References: <20190104082731.24967-1-pbonzini@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gfREv-0008ER-M5
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:18:26 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35425)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gfREv-0008Bl-H0
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:18:25 -0500
+Received: by mail-oi1-x241.google.com with SMTP id v6so30586909oif.2
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 07:18:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190104082731.24967-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] include: update Linux headers to
- 4.21-rc1/5.0-rc1
+References: <20190104104749.5314-1-edgar.iglesias@gmail.com>
+In-Reply-To: <20190104104749.5314-1-edgar.iglesias@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Jan 2019 15:18:14 +0000
+Message-ID: <CAFEAcA-y3X2wv=pDw4ufAFRnhdFmGRDHc8KAT9B9p1F20V1hqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 0/1] hw/arm: versal: Fix memory leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, cohuck@redhat.com, peter.maydell@linaro.org
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Luc Michel <luc.michel@greensocs.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
 
-On Fri, Jan 04, 2019 at 09:27:29AM +0100, Paolo Bonzini wrote:
-> This is the same patch I've sent, except that scripts/update-linux-headers.sh
-> changes are split to a separate commit.
-> 
-> Paolo
+On Fri, 4 Jan 2019 at 10:47, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> This series fixes the memory leaks in versal board creation
+> reported by Peter Maydell.
+>
+> Best regards,
+> Edgar
+>
+> Edgar E. Iglesias (1):
+>   hw/arm: versal: Plug memory leaks
+>
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Applied to target-arm.next, thanks (with a Fixes: line added)
 
-> Paolo Bonzini (2):
->   scripts/update-linux-headers.sh: adjust for Linux 4.21-rc1 (or
->     5.0-rc1)
->   include: update Linux headers to 4.21-rc1/5.0-rc1
-> 
->  include/standard-headers/drm/drm_fourcc.h     |   63 +
->  include/standard-headers/linux/ethtool.h      |   19 +-
->  .../linux/input-event-codes.h                 |   17 +
->  include/standard-headers/linux/pci_regs.h     |    1 +
->  include/standard-headers/linux/vhost_types.h  |  128 ++
->  .../standard-headers/linux/virtio_balloon.h   |    8 +
->  include/standard-headers/linux/virtio_blk.h   |   54 +
->  .../standard-headers/linux/virtio_config.h    |    3 +
->  include/standard-headers/linux/virtio_gpu.h   |   18 +
->  include/standard-headers/linux/virtio_ring.h  |   52 +
->  linux-headers/asm-arm/unistd-common.h         |    1 +
->  linux-headers/asm-arm64/unistd.h              |    1 +
->  linux-headers/asm-generic/unistd.h            |   10 +-
->  linux-headers/asm-mips/sgidefs.h              |    8 -
->  linux-headers/asm-mips/unistd.h               | 1074 +----------------
->  linux-headers/asm-mips/unistd_n32.h           |  338 ++++++
->  linux-headers/asm-mips/unistd_n64.h           |  334 +++++
->  linux-headers/asm-mips/unistd_o32.h           |  374 ++++++
->  linux-headers/asm-powerpc/unistd.h            |  389 +-----
->  linux-headers/asm-powerpc/unistd_32.h         |  381 ++++++
->  linux-headers/asm-powerpc/unistd_64.h         |  372 ++++++
->  linux-headers/linux/kvm.h                     |   29 +
->  linux-headers/linux/vfio.h                    |   92 ++
->  linux-headers/linux/vhost.h                   |  113 +-
->  linux-headers/linux/vhost_types.h             |    1 +
->  scripts/update-linux-headers.sh               |   11 +
->  26 files changed, 2302 insertions(+), 1589 deletions(-)
->  create mode 100644 include/standard-headers/linux/vhost_types.h
->  create mode 100644 linux-headers/asm-mips/unistd_n32.h
->  create mode 100644 linux-headers/asm-mips/unistd_n64.h
->  create mode 100644 linux-headers/asm-mips/unistd_o32.h
->  create mode 100644 linux-headers/asm-powerpc/unistd_32.h
->  create mode 100644 linux-headers/asm-powerpc/unistd_64.h
->  create mode 100644 linux-headers/linux/vhost_types.h
-> 
-> -- 
-> 2.20.1
+-- PMM
