@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([208.118.235.92]:39272)
+Received: from eggs.gnu.org ([208.118.235.92]:40927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gfQI3-0005Ps-Ps
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:17:36 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gfQSa-0008W3-I1
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:28:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gfQI2-0002dZ-Qf
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:17:35 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37637)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1gfQI2-0002Yi-LS
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:17:34 -0500
-Received: by mail-oi1-x243.google.com with SMTP id y23so30443020oia.4
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 06:17:23 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20190104082731.24967-2-pbonzini@redhat.com>
-References: <20190104082731.24967-1-pbonzini@redhat.com>
-	<20190104082731.24967-2-pbonzini@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 4 Jan 2019 15:17:22 +0100
-Message-ID: <CAL1e-=g24zvWnWfB6dyLqLfBLB8mn=pmuSP3gsRX2qBqc7kiyA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] scripts/update-linux-headers.sh:
- adjust for Linux 4.21-rc1 (or 5.0-rc1)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gfQSY-0000om-2T
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:28:28 -0500
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Fri,  4 Jan 2019 15:28:12 +0100
+Message-Id: <20190104142812.20444-3-edgar.iglesias@gmail.com>
+In-Reply-To: <20190104142812.20444-1-edgar.iglesias@gmail.com>
+References: <20190104142812.20444-1-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 2/2] target/microblaze: Add props enabling
+ exceptions on failed bus accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +20,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "cohuck@redhat.com" <cohuck@redhat.com>, "mst@redhat.com" <mst@redhat.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, luc.michel@greensocs.com, philmd@redhat.com, frasse.iglesias@gmail.com, figlesia@xilinx.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-On Friday, January 4, 2019, Paolo Bonzini <pbonzini@redhat.com> wrote:
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-> There are three new indirect inclusions: vhost_types.h, which we'll
-> shortly put to use as a portable header and thus is copied to
-> standard-headers; and new per-subtarget versions of MIPS unistd.h
-> and PowerPC unistd.h.
->
-> Because vhost.h includes vhost_types.h, we also need a proxy include
-> from linux/vhost.h to standard-headers.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  scripts/update-linux-headers.sh | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+Add MicroBlaze CPU properties to enable exceptions on failed
+bus accesses.
 
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ target/microblaze/cpu.c | 12 +++++++++++-
+ target/microblaze/cpu.h |  2 ++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-For MIPS parts:
-
- Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
->
-> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-
-> headers.sh
-> index 0a964fe240..c933489cbc 100755
-> --- a/scripts/update-linux-headers.sh
-> +++ b/scripts/update-linux-headers.sh
-> @@ -101,6 +101,13 @@ for arch in $ARCHLIST; do
->
->      if [ $arch = mips ]; then
->          cp "$tmpdir/include/asm/sgidefs.h" "$output/linux-headers/asm-
-> mips/"
-> +        cp "$tmpdir/include/asm/unistd_o32.h" "$output/linux-headers/asm-
-> mips/"
-> +        cp "$tmpdir/include/asm/unistd_n32.h" "$output/linux-headers/asm-
-> mips/"
-> +        cp "$tmpdir/include/asm/unistd_n64.h" "$output/linux-headers/asm-
-> mips/"
-> +    fi
-> +    if [ $arch = powerpc ]; then
-> +        cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-
-> powerpc/"
-> +        cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-
-> powerpc/"
->      fi
->
->      rm -rf "$output/include/standard-headers/asm-$arch"
-> @@ -162,6 +169,9 @@ EOF
->  cat <<EOF >$output/linux-headers/linux/virtio_ring.h
->  #include "standard-headers/linux/virtio_ring.h"
->  EOF
-> +cat <<EOF >$output/linux-headers/linux/vhost_types.h
-> +#include "standard-headers/linux/vhost_types.h"
-> +EOF
->
->  rm -rf "$output/include/standard-headers/linux"
->  mkdir -p "$output/include/standard-headers/linux"
-> @@ -171,6 +181,7 @@ for i in "$tmpdir"/include/linux/*virtio*.h \
->           "$tmpdir/include/linux/input-event-codes.h" \
->           "$tmpdir/include/linux/pci_regs.h" \
->           "$tmpdir/include/linux/ethtool.h" "$tmpdir/include/linux/kernel.h"
-> \
-> +         "$tmpdir/include/linux/vhost_types.h" \
->           "$tmpdir/include/linux/sysinfo.h"; do
->      cp_portable "$i" "$output/include/standard-headers/linux"
->  done
-> --
-> 2.20.1
->
->
->
->
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index 49876b19b3..5596cd5485 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -202,7 +202,11 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
+                         (cpu->cfg.use_barrel ? PVR2_USE_BARREL_MASK : 0) |
+                         (cpu->cfg.use_div ? PVR2_USE_DIV_MASK : 0) |
+                         (cpu->cfg.use_msr_instr ? PVR2_USE_MSR_INSTR : 0) |
+-                        (cpu->cfg.use_pcmp_instr ? PVR2_USE_PCMP_INSTR : 0);
++                        (cpu->cfg.use_pcmp_instr ? PVR2_USE_PCMP_INSTR : 0) |
++                        (cpu->cfg.dopb_bus_exception ?
++                                                 PVR2_DOPB_BUS_EXC_MASK : 0) |
++                        (cpu->cfg.iopb_bus_exception ?
++                                                 PVR2_IOPB_BUS_EXC_MASK : 0);
+ 
+     env->pvr.regs[5] |= cpu->cfg.dcache_writeback ?
+                                         PVR5_DCACHE_WRITEBACK_MASK : 0;
+@@ -265,6 +269,12 @@ static Property mb_properties[] = {
+     DEFINE_PROP_BOOL("dcache-writeback", MicroBlazeCPU, cfg.dcache_writeback,
+                      false),
+     DEFINE_PROP_BOOL("endianness", MicroBlazeCPU, cfg.endi, false),
++    /* Enables bus exceptions on failed data accesses (load/stores).  */
++    DEFINE_PROP_BOOL("dopb-bus-exception", MicroBlazeCPU,
++                     cfg.dopb_bus_exception, false),
++    /* Enables bus exceptions on failed instruction fetches.  */
++    DEFINE_PROP_BOOL("iopb-bus-exception", MicroBlazeCPU,
++                     cfg.iopb_bus_exception, false),
+     DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
+     DEFINE_PROP_UINT8("pvr", MicroBlazeCPU, cfg.pvr, C_PVR_FULL),
+     DEFINE_PROP_END_OF_LIST(),
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 03ca91007d..792bbc97c7 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -308,6 +308,8 @@ struct MicroBlazeCPU {
+         bool use_mmu;
+         bool dcache_writeback;
+         bool endi;
++        bool dopb_bus_exception;
++        bool iopb_bus_exception;
+         char *version;
+         uint8_t pvr;
+     } cfg;
+-- 
+2.17.1
