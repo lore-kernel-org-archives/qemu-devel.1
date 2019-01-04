@@ -1,16 +1,18 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51368)
+Received: from eggs.gnu.org ([208.118.235.92]:51471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gfNY7-0002IY-TW
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:00 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gfNYK-0002Uk-HG
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gfNY7-0005Jg-8K
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:21:59 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gfNYJ-0005Rj-Rg
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:12 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  4 Jan 2019 11:21:41 +0000
-Message-Id: <20190104112145.12413-1-stefanha@redhat.com>
+Date: Fri,  4 Jan 2019 11:21:43 +0000
+Message-Id: <20190104112145.12413-3-stefanha@redhat.com>
+In-Reply-To: <20190104112145.12413-1-stefanha@redhat.com>
+References: <20190104112145.12413-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/4] Block patches
+Subject: [Qemu-devel] [PULL 2/4] dmg: fix binary search
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,39 +22,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, yuchenlin <npes87184@gmail.com>
 
-The following changes since commit 20d6c7312f1b812bb9c750f4087f69ac8485cc=
-90:
+From: yuchenlin <npes87184@gmail.com>
 
-  Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3.2-=
-part1' into staging (2019-01-03 13:26:30 +0000)
+There is a possible hang in original binary search implementation. That i=
+s
+if chunk1 =3D 4, chunk2 =3D 5, chunk3 =3D 4, and we go else case.
 
-are available in the Git repository at:
+The chunk1 will be still 4, and so on.
 
-  git://github.com/stefanha/qemu.git tags/block-pull-request
+Signed-off-by: yuchenlin <npes87184@gmail.com>
+Message-id: 20190103114700.9686-2-npes87184@gmail.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/dmg.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-for you to fetch changes up to 39a0408e768cd00142f5b57d27ab234282bf4df5:
-
-  dmg: don't skip zero chunk (2019-01-04 11:15:09 +0000)
-
-----------------------------------------------------------------
-Pull request
-
-Bug fixes for the .dmg image file format.
-
-----------------------------------------------------------------
-
-Julio Faracco (1):
-  dmg: Fixing wrong dmg block type value for block terminator.
-
-yuchenlin (3):
-  dmg: fix binary search
-  dmg: use enumeration type instead of hard coding number
-  dmg: don't skip zero chunk
-
- block/dmg.c | 31 ++++++++++++++++++++-----------
- 1 file changed, 20 insertions(+), 11 deletions(-)
-
+diff --git a/block/dmg.c b/block/dmg.c
+index 2c806e3389..b26ddb1f68 100644
+--- a/block/dmg.c
++++ b/block/dmg.c
+@@ -572,16 +572,20 @@ static inline uint32_t search_chunk(BDRVDMGState *s=
+, uint64_t sector_num)
+ {
+     /* binary search */
+     uint32_t chunk1 =3D 0, chunk2 =3D s->n_chunks, chunk3;
+-    while (chunk1 !=3D chunk2) {
++    while (chunk1 <=3D chunk2) {
+         chunk3 =3D (chunk1 + chunk2) / 2;
+         if (s->sectors[chunk3] > sector_num) {
+-            chunk2 =3D chunk3;
++            if (chunk3 =3D=3D 0) {
++                goto err;
++            }
++            chunk2 =3D chunk3 - 1;
+         } else if (s->sectors[chunk3] + s->sectorcounts[chunk3] > sector=
+_num) {
+             return chunk3;
+         } else {
+-            chunk1 =3D chunk3;
++            chunk1 =3D chunk3 + 1;
+         }
+     }
++err:
+     return s->n_chunks; /* error */
+ }
+=20
 --=20
 2.20.1
