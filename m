@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:53712)
+Received: from eggs.gnu.org ([208.118.235.92]:53796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfSHo-00057V-U6
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:25:29 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gfSI4-0005K3-JP
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfSHo-0002AB-7V
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:25:28 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40367)
+	(envelope-from <peter.maydell@linaro.org>) id 1gfSI4-0002Kh-0X
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:25:44 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37286)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfSHm-0001yM-BT
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:25:28 -0500
-Received: by mail-oi1-x241.google.com with SMTP id t204so30765136oie.7
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 08:25:24 -0800 (PST)
+	id 1gfSI3-0002KO-SQ
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:25:43 -0500
+Received: by mail-oi1-x244.google.com with SMTP id y23so30763391oia.4
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 08:25:43 -0800 (PST)
 MIME-Version: 1.0
 References: <20181214052410.11863-1-richard.henderson@linaro.org>
-	<20181214052410.11863-5-richard.henderson@linaro.org>
-In-Reply-To: <20181214052410.11863-5-richard.henderson@linaro.org>
+	<20181214052410.11863-2-richard.henderson@linaro.org>
+In-Reply-To: <20181214052410.11863-2-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 16:25:12 +0000
-Message-ID: <CAFEAcA8r+Zt3rZWnHa+-uj25OtB9i6UoCXVqNHBsr_88JVfRuA@mail.gmail.com>
+Date: Fri, 4 Jan 2019 16:25:32 +0000
+Message-ID: <CAFEAcA-EO-vB5mFO+G2hqLcyRQ4-cMPHL-1qkLa-xPpmFa8zsQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 04/27] target/arm: Add PAuth helpers
+Subject: Re: [Qemu-devel] [PATCH v2 01/27] target/arm: Add state for the
+ ARMv8.3-PAuth extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +36,16 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>
 On Fri, 14 Dec 2018 at 05:24, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> The cryptographic internals are stubbed out for now,
-> but the enable and trap bits are checked.
+> Add storage space for the 5 encryption keys.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ----
+> v2: Remove pointless double migration.
+>     Use a struct to make it clear which half is which.
+> ---
 
-> +static void QEMU_NORETURN pauth_trap(CPUARMState *env, int target_el,
-> +                                     uintptr_t ra)
-> +{
-> +    CPUState *cs = ENV_GET_CPU(env);
-> +
-> +    cs->exception_index = EXCP_UDEF;
-> +    env->exception.syndrome = syn_pactrap();
-> +    env->exception.target_el = target_el;
-> +    cpu_loop_exit_restore(cs, ra);
 
-This should use raise_exception(), or some variant on it that
-lets you pass in the ra, because otherwise you lose the
-"redirect EL1 exceptions to EL2" HCR.TGE behaviour.
-Or can we only ever call this for a target_el of 2 or 3?
-
-It might be cleaner to have a raise_exception_ra() anyway,
-to preserve the "all exception throwing goes through here" rule.
-
-> +}
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
