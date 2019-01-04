@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:45382)
+Received: from eggs.gnu.org ([208.118.235.92]:47615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gfS1v-0006Yh-TB
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:09:05 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gfS4d-00083e-KN
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:11:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gfS1s-0003rd-P2
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:09:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40386)
+	(envelope-from <ehabkost@redhat.com>) id 1gfS4Y-0006BE-9g
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:11:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gfS1s-0003r7-Gx
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:09:00 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gfS4Y-00069k-1e
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:11:46 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DCA60C067821
-	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 16:08:59 +0000 (UTC)
-Date: Fri, 4 Jan 2019 14:08:54 -0200
+	by mx1.redhat.com (Postfix) with ESMTPS id 751094D2CD
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 16:11:44 +0000 (UTC)
+Date: Fri, 4 Jan 2019 14:11:36 -0200
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190104160854.GE4157@habkost.net>
+Message-ID: <20190104161136.GF4157@habkost.net>
 References: <20190104032226.21428-1-ehabkost@redhat.com>
-	<20190103232012-mutt-send-email-mst@kernel.org>
+	<20190104104919.594a6498.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190103232012-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190104104919.594a6498.cohuck@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] compat: Use explicit type names on
  HW_COMPAT_2_6
 List-Id: <qemu-devel.nongnu.org>
@@ -34,11 +34,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Thu, Jan 03, 2019 at 11:23:45PM -0500, Michael S. Tsirkin wrote:
-> On Fri, Jan 04, 2019 at 01:22:26AM -0200, Eduardo Habkost wrote:
+On Fri, Jan 04, 2019 at 10:49:19AM +0100, Cornelia Huck wrote:
+> On Fri,  4 Jan 2019 01:22:26 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
 > > The virtio-pci entries in HW_COMPAT_2_6 had an implicit
 > > assumption: that all virtio-pci subclasses support the
 > > disable-legacy and disable-modern options.
@@ -65,197 +67,36 @@ On Thu, Jan 03, 2019 at 11:23:45PM -0500, Michael S. Tsirkin wrote:
 > > the future, because new devices won't require QEMU 2.6
 > > compatibility.
 > 
-> I fully expect that e.g. packed ring support will need
-> to affect all virtio devices too. And it's likely
-> that we'll have some new virtio-pci transport features too.
+> Some of these will not be relevant for 2.6 compat, but better safe than
+> sorry :)
 
-If you need to affect all virtio devices, you can still use
-.driver="virtio-pci" on compat_props.  This is just about the
-disable-legacy and disable-modern properties.
+Yes.  My first version was based on grepping the v2.6.0 tree, but
+then I decided to be safer and grep for ".generic_name" on
+qemu.git master.  Just in case somebody is using a v2.7+ device
+type with 2.6 machine-types.
 
 > 
+> > 
 > > This makes the compat entries annoyingly verbose, but is simpler
 > > than the alternative of making the virtio-pci type inheritance
 > > rules even more complex.
 > 
-> God forbid we forgot something, the only way to notice is to
-> run a cross version migration with an old qemu.
-> I think we need to come up with something less verbose and fragile.
+> Maybe also write out explicitly:
+> 
+> Fixes: f6e501a28ef9 ("virtio: Provide version-specific variants of virtio PCI devices")
 
-Both approaches can break if we forget something or do something
-wrong.  I don't think this one is more fragile than the others.
-
-The difference is that this one lets us list the device types
-once on compat_props and never think about it again.  The others
-would require us to worry forever about subtle interactions
-between the disable-modern/disable-legacy properties and QOM
-inheritance.
+Yes, I forgot to do it.  Thanks no noting!
 
 > 
-> 
+> > 
 > > Reported-by: Thomas Huth <thuth@redhat.com>
 > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > > ---
 > > ---
 > >  include/hw/compat.h | 140 +++++++++++++++++++++++++++++++++++++++++++-
 > >  1 file changed, 138 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/include/hw/compat.h b/include/hw/compat.h
-> > index 3ca85b037c..fbb6c1138a 100644
-> > --- a/include/hw/compat.h
-> > +++ b/include/hw/compat.h
-> > @@ -163,11 +163,147 @@
-> >          .property = "format_transport_address",\
-> >          .value    = "off",\
-> >      },{\
-> > -        .driver   = "virtio-pci",\
-> > +        .driver   = "vhost-scsi-pci",\
-> >          .property = "disable-modern",\
-> >          .value    = "on",\
-> >      },{\
-> > -        .driver   = "virtio-pci",\
-> > +        .driver   = "vhost-scsi-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "vhost-user-blk-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "vhost-user-blk-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "vhost-user-scsi-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "vhost-user-scsi-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "vhost-vsock-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "vhost-vsock-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-9p-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-9p-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-balloon-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-balloon-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-blk-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-blk-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-crypto-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-crypto-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-gpu-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-gpu-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-input-host-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-input-host-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-keyboard-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-keyboard-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-mouse-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-mouse-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-net-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-net-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-rng-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-rng-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-scsi-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-scsi-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-serial-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-serial-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-tablet-pci",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-tablet-pci",\
-> > +        .property = "disable-legacy",\
-> > +        .value    = "off",\
-> > +    },{\
-> > +        .driver   = "virtio-vga",\
-> > +        .property = "disable-modern",\
-> > +        .value    = "on",\
-> > +    },{\
-> > +        .driver   = "virtio-vga",\
-> >          .property = "disable-legacy",\
-> >          .value    = "off",\
-> >      },
-> > -- 
-> > 2.18.0.rc1.1.g3f1ff2140
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 -- 
 Eduardo
