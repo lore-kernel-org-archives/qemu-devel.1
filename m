@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57347)
+Received: from eggs.gnu.org ([208.118.235.92]:36961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sha@pengutronix.de>) id 1gfKfx-0000Xo-Ab
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:17:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gfQAx-0000K2-JH
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:10:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sha@pengutronix.de>) id 1gfKfw-0007G8-FQ
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:17:53 -0500
-Received: from metis.ext.pengutronix.de
-	([2001:67c:670:201:290:27ff:fe1d:cc33]:37493)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sha@pengutronix.de>) id 1gfKfw-0007ER-3k
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:17:52 -0500
-Date: Fri, 4 Jan 2019 09:17:41 +0100
-From: Sascha Hauer <s.hauer@pengutronix.de>
-Message-ID: <20190104081741.mxdgg4dwm4l5s4ki@pengutronix.de>
-References: <20190104015641.e6d525f098c5e272694faa62@gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gfQAt-0006TP-Rq
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:10:13 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42637)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gfQAs-0006Pk-6D
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 09:10:11 -0500
+Received: by mail-ot1-x341.google.com with SMTP id v23so32160947otk.9
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 06:10:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190104015641.e6d525f098c5e272694faa62@gmail.com>
-Subject: Re: [Qemu-devel] barebox on Canon A1100
+References: <20181209193742.7582-1-f4bug@amsat.org>
+In-Reply-To: <20181209193742.7582-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Jan 2019 14:09:58 +0000
+Message-ID: <CAFEAcA_nOm4gcuF0NgYtqgAfB1UaW1MFmcRCtWwrUr9-X+Xe8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/allwinner-a10: Add the 'A' SRAM and
+ the SRAM controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Antony Pavlov <antonynpavlov@gmail.com>
-Cc: Barebox List <barebox@lists.infradead.org>, Marc Kleine-Budde <mkl@pengutronix.de>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Beniamino Galvani <b.galvani@gmail.com>, Charlie Smurthwaite <charlie@atech.media>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Fri, Jan 04, 2019 at 01:56:41AM +0300, Antony Pavlov wrote:
-> Hi Sascha!
-> 
-> I have some good news and some bad news.
-> 
-> First the good news.
-> 
-> Barebox was used for Day 18 of QEMU 2018 advent (https://www.qemu-advent-calendar.org/2018/).
-> 
-> Here is a quote:
-> 
->   > This is an image for QEMU's emulated Canon A1100 Arm machine:
->   > Play 2048 in the Barebox firmware environment.
+On Sun, 9 Dec 2018 at 19:37, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+>
+> From the "A10 User Manual V1.20" p.29: "3.2. Memory Mapping" and:
+>
+>  7. System Control
+>   7.1. Overview
+>
+>   A10 embeds a high-speed SRAM which has been split into five segments.
+>   See detailed memory mapping in following table:
+>
+>   Area          Address        Size (Bytes)
+>    A1    0x00000000-0x00003FFF 16K
+>    A2    0x00004000-0x00007FFF 16K
+>    A3    0x00008000-0x0000B3FF 13K
+>    A4    0x0000B400-0x0000BFFF  3K
+>
+> Since for emulation purpose we don't need the segmentations, we simply de=
+fine
+> the 'A' area as a single 48KB SRAM.
 
-Hey nice :)
+>  static void aw_a10_init(Object *obj)
+>  {
+> @@ -85,6 +86,10 @@ static void aw_a10_realize(DeviceState *dev, Error **e=
+rrp)
+>      sysbus_connect_irq(sysbusdev, 4, s->irq[67]);
+>      sysbus_connect_irq(sysbusdev, 5, s->irq[68]);
+>
+> +    memory_region_init_ram(&s->sram_a, NULL, "sram A", 48 * KiB, &error_=
+fatal);
 
-> 
-> The bad news.
-> 
-> Current master branch barebox for Canon A1100 does not work under qemu,
-> barebox v2017.02.0 was used for qemu advent.
-> 
-> Thomas Huth reported the problem in the qemu-devel mailing
-> list two months ago. Please see https://www.mail-archive.com/qemu-devel@nongnu.org/msg571887.html
-> for details.
-> 
-> The commit a43e2bbc468a71 breaks barebox for Canon A1100:
-> 
->   > commit a43e2bbc468a71fb8825e8acafb7fac7ad7c6dad
->   > Author: Sascha Hauer <s.hauer@pengutronix.de>
->   > Date:   Wed Mar 7 10:04:07 2018 +0100
->   >
->   >    ARM: return positive offset in get_runtime_offset()
-> 
-> Any suggestion?
+This creates the memory region with a NULL owner, which is
+OK for board model code, but since we're a device object
+here we should use OBJECT(dev) as the owner.
 
-Yes, try again with a recent barebox. There was a bug in this commit that
-should be fixed with the following:
+This is more important if the region creation happens
+in the instance_init function, in which case it will
+result in a leak of the memory region after the device
+is destroyed (see for instance commit 09d98b69804cfd9e),
+but it's worth getting right here anyway.
 
-| commit 0230365df6601cd561c9e3e368c96222076ec9f5
-| Author: Sascha Hauer <s.hauer@pengutronix.de>
-| Date:   Wed Dec 12 08:55:31 2018 +0100
-| 
-|     ARM: fix setup_c when runtime offset is != 0
-|     
-|     The runtime offset has to be added to the memcpy source address and
-|     substracted from the return address. This should have been changed in
-|     a43e2bbc46 which changed from returning the negative runtime offset
-|     into changing the positive runtime offset. Instead a43e2bbc46 only
-|     changed a zero substraction ("subs r4, r0, #0") into a zero addition
-|     ("adds r4, r0, #0") which was used as a equal to zero test and changed
-|     nothing. This part is reverted here.
-|     
-|     Fixes wrong copy / return locations when setup_c is called with
-|     different runtime and link addresses.
-|     
-|     fixes: a43e2bbc46 ("ARM: return positive offset in get_runtime_offset()")
-|     
-|     Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+> +    memory_region_add_subregion(get_system_memory(), 0x00000000, &s->sra=
+m_a);
+> +    create_unimplemented_device("a10-sram-ctrl", 0x01c00000, 4 * KiB);
+> +
+>      /* FIXME use qdev NIC properties instead of nd_table[] */
+>      if (nd_table[0].used) {
+>          qemu_check_nic_model(&nd_table[0], TYPE_AW_EMAC);
 
-Sascha
-
--- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+thanks
+-- PMM
