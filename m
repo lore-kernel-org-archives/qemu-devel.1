@@ -1,31 +1,38 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50113)
+Received: from eggs.gnu.org ([208.118.235.92]:50769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gfR0E-0006eE-Ev
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:03:15 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gfR2U-0000LN-W1
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gfR09-0001dT-Fa
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:03:14 -0500
-Received: from mail-eopbgr790092.outbound.protection.outlook.com
-	([40.107.79.92]:16696
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	(envelope-from <pasic@linux.ibm.com>) id 1gfR2Q-0004S5-0r
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:05:34 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gfR09-0001bk-5s
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:03:09 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 4 Jan 2019 15:03:05 +0000
-Message-ID: <BN6PR2201MB1251C334FE66ADF677BAE8D2C68E0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <cover.1541093316.git.noring@nocrew.org>
-	<eecae865fc8f7934cc2d51b24cba7d8ac3ec37c6.1541093316.git.noring@nocrew.org>
-	<BN6PR2201MB1251DBF84B71346A8B673CA6C6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>,
-	<20190101182745.GA17022@sx9>
-In-Reply-To: <20190101182745.GA17022@sx9>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gfR2L-0004Gc-Iz
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 10:05:27 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x04Ex1xt064742
+	for <qemu-devel@nongnu.org>; Fri, 4 Jan 2019 10:05:24 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pt6yerr57-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 10:05:23 -0500
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Fri, 4 Jan 2019 15:05:21 -0000
+Date: Fri, 4 Jan 2019 16:05:15 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <20190104151005.42b6f111.cohuck@redhat.com>
+References: <20190103151612.51399-1-liq3ea@163.com>
+	<20190104151005.42b6f111.cohuck@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 09/12] tests/tcg/mips: Test R5900
- three-operand MADDU1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20190104160515.1b4a6dc1@oc2783563651>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] s390: avoid potential null
+ dereference in s390_pcihost_unplug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,94 +41,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Li Qiang <liq3ea@163.com>, peter.maydell@linaro.org, walling@linux.ibm.com, david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-> From: Fredrik Noring <noring@nocrew.org>
-> Sent: Tuesday, January 1, 2019 7:27 PM
-> To: Aleksandar Markovic
-> Cc: Aurelien Jarno; Philippe Mathieu-Daud=E9; J=FCrgen Urban; Maciej W. R=
-ozycki;
-> qemu-devel@nongnu.org
-> Subject: Re: [PATCH v2 09/12] tests/tcg/mips: Test R5900 three-operand MA=
-DDU1
->=20
-> Thanks Aleksandar!
->=20
-> > > From: Fredrik Noring <noring@nocrew.org>
-> > > Subject: [PATCH v2 09/12] tests/tcg/mips: Test R5900 three-operand MA=
-DDU1
-> >
-> > Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > This patch is selected for integration in the next MIPS pull request sc=
-heduled shortly.
-> >
-> > THANKS FOR ALL EFFORTS!
->=20
-> Is this a preparation to revert commit 823f2897bdd7 ("target/mips: Disabl=
-e
-> R5900 support")?
->=20
-> Fredrik
+On Fri, 4 Jan 2019 15:10:05 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Hello!
+> On Thu,  3 Jan 2019 07:16:12 -0800
+> Li Qiang <liq3ea@163.com> wrote:
+> 
+> > When getting the 'pbdev', the if...else has no default branch.
+> > From Coverity, the 'pbdev' maybe null when the 'dev' is not
+> > the TYPE_PCI_BRIDGE/TYPE_PCI_DEVICE/TYPE_S390_PCI_DEVICE.
+> > This patch adds a default branch for device plug and unplug.
+> > 
+> > Spotted by Coverity: CID 1398593
+> > 
+> > Signed-off-by: Li Qiang <liq3ea@163.com>
+> > ---
+> > Adds a default branch for device plug per Cornelia's review.
+> > 
+> >  hw/s390x/s390-pci-bus.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> > 
+> > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> > index 15759b6514..fe48a36ff6 100644
+> > --- a/hw/s390x/s390-pci-bus.c
+> > +++ b/hw/s390x/s390-pci-bus.c
+> > @@ -912,6 +912,9 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >          pbdev->fh = pbdev->idx;
+> >          QTAILQ_INSERT_TAIL(&s->zpci_devs, pbdev, link);
+> >          g_hash_table_insert(s->zpci_table, &pbdev->idx, pbdev);
+> > +    } else {
+> > +        error_setg(errp, "s390: device plug request for not supported device"
+> > +                   " type: %s", object_get_typename(OBJECT(dev)));
+> 
+> Maybe make this "s390/pci: plugging device type <%s> is not supported"?
+> 
 
-Glad to see you back!
+Under what circumstances could/does this happen? I mean how can this
+be triggered by the user?
 
-Yes, one can say this is a step towards reenabling R5900 support.
+Regards,
+Halil
 
-However, this is not the only step. I will let you know about all
-needed details in near future - and I apologize for being little
-slow with responses so far, I was being swamped with other tasks.
-
-Let's not rush. If one learned that the rush is bad, that is me,
-making severe missteps, overly eager to do the thing sooner rather
-than later. However, the faster in not always the better.
-
-At this moment I have a question a suggestion for you:
-
-- Question: Do you have somewhere link to n32 R5900 toolchain, or
-similar thing that would enable me to test R5900's n32 in QEMU
-(I'll do the tweaks in QEMU by myself for that, but I need a way
-to compile R5900 test programs for n32)?
-
-- Suggestion: The next MIPS pull request is scehuled for Friday,
-Jan 18, 2018. It would be fantastic if you could prepare the
-following by Jan 14:
-
-  * Add 32 TCGv_i64 registers that would represent higher halves
-  of R5900 general purpose registers.
-  * Add TCGv_i32 register SA (shift amount).
-  * Perhaps consider adding higher halves of registers HI an LO
-  independently on HI/LO array used by DSP.
-  * It is customary to implement R/W access while introducing
-  such registers:
-    * Implement R/W access instructions to higher halves of
-    R5900 GPRs:
-      * LQ
-      * SQ
-    * Implement R/W access instructions to SA register:
-      * MFSA
-      * MTSA
-      * MTSAH
-      * MTSAB
-
-I think a reasonable person would consider that the number and
-size of registers of emulated CPU is a fundamental thing that
-must be done before enabling its support - hence my suggestion
-above.
-
-If you don't have enough time resources before Jan 14, that is
-fine too, do everything at your own pace.
-
-My vision is that we continue step by step amending R5900 until
-we reach a decent and stable state of emulation and than enable
-the R5900 support for end user. (I'll provide all the details
-later on.)
-
-Let me know if you have questions and/or different opinion.
-
-Looking forward to seeing you!
-
-Aleksandar
+> >      }
+> >  }
+> >  
+> > @@ -956,6 +959,10 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
+> >          pbdev = S390_PCI_DEVICE(dev);
+> >          pci_dev = pbdev->pdev;
+> > +    } else {
+> > +        error_setg(errp, "s390: device unplug request for not supported device"
+> > +                   " type: %s", object_get_typename(OBJECT(dev)));
+> 
+> Halil has a point when he suggests an assert here. If we fence the
+> device type in the plug function, I can't think of a way we would end
+> up here.
+> 
+> > +        return;
+> >      }
+> >  
+> >      switch (pbdev->state) {
+> 
+> 
