@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:40805)
+Received: from eggs.gnu.org ([208.118.235.92]:41198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gfWFg-0005CM-4a
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:39:32 -0500
+	(envelope-from <bounces@canonical.com>) id 1gfWHD-0006TJ-Om
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:41:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gfWFd-0007Qy-1P
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:39:32 -0500
-Received: from 15.mo5.mail-out.ovh.net ([178.33.107.29]:59412)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gfWFc-0007Et-RP
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:39:28 -0500
-Received: from player776.ha.ovh.net (unknown [10.109.143.238])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id A357120C664
-	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 21:39:20 +0100 (CET)
-Date: Fri, 4 Jan 2019 21:39:10 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190104213910.215d6859@bahia.lan>
-In-Reply-To: <20190104133050.7468-1-clg@kaod.org>
-References: <20190104133050.7468-1-clg@kaod.org>
+	(envelope-from <bounces@canonical.com>) id 1gfWHA-0000sR-Js
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:41:07 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60922)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gfWHA-0000rJ-E9
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:41:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gfWH8-0005Yg-OF
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 20:41:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B61082E80CC
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 20:41:02 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr: return from post_load
- method when RTC import fails
+Date: Fri, 04 Jan 2019 20:30:04 -0000
+From: Bruno Haible <bruno@clisp.org>
+Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
+Message-Id: <154663380497.4791.8633433567426881168.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
+ qemu-alpha
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +37,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Fri,  4 Jan 2019 14:30:50 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> You should try building with -mieee.
 
-> The error value can be squashed by the section handling radix migration.
-> Simply bail out if an error occurs when the RTC offset is imported.
->=20
-> This fixes the Coverity issue CID 1398591.
->=20
-> Fixes: d39c90f5f3ae ("spapr: Fix migration of Radix guests")
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->=20
+When I build with
+../configure CFLAGS=3D"-mieee -O2 -g" CPPFLAGS=3D-Wall LDFLAGS=3D"-static -=
+lieee"
+I observe the exact same behaviour: Only 4 tests fail in a VM executed with=
+ qemu-system-alpha, whereas the same test failures (from test-cbrt to test-=
+truncf1) are seen with qemu-alpha.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+-- =
 
->  Changes since v1 :
->=20
->  - Added Coverity issue CID
->=20
->  hw/ppc/spapr.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index f1725313e979..64397ee91ef0 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1748,12 +1748,17 @@ static int spapr_post_load(void *opaque, int vers=
-ion_id)
->          return err;
->      }
-> =20
-> -    /* In earlier versions, there was no separate qdev for the PAPR
-> +    /*
-> +     * In earlier versions, there was no separate qdev for the PAPR
->       * RTC, so the RTC offset was stored directly in sPAPREnvironment.
->       * So when migrating from those versions, poke the incoming offset
-> -     * value into the RTC device */
-> +     * value into the RTC device
-> +     */
->      if (version_id < 3) {
->          err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
-> +        if (err) {
-> +            return err;
-> +        }
->      }
-> =20
->      if (kvm_enabled() && spapr->patb_entry) {
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701835
+
+Title:
+  floating-point operation bugs in qemu-alpha
+
+Status in QEMU:
+  New
+
+Bug description:
+  When running the gnulib testsuite, I'm seeing test failures in the tests =
+for libm functions
+    cbrt
+    cbrtf
+    ceil
+    ceilf
+    coshf
+    exp2
+    exp2f
+    floor
+    floorf
+    fma
+    fmaf
+    fmal
+    frexp
+    frexpf
+    hypot
+    hypotf
+    hypotl
+    ilogb
+    ilogbf
+    isfinite
+    isinf
+    isnan
+    isnand
+    isnanf
+    ldexp
+    ldexpf
+    ldexpl
+    log1p
+    log1pf
+    log2
+    log2f
+    logb
+    logbf
+    logbl
+    rint
+    rintf
+    rintl
+    signbit
+    sqrt
+    sqrtf
+    strtod
+  that I don't see when running the same (statically linked) executables in=
+ a VM, through qemu-system-alpha.
+
+  How to reproduce:
+  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
+h --single-configure cbrt cbrtf ceil ceilf coshf exp2 exp2f float floor flo=
+orf fma fmaf fmal frexp frexpf hypot hypotf hypotl ilogb ilogbf isfinite is=
+inf isnan isnand isnanf ldexp ldexpf ldexpl log1p log1pf log2 log2f logb lo=
+gbf logbl math printf-frexp rint rintf rintl round roundf signbit sqrt sqrt=
+f strtod trunc truncf
+  - Copy the resulting directory to a VM running Linux 2.6.26 with qemu-sys=
+tem-alpha.
+  - There, configure and build the package:
+    mkdir build-native-static; cd build-native-static; ../configure CPPFLAG=
+S=3D"-Wall" LDFLAGS=3D"-static"; make; make check
+    Only 4 tests fail.
+  - Copy the resulting binaries back to the original x86_64 machine.
+  - Set environment variables for using qemu-alpha.
+  - Here, 50 tests fail that did not fail originally:
+
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-cbrt
+  ../../gltests/test-cbrt.h:39: assertion 'err > - L_(4.0) * L_(16.0) / TWO=
+_MANT_DIG && err < L_(4.0) * L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-coshf =
+
+  ../../gltests/test-coshf.c:37: assertion 'y >=3D 1.1854652f && y <=3D 1.1=
+854653f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-float
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma1   =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmal2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypot =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotl
+  ../../gltests/test-hypot.h:41: assertion 'z =3D=3D HUGEVAL' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isfinite
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isinf   =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnan
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexp =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpl
+  ../../gltests/test-ldexp.h:99: assertion 'y =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1p =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1pf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2  =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2f
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-math =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-printf-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rint        =
+
+  ../../gltests/test-rint.c:63: assertion 'rint (0.7) =3D=3D 1.0' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintf
+  ../../gltests/test-rintf.c:63: assertion 'rintf (0.7f) =3D=3D 1.0f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintl
+  ../../gltests/test-rintl.c:68: assertion 'rintl (0.7L) =3D=3D 1.0L' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-round1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-roundf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-signbit
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-sqrt   =
+
+  ../../gltests/test-sqrt.h:40: assertion 'err > - L_(16.0) / TWO_MANT_DIG =
+&& err < L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-trunc1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-truncf1
+  Floating point exception (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701835/+subscriptions
