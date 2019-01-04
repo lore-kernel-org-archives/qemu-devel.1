@@ -1,18 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51752)
+Received: from eggs.gnu.org ([208.118.235.92]:54442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gfNYp-0003BV-GN
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:44 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gfNhJ-0000SJ-9e
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:31:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gfNYo-0005fm-IM
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:43 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  4 Jan 2019 11:21:45 +0000
-Message-Id: <20190104112145.12413-5-stefanha@redhat.com>
-In-Reply-To: <20190104112145.12413-1-stefanha@redhat.com>
-References: <20190104112145.12413-1-stefanha@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gfNhH-0004d3-6w
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:31:28 -0500
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:45978)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gfNhF-0004Ym-9L
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:31:26 -0500
+Received: by mail-oi1-x22c.google.com with SMTP id y1so30132687oie.12
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 03:31:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/4] dmg: don't skip zero chunk
+References: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA9FwFg9zsg3xLhOs9C=XJHjAo+ACd1=g22YtPaax6N0YQ@mail.gmail.com>
+	<42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
+	<CAFEAcA9UqiaiKa_4EWfBHbRS0H=trHfJiArHOJkW6=vKoGvRpQ@mail.gmail.com>
+	<bc564647-0550-df53-7a17-7760489b8c45@redhat.com>
+	<CAFEAcA9tiqHEiCdUXWcD+SvzUzZPG4sTqiTSR57N=qYM49eykw@mail.gmail.com>
+	<d8bb4435-7b69-04e9-2b4a-4cfdd439ecea@redhat.com>
+In-Reply-To: <d8bb4435-7b69-04e9-2b4a-4cfdd439ecea@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Jan 2019 11:31:11 +0000
+Message-ID: <CAFEAcA9QKYc89Fknmz-MGSGv11eSTuvNYjsf+-sqsAGT=ZYQ3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,135 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, yuchenlin <npes87184@gmail.com>, Julio Faracco <jcfaracco@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: yuchenlin <npes87184@gmail.com>
+On Fri, 4 Jan 2019 at 11:01, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 04/01/19 11:06, Peter Maydell wrote:
+> > On Fri, 4 Jan 2019 at 07:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 03/01/19 19:37, Peter Maydell wrote:
+> >>> On Sat, 22 Dec 2018 at 08:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>> Interestingly, I have today run into "make: write error: stdout"
+> >>> with the existing make check infrastructure. [...]
+> >>> I presume that something in one of the tests we're running,
+> >>> likely QEMU itself, ends up setting stdout to non-blocking.
+> >>> This while rune *used* to be entirely reliable, so maybe
+> >>> something recent has changed ?
+> >>
+> >> I don't know... I tried running make check under "strace -e fcntl" and I
+> >> didn't find any occurrences of fcntl(1, O_SETFL, ...|O_NONBLOCK).
+> >> Perhaps you can add a check after every invocation of a test executable.
+> >
+> >> Are you going to apply the pull request since the bug is preexisting?
+> >
+> > The pull request takes the problem from "occasionally shows up
+> > in by-hand running of make check in a while loop" to "reliably
+> > causes my automated tests to fail every time". I can't apply
+> > a pullreq that does that, so we need to find at least a workaround.
+>
+> The certain workaround is to clear O_NONBLOCK before invoking make,
+> possibly by placing a wrapper in ~/bin:
+>
+>     import os
+>     from fcntl import *
+>     fcntl(1, F_SETFL, fcntl(1, F_GETFL) & ~os.O_NONBLOCK)
 
-The dmg file has many tables which describe: "start from sector XXX to
-sector XXX, the compression method is XXX and where the compressed data
-resides on".
+I'll give this a go, but I think this will not necessarily be
+sufficient if some program invoked by make sets the O_NONBLOCK flag,
+and then make later in the same run tries to output and gets EINTR.
+Perhaps it would be better to put it in the test harness that
+invokes test binaries, so as to clear the flag as soon
+as possible? It could also then in theory print a warning
+if a test case had put stdin/stdout into non-blocking mode.
 
-Each sector in the expanded file should be covered by a table. The table
-will describe the offset of compressed data (or raw depends on the type)
-in the dmg.
+(The semantics of O_NONBLOCK here seem to me to be completely
+broken. But they are what they are...)
 
-For example:
-
-[-----------The expanded file------------]
-[---bzip table ---]/* zeros */[---zlib---]
-    ^
-    | if we want to read this sector.
-
-we will find bzip table which contains this sector, and get the
-compressed data offset, read it from dmg, uncompress it, finally write to
-expanded file.
-
-If we skip zero chunk (table), some sector cannot find the table which
-will cause search_chunk() return s->n_chunks, dmg_read_chunk() return -1
-and finally causing dmg_co_preadv() return EIO.
-
-See:
-
-[-----------The expanded file------------]
-[---bzip table ---]/* zeros */[---zlib---]
-                    ^
-                    | if we want to read this sector.
-
-Oops, we cannot find the table contains it...
-
-In the original implementation, we don't have zero table. When we try to
-read sector inside the zero chunk. We will get EIO, and skip reading.
-
-After this patch, we treat zero chunk the same as ignore chunk, it will
-directly write zero and avoid some sector may not find the table.
-
-After this patch:
-
-[-----------The expanded file------------]
-[---bzip table ---][--zeros--][---zlib---]
-
-Signed-off-by: yuchenlin <npes87184@gmail.com>
-Reviewed-by: Julio Faracco <jcfaracco@gmail.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20190103114700.9686-4-npes87184@gmail.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/dmg.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
-
-diff --git a/block/dmg.c b/block/dmg.c
-index 84732a64c1..43497bf343 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -130,7 +130,8 @@ static void update_max_chunk_size(BDRVDMGState *s, ui=
-nt32_t chunk,
-     case UDRW: /* copy */
-         uncompressed_sectors =3D DIV_ROUND_UP(s->lengths[chunk], 512);
-         break;
--    case UDIG: /* zero */
-+    case UDZE: /* zero */
-+    case UDIG: /* ignore */
-         /* as the all-zeroes block may be large, it is treated specially=
-: the
-          * sector is not copied from a large buffer, a simple memset is =
-used
-          * instead. Therefore uncompressed_sectors does not need to be s=
-et. */
-@@ -199,8 +200,9 @@ typedef struct DmgHeaderState {
- static bool dmg_is_known_block_type(uint32_t entry_type)
- {
-     switch (entry_type) {
-+    case UDZE:    /* zeros */
-     case UDRW:    /* uncompressed */
--    case UDIG:    /* zeroes */
-+    case UDIG:    /* ignore */
-     case UDZO:    /* zlib */
-         return true;
-     case UDBZ:    /* bzip2 */
-@@ -265,9 +267,10 @@ static int dmg_read_mish_block(BDRVDMGState *s, DmgH=
-eaderState *ds,
-         /* sector count */
-         s->sectorcounts[i] =3D buff_read_uint64(buffer, offset + 0x10);
-=20
--        /* all-zeroes sector (type 2) does not need to be "uncompressed"=
- and can
--         * therefore be unbounded. */
--        if (s->types[i] !=3D UDIG && s->sectorcounts[i] > DMG_SECTORCOUN=
-TS_MAX) {
-+        /* all-zeroes sector (type UDZE and UDIG) does not need to be
-+         * "uncompressed" and can therefore be unbounded. */
-+        if (s->types[i] !=3D UDZE && s->types[i] !=3D UDIG
-+            && s->sectorcounts[i] > DMG_SECTORCOUNTS_MAX) {
-             error_report("sector count %" PRIu64 " for chunk %" PRIu32
-                          " is larger than max (%u)",
-                          s->sectorcounts[i], i, DMG_SECTORCOUNTS_MAX);
-@@ -675,7 +678,8 @@ static inline int dmg_read_chunk(BlockDriverState *bs=
-, uint64_t sector_num)
-                 return -1;
-             }
-             break;
--        case UDIG: /* zero */
-+        case UDZE: /* zeros */
-+        case UDIG: /* ignore */
-             /* see dmg_read, it is treated specially. No buffer needs to=
- be
-              * pre-filled, the zeroes can be set directly. */
-             break;
-@@ -710,7 +714,8 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset, =
-uint64_t bytes,
-         /* Special case: current chunk is all zeroes. Do not perform a m=
-emcpy as
-          * s->uncompressed_chunk may be too small to cover the large all=
--zeroes
-          * section. dmg_read_chunk is called to find s->current_chunk */
--        if (s->types[s->current_chunk] =3D=3D UDIG) { /* all zeroes bloc=
-k entry */
-+        if (s->types[s->current_chunk] =3D=3D UDZE
-+            || s->types[s->current_chunk] =3D=3D UDIG) { /* all zeroes b=
-lock entry */
-             qemu_iovec_memset(qiov, i * 512, 0, 512);
-             continue;
-         }
---=20
-2.20.1
+thanks
+-- PMM
