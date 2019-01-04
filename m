@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48586)
+Received: from eggs.gnu.org ([208.118.235.92]:57347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <t.glaser@tarent.de>) id 1gfK5r-0001pB-SJ
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 02:40:36 -0500
+	(envelope-from <sha@pengutronix.de>) id 1gfKfx-0000Xo-Ab
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:17:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <t.glaser@tarent.de>) id 1gfK5q-0004cy-OI
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 02:40:35 -0500
-Received: from herc.mirbsd.org ([2001:470:1f15:10c:202:b3ff:feb7:54e8]:48716)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <t.glaser@tarent.de>) id 1gfK5q-0004XZ-Bn
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 02:40:34 -0500
-Date: Fri, 4 Jan 2019 07:30:42 +0000 (UTC)
-From: Thorsten Glaser <t.glaser@tarent.de>
-In-Reply-To: <20190104053013.GA6519@lorien.valinor.li>
-Message-ID: <Pine.BSM.4.64L.1901040722540.14540@herc.mirbsd.org>
-References: <154644530361.2390.18185252504260044930.reportbug@ci-busyapps.lan.tarent.de>
-	<154644530361.2390.18185252504260044930.reportbug@ci-busyapps.lan.tarent.de>
-	<20190102163939.GB13145@eldamar.local>
-	<154644530361.2390.18185252504260044930.reportbug@ci-busyapps.lan.tarent.de>
-	<20190104053013.GA6519@lorien.valinor.li>
-	<CA+CK2bC70pnL0Wimb0xt99J4nNfi8W3zuUHgAk-jsPuOP9jpHA@mail.gmail.com>
-Content-Language: de-DE-1901, en-GB
+	(envelope-from <sha@pengutronix.de>) id 1gfKfw-0007G8-FQ
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:17:53 -0500
+Received: from metis.ext.pengutronix.de
+	([2001:67c:670:201:290:27ff:fe1d:cc33]:37493)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sha@pengutronix.de>) id 1gfKfw-0007ER-3k
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:17:52 -0500
+Date: Fri, 4 Jan 2019 09:17:41 +0100
+From: Sascha Hauer <s.hauer@pengutronix.de>
+Message-ID: <20190104081741.mxdgg4dwm4l5s4ki@pengutronix.de>
+References: <20190104015641.e6d525f098c5e272694faa62@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Subject: Re: [Qemu-devel] [PATCH v15 23/26] sched: early boot clock (was Re:
- Bug#918036: linux: uptime after reboot wrong (kvm-clock related?))
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190104015641.e6d525f098c5e272694faa62@gmail.com>
+Subject: Re: [Qemu-devel] barebox on Canon A1100
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Salvatore Bonaccorso <carnil@debian.org>, 918036@bugs.debian.org, Pavel Tatashin <pasha.tatashin@soleen.com>
-Cc: Steven Sistare <steven.sistare@oracle.com>, Dominique Martinet <asmadeus@codewreck.org>, Pavel Tatashin <pavel.tatashin@microsoft.com>, Daniel Jordan <daniel.m.jordan@oracle.com>, linux@armlinux.org.uk, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, john.stultz@linaro.org, sboyd@codeaurora.org, x86@kernel.org, LKML <linux-kernel@vger.kernel.org>, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, hpa@zytor.com, douly.fnst@cn.fujitsu.com, Peter Zijlstra <peterz@infradead.org>, prarit@redhat.com, feng.tang@intel.com, pmladek@suse.com, gnomes@lxorguk.ukuu.org.uk, linux-s390@vger.kernel.org, boris.ostrovsky@oracle.com, jgross@suse.com, pbonzini@redhat.com, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
+To: Antony Pavlov <antonynpavlov@gmail.com>
+Cc: Barebox List <barebox@lists.infradead.org>, Marc Kleine-Budde <mkl@pengutronix.de>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Hi Salvatore,
+On Fri, Jan 04, 2019 at 01:56:41AM +0300, Antony Pavlov wrote:
+> Hi Sascha!
+> 
+> I have some good news and some bad news.
+> 
+> First the good news.
+> 
+> Barebox was used for Day 18 of QEMU 2018 advent (https://www.qemu-advent-calendar.org/2018/).
+> 
+> Here is a quote:
+> 
+>   > This is an image for QEMU's emulated Canon A1100 Arm machine:
+>   > Play 2048 in the Barebox firmware environment.
 
->p.s.: my earlier reply to you seem to have been rejected and never
->      reached you, hope this one does now.
+Hey nice :)
 
-if you sent from Googlemail, it may reach me in the next weeks or
-never *shrug* they don=E2=80=99t play nice with greylisting. The -submitter
-or @d.o works, though. I=E2=80=99m following up from my $dayjob address as
-the issue occurred there (which is also Googlemail, unfortunately).
+> 
+> The bad news.
+> 
+> Current master branch barebox for Canon A1100 does not work under qemu,
+> barebox v2017.02.0 was used for qemu advent.
+> 
+> Thomas Huth reported the problem in the qemu-devel mailing
+> list two months ago. Please see https://www.mail-archive.com/qemu-devel@nongnu.org/msg571887.html
+> for details.
+> 
+> The commit a43e2bbc468a71 breaks barebox for Canon A1100:
+> 
+>   > commit a43e2bbc468a71fb8825e8acafb7fac7ad7c6dad
+>   > Author: Sascha Hauer <s.hauer@pengutronix.de>
+>   > Date:   Wed Mar 7 10:04:07 2018 +0100
+>   >
+>   >    ARM: return positive offset in get_runtime_offset()
+> 
+> Any suggestion?
 
->There was now a followup on this, and if you can I think it's best if
->you can followup there.
->
->https://lore.kernel.org/lkml/CA+CK2bC70pnL0Wimb0xt99J4nNfi8W3zuUHgAk-jsPuO=
-P9jpHA@mail.gmail.com/
+Yes, try again with a recent barebox. There was a bug in this commit that
+should be fixed with the following:
 
-OK, doing now:
+| commit 0230365df6601cd561c9e3e368c96222076ec9f5
+| Author: Sascha Hauer <s.hauer@pengutronix.de>
+| Date:   Wed Dec 12 08:55:31 2018 +0100
+| 
+|     ARM: fix setup_c when runtime offset is != 0
+|     
+|     The runtime offset has to be added to the memcpy source address and
+|     substracted from the return address. This should have been changed in
+|     a43e2bbc46 which changed from returning the negative runtime offset
+|     into changing the positive runtime offset. Instead a43e2bbc46 only
+|     changed a zero substraction ("subs r4, r0, #0") into a zero addition
+|     ("adds r4, r0, #0") which was used as a equal to zero test and changed
+|     nothing. This part is reverted here.
+|     
+|     Fixes wrong copy / return locations when setup_c is called with
+|     different runtime and link addresses.
+|     
+|     fixes: a43e2bbc46 ("ARM: return positive offset in get_runtime_offset()")
+|     
+|     Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
 
+Sascha
 
-Pavel Tatashin wrote:
-
->Could you please send the config file and qemu arguments that were
->used to reproduce this problem.
-
-This is from a libvirt-managed system. The arguments as shown by
-=E2=80=9Cps axwww=E2=80=9D are:
-
-qemu-system-x86_64 -enable-kvm -name ci-busyapps -S -machine pc-1.1,accel=
-=3Dkvm,usb=3Doff -m 8192 -realtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1=
-,threads=3D1 -uuid 09536d92-dd73-8993-78fb-e0c885acf763 -no-user-config -no=
-defaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/ci-b=
-usyapps.monitor,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=
-=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-usb=
--uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/dev/vms/ci-busyapp=
-s,format=3Draw,if=3Dnone,id=3Ddrive-virtio-disk0,cache=3Dnone,aio=3Dnative =
--device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virt=
-io-disk0,id=3Dvirtio-disk0,bootindex=3D1 -netdev tap,fd=3D24,id=3Dhostnet0,=
-vhost=3Don,vhostfd=3D25 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,=
-mac=3D52:54:00:05:6e:fd,bus=3Dpci.0,addr=3D0x3 -chardev pty,id=3Dcharserial=
-0 -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -device usb-tablet,=
-id=3Dinput0 -vnc 127.0.0.1:0 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,add=
-r=3D0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -ms=
-g timestamp=3Don
-
-I=E2=80=99ve attached the kernel configuration; this is a stock Debian
-unstable/amd64 system, just upgraded. After upgrading the guest,
-I merely issued a =E2=80=9Creboot=E2=80=9D in the guest and did not stop/st=
-art
-qemu.
-
-The host is Debian jessie/amd64 (Linux 3.16.0-7-amd64 / 3.16.59-1)
-in case that matters.
-
-Thanks,
-//mirabilos
---=20
-tarent solutions GmbH
-Rochusstra=C3=9Fe 2-4, D-53123 Bonn =E2=80=A2 http://www.tarent.de/
-Tel: +49 228 54881-393 =E2=80=A2 Fax: +49 228 54881-235
-HRB 5168 (AG Bonn) =E2=80=A2 USt-ID (VAT): DE122264941
-Gesch=C3=A4ftsf=C3=BChrer: Dr. Stefan Barth, Kai Ebenrett, Boris Esser, Ale=
-xander Steeg
+-- 
+Pengutronix e.K.                           |                             |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
