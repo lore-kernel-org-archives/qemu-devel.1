@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51471)
+Received: from eggs.gnu.org ([208.118.235.92]:51713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gfNYK-0002Uk-HG
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:13 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gfNYn-000393-9J
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gfNYJ-0005Rj-Rg
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:12 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gfNYm-0005eW-H5
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:41 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  4 Jan 2019 11:21:43 +0000
-Message-Id: <20190104112145.12413-3-stefanha@redhat.com>
+Date: Fri,  4 Jan 2019 11:21:44 +0000
+Message-Id: <20190104112145.12413-4-stefanha@redhat.com>
 In-Reply-To: <20190104112145.12413-1-stefanha@redhat.com>
 References: <20190104112145.12413-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/4] dmg: fix binary search
+Subject: [Qemu-devel] [PULL 3/4] dmg: use enumeration type instead of hard
+ coding number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +23,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, yuchenlin <npes87184@gmail.com>
+Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, yuchenlin <npes87184@gmail.com>, Julio Faracco <jcfaracco@gmail.com>
 
 From: yuchenlin <npes87184@gmail.com>
 
-There is a possible hang in original binary search implementation. That i=
-s
-if chunk1 =3D 4, chunk2 =3D 5, chunk3 =3D 4, and we go else case.
-
-The chunk1 will be still 4, and so on.
-
 Signed-off-by: yuchenlin <npes87184@gmail.com>
-Message-id: 20190103114700.9686-2-npes87184@gmail.com
+Reviewed-by: Julio Faracco <jcfaracco@gmail.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20190103114700.9686-3-npes87184@gmail.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/dmg.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ block/dmg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/block/dmg.c b/block/dmg.c
-index 2c806e3389..b26ddb1f68 100644
+index b26ddb1f68..84732a64c1 100644
 --- a/block/dmg.c
 +++ b/block/dmg.c
-@@ -572,16 +572,20 @@ static inline uint32_t search_chunk(BDRVDMGState *s=
-, uint64_t sector_num)
- {
-     /* binary search */
-     uint32_t chunk1 =3D 0, chunk2 =3D s->n_chunks, chunk3;
--    while (chunk1 !=3D chunk2) {
-+    while (chunk1 <=3D chunk2) {
-         chunk3 =3D (chunk1 + chunk2) / 2;
-         if (s->sectors[chunk3] > sector_num) {
--            chunk2 =3D chunk3;
-+            if (chunk3 =3D=3D 0) {
-+                goto err;
-+            }
-+            chunk2 =3D chunk3 - 1;
-         } else if (s->sectors[chunk3] + s->sectorcounts[chunk3] > sector=
-_num) {
-             return chunk3;
-         } else {
--            chunk1 =3D chunk3;
-+            chunk1 =3D chunk3 + 1;
-         }
-     }
-+err:
-     return s->n_chunks; /* error */
- }
+@@ -267,7 +267,7 @@ static int dmg_read_mish_block(BDRVDMGState *s, DmgHe=
+aderState *ds,
 =20
+         /* all-zeroes sector (type 2) does not need to be "uncompressed"=
+ and can
+          * therefore be unbounded. */
+-        if (s->types[i] !=3D 2 && s->sectorcounts[i] > DMG_SECTORCOUNTS_=
+MAX) {
++        if (s->types[i] !=3D UDIG && s->sectorcounts[i] > DMG_SECTORCOUN=
+TS_MAX) {
+             error_report("sector count %" PRIu64 " for chunk %" PRIu32
+                          " is larger than max (%u)",
+                          s->sectorcounts[i], i, DMG_SECTORCOUNTS_MAX);
+@@ -710,7 +710,7 @@ dmg_co_preadv(BlockDriverState *bs, uint64_t offset, =
+uint64_t bytes,
+         /* Special case: current chunk is all zeroes. Do not perform a m=
+emcpy as
+          * s->uncompressed_chunk may be too small to cover the large all=
+-zeroes
+          * section. dmg_read_chunk is called to find s->current_chunk */
+-        if (s->types[s->current_chunk] =3D=3D 2) { /* all zeroes block e=
+ntry */
++        if (s->types[s->current_chunk] =3D=3D UDIG) { /* all zeroes bloc=
+k entry */
+             qemu_iovec_memset(qiov, i * 512, 0, 512);
+             continue;
+         }
 --=20
 2.20.1
