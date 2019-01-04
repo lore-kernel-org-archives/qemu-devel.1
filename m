@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54465)
+Received: from eggs.gnu.org ([208.118.235.92]:54957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gfVSA-000431-8Z
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:48:22 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gfVUH-0005pJ-Mn
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:50:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gfVS1-0001sX-PK
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:48:17 -0500
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:46869)
+	(envelope-from <pbonzini@redhat.com>) id 1gfVUC-0003cc-5g
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:50:33 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33657)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1gfVS0-0001qa-9V
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:48:12 -0500
-Received: by mail-lf1-x141.google.com with SMTP id y14so7222231lfg.13
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 11:48:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gfVUA-0003Xc-QB
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 14:50:28 -0500
+Received: by mail-wr1-f65.google.com with SMTP id c14so37620406wrr.0
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 11:50:24 -0800 (PST)
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+	<20181227063419.12981-21-yang.zhong@intel.com>
+	<b29d2a27-f558-1d15-761b-2cc2f256cd5c@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a8965a62-df89-c324-33dd-787d4cadda75@redhat.com>
+Date: Fri, 4 Jan 2019 20:50:23 +0100
 MIME-Version: 1.0
-References: <20190104182057.8778-1-philmd@redhat.com>
-	<8176371f-6dff-adee-84d1-5758ed74700c@redhat.com>
-In-Reply-To: <8176371f-6dff-adee-84d1-5758ed74700c@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 4 Jan 2019 11:47:43 -0800
-Message-ID: <CAKmqyKON+qf_+8sGYtaudLLcccdDz96SkiCNn_XztnJr8_m7bA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/char/stm32f2xx_usart: Do not update
- data register when device is disabled
+In-Reply-To: <b29d2a27-f558-1d15-761b-2cc2f256cd5c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 20/25] hyperv: express dependencies
+ with kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com
 
-On Fri, Jan 4, 2019 at 10:31 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> On 1/4/19 7:20 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > When the device is disable, the internal circuitry keep the data
->
-> "keep" -> "keeps"
->
-> > register loaded and doesn't update it.
-> >
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 04/01/19 16:38, Thomas Huth wrote:
+> On 2018-12-27 07:34, Yang Zhong wrote:
+>> remove default-configs/hyperv.mak and make dependencies
+>> with Kconfig.
+>>
+>> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+>> ---
+>>  default-configs/hyperv.mak       | 2 --
+>>  default-configs/i386-softmmu.mak | 1 -
+>>  hw/hyperv/Kconfig                | 1 +
+>>  hw/i386/Kconfig                  | 2 ++
+>>  4 files changed, 3 insertions(+), 3 deletions(-)
+>>  delete mode 100644 default-configs/hyperv.mak
+>>
+>> diff --git a/default-configs/hyperv.mak b/default-configs/hyperv.mak
+>> deleted file mode 100644
+>> index 5d0d9fd830..0000000000
+>> --- a/default-configs/hyperv.mak
+>> +++ /dev/null
+>> @@ -1,2 +0,0 @@
+>> -CONFIG_HYPERV=$(CONFIG_KVM)
+>> -CONFIG_HYPERV_TESTDEV=y
+>> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+>> index d2e58edd17..eb2d22de3c 100644
+>> --- a/default-configs/i386-softmmu.mak
+>> +++ b/default-configs/i386-softmmu.mak
+>> @@ -1,6 +1,5 @@
+>>  # Default configuration for i386-softmmu
+>>  
+>> -include hyperv.mak
+>>  CONFIG_VMXNET3_PCI=y
+>>  CONFIG_VIRTIO_VGA=y
+>>  CONFIG_IPMI=y
+>> diff --git a/hw/hyperv/Kconfig b/hw/hyperv/Kconfig
+>> index be724b7f8b..632c3a675b 100644
+>> --- a/hw/hyperv/Kconfig
+>> +++ b/hw/hyperv/Kconfig
+>> @@ -1,5 +1,6 @@
+>>  config HYPERV
+>>      bool
+>> +    depends on KVM
+>>  
+>>  config HYPERV_TESTDEV
+>>      bool
+> 
+> Should HYPERV_TESTDEV maybe get a "depends on HYPERV", too?
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Yes, and also a "default y if PC".  That makes the "select
+HYPERV_TESTDEV" unnecessary below.
 
-Alistair
+Paolo
 
-> > ---
-> >  hw/char/stm32f2xx_usart.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> >
-> > diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
-> > index f3363a2952..10392c70e2 100644
-> > --- a/hw/char/stm32f2xx_usart.c
-> > +++ b/hw/char/stm32f2xx_usart.c
-> > @@ -53,14 +53,13 @@ static void stm32f2xx_usart_receive(void *opaque, c=
-onst uint8_t *buf, int size)
-> >  {
-> >      STM32F2XXUsartState *s =3D opaque;
-> >
-> > -    s->usart_dr =3D *buf;
-> > -
-> >      if (!(s->usart_cr1 & USART_CR1_UE && s->usart_cr1 & USART_CR1_RE))=
- {
-> >          /* USART not enabled - drop the chars */
-> >          DB_PRINT("Dropping the chars\n");
-> >          return;
-> >      }
-> >
-> > +    s->usart_dr =3D *buf;
-> >      s->usart_sr |=3D USART_SR_RXNE;
-> >
-> >      if (s->usart_cr1 & USART_CR1_RXNEIE) {
-> >
->
+>> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+>> index 695a67f88d..af4b81bae1 100644
+>> --- a/hw/i386/Kconfig
+>> +++ b/hw/i386/Kconfig
+>> @@ -11,6 +11,8 @@ config PC
+>>      select I8257
+>>      select MC146818RTC
+>>      select TPM_TIS if TPM
+>> +    select HYPERV
+>> +    select HYPERV_TESTDEV
+>>  
+>>  config PC_PCI
+>>      bool
+>>
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
