@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52820)
+Received: from eggs.gnu.org ([208.118.235.92]:54607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfPR3-0003zp-Hr
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:22:50 -0500
+	(envelope-from <thuth@redhat.com>) id 1gfPZU-00075q-5h
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:31:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfPR2-0006mx-HH
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:22:49 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43990)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfPR2-0006mp-4d
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:22:48 -0500
-Received: by mail-oi1-x241.google.com with SMTP id u18so30294766oie.10
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 05:22:48 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gfPZR-000265-0P
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:31:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50506)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gfPZP-00022U-D7
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:31:27 -0500
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+	<20181227063419.12981-13-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <af35eca8-9c8e-1dc8-2de7-fa654da85089@redhat.com>
+Date: Fri, 4 Jan 2019 14:31:18 +0100
 MIME-Version: 1.0
-References: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 13:22:36 +0000
-Message-ID: <CAFEAcA-JCofFz44oaSaHMnAY-+ZjKVGBCw-hbsyW4upUQADErg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/44] MIPS pull request for December
- 2018 - v3
+In-Reply-To: <20181227063419.12981-13-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 12/25] build: convert usb.mak to Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org
 
-On Thu, 3 Jan 2019 at 17:08, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> The following changes since commit 1b3e80082bcd9b760113bbc023496cd22efad2dc:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20181226' into staging (2019-01-03 10:42:21 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/AMarkovic/qemu tags/mips-queue-december-2018-v3
->
-> for you to fetch changes up to 19749a21d79bc26e35d88b9e9cfe7e2902979273:
->
->   tests/tcg: mips: Test R5900 three-operand MADDU1 (2019-01-03 17:52:52 +0100)
->
-> ----------------------------------------------------------------
->
-> MIPS queue for December 2018 - v3
->
->   - this queue contains various amendments to MIPS code
->       - MAINTAINERS updates
->       - MXU support updates
->       - R5900 updates
->       - nanoMIPS disassembler updates
->       - fix for builds on n32 hosts
->   - there are three checkpatch warnings that should be ingnored
->     for given circumstances
->   - most of the patches are not yet visible/noticeable to the end
->     user, just a single note related to Paul's patch (fixing build
->     on n32 hosts) will be added to ChangeLog
->
-> v2->v3:
->
->   - corrected two build errors related to declaring counter within
->     "for" loops
->   - rebased to the latest code
->
-> v1->v2:
->
->   - added three patches that were meanwhile tested better
->
+On 2018-12-27 07:34, Yang Zhong wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Instead of including the same list of devices for each target,
+> let the host controllers select CONFIG_USB and make the devices
+> default to present whenever USB is available.
+> 
+> Done with the following script:
+>   while read i; do
+>      i=${i%=y}; i=${i#CONFIG_}
+>      sed -i -e'/^config '$i'$/!b' -en \
+>             -e'a\' -e'    default y\' -e'    depends on USB' \
+>           `grep -lw $i hw/*/Kconfig`
+>   done < default-configs/usb.mak
+> 
+> followed by adding "select USB" on the host controllers.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  default-configs/i386-softmmu.mak |  1 -
+>  default-configs/usb.mak          | 11 -----------
+>  hw/usb/Kconfig                   | 26 ++++++++++++++++++++++++++
+>  3 files changed, 26 insertions(+), 12 deletions(-)
+>  delete mode 100644 default-configs/usb.mak
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+Reviewed-by: Thomas Huth <thuth@redhat.com>
