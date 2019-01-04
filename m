@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:33389)
+Received: from eggs.gnu.org ([208.118.235.92]:33870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gfPzu-00064a-4F
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:58:52 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gfQ0t-00071u-LL
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:59:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gfPzq-0005zC-ST
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:58:50 -0500
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:42843)
+	(envelope-from <pbonzini@redhat.com>) id 1gfQ0q-0006gC-Ey
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:59:51 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46890)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1gfPzq-0005uI-En
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:58:46 -0500
-Received: by mail-lf1-x142.google.com with SMTP id l10so25469106lfh.9
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 05:58:46 -0800 (PST)
-Date: Fri, 4 Jan 2019 14:58:43 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20190104135843.GR1148@toto>
-References: <20181210152829.29271-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gfQ0q-0006fq-8P
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 08:59:48 -0500
+Received: by mail-wr1-f67.google.com with SMTP id l9so36640655wrt.13
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 05:59:48 -0800 (PST)
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+	<20181227063419.12981-23-yang.zhong@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1f94070a-d9df-9fb9-66e8-77e576aeb229@redhat.com>
+Date: Fri, 4 Jan 2019 14:59:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181210152829.29271-1-alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] [RFC PATCH  00/13] Enabling tcg/tests for xtensa,
- mips and cris
+In-Reply-To: <20181227063419.12981-23-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 22/25] i386-softmmu.mak: remove all
+ CONFIG_* except boards definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,348 +31,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, michael@walle.cc, aurelien@aurel32.net, amarkovic@wavecomp.com, shorne@gmail.com, jcmvbkbc@gmail.com
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, thuth@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com
 
-On Mon, Dec 10, 2018 at 03:28:16PM +0000, Alex Bennée wrote:
-> Hi,
+On 27/12/18 07:34, Yang Zhong wrote:
+> %-softmmu.mak only keep boards definitions in Kconfig mode.
 > 
-> This is very much a work in progress but I'm posting it in the hope of
-> getting some feedback from the architecture maintainers.
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  default-configs/i386-softmmu.mak | 30 ------------------------------
+>  hw/i386/Kconfig                  | 30 ++++++++++++++++++++++++++++++
+>  hw/ide/Kconfig                   |  2 +-
+>  hw/net/Kconfig                   |  2 ++
+>  4 files changed, 33 insertions(+), 31 deletions(-)
 > 
-> When I originally enabled tcg tests I only enabled linux-user tests for
-> architectures that had easily available compilers. I also skipped over a
-> bunch of the tests that were already in the tree but didn't build.
-> 
-> Enabling the building of system tests is actually fairly simple. The
-> patch introduces the concept of Makefile.softmmu-target so we can keep
-> the build rules nicely separated from that of linux-user targets.
-> 
-> I've enabled system builds for xtensa, cris and mips64. However they all
-> have some niggles that need sorting out.
-> 
-> Xtensa
-> 
-> The tests all build and run manually but for some reason running under
-> make break. I think this is something to do with the monitor being
-> involved in the semihosting output.
-> 
-> MIPS
-> 
-> The existing mips tests are split between 32 bit which are linux-user
-> tests. I've enabled a chunk of these but adding the mips32r2 aran into
-> problems with make which I haven't yet figured out despite having
-> targets in different build directories. The mipsr5900 build is limited
-> by the fact that upstream GCC doesn't seem to support the build type.
-> 
-> The 64 bit mips tests are system tests and are built for the
-> mips64el-softmmu target. Getting them to build has been more problematic
-> possibly because there is a bunch of target flags I don't understand.
-> For example why does FLAGS define have -march=mips64r2 for the mip64-dsp
-> target?
-> 
-> I could do with some guidance from the MIPS guys here about the right
-> toolchain and build options.
-> 
-> CRIS
-> 
-> Again I've gotten these building. I had to skip a bunch of tests because
-> it seems the upstream cris compiler:
-> 
-> cris-linux-gnu-gcc (GCC) 7.2.1 20170915 (Red Hat Cross 7.2.1-1)
-> 
-> Can't build all the cris tests because it doesn't support all the
-> versions of the architecture. Secondly I'm not sure how these tests are
-> meant to be invoked within QEMU. They originally come from the binutils
-> simulator (SIM) and are split into ctst (linux-user) and tst (simulator)
-> tests. As we can only build system tests with the cris cross compiler
-> I've stuck to those but I'm unsure how they are meant to be invoked.
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> index d3488b5a6d..7b083412af 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -1,35 +1,5 @@
+>  # Default configuration for i386-softmmu
+>  
+> -CONFIG_VMXNET3_PCI=y
+> -CONFIG_IPMI=y
+> -CONFIG_IPMI_LOCAL=y
+> -CONFIG_IPMI_EXTERN=y
+> -CONFIG_ISA_IPMI_KCS=y
+> -CONFIG_ISA_IPMI_BT=y
+> -
+> -# Optional devices:
+> -#
+> -CONFIG_HPET=y
+> -CONFIG_APPLESMC=y
+> -CONFIG_PFLASH_CFI01=y
+> -CONFIG_ISA_TESTDEV=y
+> -CONFIG_VMPORT=y
+> -CONFIG_SGA=y
+> -CONFIG_PVPANIC=y
+> -CONFIG_MEM_DEVICE=y
+> -CONFIG_DIMM=y
+> -CONFIG_NVDIMM=y
+> -CONFIG_ACPI_NVDIMM=y
+> -CONFIG_PCIE_PORT=y
+> -CONFIG_SMBIOS=y
+> -CONFIG_PXB=y
+> -CONFIG_ACPI_VMGENID=y
+> -CONFIG_FW_CFG_DMA=y
+> -CONFIG_I2C=y
+> -CONFIG_SEV=$(CONFIG_KVM)
+> -CONFIG_VTD=y
+> -CONFIG_AMD_IOMMU=y
+> -
+>  # Boards:
+>  #
+>  CONFIG_ISAPC=y
+> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+> index af4b81bae1..c00080ac76 100644
+> --- a/hw/i386/Kconfig
+> +++ b/hw/i386/Kconfig
+> @@ -1,6 +1,9 @@
+>  config KVM
+>      bool
+>  
+> +config SEV
+> +    bool
 
-Hi Alex,
+The rest of this patch should not be needed:
 
-The Makefile has run rules for running these, make check.
-make check-g is for comparing with GDB's cris simulator.
+>  config PC
+>      bool
+>      select ISA_DEBUG
+> @@ -13,6 +16,29 @@ config PC
+>      select TPM_TIS if TPM
+>      select HYPERV
+>      select HYPERV_TESTDEV
+> +    select DIMM
+> +    select AMD_IOMMU
 
-Some tests target cris-v10 (actually v17 which is an extended v10) and others target cris-v32.
-v10 and v32 are quite different. In the old days, we used to have a crisv32- toolchain
-that would default to building cris-v32 binaries but could also build cris-v10 binaries
-when -mcpu=v10 was used.
+This should be selected by Q35 only, in patch 16.
 
-It may be the case that your toolchain defaults to v10 but can build v32 binaries
-with -mcpu=v32, I don't know. In any case, it may be better to change the Makefile
-to always be explicit about the -mcpu instead of assuming v32 per default.
+> +    select NVDIMM
+> +    select ACPI_NVDIMM
+> +    select ACPI_VMGENID
 
-I hope that helps a little a least!
+I think these should not be selected
 
-Best regards,
-Edgar
+> +    select SMBIOS
 
+Please add this to patch 16 instead.
 
+> +    select IPMI
 
+This should be selected through ISA_IPMI_KCS and ISA_IPMI_BT.
 
+> +    select IPMI_LOCAL
+> +    select IPMI_EXTERN
 
+These should be config symbols that depend on IPMI.
 
-> 
-> I actually started down this road to add Stefan's microbit tests to the
-> build. You can see this commit:
-> 
-> [https://github.com/stsquad/qemu/commit/727e106204e867cc42dc8fa44f84b013c7f7fcb7]
-> 
-> For how easy it was to add. As this is an RFC I've included all the
-> aspirational work in progress for our more esoteric architectures so
-> maintainers can have a play. The next iteration of the series will only
-> include working patches ;-)
-> 
-> Alex Bennée (12):
->   tests/tcg: add softmmu awareness to Makefile
->   tests: enable tcg tests for softmmu
->   tests/tcg: add QEMU_OPT option for test runner
->   tests/tcg/mips: enable mips32-dsp/mips32-dspr2/mipsr5900 linux-user
->     (WIP)
->   tests/tcg/mips: enable mips64 system tests (WIP)
->   tests/tcg/xtensa: enable system tests
->   tests/docker: add fedora-cris-cross compilers
->   tests/tcg: split cris tests into system and user mode
->   tests/tcg/cris: cleanup sys.c
->   tests/tcg/cris: comment out the ccs test
->   tests/tcg/cris: align mul operations
->   tests/tcg: enable cris system tests
-> 
-> Philippe Mathieu-Daudé (1):
->   tests/docker: add debian-xtensa-cross image
-> 
->  Makefile.target                               |   2 -
->  tests/Makefile.include                        |   7 +-
->  tests/docker/Makefile.include                 |   1 +
->  .../dockerfiles/debian-xtensa-cross.docker    |  31 ++
->  .../dockerfiles/fedora-cris-cross.docker      |   8 +
->  tests/tcg/Makefile                            |  21 +-
->  tests/tcg/Makefile.include                    |   2 +-
->  tests/tcg/cris/Makefile                       | 168 ---------
->  tests/tcg/cris/Makefile.include               |   6 +
->  tests/tcg/cris/Makefile.softmmu-target        |  50 +++
->  tests/tcg/cris/sys.c                          |  59 ---
->  tests/tcg/cris/{ => system}/check_addcv17.s   |   0
->  tests/tcg/cris/{ => system}/check_addi.s      |   0
->  tests/tcg/cris/{ => system}/check_addiv32.s   |   0
->  tests/tcg/cris/{ => system}/check_addm.s      |   0
->  tests/tcg/cris/{ => system}/check_addq.s      |   0
->  tests/tcg/cris/{ => system}/check_addr.s      |   0
->  tests/tcg/cris/{ => system}/check_addxc.s     |   0
->  tests/tcg/cris/{ => system}/check_addxm.s     |   0
->  tests/tcg/cris/{ => system}/check_addxr.s     |   0
->  tests/tcg/cris/{ => system}/check_andc.s      |   0
->  tests/tcg/cris/{ => system}/check_andm.s      |   0
->  tests/tcg/cris/{ => system}/check_andq.s      |   0
->  tests/tcg/cris/{ => system}/check_andr.s      |   0
->  tests/tcg/cris/{ => system}/check_asr.s       |   0
->  tests/tcg/cris/{ => system}/check_ba.s        |   0
->  tests/tcg/cris/{ => system}/check_bas.s       |   0
->  tests/tcg/cris/{ => system}/check_bcc.s       |   0
->  tests/tcg/cris/{ => system}/check_boundc.s    |   0
->  tests/tcg/cris/{ => system}/check_boundr.s    |   0
->  tests/tcg/cris/{ => system}/check_btst.s      |  14 +-
->  tests/tcg/cris/{ => system}/check_clearfv32.s |   0
->  tests/tcg/cris/{ => system}/check_clrjmp1.s   |   0
->  tests/tcg/cris/{ => system}/check_cmp-2.s     |   0
->  tests/tcg/cris/{ => system}/check_cmpc.s      |   0
->  tests/tcg/cris/{ => system}/check_cmpm.s      |   0
->  tests/tcg/cris/{ => system}/check_cmpq.s      |   0
->  tests/tcg/cris/{ => system}/check_cmpr.s      |   0
->  tests/tcg/cris/{ => system}/check_cmpxc.s     |   0
->  tests/tcg/cris/{ => system}/check_cmpxm.s     |   0
->  tests/tcg/cris/{ => system}/check_dstep.s     |   0
->  tests/tcg/cris/{ => system}/check_jsr.s       |   0
->  tests/tcg/cris/{ => system}/check_lapc.s      |   0
->  tests/tcg/cris/{ => system}/check_lsl.s       |   0
->  tests/tcg/cris/{ => system}/check_lsr.s       |   0
->  tests/tcg/cris/{ => system}/check_mcp.s       |   0
->  tests/tcg/cris/{ => system}/check_movdelsr1.s |   0
->  tests/tcg/cris/{ => system}/check_movecr.s    |   0
->  tests/tcg/cris/{ => system}/check_movei.s     |   0
->  tests/tcg/cris/{ => system}/check_movemr.s    |   0
->  tests/tcg/cris/{ => system}/check_movemrv32.s |   0
->  tests/tcg/cris/{ => system}/check_mover.s     |   0
->  tests/tcg/cris/{ => system}/check_moverm.s    |   0
->  tests/tcg/cris/{ => system}/check_movmp.s     |   0
->  tests/tcg/cris/{ => system}/check_movpmv32.s  |   0
->  tests/tcg/cris/{ => system}/check_movpr.s     |   0
->  tests/tcg/cris/{ => system}/check_movprv32.s  |   0
->  tests/tcg/cris/{ => system}/check_movscr.s    |   0
->  tests/tcg/cris/{ => system}/check_movsm.s     |   0
->  tests/tcg/cris/{ => system}/check_movsr.s     |   0
->  tests/tcg/cris/{ => system}/check_movucr.s    |   0
->  tests/tcg/cris/{ => system}/check_movum.s     |   0
->  tests/tcg/cris/{ => system}/check_movur.s     |   0
->  tests/tcg/cris/{ => system}/check_mulv32.s    |   0
->  tests/tcg/cris/{ => system}/check_mulx.s      |  11 +
->  tests/tcg/cris/{ => system}/check_neg.s       |   0
->  tests/tcg/cris/{ => system}/check_not.s       |   0
->  tests/tcg/cris/{ => system}/check_orc.s       |   0
->  tests/tcg/cris/{ => system}/check_orm.s       |   0
->  tests/tcg/cris/{ => system}/check_orq.s       |   0
->  tests/tcg/cris/{ => system}/check_orr.s       |   0
->  tests/tcg/cris/{ => system}/check_ret.s       |   0
->  tests/tcg/cris/{ => system}/check_scc.s       |   0
->  tests/tcg/cris/{ => system}/check_subc.s      |   0
->  tests/tcg/cris/{ => system}/check_subm.s      |   0
->  tests/tcg/cris/{ => system}/check_subq.s      |   0
->  tests/tcg/cris/{ => system}/check_subr.s      |   0
->  tests/tcg/cris/{ => system}/check_xarith.s    |   0
->  tests/tcg/cris/{ => system}/crt.s             |   0
->  tests/tcg/cris/system/sys.c                   |  59 +++
->  tests/tcg/cris/{ => system}/testutils.inc     |   0
->  tests/tcg/cris/{ => user}/check_abs.c         |   0
->  tests/tcg/cris/{ => user}/check_addc.c        |   0
->  tests/tcg/cris/{ => user}/check_addcm.c       |   0
->  tests/tcg/cris/{ => user}/check_addo.c        |   0
->  tests/tcg/cris/{ => user}/check_addoq.c       |   0
->  tests/tcg/cris/{ => user}/check_bound.c       |   0
->  tests/tcg/cris/{ => user}/check_ftag.c        |   0
->  .../{ => user}/check_glibc_kernelversion.c    |   0
->  tests/tcg/cris/{ => user}/check_hello.c       |   0
->  tests/tcg/cris/{ => user}/check_int64.c       |   0
->  tests/tcg/cris/{ => user}/check_lz.c          |   0
->  tests/tcg/cris/{ => user}/check_mapbrk.c      |   0
->  tests/tcg/cris/{ => user}/check_mmap1.c       |   0
->  tests/tcg/cris/{ => user}/check_mmap2.c       |   0
->  tests/tcg/cris/{ => user}/check_mmap3.c       |   0
->  tests/tcg/cris/{ => user}/check_moveq.c       |   0
->  tests/tcg/cris/{ => user}/check_openpf1.c     |   0
->  tests/tcg/cris/{ => user}/check_openpf2.c     |   0
->  tests/tcg/cris/{ => user}/check_openpf3.c     |   0
->  tests/tcg/cris/{ => user}/check_openpf5.c     |   0
->  tests/tcg/cris/{ => user}/check_settls1.c     |   0
->  tests/tcg/cris/{ => user}/check_sigalrm.c     |   0
->  tests/tcg/cris/{ => user}/check_stat1.c       |   0
->  tests/tcg/cris/{ => user}/check_stat2.c       |   0
->  tests/tcg/cris/{ => user}/check_stat3.c       |   0
->  tests/tcg/cris/{ => user}/check_stat4.c       |   0
->  tests/tcg/cris/{ => user}/check_swap.c        |   0
->  tests/tcg/cris/{ => user}/check_time2.c       |   0
->  tests/tcg/cris/{ => user}/crisutils.h         |   0
->  tests/tcg/cris/{ => user}/sys.h               |   0
->  tests/tcg/mips/Makefile.softmmu-target        |  20 ++
->  tests/tcg/mips/Makefile.target                |  15 +-
->  tests/tcg/mips/mips32-dsp/Makefile            | 166 ++-------
->  tests/tcg/mips/mips32-dspr2/Makefile          |  83 +----
->  tests/tcg/mips/mips64-dsp/Makefile            | 336 +++---------------
->  tests/tcg/mips/mipsr5900/Makefile             |  40 +--
->  tests/tcg/xtensa/Makefile                     |  93 -----
->  tests/tcg/xtensa/Makefile.include             |   7 +
->  tests/tcg/xtensa/Makefile.softmmu-target      |  43 +++
->  120 files changed, 385 insertions(+), 857 deletions(-)
->  create mode 100644 tests/docker/dockerfiles/debian-xtensa-cross.docker
->  create mode 100644 tests/docker/dockerfiles/fedora-cris-cross.docker
->  delete mode 100644 tests/tcg/cris/Makefile
->  create mode 100644 tests/tcg/cris/Makefile.include
->  create mode 100644 tests/tcg/cris/Makefile.softmmu-target
->  delete mode 100644 tests/tcg/cris/sys.c
->  rename tests/tcg/cris/{ => system}/check_addcv17.s (100%)
->  rename tests/tcg/cris/{ => system}/check_addi.s (100%)
->  rename tests/tcg/cris/{ => system}/check_addiv32.s (100%)
->  rename tests/tcg/cris/{ => system}/check_addm.s (100%)
->  rename tests/tcg/cris/{ => system}/check_addq.s (100%)
->  rename tests/tcg/cris/{ => system}/check_addr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_addxc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_addxm.s (100%)
->  rename tests/tcg/cris/{ => system}/check_addxr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_andc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_andm.s (100%)
->  rename tests/tcg/cris/{ => system}/check_andq.s (100%)
->  rename tests/tcg/cris/{ => system}/check_andr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_asr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_ba.s (100%)
->  rename tests/tcg/cris/{ => system}/check_bas.s (100%)
->  rename tests/tcg/cris/{ => system}/check_bcc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_boundc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_boundr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_btst.s (89%)
->  rename tests/tcg/cris/{ => system}/check_clearfv32.s (100%)
->  rename tests/tcg/cris/{ => system}/check_clrjmp1.s (100%)
->  rename tests/tcg/cris/{ => system}/check_cmp-2.s (100%)
->  rename tests/tcg/cris/{ => system}/check_cmpc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_cmpm.s (100%)
->  rename tests/tcg/cris/{ => system}/check_cmpq.s (100%)
->  rename tests/tcg/cris/{ => system}/check_cmpr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_cmpxc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_cmpxm.s (100%)
->  rename tests/tcg/cris/{ => system}/check_dstep.s (100%)
->  rename tests/tcg/cris/{ => system}/check_jsr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_lapc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_lsl.s (100%)
->  rename tests/tcg/cris/{ => system}/check_lsr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_mcp.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movdelsr1.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movecr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movei.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movemr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movemrv32.s (100%)
->  rename tests/tcg/cris/{ => system}/check_mover.s (100%)
->  rename tests/tcg/cris/{ => system}/check_moverm.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movmp.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movpmv32.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movpr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movprv32.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movscr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movsm.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movsr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movucr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movum.s (100%)
->  rename tests/tcg/cris/{ => system}/check_movur.s (100%)
->  rename tests/tcg/cris/{ => system}/check_mulv32.s (100%)
->  rename tests/tcg/cris/{ => system}/check_mulx.s (98%)
->  rename tests/tcg/cris/{ => system}/check_neg.s (100%)
->  rename tests/tcg/cris/{ => system}/check_not.s (100%)
->  rename tests/tcg/cris/{ => system}/check_orc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_orm.s (100%)
->  rename tests/tcg/cris/{ => system}/check_orq.s (100%)
->  rename tests/tcg/cris/{ => system}/check_orr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_ret.s (100%)
->  rename tests/tcg/cris/{ => system}/check_scc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_subc.s (100%)
->  rename tests/tcg/cris/{ => system}/check_subm.s (100%)
->  rename tests/tcg/cris/{ => system}/check_subq.s (100%)
->  rename tests/tcg/cris/{ => system}/check_subr.s (100%)
->  rename tests/tcg/cris/{ => system}/check_xarith.s (100%)
->  rename tests/tcg/cris/{ => system}/crt.s (100%)
->  create mode 100644 tests/tcg/cris/system/sys.c
->  rename tests/tcg/cris/{ => system}/testutils.inc (100%)
->  rename tests/tcg/cris/{ => user}/check_abs.c (100%)
->  rename tests/tcg/cris/{ => user}/check_addc.c (100%)
->  rename tests/tcg/cris/{ => user}/check_addcm.c (100%)
->  rename tests/tcg/cris/{ => user}/check_addo.c (100%)
->  rename tests/tcg/cris/{ => user}/check_addoq.c (100%)
->  rename tests/tcg/cris/{ => user}/check_bound.c (100%)
->  rename tests/tcg/cris/{ => user}/check_ftag.c (100%)
->  rename tests/tcg/cris/{ => user}/check_glibc_kernelversion.c (100%)
->  rename tests/tcg/cris/{ => user}/check_hello.c (100%)
->  rename tests/tcg/cris/{ => user}/check_int64.c (100%)
->  rename tests/tcg/cris/{ => user}/check_lz.c (100%)
->  rename tests/tcg/cris/{ => user}/check_mapbrk.c (100%)
->  rename tests/tcg/cris/{ => user}/check_mmap1.c (100%)
->  rename tests/tcg/cris/{ => user}/check_mmap2.c (100%)
->  rename tests/tcg/cris/{ => user}/check_mmap3.c (100%)
->  rename tests/tcg/cris/{ => user}/check_moveq.c (100%)
->  rename tests/tcg/cris/{ => user}/check_openpf1.c (100%)
->  rename tests/tcg/cris/{ => user}/check_openpf2.c (100%)
->  rename tests/tcg/cris/{ => user}/check_openpf3.c (100%)
->  rename tests/tcg/cris/{ => user}/check_openpf5.c (100%)
->  rename tests/tcg/cris/{ => user}/check_settls1.c (100%)
->  rename tests/tcg/cris/{ => user}/check_sigalrm.c (100%)
->  rename tests/tcg/cris/{ => user}/check_stat1.c (100%)
->  rename tests/tcg/cris/{ => user}/check_stat2.c (100%)
->  rename tests/tcg/cris/{ => user}/check_stat3.c (100%)
->  rename tests/tcg/cris/{ => user}/check_stat4.c (100%)
->  rename tests/tcg/cris/{ => user}/check_swap.c (100%)
->  rename tests/tcg/cris/{ => user}/check_time2.c (100%)
->  rename tests/tcg/cris/{ => user}/crisutils.h (100%)
->  rename tests/tcg/cris/{ => user}/sys.h (100%)
->  create mode 100644 tests/tcg/mips/Makefile.softmmu-target
->  delete mode 100644 tests/tcg/xtensa/Makefile
->  create mode 100644 tests/tcg/xtensa/Makefile.include
->  create mode 100644 tests/tcg/xtensa/Makefile.softmmu-target
-> 
-> -- 
-> 2.17.1
-> 
+> +    select ISA_IPMI_KCS
+> +    select ISA_IPMI_BT
+
+These should be config symbols that depend on PC and select IPMI.  The
+default should be y.
+
+> +    select PFLASH_CFI01
+> +    select I2C
+
+This should be selected automatically via PC_ACPI and ACPI_SMBUS.  No
+need to specify it here.
+
+> +    select PVPANIC
+
+This should be a config symbol that has "default y if PC".  No need to
+specify it here.
+
+> +    select PXB
+
+This should be "default y if PC", again no need to specify it here.
+
+> +    select VMPORT
+> +    select VMMOUSE
+
+These ones are good, but they should be in patch 16.
+
+> +    select SEV if KVM
+
+This one should be "default y if PC && KVM", and not selected here.
+
+> +    select HPET
+> +    select APPLESMC
+> +    select ISA_TESTDEV
+> +    select SGA
+
+These four should be "default y if PC" and not selected here.
+
+> +    select FW_CFG_DMA
+
+And finally this one should be in patch 16.
+
+>  config PC_PCI
+>      bool
+> @@ -37,6 +63,7 @@ config I440FX
+>      select PCI_PIIX
+>      select FDC
+>      select IDE_PIIX
+> +    select VTD
+
+I440FX should not select VTD, like AMD_IOMMU.
+
+>  
+>  config ISAPC
+>      bool
+> @@ -55,6 +82,8 @@ config Q35
+>      select PCI_Q35
+>      select LPC_ICH9
+>      select AHCI
+> +    select VTD
+
+This should be in patch 16.
+
+> +    select PCIE_PORT
+
+There should be a "config PCIE" in patch 10, and then
+
+config PCIE_PORT
+    depends on PCIE
+    default y if PCIE
+
+In patch 10, all of XIO3130, IOH3420 and PCIE_PORT should depend on
+PCIE.  PCI_Q35, PCI_XILINX, PCI_GENERIC and PCI_DESIGNWARE should select
+PCIE.
+
+>  config VTD
+>      bool
+> @@ -67,3 +96,4 @@ config VMPORT
+>  
+>  config VMMOUSE
+>      bool
+> +    depends on VMPORT
+
+This should be in patch 16.
+
+> diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
+> index 41d3057675..b9ba571c04 100644
+> --- a/hw/ide/Kconfig
+> +++ b/hw/ide/Kconfig
+> @@ -17,7 +17,7 @@ config IDE_ISA
+>  
+>  config IDE_PIIX
+>      bool
+> -    depends on PCI
+> +    select IDE_PCI
+
+This is correct, but move it to patch 10.
+
+>      select IDE_QDEV
+>  
+>  config IDE_CMD646
+> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+> index 8b65de1d7f..3be0571649 100644
+> --- a/hw/net/Kconfig
+> +++ b/hw/net/Kconfig
+> @@ -108,6 +108,7 @@ config ROCKER
+>  
+>  config CAN_BUS
+>      bool
+> +    default y
+
+This should not be default y.
+
+>  config CAN_PCI
+>      bool
+> @@ -116,3 +117,4 @@ config CAN_PCI
+>  
+>  config CAN_SJA1000
+>      bool
+> +    default y
+
+This should select CAN_BUS and, after patch 10, depend on PCI.
+
+Paolo
