@@ -1,23 +1,23 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:43385 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:43863 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfZA9-00020X-8G
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:46:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1gfZBv-00038G-VC
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:47:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfZA8-0002sz-FJ
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:46:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1gfZBv-0005qG-6E
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:47:51 -0500
 References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-4-eblake@redhat.com>
-	<1ab7fd0f-fc28-6ff0-286e-27b966f85404@virtuozzo.com>
+	<20181215135324.152629-5-eblake@redhat.com>
+	<20181215141305.GT27120@redhat.com>
+	<09763ed2-ec13-c159-879a-0f081a229280@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <719a11ad-7d01-e401-14c3-3bc4e9f88b54@redhat.com>
-Date: Fri, 4 Jan 2019 17:45:51 -0600
+Message-ID: <f23060ca-7656-4b6c-3936-9bb0b2a0c3b0@redhat.com>
+Date: Fri, 4 Jan 2019 17:47:41 -0600
 MIME-Version: 1.0
-In-Reply-To: <1ab7fd0f-fc28-6ff0-286e-27b966f85404@virtuozzo.com>
+In-Reply-To: <09763ed2-ec13-c159-879a-0f081a229280@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="12uPwV58ZLgFisTSsvAirTGwMBCXlaKye"
-Subject: Re: [Qemu-devel] [PATCH v2 03/22] maint: Allow for EXAMPLES in
- texi2pod
+	boundary="hAox2pnpJTSdz5Cwx3c5zlN61NiHKWbGz"
+Subject: Re: [Qemu-devel] [PATCH v2 04/22] qemu-nbd: Enhance man page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: nsoffer@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---12uPwV58ZLgFisTSsvAirTGwMBCXlaKye
+--hAox2pnpJTSdz5Cwx3c5zlN61NiHKWbGz
 From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com"
- <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Message-ID: <719a11ad-7d01-e401-14c3-3bc4e9f88b54@redhat.com>
-Subject: Re: [PATCH v2 03/22] maint: Allow for EXAMPLES in texi2pod
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: nsoffer@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <f23060ca-7656-4b6c-3936-9bb0b2a0c3b0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 04/22] qemu-nbd: Enhance man page
 References: <20181215135324.152629-1-eblake@redhat.com>
- <20181215135324.152629-4-eblake@redhat.com>
- <1ab7fd0f-fc28-6ff0-286e-27b966f85404@virtuozzo.com>
-In-Reply-To: <1ab7fd0f-fc28-6ff0-286e-27b966f85404@virtuozzo.com>
+ <20181215135324.152629-5-eblake@redhat.com>
+ <20181215141305.GT27120@redhat.com>
+ <09763ed2-ec13-c159-879a-0f081a229280@redhat.com>
+In-Reply-To: <09763ed2-ec13-c159-879a-0f081a229280@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 12/18/18 7:46 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 15.12.2018 16:53, Eric Blake wrote:
->> The next commit will add an EXAMPLES section to qemu-nbd.8;
->> for that to work, we need to recognize EXAMPLES in texi2pod,
->> and we need to make all man pages be regenerated since the
->> output of texi2pod can be different.
+On 12/17/18 9:19 AM, Eric Blake wrote:
+
 >>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>> +@c man begin EXAMPLES
+>>> +Start a server listening on port 10809 that exposes only the
+>>> +guest-visible contents of a qcow2 file, with no TLS encryption, and
+>>> +with the default export name (an empty string). The command will blo=
+ck
+>>> +until the first successful client disconnects:
 >>
-
->> +qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi \
->> +	qemu-monitor-info.texi scripts/texi2pod.pl
->> +qemu.1: qemu-option-trace.texi scripts/texi2pod.pl
+>> TBH I'd always include the -t option in every example.=C2=A0 I don't
+>> understand (except for backwards compatibility) why it isn't the
+>> default since it's something I always trip over when using qemu-nbd.
 >=20
-> I think, no needs to add scripts/texi2pod.pl to both qemu.1: lines, as =
-they should be
-> merged anyway. And if you want to add line breaking anyway, it looks be=
-tter to use one qemu.1:
-> dependency line.
+> I'd still like one example without -t, to call out specifically that it=
 
-Easy to fix.
-
+> creates a one-shot server that goes away after the first client, but
+> don't mind fixing the rest of the examples to use -t.
 >=20
-> On the other hand, it may be better to add MANS variable as subset of D=
-OCS to combine all man page targets,
-> and than do like $(MANS): scripts/texi2pod.pl.. (and recombine DOCS, us=
-ing MANS ofcourse)
-> Hm, and I don't see here docs/interop/qemu-ga-ref.7 and docs/interop/qe=
-mu-qmp-ref.7,
-> which exist in DOCS.
+> Using -e for read-only connections makes sense, using -e for writable
+> exports is a bit more questionable - we _don't_ advertise the
+> NBD_FLAG_CAN_MULTI_CONN which states that caches are kept consistent
+> between simultaneous write connections, although maybe we should see if=
 
-Oh, good point. The .txt files should also have the dependency - in
-general, ALL generated documentation should depend on the generator, not
-just the man pages.  I'll have to think about respinning this patch.
+> qemu-nbd can start promising multi-write consistency in future patches?=
+
+
+And I see you've just posted patches for nbdkit to start advertising
+CAN_MULTI_CONN - so I really need to spend some time figuring out when
+it makes sense for qemu to advertise the flag.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -87,21 +82,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---12uPwV58ZLgFisTSsvAirTGwMBCXlaKye
+--hAox2pnpJTSdz5Cwx3c5zlN61NiHKWbGz
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwv8C8ACgkQ3g5py3or
-ov2wMgf/UcO7fm8nr+JsVaLzGNIYcRkUM7kE0NAla0eLbX0uopcf8EhPaWPbyUgl
-Dv6WWFht7dZVkexTGFsiMBF7O47Nz5uahqruFUZ9Oo1hpqQ9xIHzWUxQrAxhASRg
-ij1aG8TYnbPjXuSeXRbDDrq2gMkAk8exYD/IIxkoC4t1uV5sdFuqEm2HBP9c7P/8
-HMqidvaCi70d/lR2m+MAoAs6PNt89fLY/KGsK9o/PcDs07emWBwEN635OCaxIZy/
-ioCCoH3YXIuWAkV9AAgafc7MrgjLC6lnSpaNWAvaGJIigFzw66/WjEGtxBFjxri1
-i+OgJvK8GQVKFcQv8biECQJmCsOSqA==
-=4PKp
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwv8J0ACgkQ3g5py3or
+ov07EAf/cYPgpRCmIcD6WYwVDgM/8bHu6nT9Ez6PurntqLePNRnQ4G4iFh6Aop35
+RL2F/XAlXMFMdeu0zqj+4kI9Gnoi9ejpzZUuGv7SnsriXfltMKDFrVbTWfLlZbGT
+H84VOJZNidh2B0+RKlw6LInomQHaZHWiITYv6gcEureta4o6HskfmBmLaFClAJ5w
+coSS5ebj1ztQREg0u0gK+kes5lz9pI0gi0PmGl6aLolWyR+4bxzuqWG1beUujsi6
+wMP8NAyLxGCp7jM5VEvkCSG9ByDrTpaganeEr3SGNhFvGY/KSwN7BvVxnYnJMU7B
+EXj64zTD9FE4UOvXH6vSiN/+2/Zd8w==
+=+0T1
 -----END PGP SIGNATURE-----
 
---12uPwV58ZLgFisTSsvAirTGwMBCXlaKye--
+--hAox2pnpJTSdz5Cwx3c5zlN61NiHKWbGz--
