@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42587)
+Received: from eggs.gnu.org ([208.118.235.92]:43551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gfWO1-0001ND-B6
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:48:10 -0500
+	(envelope-from <bounces@canonical.com>) id 1gfWQk-0003uM-29
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:51:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gfWNy-0006ut-5E
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:48:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gfWNx-0006th-T8
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:48:06 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41A30C057F80
-	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 20:48:04 +0000 (UTC)
-Date: Fri, 4 Jan 2019 15:48:02 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190104154723-mutt-send-email-mst@kernel.org>
-References: <20190104032226.21428-1-ehabkost@redhat.com>
-	<20190103232012-mutt-send-email-mst@kernel.org>
-	<20190104101200.GA2494@work-vm> <20190104175439.GH4157@habkost.net>
-	<20190104200952.GI4157@habkost.net>
+	(envelope-from <bounces@canonical.com>) id 1gfWQg-0000FR-62
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:50:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36154)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gfWQe-0000Bj-NP
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:50:52 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gfWQa-0006nB-JE
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 20:50:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 60A5A2E80D4
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 20:50:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190104200952.GI4157@habkost.net>
-Subject: Re: [Qemu-devel] [PATCH] compat: Use explicit type names on
- HW_COMPAT_2_6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 Jan 2019 20:44:27 -0000
+From: Stefan Ring <1701835@bugs.launchpad.net>
+Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
+Message-Id: <154663466772.5473.1641735127742217247.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
+ qemu-alpha
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,137 +37,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Jan 04, 2019 at 06:09:52PM -0200, Eduardo Habkost wrote:
-> On Fri, Jan 04, 2019 at 03:54:39PM -0200, Eduardo Habkost wrote:
-> > On Fri, Jan 04, 2019 at 10:12:00AM +0000, Dr. David Alan Gilbert wrote:
-> > > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > > On Fri, Jan 04, 2019 at 01:22:26AM -0200, Eduardo Habkost wrote:
-> > > > > The virtio-pci entries in HW_COMPAT_2_6 had an implicit
-> > > > > assumption: that all virtio-pci subclasses support the
-> > > > > disable-legacy and disable-modern options.
-> > > > > 
-> > > > > That assumption was broken by commit f6e501a28ef9 ("virtio:
-> > > > > Provide version-specific variants of virtio PCI devices").  This
-> > > > > caused QEMU to crash if using the new -non-transitional or
-> > > > > -transitional device types:
-> > > > > 
-> > > > >   $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
-> > > > >     -device virtio-net-pci-non-transitional
-> > > > >   Unexpected error in object_property_find() at qom/object.c:1092:
-> > > > >   qemu-system-x86_64: -device virtio-net-pci-non-transitional: can't apply \
-> > > > >   global virtio-pci.disable-modern=on: Property '.disable-modern' not found
-> > > > >   Aborted (core dumped)
-> > > > > 
-> > > > > Replace the virtio-pci.disable-legacy=off and
-> > > > > virtio-pci.disable-modern=on entries on HW_COMPAT_2_6 with
-> > > > > explicit entries for each generic virtio device type.
-> > > > > 
-> > > > > The full list of generic virtio device types was extracted by
-> > > > > just grepping for ".generic_name".  Note that we don't need to
-> > > > > worry about listing new virtio-pci devices in HW_COMPAT_2_6 in
-> > > > > the future, because new devices won't require QEMU 2.6
-> > > > > compatibility.
-> > > > 
-> > > > I fully expect that e.g. packed ring support will need
-> > > > to affect all virtio devices too. And it's likely
-> > > > that we'll have some new virtio-pci transport features too.
-> > > > 
-> > > > > This makes the compat entries annoyingly verbose, but is simpler
-> > > > > than the alternative of making the virtio-pci type inheritance
-> > > > > rules even more complex.
-> > > > 
-> > > > God forbid we forgot something, the only way to notice is to
-> > > > run a cross version migration with an old qemu.
-> > > > I think we need to come up with something less verbose and fragile.
-> > > 
-> > > I guess we could use a script like tests/acceptance/virtio_version.py to
-> > > do a check?
-> > 
-> > That's a good idea.  On test code we can try additional tricks to
-> > detect the hybrid virtio devices without increasing the
-> > complexity of QEMU code.  I'll give it a try.
-> 
-> I did it but I'm not happy with the result: many of the virtio
-> devices can't be tested without extra arguments.  Some of them
-> (like vhost-*) require extra privileges on the host that might be
-> unavailable.
-> 
-> Anyway, while writing this I noticed another issue: many of the
-> virtio devices in QEMU 2.6 were already modern-only!
-> 
-> Setting disable-modern=off on modern-only devices like virtio-vga
-> or virtio-tablet-pci doesn't make sense.  This means setting
-> virtio-pci.disable-modern=off on HW_COMPAT_2_6 was incorrect even
-> before the -non-transitional and -transitional device types were
-> introduced.
+Most likely some bits are initialized differently in the FPCR.
 
+-- =
 
-It did create an opportunity to create non working devices.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701835
 
-Whether that's incorrect as such I'm not sure.
+Title:
+  floating-point operation bugs in qemu-alpha
 
+Status in QEMU:
+  New
 
-> ---
-> diff --git a/tests/acceptance/virtio_version.py b/tests/acceptance/virtio_version.py
-> index ce990250d8..9157a1b173 100644
-> --- a/tests/acceptance/virtio_version.py
-> +++ b/tests/acceptance/virtio_version.py
-> @@ -55,6 +55,18 @@ def get_pci_interfaces(vm, devtype):
->      interfaces = ('pci-express-device', 'conventional-pci-device')
->      return [i for i in interfaces if devtype_implements(vm, devtype, i)]
->  
-> +def is_hybrid_dev(vm, devtype):
-> +    props = [p['name'] for p in vm.command('device-list-properties',
-> +                                           typename=devtype)]
-> +    return 'disable-legacy' in props
-> +
-> +def get_all_hybrid_devs(vm):
-> +    """Return list of all hybrid virtio device types (the ones that can be
-> +    configured using the disable-legacy & disable-modern properties)"""
-> +    alldevs = [d['name'] for d in vm.command('qom-list-types',
-> +                                             implements='virtio-pci')]
-> +    return [d for d in alldevs if is_hybrid_dev(vm, d)]
-> +
->  class VirtioVersionCheck(Test):
->      """
->      Check if virtio-version-specific device types result in the
-> @@ -174,3 +186,33 @@ class VirtioVersionCheck(Test):
->          self.check_modern_only('virtio-mouse-pci', VIRTIO_INPUT)
->          self.check_modern_only('virtio-tablet-pci', VIRTIO_INPUT)
->          self.check_modern_only('virtio-keyboard-pci', VIRTIO_INPUT)
-> +
-> +    def get_all_hybrid_devs(self):
-> +        with QEMUMachine(self.qemu_bin) as vm:
-> +            vm.set_machine('none')
-> +            vm.add_args('-S')
-> +            vm.launch()
-> +            return get_all_hybrid_devs(vm)
-> +
-> +    def check_legacy_compat(self, qemu_devtype):
-> +        # these device types can't be run with extra arguments, so we can't
-> +        # test them directly:
-> +        if qemu_devtype in ('virtio-input-host-pci', 'virtio-blk-pci',
-> +                            'virtio-crypto-pci', 'virtio-9p-pci',
-> +                            'vhost-vsock-pci', 'vhost-scsi-pci',
-> +                            'vhost-user-blk-pci', 'vhost-user-scsi-pci'):
-> +               return
-> +
-> +        # Force legacy mode:
-> +        dev_legacy, _ = self.run_device(qemu_devtype,
-> +                                        'disable-modern=on,disable-legacy=off',
-> +                                        machine='pc-i440fx-2.6')
-> +
-> +        # No options: default to legacy on <= 2.6 machine-types:
-> +        no_opts_pc, _ = self.run_device(qemu_devtype, machine='pc-i440fx-2.6')
-> +        self.assertEqual(dev_legacy, no_opts_pc)
-> +
-> +    def test_legacy_compat(self):
-> +        devs = self.get_all_hybrid_devs()
-> +        for d in devs:
-> +            self.check_legacy_compat(d)
-> 
-> -- 
-> Eduardo
+Bug description:
+  When running the gnulib testsuite, I'm seeing test failures in the tests =
+for libm functions
+    cbrt
+    cbrtf
+    ceil
+    ceilf
+    coshf
+    exp2
+    exp2f
+    floor
+    floorf
+    fma
+    fmaf
+    fmal
+    frexp
+    frexpf
+    hypot
+    hypotf
+    hypotl
+    ilogb
+    ilogbf
+    isfinite
+    isinf
+    isnan
+    isnand
+    isnanf
+    ldexp
+    ldexpf
+    ldexpl
+    log1p
+    log1pf
+    log2
+    log2f
+    logb
+    logbf
+    logbl
+    rint
+    rintf
+    rintl
+    signbit
+    sqrt
+    sqrtf
+    strtod
+  that I don't see when running the same (statically linked) executables in=
+ a VM, through qemu-system-alpha.
+
+  How to reproduce:
+  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
+h --single-configure cbrt cbrtf ceil ceilf coshf exp2 exp2f float floor flo=
+orf fma fmaf fmal frexp frexpf hypot hypotf hypotl ilogb ilogbf isfinite is=
+inf isnan isnand isnanf ldexp ldexpf ldexpl log1p log1pf log2 log2f logb lo=
+gbf logbl math printf-frexp rint rintf rintl round roundf signbit sqrt sqrt=
+f strtod trunc truncf
+  - Copy the resulting directory to a VM running Linux 2.6.26 with qemu-sys=
+tem-alpha.
+  - There, configure and build the package:
+    mkdir build-native-static; cd build-native-static; ../configure CPPFLAG=
+S=3D"-Wall" LDFLAGS=3D"-static"; make; make check
+    Only 4 tests fail.
+  - Copy the resulting binaries back to the original x86_64 machine.
+  - Set environment variables for using qemu-alpha.
+  - Here, 50 tests fail that did not fail originally:
+
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-cbrt
+  ../../gltests/test-cbrt.h:39: assertion 'err > - L_(4.0) * L_(16.0) / TWO=
+_MANT_DIG && err < L_(4.0) * L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-coshf =
+
+  ../../gltests/test-coshf.c:37: assertion 'y >=3D 1.1854652f && y <=3D 1.1=
+854653f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-float
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma1   =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmal2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypot =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotl
+  ../../gltests/test-hypot.h:41: assertion 'z =3D=3D HUGEVAL' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isfinite
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isinf   =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnan
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexp =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpl
+  ../../gltests/test-ldexp.h:99: assertion 'y =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1p =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1pf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2  =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2f
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-math =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-printf-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rint        =
+
+  ../../gltests/test-rint.c:63: assertion 'rint (0.7) =3D=3D 1.0' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintf
+  ../../gltests/test-rintf.c:63: assertion 'rintf (0.7f) =3D=3D 1.0f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintl
+  ../../gltests/test-rintl.c:68: assertion 'rintl (0.7L) =3D=3D 1.0L' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-round1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-roundf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-signbit
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-sqrt   =
+
+  ../../gltests/test-sqrt.h:40: assertion 'err > - L_(16.0) / TWO_MANT_DIG =
+&& err < L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-trunc1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-truncf1
+  Floating point exception (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701835/+subscriptions
