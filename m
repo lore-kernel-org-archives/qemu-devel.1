@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59318)
+Received: from eggs.gnu.org ([208.118.235.92]:59349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gfKpJ-0002U0-MN
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:27:34 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gfKpK-0002Vn-MZ
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:27:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gfKpI-0004po-Qj
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:27:33 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45616)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gfKpJ-0004qx-NQ
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:27:34 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40665)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gfKpI-0004pI-K2
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:27:32 -0500
-Received: by mail-wr1-x441.google.com with SMTP id t6so35842815wrr.12
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 00:27:32 -0800 (PST)
+	id 1gfKpJ-0004py-Gj
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:27:33 -0500
+Received: by mail-wm1-x344.google.com with SMTP id f188so450403wmf.5
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 00:27:33 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  4 Jan 2019 09:27:29 +0100
-Message-Id: <20190104082731.24967-1-pbonzini@redhat.com>
+Date: Fri,  4 Jan 2019 09:27:30 +0100
+Message-Id: <20190104082731.24967-2-pbonzini@redhat.com>
+In-Reply-To: <20190104082731.24967-1-pbonzini@redhat.com>
+References: <20190104082731.24967-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 0/2] include: update Linux headers to
- 4.21-rc1/5.0-rc1
+Subject: [Qemu-devel] [PATCH 1/2] scripts/update-linux-headers.sh: adjust
+ for Linux 4.21-rc1 (or 5.0-rc1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +33,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, cohuck@redhat.com, peter.maydell@linaro.org
 
-This is the same patch I've sent, except that scripts/update-linux-headers.sh
-changes are split to a separate commit.
+There are three new indirect inclusions: vhost_types.h, which we'll
+shortly put to use as a portable header and thus is copied to
+standard-headers; and new per-subtarget versions of MIPS unistd.h
+and PowerPC unistd.h.
 
-Paolo
+Because vhost.h includes vhost_types.h, we also need a proxy include
+from linux/vhost.h to standard-headers.
 
-Paolo Bonzini (2):
-  scripts/update-linux-headers.sh: adjust for Linux 4.21-rc1 (or
-    5.0-rc1)
-  include: update Linux headers to 4.21-rc1/5.0-rc1
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ scripts/update-linux-headers.sh | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
- include/standard-headers/drm/drm_fourcc.h     |   63 +
- include/standard-headers/linux/ethtool.h      |   19 +-
- .../linux/input-event-codes.h                 |   17 +
- include/standard-headers/linux/pci_regs.h     |    1 +
- include/standard-headers/linux/vhost_types.h  |  128 ++
- .../standard-headers/linux/virtio_balloon.h   |    8 +
- include/standard-headers/linux/virtio_blk.h   |   54 +
- .../standard-headers/linux/virtio_config.h    |    3 +
- include/standard-headers/linux/virtio_gpu.h   |   18 +
- include/standard-headers/linux/virtio_ring.h  |   52 +
- linux-headers/asm-arm/unistd-common.h         |    1 +
- linux-headers/asm-arm64/unistd.h              |    1 +
- linux-headers/asm-generic/unistd.h            |   10 +-
- linux-headers/asm-mips/sgidefs.h              |    8 -
- linux-headers/asm-mips/unistd.h               | 1074 +----------------
- linux-headers/asm-mips/unistd_n32.h           |  338 ++++++
- linux-headers/asm-mips/unistd_n64.h           |  334 +++++
- linux-headers/asm-mips/unistd_o32.h           |  374 ++++++
- linux-headers/asm-powerpc/unistd.h            |  389 +-----
- linux-headers/asm-powerpc/unistd_32.h         |  381 ++++++
- linux-headers/asm-powerpc/unistd_64.h         |  372 ++++++
- linux-headers/linux/kvm.h                     |   29 +
- linux-headers/linux/vfio.h                    |   92 ++
- linux-headers/linux/vhost.h                   |  113 +-
- linux-headers/linux/vhost_types.h             |    1 +
- scripts/update-linux-headers.sh               |   11 +
- 26 files changed, 2302 insertions(+), 1589 deletions(-)
- create mode 100644 include/standard-headers/linux/vhost_types.h
- create mode 100644 linux-headers/asm-mips/unistd_n32.h
- create mode 100644 linux-headers/asm-mips/unistd_n64.h
- create mode 100644 linux-headers/asm-mips/unistd_o32.h
- create mode 100644 linux-headers/asm-powerpc/unistd_32.h
- create mode 100644 linux-headers/asm-powerpc/unistd_64.h
- create mode 100644 linux-headers/linux/vhost_types.h
-
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 0a964fe240..c933489cbc 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -101,6 +101,13 @@ for arch in $ARCHLIST; do
+ 
+     if [ $arch = mips ]; then
+         cp "$tmpdir/include/asm/sgidefs.h" "$output/linux-headers/asm-mips/"
++        cp "$tmpdir/include/asm/unistd_o32.h" "$output/linux-headers/asm-mips/"
++        cp "$tmpdir/include/asm/unistd_n32.h" "$output/linux-headers/asm-mips/"
++        cp "$tmpdir/include/asm/unistd_n64.h" "$output/linux-headers/asm-mips/"
++    fi
++    if [ $arch = powerpc ]; then
++        cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-powerpc/"
++        cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-powerpc/"
+     fi
+ 
+     rm -rf "$output/include/standard-headers/asm-$arch"
+@@ -162,6 +169,9 @@ EOF
+ cat <<EOF >$output/linux-headers/linux/virtio_ring.h
+ #include "standard-headers/linux/virtio_ring.h"
+ EOF
++cat <<EOF >$output/linux-headers/linux/vhost_types.h
++#include "standard-headers/linux/vhost_types.h"
++EOF
+ 
+ rm -rf "$output/include/standard-headers/linux"
+ mkdir -p "$output/include/standard-headers/linux"
+@@ -171,6 +181,7 @@ for i in "$tmpdir"/include/linux/*virtio*.h \
+          "$tmpdir/include/linux/input-event-codes.h" \
+          "$tmpdir/include/linux/pci_regs.h" \
+          "$tmpdir/include/linux/ethtool.h" "$tmpdir/include/linux/kernel.h" \
++         "$tmpdir/include/linux/vhost_types.h" \
+          "$tmpdir/include/linux/sysinfo.h"; do
+     cp_portable "$i" "$output/include/standard-headers/linux"
+ done
 -- 
 2.20.1
