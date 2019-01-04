@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51902)
+Received: from eggs.gnu.org ([208.118.235.92]:51975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfTlI-0003Ls-K8
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:00:01 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfTlS-0003aY-Nz
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:00:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfTlH-0004VO-Mh
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:00:00 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfTlR-0004d3-Mp
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:00:10 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri,  4 Jan 2019 18:58:35 +0100
-Message-Id: <20190104175847.6290-5-philmd@redhat.com>
+Date: Fri,  4 Jan 2019 18:58:36 +0100
+Message-Id: <20190104175847.6290-6-philmd@redhat.com>
 In-Reply-To: <20190104175847.6290-1-philmd@redhat.com>
 References: <20190104175847.6290-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 04/16] hw/devices: Move TC6393XB declarations
+Subject: [Qemu-devel] [PATCH 05/16] hw/devices: Move Blizzard declarations
  into a new header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,104 +29,97 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Edgar E. Igles
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
  MAINTAINERS                   |  1 +
- hw/arm/tosa.c                 |  2 +-
- hw/display/tc6393xb.c         |  2 +-
- include/hw/devices.h          |  9 ---------
- include/hw/display/tc6393xb.h | 25 +++++++++++++++++++++++++
- 5 files changed, 28 insertions(+), 11 deletions(-)
- create mode 100644 include/hw/display/tc6393xb.h
+ hw/arm/nseries.c              |  1 +
+ hw/display/blizzard.c         |  2 +-
+ include/hw/devices.h          |  7 -------
+ include/hw/display/blizzard.h | 21 +++++++++++++++++++++
+ 5 files changed, 24 insertions(+), 8 deletions(-)
+ create mode 100644 include/hw/display/blizzard.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 19792cfb2d..dff4b98401 100644
+index dff4b98401..156ce9a698 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -685,6 +685,7 @@ F: hw/gpio/zaurus.c
- F: hw/misc/mst_fpga.c
- F: include/hw/arm/pxa.h
- F: include/hw/arm/sharpsl.h
-+F: include/hw/display/tc6393xb.h
+@@ -640,6 +640,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
+ L: qemu-arm@nongnu.org
+ S: Odd Fixes
+ F: hw/arm/nseries.c
++F: include/hw/display/blizzard.h
 =20
- SABRELITE / i.MX6
- M: Peter Maydell <peter.maydell@linaro.org>
-diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-index 7a925fa5e6..b6d464ab16 100644
---- a/hw/arm/tosa.c
-+++ b/hw/arm/tosa.c
-@@ -16,10 +16,10 @@
- #include "hw/hw.h"
- #include "hw/arm/pxa.h"
- #include "hw/arm/arm.h"
--#include "hw/devices.h"
- #include "hw/arm/sharpsl.h"
- #include "hw/pcmcia.h"
+ Palm
+ M: Andrzej Zaborowski <balrogg@gmail.com>
+diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
+index 906b7ca22d..9521be1cef 100644
+--- a/hw/arm/nseries.c
++++ b/hw/arm/nseries.c
+@@ -31,6 +31,7 @@
  #include "hw/boards.h"
-+#include "hw/display/tc6393xb.h"
  #include "hw/i2c/i2c.h"
- #include "hw/ssi/ssi.h"
- #include "hw/sysbus.h"
-diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
-index 3360be6f84..2a59af2dc3 100644
---- a/hw/display/tc6393xb.c
-+++ b/hw/display/tc6393xb.c
-@@ -14,7 +14,7 @@
- #include "qapi/error.h"
- #include "qemu/host-utils.h"
- #include "hw/hw.h"
--#include "hw/devices.h"
-+#include "hw/display/tc6393xb.h"
+ #include "hw/devices.h"
++#include "hw/display/blizzard.h"
  #include "hw/block/flash.h"
+ #include "hw/hw.h"
+ #include "hw/bt.h"
+diff --git a/hw/display/blizzard.c b/hw/display/blizzard.c
+index 291abe6fca..471bd0ed99 100644
+--- a/hw/display/blizzard.c
++++ b/hw/display/blizzard.c
+@@ -21,7 +21,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
  #include "ui/console.h"
+-#include "hw/devices.h"
++#include "hw/display/blizzard.h"
  #include "ui/pixel_ops.h"
+=20
+ typedef void (*blizzard_fn_t)(uint8_t *, const uint8_t *, unsigned int);
 diff --git a/include/hw/devices.h b/include/hw/devices.h
-index 4019b3be17..5ad134232c 100644
+index 5ad134232c..25f895b330 100644
 --- a/include/hw/devices.h
 +++ b/include/hw/devices.h
-@@ -49,13 +49,4 @@ void *tahvo_init(qemu_irq irq, int betty);
+@@ -28,13 +28,6 @@ void tsc2005_set_transform(void *opaque, MouseTransfor=
+mInfo *info);
+ /* stellaris_input.c */
+ void stellaris_gamepad_init(int n, qemu_irq *irq, const int *keycode);
 =20
- void retu_key_event(void *retu, int state);
-=20
--/* tc6393xb.c */
--typedef struct TC6393xbState TC6393xbState;
--TC6393xbState *tc6393xb_init(struct MemoryRegion *sysmem,
--                             uint32_t base, qemu_irq irq);
--void tc6393xb_gpio_out_set(TC6393xbState *s, int line,
--                    qemu_irq handler);
--qemu_irq *tc6393xb_gpio_in_get(TC6393xbState *s);
--qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
+-/* blizzard.c */
+-void *s1d13745_init(qemu_irq gpio_int);
+-void s1d13745_write(void *opaque, int dc, uint16_t value);
+-void s1d13745_write_block(void *opaque, int dc,
+-                void *buf, size_t len, int pitch);
+-uint16_t s1d13745_read(void *opaque, int dc);
 -
- #endif
-diff --git a/include/hw/display/tc6393xb.h b/include/hw/display/tc6393xb.=
+ /* cbus.c */
+ typedef struct {
+     qemu_irq clk;
+diff --git a/include/hw/display/blizzard.h b/include/hw/display/blizzard.=
 h
 new file mode 100644
-index 0000000000..434c345aa1
+index 0000000000..8132557da1
 --- /dev/null
-+++ b/include/hw/display/tc6393xb.h
-@@ -0,0 +1,25 @@
++++ b/include/hw/display/blizzard.h
+@@ -0,0 +1,21 @@
 +/*
-+ * Toshiba TC6393XB I/O Controller.
-+ * Found in Sharp Zaurus SL-6000 (tosa) or some
-+ * Toshiba e-Series PDAs.
++ * Epson S1D13744/S1D13745 (Blizzard/Hailstorm/Tornado) LCD/TV controlle=
+r.
 + *
-+ * Copyright (c) 2007 Herv=C3=A9 Poussineau
++ * Copyright (C) 2008 Nokia Corporation
++ * Written by Andrzej Zaborowski <andrew@openedhand.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or la=
 ter.
 + * See the COPYING file in the top-level directory.
 + */
-+#ifndef HW_DISPLAY_TC6393XB_H
-+#define HW_DISPLAY_TC6393XB_H
++#ifndef HW_DISPLAY_BLIZZARD_H
++#define HW_DISPLAY_BLIZZARD_H
 +
-+#include "exec/memory.h"
 +#include "hw/irq.h"
 +
-+typedef struct TC6393xbState TC6393xbState;
-+
-+TC6393xbState *tc6393xb_init(struct MemoryRegion *sysmem,
-+                             uint32_t base, qemu_irq irq);
-+void tc6393xb_gpio_out_set(TC6393xbState *s, int line, qemu_irq handler)=
-;
-+qemu_irq *tc6393xb_gpio_in_get(TC6393xbState *s);
-+qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
++void *s1d13745_init(qemu_irq gpio_int);
++void s1d13745_write(void *opaque, int dc, uint16_t value);
++void s1d13745_write_block(void *opaque, int dc,
++                          void *buf, size_t len, int pitch);
++uint16_t s1d13745_read(void *opaque, int dc);
 +
 +#endif
 --=20
