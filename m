@@ -1,17 +1,17 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:56811 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:57838 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY6q-0003eJ-G5
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:38:33 -0500
+	(envelope-from <makren67@gmail.com>) id 1gfYB7-0000iv-Rl
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:42:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY6p-0001m1-5U
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:38:32 -0500
-Received: from mail-it1-x133.google.com ([2607:f8b0:4864:20::133]:38742)
+	(envelope-from <makren67@gmail.com>) id 1gfYB7-0005wR-89
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:42:57 -0500
+Received: from mail-yb1-xb2a.google.com ([2607:f8b0:4864:20::b2a]:33457)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gfY6p-0001lg-0h
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:38:31 -0500
-Received: by mail-it1-x133.google.com with SMTP id h65so3456414ith.3
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:38:30 -0800 (PST)
+	(Exim 4.71) (envelope-from <makren67@gmail.com>) id 1gfYB7-0005wG-4S
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:42:57 -0500
+Received: by mail-yb1-xb2a.google.com with SMTP id o73so7415495ybc.0
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:42:57 -0800 (PST)
+MIME-Version: 1.0
 References: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
 	<945511ac-d99a-d483-12a2-e6ad4dda09c2@linaro.org>
 	<CAObpvQktCHp-9V40z7kDaTU2CwRWSq8ZVS1PxRg3WK01TFXCzQ@mail.gmail.com>
@@ -25,14 +25,13 @@ References: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
 	<CAObpvQ=uzvxqFxD0AC=F6kcAysqwAdLwvwUWEGqWGa3mWgVQmQ@mail.gmail.com>
 	<85031ff4-cc90-32f7-1ec4-e342a5d52f34@linaro.org>
 	<CAObpvQki6FxDT_YvCvFZi-=7RFpRT=hGFJvBpK-9TjKL5=jFjA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ce603f31-e6a9-03aa-5967-c94ca19f7335@linaro.org>
-Date: Sat, 5 Jan 2019 08:38:22 +1000
-MIME-Version: 1.0
-In-Reply-To: <CAObpvQki6FxDT_YvCvFZi-=7RFpRT=hGFJvBpK-9TjKL5=jFjA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+	<ce603f31-e6a9-03aa-5967-c94ca19f7335@linaro.org>
+In-Reply-To: <ce603f31-e6a9-03aa-5967-c94ca19f7335@linaro.org>
+From: Nick Renieris <makren67@gmail.com>
+Date: Sat, 5 Jan 2019 00:42:30 +0200
+Message-ID: <CAObpvQ=JaAzbfJ8zFwgAi9-D726wzyCykgwCgX04-M3RgaDYUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] AVX support for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -42,17 +41,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nick Renieris <makren67@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 1/5/19 8:33 AM, Nick Renieris wrote:
-> I know host ABI's can differ like that, but I don't understand why
-> that should matter. Everything (TCG compiler included) is compiled
-> with the same way, right? For the host arch.
+Ohh got it, thanks.
 
-No, not all of the pieces are compiled the same way.  TCG generates machine
-instructions to perform a call from generated code into compiler generated
-code.  So TCG needs to know about the host compiler ABI.
-
-
-r~
+=CE=A3=CF=84=CE=B9=CF=82 =CE=A3=CE=AC=CE=B2, 5 =CE=99=CE=B1=CE=BD 2019 =CF=
+=83=CF=84=CE=B9=CF=82 12:38 =CF=80.=CE=BC., =CE=BF/=CE=B7 Richard Henderson
+<richard.henderson@linaro.org> =CE=AD=CE=B3=CF=81=CE=B1=CF=88=CE=B5:
+>
+> On 1/5/19 8:33 AM, Nick Renieris wrote:
+> > I know host ABI's can differ like that, but I don't understand why
+> > that should matter. Everything (TCG compiler included) is compiled
+> > with the same way, right? For the host arch.
+>
+> No, not all of the pieces are compiled the same way.  TCG generates machi=
+ne
+> instructions to perform a call from generated code into compiler generate=
+d
+> code.  So TCG needs to know about the host compiler ABI.
+>
+>
+> r~
