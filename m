@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56597)
+Received: from eggs.gnu.org ([208.118.235.92]:56771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfTxS-00021y-D2
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:12:36 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfTxd-0002HM-LW
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:12:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfTxP-0003A8-9P
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:12:34 -0500
+	(envelope-from <philmd@redhat.com>) id 1gfTxc-0003JG-GC
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:12:45 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri,  4 Jan 2019 19:12:05 +0100
-Message-Id: <20190104181208.7809-1-philmd@redhat.com>
+Date: Fri,  4 Jan 2019 19:12:07 +0100
+Message-Id: <20190104181208.7809-3-philmd@redhat.com>
+In-Reply-To: <20190104181208.7809-1-philmd@redhat.com>
+References: <20190104181208.7809-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/3] cutils: Cleanup, improve documentation
+Subject: [Qemu-devel] [PATCH v2 2/3] util/cutils: Move ctype macros to
+ "cutils.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +26,215 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Stefano Garzarella <sgarzare@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-This series is a fairly trivial cleanup of "cutils.h"
-(size_to_str() and ctype macros moved into it), and
-some documentation improvements.
+Introduced in cd390083ad1, these macros don't need to be in
+a generic header.
+Add documentation to justify their use.
 
-Since v1:
-- Fixed checkpatch errors (patchew)
-- Added Stefano R-b
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+v2: Fixed checkpatch warnings (tabs)
+---
+ hw/core/bus.c              |  2 +-
+ hw/core/qdev-properties.c  |  1 +
+ hw/s390x/s390-virtio-ccw.c |  1 +
+ hw/scsi/scsi-generic.c     |  2 +-
+ include/qemu-common.h      | 16 ----------------
+ include/qemu/cutils.h      | 25 +++++++++++++++++++++++++
+ qapi/qapi-util.c           |  2 +-
+ qobject/json-parser.c      |  1 -
+ target/ppc/monitor.c       |  1 +
+ ui/keymaps.c               |  1 +
+ util/id.c                  |  2 +-
+ util/readline.c            |  1 -
+ 12 files changed, 33 insertions(+), 22 deletions(-)
 
-There are still checkpatch warnings (due to 8c06fbdf36b) for using the
-Doxygen '/**' comment opening:
-
-    WARNING: Block comments use a leading /* on a separate line
-    #42: FILE: include/qemu/cutils.h:160:
-    +/**
-
-v1: https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05927.html
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daud=C3=A9 (3):
-  util/cutils: Move size_to_str() from "qemu-common.h" to "cutils.h"
-  util/cutils: Move ctype macros to "cutils.h"
-  util/cutils: Move function documentations to the header
-
- hw/core/bus.c                |   2 +-
- hw/core/qdev-properties.c    |   1 +
- hw/s390x/s390-virtio-ccw.c   |   1 +
- hw/scsi/scsi-generic.c       |   2 +-
- include/qemu-common.h        |  17 ---
- include/qemu/cutils.h        | 262 +++++++++++++++++++++++++++++++++++
- qapi/qapi-util.c             |   2 +-
- qapi/string-output-visitor.c |   2 +-
- qobject/json-parser.c        |   1 -
- target/ppc/monitor.c         |   1 +
- ui/keymaps.c                 |   1 +
- util/cutils.c                | 191 -------------------------
- util/id.c                    |   2 +-
- util/readline.c              |   1 -
- 14 files changed, 271 insertions(+), 215 deletions(-)
-
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index 4651f24486..dceb144075 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -18,7 +18,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/cutils.h"
+ #include "hw/qdev.h"
+ #include "qapi/error.h"
+=20
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 943dc2654b..3bdebac361 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -1,4 +1,5 @@
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "net/net.h"
+ #include "hw/qdev.h"
+ #include "qapi/error.h"
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index fd9d0b0542..ed23bb7b3a 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -11,6 +11,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "cpu.h"
+ #include "hw/boards.h"
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index 7237b4162e..86f65fd474 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -12,8 +12,8 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qemu/error-report.h"
+ #include "hw/scsi/scsi.h"
+ #include "hw/scsi/emulation.h"
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index 760527294f..ed43ae286d 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -33,22 +33,6 @@ int qemu_main(int argc, char **argv, char **envp);
+ void qemu_get_timedate(struct tm *tm, int offset);
+ int qemu_timedate_diff(struct tm *tm);
+=20
+-#define qemu_isalnum(c)		isalnum((unsigned char)(c))
+-#define qemu_isalpha(c)		isalpha((unsigned char)(c))
+-#define qemu_iscntrl(c)		iscntrl((unsigned char)(c))
+-#define qemu_isdigit(c)		isdigit((unsigned char)(c))
+-#define qemu_isgraph(c)		isgraph((unsigned char)(c))
+-#define qemu_islower(c)		islower((unsigned char)(c))
+-#define qemu_isprint(c)		isprint((unsigned char)(c))
+-#define qemu_ispunct(c)		ispunct((unsigned char)(c))
+-#define qemu_isspace(c)		isspace((unsigned char)(c))
+-#define qemu_isupper(c)		isupper((unsigned char)(c))
+-#define qemu_isxdigit(c)	isxdigit((unsigned char)(c))
+-#define qemu_tolower(c)		tolower((unsigned char)(c))
+-#define qemu_toupper(c)		toupper((unsigned char)(c))
+-#define qemu_isascii(c)		isascii((unsigned char)(c))
+-#define qemu_toascii(c)		toascii((unsigned char)(c))
+-
+ void *qemu_oom_check(void *ptr);
+=20
+ ssize_t qemu_write_full(int fd, const void *buf, size_t count)
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index 9ee40470e3..644f2d75bd 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -3,6 +3,31 @@
+=20
+ #include "qemu/fprintf-fn.h"
+=20
++/**
++ * unsigned ctype macros:
++ *
++ * The standards require that the argument for these functions
++ * is either EOF or a value that is representable in the type
++ * unsigned char. If the argument is of type char, it must be
++ * cast to unsigned char. This is what these macros do,
++ * avoiding 'signed to unsigned' conversion warnings.
++ */
++#define qemu_isalnum(c)     isalnum((unsigned char)(c))
++#define qemu_isalpha(c)     isalpha((unsigned char)(c))
++#define qemu_iscntrl(c)     iscntrl((unsigned char)(c))
++#define qemu_isdigit(c)     isdigit((unsigned char)(c))
++#define qemu_isgraph(c)     isgraph((unsigned char)(c))
++#define qemu_islower(c)     islower((unsigned char)(c))
++#define qemu_isprint(c)     isprint((unsigned char)(c))
++#define qemu_ispunct(c)     ispunct((unsigned char)(c))
++#define qemu_isspace(c)     isspace((unsigned char)(c))
++#define qemu_isupper(c)     isupper((unsigned char)(c))
++#define qemu_isxdigit(c)    isxdigit((unsigned char)(c))
++#define qemu_tolower(c)     tolower((unsigned char)(c))
++#define qemu_toupper(c)     toupper((unsigned char)(c))
++#define qemu_isascii(c)     isascii((unsigned char)(c))
++#define qemu_toascii(c)     toascii((unsigned char)(c))
++
+ /**
+  * pstrcpy:
+  * @buf: buffer to copy string into
+diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+index e9b266bb70..ea93ae05d9 100644
+--- a/qapi/qapi-util.c
++++ b/qapi/qapi-util.c
+@@ -11,8 +11,8 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+=20
+ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+ {
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 7a7ae9e8d1..06316f3a53 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -15,7 +15,6 @@
+ #include "qemu/cutils.h"
+ #include "qemu/unicode.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qlist.h"
+diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
+index 14915119fc..dbcb921231 100644
+--- a/target/ppc/monitor.c
++++ b/target/ppc/monitor.c
+@@ -22,6 +22,7 @@
+  * THE SOFTWARE.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "cpu.h"
+ #include "monitor/monitor.h"
+ #include "monitor/hmp-target.h"
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index 085889b555..00b52a6db3 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -23,6 +23,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "keymaps.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
+diff --git a/util/id.c b/util/id.c
+index 6141352955..ca21a77522 100644
+--- a/util/id.c
++++ b/util/id.c
+@@ -11,7 +11,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/cutils.h"
+ #include "qemu/id.h"
+=20
+ bool id_wellformed(const char *id)
+diff --git a/util/readline.c b/util/readline.c
+index ec91ee0fea..f3d8b0698a 100644
+--- a/util/readline.c
++++ b/util/readline.c
+@@ -23,7 +23,6 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/readline.h"
+ #include "qemu/cutils.h"
+=20
 --=20
 2.17.2
