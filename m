@@ -1,22 +1,46 @@
-Received: from eggs.gnu.org ([208.118.235.92]:34603)
+Received: from eggs.gnu.org ([208.118.235.92]:35934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfVuK-0003xf-FX
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:17:29 -0500
+	(envelope-from <jl4312@columbia.edu>) id 1gfVym-0006ko-LF
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:22:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfVuH-0005Xt-68
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:17:28 -0500
-References: <20190104181208.7809-1-philmd@redhat.com>
-	<20190104181208.7809-4-philmd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <349cd87b-0526-30b8-d9cd-0eee537ab5a4@redhat.com>
-Date: Fri, 4 Jan 2019 14:17:14 -0600
+	(envelope-from <jl4312@columbia.edu>) id 1gfVyj-0000Go-GT
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:22:04 -0500
+Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:59676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1gfVyj-00007f-Bz
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 15:22:01 -0500
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	x04KLtn3008286
+	for <qemu-devel@nongnu.org>; Fri, 4 Jan 2019 15:21:55 -0500
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+	by hazelnut (Postfix) with ESMTP id 7CF498B
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 15:21:55 -0500 (EST)
+Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
+	[128.59.72.13]) by hazelnut (Postfix) with ESMTP id 3B5236D
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 15:21:41 -0500 (EST)
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+	[209.85.208.70])
+	by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	x04KLe2M044616
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 4 Jan 2019 15:21:41 -0500
+Received: by mail-ed1-f70.google.com with SMTP id d41so35113364eda.12
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 12:21:40 -0800 (PST)
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com.
+	[209.85.128.46]) by smtp.gmail.com with ESMTPSA id
+	q4sm23355189eda.50.2019.01.04.12.21.38 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 04 Jan 2019 12:21:38 -0800 (PST)
+Received: by mail-wm1-f46.google.com with SMTP id y185so1798786wmd.1
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 12:21:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190104181208.7809-4-philmd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ovPHYZvWjj0WMrppWv1Y6vY58dY7WfNiU"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] util/cutils: Move function
- documentations to the header
+From: Jintack Lim <jintack@cs.columbia.edu>
+Date: Fri, 4 Jan 2019 15:21:27 -0500
+Message-ID: <CAHyh4xhv5ZDfZv842U=adQN7hQFr=16BKEgZcEUZOLjFo3P+Jw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Why one virtio-pci device has two different
+ DeviceState?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +49,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: Peter Xu <peterx@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ovPHYZvWjj0WMrppWv1Y6vY58dY7WfNiU
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella
- <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
-Message-ID: <349cd87b-0526-30b8-d9cd-0eee537ab5a4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] util/cutils: Move function
- documentations to the header
-References: <20190104181208.7809-1-philmd@redhat.com>
- <20190104181208.7809-4-philmd@redhat.com>
-In-Reply-To: <20190104181208.7809-4-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 1/4/19 12:12 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Many functions have documentation before the implementation in
-> cutils.c. Since we expect documentation around the prototype
-> declaration in headers, move the comments in cutils.h.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  include/qemu/cutils.h | 224 ++++++++++++++++++++++++++++++++++++++++++=
+I was wondering why one virtio-pci device has two different
+DeviceState? - one directly from VirtIOPCIProxy and the other from
+VirtIO<dev type> such as VirtIONet. As an example, they are denoted as
+qdev and vdev respectively in virtio_net_pci_realize().
 
->  util/cutils.c         | 185 ----------------------------------
->  2 files changed, 224 insertions(+), 185 deletions(-)
+I thought that just one DeviceState is enough for any device in QEMU.
+Maybe I'm missing something fundamental here.
 
-I find documentation in .c files slightly easier to use (you can then
-read the code right below to see if the documentation is still
-accurate); but as we had an inconsistent mix, I'm also okay with your
-patch consolidating all the documentation to one of the two files,
-rather than the bad mix of half-and-half.
+*Just* for people who wonder why I'm asking this question, I'd like to
+find a device in the list of SaveStateEntry on a MMIO operation to a
+PCI device. For virtio devices, I only have qdev information in the
+MMIO handler while I need to have vdev information to find the virtio
+device in the SaveStateEntry list. I can possibly do this by
+converting qdev to vdev knowing this is a virtio device as in
+virtio_net_pci_realize(), but I'd like to find a way to do it without
+knowing the device is a virtio device.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---ovPHYZvWjj0WMrppWv1Y6vY58dY7WfNiU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwvv0oACgkQ3g5py3or
-ov1/8gf8DOeTEAae/7Z0+naf9nIxiQr4KaMa7lEAD5J1lPumjYmcjLY8Xm5r6g2g
-vVNilsHfenfdoVgk25op5eS0j03/FRu3aY++iVaVYRmERvL+sCPcjFq5zaAePg+d
-GFByjBH9c9qrtrijN+nwBjKGnCj2IR7Ik18lNKSx30gzjsT7UJMQ6DLKVGTn4D4p
-zDKBeGvz33NGOQ/iBFSYmLBsewyJvWAw6s6MibeJlJT6S1sxK+eLbcOw0lk6UE9M
-780zYBMXtS3mtGM29GokFhI72RSzp7VlvMwF3vQtMnAVZtvS/Ac2dauVrsyskCWf
-KyNN5Xwv3CDiM01nkAobDY5rpgUBjA==
-=w43k
------END PGP SIGNATURE-----
-
---ovPHYZvWjj0WMrppWv1Y6vY58dY7WfNiU--
+Thanks,
+Jintack
