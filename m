@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59065)
+Received: from eggs.gnu.org ([208.118.235.92]:59138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfU5p-0002zg-7l
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:21:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gfU6F-0003QZ-Uv
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:21:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfU5m-00087p-5F
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:21:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33490)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gfU5m-00086y-0D
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:21:10 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri,  4 Jan 2019 19:20:57 +0100
-Message-Id: <20190104182057.8778-1-philmd@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gfU6F-0008II-7W
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:21:39 -0500
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:43385)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gfU6F-0008I1-2g
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:21:39 -0500
+Received: by mail-ot1-x330.google.com with SMTP id a11so32789399otr.10
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 10:21:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] hw/char/stm32f2xx_usart: Do not update data
- register when device is disabled
+References: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<CAFEAcA-JCofFz44oaSaHMnAY-+ZjKVGBCw-hbsyW4upUQADErg@mail.gmail.com>
+	<BN6PR2201MB12519B3FDAC3A43FC1B4BD91C68E0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <BN6PR2201MB12519B3FDAC3A43FC1B4BD91C68E0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Jan 2019 18:21:27 +0000
+Message-ID: <CAFEAcA9pNQVcGN6jTboo2boOfVQ0gSAbBk6+O70+BPCGS4xNWQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v3 00/44] MIPS pull request for December
+ 2018 - v3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-When the device is disable, the internal circuitry keep the data
-register loaded and doesn't update it.
+On Fri, 4 Jan 2019 at 17:41, Aleksandar Markovic <amarkovic@wavecomp.com> wrote:
+>
+> > Applied, thanks.
+> >
+> > Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+> > for any user-visible changes.
+>
+> I updated the change log with a single item, as I mentioned in the pull
+> request cover letter:
+>
+> https://wiki.qemu.org/ChangeLog/4.0#MIPS
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/char/stm32f2xx_usart.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+That's fine, thanks. My 'applied this' emails for pull requests
+are standard templates, so they'll always ask for changelog
+updates even when that isn't necessarily applicable to a
+particular pull. It's just intended as a reminder that
+we're trying to do updates of the changelog as we go along
+this release cycle.
 
-diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
-index f3363a2952..10392c70e2 100644
---- a/hw/char/stm32f2xx_usart.c
-+++ b/hw/char/stm32f2xx_usart.c
-@@ -53,14 +53,13 @@ static void stm32f2xx_usart_receive(void *opaque, con=
-st uint8_t *buf, int size)
- {
-     STM32F2XXUsartState *s =3D opaque;
-=20
--    s->usart_dr =3D *buf;
--
-     if (!(s->usart_cr1 & USART_CR1_UE && s->usart_cr1 & USART_CR1_RE)) {
-         /* USART not enabled - drop the chars */
-         DB_PRINT("Dropping the chars\n");
-         return;
-     }
-=20
-+    s->usart_dr =3D *buf;
-     s->usart_sr |=3D USART_SR_RXNE;
-=20
-     if (s->usart_cr1 & USART_CR1_RXNEIE) {
---=20
-2.17.2
+-- PMM
