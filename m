@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52590)
+Received: from eggs.gnu.org ([208.118.235.92]:54701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gfKO6-0004gf-4D
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 02:59:26 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gfKVy-0006ji-16
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:07:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gfKO2-00046k-7x
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 02:59:25 -0500
-Received: from mail-wm1-f41.google.com ([209.85.128.41]:38788)
+	(envelope-from <pbonzini@redhat.com>) id 1gfKVu-0003X0-OD
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:07:33 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:33476)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gfKO1-0003tn-PI
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 02:59:21 -0500
-Received: by mail-wm1-f41.google.com with SMTP id m22so400624wml.3
-	for <qemu-devel@nongnu.org>; Thu, 03 Jan 2019 23:59:19 -0800 (PST)
-References: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA9FwFg9zsg3xLhOs9C=XJHjAo+ACd1=g22YtPaax6N0YQ@mail.gmail.com>
-	<42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
-	<CAFEAcA9UqiaiKa_4EWfBHbRS0H=trHfJiArHOJkW6=vKoGvRpQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gfKVs-0003Q2-OC
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 03:07:28 -0500
+Received: by mail-wr1-f66.google.com with SMTP id c14so35883163wrr.0
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 00:07:24 -0800 (PST)
+References: <20190103175113.18196-1-pbonzini@redhat.com>
+	<20190103130406-mutt-send-email-mst@kernel.org>
+	<CAFEAcA9T4YE8pgkccRRwFTm35LVLv_sfPFc00UY6L4FA-gB5fg@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bc564647-0550-df53-7a17-7760489b8c45@redhat.com>
-Date: Fri, 4 Jan 2019 08:59:17 +0100
+Message-ID: <714a115f-835b-0041-426b-d16f9439ebc1@redhat.com>
+Date: Fri, 4 Jan 2019 09:07:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9UqiaiKa_4EWfBHbRS0H=trHfJiArHOJkW6=vKoGvRpQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9T4YE8pgkccRRwFTm35LVLv_sfPFc00UY6L4FA-gB5fg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-21
+Subject: Re: [Qemu-devel] [PATCH] include: update Linux headers to 4.21/5.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 03/01/19 19:37, Peter Maydell wrote:
-> On Sat, 22 Dec 2018 at 08:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 03/01/19 20:26, Peter Maydell wrote:
+> On Thu, 3 Jan 2019 at 18:19, Michael S. Tsirkin <mst@redhat.com> wrote:
 >>
->> On 21/12/18 22:09, Peter Maydell wrote:
->>> I don't really understand what's going on here, or why
->>> it only happens with this one system (my main x86-64
->>> Linux Ubuntu 16.04.5 box) and not the various others I'm
->>> running test builds on. But it does seem to be 100%
->>> reliable with any of these pullreqs with the new test
->>> driver in them :-(
+>> On Thu, Jan 03, 2019 at 06:51:13PM +0100, Paolo Bonzini wrote:
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 >>
->> I'm afraid something in your setup is causing make's stdout to have
->> O_NONBLOCK set.  Make doesn't use O_NONBLOCK at all, so it must be
->> something above it.  I also checked Perl with strace and, at least here,
->> it doesn't set O_NONBLOCK.
+>> Note that in the past we just updated what we needed.
 > 
-> Interestingly, I have today run into "make: write error: stdout"
-> with the existing make check infrastructure. [...]
-> I presume that something in one of the tests we're running,
-> likely QEMU itself, ends up setting stdout to non-blocking.
-> This while rune *used* to be entirely reliable, so maybe
-> something recent has changed ?
+> Not if I noticed it -- our copies of the Linux headers
+> are supposed to always be synchronized entirely from
+> a commit of Linux upstream master. Ad-hoc cherry-picked
+> changes can easily be accidentally undone by a later sync
+> by somebody else. This is why we have an automatic
+> script to do header synchronization, so we don't have
+> to manually write and review header updates.
 
-I don't know... I tried running make check under "strace -e fcntl" and I
-didn't find any occurrences of fcntl(1, O_SETFL, ...|O_NONBLOCK).
-Perhaps you can add a check after every invocation of a test executable.
+I agree, and shortlog seems to agree too in general.  Most commits look like
 
-Are you going to apply the pull request since the bug is preexisting?
+      linux-headers: Update to v3.10-rc5
+      linux-headers: update to 3.11
+      linux-headers: Update to 4.2-rc1
+      linux-headers: sync against v4.14-rc1
+      linux-headers: update to 3.12-rc1
+      linux-headers: update to 3.18-rc5
+      update linux headers to kvm/next
+      synchronize Linux headers to 4.0-rc3
+      linux-headers: update to 4.13-rc0
+      linux header sync against v4.13-rc1
 
-Thanks,
+and so on.
 
-Polo
+
+>> I'd prefer the shell script part and the new vhost_types header which
+>> are actually reviewable to be split out to a separate patch.
+> 
+> I agree that shell script changes should be their own patch.
+> My view is that a header-update commit should be entirely
+> and nothing but the automatically generated results of
+> running scripts/update-linux-headers.sh, with a commit
+> message that says "Generated by running update-linux-headers.sh
+> on upstream kernel commit xxxx".
+
+The problem with this approach is that the old script does not work with
+the new commit and the new script does not work with the old commit.
+Doing the update in the same commit as the script update means that it's
+clear from the commit message on which Linux commit you should run it
+(though in this case I should have specified 4.21-rc1 or 5.0-rc1).
+
+Another way would be to make Linux a submodule.  Then you'd upgrade the
+submodule and the script in one commit, and then generate the headers at
+compile-time or release-time.  This however wouldn't be as nice for
+users of the git repo.  That's the reason why I went for the single
+commit, but of course I can split it and will in v2.
+
+Paolo
+
+> Doing by-hand updates to the headers is quite a common
+> error; I'm not sure if we can automatically catch it
+> with checkpatch. ("Any change to include/standard-headers
+> or linux-headers/ must be a commit that touches only files
+> in those subdirectories and whose commit message is in
+> a standard format", perhaps.)
+> 
+> thanks
+> -- PMM
+> 
