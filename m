@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56570)
+Received: from eggs.gnu.org ([208.118.235.92]:56555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfMNC-0005YF-GY
+	(envelope-from <cfergeau@redhat.com>) id 1gfMNB-0005YD-Tl
 	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 05:06:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfMNB-0002DJ-NC
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 05:06:38 -0500
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:36899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfMNB-0002D3-9Z
+	(envelope-from <cfergeau@redhat.com>) id 1gfMN6-0002AD-SE
 	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 05:06:37 -0500
-Received: by mail-oi1-x234.google.com with SMTP id y23so29970450oia.4
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 02:06:37 -0800 (PST)
+Received: from mx1.redhat.com ([209.132.183.28]:48202)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gfMN6-0001ub-KC
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 05:06:32 -0500
+Date: Fri, 4 Jan 2019 11:06:06 +0100
+From: Christophe Fergeau <cfergeau@redhat.com>
+Message-ID: <20190104100606.GH20900@natto.ory.fergeau.eu>
+References: <110999ea-0ab9-49cb-915f-6d08cccdea3c@linuxsystems.it>
+	<47cfb9f8-5957-7935-063b-304e3c53c268@redhat.com>
+	<9de9afbe-fc7b-48a0-9b2d-b756f146303d@linuxsystems.it>
+	<254296205.54150897.1545827908434.JavaMail.zimbra@redhat.com>
+	<04864360-b345-4d49-a842-8cde724b3c94@linuxsystems.it>
+	<87174d6c-2437-6331-e44b-93e2ecb8a572@redhat.com>
 MIME-Version: 1.0
-References: <1545395783-39040-1-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA9FwFg9zsg3xLhOs9C=XJHjAo+ACd1=g22YtPaax6N0YQ@mail.gmail.com>
-	<42d8a1b8-6c33-8e22-b5d9-35f42f6b928e@redhat.com>
-	<CAFEAcA9UqiaiKa_4EWfBHbRS0H=trHfJiArHOJkW6=vKoGvRpQ@mail.gmail.com>
-	<bc564647-0550-df53-7a17-7760489b8c45@redhat.com>
-In-Reply-To: <bc564647-0550-df53-7a17-7760489b8c45@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 10:06:25 +0000
-Message-ID: <CAFEAcA9tiqHEiCdUXWcD+SvzUzZPG4sTqiTSR57N=qYM49eykw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-21
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="RkLO0ZVuuT1d19pw"
+Content-Disposition: inline
+In-Reply-To: <87174d6c-2437-6331-e44b-93e2ecb8a572@redhat.com>
+Subject: Re: [Qemu-devel] [Spice-devel] Always get Invalid password while
+ trying to connect to spice server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?iso-8859-1?Q?Niccol=F2?= Belli <darkbasic@linuxsystems.it>, Frediano Ziglio <fziglio@redhat.com>, secalert@redhat.com, mst@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, spice-devel@lists.freedesktop.org
 
-On Fri, 4 Jan 2019 at 07:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 03/01/19 19:37, Peter Maydell wrote:
-> > On Sat, 22 Dec 2018 at 08:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > Interestingly, I have today run into "make: write error: stdout"
-> > with the existing make check infrastructure. [...]
-> > I presume that something in one of the tests we're running,
-> > likely QEMU itself, ends up setting stdout to non-blocking.
-> > This while rune *used* to be entirely reliable, so maybe
-> > something recent has changed ?
->
-> I don't know... I tried running make check under "strace -e fcntl" and I
-> didn't find any occurrences of fcntl(1, O_SETFL, ...|O_NONBLOCK).
-> Perhaps you can add a check after every invocation of a test executable.
 
-> Are you going to apply the pull request since the bug is preexisting?
+--RkLO0ZVuuT1d19pw
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The pull request takes the problem from "occasionally shows up
-in by-hand running of make check in a while loop" to "reliably
-causes my automated tests to fail every time". I can't apply
-a pullreq that does that, so we need to find at least a workaround.
-I'm not sure why your test harness makes it much more likely
-that the problem manifests.
+Hey,
 
-(The shell will typically clear the O_NONBLOCK flag on its terminal
-before waiting for interactive input, which is why this is a
-problem when running make check inside a while loop or in my
-pull test script which runs make check for several trees in
-succession, but not an issue for individual runs on the command line.)
+On Thu, Jan 03, 2019 at 04:25:00PM -0600, Eric Blake wrote:
+> On 12/27/18 8:51 AM, Niccol=F2 Belli wrote:
+> > On mercoled=EC 26 dicembre 2018 13:38:28 CET, Frediano Ziglio wrote:
+> >> Yes, this looks like a format string error in the upper (not into
+> >> spice) layer.
+> >>
+> >> This potentially is a security problem.
+> >=20
+> > Considering the spice server is exposed to the internet this is
+> > definitely worth investigating.
+> >=20
+> >> The specific '%' character could be the issue, can you try others
+> >> ('!', '@' and
+> >> so on) ?
+> >=20
+> > I tried several other special characters and they all seems to work,
+> > expect for "Password&&" which gets converted to "Password&amp;&amp;" (if
+> > I type "Password&amp;&amp;" it works).
+>=20
+> Could it be related to this patch where our JSON code mishandles %?
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00108.html
 
-thanks
--- PMM
+Yes definitely, this is where the patch came from.
+Mentioning this spice issue is yet another thing I should have added in the
+commit log, but which I only thought about *after* having sent the patch :)
+
+Christophe
+
+--RkLO0ZVuuT1d19pw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlwvMA4ACgkQqdjCFCms
+bILBng/8DSQ9+DU+DwyRxE9aVvYWSB92Hn08gCnO2OGCKSBrwp8RlcrGcudQmebB
+Bzt+FqA7V6fNu0ozAo+qD9nFHIXG0mV38CGCKag3yNIGsHP2ukN+m6Z1M+TldOe5
+LJyOHvbaGt2XfXqiEs+7847t9DiXEgqWRh8icPuRkVI3ejRVEOWPbTwV/1WhnqNQ
+n7fWNjVu/yGEIck54FlbNPbF1qBDV4MjAJFiMl5TciU3Faq/DFqYRNI6S/j+JNWY
+I8gFqtkKIyhyBVR6Pg9HzLkrcWXR5GC9/01Fo+hwmEK1mGU0q5mKvluass+A2XBX
+1TZqSbBAIK6iRsj7o1kDbUP/oKyXgf/ulcjTqjHrKUt6JHtm9lwkXvhaKjEDdZG5
+3iSw3PRRsj9Og+K8GdE7n1pJ3ItRLb09qgC+F6B3VYwiaBa+EKcgeZRkXUgeL9VV
+3Cvk+dylOsSiugCMSRbYojrMYxKi5aCZPCD5tZoOilhjUsnpagm2P74p+tlhbX/o
+ax0pRYINJJFX+lTlszPYs2Cx7oEq27Dz1EfQvtOdn9zD7pDJqEBD5Om2TXmWSwvv
+dLrBXrSzfxVSwZrJ4zqExKYOxQ0iHIXDu5NBBYzu114RfZYkOKCFW/tlkAokfTuM
+y1YRcvfi5Lym5W+JhYz7tercU6Kr9Bw29JQ15E+QrJwNfk9WGrA=
+=3mJ4
+-----END PGP SIGNATURE-----
+
+--RkLO0ZVuuT1d19pw--
