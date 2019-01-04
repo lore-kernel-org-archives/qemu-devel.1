@@ -1,17 +1,17 @@
-Received: from [208.118.235.92] (port=58451 helo=eggs.gnu.org)
+Received: from [208.118.235.92] (port=59808 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <makren67@gmail.com>) id 1gfXGd-0000kT-SP
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 16:44:36 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gfXNR-0003Ni-La
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 16:51:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <makren67@gmail.com>) id 1gfXGX-0007qk-5g
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 16:44:29 -0500
-Received: from mail-yb1-xb35.google.com ([2607:f8b0:4864:20::b35]:35495)
+	(envelope-from <richard.henderson@linaro.org>) id 1gfXNI-0005Np-Bg
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 16:51:31 -0500
+Received: from mail-io1-xd2a.google.com ([2607:f8b0:4864:20::d2a]:38753)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <makren67@gmail.com>) id 1gfXGR-0007mh-Ua
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 16:44:25 -0500
-Received: by mail-yb1-xb35.google.com with SMTP id f187so5465408ybb.2
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 13:44:11 -0800 (PST)
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gfXNA-0005Hq-JG
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 16:51:22 -0500
+Received: by mail-io1-xd2a.google.com with SMTP id l14so30620982ioj.5
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 13:51:17 -0800 (PST)
 References: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
 	<945511ac-d99a-d483-12a2-e6ad4dda09c2@linaro.org>
 	<CAObpvQktCHp-9V40z7kDaTU2CwRWSq8ZVS1PxRg3WK01TFXCzQ@mail.gmail.com>
@@ -20,11 +20,15 @@ References: <CAObpvQ=1dw4pTX3aiDvOvgnAkZQ0d9svMaL4Bwz55nkE8i4yrQ@mail.gmail.com>
 	<aeeb8c50-0293-e37b-9f9f-5d392b7e10f6@linaro.org>
 	<CAObpvQkjXLmXjB61w0Ecu8QfbA4+qBxLUVMjnDUD4dchOp+duA@mail.gmail.com>
 	<38b906b7-56a6-a0dc-95f3-365452b59099@linaro.org>
-In-Reply-To: <38b906b7-56a6-a0dc-95f3-365452b59099@linaro.org>
-From: Nick Renieris <makren67@gmail.com>
-Date: Fri, 4 Jan 2019 23:43:45 +0200
-Message-ID: <CAObpvQmJzCQZzW4pL02KD7HntnTbn9JWUE9eLi5J-6md3_b0yA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAObpvQmJzCQZzW4pL02KD7HntnTbn9JWUE9eLi5J-6md3_b0yA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <dede13a1-d512-1b70-b863-0b71a7e52c30@linaro.org>
+Date: Sat, 5 Jan 2019 07:51:09 +1000
+MIME-Version: 1.0
+In-Reply-To: <CAObpvQmJzCQZzW4pL02KD7HntnTbn9JWUE9eLi5J-6md3_b0yA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] AVX support for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,16 +38,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
+To: Nick Renieris <makren67@gmail.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Right, that makes sense, thanks for the explanations. As someone with
-very little x86 experience (zero experience from this perspective)
-it's kind of daunting that I'd have to refactor all this stuff. All
-these helpers via macros to get around C's 'minimalism' also seem like
-something I'd have to get accustomed to. I will think about it.
+On 1/5/19 7:43 AM, Nick Renieris wrote:
+> Just curious, why is gvec-desc a bitfield instead of a normal struct?
+> Surely it'd be more readable that way. Also this is C, so it's not
+> even a typed bitfield, just a uint32. I'm guessing there's a reason
+> behind this?
 
-Just curious, why is gvec-desc a bitfield instead of a normal struct?
-Surely it'd be more readable that way. Also this is C, so it's not
-even a typed bitfield, just a uint32. I'm guessing there's a reason
-behind this?
+As an integer it is always passed by value.  As a structure some host abis pass
+it by reference, and the TCG compiler doesn't know about that.
+
+
+r~
