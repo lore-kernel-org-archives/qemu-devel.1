@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59138)
+Received: from eggs.gnu.org ([208.118.235.92]:33331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfU6F-0003QZ-Uv
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:21:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1gfUF5-0008D7-Oi
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:30:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfU6F-0008II-7W
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:21:39 -0500
-Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:43385)
+	(envelope-from <bounces@canonical.com>) id 1gfUF0-0003ha-Ur
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:30:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53734)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfU6F-0008I1-2g
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:21:39 -0500
-Received: by mail-ot1-x330.google.com with SMTP id a11so32789399otr.10
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 10:21:38 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gfUF0-0003gy-P6
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 13:30:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gfUEy-0004r1-Hu
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 18:30:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 445202E80D3
+	for <qemu-devel@nongnu.org>; Fri,  4 Jan 2019 18:30:39 +0000 (UTC)
 MIME-Version: 1.0
-References: <1546535297-11040-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<CAFEAcA-JCofFz44oaSaHMnAY-+ZjKVGBCw-hbsyW4upUQADErg@mail.gmail.com>
-	<BN6PR2201MB12519B3FDAC3A43FC1B4BD91C68E0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB12519B3FDAC3A43FC1B4BD91C68E0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Jan 2019 18:21:27 +0000
-Message-ID: <CAFEAcA9pNQVcGN6jTboo2boOfVQ0gSAbBk6+O70+BPCGS4xNWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/44] MIPS pull request for December
- 2018 - v3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 Jan 2019 18:21:31 -0000
+From: Stefan Ring <1810545@bugs.launchpad.net>
+Reply-To: Bug 1810545 <1810545@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154662609174.25797.11037697007951339169.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1810545] [NEW] [alpha] Strange exception address
+ reported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +36,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Fri, 4 Jan 2019 at 17:41, Aleksandar Markovic <amarkovic@wavecomp.com> wrote:
->
-> > Applied, thanks.
-> >
-> > Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-> > for any user-visible changes.
->
-> I updated the change log with a single item, as I mentioned in the pull
-> request cover letter:
->
-> https://wiki.qemu.org/ChangeLog/4.0#MIPS
+Public bug reported:
 
-That's fine, thanks. My 'applied this' emails for pull requests
-are standard templates, so they'll always ask for changelog
-updates even when that isn't necessarily applicable to a
-particular pull. It's just intended as a reminder that
-we're trying to do updates of the changelog as we go along
-this release cycle.
+For some reason the SIGILL handler receives a different address under
+qemu than it used to on real hardware. I don't know specifics about the
+hardware used back then =E2=80=93 it was some sort of 21264a somewhere betw=
+een
+600-800 MHz =E2=80=93, and I cannot say anything about the kernel as well, =
+but I
+know that it delivered the faulting address +4, while under qemu it
+receives +8. I know because CACAO, an early Java JIT compiler extracts
+the address from the SIGILL handler and inspects the code at the
+faulting site, and it has substracted 4 from the handler address since
+the dawn of time, and this used to produce the desired result on the
+Alpha hardware. It actually ran on two different Alpha machines over the
+years, and both behaved identically.
 
--- PMM
+The handler looks like this:
+void handler_sigill(int sig, siginfo_t *siginfo, void *_p)
+{
+  uintptr_t trap_address =3D (uintptr_t) (((ucontext_t*) _p)->uc_mcontext.s=
+c_pc) - 4;
+}
+
+(paraphrasing, the actual code is here: https://bitbucket.org/cacaovm
+/cacao-
+staging/src/c8d3fbab864c3243f97629fcfa8d84ba71f38157/src/vm/jit/alpha/linux
+/md-os.cpp?at=3Ddefault&fileviewer=3Dfile-view-default#md-os.cpp-65)
+
+I don't know much about the qemu source code and cannot say where this
+is coming from at first glance. The gen_invalid function uses pc_next,
+which sounds like the next instruction, not the next-to-next ;). In
+theory it could actually be the kernel's fault, although I consider this
+unlikely.
+
+This is qemu-system-alpha with apparently the last Debian which existed
+for Alpha (lenny). The kernel is 2.6.26-2-alpha-generic (Debian
+2.6.26-29). Observed with qemu git 1b3e80082b, but I guess it is the
+same with any version.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1810545
+
+Title:
+  [alpha] Strange exception address reported
+
+Status in QEMU:
+  New
+
+Bug description:
+  For some reason the SIGILL handler receives a different address under
+  qemu than it used to on real hardware. I don't know specifics about
+  the hardware used back then =E2=80=93 it was some sort of 21264a somewhere
+  between 600-800 MHz =E2=80=93, and I cannot say anything about the kernel=
+ as
+  well, but I know that it delivered the faulting address +4, while
+  under qemu it receives +8. I know because CACAO, an early Java JIT
+  compiler extracts the address from the SIGILL handler and inspects the
+  code at the faulting site, and it has substracted 4 from the handler
+  address since the dawn of time, and this used to produce the desired
+  result on the Alpha hardware. It actually ran on two different Alpha
+  machines over the years, and both behaved identically.
+
+  The handler looks like this:
+  void handler_sigill(int sig, siginfo_t *siginfo, void *_p)
+  {
+    uintptr_t trap_address =3D (uintptr_t) (((ucontext_t*) _p)->uc_mcontext=
+.sc_pc) - 4;
+  }
+
+  (paraphrasing, the actual code is here: https://bitbucket.org/cacaovm
+  /cacao-
+  staging/src/c8d3fbab864c3243f97629fcfa8d84ba71f38157/src/vm/jit/alpha/lin=
+ux
+  /md-os.cpp?at=3Ddefault&fileviewer=3Dfile-view-default#md-os.cpp-65)
+
+  I don't know much about the qemu source code and cannot say where this
+  is coming from at first glance. The gen_invalid function uses pc_next,
+  which sounds like the next instruction, not the next-to-next ;). In
+  theory it could actually be the kernel's fault, although I consider
+  this unlikely.
+
+  This is qemu-system-alpha with apparently the last Debian which
+  existed for Alpha (lenny). The kernel is 2.6.26-2-alpha-generic
+  (Debian 2.6.26-29). Observed with qemu git 1b3e80082b, but I guess it
+  is the same with any version.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1810545/+subscriptions
