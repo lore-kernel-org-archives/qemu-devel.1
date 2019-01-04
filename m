@@ -1,29 +1,29 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:54877 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:54972 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY0F-0002oD-4a
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:45 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gfY0I-0002tu-P6
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY0D-0001to-4b
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:43 -0500
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:36634)
+	(envelope-from <richard.henderson@linaro.org>) id 1gfY0G-0001y0-9e
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:46 -0500
+Received: from mail-io1-xd34.google.com ([2607:f8b0:4864:20::d34]:43030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gfY0C-0001r7-UR
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:41 -0500
-Received: by mail-io1-xd44.google.com with SMTP id m19so30707930ioh.3
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:31:40 -0800 (PST)
+	id 1gfY0G-0001xZ-1H
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:44 -0500
+Received: by mail-io1-xd34.google.com with SMTP id b23so9777766ios.10
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:31:43 -0800 (PST)
 Received: from cloudburst.twiddle.net ([172.56.12.23])
 	by smtp.gmail.com with ESMTPSA id
-	t6sm27793259ioc.87.2019.01.04.14.31.36 for <qemu-devel@nongnu.org>
+	t6sm27793259ioc.87.2019.01.04.14.31.39 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 04 Jan 2019 14:31:38 -0800 (PST)
+	Fri, 04 Jan 2019 14:31:42 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  5 Jan 2019 08:31:11 +1000
-Message-Id: <20190104223116.14037-6-richard.henderson@linaro.org>
+Date: Sat,  5 Jan 2019 08:31:12 +1000
+Message-Id: <20190104223116.14037-7-richard.henderson@linaro.org>
 In-Reply-To: <20190104223116.14037-1-richard.henderson@linaro.org>
 References: <20190104223116.14037-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 05/10] tcg: Add opcodes for vector minmax
- arithmetic
+Subject: [Qemu-devel] [PATCH v2 06/10] tcg/i386: Split subroutines out of
+ tcg_expand_vec_op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,533 +34,502 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+This routine was becoming too large.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/tcg-runtime.h      |  20 ++++
- tcg/aarch64/tcg-target.h     |   1 +
- tcg/i386/tcg-target.h        |   1 +
- tcg/tcg-op-gvec.h            |  10 ++
- tcg/tcg-op.h                 |   4 +
- tcg/tcg-opc.h                |   4 +
- tcg/tcg.h                    |   1 +
- accel/tcg/tcg-runtime-gvec.c | 224 +++++++++++++++++++++++++++++++++++
- tcg/tcg-op-gvec.c            | 108 +++++++++++++++++
- tcg/tcg-op-vec.c             |  20 ++++
- tcg/tcg.c                    |   5 +
- 11 files changed, 398 insertions(+)
+ tcg/i386/tcg-target.inc.c | 459 +++++++++++++++++++-------------------
+ 1 file changed, 232 insertions(+), 227 deletions(-)
 
-diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-index 835ddfebb2..dfe325625c 100644
---- a/accel/tcg/tcg-runtime.h
-+++ b/accel/tcg/tcg-runtime.h
-@@ -200,6 +200,26 @@ DEF_HELPER_FLAGS_4(gvec_ussub16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_ussub32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_ussub64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_4(gvec_smin8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_smin16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_smin32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_smin64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(gvec_smax8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_smax16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_smax32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_smax64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(gvec_umin8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_umin16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_umin32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_umin64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(gvec_umax8, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_umax16, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_umax32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_umax64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_3(gvec_neg8, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(gvec_neg16, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(gvec_neg32, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index 98556bcf22..545a6eec75 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -136,6 +136,7 @@ typedef enum {
- #define TCG_TARGET_HAS_cmp_vec          1
- #define TCG_TARGET_HAS_mul_vec          1
- #define TCG_TARGET_HAS_sat_vec          0
-+#define TCG_TARGET_HAS_minmax_vec       0
- 
- #define TCG_TARGET_DEFAULT_MO (0)
- #define TCG_TARGET_HAS_MEMORY_BSWAP     1
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 44381062e6..7bd7eae672 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -186,6 +186,7 @@ extern bool have_avx2;
- #define TCG_TARGET_HAS_cmp_vec          1
- #define TCG_TARGET_HAS_mul_vec          1
- #define TCG_TARGET_HAS_sat_vec          0
-+#define TCG_TARGET_HAS_minmax_vec       0
- 
- #define TCG_TARGET_deposit_i32_valid(ofs, len) \
-     (((ofs) == 0 && (len) == 8) || ((ofs) == 8 && (len) == 8) || \
-diff --git a/tcg/tcg-op-gvec.h b/tcg/tcg-op-gvec.h
-index 2cb447112e..4734eef7de 100644
---- a/tcg/tcg-op-gvec.h
-+++ b/tcg/tcg-op-gvec.h
-@@ -234,6 +234,16 @@ void tcg_gen_gvec_usadd(unsigned vece, uint32_t dofs, uint32_t aofs,
- void tcg_gen_gvec_ussub(unsigned vece, uint32_t dofs, uint32_t aofs,
-                         uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
- 
-+/* Min/max.  */
-+void tcg_gen_gvec_smin(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-+void tcg_gen_gvec_umin(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-+void tcg_gen_gvec_smax(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-+void tcg_gen_gvec_umax(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
-+
- void tcg_gen_gvec_and(unsigned vece, uint32_t dofs, uint32_t aofs,
-                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz);
- void tcg_gen_gvec_or(unsigned vece, uint32_t dofs, uint32_t aofs,
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 4a93d730e8..2d98868d8f 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -971,6 +971,10 @@ void tcg_gen_ssadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_usadd_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_sssub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- void tcg_gen_ussub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_smin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_umin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_smax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
-+void tcg_gen_umax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b);
- 
- void tcg_gen_shli_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i);
- void tcg_gen_shri_vec(unsigned vece, TCGv_vec r, TCGv_vec a, int64_t i);
-diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
-index 94b2ed80af..4e0238ad1a 100644
---- a/tcg/tcg-opc.h
-+++ b/tcg/tcg-opc.h
-@@ -226,6 +226,10 @@ DEF(ssadd_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
- DEF(usadd_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
- DEF(sssub_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
- DEF(ussub_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_sat_vec))
-+DEF(smin_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_minmax_vec))
-+DEF(umin_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_minmax_vec))
-+DEF(smax_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_minmax_vec))
-+DEF(umax_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_HAS_minmax_vec))
- 
- DEF(and_vec, 1, 2, 0, IMPLVEC)
- DEF(or_vec, 1, 2, 0, IMPLVEC)
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index df24afa425..1c3579077d 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -184,6 +184,7 @@ typedef uint64_t TCGRegSet;
- #define TCG_TARGET_HAS_shv_vec          0
- #define TCG_TARGET_HAS_mul_vec          0
- #define TCG_TARGET_HAS_sat_vec          0
-+#define TCG_TARGET_HAS_minmax_vec       0
- #else
- #define TCG_TARGET_MAYBE_vec            1
- #endif
-diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
-index d1802467d5..9358749741 100644
---- a/accel/tcg/tcg-runtime-gvec.c
-+++ b/accel/tcg/tcg-runtime-gvec.c
-@@ -1028,3 +1028,227 @@ void HELPER(gvec_ussub64)(void *d, void *a, void *b, uint32_t desc)
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index c21c3272f2..ad97386d06 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -3079,253 +3079,258 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
      }
-     clear_high(d, oprsz, desc);
- }
-+
-+void HELPER(gvec_smin8)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(int8_t)) {
-+        int8_t aa = *(int8_t *)(a + i);
-+        int8_t bb = *(int8_t *)(b + i);
-+        int8_t dd = aa < bb ? aa : bb;
-+        *(int8_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_smin16)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(int16_t)) {
-+        int16_t aa = *(int16_t *)(a + i);
-+        int16_t bb = *(int16_t *)(b + i);
-+        int16_t dd = aa < bb ? aa : bb;
-+        *(int16_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_smin32)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(int32_t)) {
-+        int32_t aa = *(int32_t *)(a + i);
-+        int32_t bb = *(int32_t *)(b + i);
-+        int32_t dd = aa < bb ? aa : bb;
-+        *(int32_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_smin64)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(int64_t)) {
-+        int64_t aa = *(int64_t *)(a + i);
-+        int64_t bb = *(int64_t *)(b + i);
-+        int64_t dd = aa < bb ? aa : bb;
-+        *(int64_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_smax8)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(int8_t)) {
-+        int8_t aa = *(int8_t *)(a + i);
-+        int8_t bb = *(int8_t *)(b + i);
-+        int8_t dd = aa > bb ? aa : bb;
-+        *(int8_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_smax16)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(int16_t)) {
-+        int16_t aa = *(int16_t *)(a + i);
-+        int16_t bb = *(int16_t *)(b + i);
-+        int16_t dd = aa > bb ? aa : bb;
-+        *(int16_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_smax32)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(int32_t)) {
-+        int32_t aa = *(int32_t *)(a + i);
-+        int32_t bb = *(int32_t *)(b + i);
-+        int32_t dd = aa > bb ? aa : bb;
-+        *(int32_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_smax64)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(int64_t)) {
-+        int64_t aa = *(int64_t *)(a + i);
-+        int64_t bb = *(int64_t *)(b + i);
-+        int64_t dd = aa > bb ? aa : bb;
-+        *(int64_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_umin8)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint8_t)) {
-+        uint8_t aa = *(uint8_t *)(a + i);
-+        uint8_t bb = *(uint8_t *)(b + i);
-+        uint8_t dd = aa < bb ? aa : bb;
-+        *(uint8_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_umin16)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint16_t)) {
-+        uint16_t aa = *(uint16_t *)(a + i);
-+        uint16_t bb = *(uint16_t *)(b + i);
-+        uint16_t dd = aa < bb ? aa : bb;
-+        *(uint16_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_umin32)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint32_t)) {
-+        uint32_t aa = *(uint32_t *)(a + i);
-+        uint32_t bb = *(uint32_t *)(b + i);
-+        uint32_t dd = aa < bb ? aa : bb;
-+        *(uint32_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_umin64)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint64_t)) {
-+        uint64_t aa = *(uint64_t *)(a + i);
-+        uint64_t bb = *(uint64_t *)(b + i);
-+        uint64_t dd = aa < bb ? aa : bb;
-+        *(uint64_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_umax8)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint8_t)) {
-+        uint8_t aa = *(uint8_t *)(a + i);
-+        uint8_t bb = *(uint8_t *)(b + i);
-+        uint8_t dd = aa > bb ? aa : bb;
-+        *(uint8_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_umax16)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint16_t)) {
-+        uint16_t aa = *(uint16_t *)(a + i);
-+        uint16_t bb = *(uint16_t *)(b + i);
-+        uint16_t dd = aa > bb ? aa : bb;
-+        *(uint16_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_umax32)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint32_t)) {
-+        uint32_t aa = *(uint32_t *)(a + i);
-+        uint32_t bb = *(uint32_t *)(b + i);
-+        uint32_t dd = aa > bb ? aa : bb;
-+        *(uint32_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-+
-+void HELPER(gvec_umax64)(void *d, void *a, void *b, uint32_t desc)
-+{
-+    intptr_t oprsz = simd_oprsz(desc);
-+    intptr_t i;
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint64_t)) {
-+        uint64_t aa = *(uint64_t *)(a + i);
-+        uint64_t bb = *(uint64_t *)(b + i);
-+        uint64_t dd = aa > bb ? aa : bb;
-+        *(uint64_t *)(d + i) = dd;
-+    }
-+    clear_high(d, oprsz, desc);
-+}
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 0a33f51065..3ee44fcb75 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -1810,6 +1810,114 @@ void tcg_gen_gvec_ussub(unsigned vece, uint32_t dofs, uint32_t aofs,
-     tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
  }
  
-+void tcg_gen_gvec_smin(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
++static void expand_vec_shi(TCGType type, unsigned vece, bool shr,
++                           TCGv_vec v0, TCGv_vec v1, TCGArg imm)
 +{
-+    static const GVecGen3 g[4] = {
-+        { .fniv = tcg_gen_smin_vec,
-+          .fno = gen_helper_gvec_smin8,
-+          .opc = INDEX_op_smin_vec,
-+          .vece = MO_8 },
-+        { .fniv = tcg_gen_smin_vec,
-+          .fno = gen_helper_gvec_smin16,
-+          .opc = INDEX_op_smin_vec,
-+          .vece = MO_16 },
-+        { .fni4 = tcg_gen_smin_i32,
-+          .fniv = tcg_gen_smin_vec,
-+          .fno = gen_helper_gvec_smin32,
-+          .opc = INDEX_op_smin_vec,
-+          .vece = MO_32 },
-+        { .fni8 = tcg_gen_smin_i64,
-+          .fniv = tcg_gen_smin_vec,
-+          .fno = gen_helper_gvec_smin64,
-+          .opc = INDEX_op_smin_vec,
-+          .vece = MO_64 }
-+    };
-+    tcg_debug_assert(vece <= MO_64);
-+    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
++    TCGv_vec t1, t2;
++
++    tcg_debug_assert(vece == MO_8);
++
++    t1 = tcg_temp_new_vec(type);
++    t2 = tcg_temp_new_vec(type);
++
++    /* Unpack to W, shift, and repack.  Tricky bits:
++       (1) Use punpck*bw x,x to produce DDCCBBAA,
++           i.e. duplicate in other half of the 16-bit lane.
++       (2) For right-shift, add 8 so that the high half of
++           the lane becomes zero.  For left-shift, we must
++           shift up and down again.
++       (3) Step 2 leaves high half zero such that PACKUSWB
++           (pack with unsigned saturation) does not modify
++           the quantity.  */
++    vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
++              tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(v1));
++    vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
++              tcgv_vec_arg(t2), tcgv_vec_arg(v1), tcgv_vec_arg(v1));
++
++    if (shr) {
++        tcg_gen_shri_vec(MO_16, t1, t1, imm + 8);
++        tcg_gen_shri_vec(MO_16, t2, t2, imm + 8);
++    } else {
++        tcg_gen_shli_vec(MO_16, t1, t1, imm + 8);
++        tcg_gen_shli_vec(MO_16, t2, t2, imm + 8);
++        tcg_gen_shri_vec(MO_16, t1, t1, 8);
++        tcg_gen_shri_vec(MO_16, t2, t2, 8);
++    }
++
++    vec_gen_3(INDEX_op_x86_packus_vec, type, MO_8,
++              tcgv_vec_arg(v0), tcgv_vec_arg(t1), tcgv_vec_arg(t2));
++    tcg_temp_free_vec(t1);
++    tcg_temp_free_vec(t2);
 +}
 +
-+void tcg_gen_gvec_umin(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
++static void expand_vec_sari(TCGType type, unsigned vece,
++                            TCGv_vec v0, TCGv_vec v1, TCGArg imm)
 +{
-+    static const GVecGen3 g[4] = {
-+        { .fniv = tcg_gen_umin_vec,
-+          .fno = gen_helper_gvec_umin8,
-+          .opc = INDEX_op_umin_vec,
-+          .vece = MO_8 },
-+        { .fniv = tcg_gen_umin_vec,
-+          .fno = gen_helper_gvec_umin16,
-+          .opc = INDEX_op_umin_vec,
-+          .vece = MO_16 },
-+        { .fni4 = tcg_gen_umin_i32,
-+          .fniv = tcg_gen_umin_vec,
-+          .fno = gen_helper_gvec_umin32,
-+          .opc = INDEX_op_umin_vec,
-+          .vece = MO_32 },
-+        { .fni8 = tcg_gen_umin_i64,
-+          .fniv = tcg_gen_umin_vec,
-+          .fno = gen_helper_gvec_umin64,
-+          .opc = INDEX_op_umin_vec,
-+          .vece = MO_64 }
-+    };
-+    tcg_debug_assert(vece <= MO_64);
-+    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
++    TCGv_vec t1, t2;
++
++    switch (vece) {
++    case MO_8:
++        /* Unpack to W, shift, and repack, as in expand_vec_shi.  */
++        t1 = tcg_temp_new_vec(type);
++        t2 = tcg_temp_new_vec(type);
++        vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
++                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(v1));
++        vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
++                  tcgv_vec_arg(t2), tcgv_vec_arg(v1), tcgv_vec_arg(v1));
++        tcg_gen_sari_vec(MO_16, t1, t1, imm + 8);
++        tcg_gen_sari_vec(MO_16, t2, t2, imm + 8);
++        vec_gen_3(INDEX_op_x86_packss_vec, type, MO_8,
++                  tcgv_vec_arg(v0), tcgv_vec_arg(t1), tcgv_vec_arg(t2));
++        tcg_temp_free_vec(t1);
++        tcg_temp_free_vec(t2);
++        break;
++
++    case MO_64:
++        if (imm <= 32) {
++            /* We can emulate a small sign extend by performing an arithmetic
++             * 32-bit shift and overwriting the high half of a 64-bit logical
++             * shift (note that the ISA says shift of 32 is valid).
++             */
++            t1 = tcg_temp_new_vec(type);
++            tcg_gen_sari_vec(MO_32, t1, v1, imm);
++            tcg_gen_shri_vec(MO_64, v0, v1, imm);
++            vec_gen_4(INDEX_op_x86_blend_vec, type, MO_32,
++                      tcgv_vec_arg(v0), tcgv_vec_arg(v0),
++                      tcgv_vec_arg(t1), 0xaa);
++            tcg_temp_free_vec(t1);
++        } else {
++            /* Otherwise we will need to use a compare vs 0 to produce
++             * the sign-extend, shift and merge.
++             */
++            t1 = tcg_const_zeros_vec(type);
++            tcg_gen_cmp_vec(TCG_COND_GT, MO_64, t1, t1, v1);
++            tcg_gen_shri_vec(MO_64, v0, v1, imm);
++            tcg_gen_shli_vec(MO_64, t1, t1, 64 - imm);
++            tcg_gen_or_vec(MO_64, v0, v0, t1);
++            tcg_temp_free_vec(t1);
++        }
++        break;
++
++    default:
++        g_assert_not_reached();
++    }
 +}
 +
-+void tcg_gen_gvec_smax(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
++static void expand_vec_mul(TCGType type, unsigned vece,
++                           TCGv_vec v0, TCGv_vec v1, TCGv_vec v2)
 +{
-+    static const GVecGen3 g[4] = {
-+        { .fniv = tcg_gen_smax_vec,
-+          .fno = gen_helper_gvec_smax8,
-+          .opc = INDEX_op_smax_vec,
-+          .vece = MO_8 },
-+        { .fniv = tcg_gen_smax_vec,
-+          .fno = gen_helper_gvec_smax16,
-+          .opc = INDEX_op_smax_vec,
-+          .vece = MO_16 },
-+        { .fni4 = tcg_gen_smax_i32,
-+          .fniv = tcg_gen_smax_vec,
-+          .fno = gen_helper_gvec_smax32,
-+          .opc = INDEX_op_smax_vec,
-+          .vece = MO_32 },
-+        { .fni8 = tcg_gen_smax_i64,
-+          .fniv = tcg_gen_smax_vec,
-+          .fno = gen_helper_gvec_smax64,
-+          .opc = INDEX_op_smax_vec,
-+          .vece = MO_64 }
-+    };
-+    tcg_debug_assert(vece <= MO_64);
-+    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
++    TCGv_vec t1, t2, t3, t4;
++
++    tcg_debug_assert(vece == MO_8);
++
++    /*
++     * Unpack v1 bytes to words, 0 | x.
++     * Unpack v2 bytes to words, y | 0.
++     * This leaves the 8-bit result, x * y, with 8 bits of right padding.
++     * Shift logical right by 8 bits to clear the high 8 bytes before
++     * using an unsigned saturated pack.
++     *
++     * The difference between the V64, V128 and V256 cases is merely how
++     * we distribute the expansion between temporaries.
++     */
++    switch (type) {
++    case TCG_TYPE_V64:
++        t1 = tcg_temp_new_vec(TCG_TYPE_V128);
++        t2 = tcg_temp_new_vec(TCG_TYPE_V128);
++        tcg_gen_dup16i_vec(t2, 0);
++        vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
++                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(t2));
++        vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
++                  tcgv_vec_arg(t2), tcgv_vec_arg(t2), tcgv_vec_arg(v2));
++        tcg_gen_mul_vec(MO_16, t1, t1, t2);
++        tcg_gen_shri_vec(MO_16, t1, t1, 8);
++        vec_gen_3(INDEX_op_x86_packus_vec, TCG_TYPE_V128, MO_8,
++                  tcgv_vec_arg(v0), tcgv_vec_arg(t1), tcgv_vec_arg(t1));
++        tcg_temp_free_vec(t1);
++        tcg_temp_free_vec(t2);
++        break;
++
++    case TCG_TYPE_V128:
++    case TCG_TYPE_V256:
++        t1 = tcg_temp_new_vec(type);
++        t2 = tcg_temp_new_vec(type);
++        t3 = tcg_temp_new_vec(type);
++        t4 = tcg_temp_new_vec(type);
++        tcg_gen_dup16i_vec(t4, 0);
++        vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
++                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(t4));
++        vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
++                  tcgv_vec_arg(t2), tcgv_vec_arg(t4), tcgv_vec_arg(v2));
++        vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
++                  tcgv_vec_arg(t3), tcgv_vec_arg(v1), tcgv_vec_arg(t4));
++        vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
++                  tcgv_vec_arg(t4), tcgv_vec_arg(t4), tcgv_vec_arg(v2));
++        tcg_gen_mul_vec(MO_16, t1, t1, t2);
++        tcg_gen_mul_vec(MO_16, t3, t3, t4);
++        tcg_gen_shri_vec(MO_16, t1, t1, 8);
++        tcg_gen_shri_vec(MO_16, t3, t3, 8);
++        vec_gen_3(INDEX_op_x86_packus_vec, type, MO_8,
++                  tcgv_vec_arg(v0), tcgv_vec_arg(t1), tcgv_vec_arg(t3));
++        tcg_temp_free_vec(t1);
++        tcg_temp_free_vec(t2);
++        tcg_temp_free_vec(t3);
++        tcg_temp_free_vec(t4);
++        break;
++
++    default:
++        g_assert_not_reached();
++    }
 +}
 +
-+void tcg_gen_gvec_umax(unsigned vece, uint32_t dofs, uint32_t aofs,
-+                       uint32_t bofs, uint32_t oprsz, uint32_t maxsz)
++static void expand_vec_cmp(TCGType type, unsigned vece, TCGv_vec v0,
++                           TCGv_vec v1, TCGv_vec v2, TCGCond cond)
 +{
-+    static const GVecGen3 g[4] = {
-+        { .fniv = tcg_gen_umax_vec,
-+          .fno = gen_helper_gvec_umax8,
-+          .opc = INDEX_op_umax_vec,
-+          .vece = MO_8 },
-+        { .fniv = tcg_gen_umax_vec,
-+          .fno = gen_helper_gvec_umax16,
-+          .opc = INDEX_op_umax_vec,
-+          .vece = MO_16 },
-+        { .fni4 = tcg_gen_umax_i32,
-+          .fniv = tcg_gen_umax_vec,
-+          .fno = gen_helper_gvec_umax32,
-+          .opc = INDEX_op_umax_vec,
-+          .vece = MO_32 },
-+        { .fni8 = tcg_gen_umax_i64,
-+          .fniv = tcg_gen_umax_vec,
-+          .fno = gen_helper_gvec_umax64,
-+          .opc = INDEX_op_umax_vec,
-+          .vece = MO_64 }
++    enum {
++        NEED_SWAP = 1,
++        NEED_INV  = 2,
++        NEED_BIAS = 4
 +    };
-+    tcg_debug_assert(vece <= MO_64);
-+    tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g[vece]);
++    static const uint8_t fixups[16] = {
++        [0 ... 15] = -1,
++        [TCG_COND_EQ] = 0,
++        [TCG_COND_NE] = NEED_INV,
++        [TCG_COND_GT] = 0,
++        [TCG_COND_LT] = NEED_SWAP,
++        [TCG_COND_LE] = NEED_INV,
++        [TCG_COND_GE] = NEED_SWAP | NEED_INV,
++        [TCG_COND_GTU] = NEED_BIAS,
++        [TCG_COND_LTU] = NEED_BIAS | NEED_SWAP,
++        [TCG_COND_LEU] = NEED_BIAS | NEED_INV,
++        [TCG_COND_GEU] = NEED_BIAS | NEED_SWAP | NEED_INV,
++    };
++    TCGv_vec t1, t2;
++    uint8_t fixup;
++
++    fixup = fixups[cond & 15];
++    tcg_debug_assert(fixup != 0xff);
++
++    if (fixup & NEED_INV) {
++        cond = tcg_invert_cond(cond);
++    }
++    if (fixup & NEED_SWAP) {
++        t1 = v1, v1 = v2, v2 = t1;
++        cond = tcg_swap_cond(cond);
++    }
++
++    t1 = t2 = NULL;
++    if (fixup & NEED_BIAS) {
++        t1 = tcg_temp_new_vec(type);
++        t2 = tcg_temp_new_vec(type);
++        tcg_gen_dupi_vec(vece, t2, 1ull << ((8 << vece) - 1));
++        tcg_gen_sub_vec(vece, t1, v1, t2);
++        tcg_gen_sub_vec(vece, t2, v2, t2);
++        v1 = t1;
++        v2 = t2;
++        cond = tcg_signed_cond(cond);
++    }
++
++    tcg_debug_assert(cond == TCG_COND_EQ || cond == TCG_COND_GT);
++    /* Expand directly; do not recurse.  */
++    vec_gen_4(INDEX_op_cmp_vec, type, vece,
++              tcgv_vec_arg(v0), tcgv_vec_arg(v1), tcgv_vec_arg(v2), cond);
++
++    if (t1) {
++        tcg_temp_free_vec(t1);
++        if (t2) {
++            tcg_temp_free_vec(t2);
++        }
++    }
++    if (fixup & NEED_INV) {
++        tcg_gen_not_vec(vece, v0, v0);
++    }
 +}
 +
- /* Perform a vector negation using normal negation and a mask.
-    Compare gen_subv_mask above.  */
- static void gen_negv_mask(TCGv_i64 d, TCGv_i64 b, TCGv_i64 m)
-diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-index 675aa09258..36f35022ac 100644
---- a/tcg/tcg-op-vec.c
-+++ b/tcg/tcg-op-vec.c
-@@ -433,3 +433,23 @@ void tcg_gen_ussub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
+ void tcg_expand_vec_op(TCGOpcode opc, TCGType type, unsigned vece,
+                        TCGArg a0, ...)
  {
-     do_op3(vece, r, a, b, INDEX_op_ussub_vec);
- }
-+
-+void tcg_gen_smin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-+{
-+    do_op3(vece, r, a, b, INDEX_op_smin_vec);
-+}
-+
-+void tcg_gen_umin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-+{
-+    do_op3(vece, r, a, b, INDEX_op_umin_vec);
-+}
-+
-+void tcg_gen_smax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-+{
-+    do_op3(vece, r, a, b, INDEX_op_smax_vec);
-+}
-+
-+void tcg_gen_umax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-+{
-+    do_op3(vece, r, a, b, INDEX_op_umax_vec);
-+}
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 15ed5af007..1ae1e788f6 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1612,6 +1612,11 @@ bool tcg_op_supported(TCGOpcode op)
-     case INDEX_op_sssub_vec:
-     case INDEX_op_ussub_vec:
-         return have_vec && TCG_TARGET_HAS_sat_vec;
-+    case INDEX_op_smin_vec:
-+    case INDEX_op_umin_vec:
-+    case INDEX_op_smax_vec:
-+    case INDEX_op_umax_vec:
-+        return have_vec && TCG_TARGET_HAS_minmax_vec;
+     va_list va;
+-    TCGArg a1, a2;
+-    TCGv_vec v0, t1, t2, t3, t4;
++    TCGArg a2;
++    TCGv_vec v0, v1, v2;
+ 
+     va_start(va, a0);
+     v0 = temp_tcgv_vec(arg_temp(a0));
++    v1 = temp_tcgv_vec(arg_temp(va_arg(va, TCGArg)));
++    a2 = va_arg(va, TCGArg);
+ 
+     switch (opc) {
+     case INDEX_op_shli_vec:
+     case INDEX_op_shri_vec:
+-        tcg_debug_assert(vece == MO_8);
+-        a1 = va_arg(va, TCGArg);
+-        a2 = va_arg(va, TCGArg);
+-        /* Unpack to W, shift, and repack.  Tricky bits:
+-           (1) Use punpck*bw x,x to produce DDCCBBAA,
+-               i.e. duplicate in other half of the 16-bit lane.
+-           (2) For right-shift, add 8 so that the high half of
+-               the lane becomes zero.  For left-shift, we must
+-               shift up and down again.
+-           (3) Step 2 leaves high half zero such that PACKUSWB
+-               (pack with unsigned saturation) does not modify
+-               the quantity.  */
+-        t1 = tcg_temp_new_vec(type);
+-        t2 = tcg_temp_new_vec(type);
+-        vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
+-                  tcgv_vec_arg(t1), a1, a1);
+-        vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
+-                  tcgv_vec_arg(t2), a1, a1);
+-        if (opc == INDEX_op_shri_vec) {
+-            vec_gen_3(INDEX_op_shri_vec, type, MO_16,
+-                     tcgv_vec_arg(t1), tcgv_vec_arg(t1), a2 + 8);
+-            vec_gen_3(INDEX_op_shri_vec, type, MO_16,
+-                     tcgv_vec_arg(t2), tcgv_vec_arg(t2), a2 + 8);
+-        } else {
+-            vec_gen_3(INDEX_op_shli_vec, type, MO_16,
+-                     tcgv_vec_arg(t1), tcgv_vec_arg(t1), a2 + 8);
+-            vec_gen_3(INDEX_op_shli_vec, type, MO_16,
+-                     tcgv_vec_arg(t2), tcgv_vec_arg(t2), a2 + 8);
+-            vec_gen_3(INDEX_op_shri_vec, type, MO_16,
+-                     tcgv_vec_arg(t1), tcgv_vec_arg(t1), 8);
+-            vec_gen_3(INDEX_op_shri_vec, type, MO_16,
+-                     tcgv_vec_arg(t2), tcgv_vec_arg(t2), 8);
+-        }
+-        vec_gen_3(INDEX_op_x86_packus_vec, type, MO_8,
+-                 a0, tcgv_vec_arg(t1), tcgv_vec_arg(t2));
+-        tcg_temp_free_vec(t1);
+-        tcg_temp_free_vec(t2);
++        expand_vec_shi(type, vece, opc == INDEX_op_shri_vec, v0, v1, a2);
+         break;
+ 
+     case INDEX_op_sari_vec:
+-        a1 = va_arg(va, TCGArg);
+-        a2 = va_arg(va, TCGArg);
+-        if (vece == MO_8) {
+-            /* Unpack to W, shift, and repack, as above.  */
+-            t1 = tcg_temp_new_vec(type);
+-            t2 = tcg_temp_new_vec(type);
+-            vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
+-                      tcgv_vec_arg(t1), a1, a1);
+-            vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
+-                      tcgv_vec_arg(t2), a1, a1);
+-            vec_gen_3(INDEX_op_sari_vec, type, MO_16,
+-                      tcgv_vec_arg(t1), tcgv_vec_arg(t1), a2 + 8);
+-            vec_gen_3(INDEX_op_sari_vec, type, MO_16,
+-                      tcgv_vec_arg(t2), tcgv_vec_arg(t2), a2 + 8);
+-            vec_gen_3(INDEX_op_x86_packss_vec, type, MO_8,
+-                      a0, tcgv_vec_arg(t1), tcgv_vec_arg(t2));
+-            tcg_temp_free_vec(t1);
+-            tcg_temp_free_vec(t2);
+-            break;
+-        }
+-        tcg_debug_assert(vece == MO_64);
+-        /* MO_64: If the shift is <= 32, we can emulate the sign extend by
+-           performing an arithmetic 32-bit shift and overwriting the high
+-           half of the result (note that the ISA says shift of 32 is valid). */
+-        if (a2 <= 32) {
+-            t1 = tcg_temp_new_vec(type);
+-            vec_gen_3(INDEX_op_sari_vec, type, MO_32, tcgv_vec_arg(t1), a1, a2);
+-            vec_gen_3(INDEX_op_shri_vec, type, MO_64, a0, a1, a2);
+-            vec_gen_4(INDEX_op_x86_blend_vec, type, MO_32,
+-                      a0, a0, tcgv_vec_arg(t1), 0xaa);
+-            tcg_temp_free_vec(t1);
+-            break;
+-        }
+-        /* Otherwise we will need to use a compare vs 0 to produce the
+-           sign-extend, shift and merge.  */
+-        t1 = tcg_temp_new_vec(type);
+-        t2 = tcg_const_zeros_vec(type);
+-        vec_gen_4(INDEX_op_cmp_vec, type, MO_64,
+-                  tcgv_vec_arg(t1), tcgv_vec_arg(t2), a1, TCG_COND_GT);
+-        tcg_temp_free_vec(t2);
+-        vec_gen_3(INDEX_op_shri_vec, type, MO_64, a0, a1, a2);
+-        vec_gen_3(INDEX_op_shli_vec, type, MO_64,
+-                  tcgv_vec_arg(t1), tcgv_vec_arg(t1), 64 - a2);
+-        vec_gen_3(INDEX_op_or_vec, type, MO_64, a0, a0, tcgv_vec_arg(t1));
+-        tcg_temp_free_vec(t1);
++        expand_vec_sari(type, vece, v0, v1, a2);
+         break;
+ 
+     case INDEX_op_mul_vec:
+-        tcg_debug_assert(vece == MO_8);
+-        a1 = va_arg(va, TCGArg);
+-        a2 = va_arg(va, TCGArg);
+-        switch (type) {
+-        case TCG_TYPE_V64:
+-            t1 = tcg_temp_new_vec(TCG_TYPE_V128);
+-            t2 = tcg_temp_new_vec(TCG_TYPE_V128);
+-            tcg_gen_dup16i_vec(t2, 0);
+-            vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
+-                      tcgv_vec_arg(t1), a1, tcgv_vec_arg(t2));
+-            vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
+-                      tcgv_vec_arg(t2), tcgv_vec_arg(t2), a2);
+-            tcg_gen_mul_vec(MO_16, t1, t1, t2);
+-            tcg_gen_shri_vec(MO_16, t1, t1, 8);
+-            vec_gen_3(INDEX_op_x86_packus_vec, TCG_TYPE_V128, MO_8,
+-                      a0, tcgv_vec_arg(t1), tcgv_vec_arg(t1));
+-            tcg_temp_free_vec(t1);
+-            tcg_temp_free_vec(t2);
+-            break;
+-
+-        case TCG_TYPE_V128:
+-            t1 = tcg_temp_new_vec(TCG_TYPE_V128);
+-            t2 = tcg_temp_new_vec(TCG_TYPE_V128);
+-            t3 = tcg_temp_new_vec(TCG_TYPE_V128);
+-            t4 = tcg_temp_new_vec(TCG_TYPE_V128);
+-            tcg_gen_dup16i_vec(t4, 0);
+-            vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
+-                      tcgv_vec_arg(t1), a1, tcgv_vec_arg(t4));
+-            vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
+-                      tcgv_vec_arg(t2), tcgv_vec_arg(t4), a2);
+-            vec_gen_3(INDEX_op_x86_punpckh_vec, TCG_TYPE_V128, MO_8,
+-                      tcgv_vec_arg(t3), a1, tcgv_vec_arg(t4));
+-            vec_gen_3(INDEX_op_x86_punpckh_vec, TCG_TYPE_V128, MO_8,
+-                      tcgv_vec_arg(t4), tcgv_vec_arg(t4), a2);
+-            tcg_gen_mul_vec(MO_16, t1, t1, t2);
+-            tcg_gen_mul_vec(MO_16, t3, t3, t4);
+-            tcg_gen_shri_vec(MO_16, t1, t1, 8);
+-            tcg_gen_shri_vec(MO_16, t3, t3, 8);
+-            vec_gen_3(INDEX_op_x86_packus_vec, TCG_TYPE_V128, MO_8,
+-                      a0, tcgv_vec_arg(t1), tcgv_vec_arg(t3));
+-            tcg_temp_free_vec(t1);
+-            tcg_temp_free_vec(t2);
+-            tcg_temp_free_vec(t3);
+-            tcg_temp_free_vec(t4);
+-            break;
+-
+-        case TCG_TYPE_V256:
+-            t1 = tcg_temp_new_vec(TCG_TYPE_V256);
+-            t2 = tcg_temp_new_vec(TCG_TYPE_V256);
+-            t3 = tcg_temp_new_vec(TCG_TYPE_V256);
+-            t4 = tcg_temp_new_vec(TCG_TYPE_V256);
+-            tcg_gen_dup16i_vec(t4, 0);
+-            /* a1: A[0-7] ... D[0-7]; a2: W[0-7] ... Z[0-7]
+-               t1: extends of B[0-7], D[0-7]
+-               t2: extends of X[0-7], Z[0-7]
+-               t3: extends of A[0-7], C[0-7]
+-               t4: extends of W[0-7], Y[0-7].  */
+-            vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V256, MO_8,
+-                      tcgv_vec_arg(t1), a1, tcgv_vec_arg(t4));
+-            vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V256, MO_8,
+-                      tcgv_vec_arg(t2), tcgv_vec_arg(t4), a2);
+-            vec_gen_3(INDEX_op_x86_punpckh_vec, TCG_TYPE_V256, MO_8,
+-                      tcgv_vec_arg(t3), a1, tcgv_vec_arg(t4));
+-            vec_gen_3(INDEX_op_x86_punpckh_vec, TCG_TYPE_V256, MO_8,
+-                      tcgv_vec_arg(t4), tcgv_vec_arg(t4), a2);
+-            /* t1: BX DZ; t2: AW CY.  */
+-            tcg_gen_mul_vec(MO_16, t1, t1, t2);
+-            tcg_gen_mul_vec(MO_16, t3, t3, t4);
+-            tcg_gen_shri_vec(MO_16, t1, t1, 8);
+-            tcg_gen_shri_vec(MO_16, t3, t3, 8);
+-            /* a0: AW BX CY DZ.  */
+-            vec_gen_3(INDEX_op_x86_packus_vec, TCG_TYPE_V256, MO_8,
+-                      a0, tcgv_vec_arg(t1), tcgv_vec_arg(t3));
+-            tcg_temp_free_vec(t1);
+-            tcg_temp_free_vec(t2);
+-            tcg_temp_free_vec(t3);
+-            tcg_temp_free_vec(t4);
+-            break;
+-
+-        default:
+-            g_assert_not_reached();
+-        }
++        v2 = temp_tcgv_vec(arg_temp(a2));
++        expand_vec_mul(type, vece, v0, v1, v2);
+         break;
+ 
+     case INDEX_op_cmp_vec:
+-        {
+-            enum {
+-                NEED_SWAP = 1,
+-                NEED_INV  = 2,
+-                NEED_BIAS = 4
+-            };
+-            static const uint8_t fixups[16] = {
+-                [0 ... 15] = -1,
+-                [TCG_COND_EQ] = 0,
+-                [TCG_COND_NE] = NEED_INV,
+-                [TCG_COND_GT] = 0,
+-                [TCG_COND_LT] = NEED_SWAP,
+-                [TCG_COND_LE] = NEED_INV,
+-                [TCG_COND_GE] = NEED_SWAP | NEED_INV,
+-                [TCG_COND_GTU] = NEED_BIAS,
+-                [TCG_COND_LTU] = NEED_BIAS | NEED_SWAP,
+-                [TCG_COND_LEU] = NEED_BIAS | NEED_INV,
+-                [TCG_COND_GEU] = NEED_BIAS | NEED_SWAP | NEED_INV,
+-            };
+-
+-            TCGCond cond;
+-            uint8_t fixup;
+-
+-            a1 = va_arg(va, TCGArg);
+-            a2 = va_arg(va, TCGArg);
+-            cond = va_arg(va, TCGArg);
+-            fixup = fixups[cond & 15];
+-            tcg_debug_assert(fixup != 0xff);
+-
+-            if (fixup & NEED_INV) {
+-                cond = tcg_invert_cond(cond);
+-            }
+-            if (fixup & NEED_SWAP) {
+-                TCGArg t;
+-                t = a1, a1 = a2, a2 = t;
+-                cond = tcg_swap_cond(cond);
+-            }
+-
+-            t1 = t2 = NULL;
+-            if (fixup & NEED_BIAS) {
+-                t1 = tcg_temp_new_vec(type);
+-                t2 = tcg_temp_new_vec(type);
+-                tcg_gen_dupi_vec(vece, t2, 1ull << ((8 << vece) - 1));
+-                tcg_gen_sub_vec(vece, t1, temp_tcgv_vec(arg_temp(a1)), t2);
+-                tcg_gen_sub_vec(vece, t2, temp_tcgv_vec(arg_temp(a2)), t2);
+-                a1 = tcgv_vec_arg(t1);
+-                a2 = tcgv_vec_arg(t2);
+-                cond = tcg_signed_cond(cond);
+-            }
+-
+-            tcg_debug_assert(cond == TCG_COND_EQ || cond == TCG_COND_GT);
+-            vec_gen_4(INDEX_op_cmp_vec, type, vece, a0, a1, a2, cond);
+-
+-            if (fixup & NEED_BIAS) {
+-                tcg_temp_free_vec(t1);
+-                tcg_temp_free_vec(t2);
+-            }
+-            if (fixup & NEED_INV) {
+-                tcg_gen_not_vec(vece, v0, v0);
+-            }
+-        }
++        v2 = temp_tcgv_vec(arg_temp(a2));
++        expand_vec_cmp(type, vece, v0, v1, v2, va_arg(va, TCGArg));
+         break;
  
      default:
-         tcg_debug_assert(op > INDEX_op_last_generic && op < NB_OPS);
 -- 
 2.17.2
