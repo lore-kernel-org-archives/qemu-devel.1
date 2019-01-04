@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([208.118.235.92]:51372)
+Received: from eggs.gnu.org ([208.118.235.92]:51368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gfNY8-0002IZ-0j
+	(envelope-from <stefanha@redhat.com>) id 1gfNY7-0002IY-TW
 	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gfNY7-0005Jl-BP
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:22:00 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gfNY7-0005Jg-8K
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:21:59 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  4 Jan 2019 11:21:42 +0000
-Message-Id: <20190104112145.12413-2-stefanha@redhat.com>
-In-Reply-To: <20190104112145.12413-1-stefanha@redhat.com>
-References: <20190104112145.12413-1-stefanha@redhat.com>
+Date: Fri,  4 Jan 2019 11:21:41 +0000
+Message-Id: <20190104112145.12413-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/4] dmg: Fixing wrong dmg block type value for
- block terminator.
+Subject: [Qemu-devel] [PULL 0/4] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +20,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Julio Faracco <jcfaracco@gmail.com>, yuchenlin <yuchenlin@synology.com>
+Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org
 
-From: Julio Faracco <jcfaracco@gmail.com>
+The following changes since commit 20d6c7312f1b812bb9c750f4087f69ac8485cc=
+90:
 
-This is a trivial patch to fix a wrong value for block terminator.
-The old value was 0x7fffffff which is wrong. It was not affecting the
-code because QEMU dmg block is not handling block terminator right now.
-Neverthless, it should be fixed.
+  Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3.2-=
+part1' into staging (2019-01-03 13:26:30 +0000)
 
-Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
-Reviewed-by: yuchenlin <yuchenlin@synology.com>
-Message-id: 20181228145055.18039-1-jcfaracco@gmail.com
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/dmg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+are available in the Git repository at:
 
-diff --git a/block/dmg.c b/block/dmg.c
-index 50e91aef6d..2c806e3389 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -54,7 +54,7 @@ enum {
-     UDBZ,
-     ULFO,
-     UDCM =3D 0x7ffffffe, /* Comments */
--    UDLE               /* Last Entry */
-+    UDLE =3D 0xffffffff  /* Last Entry */
- };
-=20
- static int dmg_probe(const uint8_t *buf, int buf_size, const char *filen=
-ame)
+  git://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to 39a0408e768cd00142f5b57d27ab234282bf4df5:
+
+  dmg: don't skip zero chunk (2019-01-04 11:15:09 +0000)
+
+----------------------------------------------------------------
+Pull request
+
+Bug fixes for the .dmg image file format.
+
+----------------------------------------------------------------
+
+Julio Faracco (1):
+  dmg: Fixing wrong dmg block type value for block terminator.
+
+yuchenlin (3):
+  dmg: fix binary search
+  dmg: use enumeration type instead of hard coding number
+  dmg: don't skip zero chunk
+
+ block/dmg.c | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
+
 --=20
 2.20.1
