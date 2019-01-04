@@ -1,29 +1,26 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:55099 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:55395 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY0Q-00036k-O7
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:55 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gfY1e-0004nW-Ng
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:33:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gfY0P-0002GI-RK
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:54 -0500
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:42690)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gfY0P-0002F0-Mz
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:31:53 -0500
-Received: by mail-io1-xd42.google.com with SMTP id x6so30675046ioa.9
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 14:31:53 -0800 (PST)
-Received: from cloudburst.twiddle.net ([172.56.12.23])
-	by smtp.gmail.com with ESMTPSA id
-	t6sm27793259ioc.87.2019.01.04.14.31.50 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 04 Jan 2019 14:31:52 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  5 Jan 2019 08:31:16 +1000
-Message-Id: <20190104223116.14037-11-richard.henderson@linaro.org>
-In-Reply-To: <20190104223116.14037-1-richard.henderson@linaro.org>
-References: <20190104223116.14037-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 10/10] tcg/aarch64: Implement vector minmax
- arithmetic
+	(envelope-from <no-reply@patchew.org>) id 1gfY1b-0003lj-In
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:33:10 -0500
+Resent-Message-Id: <E1gfY1b-0003lj-In@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21741)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gfY1b-0003kr-6m
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 17:33:07 -0500
+In-Reply-To: <20190104153951.32306-1-eblake@redhat.com>
+Message-ID: <154663843998.31063.6088337642335462195@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 4 Jan 2019 13:47:21 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC PATCH] osdep: Make MIN/MAX evaluate arguments
+ only once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,84 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: eblake@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/aarch64/tcg-target.h     |  2 +-
- tcg/aarch64/tcg-target.inc.c | 24 ++++++++++++++++++++++++
- 2 files changed, 25 insertions(+), 1 deletion(-)
-
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index a1884543d0..2d93cf404e 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -136,7 +136,7 @@ typedef enum {
- #define TCG_TARGET_HAS_cmp_vec          1
- #define TCG_TARGET_HAS_mul_vec          1
- #define TCG_TARGET_HAS_sat_vec          1
--#define TCG_TARGET_HAS_minmax_vec       0
-+#define TCG_TARGET_HAS_minmax_vec       1
- 
- #define TCG_TARGET_DEFAULT_MO (0)
- #define TCG_TARGET_HAS_MEMORY_BSWAP     1
-diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index b2b011f130..ee0d5819af 100644
---- a/tcg/aarch64/tcg-target.inc.c
-+++ b/tcg/aarch64/tcg-target.inc.c
-@@ -528,8 +528,12 @@ typedef enum {
-     I3616_CMHI      = 0x2e203400,
-     I3616_CMHS      = 0x2e203c00,
-     I3616_CMEQ      = 0x2e208c00,
-+    I3616_SMAX      = 0x0e206400,
-+    I3616_SMIN      = 0x0e206c00,
-     I3616_SQADD     = 0x0e200c00,
-     I3616_SQSUB     = 0x0e202c00,
-+    I3616_UMAX      = 0x2e206400,
-+    I3616_UMIN      = 0x2e206c00,
-     I3616_UQADD     = 0x2e200c00,
-     I3616_UQSUB     = 0x2e202c00,
- 
-@@ -2153,6 +2157,18 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_ussub_vec:
-         tcg_out_insn(s, 3616, UQSUB, is_q, vece, a0, a1, a2);
-         break;
-+    case INDEX_op_smax_vec:
-+        tcg_out_insn(s, 3616, SMAX, is_q, vece, a0, a1, a2);
-+        break;
-+    case INDEX_op_smin_vec:
-+        tcg_out_insn(s, 3616, SMIN, is_q, vece, a0, a1, a2);
-+        break;
-+    case INDEX_op_umax_vec:
-+        tcg_out_insn(s, 3616, UMAX, is_q, vece, a0, a1, a2);
-+        break;
-+    case INDEX_op_umin_vec:
-+        tcg_out_insn(s, 3616, UMIN, is_q, vece, a0, a1, a2);
-+        break;
-     case INDEX_op_not_vec:
-         tcg_out_insn(s, 3617, NOT, is_q, 0, a0, a1);
-         break;
-@@ -2227,6 +2243,10 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
-     case INDEX_op_sssub_vec:
-     case INDEX_op_usadd_vec:
-     case INDEX_op_ussub_vec:
-+    case INDEX_op_smax_vec:
-+    case INDEX_op_smin_vec:
-+    case INDEX_op_umax_vec:
-+    case INDEX_op_umin_vec:
-         return 1;
-     case INDEX_op_mul_vec:
-         return vece < MO_64;
-@@ -2410,6 +2430,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_sssub_vec:
-     case INDEX_op_usadd_vec:
-     case INDEX_op_ussub_vec:
-+    case INDEX_op_smax_vec:
-+    case INDEX_op_smin_vec:
-+    case INDEX_op_umax_vec:
-+    case INDEX_op_umin_vec:
-         return &w_w_w;
-     case INDEX_op_not_vec:
-     case INDEX_op_neg_vec:
--- 
-2.17.2
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEwNDE1Mzk1MS4zMjMw
+Ni0xLWVibGFrZUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
+bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
+ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRv
+czcgU0hPV19FTlY9MSBKPTgKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCmxpYnBtZW0gc3VwcG9y
+dCAgIG5vCmxpYnVkZXYgICAgICAgICAgIG5vCgpXQVJOSU5HOiBVc2Ugb2YgU0RMIDEuMiBpcyBk
+ZXByZWNhdGVkIGFuZCB3aWxsIGJlIHJlbW92ZWQgaW4KV0FSTklORzogZnV0dXJlIHJlbGVhc2Vz
+LiBQbGVhc2Ugc3dpdGNoIHRvIHVzaW5nIFNETCAyLjAKCk5PVEU6IGNyb3NzLWNvbXBpbGVycyBl
+bmFibGVkOiAgJ2NjJwogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFr
+LnRtcAotLS0KICBDQyAgICAgIGJsb2NrL2NvbW1pdC5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAv
+dG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svYmxvY2stYmFja2VuZC5jOjEzOjA6Ci90bXAvcWVtdS10
+ZXN0L3NyYy9ibG9jay9ibG9jay1iYWNrZW5kLmM6IEluIGZ1bmN0aW9uICdibGtfZ2V0X21heF90
+cmFuc2Zlcic6Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FlbXUvb3NkZXAuaDoyNTc6OTog
+ZXJyb3I6IHVua25vd24gdHlwZSBuYW1lICdfX2F1dG9fdHlwZScKICAgICAgICAgX19hdXRvX3R5
+cGUgX2EgPSAoYSk7ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAogICAgICAgICBeCi90bXAv
+cWVtdS10ZXN0L3NyYy9ibG9jay9ibG9jay1iYWNrZW5kLmM6MTgxNzoxMjogbm90ZTogaW4gZXhw
+YW5zaW9uIG9mIG1hY3JvICdNSU5fTk9OX1pFUk8nCiAgICAgcmV0dXJuIE1JTl9OT05fWkVSTyht
+YXgsIElOVF9NQVgpOwogICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3Fl
+bXUvb3NkZXAuaDoyNTg6OTogZXJyb3I6IHVua25vd24gdHlwZSBuYW1lICdfX2F1dG9fdHlwZScK
+ICAgICAgICAgX19hdXRvX3R5cGUgX2IgPSAoYik7ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XAogICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9ibG9jay1iYWNrZW5kLmM6MTgx
+NzoxMjogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvICdNSU5fTk9OX1pFUk8nCiAgICAgcmV0
+dXJuIE1JTl9OT05fWkVSTyhtYXgsIElOVF9NQVgpOwogICAgICAgICAgICBeCi90bXAvcWVtdS10
+ZXN0L3NyYy9ibG9jay9ibG9jay1iYWNrZW5kLmM6IEF0IHRvcCBsZXZlbDoKY2MxOiBlcnJvcjog
+dW5yZWNvZ25pemVkIGNvbW1hbmQgbGluZSBvcHRpb24gIi1Xbm8tZm9ybWF0LXRydW5jYXRpb24i
+IFstV2Vycm9yXQpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtl
+OiAqKiogW2Jsb2NrL2Jsb2NrLWJhY2tlbmQub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBm
+b3IgdW5maW5pc2hlZCBqb2JzLi4uLgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
+cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMDQxNTM5NTEuMzIzMDYtMS1lYmxha2VAcmVkaGF0
+LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
