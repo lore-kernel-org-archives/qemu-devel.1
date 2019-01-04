@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46181)
+Received: from eggs.gnu.org ([208.118.235.92]:46698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gfNFR-0003wC-28
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:02:45 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gfNH1-00056Y-26
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:04:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gfNFN-000162-Tg
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:02:41 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:33540)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gfNFN-00015h-NK
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:02:37 -0500
-Received: by mail-wm1-f66.google.com with SMTP id r24so855085wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 03:02:37 -0800 (PST)
-References: <20190104082731.24967-1-pbonzini@redhat.com>
-	<20190104082731.24967-2-pbonzini@redhat.com>
-	<20190104102655.3bf599f5.cohuck@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c60f6b8a-810a-cf50-aafd-8ca3991e23c2@redhat.com>
-Date: Fri, 4 Jan 2019 12:02:37 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gfNGx-00020v-6w
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:04:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48384)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gfNGw-0001z9-S8
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:04:15 -0500
+Date: Fri, 4 Jan 2019 12:04:06 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190104120406.52438fb2.cohuck@redhat.com>
+In-Reply-To: <CAJ+F1CLedF6tTqn3YSp9QeMchh_4LxBfiDCkLqn+8x2Q88GTDg@mail.gmail.com>
+References: <20181221090410.27250-1-marcandre.lureau@redhat.com>
+	<20181221090410.27250-26-marcandre.lureau@redhat.com>
+	<20181221163426.1e0bbb35.cohuck@redhat.com>
+	<CAJ+F1CLedF6tTqn3YSp9QeMchh_4LxBfiDCkLqn+8x2Q88GTDg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190104102655.3bf599f5.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] scripts/update-linux-headers.sh:
- adjust for Linux 4.21-rc1 (or 5.0-rc1)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 25/28] qdev-props: remove errp from
+ GlobalProperty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mst@redhat.com
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 04/01/19 10:26, Cornelia Huck wrote:
-> On Fri,  4 Jan 2019 09:27:30 +0100
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
->> There are three new indirect inclusions: vhost_types.h, which we'll
->> shortly put to use as a portable header and thus is copied to
->> standard-headers; and new per-subtarget versions of MIPS unistd.h
->> and PowerPC unistd.h.
->>
->> Because vhost.h includes vhost_types.h, we also need a proxy include
->> from linux/vhost.h to standard-headers.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  scripts/update-linux-headers.sh | 11 +++++++++++
->>  1 file changed, 11 insertions(+)
-> 
-> I still think we could squash this change (and the description :) with
-> the headers update, but I don't object to a separate change, either.
+On Fri, 4 Jan 2019 14:57:26 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
 
-Me too, but I figured I'd rather not pull another tantrum like I did for
-multiline comments...
+> Hi
+>=20
+> On Fri, Dec 21, 2018 at 7:34 PM Cornelia Huck <cohuck@redhat.com> wrote:
+> >
+> > On Fri, 21 Dec 2018 13:04:07 +0400
+> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> > =20
+> > > All qdev_prop_register_global() set &error_fatal for errp, except
+> > > '-rtc driftfix=3Dslew', which arguably should also use &error_fatal, =
+as
+> > > otherwise failing to apply the property would only report a warning.
+> > >
+> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > >  include/hw/qdev-core.h    | 6 ------
+> > >  hw/core/qdev-properties.c | 4 ++--
+> > >  qom/cpu.c                 | 1 -
+> > >  target/i386/cpu.c         | 1 -
+> > >  target/sparc/cpu.c        | 1 -
+> > >  vl.c                      | 1 -
+> > >  6 files changed, 2 insertions(+), 12 deletions(-)
+> > > =20
+> > =20
+> > > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> > > index 3467e0485c..a2d25d3d37 100644
+> > > --- a/hw/core/qdev-properties.c
+> > > +++ b/hw/core/qdev-properties.c
+> > > @@ -1238,8 +1238,8 @@ void qdev_prop_set_globals(DeviceState *dev)
+> > >          if (err !=3D NULL) {
+> > >              error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+> > >                            prop->driver, prop->property, prop->value);
+> > > -            if (!dev->hotplugged && prop->errp) {
+> > > -                error_propagate(prop->errp, err);
+> > > +            if (!dev->hotplugged) {
+> > > +                error_propagate(&error_fatal, err); =20
+> >
+> > Might want to add a comment to this function that any error is fatal
+> > for non-hotplugged devices.
+> > =20
+>=20
+> What about adding the following comment to GlobalProperty?
+>=20
+>  * An error is fatal for non-hotplugged devices, when the global is appli=
+ed.
 
-Paolo
+Sounds good.
+
+>=20
+> > >              } else {
+> > >                  warn_report_err(err);
+> > >              } =20
+> >
+> > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> > =20
+>=20
+> thanks
+>=20
