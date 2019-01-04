@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44058)
+Received: from eggs.gnu.org ([208.118.235.92]:44076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gfTKB-0003wJ-6C
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:32:00 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gfTKE-00040p-SB
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:32:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gfTK8-0001O4-RT
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:31:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42172)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gfTKD-0001Rj-35
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:32:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39906)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gfTK6-0001ME-RC
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:31:56 -0500
+	id 1gfTKC-0001Qf-Rg
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 12:32:01 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  4 Jan 2019 21:30:26 +0400
-Message-Id: <20190104173042.32714-13-marcandre.lureau@redhat.com>
+Date: Fri,  4 Jan 2019 21:30:27 +0400
+Message-Id: <20190104173042.32714-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20190104173042.32714-1-marcandre.lureau@redhat.com>
 References: <20190104173042.32714-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/28] compat: replace PC_COMPAT_2_8 &
- HW_COMPAT_2_8 macros
+Subject: [Qemu-devel] [PULL 13/28] compat: replace PC_COMPAT_2_7 &
+ HW_COMPAT_2_7 macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,328 +40,290 @@ Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Acked-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
  include/hw/boards.h        |  3 +++
- include/hw/compat.h        | 43 -----------------------------------
- include/hw/i386/pc.h       | 29 ++----------------------
+ include/hw/compat.h        | 23 -----------------------
+ include/hw/i386/pc.h       | 34 ++--------------------------------
  hw/arm/virt.c              |  5 +----
- hw/core/machine.c          | 46 ++++++++++++++++++++++++++++++++++++++
- hw/i386/pc.c               | 29 ++++++++++++++++++++++++
- hw/i386/pc_piix.c          |  7 ++----
- hw/i386/pc_q35.c           |  7 ++----
+ hw/core/machine.c          | 25 +++++++++++++++++++++++++
+ hw/i386/pc.c               | 34 ++++++++++++++++++++++++++++++++++
+ hw/i386/pc_piix.c          |  7 ++-----
+ hw/i386/pc_q35.c           |  7 ++-----
  hw/ppc/spapr.c             |  2 +-
- hw/s390x/s390-virtio-ccw.c |  2 +-
- 10 files changed, 87 insertions(+), 86 deletions(-)
+ hw/s390x/s390-virtio-ccw.c |  5 +----
+ 10 files changed, 71 insertions(+), 74 deletions(-)
 
 diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 0e69350939..03278a8c39 100644
+index 03278a8c39..ac4854db0f 100644
 --- a/include/hw/boards.h
 +++ b/include/hw/boards.h
-@@ -306,4 +306,7 @@ extern const size_t hw_compat_2_10_len;
- extern GlobalProperty hw_compat_2_9[];
- extern const size_t hw_compat_2_9_len;
+@@ -309,4 +309,7 @@ extern const size_t hw_compat_2_9_len;
+ extern GlobalProperty hw_compat_2_8[];
+ extern const size_t hw_compat_2_8_len;
 =20
-+extern GlobalProperty hw_compat_2_8[];
-+extern const size_t hw_compat_2_8_len;
++extern GlobalProperty hw_compat_2_7[];
++extern const size_t hw_compat_2_7_len;
 +
  #endif
 diff --git a/include/hw/compat.h b/include/hw/compat.h
-index ef154ca470..65d6748054 100644
+index 65d6748054..7ceab17401 100644
 --- a/include/hw/compat.h
 +++ b/include/hw/compat.h
-@@ -1,49 +1,6 @@
+@@ -1,29 +1,6 @@
  #ifndef HW_COMPAT_H
  #define HW_COMPAT_H
 =20
--#define HW_COMPAT_2_8 \
+-#define HW_COMPAT_2_7 \
 -    {\
--        .driver   =3D "fw_cfg_mem",\
--        .property =3D "x-file-slots",\
--        .value    =3D stringify(0x10),\
--    },{\
--        .driver   =3D "fw_cfg_io",\
--        .property =3D "x-file-slots",\
--        .value    =3D stringify(0x10),\
--    },{\
--        .driver   =3D "pflash_cfi01",\
--        .property =3D "old-multiple-chip-handling",\
+-        .driver   =3D "virtio-pci",\
+-        .property =3D "page-per-vq",\
 -        .value    =3D "on",\
 -    },{\
--        .driver   =3D "pci-bridge",\
--        .property =3D "shpc",\
+-        .driver   =3D "virtio-serial-device",\
+-        .property =3D "emergency-write",\
+-        .value    =3D "off",\
+-    },{\
+-        .driver   =3D "ioapic",\
+-        .property =3D "version",\
+-        .value    =3D "0x11",\
+-    },{\
+-        .driver   =3D "intel-iommu",\
+-        .property =3D "x-buggy-eim",\
+-        .value    =3D "true",\
+-    },{\
+-        .driver   =3D "virtio-pci",\
+-        .property =3D "x-ignore-backend-features",\
 -        .value    =3D "on",\
--    },{\
--        .driver   =3D TYPE_PCI_DEVICE,\
--        .property =3D "x-pcie-extcap-init",\
--        .value    =3D "off",\
--    },{\
--        .driver   =3D "virtio-pci",\
--        .property =3D "x-pcie-deverr-init",\
--        .value    =3D "off",\
--    },{\
--        .driver   =3D "virtio-pci",\
--        .property =3D "x-pcie-lnkctl-init",\
--        .value    =3D "off",\
--    },{\
--        .driver   =3D "virtio-pci",\
--        .property =3D "x-pcie-pm-init",\
--        .value    =3D "off",\
--    },{\
--        .driver   =3D "cirrus-vga",\
--        .property =3D "vgamem_mb",\
--        .value    =3D "8",\
--    },{\
--        .driver   =3D "isa-cirrus-vga",\
--        .property =3D "vgamem_mb",\
--        .value    =3D "8",\
 -    },
 -
- #define HW_COMPAT_2_7 \
+ #define HW_COMPAT_2_6 \
      {\
-         .driver   =3D "virtio-pci",\
+         .driver   =3D "virtio-mmio",\
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index fb79f0b988..12c47d2506 100644
+index 12c47d2506..504fbc79a9 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -312,33 +312,8 @@ extern const size_t pc_compat_2_10_len;
- extern GlobalProperty pc_compat_2_9[];
- extern const size_t pc_compat_2_9_len;
+@@ -315,38 +315,8 @@ extern const size_t pc_compat_2_9_len;
+ extern GlobalProperty pc_compat_2_8[];
+ extern const size_t pc_compat_2_8_len;
 =20
--#define PC_COMPAT_2_8 \
--    HW_COMPAT_2_8 \
+-#define PC_COMPAT_2_7 \
+-    HW_COMPAT_2_7 \
 -    {\
 -        .driver   =3D TYPE_X86_CPU,\
--        .property =3D "tcg-cpuid",\
--        .value    =3D "off",\
--    },\
--    {\
--        .driver   =3D "kvmclock",\
--        .property =3D "x-mach-use-reliable-get-clock",\
--        .value    =3D "off",\
--    },\
--    {\
--        .driver   =3D "ICH9-LPC",\
--        .property =3D "x-smi-broadcast",\
+-        .property =3D "l3-cache",\
 -        .value    =3D "off",\
 -    },\
 -    {\
 -        .driver   =3D TYPE_X86_CPU,\
--        .property =3D "vmware-cpuid-freq",\
+-        .property =3D "full-cpuid-auto-level",\
 -        .value    =3D "off",\
 -    },\
 -    {\
--        .driver   =3D "Haswell-" TYPE_X86_CPU,\
+-        .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,\
+-        .property =3D "family",\
+-        .value    =3D "15",\
+-    },\
+-    {\
+-        .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,\
+-        .property =3D "model",\
+-        .value    =3D "6",\
+-    },\
+-    {\
+-        .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,\
 -        .property =3D "stepping",\
 -        .value    =3D "1",\
+-    },\
+-    {\
+-        .driver   =3D "isa-pcspk",\
+-        .property =3D "migrate",\
+-        .value    =3D "off",\
 -    },
-+extern GlobalProperty pc_compat_2_8[];
-+extern const size_t pc_compat_2_8_len;
++extern GlobalProperty pc_compat_2_7[];
++extern const size_t pc_compat_2_7_len;
 =20
- #define PC_COMPAT_2_7 \
-     HW_COMPAT_2_7 \
+ #define PC_COMPAT_2_6 \
+     HW_COMPAT_2_6 \
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a0898f27d3..d4dee3ece7 100644
+index d4dee3ece7..0134d0d439 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -1926,12 +1926,9 @@ DEFINE_VIRT_MACHINE(2, 9)
- static void virt_machine_2_8_options(MachineClass *mc)
+@@ -1939,12 +1939,9 @@ DEFINE_VIRT_MACHINE(2, 8)
+ static void virt_machine_2_7_options(MachineClass *mc)
  {
      VirtMachineClass *vmc =3D VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
 -    static GlobalProperty compat[] =3D {
--        HW_COMPAT_2_8
+-        HW_COMPAT_2_7
 -    };
 =20
-     virt_machine_2_9_options(mc);
+     virt_machine_2_8_options(mc);
 -    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-+    compat_props_add(mc->compat_props, hw_compat_2_8, hw_compat_2_8_len)=
++    compat_props_add(mc->compat_props, hw_compat_2_7, hw_compat_2_7_len)=
 ;
-     /* For 2.8 and earlier we falsely claimed in the DT that
-      * our timers were edge-triggered, not level-triggered.
-      */
+     /* ITS was introduced with 2.8 */
+     vmc->no_its =3D true;
+     /* Stick with 1K pages for migration compatibility */
 diff --git a/hw/core/machine.c b/hw/core/machine.c
-index aa5f03fba2..efda98a9ab 100644
+index efda98a9ab..cc92b0cc84 100644
 --- a/hw/core/machine.c
 +++ b/hw/core/machine.c
-@@ -21,6 +21,7 @@
- #include "sysemu/numa.h"
- #include "qemu/error-report.h"
- #include "sysemu/qtest.h"
-+#include "hw/pci/pci.h"
-=20
- GlobalProperty hw_compat_3_1[] =3D {
-     {
-@@ -122,6 +123,51 @@ GlobalProperty hw_compat_2_9[] =3D {
+@@ -168,6 +168,31 @@ GlobalProperty hw_compat_2_8[] =3D {
  };
- const size_t hw_compat_2_9_len =3D G_N_ELEMENTS(hw_compat_2_9);
+ const size_t hw_compat_2_8_len =3D G_N_ELEMENTS(hw_compat_2_8);
 =20
-+GlobalProperty hw_compat_2_8[] =3D {
++GlobalProperty hw_compat_2_7[] =3D {
 +    {
-+        .driver   =3D "fw_cfg_mem",
-+        .property =3D "x-file-slots",
-+        .value    =3D stringify(0x10),
-+    },{
-+        .driver   =3D "fw_cfg_io",
-+        .property =3D "x-file-slots",
-+        .value    =3D stringify(0x10),
-+    },{
-+        .driver   =3D "pflash_cfi01",
-+        .property =3D "old-multiple-chip-handling",
++        .driver   =3D "virtio-pci",
++        .property =3D "page-per-vq",
 +        .value    =3D "on",
 +    },{
-+        .driver   =3D "pci-bridge",
-+        .property =3D "shpc",
++        .driver   =3D "virtio-serial-device",
++        .property =3D "emergency-write",
++        .value    =3D "off",
++    },{
++        .driver   =3D "ioapic",
++        .property =3D "version",
++        .value    =3D "0x11",
++    },{
++        .driver   =3D "intel-iommu",
++        .property =3D "x-buggy-eim",
++        .value    =3D "true",
++    },{
++        .driver   =3D "virtio-pci",
++        .property =3D "x-ignore-backend-features",
 +        .value    =3D "on",
-+    },{
-+        .driver   =3D TYPE_PCI_DEVICE,
-+        .property =3D "x-pcie-extcap-init",
-+        .value    =3D "off",
-+    },{
-+        .driver   =3D "virtio-pci",
-+        .property =3D "x-pcie-deverr-init",
-+        .value    =3D "off",
-+    },{
-+        .driver   =3D "virtio-pci",
-+        .property =3D "x-pcie-lnkctl-init",
-+        .value    =3D "off",
-+    },{
-+        .driver   =3D "virtio-pci",
-+        .property =3D "x-pcie-pm-init",
-+        .value    =3D "off",
-+    },{
-+        .driver   =3D "cirrus-vga",
-+        .property =3D "vgamem_mb",
-+        .value    =3D "8",
-+    },{
-+        .driver   =3D "isa-cirrus-vga",
-+        .property =3D "vgamem_mb",
-+        .value    =3D "8",
 +    },
 +};
-+const size_t hw_compat_2_8_len =3D G_N_ELEMENTS(hw_compat_2_8);
++const size_t hw_compat_2_7_len =3D G_N_ELEMENTS(hw_compat_2_7);
 +
  static char *machine_get_accel(Object *obj, Error **errp)
  {
      MachineState *ms =3D MACHINE(obj);
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3f6f5df363..b094e5b2ad 100644
+index b094e5b2ad..ed46f9c27f 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -195,6 +195,35 @@ GlobalProperty pc_compat_2_9[] =3D {
+@@ -224,6 +224,40 @@ GlobalProperty pc_compat_2_8[] =3D {
  };
- const size_t pc_compat_2_9_len =3D G_N_ELEMENTS(pc_compat_2_9);
+ const size_t pc_compat_2_8_len =3D G_N_ELEMENTS(pc_compat_2_8);
 =20
-+GlobalProperty pc_compat_2_8[] =3D {
++GlobalProperty pc_compat_2_7[] =3D {
 +    {
 +        .driver   =3D TYPE_X86_CPU,
-+        .property =3D "tcg-cpuid",
-+        .value    =3D "off",
-+    },
-+    {
-+        .driver   =3D "kvmclock",
-+        .property =3D "x-mach-use-reliable-get-clock",
-+        .value    =3D "off",
-+    },
-+    {
-+        .driver   =3D "ICH9-LPC",
-+        .property =3D "x-smi-broadcast",
++        .property =3D "l3-cache",
 +        .value    =3D "off",
 +    },
 +    {
 +        .driver   =3D TYPE_X86_CPU,
-+        .property =3D "vmware-cpuid-freq",
++        .property =3D "full-cpuid-auto-level",
 +        .value    =3D "off",
 +    },
 +    {
-+        .driver   =3D "Haswell-" TYPE_X86_CPU,
++        .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,
++        .property =3D "family",
++        .value    =3D "15",
++    },
++    {
++        .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,
++        .property =3D "model",
++        .value    =3D "6",
++    },
++    {
++        .driver   =3D "Opteron_G3" "-" TYPE_X86_CPU,
 +        .property =3D "stepping",
 +        .value    =3D "1",
 +    },
++    {
++        .driver   =3D "isa-pcspk",
++        .property =3D "migrate",
++        .value    =3D "off",
++    },
 +};
-+const size_t pc_compat_2_8_len =3D G_N_ELEMENTS(pc_compat_2_8);
++const size_t pc_compat_2_7_len =3D G_N_ELEMENTS(pc_compat_2_7);
 +
  void gsi_handler(void *opaque, int n, int level)
  {
      GSIState *s =3D opaque;
 diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 02520bceb9..b1fa038a69 100644
+index b1fa038a69..182d868de8 100644
 --- a/hw/i386/pc_piix.c
 +++ b/hw/i386/pc_piix.c
-@@ -504,12 +504,9 @@ DEFINE_I440FX_MACHINE(v2_9, "pc-i440fx-2.9", NULL,
+@@ -514,12 +514,9 @@ DEFINE_I440FX_MACHINE(v2_8, "pc-i440fx-2.8", NULL,
 =20
- static void pc_i440fx_2_8_machine_options(MachineClass *m)
+ static void pc_i440fx_2_7_machine_options(MachineClass *m)
  {
 -    static GlobalProperty compat[] =3D {
--        PC_COMPAT_2_8
+-        PC_COMPAT_2_7
 -    };
 -
-     pc_i440fx_2_9_machine_options(m);
+     pc_i440fx_2_8_machine_options(m);
 -    compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
-+    compat_props_add(m->compat_props, hw_compat_2_8, hw_compat_2_8_len);
-+    compat_props_add(m->compat_props, pc_compat_2_8, pc_compat_2_8_len);
++    compat_props_add(m->compat_props, hw_compat_2_7, hw_compat_2_7_len);
++    compat_props_add(m->compat_props, pc_compat_2_7, pc_compat_2_7_len);
  }
 =20
- DEFINE_I440FX_MACHINE(v2_8, "pc-i440fx-2.8", NULL,
+ DEFINE_I440FX_MACHINE(v2_7, "pc-i440fx-2.7", NULL,
 diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index e94d2d05c7..7e608b3ffb 100644
+index 7e608b3ffb..35377524d0 100644
 --- a/hw/i386/pc_q35.c
 +++ b/hw/i386/pc_q35.c
-@@ -390,12 +390,9 @@ DEFINE_Q35_MACHINE(v2_9, "pc-q35-2.9", NULL,
+@@ -400,13 +400,10 @@ DEFINE_Q35_MACHINE(v2_8, "pc-q35-2.8", NULL,
 =20
- static void pc_q35_2_8_machine_options(MachineClass *m)
+ static void pc_q35_2_7_machine_options(MachineClass *m)
  {
 -    static GlobalProperty compat[] =3D {
--        PC_COMPAT_2_8
+-        PC_COMPAT_2_7
 -    };
 -
-     pc_q35_2_9_machine_options(m);
+     pc_q35_2_8_machine_options(m);
+     m->max_cpus =3D 255;
 -    compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
-+    compat_props_add(m->compat_props, hw_compat_2_8, hw_compat_2_8_len);
-+    compat_props_add(m->compat_props, pc_compat_2_8, pc_compat_2_8_len);
++    compat_props_add(m->compat_props, hw_compat_2_7, hw_compat_2_7_len);
++    compat_props_add(m->compat_props, pc_compat_2_7, pc_compat_2_7_len);
  }
 =20
- DEFINE_Q35_MACHINE(v2_8, "pc-q35-2.8", NULL,
+ DEFINE_Q35_MACHINE(v2_7, "pc-q35-2.7", NULL,
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 477ff5eb94..a19353827f 100644
+index a19353827f..c83b0c0d66 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -4151,7 +4151,6 @@ DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
- static void spapr_machine_2_8_class_options(MachineClass *mc)
+@@ -4223,7 +4223,6 @@ static void spapr_machine_2_7_class_options(Machine=
+Class *mc)
  {
+     sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
      static GlobalProperty compat[] =3D {
--        HW_COMPAT_2_8
+-        HW_COMPAT_2_7
          {
              .driver   =3D TYPE_SPAPR_PCI_HOST_BRIDGE,
-             .property =3D "pcie-extended-configuration-space",
-@@ -4160,6 +4159,7 @@ static void spapr_machine_2_8_class_options(Machine=
+             .property =3D "mem_win_size",
+@@ -4249,6 +4248,7 @@ static void spapr_machine_2_7_class_options(Machine=
 Class *mc)
-     };
-=20
-     spapr_machine_2_9_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_2_8, hw_compat_2_8_len)=
+     spapr_machine_2_8_class_options(mc);
+     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power7_v2.3");
+     mc->default_machine_opts =3D "modern-hotplug-events=3Doff";
++    compat_props_add(mc->compat_props, hw_compat_2_7, hw_compat_2_7_len)=
 ;
      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-     mc->numa_mem_align_shift =3D 23;
+     smc->phb_placement =3D phb_placement_2_7;
  }
 diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 549f6e0231..22e96ab353 100644
+index 22e96ab353..f28feedd4b 100644
 --- a/hw/s390x/s390-virtio-ccw.c
 +++ b/hw/s390x/s390-virtio-ccw.c
-@@ -774,7 +774,6 @@ static void ccw_machine_2_8_instance_options(MachineS=
-tate *machine)
- static void ccw_machine_2_8_class_options(MachineClass *mc)
+@@ -795,13 +795,10 @@ static void ccw_machine_2_7_instance_options(Machin=
+eState *machine)
+ static void ccw_machine_2_7_class_options(MachineClass *mc)
  {
-     static GlobalProperty compat[] =3D {
--        HW_COMPAT_2_8
-         {
-             .driver   =3D TYPE_S390_FLIC_COMMON,
-             .property =3D "adapter_routes_max_batch",
-@@ -783,6 +782,7 @@ static void ccw_machine_2_8_class_options(MachineClas=
-s *mc)
-     };
+     S390CcwMachineClass *s390mc =3D S390_MACHINE_CLASS(mc);
+-    static GlobalProperty compat[] =3D {
+-        HW_COMPAT_2_7
+-    };
 =20
-     ccw_machine_2_9_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_2_8, hw_compat_2_8_len)=
+     s390mc->cpu_model_allowed =3D false;
+     ccw_machine_2_8_class_options(mc);
+-    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
++    compat_props_add(mc->compat_props, hw_compat_2_7, hw_compat_2_7_len)=
 ;
-     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
  }
- DEFINE_CCW_MACHINE(2_8, "2.8", false);
+ DEFINE_CCW_MACHINE(2_7, "2.7", false);
+=20
 --=20
 2.20.1.2.gb21ebb671b
