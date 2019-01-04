@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([208.118.235.92]:46698)
+Received: from eggs.gnu.org ([208.118.235.92]:50950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gfNH1-00056Y-26
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:04:20 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gfNWJ-0001Bj-Kd
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:20:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gfNGx-00020v-6w
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:04:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48384)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gfNGw-0001z9-S8
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:04:15 -0500
-Date: Fri, 4 Jan 2019 12:04:06 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190104120406.52438fb2.cohuck@redhat.com>
-In-Reply-To: <CAJ+F1CLedF6tTqn3YSp9QeMchh_4LxBfiDCkLqn+8x2Q88GTDg@mail.gmail.com>
-References: <20181221090410.27250-1-marcandre.lureau@redhat.com>
-	<20181221090410.27250-26-marcandre.lureau@redhat.com>
-	<20181221163426.1e0bbb35.cohuck@redhat.com>
-	<CAJ+F1CLedF6tTqn3YSp9QeMchh_4LxBfiDCkLqn+8x2Q88GTDg@mail.gmail.com>
+	(envelope-from <stefanha@redhat.com>) id 1gfNWI-0004S5-SI
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 06:20:07 -0500
+Date: Fri, 4 Jan 2019 11:19:58 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190104111958.GC30381@stefanha-x1.localdomain>
+References: <20190103114700.9686-1-npes87184@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 25/28] qdev-props: remove errp from
- GlobalProperty
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="m51xatjYGsM+13rf"
+Content-Disposition: inline
+In-Reply-To: <20190103114700.9686-1-npes87184@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] dmg: fixing reading in dmg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: yuchenlin <npes87184@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Fri, 4 Jan 2019 14:57:26 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
 
-> Hi
->=20
-> On Fri, Dec 21, 2018 at 7:34 PM Cornelia Huck <cohuck@redhat.com> wrote:
-> >
-> > On Fri, 21 Dec 2018 13:04:07 +0400
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > =20
-> > > All qdev_prop_register_global() set &error_fatal for errp, except
-> > > '-rtc driftfix=3Dslew', which arguably should also use &error_fatal, =
-as
-> > > otherwise failing to apply the property would only report a warning.
-> > >
-> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > >  include/hw/qdev-core.h    | 6 ------
-> > >  hw/core/qdev-properties.c | 4 ++--
-> > >  qom/cpu.c                 | 1 -
-> > >  target/i386/cpu.c         | 1 -
-> > >  target/sparc/cpu.c        | 1 -
-> > >  vl.c                      | 1 -
-> > >  6 files changed, 2 insertions(+), 12 deletions(-)
-> > > =20
-> > =20
-> > > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> > > index 3467e0485c..a2d25d3d37 100644
-> > > --- a/hw/core/qdev-properties.c
-> > > +++ b/hw/core/qdev-properties.c
-> > > @@ -1238,8 +1238,8 @@ void qdev_prop_set_globals(DeviceState *dev)
-> > >          if (err !=3D NULL) {
-> > >              error_prepend(&err, "can't apply global %s.%s=3D%s: ",
-> > >                            prop->driver, prop->property, prop->value);
-> > > -            if (!dev->hotplugged && prop->errp) {
-> > > -                error_propagate(prop->errp, err);
-> > > +            if (!dev->hotplugged) {
-> > > +                error_propagate(&error_fatal, err); =20
-> >
-> > Might want to add a comment to this function that any error is fatal
-> > for non-hotplugged devices.
-> > =20
->=20
-> What about adding the following comment to GlobalProperty?
->=20
->  * An error is fatal for non-hotplugged devices, when the global is appli=
-ed.
+--m51xatjYGsM+13rf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Sounds good.
+On Thu, Jan 03, 2019 at 07:46:57PM +0800, yuchenlin wrote:
+> There are two bugs in dmg reading.
+>=20
+> First, it may hang in binary search. this problem is solved by patch 1.
+> Second, because of lacking zero chunk table, reading zero sector will
+> return EIO. this problem is solved by patch 2 and 3.
+>=20
+> Thanks
+>=20
+> v2 -> v3:
+> * fix potential overflow (Thanks Stefan)
+> * add Reviewed tag in patch 2 and 3
+>=20
+> v1 -> v2:
+> * fix typos in patch 1
+> * add patch 2 and patch 3
+>=20
+> yuchenlin (3):
+>   dmg: fix binary search
+>   dmg: use enumeration type instead of hard coding number
+>   dmg: don't skip zero chunk
+>=20
+>  block/dmg.c | 29 +++++++++++++++++++----------
+>  1 file changed, 19 insertions(+), 10 deletions(-)
+>=20
+> --=20
+> 2.17.1
+>=20
 
->=20
-> > >              } else {
-> > >                  warn_report_err(err);
-> > >              } =20
-> >
-> > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> > =20
->=20
-> thanks
->=20
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
+
+Stefan
+
+--m51xatjYGsM+13rf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcL0FeAAoJEJykq7OBq3PI0rAH/jihKBijXxIlgiJB/hzgUewF
+fxsmcJTSQ81hYv/gXaCw43QYef2s6QfTBTYWI6w5b8YDsEohv+9NpSJuVOMomC5k
+2w/OxUAdSPV3kLPdxuHm2V0kwNoqPYASXwJI/0YH8sStCkD2kLXn5Am51USOAMJj
+eYSmIhjpG6GcceUEYqONDDOSTX8TAGZxwk3WOQmvAnmnryxruG82CID+yZCM+AAV
+3KnDNB74CkZR8jt7GcSblZ7QhwBvg51ulZ5+J2x5czM3ynsNWxKiq1xryQjJjTeN
+mV8adlJMuvAxjof37JXTnaJp3adv9eXZFUtgN7fkpnNB09zUep7uM3yw/YFprPo=
+=ocy7
+-----END PGP SIGNATURE-----
+
+--m51xatjYGsM+13rf--
