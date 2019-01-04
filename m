@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:54241)
+Received: from eggs.gnu.org ([208.118.235.92]:54243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfSJ6-0006By-2X
+	(envelope-from <philmd@redhat.com>) id 1gfSJ6-0006Bz-3q
 	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:26:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gfSJ2-00038X-Qd
+	(envelope-from <philmd@redhat.com>) id 1gfSJ5-0003Ap-AC
 	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:26:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:12040)
+Received: from mx1.redhat.com ([209.132.183.28]:47290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gfSJ2-00038F-JQ
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:26:44 -0500
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gfSJ5-0003Ah-50
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 11:26:47 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri,  4 Jan 2019 17:25:58 +0100
-Message-Id: <20190104162559.20760-4-philmd@redhat.com>
+Date: Fri,  4 Jan 2019 17:25:59 +0100
+Message-Id: <20190104162559.20760-5-philmd@redhat.com>
 In-Reply-To: <20190104162559.20760-1-philmd@redhat.com>
 References: <20190104162559.20760-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/4] fw_cfg: Fix -boot reboot-timeout error
- checking
+Subject: [Qemu-devel] [PULL 4/4] fw_cfg: Make qemu_extra_params_fw locally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +31,58 @@ Cc: Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd 
 
 From: Li Qiang <liq3ea@gmail.com>
 
-fw_cfg_reboot() gets option parameter "reboot-timeout" with
-qemu_opt_get(), then converts it to an integer by hand. It neglects to
-check that conversion for errors, and fails to reject negative values.
-Positive values above the limit get reported and replaced by the limit.
-This patch checks for conversion errors properly, and reject all values
-outside 0...0xffff.
+qemu_extra_params_fw[] has external linkage, but is used
+only in fw_cfg_bootsplash(), it makes sense to make it
+locally.
 
 Signed-off-by: Li Qiang <liq3ea@gmail.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <1542777026-2788-3-git-send-email-liq3ea@gmail.com>
+Message-Id: <1542777026-2788-4-git-send-email-liq3ea@gmail.com>
+[PMD: Removed qemu_extra_params_fw declaration in vl.c]
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/nvram/fw_cfg.c | 27 +++++++++++++--------------
- vl.c              |  2 +-
- 2 files changed, 14 insertions(+), 15 deletions(-)
+ hw/nvram/fw_cfg.c       | 1 +
+ include/sysemu/sysemu.h | 1 -
+ vl.c                    | 1 -
+ 3 files changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index ad91abdbb7..cba58344f5 100644
+index cba58344f5..de58c7be46 100644
 --- a/hw/nvram/fw_cfg.c
 +++ b/hw/nvram/fw_cfg.c
-@@ -176,26 +176,25 @@ static void fw_cfg_bootsplash(FWCfgState *s)
-=20
- static void fw_cfg_reboot(FWCfgState *s)
+@@ -119,6 +119,7 @@ static void fw_cfg_bootsplash(FWCfgState *s)
  {
--    int reboot_timeout =3D -1;
--    char *p;
--    const char *temp;
-+    const char *reboot_timeout =3D NULL;
-+    int64_t rt_val =3D -1;
-=20
-     /* get user configuration */
-     QemuOptsList *plist =3D qemu_find_opts("boot-opts");
-     QemuOpts *opts =3D QTAILQ_FIRST(&plist->head);
--    if (opts !=3D NULL) {
--        temp =3D qemu_opt_get(opts, "reboot-timeout");
--        if (temp !=3D NULL) {
--            p =3D (char *)temp;
--            reboot_timeout =3D strtol(p, &p, 10);
-+    reboot_timeout =3D qemu_opt_get(opts, "reboot-timeout");
-+
-+    if (reboot_timeout) {
-+        rt_val =3D qemu_opt_get_number(opts, "reboot-timeout", -1);
-+        /* validate the input */
-+        if (rt_val < 0 || rt_val > 0xffff) {
-+            error_report("reboot timeout is invalid,"
-+                         "it should be a value between 0 and 65535");
-+            exit(1);
-         }
-     }
--    /* validate the input */
--    if (reboot_timeout > 0xffff) {
--        error_report("reboot timeout is larger than 65535, force it to 6=
-5535.");
--        reboot_timeout =3D 0xffff;
--    }
--    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&reboot_timeout, 4=
-), 4);
-+
-+    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&rt_val, 4), 4);
- }
-=20
- static void fw_cfg_write(FWCfgState *s, uint8_t value)
+     const char *boot_splash_filename =3D NULL;
+     const char *boot_splash_time =3D NULL;
++    uint8_t qemu_extra_params_fw[2];
+     char *filename, *file_data;
+     gsize file_size;
+     int file_type;
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index e0d15da937..85877b7e43 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -116,7 +116,6 @@ extern uint8_t *boot_splash_filedata;
+ extern size_t boot_splash_filedata_size;
+ extern bool enable_mlock;
+ extern bool enable_cpu_pm;
+-extern uint8_t qemu_extra_params_fw[2];
+ extern QEMUClockType rtc_clock;
+ extern const char *mem_path;
+ extern int mem_prealloc;
 diff --git a/vl.c b/vl.c
-index a24e5e076d..efa4ff9da5 100644
+index efa4ff9da5..0db5ad0246 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -341,7 +341,7 @@ static QemuOptsList qemu_boot_opts =3D {
-             .type =3D QEMU_OPT_NUMBER,
-         }, {
-             .name =3D "reboot-timeout",
--            .type =3D QEMU_OPT_STRING,
-+            .type =3D QEMU_OPT_NUMBER,
-         }, {
-             .name =3D "strict",
-             .type =3D QEMU_OPT_BOOL,
+@@ -191,7 +191,6 @@ int boot_menu;
+ bool boot_strict;
+ uint8_t *boot_splash_filedata;
+ size_t boot_splash_filedata_size;
+-uint8_t qemu_extra_params_fw[2];
+ bool wakeup_suspend_enabled;
+=20
+ int icount_align_option;
 --=20
 2.17.2
