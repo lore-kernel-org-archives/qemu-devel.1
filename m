@@ -1,32 +1,26 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:51318 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:51707 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gfo4F-0004Hv-2k
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:40:56 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gfo5q-0005QK-Jt
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:42:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gfo4B-0003VJ-9h
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:40:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40818)
+	(envelope-from <peter.maydell@linaro.org>) id 1gfo5o-0005l6-4S
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:42:33 -0500
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:35423)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gfo49-0003QU-C4
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:40:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gfo46-0000IG-BT
-	for <qemu-devel@nongnu.org>; Sat, 05 Jan 2019 15:40:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 55C962E8053
-	for <qemu-devel@nongnu.org>; Sat,  5 Jan 2019 15:40:46 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gfo5n-0005kE-Va
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:42:32 -0500
+Received: by mail-oi1-x231.google.com with SMTP id v6so32685024oif.2
+	for <qemu-devel@nongnu.org>; Sat, 05 Jan 2019 07:42:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 05 Jan 2019 15:32:49 -0000
-From: Lenny Helpline <1810603@bugs.launchpad.net>
-Reply-To: Bug 1810603 <1810603@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154670237006.5111.1505843603378488710.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810603] [NEW] QEMU QCow Images crow dramatically
+References: <CAHyh4xhv5ZDfZv842U=adQN7hQFr=16BKEgZcEUZOLjFo3P+Jw@mail.gmail.com>
+In-Reply-To: <CAHyh4xhv5ZDfZv842U=adQN7hQFr=16BKEgZcEUZOLjFo3P+Jw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 5 Jan 2019 15:42:18 +0000
+Message-ID: <CAFEAcA_GCPp7ga7OGkZQopOSY_u+mwJ=vve5a9a4uU217butcA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Why one virtio-pci device has two different
+ DeviceState?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,152 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 
-Public bug reported:
+On Fri, 4 Jan 2019 at 20:23, Jintack Lim <jintack@cs.columbia.edu> wrote:
+> I was wondering why one virtio-pci device has two different
+> DeviceState? - one directly from VirtIOPCIProxy and the other from
+> VirtIO<dev type> such as VirtIONet. As an example, they are denoted as
+> qdev and vdev respectively in virtio_net_pci_realize().
 
-I've recently migrated our VM infrastructure (~200 guest on 15 hosts)
-from vbox to Qemu (using KVM / libvirt). We have a master image (QEMU
-QCow v3) from which we spawn multiple instances (linked clones). All
-guests are being revert once per hour for security reasons.
+It's been a while since I looked at this, but there are two
+basic issues underlying the weird way virtio devices are
+set up:
+ (1) PCI is not the only "transport" -- the VirtIONet etc
+     are shared with other transports like MMIO or the S390 ones
+ (2) retaining back-compatibility matters a lot here: we need
+     command lines to still work, and also the migration data
+     stream needs to stay compatible
+Some of the way the devices are reflects the way we started
+with a design where there was only a single device (eg the
+pci virtio-net device) and then refactored it to support
+multiple transports while retaining back compatibility.
 
-About 2 weeks after we successfully migrated to Qemu, we noticed that
-almost all disks went full across all 15 hosts. Our investigation showed
-that the initial qcow disk images blow up from a few gigabytes to 100GB
-and more. This should not happen, as we revert all VMs back to the
-initial snapshot once per hour and hence all changes that have been made
-to disks must be reverted too.
+> I thought that just one DeviceState is enough for any device in QEMU.
+> Maybe I'm missing something fundamental here.
 
-We did an addition test with 24 hour time frame with which we could
-reproduce this bug as documented below.
+This isn't generally true, it's just that a lot of
+our devices are of the simple straightforward kind
+where that's true. It's also possible for an
+implementation of a device to be as a combination
+of other devices, which is what we have here.
+virtio-pci-net is-a PCIDevice (which in turn is-a Device),
+but it has-a VirtIONet device (which is-a Device) as
+part of its implementation.
+(It's also possible to manually create the pci
+transport and the virtio-net backend separately
+and connect them together without the virtio-pci-net
+device at all. That's more often used with non-pci
+transports but it works for pci too.)
 
-Initial disk image size (created on Jan 04):
--rw-r--r-- 1 root root 7.1G Jan  4 15:59 W10-TS01-0.img
--rw-r--r-- 1 root root 7.3G Jan  4 15:59 W10-TS02-0.img
--rw-r--r-- 1 root root 7.4G Jan  4 15:59 W10-TS03-0.img
--rw-r--r-- 1 root root 8.3G Jan  4 16:02 W10-CLIENT01-0.img
--rw-r--r-- 1 root root 8.6G Jan  4 16:05 W10-CLIENT02-0.img
--rw-r--r-- 1 root root 8.0G Jan  4 16:05 W10-CLIENT03-0.img
--rw-r--r-- 1 root root 8.3G Jan  4 16:08 W10-CLIENT04-0.img
--rw-r--r-- 1 root root 8.1G Jan  4 16:12 W10-CLIENT05-0.img
--rw-r--r-- 1 root root 8.0G Jan  4 16:12 W10-CLIENT06-0.img
--rw-r--r-- 1 root root 8.1G Jan  4 16:16 W10-CLIENT07-0.img
--rw-r--r-- 1 root root 7.6G Jan  4 16:16 W10-CLIENT08-0.img
--rw-r--r-- 1 root root 7.6G Jan  4 16:19 W10-CLIENT09-0.img
--rw-r--r-- 1 root root 7.5G Jan  4 16:21 W10-ROUTER-0.img
--rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
+You can also see a similar thing with a lot of the
+"container" SoC objects like TYPE_ASPEED_SOC, which
+is a subclass of DeviceState, but is implemented
+using a dozen different objects all of which are
+themselves DeviceState subclasses.
 
-Disk image size after 24 hours (printed on Jan 05):
--rw-r--r-- 1 root root  13G Jan  5 15:07 W10-TS01-0.img
--rw-r--r-- 1 root root 8.9G Jan  5 14:20 W10-TS02-0.img
--rw-r--r-- 1 root root 9.0G Jan  5 15:07 W10-TS03-0.img
--rw-r--r-- 1 root root  10G Jan  5 15:08 W10-CLIENT01-0.img
--rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT02-0.img
--rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT03-0.img
--rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT04-0.img
--rw-r--r-- 1 root root  19G Jan  5 15:07 W10-CLIENT05-0.img
--rw-r--r-- 1 root root  14G Jan  5 15:08 W10-CLIENT06-0.img
--rw-r--r-- 1 root root 9.7G Jan  5 15:07 W10-CLIENT07-0.img
--rw-r--r-- 1 root root  35G Jan  5 15:08 W10-CLIENT08-0.img
--rw-r--r-- 1 root root 9.2G Jan  5 15:07 W10-CLIENT09-0.img
--rw-r--r-- 1 root root  41G Jan  5 15:08 W10-ROUTER-0.img
--rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
-
-You can reproduce this bug as follow:
-1) create an initial disk image
-2) create a linked clone
-3) create a snapshot of the linked clone
-4) revert the snapshot every X minutes / hours
-
-Due the described behavior / bug, our VM farm is completely down at the
-moment (as we run out of disk space on all host systems). A quick fix
-for this bug would be much appreciated.
-
-Host OS: Ubuntu 18.04.01 LTS
-Kernel: 4.15.0-43-generic
-Qemu: 3.1.0
-libvirt: 4.10.0
-Guest OS: Windows 10 64bit
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810603
-
-Title:
-  QEMU QCow Images crow dramatically
-
-Status in QEMU:
-  New
-
-Bug description:
-  I've recently migrated our VM infrastructure (~200 guest on 15 hosts)
-  from vbox to Qemu (using KVM / libvirt). We have a master image (QEMU
-  QCow v3) from which we spawn multiple instances (linked clones). All
-  guests are being revert once per hour for security reasons.
-
-  About 2 weeks after we successfully migrated to Qemu, we noticed that
-  almost all disks went full across all 15 hosts. Our investigation
-  showed that the initial qcow disk images blow up from a few gigabytes
-  to 100GB and more. This should not happen, as we revert all VMs back
-  to the initial snapshot once per hour and hence all changes that have
-  been made to disks must be reverted too.
-
-  We did an addition test with 24 hour time frame with which we could
-  reproduce this bug as documented below.
-
-  Initial disk image size (created on Jan 04):
-  -rw-r--r-- 1 root root 7.1G Jan  4 15:59 W10-TS01-0.img
-  -rw-r--r-- 1 root root 7.3G Jan  4 15:59 W10-TS02-0.img
-  -rw-r--r-- 1 root root 7.4G Jan  4 15:59 W10-TS03-0.img
-  -rw-r--r-- 1 root root 8.3G Jan  4 16:02 W10-CLIENT01-0.img
-  -rw-r--r-- 1 root root 8.6G Jan  4 16:05 W10-CLIENT02-0.img
-  -rw-r--r-- 1 root root 8.0G Jan  4 16:05 W10-CLIENT03-0.img
-  -rw-r--r-- 1 root root 8.3G Jan  4 16:08 W10-CLIENT04-0.img
-  -rw-r--r-- 1 root root 8.1G Jan  4 16:12 W10-CLIENT05-0.img
-  -rw-r--r-- 1 root root 8.0G Jan  4 16:12 W10-CLIENT06-0.img
-  -rw-r--r-- 1 root root 8.1G Jan  4 16:16 W10-CLIENT07-0.img
-  -rw-r--r-- 1 root root 7.6G Jan  4 16:16 W10-CLIENT08-0.img
-  -rw-r--r-- 1 root root 7.6G Jan  4 16:19 W10-CLIENT09-0.img
-  -rw-r--r-- 1 root root 7.5G Jan  4 16:21 W10-ROUTER-0.img
-  -rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
-
-  Disk image size after 24 hours (printed on Jan 05):
-  -rw-r--r-- 1 root root  13G Jan  5 15:07 W10-TS01-0.img
-  -rw-r--r-- 1 root root 8.9G Jan  5 14:20 W10-TS02-0.img
-  -rw-r--r-- 1 root root 9.0G Jan  5 15:07 W10-TS03-0.img
-  -rw-r--r-- 1 root root  10G Jan  5 15:08 W10-CLIENT01-0.img
-  -rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT02-0.img
-  -rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT03-0.img
-  -rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT04-0.img
-  -rw-r--r-- 1 root root  19G Jan  5 15:07 W10-CLIENT05-0.img
-  -rw-r--r-- 1 root root  14G Jan  5 15:08 W10-CLIENT06-0.img
-  -rw-r--r-- 1 root root 9.7G Jan  5 15:07 W10-CLIENT07-0.img
-  -rw-r--r-- 1 root root  35G Jan  5 15:08 W10-CLIENT08-0.img
-  -rw-r--r-- 1 root root 9.2G Jan  5 15:07 W10-CLIENT09-0.img
-  -rw-r--r-- 1 root root  41G Jan  5 15:08 W10-ROUTER-0.img
-  -rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
-
-  You can reproduce this bug as follow:
-  1) create an initial disk image
-  2) create a linked clone
-  3) create a snapshot of the linked clone
-  4) revert the snapshot every X minutes / hours
-
-  Due the described behavior / bug, our VM farm is completely down at
-  the moment (as we run out of disk space on all host systems). A quick
-  fix for this bug would be much appreciated.
-
-  Host OS: Ubuntu 18.04.01 LTS
-  Kernel: 4.15.0-43-generic
-  Qemu: 3.1.0
-  libvirt: 4.10.0
-  Guest OS: Windows 10 64bit
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810603/+subscriptions
+thanks
+-- PMM
