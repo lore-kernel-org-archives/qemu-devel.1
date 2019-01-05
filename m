@@ -1,22 +1,29 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:54353 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:56416 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfmPG-0000mC-9Y
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 08:54:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1gfmVg-0003h0-AC
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 09:01:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfmPF-0000iq-Hf
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 08:54:30 -0500
-References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-9-eblake@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gfmVc-0007YC-A8
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 09:01:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57836)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gfmVc-0007Wl-53
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 09:01:04 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41A37C057F36
+	for <qemu-devel@nongnu.org>; Sat,  5 Jan 2019 14:01:03 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-216.phx2.redhat.com [10.3.116.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0383B5C22E
+	for <qemu-devel@nongnu.org>; Sat,  5 Jan 2019 14:01:02 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a7d780e1-60a8-262f-9989-f03f47e91f38@redhat.com>
-Date: Sat, 5 Jan 2019 07:54:18 -0600
+Date: Sat,  5 Jan 2019 08:00:52 -0600
+Message-Id: <20190105140100.26913-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181215135324.152629-9-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="J53o0J3HzlurLspdrUpyTp0w8H1h4XyH7"
-Subject: Re: [Qemu-devel] [PATCH v2 08/22] nbd/client: Drop pointless buf
- variable
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/8] NBD patches through 2019-01-05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +33,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: nsoffer@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com, rjones@redhat.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---J53o0J3HzlurLspdrUpyTp0w8H1h4XyH7
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: nsoffer@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
- rjones@redhat.com, qemu-block@nongnu.org
-Message-ID: <a7d780e1-60a8-262f-9989-f03f47e91f38@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 08/22] nbd/client: Drop pointless buf
- variable
-References: <20181215135324.152629-1-eblake@redhat.com>
- <20181215135324.152629-9-eblake@redhat.com>
-In-Reply-To: <20181215135324.152629-9-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit 9b2e891ec5ccdb4a7d583b77988848282606fd=
+ea:
 
-On 12/15/18 7:53 AM, Eric Blake wrote:
-> There's no need to read into a temporary buffer (oversized
-> since commit 7d3123e1) followed by a byteswap into a uint64_t
-> to check for a magic number via memcmp(), when the code
-> immediately below demonstrates reading into the uint64_t then
-> byteswapping in place and checking for a magic number via
-> integer math.  What's more, having a different error message
-> when the server's first reply byte is 0 is unusual - it's no
-> different from any other wrong magic number, and we already
-> detected short reads. That whole strlen() issue has been
-> present and useless since commit 1d45f8b5 in 2010; perhaps it
-> was leftover debugging (since the correct magic number happens
-> to be ASCII)?  Make the error messages more consistent and
-> detailed while touching things.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+  Merge remote-tracking branch 'remotes/marcel/tags/rdma-pull-request' in=
+to staging (2018-12-22 11:25:31 +0000)
 
-I'm queuing 1, 2, 5, 6, and 8 for my next NBD pull request, and will
-respin the rest of the series to incorporate review comments.
+are available in the Git repository at:
+
+  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-01-05
+
+for you to fetch changes up to ef2e35fcc8e14bcc9366df5fdf53f65d679f8dca:
+
+  nbd/client: Drop pointless buf variable (2019-01-05 07:53:22 -0600)
+
+----------------------------------------------------------------
+nbd patches for 2019-01-05
+
+Error and trace improvements in NBD code, such as less noise for
+common disconnect scenarios.
+
+- Vladimir Sementsov-Ogievskiy: 0/3 nbd-client: drop extra error noise
+- Eric Blake: portions of 0/22 nbd: add qemu-nbd --list
+
+----------------------------------------------------------------
+Eric Blake (6):
+      nbd/client: Trace all server option error messages
+      qemu-nbd: Use program name in error messages
+      nbd: Document timeline of various features
+      nbd/client: More consistent error messages
+      qemu-nbd: Fail earlier for -c/-d on non-linux
+      nbd/client: Drop pointless buf variable
+
+Vladimir Sementsov-Ogievskiy (2):
+      nbd: publish _lookup functions
+      block/nbd-client: use traces instead of noisy error_report_err
+
+ docs/interop/nbd.txt       | 19 +++++++++++++-
+ include/block/nbd.h        |  5 ++++
+ nbd/nbd-internal.h         |  8 ++----
+ block/nbd-client.c         | 23 ++++++++++++++---
+ nbd/client.c               | 63 ++++++++++++++++------------------------=
+------
+ qemu-nbd.c                 | 22 ++++++++++++++--
+ block/trace-events         |  4 +++
+ nbd/trace-events           |  1 +
+ tests/qemu-iotests/083.out | 28 ---------------------
+ tests/qemu-iotests/233.out |  2 +-
+ 10 files changed, 92 insertions(+), 83 deletions(-)
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---J53o0J3HzlurLspdrUpyTp0w8H1h4XyH7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwwtwoACgkQ3g5py3or
-ov2/mwf/QnFJxXkBH8U1a11xAF9LSuY3yiOPct0BvVv2bwPvbUCslOgNF8++E8+4
-6xnnzsRi/Io02aPqD0aoRHhN7mOm5iivwguy7KKyZtFMZULSTzq1fsLiRql5ZSXV
-pzNjuL1StA5wh1N6aLdCHq3s6UHWsFWww0GIkGyxKnV51H93Qqo3F7aDQDot5Dor
-ez9bp0tha/Otjlex85v4s1woe2ZDUQfBbsqz4Ac02lNNvTkv5rSzR3O6RLhlypXb
-sQxNCbfTbCuS2nAlmF3h5UNUvQFiBGzinvGdwjwIMklxJnJjwsnnLrXSXF3eFSRI
-SqiL8APWOVbA+0MouWTo7Ip1Lu6MNg==
-=lsR+
------END PGP SIGNATURE-----
-
---J53o0J3HzlurLspdrUpyTp0w8H1h4XyH7--
+2.20.1
