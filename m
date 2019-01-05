@@ -1,29 +1,34 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:53630 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:40690 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gfbwP-00044J-NP
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 21:44:02 -0500
+	(envelope-from <bounces@canonical.com>) id 1gfdX6-0001J6-2z
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 23:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gfbwM-0002c2-JE
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 21:44:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53364)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gfbwM-0002bF-Bl
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 21:43:58 -0500
-Date: Sat, 5 Jan 2019 00:43:51 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190105024350.GO4157@habkost.net>
-References: <20181127135030.1671-1-i.maximets@samsung.com>
-	<CGME20181127135045eucas1p1e259cacbab5e715f7845b9beee22f882@eucas1p1.samsung.com>
-	<20181127135030.1671-2-i.maximets@samsung.com>
-	<20181210171845.4f132e25@Igors-MacBook-Pro.local>
-	<61558042-beba-3a2a-b3de-c39faf8cc078@samsung.com>
-	<20181211164823.6d048a83@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gfdX2-0000oP-2k
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 23:26:00 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48786)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gfdX1-0000mt-Px
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 23:25:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gfdWz-0002Ly-R5
+	for <qemu-devel@nongnu.org>; Sat, 05 Jan 2019 04:25:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A81462E80D5
+	for <qemu-devel@nongnu.org>; Sat,  5 Jan 2019 04:25:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181211164823.6d048a83@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] hostmem-memfd: disable for systems
- wihtout sealing support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 05 Jan 2019 04:17:39 -0000
+From: Launchpad Bug Tracker <1800786@bugs.launchpad.net>
+Reply-To: Bug 1800786 <1800786@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154097463545.29353.15792040571614234775.malonedeb@soybean.canonical.com>
+Message-Id: <154666185962.14887.9194159854444222197.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1800786] Re: USB assertion `s->csw.sig ==
+ cpu_to_le32(0x53425355)' failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +37,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Ilya Maximets <i.maximets@samsung.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Dec 11, 2018 at 04:48:23PM +0100, Igor Mammedov wrote:
-> On Tue, 11 Dec 2018 13:29:19 +0300
-> Ilya Maximets <i.maximets@samsung.com> wrote:
-> 
-> CCing libvirt folk for an opinion
-> 
-> > On 10.12.2018 19:18, Igor Mammedov wrote:
-> > > On Tue, 27 Nov 2018 16:50:27 +0300
-> > > Ilya Maximets <i.maximets@samsung.com> wrote:
-> > > 
-> > > s/wihtout/without/ in subj
-> > >   
-> > >> If seals are not supported, memfd_create() will fail.
-> > >> Furthermore, there is no way to disable it in this case because
-> > >> '.seal' property is not registered.
-> > >>
-> > >> This issue leads to vhost-user-test failures on RHEL 7.2:
-> > >>
-> > >>   qemu-system-x86_64: -object memory-backend-memfd,id=mem,size=2M,: \
-> > >>                       failed to create memfd: Invalid argument
-> > >>
-> > >> and actually breaks the feature on such systems.
-> > >>
-> > >> Let's restrict memfd backend to systems with sealing support.
-> > >>
-> [...]
-> > >> @@ -177,7 +175,7 @@ static const TypeInfo memfd_backend_info = {
-> > >>  
-> > >>  static void register_types(void)
-> > >>  {
-> > >> -    if (qemu_memfd_check(0)) {
-> > >> +    if (qemu_memfd_check(MFD_ALLOW_SEALING)) {
-> > >>          type_register_static(&memfd_backend_info);  
-> > > that would either lead to not clear error that type doesn't exist.
-> > > it could be better to report sensible error from memfd_backend_memory_alloc() if
-> > > the feature is required but not supported by host   
-> > 
-> > I'm not sure, but this could break the libvirt capability discovering.
-> > 
-> > Current patch changes behaviour probably only for RHEL/CentOS 7.2.
-> > All other systems are not affected. Do you think that we need to
-> > change behaviour on all the systems?
-> you are changing behavior anyways, so when users start getting
-> on some of 'All other systems' start getting 'type doesn't exist'
-> error, they won't have a clue what's wrong. In case where we are
-> fixing broken defaults, shouldn't we at least do it the way that
-> would inform user about misconfiguration.
-> 
-> But I'm not insisting since memfd is fairly new, it might be fine
-> for device to just disappear.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-(Sorry for taking so long to reply on this series.  I couldn't
-review the code yet.)
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-I'd like to make the QOM type hierarchy static, and not depend on
-any runtime host capability checks.  But this is not a new
-problem in the code, so I don't think it should block this
-series.
+-- =
 
--- 
-Eduardo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1800786
+
+Title:
+  USB assertion `s->csw.sig =3D=3D cpu_to_le32(0x53425355)' failed
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Qemu crashed after starting and stopping VM for many times, and the
+  final log shows below.
+
+  qemu-system-x86_64: hw/usb/dev-storage.c:236: usb_msd_send_status: Assert=
+ion `s->csw.sig =3D=3D cpu_to_le32(0x53425355)' failed.
+  2018-10-05 15:33:11.261+0000: shutting down
+
+  I got the back trace in coredump file:
+
+  -----------------------back trace----------------------------------------
+  #0 0x00007fc890e6cff9 in __GI_raise (sig=3Dsig@entry=3D6) =
+
+      at ../nptl/sysdeps/unix/sysv/linux/raise.c:56 =
+
+  #1 0x00007fc890e700f8 in __GI_abort () at abort.c:89 =
+
+  #2 0x00007fc890e66216 in __assert_fail_base ( =
+
+      fmt=3D0x7fc890f9dfc0 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", =
+
+      assertion=3Dassertion@entry=3D0x7fc8957cd460 "s->csw.sig =3D=3D cpu_t=
+o_le32(0x53425355)", file=3Dfile@entry=3D0x7fc8957cd2d0 "hw/usb/dev-storage=
+.c", =
+
+      line=3Dline@entry=3D236, =
+
+      function=3Dfunction@entry=3D0x7fc8957cd5e0 <__PRETTY_FUNCTION__.29765=
+> "usb_msd_send_status") at assert.c:92 =
+
+  #3 0x00007fc890e662c2 in __GI___assert_fail ( =
+
+      assertion=3Dassertion@entry=3D0x7fc8957cd460 "s->csw.sig =3D=3D cpu_t=
+o_le32(0x53425355)", file=3Dfile@entry=3D0x7fc8957cd2d0 "hw/usb/dev-storage=
+.c", =
+
+      line=3Dline@entry=3D236, =
+
+      function=3Dfunction@entry=3D0x7fc8957cd5e0 <__PRETTY_FUNCTION__.29765=
+> "usb_msd_send_status") at assert.c:101 =
+
+  #4 0x00007fc8955dee12 in usb_msd_send_status (s=3D0x7fc8961588f0, =
+
+      p=3D<optimized out>) at hw/usb/dev-storage.c:236 =
+
+  #5 0x00007fc8955df092 in usb_msd_handle_data (dev=3D0x7fc8961588f0, =
+
+      p=3D0x7fc896105260) at hw/usb/dev-storage.c:507 =
+
+  #6 0x00007fc8955d5940 in usb_handle_packet (dev=3D<optimized out>, =
+
+      p=3Dp@entry=3D0x7fc896105260) at hw/usb/core.c:407 =
+
+  #7 0x00007fc8955ea8a8 in uhci_handle_td (s=3Ds@entry=3D0x7fc896133080, =
+
+  ---Type <return> to continue, or q <return> to quit--- =
+
+      q=3D0x7fc896197c90, q@entry=3D0x0, qh_addr=3Dqh_addr@entry=3D25394381=
+0, =
+
+      td=3Dtd@entry=3D0x7ffcc646c0e0, td_addr=3D<optimized out>, =
+
+      int_mask=3Dint_mask@entry=3D0x7ffcc646c0cc) at hw/usb/hcd-uhci.c:911 =
+
+  #8 0x00007fc8955eada9 in uhci_process_frame (s=3Ds@entry=3D0x7fc896133080=
+) =
+
+      at hw/usb/hcd-uhci.c:1091 =
+
+  #9 0x00007fc8955eaff5 in uhci_frame_timer (opaque=3D0x7fc896133080) =
+
+      at hw/usb/hcd-uhci.c:1190 =
+
+  #10 0x00007fc895636c69 in timerlist_run_timers (timer_list=3D0x7fc896093a=
+f0) =
+
+      at qemu-timer.c:491 =
+
+  #11 0x00007fc895636f01 in qemu_clock_run_timers (type=3D<optimized out>) =
+
+      at qemu-timer.c:502 =
+
+  #12 qemu_clock_run_all_timers () at qemu-timer.c:608 =
+
+  #13 0x00007fc8955f9b0c in main_loop_wait (nonblocking=3D<optimized out>) =
+
+      at main-loop.c:507 =
+
+  #14 0x00007fc8954bc750 in main_loop () at vl.c:2021 =
+
+  #15 main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
+ed out>) =
+
+      at vl.c:4447 =
+
+  -------------------------------------------------------------------------=
+------
+
+  QEMU release version: 1.7.2
+
+  QEMU command:
+
+  qemu-system-x86_64 -enable-kvm -name guest=3Dguest,debug-threads=3Don -S
+  -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-4=
+2-guest
+  /master-key.aes -machine pc-i440fx-xenial,accel=3Dkvm,usb=3Doff,dump-
+  guest-core=3Doff -cpu IvyBridge-
+  IBRS,ss=3Don,vmx=3Don,pcid=3Don,hypervisor=3Don,arat=3Don,tsc_adjust=3Don=
+,ssbd=3Don,xsaveopt=3Don
+  -m 1024 -realtime mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -u=
+uid
+  f4fdccb5-8c59-441f-9a78-83d23fbc34f6 -no-user-config -nodefaults
+  -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-42-guest/moni=
+tor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-h=
+pet
+  -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
+  PIIX4_PM.disable_s4=3D1 -boot menu=3Doff,strict=3Don -kernel
+  /nfsroot/rootfs/root/bzImage -initrd /nfsroot/rootfs/root/wrlinux-
+  image-initramfs-x86-64-kvm-guest.cpio.gz -device piix3-usb-
+  uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -device
+  lsi,id=3Dscsi0,bus=3Dpci.0,addr=3D0x7 -device
+  ahci,id=3Dsata0,bus=3Dpci.0,addr=3D0x6 -device virtio-serial-pci,id=3Dvir=
+tio-
+  serial0,bus=3Dpci.0,addr=3D0x5 -drive file=3D/nfsroot/rootfs.ovp6/wrlinux-
+  image-ovp-kvm-
+  intel-x86-64-20181015084008.rootfs.ext3,format=3Draw,if=3Dnone,id=3Ddrive-
+  usb-disk0 -device usb-storage,bus=3Dusb.0,port=3D1,drive=3Ddrive-usb-
+  disk0,id=3Dusb-disk0,bootindex=3D1,removable=3Doff -netdev
+  tap,fd=3D26,id=3Dhostnet0 -device
+  e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:93:6b:0c,bus=3Dpci.0,add=
+r=3D0x3
+  -chardev pty,id=3Dcharserial0 -device isa-
+  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+  spicevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus
+  =3Dvirtio-
+  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.s=
+pice.0
+  -spice port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-
+  compression=3Doff,seamless-migration=3Don -device qxl-
+  vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=
+=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpci.0,addr=3D0x2
+  -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-
+  duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -device virtio-balloon-
+  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 -msg timestamp=3Don
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1800786/+subscriptions
