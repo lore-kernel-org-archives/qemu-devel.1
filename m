@@ -1,19 +1,27 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:56601 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:36967 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfmVv-0003tx-No
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 09:01:25 -0500
+	(envelope-from <eblake@redhat.com>) id 1gfn22-0001K4-Jo
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 09:34:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfmVt-0007oQ-Pk
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 09:01:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1gfn1x-0003Zh-VG
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 09:34:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42292)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gfn1x-0003ZK-KN
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 09:34:29 -0500
+References: <20190104153951.32306-1-eblake@redhat.com>
+	<4e30c442-6ddc-2988-160e-168dec552966@gmail.com>
+	<758d4c6d-75a3-df55-9128-dad29259da4e@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Date: Sat,  5 Jan 2019 08:00:59 -0600
-Message-Id: <20190105140100.26913-8-eblake@redhat.com>
-In-Reply-To: <20190105140100.26913-1-eblake@redhat.com>
-References: <20190105140100.26913-1-eblake@redhat.com>
+Message-ID: <6521a91d-d44f-6116-fd7b-2be7fbac9853@redhat.com>
+Date: Sat, 5 Jan 2019 08:34:26 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 7/8] qemu-nbd: Fail earlier for -c/-d on
- non-linux
+In-Reply-To: <758d4c6d-75a3-df55-9128-dad29259da4e@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="E873hblAXHmSbMfSuiCRaHcBNLU9nNJyJ"
+Subject: Re: [Qemu-devel] [RFC PATCH] osdep: Make MIN/MAX evaluate arguments
+ only once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,148 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Richard W . M . Jones" <rjones@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>, qemu-devel@nongnu.org
 
-Connecting to a /dev/nbdN device is a Linux-specific action.
-We were already masking -c and -d from 'qemu-nbd --help' on
-non-linux.  However, while -d fails with a sensible error
-message, it took hunting through a couple of files to prove
-that.  What's more, the code for -c doesn't fail until after
-it has created a pthread and tried to open a device - possibly
-even printing an error message with %m on a non-Linux platform
-in spite of the comment that %m is glibc-specific.  Make the
-failure happen sooner, then get rid of stubs that are no
-longer needed because of the early exits.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--E873hblAXHmSbMfSuiCRaHcBNLU9nNJyJ
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>,
+ qemu-devel@nongnu.org
+Message-ID: <6521a91d-d44f-6116-fd7b-2be7fbac9853@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] osdep: Make MIN/MAX evaluate arguments
+ only once
+References: <20190104153951.32306-1-eblake@redhat.com>
+ <4e30c442-6ddc-2988-160e-168dec552966@gmail.com>
+ <758d4c6d-75a3-df55-9128-dad29259da4e@redhat.com>
+In-Reply-To: <758d4c6d-75a3-df55-9128-dad29259da4e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-While at it: tweak the blank newlines in --help output to be
-consistent, whether or not built on Linux.
+On 1/5/19 7:48 AM, Eric Blake wrote:
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181215135324.152629-7-eblake@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- nbd/client.c | 18 +-----------------
- qemu-nbd.c   | 21 +++++++++++++++++++--
- 2 files changed, 20 insertions(+), 19 deletions(-)
+> I'm fine keeping the name MIN/MAX for the common use, but we'd need a
+> second pair, maybe named MIN_CONST/MAX_CONST, for use in contexts that
+> require a constant (there, both arguments are evaluated twice because i=
+t
+> is the naive implementation, but that is harmless because both argument=
+s
+> are constant and the macro is then usable in places where the smart
+> MIN/MAX are not).  I don't know if trying to use __builtin_constant_p i=
+n
+> the const version would also be worthwhile.  In fact, if
+> __builtin_constant_p is powerful enough, perhaps we could use it to
+> force a single macro to expand to the naive version if both arguments
+> are constant and the smart version otherwise.  I'll give that a shot.
 
-diff --git a/nbd/client.c b/nbd/client.c
-index e77414711ba..5a03a844187 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -1031,23 +1031,7 @@ int nbd_disconnect(int fd)
-     return 0;
- }
+Alas, even though __builtin_constant_p can let the compiler overlook
+SOME cases of non-constant code (as in __builtin_constant_p(0 && foo())
+returning 1), it is not powerful enough to ignore the dead branch:
 
--#else
--int nbd_init(int fd, QIOChannelSocket *ioc, NBDExportInfo *info,
--	     Error **errp)
--{
--    error_setg(errp, "nbd_init is only supported on Linux");
--    return -ENOTSUP;
--}
--
--int nbd_client(int fd)
--{
--    return -ENOTSUP;
--}
--int nbd_disconnect(int fd)
--{
--    return -ENOTSUP;
--}
--#endif
-+#endif /* __linux__ */
+$ cat foo.c
+#define MIN(a, b)                                               \
+    (__builtin_constant_p(a) && __builtin_constant_p(b) ?       \
+     (a) < (b) ? (a) : (b) :                                    \
+     ({                                                         \
+         __auto_type _a =3D (a) + 0;                              \
+         __auto_type _b =3D (b) + 0;                              \
+         _a < _b ? _a : _b;                                     \
+     }))
 
- int nbd_send_request(QIOChannel *ioc, NBDRequest *request)
- {
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index e169b839ece..2807e132396 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -43,6 +43,12 @@
- #include "trace/control.h"
- #include "qemu-version.h"
+char x[MIN(1, 2)];
 
-+#ifdef __linux__
-+#define HAVE_NBD_DEVICE 1
-+#else
-+#define HAVE_NBD_DEVICE 0
-+#endif
-+
- #define SOCKET_PATH                "/var/lock/qemu-nbd-%s"
- #define QEMU_NBD_OPT_CACHE         256
- #define QEMU_NBD_OPT_AIO           257
-@@ -98,11 +104,11 @@ static void usage(const char *name)
- "                            specify tracing options\n"
- "  --fork                    fork off the server process and exit the pa=
-rent\n"
- "                            once the server is running\n"
--#ifdef __linux__
-+#if HAVE_NBD_DEVICE
-+"\n"
- "Kernel NBD client support:\n"
- "  -c, --connect=3DDEV         connect FILE to the local NBD device DEV\=
-n"
- "  -d, --disconnect          disconnect the specified device\n"
--"\n"
- #endif
- "\n"
- "Block device options:\n"
-@@ -236,6 +242,7 @@ static void termsig_handler(int signum)
- }
+int
+main(int argc, char **argv)
+{
+    return MIN(argc, 0);
+}
+$ gcc -o foo -Wall foo.c
+foo.c:4:6: error: braced-group within expression allowed only inside a
+function
+      ({                                                         \
+      ^
+foo.c:10:8: note: in expansion of macro =E2=80=98MIN=E2=80=99
+ char x[MIN(1, 2)];
+        ^~~
 
+If anyone can come up with a workaround for single-macro usage, be my
+guest.  Otherwise, I'm going with the two-macro solution, with MIN/MAX
+for common use, and MIN_CONST/MAX_CONST for constant-context use.
 
-+#if HAVE_NBD_DEVICE
- static void *show_parts(void *arg)
- {
-     char *device =3D arg;
-@@ -321,6 +328,7 @@ out:
-     kill(getpid(), SIGTERM);
-     return (void *) EXIT_FAILURE;
- }
-+#endif /* HAVE_NBD_DEVICE */
-
- static int nbd_can_accept(void)
- {
-@@ -814,6 +822,12 @@ int main(int argc, char **argv)
-         }
-     }
-
-+#if !HAVE_NBD_DEVICE
-+    if (disconnect || device) {
-+        error_report("Kernel /dev/nbdN support not available");
-+        exit(EXIT_FAILURE);
-+    }
-+#else /* HAVE_NBD_DEVICE */
-     if (disconnect) {
-         int nbdfd =3D open(argv[optind], O_RDWR);
-         if (nbdfd < 0) {
-@@ -829,6 +843,7 @@ int main(int argc, char **argv)
-
-         return 0;
-     }
-+#endif
-
-     if ((device && !verbose) || fork_process) {
-         int stderr_fd[2];
-@@ -1006,6 +1021,7 @@ int main(int argc, char **argv)
-     nbd_export_set_description(exp, export_description);
-
-     if (device) {
-+#if HAVE_NBD_DEVICE
-         int ret;
-
-         ret =3D pthread_create(&client_thread, NULL, nbd_client_thread, =
-device);
-@@ -1013,6 +1029,7 @@ int main(int argc, char **argv)
-             error_report("Failed to create client thread: %s", strerror(=
-ret));
-             exit(EXIT_FAILURE);
-         }
-+#endif
-     } else {
-         /* Shut up GCC warnings.  */
-         memset(&client_thread, 0, sizeof(client_thread));
 --=20
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--E873hblAXHmSbMfSuiCRaHcBNLU9nNJyJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwwwHIACgkQ3g5py3or
+ov1nYAf9G2LjN+ixAYW3u5zsliGX8l+jE+dAJnyLwM5Y+n+Zx1lNpZCPfmznIehi
+sx5xHUvkHYz20NCutPkU6H5D/kN8xExLaw94byAFbrpnkxHchGlecY42m0K6ji5K
+rIhFVpOp8iCyVj2SJsqr6amYLsWPWz0vO5nDsZV0b5C+mHTt/ATAUGhmEBmkqqT1
+frNnYH08IwMUysjodxzsYJ0Qx23o0y1k8dLIxb43TNYziNcqyvpKBLwWgePEsOuf
+dslVqaEEz8ya9TXJ4V8j4onGtRzRIZ14wOR1zWJDQykt4MD9Vx0SiUuv67wmMGdo
+7tNnu7rPDS2BMFm4E+tU6FDivWJIIA==
+=wV9/
+-----END PGP SIGNATURE-----
+
+--E873hblAXHmSbMfSuiCRaHcBNLU9nNJyJ--
