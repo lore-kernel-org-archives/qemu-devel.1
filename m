@@ -1,14 +1,29 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:53058 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:53630 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gfbsJ-0002mp-EP
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 21:39:48 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gfbwP-00044J-NP
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 21:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gfbsG-0007qz-3o
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 21:39:47 -0500
-From: Li Qiang <liq3ea@163.com>
-Date: Fri,  4 Jan 2019 18:38:31 -0800
-Message-Id: <20190105023831.66910-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH] ioapic: use TYPE_FOO MACRO than constant string
+	(envelope-from <ehabkost@redhat.com>) id 1gfbwM-0002c2-JE
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 21:44:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gfbwM-0002bF-Bl
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 21:43:58 -0500
+Date: Sat, 5 Jan 2019 00:43:51 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190105024350.GO4157@habkost.net>
+References: <20181127135030.1671-1-i.maximets@samsung.com>
+	<CGME20181127135045eucas1p1e259cacbab5e715f7845b9beee22f882@eucas1p1.samsung.com>
+	<20181127135030.1671-2-i.maximets@samsung.com>
+	<20181210171845.4f132e25@Igors-MacBook-Pro.local>
+	<61558042-beba-3a2a-b3de-c39faf8cc078@samsung.com>
+	<20181211164823.6d048a83@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181211164823.6d048a83@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] hostmem-memfd: disable for systems
+ wihtout sealing support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,75 +32,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, lvivier@redhat.com, Li Qiang <liq3ea@163.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Ilya Maximets <i.maximets@samsung.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Make them more QOMConventional.
-Cc:qemu-trivial@nongnu.org
+On Tue, Dec 11, 2018 at 04:48:23PM +0100, Igor Mammedov wrote:
+> On Tue, 11 Dec 2018 13:29:19 +0300
+> Ilya Maximets <i.maximets@samsung.com> wrote:
+> 
+> CCing libvirt folk for an opinion
+> 
+> > On 10.12.2018 19:18, Igor Mammedov wrote:
+> > > On Tue, 27 Nov 2018 16:50:27 +0300
+> > > Ilya Maximets <i.maximets@samsung.com> wrote:
+> > > 
+> > > s/wihtout/without/ in subj
+> > >   
+> > >> If seals are not supported, memfd_create() will fail.
+> > >> Furthermore, there is no way to disable it in this case because
+> > >> '.seal' property is not registered.
+> > >>
+> > >> This issue leads to vhost-user-test failures on RHEL 7.2:
+> > >>
+> > >>   qemu-system-x86_64: -object memory-backend-memfd,id=mem,size=2M,: \
+> > >>                       failed to create memfd: Invalid argument
+> > >>
+> > >> and actually breaks the feature on such systems.
+> > >>
+> > >> Let's restrict memfd backend to systems with sealing support.
+> > >>
+> [...]
+> > >> @@ -177,7 +175,7 @@ static const TypeInfo memfd_backend_info = {
+> > >>  
+> > >>  static void register_types(void)
+> > >>  {
+> > >> -    if (qemu_memfd_check(0)) {
+> > >> +    if (qemu_memfd_check(MFD_ALLOW_SEALING)) {
+> > >>          type_register_static(&memfd_backend_info);  
+> > > that would either lead to not clear error that type doesn't exist.
+> > > it could be better to report sensible error from memfd_backend_memory_alloc() if
+> > > the feature is required but not supported by host   
+> > 
+> > I'm not sure, but this could break the libvirt capability discovering.
+> > 
+> > Current patch changes behaviour probably only for RHEL/CentOS 7.2.
+> > All other systems are not affected. Do you think that we need to
+> > change behaviour on all the systems?
+> you are changing behavior anyways, so when users start getting
+> on some of 'All other systems' start getting 'type doesn't exist'
+> error, they won't have a clue what's wrong. In case where we are
+> fixing broken defaults, shouldn't we at least do it the way that
+> would inform user about misconfiguration.
+> 
+> But I'm not insisting since memfd is fairly new, it might be fine
+> for device to just disappear.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- hw/i386/kvm/ioapic.c     | 2 +-
- hw/i386/pc.c             | 4 ++--
- hw/intc/ioapic.c         | 2 +-
- include/hw/i386/ioapic.h | 3 +++
- 4 files changed, 7 insertions(+), 4 deletions(-)
+(Sorry for taking so long to reply on this series.  I couldn't
+review the code yet.)
 
-diff --git a/hw/i386/kvm/ioapic.c b/hw/i386/kvm/ioapic.c
-index 5b40d75439..e453692199 100644
---- a/hw/i386/kvm/ioapic.c
-+++ b/hw/i386/kvm/ioapic.c
-@@ -163,7 +163,7 @@ static void kvm_ioapic_class_init(ObjectClass *klass, void *data)
- }
- 
- static const TypeInfo kvm_ioapic_info = {
--    .name  = "kvm-ioapic",
-+    .name  = TYPE_KVM_IOAPIC,
-     .parent = TYPE_IOAPIC_COMMON,
-     .instance_size = sizeof(KVMIOAPICState),
-     .class_init = kvm_ioapic_class_init,
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f248662e97..af68a61615 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1665,9 +1665,9 @@ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
-     unsigned int i;
- 
-     if (kvm_ioapic_in_kernel()) {
--        dev = qdev_create(NULL, "kvm-ioapic");
-+        dev = qdev_create(NULL, TYPE_KVM_IOAPIC);
-     } else {
--        dev = qdev_create(NULL, "ioapic");
-+        dev = qdev_create(NULL, TYPE_IOAPIC);
-     }
-     if (parent_name) {
-         object_property_add_child(object_resolve_path(parent_name, NULL),
-diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-index 4e529729b4..9d75f84d3b 100644
---- a/hw/intc/ioapic.c
-+++ b/hw/intc/ioapic.c
-@@ -429,7 +429,7 @@ static void ioapic_class_init(ObjectClass *klass, void *data)
- }
- 
- static const TypeInfo ioapic_info = {
--    .name          = "ioapic",
-+    .name          = TYPE_IOAPIC,
-     .parent        = TYPE_IOAPIC_COMMON,
-     .instance_size = sizeof(IOAPICCommonState),
-     .class_init    = ioapic_class_init,
-diff --git a/include/hw/i386/ioapic.h b/include/hw/i386/ioapic.h
-index 9c8816f11f..59fcb158a7 100644
---- a/include/hw/i386/ioapic.h
-+++ b/include/hw/i386/ioapic.h
-@@ -23,6 +23,9 @@
- #define IOAPIC_NUM_PINS 24
- #define IO_APIC_DEFAULT_ADDRESS 0xfec00000
- 
-+#define TYPE_KVM_IOAPIC "kvm-ioapic"
-+#define TYPE_IOAPIC "ioapic"
-+
- void ioapic_eoi_broadcast(int vector);
- 
- #endif /* HW_IOAPIC_H */
+I'd like to make the QOM type hierarchy static, and not depend on
+any runtime host capability checks.  But this is not a new
+problem in the code, so I don't think it should block this
+series.
+
 -- 
-2.17.1
+Eduardo
