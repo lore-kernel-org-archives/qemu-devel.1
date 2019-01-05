@@ -1,27 +1,32 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:49417 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:51318 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfnw7-0002Ev-SD
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:32:32 -0500
+	(envelope-from <bounces@canonical.com>) id 1gfo4F-0004Hv-2k
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:40:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfnw6-0006Di-VU
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:32:31 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38685)
+	(envelope-from <bounces@canonical.com>) id 1gfo4B-0003VJ-9h
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:40:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40818)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfnw6-00069v-Qh
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:32:30 -0500
-Received: by mail-oi1-x243.google.com with SMTP id a77so32669856oii.5
-	for <qemu-devel@nongnu.org>; Sat, 05 Jan 2019 07:32:25 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gfo49-0003QU-C4
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:40:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gfo46-0000IG-BT
+	for <qemu-devel@nongnu.org>; Sat, 05 Jan 2019 15:40:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 55C962E8053
+	for <qemu-devel@nongnu.org>; Sat,  5 Jan 2019 15:40:46 +0000 (UTC)
 MIME-Version: 1.0
-References: <20181227063419.12981-1-yang.zhong@intel.com>
-	<20181227063419.12981-24-yang.zhong@intel.com>
-In-Reply-To: <20181227063419.12981-24-yang.zhong@intel.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 5 Jan 2019 15:32:13 +0000
-Message-ID: <CAFEAcA9c3VRmcUiiHFZ-5BW6kQ3ACGkVE6ZLTyJ=KgA=YGws=w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH 23/25] x86_64-softmmu.mak: remove
- i386-softmmu.mak include
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 05 Jan 2019 15:32:49 -0000
+From: Lenny Helpline <1810603@bugs.launchpad.net>
+Reply-To: Bug 1810603 <1810603@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154670237006.5111.1505843603378488710.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1810603] [NEW] QEMU QCow Images crow dramatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +35,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, 27 Dec 2018 at 06:35, Yang Zhong <yang.zhong@intel.com> wrote:
->
-> Only keep same boards definitions as i386-softmmu.mak in
-> x86_64-softmmu.mak.
->
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  default-configs/x86_64-softmmu.mak | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-> index 64b2ee2960..0c69c2930c 100644
-> --- a/default-configs/x86_64-softmmu.mak
-> +++ b/default-configs/x86_64-softmmu.mak
-> @@ -1,3 +1,7 @@
->  # Default configuration for x86_64-softmmu
->
-> -include i386-softmmu.mak
-> +# Boards:
-> +#
-> +CONFIG_ISAPC=y
-> +CONFIG_I440FX=y
-> +CONFIG_Q35=y
+Public bug reported:
 
-Could you explain the rationale for doing this? Now
-any new i386 board has to be added in two places,
-doesn't it?
+I've recently migrated our VM infrastructure (~200 guest on 15 hosts)
+from vbox to Qemu (using KVM / libvirt). We have a master image (QEMU
+QCow v3) from which we spawn multiple instances (linked clones). All
+guests are being revert once per hour for security reasons.
 
-thanks
--- PMM
+About 2 weeks after we successfully migrated to Qemu, we noticed that
+almost all disks went full across all 15 hosts. Our investigation showed
+that the initial qcow disk images blow up from a few gigabytes to 100GB
+and more. This should not happen, as we revert all VMs back to the
+initial snapshot once per hour and hence all changes that have been made
+to disks must be reverted too.
+
+We did an addition test with 24 hour time frame with which we could
+reproduce this bug as documented below.
+
+Initial disk image size (created on Jan 04):
+-rw-r--r-- 1 root root 7.1G Jan  4 15:59 W10-TS01-0.img
+-rw-r--r-- 1 root root 7.3G Jan  4 15:59 W10-TS02-0.img
+-rw-r--r-- 1 root root 7.4G Jan  4 15:59 W10-TS03-0.img
+-rw-r--r-- 1 root root 8.3G Jan  4 16:02 W10-CLIENT01-0.img
+-rw-r--r-- 1 root root 8.6G Jan  4 16:05 W10-CLIENT02-0.img
+-rw-r--r-- 1 root root 8.0G Jan  4 16:05 W10-CLIENT03-0.img
+-rw-r--r-- 1 root root 8.3G Jan  4 16:08 W10-CLIENT04-0.img
+-rw-r--r-- 1 root root 8.1G Jan  4 16:12 W10-CLIENT05-0.img
+-rw-r--r-- 1 root root 8.0G Jan  4 16:12 W10-CLIENT06-0.img
+-rw-r--r-- 1 root root 8.1G Jan  4 16:16 W10-CLIENT07-0.img
+-rw-r--r-- 1 root root 7.6G Jan  4 16:16 W10-CLIENT08-0.img
+-rw-r--r-- 1 root root 7.6G Jan  4 16:19 W10-CLIENT09-0.img
+-rw-r--r-- 1 root root 7.5G Jan  4 16:21 W10-ROUTER-0.img
+-rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
+
+Disk image size after 24 hours (printed on Jan 05):
+-rw-r--r-- 1 root root  13G Jan  5 15:07 W10-TS01-0.img
+-rw-r--r-- 1 root root 8.9G Jan  5 14:20 W10-TS02-0.img
+-rw-r--r-- 1 root root 9.0G Jan  5 15:07 W10-TS03-0.img
+-rw-r--r-- 1 root root  10G Jan  5 15:08 W10-CLIENT01-0.img
+-rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT02-0.img
+-rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT03-0.img
+-rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT04-0.img
+-rw-r--r-- 1 root root  19G Jan  5 15:07 W10-CLIENT05-0.img
+-rw-r--r-- 1 root root  14G Jan  5 15:08 W10-CLIENT06-0.img
+-rw-r--r-- 1 root root 9.7G Jan  5 15:07 W10-CLIENT07-0.img
+-rw-r--r-- 1 root root  35G Jan  5 15:08 W10-CLIENT08-0.img
+-rw-r--r-- 1 root root 9.2G Jan  5 15:07 W10-CLIENT09-0.img
+-rw-r--r-- 1 root root  41G Jan  5 15:08 W10-ROUTER-0.img
+-rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
+
+You can reproduce this bug as follow:
+1) create an initial disk image
+2) create a linked clone
+3) create a snapshot of the linked clone
+4) revert the snapshot every X minutes / hours
+
+Due the described behavior / bug, our VM farm is completely down at the
+moment (as we run out of disk space on all host systems). A quick fix
+for this bug would be much appreciated.
+
+Host OS: Ubuntu 18.04.01 LTS
+Kernel: 4.15.0-43-generic
+Qemu: 3.1.0
+libvirt: 4.10.0
+Guest OS: Windows 10 64bit
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1810603
+
+Title:
+  QEMU QCow Images crow dramatically
+
+Status in QEMU:
+  New
+
+Bug description:
+  I've recently migrated our VM infrastructure (~200 guest on 15 hosts)
+  from vbox to Qemu (using KVM / libvirt). We have a master image (QEMU
+  QCow v3) from which we spawn multiple instances (linked clones). All
+  guests are being revert once per hour for security reasons.
+
+  About 2 weeks after we successfully migrated to Qemu, we noticed that
+  almost all disks went full across all 15 hosts. Our investigation
+  showed that the initial qcow disk images blow up from a few gigabytes
+  to 100GB and more. This should not happen, as we revert all VMs back
+  to the initial snapshot once per hour and hence all changes that have
+  been made to disks must be reverted too.
+
+  We did an addition test with 24 hour time frame with which we could
+  reproduce this bug as documented below.
+
+  Initial disk image size (created on Jan 04):
+  -rw-r--r-- 1 root root 7.1G Jan  4 15:59 W10-TS01-0.img
+  -rw-r--r-- 1 root root 7.3G Jan  4 15:59 W10-TS02-0.img
+  -rw-r--r-- 1 root root 7.4G Jan  4 15:59 W10-TS03-0.img
+  -rw-r--r-- 1 root root 8.3G Jan  4 16:02 W10-CLIENT01-0.img
+  -rw-r--r-- 1 root root 8.6G Jan  4 16:05 W10-CLIENT02-0.img
+  -rw-r--r-- 1 root root 8.0G Jan  4 16:05 W10-CLIENT03-0.img
+  -rw-r--r-- 1 root root 8.3G Jan  4 16:08 W10-CLIENT04-0.img
+  -rw-r--r-- 1 root root 8.1G Jan  4 16:12 W10-CLIENT05-0.img
+  -rw-r--r-- 1 root root 8.0G Jan  4 16:12 W10-CLIENT06-0.img
+  -rw-r--r-- 1 root root 8.1G Jan  4 16:16 W10-CLIENT07-0.img
+  -rw-r--r-- 1 root root 7.6G Jan  4 16:16 W10-CLIENT08-0.img
+  -rw-r--r-- 1 root root 7.6G Jan  4 16:19 W10-CLIENT09-0.img
+  -rw-r--r-- 1 root root 7.5G Jan  4 16:21 W10-ROUTER-0.img
+  -rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
+
+  Disk image size after 24 hours (printed on Jan 05):
+  -rw-r--r-- 1 root root  13G Jan  5 15:07 W10-TS01-0.img
+  -rw-r--r-- 1 root root 8.9G Jan  5 14:20 W10-TS02-0.img
+  -rw-r--r-- 1 root root 9.0G Jan  5 15:07 W10-TS03-0.img
+  -rw-r--r-- 1 root root  10G Jan  5 15:08 W10-CLIENT01-0.img
+  -rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT02-0.img
+  -rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT03-0.img
+  -rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT04-0.img
+  -rw-r--r-- 1 root root  19G Jan  5 15:07 W10-CLIENT05-0.img
+  -rw-r--r-- 1 root root  14G Jan  5 15:08 W10-CLIENT06-0.img
+  -rw-r--r-- 1 root root 9.7G Jan  5 15:07 W10-CLIENT07-0.img
+  -rw-r--r-- 1 root root  35G Jan  5 15:08 W10-CLIENT08-0.img
+  -rw-r--r-- 1 root root 9.2G Jan  5 15:07 W10-CLIENT09-0.img
+  -rw-r--r-- 1 root root  41G Jan  5 15:08 W10-ROUTER-0.img
+  -rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
+
+  You can reproduce this bug as follow:
+  1) create an initial disk image
+  2) create a linked clone
+  3) create a snapshot of the linked clone
+  4) revert the snapshot every X minutes / hours
+
+  Due the described behavior / bug, our VM farm is completely down at
+  the moment (as we run out of disk space on all host systems). A quick
+  fix for this bug would be much appreciated.
+
+  Host OS: Ubuntu 18.04.01 LTS
+  Kernel: 4.15.0-43-generic
+  Qemu: 3.1.0
+  libvirt: 4.10.0
+  Guest OS: Windows 10 64bit
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1810603/+subscriptions
