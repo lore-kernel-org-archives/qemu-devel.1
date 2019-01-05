@@ -1,31 +1,31 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:47433 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:36301 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gfrZm-0005uN-CM
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 14:25:44 -0500
+	(envelope-from <bounces@canonical.com>) id 1gfsVy-00022z-Iq
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 15:25:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gfrZh-0001Vu-9K
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 14:25:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42180)
+	(envelope-from <bounces@canonical.com>) id 1gfsVt-0004yJ-J3
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 15:25:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44788)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gfrZh-0001Uw-3B
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 14:25:37 -0500
+	id 1gfsVt-0004uf-8f
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 15:25:45 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gfrZf-0006FY-RG
-	for <qemu-devel@nongnu.org>; Sat, 05 Jan 2019 19:25:35 +0000
+	id 1gfsVr-0000en-HB
+	for <qemu-devel@nongnu.org>; Sat, 05 Jan 2019 20:25:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CCEF42E80C7
-	for <qemu-devel@nongnu.org>; Sat,  5 Jan 2019 19:25:35 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 79A7C2E80CC
+	for <qemu-devel@nongnu.org>; Sat,  5 Jan 2019 20:25:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 05 Jan 2019 19:17:48 -0000
-From: Bruno Haible <bruno@clisp.org>
+Date: Sat, 05 Jan 2019 20:19:18 -0000
+From: Stefan Ring <1701835@bugs.launchpad.net>
 Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
-Message-Id: <154671586835.24939.1599869410593200099.malone@gac.canonical.com>
+Message-Id: <154671955852.4791.7085719024707370720.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
  qemu-alpha
@@ -39,10 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Under qemu-system-alpha I get 680e800000000000 as well.
+https://download.majix.org/dec/alpha_arch_ref.pdf
 
-Under qemu-alpha (versions 2.8.1, 2.9.0, 2.10.0, 2.11.0, 2.12.0, 3.1.0)
-I get 600e800000000000, i.e. bit 59 is unset.
+The bits are defined in 4.7.8 Floating-Point Control Register (FPCR).
+59/58 zero is chopped rounding. This does not seem like a good default.
 
 -- =
 
