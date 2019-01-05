@@ -1,26 +1,25 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:51707 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:33862 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfo5q-0005QK-Jt
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:42:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1gfog8-0004gV-DY
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 11:20:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gfo5o-0005l6-4S
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:42:33 -0500
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:35423)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gfo5n-0005kE-Va
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 10:42:32 -0500
-Received: by mail-oi1-x231.google.com with SMTP id v6so32685024oif.2
-	for <qemu-devel@nongnu.org>; Sat, 05 Jan 2019 07:42:30 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gfog4-0007Ip-2Y
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 11:20:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gfog3-0007HI-PR
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 11:19:59 -0500
+References: <154670237006.5111.1505843603378488710.malonedeb@wampee.canonical.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a786cc53-c01a-3fa0-7d7d-f0bef8944b38@redhat.com>
+Date: Sat, 5 Jan 2019 10:19:57 -0600
 MIME-Version: 1.0
-References: <CAHyh4xhv5ZDfZv842U=adQN7hQFr=16BKEgZcEUZOLjFo3P+Jw@mail.gmail.com>
-In-Reply-To: <CAHyh4xhv5ZDfZv842U=adQN7hQFr=16BKEgZcEUZOLjFo3P+Jw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 5 Jan 2019 15:42:18 +0000
-Message-ID: <CAFEAcA_GCPp7ga7OGkZQopOSY_u+mwJ=vve5a9a4uU217butcA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Why one virtio-pci device has two different
- DeviceState?
+In-Reply-To: <154670237006.5111.1505843603378488710.malonedeb@wampee.canonical.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="YjuIf8yBGF2XCMi10MiSMslyuRaKrH0ZE"
+Subject: Re: [Qemu-devel] [Bug 1810603] [NEW] QEMU QCow Images crow
+ dramatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jintack Lim <jintack@cs.columbia.edu>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Bug 1810603 <1810603@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-On Fri, 4 Jan 2019 at 20:23, Jintack Lim <jintack@cs.columbia.edu> wrote:
-> I was wondering why one virtio-pci device has two different
-> DeviceState? - one directly from VirtIOPCIProxy and the other from
-> VirtIO<dev type> such as VirtIONet. As an example, they are denoted as
-> qdev and vdev respectively in virtio_net_pci_realize().
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YjuIf8yBGF2XCMi10MiSMslyuRaKrH0ZE
+From: Eric Blake <eblake@redhat.com>
+To: Bug 1810603 <1810603@bugs.launchpad.net>, qemu-devel@nongnu.org
+Message-ID: <a786cc53-c01a-3fa0-7d7d-f0bef8944b38@redhat.com>
+Subject: Re: [Qemu-devel] [Bug 1810603] [NEW] QEMU QCow Images crow
+ dramatically
+References: <154670237006.5111.1505843603378488710.malonedeb@wampee.canonical.com>
+In-Reply-To: <154670237006.5111.1505843603378488710.malonedeb@wampee.canonical.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It's been a while since I looked at this, but there are two
-basic issues underlying the weird way virtio devices are
-set up:
- (1) PCI is not the only "transport" -- the VirtIONet etc
-     are shared with other transports like MMIO or the S390 ones
- (2) retaining back-compatibility matters a lot here: we need
-     command lines to still work, and also the migration data
-     stream needs to stay compatible
-Some of the way the devices are reflects the way we started
-with a design where there was only a single device (eg the
-pci virtio-net device) and then refactored it to support
-multiple transports while retaining back compatibility.
+On 1/5/19 9:32 AM, Lenny Helpline wrote:
 
-> I thought that just one DeviceState is enough for any device in QEMU.
-> Maybe I'm missing something fundamental here.
+>=20
+> You can reproduce this bug as follow:
+> 1) create an initial disk image
+> 2) create a linked clone
+> 3) create a snapshot of the linked clone
+> 4) revert the snapshot every X minutes / hours
 
-This isn't generally true, it's just that a lot of
-our devices are of the simple straightforward kind
-where that's true. It's also possible for an
-implementation of a device to be as a combination
-of other devices, which is what we have here.
-virtio-pci-net is-a PCIDevice (which in turn is-a Device),
-but it has-a VirtIONet device (which is-a Device) as
-part of its implementation.
-(It's also possible to manually create the pci
-transport and the virtio-net backend separately
-and connect them together without the virtio-pci-net
-device at all. That's more often used with non-pci
-transports but it works for pci too.)
+Needs more details to reproduce.  What is the exact command you used for
+each of these steps?  For example, without that command, I can't tell if
+you are creating internal or external snapshots, and that drastically
+changes the approach for how to deal with reverting snapshots.
 
-You can also see a similar thing with a lot of the
-"container" SoC objects like TYPE_ASPEED_SOC, which
-is a subclass of DeviceState, but is implemented
-using a dozen different objects all of which are
-themselves DeviceState subclasses.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-thanks
--- PMM
+
+--YjuIf8yBGF2XCMi10MiSMslyuRaKrH0ZE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlww2S0ACgkQ3g5py3or
+ov1HAgf+IK0rW/HIcZkU1YvEMrujRDNDr6Xqe4I1oLEb++8CtxwjbRgqv7yJo2Ig
+0ePept+6Nyr7F2bs6XLz1N/GBa3wySJX7Bm3Su4Lbt1t1b7SkHJism7nK64ZBAAD
+W4DDp/cC/z8hYnEd/MrCBaQpcp2X0lDLwMPvtagxmi3SmQRo+9kdRNZzXfzqQK1U
+R0qUM65nWSMZYwAt4W1rYfXyjpg7d+gTx4XNTQidUxniY1aJ8jsSkF6ztg/p40Bq
+ID4jKpqgVvMMclS4SRTMM4F1S9W/0vwT2U1wJy//AcMq5pjwf7bUfowUujW47h8z
+3syFFCZAKRO6E5tcDnRsapNpbNGYTA==
+=jUOW
+-----END PGP SIGNATURE-----
+
+--YjuIf8yBGF2XCMi10MiSMslyuRaKrH0ZE--
