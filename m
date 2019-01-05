@@ -1,22 +1,35 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:44423 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:54671 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfZEc-0005AL-21
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:50:38 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gfZkg-0005Zt-Mt
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 19:23:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfZEb-00071K-8f
-	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 18:50:38 -0500
-References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-8-eblake@redhat.com>
-	<b91e2cff-2d5c-f5dd-e8cc-7a8944c93de4@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <048303ff-cdc2-d0b6-a990-1453df29626b@redhat.com>
-Date: Fri, 4 Jan 2019 17:50:27 -0600
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gfZke-0001fy-KA
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 19:23:46 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40009)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1gfZkc-0001SK-Ty
+	for qemu-devel@nongnu.org; Fri, 04 Jan 2019 19:23:43 -0500
+Received: by mail-wr1-x442.google.com with SMTP id p4so37990918wrt.7
+	for <qemu-devel@nongnu.org>; Fri, 04 Jan 2019 16:23:41 -0800 (PST)
+Received: from ?IPv6:fd00:835b:d940:d4fc:1::b8?
+	(2a01-036c-0113-6e8c-0001-0000-0000-00b8.pool6.digikabel.hu.
+	[2a01:36c:113:6e8c:1::b8])
+	by smtp.gmail.com with ESMTPSA id r69sm3439953wmd.4.2019.01.04.16.23.39
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 04 Jan 2019 16:23:39 -0800 (PST)
+From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
+References: <20190104153951.32306-1-eblake@redhat.com>
+Message-ID: <4e30c442-6ddc-2988-160e-168dec552966@gmail.com>
+Date: Sat, 5 Jan 2019 01:23:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <b91e2cff-2d5c-f5dd-e8cc-7a8944c93de4@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qT5LB1aZst7GFKgAQv3S1xnDWQemmQPQS"
-Subject: Re: [Qemu-devel] [PATCH v2 07/22] qemu-nbd: Avoid strtol open-coding
+In-Reply-To: <20190104153951.32306-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] osdep: Make MIN/MAX evaluate arguments
+ only once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +38,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qT5LB1aZst7GFKgAQv3S1xnDWQemmQPQS
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>, "rjones@redhat.com"
- <rjones@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Message-ID: <048303ff-cdc2-d0b6-a990-1453df29626b@redhat.com>
-Subject: Re: [PATCH v2 07/22] qemu-nbd: Avoid strtol open-coding
-References: <20181215135324.152629-1-eblake@redhat.com>
- <20181215135324.152629-8-eblake@redhat.com>
- <b91e2cff-2d5c-f5dd-e8cc-7a8944c93de4@virtuozzo.com>
-In-Reply-To: <b91e2cff-2d5c-f5dd-e8cc-7a8944c93de4@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 12/18/18 9:11 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 15.12.2018 16:53, Eric Blake wrote:
->> Our copy-and-pasted open-coding of strtol handling forgot to
->> handle overflow conditions.  Use qemu_strto*() instead.
->>
->> In the case of --partition, since we insist on a user-supplied
->> partition to be non-zero, we can use 0 rather than -1 for our
->> initial value to distinguish when a partition is not being
->> served, for slightly more optimal code.
->>
->> The error messages for out-of-bounds values are less specific,
->> but should not be a terrible loss in quality.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> ---
->> v2: Retitle, catch more uses of strtol
->> [Hmm - this depends on int64_t and off_t being compatible; if they
->> aren't that way on all platforms, I'll need a temporary variable]
->=20
-> hmm, as I understand, even if this compatibility exists, it's not a par=
-t
-> of standard and nothing about off_t size in POSIX..
+I have a similar patch in my queue[1]
 
-off_t allows you to run on older systems with 32-bit offsets and newer
-systems with 64-bit offsets; but these days, even on 32-bit systems, we
-compile qemu to always ask for 64-bit off_t.  Using off_t instead of
-int64_t is probably a separate cleanup, but one that may be worth making
-prior to this patch, so I'll defer this one to my v3.
+On 2019-01-04 16:39, Eric Blake wrote:
+> Use the __auto_type keyword to make sure our min/max macros only
+> evaluate their arguments once.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> RFC because __auto_type didn't exist until gcc 4.9, and I don't know
+> which clang version introduced it (other than that it went in
+> during 2015: https://reviews.llvm.org/D12686).  Our minimum gcc
+> version is 4.8, which has typeof; I'm not sure if our minimum clang
+> version supports typeof.
+> 
+> I'm considering adding a snippet to compiler.h that looks like:
+> 
+>  #if .... // new enough gcc/clang
+>  #define QEMU_TYPEOF(a) __auto_type
+>  #else
+>  #define QEMU_TYPEOF(a) typeof(a)
+>  #endif
+> 
+> at which point we could blindly use QEMU_TYPEOF(a)=(a) anywhere we
+> need automatic typing, for the benefit of smaller macro expansion
+> [and proper handling of VLA types, although I don't think we use
+> those to care about that aspect of __auto_type] in newer compilers,
+> while still getting automatic type deduction in older compilers for
+> macros that want single evaluation, and where we've localized the
+> version checks to one spot instead of everywhere.  But for that to
+> work, again, I need to know whether typeof is supported in our
+> minimum clang version, and how to properly spell the version check
+> for clang on when to prefer __auto_type over typeof (at least I
+> know how to spell it for gcc).
+> 
+> While at it, the comments to MIN_NON_ZERO() state that callers should
+> only compare unsigned types; I suspect we don't actually obey that
+> rule, but I also think the comment is over-strict - the macro works
+> as long as both arguments are non-negative, and when called with a
+> mix of signed and unsigned types, as long as the type promotion
+> preserves the fact that the value is still non-negative.  But it
+> might be interesting to add compile-time checking (or maybe runtime
+> asserts) that the macro is indeed only used on non-negative values.
+> 
+>  include/qemu/osdep.h | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 3bf48bcdec0..b941572b808 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -233,17 +233,31 @@ extern int daemon(int, int);
+>  #endif
+> 
+>  #ifndef MIN
+> -#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+> +#define MIN(a, b)              \
+> +    ({                         \
+> +        __auto_type _a = (a);  \
+> +        __auto_type _b = (b);  \
+> +        _a < _b ? _a : _b;     \
+> +    })
+>  #endif
+>  #ifndef MAX
+> -#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+> +#define MAX(a, b)              \
+> +    ({                         \
+> +        __auto_type _a = (a);  \
+> +        __auto_type _b = (b);  \
+> +        _a > _b ? _a : _b;     \
+> +    })
+>  #endif
+I tried this[2], but apparently random linux headers define their own
+MIN/MAX and in case this version won't be used. And the version above
+with __auto_type and statement expression doesn't work on bitfields and
+when not in functions (for example struct XHCIState has
+    USBPort  uports[MAX(MAXPORTS_2, MAXPORTS_3)];
+as one of its member). It only works because currently glib/gmacros.h or
+sys/param.h defines it's own MIN/MAX which is identical to the old version.
 
->=20
-> Moreover: what is the reason for using off_t in NBD code? We don't have=
- it
-> in NBD protocol, we don't have it in generic block layer interface. Isn=
-'t it
-> always casted to int64_t or like this?
->=20
+Now that I think about it, instead of undefining the old macro or only
+conditionally defining it, maybe the best course of action would be to
+rename MIN/MAX to something more unique so it won't clash with random
+system headers.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> 
+>  /* Minimum function that returns zero only iff both values are zero.
+>   * Intended for use with unsigned values only. */
+>  #ifndef MIN_NON_ZERO
+> -#define MIN_NON_ZERO(a, b) ((a) == 0 ? (b) : \
+> -                                ((b) == 0 ? (a) : (MIN(a, b))))
+> +#define MIN_NON_ZERO(a, b)                              \
+> +    ({                                                  \
+> +        __auto_type _a = (a);                           \
+> +        __auto_type _b = (b);                           \
+> +        _a == 0 ? _b : (_b == 0 || _b > _a) ? _a : _b;  \
+> +    })
+>  #endif
+> 
+>  /* Round number down to multiple */
+> 
 
+[1]: https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05718.html
+[2]: https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg06006.html
 
---qT5LB1aZst7GFKgAQv3S1xnDWQemmQPQS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwv8UMACgkQ3g5py3or
-ov0f0Qf+IlFcb3Vty3fmjYDvANVpx4XEdpedq6FKgV80ah0zCWc9tolqnJoMIADA
-gBIJInsBNeLVNIMgqB9e2N59UTmi/zCih2ty4qUzKB01TREuXww2xsF4ZlIYjqsR
-8cR5S1emNwFZPHVVn9MGpocNiQEhx/GU5poJap7b5dlAFVgH0FMLotAQwloRy4RE
-zjGytqCB+RHigPT/KRxZb06euHc+GyM2/GqTZAqd8MgwHw3XT+KFNDDcbCyIP1Jz
-Wt0t7pNk2elOnPRMWcHqpK2iPzUTaPmOb4Pin1zsicMWhLLYun69w/mWPxnc4egU
-ZOComT9BadtHGbUI0TmovVR772PMLw==
-=Rl8r
------END PGP SIGNATURE-----
-
---qT5LB1aZst7GFKgAQv3S1xnDWQemmQPQS--
+Regards,
+Zoltan
