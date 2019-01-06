@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53948)
+Received: from eggs.gnu.org ([209.51.188.92]:55154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggHHY-0005eN-PZ
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 17:52:38 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ggHLn-0001Hp-Cm
+	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 17:57:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggHHY-0006LM-2K
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 17:52:36 -0500
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:33172)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggHHX-0006L7-TE
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 17:52:36 -0500
-Received: by mail-pf1-x42b.google.com with SMTP id c123so20889840pfb.0
-	for <qemu-devel@nongnu.org>; Sun, 06 Jan 2019 14:52:35 -0800 (PST)
-References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
-	<154681323372.20138.8534715504744622137.malone@soybean.canonical.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2114516e-daac-e1f7-f911-48df8208281e@linaro.org>
-Date: Mon, 7 Jan 2019 08:52:29 +1000
+	(envelope-from <no-reply@patchew.org>) id 1ggHLl-0000VI-QB
+	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 17:56:59 -0500
+Resent-Message-Id: <E1ggHLl-0000VI-QB@eggs.gnu.org>
+In-Reply-To: <d19529f5-841e-ea06-fe7d-86ccfd528817@gmail.com>
+Message-ID: <154681539681.475.7900177304020568757@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <154681323372.20138.8534715504744622137.malone@soybean.canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
- qemu-alpha
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 6 Jan 2019 14:56:38 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v4] Support u-boot noload images for arm as
+ used by, NetBSD/evbarm GENERIC kernel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,14 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1701835 <1701835@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: nicholas.a.hudson@gmail.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On 1/7/19 8:20 AM, Bruno Haible wrote:
-> No, it is not fixed: even with this patch the program that fetches the
-> fpcr still prints 600e800000000000, and the various program crashes
-> still occur.
-
-Are you sure you rebuilt properly?  The fpcr prints 680e800000000000 here.
-
-
-r~
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9kMTk1MjlmNS04NDFlLWVhMDYt
+ZmU3ZC04NmNjZmQ1Mjg4MTdAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0XSBTdXBwb3J0
+IHUtYm9vdCBub2xvYWQgaW1hZ2VzIGZvciBhcm0gYXMgdXNlZCBieSwgTmV0QlNEL2V2YmFybSBH
+RU5FUklDIGtlcm5lbC4KVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IGQxOTUyOWY1LTg0MWUtZWEw
+Ni1mZTdkLTg2Y2NmZDUyODgxN0BnbWFpbC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
+JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
+ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
+IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
+dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
+ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTJhMTVkYSBTdXBwb3J0IHUtYm9vdCBu
+b2xvYWQgaW1hZ2VzIGZvciBhcm0gYXMgdXNlZCBieSwgTmV0QlNEL2V2YmFybSBHRU5FUklDIGtl
+cm5lbC4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogU3VwcG9ydCB1
+LWJvb3Qgbm9sb2FkIGltYWdlcyBmb3IgYXJtIGFzIHVzZWQgYnksIE5ldEJTRC9ldmJhcm0gR0VO
+RVJJQyBrZXJuZWwuLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
+Izg5OiBGSUxFOiBody9jb3JlL3Vib290X2ltYWdlLmg6MTI3OgorI2RlZmluZSBJSF9UWVBFX0tF
+Uk5FTF9OT0xPQUQgIDE0XkkvKiBPUyBLZXJuZWwgSW1hZ2UgKG5vbG9hZCleSSovJAoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3MTogRklMRTogaW5jbHVkZS9ody9sb2FkZXIu
+aDoxODM6CisgKiBAbG9hZGFkZHI6IGxvYWQgYWRkcmVzcyBpZiBub25lIHNwZWNpZmllZCBpbiB0
+aGUgaW1hZ2Ugb3Igd2hlbiBsb2FkaW5nIGEgcmFtZGlzay4KCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMxNzM6IEZJTEU6IGluY2x1ZGUvaHcvbG9hZGVyLmg6MTg1OgorICogICAg
+ICAgICAgICBMT0FEX1VJTUFHRV9MT0FEQUREUl9JTlZBTElEIChpbWFnZXMgd2hpY2ggZG8gbm90
+IHNwZWNpZnkgYSBsb2FkIGFkZHJlc3MKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxp
+bmUocykKCnRvdGFsOiAyIGVycm9ycywgMiB3YXJuaW5ncywgMTExIGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
+YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL2QxOTUyOWY1LTg0MWUtZWEwNi1mZTdkLTg2
+Y2NmZDUyODgxN0BnbWFpbC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
