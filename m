@@ -1,21 +1,34 @@
-Received: from eggsout.gnu.org ([209.51.188.92]:60921 helo=eggs.gnu.org)
+Received: from eggsout.gnu.org ([209.51.188.92]:33399 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfxOG-0000HS-Su
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 20:38:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1gfxQn-0001TP-Kk
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 20:40:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gfxOC-0005PB-Sw
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 20:38:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37918)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gfxOC-0005OP-Ll
-	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 20:38:08 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Sat,  5 Jan 2019 19:38:02 -0600
-Message-Id: <20190106013802.3645-1-eblake@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gfxQj-000797-Jq
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 20:40:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55794)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gfxQj-00077b-Cj
+	for qemu-devel@nongnu.org; Sat, 05 Jan 2019 20:40:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gfxQg-0002dl-EF
+	for <qemu-devel@nongnu.org>; Sun, 06 Jan 2019 01:40:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 443552E806E
+	for <qemu-devel@nongnu.org>; Sun,  6 Jan 2019 01:40:42 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] osdep: Make MIN/MAX evaluate arguments only
- once
+Date: Sun, 06 Jan 2019 01:31:02 -0000
+From: Bruno Haible <bruno@clisp.org>
+Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
+Message-Id: <154673826273.25513.15624416615109987290.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
+ qemu-alpha
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,159 +38,227 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dirty.ice.hu@gmail.com, f4bug@amsat.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add the macro QEMU_TYPEOF() to access __auto_type in new enough
-compilers, while falling back to typeof on older compilers (the
-fallback doesn't handle variable length arrays, but we don't use
-those; it also expands to more text).
+The fpcr value seen in a process running in a VM comes from the Linux
+kernel, file linux/arch/alpha/kernel/process.c, function flush_thread():
 
-Then use that macro to make MIN/MAX only evaluate their argument
-once; this uses type promotion (by adding to 0) to work around
-the fact that typeof(bitfield) won't compile.  However, we are
-unable to work around gcc refusing to compile ({}) in a constant
-context, even when only used in the dead branch of a
-__builtin_choose_expr(), so we have to provide a second macro
-pair MIN_CONST and MAX_CONST for use when both arguments are
-known to be compile-time constants and where the result must
-also be usable in constant contexts.
+        /* Arrange for each exec'ed process to start off with a clean slate
+           with respect to the FPU.  This is all exceptions disabled.  */
+        current_thread_info()->ieee_state =3D 0;
+        wrfpcr(FPCR_DYN_NORMAL | ieee_swcr_to_fpcr(0));
 
-Fix the resulting callsites that compute a compile-time constant
-min or max to use the new macros.
+where FPCR_DYN_NORMAL is 0x2UL << 58 /* towards nearest */
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Where do we go from here? As far as I understand, qemu-alpha ought to
+initialize the DYN bits to FPCR_DYN_NORMAL. Where in the code should
+this be done? I see code in target/alpha/cpu.c, function
+alpha_cpu_initfn, that initializes the DYN bits to FPCR_DYN_NORMAL. Is
+this at the wrong place? Is it insufficient for another reason?
 
----
-v2: Force use of our smart macros, and make macro handle bitfields,
-constant expressions, and older compilers [Zoltan]
----
- hw/usb/hcd-xhci.h       |  2 +-
- include/exec/cpu-defs.h |  2 +-
- include/qemu/compiler.h | 10 +++++++++
- include/qemu/osdep.h    | 46 ++++++++++++++++++++++++++++++++++-------
- migration/qemu-file.c   |  2 +-
- 5 files changed, 51 insertions(+), 11 deletions(-)
+-- =
 
-diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-index fc36a4c787c..10beee9a7b1 100644
---- a/hw/usb/hcd-xhci.h
-+++ b/hw/usb/hcd-xhci.h
-@@ -210,7 +210,7 @@ struct XHCIState {
-     uint32_t dcbaap_high;
-     uint32_t config;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701835
 
--    USBPort  uports[MAX(MAXPORTS_2, MAXPORTS_3)];
-+    USBPort  uports[MAX_CONST(MAXPORTS_2, MAXPORTS_3)];
-     XHCIPort ports[MAXPORTS];
-     XHCISlot slots[MAXSLOTS];
-     uint32_t numports;
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 6a60f94a41d..5b2fd46f687 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -90,7 +90,7 @@ typedef uint64_t target_ulong;
-  * of tlb_table inside env (which is non-trivial but not huge).
-  */
- #define CPU_TLB_BITS                                             \
--    MIN(8,                                                       \
-+    MIN_CONST(8,                                                 \
-         TCG_TARGET_TLB_DISPLACEMENT_BITS - CPU_TLB_ENTRY_BITS -  \
-         (NB_MMU_MODES <=3D 1 ? 0 :                                 \
-          NB_MMU_MODES <=3D 2 ? 1 :                                 \
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 261842beae2..3bf6f68a6b0 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -191,4 +191,14 @@
- #define QEMU_GENERIC9(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC8(x=
-, __VA_ARGS__))
- #define QEMU_GENERIC10(x, a0, ...) QEMU_GENERIC_IF(x, a0, QEMU_GENERIC9(=
-x, __VA_ARGS__))
+Title:
+  floating-point operation bugs in qemu-alpha
 
-+/*
-+ * Automatic type deduction, to be used as:
-+ * QEMU_TYPEOF(expr) name =3D expr;
-+ */
-+#if QEMU_GNUC_PREREQ(4, 9)
-+# define QEMU_TYPEOF(a) __auto_type
-+#else
-+# define QEMU_TYPEOF(a) typeof(a)
-+#endif
-+
- #endif /* COMPILER_H */
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 3bf48bcdec0..821ce627f73 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -232,18 +232,48 @@ extern int daemon(int, int);
- #define SIZE_MAX ((size_t)-1)
- #endif
+Status in QEMU:
+  New
 
--#ifndef MIN
--#define MIN(a, b) (((a) < (b)) ? (a) : (b))
--#endif
--#ifndef MAX
--#define MAX(a, b) (((a) > (b)) ? (a) : (b))
--#endif
-+/*
-+ * Two variations of MIN/MAX macros. The first is for runtime use, and
-+ * evaluates arguments only once (so it is safe even with side
-+ * effects), but will not work in constant contexts (such as array
-+ * size declarations).  The second is for compile-time use, where
-+ * evaluating arguments twice is safe because the result is going to
-+ * be constant anyway.
-+ */
-+#undef MIN
-+#define MIN(a, b)                            \
-+    ({                                       \
-+        QEMU_TYPEOF((a) + 0) _a =3D (a) + 0;   \
-+        QEMU_TYPEOF((b) + 0) _b =3D (b) + 0;   \
-+        _a < _b ? _a : _b;                   \
-+    })
-+#define MIN_CONST(a, b)                                         \
-+    __builtin_choose_expr(                                      \
-+        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-+        (a) < (b) ? (a) : (b),                                  \
-+        __builtin_unreachable())
-+#undef MAX
-+#define MAX(a, b)                            \
-+    ({                                       \
-+        QEMU_TYPEOF((a) + 0) _a =3D (a) + 0;   \
-+        QEMU_TYPEOF((b) + 0) _b =3D (b) + 0;   \
-+        _a > _b ? _a : _b;                   \
-+    })
-+#define MAX_CONST(a, b)                                         \
-+    __builtin_choose_expr(                                      \
-+        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-+        (a) > (b) ? (a) : (b),                                  \
-+        __builtin_unreachable())
+Bug description:
+  When running the gnulib testsuite, I'm seeing test failures in the tests =
+for libm functions
+    cbrt
+    cbrtf
+    ceil
+    ceilf
+    coshf
+    exp2
+    exp2f
+    floor
+    floorf
+    fma
+    fmaf
+    fmal
+    frexp
+    frexpf
+    hypot
+    hypotf
+    hypotl
+    ilogb
+    ilogbf
+    isfinite
+    isinf
+    isnan
+    isnand
+    isnanf
+    ldexp
+    ldexpf
+    ldexpl
+    log1p
+    log1pf
+    log2
+    log2f
+    logb
+    logbf
+    logbl
+    rint
+    rintf
+    rintl
+    signbit
+    sqrt
+    sqrtf
+    strtod
+  that I don't see when running the same (statically linked) executables in=
+ a VM, through qemu-system-alpha.
 
- /* Minimum function that returns zero only iff both values are zero.
-  * Intended for use with unsigned values only. */
- #ifndef MIN_NON_ZERO
--#define MIN_NON_ZERO(a, b) ((a) =3D=3D 0 ? (b) : \
--                                ((b) =3D=3D 0 ? (a) : (MIN(a, b))))
-+#define MIN_NON_ZERO(a, b)                              \
-+    ({                                                  \
-+        QEMU_TYPEOF((a) + 0) _a =3D (a) + 0;              \
-+        QEMU_TYPEOF((b) + 0) _b =3D (b) + 0;              \
-+        _a =3D=3D 0 ? _b : (_b =3D=3D 0 || _b > _a) ? _a : _b;  \
-+    })
- #endif
+  How to reproduce:
+  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
+h --single-configure cbrt cbrtf ceil ceilf coshf exp2 exp2f float floor flo=
+orf fma fmaf fmal frexp frexpf hypot hypotf hypotl ilogb ilogbf isfinite is=
+inf isnan isnand isnanf ldexp ldexpf ldexpl log1p log1pf log2 log2f logb lo=
+gbf logbl math printf-frexp rint rintf rintl round roundf signbit sqrt sqrt=
+f strtod trunc truncf
+  - Copy the resulting directory to a VM running Linux 2.6.26 with qemu-sys=
+tem-alpha.
+  - There, configure and build the package:
+    mkdir build-native-static; cd build-native-static; ../configure CPPFLAG=
+S=3D"-Wall" LDFLAGS=3D"-static"; make; make check
+    Only 4 tests fail.
+  - Copy the resulting binaries back to the original x86_64 machine.
+  - Set environment variables for using qemu-alpha.
+  - Here, 50 tests fail that did not fail originally:
 
- /* Round number down to multiple */
-diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-index 977b9ae07c1..9746cbec0f3 100644
---- a/migration/qemu-file.c
-+++ b/migration/qemu-file.c
-@@ -31,7 +31,7 @@
- #include "trace.h"
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-cbrt
+  ../../gltests/test-cbrt.h:39: assertion 'err > - L_(4.0) * L_(16.0) / TWO=
+_MANT_DIG && err < L_(4.0) * L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-coshf =
 
- #define IO_BUF_SIZE 32768
--#define MAX_IOV_SIZE MIN(IOV_MAX, 64)
-+#define MAX_IOV_SIZE MIN_CONST(IOV_MAX, 64)
+  ../../gltests/test-coshf.c:37: assertion 'y >=3D 1.1854652f && y <=3D 1.1=
+854653f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-float
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf2
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma1   =
 
- struct QEMUFile {
-     const QEMUFileOps *ops;
---=20
-2.20.1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmal2
+  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypot =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotl
+  ../../gltests/test-hypot.h:41: assertion 'z =3D=3D HUGEVAL' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isfinite
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isinf   =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnan
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf-nolibm
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf       =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexp =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpl
+  ../../gltests/test-ldexp.h:99: assertion 'y =3D=3D expected' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1p =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1pf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2  =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2f
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logb =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logbf
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-math =
+
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-printf-frexp
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rint        =
+
+  ../../gltests/test-rint.c:63: assertion 'rint (0.7) =3D=3D 1.0' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintf
+  ../../gltests/test-rintf.c:63: assertion 'rintf (0.7f) =3D=3D 1.0f' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintl
+  ../../gltests/test-rintl.c:68: assertion 'rintl (0.7L) =3D=3D 1.0L' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-round1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-roundf1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-signbit
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-sqrt   =
+
+  ../../gltests/test-sqrt.h:40: assertion 'err > - L_(16.0) / TWO_MANT_DIG =
+&& err < L_(16.0) / TWO_MANT_DIG' failed
+  Aborted (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-trunc1
+  Floating point exception (core dumped)
+  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-truncf1
+  Floating point exception (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701835/+subscriptions
