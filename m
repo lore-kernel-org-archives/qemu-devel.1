@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41222)
+Received: from eggs.gnu.org ([209.51.188.92]:44421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggV0D-000330-AY
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:31:38 -0500
+	(envelope-from <armbru@redhat.com>) id 1ggV8s-0004hH-5N
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggV0C-0005xN-Iu
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:31:37 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39263)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggV08-0005mw-Pf
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:31:34 -0500
-Received: by mail-oi1-x241.google.com with SMTP id i6so285449oia.6
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 05:31:32 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1ggV8r-0007JU-BN
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:40:34 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190104181208.7809-1-philmd@redhat.com>
+	<20190104181208.7809-4-philmd@redhat.com>
+	<349cd87b-0526-30b8-d9cd-0eee537ab5a4@redhat.com>
+Date: Mon, 07 Jan 2019 14:40:01 +0100
+In-Reply-To: <349cd87b-0526-30b8-d9cd-0eee537ab5a4@redhat.com> (Eric Blake's
+	message of "Fri, 4 Jan 2019 14:17:14 -0600")
+Message-ID: <874lakk2mm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20181214052410.11863-1-richard.henderson@linaro.org>
-	<20181214052410.11863-23-richard.henderson@linaro.org>
-In-Reply-To: <20181214052410.11863-23-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Jan 2019 13:31:20 +0000
-Message-ID: <CAFEAcA-qLZu72eaaahdN8=qK79CRLwmAn3aMgOxCVc6Pq=fXww@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 22/27] target/arm: Implement pauth_addpac
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] util/cutils: Move function
+ documentations to the header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, 14 Dec 2018 at 05:24, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+Eric Blake <eblake@redhat.com> writes:
+
+> On 1/4/19 12:12 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Many functions have documentation before the implementation in
+>> cutils.c. Since we expect documentation around the prototype
+>> declaration in headers, move the comments in cutils.h.
+>>=20
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>>  include/qemu/cutils.h | 224 ++++++++++++++++++++++++++++++++++++++++++
+>>  util/cutils.c         | 185 ----------------------------------
+>>  2 files changed, 224 insertions(+), 185 deletions(-)
 >
-> This is not really functional yet, because the crypto is not yet
-> implemented.  This, however follows the AddPAC pseudo function.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper-a64.c | 40 +++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 39 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-> index 87cff7d96a..19486b9677 100644
-> --- a/target/arm/helper-a64.c
-> +++ b/target/arm/helper-a64.c
-> @@ -1066,7 +1066,45 @@ static uint64_t pauth_computepac(uint64_t data, uint64_t modifier,
->  static uint64_t pauth_addpac(CPUARMState *env, uint64_t ptr, uint64_t modifier,
->                               ARMPACKey *key, bool data)
->  {
-> -    g_assert_not_reached(); /* FIXME */
-> +    ARMMMUIdx mmu_idx = arm_stage1_mmu_idx(env);
-> +    ARMVAParameters param = aa64_va_parameters(env, ptr, mmu_idx, data);
-> +    uint64_t pac, ext_ptr, ext, test;
-> +    int bot_bit, top_bit;
-> +
-> +    /* If tagged pointers are in use, use ptr<55>, otherwise ptr<63>.  */
-> +    if (param.tbi) {
-> +        ext = sextract64(ptr, 55, 1);
-> +    } else {
-> +        ext = sextract64(ptr, 63, 1);
-> +    }
-> +
-> +    /* Build a pointer with known good extension bits.  */
-> +    top_bit = 64 - 8 * param.tbi;
-> +    bot_bit = 64 - param.tsz;
-> +    ext_ptr = deposit64(ptr, bot_bit, top_bit - bot_bit, ext);
-> +
-> +    pac = pauth_computepac(ext_ptr, modifier, *key);
-> +
-> +    /* Check if the ptr has good extension bits and corrupt the
-> +     * pointer authentication code if not.
-> +     */
+> I find documentation in .c files slightly easier to use (you can then
+> read the code right below to see if the documentation is still
+> accurate);
 
-Newer checkpatch will grumble about this style of block
-comment, by the way.
+This is the kicker for me.  I try to cultivate a healthy suspicion of
+comments in general, x10 for comments acting at a distance.
 
-> +    test = sextract64(ptr, bot_bit, top_bit - bot_bit);
-> +    if (test != 0 && test != -1) {
-> +        pac ^= 1ull << (top_bit - 1);
+>            but as we had an inconsistent mix, I'm also okay with your
+> patch consolidating all the documentation to one of the two files,
+> rather than the bad mix of half-and-half.
 
-MAKE_64BIT_MASK(top_bit - 1, 1) might be more consistent with
-the code below ?
-
-> +    }
-> +
-> +    /* Preserve the determination between upper and lower at bit 55,
-> +     * and insert pointer authentication code.
-> +     */
-> +    if (param.tbi) {
-> +        ptr &= ~MAKE_64BIT_MASK(bot_bit, 55 - bot_bit + 1);
-> +        pac &= MAKE_64BIT_MASK(bot_bit, 54 - bot_bit + 1);
-> +    } else {
-> +        ptr &= MAKE_64BIT_MASK(0, bot_bit);
-> +        pac &= ~(MAKE_64BIT_MASK(55, 1) | MAKE_64BIT_MASK(0, bot_bit));
-> +    }
-> +    ext &= MAKE_64BIT_MASK(55, 1);
-
-I found this a bit confusing to disentangle and compare with
-the pseudocode: the difference between the tbi and
-not-tbi cases is only "what are bits 63:56 in the result",
-but the implementation of how we put together bits 55:0 is
-different in the two code paths here.
-
-> +    return pac | ext | ptr;
->  }
->
->  static uint64_t pauth_original_ptr(uint64_t ptr, ARMVAParameters param)
-> --
-> 2.17.2
-
-Anyway, the implementation is correct, so:
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+Concur.
