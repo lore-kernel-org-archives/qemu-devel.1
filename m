@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60588)
+Received: from eggs.gnu.org ([209.51.188.92]:60550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ggVuH-0005AT-RZ
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:29:35 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ggVuF-00037b-Kn
+	(envelope-from <prvs=90328960c=Paul.Durrant@citrix.com>)
+	id 1ggVuF-00058V-OF
 	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:29:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ggVuA-00035W-OJ
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:29:27 -0500
-References: <20190106013802.3645-1-eblake@redhat.com>
-	<657598d6-0cea-91dc-a975-f716522a49b9@twiddle.net>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <80396f87-87d0-5ba9-3efc-405a8dce16d8@redhat.com>
-Date: Mon, 7 Jan 2019 08:22:16 -0600
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <prvs=90328960c=Paul.Durrant@citrix.com>)
+	id 1ggVuA-00036S-QJ
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:29:30 -0500
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Mon, 7 Jan 2019 14:13:07 +0000
+Message-ID: <20190107141309.15774-17-paul.durrant@citrix.com>
+In-Reply-To: <20190107141309.15774-1-paul.durrant@citrix.com>
+References: <20190107141309.15774-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <657598d6-0cea-91dc-a975-f716522a49b9@twiddle.net>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XZLuUQqsRgI8Affcf0Dv0MBiOBDS47mx3"
-Subject: Re: [Qemu-devel] [PATCH v2] osdep: Make MIN/MAX evaluate arguments
- only once
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v8 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +25,541 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: dirty.ice.hu@gmail.com, f4bug@amsat.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XZLuUQqsRgI8Affcf0Dv0MBiOBDS47mx3
-From: Eric Blake <eblake@redhat.com>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: dirty.ice.hu@gmail.com, f4bug@amsat.org, Gerd Hoffmann
- <kraxel@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <80396f87-87d0-5ba9-3efc-405a8dce16d8@redhat.com>
-Subject: Re: [PATCH v2] osdep: Make MIN/MAX evaluate arguments only once
-References: <20190106013802.3645-1-eblake@redhat.com>
- <657598d6-0cea-91dc-a975-f716522a49b9@twiddle.net>
-In-Reply-To: <657598d6-0cea-91dc-a975-f716522a49b9@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This patch adds create and destroy function for XenBlockDevice-s so that
+they can be created automatically when the Xen toolstack instantiates a new
+PV backend via xenstore. When the XenBlockDevice is created this way it is
+also necessary to create a 'drive' which matches the configuration that the
+Xen toolstack has written into xenstore. This is done by formulating the
+parameters necessary for each 'blockdev' layer of the drive and then using
+qmp_blockdev_add() to create the layers. Also, for compatibility with the
+legacy 'xen_disk' implementation, an iothread is automatically created for
+the new XenBlockDevice. This, like the driver layers, will be destroyed
+after the XenBlockDevice is unrealized.
 
-On 1/6/19 2:32 AM, Richard Henderson wrote:
-> On 1/6/19 11:38 AM, Eric Blake wrote:
->> +/*
->> + * Automatic type deduction, to be used as:
->> + * QEMU_TYPEOF(expr) name =3D expr;
->> + */
->> +#if QEMU_GNUC_PREREQ(4, 9)
->> +# define QEMU_TYPEOF(a) __auto_type
->> +#else
->> +# define QEMU_TYPEOF(a) typeof(a)
->> +#endif
->=20
-> What's wrong with always using typeof?  This seems like it leaves poten=
-tial odd
-> bugs affecting gcc-4.8.
+The legacy backend scan for 'qdisk' is removed by this patch, which makes
+the 'xen_disk' code is redundant. The code will be removed by a subsequent
+patch.
 
-Always using typeof is an option, but gcc documents that __auto_type is
-nicer than typeof:
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+---
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
 
->  Using '__auto_type' instead of 'typeof' has two advantages:
->=20
->    * Each argument to the macro appears only once in the expansion of
->      the macro.  This prevents the size of the macro expansion growing
->      exponentially when calls to such macros are nested inside argument=
-s
->      of such macros.
->=20
->    * If the argument to the macro has variably modified type, it is
->      evaluated only once when using '__auto_type', but twice if 'typeof=
-'
->      is used.
+v8:
+ - Add 'raw' image layer for raw images
 
-We don't use variably modified types (at least, I don't think we do), so
-the latter is moot (but WOULD be the spot where we are most likely to be
-bitten on 4.8 compilers lacking __auto_type); the former point is a
-minor speed win in favor of __auto_type.
+v7:
+ - Don't use qobject_input_visitor_new_flat_confused()
 
->=20
->> +#undef MIN
->> +#define MIN(a, b)                            \
->> +    ({                                       \
->> +        QEMU_TYPEOF((a) + 0) _a =3D (a) + 0;   \
->> +        QEMU_TYPEOF((b) + 0) _b =3D (b) + 0;   \
->=20
-> If you're promoting the type, why don't you want to promote to the comm=
-on type
-> between A and B?  E.g.
->=20
->   __typeof((a) + (b)) _a =3D (a), _b =3D (b);
->=20
-> After all, that's what the result type of (p ? _a : _b) will be.
+v5:
+ - Extensively re-worked to avoid using drive_new() and use
+   qmp_blockdev_add() instead
+ - Also use qmp_object_add() for IOThread
+ - Dropped Anthony's R-b because of the code changes
 
-That formulation should work as well, if anyone likes it better (but it
-does NOT work with __auto_type).
+v2:
+ - Get rid of error_abort
+ - Don't use qdev_init_nofail()
+ - Explain why file locking needs to be off
+---
+ hw/block/trace-events       |   4 +
+ hw/block/xen-block.c        | 399 ++++++++++++++++++++++++++++++++++++
+ hw/xen/xen-legacy-backend.c |   1 -
+ include/hw/xen/xen-block.h  |  13 ++
+ 4 files changed, 416 insertions(+), 1 deletion(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---XZLuUQqsRgI8Affcf0Dv0MBiOBDS47mx3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwzYJgACgkQ3g5py3or
-ov0mtAf8DaSlbgSMvvDGu7V9T0eF2zN39aguyJujI/ELif15xUc1eyipqVCsevJz
-67RYaw2RQmr08iavtgtYjF9hZYaJqDRlAUtHighsjcQTxLHWtxJE3gqrv0pIkMXH
-UOKlofsz5VxwhWTuRrYETyNLTww7NCK5tqf8IIt3zexIIlZR+0rQMHxGz0FtxpBs
-+uczQTvuGlWEUvrFEZn1aYaGYtPD5VkDE6+vNHxTD7dJU9IH4bnVDb431RzO03W+
-OJAodwj21xdxLfcZYzIaOpdqrWo39VsYFwE96UiG7T+ytk5AND2lWfbEjzTeWzfC
-FJ1IgwzfWEVh8q6PQ+a5N++yS1Rnhg==
-=vDuV
------END PGP SIGNATURE-----
-
---XZLuUQqsRgI8Affcf0Dv0MBiOBDS47mx3--
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 89e258319c..55e5a5500c 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -137,3 +137,7 @@ xen_disk_realize(void) ""
+ xen_disk_unrealize(void) ""
+ xen_cdrom_realize(void) ""
+ xen_cdrom_unrealize(void) ""
++xen_block_blockdev_add(char *str) "%s"
++xen_block_blockdev_del(const char *node_name) "%s"
++xen_block_device_create(unsigned int number) "%u"
++xen_block_device_destroy(unsigned int number) "%u"
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+index a7c37c185a..91f5b58993 100644
+--- a/hw/block/xen-block.c
++++ b/hw/block/xen-block.c
+@@ -7,12 +7,20 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
++#include "qemu/option.h"
+ #include "qapi/error.h"
++#include "qapi/qapi-commands-block-core.h"
++#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-visit-block-core.h"
++#include "qapi/qobject-input-visitor.h"
+ #include "qapi/visitor.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qstring.h"
+ #include "hw/hw.h"
+ #include "hw/xen/xen_common.h"
+ #include "hw/block/xen_blkif.h"
+ #include "hw/xen/xen-block.h"
++#include "hw/xen/xen-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/iothread.h"
+@@ -474,6 +482,7 @@ static void xen_block_class_init(ObjectClass *class, void *data)
+     DeviceClass *dev_class = DEVICE_CLASS(class);
+     XenDeviceClass *xendev_class = XEN_DEVICE_CLASS(class);
+ 
++    xendev_class->backend = "qdisk";
+     xendev_class->device = "vbd";
+     xendev_class->get_name = xen_block_get_name;
+     xendev_class->realize = xen_block_realize;
+@@ -586,3 +595,393 @@ static void xen_block_register_types(void)
+ }
+ 
+ type_init(xen_block_register_types)
++
++static void xen_block_blockdev_del(const char *node_name, Error **errp)
++{
++    trace_xen_block_blockdev_del(node_name);
++
++    qmp_blockdev_del(node_name, errp);
++}
++
++static char *xen_block_blockdev_add(const char *id, QDict *qdict,
++                                    Error **errp)
++{
++    const char *driver = qdict_get_try_str(qdict, "driver");
++    BlockdevOptions *options = NULL;
++    Error *local_err = NULL;
++    char *node_name;
++    Visitor *v;
++
++    if (!driver) {
++        error_setg(errp, "no 'driver' parameter");
++        return NULL;
++    }
++
++    node_name = g_strdup_printf("%s-%s", id, driver);
++    qdict_put_str(qdict, "node-name", node_name);
++
++    trace_xen_block_blockdev_add(node_name);
++
++    v = qobject_input_visitor_new(QOBJECT(qdict));
++    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
++    visit_free(v);
++
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto fail;
++    }
++
++    qmp_blockdev_add(options, &local_err);
++
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto fail;
++    }
++
++    qapi_free_BlockdevOptions(options);
++
++    return node_name;
++
++fail:
++    if (options) {
++        qapi_free_BlockdevOptions(options);
++    }
++    g_free(node_name);
++
++    return NULL;
++}
++
++static void xen_block_drive_destroy(XenBlockDrive *drive, Error **errp)
++{
++    while (drive->layers-- != 0) {
++        char *node_name = drive->node_name[drive->layers];
++        Error *local_err = NULL;
++
++        xen_block_blockdev_del(node_name, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            drive->layers++;
++            return;
++        }
++    }
++    g_free(drive->id);
++    g_free(drive);
++}
++
++static void xen_block_drive_layer_add(XenBlockDrive *drive, QDict *qdict,
++                                      Error **errp)
++{
++    unsigned int i = drive->layers;
++    char *node_name;
++
++    g_assert(drive->layers < ARRAY_SIZE(drive->node_name));
++
++    if (i != 0) {
++        /* Link to the lower layer */
++        qdict_put_str(qdict, "file", drive->node_name[i - 1]);
++    }
++
++    node_name = xen_block_blockdev_add(drive->id, qdict, errp);
++    if (!node_name) {
++        return;
++    }
++
++    drive->node_name[i] = node_name;
++    drive->layers++;
++}
++
++static XenBlockDrive *xen_block_drive_create(const char *id,
++                                             const char *device_type,
++                                             QDict *opts, Error **errp)
++{
++    const char *params = qdict_get_try_str(opts, "params");
++    const char *mode = qdict_get_try_str(opts, "mode");
++    const char *direct_io_safe = qdict_get_try_str(opts, "direct-io-safe");
++    const char *discard_enable = qdict_get_try_str(opts, "discard-enable");
++    char *driver = NULL;
++    char *filename = NULL;
++    XenBlockDrive *drive = NULL;
++    Error *local_err = NULL;
++    QDict *qdict;
++
++    if (params) {
++        char **v = g_strsplit(params, ":", 2);
++
++        if (v[1] == NULL) {
++            filename = g_strdup(v[0]);
++            driver = g_strdup("raw");
++        } else {
++            if (strcmp(v[0], "aio") == 0) {
++                driver = g_strdup("raw");
++            } else if (strcmp(v[0], "vhd") == 0) {
++                driver = g_strdup("vpc");
++            } else {
++                driver = g_strdup(v[0]);
++            }
++            filename = g_strdup(v[1]);
++        }
++
++        g_strfreev(v);
++    }
++
++    if (!filename) {
++        error_setg(errp, "no filename");
++        goto done;
++    }
++    assert(driver);
++
++    drive = g_new0(XenBlockDrive, 1);
++    drive->id = g_strdup(id);
++
++    qdict = qdict_new();
++
++    qdict_put_str(qdict, "driver", "file");
++    qdict_put_str(qdict, "filename", filename);
++
++    if (mode && *mode != 'w') {
++        qdict_put_bool(qdict, "read-only", true);
++    }
++
++    if (direct_io_safe) {
++        unsigned long value;
++
++        if (!qemu_strtoul(direct_io_safe, NULL, 2, &value) && !!value) {
++            QDict *cache_qdict = qdict_new();
++
++            qdict_put_bool(cache_qdict, "direct", true);
++            qdict_put_obj(qdict, "cache", QOBJECT(cache_qdict));
++
++            qdict_put_str(qdict, "aio", "native");
++        }
++    }
++
++    if (discard_enable) {
++        unsigned long value;
++
++        if (!qemu_strtoul(discard_enable, NULL, 2, &value) && !!value) {
++            qdict_put_str(qdict, "discard", "unmap");
++        }
++    }
++
++    /*
++     * It is necessary to turn file locking off as an emulated device
++     * may have already opened the same image file.
++     */
++    qdict_put_str(qdict, "locking", "off");
++
++    xen_block_drive_layer_add(drive, qdict, &local_err);
++    qobject_unref(qdict);
++
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto done;
++    }
++
++    qdict = qdict_new();
++
++    qdict_put_str(qdict, "driver", driver);
++
++    xen_block_drive_layer_add(drive, qdict, &local_err);
++    qobject_unref(qdict);
++
++done:
++    g_free(driver);
++    g_free(filename);
++
++    if (local_err) {
++        xen_block_drive_destroy(drive, NULL);
++        return NULL;
++    }
++
++    return drive;
++}
++
++static const char *xen_block_drive_get_node_name(XenBlockDrive *drive)
++{
++    return drive->layers ? drive->node_name[drive->layers - 1] : "";
++}
++
++static void xen_block_iothread_destroy(XenBlockIOThread *iothread,
++                                       Error **errp)
++{
++    qmp_object_del(iothread->id, errp);
++
++    g_free(iothread->id);
++    g_free(iothread);
++}
++
++static XenBlockIOThread *xen_block_iothread_create(const char *id,
++                                                   Error **errp)
++{
++    XenBlockIOThread *iothread = g_new(XenBlockIOThread, 1);
++    Error *local_err = NULL;
++
++    iothread->id = g_strdup(id);
++
++    qmp_object_add(TYPE_IOTHREAD, id, false, NULL, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++
++        g_free(iothread->id);
++        g_free(iothread);
++        return NULL;
++    }
++
++    return iothread;
++}
++
++static void xen_block_device_create(XenBackendInstance *backend,
++                                    QDict *opts, Error **errp)
++{
++    XenBus *xenbus = xen_backend_get_bus(backend);
++    const char *name = xen_backend_get_name(backend);
++    unsigned long number;
++    const char *vdev, *device_type;
++    XenBlockDrive *drive = NULL;
++    XenBlockIOThread *iothread = NULL;
++    XenDevice *xendev = NULL;
++    Error *local_err = NULL;
++    const char *type;
++    XenBlockDevice *blockdev;
++
++    if (qemu_strtoul(name, NULL, 10, &number)) {
++        error_setg(errp, "failed to parse name '%s'", name);
++        goto fail;
++    }
++
++    trace_xen_block_device_create(number);
++
++    vdev = qdict_get_try_str(opts, "dev");
++    if (!vdev) {
++        error_setg(errp, "no dev parameter");
++        goto fail;
++    }
++
++    device_type = qdict_get_try_str(opts, "device-type");
++    if (!device_type) {
++        error_setg(errp, "no device-type parameter");
++        goto fail;
++    }
++
++    if (!strcmp(device_type, "disk")) {
++        type = TYPE_XEN_DISK_DEVICE;
++    } else if (!strcmp(device_type, "cdrom")) {
++        type = TYPE_XEN_CDROM_DEVICE;
++    } else {
++        error_setg(errp, "invalid device-type parameter '%s'", device_type);
++        goto fail;
++    }
++
++    drive = xen_block_drive_create(vdev, device_type, opts, &local_err);
++    if (!drive) {
++        error_propagate_prepend(errp, local_err, "failed to create drive: ");
++        goto fail;
++    }
++
++    iothread = xen_block_iothread_create(vdev, &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err,
++                                "failed to create iothread: ");
++        goto fail;
++    }
++
++    xendev = XEN_DEVICE(qdev_create(BUS(xenbus), type));
++    blockdev = XEN_BLOCK_DEVICE(xendev);
++
++    object_property_set_str(OBJECT(xendev), vdev, "vdev", &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err, "failed to set 'vdev': ");
++        goto fail;
++    }
++
++    object_property_set_str(OBJECT(xendev),
++                            xen_block_drive_get_node_name(drive), "drive",
++                            &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err, "failed to set 'drive': ");
++        goto fail;
++    }
++
++    object_property_set_str(OBJECT(xendev), iothread->id, "iothread",
++                            &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err,
++                                "failed to set 'iothread': ");
++        goto fail;
++    }
++
++    blockdev->iothread = iothread;
++    blockdev->drive = drive;
++
++    object_property_set_bool(OBJECT(xendev), true, "realized", &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err,
++                                "realization of device %s failed: ",
++                                type);
++        goto fail;
++    }
++
++    xen_backend_set_device(backend, xendev);
++    return;
++
++fail:
++    if (xendev) {
++        object_unparent(OBJECT(xendev));
++    }
++
++    if (iothread) {
++        xen_block_iothread_destroy(iothread, NULL);
++    }
++
++    if (drive) {
++        xen_block_drive_destroy(drive, NULL);
++    }
++}
++
++static void xen_block_device_destroy(XenBackendInstance *backend,
++                                     Error **errp)
++{
++    XenDevice *xendev = xen_backend_get_device(backend);
++    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
++    XenBlockVdev *vdev = &blockdev->props.vdev;
++    XenBlockDrive *drive = blockdev->drive;
++    XenBlockIOThread *iothread = blockdev->iothread;
++
++    trace_xen_block_device_destroy(vdev->number);
++
++    object_unparent(OBJECT(xendev));
++
++    if (iothread) {
++        Error *local_err = NULL;
++
++        xen_block_iothread_destroy(iothread, &local_err);
++        if (local_err) {
++            error_propagate_prepend(errp, local_err,
++                                "failed to destroy iothread: ");
++            return;
++        }
++    }
++
++    if (drive) {
++        Error *local_err = NULL;
++
++        xen_block_drive_destroy(drive, &local_err);
++        if (local_err) {
++            error_propagate_prepend(errp, local_err,
++                                "failed to destroy drive: ");
++        }
++    }
++}
++
++static const XenBackendInfo xen_block_backend_info = {
++    .type = "qdisk",
++    .create = xen_block_device_create,
++    .destroy = xen_block_device_destroy,
++};
++
++static void xen_block_register_backend(void)
++{
++    xen_backend_register(&xen_block_backend_info);
++}
++
++xen_backend_init(xen_block_register_backend);
+diff --git a/hw/xen/xen-legacy-backend.c b/hw/xen/xen-legacy-backend.c
+index 41419763c8..36fd1e9b09 100644
+--- a/hw/xen/xen-legacy-backend.c
++++ b/hw/xen/xen-legacy-backend.c
+@@ -753,7 +753,6 @@ void xen_be_register_common(void)
+ 
+     xen_be_register("console", &xen_console_ops);
+     xen_be_register("vkbd", &xen_kbdmouse_ops);
+-    xen_be_register("qdisk", &xen_blkdev_ops);
+ #ifdef CONFIG_VIRTFS
+     xen_be_register("9pfs", &xen_9pfs_ops);
+ #endif
+diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
+index c4223f9be1..6f5d675edb 100644
+--- a/include/hw/xen/xen-block.h
++++ b/include/hw/xen/xen-block.h
+@@ -29,6 +29,7 @@ typedef struct XenBlockVdev {
+     unsigned long number;
+ } XenBlockVdev;
+ 
++
+ typedef struct XenBlockProperties {
+     XenBlockVdev vdev;
+     BlockConf conf;
+@@ -36,12 +37,24 @@ typedef struct XenBlockProperties {
+     IOThread *iothread;
+ } XenBlockProperties;
+ 
++typedef struct XenBlockDrive {
++    char *id;
++    char *node_name[2];
++    unsigned int layers;
++} XenBlockDrive;
++
++typedef struct XenBlockIOThread {
++    char *id;
++} XenBlockIOThread;
++
+ typedef struct XenBlockDevice {
+     XenDevice xendev;
+     XenBlockProperties props;
+     const char *device_type;
+     unsigned int info;
+     XenBlockDataPlane *dataplane;
++    XenBlockDrive *drive;
++    XenBlockIOThread *iothread;
+ } XenBlockDevice;
+ 
+ typedef void (*XenBlockDeviceRealize)(XenBlockDevice *blockdev, Error **errp);
+-- 
+2.20.1.2.gb21ebb6
