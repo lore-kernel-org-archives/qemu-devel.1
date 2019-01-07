@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49789)
+Received: from eggs.gnu.org ([209.51.188.92]:54273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jonathan.davies@nutanix.com>) id 1ggZ5F-0004dZ-2i
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:53:06 -0500
+	(envelope-from <venu.busireddy@oracle.com>) id 1ggZAy-00028c-C1
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:59:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jonathan.davies@nutanix.com>) id 1ggZ49-00008N-2U
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:51:59 -0500
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:40660)
+	(envelope-from <venu.busireddy@oracle.com>) id 1ggZAx-0005Nq-7y
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:59:00 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:54536)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jonathan.davies@nutanix.com>)
-	id 1ggZ47-0008Tf-JJ
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:51:56 -0500
-From: Jonathan Davies <jonathan.davies@nutanix.com>
-Date: Mon, 7 Jan 2019 17:51:40 +0000
-Message-ID: <20190107175117.23769-1-jonathan.davies@nutanix.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
+	id 1ggZAw-0005Mx-Uz
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:58:59 -0500
+Date: Mon, 7 Jan 2019 11:58:54 -0600
+From: Venu Busireddy <venu.busireddy@oracle.com>
+Message-ID: <20190107175854.GA6932@troi>
+References: <1544458548-5986-1-git-send-email-venu.busireddy@oracle.com>
+	<1544458548-5986-3-git-send-email-venu.busireddy@oracle.com>
+	<6f1e76f0-4871-95fb-4691-d10c216a0826@redhat.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH] usb: drop unnecessary usb_device_post_load
- checks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6f1e76f0-4871-95fb-4691-d10c216a0826@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] virtio_net: Add support for "Data Path
+ Switching" during Live Migration.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Jonathan Davies <jonathan.davies@nutanix.com>, =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-SW4gdXNiX2RldmljZV9wb3N0X2xvYWQsIGNlcnRhaW4gdmFsdWVzIG9mIGRldi0+c2V0dXBfbGVu
-IG9yDQpkZXYtPnNldHVwX2luZGV4IGNhbiBjYXVzZSAtRUlOVkFMIHRvIGJlIHJldHVybmVkLiBP
-bmUgZXhhbXBsZSBpcyB3aGVuDQpzZXR1cF9sZW4gZXhjZWVkcyA0MDk2LCB0aGUgaGFyZC1jb2Rl
-ZCB2YWx1ZSBvZiBzaXplb2YoZGV2LT5kYXRhX2J1ZikuDQpUaGlzIGNhbiBoYXBwZW4gdGhyb3Vn
-aCBsZWdpdGltYXRlIGd1ZXN0IGFjdGl2aXR5IGFuZCB3aWxsIGNhdXNlIGFsbA0Kc3Vic2VxdWVu
-dCBhdHRlbXB0cyB0byBtaWdyYXRlIHRoZSBndWVzdCB0byBmYWlsIGluIHZtc3RhdGVfbG9hZF9z
-dGF0ZS4NCg0KVGhlIHZhbHVlcyBvZiB0aGVzZSB2YXJpYWJsZXMgY2FuIGJlIHNldCBieSBVU0Ig
-cGFja2V0cyBvcmlnaW5hdGluZyBpbg0KdGhlIGd1ZXN0LiBUaGVyZSBhcmUgdHdvIHdheXMgaW4g
-d2hpY2ggdGhleSBjYW4gYmUgc2V0OiBpbg0KZG9fdG9rZW5fc2V0dXAgYW5kIGluIGRvX3BhcmFt
-ZXRlciBpbiBody91c2IvY29yZS5jLg0KDQpJdCBpcyBlYXN5IHRvIGNyYWZ0IGEgVVNCIHBhY2tl
-dCBpbiBhIGd1ZXN0IHRoYXQgY2F1c2VzIGRvX3Rva2VuX3NldHVwDQp0byBzZXQgc2V0dXBfbGVu
-IHRvIGEgdmFsdWUgbGFyZ2VyIHRoYW4gNDA5Ni4gV2hlbiB0aGlzIGhhcyBiZWVuIGRvbmUNCm9u
-Y2UsIGFsbCBzdWJzZXF1ZW50IGF0dGVtcHRzIHRvIG1pZ3JhdGUgdGhlIFZNIHdpbGwgZmFpbCBp
-bg0KdXNiX2RldmljZV9wb3N0X2xvYWQgdW50aWwgdGhlIFZNIGlzIG5leHQgcG93ZXItY3ljbGVk
-IG9yIGENCnNtYWxsZXItc2l6ZWQgVVNCIHBhY2tldCBpcyBzZW50IHRvIHRoZSBkZXZpY2UuDQoN
-ClNhbXBsZSBjb2RlIGZvciBhY2hpZXZpbmcgdGhpcyBpbiBhIFZNIHN0YXJ0ZWQgd2l0aCAiLWRl
-dmljZSB1c2ItdGFibGV0Ig0KcnVubmluZyBMaW51eCB3aXRoIENPTkZJR19ISURSQVc9eSBhbmQg
-SElEX01BWF9CVUZGRVJfU0laRSA+IDQwOTY6DQoNCiAgI2luY2x1ZGUgPHN5cy90eXBlcy5oPg0K
-ICAjaW5jbHVkZSA8c3lzL3N0YXQuaD4NCiAgI2luY2x1ZGUgPGZjbnRsLmg+DQogICNpbmNsdWRl
-IDx1bmlzdGQuaD4NCg0KICBpbnQgbWFpbigpIHsNCiAgICAgICAgICAgY2hhciBidWZbNDA5N107
-DQogICAgICAgICAgIGludCBmZCA9IG9wZW4oIi9kZXYvaGlkcmF3MCIsIE9fUkRXUnxPX05PTkJM
-T0NLKTsNCg0KICAgICAgICAgICBidWZbMF0gPSAweDE7DQogICAgICAgICAgIHdyaXRlKGZkLCBi
-dWYsIDQwOTcpOw0KDQogICAgICAgICAgIHJldHVybiAwOw0KICB9DQoNCldoZW4gdGhpcyBjb2Rl
-IGlzIHJ1biBpbiB0aGUgVk0sIHFlbXUgd2lsbCBvdXRwdXQ6DQoNCiAgdXNiX2dlbmVyaWNfaGFu
-ZGxlX3BhY2tldDogY3RybCBidWZmZXIgdG9vIHNtYWxsICg0MDk3ID4gNDA5NikNCg0KQSBzdWJz
-ZXF1ZW50IGF0dGVtcHQgdG8gbWlncmF0ZSB0aGUgVk0gd2lsbCBmYWlsIGFuZCBvdXRwdXQgdGhl
-DQpmb2xsb3dpbmcgb24gdGhlIGRlc3RpbmF0aW9uIGhvc3Q6DQoNCiAgcWVtdS1rdm06IGVycm9y
-IHdoaWxlIGxvYWRpbmcgc3RhdGUgZm9yIGluc3RhbmNlIDB4MCBvZiBkZXZpY2UgJzAwMDA6MDA6
-MDYuNy8xL3VzYi1wdHInDQogIHFlbXUta3ZtOiBsb2FkIG9mIG1pZ3JhdGlvbiBmYWlsZWQ6IElu
-dmFsaWQgYXJndW1lbnQNCg0KVGhlIGlkZWEgYmVoaW5kIGNoZWNraW5nIHRoZSB2YWx1ZXMgb2Yg
-c2V0dXBfbGVuIGFuZCBzZXR1cF9pbmRleCBiZWZvcmUNCnRoZXkgYXJlIHVzZWQgaXMgY29ycmVj
-dCwgYnV0IGRvaW5nIGl0IGluIHVzYl9kZXZpY2VfcG9zdF9sb2FkIGZlZWxzDQphcmJpdHJhcnks
-IGFuZCB3aWxsIGNhdXNlIHVubmVjZXNzYXJ5IG1pZ3JhdGlvbiBmYWlsdXJlcy4gSW5kZWVkLCBu
-b25lDQpvZiB0aGUgY29tbWl0IG1lc3NhZ2VzIGZvciBjNjAxNzRlOCwgOWY4ZTk4OTUgYW5kIDcx
-OWZmZTFmIGp1c3RpZnkgd2h5DQpwb3N0X2xvYWQgaXMgdGhlIHJpZ2h0IHBsYWNlIHRvIGRvIHRo
-ZXNlIGNoZWNrcy4gVGhleSBjb3JyZWN0bHkgcG9pbnQNCm91dCB0aGF0IHRoZSBpbXBvcnRhbnQg
-dGhpbmcgdG8gcHJvdGVjdCBpcyB0aGUgdXNiX3BhY2tldF9jb3B5Lg0KDQpJbnN0ZWFkLCB0aGUg
-cmlnaHQgcGxhY2UgdG8gZG8gdGhlIGNoZWNrcyBpcyBpbiBkb190b2tlbl9zZXR1cCBhbmQNCmRv
-X3BhcmFtZXRlci4gSW5kZWVkLCB0aGVyZSBhcmUgYWxyZWFkeSBzb21lIGNoZWNrcyBoZXJlLiBX
-ZSBjYW4gZXhhbWluZQ0KZWFjaCBvZiB0aGUgZGlzanVuY3RzIGN1cnJlbnRseSB0ZXN0ZWQgaW4g
-dXNiX2RldmljZV9wb3N0X2xvYWQgdG8gc2VlDQp3aGV0aGVyIGFueSBuZWVkIGFkZGluZyB0byBk
-b190b2tlbl9zZXR1cCBvciBkb19wYXJhbWV0ZXIgdG8gaW1wcm92ZQ0Kc2FmZXR5IHRoZXJlOg0K
-DQogICogZGV2LT5zZXR1cF9pbmRleCA8IDANCiAgICAgLSBUaGlzIHRlc3QgaXMgbm90IG5lZWRl
-ZCBiZWNhdXNlIHNldHVwX2luZGV4IGlzIGV4cGxpY2l0bHkgc2V0IHRvDQowIGluIGRvX3Rva2Vu
-X3NldHVwIGFuZCBkb19wYXJhbWV0ZXIuDQoNCiAgKiBkZXYtPnNldHVwX2xlbiA8IDANCiAgICAg
-LSBJbiBib3RoIGRvX3Rva2VuX3NldHVwIGFuZCBkb19wYXJhbWV0ZXIsIHRoZSB2YWx1ZSBvZiBz
-ZXR1cF9sZW4NCmlzIGNvbXB1dGVkIGJ5IChzLT5zZXR1cF9idWZbN10gPDwgOCkgfCBzLT5zZXR1
-cF9idWZbNl0uIFNpbmNlDQpzLT5zZXR1cF9idWYgaXMgYSBieXRlIGFycmF5IGFuZCBzZXR1cF9s
-ZW4gaXMgYW4gaW50MzJfdCwgaXQncw0KaW1wb3NzaWJsZSBmb3IgdGhpcyBhcml0aG1ldGljIHRv
-IHNldCBzZXR1cF9sZW4ncyB0b3AgYml0LCBzbyBpdCBjYW4NCm5ldmVyIGJlIG5lZ2F0aXZlLg0K
-DQogICogZGV2LT5zZXR1cF9pbmRleCA+IGRldi0+c2V0dXBfbGVuDQogICAgIC0gU2luY2Ugc2V0
-dXBfaW5kZXggaXMgMCwgdGhpcyBpcyBlcXVpdmFsZW50IHRvIHRoZSBwcmV2aW91cyB0ZXN0LA0K
-c28gaXMgcmVkdW5kYW50Lg0KDQogICogZGV2LT5zZXR1cF9sZW4gPiBzaXplb2YoZGV2LT5kYXRh
-X2J1ZikNCiAgICAgLSBUaGlzIGNvbmRpdGlvbiBpcyBhbHJlYWR5IGV4cGxpY2l0bHkgY2hlY2tl
-ZCBpbiBib3RoDQpkb190b2tlbl9zZXR1cCBhbmQgZG9fcGFyYW1ldGVyLg0KDQpIZW5jZSB0aGVy
-ZSBpcyBubyBuZWVkIHRvIGJvbHN0ZXIgdGhlIGV4aXN0aW5nIGNoZWNrcyBpbiBkb190b2tlbl9z
-ZXR1cA0Kb3IgZG9fcGFyYW1ldGVyLCBhbmQgd2UgY2FuIHNhZmVseSByZW1vdmUgdGhlc2UgY2hl
-Y2tzIGZyb20NCnVzYl9kZXZpY2VfcG9zdF9sb2FkIHdpdGhvdXQgcmVkdWNpbmcgc2FmZXR5IGJ1
-dCBhbGxvd2luZyBtaWdyYXRpb25zIHRvDQpwcm9jZWVkIHJlZ2FyZGxlc3Mgb2Ygd2hhdCBVU0Ig
-cGFja2V0cyBoYXZlIGJlZW4gZ2VuZXJhdGVkIGJ5IHRoZSBndWVzdC4NCg0KU2lnbmVkLW9mZi1i
-eTogSm9uYXRoYW4gRGF2aWVzIDxqb25hdGhhbi5kYXZpZXNAbnV0YW5peC5jb20+DQotLS0NCiBo
-dy91c2IvYnVzLmMgfCA2IC0tLS0tLQ0KIDEgZmlsZSBjaGFuZ2VkLCA2IGRlbGV0aW9ucygtKQ0K
-DQpkaWZmIC0tZ2l0IGEvaHcvdXNiL2J1cy5jIGIvaHcvdXNiL2J1cy5jDQppbmRleCBiZjc5NmQ2
-N2U2Li42ZmZmYWI3YmZhIDEwMDY0NA0KLS0tIGEvaHcvdXNiL2J1cy5jDQorKysgYi9ody91c2Iv
-YnVzLmMNCkBAIC01OSwxMiArNTksNiBAQCBzdGF0aWMgaW50IHVzYl9kZXZpY2VfcG9zdF9sb2Fk
-KHZvaWQgKm9wYXF1ZSwgaW50IHZlcnNpb25faWQpDQogICAgIH0gZWxzZSB7DQogICAgICAgICBk
-ZXYtPmF0dGFjaGVkID0gdHJ1ZTsNCiAgICAgfQ0KLSAgICBpZiAoZGV2LT5zZXR1cF9pbmRleCA8
-IDAgfHwNCi0gICAgICAgIGRldi0+c2V0dXBfbGVuIDwgMCB8fA0KLSAgICAgICAgZGV2LT5zZXR1
-cF9pbmRleCA+IGRldi0+c2V0dXBfbGVuIHx8DQotICAgICAgICBkZXYtPnNldHVwX2xlbiA+IHNp
-emVvZihkZXYtPmRhdGFfYnVmKSkgew0KLSAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQotICAgIH0N
-CiAgICAgcmV0dXJuIDA7DQogfQ0KIA0KLS0gDQoyLjE3LjENCg0K
+On 2018-12-10 13:28:42 -0600, Eric Blake wrote:
+> On 12/10/18 10:15 AM, Venu Busireddy wrote:
+> > Added two new events, FAILOVER_PLUG_PRIMARY and FAILOVER_UNPLUG_PRIMARY.
+> > The first is emitted when the guest negotiates the F_STANDBY feature
+> > bit. The second is emitted when the virtio_net driver is removed, either
+> > manually or as a result of guest reboot. Management stack can use these
+> > events to determine when to plug/unplug the VF device to/from the guest.
+> > 
+> > Also, the Virtual Functions will be automatically removed from the guest
+> > if the guest is rebooted. To properly identify the VFIO devices that
+> > must be removed, a new property named "x-failover-primary" is added to
+> > the vfio-pci devices. Only the vfio-pci devices that have this property
+> > enabled are removed from the guest upon reboot.
+> > 
+> > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+> > ---
+> 
+> > +++ b/qapi/net.json
+> > @@ -683,3 +683,47 @@
+> >   ##
+> >   { 'event': 'NIC_RX_FILTER_CHANGED',
+> >     'data': { '*name': 'str', 'path': 'str' } }
+> > +
+> > +##
+> > +# @FAILOVER_PLUG_PRIMARY:
+> > +#
+> > +# Emitted when the guest successfully loads the driver after the STANDBY
+> > +# feature bit is negotiated.
+> > +#
+> > +# @device: Indicates the virtio_net device.
+> > +#
+> > +# @path: Indicates the device path.
+> > +#
+> > +# Since: 3.0
+> 
+> You've missed 3.0, and even 3.1.  This should be 4.0.
+
+Sorry for the delay in responding...
+
+Posted v2 including your suggestion at
+https://lists.oasis-open.org/archives/virtio-dev/201901/msg00046.html
+
+Thanks!
+
+> 
+> > +#
+> > +# Example:
+> > +#
+> > +# <- {"timestamp": {"seconds": 1432121972, "microseconds": 744001},
+> > +#     "event": "FAILOVER_PLUG_PRIMARY",
+> > +#     "data": {"device": "net0", "path": "/machine/peripheral/net0/virtio-backend"} }
+> > +#
+> > +##
+> > +{ 'event': 'FAILOVER_PLUG_PRIMARY',
+> > +  'data': {'*device': 'str', 'path': 'str'} }
+> > +
+> > +##
+> > +# @FAILOVER_UNPLUG_PRIMARY:
+> > +#
+> > +# Emitted when the guest resets the virtio_net driver.
+> > +# The reset can be the result of either unloading the driver or a reboot.
+> > +#
+> > +# @device: Indicates the virtio_net device.
+> > +#
+> > +# @path: Indicates the device path.
+> > +#
+> > +# Since: 3.0
+> 
+> and again
+> 
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
