@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49248)
+Received: from eggs.gnu.org ([209.51.188.92]:49401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU26-0005iG-Kn
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:29:31 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU2d-000650-3N
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:30:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU22-0007dZ-N8
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:29:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48874)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU2Z-0007rd-6s
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:30:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59390)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ggU21-0007cZ-11
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:29:26 -0500
+	id 1ggU2V-0007qB-H6
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:29:55 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon,  7 Jan 2019 16:22:44 +0400
-Message-Id: <20190107122304.22997-9-marcandre.lureau@redhat.com>
+Date: Mon,  7 Jan 2019 16:22:42 +0400
+Message-Id: <20190107122304.22997-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20190107122304.22997-1-marcandre.lureau@redhat.com>
 References: <20190107122304.22997-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 08/28] compat: replace PC_COMPAT_2_12 &
- HW_COMPAT_2_12 macros
+Subject: [Qemu-devel] [PULL v2 06/28] compat: replace PC_COMPAT_3_1 &
+ HW_COMPAT_3_1 macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,275 +40,214 @@ Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Acked-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
  include/hw/boards.h        |  3 +++
- include/hw/compat.h        | 27 ---------------------------
- include/hw/i386/pc.h       | 21 ++-------------------
- hw/arm/virt.c              |  5 +----
- hw/core/machine.c          | 29 +++++++++++++++++++++++++++++
- hw/i386/pc.c               | 21 +++++++++++++++++++++
+ include/hw/compat.h        | 11 -----------
+ include/hw/i386/pc.h       |  9 ++-------
+ hw/arm/virt.c              |  6 +-----
+ hw/core/machine.c          | 13 +++++++++++++
+ hw/i386/pc.c               |  9 +++++++++
  hw/i386/pc_piix.c          |  7 ++-----
  hw/i386/pc_q35.c           |  7 ++-----
- hw/ppc/spapr.c             |  2 +-
+ hw/ppc/spapr.c             |  6 +-----
  hw/s390x/s390-virtio-ccw.c |  6 +-----
- 10 files changed, 62 insertions(+), 66 deletions(-)
+ 10 files changed, 34 insertions(+), 43 deletions(-)
 
 diff --git a/include/hw/boards.h b/include/hw/boards.h
-index aaa57f1f6b..c6d828e73c 100644
+index 0566742412..b9a5c2d087 100644
 --- a/include/hw/boards.h
 +++ b/include/hw/boards.h
-@@ -294,4 +294,7 @@ extern const size_t hw_compat_3_1_len;
- extern GlobalProperty hw_compat_3_0[];
- extern const size_t hw_compat_3_0_len;
+@@ -288,4 +288,7 @@ struct MachineState {
+     } \
+     type_init(machine_initfn##_register_types)
 =20
-+extern GlobalProperty hw_compat_2_12[];
-+extern const size_t hw_compat_2_12_len;
++extern GlobalProperty hw_compat_3_1[];
++extern const size_t hw_compat_3_1_len;
 +
  #endif
 diff --git a/include/hw/compat.h b/include/hw/compat.h
-index c08f4040bb..13242b831a 100644
+index 3ca85b037c..6f4d5fc647 100644
 --- a/include/hw/compat.h
 +++ b/include/hw/compat.h
-@@ -1,33 +1,6 @@
+@@ -1,17 +1,6 @@
  #ifndef HW_COMPAT_H
  #define HW_COMPAT_H
 =20
--#define HW_COMPAT_2_12 \
+-#define HW_COMPAT_3_1 \
 -    {\
--        .driver   =3D "migration",\
--        .property =3D "decompress-error-check",\
--        .value    =3D "off",\
+-        .driver   =3D "pcie-root-port",\
+-        .property =3D "x-speed",\
+-        .value    =3D "2_5",\
 -    },{\
--        .driver   =3D "hda-audio",\
--        .property =3D "use-timer",\
--        .value    =3D "false",\
--    },{\
--        .driver   =3D "cirrus-vga",\
--        .property =3D "global-vmstate",\
--        .value    =3D "true",\
--    },{\
--        .driver   =3D "VGA",\
--        .property =3D "global-vmstate",\
--        .value    =3D "true",\
--    },{\
--        .driver   =3D "vmware-svga",\
--        .property =3D "global-vmstate",\
--        .value    =3D "true",\
--    },{\
--        .driver   =3D "qxl-vga",\
--        .property =3D "global-vmstate",\
--        .value    =3D "true",\
+-        .driver   =3D "pcie-root-port",\
+-        .property =3D "x-width",\
+-        .value    =3D "1",\
 -    },
 -
- #define HW_COMPAT_2_11 \
-     {\
-         .driver   =3D "hpet",\
+ #define HW_COMPAT_3_0 \
+     /* empty */
+=20
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 197131ff9a..91cb3283f0 100644
+index c7c0c944e8..dd1d6fd0f3 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -300,25 +300,8 @@ extern const size_t pc_compat_3_1_len;
- extern GlobalProperty pc_compat_3_0[];
- extern const size_t pc_compat_3_0_len;
+@@ -294,13 +294,8 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+ int e820_get_num_entries(void);
+ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
 =20
--#define PC_COMPAT_2_12 \
--    HW_COMPAT_2_12 \
+-#define PC_COMPAT_3_1 \
+-    HW_COMPAT_3_1 \
 -    {\
--        .driver   =3D TYPE_X86_CPU,\
--        .property =3D "legacy-cache",\
--        .value    =3D "on",\
--    },{\
--        .driver   =3D TYPE_X86_CPU,\
--        .property =3D "topoext",\
+-        .driver   =3D "intel-iommu",\
+-        .property =3D "dma-drain",\
 -        .value    =3D "off",\
--    },{\
--        .driver   =3D "EPYC-" TYPE_X86_CPU,\
--        .property =3D "xlevel",\
--        .value    =3D stringify(0x8000000a),\
--    },{\
--        .driver   =3D "EPYC-IBPB-" TYPE_X86_CPU,\
--        .property =3D "xlevel",\
--        .value    =3D stringify(0x8000000a),\
 -    },
-+extern GlobalProperty pc_compat_2_12[];
-+extern const size_t pc_compat_2_12_len;
++extern GlobalProperty pc_compat_3_1[];
++extern const size_t pc_compat_3_1_len;
 =20
- #define PC_COMPAT_2_11 \
-     HW_COMPAT_2_11 \
+ #define PC_COMPAT_3_0 \
+     HW_COMPAT_3_0 \
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 5c541ec55e..228ee63d99 100644
+index 19bec3fe59..ebd5f306e4 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -1889,12 +1889,9 @@ DEFINE_VIRT_MACHINE(3, 0)
- static void virt_machine_2_12_options(MachineClass *mc)
- {
-     VirtMachineClass *vmc =3D VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
--    static GlobalProperty compat[] =3D {
--        HW_COMPAT_2_12
--    };
+@@ -1874,12 +1874,8 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
 =20
-     virt_machine_3_0_options(mc);
+ static void virt_machine_3_1_options(MachineClass *mc)
+ {
+-    static GlobalProperty compat[] =3D {
+-        HW_COMPAT_3_1
+-    };
+-
+     virt_machine_4_0_options(mc);
 -    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-+    compat_props_add(mc->compat_props, hw_compat_2_12, hw_compat_2_12_le=
-n);
-     vmc->no_highmem_ecam =3D true;
-     mc->max_cpus =3D 255;
++    compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len)=
+;
  }
+ DEFINE_VIRT_MACHINE(3, 1)
+=20
 diff --git a/hw/core/machine.c b/hw/core/machine.c
-index f00f6381d2..ae94f5e4ca 100644
+index bd644c976b..d6204967c3 100644
 --- a/hw/core/machine.c
 +++ b/hw/core/machine.c
-@@ -38,6 +38,35 @@ const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_com=
-pat_3_1);
- GlobalProperty hw_compat_3_0[] =3D {};
- const size_t hw_compat_3_0_len =3D G_N_ELEMENTS(hw_compat_3_0);
+@@ -22,6 +22,19 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
 =20
-+GlobalProperty hw_compat_2_12[] =3D {
++GlobalProperty hw_compat_3_1[] =3D {
 +    {
-+        .driver   =3D "migration",
-+        .property =3D "decompress-error-check",
-+        .value    =3D "off",
++        .driver   =3D "pcie-root-port",
++        .property =3D "x-speed",
++        .value    =3D "2_5",
 +    },{
-+        .driver   =3D "hda-audio",
-+        .property =3D "use-timer",
-+        .value    =3D "false",
-+    },{
-+        .driver   =3D "cirrus-vga",
-+        .property =3D "global-vmstate",
-+        .value    =3D "true",
-+    },{
-+        .driver   =3D "VGA",
-+        .property =3D "global-vmstate",
-+        .value    =3D "true",
-+    },{
-+        .driver   =3D "vmware-svga",
-+        .property =3D "global-vmstate",
-+        .value    =3D "true",
-+    },{
-+        .driver   =3D "qxl-vga",
-+        .property =3D "global-vmstate",
-+        .value    =3D "true",
++        .driver   =3D "pcie-root-port",
++        .property =3D "x-width",
++        .value    =3D "1",
 +    },
 +};
-+const size_t hw_compat_2_12_len =3D G_N_ELEMENTS(hw_compat_2_12);
++const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
 +
  static char *machine_get_accel(Object *obj, Error **errp)
  {
      MachineState *ms =3D MACHINE(obj);
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b5799985a1..031602a005 100644
+index f248662e97..33d09a832a 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -135,6 +135,27 @@ GlobalProperty pc_compat_3_0[] =3D {
- };
- const size_t pc_compat_3_0_len =3D G_N_ELEMENTS(pc_compat_3_0);
+@@ -109,6 +109,15 @@ static struct e820_entry *e820_table;
+ static unsigned e820_entries;
+ struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_MAX};
 =20
-+GlobalProperty pc_compat_2_12[] =3D {
++GlobalProperty pc_compat_3_1[] =3D {
 +    {
-+        .driver   =3D TYPE_X86_CPU,
-+        .property =3D "legacy-cache",
-+        .value    =3D "on",
-+    },{
-+        .driver   =3D TYPE_X86_CPU,
-+        .property =3D "topoext",
++        .driver   =3D "intel-iommu",
++        .property =3D "dma-drain",
 +        .value    =3D "off",
-+    },{
-+        .driver   =3D "EPYC-" TYPE_X86_CPU,
-+        .property =3D "xlevel",
-+        .value    =3D stringify(0x8000000a),
-+    },{
-+        .driver   =3D "EPYC-IBPB-" TYPE_X86_CPU,
-+        .property =3D "xlevel",
-+        .value    =3D stringify(0x8000000a),
 +    },
 +};
-+const size_t pc_compat_2_12_len =3D G_N_ELEMENTS(pc_compat_2_12);
++const size_t pc_compat_3_1_len =3D G_N_ELEMENTS(pc_compat_3_1);
 +
  void gsi_handler(void *opaque, int n, int level)
  {
      GSIState *s =3D opaque;
 diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index cc8b249ccc..fd3906cda6 100644
+index 2423428acd..c938437627 100644
 --- a/hw/i386/pc_piix.c
 +++ b/hw/i386/pc_piix.c
-@@ -462,12 +462,9 @@ DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
+@@ -440,14 +440,11 @@ DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
 =20
- static void pc_i440fx_2_12_machine_options(MachineClass *m)
+ static void pc_i440fx_3_1_machine_options(MachineClass *m)
  {
 -    static GlobalProperty compat[] =3D {
--        PC_COMPAT_2_12
+-        PC_COMPAT_3_1
 -    };
 -
-     pc_i440fx_3_0_machine_options(m);
+     pc_i440fx_4_0_machine_options(m);
+     m->is_default =3D 0;
+     m->alias =3D NULL;
 -    compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
-+    compat_props_add(m->compat_props, hw_compat_2_12, hw_compat_2_12_len=
-);
-+    compat_props_add(m->compat_props, pc_compat_2_12, pc_compat_2_12_len=
-);
++    compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
++    compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
  }
 =20
- DEFINE_I440FX_MACHINE(v2_12, "pc-i440fx-2.12", NULL,
+ DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
 diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 39378ee1cd..7928f703d0 100644
+index d84614546c..fad3d6da17 100644
 --- a/hw/i386/pc_q35.c
 +++ b/hw/i386/pc_q35.c
-@@ -345,12 +345,9 @@ DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
+@@ -323,14 +323,11 @@ DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
 =20
- static void pc_q35_2_12_machine_options(MachineClass *m)
+ static void pc_q35_3_1_machine_options(MachineClass *m)
  {
 -    static GlobalProperty compat[] =3D {
--        PC_COMPAT_2_12
+-        PC_COMPAT_3_1
 -    };
 -
-     pc_q35_3_0_machine_options(m);
+     pc_q35_4_0_machine_options(m);
+     m->default_kernel_irqchip_split =3D false;
+     m->alias =3D NULL;
 -    compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
-+    compat_props_add(m->compat_props, hw_compat_2_12, hw_compat_2_12_len=
-);
-+    compat_props_add(m->compat_props, pc_compat_2_12, pc_compat_2_12_len=
-);
++    compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
++    compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
  }
 =20
- DEFINE_Q35_MACHINE(v2_12, "pc-q35-2.12", NULL,
+ DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8a99e4d9b8..f1fe455c71 100644
+index f3b8c18de3..f04135fffd 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -4054,7 +4054,6 @@ static void spapr_machine_2_12_class_options(Machin=
-eClass *mc)
- {
-     sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-     static GlobalProperty compat[] =3D {
--        HW_COMPAT_2_12
-         {
-             .driver =3D TYPE_POWERPC_CPU,
-             .property =3D "pre-3.0-migration",
-@@ -4068,6 +4067,7 @@ static void spapr_machine_2_12_class_options(Machin=
-eClass *mc)
-     };
-=20
-     spapr_machine_3_0_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_2_12, hw_compat_2_12_le=
-n);
-     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-=20
-     /* We depend on kvm_enabled() to choose a default value for the
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index e54e6f6dd0..ce22a9d511 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -696,12 +696,8 @@ static void ccw_machine_2_12_instance_options(Machin=
-eState *machine)
-=20
- static void ccw_machine_2_12_class_options(MachineClass *mc)
+@@ -4023,12 +4023,8 @@ DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
+  */
+ static void spapr_machine_3_1_class_options(MachineClass *mc)
  {
 -    static GlobalProperty compat[] =3D {
--        HW_COMPAT_2_12
+-        HW_COMPAT_3_1
 -    };
 -
-     ccw_machine_3_0_class_options(mc);
+     spapr_machine_4_0_class_options(mc);
 -    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-+    compat_props_add(mc->compat_props, hw_compat_2_12, hw_compat_2_12_le=
-n);
++    compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len)=
+;
+     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
  }
- DEFINE_CCW_MACHINE(2_12, "2.12", false);
+=20
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 21f3325c5a..5e8b48e75b 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -667,12 +667,8 @@ static void ccw_machine_3_1_instance_options(Machine=
+State *machine)
+=20
+ static void ccw_machine_3_1_class_options(MachineClass *mc)
+ {
+-    static GlobalProperty compat[] =3D {
+-        HW_COMPAT_3_1
+-    };
+-
+     ccw_machine_4_0_class_options(mc);
+-    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
++    compat_props_add(mc->compat_props, hw_compat_3_1, hw_compat_3_1_len)=
+;
+ }
+ DEFINE_CCW_MACHINE(3_1, "3.1", false);
 =20
 --=20
 2.20.1.2.gb21ebb671b
