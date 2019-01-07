@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45138)
+Received: from eggs.gnu.org ([209.51.188.92]:58339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ggcL5-00017i-1H
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 16:21:41 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1ggcxD-0003h2-8X
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:01:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ggcL3-00043P-NT
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 16:21:38 -0500
-Resent-Message-Id: <E1ggcL3-00043P-NT@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21777)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ggcL3-0003xw-AX
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 16:21:37 -0500
-In-Reply-To: <1546883690-17798-1-git-send-email-venu.busireddy@oracle.com>
-Message-ID: <154689513656.26738.17539824049175463426@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1ggcxC-0001Eb-8f
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:01:03 -0500
+Date: Mon, 7 Jan 2019 23:00:55 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20190104051729.GD2801@umbus.fritz.box>
+Message-ID: <alpine.BSF.2.21.9999.1901072242450.28927@zero.eik.bme.hu>
+References: <cover.1546394798.git.balaton@eik.bme.hu>
+	<16d6e1b4987d30c11ace0211e9d6a57303784467.1546394798.git.balaton@eik.bme.hu>
+	<20190102041507.GN27457@umbus.fritz.box>
+	<alpine.BSF.2.21.9999.1901031501030.39019@zero.eik.bme.hu>
+	<20190104051729.GD2801@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 7 Jan 2019 13:05:38 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Support for datapath switching
- during live migration
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH 4/8] ppc4xx: Use ram_addr_t in
+ ppc4xx_sdram_adjust()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: venu.busireddy@oracle.com
-Cc: fam@euphon.net, mst@redhat.com, marcel@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ2ODgzNjkwLTE3Nzk4LTEt
-Z2l0LXNlbmQtZW1haWwtdmVudS5idXNpcmVkZHlAb3JhY2xlLmNvbS8KCgoKSGksCgpUaGlzIHNl
-cmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0
-IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRD
-SCB2MiAwLzVdIFN1cHBvcnQgZm9yIGRhdGFwYXRoIHN3aXRjaGluZyBkdXJpbmcgbGl2ZSBtaWdy
-YXRpb24KTWVzc2FnZS1pZDogMTU0Njg4MzY5MC0xNzc5OC0xLWdpdC1zZW5kLWVtYWlsLXZlbnUu
-YnVzaXJlZGR5QG9yYWNsZS5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
-JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
-bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
-ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
-KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
-aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
-MzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg4YjBhY2IgcGNpOiBxdWVyeSBj
-b21tYW5kIGV4dGVuc2lvbiB0byBjaGVjayB0aGUgYnVzIG1hc3RlciBlbmFibGluZyBzdGF0dXMg
-b2YgdGhlIGZhaWxvdmVyLXByaW1hcnkgZGV2aWNlCmVkMmRjNzcgdmZpby1wY2k6IEFkZCBGQUlM
-T1ZFUl9QUklNQVJZX0NIQU5HRUQgZXZlbnQgdG8gc2hvcnRlbiBkb3dudGltZSBkdXJpbmcgZmFp
-bG92ZXIKYzY3NzI0NiB2aXJ0aW9fbmV0OiBBZGQgYSBxdWVyeSBjb21tYW5kIGZvciBGQUlMT1ZF
-Ul9TVEFOREJZX0NIQU5HRUQgZXZlbnQuCjEzNWRmYTcgdmlydGlvX25ldDogQWRkIHN1cHBvcnQg
-Zm9yICJEYXRhIFBhdGggU3dpdGNoaW5nIiBkdXJpbmcgTGl2ZSBNaWdyYXRpb24uCmE4N2Y0NTEg
-dmlydGlvX25ldDogQWRkIFZJUlRJT19ORVRfRl9TVEFOREJZIGZlYXR1cmUgYml0LgoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81OiB2aXJ0aW9fbmV0OiBBZGQgVklSVElP
-X05FVF9GX1NUQU5EQlkgZmVhdHVyZSBiaXQuLi4uCkNoZWNraW5nIFBBVENIIDIvNTogdmlydGlv
-X25ldDogQWRkIHN1cHBvcnQgZm9yICJEYXRhIFBhdGggU3dpdGNoaW5nIiBkdXJpbmcgTGl2ZSBN
-aWdyYXRpb24uLi4uCkNoZWNraW5nIFBBVENIIDMvNTogdmlydGlvX25ldDogQWRkIGEgcXVlcnkg
-Y29tbWFuZCBmb3IgRkFJTE9WRVJfU1RBTkRCWV9DSEFOR0VEIGV2ZW50Li4uLgpXQVJOSU5HOiBC
-bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTIxOiBG
-SUxFOiBuZXQvbmV0LmM6MTM0NzoKKyAgICAgICAgLyogb25seSBxdWVyeSBpbmZvcm1hdGlvbiBv
-biBxdWV1ZSAwIHNpbmNlIHRoZSBpbmZvIGlzIHBlciBuaWMsCgpFUlJPUjogYnJhY2VzIHt9IGFy
-ZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMjQ6IEZJTEU6IG5l
-dC9uZXQuYzoxMzUwOgorICAgICAgICBpZiAobmMtPnF1ZXVlX2luZGV4ICE9IDApClsuLi5dCgp0
-b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDE3MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzU6IHZmaW8tcGNp
-OiBBZGQgRkFJTE9WRVJfUFJJTUFSWV9DSEFOR0VEIGV2ZW50IHRvIHNob3J0ZW4gZG93bnRpbWUg
-ZHVyaW5nIGZhaWxvdmVyLi4uCkNoZWNraW5nIFBBVENIIDUvNTogcGNpOiBxdWVyeSBjb21tYW5k
-IGV4dGVuc2lvbiB0byBjaGVjayB0aGUgYnVzIG1hc3RlciBlbmFibGluZyBzdGF0dXMgb2YgdGhl
-IGZhaWxvdmVyLXByaW1hcnkgZGV2aWNlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NDY4ODM2OTAtMTc3OTgtMS1naXQtc2VuZC1lbWFpbC12
-ZW51LmJ1c2lyZWRkeUBvcmFjbGUuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
-LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On Fri, 4 Jan 2019, David Gibson wrote:
+> On Thu, Jan 03, 2019 at 03:03:20PM +0100, BALATON Zoltan wrote:
+>> On Wed, 2 Jan 2019, David Gibson wrote:
+>>> On Wed, Jan 02, 2019 at 03:06:38AM +0100, BALATON Zoltan wrote:
+>>>> To avoid overflow if larger values are added later use ram_addr_t for
+>>>> the sdram_bank_sizes parameter to match ram_size to which it is
+>>>> compared.
+>>>
+>>> So, technically I think these should be 'hwaddr' (which represents a
+>>> guest physical address) rather tham ram_addr_t which
+>>> represents... something subtley different I've never properly
+>>> understood.
+>>
+>> I don't understand the difference either but ram_size in MachineState where
+>> this value comes from is ram_addr_t now so I've left is for now. If someone
+>> knows which type should this be can change it in another patch
+>> later.
+>
+> Ok, fair enough.
+
+Then will you take v3 of this series or is there anything else that should 
+be corrected?
+
+Regards,
+BALATON Zoltan
