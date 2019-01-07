@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38261)
+Received: from eggs.gnu.org ([209.51.188.92]:38542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ggSOS-0006Am-I6
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:44:29 -0500
+	(envelope-from <thuth@redhat.com>) id 1ggSPX-0006rg-2M
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:45:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ggSOO-0003sY-Qo
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:44:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35294)
+	(envelope-from <thuth@redhat.com>) id 1ggSPW-0004Y7-5a
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:45:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56556)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ggSOM-0003qm-Rn
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:44:24 -0500
-Date: Mon, 7 Jan 2019 11:44:19 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190107104419.coaistvm72hx2slz@sirius.home.kraxel.org>
-References: <alpine.DEB.2.11.1812271413170.12302@REDDOT>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.11.1812271413170.12302@REDDOT>
-Subject: Re: [Qemu-devel] [PATCH] Introduce new "no_guest_reset" parameter
- for usb-host device (fwd)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ggSPW-0004UW-07
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:45:34 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon,  7 Jan 2019 11:45:26 +0100
+Message-Id: <1546857926-5958-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +21,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Kappner <agk@godking.net>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, pbonzini@redhat.com, peter.maydell@linaro.org
 
-On Thu, Dec 27, 2018 at 02:19:09PM -0800, Alexander Kappner wrote:
-> 
-> Resending; forgot to CC maintainer.
+Different versions of GCC and Clang use different versions of the C standard.
+This repeatedly caused problems already, e.g. with duplicated typedefs:
 
-Now the list mail address is wrong (.com instead of .org).
+ https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
 
-> 1) Guest recognizes new device, sends reset to emulated USB host
-> 2) QEMU's USB host sends reset to host kernel
-> 3) Host kernel resets device
-> 4) After reset, host kernel determines that some part of the device descriptor
-> has changed ("device firmware changed" in dmesg), so host kernel decides to
-> re-enumerate the device.
+or with for-loop variable initializers:
 
-Not sure this is actually the reason ...
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
 
-> 5) Re-enumeration causes QEMU to disconnect and reconnect the device in the
-> guest.
-> 6) goto 1)
-> 
-> Here's from the host kernel (note the "device firmware changed" lines")
-> 
-> [3677704.473050] usb 1-1.3: new high-speed USB device number 53 using ehci-pci
-> [3677704.555594] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
-> [3677704.555599] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-> [3677704.555602] usb 1-1.3: Product: iPhone
-> [3677704.555605] usb 1-1.3: Manufacturer: Apple Inc.
-> [3677704.555607] usb 1-1.3: SerialNumber: [[removed]]
-> [3677709.401040] usb 1-1.3: reset high-speed USB device number 53 using ehci-pci
-> [3677709.479486] usb 1-1.3: device firmware changed
+To avoid these problems, we should enforce the C language version to the
+same level for all compilers. Since our minimum compiler versions are
+GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" already,
+this seems to be a good choice.
 
-.. here it is ...
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ configure | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> [3677709.479842] usb 1-1.3: USB disconnect, device number 53
-> [3677709.546039] usb 1-1.3: new high-speed USB device number 54 using ehci-pci
-> [3677709.627471] usb 1-1.3: New USB device found, idVendor=05ac, idProduct=12a8, bcdDevice=11.08
-> [3677709.627476] usb 1-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-> [3677709.627479] usb 1-1.3: Product: iPhone
-> [3677709.627481] usb 1-1.3: Manufacturer: Apple Inc.
-> [3677709.627483] usb 1-1.3: SerialNumber: [[removed]]
-> [3677762.320044] usb 1-1.3: reset high-speed USB device number 54 using ehci-pci
-> [3677762.615630] usb 1-1.3: USB disconnect, device number 54
-
-... but on the second cycle this is missing but there is still a disconnect.
-
-Could be the phone actually disconnects.
-
-> introduced for the usb-host device. I can confirm that the configuration
-> described above (iPhone XS + Mojave guest) works flawlessly with
-> no_guest_reset=True specified.
-
-Can you make this "guest-reset=false"?  Otherwise the patch looks fine.
-
-thanks,
-  Gerd
+diff --git a/configure b/configure
+index 79375af..07f8105 100755
+--- a/configure
++++ b/configure
+@@ -107,6 +107,9 @@ update_cxxflags() {
+             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
+             -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls)
+                 ;;
++            -std=gnu11)
++                QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }-std=gnu++11
++                ;;
+             *)
+                 QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
+                 ;;
+@@ -585,7 +588,7 @@ ARFLAGS="${ARFLAGS-rv}"
+ # left shift of signed integers is well defined and has the expected
+ # 2s-complement style results. (Both clang and gcc agree that it
+ # provides these semantics.)
+-QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
++QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv -std=gnu11 $QEMU_CFLAGS"
+ QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
+ QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+ QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
+-- 
+1.8.3.1
