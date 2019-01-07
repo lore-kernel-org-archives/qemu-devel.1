@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58361)
+Received: from eggs.gnu.org ([209.51.188.92]:58486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggX87-0003p0-9D
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:47:56 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ggX8P-00040j-BT
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:48:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggX86-0002Gg-Dw
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:47:55 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190102140535.11512-1-cfergeau@redhat.com>
-	<20190102180158.GA6015@natto.ory.fergeau.eu>
-	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
-Date: Mon, 07 Jan 2019 16:47:44 +0100
-In-Reply-To: <4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com> (Eric Blake's
-	message of "Wed, 2 Jan 2019 16:08:10 -0600")
-Message-ID: <87o98sii5b.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1ggX8O-0002OF-PH
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:48:13 -0500
+Date: Mon, 7 Jan 2019 16:48:01 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190107164801.32e9d6dc.cohuck@redhat.com>
+In-Reply-To: <5C2F6ED2.33D0D1.16460@m12-13.163.com>
+References: <20190103151612.51399-1-liq3ea@163.com>
+	<20190104151005.42b6f111.cohuck@redhat.com>
+	<5C2F6ED2.33D0D1.16460@m12-13.163.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] s390: avoid potential null dereference
+ ins390_pcihost_unplug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +25,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Christophe Fergeau <cfergeau@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Li Qiang <liq3ea@163.com>
+Cc: "walling@linux.ibm.com" <walling@linux.ibm.com>, "rth@twiddle.net" <rth@twiddle.net>, "david@redhat.com" <david@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>, "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
 
-Eric Blake <eblake@redhat.com> writes:
+On Fri, 4 Jan 2019 22:33:51 +0800
+Li Qiang <liq3ea@163.com> wrote:
 
-> On 1/2/19 12:01 PM, Christophe Fergeau wrote:
->> Adding Markus to cc: list, I forgot to do it when sending the patch.
->
-> Also worth backporting via qemu-stable, now in cc.
->
->> 
->> Christophe
->> 
->> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
->>> commit 8bca4613 added support for %% in json strings when interpolating,
->>> but in doing so, this broke handling of % when not interpolating as the
->>> '%' is skipped in both cases.
->>> This commit ensures we only try to handle %% when interpolating.
+> What do you think of =E2=80=98g_assert_not_reached();=E2=80=99. For examp=
+le:
+>=20
+> else {
+>      g_assert_not_reached();
+> }
 
-Impact?
-
-If you're unable to assess, could you give us at least a reproducer?
-
->>> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
->>> ---
->>>  qobject/json-parser.c | 10 ++++++----
->>>  tests/check-qjson.c   |  5 +++++
->>>  2 files changed, 11 insertions(+), 4 deletions(-)
->>>
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Patch looks good to me, but I'd like us to improve the commit message.
+Sounds good. But please return anyway in the unplug case, so that the
+code is fine if asserts have been configured out.
