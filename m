@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55203)
+Received: from eggs.gnu.org ([209.51.188.92]:56386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ggT7A-00019U-S9
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 06:30:41 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1ggT9Z-0001sW-1w
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 06:33:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ggT7A-0002Ak-1o
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 06:30:40 -0500
-References: <1546510620-6707-1-git-send-email-pmorel@linux.ibm.com>
-	<1546510620-6707-2-git-send-email-pmorel@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <787ebc5e-73e7-dfc8-fda5-91ac560f2e59@redhat.com>
-Date: Mon, 7 Jan 2019 12:30:35 +0100
+	(envelope-from <yang.zhong@intel.com>) id 1ggT9Y-0004b5-9J
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 06:33:09 -0500
+Received: from mga18.intel.com ([134.134.136.126]:55182)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1ggT9Y-0004QG-0m
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 06:33:08 -0500
+Date: Mon, 7 Jan 2019 19:29:29 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190107112929.GA26045@yangzhon-Virtual>
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+	<20181227063419.12981-2-yang.zhong@intel.com>
+	<5bd93d20-08a3-e382-94a1-bf6529a5944c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1546510620-6707-2-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6] s390x/pci: add common function
- measurement block
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5bd93d20-08a3-e382-94a1-bf6529a5944c@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 01/25] build: actually use CONFIG_PAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>, walling@linux.ibm.com
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, sameo@linux.intel.com, ehabkost@redhat.com, peter.maydell@linaro.org, "Daniel P. Berrange" <berrange@redhat.com>, yang.zhong@intel.com
 
-On 03.01.19 11:17, Pierre Morel wrote:
-> From: Yi Min Zhao <zyimin@linux.ibm.com>
+On Thu, Jan 03, 2019 at 03:15:44PM +0100, Thomas Huth wrote:
+>  Hi,
 > 
-> Common function measurement block is used to report zPCI internal
-> counters of successful pcilg/stg/stb and rpcit instructions to
-> a memory location provided by the program.
+> On 2018-12-27 07:33, Yang Zhong wrote:
+> > From: Paolo Bonzini <pbonzini@redhat.com>
+> > 
+> > Do not link it unconditionally into all binaries.
+> > 
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  hw/pci-host/Makefile.objs | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+> > index 6d6597c065..9d7e7cd1b8 100644
+> > --- a/hw/pci-host/Makefile.objs
+> > +++ b/hw/pci-host/Makefile.objs
+> > @@ -1,4 +1,4 @@
+> > -common-obj-y += pam.o
+> > +common-obj-$(CONFIG_PAM) += pam.o
 > 
-> This patch introduces a new ZpciFmb structure and schedules a timer
-> callback to copy the zPCI measures to the FMB in the guest memory
-> at an interval time set to 4s.
+> CONFIG_PAM has been removed in the default-configs with commit
 > 
-> An error while attemping to update the FMB, would generate an error
-> event to the guest.
+>   a3b6e2bb71e6495a44f24e2296ab4feb4b6d4818
+>    default-configs: remove CONFIG_PAM
 > 
-> The pcilg/stg/stb and rpcit interception handlers increase the
-> related counter on a successful call.
-> The guest shall pass a null FMBA (FMB address) in the FIB (Function
-> Information Block) when it issues a Modify PCI Function Control
-> instruction to switch off FMB and stop the corresponding timer.
+> ... so if you want to use it now, you've got to revert that commit, too.
 > 
-> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  hw/s390x/s390-pci-bus.c  |   4 +-
->  hw/s390x/s390-pci-bus.h  |  29 +++++++++++
->  hw/s390x/s390-pci-inst.c | 133 +++++++++++++++++++++++++++++++++++++++++++++--
->  hw/s390x/s390-pci-inst.h |   1 +
->  4 files changed, 163 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 060ff06..f0d34dd 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -989,6 +989,7 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
->      bus = pci_get_bus(pci_dev);
->      devfn = pci_dev->devfn;
->      object_unparent(OBJECT(pci_dev));
-> +    fmb_timer_free(pbdev);
+>  Thomas
 
-I wonder if this should go into the unrealize function instead.
+   Thanks Thomas for your reminder!
+   Since default-configs/x86_64-softmmu.mak has only include i386-softmmu.mak file now,
+   It's is hard to directly revert this patch, i will merge CONFIG_PAM=y into i386-softmmu.mak
+   with this patch. thanks!
 
+   Regards,
 
-
--- 
-
-Thanks,
-
-David / dhildenb
+   Yang
