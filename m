@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46538)
+Received: from eggs.gnu.org ([209.51.188.92]:46599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXok-000592-G7
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:32:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXoq-0005Fi-ND
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:32:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoi-0002Kv-7d
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:57 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45208)
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXon-0002Ts-RD
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:32:04 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:38747)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggXof-0002FG-6W
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:53 -0500
-Received: by mail-wr1-x443.google.com with SMTP id t6so1025832wrr.12
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:51 -0800 (PST)
+	id 1ggXok-0002Np-Lx
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:32:00 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id v13so1075124wrw.5
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:58 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	j14sm46039759wrv.96.2019.01.07.08.31.49 for <qemu-devel@nongnu.org>
+	j14sm46039759wrv.96.2019.01.07.08.31.55 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 07 Jan 2019 08:31:49 -0800 (PST)
+	Mon, 07 Jan 2019 08:31:56 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  7 Jan 2019 16:31:05 +0000
-Message-Id: <20190107163117.16269-26-peter.maydell@linaro.org>
+Date: Mon,  7 Jan 2019 16:31:10 +0000
+Message-Id: <20190107163117.16269-31-peter.maydell@linaro.org>
 In-Reply-To: <20190107163117.16269-1-peter.maydell@linaro.org>
 References: <20190107163117.16269-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 25/37] arm: Add header to host common definition
- for nRF51 SOC peripherals
+Subject: [Qemu-devel] [PULL 30/37] tests/microbit-test: Add Tests for nRF51
+ GPIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,35 +39,57 @@ To: qemu-devel@nongnu.org
 
 From: Steffen Görtz <contrib@steffen-goertz.de>
 
-Adds a header that provides definitions that are used
-across nRF51 peripherals
+The test suite for the nRF51 GPIO peripheral for now
+only tests initial state. Additionally a set of
+tests testing an implementation detail of the model
+are included.
 
 Signed-off-by: Steffen Görtz <contrib@steffen-goertz.de>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20190103091119.9367-3-stefanha@redhat.com
+Message-id: 20190103091119.9367-8-stefanha@redhat.com
+[PMM: fixed stray space at start of file]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/nrf51.h       | 45 ++++++++++++++++++++++++++++++++++++
- include/hw/char/nrf51_uart.h |  1 -
- hw/arm/nrf51_soc.c           | 33 ++++++++++----------------
- 3 files changed, 57 insertions(+), 22 deletions(-)
- create mode 100644 include/hw/arm/nrf51.h
+ tests/Makefile.include |   2 +
+ tests/microbit-test.c  | 160 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 162 insertions(+)
+ create mode 100644 tests/microbit-test.c
 
-diff --git a/include/hw/arm/nrf51.h b/include/hw/arm/nrf51.h
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3f5a1d0c308..9c84bbd8296 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -277,6 +277,7 @@ check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-arm-y += tests/tmp105-test$(EXESUF)
+ check-qtest-arm-y += tests/pca9552-test$(EXESUF)
+ check-qtest-arm-y += tests/ds1338-test$(EXESUF)
++check-qtest-arm-y += tests/microbit-test$(EXESUF)
+ check-qtest-arm-y += tests/m25p80-test$(EXESUF)
+ check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
+ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+@@ -708,6 +709,7 @@ tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
+ tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
+ tests/pca9552-test$(EXESUF): tests/pca9552-test.o $(libqos-omap-obj-y)
+ tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
++tests/microbit-test$(EXESUF): tests/microbit-test.o
+ tests/m25p80-test$(EXESUF): tests/m25p80-test.o
+ tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
+ tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
+diff --git a/tests/microbit-test.c b/tests/microbit-test.c
 new file mode 100644
-index 00000000000..175bb6c301e
+index 00000000000..f0a180cbc6f
 --- /dev/null
-+++ b/include/hw/arm/nrf51.h
-@@ -0,0 +1,45 @@
++++ b/tests/microbit-test.c
+@@ -0,0 +1,160 @@
 +/*
-+ * Nordic Semiconductor nRF51 Series SOC Common Defines
++ * QTest testcase for Microbit board using the Nordic Semiconductor nRF51 SoC.
 + *
-+ * This file hosts generic defines used in various nRF51 peripheral devices.
-+ *
++ * nRF51:
 + * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
 + * Product Spec: http://infocenter.nordicsemi.com/pdf/nRF51822_PS_v3.1.pdf
++ *
++ * Microbit Board: http://microbit.org/
 + *
 + * Copyright 2018 Steffen Görtz <contrib@steffen-goertz.de>
 + *
@@ -75,123 +97,150 @@ index 00000000000..175bb6c301e
 + * the COPYING file in the top-level directory.
 + */
 +
-+#ifndef NRF51_H
-+#define NRF51_H
 +
-+#define NRF51_FLASH_BASE      0x00000000
-+#define NRF51_FICR_BASE       0x10000000
-+#define NRF51_FICR_SIZE       0x00000100
-+#define NRF51_UICR_BASE       0x10001000
-+#define NRF51_SRAM_BASE       0x20000000
++#include "qemu/osdep.h"
++#include "exec/hwaddr.h"
++#include "libqtest.h"
 +
-+#define NRF51_IOMEM_BASE      0x40000000
-+#define NRF51_IOMEM_SIZE      0x20000000
-+
-+#define NRF51_UART_BASE       0x40002000
-+#define NRF51_TIMER_BASE      0x40008000
-+#define NRF51_TIMER_SIZE      0x00001000
-+#define NRF51_RNG_BASE        0x4000D000
-+#define NRF51_NVMC_BASE       0x4001E000
-+#define NRF51_GPIO_BASE       0x50000000
-+
-+#define NRF51_PRIVATE_BASE    0xF0000000
-+#define NRF51_PRIVATE_SIZE    0x10000000
-+
-+#define NRF51_PAGE_SIZE       1024
-+
-+/* Trigger */
-+#define NRF51_TRIGGER_TASK 0x01
-+
-+/* Events */
-+#define NRF51_EVENT_CLEAR  0x00
-+
-+#endif
-diff --git a/include/hw/char/nrf51_uart.h b/include/hw/char/nrf51_uart.h
-index e3ecb7c81c2..eb1c15b490b 100644
---- a/include/hw/char/nrf51_uart.h
-+++ b/include/hw/char/nrf51_uart.h
-@@ -16,7 +16,6 @@
- #include "hw/registerfields.h"
- 
- #define UART_FIFO_LENGTH 6
--#define UART_BASE 0x40002000
- #define UART_SIZE 0x1000
- 
- #define TYPE_NRF51_UART "nrf51_soc.uart"
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index b89c1bdea08..55f8eaafcb0 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -21,27 +21,16 @@
- #include "qemu/log.h"
- #include "cpu.h"
- 
 +#include "hw/arm/nrf51.h"
- #include "hw/arm/nrf51_soc.h"
- 
--#define IOMEM_BASE      0x40000000
--#define IOMEM_SIZE      0x20000000
--
--#define FICR_BASE       0x10000000
--#define FICR_SIZE       0x000000fc
--
--#define FLASH_BASE      0x00000000
--#define SRAM_BASE       0x20000000
--
--#define PRIVATE_BASE    0xF0000000
--#define PRIVATE_SIZE    0x10000000
--
- /*
-  * The size and base is for the NRF51822 part. If other parts
-  * are supported in the future, add a sub-class of NRF51SoC for
-  * the specific variants
-  */
--#define NRF51822_FLASH_SIZE     (256 * 1024)
--#define NRF51822_SRAM_SIZE      (16 * 1024)
-+#define NRF51822_FLASH_SIZE     (256 * NRF51_PAGE_SIZE)
-+#define NRF51822_SRAM_SIZE      (16 * NRF51_PAGE_SIZE)
- 
- #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
- 
-@@ -76,14 +65,14 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-         error_propagate(errp, err);
-         return;
-     }
--    memory_region_add_subregion(&s->container, FLASH_BASE, &s->flash);
-+    memory_region_add_subregion(&s->container, NRF51_FLASH_BASE, &s->flash);
- 
-     memory_region_init_ram(&s->sram, NULL, "nrf51.sram", s->sram_size, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
--    memory_region_add_subregion(&s->container, SRAM_BASE, &s->sram);
-+    memory_region_add_subregion(&s->container, NRF51_SRAM_BASE, &s->sram);
- 
-     /* UART */
-     object_property_set_bool(OBJECT(&s->uart), true, "realized", &err);
-@@ -92,15 +81,17 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-         return;
-     }
-     mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->uart), 0);
--    memory_region_add_subregion_overlap(&s->container, UART_BASE, mr, 0);
-+    memory_region_add_subregion_overlap(&s->container, NRF51_UART_BASE, mr, 0);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart), 0,
-                        qdev_get_gpio_in(DEVICE(&s->cpu),
--                       BASE_TO_IRQ(UART_BASE)));
-+                       BASE_TO_IRQ(NRF51_UART_BASE)));
- 
--    create_unimplemented_device("nrf51_soc.io", IOMEM_BASE, IOMEM_SIZE);
--    create_unimplemented_device("nrf51_soc.ficr", FICR_BASE, FICR_SIZE);
-+    create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
-+                                NRF51_IOMEM_SIZE);
-+    create_unimplemented_device("nrf51_soc.ficr", NRF51_FICR_BASE,
-+                                NRF51_FICR_SIZE);
-     create_unimplemented_device("nrf51_soc.private",
--                                PRIVATE_BASE, PRIVATE_SIZE);
-+                                NRF51_PRIVATE_BASE, NRF51_PRIVATE_SIZE);
- }
- 
- static void nrf51_soc_init(Object *obj)
++#include "hw/gpio/nrf51_gpio.h"
++
++static void test_nrf51_gpio(void)
++{
++    size_t i;
++    uint32_t actual, expected;
++
++    struct {
++        hwaddr addr;
++        uint32_t expected;
++    } const reset_state[] = {
++        {NRF51_GPIO_REG_OUT, 0x00000000}, {NRF51_GPIO_REG_OUTSET, 0x00000000},
++        {NRF51_GPIO_REG_OUTCLR, 0x00000000}, {NRF51_GPIO_REG_IN, 0x00000000},
++        {NRF51_GPIO_REG_DIR, 0x00000000}, {NRF51_GPIO_REG_DIRSET, 0x00000000},
++        {NRF51_GPIO_REG_DIRCLR, 0x00000000}
++    };
++
++    /* Check reset state */
++    for (i = 0; i < ARRAY_SIZE(reset_state); i++) {
++        expected = reset_state[i].expected;
++        actual = readl(NRF51_GPIO_BASE + reset_state[i].addr);
++        g_assert_cmpuint(actual, ==, expected);
++    }
++
++    for (i = 0; i < NRF51_GPIO_PINS; i++) {
++        expected = 0x00000002;
++        actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START + i * 4);
++        g_assert_cmpuint(actual, ==, expected);
++    }
++
++    /* Check dir bit consistency between dir and cnf */
++    /* Check set via DIRSET */
++    expected = 0x80000001;
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIRSET, expected);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR);
++    g_assert_cmpuint(actual, ==, expected);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x01);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_END) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x01);
++
++    /* Check clear via DIRCLR */
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIRCLR, 0x80000001);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR);
++    g_assert_cmpuint(actual, ==, 0x00000000);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x00);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_END) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x00);
++
++    /* Check set via DIR */
++    expected = 0x80000001;
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR, expected);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR);
++    g_assert_cmpuint(actual, ==, expected);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x01);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_END) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x01);
++
++    /* Reset DIR */
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR, 0x00000000);
++
++    /* Check Input propagates */
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0x00);
++    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 0);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x00);
++    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 1);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x01);
++    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, -1);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x01);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0x02);
++
++    /* Check pull-up working */
++    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 0);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b0000);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x00);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b1110);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x01);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0x02);
++
++    /* Check pull-down working */
++    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 1);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b0000);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x01);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b0110);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x00);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0x02);
++    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, -1);
++
++    /* Check Output propagates */
++    irq_intercept_out("/machine/nrf51");
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b0011);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTSET, 0x01);
++    g_assert_true(get_irq(0));
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTCLR, 0x01);
++    g_assert_false(get_irq(0));
++
++    /* Check self-stimulation */
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b01);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTSET, 0x01);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x01);
++
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTCLR, 0x01);
++    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
++    g_assert_cmpuint(actual, ==, 0x00);
++
++    /*
++     * Check short-circuit - generates an guest_error which must be checked
++     * manually as long as qtest can not scan qemu_log messages
++     */
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b01);
++    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTSET, 0x01);
++    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 0);
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++
++    g_test_init(&argc, &argv, NULL);
++
++    global_qtest = qtest_initf("-machine microbit");
++
++    qtest_add_func("/microbit/nrf51/gpio", test_nrf51_gpio);
++
++    ret = g_test_run();
++
++    qtest_quit(global_qtest);
++    return ret;
++}
 -- 
 2.19.2
