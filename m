@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58175)
+Received: from eggs.gnu.org ([209.51.188.92]:60872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ggQbN-0002gw-0O
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:49:41 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ggQhm-0004R9-5i
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:56:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ggQbM-0007vd-1H
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:49:40 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38763)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ggQbL-0007lG-R4
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:49:39 -0500
-Received: by mail-wm1-x341.google.com with SMTP id m22so59162wml.3
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 00:49:27 -0800 (PST)
-References: <20181213115503.24188-1-alex.bennee@linaro.org>
-	<20181213115503.24188-3-alex.bennee@linaro.org>
-	<CAFEAcA_7OgJXKb2YwF9qMwf1J2+hkYwft1us4+yMJ_OeUiJ-jQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA_7OgJXKb2YwF9qMwf1J2+hkYwft1us4+yMJ_OeUiJ-jQ@mail.gmail.com>
-Date: Mon, 07 Jan 2019 08:49:24 +0000
-Message-ID: <87r2dovomj.fsf@linaro.org>
+	(envelope-from <luc.michel@greensocs.com>) id 1ggQhl-0006CV-CN
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:56:18 -0500
+References: <20181207090135.7651-1-luc.michel@greensocs.com>
+	<CAFEAcA9F2q6fQV13EDWFzuPYiFTDvqSCx_4P9aD=zP2RR5Kp0g@mail.gmail.com>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <8b118f0c-b2e4-3821-5348-25a9abbd7948@greensocs.com>
+Date: Mon, 7 Jan 2019 09:56:00 +0100
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9F2q6fQV13EDWFzuPYiFTDvqSCx_4P9aD=zP2RR5Kp0g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] target/arm: defer setting up of
- aarch64 gdb until arm_cpu_realize
+Subject: Re: [Qemu-devel] [PATCH v8 00/16] gdbstub: support for the
+ multiprocess extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +26,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Omair Javaid <omair.javaid@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Mark Burton <mark.burton@greensocs.com>, Eduardo Habkost <ehabkost@redhat.com>
 
+On 1/4/19 4:12 PM, Peter Maydell wrote:
+> On Fri, 7 Dec 2018 at 09:01, Luc Michel <luc.michel@greensocs.com> wrot=
+e:
+>> This series adds support for the multiprocess extension of the GDB
+>> remote protocol in the QEMU GDB stub.
+>>
+>> This extension is useful to split QEMU emulated CPUs in different
+>> processes from the point of view of the GDB client. It adds the
+>> possibility to debug different kind of processors (e.g. an AArch64 and
+>> an ARMv7 CPU) at the same time (it is not possible otherwise since GDB
+>> expects an SMP view at the thread granularity.
+>=20
+> I've applied this patchset to target-arm.next, thanks.
+> (I fixed up a few checkpatch nits about block comment style.)
+Thanks!
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+>=20
+>> To test this patchset, you can use the following commands:
+>>
+>> (Note that this requires a recent enough GDB, I think GDB 7.2 is OK.
+>> Also, it must be compiled to support both ARM and AArch64 architecture=
+s)
+>>
+>> Run QEMU: (-smp 6 in xlnx-zcu102 enables both cortex-a53 and cortex-r5
+>> CPUs)
+>>
+>> qemu-system-aarch64 -M xlnx-zcu102 -gdb tcp::1234 -S -smp 6
+>>
+>> Run the following commands in GDB:
+>>
+>> target extended :1234
+>> add-inferior
+>> inferior 2
+>> attach 2
+>> info threads
+>=20
+> This seems a bit clumsy -- is it just the limitations of
+> gdb here? I was expecting that just connecting to the
+> remote would cause gdb to interrogate it and attach to
+> all the inferior processes that it had.
+AFAIK this is a "limitation" of GDB. In QEMU context it seems like a
+limitation, but when you are connecting to a remote gdbserver that
+exposes all the processes currently running on an OS, you probably don't
+want to attach them all automatically.
 
-> On Thu, 13 Dec 2018 at 11:55, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->> If we setup earlier we miss the parsing of the aarch64 state of the
->> CPU. If the user has booted up with:
->>
->>   qemu-system-aarch64 -cpu host,aarch64=3Doff -enable-kvm
->>
->> we end up presenting an aarch64 view of the world via the gdbstub and
->> hilarity ensues.
->>
->> Reported-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Cc: Omair Javaid <omair.javaid@linaro.org>
->> ---
->>  include/hw/arm/arm.h |  2 ++
->>  target/arm/cpu.c     |  4 ++++
->>  target/arm/cpu64.c   | 20 +++++++++++++++-----
->>  3 files changed, 21 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
->> index ffed39252d..f9a7a6e2fb 100644
->> --- a/include/hw/arm/arm.h
->> +++ b/include/hw/arm/arm.h
->> @@ -171,4 +171,6 @@ void arm_write_secure_board_setup_dummy_smc(ARMCPU *=
-cpu,
->>     ticks.  */
->>  extern int system_clock_scale;
->>
->> +void arm_cpu_enable_aarch64_gdbstub(CPUClass *cc);
->> +
->>  #endif /* HW_ARM_H */
->> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
->> index 60411f6bfe..100a72ff81 100644
->> --- a/target/arm/cpu.c
->> +++ b/target/arm/cpu.c
->> @@ -890,9 +890,13 @@ static void arm_cpu_realizefn(DeviceState *dev, Err=
-or **errp)
->>       * queries ID_ISAR0_EL1 on such a host, the value is UNKNOWN.
->>       * Similarly, we cannot check ID_AA64PFR0 without AArch64 support.
->>       */
->> +#ifdef TARGET_AARCH64
->>      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
->> +        CPUClass *cc =3D CPU_GET_CLASS(cs);
->>          no_aa32 =3D !cpu_isar_feature(aa64_aa32, cpu);
->> +        arm_cpu_enable_aarch64_gdbstub(cc);
->>      }
->> +#endif
->
-> This seems weird, because the fields in cc are common
-> to all CPUs in the class, and so setting them on
-> realize of a specific instance based on properties of
-> the instance looks wrong... At least in theory there's
-> no reason we couldn't have one -cpu host CPU with
-> aarch64=3Doff and one with aarch64=3Don, though I'm not
-> sure our UI allows the user to actually set the
-> properties per-cpu like that.
+Luc
 
-So we should really move these to be object instance methods? Or
-possibly have object instance methods that override the class methods if
-they are not NULL?
-
->
+>=20
 > thanks
 > -- PMM
-
-
---=20
-Alex Benn=C3=A9e
+>=20
