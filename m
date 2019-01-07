@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34989)
+Received: from eggs.gnu.org ([209.51.188.92]:46077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tom.deseyn@gmail.com>) id 1ggNo3-0002FM-EQ
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:50:36 -0500
+	(envelope-from <thuth@redhat.com>) id 1ggOSg-0008Be-Pj
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 01:32:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tom.deseyn@gmail.com>) id 1ggNo2-0001B6-90
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:50:35 -0500
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:44047)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tom.deseyn@gmail.com>)
-	id 1ggNo2-000146-0g
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:50:34 -0500
-Received: by mail-qk1-x743.google.com with SMTP id o8so8373028qkk.11
-	for <qemu-devel@nongnu.org>; Sun, 06 Jan 2019 21:50:28 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1ggOSf-0004Qj-ST
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 01:32:34 -0500
+References: <20190104175847.6290-1-philmd@redhat.com>
+	<20190104175847.6290-4-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5d940a10-85c9-7361-86e0-99f9e1e8e737@redhat.com>
+Date: Mon, 7 Jan 2019 07:32:07 +0100
 MIME-Version: 1.0
-References: <b95d4a9c-4bee-5e0d-5ec6-02edf3aefcc1@vivier.eu>
-	<20181214154130.4069-1-tom.deseyn@gmail.com>
-In-Reply-To: <20181214154130.4069-1-tom.deseyn@gmail.com>
-From: Tom Deseyn <tom.deseyn@gmail.com>
-Date: Mon, 7 Jan 2019 06:50:15 +0100
-Message-ID: <CAErTmiPDhaLR8YZbABtZ=BAquXC0ZW=Y+tBRZr4YtRas0UpiLQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] Add getsockopt for settable SOL_IPV6
- options
+In-Reply-To: <20190104175847.6290-4-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 03/16] hw/devices: Remove unused
+ TC6393XB_RAM definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, Laurent Vivier <laurent@vivier.eu>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Magnus Damm <magnus.damm@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, Michael Walle <michael@walle.cc>, Richard Henderson <rth@twiddle.net>, Jan Kiszka <jan.kiszka@web.de>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Rob Herring <robh@kernel.org>
 
-Hi Laurent,
-
-Can you please take a look at the updated patch? Should I add braces for
-code-style?
-
-Thanks,
-
-Tom
-
-
-On Fri, Dec 14, 2018 at 4:43 PM <tom.deseyn@gmail.com> wrote:
-
-> From: Tom Deseyn <tom.deseyn@gmail.com>
->
-> Thank you for reviewing Laurant.
-> Sorry for missing history, I'm not used to sending patches via mail.
-> I got an email about code style. For now, I'm sticking to the style
-> that is used in the function.
->
-> v2: default to unimplemented
-> v3: match kernel behavior
->
-> Signed-off-by: Tom Deseyn <tom.deseyn@gmail.com>
+On 2019-01-04 18:58, Philippe Mathieu-Daud=C3=A9 wrote:
+> Introduced in 64b40bc54a9, this definition is no more used since
+> a0b753dfd39. Remove it.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  linux-user/syscall.c | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 280137da8c..f103437f26 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -2352,6 +2352,42 @@ static abi_long do_getsockopt(int sockfd, int
-> level, int optname,
->              break;
->          }
->          break;
-> +    case SOL_IPV6:
-> +        switch (optname) {
-> +        case IPV6_MTU_DISCOVER:
-> +        case IPV6_MTU:
-> +        case IPV6_V6ONLY:
-> +        case IPV6_RECVPKTINFO:
-> +        case IPV6_UNICAST_HOPS:
-> +        case IPV6_MULTICAST_HOPS:
-> +        case IPV6_MULTICAST_LOOP:
-> +        case IPV6_RECVERR:
-> +        case IPV6_RECVHOPLIMIT:
-> +        case IPV6_2292HOPLIMIT:
-> +        case IPV6_CHECKSUM: {
-> +            void* target_addr;
-> +            if (get_user_u32(len, optlen))
-> +                return -TARGET_EFAULT;
-> +            if (len < 0)
-> +                return -TARGET_EINVAL;
-> +            lv = sizeof(val);
-> +            ret = get_errno(getsockopt(sockfd, level, optname, &val,
-> &lv));
-> +            if (ret < 0)
-> +                return ret;
-> +            if (lv < len)
-> +                len = lv;
-> +            if (put_user_u32(len, optlen))
-> +                return -TARGET_EFAULT;
-> +            target_addr = lock_user(VERIFY_WRITE, optval_addr, len, 0);
-> +            tswap32s((uint32_t*)&val);
-> +            memcpy(target_addr, &val, len);
-> +            unlock_user(target_addr, optval_addr, len);
-> +            break;
-> +        }
-> +        default:
-> +            goto unimplemented;
-> +        }
-> +        break;
->      default:
->      unimplemented:
->          gemu_log("getsockopt level=%d optname=%d not yet supported\n",
-> --
-> 2.19.2
->
->
+>  include/hw/devices.h | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/include/hw/devices.h b/include/hw/devices.h
+> index 0e27feb0c2..4019b3be17 100644
+> --- a/include/hw/devices.h
+> +++ b/include/hw/devices.h
+> @@ -51,7 +51,6 @@ void retu_key_event(void *retu, int state);
+> =20
+>  /* tc6393xb.c */
+>  typedef struct TC6393xbState TC6393xbState;
+> -#define TC6393XB_RAM	0x110000 /* amount of ram for Video and USB */
+>  TC6393xbState *tc6393xb_init(struct MemoryRegion *sysmem,
+>                               uint32_t base, qemu_irq irq);
+>  void tc6393xb_gpio_out_set(TC6393xbState *s, int line,
+>=20
+
+I think I'd simply squash this into the next patch and mention it in the
+patch description there that you removed the #define.
+
+ Thomas
