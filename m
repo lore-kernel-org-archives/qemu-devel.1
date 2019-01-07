@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48847)
+Received: from eggs.gnu.org ([209.51.188.92]:49101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ggWgt-0002Ic-Qy
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:19:49 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggWhJ-0002Zw-RG
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:20:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ggWgs-0008SM-GW
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:19:47 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20181218075707.12006-6-anton.nefedov@virtuozzo.com>
-References: <20181218075707.12006-1-anton.nefedov@virtuozzo.com>
-	<20181218075707.12006-6-anton.nefedov@virtuozzo.com>
-Date: Mon, 07 Jan 2019 16:19:43 +0100
-Message-ID: <w51bm4sxzow.fsf@maestria.local.igalia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ggWhH-0000LD-2c
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:20:13 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43758)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ggWhG-0000F2-Bx
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:20:10 -0500
+Received: by mail-ot1-x343.google.com with SMTP id a11so585728otr.10
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 07:20:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v11 05/10] block: treat BDRV_REQ_ALLOCATE
- as serialising
+References: <20190103091119.9367-1-stefanha@redhat.com>
+In-Reply-To: <20190103091119.9367-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Jan 2019 15:19:56 +0000
+Message-ID: <CAFEAcA-=fApDM-CGhJvXpv6BSp24K7a=fjfxOkUec0AoAMB7rw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 00/11] arm: Core nRF51 Devices and Microbit
+ Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>, Paolo Bonzini <pbonzini@redhat.com>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, Laurent Vivier <lvivier@redhat.com>
 
-On Tue 18 Dec 2018 08:57:38 AM CET, Anton Nefedov wrote:
-> The idea is that ALLOCATE requests may overlap with other requests.
-> Reuse the existing block layer infrastructure for serialising requests.
-> Use the following approach:
->   - mark ALLOCATE also SERIALISING, so subsequent requests to the area wait
->   - ALLOCATE request itself must never wait if another request is in flight
->     already. Return EAGAIN, let the caller reconsider.
+On Thu, 3 Jan 2019 at 09:12, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Steffen has been busy so I picked up "[PATCH v5 00/14] arm: nRF51 Devices and
+> Microbit Support".  This series includes the core devices needed to boot basic
+> guest software on the "microbit" board.
+>
+> This series includes Steffen's random number generator, GPIO, timer, and a
+> stubbed clock.  Also, this series adds the tests/microbit-test.c qtest.
+>
+> Changes from Steffen's series:
+>  * Made timer tickless [Peter]
+>  * Dropped non-volatile memory controller.  More work is needed there and I
+>    don't want to hold back other devices in this series that are ready for
+>    merge.
+>  * Rebased and re-tested with make check and real micro:bit programs
+>    (requires out-of-tree -kernel and stub TWI device patches)
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Applied to target-arm.next, thanks.
 
-Berto
+-- PMM
