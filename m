@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51688)
+Received: from eggs.gnu.org ([209.51.188.92]:56628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ggQJM-0007XW-Eg
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:31:06 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ggQWx-0001Ig-LW
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:45:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ggQJI-0001rL-Nb
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:31:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60444)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ggQJF-0001oG-43
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:30:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ggQJ9-0002Ue-TS
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:30:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7B6012E80D4
-	for <qemu-devel@nongnu.org>; Mon,  7 Jan 2019 08:30:51 +0000 (UTC)
+	(envelope-from <luc.michel@greensocs.com>) id 1ggQWv-0005Yp-T4
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:45:07 -0500
+References: <20190104142812.20444-1-edgar.iglesias@gmail.com>
+	<20190104142812.20444-2-edgar.iglesias@gmail.com>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <9675af33-37b0-55c7-9f81-511f0916abb9@greensocs.com>
+Date: Mon, 7 Jan 2019 09:44:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 07 Jan 2019 08:16:40 -0000
-From: Gerd Hoffmann <1809075@bugs.launchpad.net>
-Reply-To: Bug 1809075 <1809075@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154520012723.21082.14347694074023377449.malonedeb@wampee.canonical.com>
-Message-Id: <154684900083.4827.10123305490390321592.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1809075] Re: Concurrency bug on keyboard events:
- capslock LED messing up keycode streams causes character misses at guest
- kernel
+In-Reply-To: <20190104142812.20444-2-edgar.iglesias@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="U80yTnc5JATO2gsn35zfrZUEAsBcxfqZD"
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] hw/microblaze: s3adsp1800: Create
+ an unimplemented GPIO area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,92 +25,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, philmd@redhat.com, frasse.iglesias@gmail.com, figlesia@xilinx.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-There is no "capslock LED key event".  0xfa is KBD_REPLY_ACK, and the
-device queues it in response to guest port writes.  Yes, the ack can
-race with actual key events.  But IMO that isn't a bug in qemu.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--U80yTnc5JATO2gsn35zfrZUEAsBcxfqZD
+From: Luc Michel <luc.michel@greensocs.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com,
+ alistair@alistair23.me, philmd@redhat.com, frasse.iglesias@gmail.com,
+ figlesia@xilinx.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com,
+ edgar.iglesias@xilinx.com
+Message-ID: <9675af33-37b0-55c7-9f81-511f0916abb9@greensocs.com>
+Subject: Re: [PATCH v1 1/2] hw/microblaze: s3adsp1800: Create an unimplemented
+ GPIO area
+References: <20190104142812.20444-1-edgar.iglesias@gmail.com>
+ <20190104142812.20444-2-edgar.iglesias@gmail.com>
+In-Reply-To: <20190104142812.20444-2-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Probably the linux kernel just throws away everything until it got the
-ack for the port write, and that way the key event gets lost.  On
-physical hardware you will not notice because it is next to impossible
-to type fast enough to hit the race window.
+On 1/4/19 3:28 PM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>=20
+> Create an unimplemented GPIO area instead of leaving it unassigned.
+>=20
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
-So, go fix the kernel.
+> ---
+>  hw/microblaze/petalogix_s3adsp1800_mmu.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/hw/microblaze/petalogix_s3adsp1800_mmu.c b/hw/microblaze/p=
+etalogix_s3adsp1800_mmu.c
+> index 5cf7b84c79..b9f0b0d06e 100644
+> --- a/hw/microblaze/petalogix_s3adsp1800_mmu.c
+> +++ b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+> @@ -35,6 +35,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "hw/devices.h"
+>  #include "hw/boards.h"
+> +#include "hw/misc/unimp.h"
+>  #include "exec/address-spaces.h"
+>  #include "hw/char/xilinx_uartlite.h"
+> =20
+> @@ -47,6 +48,7 @@
+> =20
+>  #define MEMORY_BASEADDR 0x90000000
+>  #define FLASH_BASEADDR 0xa0000000
+> +#define GPIO_BASEADDR 0x81400000
+>  #define INTC_BASEADDR 0x81800000
+>  #define TIMER_BASEADDR 0x83c00000
+>  #define UARTLITE_BASEADDR 0x84000000
+> @@ -122,6 +124,8 @@ petalogix_s3adsp1800_init(MachineState *machine)
+>      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, ETHLITE_BASEADDR);
+>      sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq[ETHLITE_IRQ]);
+> =20
+> +    create_unimplemented_device("gpio", GPIO_BASEADDR, 0x10000);
+> +
+>      microblaze_load_kernel(cpu, ddr_base, ram_size,
+>                             machine->initrd_filename,
+>                             BINARY_DEVICE_TREE_FILE,
+>=20
 
-Alternatively fix vncdotool to send uppercase letters properly with
-shift key pressed.  Then qemu wouldn't generate capslock key events
-(that happens because qemu thinks guest and host capslock state is out
-of sync) and the guests's capslock led update request wouldn't get into
-the way.
 
+--U80yTnc5JATO2gsn35zfrZUEAsBcxfqZD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+-----BEGIN PGP SIGNATURE-----
 
--- =
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlwzEXwACgkQd8knW3Qn
+Tr41vQ//Wrras38Hz22rnTb2J9YkYTqJ4Z7oxkbjLINwtwejbILt4lh72ua1drmd
+N56QyPDhvzXBNNYksqfvJ62K4xDUc5S7euLMeHWhZ0lpsurxS74mEqYjOHUrUPKG
+E8u28bxaBY07b9rYTDkRMCBGSMUAFT3adHEp5aIjZa+smU2UpVdgGd+xHrrdQqoA
+mEhdqDlCQpiF59Tg3stoQxioODlF7gx0553dpxAZFoo4VY103nZPKqRoHecrSoYO
+mLUd8OE7O01DzkqSE9yFcePJYZkvn4uoNu/8XEApsBWH3WeDNa8eO+Q5OGnQ0pNa
+AeP+3E89Gd8P2kKh9YB4/Y0uE8znWfonGCZZV4rnNqotNMSSWznPJlNiH1hwl8Mw
+5ZI0QP6BV39F7GkDtmL4VcR1JD1ccUpjHpuoufWf3SE/lG67hUWXWc4Zd/ywJ/J9
+5Dp/BsNKarmDyiVFQJUU4CcUMoxosRl7TybEFv2E+KFhWhIID+MiBjYeCRdiX7LB
+PMLWzTNYMvfcuUKC5rvrl915GCe4bansFi/Xyx8UhkYiNlXOwQ4/BpactAtBR6YR
+7hXJyZ8JAOef+gJRi7HZMT9Kjjz0kaJRcgDNOUKAXNG8XL1FRJUhs5TnsahjRsiN
++fglcFNJKFTctyt7ocFnd+xQXT1sHqwRMyf3BQLl8Bp8YvctJZY=
+=whE6
+-----END PGP SIGNATURE-----
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1809075
-
-Title:
-  Concurrency bug on keyboard events: capslock LED messing up keycode
-  streams causes character misses at guest kernel
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Whenever capslock is pressed on host, both capslock keycode(0x3a 0xba)
-  and capslock LED keycode(0xfa 0xfa) would be sent to the ps2 keycode
-  stream.
-
-  However, capslock LED is handled by another thread, confirmed by
-  tracing `ps2_write_keyboard` with gdb. The keycode of casplock LED
-  might divide
-
-  For example, I sent AaBb but got ABa. I was using vncdotool, so it
-  equals sending `capslock a capslock a capslock b capslock b`. In
-  ps2_queue, I was expecting `3a fa fa ba 1e 9e 3a fa fa ba 1e 9e 3a fa
-  fa ba 30 b0 3a fa fa ba 30 b0`. But actually once in a while, it might
-  not receive such streams. In one case I got `3a fa fa ba 1e 9e 3a ba
-  1e fa fa 9e 3a ba 30 b0 3a ba 30 b0 fa fa`
-
-  In this specific example, `a` was lost because LED keycode 'jumps in' its=
- keycode. Kernel event device receives below streams
-  ```
-  # /dev/input/event receives    what is sent from ps2_queue
-  # I use cap_1 to show capslock key down
-  cap_1   led     caps_0,        # 0x3a 0xfa 0xfa 0xba
-  a_1     a_0                    # 0x1e 0x9e
-  caps_1  caps_0                 # 0x3a 0xba
-  led                            # 0x1e 0xfa 0xfa 0x1e (we lost `a` here)
-  caps_1  caps_0                 # 0x3a 0xba
-  b_1     led     b_0            # 0x30 0xfa 0xfa 0xb0 =
-
-  caps_1  caps_0                 # 0x3a 0xba
-  led     b_1     b_0            # 0xfa 0xfa 0x30 0xb0
-  ```
-
-  I made sure kernel receives the correct key stream as the qemu
-  ps2_queue sends using /proc, ftrace and dynamic_debug. I explained the
-  details in this [post](https://medium.com/@alapha23/quick-peek-into-
-  kernel-land-keyboard-events-handling-with-ftrace-and-dynamic-debug-
-  24a790056d5a)
-
-  So it seems to be a concurrency issue.
-
-  A hacky path on my mind is to skip all `0xfa` in ps2_queue. But I'm
-  not sure if capslock LED is the only stink bug to our ps2 keycode
-  queue as I've seen other keycodes handled by `ps2_write_keyboard` sent
-  to ps2 queue.
-
-  Another solution might be a memory barrier or a lock. Making key down
-  and key up atomic will prevent another thread modifying the ps2 queue
-  unwantedly.
-
-  What do you think?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1809075/+subscriptions
+--U80yTnc5JATO2gsn35zfrZUEAsBcxfqZD--
