@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52333)
+Received: from eggs.gnu.org ([209.51.188.92]:53615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xuyandong2@huawei.com>) id 1ggWpe-0006aa-3l
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:28:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggWt0-0007pn-6Z
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:32:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xuyandong2@huawei.com>) id 1ggWpc-0006iM-P4
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:28:50 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2048 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xuyandong2@huawei.com>)
-	id 1ggWpc-0006ho-7H
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:28:48 -0500
-From: xuyandong <xuyandong2@huawei.com>
-Date: Mon, 7 Jan 2019 15:28:36 +0000
-Message-ID: <7CECC2DFC21538489F72729DF5EFB4D908AE91FB@dggemm521-mbs.china.huawei.com>
-References: <20181209211730-mutt-send-email-mst@kernel.org>
-	<7CECC2DFC21538489F72729DF5EFB4D908AC486D@DGGEMM501-MBX.china.huawei.com>
-	<20181210130650-mutt-send-email-mst@kernel.org>
-	<7CECC2DFC21538489F72729DF5EFB4D908AC78EE@DGGEMM501-MBX.china.huawei.com>
-	<20181210205229-mutt-send-email-mst@kernel.org>
-	<7CECC2DFC21538489F72729DF5EFB4D908AC7980@DGGEMM501-MBX.china.huawei.com>
-	<20181210223128-mutt-send-email-mst@kernel.org>
-	<7CECC2DFC21538489F72729DF5EFB4D908AC7A04@DGGEMM501-MBX.china.huawei.com>
-	<20181210232256-mutt-send-email-mst@kernel.org>
-	<7CECC2DFC21538489F72729DF5EFB4D908AE9096@dggemm521-mbs.china.huawei.com>
-	<20190107095414-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190107095414-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1ggWsr-0002Ro-VJ
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:32:13 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46089)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ggWsm-0002Po-8V
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:32:04 -0500
+Received: by mail-oi1-x243.google.com with SMTP id x202so590771oif.13
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 07:32:02 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [BUG]Unassigned mem write during pci device
- hot-plug
+References: <20190106053409.10712-1-fam@euphon.net>
+In-Reply-To: <20190106053409.10712-1-fam@euphon.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Jan 2019 15:31:50 +0000
+Message-ID: <CAFEAcA8=yM9MB3z9hK_3qW=uyFzRdDQ93y1yAtdG=ikKJoHPMA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Block and testing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,110 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "marcel@redhat.com" <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To: Fam Zheng <fam@euphon.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWljaGFlbCBTLiBUc2ly
-a2luIFttYWlsdG86bXN0QHJlZGhhdC5jb21dDQo+IFNlbnQ6IE1vbmRheSwgSmFudWFyeSAwNywg
-MjAxOSAxMTowNiBQTQ0KPiBUbzogeHV5YW5kb25nIDx4dXlhbmRvbmcyQGh1YXdlaS5jb20+DQo+
-IENjOiBtYXJjZWxAcmVkaGF0LmNvbTsgUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNv
-bT47IHFlbXUtDQo+IGRldmVsQG5vbmdudS5vcmc7IFpoYW5naGFpbGlhbmcgPHpoYW5nLnpoYW5n
-aGFpbGlhbmdAaHVhd2VpLmNvbT47DQo+IHdhbmd4aW4gKFUpIDx3YW5neGlueGluLndhbmdAaHVh
-d2VpLmNvbT47IEh1YW5nd2VpZG9uZyAoQykNCj4gPHdlaWRvbmcuaHVhbmdAaHVhd2VpLmNvbT4N
-Cj4gU3ViamVjdDogUmU6IFtCVUddVW5hc3NpZ25lZCBtZW0gd3JpdGUgZHVyaW5nIHBjaSBkZXZp
-Y2UgaG90LXBsdWcNCj4gDQo+IE9uIE1vbiwgSmFuIDA3LCAyMDE5IGF0IDAyOjM3OjE3UE0gKzAw
-MDAsIHh1eWFuZG9uZyB3cm90ZToNCj4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+IEhpIGFsbCwNCj4g
-PiA+ID4gPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+
-ID4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+IEluIG91ciB0ZXN0LCB3ZSBj
-b25maWd1cmVkIFZNIHdpdGggc2V2ZXJhbA0KPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gcGNpLWJy
-aWRnZXMgYW5kIGEgdmlydGlvLW5ldCBuaWMgYmVlbiBhdHRhY2hlZA0KPiA+ID4gPiA+ID4gPiA+
-ID4gPiA+ID4gd2l0aCBidXMgNCwNCj4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4g
-PiA+ID4gPiA+ID4gPiBBZnRlciBWTSBpcyBzdGFydHVwLCBXZSBwaW5nIHRoaXMgbmljIGZyb20g
-aG9zdCB0bw0KPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4ganVkZ2UgaWYgaXQgaXMgd29ya2luZyBu
-b3JtYWxseS4gVGhlbiwgd2UgaG90IGFkZA0KPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gcGNpIGRl
-dmljZXMgdG8gdGhpcyBWTSB3aXRoIGJ1cw0KPiA+ID4gPiA+ID4gPiAwLg0KPiA+ID4gPiA+ID4g
-PiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+IFdlICBmb3VuZCB0aGUgdmlydGlv
-LW5ldCBOSUMgaW4gYnVzIDQgaXMgbm90DQo+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiB3b3JraW5n
-IChjYW4gbm90DQo+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiBjb25uZWN0KSBvY2Nhc2lvbmFsbHks
-IGFzIGl0IGtpY2sgdmlydGlvIGJhY2tlbmQNCj4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+IGZhaWx1
-cmUgd2l0aCBlcnJvcg0KPiA+DQo+ID4gPiA+ID4gPiBCdXQgSSBoYXZlIGFub3RoZXIgcXVlc3Rp
-b24sIGlmIHdlIG9ubHkgZml4IHRoaXMgcHJvYmxlbSBpbg0KPiA+ID4gPiA+ID4gdGhlIGtlcm5l
-bCwgdGhlIExpbnV4IHZlcnNpb24gdGhhdCBoYXMgYmVlbiByZWxlYXNlZCBkb2VzIG5vdA0KPiA+
-ID4gPiA+ID4gd29yayB3ZWxsIG9uIHRoZQ0KPiA+ID4gPiA+IHZpcnR1YWxpemF0aW9uIHBsYXRm
-b3JtLg0KPiA+ID4gPiA+ID4gSXMgdGhlcmUgYSB3YXkgdG8gZml4IHRoaXMgcHJvYmxlbSBpbiB0
-aGUgYmFja2VuZD8NCj4gPg0KPiA+IEhpIE1pY2hhZWwsDQo+ID4NCj4gPiBJZiB3ZSB3YW50IHRv
-IGZpeCB0aGlzIHByb2JsZW0gb24gdGhlIGJhY2tlbmQsIGl0IGlzIG5vdCBlbm91Z2ggdG8NCj4g
-PiBjb25zaWRlciBvbmx5IFBDSSBkZXZpY2UgaG90IHBsdWdnaW5nLCBiZWNhdXNlIEkgZm91bmQg
-dGhhdCBpZiB3ZSB1c2UNCj4gPiBhIGNvbW1hbmQgbGlrZSAiZWNobyAxID4gL3N5cy9idXMvcGNp
-L3Jlc2NhbiIgaW4gZ3Vlc3QsIHRoaXMgcHJvYmxlbSBpcyB2ZXJ5DQo+IGVhc3kgdG8gcmVwcm9k
-dWNlLg0KPiA+DQo+ID4gRnJvbSB0aGUgcGVyc3BlY3RpdmUgb2YgZGV2aWNlIGVtdWxhdGlvbiwg
-d2hlbiBndWVzdCB3cml0ZXMgMHhmZmZmZmZmZg0KPiA+IHRvIHRoZSBCQVIsIGd1ZXN0IGp1c3Qg
-d2FudCB0byBnZXQgdGhlIHNpemUgb2YgdGhlIHJlZ2lvbiBidXQgbm90IHJlYWxseQ0KPiB1cGRh
-dGluZyB0aGUgYWRkcmVzcyBzcGFjZS4NCj4gPiBTbyBJIG1hZGUgdGhlIGZvbGxvd2luZyBwYXRj
-aCB0byBhdm9pZCAgdXBkYXRlIHBjaSBtYXBwaW5nLg0KPiA+DQo+ID4gRG8geW91IHRoaW5rIHRo
-aXMgbWFrZSBzZW5zZT8NCj4gPg0KPiA+IFtQQVRDSF0gcGNpOiBhdm9pZCB1cGRhdGUgcGNpIG1h
-cHBpbmcgd2hlbiB3cml0aW5nIDB4RkZGRiBGRkZGIHRvIEJBUg0KPiA+DQo+ID4gV2hlbiBndWVz
-dCB3cml0ZXMgMHhmZmZmZmZmZiB0byB0aGUgQkFSLCBndWVzdCBqdXN0IHdhbnQgdG8gZ2V0IHRo
-ZQ0KPiA+IHNpemUgb2YgdGhlIHJlZ2lvbiBidXQgbm90IHJlYWxseSB1cGRhdGluZyB0aGUgYWRk
-cmVzcyBzcGFjZS4NCj4gPiBTbyB3aGVuIGd1ZXN0IHdyaXRlcyAweGZmZmZmZmZmIHRvIEJBUiwg
-d2UgbmVlZCBhdm9pZA0KPiA+IHBjaV91cGRhdGVfbWFwcGluZ3Mgb3IgcGNpX2JyaWRnZV91cGRh
-dGVfbWFwcGluZ3MuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiB4dXlhbmRvbmcgPHh1eWFuZG9u
-ZzJAaHVhd2VpLmNvbT4NCj4gDQo+IEkgc2VlIGhvdyB0aGF0IHdpbGwgYWRkcmVzcyB0aGUgY29t
-bW9uIGNhc2UgaG93ZXZlciB0aGVyZSBhcmUgYSBidW5jaCBvZg0KPiBpc3N1ZXMgaGVyZS4gIEZp
-cnN0IG9mIGFsbCBpdCdzIGVhc3kgdG8gdHJpZ2dlciB0aGUgdXBkYXRlIGJ5IHNvbWUgb3RoZXIg
-YWN0aW9uIGxpa2UNCj4gVk0gbWlncmF0aW9uLiAgTW9yZSBpbXBvcnRhbnRseSBpdCdzIGp1c3Qg
-cG9zc2libGUgdGhhdCBndWVzdCBhY3R1YWxseSBkb2VzIHdhbnQNCj4gdG8gc2V0IHRoZSBsb3cg
-MzIgYml0IG9mIHRoZSBhZGRyZXNzIHRvIGFsbCBvbmVzLiAgRm9yIGV4YW1wbGUsIHRoYXQgaXMg
-Y2xlYXJseQ0KPiBsaXN0ZWQgYXMgYSB3YXkgdG8gZGlzYWJsZSBhbGwgZGV2aWNlcyBiZWhpbmQg
-dGhlIGJyaWRnZSBpbiB0aGUgcGNpIHRvIHBjaSBicmlkZ2UNCj4gc3BlYy4NCg0KT2ssIEkgc2Vl
-LiBJZiBJIG9ubHkgc2tpcCB1cGF0ZSB3aGVuIGd1ZXN0IHdyaXRpbmcgMHhGRkZGRkZGRiB0byBQ
-cmVmZXRjYWJsZSBCYXNlIFVwcGVyIDMyIEJpdHMNCnRvIG1lZXQgdGhlIGtlcm5lbCBkb3VibGUg
-Y2hlY2sgcHJvYmxlbS4NCkRvIHlvdSB0aGluayB0aGVyZSBpcyBzdGlsbCByaXNrPw0KDQo+IA0K
-PiBHaXZlbiB1cHN0cmVhbSBpcyBkcmFnZ2luZyBpdCdzIGZlZXQgSSdtIG9wZW4gdG8gYWRkaW5n
-IGEgZmxhZyB0aGF0IHdpbGwgaGVscA0KPiBrZWVwIGd1ZXN0cyBnb2luZyBhcyBhIHRlbXBvcmFy
-eSBtZWFzdXJlLg0KPiBXZSB3aWxsIG5lZWQgdG8gdGhpbmsgYWJvdXQgd2F5cyB0byByZXN0cmlj
-dCB0aGlzIGFzIG11Y2ggYXMgd2UgY2FuLg0KPiANCj4gDQo+ID4gLS0tDQo+ID4gIGh3L3BjaS9w
-Y2kuYyAgICAgICAgfCA2ICsrKystLQ0KPiA+ICBody9wY2kvcGNpX2JyaWRnZS5jIHwgOCArKysr
-Ky0tLQ0KPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDkgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMo
-LSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody9wY2kvcGNpLmMgYi9ody9wY2kvcGNpLmMgaW5k
-ZXggNTZiMTNiMy4uZWYzNjhlMSAxMDA2NDQNCj4gPiAtLS0gYS9ody9wY2kvcGNpLmMNCj4gPiAr
-KysgYi9ody9wY2kvcGNpLmMNCj4gPiBAQCAtMTM2MSw2ICsxMzYxLDcgQEAgdm9pZCBwY2lfZGVm
-YXVsdF93cml0ZV9jb25maWcoUENJRGV2aWNlICpkLA0KPiA+IHVpbnQzMl90IGFkZHIsIHVpbnQz
-Ml90IHZhbF9pbiwgaW50ICB7DQo+ID4gICAgICBpbnQgaSwgd2FzX2lycV9kaXNhYmxlZCA9IHBj
-aV9pcnFfZGlzYWJsZWQoZCk7DQo+ID4gICAgICB1aW50MzJfdCB2YWwgPSB2YWxfaW47DQo+ID4g
-KyAgICB1aW50NjRfdCBiYXJtYXNrID0gKDEgPDwgbCo4KSAtIDE7DQo+ID4NCj4gPiAgICAgIGZv
-ciAoaSA9IDA7IGkgPCBsOyB2YWwgPj49IDgsICsraSkgew0KPiA+ICAgICAgICAgIHVpbnQ4X3Qg
-d21hc2sgPSBkLT53bWFza1thZGRyICsgaV07IEBAIC0xMzY5LDkgKzEzNzAsMTAgQEANCj4gPiB2
-b2lkIHBjaV9kZWZhdWx0X3dyaXRlX2NvbmZpZyhQQ0lEZXZpY2UgKmQsIHVpbnQzMl90IGFkZHIs
-IHVpbnQzMl90IHZhbF9pbiwNCj4gaW50DQo+ID4gICAgICAgICAgZC0+Y29uZmlnW2FkZHIgKyBp
-XSA9IChkLT5jb25maWdbYWRkciArIGldICYgfndtYXNrKSB8ICh2YWwgJiB3bWFzayk7DQo+ID4g
-ICAgICAgICAgZC0+Y29uZmlnW2FkZHIgKyBpXSAmPSB+KHZhbCAmIHcxY21hc2spOyAvKiBXMUM6
-IFdyaXRlIDEgdG8gQ2xlYXIgKi8NCj4gPiAgICAgIH0NCj4gPiAtICAgIGlmIChyYW5nZXNfb3Zl
-cmxhcChhZGRyLCBsLCBQQ0lfQkFTRV9BRERSRVNTXzAsIDI0KSB8fA0KPiA+ICsgICAgaWYgKCh2
-YWxfaW4gIT0gYmFybWFzayAmJg0KPiA+ICsJKHJhbmdlc19vdmVybGFwKGFkZHIsIGwsIFBDSV9C
-QVNFX0FERFJFU1NfMCwgMjQpIHx8DQo+ID4gICAgICAgICAgcmFuZ2VzX292ZXJsYXAoYWRkciwg
-bCwgUENJX1JPTV9BRERSRVNTLCA0KSB8fA0KPiA+IC0gICAgICAgIHJhbmdlc19vdmVybGFwKGFk
-ZHIsIGwsIFBDSV9ST01fQUREUkVTUzEsIDQpIHx8DQo+ID4gKyAgICAgICAgcmFuZ2VzX292ZXJs
-YXAoYWRkciwgbCwgUENJX1JPTV9BRERSRVNTMSwgNCkpKSB8fA0KPiA+ICAgICAgICAgIHJhbmdl
-X2NvdmVyc19ieXRlKGFkZHIsIGwsIFBDSV9DT01NQU5EKSkNCj4gPiAgICAgICAgICBwY2lfdXBk
-YXRlX21hcHBpbmdzKGQpOw0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2h3L3BjaS9wY2lfYnJpZGdl
-LmMgYi9ody9wY2kvcGNpX2JyaWRnZS5jIGluZGV4DQo+ID4gZWU5ZGZmMi4uZjJiYWQ3OSAxMDA2
-NDQNCj4gPiAtLS0gYS9ody9wY2kvcGNpX2JyaWRnZS5jDQo+ID4gKysrIGIvaHcvcGNpL3BjaV9i
-cmlkZ2UuYw0KPiA+IEBAIC0yNTMsMTcgKzI1MywxOSBAQCB2b2lkIHBjaV9icmlkZ2Vfd3JpdGVf
-Y29uZmlnKFBDSURldmljZSAqZCwNCj4gPiAgICAgIFBDSUJyaWRnZSAqcyA9IFBDSV9CUklER0Uo
-ZCk7DQo+ID4gICAgICB1aW50MTZfdCBvbGRjdGwgPSBwY2lfZ2V0X3dvcmQoZC0+Y29uZmlnICsg
-UENJX0JSSURHRV9DT05UUk9MKTsNCj4gPiAgICAgIHVpbnQxNl90IG5ld2N0bDsNCj4gPiArICAg
-IHVpbnQ2NF90IGJhcm1hc2sgPSAoMSA8PCBsZW4gKiA4KSAtIDE7DQo+ID4NCj4gPiAgICAgIHBj
-aV9kZWZhdWx0X3dyaXRlX2NvbmZpZyhkLCBhZGRyZXNzLCB2YWwsIGxlbik7DQo+ID4NCj4gPiAg
-ICAgIGlmIChyYW5nZXNfb3ZlcmxhcChhZGRyZXNzLCBsZW4sIFBDSV9DT01NQU5ELCAyKSB8fA0K
-PiA+DQo+ID4gLSAgICAgICAgLyogaW8gYmFzZS9saW1pdCAqLw0KPiA+IC0gICAgICAgIHJhbmdl
-c19vdmVybGFwKGFkZHJlc3MsIGxlbiwgUENJX0lPX0JBU0UsIDIpIHx8DQo+ID4gKyAgICAgICAg
-KHZhbCAhPSBiYXJtYXNrICYmDQo+ID4gKwkvKiBpbyBiYXNlL2xpbWl0ICovDQo+ID4gKyAgICAg
-ICAgKHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxlbiwgUENJX0lPX0JBU0UsIDIpIHx8DQo+ID4N
-Cj4gPiAgICAgICAgICAvKiBtZW1vcnkgYmFzZS9saW1pdCwgcHJlZmV0Y2hhYmxlIGJhc2UvbGlt
-aXQgYW5kDQo+ID4gICAgICAgICAgICAgaW8gYmFzZS9saW1pdCB1cHBlciAxNiAqLw0KPiA+IC0g
-ICAgICAgIHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxlbiwgUENJX01FTU9SWV9CQVNFLCAyMCkg
-fHwNCj4gPiArICAgICAgICByYW5nZXNfb3ZlcmxhcChhZGRyZXNzLCBsZW4sIFBDSV9NRU1PUllf
-QkFTRSwgMjApKSkgfHwNCj4gPg0KPiA+ICAgICAgICAgIC8qIHZnYSBlbmFibGUgKi8NCj4gPiAg
-ICAgICAgICByYW5nZXNfb3ZlcmxhcChhZGRyZXNzLCBsZW4sIFBDSV9CUklER0VfQ09OVFJPTCwg
-MikpIHsNCj4gPiAtLQ0KPiA+IDEuOC4zLjENCj4gPg0KPiA+DQo+ID4NCg==
+On Sun, 6 Jan 2019 at 05:35, Fam Zheng <fam@euphon.net> wrote:
+>
+> The following changes since commit 9b2e891ec5ccdb4a7d583b77988848282606fdea:
+>
+>   Merge remote-tracking branch 'remotes/marcel/tags/rdma-pull-request' into staging (2018-12-22 11:25:31 +0000)
+>
+> are available in the git repository at:
+>
+>   https://famz@github.com/famz/qemu tags/block-and-testing-pull-request
+
+I think something in your workflow has put in the wrong URL
+for your repo here: this looks like the one you use to log
+in with (ie to push with), not the general one other people
+pull from the repo with. I manually used the github URL I
+have on record for you (git://github.com/famz/qemu).
+
+
+> for you to fetch changes up to 3baa6942169cce0f58b88484ad010742c382480a:
+>
+>   tests: vm: auto_install OpenBSD (2019-01-02 20:51:15 +0800)
+
+This makes my OpenBSD build test fail:
+
+DEBUG:root:QEMU args: -nodefaults -m 4G -cpu max -vnc
+127.0.0.1:0,to=20 -serial file:/home/peter.maydell
+/qemu-openbsd/build/vm-test-0cyRK6.tmp/serial.out -smp 18 -enable-kvm
+-netdev user,id=vnet,hostfwd=:127.
+0.0.1:0-:22,tftp=/tmp/tmpXrGR4K,bootfile=/auto_install,tftp-server-name=10.0.2.4,guestfwd=tcp:10.0.2.4:8
+0-cmd:cat /tmp/tmpXrGR4K/install.conf -device
+virtio-net-pci,netdev=vnet -device VGA -drive file=tests/v
+m/openbsd.img.tmp,if=none,id=drive0,cache=writeback -device
+virtio-blk,drive=drive0,bootindex=0 -boot on
+ce=n -no-reboot -cdrom
+/home/peter.maydell/.cache/qemu-vm/download/535472578c58eb79f8b3c168a22fa5bcd2c1e
+6d4
+DEBUG:QMP:>>> {'execute': 'quit'}
+DEBUG:qemu:Error launching VM
+DEBUG:qemu:Command: 'qemu-system-x86_64 -chardev
+socket,id=mon,path=/var/tmp/tmp2kj6Xg/qemu-35162-monito
+r.sock -mon chardev=mon,mode=control -display none -vga none
+-nodefaults -m 4G -cpu max -vnc 127.0.0.1:0
+,to=20 -serial file:/home/peter.maydell/qemu-openbsd/build/vm-test-0cyRK6.tmp/serial.out
+-smp 18 -enable
+-kvm -netdev user,id=vnet,hostfwd=:127.0.0.1:0-:22,tftp=/tmp/tmpXrGR4K,bootfile=/auto_install,tftp-serve
+r-name=10.0.2.4,guestfwd=tcp:10.0.2.4:80-cmd:cat
+/tmp/tmpXrGR4K/install.conf -device virtio-net-pci,netd
+ev=vnet -device VGA -drive
+file=tests/vm/openbsd.img.tmp,if=none,id=drive0,cache=writeback
+-device virti
+o-blk,drive=drive0,bootindex=0 -boot once=n -no-reboot -cdrom
+/home/peter.maydell/.cache/qemu-vm/downloa
+d/535472578c58eb79f8b3c168a22fa5bcd2c1e6d4'
+DEBUG:qemu:Output: "qemu-system-x86_64: -netdev
+user,id=vnet,hostfwd=:127.0.0.1:0-:22,tftp=/tmp/tmpXrGR4K,bootfile=/auto_install,tftp-server-name=10.0.2.4,guestfwd=tcp:10.0.2.4:80-cmd:cat
+/tmp/tmpXrGR4K/install.conf: Invalid parameter 'tftp-server-name'\n"
+ERROR:root:Failed to launch QEMU, command line:
+ERROR:root:qemu-system-x86_64 -nodefaults -m 4G -cpu max -vnc
+127.0.0.1:0,to=20 -serial
+file:/home/peter.maydell/qemu-openbsd/build/vm-test-0cyRK6.tmp/serial.out
+-smp 18 -enable-kvm -netdev
+user,id=vnet,hostfwd=:127.0.0.1:0-:22,tftp=/tmp/tmpXrGR4K,bootfile=/auto_install,tftp-server-name=10.0.2.4,guestfwd=tcp:10.0.2.4:80-cmd:cat
+/tmp/tmpXrGR4K/install.conf -device virtio-net-pci,netdev=vnet -device
+VGA -drive file=tests/vm/openbsd.img.tmp,if=none,id=drive0,cache=writeback
+-device virtio-blk,drive=drive0,bootindex=0 -boot once=n -no-reboot
+-cdrom /home/peter.maydell/.cache/qemu-vm/download/535472578c58eb79f8b3c168a22fa5bcd2c1e6d4
+ERROR:root:Log:
+ERROR:root:qemu-system-x86_64: -netdev
+user,id=vnet,hostfwd=:127.0.0.1:0-:22,tftp=/tmp/tmpXrGR4K,bootfile=/auto_install,tftp-server-name=10.0.2.4,guestfwd=tcp:10.0.2.4:80-cmd:cat
+/tmp/tmpXrGR4K/install.conf: Invalid parameter 'tftp-server-name'
+
+ERROR:root:QEMU version >= 2.10 is required
+Failed to prepare guest environment
+
+The host is an Ubuntu 18.04.1, with QEMU version
+2.11.1(Debian 1:2.11+dfsg-1ubuntu7.8), so that should
+be good enough for a ">= 2.10" requirement.
+I notice that our qapi/net.json says tftp-server-name is
+"Since 3.1", though, so maybe the error message is wrong.
+
+I don't really want to have to build and maintain a non-distro
+QEMU binary for running these VM tests if we can avoid it.
+
+thanks
+-- PMM
