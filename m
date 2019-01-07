@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35754)
+Received: from eggs.gnu.org ([209.51.188.92]:35921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggSFz-00035B-RX
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:35:44 -0500
+	(envelope-from <ppandit@redhat.com>) id 1ggSGo-0003Uu-GC
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:36:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggSFz-0004qf-56
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:35:43 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35409)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggSFy-0004qF-VE
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:35:43 -0500
-Received: by mail-oi1-x242.google.com with SMTP id v6so35482010oif.2
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 02:35:42 -0800 (PST)
+	(envelope-from <ppandit@redhat.com>) id 1ggSGn-00058h-Nu
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:36:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ggSGn-000581-In
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:36:33 -0500
+From: P J P <ppandit@redhat.com>
+Date: Mon,  7 Jan 2019 16:04:26 +0530
+Message-Id: <20190107103426.2669-1-ppandit@redhat.com>
 MIME-Version: 1.0
-References: <20190103133113.49599-1-liq3ea@163.com>
-	<20190107102218.wzzcisnfqpasqjiq@sirius.home.kraxel.org>
-In-Reply-To: <20190107102218.wzzcisnfqpasqjiq@sirius.home.kraxel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Jan 2019 10:35:30 +0000
-Message-ID: <CAFEAcA_9jO1DEWvUNYdEvXbEWoDi+NR+ay6H21zaApoDdXKO4g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] usb: dev-mtp: close fd in
- usb_mtp_object_readdir()
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] qga: check length of command-line &
+ environment variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Li Qiang <liq3ea@163.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, niuguoxiang <niuguoxiang@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On Mon, 7 Jan 2019 at 10:22, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Thu, Jan 03, 2019 at 05:31:13AM -0800, Li Qiang wrote:
-> > Spotted by Coverity: CID 1397070
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-> >  #ifdef CONFIG_INOTIFY1
-> > @@ -682,6 +683,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
-> >          usb_mtp_add_child(s, o, entry->d_name);
-> >      }
-> >      closedir(dir);
-> > +    close(fd);
->
-> Not fully sure this is correct.
->
-> The fdopendir manpage says the app should not use fd any more after
-> successfully calling fdopendir(), and I assumed that includes calling
-> close().
+Qemu guest agent while executing user commands does not seem to
+check length of argument list and/or environment variables passed.
+It may lead to integer overflow or infinite loop issues. Add check
+to avoid it.
 
-Yes. The POSIX spec is clearer:
-http://pubs.opengroup.org/onlinepubs/9699919799/functions/fdopendir.html
-"Upon successful return from fdopendir(), the file descriptor is under
- the control of the system, and if any attempt is made to close the file
- descriptor, or to modify the state of the associated description, other
- than by means of closedir(), readdir(), readdir_r(), rewinddir(), or
- seekdir(), the behavior is undefined. Upon calling closedir() the file
- descriptor shall be closed."
+Reported-by: Niu Guoxiang <niuguoxiang@huawei.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ qga/commands.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-> But I've seen the Coverity message warning this one too, so
-> maybe I'm wrong ...
-
-If coverity insists on a close(fd) then that's a coverity bug :-)
-
-thanks
--- PMM
+diff --git a/qga/commands.c b/qga/commands.c
+index 0c7d1385c2..6d684ef209 100644
+--- a/qga/commands.c
++++ b/qga/commands.c
+@@ -231,17 +231,22 @@ static char **guest_exec_get_args(const strList *en=
+try, bool log)
+     int count =3D 1, i =3D 0;  /* reserve for NULL terminator */
+     char **args;
+     char *str; /* for logging array of arguments */
+-    size_t str_size =3D 1;
++    size_t str_size =3D 1, args_max;
+=20
++    args_max =3D sysconf(_SC_ARG_MAX);
+     for (it =3D entry; it !=3D NULL; it =3D it->next) {
+         count++;
+         str_size +=3D 1 + strlen(it->value);
++        if (str_size >=3D args_max / 2
++            || count >=3D args_max / sizeof(char *)) {
++            break;
++        }
+     }
+=20
+     str =3D g_malloc(str_size);
+     *str =3D 0;
+     args =3D g_malloc(count * sizeof(char *));
+-    for (it =3D entry; it !=3D NULL; it =3D it->next) {
++    for (it =3D entry; it !=3D NULL && i < count; it =3D it->next) {
+         args[i++] =3D it->value;
+         pstrcat(str, str_size, it->value);
+         if (it->next) {
+--=20
+2.20.1
