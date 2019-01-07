@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56049)
+Received: from eggs.gnu.org ([209.51.188.92]:58083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1ggZDw-0005HJ-NO
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:02:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1ggZHP-0000FB-Kc
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:05:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1ggZDq-0007Hw-0A
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:02:04 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:34604)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
-	id 1ggZDp-0007EG-Ho
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:01:57 -0500
-Date: Mon, 7 Jan 2019 12:01:53 -0600
-From: Venu Busireddy <venu.busireddy@oracle.com>
-Message-ID: <20190107180152.GA6977@troi>
-References: <1544458548-5986-1-git-send-email-venu.busireddy@oracle.com>
-	<1544458548-5986-4-git-send-email-venu.busireddy@oracle.com>
-	<20181210122311-mutt-send-email-mst@kernel.org>
+	(envelope-from <bounces@canonical.com>) id 1ggZHM-0001BM-3J
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:05:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34904)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ggZHL-00019W-OY
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:05:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ggZHK-0006Ul-JI
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 18:05:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 86FE02E8005
+	for <qemu-devel@nongnu.org>; Mon,  7 Jan 2019 18:05:34 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181210122311-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH 3/3] vfio-pci: Add
- FAILOVER_PRIMARY_CHANGED event to shorten downtime during failover
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 07 Jan 2019 17:57:34 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1810545 <1810545@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154662609174.25797.11037697007951339169.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154688385484.19401.18084021166417230504.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1810545] Re: [alpha] Strange exception address
+ reported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,207 +37,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 2018-12-10 12:31:43 -0500, Michael S. Tsirkin wrote:
-> On Mon, Dec 10, 2018 at 11:15:48AM -0500, Venu Busireddy wrote:
-> > From: Si-Wei Liu <si-wei.liu@oracle.com>
-> > 
-> > When a VF is hotplugged into the guest, datapath switching will be
-> > performed immediately, which is sub-optimal in terms of timing, and
-> > could end up with substantial network downtime. One of ways to shorten
-> > this downtime is to switch the datapath only after the VF is seen to get
-> > enabled by guest, indicated by the bus master bit in VF's PCI config
-> > space getting enabled. The FAILOVER_PRIMARY_CHANGED event is emitted
-> > at that time to indicate this condition. Then management stack can kick
-> > off datapath switching upon receiving the event.
-> > 
-> > Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
-> > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
-> 
-> As management stacks can lose events, it's necessary
-> to also have a query command to check device status.
+The problem seems to be that the PC we report for an OPCDEC is first select=
+ed by gen_invalid()/gen-excp() in target/alpha/translate.c, which uses pc_n=
+ext (ie the insn's address plus 4). But that is then handed through to our =
+custom PALcode (https://git.qemu.org/?p=3Dqemu-palcode.git;a=3Dblob;f=3Dpal=
+.S;h=3D1781c4b415700ca3a68af07fdae90ae43e722501;hb=3DHEAD) which does
+  addq    p6, 4, p1  // increment past the faulting insn
+resulting in insn + 8.
 
-Thanks for the feedback. Implemented the changes, and posted v2:
+That is, the palcode and the QEMU code have a disagreement about what
+the (private) API between them is. I'm not sure which side is wrong and
+should be corrected. I think the linux-user code assumes the same thing
+that translate.c is doing, so perhaps the palcode.
 
-    https://lists.oasis-open.org/archives/virtio-dev/201901/msg00046.html
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1810545
 
-> > ---
-> >  hw/vfio/pci.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  qapi/net.json | 26 ++++++++++++++++++++++++++
-> >  2 files changed, 83 insertions(+)
-> > 
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index ce1f33c..ea24ca2 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -34,6 +34,7 @@
-> >  #include "pci.h"
-> >  #include "trace.h"
-> >  #include "qapi/error.h"
-> > +#include "qapi/qapi-events-net.h"
-> >  
-> >  #define MSIX_CAP_LENGTH 12
-> >  
-> > @@ -42,6 +43,7 @@
-> >  
-> >  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
-> >  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
-> > +static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status);
-> >  
-> >  /*
-> >   * Disabling BAR mmaping can be slow, but toggling it around INTx can
-> > @@ -1170,6 +1172,8 @@ void vfio_pci_write_config(PCIDevice *pdev,
-> >  {
-> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-> >      uint32_t val_le = cpu_to_le32(val);
-> > +    bool may_notify = false;
-> > +    bool master_was = false;
-> >  
-> >      trace_vfio_pci_write_config(vdev->vbasedev.name, addr, val, len);
-> >  
-> > @@ -1180,6 +1184,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
-> >                       __func__, vdev->vbasedev.name, addr, val, len);
-> >      }
-> >  
-> > +    /* Bus Master Enabling/Disabling */
-> > +    if (pdev->failover_primary && current_cpu &&
-> > +        range_covers_byte(addr, len, PCI_COMMAND)) {
-> > +        master_was = !!(pci_get_word(pdev->config + PCI_COMMAND) &
-> > +                        PCI_COMMAND_MASTER);
-> > +        may_notify = true;
-> > +    }
-> > +
-> >      /* MSI/MSI-X Enabling/Disabling */
-> >      if (pdev->cap_present & QEMU_PCI_CAP_MSI &&
-> >          ranges_overlap(addr, len, pdev->msi_cap, vdev->msi_cap_size)) {
-> > @@ -1235,6 +1247,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
-> >          /* Write everything to QEMU to keep emulated bits correct */
-> >          pci_default_write_config(pdev, addr, val, len);
-> >      }
-> > +
-> > +    if (may_notify) {
-> > +        bool master_now = !!(pci_get_word(pdev->config + PCI_COMMAND) &
-> > +                             PCI_COMMAND_MASTER);
-> > +        if (master_was != master_now) {
-> > +            vfio_failover_notify(vdev, master_now);
-> > +        }
-> > +    }
-> >  }
-> >  
-> >  /*
-> 
-> It's very easy to have guest trigger a high load of events by playing
-> with the bus master enable bits.  How about instead sending an event
-> that just says "something changed" without the current status and have
-> management issue a query command to check the status. QEMU then does not
-> need to re-send an event until management issues a query command.
-> 
-> 
-> > @@ -2801,6 +2821,17 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
-> >      vdev->req_enabled = false;
-> >  }
-> >  
-> > +static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status)
-> > +{
-> > +    PCIDevice *pdev = &vdev->pdev;
-> > +    const char *n;
-> > +    gchar *path;
-> > +
-> > +    n = pdev->qdev.id ? pdev->qdev.id : vdev->vbasedev.name;
-> > +    path = object_get_canonical_path(OBJECT(vdev));
-> > +    qapi_event_send_failover_primary_changed(!!n, n, path, status);
-> > +}
-> > +
-> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
-> >  {
-> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-> > @@ -3109,10 +3140,36 @@ static void vfio_instance_finalize(Object *obj)
-> >      vfio_put_group(group);
-> >  }
-> >  
-> > +static void vfio_exit_failover_notify(VFIOPCIDevice *vdev)
-> > +{
-> > +    PCIDevice *pdev = &vdev->pdev;
-> > +
-> > +    /*
-> > +     * Guest driver may not get the chance to disable bus mastering
-> > +     * before the device object gets to be unrealized. In that event,
-> > +     * send out a "disabled" notification on behalf of guest driver.
-> > +     */
-> > +    if (pdev->failover_primary &&
-> > +        pdev->bus_master_enable_region.enabled) {
-> > +        vfio_failover_notify(vdev, false);
-> > +    }
-> > +}
-> > +
-> 
-> With the idea above this won't be necessary anymore.
-> 
-> 
-> >  static void vfio_exitfn(PCIDevice *pdev)
-> >  {
-> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-> >  
-> > +    /*
-> > +     * During the guest reboot sequence, it is sometimes possible that
-> > +     * the guest may not get sufficient time to complete the entire driver
-> > +     * removal sequence, near the end of which a PCI config space write to
-> > +     * disable bus mastering can be intercepted by device. In such cases,
-> > +     * the FAILOVER_PRIMARY_CHANGED "disable" event will not be emitted. It
-> > +     * is imperative to generate the event on the guest's behalf if the
-> > +     * guest fails to make it.
-> > +     */
-> > +    vfio_exit_failover_notify(vdev);
-> > +
-> >      vfio_unregister_req_notifier(vdev);
-> >      vfio_unregister_err_notifier(vdev);
-> >      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-> > diff --git a/qapi/net.json b/qapi/net.json
-> > index 04a9de9..e5992c8 100644
-> > --- a/qapi/net.json
-> > +++ b/qapi/net.json
-> > @@ -727,3 +727,29 @@
-> >  ##
-> >  { 'event': 'FAILOVER_UNPLUG_PRIMARY',
-> >    'data': {'*device': 'str', 'path': 'str'} }
-> > +
-> > +##
-> > +# @FAILOVER_PRIMARY_CHANGED:
-> > +#
-> > +# Emitted whenever the driver of failover primary is loaded or unloaded
-> > +# by the guest.
-> > +#
-> > +# @device: device name
-> > +#
-> > +# @path: device path
-> > +#
-> > +# @enabled: true if driver is loaded thus device is enabled in guest
-> > +#
-> > +# Since: 3.0
-> > +#
-> > +# Example:
-> > +#
-> > +# <- { "event": "FAILOVER_PRIMARY_CHANGED",
-> 
-> 
-> This event doesn't seem to be failover specific.
-> How about a more generic name?
-> 
-> 
-> 
-> > +#      "data": { "device": "vfio-0",
-> > +#                "path": "/machine/peripheral/vfio-0" },
-> > +#                "enabled": "true" },
-> > +#      "timestamp": { "seconds": 1539935213, "microseconds": 753529 } }
-> > +#
-> > +##
-> > +{ 'event': 'FAILOVER_PRIMARY_CHANGED',
-> > +  'data': { '*device': 'str', 'path': 'str', 'enabled': 'bool' } }
-> 
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
-> 
+Title:
+  [alpha] Strange exception address reported
+
+Status in QEMU:
+  New
+
+Bug description:
+  For some reason the SIGILL handler receives a different address under
+  qemu than it used to on real hardware. I don't know specifics about
+  the hardware used back then =E2=80=93 it was some sort of 21264a somewhere
+  between 600-800 MHz =E2=80=93, and I cannot say anything about the kernel=
+ as
+  well, but I know that it delivered the faulting address +4, while
+  under qemu it receives +8. I know because CACAO, an early Java JIT
+  compiler extracts the address from the SIGILL handler and inspects the
+  code at the faulting site, and it has substracted 4 from the handler
+  address since the dawn of time, and this used to produce the desired
+  result on the Alpha hardware. It actually ran on two different Alpha
+  machines over the years, and both behaved identically.
+
+  The handler looks like this:
+  void handler_sigill(int sig, siginfo_t *siginfo, void *_p)
+  {
+    uintptr_t trap_address =3D (uintptr_t) (((ucontext_t*) _p)->uc_mcontext=
+.sc_pc) - 4;
+  }
+
+  (paraphrasing, the actual code is here: https://bitbucket.org/cacaovm
+  /cacao-
+  staging/src/c8d3fbab864c3243f97629fcfa8d84ba71f38157/src/vm/jit/alpha/lin=
+ux
+  /md-os.cpp?at=3Ddefault&fileviewer=3Dfile-view-default#md-os.cpp-65)
+
+  I don't know much about the qemu source code and cannot say where this
+  is coming from at first glance. The gen_invalid function uses pc_next,
+  which sounds like the next instruction, not the next-to-next ;). In
+  theory it could actually be the kernel's fault, although I consider
+  this unlikely.
+
+  This is qemu-system-alpha with apparently the last Debian which
+  existed for Alpha (lenny). The kernel is 2.6.26-2-alpha-generic
+  (Debian 2.6.26-29). Observed with qemu git 1b3e80082b, but I guess it
+  is the same with any version.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1810545/+subscriptions
