@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54644)
+Received: from eggs.gnu.org ([209.51.188.92]:56049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ggZBn-000322-94
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:59:52 -0500
+	(envelope-from <venu.busireddy@oracle.com>) id 1ggZDw-0005HJ-NO
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:02:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ggZBm-0005uc-4g
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:59:51 -0500
-References: <20190103094728.31747-1-rjones@redhat.com>
-	<20190103094728.31747-2-rjones@redhat.com>
-	<cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
-	<741a5843-a47a-6a02-c378-b778f7ffe172@redhat.com>
-	<f5aa2057-509b-28fa-d803-b18ca525ae73@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <94a72d7e-a8c9-09d4-fad3-00b09ffd7eb9@redhat.com>
-Date: Mon, 7 Jan 2019 11:59:28 -0600
+	(envelope-from <venu.busireddy@oracle.com>) id 1ggZDq-0007Hw-0A
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:02:04 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:34604)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
+	id 1ggZDp-0007EG-Ho
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:01:57 -0500
+Date: Mon, 7 Jan 2019 12:01:53 -0600
+From: Venu Busireddy <venu.busireddy@oracle.com>
+Message-ID: <20190107180152.GA6977@troi>
+References: <1544458548-5986-1-git-send-email-venu.busireddy@oracle.com>
+	<1544458548-5986-4-git-send-email-venu.busireddy@oracle.com>
+	<20181210122311-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f5aa2057-509b-28fa-d803-b18ca525ae73@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jWrjf7NvR1U72Xyq3GzUBMGJKD1F986Pi"
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: Reinitialize optind to 1 (not
- 0) before parsing inner command.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181210122311-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH 3/3] vfio-pci: Add
+ FAILOVER_PRIMARY_CHANGED event to shorten downtime during failover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +30,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jWrjf7NvR1U72Xyq3GzUBMGJKD1F986Pi
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <94a72d7e-a8c9-09d4-fad3-00b09ffd7eb9@redhat.com>
-Subject: Re: [PATCH v2] qemu-io: Reinitialize optind to 1 (not 0) before
- parsing inner command.
-References: <20190103094728.31747-1-rjones@redhat.com>
- <20190103094728.31747-2-rjones@redhat.com>
- <cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
- <741a5843-a47a-6a02-c378-b778f7ffe172@redhat.com>
- <f5aa2057-509b-28fa-d803-b18ca525ae73@redhat.com>
-In-Reply-To: <f5aa2057-509b-28fa-d803-b18ca525ae73@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 2018-12-10 12:31:43 -0500, Michael S. Tsirkin wrote:
+> On Mon, Dec 10, 2018 at 11:15:48AM -0500, Venu Busireddy wrote:
+> > From: Si-Wei Liu <si-wei.liu@oracle.com>
+> > 
+> > When a VF is hotplugged into the guest, datapath switching will be
+> > performed immediately, which is sub-optimal in terms of timing, and
+> > could end up with substantial network downtime. One of ways to shorten
+> > this downtime is to switch the datapath only after the VF is seen to get
+> > enabled by guest, indicated by the bus master bit in VF's PCI config
+> > space getting enabled. The FAILOVER_PRIMARY_CHANGED event is emitted
+> > at that time to indicate this condition. Then management stack can kick
+> > off datapath switching upon receiving the event.
+> > 
+> > Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
+> > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+> 
+> As management stacks can lose events, it's necessary
+> to also have a query command to check device status.
 
-On 1/7/19 11:50 AM, Max Reitz wrote:
+Thanks for the feedback. Implemented the changes, and posted v2:
 
->>>> Note I didn't set optreset.  It's not present in glibc and the "hard=
-
->>>> reset" is not necessary in this context.
->>>
->>> But it sure sounds like FreeBSD requires you to set it, doesn't it?
-
-No.  Quoting https://www.freebsd.org/cgi/man.cgi?getopt(3)
-
-     The variables opterr and optind are both initialized to 1.	 The opti=
-nd
-     variable may be set to another value before a set of calls	to
-getopt() in
-     order to skip over	more or	less argv entries.
-
-so resetting it to 1 as a soft reset is no different to setting it to 2
-to skip argv[1].  It just means that you didn't get the hard reset of
-internal state (there is definitely internal state if argv[1] was merged
-short options - but that state is cleared if you run getopt() until it
-returns -1; there may also be internal state if you used extensions, but
-when you don't use extensions, such internal state is irrelevant).
-
-I think the BSD man page needs updating, and that will probably happen
-if I file my promised POSIX defect.
+    https://lists.oasis-open.org/archives/virtio-dev/201901/msg00046.html
 
 
->> At the end of the day, both GNU optind=3D0 and BSD optreset=3D1 are
->> sufficient to force a hard reset of all hidden state.  But if you don'=
-t
->> use POSIX extensions, and always run getopt() until a -1 return, then
->> setting optind=3D1 is a portable soft reset, regardless of how the hid=
-den
->> state is implemented, and regardless of how (or even if) libc offers a=
-
->> hard reset, even though POSIX itself is currently lacking that mention=
-=2E
->> (I should probably file a POSIX defect to get that wording listed in P=
-OSIX)
->=20
-> Hm, OK?  Is there any guarantee for that behavior for FreeBSD, or is
-> that just how it is?  Because the man page is very clear on it:
-> "optreset must be set to 1".  It doesn't talk about soft or hard resets=
-
-> like the glibc man page does.
->=20
-> And if optreset not being available for glibc is the only issue, I'd sa=
-y
-> adding it as a weak global variable would work without #ifdefs.
-
-I don't see the point - Richard has already tested that optind =3D 1
-worked on BSD machines for our purposes, so we don't have to worry about
-the hard reset aspect of optreset=3D1.  (But yes, it would also be nice i=
-f
-BSD and glibc folks could agree on how to do hard resets, instead of
-having two different incompatible ways).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---jWrjf7NvR1U72Xyq3GzUBMGJKD1F986Pi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwzk4AACgkQ3g5py3or
-ov1skwf/Qxa1kJe2iyN9hUJFuBtcuZnaDdLkVI6FFtxmAt7vqt6xvZka1mKXCCZ7
-iFh2SsAoPVmBi/5ugnYSTY6Bq5Bu/P0VmduK2ODuE/IUFfqxAzPSvVjo/na2t06f
-EC6RCkFH5sRb3hYCZhsSQc0iOoSGZYNa5BvT+mmgVQxlJt+UYT+DHYRVawAscrwd
-ZlnCtGuIy/BSxrtzX8G9lBDw6G8sP68gZm6mOC7s0rorao+kxbhA5JthNrBJDVMU
-k9NuwgjTYPAdPl5mFGJ4lmsexrVQRhstSKpvBIRX1OHYWgsTDUjNCfDxQHiegY2k
-OxXQiS9v9KvIUeMe5NeXxXJ7vg+HFQ==
-=WY+V
------END PGP SIGNATURE-----
-
---jWrjf7NvR1U72Xyq3GzUBMGJKD1F986Pi--
+> > ---
+> >  hw/vfio/pci.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  qapi/net.json | 26 ++++++++++++++++++++++++++
+> >  2 files changed, 83 insertions(+)
+> > 
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index ce1f33c..ea24ca2 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -34,6 +34,7 @@
+> >  #include "pci.h"
+> >  #include "trace.h"
+> >  #include "qapi/error.h"
+> > +#include "qapi/qapi-events-net.h"
+> >  
+> >  #define MSIX_CAP_LENGTH 12
+> >  
+> > @@ -42,6 +43,7 @@
+> >  
+> >  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+> >  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+> > +static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status);
+> >  
+> >  /*
+> >   * Disabling BAR mmaping can be slow, but toggling it around INTx can
+> > @@ -1170,6 +1172,8 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> >  {
+> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> >      uint32_t val_le = cpu_to_le32(val);
+> > +    bool may_notify = false;
+> > +    bool master_was = false;
+> >  
+> >      trace_vfio_pci_write_config(vdev->vbasedev.name, addr, val, len);
+> >  
+> > @@ -1180,6 +1184,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> >                       __func__, vdev->vbasedev.name, addr, val, len);
+> >      }
+> >  
+> > +    /* Bus Master Enabling/Disabling */
+> > +    if (pdev->failover_primary && current_cpu &&
+> > +        range_covers_byte(addr, len, PCI_COMMAND)) {
+> > +        master_was = !!(pci_get_word(pdev->config + PCI_COMMAND) &
+> > +                        PCI_COMMAND_MASTER);
+> > +        may_notify = true;
+> > +    }
+> > +
+> >      /* MSI/MSI-X Enabling/Disabling */
+> >      if (pdev->cap_present & QEMU_PCI_CAP_MSI &&
+> >          ranges_overlap(addr, len, pdev->msi_cap, vdev->msi_cap_size)) {
+> > @@ -1235,6 +1247,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> >          /* Write everything to QEMU to keep emulated bits correct */
+> >          pci_default_write_config(pdev, addr, val, len);
+> >      }
+> > +
+> > +    if (may_notify) {
+> > +        bool master_now = !!(pci_get_word(pdev->config + PCI_COMMAND) &
+> > +                             PCI_COMMAND_MASTER);
+> > +        if (master_was != master_now) {
+> > +            vfio_failover_notify(vdev, master_now);
+> > +        }
+> > +    }
+> >  }
+> >  
+> >  /*
+> 
+> It's very easy to have guest trigger a high load of events by playing
+> with the bus master enable bits.  How about instead sending an event
+> that just says "something changed" without the current status and have
+> management issue a query command to check the status. QEMU then does not
+> need to re-send an event until management issues a query command.
+> 
+> 
+> > @@ -2801,6 +2821,17 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+> >      vdev->req_enabled = false;
+> >  }
+> >  
+> > +static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status)
+> > +{
+> > +    PCIDevice *pdev = &vdev->pdev;
+> > +    const char *n;
+> > +    gchar *path;
+> > +
+> > +    n = pdev->qdev.id ? pdev->qdev.id : vdev->vbasedev.name;
+> > +    path = object_get_canonical_path(OBJECT(vdev));
+> > +    qapi_event_send_failover_primary_changed(!!n, n, path, status);
+> > +}
+> > +
+> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >  {
+> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> > @@ -3109,10 +3140,36 @@ static void vfio_instance_finalize(Object *obj)
+> >      vfio_put_group(group);
+> >  }
+> >  
+> > +static void vfio_exit_failover_notify(VFIOPCIDevice *vdev)
+> > +{
+> > +    PCIDevice *pdev = &vdev->pdev;
+> > +
+> > +    /*
+> > +     * Guest driver may not get the chance to disable bus mastering
+> > +     * before the device object gets to be unrealized. In that event,
+> > +     * send out a "disabled" notification on behalf of guest driver.
+> > +     */
+> > +    if (pdev->failover_primary &&
+> > +        pdev->bus_master_enable_region.enabled) {
+> > +        vfio_failover_notify(vdev, false);
+> > +    }
+> > +}
+> > +
+> 
+> With the idea above this won't be necessary anymore.
+> 
+> 
+> >  static void vfio_exitfn(PCIDevice *pdev)
+> >  {
+> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> >  
+> > +    /*
+> > +     * During the guest reboot sequence, it is sometimes possible that
+> > +     * the guest may not get sufficient time to complete the entire driver
+> > +     * removal sequence, near the end of which a PCI config space write to
+> > +     * disable bus mastering can be intercepted by device. In such cases,
+> > +     * the FAILOVER_PRIMARY_CHANGED "disable" event will not be emitted. It
+> > +     * is imperative to generate the event on the guest's behalf if the
+> > +     * guest fails to make it.
+> > +     */
+> > +    vfio_exit_failover_notify(vdev);
+> > +
+> >      vfio_unregister_req_notifier(vdev);
+> >      vfio_unregister_err_notifier(vdev);
+> >      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+> > diff --git a/qapi/net.json b/qapi/net.json
+> > index 04a9de9..e5992c8 100644
+> > --- a/qapi/net.json
+> > +++ b/qapi/net.json
+> > @@ -727,3 +727,29 @@
+> >  ##
+> >  { 'event': 'FAILOVER_UNPLUG_PRIMARY',
+> >    'data': {'*device': 'str', 'path': 'str'} }
+> > +
+> > +##
+> > +# @FAILOVER_PRIMARY_CHANGED:
+> > +#
+> > +# Emitted whenever the driver of failover primary is loaded or unloaded
+> > +# by the guest.
+> > +#
+> > +# @device: device name
+> > +#
+> > +# @path: device path
+> > +#
+> > +# @enabled: true if driver is loaded thus device is enabled in guest
+> > +#
+> > +# Since: 3.0
+> > +#
+> > +# Example:
+> > +#
+> > +# <- { "event": "FAILOVER_PRIMARY_CHANGED",
+> 
+> 
+> This event doesn't seem to be failover specific.
+> How about a more generic name?
+> 
+> 
+> 
+> > +#      "data": { "device": "vfio-0",
+> > +#                "path": "/machine/peripheral/vfio-0" },
+> > +#                "enabled": "true" },
+> > +#      "timestamp": { "seconds": 1539935213, "microseconds": 753529 } }
+> > +#
+> > +##
+> > +{ 'event': 'FAILOVER_PRIMARY_CHANGED',
+> > +  'data': { '*device': 'str', 'path': 'str', 'enabled': 'bool' } }
+> 
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> 
