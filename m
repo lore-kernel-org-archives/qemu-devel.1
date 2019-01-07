@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40106)
+Received: from eggs.gnu.org ([209.51.188.92]:44080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggWGu-0003Wo-UJ
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:52:57 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ggWVL-0007Dx-GL
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:07:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggWGs-00005v-Tq
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:52:56 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36704)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggWGq-0008L7-Vn
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:52:54 -0500
-Received: by mail-ot1-x341.google.com with SMTP id k98so529804otk.3
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 06:52:46 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1ggWVJ-0002t9-Tm
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:07:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ggWVJ-0002se-Lg
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:07:49 -0500
+Date: Mon, 7 Jan 2019 15:07:38 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190107150737.GB2442@work-vm>
+References: <20190106013802.3645-1-eblake@redhat.com>
+	<20190107094927.GA2442@work-vm>
+	<96a72fff-a7ab-ca0f-2d1b-5efdc0a9868e@redhat.com>
 MIME-Version: 1.0
-References: <20190104142921.878-1-f4bug@amsat.org>
-In-Reply-To: <20190104142921.878-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Jan 2019 14:52:34 +0000
-Message-ID: <CAFEAcA9ex7D5VQNEv+Nc2F_baFATjVZA4sJjL-S2BuPGQFD1=Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/allwinner-a10: Add the 'A' SRAM
- and the SRAM controller
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96a72fff-a7ab-ca0f-2d1b-5efdc0a9868e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] osdep: Make MIN/MAX evaluate arguments
+ only once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Charlie Smurthwaite <charlie@atech.media>, Beniamino Galvani <b.galvani@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, dirty.ice.hu@gmail.com, f4bug@amsat.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On Fri, 4 Jan 2019 at 14:29, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->
-> From the "A10 User Manual V1.20" p.29: "3.2. Memory Mapping" and:
->
->  7. System Control
->   7.1. Overview
->
->   A10 embeds a high-speed SRAM which has been split into five segments.
->   See detailed memory mapping in following table:
->
->   Area          Address        Size (Bytes)
->    A1    0x00000000-0x00003FFF 16K
->    A2    0x00004000-0x00007FFF 16K
->    A3    0x00008000-0x0000B3FF 13K
->    A4    0x0000B400-0x0000BFFF  3K
->
-> Since for emulation purpose we don't need the segmentations, we simply de=
-fine
-> the 'A' area as a single 48KB SRAM.
->
-> We don't implement the following others areas:
-> - 'B': 'Secure RAM' (64K),
-> - 'C': Debug/ISP SRAM
-> - 'D': USB SRAM
->
-> (qemu) info mtree
-> address-space: memory
->   0000000000000000-ffffffffffffffff (prio 0, i/o): system
->     0000000000000000-000000000000bfff (prio 0, ram): sram A
->     0000000001c00000-0000000001c00fff (prio -1000, i/o): a10-sram-ctrl
->     0000000001c0b000-0000000001c0bfff (prio 0, i/o): aw_emac
->     0000000001c18000-0000000001c18fff (prio 0, i/o): ahci
->       0000000001c18080-0000000001c180ff (prio 0, i/o): allwinner-ahci
->     0000000001c20400-0000000001c207ff (prio 0, i/o): allwinner-a10-pic
->     0000000001c20c00-0000000001c20fff (prio 0, i/o): allwinner-A10-timer
->     0000000001c28000-0000000001c2801f (prio 0, i/o): serial
->     0000000040000000-0000000047ffffff (prio 0, ram): cubieboard.ram
->
-> Reported-by: Charlie Smurthwaite <charlie@atech.media>
-> Tested-by: Charlie Smurthwaite <charlie@atech.media>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> v2: Set owner=3DSoC in memory_region_init_ram() to avoid leak
->     when SoC is destroyed (Peter Maydell)
+* Eric Blake (eblake@redhat.com) wrote:
+> On 1/7/19 3:49 AM, Dr. David Alan Gilbert wrote:
+> > * Eric Blake (eblake@redhat.com) wrote:
+> >> Add the macro QEMU_TYPEOF() to access __auto_type in new enough
+> >> compilers, while falling back to typeof on older compilers (the
+> >> fallback doesn't handle variable length arrays, but we don't use
+> >> those; it also expands to more text).
+> >>
+> >> Then use that macro to make MIN/MAX only evaluate their argument
+> >> once; this uses type promotion (by adding to 0) to work around
+> >> the fact that typeof(bitfield) won't compile.  However, we are
+> >> unable to work around gcc refusing to compile ({}) in a constant
+> >> context, even when only used in the dead branch of a
+> >> __builtin_choose_expr(),
+> 
+> 
+> >> +#undef MIN
+> >> +#define MIN(a, b)                            \
+> >> +    ({                                       \
+> >> +        QEMU_TYPEOF((a) + 0) _a = (a) + 0;   \
+> >> +        QEMU_TYPEOF((b) + 0) _b = (b) + 0;   \
+> >> +        _a < _b ? _a : _b;                   \
+> >> +    })
+> >> +#define MIN_CONST(a, b)                                         \
+> >> +    __builtin_choose_expr(                                      \
+> >> +        __builtin_constant_p(a) && __builtin_constant_p(b),     \
+> >> +        (a) < (b) ? (a) : (b),                                  \
+> >> +        __builtin_unreachable())
+> > 
+> > Why do these need to be separate macros? Can't you just put the 
+> > non-constant code in what you have as the 'builtin_unreachable' side of
+> > the choose_expr:
+> > 
+> > #define DMIN(a,b) __builtin_choose_expr(                  \
+> >     __builtin_constant_p(a) && __builtin_constant_p(b),   \
+> >     (a) < (b) ? (a) : (b),                                \
+> >     ({                                       \
+> >         QEMU_TYPEOF((a) + 0) _a = (a) + 0;   \
+> >         QEMU_TYPEOF((b) + 0) _b = (b) + 0;   \
+> >         _a < _b ? _a : _b;                   \
+> >     }))
+> 
+> Because it doesn't work - gcc treats ({}) as a syntax error inside
+> constant expressions, even in dead code (although 'info gcc' said that
+> might change in the future, we can't wait for that change).  I also
+> tried it as documented here:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00715.html
+> hence my mention in the commit message.
+
+Ah, I didn't understand the context in your message;  you say 'even in
+the dead branch of a __builtin_choose_expr()' but the following works
+for me (on f29 and rhel7):
+
+#include <stdio.h>
+
+# define QEMU_TYPEOF(a) typeof(a)
+
+#define DMIN(a,b) __builtin_choose_expr(                  \
+    __builtin_constant_p(a) && __builtin_constant_p(b),   \
+    (a) < (b) ? (a) : (b),                                \
+    ({                                       \
+        QEMU_TYPEOF((a) + 0) _a = (a) + 0;   \
+        QEMU_TYPEOF((b) + 0) _b = (b) + 0;   \
+        _a < _b ? _a : _b;                   \
+    }))
+
+
+int main(int argc, char *argv[])
+{
+    int anarray[DMIN(5, 10)];
+    int a=5;
+    int b=6;
+    fprintf(stderr, "sizeof(anarray)=%zd DMIN(a,b)=%d\n", sizeof(anarray), DMIN(a++,b++));
+    fprintf(stderr, "a=%d b=%d\n", a,b);
+}
+
+Dave
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
 
 
 
-Applied to target-arm.next, thanks.
-
--- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
