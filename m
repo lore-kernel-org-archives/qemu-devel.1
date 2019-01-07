@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50209)
+Received: from eggs.gnu.org ([209.51.188.92]:50711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU4c-0007m4-IG
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:32:09 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU6e-0000mE-Dy
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU4a-0001DJ-95
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:32:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40424)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU6a-0002TO-K6
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:34:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ggU4Z-00019B-Ns
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:32:04 -0500
+	id 1ggU6X-0002RN-Kd
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:34:06 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon,  7 Jan 2019 16:22:54 +0400
-Message-Id: <20190107122304.22997-19-marcandre.lureau@redhat.com>
+Date: Mon,  7 Jan 2019 16:22:56 +0400
+Message-Id: <20190107122304.22997-21-marcandre.lureau@redhat.com>
 In-Reply-To: <20190107122304.22997-1-marcandre.lureau@redhat.com>
 References: <20190107122304.22997-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 18/28] compat: replace PC_COMPAT_2_2 &
- HW_COMPAT_2_2 macros
+Subject: [Qemu-devel] [PULL v2 20/28] include: remove compat.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,352 +30,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Use static arrays instead.  I decided to rename the conflicting
-pc_compat_2_2() function with pc_compat_2_2_fn().
+The header is now empty.
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Acked-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/boards.h  |  3 ++
- include/hw/compat.h  |  3 --
- include/hw/i386/pc.h | 97 ++------------------------------------------
- hw/core/machine.c    |  3 ++
- hw/i386/pc.c         | 95 +++++++++++++++++++++++++++++++++++++++++++
- hw/i386/pc_piix.c    | 12 +++---
- hw/ppc/spapr.c       |  2 +-
- 7 files changed, 110 insertions(+), 105 deletions(-)
+ include/hw/compat.h        | 4 ----
+ include/hw/i386/pc.h       | 1 -
+ hw/arm/virt.c              | 1 -
+ hw/ppc/spapr.c             | 1 -
+ hw/s390x/s390-virtio-ccw.c | 1 -
+ 5 files changed, 8 deletions(-)
+ delete mode 100644 include/hw/compat.h
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index e7e3d2bc3c..2d82d80107 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -324,4 +324,7 @@ extern const size_t hw_compat_2_4_len;
- extern GlobalProperty hw_compat_2_3[];
- extern const size_t hw_compat_2_3_len;
-=20
-+extern GlobalProperty hw_compat_2_2[];
-+extern const size_t hw_compat_2_2_len;
-+
- #endif
 diff --git a/include/hw/compat.h b/include/hw/compat.h
-index fbe64d5983..3bd91908e4 100644
+deleted file mode 100644
+index b2d0bdd599..0000000000
 --- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -1,9 +1,6 @@
- #ifndef HW_COMPAT_H
- #define HW_COMPAT_H
-=20
--#define HW_COMPAT_2_2 \
--    /* empty */
++++ /dev/null
+@@ -1,4 +0,0 @@
+-#ifndef HW_COMPAT_H
+-#define HW_COMPAT_H
 -
- #define HW_COMPAT_2_1 \
-     {\
-         .driver   =3D "intel-hda",\
+-#endif /* HW_COMPAT_H */
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index def40cd545..49b45bb79d 100644
+index 784ea7a92c..6b7bf334cd 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -330,6 +330,9 @@ extern const size_t pc_compat_2_4_len;
- extern GlobalProperty pc_compat_2_3[];
- extern const size_t pc_compat_2_3_len;
-=20
-+extern GlobalProperty pc_compat_2_2[];
-+extern const size_t pc_compat_2_2_len;
-+
- /* Helper for setting model-id for CPU models that changed model-id
-  * depending on QEMU versions up to QEMU 2.4.
-  */
-@@ -350,100 +353,6 @@ extern const size_t pc_compat_2_3_len;
-         .value    =3D "QEMU Virtual CPU version " v,\
-     },
-=20
--#define PC_COMPAT_2_2 \
--    HW_COMPAT_2_2 \
--    PC_CPU_MODEL_IDS("2.2.0") \
--    {\
--        .driver =3D "kvm64" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "kvm32" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Conroe" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Penryn" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Nehalem" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Westmere" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "SandyBridge" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Haswell" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Broadwell" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Opteron_G1" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Opteron_G2" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Opteron_G3" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Opteron_G4" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Opteron_G5" "-" TYPE_X86_CPU,\
--        .property =3D "vme",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Haswell" "-" TYPE_X86_CPU,\
--        .property =3D "f16c",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Haswell" "-" TYPE_X86_CPU,\
--        .property =3D "rdrand",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Broadwell" "-" TYPE_X86_CPU,\
--        .property =3D "f16c",\
--        .value =3D "off",\
--    },\
--    {\
--        .driver =3D "Broadwell" "-" TYPE_X86_CPU,\
--        .property =3D "rdrand",\
--        .value =3D "off",\
--    },
--
- #define PC_COMPAT_2_1 \
-     HW_COMPAT_2_1 \
-     PC_CPU_MODEL_IDS("2.1.0") \
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index d37cdc3153..cfa9a5d95f 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -306,6 +306,9 @@ GlobalProperty hw_compat_2_3[] =3D {
- };
- const size_t hw_compat_2_3_len =3D G_N_ELEMENTS(hw_compat_2_3);
-=20
-+GlobalProperty hw_compat_2_2[] =3D {};
-+const size_t hw_compat_2_2_len =3D G_N_ELEMENTS(hw_compat_2_2);
-+
- static char *machine_get_accel(Object *obj, Error **errp)
- {
-     MachineState *ms =3D MACHINE(obj);
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 1f6d7809ce..b92d1900da 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -441,6 +441,101 @@ GlobalProperty pc_compat_2_3[] =3D {
- };
- const size_t pc_compat_2_3_len =3D G_N_ELEMENTS(pc_compat_2_3);
-=20
-+GlobalProperty pc_compat_2_2[] =3D {
-+    PC_CPU_MODEL_IDS("2.2.0")
-+    {
-+        .driver =3D "kvm64" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "kvm32" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Conroe" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Penryn" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Nehalem" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Westmere" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "SandyBridge" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Haswell" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Broadwell" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Opteron_G1" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Opteron_G2" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Opteron_G3" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Opteron_G4" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Opteron_G5" "-" TYPE_X86_CPU,
-+        .property =3D "vme",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Haswell" "-" TYPE_X86_CPU,
-+        .property =3D "f16c",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Haswell" "-" TYPE_X86_CPU,
-+        .property =3D "rdrand",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Broadwell" "-" TYPE_X86_CPU,
-+        .property =3D "f16c",
-+        .value =3D "off",
-+    },
-+    {
-+        .driver =3D "Broadwell" "-" TYPE_X86_CPU,
-+        .property =3D "rdrand",
-+        .value =3D "off",
-+    },
-+};
-+const size_t pc_compat_2_2_len =3D G_N_ELEMENTS(pc_compat_2_2);
-+
- void gsi_handler(void *opaque, int n, int level)
- {
-     GSIState *s =3D opaque;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 5b03f9ef80..d2a2bacba4 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -318,14 +318,14 @@ static void pc_compat_2_3_fn(MachineState *machine)
-     }
- }
-=20
--static void pc_compat_2_2(MachineState *machine)
-+static void pc_compat_2_2_fn(MachineState *machine)
- {
-     pc_compat_2_3_fn(machine);
- }
-=20
- static void pc_compat_2_1(MachineState *machine)
- {
--    pc_compat_2_2(machine);
-+    pc_compat_2_2_fn(machine);
-     x86_cpu_change_kvm_default("svm", NULL);
- }
-=20
-@@ -578,18 +578,16 @@ DEFINE_I440FX_MACHINE(v2_3, "pc-i440fx-2.3", pc_com=
-pat_2_3_fn,
- static void pc_i440fx_2_2_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
--    static GlobalProperty compat[] =3D {
--        PC_COMPAT_2_2
--    };
-=20
-     pc_i440fx_2_3_machine_options(m);
-     m->hw_version =3D "2.2.0";
-     m->default_machine_opts =3D "firmware=3Dbios-256k.bin,suppress-vmdes=
-c=3Don";
--    compat_props_add(m->compat_props, compat, G_N_ELEMENTS(compat));
-+    compat_props_add(m->compat_props, hw_compat_2_2, hw_compat_2_2_len);
-+    compat_props_add(m->compat_props, pc_compat_2_2, pc_compat_2_2_len);
-     pcmc->rsdp_in_ram =3D false;
- }
-=20
--DEFINE_I440FX_MACHINE(v2_2, "pc-i440fx-2.2", pc_compat_2_2,
-+DEFINE_I440FX_MACHINE(v2_2, "pc-i440fx-2.2", pc_compat_2_2_fn,
-                       pc_i440fx_2_2_machine_options);
-=20
- static void pc_i440fx_2_1_machine_options(MachineClass *m)
+@@ -13,7 +13,6 @@
+ #include "qemu/bitmap.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/pci/pci.h"
+-#include "hw/compat.h"
+ #include "hw/mem/pc-dimm.h"
+ #include "hw/mem/nvdimm.h"
+ #include "hw/acpi/acpi_dev_interface.h"
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index d3174f1402..99c2b6e60d 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -43,7 +43,6 @@
+ #include "sysemu/numa.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/kvm.h"
+-#include "hw/compat.h"
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
+ #include "qemu/bitops.h"
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b99ed19baf..449c5dd58d 100644
+index 8aba66a32f..5671608cea 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -4341,7 +4341,6 @@ DEFINE_SPAPR_MACHINE(2_3, "2.3", false);
- static void spapr_machine_2_2_class_options(MachineClass *mc)
- {
-     static GlobalProperty compat[] =3D {
--        HW_COMPAT_2_2
-         {
-             .driver   =3D TYPE_SPAPR_PCI_HOST_BRIDGE,
-             .property =3D "mem_win_size",
-@@ -4350,6 +4349,7 @@ static void spapr_machine_2_2_class_options(Machine=
-Class *mc)
-     };
+@@ -70,7 +70,6 @@
+ #include "hw/nmi.h"
+ #include "hw/intc/intc.h"
 =20
-     spapr_machine_2_3_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_2_2, hw_compat_2_2_len)=
-;
-     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-     mc->default_machine_opts =3D "modern-hotplug-events=3Doff,suppress-v=
-mdesc=3Don";
- }
+-#include "hw/compat.h"
+ #include "qemu/cutils.h"
+ #include "hw/ppc/spapr_cpu_core.h"
+ #include "hw/mem/memory-device.h"
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index bf5f2f463c..c737507053 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -28,7 +28,6 @@
+ #include "hw/s390x/storage-keys.h"
+ #include "hw/s390x/storage-attributes.h"
+ #include "hw/s390x/event-facility.h"
+-#include "hw/compat.h"
+ #include "ipl.h"
+ #include "hw/s390x/s390-virtio-ccw.h"
+ #include "hw/s390x/css-bridge.h"
 --=20
 2.20.1.2.gb21ebb671b
