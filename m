@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38542)
+Received: from eggs.gnu.org ([209.51.188.92]:46031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ggSPX-0006rg-2M
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:45:36 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ggSog-0002Jk-9E
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 06:11:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ggSPW-0004Y7-5a
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:45:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56556)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ggSPW-0004UW-07
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:45:34 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon,  7 Jan 2019 11:45:26 +0100
-Message-Id: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+	(envelope-from <alex.bennee@linaro.org>) id 1ggSof-0001Qn-1t
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 06:11:34 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37274)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ggSoe-0001Lf-Rx
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 06:11:32 -0500
+Received: by mail-wm1-x341.google.com with SMTP id g67so509166wmd.2
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 03:11:32 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon,  7 Jan 2019 11:11:28 +0000
+Message-Id: <20190107111129.2087-3-alex.bennee@linaro.org>
+In-Reply-To: <20190107111129.2087-1-alex.bennee@linaro.org>
+References: <20190107111129.2087-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH  v1 2/3] contrib/gitdm: Add other IBMers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,49 +30,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, pbonzini@redhat.com, peter.maydell@linaro.org
+Cc: cota@braap.org, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Different versions of GCC and Clang use different versions of the C standard.
-This repeatedly caused problems already, e.g. with duplicated typedefs:
+From: Joel Stanley <joel@jms.id.au>
 
- https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+Here are some IBMers who use their personal addresses when submitting
+patches.
 
-or with for-loop variable initializers:
-
- https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
-
-To avoid these problems, we should enforce the C language version to the
-same level for all compilers. Since our minimum compiler versions are
-GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" already,
-this seems to be a good choice.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+Acked-by: Andrew Jeffery <andrew@aj.id.au>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- configure | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ contrib/gitdm/group-map-ibm | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/configure b/configure
-index 79375af..07f8105 100755
---- a/configure
-+++ b/configure
-@@ -107,6 +107,9 @@ update_cxxflags() {
-             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
-             -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls)
-                 ;;
-+            -std=gnu11)
-+                QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }-std=gnu++11
-+                ;;
-             *)
-                 QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
-                 ;;
-@@ -585,7 +588,7 @@ ARFLAGS="${ARFLAGS-rv}"
- # left shift of signed integers is well defined and has the expected
- # 2s-complement style results. (Both clang and gcc agree that it
- # provides these semantics.)
--QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
-+QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv -std=gnu11 $QEMU_CFLAGS"
- QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
- QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
- QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
+diff --git a/contrib/gitdm/group-map-ibm b/contrib/gitdm/group-map-ibm
+index b66db5f4a8..6c0570107d 100644
+--- a/contrib/gitdm/group-map-ibm
++++ b/contrib/gitdm/group-map-ibm
+@@ -2,5 +2,10 @@
+ # Some IBM contributors submit via another domain
+ #
+ 
++aik@ozlabs.ru
++andrew@aj.id.au
++benh@kernel.crashing.org
+ clg@kaod.org
+ groug@kaod.org
++joel@jms.id.au
++sjitindarsingh@gmail.com
 -- 
-1.8.3.1
+2.17.1
