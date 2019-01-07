@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39467)
+Received: from eggs.gnu.org ([209.51.188.92]:40384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1ggdPo-0005Jl-Qy
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:30:41 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ggdR4-0006OZ-2h
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:31:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1ggdPl-00050p-HC
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:30:36 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:54880)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
-	id 1ggdPl-0004OV-7F
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:30:33 -0500
-From: Venu Busireddy <venu.busireddy@oracle.com>
-Date: Mon,  7 Jan 2019 17:29:43 -0500
-Message-Id: <1546900184-27403-5-git-send-email-venu.busireddy@oracle.com>
-In-Reply-To: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
-References: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 4/5] vfio-pci: Add FAILOVER_PRIMARY_CHANGED
- event to shorten downtime during failover
+	(envelope-from <pbonzini@redhat.com>) id 1ggdR3-000884-5v
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:31:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34058)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ggdR3-00087I-0I
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:31:53 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon,  7 Jan 2019 23:31:46 +0100
+Message-Id: <20190107223147.14269-2-pbonzini@redhat.com>
+In-Reply-To: <20190107223147.14269-1-pbonzini@redhat.com>
+References: <20190107223147.14269-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 21/35] tests/hexloader-test: Don't pass
+ -nographic to the QEMU under test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,172 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: venu.busireddy@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: Si-Wei Liu <si-wei.liu@oracle.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-From: Si-Wei Liu <si-wei.liu@oracle.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-When a VF is hotplugged into the guest, datapath switching will be
-performed immediately, which is sub-optimal in terms of timing, and
-could end up with substantial network downtime. One of ways to shorten
-this downtime is to switch the datapath only after the VF is seen to get
-enabled by guest, indicated by the bus master bit in VF's PCI config
-space getting enabled. The FAILOVER_PRIMARY_CHANGED event is emitted
-at that time to indicate this condition. Then management stack can kick
-off datapath switching upon receiving the event.
+The hexloader test invokes QEMU with the -nographic argument. This
+is unnecessary, because the qtest_initf() function will pass it
+-display none, which suffices to disable the graphical window.
+It also means that the QEMU process will make the stdin/stdout
+O_NONBLOCK. Since O_NONBLOCK is not per-file descriptor but per
+"file description", this non-blocking behaviour is then shared
+with any other process that's using the stdin/stdout of the
+'make check' run, including make itself. This can result in make
+falling over with "make: write error: stdout" because it got
+an unexpected EINTR trying to write output messages to the terminal.
+This is particularly noticable if running 'make check' in a loop with
+  while make check; do true; done
+(It does not affect single make check runs so much because the
+shell will remove the O_NONBLOCK status before it reads the
+terminal for interactive input.)
 
-Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
-Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+Remove the unwanted -nographic argument.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20190104145018.16950-1-peter.maydell@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/vfio/pci.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- qapi/net.json | 26 ++++++++++++++++++++++++++
- 2 files changed, 83 insertions(+)
+ tests/hexloader-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index bd83b58..adcc95a 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -34,6 +34,7 @@
- #include "pci.h"
- #include "trace.h"
- #include "qapi/error.h"
-+#include "qapi/qapi-events-net.h"
- 
- #define MSIX_CAP_LENGTH 12
- 
-@@ -42,6 +43,7 @@
- 
- static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
- static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
-+static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status);
- 
- /*
-  * Disabling BAR mmaping can be slow, but toggling it around INTx can
-@@ -1170,6 +1172,8 @@ void vfio_pci_write_config(PCIDevice *pdev,
- {
-     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     uint32_t val_le = cpu_to_le32(val);
-+    bool may_notify = false;
-+    bool master_was = false;
- 
-     trace_vfio_pci_write_config(vdev->vbasedev.name, addr, val, len);
- 
-@@ -1180,6 +1184,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
-                      __func__, vdev->vbasedev.name, addr, val, len);
-     }
- 
-+    /* Bus Master Enabling/Disabling */
-+    if (pdev->failover_primary && current_cpu &&
-+        range_covers_byte(addr, len, PCI_COMMAND)) {
-+        master_was = !!(pci_get_word(pdev->config + PCI_COMMAND) &
-+                        PCI_COMMAND_MASTER);
-+        may_notify = true;
-+    }
-+
-     /* MSI/MSI-X Enabling/Disabling */
-     if (pdev->cap_present & QEMU_PCI_CAP_MSI &&
-         ranges_overlap(addr, len, pdev->msi_cap, vdev->msi_cap_size)) {
-@@ -1235,6 +1247,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
-         /* Write everything to QEMU to keep emulated bits correct */
-         pci_default_write_config(pdev, addr, val, len);
-     }
-+
-+    if (may_notify) {
-+        bool master_now = !!(pci_get_word(pdev->config + PCI_COMMAND) &
-+                             PCI_COMMAND_MASTER);
-+        if (master_was != master_now) {
-+            vfio_failover_notify(vdev, master_now);
-+        }
-+    }
- }
- 
- /*
-@@ -2801,6 +2821,17 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
-     vdev->req_enabled = false;
- }
- 
-+static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status)
-+{
-+    PCIDevice *pdev = &vdev->pdev;
-+    const char *n;
-+    gchar *path;
-+
-+    n = pdev->qdev.id ? pdev->qdev.id : vdev->vbasedev.name;
-+    path = object_get_canonical_path(OBJECT(vdev));
-+    qapi_event_send_failover_primary_changed(!!n, n, path, status);
-+}
-+
- static void vfio_realize(PCIDevice *pdev, Error **errp)
- {
-     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-@@ -3109,10 +3140,36 @@ static void vfio_instance_finalize(Object *obj)
-     vfio_put_group(group);
- }
- 
-+static void vfio_exit_failover_notify(VFIOPCIDevice *vdev)
-+{
-+    PCIDevice *pdev = &vdev->pdev;
-+
-+    /*
-+     * Guest driver may not get the chance to disable bus mastering
-+     * before the device object gets to be unrealized. In that event,
-+     * send out a "disabled" notification on behalf of guest driver.
-+     */
-+    if (pdev->failover_primary &&
-+        pdev->bus_master_enable_region.enabled) {
-+        vfio_failover_notify(vdev, false);
-+    }
-+}
-+
- static void vfio_exitfn(PCIDevice *pdev)
- {
-     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
- 
-+    /*
-+     * During the guest reboot sequence, it is sometimes possible that
-+     * the guest may not get sufficient time to complete the entire driver
-+     * removal sequence, near the end of which a PCI config space write to
-+     * disable bus mastering can be intercepted by device. In such cases,
-+     * the FAILOVER_PRIMARY_CHANGED "disable" event will not be emitted. It
-+     * is imperative to generate the event on the guest's behalf if the
-+     * guest fails to make it.
-+     */
-+    vfio_exit_failover_notify(vdev);
-+
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-diff --git a/qapi/net.json b/qapi/net.json
-index 633ac87..a5b8d70 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -757,3 +757,29 @@
- ##
- { 'command': 'query-standby-status', 'data': { '*device': 'str' },
-   'returns': ['StandbyStatusInfo'] }
-+
-+##
-+# @FAILOVER_PRIMARY_CHANGED:
-+#
-+# Emitted whenever the driver of failover primary is loaded or unloaded
-+# by the guest.
-+#
-+# @device: device name
-+#
-+# @path: device path
-+#
-+# @enabled: true if driver is loaded thus device is enabled in guest
-+#
-+# Since: 3.0
-+#
-+# Example:
-+#
-+# <- { "event": "FAILOVER_PRIMARY_CHANGED",
-+#      "data": { "device": "vfio-0",
-+#                "path": "/machine/peripheral/vfio-0" },
-+#                "enabled": "true" },
-+#      "timestamp": { "seconds": 1539935213, "microseconds": 753529 } }
-+#
-+##
-+{ 'event': 'FAILOVER_PRIMARY_CHANGED',
-+  'data': { '*device': 'str', 'path': 'str', 'enabled': 'bool' } }
+diff --git a/tests/hexloader-test.c b/tests/hexloader-test.c
+index 834ed52c22..8b7aa2d72d 100644
+--- a/tests/hexloader-test.c
++++ b/tests/hexloader-test.c
+@@ -23,7 +23,7 @@ static void hex_loader_test(void)
+     const unsigned int base_addr =3D 0x00010000;
+=20
+     QTestState *s =3D qtest_initf(
+-        "-M vexpress-a9 -nographic -device loader,file=3Dtests/data/hex-=
+loader/test.hex");
++        "-M vexpress-a9 -device loader,file=3Dtests/data/hex-loader/test=
+.hex");
+=20
+     for (i =3D 0; i < 256; ++i) {
+         uint8_t val =3D qtest_readb(s, base_addr + i);
+--=20
+2.20.1
