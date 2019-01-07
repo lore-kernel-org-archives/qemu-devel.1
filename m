@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46027)
+Received: from eggs.gnu.org ([209.51.188.92]:46084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoI-0004nw-AW
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXoM-0004r5-9W
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoG-0001dy-DN
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:30 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:52182)
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXoK-0001jx-By
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:34 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:38967)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggXoF-0001bi-Rl
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:28 -0500
-Received: by mail-wm1-x332.google.com with SMTP id b11so1465566wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:27 -0800 (PST)
+	id 1ggXoI-0001eH-Ca
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:32 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id t27so1064602wra.6
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:29 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	j14sm46039759wrv.96.2019.01.07.08.31.24 for <qemu-devel@nongnu.org>
+	j14sm46039759wrv.96.2019.01.07.08.31.26 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 07 Jan 2019 08:31:25 -0800 (PST)
+	Mon, 07 Jan 2019 08:31:26 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  7 Jan 2019 16:30:44 +0000
-Message-Id: <20190107163117.16269-5-peter.maydell@linaro.org>
+Date: Mon,  7 Jan 2019 16:30:45 +0000
+Message-Id: <20190107163117.16269-6-peter.maydell@linaro.org>
 In-Reply-To: <20190107163117.16269-1-peter.maydell@linaro.org>
 References: <20190107163117.16269-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/37] gdbstub: introduce GDB processes
+Subject: [Qemu-devel] [PULL 05/37] gdbstub: add multiprocess support to '?'
+ packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,187 +38,126 @@ To: qemu-devel@nongnu.org
 
 From: Luc Michel <luc.michel@greensocs.com>
 
-Add a structure GDBProcess that represents processes from the GDB
-semantic point of view.
+The gdb_get_cpu_pid() function does the PID lookup for the given CPU. It
+checks if the CPU is a direct child of a CPU cluster. If it is, the
+returned PID is the cluster ID plus one (cluster IDs start at 0, GDB
+PIDs at 1). When the CPU is not a child of such a container, the PID of
+the default process is returned.
 
-CPUs can be split into different processes, by grouping them under
-different cpu-cluster objects.  Each occurrence of a cpu-cluster object
-implies the existence of the corresponding process in the GDB stub. The
-GDB process ID is derived from the corresponding cluster ID as follows:
+The gdb_fmt_thread_id() function generates the string to be used to identify
+a given thread, in a response packet for the peer. This function
+supports generating thread IDs when multiprocess mode is enabled (in the
+form `p<pid>.<tid>').
 
-  GDB PID = cluster ID + 1
-
-This is because PIDs -1 and 0 are reserved in GDB and cannot be used by
-processes.
-
-A default process is created to handle CPUs that are not in a cluster.
-This process gets the PID of the last process PID + 1.
+Use them in the reply to a '?' request.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 Acked-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20181207090135.7651-3-luc.michel@greensocs.com
-[PMM: fixed checkpatch nit about block comment style]
+Message-id: 20181207090135.7651-4-luc.michel@greensocs.com
+[PMM: fixed checkpatch blockquote style nit]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- gdbstub.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 97 insertions(+)
+ gdbstub.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 64 insertions(+), 2 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index c4e4f9f0821..9ac6f19a186 100644
+index 9ac6f19a186..02beb44d973 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -29,6 +29,7 @@
- #include "chardev/char-fe.h"
- #include "sysemu/sysemu.h"
- #include "exec/gdbstub.h"
-+#include "hw/cpu/cluster.h"
- #endif
- 
- #define MAX_PACKET_LENGTH 4096
-@@ -296,6 +297,11 @@ typedef struct GDBRegisterState {
-     struct GDBRegisterState *next;
- } GDBRegisterState;
- 
-+typedef struct GDBProcess {
-+    uint32_t pid;
-+    bool attached;
-+} GDBProcess;
-+
- enum RSState {
-     RS_INACTIVE,
-     RS_IDLE,
-@@ -324,6 +330,9 @@ typedef struct GDBState {
-     CharBackend chr;
-     Chardev *mon_chr;
- #endif
-+    bool multiprocess;
-+    GDBProcess *processes;
-+    int process_num;
-     char syscall_buf[256];
-     gdb_syscall_complete_cb current_syscall_cb;
- } GDBState;
-@@ -1751,6 +1760,30 @@ void gdb_exit(CPUArchState *env, int code)
- #endif
+@@ -640,6 +640,54 @@ static int memtox(char *buf, const char *mem, int len)
+     return p - buf;
  }
  
-+/*
-+ * Create the process that will contain all the "orphan" CPUs (that are not
-+ * part of a CPU cluster). Note that if this process contains no CPUs, it won't
-+ * be attachable and thus will be invisible to the user.
-+ */
-+static void create_default_process(GDBState *s)
++static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
 +{
-+    GDBProcess *process;
-+    int max_pid = 0;
++#ifndef CONFIG_USER_ONLY
++    gchar *path, *name = NULL;
++    Object *obj;
++    CPUClusterState *cluster;
++    uint32_t ret;
 +
-+    if (s->process_num) {
-+        max_pid = s->processes[s->process_num - 1].pid;
++    path = object_get_canonical_path(OBJECT(cpu));
++
++    if (path == NULL) {
++        /* Return the default process' PID */
++        ret = s->processes[s->process_num - 1].pid;
++        goto out;
 +    }
 +
-+    s->processes = g_renew(GDBProcess, s->processes, ++s->process_num);
-+    process = &s->processes[s->process_num - 1];
++    name = object_get_canonical_path_component(OBJECT(cpu));
++    assert(name != NULL);
 +
-+    /* We need an available PID slot for this process */
-+    assert(max_pid < UINT32_MAX);
++    /*
++     * Retrieve the CPU parent path by removing the last '/' and the CPU name
++     * from the CPU canonical path.
++     */
++    path[strlen(path) - strlen(name) - 1] = '\0';
 +
-+    process->pid = max_pid + 1;
-+    process->attached = false;
-+}
++    obj = object_resolve_path_type(path, TYPE_CPU_CLUSTER, NULL);
 +
- #ifdef CONFIG_USER_ONLY
- int
- gdb_handlesig(CPUState *cpu, int sig)
-@@ -1848,6 +1881,7 @@ static bool gdb_accept(void)
-     s = g_malloc0(sizeof(GDBState));
-     s->c_cpu = first_cpu;
-     s->g_cpu = first_cpu;
-+    create_default_process(s);
-     s->fd = fd;
-     gdb_has_xml = false;
- 
-@@ -2004,6 +2038,65 @@ static const TypeInfo char_gdb_type_info = {
-     .class_init = char_gdb_class_init,
- };
- 
-+static int find_cpu_clusters(Object *child, void *opaque)
-+{
-+    if (object_dynamic_cast(child, TYPE_CPU_CLUSTER)) {
-+        GDBState *s = (GDBState *) opaque;
-+        CPUClusterState *cluster = CPU_CLUSTER(child);
-+        GDBProcess *process;
-+
-+        s->processes = g_renew(GDBProcess, s->processes, ++s->process_num);
-+
-+        process = &s->processes[s->process_num - 1];
-+
-+        /*
-+         * GDB process IDs -1 and 0 are reserved. To avoid subtle errors at
-+         * runtime, we enforce here that the machine does not use a cluster ID
-+         * that would lead to PID 0.
-+         */
-+        assert(cluster->cluster_id != UINT32_MAX);
-+        process->pid = cluster->cluster_id + 1;
-+        process->attached = false;
-+
-+        return 0;
++    if (obj == NULL) {
++        /* Return the default process' PID */
++        ret = s->processes[s->process_num - 1].pid;
++        goto out;
 +    }
 +
-+    return object_child_foreach(child, find_cpu_clusters, opaque);
++    cluster = CPU_CLUSTER(obj);
++    ret = cluster->cluster_id + 1;
++
++out:
++    g_free(name);
++    g_free(path);
++
++    return ret;
++
++#else
++    /* TODO: In user mode, we should use the task state PID */
++    return s->processes[s->process_num - 1].pid;
++#endif
 +}
 +
-+static int pid_order(const void *a, const void *b)
-+{
-+    GDBProcess *pa = (GDBProcess *) a;
-+    GDBProcess *pb = (GDBProcess *) b;
-+
-+    if (pa->pid < pb->pid) {
-+        return -1;
-+    } else if (pa->pid > pb->pid) {
-+        return 1;
-+    } else {
-+        return 0;
-+    }
-+}
-+
-+static void create_processes(GDBState *s)
-+{
-+    object_child_foreach(object_get_root(), find_cpu_clusters, s);
-+
-+    if (s->processes) {
-+        /* Sort by PID */
-+        qsort(s->processes, s->process_num, sizeof(s->processes[0]), pid_order);
-+    }
-+
-+    create_default_process(s);
-+}
-+
-+static void cleanup_processes(GDBState *s)
-+{
-+    g_free(s->processes);
-+    s->process_num = 0;
-+    s->processes = NULL;
-+}
-+
- int gdbserver_start(const char *device)
+ static const char *get_feature_xml(const char *p, const char **newp,
+                                    CPUClass *cc)
  {
-     trace_gdbstub_op_start(device);
-@@ -2060,11 +2153,15 @@ int gdbserver_start(const char *device)
-     } else {
-         qemu_chr_fe_deinit(&s->chr, true);
-         mon_chr = s->mon_chr;
-+        cleanup_processes(s);
-         memset(s, 0, sizeof(GDBState));
-         s->mon_chr = mon_chr;
-     }
-     s->c_cpu = first_cpu;
-     s->g_cpu = first_cpu;
+@@ -909,6 +957,19 @@ static CPUState *find_cpu(uint32_t thread_id)
+     return NULL;
+ }
+ 
++static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
++                           char *buf, size_t buf_size)
++{
++    if (s->multiprocess) {
++        snprintf(buf, buf_size, "p%02x.%02x",
++                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
++    } else {
++        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
++    }
 +
-+    create_processes(s);
++    return buf;
++}
 +
-     if (chr) {
-         qemu_chr_fe_init(&s->chr, chr, &error_abort);
-         qemu_chr_fe_set_handlers(&s->chr, gdb_chr_can_receive, gdb_chr_receive,
+ static int is_query_packet(const char *p, const char *query, char separator)
+ {
+     unsigned int query_len = strlen(query);
+@@ -1020,6 +1081,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     int ch, reg_size, type, res;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
++    char thread_id[16];
+     uint8_t *registers;
+     target_ulong addr, len;
+ 
+@@ -1030,8 +1092,8 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     switch(ch) {
+     case '?':
+         /* TODO: Make this return the correct value for user-mode.  */
+-        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TRAP,
+-                 cpu_gdb_index(s->c_cpu));
++        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
++                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread_id)));
+         put_packet(s, buf);
+         /* Remove all the breakpoints when this query is issued,
+          * because gdb is doing and initial connect and the state
 -- 
 2.19.2
