@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58083)
+Received: from eggs.gnu.org ([209.51.188.92]:59594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ggZHP-0000FB-Kc
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:05:42 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ggZKw-0003K6-2L
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:09:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ggZHM-0001BM-3J
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:05:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34904)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ggZHL-00019W-OY
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:05:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ggZHK-0006Ul-JI
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 18:05:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 86FE02E8005
-	for <qemu-devel@nongnu.org>; Mon,  7 Jan 2019 18:05:34 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1ggZKv-0003j6-1w
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:09:18 -0500
+References: <20181221170909.25584-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <022ab924-5082-ffc7-9e1d-8633e1a8aa91@redhat.com>
+Date: Mon, 7 Jan 2019 18:31:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 07 Jan 2019 17:57:34 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1810545 <1810545@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154662609174.25797.11037697007951339169.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154688385484.19401.18084021166417230504.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810545] Re: [alpha] Strange exception address
- reported
+In-Reply-To: <20181221170909.25584-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7iTQoughzVuT7TKqiyfX2DNiaPZO69pGu"
+Subject: Re: [Qemu-devel] [PATCH v6 0/3] block nodes graph visualization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,70 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, ehabkost@redhat.com, crosa@redhat.com, den@virtuozzo.com
 
-The problem seems to be that the PC we report for an OPCDEC is first select=
-ed by gen_invalid()/gen-excp() in target/alpha/translate.c, which uses pc_n=
-ext (ie the insn's address plus 4). But that is then handed through to our =
-custom PALcode (https://git.qemu.org/?p=3Dqemu-palcode.git;a=3Dblob;f=3Dpal=
-.S;h=3D1781c4b415700ca3a68af07fdae90ae43e722501;hb=3DHEAD) which does
-  addq    p6, 4, p1  // increment past the faulting insn
-resulting in insn + 8.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7iTQoughzVuT7TKqiyfX2DNiaPZO69pGu
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com,
+ ehabkost@redhat.com, crosa@redhat.com, den@virtuozzo.com
+Message-ID: <022ab924-5082-ffc7-9e1d-8633e1a8aa91@redhat.com>
+Subject: Re: [PATCH v6 0/3] block nodes graph visualization
+References: <20181221170909.25584-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20181221170909.25584-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-That is, the palcode and the QEMU code have a disagreement about what
-the (private) API between them is. I'm not sure which side is wrong and
-should be corrected. I think the linux-user code assumes the same thing
-that translate.c is doing, so perhaps the palcode.
+On 21.12.18 18:09, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+>=20
+> On the way of backup schemes development (and in general any complicate=
+d
+> developments in Qemu block layer) it would be good to have an ability t=
+o print
+> out graph of block nodes with their permissions.
 
--- =
+Thanks, applied patches 1 and 2 to my block branch:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810545
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-Title:
-  [alpha] Strange exception address reported
+Max
 
-Status in QEMU:
-  New
 
-Bug description:
-  For some reason the SIGILL handler receives a different address under
-  qemu than it used to on real hardware. I don't know specifics about
-  the hardware used back then =E2=80=93 it was some sort of 21264a somewhere
-  between 600-800 MHz =E2=80=93, and I cannot say anything about the kernel=
- as
-  well, but I know that it delivered the faulting address +4, while
-  under qemu it receives +8. I know because CACAO, an early Java JIT
-  compiler extracts the address from the SIGILL handler and inspects the
-  code at the faulting site, and it has substracted 4 from the handler
-  address since the dawn of time, and this used to produce the desired
-  result on the Alpha hardware. It actually ran on two different Alpha
-  machines over the years, and both behaved identically.
+--7iTQoughzVuT7TKqiyfX2DNiaPZO69pGu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  The handler looks like this:
-  void handler_sigill(int sig, siginfo_t *siginfo, void *_p)
-  {
-    uintptr_t trap_address =3D (uintptr_t) (((ucontext_t*) _p)->uc_mcontext=
-.sc_pc) - 4;
-  }
+-----BEGIN PGP SIGNATURE-----
 
-  (paraphrasing, the actual code is here: https://bitbucket.org/cacaovm
-  /cacao-
-  staging/src/c8d3fbab864c3243f97629fcfa8d84ba71f38157/src/vm/jit/alpha/lin=
-ux
-  /md-os.cpp?at=3Ddefault&fileviewer=3Dfile-view-default#md-os.cpp-65)
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwzjNgACgkQ9AfbAGHV
+z0BPkgf/XgIeieyDhmhnt2XBq3jEMkU9QjYRQixEJSQn+WmrXL4xkHrcKgQandRe
+gGjYfobD0Uh8RxW9VGlLVYSD5DsKP/EuGSji5EAzd72SiSsRjlVirSJmOnVc45MS
+Em/fAOOZx7h6AvEZLAKq2PVLBOHiUO+XdLdR7S6tZoF9yS3j8j2WWIGinIkNfe+P
+TTgbHHB2bAs9ZR7JYUbmgDLcrqx+J12slE1MdmjW3RWcCuiND7plgg2cw0XWHx9U
+ew5N525bKlSnMkZEIvQI36YtBIglQFgNFVa4iyHckS5BmLgjtWr62Ohqb2sQJ6ZQ
+Bq1jm5q27WHx8wU35TL02RXKArkXcg==
+=r1Jr
+-----END PGP SIGNATURE-----
 
-  I don't know much about the qemu source code and cannot say where this
-  is coming from at first glance. The gen_invalid function uses pc_next,
-  which sounds like the next instruction, not the next-to-next ;). In
-  theory it could actually be the kernel's fault, although I consider
-  this unlikely.
-
-  This is qemu-system-alpha with apparently the last Debian which
-  existed for Alpha (lenny). The kernel is 2.6.26-2-alpha-generic
-  (Debian 2.6.26-29). Observed with qemu git 1b3e80082b, but I guess it
-  is the same with any version.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810545/+subscriptions
+--7iTQoughzVuT7TKqiyfX2DNiaPZO69pGu--
