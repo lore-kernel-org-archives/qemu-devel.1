@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57752)
+Received: from eggs.gnu.org ([209.51.188.92]:58361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ggX6U-0002zJ-A8
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:46:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1ggX87-0003p0-9D
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:47:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ggX6T-00016a-Ip
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:46:14 -0500
-Date: Mon, 7 Jan 2019 16:45:59 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190107164559.02476c6e.cohuck@redhat.com>
-In-Reply-To: <20190104160515.1b4a6dc1@oc2783563651>
-References: <20190103151612.51399-1-liq3ea@163.com>
-	<20190104151005.42b6f111.cohuck@redhat.com>
-	<20190104160515.1b4a6dc1@oc2783563651>
+	(envelope-from <armbru@redhat.com>) id 1ggX86-0002Gg-Dw
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:47:55 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190102140535.11512-1-cfergeau@redhat.com>
+	<20190102180158.GA6015@natto.ory.fergeau.eu>
+	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
+Date: Mon, 07 Jan 2019 16:47:44 +0100
+In-Reply-To: <4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com> (Eric Blake's
+	message of "Wed, 2 Jan 2019 16:08:10 -0600")
+Message-ID: <87o98sii5b.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] s390: avoid potential null
- dereference in s390_pcihost_unplug()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Li Qiang <liq3ea@163.com>, peter.maydell@linaro.org, walling@linux.ibm.com, david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>
+Cc: Christophe Fergeau <cfergeau@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On Fri, 4 Jan 2019 16:05:15 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Eric Blake <eblake@redhat.com> writes:
 
-> On Fri, 4 Jan 2019 15:10:05 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Thu,  3 Jan 2019 07:16:12 -0800
-> > Li Qiang <liq3ea@163.com> wrote:
-> >   
-> > > When getting the 'pbdev', the if...else has no default branch.
-> > > From Coverity, the 'pbdev' maybe null when the 'dev' is not
-> > > the TYPE_PCI_BRIDGE/TYPE_PCI_DEVICE/TYPE_S390_PCI_DEVICE.
-> > > This patch adds a default branch for device plug and unplug.
-> > > 
-> > > Spotted by Coverity: CID 1398593
-> > > 
-> > > Signed-off-by: Li Qiang <liq3ea@163.com>
-> > > ---
-> > > Adds a default branch for device plug per Cornelia's review.
-> > > 
-> > >  hw/s390x/s390-pci-bus.c | 7 +++++++
-> > >  1 file changed, 7 insertions(+)
-> > > 
-> > > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> > > index 15759b6514..fe48a36ff6 100644
-> > > --- a/hw/s390x/s390-pci-bus.c
-> > > +++ b/hw/s390x/s390-pci-bus.c
-> > > @@ -912,6 +912,9 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> > >          pbdev->fh = pbdev->idx;
-> > >          QTAILQ_INSERT_TAIL(&s->zpci_devs, pbdev, link);
-> > >          g_hash_table_insert(s->zpci_table, &pbdev->idx, pbdev);
-> > > +    } else {
-> > > +        error_setg(errp, "s390: device plug request for not supported device"
-> > > +                   " type: %s", object_get_typename(OBJECT(dev)));  
-> > 
-> > Maybe make this "s390/pci: plugging device type <%s> is not supported"?
-> >   
-> 
-> Under what circumstances could/does this happen? I mean how can this
-> be triggered by the user?
+> On 1/2/19 12:01 PM, Christophe Fergeau wrote:
+>> Adding Markus to cc: list, I forgot to do it when sending the patch.
+>
+> Also worth backporting via qemu-stable, now in cc.
+>
+>> 
+>> Christophe
+>> 
+>> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
+>>> commit 8bca4613 added support for %% in json strings when interpolating,
+>>> but in doing so, this broke handling of % when not interpolating as the
+>>> '%' is skipped in both cases.
+>>> This commit ensures we only try to handle %% when interpolating.
 
-Probably only if a new type that can be plugged has been added, but the
-s390 pci code has not been updated. We could also assert, not sure what
-would make it easier to figure out what went wrong.
+Impact?
+
+If you're unable to assess, could you give us at least a reproducer?
+
+>>> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
+>>> ---
+>>>  qobject/json-parser.c | 10 ++++++----
+>>>  tests/check-qjson.c   |  5 +++++
+>>>  2 files changed, 11 insertions(+), 4 deletions(-)
+>>>
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Patch looks good to me, but I'd like us to improve the commit message.
