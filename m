@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35203)
+Received: from eggs.gnu.org ([209.51.188.92]:35754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ggSDw-0002Bg-Nm
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:33:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggSFz-00035B-RX
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:35:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ggSDp-0003Uz-Be
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:33:33 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:35142)
+	(envelope-from <peter.maydell@linaro.org>) id 1ggSFz-0004qf-56
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:35:43 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35409)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ggSDh-0003Rx-1s
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:33:23 -0500
-Received: by mail-oi1-f194.google.com with SMTP id v6so35477215oif.2
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 02:33:20 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ggSFy-0004qF-VE
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:35:43 -0500
+Received: by mail-oi1-x242.google.com with SMTP id v6so35482010oif.2
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 02:35:42 -0800 (PST)
 MIME-Version: 1.0
-References: <1544063533-10139-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1544063533-10139-3-git-send-email-lizhijian@cn.fujitsu.com>
-	<20181221111136-mutt-send-email-mst@kernel.org>
-	<a04239e5-8b87-6b90-f8c7-e9c893acceac@cn.fujitsu.com>
-In-Reply-To: <a04239e5-8b87-6b90-f8c7-e9c893acceac@cn.fujitsu.com>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Mon, 7 Jan 2019 11:33:08 +0100
-Message-ID: <CAGxU2F5jpU1Tam0C+ZPEuYGZj=J3V5hk7rkxHgW75-V+vCeShw@mail.gmail.com>
+References: <20190103133113.49599-1-liq3ea@163.com>
+	<20190107102218.wzzcisnfqpasqjiq@sirius.home.kraxel.org>
+In-Reply-To: <20190107102218.wzzcisnfqpasqjiq@sirius.home.kraxel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Jan 2019 10:35:30 +0000
+Message-ID: <CAFEAcA_9jO1DEWvUNYdEvXbEWoDi+NR+ay6H21zaApoDdXKO4g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 2/4] refactor load_image_size
+Subject: Re: [Qemu-devel] [PATCH] usb: dev-mtp: close fd in
+ usb_mtp_object_readdir()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, zhijianx.li@intel.com, Philippe Mathieu Daude <philmd@redhat.com>, qemu-devel@nongnu.org, philip.li@intel.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Li Qiang <liq3ea@163.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Dec 24, 2018 at 3:16 AM Li Zhijian <lizhijian@cn.fujitsu.com> wrote=
-:
+On Mon, 7 Jan 2019 at 10:22, Gerd Hoffmann <kraxel@redhat.com> wrote:
 >
->
-> On 12/22/18 00:12, Michael S. Tsirkin wrote:
-> > On Thu, Dec 06, 2018 at 10:32:11AM +0800, Li Zhijian wrote:
-> >> Don't expect read(2) can always read as many as it's told.
-> >>
-> >> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> >> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> > This is more a theoretical bugfix than a refactoring right?
->
-> Yes=EF=BC=8C it does.
->
-> how about change the title to : "enhance reading on load_image_size()" or=
- such
+> On Thu, Jan 03, 2019 at 05:31:13AM -0800, Li Qiang wrote:
+> > Spotted by Coverity: CID 1397070
 
-Maybe something like this: "hw/core/loader.c: Read as long as possible
-in load_image_size()"
+> >  #ifdef CONFIG_INOTIFY1
+> > @@ -682,6 +683,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
+> >          usb_mtp_add_child(s, o, entry->d_name);
+> >      }
+> >      closedir(dir);
+> > +    close(fd);
+>
+> Not fully sure this is correct.
+>
+> The fdopendir manpage says the app should not use fd any more after
+> successfully calling fdopendir(), and I assumed that includes calling
+> close().
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Yes. The POSIX spec is clearer:
+http://pubs.opengroup.org/onlinepubs/9699919799/functions/fdopendir.html
+"Upon successful return from fdopendir(), the file descriptor is under
+ the control of the system, and if any attempt is made to close the file
+ descriptor, or to modify the state of the associated description, other
+ than by means of closedir(), readdir(), readdir_r(), rewinddir(), or
+ seekdir(), the behavior is undefined. Upon calling closedir() the file
+ descriptor shall be closed."
 
->
-> Thanks
-> Zhijian
->
->
-> >
-> >> ---
-> >> V4: add reviewed-by tag
-> >> ---
-> >>   hw/core/loader.c | 11 +++++------
-> >>   1 file changed, 5 insertions(+), 6 deletions(-)
-> >>
-> >> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> >> index fa41842..9cbceab 100644
-> >> --- a/hw/core/loader.c
-> >> +++ b/hw/core/loader.c
-> >> @@ -77,21 +77,20 @@ int64_t get_image_size(const char *filename)
-> >>   ssize_t load_image_size(const char *filename, void *addr, size_t siz=
-e)
-> >>   {
-> >>       int fd;
-> >> -    ssize_t actsize;
-> >> +    ssize_t actsize, l =3D 0;
-> >>
-> >>       fd =3D open(filename, O_RDONLY | O_BINARY);
-> >>       if (fd < 0) {
-> >>           return -1;
-> >>       }
-> >>
-> >> -    actsize =3D read(fd, addr, size);
-> >> -    if (actsize < 0) {
-> >> -        close(fd);
-> >> -        return -1;
-> >> +    while ((actsize =3D read(fd, addr + l, size - l)) > 0) {
-> >> +        l +=3D actsize;
-> >>       }
-> >> +
-> >>       close(fd);
-> >>
-> >> -    return actsize;
-> >> +    return actsize < 0 ? -1 : l;
-> >>   }
-> >>
-> >>   /* read()-like version */
-> >> --
-> >> 2.7.4
-> >
-> >
-> >
-> --
-> Best regards.
-> Li Zhijian (8528)
->
->
->
+> But I've seen the Coverity message warning this one too, so
+> maybe I'm wrong ...
 
+If coverity insists on a close(fd) then that's a coverity bug :-)
 
---=20
-Stefano Garzarella
-Red Hat
+thanks
+-- PMM
