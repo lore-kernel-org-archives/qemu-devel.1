@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34249)
+Received: from eggs.gnu.org ([209.51.188.92]:36229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ggUa8-0004YD-VC
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:04:41 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ggUgz-0006EJ-Sd
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:11:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ggUa7-0002rw-B0
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:04:40 -0500
-Resent-Message-Id: <E1ggUa7-0002rw-B0@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21757)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ggUgy-0001I9-Pt
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:11:45 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:41805
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ggUa7-0002qR-2U
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:04:39 -0500
-In-Reply-To: <20190107103426.2669-1-ppandit@redhat.com>
-Message-ID: <154686624655.22866.14881829544470322179@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1ggUgy-0001DJ-Ec
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:11:44 -0500
+References: <20190104223116.14037-1-richard.henderson@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <d52c8ae0-edee-ed9a-56b8-43cc1cf0208d@ilande.co.uk>
+Date: Mon, 7 Jan 2019 13:11:32 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 7 Jan 2019 05:04:07 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] qga: check length of command-line &
- environment variables
+In-Reply-To: <20190104223116.14037-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] tcg vector improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ppandit@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, niuguoxiang@huawei.com, pjp@fedoraproject.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEwNzEwMzQyNi4yNjY5
-LTEtcHBhbmRpdEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
-IFNIT1dfRU5WPTEgSj04Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIExJTksgICAgcWVtdS1l
-ZGlkLmV4ZQogIExJTksgICAgcWVtdS1pbWcuZXhlCi90bXAvcWVtdS10ZXN0L3NyYy9xZ2EvY29t
-bWFuZHMuYzogSW4gZnVuY3Rpb24gJ2d1ZXN0X2V4ZWNfZ2V0X2FyZ3MnOgovdG1wL3FlbXUtdGVz
-dC9zcmMvcWdhL2NvbW1hbmRzLmM6MjM2OjE2OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24g
-b2YgZnVuY3Rpb24gJ3N5c2NvbmYnOyBkaWQgeW91IG1lYW4gJ3N3c2NhbmYnPyBbLVdlcnJvcj1p
-bXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgICBhcmdzX21heCA9IHN5c2NvbmYoX1ND
-X0FSR19NQVgpOwogICAgICAgICAgICAgICAgXn5+fn5+fgogICAgICAgICAgICAgICAgc3dzY2Fu
-ZgovdG1wL3FlbXUtdGVzdC9zcmMvcWdhL2NvbW1hbmRzLmM6MjM2OjE2OiBlcnJvcjogbmVzdGVk
-IGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnc3lzY29uZicgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNd
-Ci90bXAvcWVtdS10ZXN0L3NyYy9xZ2EvY29tbWFuZHMuYzoyMzY6MjQ6IGVycm9yOiAnX1NDX0FS
-R19NQVgnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKTsgZGlkIHlvdSBt
-ZWFuICdTQ0hBUl9NQVgnPwogICAgIGFyZ3NfbWF4ID0gc3lzY29uZihfU0NfQVJHX01BWCk7CiAg
-ICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgICAgICAg
-IFNDSEFSX01BWAoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAxOTAxMDcxMDM0MjYuMjY2OS0xLXBwYW5kaXRAcmVkaGF0LmNvbS90ZXN0aW5n
-LmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 04/01/2019 22:31, Richard Henderson wrote:
+
+> I've split this out from the target/ppc patch set in which
+> it was developed.
+> 
+> 
+> r~
+> 
+> 
+> Richard Henderson (10):
+>   tcg: Add logical simplifications during gvec expand
+>   tcg: Add gvec expanders for nand, nor, eqv
+>   tcg: Add write_aofs to GVecGen4
+>   tcg: Add opcodes for vector saturated arithmetic
+>   tcg: Add opcodes for vector minmax arithmetic
+>   tcg/i386: Split subroutines out of tcg_expand_vec_op
+>   tcg/i386: Implement vector saturating arithmetic
+>   tcg/i386: Implement vector minmax arithmetic
+>   tcg/aarch64: Implement vector saturating arithmetic
+>   tcg/aarch64: Implement vector minmax arithmetic
+> 
+>  accel/tcg/tcg-runtime.h      |  23 ++
+>  tcg/aarch64/tcg-target.h     |   2 +
+>  tcg/i386/tcg-target.h        |   2 +
+>  tcg/tcg-op-gvec.h            |  18 ++
+>  tcg/tcg-op.h                 |  11 +
+>  tcg/tcg-opc.h                |   8 +
+>  tcg/tcg.h                    |   2 +
+>  accel/tcg/tcg-runtime-gvec.c | 257 ++++++++++++++++
+>  tcg/aarch64/tcg-target.inc.c |  48 +++
+>  tcg/i386/tcg-target.inc.c    | 580 +++++++++++++++++++++--------------
+>  tcg/tcg-op-gvec.c            | 305 ++++++++++++++++--
+>  tcg/tcg-op-vec.c             |  75 ++++-
+>  tcg/tcg.c                    |  10 +
+>  13 files changed, 1078 insertions(+), 263 deletions(-)
+
+Not sure that I'm particularly qualified to give this an R-B, however should there be
+a corresponding update to tcg/README for the new instructions?
+
+One other thing is that Howard sent me off-list a backtrace from trying my combined
+branch at https://github.com/mcayland/qemu/tree/ppc-altivec-v5.5-rth booting MacOS
+10.5 in the guest and ended up hitting an assert in an --enable-debug build:
+
+Thread 5 (Thread 0x7fffe3fff700 (LWP 10627)):
+#0  0x00007ffff698d53f in raise () at /lib64/libc.so.6
+#1  0x00007ffff6977895 in abort () at /lib64/libc.so.6
+#2  0x00007ffff6977769 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
+#3  0x00007ffff69859f6 in .annobin_assert.c_end () at /lib64/libc.so.6
+#4  0x000055555584bb67 in do_op3 (vece=2, r=0x1848, a=0x18b8,
+b=0x18f0, opc=INDEX_op_ssadd_vec) at
+/home/hsp/src/qemu-altivec-55/tcg/tcg-op-vec.c:407
+        rt = 0x7fffdc002368
+        at = 0x7fffdc0023d8
+        bt = 0x7fffdc002410
+        ri = 140736884384616
+        ai = 140736884384728
+        bi = 140736884384784
+        type = TCG_TYPE_V128
+        can = 0
+        __PRETTY_FUNCTION__ = "do_op3"
+#5  0x000055555584bbfa in tcg_gen_ssadd_vec (vece=2, r=0x1848,
+a=0x18b8, b=0x18f0) at
+/home/hsp/src/qemu-altivec-55/tcg/tcg-op-vec.c:419
+#6  0x0000555555991887 in gen_vaddsws_vec (vece=2, t=0x1848,
+sat=0x1880, a=0x18b8, b=0x18f0) at
+/home/hsp/src/qemu-altivec-55/target/ppc/translate/vmx-impl.inc.c:597
+        x = 0x1928
+#7  0x0000555555852e53 in expand_4_vec (vece=2, dofs=197872,
+aofs=198288, bofs=197776, cofs=197792, oprsz=16, tysz=16,
+type=TCG_TYPE_V128, write_aofs=true, fni=0x55555599182a
+<gen_vaddsws_vec>) at
+/home/hsp/src/qemu-altivec-55/tcg/tcg-op-gvec.c:903
+        t0 = 0x1848
+        t1 = 0x1880
+        t2 = 0x18b8
+        t3 = 0x18f0
+        i = 0
+#8  0x0000555555853cc4 in tcg_gen_gvec_4 (dofs=197872, aofs=198288,
+bofs=197776, cofs=197792, oprsz=16, maxsz=16, g=0x5555562d33c0 <g>) at
+/home/hsp/src/qemu-altivec-55/tcg/tcg-op-gvec.c:1211
+        type = TCG_TYPE_V128
+        some = 21845
+        __PRETTY_FUNCTION__ = "tcg_gen_gvec_4"
+        __func__ = "tcg_gen_gvec_4"
+#9  0x0000555555991987 in gen_vaddsws (ctx=0x7fffe3ffe5f0) at
+/home/hsp/src/qemu-altivec-55/target/ppc/translate/vmx-impl.inc.c:597
+        g = {fni8 = 0x0, fni4 = 0x0, fniv = 0x55555599182a
+<gen_vaddsws_vec>, fno = 0x5555559601a1 <gen_helper_vaddsws>, opc =
+INDEX_op_add_vec, data = 0, vece = 2 '\002', prefer_i64 = false,
+write_aofs = true}
+
+
+Certainly according to patch 7 of the series only 8-bit and 16-bit accesses are
+supported on i386 hosts, but shouldn't we be falling back to the previous
+implementations rather than hitting an assert()?
+
+
+ATB,
+
+Mark.
