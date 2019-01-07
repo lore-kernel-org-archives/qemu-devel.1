@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50847)
+Received: from eggs.gnu.org ([209.51.188.92]:55351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ggOnp-0003s5-HU
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 01:54:26 -0500
+	(envelope-from <thuth@redhat.com>) id 1ggP3R-0006Xn-Kh
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 02:10:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ggOno-0008VT-II
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 01:54:25 -0500
-Received: from 17.mo3.mail-out.ovh.net ([87.98.178.58]:46116)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ggOno-0008V9-C4
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 01:54:24 -0500
-Received: from player787.ha.ovh.net (unknown [10.109.159.248])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 99D6A1EEF40
-	for <qemu-devel@nongnu.org>; Mon,  7 Jan 2019 07:54:22 +0100 (CET)
-References: <20190102055743.5052-1-clg@kaod.org>
-	<20190107044815.GF13339@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <93414fb8-2100-53a3-2925-3c44bfcf829e@kaod.org>
-Date: Mon, 7 Jan 2019 07:54:16 +0100
+	(envelope-from <thuth@redhat.com>) id 1ggP3O-0001UM-Ld
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 02:10:33 -0500
+References: <20190104175847.6290-1-philmd@redhat.com>
+	<20190104175847.6290-7-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9ac3a593-3053-ff83-0bb9-6089278774a5@redhat.com>
+Date: Mon, 7 Jan 2019 08:00:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190107044815.GF13339@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20190104175847.6290-7-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/10] spapr: introduce the 'dual'
- interrupt mode XICS/XIVE
+Subject: Re: [Qemu-devel] [PATCH 06/16] hw/devices: Move CBus declarations
+ into a new header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +25,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Magnus Damm <magnus.damm@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, Michael Walle <michael@walle.cc>, Richard Henderson <rth@twiddle.net>, Jan Kiszka <jan.kiszka@web.de>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Rob Herring <robh@kernel.org>
 
-On 1/7/19 5:48 AM, David Gibson wrote:
-> On Wed, Jan 02, 2019 at 06:57:33AM +0100, C=E9dric Le Goater wrote:
->> Hello,
->>
->> This series adds a new sPAPR IRQ backend called 'dual' which supports
->> both interrupt mode, the XIVE native exploitation mode and the legacy
->> compatibility mode (XICS).
->>
->> The machine operates with the legacy mode by default and lets CAS
->> negotiate a new interrupt mode. If a new mode is selected, it is
->> activated after a machine reset to take into account the required
->> changes. These impact the device tree layout, the interrupt presenter
->> object and the exposed MMIO regions in the case of XIVE.
->>
->> The preliminary changes for this new IRQ backend are the introduction
->> of a second interrupt presenter object under the PowerPCCPU to support
->> XIVE. The qemu_irq array of each interrupt controller model is also
->> made common and moved under the machine.
+On 2019-01-04 18:58, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  MAINTAINERS            |  1 +
+>  hw/arm/nseries.c       |  1 +
+>  hw/misc/cbus.c         |  2 +-
+>  include/hw/devices.h   | 14 --------------
+>  include/hw/misc/cbus.h | 31 +++++++++++++++++++++++++++++++
+>  5 files changed, 34 insertions(+), 15 deletions(-)
+>  create mode 100644 include/hw/misc/cbus.h
 >=20
-> Ok, I've now applied all of this series to ppc-for-4.0.
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 156ce9a698..63ed6636ef 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -641,6 +641,7 @@ L: qemu-arm@nongnu.org
+>  S: Odd Fixes
+>  F: hw/arm/nseries.c
+>  F: include/hw/display/blizzard.h
+> +F: include/hw/misc/cbus.h
 
-Thanks,
+(note: I've added an entry for cbus.c here:
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00097.html
+ you likely got to rebase this patch in case it hits master before
+ your patch)
 
-We should pursue with KVM XIVE support now. Shall I send the Linux KVM =20
-and the QEMU KVM patchsets in parallel ?
+>  Palm
+>  M: Andrzej Zaborowski <balrogg@gmail.com>
+> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
+> index 9521be1cef..ac876b5878 100644
+> --- a/hw/arm/nseries.c
+> +++ b/hw/arm/nseries.c
+> @@ -32,6 +32,7 @@
+>  #include "hw/i2c/i2c.h"
+>  #include "hw/devices.h"
+>  #include "hw/display/blizzard.h"
+> +#include "hw/misc/cbus.h"
+>  #include "hw/block/flash.h"
+>  #include "hw/hw.h"
+>  #include "hw/bt.h"
+> diff --git a/hw/misc/cbus.c b/hw/misc/cbus.c
+> index 25e337ea77..16ee704bca 100644
+> --- a/hw/misc/cbus.c
+> +++ b/hw/misc/cbus.c
+> @@ -23,7 +23,7 @@
+>  #include "qemu/osdep.h"
+>  #include "hw/hw.h"
+>  #include "hw/irq.h"
+> -#include "hw/devices.h"
+> +#include "hw/misc/cbus.h"
+>  #include "sysemu/sysemu.h"
+> =20
+>  //#define DEBUG
+> diff --git a/include/hw/devices.h b/include/hw/devices.h
+> index 25f895b330..8b649541b1 100644
+> --- a/include/hw/devices.h
+> +++ b/include/hw/devices.h
+> @@ -28,18 +28,4 @@ void tsc2005_set_transform(void *opaque, MouseTransf=
+ormInfo *info);
+>  /* stellaris_input.c */
+>  void stellaris_gamepad_init(int n, qemu_irq *irq, const int *keycode);
+> =20
+> -/* cbus.c */
+> -typedef struct {
+> -    qemu_irq clk;
+> -    qemu_irq dat;
+> -    qemu_irq sel;
+> -} CBus;
+> -CBus *cbus_init(qemu_irq dat_out);
+> -void cbus_attach(CBus *bus, void *slave_opaque);
+> -
+> -void *retu_init(qemu_irq irq, int vilma);
+> -void *tahvo_init(qemu_irq irq, int betty);
+> -
+> -void retu_key_event(void *retu, int state);
+> -
+>  #endif
+> diff --git a/include/hw/misc/cbus.h b/include/hw/misc/cbus.h
+> new file mode 100644
+> index 0000000000..1ce1855ccf
+> --- /dev/null
+> +++ b/include/hw/misc/cbus.h
+> @@ -0,0 +1,31 @@
+> +/*
+> + * CBUS three-pin bus and the Retu / Betty / Tahvo / Vilma / Avilma /
+> + * Hinku / Vinku / Ahne / Pihi chips used in various Nokia platforms.
+> + * Based on reverse-engineering of a linux driver.
+> + *
+> + * Copyright (C) 2008 Nokia Corporation
+> + * Written by Andrzej Zaborowski <andrew@openedhand.com>
 
-I still have some work to be done on the QEMU PowerNV before resending.
+I'd drop the invalid e-mail address here, too, I think.
 
-Thanks,
-
-C.     =20
-
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef HW_MISC_CBUS_H
+> +#define HW_MISC_CBUS_H
+> +
+> +#include "hw/irq.h"
+> +
+> +typedef struct {
+> +    qemu_irq clk;
+> +    qemu_irq dat;
+> +    qemu_irq sel;
+> +} CBus;
+> +
+> +CBus *cbus_init(qemu_irq dat_out);
+> +void cbus_attach(CBus *bus, void *slave_opaque);
+> +
+> +void *retu_init(qemu_irq irq, int vilma);
+> +void *tahvo_init(qemu_irq irq, int betty);
+> +
+> +void retu_key_event(void *retu, int state);
+> +
+> +#endif
 >=20
->>
->>
->> GitHub trees available here :
->> =20
->> QEMU sPAPR:
->>
->>   https://github.com/legoater/qemu/commits/xive-next
->>  =20
->> QEMU PowerNV:
->>
->>   https://github.com/legoater/qemu/commits/powernv-3.1
->>
->> Linux/KVM:
->>
->>   https://github.com/legoater/linux/commits/xive-4.20
->>
->> OPAL:
->>
->>   https://github.com/legoater/skiboot/commits/xive
->>
->> Best wishes for 2019 !=20
->>
->> C.
->>
->>
->>
->> C=E9dric Le Goater (10):
->>   spapr: modify the prototype of the cpu_intc_create() method
->>   ppc/xive: introduce a XiveTCTX pointer under PowerPCCPU
->>   ppc: replace the 'Object *intc' by a 'ICPState *icp' pointer under t=
-he
->>     CPU
->>   spapr/xive: simplify the sPAPR IRQ qirq method for XIVE
->>   ppc: export the XICS and XIVE set_irq handlers
->>   pnv/psi: move the ICSState qemu_irq array under the PSI device model
->>   spapr: move the ICSState qemu_irq array under the machine
->>   ppc/xics: allow ICSState to have an offset 0
->>   spapr: introduce a new sPAPR IRQ backend supporting XIVE and XICS
->>   spapr: enable XIVE MMIOs at reset
->>
->>  include/hw/ppc/pnv.h        |   2 +-
->>  include/hw/ppc/pnv_psi.h    |   1 +
->>  include/hw/ppc/spapr.h      |   1 +
->>  include/hw/ppc/spapr_irq.h  |   6 +-
->>  include/hw/ppc/spapr_xive.h |   2 +-
->>  include/hw/ppc/xics.h       |   6 +-
->>  include/hw/ppc/xive.h       |   9 +-
->>  target/ppc/cpu.h            |   5 +-
->>  hw/intc/spapr_xive.c        |  23 ++-
->>  hw/intc/xics.c              |   4 +-
->>  hw/intc/xics_kvm.c          |   3 +-
->>  hw/intc/xics_spapr.c        |  10 +-
->>  hw/intc/xive.c              |  11 +-
->>  hw/ppc/pnv.c                |  27 ++--
->>  hw/ppc/pnv_core.c           |   4 +-
->>  hw/ppc/pnv_psi.c            |   7 +-
->>  hw/ppc/spapr.c              |  12 +-
->>  hw/ppc/spapr_cpu_core.c     |   9 +-
->>  hw/ppc/spapr_hcall.c        |  11 ++
->>  hw/ppc/spapr_irq.c          | 270 ++++++++++++++++++++++++++++++++++-=
--
->>  20 files changed, 342 insertions(+), 81 deletions(-)
->>
->=20
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
