@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60872)
+Received: from eggs.gnu.org ([209.51.188.92]:34057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1ggQhm-0004R9-5i
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:56:18 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1ggQkr-0005vr-SS
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:59:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1ggQhl-0006CV-CN
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:56:18 -0500
-References: <20181207090135.7651-1-luc.michel@greensocs.com>
-	<CAFEAcA9F2q6fQV13EDWFzuPYiFTDvqSCx_4P9aD=zP2RR5Kp0g@mail.gmail.com>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <8b118f0c-b2e4-3821-5348-25a9abbd7948@greensocs.com>
-Date: Mon, 7 Jan 2019 09:56:00 +0100
+	(envelope-from <sgarzare@redhat.com>) id 1ggQkp-0000V7-SW
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:59:29 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:41137)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ggQko-0000Q5-RN
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:59:27 -0500
+Received: by mail-oi1-f195.google.com with SMTP id j21so35281795oii.8
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 00:59:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9F2q6fQV13EDWFzuPYiFTDvqSCx_4P9aD=zP2RR5Kp0g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <20190104181208.7809-1-philmd@redhat.com>
+	<20190104181208.7809-2-philmd@redhat.com>
+In-Reply-To: <20190104181208.7809-2-philmd@redhat.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Mon, 7 Jan 2019 09:59:03 +0100
+Message-ID: <CAGxU2F6wbeFXAvcCMJbDn4_FF3iigiD25QZVo7RnR2--YbUbrQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 00/16] gdbstub: support for the
- multiprocess extension
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] util/cutils: Move size_to_str()
+ from "qemu-common.h" to "cutils.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +30,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Mark Burton <mark.burton@greensocs.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>, "open list:PowerPC" <qemu-ppc@nongnu.org>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:S390" <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 1/4/19 4:12 PM, Peter Maydell wrote:
-> On Fri, 7 Dec 2018 at 09:01, Luc Michel <luc.michel@greensocs.com> wrot=
-e:
->> This series adds support for the multiprocess extension of the GDB
->> remote protocol in the QEMU GDB stub.
->>
->> This extension is useful to split QEMU emulated CPUs in different
->> processes from the point of view of the GDB client. It adds the
->> possibility to debug different kind of processors (e.g. an AArch64 and
->> an ARMv7 CPU) at the same time (it is not possible otherwise since GDB
->> expects an SMP view at the thread granularity.
->=20
-> I've applied this patchset to target-arm.next, thanks.
-> (I fixed up a few checkpatch nits about block comment style.)
-Thanks!
+On Fri, Jan 4, 2019 at 7:12 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om> wrote:
+>
+> The size_to_str() function doesn't need to be in a generic header.
+>
+> It makes also sens to find this function in the same header than
+> the opposite string to size functions: qemu_strtosz*().
+> Note than this function is already implemented in util/cutils.c.
+>
+> Since we introduce a new function in a header, we document it,
+> using the previous comment from the source file.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  include/qemu-common.h        |  1 -
+>  include/qemu/cutils.h        | 13 +++++++++++++
+>  qapi/string-output-visitor.c |  2 +-
+>  util/cutils.c                |  6 ------
+>  4 files changed, 14 insertions(+), 8 deletions(-)
 
->=20
->> To test this patchset, you can use the following commands:
->>
->> (Note that this requires a recent enough GDB, I think GDB 7.2 is OK.
->> Also, it must be compiled to support both ARM and AArch64 architecture=
-s)
->>
->> Run QEMU: (-smp 6 in xlnx-zcu102 enables both cortex-a53 and cortex-r5
->> CPUs)
->>
->> qemu-system-aarch64 -M xlnx-zcu102 -gdb tcp::1234 -S -smp 6
->>
->> Run the following commands in GDB:
->>
->> target extended :1234
->> add-inferior
->> inferior 2
->> attach 2
->> info threads
->=20
-> This seems a bit clumsy -- is it just the limitations of
-> gdb here? I was expecting that just connecting to the
-> remote would cause gdb to interrogate it and attach to
-> all the inferior processes that it had.
-AFAIK this is a "limitation" of GDB. In QEMU context it seems like a
-limitation, but when you are connecting to a remote gdbserver that
-exposes all the processes currently running on an OS, you probably don't
-want to attach them all automatically.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Luc
-
->=20
-> thanks
-> -- PMM
->=20
+>
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index ed60ba251d..760527294f 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -153,7 +153,6 @@ void qemu_hexdump(const char *buf, FILE *fp, const ch=
+ar *prefix, size_t size);
+>  int parse_debug_env(const char *name, int max, int initial);
+>
+>  const char *qemu_ether_ntoa(const MACAddr *mac);
+> -char *size_to_str(uint64_t val);
+>  void page_size_init(void);
+>
+>  /* returns non-zero if dump is in progress, otherwise zero is
+> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+> index d2dad3057c..9ee40470e3 100644
+> --- a/include/qemu/cutils.h
+> +++ b/include/qemu/cutils.h
+> @@ -157,6 +157,19 @@ int qemu_strtosz(const char *nptr, const char **end,=
+ uint64_t *result);
+>  int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *resul=
+t);
+>  int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *re=
+sult);
+>
+> +/**
+> + * size_to_str:
+> + *
+> + * Return human readable string for size @val.
+> + * Use IEC binary units like KiB, MiB, and so forth.
+> + *
+> + * @val: The value to format.
+> + *       Can be anything that uint64_t allows (no more than "16 EiB").
+> + *
+> + * Caller is responsible for passing it to g_free().
+> + */
+> +char *size_to_str(uint64_t val);
+> +
+>  /* used to print char* safely */
+>  #define STR_OR_NULL(str) ((str) ? (str) : "null")
+>
+> diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
+> index 7ab64468d9..edf268b373 100644
+> --- a/qapi/string-output-visitor.c
+> +++ b/qapi/string-output-visitor.c
+> @@ -11,9 +11,9 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> -#include "qemu-common.h"
+>  #include "qapi/string-output-visitor.h"
+>  #include "qapi/visitor-impl.h"
+> +#include "qemu/cutils.h"
+>  #include "qemu/host-utils.h"
+>  #include <math.h>
+>  #include "qemu/range.h"
+> diff --git a/util/cutils.c b/util/cutils.c
+> index e098debdc0..a8a3a3ba3b 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> @@ -816,12 +816,6 @@ const char *qemu_ether_ntoa(const MACAddr *mac)
+>      return ret;
+>  }
+>
+> -/*
+> - * Return human readable string for size @val.
+> - * @val can be anything that uint64_t allows (no more than "16 EiB").
+> - * Use IEC binary units like KiB, MiB, and so forth.
+> - * Caller is responsible for passing it to g_free().
+> - */
+>  char *size_to_str(uint64_t val)
+>  {
+>      static const char *suffixes[] =3D { "", "Ki", "Mi", "Gi", "Ti", "Pi"=
+, "Ei" };
+> --
+> 2.17.2
+>
