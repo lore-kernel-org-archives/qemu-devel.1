@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40187)
+Received: from eggs.gnu.org ([209.51.188.92]:40847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1ggYh5-0005hc-LZ
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:28:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1ggYiE-0006ON-N1
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:29:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1ggYh4-0006Ci-IH
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:28:07 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33225)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1ggYh3-00065f-Q6
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:28:06 -0500
-Received: by mail-wm1-x344.google.com with SMTP id r24so6603194wmh.0
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 09:28:03 -0800 (PST)
-References: <20181222095036.29743-1-marcel.apfelbaum@gmail.com>
-	<20181222095036.29743-3-marcel.apfelbaum@gmail.com>
-	<20190103113414.503eed8b.cohuck@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <bed8bcb6-67ca-b8c5-ffbe-684241fe2b70@gmail.com>
-Date: Mon, 7 Jan 2019 19:28:10 +0200
+	(envelope-from <armbru@redhat.com>) id 1ggYiC-0007bt-NW
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:29:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38240)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ggYiC-0007b4-BG
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:29:16 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-10-fli@suse.com>
+Date: Mon, 07 Jan 2019 18:29:13 +0100
+In-Reply-To: <20181225140449.15786-10-fli@suse.com> (Fei Li's message of "Tue,
+	25 Dec 2018 22:04:42 +0800")
+Message-ID: <87a7kcml5i.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190103113414.503eed8b.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH PULL 02/31] contrib/rdmacm-mux: Add
- implementation of RDMA User MAD multiplexer
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 09/16] qemu_thread: supplement
+ error handling for pci_edu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, yuval.shaia@oracle.com, pjp@fedoraproject.org
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com, Jiri Slaby <jslaby@suse.cz>
 
+Fei Li <fli@suse.com> writes:
 
-
-On 1/3/19 12:34 PM, Cornelia Huck wrote:
-> On Sat, 22 Dec 2018 11:50:07 +0200
-> Marcel Apfelbaum <marcel.apfelbaum@gmail.com> wrote:
+> Utilize the existed errp to propagate the error instead of the
+> temporary &error_abort.
 >
->> From: Yuval Shaia <yuval.shaia@oracle.com>
->>
->> RDMA MAD kernel module (ibcm) disallow more than one MAD-agent for a
->> given MAD class.
->> This does not go hand-by-hand with qemu pvrdma device's requirements
->> where each VM is MAD agent.
->> Fix it by adding implementation of RDMA MAD multiplexer service which on
->> one hand register as a sole MAD agent with the kernel module and on the
->> other hand gives service to more than one VM.
->>
->> Design Overview:
->> Reviewed-by: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
->> ----------------
->> A server process is registered to UMAD framework (for this to work the
->> rdma_cm kernel module needs to be unloaded) and creates a unix socket to
->> listen to incoming request from clients.
->> A client process (such as QEMU) connects to this unix socket and
->> registers with its own GID.
->>
->> TX:
->> ----
->> When client needs to send rdma_cm MAD message it construct it the same
->> way as without this multiplexer, i.e. creates a umad packet but this
->> time it writes its content to the socket instead of calling umad_send().
->> The server, upon receiving such a message fetch local_comm_id from it so
->> a context for this session can be maintain and relay the message to UMAD
->> layer by calling umad_send().
->>
->> RX:
->> ----
->> The server creates a worker thread to process incoming rdma_cm MAD
->> messages. When an incoming message arrived (umad_recv()) the server,
->> depending on the message type (attr_id) looks for target client by
->> either searching in gid->fd table or in local_comm_id->fd table. With
->> the extracted fd the server relays to incoming message to the client.
->>
->> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
->> Reviewed-by: Shamir Rabinovitch <shamir.rabinovitch@oracle.com>
->> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->>
->> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->> ---
->>   MAINTAINERS                      |   1 +
->>   Makefile                         |   3 +
->>   Makefile.objs                    |   1 +
->>   contrib/rdmacm-mux/Makefile.objs |   4 +
->>   contrib/rdmacm-mux/main.c        | 798 +++++++++++++++++++++++++++++++
->>   contrib/rdmacm-mux/rdmacm-mux.h  |  61 +++
->>   6 files changed, 868 insertions(+)
->>   create mode 100644 contrib/rdmacm-mux/Makefile.objs
->>   create mode 100644 contrib/rdmacm-mux/main.c
->>   create mode 100644 contrib/rdmacm-mux/rdmacm-mux.h
-> This commit breaks building with clang on Fedora 28 for me; I get a
-> bunch of
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Jiri Slaby <jslaby@suse.cz>
+> Signed-off-by: Fei Li <fli@suse.com>
+> ---
+>  hw/misc/edu.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 >
+> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+> index 3f4ba7ded3..011fe6e0b7 100644
+> --- a/hw/misc/edu.c
+> +++ b/hw/misc/edu.c
+> @@ -356,9 +356,10 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
+>  
+>      qemu_mutex_init(&edu->thr_mutex);
+>      qemu_cond_init(&edu->thr_cond);
+> -    /* TODO: let the further caller handle the error instead of abort() here */
+> -    qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+> -                       edu, QEMU_THREAD_JOINABLE, &error_abort);
+> +    if (!qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+> +                            edu, QEMU_THREAD_JOINABLE, errp)) {
+> +        return;
 
-Hi Cornelia,
-Thanks for spotting the issue.
+You need to clean up everything that got initialized so far.  You might
+want to call qemu_thread_create() earlier so you have less to clean up.
 
-> clang-6.0: error: -libumad: 'linker' input unused [-Werror,-Wunused-command-line-argument]
+> +    }
+>  
+>      memory_region_init_io(&edu->mmio, OBJECT(edu), &edu_mmio_ops, edu,
+>                      "edu-mmio", 1 * MiB);
+       pci_register_bar(pdev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &edu->mmio);
+   }
 
-Is really strange, the rdma-mux is part of the contrib directory
-and is not even compiled by default.
+   static void pci_edu_uninit(PCIDevice *pdev)
+   {
+       EduState *edu = EDU(pdev);
 
-> Explicitly passing --disable-pvrdma to configure disables the offending
-> code.
->
-> Let me know if you need more information.
+       qemu_mutex_lock(&edu->thr_mutex);
+       edu->stopping = true;
+       qemu_mutex_unlock(&edu->thr_mutex);
+       qemu_cond_signal(&edu->thr_cond);
+       qemu_thread_join(&edu->thread);
 
-Can you please send the exact steps you are using to configure and 
-compile QEMU,
-are you compiling on a x86 machine?
+       qemu_cond_destroy(&edu->thr_cond);
+       qemu_mutex_destroy(&edu->thr_mutex);
 
-Thanks,
-Marcel
+       timer_del(&edu->dma_timer);
+   }
+
+Preexisting: pci_edu_uninit() neglects to call msi_uninit().  Jiri?
