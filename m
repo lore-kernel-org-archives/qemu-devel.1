@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43959)
+Received: from eggs.gnu.org ([209.51.188.92]:44756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1ggPwB-00086C-RN
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:07:09 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggPyT-0000sw-D4
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:09:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1ggPwA-0001DS-Fv
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:07:07 -0500
-References: <d19529f5-841e-ea06-fe7d-86ccfd528817@gmail.com>
-	<alpine.BSF.2.21.9999.1901070108080.28018@zero.eik.bme.hu>
-From: Nick Hudson <nicholas.a.hudson@gmail.com>
-Message-ID: <8dd03185-2d92-328a-dfb1-e0b2ce6ea2e1@gmail.com>
-Date: Mon, 7 Jan 2019 08:06:57 +0000
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggPyP-0002YM-KJ
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:09:29 -0500
+Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:36790)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1ggPyN-0002Wf-NJ
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:09:24 -0500
+Received: by mail-ot1-x32a.google.com with SMTP id k98so37091474otk.3
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 00:09:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1901070108080.28018@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4] Support u-boot noload images for arm as
- used by, NetBSD/evbarm GENERIC kernel.
+In-Reply-To: <20181214111032.2084-1-alex.bennee@linaro.org>
+References: <20181214111032.2084-1-alex.bennee@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 7 Jan 2019 09:09:18 +0100
+Message-ID: <CAL1e-=jSFOX9Betu-3ERQvejBTK4_MdwCOfc41OV5QBsDicYyg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] contrib: add a basic gitdm config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,246 +29,433 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Thanks for the comments.
+On Friday, December 14, 2018, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
 
-On 07/01/2019 00:33, BALATON Zoltan wrote:
-> On Sun, 6 Jan 2019, Nick Hudson wrote:
->> noload kernels are loaded with the u-boot image header and as a result
->> the header size needs adding to the entry point.  Fake up a hdr so the
->> kernel image is loaded at the right address and the entry point is
->> adjusted appropriately.
->>
->> The default location for the uboot file is 32MiB above bottom of DRAM.
->> This matches the recommendation in Documentation/arm/Booting.
->>
->> Clarify the load_uimage API to state the passing of a load address 
->> when an
->> image doesn't specify one, or when loading a ramdisk is expected.
->>
->> Adjust callers of load_uimage, etc.
->> ---
->> hw/arm/boot.c          |  8 +++++---
->> hw/core/loader.c       | 19 ++++++++++++++++---
->> hw/core/uboot_image.h  |  1 +
->> hw/microblaze/boot.c   |  2 +-
->> hw/nios2/boot.c        |  2 +-
->> hw/ppc/e500.c          |  1 +
->> hw/ppc/ppc440_bamboo.c |  2 +-
->> hw/ppc/sam460ex.c      |  2 +-
->> include/hw/loader.h    |  7 ++++++-
->> 9 files changed, 33 insertions(+), 11 deletions(-)
->>
->> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
->> index 94fce12802..c7a67af7a9 100644
->> --- a/hw/arm/boot.c
->> +++ b/hw/arm/boot.c
->> @@ -30,8 +30,9 @@
->>  * Documentation/arm/Booting and Documentation/arm64/booting.txt
->>  * They have different preferred image load offsets from system RAM base.
->>  */
->> -#define KERNEL_ARGS_ADDR 0x100
->> -#define KERNEL_LOAD_ADDR 0x00010000
->> +#define KERNEL_ARGS_ADDR   0x100
->> +#define KERNEL_NOLOAD_ADDR 0x02000000
->> +#define KERNEL_LOAD_ADDR   0x00010000
->> #define KERNEL64_LOAD_ADDR 0x00080000
->>
->> #define ARM64_TEXT_OFFSET_OFFSET    8
->> @@ -1082,7 +1083,8 @@ void arm_load_kernel(ARMCPU *cpu, struct 
->> arm_boot_info *info)
->>     }
->>     entry = elf_entry;
->>     if (kernel_size < 0) {
->> -        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
->> NULL,
->> +        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
->> +        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
->> &loadaddr,
->>                                      &is_linux, NULL, NULL, as);
->>     }
->>     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
->> diff --git a/hw/core/loader.c b/hw/core/loader.c
->> index fa41842280..c7182dfa64 100644
->> --- a/hw/core/loader.c
->> +++ b/hw/core/loader.c
->> @@ -613,13 +613,26 @@ static int load_uboot_image(const char 
->> *filename, hwaddr *ep, hwaddr *loadaddr,
->>         goto out;
->>
->>     if (hdr->ih_type != image_type) {
->> -        fprintf(stderr, "Wrong image type %d, expected %d\n", 
->> hdr->ih_type,
->> -                image_type);
->> -        goto out;
->> +        if (!(image_type == IH_TYPE_KERNEL &&
->> +            hdr->ih_type == IH_TYPE_KERNEL_NOLOAD)) {
-> 
-> So this is now effectively
-> 
-> (hdr->ih_type != image_type && !(image_type == IH_TYPE_KERNEL && 
-> hdr->ih_type == IH_TYPE_KERNEL_NOLOAD))
-> 
-> Maybe you don't need two if-s just one with this condition?
-
-I didn't see anything in the style guide that stipulated I couldn't keep
-the two ifs.  I've left it as is.
-
-> 
->> +            fprintf(stderr, "Wrong image type %d, expected %d\n", 
->> hdr->ih_type,
->> +                    image_type);
->> +            goto out;
->> +        }
->>     }
->>
->>     /* TODO: Implement other image types.  */
->>     switch (hdr->ih_type) {
->> +    case IH_TYPE_KERNEL_NOLOAD:
->> +        if (!loadaddr || *loadaddr == LOAD_UIMAGE_LOADADDR_INVALID) {
->> +            fprintf(stderr, "this image format (kernel_noload) cannot 
->> be "
->> +                    "loaded on this machine type");
->> +            goto out;
->> +        }
->> +
->> +        hdr->ih_load = *loadaddr + sizeof(*hdr);
->> +        hdr->ih_ep += hdr->ih_load;
->> +        /* fall through */
->>     case IH_TYPE_KERNEL:
->>         address = hdr->ih_load;
->>         if (translate_fn) {
->> diff --git a/hw/core/uboot_image.h b/hw/core/uboot_image.h
->> index 34c11a70a6..608022de6e 100644
->> --- a/hw/core/uboot_image.h
->> +++ b/hw/core/uboot_image.h
->> @@ -124,6 +124,7 @@
->> #define IH_TYPE_SCRIPT        6    /* Script file            */
->> #define IH_TYPE_FILESYSTEM    7    /* Filesystem Image (any type)    */
->> #define IH_TYPE_FLATDT        8    /* Binary Flat Device Tree Blob    */
->> +#define IH_TYPE_KERNEL_NOLOAD  14    /* OS Kernel Image (noload)    */
-> 
-> Do we want to make this an enum like in recent U-Boot? (Not suggesting 
-> we should just asking if you're touching this anyway.)
-
-I guess this is for someone else to answer. I wanted to provide a 
-minimal diff.
+> This is a QEMU specific version of a gitdm config for generating
+> reports on the contributor base of the project. I've added enough
+> group maps and domain aliases to ensure the current top ten is as
+> reflective as it can be. As of this commit running:
+>
+>   git log --numstat --since "Last Year" | gitdm -n -l 10
 
 
-> 
->> /*
->>  * Compression Types
->> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
->> index 35bfeda7aa..489ab839b7 100644
->> --- a/hw/microblaze/boot.c
->> +++ b/hw/microblaze/boot.c
->> @@ -156,7 +156,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, 
->> hwaddr ddr_base,
->>
->>         /* If it wasn't an ELF image, try an u-boot image.  */
->>         if (kernel_size < 0) {
->> -            hwaddr uentry, loadaddr;
->> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->>
->>             kernel_size = load_uimage(kernel_filename, &uentry, 
->> &loadaddr, 0,
->>                                       NULL, NULL);
->> diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
->> index 4bb5b601d3..ed5cb28e94 100644
->> --- a/hw/nios2/boot.c
->> +++ b/hw/nios2/boot.c
->> @@ -161,7 +161,7 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr 
->> ddr_base,
->>
->>         /* If it wasn't an ELF image, try an u-boot image. */
->>         if (kernel_size < 0) {
->> -            hwaddr uentry, loadaddr;
->> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->>
->>             kernel_size = load_uimage(kernel_filename, &uentry, 
->> &loadaddr, 0,
->>                                       NULL, NULL);
->> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
->> index b20fea0dfc..0581e9e3d4 100644
->> --- a/hw/ppc/e500.c
->> +++ b/hw/ppc/e500.c
->> @@ -995,6 +995,7 @@ void ppce500_init(MachineState *machine)
->>          * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
->>          * ePAPR compliant kernel
->>          */
->> +        loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->>         payload_size = load_uimage(filename, &bios_entry, &loadaddr, 
->> NULL,
->>                                    NULL, NULL);
->>         if (payload_size < 0) {
->> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
->> index b8aa55d526..fc06191588 100644
->> --- a/hw/ppc/ppc440_bamboo.c
->> +++ b/hw/ppc/ppc440_bamboo.c
->> @@ -179,7 +179,7 @@ static void bamboo_init(MachineState *machine)
->>     CPUPPCState *env;
->>     uint64_t elf_entry;
->>     uint64_t elf_lowaddr;
->> -    hwaddr loadaddr = 0;
->> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->>     target_long initrd_size = 0;
->>     DeviceState *dev;
->>     int success;
->> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
->> index 4b051c0950..84ea592749 100644
->> --- a/hw/ppc/sam460ex.c
->> +++ b/hw/ppc/sam460ex.c
->> @@ -402,7 +402,7 @@ static void sam460ex_init(MachineState *machine)
->>     CPUPPCState *env;
->>     PPC4xxI2CState *i2c[2];
->>     hwaddr entry = UBOOT_ENTRY;
->> -    hwaddr loadaddr = 0;
->> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->>     target_long initrd_size = 0;
->>     DeviceState *dev;
->>     SysBusDevice *sbdev;
->> diff --git a/include/hw/loader.h b/include/hw/loader.h
->> index 0a0ad808ea..84d6bb44b7 100644
->> --- a/include/hw/loader.h
->> +++ b/include/hw/loader.h
->> @@ -175,10 +175,15 @@ void load_elf_hdr(const char *filename, void 
->> *hdr, bool *is64, Error **errp);
->> int load_aout(const char *filename, hwaddr addr, int max_sz,
->>               int bswap_needed, hwaddr target_page_size);
->>
->> +#define LOAD_UIMAGE_LOADADDR_INVALID (-1)
-> 
-> hwadrr is uint64_t, an unsigned type so maybe -1 is not the best value 
-> for invalid address. Doesn't this give you a warning?
+Alex, can you perhaps send final statistics for 2018, now that New Year
+passed?
 
-I don't see a problem here and no warning is issued in my build.
-
-> 
->> +
->> /** load_uimage_as:
->>  * @filename: Path of uimage file
->>  * @ep: Populated with program entry point. Ignored if NULL.
->> - * @loadaddr: Populated with the load address. Ignored if NULL.
->> + * @loadaddr: load address if none specified in the image or when 
->> loading a ramdisk.
->> + *            Populated with the the load address. Ignored if NULL or
-> 
-> You have "the the" typo here ---^^^^^^^
-
-fixed in v5.
-
-> 
->> + *            LOAD_UIMAGE_LOADADDR_INVALID (images which do not 
->> specify a load address
->> + *            will not be loadable).
->>  * @is_linux: Is set to true if the image loaded is Linux. Ignored if 
->> NULL.
->>  * @translate_fn: optional function to translate load addresses
->>  * @translate_opaque: opaque data passed to @translate_fn
->>
+Thanks, Aleksandar
 
 
-Thanks,
-Nick
+>
+> Reports:
+>
+>   Top changeset contributors by employer
+>   Red Hat                   3172 (44.3%)
+>   Linaro                    1153 (16.1%)
+>   (None)                     549 (7.7%)
+>   IBM                        348 (4.9%)
+>   Academics (various)        170 (2.4%)
+>   Virtuozzo                  168 (2.3%)
+>   Wave Computing             118 (1.6%)
+>   Xilinx                     102 (1.4%)
+>   Igalia                      93 (1.3%)
+>   Cadence Design Systems      88 (1.2%)
+>
+>   Top lines changed by employer
+>   Red Hat                   144092 (28.1%)
+>   Cadence Design Systems    126554 (24.6%)
+>   Linaro                    77480 (15.1%)
+>   Wave Computing            33134 (6.5%)
+>   SiFive                    14392 (2.8%)
+>   IBM                       12219 (2.4%)
+>   (None)                    11948 (2.3%)
+>   Academics (various)       10447 (2.0%)
+>   Virtuozzo                 10445 (2.0%)
+>   CodeWeavers               9179 (1.8%)
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> ---
+> v2
+>   - use aliases instead of .mailmap
+>   - add more companies to domainmap
+>   - add more groups to cover non-corporate email
+>   - add an individuals group-map for (None)
+>   - limit the stats to top ten
+> v3
+>   - updates to wavecomp group
+>   - grouped ispras & others under academics
+>   - tweaked invocation
+>   - added tags
+>   - updated stats while based of master
+>   - slimmed down filetypes, added QEMU specific patterns
+> ---
+>  contrib/gitdm/aliases               |  27 +++++
+>  contrib/gitdm/domain-map            |  19 ++++
+>  contrib/gitdm/filetypes.txt         | 146 ++++++++++++++++++++++++++++
+>  contrib/gitdm/group-map-cadence     |   3 +
+>  contrib/gitdm/group-map-codeweavers |   1 +
+>  contrib/gitdm/group-map-ibm         |   6 ++
+>  contrib/gitdm/group-map-redhat      |   7 ++
+>  contrib/gitdm/group-map-wavecomp    |  18 ++++
+>  gitdm.config                        |  50 ++++++++++
+>  9 files changed, 277 insertions(+)
+>  create mode 100644 contrib/gitdm/aliases
+>  create mode 100644 contrib/gitdm/domain-map
+>  create mode 100644 contrib/gitdm/filetypes.txt
+>  create mode 100644 contrib/gitdm/group-map-cadence
+>  create mode 100644 contrib/gitdm/group-map-codeweavers
+>  create mode 100644 contrib/gitdm/group-map-ibm
+>  create mode 100644 contrib/gitdm/group-map-redhat
+>  create mode 100644 contrib/gitdm/group-map-wavecomp
+>  create mode 100644 gitdm.config
+>
+> diff --git a/contrib/gitdm/aliases b/contrib/gitdm/aliases
+> new file mode 100644
+> index 0000000000..07fd3391a5
+> --- /dev/null
+> +++ b/contrib/gitdm/aliases
+> @@ -0,0 +1,27 @@
+> +#
+> +# This is the email aliases file, mapping secondary addresses
+> +# onto a single, canonical address. Duplicates some info from .mailmap
+> +#
+> +
+> +# weird commits
+> +balrog@c046a42c-6fe2-441c-8c8c-71466251a162 balrogg@gmail.com
+> +aliguori@c046a42c-6fe2-441c-8c8c-71466251a162 anthony@codemonkey.ws
+> +aurel32@c046a42c-6fe2-441c-8c8c-71466251a162 aurelien@aurel32.net
+> +blueswir1@c046a42c-6fe2-441c-8c8c-71466251a162 blauwirbel@gmail.com
+> +edgar_igl@c046a42c-6fe2-441c-8c8c-71466251a162 edgar.iglesias@gmail.com
+> +bellard@c046a42c-6fe2-441c-8c8c-71466251a162 fabrice@bellard.org
+> +j_mayer@c046a42c-6fe2-441c-8c8c-71466251a162 l_indien@magic.fr
+> +pbrook@c046a42c-6fe2-441c-8c8c-71466251a162 paul@codesourcery.com
+> +ths@c046a42c-6fe2-441c-8c8c-71466251a162 ths@networkno.de
+> +malc@c046a42c-6fe2-441c-8c8c-71466251a162 av1474@comtv.ru
+> +
+> +# There is also a:
+> +#    (no author) <(no author)@c046a42c-6fe2-441c-8c8c-71466251a162>
+> +# for the cvs2svn initialization commit e63c3dc74bf.
+> +
+> +# Next, translate a few commits where mailman rewrote the From: line due
+> +# to strict SPF, although we prefer to avoid adding more entries like
+> that.
+> +"Ed Swierk via Qemu-devel" eswierk@skyportsystems.com
+> +"Ian McKellar via Qemu-devel" ianloic@google.com
+> +"Julia Suvorova via Qemu-devel" jusual@mail.ru
+> +"Justin Terry (VM) via Qemu-devel" juterry@microsoft.com
+> diff --git a/contrib/gitdm/domain-map b/contrib/gitdm/domain-map
+> new file mode 100644
+> index 0000000000..8cbbcfe93d
+> --- /dev/null
+> +++ b/contrib/gitdm/domain-map
+> @@ -0,0 +1,19 @@
+> +#
+> +# QEMU gitdm domain-map
+> +#
+> +# This maps email domains to nice easy to read company names
+> +#
+> +
+> +amd.com         AMD
+> +greensocs.com   GreenSocs
+> +ibm.com         IBM
+> +igalia.com      Igalia
+> +linaro.org      Linaro
+> +oracle.com      Oracle
+> +redhat.com      Red Hat
+> +siemens.com     Siemens
+> +sifive.com      SiFive
+> +suse.de         SUSE
+> +virtuozzo.com   Virtuozzo
+> +wdc.com         Western Digital
+> +xilinx.com      Xilinx
+> diff --git a/contrib/gitdm/filetypes.txt b/contrib/gitdm/filetypes.txt
+> new file mode 100644
+> index 0000000000..15d6f803b9
+> --- /dev/null
+> +++ b/contrib/gitdm/filetypes.txt
+> @@ -0,0 +1,146 @@
+> +# -*- coding:utf-8 -*-
+> +# Copyright (C)  2006 Libresoft
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option  any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU Library General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program; if not, write to the Free Software
+> +# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+> USA.
+> +#
+> +# Authors : Gregorio Robles <grex@gsyc.escet.urjc.es>
+> +# Authors : Germ=C3=A1n P=C3=B3o-Caama=C3=B1o <gpoo@gnome.org>
+> +#
+> +# This QEMU version is a cut-down version of what originally shipped
+> +# in the gitdm sample-config directory.
+> +#
+> +# This file contains associations parameters regarding filetypes
+> +# (documentation, develompent, multimedia, images...)
+> +#
+> +# format:
+> +# filetype <type> <regex> [<comment>]
+> +#
+> +# Order:
+> +#   The list should keep an order, so filetypes can be counted properly.
+> +#   ie. we want ltmain.sh -> 'build' instead of 'code'.
+> +#
+> +#   If there is an filetype which is not in order but has values, it wil=
+l
+> +#   be added at the end.
+> +#
+> +order build,tests,code,documentation,devel-doc,blobs
+> +
+> +#
+> +#
+> +# Code files (headers and the like included
+> +# (most common languages first
+> +#
+> +filetype code \.c$     # C
+> +filetype code \.inc.c$ # C
+> +filetype code \.C$     # C++
+> +filetype code \.cpp$   # C++
+> +filetype code \.c\+\+$ # C++
+> +filetype code \.cxx$   # C++
+> +filetype code \.cc$    # C++
+> +filetype code \.h$     # C or C++ header
+> +filetype code \.hh$    # C++ header
+> +filetype code \.hpp$   # C++ header
+> +filetype code \.hxx$   # C++ header
+> +filetype code \.sh$    # Shell
+> +filetype code \.pl$    # Perl
+> +filetype code \.py$    # Python
+> +filetype code \.s$     # Assembly
+> +filetype code \.S$     # Assembly
+> +filetype code \.asm$   # Assembly
+> +filetype code \.awk$   # awk
+> +filetype code ^common$  # script fragements
+> +filetype code ^common.*$  # script fragements
+> +filetype code (qom|qmp)-\w+$  # python script fragments
+> +
+> +#
+> +# Interface/api files
+> +#
+> +filetype interface \.json$   # json
+> +filetype interface \.hx$     # documented options
+> +
+> +#
+> +# Test related blobs (unfortunately we can't filter out test code)
+> +#
+> +filetype tests \.hex$
+> +filetype tests \d{2,3}$     # test data 00-999
+> +filetype tests ^[A-Z]{4}$   # ACPI test data
+> +filetype tests ^[A-Z]{4}\.*$   # ACPI test data
+> +filetype tests \.out$
+> +filetype tests \.out\.nocache$
+> +filetype tests \.err$
+> +filetype tests \.exit$      # bad-if-FOO.exit etc
+> +filetype tests \.decode$
+> +filetype tests \.yml$        # travis/shippable config
+> +
+> +#
+> +# Development documentation files (for hacking generally)
+> +#
+> +filetype devel-doc ^readme.*$
+> +filetype devel-doc ^changelog.*
+> +filetype devel-doc ^hacking.*$
+> +filetype devel-doc ^licen(s|c)e.*$
+> +filetype devel-doc ^copying.*$
+> +filetype devel-doc ^MAINTAINERS$
+> +filetype devel-doc ^BSD-2-Clause$
+> +filetype devel-doc ^BSD-3-Clause$
+> +filetype devel-doc ^GPL-2.0$
+> +filetype devel-doc \.txt$
+> +filetype devel-doc \.rst$
+> +filetype devel-doc \.texi$
+> +filetype devel-doc \.pod$
+> +
+> +#
+> +# Building, compiling, and configuration admin files
+> +#
+> +filetype build configure.*$
+> +filetype build Makefile$
+> +filetype build Makefile\.*$
+> +filetype build config$
+> +filetype build conf$
+> +filetype build \.cfg$
+> +filetype build \.mk$
+> +filetype build \.mak$
+> +filetype build \.docker$
+> +filetype build \.pre$
+> +filetype build ^.gitignore$
+> +filetype build ^.gitmodules$
+> +filetype build ^.gitpublish$
+> +filetype build ^.mailmap$
+> +filetype build ^.dir-locals.el$
+> +filetype build ^.editorconfig$
+> +filetype build ^.exrc$
+> +filetype build ^.gdbinit$
+> +filetype build \.cocci$         # Coccinelle semantic patches
+> +
+> +#
+> +# Misc blobs
+> +#
+> +filetype blobs \.bin$
+> +filetype blobs \.dtb$
+> +filetype blobs \.dts$
+> +filetype blobs \.rom$
+> +filetype blobs \.img$
+> +filetype blobs \.ndrv$
+> +filetype blobs \.bmp$
+> +filetype blobs \.svg$
+> +filetype blobs ^pi_10.com$
+> +
+> +
+> +#
+> +# Documentation files
+> +#
+> +filetype documentation \.html$
+> +filetype documentation \.txt$
+> +filetype documentation \.texi$
+> +filetype documentation \.po$            # translation files
+> diff --git a/contrib/gitdm/group-map-cadence b/contrib/gitdm/group-map-
+> cadence
+> new file mode 100644
+> index 0000000000..ab97dd2fc3
+> --- /dev/null
+> +++ b/contrib/gitdm/group-map-cadence
+> @@ -0,0 +1,3 @@
+> +# Cadence Design Systems
+> +
+> +jcmvbkbc@gmail.com
+> diff --git a/contrib/gitdm/group-map-codeweavers
+> b/contrib/gitdm/group-map-codeweavers
+> new file mode 100644
+> index 0000000000..c4803489e2
+> --- /dev/null
+> +++ b/contrib/gitdm/group-map-codeweavers
+> @@ -0,0 +1 @@
+> +sergio.g.delreal@gmail.com
+> diff --git a/contrib/gitdm/group-map-ibm b/contrib/gitdm/group-map-ibm
+> new file mode 100644
+> index 0000000000..b66db5f4a8
+> --- /dev/null
+> +++ b/contrib/gitdm/group-map-ibm
+> @@ -0,0 +1,6 @@
+> +#
+> +# Some IBM contributors submit via another domain
+> +#
+> +
+> +clg@kaod.org
+> +groug@kaod.org
+> diff --git a/contrib/gitdm/group-map-redhat b/contrib/gitdm/group-map-
+> redhat
+> new file mode 100644
+> index 0000000000..6d05c6b54f
+> --- /dev/null
+> +++ b/contrib/gitdm/group-map-redhat
+> @@ -0,0 +1,7 @@
+> +#
+> +# Red Hat contributors using non-corporate email
+> +#
+> +
+> +david@gibson.dropbear.id.au
+> +laurent@vivier.eu
+> +pjp@fedoraproject.org
+> diff --git a/contrib/gitdm/group-map-wavecomp b/contrib/gitdm/group-map-
+> wavecomp
+> new file mode 100644
+> index 0000000000..c571a52c65
+> --- /dev/null
+> +++ b/contrib/gitdm/group-map-wavecomp
+> @@ -0,0 +1,18 @@
+> +#
+> +# Wave Computing acquired MIPS in June 2018. Also, from February 2013
+> +# to October 2017, MIPS was owned by Imagination Technologies.
+> +#
+> +
+> +aleksandar.markovic@imgtec.com
+> +aleksandar.markovic@mips.com
+> +amarkovic@wavecomp.com
+> +arikalo@wavecomp.com
+> +dnikolic@wavecomp.com
+> +james.hogan@mips.com
+> +matthew.fortune@mips.com
+> +paul.burton@imgtec.com
+> +pburton@wavecomp.com
+> +smarkovic@wavecomp.com
+> +yongbok.kim@imgtec.com
+> +yongbok.kim@mips.com
+> +ysu@wavecomp.com
+> diff --git a/gitdm.config b/gitdm.config
+> new file mode 100644
+> index 0000000000..7472d4b8be
+> --- /dev/null
+> +++ b/gitdm.config
+> @@ -0,0 +1,50 @@
+> +#
+> +# This is the gitdm configuration file for QEMU.
+> +#
+> +# It is to be used with LWN's git dataminer tool for generating
+> +# reports about development activity in the QEMU repo. The LWN gitdm
+> +# tool can be found at:
+> +#
+> +#   git://git.lwn.net/gitdm.git
+> +#
+> +# A run to generate a report for the last year of activity would be
+> +#
+> +#   git log --numstat --since "Last Year" | gitdm -n -l 10
+> +#
+> +
+> +# EmailAliases lets us cope with developers who use more
+> +# than one address or have changed addresses. This duplicates some of
+> +# the information in the existing .mailmap but in a slightly different
+> +# form.
+> +#
+> +EmailAliases contrib/gitdm/aliases
+> +
+> +#
+> +# EmailMap does the main work of mapping addresses onto
+> +# employers.
+> +#
+> +EmailMap contrib/gitdm/domain-map
+> +
+> +#
+> +# Use GroupMap to map a file full of addresses to the
+> +# same employer. This is used for people that don't post from easily
+> +# identifiable corporate emails.
+> +#
+> +
+> +GroupMap contrib/gitdm/group-map-redhat Red Hat
+> +GroupMap contrib/gitdm/group-map-wavecomp Wave Computing
+> +GroupMap contrib/gitdm/group-map-cadence Cadence Design Systems
+> +GroupMap contrib/gitdm/group-map-codeweavers CodeWeavers
+> +GroupMap contrib/gitdm/group-map-ibm IBM
+> +
+> +# Also group together our prolific individual contributors
+> +# and those working under academic auspices
+> +GroupMap contrib/gitdm/group-map-individuals (None)
+> +GroupMap contrib/gitdm/group-map-academics Academics (various)
+> +
+> +#
+> +#
+> +# Use FileTypeMap to map a file types to file names using regular
+> +# regular expressions.
+> +#
+> +FileTypeMap contrib/gitdm/filetypes.txt
+> --
+> 2.17.1
+>
+>
+>
