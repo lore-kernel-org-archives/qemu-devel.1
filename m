@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47387)
+Received: from eggs.gnu.org ([209.51.188.92]:57132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ggIrC-0008CU-UU
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 19:33:32 -0500
+	(envelope-from <fangying1@huawei.com>) id 1ggJfY-0003DL-Bc
+	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 20:25:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ggIrB-000618-0m
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 19:33:30 -0500
-Date: Mon, 7 Jan 2019 01:33:04 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <d19529f5-841e-ea06-fe7d-86ccfd528817@gmail.com>
-Message-ID: <alpine.BSF.2.21.9999.1901070108080.28018@zero.eik.bme.hu>
-References: <d19529f5-841e-ea06-fe7d-86ccfd528817@gmail.com>
+	(envelope-from <fangying1@huawei.com>) id 1ggJfT-0001pb-BS
+	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 20:25:30 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:58148 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fangying1@huawei.com>)
+	id 1ggJfL-0001h0-0R
+	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 20:25:22 -0500
+From: Ying Fang <fangying1@huawei.com>
+References: <9af4a3f8-3095-61dc-77fa-17a877e48a02@huawei.com>
+Message-ID: <7bdf5dd6-392f-4046-7a43-b39376529d08@huawei.com>
+Date: Mon, 7 Jan 2019 09:23:54 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v4] Support u-boot noload images for arm as
- used by, NetBSD/evbarm GENERIC kernel.
+In-Reply-To: <9af4a3f8-3095-61dc-77fa-17a877e48a02@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] Questions on the I/O performance of emulated
+ host cdrom device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,206 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nick Hudson <nicholas.a.hudson@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+To: mreitz@redhat.com, kwolf@redhat.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, jianjay.zhou@huawei.com, dengkai1@huawei.com
 
-On Sun, 6 Jan 2019, Nick Hudson wrote:
-> noload kernels are loaded with the u-boot image header and as a result
-> the header size needs adding to the entry point.  Fake up a hdr so the
-> kernel image is loaded at the right address and the entry point is
-> adjusted appropriately.
->
-> The default location for the uboot file is 32MiB above bottom of DRAM.
-> This matches the recommendation in Documentation/arm/Booting.
->
-> Clarify the load_uimage API to state the passing of a load address when an
-> image doesn't specify one, or when loading a ramdisk is expected.
->
-> Adjust callers of load_uimage, etc.
-> ---
-> hw/arm/boot.c          |  8 +++++---
-> hw/core/loader.c       | 19 ++++++++++++++++---
-> hw/core/uboot_image.h  |  1 +
-> hw/microblaze/boot.c   |  2 +-
-> hw/nios2/boot.c        |  2 +-
-> hw/ppc/e500.c          |  1 +
-> hw/ppc/ppc440_bamboo.c |  2 +-
-> hw/ppc/sam460ex.c      |  2 +-
-> include/hw/loader.h    |  7 ++++++-
-> 9 files changed, 33 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index 94fce12802..c7a67af7a9 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -30,8 +30,9 @@
->  * Documentation/arm/Booting and Documentation/arm64/booting.txt
->  * They have different preferred image load offsets from system RAM base.
->  */
-> -#define KERNEL_ARGS_ADDR 0x100
-> -#define KERNEL_LOAD_ADDR 0x00010000
-> +#define KERNEL_ARGS_ADDR   0x100
-> +#define KERNEL_NOLOAD_ADDR 0x02000000
-> +#define KERNEL_LOAD_ADDR   0x00010000
-> #define KERNEL64_LOAD_ADDR 0x00080000
->
-> #define ARM64_TEXT_OFFSET_OFFSET    8
-> @@ -1082,7 +1083,8 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->     }
->     entry = elf_entry;
->     if (kernel_size < 0) {
-> -        kernel_size = load_uimage_as(info->kernel_filename, &entry, NULL,
-> +        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
-> +        kernel_size = load_uimage_as(info->kernel_filename, &entry, &loadaddr,
->                                      &is_linux, NULL, NULL, as);
->     }
->     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index fa41842280..c7182dfa64 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -613,13 +613,26 @@ static int load_uboot_image(const char *filename, hwaddr *ep, hwaddr *loadaddr,
->         goto out;
->
->     if (hdr->ih_type != image_type) {
-> -        fprintf(stderr, "Wrong image type %d, expected %d\n", hdr->ih_type,
-> -                image_type);
-> -        goto out;
-> +        if (!(image_type == IH_TYPE_KERNEL &&
-> +            hdr->ih_type == IH_TYPE_KERNEL_NOLOAD)) {
+ping
 
-So this is now effectively
-
-(hdr->ih_type != image_type && !(image_type == IH_TYPE_KERNEL && hdr->ih_type == IH_TYPE_KERNEL_NOLOAD))
-
-Maybe you don't need two if-s just one with this condition?
-
-> +            fprintf(stderr, "Wrong image type %d, expected %d\n", hdr->ih_type,
-> +                    image_type);
-> +            goto out;
-> +        }
->     }
->
->     /* TODO: Implement other image types.  */
->     switch (hdr->ih_type) {
-> +    case IH_TYPE_KERNEL_NOLOAD:
-> +        if (!loadaddr || *loadaddr == LOAD_UIMAGE_LOADADDR_INVALID) {
-> +            fprintf(stderr, "this image format (kernel_noload) cannot be "
-> +                    "loaded on this machine type");
-> +            goto out;
-> +        }
-> +
-> +        hdr->ih_load = *loadaddr + sizeof(*hdr);
-> +        hdr->ih_ep += hdr->ih_load;
-> +        /* fall through */
->     case IH_TYPE_KERNEL:
->         address = hdr->ih_load;
->         if (translate_fn) {
-> diff --git a/hw/core/uboot_image.h b/hw/core/uboot_image.h
-> index 34c11a70a6..608022de6e 100644
-> --- a/hw/core/uboot_image.h
-> +++ b/hw/core/uboot_image.h
-> @@ -124,6 +124,7 @@
-> #define IH_TYPE_SCRIPT		6	/* Script file			*/
-> #define IH_TYPE_FILESYSTEM	7	/* Filesystem Image (any type)	*/
-> #define IH_TYPE_FLATDT		8	/* Binary Flat Device Tree Blob	*/
-> +#define IH_TYPE_KERNEL_NOLOAD  14	/* OS Kernel Image (noload)	*/
-
-Do we want to make this an enum like in recent U-Boot? (Not suggesting we 
-should just asking if you're touching this anyway.)
-
-> /*
->  * Compression Types
-> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
-> index 35bfeda7aa..489ab839b7 100644
-> --- a/hw/microblaze/boot.c
-> +++ b/hw/microblaze/boot.c
-> @@ -156,7 +156,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
->
->         /* If it wasn't an ELF image, try an u-boot image.  */
->         if (kernel_size < 0) {
-> -            hwaddr uentry, loadaddr;
-> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->
->             kernel_size = load_uimage(kernel_filename, &uentry, &loadaddr, 0,
->                                       NULL, NULL);
-> diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
-> index 4bb5b601d3..ed5cb28e94 100644
-> --- a/hw/nios2/boot.c
-> +++ b/hw/nios2/boot.c
-> @@ -161,7 +161,7 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
->
->         /* If it wasn't an ELF image, try an u-boot image. */
->         if (kernel_size < 0) {
-> -            hwaddr uentry, loadaddr;
-> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->
->             kernel_size = load_uimage(kernel_filename, &uentry, &loadaddr, 0,
->                                       NULL, NULL);
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index b20fea0dfc..0581e9e3d4 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -995,6 +995,7 @@ void ppce500_init(MachineState *machine)
->          * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
->          * ePAPR compliant kernel
->          */
-> +        loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->         payload_size = load_uimage(filename, &bios_entry, &loadaddr, NULL,
->                                    NULL, NULL);
->         if (payload_size < 0) {
-> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-> index b8aa55d526..fc06191588 100644
-> --- a/hw/ppc/ppc440_bamboo.c
-> +++ b/hw/ppc/ppc440_bamboo.c
-> @@ -179,7 +179,7 @@ static void bamboo_init(MachineState *machine)
->     CPUPPCState *env;
->     uint64_t elf_entry;
->     uint64_t elf_lowaddr;
-> -    hwaddr loadaddr = 0;
-> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->     target_long initrd_size = 0;
->     DeviceState *dev;
->     int success;
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> index 4b051c0950..84ea592749 100644
-> --- a/hw/ppc/sam460ex.c
-> +++ b/hw/ppc/sam460ex.c
-> @@ -402,7 +402,7 @@ static void sam460ex_init(MachineState *machine)
->     CPUPPCState *env;
->     PPC4xxI2CState *i2c[2];
->     hwaddr entry = UBOOT_ENTRY;
-> -    hwaddr loadaddr = 0;
-> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
->     target_long initrd_size = 0;
->     DeviceState *dev;
->     SysBusDevice *sbdev;
-> diff --git a/include/hw/loader.h b/include/hw/loader.h
-> index 0a0ad808ea..84d6bb44b7 100644
-> --- a/include/hw/loader.h
-> +++ b/include/hw/loader.h
-> @@ -175,10 +175,15 @@ void load_elf_hdr(const char *filename, void *hdr, bool *is64, Error **errp);
-> int load_aout(const char *filename, hwaddr addr, int max_sz,
->               int bswap_needed, hwaddr target_page_size);
->
-> +#define LOAD_UIMAGE_LOADADDR_INVALID (-1)
-
-hwadrr is uint64_t, an unsigned type so maybe -1 is not the best value for 
-invalid address. Doesn't this give you a warning?
-
-> +
-> /** load_uimage_as:
->  * @filename: Path of uimage file
->  * @ep: Populated with program entry point. Ignored if NULL.
-> - * @loadaddr: Populated with the load address. Ignored if NULL.
-> + * @loadaddr: load address if none specified in the image or when loading a ramdisk.
-> + *            Populated with the the load address. Ignored if NULL or
-
-You have "the the" typo here ---^^^^^^^
-
-> + *            LOAD_UIMAGE_LOADADDR_INVALID (images which do not specify a load address
-> + *            will not be loadable).
->  * @is_linux: Is set to true if the image loaded is Linux. Ignored if NULL.
->  * @translate_fn: optional function to translate load addresses
->  * @translate_opaque: opaque data passed to @translate_fn
->
+On 2018/12/29 14:33, Ying Fang wrote:
+> Hi.
+> Recently one of our customer complained about the I/O performance of QEMU emulated host cdrom device.
+> I did some investigation on it and there was still some point I could not figure out. So I had to ask for your help.
+> 
+> Here is the application scenario setup by our customer.
+> filename.iso        /dev/sr0           /dev/cdrom
+> remote client    -->  host(cdemu)      -->  Linux VM
+> (1)A remote client maps an iso file to x86 host machine through network using tcp.
+> (2)The cdemu daemon then load it as a local virtual cdrom disk drive.
+> (3)A VM is launched with the virtual cdrom disk drive configured.
+> The VM can make use of this virtual cdrom to install an OS in the iso file.
+> 
+> The network bandwith btw the remote client and host is 100Mbps, we test I/O perf using: dd if=/dev/sr0 of=/dev/null bs=32K count=100000.
+> And we have
+> (1) I/O perf of host side /dev/sr0 is 11MB/s;
+> (2) I/O perf of /dev/cdrom inside VM is 3.8MB/s.
+> 
+> As we can see, I/O perf of cdrom inside the VM is about 34.5% compared with host side.
+> FlameGraph is used to find out the bottleneck of this operation and we find out that too much time is occupied by calling *bdrv_is_inserted*.
+> Then we dig into the code and figure out that the ioctl in *cdrom_is_inserted* takes too much time, because it triggers io_schdule_timeout in kernel.
+> In the code path of emulated cdrom device, each DMA I/O request consists of several *bdrv_is_inserted*, which degrades the I/O performance by about 31% in our test.
+> static bool cdrom_is_inserted(BlockDriverState *bs)
+> {
+>     BDRVRawState *s = bs->opaque;
+>     int ret;
+> 
+>     ret = ioctl(s->fd, CDROM_DRIVE_STATUS, CDSL_CURRENT);
+>     return ret == CDS_DISC_OK;
+> }
+> A flamegraph svg file (cdrom.svg) is attachieved in this email to show the code timing profile we've tested.
+> 
+> So here is my question.
+> (1) Why do we regularly check the presence of a cdrom disk drive in the code path?  Can we do it asynchronously?
+> (2) Can we drop some check point in the code path to improve the performance?
+> Thanks.
+> 
