@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46086)
+Received: from eggs.gnu.org ([209.51.188.92]:46125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoM-0004r6-9a
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXoP-0004tM-VD
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoK-0001k1-CS
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:34 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:35428)
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXoM-0001nT-BH
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:36 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:42843)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggXoJ-0001fn-EA
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:32 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id t200so1538751wmt.0
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:30 -0800 (PST)
+	id 1ggXoK-0001hp-AO
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:34 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id q18so1047302wrx.9
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:31 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	j14sm46039759wrv.96.2019.01.07.08.31.27 for <qemu-devel@nongnu.org>
+	j14sm46039759wrv.96.2019.01.07.08.31.28 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 07 Jan 2019 08:31:27 -0800 (PST)
+	Mon, 07 Jan 2019 08:31:29 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  7 Jan 2019 16:30:46 +0000
-Message-Id: <20190107163117.16269-7-peter.maydell@linaro.org>
+Date: Mon,  7 Jan 2019 16:30:47 +0000
+Message-Id: <20190107163117.16269-8-peter.maydell@linaro.org>
 In-Reply-To: <20190107163117.16269-1-peter.maydell@linaro.org>
 References: <20190107163117.16269-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 06/37] gdbstub: add multiprocess support to 'H'
- and 'T' packets
+Subject: [Qemu-devel] [PULL 07/37] gdbstub: add multiprocess support to
+ vCont packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,68 +39,40 @@ To: qemu-devel@nongnu.org
 
 From: Luc Michel <luc.michel@greensocs.com>
 
-Add a couple of helper functions to cope with GDB threads and processes.
+Add the gdb_first_attached_cpu() and gdb_next_attached_cpu() to iterate
+over all the CPUs in currently attached processes.
 
-The gdb_get_process() function looks for a process given a pid.
+Add the gdb_first_cpu_in_process() and gdb_next_cpu_in_process() to
+iterate over CPUs of a given process.
 
-The gdb_get_cpu() function returns the CPU corresponding to the (pid,
-tid) pair given as parameters.
-
-The read_thread_id() function parses the thread-id sent by the peer.
-This function supports the multiprocess extension thread-id syntax.  The
-return value specifies if the parsing failed, or if a special case was
-encountered (all processes or all threads).
-
-Use them in 'H' and 'T' packets handling to support the multiprocess
-extension.
+Use them to add multiprocess extension support to vCont packets.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Acked-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20181207090135.7651-5-luc.michel@greensocs.com
+Message-id: 20181207090135.7651-6-luc.michel@greensocs.com
+[PMM: corrected checkpatch comment style nit]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- gdbstub.c | 154 +++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 136 insertions(+), 18 deletions(-)
+ gdbstub.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 100 insertions(+), 15 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 02beb44d973..644377db9f5 100644
+index 644377db9f5..09114ea7769 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -688,6 +688,71 @@ out:
- #endif
+@@ -724,6 +724,36 @@ static CPUState *find_cpu(uint32_t thread_id)
+     return NULL;
  }
  
-+static GDBProcess *gdb_get_process(const GDBState *s, uint32_t pid)
-+{
-+    int i;
-+
-+    if (!pid) {
-+        /* 0 means any process, we take the first one */
-+        return &s->processes[0];
-+    }
-+
-+    for (i = 0; i < s->process_num; i++) {
-+        if (s->processes[i].pid == pid) {
-+            return &s->processes[i];
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static GDBProcess *gdb_get_cpu_process(const GDBState *s, CPUState *cpu)
-+{
-+    return gdb_get_process(s, gdb_get_cpu_pid(s, cpu));
-+}
-+
-+static CPUState *find_cpu(uint32_t thread_id)
++static CPUState *get_first_cpu_in_process(const GDBState *s,
++                                          GDBProcess *process)
 +{
 +    CPUState *cpu;
 +
 +    CPU_FOREACH(cpu) {
-+        if (cpu_gdb_index(cpu) == thread_id) {
++        if (gdb_get_cpu_pid(s, cpu) == process->pid) {
 +            return cpu;
 +        }
 +    }
@@ -108,30 +80,53 @@ index 02beb44d973..644377db9f5 100644
 +    return NULL;
 +}
 +
-+static CPUState *gdb_get_cpu(const GDBState *s, uint32_t pid, uint32_t tid)
++static CPUState *gdb_next_cpu_in_process(const GDBState *s, CPUState *cpu)
 +{
-+    GDBProcess *process;
-+    CPUState *cpu;
++    uint32_t pid = gdb_get_cpu_pid(s, cpu);
++    cpu = CPU_NEXT(cpu);
 +
-+    if (!tid) {
-+        /* 0 means any thread, we take the first one */
-+        tid = 1;
++    while (cpu) {
++        if (gdb_get_cpu_pid(s, cpu) == pid) {
++            break;
++        }
++
++        cpu = CPU_NEXT(cpu);
 +    }
 +
-+    cpu = find_cpu(tid);
++    return cpu;
++}
 +
-+    if (cpu == NULL) {
-+        return NULL;
+ static CPUState *gdb_get_cpu(const GDBState *s, uint32_t pid, uint32_t tid)
+ {
+     GDBProcess *process;
+@@ -753,6 +783,35 @@ static CPUState *gdb_get_cpu(const GDBState *s, uint32_t pid, uint32_t tid)
+     return cpu;
+ }
+ 
++/* Return the cpu following @cpu, while ignoring unattached processes. */
++static CPUState *gdb_next_attached_cpu(const GDBState *s, CPUState *cpu)
++{
++    cpu = CPU_NEXT(cpu);
++
++    while (cpu) {
++        if (gdb_get_cpu_process(s, cpu)->attached) {
++            break;
++        }
++
++        cpu = CPU_NEXT(cpu);
 +    }
 +
-+    process = gdb_get_cpu_process(s, cpu);
++    return cpu;
++}
 +
-+    if (process->pid != pid) {
-+        return NULL;
-+    }
++/* Return the first attached cpu */
++static CPUState *gdb_first_attached_cpu(const GDBState *s)
++{
++    CPUState *cpu = first_cpu;
++    GDBProcess *process = gdb_get_cpu_process(s, cpu);
 +
 +    if (!process->attached) {
-+        return NULL;
++        return gdb_next_attached_cpu(s, cpu);
 +    }
 +
 +    return cpu;
@@ -140,138 +135,90 @@ index 02beb44d973..644377db9f5 100644
  static const char *get_feature_xml(const char *p, const char **newp,
                                     CPUClass *cc)
  {
-@@ -944,19 +1009,6 @@ static void gdb_set_cpu_pc(GDBState *s, target_ulong pc)
-     cpu_set_pc(cpu, pc);
- }
- 
--static CPUState *find_cpu(uint32_t thread_id)
--{
--    CPUState *cpu;
--
--    CPU_FOREACH(cpu) {
--        if (cpu_gdb_index(cpu) == thread_id) {
--            return cpu;
--        }
--    }
--
--    return NULL;
--}
--
- static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
-                            char *buf, size_t buf_size)
+@@ -1091,10 +1150,12 @@ static int is_query_packet(const char *p, const char *query, char separator)
+  */
+ static int gdb_handle_vcont(GDBState *s, const char *p)
  {
-@@ -970,6 +1022,60 @@ static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
-     return buf;
- }
- 
-+typedef enum GDBThreadIdKind {
-+    GDB_ONE_THREAD = 0,
-+    GDB_ALL_THREADS,     /* One process, all threads */
-+    GDB_ALL_PROCESSES,
-+    GDB_READ_THREAD_ERR
-+} GDBThreadIdKind;
-+
-+static GDBThreadIdKind read_thread_id(const char *buf, const char **end_buf,
-+                                      uint32_t *pid, uint32_t *tid)
-+{
-+    unsigned long p, t;
-+    int ret;
-+
-+    if (*buf == 'p') {
-+        buf++;
-+        ret = qemu_strtoul(buf, &buf, 16, &p);
-+
-+        if (ret) {
-+            return GDB_READ_THREAD_ERR;
-+        }
-+
-+        /* Skip '.' */
-+        buf++;
-+    } else {
-+        p = 1;
-+    }
-+
-+    ret = qemu_strtoul(buf, &buf, 16, &t);
-+
-+    if (ret) {
-+        return GDB_READ_THREAD_ERR;
-+    }
-+
-+    *end_buf = buf;
-+
-+    if (p == -1) {
-+        return GDB_ALL_PROCESSES;
-+    }
-+
-+    if (pid) {
-+        *pid = p;
-+    }
-+
-+    if (t == -1) {
-+        return GDB_ALL_THREADS;
-+    }
-+
-+    if (tid) {
-+        *tid = t;
-+    }
-+
-+    return GDB_ONE_THREAD;
-+}
-+
- static int is_query_packet(const char *p, const char *query, char separator)
- {
-     unsigned int query_len = strlen(query);
-@@ -1078,12 +1184,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     CPUClass *cc;
-     const char *p;
-     uint32_t thread;
+-    int res, idx, signal = 0;
++    int res, signal = 0;
+     char cur_action;
+     char *newstates;
+     unsigned long tmp;
 +    uint32_t pid, tid;
-     int ch, reg_size, type, res;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
-     uint8_t *registers;
-     target_ulong addr, len;
-+    GDBThreadIdKind thread_kind;
- 
-     trace_gdbstub_io_command(line_buf);
- 
-@@ -1291,12 +1399,18 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         break;
-     case 'H':
-         type = *p++;
--        thread = strtoull(p, (char **)&p, 16);
--        if (thread == -1 || thread == 0) {
++    GDBProcess *process;
+     CPUState *cpu;
+ #ifdef CONFIG_USER_ONLY
+     int max_cpus = 1; /* global variable max_cpus exists only in system mode */
+@@ -1137,25 +1198,48 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
+             res = -ENOTSUP;
+             goto out;
+         }
+-        /* thread specification. special values: (none), -1 = all; 0 = any */
+-        if ((p[0] == ':' && p[1] == '-' && p[2] == '1') || (p[0] != ':')) {
+-            if (*p == ':') {
+-                p += 3;
+-            }
+-            for (idx = 0; idx < max_cpus; idx++) {
+-                if (newstates[idx] == 1) {
+-                    newstates[idx] = cur_action;
 +
-+        thread_kind = read_thread_id(p, &p, &pid, &tid);
-+        if (thread_kind == GDB_READ_THREAD_ERR) {
-+            put_packet(s, "E22");
-+            break;
++        if (*p++ != ':') {
++            res = -ENOTSUP;
++            goto out;
 +        }
 +
-+        if (thread_kind != GDB_ONE_THREAD) {
-             put_packet(s, "OK");
-             break;
-         }
--        cpu = find_cpu(thread);
-+        cpu = gdb_get_cpu(s, pid, tid);
-         if (cpu == NULL) {
-             put_packet(s, "E22");
-             break;
-@@ -1316,8 +1430,12 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'T':
--        thread = strtoull(p, (char **)&p, 16);
--        cpu = find_cpu(thread);
-+        thread_kind = read_thread_id(p, &p, &pid, &tid);
-+        if (thread_kind == GDB_READ_THREAD_ERR) {
-+            put_packet(s, "E22");
++        switch (read_thread_id(p, &p, &pid, &tid)) {
++        case GDB_READ_THREAD_ERR:
++            res = -EINVAL;
++            goto out;
++
++        case GDB_ALL_PROCESSES:
++            cpu = gdb_first_attached_cpu(s);
++            while (cpu) {
++                if (newstates[cpu->cpu_index] == 1) {
++                    newstates[cpu->cpu_index] = cur_action;
+                 }
++
++                cpu = gdb_next_attached_cpu(s, cpu);
+             }
+-        } else if (*p == ':') {
+-            p++;
+-            res = qemu_strtoul(p, &p, 16, &tmp);
+-            if (res) {
 +            break;
-+        }
-+        cpu = gdb_get_cpu(s, pid, tid);
++
++        case GDB_ALL_THREADS:
++            process = gdb_get_process(s, pid);
++
++            if (!process->attached) {
++                res = -EINVAL;
+                 goto out;
+             }
  
-         if (cpu != NULL) {
-             put_packet(s, "OK");
+-            /* 0 means any thread, so we pick the first valid CPU */
+-            cpu = tmp ? find_cpu(tmp) : first_cpu;
++            cpu = get_first_cpu_in_process(s, process);
++            while (cpu) {
++                if (newstates[cpu->cpu_index] == 1) {
++                    newstates[cpu->cpu_index] = cur_action;
++                }
++
++                cpu = gdb_next_cpu_in_process(s, cpu);
++            }
++            break;
++
++        case GDB_ONE_THREAD:
++            cpu = gdb_get_cpu(s, pid, tid);
+ 
+             /* invalid CPU/thread specified */
+             if (!cpu) {
+@@ -1167,6 +1251,7 @@ static int gdb_handle_vcont(GDBState *s, const char *p)
+             if (newstates[cpu->cpu_index] == 1) {
+                 newstates[cpu->cpu_index] = cur_action;
+             }
++            break;
+         }
+     }
+     s->signal = signal;
 -- 
 2.19.2
