@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36677)
+Received: from eggs.gnu.org ([209.51.188.92]:39165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggdIB-0008TM-To
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:22:44 -0500
+	(envelope-from <venu.busireddy@oracle.com>) id 1ggdPG-0004gc-Az
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:30:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggdIB-000754-Ag
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:22:43 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35288)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggdIB-00074J-2e
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:22:43 -0500
-Received: by mail-pg1-x544.google.com with SMTP id s198so770811pgs.2
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 14:22:42 -0800 (PST)
-References: <20181214052410.11863-1-richard.henderson@linaro.org>
-	<20181214052410.11863-20-richard.henderson@linaro.org>
-	<CAFEAcA-GHkNshsMRvMFLiN2rb837D0YEU6ds0Ns5JR8ABo_n6A@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0a1eb55f-b569-8996-bf8a-55a9a711157e@linaro.org>
-Date: Tue, 8 Jan 2019 08:22:35 +1000
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-GHkNshsMRvMFLiN2rb837D0YEU6ds0Ns5JR8ABo_n6A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 19/27] target/arm: Export
- aa64_va_parameters to internals.h
+	(envelope-from <venu.busireddy@oracle.com>) id 1ggdPF-0003w4-L9
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:30:02 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:54510)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
+	id 1ggdPF-0003rJ-Bk
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 17:30:01 -0500
+From: Venu Busireddy <venu.busireddy@oracle.com>
+Date: Mon,  7 Jan 2019 17:29:39 -0500
+Message-Id: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
+Subject: [Qemu-devel] [PATCH v3 0/5] Support for datapath switching during
+ live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,14 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: venu.busireddy@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On 1/7/19 9:45 PM, Peter Maydell wrote:
-> I assume 48 bits is what the kernel sets up for userspace ?
+Implement the infrastructure to support datapath switching during live
+migration involving SR-IOV devices.
 
-Yep.  There's been some discussion about what to do with 52-bit addressing, but
-it hasn't landed upstream yet.
+1. This patch is based off on the current VIRTIO_NET_F_STANDBY feature
+   bit and MAC address device pairing.
+
+2. This set of events will be consumed by userspace management software
+   to orchestrate all the hot plug and datapath switching activities.
+   This scheme has the least QEMU modifications while allowing userspace
+   software to build its own intelligence to control the whole process
+   of SR-IOV live migration.
+
+3. While the hidden device model (viz. coupled device model) is still
+   being explored for automatic hot plugging (QEMU) and automatic datapath
+   switching (host-kernel), this series provides a supplemental set
+   of interfaces if management software wants to drive the SR-IOV live
+   migration on its own. It should not conflict with the hidden device
+   model but just offers simplicity of implementation.
 
 
-r~
+Si-Wei Liu (2):
+  vfio-pci: Add FAILOVER_PRIMARY_CHANGED event to shorten downtime during failover
+  pci: query command extension to check the bus master enabling status of the failover-primary device
+
+Sridhar Samudrala (1):
+  virtio_net: Add VIRTIO_NET_F_STANDBY feature bit.
+
+Venu Busireddy (2):
+  virtio_net: Add support for "Data Path Switching" during Live Migration.
+  virtio_net: Add a query command for FAILOVER_STANDBY_CHANGED event.
+
+---
+Changes in v3:
+  Fix issues with coding style in patch 3/5.
+
+Changes in v2:
+  Added a query command for FAILOVER_STANDBY_CHANGED event.
+  Added a query command for FAILOVER_PRIMARY_CHANGED event.
+
+ hmp.c                          |   5 +++
+ hw/acpi/pcihp.c                |  27 +++++++++++
+ hw/net/virtio-net.c            |  42 +++++++++++++++++
+ hw/pci/pci.c                   |   5 +++
+ hw/vfio/pci.c                  |  60 +++++++++++++++++++++++++
+ hw/vfio/pci.h                  |   1 +
+ include/hw/pci/pci.h           |   1 +
+ include/hw/virtio/virtio-net.h |   1 +
+ include/net/net.h              |   2 +
+ net/net.c                      |  61 +++++++++++++++++++++++++
+ qapi/misc.json                 |   5 ++-
+ qapi/net.json                  | 100 +++++++++++++++++++++++++++++++++++++++++
+ 12 files changed, 309 insertions(+), 1 deletion(-)
