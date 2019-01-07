@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56628)
+Received: from eggs.gnu.org ([209.51.188.92]:57861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1ggQWx-0001Ig-LW
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:45:08 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ggQaJ-0002B0-N0
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:48:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1ggQWv-0005Yp-T4
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:45:07 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ggQaH-0007IY-Nd
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:48:35 -0500
 References: <20190104142812.20444-1-edgar.iglesias@gmail.com>
-	<20190104142812.20444-2-edgar.iglesias@gmail.com>
+	<20190104142812.20444-3-edgar.iglesias@gmail.com>
 From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <9675af33-37b0-55c7-9f81-511f0916abb9@greensocs.com>
-Date: Mon, 7 Jan 2019 09:44:37 +0100
+Message-ID: <b35dfd51-bf47-7cca-159b-0649f8caebf8@greensocs.com>
+Date: Mon, 7 Jan 2019 09:48:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190104142812.20444-2-edgar.iglesias@gmail.com>
+In-Reply-To: <20190104142812.20444-3-edgar.iglesias@gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="U80yTnc5JATO2gsn35zfrZUEAsBcxfqZD"
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] hw/microblaze: s3adsp1800: Create
- an unimplemented GPIO area
+	boundary="cJKqJ45iR8fo8AsiVhOGC0hAlBolVKpzk"
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] target/microblaze: Add props
+ enabling exceptions on failed bus accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,7 +29,7 @@ To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org, qemu-
 Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, philmd@redhat.com, frasse.iglesias@gmail.com, figlesia@xilinx.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---U80yTnc5JATO2gsn35zfrZUEAsBcxfqZD
+--cJKqJ45iR8fo8AsiVhOGC0hAlBolVKpzk
 From: Luc Michel <luc.michel@greensocs.com>
 To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
@@ -37,80 +37,105 @@ Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com,
  alistair@alistair23.me, philmd@redhat.com, frasse.iglesias@gmail.com,
  figlesia@xilinx.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com,
  edgar.iglesias@xilinx.com
-Message-ID: <9675af33-37b0-55c7-9f81-511f0916abb9@greensocs.com>
-Subject: Re: [PATCH v1 1/2] hw/microblaze: s3adsp1800: Create an unimplemented
- GPIO area
+Message-ID: <b35dfd51-bf47-7cca-159b-0649f8caebf8@greensocs.com>
+Subject: Re: [PATCH v1 2/2] target/microblaze: Add props enabling exceptions
+ on failed bus accesses
 References: <20190104142812.20444-1-edgar.iglesias@gmail.com>
- <20190104142812.20444-2-edgar.iglesias@gmail.com>
-In-Reply-To: <20190104142812.20444-2-edgar.iglesias@gmail.com>
+ <20190104142812.20444-3-edgar.iglesias@gmail.com>
+In-Reply-To: <20190104142812.20444-3-edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 1/4/19 3:28 PM, Edgar E. Iglesias wrote:
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >=20
-> Create an unimplemented GPIO area instead of leaving it unassigned.
+> Add MicroBlaze CPU properties to enable exceptions on failed
+> bus accesses.
 >=20
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
 > ---
->  hw/microblaze/petalogix_s3adsp1800_mmu.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  target/microblaze/cpu.c | 12 +++++++++++-
+>  target/microblaze/cpu.h |  2 ++
+>  2 files changed, 13 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/microblaze/petalogix_s3adsp1800_mmu.c b/hw/microblaze/p=
-etalogix_s3adsp1800_mmu.c
-> index 5cf7b84c79..b9f0b0d06e 100644
-> --- a/hw/microblaze/petalogix_s3adsp1800_mmu.c
-> +++ b/hw/microblaze/petalogix_s3adsp1800_mmu.c
-> @@ -35,6 +35,7 @@
->  #include "sysemu/sysemu.h"
->  #include "hw/devices.h"
->  #include "hw/boards.h"
-> +#include "hw/misc/unimp.h"
->  #include "exec/address-spaces.h"
->  #include "hw/char/xilinx_uartlite.h"
+> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> index 49876b19b3..5596cd5485 100644
+> --- a/target/microblaze/cpu.c
+> +++ b/target/microblaze/cpu.c
+> @@ -202,7 +202,11 @@ static void mb_cpu_realizefn(DeviceState *dev, Err=
+or **errp)
+>                          (cpu->cfg.use_barrel ? PVR2_USE_BARREL_MASK : =
+0) |
+>                          (cpu->cfg.use_div ? PVR2_USE_DIV_MASK : 0) |
+>                          (cpu->cfg.use_msr_instr ? PVR2_USE_MSR_INSTR :=
+ 0) |
+> -                        (cpu->cfg.use_pcmp_instr ? PVR2_USE_PCMP_INSTR=
+ : 0);
+> +                        (cpu->cfg.use_pcmp_instr ? PVR2_USE_PCMP_INSTR=
+ : 0) |
+> +                        (cpu->cfg.dopb_bus_exception ?
+> +                                                 PVR2_DOPB_BUS_EXC_MAS=
+K : 0) |
+> +                        (cpu->cfg.iopb_bus_exception ?
+> +                                                 PVR2_IOPB_BUS_EXC_MAS=
+K : 0);
 > =20
-> @@ -47,6 +48,7 @@
-> =20
->  #define MEMORY_BASEADDR 0x90000000
->  #define FLASH_BASEADDR 0xa0000000
-> +#define GPIO_BASEADDR 0x81400000
->  #define INTC_BASEADDR 0x81800000
->  #define TIMER_BASEADDR 0x83c00000
->  #define UARTLITE_BASEADDR 0x84000000
-> @@ -122,6 +124,8 @@ petalogix_s3adsp1800_init(MachineState *machine)
->      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, ETHLITE_BASEADDR);
->      sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq[ETHLITE_IRQ]);
-> =20
-> +    create_unimplemented_device("gpio", GPIO_BASEADDR, 0x10000);
-> +
->      microblaze_load_kernel(cpu, ddr_base, ram_size,
->                             machine->initrd_filename,
->                             BINARY_DEVICE_TREE_FILE,
+>      env->pvr.regs[5] |=3D cpu->cfg.dcache_writeback ?
+>                                          PVR5_DCACHE_WRITEBACK_MASK : 0=
+;
+> @@ -265,6 +269,12 @@ static Property mb_properties[] =3D {
+>      DEFINE_PROP_BOOL("dcache-writeback", MicroBlazeCPU, cfg.dcache_wri=
+teback,
+>                       false),
+>      DEFINE_PROP_BOOL("endianness", MicroBlazeCPU, cfg.endi, false),
+> +    /* Enables bus exceptions on failed data accesses (load/stores).  =
+*/
+> +    DEFINE_PROP_BOOL("dopb-bus-exception", MicroBlazeCPU,
+> +                     cfg.dopb_bus_exception, false),
+> +    /* Enables bus exceptions on failed instruction fetches.  */
+> +    DEFINE_PROP_BOOL("iopb-bus-exception", MicroBlazeCPU,
+> +                     cfg.iopb_bus_exception, false),
+>      DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
+>      DEFINE_PROP_UINT8("pvr", MicroBlazeCPU, cfg.pvr, C_PVR_FULL),
+>      DEFINE_PROP_END_OF_LIST(),
+> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+> index 03ca91007d..792bbc97c7 100644
+> --- a/target/microblaze/cpu.h
+> +++ b/target/microblaze/cpu.h
+> @@ -308,6 +308,8 @@ struct MicroBlazeCPU {
+>          bool use_mmu;
+>          bool dcache_writeback;
+>          bool endi;
+> +        bool dopb_bus_exception;
+> +        bool iopb_bus_exception;
+>          char *version;
+>          uint8_t pvr;
+>      } cfg;
 >=20
 
 
---U80yTnc5JATO2gsn35zfrZUEAsBcxfqZD
+--cJKqJ45iR8fo8AsiVhOGC0hAlBolVKpzk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlwzEXwACgkQd8knW3Qn
-Tr41vQ//Wrras38Hz22rnTb2J9YkYTqJ4Z7oxkbjLINwtwejbILt4lh72ua1drmd
-N56QyPDhvzXBNNYksqfvJ62K4xDUc5S7euLMeHWhZ0lpsurxS74mEqYjOHUrUPKG
-E8u28bxaBY07b9rYTDkRMCBGSMUAFT3adHEp5aIjZa+smU2UpVdgGd+xHrrdQqoA
-mEhdqDlCQpiF59Tg3stoQxioODlF7gx0553dpxAZFoo4VY103nZPKqRoHecrSoYO
-mLUd8OE7O01DzkqSE9yFcePJYZkvn4uoNu/8XEApsBWH3WeDNa8eO+Q5OGnQ0pNa
-AeP+3E89Gd8P2kKh9YB4/Y0uE8znWfonGCZZV4rnNqotNMSSWznPJlNiH1hwl8Mw
-5ZI0QP6BV39F7GkDtmL4VcR1JD1ccUpjHpuoufWf3SE/lG67hUWXWc4Zd/ywJ/J9
-5Dp/BsNKarmDyiVFQJUU4CcUMoxosRl7TybEFv2E+KFhWhIID+MiBjYeCRdiX7LB
-PMLWzTNYMvfcuUKC5rvrl915GCe4bansFi/Xyx8UhkYiNlXOwQ4/BpactAtBR6YR
-7hXJyZ8JAOef+gJRi7HZMT9Kjjz0kaJRcgDNOUKAXNG8XL1FRJUhs5TnsahjRsiN
-+fglcFNJKFTctyt7ocFnd+xQXT1sHqwRMyf3BQLl8Bp8YvctJZY=
-=whE6
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlwzElgACgkQd8knW3Qn
+Tr6DuhAAlLLjK7ik55617B5bbLGLNH/HmfUoWbS7RXxqveT3VmjwdYT6gsutzC5g
+E3Od4a7ylz0uLUNH3FSVHIcBVyisB8vn/F4oJGpR+/xAPioTS7D2wYaUkz9WzfWc
+H5sxXYMWTM5LSzgvM5CL5hAleIYqANKZtUctECiKRkZfaTVeP6lnomC+hdLg0Pfj
+CTBwwF06ygt7ExfNrmrnEmF3LSQgge7ZLzFO0Yw9ijk8cu7l20vS1UCfA2wiLVmg
+uGr1V3yZFesNZLIDy9L9dFX3zOOyz76PTU/R5CiDyJui/5IM3J7Vq7nHVx2HuR38
+Lt/zUOmXXlDPOKn6mvg+R8VSuyeAbMYhGqcWF3ZEgsv6qHiG62F7uFUb/w4WzquA
+y0L/wPofAnAIsD26Nf7lIiKmxjfb/IcbBZKRc7iqJmNhbIn/cXR7IdcoLvJUZMfH
+r65X7toRQMiPD5wGRwncltrQ+ggDcg88qZXMFOhe/pXpFI4N6qgdUcsT+fKV5x63
+zA5iZKgIDXZ1RN6h19YWF1fvTBP0nP3kmD8GhkWfKebB3ev/whV4dwT4SsfApP3Q
+YPXOX/6S3fNBCwixe7Uv0z+yUKC0fv6ATLMIDR+dDZmFks+HSychD3b/3d3rlQg3
+Q1NHONeIKc+4iWNeZZuWVDmXbiPXCmzrPsGUwZnyVAn1ZPZLWpk=
+=TCMI
 -----END PGP SIGNATURE-----
 
---U80yTnc5JATO2gsn35zfrZUEAsBcxfqZD--
+--cJKqJ45iR8fo8AsiVhOGC0hAlBolVKpzk--
