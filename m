@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33911)
+Received: from eggs.gnu.org ([209.51.188.92]:34467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ggZQT-0008ND-IZ
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:15:03 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ggZRC-0000mb-0o
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:15:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1ggZQQ-0008Hn-TY
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:15:01 -0500
-References: <20181225125344.4482-1-arilou@gmail.com>
-	<CAJ+F1CJN=Gn5GYqrOeqWFNryw=q+7q8TDUX0VQEzrtS8tbUeQg@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <7961a154-f139-af73-613d-94b88bf95392@redhat.com>
-Date: Mon, 7 Jan 2019 19:04:49 +0100
+	(envelope-from <mreitz@redhat.com>) id 1ggZR9-0000lQ-N7
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:15:45 -0500
+References: <1544698788-52893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3a60eace-dc00-c82c-4d2a-784e1796ab9a@redhat.com>
+Date: Mon, 7 Jan 2019 19:15:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CJN=Gn5GYqrOeqWFNryw=q+7q8TDUX0VQEzrtS8tbUeQg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] dump: Set correct vaddr for ELF dump
+In-Reply-To: <1544698788-52893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="47q9kjbKS0JDebtkt05QyNM26Ws0kXJRV"
+Subject: Re: [Qemu-devel] [PATCH v7] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Jon Doron <arilou@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>, Wen Congyang <wency@cn.fujitsu.com>, Luiz Capitulino <lcapitulino@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On 01/07/19 13:14, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Tue, Dec 25, 2018 at 5:52 PM Jon Doron <arilou@gmail.com> wrote:
->>
->> vaddr needs to be equal to the paddr since the dump file represents th=
-e
->> physical memory image.
->>
->> Without setting vaddr correctly, GDB would load all the different memo=
-ry
->> regions on top of each other to vaddr 0, thus making GDB showing the w=
-rong
->> memory data for a given address.
->>
->> Signed-off-by: Jon Doron <arilou@gmail.com>
->=20
-> This is a non-trivial patch! (qemu-trivial, please ignore).
->=20
->> ---
->>  dump.c                       | 4 ++--
->>  scripts/dump-guest-memory.py | 1 +
->>  2 files changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/dump.c b/dump.c
->> index 4ec94c5e25..bf77a119ea 100644
->> --- a/dump.c
->> +++ b/dump.c
->> @@ -192,7 +192,7 @@ static void write_elf64_load(DumpState *s, MemoryM=
-apping *memory_mapping,
->>      phdr.p_paddr =3D cpu_to_dump64(s, memory_mapping->phys_addr);
->>      phdr.p_filesz =3D cpu_to_dump64(s, filesz);
->>      phdr.p_memsz =3D cpu_to_dump64(s, memory_mapping->length);
->> -    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr);
->> +    phdr.p_vaddr =3D phdr.p_paddr;
->=20
-> This is likely breaking paging=3Dtrue somehow, which sets
-> memory_mapping->virt_addr to non-0.
->=20
-> According to doc "If you want to use gdb to process the core, please
-> set @paging to true."
->=20
-> Although I am not able to (gdb) x/10bx 0xa0000 for example on a core
-> produced with paging. Not sure why, anybody could help?
->=20
->>      assert(memory_mapping->length >=3D filesz);
->>
->> @@ -216,7 +216,7 @@ static void write_elf32_load(DumpState *s, MemoryM=
-apping *memory_mapping,
->>      phdr.p_paddr =3D cpu_to_dump32(s, memory_mapping->phys_addr);
->>      phdr.p_filesz =3D cpu_to_dump32(s, filesz);
->>      phdr.p_memsz =3D cpu_to_dump32(s, memory_mapping->length);
->> -    phdr.p_vaddr =3D cpu_to_dump32(s, memory_mapping->virt_addr);
->> +    phdr.p_vaddr =3D phdr.p_paddr;
->>
->>      assert(memory_mapping->length >=3D filesz);
->>
->> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.=
-py
->> index 198cd0fe40..2c587cbefc 100644
->> --- a/scripts/dump-guest-memory.py
->> +++ b/scripts/dump-guest-memory.py
->> @@ -163,6 +163,7 @@ class ELF(object):
->>          phdr =3D get_arch_phdr(self.endianness, self.elfclass)
->>          phdr.p_type =3D p_type
->>          phdr.p_paddr =3D p_paddr
->> +        phdr.p_vaddr =3D p_paddr
->=20
-> With your proposed change though, I can dump memory with gdb...
->=20
->>          phdr.p_filesz =3D p_size
->>          phdr.p_memsz =3D p_size
->>          self.segments.append(phdr)
->> --
->> 2.19.2
->>
->>
->=20
->=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--47q9kjbKS0JDebtkt05QyNM26Ws0kXJRV
+From: Max Reitz <mreitz@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ den@openvz.org, vsementsov@virtuozzo.com
+Message-ID: <3a60eace-dc00-c82c-4d2a-784e1796ab9a@redhat.com>
+Subject: Re: [PATCH v7] qemu-img info lists bitmap directory entries
+References: <1544698788-52893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1544698788-52893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I've never used paging-enabled dumps. First, because doing so requires
-QEMU to trust guest memory contents (see original commit 783e9b4826b9;
-or more recently/generally, the @dump-guest-memory docs in
-"qapi/misc.json"). Second, because whenever I had to deal with guest
-memory dumps, I always used "crash" (which needs no paging), and the
-subject guests were all Linux.
+On 13.12.18 11:59, Andrey Shinkevich wrote:
+> In the 'Format specific information' section of the 'qemu-img info'
+> command output, the supplemental information about existing QCOW2
+> bitmaps will be shown, such as a bitmap name, flags and granularity:
+>=20
+> image: /vz/vmprivate/VM1/harddisk.hdd
+> file format: qcow2
+> virtual size: 64G (68719476736 bytes)
+> disk size: 3.0M
+> cluster_size: 1048576
+> Format specific information:
+>     compat: 1.1
+>     lazy refcounts: true
+>     bitmaps:
+>         [0]:
+>             flags:
+>                 [0]: in-use
+>                 [1]: auto
+>             name: back-up1
+>             unknown flags: 4
+>             granularity: 65536
+>         [1]:
+>             flags:
+>                 [0]: in-use
+>                 [1]: auto
+>             name: back-up2
+>             unknown flags: 8
+>             granularity: 65536
+>     refcount bits: 16
+>     corrupt: false
+>=20
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-I can't comment on paging-enabled patches for dump, except that they
-shouldn't regress the paging-disabled functionality. :) If the patches
-satisfy that, I'm fine.
+The patch itself looks OK, but it breaks a couple of iotests, namely
+060, 065, 082, 112, 198, and 206.
 
-(I *am* surprised that GDB insists on p_vaddr equaling p_paddr; after
-all, in the guest, the virtual address is "memory_mapping->virt_addr".
-But, I would never claim to understand most of the ELF intricacies,
-and/or what GDB requires on top of those.)
+In addition, an iotest specifically for this new feature would be nice
+as well.
 
-Thanks
-Laszlo
+Max
+
+
+--47q9kjbKS0JDebtkt05QyNM26Ws0kXJRV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwzl0MACgkQ9AfbAGHV
+z0CGHQf+KyfuJpp7/2bYZEXyzi60CcyirCjgP3HFPK+mXwyMBNFv6KFpfFgMGWqm
+pmsdzDrfunFr+ioV/th78iwVrO+KR2IcH20UiMSVk/YPR021r+K7PubXyTAd7Uag
+l1YEWaIwSgXJB5rp4vOl1AJgJ0JOFpMhf7/2Mj9pmEj8oB6NSgmUX1n840dbxX64
+pp9FTIcxYjoTGPQ/3QwIhqbiUmhnvDDmuH6Hs2HhOB7LvgELvC/Nxmr6LELZwCZk
+AkpJITBkV9lvpr9iPTJwBofVq62EYKxly3PNaNu9zHiDuxj+2vv7DiIM9WTSlB3u
+gWCyoAKMKRmhLGmOK5fOJLlVdFimCg==
+=9mZT
+-----END PGP SIGNATURE-----
+
+--47q9kjbKS0JDebtkt05QyNM26Ws0kXJRV--
