@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59774)
+Received: from eggs.gnu.org ([209.51.188.92]:60470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ggRzy-0005vx-AH
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:19:11 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ggS3D-0007OZ-Nu
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:22:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ggRzv-00080e-Lc
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:19:10 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  7 Jan 2019 11:10:41 +0100
-Message-Id: <20190107101041.765-1-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] hw/arm/virt-acpi-build: Set COHACC override
- flag in IORT SMMUv3 node
+	(envelope-from <kraxel@redhat.com>) id 1ggS3D-0003kA-2G
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:22:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53268)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ggS3C-0003i7-S7
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:22:30 -0500
+Date: Mon, 7 Jan 2019 11:22:18 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190107102218.wzzcisnfqpasqjiq@sirius.home.kraxel.org>
+References: <20190103133113.49599-1-liq3ea@163.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190103133113.49599-1-liq3ea@163.com>
+Subject: Re: [Qemu-devel] [PATCH] usb: dev-mtp: close fd in
+ usb_mtp_object_readdir()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,53 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shannon.zhaosl@gmail.com
-Cc: shameerali.kolothum.thodi@huawei.com, drjones@redhat.com
+To: Li Qiang <liq3ea@163.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Let's report IO-coherent access is supported for translation
-table walks, descriptor fetches and queues by setting the COHACC
-override flag. Without that, we observe wrong command opcodes.
-The DT description also advertises the dma coherency.
+On Thu, Jan 03, 2019 at 05:31:13AM -0800, Li Qiang wrote:
+> Spotted by Coverity: CID 1397070
 
-Fixes a703b4f6c1ee ("hw/arm/virt-acpi-build: Add smmuv3 node in IORT table")
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index b19b576278..666bafd9e8 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -666,6 +666,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
+>      }
+>      dir = fdopendir(fd);
+>      if (!dir) {
+> +        close(fd);
+>          return;
+>      }
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Ok, clearly a bug.
 
----
-v2 -> v3:
-- added cpu_to_le32
----
- hw/arm/virt-acpi-build.c    | 1 +
- include/hw/acpi/acpi-defs.h | 2 ++
- 2 files changed, 3 insertions(+)
+>  #ifdef CONFIG_INOTIFY1
+> @@ -682,6 +683,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
+>          usb_mtp_add_child(s, o, entry->d_name);
+>      }
+>      closedir(dir);
+> +    close(fd);
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 95fad6f0ce..04b62c714d 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -418,6 +418,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         smmu->mapping_count = cpu_to_le32(1);
-         smmu->mapping_offset = cpu_to_le32(sizeof(*smmu));
-         smmu->base_address = cpu_to_le64(vms->memmap[VIRT_SMMU].base);
-+        smmu->flags = cpu_to_le32(ACPI_IORT_SMMU_V3_COHACC_OVERRIDE);
-         smmu->event_gsiv = cpu_to_le32(irq);
-         smmu->pri_gsiv = cpu_to_le32(irq + 1);
-         smmu->gerr_gsiv = cpu_to_le32(irq + 2);
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 5021cb9e79..df37f68757 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -623,6 +623,8 @@ struct AcpiIortItsGroup {
- } QEMU_PACKED;
- typedef struct AcpiIortItsGroup AcpiIortItsGroup;
- 
-+#define ACPI_IORT_SMMU_V3_COHACC_OVERRIDE 1
-+
- struct AcpiIortSmmu3 {
-     ACPI_IORT_NODE_HEADER_DEF
-     uint64_t base_address;
--- 
-2.17.2
+Not fully sure this is correct.
+
+The fdopendir manpage says the app should not use fd any more after
+successfully calling fdopendir(), and I assumed that includes calling
+close().  But I've seen the Coverity message warning this one too, so
+maybe I'm wrong ...
+
+cheers,
+  Gerd
