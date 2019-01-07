@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60470)
+Received: from eggs.gnu.org ([209.51.188.92]:34541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ggS3D-0007OZ-Nu
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:22:32 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggSAz-0001Al-7D
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:30:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ggS3D-0003kA-2G
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:22:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53268)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ggS3C-0003i7-S7
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:22:30 -0500
-Date: Mon, 7 Jan 2019 11:22:18 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190107102218.wzzcisnfqpasqjiq@sirius.home.kraxel.org>
-References: <20190103133113.49599-1-liq3ea@163.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1ggSAy-0000wv-9J
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:30:33 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ggSAp-0000rF-MT
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 05:30:25 -0500
+Received: by mail-ot1-x342.google.com with SMTP id 81so37357133otj.2
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 02:30:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190103133113.49599-1-liq3ea@163.com>
-Subject: Re: [Qemu-devel] [PATCH] usb: dev-mtp: close fd in
- usb_mtp_object_readdir()
+References: <154681539681.475.7900177304020568757@02a1dbf831e2>
+	<45bd563b-881a-5308-dca8-9aaad94b7ebb@gmail.com>
+In-Reply-To: <45bd563b-881a-5308-dca8-9aaad94b7ebb@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Jan 2019 10:30:06 +0000
+Message-ID: <CAFEAcA_dzEkTFZEsKRjB0pX+rDnhkE=5=qKy9EnFUdu0nH_=yw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4] Support u-boot noload images for arm as
+ used by, NetBSD/evbarm GENERIC kernel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Nick Hudson <nicholas.a.hudson@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, fam@euphon.net, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, Jan 03, 2019 at 05:31:13AM -0800, Li Qiang wrote:
-> Spotted by Coverity: CID 1397070
+On Mon, 7 Jan 2019 at 07:54, Nick Hudson <nicholas.a.hudson@gmail.com> wrote:
+> On 06/01/2019 22:56, no-reply@patchew.org wrote:
+> > This series seems to have some coding style problems. See output below for
+> > more information:
+>
+> The files being touched have lots of coding style problems already.  I'm
+> avoiding i) fixing these in the same diff for clarity and ii) in the
+> case of IH_TYPE_KERNEL_NOLOAD, following existing formatting.
 
-> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-> index b19b576278..666bafd9e8 100644
-> --- a/hw/usb/dev-mtp.c
-> +++ b/hw/usb/dev-mtp.c
-> @@ -666,6 +666,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
->      }
->      dir = fdopendir(fd);
->      if (!dir) {
-> +        close(fd);
->          return;
->      }
+Our usual rule of thumb is "keep checkpatch happy", ie don't introduce
+new style issues, even if the code being modified is a bit messy.
+In this case it's no big deal -- if you've already sent v5 I can
+just wrap the long lines when I apply the patch to my tree.
 
-Ok, clearly a bug.
-
->  #ifdef CONFIG_INOTIFY1
-> @@ -682,6 +683,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
->          usb_mtp_add_child(s, o, entry->d_name);
->      }
->      closedir(dir);
-> +    close(fd);
-
-Not fully sure this is correct.
-
-The fdopendir manpage says the app should not use fd any more after
-successfully calling fdopendir(), and I assumed that includes calling
-close().  But I've seen the Coverity message warning this one too, so
-maybe I'm wrong ...
-
-cheers,
-  Gerd
+thanks
+-- PMM
