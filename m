@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35428)
+Received: from eggs.gnu.org ([209.51.188.92]:38553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasha.tatashin@soleen.com>) id 1ggZT2-0002P4-CV
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:17:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggZZe-00067d-VW
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:24:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasha.tatashin@soleen.com>) id 1ggZT0-00037s-2n
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:17:40 -0500
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:41026)
+	(envelope-from <peter.maydell@linaro.org>) id 1ggZZd-0004U3-CK
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:24:30 -0500
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:46704)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pasha.tatashin@soleen.com>)
-	id 1ggZSz-0002t6-OM
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:17:37 -0500
-Received: by mail-ed1-x544.google.com with SMTP id a20so1788428edc.8
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 10:17:28 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ggZZa-0004Hs-NK
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:24:27 -0500
+Received: by mail-ot1-x333.google.com with SMTP id w25so1145342otm.13
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 10:24:26 -0800 (PST)
 MIME-Version: 1.0
-References: <20180719205545.16512-1-pasha.tatashin@oracle.com>
-	<20180719205545.16512-24-pasha.tatashin@oracle.com>
-	<20181106054212.GA31768@nautica>
-	<95c3920e-bf80-0c7e-7854-01a1c3189c23@oracle.com>
-	<20190102202032.GA1034@eldamar.local>
-	<CA+CK2bC70pnL0Wimb0xt99J4nNfi8W3zuUHgAk-jsPuOP9jpHA@mail.gmail.com>
-	<20190103234339.GA17457@nautica>
-In-Reply-To: <20190103234339.GA17457@nautica>
-From: Pavel Tatashin <pasha.tatashin@soleen.com>
-Date: Mon, 7 Jan 2019 13:17:16 -0500
-Message-ID: <CA+CK2bDj1f=VpT+k-e8kSSaoLJ3W9-JPPq9udFdDwd6ijXi28g@mail.gmail.com>
+References: <20190107163117.16269-1-peter.maydell@linaro.org>
+In-Reply-To: <20190107163117.16269-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Jan 2019 18:24:14 +0000
+Message-ID: <CAFEAcA8FUq+ppCL+gnYr1Xa0HtCi9+bC5k-A2OP18Pf-7F00Ew@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v15 23/26] sched: early boot clock
+Subject: Re: [Qemu-devel] [PULL 00/37] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dominique Martinet <asmadeus@codewreck.org>
-Cc: Salvatore Bonaccorso <carnil@debian.org>, Steven Sistare <steven.sistare@oracle.com>, Pavel Tatashin <pavel.tatashin@microsoft.com>, Daniel Jordan <daniel.m.jordan@oracle.com>, linux@armlinux.org.uk, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, John Stultz <john.stultz@linaro.org>, sboyd@codeaurora.org, x86@kernel.org, LKML <linux-kernel@vger.kernel.org>, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, hpa@zytor.com, douly.fnst@cn.fujitsu.com, Peter Zijlstra <peterz@infradead.org>, prarit@redhat.com, feng.tang@intel.com, Petr Mladek <pmladek@suse.com>, gnomes@lxorguk.ukuu.org.uk, linux-s390@vger.kernel.org, boris.ostrovsky@oracle.com, jgross@suse.com, pbonzini@redhat.com, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Jan 3, 2019 at 6:43 PM Dominique Martinet
-<asmadeus@codewreck.org> wrote:
+On Mon, 7 Jan 2019 at 16:31, Peter Maydell <peter.maydell@linaro.org> wrote:
 >
-> Pavel Tatashin wrote on Thu, Jan 03, 2019:
-> > Could you please send the config file and qemu arguments that were
-> > used to reproduce this problem.
+> target-arm queue: the big things here are the new nRF51
+> (microbit) devices and Luc's gdbstub multiprocess work.
 >
-> Running qemu by hand, nothing fancy e.g. this works:
+> thanks
+> -- PMM
 >
-> # qemu-system-x86_64 -m 1G -smp 4 -drive file=/root/kvm-wrapper/disks/f2.img,if=virtio -serial mon:stdio --enable-kvm -cpu Haswell -device virtio-rng-pci -nographic
+> The following changes since commit a29644590f95166c8a13e5797f8e7701134b31d0:
 >
-> (used a specific cpu just in case but normally runnning with cpu host on
-> a skylake machine; can probably go older)
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-01-05' into staging (2019-01-07 11:55:52 +0000)
 >
+> are available in the Git repository at:
 >
-> qemu is fedora 29 blend as is:
-> $ qemu-system-x86_64 --version
-> QEMU emulator version 3.0.0 (qemu-3.0.0-3.fc29)
-> Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190107
 >
+> for you to fetch changes up to f831f955d420966471f5f8b316ba50d2523b1ff0:
 >
-> compressed .config attached to the mail, this can likely be trimmed down
-> some as well but that takes more time for me..
-> I didn't rebuild the kernel so not 100% sure (comes from
-> /proc/config.gz) but it should work on a 4.20-rc2 kernel as written in
-> the first few lines; 857baa87b64 I referred to in another mail was
-> merged in 4.19-rc1 so anything past that is probably OK to reproduce...
+>   Support u-boot noload images for arm as used by, NetBSD/evbarm GENERIC kernel. (2019-01-07 15:46:20 +0000)
 >
->
-> Re-checked today with these exact options (fresh VM start; then suspend
-> laptop for a bit, then reboot VM):
-> [    0.000000] Hypervisor detected: KVM
-> [    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
-> [ 2477.907447] kvm-clock: cpu 0, msr 153a4001, primary cpu clock
-> [ 2477.907448] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
-> [ 2477.907450] tsc: Detected 2592.000 MHz processor
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * Support u-boot 'noload' images for Arm (as used by NetBSD/evbarm GENERIC kernel)
+>  * hw/misc/tz-mpc: Fix value of BLK_MAX register
+>  * target/arm: Emit barriers for A32/T32 load-acquire/store-release insns
+>  * nRF51 SoC: add timer, GPIO, RNG peripherals
+>  * hw/arm/allwinner-a10: Add the 'A' SRAM and the SRAM controller
+>  * cpus.c: Fix race condition in cpu_stop_current()
+>  * hw/arm: versal: Plug memory leaks
+>  * Allow M profile boards to run even if -kernel not specified
+>  * gdbstub: Add multiprocess extension support for use when the
+>    board has multiple CPUs of different types (like the Xilinx Zynq boards)
+>  * target/arm: Don't decode S bit in SVE brk[ab] merging insns
+>  * target/arm: Convert ARM_TBFLAG_* to FIELDs
 
-I could not reproduce the problem. Did you suspend to memory between
-wake ups? Does this time jump happen every time, even if your laptop
-sleeps for a minute?
 
-I have tried with qemu 2.6 and 3.1 on Ubuntu, testing 4.20rc2.
+Applied, thanks.
 
-Pasha
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
