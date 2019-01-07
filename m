@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56791)
+Received: from eggs.gnu.org ([209.51.188.92]:57445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggVk0-000655-Vy
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:18:57 -0500
+	(envelope-from <olaf@aepfle.de>) id 1ggVle-0007Mu-0D
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:20:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggVk0-00018M-Af
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:18:56 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41986)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggVk0-00016I-5i
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:18:56 -0500
-Received: by mail-oi1-x242.google.com with SMTP id w13so393245oiw.9
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 06:18:55 -0800 (PST)
+	(envelope-from <olaf@aepfle.de>) id 1ggVlc-0004Cl-Ap
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:20:37 -0500
+Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::1]:29590)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1ggVlb-0003wE-Kz
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:20:36 -0500
+Date: Mon, 7 Jan 2019 15:20:16 +0100
+From: Olaf Hering <olaf@aepfle.de>
+Message-ID: <20190107152016.03464ee3.olaf@aepfle.de>
+In-Reply-To: <20181213110525.GY18875@perard.uk.xensource.com>
+References: <20181026101016.28584-1-olaf@aepfle.de>
+	<20181213110525.GY18875@perard.uk.xensource.com>
 MIME-Version: 1.0
-References: <20181214052410.11863-1-richard.henderson@linaro.org>
-	<20181214052410.11863-26-richard.henderson@linaro.org>
-In-Reply-To: <20181214052410.11863-26-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Jan 2019 14:18:43 +0000
-Message-ID: <CAFEAcA-vVFjgyiJmZz8O8tmr7=Gn_aN35r0srExyka8zMvoLLA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 25/27] target/arm: Enable PAuth for -cpu
- max
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/PUzmwa.URpv55AFLiE_WGv7";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v1] xen: preserve COMPAT in CFLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: Ian Jackson <ian.jackson@citrix.com>, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-On Fri, 14 Dec 2018 at 05:24, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu64.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 1d57be0c91..84f70b2a24 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -316,6 +316,10 @@ static void aarch64_max_initfn(Object *obj)
->
->          t = cpu->isar.id_aa64isar1;
->          t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);
-> +        t = FIELD_DP64(t, ID_AA64ISAR1, APA, 1); /* PAuth, architected only */
-> +        t = FIELD_DP64(t, ID_AA64ISAR1, API, 0);
-> +        t = FIELD_DP64(t, ID_AA64ISAR1, GPA, 1);
-> +        t = FIELD_DP64(t, ID_AA64ISAR1, GPI, 0);
->          cpu->isar.id_aa64isar1 = t;
->
+--Sig_/PUzmwa.URpv55AFLiE_WGv7
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Am Thu, 13 Dec 2018 11:05:25 +0000
+schrieb Anthony PERARD <anthony.perard@citrix.com>:
 
-thanks
--- PMM
+> Hi,
+>=20
+> Ian, we have those XC_WANT_COMPAT_* #defines to allow consumers of Xen
+> libs be able to use old interfaces. Do you think it's a good idea to
+> have this consumers (QEMU here) #undef the flag when it has implemented
+> the newer interface?
+
+I think the wording is wrong.
+
+The defines exist to expose existing APIs to software that was not updated =
+to use the "latest" API. To me it looks like the undef's are wrong. Even th=
+e usage in configure looks bogus, but that is another unrelated thing.
+
+Olaf
+
+--Sig_/PUzmwa.URpv55AFLiE_WGv7
+Content-Type: application/pgp-signature
+Content-Description: Digitale Signatur von OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXDNgIAAKCRBdQqD6ppg2
+fu5TAKCMBBZF7gk7Qc47TVW1U8GXd7YH+gCgw8IaNuKH7wgvFE1OgbPlHGXC8XI=
+=MkI/
+-----END PGP SIGNATURE-----
+
+--Sig_/PUzmwa.URpv55AFLiE_WGv7--
