@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60301)
+Received: from eggs.gnu.org ([209.51.188.92]:60454)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=90328960c=Paul.Durrant@citrix.com>)
-	id 1ggVtZ-0004XA-Aj
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:28:51 -0500
+	id 1ggVu3-0004vb-Fh
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:29:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=90328960c=Paul.Durrant@citrix.com>)
-	id 1ggVtU-0002rf-0j
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:28:49 -0500
+	id 1ggVu1-00033I-9h
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:29:19 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Mon, 7 Jan 2019 14:13:06 +0000
-Message-ID: <20190107141309.15774-16-paul.durrant@citrix.com>
+Date: Mon, 7 Jan 2019 14:13:03 +0000
+Message-ID: <20190107141309.15774-13-paul.durrant@citrix.com>
 In-Reply-To: <20190107141309.15774-1-paul.durrant@citrix.com>
 References: <20190107141309.15774-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 15/18] xen: add a mechanism to automatically
- create XenDevice-s...
+Subject: [Qemu-devel] [PATCH v8 12/18] xen: remove 'ioreq'
+ struct/varable/field names from dataplane/xen-block.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,540 +26,671 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-...that maintains compatibility with existing Xen toolstacks.
+This is a purely cosmetic patch that purges the name 'ioreq' from struct,
+variable and field names. (This name has been problematic for a long time
+as 'ioreq' is the name used for generic I/O requests coming from Xen).
+The patch replaces 'struct ioreq' with a new 'XenBlockRequest' type and
+'ioreq' field/variable names with 'request', and then does necessary
+fix-up to adhere to coding style.
 
-Xen toolstacks instantiate PV backends by simply writing information into
-xenstore and expecting a backend implementation to be watching for this.
+Function names are not modified by this patch. They will be dealt with in
+a subsequent patch.
 
-This patch adds a new 'xen-backend' module to allow individual XenDevice
-implementations to register create and destroy functions. The creator
-will be called when a tool-stack instantiates a new backend in this way,
-and the destructor will then be called after the resulting XenDevice
-object is unrealized.
-
-To support this it is also necessary to add new watchers into the XenBus
-implementation to handle enumeration of new backends and also destruction
-of XenDevice-s when the toolstack sets the backend 'online' key to 0.
-
-NOTE: This patch only adds the framework. A subsequent patch will add a
-      creator function for xen-block devices.
+No functional change.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+Acked-by: Anthony Perard <anthony.perard@citrix.com>
 ---
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
-
-v5:
- - Added destructor function, therefore Anthony's R-b is not carried
-   from v4
-
-v3:
- - Use a xenstore transaction in enumeration code to ensure consistent
-   parameters
- - Not adding Anthony's R-b because of change
-
-v2:
- - Sort out error paths and error reporting
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
 ---
- hw/xen/Makefile.objs         |   2 +-
- hw/xen/trace-events          |   3 +
- hw/xen/xen-backend.c         | 165 +++++++++++++++++++++++++++++++++++
- hw/xen/xen-bus.c             | 164 +++++++++++++++++++++++++++++++++-
- include/hw/xen/xen-backend.h |  39 +++++++++
- include/hw/xen/xen-bus.h     |   1 +
- include/qemu/module.h        |   3 +
- 7 files changed, 375 insertions(+), 2 deletions(-)
- create mode 100644 hw/xen/xen-backend.c
- create mode 100644 include/hw/xen/xen-backend.h
+ hw/block/dataplane/xen-block.c | 310 +++++++++++++++++----------------
+ 1 file changed, 156 insertions(+), 154 deletions(-)
 
-diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index 77c0868190..84df60a928 100644
---- a/hw/xen/Makefile.objs
-+++ b/hw/xen/Makefile.objs
-@@ -1,5 +1,5 @@
- # xen backend driver support
--common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o
-+common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o xen-backend.o
+diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
+index 1ff464973c..6788bbf338 100644
+--- a/hw/block/dataplane/xen-block.c
++++ b/hw/block/dataplane/xen-block.c
+@@ -28,7 +28,7 @@
+ #include "sysemu/iothread.h"
+ #include "xen-block.h"
  
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index d4651bdb30..f6944624b2 100644
---- a/hw/xen/trace-events
-+++ b/hw/xen/trace-events
-@@ -16,6 +16,9 @@ xen_domid_restrict(int err) "err: %u"
- # include/hw/xen/xen-bus.c
- xen_bus_realize(void) ""
- xen_bus_unrealize(void) ""
-+xen_bus_enumerate(void) ""
-+xen_bus_type_enumerate(const char *type) "type: %s"
-+xen_bus_backend_create(const char *type, const char *path) "type: %s path: %s"
- xen_bus_add_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
- xen_bus_remove_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
- xen_bus_watch(const char *token) "token: %s"
-diff --git a/hw/xen/xen-backend.c b/hw/xen/xen-backend.c
-new file mode 100644
-index 0000000000..da065f81b7
---- /dev/null
-+++ b/hw/xen/xen-backend.c
-@@ -0,0 +1,165 @@
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "hw/xen/xen-backend.h"
-+#include "hw/xen/xen-bus.h"
-+
-+typedef struct XenBackendImpl {
-+    const char *type;
-+    XenBackendDeviceCreate create;
-+    XenBackendDeviceDestroy destroy;
-+} XenBackendImpl;
-+
-+struct XenBackendInstance {
-+    QLIST_ENTRY(XenBackendInstance) entry;
-+    const XenBackendImpl *impl;
-+    XenBus *xenbus;
-+    char *name;
-+    XenDevice *xendev;
-+};
-+
-+static GHashTable *xen_backend_table_get(void)
-+{
-+    static GHashTable *table;
-+
-+    if (table == NULL) {
-+        table = g_hash_table_new(g_str_hash, g_str_equal);
-+    }
-+
-+    return table;
-+}
-+
-+static void xen_backend_table_add(XenBackendImpl *impl)
-+{
-+    g_hash_table_insert(xen_backend_table_get(), (void *)impl->type, impl);
-+}
-+
-+static const XenBackendImpl *xen_backend_table_lookup(const char *type)
-+{
-+    return g_hash_table_lookup(xen_backend_table_get(), type);
-+}
-+
-+void xen_backend_register(const XenBackendInfo *info)
-+{
-+    XenBackendImpl *impl = g_new0(XenBackendImpl, 1);
-+
-+    g_assert(info->type);
-+
-+    if (xen_backend_table_lookup(info->type)) {
-+        error_report("attempt to register duplicate Xen backend type '%s'",
-+                     info->type);
-+        abort();
-+    }
-+
-+    if (!info->create) {
-+        error_report("backend type '%s' has no creator", info->type);
-+        abort();
-+    }
-+
-+    impl->type = info->type;
-+    impl->create = info->create;
-+    impl->destroy = info->destroy;
-+
-+    xen_backend_table_add(impl);
-+}
-+
-+static QLIST_HEAD(, XenBackendInstance) backend_list;
-+
-+static void xen_backend_list_add(XenBackendInstance *backend)
-+{
-+    QLIST_INSERT_HEAD(&backend_list, backend, entry);
-+}
-+
-+static XenBackendInstance *xen_backend_list_find(XenDevice *xendev)
-+{
-+    XenBackendInstance *backend;
-+
-+    QLIST_FOREACH(backend, &backend_list, entry) {
-+        if (backend->xendev == xendev) {
-+            return backend;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static void xen_backend_list_remove(XenBackendInstance *backend)
-+{
-+    QLIST_REMOVE(backend, entry);
-+}
-+
-+void xen_backend_device_create(XenBus *xenbus, const char *type,
-+                               const char *name, QDict *opts, Error **errp)
-+{
-+    const XenBackendImpl *impl = xen_backend_table_lookup(type);
-+    XenBackendInstance *backend;
-+    Error *local_error = NULL;
-+
-+    if (!impl) {
-+        return;
-+    }
-+
-+    backend = g_new0(XenBackendInstance, 1);
-+    backend->xenbus = xenbus;
-+    backend->name = g_strdup(name);
-+
-+    impl->create(backend, opts, &local_error);
-+    if (local_error) {
-+        error_propagate(errp, local_error);
-+        g_free(backend->name);
-+        g_free(backend);
-+        return;
-+    }
-+
-+    backend->impl = impl;
-+    xen_backend_list_add(backend);
-+}
-+
-+XenBus *xen_backend_get_bus(XenBackendInstance *backend)
-+{
-+    return backend->xenbus;
-+}
-+
-+const char *xen_backend_get_name(XenBackendInstance *backend)
-+{
-+    return backend->name;
-+}
-+
-+void xen_backend_set_device(XenBackendInstance *backend,
-+                            XenDevice *xendev)
-+{
-+    g_assert(!backend->xendev);
-+    backend->xendev = xendev;
-+}
-+
-+XenDevice *xen_backend_get_device(XenBackendInstance *backend)
-+{
-+    return backend->xendev;
-+}
-+
-+
-+bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp)
-+{
-+    XenBackendInstance *backend = xen_backend_list_find(xendev);
-+    const XenBackendImpl *impl;
-+
-+    if (!backend) {
-+        return false;
-+    }
-+
-+    impl = backend->impl;
-+    impl->destroy(backend, errp);
-+
-+    xen_backend_list_remove(backend);
-+    g_free(backend->name);
-+    g_free(backend);
-+
-+    return true;
-+}
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index a22aa49921..f90bcf2342 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -11,10 +11,12 @@
- #include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "hw/xen/xen.h"
-+#include "hw/xen/xen-backend.h"
- #include "hw/xen/xen-bus.h"
- #include "hw/xen/xen-bus-helper.h"
- #include "monitor/monitor.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qdict.h"
- #include "sysemu/sysemu.h"
- #include "trace.h"
+-struct ioreq {
++typedef struct XenBlockRequest {
+     blkif_request_t req;
+     int16_t status;
+     off_t start;
+@@ -39,9 +39,9 @@ struct ioreq {
+     int aio_inflight;
+     int aio_errors;
+     XenBlockDataPlane *dataplane;
+-    QLIST_ENTRY(ioreq) list;
++    QLIST_ENTRY(XenBlockRequest) list;
+     BlockAcctCookie acct;
+-};
++} XenBlockRequest;
  
-@@ -190,12 +192,151 @@ static void xen_bus_remove_watch(XenBus *xenbus, XenWatch *watch,
-     free_watch(watch);
+ struct XenBlockDataPlane {
+     XenDevice *xendev;
+@@ -54,9 +54,9 @@ struct XenBlockDataPlane {
+     int protocol;
+     blkif_back_rings_t rings;
+     int more_work;
+-    QLIST_HEAD(inflight_head, ioreq) inflight;
+-    QLIST_HEAD(finished_head, ioreq) finished;
+-    QLIST_HEAD(freelist_head, ioreq) freelist;
++    QLIST_HEAD(inflight_head, XenBlockRequest) inflight;
++    QLIST_HEAD(finished_head, XenBlockRequest) finished;
++    QLIST_HEAD(freelist_head, XenBlockRequest) freelist;
+     int requests_total;
+     int requests_inflight;
+     int requests_finished;
+@@ -67,68 +67,68 @@ struct XenBlockDataPlane {
+     AioContext *ctx;
+ };
+ 
+-static void ioreq_reset(struct ioreq *ioreq)
++static void ioreq_reset(XenBlockRequest *request)
+ {
+-    memset(&ioreq->req, 0, sizeof(ioreq->req));
+-    ioreq->status = 0;
+-    ioreq->start = 0;
+-    ioreq->buf = NULL;
+-    ioreq->size = 0;
+-    ioreq->presync = 0;
++    memset(&request->req, 0, sizeof(request->req));
++    request->status = 0;
++    request->start = 0;
++    request->buf = NULL;
++    request->size = 0;
++    request->presync = 0;
+ 
+-    ioreq->aio_inflight = 0;
+-    ioreq->aio_errors = 0;
++    request->aio_inflight = 0;
++    request->aio_errors = 0;
+ 
+-    ioreq->dataplane = NULL;
+-    memset(&ioreq->list, 0, sizeof(ioreq->list));
+-    memset(&ioreq->acct, 0, sizeof(ioreq->acct));
++    request->dataplane = NULL;
++    memset(&request->list, 0, sizeof(request->list));
++    memset(&request->acct, 0, sizeof(request->acct));
+ 
+-    qemu_iovec_reset(&ioreq->v);
++    qemu_iovec_reset(&request->v);
  }
  
-+static void xen_bus_backend_create(XenBus *xenbus, const char *type,
-+                                   const char *name, char *path,
-+                                   Error **errp)
-+{
-+    xs_transaction_t tid;
-+    char **key;
-+    QDict *opts;
-+    unsigned int i, n;
-+    Error *local_err = NULL;
-+
-+    trace_xen_bus_backend_create(type, path);
-+
-+again:
-+    tid = xs_transaction_start(xenbus->xsh);
-+    if (tid == XBT_NULL) {
-+        error_setg(errp, "failed xs_transaction_start");
-+        return;
-+    }
-+
-+    key = xs_directory(xenbus->xsh, tid, path, &n);
-+    if (!key) {
-+        if (!xs_transaction_end(xenbus->xsh, tid, true)) {
-+            error_setg_errno(errp, errno, "failed xs_transaction_end");
-+        }
-+        return;
-+    }
-+
-+    opts = qdict_new();
-+    for (i = 0; i < n; i++) {
-+        char *val;
-+
-+        /*
-+         * Assume anything found in the xenstore backend area, other than
-+         * the keys created for a generic XenDevice, are parameters
-+         * to be used to configure the backend.
-+         */
-+        if (!strcmp(key[i], "state") ||
-+            !strcmp(key[i], "online") ||
-+            !strcmp(key[i], "frontend") ||
-+            !strcmp(key[i], "frontend-id") ||
-+            !strcmp(key[i], "hotplug-status"))
-+            continue;
-+
-+        if (xs_node_scanf(xenbus->xsh, tid, path, key[i], NULL, "%ms",
-+                          &val) == 1) {
-+            qdict_put_str(opts, key[i], val);
-+            free(val);
-+        }
-+    }
-+
-+    free(key);
-+
-+    if (!xs_transaction_end(xenbus->xsh, tid, false)) {
-+        qobject_unref(opts);
-+
-+        if (errno == EAGAIN) {
-+            goto again;
-+        }
-+
-+        error_setg_errno(errp, errno, "failed xs_transaction_end");
-+        return;
-+    }
-+
-+    xen_backend_device_create(xenbus, type, name, opts, &local_err);
-+    qobject_unref(opts);
-+
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to create '%s' device '%s': ",
-+                                type, name);
-+    }
-+}
-+
-+static void xen_bus_type_enumerate(XenBus *xenbus, const char *type)
-+{
-+    char *domain_path = g_strdup_printf("backend/%s/%u", type, xen_domid);
-+    char **backend;
-+    unsigned int i, n;
-+
-+    trace_xen_bus_type_enumerate(type);
-+
-+    backend = xs_directory(xenbus->xsh, XBT_NULL, domain_path, &n);
-+    if (!backend) {
-+        goto out;
-+    }
-+
-+    for (i = 0; i < n; i++) {
-+        char *backend_path = g_strdup_printf("%s/%s", domain_path,
-+                                             backend[i]);
-+        enum xenbus_state backend_state;
-+
-+        if (xs_node_scanf(xenbus->xsh, XBT_NULL, backend_path, "state",
-+                          NULL, "%u", &backend_state) != 1)
-+            backend_state = XenbusStateUnknown;
-+
-+        if (backend_state == XenbusStateInitialising) {
-+            Error *local_err = NULL;
-+
-+            xen_bus_backend_create(xenbus, type, backend[i], backend_path,
-+                                   &local_err);
-+            if (local_err) {
-+                error_report_err(local_err);
-+            }
-+        }
-+
-+        g_free(backend_path);
-+    }
-+
-+    free(backend);
-+
-+out:
-+    g_free(domain_path);
-+}
-+
-+static void xen_bus_enumerate(void *opaque)
-+{
-+    XenBus *xenbus = opaque;
-+    char **type;
-+    unsigned int i, n;
-+
-+    trace_xen_bus_enumerate();
-+
-+    type = xs_directory(xenbus->xsh, XBT_NULL, "backend", &n);
-+    if (!type) {
-+        return;
-+    }
-+
-+    for (i = 0; i < n; i++) {
-+        xen_bus_type_enumerate(xenbus, type[i]);
-+    }
-+
-+    free(type);
-+}
-+
- static void xen_bus_unrealize(BusState *bus, Error **errp)
+-static struct ioreq *ioreq_start(XenBlockDataPlane *dataplane)
++static XenBlockRequest *ioreq_start(XenBlockDataPlane *dataplane)
  {
-     XenBus *xenbus = XEN_BUS(bus);
+-    struct ioreq *ioreq = NULL;
++    XenBlockRequest *request = NULL;
  
-     trace_xen_bus_unrealize();
+     if (QLIST_EMPTY(&dataplane->freelist)) {
+         if (dataplane->requests_total >= dataplane->max_requests) {
+             goto out;
+         }
+         /* allocate new struct */
+-        ioreq = g_malloc0(sizeof(*ioreq));
+-        ioreq->dataplane = dataplane;
++        request = g_malloc0(sizeof(*request));
++        request->dataplane = dataplane;
+         dataplane->requests_total++;
+-        qemu_iovec_init(&ioreq->v, 1);
++        qemu_iovec_init(&request->v, 1);
+     } else {
+         /* get one from freelist */
+-        ioreq = QLIST_FIRST(&dataplane->freelist);
+-        QLIST_REMOVE(ioreq, list);
++        request = QLIST_FIRST(&dataplane->freelist);
++        QLIST_REMOVE(request, list);
+     }
+-    QLIST_INSERT_HEAD(&dataplane->inflight, ioreq, list);
++    QLIST_INSERT_HEAD(&dataplane->inflight, request, list);
+     dataplane->requests_inflight++;
  
-+    if (xenbus->backend_watch) {
-+        xen_bus_remove_watch(xenbus, xenbus->backend_watch, NULL);
-+        xenbus->backend_watch = NULL;
-+    }
+ out:
+-    return ioreq;
++    return request;
+ }
+ 
+-static void ioreq_finish(struct ioreq *ioreq)
++static void ioreq_finish(XenBlockRequest *request)
+ {
+-    XenBlockDataPlane *dataplane = ioreq->dataplane;
++    XenBlockDataPlane *dataplane = request->dataplane;
+ 
+-    QLIST_REMOVE(ioreq, list);
+-    QLIST_INSERT_HEAD(&dataplane->finished, ioreq, list);
++    QLIST_REMOVE(request, list);
++    QLIST_INSERT_HEAD(&dataplane->finished, request, list);
+     dataplane->requests_inflight--;
+     dataplane->requests_finished++;
+ }
+ 
+-static void ioreq_release(struct ioreq *ioreq, bool finish)
++static void ioreq_release(XenBlockRequest *request, bool finish)
+ {
+-    XenBlockDataPlane *dataplane = ioreq->dataplane;
++    XenBlockDataPlane *dataplane = request->dataplane;
+ 
+-    QLIST_REMOVE(ioreq, list);
+-    ioreq_reset(ioreq);
+-    ioreq->dataplane = dataplane;
+-    QLIST_INSERT_HEAD(&dataplane->freelist, ioreq, list);
++    QLIST_REMOVE(request, list);
++    ioreq_reset(request);
++    request->dataplane = dataplane;
++    QLIST_INSERT_HEAD(&dataplane->freelist, request, list);
+     if (finish) {
+         dataplane->requests_finished--;
+     } else {
+@@ -140,18 +140,18 @@ static void ioreq_release(struct ioreq *ioreq, bool finish)
+  * translate request into iovec + start offset
+  * do sanity checks along the way
+  */
+-static int ioreq_parse(struct ioreq *ioreq)
++static int ioreq_parse(XenBlockRequest *request)
+ {
+-    XenBlockDataPlane *dataplane = ioreq->dataplane;
++    XenBlockDataPlane *dataplane = request->dataplane;
+     size_t len;
+     int i;
+ 
+-    switch (ioreq->req.operation) {
++    switch (request->req.operation) {
+     case BLKIF_OP_READ:
+         break;
+     case BLKIF_OP_FLUSH_DISKCACHE:
+-        ioreq->presync = 1;
+-        if (!ioreq->req.nr_segments) {
++        request->presync = 1;
++        if (!request->req.nr_segments) {
+             return 0;
+         }
+         /* fall through */
+@@ -160,77 +160,78 @@ static int ioreq_parse(struct ioreq *ioreq)
+     case BLKIF_OP_DISCARD:
+         return 0;
+     default:
+-        error_report("error: unknown operation (%d)", ioreq->req.operation);
++        error_report("error: unknown operation (%d)", request->req.operation);
+         goto err;
+     };
+ 
+-    if (ioreq->req.operation != BLKIF_OP_READ &&
++    if (request->req.operation != BLKIF_OP_READ &&
+         blk_is_read_only(dataplane->blk)) {
+         error_report("error: write req for ro device");
+         goto err;
+     }
+ 
+-    ioreq->start = ioreq->req.sector_number * dataplane->file_blk;
+-    for (i = 0; i < ioreq->req.nr_segments; i++) {
++    request->start = request->req.sector_number * dataplane->file_blk;
++    for (i = 0; i < request->req.nr_segments; i++) {
+         if (i == BLKIF_MAX_SEGMENTS_PER_REQUEST) {
+             error_report("error: nr_segments too big");
+             goto err;
+         }
+-        if (ioreq->req.seg[i].first_sect > ioreq->req.seg[i].last_sect) {
++        if (request->req.seg[i].first_sect > request->req.seg[i].last_sect) {
+             error_report("error: first > last sector");
+             goto err;
+         }
+-        if (ioreq->req.seg[i].last_sect * dataplane->file_blk >= XC_PAGE_SIZE) {
++        if (request->req.seg[i].last_sect * dataplane->file_blk >=
++            XC_PAGE_SIZE) {
+             error_report("error: page crossing");
+             goto err;
+         }
+ 
+-        len = (ioreq->req.seg[i].last_sect -
+-               ioreq->req.seg[i].first_sect + 1) * dataplane->file_blk;
+-        ioreq->size += len;
++        len = (request->req.seg[i].last_sect -
++               request->req.seg[i].first_sect + 1) * dataplane->file_blk;
++        request->size += len;
+     }
+-    if (ioreq->start + ioreq->size > dataplane->file_size) {
++    if (request->start + request->size > dataplane->file_size) {
+         error_report("error: access beyond end of file");
+         goto err;
+     }
+     return 0;
+ 
+ err:
+-    ioreq->status = BLKIF_RSP_ERROR;
++    request->status = BLKIF_RSP_ERROR;
+     return -1;
+ }
+ 
+-static int ioreq_grant_copy(struct ioreq *ioreq)
++static int ioreq_grant_copy(XenBlockRequest *request)
+ {
+-    XenBlockDataPlane *dataplane = ioreq->dataplane;
++    XenBlockDataPlane *dataplane = request->dataplane;
+     XenDevice *xendev = dataplane->xendev;
+     XenDeviceGrantCopySegment segs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+     int i, count;
+     int64_t file_blk = dataplane->file_blk;
+-    bool to_domain = (ioreq->req.operation == BLKIF_OP_READ);
+-    void *virt = ioreq->buf;
++    bool to_domain = (request->req.operation == BLKIF_OP_READ);
++    void *virt = request->buf;
+     Error *local_err = NULL;
+ 
+-    if (ioreq->req.nr_segments == 0) {
++    if (request->req.nr_segments == 0) {
+         return 0;
+     }
+ 
+-    count = ioreq->req.nr_segments;
++    count = request->req.nr_segments;
+ 
+     for (i = 0; i < count; i++) {
+         if (to_domain) {
+-            segs[i].dest.foreign.ref = ioreq->req.seg[i].gref;
+-            segs[i].dest.foreign.offset = ioreq->req.seg[i].first_sect *
++            segs[i].dest.foreign.ref = request->req.seg[i].gref;
++            segs[i].dest.foreign.offset = request->req.seg[i].first_sect *
+                 file_blk;
+             segs[i].source.virt = virt;
+         } else {
+-            segs[i].source.foreign.ref = ioreq->req.seg[i].gref;
+-            segs[i].source.foreign.offset = ioreq->req.seg[i].first_sect *
++            segs[i].source.foreign.ref = request->req.seg[i].gref;
++            segs[i].source.foreign.offset = request->req.seg[i].first_sect *
+                 file_blk;
+             segs[i].dest.virt = virt;
+         }
+-        segs[i].len = (ioreq->req.seg[i].last_sect -
+-                       ioreq->req.seg[i].first_sect + 1) * file_blk;
++        segs[i].len = (request->req.seg[i].last_sect -
++                       request->req.seg[i].first_sect + 1) * file_blk;
+         virt += segs[i].len;
+     }
+ 
+@@ -239,72 +240,72 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
+     if (local_err) {
+         error_reportf_err(local_err, "failed to copy data: ");
+ 
+-        ioreq->aio_errors++;
++        request->aio_errors++;
+         return -1;
+     }
+ 
+     return 0;
+ }
+ 
+-static int ioreq_runio_qemu_aio(struct ioreq *ioreq);
++static int ioreq_runio_qemu_aio(XenBlockRequest *request);
+ 
+ static void qemu_aio_complete(void *opaque, int ret)
+ {
+-    struct ioreq *ioreq = opaque;
+-    XenBlockDataPlane *dataplane = ioreq->dataplane;
++    XenBlockRequest *request = opaque;
++    XenBlockDataPlane *dataplane = request->dataplane;
+ 
+     aio_context_acquire(dataplane->ctx);
+ 
+     if (ret != 0) {
+         error_report("%s I/O error",
+-                     ioreq->req.operation == BLKIF_OP_READ ?
++                     request->req.operation == BLKIF_OP_READ ?
+                      "read" : "write");
+-        ioreq->aio_errors++;
++        request->aio_errors++;
+     }
+ 
+-    ioreq->aio_inflight--;
+-    if (ioreq->presync) {
+-        ioreq->presync = 0;
+-        ioreq_runio_qemu_aio(ioreq);
++    request->aio_inflight--;
++    if (request->presync) {
++        request->presync = 0;
++        ioreq_runio_qemu_aio(request);
+         goto done;
+     }
+-    if (ioreq->aio_inflight > 0) {
++    if (request->aio_inflight > 0) {
+         goto done;
+     }
+ 
+-    switch (ioreq->req.operation) {
++    switch (request->req.operation) {
+     case BLKIF_OP_READ:
+-        /* in case of failure ioreq->aio_errors is increased */
++        /* in case of failure request->aio_errors is increased */
+         if (ret == 0) {
+-            ioreq_grant_copy(ioreq);
++            ioreq_grant_copy(request);
+         }
+-        qemu_vfree(ioreq->buf);
++        qemu_vfree(request->buf);
+         break;
+     case BLKIF_OP_WRITE:
+     case BLKIF_OP_FLUSH_DISKCACHE:
+-        if (!ioreq->req.nr_segments) {
++        if (!request->req.nr_segments) {
+             break;
+         }
+-        qemu_vfree(ioreq->buf);
++        qemu_vfree(request->buf);
+         break;
+     default:
+         break;
+     }
+ 
+-    ioreq->status = ioreq->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
+-    ioreq_finish(ioreq);
++    request->status = request->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
++    ioreq_finish(request);
+ 
+-    switch (ioreq->req.operation) {
++    switch (request->req.operation) {
+     case BLKIF_OP_WRITE:
+     case BLKIF_OP_FLUSH_DISKCACHE:
+-        if (!ioreq->req.nr_segments) {
++        if (!request->req.nr_segments) {
+             break;
+         }
+     case BLKIF_OP_READ:
+-        if (ioreq->status == BLKIF_RSP_OKAY) {
+-            block_acct_done(blk_get_stats(dataplane->blk), &ioreq->acct);
++        if (request->status == BLKIF_RSP_OKAY) {
++            block_acct_done(blk_get_stats(dataplane->blk), &request->acct);
+         } else {
+-            block_acct_failed(blk_get_stats(dataplane->blk), &ioreq->acct);
++            block_acct_failed(blk_get_stats(dataplane->blk), &request->acct);
+         }
+         break;
+     case BLKIF_OP_DISCARD:
+@@ -317,10 +318,11 @@ done:
+     aio_context_release(dataplane->ctx);
+ }
+ 
+-static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
++static bool blk_split_discard(XenBlockRequest *request,
++                              blkif_sector_t sector_number,
+                               uint64_t nr_sectors)
+ {
+-    XenBlockDataPlane *dataplane = ioreq->dataplane;
++    XenBlockDataPlane *dataplane = request->dataplane;
+     int64_t byte_offset;
+     int byte_chunk;
+     uint64_t byte_remaining, limit;
+@@ -339,9 +341,9 @@ static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
+ 
+     do {
+         byte_chunk = byte_remaining > limit ? limit : byte_remaining;
+-        ioreq->aio_inflight++;
++        request->aio_inflight++;
+         blk_aio_pdiscard(dataplane->blk, byte_offset, byte_chunk,
+-                         qemu_aio_complete, ioreq);
++                         qemu_aio_complete, request);
+         byte_remaining -= byte_chunk;
+         byte_offset += byte_chunk;
+     } while (byte_remaining > 0);
+@@ -349,53 +351,53 @@ static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
+     return true;
+ }
+ 
+-static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
++static int ioreq_runio_qemu_aio(XenBlockRequest *request)
+ {
+-    XenBlockDataPlane *dataplane = ioreq->dataplane;
+-
+-    ioreq->buf = qemu_memalign(XC_PAGE_SIZE, ioreq->size);
+-    if (ioreq->req.nr_segments &&
+-        (ioreq->req.operation == BLKIF_OP_WRITE ||
+-         ioreq->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
+-        ioreq_grant_copy(ioreq)) {
+-        qemu_vfree(ioreq->buf);
++    XenBlockDataPlane *dataplane = request->dataplane;
 +
-     if (!xenbus->xsh) {
++    request->buf = qemu_memalign(XC_PAGE_SIZE, request->size);
++    if (request->req.nr_segments &&
++        (request->req.operation == BLKIF_OP_WRITE ||
++         request->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
++        ioreq_grant_copy(request)) {
++        qemu_vfree(request->buf);
+         goto err;
+     }
+ 
+-    ioreq->aio_inflight++;
+-    if (ioreq->presync) {
+-        blk_aio_flush(ioreq->dataplane->blk, qemu_aio_complete, ioreq);
++    request->aio_inflight++;
++    if (request->presync) {
++        blk_aio_flush(request->dataplane->blk, qemu_aio_complete, request);
+         return 0;
+     }
+ 
+-    switch (ioreq->req.operation) {
++    switch (request->req.operation) {
+     case BLKIF_OP_READ:
+-        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
+-        block_acct_start(blk_get_stats(dataplane->blk), &ioreq->acct,
+-                         ioreq->v.size, BLOCK_ACCT_READ);
+-        ioreq->aio_inflight++;
+-        blk_aio_preadv(dataplane->blk, ioreq->start, &ioreq->v, 0,
+-                       qemu_aio_complete, ioreq);
++        qemu_iovec_add(&request->v, request->buf, request->size);
++        block_acct_start(blk_get_stats(dataplane->blk), &request->acct,
++                         request->v.size, BLOCK_ACCT_READ);
++        request->aio_inflight++;
++        blk_aio_preadv(dataplane->blk, request->start, &request->v, 0,
++                       qemu_aio_complete, request);
+         break;
+     case BLKIF_OP_WRITE:
+     case BLKIF_OP_FLUSH_DISKCACHE:
+-        if (!ioreq->req.nr_segments) {
++        if (!request->req.nr_segments) {
+             break;
+         }
+ 
+-        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
+-        block_acct_start(blk_get_stats(dataplane->blk), &ioreq->acct,
+-                         ioreq->v.size,
+-                         ioreq->req.operation == BLKIF_OP_WRITE ?
++        qemu_iovec_add(&request->v, request->buf, request->size);
++        block_acct_start(blk_get_stats(dataplane->blk), &request->acct,
++                         request->v.size,
++                         request->req.operation == BLKIF_OP_WRITE ?
+                          BLOCK_ACCT_WRITE : BLOCK_ACCT_FLUSH);
+-        ioreq->aio_inflight++;
+-        blk_aio_pwritev(dataplane->blk, ioreq->start, &ioreq->v, 0,
+-                        qemu_aio_complete, ioreq);
++        request->aio_inflight++;
++        blk_aio_pwritev(dataplane->blk, request->start, &request->v, 0,
++                        qemu_aio_complete, request);
+         break;
+     case BLKIF_OP_DISCARD:
+     {
+-        struct blkif_request_discard *req = (void *)&ioreq->req;
+-        if (!blk_split_discard(ioreq, req->sector_number, req->nr_sectors)) {
++        struct blkif_request_discard *req = (void *)&request->req;
++        if (!blk_split_discard(request, req->sector_number, req->nr_sectors)) {
+             goto err;
+         }
+         break;
+@@ -405,19 +407,19 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+         goto err;
+     }
+ 
+-    qemu_aio_complete(ioreq, 0);
++    qemu_aio_complete(request, 0);
+ 
+     return 0;
+ 
+ err:
+-    ioreq_finish(ioreq);
+-    ioreq->status = BLKIF_RSP_ERROR;
++    ioreq_finish(request);
++    request->status = BLKIF_RSP_ERROR;
+     return -1;
+ }
+ 
+-static int blk_send_response_one(struct ioreq *ioreq)
++static int blk_send_response_one(XenBlockRequest *request)
+ {
+-    XenBlockDataPlane *dataplane = ioreq->dataplane;
++    XenBlockDataPlane *dataplane = request->dataplane;
+     int send_notify = 0;
+     int have_requests = 0;
+     blkif_response_t *resp;
+@@ -443,9 +445,9 @@ static int blk_send_response_one(struct ioreq *ioreq)
+         return 0;
+     }
+ 
+-    resp->id = ioreq->req.id;
+-    resp->operation = ioreq->req.operation;
+-    resp->status = ioreq->status;
++    resp->id = request->req.id;
++    resp->operation = request->req.operation;
++    resp->status = request->status;
+ 
+     dataplane->rings.common.rsp_prod_pvt++;
+ 
+@@ -473,13 +475,13 @@ static int blk_send_response_one(struct ioreq *ioreq)
+ /* walk finished list, send outstanding responses, free requests */
+ static void blk_send_response_all(XenBlockDataPlane *dataplane)
+ {
+-    struct ioreq *ioreq;
++    XenBlockRequest *request;
+     int send_notify = 0;
+ 
+     while (!QLIST_EMPTY(&dataplane->finished)) {
+-        ioreq = QLIST_FIRST(&dataplane->finished);
+-        send_notify += blk_send_response_one(ioreq);
+-        ioreq_release(ioreq, true);
++        request = QLIST_FIRST(&dataplane->finished);
++        send_notify += blk_send_response_one(request);
++        ioreq_release(request, true);
+     }
+     if (send_notify) {
+         Error *local_err = NULL;
+@@ -493,29 +495,29 @@ static void blk_send_response_all(XenBlockDataPlane *dataplane)
+     }
+ }
+ 
+-static int blk_get_request(XenBlockDataPlane *dataplane, struct ioreq *ioreq,
+-                           RING_IDX rc)
++static int blk_get_request(XenBlockDataPlane *dataplane,
++                           XenBlockRequest *request, RING_IDX rc)
+ {
+     switch (dataplane->protocol) {
+     case BLKIF_PROTOCOL_NATIVE: {
+         blkif_request_t *req =
+             RING_GET_REQUEST(&dataplane->rings.native, rc);
+ 
+-        memcpy(&ioreq->req, req, sizeof(ioreq->req));
++        memcpy(&request->req, req, sizeof(request->req));
+         break;
+     }
+     case BLKIF_PROTOCOL_X86_32: {
+         blkif_x86_32_request_t *req =
+             RING_GET_REQUEST(&dataplane->rings.x86_32_part, rc);
+ 
+-        blkif_get_x86_32_req(&ioreq->req, req);
++        blkif_get_x86_32_req(&request->req, req);
+         break;
+     }
+     case BLKIF_PROTOCOL_X86_64: {
+         blkif_x86_64_request_t *req =
+             RING_GET_REQUEST(&dataplane->rings.x86_64_part, rc);
+ 
+-        blkif_get_x86_64_req(&ioreq->req, req);
++        blkif_get_x86_64_req(&request->req, req);
+         break;
+     }
+     }
+@@ -527,7 +529,7 @@ static int blk_get_request(XenBlockDataPlane *dataplane, struct ioreq *ioreq,
+ static void blk_handle_requests(XenBlockDataPlane *dataplane)
+ {
+     RING_IDX rc, rp;
+-    struct ioreq *ioreq;
++    XenBlockRequest *request;
+ 
+     dataplane->more_work = 0;
+ 
+@@ -541,18 +543,18 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
+         if (RING_REQUEST_CONS_OVERFLOW(&dataplane->rings.common, rc)) {
+             break;
+         }
+-        ioreq = ioreq_start(dataplane);
+-        if (ioreq == NULL) {
++        request = ioreq_start(dataplane);
++        if (request == NULL) {
+             dataplane->more_work++;
+             break;
+         }
+-        blk_get_request(dataplane, ioreq, rc);
++        blk_get_request(dataplane, request, rc);
+         dataplane->rings.common.req_cons = ++rc;
+ 
+         /* parse them */
+-        if (ioreq_parse(ioreq) != 0) {
++        if (ioreq_parse(request) != 0) {
+ 
+-            switch (ioreq->req.operation) {
++            switch (request->req.operation) {
+             case BLKIF_OP_READ:
+                 block_acct_invalid(blk_get_stats(dataplane->blk),
+                                    BLOCK_ACCT_READ);
+@@ -568,7 +570,7 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
+                 break;
+             };
+ 
+-            if (blk_send_response_one(ioreq)) {
++            if (blk_send_response_one(request)) {
+                 Error *local_err = NULL;
+ 
+                 xen_device_notify_event_channel(dataplane->xendev,
+@@ -578,11 +580,11 @@ static void blk_handle_requests(XenBlockDataPlane *dataplane)
+                     error_report_err(local_err);
+                 }
+             }
+-            ioreq_release(ioreq, false);
++            ioreq_release(request, false);
+             continue;
+         }
+ 
+-        ioreq_runio_qemu_aio(ioreq);
++        ioreq_runio_qemu_aio(request);
+     }
+ 
+     if (dataplane->more_work &&
+@@ -636,17 +638,17 @@ XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
+ 
+ void xen_block_dataplane_destroy(XenBlockDataPlane *dataplane)
+ {
+-    struct ioreq *ioreq;
++    XenBlockRequest *request;
+ 
+     if (!dataplane) {
          return;
      }
-@@ -231,6 +372,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(bus);
-     unsigned int domid;
-+    Error *local_err = NULL;
  
-     trace_xen_bus_realize();
- 
-@@ -250,6 +392,18 @@ static void xen_bus_realize(BusState *bus, Error **errp)
-     notifier_list_init(&xenbus->watch_notifiers);
-     qemu_set_fd_handler(xs_fileno(xenbus->xsh), xen_bus_watch, NULL,
-                         xenbus);
-+
-+    module_call_init(MODULE_INIT_XEN_BACKEND);
-+
-+    xenbus->backend_watch =
-+        xen_bus_add_watch(xenbus, "", /* domain root node */
-+                          "backend", xen_bus_enumerate, xenbus, &local_err);
-+    if (local_err) {
-+        /* This need not be treated as a hard error so don't propagate */
-+        error_reportf_err(local_err,
-+                          "failed to set up enumeration watch: ");
-+    }
-+
-     return;
- 
- fail:
-@@ -407,7 +561,15 @@ static void xen_device_backend_changed(void *opaque)
-                 xendev->backend_state == XenbusStateInitialising ||
-                 xendev->backend_state == XenbusStateInitWait ||
-                 xendev->backend_state == XenbusStateUnknown)) {
--        object_unparent(OBJECT(xendev));
-+        Error *local_err = NULL;
-+
-+        if (!xen_backend_try_device_destroy(xendev, &local_err)) {
-+            object_unparent(OBJECT(xendev));
-+        }
-+
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
+     while (!QLIST_EMPTY(&dataplane->freelist)) {
+-        ioreq = QLIST_FIRST(&dataplane->freelist);
+-        QLIST_REMOVE(ioreq, list);
+-        qemu_iovec_destroy(&ioreq->v);
+-        g_free(ioreq);
++        request = QLIST_FIRST(&dataplane->freelist);
++        QLIST_REMOVE(request, list);
++        qemu_iovec_destroy(&request->v);
++        g_free(request);
      }
- }
  
-diff --git a/include/hw/xen/xen-backend.h b/include/hw/xen/xen-backend.h
-new file mode 100644
-index 0000000000..010d712638
---- /dev/null
-+++ b/include/hw/xen/xen-backend.h
-@@ -0,0 +1,39 @@
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_XEN_BACKEND_H
-+#define HW_XEN_BACKEND_H
-+
-+#include "hw/xen/xen-bus.h"
-+
-+typedef struct XenBackendInstance XenBackendInstance;
-+
-+typedef void (*XenBackendDeviceCreate)(XenBackendInstance *backend,
-+                                       QDict *opts, Error **errp);
-+typedef void (*XenBackendDeviceDestroy)(XenBackendInstance *backend,
-+                                        Error **errp);
-+
-+typedef struct XenBackendInfo {
-+    const char *type;
-+    XenBackendDeviceCreate create;
-+    XenBackendDeviceDestroy destroy;
-+} XenBackendInfo;
-+
-+XenBus *xen_backend_get_bus(XenBackendInstance *backend);
-+const char *xen_backend_get_name(XenBackendInstance *backend);
-+
-+void xen_backend_set_device(XenBackendInstance *backend,
-+                            XenDevice *xendevice);
-+XenDevice *xen_backend_get_device(XenBackendInstance *backend);
-+
-+void xen_backend_register(const XenBackendInfo *info);
-+
-+void xen_backend_device_create(XenBus *xenbus, const char *type,
-+                               const char *name, QDict *opts, Error **errp);
-+bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp);
-+
-+#endif /* HW_XEN_BACKEND_H */
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 0834cb3a7e..e55a5de5f1 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -65,6 +65,7 @@ typedef struct XenBus {
-     domid_t backend_id;
-     struct xs_handle *xsh;
-     NotifierList watch_notifiers;
-+    XenWatch *backend_watch;
- } XenBus;
- 
- typedef struct XenBusClass {
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 54300ab6e5..55dd2beea8 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -44,6 +44,7 @@ typedef enum {
-     MODULE_INIT_OPTS,
-     MODULE_INIT_QOM,
-     MODULE_INIT_TRACE,
-+    MODULE_INIT_XEN_BACKEND,
-     MODULE_INIT_MAX
- } module_init_type;
- 
-@@ -51,6 +52,8 @@ typedef enum {
- #define opts_init(function) module_init(function, MODULE_INIT_OPTS)
- #define type_init(function) module_init(function, MODULE_INIT_QOM)
- #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
-+#define xen_backend_init(function) module_init(function, \
-+                                               MODULE_INIT_XEN_BACKEND)
- 
- #define block_module_load_one(lib) module_load_one("block-", lib)
- #define ui_module_load_one(lib) module_load_one("ui-", lib)
+     qemu_bh_delete(dataplane->bh);
 -- 
 2.20.1.2.gb21ebb6
