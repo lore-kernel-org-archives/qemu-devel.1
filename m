@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46350)
+Received: from eggs.gnu.org ([209.51.188.92]:46388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoa-00050L-8a
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXob-000511-43
 	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoY-00024s-BB
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:48 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:56147)
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXoY-00024Q-5p
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:47 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:41386)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggXoX-0001w9-V9
+	id 1ggXoX-000216-S4
 	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:46 -0500
-Received: by mail-wm1-x331.google.com with SMTP id y139so1436454wmc.5
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:40 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id x10so1052510wrs.8
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:44 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	j14sm46039759wrv.96.2019.01.07.08.31.38 for <qemu-devel@nongnu.org>
+	j14sm46039759wrv.96.2019.01.07.08.31.42 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 07 Jan 2019 08:31:38 -0800 (PST)
+	Mon, 07 Jan 2019 08:31:42 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  7 Jan 2019 16:30:55 +0000
-Message-Id: <20190107163117.16269-16-peter.maydell@linaro.org>
+Date: Mon,  7 Jan 2019 16:30:59 +0000
+Message-Id: <20190107163117.16269-20-peter.maydell@linaro.org>
 In-Reply-To: <20190107163117.16269-1-peter.maydell@linaro.org>
 References: <20190107163117.16269-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/37] gdbstub: processes initialization on new
- peer connection
+Subject: [Qemu-devel] [PULL 19/37] Revert "armv7m: Guard against no -kernel
+ argument"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,75 +36,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Luc Michel <luc.michel@greensocs.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-When a new connection is established, we set the first process to be
-attached, and the others detached. The first CPU of the first process
-is selected as the current CPU.
+This reverts commit 01fd41ab3fb69971c24a69ed49cde96086d81278.
 
-Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20181207090135.7651-14-luc.michel@greensocs.com
+The generic loader device (-device loader,file=kernel.bin) can be used
+to load a kernel instead of the -kernel option.  Some boards have flash
+memory (pflash) that is set via the -pflash or -drive options.
+
+Allow starting QEMU without the -kernel option to accommodate these
+scenarios.
+
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20190103144124.18917-1-stefanha@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- gdbstub.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ hw/arm/armv7m.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index d80af955cea..432e7d2f7da 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2267,9 +2267,10 @@ static bool gdb_accept(void)
-     }
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 4bf9131b81e..f4446528307 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -285,11 +285,6 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
+     big_endian = 0;
+ #endif
  
-     s = g_malloc0(sizeof(GDBState));
--    s->c_cpu = first_cpu;
--    s->g_cpu = first_cpu;
-     create_default_process(s);
-+    s->processes[0].attached = true;
-+    s->c_cpu = gdb_first_attached_cpu(s);
-+    s->g_cpu = s->c_cpu;
-     s->fd = fd;
-     gdb_has_xml = false;
- 
-@@ -2355,8 +2356,19 @@ static void gdb_chr_receive(void *opaque, const uint8_t *buf, int size)
- 
- static void gdb_chr_event(void *opaque, int event)
- {
-+    int i;
-+    GDBState *s = (GDBState *) opaque;
-+
-     switch (event) {
-     case CHR_EVENT_OPENED:
-+        /* Start with first process attached, others detached */
-+        for (i = 0; i < s->process_num; i++) {
-+            s->processes[i].attached = !i;
-+        }
-+
-+        s->c_cpu = gdb_first_attached_cpu(s);
-+        s->g_cpu = s->c_cpu;
-+
-         vm_stop(RUN_STATE_PAUSED);
-         gdb_has_xml = false;
-         break;
-@@ -2546,15 +2558,13 @@ int gdbserver_start(const char *device)
-         memset(s, 0, sizeof(GDBState));
-         s->mon_chr = mon_chr;
-     }
--    s->c_cpu = first_cpu;
--    s->g_cpu = first_cpu;
- 
-     create_processes(s);
- 
-     if (chr) {
-         qemu_chr_fe_init(&s->chr, chr, &error_abort);
-         qemu_chr_fe_set_handlers(&s->chr, gdb_chr_can_receive, gdb_chr_receive,
--                                 gdb_chr_event, NULL, NULL, NULL, true);
-+                                 gdb_chr_event, NULL, s, NULL, true);
-     }
-     s->state = chr ? RS_IDLE : RS_INACTIVE;
-     s->mon_chr = mon_chr;
+-    if (!kernel_filename && !qtest_enabled()) {
+-        error_report("Guest image must be specified (using -kernel)");
+-        exit(1);
+-    }
+-
+     if (arm_feature(&cpu->env, ARM_FEATURE_EL3)) {
+         asidx = ARMASIdx_S;
+     } else {
 -- 
 2.19.2
