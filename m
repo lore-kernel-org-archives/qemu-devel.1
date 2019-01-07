@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49746)
+Received: from eggs.gnu.org ([209.51.188.92]:49970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggZ5Q-0004aw-M0
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:53:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1ggZ5i-0004kp-5f
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:53:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggZ31-0007QP-R7
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:50:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55408)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ggZ31-0007PQ-I1
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:50:47 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-13-fli@suse.com>
-Date: Mon, 07 Jan 2019 18:50:42 +0100
-In-Reply-To: <20181225140449.15786-13-fli@suse.com> (Fei Li's message of "Tue,
-	25 Dec 2018 22:04:45 +0800")
-Message-ID: <87h8ekl5l9.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1ggYyz-0003Ic-Ae
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:46:39 -0500
+References: <20190103094728.31747-1-rjones@redhat.com>
+	<20190103094728.31747-2-rjones@redhat.com>
+	<cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <741a5843-a47a-6a02-c378-b778f7ffe172@redhat.com>
+Date: Mon, 7 Jan 2019 11:46:28 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 12/16] qemu_thread: supplement
- error handling for iothread_complete/qemu_signalfd_compat
+In-Reply-To: <cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BHGGfrbhJ8Hiu7lkinaS8aUlKGfCfTDAq"
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: Reinitialize optind to 1 (not
+ 0) before parsing inner command.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,129 +26,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Fei Li <fli@suse.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BHGGfrbhJ8Hiu7lkinaS8aUlKGfCfTDAq
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <741a5843-a47a-6a02-c378-b778f7ffe172@redhat.com>
+Subject: Re: [PATCH v2] qemu-io: Reinitialize optind to 1 (not 0) before
+ parsing inner command.
+References: <20190103094728.31747-1-rjones@redhat.com>
+ <20190103094728.31747-2-rjones@redhat.com>
+ <cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
+In-Reply-To: <cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> For iothread_complete: utilize the existed errp to propagate the
-> error and do the corresponding cleanup to replace the temporary
-> &error_abort.
->
-> For qemu_signalfd_compat: add a local_err to hold the error, and
-> return the corresponding error code to replace the temporary
-> &error_abort.
+On 1/7/19 11:17 AM, Max Reitz wrote:
+> On 03.01.19 10:47, Richard W.M. Jones wrote:
+>> On FreeBSD 11.2:
+>>
+>>   $ nbdkit memory size=3D1M --run './qemu-io -f raw -c "aio_write 0 51=
+2" $nbd'
+>>   Parsing error: non-numeric argument, or extraneous/unrecognized suff=
+ix -- aio_write
+>>
+>> After main option parsing, we reinitialize optind so we can parse each=
 
-I'd split the patch.
+>> command.  However reinitializing optind to 0 does not work on FreeBSD.=
 
->
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Fei Li <fli@suse.com>
-> ---
->  iothread.c      | 17 +++++++++++------
->  util/compatfd.c | 11 ++++++++---
->  2 files changed, 19 insertions(+), 9 deletions(-)
->
-> diff --git a/iothread.c b/iothread.c
-> index 8e8aa01999..7335dacf0b 100644
-> --- a/iothread.c
-> +++ b/iothread.c
-> @@ -164,9 +164,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
->                                  &local_error);
->      if (local_error) {
->          error_propagate(errp, local_error);
-> -        aio_context_unref(iothread->ctx);
-> -        iothread->ctx = NULL;
-> -        return;
-> +        goto fail;
->      }
->  
->      qemu_mutex_init(&iothread->init_done_lock);
-> @@ -178,9 +176,12 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
->       */
->      name = object_get_canonical_path_component(OBJECT(obj));
->      thread_name = g_strdup_printf("IO %s", name);
-> -    /* TODO: let the further caller handle the error instead of abort() here */
-> -    qemu_thread_create(&iothread->thread, thread_name, iothread_run,
-> -                       iothread, QEMU_THREAD_JOINABLE, &error_abort);
-> +    if (!qemu_thread_create(&iothread->thread, thread_name, iothread_run,
-> +                            iothread, QEMU_THREAD_JOINABLE, errp)) {
-> +        g_free(thread_name);
-> +        g_free(name);
+>> What happens when you do this is optind remains 0 after the option
+>> parsing loop, and the result is we try to parse argv[optind] =3D=3D
+>> argv[0] =3D=3D "aio_write" as if it was the first parameter.
+>>
+>> The FreeBSD manual page says:
+>>
+>>   In order to use getopt() to evaluate multiple sets of arguments, or =
+to
+>>   evaluate a single set of arguments multiple times, the variable optr=
+eset
+>>   must be set to 1 before the second and each additional set of calls =
+to
+>>   getopt(), and the variable optind must be reinitialized.
+>=20
+> [...]
+>=20
+>> Note I didn't set optreset.  It's not present in glibc and the "hard
+>> reset" is not necessary in this context.
+>=20
+> But it sure sounds like FreeBSD requires you to set it, doesn't it?
 
-I suspect you're missing cleanup here:
+The reason BSD and glibc have a hard reset path is because of hidden
+state - both BSD and glibc track state that remembers if the options
+began with '+' or '-' (both of those are extensions beyond POSIX), and
+whether POSIXLY_CORRECT was set.  Beyond that hidden state is a corner
+case of one more piece of state that you can trigger using only POSIX:
+if the user passes './prog -ab' while you had code:
 
-           qemu_cond_destroy(&iothread->init_done_cond);
-           qemu_mutex_destroy(&iothread->init_done_lock);
+swich (getopt(argc, argv, "ab")) {
+  case 'a': optind =3D 1; ...
 
-But I'm not 100% sure, to be honest.  Stefan, can you help?
+then things fall apart for both BSD and glibc, because getopt() has to
+track invisible state in order to remember that the next call will
+process the -b portion of the merged short-option in argv[optind=3D=3D1]
+rather than repeating the -a half and before moving on to optind=3D=3D2.
+But this latter corner case can only happen when getopt() did not return =
+-1.
+
+At the end of the day, both GNU optind=3D0 and BSD optreset=3D1 are
+sufficient to force a hard reset of all hidden state.  But if you don't
+use POSIX extensions, and always run getopt() until a -1 return, then
+setting optind=3D1 is a portable soft reset, regardless of how the hidden=
+
+state is implemented, and regardless of how (or even if) libc offers a
+hard reset, even though POSIX itself is currently lacking that mention.
+(I should probably file a POSIX defect to get that wording listed in POSI=
+X)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-> +        goto fail;
-> +    }
->      g_free(thread_name);
->      g_free(name);
->  
+--BHGGfrbhJ8Hiu7lkinaS8aUlKGfCfTDAq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I'd avoid the code duplication like this:
+-----BEGIN PGP SIGNATURE-----
 
-       thread_ok = qemu_thread_create(&iothread->thread, thread_name,
-                                      iothread_run, iothread,
-                                      QEMU_THREAD_JOINABLE, errp);
-       g_free(thread_name);
-       g_free(name);
-       if (!thread_ok) {
-           qemu_cond_destroy(&iothread->init_done_cond);
-           qemu_mutex_destroy(&iothread->init_done_lock);
-           goto fail;
-       }
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwzkHQACgkQ3g5py3or
+ov0K/ggAjBHzgOUp4mFCHLbJsdg8eK1+pzL6nWFGMkkY0huH6zcivKsjEYkdIu+C
+qCITLumprEB3isV5jMtRBEcjRgaMydby/uvKPFlFgnlTx5w5xNfagnx6xgvgDEbm
+J/SySeXwJ+gdZ5sWLBsVldg9PCnAKFpIpem6f+AUcf/KIcTp4std1PN9vjUq234N
+Db743l7bCjduSWakZeQ96O5MRMln55WsK9+WIHK8OkI0tjaJk0wXHg6slnx7MePe
+BUKTu6AlpU5TTEslEts/9TuRJTs8oYs+BJsCSjtQRVF0QAwz/tzgQfAYTHfEo0na
+SiGeudi+EDWK1OvylGby7jx0jbUdtw==
+=e28r
+-----END PGP SIGNATURE-----
 
-Matter of taste.
-
-Hmm, iothread.c has no maintainer.  Stefan, you created it, would you be
-willing to serve as maintainer?
-
-> @@ -191,6 +192,10 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
->                         &iothread->init_done_lock);
->      }
->      qemu_mutex_unlock(&iothread->init_done_lock);
-> +    return;
-> +fail:
-> +    aio_context_unref(iothread->ctx);
-> +    iothread->ctx = NULL;
->  }
->  
->  typedef struct {
-> diff --git a/util/compatfd.c b/util/compatfd.c
-> index c3d8448264..9cb13381e4 100644
-> --- a/util/compatfd.c
-> +++ b/util/compatfd.c
-> @@ -71,6 +71,7 @@ static int qemu_signalfd_compat(const sigset_t *mask)
->      struct sigfd_compat_info *info;
->      QemuThread thread;
->      int fds[2];
-> +    Error *local_err = NULL;
->  
->      info = malloc(sizeof(*info));
->      if (info == NULL) {
-> @@ -89,9 +90,13 @@ static int qemu_signalfd_compat(const sigset_t *mask)
->      memcpy(&info->mask, mask, sizeof(*mask));
->      info->fd = fds[1];
->  
-> -    /* TODO: let the further caller handle the error instead of abort() here */
-> -    qemu_thread_create(&thread, "signalfd_compat", sigwait_compat,
-> -                       info, QEMU_THREAD_DETACHED, &error_abort);
-> +    if (!qemu_thread_create(&thread, "signalfd_compat", sigwait_compat,
-> +                            info, QEMU_THREAD_DETACHED, &local_err)) {
-> +        close(fds[0]);
-> +        close(fds[1]);
-> +        free(info);
-> +        return -1;
-
-Leaks @local_err.  Pass NULL instead.
-
-> +    }
->  
->      return fds[0];
->  }
+--BHGGfrbhJ8Hiu7lkinaS8aUlKGfCfTDAq--
