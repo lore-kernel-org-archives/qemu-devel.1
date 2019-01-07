@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54604)
+Received: from eggs.gnu.org ([209.51.188.92]:55462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ggUF9-0007nD-2j
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:43:00 -0500
+	(envelope-from <shirley17fei@gmail.com>) id 1ggUHD-0001LI-KR
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:45:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ggUF8-0008OG-33
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:42:59 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54156)
+	(envelope-from <shirley17fei@gmail.com>) id 1ggUHC-0003Sq-El
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:45:07 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:43175)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ggUF7-0008N7-RT
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:42:58 -0500
-Received: by mail-wm1-x344.google.com with SMTP id d15so751293wmb.3
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 04:42:57 -0800 (PST)
-References: <20181220111008.24954-1-alex.bennee@linaro.org>
-	<20181221193037.GB11197@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181221193037.GB11197@flamenco>
-Date: Mon, 07 Jan 2019 12:42:55 +0000
-Message-ID: <87k1jgvdtc.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <shirley17fei@gmail.com>)
+	id 1ggUHC-0003OM-8q
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:45:06 -0500
+Received: by mail-pf1-x443.google.com with SMTP id w73so98436pfk.10
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 04:45:05 -0800 (PST)
+References: <154643680857.9907.2563926974140301260@02a1dbf831e2>
+From: Fei Li <shirley17fei@gmail.com>
+Message-ID: <d38d46fb-67f0-bf39-2e13-6305e5e115a1@gmail.com>
+Date: Mon, 7 Jan 2019 20:44:01 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] fpu: add compile time check for old
- glibc/libm and fma
+In-Reply-To: <154643680857.9907.2563926974140301260@02a1dbf831e2>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 00/16] qemu_thread_create:
+ propagate the error to callers to handle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,102 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, laurent.desnogues@gmail.com, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org, fli@suse.com
+Cc: fam@euphon.net, lifei1214@126.com
+
+Hi all,
+
+Sorry for the mistakenly deleted " include "qapi/error.h" " for
+[PATCH for-4.0 v9 11/16] qemu_thread: supplement error handling for 
+emulated_realize,
+will add this #include back in next version.
 
 
-Emilio G. Cota <cota@braap.org> writes:
+Have a nice day, and again sorry for the trouble.
+Fei
 
-> On Thu, Dec 20, 2018 at 11:10:08 +0000, Alex Benn=C3=A9e wrote:
-> (snip)
->> +#if defined(__GLIBC__) && (__GLIBC__ =3D=3D 2 && __GLIBC_MINOR__ <=3D 1=
-2)
->> +#define QEMU_HARDFLOAT_USE_FMA 0
->> +#else
->> +#define QEMU_HARDFLOAT_USE_FMA 1
->> +#endif
->> +#else
->> +#define QEMU_HARDFLOAT_USE_FMA 1
->> +#endif
->> +
->>  /*
->>   * QEMU_HARDFLOAT_USE_ISINF chooses whether to use isinf() over
->>   * float{32,64}_is_infinity when !USE_FP.
->> @@ -1551,6 +1570,9 @@ float32_muladd(float32 xa, float32 xb, float32 xc,=
- int flags, float_status *s)
->>      ub.s =3D xb;
->>      uc.s =3D xc;
->>
->> +    if (!QEMU_HARDFLOAT_USE_FMA) {
->> +        goto soft;
->> +    }
+
+在 2019/1/2 下午9:46, no-reply@patchew.org 写道:
+> Patchew URL: https://patchew.org/QEMU/20181225140449.15786-1-fli@suse.com/
 >
-> I don't think this should be a compile-time check; if the QEMU binary
-> is run on a system with a newer, fixed glibc (or any other libc), then
-> we'll have disabled fma hardfloat unnecessarily.
 >
-> What do you think about the following?
 >
-> Laurent: if you want to test the below, you can pull it from
->    https://github.com/cota/qemu/tree/fma-fix
+> Hi,
 >
-> Thanks,
+> This series failed the docker-quick@centos7 build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
 >
-> 		Emilio
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> time make docker-test-quick@centos7 SHOW_ENV=1 J=8
+> === TEST SCRIPT END ===
+>
+> libpmem support   no
+> libudev           no
+>
+> WARNING: Use of SDL 1.2 is deprecated and will be removed in
+> WARNING: future releases. Please switch to using SDL 2.0
+>
+> NOTE: cross-compilers enabled:  'cc'
+>    GEN     x86_64-softmmu/config-devices.mak.tmp
 > ---
-> commit ddeec29a2c33550c5d018aeea05d45a23579ae1b
-> Author: Emilio G. Cota <cota@braap.org>
-> Date:   Fri Dec 21 14:08:57 2018 -0500
+>    CC      hw/usb/host-stub.o
+>    CC      hw/virtio/virtio-bus.o
+> /tmp/qemu-test/src/hw/usb/ccid-card-emulated.c: In function 'init_event_notifier':
+> /tmp/qemu-test/src/hw/usb/ccid-card-emulated.c:404:9: error: implicit declaration of function 'error_setg' [-Werror=implicit-function-declaration]
+>           error_setg(errp, "ccid-card-emul: event notifier creation failed");
+>           ^
+> /tmp/qemu-test/src/hw/usb/ccid-card-emulated.c:404:9: error: nested extern declaration of 'error_setg' [-Werror=nested-externs]
+> /tmp/qemu-test/src/hw/usb/ccid-card-emulated.c: In function 'emulated_realize':
+> /tmp/qemu-test/src/hw/usb/ccid-card-emulated.c:513:13: error: implicit declaration of function 'error_append_hint' [-Werror=implicit-function-declaration]
+>               error_append_hint(errp, "%s\n", ptable->name);
+>               ^
+> /tmp/qemu-test/src/hw/usb/ccid-card-emulated.c:513:13: error: nested extern declaration of 'error_append_hint' [-Werror=nested-externs]
+> /tmp/qemu-test/src/hw/usb/ccid-card-emulated.c: At top level:
+> cc1: error: unrecognized command line option "-Wno-format-truncation" [-Werror]
+> cc1: all warnings being treated as errors
+> make: *** [hw/usb/ccid-card-emulated.o] Error 1
+> make: *** Waiting for unfinished jobs....
 >
->     softfloat: enforce softfloat if the host's FMA is broken
 >
->     The added branch is marked as unlikely and therefore its impact
->     on performance (measured with fp-bench) is within the noise range
->     when measured on an Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz.
->
->     Laurent Desnogues <laurent.desnogues@gmail.com>
->     Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-I've applied b8cc3928cee7b1d91bf39c86bec4801b9dc612e1 from your tree to
-fpu/next although the numbers look a bit odd. I see:
-
-Before:
-  143.83 MFlops
-  89.34 MFlops
-
-After:
-  150.20 MFlops
-  85.73 MFlops
-
-On my i7-4770 where as your commit seems to show a big jump in
-performance which is odd as this is preventing a bug not enabling FMA.
-
-> +
-> +static void __attribute__((constructor)) softfloat_init(void)
-> +{
-> +    union_float64 ua, ub, uc, ur;
-> +
-> +    if (QEMU_NO_HARDFLOAT) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Test that the host's FMA is not obviously broken. For example,
-> +     * glibc < 2.23 can perform an incorrect FMA on certain hosts; see
-> +     *   https://sourceware.org/bugzilla/show_bug.cgi?id=3D13304
-> +     */
-> +    ua.s =3D 0x0020000000000001;
-> +    ub.s =3D 0x3ca0000000000000;
-> +    uc.s =3D 0x0020000000000000;
-> +    ur.h =3D fma(ua.h, ub.h, uc.h);
-> +    if (ur.s !=3D 0x0020000000000001) {
-> +        host_fma_is_broken =3D true;
-> +    }
-> +}
-
-I'm fine with the cpuid stuff at the bottom of softfloat for now. We can
-move it later if the other micro-architectures want to get in on the
-detecting features game.
-
---
-Alex Benn=C3=A9e
+> The full log is available at
+> http://patchew.org/logs/20181225140449.15786-1-fli@suse.com/testing.docker-quick@centos7/?type=message.
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
