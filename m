@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57132)
+Received: from eggs.gnu.org ([209.51.188.92]:57699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fangying1@huawei.com>) id 1ggJfY-0003DL-Bc
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 20:25:33 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ggLfP-00071A-2H
+	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 22:33:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fangying1@huawei.com>) id 1ggJfT-0001pb-BS
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 20:25:30 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58148 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fangying1@huawei.com>)
-	id 1ggJfL-0001h0-0R
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 20:25:22 -0500
-From: Ying Fang <fangying1@huawei.com>
-References: <9af4a3f8-3095-61dc-77fa-17a877e48a02@huawei.com>
-Message-ID: <7bdf5dd6-392f-4046-7a43-b39376529d08@huawei.com>
-Date: Mon, 7 Jan 2019 09:23:54 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1ggLfN-0003CO-8Z
+	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 22:33:30 -0500
+Date: Mon, 7 Jan 2019 11:42:28 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190107004228.GD13339@umbus.fritz.box>
+References: <20190104133050.7468-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <9af4a3f8-3095-61dc-77fa-17a877e48a02@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] Questions on the I/O performance of emulated
- host cdrom device
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="u65IjBhB3TIa72Vp"
+Content-Disposition: inline
+In-Reply-To: <20190104133050.7468-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2] spapr: return from post_load method
+ when RTC import fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mreitz@redhat.com, kwolf@redhat.com
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, jianjay.zhou@huawei.com, dengkai1@huawei.com
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-ping
 
-On 2018/12/29 14:33, Ying Fang wrote:
-> Hi.
-> Recently one of our customer complained about the I/O performance of QEMU emulated host cdrom device.
-> I did some investigation on it and there was still some point I could not figure out. So I had to ask for your help.
-> 
-> Here is the application scenario setup by our customer.
-> filename.iso        /dev/sr0           /dev/cdrom
-> remote client    -->  host(cdemu)      -->  Linux VM
-> (1)A remote client maps an iso file to x86 host machine through network using tcp.
-> (2)The cdemu daemon then load it as a local virtual cdrom disk drive.
-> (3)A VM is launched with the virtual cdrom disk drive configured.
-> The VM can make use of this virtual cdrom to install an OS in the iso file.
-> 
-> The network bandwith btw the remote client and host is 100Mbps, we test I/O perf using: dd if=/dev/sr0 of=/dev/null bs=32K count=100000.
-> And we have
-> (1) I/O perf of host side /dev/sr0 is 11MB/s;
-> (2) I/O perf of /dev/cdrom inside VM is 3.8MB/s.
-> 
-> As we can see, I/O perf of cdrom inside the VM is about 34.5% compared with host side.
-> FlameGraph is used to find out the bottleneck of this operation and we find out that too much time is occupied by calling *bdrv_is_inserted*.
-> Then we dig into the code and figure out that the ioctl in *cdrom_is_inserted* takes too much time, because it triggers io_schdule_timeout in kernel.
-> In the code path of emulated cdrom device, each DMA I/O request consists of several *bdrv_is_inserted*, which degrades the I/O performance by about 31% in our test.
-> static bool cdrom_is_inserted(BlockDriverState *bs)
-> {
->     BDRVRawState *s = bs->opaque;
->     int ret;
-> 
->     ret = ioctl(s->fd, CDROM_DRIVE_STATUS, CDSL_CURRENT);
->     return ret == CDS_DISC_OK;
-> }
-> A flamegraph svg file (cdrom.svg) is attachieved in this email to show the code timing profile we've tested.
-> 
-> So here is my question.
-> (1) Why do we regularly check the presence of a cdrom disk drive in the code path?  Can we do it asynchronously?
-> (2) Can we drop some check point in the code path to improve the performance?
-> Thanks.
-> 
+--u65IjBhB3TIa72Vp
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 04, 2019 at 02:30:50PM +0100, C=E9dric Le Goater wrote:
+> The error value can be squashed by the section handling radix migration.
+> Simply bail out if an error occurs when the RTC offset is imported.
+>=20
+> This fixes the Coverity issue CID 1398591.
+>=20
+> Fixes: d39c90f5f3ae ("spapr: Fix migration of Radix guests")
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Applied to ppc-for-4.0, thanks.
+
+> ---
+>=20
+>  Changes since v1 :
+>=20
+>  - Added Coverity issue CID
+>=20
+>  hw/ppc/spapr.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f1725313e979..64397ee91ef0 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1748,12 +1748,17 @@ static int spapr_post_load(void *opaque, int vers=
+ion_id)
+>          return err;
+>      }
+> =20
+> -    /* In earlier versions, there was no separate qdev for the PAPR
+> +    /*
+> +     * In earlier versions, there was no separate qdev for the PAPR
+>       * RTC, so the RTC offset was stored directly in sPAPREnvironment.
+>       * So when migrating from those versions, poke the incoming offset
+> -     * value into the RTC device */
+> +     * value into the RTC device
+> +     */
+>      if (version_id < 3) {
+>          err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
+> +        if (err) {
+> +            return err;
+> +        }
+>      }
+> =20
+>      if (kvm_enabled() && spapr->patb_entry) {
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--u65IjBhB3TIa72Vp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwyoHQACgkQbDjKyiDZ
+s5LYBA/+Jmr0VAQL4A+mBUeLwHDQLttJYF3MSmBaBIGKWikqT3A+YEkUSe3mRTQ1
+Pexq0l8TT0uJxQJ9sQsGPh5lj6VHrN1TDPJrLuxEMC1swmkOyzHGSMMClWoWSjpb
+E2F+XQj8u4bZdTMJxUjoX5AJfSRkQ6Rt14EX3oOQAewhPddWR9sO3mVhnibnvid2
+JXjaQeEPvwAlYgLdydCSQbC6DWLv2LtwZvcVnUvyWUDeD64TkjQhItdo5uIalDtV
+/hbJq+NHPhLrKOmooY/CcSVERKJ5525Dz6kePRxJxXh/rbMOWlsw9K41NiVhE1i2
+ssWrqisfO/DBJq+15zrigHUUzZXVZOpe3yFWXSTrWW03bd6wD/+76vJ0h+s8Ra4F
+7hM4/nlPU7ylhCfw+SnYLEnId9Zh2Tm2OI6zioo6RUF3XcA64hnMD6zNvhDwlBym
+AhGTMiIKdATuYzxIXQ5L/QofQe9BZhxEu9NBNjIrotNwo7VSvQHyeUvEOFUnS8tC
+yuULOPqTnfSocywD6cIjimAHzS1C2hT3ISWD/SIOSLh+vcgQJctVgftaXLTVRSzK
+I8TcLdcSxLJ3tCrjo8bkTWR9Sq5e/V9ni2CP+zmFlbsvwHkZWDxKdcUT4w6FH/pd
+qnZ7oNMrAxar7oMU7kgznf1WBbubh9W5uUoO6cnbWIrS9sdNKBQ=
+=ulzS
+-----END PGP SIGNATURE-----
+
+--u65IjBhB3TIa72Vp--
