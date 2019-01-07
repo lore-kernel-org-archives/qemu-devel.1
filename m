@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52414)
+Received: from eggs.gnu.org ([209.51.188.92]:49789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggZ7p-0007MB-AG
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:55:46 -0500
+	(envelope-from <jonathan.davies@nutanix.com>) id 1ggZ5F-0004dZ-2i
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:53:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggZ7k-0003NW-U1
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:55:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37066)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ggZ7k-0003NA-MP
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:55:40 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-17-fli@suse.com>
-Date: Mon, 07 Jan 2019 18:55:37 +0100
-In-Reply-To: <20181225140449.15786-17-fli@suse.com> (Fei Li's message of "Tue,
-	25 Dec 2018 22:04:49 +0800")
-Message-ID: <874lakl5d2.fsf@dusky.pond.sub.org>
+	(envelope-from <jonathan.davies@nutanix.com>) id 1ggZ49-00008N-2U
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:51:59 -0500
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:40660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jonathan.davies@nutanix.com>)
+	id 1ggZ47-0008Tf-JJ
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:51:56 -0500
+From: Jonathan Davies <jonathan.davies@nutanix.com>
+Date: Mon, 7 Jan 2019 17:51:40 +0000
+Message-ID: <20190107175117.23769-1-jonathan.davies@nutanix.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 16/16] qemu_thread_join: fix
- segmentation fault
+Subject: [Qemu-devel] [PATCH] usb: drop unnecessary usb_device_post_load
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com, Stefan Weil <sw@weilnetz.de>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Jonathan Davies <jonathan.davies@nutanix.com>, =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Fei Li <fli@suse.com> writes:
-
-> To avoid the segmentation fault in qemu_thread_join(), just directly
-> return when the QemuThread *thread failed to be created in either
-> qemu-thread-posix.c or qemu-thread-win32.c.
->
-> Cc: Stefan Weil <sw@weilnetz.de>
-> Signed-off-by: Fei Li <fli@suse.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> ---
->  util/qemu-thread-posix.c | 3 +++
->  util/qemu-thread-win32.c | 2 +-
->  2 files changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-> index 39834b0551..3548935dac 100644
-> --- a/util/qemu-thread-posix.c
-> +++ b/util/qemu-thread-posix.c
-> @@ -571,6 +571,9 @@ void *qemu_thread_join(QemuThread *thread)
->      int err;
->      void *ret;
->  
-> +    if (!thread->thread) {
-> +        return NULL;
-> +    }
-
-How can this happen?
-
->      err = pthread_join(thread->thread, &ret);
->      if (err) {
->          error_exit(err, __func__);
-> diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-> index 57b1143e97..ca4d5329e3 100644
-> --- a/util/qemu-thread-win32.c
-> +++ b/util/qemu-thread-win32.c
-> @@ -367,7 +367,7 @@ void *qemu_thread_join(QemuThread *thread)
->      HANDLE handle;
->  
->      data = thread->data;
-> -    if (data->mode == QEMU_THREAD_DETACHED) {
-> +    if (data == NULL || data->mode == QEMU_THREAD_DETACHED) {
->          return NULL;
->      }
+SW4gdXNiX2RldmljZV9wb3N0X2xvYWQsIGNlcnRhaW4gdmFsdWVzIG9mIGRldi0+c2V0dXBfbGVu
+IG9yDQpkZXYtPnNldHVwX2luZGV4IGNhbiBjYXVzZSAtRUlOVkFMIHRvIGJlIHJldHVybmVkLiBP
+bmUgZXhhbXBsZSBpcyB3aGVuDQpzZXR1cF9sZW4gZXhjZWVkcyA0MDk2LCB0aGUgaGFyZC1jb2Rl
+ZCB2YWx1ZSBvZiBzaXplb2YoZGV2LT5kYXRhX2J1ZikuDQpUaGlzIGNhbiBoYXBwZW4gdGhyb3Vn
+aCBsZWdpdGltYXRlIGd1ZXN0IGFjdGl2aXR5IGFuZCB3aWxsIGNhdXNlIGFsbA0Kc3Vic2VxdWVu
+dCBhdHRlbXB0cyB0byBtaWdyYXRlIHRoZSBndWVzdCB0byBmYWlsIGluIHZtc3RhdGVfbG9hZF9z
+dGF0ZS4NCg0KVGhlIHZhbHVlcyBvZiB0aGVzZSB2YXJpYWJsZXMgY2FuIGJlIHNldCBieSBVU0Ig
+cGFja2V0cyBvcmlnaW5hdGluZyBpbg0KdGhlIGd1ZXN0LiBUaGVyZSBhcmUgdHdvIHdheXMgaW4g
+d2hpY2ggdGhleSBjYW4gYmUgc2V0OiBpbg0KZG9fdG9rZW5fc2V0dXAgYW5kIGluIGRvX3BhcmFt
+ZXRlciBpbiBody91c2IvY29yZS5jLg0KDQpJdCBpcyBlYXN5IHRvIGNyYWZ0IGEgVVNCIHBhY2tl
+dCBpbiBhIGd1ZXN0IHRoYXQgY2F1c2VzIGRvX3Rva2VuX3NldHVwDQp0byBzZXQgc2V0dXBfbGVu
+IHRvIGEgdmFsdWUgbGFyZ2VyIHRoYW4gNDA5Ni4gV2hlbiB0aGlzIGhhcyBiZWVuIGRvbmUNCm9u
+Y2UsIGFsbCBzdWJzZXF1ZW50IGF0dGVtcHRzIHRvIG1pZ3JhdGUgdGhlIFZNIHdpbGwgZmFpbCBp
+bg0KdXNiX2RldmljZV9wb3N0X2xvYWQgdW50aWwgdGhlIFZNIGlzIG5leHQgcG93ZXItY3ljbGVk
+IG9yIGENCnNtYWxsZXItc2l6ZWQgVVNCIHBhY2tldCBpcyBzZW50IHRvIHRoZSBkZXZpY2UuDQoN
+ClNhbXBsZSBjb2RlIGZvciBhY2hpZXZpbmcgdGhpcyBpbiBhIFZNIHN0YXJ0ZWQgd2l0aCAiLWRl
+dmljZSB1c2ItdGFibGV0Ig0KcnVubmluZyBMaW51eCB3aXRoIENPTkZJR19ISURSQVc9eSBhbmQg
+SElEX01BWF9CVUZGRVJfU0laRSA+IDQwOTY6DQoNCiAgI2luY2x1ZGUgPHN5cy90eXBlcy5oPg0K
+ICAjaW5jbHVkZSA8c3lzL3N0YXQuaD4NCiAgI2luY2x1ZGUgPGZjbnRsLmg+DQogICNpbmNsdWRl
+IDx1bmlzdGQuaD4NCg0KICBpbnQgbWFpbigpIHsNCiAgICAgICAgICAgY2hhciBidWZbNDA5N107
+DQogICAgICAgICAgIGludCBmZCA9IG9wZW4oIi9kZXYvaGlkcmF3MCIsIE9fUkRXUnxPX05PTkJM
+T0NLKTsNCg0KICAgICAgICAgICBidWZbMF0gPSAweDE7DQogICAgICAgICAgIHdyaXRlKGZkLCBi
+dWYsIDQwOTcpOw0KDQogICAgICAgICAgIHJldHVybiAwOw0KICB9DQoNCldoZW4gdGhpcyBjb2Rl
+IGlzIHJ1biBpbiB0aGUgVk0sIHFlbXUgd2lsbCBvdXRwdXQ6DQoNCiAgdXNiX2dlbmVyaWNfaGFu
+ZGxlX3BhY2tldDogY3RybCBidWZmZXIgdG9vIHNtYWxsICg0MDk3ID4gNDA5NikNCg0KQSBzdWJz
+ZXF1ZW50IGF0dGVtcHQgdG8gbWlncmF0ZSB0aGUgVk0gd2lsbCBmYWlsIGFuZCBvdXRwdXQgdGhl
+DQpmb2xsb3dpbmcgb24gdGhlIGRlc3RpbmF0aW9uIGhvc3Q6DQoNCiAgcWVtdS1rdm06IGVycm9y
+IHdoaWxlIGxvYWRpbmcgc3RhdGUgZm9yIGluc3RhbmNlIDB4MCBvZiBkZXZpY2UgJzAwMDA6MDA6
+MDYuNy8xL3VzYi1wdHInDQogIHFlbXUta3ZtOiBsb2FkIG9mIG1pZ3JhdGlvbiBmYWlsZWQ6IElu
+dmFsaWQgYXJndW1lbnQNCg0KVGhlIGlkZWEgYmVoaW5kIGNoZWNraW5nIHRoZSB2YWx1ZXMgb2Yg
+c2V0dXBfbGVuIGFuZCBzZXR1cF9pbmRleCBiZWZvcmUNCnRoZXkgYXJlIHVzZWQgaXMgY29ycmVj
+dCwgYnV0IGRvaW5nIGl0IGluIHVzYl9kZXZpY2VfcG9zdF9sb2FkIGZlZWxzDQphcmJpdHJhcnks
+IGFuZCB3aWxsIGNhdXNlIHVubmVjZXNzYXJ5IG1pZ3JhdGlvbiBmYWlsdXJlcy4gSW5kZWVkLCBu
+b25lDQpvZiB0aGUgY29tbWl0IG1lc3NhZ2VzIGZvciBjNjAxNzRlOCwgOWY4ZTk4OTUgYW5kIDcx
+OWZmZTFmIGp1c3RpZnkgd2h5DQpwb3N0X2xvYWQgaXMgdGhlIHJpZ2h0IHBsYWNlIHRvIGRvIHRo
+ZXNlIGNoZWNrcy4gVGhleSBjb3JyZWN0bHkgcG9pbnQNCm91dCB0aGF0IHRoZSBpbXBvcnRhbnQg
+dGhpbmcgdG8gcHJvdGVjdCBpcyB0aGUgdXNiX3BhY2tldF9jb3B5Lg0KDQpJbnN0ZWFkLCB0aGUg
+cmlnaHQgcGxhY2UgdG8gZG8gdGhlIGNoZWNrcyBpcyBpbiBkb190b2tlbl9zZXR1cCBhbmQNCmRv
+X3BhcmFtZXRlci4gSW5kZWVkLCB0aGVyZSBhcmUgYWxyZWFkeSBzb21lIGNoZWNrcyBoZXJlLiBX
+ZSBjYW4gZXhhbWluZQ0KZWFjaCBvZiB0aGUgZGlzanVuY3RzIGN1cnJlbnRseSB0ZXN0ZWQgaW4g
+dXNiX2RldmljZV9wb3N0X2xvYWQgdG8gc2VlDQp3aGV0aGVyIGFueSBuZWVkIGFkZGluZyB0byBk
+b190b2tlbl9zZXR1cCBvciBkb19wYXJhbWV0ZXIgdG8gaW1wcm92ZQ0Kc2FmZXR5IHRoZXJlOg0K
+DQogICogZGV2LT5zZXR1cF9pbmRleCA8IDANCiAgICAgLSBUaGlzIHRlc3QgaXMgbm90IG5lZWRl
+ZCBiZWNhdXNlIHNldHVwX2luZGV4IGlzIGV4cGxpY2l0bHkgc2V0IHRvDQowIGluIGRvX3Rva2Vu
+X3NldHVwIGFuZCBkb19wYXJhbWV0ZXIuDQoNCiAgKiBkZXYtPnNldHVwX2xlbiA8IDANCiAgICAg
+LSBJbiBib3RoIGRvX3Rva2VuX3NldHVwIGFuZCBkb19wYXJhbWV0ZXIsIHRoZSB2YWx1ZSBvZiBz
+ZXR1cF9sZW4NCmlzIGNvbXB1dGVkIGJ5IChzLT5zZXR1cF9idWZbN10gPDwgOCkgfCBzLT5zZXR1
+cF9idWZbNl0uIFNpbmNlDQpzLT5zZXR1cF9idWYgaXMgYSBieXRlIGFycmF5IGFuZCBzZXR1cF9s
+ZW4gaXMgYW4gaW50MzJfdCwgaXQncw0KaW1wb3NzaWJsZSBmb3IgdGhpcyBhcml0aG1ldGljIHRv
+IHNldCBzZXR1cF9sZW4ncyB0b3AgYml0LCBzbyBpdCBjYW4NCm5ldmVyIGJlIG5lZ2F0aXZlLg0K
+DQogICogZGV2LT5zZXR1cF9pbmRleCA+IGRldi0+c2V0dXBfbGVuDQogICAgIC0gU2luY2Ugc2V0
+dXBfaW5kZXggaXMgMCwgdGhpcyBpcyBlcXVpdmFsZW50IHRvIHRoZSBwcmV2aW91cyB0ZXN0LA0K
+c28gaXMgcmVkdW5kYW50Lg0KDQogICogZGV2LT5zZXR1cF9sZW4gPiBzaXplb2YoZGV2LT5kYXRh
+X2J1ZikNCiAgICAgLSBUaGlzIGNvbmRpdGlvbiBpcyBhbHJlYWR5IGV4cGxpY2l0bHkgY2hlY2tl
+ZCBpbiBib3RoDQpkb190b2tlbl9zZXR1cCBhbmQgZG9fcGFyYW1ldGVyLg0KDQpIZW5jZSB0aGVy
+ZSBpcyBubyBuZWVkIHRvIGJvbHN0ZXIgdGhlIGV4aXN0aW5nIGNoZWNrcyBpbiBkb190b2tlbl9z
+ZXR1cA0Kb3IgZG9fcGFyYW1ldGVyLCBhbmQgd2UgY2FuIHNhZmVseSByZW1vdmUgdGhlc2UgY2hl
+Y2tzIGZyb20NCnVzYl9kZXZpY2VfcG9zdF9sb2FkIHdpdGhvdXQgcmVkdWNpbmcgc2FmZXR5IGJ1
+dCBhbGxvd2luZyBtaWdyYXRpb25zIHRvDQpwcm9jZWVkIHJlZ2FyZGxlc3Mgb2Ygd2hhdCBVU0Ig
+cGFja2V0cyBoYXZlIGJlZW4gZ2VuZXJhdGVkIGJ5IHRoZSBndWVzdC4NCg0KU2lnbmVkLW9mZi1i
+eTogSm9uYXRoYW4gRGF2aWVzIDxqb25hdGhhbi5kYXZpZXNAbnV0YW5peC5jb20+DQotLS0NCiBo
+dy91c2IvYnVzLmMgfCA2IC0tLS0tLQ0KIDEgZmlsZSBjaGFuZ2VkLCA2IGRlbGV0aW9ucygtKQ0K
+DQpkaWZmIC0tZ2l0IGEvaHcvdXNiL2J1cy5jIGIvaHcvdXNiL2J1cy5jDQppbmRleCBiZjc5NmQ2
+N2U2Li42ZmZmYWI3YmZhIDEwMDY0NA0KLS0tIGEvaHcvdXNiL2J1cy5jDQorKysgYi9ody91c2Iv
+YnVzLmMNCkBAIC01OSwxMiArNTksNiBAQCBzdGF0aWMgaW50IHVzYl9kZXZpY2VfcG9zdF9sb2Fk
+KHZvaWQgKm9wYXF1ZSwgaW50IHZlcnNpb25faWQpDQogICAgIH0gZWxzZSB7DQogICAgICAgICBk
+ZXYtPmF0dGFjaGVkID0gdHJ1ZTsNCiAgICAgfQ0KLSAgICBpZiAoZGV2LT5zZXR1cF9pbmRleCA8
+IDAgfHwNCi0gICAgICAgIGRldi0+c2V0dXBfbGVuIDwgMCB8fA0KLSAgICAgICAgZGV2LT5zZXR1
+cF9pbmRleCA+IGRldi0+c2V0dXBfbGVuIHx8DQotICAgICAgICBkZXYtPnNldHVwX2xlbiA+IHNp
+emVvZihkZXYtPmRhdGFfYnVmKSkgew0KLSAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQotICAgIH0N
+CiAgICAgcmV0dXJuIDA7DQogfQ0KIA0KLS0gDQoyLjE3LjENCg0K
