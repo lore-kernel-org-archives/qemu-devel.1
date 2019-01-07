@@ -1,49 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60521)
+Received: from eggs.gnu.org ([209.51.188.92]:49938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1ggLoE-0004W4-1x
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 22:42:38 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ggMnX-0006R8-2x
+	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 23:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1ggLoD-0007Fu-4l
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 22:42:38 -0500
-Received: from outprodmail02.cc.columbia.edu ([128.59.72.51]:44376)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1ggLoD-0007BJ-0U
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 22:42:37 -0500
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	x073gEQG054672
-	for <qemu-devel@nongnu.org>; Sun, 6 Jan 2019 22:42:30 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id C49367E
-	for <qemu-devel@nongnu.org>; Sun,  6 Jan 2019 22:42:30 -0500 (EST)
-Received: from sendprodmail01.cc.columbia.edu (sendprodmail01.cc.columbia.edu
-	[128.59.72.13]) by hazelnut (Postfix) with ESMTP id A531980
-	for <qemu-devel@nongnu.org>; Sun,  6 Jan 2019 22:42:30 -0500 (EST)
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
-	[209.85.208.71])
-	by sendprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	x073gT3h064898
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 6 Jan 2019 22:42:30 -0500
-Received: by mail-ed1-f71.google.com with SMTP id o21so37345088edq.4
-	for <qemu-devel@nongnu.org>; Sun, 06 Jan 2019 19:42:30 -0800 (PST)
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com.
-	[209.85.128.49]) by smtp.gmail.com with ESMTPSA id
-	k20sm30497658eda.71.2019.01.06.19.42.27 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Sun, 06 Jan 2019 19:42:28 -0800 (PST)
-Received: by mail-wm1-f49.google.com with SMTP id y139so5820486wmc.5
-	for <qemu-devel@nongnu.org>; Sun, 06 Jan 2019 19:42:27 -0800 (PST)
+	(envelope-from <dgibson@ozlabs.org>) id 1ggMnW-0000Gi-1I
+	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 23:45:59 -0500
+Date: Mon, 7 Jan 2019 15:29:43 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190107042943.GE13339@umbus.fritz.box>
+References: <20190102055743.5052-1-clg@kaod.org>
+	<20190102055743.5052-9-clg@kaod.org>
+	<20190103043340.GT10853@umbus.fritz.box>
+	<f21712f9-0b67-cbe2-fa5c-7207dd9321be@kaod.org>
 MIME-Version: 1.0
-References: <CAHyh4xhv5ZDfZv842U=adQN7hQFr=16BKEgZcEUZOLjFo3P+Jw@mail.gmail.com>
-	<CAFEAcA_GCPp7ga7OGkZQopOSY_u+mwJ=vve5a9a4uU217butcA@mail.gmail.com>
-In-Reply-To: <CAFEAcA_GCPp7ga7OGkZQopOSY_u+mwJ=vve5a9a4uU217butcA@mail.gmail.com>
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Sun, 6 Jan 2019 22:42:16 -0500
-Message-ID: <CAHyh4xgs0vYN8=CbmedMTbnK4cp4GR1Kmj=Z9QUwqHq3F0o+Eg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Why one virtio-pci device has two different
- DeviceState?
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dFWYt1i2NyOo1oI9"
+Content-Disposition: inline
+In-Reply-To: <f21712f9-0b67-cbe2-fa5c-7207dd9321be@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 08/10] ppc/xics: allow ICSState to have an
+ offset 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,59 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Sat, Jan 5, 2019 at 10:42 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Fri, 4 Jan 2019 at 20:23, Jintack Lim <jintack@cs.columbia.edu> wrote:
-> > I was wondering why one virtio-pci device has two different
-> > DeviceState? - one directly from VirtIOPCIProxy and the other from
-> > VirtIO<dev type> such as VirtIONet. As an example, they are denoted as
-> > qdev and vdev respectively in virtio_net_pci_realize().
->
-> It's been a while since I looked at this, but there are two
-> basic issues underlying the weird way virtio devices are
-> set up:
->  (1) PCI is not the only "transport" -- the VirtIONet etc
->      are shared with other transports like MMIO or the S390 ones
->  (2) retaining back-compatibility matters a lot here: we need
->      command lines to still work, and also the migration data
->      stream needs to stay compatible
-> Some of the way the devices are reflects the way we started
-> with a design where there was only a single device (eg the
-> pci virtio-net device) and then refactored it to support
-> multiple transports while retaining back compatibility.
 
-Thanks for the insight, Peter. That make sense!!
+--dFWYt1i2NyOo1oI9
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Jintack
+On Thu, Jan 03, 2019 at 06:45:25PM +0100, C=E9dric Le Goater wrote:
+> On 1/3/19 5:33 AM, David Gibson wrote:
+> > On Wed, Jan 02, 2019 at 06:57:41AM +0100, C=E9dric Le Goater wrote:
+> >> commit 15ed653fa49a ("ppc/xics: An ICS with offset 0 is assumed to be
+> >> uninitialized") introduced an extra check on the ICS offset which is
+> >> not strictly necessary.
+> >=20
+> > The commit message for that suggests it was added to make pnv easier.
+> > I take it you no longer need this for the current or expected pnv
+> > code?
+>=20
+> This is really just a runtime check which makes sure that the=20
+> ICSState offset is initialized by the FW before being used.
+>=20
+> The problem is more global. It comes from the fact the ICSState=20
+> offset in QEMU and the XICS offset in KVM is hardcoded to 0x1000.=20
+>=20
+>   Thinking aloud :
+>=20
+>     May be we should default the offset to 0 and introduce a service=20
+>     to set the value in QEMU and KVM.  =20
+>=20
+> The 'dual' interrupt mode (using the qirq array at the machine level)=20
+> needs the IRQ number space of the XIVE and XICS interrupt mode to
+> be in sync, that is to start a 0x0, even if the lower 4K are ignored
+> in XICS.  =20
+>=20
+> So the 'dual' mode tunes the offset to 0 once the ICSState is created
+> and ignores the lower 4K when initializing the KVM XICS device.
 
->
-> > I thought that just one DeviceState is enough for any device in QEMU.
-> > Maybe I'm missing something fundamental here.
->
-> This isn't generally true, it's just that a lot of
-> our devices are of the simple straightforward kind
-> where that's true. It's also possible for an
-> implementation of a device to be as a combination
-> of other devices, which is what we have here.
-> virtio-pci-net is-a PCIDevice (which in turn is-a Device),
-> but it has-a VirtIONet device (which is-a Device) as
-> part of its implementation.
-> (It's also possible to manually create the pci
-> transport and the virtio-net backend separately
-> and connect them together without the virtio-pci-net
-> device at all. That's more often used with non-pci
-> transports but it works for pci too.)
->
-> You can also see a similar thing with a lot of the
-> "container" SoC objects like TYPE_ASPEED_SOC, which
-> is a subclass of DeviceState, but is implemented
-> using a dozen different objects all of which are
-> themselves DeviceState subclasses.
->
-> thanks
-> -- PMM
->
+Hm, ok.
+
+I've applied patches 5..8.
+
+>=20
+> C.
+>=20
+> >> Revert the change to be able to map the XICS IRQ number space on the
+> >> XIVE IRQ number space.
+> >=20
+> >=20
+> >=20
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  include/hw/ppc/xics.h | 3 +--
+> >>  1 file changed, 1 insertion(+), 2 deletions(-)
+> >>
+> >> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> >> index 7668c381a887..07508cbd217e 100644
+> >> --- a/include/hw/ppc/xics.h
+> >> +++ b/include/hw/ppc/xics.h
+> >> @@ -139,8 +139,7 @@ struct ICSState {
+> >> =20
+> >>  static inline bool ics_valid_irq(ICSState *ics, uint32_t nr)
+> >>  {
+> >> -    return (ics->offset !=3D 0) && (nr >=3D ics->offset)
+> >> -        && (nr < (ics->offset + ics->nr_irqs));
+> >> +    return (nr >=3D ics->offset) && (nr < (ics->offset + ics->nr_irqs=
+));
+> >>  }
+> >> =20
+> >>  struct ICSIRQState {
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--dFWYt1i2NyOo1oI9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwy1bMACgkQbDjKyiDZ
+s5LJfxAAnTLQkfeQWVd38mHAAWFEvQs+G1rCoN454juPmCvdGT/yejN2j4H31/94
+Uww+oi58aOOct3XxWV7z7zc0EuAOvS3SMsYPAsVQuwQ4/Xk4VQFc353rOnUhC80O
+ITtmbLMoh994cAORT5+WDkAPUcHolSE3TW8id3+kqTlO4hK8sJ7qK6C7mFIO0aQQ
+v2dnaKxN1gLC1yP7ICHskcODL7na/+gHP1yBHbhtkIKy9CECTTm7lwLeghoeffOj
+UEh1QWcQX/TI0uvpjD7GqpZWlQsXZfNuhiQK6abwctFEIQ3FT5BoNpULSi1C+11K
+QzmXIx6qmQd+oBkB6koeJDrS40LRqBpZKRJ2SG+m+/sO1THjYos5+KEDCV3VlvG1
+iEFnBKwjPWlS82FsGsU0nC+bTA1PCX6rEZJvm3dn5xYrhuF1yC+DwcnMcdVe/agQ
+/sCKIVzzfkYlBJoJDFGdsnRt7PVNhSzf0jVXq3mJGEuFp//SH2GhBArbQDdcEQ5D
+aupgetroHNFGbLWhH55Wjp5A7wC/ahDzKFcnlCzN3spmC8FL4JLQtgZTVtSI95BD
+fx8R7+y7p90cUls5wipoB10FwcydRdl/sZQE4Yj9TFJ3e+bPvdIi/qQG9racQhD5
+pTorvY5/qXlzPuZmIIfY6MuTuRHMFZC1RBB0iKe2GWGdJTJdByg=
+=+inr
+-----END PGP SIGNATURE-----
+
+--dFWYt1i2NyOo1oI9--
