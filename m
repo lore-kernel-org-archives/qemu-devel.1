@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42183)
+Received: from eggs.gnu.org ([209.51.188.92]:48684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tom.deseyn@gmail.com>) id 1ggR94-0007te-Aa
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 04:24:31 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ggRTz-0002zR-0C
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 04:46:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tom.deseyn@gmail.com>) id 1ggR8z-0001xl-7w
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 04:24:28 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51514)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tom.deseyn@gmail.com>)
-	id 1ggR8t-0001tq-LL
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 04:24:21 -0500
-Received: by mail-wm1-x343.google.com with SMTP id b11so189926wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 01:24:16 -0800 (PST)
-From: tom.deseyn@gmail.com
-Date: Mon,  7 Jan 2019 10:24:00 +0100
-Message-Id: <20190107092400.8038-1-tom.deseyn@gmail.com>
-In-Reply-To: <199d2900-1f2c-4940-ae2a-d6832501f1f0@vivier.eu>
-References: <199d2900-1f2c-4940-ae2a-d6832501f1f0@vivier.eu>
+	(envelope-from <kraxel@redhat.com>) id 1ggRTx-0002zK-An
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 04:46:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60966)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ggRTx-0002z3-46
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 04:46:05 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3AFFE8762D
+	for <qemu-devel@nongnu.org>; Mon,  7 Jan 2019 09:46:04 +0000 (UTC)
+Date: Mon, 7 Jan 2019 10:45:55 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190107094555.es7xunsor2aud3k7@sirius.home.kraxel.org>
+References: <20181220141553.24098-1-marcandre.lureau@redhat.com>
+	<20181220141553.24098-11-marcandre.lureau@redhat.com>
+	<461252a9-b095-9441-054c-bb9dd00f8cf5@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5] Add getsockopt for settable SOL_IPV6 options
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <461252a9-b095-9441-054c-bb9dd00f8cf5@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 10/12] qapi: document DisplayType enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +35,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, laurent@vivier.eu
-Cc: riku.voipio@iki.fi, Tom Deseyn <tom.deseyn@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-From: Tom Deseyn <tom.deseyn@gmail.com>
+On Thu, Dec 20, 2018 at 08:46:13AM -0600, Eric Blake wrote:
+> On 12/20/18 8:15 AM, Marc-Andr=E9 Lureau wrote:
+> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >   qapi/ui.json | 24 ++++++++++++++++++++++++
+> >   1 file changed, 24 insertions(+)
+> >=20
+> > diff --git a/qapi/ui.json b/qapi/ui.json
+> > index 5ad13248d5..3f2f662dca 100644
+> > --- a/qapi/ui.json
+> > +++ b/qapi/ui.json
+> > @@ -1075,6 +1075,30 @@
+> >   #
+> >   # Display (user interface) type.
+> >   #
+> > +# @default: The default user interface.
+>=20
+> Any more hints on how this default is determined?  Is it a compile-time
+> decision, based on what libraries were linked in?
 
-v2: default to unimplemented
-v3: match kernel behavior
-v4: braces code-style
-v5: pointer code-style
+Basically yes.  A bit more complicated due to modules.  gtk, sdl and
+cocoa are checked, in that order.  And if none of them is available the
+vnc server is enabled.
 
-Signed-off-by: Tom Deseyn <tom.deseyn@gmail.com>
----
- linux-user/syscall.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+> Does the work on adding
+> #if support to qapi make it introspectible what the default is?
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 280137da8c..a6f6e9c1f7 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2352,6 +2352,47 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
-             break;
-         }
-         break;
-+    case SOL_IPV6:
-+        switch (optname) {
-+        case IPV6_MTU_DISCOVER:
-+        case IPV6_MTU:
-+        case IPV6_V6ONLY:
-+        case IPV6_RECVPKTINFO:
-+        case IPV6_UNICAST_HOPS:
-+        case IPV6_MULTICAST_HOPS:
-+        case IPV6_MULTICAST_LOOP:
-+        case IPV6_RECVERR:
-+        case IPV6_RECVHOPLIMIT:
-+        case IPV6_2292HOPLIMIT:
-+        case IPV6_CHECKSUM: {
-+            void *target_addr;
-+            if (get_user_u32(len, optlen)) {
-+                return -TARGET_EFAULT;
-+            }
-+            if (len < 0) {
-+                return -TARGET_EINVAL;
-+            }
-+            lv = sizeof(val);
-+            ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
-+            if (ret < 0) {
-+                return ret;
-+            }
-+            if (lv < len) {
-+                len = lv;
-+            }
-+            if (put_user_u32(len, optlen)) {
-+                return -TARGET_EFAULT;
-+            }
-+            target_addr = lock_user(VERIFY_WRITE, optval_addr, len, 0);
-+            tswap32s((uint32_t *)&val);
-+            memcpy(target_addr, &val, len);
-+            unlock_user(target_addr, optval_addr, len);
-+            break;
-+        }
-+        default:
-+            goto unimplemented;
-+        }
-+        break;
-     default:
-     unimplemented:
-         gemu_log("getsockopt level=%d optname=%d not yet supported\n",
--- 
-2.19.2
+Due to modules it isn't a compile time constant.  With a modular build
+and gtk being packaged as separate sub-rpm the default depends on
+whenever the sub-rpm is installed or not.
+
+So I guess the answer is "no".
+
+cheers,
+  Gerd
