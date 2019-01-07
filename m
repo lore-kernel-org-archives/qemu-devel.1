@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45687)
+Received: from eggs.gnu.org ([209.51.188.92]:49882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ggQ1A-0001pr-TZ
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:12:17 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ggQF2-0005ep-R4
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:26:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ggQ1A-00005C-0O
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:12:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38374)
+	(envelope-from <kraxel@redhat.com>) id 1ggQEw-0007rd-PI
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:26:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37888)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ggQ19-0008WG-Ov
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:12:15 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1BA6D58E23
-	for <qemu-devel@nongnu.org>; Mon,  7 Jan 2019 08:12:14 +0000 (UTC)
-Date: Mon, 7 Jan 2019 09:12:06 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190107091206.6b5bd772.cohuck@redhat.com>
-In-Reply-To: <20190104220050.GK4157@habkost.net>
-References: <20190104032226.21428-1-ehabkost@redhat.com>
-	<20190103232012-mutt-send-email-mst@kernel.org>
-	<20190104101200.GA2494@work-vm> <20190104175439.GH4157@habkost.net>
-	<20190104200952.GI4157@habkost.net>
-	<20190104154723-mutt-send-email-mst@kernel.org>
-	<20190104210656.GJ4157@habkost.net>
-	<20190104161217-mutt-send-email-mst@kernel.org>
-	<20190104220050.GK4157@habkost.net>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ggQEl-0007h3-EF
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:26:24 -0500
+Date: Mon, 7 Jan 2019 09:16:27 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190107081627.btzrwwnodcszuftl@sirius.home.kraxel.org>
+References: <ddc7219f-98c3-28be-084f-64606452e49b@suse.com>
+	<e51bd6dc-e135-b66a-189d-8b79bc5f7e49@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] compat: Use explicit type names on
- HW_COMPAT_2_6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <e51bd6dc-e135-b66a-189d-8b79bc5f7e49@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Can I have someone's feedback on [bug 1809075]
+ Concurrency bug on keyboard events: capslock LED messing up keycode streams
+ causes character misses at guest kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,45 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Gao Zhiyuan <zgao@suse.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, 4 Jan 2019 20:00:50 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Thu, Jan 03, 2019 at 12:05:54PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Cc'ing Marc-Andr=E9 & Gerd.
+>=20
+> On 12/19/18 10:31 AM, Gao Zhiyuan wrote:
+> > Hi everyone.
+> >=20
+> > Can I please have someone's feedback on this bug?
+> > https://bugs.launchpad.net/qemu/+bug/1809075
+> > Briefly, guest OS loses characters sent to it via vnc. And I spot the
+> > bug in relation to ps2 driver.
+> >=20
+> > I'm thinking of possible fixes and I might want to use a memory barri=
+er.
+> > But I would really like to have some suggestion from a qemu developer
+> > first. For example, can we brutally drop capslock LED key events in p=
+s2
+> > queue?
 
-> On Fri, Jan 04, 2019 at 04:13:15PM -0500, Michael S. Tsirkin wrote:
-> > On Fri, Jan 04, 2019 at 07:06:56PM -0200, Eduardo Habkost wrote:  
-> > > On Fri, Jan 04, 2019 at 03:48:02PM -0500, Michael S. Tsirkin wrote:  
-> > > > On Fri, Jan 04, 2019 at 06:09:52PM -0200, Eduardo Habkost wrote:  
+There is no "capslock LED key event".  0xfa is KBD_REPLY_ACK, and the
+device queues it in response to guest port writes.  Yes, the ack can
+race with actual key events.  But IMO that isn't a bug in qemu.
 
-> > > > > Anyway, while writing this I noticed another issue: many of the
-> > > > > virtio devices in QEMU 2.6 were already modern-only!
-> > > > > 
-> > > > > Setting disable-modern=off on modern-only devices like virtio-vga
-> > > > > or virtio-tablet-pci doesn't make sense.  This means setting
-> > > > > virtio-pci.disable-modern=off on HW_COMPAT_2_6 was incorrect even
-> > > > > before the -non-transitional and -transitional device types were
-> > > > > introduced.  
-> > > > 
-> > > > 
-> > > > It did create an opportunity to create non working devices.
-> > > > 
-> > > > Whether that's incorrect as such I'm not sure.  
-> > > 
-> > > This is not just creating the opportunity for an user to
-> > > disable-modern=on.  HW_COMPAT_2_6 is actually setting
-> > > disable-modern=on on virtio-vga and other modern-only devices.
-> > > Sounds like a mistake to me.
-> > > 
-> > > Luckily those modern-only devices silently ignore the
-> > > disable-modern/disable-legacy properties, but this might change
-> > > in the future.  
-> > 
-> > Worry about it then?  
-> 
-> Right, we don't need to worry about it today.  But if a solution
-> to the crash reported by Thomas will make the problem go away,
-> that's even better.
+Probably the linux kernel just throws away everything until it got the
+ack for the port write, and that way the key event gets lost.  On
+physical hardware you will not notice because it is next to impossible
+to type fast enough to hit the race window.
 
-It seems your patch with the modern-only devices removed from the list
-would achieve that?
+So, go fix the kernel.
+
+Alternatively fix vncdotool to send uppercase letters properly with
+shift key pressed.  Then qemu wouldn't generate capslock key events
+(that happens because qemu thinks guest and host capslock state is out
+of sync) and the guests's capslock led update request wouldn't get into
+the way.
+
+cheers,
+  Gerd
