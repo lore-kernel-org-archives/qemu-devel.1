@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47500)
+Received: from eggs.gnu.org ([209.51.188.92]:48847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ggWdL-0001K5-BB
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:16:08 -0500
+	(envelope-from <berto@igalia.com>) id 1ggWgt-0002Ic-Qy
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:19:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ggWdK-0004qT-5H
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:16:07 -0500
-Resent-Message-Id: <E1ggWdK-0004qT-5H@eggs.gnu.org>
-In-Reply-To: <11488a08-1fe0-a278-2210-deb64731107f@gmx.co.uk>
-Message-ID: <154687413976.24336.4276350676808769334@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <berto@igalia.com>) id 1ggWgs-0008SM-GW
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 10:19:47 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181218075707.12006-6-anton.nefedov@virtuozzo.com>
+References: <20181218075707.12006-1-anton.nefedov@virtuozzo.com>
+	<20181218075707.12006-6-anton.nefedov@virtuozzo.com>
+Date: Mon, 07 Jan 2019 16:19:43 +0100
+Message-ID: <w51bm4sxzow.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 7 Jan 2019 07:15:40 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v5] Support u-boot noload images for arm as
- used by, NetBSD/evbarm GENERIC kernel.
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v11 05/10] block: treat BDRV_REQ_ALLOCATE
+ as serialising
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: nick.hudson@gmx.co.uk
-Cc: fam@euphon.net, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xMTQ4OGEwOC0xZmUwLWEyNzgt
-MjIxMC1kZWI2NDczMTEwN2ZAZ214LmNvLnVrLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1XSBTdXBwb3J0
-IHUtYm9vdCBub2xvYWQgaW1hZ2VzIGZvciBhcm0gYXMgdXNlZCBieSwgTmV0QlNEL2V2YmFybSBH
-RU5FUklDIGtlcm5lbC4KTWVzc2FnZS1pZDogMTE0ODhhMDgtMWZlMC1hMjc4LTIyMTAtZGViNjQ3
-MzExMDdmQGdteC5jby51awpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
-JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
-ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
-IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
-ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNjAzN2Q1NSBTdXBwb3J0IHUtYm9vdCBu
-b2xvYWQgaW1hZ2VzIGZvciBhcm0gYXMgdXNlZCBieSwgTmV0QlNEL2V2YmFybSBHRU5FUklDIGtl
-cm5lbC4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogU3VwcG9ydCB1
-LWJvb3Qgbm9sb2FkIGltYWdlcyBmb3IgYXJtIGFzIHVzZWQgYnksIE5ldEJTRC9ldmJhcm0gR0VO
-RVJJQyBrZXJuZWwuLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzkxOiBGSUxFOiBody9jb3JlL3Vib290X2ltYWdlLmg6MTI3OgorI2RlZmluZSBJSF9UWVBFX0tF
-Uk5FTF9OT0xPQUQgIDE0XkkvKiBPUyBLZXJuZWwgSW1hZ2UgKG5vbG9hZCleSSovJAoKdG90YWw6
-IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvMTE0ODhhMDgtMWZlMC1hMjc4LTIyMTAtZGViNjQ3MzExMDdmQGdt
-eC5jby51ay90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Tue 18 Dec 2018 08:57:38 AM CET, Anton Nefedov wrote:
+> The idea is that ALLOCATE requests may overlap with other requests.
+> Reuse the existing block layer infrastructure for serialising requests.
+> Use the following approach:
+>   - mark ALLOCATE also SERIALISING, so subsequent requests to the area wait
+>   - ALLOCATE request itself must never wait if another request is in flight
+>     already. Return EAGAIN, let the caller reconsider.
+>
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
