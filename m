@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46599)
+Received: from eggs.gnu.org ([209.51.188.92]:46596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoq-0005Fi-ND
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXoq-0005Fe-LF
 	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:32:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXon-0002Ts-RD
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:32:04 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:38747)
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXok-0002OM-Em
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:32:02 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:39741)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggXok-0002Np-Lx
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:32:00 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id v13so1075124wrw.5
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:58 -0800 (PST)
+	id 1ggXoi-0002GY-8s
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:56 -0500
+Received: by mail-wm1-x334.google.com with SMTP id f81so1510966wmd.4
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:53 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	j14sm46039759wrv.96.2019.01.07.08.31.55 for <qemu-devel@nongnu.org>
+	j14sm46039759wrv.96.2019.01.07.08.31.50 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 07 Jan 2019 08:31:56 -0800 (PST)
+	Mon, 07 Jan 2019 08:31:51 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  7 Jan 2019 16:31:10 +0000
-Message-Id: <20190107163117.16269-31-peter.maydell@linaro.org>
+Date: Mon,  7 Jan 2019 16:31:06 +0000
+Message-Id: <20190107163117.16269-27-peter.maydell@linaro.org>
 In-Reply-To: <20190107163117.16269-1-peter.maydell@linaro.org>
 References: <20190107163117.16269-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 30/37] tests/microbit-test: Add Tests for nRF51
- GPIO
+Subject: [Qemu-devel] [PULL 26/37] hw/misc/nrf51_rng: Add NRF51 random
+ number generator peripheral
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,57 +39,134 @@ To: qemu-devel@nongnu.org
 
 From: Steffen Görtz <contrib@steffen-goertz.de>
 
-The test suite for the nRF51 GPIO peripheral for now
-only tests initial state. Additionally a set of
-tests testing an implementation detail of the model
-are included.
+Add a model of the NRF51 random number generator peripheral.
+This is a simple random generator that continuously generates
+new random values after startup.
+
+Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
 
 Signed-off-by: Steffen Görtz <contrib@steffen-goertz.de>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20190103091119.9367-8-stefanha@redhat.com
-[PMM: fixed stray space at start of file]
+Message-id: 20190103091119.9367-4-stefanha@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- tests/Makefile.include |   2 +
- tests/microbit-test.c  | 160 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 162 insertions(+)
- create mode 100644 tests/microbit-test.c
+ hw/misc/Makefile.objs       |   1 +
+ include/hw/misc/nrf51_rng.h |  83 ++++++++++++
+ hw/misc/nrf51_rng.c         | 262 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 346 insertions(+)
+ create mode 100644 include/hw/misc/nrf51_rng.h
+ create mode 100644 hw/misc/nrf51_rng.c
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3f5a1d0c308..9c84bbd8296 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -277,6 +277,7 @@ check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
- check-qtest-arm-y += tests/tmp105-test$(EXESUF)
- check-qtest-arm-y += tests/pca9552-test$(EXESUF)
- check-qtest-arm-y += tests/ds1338-test$(EXESUF)
-+check-qtest-arm-y += tests/microbit-test$(EXESUF)
- check-qtest-arm-y += tests/m25p80-test$(EXESUF)
- check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
- check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
-@@ -708,6 +709,7 @@ tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
- tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
- tests/pca9552-test$(EXESUF): tests/pca9552-test.o $(libqos-omap-obj-y)
- tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
-+tests/microbit-test$(EXESUF): tests/microbit-test.o
- tests/m25p80-test$(EXESUF): tests/m25p80-test.o
- tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
- tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
-diff --git a/tests/microbit-test.c b/tests/microbit-test.c
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 680350b3c3b..04f3bfa516e 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -74,3 +74,4 @@ obj-$(CONFIG_PVPANIC) += pvpanic.o
+ obj-$(CONFIG_AUX) += auxbus.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+ obj-$(CONFIG_MSF2) += msf2-sysreg.o
++obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
+diff --git a/include/hw/misc/nrf51_rng.h b/include/hw/misc/nrf51_rng.h
 new file mode 100644
-index 00000000000..f0a180cbc6f
+index 00000000000..3d6bf799977
 --- /dev/null
-+++ b/tests/microbit-test.c
-@@ -0,0 +1,160 @@
++++ b/include/hw/misc/nrf51_rng.h
+@@ -0,0 +1,83 @@
 +/*
-+ * QTest testcase for Microbit board using the Nordic Semiconductor nRF51 SoC.
++ * nRF51 Random Number Generator
 + *
-+ * nRF51:
-+ * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
-+ * Product Spec: http://infocenter.nordicsemi.com/pdf/nRF51822_PS_v3.1.pdf
++ * QEMU interface:
++ * + Property "period_unfiltered_us": Time between two biased values in
++ *   microseconds.
++ * + Property "period_filtered_us": Time between two unbiased values in
++ *   microseconds.
++ * + sysbus MMIO regions 0: Memory Region with tasks, events and registers
++ *   to be mapped to the peripherals instance address by the SOC.
++ * + Named GPIO output "irq": Interrupt line of the peripheral. Must be
++ *   connected to the associated peripheral interrupt line of the NVIC.
++ * + Named GPIO output "eep_valrdy": Event set when new random value is ready
++ *   to be read.
++ * + Named GPIO input "tep_start": Task that triggers start of continuous
++ *   generation of random values.
++ * + Named GPIO input "tep_stop": Task that ends continuous generation of
++ *   random values.
 + *
-+ * Microbit Board: http://microbit.org/
++ * Accuracy of the peripheral model:
++ * + Stochastic properties of different configurations of the random source
++ *   are not modeled.
++ * + Generation of unfiltered and filtered random values take at least the
++ *   average generation time stated in the production specification;
++ *   non-deterministic generation times are not modeled.
++ *
++ * Copyright 2018 Steffen Görtz <contrib@steffen-goertz.de>
++ *
++ * This code is licensed under the GPL version 2 or later.  See
++ * the COPYING file in the top-level directory.
++ *
++ */
++#ifndef NRF51_RNG_H
++#define NRF51_RNG_H
++
++#include "hw/sysbus.h"
++#include "qemu/timer.h"
++#define TYPE_NRF51_RNG "nrf51_soc.rng"
++#define NRF51_RNG(obj) OBJECT_CHECK(NRF51RNGState, (obj), TYPE_NRF51_RNG)
++
++#define NRF51_RNG_SIZE         0x1000
++
++#define NRF51_RNG_TASK_START   0x000
++#define NRF51_RNG_TASK_STOP    0x004
++#define NRF51_RNG_EVENT_VALRDY 0x100
++#define NRF51_RNG_REG_SHORTS   0x200
++#define NRF51_RNG_REG_SHORTS_VALRDY_STOP 0
++#define NRF51_RNG_REG_INTEN    0x300
++#define NRF51_RNG_REG_INTEN_VALRDY 0
++#define NRF51_RNG_REG_INTENSET 0x304
++#define NRF51_RNG_REG_INTENCLR 0x308
++#define NRF51_RNG_REG_CONFIG   0x504
++#define NRF51_RNG_REG_CONFIG_DECEN 0
++#define NRF51_RNG_REG_VALUE    0x508
++
++typedef struct {
++    SysBusDevice parent_obj;
++
++    MemoryRegion mmio;
++    qemu_irq irq;
++
++    /* Event End Points */
++    qemu_irq eep_valrdy;
++
++    QEMUTimer timer;
++
++    /* Time between generation of successive unfiltered values in us */
++    uint16_t period_unfiltered_us;
++    /* Time between generation of successive filtered values in us */
++    uint16_t period_filtered_us;
++
++    uint8_t value;
++
++    uint32_t active;
++    uint32_t event_valrdy;
++    uint32_t shortcut_stop_on_valrdy;
++    uint32_t interrupt_enabled;
++    uint32_t filter_enabled;
++
++} NRF51RNGState;
++
++
++#endif /* NRF51_RNG_H_ */
+diff --git a/hw/misc/nrf51_rng.c b/hw/misc/nrf51_rng.c
+new file mode 100644
+index 00000000000..d188f044f4c
+--- /dev/null
++++ b/hw/misc/nrf51_rng.c
+@@ -0,0 +1,262 @@
++/*
++ * nRF51 Random Number Generator
++ *
++ * Reference Manual: http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.1.pdf
 + *
 + * Copyright 2018 Steffen Görtz <contrib@steffen-goertz.de>
 + *
@@ -97,150 +174,256 @@ index 00000000000..f0a180cbc6f
 + * the COPYING file in the top-level directory.
 + */
 +
-+
 +#include "qemu/osdep.h"
-+#include "exec/hwaddr.h"
-+#include "libqtest.h"
-+
++#include "qemu/log.h"
++#include "qapi/error.h"
 +#include "hw/arm/nrf51.h"
-+#include "hw/gpio/nrf51_gpio.h"
++#include "hw/misc/nrf51_rng.h"
++#include "crypto/random.h"
 +
-+static void test_nrf51_gpio(void)
++static void update_irq(NRF51RNGState *s)
 +{
-+    size_t i;
-+    uint32_t actual, expected;
-+
-+    struct {
-+        hwaddr addr;
-+        uint32_t expected;
-+    } const reset_state[] = {
-+        {NRF51_GPIO_REG_OUT, 0x00000000}, {NRF51_GPIO_REG_OUTSET, 0x00000000},
-+        {NRF51_GPIO_REG_OUTCLR, 0x00000000}, {NRF51_GPIO_REG_IN, 0x00000000},
-+        {NRF51_GPIO_REG_DIR, 0x00000000}, {NRF51_GPIO_REG_DIRSET, 0x00000000},
-+        {NRF51_GPIO_REG_DIRCLR, 0x00000000}
-+    };
-+
-+    /* Check reset state */
-+    for (i = 0; i < ARRAY_SIZE(reset_state); i++) {
-+        expected = reset_state[i].expected;
-+        actual = readl(NRF51_GPIO_BASE + reset_state[i].addr);
-+        g_assert_cmpuint(actual, ==, expected);
-+    }
-+
-+    for (i = 0; i < NRF51_GPIO_PINS; i++) {
-+        expected = 0x00000002;
-+        actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START + i * 4);
-+        g_assert_cmpuint(actual, ==, expected);
-+    }
-+
-+    /* Check dir bit consistency between dir and cnf */
-+    /* Check set via DIRSET */
-+    expected = 0x80000001;
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIRSET, expected);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR);
-+    g_assert_cmpuint(actual, ==, expected);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x01);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_END) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x01);
-+
-+    /* Check clear via DIRCLR */
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIRCLR, 0x80000001);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR);
-+    g_assert_cmpuint(actual, ==, 0x00000000);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x00);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_END) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x00);
-+
-+    /* Check set via DIR */
-+    expected = 0x80000001;
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR, expected);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR);
-+    g_assert_cmpuint(actual, ==, expected);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x01);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_END) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x01);
-+
-+    /* Reset DIR */
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_DIR, 0x00000000);
-+
-+    /* Check Input propagates */
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0x00);
-+    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 0);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x00);
-+    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 1);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x01);
-+    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, -1);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x01);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0x02);
-+
-+    /* Check pull-up working */
-+    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 0);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b0000);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x00);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b1110);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x01);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0x02);
-+
-+    /* Check pull-down working */
-+    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 1);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b0000);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x01);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b0110);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x00);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0x02);
-+    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, -1);
-+
-+    /* Check Output propagates */
-+    irq_intercept_out("/machine/nrf51");
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b0011);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTSET, 0x01);
-+    g_assert_true(get_irq(0));
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTCLR, 0x01);
-+    g_assert_false(get_irq(0));
-+
-+    /* Check self-stimulation */
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b01);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTSET, 0x01);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x01);
-+
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTCLR, 0x01);
-+    actual = readl(NRF51_GPIO_BASE + NRF51_GPIO_REG_IN) & 0x01;
-+    g_assert_cmpuint(actual, ==, 0x00);
-+
-+    /*
-+     * Check short-circuit - generates an guest_error which must be checked
-+     * manually as long as qtest can not scan qemu_log messages
-+     */
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_START, 0b01);
-+    writel(NRF51_GPIO_BASE + NRF51_GPIO_REG_OUTSET, 0x01);
-+    qtest_set_irq_in(global_qtest, "/machine/nrf51", "unnamed-gpio-in", 0, 0);
++    bool irq = s->interrupt_enabled && s->event_valrdy;
++    qemu_set_irq(s->irq, irq);
 +}
 +
-+int main(int argc, char **argv)
++static uint64_t rng_read(void *opaque, hwaddr offset, unsigned int size)
 +{
-+    int ret;
++    NRF51RNGState *s = NRF51_RNG(opaque);
++    uint64_t r = 0;
 +
-+    g_test_init(&argc, &argv, NULL);
++    switch (offset) {
++    case NRF51_RNG_EVENT_VALRDY:
++        r = s->event_valrdy;
++        break;
++    case NRF51_RNG_REG_SHORTS:
++        r = s->shortcut_stop_on_valrdy;
++        break;
++    case NRF51_RNG_REG_INTEN:
++    case NRF51_RNG_REG_INTENSET:
++    case NRF51_RNG_REG_INTENCLR:
++        r = s->interrupt_enabled;
++        break;
++    case NRF51_RNG_REG_CONFIG:
++        r = s->filter_enabled;
++        break;
++    case NRF51_RNG_REG_VALUE:
++        r = s->value;
++        break;
 +
-+    global_qtest = qtest_initf("-machine microbit");
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: bad read offset 0x%" HWADDR_PRIx "\n",
++                      __func__, offset);
++    }
 +
-+    qtest_add_func("/microbit/nrf51/gpio", test_nrf51_gpio);
-+
-+    ret = g_test_run();
-+
-+    qtest_quit(global_qtest);
-+    return ret;
++    return r;
 +}
++
++static int64_t calc_next_timeout(NRF51RNGState *s)
++{
++    int64_t timeout = qemu_clock_get_us(QEMU_CLOCK_VIRTUAL);
++    if (s->filter_enabled) {
++        timeout += s->period_filtered_us;
++    } else {
++        timeout += s->period_unfiltered_us;
++    }
++
++    return timeout;
++}
++
++
++static void rng_update_timer(NRF51RNGState *s)
++{
++    if (s->active) {
++        timer_mod(&s->timer, calc_next_timeout(s));
++    } else {
++        timer_del(&s->timer);
++    }
++}
++
++
++static void rng_write(void *opaque, hwaddr offset,
++                       uint64_t value, unsigned int size)
++{
++    NRF51RNGState *s = NRF51_RNG(opaque);
++
++    switch (offset) {
++    case NRF51_RNG_TASK_START:
++        if (value == NRF51_TRIGGER_TASK) {
++            s->active = 1;
++            rng_update_timer(s);
++        }
++        break;
++    case NRF51_RNG_TASK_STOP:
++        if (value == NRF51_TRIGGER_TASK) {
++            s->active = 0;
++            rng_update_timer(s);
++        }
++        break;
++    case NRF51_RNG_EVENT_VALRDY:
++        if (value == NRF51_EVENT_CLEAR) {
++            s->event_valrdy = 0;
++        }
++        break;
++    case NRF51_RNG_REG_SHORTS:
++        s->shortcut_stop_on_valrdy =
++                (value & BIT_MASK(NRF51_RNG_REG_SHORTS_VALRDY_STOP)) ? 1 : 0;
++        break;
++    case NRF51_RNG_REG_INTEN:
++        s->interrupt_enabled =
++                (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) ? 1 : 0;
++        break;
++    case NRF51_RNG_REG_INTENSET:
++        if (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) {
++            s->interrupt_enabled = 1;
++        }
++        break;
++    case NRF51_RNG_REG_INTENCLR:
++        if (value & BIT_MASK(NRF51_RNG_REG_INTEN_VALRDY)) {
++            s->interrupt_enabled = 0;
++        }
++        break;
++    case NRF51_RNG_REG_CONFIG:
++        s->filter_enabled =
++                      (value & BIT_MASK(NRF51_RNG_REG_CONFIG_DECEN)) ? 1 : 0;
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: bad write offset 0x%" HWADDR_PRIx "\n",
++                      __func__, offset);
++    }
++
++    update_irq(s);
++}
++
++static const MemoryRegionOps rng_ops = {
++    .read =  rng_read,
++    .write = rng_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .impl.min_access_size = 4,
++    .impl.max_access_size = 4
++};
++
++static void nrf51_rng_timer_expire(void *opaque)
++{
++    NRF51RNGState *s = NRF51_RNG(opaque);
++
++    qcrypto_random_bytes(&s->value, 1, &error_abort);
++
++    s->event_valrdy = 1;
++    qemu_set_irq(s->eep_valrdy, 1);
++
++    if (s->shortcut_stop_on_valrdy) {
++        s->active = 0;
++    }
++
++    rng_update_timer(s);
++    update_irq(s);
++}
++
++static void nrf51_rng_tep_start(void *opaque, int n, int level)
++{
++    NRF51RNGState *s = NRF51_RNG(opaque);
++
++    if (level) {
++        s->active = 1;
++        rng_update_timer(s);
++    }
++}
++
++static void nrf51_rng_tep_stop(void *opaque, int n, int level)
++{
++    NRF51RNGState *s = NRF51_RNG(opaque);
++
++    if (level) {
++        s->active = 0;
++        rng_update_timer(s);
++    }
++}
++
++
++static void nrf51_rng_init(Object *obj)
++{
++    NRF51RNGState *s = NRF51_RNG(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++
++    memory_region_init_io(&s->mmio, obj, &rng_ops, s,
++            TYPE_NRF51_RNG, NRF51_RNG_SIZE);
++    sysbus_init_mmio(sbd, &s->mmio);
++
++    timer_init_us(&s->timer, QEMU_CLOCK_VIRTUAL, nrf51_rng_timer_expire, s);
++
++    sysbus_init_irq(sbd, &s->irq);
++
++    /* Tasks */
++    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_start, "tep_start", 1);
++    qdev_init_gpio_in_named(DEVICE(s), nrf51_rng_tep_stop, "tep_stop", 1);
++
++    /* Events */
++    qdev_init_gpio_out_named(DEVICE(s), &s->eep_valrdy, "eep_valrdy", 1);
++}
++
++static void nrf51_rng_reset(DeviceState *dev)
++{
++    NRF51RNGState *s = NRF51_RNG(dev);
++
++    s->value = 0;
++    s->active = 0;
++    s->event_valrdy = 0;
++    s->shortcut_stop_on_valrdy = 0;
++    s->interrupt_enabled = 0;
++    s->filter_enabled = 0;
++
++    rng_update_timer(s);
++}
++
++
++static Property nrf51_rng_properties[] = {
++    DEFINE_PROP_UINT16("period_unfiltered_us", NRF51RNGState,
++            period_unfiltered_us, 167),
++    DEFINE_PROP_UINT16("period_filtered_us", NRF51RNGState,
++            period_filtered_us, 660),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static const VMStateDescription vmstate_rng = {
++    .name = "nrf51_soc.rng",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(active, NRF51RNGState),
++        VMSTATE_UINT32(event_valrdy, NRF51RNGState),
++        VMSTATE_UINT32(shortcut_stop_on_valrdy, NRF51RNGState),
++        VMSTATE_UINT32(interrupt_enabled, NRF51RNGState),
++        VMSTATE_UINT32(filter_enabled, NRF51RNGState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void nrf51_rng_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->props = nrf51_rng_properties;
++    dc->vmsd = &vmstate_rng;
++    dc->reset = nrf51_rng_reset;
++}
++
++static const TypeInfo nrf51_rng_info = {
++    .name = TYPE_NRF51_RNG,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(NRF51RNGState),
++    .instance_init = nrf51_rng_init,
++    .class_init = nrf51_rng_class_init
++};
++
++static void nrf51_rng_register_types(void)
++{
++    type_register_static(&nrf51_rng_info);
++}
++
++type_init(nrf51_rng_register_types)
 -- 
 2.19.2
