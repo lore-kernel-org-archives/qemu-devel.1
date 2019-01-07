@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34188)
+Received: from eggs.gnu.org ([209.51.188.92]:34958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ggVzZ-0001GK-SR
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:35:03 -0500
+	(envelope-from <xuyandong2@huawei.com>) id 1ggW2B-00037i-5C
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:37:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ggVzZ-0004lk-2O
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:35:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54056)
+	(envelope-from <xuyandong2@huawei.com>) id 1ggW2A-0001Zk-28
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:37:43 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2482 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ggVzY-0004iw-Nz
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:35:00 -0500
-References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
-	<11a6562f583531e5a5473716bea44ee3ae7be120.1545598229.git.DirtY.iCE.hu@gmail.com>
-	<66e793ef-dd32-eb81-14f5-cf59ca8c73bb@amsat.org>
-	<980b862a-9c2d-8ab7-2937-846524399148@gmail.com>
-	<42f870e2-97bc-1028-3587-d9ae31537a13@amsat.org>
-	<20a6e023-89be-f2e1-aa11-0686a1dfe021@gmail.com>
-	<3ff67b65-935e-9149-05a7-543752723b06@amsat.org>
-	<c82a6572-bcb7-3577-7332-5420c8cfdbb0@gmail.com>
-	<20190107095454.cokxnwinrqmtsfl5@sirius.home.kraxel.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <92d80605-62f8-9b1a-b583-1d44b290a1ea@redhat.com>
-Date: Mon, 7 Jan 2019 08:26:15 -0600
+	(Exim 4.71) (envelope-from <xuyandong2@huawei.com>)
+	id 1ggW27-0001Al-Vd
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:37:41 -0500
+From: xuyandong <xuyandong2@huawei.com>
+Date: Mon, 7 Jan 2019 14:37:17 +0000
+Message-ID: <7CECC2DFC21538489F72729DF5EFB4D908AE9096@dggemm521-mbs.china.huawei.com>
+References: <7CECC2DFC21538489F72729DF5EFB4D908ABD3A4@dggemm521-mbs.china.huawei.com>
+	<20181209211730-mutt-send-email-mst@kernel.org>
+	<7CECC2DFC21538489F72729DF5EFB4D908AC486D@DGGEMM501-MBX.china.huawei.com>
+	<20181210130650-mutt-send-email-mst@kernel.org>
+	<7CECC2DFC21538489F72729DF5EFB4D908AC78EE@DGGEMM501-MBX.china.huawei.com>
+	<20181210205229-mutt-send-email-mst@kernel.org>
+	<7CECC2DFC21538489F72729DF5EFB4D908AC7980@DGGEMM501-MBX.china.huawei.com>
+	<20181210223128-mutt-send-email-mst@kernel.org>
+	<7CECC2DFC21538489F72729DF5EFB4D908AC7A04@DGGEMM501-MBX.china.huawei.com>
+	<20181210232256-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20181210232256-mutt-send-email-mst@kernel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190107095454.cokxnwinrqmtsfl5@sirius.home.kraxel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jU7efdJbpPveakDvtQZsew05ydXNBf6eQ"
-Subject: Re: [Qemu-devel] [PATCH v2 23/52] audio: remove audio_MIN, audio_MAX
+Subject: Re: [Qemu-devel] [BUG]Unassigned mem write during pci device
+ hot-plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +38,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?B?S8WRdsOhZ8OzIFpvbHTDoW4=?= <dirty.ice.hu@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Michael Walle <michael@walle.cc>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "marcel@redhat.com" <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jU7efdJbpPveakDvtQZsew05ydXNBf6eQ
-From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?B?S8WRdsOhZ8OzIFpvbHTDoW4=?=
- <dirty.ice.hu@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Michael Walle <michael@walle.cc>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-Message-ID: <92d80605-62f8-9b1a-b583-1d44b290a1ea@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 23/52] audio: remove audio_MIN, audio_MAX
-References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
- <11a6562f583531e5a5473716bea44ee3ae7be120.1545598229.git.DirtY.iCE.hu@gmail.com>
- <66e793ef-dd32-eb81-14f5-cf59ca8c73bb@amsat.org>
- <980b862a-9c2d-8ab7-2937-846524399148@gmail.com>
- <42f870e2-97bc-1028-3587-d9ae31537a13@amsat.org>
- <20a6e023-89be-f2e1-aa11-0686a1dfe021@gmail.com>
- <3ff67b65-935e-9149-05a7-543752723b06@amsat.org>
- <c82a6572-bcb7-3577-7332-5420c8cfdbb0@gmail.com>
- <20190107095454.cokxnwinrqmtsfl5@sirius.home.kraxel.org>
-In-Reply-To: <20190107095454.cokxnwinrqmtsfl5@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/7/19 3:54 AM, Gerd Hoffmann wrote:
->> The first one is fixable with an explicit cast (ugly but works), but t=
-he
->> second one is more problematic. It means we can't write stuff like
->>
->> USBPort  uports[MAX(MAXPORTS_2, MAXPORTS_3)];
->>
->> when not in a function. So we either need a dumb version of MIN/MAX, o=
-r
->> scrape the idea altogether.
->=20
-> const_max() for stuff which is a compile time constant maybe?
-
-The conversation on MIN/MAX has been extracted to a new thread:
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00727.html
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00695.html
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---jU7efdJbpPveakDvtQZsew05ydXNBf6eQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlwzYYcACgkQ3g5py3or
-ov0B0gf9HlYpnrMDVddJnMMHmQbxPPygebTzRGYiVbZA3p9NnaKdkZxXqxP7BhSI
-ysngSfme4e+zsWbdqL33AZJZDN1lKYEqTbkDgTs2lCfwt/IB1cxnkS03Cmh07coI
-DgaEvNjfqhbzfICgp1BqQF0/RV+jtFOaM4cS2IXvPyUFRSB9H++xdI9BpOnUhWvj
-BAVTBHfc+O1oi7x1BNzaYhoAc+v+0bcIk0w8wSwYyIC+UE6nvAwJoRpHLPibQR02
-OX1QYdgEfKicqa8pYa6L6cyEb0csC5I2j2DWLg7gFdYVRMsvDHQ+YTYXJEUuldw0
-JYTlzdxNqKBHtbeS1AIPy63KkYsomQ==
-=zPyF
------END PGP SIGNATURE-----
-
---jU7efdJbpPveakDvtQZsew05ydXNBf6eQ--
+PiA+ID4gPiA+ID4gPiA+ID4gPiBIaSBhbGwsDQo+ID4gPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+
+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4gPiA+IElu
+IG91ciB0ZXN0LCB3ZSBjb25maWd1cmVkIFZNIHdpdGggc2V2ZXJhbCBwY2ktYnJpZGdlcw0KPiA+
+ID4gPiA+ID4gPiA+ID4gPiBhbmQgYSB2aXJ0aW8tbmV0IG5pYyBiZWVuIGF0dGFjaGVkIHdpdGgg
+YnVzIDQsDQo+ID4gPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4gPiA+IEFmdGVyIFZN
+IGlzIHN0YXJ0dXAsIFdlIHBpbmcgdGhpcyBuaWMgZnJvbSBob3N0IHRvDQo+ID4gPiA+ID4gPiA+
+ID4gPiA+IGp1ZGdlIGlmIGl0IGlzIHdvcmtpbmcgbm9ybWFsbHkuIFRoZW4sIHdlIGhvdCBhZGQg
+cGNpDQo+ID4gPiA+ID4gPiA+ID4gPiA+IGRldmljZXMgdG8gdGhpcyBWTSB3aXRoIGJ1cw0KPiA+
+ID4gPiA+IDAuDQo+ID4gPiA+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ID4gPiA+IFdlICBm
+b3VuZCB0aGUgdmlydGlvLW5ldCBOSUMgaW4gYnVzIDQgaXMgbm90IHdvcmtpbmcNCj4gPiA+ID4g
+PiA+ID4gPiA+ID4gKGNhbiBub3QNCj4gPiA+ID4gPiA+ID4gPiA+ID4gY29ubmVjdCkgb2NjYXNp
+b25hbGx5LCBhcyBpdCBraWNrIHZpcnRpbyBiYWNrZW5kDQo+ID4gPiA+ID4gPiA+ID4gPiA+IGZh
+aWx1cmUgd2l0aCBlcnJvcg0KDQo+ID4gPiA+IEJ1dCBJIGhhdmUgYW5vdGhlciBxdWVzdGlvbiwg
+aWYgd2Ugb25seSBmaXggdGhpcyBwcm9ibGVtIGluIHRoZQ0KPiA+ID4gPiBrZXJuZWwsIHRoZSBM
+aW51eCB2ZXJzaW9uIHRoYXQgaGFzIGJlZW4gcmVsZWFzZWQgZG9lcyBub3Qgd29yaw0KPiA+ID4g
+PiB3ZWxsIG9uIHRoZQ0KPiA+ID4gdmlydHVhbGl6YXRpb24gcGxhdGZvcm0uDQo+ID4gPiA+IElz
+IHRoZXJlIGEgd2F5IHRvIGZpeCB0aGlzIHByb2JsZW0gaW4gdGhlIGJhY2tlbmQ/DQo+ID4gPg0K
+PiA+ID4gVGhlcmUgY291bGQgd2UgYSB3YXkgdG8gd29yayBhcm91bmQgdGhpcy4NCj4gPiA+IERv
+ZXMgYmVsb3cgaGVscD8NCj4gPg0KPiA+IEkgYW0gc29ycnkgdG8gdGVsbCB5b3UsIEkgdGVzdGVk
+IHRoaXMgcGF0Y2ggYW5kIGl0IGRvZXNuJ3Qgd29yayBmaW5lLg0KPiA+DQo+ID4gPg0KPiA+ID4g
+ZGlmZiAtLWdpdCBhL2h3L2kzODYvYWNwaS1idWlsZC5jIGIvaHcvaTM4Ni9hY3BpLWJ1aWxkLmMg
+aW5kZXgNCj4gPiA+IDIzNmEyMGVhYTguLjc4MzRjYWM0YjAgMTAwNjQ0DQo+ID4gPiAtLS0gYS9o
+dy9pMzg2L2FjcGktYnVpbGQuYw0KPiA+ID4gKysrIGIvaHcvaTM4Ni9hY3BpLWJ1aWxkLmMNCj4g
+PiA+IEBAIC01NTEsNyArNTUxLDcgQEAgc3RhdGljIHZvaWQgYnVpbGRfYXBwZW5kX3BjaV9idXNf
+ZGV2aWNlcyhBbWwNCj4gPiA+ICpwYXJlbnRfc2NvcGUsIFBDSUJ1cyAqYnVzLA0KPiA+ID4NCj4g
+PiA+ICAgICAgICAgIGFtbF9hcHBlbmQobWV0aG9kLCBhbWxfc3RvcmUoYW1sX2ludChic2VsX3Zh
+bCksDQo+IGFtbF9uYW1lKCJCTlVNIikpKTsNCj4gPiA+ICAgICAgICAgIGFtbF9hcHBlbmQobWV0
+aG9kLA0KPiA+ID4gLSAgICAgICAgICAgIGFtbF9jYWxsMigiRFZOVCIsIGFtbF9uYW1lKCJQQ0lV
+IiksIGFtbF9pbnQoMSkgLyogRGV2aWNlIENoZWNrDQo+ICovKQ0KPiA+ID4gKyAgICAgICAgICAg
+IGFtbF9jYWxsMigiRFZOVCIsIGFtbF9uYW1lKCJQQ0lVIiksIGFtbF9pbnQoNCkgLyoNCj4gPiA+
+ICsgRGV2aWNlIENoZWNrIExpZ2h0ICovKQ0KPiA+ID4gICAgICAgICAgKTsNCj4gPiA+ICAgICAg
+ICAgIGFtbF9hcHBlbmQobWV0aG9kLA0KPiA+ID4gICAgICAgICAgICAgIGFtbF9jYWxsMigiRFZO
+VCIsIGFtbF9uYW1lKCJQQ0lEIiksIGFtbF9pbnQoMykvKiBFamVjdA0KPiA+ID4gUmVxdWVzdCAq
+LykNCj4gDQo+IA0KPiBPaCBJIHNlZSwgYW5vdGhlciBidWc6DQo+IA0KPiAgICAgICAgIGNhc2Ug
+QUNQSV9OT1RJRllfREVWSUNFX0NIRUNLX0xJR0hUOg0KPiAgICAgICAgICAgICAgICAgYWNwaV9o
+YW5kbGVfZGVidWcoaGFuZGxlLCAiQUNQSV9OT1RJRllfREVWSUNFX0NIRUNLX0xJR0hUDQo+IGV2
+ZW50XG4iKTsNCj4gICAgICAgICAgICAgICAgIC8qIFRCRDogRXhhY3RseSB3aGF0IGRvZXMgJ2xp
+Z2h0JyBtZWFuPyAqLw0KPiAgICAgICAgICAgICAgICAgYnJlYWs7DQo+IA0KPiBBbmQgdGhlbiBl
+LmcuIGFjcGlfZ2VuZXJpY19ob3RwbHVnX2V2ZW50KHN0cnVjdCBhY3BpX2RldmljZSAqYWRldiwg
+dTMyIHR5cGUpDQo+IGFuZCBmcmllbmRzIGFsbCBqdXN0IGlnbm9yZSB0aGlzIGV2ZW50IHR5cGUu
+DQo+IA0KPiANCj4gDQo+IC0tDQo+IE1TVA0KDQpIaSBNaWNoYWVsLA0KDQpJZiB3ZSB3YW50IHRv
+IGZpeCB0aGlzIHByb2JsZW0gb24gdGhlIGJhY2tlbmQsIGl0IGlzIG5vdCBlbm91Z2ggdG8gY29u
+c2lkZXIgb25seSBQQ0kNCmRldmljZSBob3QgcGx1Z2dpbmcsIGJlY2F1c2UgSSBmb3VuZCB0aGF0
+IGlmIHdlIHVzZSBhIGNvbW1hbmQgbGlrZQ0KImVjaG8gMSA+IC9zeXMvYnVzL3BjaS9yZXNjYW4i
+IGluIGd1ZXN0LCB0aGlzIHByb2JsZW0gaXMgdmVyeSBlYXN5IHRvIHJlcHJvZHVjZS4NCg0KRnJv
+bSB0aGUgcGVyc3BlY3RpdmUgb2YgZGV2aWNlIGVtdWxhdGlvbiwgd2hlbiBndWVzdCB3cml0ZXMg
+MHhmZmZmZmZmZiB0byB0aGUgQkFSLA0KZ3Vlc3QganVzdCB3YW50IHRvIGdldCB0aGUgc2l6ZSBv
+ZiB0aGUgcmVnaW9uIGJ1dCBub3QgcmVhbGx5IHVwZGF0aW5nIHRoZSBhZGRyZXNzIHNwYWNlLg0K
+U28gSSBtYWRlIHRoZSBmb2xsb3dpbmcgcGF0Y2ggdG8gYXZvaWQgIHVwZGF0ZSBwY2kgbWFwcGlu
+Zy4NCg0KRG8geW91IHRoaW5rIHRoaXMgbWFrZSBzZW5zZT8NCg0KW1BBVENIXSBwY2k6IGF2b2lk
+IHVwZGF0ZSBwY2kgbWFwcGluZyB3aGVuIHdyaXRpbmcgMHhGRkZGIEZGRkYgdG8gQkFSDQoNCldo
+ZW4gZ3Vlc3Qgd3JpdGVzIDB4ZmZmZmZmZmYgdG8gdGhlIEJBUiwgZ3Vlc3QganVzdCB3YW50IHRv
+IGdldCB0aGUgc2l6ZSBvZiB0aGUgcmVnaW9uDQpidXQgbm90IHJlYWxseSB1cGRhdGluZyB0aGUg
+YWRkcmVzcyBzcGFjZS4NClNvIHdoZW4gZ3Vlc3Qgd3JpdGVzIDB4ZmZmZmZmZmYgdG8gQkFSLCB3
+ZSBuZWVkIGF2b2lkIHBjaV91cGRhdGVfbWFwcGluZ3MgDQpvciBwY2lfYnJpZGdlX3VwZGF0ZV9t
+YXBwaW5ncy4NCg0KU2lnbmVkLW9mZi1ieTogeHV5YW5kb25nIDx4dXlhbmRvbmcyQGh1YXdlaS5j
+b20+DQotLS0NCiBody9wY2kvcGNpLmMgICAgICAgIHwgNiArKysrLS0NCiBody9wY2kvcGNpX2Jy
+aWRnZS5jIHwgOCArKysrKy0tLQ0KIDIgZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCA1
+IGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvaHcvcGNpL3BjaS5jIGIvaHcvcGNpL3BjaS5j
+DQppbmRleCA1NmIxM2IzLi5lZjM2OGUxIDEwMDY0NA0KLS0tIGEvaHcvcGNpL3BjaS5jDQorKysg
+Yi9ody9wY2kvcGNpLmMNCkBAIC0xMzYxLDYgKzEzNjEsNyBAQCB2b2lkIHBjaV9kZWZhdWx0X3dy
+aXRlX2NvbmZpZyhQQ0lEZXZpY2UgKmQsIHVpbnQzMl90IGFkZHIsIHVpbnQzMl90IHZhbF9pbiwg
+aW50DQogew0KICAgICBpbnQgaSwgd2FzX2lycV9kaXNhYmxlZCA9IHBjaV9pcnFfZGlzYWJsZWQo
+ZCk7DQogICAgIHVpbnQzMl90IHZhbCA9IHZhbF9pbjsNCisgICAgdWludDY0X3QgYmFybWFzayA9
+ICgxIDw8IGwqOCkgLSAxOw0KIA0KICAgICBmb3IgKGkgPSAwOyBpIDwgbDsgdmFsID4+PSA4LCAr
+K2kpIHsNCiAgICAgICAgIHVpbnQ4X3Qgd21hc2sgPSBkLT53bWFza1thZGRyICsgaV07DQpAQCAt
+MTM2OSw5ICsxMzcwLDEwIEBAIHZvaWQgcGNpX2RlZmF1bHRfd3JpdGVfY29uZmlnKFBDSURldmlj
+ZSAqZCwgdWludDMyX3QgYWRkciwgdWludDMyX3QgdmFsX2luLCBpbnQNCiAgICAgICAgIGQtPmNv
+bmZpZ1thZGRyICsgaV0gPSAoZC0+Y29uZmlnW2FkZHIgKyBpXSAmIH53bWFzaykgfCAodmFsICYg
+d21hc2spOw0KICAgICAgICAgZC0+Y29uZmlnW2FkZHIgKyBpXSAmPSB+KHZhbCAmIHcxY21hc2sp
+OyAvKiBXMUM6IFdyaXRlIDEgdG8gQ2xlYXIgKi8NCiAgICAgfQ0KLSAgICBpZiAocmFuZ2VzX292
+ZXJsYXAoYWRkciwgbCwgUENJX0JBU0VfQUREUkVTU18wLCAyNCkgfHwNCisgICAgaWYgKCh2YWxf
+aW4gIT0gYmFybWFzayAmJg0KKwkocmFuZ2VzX292ZXJsYXAoYWRkciwgbCwgUENJX0JBU0VfQURE
+UkVTU18wLCAyNCkgfHwNCiAgICAgICAgIHJhbmdlc19vdmVybGFwKGFkZHIsIGwsIFBDSV9ST01f
+QUREUkVTUywgNCkgfHwNCi0gICAgICAgIHJhbmdlc19vdmVybGFwKGFkZHIsIGwsIFBDSV9ST01f
+QUREUkVTUzEsIDQpIHx8DQorICAgICAgICByYW5nZXNfb3ZlcmxhcChhZGRyLCBsLCBQQ0lfUk9N
+X0FERFJFU1MxLCA0KSkpIHx8DQogICAgICAgICByYW5nZV9jb3ZlcnNfYnl0ZShhZGRyLCBsLCBQ
+Q0lfQ09NTUFORCkpDQogICAgICAgICBwY2lfdXBkYXRlX21hcHBpbmdzKGQpOw0KIA0KZGlmZiAt
+LWdpdCBhL2h3L3BjaS9wY2lfYnJpZGdlLmMgYi9ody9wY2kvcGNpX2JyaWRnZS5jDQppbmRleCBl
+ZTlkZmYyLi5mMmJhZDc5IDEwMDY0NA0KLS0tIGEvaHcvcGNpL3BjaV9icmlkZ2UuYw0KKysrIGIv
+aHcvcGNpL3BjaV9icmlkZ2UuYw0KQEAgLTI1MywxNyArMjUzLDE5IEBAIHZvaWQgcGNpX2JyaWRn
+ZV93cml0ZV9jb25maWcoUENJRGV2aWNlICpkLA0KICAgICBQQ0lCcmlkZ2UgKnMgPSBQQ0lfQlJJ
+REdFKGQpOw0KICAgICB1aW50MTZfdCBvbGRjdGwgPSBwY2lfZ2V0X3dvcmQoZC0+Y29uZmlnICsg
+UENJX0JSSURHRV9DT05UUk9MKTsNCiAgICAgdWludDE2X3QgbmV3Y3RsOw0KKyAgICB1aW50NjRf
+dCBiYXJtYXNrID0gKDEgPDwgbGVuICogOCkgLSAxOw0KIA0KICAgICBwY2lfZGVmYXVsdF93cml0
+ZV9jb25maWcoZCwgYWRkcmVzcywgdmFsLCBsZW4pOw0KIA0KICAgICBpZiAocmFuZ2VzX292ZXJs
+YXAoYWRkcmVzcywgbGVuLCBQQ0lfQ09NTUFORCwgMikgfHwNCiANCi0gICAgICAgIC8qIGlvIGJh
+c2UvbGltaXQgKi8NCi0gICAgICAgIHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxlbiwgUENJX0lP
+X0JBU0UsIDIpIHx8DQorICAgICAgICAodmFsICE9IGJhcm1hc2sgJiYNCisJLyogaW8gYmFzZS9s
+aW1pdCAqLw0KKyAgICAgICAgKHJhbmdlc19vdmVybGFwKGFkZHJlc3MsIGxlbiwgUENJX0lPX0JB
+U0UsIDIpIHx8DQogDQogICAgICAgICAvKiBtZW1vcnkgYmFzZS9saW1pdCwgcHJlZmV0Y2hhYmxl
+IGJhc2UvbGltaXQgYW5kDQogICAgICAgICAgICBpbyBiYXNlL2xpbWl0IHVwcGVyIDE2ICovDQot
+ICAgICAgICByYW5nZXNfb3ZlcmxhcChhZGRyZXNzLCBsZW4sIFBDSV9NRU1PUllfQkFTRSwgMjAp
+IHx8DQorICAgICAgICByYW5nZXNfb3ZlcmxhcChhZGRyZXNzLCBsZW4sIFBDSV9NRU1PUllfQkFT
+RSwgMjApKSkgfHwNCiANCiAgICAgICAgIC8qIHZnYSBlbmFibGUgKi8NCiAgICAgICAgIHJhbmdl
+c19vdmVybGFwKGFkZHJlc3MsIGxlbiwgUENJX0JSSURHRV9DT05UUk9MLCAyKSkgew0KLS0gDQox
+LjguMy4xDQoNCg0KDQo=
