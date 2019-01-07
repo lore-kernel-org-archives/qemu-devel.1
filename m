@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38753)
+Received: from eggs.gnu.org ([209.51.188.92]:41222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggUqB-0000km-6Z
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:21:16 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggV0D-000330-AY
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:31:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggUq9-0001D4-65
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:21:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55224)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ggUq8-00019K-UL
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:21:13 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
-	<26b300d6c17e6ac015f1519d50151744cf806c03.1545598229.git.DirtY.iCE.hu@gmail.com>
-Date: Mon, 07 Jan 2019 14:13:52 +0100
-In-Reply-To: <26b300d6c17e6ac015f1519d50151744cf806c03.1545598229.git.DirtY.iCE.hu@gmail.com>
-	(=?utf-8?B?IkvFkXbDoWfDsywgWm9sdMOhbiIncw==?= message of "Sun,
-	23 Dec 2018 21:51:42 +0100")
-Message-ID: <87sgy4k3u7.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1ggV0C-0005xN-Iu
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:31:37 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39263)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ggV08-0005mw-Pf
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 08:31:34 -0500
+Received: by mail-oi1-x241.google.com with SMTP id i6so285449oia.6
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 05:31:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 06/52] audio: -audiodev command line
- option basic implementation
+References: <20181214052410.11863-1-richard.henderson@linaro.org>
+	<20181214052410.11863-23-richard.henderson@linaro.org>
+In-Reply-To: <20181214052410.11863-23-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Jan 2019 13:31:20 +0000
+Message-ID: <CAFEAcA-qLZu72eaaahdN8=qK79CRLwmAn3aMgOxCVc6Pq=fXww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 22/27] target/arm: Implement pauth_addpac
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,185 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-"K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com> writes:
-
-> Audio drivers now get an Audiodev * as config paramters, instead of the
-> global audio_option structs.  There is some code in audio/audio_legacy.c
-> that converts the old environment variables to audiodev options (this
-> way backends do not have to worry about legacy options).  It also
-> contains a replacement of -audio-help, which prints out the equivalent
-> -audiodev based config of the currently specified environment variables.
+On Fri, 14 Dec 2018 at 05:24, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> Note that backends are not updated and still rely on environment
-> variables.
+> This is not really functional yet, because the crypto is not yet
+> implemented.  This, however follows the AddPAC pseudo function.
 >
-> Also note that (due to moving try-poll from global to backend specific
-> option) currently ALSA and OSS will always try poll mode, regardless of
-> environment variables or -audiodev options.
->
-> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-[...]
-> diff --git a/audio/audio.c b/audio/audio.c
-> index 96cbd57c37..e7f25ea84b 100644
-> --- a/audio/audio.c
-> +++ b/audio/audio.c
-[...]
-> @@ -2127,3 +1841,158 @@ void AUD_set_volume_in (SWVoiceIn *sw, int mute, =
-uint8_t lvol, uint8_t rvol)
->          }
->      }
+>  target/arm/helper-a64.c | 40 +++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 39 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+> index 87cff7d96a..19486b9677 100644
+> --- a/target/arm/helper-a64.c
+> +++ b/target/arm/helper-a64.c
+> @@ -1066,7 +1066,45 @@ static uint64_t pauth_computepac(uint64_t data, uint64_t modifier,
+>  static uint64_t pauth_addpac(CPUARMState *env, uint64_t ptr, uint64_t modifier,
+>                               ARMPACKey *key, bool data)
+>  {
+> -    g_assert_not_reached(); /* FIXME */
+> +    ARMMMUIdx mmu_idx = arm_stage1_mmu_idx(env);
+> +    ARMVAParameters param = aa64_va_parameters(env, ptr, mmu_idx, data);
+> +    uint64_t pac, ext_ptr, ext, test;
+> +    int bot_bit, top_bit;
+> +
+> +    /* If tagged pointers are in use, use ptr<55>, otherwise ptr<63>.  */
+> +    if (param.tbi) {
+> +        ext = sextract64(ptr, 55, 1);
+> +    } else {
+> +        ext = sextract64(ptr, 63, 1);
+> +    }
+> +
+> +    /* Build a pointer with known good extension bits.  */
+> +    top_bit = 64 - 8 * param.tbi;
+> +    bot_bit = 64 - param.tsz;
+> +    ext_ptr = deposit64(ptr, bot_bit, top_bit - bot_bit, ext);
+> +
+> +    pac = pauth_computepac(ext_ptr, modifier, *key);
+> +
+> +    /* Check if the ptr has good extension bits and corrupt the
+> +     * pointer authentication code if not.
+> +     */
+
+Newer checkpatch will grumble about this style of block
+comment, by the way.
+
+> +    test = sextract64(ptr, bot_bit, top_bit - bot_bit);
+> +    if (test != 0 && test != -1) {
+> +        pac ^= 1ull << (top_bit - 1);
+
+MAKE_64BIT_MASK(top_bit - 1, 1) might be more consistent with
+the code below ?
+
+> +    }
+> +
+> +    /* Preserve the determination between upper and lower at bit 55,
+> +     * and insert pointer authentication code.
+> +     */
+> +    if (param.tbi) {
+> +        ptr &= ~MAKE_64BIT_MASK(bot_bit, 55 - bot_bit + 1);
+> +        pac &= MAKE_64BIT_MASK(bot_bit, 54 - bot_bit + 1);
+> +    } else {
+> +        ptr &= MAKE_64BIT_MASK(0, bot_bit);
+> +        pac &= ~(MAKE_64BIT_MASK(55, 1) | MAKE_64BIT_MASK(0, bot_bit));
+> +    }
+> +    ext &= MAKE_64BIT_MASK(55, 1);
+
+I found this a bit confusing to disentangle and compare with
+the pseudocode: the difference between the tbi and
+not-tbi cases is only "what are bits 63:56 in the result",
+but the implementation of how we put together bits 55:0 is
+different in the two code paths here.
+
+> +    return pac | ext | ptr;
 >  }
-> +
-> +QemuOptsList qemu_audiodev_opts =3D {
-> +    .name =3D "audiodev",
-> +    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_audiodev_opts.head),
-> +    .implied_opt_name =3D "driver",
-> +    .desc =3D {
-> +        /*
-> +         * no elements =3D> accept any params
-> +         * sanity checking will happen later
-> +         */
-> +        { /* end of list */ }
-> +    },
-> +};
-> +
-> +static void validate_per_direction_opts(AudiodevPerDirectionOptions *pdo,
-> +                                        Error **errp)
-> +{
-> +    if (!pdo->has_fixed_settings) {
-> +        pdo->has_fixed_settings =3D true;
-> +        pdo->fixed_settings =3D true;
-> +    }
-> +    if (!pdo->fixed_settings &&
-> +        (pdo->has_frequency || pdo->has_channels || pdo->has_format)) {
-> +        error_setg(errp,
-> +                   "You can't use frequency, channels or format with fix=
-ed-settings=3Doff");
-> +        return;
-> +    }
-> +
-> +    if (!pdo->has_frequency) {
-> +        pdo->has_frequency =3D true;
-> +        pdo->frequency =3D 44100;
-> +    }
-> +    if (!pdo->has_channels) {
-> +        pdo->has_channels =3D true;
-> +        pdo->channels =3D 2;
-> +    }
-> +    if (!pdo->has_voices) {
-> +        pdo->has_voices =3D true;
-> +        pdo->voices =3D 1;
-> +    }
-> +    if (!pdo->has_format) {
-> +        pdo->has_format =3D true;
-> +        pdo->format =3D AUDIO_FORMAT_S16;
-> +    }
-> +}
-> +
-> +static Audiodev *parse_option(QemuOpts *opts, Error **errp)
-> +{
-> +    Error *local_err =3D NULL;
-> +    Visitor *v =3D opts_visitor_new(opts, true);
-> +    Audiodev *dev =3D NULL;
-> +    visit_type_Audiodev(v, NULL, &dev, &local_err);
-> +    visit_free(v);
-> +
-> +    if (local_err) {
-> +        goto err2;
-> +    }
-> +
-> +    validate_per_direction_opts(dev->in, &local_err);
-> +    if (local_err) {
-> +        goto err;
-> +    }
-> +    validate_per_direction_opts(dev->out, &local_err);
-> +    if (local_err) {
-> +        goto err;
-> +    }
-> +
-> +    if (!dev->has_timer_period) {
-> +        dev->has_timer_period =3D true;
-> +        dev->timer_period =3D 10000; /* 100Hz -> 10ms */
-> +    }
-> +
-> +    return dev;
-> +
-> +err:
-> +    qapi_free_Audiodev(dev);
-> +err2:
-> +    error_propagate(errp, local_err);
-> +    return NULL;
-> +}
-> +
-> +static int each_option(void *opaque, QemuOpts *opts, Error **errp)
-> +{
-> +    Audiodev *dev =3D parse_option(opts, errp);
-> +    if (!dev) {
-> +        return -1;
-> +    }
-> +    return audio_init(dev);
-> +}
-> +
-> +void audio_set_options(void)
-> +{
-> +    if (qemu_opts_foreach(qemu_find_opts("audiodev"), each_option, NULL,
-> +                          &error_abort)) {
-> +        exit(1);
-> +    }
-> +}
-[...]
-> diff --git a/vl.c b/vl.c
-> index 8353d3c718..b5364ffe46 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3074,6 +3074,7 @@ int main(int argc, char **argv, char **envp)
->      qemu_add_opts(&qemu_option_rom_opts);
->      qemu_add_opts(&qemu_machine_opts);
->      qemu_add_opts(&qemu_accel_opts);
-> +    qemu_add_opts(&qemu_audiodev_opts);
->      qemu_add_opts(&qemu_mem_opts);
->      qemu_add_opts(&qemu_smp_opts);
->      qemu_add_opts(&qemu_boot_opts);
-> @@ -3307,9 +3308,15 @@ int main(int argc, char **argv, char **envp)
->                  add_device_config(DEV_BT, optarg);
->                  break;
->              case QEMU_OPTION_audio_help:
-> -                AUD_help ();
-> +                audio_legacy_help();
->                  exit (0);
->                  break;
-> +            case QEMU_OPTION_audiodev:
-> +                if (!qemu_opts_parse_noisily(qemu_find_opts("audiodev"),
-> +                                             optarg, true)) {
-> +                    exit(1);
-> +                }
-> +                break;
->              case QEMU_OPTION_soundhw:
->                  select_soundhw (optarg);
->                  break;
-> @@ -4545,6 +4552,8 @@ int main(int argc, char **argv, char **envp)
->      /* do monitor/qmp handling at preconfig state if requested */
->      main_loop();
->=20=20
-> +    audio_set_options();
-> +
->      /* from here on runstate is RUN_STATE_PRELAUNCH */
->      machine_run_board_init(current_machine);
+>
+>  static uint64_t pauth_original_ptr(uint64_t ptr, ARMVAParameters param)
+> --
+> 2.17.2
 
-This uses the options visitor, roughly like -netdev.  Depends on your
-options visitor enhancements.  Is there any particular reason not to do
-it like -blockdev and -display, with qobject_input_visitor_new_str()?
-I'm asking because I'd very much like new code to use
-qobject_input_visitor_new_str() rather than the options visitor.
+Anyway, the implementation is correct, so:
 
-Today, the options visitor looks like an evolutionary dead end.  My
-command-line qapification (still stuck at the RFC stage, hope to get it
-unstuck this year) relies on qobject_input_visitor_new_str().  The goal
-is to convert *all* of the command line to it.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-I suspect your series uses the options visitor only because back when
-you started, qobject_input_visitor_new_str() didn't exist.
+thanks
+-- PMM
