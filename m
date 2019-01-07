@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43639)
+Received: from eggs.gnu.org ([209.51.188.92]:43959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ggPvG-0007TV-Dw
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:06:11 -0500
+	(envelope-from <nicholas.a.hudson@gmail.com>) id 1ggPwB-00086C-RN
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:07:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ggPvE-0000Aq-HB
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:06:10 -0500
-References: <20190104175847.6290-1-philmd@redhat.com>
-	<20190104175847.6290-9-philmd@redhat.com>
-	<fe31012f-9311-1455-a20a-70eb83400e50@redhat.com>
-	<6443e9fa-6fb3-56d8-8568-93608cff0d69@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2641db06-06c3-3c18-c00b-db7e17cffa55@redhat.com>
-Date: Mon, 7 Jan 2019 09:05:37 +0100
+	(envelope-from <nicholas.a.hudson@gmail.com>) id 1ggPwA-0001DS-Fv
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:07:07 -0500
+References: <d19529f5-841e-ea06-fe7d-86ccfd528817@gmail.com>
+	<alpine.BSF.2.21.9999.1901070108080.28018@zero.eik.bme.hu>
+From: Nick Hudson <nicholas.a.hudson@gmail.com>
+Message-ID: <8dd03185-2d92-328a-dfb1-e0b2ce6ea2e1@gmail.com>
+Date: Mon, 7 Jan 2019 08:06:57 +0000
 MIME-Version: 1.0
-In-Reply-To: <6443e9fa-6fb3-56d8-8568-93608cff0d69@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 08/16] MAINTAINERS: Add missing entries for
- the TI touchscreen devices
+In-Reply-To: <alpine.BSF.2.21.9999.1901070108080.28018@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4] Support u-boot noload images for arm as
+ used by, NetBSD/evbarm GENERIC kernel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +25,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Magnus Damm <magnus.damm@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, Michael Walle <michael@walle.cc>, Richard Henderson <rth@twiddle.net>, Jan Kiszka <jan.kiszka@web.de>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Peter Chubb <peter.chubb@nicta.com.au>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Rob Herring <robh@kernel.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 2019-01-07 09:02, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Thomas,
->=20
-> On 1/7/19 8:18 AM, Thomas Huth wrote:
->> On 2019-01-04 18:58, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> ---
->>>  MAINTAINERS | 2 ++
->>>  1 file changed, 2 insertions(+)
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index f571b29077..03872552ee 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -640,6 +640,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
->>>  L: qemu-arm@nongnu.org
->>>  S: Odd Fixes
->>>  F: hw/arm/nseries.c
->>> +F: hw/input/tsc2*.c
->>>  F: include/hw/display/blizzard.h
->>>  F: include/hw/misc/cbus.h
->>> =20
->>> @@ -649,6 +650,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
->>>  L: qemu-arm@nongnu.org
->>>  S: Odd Fixes
->>>  F: hw/arm/palm.c
->>> +F: hw/input/tsc2*.c
+Thanks for the comments.
+
+On 07/01/2019 00:33, BALATON Zoltan wrote:
+> On Sun, 6 Jan 2019, Nick Hudson wrote:
+>> noload kernels are loaded with the u-boot image header and as a result
+>> the header size needs adding to the entry point.  Fake up a hdr so the
+>> kernel image is loaded at the right address and the entry point is
+>> adjusted appropriately.
 >>
->> The Palm machine does not seem to use tsc2005, does it? So I think thi=
-s
->> entry here is wrong.
->=20
-> It does use another touchscreen controller, the tsc2102, which in the
-> next patch are declared in the same header (you suggested "tsc2xxx.h):
+>> The default location for the uboot file is 32MiB above bottom of DRAM.
+>> This matches the recommendation in Documentation/arm/Booting.
+>>
+>> Clarify the load_uimage API to state the passing of a load address 
+>> when an
+>> image doesn't specify one, or when loading a ramdisk is expected.
+>>
+>> Adjust callers of load_uimage, etc.
+>> ---
+>> hw/arm/boot.c          |  8 +++++---
+>> hw/core/loader.c       | 19 ++++++++++++++++---
+>> hw/core/uboot_image.h  |  1 +
+>> hw/microblaze/boot.c   |  2 +-
+>> hw/nios2/boot.c        |  2 +-
+>> hw/ppc/e500.c          |  1 +
+>> hw/ppc/ppc440_bamboo.c |  2 +-
+>> hw/ppc/sam460ex.c      |  2 +-
+>> include/hw/loader.h    |  7 ++++++-
+>> 9 files changed, 33 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+>> index 94fce12802..c7a67af7a9 100644
+>> --- a/hw/arm/boot.c
+>> +++ b/hw/arm/boot.c
+>> @@ -30,8 +30,9 @@
+>>  * Documentation/arm/Booting and Documentation/arm64/booting.txt
+>>  * They have different preferred image load offsets from system RAM base.
+>>  */
+>> -#define KERNEL_ARGS_ADDR 0x100
+>> -#define KERNEL_LOAD_ADDR 0x00010000
+>> +#define KERNEL_ARGS_ADDR   0x100
+>> +#define KERNEL_NOLOAD_ADDR 0x02000000
+>> +#define KERNEL_LOAD_ADDR   0x00010000
+>> #define KERNEL64_LOAD_ADDR 0x00080000
+>>
+>> #define ARM64_TEXT_OFFSET_OFFSET    8
+>> @@ -1082,7 +1083,8 @@ void arm_load_kernel(ARMCPU *cpu, struct 
+>> arm_boot_info *info)
+>>     }
+>>     entry = elf_entry;
+>>     if (kernel_size < 0) {
+>> -        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
+>> NULL,
+>> +        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
+>> +        kernel_size = load_uimage_as(info->kernel_filename, &entry, 
+>> &loadaddr,
+>>                                      &is_linux, NULL, NULL, as);
+>>     }
+>>     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
+>> diff --git a/hw/core/loader.c b/hw/core/loader.c
+>> index fa41842280..c7182dfa64 100644
+>> --- a/hw/core/loader.c
+>> +++ b/hw/core/loader.c
+>> @@ -613,13 +613,26 @@ static int load_uboot_image(const char 
+>> *filename, hwaddr *ep, hwaddr *loadaddr,
+>>         goto out;
+>>
+>>     if (hdr->ih_type != image_type) {
+>> -        fprintf(stderr, "Wrong image type %d, expected %d\n", 
+>> hdr->ih_type,
+>> -                image_type);
+>> -        goto out;
+>> +        if (!(image_type == IH_TYPE_KERNEL &&
+>> +            hdr->ih_type == IH_TYPE_KERNEL_NOLOAD)) {
+> 
+> So this is now effectively
+> 
+> (hdr->ih_type != image_type && !(image_type == IH_TYPE_KERNEL && 
+> hdr->ih_type == IH_TYPE_KERNEL_NOLOAD))
+> 
+> Maybe you don't need two if-s just one with this condition?
 
-So using the tsc2*.c wildcard for the *C* file is still wrong here,
-isn't it?
+I didn't see anything in the style guide that stipulated I couldn't keep
+the two ifs.  I've left it as is.
 
- Thomas
+> 
+>> +            fprintf(stderr, "Wrong image type %d, expected %d\n", 
+>> hdr->ih_type,
+>> +                    image_type);
+>> +            goto out;
+>> +        }
+>>     }
+>>
+>>     /* TODO: Implement other image types.  */
+>>     switch (hdr->ih_type) {
+>> +    case IH_TYPE_KERNEL_NOLOAD:
+>> +        if (!loadaddr || *loadaddr == LOAD_UIMAGE_LOADADDR_INVALID) {
+>> +            fprintf(stderr, "this image format (kernel_noload) cannot 
+>> be "
+>> +                    "loaded on this machine type");
+>> +            goto out;
+>> +        }
+>> +
+>> +        hdr->ih_load = *loadaddr + sizeof(*hdr);
+>> +        hdr->ih_ep += hdr->ih_load;
+>> +        /* fall through */
+>>     case IH_TYPE_KERNEL:
+>>         address = hdr->ih_load;
+>>         if (translate_fn) {
+>> diff --git a/hw/core/uboot_image.h b/hw/core/uboot_image.h
+>> index 34c11a70a6..608022de6e 100644
+>> --- a/hw/core/uboot_image.h
+>> +++ b/hw/core/uboot_image.h
+>> @@ -124,6 +124,7 @@
+>> #define IH_TYPE_SCRIPT        6    /* Script file            */
+>> #define IH_TYPE_FILESYSTEM    7    /* Filesystem Image (any type)    */
+>> #define IH_TYPE_FLATDT        8    /* Binary Flat Device Tree Blob    */
+>> +#define IH_TYPE_KERNEL_NOLOAD  14    /* OS Kernel Image (noload)    */
+> 
+> Do we want to make this an enum like in recent U-Boot? (Not suggesting 
+> we should just asking if you're touching this anyway.)
+
+I guess this is for someone else to answer. I wanted to provide a 
+minimal diff.
+
+
+> 
+>> /*
+>>  * Compression Types
+>> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
+>> index 35bfeda7aa..489ab839b7 100644
+>> --- a/hw/microblaze/boot.c
+>> +++ b/hw/microblaze/boot.c
+>> @@ -156,7 +156,7 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, 
+>> hwaddr ddr_base,
+>>
+>>         /* If it wasn't an ELF image, try an u-boot image.  */
+>>         if (kernel_size < 0) {
+>> -            hwaddr uentry, loadaddr;
+>> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>>
+>>             kernel_size = load_uimage(kernel_filename, &uentry, 
+>> &loadaddr, 0,
+>>                                       NULL, NULL);
+>> diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
+>> index 4bb5b601d3..ed5cb28e94 100644
+>> --- a/hw/nios2/boot.c
+>> +++ b/hw/nios2/boot.c
+>> @@ -161,7 +161,7 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr 
+>> ddr_base,
+>>
+>>         /* If it wasn't an ELF image, try an u-boot image. */
+>>         if (kernel_size < 0) {
+>> -            hwaddr uentry, loadaddr;
+>> +            hwaddr uentry, loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>>
+>>             kernel_size = load_uimage(kernel_filename, &uentry, 
+>> &loadaddr, 0,
+>>                                       NULL, NULL);
+>> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+>> index b20fea0dfc..0581e9e3d4 100644
+>> --- a/hw/ppc/e500.c
+>> +++ b/hw/ppc/e500.c
+>> @@ -995,6 +995,7 @@ void ppce500_init(MachineState *machine)
+>>          * Hrm. No ELF image? Try a uImage, maybe someone is giving us an
+>>          * ePAPR compliant kernel
+>>          */
+>> +        loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>>         payload_size = load_uimage(filename, &bios_entry, &loadaddr, 
+>> NULL,
+>>                                    NULL, NULL);
+>>         if (payload_size < 0) {
+>> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+>> index b8aa55d526..fc06191588 100644
+>> --- a/hw/ppc/ppc440_bamboo.c
+>> +++ b/hw/ppc/ppc440_bamboo.c
+>> @@ -179,7 +179,7 @@ static void bamboo_init(MachineState *machine)
+>>     CPUPPCState *env;
+>>     uint64_t elf_entry;
+>>     uint64_t elf_lowaddr;
+>> -    hwaddr loadaddr = 0;
+>> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>>     target_long initrd_size = 0;
+>>     DeviceState *dev;
+>>     int success;
+>> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+>> index 4b051c0950..84ea592749 100644
+>> --- a/hw/ppc/sam460ex.c
+>> +++ b/hw/ppc/sam460ex.c
+>> @@ -402,7 +402,7 @@ static void sam460ex_init(MachineState *machine)
+>>     CPUPPCState *env;
+>>     PPC4xxI2CState *i2c[2];
+>>     hwaddr entry = UBOOT_ENTRY;
+>> -    hwaddr loadaddr = 0;
+>> +    hwaddr loadaddr = LOAD_UIMAGE_LOADADDR_INVALID;
+>>     target_long initrd_size = 0;
+>>     DeviceState *dev;
+>>     SysBusDevice *sbdev;
+>> diff --git a/include/hw/loader.h b/include/hw/loader.h
+>> index 0a0ad808ea..84d6bb44b7 100644
+>> --- a/include/hw/loader.h
+>> +++ b/include/hw/loader.h
+>> @@ -175,10 +175,15 @@ void load_elf_hdr(const char *filename, void 
+>> *hdr, bool *is64, Error **errp);
+>> int load_aout(const char *filename, hwaddr addr, int max_sz,
+>>               int bswap_needed, hwaddr target_page_size);
+>>
+>> +#define LOAD_UIMAGE_LOADADDR_INVALID (-1)
+> 
+> hwadrr is uint64_t, an unsigned type so maybe -1 is not the best value 
+> for invalid address. Doesn't this give you a warning?
+
+I don't see a problem here and no warning is issued in my build.
+
+> 
+>> +
+>> /** load_uimage_as:
+>>  * @filename: Path of uimage file
+>>  * @ep: Populated with program entry point. Ignored if NULL.
+>> - * @loadaddr: Populated with the load address. Ignored if NULL.
+>> + * @loadaddr: load address if none specified in the image or when 
+>> loading a ramdisk.
+>> + *            Populated with the the load address. Ignored if NULL or
+> 
+> You have "the the" typo here ---^^^^^^^
+
+fixed in v5.
+
+> 
+>> + *            LOAD_UIMAGE_LOADADDR_INVALID (images which do not 
+>> specify a load address
+>> + *            will not be loadable).
+>>  * @is_linux: Is set to true if the image loaded is Linux. Ignored if 
+>> NULL.
+>>  * @translate_fn: optional function to translate load addresses
+>>  * @translate_opaque: opaque data passed to @translate_fn
+>>
+
+
+Thanks,
+Nick
