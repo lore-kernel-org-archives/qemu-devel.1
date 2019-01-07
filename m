@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51344)
+Received: from eggs.gnu.org ([209.51.188.92]:54604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU7u-0001n9-SN
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:35:31 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ggUF9-0007nD-2j
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:43:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU7t-0004pL-1F
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:35:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57896)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ggU7s-0004o9-Pg
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:35:28 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon,  7 Jan 2019 16:23:03 +0400
-Message-Id: <20190107122304.22997-28-marcandre.lureau@redhat.com>
-In-Reply-To: <20190107122304.22997-1-marcandre.lureau@redhat.com>
-References: <20190107122304.22997-1-marcandre.lureau@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1ggUF8-0008OG-33
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:42:59 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54156)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ggUF7-0008N7-RT
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:42:58 -0500
+Received: by mail-wm1-x344.google.com with SMTP id d15so751293wmb.3
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 04:42:57 -0800 (PST)
+References: <20181220111008.24954-1-alex.bennee@linaro.org>
+	<20181221193037.GB11197@flamenco>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181221193037.GB11197@flamenco>
+Date: Mon, 07 Jan 2019 12:42:55 +0000
+Message-ID: <87k1jgvdtc.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 27/28] arm: replace instance_post_init()
+Subject: Re: [Qemu-devel] [RFC PATCH] fpu: add compile time check for old
+ glibc/libm and fma
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,198 +31,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, laurent.desnogues@gmail.com, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
 
-Replace arm_cpu_post_init() instance callback by calling it from leaf
-classes, to avoid potential ordering issue with other post_init callbacks=
-.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/arm/cpu-qom.h |  3 +++
- target/arm/cpu.h     |  2 ++
- target/arm/cpu.c     | 30 ++++++++++++++++++++++++------
- target/arm/cpu64.c   | 24 ++++++++++++++++++++----
- 4 files changed, 49 insertions(+), 10 deletions(-)
+Emilio G. Cota <cota@braap.org> writes:
 
-diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
-index d135ff8e06..2049fa9612 100644
---- a/target/arm/cpu-qom.h
-+++ b/target/arm/cpu-qom.h
-@@ -35,6 +35,8 @@ struct arm_boot_info;
-=20
- #define TYPE_ARM_MAX_CPU "max-" TYPE_ARM_CPU
-=20
-+typedef struct ARMCPUInfo ARMCPUInfo;
-+
- /**
-  * ARMCPUClass:
-  * @parent_realize: The parent class' realize handler.
-@@ -47,6 +49,7 @@ typedef struct ARMCPUClass {
-     CPUClass parent_class;
-     /*< public >*/
-=20
-+    const ARMCPUInfo *info;
-     DeviceRealize parent_realize;
-     void (*parent_reset)(CPUState *cpu);
- } ARMCPUClass;
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index c943f35dd9..3aedfeeaf1 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -884,6 +884,8 @@ static inline ARMCPU *arm_env_get_cpu(CPUARMState *en=
-v)
-     return container_of(env, ARMCPU, env);
- }
-=20
-+void arm_cpu_post_init(Object *obj);
-+
- uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz);
-=20
- #define ENV_GET_CPU(e) CPU(arm_env_get_cpu(e))
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index c8505eaaee..4c4e9e169e 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -740,7 +740,7 @@ static Property arm_cpu_pmsav7_dregion_property =3D
- static Property arm_cpu_initsvtor_property =3D
-             DEFINE_PROP_UINT32("init-svtor", ARMCPU, init_svtor, 0);
-=20
--static void arm_cpu_post_init(Object *obj)
-+void arm_cpu_post_init(Object *obj)
- {
-     ARMCPU *cpu =3D ARM_CPU(obj);
-=20
-@@ -1457,8 +1457,10 @@ static void cortex_m33_initfn(Object *obj)
-=20
- static void arm_v7m_class_init(ObjectClass *oc, void *data)
- {
-+    ARMCPUClass *acc =3D ARM_CPU_CLASS(oc);
-     CPUClass *cc =3D CPU_CLASS(oc);
-=20
-+    acc->info =3D data;
- #ifndef CONFIG_USER_ONLY
-     cc->do_interrupt =3D arm_v7m_cpu_do_interrupt;
- #endif
-@@ -1959,11 +1961,11 @@ static void arm_max_initfn(Object *obj)
-=20
- #endif /* !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64) */
-=20
--typedef struct ARMCPUInfo {
-+struct ARMCPUInfo {
-     const char *name;
-     void (*initfn)(Object *obj);
-     void (*class_init)(ObjectClass *oc, void *data);
--} ARMCPUInfo;
-+};
-=20
- static const ARMCPUInfo arm_cpus[] =3D {
- #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
-@@ -2113,6 +2115,7 @@ static void arm_host_initfn(Object *obj)
-     ARMCPU *cpu =3D ARM_CPU(obj);
-=20
-     kvm_arm_set_cpu_features_from_host(cpu);
-+    arm_cpu_post_init(obj);
- }
-=20
- static const TypeInfo host_arm_cpu_type_info =3D {
-@@ -2127,14 +2130,30 @@ static const TypeInfo host_arm_cpu_type_info =3D =
-{
-=20
- #endif
-=20
-+static void arm_cpu_instance_init(Object *obj)
-+{
-+    ARMCPUClass *acc =3D ARM_CPU_GET_CLASS(obj);
-+
-+    acc->info->initfn(obj);
-+    arm_cpu_post_init(obj);
-+}
-+
-+static void cpu_register_class_init(ObjectClass *oc, void *data)
-+{
-+    ARMCPUClass *acc =3D ARM_CPU_CLASS(oc);
-+
-+    acc->info =3D data;
-+}
-+
- static void cpu_register(const ARMCPUInfo *info)
- {
-     TypeInfo type_info =3D {
-         .parent =3D TYPE_ARM_CPU,
-         .instance_size =3D sizeof(ARMCPU),
--        .instance_init =3D info->initfn,
-+        .instance_init =3D arm_cpu_instance_init,
-         .class_size =3D sizeof(ARMCPUClass),
--        .class_init =3D info->class_init,
-+        .class_init =3D info->class_init ?: cpu_register_class_init,
-+        .class_data =3D (void *)info,
-     };
-=20
-     type_info.name =3D g_strdup_printf("%s-" TYPE_ARM_CPU, info->name);
-@@ -2147,7 +2166,6 @@ static const TypeInfo arm_cpu_type_info =3D {
-     .parent =3D TYPE_CPU,
-     .instance_size =3D sizeof(ARMCPU),
-     .instance_init =3D arm_cpu_initfn,
--    .instance_post_init =3D arm_cpu_post_init,
-     .instance_finalize =3D arm_cpu_finalizefn,
-     .abstract =3D true,
-     .class_size =3D sizeof(ARMCPUClass),
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 1d57be0c91..4b544a1c58 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -364,11 +364,11 @@ static void aarch64_max_initfn(Object *obj)
-     }
- }
-=20
--typedef struct ARMCPUInfo {
-+struct ARMCPUInfo {
-     const char *name;
-     void (*initfn)(Object *obj);
-     void (*class_init)(ObjectClass *oc, void *data);
--} ARMCPUInfo;
-+};
-=20
- static const ARMCPUInfo aarch64_cpus[] =3D {
-     { .name =3D "cortex-a57",         .initfn =3D aarch64_a57_initfn },
-@@ -452,14 +452,30 @@ static void aarch64_cpu_class_init(ObjectClass *oc,=
- void *data)
-     cc->gdb_arch_name =3D aarch64_gdb_arch_name;
- }
-=20
-+static void aarch64_cpu_instance_init(Object *obj)
-+{
-+    ARMCPUClass *acc =3D ARM_CPU_GET_CLASS(obj);
-+
-+    acc->info->initfn(obj);
-+    arm_cpu_post_init(obj);
-+}
-+
-+static void cpu_register_class_init(ObjectClass *oc, void *data)
-+{
-+    ARMCPUClass *acc =3D ARM_CPU_CLASS(oc);
-+
-+    acc->info =3D data;
-+}
-+
- static void aarch64_cpu_register(const ARMCPUInfo *info)
- {
-     TypeInfo type_info =3D {
-         .parent =3D TYPE_AARCH64_CPU,
-         .instance_size =3D sizeof(ARMCPU),
--        .instance_init =3D info->initfn,
-+        .instance_init =3D aarch64_cpu_instance_init,
-         .class_size =3D sizeof(ARMCPUClass),
--        .class_init =3D info->class_init,
-+        .class_init =3D info->class_init ?: cpu_register_class_init,
-+        .class_data =3D (void *)info,
-     };
-=20
-     type_info.name =3D g_strdup_printf("%s-" TYPE_ARM_CPU, info->name);
---=20
-2.20.1.2.gb21ebb671b
+> On Thu, Dec 20, 2018 at 11:10:08 +0000, Alex Benn=C3=A9e wrote:
+> (snip)
+>> +#if defined(__GLIBC__) && (__GLIBC__ =3D=3D 2 && __GLIBC_MINOR__ <=3D 1=
+2)
+>> +#define QEMU_HARDFLOAT_USE_FMA 0
+>> +#else
+>> +#define QEMU_HARDFLOAT_USE_FMA 1
+>> +#endif
+>> +#else
+>> +#define QEMU_HARDFLOAT_USE_FMA 1
+>> +#endif
+>> +
+>>  /*
+>>   * QEMU_HARDFLOAT_USE_ISINF chooses whether to use isinf() over
+>>   * float{32,64}_is_infinity when !USE_FP.
+>> @@ -1551,6 +1570,9 @@ float32_muladd(float32 xa, float32 xb, float32 xc,=
+ int flags, float_status *s)
+>>      ub.s =3D xb;
+>>      uc.s =3D xc;
+>>
+>> +    if (!QEMU_HARDFLOAT_USE_FMA) {
+>> +        goto soft;
+>> +    }
+>
+> I don't think this should be a compile-time check; if the QEMU binary
+> is run on a system with a newer, fixed glibc (or any other libc), then
+> we'll have disabled fma hardfloat unnecessarily.
+>
+> What do you think about the following?
+>
+> Laurent: if you want to test the below, you can pull it from
+>    https://github.com/cota/qemu/tree/fma-fix
+>
+> Thanks,
+>
+> 		Emilio
+> ---
+> commit ddeec29a2c33550c5d018aeea05d45a23579ae1b
+> Author: Emilio G. Cota <cota@braap.org>
+> Date:   Fri Dec 21 14:08:57 2018 -0500
+>
+>     softfloat: enforce softfloat if the host's FMA is broken
+>
+>     The added branch is marked as unlikely and therefore its impact
+>     on performance (measured with fp-bench) is within the noise range
+>     when measured on an Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz.
+>
+>     Laurent Desnogues <laurent.desnogues@gmail.com>
+>     Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+I've applied b8cc3928cee7b1d91bf39c86bec4801b9dc612e1 from your tree to
+fpu/next although the numbers look a bit odd. I see:
+
+Before:
+  143.83 MFlops
+  89.34 MFlops
+
+After:
+  150.20 MFlops
+  85.73 MFlops
+
+On my i7-4770 where as your commit seems to show a big jump in
+performance which is odd as this is preventing a bug not enabling FMA.
+
+> +
+> +static void __attribute__((constructor)) softfloat_init(void)
+> +{
+> +    union_float64 ua, ub, uc, ur;
+> +
+> +    if (QEMU_NO_HARDFLOAT) {
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * Test that the host's FMA is not obviously broken. For example,
+> +     * glibc < 2.23 can perform an incorrect FMA on certain hosts; see
+> +     *   https://sourceware.org/bugzilla/show_bug.cgi?id=3D13304
+> +     */
+> +    ua.s =3D 0x0020000000000001;
+> +    ub.s =3D 0x3ca0000000000000;
+> +    uc.s =3D 0x0020000000000000;
+> +    ur.h =3D fma(ua.h, ub.h, uc.h);
+> +    if (ur.s !=3D 0x0020000000000001) {
+> +        host_fma_is_broken =3D true;
+> +    }
+> +}
+
+I'm fine with the cpuid stuff at the bottom of softfloat for now. We can
+move it later if the other micro-architectures want to get in on the
+detecting features game.
+
+--
+Alex Benn=C3=A9e
