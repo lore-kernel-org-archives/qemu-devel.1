@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49938)
+Received: from eggs.gnu.org ([209.51.188.92]:53144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ggMnX-0006R8-2x
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 23:46:00 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ggN4C-0002q3-SC
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:03:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ggMnW-0000Gi-1I
-	for qemu-devel@nongnu.org; Sun, 06 Jan 2019 23:45:59 -0500
-Date: Mon, 7 Jan 2019 15:29:43 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ggN4B-0006f3-R8
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:03:12 -0500
+Date: Mon, 7 Jan 2019 15:48:15 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190107042943.GE13339@umbus.fritz.box>
+Message-ID: <20190107044815.GF13339@umbus.fritz.box>
 References: <20190102055743.5052-1-clg@kaod.org>
-	<20190102055743.5052-9-clg@kaod.org>
-	<20190103043340.GT10853@umbus.fritz.box>
-	<f21712f9-0b67-cbe2-fa5c-7207dd9321be@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="dFWYt1i2NyOo1oI9"
+	protocol="application/pgp-signature"; boundary="gdTfX7fkYsEEjebm"
 Content-Disposition: inline
-In-Reply-To: <f21712f9-0b67-cbe2-fa5c-7207dd9321be@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 08/10] ppc/xics: allow ICSState to have an
- offset 0
+In-Reply-To: <20190102055743.5052-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 00/10] spapr: introduce the 'dual'
+ interrupt mode XICS/XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +28,91 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---dFWYt1i2NyOo1oI9
+--gdTfX7fkYsEEjebm
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 03, 2019 at 06:45:25PM +0100, C=E9dric Le Goater wrote:
-> On 1/3/19 5:33 AM, David Gibson wrote:
-> > On Wed, Jan 02, 2019 at 06:57:41AM +0100, C=E9dric Le Goater wrote:
-> >> commit 15ed653fa49a ("ppc/xics: An ICS with offset 0 is assumed to be
-> >> uninitialized") introduced an extra check on the ICS offset which is
-> >> not strictly necessary.
-> >=20
-> > The commit message for that suggests it was added to make pnv easier.
-> > I take it you no longer need this for the current or expected pnv
-> > code?
+On Wed, Jan 02, 2019 at 06:57:33AM +0100, C=E9dric Le Goater wrote:
+> Hello,
 >=20
-> This is really just a runtime check which makes sure that the=20
-> ICSState offset is initialized by the FW before being used.
+> This series adds a new sPAPR IRQ backend called 'dual' which supports
+> both interrupt mode, the XIVE native exploitation mode and the legacy
+> compatibility mode (XICS).
 >=20
-> The problem is more global. It comes from the fact the ICSState=20
-> offset in QEMU and the XICS offset in KVM is hardcoded to 0x1000.=20
+> The machine operates with the legacy mode by default and lets CAS
+> negotiate a new interrupt mode. If a new mode is selected, it is
+> activated after a machine reset to take into account the required
+> changes. These impact the device tree layout, the interrupt presenter
+> object and the exposed MMIO regions in the case of XIVE.
 >=20
->   Thinking aloud :
->=20
->     May be we should default the offset to 0 and introduce a service=20
->     to set the value in QEMU and KVM.  =20
->=20
-> The 'dual' interrupt mode (using the qirq array at the machine level)=20
-> needs the IRQ number space of the XIVE and XICS interrupt mode to
-> be in sync, that is to start a 0x0, even if the lower 4K are ignored
-> in XICS.  =20
->=20
-> So the 'dual' mode tunes the offset to 0 once the ICSState is created
-> and ignores the lower 4K when initializing the KVM XICS device.
+> The preliminary changes for this new IRQ backend are the introduction
+> of a second interrupt presenter object under the PowerPCCPU to support
+> XIVE. The qemu_irq array of each interrupt controller model is also
+> made common and moved under the machine.
 
-Hm, ok.
+Ok, I've now applied all of this series to ppc-for-4.0.
 
-I've applied patches 5..8.
-
+>=20
+>=20
+> GitHub trees available here :
+> =20
+> QEMU sPAPR:
+>=20
+>   https://github.com/legoater/qemu/commits/xive-next
+>  =20
+> QEMU PowerNV:
+>=20
+>   https://github.com/legoater/qemu/commits/powernv-3.1
+>=20
+> Linux/KVM:
+>=20
+>   https://github.com/legoater/linux/commits/xive-4.20
+>=20
+> OPAL:
+>=20
+>   https://github.com/legoater/skiboot/commits/xive
+>=20
+> Best wishes for 2019 !=20
 >=20
 > C.
 >=20
-> >> Revert the change to be able to map the XICS IRQ number space on the
-> >> XIVE IRQ number space.
-> >=20
-> >=20
-> >=20
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  include/hw/ppc/xics.h | 3 +--
-> >>  1 file changed, 1 insertion(+), 2 deletions(-)
-> >>
-> >> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> >> index 7668c381a887..07508cbd217e 100644
-> >> --- a/include/hw/ppc/xics.h
-> >> +++ b/include/hw/ppc/xics.h
-> >> @@ -139,8 +139,7 @@ struct ICSState {
-> >> =20
-> >>  static inline bool ics_valid_irq(ICSState *ics, uint32_t nr)
-> >>  {
-> >> -    return (ics->offset !=3D 0) && (nr >=3D ics->offset)
-> >> -        && (nr < (ics->offset + ics->nr_irqs));
-> >> +    return (nr >=3D ics->offset) && (nr < (ics->offset + ics->nr_irqs=
-));
-> >>  }
-> >> =20
-> >>  struct ICSIRQState {
-> >=20
+>=20
+>=20
+> C=E9dric Le Goater (10):
+>   spapr: modify the prototype of the cpu_intc_create() method
+>   ppc/xive: introduce a XiveTCTX pointer under PowerPCCPU
+>   ppc: replace the 'Object *intc' by a 'ICPState *icp' pointer under the
+>     CPU
+>   spapr/xive: simplify the sPAPR IRQ qirq method for XIVE
+>   ppc: export the XICS and XIVE set_irq handlers
+>   pnv/psi: move the ICSState qemu_irq array under the PSI device model
+>   spapr: move the ICSState qemu_irq array under the machine
+>   ppc/xics: allow ICSState to have an offset 0
+>   spapr: introduce a new sPAPR IRQ backend supporting XIVE and XICS
+>   spapr: enable XIVE MMIOs at reset
+>=20
+>  include/hw/ppc/pnv.h        |   2 +-
+>  include/hw/ppc/pnv_psi.h    |   1 +
+>  include/hw/ppc/spapr.h      |   1 +
+>  include/hw/ppc/spapr_irq.h  |   6 +-
+>  include/hw/ppc/spapr_xive.h |   2 +-
+>  include/hw/ppc/xics.h       |   6 +-
+>  include/hw/ppc/xive.h       |   9 +-
+>  target/ppc/cpu.h            |   5 +-
+>  hw/intc/spapr_xive.c        |  23 ++-
+>  hw/intc/xics.c              |   4 +-
+>  hw/intc/xics_kvm.c          |   3 +-
+>  hw/intc/xics_spapr.c        |  10 +-
+>  hw/intc/xive.c              |  11 +-
+>  hw/ppc/pnv.c                |  27 ++--
+>  hw/ppc/pnv_core.c           |   4 +-
+>  hw/ppc/pnv_psi.c            |   7 +-
+>  hw/ppc/spapr.c              |  12 +-
+>  hw/ppc/spapr_cpu_core.c     |   9 +-
+>  hw/ppc/spapr_hcall.c        |  11 ++
+>  hw/ppc/spapr_irq.c          | 270 ++++++++++++++++++++++++++++++++++--
+>  20 files changed, 342 insertions(+), 81 deletions(-)
 >=20
 
 --=20
@@ -108,24 +121,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---dFWYt1i2NyOo1oI9
+--gdTfX7fkYsEEjebm
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwy1bMACgkQbDjKyiDZ
-s5LJfxAAnTLQkfeQWVd38mHAAWFEvQs+G1rCoN454juPmCvdGT/yejN2j4H31/94
-Uww+oi58aOOct3XxWV7z7zc0EuAOvS3SMsYPAsVQuwQ4/Xk4VQFc353rOnUhC80O
-ITtmbLMoh994cAORT5+WDkAPUcHolSE3TW8id3+kqTlO4hK8sJ7qK6C7mFIO0aQQ
-v2dnaKxN1gLC1yP7ICHskcODL7na/+gHP1yBHbhtkIKy9CECTTm7lwLeghoeffOj
-UEh1QWcQX/TI0uvpjD7GqpZWlQsXZfNuhiQK6abwctFEIQ3FT5BoNpULSi1C+11K
-QzmXIx6qmQd+oBkB6koeJDrS40LRqBpZKRJ2SG+m+/sO1THjYos5+KEDCV3VlvG1
-iEFnBKwjPWlS82FsGsU0nC+bTA1PCX6rEZJvm3dn5xYrhuF1yC+DwcnMcdVe/agQ
-/sCKIVzzfkYlBJoJDFGdsnRt7PVNhSzf0jVXq3mJGEuFp//SH2GhBArbQDdcEQ5D
-aupgetroHNFGbLWhH55Wjp5A7wC/ahDzKFcnlCzN3spmC8FL4JLQtgZTVtSI95BD
-fx8R7+y7p90cUls5wipoB10FwcydRdl/sZQE4Yj9TFJ3e+bPvdIi/qQG9racQhD5
-pTorvY5/qXlzPuZmIIfY6MuTuRHMFZC1RBB0iKe2GWGdJTJdByg=
-=+inr
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwy2g8ACgkQbDjKyiDZ
+s5JS+A//SuATKbEfUhrDFIL9tPG35E/DonclRQ8TqZfffyELIyW24IrdyxfYe6/J
++roU5zNe5Y2f2Hw0nz3+JwH6Gt6kieL+eNA3DvA8WALfejE0KZA7VWWr6ExhhOhN
+JJkZ0C6xJcLYxnFdYjUIUvMZnU4fSwawzRdfk7GlDSRinWibbBvxl7WrrJTpkv/d
+Xaj6Cx7pgKGP2mCnub2ejOI7KmJ3HYpomTtxUVPijELTgjPcVjpmYh+Ll3lm/4Gr
+qgzYU125vCtgf1Krlp7mkl5zLClO+hNRjXv/CQt4qulGKjVcO/eBEc7a7ZWnYrO5
+iMkwj88QQQE4IPQZkMzkV1YFhN4pD9E/zSpVBl2Y6E2ukyVmSOwV/O/GtiA9/57X
+px83twhvZmhKlyFiQOgaHGkui01Cq3Kyx1IRZFCqN+SZXfuVMJ7tomJncVsrghUm
+FSxZGsBo4z+KkT77R3aueDPNo98VRdQUZNzaXFKORNYCakaouwNfieZvaa/A45Ca
+XHwlh9rL7ZDlMa4ZSysLyGpBhRz1hyXPkd7ygWM95g8mHL4OuH/QcHR9GnUqUmte
+w5veVcUEquE036b/uBinSK+MOozffDvMZbrS5/lP8pHX4FyumZT0cOnz9/hv2bji
+T7ztSGxB6MR7WxRHkPRpxMTbMdkcavIzqeOHfLczKXPZcGrtGis=
+=k+1R
 -----END PGP SIGNATURE-----
 
---dFWYt1i2NyOo1oI9--
+--gdTfX7fkYsEEjebm--
