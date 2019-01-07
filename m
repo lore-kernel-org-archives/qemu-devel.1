@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53827)
+Received: from eggs.gnu.org ([209.51.188.92]:55804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ggY8F-0004NB-8w
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:52:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ggYCb-00085p-3C
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:56:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ggY8E-0003Ll-30
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:52:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43046)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ggY8D-0003IY-TK
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:52:06 -0500
-Date: Mon, 7 Jan 2019 14:42:43 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190107164243.GR4157@habkost.net>
-References: <beec7ae9-f9ce-52f0-7e55-cb25d70c51f4@ozlabs.ru>
-	<d5247b86-4c9c-0eff-7900-66443041f63e@redhat.com>
-	<20181221093623.738b71e9@bahia.lan>
-	<20181221112634.4abd9d02@bahia.lan>
-	<20181221182810.GA11197@flamenco>
+	(envelope-from <peter.maydell@linaro.org>) id 1ggYCY-0002pU-Cz
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:56:36 -0500
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:37822)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ggYCY-0002gP-1M
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:56:34 -0500
+Received: by mail-oi1-x234.google.com with SMTP id y23so883044oia.4
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:56:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181221182810.GA11197@flamenco>
-Subject: Re: [Qemu-devel] travis failures
+References: <20190107122304.22997-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190107122304.22997-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Jan 2019 16:56:17 +0000
+Message-ID: <CAFEAcA_MrBuqKD+4rBmiQ_0Q8qc4q3Wb1FfDu=Q_r69P8bNVmg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/28] Machine props patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Dec 21, 2018 at 01:28:10PM -0500, Emilio G. Cota wrote:
-> On Fri, Dec 21, 2018 at 11:26:34 +0100, Greg Kurz wrote:
-> > On Fri, 21 Dec 2018 09:36:23 +0100
-> > Greg Kurz <groug@kaod.org> wrote:
-> > 
-> > > On Fri, 21 Dec 2018 07:47:07 +0100
-> > > Thomas Huth <thuth@redhat.com> wrote:
-> > > 
-> > > > On 2018-12-21 04:06, Alexey Kardashevskiy wrote:  
-> > > > > Hi
-> > > > > 
-> > > > > I am trying https://travis-ci.org/aik/qemu/ and that thing fails every
-> > > > > time I am not so sure why.
-> > > > > 
-> > > > > One example:
-> > > > > https://travis-ci.org/aik/qemu/jobs/470796318
-> > > > > 
-> > > > > The errors are like this:
-> > > > > 
-> > > > >   GTESTER check-qtest-unicore32
-> > > > >   GTESTER check-qtest-x86_64
-> > > > > Could not access KVM kernel module: No such file or directory
-> > > > > qemu-system-x86_64: failed to initialize KVM: No such file or directory
-> > > > > qemu-system-x86_64: Back to tcg accelerator
-> > > > > 
-> > > > > 
-> > > > > Does anyone else see those? How do we fix them? Thanks.    
-> > > > 
-> > > > Some test are explicitly requesting "-M accel=kvm:tcg" and this is
-> > > > causing this message if KVM is not available. We could maybe silence
-> > > > them if qtest_enabled() ?
-> > > > 
-> > > >  Thomas
-> > > > 
-> > > >   
-> > > 
-> > > I've also experienced a bunch of similar failures with travis, like:
-> > > 
-> > > https://travis-ci.org/gkurz/qemu/jobs/466994463
-> > > 
-> > 
-> > Today with tests/test-qht-par again:
-> > 
-> > https://travis-ci.org/gkurz/qemu/jobs/470871251#L4455
-> > 
-> > Cc'ing Emilio for suggestions on how to go forward with this.
-> 
-> Yes, this was being discussed in this thread:
-> 
->   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg01638.html
-> 
-> I haven't heard from Eduardo in a while, I guess he's off for the
-> holidays.
+On Mon, 7 Jan 2019 at 12:23, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> The following changes since commit e59dbbac0364344a3ad84c3497a98c56003d3f=
+b8:
+>
+>   Merge remote-tracking branch 'remotes/philmd/tags/fw_cfg-20190104-pull-=
+request' into staging (2019-01-04 18:23:13 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/elmarco/qemu.git tags/machine-props-pull-request
+>
+> for you to fetch changes up to fa0cb34d2210cc749b9a70db99bb41c56ad20831:
+>
+>   hostmem: use object id for memory region name with >=3D 4.0 (2019-01-07=
+ 16:18:42 +0400)
+>
+> ----------------------------------------------------------------
+> Generalize machine compatibility properties
+>
+> During "[PATCH v2 05/10] qom/globals: generalize
+> object_property_set_globals()" review, Eduardo suggested to rework the
+> GlobalProperty handling, so that -global is limited to QDev only and
+> we avoid mixing the machine compats and the user-provided -global
+> properties (instead of generalizing -global to various object kinds,
+> like I proposed in v2).
+>
+> "qdev: do not mix compat props with global props" patch decouples a
+> bit user-provided -global from machine compat properties. This allows
+> to get rid of "user_provided" and "errp" fields in following patches.
+>
+> A new compat property "x-use-canonical-path-for-ramblock-id" is added
+> to hostmem for legacy canonical path names, set to true for -file and
+> -memfd with qemu < 4.0.
+>
+> (this series was initially titled "[PATCH v2 00/10] hostmem: use
+> object "id" for memory region name with >=3D 3.1", but its focus is more
+> in refactoring the global and compatilibity properties handling now)
+>
+> ----------------------------------------------------------------
 
-Yes, sorry.  :)
+Applied, thanks.
 
-> 
-> My latest suggestion was to try a branch where test-qht-par is
-> standalone, instead of using system(3) to call qht-bench--see
-> this message:
->   https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg02056.html
-> 
-> Can anyone please try that? Or at least let me know how to run
-> a test Travis build so that I can debug this faster.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-I don't remember the exact steps, but I think you should be able
-to trigger Travis jobs on your GitHub branches by just logging
-into travis-ci.org using your GitHub account.
-
-I have pushed your test-qht-par branch to my repository, and the
-jobs are still failing:
-
-https://travis-ci.org/ehabkost/qemu-hacks/jobs/475580438
-
--- 
-Eduardo
+-- PMM
