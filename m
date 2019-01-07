@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49882)
+Received: from eggs.gnu.org ([209.51.188.92]:50684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ggQF2-0005ep-R4
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:26:38 -0500
+	(envelope-from <tom.deseyn@gmail.com>) id 1ggQH6-0006fK-Jb
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:28:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ggQEw-0007rd-PI
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:26:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ggQEl-0007h3-EF
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:26:24 -0500
-Date: Mon, 7 Jan 2019 09:16:27 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190107081627.btzrwwnodcszuftl@sirius.home.kraxel.org>
-References: <ddc7219f-98c3-28be-084f-64606452e49b@suse.com>
-	<e51bd6dc-e135-b66a-189d-8b79bc5f7e49@redhat.com>
+	(envelope-from <tom.deseyn@gmail.com>) id 1ggQH5-0000c0-GK
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:28:44 -0500
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:38376)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tom.deseyn@gmail.com>)
+	id 1ggQH5-0000bo-AV
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 03:28:43 -0500
+Received: by mail-ed1-x541.google.com with SMTP id h50so25916ede.5
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 00:28:43 -0800 (PST)
+From: tom.deseyn@gmail.com
+Date: Mon,  7 Jan 2019 09:27:51 +0100
+Message-Id: <20190107082751.6461-1-tom.deseyn@gmail.com>
+In-Reply-To: <199d2900-1f2c-4940-ae2a-d6832501f1f0@vivier.eu>
+References: <199d2900-1f2c-4940-ae2a-d6832501f1f0@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <e51bd6dc-e135-b66a-189d-8b79bc5f7e49@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Can I have someone's feedback on [bug 1809075]
- Concurrency bug on keyboard events: capslock LED messing up keycode streams
- causes character misses at guest kernel
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4] Add getsockopt for settable SOL_IPV6 options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Gao Zhiyuan <zgao@suse.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, laurent@vivier.eu
+Cc: riku.voipio@iki.fi, Tom Deseyn <tom.deseyn@gmail.com>
 
-On Thu, Jan 03, 2019 at 12:05:54PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Cc'ing Marc-Andr=E9 & Gerd.
->=20
-> On 12/19/18 10:31 AM, Gao Zhiyuan wrote:
-> > Hi everyone.
-> >=20
-> > Can I please have someone's feedback on this bug?
-> > https://bugs.launchpad.net/qemu/+bug/1809075
-> > Briefly, guest OS loses characters sent to it via vnc. And I spot the
-> > bug in relation to ps2 driver.
-> >=20
-> > I'm thinking of possible fixes and I might want to use a memory barri=
-er.
-> > But I would really like to have some suggestion from a qemu developer
-> > first. For example, can we brutally drop capslock LED key events in p=
-s2
-> > queue?
+From: Tom Deseyn <tom.deseyn@gmail.com>
 
-There is no "capslock LED key event".  0xfa is KBD_REPLY_ACK, and the
-device queues it in response to guest port writes.  Yes, the ack can
-race with actual key events.  But IMO that isn't a bug in qemu.
+v2: default to unimplemented
+v3: match kernel behavior
+v4: braces code-style
 
-Probably the linux kernel just throws away everything until it got the
-ack for the port write, and that way the key event gets lost.  On
-physical hardware you will not notice because it is next to impossible
-to type fast enough to hit the race window.
+Signed-off-by: Tom Deseyn <tom.deseyn@gmail.com>
+---
+ linux-user/syscall.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-So, go fix the kernel.
-
-Alternatively fix vncdotool to send uppercase letters properly with
-shift key pressed.  Then qemu wouldn't generate capslock key events
-(that happens because qemu thinks guest and host capslock state is out
-of sync) and the guests's capslock led update request wouldn't get into
-the way.
-
-cheers,
-  Gerd
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 280137da8c..bbcc0e86c6 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -2352,6 +2352,47 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+             break;
+         }
+         break;
++    case SOL_IPV6:
++        switch (optname) {
++        case IPV6_MTU_DISCOVER:
++        case IPV6_MTU:
++        case IPV6_V6ONLY:
++        case IPV6_RECVPKTINFO:
++        case IPV6_UNICAST_HOPS:
++        case IPV6_MULTICAST_HOPS:
++        case IPV6_MULTICAST_LOOP:
++        case IPV6_RECVERR:
++        case IPV6_RECVHOPLIMIT:
++        case IPV6_2292HOPLIMIT:
++        case IPV6_CHECKSUM: {
++            void* target_addr;
++            if (get_user_u32(len, optlen)) {
++                return -TARGET_EFAULT;
++            }
++            if (len < 0) {
++                return -TARGET_EINVAL;
++            }
++            lv = sizeof(val);
++            ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
++            if (ret < 0) {
++                return ret;
++            }
++            if (lv < len) {
++                len = lv;
++            }
++            if (put_user_u32(len, optlen)) {
++                return -TARGET_EFAULT;
++            }
++            target_addr = lock_user(VERIFY_WRITE, optval_addr, len, 0);
++            tswap32s((uint32_t*)&val);
++            memcpy(target_addr, &val, len);
++            unlock_user(target_addr, optval_addr, len);
++            break;
++        }
++        default:
++            goto unimplemented;
++        }
++        break;
+     default:
+     unimplemented:
+         gemu_log("getsockopt level=%d optname=%d not yet supported\n",
+-- 
+2.19.2
