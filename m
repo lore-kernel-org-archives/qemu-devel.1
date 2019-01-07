@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59972)
+Received: from eggs.gnu.org ([209.51.188.92]:60301)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=90328960c=Paul.Durrant@citrix.com>)
-	id 1ggVsh-0003mU-MY
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:27:58 -0500
+	id 1ggVtZ-0004XA-Aj
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:28:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=90328960c=Paul.Durrant@citrix.com>)
-	id 1ggVsf-0002Wc-9N
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:27:55 -0500
+	id 1ggVtU-0002rf-0j
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:28:49 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Mon, 7 Jan 2019 14:12:55 +0000
-Message-ID: <20190107141309.15774-5-paul.durrant@citrix.com>
+Date: Mon, 7 Jan 2019 14:13:06 +0000
+Message-ID: <20190107141309.15774-16-paul.durrant@citrix.com>
 In-Reply-To: <20190107141309.15774-1-paul.durrant@citrix.com>
 References: <20190107141309.15774-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 04/18] xen: create xenstore areas for
- XenDevice-s
+Subject: [Qemu-devel] [PATCH v8 15/18] xen: add a mechanism to automatically
+ create XenDevice-s...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +26,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-This patch adds a new source module, xen-bus-helper.c, which builds on
-basic libxenstore primitives to provide functions to create (setting
-permissions appropriately) and destroy xenstore areas, and functions to
-'printf' and 'scanf' nodes therein. The main xen-bus code then uses
-these primitives [1] to initialize and destroy the frontend and backend
-areas for a XenDevice during realize and unrealize respectively.
+...that maintains compatibility with existing Xen toolstacks.
 
-The 'xen-block' implementation is extended with a 'get_name' method that
-returns the VBD number. This number is required to 'name' the xenstore
-areas.
+Xen toolstacks instantiate PV backends by simply writing information into
+xenstore and expecting a backend implementation to be watching for this.
 
-NOTE: An exit handler is also added to make sure the xenstore areas are
-      cleaned up if QEMU terminates without devices being unrealized.
+This patch adds a new 'xen-backend' module to allow individual XenDevice
+implementations to register create and destroy functions. The creator
+will be called when a tool-stack instantiates a new backend in this way,
+and the destructor will then be called after the resulting XenDevice
+object is unrealized.
 
-[1] The 'scanf' functions are actually not yet needed, but they will be
-    needed by code delivered in subsequent patches.
+To support this it is also necessary to add new watchers into the XenBus
+implementation to handle enumeration of new backends and also destruction
+of XenDevice-s when the toolstack sets the backend 'online' key to 0.
+
+NOTE: This patch only adds the framework. A subsequent patch will add a
+      creator function for xen-block devices.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
 
 v5:
- - Re-base
+ - Added destructor function, therefore Anthony's R-b is not carried
+   from v4
 
 v3:
- - Add transaction id parameters to xen-bus-helper functions
- - Not added Anthony's R-b because of change
+ - Use a xenstore transaction in enumeration code to ensure consistent
+   parameters
+ - Not adding Anthony's R-b because of change
 
 v2:
- - Fix boilerplate
- - Add error pointers to all xs_node... helpers
- - Add GCC_FMT_ATTR to declarations of printf-like helpers
+ - Sort out error paths and error reporting
 ---
- hw/block/xen-block.c            |   9 +
- hw/xen/Makefile.objs            |   2 +-
- hw/xen/trace-events             |  12 +-
- hw/xen/xen-bus-helper.c         | 150 +++++++++++++++
- hw/xen/xen-bus.c                | 321 +++++++++++++++++++++++++++++++-
- include/hw/xen/xen-bus-helper.h |  39 ++++
- include/hw/xen/xen-bus.h        |  12 ++
- 7 files changed, 540 insertions(+), 5 deletions(-)
- create mode 100644 hw/xen/xen-bus-helper.c
- create mode 100644 include/hw/xen/xen-bus-helper.h
+ hw/xen/Makefile.objs         |   2 +-
+ hw/xen/trace-events          |   3 +
+ hw/xen/xen-backend.c         | 165 +++++++++++++++++++++++++++++++++++
+ hw/xen/xen-bus.c             | 164 +++++++++++++++++++++++++++++++++-
+ include/hw/xen/xen-backend.h |  39 +++++++++
+ include/hw/xen/xen-bus.h     |   1 +
+ include/qemu/module.h        |   3 +
+ 7 files changed, 375 insertions(+), 2 deletions(-)
+ create mode 100644 hw/xen/xen-backend.c
+ create mode 100644 include/hw/xen/xen-backend.h
 
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 8e78b6a034..d27a2865bc 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -13,6 +13,14 @@
- #include "hw/xen/xen-block.h"
- #include "trace.h"
- 
-+static char *xen_block_get_name(XenDevice *xendev, Error **errp)
-+{
-+    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-+    XenBlockVdev *vdev = &blockdev->props.vdev;
-+
-+    return g_strdup_printf("%lu", vdev->number);
-+}
-+
- static void xen_block_unrealize(XenDevice *xendev, Error **errp)
- {
-     XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-@@ -262,6 +270,7 @@ static void xen_block_class_init(ObjectClass *class, void *data)
-     DeviceClass *dev_class = DEVICE_CLASS(class);
-     XenDeviceClass *xendev_class = XEN_DEVICE_CLASS(class);
- 
-+    xendev_class->get_name = xen_block_get_name;
-     xendev_class->realize = xen_block_realize;
-     xendev_class->unrealize = xen_block_unrealize;
- 
 diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index d9d6d7b4f9..77c0868190 100644
+index 77c0868190..84df60a928 100644
 --- a/hw/xen/Makefile.objs
 +++ b/hw/xen/Makefile.objs
 @@ -1,5 +1,5 @@
  # xen backend driver support
--common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o
-+common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o
+-common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o
++common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o xen-backend.o
  
  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
 diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index 0172cd4e26..75dc226d75 100644
+index d4651bdb30..f6944624b2 100644
 --- a/hw/xen/trace-events
 +++ b/hw/xen/trace-events
-@@ -16,5 +16,13 @@ xen_domid_restrict(int err) "err: %u"
+@@ -16,6 +16,9 @@ xen_domid_restrict(int err) "err: %u"
  # include/hw/xen/xen-bus.c
  xen_bus_realize(void) ""
  xen_bus_unrealize(void) ""
--xen_device_realize(const char *type) "type: %s"
--xen_device_unrealize(const char *type) "type: %s"
-+xen_device_realize(const char *type, char *name) "type: %s name: %s"
-+xen_device_unrealize(const char *type, char *name) "type: %s name: %s"
-+xen_device_backend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
-+xen_device_frontend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
-+
-+# include/hw/xen/xen-bus-helper.c
-+xs_node_create(const char *node) "%s"
-+xs_node_destroy(const char *node) "%s"
-+xs_node_vprintf(char *path, char *value) "%s %s"
-+xs_node_vscanf(char *path, char *value) "%s %s"
-diff --git a/hw/xen/xen-bus-helper.c b/hw/xen/xen-bus-helper.c
++xen_bus_enumerate(void) ""
++xen_bus_type_enumerate(const char *type) "type: %s"
++xen_bus_backend_create(const char *type, const char *path) "type: %s path: %s"
+ xen_bus_add_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
+ xen_bus_remove_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
+ xen_bus_watch(const char *token) "token: %s"
+diff --git a/hw/xen/xen-backend.c b/hw/xen/xen-backend.c
 new file mode 100644
-index 0000000000..15b3ad8d78
+index 0000000000..da065f81b7
 --- /dev/null
-+++ b/hw/xen/xen-bus-helper.c
-@@ -0,0 +1,150 @@
++++ b/hw/xen/xen-backend.c
+@@ -0,0 +1,165 @@
 +/*
 + * Copyright (c) 2018  Citrix Systems Inc.
 + *
@@ -147,548 +113,381 @@ index 0000000000..15b3ad8d78
 + */
 +
 +#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/xen/xen.h"
-+#include "hw/xen/xen-bus.h"
-+#include "hw/xen/xen-bus-helper.h"
++#include "qemu/error-report.h"
 +#include "qapi/error.h"
++#include "hw/xen/xen-backend.h"
++#include "hw/xen/xen-bus.h"
 +
-+#include <glib/gprintf.h>
++typedef struct XenBackendImpl {
++    const char *type;
++    XenBackendDeviceCreate create;
++    XenBackendDeviceDestroy destroy;
++} XenBackendImpl;
 +
-+struct xs_state {
-+    enum xenbus_state statenum;
-+    const char *statestr;
-+};
-+#define XS_STATE(state) { state, #state }
-+
-+static struct xs_state xs_state[] = {
-+    XS_STATE(XenbusStateUnknown),
-+    XS_STATE(XenbusStateInitialising),
-+    XS_STATE(XenbusStateInitWait),
-+    XS_STATE(XenbusStateInitialised),
-+    XS_STATE(XenbusStateConnected),
-+    XS_STATE(XenbusStateClosing),
-+    XS_STATE(XenbusStateClosed),
-+    XS_STATE(XenbusStateReconfiguring),
-+    XS_STATE(XenbusStateReconfigured),
++struct XenBackendInstance {
++    QLIST_ENTRY(XenBackendInstance) entry;
++    const XenBackendImpl *impl;
++    XenBus *xenbus;
++    char *name;
++    XenDevice *xendev;
 +};
 +
-+#undef XS_STATE
-+
-+const char *xs_strstate(enum xenbus_state state)
++static GHashTable *xen_backend_table_get(void)
 +{
-+    unsigned int i;
++    static GHashTable *table;
 +
-+   for (i = 0; i < ARRAY_SIZE(xs_state); i++) {
-+        if (xs_state[i].statenum == state) {
-+            return xs_state[i].statestr;
++    if (table == NULL) {
++        table = g_hash_table_new(g_str_hash, g_str_equal);
++    }
++
++    return table;
++}
++
++static void xen_backend_table_add(XenBackendImpl *impl)
++{
++    g_hash_table_insert(xen_backend_table_get(), (void *)impl->type, impl);
++}
++
++static const XenBackendImpl *xen_backend_table_lookup(const char *type)
++{
++    return g_hash_table_lookup(xen_backend_table_get(), type);
++}
++
++void xen_backend_register(const XenBackendInfo *info)
++{
++    XenBackendImpl *impl = g_new0(XenBackendImpl, 1);
++
++    g_assert(info->type);
++
++    if (xen_backend_table_lookup(info->type)) {
++        error_report("attempt to register duplicate Xen backend type '%s'",
++                     info->type);
++        abort();
++    }
++
++    if (!info->create) {
++        error_report("backend type '%s' has no creator", info->type);
++        abort();
++    }
++
++    impl->type = info->type;
++    impl->create = info->create;
++    impl->destroy = info->destroy;
++
++    xen_backend_table_add(impl);
++}
++
++static QLIST_HEAD(, XenBackendInstance) backend_list;
++
++static void xen_backend_list_add(XenBackendInstance *backend)
++{
++    QLIST_INSERT_HEAD(&backend_list, backend, entry);
++}
++
++static XenBackendInstance *xen_backend_list_find(XenDevice *xendev)
++{
++    XenBackendInstance *backend;
++
++    QLIST_FOREACH(backend, &backend_list, entry) {
++        if (backend->xendev == xendev) {
++            return backend;
 +        }
 +    }
 +
-+    return "INVALID";
++    return NULL;
 +}
 +
-+void xs_node_create(struct xs_handle *xsh, xs_transaction_t tid,
-+                    const char *node, struct xs_permissions perms[],
-+                    unsigned int nr_perms, Error **errp)
++static void xen_backend_list_remove(XenBackendInstance *backend)
 +{
-+    trace_xs_node_create(node);
++    QLIST_REMOVE(backend, entry);
++}
 +
-+    if (!xs_write(xsh, tid, node, "", 0)) {
-+        error_setg_errno(errp, errno, "failed to create node '%s'", node);
++void xen_backend_device_create(XenBus *xenbus, const char *type,
++                               const char *name, QDict *opts, Error **errp)
++{
++    const XenBackendImpl *impl = xen_backend_table_lookup(type);
++    XenBackendInstance *backend;
++    Error *local_error = NULL;
++
++    if (!impl) {
 +        return;
 +    }
 +
-+    if (!xs_set_permissions(xsh, tid, node, perms, nr_perms)) {
-+        error_setg_errno(errp, errno, "failed to set node '%s' permissions",
-+                         node);
-+    }
-+}
++    backend = g_new0(XenBackendInstance, 1);
++    backend->xenbus = xenbus;
++    backend->name = g_strdup(name);
 +
-+void xs_node_destroy(struct xs_handle *xsh, xs_transaction_t tid,
-+                     const char *node, Error **errp)
-+{
-+    trace_xs_node_destroy(node);
-+
-+    if (!xs_rm(xsh, tid, node)) {
-+        error_setg_errno(errp, errno, "failed to destroy node '%s'", node);
-+    }
-+}
-+
-+void xs_node_vprintf(struct xs_handle *xsh, xs_transaction_t tid,
-+                     const char *node, const char *key, Error **errp,
-+                     const char *fmt, va_list ap)
-+{
-+    char *path, *value;
-+    int len;
-+
-+    path = (strlen(node) != 0) ? g_strdup_printf("%s/%s", node, key) :
-+        g_strdup(key);
-+    len = g_vasprintf(&value, fmt, ap);
-+
-+    trace_xs_node_vprintf(path, value);
-+
-+    if (!xs_write(xsh, tid, path, value, len)) {
-+        error_setg_errno(errp, errno, "failed to write '%s' to '%s'",
-+                         value, path);
++    impl->create(backend, opts, &local_error);
++    if (local_error) {
++        error_propagate(errp, local_error);
++        g_free(backend->name);
++        g_free(backend);
++        return;
 +    }
 +
-+    g_free(value);
-+    g_free(path);
++    backend->impl = impl;
++    xen_backend_list_add(backend);
 +}
 +
-+void xs_node_printf(struct xs_handle *xsh,  xs_transaction_t tid,
-+                    const char *node, const char *key, Error **errp,
-+                    const char *fmt, ...)
++XenBus *xen_backend_get_bus(XenBackendInstance *backend)
 +{
-+    va_list ap;
-+
-+    va_start(ap, fmt);
-+    xs_node_vprintf(xsh, tid, node, key, errp, fmt, ap);
-+    va_end(ap);
++    return backend->xenbus;
 +}
 +
-+int xs_node_vscanf(struct xs_handle *xsh,  xs_transaction_t tid,
-+                   const char *node, const char *key, Error **errp,
-+                   const char *fmt, va_list ap)
++const char *xen_backend_get_name(XenBackendInstance *backend)
 +{
-+    char *path, *value;
-+    int rc;
-+
-+    path = (strlen(node) != 0) ? g_strdup_printf("%s/%s", node, key) :
-+        g_strdup(key);
-+    value = xs_read(xsh, tid, path, NULL);
-+
-+    trace_xs_node_vscanf(path, value);
-+
-+    if (value) {
-+        rc = vsscanf(value, fmt, ap);
-+    } else {
-+        error_setg_errno(errp, errno, "failed to read from '%s'",
-+                         path);
-+        rc = EOF;
-+    }
-+
-+    free(value);
-+    g_free(path);
-+
-+    return rc;
++    return backend->name;
 +}
 +
-+int xs_node_scanf(struct xs_handle *xsh,  xs_transaction_t tid,
-+                  const char *node, const char *key, Error **errp,
-+                  const char *fmt, ...)
++void xen_backend_set_device(XenBackendInstance *backend,
++                            XenDevice *xendev)
 +{
-+    va_list ap;
-+    int rc;
-+
-+    va_start(ap, fmt);
-+    rc = xs_node_vscanf(xsh, tid, node, key, errp, fmt, ap);
-+    va_end(ap);
-+
-+    return rc;
++    g_assert(!backend->xendev);
++    backend->xendev = xendev;
 +}
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index bc04da748b..843fda26a9 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -8,24 +8,102 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/sysbus.h"
-+#include "hw/xen/xen.h"
- #include "hw/xen/xen-bus.h"
-+#include "hw/xen/xen-bus-helper.h"
-+#include "monitor/monitor.h"
- #include "qapi/error.h"
-+#include "sysemu/sysemu.h"
- #include "trace.h"
- 
-+static char *xen_device_get_backend_path(XenDevice *xendev)
++
++XenDevice *xen_backend_get_device(XenBackendInstance *backend)
 +{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    const char *backend = xendev_class->backend;
++    return backend->xendev;
++}
++
++
++bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp)
++{
++    XenBackendInstance *backend = xen_backend_list_find(xendev);
++    const XenBackendImpl *impl;
 +
 +    if (!backend) {
-+        backend = type;
++        return false;
 +    }
 +
-+    return g_strdup_printf("/local/domain/%u/backend/%s/%u/%s",
-+                           xenbus->backend_id, backend, xendev->frontend_id,
-+                           xendev->name);
++    impl = backend->impl;
++    impl->destroy(backend, errp);
++
++    xen_backend_list_remove(backend);
++    g_free(backend->name);
++    g_free(backend);
++
++    return true;
 +}
-+
-+static char *xen_device_get_frontend_path(XenDevice *xendev)
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index a22aa49921..f90bcf2342 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -11,10 +11,12 @@
+ #include "hw/hw.h"
+ #include "hw/sysbus.h"
+ #include "hw/xen/xen.h"
++#include "hw/xen/xen-backend.h"
+ #include "hw/xen/xen-bus.h"
+ #include "hw/xen/xen-bus-helper.h"
+ #include "monitor/monitor.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qdict.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
+ 
+@@ -190,12 +192,151 @@ static void xen_bus_remove_watch(XenBus *xenbus, XenWatch *watch,
+     free_watch(watch);
+ }
+ 
++static void xen_bus_backend_create(XenBus *xenbus, const char *type,
++                                   const char *name, char *path,
++                                   Error **errp)
 +{
-+    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    const char *device = xendev_class->device;
++    xs_transaction_t tid;
++    char **key;
++    QDict *opts;
++    unsigned int i, n;
++    Error *local_err = NULL;
 +
-+    if (!device) {
-+        device = type;
++    trace_xen_bus_backend_create(type, path);
++
++again:
++    tid = xs_transaction_start(xenbus->xsh);
++    if (tid == XBT_NULL) {
++        error_setg(errp, "failed xs_transaction_start");
++        return;
 +    }
 +
-+    return g_strdup_printf("/local/domain/%u/device/%s/%s",
-+                           xendev->frontend_id, device, xendev->name);
++    key = xs_directory(xenbus->xsh, tid, path, &n);
++    if (!key) {
++        if (!xs_transaction_end(xenbus->xsh, tid, true)) {
++            error_setg_errno(errp, errno, "failed xs_transaction_end");
++        }
++        return;
++    }
++
++    opts = qdict_new();
++    for (i = 0; i < n; i++) {
++        char *val;
++
++        /*
++         * Assume anything found in the xenstore backend area, other than
++         * the keys created for a generic XenDevice, are parameters
++         * to be used to configure the backend.
++         */
++        if (!strcmp(key[i], "state") ||
++            !strcmp(key[i], "online") ||
++            !strcmp(key[i], "frontend") ||
++            !strcmp(key[i], "frontend-id") ||
++            !strcmp(key[i], "hotplug-status"))
++            continue;
++
++        if (xs_node_scanf(xenbus->xsh, tid, path, key[i], NULL, "%ms",
++                          &val) == 1) {
++            qdict_put_str(opts, key[i], val);
++            free(val);
++        }
++    }
++
++    free(key);
++
++    if (!xs_transaction_end(xenbus->xsh, tid, false)) {
++        qobject_unref(opts);
++
++        if (errno == EAGAIN) {
++            goto again;
++        }
++
++        error_setg_errno(errp, errno, "failed xs_transaction_end");
++        return;
++    }
++
++    xen_backend_device_create(xenbus, type, name, opts, &local_err);
++    qobject_unref(opts);
++
++    if (local_err) {
++        error_propagate_prepend(errp, local_err,
++                                "failed to create '%s' device '%s': ",
++                                type, name);
++    }
 +}
 +
-+static void xen_bus_print_dev(Monitor *mon, DeviceState *dev, int indent)
++static void xen_bus_type_enumerate(XenBus *xenbus, const char *type)
 +{
-+    XenDevice *xendev = XEN_DEVICE(dev);
++    char *domain_path = g_strdup_printf("backend/%s/%u", type, xen_domid);
++    char **backend;
++    unsigned int i, n;
 +
-+    monitor_printf(mon, "%*sname = '%s' frontend_id = %u\n",
-+                   indent, "", xendev->name, xendev->frontend_id);
++    trace_xen_bus_type_enumerate(type);
++
++    backend = xs_directory(xenbus->xsh, XBT_NULL, domain_path, &n);
++    if (!backend) {
++        goto out;
++    }
++
++    for (i = 0; i < n; i++) {
++        char *backend_path = g_strdup_printf("%s/%s", domain_path,
++                                             backend[i]);
++        enum xenbus_state backend_state;
++
++        if (xs_node_scanf(xenbus->xsh, XBT_NULL, backend_path, "state",
++                          NULL, "%u", &backend_state) != 1)
++            backend_state = XenbusStateUnknown;
++
++        if (backend_state == XenbusStateInitialising) {
++            Error *local_err = NULL;
++
++            xen_bus_backend_create(xenbus, type, backend[i], backend_path,
++                                   &local_err);
++            if (local_err) {
++                error_report_err(local_err);
++            }
++        }
++
++        g_free(backend_path);
++    }
++
++    free(backend);
++
++out:
++    g_free(domain_path);
 +}
 +
-+static char *xen_bus_get_dev_path(DeviceState *dev)
++static void xen_bus_enumerate(void *opaque)
 +{
-+    return xen_device_get_backend_path(XEN_DEVICE(dev));
++    XenBus *xenbus = opaque;
++    char **type;
++    unsigned int i, n;
++
++    trace_xen_bus_enumerate();
++
++    type = xs_directory(xenbus->xsh, XBT_NULL, "backend", &n);
++    if (!type) {
++        return;
++    }
++
++    for (i = 0; i < n; i++) {
++        xen_bus_type_enumerate(xenbus, type[i]);
++    }
++
++    free(type);
 +}
 +
  static void xen_bus_unrealize(BusState *bus, Error **errp)
  {
-+    XenBus *xenbus = XEN_BUS(bus);
-+
+     XenBus *xenbus = XEN_BUS(bus);
+ 
      trace_xen_bus_unrealize();
-+
-+    if (!xenbus->xsh) {
-+        return;
+ 
++    if (xenbus->backend_watch) {
++        xen_bus_remove_watch(xenbus, xenbus->backend_watch, NULL);
++        xenbus->backend_watch = NULL;
 +    }
 +
-+    xs_close(xenbus->xsh);
- }
- 
- static void xen_bus_realize(BusState *bus, Error **errp)
+     if (!xenbus->xsh) {
+         return;
+     }
+@@ -231,6 +372,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
  {
-+    XenBus *xenbus = XEN_BUS(bus);
-+    unsigned int domid;
-+
+     XenBus *xenbus = XEN_BUS(bus);
+     unsigned int domid;
++    Error *local_err = NULL;
+ 
      trace_xen_bus_realize();
-+
-+    xenbus->xsh = xs_open(0);
-+    if (!xenbus->xsh) {
-+        error_setg_errno(errp, errno, "failed xs_open");
-+        goto fail;
-+    }
-+
-+    if (xs_node_scanf(xenbus->xsh, XBT_NULL, "", /* domain root node */
-+                      "domid", NULL, "%u", &domid) == 1) {
-+        xenbus->backend_id = domid;
-+    } else {
-+        xenbus->backend_id = 0; /* Assume lack of node means dom0 */
-+    }
-+
-+    return;
-+
-+fail:
-+    xen_bus_unrealize(bus, &error_abort);
- }
  
- static void xen_bus_class_init(ObjectClass *class, void *data)
- {
-     BusClass *bus_class = BUS_CLASS(class);
- 
-+    bus_class->print_dev = xen_bus_print_dev;
-+    bus_class->get_dev_path = xen_bus_get_dev_path;
-     bus_class->realize = xen_bus_realize;
-     bus_class->unrealize = xen_bus_unrealize;
- }
-@@ -42,27 +120,241 @@ static const TypeInfo xen_bus_type_info = {
-     },
- };
- 
-+static void xen_device_backend_printf(XenDevice *xendev, const char *key,
-+                                      const char *fmt, ...)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    Error *local_err = NULL;
-+    va_list ap;
+@@ -250,6 +392,18 @@ static void xen_bus_realize(BusState *bus, Error **errp)
+     notifier_list_init(&xenbus->watch_notifiers);
+     qemu_set_fd_handler(xs_fileno(xenbus->xsh), xen_bus_watch, NULL,
+                         xenbus);
 +
-+    g_assert(xenbus->xsh);
++    module_call_init(MODULE_INIT_XEN_BACKEND);
 +
-+    va_start(ap, fmt);
-+    xs_node_vprintf(xenbus->xsh, XBT_NULL, xendev->backend_path, key,
-+                    &local_err, fmt, ap);
-+    va_end(ap);
-+
++    xenbus->backend_watch =
++        xen_bus_add_watch(xenbus, "", /* domain root node */
++                          "backend", xen_bus_enumerate, xenbus, &local_err);
 +    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
-+static void xen_device_backend_set_state(XenDevice *xendev,
-+                                         enum xenbus_state state)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+
-+    if (xendev->backend_state == state) {
-+        return;
++        /* This need not be treated as a hard error so don't propagate */
++        error_reportf_err(local_err,
++                          "failed to set up enumeration watch: ");
 +    }
 +
-+    trace_xen_device_backend_state(type, xendev->name,
-+                                   xs_strstate(state));
-+
-+    xendev->backend_state = state;
-+    xen_device_backend_printf(xendev, "state", "%u", state);
-+}
-+
-+static void xen_device_backend_create(XenDevice *xendev, Error **errp)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    struct xs_permissions perms[2];
-+    Error *local_err = NULL;
-+
-+    xendev->backend_path = xen_device_get_backend_path(xendev);
-+
-+    perms[0].id = xenbus->backend_id;
-+    perms[0].perms = XS_PERM_NONE;
-+    perms[1].id = xendev->frontend_id;
-+    perms[1].perms = XS_PERM_READ;
-+
-+    g_assert(xenbus->xsh);
-+
-+    xs_node_create(xenbus->xsh, XBT_NULL, xendev->backend_path, perms,
-+                   ARRAY_SIZE(perms), &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to create backend: ");
-+    }
-+}
-+
-+static void xen_device_backend_destroy(XenDevice *xendev)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    Error *local_err = NULL;
-+
-+    if (!xendev->backend_path) {
-+        return;
-+    }
-+
-+    g_assert(xenbus->xsh);
-+
-+    xs_node_destroy(xenbus->xsh, XBT_NULL, xendev->backend_path,
-+                    &local_err);
-+    g_free(xendev->backend_path);
-+    xendev->backend_path = NULL;
-+
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
-+static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-+                                       const char *fmt, ...)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    Error *local_err = NULL;
-+    va_list ap;
-+
-+    g_assert(xenbus->xsh);
-+
-+    va_start(ap, fmt);
-+    xs_node_vprintf(xenbus->xsh, XBT_NULL, xendev->frontend_path, key,
-+                    &local_err, fmt, ap);
-+    va_end(ap);
-+
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
-+static void xen_device_frontend_set_state(XenDevice *xendev,
-+                                          enum xenbus_state state)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+
-+    if (xendev->frontend_state == state) {
-+        return;
-+    }
-+
-+    trace_xen_device_frontend_state(type, xendev->name,
-+                                    xs_strstate(state));
-+
-+    xendev->frontend_state = state;
-+    xen_device_frontend_printf(xendev, "state", "%u", state);
-+}
-+
-+static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    struct xs_permissions perms[2];
-+    Error *local_err = NULL;
-+
-+    xendev->frontend_path = xen_device_get_frontend_path(xendev);
-+
-+    perms[0].id = xendev->frontend_id;
-+    perms[0].perms = XS_PERM_NONE;
-+    perms[1].id = xenbus->backend_id;
-+    perms[1].perms = XS_PERM_READ | XS_PERM_WRITE;
-+
-+    g_assert(xenbus->xsh);
-+
-+    xs_node_create(xenbus->xsh, XBT_NULL, xendev->frontend_path, perms,
-+                   ARRAY_SIZE(perms), &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to create frontend: ");
-+    }
-+}
-+
-+static void xen_device_frontend_destroy(XenDevice *xendev)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    Error *local_err = NULL;
-+
-+    if (!xendev->frontend_path) {
-+        return;
-+    }
-+
-+    g_assert(xenbus->xsh);
-+
-+    xs_node_destroy(xenbus->xsh, XBT_NULL, xendev->frontend_path,
-+                    &local_err);
-+    g_free(xendev->frontend_path);
-+    xendev->frontend_path = NULL;
-+
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
- static void xen_device_unrealize(DeviceState *dev, Error **errp)
- {
-     XenDevice *xendev = XEN_DEVICE(dev);
-     XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
-     const char *type = object_get_typename(OBJECT(xendev));
- 
--    trace_xen_device_unrealize(type);
-+    if (!xendev->name) {
-+        return;
-+    }
-+
-+    trace_xen_device_unrealize(type, xendev->name);
-+
-+    if (xendev->exit.notify) {
-+        qemu_remove_exit_notifier(&xendev->exit);
-+        xendev->exit.notify = NULL;
-+    }
- 
-     if (xendev_class->unrealize) {
-         xendev_class->unrealize(xendev, errp);
-     }
-+
-+    xen_device_frontend_destroy(xendev);
-+    xen_device_backend_destroy(xendev);
-+
-+    g_free(xendev->name);
-+    xendev->name = NULL;
-+}
-+
-+static void xen_device_exit(Notifier *n, void *data)
-+{
-+    XenDevice *xendev = container_of(n, XenDevice, exit);
-+
-+    xen_device_unrealize(DEVICE(xendev), &error_abort);
- }
- 
- static void xen_device_realize(DeviceState *dev, Error **errp)
- {
-     XenDevice *xendev = XEN_DEVICE(dev);
-     XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     const char *type = object_get_typename(OBJECT(xendev));
-     Error *local_err = NULL;
- 
--    trace_xen_device_realize(type);
-+    if (xendev->frontend_id == DOMID_INVALID) {
-+        xendev->frontend_id = xen_domid;
-+    }
-+
-+    if (xendev->frontend_id >= DOMID_FIRST_RESERVED) {
-+        error_setg(errp, "invalid frontend-id");
-+        goto unrealize;
-+    }
-+
-+    if (!xendev_class->get_name) {
-+        error_setg(errp, "get_name method not implemented");
-+        goto unrealize;
-+    }
-+
-+    xendev->name = xendev_class->get_name(xendev, &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to get device name: ");
-+        goto unrealize;
-+    }
-+
-+    trace_xen_device_realize(type, xendev->name);
-+
-+    xen_device_backend_create(xendev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto unrealize;
-+    }
-+
-+    xen_device_frontend_create(xendev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto unrealize;
-+    }
- 
-     if (xendev_class->realize) {
-         xendev_class->realize(xendev, &local_err);
-@@ -72,18 +364,43 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
-         }
-     }
- 
-+    xen_device_backend_printf(xendev, "frontend", "%s",
-+                              xendev->frontend_path);
-+    xen_device_backend_printf(xendev, "frontend-id", "%u",
-+                              xendev->frontend_id);
-+    xen_device_backend_printf(xendev, "online", "%u", 1);
-+    xen_device_backend_printf(xendev, "hotplug-status", "connected");
-+
-+    xen_device_backend_set_state(xendev, XenbusStateInitWait);
-+
-+    xen_device_frontend_printf(xendev, "backend", "%s",
-+                               xendev->backend_path);
-+    xen_device_frontend_printf(xendev, "backend-id", "%u",
-+                               xenbus->backend_id);
-+
-+    xen_device_frontend_set_state(xendev, XenbusStateInitialising);
-+
-+    xendev->exit.notify = xen_device_exit;
-+    qemu_add_exit_notifier(&xendev->exit);
      return;
  
- unrealize:
-     xen_device_unrealize(dev, &error_abort);
- }
- 
-+static Property xen_device_props[] = {
-+    DEFINE_PROP_UINT16("frontend-id", XenDevice, frontend_id,
-+                       DOMID_INVALID),
-+    DEFINE_PROP_END_OF_LIST()
-+};
+ fail:
+@@ -407,7 +561,15 @@ static void xen_device_backend_changed(void *opaque)
+                 xendev->backend_state == XenbusStateInitialising ||
+                 xendev->backend_state == XenbusStateInitWait ||
+                 xendev->backend_state == XenbusStateUnknown)) {
+-        object_unparent(OBJECT(xendev));
++        Error *local_err = NULL;
 +
- static void xen_device_class_init(ObjectClass *class, void *data)
- {
-     DeviceClass *dev_class = DEVICE_CLASS(class);
- 
-     dev_class->realize = xen_device_realize;
-     dev_class->unrealize = xen_device_unrealize;
-+    dev_class->props = xen_device_props;
-     dev_class->bus_type = TYPE_XEN_BUS;
++        if (!xen_backend_try_device_destroy(xendev, &local_err)) {
++            object_unparent(OBJECT(xendev));
++        }
++
++        if (local_err) {
++            error_report_err(local_err);
++        }
+     }
  }
  
-diff --git a/include/hw/xen/xen-bus-helper.h b/include/hw/xen/xen-bus-helper.h
+diff --git a/include/hw/xen/xen-backend.h b/include/hw/xen/xen-backend.h
 new file mode 100644
-index 0000000000..5cd9c3d759
+index 0000000000..010d712638
 --- /dev/null
-+++ b/include/hw/xen/xen-bus-helper.h
++++ b/include/hw/xen/xen-backend.h
 @@ -0,0 +1,39 @@
 +/*
 + * Copyright (c) 2018  Citrix Systems Inc.
@@ -697,80 +496,70 @@ index 0000000000..5cd9c3d759
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef HW_XEN_BUS_HELPER_H
-+#define HW_XEN_BUS_HELPER_H
++#ifndef HW_XEN_BACKEND_H
++#define HW_XEN_BACKEND_H
 +
-+#include "hw/xen/xen_common.h"
++#include "hw/xen/xen-bus.h"
 +
-+const char *xs_strstate(enum xenbus_state state);
++typedef struct XenBackendInstance XenBackendInstance;
 +
-+void xs_node_create(struct xs_handle *xsh,  xs_transaction_t tid,
-+                    const char *node, struct xs_permissions perms[],
-+                    unsigned int nr_perms, Error **errp);
-+void xs_node_destroy(struct xs_handle *xsh,  xs_transaction_t tid,
-+                     const char *node, Error **errp);
++typedef void (*XenBackendDeviceCreate)(XenBackendInstance *backend,
++                                       QDict *opts, Error **errp);
++typedef void (*XenBackendDeviceDestroy)(XenBackendInstance *backend,
++                                        Error **errp);
 +
-+/* Write to node/key unless node is empty, in which case write to key */
-+void xs_node_vprintf(struct xs_handle *xsh,  xs_transaction_t tid,
-+                     const char *node, const char *key, Error **errp,
-+                     const char *fmt, va_list ap)
-+    GCC_FMT_ATTR(6, 0);
-+void xs_node_printf(struct xs_handle *xsh,  xs_transaction_t tid,
-+                    const char *node, const char *key, Error **errp,
-+                    const char *fmt, ...)
-+    GCC_FMT_ATTR(6, 7);
++typedef struct XenBackendInfo {
++    const char *type;
++    XenBackendDeviceCreate create;
++    XenBackendDeviceDestroy destroy;
++} XenBackendInfo;
 +
-+/* Read from node/key unless node is empty, in which case read from key */
-+int xs_node_vscanf(struct xs_handle *xsh,  xs_transaction_t tid,
-+                   const char *node, const char *key, Error **errp,
-+                   const char *fmt, va_list ap);
-+int xs_node_scanf(struct xs_handle *xsh,  xs_transaction_t tid,
-+                  const char *node, const char *key, Error **errp,
-+                  const char *fmt, ...);
++XenBus *xen_backend_get_bus(XenBackendInstance *backend);
++const char *xen_backend_get_name(XenBackendInstance *backend);
 +
-+#endif /* HW_XEN_BUS_HELPER_H */
++void xen_backend_set_device(XenBackendInstance *backend,
++                            XenDevice *xendevice);
++XenDevice *xen_backend_get_device(XenBackendInstance *backend);
++
++void xen_backend_register(const XenBackendInfo *info);
++
++void xen_backend_device_create(XenBus *xenbus, const char *type,
++                               const char *name, QDict *opts, Error **errp);
++bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp);
++
++#endif /* HW_XEN_BACKEND_H */
 diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 0cb12464ce..85a75d8dec 100644
+index 0834cb3a7e..e55a5de5f1 100644
 --- a/include/hw/xen/xen-bus.h
 +++ b/include/hw/xen/xen-bus.h
-@@ -8,12 +8,19 @@
- #ifndef HW_XEN_BUS_H
- #define HW_XEN_BUS_H
- 
-+#include "hw/xen/xen_common.h"
- #include "hw/sysbus.h"
- 
- typedef struct XenDevice {
-     DeviceState qdev;
-+    domid_t frontend_id;
-+    char *name;
-+    char *backend_path, *frontend_path;
-+    enum xenbus_state backend_state, frontend_state;
-+    Notifier exit;
- } XenDevice;
- 
-+typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
- typedef void (*XenDeviceRealize)(XenDevice *xendev, Error **errp);
- typedef void (*XenDeviceUnrealize)(XenDevice *xendev, Error **errp);
- 
-@@ -21,6 +28,9 @@ typedef struct XenDeviceClass {
-     /*< private >*/
-     DeviceClass parent_class;
-     /*< public >*/
-+    const char *backend;
-+    const char *device;
-+    XenDeviceGetName get_name;
-     XenDeviceRealize realize;
-     XenDeviceUnrealize unrealize;
- } XenDeviceClass;
-@@ -35,6 +45,8 @@ typedef struct XenDeviceClass {
- 
- typedef struct XenBus {
-     BusState qbus;
-+    domid_t backend_id;
-+    struct xs_handle *xsh;
+@@ -65,6 +65,7 @@ typedef struct XenBus {
+     domid_t backend_id;
+     struct xs_handle *xsh;
+     NotifierList watch_notifiers;
++    XenWatch *backend_watch;
  } XenBus;
  
  typedef struct XenBusClass {
+diff --git a/include/qemu/module.h b/include/qemu/module.h
+index 54300ab6e5..55dd2beea8 100644
+--- a/include/qemu/module.h
++++ b/include/qemu/module.h
+@@ -44,6 +44,7 @@ typedef enum {
+     MODULE_INIT_OPTS,
+     MODULE_INIT_QOM,
+     MODULE_INIT_TRACE,
++    MODULE_INIT_XEN_BACKEND,
+     MODULE_INIT_MAX
+ } module_init_type;
+ 
+@@ -51,6 +52,8 @@ typedef enum {
+ #define opts_init(function) module_init(function, MODULE_INIT_OPTS)
+ #define type_init(function) module_init(function, MODULE_INIT_QOM)
+ #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
++#define xen_backend_init(function) module_init(function, \
++                                               MODULE_INIT_XEN_BACKEND)
+ 
+ #define block_module_load_one(lib) module_load_one("block-", lib)
+ #define ui_module_load_one(lib) module_load_one("ui-", lib)
 -- 
 2.20.1.2.gb21ebb6
