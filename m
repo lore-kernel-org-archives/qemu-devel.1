@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43976)
+Received: from eggs.gnu.org ([209.51.188.92]:43978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ggZq8-0003Xq-T7
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:41:34 -0500
+	(envelope-from <clg@kaod.org>) id 1ggZq8-0003Xu-TE
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:41:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ggZq7-0004Io-L1
+	(envelope-from <clg@kaod.org>) id 1ggZq7-0004Ic-KT
 	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:41:32 -0500
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:50136)
+Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:60154)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ggZq5-0003eI-2g
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ggZq5-00044A-25
 	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:41:30 -0500
-Received: from player687.ha.ovh.net (unknown [10.109.146.173])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id F3715179214
-	for <qemu-devel@nongnu.org>; Mon,  7 Jan 2019 19:41:11 +0100 (CET)
+Received: from player687.ha.ovh.net (unknown [10.109.146.5])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 8BD66E4E2D
+	for <qemu-devel@nongnu.org>; Mon,  7 Jan 2019 19:41:25 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon,  7 Jan 2019 19:39:43 +0100
-Message-Id: <20190107183946.7230-11-clg@kaod.org>
+Date: Mon,  7 Jan 2019 19:39:45 +0100
+Message-Id: <20190107183946.7230-13-clg@kaod.org>
 In-Reply-To: <20190107183946.7230-1-clg@kaod.org>
 References: <20190107183946.7230-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 10/13] spapr: introduce routines to delete the
- KVM IRQ device
+Subject: [Qemu-devel] [PATCH 12/13] spapr/xics: ignore the lower 4K in the
+ IRQ number space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,204 +33,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-If a new interrupt mode is chosen by CAS, the machine generates a
-reset to reconfigure. At this point, the connection with the previous
-KVM device needs to be closed and a new connection needs to opened
-with the KVM device operating the chosen interrupt mode.
+The IRQ number space of the XIVE and XICS interrupt mode are aligned
+when using the dual interrupt mode for the machine. This means that
+the ICS offset is set to zero in QEMU and that the KVM XICS device
+should be informed of this new value. Unfortunately, there is now way
+to do so and KVM still maintains the XICS_IRQ_BASE (0x1000) offset.
 
-New routines are introduced to destroy the XICS and the XIVE KVM
-devices. They make use of a new KVM device ioctl which destroys the
-device and also disconnects the IRQ presenters from the vCPUs.
+Ignore the lower 4K which are not used under the XICS interrupt
+mode. These IRQ numbers are only claimed by XIVE for the CPU IPIs.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/spapr_xive.h |  1 +
- include/hw/ppc/xics.h       |  1 +
- hw/intc/spapr_xive_kvm.c    | 60 +++++++++++++++++++++++++++++++++++++
- hw/intc/xics_kvm.c          | 57 +++++++++++++++++++++++++++++++++++
- 4 files changed, 119 insertions(+)
+ hw/intc/xics_kvm.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 52804516e909..f172fc20b650 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -70,6 +70,7 @@ void spapr_xive_map_mmio(sPAPRXive *xive);
-  * KVM XIVE device helpers
-  */
- void kvmppc_xive_connect(sPAPRXive *xive, Error **errp);
-+void kvmppc_xive_disconnect(sPAPRXive *xive, Error **errp);
- void kvmppc_xive_synchronize_state(sPAPRXive *xive, Error **errp);
- int kvmppc_xive_pre_save(sPAPRXive *xive);
- int kvmppc_xive_post_load(sPAPRXive *xive, int version_id);
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 07508cbd217e..75d4effb5c5f 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -205,6 +205,7 @@ typedef struct sPAPRMachineState sPAPRMachineState;
- void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
-fdt,
-                    uint32_t phandle);
- int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-+int xics_kvm_disconnect(sPAPRMachineState *spapr, Error **errp);
- void xics_spapr_init(sPAPRMachineState *spapr);
-=20
- Object *icp_create(Object *cpu, const char *type, XICSFabric *xi,
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index fe58a9ee32d3..93ea8e71047a 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -57,6 +57,16 @@ static void kvm_cpu_enable(CPUState *cs)
-     QLIST_INSERT_HEAD(&kvm_enabled_cpus, enabled_cpu, node);
- }
-=20
-+static void kvm_cpu_disable_all(void)
-+{
-+    KVMEnabledCPU *enabled_cpu, *next;
-+
-+    QLIST_FOREACH_SAFE(enabled_cpu, &kvm_enabled_cpus, node, next) {
-+        QLIST_REMOVE(enabled_cpu, node);
-+        g_free(enabled_cpu);
-+    }
-+}
-+
- /*
-  * XIVE Thread Interrupt Management context (KVM)
-  */
-@@ -769,3 +779,53 @@ void kvmppc_xive_connect(sPAPRXive *xive, Error **er=
-rp)
-     /* Map all regions */
-     spapr_xive_map_mmio(xive);
- }
-+
-+void kvmppc_xive_disconnect(sPAPRXive *xive, Error **errp)
-+{
-+    XiveSource *xsrc;
-+    struct kvm_create_device xive_destroy_device =3D { 0 };
-+    size_t esb_len;
-+    int rc;
-+
-+    if (!kvm_enabled() || !kvmppc_has_cap_xive()) {
-+        error_setg(errp, "IRQ_XIVE capability must be present for KVM");
-+        return;
-+    }
-+
-+    /* The KVM XIVE device is not in use */
-+    if (!xive || xive->fd =3D=3D -1) {
-+        return;
-+    }
-+
-+    /* Clear the KVM mapping */
-+    xsrc =3D &xive->source;
-+    esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-+
-+    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 0);
-+    munmap(xsrc->esb_mmap, esb_len);
-+
-+    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 1);
-+
-+    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 2);
-+    munmap(xive->tm_mmap, 4ull << TM_SHIFT);
-+
-+    /* Destroy the KVM device. This also clears the VCPU presenters */
-+    xive_destroy_device.fd =3D xive->fd;
-+    xive_destroy_device.type =3D KVM_DEV_TYPE_XIVE;
-+    rc =3D kvm_vm_ioctl(kvm_state, KVM_DESTROY_DEVICE, &xive_destroy_dev=
-ice);
-+    if (rc < 0) {
-+        error_setg_errno(errp, -rc, "Error on KVM_DESTROY_DEVICE for XIV=
-E");
-+    }
-+    close(xive->fd);
-+    xive->fd =3D -1;
-+
-+    kvm_kernel_irqchip =3D false;
-+    kvm_msi_via_irqfd_allowed =3D false;
-+    kvm_gsi_direct_mapping =3D false;
-+
-+    /* Clear the local list of presenter (hotplug) */
-+    kvm_cpu_disable_all();
-+
-+    /* VM Change state handler is not needed anymore */
-+    qemu_del_vm_change_state_handler(xive->change);
-+}
 diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 2426e5b2f4ed..da6a00bc88cc 100644
+index 651bbfdf6966..1d21ff217b82 100644
 --- a/hw/intc/xics_kvm.c
 +++ b/hw/intc/xics_kvm.c
-@@ -50,6 +50,16 @@ typedef struct KVMEnabledICP {
- static QLIST_HEAD(, KVMEnabledICP)
-     kvm_enabled_icps =3D QLIST_HEAD_INITIALIZER(&kvm_enabled_icps);
+@@ -238,6 +238,15 @@ static void ics_get_kvm_state(ICSState *ics)
+     for (i =3D 0; i < ics->nr_irqs; i++) {
+         ICSIRQState *irq =3D &ics->irqs[i];
 =20
-+static void kvm_disable_icps(void)
-+{
-+    KVMEnabledICP *enabled_icp, *next;
++        /*
++         * The KVM XICS device considers that the IRQ numbers should
++         * start at XICS_IRQ_BASE (0x1000). Ignore the lower 4K
++         * numbers (only claimed by XIVE for the CPU IPIs).
++         */
++        if (i + ics->offset < XICS_IRQ_BASE) {
++            continue;
++        }
 +
-+    QLIST_FOREACH_SAFE(enabled_icp, &kvm_enabled_icps, node, next) {
-+        QLIST_REMOVE(enabled_icp, node);
-+        g_free(enabled_icp);
-+    }
-+}
-+
- /*
-  * ICP-KVM
-  */
-@@ -455,6 +465,53 @@ fail:
-     return -1;
- }
+         kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+                           i + ics->offset, &state, false, &error_fatal);
 =20
-+int xics_kvm_disconnect(sPAPRMachineState *spapr, Error **errp)
-+{
-+    int rc;
-+    struct kvm_create_device xics_create_device =3D {
-+        .fd =3D kernel_xics_fd,
-+        .type =3D KVM_DEV_TYPE_XICS,
-+        .flags =3D 0,
-+    };
+@@ -303,6 +312,15 @@ static int ics_set_kvm_state(ICSState *ics, int vers=
+ion_id)
+         ICSIRQState *irq =3D &ics->irqs[i];
+         int ret;
+=20
++        /*
++         * The KVM XICS device considers that the IRQ numbers should
++         * start at XICS_IRQ_BASE (0x1000). Ignore the lower 4K
++         * numbers (only claimed by XIVE for the CPU IPIs).
++         */
++        if (i + ics->offset < XICS_IRQ_BASE) {
++            continue;
++        }
 +
-+    /* The KVM XICS device is not in use */
-+    if (kernel_xics_fd =3D=3D -1) {
-+        return 0;
-+    }
-+
-+    if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_IRQ_XI=
-CS)) {
-+        error_setg(errp,
-+                   "KVM and IRQ_XICS capability must be present for KVM =
-XICS device");
-+        return -1;
-+    }
-+
-+    rc =3D kvm_vm_ioctl(kvm_state, KVM_DESTROY_DEVICE, &xics_create_devi=
-ce);
-+    if (rc < 0) {
-+        error_setg_errno(errp, -rc, "Error on KVM_DESTROY_DEVICE for XIC=
-S");
-+    }
-+    close(kernel_xics_fd);
-+    kernel_xics_fd =3D -1;
-+
-+    spapr_rtas_register(RTAS_IBM_SET_XIVE, NULL, 0);
-+    spapr_rtas_register(RTAS_IBM_GET_XIVE, NULL, 0);
-+    spapr_rtas_register(RTAS_IBM_INT_OFF, NULL, 0);
-+    spapr_rtas_register(RTAS_IBM_INT_ON, NULL, 0);
-+
-+    kvmppc_define_rtas_kernel_token(0, "ibm,set-xive");
-+    kvmppc_define_rtas_kernel_token(0, "ibm,get-xive");
-+    kvmppc_define_rtas_kernel_token(0, "ibm,int-on");
-+    kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
-+
-+    kvm_kernel_irqchip =3D false;
-+    kvm_msi_via_irqfd_allowed =3D false;
-+    kvm_gsi_direct_mapping =3D false;
-+
-+    /* Clear the presenter from the VCPUs */
-+    kvm_disable_icps();
-+
-+    return rc;
-+}
-+
- static void xics_kvm_register_types(void)
- {
-     type_register_static(&ics_kvm_info);
+         state =3D irq->server;
+         state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MA=
+SK)
+             << KVM_XICS_PRIORITY_SHIFT;
 --=20
 2.20.1
