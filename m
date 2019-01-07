@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45260)
+Received: from eggs.gnu.org ([209.51.188.92]:49154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ggTnu-0000wL-GE
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:14:51 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU1i-0005MN-90
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:29:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ggTnt-0006wX-Oj
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:14:50 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggU1h-0007VO-4y
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:29:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1ggU1g-0007UU-TA
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 07:29:05 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon,  7 Jan 2019 16:22:37 +0400
+Message-Id: <20190107122304.22997-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20190107122304.22997-1-marcandre.lureau@redhat.com>
+References: <20190107122304.22997-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20181225125344.4482-1-arilou@gmail.com>
-In-Reply-To: <20181225125344.4482-1-arilou@gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 7 Jan 2019 16:14:36 +0400
-Message-ID: <CAJ+F1CJN=Gn5GYqrOeqWFNryw=q+7q8TDUX0VQEzrtS8tbUeQg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] dump: Set correct vaddr for ELF dump
+Subject: [Qemu-devel] [PULL v2 01/28] hw: apply accel compat properties
+ without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,83 +28,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jon Doron <arilou@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, Wen Congyang <wency@cn.fujitsu.com>, Luiz Capitulino <lcapitulino@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Hi
+Instead of registering compat properties as globals, let's keep them
+in their own array, to avoid mixing with user globals.
 
-On Tue, Dec 25, 2018 at 5:52 PM Jon Doron <arilou@gmail.com> wrote:
->
-> vaddr needs to be equal to the paddr since the dump file represents the
-> physical memory image.
->
-> Without setting vaddr correctly, GDB would load all the different memory
-> regions on top of each other to vaddr 0, thus making GDB showing the wron=
-g
-> memory data for a given address.
->
-> Signed-off-by: Jon Doron <arilou@gmail.com>
+Introduce object_apply_global_props() function, to apply compatibility
+properties from a GPtrArray.
 
-This is a non-trivial patch! (qemu-trivial, please ignore).
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/hw/qdev-core.h | 10 ++++++++++
+ include/qom/object.h   |  3 +++
+ include/sysemu/accel.h |  4 +---
+ accel/accel.c          | 12 ------------
+ hw/core/qdev.c         |  9 +++++++++
+ hw/xen/xen-common.c    |  9 ++++++---
+ qom/object.c           | 25 +++++++++++++++++++++++++
+ vl.c                   |  1 -
+ 8 files changed, 54 insertions(+), 19 deletions(-)
 
-> ---
->  dump.c                       | 4 ++--
->  scripts/dump-guest-memory.py | 1 +
->  2 files changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/dump.c b/dump.c
-> index 4ec94c5e25..bf77a119ea 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -192,7 +192,7 @@ static void write_elf64_load(DumpState *s, MemoryMapp=
-ing *memory_mapping,
->      phdr.p_paddr =3D cpu_to_dump64(s, memory_mapping->phys_addr);
->      phdr.p_filesz =3D cpu_to_dump64(s, filesz);
->      phdr.p_memsz =3D cpu_to_dump64(s, memory_mapping->length);
-> -    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr);
-> +    phdr.p_vaddr =3D phdr.p_paddr;
-
-This is likely breaking paging=3Dtrue somehow, which sets
-memory_mapping->virt_addr to non-0.
-
-According to doc "If you want to use gdb to process the core, please
-set @paging to true."
-
-Although I am not able to (gdb) x/10bx 0xa0000 for example on a core
-produced with paging. Not sure why, anybody could help?
-
->      assert(memory_mapping->length >=3D filesz);
->
-> @@ -216,7 +216,7 @@ static void write_elf32_load(DumpState *s, MemoryMapp=
-ing *memory_mapping,
->      phdr.p_paddr =3D cpu_to_dump32(s, memory_mapping->phys_addr);
->      phdr.p_filesz =3D cpu_to_dump32(s, filesz);
->      phdr.p_memsz =3D cpu_to_dump32(s, memory_mapping->length);
-> -    phdr.p_vaddr =3D cpu_to_dump32(s, memory_mapping->virt_addr);
-> +    phdr.p_vaddr =3D phdr.p_paddr;
->
->      assert(memory_mapping->length >=3D filesz);
->
-> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-> index 198cd0fe40..2c587cbefc 100644
-> --- a/scripts/dump-guest-memory.py
-> +++ b/scripts/dump-guest-memory.py
-> @@ -163,6 +163,7 @@ class ELF(object):
->          phdr =3D get_arch_phdr(self.endianness, self.elfclass)
->          phdr.p_type =3D p_type
->          phdr.p_paddr =3D p_paddr
-> +        phdr.p_vaddr =3D p_paddr
-
-With your proposed change though, I can dump memory with gdb...
-
->          phdr.p_filesz =3D p_size
->          phdr.p_memsz =3D p_size
->          self.segments.append(phdr)
-> --
-> 2.19.2
->
->
-
-
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 92851e55df..84e612f473 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -267,6 +267,16 @@ typedef struct GlobalProperty {
+     Error **errp;
+ } GlobalProperty;
+=20
++static inline void
++compat_props_add(GPtrArray *arr,
++                 GlobalProperty props[], size_t nelem)
++{
++    int i;
++    for (i =3D 0; i < nelem; i++) {
++        g_ptr_array_add(arr, (void *)&props[i]);
++    }
++}
++
+ /*** Board API.  This should go away once we have a machine config file.=
+  ***/
+=20
+ DeviceState *qdev_create(BusState *bus, const char *name);
+diff --git a/include/qom/object.h b/include/qom/object.h
+index bcae3f4951..e0262962b5 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -675,6 +675,9 @@ Object *object_new_with_propv(const char *typename,
+                               Error **errp,
+                               va_list vargs);
+=20
++void object_apply_global_props(Object *obj, const GPtrArray *props,
++                               Error **errp);
++
+ /**
+  * object_set_props:
+  * @obj: the object instance to set properties on
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 637358f430..f331d128e9 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -49,7 +49,7 @@ typedef struct AccelClass {
+      * global properties may be overridden by machine-type
+      * compat_props or user-provided global properties.
+      */
+-    GlobalProperty *global_props;
++    GPtrArray *compat_props;
+ } AccelClass;
+=20
+ #define TYPE_ACCEL "accel"
+@@ -67,8 +67,6 @@ typedef struct AccelClass {
+ extern unsigned long tcg_tb_size;
+=20
+ void configure_accelerator(MachineState *ms);
+-/* Register accelerator specific global properties */
+-void accel_register_compat_props(AccelState *accel);
+ /* Called just before os_setup_post (ie just before drop OS privs) */
+ void accel_setup_post(MachineState *ms);
+=20
+diff --git a/accel/accel.c b/accel/accel.c
+index 3da26eb90f..6db5d8f4df 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -119,18 +119,6 @@ void configure_accelerator(MachineState *ms)
+     }
+ }
+=20
+-void accel_register_compat_props(AccelState *accel)
+-{
+-    AccelClass *class =3D ACCEL_GET_CLASS(accel);
+-    GlobalProperty *prop =3D class->global_props;
+-
+-    for (; prop && prop->driver; prop++) {
+-        /* Any compat_props must never cause error */
+-        prop->errp =3D &error_abort;
+-        qdev_prop_register_global(prop);
+-    }
+-}
+-
+ void accel_setup_post(MachineState *ms)
+ {
+     AccelState *accel =3D ms->accelerator;
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 6b3cc55b27..53b507164f 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -972,6 +972,15 @@ static void device_initfn(Object *obj)
+=20
+ static void device_post_init(Object *obj)
+ {
++    if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
++        MachineState *m =3D MACHINE(qdev_get_machine());
++        AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
++
++        if (ac->compat_props) {
++            object_apply_global_props(obj, ac->compat_props, &error_abor=
+t);
++        }
++    }
++
+     qdev_prop_set_globals(DEVICE(obj));
+ }
+=20
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 6ec14c73ca..4532aa8632 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -174,18 +174,21 @@ static GlobalProperty xen_compat_props[] =3D {
+         .driver =3D "migration",
+         .property =3D "send-section-footer",
+         .value =3D "off",
+-    },
+-    { /* end of list */ },
++    }
+ };
+=20
+ static void xen_accel_class_init(ObjectClass *oc, void *data)
+ {
+     AccelClass *ac =3D ACCEL_CLASS(oc);
++
+     ac->name =3D "Xen";
+     ac->init_machine =3D xen_init;
+     ac->setup_post =3D xen_setup_post;
+     ac->allowed =3D &xen_allowed;
+-    ac->global_props =3D xen_compat_props;
++    ac->compat_props =3D g_ptr_array_new();
++
++    compat_props_add(ac->compat_props,
++                     xen_compat_props, G_N_ELEMENTS(xen_compat_props));
+ }
+=20
+ #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+diff --git a/qom/object.c b/qom/object.c
+index 17921c0a71..dbdab0aead 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -370,6 +370,31 @@ static void object_post_init_with_type(Object *obj, =
+TypeImpl *ti)
+     }
+ }
+=20
++void object_apply_global_props(Object *obj, const GPtrArray *props, Erro=
+r **errp)
++{
++    Error *err =3D NULL;
++    int i;
++
++    if (!props) {
++        return;
++    }
++
++    for (i =3D 0; i < props->len; i++) {
++        GlobalProperty *p =3D g_ptr_array_index(props, i);
++
++        if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
++            continue;
++        }
++        p->used =3D true;
++        object_property_parse(obj, p->value, p->property, &err);
++        if (err !=3D NULL) {
++            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
++                          p->driver, p->property, p->value);
++            error_propagate(errp, err);
++        }
++    }
++}
++
+ static void object_initialize_with_type(void *data, size_t size, TypeImp=
+l *type)
+ {
+     Object *obj =3D data;
+diff --git a/vl.c b/vl.c
+index 0db5ad0246..936d0c2587 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2996,7 +2996,6 @@ static void user_register_global_props(void)
+  */
+ static void register_global_properties(MachineState *ms)
+ {
+-    accel_register_compat_props(ms->accelerator);
+     machine_register_compat_props(ms);
+     user_register_global_props();
+ }
 --=20
-Marc-Andr=C3=A9 Lureau
+2.20.1.2.gb21ebb671b
