@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33047)
+Received: from eggs.gnu.org ([209.51.188.92]:33770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggZOk-0006k3-K5
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:13:16 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ggZQN-0008H0-2f
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:14:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggZOj-0006pk-KV
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:13:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39628)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ggZOj-0006pK-Bc
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:13:13 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-16-fli@suse.com>
-Date: Mon, 07 Jan 2019 19:13:10 +0100
-In-Reply-To: <20181225140449.15786-16-fli@suse.com> (Fei Li's message of "Tue,
-	25 Dec 2018 22:04:48 +0800")
-Message-ID: <87k1jgjpzd.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1ggZQ7-00080R-CL
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 13:14:42 -0500
+References: <20190103094728.31747-1-rjones@redhat.com>
+	<20190103094728.31747-2-rjones@redhat.com>
+	<cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
+	<741a5843-a47a-6a02-c378-b778f7ffe172@redhat.com>
+	<f5aa2057-509b-28fa-d803-b18ca525ae73@redhat.com>
+	<94a72d7e-a8c9-09d4-fad3-00b09ffd7eb9@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b52f88bd-754e-d5ea-844b-cb05a4bbd9a7@redhat.com>
+Date: Mon, 7 Jan 2019 19:14:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 15/16] qemu_thread: supplement
- error handling for touch_all_pages
+In-Reply-To: <94a72d7e-a8c9-09d4-fad3-00b09ffd7eb9@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ZhnRHJwLvoGjBYNFojC1fEb6uQUMwkr5c"
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: Reinitialize optind to 1 (not
+ 0) before parsing inner command.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,128 +29,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com
+To: Eric Blake <eblake@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Fei Li <fli@suse.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZhnRHJwLvoGjBYNFojC1fEb6uQUMwkr5c
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <b52f88bd-754e-d5ea-844b-cb05a4bbd9a7@redhat.com>
+Subject: Re: [PATCH v2] qemu-io: Reinitialize optind to 1 (not 0) before
+ parsing inner command.
+References: <20190103094728.31747-1-rjones@redhat.com>
+ <20190103094728.31747-2-rjones@redhat.com>
+ <cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
+ <741a5843-a47a-6a02-c378-b778f7ffe172@redhat.com>
+ <f5aa2057-509b-28fa-d803-b18ca525ae73@redhat.com>
+ <94a72d7e-a8c9-09d4-fad3-00b09ffd7eb9@redhat.com>
+In-Reply-To: <94a72d7e-a8c9-09d4-fad3-00b09ffd7eb9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Supplement the error handling for touch_all_pages: add an Error
-> parameter for it to propagate the error to its caller to do the
-> handling in case it fails.
->
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Fei Li <fli@suse.com>
-> ---
->  util/oslib-posix.c | 25 ++++++++++++++++---------
->  1 file changed, 16 insertions(+), 9 deletions(-)
->
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 251e2f1aea..afc1d99093 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -431,15 +431,17 @@ static inline int get_memset_num_threads(int smp_cpus)
->  }
->  
->  static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
-> -                            int smp_cpus)
-> +                            int smp_cpus, Error **errp)
->  {
->      size_t numpages_per_thread;
->      size_t size_per_thread;
->      char *addr = area;
->      int i = 0;
-> +    int started_thread = 0;
->  
->      memset_thread_failed = false;
->      memset_num_threads = get_memset_num_threads(smp_cpus);
-> +    started_thread = memset_num_threads;
->      memset_thread = g_new0(MemsetThread, memset_num_threads);
->      numpages_per_thread = (numpages / memset_num_threads);
->      size_per_thread = (hpagesize * numpages_per_thread);
-> @@ -448,14 +450,18 @@ static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
->          memset_thread[i].numpages = (i == (memset_num_threads - 1)) ?
->                                      numpages : numpages_per_thread;
->          memset_thread[i].hpagesize = hpagesize;
-> -        /* TODO: let the callers handle the error instead of abort() here */
-> -        qemu_thread_create(&memset_thread[i].pgthread, "touch_pages",
-> -                           do_touch_pages, &memset_thread[i],
-> -                           QEMU_THREAD_JOINABLE, &error_abort);
-> +        if (!qemu_thread_create(&memset_thread[i].pgthread, "touch_pages",
-> +                                do_touch_pages, &memset_thread[i],
-> +                                QEMU_THREAD_JOINABLE, errp)) {
-> +            memset_thread_failed = true;
-> +            started_thread = i;
-> +            goto out;
+On 07.01.19 18:59, Eric Blake wrote:
+> On 1/7/19 11:50 AM, Max Reitz wrote:
+>=20
+>>>>> Note I didn't set optreset.  It's not present in glibc and the "har=
+d
+>>>>> reset" is not necessary in this context.
+>>>>
+>>>> But it sure sounds like FreeBSD requires you to set it, doesn't it?
+>=20
+> No.  Quoting https://www.freebsd.org/cgi/man.cgi?getopt(3)
+>=20
+>      The variables opterr and optind are both initialized to 1.	 The op=
+tind
+>      variable may be set to another value before a set of calls	to
+> getopt() in
+>      order to skip over	more or	less argv entries.
+>=20
+> so resetting it to 1 as a soft reset is no different to setting it to 2=
 
-break rather than goto, please.
+> to skip argv[1].
 
-> +        }
->          addr += size_per_thread;
->          numpages -= numpages_per_thread;
->      }
-> -    for (i = 0; i < memset_num_threads; i++) {
-> +out:
-> +    for (i = 0; i < started_thread; i++) {
->          qemu_thread_join(&memset_thread[i].pgthread);
->      }
+In theory it is very much different because the text clearly says "in
+order to skip", not "in order to re-parse or use a different argv".
+Especially the fact that we use different argvs is something that
+implementations may not expect.
 
-I don't like how @started_thread is computed.  The name suggests it's
-the number of threads started so far.  That's the case when you
-initialize it to zero.  But then you immediately set it to
-memset_thread().  It again becomes the case only when you break the loop
-on error, or when you complete it successfully.
+> It just means that you didn't get the hard reset of
+> internal state (there is definitely internal state if argv[1] was merge=
+d
+> short options - but that state is cleared if you run getopt() until it
+> returns -1;
 
-There's no need for @started_thread, since the number of threads created
-is readily available as @i:
+While I agree that this is probably the case in practice, I see no
+reason why this should be the case if it isn't guaranteed.  Why should
+the state be cleared once you reach the end?
 
-       memset_num_threads = i;
-       for (i = 0; i < memset_num_threads; i++) {
-           qemu_thread_join(&memset_thread[i].pgthread);
-       }
+> there may also be internal state if you used extensions, but
+> when you don't use extensions, such internal state is irrelevant).
+>=20
+> I think the BSD man page needs updating, and that will probably happen
+> if I file my promised POSIX defect.
 
-Rest of the function:
+Sure.  But as it is, it doesn't tell me that resetting optind to 1 is
+sufficient to be able to parse a new argv.
+>>> At the end of the day, both GNU optind=3D0 and BSD optreset=3D1 are
+>>> sufficient to force a hard reset of all hidden state.  But if you don=
+'t
+>>> use POSIX extensions, and always run getopt() until a -1 return, then=
 
->      g_free(memset_thread);
-       memset_thread = NULL;
+>>> setting optind=3D1 is a portable soft reset, regardless of how the hi=
+dden
+>>> state is implemented, and regardless of how (or even if) libc offers =
+a
+>>> hard reset, even though POSIX itself is currently lacking that mentio=
+n.
+>>> (I should probably file a POSIX defect to get that wording listed in =
+POSIX)
+>>
+>> Hm, OK?  Is there any guarantee for that behavior for FreeBSD, or is
+>> that just how it is?  Because the man page is very clear on it:
+>> "optreset must be set to 1".  It doesn't talk about soft or hard reset=
+s
+>> like the glibc man page does.
+>>
+>> And if optreset not being available for glibc is the only issue, I'd s=
+ay
+>> adding it as a weak global variable would work without #ifdefs.
+>=20
+> I don't see the point - Richard has already tested that optind =3D 1
+> worked on BSD machines for our purposes, so we don't have to worry abou=
+t
+> the hard reset aspect of optreset=3D1.
 
-       return memset_thread_failed;
-   }
+Well, and as far as I remember glibc's memcpy() at one point only copied
+in one direction and things broke badly once they reversed it at some
+point for some CPUs.
 
-If do_touch_pages() set memset_thread_failed(), we return false without
-setting an error.  I believe you should
+Just because it works now doesn't mean it will work always if the
+specification allows for different behavior.
 
-       if (memset_thread_failed) {
-           error_setg(errp, "os_mem_prealloc: Insufficient free host memory "
-               "pages available to allocate guest RAM");
-           return false;
-       }
-       return true;
+> (But yes, it would also be nice if
+> BSD and glibc folks could agree on how to do hard resets, instead of
+> having two different incompatible ways)
+I don't see why we should have a general code path if there is no
+standard way of resetting getopt() other than "This seems to work".
+What's so bad about a weak optreset or an
+"#ifdef __FreeBSD__; optreset =3D 1; #endif"?
 
-here, and ...
+Sure, if you can get POSIX to define the fact that optind =3D 1 after
+getopt() =3D=3D -1 will be sufficient to start parsing a new argv, that'd=
+ be
+great.  But there is no such standard yet (other than "Why would that
+not work?").
 
-> @@ -471,6 +477,7 @@ void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
->      struct sigaction act, oldact;
->      size_t hpagesize = qemu_fd_getpagesize(fd);
->      size_t numpages = DIV_ROUND_UP(memory, hpagesize);
-> +    Error *local_err = NULL;
->  
->      memset(&act, 0, sizeof(act));
->      act.sa_handler = &sigbus_handler;
-> @@ -484,9 +491,9 @@ void os_mem_prealloc(int fd, char *area, size_t memory, int smp_cpus,
->      }
->  
->      /* touch pages simultaneously */
-> -    if (touch_all_pages(area, hpagesize, numpages, smp_cpus)) {
-> -        error_setg(errp, "os_mem_prealloc: Insufficient free host memory "
-> -            "pages available to allocate guest RAM");
-> +    if (touch_all_pages(area, hpagesize, numpages, smp_cpus, &local_err)) {
-> +        error_propagate_prepend(errp, local_err, "os_mem_prealloc: Insufficient"
-> +            " free host memory pages available to allocate guest RAM: ");
->      }
+Max
 
-... not mess with the error message here, i.e.
 
-       touch_all_pages(area, hpagesize, numpages, smp_cpus), errp);
+--ZhnRHJwLvoGjBYNFojC1fEb6uQUMwkr5c
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->  
->      ret = sigaction(SIGBUS, &oldact, NULL);
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwzlvEACgkQ9AfbAGHV
+z0Cg/gf+PY8j2hQSqYd7muHLaXTAg2Fwb51v97STGBgblVL8sd9oomwywSRWeVdt
+55cgdLRB2/f2j2GiDZPVyqrGjf9+Zj/3kdd0GfnJ4CrsmFr9k77lgiKJSwwu8BiN
+grCoUbr7UhTBtTtDdsTX1/5/T6UH1eskatCK9GJM3luh7PXuyw+Ms4akK1t+S4+u
+ezlNvRlQdfJ6SP+Ax9qHnQfl20kpXS7FB8ZBmVWom9uInJT7AFWgdIapJepfPOAW
+y1q5iMEOmQbnnaHurCxwQrHZyU/qDqTtSC/klE1ZoQu3yQ9FJySkU4w6GgiHJ8hM
+bRsFZsFb9NMWr8t/5oDAO3morQr0aA==
+=ucIw
+-----END PGP SIGNATURE-----
+
+--ZhnRHJwLvoGjBYNFojC1fEb6uQUMwkr5c--
