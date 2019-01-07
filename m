@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57445)
+Received: from eggs.gnu.org ([209.51.188.92]:58119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1ggVle-0007Mu-0D
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:20:38 -0500
+	(envelope-from <berto@igalia.com>) id 1ggVoB-0008JW-Kk
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:23:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1ggVlc-0004Cl-Ap
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:20:37 -0500
-Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::1]:29590)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1ggVlb-0003wE-Kz
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:20:36 -0500
-Date: Mon, 7 Jan 2019 15:20:16 +0100
-From: Olaf Hering <olaf@aepfle.de>
-Message-ID: <20190107152016.03464ee3.olaf@aepfle.de>
-In-Reply-To: <20181213110525.GY18875@perard.uk.xensource.com>
-References: <20181026101016.28584-1-olaf@aepfle.de>
-	<20181213110525.GY18875@perard.uk.xensource.com>
+	(envelope-from <berto@igalia.com>) id 1ggVo6-0006GO-3q
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 09:23:13 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181218075707.12006-5-anton.nefedov@virtuozzo.com>
+References: <20181218075707.12006-1-anton.nefedov@virtuozzo.com>
+	<20181218075707.12006-5-anton.nefedov@virtuozzo.com>
+Date: Mon, 07 Jan 2019 15:22:50 +0100
+Message-ID: <w51ef9oy2bp.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/PUzmwa.URpv55AFLiE_WGv7";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v1] xen: preserve COMPAT in CFLAGS
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v11 04/10] block: introduce
+ BDRV_REQ_ALLOCATE flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +23,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: Ian Jackson <ian.jackson@citrix.com>, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
---Sig_/PUzmwa.URpv55AFLiE_WGv7
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue 18 Dec 2018 08:57:36 AM CET, Anton Nefedov wrote:
+> The flag is supposed to indicate that the region of the disk image has
+> to be sufficiently allocated so it reads as zeroes.
+>
+> The call with the flag set must return -ENOTSUP if allocation cannot
+> be done efficiently.
+> This has to be made sure of by both
+>   - the drivers that support the flag
+>   - and the common block layer (so it will not fall back to any slowpath
+>     (like writing zero buffers) in case the driver does not support
+>     the flag).
+>
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Am Thu, 13 Dec 2018 11:05:25 +0000
-schrieb Anthony PERARD <anthony.perard@citrix.com>:
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-> Hi,
->=20
-> Ian, we have those XC_WANT_COMPAT_* #defines to allow consumers of Xen
-> libs be able to use old interfaces. Do you think it's a good idea to
-> have this consumers (QEMU here) #undef the flag when it has implemented
-> the newer interface?
-
-I think the wording is wrong.
-
-The defines exist to expose existing APIs to software that was not updated =
-to use the "latest" API. To me it looks like the undef's are wrong. Even th=
-e usage in configure looks bogus, but that is another unrelated thing.
-
-Olaf
-
---Sig_/PUzmwa.URpv55AFLiE_WGv7
-Content-Type: application/pgp-signature
-Content-Description: Digitale Signatur von OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQSkRyP6Rn//f03pRUBdQqD6ppg2fgUCXDNgIAAKCRBdQqD6ppg2
-fu5TAKCMBBZF7gk7Qc47TVW1U8GXd7YH+gCgw8IaNuKH7wgvFE1OgbPlHGXC8XI=
-=MkI/
------END PGP SIGNATURE-----
-
---Sig_/PUzmwa.URpv55AFLiE_WGv7--
+Berto
