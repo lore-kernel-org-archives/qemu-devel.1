@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53144)
+Received: from eggs.gnu.org ([209.51.188.92]:34989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ggN4C-0002q3-SC
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:03:13 -0500
+	(envelope-from <tom.deseyn@gmail.com>) id 1ggNo3-0002FM-EQ
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:50:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ggN4B-0006f3-R8
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:03:12 -0500
-Date: Mon, 7 Jan 2019 15:48:15 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190107044815.GF13339@umbus.fritz.box>
-References: <20190102055743.5052-1-clg@kaod.org>
+	(envelope-from <tom.deseyn@gmail.com>) id 1ggNo2-0001B6-90
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:50:35 -0500
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:44047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tom.deseyn@gmail.com>)
+	id 1ggNo2-000146-0g
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 00:50:34 -0500
+Received: by mail-qk1-x743.google.com with SMTP id o8so8373028qkk.11
+	for <qemu-devel@nongnu.org>; Sun, 06 Jan 2019 21:50:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gdTfX7fkYsEEjebm"
-Content-Disposition: inline
-In-Reply-To: <20190102055743.5052-1-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 00/10] spapr: introduce the 'dual'
- interrupt mode XICS/XIVE
+References: <b95d4a9c-4bee-5e0d-5ec6-02edf3aefcc1@vivier.eu>
+	<20181214154130.4069-1-tom.deseyn@gmail.com>
+In-Reply-To: <20181214154130.4069-1-tom.deseyn@gmail.com>
+From: Tom Deseyn <tom.deseyn@gmail.com>
+Date: Mon, 7 Jan 2019 06:50:15 +0100
+Message-ID: <CAErTmiPDhaLR8YZbABtZ=BAquXC0ZW=Y+tBRZr4YtRas0UpiLQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3] Add getsockopt for settable SOL_IPV6
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,121 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, Laurent Vivier <laurent@vivier.eu>
+
+Hi Laurent,
+
+Can you please take a look at the updated patch? Should I add braces for
+code-style?
+
+Thanks,
+
+Tom
 
 
---gdTfX7fkYsEEjebm
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, Dec 14, 2018 at 4:43 PM <tom.deseyn@gmail.com> wrote:
 
-On Wed, Jan 02, 2019 at 06:57:33AM +0100, C=E9dric Le Goater wrote:
-> Hello,
->=20
-> This series adds a new sPAPR IRQ backend called 'dual' which supports
-> both interrupt mode, the XIVE native exploitation mode and the legacy
-> compatibility mode (XICS).
->=20
-> The machine operates with the legacy mode by default and lets CAS
-> negotiate a new interrupt mode. If a new mode is selected, it is
-> activated after a machine reset to take into account the required
-> changes. These impact the device tree layout, the interrupt presenter
-> object and the exposed MMIO regions in the case of XIVE.
->=20
-> The preliminary changes for this new IRQ backend are the introduction
-> of a second interrupt presenter object under the PowerPCCPU to support
-> XIVE. The qemu_irq array of each interrupt controller model is also
-> made common and moved under the machine.
-
-Ok, I've now applied all of this series to ppc-for-4.0.
-
->=20
->=20
-> GitHub trees available here :
-> =20
-> QEMU sPAPR:
->=20
->   https://github.com/legoater/qemu/commits/xive-next
->  =20
-> QEMU PowerNV:
->=20
->   https://github.com/legoater/qemu/commits/powernv-3.1
->=20
-> Linux/KVM:
->=20
->   https://github.com/legoater/linux/commits/xive-4.20
->=20
-> OPAL:
->=20
->   https://github.com/legoater/skiboot/commits/xive
->=20
-> Best wishes for 2019 !=20
->=20
-> C.
->=20
->=20
->=20
-> C=E9dric Le Goater (10):
->   spapr: modify the prototype of the cpu_intc_create() method
->   ppc/xive: introduce a XiveTCTX pointer under PowerPCCPU
->   ppc: replace the 'Object *intc' by a 'ICPState *icp' pointer under the
->     CPU
->   spapr/xive: simplify the sPAPR IRQ qirq method for XIVE
->   ppc: export the XICS and XIVE set_irq handlers
->   pnv/psi: move the ICSState qemu_irq array under the PSI device model
->   spapr: move the ICSState qemu_irq array under the machine
->   ppc/xics: allow ICSState to have an offset 0
->   spapr: introduce a new sPAPR IRQ backend supporting XIVE and XICS
->   spapr: enable XIVE MMIOs at reset
->=20
->  include/hw/ppc/pnv.h        |   2 +-
->  include/hw/ppc/pnv_psi.h    |   1 +
->  include/hw/ppc/spapr.h      |   1 +
->  include/hw/ppc/spapr_irq.h  |   6 +-
->  include/hw/ppc/spapr_xive.h |   2 +-
->  include/hw/ppc/xics.h       |   6 +-
->  include/hw/ppc/xive.h       |   9 +-
->  target/ppc/cpu.h            |   5 +-
->  hw/intc/spapr_xive.c        |  23 ++-
->  hw/intc/xics.c              |   4 +-
->  hw/intc/xics_kvm.c          |   3 +-
->  hw/intc/xics_spapr.c        |  10 +-
->  hw/intc/xive.c              |  11 +-
->  hw/ppc/pnv.c                |  27 ++--
->  hw/ppc/pnv_core.c           |   4 +-
->  hw/ppc/pnv_psi.c            |   7 +-
->  hw/ppc/spapr.c              |  12 +-
->  hw/ppc/spapr_cpu_core.c     |   9 +-
->  hw/ppc/spapr_hcall.c        |  11 ++
->  hw/ppc/spapr_irq.c          | 270 ++++++++++++++++++++++++++++++++++--
->  20 files changed, 342 insertions(+), 81 deletions(-)
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---gdTfX7fkYsEEjebm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwy2g8ACgkQbDjKyiDZ
-s5JS+A//SuATKbEfUhrDFIL9tPG35E/DonclRQ8TqZfffyELIyW24IrdyxfYe6/J
-+roU5zNe5Y2f2Hw0nz3+JwH6Gt6kieL+eNA3DvA8WALfejE0KZA7VWWr6ExhhOhN
-JJkZ0C6xJcLYxnFdYjUIUvMZnU4fSwawzRdfk7GlDSRinWibbBvxl7WrrJTpkv/d
-Xaj6Cx7pgKGP2mCnub2ejOI7KmJ3HYpomTtxUVPijELTgjPcVjpmYh+Ll3lm/4Gr
-qgzYU125vCtgf1Krlp7mkl5zLClO+hNRjXv/CQt4qulGKjVcO/eBEc7a7ZWnYrO5
-iMkwj88QQQE4IPQZkMzkV1YFhN4pD9E/zSpVBl2Y6E2ukyVmSOwV/O/GtiA9/57X
-px83twhvZmhKlyFiQOgaHGkui01Cq3Kyx1IRZFCqN+SZXfuVMJ7tomJncVsrghUm
-FSxZGsBo4z+KkT77R3aueDPNo98VRdQUZNzaXFKORNYCakaouwNfieZvaa/A45Ca
-XHwlh9rL7ZDlMa4ZSysLyGpBhRz1hyXPkd7ygWM95g8mHL4OuH/QcHR9GnUqUmte
-w5veVcUEquE036b/uBinSK+MOozffDvMZbrS5/lP8pHX4FyumZT0cOnz9/hv2bji
-T7ztSGxB6MR7WxRHkPRpxMTbMdkcavIzqeOHfLczKXPZcGrtGis=
-=k+1R
------END PGP SIGNATURE-----
-
---gdTfX7fkYsEEjebm--
+> From: Tom Deseyn <tom.deseyn@gmail.com>
+>
+> Thank you for reviewing Laurant.
+> Sorry for missing history, I'm not used to sending patches via mail.
+> I got an email about code style. For now, I'm sticking to the style
+> that is used in the function.
+>
+> v2: default to unimplemented
+> v3: match kernel behavior
+>
+> Signed-off-by: Tom Deseyn <tom.deseyn@gmail.com>
+> ---
+>  linux-user/syscall.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+>
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 280137da8c..f103437f26 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -2352,6 +2352,42 @@ static abi_long do_getsockopt(int sockfd, int
+> level, int optname,
+>              break;
+>          }
+>          break;
+> +    case SOL_IPV6:
+> +        switch (optname) {
+> +        case IPV6_MTU_DISCOVER:
+> +        case IPV6_MTU:
+> +        case IPV6_V6ONLY:
+> +        case IPV6_RECVPKTINFO:
+> +        case IPV6_UNICAST_HOPS:
+> +        case IPV6_MULTICAST_HOPS:
+> +        case IPV6_MULTICAST_LOOP:
+> +        case IPV6_RECVERR:
+> +        case IPV6_RECVHOPLIMIT:
+> +        case IPV6_2292HOPLIMIT:
+> +        case IPV6_CHECKSUM: {
+> +            void* target_addr;
+> +            if (get_user_u32(len, optlen))
+> +                return -TARGET_EFAULT;
+> +            if (len < 0)
+> +                return -TARGET_EINVAL;
+> +            lv = sizeof(val);
+> +            ret = get_errno(getsockopt(sockfd, level, optname, &val,
+> &lv));
+> +            if (ret < 0)
+> +                return ret;
+> +            if (lv < len)
+> +                len = lv;
+> +            if (put_user_u32(len, optlen))
+> +                return -TARGET_EFAULT;
+> +            target_addr = lock_user(VERIFY_WRITE, optval_addr, len, 0);
+> +            tswap32s((uint32_t*)&val);
+> +            memcpy(target_addr, &val, len);
+> +            unlock_user(target_addr, optval_addr, len);
+> +            break;
+> +        }
+> +        default:
+> +            goto unimplemented;
+> +        }
+> +        break;
+>      default:
+>      unimplemented:
+>          gemu_log("getsockopt level=%d optname=%d not yet supported\n",
+> --
+> 2.19.2
+>
+>
