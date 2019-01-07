@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52272)
+Received: from eggs.gnu.org ([209.51.188.92]:52414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1ggZ7f-0007Cc-C3
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:55:43 -0500
+	(envelope-from <armbru@redhat.com>) id 1ggZ7p-0007MB-AG
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <venu.busireddy@oracle.com>) id 1ggZ7c-0003EI-3C
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:55:35 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:50674)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
-	id 1ggZ7Y-0002o0-Q4
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:55:30 -0500
-From: Venu Busireddy <venu.busireddy@oracle.com>
-Date: Mon,  7 Jan 2019 12:54:48 -0500
-Message-Id: <1546883690-17798-4-git-send-email-venu.busireddy@oracle.com>
-In-Reply-To: <1546883690-17798-1-git-send-email-venu.busireddy@oracle.com>
-References: <1546883690-17798-1-git-send-email-venu.busireddy@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] virtio_net: Add a query command for
- FAILOVER_STANDBY_CHANGED event.
+	(envelope-from <armbru@redhat.com>) id 1ggZ7k-0003NW-U1
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:55:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37066)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ggZ7k-0003NA-MP
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:55:40 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-17-fli@suse.com>
+Date: Mon, 07 Jan 2019 18:55:37 +0100
+In-Reply-To: <20181225140449.15786-17-fli@suse.com> (Fei Li's message of "Tue,
+	25 Dec 2018 22:04:49 +0800")
+Message-ID: <874lakl5d2.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 16/16] qemu_thread_join: fix
+ segmentation fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,218 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: venu.busireddy@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com, Stefan Weil <sw@weilnetz.de>
 
-Add a query command to check the status of the FAILOVER_STANDBY_CHANGED
-state of the virtio_net devices.
+Fei Li <fli@suse.com> writes:
 
-Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
----
- hw/net/virtio-net.c            | 16 ++++++++++++
- include/hw/virtio/virtio-net.h |  1 +
- include/net/net.h              |  2 ++
- net/net.c                      | 59 ++++++++++++++++++++++++++++++++++++++++++
- qapi/net.json                  | 46 ++++++++++++++++++++++++++++++++
- 5 files changed, 124 insertions(+)
+> To avoid the segmentation fault in qemu_thread_join(), just directly
+> return when the QemuThread *thread failed to be created in either
+> qemu-thread-posix.c or qemu-thread-win32.c.
+>
+> Cc: Stefan Weil <sw@weilnetz.de>
+> Signed-off-by: Fei Li <fli@suse.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> ---
+>  util/qemu-thread-posix.c | 3 +++
+>  util/qemu-thread-win32.c | 2 +-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+> index 39834b0551..3548935dac 100644
+> --- a/util/qemu-thread-posix.c
+> +++ b/util/qemu-thread-posix.c
+> @@ -571,6 +571,9 @@ void *qemu_thread_join(QemuThread *thread)
+>      int err;
+>      void *ret;
+>  
+> +    if (!thread->thread) {
+> +        return NULL;
+> +    }
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 7b1bcde..a4e07ac 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -263,9 +263,11 @@ static void virtio_net_failover_notify_event(VirtIONet *n, uint8_t status)
-          */
-         if ((status & VIRTIO_CONFIG_S_DRIVER_OK) &&
-                 (!(vdev->status & VIRTIO_CONFIG_S_DRIVER_OK))) {
-+            n->standby_enabled = true;
-             qapi_event_send_failover_standby_changed(!!ncn, ncn, path, true);
-         } else if ((!(status & VIRTIO_CONFIG_S_DRIVER_OK)) &&
-                 (vdev->status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-+            n->standby_enabled = false;
-             qapi_event_send_failover_standby_changed(!!ncn, ncn, path, false);
-         }
-     }
-@@ -448,6 +450,19 @@ static RxFilterInfo *virtio_net_query_rxfilter(NetClientState *nc)
-     return info;
- }
- 
-+static StandbyStatusInfo *virtio_net_query_standby_status(NetClientState *nc)
-+{
-+    StandbyStatusInfo *info;
-+    VirtIONet *n = qemu_get_nic_opaque(nc);
-+
-+    info = g_malloc0(sizeof(*info));
-+    info->device = g_strdup(n->netclient_name);
-+    info->path = g_strdup(object_get_canonical_path(OBJECT(n->qdev)));
-+    info->enabled = n->standby_enabled;
-+
-+    return info;
-+}
-+
- static void virtio_net_reset(VirtIODevice *vdev)
- {
-     VirtIONet *n = VIRTIO_NET(vdev);
-@@ -1923,6 +1938,7 @@ static NetClientInfo net_virtio_info = {
-     .receive = virtio_net_receive,
-     .link_status_changed = virtio_net_set_link_status,
-     .query_rx_filter = virtio_net_query_rxfilter,
-+    .query_standby_status = virtio_net_query_standby_status,
- };
- 
- static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index 4d7f3c8..9071e96 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -103,6 +103,7 @@ typedef struct VirtIONet {
-     int announce_counter;
-     bool needs_vnet_hdr_swap;
-     bool mtu_bypass_backend;
-+    bool standby_enabled;
- } VirtIONet;
- 
- void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
-diff --git a/include/net/net.h b/include/net/net.h
-index ec13702..61e8513 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -50,6 +50,7 @@ typedef void (NetCleanup) (NetClientState *);
- typedef void (LinkStatusChanged)(NetClientState *);
- typedef void (NetClientDestructor)(NetClientState *);
- typedef RxFilterInfo *(QueryRxFilter)(NetClientState *);
-+typedef StandbyStatusInfo *(QueryStandbyStatus)(NetClientState *);
- typedef bool (HasUfo)(NetClientState *);
- typedef bool (HasVnetHdr)(NetClientState *);
- typedef bool (HasVnetHdrLen)(NetClientState *, int);
-@@ -71,6 +72,7 @@ typedef struct NetClientInfo {
-     NetCleanup *cleanup;
-     LinkStatusChanged *link_status_changed;
-     QueryRxFilter *query_rx_filter;
-+    QueryStandbyStatus *query_standby_status;
-     NetPoll *poll;
-     HasUfo *has_ufo;
-     HasVnetHdr *has_vnet_hdr;
-diff --git a/net/net.c b/net/net.c
-index 1f7d626..a6d8e73 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1320,6 +1320,65 @@ RxFilterInfoList *qmp_query_rx_filter(bool has_name, const char *name,
-     return filter_list;
- }
- 
-+StandbyStatusInfoList *qmp_query_standby_status(bool has_device,
-+                                                const char *device,
-+                                                Error **errp)
-+{
-+    NetClientState *nc;
-+    StandbyStatusInfoList *status_list = NULL, *last_entry = NULL;
-+
-+    QTAILQ_FOREACH(nc, &net_clients, next) {
-+        StandbyStatusInfoList *entry;
-+        StandbyStatusInfo *info;
-+
-+        if (has_device && strcmp(nc->name, device) != 0) {
-+            continue;
-+        }
-+
-+        /* only query standby status information of NIC */
-+        if (nc->info->type != NET_CLIENT_DRIVER_NIC) {
-+            if (has_device) {
-+                error_setg(errp, "net client(%s) isn't a NIC", device);
-+                return NULL;
-+            }
-+            continue;
-+        }
-+
-+        /* only query information on queue 0 since the info is per nic,
-+         * not per queue
-+         */
-+        if (nc->queue_index != 0)
-+            continue;
-+
-+        if (nc->info->query_standby_status) {
-+            info = nc->info->query_standby_status(nc);
-+            entry = g_malloc0(sizeof(*entry));
-+            entry->value = info;
-+
-+            if (!status_list) {
-+                status_list = entry;
-+            } else {
-+                last_entry->next = entry;
-+            }
-+            last_entry = entry;
-+        } else if (has_device) {
-+            error_setg(errp, "net client(%s) doesn't support"
-+                       " standby status querying", device);
-+            return NULL;
-+        }
-+
-+        if (has_device) {
-+            break;
-+        }
-+    }
-+
-+    if (status_list == NULL && has_device) {
-+        error_setg(errp, "invalid net client name: %s", device);
-+    }
-+
-+    return status_list;
-+}
-+
- void hmp_info_network(Monitor *mon, const QDict *qdict)
- {
-     NetClientState *nc, *peer;
-diff --git a/qapi/net.json b/qapi/net.json
-index 6a6d6fe..633ac87 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -711,3 +711,49 @@
- ##
- { 'event': 'FAILOVER_STANDBY_CHANGED',
-   'data': {'*device': 'str', 'path': 'str', 'enabled': 'bool'} }
-+
-+##
-+# @StandbyStatusInfo:
-+#
-+# Standby status information for a virtio_net device.
-+#
-+# @device: Indicates the virtio_net device.
-+#
-+# @path: Indicates the device path.
-+#
-+# @enabled: true if the virtio_net driver is loaded.
-+#           false if the virtio_net driver is unloaded or the guest rebooted.
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'StandbyStatusInfo',
-+  'data': {'device': 'str', 'path': 'str', 'enabled': 'bool'} }
-+
-+##
-+# @query-standby-status:
-+#
-+# Return Standby status information for all virtio_net devices,
-+#        or for the given virtio_net device.
-+#
-+# @device: Name of the virtio_net device.
-+#
-+# Returns: List of @StandbyStatusInfo for all virtio_net devices,
-+#          or for the given virtio_net device.
-+#          Returns an error if the given @device doesn't exist.
-+#
-+# Since: 4.0
-+#
-+# Example:
-+#
-+# -> { "execute": "query-standby-status", "arguments": { "device": "net0" } }
-+# <- { "return": [
-+#                  { 'device': 'net0',
-+#                    'path': '/machine/peripheral/net0/virtio-backend',
-+#                    'enabled': 'true'
-+#                  }
-+#                ]
-+#    }
-+#
-+##
-+{ 'command': 'query-standby-status', 'data': { '*device': 'str' },
-+  'returns': ['StandbyStatusInfo'] }
+How can this happen?
+
+>      err = pthread_join(thread->thread, &ret);
+>      if (err) {
+>          error_exit(err, __func__);
+> diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+> index 57b1143e97..ca4d5329e3 100644
+> --- a/util/qemu-thread-win32.c
+> +++ b/util/qemu-thread-win32.c
+> @@ -367,7 +367,7 @@ void *qemu_thread_join(QemuThread *thread)
+>      HANDLE handle;
+>  
+>      data = thread->data;
+> -    if (data->mode == QEMU_THREAD_DETACHED) {
+> +    if (data == NULL || data->mode == QEMU_THREAD_DETACHED) {
+>          return NULL;
+>      }
