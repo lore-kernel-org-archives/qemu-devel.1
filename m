@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46010)
+Received: from eggs.gnu.org ([209.51.188.92]:45981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoG-0004mj-Cl
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXoF-0004mH-1R
 	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggXoE-0001b5-ME
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:28 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40571)
+	(envelope-from <peter.maydell@linaro.org>) id 1ggXoC-0001Xp-3K
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:26 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:45740)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggXoE-0001Zk-D1
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:26 -0500
-Received: by mail-wr1-x429.google.com with SMTP id p4so1062139wrt.7
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:26 -0800 (PST)
+	id 1ggXoB-0001Wk-Ph
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 11:31:24 -0500
+Received: by mail-wr1-x434.google.com with SMTP id t6so1024045wrr.12
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 08:31:23 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	j14sm46039759wrv.96.2019.01.07.08.31.23 for <qemu-devel@nongnu.org>
+	j14sm46039759wrv.96.2019.01.07.08.31.20 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-	Mon, 07 Jan 2019 08:31:23 -0800 (PST)
+	Mon, 07 Jan 2019 08:31:21 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  7 Jan 2019 16:30:43 +0000
-Message-Id: <20190107163117.16269-4-peter.maydell@linaro.org>
+Date: Mon,  7 Jan 2019 16:30:41 +0000
+Message-Id: <20190107163117.16269-2-peter.maydell@linaro.org>
 In-Reply-To: <20190107163117.16269-1-peter.maydell@linaro.org>
 References: <20190107163117.16269-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 03/37] hw/cpu: introduce CPU clusters
+Subject: [Qemu-devel] [PULL 01/37] target/arm: Convert ARM_TBFLAG_* to FIELDs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,174 +36,395 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Luc Michel <luc.michel@greensocs.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-This commit adds the cpu-cluster type. It aims at gathering CPUs from
-the same cluster in a machine.
+Use "register" TBFLAG_ANY to indicate shared state between
+A32 and A64, and "registers" TBFLAG_A32 & TBFLAG_A64 for
+fields that are specific to the given cpu state.
 
-For now it only has a `cluster-id` property.
+Move ARM_TBFLAG_BE_DATA to shared state, instead of its current
+placement within "Bit usage when in AArch32 state".
 
-Documentation in cluster.h written with the help of Peter Maydell.
-
-Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20181207090135.7651-2-luc.michel@greensocs.com
+Message-id: 20181218164348.7127-1-richard.henderson@linaro.org
+[PMM: removed the renaming of BE_DATA flag to BE]
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/cpu/Makefile.objs     |  2 +-
- include/hw/cpu/cluster.h | 58 ++++++++++++++++++++++++++++++++++++++++
- hw/cpu/cluster.c         | 50 ++++++++++++++++++++++++++++++++++
- MAINTAINERS              |  2 ++
- 4 files changed, 111 insertions(+), 1 deletion(-)
- create mode 100644 include/hw/cpu/cluster.h
- create mode 100644 hw/cpu/cluster.c
+ target/arm/cpu.h           | 102 ++++++++-----------------------------
+ target/arm/helper.c        |  49 +++++++++---------
+ target/arm/translate-a64.c |  22 ++++----
+ target/arm/translate.c     |  40 ++++++++-------
+ 4 files changed, 78 insertions(+), 135 deletions(-)
 
-diff --git a/hw/cpu/Makefile.objs b/hw/cpu/Makefile.objs
-index cd52d20b652..8db9e8a7b3c 100644
---- a/hw/cpu/Makefile.objs
-+++ b/hw/cpu/Makefile.objs
-@@ -2,4 +2,4 @@ obj-$(CONFIG_ARM11MPCORE) += arm11mpcore.o
- obj-$(CONFIG_REALVIEW) += realview_mpcore.o
- obj-$(CONFIG_A9MPCORE) += a9mpcore.o
- obj-$(CONFIG_A15MPCORE) += a15mpcore.o
--common-obj-y += core.o
-+common-obj-y += core.o cluster.o
-diff --git a/include/hw/cpu/cluster.h b/include/hw/cpu/cluster.h
-new file mode 100644
-index 00000000000..73818232437
---- /dev/null
-+++ b/include/hw/cpu/cluster.h
-@@ -0,0 +1,58 @@
-+/*
-+ * QEMU CPU cluster
-+ *
-+ * Copyright (c) 2018 GreenSocs SAS
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see
-+ * <http://www.gnu.org/licenses/gpl-2.0.html>
-+ */
-+#ifndef HW_CPU_CLUSTER_H
-+#define HW_CPU_CLUSTER_H
-+
-+#include "qemu/osdep.h"
-+#include "hw/qdev.h"
-+
-+/*
-+ * CPU Cluster type
-+ *
-+ * A cluster is a group of CPUs which are all identical and have the same view
-+ * of the rest of the system. It is mainly an internal QEMU representation and
-+ * does not necessarily match with the notion of clusters on the real hardware.
-+ *
-+ * If CPUs are not identical (for example, Cortex-A53 and Cortex-A57 CPUs in an
-+ * Arm big.LITTLE system) they should be in different clusters. If the CPUs do
-+ * not have the same view of memory (for example the main CPU and a management
-+ * controller processor) they should be in different clusters.
-+ */
-+
-+#define TYPE_CPU_CLUSTER "cpu-cluster"
-+#define CPU_CLUSTER(obj) \
-+    OBJECT_CHECK(CPUClusterState, (obj), TYPE_CPU_CLUSTER)
-+
-+/**
-+ * CPUClusterState:
-+ * @cluster_id: The cluster ID. This value is for internal use only and should
-+ *   not be exposed directly to the user or to the guest.
-+ *
-+ * State of a CPU cluster.
-+ */
-+typedef struct CPUClusterState {
-+    /*< private >*/
-+    DeviceState parent_obj;
-+
-+    /*< public >*/
-+    uint32_t cluster_id;
-+} CPUClusterState;
-+
-+#endif
-diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
-new file mode 100644
-index 00000000000..9d50a235d5c
---- /dev/null
-+++ b/hw/cpu/cluster.c
-@@ -0,0 +1,50 @@
-+/*
-+ * QEMU CPU cluster
-+ *
-+ * Copyright (c) 2018 GreenSocs SAS
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version 2
-+ * of the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see
-+ * <http://www.gnu.org/licenses/gpl-2.0.html>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/cpu/cluster.h"
-+#include "qapi/error.h"
-+#include "qemu/module.h"
-+
-+static Property cpu_cluster_properties[] = {
-+    DEFINE_PROP_UINT32("cluster-id", CPUClusterState, cluster_id, 0),
-+    DEFINE_PROP_END_OF_LIST()
-+};
-+
-+static void cpu_cluster_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = cpu_cluster_properties;
-+}
-+
-+static const TypeInfo cpu_cluster_type_info = {
-+    .name = TYPE_CPU_CLUSTER,
-+    .parent = TYPE_DEVICE,
-+    .instance_size = sizeof(CPUClusterState),
-+    .class_init = cpu_cluster_class_init,
-+};
-+
-+static void cpu_cluster_register_types(void)
-+{
-+    type_register_static(&cpu_cluster_type_info);
-+}
-+
-+type_init(cpu_cluster_register_types)
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 19792cfb2da..471161742de 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1195,7 +1195,9 @@ M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
- S: Supported
- F: hw/core/machine.c
- F: hw/core/null-machine.c
-+F: hw/cpu/cluster.c
- F: include/hw/boards.h
-+F: include/hw/cpu/cluster.h
- T: git https://github.com/ehabkost/qemu.git machine-next
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index c943f35dd92..fba1c578d30 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2944,102 +2944,40 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
+  * We put flags which are shared between 32 and 64 bit mode at the top
+  * of the word, and flags which apply to only one mode at the bottom.
+  */
+-#define ARM_TBFLAG_AARCH64_STATE_SHIFT 31
+-#define ARM_TBFLAG_AARCH64_STATE_MASK  (1U << ARM_TBFLAG_AARCH64_STATE_SHIFT)
+-#define ARM_TBFLAG_MMUIDX_SHIFT 28
+-#define ARM_TBFLAG_MMUIDX_MASK (0x7 << ARM_TBFLAG_MMUIDX_SHIFT)
+-#define ARM_TBFLAG_SS_ACTIVE_SHIFT 27
+-#define ARM_TBFLAG_SS_ACTIVE_MASK (1 << ARM_TBFLAG_SS_ACTIVE_SHIFT)
+-#define ARM_TBFLAG_PSTATE_SS_SHIFT 26
+-#define ARM_TBFLAG_PSTATE_SS_MASK (1 << ARM_TBFLAG_PSTATE_SS_SHIFT)
++FIELD(TBFLAG_ANY, AARCH64_STATE, 31, 1)
++FIELD(TBFLAG_ANY, MMUIDX, 28, 3)
++FIELD(TBFLAG_ANY, SS_ACTIVE, 27, 1)
++FIELD(TBFLAG_ANY, PSTATE_SS, 26, 1)
+ /* Target EL if we take a floating-point-disabled exception */
+-#define ARM_TBFLAG_FPEXC_EL_SHIFT 24
+-#define ARM_TBFLAG_FPEXC_EL_MASK (0x3 << ARM_TBFLAG_FPEXC_EL_SHIFT)
++FIELD(TBFLAG_ANY, FPEXC_EL, 24, 2)
++FIELD(TBFLAG_ANY, BE_DATA, 23, 1)
  
- Xtensa Machines
+ /* Bit usage when in AArch32 state: */
+-#define ARM_TBFLAG_THUMB_SHIFT      0
+-#define ARM_TBFLAG_THUMB_MASK       (1 << ARM_TBFLAG_THUMB_SHIFT)
+-#define ARM_TBFLAG_VECLEN_SHIFT     1
+-#define ARM_TBFLAG_VECLEN_MASK      (0x7 << ARM_TBFLAG_VECLEN_SHIFT)
+-#define ARM_TBFLAG_VECSTRIDE_SHIFT  4
+-#define ARM_TBFLAG_VECSTRIDE_MASK   (0x3 << ARM_TBFLAG_VECSTRIDE_SHIFT)
+-#define ARM_TBFLAG_VFPEN_SHIFT      7
+-#define ARM_TBFLAG_VFPEN_MASK       (1 << ARM_TBFLAG_VFPEN_SHIFT)
+-#define ARM_TBFLAG_CONDEXEC_SHIFT   8
+-#define ARM_TBFLAG_CONDEXEC_MASK    (0xff << ARM_TBFLAG_CONDEXEC_SHIFT)
+-#define ARM_TBFLAG_SCTLR_B_SHIFT    16
+-#define ARM_TBFLAG_SCTLR_B_MASK     (1 << ARM_TBFLAG_SCTLR_B_SHIFT)
++FIELD(TBFLAG_A32, THUMB, 0, 1)
++FIELD(TBFLAG_A32, VECLEN, 1, 3)
++FIELD(TBFLAG_A32, VECSTRIDE, 4, 2)
++FIELD(TBFLAG_A32, VFPEN, 7, 1)
++FIELD(TBFLAG_A32, CONDEXEC, 8, 8)
++FIELD(TBFLAG_A32, SCTLR_B, 16, 1)
+ /* We store the bottom two bits of the CPAR as TB flags and handle
+  * checks on the other bits at runtime
+  */
+-#define ARM_TBFLAG_XSCALE_CPAR_SHIFT 17
+-#define ARM_TBFLAG_XSCALE_CPAR_MASK (3 << ARM_TBFLAG_XSCALE_CPAR_SHIFT)
++FIELD(TBFLAG_A32, XSCALE_CPAR, 17, 2)
+ /* Indicates whether cp register reads and writes by guest code should access
+  * the secure or nonsecure bank of banked registers; note that this is not
+  * the same thing as the current security state of the processor!
+  */
+-#define ARM_TBFLAG_NS_SHIFT         19
+-#define ARM_TBFLAG_NS_MASK          (1 << ARM_TBFLAG_NS_SHIFT)
+-#define ARM_TBFLAG_BE_DATA_SHIFT    20
+-#define ARM_TBFLAG_BE_DATA_MASK     (1 << ARM_TBFLAG_BE_DATA_SHIFT)
++FIELD(TBFLAG_A32, NS, 19, 1)
+ /* For M profile only, Handler (ie not Thread) mode */
+-#define ARM_TBFLAG_HANDLER_SHIFT    21
+-#define ARM_TBFLAG_HANDLER_MASK     (1 << ARM_TBFLAG_HANDLER_SHIFT)
++FIELD(TBFLAG_A32, HANDLER, 21, 1)
+ /* For M profile only, whether we should generate stack-limit checks */
+-#define ARM_TBFLAG_STACKCHECK_SHIFT 22
+-#define ARM_TBFLAG_STACKCHECK_MASK  (1 << ARM_TBFLAG_STACKCHECK_SHIFT)
++FIELD(TBFLAG_A32, STACKCHECK, 22, 1)
+ 
+ /* Bit usage when in AArch64 state */
+-#define ARM_TBFLAG_TBI0_SHIFT 0        /* TBI0 for EL0/1 or TBI for EL2/3 */
+-#define ARM_TBFLAG_TBI0_MASK (0x1ull << ARM_TBFLAG_TBI0_SHIFT)
+-#define ARM_TBFLAG_TBI1_SHIFT 1        /* TBI1 for EL0/1  */
+-#define ARM_TBFLAG_TBI1_MASK (0x1ull << ARM_TBFLAG_TBI1_SHIFT)
+-#define ARM_TBFLAG_SVEEXC_EL_SHIFT  2
+-#define ARM_TBFLAG_SVEEXC_EL_MASK   (0x3 << ARM_TBFLAG_SVEEXC_EL_SHIFT)
+-#define ARM_TBFLAG_ZCR_LEN_SHIFT    4
+-#define ARM_TBFLAG_ZCR_LEN_MASK     (0xf << ARM_TBFLAG_ZCR_LEN_SHIFT)
+-
+-/* some convenience accessor macros */
+-#define ARM_TBFLAG_AARCH64_STATE(F) \
+-    (((F) & ARM_TBFLAG_AARCH64_STATE_MASK) >> ARM_TBFLAG_AARCH64_STATE_SHIFT)
+-#define ARM_TBFLAG_MMUIDX(F) \
+-    (((F) & ARM_TBFLAG_MMUIDX_MASK) >> ARM_TBFLAG_MMUIDX_SHIFT)
+-#define ARM_TBFLAG_SS_ACTIVE(F) \
+-    (((F) & ARM_TBFLAG_SS_ACTIVE_MASK) >> ARM_TBFLAG_SS_ACTIVE_SHIFT)
+-#define ARM_TBFLAG_PSTATE_SS(F) \
+-    (((F) & ARM_TBFLAG_PSTATE_SS_MASK) >> ARM_TBFLAG_PSTATE_SS_SHIFT)
+-#define ARM_TBFLAG_FPEXC_EL(F) \
+-    (((F) & ARM_TBFLAG_FPEXC_EL_MASK) >> ARM_TBFLAG_FPEXC_EL_SHIFT)
+-#define ARM_TBFLAG_THUMB(F) \
+-    (((F) & ARM_TBFLAG_THUMB_MASK) >> ARM_TBFLAG_THUMB_SHIFT)
+-#define ARM_TBFLAG_VECLEN(F) \
+-    (((F) & ARM_TBFLAG_VECLEN_MASK) >> ARM_TBFLAG_VECLEN_SHIFT)
+-#define ARM_TBFLAG_VECSTRIDE(F) \
+-    (((F) & ARM_TBFLAG_VECSTRIDE_MASK) >> ARM_TBFLAG_VECSTRIDE_SHIFT)
+-#define ARM_TBFLAG_VFPEN(F) \
+-    (((F) & ARM_TBFLAG_VFPEN_MASK) >> ARM_TBFLAG_VFPEN_SHIFT)
+-#define ARM_TBFLAG_CONDEXEC(F) \
+-    (((F) & ARM_TBFLAG_CONDEXEC_MASK) >> ARM_TBFLAG_CONDEXEC_SHIFT)
+-#define ARM_TBFLAG_SCTLR_B(F) \
+-    (((F) & ARM_TBFLAG_SCTLR_B_MASK) >> ARM_TBFLAG_SCTLR_B_SHIFT)
+-#define ARM_TBFLAG_XSCALE_CPAR(F) \
+-    (((F) & ARM_TBFLAG_XSCALE_CPAR_MASK) >> ARM_TBFLAG_XSCALE_CPAR_SHIFT)
+-#define ARM_TBFLAG_NS(F) \
+-    (((F) & ARM_TBFLAG_NS_MASK) >> ARM_TBFLAG_NS_SHIFT)
+-#define ARM_TBFLAG_BE_DATA(F) \
+-    (((F) & ARM_TBFLAG_BE_DATA_MASK) >> ARM_TBFLAG_BE_DATA_SHIFT)
+-#define ARM_TBFLAG_HANDLER(F) \
+-    (((F) & ARM_TBFLAG_HANDLER_MASK) >> ARM_TBFLAG_HANDLER_SHIFT)
+-#define ARM_TBFLAG_STACKCHECK(F) \
+-    (((F) & ARM_TBFLAG_STACKCHECK_MASK) >> ARM_TBFLAG_STACKCHECK_SHIFT)
+-#define ARM_TBFLAG_TBI0(F) \
+-    (((F) & ARM_TBFLAG_TBI0_MASK) >> ARM_TBFLAG_TBI0_SHIFT)
+-#define ARM_TBFLAG_TBI1(F) \
+-    (((F) & ARM_TBFLAG_TBI1_MASK) >> ARM_TBFLAG_TBI1_SHIFT)
+-#define ARM_TBFLAG_SVEEXC_EL(F) \
+-    (((F) & ARM_TBFLAG_SVEEXC_EL_MASK) >> ARM_TBFLAG_SVEEXC_EL_SHIFT)
+-#define ARM_TBFLAG_ZCR_LEN(F) \
+-    (((F) & ARM_TBFLAG_ZCR_LEN_MASK) >> ARM_TBFLAG_ZCR_LEN_SHIFT)
++FIELD(TBFLAG_A64, TBI0, 0, 1)
++FIELD(TBFLAG_A64, TBI1, 1, 1)
++FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
++FIELD(TBFLAG_A64, ZCR_LEN, 4, 4)
+ 
+ static inline bool bswap_code(bool sctlr_b)
+ {
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 644599b29d6..f00c141ef96 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -12955,16 +12955,18 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+     ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
+     int current_el = arm_current_el(env);
+     int fp_el = fp_exception_el(env, current_el);
+-    uint32_t flags;
++    uint32_t flags = 0;
+ 
+     if (is_a64(env)) {
+         ARMCPU *cpu = arm_env_get_cpu(env);
+ 
+         *pc = env->pc;
+-        flags = ARM_TBFLAG_AARCH64_STATE_MASK;
++        flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
+         /* Get control bits for tagged addresses */
+-        flags |= (arm_regime_tbi0(env, mmu_idx) << ARM_TBFLAG_TBI0_SHIFT);
+-        flags |= (arm_regime_tbi1(env, mmu_idx) << ARM_TBFLAG_TBI1_SHIFT);
++        flags = FIELD_DP32(flags, TBFLAG_A64, TBI0,
++                           arm_regime_tbi0(env, mmu_idx));
++        flags = FIELD_DP32(flags, TBFLAG_A64, TBI1,
++                           arm_regime_tbi1(env, mmu_idx));
+ 
+         if (cpu_isar_feature(aa64_sve, cpu)) {
+             int sve_el = sve_exception_el(env, current_el);
+@@ -12978,28 +12980,25 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+             } else {
+                 zcr_len = sve_zcr_len_for_el(env, current_el);
+             }
+-            flags |= sve_el << ARM_TBFLAG_SVEEXC_EL_SHIFT;
+-            flags |= zcr_len << ARM_TBFLAG_ZCR_LEN_SHIFT;
++            flags = FIELD_DP32(flags, TBFLAG_A64, SVEEXC_EL, sve_el);
++            flags = FIELD_DP32(flags, TBFLAG_A64, ZCR_LEN, zcr_len);
+         }
+     } else {
+         *pc = env->regs[15];
+-        flags = (env->thumb << ARM_TBFLAG_THUMB_SHIFT)
+-            | (env->vfp.vec_len << ARM_TBFLAG_VECLEN_SHIFT)
+-            | (env->vfp.vec_stride << ARM_TBFLAG_VECSTRIDE_SHIFT)
+-            | (env->condexec_bits << ARM_TBFLAG_CONDEXEC_SHIFT)
+-            | (arm_sctlr_b(env) << ARM_TBFLAG_SCTLR_B_SHIFT);
+-        if (!(access_secure_reg(env))) {
+-            flags |= ARM_TBFLAG_NS_MASK;
+-        }
++        flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
++        flags = FIELD_DP32(flags, TBFLAG_A32, VECLEN, env->vfp.vec_len);
++        flags = FIELD_DP32(flags, TBFLAG_A32, VECSTRIDE, env->vfp.vec_stride);
++        flags = FIELD_DP32(flags, TBFLAG_A32, CONDEXEC, env->condexec_bits);
++        flags = FIELD_DP32(flags, TBFLAG_A32, SCTLR_B, arm_sctlr_b(env));
++        flags = FIELD_DP32(flags, TBFLAG_A32, NS, !access_secure_reg(env));
+         if (env->vfp.xregs[ARM_VFP_FPEXC] & (1 << 30)
+             || arm_el_is_aa64(env, 1)) {
+-            flags |= ARM_TBFLAG_VFPEN_MASK;
++            flags = FIELD_DP32(flags, TBFLAG_A32, VFPEN, 1);
+         }
+-        flags |= (extract32(env->cp15.c15_cpar, 0, 2)
+-                  << ARM_TBFLAG_XSCALE_CPAR_SHIFT);
++        flags = FIELD_DP32(flags, TBFLAG_A32, XSCALE_CPAR, env->cp15.c15_cpar);
+     }
+ 
+-    flags |= (arm_to_core_mmu_idx(mmu_idx) << ARM_TBFLAG_MMUIDX_SHIFT);
++    flags = FIELD_DP32(flags, TBFLAG_ANY, MMUIDX, arm_to_core_mmu_idx(mmu_idx));
+ 
+     /* The SS_ACTIVE and PSTATE_SS bits correspond to the state machine
+      * states defined in the ARM ARM for software singlestep:
+@@ -13009,24 +13008,24 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+      *     1            1       Active-not-pending
+      */
+     if (arm_singlestep_active(env)) {
+-        flags |= ARM_TBFLAG_SS_ACTIVE_MASK;
++        flags = FIELD_DP32(flags, TBFLAG_ANY, SS_ACTIVE, 1);
+         if (is_a64(env)) {
+             if (env->pstate & PSTATE_SS) {
+-                flags |= ARM_TBFLAG_PSTATE_SS_MASK;
++                flags = FIELD_DP32(flags, TBFLAG_ANY, PSTATE_SS, 1);
+             }
+         } else {
+             if (env->uncached_cpsr & PSTATE_SS) {
+-                flags |= ARM_TBFLAG_PSTATE_SS_MASK;
++                flags = FIELD_DP32(flags, TBFLAG_ANY, PSTATE_SS, 1);
+             }
+         }
+     }
+     if (arm_cpu_data_is_big_endian(env)) {
+-        flags |= ARM_TBFLAG_BE_DATA_MASK;
++        flags = FIELD_DP32(flags, TBFLAG_ANY, BE_DATA, 1);
+     }
+-    flags |= fp_el << ARM_TBFLAG_FPEXC_EL_SHIFT;
++    flags = FIELD_DP32(flags, TBFLAG_ANY, FPEXC_EL, fp_el);
+ 
+     if (arm_v7m_is_handler_mode(env)) {
+-        flags |= ARM_TBFLAG_HANDLER_MASK;
++        flags = FIELD_DP32(flags, TBFLAG_A32, HANDLER, 1);
+     }
+ 
+     /* v8M always applies stack limit checks unless CCR.STKOFHFNMIGN is
+@@ -13036,7 +13035,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+         arm_feature(env, ARM_FEATURE_M) &&
+         !((mmu_idx  & ARM_MMU_IDX_M_NEGPRI) &&
+           (env->v7m.ccr[env->v7m.secure] & R_V7M_CCR_STKOFHFNMIGN_MASK))) {
+-        flags |= ARM_TBFLAG_STACKCHECK_MASK;
++        flags = FIELD_DP32(flags, TBFLAG_A32, STACKCHECK, 1);
+     }
+ 
+     *pflags = flags;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index e1da1e4d6f5..b7b6ab63716 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -13380,7 +13380,8 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+     CPUARMState *env = cpu->env_ptr;
+     ARMCPU *arm_cpu = arm_env_get_cpu(env);
+-    int bound;
++    uint32_t tb_flags = dc->base.tb->flags;
++    int bound, core_mmu_idx;
+ 
+     dc->isar = &arm_cpu->isar;
+     dc->pc = dc->base.pc_first;
+@@ -13394,19 +13395,20 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+                                !arm_el_is_aa64(env, 3);
+     dc->thumb = 0;
+     dc->sctlr_b = 0;
+-    dc->be_data = ARM_TBFLAG_BE_DATA(dc->base.tb->flags) ? MO_BE : MO_LE;
++    dc->be_data = FIELD_EX32(tb_flags, TBFLAG_ANY, BE_DATA) ? MO_BE : MO_LE;
+     dc->condexec_mask = 0;
+     dc->condexec_cond = 0;
+-    dc->mmu_idx = core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(dc->base.tb->flags));
+-    dc->tbi0 = ARM_TBFLAG_TBI0(dc->base.tb->flags);
+-    dc->tbi1 = ARM_TBFLAG_TBI1(dc->base.tb->flags);
++    core_mmu_idx = FIELD_EX32(tb_flags, TBFLAG_ANY, MMUIDX);
++    dc->mmu_idx = core_to_arm_mmu_idx(env, core_mmu_idx);
++    dc->tbi0 = FIELD_EX32(tb_flags, TBFLAG_A64, TBI0);
++    dc->tbi1 = FIELD_EX32(tb_flags, TBFLAG_A64, TBI1);
+     dc->current_el = arm_mmu_idx_to_el(dc->mmu_idx);
+ #if !defined(CONFIG_USER_ONLY)
+     dc->user = (dc->current_el == 0);
+ #endif
+-    dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
+-    dc->sve_excp_el = ARM_TBFLAG_SVEEXC_EL(dc->base.tb->flags);
+-    dc->sve_len = (ARM_TBFLAG_ZCR_LEN(dc->base.tb->flags) + 1) * 16;
++    dc->fp_excp_el = FIELD_EX32(tb_flags, TBFLAG_ANY, FPEXC_EL);
++    dc->sve_excp_el = FIELD_EX32(tb_flags, TBFLAG_A64, SVEEXC_EL);
++    dc->sve_len = (FIELD_EX32(tb_flags, TBFLAG_A64, ZCR_LEN) + 1) * 16;
+     dc->vec_len = 0;
+     dc->vec_stride = 0;
+     dc->cp_regs = arm_cpu->cp_regs;
+@@ -13427,8 +13429,8 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+      *   emit code to generate a software step exception
+      *   end the TB
+      */
+-    dc->ss_active = ARM_TBFLAG_SS_ACTIVE(dc->base.tb->flags);
+-    dc->pstate_ss = ARM_TBFLAG_PSTATE_SS(dc->base.tb->flags);
++    dc->ss_active = FIELD_EX32(tb_flags, TBFLAG_ANY, SS_ACTIVE);
++    dc->pstate_ss = FIELD_EX32(tb_flags, TBFLAG_ANY, PSTATE_SS);
+     dc->is_ldex = false;
+     dc->ss_same_el = (arm_debug_target_el(env) == dc->current_el);
+ 
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 7c4675ffd8a..ed3db0c3946 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -13021,6 +13021,8 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+     CPUARMState *env = cs->env_ptr;
+     ARMCPU *cpu = arm_env_get_cpu(env);
++    uint32_t tb_flags = dc->base.tb->flags;
++    uint32_t condexec, core_mmu_idx;
+ 
+     dc->isar = &cpu->isar;
+     dc->pc = dc->base.pc_first;
+@@ -13032,26 +13034,28 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+      */
+     dc->secure_routed_to_el3 = arm_feature(env, ARM_FEATURE_EL3) &&
+                                !arm_el_is_aa64(env, 3);
+-    dc->thumb = ARM_TBFLAG_THUMB(dc->base.tb->flags);
+-    dc->sctlr_b = ARM_TBFLAG_SCTLR_B(dc->base.tb->flags);
+-    dc->be_data = ARM_TBFLAG_BE_DATA(dc->base.tb->flags) ? MO_BE : MO_LE;
+-    dc->condexec_mask = (ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) & 0xf) << 1;
+-    dc->condexec_cond = ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) >> 4;
+-    dc->mmu_idx = core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(dc->base.tb->flags));
++    dc->thumb = FIELD_EX32(tb_flags, TBFLAG_A32, THUMB);
++    dc->sctlr_b = FIELD_EX32(tb_flags, TBFLAG_A32, SCTLR_B);
++    dc->be_data = FIELD_EX32(tb_flags, TBFLAG_ANY, BE_DATA) ? MO_BE : MO_LE;
++    condexec = FIELD_EX32(tb_flags, TBFLAG_A32, CONDEXEC);
++    dc->condexec_mask = (condexec & 0xf) << 1;
++    dc->condexec_cond = condexec >> 4;
++    core_mmu_idx = FIELD_EX32(tb_flags, TBFLAG_ANY, MMUIDX);
++    dc->mmu_idx = core_to_arm_mmu_idx(env, core_mmu_idx);
+     dc->current_el = arm_mmu_idx_to_el(dc->mmu_idx);
+ #if !defined(CONFIG_USER_ONLY)
+     dc->user = (dc->current_el == 0);
+ #endif
+-    dc->ns = ARM_TBFLAG_NS(dc->base.tb->flags);
+-    dc->fp_excp_el = ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
+-    dc->vfp_enabled = ARM_TBFLAG_VFPEN(dc->base.tb->flags);
+-    dc->vec_len = ARM_TBFLAG_VECLEN(dc->base.tb->flags);
+-    dc->vec_stride = ARM_TBFLAG_VECSTRIDE(dc->base.tb->flags);
+-    dc->c15_cpar = ARM_TBFLAG_XSCALE_CPAR(dc->base.tb->flags);
+-    dc->v7m_handler_mode = ARM_TBFLAG_HANDLER(dc->base.tb->flags);
++    dc->ns = FIELD_EX32(tb_flags, TBFLAG_A32, NS);
++    dc->fp_excp_el = FIELD_EX32(tb_flags, TBFLAG_ANY, FPEXC_EL);
++    dc->vfp_enabled = FIELD_EX32(tb_flags, TBFLAG_A32, VFPEN);
++    dc->vec_len = FIELD_EX32(tb_flags, TBFLAG_A32, VECLEN);
++    dc->vec_stride = FIELD_EX32(tb_flags, TBFLAG_A32, VECSTRIDE);
++    dc->c15_cpar = FIELD_EX32(tb_flags, TBFLAG_A32, XSCALE_CPAR);
++    dc->v7m_handler_mode = FIELD_EX32(tb_flags, TBFLAG_A32, HANDLER);
+     dc->v8m_secure = arm_feature(env, ARM_FEATURE_M_SECURITY) &&
+         regime_is_secure(env, dc->mmu_idx);
+-    dc->v8m_stackcheck = ARM_TBFLAG_STACKCHECK(dc->base.tb->flags);
++    dc->v8m_stackcheck = FIELD_EX32(tb_flags, TBFLAG_A32, STACKCHECK);
+     dc->cp_regs = cpu->cp_regs;
+     dc->features = env->features;
+ 
+@@ -13070,8 +13074,8 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+      *   emit code to generate a software step exception
+      *   end the TB
+      */
+-    dc->ss_active = ARM_TBFLAG_SS_ACTIVE(dc->base.tb->flags);
+-    dc->pstate_ss = ARM_TBFLAG_PSTATE_SS(dc->base.tb->flags);
++    dc->ss_active = FIELD_EX32(tb_flags, TBFLAG_ANY, SS_ACTIVE);
++    dc->pstate_ss = FIELD_EX32(tb_flags, TBFLAG_ANY, PSTATE_SS);
+     dc->is_ldex = false;
+     dc->ss_same_el = false; /* Can't be true since EL_d must be AArch64 */
+ 
+@@ -13516,11 +13520,11 @@ void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
+     DisasContext dc;
+     const TranslatorOps *ops = &arm_translator_ops;
+ 
+-    if (ARM_TBFLAG_THUMB(tb->flags)) {
++    if (FIELD_EX32(tb->flags, TBFLAG_A32, THUMB)) {
+         ops = &thumb_translator_ops;
+     }
+ #ifdef TARGET_AARCH64
+-    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
++    if (FIELD_EX32(tb->flags, TBFLAG_ANY, AARCH64_STATE)) {
+         ops = &aarch64_translator_ops;
+     }
+ #endif
 -- 
 2.19.2
