@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41674)
+Received: from eggs.gnu.org ([209.51.188.92]:49789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1ggYk9-0007Nm-Rf
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:31:48 -0500
+	(envelope-from <philmd@redhat.com>) id 1ggZ5E-0004dZ-3c
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:53:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1ggYjp-0000zi-Fc
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:31:17 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46877)
+	(envelope-from <philmd@redhat.com>) id 1ggZ4F-0000Em-Rv
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:52:05 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:39020)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1ggYjp-0000xu-7G
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:30:57 -0500
-Received: by mail-wr1-x441.google.com with SMTP id l9so1239381wrt.13
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 09:30:57 -0800 (PST)
-References: <20190103131251.49271-1-liq3ea@163.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <da2973f5-174e-2621-ce2b-c1d5a6cd5a00@gmail.com>
-Date: Mon, 7 Jan 2019 19:31:06 +0200
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ggZ4F-0000Cv-LO
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 12:52:03 -0500
+Received: by mail-wm1-f65.google.com with SMTP id f81so1769908wmd.4
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 09:52:02 -0800 (PST)
+References: <20181221195200.6544-1-cota@braap.org>
+	<20181221195200.6544-2-cota@braap.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0f16e9a4-9a5c-d1b0-16d3-daa480fc1491@redhat.com>
+Date: Mon, 7 Jan 2019 18:51:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190103131251.49271-1-liq3ea@163.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20181221195200.6544-2-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] hw: rdma: fix an off-by-one issue
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] fp-bench: fix update_random_ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>, yuval.shaia@oracle.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-
-
-On 1/3/19 3:12 PM, Li Qiang wrote:
-> In rdma_rm_get_backend_gid_index(), the 'sgid_idx' is used
-> to index the array 'dev_res->port.gid_tbl' which size is
-> MAX_PORT_GIDS. Current the 'sgid_idx' may be MAX_PORT_GIDS
-> thus cause an off-by-one issue.
->
-> Spotted by Coverity: CID 1398594
->
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+On 12/21/18 8:51 PM, Emilio G. Cota wrote:
+> The second test in the branches is wrong; fix while converting
+> to a switch statement, which is easier to get right.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->   hw/rdma/rdma_rm.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-> index f5b1295890..1bbc5f128f 100644
-> --- a/hw/rdma/rdma_rm.c
-> +++ b/hw/rdma/rdma_rm.c
-> @@ -576,7 +576,7 @@ int rdma_rm_del_gid(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
->   int rdma_rm_get_backend_gid_index(RdmaDeviceResources *dev_res,
->                                     RdmaBackendDev *backend_dev, int sgid_idx)
->   {
-> -    if (unlikely(sgid_idx < 0 || sgid_idx > MAX_PORT_GIDS)) {
-> +    if (unlikely(sgid_idx < 0 || sgid_idx >= MAX_PORT_GIDS)) {
->           pr_dbg("Got invalid sgid_idx %d\n", sgid_idx);
->           return -EINVAL;
->       }
+>  tests/fp/fp-bench.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tests/fp/fp-bench.c b/tests/fp/fp-bench.c
+> index f5bc5edebf..546bac9c9c 100644
+> --- a/tests/fp/fp-bench.c
+> +++ b/tests/fp/fp-bench.c
+> @@ -143,15 +143,20 @@ static void update_random_ops(int n_ops, enum precision prec)
+>      for (i = 0; i < n_ops; i++) {
+>          uint64_t r = random_ops[i];
+>  
+> -        if (prec == PREC_SINGLE || PREC_FLOAT32) {
 
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+:)
 
-Thanks,
-Marcel
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> +        switch (prec) {
+> +        case PREC_SINGLE:
+> +        case PREC_FLOAT32:
+>              do {
+>                  r = xorshift64star(r);
+>              } while (!float32_is_normal(r));
+> -        } else if (prec == PREC_DOUBLE || PREC_FLOAT64) {
+> +            break;
+> +        case PREC_DOUBLE:
+> +        case PREC_FLOAT64:
+>              do {
+>                  r = xorshift64star(r);
+>              } while (!float64_is_normal(r));
+> -        } else {
+> +            break;
+> +        default:
+>              g_assert_not_reached();
+>          }
+>          random_ops[i] = r;
+> 
