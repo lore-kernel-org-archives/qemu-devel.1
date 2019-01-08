@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36953)
+Received: from eggs.gnu.org ([209.51.188.92]:37810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ggsPP-0004MV-85
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:31:11 -0500
+	(envelope-from <philmd@redhat.com>) id 1ggsR4-0005aD-9R
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:32:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ggsPO-0002rQ-Ev
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:31:11 -0500
-Received: from mail-wm1-f41.google.com ([209.85.128.41]:35317)
+	(envelope-from <philmd@redhat.com>) id 1ggsR3-0007AE-8o
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:32:54 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:33458)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ggsPO-0002ik-8S
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:31:10 -0500
-Received: by mail-wm1-f41.google.com with SMTP id t200so4631240wmt.0
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 06:31:07 -0800 (PST)
-References: <20190108102301.1957-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ggsR3-00077B-0m
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:32:53 -0500
+Received: by mail-wr1-f68.google.com with SMTP id c14so4302771wrr.0
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 06:32:52 -0800 (PST)
+References: <20190108084039.9254-1-marcandre.lureau@redhat.com>
+	<20190108084039.9254-7-marcandre.lureau@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <15165f29-ba5e-7320-10e1-d0987f8801f3@redhat.com>
-Date: Tue, 8 Jan 2019 15:31:05 +0100
+Message-ID: <b1ba6cce-a957-86ab-9e02-6586c067e32c@redhat.com>
+Date: Tue, 8 Jan 2019 15:32:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190108102301.1957-1-kraxel@redhat.com>
+In-Reply-To: <20190108084039.9254-7-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] i2c-ddc: fix oob read
+Subject: Re: [Qemu-devel] [PATCH v14 6/6] tpm: clear RAM when "memory
+ overwrite" requested
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +31,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: public@hansmi.ch
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, stefanb@linux.vnet.ibm.com, f4bug@amsat.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
 
-On 1/8/19 11:23 AM, Gerd Hoffmann wrote:
-> Suggested-by: Michael Hanselmann <public@hansmi.ch>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/i2c/i2c-ddc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 1/8/19 9:40 AM, Marc-André Lureau wrote:
+> Note: the "Platform Reset Attack Mitigation" specification isn't
+> explicit about NVDIMM, since they could have different usages. It uses
+> the term "system memory" generally (and also "volatile memory RAM" in
+> its introduction). For initial support, I propose to consider
+> non-volatile memory as not being subject to the memory clear. There is
+> an on-going discussion in the TCG "pcclientwg" working group for
+> future revisions.
 > 
-> diff --git a/hw/i2c/i2c-ddc.c b/hw/i2c/i2c-ddc.c
-> index be34fe072c..0a0367ff38 100644
-> --- a/hw/i2c/i2c-ddc.c
-> +++ b/hw/i2c/i2c-ddc.c
-> @@ -56,7 +56,7 @@ static int i2c_ddc_rx(I2CSlave *i2c)
->      I2CDDCState *s = I2CDDC(i2c);
->  
->      int value;
-> -    value = s->edid_blob[s->reg];
-> +    value = s->edid_blob[s->reg % sizeof(s->edid_blob)];
->      s->reg++;
->      return value;
->  }
+> CPU cache clearing is done unconditionally in edk2 since commit
+> d20ae95a13e851 (edk2-stable201811).
 > 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  hw/tpm/tpm_ppi.h    | 10 ++++++++++
+>  hw/tpm/tpm_crb.c    |  1 +
+>  hw/tpm/tpm_ppi.c    | 22 ++++++++++++++++++++++
+>  hw/tpm/tpm_tis.c    |  1 +
+>  hw/tpm/trace-events |  3 +++
+>  5 files changed, 37 insertions(+)
+> 
+> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+> index c5e555fe2c..d33ef27de6 100644
+> --- a/hw/tpm/tpm_ppi.h
+> +++ b/hw/tpm/tpm_ppi.h
+> @@ -33,4 +33,14 @@ typedef struct TPMPPI {
+>  void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+>                    hwaddr addr, Object *obj);
+>  
+> +/**
+> + * tpm_ppi_reset:
+> + * @tpmppi: a TPMPPI
+> + *
+> + * Function to call on machine reset. It will check if the "Memory
+> + * overwrite" variable is set, and perform a memory clear on volatile
+> + * memory if requested.
+> + **/
+> +void tpm_ppi_reset(TPMPPI *tpmppi);
+> +
+>  #endif /* TPM_TPM_PPI_H */
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> index 012ec686d4..663469bd20 100644
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -233,6 +233,7 @@ static void tpm_crb_reset(void *dev)
+>  {
+>      CRBState *s = CRB(dev);
+>  
+> +    tpm_ppi_reset(&s->ppi);
+>      tpm_backend_reset(s->tpmbe);
+>  
+>      memset(s->regs, 0, sizeof(s->regs));
+> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+> index cf17779c20..cd8205f212 100644
+> --- a/hw/tpm/tpm_ppi.c
+> +++ b/hw/tpm/tpm_ppi.c
+> @@ -16,8 +16,30 @@
+>  #include "qapi/error.h"
+>  #include "cpu.h"
+>  #include "sysemu/memory_mapping.h"
+> +#include "sysemu/reset.h"
+>  #include "migration/vmstate.h"
+>  #include "tpm_ppi.h"
+> +#include "trace.h"
+> +
+> +void tpm_ppi_reset(TPMPPI *tpmppi)
+> +{
+> +    if (tpmppi->buf[0x15a /* movv, docs/specs/tpm.txt */] & 0x1) {
+> +        GuestPhysBlockList guest_phys_blocks;
+> +        GuestPhysBlock *block;
+> +
+> +        guest_phys_blocks_init(&guest_phys_blocks);
+> +        guest_phys_blocks_append(&guest_phys_blocks);
+> +        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
+> +            trace_tpm_ppi_memset(block->host_addr,
+> +                                 block->target_end - block->target_start);
+> +            memset(block->host_addr, 0,
+> +                   block->target_end - block->target_start);
+> +            memory_region_set_dirty(block->mr, 0,
+> +                                    block->target_end - block->target_start);
+> +        }
+> +        guest_phys_blocks_free(&guest_phys_blocks);
+> +    }
+> +}
+>  
+>  void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+>                    hwaddr addr, Object *obj)
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 02d9d5c911..6a5511e042 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -872,6 +872,7 @@ static void tpm_tis_reset(DeviceState *dev)
+>      s->be_buffer_size = MIN(tpm_backend_get_buffer_size(s->be_driver),
+>                              TPM_TIS_BUFFER_MAX);
+>  
+> +    tpm_ppi_reset(&s->ppi);
+>      tpm_backend_reset(s->be_driver);
+>  
+>      s->active_locty = TPM_TIS_NO_LOCALITY;
+> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+> index 25bee0cecf..920d32ad55 100644
+> --- a/hw/tpm/trace-events
+> +++ b/hw/tpm/trace-events
+> @@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
+>  tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
+>  tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to send to TPM: 0x%08x (size=%d)"
+>  tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offset = %u"
+> +
+> +# hw/tpm/tpm_ppi.c
+> +tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
+> 
