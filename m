@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36476)
+Received: from eggs.gnu.org ([209.51.188.92]:36647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggr1i-0002hp-3m
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:02:41 -0500
+	(envelope-from <arilou@gmail.com>) id 1ggr1t-0002mV-KS
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:02:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggr1R-0002RE-4q
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:02:27 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39255)
+	(envelope-from <arilou@gmail.com>) id 1ggr1r-0003Uu-SP
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:02:49 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45780)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggr1N-00029n-B6
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:02:18 -0500
-Received: by mail-ot1-x341.google.com with SMTP id n8so3385264otl.6
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 05:02:14 -0800 (PST)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1ggr1r-0003M1-HD
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:02:47 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t6so3920699wrr.12
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 05:02:47 -0800 (PST)
+From: Jon Doron <arilou@gmail.com>
+Date: Tue,  8 Jan 2019 15:02:19 +0200
+Message-Id: <20190108130219.18550-1-arilou@gmail.com>
 MIME-Version: 1.0
-References: <20181122170309.4856-1-peter.maydell@linaro.org>
-	<20181210143112.ea24zv6klorfkwad@sirius.home.kraxel.org>
-In-Reply-To: <20181210143112.ea24zv6klorfkwad@sirius.home.kraxel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 Jan 2019 13:02:02 +0000
-Message-ID: <CAFEAcA9Cz3x_g0Ofkt6qU9bTcEsSEjpfx7VLOuqK0NP+C-dYAw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-4.0] ui/console: Remove
- qemu_create_display_surface_guestmem()
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] dump: Set correct vaddr for ELF dump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: lersek@redhat.com, marcandre.lureau@redhat.com, Jon Doron <arilou@gmail.com>
 
-On Mon, 10 Dec 2018 at 14:31, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Thu, Nov 22, 2018 at 05:03:09PM +0000, Peter Maydell wrote:
-> > The qemu_create_display_surface_guestmem() function was added in
-> > commit a77549b3ffcc24c32ee4e but apparently never used. Remove it.
-> >
-> > (The API of this function is in any case awkward as a generic
-> > function: it assumes that a physical address uniquely identifies
-> > a piece of memory in the system, which is mostly but not
-> > always true.)
->
-> Added to ui queue.
+vaddr needs to be equal to the paddr since the dump file represents the
+physical memory image.
 
-Ping? This doesn't seem to have made it to master.
+Without setting vaddr correctly, GDB would load all the different memory
+regions on top of each other to vaddr 0, thus making GDB showing the wrong
+memory data for a given address.
 
-thanks
--- PMM
+Signed-off-by: Jon Doron <arilou@gmail.com>
+---
+ dump.c                       | 5 +++--
+ scripts/dump-guest-memory.py | 1 +
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/dump.c b/dump.c
+index 4ec94c5e25..7a56e254d4 100644
+--- a/dump.c
++++ b/dump.c
+@@ -192,7 +192,7 @@ static void write_elf64_load(DumpState *s, MemoryMapping *memory_mapping,
+     phdr.p_paddr = cpu_to_dump64(s, memory_mapping->phys_addr);
+     phdr.p_filesz = cpu_to_dump64(s, filesz);
+     phdr.p_memsz = cpu_to_dump64(s, memory_mapping->length);
+-    phdr.p_vaddr = cpu_to_dump64(s, memory_mapping->virt_addr);
++    phdr.p_vaddr = cpu_to_dump64(s, memory_mapping->virt_addr) ? : phdr.p_paddr;
+ 
+     assert(memory_mapping->length >= filesz);
+ 
+@@ -216,7 +216,8 @@ static void write_elf32_load(DumpState *s, MemoryMapping *memory_mapping,
+     phdr.p_paddr = cpu_to_dump32(s, memory_mapping->phys_addr);
+     phdr.p_filesz = cpu_to_dump32(s, filesz);
+     phdr.p_memsz = cpu_to_dump32(s, memory_mapping->length);
+-    phdr.p_vaddr = cpu_to_dump32(s, memory_mapping->virt_addr);
++    phdr.p_vaddr =
++		cpu_to_dump32(s, memory_mapping->virt_addr) ? : phdr.p_paddr;
+ 
+     assert(memory_mapping->length >= filesz);
+ 
+diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
+index 198cd0fe40..2c587cbefc 100644
+--- a/scripts/dump-guest-memory.py
++++ b/scripts/dump-guest-memory.py
+@@ -163,6 +163,7 @@ class ELF(object):
+         phdr = get_arch_phdr(self.endianness, self.elfclass)
+         phdr.p_type = p_type
+         phdr.p_paddr = p_paddr
++        phdr.p_vaddr = p_paddr
+         phdr.p_filesz = p_size
+         phdr.p_memsz = p_size
+         self.segments.append(phdr)
+-- 
+2.19.2
