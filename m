@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57989)
+Received: from eggs.gnu.org ([209.51.188.92]:59710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gglJ6-0003FL-RT
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 01:56:15 -0500
+	(envelope-from <peterx@redhat.com>) id 1gglOU-0004k9-WC
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:01:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gglJ4-0000NO-QQ
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 01:56:12 -0500
-Received: from m13-139.163.com ([220.181.13.139]:21581)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gglJ3-00006Q-G4
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 01:56:10 -0500
-Date: Tue, 8 Jan 2019 14:40:33 +0800 (CST)
-From: =?GBK?B?wO7Hvw==?= <liq3ea@163.com>
-In-Reply-To: <20190107162657.GB3249@lap1>
-References: <20190103130338.49081-1-liq3ea@163.com>
-	<fad70169-0cff-ede5-c07d-bff01d113f88@redhat.com>
-	<20190107162657.GB3249@lap1>
+	(envelope-from <peterx@redhat.com>) id 1gglOU-0004GN-7U
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:01:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gglOT-00046A-W6
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:01:46 -0500
+Date: Tue, 8 Jan 2019 14:51:59 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190108065159.GA20511@xz-x1>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-10-fli@suse.com>
+	<87a7kcml5i.fsf@dusky.pond.sub.org>
+	<36097839-654b-6d1f-b79e-f9bc174ec126@suse.cz>
 MIME-Version: 1.0
-Message-ID: <40b197f3.c113.1682c30f91c.Coremail.liq3ea@163.com>
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH] hw: pvrdma: fix memory leak in error path
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <36097839-654b-6d1f-b79e-f9bc174ec126@suse.cz>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 09/16] qemu_thread: supplement
+ error handling for pci_edu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-Cc: =?GBK?Q?Philippe_Mathieu-Daud=A8=A6?= <philmd@redhat.com>, marcel.apfelbaum@gmail.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Jiri Slaby <jslaby@suse.cz>
+Cc: Markus Armbruster <armbru@redhat.com>, Fei Li <fli@suse.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com
 
-CkF0IDIwMTktMDEtMDggMDA6MjY6NTgsICJZdXZhbCBTaGFpYSIgPHl1dmFsLnNoYWlhQG9yYWNs
-ZS5jb20+IHdyb3RlOgo+T24gVGh1LCBKYW4gMDMsIDIwMTkgYXQgMDI6NDc6MzdQTSArMDEwMCwg
-UGhpbGlwcGUgTWF0aGlldS1EYXVkqKYgd3JvdGU6Cj4+IE9uIDEvMy8xOSAyOjAzIFBNLCBMaSBR
-aWFuZyB3cm90ZToKPj4gPiBTcG90dGVkIGJ5IENvdmVyaXR5OiBDSUQgMTM5ODU5NQo+PiA+IAo+
-PiAKPj4gRml4ZXM6IDJiMDU3MDVkYzgKPj4gCj4+ID4gU2lnbmVkLW9mZi1ieTogTGkgUWlhbmcg
-PGxpcTNlYUAxNjMuY29tPgo+PiAKPj4gUmV2aWV3ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1
-ZKimIDxwaGlsbWRAcmVkaGF0LmNvbT4KPj4gCj4+ID4gLS0tCj4+ID4gIGh3L3JkbWEvdm13L3B2
-cmRtYV9xcF9vcHMuYyB8IDIgKysKPj4gPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygr
-KQo+PiA+IAo+PiA+IGRpZmYgLS1naXQgYS9ody9yZG1hL3Ztdy9wdnJkbWFfcXBfb3BzLmMgYi9o
-dy9yZG1hL3Ztdy9wdnJkbWFfcXBfb3BzLmMKPj4gPiBpbmRleCAzMDA0NzFhNGM5Li41ODRiZTIw
-NDNlIDEwMDY0NAo+PiA+IC0tLSBhL2h3L3JkbWEvdm13L3B2cmRtYV9xcF9vcHMuYwo+PiA+ICsr
-KyBiL2h3L3JkbWEvdm13L3B2cmRtYV9xcF9vcHMuYwo+PiA+IEBAIC0xNjgsNiArMTY4LDcgQEAg
-aW50IHB2cmRtYV9xcF9zZW5kKFBWUkRNQURldiAqZGV2LCB1aW50MzJfdCBxcF9oYW5kbGUpCj4+
-ID4gICAgICAgICAgc2dpZCA9IHJkbWFfcm1fZ2V0X2dpZCgmZGV2LT5yZG1hX2Rldl9yZXMsIHdx
-ZS0+aGRyLndyLnVkLmF2LmdpZF9pbmRleCk7Cj4+ID4gICAgICAgICAgaWYgKCFzZ2lkKSB7Cj4+
-ID4gICAgICAgICAgICAgIHByX2RiZygiRmFpbCB0byBnZXQgZ2lkIGZvciBpZHggJWRcbiIsIHdx
-ZS0+aGRyLndyLnVkLmF2LmdpZF9pbmRleCk7Cj4+ID4gKyAgICAgICAgICAgIGdfZnJlZShjb21w
-X2N0eCk7Cj4+ID4gICAgICAgICAgICAgIHJldHVybiAtRUlPOwo+PiA+ICAgICAgICAgIH0KPj4g
-PiAgICAgICAgICBwcl9kYmcoInNnaWRfaWQ9JWQsIHNnaWQ9MHglbGx4XG4iLCB3cWUtPmhkci53
-ci51ZC5hdi5naWRfaW5kZXgsCj4+ID4gQEAgLTE3OSw2ICsxODAsNyBAQCBpbnQgcHZyZG1hX3Fw
-X3NlbmQoUFZSRE1BRGV2ICpkZXYsIHVpbnQzMl90IHFwX2hhbmRsZSkKPj4gPiAgICAgICAgICBp
-ZiAoc2dpZF9pZHggPD0gMCkgewo+PiA+ICAgICAgICAgICAgICBwcl9kYmcoIkZhaWwgdG8gZ2V0
-IGJrIHNnaWRfaWR4IGZvciBzZ2lkX2lkeCAlZFxuIiwKPj4gPiAgICAgICAgICAgICAgICAgICAg
-IHdxZS0+aGRyLndyLnVkLmF2LmdpZF9pbmRleCk7Cj4+ID4gKyAgICAgICAgICAgIGdfZnJlZShj
-b21wX2N0eCk7Cj4+ID4gICAgICAgICAgICAgIHJldHVybiAtRUlPOwo+PiA+ICAgICAgICAgIH0K
-Pgo+U2luY2UgY29tcF9jdHggaXMgbm90IHVzZWQgdW50aWwgdGhlIHR3byBjaGVja3MgYXJlIGRv
-bmUgd2UganVzdCBjYW4KPnJlbG9jYXRlIHRoZSBhbGxvY2F0aW9uICYgaW5pdGlhbGl6YXRpb24g
-cmlnaHQgYWZ0ZXIgdGhlIHR3byBjaGVja3MuCgo+CgoKT0ssIHdpbGwgc2VuZCBhIHJldmlzZWQg
-dmVyc2lvbiBsYXRlci4KCgpUaGFua3MsCkxpIFFpYW5nCgoKPll1dmFsCj4KPj4gPiAgCj4+ID4g
-Cg==
+On Tue, Jan 08, 2019 at 07:14:11AM +0100, Jiri Slaby wrote:
+> On 07. 01. 19, 18:29, Markus Armbruster wrote:
+> >    static void pci_edu_uninit(PCIDevice *pdev)
+> >    {
+> >        EduState *edu = EDU(pdev);
+> > 
+> >        qemu_mutex_lock(&edu->thr_mutex);
+> >        edu->stopping = true;
+> >        qemu_mutex_unlock(&edu->thr_mutex);
+> >        qemu_cond_signal(&edu->thr_cond);
+> >        qemu_thread_join(&edu->thread);
+> > 
+> >        qemu_cond_destroy(&edu->thr_cond);
+> >        qemu_mutex_destroy(&edu->thr_mutex);
+> > 
+> >        timer_del(&edu->dma_timer);
+> >    }
+> > 
+> > Preexisting: pci_edu_uninit() neglects to call msi_uninit().  Jiri?\
+> 
+> I don't know, the MSI support was added in:
+> commit eabb5782f70b4a10975b24ccd7129929a05ac932
+> Author: Peter Xu <peterx@redhat.com>
+> Date:   Wed Sep 28 21:03:39 2016 +0800
+> 
+>     hw/misc/edu: support MSI interrupt
+> 
+> Hence CCing Peter.
+
+Hi, Jiri, Markus, Fei,
+
+IMHO msi_uninit() is optional since it only operates on the config
+space of the device to remove the capability or fix up the flags
+without really doing any real destruction of objects so nothing will
+be leaked (unlike msix_uninit, which should be required).  But I do
+agree that calling msi_uninit() could be even nicer here.
+
+Anyone would like to post a patch? Or should I?
+
+Thanks,
+
+-- 
+Peter Xu
