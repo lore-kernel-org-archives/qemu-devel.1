@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58089)
+Received: from eggs.gnu.org ([209.51.188.92]:38143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ggy6s-0003lJ-D5
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 15:36:27 -0500
+	(envelope-from <bounces@canonical.com>) id 1ggysX-00026i-Jz
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 16:25:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ggy6o-0002hM-Mc
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 15:36:26 -0500
-Resent-Message-Id: <E1ggy6o-0002hM-Mc@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1ggy6m-0002fs-QZ
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 15:36:22 -0500
-In-Reply-To: <20190108162154.22259-1-alex.bennee@linaro.org>
-Message-ID: <154697975277.32765.18095479834595364739@02a1dbf831e2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <bounces@canonical.com>) id 1ggysW-0006rW-Na
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 16:25:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39550)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ggysW-0006ml-Hm
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 16:25:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ggysT-0003KU-Lh
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 21:25:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8E1CB2E807B
+	for <qemu-devel@nongnu.org>; Tue,  8 Jan 2019 21:25:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 8 Jan 2019 12:35:53 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH  v1 0/6] current fpu/next queue
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 08 Jan 2019 21:13:43 -0000
+From: Stefan Ring <1810545@bugs.launchpad.net>
+Reply-To: Bug 1810545 <1810545@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154662609174.25797.11037697007951339169.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154698202326.24863.3273434035135112748.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1810545] Re: [alpha] Strange exception address
+ reported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, cota@braap.org
+To: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEwODE2MjE1NC4yMjI1
-OS0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENI
-ICB2MSAwLzZdIGN1cnJlbnQgZnB1L25leHQgcXVldWUKTWVzc2FnZS1pZDogMjAxOTAxMDgxNjIx
-NTQuMjIyNTktMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
-JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
-bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
-ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
-KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
-aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
-MzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjQ4YTE0NjUgdGVzdHMvTWFrZmls
-ZTogYWRkIGNoZWNrLXNvZnRmbG9hdCBydWxlCjI4Mzc4NmIgc2NyaXB0cy9hcmNoaXZlLXNvdXJj
-ZTogaW5jbHVkZSBzb2Z0ZmxvYXQgdGVzdHMKNDA2OWNmNiB0ZXN0cy9NYWtlZmlsZTogYWRkIGZs
-b2F0aW5nIHBvaW50IHRlc3RzCjQ0YjM3MGUgc29mdGZsb2F0OiBlbmZvcmNlIHNvZnRmbG9hdCBp
-ZiB0aGUgaG9zdCdzIEZNQSBpcyBicm9rZW4KYTVhMTg0MCBmcC1iZW5jaDogcmVtb3ZlIHdyb25n
-IGV4cG9uZW50IHJhaXNlIGluIGZpbGxfcmFuZG9tCmY1MTFhNWMgZnAtYmVuY2g6IGZpeCB1cGRh
-dGVfcmFuZG9tX29wcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiBm
-cC1iZW5jaDogZml4IHVwZGF0ZV9yYW5kb21fb3BzLi4uCkNoZWNraW5nIFBBVENIIDIvNjogZnAt
-YmVuY2g6IHJlbW92ZSB3cm9uZyBleHBvbmVudCByYWlzZSBpbiBmaWxsX3JhbmRvbS4uLgpDaGVj
-a2luZyBQQVRDSCAzLzY6IHNvZnRmbG9hdDogZW5mb3JjZSBzb2Z0ZmxvYXQgaWYgdGhlIGhvc3Qn
-cyBGTUEgaXMgYnJva2VuLi4uCkNoZWNraW5nIFBBVENIIDQvNjogdGVzdHMvTWFrZWZpbGU6IGFk
-ZCBmbG9hdGluZyBwb2ludCB0ZXN0cy4uLgpDaGVja2luZyBQQVRDSCA1LzY6IHNjcmlwdHMvYXJj
-aGl2ZS1zb3VyY2U6IGluY2x1ZGUgc29mdGZsb2F0IHRlc3RzLi4uCkVSUk9SOiBsaW5lIG92ZXIg
-OTAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IHNjcmlwdHMvYXJjaGl2ZS1zb3VyY2Uuc2g6Mjk6Citz
-dWJtb2R1bGVzPSJkdGMgdWkva2V5Y29kZW1hcGRiIHRlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9h
-dC0zIHRlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zIgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCkNoZWNraW5nIFBBVENIIDYvNjogdGVzdHMvTWFrZmlsZTogYWRkIGNoZWNrLXNvZnRm
-bG9hdCBydWxlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzIwMTkwMTA4MTYyMTU0LjIyMjU5LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZy90ZXN0
-aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Works, thanks!
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1810545
+
+Title:
+  [alpha] Strange exception address reported
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  For some reason the SIGILL handler receives a different address under
+  qemu than it used to on real hardware. I don't know specifics about
+  the hardware used back then =E2=80=93 it was some sort of 21264a somewhere
+  between 600-800 MHz =E2=80=93, and I cannot say anything about the kernel=
+ as
+  well, but I know that it delivered the faulting address +4, while
+  under qemu it receives +8. I know because CACAO, an early Java JIT
+  compiler extracts the address from the SIGILL handler and inspects the
+  code at the faulting site, and it has substracted 4 from the handler
+  address since the dawn of time, and this used to produce the desired
+  result on the Alpha hardware. It actually ran on two different Alpha
+  machines over the years, and both behaved identically.
+
+  The handler looks like this:
+  void handler_sigill(int sig, siginfo_t *siginfo, void *_p)
+  {
+    uintptr_t trap_address =3D (uintptr_t) (((ucontext_t*) _p)->uc_mcontext=
+.sc_pc) - 4;
+  }
+
+  (paraphrasing, the actual code is here: https://bitbucket.org/cacaovm
+  /cacao-
+  staging/src/c8d3fbab864c3243f97629fcfa8d84ba71f38157/src/vm/jit/alpha/lin=
+ux
+  /md-os.cpp?at=3Ddefault&fileviewer=3Dfile-view-default#md-os.cpp-65)
+
+  I don't know much about the qemu source code and cannot say where this
+  is coming from at first glance. The gen_invalid function uses pc_next,
+  which sounds like the next instruction, not the next-to-next ;). In
+  theory it could actually be the kernel's fault, although I consider
+  this unlikely.
+
+  This is qemu-system-alpha with apparently the last Debian which
+  existed for Alpha (lenny). The kernel is 2.6.26-2-alpha-generic
+  (Debian 2.6.26-29). Observed with qemu git 1b3e80082b, but I guess it
+  is the same with any version.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1810545/+subscriptions
