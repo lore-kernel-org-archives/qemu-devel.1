@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42873)
+Received: from eggs.gnu.org ([209.51.188.92]:43517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ggf2Q-0006aZ-JV
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:14:35 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ggf4I-00080V-IY
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:16:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ggf2L-0004qy-KX
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:14:31 -0500
-Date: Mon, 7 Jan 2019 19:14:16 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190107191401-mutt-send-email-mst@kernel.org>
-References: <20181212091623.16950-1-david@redhat.com>
-	<20181212091623.16950-5-david@redhat.com>
-	<2527cf5c-983b-e4df-2c26-c47df87e6bf0@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1ggf4H-00082n-CU
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:16:30 -0500
+Date: Tue, 8 Jan 2019 11:07:49 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190108000749.GG13339@umbus.fritz.box>
+References: <20190107193020.21744-1-ehabkost@redhat.com>
+	<20190107193020.21744-2-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="gm5TwAJMO0F2iVRz"
 Content-Disposition: inline
-In-Reply-To: <2527cf5c-983b-e4df-2c26-c47df87e6bf0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 04/11] pci/pcie: stop plug/unplug if the
- slot is locked
+In-Reply-To: <20190107193020.21744-2-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] spapr: Eliminate
+ SPAPR_PCI_2_7_MMIO_WIN_SIZE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>, qemu-ppc@nongnu.org
-
-On Mon, Jan 07, 2019 at 01:13:58PM +0100, David Hildenbrand wrote:
-> On 12.12.18 10:16, David Hildenbrand wrote:
-> > We better stop right away. For now, errors would be partially ignored
-> > (so the guest might get informed or the device might get unplugged),
-> > although actual plug/unplug will be reported as failed to the user.
-> > 
-> > While at it, properly move the check to the pre_plug handler for the plug
-> > case, as we can test the slot state before the device will be realized.
-> > 
-> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> @MST, looks like you missed this one.
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Anthony Perard <anthony.perard@citrix.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, xen-devel@lists.xenproject.org
 
 
-Ouch I wonder what happened.
-Thanks!
+--gm5TwAJMO0F2iVRz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> -- 
-> 
-> Thanks,
-> 
-> David / dhildenb
+On Mon, Jan 07, 2019 at 05:30:18PM -0200, Eduardo Habkost wrote:
+> The macro is only used in one place, where the purpose of the
+> value is obvious.  Eliminate the macro so we don't need to rely
+> on stringify().
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  include/hw/pci-host/spapr.h | 1 -
+>  hw/ppc/spapr.c              | 2 +-
+>  2 files changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+> index 7c66c3872f..a85a995b6c 100644
+> --- a/include/hw/pci-host/spapr.h
+> +++ b/include/hw/pci-host/spapr.h
+> @@ -99,7 +99,6 @@ struct sPAPRPHBState {
+>  #define SPAPR_PCI_BASE               (1ULL << 45) /* 32 TiB */
+>  #define SPAPR_PCI_LIMIT              (1ULL << 46) /* 64 TiB */
+> =20
+> -#define SPAPR_PCI_2_7_MMIO_WIN_SIZE  0xf80000000
+>  #define SPAPR_PCI_IO_WIN_SIZE        0x10000
+> =20
+>  #define SPAPR_PCI_MSI_WINDOW         0x40000000000ULL
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 5671608cea..bff42f0adb 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4225,7 +4225,7 @@ static void spapr_machine_2_7_class_options(Machine=
+Class *mc)
+>          {
+>              .driver   =3D TYPE_SPAPR_PCI_HOST_BRIDGE,
+>              .property =3D "mem_win_size",
+> -            .value    =3D stringify(SPAPR_PCI_2_7_MMIO_WIN_SIZE),
+> +            .value    =3D "0xf80000000",
+>          },
+>          {
+>              .driver   =3D TYPE_SPAPR_PCI_HOST_BRIDGE,
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--gm5TwAJMO0F2iVRz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwz6dAACgkQbDjKyiDZ
+s5KxthAAmMSt+mzO7gBNqkfCRsvhE9RQs+CbWqXU+qb6Wgb5QkfCCsMrfWWe0UGo
+HPs6teVCyt9K31XT7W9ZGde5YtMEO7wpEHcr3EkZT4KyMUUwOjUaL3ut5npQSCWL
+2SG6wtePDIPTLmsODoLJVCoCRhcuFF2ZN+d91DlANwr3purOP/B9KEVu1GUOlA8r
+JdPMXRNN9VaRm7VaUvUVOb8NCSqaFt5IiHlgRUGGD3ZnH5a0Hjvu9NaLL0oFuGCK
+r3D8eyrivhxRxGeWX8kGu5rAbpYZx2LKWRZ+TXsZIJ7KKXTVPU3hVZERR+ApjBMz
+soDywiID/1HTrPvKtxaqiRigZCvNOUWMbSNzFKFX/FC7Z2w19dbXKV238olN+k7p
+ryNRPXkC85Lcu6WWnNk4QusdxWYw52r4u+2sAhgh1z5CIRCGRsqCFenXxFOyIMYA
+pQiJrzjaxoLB6K+jAVyzB23Pw1CCaIDPUgfmCCBu4imO5ib55JGL+JYvmBXsGfCw
+ak+dOo4EBYuq3XtqYNFGoKRJ+CIyGpNQFBFkq5O1GV79eicDkyyTQWcs99+8XBse
+V2pvvlcWsvns+qpJyFF5+JKMuSoz8umf6P/VXDmB2Gw92v2gGKKrd8tAxyO6Kvq8
+9kqQ543+SyML7/ddyLH8O4SjlzScXrRS2uACOtpHjH4OgqupC1A=
+=89iK
+-----END PGP SIGNATURE-----
+
+--gm5TwAJMO0F2iVRz--
