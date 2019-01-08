@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35518)
+Received: from eggs.gnu.org ([209.51.188.92]:35516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqM-000752-6n
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:11 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqN-000750-6K
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqL-0004iw-73
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqL-0004iW-5O
 	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:10 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  8 Jan 2019 20:06:49 +0300
-Message-Id: <20190108170655.29766-4-vsementsov@virtuozzo.com>
+Date: Tue,  8 Jan 2019 20:06:51 +0300
+Message-Id: <20190108170655.29766-6-vsementsov@virtuozzo.com>
 In-Reply-To: <20190108170655.29766-1-vsementsov@virtuozzo.com>
 References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 3/9] qcow2-threads: use thread_pool_submit_co
+Subject: [Qemu-devel] [PATCH v3 5/9] qcow2-threads: split out generic path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,56 +22,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, berto@igalia.com, vsementsov@virtuozzo.com, den@openvz.org, pbonzini@redhat.com
 
-Use thread_pool_submit_co, instead of reinventing it here. Note, that
-thread_pool_submit_aio() never returns NULL, so checking it was an
-extra thing.
+Move generic part out of qcow2_co_do_compress, to reuse it for
+encryption and rename things that would be shared with encryption path.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-threads.c | 17 ++---------------
- 1 file changed, 2 insertions(+), 15 deletions(-)
+ block/qcow2.h         |  4 ++--
+ block/qcow2-threads.c | 47 ++++++++++++++++++++++++++++---------------
+ block/qcow2.c         |  2 +-
+ 3 files changed, 34 insertions(+), 19 deletions(-)
 
+diff --git a/block/qcow2.h b/block/qcow2.h
+index be84d7c96a..9c2f6749ba 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -336,8 +336,8 @@ typedef struct BDRVQcow2State {
+     char *image_backing_file;
+     char *image_backing_format;
+ 
+-    CoQueue compress_wait_queue;
+-    int nb_compress_threads;
++    CoQueue thread_task_queue;
++    int nb_threads;
+ } BDRVQcow2State;
+ 
+ typedef struct Qcow2COWRegion {
 diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index dea9ac431c..20b2616529 100644
+index 156e0667be..e3066075da 100644
 --- a/block/qcow2-threads.c
 +++ b/block/qcow2-threads.c
-@@ -144,17 +144,11 @@ static int qcow2_compress_pool_func(void *opaque)
-     return 0;
- }
+@@ -31,7 +31,36 @@
+ #include "qcow2.h"
+ #include "block/thread-pool.h"
  
--static void qcow2_compress_complete(void *opaque, int ret)
--{
--    qemu_coroutine_enter(opaque);
--}
--
- static ssize_t coroutine_fn
+-#define MAX_COMPRESS_THREADS 4
++#define QCOW2_MAX_THREADS 4
++
++static int coroutine_fn
++qcow2_co_process(BlockDriverState *bs, ThreadPoolFunc *func, void *arg)
++{
++    int ret;
++    BDRVQcow2State *s = bs->opaque;
++    ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
++
++    qemu_co_mutex_lock(&s->lock);
++    while (s->nb_threads >= QCOW2_MAX_THREADS) {
++        qemu_co_queue_wait(&s->thread_task_queue, &s->lock);
++    }
++    s->nb_threads++;
++    qemu_co_mutex_unlock(&s->lock);
++
++    ret = thread_pool_submit_co(pool, func, arg);
++
++    qemu_co_mutex_lock(&s->lock);
++    s->nb_threads--;
++    qemu_co_queue_next(&s->thread_task_queue);
++    qemu_co_mutex_unlock(&s->lock);
++
++    return ret;
++}
++
++
++/*
++ * Compression
++ */
+ 
+ typedef ssize_t (*Qcow2CompressFunc)(void *dest, size_t dest_size,
+                                      const void *src, size_t src_size);
+@@ -148,8 +177,6 @@ static ssize_t coroutine_fn
  qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
                       const void *src, size_t src_size, Qcow2CompressFunc func)
  {
-     BDRVQcow2State *s = bs->opaque;
--    BlockAIOCB *acb;
-     ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
+-    BDRVQcow2State *s = bs->opaque;
+-    ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
      Qcow2CompressData arg = {
          .dest = dest,
-@@ -169,16 +163,9 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-     }
+         .dest_size = dest_size,
+@@ -158,19 +185,7 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+         .func = func,
+     };
  
-     s->nb_compress_threads++;
--    acb = thread_pool_submit_aio(pool, qcow2_compress_pool_func, &arg,
--                                 qcow2_compress_complete,
--                                 qemu_coroutine_self());
--
--    if (!acb) {
--        s->nb_compress_threads--;
--        return -EINVAL;
+-    qemu_co_mutex_lock(&s->lock);
+-    while (s->nb_compress_threads >= MAX_COMPRESS_THREADS) {
+-        qemu_co_queue_wait(&s->compress_wait_queue, &s->lock);
 -    }
--    qemu_coroutine_yield();
-+    thread_pool_submit_co(pool, qcow2_compress_pool_func, &arg);
-     s->nb_compress_threads--;
-+
-     qemu_co_queue_next(&s->compress_wait_queue);
+-    s->nb_compress_threads++;
+-    qemu_co_mutex_unlock(&s->lock);
+-
+-    thread_pool_submit_co(pool, qcow2_compress_pool_func, &arg);
+-
+-    qemu_co_mutex_lock(&s->lock);
+-    s->nb_compress_threads--;
+-    qemu_co_queue_next(&s->compress_wait_queue);
+-    qemu_co_mutex_unlock(&s->lock);
++    qcow2_co_process(bs, qcow2_compress_pool_func, &arg);
  
      return arg.ret;
+ }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 4a1265dc42..2865903b0e 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1599,7 +1599,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+     }
+ #endif
+ 
+-    qemu_co_queue_init(&s->compress_wait_queue);
++    qemu_co_queue_init(&s->thread_task_queue);
+ 
+     return ret;
+ 
 -- 
 2.18.0
