@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59779)
+Received: from eggs.gnu.org ([209.51.188.92]:60128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ggmwV-0003kS-7O
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:04 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggmwh-0003si-OX
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ggmwR-0006qE-IQ
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:40:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ggmwP-0006fP-L3
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:40:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ggmwL-0007RL-K5
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 08:40:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 971352E8048
-	for <qemu-devel@nongnu.org>; Tue,  8 Jan 2019 08:40:49 +0000 (UTC)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggmwf-0007JF-86
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1ggmwf-0007CT-05
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:09 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue,  8 Jan 2019 12:40:36 +0400
+Message-Id: <20190108084039.9254-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20190108084039.9254-1-marcandre.lureau@redhat.com>
+References: <20190108084039.9254-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Jan 2019 08:30:09 -0000
-From: Lenny Helpline <1810603@bugs.launchpad.net>
-Reply-To: Bug 1810603 <1810603@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154670237006.5111.1505843603378488710.malonedeb@wampee.canonical.com>
-Message-Id: <154693620998.25278.657579942079364570.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810603] Re: QEMU QCow Images grow dramatically
+Subject: [Qemu-devel] [PATCH v14 3/6] acpi: expose TPM/PPI configuration
+ parameters to firmware via fw_cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,96 +29,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, f4bug@amsat.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-I don't have many commands handy, as we manage almost everything through
-libvirt manager.
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-3) create a snapshot of the lined clone:
+To avoid having to hard code the base address of the PPI virtual
+memory device we introduce a fw_cfg file etc/tpm/config that holds the
+base address of the PPI device, the version of the PPI interface and
+the version of the attached TPM.
 
-virsh snapshot-create-as --domain <VMNAME> --name "test" --halt
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+[ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document it=
+ ]
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ include/hw/acpi/tpm.h |  3 +++
+ hw/i386/acpi-build.c  | 19 +++++++++++++++++++
+ docs/specs/tpm.txt    | 19 +++++++++++++++++++
+ 3 files changed, 41 insertions(+)
 
-4) revert the snapshot every X minutes / hours:
-
-virsh destroy <VMNAME>
-virsh snapshot-revert --snapshotname test --running --force
-
-Does that help?
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810603
-
-Title:
-  QEMU QCow Images grow dramatically
-
-Status in QEMU:
-  New
-
-Bug description:
-  I've recently migrated our VM infrastructure (~200 guest on 15 hosts)
-  from vbox to Qemu (using KVM / libvirt). We have a master image (QEMU
-  QCow v3) from which we spawn multiple instances (linked clones). All
-  guests are being revert once per hour for security reasons.
-
-  About 2 weeks after we successfully migrated to Qemu, we noticed that
-  almost all disks went full across all 15 hosts. Our investigation
-  showed that the initial qcow disk images blow up from a few gigabytes
-  to 100GB and more. This should not happen, as we revert all VMs back
-  to the initial snapshot once per hour and hence all changes that have
-  been made to disks must be reverted too.
-
-  We did an addition test with 24 hour time frame with which we could
-  reproduce this bug as documented below.
-
-  Initial disk image size (created on Jan 04):
-  -rw-r--r-- 1 root root 7.1G Jan  4 15:59 W10-TS01-0.img
-  -rw-r--r-- 1 root root 7.3G Jan  4 15:59 W10-TS02-0.img
-  -rw-r--r-- 1 root root 7.4G Jan  4 15:59 W10-TS03-0.img
-  -rw-r--r-- 1 root root 8.3G Jan  4 16:02 W10-CLIENT01-0.img
-  -rw-r--r-- 1 root root 8.6G Jan  4 16:05 W10-CLIENT02-0.img
-  -rw-r--r-- 1 root root 8.0G Jan  4 16:05 W10-CLIENT03-0.img
-  -rw-r--r-- 1 root root 8.3G Jan  4 16:08 W10-CLIENT04-0.img
-  -rw-r--r-- 1 root root 8.1G Jan  4 16:12 W10-CLIENT05-0.img
-  -rw-r--r-- 1 root root 8.0G Jan  4 16:12 W10-CLIENT06-0.img
-  -rw-r--r-- 1 root root 8.1G Jan  4 16:16 W10-CLIENT07-0.img
-  -rw-r--r-- 1 root root 7.6G Jan  4 16:16 W10-CLIENT08-0.img
-  -rw-r--r-- 1 root root 7.6G Jan  4 16:19 W10-CLIENT09-0.img
-  -rw-r--r-- 1 root root 7.5G Jan  4 16:21 W10-ROUTER-0.img
-  -rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
-
-  Disk image size after 24 hours (printed on Jan 05):
-  -rw-r--r-- 1 root root  13G Jan  5 15:07 W10-TS01-0.img
-  -rw-r--r-- 1 root root 8.9G Jan  5 14:20 W10-TS02-0.img
-  -rw-r--r-- 1 root root 9.0G Jan  5 15:07 W10-TS03-0.img
-  -rw-r--r-- 1 root root  10G Jan  5 15:08 W10-CLIENT01-0.img
-  -rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT02-0.img
-  -rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT03-0.img
-  -rw-r--r-- 1 root root  11G Jan  5 15:08 W10-CLIENT04-0.img
-  -rw-r--r-- 1 root root  19G Jan  5 15:07 W10-CLIENT05-0.img
-  -rw-r--r-- 1 root root  14G Jan  5 15:08 W10-CLIENT06-0.img
-  -rw-r--r-- 1 root root 9.7G Jan  5 15:07 W10-CLIENT07-0.img
-  -rw-r--r-- 1 root root  35G Jan  5 15:08 W10-CLIENT08-0.img
-  -rw-r--r-- 1 root root 9.2G Jan  5 15:07 W10-CLIENT09-0.img
-  -rw-r--r-- 1 root root  41G Jan  5 15:08 W10-ROUTER-0.img
-  -rw-r--r-- 1 root root  18G Jan  4 16:25 W10-MASTER-IMG.qcow2
-
-  You can reproduce this bug as follow:
-  1) create an initial disk image
-  2) create a linked clone
-  3) create a snapshot of the linked clone
-  4) revert the snapshot every X minutes / hours
-
-  Due the described behavior / bug, our VM farm is completely down at
-  the moment (as we run out of disk space on all host systems). A quick
-  fix for this bug would be much appreciated.
-
-  Host OS: Ubuntu 18.04.01 LTS
-  Kernel: 4.15.0-43-generic
-  Qemu: 3.1.0
-  libvirt: 4.10.0
-  Guest OS: Windows 10 64bit
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810603/+subscriptions
+diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+index b8796df916..a6109a97fc 100644
+--- a/include/hw/acpi/tpm.h
++++ b/include/hw/acpi/tpm.h
+@@ -194,4 +194,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+ #define TPM_PPI_ADDR_SIZE           0x400
+ #define TPM_PPI_ADDR_BASE           0xFED45000
+=20
++#define TPM_PPI_VERSION_NONE        0
++#define TPM_PPI_VERSION_1_30        1
++
+ #endif /* HW_ACPI_TPM_H */
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 14f757fc36..9898247705 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
+     bool pcihp_bridge_en;
+ } AcpiBuildPciBusHotplugState;
+=20
++typedef struct FwCfgTPMConfig {
++    uint32_t tpmppi_address;
++    uint8_t tpm_version;
++    uint8_t tpmppi_version;
++} QEMU_PACKED FwCfgTPMConfig;
++
+ static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+ {
+     uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
+ NULL);
+@@ -2847,6 +2853,8 @@ void acpi_setup(void)
+     AcpiBuildTables tables;
+     AcpiBuildState *build_state;
+     Object *vmgenid_dev;
++    TPMIf *tpm;
++    static FwCfgTPMConfig tpm_config;
+=20
+     if (!pcms->fw_cfg) {
+         ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+@@ -2881,6 +2889,17 @@ void acpi_setup(void)
+     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+                     tables.tcpalog->data, acpi_data_len(tables.tcpalog))=
+;
+=20
++    tpm =3D tpm_find();
++    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_abort=
+)) {
++        tpm_config =3D (FwCfgTPMConfig) {
++            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
++            .tpm_version =3D tpm_get_version(tpm),
++            .tpmppi_version =3D TPM_PPI_VERSION_NONE
++        };
++        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
++                        &tpm_config, sizeof tpm_config);
++    }
++
+     vmgenid_dev =3D find_vmgenid_dev();
+     if (vmgenid_dev) {
+         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+index 1af82bba86..e4bb094700 100644
+--- a/docs/specs/tpm.txt
++++ b/docs/specs/tpm.txt
+@@ -34,6 +34,25 @@ The CRB interface makes a memory mapped IO region in t=
+he area 0xfed40000 -
+ QEMU files related to TPM CRB interface:
+  - hw/tpm/tpm_crb.c
+=20
++=3D fw_cfg interface =3D
++
++The bios/firmware may read the "etc/tpm/config" fw_cfg entry for
++configuring the guest appropriately.
++
++The entry of 6 bytes has the following content, in little-endian:
++
++    #define TPM_VERSION_UNSPEC          0
++    #define TPM_VERSION_1_2             1
++    #define TPM_VERSION_2_0             2
++
++    #define TPM_PPI_VERSION_NONE        0
++    #define TPM_PPI_VERSION_1_30        1
++
++    struct FwCfgTPMConfig {
++        uint32_t tpmppi_address;         /* PPI memory location */
++        uint8_t tpm_version;             /* TPM version */
++        uint8_t tpmppi_version;          /* PPI version */
++    };
+=20
+ =3D ACPI Interface =3D
+=20
+--=20
+2.20.1.2.gb21ebb671b
