@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52615)
+Received: from eggs.gnu.org ([209.51.188.92]:52638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzul-0008Gx-Bd
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:03 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzuz-0008Tw-F7
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzuj-0004W5-Ek
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:03 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:44476)
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzut-0004bH-KW
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:13 -0500
+Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:41596)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggzuj-0004VC-5l
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:01 -0500
-Received: by mail-pl1-x643.google.com with SMTP id e11so2558319plt.11
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:32:01 -0800 (PST)
+	id 1ggzur-0004Yt-MG
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:11 -0500
+Received: by mail-pf1-x430.google.com with SMTP id b7so2607721pfi.8
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:32:06 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  9 Jan 2019 08:31:07 +1000
-Message-Id: <20190108223129.5570-10-richard.henderson@linaro.org>
+Date: Wed,  9 Jan 2019 08:31:09 +1000
+Message-Id: <20190108223129.5570-12-richard.henderson@linaro.org>
 In-Reply-To: <20190108223129.5570-1-richard.henderson@linaro.org>
 References: <20190108223129.5570-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 09/31] target/arm: Decode PAuth within
- disas_data_proc_2src
+Subject: [Qemu-devel] [PATCH v3 11/31] target/arm: Add new_pc argument to
+ helper_exception_return
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +33,91 @@ Cc: peter.maydell@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ target/arm/helper-a64.h    |  2 +-
+ target/arm/helper-a64.c    | 10 +++++-----
+ target/arm/translate-a64.c |  7 ++++++-
+ 3 files changed, 12 insertions(+), 7 deletions(-)
 
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index 55299896c4..aff8d6c9f3 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -86,7 +86,7 @@ DEF_HELPER_2(advsimd_f16tosinth, i32, f16, ptr)
+ DEF_HELPER_2(advsimd_f16touinth, i32, f16, ptr)
+ DEF_HELPER_2(sqrt_f16, f16, f16, ptr)
+ 
+-DEF_HELPER_1(exception_return, void, env)
++DEF_HELPER_2(exception_return, void, env, i64)
+ 
+ DEF_HELPER_FLAGS_3(pacia, TCG_CALL_NO_WG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_3(pacib, TCG_CALL_NO_WG, i64, env, i64, i64)
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 66ff70dcdb..101fa6d3ea 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -925,7 +925,7 @@ static int el_from_spsr(uint32_t spsr)
+     }
+ }
+ 
+-void HELPER(exception_return)(CPUARMState *env)
++void HELPER(exception_return)(CPUARMState *env, uint64_t new_pc)
+ {
+     int cur_el = arm_current_el(env);
+     unsigned int spsr_idx = aarch64_banked_spsr_index(cur_el);
+@@ -991,9 +991,9 @@ void HELPER(exception_return)(CPUARMState *env)
+         aarch64_sync_64_to_32(env);
+ 
+         if (spsr & CPSR_T) {
+-            env->regs[15] = env->elr_el[cur_el] & ~0x1;
++            env->regs[15] = new_pc & ~0x1;
+         } else {
+-            env->regs[15] = env->elr_el[cur_el] & ~0x3;
++            env->regs[15] = new_pc & ~0x3;
+         }
+         qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+                       "AArch32 EL%d PC 0x%" PRIx32 "\n",
+@@ -1005,7 +1005,7 @@ void HELPER(exception_return)(CPUARMState *env)
+             env->pstate &= ~PSTATE_SS;
+         }
+         aarch64_restore_sp(env, new_el);
+-        env->pc = env->elr_el[cur_el];
++        env->pc = new_pc;
+         qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+                       "AArch64 EL%d PC 0x%" PRIx64 "\n",
+                       cur_el, new_el, env->pc);
+@@ -1031,7 +1031,7 @@ illegal_return:
+      * no change to exception level, execution state or stack pointer
+      */
+     env->pstate |= PSTATE_IL;
+-    env->pc = env->elr_el[cur_el];
++    env->pc = new_pc;
+     spsr &= PSTATE_NZCV | PSTATE_DAIF;
+     spsr |= pstate_read(env) & ~(PSTATE_NZCV | PSTATE_DAIF);
+     pstate_write(env, spsr);
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 8a8408c1b7..3f08db580b 100644
+index 3f08db580b..2df2323646 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -4884,6 +4884,13 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
-     case 11: /* RORV */
-         handle_shift_reg(s, A64_SHIFT_TYPE_ROR, sf, rm, rn, rd);
-         break;
-+    case 12: /* PACGA */
-+        if (sf == 0 || !dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        gen_helper_pacga(cpu_reg(s, rd), cpu_env,
-+                         cpu_reg(s, rn), cpu_reg_sp(s, rm));
-+        break;
-     case 16:
-     case 17:
-     case 18:
-@@ -4899,6 +4906,7 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
-         break;
-     }
-     default:
-+    do_unallocated:
-         unallocated_encoding(s);
-         break;
-     }
+@@ -1981,6 +1981,7 @@ static void disas_exc(DisasContext *s, uint32_t insn)
+ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+ {
+     unsigned int opc, op2, op3, rn, op4;
++    TCGv_i64 dst;
+ 
+     opc = extract32(insn, 21, 4);
+     op2 = extract32(insn, 16, 5);
+@@ -2011,7 +2012,11 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+         if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+             gen_io_start();
+         }
+-        gen_helper_exception_return(cpu_env);
++        dst = tcg_temp_new_i64();
++        tcg_gen_ld_i64(dst, cpu_env,
++                       offsetof(CPUARMState, elr_el[s->current_el]));
++        gen_helper_exception_return(cpu_env, dst);
++        tcg_temp_free_i64(dst);
+         if (tb_cflags(s->base.tb) & CF_USE_ICOUNT) {
+             gen_io_end();
+         }
 -- 
 2.17.2
