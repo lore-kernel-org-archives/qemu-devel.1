@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38143)
+Received: from eggs.gnu.org ([209.51.188.92]:47457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ggysX-00026i-Jz
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 16:25:42 -0500
+	(envelope-from <david@redhat.com>) id 1ggzd6-0007hK-Uo
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:13:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ggysW-0006rW-Na
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 16:25:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39550)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ggysW-0006ml-Hm
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 16:25:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ggysT-0003KU-Lh
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 21:25:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8E1CB2E807B
-	for <qemu-devel@nongnu.org>; Tue,  8 Jan 2019 21:25:37 +0000 (UTC)
+	(envelope-from <david@redhat.com>) id 1ggzd5-0005gx-W2
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:13:48 -0500
+References: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
+	<5a7e9130-30d1-84ad-0737-5023b718b99c@redhat.com>
+	<54bc1f9c-e997-cb1b-77cb-0dce478fafdc@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <d4599c55-2d71-e1e9-ec7a-cffbc7d06abe@redhat.com>
+Date: Tue, 8 Jan 2019 23:13:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <54bc1f9c-e997-cb1b-77cb-0dce478fafdc@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Jan 2019 21:13:43 -0000
-From: Stefan Ring <1810545@bugs.launchpad.net>
-Reply-To: Bug 1810545 <1810545@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154662609174.25797.11037697007951339169.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154698202326.24863.3273434035135112748.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1810545] Re: [alpha] Strange exception address
- reported
+Subject: Re: [Qemu-devel] [PATCH] s390x/vfio-ap: Implement hot plug/unplug
+ of vfio-ap device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,59 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Tony Krowiak <akrowiak@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, jjherne@linux.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, peter.maydell@linaro.org, rth@twiddle.net, fiuczy@linux.ibm.com
 
-Works, thanks!
+On 08.01.19 20:52, Tony Krowiak wrote:
+> On 1/8/19 11:09 AM, David Hildenbrand wrote:
+>> On 08.01.19 17:01, Tony Krowiak wrote:
+>>> Introduces hot plug/unplug support for the vfio-ap device. Note that =
+only one
+>>> vfio-ap device can be attached to the ap-bus, so a vfio-ap device can=
+ only be
+>>> hot plugged if the '-device vfio-ap,sysfsdev=3D$path_to_mdev' option =
+is not
+>>> specified on the QEMU command line.
+>>>
+>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+>>> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+>>> ---
+>>>   hw/s390x/ap-bridge.c | 12 +++++++++++-
+>>>   hw/vfio/ap.c         |  2 +-
+>>>   2 files changed, 12 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
+>>> index 3795d30dd7c9..25a03412fcb9 100644
+>>> --- a/hw/s390x/ap-bridge.c
+>>> +++ b/hw/s390x/ap-bridge.c
+>>> @@ -39,6 +39,7 @@ static const TypeInfo ap_bus_info =3D {
+>>>   void s390_init_ap(void)
+>>>   {
+>>>       DeviceState *dev;
+>>> +    BusState *bus;
+>>>  =20
+>>>       /* If no AP instructions then no need for AP bridge */
+>>>       if (!s390_has_feat(S390_FEAT_AP)) {
+>>> @@ -52,13 +53,18 @@ void s390_init_ap(void)
+>>>       qdev_init_nofail(dev);
+>>>  =20
+>>>       /* Create bus on bridge device */
+>>> -    qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
+>>> +    bus =3D qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
+>>> +
+>>> +    /* Enable hotplugging */
+>>> +    qbus_set_hotplug_handler(bus, dev, &error_abort);
+>>>    }
+>>>  =20
+>>>   static void ap_bridge_class_init(ObjectClass *oc, void *data)
+>>>   {
+>>>       DeviceClass *dc =3D DEVICE_CLASS(oc);
+>>> +    HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(oc);
+>>>  =20
+>>> +    hc->unplug =3D qdev_simple_device_unplug_cb;
+>>
+>> confused, why is there no plug action?
+>=20
+> You will find this is the case for several devices that are hot
+> pluggable.
 
--- =
+Usually missing hotplug handlers are an indication of legacy code ;)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810545
+> The plug callback is invoked after the device is
+> attached to the bus and after the device is realized. Not having
+> a hot plug callback does not preclude hot plugging of a device.
 
-Title:
-  [alpha] Strange exception address reported
+The hotplug handler is there to
 
-Status in QEMU:
-  Fix Committed
+1. Assign resources (e.g. ids etc)
+2. Notify the system (e.g. hotplug interrupt)
 
-Bug description:
-  For some reason the SIGILL handler receives a different address under
-  qemu than it used to on real hardware. I don't know specifics about
-  the hardware used back then =E2=80=93 it was some sort of 21264a somewhere
-  between 600-800 MHz =E2=80=93, and I cannot say anything about the kernel=
- as
-  well, but I know that it delivered the faulting address +4, while
-  under qemu it receives +8. I know because CACAO, an early Java JIT
-  compiler extracts the address from the SIGILL handler and inspects the
-  code at the faulting site, and it has substracted 4 from the handler
-  address since the dawn of time, and this used to produce the desired
-  result on the Alpha hardware. It actually ran on two different Alpha
-  machines over the years, and both behaved identically.
+In legacy code (e.g. PCI) such stuff is usually still located in the
+realize function (where it doesn't belong anymore but factoring out is
+hard ...)
 
-  The handler looks like this:
-  void handler_sigill(int sig, siginfo_t *siginfo, void *_p)
-  {
-    uintptr_t trap_address =3D (uintptr_t) (((ucontext_t*) _p)->uc_mcontext=
-.sc_pc) - 4;
-  }
+Looking at hw/vfio/ap.c:realize(), there isn't really anything in there.
 
-  (paraphrasing, the actual code is here: https://bitbucket.org/cacaovm
-  /cacao-
-  staging/src/c8d3fbab864c3243f97629fcfa8d84ba71f38157/src/vm/jit/alpha/lin=
-ux
-  /md-os.cpp?at=3Ddefault&fileviewer=3Dfile-view-default#md-os.cpp-65)
+So I assume that
 
-  I don't know much about the qemu source code and cannot say where this
-  is coming from at first glance. The gen_invalid function uses pc_next,
-  which sounds like the next instruction, not the next-to-next ;). In
-  theory it could actually be the kernel's fault, although I consider
-  this unlikely.
+1. No resources have to be assigned (for vfio-ap, I guess the IDs and
+such are implicit)
+2. No notification will happen. How will the guest know that a new AP
+adapter is available?
 
-  This is qemu-system-alpha with apparently the last Debian which
-  existed for Alpha (lenny). The kernel is 2.6.26-2-alpha-generic
-  (Debian 2.6.26-29). Observed with qemu git 1b3e80082b, but I guess it
-  is the same with any version.
+> I presume the purpose of the callback is to provide an opportunity
+> to do perform any additional processing that may be required to prepare
+> the device for use. In the case of the vfio-ap device, there is nothing
+> to do once the device is plugged.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810545/+subscriptions
+When removing the device, is it really a forced removal? ("simply rip it
+out without telling the guest")
+
+--=20
+
+Thanks,
+
+David / dhildenb
