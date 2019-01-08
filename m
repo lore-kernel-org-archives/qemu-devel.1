@@ -1,29 +1,39 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44597)
+Received: from eggs.gnu.org ([209.51.188.92]:45936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cdupontd@redhat.com>) id 1ggtyi-0008Pt-UP
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:11:46 -0500
+	(envelope-from <akrowiak@linux.ibm.com>) id 1ggu1Y-0001TZ-Aa
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:14:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cdupontd@redhat.com>) id 1ggtyh-00033M-TL
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:11:44 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:35552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cdupontd@redhat.com>) id 1ggtyh-0002SC-N7
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:11:43 -0500
-Received: by mail-ed1-f66.google.com with SMTP id x30so4783342edx.2
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 08:11:28 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-From: Christophe de Dinechin <cdupontd@redhat.com>
-In-Reply-To: <7a6de6a8c37161fc207f7003fc0e762045fb4028.1545806972.git.weijiang.yang@intel.com>
-Date: Tue, 8 Jan 2019 17:11:22 +0100
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <840FA547-E55B-4B91-AE92-43A6F1AF4461@redhat.com>
-References: <cover.1545806972.git.weijiang.yang@intel.com>
-	<cover.1545806972.git.weijiang.yang@intel.com>
-	<7a6de6a8c37161fc207f7003fc0e762045fb4028.1545806972.git.weijiang.yang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] Add hepler functions for CPUID xsave
- area size calculation.
+	(envelope-from <akrowiak@linux.ibm.com>) id 1ggu1V-0002JK-HK
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:14:39 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59806)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1ggu1V-00022s-2c
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:14:37 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x08G9PZB131411
+	for <qemu-devel@nongnu.org>; Tue, 8 Jan 2019 11:14:32 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pvy4t0b06-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 11:14:32 -0500
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Tue, 8 Jan 2019 16:14:31 -0000
+References: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Tue, 8 Jan 2019 11:14:26 -0500
+MIME-Version: 1.0
+In-Reply-To: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <acef92c0-d3d3-c3e4-583f-8c4e1057981e@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390x/vfio-ap: Implement hot plug/unplug
+ of vfio-ap device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +42,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Weijiang <weijiang.yang@intel.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, open list <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, yu-cheng.yu@intel.com, yi.z.zhang@intel.com, hjl.tools@gmail.com, Zhang Yi <yi.z.zhang@linux.intel.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, jjherne@linux.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, peter.maydell@linaro.org, rth@twiddle.net, fiuczy@linux.ibm.com
 
-Typo in subject line (helper)
-
-> On 26 Dec 2018, at 09:25, Yang Weijiang <weijiang.yang@intel.com> =
-wrote:
->=20
-> These functions are called when return CPUID xsave area
-> size information.
->=20
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+On 1/8/19 11:01 AM, Tony Krowiak wrote:
+> Introduces hot plug/unplug support for the vfio-ap device. Note that only one
+> vfio-ap device can be attached to the ap-bus, so a vfio-ap device can only be
+> hot plugged if the '-device vfio-ap,sysfsdev=$path_to_mdev' option is not
+> specified on the QEMU command line.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
 > ---
-> target/i386/cpu.c | 26 +++++++++++++++++++++++++-
-> 1 file changed, 25 insertions(+), 1 deletion(-)
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 3630c688d6..cf4f2798dc 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1281,12 +1281,34 @@ static inline bool accel_uses_host_cpuid(void)
->     return kvm_enabled() || hvf_enabled();
-> }
->=20
-> +static uint32_t xsave_area_size_compat(uint64_t mask)
+>   hw/s390x/ap-bridge.c | 12 +++++++++++-
+>   hw/vfio/ap.c         |  2 +-
+>   2 files changed, 12 insertions(+), 2 deletions(-)
+> 
 
-Just curious, why =E2=80=9Ccompat=E2=80=9D?
+Please note: During testing of this patch I discovered a bug whereby an
+attempt to plug in a vfio-ap device subsequent to an unplug of the
+device will result in the following error:
 
-> +{
-> +    int i;
-> +    uint64_t ret =3D 0;
-> +    uint32_t offset;
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
-> +        const ExtSaveArea *esa =3D &x86_ext_save_areas[i];
-> +        offset =3D i > 1 ? ret : esa->offset;
+error: Failed to attach device from /root/conf/vfio-ap.xml
+error: internal error: unable to execute QEMU command 'device_add': No 
+'ap-bus' bus found for device 'vfio-ap'
 
-What about a named constant instead of =E2=80=981=E2=80=99?
-
-(note that a loop around line 4657 starts at 2, so I guess it=E2=80=99s =
-OK to use 1 here, or at least >=3D 2 ;-)
-
-
-> +        if ((mask >> i) & 1) {
-> +            ret =3D MAX(ret, offset + esa->size);
-> +        }
-> +    }
-> +    return ret;
-> +}
-> +
-> static inline uint64_t x86_cpu_xsave_components(X86CPU *cpu)
-> {
->     return ((uint64_t)cpu->env.features[FEAT_XSAVE_COMP_HI]) << 32 |
->            cpu->env.features[FEAT_XSAVE_COMP_LO];
-> }
->=20
-> +static inline uint64_t x86_cpu_xsave_sv_components(X86CPU *cpu)
-> +{
-> +    return ((uint64_t)cpu->env.features[FEAT_XSAVE_SV_HI]) << 32 |
-> +           cpu->env.features[FEAT_XSAVE_SV_LO];
-> +}
-> +
-> const char *get_register_name_32(unsigned int reg)
-> {
->     if (reg >=3D CPU_NB_REGS32) {
-> @@ -4913,8 +4935,10 @@ static void =
-x86_cpu_enable_xsave_components(X86CPU *cpu)
->         }
->     }
->=20
-> -    env->features[FEAT_XSAVE_COMP_LO] =3D mask;
-> +    env->features[FEAT_XSAVE_COMP_LO] =3D mask & =
-CPUID_XSTATE_USER_MASK;
->     env->features[FEAT_XSAVE_COMP_HI] =3D mask >> 32;
-> +    env->features[FEAT_XSAVE_SV_LO] =3D mask & =
-CPUID_XSTATE_KERNEL_MASK;
-> +    env->features[FEAT_XSAVE_SV_HI] =3D mask >> 32;
-> }
->=20
-> /***** Steps involved on loading and filtering CPUID data
-> --=20
-> 2.17.1
->=20
+I wrote a patch for this bug:
+Message ID: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
