@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43533)
+Received: from eggs.gnu.org ([209.51.188.92]:45604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ggf4K-00081U-EF
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:16:34 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1ggfBw-00049F-Jv
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:24:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ggf4H-00082h-CA
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:16:32 -0500
-Date: Tue, 8 Jan 2019 11:08:23 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190108000823.GH13339@umbus.fritz.box>
-References: <20190107193020.21744-1-ehabkost@redhat.com>
-	<20190107193020.21744-3-ehabkost@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1ggfBv-0004aJ-7i
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:24:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1ggfBu-0004R1-UT
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:24:23 -0500
+Date: Mon, 7 Jan 2019 17:24:15 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190107172415.2f723149@x1.home>
+In-Reply-To: <20190107191044-mutt-send-email-mst@kernel.org>
+References: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
+	<1546900184-27403-5-git-send-email-venu.busireddy@oracle.com>
+	<20190107161717.4648aba2@x1.home>
+	<20190107182115-mutt-send-email-mst@kernel.org>
+	<20190107164115.6daffe19@x1.home>
+	<20190107191044-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ik0NlRzMGhMnxrMX"
-Content-Disposition: inline
-In-Reply-To: <20190107193020.21744-3-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] machine: Eliminate unnecessary
- stringify() usage
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] vfio-pci: Add
+ FAILOVER_PRIMARY_CHANGED event to shorten downtime during failover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,500 +33,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Anthony Perard <anthony.perard@citrix.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, xen-devel@lists.xenproject.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
+On Mon, 7 Jan 2019 19:12:06 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
---ik0NlRzMGhMnxrMX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Mon, Jan 07, 2019 at 04:41:15PM -0700, Alex Williamson wrote:
+> > On Mon, 7 Jan 2019 18:22:20 -0500
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Mon, Jan 07, 2019 at 04:17:17PM -0700, Alex Williamson wrote:  
+> > > > On Mon,  7 Jan 2019 17:29:43 -0500
+> > > > Venu Busireddy <venu.busireddy@oracle.com> wrote:
+> > > >     
+> > > > > From: Si-Wei Liu <si-wei.liu@oracle.com>
+> > > > > 
+> > > > > When a VF is hotplugged into the guest, datapath switching will be
+> > > > > performed immediately, which is sub-optimal in terms of timing, and
+> > > > > could end up with substantial network downtime. One of ways to shorten
+> > > > > this downtime is to switch the datapath only after the VF is seen to get
+> > > > > enabled by guest, indicated by the bus master bit in VF's PCI config
+> > > > > space getting enabled. The FAILOVER_PRIMARY_CHANGED event is emitted
+> > > > > at that time to indicate this condition. Then management stack can kick
+> > > > > off datapath switching upon receiving the event.
+> > > > > 
+> > > > > Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
+> > > > > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+> > > > > ---
+> > > > >  hw/vfio/pci.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > > > >  qapi/net.json | 26 ++++++++++++++++++++++++++
+> > > > >  2 files changed, 83 insertions(+)    
+> > > > 
+> > > > Why is this done at the vfio driver layer rather than the PCI core
+> > > > layer?  We write everything through using pci_default_write_config(), I
+> > > > don't see that anything here is particularly vfio specific.  Please copy
+> > > > me on any changes in hw/vfio.  Thanks,
+> > > > 
+> > > > Alex    
+> > > 
+> > > Hmm so you are saying let's send events for each device?
+> > > I don't have a problem with this but in this case
+> > > I think I would like to see a per-device option "send events".
+> > > We don't want a ton of events in the simple default config.  
+> > 
+> > In the below we're only sending events for PCIDevice.failover_primary,  
+> 
+> Well failover_primary in this patch is a vfio property, not a
+> pci device property.
 
-On Mon, Jan 07, 2019 at 05:30:19PM -0200, Eduardo Habkost wrote:
-> stringify() is useful when we need to use macros in compat_props
-> (like when we set virtio-baloon-pci.class=3DPCI_CLASS_MEMORY_RAM at
-> pc_i440fx_1_0_machine_options()), but it is pointless when we are
-> already providing a number literal.
->=20
-> Replace stringify() with string literals when appropriate.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+It's both and it's kind of a kludge (from 2/5):
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -3077,6 +3077,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
++    pdev->failover_primary = vdev->failover_primary;
+ 
+     return;
+ 
+@@ -3219,6 +3220,8 @@ static Property vfio_pci_dev_properties[] = {
+                                    qdev_prop_nv_gpudirect_clique, uint8_t),
+     DEFINE_PROP_OFF_AUTO_PCIBAR("x-msix-relocation", VFIOPCIDevice, msix_relo,
+                                 OFF_AUTOPCIBAR_OFF),
++    DEFINE_PROP_BOOL("failover-primary", VFIOPCIDevice, failover_primary,
++                     false),
+     /*
+      * TODO - support passed fds... is this necessary?
+      * DEFINE_PROP_STRING("vfiofd", VFIOPCIDevice, vfiofd_name),
 
-> ---
->  hw/core/machine.c |  8 ++--
->  hw/i386/pc.c      | 94 +++++++++++++++++++++++------------------------
->  hw/i386/pc_piix.c | 30 +++++++--------
->  hw/ppc/spapr.c    |  2 +-
->  4 files changed, 67 insertions(+), 67 deletions(-)
->=20
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index f8563efb86..4b4d6c23de 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -135,11 +135,11 @@ GlobalProperty hw_compat_2_8[] =3D {
->      {
->          .driver   =3D "fw_cfg_mem",
->          .property =3D "x-file-slots",
-> -        .value    =3D stringify(0x10),
-> +        .value    =3D "0x10",
->      },{
->          .driver   =3D "fw_cfg_io",
->          .property =3D "x-file-slots",
-> -        .value    =3D stringify(0x10),
-> +        .value    =3D "0x10",
->      },{
->          .driver   =3D "pflash_cfi01",
->          .property =3D "old-multiple-chip-handling",
-> @@ -337,11 +337,11 @@ GlobalProperty hw_compat_2_1[] =3D {
->      },{
->          .driver   =3D "usb-mouse",
->          .property =3D "usb_version",
-> -        .value    =3D stringify(1),
-> +        .value    =3D "1",
->      },{
->          .driver   =3D "usb-kbd",
->          .property =3D "usb_version",
-> -        .value    =3D stringify(1),
-> +        .value    =3D "1",
->      },{
->          .driver   =3D "virtio-pci",
->          .property =3D "virtio-pci-bus-master-bug-migration",
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 4952feb476..ff14b6d4df 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -148,11 +148,11 @@ GlobalProperty pc_compat_2_12[] =3D {
->      },{
->          .driver   =3D "EPYC-" TYPE_X86_CPU,
->          .property =3D "xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "EPYC-IBPB-" TYPE_X86_CPU,
->          .property =3D "xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },
->  };
->  const size_t pc_compat_2_12_len =3D G_N_ELEMENTS(pc_compat_2_12);
-> @@ -191,7 +191,7 @@ GlobalProperty pc_compat_2_9[] =3D {
->      {
->          .driver   =3D "mch",
->          .property =3D "extended-tseg-mbytes",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },
->  };
->  const size_t pc_compat_2_9_len =3D G_N_ELEMENTS(pc_compat_2_9);
-> @@ -365,75 +365,75 @@ GlobalProperty pc_compat_2_3[] =3D {
->      },{
->          .driver   =3D "qemu64" "-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(4),
-> +        .value    =3D "4",
->      },{
->          .driver   =3D "kvm64" "-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(5),
-> +        .value    =3D "5",
->      },{
->          .driver   =3D "pentium3" "-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(2),
-> +        .value    =3D "2",
->      },{
->          .driver   =3D "n270" "-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(5),
-> +        .value    =3D "5",
->      },{
->          .driver   =3D "Conroe" "-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(4),
-> +        .value    =3D "4",
->      },{
->          .driver   =3D "Penryn" "-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(4),
-> +        .value    =3D "4",
->      },{
->          .driver   =3D "Nehalem" "-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(4),
-> +        .value    =3D "4",
->      },{
->          .driver   =3D "n270" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "Penryn" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "Conroe" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "Nehalem" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "Westmere" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "SandyBridge" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "IvyBridge" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "Haswell" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "Haswell-noTSX" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "Broadwell" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver   =3D "Broadwell-noTSX" "-" TYPE_X86_CPU,
->          .property =3D "min-xlevel",
-> -        .value    =3D stringify(0x8000000a),
-> +        .value    =3D "0x8000000a",
->      },{
->          .driver =3D TYPE_X86_CPU,
->          .property =3D "kvm-no-smi-migration",
-> @@ -566,7 +566,7 @@ GlobalProperty pc_compat_2_0[] =3D {
->      {
->          .driver   =3D "apic",
->          .property =3D "version",
-> -        .value    =3D stringify(0x11),
-> +        .value    =3D "0x11",
->      },
->      {
->          .driver   =3D "nec-usb-xhci",
-> @@ -581,17 +581,17 @@ GlobalProperty pc_compat_2_0[] =3D {
->      {
->          .driver   =3D "pci-serial",
->          .property =3D "prog_if",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },
->      {
->          .driver   =3D "pci-serial-2x",
->          .property =3D "prog_if",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },
->      {
->          .driver   =3D "pci-serial-4x",
->          .property =3D "prog_if",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },
->      {
->          .driver   =3D "virtio-net-pci",
-> @@ -629,7 +629,7 @@ GlobalProperty pc_compat_1_7[] =3D {
->      {
->          .driver   =3D "hpet",
->          .property =3D HPET_INTCAP,
-> -        .value    =3D stringify(4),
-> +        .value    =3D "4",
->      },
->  };
->  const size_t pc_compat_1_7_len =3D G_N_ELEMENTS(pc_compat_1_7);
-> @@ -643,19 +643,19 @@ GlobalProperty pc_compat_1_6[] =3D {
->      },{
->          .driver   =3D "qemu64-" TYPE_X86_CPU,
->          .property =3D "model",
-> -        .value    =3D stringify(2),
-> +        .value    =3D "2",
->      },{
->          .driver   =3D "qemu32-" TYPE_X86_CPU,
->          .property =3D "model",
-> -        .value    =3D stringify(3),
-> +        .value    =3D "3",
->      },{
->          .driver   =3D "i440FX-pcihost",
->          .property =3D "short_root_bus",
-> -        .value    =3D stringify(1),
-> +        .value    =3D "1",
->      },{
->          .driver   =3D "q35-pcihost",
->          .property =3D "short_root_bus",
-> -        .value    =3D stringify(1),
-> +        .value    =3D "1",
->      },
->  };
->  const size_t pc_compat_1_6_len =3D G_N_ELEMENTS(pc_compat_1_6);
-> @@ -665,27 +665,27 @@ GlobalProperty pc_compat_1_5[] =3D {
->      {
->          .driver   =3D "Conroe-" TYPE_X86_CPU,
->          .property =3D "model",
-> -        .value    =3D stringify(2),
-> +        .value    =3D "2",
->      },{
->          .driver   =3D "Conroe-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(2),
-> +        .value    =3D "2",
->      },{
->          .driver   =3D "Penryn-" TYPE_X86_CPU,
->          .property =3D "model",
-> -        .value    =3D stringify(2),
-> +        .value    =3D "2",
->      },{
->          .driver   =3D "Penryn-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(2),
-> +        .value    =3D "2",
->      },{
->          .driver   =3D "Nehalem-" TYPE_X86_CPU,
->          .property =3D "model",
-> -        .value    =3D stringify(2),
-> +        .value    =3D "2",
->      },{
->          .driver   =3D "Nehalem-" TYPE_X86_CPU,
->          .property =3D "min-level",
-> -        .value    =3D stringify(2),
-> +        .value    =3D "2",
->      },{
->          .driver   =3D "virtio-net-pci",
->          .property =3D "any_layout",
-> @@ -697,11 +697,11 @@ GlobalProperty pc_compat_1_5[] =3D {
->      },{
->          .driver   =3D "i440FX-pcihost",
->          .property =3D "short_root_bus",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },{
->          .driver   =3D "q35-pcihost",
->          .property =3D "short_root_bus",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },
->  };
->  const size_t pc_compat_1_5_len =3D G_N_ELEMENTS(pc_compat_1_5);
-> @@ -711,36 +711,36 @@ GlobalProperty pc_compat_1_4[] =3D {
->      {
->          .driver   =3D "scsi-hd",
->          .property =3D "discard_granularity",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },{
->          .driver   =3D "scsi-cd",
->          .property =3D "discard_granularity",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },{
->          .driver   =3D "scsi-disk",
->          .property =3D "discard_granularity",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },{
->          .driver   =3D "ide-hd",
->          .property =3D "discard_granularity",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },{
->          .driver   =3D "ide-cd",
->          .property =3D "discard_granularity",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },{
->          .driver   =3D "ide-drive",
->          .property =3D "discard_granularity",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },{
->          .driver   =3D "virtio-blk-pci",
->          .property =3D "discard_granularity",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },{
->          .driver   =3D "virtio-serial-pci",
->          .property =3D "vectors",
->          /* DEV_NVECTORS_UNSPECIFIED as a uint32_t string */
-> -        .value    =3D stringify(0xFFFFFFFF),
-> +        .value    =3D "0xFFFFFFFF",
->      },{
->          .driver   =3D "virtio-net-pci",
->          .property =3D "ctrl_guest_offloads",
-> @@ -768,7 +768,7 @@ GlobalProperty pc_compat_1_4[] =3D {
->      },{
->          .driver   =3D "486-" TYPE_X86_CPU,
->          .property =3D "model",
-> -        .value    =3D stringify(0),
-> +        .value    =3D "0",
->      },
->      {
->          .driver =3D "n270" "-" TYPE_X86_CPU,
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index ed6984638e..fd20227af3 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -697,7 +697,7 @@ static void pc_i440fx_1_3_machine_options(MachineClas=
-s *m)
->          {
->              .driver   =3D "usb-tablet",
->              .property =3D "usb_version",
-> -            .value    =3D stringify(1),
-> +            .value    =3D "1",
->          },{
->              .driver   =3D "virtio-net-pci",
->              .property =3D "ctrl_mac_addr",
-> @@ -741,11 +741,11 @@ static void pc_i440fx_1_2_machine_options(MachineCl=
-ass *m)
->          },{
->              .driver   =3D "qxl",
->              .property =3D "revision",
-> -            .value    =3D stringify(3),
-> +            .value    =3D "3",
->          },{
->              .driver   =3D "qxl-vga",
->              .property =3D "revision",
-> -            .value    =3D stringify(3),
-> +            .value    =3D "3",
->          },{
->              .driver   =3D "VGA",
->              .property =3D "mmio",
-> @@ -777,19 +777,19 @@ static void pc_i440fx_1_1_machine_options(MachineCl=
-ass *m)
->          },{
->              .driver   =3D "VGA",
->              .property =3D "vgamem_mb",
-> -            .value    =3D stringify(8),
-> +            .value    =3D "8",
->          },{
->              .driver   =3D "vmware-svga",
->              .property =3D "vgamem_mb",
-> -            .value    =3D stringify(8),
-> +            .value    =3D "8",
->          },{
->              .driver   =3D "qxl-vga",
->              .property =3D "vgamem_mb",
-> -            .value    =3D stringify(8),
-> +            .value    =3D "8",
->          },{
->              .driver   =3D "qxl",
->              .property =3D "vgamem_mb",
-> -            .value    =3D stringify(8),
-> +            .value    =3D "8",
->          },{
->              .driver   =3D "virtio-blk-pci",
->              .property =3D "config-wce",
-> @@ -876,11 +876,11 @@ static void pc_i440fx_0_14_machine_options(MachineC=
-lass *m)
->          },{
->              .driver   =3D "qxl",
->              .property =3D "revision",
-> -            .value    =3D stringify(2),
-> +            .value    =3D "2",
->          },{
->              .driver   =3D "qxl-vga",
->              .property =3D "revision",
-> -            .value    =3D stringify(2),
-> +            .value    =3D "2",
->          },
->      };
-> =20
-> @@ -904,19 +904,19 @@ static void pc_i440fx_0_13_machine_options(MachineC=
-lass *m)
->          },{
->              .driver   =3D "AC97",
->              .property =3D "use_broken_id",
-> -            .value    =3D stringify(1),
-> +            .value    =3D "1",
->          },{
->              .driver   =3D "virtio-9p-pci",
->              .property =3D "vectors",
-> -            .value    =3D stringify(0),
-> +            .value    =3D "0",
->          },{
->              .driver   =3D "VGA",
->              .property =3D "rombar",
-> -            .value    =3D stringify(0),
-> +            .value    =3D "0",
->          },{
->              .driver   =3D "vmware-svga",
->              .property =3D "rombar",
-> -            .value    =3D stringify(0),
-> +            .value    =3D "0",
->          },
->      };
-> =20
-> @@ -936,11 +936,11 @@ static void pc_i440fx_0_12_machine_options(MachineC=
-lass *m)
->          {
->              .driver   =3D "virtio-serial-pci",
->              .property =3D "max_ports",
-> -            .value    =3D stringify(1),
-> +            .value    =3D "1",
->          },{
->              .driver   =3D "virtio-serial-pci",
->              .property =3D "vectors",
-> -            .value    =3D stringify(0),
-> +            .value    =3D "0",
->          },{
->              .driver   =3D "usb-mouse",
->              .property =3D "serial",
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index bff42f0adb..d7d87b0ae8 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4264,7 +4264,7 @@ static void spapr_machine_2_6_class_options(Machine=
-Class *mc)
->          {
->              .driver   =3D TYPE_SPAPR_PCI_HOST_BRIDGE,
->              .property =3D "ddw",
-> -            .value    =3D stringify(off),
-> +            .value    =3D "off",
->          },
->      };
-> =20
+The property could have set VFIOPCIDevice.pdev.failover_primary
+directly.  I'm not thrilled about that name either, it's a very NIC
+centric property whereas vfio-pci supports plenty of non-networking
+devices, as of course does PCIDevice.  Maybe the concept needs to be
+more general or the name needs to be more NIC specific and fail for
+devices that don't have the correct class code.  Thanks,
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Alex
 
---ik0NlRzMGhMnxrMX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlwz6fcACgkQbDjKyiDZ
-s5JihA/+MMEu2dLoAvJEtlAd7YcOMqsA/ZxiiILBfqMC8PMEzRHvkCZvnZyS0e3h
-PWPUZBwOYqBJnF8XnTn2oinl2L59vKBZgxAMhwEVh+VIlHrVtnlV/H/o+E9RXvG0
-6O6KboBBGuedUi2+LgIIA+MOdELJOQclNXUm1BbR3awX7R2mQZ0vPN/KrV31U6Fc
-HSZSpKJIsXDJ0LWuxXCJSyfxJnPS9hNNMqnouLjZp1GZr8vavrDrddVHTUKqfWnJ
-3FdDMtkfhAQstNTakfIf8g3nWxtrEfWqg3dU1uNQ299ZJqF7MpVFcaN6LX+jdrxU
-n1Y/C7OY4FVRe9xN8urVKG/r/T2afuaGYb0fimIVD+xbvznrAT23PN3wg/T+vZUt
-yXH8cNDsfStTChSe28YqmybhMgDspQJq3wo/M2ZYg2khF8z+BiczdMGrDygfqfE9
-9cu8Yzlv39BnVeDEcgXS2fILXlmBz7grv7r5l0FlbZVcZ+zZR5CQa/HvxsTkzyGq
-//cJMtuXQkpGjK22sA7OOAqOfdywJFQie1P1z07LWhDVSfkAMCAmGUQfaXC7+RlM
-vAo7hJ9gKsDN7D7gufr/9+WdNskz6tpCMxvyC1N4EoT2AItbhcU2p8ivv1PV7Yj8
-NI3nI1vWIRCcDWY2uQLu8FirGiA/gzDB6j21eMoxxWnFGkkqKhE=
-=ibsj
------END PGP SIGNATURE-----
-
---ik0NlRzMGhMnxrMX--
+> > seems like that would filter out the rest of the non-NIC PCI devices as
+> > well as it does for non-NIC VFIO PCI devices.  The only thing remotely
+> > vfio specific below is that it might notify based on the vfio device
+> > name, but it's a fallback to PCIDevice.qdev.id.  A real ID could just
+> > be a requirement to make use of this.  
+> 
+> 
+> Right and in fact I don't see why we can't make reporting
+> bus master status a capability of all devices.
+> 
+> 
+> >  Thanks,
+> > 
+> > Alex
+> >   
+> > > > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > > > > index bd83b58..adcc95a 100644
+> > > > > --- a/hw/vfio/pci.c
+> > > > > +++ b/hw/vfio/pci.c
+> > > > > @@ -34,6 +34,7 @@
+> > > > >  #include "pci.h"
+> > > > >  #include "trace.h"
+> > > > >  #include "qapi/error.h"
+> > > > > +#include "qapi/qapi-events-net.h"
+> > > > >  
+> > > > >  #define MSIX_CAP_LENGTH 12
+> > > > >  
+> > > > > @@ -42,6 +43,7 @@
+> > > > >  
+> > > > >  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+> > > > >  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+> > > > > +static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status);
+> > > > >  
+> > > > >  /*
+> > > > >   * Disabling BAR mmaping can be slow, but toggling it around INTx can
+> > > > > @@ -1170,6 +1172,8 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> > > > >  {
+> > > > >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> > > > >      uint32_t val_le = cpu_to_le32(val);
+> > > > > +    bool may_notify = false;
+> > > > > +    bool master_was = false;
+> > > > >  
+> > > > >      trace_vfio_pci_write_config(vdev->vbasedev.name, addr, val, len);
+> > > > >  
+> > > > > @@ -1180,6 +1184,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> > > > >                       __func__, vdev->vbasedev.name, addr, val, len);
+> > > > >      }
+> > > > >  
+> > > > > +    /* Bus Master Enabling/Disabling */
+> > > > > +    if (pdev->failover_primary && current_cpu &&
+> > > > > +        range_covers_byte(addr, len, PCI_COMMAND)) {
+> > > > > +        master_was = !!(pci_get_word(pdev->config + PCI_COMMAND) &
+> > > > > +                        PCI_COMMAND_MASTER);
+> > > > > +        may_notify = true;
+> > > > > +    }
+> > > > > +
+> > > > >      /* MSI/MSI-X Enabling/Disabling */
+> > > > >      if (pdev->cap_present & QEMU_PCI_CAP_MSI &&
+> > > > >          ranges_overlap(addr, len, pdev->msi_cap, vdev->msi_cap_size)) {
+> > > > > @@ -1235,6 +1247,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> > > > >          /* Write everything to QEMU to keep emulated bits correct */
+> > > > >          pci_default_write_config(pdev, addr, val, len);
+> > > > >      }
+> > > > > +
+> > > > > +    if (may_notify) {
+> > > > > +        bool master_now = !!(pci_get_word(pdev->config + PCI_COMMAND) &
+> > > > > +                             PCI_COMMAND_MASTER);
+> > > > > +        if (master_was != master_now) {
+> > > > > +            vfio_failover_notify(vdev, master_now);
+> > > > > +        }
+> > > > > +    }
+> > > > >  }
+> > > > >  
+> > > > >  /*
+> > > > > @@ -2801,6 +2821,17 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+> > > > >      vdev->req_enabled = false;
+> > > > >  }
+> > > > >  
+> > > > > +static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status)
+> > > > > +{
+> > > > > +    PCIDevice *pdev = &vdev->pdev;
+> > > > > +    const char *n;
+> > > > > +    gchar *path;
+> > > > > +
+> > > > > +    n = pdev->qdev.id ? pdev->qdev.id : vdev->vbasedev.name;
+> > > > > +    path = object_get_canonical_path(OBJECT(vdev));
+> > > > > +    qapi_event_send_failover_primary_changed(!!n, n, path, status);
+> > > > > +}
+> > > > > +
+> > > > >  static void vfio_realize(PCIDevice *pdev, Error **errp)
+> > > > >  {
+> > > > >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> > > > > @@ -3109,10 +3140,36 @@ static void vfio_instance_finalize(Object *obj)
+> > > > >      vfio_put_group(group);
+> > > > >  }
+> > > > >  
+> > > > > +static void vfio_exit_failover_notify(VFIOPCIDevice *vdev)
+> > > > > +{
+> > > > > +    PCIDevice *pdev = &vdev->pdev;
+> > > > > +
+> > > > > +    /*
+> > > > > +     * Guest driver may not get the chance to disable bus mastering
+> > > > > +     * before the device object gets to be unrealized. In that event,
+> > > > > +     * send out a "disabled" notification on behalf of guest driver.
+> > > > > +     */
+> > > > > +    if (pdev->failover_primary &&
+> > > > > +        pdev->bus_master_enable_region.enabled) {
+> > > > > +        vfio_failover_notify(vdev, false);
+> > > > > +    }
+> > > > > +}
+> > > > > +
+> > > > >  static void vfio_exitfn(PCIDevice *pdev)
+> > > > >  {
+> > > > >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> > > > >  
+> > > > > +    /*
+> > > > > +     * During the guest reboot sequence, it is sometimes possible that
+> > > > > +     * the guest may not get sufficient time to complete the entire driver
+> > > > > +     * removal sequence, near the end of which a PCI config space write to
+> > > > > +     * disable bus mastering can be intercepted by device. In such cases,
+> > > > > +     * the FAILOVER_PRIMARY_CHANGED "disable" event will not be emitted. It
+> > > > > +     * is imperative to generate the event on the guest's behalf if the
+> > > > > +     * guest fails to make it.
+> > > > > +     */
+> > > > > +    vfio_exit_failover_notify(vdev);
+> > > > > +
+> > > > >      vfio_unregister_req_notifier(vdev);
+> > > > >      vfio_unregister_err_notifier(vdev);
+> > > > >      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+> > > > > diff --git a/qapi/net.json b/qapi/net.json
+> > > > > index 633ac87..a5b8d70 100644
+> > > > > --- a/qapi/net.json
+> > > > > +++ b/qapi/net.json
+> > > > > @@ -757,3 +757,29 @@
+> > > > >  ##
+> > > > >  { 'command': 'query-standby-status', 'data': { '*device': 'str' },
+> > > > >    'returns': ['StandbyStatusInfo'] }
+> > > > > +
+> > > > > +##
+> > > > > +# @FAILOVER_PRIMARY_CHANGED:
+> > > > > +#
+> > > > > +# Emitted whenever the driver of failover primary is loaded or unloaded
+> > > > > +# by the guest.
+> > > > > +#
+> > > > > +# @device: device name
+> > > > > +#
+> > > > > +# @path: device path
+> > > > > +#
+> > > > > +# @enabled: true if driver is loaded thus device is enabled in guest
+> > > > > +#
+> > > > > +# Since: 3.0
+> > > > > +#
+> > > > > +# Example:
+> > > > > +#
+> > > > > +# <- { "event": "FAILOVER_PRIMARY_CHANGED",
+> > > > > +#      "data": { "device": "vfio-0",
+> > > > > +#                "path": "/machine/peripheral/vfio-0" },
+> > > > > +#                "enabled": "true" },
+> > > > > +#      "timestamp": { "seconds": 1539935213, "microseconds": 753529 } }
+> > > > > +#
+> > > > > +##
+> > > > > +{ 'event': 'FAILOVER_PRIMARY_CHANGED',
+> > > > > +  'data': { '*device': 'str', 'path': 'str', 'enabled': 'bool' } }
+> > > > >     
