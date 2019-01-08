@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37740)
+Received: from eggs.gnu.org ([209.51.188.92]:38362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ggr5B-0004bd-RF
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:06:14 -0500
+	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
+	id 1ggr6t-0005EI-0v
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:08:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ggr58-0002gV-RO
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:06:12 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:38417)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ggr54-0002E3-TJ
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:06:10 -0500
-Received: by mail-qt1-f196.google.com with SMTP id p17so4220463qtl.5
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 05:06:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20190108130219.18550-1-arilou@gmail.com>
-In-Reply-To: <20190108130219.18550-1-arilou@gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Tue, 8 Jan 2019 17:05:46 +0400
-Message-ID: <CAMxuvayU-0nLmcMs3zWF61Y5GT9u8AtaZtZApdbYaDDDoCti=A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
+	id 1ggr6r-00073E-VW
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:07:59 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 8 Jan 2019 13:07:49 +0000
+Message-ID: <904d305f8c0f4aac8e60fb7ea14ebd41@AMSPEX02CL03.citrite.net>
+References: <20181220171439.11159-1-paul.durrant@citrix.com>
+	<20181220171439.11159-17-paul.durrant@citrix.com>
+	<20190104163124.GE1508@perard.uk.xensource.com>
+	<da727b0b8a9a4f9baa47a660298a9cba@AMSPEX02CL03.citrite.net>
+	<20190108125321.GD11492@linux.fritz.box>
+In-Reply-To: <20190108125321.GD11492@linux.fritz.box>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] dump: Set correct vaddr for ELF dump
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v7 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jon Doron <arilou@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
+To: 'Kevin Wolf' <kwolf@redhat.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-On Tue, Jan 8, 2019 at 5:02 PM Jon Doron <arilou@gmail.com> wrote:
->
-> vaddr needs to be equal to the paddr since the dump file represents the
-> physical memory image.
->
-> Without setting vaddr correctly, GDB would load all the different memory
-> regions on top of each other to vaddr 0, thus making GDB showing the wron=
-g
-> memory data for a given address.
->
-> Signed-off-by: Jon Doron <arilou@gmail.com>
+> -----Original Message-----
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Sent: 08 January 2019 12:53
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: Anthony Perard <anthony.perard@citrix.com>; qemu-devel@nongnu.org;
+> qemu-block@nongnu.org; xen-devel@lists.xenproject.org; Max Reitz
+> <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> Subject: Re: [PATCH v7 16/18] xen: automatically create XenBlockDevice-s
+>=20
+> Am 04.01.2019 um 17:40 hat Paul Durrant geschrieben:
+> > > -----Original Message-----
+> > > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > > Sent: 04 January 2019 16:31
+> > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> > > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
+> > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> > > Subject: Re: [PATCH v7 16/18] xen: automatically create
+> XenBlockDevice-s
+> > >
+> > > Almost done, there is one thing left which I believe is an issue.
+> > > Whenever I attach a raw file to QEMU, it print:
+> > >     qemu-system-i386: warning: Opening a block device as a file using
+> the
+> > > 'file' driver is deprecated
+> >
+> > Oh, I'd not noticed that... but then I only use raw files occasionally.
+>=20
+> Strictly speaking, this is not about raw (regular) files, but raw block
+> devices. 'file' is fine for actual regular files, but the protocol
+> driver for block devices is 'host_device'.
+>=20
+> > > raw files should use the "raw" driver, so we aren't done yet.
+> >
+> > Ok. Having a strictly 2-layer stack actually makes things simpler anywa=
+y
+> :-)
+>=20
+> Using 'raw' there will make the block layer auto-detect the right
+> protocol layer, so this works. If you want to avoid the second layer,
+> you'd have to figure out manually whether to use 'file' or
+> 'host_device'.
 
-Not sure we are doing everything correctly, but solves the non-paging
-GDB case, so:
+Thanks for the explanation. I'll give it a spin using a device... I've post=
+ed v8 but, given what you say, I'm still not sure I have it right.
 
-Tested-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+  Paul
 
-> ---
->  dump.c                       | 5 +++--
->  scripts/dump-guest-memory.py | 1 +
->  2 files changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/dump.c b/dump.c
-> index 4ec94c5e25..7a56e254d4 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -192,7 +192,7 @@ static void write_elf64_load(DumpState *s, MemoryMapp=
-ing *memory_mapping,
->      phdr.p_paddr =3D cpu_to_dump64(s, memory_mapping->phys_addr);
->      phdr.p_filesz =3D cpu_to_dump64(s, filesz);
->      phdr.p_memsz =3D cpu_to_dump64(s, memory_mapping->length);
-> -    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr);
-> +    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr) ? : phd=
-r.p_paddr;
->
->      assert(memory_mapping->length >=3D filesz);
->
-> @@ -216,7 +216,8 @@ static void write_elf32_load(DumpState *s, MemoryMapp=
-ing *memory_mapping,
->      phdr.p_paddr =3D cpu_to_dump32(s, memory_mapping->phys_addr);
->      phdr.p_filesz =3D cpu_to_dump32(s, filesz);
->      phdr.p_memsz =3D cpu_to_dump32(s, memory_mapping->length);
-> -    phdr.p_vaddr =3D cpu_to_dump32(s, memory_mapping->virt_addr);
-> +    phdr.p_vaddr =3D
-> +               cpu_to_dump32(s, memory_mapping->virt_addr) ? : phdr.p_pa=
-ddr;
->
->      assert(memory_mapping->length >=3D filesz);
->
-> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-> index 198cd0fe40..2c587cbefc 100644
-> --- a/scripts/dump-guest-memory.py
-> +++ b/scripts/dump-guest-memory.py
-> @@ -163,6 +163,7 @@ class ELF(object):
->          phdr =3D get_arch_phdr(self.endianness, self.elfclass)
->          phdr.p_type =3D p_type
->          phdr.p_paddr =3D p_paddr
-> +        phdr.p_vaddr =3D p_paddr
->          phdr.p_filesz =3D p_size
->          phdr.p_memsz =3D p_size
->          self.segments.append(phdr)
-> --
-> 2.19.2
->
+>=20
+> Kevin
