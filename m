@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48653)
+Received: from eggs.gnu.org ([209.51.188.92]:48973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggqIO-0004KE-CC
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:15:50 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ggqJB-0004kt-Fd
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:16:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggqIM-0004OL-SB
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:15:48 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45105)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1ggqIM-0004Kq-G2
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:15:46 -0500
-Received: by mail-oi1-x242.google.com with SMTP id y1so3082407oie.12
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 04:15:45 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1ggqJA-0005oF-ME
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:16:37 -0500
+Date: Tue, 8 Jan 2019 13:16:25 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190108121625.GA11492@linux.fritz.box>
+References: <20190103094728.31747-1-rjones@redhat.com>
+	<20190103094728.31747-2-rjones@redhat.com>
+	<cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
+	<741a5843-a47a-6a02-c378-b778f7ffe172@redhat.com>
+	<f5aa2057-509b-28fa-d803-b18ca525ae73@redhat.com>
+	<20190107184058.GN27120@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1546533252-26601-2-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1546533252-26601-2-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 8 Jan 2019 13:15:43 +0100
-Message-ID: <CAL1e-=h7Pp3mBbxSY=NML_11FwqfzgZ7NXcCfHpU7TJKrQhKog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/8] target/mips: Move comment containing
- summary of CP0 registers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190107184058.GN27120@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: Reinitialize optind to 1 (not
+ 0) before parsing inner command.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,222 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "smarkovic@wavecomp.com" <smarkovic@wavecomp.com>, "arikalo@wavecomp.com" <arikalo@wavecomp.com>, "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Thursday, January 3, 2019, Aleksandar Markovic <
-aleksandar.markovic@rt-rk.com> wrote:
-
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> Move comment containing summary of CP0 registers. Checkpatch
-> script reported some tabs in the resutling diff, so convert
-> these tabs to spaces too.
->
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  target/mips/cpu.h | 165 +++++++++++++++++++++++++++---
-> ------------------------
->  1 file changed, 84 insertions(+), 81 deletions(-)
->
->
-My original intention was moving a comment some 80 lines upwards, but git
-interpreted that I wanted to move these 80 lines below the comment - hence
-such strange diff, where no comment in question can be seen. The net result
-is same, I don't have objection about that, except that it is very unclear
-to reviewers.
-
-Aleksandaer
-
-
-
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 03c03fd..6c2a7e4 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -123,87 +123,6 @@ typedef struct mips_def_t mips_def_t;
->  #define MIPS_KSCRATCH_NUM 6
->  #define MIPS_MAAR_MAX 16 /* Must be an even number. */
->
-> -typedef struct TCState TCState;
-> -struct TCState {
-> -    target_ulong gpr[32];
-> -    target_ulong PC;
-> -    target_ulong HI[MIPS_DSP_ACC];
-> -    target_ulong LO[MIPS_DSP_ACC];
-> -    target_ulong ACX[MIPS_DSP_ACC];
-> -    target_ulong DSPControl;
-> -    int32_t CP0_TCStatus;
-> -#define CP0TCSt_TCU3   31
-> -#define CP0TCSt_TCU2   30
-> -#define CP0TCSt_TCU1   29
-> -#define CP0TCSt_TCU0   28
-> -#define CP0TCSt_TMX    27
-> -#define CP0TCSt_RNST   23
-> -#define CP0TCSt_TDS    21
-> -#define CP0TCSt_DT     20
-> -#define CP0TCSt_DA     15
-> -#define CP0TCSt_A      13
-> -#define CP0TCSt_TKSU   11
-> -#define CP0TCSt_IXMT   10
-> -#define CP0TCSt_TASID  0
-> -    int32_t CP0_TCBind;
-> -#define CP0TCBd_CurTC  21
-> -#define CP0TCBd_TBE    17
-> -#define CP0TCBd_CurVPE 0
-> -    target_ulong CP0_TCHalt;
-> -    target_ulong CP0_TCContext;
-> -    target_ulong CP0_TCSchedule;
-> -    target_ulong CP0_TCScheFBack;
-> -    int32_t CP0_Debug_tcstatus;
-> -    target_ulong CP0_UserLocal;
-> -
-> -    int32_t msacsr;
-> -
-> -#define MSACSR_FS       24
-> -#define MSACSR_FS_MASK  (1 << MSACSR_FS)
-> -#define MSACSR_NX       18
-> -#define MSACSR_NX_MASK  (1 << MSACSR_NX)
-> -#define MSACSR_CEF      2
-> -#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
-> -#define MSACSR_RM       0
-> -#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
-> -#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK |
-> MSACSR_NX_MASK | \
-> -        MSACSR_FS_MASK)
-> -
-> -    float_status msa_fp_status;
-> -
-> -#define NUMBER_OF_MXU_REGISTERS 16
-> -    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
-> -    target_ulong mxu_cr;
-> -#define MXU_CR_LC       31
-> -#define MXU_CR_RC       30
-> -#define MXU_CR_BIAS     2
-> -#define MXU_CR_RD_EN    1
-> -#define MXU_CR_MXU_EN   0
-> -
-> -};
-> -
-> -typedef struct CPUMIPSState CPUMIPSState;
-> -struct CPUMIPSState {
-> -    TCState active_tc;
-> -    CPUMIPSFPUContext active_fpu;
-> -
-> -    uint32_t current_tc;
-> -    uint32_t current_fpu;
-> -
-> -    uint32_t SEGBITS;
-> -    uint32_t PABITS;
-> -#if defined(TARGET_MIPS64)
-> -# define PABITS_BASE 36
-> -#else
-> -# define PABITS_BASE 32
-> -#endif
-> -    target_ulong SEGMask;
-> -    uint64_t PAMask;
-> -#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
-> -
-> -    int32_t msair;
-> -#define MSAIR_ProcID    8
-> -#define MSAIR_Rev       0
->
->  /*
->   *     Summary of CP0 registers
-> @@ -314,6 +233,90 @@ struct CPUMIPSState {
->   * 7   TagLo             TagHi                               KScratch<n>
->   *
->   */
-> +
-> +
-> +typedef struct TCState TCState;
-> +struct TCState {
-> +    target_ulong gpr[32];
-> +    target_ulong PC;
-> +    target_ulong HI[MIPS_DSP_ACC];
-> +    target_ulong LO[MIPS_DSP_ACC];
-> +    target_ulong ACX[MIPS_DSP_ACC];
-> +    target_ulong DSPControl;
-> +    int32_t CP0_TCStatus;
-> +#define CP0TCSt_TCU3    31
-> +#define CP0TCSt_TCU2    30
-> +#define CP0TCSt_TCU1    29
-> +#define CP0TCSt_TCU0    28
-> +#define CP0TCSt_TMX     27
-> +#define CP0TCSt_RNST    23
-> +#define CP0TCSt_TDS     21
-> +#define CP0TCSt_DT      20
-> +#define CP0TCSt_DA      15
-> +#define CP0TCSt_A       13
-> +#define CP0TCSt_TKSU    11
-> +#define CP0TCSt_IXMT    10
-> +#define CP0TCSt_TASID   0
-> +    int32_t CP0_TCBind;
-> +#define CP0TCBd_CurTC   21
-> +#define CP0TCBd_TBE     17
-> +#define CP0TCBd_CurVPE  0
-> +    target_ulong CP0_TCHalt;
-> +    target_ulong CP0_TCContext;
-> +    target_ulong CP0_TCSchedule;
-> +    target_ulong CP0_TCScheFBack;
-> +    int32_t CP0_Debug_tcstatus;
-> +    target_ulong CP0_UserLocal;
-> +
-> +    int32_t msacsr;
-> +
-> +#define MSACSR_FS       24
-> +#define MSACSR_FS_MASK  (1 << MSACSR_FS)
-> +#define MSACSR_NX       18
-> +#define MSACSR_NX_MASK  (1 << MSACSR_NX)
-> +#define MSACSR_CEF      2
-> +#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
-> +#define MSACSR_RM       0
-> +#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
-> +#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK |
-> MSACSR_NX_MASK | \
-> +        MSACSR_FS_MASK)
-> +
-> +    float_status msa_fp_status;
-> +
-> +#define NUMBER_OF_MXU_REGISTERS 16
-> +    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
-> +    target_ulong mxu_cr;
-> +#define MXU_CR_LC       31
-> +#define MXU_CR_RC       30
-> +#define MXU_CR_BIAS     2
-> +#define MXU_CR_RD_EN    1
-> +#define MXU_CR_MXU_EN   0
-> +
-> +};
-> +
-> +typedef struct CPUMIPSState CPUMIPSState;
-> +struct CPUMIPSState {
-> +    TCState active_tc;
-> +    CPUMIPSFPUContext active_fpu;
-> +
-> +    uint32_t current_tc;
-> +    uint32_t current_fpu;
-> +
-> +    uint32_t SEGBITS;
-> +    uint32_t PABITS;
-> +#if defined(TARGET_MIPS64)
-> +# define PABITS_BASE 36
+Am 07.01.2019 um 19:40 hat Richard W.M. Jones geschrieben:
+> On Mon, Jan 07, 2019 at 06:50:53PM +0100, Max Reitz wrote:
+> [...]
+> 
+> I don't particularly care how we fix this, but it breaks the nbdkit
+> tests on FreeBSD so I am keen to fix it one way or another.
+> 
+> > And if optreset not being available for glibc is the only issue, I'd say
+> > adding it as a weak global variable would work without #ifdefs.
+> 
+> The weak global variable doesn't make the code "#ifdef free".  I tried
+> a patch like this:
+> 
+> +int optreset __attribute__((weak));
+> 
+> ...
+> 
+>  static int command(...)
+>  {
+>    ...
+>    optind = 0;
+> +  optreset = 1;
+>   ...
+>  }
+> 
+> but that still doesn't work on FreeBSD.
+> 
+> You have to set optind=1 apparently.  So if we want to set optreset=1
+> we still end up with #ifdef __FreeBSD__.  The final patch will
+> end up looking something like:
+> 
+>  static int command(...)
+>  {
+>    ...
+> +#ifdef __FreeBSD__
+> +  optind = 1;
+> +  optreset = 1;
 > +#else
-> +# define PABITS_BASE 32
+>    optind = 0;
 > +#endif
-> +    target_ulong SEGMask;
-> +    uint64_t PAMask;
-> +#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
-> +
-> +    int32_t msair;
-> +#define MSAIR_ProcID    8
-> +#define MSAIR_Rev       0
-> +
->  /*
->   * CP0 Register 0
->   */
-> --
-> 2.7.4
->
->
->
+>   ...
+>  }
+
+Unconditionally setting optind = 1 looks fine. I would, however, quote a
+different part of the glibc man page (in addition or instead of the
+paragraph you already quoted):
+
+    The  variable  optind is the index of the next element to be
+    processed in argv.  The system initializes this value to 1.  The
+    caller can reset it to 1 to restart scanning of the same argv, or
+    when scanning a new argument vector.
+
+This makes it pretty clear that optind = 1 is fine for our case with
+glibc. The FreeBSD man page still suggests that we need optreset = 1, so
+I suppose we'd end up with something like:
+
+...
+optind = 1;
+#ifdef __FreeBSD__
+optreset = 1;
+#endif
+...
+
+I think I slightly prefer the #ifdef to a weak variable, but that's
+another option.
+
+Kevin
