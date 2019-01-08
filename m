@@ -1,15 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60170)
+Received: from eggs.gnu.org ([209.51.188.92]:33875)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
-	id 1ggs6U-0006cl-9p
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:11:39 -0500
+	id 1ggsF2-0008J0-9w
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:20:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
-	id 1ggs6T-0003fH-DE
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:11:38 -0500
+	id 1ggsF0-00050x-W9
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:20:28 -0500
 From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Tue, 8 Jan 2019 14:11:05 +0000
-Message-ID: <cc64da25a6a3418e8d36c6975fe2df45@AMSPEX02CL03.citrite.net>
+Date: Tue, 8 Jan 2019 14:20:02 +0000
+Message-ID: <3d36565f9e7646d08f9b02bf5b5474d7@AMSPEX02CL03.citrite.net>
 References: <20181220171439.11159-1-paul.durrant@citrix.com>
 	<20181220171439.11159-17-paul.durrant@citrix.com>
 	<20190104163124.GE1508@perard.uk.xensource.com>
@@ -17,10 +17,11 @@ References: <20181220171439.11159-1-paul.durrant@citrix.com>
 	<20190108125321.GD11492@linux.fritz.box>
 	<904d305f8c0f4aac8e60fb7ea14ebd41@AMSPEX02CL03.citrite.net>
 	<20190108132823.GF1508@perard.uk.xensource.com>
-In-Reply-To: <20190108132823.GF1508@perard.uk.xensource.com>
+	<cc64da25a6a3418e8d36c6975fe2df45@AMSPEX02CL03.citrite.net>
+In-Reply-To: <cc64da25a6a3418e8d36c6975fe2df45@AMSPEX02CL03.citrite.net>
 Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [PATCH v7 16/18] xen: automatically create
  XenBlockDevice-s
@@ -32,89 +33,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: 'Kevin Wolf' <kwolf@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Paul Durrant <Paul.Durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>
+Cc: 'Kevin Wolf' <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 08 January 2019 13:28
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: 'Kevin Wolf' <kwolf@redhat.com>; qemu-devel@nongnu.org; qemu-
-> block@nongnu.org; xen-devel@lists.xenproject.org; Max Reitz
-> <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> Subject: Re: [PATCH v7 16/18] xen: automatically create XenBlockDevice-s
->=20
-> On Tue, Jan 08, 2019 at 01:07:49PM +0000, Paul Durrant wrote:
-> > > -----Original Message-----
-> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > Sent: 08 January 2019 12:53
-> > > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > > Cc: Anthony Perard <anthony.perard@citrix.com>; qemu-devel@nongnu.org=
-;
-> > > qemu-block@nongnu.org; xen-devel@lists.xenproject.org; Max Reitz
-> > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> > > Subject: Re: [PATCH v7 16/18] xen: automatically create
-> XenBlockDevice-s
-> > >
-> > > Am 04.01.2019 um 17:40 hat Paul Durrant geschrieben:
-> > > > > -----Original Message-----
-> > > > > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> > > > > Sent: 04 January 2019 16:31
-> > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > > > > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> > > > > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max
-> Reitz
-> > > > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> > > > > Subject: Re: [PATCH v7 16/18] xen: automatically create
-> > > XenBlockDevice-s
-> > > > >
-> > > > > Almost done, there is one thing left which I believe is an issue.
-> > > > > Whenever I attach a raw file to QEMU, it print:
-> > > > >     qemu-system-i386: warning: Opening a block device as a file
-> using
-> > > the
-> > > > > 'file' driver is deprecated
-> > > >
-> > > > Oh, I'd not noticed that... but then I only use raw files
-> occasionally.
-> > >
-> > > Strictly speaking, this is not about raw (regular) files, but raw
-> block
-> > > devices. 'file' is fine for actual regular files, but the protocol
-> > > driver for block devices is 'host_device'.
-> > >
-> > > > > raw files should use the "raw" driver, so we aren't done yet.
-> > > >
-> > > > Ok. Having a strictly 2-layer stack actually makes things simpler
-> anyway
-> > > :-)
-> > >
-> > > Using 'raw' there will make the block layer auto-detect the right
-> > > protocol layer, so this works. If you want to avoid the second layer,
-> > > you'd have to figure out manually whether to use 'file' or
-> > > 'host_device'.
-> >
-> > Thanks for the explanation. I'll give it a spin using a device... I've
-> posted v8 but, given what you say, I'm still not sure I have it right.
->=20
-> Indeed, in v8, even with the extra 'raw' layer, the warning is still
-> there. I was trying to understand why, and I only found out today that
-> we would need to use the 'host_device' driver as explain by Kevin.
->=20
->=20
-> BTW Paul, we can simplify the code that manage layers, by not managing
-> them.
-> Instead of (in JSON / QMP term):
->     { 'driver': 'file', 'filename': '/file', 'node-name': 'node-file' }
->     { 'driver': 'qcow2', 'file': 'node-file', 'node-name': 'node-qcow2' }
-> we can have:
->     { 'driver': 'qcow2', 'node-name': 'node-qcow2',
->       'file': { 'driver': 'file', 'filename': '/file' } }
->
-
-I kind of like the clean separation though... From what Kevin said, it soun=
-ds like the lowest layer should use 'raw' instead of 'file' to DTRT, and th=
-en we should be back to only needing the single layer in that case. I'll re=
-vert back to v7 and give it a try.
-
-  Paul
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
+ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW5wcm9qZWN0Lm9yZ10gT24gQmVoYWxmDQo+IE9mIFBh
+dWwgRHVycmFudA0KPiBTZW50OiAwOCBKYW51YXJ5IDIwMTkgMTQ6MTENCj4gVG86IEFudGhvbnkg
+UGVyYXJkIDxhbnRob255LnBlcmFyZEBjaXRyaXguY29tPg0KPiBDYzogJ0tldmluIFdvbGYnIDxr
+d29sZkByZWRoYXQuY29tPjsgU3RlZmFubyBTdGFiZWxsaW5pDQo+IDxzc3RhYmVsbGluaUBrZXJu
+ZWwub3JnPjsgcWVtdS1ibG9ja0Bub25nbnUub3JnOyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+
+IE1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+OyB4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVj
+dC5vcmcNCj4gU3ViamVjdDogUmU6IFtYZW4tZGV2ZWxdIFtQQVRDSCB2NyAxNi8xOF0geGVuOiBh
+dXRvbWF0aWNhbGx5IGNyZWF0ZQ0KPiBYZW5CbG9ja0RldmljZS1zDQo+IA0KPiA+IC0tLS0tT3Jp
+Z2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gRnJvbTogQW50aG9ueSBQRVJBUkQgW21haWx0bzphbnRo
+b255LnBlcmFyZEBjaXRyaXguY29tXQ0KPiA+IFNlbnQ6IDA4IEphbnVhcnkgMjAxOSAxMzoyOA0K
+PiA+IFRvOiBQYXVsIER1cnJhbnQgPFBhdWwuRHVycmFudEBjaXRyaXguY29tPg0KPiA+IENjOiAn
+S2V2aW4gV29sZicgPGt3b2xmQHJlZGhhdC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IHFl
+bXUtDQo+ID4gYmxvY2tAbm9uZ251Lm9yZzsgeGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qub3Jn
+OyBNYXggUmVpdHoNCj4gPiA8bXJlaXR6QHJlZGhhdC5jb20+OyBTdGVmYW5vIFN0YWJlbGxpbmkg
+PHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+DQo+ID4gU3ViamVjdDogUmU6IFtQQVRDSCB2NyAxNi8x
+OF0geGVuOiBhdXRvbWF0aWNhbGx5IGNyZWF0ZSBYZW5CbG9ja0RldmljZS1zDQo+ID4NCj4gPiBP
+biBUdWUsIEphbiAwOCwgMjAxOSBhdCAwMTowNzo0OVBNICswMDAwLCBQYXVsIER1cnJhbnQgd3Jv
+dGU6DQo+ID4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiA+IEZyb206IEtl
+dmluIFdvbGYgW21haWx0bzprd29sZkByZWRoYXQuY29tXQ0KPiA+ID4gPiBTZW50OiAwOCBKYW51
+YXJ5IDIwMTkgMTI6NTMNCj4gPiA+ID4gVG86IFBhdWwgRHVycmFudCA8UGF1bC5EdXJyYW50QGNp
+dHJpeC5jb20+DQo+ID4gPiA+IENjOiBBbnRob255IFBlcmFyZCA8YW50aG9ueS5wZXJhcmRAY2l0
+cml4LmNvbT47IHFlbXUtDQo+IGRldmVsQG5vbmdudS5vcmc7DQo+ID4gPiA+IHFlbXUtYmxvY2tA
+bm9uZ251Lm9yZzsgeGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qub3JnOyBNYXggUmVpdHoNCj4g
+PiA+ID4gPG1yZWl0ekByZWRoYXQuY29tPjsgU3RlZmFubyBTdGFiZWxsaW5pIDxzc3RhYmVsbGlu
+aUBrZXJuZWwub3JnPg0KPiA+ID4gPiBTdWJqZWN0OiBSZTogW1BBVENIIHY3IDE2LzE4XSB4ZW46
+IGF1dG9tYXRpY2FsbHkgY3JlYXRlDQo+ID4gWGVuQmxvY2tEZXZpY2Utcw0KPiA+ID4gPg0KPiA+
+ID4gPiBBbSAwNC4wMS4yMDE5IHVtIDE3OjQwIGhhdCBQYXVsIER1cnJhbnQgZ2VzY2hyaWViZW46
+DQo+ID4gPiA+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gPiA+ID4gRnJv
+bTogQW50aG9ueSBQRVJBUkQgW21haWx0bzphbnRob255LnBlcmFyZEBjaXRyaXguY29tXQ0KPiA+
+ID4gPiA+ID4gU2VudDogMDQgSmFudWFyeSAyMDE5IDE2OjMxDQo+ID4gPiA+ID4gPiBUbzogUGF1
+bCBEdXJyYW50IDxQYXVsLkR1cnJhbnRAY2l0cml4LmNvbT4NCj4gPiA+ID4gPiA+IENjOiBxZW11
+LWRldmVsQG5vbmdudS5vcmc7IHFlbXUtYmxvY2tAbm9uZ251Lm9yZzsgeGVuLQ0KPiA+ID4gPiA+
+ID4gZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc7IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5j
+b20+OyBNYXgNCj4gPiBSZWl0eg0KPiA+ID4gPiA+ID4gPG1yZWl0ekByZWRoYXQuY29tPjsgU3Rl
+ZmFubyBTdGFiZWxsaW5pIDxzc3RhYmVsbGluaUBrZXJuZWwub3JnPg0KPiA+ID4gPiA+ID4gU3Vi
+amVjdDogUmU6IFtQQVRDSCB2NyAxNi8xOF0geGVuOiBhdXRvbWF0aWNhbGx5IGNyZWF0ZQ0KPiA+
+ID4gPiBYZW5CbG9ja0RldmljZS1zDQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gQWxtb3N0IGRv
+bmUsIHRoZXJlIGlzIG9uZSB0aGluZyBsZWZ0IHdoaWNoIEkgYmVsaWV2ZSBpcyBhbg0KPiBpc3N1
+ZS4NCj4gPiA+ID4gPiA+IFdoZW5ldmVyIEkgYXR0YWNoIGEgcmF3IGZpbGUgdG8gUUVNVSwgaXQg
+cHJpbnQ6DQo+ID4gPiA+ID4gPiAgICAgcWVtdS1zeXN0ZW0taTM4Njogd2FybmluZzogT3Blbmlu
+ZyBhIGJsb2NrIGRldmljZSBhcyBhIGZpbGUNCj4gPiB1c2luZw0KPiA+ID4gPiB0aGUNCj4gPiA+
+ID4gPiA+ICdmaWxlJyBkcml2ZXIgaXMgZGVwcmVjYXRlZA0KPiA+ID4gPiA+DQo+ID4gPiA+ID4g
+T2gsIEknZCBub3Qgbm90aWNlZCB0aGF0Li4uIGJ1dCB0aGVuIEkgb25seSB1c2UgcmF3IGZpbGVz
+DQo+ID4gb2NjYXNpb25hbGx5Lg0KPiA+ID4gPg0KPiA+ID4gPiBTdHJpY3RseSBzcGVha2luZywg
+dGhpcyBpcyBub3QgYWJvdXQgcmF3IChyZWd1bGFyKSBmaWxlcywgYnV0IHJhdw0KPiA+IGJsb2Nr
+DQo+ID4gPiA+IGRldmljZXMuICdmaWxlJyBpcyBmaW5lIGZvciBhY3R1YWwgcmVndWxhciBmaWxl
+cywgYnV0IHRoZSBwcm90b2NvbA0KPiA+ID4gPiBkcml2ZXIgZm9yIGJsb2NrIGRldmljZXMgaXMg
+J2hvc3RfZGV2aWNlJy4NCj4gPiA+ID4NCj4gPiA+ID4gPiA+IHJhdyBmaWxlcyBzaG91bGQgdXNl
+IHRoZSAicmF3IiBkcml2ZXIsIHNvIHdlIGFyZW4ndCBkb25lIHlldC4NCj4gPiA+ID4gPg0KPiA+
+ID4gPiA+IE9rLiBIYXZpbmcgYSBzdHJpY3RseSAyLWxheWVyIHN0YWNrIGFjdHVhbGx5IG1ha2Vz
+IHRoaW5ncyBzaW1wbGVyDQo+ID4gYW55d2F5DQo+ID4gPiA+IDotKQ0KPiA+ID4gPg0KPiA+ID4g
+PiBVc2luZyAncmF3JyB0aGVyZSB3aWxsIG1ha2UgdGhlIGJsb2NrIGxheWVyIGF1dG8tZGV0ZWN0
+IHRoZSByaWdodA0KPiA+ID4gPiBwcm90b2NvbCBsYXllciwgc28gdGhpcyB3b3Jrcy4gSWYgeW91
+IHdhbnQgdG8gYXZvaWQgdGhlIHNlY29uZA0KPiBsYXllciwNCj4gPiA+ID4geW91J2QgaGF2ZSB0
+byBmaWd1cmUgb3V0IG1hbnVhbGx5IHdoZXRoZXIgdG8gdXNlICdmaWxlJyBvcg0KPiA+ID4gPiAn
+aG9zdF9kZXZpY2UnLg0KPiA+ID4NCj4gPiA+IFRoYW5rcyBmb3IgdGhlIGV4cGxhbmF0aW9uLiBJ
+J2xsIGdpdmUgaXQgYSBzcGluIHVzaW5nIGEgZGV2aWNlLi4uIEkndmUNCj4gPiBwb3N0ZWQgdjgg
+YnV0LCBnaXZlbiB3aGF0IHlvdSBzYXksIEknbSBzdGlsbCBub3Qgc3VyZSBJIGhhdmUgaXQgcmln
+aHQuDQo+ID4NCj4gPiBJbmRlZWQsIGluIHY4LCBldmVuIHdpdGggdGhlIGV4dHJhICdyYXcnIGxh
+eWVyLCB0aGUgd2FybmluZyBpcyBzdGlsbA0KPiA+IHRoZXJlLiBJIHdhcyB0cnlpbmcgdG8gdW5k
+ZXJzdGFuZCB3aHksIGFuZCBJIG9ubHkgZm91bmQgb3V0IHRvZGF5IHRoYXQNCj4gPiB3ZSB3b3Vs
+ZCBuZWVkIHRvIHVzZSB0aGUgJ2hvc3RfZGV2aWNlJyBkcml2ZXIgYXMgZXhwbGFpbiBieSBLZXZp
+bi4NCj4gPg0KPiA+DQo+ID4gQlRXIFBhdWwsIHdlIGNhbiBzaW1wbGlmeSB0aGUgY29kZSB0aGF0
+IG1hbmFnZSBsYXllcnMsIGJ5IG5vdCBtYW5hZ2luZw0KPiA+IHRoZW0uDQo+ID4gSW5zdGVhZCBv
+ZiAoaW4gSlNPTiAvIFFNUCB0ZXJtKToNCj4gPiAgICAgeyAnZHJpdmVyJzogJ2ZpbGUnLCAnZmls
+ZW5hbWUnOiAnL2ZpbGUnLCAnbm9kZS1uYW1lJzogJ25vZGUtZmlsZScgfQ0KPiA+ICAgICB7ICdk
+cml2ZXInOiAncWNvdzInLCAnZmlsZSc6ICdub2RlLWZpbGUnLCAnbm9kZS1uYW1lJzogJ25vZGUt
+cWNvdzInDQo+IH0NCj4gPiB3ZSBjYW4gaGF2ZToNCj4gPiAgICAgeyAnZHJpdmVyJzogJ3Fjb3cy
+JywgJ25vZGUtbmFtZSc6ICdub2RlLXFjb3cyJywNCj4gPiAgICAgICAnZmlsZSc6IHsgJ2RyaXZl
+cic6ICdmaWxlJywgJ2ZpbGVuYW1lJzogJy9maWxlJyB9IH0NCj4gPg0KPiANCj4gSSBraW5kIG9m
+IGxpa2UgdGhlIGNsZWFuIHNlcGFyYXRpb24gdGhvdWdoLi4uIEZyb20gd2hhdCBLZXZpbiBzYWlk
+LCBpdA0KPiBzb3VuZHMgbGlrZSB0aGUgbG93ZXN0IGxheWVyIHNob3VsZCB1c2UgJ3JhdycgaW5z
+dGVhZCBvZiAnZmlsZScgdG8gRFRSVCwNCj4gYW5kIHRoZW4gd2Ugc2hvdWxkIGJlIGJhY2sgdG8g
+b25seSBuZWVkaW5nIHRoZSBzaW5nbGUgbGF5ZXIgaW4gdGhhdCBjYXNlLg0KPiBJJ2xsIHJldmVy
+dCBiYWNrIHRvIHY3IGFuZCBnaXZlIGl0IGEgdHJ5Lg0KDQpObywgdGhhdCBkb2Vzbid0IHdvcmsg
+YXMgd2UgY2FuJ3QgZGVhbCB3aXRoIGxvY2tpbmcgY29ycmVjdGx5IHVubGVzcyB3ZSB1c2UgZHJp
+dmVyPWZpbGUgc28gbWF5YmUgSSBtaXN1bmRlcnN0b29kLg0KDQogIFBhdWwNCg0KPiANCj4gICBQ
+YXVsDQo+IA0KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+Xw0KPiBYZW4tZGV2ZWwgbWFpbGluZyBsaXN0DQo+IFhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0
+Lm9yZw0KPiBodHRwczovL2xpc3RzLnhlbnByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8veGVu
+LWRldmVsDQo=
