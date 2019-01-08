@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59710)
+Received: from eggs.gnu.org ([209.51.188.92]:39020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gglOU-0004k9-WC
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:01:48 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gglkL-00033V-Pw
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:24:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gglOU-0004GN-7U
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:01:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58922)
+	(envelope-from <yang.zhong@intel.com>) id 1gglkK-0005sD-GF
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:24:21 -0500
+Received: from mga18.intel.com ([134.134.136.126]:43735)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gglOT-00046A-W6
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:01:46 -0500
-Date: Tue, 8 Jan 2019 14:51:59 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190108065159.GA20511@xz-x1>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-10-fli@suse.com>
-	<87a7kcml5i.fsf@dusky.pond.sub.org>
-	<36097839-654b-6d1f-b79e-f9bc174ec126@suse.cz>
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1gglkI-0005Vu-FA
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:24:19 -0500
+Date: Tue, 8 Jan 2019 15:20:33 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190108072033.GC27412@yangzhon-Virtual>
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+	<20181227063419.12981-11-yang.zhong@intel.com>
+	<2a2562bd-addc-d507-f2a1-b90e2a22200e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <36097839-654b-6d1f-b79e-f9bc174ec126@suse.cz>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 09/16] qemu_thread: supplement
- error handling for pci_edu_realize
+In-Reply-To: <2a2562bd-addc-d507-f2a1-b90e2a22200e@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 10/25] build: convert pci.mak to Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiri Slaby <jslaby@suse.cz>
-Cc: Markus Armbruster <armbru@redhat.com>, Fei Li <fli@suse.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com, lifei1214@126.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, eter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com, yang.zhong@intel.com
 
-On Tue, Jan 08, 2019 at 07:14:11AM +0100, Jiri Slaby wrote:
-> On 07. 01. 19, 18:29, Markus Armbruster wrote:
-> >    static void pci_edu_uninit(PCIDevice *pdev)
-> >    {
-> >        EduState *edu = EDU(pdev);
+On Fri, Jan 04, 2019 at 02:48:03PM +0100, Thomas Huth wrote:
+> On 2018-12-27 07:34, Yang Zhong wrote:
+> > From: Paolo Bonzini <pbonzini@redhat.com>
 > > 
-> >        qemu_mutex_lock(&edu->thr_mutex);
-> >        edu->stopping = true;
-> >        qemu_mutex_unlock(&edu->thr_mutex);
-> >        qemu_cond_signal(&edu->thr_cond);
-> >        qemu_thread_join(&edu->thread);
+> > Instead of including the same list of devices for each target,
+> > set CONFIG_PCI to true, and make the devices default to present
+> > whenever PCI is available.
 > > 
-> >        qemu_cond_destroy(&edu->thr_cond);
-> >        qemu_mutex_destroy(&edu->thr_mutex);
+> > Done mostly with the following script:
 > > 
-> >        timer_del(&edu->dma_timer);
-> >    }
+> >   while read i; do
+> >      i=${i%=y}; i=${i#CONFIG_}
+> >      sed -i -e'/^config '$i'$/!b' -en \
+> >             -e'a\' -e'    default y\' -e'    depends on PCI' \
+> >           `grep -lw $i hw/*/Kconfig`
+> >   done < default-configs/pci.mak
 > > 
-> > Preexisting: pci_edu_uninit() neglects to call msi_uninit().  Jiri?\
+> > followed by replacing a few "depends on" clauses with "select"
+> > whenever the symbol is not really related to PCI.
+> > 
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> > ---
+> >  default-configs/i386-softmmu.mak |  2 +-
+> >  default-configs/pci.mak          | 47 --------------------------------
+> >  hw/audio/Kconfig                 |  6 ++++
+> >  hw/block/Kconfig                 |  2 ++
+> >  hw/char/Kconfig                  |  2 ++
+> >  hw/display/Kconfig               | 12 +++++++-
+> >  hw/ide/Kconfig                   |  6 ++++
+> >  hw/ipack/Kconfig                 |  2 ++
+> >  hw/misc/Kconfig                  |  4 +++
+> >  hw/net/Kconfig                   | 19 +++++++++++++
+> >  hw/scsi/Kconfig                  | 11 ++++++++
+> >  hw/sd/Kconfig                    |  3 ++
+> >  hw/usb/Kconfig                   | 10 +++++++
+> >  hw/virtio/Kconfig                |  3 ++
+> >  hw/watchdog/Kconfig              |  2 ++
+> >  15 files changed, 82 insertions(+), 49 deletions(-)
+> >  delete mode 100644 default-configs/pci.mak
+> [...]
+> > diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+> > index 26c13243cf..1ed6f0dbce 100644
+> > --- a/hw/char/Kconfig
+> > +++ b/hw/char/Kconfig
+> > @@ -15,6 +15,8 @@ config SERIAL_ISA
+> >  
+> >  config SERIAL_PCI
+> >      bool
+> > +    default y
+> > +    depends on PCI
 > 
-> I don't know, the MSI support was added in:
-> commit eabb5782f70b4a10975b24ccd7129929a05ac932
-> Author: Peter Xu <peterx@redhat.com>
-> Date:   Wed Sep 28 21:03:39 2016 +0800
+> I think this likely needs a "select SERIAL", too? At least the
+> SERIAL_ISA switch gets a "select SERIAL" in patch 15/25, so it sounds
+> logical if the SERIAL_PCI would get this, too...
 > 
->     hw/misc/edu: support MSI interrupt
-> 
-> Hence CCing Peter.
+>  Thomas
 
-Hi, Jiri, Markus, Fei,
+  Thomas, thanks, i will add "select SERIAL" into 15/25 patch, thanks again!
 
-IMHO msi_uninit() is optional since it only operates on the config
-space of the device to remove the capability or fix up the flags
-without really doing any real destruction of objects so nothing will
-be leaked (unlike msix_uninit, which should be required).  But I do
-agree that calling msi_uninit() could be even nicer here.
+  Regards,
 
-Anyone would like to post a patch? Or should I?
-
-Thanks,
-
--- 
-Peter Xu
+  Yang
