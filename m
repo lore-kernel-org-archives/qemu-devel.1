@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53207)
+Received: from eggs.gnu.org ([209.51.188.92]:57688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzvf-0000rS-JJ
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:33:00 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gh08Y-0005dQ-Nt
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:46:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzve-0005UP-I0
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:59 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggzve-0005Og-BJ
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:58 -0500
-Received: by mail-pg1-x543.google.com with SMTP id t13so2346827pgr.11
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:32:55 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  9 Jan 2019 08:31:28 +1000
-Message-Id: <20190108223129.5570-31-richard.henderson@linaro.org>
-In-Reply-To: <20190108223129.5570-1-richard.henderson@linaro.org>
-References: <20190108223129.5570-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 30/31] target/arm: Enable PAuth for user-only
+	(envelope-from <dgibson@ozlabs.org>) id 1gh08U-0006XX-C4
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:46:16 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed,  9 Jan 2019 09:45:31 +1100
+Message-Id: <20190108224600.23125-1-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/29] ppc-for-4.0 queue 20190109
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +20,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: peter.maydell@linaro.org
+Cc: groug@kaod.org, clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Add 4 attributes that controls the EL1 enable bits, as we may not
-always want to turn on pointer authentication with -cpu max.
-However, by default they are enabled.
+The following changes since commit 147923b1a901a0370f83a0f4c58ec1baffef22=
+f0:
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.c   |  3 +++
- target/arm/cpu64.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 63 insertions(+)
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20190108-pull-req=
+uest' into staging (2019-01-08 16:07:32 +0000)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 4c4e9e169e..14bc24a35a 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -162,6 +162,9 @@ static void arm_cpu_reset(CPUState *s)
-         env->pstate = PSTATE_MODE_EL0t;
-         /* Userspace expects access to DC ZVA, CTL_EL0 and the cache ops */
-         env->cp15.sctlr_el[1] |= SCTLR_UCT | SCTLR_UCI | SCTLR_DZE;
-+        /* Enable all PAC instructions */
-+        env->cp15.hcr_el2 |= HCR_API;
-+        env->cp15.scr_el3 |= SCR_API;
-         /* and to the FP/Neon instructions */
-         env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 20, 2, 3);
-         /* and to the SVE instructions */
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 1974f1aeb7..d0de0d5dcf 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -285,6 +285,38 @@ static void cpu_max_set_sve_vq(Object *obj, Visitor *v, const char *name,
-     error_propagate(errp, err);
- }
- 
-+#ifdef CONFIG_USER_ONLY
-+static void cpu_max_get_packey(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    const uint64_t *bit = opaque;
-+    bool enabled = (cpu->env.cp15.sctlr_el[1] & *bit) != 0;
-+
-+    visit_type_bool(v, name, &enabled, errp);
-+}
-+
-+static void cpu_max_set_packey(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    Error *err = NULL;
-+    const uint64_t *bit = opaque;
-+    bool enabled;
-+
-+    visit_type_bool(v, name, &enabled, errp);
-+
-+    if (!err) {
-+        if (enabled) {
-+            cpu->env.cp15.sctlr_el[1] |= *bit;
-+        } else {
-+            cpu->env.cp15.sctlr_el[1] &= ~*bit;
-+        }
-+    }
-+    error_propagate(errp, err);
-+}
-+#endif
-+
- /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-  * otherwise, a CPU with as many features enabled as our emulation supports.
-  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-@@ -360,6 +392,34 @@ static void aarch64_max_initfn(Object *obj)
-          */
-         cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
-         cpu->dcz_blocksize = 7; /*  512 bytes */
-+
-+        /*
-+         * Note that Linux will enable enable all of the keys at once.
-+         * But doing it this way will allow experimentation beyond that.
-+         */
-+        {
-+            static const uint64_t apia_bit = SCTLR_EnIA;
-+            static const uint64_t apib_bit = SCTLR_EnIB;
-+            static const uint64_t apda_bit = SCTLR_EnDA;
-+            static const uint64_t apdb_bit = SCTLR_EnDB;
-+
-+            object_property_add(obj, "apia", "bool", cpu_max_get_packey,
-+                                cpu_max_set_packey, NULL,
-+                                (void *)&apia_bit, &error_fatal);
-+            object_property_add(obj, "apib", "bool", cpu_max_get_packey,
-+                                cpu_max_set_packey, NULL,
-+                                (void *)&apib_bit, &error_fatal);
-+            object_property_add(obj, "apda", "bool", cpu_max_get_packey,
-+                                cpu_max_set_packey, NULL,
-+                                (void *)&apda_bit, &error_fatal);
-+            object_property_add(obj, "apdb", "bool", cpu_max_get_packey,
-+                                cpu_max_set_packey, NULL,
-+                                (void *)&apdb_bit, &error_fatal);
-+
-+            /* Enable all PAC keys by default.  */
-+            cpu->env.cp15.sctlr_el[1] |= SCTLR_EnIA | SCTLR_EnIB;
-+            cpu->env.cp15.sctlr_el[1] |= SCTLR_EnDA | SCTLR_EnDB;
-+        }
- #endif
- 
-         cpu->sve_max_vq = ARM_MAX_VQ;
--- 
-2.17.2
+are available in the Git repository at:
+
+  git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190109
+
+for you to fetch changes up to 3a8eb78e6c135422017888380db091793039b6dd:
+
+  spapr: enable XIVE MMIOs at reset (2019-01-09 09:28:14 +1100)
+
+----------------------------------------------------------------
+ppc patch queue 2019-01-09
+
+Second main pull request for qemu-4.0.  Highlights are:
+ * Final parts of XIVE support for pseries (without KVM)
+ * Preliminary work for PHB hotplug
+ * Starting to use TCG vector operations
+
+This includes some changes in the PCI core, which Michael Tsirkin
+requested come through this tree, since they're primarily of interest
+for ppc.
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (1):
+      ppc/spapr: Receive and store device tree blob from SLOF
+
+BALATON Zoltan (2):
+      ppc4xx: Disable debug logging by default
+      MAINTAINERS: Add more files to sam460ex
+
+C=C3=A9dric Le Goater (11):
+      spapr/xive: simplify the sPAPR IRQ qirq method for XIVE
+      spapr: modify the prototype of the cpu_intc_create() method
+      ppc/xive: introduce a XiveTCTX pointer under PowerPCCPU
+      ppc: replace the 'Object *intc' by a 'ICPState *icp' pointer under =
+the CPU
+      spapr: return from post_load method when RTC import fails
+      ppc: export the XICS and XIVE set_irq handlers
+      pnv/psi: move the ICSState qemu_irq array under the PSI device mode=
+l
+      spapr: move the qemu_irq array under the machine
+      ppc/xics: allow ICSState to have an offset 0
+      spapr: introduce a new sPAPR IRQ backend supporting XIVE and XICS
+      spapr: enable XIVE MMIOs at reset
+
+Greg Kurz (2):
+      spapr: move spapr_create_phb() to core machine code
+      spapr_pci: Define SPAPR_MAX_PHBS in hw/pci-host/spapr.h
+
+Laurent Vivier (1):
+      spapr: Add H-Call H_HOME_NODE_ASSOCIATIVITY
+
+Mark Cave-Ayland (10):
+      target/ppc: fix typo in SIMM5 extraction helper
+      target/ppc: switch EXTRACT_HELPER macros over to use sextract32/ext=
+ract32
+      target/ppc: introduce get_fpr() and set_fpr() helpers for FP regist=
+er access
+      target/ppc: introduce get_avr64() and set_avr64() helpers for VMX r=
+egister access
+      target/ppc: introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}() hel=
+pers for VSR register access
+      target/ppc: switch FPR, VMX and VSX helpers to access data directly=
+ from cpu_env
+      target/ppc: merge ppc_vsr_t and ppc_avr_t union types
+      target/ppc: move FP and VMX registers into aligned vsr register arr=
+ay
+      target/ppc: replace AVR* macros with Vsr* macros
+      MAINTAINERS: add qemu_vga.ndrv file entry for Mac machines
+
+Michael Roth (1):
+      pci: allow cleanup/unregistration of PCI root buses
+
+Thomas Huth (1):
+      MAINTAINERS: Add some missing ppc-related files
+
+ MAINTAINERS                         |  17 +-
+ configure                           |   2 +-
+ hw/intc/spapr_xive.c                |  23 +-
+ hw/intc/xics.c                      |   4 +-
+ hw/intc/xics_kvm.c                  |   3 +-
+ hw/intc/xics_spapr.c                |  10 +-
+ hw/intc/xive.c                      |  11 +-
+ hw/pci/pci.c                        |  33 ++
+ hw/ppc/pnv.c                        |  27 +-
+ hw/ppc/pnv_core.c                   |   4 +-
+ hw/ppc/pnv_psi.c                    |   7 +-
+ hw/ppc/ppc4xx_devs.c                |   3 +-
+ hw/ppc/spapr.c                      |  80 +++-
+ hw/ppc/spapr_cpu_core.c             |   9 +-
+ hw/ppc/spapr_hcall.c                |  93 ++++
+ hw/ppc/spapr_irq.c                  | 270 ++++++++++-
+ hw/ppc/spapr_pci.c                  |  11 -
+ hw/ppc/trace-events                 |   3 +
+ include/hw/pci-host/spapr.h         |   8 +-
+ include/hw/pci/pci.h                |   3 +
+ include/hw/ppc/pnv.h                |   2 +-
+ include/hw/ppc/pnv_psi.h            |   1 +
+ include/hw/ppc/spapr.h              |   9 +-
+ include/hw/ppc/spapr_irq.h          |   6 +-
+ include/hw/ppc/spapr_xive.h         |   2 +-
+ include/hw/ppc/xics.h               |   6 +-
+ include/hw/ppc/xive.h               |   9 +-
+ linux-user/ppc/signal.c             |  28 +-
+ target/ppc/arch_dump.c              |  15 +-
+ target/ppc/cpu.h                    |  47 +-
+ target/ppc/gdbstub.c                |   8 +-
+ target/ppc/int_helper.c             |  86 ++--
+ target/ppc/internal.h               |  39 +-
+ target/ppc/kvm.c                    |  24 +-
+ target/ppc/machine.c                |  72 ++-
+ target/ppc/monitor.c                |   4 +-
+ target/ppc/translate.c              |  73 ++-
+ target/ppc/translate/dfp-impl.inc.c |   2 +-
+ target/ppc/translate/fp-impl.inc.c  | 486 +++++++++++++++-----
+ target/ppc/translate/vmx-impl.inc.c | 154 +++++--
+ target/ppc/translate/vsx-impl.inc.c | 862 ++++++++++++++++++++++++++----=
+------
+ target/ppc/translate_init.inc.c     |  26 +-
+ 42 files changed, 1927 insertions(+), 655 deletions(-)
