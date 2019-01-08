@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55161)
+Received: from eggs.gnu.org ([209.51.188.92]:58665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggjJo-0008De-Bq
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 23:48:49 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ggjVC-0002lp-51
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 00:00:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggjJm-0005kh-7k
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 23:48:47 -0500
-Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:40084)
+	(envelope-from <richard.henderson@linaro.org>) id 1ggjV8-0004Zs-50
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 00:00:32 -0500
+Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:35738)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggjJl-0005hG-WE
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 23:48:46 -0500
-Received: by mail-pg1-x52e.google.com with SMTP id z10so1154168pgp.7
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 20:48:45 -0800 (PST)
+	id 1ggjV5-0004Rl-Oc
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 00:00:28 -0500
+Received: by mail-pl1-x631.google.com with SMTP id p8so1275256plo.2
+	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 21:00:27 -0800 (PST)
 References: <20181214052410.11863-1-richard.henderson@linaro.org>
-	<20181214052410.11863-23-richard.henderson@linaro.org>
-	<CAFEAcA-qLZu72eaaahdN8=qK79CRLwmAn3aMgOxCVc6Pq=fXww@mail.gmail.com>
+	<20181214052410.11863-24-richard.henderson@linaro.org>
+	<CAFEAcA-Us3KWaLSEkvpg2uE+yvRFbVB=NVemrdhTFfvKxZt3xw@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5cee1ccb-6913-3f78-7b80-35949d5b6e6b@linaro.org>
-Date: Tue, 8 Jan 2019 14:48:37 +1000
+Message-ID: <0ff1044a-a8d8-75f1-6e37-5149b1cf3dea@linaro.org>
+Date: Tue, 8 Jan 2019 15:00:19 +1000
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-qLZu72eaaahdN8=qK79CRLwmAn3aMgOxCVc6Pq=fXww@mail.gmail.com>
+In-Reply-To: <CAFEAcA-Us3KWaLSEkvpg2uE+yvRFbVB=NVemrdhTFfvKxZt3xw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 22/27] target/arm: Implement pauth_addpac
+Subject: Re: [Qemu-devel] [PATCH v2 23/27] target/arm: Implement
+ pauth_computepac
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +36,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 1/7/19 11:31 PM, Peter Maydell wrote:
->> +    /* Preserve the determination between upper and lower at bit 55,
->> +     * and insert pointer authentication code.
->> +     */
->> +    if (param.tbi) {
->> +        ptr &= ~MAKE_64BIT_MASK(bot_bit, 55 - bot_bit + 1);
->> +        pac &= MAKE_64BIT_MASK(bot_bit, 54 - bot_bit + 1);
->> +    } else {
->> +        ptr &= MAKE_64BIT_MASK(0, bot_bit);
->> +        pac &= ~(MAKE_64BIT_MASK(55, 1) | MAKE_64BIT_MASK(0, bot_bit));
->> +    }
->> +    ext &= MAKE_64BIT_MASK(55, 1);
+On 1/8/19 12:09 AM, Peter Maydell wrote:
+>> +static int rot_cell(int cell, int n)
+>> +{
+>> +    cell |= cell << 4;
+>> +    cell >>= n;
+>> +    return cell & 0xf;
 > 
-> I found this a bit confusing to disentangle and compare with
-> the pseudocode: the difference between the tbi and
-> not-tbi cases is only "what are bits 63:56 in the result",
-> but the implementation of how we put together bits 55:0 is
-> different in the two code paths here.
+> This doesn't seem to do what the RotCell pseudocode does?
+> Unless I've made an error, RotCell(ABCD, 1) == BCDA,
+> but rot_cell(ABCD, 1) == DABC.
 
-Yes.  I found the pseudocode itself to be confusing.
-Perhaps I went away from it too far.
+Yep, I mis-read the direction of the rotate.
+
+Thanks for all of the proof-reading.
+This section I found particularly eye watering.
 
 
 r~
