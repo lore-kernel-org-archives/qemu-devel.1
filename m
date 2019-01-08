@@ -1,14 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49401)
+Received: from eggs.gnu.org ([209.51.188.92]:50864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ggxK6-00039J-IS
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 14:46:03 -0500
+	(envelope-from <akrowiak@linux.ibm.com>) id 1ggxQW-0007AB-I5
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 14:52:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ggxK2-0003dc-JN
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 14:46:00 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  8 Jan 2019 22:45:52 +0300
-Message-Id: <20190108194552.45453-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] file-posix: add rough-block-status parameter
+	(envelope-from <akrowiak@linux.ibm.com>) id 1ggxQV-0006p9-Hx
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 14:52:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48242
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1ggxQV-0006oK-8t
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 14:52:39 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x08JYX2X061164
+	for <qemu-devel@nongnu.org>; Tue, 8 Jan 2019 14:52:38 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2pvy9hh4eh-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:52:38 -0500
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Tue, 8 Jan 2019 19:52:37 -0000
+References: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
+	<5a7e9130-30d1-84ad-0737-5023b718b99c@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Tue, 8 Jan 2019 14:52:32 -0500
+MIME-Version: 1.0
+In-Reply-To: <5a7e9130-30d1-84ad-0737-5023b718b99c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <54bc1f9c-e997-cb1b-77cb-0dce478fafdc@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390x/vfio-ap: Implement hot plug/unplug
+ of vfio-ap device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,110 +44,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, fam@euphon.net, stefanha@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, jjherne@linux.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, peter.maydell@linaro.org, rth@twiddle.net, fiuczy@linux.ibm.com
 
-bdrv_co_block_status digs bs->file for additional, more accurate search
-for hole inside region, reported as DATA by bs since 5daa74a6ebc.
+On 1/8/19 11:09 AM, David Hildenbrand wrote:
+> On 08.01.19 17:01, Tony Krowiak wrote:
+>> Introduces hot plug/unplug support for the vfio-ap device. Note that only one
+>> vfio-ap device can be attached to the ap-bus, so a vfio-ap device can only be
+>> hot plugged if the '-device vfio-ap,sysfsdev=$path_to_mdev' option is not
+>> specified on the QEMU command line.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+>> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+>> ---
+>>   hw/s390x/ap-bridge.c | 12 +++++++++++-
+>>   hw/vfio/ap.c         |  2 +-
+>>   2 files changed, 12 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
+>> index 3795d30dd7c9..25a03412fcb9 100644
+>> --- a/hw/s390x/ap-bridge.c
+>> +++ b/hw/s390x/ap-bridge.c
+>> @@ -39,6 +39,7 @@ static const TypeInfo ap_bus_info = {
+>>   void s390_init_ap(void)
+>>   {
+>>       DeviceState *dev;
+>> +    BusState *bus;
+>>   
+>>       /* If no AP instructions then no need for AP bridge */
+>>       if (!s390_has_feat(S390_FEAT_AP)) {
+>> @@ -52,13 +53,18 @@ void s390_init_ap(void)
+>>       qdev_init_nofail(dev);
+>>   
+>>       /* Create bus on bridge device */
+>> -    qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
+>> +    bus = qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
+>> +
+>> +    /* Enable hotplugging */
+>> +    qbus_set_hotplug_handler(bus, dev, &error_abort);
+>>    }
+>>   
+>>   static void ap_bridge_class_init(ObjectClass *oc, void *data)
+>>   {
+>>       DeviceClass *dc = DEVICE_CLASS(oc);
+>> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+>>   
+>> +    hc->unplug = qdev_simple_device_unplug_cb;
+> 
+> confused, why is there no plug action?
 
-This accuracy is not free: assume we have qcow2 disk. Actually, qcow2
-knows, where are holes and where is data. But every block_status
-request calls lseek additionally. Assume a big disk, full of
-data, in any iterative copying block job (or img convert) we'll call
-lseek(HOLE) on every iteration, and each of these lseeks will have to
-iterate through all metadata up to the end of file. It's obviously
-ineffective behavior. And for many scenarios we don't need this lseek
-at all.
+You will find this is the case for several devices that are hot
+pluggable. The plug callback is invoked after the device is
+attached to the bus and after the device is realized. Not having
+a hot plug callback does not preclude hot plugging of a device.
+I presume the purpose of the callback is to provide an opportunity
+to do perform any additional processing that may be required to prepare
+the device for use. In the case of the vfio-ap device, there is nothing
+to do once the device is plugged.
 
-So, add an option to omit calling lseek.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
-
-Hi all!
-
-This is a continuation of "do not lseek in qcow2 block_status" thread
-(https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05749.html)
-
- qapi/block-core.json |  6 +++++-
- block/file-posix.c   | 13 ++++++++++++-
- 2 files changed, 17 insertions(+), 2 deletions(-)
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 762000f31f..ec5549e5c2 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2645,6 +2645,9 @@
- #                         migration.  May cause noticeable delays if the image
- #                         file is large, do not use in production.
- #                         (default: off) (since: 3.0)
-+# @rough-block-status: If set, on block-status querying assume that the whole
-+#                      file is data and do not try to find holes through system
-+#                      calls (default: off) (since 4.0)
- #
- # Since: 2.9
- ##
-@@ -2653,7 +2656,8 @@
-             '*pr-manager': 'str',
-             '*locking': 'OnOffAuto',
-             '*aio': 'BlockdevAioOptions',
--            '*x-check-cache-dropped': 'bool' } }
-+            '*x-check-cache-dropped': 'bool',
-+            '*rough-block-status': 'bool' } }
- 
- ##
- # @BlockdevOptionsNull:
-diff --git a/block/file-posix.c b/block/file-posix.c
-index d8f0b93752..3f6d76a5dc 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -167,6 +167,7 @@ typedef struct BDRVRawState {
-     bool has_fallocate;
-     bool needs_alignment;
-     bool check_cache_dropped;
-+    bool rough_block_status;
- 
-     PRManager *pr_mgr;
- } BDRVRawState;
-@@ -439,6 +440,13 @@ static QemuOptsList raw_runtime_opts = {
-             .type = QEMU_OPT_BOOL,
-             .help = "check that page cache was dropped on live migration (default: off)"
-         },
-+        {
-+            .name = "rough-block-status",
-+            .type = QEMU_OPT_BOOL,
-+            .help = "If set, on block-status querying assume that the whole "
-+                    "file is data and do not try to find holes through system "
-+                    "calls (default: off)"
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -525,6 +533,8 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
- 
-     s->check_cache_dropped = qemu_opt_get_bool(opts, "x-check-cache-dropped",
-                                                false);
-+    s->rough_block_status = qemu_opt_get_bool(opts, "rough-block-status",
-+                                              false);
- 
-     s->open_flags = open_flags;
-     raw_parse_flags(bdrv_flags, &s->open_flags);
-@@ -2424,6 +2434,7 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
-                                             int64_t *map,
-                                             BlockDriverState **file)
- {
-+    BDRVRawState *s = bs->opaque;
-     off_t data = 0, hole = 0;
-     int ret;
- 
-@@ -2432,7 +2443,7 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
-         return ret;
-     }
- 
--    if (!want_zero) {
-+    if (!want_zero || s->rough_block_status) {
-         *pnum = bytes;
-         *map = offset;
-         *file = bs;
--- 
-2.18.0
+> 
+>>       set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>>   }
+>>   
+>> @@ -67,6 +73,10 @@ static const TypeInfo ap_bridge_info = {
+>>       .parent        = TYPE_SYS_BUS_DEVICE,
+>>       .instance_size = 0,
+>>       .class_init    = ap_bridge_class_init,
+>> +    .interfaces = (InterfaceInfo[]) {
+>> +        { TYPE_HOTPLUG_HANDLER },
+>> +        { }
+>> +    }
+>>   };
+>>   
+>>   static void ap_register(void)
+>> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+>> index 6166ccd47a4a..d8b79ebe53ae 100644
+>> --- a/hw/vfio/ap.c
+>> +++ b/hw/vfio/ap.c
+>> @@ -169,7 +169,7 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
+>>       set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+>>       dc->realize = vfio_ap_realize;
+>>       dc->unrealize = vfio_ap_unrealize;
+>> -    dc->hotpluggable = false;
+>> +    dc->hotpluggable = true;
+>>       dc->reset = vfio_ap_reset;
+>>       dc->bus_type = TYPE_AP_BUS;
+>>   }
+>>
+> 
+> 
