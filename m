@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44648)
+Received: from eggs.gnu.org ([209.51.188.92]:45063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggojC-0007em-8S
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:35:23 -0500
+	(envelope-from <armbru@redhat.com>) id 1ggokl-0008Le-Hn
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:37:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ggojB-0005mB-GB
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:35:22 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:33151)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ggoj8-0005VK-HS
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:35:20 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id i20so3089702otl.0
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 02:35:15 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1ggokk-00015O-Kj
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:36:59 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190102140535.11512-1-cfergeau@redhat.com>
+	<20190102180158.GA6015@natto.ory.fergeau.eu>
+	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
+	<87o98sii5b.fsf@dusky.pond.sub.org>
+	<20190107163606.GL23773@natto.ory.fergeau.eu>
+Date: Tue, 08 Jan 2019 11:36:55 +0100
+In-Reply-To: <20190107163606.GL23773@natto.ory.fergeau.eu> (Christophe
+	Fergeau's message of "Mon, 7 Jan 2019 17:36:06 +0100")
+Message-ID: <87pnt7bflk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20190107223147.14269-1-pbonzini@redhat.com>
-In-Reply-To: <20190107223147.14269-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 Jan 2019 10:35:03 +0000
-Message-ID: <CAFEAcA-kd=zuASx3k1QW5qveU9sLNSaaL45gj-EvDJwqtOVQMQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v4 00/35] Misc patches for 2018-12-18
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Christophe Fergeau <cfergeau@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon, 7 Jan 2019 at 22:35, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit 9b2e891ec5ccdb4a7d583b77988848282606fd=
-ea:
->
->   Merge remote-tracking branch 'remotes/marcel/tags/rdma-pull-request' in=
-to staging (2018-12-22 11:25:31 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to a486bd29567a23a454e248aed1d8c28b90a6ea3e:
->
->   avoid TABs in files that only contain a few (2019-01-04 20:59:49 +0100)
->
-> ----------------------------------------------------------------
-> * HAX support for Linux hosts (Alejandro)
-> * esp bugfixes (Guenter)
-> * Windows build cleanup (Marc-Andr=C3=A9)
-> * checkpatch logic improvements (Paolo)
-> * coalesced range bugfix (Paolo)
-> * switch testsuite to TAP (Paolo, with Peter's fix to hexloader-test)
-> * QTAILQ rewrite (Paolo)
-> * block/iscsi.c cancellation fixes (Stefan)
-> * improve selection of the default accelerator (Thomas)
->
+Copying block maintainers for help with assessing the bug's (non-)impact
+on security.
 
-Hi. I fixed up a couple of textual conflicts but there
-seems to be a semantic conflict with the TCG pull:
+Christophe Fergeau <cfergeau@redhat.com> writes:
 
-/var/tmp/qemu-test.PYf8dT/tcg/tcg.c:2322:65: error: too many arguments
-provided to function-like macro i
-nvocation
-                    TCGOp *op_prev =3D QTAILQ_PREV(op, TCGOpHead, link);
-                                                                ^
-/var/tmp/qemu-test.PYf8dT/include/qemu/queue.h:457:9: note: macro
-'QTAILQ_PREV' defined here
-#define QTAILQ_PREV(elm, field)                                         \
-        ^
-/var/tmp/qemu-test.PYf8dT/tcg/tcg.c:2322:38: error: use of undeclared
-identifier 'QTAILQ_PREV'
-                    TCGOp *op_prev =3D QTAILQ_PREV(op, TCGOpHead, link);
-                                     ^
-2 errors generated.
+> On Mon, Jan 07, 2019 at 04:47:44PM +0100, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>> > On 1/2/19 12:01 PM, Christophe Fergeau wrote:
+>> >> Adding Markus to cc: list, I forgot to do it when sending the patch.
+>> >
+>> > Also worth backporting via qemu-stable, now in cc.
+>> >
+>> >> 
+>> >> Christophe
+>> >> 
+>> >> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
+>> >>> commit 8bca4613 added support for %% in json strings when interpolating,
+>> >>> but in doing so, this broke handling of % when not interpolating as the
+>> >>> '%' is skipped in both cases.
+>> >>> This commit ensures we only try to handle %% when interpolating.
+>> 
+>> Impact?
+>> 
+>> If you're unable to assess, could you give us at least a reproducer?
+>
+> This all came from https://lists.freedesktop.org/archives/spice-devel/2018-December/046644.html
+> Setting up a VM with libvirt with <graphics type='spice' autoport='yes' passwd='password%'/>
+> fails to start with:
+>   qemu-system-x86_64: qobject/json-parser.c:146: parse_string: Assertion `*ptr' failed.
+>
+> If you use 'password%%' as the password instead, when trying to connect
+> to the VM, you type 'password%' as the password instead of 'password%%'
+> as configured in the domain XML.
 
-Can you fix up and resend, please?
+Thanks.
 
-thanks
--- PMM
+As the commit message says, the bug bites when we parse a string
+containing '%s' with !ctxt->ap.  The parser then swallows a character.
+If it swallows the terminating '"', it fails the assertion.
+
+We parse with !ctxt->ap in the following cases:
+
+* Tests (tests/check-qjson.c, tests/test-qobject-input-visitor.c,
+  tests/test-visitor-serialization.c)
+
+  Plenty of tests, but we still failed to cover the buggy case :(
+
+* QMP input (monitor.c)
+
+* QGA input (qga/main.c)
+
+* qobject_from_json()
+
+  - JSON pseudo-filenames (block.c)
+
+    These are pseudo-filenames starting with "json:".
+
+  - JSON key pairs (block/rbd.c)
+
+    As far as I can tell, these can come only from pseudo-filenames
+    starting with "rbd:".
+
+  - JSON command line option arguments of -display and -blockdev
+    (qobject-input-visitor.c)
+
+    Reproducer: -blockdev '{"%"}'
+
+Command line, QMP and QGA input are trusted.
+
+Filenames are trusted when they come from command line, QMP or HMP.
+They are untrusted when they come from from image file headers.
+Example: QCOW2 backing file name.  Note that this is *not* the security
+boundary between host and guest.  It's the boundary between host and an
+image file from an untrusted source.
+
+I can't see how the bug could be exploited.  Neither failing an
+assertion nor skipping a character in a filename of your choice is
+interesting.  We don't support compiling with NDEBUG.
+
+Kevin, Max, do you agree?
