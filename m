@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45063)
+Received: from eggs.gnu.org ([209.51.188.92]:45688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggokl-0008Le-Hn
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:37:00 -0500
+	(envelope-from <public@hansmi.ch>) id 1ggomw-0000nr-QC
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:39:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggokk-00015O-Kj
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:36:59 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190102140535.11512-1-cfergeau@redhat.com>
-	<20190102180158.GA6015@natto.ory.fergeau.eu>
-	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
-	<87o98sii5b.fsf@dusky.pond.sub.org>
-	<20190107163606.GL23773@natto.ory.fergeau.eu>
-Date: Tue, 08 Jan 2019 11:36:55 +0100
-In-Reply-To: <20190107163606.GL23773@natto.ory.fergeau.eu> (Christophe
-	Fergeau's message of "Mon, 7 Jan 2019 17:36:06 +0100")
-Message-ID: <87pnt7bflk.fsf@dusky.pond.sub.org>
+	(envelope-from <public@hansmi.ch>) id 1ggomu-0005hd-UM
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:39:13 -0500
+Received: from relay6-d.mail.gandi.net ([217.70.183.198]:60975)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <public@hansmi.ch>) id 1ggomu-0005YO-NK
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:39:12 -0500
+References: <20190108102301.1957-1-kraxel@redhat.com>
+From: Michael Hanselmann <public@hansmi.ch>
+Message-ID: <f757d3c9-88dc-5c55-b736-ac08009ea0ac@msgid.hansmi.ch>
+Date: Tue, 8 Jan 2019 11:38:58 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
+In-Reply-To: <20190108102301.1957-1-kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="cNPGyMh5oxwtuVLyJmZpjQ9Hmdb5970H1"
+Subject: Re: [Qemu-devel] [PATCH] i2c-ddc: fix oob read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Fergeau <cfergeau@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-Copying block maintainers for help with assessing the bug's (non-)impact
-on security.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cNPGyMh5oxwtuVLyJmZpjQ9Hmdb5970H1
+From: Michael Hanselmann <public@hansmi.ch>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <f757d3c9-88dc-5c55-b736-ac08009ea0ac@msgid.hansmi.ch>
+Subject: Re: [PATCH] i2c-ddc: fix oob read
+References: <20190108102301.1957-1-kraxel@redhat.com>
+In-Reply-To: <20190108102301.1957-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Christophe Fergeau <cfergeau@redhat.com> writes:
+On 08.01.19 11:23, Gerd Hoffmann wrote:
+> Suggested-by: Michael Hanselmann <public@hansmi.ch>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-> On Mon, Jan 07, 2019 at 04:47:44PM +0100, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->> 
->> > On 1/2/19 12:01 PM, Christophe Fergeau wrote:
->> >> Adding Markus to cc: list, I forgot to do it when sending the patch.
->> >
->> > Also worth backporting via qemu-stable, now in cc.
->> >
->> >> 
->> >> Christophe
->> >> 
->> >> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
->> >>> commit 8bca4613 added support for %% in json strings when interpolating,
->> >>> but in doing so, this broke handling of % when not interpolating as the
->> >>> '%' is skipped in both cases.
->> >>> This commit ensures we only try to handle %% when interpolating.
->> 
->> Impact?
->> 
->> If you're unable to assess, could you give us at least a reproducer?
->
-> This all came from https://lists.freedesktop.org/archives/spice-devel/2018-December/046644.html
-> Setting up a VM with libvirt with <graphics type='spice' autoport='yes' passwd='password%'/>
-> fails to start with:
->   qemu-system-x86_64: qobject/json-parser.c:146: parse_string: Assertion `*ptr' failed.
->
-> If you use 'password%%' as the password instead, when trying to connect
-> to the VM, you type 'password%' as the password instead of 'password%%'
-> as configured in the domain XML.
+Looks good to me.
 
-Thanks.
+Reviewed-by: Michael Hanselmann <public@hansmi.ch>
 
-As the commit message says, the bug bites when we parse a string
-containing '%s' with !ctxt->ap.  The parser then swallows a character.
-If it swallows the terminating '"', it fails the assertion.
 
-We parse with !ctxt->ap in the following cases:
+--cNPGyMh5oxwtuVLyJmZpjQ9Hmdb5970H1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-* Tests (tests/check-qjson.c, tests/test-qobject-input-visitor.c,
-  tests/test-visitor-serialization.c)
+-----BEGIN PGP SIGNATURE-----
 
-  Plenty of tests, but we still failed to cover the buggy case :(
+iQIzBAEBCgAdFiEENEVC6w7lpobWh8t0Yy8zJpbbY3YFAlw0fccACgkQYy8zJpbb
+Y3Z9Ig/9GqhKMwoJchIqiAwkax9YWjg8MByQvggsBz/NLGKBJMapn1RyXLLINxlW
+u/m0X/SsarR2u+TvlAsaItOaAudyar6wQhu1l5OTtn25COwrrJg5oP57oyiDJTMj
+xW84Y2FJLRUqzt7BFF8V+dPUri/RCYvDijwkG/BaG9dfB8v1GK3K/3uPVyU0J2vc
+zOPjmM7rD49LCVf0hwllMvjw6fqmZro67KSZhVGebc5e4XWIF9nZDt218vqqIbS6
+NOm0QFuzrGB3t4KJES+ljqYpBaChw4K5Qor+GH+xCgbKaVIXQCl0fGfqH9+bOFpu
+7dWYqByoyGHv/lKn47V4Wd4qNWddjQz9PG6nbiH5TH2CQveHfkEsl89BGyNsefZ8
+j6H1iUyxsGIKZFoZZHZ8gqykduZ62y1qrDbQixfm5XoO5kELUdKnu2UqM1odSA9R
+QKjpuDAr+7k41WE7bWoH9AWP43wKZShpZgKslojjglXaK2wFGWSQX5GVTOI41JPz
+qxZmWqcKZOzle/6sy6Zm9bBU9x1AdVWpb6rvP0WAOxHM65dWJ1nH+QzQw8IJ8Ngc
+UHCc66a3EpXIdxXoS699QuKQXum5qc3FIGvGQJHd0Cxb01XT6Yrdo0oGgnG5m7Iz
+gydp0KoxfTx2Ffrq6H7NJaXIrou4DO8gttuV7OJyB8TlzpkHGbo=
+=D7pV
+-----END PGP SIGNATURE-----
 
-* QMP input (monitor.c)
-
-* QGA input (qga/main.c)
-
-* qobject_from_json()
-
-  - JSON pseudo-filenames (block.c)
-
-    These are pseudo-filenames starting with "json:".
-
-  - JSON key pairs (block/rbd.c)
-
-    As far as I can tell, these can come only from pseudo-filenames
-    starting with "rbd:".
-
-  - JSON command line option arguments of -display and -blockdev
-    (qobject-input-visitor.c)
-
-    Reproducer: -blockdev '{"%"}'
-
-Command line, QMP and QGA input are trusted.
-
-Filenames are trusted when they come from command line, QMP or HMP.
-They are untrusted when they come from from image file headers.
-Example: QCOW2 backing file name.  Note that this is *not* the security
-boundary between host and guest.  It's the boundary between host and an
-image file from an untrusted source.
-
-I can't see how the bug could be exploited.  Neither failing an
-assertion nor skipping a character in a filename of your choice is
-interesting.  We don't support compiling with NDEBUG.
-
-Kevin, Max, do you agree?
+--cNPGyMh5oxwtuVLyJmZpjQ9Hmdb5970H1--
