@@ -1,40 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50090)
+Received: from eggs.gnu.org ([209.51.188.92]:50532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1ggvIp-0005wZ-2t
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:36:36 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1ggvJw-0006wq-Qq
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:37:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1ggvIn-0004Md-7Z
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:36:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48768
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <pmorel@linux.ibm.com>) id 1ggvJt-0007ID-Np
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:37:44 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46998)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1ggvIj-0003qT-AS
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:36:31 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x08HYF32008266
-	for <qemu-devel@nongnu.org>; Tue, 8 Jan 2019 12:36:17 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2pvyxu9arn-1
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1ggvJt-0007Ez-CN
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:37:41 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x08HYTqj060066
+	for <qemu-devel@nongnu.org>; Tue, 8 Jan 2019 12:37:40 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pvx77qpqm-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 12:36:17 -0500
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 12:37:39 -0500
 Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Tue, 8 Jan 2019 17:36:15 -0000
-Date: Tue, 8 Jan 2019 18:36:09 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <f38c791b-3aad-46a8-79e7-9adb74ba4726@linux.ibm.com>
-References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-	<20181212153426.2ca5a481.cohuck@redhat.com>
-	<f38c791b-3aad-46a8-79e7-9adb74ba4726@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20190108183609.235a8eb8@oc2783563651>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 00/15] s390: vfio-ccw dasd ipl
- support
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Tue, 8 Jan 2019 17:37:36 -0000
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Tue,  8 Jan 2019 18:37:30 +0100
+In-Reply-To: <1546969050-8884-1-git-send-email-pmorel@linux.ibm.com>
+References: <1546969050-8884-1-git-send-email-pmorel@linux.ibm.com>
+Message-Id: <1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v7] s390x/pci: add common function measurement
+ block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,54 +38,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
+To: walling@linux.ibm.com
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
 
-On Tue, 8 Jan 2019 11:37:56 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+From: Yi Min Zhao <zyimin@linux.ibm.com>
 
-> On 12/12/18 9:34 AM, Cornelia Huck wrote:
-> ...
-> >>
-> >> NOTE: It has been a while, but I've finally chased down my infamous "reset bug".
-> >> On subsystem reset (I see this right after host ipl) we sometimes end up getting
-> >> an unexpected unit check status from a dasd device. This causes the first start
-> >> subchannel instruction to fail due to the pending unit check status. My solution
-> >> to this problem, as advised by the kernel folks, is to simply retry my ssch
-> >> instructions before declaring failure when unexpected unit checks happen. In the
-> >> event of a persistent error, after two retries we'll give up and print some
-> >> useful error info for the user.
-> > 
-> > So, is that a status we only see because the vfio-ccw driver keeps the
-> > subchannel enabled (as by the other recent thread)?
-> > 
-> > Is there any value in distinguishing different unit checks, or is retry
-> > the best strategy in any case?
-> > 
-> The status presents on device reset. So when the host kernel IPLs this status will be 
-> present. The very first attempt to use the device (SSCH, other instructions perhaps?) will 
-> cause this status to be presented. Sometimes the host kernel must "get there first" and 
-> clear the status. And other times the guest (by way of Qemu bios) gets there first.
-> 
-> The kernel handles unexpected unit checks by simply retrying a low number of times before 
-> giving up. Given that bios code is a constant frequency code path, and the kernel has 
-> already set this precedent, I feel safe with this decision and don't see a ton of value in 
-> doing much more. If we find a case that requires more handling we can take a look at it.
-> 
+Common function measurement block is used to report zPCI internal
+counters of successful pcilg/stg/stb and rpcit instructions to
+a memory location provided by the program.
 
-I agree, doing elaborate CIO error handling here does not seem like a
-particularly good idea.
+This patch introduces a new ZpciFmb structure and schedules a timer
+callback to copy the zPCI measures to the FMB in the guest memory
+at an interval time set to 4s.
 
-Something remotely related -- let me play crazy for a moment: let's say
-we pass-through two DASD's to a single guest, one as the IPL disk and
-one just so. If I'm not mistaken, the guest is guaranteed to get this
-special after reset unit check (let's say freshly constructed VM),
-unless there is another OS messing with the same DASD maybe, at least
-for the 'just son DASD'. I would even guess that the condition in
-question is indicated even for the IPL-DASD (if we thing guest1).
+An error while attemping to update the FMB, would generate an error
+event to the guest.
 
-But ccw-passthrough won't get perfect anyway. So I think we can ignore
-this side effect of the reset, unless  a need arises not to.
+The pcilg/stg/stb and rpcit interception handlers increase the
+related counter on a successful call.
+The guest shall pass a null FMBA (FMB address) in the FIB (Function
+Information Block) when it issues a Modify PCI Function Control
+instruction to switch off FMB and stop the corresponding timer.
 
-Regards,
-Halil
+Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+---
+ hw/s390x/s390-pci-bus.c  |   4 +-
+ hw/s390x/s390-pci-bus.h  |  29 +++++++++++
+ hw/s390x/s390-pci-inst.c | 133 +++++++++++++++++++++++++++++++++++++++++++++--
+ hw/s390x/s390-pci-inst.h |   1 +
+ 4 files changed, 163 insertions(+), 4 deletions(-)
+
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 060ff06..f0d34dd 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -989,6 +989,7 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
+     bus = pci_get_bus(pci_dev);
+     devfn = pci_dev->devfn;
+     object_unparent(OBJECT(pci_dev));
++    fmb_timer_free(pbdev);
+     s390_pci_msix_free(pbdev);
+     s390_pci_iommu_free(s, bus, devfn);
+     pbdev->pdev = NULL;
+@@ -1136,6 +1137,7 @@ static void s390_pci_device_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     zpci->state = ZPCI_FS_RESERVED;
++    zpci->fmb.format = ZPCI_FMB_FORMAT;
+ }
+ 
+ static void s390_pci_device_reset(DeviceState *dev)
+@@ -1160,7 +1162,7 @@ static void s390_pci_device_reset(DeviceState *dev)
+         pci_dereg_ioat(pbdev->iommu);
+     }
+ 
+-    pbdev->fmb_addr = 0;
++    fmb_timer_free(pbdev);
+ }
+ 
+ static void s390_pci_get_fid(Object *obj, Visitor *v, const char *name,
+diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+index 1f7f9b5..69353ef 100644
+--- a/hw/s390x/s390-pci-bus.h
++++ b/hw/s390x/s390-pci-bus.h
+@@ -286,6 +286,33 @@ typedef struct S390PCIIOMMUTable {
+     S390PCIIOMMU *iommu[PCI_SLOT_MAX];
+ } S390PCIIOMMUTable;
+ 
++/* Function Measurement Block */
++#define DEFAULT_MUI 4000
++#define UPDATE_U_BIT 0x1ULL
++#define FMBK_MASK 0xfULL
++
++typedef struct ZpciFmbFmt0 {
++    uint64_t dma_rbytes;
++    uint64_t dma_wbytes;
++} ZpciFmbFmt0;
++
++#define ZPCI_FMB_CNT_LD    0
++#define ZPCI_FMB_CNT_ST    1
++#define ZPCI_FMB_CNT_STB   2
++#define ZPCI_FMB_CNT_RPCIT 3
++#define ZPCI_FMB_CNT_MAX   4
++
++#define ZPCI_FMB_FORMAT    0
++
++typedef struct ZpciFmb {
++    uint32_t format;
++    uint32_t sample;
++    uint64_t last_update;
++    uint64_t counter[ZPCI_FMB_CNT_MAX];
++    ZpciFmbFmt0 fmt0;
++} ZpciFmb;
++QEMU_BUILD_BUG_MSG(offsetof(ZpciFmb, fmt0) != 48, "padding in ZpciFmb");
++
+ struct S390PCIBusDevice {
+     DeviceState qdev;
+     PCIDevice *pdev;
+@@ -297,6 +324,8 @@ struct S390PCIBusDevice {
+     uint32_t fid;
+     bool fid_defined;
+     uint64_t fmb_addr;
++    ZpciFmb fmb;
++    QEMUTimer *fmb_timer;
+     uint8_t isc;
+     uint16_t noi;
+     uint16_t maxstbl;
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 7b61367..be28962 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -19,6 +19,7 @@
+ #include "exec/memory-internal.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/hw_accel.h"
++#include "hw/s390x/tod.h"
+ 
+ #ifndef DEBUG_S390PCI_INST
+ #define DEBUG_S390PCI_INST  0
+@@ -293,7 +294,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintptr_t ra)
+         resgrp->fr = 1;
+         stq_p(&resgrp->dasm, 0);
+         stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
+-        stw_p(&resgrp->mui, 0);
++        stw_p(&resgrp->mui, DEFAULT_MUI);
+         stw_p(&resgrp->i, 128);
+         stw_p(&resgrp->maxstbl, 128);
+         resgrp->version = 0;
+@@ -456,6 +457,8 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
+         return 0;
+     }
+ 
++    pbdev->fmb.counter[ZPCI_FMB_CNT_LD]++;
++
+     env->regs[r1] = data;
+     setcc(cpu, ZPCI_PCI_LS_OK);
+     return 0;
+@@ -561,6 +564,8 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
+         return 0;
+     }
+ 
++    pbdev->fmb.counter[ZPCI_FMB_CNT_ST]++;
++
+     setcc(cpu, ZPCI_PCI_LS_OK);
+     return 0;
+ }
+@@ -681,6 +686,7 @@ err:
+         s390_set_status_code(env, r1, ZPCI_PCI_ST_FUNC_IN_ERR);
+         s390_pci_generate_error_event(error, pbdev->fh, pbdev->fid, start, 0);
+     } else {
++        pbdev->fmb.counter[ZPCI_FMB_CNT_RPCIT]++;
+         setcc(cpu, ZPCI_PCI_LS_OK);
+     }
+     return 0;
+@@ -783,6 +789,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
+         }
+     }
+ 
++    pbdev->fmb.counter[ZPCI_FMB_CNT_STB]++;
++
+     setcc(cpu, ZPCI_PCI_LS_OK);
+     return 0;
+ 
+@@ -889,6 +897,99 @@ void pci_dereg_ioat(S390PCIIOMMU *iommu)
+     iommu->g_iota = 0;
+ }
+ 
++void fmb_timer_free(S390PCIBusDevice *pbdev)
++{
++    if (pbdev->fmb_timer) {
++        timer_del(pbdev->fmb_timer);
++        timer_free(pbdev->fmb_timer);
++        pbdev->fmb_timer = NULL;
++    }
++    pbdev->fmb_addr = 0;
++    memset(&pbdev->fmb, 0, sizeof(ZpciFmb));
++}
++
++static int fmb_do_update(S390PCIBusDevice *pbdev, int offset, uint64_t val,
++                         int len)
++{
++    MemTxResult ret;
++    uint64_t dst = pbdev->fmb_addr + offset;
++
++    switch (len) {
++    case 8:
++        address_space_stq_be(&address_space_memory, dst, val,
++                             MEMTXATTRS_UNSPECIFIED,
++                             &ret);
++        break;
++    case 4:
++        address_space_stl_be(&address_space_memory, dst, val,
++                             MEMTXATTRS_UNSPECIFIED,
++                             &ret);
++        break;
++    case 2:
++        address_space_stw_be(&address_space_memory, dst, val,
++                             MEMTXATTRS_UNSPECIFIED,
++                             &ret);
++        break;
++    case 1:
++        address_space_stb(&address_space_memory, dst, val,
++                          MEMTXATTRS_UNSPECIFIED,
++                          &ret);
++        break;
++    default:
++        ret = MEMTX_ERROR;
++        break;
++    }
++    if (ret != MEMTX_OK) {
++        s390_pci_generate_error_event(ERR_EVENT_FMBA, pbdev->fh, pbdev->fid,
++                                      pbdev->fmb_addr, 0);
++        fmb_timer_free(pbdev);
++    }
++
++    return ret;
++}
++
++static void fmb_update(void *opaque)
++{
++    S390PCIBusDevice *pbdev = opaque;
++    int64_t t = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
++    int i;
++
++    /* Update U bit */
++    pbdev->fmb.last_update *= 2;
++    pbdev->fmb.last_update |= UPDATE_U_BIT;
++    if (fmb_do_update(pbdev, offsetof(ZpciFmb, last_update),
++                      pbdev->fmb.last_update,
++                      sizeof(pbdev->fmb.last_update))) {
++        return;
++    }
++
++    /* Update FMB sample count */
++    if (fmb_do_update(pbdev, offsetof(ZpciFmb, sample),
++                      pbdev->fmb.sample++,
++                      sizeof(pbdev->fmb.sample))) {
++        return;
++    }
++
++    /* Update FMB counters */
++    for (i = 0; i < ZPCI_FMB_CNT_MAX; i++) {
++        if (fmb_do_update(pbdev, offsetof(ZpciFmb, counter[i]),
++                          pbdev->fmb.counter[i],
++                          sizeof(pbdev->fmb.counter[0]))) {
++            return;
++        }
++    }
++
++    /* Clear U bit and update the time */
++    pbdev->fmb.last_update = time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
++    pbdev->fmb.last_update *= 2;
++    if (fmb_do_update(pbdev, offsetof(ZpciFmb, last_update),
++                      pbdev->fmb.last_update,
++                      sizeof(pbdev->fmb.last_update))) {
++        return;
++    }
++    timer_mod(pbdev->fmb_timer, t + DEFAULT_MUI);
++}
++
+ int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
+                         uintptr_t ra)
+ {
+@@ -1018,9 +1119,35 @@ int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
+             s390_set_status_code(env, r1, ZPCI_MOD_ST_SEQUENCE);
+         }
+         break;
+-    case ZPCI_MOD_FC_SET_MEASURE:
+-        pbdev->fmb_addr = ldq_p(&fib.fmb_addr);
++    case ZPCI_MOD_FC_SET_MEASURE: {
++        uint64_t fmb_addr = ldq_p(&fib.fmb_addr);
++
++        if (fmb_addr & FMBK_MASK) {
++            cc = ZPCI_PCI_LS_ERR;
++            s390_pci_generate_error_event(ERR_EVENT_FMBPRO, pbdev->fh,
++                                          pbdev->fid, fmb_addr, 0);
++            fmb_timer_free(pbdev);
++            break;
++        }
++
++        if (!fmb_addr) {
++            /* Stop updating FMB. */
++            fmb_timer_free(pbdev);
++            break;
++        }
++
++        if (!pbdev->fmb_timer) {
++            pbdev->fmb_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
++                                            fmb_update, pbdev);
++        } else if (timer_pending(pbdev->fmb_timer)) {
++            /* Remove pending timer to update FMB address. */
++            timer_del(pbdev->fmb_timer);
++        }
++        pbdev->fmb_addr = fmb_addr;
++        timer_mod(pbdev->fmb_timer,
++                  qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + DEFAULT_MUI);
+         break;
++    }
+     default:
+         s390_program_interrupt(&cpu->env, PGM_OPERAND, 6, ra);
+         cc = ZPCI_PCI_LS_ERR;
+diff --git a/hw/s390x/s390-pci-inst.h b/hw/s390x/s390-pci-inst.h
+index 91c3d61..fa3bf8b 100644
+--- a/hw/s390x/s390-pci-inst.h
++++ b/hw/s390x/s390-pci-inst.h
+@@ -303,6 +303,7 @@ int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
+                         uintptr_t ra);
+ int stpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
+                          uintptr_t ra);
++void fmb_timer_free(S390PCIBusDevice *pbdev);
+ 
+ #define ZPCI_IO_BAR_MIN 0
+ #define ZPCI_IO_BAR_MAX 5
+-- 
+2.7.4
