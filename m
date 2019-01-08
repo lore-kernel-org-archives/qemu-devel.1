@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38336)
+Received: from eggs.gnu.org ([209.51.188.92]:38371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ggpsN-0008BX-9Q
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:48:56 -0500
+	(envelope-from <peterx@redhat.com>) id 1ggpsO-0008Cf-Cm
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:48:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ggpsL-0005c9-87
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:48:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39518)
+	(envelope-from <peterx@redhat.com>) id 1ggpsN-0005hV-9j
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:48:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:18573)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ggpsE-00055s-LM
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:48:48 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ggpsM-0005En-8q
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:48:55 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  8 Jan 2019 19:47:19 +0800
-Message-Id: <20190108114720.21760-5-peterx@redhat.com>
+Date: Tue,  8 Jan 2019 19:47:20 +0800
+Message-Id: <20190108114720.21760-6-peterx@redhat.com>
 In-Reply-To: <20190108114720.21760-1-peterx@redhat.com>
 References: <20190108114720.21760-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/5] i386/kvm: ignore masked irqs when update
- msi routes
+Subject: [Qemu-devel] [PATCH 5/5] vfio: retry one more time conditionally
+ for type1 unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +27,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-When we are with intel-iommu device and with IR on, KVM will register
-an IEC notifier to detect interrupt updates from the guest and we'll
-kick off kvm_update_msi_routes_all() when it happens to make sure
-kernel IRQ cache is matching the latest.
+In Linux version v4.15+ there's a bug (introduced in 71a7d3d78e3c,
+"vfio/type1: silence integer overflow warning", 2017-10-20) that could
+potentially reject a valid unmap region that covers exactly the whole
+u64 address space (like iova=0xfef00000, size=2^64-0xfef00000).
+Besides a fix on the kernel side, QEMU also needs to live well even
+with the old kernels.  When booting a guest with both vfio-pci and
+intel-iommu device, we can see error dumped:
 
-Though, kvm_update_msi_routes_all() is buggy in that it ignored the
-mask bit of either MSI/MSIX messages and it tries to translate the
-message even if the corresponding message was already masked by the
-guest driver (hence the MSI/MSIX message will be invalid).
+  qemu-kvm: VFIO_UNMAP_DMA: -22
+  qemu-kvm: vfio_dma_unmap(0x561f059948f0, 0xfef00000,
+            0xffffffff01100000) = -22 (Invalid argument)
 
-Without this patch, we can receive an error message when we reboot a
-guest with both an assigned vfio-pci device and intel-iommu enabled:
+This patch gives another shot of the UNMAP ioctl if the specific error
+was detected, while in the second UNMAP ioctl we skip the last page
+assuming that it's never used.  In our case, currently only Intel VT-d
+is using this code and it should never use the iova address
+2^64-4096 (so far largest supported GAW is 57 bits) so ignoring that
+page should be fine.
 
-  qemu-system-x86_64: vtd_interrupt_remap_msi: MSI address low 32 bit invalid: 0x0
+After this patch is applied, the errors go away.
 
-The error does not affect functionality of the guest since when we
-failed to translate we'll just silently continue (which makes sense
-since crashing the VM for this seems even worse), but still it's
-better to fix it up.
-
+Reported-by: Pei Zhang <pezhang@redhat.com>
+Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1662291
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- target/i386/kvm.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ hw/vfio/common.c     | 16 ++++++++++++++++
+ hw/vfio/trace-events |  1 +
+ 2 files changed, 17 insertions(+)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 739cf8c8ea..08e211c70e 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -3889,7 +3889,7 @@ static QLIST_HEAD(, MSIRouteEntry) msi_route_list = \
- static void kvm_update_msi_routes_all(void *private, bool global,
-                                       uint32_t index, uint32_t mask)
- {
--    int cnt = 0;
-+    int cnt = 0, vector;
-     MSIRouteEntry *entry;
-     MSIMessage msg;
-     PCIDevice *dev;
-@@ -3897,11 +3897,19 @@ static void kvm_update_msi_routes_all(void *private, bool global,
-     /* TODO: explicit route update */
-     QLIST_FOREACH(entry, &msi_route_list, list) {
-         cnt++;
-+        vector = entry->vector;
-         dev = entry->dev;
--        if (!msix_enabled(dev) && !msi_enabled(dev)) {
-+        if (msix_enabled(dev) && !msix_is_masked(dev, vector)) {
-+            msg = msix_get_message(dev, vector);
-+        } else if (msi_enabled(dev) && !msi_is_masked(dev, vector)) {
-+            msg = msi_get_message(dev, vector);
-+        } else {
-+            /*
-+             * Either MSI/MSIX is disabled for the device, or the
-+             * specific message was masked out.  Skip this one.
-+             */
-             continue;
-         }
--        msg = pci_get_msi_message(dev, entry->vector);
-         kvm_irqchip_update_msi_route(kvm_state, entry->virq, msg, dev);
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 7c185e5a2e..7f8de5b7a5 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -221,6 +221,22 @@ static int vfio_dma_unmap(VFIOContainer *container,
+     };
+ 
+     if (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
++        /*
++         * Give it another shot due to a bug in kernel (v4.15-v4.20)
++         * that could potentially reject a region that exactly covers
++         * the whole u64 address space (71a7d3d78e3c, "vfio/type1:
++         * silence integer overflow warning", 2017-10-20).  If that
++         * happens, we retry for one more time assuming that the last
++         * page of the address space (2^64-getpagesize()) has already
++         * been dropped.
++         */
++        if (errno == EINVAL && unmap.size && unmap.iova + unmap.size == 0) {
++            trace_vfio_dma_unmap_workaround_overflow();
++            unmap.size -= getpagesize();
++            if (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap) == 0) {
++                return 0;
++            }
++        }
+         error_report("VFIO_UNMAP_DMA: %d", -errno);
+         return -errno;
      }
-     kvm_irqchip_commit_routes(kvm_state);
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index a85e8662ea..2c9db4fb9a 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -110,6 +110,7 @@ vfio_region_mmaps_set_enabled(const char *name, bool enabled) "Region %s mmaps e
+ vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Device %s region %d: %d sparse mmap entries"
+ vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
+ vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
++vfio_dma_unmap_workaround_overflow(void) ""
+ 
+ # hw/vfio/platform.c
+ vfio_platform_base_device_init(char *name, int groupid) "%s belongs to group #%d"
 -- 
 2.17.1
