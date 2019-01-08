@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59758)
+Received: from eggs.gnu.org ([209.51.188.92]:60488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ggpYv-00078o-H7
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:28:50 -0500
+	(envelope-from <lersek@redhat.com>) id 1ggpai-0008G3-46
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:30:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ggpYs-0002GL-Im
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:28:48 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 8 Jan 2019 11:28:36 +0000
-Message-ID: <08d1811e-e8e6-1090-d9ec-ea3fc9b5c6ff@virtuozzo.com>
-References: <320758d6-012b-0b17-2467-f73bf8f4dcb2@virtuozzo.com>
-	<9e947c78-97b4-8eca-1e10-637489a39fe7@redhat.com>
-In-Reply-To: <9e947c78-97b4-8eca-1e10-637489a39fe7@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <14A2D8DBF787334499540339D016585D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <lersek@redhat.com>) id 1ggpaf-0006d1-EA
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:30:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56816)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1ggpaf-0006Se-2c
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 06:30:37 -0500
+References: <20181225125344.4482-1-arilou@gmail.com>
+	<CAJ+F1CJN=Gn5GYqrOeqWFNryw=q+7q8TDUX0VQEzrtS8tbUeQg@mail.gmail.com>
+	<7961a154-f139-af73-613d-94b88bf95392@redhat.com>
+	<CAP7QCogAWOWgkzL+ebufbpiaap=iSaNh+HWP4N3Sx1OwseQxhA@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <8d68801f-3252-fd43-cd11-7866c297677d@redhat.com>
+Date: Tue, 8 Jan 2019 12:30:26 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] do not lseek in qcow2 block_status
+In-Reply-To: <CAP7QCogAWOWgkzL+ebufbpiaap=iSaNh+HWP4N3Sx1OwseQxhA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] dump: Set correct vaddr for ELF dump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +30,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Jon Doron <arilou@gmail.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Wen Congyang <wency@cn.fujitsu.com>, Luiz Capitulino <lcapitulino@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MDcuMDEuMjAxOSAxNTo1MiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyNC4xMi4xOCAxNjo1MCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEhpIGFsbCENCj4+DQo+PiBi
-ZHJ2X2NvX2Jsb2NrX3N0YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlvbmFsLCBtb3JlIGFj
-Y3VyYXRlIHNlYXJjaCBmb3IgaG9sZQ0KPj4gaW5zaWRlIHJlZ2lvbiwgcmVwb3J0ZWQgYXMgREFU
-QSBieSBicyBzaW5jZSBsb25nLWFnbw0KPj4NCj4+ICAgICBjb21taXQgNWRhYTc0YTZlYmNlNzU0
-M2FhYWQxNzhjNDA2MWRjMDg3YmI0YzcwNQ0KPj4gICAgIEF1dGhvcjogUGFvbG8gQm9uemluaSA8
-cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4+ICAgICBEYXRlOiAgIFdlZCBTZXAgNCAxOTowMDozOCAy
-MDEzICswMjAwDQo+Pg0KPj4gICAgICAgICBibG9jazogbG9vayBmb3IgemVybyBibG9ja3MgaW4g
-YnMtPmZpbGUNCj4+DQo+PiBUaGlzIGFjY3VyYWN5IGlzIG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2
-ZSBxY293MiBkaXNrLiBBY3R1YWxseSwgcWNvdzIga25vd3MsDQo+PiB3aGVyZSBhcmUgaG9sZXMg
-YW5kIHdoZXJlIGlzIGRhdGEuIEJ1dCBldmVyeSBibG9ja19zdGF0dXMgcmVxdWVzdCBjYWxscyBs
-c2Vlaw0KPj4gYWRkaXRpb25hbGx5LiBSZWNlbnRseSAoYW5kIG5vdCB0aGUgZmlyc3QgdGltZSkg
-d2UgaGF2ZSBmYWNlZCB0aGUgc2l0dWF0aW9uLA0KPj4gd2hlbiBsc2VlayB3b3JrcyBzbG93LiBP
-ZiBjb3Vyc2UsIGl0IGlzIG1vcmUgYWJvdXQga2VybmVsIGltcGxlbWVudGF0aW9uIG9mIGl0LA0K
-Pj4gYnV0IHdoeSB0byBpbnZvbHZlIGxzZWVrIGF0IGFsbCwgaWYgd2UgaGF2ZSB0aGUgaW5mb3Jt
-YXRpb24gb24gcWNvdzIgbGV2ZWw/DQo+PiBBc3N1bWUgYSBiaWcgZGlzaywgZnVsbCBvZiBkYXRh
-LCBpbiBhbnkgaXRlcmF0aXZlIGNvcHlpbmcgYmxvY2sgam9iIChvciBpbWcNCj4+IGNvbnZlcnQp
-IHdlJ2xsIGNhbGwgbHNlZWsoSE9MRSkgb24gZXZlcnkgaXRlcmF0aW9uLCBhbmQgZWFjaCBvZiB0
-aGVzZSBsc2Vla3MNCj4+IHdpbGwgaGF2ZSB0byBpdGVyYXRlIHRocm91Z2ggYWxsIG1ldGFkYXRh
-IHVwIHRvIHRoZSBlbmQgb2YgZmlsZS4gSXQncyBvYnZpb3VzbHkNCj4+IGluZWZmZWN0aXZlIGJl
-aGF2aW9yLg0KPj4NCj4+IEknbSB0aGlua2luZyBhYm91dCwgaG93IHRvIHByb3Blcmx5IHdvcmth
-cm91bmQgdGhpcyB0aGluZywgYW5kIEkgaGF2ZSBzb21lDQo+PiBxdWVzdGlvbnMuDQo+Pg0KPj4g
-V2hhdCBhcmUgdGhlIGNhc2VzLCB3aGVuIHdlIHJlYWxseSBuZWVkIGRpZ2dpbmcgZm9yIHplcm9z
-IGluIGJzLT5maWxlPw0KPj4NCj4+IFdoeSBpbiBtaXJyb3Igd2UgY2FyZSBhYm91dCBkaXNjYXJk
-IHZzIHdyaXRlX3plcm9zLCBrZWVwaW5nIGluIG1pbmQsIHRoYXQNCj4+IGJsb2NrX3N0YXR1cyB3
-aWxsIHJldHVybiBaRVJPIGluc3RlYWQgZm9yIHVuYWxsb2NhdGVkIHJlZ2lvbnMgaW4gc29tZSBj
-YXNlcywgbm90DQo+PiByZWxhdGVkIHRvIGd1ZXN0IHZpZXcgb2YgZGlzayAoYmRydl91bmFsbG9j
-YXRlZF9ibG9ja3NfYXJlX3plcm8sIGJhY2tpbmcgZmlsZSBpcw0KPj4gc21hbGxlciB0aGFuIHJl
-cXVlc3Quc3RhcnQpPw0KPj4NCj4+IEFuZCBmaW5hbGx5LCB3aGF0IHRvIGRvIHdpdGggdGhlIHBy
-b2JsZW0/DQo+Pg0KPj4gT2J2aW91c2x5LCB0aGUgc2ltcGxlc3QgdGhpbmcgaXMganVzdCByZXZl
-cnQgNWRhYTc0YS4gV2hhdCB3aWxsIGl0IGJyZWFrPw0KPj4NCj4+IE90aGVyd2lzZSwgSSBuZWVk
-IHRvICJyZXZlcnQiIGl0IGluIHNvbWUgY2FzZXMsIGFuZCwgbWF5IGJlLCBpdCBzaG91bGQgYmUg
-YQ0KPj4gdXNlci1kZWZpbmVkIHBhcmFtZXRlci4uIFNob3VsZCBpdD8gIEFuZCB3aGF0IGFyZSB0
-aGUgY2FzZXM/IFdlIG5lZWQgdG8gImZyZWUiDQo+PiBvZiA1ZGFhNzRhIGF0IGxlYXN0IHFjb3cy
-Li4gQnV0IGFnYWluLCBzaG91bGQgaXQgYmUgZm9ybWF0LXNwZWNpZmljIG9wdGlvbiwgb3INCj4+
-IHNvbWV0aGluZyBtb3JlIGdlbmVyaWM/DQo+Pg0KPj4gVGhlbiwgaWYgaXQgd291bGQgYmUgc2Vw
-YXJhdGUgcGFyYW1ldGVyLCBob3cgc2hvdWxkIGl0IGludGVyZmVyZSB3aXRoDQo+PiB3YW50X3pl
-cm9zLCBvciBldmVuLCBzaG91bGQgaXQgYmUgd2FudF96ZXJvcywgcmV3b3JrZWQgYSBiaXQgdG8g
-YmUgd2FudF9sc2Vlaz8NCj4gDQo+IEFzIGZhciBhcyBJIGhhdmUgdW5kZXJzdG9vZCwgdGhlIEB3
-YW50X3plcm8gcGFyYW1ldGVyIGJhc2ljYWxseSBpcw0KPiBleGFjdGx5IHRoaXMuICBJZiB5b3Ug
-d2FudCB0aGUgY2FsbCB0byBiZSBxdWljaywgeW91IHNldCBpdCB0byBmYWxzZS4NCj4gSWYgeW91
-IHdhbnQgdGhlIHJlc3VsdCB0byBiZSBhY2N1cmF0ZSwgeW91IHNldCBpdCB0byB0cnVlLg0KPiAN
-Cj4gV2VsbCwgZm9yIHJhdyBpbWFnZXMgaXQnbGwgc3RpbGwgZ28gZG93biB0byBicy0+ZmlsZSBl
-dmVuIHdpdGgNCj4gd2FudF96ZXJvPWZhbHNlLCBidXQgSSBkb24ndCB0aGluayB0aGVyZSdzIG11
-Y2ggZWxzZSB3ZSBjYW4gZG8sIHJlYWxseS4NCj4gDQo+IE1heA0KPiANCg0Kd2FudF96ZXJvIGFs
-c28gYWZmZWN0cywgdGhhdCB1bmFsbG9jYXRlZCBhcmVhcyB3aXRoIGJkcnZfdW5hbGxvY2F0ZWRf
-YmxvY2tzX2FyZV96ZXJvKCkgaXMNCnRydWUgYXJlIHN0aWxsIHJlcG9ydGVkIHVuYWxsb2NhdGVk
-ICh3aXRob3V0IFpFUk8pIGlmIHdhbnRfemVybyBpcyBub3Qgc2V0LiAoYW5kIHNpbWlsYXIgZm9y
-DQp1bmFsbG9jYXRlZCBhcmVhcyBhZnRlciBlbmQgb2YgYmFja2luZyBmaWxlKS4uDQoNCkFsc28s
-IHdhbnRfemVybyBpcyBjdXJyZW50bHkgaW50ZXJuYWwgcGFyYW1ldGVyLCBqdXN0IHNldCB0byB0
-cnVlIGluIF9ibG9ja19zdGF0dXMgYW5kIGZhbHNlIGluDQpfaXNfYWxsb2NhdGVkLg0KDQpPaywg
-ZmluYWxseSwgaXMgaXQgT0sgdG8gYWRkIG5vLWxzZWVrIG9wdGlvbiBmb3IgJ2ZpbGUnIGJsb2Nr
-IGRyaXZlciwgd2hpY2ggd2lsbCBiZWhhdmUgZXhhY3RseQ0KYXMgd2FudF96ZXJvID0gZmFsc2U/
-DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 01/08/19 07:31, Jon Doron wrote:
+> Thank you for looking into this, perhaps I could change the patch (at
+> least in the C part not the python script) to something like:
+> -    phdr.p_vaddr =3D cpu_to_dumpXX(s, memory_mapping->virt_addr);
+> +    phdr.p_vaddr =3D cpu_to_dumpXX(s, memory_mapping->virt_addr) ?
+> cpu_to_dumpXX(s, memory_mapping->virt_addr) : phdr.p_paddr;
+>=20
+> So in the case of paging where virt_addr is available we will use it
+
+I guess that would be an improvement, yes.
+
+Regarding style: although I'm personally opposed to most GNUisms, QEMU
+liberally uses, for example, the GNU extension:
+
+  https://gcc.gnu.org/onlinedocs/gcc/Conditionals.html
+
+And, the "?:" operator would apply here.
+
+Thanks,
+Laszlo
+
+> On Mon, Jan 7, 2019 at 8:04 PM Laszlo Ersek <lersek@redhat.com> wrote:
+>>
+>> On 01/07/19 13:14, Marc-Andr=C3=A9 Lureau wrote:
+>>> Hi
+>>>
+>>> On Tue, Dec 25, 2018 at 5:52 PM Jon Doron <arilou@gmail.com> wrote:
+>>>>
+>>>> vaddr needs to be equal to the paddr since the dump file represents =
+the
+>>>> physical memory image.
+>>>>
+>>>> Without setting vaddr correctly, GDB would load all the different me=
+mory
+>>>> regions on top of each other to vaddr 0, thus making GDB showing the=
+ wrong
+>>>> memory data for a given address.
+>>>>
+>>>> Signed-off-by: Jon Doron <arilou@gmail.com>
+>>>
+>>> This is a non-trivial patch! (qemu-trivial, please ignore).
+>>>
+>>>> ---
+>>>>  dump.c                       | 4 ++--
+>>>>  scripts/dump-guest-memory.py | 1 +
+>>>>  2 files changed, 3 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/dump.c b/dump.c
+>>>> index 4ec94c5e25..bf77a119ea 100644
+>>>> --- a/dump.c
+>>>> +++ b/dump.c
+>>>> @@ -192,7 +192,7 @@ static void write_elf64_load(DumpState *s, Memor=
+yMapping *memory_mapping,
+>>>>      phdr.p_paddr =3D cpu_to_dump64(s, memory_mapping->phys_addr);
+>>>>      phdr.p_filesz =3D cpu_to_dump64(s, filesz);
+>>>>      phdr.p_memsz =3D cpu_to_dump64(s, memory_mapping->length);
+>>>> -    phdr.p_vaddr =3D cpu_to_dump64(s, memory_mapping->virt_addr);
+>>>> +    phdr.p_vaddr =3D phdr.p_paddr;
+>>>
+>>> This is likely breaking paging=3Dtrue somehow, which sets
+>>> memory_mapping->virt_addr to non-0.
+>>>
+>>> According to doc "If you want to use gdb to process the core, please
+>>> set @paging to true."
+>>>
+>>> Although I am not able to (gdb) x/10bx 0xa0000 for example on a core
+>>> produced with paging. Not sure why, anybody could help?
+>>>
+>>>>      assert(memory_mapping->length >=3D filesz);
+>>>>
+>>>> @@ -216,7 +216,7 @@ static void write_elf32_load(DumpState *s, Memor=
+yMapping *memory_mapping,
+>>>>      phdr.p_paddr =3D cpu_to_dump32(s, memory_mapping->phys_addr);
+>>>>      phdr.p_filesz =3D cpu_to_dump32(s, filesz);
+>>>>      phdr.p_memsz =3D cpu_to_dump32(s, memory_mapping->length);
+>>>> -    phdr.p_vaddr =3D cpu_to_dump32(s, memory_mapping->virt_addr);
+>>>> +    phdr.p_vaddr =3D phdr.p_paddr;
+>>>>
+>>>>      assert(memory_mapping->length >=3D filesz);
+>>>>
+>>>> diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memor=
+y.py
+>>>> index 198cd0fe40..2c587cbefc 100644
+>>>> --- a/scripts/dump-guest-memory.py
+>>>> +++ b/scripts/dump-guest-memory.py
+>>>> @@ -163,6 +163,7 @@ class ELF(object):
+>>>>          phdr =3D get_arch_phdr(self.endianness, self.elfclass)
+>>>>          phdr.p_type =3D p_type
+>>>>          phdr.p_paddr =3D p_paddr
+>>>> +        phdr.p_vaddr =3D p_paddr
+>>>
+>>> With your proposed change though, I can dump memory with gdb...
+>>>
+>>>>          phdr.p_filesz =3D p_size
+>>>>          phdr.p_memsz =3D p_size
+>>>>          self.segments.append(phdr)
+>>>> --
+>>>> 2.19.2
+>>>>
+>>>>
+>>>
+>>>
+>>
+>> I've never used paging-enabled dumps. First, because doing so requires
+>> QEMU to trust guest memory contents (see original commit 783e9b4826b9;
+>> or more recently/generally, the @dump-guest-memory docs in
+>> "qapi/misc.json"). Second, because whenever I had to deal with guest
+>> memory dumps, I always used "crash" (which needs no paging), and the
+>> subject guests were all Linux.
+>>
+>> I can't comment on paging-enabled patches for dump, except that they
+>> shouldn't regress the paging-disabled functionality. :) If the patches
+>> satisfy that, I'm fine.
+>>
+>> (I *am* surprised that GDB insists on p_vaddr equaling p_paddr; after
+>> all, in the guest, the virtual address is "memory_mapping->virt_addr".
+>> But, I would never claim to understand most of the ELF intricacies,
+>> and/or what GDB requires on top of those.)
+>>
+>> Thanks
+>> Laszlo
