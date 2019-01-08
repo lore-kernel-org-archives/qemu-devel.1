@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52881)
+Received: from eggs.gnu.org ([209.51.188.92]:52910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzvH-0000RG-Qa
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:36 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzvK-0000UT-DE
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzvH-00050K-0g
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:35 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33238)
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzvJ-00053Y-F8
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:38 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38112)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggzvG-0004zS-QW
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:34 -0500
-Received: by mail-pf1-x441.google.com with SMTP id c123so2630570pfb.0
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:32:34 -0800 (PST)
+	id 1ggzvJ-00052m-8M
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:37 -0500
+Received: by mail-pl1-x643.google.com with SMTP id e5so2564207plb.5
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:32:37 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  9 Jan 2019 08:31:20 +1000
-Message-Id: <20190108223129.5570-23-richard.henderson@linaro.org>
+Date: Wed,  9 Jan 2019 08:31:21 +1000
+Message-Id: <20190108223129.5570-24-richard.henderson@linaro.org>
 In-Reply-To: <20190108223129.5570-1-richard.henderson@linaro.org>
 References: <20190108223129.5570-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 22/31] target/arm: Decode TBID from TCR
+Subject: [Qemu-devel] [PATCH v3 23/31] target/arm: Reuse aa64_va_parameters
+ for setting tbflags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +30,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Use TBID in aa64_va_parameters depending on the data parameter.
-This automatically updates all existing users of the function.
+The arm_regime_tbi{0,1} functions are replacable with the new function
+by giving the lowest and highest address.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/internals.h |  1 +
- target/arm/helper.c    | 14 +++++++++++---
- 2 files changed, 12 insertions(+), 3 deletions(-)
+v3: Use aa64_va_parameters_both and compute both tbii and tbid.
+    Merged back from a later patch set.
+---
+ target/arm/cpu.h    | 35 -----------------------
+ target/arm/helper.c | 70 ++++++++++++++++-----------------------------
+ 2 files changed, 24 insertions(+), 81 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index acd99b579c..a6fd4582b2 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -950,6 +950,7 @@ typedef struct ARMVAParameters {
-     unsigned tsz    : 8;
-     unsigned select : 1;
-     bool tbi        : 1;
-+    bool tbid       : 1;
-     bool epd        : 1;
-     bool hpd        : 1;
-     bool using16k   : 1;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index ea9b8ec4a1..8512ca3552 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3015,41 +3015,6 @@ static inline bool arm_cpu_bswap_data(CPUARMState *env)
+ }
+ #endif
+ 
+-#ifndef CONFIG_USER_ONLY
+-/**
+- * arm_regime_tbi0:
+- * @env: CPUARMState
+- * @mmu_idx: MMU index indicating required translation regime
+- *
+- * Extracts the TBI0 value from the appropriate TCR for the current EL
+- *
+- * Returns: the TBI0 value.
+- */
+-uint32_t arm_regime_tbi0(CPUARMState *env, ARMMMUIdx mmu_idx);
+-
+-/**
+- * arm_regime_tbi1:
+- * @env: CPUARMState
+- * @mmu_idx: MMU index indicating required translation regime
+- *
+- * Extracts the TBI1 value from the appropriate TCR for the current EL
+- *
+- * Returns: the TBI1 value.
+- */
+-uint32_t arm_regime_tbi1(CPUARMState *env, ARMMMUIdx mmu_idx);
+-#else
+-/* We can't handle tagged addresses properly in user-only mode */
+-static inline uint32_t arm_regime_tbi0(CPUARMState *env, ARMMMUIdx mmu_idx)
+-{
+-    return 0;
+-}
+-
+-static inline uint32_t arm_regime_tbi1(CPUARMState *env, ARMMMUIdx mmu_idx)
+-{
+-    return 0;
+-}
+-#endif
+-
+ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                           target_ulong *cs_base, uint32_t *flags);
+ 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 28322ae109..cc3c0d47c8 100644
+index cc3c0d47c8..e610155166 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -9749,7 +9749,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
- {
-     uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
-     uint32_t el = regime_el(env, mmu_idx);
--    bool tbi, epd, hpd, using16k, using64k;
-+    bool tbi, tbid, epd, hpd, using16k, using64k;
-     int select, tsz;
- 
-     /* Bit 55 is always between the two regions, and is canonical for
-@@ -9763,10 +9763,11 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-         using16k = extract32(tcr, 15, 1);
-         if (mmu_idx == ARMMMUIdx_S2NS) {
-             /* VTCR_EL2 */
--            tbi = hpd = false;
-+            tbi = tbid = hpd = false;
-         } else {
-             tbi = extract32(tcr, 20, 1);
-             hpd = extract32(tcr, 24, 1);
-+            tbid = extract32(tcr, 29, 1);
-         }
-         epd = false;
-     } else if (!select) {
-@@ -9776,6 +9777,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-         using16k = extract32(tcr, 15, 1);
-         tbi = extract64(tcr, 37, 1);
-         hpd = extract64(tcr, 41, 1);
-+        tbid = extract64(tcr, 51, 1);
-     } else {
-         int tg = extract32(tcr, 30, 2);
-         using16k = tg == 1;
-@@ -9784,6 +9786,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-         epd = extract32(tcr, 23, 1);
-         tbi = extract64(tcr, 38, 1);
-         hpd = extract64(tcr, 42, 1);
-+        tbid = extract64(tcr, 52, 1);
-     }
-     tsz = MIN(tsz, 39);  /* TODO: ARMv8.4-TTST */
-     tsz = MAX(tsz, 16);  /* TODO: ARMv8.2-LVA  */
-@@ -9792,6 +9795,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-         .tsz = tsz,
-         .select = select,
-         .tbi = tbi,
-+        .tbid = tbid,
-         .epd = epd,
-         .hpd = hpd,
-         .using16k = using16k,
-@@ -9802,7 +9806,11 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
- ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
-                                    ARMMMUIdx mmu_idx, bool data)
- {
--    return aa64_va_parameters_both(env, va, mmu_idx);
-+    ARMVAParameters ret = aa64_va_parameters_both(env, va, mmu_idx);
-+
-+    /* Present TBI as a composite with TBID.  */
-+    ret.tbi &= (data || !ret.tbid);
-+    return ret;
+@@ -8957,48 +8957,6 @@ static inline ARMMMUIdx stage_1_mmu_idx(ARMMMUIdx mmu_idx)
+     return mmu_idx;
  }
  
- static ARMVAParameters aa32_va_parameters(CPUARMState *env, uint32_t va,
+-/* Returns TBI0 value for current regime el */
+-uint32_t arm_regime_tbi0(CPUARMState *env, ARMMMUIdx mmu_idx)
+-{
+-    TCR *tcr;
+-    uint32_t el;
+-
+-    /* For EL0 and EL1, TBI is controlled by stage 1's TCR, so convert
+-     * a stage 1+2 mmu index into the appropriate stage 1 mmu index.
+-     */
+-    mmu_idx = stage_1_mmu_idx(mmu_idx);
+-
+-    tcr = regime_tcr(env, mmu_idx);
+-    el = regime_el(env, mmu_idx);
+-
+-    if (el > 1) {
+-        return extract64(tcr->raw_tcr, 20, 1);
+-    } else {
+-        return extract64(tcr->raw_tcr, 37, 1);
+-    }
+-}
+-
+-/* Returns TBI1 value for current regime el */
+-uint32_t arm_regime_tbi1(CPUARMState *env, ARMMMUIdx mmu_idx)
+-{
+-    TCR *tcr;
+-    uint32_t el;
+-
+-    /* For EL0 and EL1, TBI is controlled by stage 1's TCR, so convert
+-     * a stage 1+2 mmu index into the appropriate stage 1 mmu index.
+-     */
+-    mmu_idx = stage_1_mmu_idx(mmu_idx);
+-
+-    tcr = regime_tcr(env, mmu_idx);
+-    el = regime_el(env, mmu_idx);
+-
+-    if (el > 1) {
+-        return 0;
+-    } else {
+-        return extract64(tcr->raw_tcr, 38, 1);
+-    }
+-}
+-
+ /* Return the TTBR associated with this translation regime */
+ static inline uint64_t regime_ttbr(CPUARMState *env, ARMMMUIdx mmu_idx,
+                                    int ttbrn)
+@@ -13051,10 +13009,30 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+ 
+         *pc = env->pc;
+         flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
+-        /* Get control bits for tagged addresses */
+-        flags = FIELD_DP32(flags, TBFLAG_A64, TBII,
+-                           (arm_regime_tbi1(env, mmu_idx) << 1) |
+-                           arm_regime_tbi0(env, mmu_idx));
++
++#ifndef CONFIG_USER_ONLY
++        /*
++         * Get control bits for tagged addresses.  Note that the
++         * translator only uses this for instruction addresses.
++         */
++        {
++            ARMMMUIdx stage1 = stage_1_mmu_idx(mmu_idx);
++            ARMVAParameters p0 = aa64_va_parameters_both(env, 0, stage1);
++            int tbii, tbid;
++
++            /* FIXME: ARMv8.1-VHE S2 translation regime.  */
++            if (regime_el(env, stage1) < 2) {
++                ARMVAParameters p1 = aa64_va_parameters_both(env, -1, stage1);
++                tbid = (p1.tbi << 1) | p0.tbi;
++                tbii = tbid & ~((p1.tbid << 1) | p0.tbid);
++            } else {
++                tbid = p0.tbi;
++                tbii = tbid & !p0.tbid;
++            }
++
++            flags = FIELD_DP32(flags, TBFLAG_A64, TBII, tbii);
++        }
++#endif
+ 
+         if (cpu_isar_feature(aa64_sve, cpu)) {
+             int sve_el = sve_exception_el(env, current_el);
 -- 
 2.17.2
