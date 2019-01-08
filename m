@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58540)
+Received: from eggs.gnu.org ([209.51.188.92]:58521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gh09K-0006Tn-DM
+	(envelope-from <dgibson@ozlabs.org>) id 1gh09J-0006SK-R7
 	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:47:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gh09I-00079B-TE
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:47:06 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gh09I-00078d-Gp
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:47:05 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  9 Jan 2019 09:45:59 +1100
-Message-Id: <20190108224600.23125-29-david@gibson.dropbear.id.au>
+Date: Wed,  9 Jan 2019 09:45:51 +1100
+Message-Id: <20190108224600.23125-21-david@gibson.dropbear.id.au>
 In-Reply-To: <20190108224600.23125-1-david@gibson.dropbear.id.au>
 References: <20190108224600.23125-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 28/29] spapr: introduce a new sPAPR IRQ backend
- supporting XIVE and XICS
+Subject: [Qemu-devel] [PULL 20/29] spapr: modify the prototype of the
+ cpu_intc_create() method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,324 +28,200 @@ Cc: groug@kaod.org, clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Da
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The 'dual' sPAPR IRQ backend supports both interrupt mode, XIVE
-exploitation mode and the legacy compatibility mode (XICS). both modes
-are not supported at the same time.
+Today, the interrupt presenter is linked to a CPU using the
+cpu_intc_create() method of the sPAPR IRQ backend. The resulting
+object is assigned to the PowerPCCPU 'intc' pointer whatever the
+interrupt mode, XICS or XIVE.
 
-The machine starts with the legacy mode and a new interrupt mode can
-then be negotiated by the CAS process. In this case, the new mode is
-activated after a reset to take into account the required changes in
-the machine. These impact the device tree layout, the interrupt
-presenter object and the exposed MMIO regions in the case of XIVE.
+To support the 'dual' interrupt mode, we will need to distinguish
+between the two presenter objects and for that, we plan to introduce a
+second interrupt presenter object pointer under the PowerPCCPU. The
+modifications below move the assignment of the presenter object under
+the cpu_intc_create() method to prepare ground for the future changes.
+
+Both sPAPR and PowerNV machines are impacted.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c             |  10 ++-
- hw/ppc/spapr_hcall.c       |  11 +++
- hw/ppc/spapr_irq.c         | 179 +++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr_irq.h |   1 +
- 4 files changed, 198 insertions(+), 3 deletions(-)
+ hw/ppc/pnv.c               | 23 ++++++++++++++++-------
+ hw/ppc/pnv_core.c          |  2 +-
+ hw/ppc/spapr_cpu_core.c    |  2 +-
+ hw/ppc/spapr_irq.c         | 34 ++++++++++++++++++++++++++--------
+ include/hw/ppc/pnv.h       |  2 +-
+ include/hw/ppc/spapr_irq.h |  4 ++--
+ 6 files changed, 47 insertions(+), 20 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 59faeccf4b..83081defde 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2686,11 +2686,11 @@ static void spapr_machine_init(MachineState *mach=
-ine)
-     spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
-=20
-     /* advertise XIVE on POWER9 machines */
--    if (spapr->irq->ov5 & SPAPR_OV5_XIVE_EXPLOIT) {
-+    if (spapr->irq->ov5 & (SPAPR_OV5_XIVE_EXPLOIT | SPAPR_OV5_XIVE_BOTH)=
-) {
-         if (ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL=
-_3_00,
-                                   0, spapr->max_compat_pvr)) {
-             spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
--        } else {
-+        } else if (spapr->irq->ov5 & SPAPR_OV5_XIVE_EXPLOIT) {
-             error_report("XIVE-only machines require a POWER9 CPU");
-             exit(1);
-         }
-@@ -3116,6 +3116,8 @@ static char *spapr_get_ic_mode(Object *obj, Error *=
-*errp)
-         return g_strdup("xics");
-     } else if (spapr->irq =3D=3D &spapr_irq_xive) {
-         return g_strdup("xive");
-+    } else if (spapr->irq =3D=3D &spapr_irq_dual) {
-+        return g_strdup("dual");
-     }
-     g_assert_not_reached();
- }
-@@ -3129,6 +3131,8 @@ static void spapr_set_ic_mode(Object *obj, const ch=
-ar *value, Error **errp)
-         spapr->irq =3D &spapr_irq_xics;
-     } else if (strcmp(value, "xive") =3D=3D 0) {
-         spapr->irq =3D &spapr_irq_xive;
-+    } else if (strcmp(value, "dual") =3D=3D 0) {
-+        spapr->irq =3D &spapr_irq_dual;
-     } else {
-         error_setg(errp, "Bad value for \"ic-mode\" property");
-     }
-@@ -3177,7 +3181,7 @@ static void spapr_instance_init(Object *obj)
-     object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
-                             spapr_set_ic_mode, NULL);
-     object_property_set_description(obj, "ic-mode",
--                 "Specifies the interrupt controller mode (xics, xive)",
-+                 "Specifies the interrupt controller mode (xics, xive, d=
-ual)",
-                  NULL);
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 346f5e7aed..8e83be54fc 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -668,11 +668,20 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip,=
+ uint32_t core_id)
+     return (chip->chip_id << 7) | (core_id << 3);
  }
 =20
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 1ae3e6ff5e..17bcaa3822 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1654,6 +1654,17 @@ static target_ulong h_client_architecture_support(=
-PowerPCCPU *cpu,
-             (spapr_h_cas_compose_response(spapr, args[1], args[2],
-                                           ov5_updates) !=3D 0);
-     }
+-static Object *pnv_chip_power8_intc_create(PnvChip *chip, Object *child,
+-                                           Error **errp)
++static void pnv_chip_power8_intc_create(PnvChip *chip, PowerPCCPU *cpu,
++                                        Error **errp)
+ {
+-    return icp_create(child, TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine(=
+)),
+-                      errp);
++    Error *local_err =3D NULL;
++    Object *obj;
 +
-+    /*
-+     * Generate a machine reset when we have an update of the
-+     * interrupt mode. Only required when the machine supports both
-+     * modes.
-+     */
-+    if (!spapr->cas_reboot) {
-+        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_EXPL=
-OIT)
-+            && spapr->irq->ov5 & SPAPR_OV5_XIVE_BOTH;
++    obj =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, XICS_FABRIC(qdev_get_m=
+achine()),
++                     &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
 +    }
 +
-     spapr_ovec_cleanup(ov5_updates);
++    cpu->intc =3D obj;
+ }
 =20
-     if (spapr->cas_reboot) {
+ /*
+@@ -690,10 +699,10 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip,=
+ uint32_t core_id)
+     return (chip->chip_id << 8) | (core_id << 2);
+ }
+=20
+-static Object *pnv_chip_power9_intc_create(PnvChip *chip, Object *child,
+-                                           Error **errp)
++static void pnv_chip_power9_intc_create(PnvChip *chip, PowerPCCPU *cpu,
++                                        Error **errp)
+ {
+-    return NULL;
++    return;
+ }
+=20
+ /* Allowed core identifiers on a POWER8 Processor Chip :
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index ad1bcc7990..1202737748 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -114,7 +114,7 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip=
+ *chip, Error **errp)
+         return;
+     }
+=20
+-    cpu->intc =3D pcc->intc_create(chip, OBJECT(cpu), &local_err);
++    pcc->intc_create(chip, cpu, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 82666436e9..2739b2a4b8 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -232,7 +232,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPR=
+MachineState *spapr,
+     qemu_register_reset(spapr_cpu_reset, cpu);
+     spapr_cpu_reset(cpu);
+=20
+-    cpu->intc =3D spapr->irq->cpu_intc_create(spapr, OBJECT(cpu), &local=
+_err);
++    spapr->irq->cpu_intc_create(spapr, cpu, &local_err);
+     if (local_err) {
+         goto error_unregister;
+     }
 diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index d23914887a..d110b8cdee 100644
+index be5fe531a8..eca2317cf3 100644
 --- a/hw/ppc/spapr_irq.c
 +++ b/hw/ppc/spapr_irq.c
-@@ -230,6 +230,11 @@ static void spapr_irq_set_irq_xics(void *opaque, int=
- srcno, int val)
-     }
+@@ -190,10 +190,20 @@ static void spapr_irq_print_info_xics(sPAPRMachineS=
+tate *spapr, Monitor *mon)
+     ics_pic_print_info(spapr->ics, mon);
  }
 =20
-+static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
-+{
-+    /* TODO: create the KVM XICS device */
-+}
-+
- #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
- #define SPAPR_IRQ_XICS_NR_MSIS     \
-     (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-@@ -247,6 +252,7 @@ sPAPRIrq spapr_irq_xics =3D {
-     .dt_populate =3D spapr_dt_xics,
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
-     .post_load   =3D spapr_irq_post_load_xics,
-+    .reset       =3D spapr_irq_reset_xics,
-     .set_irq     =3D spapr_irq_set_irq_xics,
- };
-=20
-@@ -403,6 +409,179 @@ sPAPRIrq spapr_irq_xive =3D {
-     .set_irq     =3D spapr_irq_set_irq_xive,
- };
-=20
-+/*
-+ * Dual XIVE and XICS IRQ backend.
-+ *
-+ * Both interrupt mode, XIVE and XICS, objects are created but the
-+ * machine starts in legacy interrupt mode (XICS). It can be changed
-+ * by the CAS negotiation process and, in that case, the new mode is
-+ * activated after an extra machine reset.
-+ */
-+
-+/*
-+ * Returns the sPAPR IRQ backend negotiated by CAS. XICS is the
-+ * default.
-+ */
-+static sPAPRIrq *spapr_irq_current(sPAPRMachineState *spapr)
-+{
-+    return spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT) ?
-+        &spapr_irq_xive : &spapr_irq_xics;
-+}
-+
-+static void spapr_irq_init_dual(sPAPRMachineState *spapr, Error **errp)
-+{
-+    MachineState *machine =3D MACHINE(spapr);
-+    Error *local_err =3D NULL;
-+
-+    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-+        error_setg(errp, "No KVM support for the 'dual' machine");
-+        return;
-+    }
-+
-+    spapr_irq_xics.init(spapr, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    /*
-+     * Align the XICS and the XIVE IRQ number space under QEMU.
-+     *
-+     * However, the XICS KVM device still considers that the IRQ
-+     * numbers should start at XICS_IRQ_BASE (0x1000). Either we
-+     * should introduce a KVM device ioctl to set the offset or ignore
-+     * the lower 4K numbers when using the get/set ioctl of the XICS
-+     * KVM device. The second option seems the least intrusive.
-+     */
-+    spapr->ics->offset =3D 0;
-+
-+    spapr_irq_xive.init(spapr, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+}
-+
-+static int spapr_irq_claim_dual(sPAPRMachineState *spapr, int irq, bool =
-lsi,
-+                                Error **errp)
-+{
-+    Error *local_err =3D NULL;
-+    int ret;
-+
-+    ret =3D spapr_irq_xics.claim(spapr, irq, lsi, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return ret;
-+    }
-+
-+    ret =3D spapr_irq_xive.claim(spapr, irq, lsi, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return ret;
-+    }
-+
-+    return ret;
-+}
-+
-+static void spapr_irq_free_dual(sPAPRMachineState *spapr, int irq, int n=
-um)
-+{
-+    spapr_irq_xics.free(spapr, irq, num);
-+    spapr_irq_xive.free(spapr, irq, num);
-+}
-+
-+static qemu_irq spapr_qirq_dual(sPAPRMachineState *spapr, int irq)
-+{
-+    sPAPRXive *xive =3D spapr->xive;
-+    ICSState *ics =3D spapr->ics;
-+
-+    if (irq >=3D spapr->irq->nr_irqs) {
-+        return NULL;
-+    }
-+
-+    /*
-+     * The IRQ number should have been claimed under both interrupt
-+     * controllers.
-+     */
-+    assert(!ICS_IRQ_FREE(ics, irq - ics->offset));
-+    assert(xive_eas_is_valid(&xive->eat[irq]));
-+
-+    return spapr->qirqs[irq];
-+}
-+
-+static void spapr_irq_print_info_dual(sPAPRMachineState *spapr, Monitor =
-*mon)
-+{
-+    spapr_irq_current(spapr)->print_info(spapr, mon);
-+}
-+
-+static void spapr_irq_dt_populate_dual(sPAPRMachineState *spapr,
-+                                       uint32_t nr_servers, void *fdt,
-+                                       uint32_t phandle)
-+{
-+    spapr_irq_current(spapr)->dt_populate(spapr, nr_servers, fdt, phandl=
-e);
-+}
-+
-+static void spapr_irq_cpu_intc_create_dual(sPAPRMachineState *spapr,
+-static Object *spapr_irq_cpu_intc_create_xics(sPAPRMachineState *spapr,
+-                                              Object *cpu, Error **errp)
++static void spapr_irq_cpu_intc_create_xics(sPAPRMachineState *spapr,
 +                                           PowerPCCPU *cpu, Error **errp=
 )
-+{
+ {
+-    return icp_create(cpu, spapr->icp_type, XICS_FABRIC(spapr), errp);
 +    Error *local_err =3D NULL;
++    Object *obj;
 +
-+    spapr_irq_xive.cpu_intc_create(spapr, cpu, &local_err);
++    obj =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(spapr),
++                     &local_err);
 +    if (local_err) {
 +        error_propagate(errp, local_err);
 +        return;
 +    }
 +
-+    spapr_irq_xics.cpu_intc_create(spapr, cpu, errp);
-+}
-+
-+static int spapr_irq_post_load_dual(sPAPRMachineState *spapr, int versio=
++    cpu->intc =3D obj;
+ }
+=20
+ static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int versio=
 n_id)
-+{
-+    /*
-+     * Force a reset of the XIVE backend after migration. The machine
-+     * defaults to XICS at startup.
-+     */
-+    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-+        spapr_irq_xive.reset(spapr, &error_fatal);
+@@ -311,17 +321,25 @@ static void spapr_irq_print_info_xive(sPAPRMachineS=
+tate *spapr,
+     spapr_xive_pic_print_info(spapr->xive, mon);
+ }
+=20
+-static Object *spapr_irq_cpu_intc_create_xive(sPAPRMachineState *spapr,
+-                                              Object *cpu, Error **errp)
++static void spapr_irq_cpu_intc_create_xive(sPAPRMachineState *spapr,
++                                           PowerPCCPU *cpu, Error **errp=
+)
+ {
+-    Object *obj =3D xive_tctx_create(cpu, XIVE_ROUTER(spapr->xive), errp=
+);
++    Error *local_err =3D NULL;
++    Object *obj;
++
++    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(spapr->xive), &loc=
+al_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
 +    }
 +
-+    return spapr_irq_current(spapr)->post_load(spapr, version_id);
-+}
-+
-+static void spapr_irq_reset_dual(sPAPRMachineState *spapr, Error **errp)
-+{
-+    spapr_irq_current(spapr)->reset(spapr, errp);
-+}
-+
-+static void spapr_irq_set_irq_dual(void *opaque, int srcno, int val)
-+{
-+    sPAPRMachineState *spapr =3D opaque;
-+
-+    spapr_irq_current(spapr)->set_irq(spapr, srcno, val);
-+}
-+
-+/*
-+ * Define values in sync with the XIVE and XICS backend
-+ */
-+#define SPAPR_IRQ_DUAL_NR_IRQS     0x2000
-+#define SPAPR_IRQ_DUAL_NR_MSIS     (SPAPR_IRQ_DUAL_NR_IRQS - SPAPR_IRQ_M=
-SI)
-+
-+sPAPRIrq spapr_irq_dual =3D {
-+    .nr_irqs     =3D SPAPR_IRQ_DUAL_NR_IRQS,
-+    .nr_msis     =3D SPAPR_IRQ_DUAL_NR_MSIS,
-+    .ov5         =3D SPAPR_OV5_XIVE_BOTH,
-+
-+    .init        =3D spapr_irq_init_dual,
-+    .claim       =3D spapr_irq_claim_dual,
-+    .free        =3D spapr_irq_free_dual,
-+    .qirq        =3D spapr_qirq_dual,
-+    .print_info  =3D spapr_irq_print_info_dual,
-+    .dt_populate =3D spapr_irq_dt_populate_dual,
-+    .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
-+    .post_load   =3D spapr_irq_post_load_dual,
-+    .reset       =3D spapr_irq_reset_dual,
-+    .set_irq     =3D spapr_irq_set_irq_dual
-+};
-+
- /*
-  * sPAPR IRQ frontend routines for devices
-  */
++    cpu->intc =3D obj;
+=20
+     /*
+      * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
+-     * don't benificiate from the reset of the XIVE IRQ backend
++     * don't beneficiate from the reset of the XIVE IRQ backend
+      */
+     spapr_xive_set_tctx_os_cam(XIVE_TCTX(obj));
+-    return obj;
+ }
+=20
+ static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int versio=
+n_id)
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 86d5f54e54..6b65397b7e 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -98,7 +98,7 @@ typedef struct PnvChipClass {
+     DeviceRealize parent_realize;
+=20
+     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+-    Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
++    void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
+     ISABus *(*isa_create)(PnvChip *chip, Error **errp);
+ } PnvChipClass;
+=20
 diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 283bb5002c..14b02c3aca 100644
+index b34d5a0038..d03d4d7ce6 100644
 --- a/include/hw/ppc/spapr_irq.h
 +++ b/include/hw/ppc/spapr_irq.h
-@@ -52,6 +52,7 @@ typedef struct sPAPRIrq {
- extern sPAPRIrq spapr_irq_xics;
- extern sPAPRIrq spapr_irq_xics_legacy;
- extern sPAPRIrq spapr_irq_xive;
-+extern sPAPRIrq spapr_irq_dual;
-=20
- void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
- int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
+@@ -42,8 +42,8 @@ typedef struct sPAPRIrq {
+     void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
+     void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers,
+                         void *fdt, uint32_t phandle);
+-    Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
+-                               Error **errp);
++    void (*cpu_intc_create)(sPAPRMachineState *spapr, PowerPCCPU *cpu,
++                            Error **errp);
+     int (*post_load)(sPAPRMachineState *spapr, int version_id);
+     void (*reset)(sPAPRMachineState *spapr, Error **errp);
+ } sPAPRIrq;
 --=20
 2.20.1
