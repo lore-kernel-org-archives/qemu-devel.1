@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52695)
+Received: from eggs.gnu.org ([209.51.188.92]:52729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzv5-00009q-B0
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:24 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzv7-0000Ce-A6
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzv4-0004lD-D8
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:23 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34528)
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzv4-0004m8-TL
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:25 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33301)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggzv3-0004b3-Gs
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:21 -0500
-Received: by mail-pf1-x442.google.com with SMTP id h3so2625655pfg.1
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:32:11 -0800 (PST)
+	id 1ggzv4-0004hY-EJ
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:22 -0500
+Received: by mail-pg1-x541.google.com with SMTP id z11so2375961pgu.0
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:32:19 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  9 Jan 2019 08:31:11 +1000
-Message-Id: <20190108223129.5570-14-richard.henderson@linaro.org>
+Date: Wed,  9 Jan 2019 08:31:14 +1000
+Message-Id: <20190108223129.5570-17-richard.henderson@linaro.org>
 In-Reply-To: <20190108223129.5570-1-richard.henderson@linaro.org>
 References: <20190108223129.5570-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 13/31] target/arm: Decode PAuth within
- disas_uncond_b_reg
+Subject: [Qemu-devel] [PATCH v3 16/31] target/arm: Introduce arm_mmu_idx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +29,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+The pattern
+
+  ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
+
+is computing the full ARMMMUIdx, stripping off the ARM bits,
+and then putting them back.
+
+Avoid the extra two steps with the appropriate helper function.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+----
+v2: Move arm_mmu_idx declaration to internals.h.
 ---
- target/arm/translate-a64.c | 82 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 81 insertions(+), 1 deletion(-)
+ target/arm/cpu.h       |  9 ++++++++-
+ target/arm/internals.h |  8 ++++++++
+ target/arm/helper.c    | 27 ++++++++++++++++-----------
+ 3 files changed, 32 insertions(+), 12 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e601753032..fa50003f0b 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1982,6 +1982,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index eb83a71b67..c1d511f274 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2749,7 +2749,14 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate_and_priv(CPUARMState *env,
+ /* Return the MMU index for a v7M CPU in the specified security state */
+ ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate);
+ 
+-/* Determine the current mmu_idx to use for normal loads/stores */
++/**
++ * cpu_mmu_index:
++ * @env: The cpu environment
++ * @ifetch: True for code access, false for data access.
++ *
++ * Return the core mmu index for the current translation regime.
++ * This function is used by generic TCG code paths.
++ */
+ int cpu_mmu_index(CPUARMState *env, bool ifetch);
+ 
+ /* Indexes used when registering address spaces with cpu_address_space_init */
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 0ed20c03cc..89f3b122a4 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -919,4 +919,12 @@ void arm_cpu_update_virq(ARMCPU *cpu);
+  */
+ void arm_cpu_update_vfiq(ARMCPU *cpu);
+ 
++/**
++ * arm_mmu_idx:
++ * @env: The cpu environment
++ *
++ * Return the full ARMMMUIdx for the current translation regime.
++ */
++ARMMMUIdx arm_mmu_idx(CPUARMState *env);
++
+ #endif
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 56d0b60b74..ba6733c4f1 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7117,7 +7117,7 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+             limit = env->v7m.msplim[M_REG_S];
+         }
+     } else {
+-        mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
++        mmu_idx = arm_mmu_idx(env);
+         frame_sp_p = &env->regs[13];
+         limit = v7m_sp_limit(env);
+     }
+@@ -7298,7 +7298,7 @@ static bool v7m_push_stack(ARMCPU *cpu)
+     CPUARMState *env = &cpu->env;
+     uint32_t xpsr = xpsr_read(env);
+     uint32_t frameptr = env->regs[13];
+-    ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
++    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
+ 
+     /* Align stack pointer if the guest wants that */
+     if ((frameptr & 4) &&
+@@ -11073,7 +11073,7 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
+     int prot;
+     bool ret;
+     ARMMMUFaultInfo fi = {};
+-    ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
++    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
+ 
+     *attrs = (MemTxAttrs) {};
+ 
+@@ -12977,26 +12977,31 @@ ARMMMUIdx arm_v7m_mmu_idx_for_secstate(CPUARMState *env, bool secstate)
+     return arm_v7m_mmu_idx_for_secstate_and_priv(env, secstate, priv);
+ }
+ 
+-int cpu_mmu_index(CPUARMState *env, bool ifetch)
++ARMMMUIdx arm_mmu_idx(CPUARMState *env)
  {
-     unsigned int opc, op2, op3, rn, op4;
-     TCGv_i64 dst;
-+    TCGv_i64 modifier;
+-    int el = arm_current_el(env);
++    int el;
  
-     opc = extract32(insn, 21, 4);
-     op2 = extract32(insn, 16, 5);
-@@ -1999,12 +2000,44 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-     case 2: /* RET */
-         switch (op3) {
-         case 0:
-+            /* BR, BLR, RET */
-             if (op4 != 0) {
-                 goto do_unallocated;
-             }
-             dst = cpu_reg(s, rn);
-             break;
+     if (arm_feature(env, ARM_FEATURE_M)) {
+-        ARMMMUIdx mmu_idx = arm_v7m_mmu_idx_for_secstate(env, env->v7m.secure);
+-
+-        return arm_to_core_mmu_idx(mmu_idx);
++        return arm_v7m_mmu_idx_for_secstate(env, env->v7m.secure);
+     }
  
-+        case 2:
-+        case 3:
-+            if (!dc_isar_feature(aa64_pauth, s)) {
-+                goto do_unallocated;
-+            }
-+            if (opc == 2) {
-+                /* RETAA, RETAB */
-+                if (rn != 0x1f || op4 != 0x1f) {
-+                    goto do_unallocated;
-+                }
-+                rn = 30;
-+                modifier = cpu_X[31];
-+            } else {
-+                /* BRAAZ, BRABZ, BLRAAZ, BLRABZ */
-+                if (op4 != 0x1f) {
-+                    goto do_unallocated;
-+                }
-+                modifier = new_tmp_a64_zero(s);
-+            }
-+            if (s->pauth_active) {
-+                dst = new_tmp_a64(s);
-+                if (op3 == 2) {
-+                    gen_helper_autia(dst, cpu_env, cpu_reg(s, rn), modifier);
-+                } else {
-+                    gen_helper_autib(dst, cpu_env, cpu_reg(s, rn), modifier);
-+                }
-+            } else {
-+                dst = cpu_reg(s, rn);
-+            }
-+            break;
++    el = arm_current_el(env);
+     if (el < 2 && arm_is_secure_below_el3(env)) {
+-        return arm_to_core_mmu_idx(ARMMMUIdx_S1SE0 + el);
++        return ARMMMUIdx_S1SE0 + el;
++    } else {
++        return ARMMMUIdx_S12NSE0 + el;
+     }
+-    return el;
++}
 +
-         default:
-             goto do_unallocated;
-         }
-@@ -2016,12 +2049,38 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         }
-         break;
++int cpu_mmu_index(CPUARMState *env, bool ifetch)
++{
++    return arm_to_core_mmu_idx(arm_mmu_idx(env));
+ }
  
-+    case 8: /* BRAA */
-+    case 9: /* BLRAA */
-+        if (!dc_isar_feature(aa64_pauth, s)) {
-+            goto do_unallocated;
-+        }
-+        if (op3 != 2 || op3 != 3) {
-+            goto do_unallocated;
-+        }
-+        if (s->pauth_active) {
-+            dst = new_tmp_a64(s);
-+            modifier = cpu_reg_sp(s, op4);
-+            if (op3 == 2) {
-+                gen_helper_autia(dst, cpu_env, cpu_reg(s, rn), modifier);
-+            } else {
-+                gen_helper_autib(dst, cpu_env, cpu_reg(s, rn), modifier);
-+            }
-+        } else {
-+            dst = cpu_reg(s, rn);
-+        }
-+        gen_a64_set_pc(s, dst);
-+        /* BLRAA also needs to load return address */
-+        if (opc == 9) {
-+            tcg_gen_movi_i64(cpu_reg(s, 30), s->pc);
-+        }
-+        break;
-+
-     case 4: /* ERET */
-         if (s->current_el == 0) {
-             goto do_unallocated;
-         }
-         switch (op3) {
--        case 0:
-+        case 0: /* ERET */
-             if (op4 != 0) {
-                 goto do_unallocated;
-             }
-@@ -2030,6 +2089,27 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-                            offsetof(CPUARMState, elr_el[s->current_el]));
-             break;
- 
-+        case 2: /* ERETAA */
-+        case 3: /* ERETAB */
-+            if (!dc_isar_feature(aa64_pauth, s)) {
-+                goto do_unallocated;
-+            }
-+            if (rn != 0x1f || op4 != 0x1f) {
-+                goto do_unallocated;
-+            }
-+            dst = tcg_temp_new_i64();
-+            tcg_gen_ld_i64(dst, cpu_env,
-+                           offsetof(CPUARMState, elr_el[s->current_el]));
-+            if (s->pauth_active) {
-+                modifier = cpu_X[31];
-+                if (op3 == 2) {
-+                    gen_helper_autia(dst, cpu_env, dst, modifier);
-+                } else {
-+                    gen_helper_autib(dst, cpu_env, dst, modifier);
-+                }
-+            }
-+            break;
-+
-         default:
-             goto do_unallocated;
-         }
+ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+                           target_ulong *cs_base, uint32_t *pflags)
+ {
+-    ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
++    ARMMMUIdx mmu_idx = arm_mmu_idx(env);
+     int current_el = arm_current_el(env);
+     int fp_el = fp_exception_el(env, current_el);
+     uint32_t flags = 0;
 -- 
 2.17.2
