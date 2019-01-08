@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58871)
+Received: from eggs.gnu.org ([209.51.188.92]:58910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ggtMI-0000nd-B2
+	(envelope-from <lhrazky@redhat.com>) id 1ggtMN-0000oM-BX
 	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:32:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ggtMH-00018y-Ep
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:32:02 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <cover.1542898669.git.berto@igalia.com>
-References: <cover.1542898669.git.berto@igalia.com>
-Date: Tue, 08 Jan 2019 16:31:32 +0100
-Message-ID: <w51a7kbupwr.fsf@maestria.local.igalia.com>
+	(envelope-from <lhrazky@redhat.com>) id 1ggtMM-0001Li-HC
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:32:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34170)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1ggtMM-0001DU-BM
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:32:06 -0500
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Tue,  8 Jan 2019 16:26:45 +0100
+Message-Id: <20190108152648.32537-1-lhrazky@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/2] Minor fixes for the mirror block job
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH spice/qemu 0/3] QXL interface to set monitor ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,27 +24,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-ping 2
+Hello,
 
-On Thu 22 Nov 2018 04:00:25 PM CET, Alberto Garcia wrote:
-> Hi,
->
-> a couple of minor fixes for the mirror block job. I don't think these
-> bugs can be reproduced at the moment so this shouldn't be 3.1
-> material.
->
-> Berto
->
-> Alberto Garcia (2):
->   mirror: Release the dirty bitmap if mirror_start_job() fails
->   mirror: Block the source BlockDriverState in mirror_start_job()
->
->  block/mirror.c             | 11 +++++++++++
->  tests/qemu-iotests/141.out |  4 ++--
->  2 files changed, 13 insertions(+), 2 deletions(-)
->
-> -- 
-> 2.11.0
+this is the final version of the new QXL interface to identify the
+graphics device monitors in the guest. This interface adds a function
+that allows to set the device path (e.g. a PCI path) and the IDs of the
+device's displays from QEMU to SPICE server. The server will forward
+this information to the guest agent, which can use it to identify the
+displays in the guest context (a follow-up series on the spice-devel
+mailing list).
+
+--=20
+2.20.1
