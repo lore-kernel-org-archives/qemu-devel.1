@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58665)
+Received: from eggs.gnu.org ([209.51.188.92]:36540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggjVC-0002lp-51
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 00:00:35 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1ggju1-00085P-Oq
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 00:26:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggjV8-0004Zs-50
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 00:00:32 -0500
-Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:35738)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggjV5-0004Rl-Oc
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 00:00:28 -0500
-Received: by mail-pl1-x631.google.com with SMTP id p8so1275256plo.2
-	for <qemu-devel@nongnu.org>; Mon, 07 Jan 2019 21:00:27 -0800 (PST)
-References: <20181214052410.11863-1-richard.henderson@linaro.org>
-	<20181214052410.11863-24-richard.henderson@linaro.org>
-	<CAFEAcA-Us3KWaLSEkvpg2uE+yvRFbVB=NVemrdhTFfvKxZt3xw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0ff1044a-a8d8-75f1-6e37-5149b1cf3dea@linaro.org>
-Date: Tue, 8 Jan 2019 15:00:19 +1000
+	(envelope-from <yang.zhong@intel.com>) id 1ggju1-0003Xl-0v
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 00:26:13 -0500
+Received: from mga07.intel.com ([134.134.136.100]:52801)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1ggju0-0003S7-Ox
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 00:26:12 -0500
+Date: Tue, 8 Jan 2019 13:22:33 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190108052233.GA27412@yangzhon-Virtual>
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+	<20181227063419.12981-10-yang.zhong@intel.com>
+	<026da2df-387b-d434-fcfd-0eec798e54c4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Us3KWaLSEkvpg2uE+yvRFbVB=NVemrdhTFfvKxZt3xw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 23/27] target/arm: Implement
- pauth_computepac
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <026da2df-387b-d434-fcfd-0eec798e54c4@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 09/25] ide: express dependencies with
+ Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,24 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com, yang.zhong@intel.com
 
-On 1/8/19 12:09 AM, Peter Maydell wrote:
->> +static int rot_cell(int cell, int n)
->> +{
->> +    cell |= cell << 4;
->> +    cell >>= n;
->> +    return cell & 0xf;
+On Thu, Jan 03, 2019 at 04:47:02PM +0100, Thomas Huth wrote:
+> On 2018-12-27 07:34, Yang Zhong wrote:
+> > From: Paolo Bonzini <pbonzini@redhat.com>
+> > 
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> [...]
+> > diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
+> > index 5ec449525f..091f3a81c9 100644
+> > --- a/hw/ide/Kconfig
+> > +++ b/hw/ide/Kconfig
+> > @@ -3,33 +3,44 @@ config IDE_CORE
+> >  
+> >  config IDE_QDEV
+> >      bool
+> > +    select IDE_CORE
+> >  
+> >  config IDE_PCI
+> >      bool
+> > +    select IDE_CORE
+> >  
+> >  config IDE_ISA
+> >      bool
+> > +    select IDE_QDEV
+> >  
+> >  config IDE_PIIX
+> >      bool
+> > +    select IDE_QDEV
+> >  
+> >  config IDE_CMD646
+> >      bool
+> > +    select IDE_QDEV
 > 
-> This doesn't seem to do what the RotCell pseudocode does?
-> Unless I've made an error, RotCell(ABCD, 1) == BCDA,
-> but rot_cell(ABCD, 1) == DABC.
+> PIIX and CMD646 seem to be derived from TYPE_PCI_IDE, so shouldn't these
+> switches rather select IDE_PCI instead? (Or depend on IDE_PCI?)
+> 
+  Hello Thomas,
 
-Yep, I mis-read the direction of the rotate.
+  Thanks, you are right. The CONFIG_IDE_PCI=y was removed in this patch,
+  so the "select IDE_PCI" should be added here from next patch(convert 
+  pci.mak to Kconfig patch). thanks!
 
-Thanks for all of the proof-reading.
-This section I found particularly eye watering.
+  Regards,
+
+  Yang  
 
 
-r~
+> >  config IDE_MACIO
+> >      bool
+> > +    select IDE_QDEV
+> >  
+> >  config IDE_MMIO
+> >      bool
+> > +    select IDE_QDEV
+> >  
+> >  config IDE_VIA
+> >      bool
+> > +    select IDE_QDEV
+> 
+> dito, VIA is a PCI device, too.
+> 
+  Yes, you are right, i will change this like above. thanks!
+
+  Regards,
+
+  Yang
+
+> >  config MICRODRIVE
+> >      bool
+> > +    select IDE_QDEV
+> >  
+> >  config AHCI
+> >      bool
+> > +    select IDE_QDEV
+> >  
+> >  config IDE_SII3112
+> >      bool
+> > +    select IDE_QDEV
+> > 
+> 
+> dito, SII3112 is a PCI device.
+> 
+>  Thomas
+
+  Yes, thanks for reminder!
+  I will add "depends on PCI" in next patches(convert pci.mak to 
+  Kconfig patch), thanks
+
+  Regards,
+
+  Yang
