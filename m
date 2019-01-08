@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52352)
+Received: from eggs.gnu.org ([209.51.188.92]:60170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ggrhe-0001G4-LR
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:45:59 -0500
+	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
+	id 1ggs6U-0006cl-9p
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:11:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ggrhZ-0008HB-G0
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:45:55 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 8 Jan 2019 13:45:31 +0000
-Message-ID: <872d42b0-c794-c104-30a9-fa1296f812d6@virtuozzo.com>
-References: <1546200557-774583-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1546200557-774583-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1546200557-774583-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
+	id 1ggs6T-0003fH-DE
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:11:38 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 8 Jan 2019 14:11:05 +0000
+Message-ID: <cc64da25a6a3418e8d36c6975fe2df45@AMSPEX02CL03.citrite.net>
+References: <20181220171439.11159-1-paul.durrant@citrix.com>
+	<20181220171439.11159-17-paul.durrant@citrix.com>
+	<20190104163124.GE1508@perard.uk.xensource.com>
+	<da727b0b8a9a4f9baa47a660298a9cba@AMSPEX02CL03.citrite.net>
+	<20190108125321.GD11492@linux.fritz.box>
+	<904d305f8c0f4aac8e60fb7ea14ebd41@AMSPEX02CL03.citrite.net>
+	<20190108132823.GF1508@perard.uk.xensource.com>
+In-Reply-To: <20190108132823.GF1508@perard.uk.xensource.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F289CA49462F9F4DA5B8C7409B6BCCAF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] Stream block job involves
- copy-on-read filter driver
+Subject: Re: [Qemu-devel] [PATCH v7 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +32,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: 'Kevin Wolf' <kwolf@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-MzAuMTIuMjAxOCAyMzowOSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRoZSBjb3B5LW9u
-LXJlYWQgZmlsdGVyIGlzIGFwcGxpZWQgdG8gYmxvY2stc3RyZWFtIG9wZXJhdGlvbi4NCj4gSXQg
-aXMgbmVjZXNzYXJ5IGZvciBmdXJ0aGVyIGJsb2NrIGRpc2NhcmQgb3B0aW9uLg0KDQpJZiB3ZSBt
-b3ZlIHRvIGMtby1yIGZpbHRlciBpbiBzdHJlYW0sIEkgdGhpbmsgd2Ugc2hvdWxkOg0KMS4gZ2V0
-IHJpZCBvZiBDT1BZX09OX1JFQUQgZmxhZyBpbiBzdHJlYW0gY29kZSAoc28sIHRoaXMgdGhpbmcg
-dG8gYmUgZG9uZSBpbiBvbmUgcGxhY2UpDQoyLiBhZGQgYmFzZSBwYXJhbWV0ZXIgdG8gYy1vLXIg
-ZmlsdGVyLCB0byBub3QgY29weSB0aGluZ3MgdGhhdCBhcmUgYmVsb3cgYmFzZS4NCg0KQ3VycmVu
-dCBiZWhhdmlvciBvZiBzdHJlYW0gaXMgZW5hYmxpbmcgY29weS1vbi1yZWFkIG9uIGJzIGR1cmlu
-ZyBzdHJlYW0gaWYgYmFzZSA9PSBOVUxMLg0KU28sIGlmIHdlIGp1c3QgYWRkIGMtby1yIGZpbHRl
-ciwgd2Ugd2lsbCBjb3B5IGV4dHJhIGJsb2Nrcy4gT24gdGhlIG90aGVyIGhhbmQsIGlmIHdlDQpz
-dXBwb3J0IGJhc2UgcGFyYW1ldGVyIGluIGMtby1yIGZpbHRlciB3ZSB3aWxsIGludm9sdmUgZ3Vl
-c3QgcmVhZHMgdG8gdGhlIHN0cmVhbQ0KcHJvY2VzcyBmb3IgY2FzZXMgd2l0aCBiYXNlICE9IE5V
-TEwsIHNvIHN0cmVhbSBvcGVyYXRpb24gc2hvdWxkIGJlY29tZSBtb3JlIGVmZmljaWVudC4NCg0K
-U28gZm9yIG1lIHRoZSBmb2xsb3dpbmcgc2VxdWVuY2Ugc2VlbXMgcmVhc29uYWJsZToNCg0KLSBw
-cmVwYXJlIGlvdGVzdHMgZm9yIGdyYXBoIGNoYW5nZXMNCi0gYWRkIGJhc2UgcGFyYW1ldGVyIHRv
-IGMtby1yIGZpbHRlcg0KLSB1c2UgYy1vLXIgaW4gc3RyZWFtIGFuZCBkcm9wIENPUFlfT05fUkVB
-RCBmbGFnIGZyb20gc3RyZWFtIGNvZGUNCg0KdGhlbiAobWF5IGJlIGluIHNlcGFyYXRlIHNlcmll
-cykgYWRkIGRpc2NhcmQgZnVuY3Rpb25hbGl0eS4gQW5kIGxvb2tzIGxpa2UgYWdhaW4sIGl0IHNo
-b3VsZA0KYmUgcHJvcGVydHkgb2YgYy1vLXIgZmlsdGVyLCBub3Qgc3RyZWFtIGpvYiBpdHNlbGYs
-IHRvIGludm9sdmUgZ3Vlc3QgcmVhZHMgdG8gZGlzY2FyZGluZyB0b28uDQoNCkluIGdlbmVyYWws
-IE1heCwgaXMgdGhhdCBjb3JyZXNwb25kIHRvIHdoYXQgeW91IG1lYW4/DQoNCkFueSBzdWdnZXN0
-aW9ucz8NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 08 January 2019 13:28
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: 'Kevin Wolf' <kwolf@redhat.com>; qemu-devel@nongnu.org; qemu-
+> block@nongnu.org; xen-devel@lists.xenproject.org; Max Reitz
+> <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> Subject: Re: [PATCH v7 16/18] xen: automatically create XenBlockDevice-s
+>=20
+> On Tue, Jan 08, 2019 at 01:07:49PM +0000, Paul Durrant wrote:
+> > > -----Original Message-----
+> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > Sent: 08 January 2019 12:53
+> > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > Cc: Anthony Perard <anthony.perard@citrix.com>; qemu-devel@nongnu.org=
+;
+> > > qemu-block@nongnu.org; xen-devel@lists.xenproject.org; Max Reitz
+> > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> > > Subject: Re: [PATCH v7 16/18] xen: automatically create
+> XenBlockDevice-s
+> > >
+> > > Am 04.01.2019 um 17:40 hat Paul Durrant geschrieben:
+> > > > > -----Original Message-----
+> > > > > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > > > > Sent: 04 January 2019 16:31
+> > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> > > > > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max
+> Reitz
+> > > > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> > > > > Subject: Re: [PATCH v7 16/18] xen: automatically create
+> > > XenBlockDevice-s
+> > > > >
+> > > > > Almost done, there is one thing left which I believe is an issue.
+> > > > > Whenever I attach a raw file to QEMU, it print:
+> > > > >     qemu-system-i386: warning: Opening a block device as a file
+> using
+> > > the
+> > > > > 'file' driver is deprecated
+> > > >
+> > > > Oh, I'd not noticed that... but then I only use raw files
+> occasionally.
+> > >
+> > > Strictly speaking, this is not about raw (regular) files, but raw
+> block
+> > > devices. 'file' is fine for actual regular files, but the protocol
+> > > driver for block devices is 'host_device'.
+> > >
+> > > > > raw files should use the "raw" driver, so we aren't done yet.
+> > > >
+> > > > Ok. Having a strictly 2-layer stack actually makes things simpler
+> anyway
+> > > :-)
+> > >
+> > > Using 'raw' there will make the block layer auto-detect the right
+> > > protocol layer, so this works. If you want to avoid the second layer,
+> > > you'd have to figure out manually whether to use 'file' or
+> > > 'host_device'.
+> >
+> > Thanks for the explanation. I'll give it a spin using a device... I've
+> posted v8 but, given what you say, I'm still not sure I have it right.
+>=20
+> Indeed, in v8, even with the extra 'raw' layer, the warning is still
+> there. I was trying to understand why, and I only found out today that
+> we would need to use the 'host_device' driver as explain by Kevin.
+>=20
+>=20
+> BTW Paul, we can simplify the code that manage layers, by not managing
+> them.
+> Instead of (in JSON / QMP term):
+>     { 'driver': 'file', 'filename': '/file', 'node-name': 'node-file' }
+>     { 'driver': 'qcow2', 'file': 'node-file', 'node-name': 'node-qcow2' }
+> we can have:
+>     { 'driver': 'qcow2', 'node-name': 'node-qcow2',
+>       'file': { 'driver': 'file', 'filename': '/file' } }
+>
+
+I kind of like the clean separation though... From what Kevin said, it soun=
+ds like the lowest layer should use 'raw' instead of 'file' to DTRT, and th=
+en we should be back to only needing the single layer in that case. I'll re=
+vert back to v7 and give it a try.
+
+  Paul
