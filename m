@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33143)
+Received: from eggs.gnu.org ([209.51.188.92]:34305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ggqsw-0007PB-K0
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:53:35 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ggqwV-0000OI-CL
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:57:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ggqsv-0007PQ-S5
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:53:34 -0500
-Date: Tue, 8 Jan 2019 13:53:21 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190108125321.GD11492@linux.fritz.box>
-References: <20181220171439.11159-1-paul.durrant@citrix.com>
-	<20181220171439.11159-17-paul.durrant@citrix.com>
-	<20190104163124.GE1508@perard.uk.xensource.com>
-	<da727b0b8a9a4f9baa47a660298a9cba@AMSPEX02CL03.citrite.net>
+	(envelope-from <cohuck@redhat.com>) id 1ggqwT-0007Mn-DH
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:57:14 -0500
+Date: Tue, 8 Jan 2019 13:56:49 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190108135649.26458f0e.cohuck@redhat.com>
+In-Reply-To: <791f6b8e-c488-7d72-956f-91e9748c74b8@redhat.com>
+References: <20190104181208.7809-1-philmd@redhat.com>
+	<20190104181208.7809-3-philmd@redhat.com>
+	<791f6b8e-c488-7d72-956f-91e9748c74b8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <da727b0b8a9a4f9baa47a660298a9cba@AMSPEX02CL03.citrite.net>
-Subject: Re: [Qemu-devel] [PATCH v7 16/18] xen: automatically create
- XenBlockDevice-s
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/5/nSgLPlJvSKPAzDzYohVR2";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] util/cutils: Move ctype macros to
+ "cutils.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: Anthony Perard <anthony.perard@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Am 04.01.2019 um 17:40 hat Paul Durrant geschrieben:
-> > -----Original Message-----
-> > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> > Sent: 04 January 2019 16:31
-> > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
-> > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> > Subject: Re: [PATCH v7 16/18] xen: automatically create XenBlockDevice-s
-> > 
-> > Almost done, there is one thing left which I believe is an issue.
-> > Whenever I attach a raw file to QEMU, it print:
-> >     qemu-system-i386: warning: Opening a block device as a file using the
-> > 'file' driver is deprecated
-> 
-> Oh, I'd not noticed that... but then I only use raw files occasionally.
+--Sig_/5/nSgLPlJvSKPAzDzYohVR2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Strictly speaking, this is not about raw (regular) files, but raw block
-devices. 'file' is fine for actual regular files, but the protocol
-driver for block devices is 'host_device'.
+On Fri, 4 Jan 2019 14:15:49 -0600
+Eric Blake <eblake@redhat.com> wrote:
 
-> > raw files should use the "raw" driver, so we aren't done yet.
-> 
-> Ok. Having a strictly 2-layer stack actually makes things simpler anyway :-)
+> On 1/4/19 12:12 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > Introduced in cd390083ad1, these macros don't need to be in
+> > a generic header.
+> > Add documentation to justify their use.
+> >=20
+> > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > --- =20
+>=20
+> > +++ b/include/qemu/cutils.h
+> > @@ -3,6 +3,31 @@
+> > =20
+> >  #include "qemu/fprintf-fn.h"
+> > =20
+> > +/**
+> > + * unsigned ctype macros:
+> > + *
+> > + * The standards require that the argument for these functions
+> > + * is either EOF or a value that is representable in the type
+> > + * unsigned char. If the argument is of type char, it must be
+> > + * cast to unsigned char. This is what these macros do,
+> > + * avoiding 'signed to unsigned' conversion warnings. =20
+>=20
+> I would also mention that these macros are ONLY intended for use with
+> char arguments (as they CANNOT handle EOF); if you are doing int c =3D
+> getchar() or similar, you still want to call the original ctype macro.
+>=20
+> Otherwise, the move and added comments makes sense to me.
+>=20
 
-Using 'raw' there will make the block layer auto-detect the right
-protocol layer, so this works. If you want to avoid the second layer,
-you'd have to figure out manually whether to use 'file' or
-'host_device'.
+Agreed on both counts.
 
-Kevin
+--Sig_/5/nSgLPlJvSKPAzDzYohVR2
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAlw0nhEACgkQ3s9rk8bw
+L68zFQ//c8WWrngzbsVmQxJMbzAvvGRWIQOp09QmqinaLM7v0a64e67qv7zkDhXW
+HGL2e7kNqLZecQsEhP0FHoRhMWljYr8bkBgpaNighAzxT1GsVD2s1ON2a3ihO9zL
+6oa0BnvMlSoFkQIrg+CO3rQtzhmXNe6Scnkwo5HP4o/y2CZyDAjTBQXDVmaseZE3
+mDGpm/nziD2mMsXSz+OXwR3RABLB4Yf7GidpFNqo3FitumJp0K4Z92AOiQqHmD+q
+lzFETntdI5w7L/oIHMcFsB/Shd954EXjVrq1cHH1bfd41FE/elmIPE+Q5i7xbLqO
+n3bBfpbHPw99SJvqE9j5ilLS7V8RU4LbtzYRhXCoPKNesMS+zN5zW+G5ueRwS6jS
+gRyHO+FvMQA2r+fZ1ux3wBvgn5MX9yUPgLZMBtkS0Eb/dEsZA8+jN2qeQtcAiATM
+aJn2FfCuP8wdPclYBRAID6mgejORu89TetuTnuVBCXp1FFPtENPSpkn51VMcuX2g
+2u8JAhZO+GmtuQAReIqDrtcHtU2k4WvZwmETRO52qhfejTTSqW/ojMJYBmKiV9+j
+cAKkwrSRheQBXDOYBYnKiyndvVCe+FA5x9zGd4QC5iwBVWccyUzSGMPP9InzWKLq
+eQGxb8VyRgvwSvbrV2S285vUuDGwuzDh88wV87lIwVEQGIYDBcI=
+=SCiS
+-----END PGP SIGNATURE-----
+
+--Sig_/5/nSgLPlJvSKPAzDzYohVR2--
