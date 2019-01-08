@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41810)
+Received: from eggs.gnu.org ([209.51.188.92]:42569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggrIs-0007Ax-4Z
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:20:23 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ggrLN-0000M3-Iv
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:23:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggrIp-0001xa-Jm
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:20:21 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181221165341.23736-1-vsementsov@virtuozzo.com>
-	<20181221165341.23736-2-vsementsov@virtuozzo.com>
-Date: Tue, 08 Jan 2019 14:20:07 +0100
-In-Reply-To: <20181221165341.23736-2-vsementsov@virtuozzo.com> (Vladimir
-	Sementsov-Ogievskiy's message of "Fri, 21 Dec 2018 19:53:40 +0300")
-Message-ID: <875zuznv5k.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanha@gmail.com>) id 1ggrLK-0001oJ-IZ
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:22:56 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] qapi: move to QOM path for
- x-block-latency-histogram-set
+References: <20190105144429.8702-1-stefanha@redhat.com>
+	<CAFEAcA_NiH6Gj1_R6yUXKsgRjhnpqkYJ=84Ugd9t_mPd+af5Wg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_NiH6Gj1_R6yUXKsgRjhnpqkYJ=84Ugd9t_mPd+af5Wg@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 8 Jan 2019 13:22:37 +0000
+Message-ID: <CAJSP0QUn+S8vDsTF+Ww12kN4x7PsVOSbujy9HVMuMfnFbV17GA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] arm: Stub out NRF51 TWI
+ magnetometer/accelerometer detection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com, pizhenwei@bytedance.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
-
-> Move to way of device selecting, however fall back to device name if
-> path is not found.
+On Tue, Jan 8, 2019 at 11:57 AM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+> On Sat, 5 Jan 2019 at 15:02, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >
+> > From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+> >
+> > Recent microbit firmwares panic if the TWI magnetometer/accelerometer
+> > devices are not detected during startup.  We don't implement TWI (I2C)
+> > so let's stub out these devices just to let the firmware boot.
+> >
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Based-on: <20190103091119.9367-1-stefanha@redhat.com>
+> > ---
+> > Steffen: Please post your Signed-off-by.  I did some minor cleanups so
+> > your patch can be merged.  Thanks!
+> >
+> >  include/hw/arm/nrf51.h     |  1 +
+> >  include/hw/arm/nrf51_soc.h |  1 +
+> >  hw/arm/nrf51_soc.c         | 62 ++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 64 insertions(+)
 >
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  qapi/block-core.json |  4 ++--
->  blockdev.c           | 22 +++++++++++++++-------
->  2 files changed, 17 insertions(+), 9 deletions(-)
+> >
+> > +/* Two-Wire Interface (TWI) is not implemented but the microbit-dal fi=
+rmware
+> > + * panics if the TWI accelerometer and magnetometer WHO_AM_I registers=
+ cannot
+> > + * be read.  Stub out this read sequence so microbit-dal starts up.
+> > + */
+> > +static uint32_t twi_read_sequence[] =3D {0x5A, 0x5A, 0x40};
+> > +static uint32_t twi_regs[0x1000 / 4];
+> > +
+> > +static uint64_t twi_read(void *opaque, hwaddr addr, unsigned int size)
+> > +{
+> > +    static int i;
+> > +    uint64_t data =3D 0x00;
+> > +
+> > +    switch (addr) {
+> > +    case NRF51_TWI_EVENT_STOPPED:
+> > +        data =3D 0x01;
+> > +        break;
+> > +    case NRF51_TWI_EVENT_RXDREADY:
+> > +        data =3D 0x01;
+> > +        break;
+> > +    case NRF51_TWI_EVENT_TXDSENT:
+> > +        data =3D 0x01;
+> > +        break;
+> > +    case NRF51_TWI_REG_RXD:
+> > +        data =3D twi_read_sequence[i];
+> > +        if (i < ARRAY_SIZE(twi_read_sequence)) {
+> > +            i++;
+> > +        }
+> > +        break;
+> > +    default:
+> > +        data =3D twi_regs[addr / 4];
+> > +        break;
+> > +    }
+> > +
+> > +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u] =3D %" PRIx3=
+2 "\n",
+> > +                  __func__, addr, size, (uint32_t)data);
+> > +
+> > +
+> > +    return data;
+> > +}
+> > +
+> > +static void twi_write(void *opaque, hwaddr addr, uint64_t data,
+> > +                      unsigned int size)
+> > +{
+> > +    qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " <- 0x%" PRIx64 " =
+[%u]\n",
+> > +                  __func__, addr, data, size);
+> > +    twi_regs[addr / 4] =3D data;
+> > +}
+> > +
+> > +static const MemoryRegionOps twi_ops =3D {
+> > +    .read =3D twi_read,
+> > +    .write =3D twi_write
+> > +};
 >
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 762000f31f..bb70c51a57 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -489,7 +489,7 @@
->  # If only @device parameter is specified, remove all present latency histograms
->  # for the device. Otherwise, add/reset some of (or all) latency histograms.
->  #
-> -# @device: device name to set latency histogram for.
-> +# @id: The QOM path or name of the guest device.
->  #
->  # @boundaries: list of interval boundary values (see description in
->  #              BlockLatencyHistogramInfo definition). If specified, all
+> Can you put this in its own device in its own source file,
+> please? This is too much device-specific code to have
+> in the SoC's source file.
 
-Is such overloaded semantics what we want in new interfaces?
+Sure, will send v2.  It should also be hooked up by the microbit
+machine type instead of being hardcoded into the nRF51 SoC.
 
-Hmm, looks like there's ample precedence for it.  Escaped my grep at
-first because its commonly documented as "The name or QOM path of the
-guest device".  Suggest to stick to that for consistency.
-
-> @@ -547,7 +547,7 @@
->  # <- { "return": {} }
->  ##
->  { 'command': 'x-block-latency-histogram-set',
-> -  'data': {'device': 'str',
-> +  'data': {'id': 'str',
->             '*boundaries': ['uint64'],
->             '*boundaries-read': ['uint64'],
->             '*boundaries-write': ['uint64'],
-[...]
+Stefan
