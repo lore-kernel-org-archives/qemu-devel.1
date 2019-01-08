@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41592)
+Received: from eggs.gnu.org ([209.51.188.92]:42073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ggsdu-0002mO-OT
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:46:11 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1ggsfQ-0003bF-Dv
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:47:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ggsdq-0002Yc-PC
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:46:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43048)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ggsdq-0002Sf-GB
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:46:06 -0500
-References: <154670237006.5111.1505843603378488710.malonedeb@wampee.canonical.com>
-	<154693620998.25278.657579942079364570.malone@gac.canonical.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c4b207e5-2b98-1bcf-05e0-1228a548c936@redhat.com>
-Date: Tue, 8 Jan 2019 08:46:02 -0600
+	(envelope-from <liam.merwick@oracle.com>) id 1ggsfN-0005ik-1W
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:47:44 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:44982)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1ggsfM-0005In-MK
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:47:40 -0500
+References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
+	<CAGxU2F53zsuVRBbvGTOU81zObL+4tTg_FgE0i04G2eOWckc29Q@mail.gmail.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <aa1cbeec-bb31-8849-c34b-e2397dc1c475@oracle.com>
+Date: Tue, 8 Jan 2019 14:47:20 +0000
 MIME-Version: 1.0
-In-Reply-To: <154693620998.25278.657579942079364570.malone@gac.canonical.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Kk7l5dIM0Mu6PnslXsTLWer0kYU8qAi9Y"
-Subject: Re: [Qemu-devel] [Bug 1810603] Re: QEMU QCow Images grow
- dramatically
+In-Reply-To: <CAGxU2F53zsuVRBbvGTOU81zObL+4tTg_FgE0i04G2eOWckc29Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 0/4] QEMU changes to do PVH boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +29,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1810603 <1810603@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: Stefano Garzarella <sgarzare@redhat.com>, maran.wilson@oracle.com
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Kk7l5dIM0Mu6PnslXsTLWer0kYU8qAi9Y
-From: Eric Blake <eblake@redhat.com>
-To: Bug 1810603 <1810603@bugs.launchpad.net>, qemu-devel@nongnu.org
-Message-ID: <c4b207e5-2b98-1bcf-05e0-1228a548c936@redhat.com>
-Subject: Re: [Qemu-devel] [Bug 1810603] Re: QEMU QCow Images grow dramatically
-References: <154670237006.5111.1505843603378488710.malonedeb@wampee.canonical.com>
- <154693620998.25278.657579942079364570.malone@gac.canonical.com>
-In-Reply-To: <154693620998.25278.657579942079364570.malone@gac.canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Stefano,
 
-On 1/8/19 2:30 AM, Lenny Helpline wrote:
-> I don't have many commands handy, as we manage almost everything throug=
-h
-> libvirt manager.
+[ Catching up on mail after vacation ]
+
+On 03/01/2019 17:22, Stefano Garzarella wrote:
+> Hi Liam, Hi Maran,
+> I'm writing the optionrom to do PVH boot also with SeaBIOS.
+> It is almost complete and I'm testing it, but I have some issue with
+> QEMU -initrd parameter.
+> (It works correctly without -initrd and using a kernel with all needed
+> modules compiled statically)
 >=20
-> 3) create a snapshot of the lined clone:
+> Linux boots correctly, but it is not able to find the ramdisk. (I have
+> the same behavior with qboot)
+> Looking at Linux, QEMU, and qboot patches, I understood that the first
+> module pointed by 'modlist_paddr' in the 'hvm_start_info' should be
+> used to pass the ramdisk address and size to the kernel, but I didn't
+> understand who load it in RAM. (I guess QEMU directly or the firmware
+> by fw_cfg interface)
 >=20
-> virsh snapshot-create-as --domain <VMNAME> --name "test" --halt
+> Can you give me some suggestions?
 >=20
-> 4) revert the snapshot every X minutes / hours:
+
+
+QEMU sets the hvm_modlist_entry in load_linux() after the call to=20
+load_elfboot() and then qboot loads it in boot_pvh_from_fw_cfg()
+
+But the current PVH patches don't handle initrd (they have=20
+start_info.nr_modules =3D=3D 1).
+
+During (or after) the call to load_elfboot() it looks like we'd need to=20
+do something like what load_multiboot() does below (along with the=20
+associated initialisation)
+
+400     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, ADDR_MBI);
+401     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, sizeof(bootinfo));
+402     fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, mb_bootinfo_data,
+403                      sizeof(bootinfo));
+
+I'm checking to see if that has any implications for the kernel side.
+
+Regards,
+Liam
+
 >=20
-> virsh destroy <VMNAME>
-> virsh snapshot-revert --snapshotname test --running --force
+> On Fri, Dec 21, 2018 at 9:07 PM Liam Merwick <liam.merwick@oracle.com> =
+wrote:
+>>
+>> For certain applications it is desirable to rapidly boot a KVM virtual
+>> machine. In cases where legacy hardware and software support within th=
+e
+>> guest is not needed, QEMU should be able to boot directly into the
+>> uncompressed Linux kernel binary with minimal firmware involvement.
+>>
+>> There already exists an ABI to allow this for Xen PVH guests and the A=
+BI
+>> is supported by Linux and FreeBSD:
+>>
+>>     https://xenbits.xen.org/docs/unstable/misc/pvh.html
+>>
+>> Details on the Linux changes (v9 staged for 4.21): https://lkml.org/lk=
+ml/2018/12/14/1330
+>> qboot pull request: https://github.com/bonzini/qboot/pull/17
+>>
+>> This patch series provides QEMU support to read the ELF header of an
+>> uncompressed kernel binary and get the 32-bit PVH kernel entry point
+>> from an ELF Note.  In load_linux() a call is made to load_elfboot()
+>> so see if the header matches that of an uncompressed kernel binary (EL=
+F)
+>> and if so, loads the binary and determines the kernel entry address
+>> from an ELF Note in the binary.  Then qboot does futher initialisation
+>> of the guest (e820, etc.) and jumps to the kernel entry address and
+>> boots the guest.
+>>
+>> changes v1 -> v2
+>> - Based on feedback from Stefan Hajnoczi
+>> - The reading of the PVH entry point is now done in a single pass duri=
+ng
+>>    elf_load() which results in Patch2 in v1 being split into Patches 1=
+&2 in v2
+>>    and considerably reworked.
+>> - Patch1 adds a new optional function pointer to parse the ELF note ty=
+pe
+>>    (the type is passed in via the existing translate_opaque arg - the
+>>    function already had 11 args so I didn't want to add more than one =
+new arg).
+>> - Patch2 adds a function to elf_ops.h to find an ELF note
+>>    matching a specific type
+>> - Patch3 just has a line added to the commit message to state that the=
+ Xen
+>>    repo is the canonical location
+>> - Patch4 (that does the PVH boot) is mainly equivalent to Patch3 in v1
+>>    just minor load_elfboot() changes and the addition of a
+>>    read_pvh_start_addr() helper function for load_elf()
+>>
+>>
+>> Us=D1=96ng the method/scripts documented by the NEMU team at
+>>
+>>     https://github.com/intel/nemu/wiki/Measuring-Boot-Latency
+>>     https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00200.htm=
+l
+>>
+>> below are some timings measured (vmlinux and bzImage from the same bui=
+ld)
+>> Time to get to kernel start is almost halved (95=E1=B9=81s -> 48ms)
+>>
+>> QEMU + qboot + vmlinux (PVH + 4.20-rc4)
+>>   qemu_init_end: 41.550521
+>>   fw_start: 41.667139 (+0.116618)
+>>   fw_do_boot: 47.448495 (+5.781356)
+>>   linux_startup_64: 47.720785 (+0.27229)
+>>   linux_start_kernel: 48.399541 (+0.678756)
+>>   linux_start_user: 296.952056 (+248.552515)
+>>
+>> QEMU + qboot + bzImage:
+>>   qemu_init_end: 29.209276
+>>   fw_start: 29.317342 (+0.108066)
+>>   linux_start_boot: 36.679362 (+7.36202)
+>>   linux_startup_64: 94.531349 (+57.851987)
+>>   linux_start_kernel: 94.900913 (+0.369564)
+>>   linux_start_user: 401.060971 (+306.160058)
+>>
+>> QEMU + bzImage:
+>>   qemu_init_end: 30.424430
+>>   linux_startup_64: 893.770334 (+863.345904)
+>>   linux_start_kernel: 894.17049 (+0.400156)
+>>   linux_start_user: 1208.679768 (+314.509278)
+>>
+>>
+>> Liam Merwick (4):
+>>    elf: Add optional function ptr to load_elf() to parse ELF notes
+>>    elf-ops.h: Add get_elf_note_type()
+>>    pvh: Add x86/HVM direct boot ABI header file
+>>    pvh: Boot uncompressed kernel using direct boot ABI
+>>
+>>   hw/alpha/dp264.c               |   4 +-
+>>   hw/arm/armv7m.c                |   3 +-
+>>   hw/arm/boot.c                  |   2 +-
+>>   hw/core/generic-loader.c       |   2 +-
+>>   hw/core/loader.c               |  24 ++++---
+>>   hw/cris/boot.c                 |   3 +-
+>>   hw/hppa/machine.c              |   6 +-
+>>   hw/i386/multiboot.c            |   2 +-
+>>   hw/i386/pc.c                   | 131 +++++++++++++++++++++++++++++++=
+++++-
+>>   hw/lm32/lm32_boards.c          |   6 +-
+>>   hw/lm32/milkymist.c            |   3 +-
+>>   hw/m68k/an5206.c               |   2 +-
+>>   hw/m68k/mcf5208.c              |   2 +-
+>>   hw/microblaze/boot.c           |   7 +-
+>>   hw/mips/mips_fulong2e.c        |   5 +-
+>>   hw/mips/mips_malta.c           |   5 +-
+>>   hw/mips/mips_mipssim.c         |   5 +-
+>>   hw/mips/mips_r4k.c             |   5 +-
+>>   hw/moxie/moxiesim.c            |   2 +-
+>>   hw/nios2/boot.c                |   7 +-
+>>   hw/openrisc/openrisc_sim.c     |   2 +-
+>>   hw/pci-host/prep.c             |   2 +-
+>>   hw/ppc/e500.c                  |   3 +-
+>>   hw/ppc/mac_newworld.c          |   5 +-
+>>   hw/ppc/mac_oldworld.c          |   5 +-
+>>   hw/ppc/ppc440_bamboo.c         |   2 +-
+>>   hw/ppc/sam460ex.c              |   3 +-
+>>   hw/ppc/spapr.c                 |   7 +-
+>>   hw/ppc/virtex_ml507.c          |   2 +-
+>>   hw/riscv/sifive_e.c            |   2 +-
+>>   hw/riscv/sifive_u.c            |   2 +-
+>>   hw/riscv/spike.c               |   2 +-
+>>   hw/riscv/virt.c                |   2 +-
+>>   hw/s390x/ipl.c                 |   9 ++-
+>>   hw/sparc/leon3.c               |   3 +-
+>>   hw/sparc/sun4m.c               |   6 +-
+>>   hw/sparc64/sun4u.c             |   4 +-
+>>   hw/tricore/tricore_testboard.c |   2 +-
+>>   hw/xtensa/sim.c                |  12 ++--
+>>   hw/xtensa/xtfpga.c             |   2 +-
+>>   include/elf.h                  |  10 +++
+>>   include/hw/elf_ops.h           |  72 ++++++++++++++++++++
+>>   include/hw/loader.h            |   9 ++-
+>>   include/hw/xen/start_info.h    | 146 +++++++++++++++++++++++++++++++=
+++++++++++
+>>   44 files changed, 469 insertions(+), 71 deletions(-)
+>>   create mode 100644 include/hw/xen/start_info.h
+>>
+>> --
+>> 1.8.3.1
+>>
 >=20
-> Does that help?
-
-Yes. It shows that you are taking internal snapshots, rather than
-external.  Note that merely reverting to an internal snapshot does not
-delete that snapshot, and also note that although qemu has code for
-deleting internal snapshots, I doubt that it currently reclaims the disk
-space that was previously in use by that snapshot but no longer needed.
-Internal snapshots do not get much attention these days, because most of
-our work is focused on external snapshots.
-
-If you were to use external snapshots, then every time you wanted to
-create a point in time that you might need to roll back to, you create a
-new external snapshot, turning:
-
-image1
-
-into
-
-image1 <- temp_overlay
-
-then, at the point when you are done with the work in temp_overlay2, you
-reset the domain back to using image1 and throw away the old
-temp_overlay (or, recreate temp_overlay to be blank, which is the same
-as going back to the state in image1); thus, the size of image1 never
-grows because you are doing all work in temp_overlay, and rolling back
-no longer keeps the changes that were done in a previous branch of work
-the way internal snapshots are doing.
-
-In libvirt terms, you could create an external snapshot by adding
---diskspec $disk,snapshot=3Dexternal for each $disk of your domain (virsh=
-
-domblklist can be used to get the list of valid $disk names).  But
-libvirt support for reverting to external snapshots is still not
-completely rounded out, so you'll have to do a bit more leg work on your
-end to piece things back together.
-
-Asking on the libvirt list may give you better insights on how best to
-use libvirt to drive external snapshots to accomplish your setup of
-frequently reverting to older points in time.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---Kk7l5dIM0Mu6PnslXsTLWer0kYU8qAi9Y
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw0t6oACgkQ3g5py3or
-ov1Ymgf/Ubo46k78MYNBRYPXWMGFUR9cJXuTLEBve+Dxd/mO6LDQBwKFnED3dZkb
-e23MSg50wUCni14q+4Inj5c5jauH2HL/il3RUTTc1Nm+Y9cLyFAPTtU/C7ZoXhHa
-IO+vreVgfWXcuVOnGA2Yztnha63v+8ql0B4oFM28y0WxxoAMYLejq45tA4XoO6B3
-Ju5wfNOJxpwsRBj9+5/ySn6+0yRsLI97tyhxo660aaAKgLpLB3RpmxTvcGd9LDMI
-rRJPhkOa5LmBHdk6I8FhE3Z4uSkdmYSXpikb7pBYVOA/t6fIpn0KgohQVcS8iw+u
-hWI78zBjgLWJ5aTBzaFiK8dqdVGtYA==
-=twVp
------END PGP SIGNATURE-----
-
---Kk7l5dIM0Mu6PnslXsTLWer0kYU8qAi9Y--
+> --
+> Stefano Garzarella
+> Red Hat
+>=20
