@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48731)
+Received: from eggs.gnu.org ([209.51.188.92]:50009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gguAm-0005wB-Dx
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:24:14 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gguDz-0000MQ-3s
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:27:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gguAl-0006au-AE
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:24:12 -0500
-Received: from m15-111.126.com ([220.181.15.111]:56959)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gguAk-0006HM-La
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:24:11 -0500
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (1.0)
-From: fei <lifei1214@126.com>
-In-Reply-To: <87a7kcl5fg.fsf@dusky.pond.sub.org>
-Date: Wed, 9 Jan 2019 00:24:00 +0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <50C7F00E-DD75-4FFB-8590-53308C34C96F@126.com>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-15-fli@suse.com>
-	<87a7kcl5fg.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 14/16] qemu_thread: supplement
- error handling for vnc_start_worker_thread
+	(envelope-from <stefanha@redhat.com>) id 1gguDu-0005cW-VH
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:27:30 -0500
+Date: Tue, 8 Jan 2019 16:27:06 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190108162706.GI32358@stefanha-x1.localdomain>
+References: <20190107120248.19491-1-kwolf@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ijf6z65S790CMqo8"
+Content-Disposition: inline
+In-Reply-To: <20190107120248.19491-1-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: Fix hangs in synchronous APIs with
+ iothreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Fei Li <fli@suse.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com, Gerd Hoffmann <kraxel@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
 
+--ijf6z65S790CMqo8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> =E5=9C=A8 2019=E5=B9=B41=E6=9C=888=E6=97=A5=EF=BC=8C01:54=EF=BC=8CMarkus A=
-rmbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+On Mon, Jan 07, 2019 at 01:02:48PM +0100, Kevin Wolf wrote:
+> In the block layer, synchronous APIs are often implemented by creating a
+> coroutine that calls the asynchronous coroutine-based implementation and
+> then waiting for completion with BDRV_POLL_WHILE().
 >=20
-> Fei Li <fli@suse.com> writes:
+> For this to work with iothreads (more specifically, when the synchronous
+> API is called in a thread that is not the home thread of the block
+> device, so that the coroutine will run in a different thread), we must
+> make sure to call aio_wait_kick() at the end of the operation. Many
+> places are missing this, so that BDRV_POLL_WHILE() keeps hanging even if
+> the condition has long become false.
 >=20
->> Supplement the error handling for vnc_thread_worker_thread: add
->> an Error parameter for it to propagate the error to its caller to
->> handle in case it fails, and make it return a Boolean to indicate
->> whether it succeeds.
->>=20
->> Cc: Markus Armbruster <armbru@redhat.com>
->> Cc: Gerd Hoffmann <kraxel@redhat.com>
->> Signed-off-by: Fei Li <fli@suse.com>
->> ---
->> ui/vnc-jobs.c | 17 +++++++++++------
->> ui/vnc-jobs.h |  2 +-
->> ui/vnc.c      |  4 +++-
->> 3 files changed, 15 insertions(+), 8 deletions(-)
->>=20
->> diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
->> index 5712f1f501..35a652d1fd 100644
->> --- a/ui/vnc-jobs.c
->> +++ b/ui/vnc-jobs.c
->> @@ -332,16 +332,21 @@ static bool vnc_worker_thread_running(void)
->>     return queue; /* Check global queue */
->> }
->>=20
->> -void vnc_start_worker_thread(void)
->> +bool vnc_start_worker_thread(Error **errp)
->> {
->>     VncJobQueue *q;
->>=20
->> -    if (vnc_worker_thread_running())
->> -        return ;
->> +    if (vnc_worker_thread_running()) {
->> +        goto out;
+> Note that bdrv_dec_in_flight() involves an aio_wait_kick() call. This
+> corresponds to the BDRV_POLL_WHILE() in the drain functions, but it is
+> generally not enough for most other operations because they haven't set
+> the return value in the coroutine entry stub yet. To avoid race
+> conditions there, we need to kick after setting the return value.
 >=20
-> Why not simply return true?
-Sounds right.. Will remove the below =E2=80=9Cout:=E2=80=9D too.
-
-Have a nice day, thanks
-Fei
-
+> The race window is small enough that the problem doesn't usually surface
+> in the common path. However, it does surface and causes easily
+> reproducible hangs if the operation can return early before even calling
+> bdrv_inc/dec_in_flight, which many of them do (trivial error or no-op
+> success paths).
 >=20
->> +    }
->>=20
->>     q =3D vnc_queue_init();
->> -    /* TODO: let the further caller handle the error instead of abort() h=
-ere */
->> -    qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread,
->> -                       q, QEMU_THREAD_DETACHED, &error_abort);
->> +    if (!qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread,=
+> The bug in bdrv_truncate(), bdrv_check() and bdrv_invalidate_cache() is
+> slightly different: These functions even neglected to schedule the
+> coroutine in the home thread of the node. This avoids the hang, but is
+> obviously wrong, too. Fix those to schedule the coroutine in the right
+> AioContext in addition to adding aio_wait_kick() calls.
+>=20
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c                     |   6 +-
+>  block/block-backend.c       |   5 +
+>  block/io.c                  |   8 +-
+>  block/nbd-client.c          |   1 +
+>  block/nvme.c                |   1 +
+>  block/qcow2.c               |   1 +
+>  block/qed.c                 |   1 +
+>  tests/test-block-iothread.c | 372 ++++++++++++++++++++++++++++++++++++
+>  tests/Makefile.include      |   2 +
+>  9 files changed, 394 insertions(+), 3 deletions(-)
+>  create mode 100644 tests/test-block-iothread.c
 
->> +                            q, QEMU_THREAD_DETACHED, errp)) {
->> +        vnc_queue_clear(q);
->> +        return false;
->> +    }
->>     queue =3D q; /* Set global queue */
->> +out:
->> +    return true;
->> }
->> diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
->> index 59f66bcc35..14640593db 100644
->> --- a/ui/vnc-jobs.h
->> +++ b/ui/vnc-jobs.h
->> @@ -37,7 +37,7 @@ void vnc_job_push(VncJob *job);
->> void vnc_jobs_join(VncState *vs);
->>=20
->> void vnc_jobs_consume_buffer(VncState *vs);
->> -void vnc_start_worker_thread(void);
->> +bool vnc_start_worker_thread(Error **errp);
->>=20
->> /* Locks */
->> static inline int vnc_trylock_display(VncDisplay *vd)
->> diff --git a/ui/vnc.c b/ui/vnc.c
->> index 0c1b477425..0ffe9e6a5d 100644
->> --- a/ui/vnc.c
->> +++ b/ui/vnc.c
->> @@ -3236,7 +3236,9 @@ void vnc_display_init(const char *id, Error **errp)=
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
->>     vd->connections_limit =3D 32;
->>=20
->>     qemu_mutex_init(&vd->mutex);
->> -    vnc_start_worker_thread();
->> +    if (!vnc_start_worker_thread(errp)) {
->> +        return;
->> +    }
->>=20
->>     vd->dcl.ops =3D &dcl_ops;
->>     register_displaychangelistener(&vd->dcl);
+--ijf6z65S790CMqo8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcNM9aAAoJEJykq7OBq3PIOY8IALau0JFpAYVcvJwhaKaa/TbS
+TIlOFX6s4ykmxTVwWoWFbLXLSeuYQ7mw7t37ugWFDu/NQ4L6M2oEAomkjNVcrWrY
+uf0WSQKHqfpFF07CixUd2prMQoM77XOdVbG9fYx03xOj+/auN81Gl2RBvwc2064l
+d3TfcHstUnRdVfcNpd/pNdWD9tQyRoJ4Pk7Frvc1G+g5OimDk8Ccbz0jIAWnCeig
++VxyMOYVA1LoGi4VkesjYBBc0XlosPn15lCM+plpH5RzvN5Gpl4ubHi7In3eurkm
+MqQ8EjQCZLkGaaplFlaVIpmhIIo0YD4u3sdh1FYIG8uievqMwtwsS+n3OSoZzUA=
+=jpRS
+-----END PGP SIGNATURE-----
+
+--ijf6z65S790CMqo8--
