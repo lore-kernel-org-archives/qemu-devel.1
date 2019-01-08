@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57878)
+Received: from eggs.gnu.org ([209.51.188.92]:58089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ggy66-0003GF-0a
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 15:35:38 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ggy6s-0003lJ-D5
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 15:36:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1ggy63-0002Dj-O0
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 15:35:37 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ggy6o-0002hM-Mc
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 15:36:26 -0500
+Resent-Message-Id: <E1ggy6o-0002hM-Mc@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21842)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ggy6m-0002fs-QZ
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 15:36:22 -0500
+In-Reply-To: <20190108162154.22259-1-alex.bennee@linaro.org>
+Message-ID: <154697975277.32765.18095479834595364739@02a1dbf831e2>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <CAFEAcA8t7V3XwkPCSKCPCd1qc=MxZcw2yjoHMW-NmTzGWMkbVQ@mail.gmail.com>
-	<mhng-39a30073-8d69-47fa-863b-b38761d1e8de@palmer-si-x1c4>
-In-Reply-To: <mhng-39a30073-8d69-47fa-863b-b38761d1e8de@palmer-si-x1c4>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 8 Jan 2019 12:35:17 -0800
-Message-ID: <CAMo8BfL96J7cT_R36qTHuwk+SvqWSEyZ5+oW05g=Bahc-QxFWw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Wiki Account Creation [Was Re: [PULL] RISC-V
- Changes for 3.2, Part 1]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 8 Jan 2019 12:35:53 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH  v1 0/6] current fpu/next queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,17 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
+To: alex.bennee@linaro.org
+Cc: fam@euphon.net, qemu-devel@nongnu.org, cota@braap.org
 
-Hi Palmer,
-
-On Tue, Jan 8, 2019 at 11:37 AM Palmer Dabbelt <palmer@sifive.com> wrote:
-> It looks like I don't have an account and I'm supposed to ask on qemu-devel for
-> one.
-
-I've created an account for you. Will send details in private e-mail.
-
--- 
-Thanks.
--- Max
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEwODE2MjE1NC4yMjI1
+OS0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENI
+ICB2MSAwLzZdIGN1cnJlbnQgZnB1L25leHQgcXVldWUKTWVzc2FnZS1pZDogMjAxOTAxMDgxNjIx
+NTQuMjIyNTktMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
+JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
+bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
+ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
+KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
+Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
+aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjQ4YTE0NjUgdGVzdHMvTWFrZmls
+ZTogYWRkIGNoZWNrLXNvZnRmbG9hdCBydWxlCjI4Mzc4NmIgc2NyaXB0cy9hcmNoaXZlLXNvdXJj
+ZTogaW5jbHVkZSBzb2Z0ZmxvYXQgdGVzdHMKNDA2OWNmNiB0ZXN0cy9NYWtlZmlsZTogYWRkIGZs
+b2F0aW5nIHBvaW50IHRlc3RzCjQ0YjM3MGUgc29mdGZsb2F0OiBlbmZvcmNlIHNvZnRmbG9hdCBp
+ZiB0aGUgaG9zdCdzIEZNQSBpcyBicm9rZW4KYTVhMTg0MCBmcC1iZW5jaDogcmVtb3ZlIHdyb25n
+IGV4cG9uZW50IHJhaXNlIGluIGZpbGxfcmFuZG9tCmY1MTFhNWMgZnAtYmVuY2g6IGZpeCB1cGRh
+dGVfcmFuZG9tX29wcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiBm
+cC1iZW5jaDogZml4IHVwZGF0ZV9yYW5kb21fb3BzLi4uCkNoZWNraW5nIFBBVENIIDIvNjogZnAt
+YmVuY2g6IHJlbW92ZSB3cm9uZyBleHBvbmVudCByYWlzZSBpbiBmaWxsX3JhbmRvbS4uLgpDaGVj
+a2luZyBQQVRDSCAzLzY6IHNvZnRmbG9hdDogZW5mb3JjZSBzb2Z0ZmxvYXQgaWYgdGhlIGhvc3Qn
+cyBGTUEgaXMgYnJva2VuLi4uCkNoZWNraW5nIFBBVENIIDQvNjogdGVzdHMvTWFrZWZpbGU6IGFk
+ZCBmbG9hdGluZyBwb2ludCB0ZXN0cy4uLgpDaGVja2luZyBQQVRDSCA1LzY6IHNjcmlwdHMvYXJj
+aGl2ZS1zb3VyY2U6IGluY2x1ZGUgc29mdGZsb2F0IHRlc3RzLi4uCkVSUk9SOiBsaW5lIG92ZXIg
+OTAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IHNjcmlwdHMvYXJjaGl2ZS1zb3VyY2Uuc2g6Mjk6Citz
+dWJtb2R1bGVzPSJkdGMgdWkva2V5Y29kZW1hcGRiIHRlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9h
+dC0zIHRlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zIgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KCkNoZWNraW5nIFBBVENIIDYvNjogdGVzdHMvTWFrZmlsZTogYWRkIGNoZWNrLXNvZnRm
+bG9hdCBydWxlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzIwMTkwMTA4MTYyMTU0LjIyMjU5LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZy90ZXN0
+aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
