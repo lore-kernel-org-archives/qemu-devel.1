@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44274)
+Received: from eggs.gnu.org ([209.51.188.92]:47889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=904c6e83a=anthony.perard@citrix.com>)
-	id 1ggrQq-0003ve-BN
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:28:37 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ggrXE-00068s-RG
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:35:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=904c6e83a=anthony.perard@citrix.com>)
-	id 1ggrQo-0004F8-46
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:28:35 -0500
-Date: Tue, 8 Jan 2019 13:28:23 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20190108132823.GF1508@perard.uk.xensource.com>
-References: <20181220171439.11159-1-paul.durrant@citrix.com>
-	<20181220171439.11159-17-paul.durrant@citrix.com>
-	<20190104163124.GE1508@perard.uk.xensource.com>
-	<da727b0b8a9a4f9baa47a660298a9cba@AMSPEX02CL03.citrite.net>
-	<20190108125321.GD11492@linux.fritz.box>
-	<904d305f8c0f4aac8e60fb7ea14ebd41@AMSPEX02CL03.citrite.net>
+	(envelope-from <stefanha@gmail.com>) id 1ggrXD-0007WI-HH
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:35:12 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:45026)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ggrXD-0007B2-8G
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 08:35:11 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id z5so4031800wrt.11
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 05:35:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <904d305f8c0f4aac8e60fb7ea14ebd41@AMSPEX02CL03.citrite.net>
-Subject: Re: [Qemu-devel] [PATCH v7 16/18] xen: automatically create
- XenBlockDevice-s
+References: <CAJSP0QWPfJWB0pZXRAxMPa1K4g21NnhL97SzY3RLFh306W2EGg@mail.gmail.com>
+	<CAE5jQCfLLRyT5fZ24jbFw52wa2d2kfi7B_47cq_sgB=O0=4prA@mail.gmail.com>
+In-Reply-To: <CAE5jQCfLLRyT5fZ24jbFw52wa2d2kfi7B_47cq_sgB=O0=4prA@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 8 Jan 2019 13:34:54 +0000
+Message-ID: <CAJSP0QUTMsB4RfH6v3MeR7P_1bFDVecMeht049QOWLs-LZFzkQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Building QEMU for WebAssembly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,228 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: 'Kevin Wolf' <kwolf@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Jim Mussared <jim@groklearning.com>
 
-On Tue, Jan 08, 2019 at 01:07:49PM +0000, Paul Durrant wrote:
-> > -----Original Message-----
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Sent: 08 January 2019 12:53
-> > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > Cc: Anthony Perard <anthony.perard@citrix.com>; qemu-devel@nongnu.org;
-> > qemu-block@nongnu.org; xen-devel@lists.xenproject.org; Max Reitz
-> > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> > Subject: Re: [PATCH v7 16/18] xen: automatically create XenBlockDevice-s
-> > 
-> > Am 04.01.2019 um 17:40 hat Paul Durrant geschrieben:
-> > > > -----Original Message-----
-> > > > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> > > > Sent: 04 January 2019 16:31
-> > > > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > > > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
-> > > > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
-> > > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> > > > Subject: Re: [PATCH v7 16/18] xen: automatically create
-> > XenBlockDevice-s
-> > > >
-> > > > Almost done, there is one thing left which I believe is an issue.
-> > > > Whenever I attach a raw file to QEMU, it print:
-> > > >     qemu-system-i386: warning: Opening a block device as a file using
-> > the
-> > > > 'file' driver is deprecated
-> > >
-> > > Oh, I'd not noticed that... but then I only use raw files occasionally.
-> > 
-> > Strictly speaking, this is not about raw (regular) files, but raw block
-> > devices. 'file' is fine for actual regular files, but the protocol
-> > driver for block devices is 'host_device'.
-> > 
-> > > > raw files should use the "raw" driver, so we aren't done yet.
-> > >
-> > > Ok. Having a strictly 2-layer stack actually makes things simpler anyway
-> > :-)
-> > 
-> > Using 'raw' there will make the block layer auto-detect the right
-> > protocol layer, so this works. If you want to avoid the second layer,
-> > you'd have to figure out manually whether to use 'file' or
-> > 'host_device'.
-> 
-> Thanks for the explanation. I'll give it a spin using a device... I've posted v8 but, given what you say, I'm still not sure I have it right.
+On Mon, Jan 7, 2019 at 5:07 PM Anatoly Trosinenko
+<anatoly.trosinenko@gmail.com> wrote:
+> > Multi-threading is not yet available in WebAssembly.  Hopefully this
+> > will change soon because multi-threading and related infrastructure
+> > like atomics are used at the core of several areas in QEMU.
+>
+> Technically, I have managed to serialize the QEMU code to the extent
+> that it was successfully running QEMU (v2.4.1 IIRC) with some
+> glitches.
 
-Indeed, in v8, even with the extra 'raw' layer, the warning is still
-there. I was trying to understand why, and I only found out today that
-we would need to use the 'host_device' driver as explain by Kevin.
+Cool :).  Great to hear that you've been looking into this.
 
+> It would be great to have some stub extension points upstreamed, such
+> as converting
+>
+> void *thread_entry_function(void *) {
+>     // some initialization
+>     while (true) {
+>         // do some work
+>     }
+> }
+>
+> into separate initialization, work and glue functions, so it would
+> behave as previously in the upstream QEMU, but can be textually
+> patched by merely fully removing only the **glue** function (or even
+> just its invocation) and writing "serializing" somewhere else (but
+> that's another story). I am not sure, though, it will not introduce
+> any performance issues at all, so it may be worth manually reapplying
+> this patch once a year when merging with upstream.
 
-BTW Paul, we can simplify the code that manage layers, by not managing
-them.
-Instead of (in JSON / QMP term):
-    { 'driver': 'file', 'filename': '/file', 'node-name': 'node-file' }
-    { 'driver': 'qcow2', 'file': 'node-file', 'node-name': 'node-qcow2' }
-we can have:
-    { 'driver': 'qcow2', 'node-name': 'node-qcow2',
-      'file': { 'driver': 'file', 'filename': '/file' } }
+QEMU has relied more and more on multi-threading over time (it's only
+natural so we can take advantage of multi-core hosts!).  My hope was
+that multi-threaded WebAssembly would land in major browsers soon and
+that empscripten would offer pthreads-like APIs.
 
+> > Stack-switching is not supported so QEMU's coroutines won't work.
+> > This mostly affects the block layer, which depends heavily on
+> > coroutines.
+>
+> Emscripten has its own coroutines: the old approach was to instrument
+> affected code paths so they can be restarted from the middle
+> (Asyncify, it generates huge code and is now unsupported) and the new
+> one -- Emterpretify, it generates bytecode instead of the affected
+> code and runs it in its own interpreter but, after all, what you want
+> from hard disk emulated in a browser. ;)
 
-Here is the patch I have, fill free to review and squash it, or not:
+Interesting, I didn't know about that!
 
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 91f5b58993..c6ec1d9543 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -653,43 +653,23 @@ static char *xen_block_blockdev_add(const char *id, QDict *qdict,
- 
- static void xen_block_drive_destroy(XenBlockDrive *drive, Error **errp)
- {
--    while (drive->layers-- != 0) {
--        char *node_name = drive->node_name[drive->layers];
-+    char *node_name = drive->node_name;
-+
-+    if (node_name) {
-         Error *local_err = NULL;
- 
-         xen_block_blockdev_del(node_name, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
--            drive->layers++;
-             return;
-         }
-+        g_free(node_name);
-+        drive->node_name = NULL;
-     }
-     g_free(drive->id);
-     g_free(drive);
- }
- 
--static void xen_block_drive_layer_add(XenBlockDrive *drive, QDict *qdict,
--                                      Error **errp)
--{
--    unsigned int i = drive->layers;
--    char *node_name;
--
--    g_assert(drive->layers < ARRAY_SIZE(drive->node_name));
--
--    if (i != 0) {
--        /* Link to the lower layer */
--        qdict_put_str(qdict, "file", drive->node_name[i - 1]);
--    }
--
--    node_name = xen_block_blockdev_add(drive->id, qdict, errp);
--    if (!node_name) {
--        return;
--    }
--
--    drive->node_name[i] = node_name;
--    drive->layers++;
--}
--
- static XenBlockDrive *xen_block_drive_create(const char *id,
-                                              const char *device_type,
-                                              QDict *opts, Error **errp)
-@@ -702,7 +682,8 @@ static XenBlockDrive *xen_block_drive_create(const char *id,
-     char *filename = NULL;
-     XenBlockDrive *drive = NULL;
-     Error *local_err = NULL;
--    QDict *qdict;
-+    QDict *file_layer;
-+    QDict *driver_layer;
- 
-     if (params) {
-         char **v = g_strsplit(params, ":", 2);
-@@ -733,13 +714,13 @@ static XenBlockDrive *xen_block_drive_create(const char *id,
-     drive = g_new0(XenBlockDrive, 1);
-     drive->id = g_strdup(id);
- 
--    qdict = qdict_new();
-+    file_layer = qdict_new();
- 
--    qdict_put_str(qdict, "driver", "file");
--    qdict_put_str(qdict, "filename", filename);
-+    qdict_put_str(file_layer, "driver", "file");
-+    qdict_put_str(file_layer, "filename", filename);
- 
-     if (mode && *mode != 'w') {
--        qdict_put_bool(qdict, "read-only", true);
-+        qdict_put_bool(file_layer, "read-only", true);
-     }
- 
-     if (direct_io_safe) {
-@@ -749,9 +730,9 @@ static XenBlockDrive *xen_block_drive_create(const char *id,
-             QDict *cache_qdict = qdict_new();
- 
-             qdict_put_bool(cache_qdict, "direct", true);
--            qdict_put_obj(qdict, "cache", QOBJECT(cache_qdict));
-+            qdict_put_obj(file_layer, "cache", QOBJECT(cache_qdict));
- 
--            qdict_put_str(qdict, "aio", "native");
-+            qdict_put_str(file_layer, "aio", "native");
-         }
-     }
- 
-@@ -759,7 +740,7 @@ static XenBlockDrive *xen_block_drive_create(const char *id,
-         unsigned long value;
- 
-         if (!qemu_strtoul(discard_enable, NULL, 2, &value) && !!value) {
--            qdict_put_str(qdict, "discard", "unmap");
-+            qdict_put_str(file_layer, "discard", "unmap");
-         }
-     }
- 
-@@ -767,22 +748,16 @@ static XenBlockDrive *xen_block_drive_create(const char *id,
-      * It is necessary to turn file locking off as an emulated device
-      * may have already opened the same image file.
-      */
--    qdict_put_str(qdict, "locking", "off");
--
--    xen_block_drive_layer_add(drive, qdict, &local_err);
--    qobject_unref(qdict);
--
--    if (local_err) {
--        error_propagate(errp, local_err);
--        goto done;
--    }
-+    qdict_put_str(file_layer, "locking", "off");
- 
--    qdict = qdict_new();
-+    driver_layer = qdict_new();
- 
--    qdict_put_str(qdict, "driver", driver);
-+    qdict_put_str(driver_layer, "driver", driver);
-+    qdict_put_obj(driver_layer, "file", QOBJECT(file_layer));
- 
--    xen_block_drive_layer_add(drive, qdict, &local_err);
--    qobject_unref(qdict);
-+    g_assert(!drive->node_name);
-+    drive->node_name = xen_block_blockdev_add(drive->id, driver_layer,
-+                                              &local_err);
- 
- done:
-     g_free(driver);
-@@ -798,7 +773,7 @@ static XenBlockDrive *xen_block_drive_create(const char *id,
- 
- static const char *xen_block_drive_get_node_name(XenBlockDrive *drive)
- {
--    return drive->layers ? drive->node_name[drive->layers - 1] : "";
-+    return drive->node_name ? drive->node_name : "";
- }
- 
- static void xen_block_iothread_destroy(XenBlockIOThread *iothread,
-diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
-index 6f5d675edb..11d351b4b3 100644
---- a/include/hw/xen/xen-block.h
-+++ b/include/hw/xen/xen-block.h
-@@ -39,8 +39,7 @@ typedef struct XenBlockProperties {
- 
- typedef struct XenBlockDrive {
-     char *id;
--    char *node_name[2];
--    unsigned int layers;
-+    char *node_name;
- } XenBlockDrive;
- 
- typedef struct XenBlockIOThread {
--- 
-Anthony PERARD
+> > Self-modifying code is not really supported.  Runtime code generation
+> > is possible (if you jump back into Javascript) but it doesn't seem
+> > designed for JIT compilers.  This makes TCG difficult.
+>
+> I had implemented a proof-of-concept TCI-to-Asm.JS JIT that was run
+> after several executions of particular Translation Block.
+>
+> All of the above can be tried here:
+> https://atrosinenko.github.io/qemujs-demo/ -- it is an old demo using
+> Asm.JS and QEMU 2.4.1.
+>
+> Now I am completely rewriting this port to make proper implementation
+> of WebAssembly backend:
+> repo: https://github.com/atrosinenko/qemujs/tree/qemujs-v2
+> discussion: https://github.com/WebAssembly/binaryen/issues/1494
+>
+> The main issues I have faced so far is to properly select functions
+> for Emterpretifying and linking the TBs compiled to WASM in the
+> efficient way -- both these issues are on the Emscripten side.
+>
+> Another my concern is the scale of software that can be run inside
+> this emulator. When run with -accel tcg, QEMU runs many times slower
+> than when run in the KVM mode on Linux. Hardly we can outperform
+> native TCG mode in browser on the same hardware (**technically** the
+> WASM engine itself can perform some very aggressive optimizations, but
+> this looks like some very optimistic assumption).
 
--- 
-Anthony PERARD
+Yes, performance will be poor.  It would be neat if hardware
+virtualization APIs (e.g. KVM) were made available to the WebAssembly
+world now that all major OSes (Linux, Windows, Mac) have standard APIs
+(KVM, WHPX, Hypervisor.framework).  But it would probably require a
+lot of muscle from influential organizations to get that accepted into
+the web standards ;-).
+
+Stefan
