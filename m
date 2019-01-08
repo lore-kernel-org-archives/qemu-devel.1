@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60541)
+Received: from eggs.gnu.org ([209.51.188.92]:35344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ggtRd-0004aJ-96
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:37:34 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ggtaU-0000CX-2h
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:46:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ggtRa-0004HX-AB
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:37:32 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20181114145857.19720-1-berto@igalia.com>
-References: <20181114145857.19720-1-berto@igalia.com>
-Date: Tue, 08 Jan 2019 16:37:19 +0100
-Message-ID: <w515zuzupn4.fsf@maestria.local.igalia.com>
+	(envelope-from <kwolf@redhat.com>) id 1ggtaS-0007L7-Gs
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:46:41 -0500
+Date: Tue, 8 Jan 2019 16:46:28 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190108154628.GG11492@linux.fritz.box>
+References: <cover.1542898669.git.berto@igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] qcow2: Assert that refcount block
- offsets fit in the refcount table
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1542898669.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] Minor fixes for the mirror block job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,46 +22,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-ping 2
+Am 22.11.2018 um 16:00 hat Alberto Garcia geschrieben:
+> Hi,
+> 
+> a couple of minor fixes for the mirror block job. I don't think these
+> bugs can be reproduced at the moment so this shouldn't be 3.1
+> material.
 
-On Wed 14 Nov 2018 03:58:57 PM CET, Alberto Garcia wrote:
-> Refcount table entries have a field to store the offset of the
-> refcount block. The rest of the bits of the entry are currently
-> reserved.
->
-> The offset is always taken from the entry using REFT_OFFSET_MASK to
-> ensure that we only use the bits that belong to that field.
->
-> While that mask is used every time we read from the refcount table, it
-> is never used when we write to it. Due to the other constraints of the
-> qcow2 format QEMU can never produce refcount block offsets that don't
-> fit in that field so any such offset when allocating a refcount block
-> would indicate a bug in QEMU.
->
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
-> v2: Add missing Signed-off-by: line
-> ---
->  block/qcow2-refcount.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index 46082aeac1..31a2e1f845 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -367,6 +367,9 @@ static int alloc_refcount_block(BlockDriverState *bs,
->          return new_block;
->      }
->  
-> +    /* The offset must fit in the offset field of the refcount table entry */
-> +    assert((new_block & REFT_OFFSET_MASK) == new_block);
-> +
->      /* If we're allocating the block at offset 0 then something is wrong */
->      if (new_block == 0) {
->          qcow2_signal_corruption(bs, true, -1, -1, "Preventing invalid "
-> -- 
-> 2.11.0
+Thanks, applied to the block branch.
+
+Kevin
