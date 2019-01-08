@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35316)
+Received: from eggs.gnu.org ([209.51.188.92]:35518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ggupr-0006p9-Ps
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:06:40 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqM-000752-6n
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ggupo-0003bH-Fk
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:06:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47822)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ggupo-00031s-7V
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:06:36 -0500
-Date: Tue, 8 Jan 2019 18:06:15 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190108180615.7e48cf13.cohuck@redhat.com>
-In-Reply-To: <20190108175021.003deab9@oc2783563651>
-References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
-	<112a03e6-3d6c-1c14-10ab-c9cea09ad388@linux.ibm.com>
-	<20190108173113.3c2d830c.cohuck@redhat.com>
-	<20190108175021.003deab9@oc2783563651>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqL-0004iw-73
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:10 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue,  8 Jan 2019 20:06:49 +0300
+Message-Id: <20190108170655.29766-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 3/9] qcow2-threads: use thread_pool_submit_co
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,123 +19,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, imammedo@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, berto@igalia.com, vsementsov@virtuozzo.com, den@openvz.org, pbonzini@redhat.com
 
-On Tue, 8 Jan 2019 17:50:21 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Use thread_pool_submit_co, instead of reinventing it here. Note, that
+thread_pool_submit_aio() never returns NULL, so checking it was an
+extra thing.
 
-> On Tue, 8 Jan 2019 17:31:13 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Tue, 8 Jan 2019 11:08:56 -0500
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >   
-> > > On 12/17/18 10:57 AM, Tony Krowiak wrote:  
-> > > > The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
-> > > > value of the BusState structure with the max_dev value of the BusClass structure
-> > > > to determine whether the maximum number of children has been reached for the
-> > > > bus. The problem is, the max_index field of the BusState structure does not
-> > > > necessarily reflect the number of devices that have been plugged into
-> > > > the bus.
-> > > > 
-> > > > Whenever a child device is plugged into the bus, the bus's max_index value is
-> > > > assigned to the child device and then incremented. If the child is subsequently
-> > > > unplugged, the value of the max_index does not change and no longer reflects the
-> > > > number of children.
-> > > > 
-> > > > When the bus's max_index value reaches the maximum number of devices
-> > > > allowed for the bus (i.e., the max_dev field in the BusClass structure),
-> > > > attempts to plug another device will be rejected claiming that the bus is
-> > > > full -- even if the bus is actually empty.
-> > > > 
-> > > > To resolve the problem, a new 'num_children' field is being added to the
-> > > > BusState structure to keep track of the number of children plugged into the
-> > > > bus. It will be incremented when a child is plugged, and decremented when a
-> > > > child is unplugged.
-> > > > 
-> > > > Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> > > > Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-> > > > Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> > > > ---
-> > > >   hw/core/qdev.c         | 3 +++
-> > > >   include/hw/qdev-core.h | 1 +
-> > > >   qdev-monitor.c         | 2 +-
-> > > >   3 files changed, 5 insertions(+), 1 deletion(-)    
-> > > 
-> > > Ping ...
-> > > I could not determine who the maintainer is for the three files
-> > > listed above. I checked the MAINTAINERS file and the prologue of each
-> > > individual file. Can someone please tell me who is responsible
-> > > for merging these changes? Any additional review comments?
-> > >   
-> > > > 
-> > > > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > > > index 6b3cc55b27c2..956923f33520 100644
-> > > > --- a/hw/core/qdev.c
-> > > > +++ b/hw/core/qdev.c
-> > > > @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
-> > > >               snprintf(name, sizeof(name), "child[%d]", kid->index);
-> > > >               QTAILQ_REMOVE(&bus->children, kid, sibling);
-> > > >   
-> > > > +            bus->num_children--;
-> > > > +
-> > > >               /* This gives back ownership of kid->child back to us.  */
-> > > >               object_property_del(OBJECT(bus), name, NULL);
-> > > >               object_unref(OBJECT(kid->child));
-> > > > @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
-> > > >       char name[32];
-> > > >       BusChild *kid = g_malloc0(sizeof(*kid));
-> > > >   
-> > > > +    bus->num_children++;
-> > > >       kid->index = bus->max_index++;  
-> > 
-> > Hm... I'm wondering what happens for insane numbers of hotplugging
-> > operations here?
-> > 
-> > (Preexisting problem for busses without limit, but busses with a limit
-> > could now run into that as well.)
-> >   
-> 
-> How does this patch change things? I mean bus->num_children gets
-> decremented on unplug.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-threads.c | 17 ++---------------
+ 1 file changed, 2 insertions(+), 15 deletions(-)
 
-We don't stop anymore if max_index >= max_dev, which means that we can
-now trigger that even if max_dev != 0.
-
-> 
-> Regards,
-> Halil
-> 
-> > > >       kid->child = child;
-> > > >       object_ref(OBJECT(kid->child));
-> > > > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> > > > index a24d0dd566e3..521f0a947ead 100644
-> > > > --- a/include/hw/qdev-core.h
-> > > > +++ b/include/hw/qdev-core.h
-> > > > @@ -206,6 +206,7 @@ struct BusState {
-> > > >       HotplugHandler *hotplug_handler;
-> > > >       int max_index;
-> > > >       bool realized;
-> > > > +    int num_children;
-> > > >       QTAILQ_HEAD(ChildrenHead, BusChild) children;
-> > > >       QLIST_ENTRY(BusState) sibling;
-> > > >   };
-> > > > diff --git a/qdev-monitor.c b/qdev-monitor.c
-> > > > index 07147c63bf8b..45a8ba49644c 100644
-> > > > --- a/qdev-monitor.c
-> > > > +++ b/qdev-monitor.c
-> > > > @@ -414,7 +414,7 @@ static DeviceState *qbus_find_dev(BusState *bus, char *elem)
-> > > >   static inline bool qbus_is_full(BusState *bus)
-> > > >   {
-> > > >       BusClass *bus_class = BUS_GET_CLASS(bus);
-> > > > -    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
-> > > > +    return bus_class->max_dev && bus->num_children >= bus_class->max_dev;
-> > > >   }
-> > > >   
-> > > >   /*
-> > > >     
-> > 
-> > The approach the patch takes looks sane to me.
-> >   
-> 
+diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+index dea9ac431c..20b2616529 100644
+--- a/block/qcow2-threads.c
++++ b/block/qcow2-threads.c
+@@ -144,17 +144,11 @@ static int qcow2_compress_pool_func(void *opaque)
+     return 0;
+ }
+ 
+-static void qcow2_compress_complete(void *opaque, int ret)
+-{
+-    qemu_coroutine_enter(opaque);
+-}
+-
+ static ssize_t coroutine_fn
+ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+                      const void *src, size_t src_size, Qcow2CompressFunc func)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    BlockAIOCB *acb;
+     ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
+     Qcow2CompressData arg = {
+         .dest = dest,
+@@ -169,16 +163,9 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+     }
+ 
+     s->nb_compress_threads++;
+-    acb = thread_pool_submit_aio(pool, qcow2_compress_pool_func, &arg,
+-                                 qcow2_compress_complete,
+-                                 qemu_coroutine_self());
+-
+-    if (!acb) {
+-        s->nb_compress_threads--;
+-        return -EINVAL;
+-    }
+-    qemu_coroutine_yield();
++    thread_pool_submit_co(pool, qcow2_compress_pool_func, &arg);
+     s->nb_compress_threads--;
++
+     qemu_co_queue_next(&s->compress_wait_queue);
+ 
+     return arg.ret;
+-- 
+2.18.0
