@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47043)
+Received: from eggs.gnu.org ([209.51.188.92]:47082)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
-	id 1ggsqa-0004ld-1b
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:59:18 -0500
+	id 1ggsqd-0004po-Sh
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:59:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
-	id 1ggsqW-0006Hs-PE
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:59:15 -0500
+	id 1ggsqZ-0006Qc-RY
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:59:18 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Tue, 8 Jan 2019 14:49:00 +0000
-Message-ID: <20190108144903.8249-16-paul.durrant@citrix.com>
+Date: Tue, 8 Jan 2019 14:49:01 +0000
+Message-ID: <20190108144903.8249-17-paul.durrant@citrix.com>
 In-Reply-To: <20190108144903.8249-1-paul.durrant@citrix.com>
 References: <20190108144903.8249-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 15/18] xen: add a mechanism to automatically
- create XenDevice-s...
+Subject: [Qemu-devel] [PATCH v9 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,540 +26,517 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-...that maintains compatibility with existing Xen toolstacks.
+This patch adds create and destroy function for XenBlockDevice-s so that
+they can be created automatically when the Xen toolstack instantiates a new
+PV backend via xenstore. When the XenBlockDevice is created this way it is
+also necessary to create a 'drive' which matches the configuration that the
+Xen toolstack has written into xenstore. This is done by formulating the
+parameters necessary for each 'blockdev' layer of the drive and then using
+qmp_blockdev_add() to create the layers. Also, for compatibility with the
+legacy 'xen_disk' implementation, an iothread is automatically created for
+the new XenBlockDevice. This, like the driver layers, will be destroyed
+after the XenBlockDevice is unrealized.
 
-Xen toolstacks instantiate PV backends by simply writing information into
-xenstore and expecting a backend implementation to be watching for this.
-
-This patch adds a new 'xen-backend' module to allow individual XenDevice
-implementations to register create and destroy functions. The creator
-will be called when a tool-stack instantiates a new backend in this way,
-and the destructor will then be called after the resulting XenDevice
-object is unrealized.
-
-To support this it is also necessary to add new watchers into the XenBus
-implementation to handle enumeration of new backends and also destruction
-of XenDevice-s when the toolstack sets the backend 'online' key to 0.
-
-NOTE: This patch only adds the framework. A subsequent patch will add a
-      creator function for xen-block devices.
+The legacy backend scan for 'qdisk' is removed by this patch, which makes
+the 'xen_disk' code is redundant. The code will be removed by a subsequent
+patch.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+Signed-off-by: Anthony Perard <anthony.perard@citrix.com>
 ---
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
 
-v5:
- - Added destructor function, therefore Anthony's R-b is not carried
-   from v4
+v9:
+ - Squash the layers with patch from Anthony
 
-v3:
- - Use a xenstore transaction in enumeration code to ensure consistent
-   parameters
- - Not adding Anthony's R-b because of change
+v8:
+ - Add 'raw' image layer for raw images
+
+v7:
+ - Don't use qobject_input_visitor_new_flat_confused()
+
+v5:
+ - Extensively re-worked to avoid using drive_new() and use
+   qmp_blockdev_add() instead
+ - Also use qmp_object_add() for IOThread
+ - Dropped Anthony's R-b because of the code changes
 
 v2:
- - Sort out error paths and error reporting
+ - Get rid of error_abort
+ - Don't use qdev_init_nofail()
+ - Explain why file locking needs to be off
 ---
- hw/xen/Makefile.objs         |   2 +-
- hw/xen/trace-events          |   3 +
- hw/xen/xen-backend.c         | 165 +++++++++++++++++++++++++++++++++++
- hw/xen/xen-bus.c             | 164 +++++++++++++++++++++++++++++++++-
- include/hw/xen/xen-backend.h |  39 +++++++++
- include/hw/xen/xen-bus.h     |   1 +
- include/qemu/module.h        |   3 +
- 7 files changed, 375 insertions(+), 2 deletions(-)
- create mode 100644 hw/xen/xen-backend.c
- create mode 100644 include/hw/xen/xen-backend.h
+ hw/block/trace-events       |   4 +
+ hw/block/xen-block.c        | 374 ++++++++++++++++++++++++++++++++++++
+ hw/xen/xen-legacy-backend.c |   1 -
+ include/hw/xen/xen-block.h  |  12 ++
+ 4 files changed, 390 insertions(+), 1 deletion(-)
 
-diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index 77c0868190..84df60a928 100644
---- a/hw/xen/Makefile.objs
-+++ b/hw/xen/Makefile.objs
-@@ -1,5 +1,5 @@
- # xen backend driver support
--common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o
-+common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o xen-backend.o
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 89e258319c..55e5a5500c 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -137,3 +137,7 @@ xen_disk_realize(void) ""
+ xen_disk_unrealize(void) ""
+ xen_cdrom_realize(void) ""
+ xen_cdrom_unrealize(void) ""
++xen_block_blockdev_add(char *str) "%s"
++xen_block_blockdev_del(const char *node_name) "%s"
++xen_block_device_create(unsigned int number) "%u"
++xen_block_device_destroy(unsigned int number) "%u"
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+index a7c37c185a..c6ec1d9543 100644
+--- a/hw/block/xen-block.c
++++ b/hw/block/xen-block.c
+@@ -7,12 +7,20 @@
  
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index d4651bdb30..f6944624b2 100644
---- a/hw/xen/trace-events
-+++ b/hw/xen/trace-events
-@@ -16,6 +16,9 @@ xen_domid_restrict(int err) "err: %u"
- # include/hw/xen/xen-bus.c
- xen_bus_realize(void) ""
- xen_bus_unrealize(void) ""
-+xen_bus_enumerate(void) ""
-+xen_bus_type_enumerate(const char *type) "type: %s"
-+xen_bus_backend_create(const char *type, const char *path) "type: %s path: %s"
- xen_bus_add_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
- xen_bus_remove_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
- xen_bus_watch(const char *token) "token: %s"
-diff --git a/hw/xen/xen-backend.c b/hw/xen/xen-backend.c
-new file mode 100644
-index 0000000000..da065f81b7
---- /dev/null
-+++ b/hw/xen/xen-backend.c
-@@ -0,0 +1,165 @@
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
++#include "qemu/option.h"
+ #include "qapi/error.h"
++#include "qapi/qapi-commands-block-core.h"
++#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-visit-block-core.h"
++#include "qapi/qobject-input-visitor.h"
+ #include "qapi/visitor.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qstring.h"
+ #include "hw/hw.h"
+ #include "hw/xen/xen_common.h"
+ #include "hw/block/xen_blkif.h"
+ #include "hw/xen/xen-block.h"
 +#include "hw/xen/xen-backend.h"
-+#include "hw/xen/xen-bus.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/iothread.h"
+@@ -474,6 +482,7 @@ static void xen_block_class_init(ObjectClass *class, void *data)
+     DeviceClass *dev_class = DEVICE_CLASS(class);
+     XenDeviceClass *xendev_class = XEN_DEVICE_CLASS(class);
+ 
++    xendev_class->backend = "qdisk";
+     xendev_class->device = "vbd";
+     xendev_class->get_name = xen_block_get_name;
+     xendev_class->realize = xen_block_realize;
+@@ -586,3 +595,368 @@ static void xen_block_register_types(void)
+ }
+ 
+ type_init(xen_block_register_types)
 +
-+typedef struct XenBackendImpl {
-+    const char *type;
-+    XenBackendDeviceCreate create;
-+    XenBackendDeviceDestroy destroy;
-+} XenBackendImpl;
-+
-+struct XenBackendInstance {
-+    QLIST_ENTRY(XenBackendInstance) entry;
-+    const XenBackendImpl *impl;
-+    XenBus *xenbus;
-+    char *name;
-+    XenDevice *xendev;
-+};
-+
-+static GHashTable *xen_backend_table_get(void)
++static void xen_block_blockdev_del(const char *node_name, Error **errp)
 +{
-+    static GHashTable *table;
++    trace_xen_block_blockdev_del(node_name);
 +
-+    if (table == NULL) {
-+        table = g_hash_table_new(g_str_hash, g_str_equal);
++    qmp_blockdev_del(node_name, errp);
++}
++
++static char *xen_block_blockdev_add(const char *id, QDict *qdict,
++                                    Error **errp)
++{
++    const char *driver = qdict_get_try_str(qdict, "driver");
++    BlockdevOptions *options = NULL;
++    Error *local_err = NULL;
++    char *node_name;
++    Visitor *v;
++
++    if (!driver) {
++        error_setg(errp, "no 'driver' parameter");
++        return NULL;
 +    }
 +
-+    return table;
-+}
++    node_name = g_strdup_printf("%s-%s", id, driver);
++    qdict_put_str(qdict, "node-name", node_name);
 +
-+static void xen_backend_table_add(XenBackendImpl *impl)
-+{
-+    g_hash_table_insert(xen_backend_table_get(), (void *)impl->type, impl);
-+}
++    trace_xen_block_blockdev_add(node_name);
 +
-+static const XenBackendImpl *xen_backend_table_lookup(const char *type)
-+{
-+    return g_hash_table_lookup(xen_backend_table_get(), type);
-+}
++    v = qobject_input_visitor_new(QOBJECT(qdict));
++    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
++    visit_free(v);
 +
-+void xen_backend_register(const XenBackendInfo *info)
-+{
-+    XenBackendImpl *impl = g_new0(XenBackendImpl, 1);
-+
-+    g_assert(info->type);
-+
-+    if (xen_backend_table_lookup(info->type)) {
-+        error_report("attempt to register duplicate Xen backend type '%s'",
-+                     info->type);
-+        abort();
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto fail;
 +    }
 +
-+    if (!info->create) {
-+        error_report("backend type '%s' has no creator", info->type);
-+        abort();
++    qmp_blockdev_add(options, &local_err);
++
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto fail;
 +    }
 +
-+    impl->type = info->type;
-+    impl->create = info->create;
-+    impl->destroy = info->destroy;
++    qapi_free_BlockdevOptions(options);
 +
-+    xen_backend_table_add(impl);
-+}
++    return node_name;
 +
-+static QLIST_HEAD(, XenBackendInstance) backend_list;
-+
-+static void xen_backend_list_add(XenBackendInstance *backend)
-+{
-+    QLIST_INSERT_HEAD(&backend_list, backend, entry);
-+}
-+
-+static XenBackendInstance *xen_backend_list_find(XenDevice *xendev)
-+{
-+    XenBackendInstance *backend;
-+
-+    QLIST_FOREACH(backend, &backend_list, entry) {
-+        if (backend->xendev == xendev) {
-+            return backend;
-+        }
++fail:
++    if (options) {
++        qapi_free_BlockdevOptions(options);
 +    }
++    g_free(node_name);
 +
 +    return NULL;
 +}
 +
-+static void xen_backend_list_remove(XenBackendInstance *backend)
++static void xen_block_drive_destroy(XenBlockDrive *drive, Error **errp)
 +{
-+    QLIST_REMOVE(backend, entry);
-+}
++    char *node_name = drive->node_name;
 +
-+void xen_backend_device_create(XenBus *xenbus, const char *type,
-+                               const char *name, QDict *opts, Error **errp)
-+{
-+    const XenBackendImpl *impl = xen_backend_table_lookup(type);
-+    XenBackendInstance *backend;
-+    Error *local_error = NULL;
-+
-+    if (!impl) {
-+        return;
-+    }
-+
-+    backend = g_new0(XenBackendInstance, 1);
-+    backend->xenbus = xenbus;
-+    backend->name = g_strdup(name);
-+
-+    impl->create(backend, opts, &local_error);
-+    if (local_error) {
-+        error_propagate(errp, local_error);
-+        g_free(backend->name);
-+        g_free(backend);
-+        return;
-+    }
-+
-+    backend->impl = impl;
-+    xen_backend_list_add(backend);
-+}
-+
-+XenBus *xen_backend_get_bus(XenBackendInstance *backend)
-+{
-+    return backend->xenbus;
-+}
-+
-+const char *xen_backend_get_name(XenBackendInstance *backend)
-+{
-+    return backend->name;
-+}
-+
-+void xen_backend_set_device(XenBackendInstance *backend,
-+                            XenDevice *xendev)
-+{
-+    g_assert(!backend->xendev);
-+    backend->xendev = xendev;
-+}
-+
-+XenDevice *xen_backend_get_device(XenBackendInstance *backend)
-+{
-+    return backend->xendev;
-+}
-+
-+
-+bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp)
-+{
-+    XenBackendInstance *backend = xen_backend_list_find(xendev);
-+    const XenBackendImpl *impl;
-+
-+    if (!backend) {
-+        return false;
-+    }
-+
-+    impl = backend->impl;
-+    impl->destroy(backend, errp);
-+
-+    xen_backend_list_remove(backend);
-+    g_free(backend->name);
-+    g_free(backend);
-+
-+    return true;
-+}
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index a22aa49921..f90bcf2342 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -11,10 +11,12 @@
- #include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "hw/xen/xen.h"
-+#include "hw/xen/xen-backend.h"
- #include "hw/xen/xen-bus.h"
- #include "hw/xen/xen-bus-helper.h"
- #include "monitor/monitor.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qdict.h"
- #include "sysemu/sysemu.h"
- #include "trace.h"
- 
-@@ -190,12 +192,151 @@ static void xen_bus_remove_watch(XenBus *xenbus, XenWatch *watch,
-     free_watch(watch);
- }
- 
-+static void xen_bus_backend_create(XenBus *xenbus, const char *type,
-+                                   const char *name, char *path,
-+                                   Error **errp)
-+{
-+    xs_transaction_t tid;
-+    char **key;
-+    QDict *opts;
-+    unsigned int i, n;
-+    Error *local_err = NULL;
-+
-+    trace_xen_bus_backend_create(type, path);
-+
-+again:
-+    tid = xs_transaction_start(xenbus->xsh);
-+    if (tid == XBT_NULL) {
-+        error_setg(errp, "failed xs_transaction_start");
-+        return;
-+    }
-+
-+    key = xs_directory(xenbus->xsh, tid, path, &n);
-+    if (!key) {
-+        if (!xs_transaction_end(xenbus->xsh, tid, true)) {
-+            error_setg_errno(errp, errno, "failed xs_transaction_end");
-+        }
-+        return;
-+    }
-+
-+    opts = qdict_new();
-+    for (i = 0; i < n; i++) {
-+        char *val;
-+
-+        /*
-+         * Assume anything found in the xenstore backend area, other than
-+         * the keys created for a generic XenDevice, are parameters
-+         * to be used to configure the backend.
-+         */
-+        if (!strcmp(key[i], "state") ||
-+            !strcmp(key[i], "online") ||
-+            !strcmp(key[i], "frontend") ||
-+            !strcmp(key[i], "frontend-id") ||
-+            !strcmp(key[i], "hotplug-status"))
-+            continue;
-+
-+        if (xs_node_scanf(xenbus->xsh, tid, path, key[i], NULL, "%ms",
-+                          &val) == 1) {
-+            qdict_put_str(opts, key[i], val);
-+            free(val);
-+        }
-+    }
-+
-+    free(key);
-+
-+    if (!xs_transaction_end(xenbus->xsh, tid, false)) {
-+        qobject_unref(opts);
-+
-+        if (errno == EAGAIN) {
-+            goto again;
-+        }
-+
-+        error_setg_errno(errp, errno, "failed xs_transaction_end");
-+        return;
-+    }
-+
-+    xen_backend_device_create(xenbus, type, name, opts, &local_err);
-+    qobject_unref(opts);
-+
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to create '%s' device '%s': ",
-+                                type, name);
-+    }
-+}
-+
-+static void xen_bus_type_enumerate(XenBus *xenbus, const char *type)
-+{
-+    char *domain_path = g_strdup_printf("backend/%s/%u", type, xen_domid);
-+    char **backend;
-+    unsigned int i, n;
-+
-+    trace_xen_bus_type_enumerate(type);
-+
-+    backend = xs_directory(xenbus->xsh, XBT_NULL, domain_path, &n);
-+    if (!backend) {
-+        goto out;
-+    }
-+
-+    for (i = 0; i < n; i++) {
-+        char *backend_path = g_strdup_printf("%s/%s", domain_path,
-+                                             backend[i]);
-+        enum xenbus_state backend_state;
-+
-+        if (xs_node_scanf(xenbus->xsh, XBT_NULL, backend_path, "state",
-+                          NULL, "%u", &backend_state) != 1)
-+            backend_state = XenbusStateUnknown;
-+
-+        if (backend_state == XenbusStateInitialising) {
-+            Error *local_err = NULL;
-+
-+            xen_bus_backend_create(xenbus, type, backend[i], backend_path,
-+                                   &local_err);
-+            if (local_err) {
-+                error_report_err(local_err);
-+            }
-+        }
-+
-+        g_free(backend_path);
-+    }
-+
-+    free(backend);
-+
-+out:
-+    g_free(domain_path);
-+}
-+
-+static void xen_bus_enumerate(void *opaque)
-+{
-+    XenBus *xenbus = opaque;
-+    char **type;
-+    unsigned int i, n;
-+
-+    trace_xen_bus_enumerate();
-+
-+    type = xs_directory(xenbus->xsh, XBT_NULL, "backend", &n);
-+    if (!type) {
-+        return;
-+    }
-+
-+    for (i = 0; i < n; i++) {
-+        xen_bus_type_enumerate(xenbus, type[i]);
-+    }
-+
-+    free(type);
-+}
-+
- static void xen_bus_unrealize(BusState *bus, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(bus);
- 
-     trace_xen_bus_unrealize();
- 
-+    if (xenbus->backend_watch) {
-+        xen_bus_remove_watch(xenbus, xenbus->backend_watch, NULL);
-+        xenbus->backend_watch = NULL;
-+    }
-+
-     if (!xenbus->xsh) {
-         return;
-     }
-@@ -231,6 +372,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(bus);
-     unsigned int domid;
-+    Error *local_err = NULL;
- 
-     trace_xen_bus_realize();
- 
-@@ -250,6 +392,18 @@ static void xen_bus_realize(BusState *bus, Error **errp)
-     notifier_list_init(&xenbus->watch_notifiers);
-     qemu_set_fd_handler(xs_fileno(xenbus->xsh), xen_bus_watch, NULL,
-                         xenbus);
-+
-+    module_call_init(MODULE_INIT_XEN_BACKEND);
-+
-+    xenbus->backend_watch =
-+        xen_bus_add_watch(xenbus, "", /* domain root node */
-+                          "backend", xen_bus_enumerate, xenbus, &local_err);
-+    if (local_err) {
-+        /* This need not be treated as a hard error so don't propagate */
-+        error_reportf_err(local_err,
-+                          "failed to set up enumeration watch: ");
-+    }
-+
-     return;
- 
- fail:
-@@ -407,7 +561,15 @@ static void xen_device_backend_changed(void *opaque)
-                 xendev->backend_state == XenbusStateInitialising ||
-                 xendev->backend_state == XenbusStateInitWait ||
-                 xendev->backend_state == XenbusStateUnknown)) {
--        object_unparent(OBJECT(xendev));
++    if (node_name) {
 +        Error *local_err = NULL;
 +
-+        if (!xen_backend_try_device_destroy(xendev, &local_err)) {
-+            object_unparent(OBJECT(xendev));
-+        }
-+
++        xen_block_blockdev_del(node_name, &local_err);
 +        if (local_err) {
-+            error_report_err(local_err);
++            error_propagate(errp, local_err);
++            return;
 +        }
-     }
- }
- 
-diff --git a/include/hw/xen/xen-backend.h b/include/hw/xen/xen-backend.h
-new file mode 100644
-index 0000000000..010d712638
---- /dev/null
-+++ b/include/hw/xen/xen-backend.h
-@@ -0,0 +1,39 @@
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
++        g_free(node_name);
++        drive->node_name = NULL;
++    }
++    g_free(drive->id);
++    g_free(drive);
++}
 +
-+#ifndef HW_XEN_BACKEND_H
-+#define HW_XEN_BACKEND_H
++static XenBlockDrive *xen_block_drive_create(const char *id,
++                                             const char *device_type,
++                                             QDict *opts, Error **errp)
++{
++    const char *params = qdict_get_try_str(opts, "params");
++    const char *mode = qdict_get_try_str(opts, "mode");
++    const char *direct_io_safe = qdict_get_try_str(opts, "direct-io-safe");
++    const char *discard_enable = qdict_get_try_str(opts, "discard-enable");
++    char *driver = NULL;
++    char *filename = NULL;
++    XenBlockDrive *drive = NULL;
++    Error *local_err = NULL;
++    QDict *file_layer;
++    QDict *driver_layer;
 +
-+#include "hw/xen/xen-bus.h"
++    if (params) {
++        char **v = g_strsplit(params, ":", 2);
 +
-+typedef struct XenBackendInstance XenBackendInstance;
++        if (v[1] == NULL) {
++            filename = g_strdup(v[0]);
++            driver = g_strdup("raw");
++        } else {
++            if (strcmp(v[0], "aio") == 0) {
++                driver = g_strdup("raw");
++            } else if (strcmp(v[0], "vhd") == 0) {
++                driver = g_strdup("vpc");
++            } else {
++                driver = g_strdup(v[0]);
++            }
++            filename = g_strdup(v[1]);
++        }
 +
-+typedef void (*XenBackendDeviceCreate)(XenBackendInstance *backend,
-+                                       QDict *opts, Error **errp);
-+typedef void (*XenBackendDeviceDestroy)(XenBackendInstance *backend,
-+                                        Error **errp);
++        g_strfreev(v);
++    }
 +
-+typedef struct XenBackendInfo {
++    if (!filename) {
++        error_setg(errp, "no filename");
++        goto done;
++    }
++    assert(driver);
++
++    drive = g_new0(XenBlockDrive, 1);
++    drive->id = g_strdup(id);
++
++    file_layer = qdict_new();
++
++    qdict_put_str(file_layer, "driver", "file");
++    qdict_put_str(file_layer, "filename", filename);
++
++    if (mode && *mode != 'w') {
++        qdict_put_bool(file_layer, "read-only", true);
++    }
++
++    if (direct_io_safe) {
++        unsigned long value;
++
++        if (!qemu_strtoul(direct_io_safe, NULL, 2, &value) && !!value) {
++            QDict *cache_qdict = qdict_new();
++
++            qdict_put_bool(cache_qdict, "direct", true);
++            qdict_put_obj(file_layer, "cache", QOBJECT(cache_qdict));
++
++            qdict_put_str(file_layer, "aio", "native");
++        }
++    }
++
++    if (discard_enable) {
++        unsigned long value;
++
++        if (!qemu_strtoul(discard_enable, NULL, 2, &value) && !!value) {
++            qdict_put_str(file_layer, "discard", "unmap");
++        }
++    }
++
++    /*
++     * It is necessary to turn file locking off as an emulated device
++     * may have already opened the same image file.
++     */
++    qdict_put_str(file_layer, "locking", "off");
++
++    driver_layer = qdict_new();
++
++    qdict_put_str(driver_layer, "driver", driver);
++    qdict_put_obj(driver_layer, "file", QOBJECT(file_layer));
++
++    g_assert(!drive->node_name);
++    drive->node_name = xen_block_blockdev_add(drive->id, driver_layer,
++                                              &local_err);
++
++done:
++    g_free(driver);
++    g_free(filename);
++
++    if (local_err) {
++        xen_block_drive_destroy(drive, NULL);
++        return NULL;
++    }
++
++    return drive;
++}
++
++static const char *xen_block_drive_get_node_name(XenBlockDrive *drive)
++{
++    return drive->node_name ? drive->node_name : "";
++}
++
++static void xen_block_iothread_destroy(XenBlockIOThread *iothread,
++                                       Error **errp)
++{
++    qmp_object_del(iothread->id, errp);
++
++    g_free(iothread->id);
++    g_free(iothread);
++}
++
++static XenBlockIOThread *xen_block_iothread_create(const char *id,
++                                                   Error **errp)
++{
++    XenBlockIOThread *iothread = g_new(XenBlockIOThread, 1);
++    Error *local_err = NULL;
++
++    iothread->id = g_strdup(id);
++
++    qmp_object_add(TYPE_IOTHREAD, id, false, NULL, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++
++        g_free(iothread->id);
++        g_free(iothread);
++        return NULL;
++    }
++
++    return iothread;
++}
++
++static void xen_block_device_create(XenBackendInstance *backend,
++                                    QDict *opts, Error **errp)
++{
++    XenBus *xenbus = xen_backend_get_bus(backend);
++    const char *name = xen_backend_get_name(backend);
++    unsigned long number;
++    const char *vdev, *device_type;
++    XenBlockDrive *drive = NULL;
++    XenBlockIOThread *iothread = NULL;
++    XenDevice *xendev = NULL;
++    Error *local_err = NULL;
 +    const char *type;
-+    XenBackendDeviceCreate create;
-+    XenBackendDeviceDestroy destroy;
-+} XenBackendInfo;
++    XenBlockDevice *blockdev;
 +
-+XenBus *xen_backend_get_bus(XenBackendInstance *backend);
-+const char *xen_backend_get_name(XenBackendInstance *backend);
++    if (qemu_strtoul(name, NULL, 10, &number)) {
++        error_setg(errp, "failed to parse name '%s'", name);
++        goto fail;
++    }
 +
-+void xen_backend_set_device(XenBackendInstance *backend,
-+                            XenDevice *xendevice);
-+XenDevice *xen_backend_get_device(XenBackendInstance *backend);
++    trace_xen_block_device_create(number);
 +
-+void xen_backend_register(const XenBackendInfo *info);
++    vdev = qdict_get_try_str(opts, "dev");
++    if (!vdev) {
++        error_setg(errp, "no dev parameter");
++        goto fail;
++    }
 +
-+void xen_backend_device_create(XenBus *xenbus, const char *type,
-+                               const char *name, QDict *opts, Error **errp);
-+bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp);
++    device_type = qdict_get_try_str(opts, "device-type");
++    if (!device_type) {
++        error_setg(errp, "no device-type parameter");
++        goto fail;
++    }
 +
-+#endif /* HW_XEN_BACKEND_H */
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 0834cb3a7e..e55a5de5f1 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -65,6 +65,7 @@ typedef struct XenBus {
-     domid_t backend_id;
-     struct xs_handle *xsh;
-     NotifierList watch_notifiers;
-+    XenWatch *backend_watch;
- } XenBus;
++    if (!strcmp(device_type, "disk")) {
++        type = TYPE_XEN_DISK_DEVICE;
++    } else if (!strcmp(device_type, "cdrom")) {
++        type = TYPE_XEN_CDROM_DEVICE;
++    } else {
++        error_setg(errp, "invalid device-type parameter '%s'", device_type);
++        goto fail;
++    }
++
++    drive = xen_block_drive_create(vdev, device_type, opts, &local_err);
++    if (!drive) {
++        error_propagate_prepend(errp, local_err, "failed to create drive: ");
++        goto fail;
++    }
++
++    iothread = xen_block_iothread_create(vdev, &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err,
++                                "failed to create iothread: ");
++        goto fail;
++    }
++
++    xendev = XEN_DEVICE(qdev_create(BUS(xenbus), type));
++    blockdev = XEN_BLOCK_DEVICE(xendev);
++
++    object_property_set_str(OBJECT(xendev), vdev, "vdev", &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err, "failed to set 'vdev': ");
++        goto fail;
++    }
++
++    object_property_set_str(OBJECT(xendev),
++                            xen_block_drive_get_node_name(drive), "drive",
++                            &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err, "failed to set 'drive': ");
++        goto fail;
++    }
++
++    object_property_set_str(OBJECT(xendev), iothread->id, "iothread",
++                            &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err,
++                                "failed to set 'iothread': ");
++        goto fail;
++    }
++
++    blockdev->iothread = iothread;
++    blockdev->drive = drive;
++
++    object_property_set_bool(OBJECT(xendev), true, "realized", &local_err);
++    if (local_err) {
++        error_propagate_prepend(errp, local_err,
++                                "realization of device %s failed: ",
++                                type);
++        goto fail;
++    }
++
++    xen_backend_set_device(backend, xendev);
++    return;
++
++fail:
++    if (xendev) {
++        object_unparent(OBJECT(xendev));
++    }
++
++    if (iothread) {
++        xen_block_iothread_destroy(iothread, NULL);
++    }
++
++    if (drive) {
++        xen_block_drive_destroy(drive, NULL);
++    }
++}
++
++static void xen_block_device_destroy(XenBackendInstance *backend,
++                                     Error **errp)
++{
++    XenDevice *xendev = xen_backend_get_device(backend);
++    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
++    XenBlockVdev *vdev = &blockdev->props.vdev;
++    XenBlockDrive *drive = blockdev->drive;
++    XenBlockIOThread *iothread = blockdev->iothread;
++
++    trace_xen_block_device_destroy(vdev->number);
++
++    object_unparent(OBJECT(xendev));
++
++    if (iothread) {
++        Error *local_err = NULL;
++
++        xen_block_iothread_destroy(iothread, &local_err);
++        if (local_err) {
++            error_propagate_prepend(errp, local_err,
++                                "failed to destroy iothread: ");
++            return;
++        }
++    }
++
++    if (drive) {
++        Error *local_err = NULL;
++
++        xen_block_drive_destroy(drive, &local_err);
++        if (local_err) {
++            error_propagate_prepend(errp, local_err,
++                                "failed to destroy drive: ");
++        }
++    }
++}
++
++static const XenBackendInfo xen_block_backend_info = {
++    .type = "qdisk",
++    .create = xen_block_device_create,
++    .destroy = xen_block_device_destroy,
++};
++
++static void xen_block_register_backend(void)
++{
++    xen_backend_register(&xen_block_backend_info);
++}
++
++xen_backend_init(xen_block_register_backend);
+diff --git a/hw/xen/xen-legacy-backend.c b/hw/xen/xen-legacy-backend.c
+index 41419763c8..36fd1e9b09 100644
+--- a/hw/xen/xen-legacy-backend.c
++++ b/hw/xen/xen-legacy-backend.c
+@@ -753,7 +753,6 @@ void xen_be_register_common(void)
  
- typedef struct XenBusClass {
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 54300ab6e5..55dd2beea8 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -44,6 +44,7 @@ typedef enum {
-     MODULE_INIT_OPTS,
-     MODULE_INIT_QOM,
-     MODULE_INIT_TRACE,
-+    MODULE_INIT_XEN_BACKEND,
-     MODULE_INIT_MAX
- } module_init_type;
+     xen_be_register("console", &xen_console_ops);
+     xen_be_register("vkbd", &xen_kbdmouse_ops);
+-    xen_be_register("qdisk", &xen_blkdev_ops);
+ #ifdef CONFIG_VIRTFS
+     xen_be_register("9pfs", &xen_9pfs_ops);
+ #endif
+diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
+index c4223f9be1..11d351b4b3 100644
+--- a/include/hw/xen/xen-block.h
++++ b/include/hw/xen/xen-block.h
+@@ -29,6 +29,7 @@ typedef struct XenBlockVdev {
+     unsigned long number;
+ } XenBlockVdev;
  
-@@ -51,6 +52,8 @@ typedef enum {
- #define opts_init(function) module_init(function, MODULE_INIT_OPTS)
- #define type_init(function) module_init(function, MODULE_INIT_QOM)
- #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
-+#define xen_backend_init(function) module_init(function, \
-+                                               MODULE_INIT_XEN_BACKEND)
++
+ typedef struct XenBlockProperties {
+     XenBlockVdev vdev;
+     BlockConf conf;
+@@ -36,12 +37,23 @@ typedef struct XenBlockProperties {
+     IOThread *iothread;
+ } XenBlockProperties;
  
- #define block_module_load_one(lib) module_load_one("block-", lib)
- #define ui_module_load_one(lib) module_load_one("ui-", lib)
++typedef struct XenBlockDrive {
++    char *id;
++    char *node_name;
++} XenBlockDrive;
++
++typedef struct XenBlockIOThread {
++    char *id;
++} XenBlockIOThread;
++
+ typedef struct XenBlockDevice {
+     XenDevice xendev;
+     XenBlockProperties props;
+     const char *device_type;
+     unsigned int info;
+     XenBlockDataPlane *dataplane;
++    XenBlockDrive *drive;
++    XenBlockIOThread *iothread;
+ } XenBlockDevice;
+ 
+ typedef void (*XenBlockDeviceRealize)(XenBlockDevice *blockdev, Error **errp);
 -- 
 2.20.1.2.gb21ebb6
