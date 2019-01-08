@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39171)
+Received: from eggs.gnu.org ([209.51.188.92]:39470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ggtlx-00085G-7N
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:58:33 -0500
+	(envelope-from <lifei1214@126.com>) id 1ggtmf-0000L6-Bz
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:59:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ggtlv-0007QJ-Cs
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:58:33 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:46713)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ggtlv-0007O9-6n
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:58:31 -0500
-Received: by mail-wr1-f66.google.com with SMTP id l9so4528225wrt.13
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 07:58:30 -0800 (PST)
-References: <20190107184404.31993-1-fziglio@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2ce5aafa-a486-9f3a-20b7-2842094132e0@redhat.com>
-Date: Tue, 8 Jan 2019 16:58:27 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190107184404.31993-1-fziglio@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] spice: Remove unused include
+	(envelope-from <lifei1214@126.com>) id 1ggtmO-0000B2-Pr
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:59:07 -0500
+Received: from m15-114.126.com ([220.181.15.114]:43509)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1ggtmL-0008Q4-Ca
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:59:00 -0500
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (1.0)
+From: fei <lifei1214@126.com>
+In-Reply-To: <878szwo1j6.fsf@dusky.pond.sub.org>
+Date: Tue, 8 Jan 2019 23:58:54 +0800
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C8A3E2AB-FEEB-4689-94AC-8147ED6AD77B@126.com>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-4-fli@suse.com>
+	<878szwo1j6.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 03/16] migration: remove unused
+ &local_err parameter in multifd_save_cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Frediano Ziglio <fziglio@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Fei Li <fli@suse.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 1/7/19 7:44 PM, Frediano Ziglio wrote:
-> The definitions in the header are not  used.
 
-Indeed, since e16f4c8770b.
 
-> Also this fixes porting SPICE to Windows where the header is not
-> available.
-> 
-> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+> =E5=9C=A8 2019=E5=B9=B41=E6=9C=888=E6=97=A5=EF=BC=8C00:50=EF=BC=8CMarkus A=
+rmbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> Fei Li <fli@suse.com> writes:
+>=20
+>> Always call migrate_set_error() to set the error state without relying
+>> on whether multifd_save_cleanup() succeeds.  As the passed &local_err
+>> is never used in multifd_save_cleanup(), remove it. And make the
+>> function be: void multifd_save_cleanup(void).
+>>=20
+>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Signed-off-by: Fei Li <fli@suse.com>
+>> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>=20
+> The commit message is confusing.  Suggest:
+>=20
+>    migration: multifd_save_cleanup() can't fail, simplify
+>=20
+>    multifd_save_cleanup() takes an Error ** argument and returns an
+>    error code even though it can't actually fail.  Its callers
+>    dutifully check for failure.  Remove the useless argument and return
+>    value, and simplify the callers.
+Nice, thanks for the clearer comment. :)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-(I might resend your patch in another series of mine)
-
-> ---
->  ui/spice-core.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/ui/spice-core.c b/ui/spice-core.c
-> index 525e0929b9..fb87944a24 100644
-> --- a/ui/spice-core.c
-> +++ b/ui/spice-core.c
-> @@ -18,7 +18,6 @@
->  #include "qemu/osdep.h"
->  #include <spice.h>
->  
-> -#include <netdb.h>
->  #include "sysemu/sysemu.h"
->  
->  #include "ui/qemu-spice.h"
-> 
+Have a nice day=20
+Fei
+>=20
+> I think multifd_load_cleanup() has exactly the same issue.  Should we
+> clean it up, too?  Juan, what do you think?
