@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42186)
+Received: from eggs.gnu.org ([209.51.188.92]:42560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1ggsfh-0003kY-Lw
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:48:02 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1ggsgY-0004M7-AM
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:48:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1ggsfg-0006Sw-Uo
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:48:01 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:45390)
+	(envelope-from <liam.merwick@oracle.com>) id 1ggsgW-0008FZ-Au
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:48:53 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:41446)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1ggsfg-0006Hu-JX
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:48:00 -0500
+	id 1ggsgV-0008A9-1t
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:48:52 -0500
 References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
-	<1545422632-24444-3-git-send-email-liam.merwick@oracle.com>
-	<20190102131234.GN24009@stefanha-x1.localdomain>
+	<1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
+	<20190102131841.GO24009@stefanha-x1.localdomain>
 From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <2a32ba41-0303-77a5-7ed8-8aefa4e800ba@oracle.com>
-Date: Tue, 8 Jan 2019 14:47:51 +0000
+Message-ID: <324f45ae-d537-180d-c6aa-92410b9cee6c@oracle.com>
+Date: Tue, 8 Jan 2019 14:48:44 +0000
 MIME-Version: 1.0
-In-Reply-To: <20190102131234.GN24009@stefanha-x1.localdomain>
+In-Reply-To: <20190102131841.GO24009@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 2/4] elf-ops.h: Add get_elf_note_type()
+Subject: Re: [Qemu-devel] [RFC v2 4/4] pvh: Boot uncompressed kernel using
+ direct boot ABI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,61 +36,20 @@ Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle
 
 
 
-On 02/01/2019 13:12, Stefan Hajnoczi wrote:
-> On Fri, Dec 21, 2018 at 08:03:50PM +0000, Liam Merwick wrote:
->> +    while (note_type != elf_note_type) {
->> +        nhdr_namesz = nhdr->n_namesz;
->> +        nhdr_descsz = nhdr->n_descsz;
->> +
->> +        elf_note_entry_offset = nhdr_size +
->> +            QEMU_ALIGN_UP(nhdr_namesz, phdr_align) +
->> +            QEMU_ALIGN_UP(nhdr_descsz, phdr_align);
->> +
->> +        /* If the offset calculated in this iteration exceeds the
->> +	 * supplied size, we are done and no matching note was found.
->> +	 */
+On 02/01/2019 13:18, Stefan Hajnoczi wrote:
+> On Fri, Dec 21, 2018 at 08:03:52PM +0000, Liam Merwick wrote:
+>> @@ -1336,7 +1470,7 @@ void pc_memory_init(PCMachineState *pcms,
+>>       int linux_boot, i;
+>>       MemoryRegion *ram, *option_rom_mr;
+>>       MemoryRegion *ram_below_4g, *ram_above_4g;
+>> -    FWCfgState *fw_cfg;
+>> +    FWCfgState *fw_cfg = NULL;
 > 
-> Indentation is off here.  QEMU uses 4-space indentation.
-> 
->> +        if (elf_note_entry_offset > note_size) {
->> +            return NULL;
->> +        }
->> +
->> +        /* skip to the next ELF Note entry */
->> +        nhdr = (void *)nhdr + elf_note_entry_offset;
->> +        note_type = nhdr->n_type;
->> +    }
->> +
->> +    return nhdr;
->> +}
->> +
->>   static int glue(load_elf, SZ)(const char *name, int fd,
->>                                 uint64_t (*elf_note_fn)(void *, void *, bool),
->>                                 uint64_t (*translate_fn)(void *, uint64_t),
->> @@ -512,6 +555,13 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->>                   }
->>               }
->>   
->> +	    /* Search the ELF notes to find one with a type matching the
->> +	     * value passed in via 'translate_opaque'
->> +	     */
->> +            nhdr = (struct elf_note *)data;
-> 
-> Ah, I see data gets used here!  It would be clearer to move loading of
-> data into this patch.
-
-
-Moved.
-
-> 
->> +	    assert(translate_opaque != NULL);
->> +            nhdr = glue(get_elf_note_type, SZ)(nhdr, file_size, ph->p_align,
->> +                                               *(uint64_t *)translate_opaque);
-> 
-> Indentation is off in this hunk.  QEMU uses 4-space indentation.
+> What is the purpose of this change?
 > 
 
-A few stray tabs had snuck in - I've fixed all those.
+I've removed this. There is no need for it - it dated from when these 
+changes used the Clear Containers -nofw patches.
 
 Regards,
 Liam
