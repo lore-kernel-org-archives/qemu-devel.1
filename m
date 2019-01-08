@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60128)
+Received: from eggs.gnu.org ([209.51.188.92]:60414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ggmwh-0003si-OX
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:12 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggmx7-0004Cc-7j
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ggmwf-0007JF-86
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43068)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ggmx5-00085n-HJ
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ggmwf-0007CT-05
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:09 -0500
+	id 1ggmx5-0007Yj-6X
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:41:35 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  8 Jan 2019 12:40:36 +0400
-Message-Id: <20190108084039.9254-4-marcandre.lureau@redhat.com>
+Date: Tue,  8 Jan 2019 12:40:38 +0400
+Message-Id: <20190108084039.9254-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20190108084039.9254-1-marcandre.lureau@redhat.com>
 References: <20190108084039.9254-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v14 3/6] acpi: expose TPM/PPI configuration
- parameters to firmware via fw_cfg
+Subject: [Qemu-devel] [PATCH v14 5/6] acpi: add ACPI memory clear interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,114 +30,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, f4bug@amsat.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+The interface is described in the "TCG Platform Reset Attack
+Mitigation Specification", chapter 6 "ACPI _DSM Function". According
+to Laszlo, it's not so easy to implement in OVMF, he suggested to do
+it in qemu instead.
 
-To avoid having to hard code the base address of the PPI virtual
-memory device we introduce a fw_cfg file etc/tpm/config that holds the
-base address of the PPI device, the version of the PPI interface and
-the version of the attached TPM.
+See specification documentation for more details, and next commit for
+memory clear on reset handling.
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-[ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document it=
- ]
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/hw/acpi/tpm.h |  3 +++
- hw/i386/acpi-build.c  | 19 +++++++++++++++++++
- docs/specs/tpm.txt    | 19 +++++++++++++++++++
- 3 files changed, 41 insertions(+)
+ hw/acpi/tpm.c      | 48 ++++++++++++++++++++++++++++++++++++++++++++++
+ docs/specs/tpm.txt |  2 ++
+ 2 files changed, 50 insertions(+)
 
-diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-index b8796df916..a6109a97fc 100644
---- a/include/hw/acpi/tpm.h
-+++ b/include/hw/acpi/tpm.h
-@@ -194,4 +194,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
- #define TPM_PPI_ADDR_SIZE           0x400
- #define TPM_PPI_ADDR_BASE           0xFED45000
+diff --git a/hw/acpi/tpm.c b/hw/acpi/tpm.c
+index fee9490306..61da1de97b 100644
+--- a/hw/acpi/tpm.c
++++ b/hw/acpi/tpm.c
+@@ -53,6 +53,16 @@ void tpm_build_ppi_acpi(TPMIf *tpm, Aml *dev)
+     pprq =3D aml_name("PPRQ");
+     pprm =3D aml_name("PPRM");
 =20
-+#define TPM_PPI_VERSION_NONE        0
-+#define TPM_PPI_VERSION_1_30        1
++    aml_append(dev,
++               aml_operation_region(
++                   "TPP3", AML_SYSTEM_MEMORY,
++                   aml_int(TPM_PPI_ADDR_BASE +
++                           0x15a /* movv, docs/specs/tpm.txt */),
++                           0x1));
++    field =3D aml_field("TPP3", AML_BYTE_ACC, AML_NOLOCK, AML_PRESERVE);
++    aml_append(field, aml_named_field("MOVV", 8));
++    aml_append(dev, field);
 +
- #endif /* HW_ACPI_TPM_H */
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 14f757fc36..9898247705 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
-     bool pcihp_bridge_en;
- } AcpiBuildPciBusHotplugState;
-=20
-+typedef struct FwCfgTPMConfig {
-+    uint32_t tpmppi_address;
-+    uint8_t tpm_version;
-+    uint8_t tpmppi_version;
-+} QEMU_PACKED FwCfgTPMConfig;
+     /*
+      * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dynamic
+      * operation region inside of a method for getting FUNC[op].
+@@ -395,6 +405,44 @@ void tpm_build_ppi_acpi(TPMIf *tpm, Aml *dev)
+             aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
+         }
+         aml_append(method, ifctx);
 +
- static void init_common_fadt_data(Object *o, AcpiFadtData *data)
- {
-     uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
- NULL);
-@@ -2847,6 +2853,8 @@ void acpi_setup(void)
-     AcpiBuildTables tables;
-     AcpiBuildState *build_state;
-     Object *vmgenid_dev;
-+    TPMIf *tpm;
-+    static FwCfgTPMConfig tpm_config;
-=20
-     if (!pcms->fw_cfg) {
-         ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
-@@ -2881,6 +2889,17 @@ void acpi_setup(void)
-     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
-                     tables.tcpalog->data, acpi_data_len(tables.tcpalog))=
++        ifctx =3D aml_if(
++            aml_equal(uuid,
++                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D45D")=
+));
++        {
++            /* standard DSM query function */
++            ifctx2 =3D aml_if(aml_equal(function, zero));
++            {
++                uint8_t byte_list[1] =3D { 0x03 };
++                aml_append(ifctx2, aml_return(aml_buffer(1, byte_list)))=
 ;
-=20
-+    tpm =3D tpm_find();
-+    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_abort=
-)) {
-+        tpm_config =3D (FwCfgTPMConfig) {
-+            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
-+            .tpm_version =3D tpm_get_version(tpm),
-+            .tpmppi_version =3D TPM_PPI_VERSION_NONE
-+        };
-+        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
-+                        &tpm_config, sizeof tpm_config);
-+    }
++            }
++            aml_append(ifctx, ifctx2);
 +
-     vmgenid_dev =3D find_vmgenid_dev();
-     if (vmgenid_dev) {
-         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
++            /*
++             * TCG Platform Reset Attack Mitigation Specification 1.0 Ch=
+.6
++             *
++             * Arg 2 (Integer): Function Index =3D 1
++             * Arg 3 (Package): Arguments =3D Package: Type: Integer
++             *                  Operation Value of the Request
++             * Returns: Type: Integer
++             *          0: Success
++             *          1: General Failure
++             */
++            ifctx2 =3D aml_if(aml_equal(function, one));
++            {
++                aml_append(ifctx2,
++                           aml_store(aml_derefof(aml_index(arguments, ze=
+ro)),
++                                     op));
++                {
++                    aml_append(ifctx2, aml_store(op, aml_name("MOVV")));
++
++                    /* 0: success */
++                    aml_append(ifctx2, aml_return(zero));
++                }
++            }
++            aml_append(ifctx, ifctx2);
++        }
++        aml_append(method, ifctx);
+     }
+     aml_append(dev, method);
+ }
 diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 1af82bba86..e4bb094700 100644
+index 424d1511fc..5d8c26b1ad 100644
 --- a/docs/specs/tpm.txt
 +++ b/docs/specs/tpm.txt
-@@ -34,6 +34,25 @@ The CRB interface makes a memory mapped IO region in t=
-he area 0xfed40000 -
- QEMU files related to TPM CRB interface:
-  - hw/tpm/tpm_crb.c
+@@ -135,6 +135,8 @@ layout:
+  +----------+--------+--------+-----------------------------------------=
+--+
+  | next_step|   0x1  |  0x159 | Operation to execute after reboot by    =
+  |
+  |          |        |        | firmware. Used by firmware.             =
+  |
++ +----------+--------+--------+-----------------------------------------=
+--+
++ | movv     |   0x1  |  0x15a | Memory overwrite variable               =
+  |
+  +----------+--------+--------+-----------------------------------------=
+--+
 =20
-+=3D fw_cfg interface =3D
-+
-+The bios/firmware may read the "etc/tpm/config" fw_cfg entry for
-+configuring the guest appropriately.
-+
-+The entry of 6 bytes has the following content, in little-endian:
-+
-+    #define TPM_VERSION_UNSPEC          0
-+    #define TPM_VERSION_1_2             1
-+    #define TPM_VERSION_2_0             2
-+
-+    #define TPM_PPI_VERSION_NONE        0
-+    #define TPM_PPI_VERSION_1_30        1
-+
-+    struct FwCfgTPMConfig {
-+        uint32_t tpmppi_address;         /* PPI memory location */
-+        uint8_t tpm_version;             /* TPM version */
-+        uint8_t tpmppi_version;          /* PPI version */
-+    };
-=20
- =3D ACPI Interface =3D
-=20
+    The following values are supported for the 'func' field. They corresp=
+ond
 --=20
 2.20.1.2.gb21ebb671b
