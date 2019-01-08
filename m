@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58471)
+Received: from eggs.gnu.org ([209.51.188.92]:58520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gh09H-0006QE-Sy
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:47:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gh09J-0006SI-Qf
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:47:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gh09H-00074Y-0g
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:47:03 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gh09I-00078t-Pl
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:47:05 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  9 Jan 2019 09:45:52 +1100
-Message-Id: <20190108224600.23125-22-david@gibson.dropbear.id.au>
+Date: Wed,  9 Jan 2019 09:45:50 +1100
+Message-Id: <20190108224600.23125-20-david@gibson.dropbear.id.au>
 In-Reply-To: <20190108224600.23125-1-david@gibson.dropbear.id.au>
 References: <20190108224600.23125-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/29] ppc/xive: introduce a XiveTCTX pointer
- under PowerPCCPU
+Subject: [Qemu-devel] [PULL 19/29] spapr/xive: simplify the sPAPR IRQ qirq
+ method for XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +28,101 @@ Cc: groug@kaod.org, clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Da
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-which will be used by the machine only when the XIVE interrupt mode is
-in use.
+The qirq routines of the XiveSource and the sPAPRXive model are only
+used under the sPAPR IRQ backend. Simplify the overall call stack and
+gather all the code under spapr_qirq_xive(). It will ease future
+changes.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xive.c          | 6 +++---
- hw/ppc/spapr_cpu_core.c | 7 ++++++-
- hw/ppc/spapr_irq.c      | 8 ++++----
- target/ppc/cpu.h        | 2 ++
- 4 files changed, 15 insertions(+), 8 deletions(-)
+ hw/intc/spapr_xive.c        | 14 --------------
+ hw/ppc/spapr_irq.c          | 12 +++++++++++-
+ include/hw/ppc/spapr_xive.h |  1 -
+ include/hw/ppc/xive.h       |  6 ------
+ 4 files changed, 11 insertions(+), 22 deletions(-)
 
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index ea33494338..410c53278a 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -321,7 +321,7 @@ static void xive_tm_write(void *opaque, hwaddr offset=
-,
-                           uint64_t value, unsigned size)
- {
-     PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
--    XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-+    XiveTCTX *tctx =3D cpu->tctx;
-     const XiveTmOp *xto;
-=20
-     /*
-@@ -360,7 +360,7 @@ static void xive_tm_write(void *opaque, hwaddr offset=
-,
- static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
- {
-     PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
--    XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-+    XiveTCTX *tctx =3D cpu->tctx;
-     const XiveTmOp *xto;
-=20
-     /*
-@@ -1186,7 +1186,7 @@ static bool xive_presenter_match(XiveRouter *xrtr, =
-uint8_t format,
-=20
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-+        XiveTCTX *tctx =3D cpu->tctx;
-         int ring;
-=20
-         /*
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 2739b2a4b8..1473ef8533 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -194,7 +194,12 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, sP=
-APRCPUCore *sc)
-         vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_=
-data);
-     }
-     qemu_unregister_reset(spapr_cpu_reset, cpu);
--    object_unparent(cpu->intc);
-+    if (cpu->intc) {
-+        object_unparent(cpu->intc);
-+    }
-+    if (cpu->tctx) {
-+        object_unparent(OBJECT(cpu->tctx));
-+    }
-     cpu_remove_sync(CPU(cpu));
-     object_unparent(OBJECT(cpu));
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 0e39c90cbd..eea28337e8 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -488,20 +488,6 @@ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t l=
+isn)
+     return true;
  }
+=20
+-qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn)
+-{
+-    XiveSource *xsrc =3D &xive->source;
+-
+-    if (lisn >=3D xive->nr_irqs) {
+-        return NULL;
+-    }
+-
+-    /* The sPAPR machine/device should have claimed the IRQ before */
+-    assert(xive_eas_is_valid(&xive->eat[lisn]));
+-
+-    return xive_source_qirq(xsrc, lisn);
+-}
+-
+ /*
+  * XIVE hcalls
+  *
 diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index eca2317cf3..598b91a808 100644
+index 7b3b5afec2..be5fe531a8 100644
 --- a/hw/ppc/spapr_irq.c
 +++ b/hw/ppc/spapr_irq.c
-@@ -315,7 +315,7 @@ static void spapr_irq_print_info_xive(sPAPRMachineSta=
-te *spapr,
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+@@ -284,7 +284,17 @@ static void spapr_irq_free_xive(sPAPRMachineState *s=
+papr, int irq, int num)
 =20
--        xive_tctx_pic_print_info(XIVE_TCTX(cpu->intc), mon);
-+        xive_tctx_pic_print_info(cpu->tctx, mon);
-     }
-=20
-     spapr_xive_pic_print_info(spapr->xive, mon);
-@@ -333,13 +333,13 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRMac=
-hineState *spapr,
-         return;
-     }
-=20
--    cpu->intc =3D obj;
-+    cpu->tctx =3D XIVE_TCTX(obj);
-=20
-     /*
-      * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
-      * don't beneficiate from the reset of the XIVE IRQ backend
-      */
--    spapr_xive_set_tctx_os_cam(XIVE_TCTX(obj));
-+    spapr_xive_set_tctx_os_cam(cpu->tctx);
+ static qemu_irq spapr_qirq_xive(sPAPRMachineState *spapr, int irq)
+ {
+-    return spapr_xive_qirq(spapr->xive, irq);
++    sPAPRXive *xive =3D spapr->xive;
++    XiveSource *xsrc =3D &xive->source;
++
++    if (irq >=3D xive->nr_irqs) {
++        return NULL;
++    }
++
++    /* The sPAPR machine/device should have claimed the IRQ before */
++    assert(xive_eas_is_valid(&xive->eat[irq]));
++
++    return xsrc->qirqs[irq];
  }
 =20
- static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int versio=
-n_id)
-@@ -355,7 +355,7 @@ static void spapr_irq_reset_xive(sPAPRMachineState *s=
-papr, Error **errp)
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+ static void spapr_irq_print_info_xive(sPAPRMachineState *spapr,
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 728735dbcf..9ee524fdb2 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -40,7 +40,6 @@ typedef struct sPAPRXive {
+ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
+ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
+ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+-qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
 =20
-         /* (TCG) Set the OS CAM line of the thread interrupt context. */
--        spapr_xive_set_tctx_os_cam(XIVE_TCTX(cpu->intc));
-+        spapr_xive_set_tctx_os_cam(cpu->tctx);
-     }
- }
+ typedef struct sPAPRMachineState sPAPRMachineState;
 =20
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 91951d7730..64e94fd83c 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1177,6 +1177,7 @@ do {                                            \
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 18cd114eb2..b05fe88b5b 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -278,12 +278,6 @@ uint8_t xive_source_esb_set(XiveSource *xsrc, uint32=
+_t srcno, uint8_t pq);
+ void xive_source_pic_print_info(XiveSource *xsrc, uint32_t offset,
+                                 Monitor *mon);
 =20
- typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
- typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
-+typedef struct XiveTCTX XiveTCTX;
-=20
- /**
-  * PowerPCCPU:
-@@ -1196,6 +1197,7 @@ struct PowerPCCPU {
-     uint32_t compat_pvr;
-     PPCVirtualHypervisor *vhyp;
-     Object *intc;
-+    XiveTCTX *tctx;
-     void *machine_data;
-     int32_t node_id; /* NUMA node this CPU belongs to */
-     PPCHash64Options *hash64_opts;
+-static inline qemu_irq xive_source_qirq(XiveSource *xsrc, uint32_t srcno=
+)
+-{
+-    assert(srcno < xsrc->nr_irqs);
+-    return xsrc->qirqs[srcno];
+-}
+-
+ static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint32_t src=
+no)
+ {
+     assert(srcno < xsrc->nr_irqs);
 --=20
 2.20.1
