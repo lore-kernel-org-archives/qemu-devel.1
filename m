@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35516)
+Received: from eggs.gnu.org ([209.51.188.92]:35536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqN-000750-6K
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqM-00075U-PA
 	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqL-0004iW-5O
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqL-0004kg-HV
 	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:10 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  8 Jan 2019 20:06:51 +0300
-Message-Id: <20190108170655.29766-6-vsementsov@virtuozzo.com>
-In-Reply-To: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 5/9] qcow2-threads: split out generic path
+Date: Tue,  8 Jan 2019 20:06:46 +0300
+Message-Id: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 0/9] qcow2: encryption threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,115 +20,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, berto@igalia.com, vsementsov@virtuozzo.com, den@openvz.org, pbonzini@redhat.com
 
-Move generic part out of qcow2_co_do_compress, to reuse it for
-encryption and rename things that would be shared with encryption path.
+Hi all!
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2.h         |  4 ++--
- block/qcow2-threads.c | 47 ++++++++++++++++++++++++++++---------------
- block/qcow2.c         |  2 +-
- 3 files changed, 34 insertions(+), 19 deletions(-)
+The series brings threads to qcow2 encryption/decryption path,
+like it is already done for compression.
+Now, based on master
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index be84d7c96a..9c2f6749ba 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -336,8 +336,8 @@ typedef struct BDRVQcow2State {
-     char *image_backing_file;
-     char *image_backing_format;
- 
--    CoQueue compress_wait_queue;
--    int nb_compress_threads;
-+    CoQueue thread_task_queue;
-+    int nb_threads;
- } BDRVQcow2State;
- 
- typedef struct Qcow2COWRegion {
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index 156e0667be..e3066075da 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -31,7 +31,36 @@
- #include "qcow2.h"
- #include "block/thread-pool.h"
- 
--#define MAX_COMPRESS_THREADS 4
-+#define QCOW2_MAX_THREADS 4
-+
-+static int coroutine_fn
-+qcow2_co_process(BlockDriverState *bs, ThreadPoolFunc *func, void *arg)
-+{
-+    int ret;
-+    BDRVQcow2State *s = bs->opaque;
-+    ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
-+
-+    qemu_co_mutex_lock(&s->lock);
-+    while (s->nb_threads >= QCOW2_MAX_THREADS) {
-+        qemu_co_queue_wait(&s->thread_task_queue, &s->lock);
-+    }
-+    s->nb_threads++;
-+    qemu_co_mutex_unlock(&s->lock);
-+
-+    ret = thread_pool_submit_co(pool, func, arg);
-+
-+    qemu_co_mutex_lock(&s->lock);
-+    s->nb_threads--;
-+    qemu_co_queue_next(&s->thread_task_queue);
-+    qemu_co_mutex_unlock(&s->lock);
-+
-+    return ret;
-+}
-+
-+
-+/*
-+ * Compression
-+ */
- 
- typedef ssize_t (*Qcow2CompressFunc)(void *dest, size_t dest_size,
-                                      const void *src, size_t src_size);
-@@ -148,8 +177,6 @@ static ssize_t coroutine_fn
- qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-                      const void *src, size_t src_size, Qcow2CompressFunc func)
- {
--    BDRVQcow2State *s = bs->opaque;
--    ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
-     Qcow2CompressData arg = {
-         .dest = dest,
-         .dest_size = dest_size,
-@@ -158,19 +185,7 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-         .func = func,
-     };
- 
--    qemu_co_mutex_lock(&s->lock);
--    while (s->nb_compress_threads >= MAX_COMPRESS_THREADS) {
--        qemu_co_queue_wait(&s->compress_wait_queue, &s->lock);
--    }
--    s->nb_compress_threads++;
--    qemu_co_mutex_unlock(&s->lock);
--
--    thread_pool_submit_co(pool, qcow2_compress_pool_func, &arg);
--
--    qemu_co_mutex_lock(&s->lock);
--    s->nb_compress_threads--;
--    qemu_co_queue_next(&s->compress_wait_queue);
--    qemu_co_mutex_unlock(&s->lock);
-+    qcow2_co_process(bs, qcow2_compress_pool_func, &arg);
- 
-     return arg.ret;
- }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4a1265dc42..2865903b0e 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1599,7 +1599,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-     }
- #endif
- 
--    qemu_co_queue_init(&s->compress_wait_queue);
-+    qemu_co_queue_init(&s->thread_task_queue);
- 
-     return ret;
- 
+v3:
+01: drop 'include block_int.h' lines not needed more [Alberto]
+02: fix comments style (open/close on separate line), add Alberto's r-b
+03: improve commit message, add Alberto's r-b
+04: new, follows Paolo's comment
+
+
+v2: (not very careful change list)
+    - multiple cipher inside QCryptoBlock instead of multiple
+      blocks inside qcow2, as suggested by Daniel, and it is
+      done in separate series
+    - use threaded encryption in do_perform_cow_encrypt() too
+    - some renaming and refactoring and simplifications
+
+
+== Performance testing ==
+
+Hmm, do we have something like tests/qemu-iotests, but for performance?
+
+[root@kvm up-qcow2-encrypt-threads]# cat test.sh 
+    #!/bin/bash
+
+    size=1G
+    src=/ssd/src.raw
+    dst=/ssd/dst.enc.qcow2
+
+    # create source for tests
+    ./qemu-img create -f raw "$src" $size > /dev/null
+    ./qemu-io -f raw -c "write -P 0xa 0 $size" "$src" > /dev/null
+
+    for w in "" "-W"; do
+        echo -e "Test with additional paramter for qemu-img: '$w'"
+
+        # create target
+        ./qemu-img create -f qcow2 --object secret,id=sec0,data=test -o encrypt.format=luks,encrypt.key-secret=sec0 "$dst" $size > /dev/null
+
+        time ./qemu-img convert $w -f raw --object secret,id=sec0,data=test --target-image-opts -n "$src" "driver=qcow2,file.filename=$dst,encrypt.key-secret=sec0"
+        echo
+    done
+
+
+before the series:
+    Test with additional paramter for qemu-img: ''
+
+    real    0m14.318s
+    user    0m13.637s
+    sys     0m0.881s
+
+    Test with additional paramter for qemu-img: '-W'
+
+    real    0m13.962s
+    user    0m13.681s
+    sys     0m1.156s
+
+
+after the series:
+    Test with additional paramter for qemu-img: ''
+
+    real    0m14.382s
+    user    0m13.735s
+    sys     0m0.835s
+
+    Test with additional paramter for qemu-img: '-W'
+
+    real    0m5.696s
+    user    0m15.931s
+    sys     0m1.144s
+
+Vladimir Sementsov-Ogievskiy (9):
+  qcow2.h: add missing include
+  qcow2: add separate file for threaded data processing functions
+  qcow2-threads: use thread_pool_submit_co
+  qcow2-threads: qcow2_co_do_compress: protect queuing by mutex
+  qcow2-threads: split out generic path
+  qcow2: qcow2_co_preadv: improve locking
+  qcow2: qcow2_co_preadv: skip using hd_qiov when possible
+  qcow2: bdrv_co_pwritev: move encryption code out of the lock
+  qcow2: do encryption in threads
+
+ block/qcow2.h          |  20 ++-
+ block/qcow2-bitmap.c   |   1 -
+ block/qcow2-cache.c    |   1 -
+ block/qcow2-cluster.c  |   8 +-
+ block/qcow2-refcount.c |   1 -
+ block/qcow2-snapshot.c |   1 -
+ block/qcow2-threads.c  | 268 +++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c          | 277 ++++++++---------------------------------
+ block/Makefile.objs    |   2 +-
+ 9 files changed, 343 insertions(+), 236 deletions(-)
+ create mode 100644 block/qcow2-threads.c
+
 -- 
 2.18.0
