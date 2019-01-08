@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57990)
+Received: from eggs.gnu.org ([209.51.188.92]:58010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gh08t-00061U-RV
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:46:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gh08v-000638-6J
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:46:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gh08r-0006j0-Lw
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:46:39 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gh08s-0006kE-OA
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:46:40 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  9 Jan 2019 09:45:45 +1100
-Message-Id: <20190108224600.23125-15-david@gibson.dropbear.id.au>
+Date: Wed,  9 Jan 2019 09:45:47 +1100
+Message-Id: <20190108224600.23125-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20190108224600.23125-1-david@gibson.dropbear.id.au>
 References: <20190108224600.23125-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 14/29] MAINTAINERS: Add some missing ppc-related
- files
+Subject: [Qemu-devel] [PULL 16/29] spapr: move spapr_create_phb() to core
+ machine code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +23,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-hw/gpio/mpc8xxx.c is only used by the e500 machine, so add it there.
-And the hw/input/adb* files are specific to the Mac machines, so
-they should be assigned to these categories.
+This function is only used when creating the default PHB. Let's rename
+it and move it to the core machine code for clarity.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- MAINTAINERS | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ hw/ppc/spapr.c              | 13 ++++++++++++-
+ hw/ppc/spapr_pci.c          | 11 -----------
+ include/hw/pci-host/spapr.h |  2 --
+ 3 files changed, 12 insertions(+), 14 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fc0be06756..625e1c8c93 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -962,6 +962,7 @@ L: qemu-ppc@nongnu.org
- S: Odd Fixes
- F: hw/ppc/e500.[hc]
- F: hw/ppc/e500plat.c
-+F: hw/gpio/mpc8xxx.c
- F: include/hw/ppc/ppc_e500.h
- F: include/hw/pci-host/ppce500.h
- F: pc-bios/u-boot.e500
-@@ -973,7 +974,7 @@ S: Odd Fixes
- F: hw/ppc/mpc8544ds.c
- F: hw/ppc/mpc8544_guts.c
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 7e61f1e5ff..f621032d40 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2552,6 +2552,17 @@ static void spapr_init_cpus(sPAPRMachineState *spa=
+pr)
+     }
+ }
 =20
--New World
-+New World (mac99)
- M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
- S: Odd Fixes
-@@ -983,12 +984,14 @@ F: hw/pci-bridge/dec.[hc]
- F: hw/misc/macio/
- F: hw/misc/mos6522.c
- F: hw/nvram/mac_nvram.c
-+F: hw/input/adb*
- F: include/hw/misc/macio/
- F: include/hw/misc/mos6522.h
- F: include/hw/ppc/mac_dbdma.h
- F: include/hw/pci-host/uninorth.h
-+F: include/hw/input/adb*
++static PCIHostState *spapr_create_default_phb(void)
++{
++    DeviceState *dev;
++
++    dev =3D qdev_create(NULL, TYPE_SPAPR_PCI_HOST_BRIDGE);
++    qdev_prop_set_uint32(dev, "index", 0);
++    qdev_init_nofail(dev);
++
++    return PCI_HOST_BRIDGE(dev);
++}
++
+ /* pSeries LPAR / sPAPR hardware init */
+ static void spapr_machine_init(MachineState *machine)
+ {
+@@ -2784,7 +2795,7 @@ static void spapr_machine_init(MachineState *machin=
+e)
+     /* Set up PCI */
+     spapr_pci_rtas_init();
 =20
--Old World
-+Old World (g3beige)
- M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
- S: Odd Fixes
-@@ -996,7 +999,9 @@ F: hw/ppc/mac_oldworld.c
- F: hw/pci-host/grackle.c
- F: hw/misc/macio/
- F: hw/intc/heathrow_pic.c
-+F: hw/input/adb*
- F: include/hw/intc/heathrow_pic.h
-+F: include/hw/input/adb*
+-    phb =3D spapr_create_phb(spapr, 0);
++    phb =3D spapr_create_default_phb();
 =20
- PReP
- M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+     for (i =3D 0; i < nb_nics; i++) {
+         NICInfo *nd =3D &nd_table[i];
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index bfb02ee96b..b74f2632ec 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1988,17 +1988,6 @@ static const TypeInfo spapr_phb_info =3D {
+     }
+ };
+=20
+-PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index)
+-{
+-    DeviceState *dev;
+-
+-    dev =3D qdev_create(NULL, TYPE_SPAPR_PCI_HOST_BRIDGE);
+-    qdev_prop_set_uint32(dev, "index", index);
+-    qdev_init_nofail(dev);
+-
+-    return PCI_HOST_BRIDGE(dev);
+-}
+-
+ typedef struct sPAPRFDT {
+     void *fdt;
+     int node_off;
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index 7c66c3872f..a65cfef169 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -111,8 +111,6 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAP=
+RPHBState *phb, int pin)
+     return spapr_qirq(spapr, phb->lsi_table[pin].irq);
+ }
+=20
+-PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index);
+-
+ int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, voi=
+d *fdt,
+                           uint32_t nr_msis);
+=20
 --=20
 2.20.1
