@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55834)
+Received: from eggs.gnu.org ([209.51.188.92]:58051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggqel-0002Ks-2I
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:38:55 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggqkH-0004DT-Km
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:44:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ggqed-0003pK-Cz
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:38:51 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1545633323-10818-1-git-send-email-dongli.zhang@oracle.com>
-Date: Tue, 08 Jan 2019 13:38:35 +0100
-In-Reply-To: <1545633323-10818-1-git-send-email-dongli.zhang@oracle.com>
-	(Dongli Zhang's message of "Mon, 24 Dec 2018 14:35:23 +0800")
-Message-ID: <87ef9nnx2s.fsf@dusky.pond.sub.org>
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggqkE-0001tN-Hc
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:44:36 -0500
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:37791)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1ggqkC-0001ll-OB
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:44:32 -0500
+Received: by mail-oi1-x22c.google.com with SMTP id y23so3182145oia.4
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 04:44:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/1] qdev: rename qdev_create() argument to
- sync with qdev_try_create()
+In-Reply-To: <20190107111129.2087-1-alex.bennee@linaro.org>
+References: <20190107111129.2087-1-alex.bennee@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 8 Jan 2019 13:44:30 +0100
+Message-ID: <CAL1e-=g47ATjpGJpM_PivAdQQ=wk=j3rmM1=vVL+2xQ5XFo1NQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel]  [PATCH v1 0/3] gitdm updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, mjt@tls.msk.ru, laurent@vivier.eu, =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cota@braap.org" <cota@braap.org>
 
-Dongli Zhang <dongli.zhang@oracle.com> writes:
+On Monday, January 7, 2019, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
+:
 
-> The second argument used by qdev_create() is typename and 'name' is very
-> confusing. Rename it from 'name' to 'type', which is the same used by
-> qdev_try_create().
 >
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> ---
->  hw/core/qdev.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> Hi,
 >
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 6b3cc55..1d65e8f 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -113,17 +113,17 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
->  /* Create a new device.  This only initializes the device state
->     structure and allows properties to be set.  The device still needs
->     to be realized.  See qdev-core.h.  */
-> -DeviceState *qdev_create(BusState *bus, const char *name)
-> +DeviceState *qdev_create(BusState *bus, const char *type)
->  {
->      DeviceState *dev;
->  
-> -    dev = qdev_try_create(bus, name);
-> +    dev = qdev_try_create(bus, type);
->      if (!dev) {
->          if (bus) {
-> -            error_report("Unknown device '%s' for bus '%s'", name,
-> +            error_report("Unknown device '%s' for bus '%s'", type,
->                           object_get_typename(OBJECT(bus)));
->          } else {
-> -            error_report("Unknown device '%s' for default sysbus", name);
-> +            error_report("Unknown device '%s' for default sysbus", type);
->          }
->          abort();
->      }
+> Added a few more updates mostly of IBMers with non corporate emails.
 
-Yes, @name is rather generic.  The sub-par function comment doesn't
-really help.
 
-You rename the parameter in the definition, but not in the declaration
-(qdev-core.h).  Better keep them consistent.
+Hi, Alex, could you please add
 
-Note that qdev_create() is just one instance of the "variables
-containing type names are confusingly named" pattern.  Let's start with
-just qdev-core.h:
+leon.alrae@imgtec.com
 
-* qdev_create() parameter @name.
+to Wave Computing group?
 
-* qdev_try_create() parameter @name.  The definition in qdev.c calls it
-  @type.
+(my email client automatically inserts and displays "ae" as one letter, the
+last name should be ending with a e, a-l-r-a-e.)
 
-* qbus_create_inplace() parameter @typename.
+I have some patches from Leon that will be upstreamed soon, with his email
+as above.
 
-* qbus_create() parameter @typename.  The definition in bus.c calls it
-  @name.
+I am on days-off and it is difficult for me to create and send patches, so
+I ask you toake this minor correction.
 
-Let's pick a single identifier and use it consistently.  Picking
-@typename would minimize churn, and be consistent with object_new() &
-friends.  Philippe, Paolo, what do you think?
+Thanks, Aleksandar
+
+
+
+> The year-end stats as per:
+>
+>  git log --numstat --after=3D"1/1/2018 00:00" \
+>                    --before=3D"31/12/2018 23:59" | gitdm -n -l 10
+>
+> Are:
+>
+>   Top changeset contributors by employer
+>   Red Hat                   3091 (43.3%)
+>   Linaro                    1201 (16.8%)
+>   (None)                     484 (6.8%)
+>   IBM                        426 (6.0%)
+>   Academics (various)        186 (2.6%)
+>   Virtuozzo                  172 (2.4%)
+>   Wave Computing             118 (1.7%)
+>   Igalia                     109 (1.5%)
+>   Xilinx                     102 (1.4%)
+>   Cadence Design Systems      80 (1.1%)
+>
+>   Top lines changed by employer
+>   Red Hat                   140523 (30.3%)
+>   Cadence Design Systems    81010 (17.5%)
+>   Linaro                    78098 (16.8%)
+>   Wave Computing            33134 (7.1%)
+>   IBM                       18918 (4.1%)
+>   SiFive                    14436 (3.1%)
+>   Academics (various)       11995 (2.6%)
+>   (None)                    11458 (2.5%)
+>   Virtuozzo                 10770 (2.3%)
+>   Oracle                    6698 (1.4%)
+>
+> Alex Benn=C3=A9e (2):
+>   contrib/gitdm: add Nokia and Proxmox to the domain-map
+>   contrib/gitdm: add two more IBM'ers to group-map-ibm
+>
+> Joel Stanley (1):
+>   contrib/gitdm: Add other IBMers
+>
+>  contrib/gitdm/domain-map    | 2 ++
+>  contrib/gitdm/group-map-ibm | 7 +++++++
+>  2 files changed, 9 insertions(+)
+>
+> --
+> 2.17.1
+>
+>
+>
