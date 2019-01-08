@@ -1,16 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35659)
+Received: from eggs.gnu.org ([209.51.188.92]:35820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqS-00078Q-Qp
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:22 -0500
+	(envelope-from <armbru@redhat.com>) id 1gguql-0007SS-Ey
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqM-0004o1-P0
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:16 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  8 Jan 2019 20:06:55 +0300
-Message-Id: <20190108170655.29766-10-vsementsov@virtuozzo.com>
-In-Reply-To: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 9/9] qcow2: do encryption in threads
+	(envelope-from <armbru@redhat.com>) id 1gguqi-0005ah-R9
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gguqe-0005BS-LX
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:30 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-7-fli@suse.com>
+	<87lg3wmln8.fsf@dusky.pond.sub.org>
+	<5DCFD2A7-85F6-42ED-8CBB-B42B6605BE6F@126.com>
+Date: Tue, 08 Jan 2019 18:07:17 +0100
+In-Reply-To: <5DCFD2A7-85F6-42ED-8CBB-B42B6605BE6F@126.com> (fei's message of
+	"Tue, 8 Jan 2019 23:55:37 +0800")
+Message-ID: <87ftu3kri2.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 06/16] qemu_thread: Make
+ qemu_thread_create() handle errors properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,199 +31,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, berto@igalia.com, vsementsov@virtuozzo.com, den@openvz.org, pbonzini@redhat.com
+To: fei <lifei1214@126.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Fei Li <fli@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com
 
-Do encryption/decryption in threads, like it is already done for
-compression. This improves asynchronous encrypted io.
+fei <lifei1214@126.com> writes:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2.h         |  8 ++++++
- block/qcow2-cluster.c |  7 ++---
- block/qcow2-threads.c | 65 +++++++++++++++++++++++++++++++++++++++++--
- block/qcow2.c         | 22 +++++----------
- 4 files changed, 81 insertions(+), 21 deletions(-)
+>> =E5=9C=A8 2019=E5=B9=B41=E6=9C=888=E6=97=A5=EF=BC=8C01:18=EF=BC=8CMarkus=
+ Armbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>=20
+>> Fei Li <fli@suse.com> writes:
+>>=20
+>>> qemu_thread_create() abort()s on error. Not nice. Give it a return
+>>> value and an Error ** argument, so it can return success/failure.
+>>>=20
+>>> Considering qemu_thread_create() is quite widely used in qemu, split
+>>> this into two steps: this patch passes the &error_abort to
+>>> qemu_thread_create() everywhere, and the next 9 patches will improve
+>>> on &error_abort for callers who need.
+>>>=20
+>>> Cc: Markus Armbruster <armbru@redhat.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Signed-off-by: Fei Li <fli@suse.com>
+>>=20
+>> The commit message's title promises more than the patch delivers.
+>> Suggest:
+>>=20
+>>    qemu_thread: Make qemu_thread_create() take Error ** argument
+> Ok, thanks for the suggestion. :)
+>>=20
+>> The rest of the commit message is fine.
+>>=20
+>>> ---
+>>> cpus.c                      | 23 +++++++++++++++--------
+>>> dump.c                      |  3 ++-
+>>> hw/misc/edu.c               |  4 +++-
+>>> hw/ppc/spapr_hcall.c        |  4 +++-
+>>> hw/rdma/rdma_backend.c      |  3 ++-
+>>> hw/usb/ccid-card-emulated.c |  5 +++--
+>>> include/qemu/thread.h       |  4 ++--
+>>> io/task.c                   |  3 ++-
+>>> iothread.c                  |  3 ++-
+>>> migration/migration.c       | 11 ++++++++---
+>>> migration/postcopy-ram.c    |  4 +++-
+>>> migration/ram.c             | 12 ++++++++----
+>>> migration/savevm.c          |  3 ++-
+>>> tests/atomic_add-bench.c    |  3 ++-
+>>> tests/iothread.c            |  2 +-
+>>> tests/qht-bench.c           |  3 ++-
+>>> tests/rcutorture.c          |  3 ++-
+>>> tests/test-aio.c            |  2 +-
+>>> tests/test-rcu-list.c       |  3 ++-
+>>> ui/vnc-jobs.c               |  6 ++++--
+>>> util/compatfd.c             |  6 ++++--
+>>> util/oslib-posix.c          |  3 ++-
+>>> util/qemu-thread-posix.c    | 27 ++++++++++++++++++++-------
+>>> util/qemu-thread-win32.c    | 16 ++++++++++++----
+>>> util/rcu.c                  |  3 ++-
+>>> util/thread-pool.c          |  4 +++-
+>>> 26 files changed, 112 insertions(+), 51 deletions(-)
+>>>=20
+>>> diff --git a/cpus.c b/cpus.c
+>>> index 0ddeeefc14..25df03326b 100644
+>>> --- a/cpus.c
+>>> +++ b/cpus.c
+>>> @@ -1961,15 +1961,17 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+>>>             snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+>>>                  cpu->cpu_index);
+>>>=20
+>>> +            /* TODO: let the callers handle the error instead of abort=
+() here */
+>>>             qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_t=
+hread_fn,
+>>> -                               cpu, QEMU_THREAD_JOINABLE);
+>>> +                               cpu, QEMU_THREAD_JOINABLE, &error_abort=
+);
+>>>=20
+>>>         } else {
+>>>             /* share a single thread for all cpus with TCG */
+>>>             snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG"=
+);
+>>> +            /* TODO: let the callers handle the error instead of abort=
+() here */
+>>>             qemu_thread_create(cpu->thread, thread_name,
+>>>                                qemu_tcg_rr_cpu_thread_fn,
+>>> -                               cpu, QEMU_THREAD_JOINABLE);
+>>> +                               cpu, QEMU_THREAD_JOINABLE, &error_abort=
+);
+>>>=20
+>>>             single_tcg_halt_cond =3D cpu->halt_cond;
+>>>             single_tcg_cpu_thread =3D cpu->thread;
+>>=20
+>> You add this TODO comment to 24 out of 37 calls.  Can you give your
+>> reasons for adding it to some calls, but not to others?
+> For those have TODO, I polish them in the next following patches, and for=
+ those do not have TODO I just let them use &error_abort.
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 9c2f6749ba..7e75f20373 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -257,6 +257,8 @@ typedef struct Qcow2BitmapHeaderExt {
-     uint64_t bitmap_directory_offset;
- } QEMU_PACKED Qcow2BitmapHeaderExt;
- 
-+#define QCOW2_MAX_THREADS 4
-+
- typedef struct BDRVQcow2State {
-     int cluster_bits;
-     int cluster_size;
-@@ -701,5 +703,11 @@ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
- ssize_t coroutine_fn
- qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
-                     const void *src, size_t src_size);
-+int coroutine_fn
-+qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                 uint64_t offset, void *buf, size_t len);
-+int coroutine_fn
-+qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                 uint64_t offset, void *buf, size_t len);
- 
- #endif
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 7815772116..55dd4144de 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -467,13 +467,12 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
- {
-     if (bytes && bs->encrypted) {
-         BDRVQcow2State *s = bs->opaque;
--        int64_t offset = (s->crypt_physical_offset ?
--                          (cluster_offset + offset_in_cluster) :
--                          (src_cluster_offset + offset_in_cluster));
-         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
-         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
-         assert(s->crypto);
--        if (qcrypto_block_encrypt(s->crypto, offset, buffer, bytes, NULL) < 0) {
-+        if (qcow2_co_encrypt(bs, cluster_offset,
-+                             src_cluster_offset + offset_in_cluster,
-+                             buffer, bytes) < 0) {
-             return false;
-         }
-     }
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index e3066075da..0e20723a4b 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -30,8 +30,7 @@
- 
- #include "qcow2.h"
- #include "block/thread-pool.h"
--
--#define QCOW2_MAX_THREADS 4
-+#include "crypto.h"
- 
- static int coroutine_fn
- qcow2_co_process(BlockDriverState *bs, ThreadPoolFunc *func, void *arg)
-@@ -205,3 +204,65 @@ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
-     return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
-                                 qcow2_decompress);
- }
-+
-+
-+/*
-+ * Cryptography
-+ */
-+
-+/*
-+ * Qcow2EncDecFunc: common prototype of qcrypto_block_encrypt() and
-+ * qcrypto_block_decrypt() functions.
-+ */
-+typedef int (*Qcow2EncDecFunc)(QCryptoBlock *block, uint64_t offset,
-+                               uint8_t *buf, size_t len, Error **errp);
-+
-+typedef struct Qcow2EncDecData {
-+    QCryptoBlock *block;
-+    uint64_t offset;
-+    uint8_t *buf;
-+    size_t len;
-+
-+    Qcow2EncDecFunc func;
-+} Qcow2EncDecData;
-+
-+static int qcow2_encdec_pool_func(void *opaque)
-+{
-+    Qcow2EncDecData *data = opaque;
-+
-+    return data->func(data->block, data->offset, data->buf, data->len, NULL);
-+}
-+
-+static int coroutine_fn
-+qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                  uint64_t offset, void *buf, size_t len, Qcow2EncDecFunc func)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2EncDecData arg = {
-+        .block = s->crypto,
-+        .offset = s->crypt_physical_offset ?
-+                      file_cluster_offset + offset_into_cluster(s, offset) :
-+                      offset,
-+        .buf = buf,
-+        .len = len,
-+        .func = func,
-+    };
-+
-+    return qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
-+}
-+
-+int coroutine_fn
-+qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                 uint64_t offset, void *buf, size_t len)
-+{
-+    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
-+                             qcrypto_block_encrypt);
-+}
-+
-+int coroutine_fn
-+qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
-+                 uint64_t offset, void *buf, size_t len)
-+{
-+    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
-+                             qcrypto_block_decrypt);
-+}
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 76d3715350..f94e5960f2 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -296,7 +296,7 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-             }
-             s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
-                                            qcow2_crypto_hdr_read_func,
--                                           bs, cflags, 1, errp);
-+                                           bs, cflags, QCOW2_MAX_THREADS, errp);
-             if (!s->crypto) {
-                 return -EINVAL;
-             }
-@@ -1446,7 +1446,8 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
-             }
-             s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
--                                           NULL, NULL, cflags, 1, errp);
-+                                           NULL, NULL, cflags,
-+                                           QCOW2_MAX_THREADS, errp);
-             if (!s->crypto) {
-                 ret = -EINVAL;
-                 goto fail;
-@@ -1966,13 +1967,8 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-                 assert(s->crypto);
-                 assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
--                if (qcrypto_block_decrypt(s->crypto,
--                                          (s->crypt_physical_offset ?
--                                           cluster_offset + offset_in_cluster :
--                                           offset),
--                                          cluster_data,
--                                          cur_bytes,
--                                          NULL) < 0) {
-+                if (qcow2_co_decrypt(bs, cluster_offset, offset,
-+                                     cluster_data, cur_bytes) < 0) {
-                     ret = -EIO;
-                     goto fail;
-                 }
-@@ -2110,12 +2106,8 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
-             qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
- 
--            if (qcrypto_block_encrypt(s->crypto,
--                                      (s->crypt_physical_offset ?
--                                       cluster_offset + offset_in_cluster :
--                                       offset),
--                                      cluster_data,
--                                      cur_bytes, NULL) < 0) {
-+            if (qcow2_co_encrypt(bs, cluster_offset, offset,
-+                                 cluster_data, cur_bytes) < 0) {
-                 ret = -EIO;
-                 goto out_unlocked;
-             }
--- 
-2.18.0
+Please mention that in the commit message.
+
+>>=20
+>> [...]
+>>> diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+>>> index 55d83a907c..12291f4ccd 100644
+>>> --- a/include/qemu/thread.h
+>>> +++ b/include/qemu/thread.h
+>>> @@ -152,9 +152,9 @@ void qemu_event_reset(QemuEvent *ev);
+>>> void qemu_event_wait(QemuEvent *ev);
+>>> void qemu_event_destroy(QemuEvent *ev);
+>>>=20
+>>> -void qemu_thread_create(QemuThread *thread, const char *name,
+>>> +bool qemu_thread_create(QemuThread *thread, const char *name,
+>>>                         void *(*start_routine)(void *),
+>>> -                        void *arg, int mode);
+>>> +                        void *arg, int mode, Error **errp);
+>>> void *qemu_thread_join(QemuThread *thread);
+>>> void qemu_thread_get_self(QemuThread *thread);
+>>> bool qemu_thread_is_self(QemuThread *thread);
+>> [...]
+>>> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+>>> index 865e476df5..39834b0551 100644
+>>> --- a/util/qemu-thread-posix.c
+>>> +++ b/util/qemu-thread-posix.c
+>>> @@ -15,6 +15,7 @@
+>>> #include "qemu/atomic.h"
+>>> #include "qemu/notify.h"
+>>> #include "qemu-thread-common.h"
+>>> +#include "qapi/error.h"
+>>>=20
+>>> static bool name_threads;
+>>>=20
+>>> @@ -500,9 +501,13 @@ static void *qemu_thread_start(void *args)
+>>>     return r;
+>>> }
+>>>=20
+>>> -void qemu_thread_create(QemuThread *thread, const char *name,
+>>> -                       void *(*start_routine)(void*),
+>>> -                       void *arg, int mode)
+>>> +/*
+>>> + * Return a boolean: true/false to indicate whether it succeeds.
+>>> + * If fails, propagate the error to Error **errp and set the errno.
+>>> + */
+>>=20
+>> Let's write something that can pass as a function contract:
+>>=20
+>>   /*
+>>    * Create a new thread with name @name
+>>    * The thread executes @start_routine() with argument @arg.
+>>    * The thread will be created in a detached state if @mode is
+>>    * QEMU_THREAD_DETACHED, and in a jounable state if it's
+>>    * QEMU_THREAD_JOINABLE.
+>>    * On success, return true.
+>>    * On failure, set @errno, store an error through @errp and return
+>>    * false.
+>>    */
+> Thanks so much for amending! :)
+>> Personally, I'd return negative errno instead of false, and dispense
+>> with setting errno.
+> Emm, I think I have replied this in last version, but due to several reas=
+ons I did not wait for your feedback and sent the v9. Sorry for that.. And =
+I like to paste my two considerations here:
+> =E2=80=9C- Actually only one caller needs the errno, that is the above qe=
+mu_signalfd_compat().=20
+
+Yes.
+
+> - For the returning value, I remember there's once a email thread talking=
+ about it: returning a bool (and let the passed errp hold the error message=
+) is to keep the consistency with glib.
+
+GLib doesn't discourage return types other than boolean.  It only asks
+that if you return boolean, then true should mean success and false
+should mean failure.  See
+
+    https://developer.gnome.org/glib/stable/glib-Error-Reporting.html
+
+under "Rules for use of GError", item "By convention, if you return a
+boolean value".
+
+The discussion you remember was about a convention we used to enforce in
+QEMU, namely to avoid returning boolean success, and return void
+instead.  That was basically a bad idea.
+
+> So IMO I am wondering whether it is really needed to change the bool (tru=
+e/false) to int (0/-errno), just for that sole function: qemu_signalfd_comp=
+at() which needs the errno. Besides if we return -errno, for each caller we=
+ need add a local variable like =E2=80=9Cret=3D qemu_thread_create()=E2=80=
+=9D to store the -errno.
+
+Well, you either assign the error code to errno just for that caller, or
+you return the error code just for that caller.  I'd do the latter
+because I consider it slightly simpler.  Compare
+
+ * On success, return true.
+ * On failure, set @errno, store an error through @errp and return
+ * false.
+
+to
+
+ * On success, return zero.
+ * On failure, store an error through @errp and return negative errno.
+
+where the second sentence describes just two instead of three actions.
+
+[...]
