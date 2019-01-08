@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52552)
+Received: from eggs.gnu.org ([209.51.188.92]:52576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzue-0008AY-9L
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:56 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzuh-0008EK-MJ
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:32:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzud-0004Px-Gh
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:56 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35300)
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzug-0004Sr-Ny
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:59 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggzud-0004P4-Av
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:55 -0500
-Received: by mail-pl1-x644.google.com with SMTP id p8so2576248plo.2
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:31:55 -0800 (PST)
+	id 1ggzug-0004SL-GO
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:58 -0500
+Received: by mail-pg1-x541.google.com with SMTP id t13so2345852pgr.11
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:31:58 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  9 Jan 2019 08:31:05 +1000
-Message-Id: <20190108223129.5570-8-richard.henderson@linaro.org>
+Date: Wed,  9 Jan 2019 08:31:06 +1000
+Message-Id: <20190108223129.5570-9-richard.henderson@linaro.org>
 In-Reply-To: <20190108223129.5570-1-richard.henderson@linaro.org>
 References: <20190108223129.5570-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 07/31] target/arm: Rearrange decode in
+Subject: [Qemu-devel] [PATCH v3 08/31] target/arm: Decode PAuth within
  disas_data_proc_1src
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,79 +30,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Now properly signals unallocated for REV64 with SF=0.
-Allows for the opcode2 field to be decoded shortly.
-
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
+ target/arm/translate-a64.c | 146 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 146 insertions(+)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index b72aea3e97..dac61a3c3a 100644
+index dac61a3c3a..8a8408c1b7 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -4563,38 +4563,51 @@ static void handle_rev16(DisasContext *s, unsigned int sf,
-  */
+@@ -4564,6 +4564,7 @@ static void handle_rev16(DisasContext *s, unsigned int sf,
  static void disas_data_proc_1src(DisasContext *s, uint32_t insn)
  {
--    unsigned int sf, opcode, rn, rd;
-+    unsigned int sf, opcode, opcode2, rn, rd;
+     unsigned int sf, opcode, opcode2, rn, rd;
++    TCGv_i64 tcg_rd;
  
--    if (extract32(insn, 29, 1) || extract32(insn, 16, 5)) {
-+    if (extract32(insn, 29, 1)) {
+     if (extract32(insn, 29, 1)) {
          unallocated_encoding(s);
-         return;
-     }
- 
-     sf = extract32(insn, 31, 1);
-     opcode = extract32(insn, 10, 6);
-+    opcode2 = extract32(insn, 16, 5);
-     rn = extract32(insn, 5, 5);
-     rd = extract32(insn, 0, 5);
- 
--    switch (opcode) {
--    case 0: /* RBIT */
-+#define MAP(SF, O2, O1) ((SF) | (O1 << 1) | (O2 << 7))
-+
-+    switch (MAP(sf, opcode2, opcode)) {
-+    case MAP(0, 0x00, 0x00): /* RBIT */
-+    case MAP(1, 0x00, 0x00):
-         handle_rbit(s, sf, rn, rd);
-         break;
--    case 1: /* REV16 */
-+    case MAP(0, 0x00, 0x01): /* REV16 */
-+    case MAP(1, 0x00, 0x01):
-         handle_rev16(s, sf, rn, rd);
-         break;
--    case 2: /* REV32 */
-+    case MAP(0, 0x00, 0x02): /* REV/REV32 */
-+    case MAP(1, 0x00, 0x02):
-         handle_rev32(s, sf, rn, rd);
-         break;
--    case 3: /* REV64 */
-+    case MAP(1, 0x00, 0x03): /* REV64 */
-         handle_rev64(s, sf, rn, rd);
-         break;
--    case 4: /* CLZ */
-+    case MAP(0, 0x00, 0x04): /* CLZ */
-+    case MAP(1, 0x00, 0x04):
-         handle_clz(s, sf, rn, rd);
-         break;
--    case 5: /* CLS */
-+    case MAP(0, 0x00, 0x05): /* CLS */
-+    case MAP(1, 0x00, 0x05):
+@@ -4602,7 +4603,152 @@ static void disas_data_proc_1src(DisasContext *s, uint32_t insn)
+     case MAP(1, 0x00, 0x05):
          handle_cls(s, sf, rn, rd);
          break;
-+    default:
-+        unallocated_encoding(s);
++    case MAP(1, 0x01, 0x00): /* PACIA */
++        if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_pacia(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
++        } else if (!dc_isar_feature(aa64_pauth, s)) {
++            goto do_unallocated;
++        }
 +        break;
++    case MAP(1, 0x01, 0x01): /* PACIB */
++        if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_pacib(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
++        } else if (!dc_isar_feature(aa64_pauth, s)) {
++            goto do_unallocated;
++        }
++        break;
++    case MAP(1, 0x01, 0x02): /* PACDA */
++        if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_pacda(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
++        } else if (!dc_isar_feature(aa64_pauth, s)) {
++            goto do_unallocated;
++        }
++        break;
++    case MAP(1, 0x01, 0x03): /* PACDB */
++        if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_pacdb(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
++        } else if (!dc_isar_feature(aa64_pauth, s)) {
++            goto do_unallocated;
++        }
++        break;
++    case MAP(1, 0x01, 0x04): /* AUTIA */
++        if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_autia(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
++        } else if (!dc_isar_feature(aa64_pauth, s)) {
++            goto do_unallocated;
++        }
++        break;
++    case MAP(1, 0x01, 0x05): /* AUTIB */
++        if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_autib(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
++        } else if (!dc_isar_feature(aa64_pauth, s)) {
++            goto do_unallocated;
++        }
++        break;
++    case MAP(1, 0x01, 0x06): /* AUTDA */
++        if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_autda(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
++        } else if (!dc_isar_feature(aa64_pauth, s)) {
++            goto do_unallocated;
++        }
++        break;
++    case MAP(1, 0x01, 0x07): /* AUTDB */
++        if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_autdb(tcg_rd, cpu_env, tcg_rd, cpu_reg_sp(s, rn));
++        } else if (!dc_isar_feature(aa64_pauth, s)) {
++            goto do_unallocated;
++        }
++        break;
++    case MAP(1, 0x01, 0x08): /* PACIZA */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_pacia(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
++        }
++        break;
++    case MAP(1, 0x01, 0x09): /* PACIZB */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_pacib(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
++        }
++        break;
++    case MAP(1, 0x01, 0x0a): /* PACDZA */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_pacda(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
++        }
++        break;
++    case MAP(1, 0x01, 0x0b): /* PACDZB */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_pacdb(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
++        }
++        break;
++    case MAP(1, 0x01, 0x0c): /* AUTIZA */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_autia(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
++        }
++        break;
++    case MAP(1, 0x01, 0x0d): /* AUTIZB */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_autib(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
++        }
++        break;
++    case MAP(1, 0x01, 0x0e): /* AUTDZA */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_autda(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
++        }
++        break;
++    case MAP(1, 0x01, 0x0f): /* AUTDZB */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_autdb(tcg_rd, cpu_env, tcg_rd, new_tmp_a64_zero(s));
++        }
++        break;
++    case MAP(1, 0x01, 0x10): /* XPACI */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_xpaci(tcg_rd, cpu_env, tcg_rd);
++        }
++        break;
++    case MAP(1, 0x01, 0x11): /* XPACD */
++        if (!dc_isar_feature(aa64_pauth, s) || rn != 31) {
++            goto do_unallocated;
++        } else if (s->pauth_active) {
++            tcg_rd = cpu_reg(s, rd);
++            gen_helper_xpacd(tcg_rd, cpu_env, tcg_rd);
++        }
++        break;
+     default:
++    do_unallocated:
+         unallocated_encoding(s);
+         break;
      }
-+
-+#undef MAP
- }
- 
- static void handle_div(DisasContext *s, bool is_signed, unsigned int sf,
 -- 
 2.17.2
