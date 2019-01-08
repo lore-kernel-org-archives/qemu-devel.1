@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48454)
+Received: from eggs.gnu.org ([209.51.188.92]:50609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1ggowG-0004JW-RK
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:48:53 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ggp2s-0006i8-IF
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:55:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1ggowG-0001M6-1h
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:48:52 -0500
-Received: from mga03.intel.com ([134.134.136.65]:34328)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1ggowF-0001Fc-OG
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:48:51 -0500
-Date: Tue, 8 Jan 2019 18:45:14 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20190108104514.GG27840@yangzhon-Virtual>
-References: <20181227063419.12981-1-yang.zhong@intel.com>
-	<20181227063419.12981-22-yang.zhong@intel.com>
-	<71bf251a-461e-8967-8b92-1bbca638f6a9@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ggp2r-0007K1-LJ
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 05:55:42 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 8 Jan 2019 10:55:29 +0000
+Message-ID: <be9e5f4b-8266-3603-76d4-43b83285bde7@virtuozzo.com>
+References: <20181221093529.23855-1-jsnow@redhat.com>
+	<20181221093529.23855-5-jsnow@redhat.com>
+	<a803d155-daa4-89f6-bee0-98ac89ee2333@redhat.com>
+In-Reply-To: <a803d155-daa4-89f6-bee0-98ac89ee2333@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7508CFA85166564DA72B798BA4D86AA7@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <71bf251a-461e-8967-8b92-1bbca638f6a9@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 21/25] virtio: make virtio dependencies
- with Kconfig
+Subject: Re: [Qemu-devel] [PATCH v6 04/11] block: remove 'x' prefix from
+ experimental bitmap APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com, yang.zhong@intel.com
+To: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Max Reitz <mreitz@redhat.com>, Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, Jan 04, 2019 at 08:54:54PM +0100, Thomas Huth wrote:
-> On 2018-12-27 07:34, Yang Zhong wrote:
-> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> > ---
-> >  default-configs/i386-softmmu.mak |  1 -
-> >  hw/9pfs/Kconfig                  |  2 ++
-> >  hw/block/Kconfig                 |  2 ++
-> >  hw/char/Kconfig                  |  2 ++
-> >  hw/display/Kconfig               |  5 +++++
-> >  hw/input/Kconfig                 |  2 ++
-> >  hw/net/Kconfig                   |  2 ++
-> >  hw/pci-host/Kconfig              |  2 ++
-> >  hw/virtio/Kconfig                | 10 +++++++++-
-> >  9 files changed, 26 insertions(+), 2 deletions(-)
-> 
-> Shouldn't this patch also get rid of default-configs/virtio.mak ?
-> 
-  Thanks for reminder, i omitted this file and should remove it. thanks!
-
-  Regards,
-
-  Yang
-
-> [...]
-> > diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
-> > index aabd6d4d96..9127daed5e 100644
-> > --- a/hw/virtio/Kconfig
-> > +++ b/hw/virtio/Kconfig
-> > @@ -3,18 +3,26 @@ config VIRTIO
-> >  
-> >  config VIRTIO_RNG
-> >      bool
-> > +    default y
-> > +    depends on VIRTIO
-> >  
-> >  config VIRTIO_PCI
-> >      bool
-> >      default y
-> >      depends on PCI
-> > -    select VIRTIO
-> > +    depends on VIRTIO
-> >  
-> >  config VIRTIO_MMIO
-> >      bool
-> > +    default y
-> > +    depends on VIRTIO
-> 
-> I don't think we should enable VIRTIO_MMIO by default - it's only used
-> on arm and riscv, but not on x86 and the other architectures.
->
-  Yes, the VIRTIO_MMIO is only used in arm and risc arch, i will change
-  this. thanks for Thomas's comments
-
-  Regards,
-
-  Yang
- 
-> >  config VIRTIO_BALLOON
-> >      bool
-> > +    default y
-> > +    depends on VIRTIO
-> >  
-> >  config VIRTIO_CRYPTO
-> >      bool
-> > +    default y
-> > +    depends on VIRTIO
-> > 
-> 
->  Thomas
+MDQuMDEuMjAxOSAyOjIxLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAxMi8yMS8xOCAzOjM1IEFN
+LCBKb2huIFNub3cgd3JvdGU6DQo+PiBUaGUgJ3gnIHByZWZpeCB3YXMgYWRkZWQgYmVjYXVzZSBJ
+IHdhcyB1bmNlcnRhaW4gb2YgdGhlIGRpcmVjdGlvbiB3ZSdkDQo+PiB0YWtlIGZvciB0aGUgbGli
+dmlydCBBUEkuIFdpdGggdGhlIGdlbmVyYWwgYXBwcm9hY2ggc29saWRpZmllZCwgSSBmZWVsDQo+
+PiBjb21mb3J0YWJsZSBjb21taXR0aW5nIHRvIHRoaXMgQVBJIGZvciA0LjAuDQo+Pg0KPj4gU2ln
+bmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPj4gUmV2aWV3ZWQtYnk6
+IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPj4gUmV2aWV3ZWQtYnk6IFZsYWRpbWly
+IFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0K
+Pj4gICBibG9ja2Rldi5jICAgICAgICAgICAgIHwgMjIgKysrKysrKysrKystLS0tLS0tLS0tLQ0K
+Pj4gICBxYXBpL2Jsb2NrLWNvcmUuanNvbiAgIHwgMzQgKysrKysrKysrKysrKysrKystLS0tLS0t
+LS0tLS0tLS0tLQ0KPj4gICBxYXBpL3RyYW5zYWN0aW9uLmpzb24gIHwgMTIgKysrKysrLS0tLS0t
+DQo+PiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yMjMgfCAgNCArKy0tDQo+PiAgIDQgZmlsZXMgY2hh
+bmdlZCwgMzYgaW5zZXJ0aW9ucygrKSwgMzYgZGVsZXRpb25zKC0pDQo+IA0KPiBNaXNzZXMgdGhl
+IGNvbnZlcnNpb24gb2YgeC1uYmQtc2VydmVyLWFkZC1iaXRtYXAgaW4gcWFwaS9ibG9jay5qc29u
+DQo+IChjb3VsZCBiZSBhIHNlcGFyYXRlIHBhdGNoKSwgYnV0IHRoYXQncyBhbHNvIG9uZSBvZiB0
+aGUgY29tbWFuZHMgdGhhdA0KPiBsaWJ2aXJ0IHdpbGwgbmVlZCB0byB1c2UgYWxvbmdzaWRlIGFs
+bCB0aGUgYml0bWFwIGNoYW5nZXMuDQo+IA0KPiBTcGVha2luZyBvZiB4LW5iZC1zZXJ2ZXItYWRk
+LWJpdG1hcCwgZG9lcyBpdCBhY3R1YWxseSBoYXZlIHRvIGJlIGENCj4gc2VwYXJhdGUgY29tbWFu
+ZCwgb3Igc2hvdWxkIGl0IGp1c3QgYmUgYW4gYWRkaXRpb25hbCBwYXJhbWV0ZXIgdG8gdGhlDQo+
+IGV4aXN0aW5nIG5iZC1zZXJ2ZXItYWRkPyAgVGhlcmUgYXJlIHR3byBkaXJlY3Rpb25zIHRoaXMg
+Y291bGQgZ286DQo+IA0KPiBBcyBhIHNpbmdsZSBjb21tYW5kLCBpdCBlbmZvcmNlcyB0aGF0IHRo
+ZXJlIGlzIG5vIHdpbmRvdyBvZiB0aW1lIHdoZXJlDQo+IHRoZSBleHBvcnQgaXMgYXZhaWxhYmxl
+IHdpdGhvdXQgdGhlIGRpcnR5IGJpdG1hcC4gSG93ZXZlciwgaXQgYWxzbyBtZWFucw0KPiB3ZSBj
+YW4gb25seSBleHBvcnQgYXQgbW9zdCBvbmUgYml0bWFwLCB1bmxlc3Mgd2UgbWFrZSB0aGUgcGFy
+YW1ldGVyIHRha2UNCj4gYW4gYXJyYXkgb2YgYml0bWFwcyB0byBleHBvcnQuICBGZXdlciBjb21t
+YW5kcyBhbHNvIG1lYW5zIGxlc3Mgcm9sbC1iYWNrDQo+IHNjZW5hcmlvcyBpbiBsaWJ2aXJ0IChu
+byBuZWVkIHRvIHdvcnJ5IGFib3V0IHRoZSBleHBvcnQgYmVpbmcgYWRkZWQgYnV0DQo+IHRoZSBi
+aXRtYXAgZmFpbGluZykuDQo+IA0KPiBBcyBhIHNlcGFyYXRlIGNvbW1hbmQsIHdlIGNvdWxkIGlu
+IHRoZSBmdXR1cmUgYWxsb3cgdGhlIHNlcnZlciB0byBleHBvcnQNCj4gbXVsdGlwbGUgYml0bWFw
+cyBhdCBvbmNlIGJ5IGNhbGxpbmcgdGhlIGFkZC1iaXRtYXAgY29tbWFuZCBtb3JlIHRoYW4NCj4g
+b25jZTsgYnV0IHJpZ2h0IG5vdywgdGhlIGNvZGUgYmFzZSBkb2VzIG5vdCBhbGxvdyBtdWx0aXBs
+ZSBiaXRtYXANCj4gZXhwb3J0cyAoYSBzZWNvbmQgYml0bWFwIGV4cG9ydCBhdHRlbXB0IGZhaWxz
+KS4NCj4gDQo+IEknbSBsZWFuaW5nIHRvd2FyZHMgdGhlIGZvcm1lciAoZHJvcCB4LW5iZC1zZXJ2
+ZXItYWRkLWJpdG1hcCBhbHRvZ2V0aGVyLA0KPiBhbmQgaW5zdGVhZCBhZGQgYSBiaXRtYXAgcGFy
+YW1ldGVyIHRvIG5iZC1zZXJ2ZXItYWRkKS4gIEFsc28sIEknbQ0KPiBsZWFuaW5nIHRvd2FyZHMg
+bG9ja2luZyBpbiB0aGF0IHdlIG9ubHkgZXZlciBleHBvcnQgb25lDQo+IHFlbXU6ZGlydHktYml0
+bWFwOkZPTyBiaXRtYXAgcGVyIGV4cG9ydCwgYW5kIHRodXMgbm90IHdvcnJ5IGFib3V0IGFuDQo+
+IGFycmF5LiAgQmVzaWRlcywgaWYgd2UgbWFrZSB0aGUgY29tbWFuZCB0YWtlIGFuIGFycmF5IG5v
+dyBidXQgZW5mb3JjZQ0KPiB0aGF0IHRoZSBhcnJheSBoYXMgYXQgbW9zdCBvbmUgZWxlbWVudCwg
+dGhlbiBsYXRlciByZWxheCBpdCB0byB0YWtlIG1vcmUNCj4gdGhhbiBvbmUgZWxlbWVudCwgdGhl
+cmUgaXMgbm8gd2F5IHRvIGludHJvc3BlY3QgdGhhdCBjaGFuZ2U7IGJ1dCBpZiB3ZQ0KPiBtYWtl
+IHRoZSBjb21tYW5kIHRha2UgYSBzaW5nbGUgc3RyaW5nIG5vdywgYW5kIGxhdGVyIGhhdmUgYSBz
+dHJvbmcNCj4gcmVhc29uIHdoeSBleHBvcnRpbmcgbW9yZSB0aGFuIG9uZSBiaXRtYXAgYXQgb25j
+ZSBtYWtlcyBzZW5zZSwgd2UgY291bGQNCj4gc3RpbGwgbWFpbnRhaW4gYmFja2NvbXBhdCBieSB1
+c2luZyBhIFFBUEkgYWx0ZXJuYXRlIHR5cGUgYmV0d2VlbiBhDQo+IHN0cmluZyBhbmQgYW4gYXJy
+YXksIHdoaWNoIHdvdWxkIGJlIGludHJvc3BlY3RpYmxlLg0KPiANCj4gSSBndWVzcyBJIHNob3Vs
+ZCBwcm9wb3NlIGEgcGF0Y2ggZm9yIHRoYXQsIHRoZW4uLi4NCj4gDQoNClJlYXNvbmFibGUsIEkn
+dmUgbm8gb2JqZWN0aW9ucy4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
