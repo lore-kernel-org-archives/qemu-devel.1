@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58051)
+Received: from eggs.gnu.org ([209.51.188.92]:58399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggqkH-0004DT-Km
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:44:39 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ggqki-0004RI-4x
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:45:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggqkE-0001tN-Hc
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:44:36 -0500
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:37791)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1ggqkC-0001ll-OB
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:44:32 -0500
-Received: by mail-oi1-x22c.google.com with SMTP id y23so3182145oia.4
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 04:44:31 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1ggqkh-00035U-Ek
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:45:04 -0500
+Date: Tue, 8 Jan 2019 13:44:40 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190108134440.0d52f2c7.cohuck@redhat.com>
+In-Reply-To: <20190104181208.7809-2-philmd@redhat.com>
+References: <20190104181208.7809-1-philmd@redhat.com>
+	<20190104181208.7809-2-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190107111129.2087-1-alex.bennee@linaro.org>
-References: <20190107111129.2087-1-alex.bennee@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 8 Jan 2019 13:44:30 +0100
-Message-ID: <CAL1e-=g47ATjpGJpM_PivAdQQ=wk=j3rmM1=vVL+2xQ5XFo1NQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel]  [PATCH v1 0/3] gitdm updates
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] util/cutils: Move size_to_str()
+ from "qemu-common.h" to "cutils.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cota@braap.org" <cota@braap.org>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Stefano Garzarella <sgarzare@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Monday, January 7, 2019, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
-:
+On Fri,  4 Jan 2019 19:12:06 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
->
-> Hi,
->
-> Added a few more updates mostly of IBMers with non corporate emails.
+> The size_to_str() function doesn't need to be in a generic header.
+>=20
+> It makes also sens to find this function in the same header than
+> the opposite string to size functions: qemu_strtosz*().
+> Note than this function is already implemented in util/cutils.c.
+>=20
+> Since we introduce a new function in a header, we document it,
+> using the previous comment from the source file.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  include/qemu-common.h        |  1 -
+>  include/qemu/cutils.h        | 13 +++++++++++++
+>  qapi/string-output-visitor.c |  2 +-
+>  util/cutils.c                |  6 ------
+>  4 files changed, 14 insertions(+), 8 deletions(-)
 
+With the patch description fixed (as noted by Eric):
 
-Hi, Alex, could you please add
-
-leon.alrae@imgtec.com
-
-to Wave Computing group?
-
-(my email client automatically inserts and displays "ae" as one letter, the
-last name should be ending with a e, a-l-r-a-e.)
-
-I have some patches from Leon that will be upstreamed soon, with his email
-as above.
-
-I am on days-off and it is difficult for me to create and send patches, so
-I ask you toake this minor correction.
-
-Thanks, Aleksandar
-
-
-
-> The year-end stats as per:
->
->  git log --numstat --after=3D"1/1/2018 00:00" \
->                    --before=3D"31/12/2018 23:59" | gitdm -n -l 10
->
-> Are:
->
->   Top changeset contributors by employer
->   Red Hat                   3091 (43.3%)
->   Linaro                    1201 (16.8%)
->   (None)                     484 (6.8%)
->   IBM                        426 (6.0%)
->   Academics (various)        186 (2.6%)
->   Virtuozzo                  172 (2.4%)
->   Wave Computing             118 (1.7%)
->   Igalia                     109 (1.5%)
->   Xilinx                     102 (1.4%)
->   Cadence Design Systems      80 (1.1%)
->
->   Top lines changed by employer
->   Red Hat                   140523 (30.3%)
->   Cadence Design Systems    81010 (17.5%)
->   Linaro                    78098 (16.8%)
->   Wave Computing            33134 (7.1%)
->   IBM                       18918 (4.1%)
->   SiFive                    14436 (3.1%)
->   Academics (various)       11995 (2.6%)
->   (None)                    11458 (2.5%)
->   Virtuozzo                 10770 (2.3%)
->   Oracle                    6698 (1.4%)
->
-> Alex Benn=C3=A9e (2):
->   contrib/gitdm: add Nokia and Proxmox to the domain-map
->   contrib/gitdm: add two more IBM'ers to group-map-ibm
->
-> Joel Stanley (1):
->   contrib/gitdm: Add other IBMers
->
->  contrib/gitdm/domain-map    | 2 ++
->  contrib/gitdm/group-map-ibm | 7 +++++++
->  2 files changed, 9 insertions(+)
->
-> --
-> 2.17.1
->
->
->
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
