@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41685)
+Received: from eggs.gnu.org ([209.51.188.92]:42188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ggeyA-0003uo-LU
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:10:11 -0500
+	(envelope-from <mst@redhat.com>) id 1ggf0O-0005BI-K6
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:12:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ggey9-0005Sr-KS
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:10:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59066)
+	(envelope-from <mst@redhat.com>) id 1ggf0C-0000pf-AS
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:12:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ggey9-0005Os-B9
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:10:09 -0500
-Date: Mon, 7 Jan 2019 19:10:01 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ggf0B-0000ik-C2
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 19:12:16 -0500
+Date: Mon, 7 Jan 2019 19:12:06 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190107190855-mutt-send-email-mst@kernel.org>
+Message-ID: <20190107191044-mutt-send-email-mst@kernel.org>
 References: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
-	<1546900184-27403-4-git-send-email-venu.busireddy@oracle.com>
+	<1546900184-27403-5-git-send-email-venu.busireddy@oracle.com>
+	<20190107161717.4648aba2@x1.home>
+	<20190107182115-mutt-send-email-mst@kernel.org>
+	<20190107164115.6daffe19@x1.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1546900184-27403-4-git-send-email-venu.busireddy@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] virtio_net: Add a query command for
- FAILOVER_STANDBY_CHANGED event.
+In-Reply-To: <20190107164115.6daffe19@x1.home>
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] vfio-pci: Add
+ FAILOVER_PRIMARY_CHANGED event to shorten downtime during failover
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,230 +31,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Venu Busireddy <venu.busireddy@oracle.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On Mon, Jan 07, 2019 at 05:29:42PM -0500, Venu Busireddy wrote:
-> Add a query command to check the status of the FAILOVER_STANDBY_CHANGED
-> state of the virtio_net devices.
+On Mon, Jan 07, 2019 at 04:41:15PM -0700, Alex Williamson wrote:
+> On Mon, 7 Jan 2019 18:22:20 -0500
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
-> ---
->  hw/net/virtio-net.c            | 16 +++++++++++
->  include/hw/virtio/virtio-net.h |  1 +
->  include/net/net.h              |  2 ++
->  net/net.c                      | 61 ++++++++++++++++++++++++++++++++++++++++++
->  qapi/net.json                  | 46 +++++++++++++++++++++++++++++++
->  5 files changed, 126 insertions(+)
+> > On Mon, Jan 07, 2019 at 04:17:17PM -0700, Alex Williamson wrote:
+> > > On Mon,  7 Jan 2019 17:29:43 -0500
+> > > Venu Busireddy <venu.busireddy@oracle.com> wrote:
+> > >   
+> > > > From: Si-Wei Liu <si-wei.liu@oracle.com>
+> > > > 
+> > > > When a VF is hotplugged into the guest, datapath switching will be
+> > > > performed immediately, which is sub-optimal in terms of timing, and
+> > > > could end up with substantial network downtime. One of ways to shorten
+> > > > this downtime is to switch the datapath only after the VF is seen to get
+> > > > enabled by guest, indicated by the bus master bit in VF's PCI config
+> > > > space getting enabled. The FAILOVER_PRIMARY_CHANGED event is emitted
+> > > > at that time to indicate this condition. Then management stack can kick
+> > > > off datapath switching upon receiving the event.
+> > > > 
+> > > > Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
+> > > > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+> > > > ---
+> > > >  hw/vfio/pci.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > > >  qapi/net.json | 26 ++++++++++++++++++++++++++
+> > > >  2 files changed, 83 insertions(+)  
+> > > 
+> > > Why is this done at the vfio driver layer rather than the PCI core
+> > > layer?  We write everything through using pci_default_write_config(), I
+> > > don't see that anything here is particularly vfio specific.  Please copy
+> > > me on any changes in hw/vfio.  Thanks,
+> > > 
+> > > Alex  
+> > 
+> > Hmm so you are saying let's send events for each device?
+> > I don't have a problem with this but in this case
+> > I think I would like to see a per-device option "send events".
+> > We don't want a ton of events in the simple default config.
 > 
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 7b1bcde..a4e07ac 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -263,9 +263,11 @@ static void virtio_net_failover_notify_event(VirtIONet *n, uint8_t status)
->           */
->          if ((status & VIRTIO_CONFIG_S_DRIVER_OK) &&
->                  (!(vdev->status & VIRTIO_CONFIG_S_DRIVER_OK))) {
-> +            n->standby_enabled = true;
->              qapi_event_send_failover_standby_changed(!!ncn, ncn, path, true);
->          } else if ((!(status & VIRTIO_CONFIG_S_DRIVER_OK)) &&
->                  (vdev->status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-> +            n->standby_enabled = false;
->              qapi_event_send_failover_standby_changed(!!ncn, ncn, path, false);
->          }
->      }
+> In the below we're only sending events for PCIDevice.failover_primary,
 
-Here too, we are sending an endless stream of events.
-
-Instead, let's send one "changed" event without data,
-and then be silent until management runs the query command.
+Well failover_primary in this patch is a vfio property, not a
+pci device property.
 
 
+> seems like that would filter out the rest of the non-NIC PCI devices as
+> well as it does for non-NIC VFIO PCI devices.  The only thing remotely
+> vfio specific below is that it might notify based on the vfio device
+> name, but it's a fallback to PCIDevice.qdev.id.  A real ID could just
+> be a requirement to make use of this.
 
 
-> @@ -448,6 +450,19 @@ static RxFilterInfo *virtio_net_query_rxfilter(NetClientState *nc)
->      return info;
->  }
->  
-> +static StandbyStatusInfo *virtio_net_query_standby_status(NetClientState *nc)
-> +{
-> +    StandbyStatusInfo *info;
-> +    VirtIONet *n = qemu_get_nic_opaque(nc);
-> +
-> +    info = g_malloc0(sizeof(*info));
-> +    info->device = g_strdup(n->netclient_name);
-> +    info->path = g_strdup(object_get_canonical_path(OBJECT(n->qdev)));
-> +    info->enabled = n->standby_enabled;
-> +
-> +    return info;
-> +}
-> +
->  static void virtio_net_reset(VirtIODevice *vdev)
->  {
->      VirtIONet *n = VIRTIO_NET(vdev);
-> @@ -1923,6 +1938,7 @@ static NetClientInfo net_virtio_info = {
->      .receive = virtio_net_receive,
->      .link_status_changed = virtio_net_set_link_status,
->      .query_rx_filter = virtio_net_query_rxfilter,
-> +    .query_standby_status = virtio_net_query_standby_status,
->  };
->  
->  static bool virtio_net_guest_notifier_pending(VirtIODevice *vdev, int idx)
-> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-> index 4d7f3c8..9071e96 100644
-> --- a/include/hw/virtio/virtio-net.h
-> +++ b/include/hw/virtio/virtio-net.h
-> @@ -103,6 +103,7 @@ typedef struct VirtIONet {
->      int announce_counter;
->      bool needs_vnet_hdr_swap;
->      bool mtu_bypass_backend;
-> +    bool standby_enabled;
->  } VirtIONet;
->  
->  void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
-> diff --git a/include/net/net.h b/include/net/net.h
-> index ec13702..61e8513 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -50,6 +50,7 @@ typedef void (NetCleanup) (NetClientState *);
->  typedef void (LinkStatusChanged)(NetClientState *);
->  typedef void (NetClientDestructor)(NetClientState *);
->  typedef RxFilterInfo *(QueryRxFilter)(NetClientState *);
-> +typedef StandbyStatusInfo *(QueryStandbyStatus)(NetClientState *);
->  typedef bool (HasUfo)(NetClientState *);
->  typedef bool (HasVnetHdr)(NetClientState *);
->  typedef bool (HasVnetHdrLen)(NetClientState *, int);
-> @@ -71,6 +72,7 @@ typedef struct NetClientInfo {
->      NetCleanup *cleanup;
->      LinkStatusChanged *link_status_changed;
->      QueryRxFilter *query_rx_filter;
-> +    QueryStandbyStatus *query_standby_status;
->      NetPoll *poll;
->      HasUfo *has_ufo;
->      HasVnetHdr *has_vnet_hdr;
-> diff --git a/net/net.c b/net/net.c
-> index 1f7d626..fbf288e 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -1320,6 +1320,67 @@ RxFilterInfoList *qmp_query_rx_filter(bool has_name, const char *name,
->      return filter_list;
->  }
->  
-> +StandbyStatusInfoList *qmp_query_standby_status(bool has_device,
-> +                                                const char *device,
-> +                                                Error **errp)
-> +{
-> +    NetClientState *nc;
-> +    StandbyStatusInfoList *status_list = NULL, *last_entry = NULL;
-> +
-> +    QTAILQ_FOREACH(nc, &net_clients, next) {
-> +        StandbyStatusInfoList *entry;
-> +        StandbyStatusInfo *info;
-> +
-> +        if (has_device && strcmp(nc->name, device) != 0) {
-> +            continue;
-> +        }
-> +
-> +        /* only query standby status information of NIC */
-> +        if (nc->info->type != NET_CLIENT_DRIVER_NIC) {
-> +            if (has_device) {
-> +                error_setg(errp, "net client(%s) isn't a NIC", device);
-> +                return NULL;
-> +            }
-> +            continue;
-> +        }
-> +
-> +        /*
-> +         * only query information on queue 0 since the info is per nic,
-> +         * not per queue.
-> +         */
-> +        if (nc->queue_index != 0) {
-> +            continue;
-> +        }
-> +
-> +        if (nc->info->query_standby_status) {
-> +            info = nc->info->query_standby_status(nc);
-> +            entry = g_malloc0(sizeof(*entry));
-> +            entry->value = info;
-> +
-> +            if (!status_list) {
-> +                status_list = entry;
-> +            } else {
-> +                last_entry->next = entry;
-> +            }
-> +            last_entry = entry;
-> +        } else if (has_device) {
-> +            error_setg(errp, "net client(%s) doesn't support"
-> +                       " standby status querying", device);
-> +            return NULL;
-> +        }
-> +
-> +        if (has_device) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    if (status_list == NULL && has_device) {
-> +        error_setg(errp, "invalid net client name: %s", device);
-> +    }
-> +
-> +    return status_list;
-> +}
-> +
->  void hmp_info_network(Monitor *mon, const QDict *qdict)
->  {
->      NetClientState *nc, *peer;
-> diff --git a/qapi/net.json b/qapi/net.json
-> index 6a6d6fe..633ac87 100644
-> --- a/qapi/net.json
-> +++ b/qapi/net.json
-> @@ -711,3 +711,49 @@
->  ##
->  { 'event': 'FAILOVER_STANDBY_CHANGED',
->    'data': {'*device': 'str', 'path': 'str', 'enabled': 'bool'} }
-> +
-> +##
-> +# @StandbyStatusInfo:
-> +#
-> +# Standby status information for a virtio_net device.
-> +#
-> +# @device: Indicates the virtio_net device.
-> +#
-> +# @path: Indicates the device path.
-> +#
-> +# @enabled: true if the virtio_net driver is loaded.
-> +#           false if the virtio_net driver is unloaded or the guest rebooted.
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'struct': 'StandbyStatusInfo',
-> +  'data': {'device': 'str', 'path': 'str', 'enabled': 'bool'} }
-> +
-> +##
-> +# @query-standby-status:
-> +#
-> +# Return Standby status information for all virtio_net devices,
-> +#        or for the given virtio_net device.
-> +#
-> +# @device: Name of the virtio_net device.
-> +#
-> +# Returns: List of @StandbyStatusInfo for all virtio_net devices,
-> +#          or for the given virtio_net device.
-> +#          Returns an error if the given @device doesn't exist.
-> +#
-> +# Since: 4.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-standby-status", "arguments": { "device": "net0" } }
-> +# <- { "return": [
-> +#                  { 'device': 'net0',
-> +#                    'path': '/machine/peripheral/net0/virtio-backend',
-> +#                    'enabled': 'true'
-> +#                  }
-> +#                ]
-> +#    }
-> +#
-> +##
-> +{ 'command': 'query-standby-status', 'data': { '*device': 'str' },
-> +  'returns': ['StandbyStatusInfo'] }
+Right and in fact I don't see why we can't make reporting
+bus master status a capability of all devices.
+
+
+>  Thanks,
+> 
+> Alex
+> 
+> > > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > > > index bd83b58..adcc95a 100644
+> > > > --- a/hw/vfio/pci.c
+> > > > +++ b/hw/vfio/pci.c
+> > > > @@ -34,6 +34,7 @@
+> > > >  #include "pci.h"
+> > > >  #include "trace.h"
+> > > >  #include "qapi/error.h"
+> > > > +#include "qapi/qapi-events-net.h"
+> > > >  
+> > > >  #define MSIX_CAP_LENGTH 12
+> > > >  
+> > > > @@ -42,6 +43,7 @@
+> > > >  
+> > > >  static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+> > > >  static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+> > > > +static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status);
+> > > >  
+> > > >  /*
+> > > >   * Disabling BAR mmaping can be slow, but toggling it around INTx can
+> > > > @@ -1170,6 +1172,8 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> > > >  {
+> > > >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> > > >      uint32_t val_le = cpu_to_le32(val);
+> > > > +    bool may_notify = false;
+> > > > +    bool master_was = false;
+> > > >  
+> > > >      trace_vfio_pci_write_config(vdev->vbasedev.name, addr, val, len);
+> > > >  
+> > > > @@ -1180,6 +1184,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> > > >                       __func__, vdev->vbasedev.name, addr, val, len);
+> > > >      }
+> > > >  
+> > > > +    /* Bus Master Enabling/Disabling */
+> > > > +    if (pdev->failover_primary && current_cpu &&
+> > > > +        range_covers_byte(addr, len, PCI_COMMAND)) {
+> > > > +        master_was = !!(pci_get_word(pdev->config + PCI_COMMAND) &
+> > > > +                        PCI_COMMAND_MASTER);
+> > > > +        may_notify = true;
+> > > > +    }
+> > > > +
+> > > >      /* MSI/MSI-X Enabling/Disabling */
+> > > >      if (pdev->cap_present & QEMU_PCI_CAP_MSI &&
+> > > >          ranges_overlap(addr, len, pdev->msi_cap, vdev->msi_cap_size)) {
+> > > > @@ -1235,6 +1247,14 @@ void vfio_pci_write_config(PCIDevice *pdev,
+> > > >          /* Write everything to QEMU to keep emulated bits correct */
+> > > >          pci_default_write_config(pdev, addr, val, len);
+> > > >      }
+> > > > +
+> > > > +    if (may_notify) {
+> > > > +        bool master_now = !!(pci_get_word(pdev->config + PCI_COMMAND) &
+> > > > +                             PCI_COMMAND_MASTER);
+> > > > +        if (master_was != master_now) {
+> > > > +            vfio_failover_notify(vdev, master_now);
+> > > > +        }
+> > > > +    }
+> > > >  }
+> > > >  
+> > > >  /*
+> > > > @@ -2801,6 +2821,17 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+> > > >      vdev->req_enabled = false;
+> > > >  }
+> > > >  
+> > > > +static void vfio_failover_notify(VFIOPCIDevice *vdev, bool status)
+> > > > +{
+> > > > +    PCIDevice *pdev = &vdev->pdev;
+> > > > +    const char *n;
+> > > > +    gchar *path;
+> > > > +
+> > > > +    n = pdev->qdev.id ? pdev->qdev.id : vdev->vbasedev.name;
+> > > > +    path = object_get_canonical_path(OBJECT(vdev));
+> > > > +    qapi_event_send_failover_primary_changed(!!n, n, path, status);
+> > > > +}
+> > > > +
+> > > >  static void vfio_realize(PCIDevice *pdev, Error **errp)
+> > > >  {
+> > > >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> > > > @@ -3109,10 +3140,36 @@ static void vfio_instance_finalize(Object *obj)
+> > > >      vfio_put_group(group);
+> > > >  }
+> > > >  
+> > > > +static void vfio_exit_failover_notify(VFIOPCIDevice *vdev)
+> > > > +{
+> > > > +    PCIDevice *pdev = &vdev->pdev;
+> > > > +
+> > > > +    /*
+> > > > +     * Guest driver may not get the chance to disable bus mastering
+> > > > +     * before the device object gets to be unrealized. In that event,
+> > > > +     * send out a "disabled" notification on behalf of guest driver.
+> > > > +     */
+> > > > +    if (pdev->failover_primary &&
+> > > > +        pdev->bus_master_enable_region.enabled) {
+> > > > +        vfio_failover_notify(vdev, false);
+> > > > +    }
+> > > > +}
+> > > > +
+> > > >  static void vfio_exitfn(PCIDevice *pdev)
+> > > >  {
+> > > >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> > > >  
+> > > > +    /*
+> > > > +     * During the guest reboot sequence, it is sometimes possible that
+> > > > +     * the guest may not get sufficient time to complete the entire driver
+> > > > +     * removal sequence, near the end of which a PCI config space write to
+> > > > +     * disable bus mastering can be intercepted by device. In such cases,
+> > > > +     * the FAILOVER_PRIMARY_CHANGED "disable" event will not be emitted. It
+> > > > +     * is imperative to generate the event on the guest's behalf if the
+> > > > +     * guest fails to make it.
+> > > > +     */
+> > > > +    vfio_exit_failover_notify(vdev);
+> > > > +
+> > > >      vfio_unregister_req_notifier(vdev);
+> > > >      vfio_unregister_err_notifier(vdev);
+> > > >      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+> > > > diff --git a/qapi/net.json b/qapi/net.json
+> > > > index 633ac87..a5b8d70 100644
+> > > > --- a/qapi/net.json
+> > > > +++ b/qapi/net.json
+> > > > @@ -757,3 +757,29 @@
+> > > >  ##
+> > > >  { 'command': 'query-standby-status', 'data': { '*device': 'str' },
+> > > >    'returns': ['StandbyStatusInfo'] }
+> > > > +
+> > > > +##
+> > > > +# @FAILOVER_PRIMARY_CHANGED:
+> > > > +#
+> > > > +# Emitted whenever the driver of failover primary is loaded or unloaded
+> > > > +# by the guest.
+> > > > +#
+> > > > +# @device: device name
+> > > > +#
+> > > > +# @path: device path
+> > > > +#
+> > > > +# @enabled: true if driver is loaded thus device is enabled in guest
+> > > > +#
+> > > > +# Since: 3.0
+> > > > +#
+> > > > +# Example:
+> > > > +#
+> > > > +# <- { "event": "FAILOVER_PRIMARY_CHANGED",
+> > > > +#      "data": { "device": "vfio-0",
+> > > > +#                "path": "/machine/peripheral/vfio-0" },
+> > > > +#                "enabled": "true" },
+> > > > +#      "timestamp": { "seconds": 1539935213, "microseconds": 753529 } }
+> > > > +#
+> > > > +##
+> > > > +{ 'event': 'FAILOVER_PRIMARY_CHANGED',
+> > > > +  'data': { '*device': 'str', 'path': 'str', 'enabled': 'bool' } }
+> > > >   
