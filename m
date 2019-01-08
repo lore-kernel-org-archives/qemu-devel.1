@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42560)
+Received: from eggs.gnu.org ([209.51.188.92]:42680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1ggsgY-0004M7-AM
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:48:54 -0500
+	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
+	id 1ggsgx-0004hG-6K
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:49:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1ggsgW-0008FZ-Au
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:48:53 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:41446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1ggsgV-0008A9-1t
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:48:52 -0500
-References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
-	<1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
-	<20190102131841.GO24009@stefanha-x1.localdomain>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <324f45ae-d537-180d-c6aa-92410b9cee6c@oracle.com>
-Date: Tue, 8 Jan 2019 14:48:44 +0000
+	(envelope-from <prvs=904727a53=Paul.Durrant@citrix.com>)
+	id 1ggsgu-0000dF-Up
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 09:49:18 -0500
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Tue, 8 Jan 2019 14:48:51 +0000
+Message-ID: <20190108144903.8249-7-paul.durrant@citrix.com>
+In-Reply-To: <20190108144903.8249-1-paul.durrant@citrix.com>
+References: <20190108144903.8249-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <20190102131841.GO24009@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 4/4] pvh: Boot uncompressed kernel using
- direct boot ABI
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v9 06/18] xen: add grant table interface for
+ XenDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +25,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net, xen-devel@lists.xenproject.org, sgarzare@redhat.com, mst@redhat.com, maran.wilson@oracle.com, george.kennedy@oracle.com, boris.ostrovsky@oracle.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
 
+The legacy PV backend infrastructure provides functions to map, unmap and
+copy pages granted by frontends. Similar functionality will be required
+by XenDevice implementations so this patch adds the necessary support.
 
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/xen/xen-bus.c         | 146 +++++++++++++++++++++++++++++++++++++++
+ include/hw/xen/xen-bus.h |  25 +++++++
+ 2 files changed, 171 insertions(+)
 
-On 02/01/2019 13:18, Stefan Hajnoczi wrote:
-> On Fri, Dec 21, 2018 at 08:03:52PM +0000, Liam Merwick wrote:
->> @@ -1336,7 +1470,7 @@ void pc_memory_init(PCMachineState *pcms,
->>       int linux_boot, i;
->>       MemoryRegion *ram, *option_rom_mr;
->>       MemoryRegion *ram_below_4g, *ram_above_4g;
->> -    FWCfgState *fw_cfg;
->> +    FWCfgState *fw_cfg = NULL;
-> 
-> What is the purpose of this change?
-> 
-
-I've removed this. There is no need for it - it dated from when these 
-changes used the Clear Containers -nofw patches.
-
-Regards,
-Liam
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index 5e19592190..faa9fd3577 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -485,6 +485,138 @@ static void xen_device_frontend_destroy(XenDevice *xendev)
+     }
+ }
+ 
++void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
++                                   Error **errp)
++{
++    if (xengnttab_set_max_grants(xendev->xgth, nr_refs)) {
++        error_setg_errno(errp, errno, "xengnttab_set_max_grants failed");
++    }
++}
++
++void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
++                                unsigned int nr_refs, int prot,
++                                Error **errp)
++{
++    void *map = xengnttab_map_domain_grant_refs(xendev->xgth, nr_refs,
++                                                xendev->frontend_id, refs,
++                                                prot);
++
++    if (!map) {
++        error_setg_errno(errp, errno,
++                         "xengnttab_map_domain_grant_refs failed");
++    }
++
++    return map;
++}
++
++void xen_device_unmap_grant_refs(XenDevice *xendev, void *map,
++                                 unsigned int nr_refs, Error **errp)
++{
++    if (xengnttab_unmap(xendev->xgth, map, nr_refs)) {
++        error_setg_errno(errp, errno, "xengnttab_unmap failed");
++    }
++}
++
++static void compat_copy_grant_refs(XenDevice *xendev, bool to_domain,
++                                   XenDeviceGrantCopySegment segs[],
++                                   unsigned int nr_segs, Error **errp)
++{
++    uint32_t *refs = g_new(uint32_t, nr_segs);
++    int prot = to_domain ? PROT_WRITE : PROT_READ;
++    void *map;
++    unsigned int i;
++
++    for (i = 0; i < nr_segs; i++) {
++        XenDeviceGrantCopySegment *seg = &segs[i];
++
++        refs[i] = to_domain ? seg->dest.foreign.ref :
++            seg->source.foreign.ref;
++    }
++
++    map = xengnttab_map_domain_grant_refs(xendev->xgth, nr_segs,
++                                          xendev->frontend_id, refs,
++                                          prot);
++    if (!map) {
++        error_setg_errno(errp, errno,
++                         "xengnttab_map_domain_grant_refs failed");
++        goto done;
++    }
++
++    for (i = 0; i < nr_segs; i++) {
++        XenDeviceGrantCopySegment *seg = &segs[i];
++        void *page = map + (i * XC_PAGE_SIZE);
++
++        if (to_domain) {
++            memcpy(page + seg->dest.foreign.offset, seg->source.virt,
++                   seg->len);
++        } else {
++            memcpy(seg->dest.virt, page + seg->source.foreign.offset,
++                   seg->len);
++        }
++    }
++
++    if (xengnttab_unmap(xendev->xgth, map, nr_segs)) {
++        error_setg_errno(errp, errno, "xengnttab_unmap failed");
++    }
++
++done:
++    g_free(refs);
++}
++
++void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
++                                XenDeviceGrantCopySegment segs[],
++                                unsigned int nr_segs, Error **errp)
++{
++    xengnttab_grant_copy_segment_t *xengnttab_segs;
++    unsigned int i;
++
++    if (!xendev->feature_grant_copy) {
++        compat_copy_grant_refs(xendev, to_domain, segs, nr_segs, errp);
++        return;
++    }
++
++    xengnttab_segs = g_new0(xengnttab_grant_copy_segment_t, nr_segs);
++
++    for (i = 0; i < nr_segs; i++) {
++        XenDeviceGrantCopySegment *seg = &segs[i];
++        xengnttab_grant_copy_segment_t *xengnttab_seg = &xengnttab_segs[i];
++
++        if (to_domain) {
++            xengnttab_seg->flags = GNTCOPY_dest_gref;
++            xengnttab_seg->dest.foreign.domid = xendev->frontend_id;
++            xengnttab_seg->dest.foreign.ref = seg->dest.foreign.ref;
++            xengnttab_seg->dest.foreign.offset = seg->dest.foreign.offset;
++            xengnttab_seg->source.virt = seg->source.virt;
++        } else {
++            xengnttab_seg->flags = GNTCOPY_source_gref;
++            xengnttab_seg->source.foreign.domid = xendev->frontend_id;
++            xengnttab_seg->source.foreign.ref = seg->source.foreign.ref;
++            xengnttab_seg->source.foreign.offset =
++                seg->source.foreign.offset;
++            xengnttab_seg->dest.virt = seg->dest.virt;
++        }
++
++        xengnttab_seg->len = seg->len;
++    }
++
++    if (xengnttab_grant_copy(xendev->xgth, nr_segs, xengnttab_segs)) {
++        error_setg_errno(errp, errno, "xengnttab_grant_copy failed");
++        goto done;
++    }
++
++    for (i = 0; i < nr_segs; i++) {
++        xengnttab_grant_copy_segment_t *xengnttab_seg = &xengnttab_segs[i];
++
++        if (xengnttab_seg->status != GNTST_okay) {
++            error_setg(errp, "xengnttab_grant_copy seg[%u] failed", i);
++            break;
++        }
++    }
++
++done:
++    g_free(xengnttab_segs);
++}
++
+ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+ {
+     XenDevice *xendev = XEN_DEVICE(dev);
+@@ -509,6 +641,11 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+     xen_device_frontend_destroy(xendev);
+     xen_device_backend_destroy(xendev);
+ 
++    if (xendev->xgth) {
++        xengnttab_close(xendev->xgth);
++        xendev->xgth = NULL;
++    }
++
+     g_free(xendev->name);
+     xendev->name = NULL;
+ }
+@@ -551,6 +688,15 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
+ 
+     trace_xen_device_realize(type, xendev->name);
+ 
++    xendev->xgth = xengnttab_open(NULL, 0);
++    if (!xendev->xgth) {
++        error_setg_errno(errp, errno, "failed xengnttab_open");
++        goto unrealize;
++    }
++
++    xendev->feature_grant_copy =
++        (xengnttab_grant_copy(xendev->xgth, 0, NULL) == 0);
++
+     xen_device_backend_create(xendev, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index df73674fcd..63a09b67ee 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -24,6 +24,8 @@ typedef struct XenDevice {
+     enum xenbus_state backend_state, frontend_state;
+     Notifier exit;
+     XenWatch *frontend_state_watch;
++    xengnttab_handle *xgth;
++    bool feature_grant_copy;
+ } XenDevice;
+ 
+ typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
+@@ -79,4 +81,27 @@ void xen_device_backend_set_state(XenDevice *xendev,
+                                   enum xenbus_state state);
+ enum xenbus_state xen_device_backend_get_state(XenDevice *xendev);
+ 
++void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
++                                   Error **errp);
++void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
++                                unsigned int nr_refs, int prot,
++                                Error **errp);
++void xen_device_unmap_grant_refs(XenDevice *xendev, void *map,
++                                 unsigned int nr_refs, Error **errp);
++
++typedef struct XenDeviceGrantCopySegment {
++    union {
++        void *virt;
++        struct {
++            uint32_t ref;
++            off_t offset;
++        } foreign;
++    } source, dest;
++    size_t len;
++} XenDeviceGrantCopySegment;
++
++void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
++                                XenDeviceGrantCopySegment segs[],
++                                unsigned int nr_segs, Error **errp);
++
+ #endif /* HW_XEN_BUS_H */
+-- 
+2.20.1.2.gb21ebb6
