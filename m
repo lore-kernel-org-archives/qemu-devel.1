@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47904)
+Received: from eggs.gnu.org ([209.51.188.92]:48579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiangyiwen@huawei.com>) id 1ggkZ8-0008D7-Aj
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 01:08:43 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1ggkbk-0001Cs-MV
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 01:11:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiangyiwen@huawei.com>) id 1ggkZ7-0006b8-5o
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 01:08:42 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:60944 helo=huawei.com)
+	(envelope-from <yan.y.zhao@intel.com>) id 1ggkbg-0003Ue-P4
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 01:11:23 -0500
+Received: from mga03.intel.com ([134.134.136.65]:5703)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jiangyiwen@huawei.com>)
-	id 1ggkZ6-0006H0-QR
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 01:08:41 -0500
-References: <20181210173151.16629-1-dgilbert@redhat.com>
-	<5C1E0380.8060702@huawei.com> <20181226190803.GB5398@redhat.com>
-From: jiangyiwen <jiangyiwen@huawei.com>
-Message-ID: <5C343E58.9080702@huawei.com>
-Date: Tue, 8 Jan 2019 14:08:24 +0800
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1ggkbf-0003Ko-Pe
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 01:11:20 -0500
+From: Zhao Yan <yan.y.zhao@intel.com>
+Date: Tue,  8 Jan 2019 01:03:47 -0500
+Message-Id: <20190108060348.3359-1-yan.y.zhao@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20181226190803.GB5398@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 0/7] virtio-fs: shared file system for
- virtual machines3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] vfio: assign idstr for VFIO's mmaped regions
+ for migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,134 +26,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vivek Goyal <vgoyal@redhat.com>
-Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, sweil@redhat.com, swhiteho@redhat.com, stefanha@redhat.com, miklos@szeredi.hu
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, alex.williamson@redhat.com, Zhao Yan <yan.y.zhao@intel.com>
 
-On 2018/12/27 3:08, Vivek Goyal wrote:
-> On Sat, Dec 22, 2018 at 05:27:28PM +0800, jiangyiwen wrote:
->> On 2018/12/11 1:31, Dr. David Alan Gilbert (git) wrote:
->>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>>
->>> Hi,
->>>   This is the first RFC for the QEMU side of 'virtio-fs';
->>> a new mechanism for mounting host directories into the guest
->>> in a fast, consistent and secure manner.  Our primary use
->>> case is kata containers, but it should be usable in other scenarios
->>> as well.
->>>
->>> There are corresponding patches being posted to Linux kernel,
->>> libfuse and kata lists.
->>>
->>> For a fuller design description, and benchmark numbers, please see
->>> Vivek's posting of the kernel set here:
->>>
->>> https://marc.info/?l=linux-kernel&m=154446243024251&w=2
->>>
->>> We've got a small website with instructions on how to use it, here:
->>>
->>> https://virtio-fs.gitlab.io/
->>>
->>> and all the code is available on gitlab at:
->>>
->>> https://gitlab.com/virtio-fs
->>>
->>> QEMU's changes
->>> --------------
->>>
->>> The QEMU changes are pretty small; 
->>>
->>> There's a new vhost-user device, which is used to carry a stream of
->>> FUSE messages to an external daemon that actually performs
->>> all the file IO.  The FUSE daemon is an external process in order to
->>> achieve better isolation for security and resource control (e.g. number
->>> of file descriptors) and also because it's cleaner than trying to
->>> integrate libfuse into QEMU.
->>>
->>> This device has an extra BAR that contains (up to) 3 regions:
->>>
->>>  a) a DAX mapping range ('the cache') - into which QEMU mmap's
->>>     files on behalf of the external daemon; those files are
->>>     then directly mapped by the guest in a way similar to a DAX
->>>     backed file system;  one advantage of this is that multiple
->>>     guests all accessing the same files should all be sharing
->>>     those pages of host cache.
->>>
->>>  b) An experimental set of mappings for use by a metadata versioning
->>>     daemon;  this mapping is shared between multiple guests and
->>>     the daemon, but only contains a set of version counters that
->>>     allow a guest to quickly tell if its metadata is stale.
->>>
->>> TODO
->>> ----
->>>
->>> This is the first RFC, we know we have a bunch of things to clear up:
->>>
->>>   a) The virtio device specificiation is still in flux and is expected
->>>      to change
->>>
->>>   b) We'd like to find ways of reducing the map/unmap latency for DAX
->>>
->>>   c) The metadata versioning scheme needs to settle out.
->>>
->>>   d) mmap'ing host files has some interesting side effects; for example
->>>      if the file gets truncated by the host and then the guest accesses
->>>      the mapping, KVM can fail the guest hard.
->>>
->>> Dr. David Alan Gilbert (6):
->>>   virtio: Add shared memory capability
->>>   virtio-fs: Add cache BAR
->>>   virtio-fs: Add vhost-user slave commands for mapping
->>>   virtio-fs: Fill in slave commands for mapping
->>>   virtio-fs: Allow mapping of meta data version table
->>>   virtio-fs: Allow mapping of journal
->>>
->>> Stefan Hajnoczi (1):
->>>   virtio: add vhost-user-fs-pci device
->>>
->>>  configure                                   |  10 +
->>>  contrib/libvhost-user/libvhost-user.h       |   3 +
->>>  docs/interop/vhost-user.txt                 |  35 ++
->>>  hw/virtio/Makefile.objs                     |   1 +
->>>  hw/virtio/vhost-user-fs.c                   | 517 ++++++++++++++++++++
->>>  hw/virtio/vhost-user.c                      |  16 +
->>>  hw/virtio/virtio-pci.c                      | 115 +++++
->>>  hw/virtio/virtio-pci.h                      |  19 +
->>>  include/hw/pci/pci.h                        |   1 +
->>>  include/hw/virtio/vhost-user-fs.h           |  79 +++
->>>  include/standard-headers/linux/virtio_fs.h  |  48 ++
->>>  include/standard-headers/linux/virtio_ids.h |   1 +
->>>  include/standard-headers/linux/virtio_pci.h |   9 +
->>>  13 files changed, 854 insertions(+)
->>>  create mode 100644 hw/virtio/vhost-user-fs.c
->>>  create mode 100644 include/hw/virtio/vhost-user-fs.h
->>>  create mode 100644 include/standard-headers/linux/virtio_fs.h
->>>
->>
->> Hi Dave,
->>
->> I encounter a problem after running qemu with virtio-fs,
->>
->> I find I only can mount virtio-fs using the following command:
->> mount -t virtio_fs /dev/null /mnt/virtio_fs/ -o tag=myfs,rootmode=040000,user_id=0,group_id=0
->> or mount -t virtio_fs /dev/null /mnt/virtio_fs/ -o tag=myfs,rootmode=040000,user_id=0,group_id=0,dax
->>
->> Then, I want to know how to use "cache=always" or "cache=none", even "cache=auto", "cache=writeback"?
->>
->> Thanks,
->> Yiwen.
-> 
-> Hi Yiwen,
-> 
-> As of now, cache options are libfuse daemon options. So while starting
-> daemon, specify "-o cache=none" or "-o cache=always" etc. One can not
-> specify caching option at virtio-fs mount time.
-> 
-> Thanks
-> Vivek
-> 
-> .
-> 
+if multiple regions in vfio are mmaped, their corresponding ramblocks
+are like below, i.e. their idstrs are "".
 
-Ok, I get it, thanks.
+(qemu) info ramblock
+Block Name  PSize       Offset               Used            Total
+pc.ram      4 KiB  0x0000000000000000 0x0000000020000000 0x0000000020000000
+            4 KiB  0x0000000021100000 0x0000000020000000 0x0000000020000000
+            4 KiB  0x0000000020900000 0x0000000000800000 0x0000000000800000
+            4 KiB  0x0000000020240000 0x0000000000687000 0x0000000000687000
+            4 KiB  0x00000000200c0000 0x0000000000178000 0x0000000000178000
+pc.bios     4 KiB  0x0000000020000000 0x0000000000040000 0x0000000000040000
+pc.rom      4 KiB  0x0000000020040000 0x0000000000020000 0x0000000000020000
 
-Yiwen.
+This is because ramblocks' idstr are assigned by calling
+vmstate_register_ram(), but memory region of type ram device ptr does not
+call vmstate_register_ram().
+vfio_region_mmap
+        |->memory_region_init_ram_device_ptr
+               |-> memory_region_init_ram_ptr
+
+Without empty idstrs will cause problem to snapshot copying during
+migration, because it uses ramblocks' idstr to identify ramblocks.
+ram_save_setup {
+  …
+  RAMBLOCK_FOREACH(block) {
+      qemu_put_byte(f, strlen(block->idstr));
+      qemu_put_buffer(f, (uint8_t *)block->idstr,strlen(block->idstr));
+      qemu_put_be64(f, block->used_length);
+  }
+  …
+}
+ram_load() {
+    block = qemu_ram_block_by_name(id);
+    if (block) {
+        if (length != block->used_length) {
+            qemu_ram_resize(block, length, &local_err);
+        }
+     ….
+   }
+}
+
+Therefore, in this patch,
+vmstate_register_ram() is called for memory region of type ram ptr,
+also a unique vfioid is assigned to vfio devices across source
+and target vms.
+e.g. in source vm, use qemu parameter
+-device
+vfio-pci,sysfsdev=/sys/bus/pci/devices/0000:00:02.0/
+882cc4da-dede-11e7-9180-078a62063ab1,vfioid=igd
+
+and in target vm, use qemu paramter
+-device
+vfio-pci,sysfsdev=/sys/bus/pci/devices/0000:00:02.0/
+5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd,vfioid=igd
+
+Signed-off-by: Zhao Yan <yan.y.zhao@intel.com>
+---
+ hw/vfio/pci.c                 | 8 +++++++-
+ include/hw/vfio/vfio-common.h | 1 +
+ memory.c                      | 4 ++++
+ 3 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index c0cb1ec289..7bc2ed0752 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2533,7 +2533,12 @@ static void vfio_populate_device(VFIOPCIDevice *vdev, Error **errp)
+     }
+ 
+     for (i = VFIO_PCI_BAR0_REGION_INDEX; i < VFIO_PCI_ROM_REGION_INDEX; i++) {
+-        char *name = g_strdup_printf("%s BAR %d", vbasedev->name, i);
++        char *name;
++        if (vbasedev->vfioid) {
++            name = g_strdup_printf("%s BAR %d", vbasedev->vfioid, i);
++        } else {
++            name = g_strdup_printf("%s BAR %d", vbasedev->name, i);
++        }
+ 
+         ret = vfio_region_setup(OBJECT(vdev), vbasedev,
+                                 &vdev->bars[i].region, i, name);
+@@ -3180,6 +3185,7 @@ static void vfio_instance_init(Object *obj)
+ static Property vfio_pci_dev_properties[] = {
+     DEFINE_PROP_PCI_HOST_DEVADDR("host", VFIOPCIDevice, host),
+     DEFINE_PROP_STRING("sysfsdev", VFIOPCIDevice, vbasedev.sysfsdev),
++    DEFINE_PROP_STRING("vfioid", VFIOPCIDevice, vbasedev.vfioid),
+     DEFINE_PROP_ON_OFF_AUTO("display", VFIOPCIDevice,
+                             display, ON_OFF_AUTO_OFF),
+     DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 1b434d02f6..84bab94f52 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -108,6 +108,7 @@ typedef struct VFIODevice {
+     struct VFIOGroup *group;
+     char *sysfsdev;
+     char *name;
++    char *vfioid;
+     DeviceState *dev;
+     int fd;
+     int type;
+diff --git a/memory.c b/memory.c
+index d14c6dec1d..dbb29fa989 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1588,6 +1588,7 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
+                                 uint64_t size,
+                                 void *ptr)
+ {
++    DeviceState *owner_dev;
+     memory_region_init(mr, owner, name, size);
+     mr->ram = true;
+     mr->terminates = true;
+@@ -1597,6 +1598,9 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
+     /* qemu_ram_alloc_from_ptr cannot fail with ptr != NULL.  */
+     assert(ptr != NULL);
+     mr->ram_block = qemu_ram_alloc_from_ptr(size, ptr, mr, &error_fatal);
++
++    owner_dev = DEVICE(owner);
++    vmstate_register_ram(mr, owner_dev);
+ }
+ 
+ void memory_region_init_ram_device_ptr(MemoryRegion *mr,
+-- 
+2.17.1
