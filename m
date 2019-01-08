@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52423)
+Received: from eggs.gnu.org ([209.51.188.92]:52464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzuR-0007w7-LK
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:45 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzuU-0007z1-8G
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzuQ-00049k-I2
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:43 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41149)
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzuT-0004CS-AG
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:46 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggzuQ-00048a-Cf
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:42 -0500
-Received: by mail-pf1-x441.google.com with SMTP id b7so2607250pfi.8
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:31:42 -0800 (PST)
+	id 1ggzuT-0004Bs-4Y
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:45 -0500
+Received: by mail-pl1-x642.google.com with SMTP id e11so2558029plt.11
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:31:45 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  9 Jan 2019 08:31:00 +1000
-Message-Id: <20190108223129.5570-3-richard.henderson@linaro.org>
+Date: Wed,  9 Jan 2019 08:31:01 +1000
+Message-Id: <20190108223129.5570-4-richard.henderson@linaro.org>
 In-Reply-To: <20190108223129.5570-1-richard.henderson@linaro.org>
 References: <20190108223129.5570-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 02/31] target/arm: Add SCTLR bits through
- ARMv8.5
+Subject: [Qemu-devel] [PATCH v3 03/31] target/arm: Add PAuth active bit to
+ tbflags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +30,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Post v8.4 bits taken from SysReg_v85_xml-00bet8.
+There are 5 bits of state that could be added, but to save
+space within tbflags, add only a single enable bit.
+Helpers will determine the rest of the state at runtime.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ----
-v2: Review fixups from Peter.
+v2: Fix whitespace, comment grammar.
+v3: Rebase on FIELD definition.
 ---
- target/arm/cpu.h | 45 +++++++++++++++++++++++++++++++++------------
- 1 file changed, 33 insertions(+), 12 deletions(-)
+ target/arm/cpu.h           |  1 +
+ target/arm/translate.h     |  2 ++
+ target/arm/helper.c        | 19 +++++++++++++++++++
+ target/arm/translate-a64.c |  1 +
+ 4 files changed, 23 insertions(+)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 8b891bbc30..843d5936ea 100644
+index 843d5936ea..9ad7b2d11e 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -991,12 +991,15 @@ void pmccntr_sync(CPUARMState *env);
- #define SCTLR_A       (1U << 1)
- #define SCTLR_C       (1U << 2)
- #define SCTLR_W       (1U << 3) /* up to v6; RAO in v7 */
--#define SCTLR_SA      (1U << 3)
-+#define SCTLR_nTLSMD_32 (1U << 3) /* v8.2-LSMAOC, AArch32 only */
-+#define SCTLR_SA      (1U << 3) /* AArch64 only */
- #define SCTLR_P       (1U << 4) /* up to v5; RAO in v6 and v7 */
-+#define SCTLR_LSMAOE_32 (1U << 4) /* v8.2-LSMAOC, AArch32 only */
- #define SCTLR_SA0     (1U << 4) /* v8 onward, AArch64 only */
- #define SCTLR_D       (1U << 5) /* up to v5; RAO in v6 */
- #define SCTLR_CP15BEN (1U << 5) /* v7 onward */
- #define SCTLR_L       (1U << 6) /* up to v5; RAO in v6 and v7; RAZ in v8 */
-+#define SCTLR_nAA     (1U << 6) /* when v8.4-LSE is implemented */
- #define SCTLR_B       (1U << 7) /* up to v6; RAZ in v7 */
- #define SCTLR_ITD     (1U << 7) /* v8 onward */
- #define SCTLR_S       (1U << 8) /* up to v6; RAZ in v7 */
-@@ -1004,35 +1007,53 @@ void pmccntr_sync(CPUARMState *env);
- #define SCTLR_R       (1U << 9) /* up to v6; RAZ in v7 */
- #define SCTLR_UMA     (1U << 9) /* v8 onward, AArch64 only */
- #define SCTLR_F       (1U << 10) /* up to v6 */
--#define SCTLR_SW      (1U << 10) /* v7 onward */
--#define SCTLR_Z       (1U << 11)
-+#define SCTLR_SW      (1U << 10) /* v7, RES0 in v8 */
-+#define SCTLR_Z       (1U << 11) /* in v7, RES1 in v8 */
-+#define SCTLR_EOS     (1U << 11) /* v8.5-ExS */
- #define SCTLR_I       (1U << 12)
--#define SCTLR_V       (1U << 13)
-+#define SCTLR_V       (1U << 13) /* AArch32 only */
-+#define SCTLR_EnDB    (1U << 13) /* v8.3, AArch64 only */
- #define SCTLR_RR      (1U << 14) /* up to v7 */
- #define SCTLR_DZE     (1U << 14) /* v8 onward, AArch64 only */
- #define SCTLR_L4      (1U << 15) /* up to v6; RAZ in v7 */
- #define SCTLR_UCT     (1U << 15) /* v8 onward, AArch64 only */
- #define SCTLR_DT      (1U << 16) /* up to ??, RAO in v6 and v7 */
- #define SCTLR_nTWI    (1U << 16) /* v8 onward */
--#define SCTLR_HA      (1U << 17)
-+#define SCTLR_HA      (1U << 17) /* up to v7, RES0 in v8 */
- #define SCTLR_BR      (1U << 17) /* PMSA only */
- #define SCTLR_IT      (1U << 18) /* up to ??, RAO in v6 and v7 */
- #define SCTLR_nTWE    (1U << 18) /* v8 onward */
- #define SCTLR_WXN     (1U << 19)
- #define SCTLR_ST      (1U << 20) /* up to ??, RAZ in v6 */
--#define SCTLR_UWXN    (1U << 20) /* v7 onward */
--#define SCTLR_FI      (1U << 21)
--#define SCTLR_U       (1U << 22)
-+#define SCTLR_UWXN    (1U << 20) /* v7 onward, AArch32 only */
-+#define SCTLR_FI      (1U << 21) /* up to v7, v8 RES0 */
-+#define SCTLR_IESB    (1U << 21) /* v8.2-IESB, AArch64 only */
-+#define SCTLR_U       (1U << 22) /* up to v6, RAO in v7 */
-+#define SCTLR_EIS     (1U << 22) /* v8.5-ExS */
- #define SCTLR_XP      (1U << 23) /* up to v6; v7 onward RAO */
-+#define SCTLR_SPAN    (1U << 23) /* v8.1-PAN */
- #define SCTLR_VE      (1U << 24) /* up to v7 */
- #define SCTLR_E0E     (1U << 24) /* v8 onward, AArch64 only */
- #define SCTLR_EE      (1U << 25)
- #define SCTLR_L2      (1U << 26) /* up to v6, RAZ in v7 */
- #define SCTLR_UCI     (1U << 26) /* v8 onward, AArch64 only */
--#define SCTLR_NMFI    (1U << 27)
--#define SCTLR_TRE     (1U << 28)
--#define SCTLR_AFE     (1U << 29)
--#define SCTLR_TE      (1U << 30)
-+#define SCTLR_NMFI    (1U << 27) /* up to v7, RAZ in v7VE and v8 */
-+#define SCTLR_EnDA    (1U << 27) /* v8.3, AArch64 only */
-+#define SCTLR_TRE     (1U << 28) /* AArch32 only */
-+#define SCTLR_nTLSMD_64 (1U << 28) /* v8.2-LSMAOC, AArch64 only */
-+#define SCTLR_AFE     (1U << 29) /* AArch32 only */
-+#define SCTLR_LSMAOE_64 (1U << 29) /* v8.2-LSMAOC, AArch64 only */
-+#define SCTLR_TE      (1U << 30) /* AArch32 only */
-+#define SCTLR_EnIB    (1U << 30) /* v8.3, AArch64 only */
-+#define SCTLR_EnIA    (1U << 31) /* v8.3, AArch64 only */
-+#define SCTLR_BT0     (1ULL << 35) /* v8.5-BTI */
-+#define SCTLR_BT1     (1ULL << 36) /* v8.5-BTI */
-+#define SCTLR_ITFSB   (1ULL << 37) /* v8.5-MemTag */
-+#define SCTLR_TCF0    (3ULL << 38) /* v8.5-MemTag */
-+#define SCTLR_TCF     (3ULL << 40) /* v8.5-MemTag */
-+#define SCTLR_ATA0    (1ULL << 42) /* v8.5-MemTag */
-+#define SCTLR_ATA     (1ULL << 43) /* v8.5-MemTag */
-+#define SCTLR_DSSBS   (1ULL << 44) /* v8.5 */
+@@ -3014,6 +3014,7 @@ FIELD(TBFLAG_A64, TBI0, 0, 1)
+ FIELD(TBFLAG_A64, TBI1, 1, 1)
+ FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
+ FIELD(TBFLAG_A64, ZCR_LEN, 4, 4)
++FIELD(TBFLAG_A64, PAUTH_ACTIVE, 8, 1)
  
- #define CPTR_TCPAC    (1U << 31)
- #define CPTR_TTA      (1U << 20)
+ static inline bool bswap_code(bool sctlr_b)
+ {
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 1550aa8bc7..d8a8bb4e9c 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -68,6 +68,8 @@ typedef struct DisasContext {
+     bool is_ldex;
+     /* True if a single-step exception will be taken to the current EL */
+     bool ss_same_el;
++    /* True if v8.3-PAuth is active.  */
++    bool pauth_active;
+     /* Bottom two bits of XScale c15_cpar coprocessor access control reg */
+     int c15_cpar;
+     /* TCG op of the current insn_start.  */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f00c141ef9..f23555b1dc 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -12983,6 +12983,25 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+             flags = FIELD_DP32(flags, TBFLAG_A64, SVEEXC_EL, sve_el);
+             flags = FIELD_DP32(flags, TBFLAG_A64, ZCR_LEN, zcr_len);
+         }
++
++        if (cpu_isar_feature(aa64_pauth, cpu)) {
++            /*
++             * In order to save space in flags, we record only whether
++             * pauth is "inactive", meaning all insns are implemented as
++             * a nop, or "active" when some action must be performed.
++             * The decision of which action to take is left to a helper.
++             */
++            uint64_t sctlr;
++            if (current_el == 0) {
++                /* FIXME: ARMv8.1-VHE S2 translation regime.  */
++                sctlr = env->cp15.sctlr_el[1];
++            } else {
++                sctlr = env->cp15.sctlr_el[current_el];
++            }
++            if (sctlr & (SCTLR_EnIA | SCTLR_EnIB | SCTLR_EnDA | SCTLR_EnDB)) {
++                flags = FIELD_DP32(flags, TBFLAG_A64, PAUTH_ACTIVE, 1);
++            }
++        }
+     } else {
+         *pc = env->regs[15];
+         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index b7b6ab6371..37a57af715 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -13409,6 +13409,7 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+     dc->fp_excp_el = FIELD_EX32(tb_flags, TBFLAG_ANY, FPEXC_EL);
+     dc->sve_excp_el = FIELD_EX32(tb_flags, TBFLAG_A64, SVEEXC_EL);
+     dc->sve_len = (FIELD_EX32(tb_flags, TBFLAG_A64, ZCR_LEN) + 1) * 16;
++    dc->pauth_active = FIELD_EX32(tb_flags, TBFLAG_A64, PAUTH_ACTIVE);
+     dc->vec_len = 0;
+     dc->vec_stride = 0;
+     dc->cp_regs = arm_cpu->cp_regs;
 -- 
 2.17.2
