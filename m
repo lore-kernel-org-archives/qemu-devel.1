@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56910)
+Received: from eggs.gnu.org ([209.51.188.92]:57407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ggtEe-0006V9-R0
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:24:10 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ggtGf-0007LQ-DJ
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:26:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ggtEd-0001gV-Ku
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:24:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ggtEd-0001Zk-Ax
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:24:07 -0500
-Date: Tue, 8 Jan 2019 08:23:50 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190108082350.1f4902f4@x1.home>
-In-Reply-To: <20190108114720.21760-6-peterx@redhat.com>
-References: <20190108114720.21760-1-peterx@redhat.com>
-	<20190108114720.21760-6-peterx@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1ggtGd-00062j-H7
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:26:13 -0500
+Date: Tue, 8 Jan 2019 16:25:51 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190108152551.GF11492@linux.fritz.box>
+References: <20181220171439.11159-1-paul.durrant@citrix.com>
+	<20181220171439.11159-17-paul.durrant@citrix.com>
+	<20190104163124.GE1508@perard.uk.xensource.com>
+	<da727b0b8a9a4f9baa47a660298a9cba@AMSPEX02CL03.citrite.net>
+	<20190108125321.GD11492@linux.fritz.box>
+	<904d305f8c0f4aac8e60fb7ea14ebd41@AMSPEX02CL03.citrite.net>
+	<20190108132823.GF1508@perard.uk.xensource.com>
+	<cc64da25a6a3418e8d36c6975fe2df45@AMSPEX02CL03.citrite.net>
+	<3d36565f9e7646d08f9b02bf5b5474d7@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] vfio: retry one more time
- conditionally for type1 unmap
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3d36565f9e7646d08f9b02bf5b5474d7@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [PATCH v7 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,120 +31,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eric Auger <eric.auger@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-On Tue,  8 Jan 2019 19:47:20 +0800
-Peter Xu <peterx@redhat.com> wrote:
-
-> In Linux version v4.15+ there's a bug (introduced in 71a7d3d78e3c,
-> "vfio/type1: silence integer overflow warning", 2017-10-20) that could
-> potentially reject a valid unmap region that covers exactly the whole
-> u64 address space (like iova=0xfef00000, size=2^64-0xfef00000).
-> Besides a fix on the kernel side, QEMU also needs to live well even
-> with the old kernels.  When booting a guest with both vfio-pci and
-> intel-iommu device, we can see error dumped:
+Am 08.01.2019 um 15:20 hat Paul Durrant geschrieben:
+> > -----Original Message-----
+> > From: Xen-devel [mailto:xen-devel-bounces@lists.xenproject.org] On Behalf
+> > Of Paul Durrant
+> > Sent: 08 January 2019 14:11
+> > To: Anthony Perard <anthony.perard@citrix.com>
+> > Cc: 'Kevin Wolf' <kwolf@redhat.com>; Stefano Stabellini
+> > <sstabellini@kernel.org>; qemu-block@nongnu.org; qemu-devel@nongnu.org;
+> > Max Reitz <mreitz@redhat.com>; xen-devel@lists.xenproject.org
+> > Subject: Re: [Xen-devel] [PATCH v7 16/18] xen: automatically create
+> > XenBlockDevice-s
+> > 
+> > > -----Original Message-----
+> > > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > > Sent: 08 January 2019 13:28
+> > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > Cc: 'Kevin Wolf' <kwolf@redhat.com>; qemu-devel@nongnu.org; qemu-
+> > > block@nongnu.org; xen-devel@lists.xenproject.org; Max Reitz
+> > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> > > Subject: Re: [PATCH v7 16/18] xen: automatically create XenBlockDevice-s
+> > >
+> > > On Tue, Jan 08, 2019 at 01:07:49PM +0000, Paul Durrant wrote:
+> > > > > -----Original Message-----
+> > > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > > > Sent: 08 January 2019 12:53
+> > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > > Cc: Anthony Perard <anthony.perard@citrix.com>; qemu-
+> > devel@nongnu.org;
+> > > > > qemu-block@nongnu.org; xen-devel@lists.xenproject.org; Max Reitz
+> > > > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> > > > > Subject: Re: [PATCH v7 16/18] xen: automatically create
+> > > XenBlockDevice-s
+> > > > >
+> > > > > Am 04.01.2019 um 17:40 hat Paul Durrant geschrieben:
+> > > > > > > -----Original Message-----
+> > > > > > > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > > > > > > Sent: 04 January 2019 16:31
+> > > > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > > > > Cc: qemu-devel@nongnu.org; qemu-block@nongnu.org; xen-
+> > > > > > > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max
+> > > Reitz
+> > > > > > > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
+> > > > > > > Subject: Re: [PATCH v7 16/18] xen: automatically create
+> > > > > XenBlockDevice-s
+> > > > > > >
+> > > > > > > Almost done, there is one thing left which I believe is an
+> > issue.
+> > > > > > > Whenever I attach a raw file to QEMU, it print:
+> > > > > > >     qemu-system-i386: warning: Opening a block device as a file
+> > > using
+> > > > > the
+> > > > > > > 'file' driver is deprecated
+> > > > > >
+> > > > > > Oh, I'd not noticed that... but then I only use raw files
+> > > occasionally.
+> > > > >
+> > > > > Strictly speaking, this is not about raw (regular) files, but raw
+> > > block
+> > > > > devices. 'file' is fine for actual regular files, but the protocol
+> > > > > driver for block devices is 'host_device'.
+> > > > >
+> > > > > > > raw files should use the "raw" driver, so we aren't done yet.
+> > > > > >
+> > > > > > Ok. Having a strictly 2-layer stack actually makes things simpler
+> > > anyway
+> > > > > :-)
+> > > > >
+> > > > > Using 'raw' there will make the block layer auto-detect the right
+> > > > > protocol layer, so this works. If you want to avoid the second
+> > layer,
+> > > > > you'd have to figure out manually whether to use 'file' or
+> > > > > 'host_device'.
+> > > >
+> > > > Thanks for the explanation. I'll give it a spin using a device... I've
+> > > posted v8 but, given what you say, I'm still not sure I have it right.
+> > >
+> > > Indeed, in v8, even with the extra 'raw' layer, the warning is still
+> > > there. I was trying to understand why, and I only found out today that
+> > > we would need to use the 'host_device' driver as explain by Kevin.
+> > >
+> > >
+> > > BTW Paul, we can simplify the code that manage layers, by not managing
+> > > them.
+> > > Instead of (in JSON / QMP term):
+> > >     { 'driver': 'file', 'filename': '/file', 'node-name': 'node-file' }
+> > >     { 'driver': 'qcow2', 'file': 'node-file', 'node-name': 'node-qcow2'
+> > }
+> > > we can have:
+> > >     { 'driver': 'qcow2', 'node-name': 'node-qcow2',
+> > >       'file': { 'driver': 'file', 'filename': '/file' } }
+> > >
+> > 
+> > I kind of like the clean separation though... From what Kevin said, it
+> > sounds like the lowest layer should use 'raw' instead of 'file' to DTRT,
+> > and then we should be back to only needing the single layer in that case.
+> > I'll revert back to v7 and give it a try.
 > 
->   qemu-kvm: VFIO_UNMAP_DMA: -22
->   qemu-kvm: vfio_dma_unmap(0x561f059948f0, 0xfef00000,
->             0xffffffff01100000) = -22 (Invalid argument)
-> 
-> This patch gives another shot of the UNMAP ioctl if the specific error
-> was detected, while in the second UNMAP ioctl we skip the last page
-> assuming that it's never used.  In our case, currently only Intel VT-d
-> is using this code and it should never use the iova address
-> 2^64-4096 (so far largest supported GAW is 57 bits) so ignoring that
-> page should be fine.
-> 
-> After this patch is applied, the errors go away.
-> 
-> Reported-by: Pei Zhang <pezhang@redhat.com>
-> Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1662291
-> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/vfio/common.c     | 16 ++++++++++++++++
->  hw/vfio/trace-events |  1 +
->  2 files changed, 17 insertions(+)
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 7c185e5a2e..7f8de5b7a5 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -221,6 +221,22 @@ static int vfio_dma_unmap(VFIOContainer *container,
->      };
->  
->      if (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
-> +        /*
-> +         * Give it another shot due to a bug in kernel (v4.15-v4.20)
-> +         * that could potentially reject a region that exactly covers
-> +         * the whole u64 address space (71a7d3d78e3c, "vfio/type1:
-> +         * silence integer overflow warning", 2017-10-20).  If that
-> +         * happens, we retry for one more time assuming that the last
-> +         * page of the address space (2^64-getpagesize()) has already
-> +         * been dropped.
-> +         */
-> +        if (errno == EINVAL && unmap.size && unmap.iova + unmap.size == 0) {
-> +            trace_vfio_dma_unmap_workaround_overflow();
-> +            unmap.size -= getpagesize();
-> +            if (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap) == 0) {
-> +                return 0;
-> +            }
-> +        }
->          error_report("VFIO_UNMAP_DMA: %d", -errno);
->          return -errno;
->      }
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index a85e8662ea..2c9db4fb9a 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -110,6 +110,7 @@ vfio_region_mmaps_set_enabled(const char *name, bool enabled) "Region %s mmaps e
->  vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Device %s region %d: %d sparse mmap entries"
->  vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
->  vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
-> +vfio_dma_unmap_workaround_overflow(void) ""
->  
->  # hw/vfio/platform.c
->  vfio_platform_base_device_init(char *name, int groupid) "%s belongs to group #%d"
+> No, that doesn't work as we can't deal with locking correctly unless
+> we use driver=file so maybe I misunderstood.
 
-Hi Peter,
+The lowest layer should use 'host_device' there. 'raw' is the format
+layer that is stacked on top.
 
-I was working on a slightly different version:
+I'm not sure what your locking requirements are, but 'host_device'
+supports the same options as 'file'.
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7c185e5a2e79..9f5a140cb1c3 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -220,7 +220,24 @@ static int vfio_dma_unmap(VFIOContainer *container,
-         .size = size,
-     };
- 
--    if (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
-+    while (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
-+        /*
-+         * The type1 backend has an off-by-one bug in the kernel (71a7d3d78e3c
-+         * v4.15) where its overflow check prevents us from unmapping the last
-+         * page of the address space.  Test for the error condition and re-try
-+         * the unmap excluding the last page.  The expectation is that we've
-+         * never mapped the last page anyway and this unmap request comes via
-+         * vIOMMU support which also makes it unlikely that this page is used.
-+         * This bug was introduced well after type1 v2 support was introduced,
-+         * so we shouldn't need to test for v1.  A fix is proposed for kernel
-+         * v5.0 so this workaround can be removed once affected kernels are
-+         * sufficiently deprecated.
-+         */
-+        if (errno == EINVAL && unmap.size && !(unmap.iova + unmap.size) &&
-+            container->iommu_type == VFIO_TYPE1v2_IOMMU) {
-+            unmap.size -= 1ULL << ctz64(container->pgsizes);
-+            continue;
-+        }
-         error_report("VFIO_UNMAP_DMA: %d", -errno);
-         return -errno;
-     }
-
-I like your addition of tracing, but I prefer the type1v2 test (the
-bug is specific to the type1 backend) and using the iommu minimum page
-size rather than the cpu page size.  Do you want to incorporate or
-would you prefer I post mine?  Thanks,
-
-Alex
+Kevin
