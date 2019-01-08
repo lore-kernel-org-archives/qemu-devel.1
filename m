@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52523)
+Received: from eggs.gnu.org ([209.51.188.92]:52552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzub-00087Q-Lv
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:54 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzue-0008AY-9L
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ggzua-0004Lt-Nj
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:53 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:37883)
+	(envelope-from <richard.henderson@linaro.org>) id 1ggzud-0004Px-Gh
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:56 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35300)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ggzua-0004Kg-Hs
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:52 -0500
-Received: by mail-pl1-x643.google.com with SMTP id b5so2568920plr.4
-	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:31:52 -0800 (PST)
+	id 1ggzud-0004P4-Av
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 17:31:55 -0500
+Received: by mail-pl1-x644.google.com with SMTP id p8so2576248plo.2
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 14:31:55 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  9 Jan 2019 08:31:04 +1000
-Message-Id: <20190108223129.5570-7-richard.henderson@linaro.org>
+Date: Wed,  9 Jan 2019 08:31:05 +1000
+Message-Id: <20190108223129.5570-8-richard.henderson@linaro.org>
 In-Reply-To: <20190108223129.5570-1-richard.henderson@linaro.org>
 References: <20190108223129.5570-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 06/31] target/arm: Decode PAuth within
- system hint space
+Subject: [Qemu-devel] [PATCH v3 07/31] target/arm: Rearrange decode in
+ disas_data_proc_1src
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,132 +30,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+Now properly signals unallocated for REV64 with SF=0.
+Allows for the opcode2 field to be decoded shortly.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v3: Use binary literals.
----
- target/arm/translate-a64.c | 93 +++++++++++++++++++++++++++++++++-----
- 1 file changed, 81 insertions(+), 12 deletions(-)
+ target/arm/translate-a64.c | 31 ++++++++++++++++++++++---------
+ 1 file changed, 22 insertions(+), 9 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 37a57af715..b72aea3e97 100644
+index b72aea3e97..dac61a3c3a 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -1471,33 +1471,102 @@ static void handle_hint(DisasContext *s, uint32_t insn,
+@@ -4563,38 +4563,51 @@ static void handle_rev16(DisasContext *s, unsigned int sf,
+  */
+ static void disas_data_proc_1src(DisasContext *s, uint32_t insn)
+ {
+-    unsigned int sf, opcode, rn, rd;
++    unsigned int sf, opcode, opcode2, rn, rd;
+ 
+-    if (extract32(insn, 29, 1) || extract32(insn, 16, 5)) {
++    if (extract32(insn, 29, 1)) {
+         unallocated_encoding(s);
+         return;
      }
  
-     switch (selector) {
--    case 0: /* NOP */
--        return;
--    case 3: /* WFI */
-+    case 0b00000: /* NOP */
-+        break;
-+    case 0b00011: /* WFI */
-         s->base.is_jmp = DISAS_WFI;
--        return;
-+        break;
-+    case 0b00001: /* YIELD */
-         /* When running in MTTCG we don't generate jumps to the yield and
-          * WFE helpers as it won't affect the scheduling of other vCPUs.
-          * If we wanted to more completely model WFE/SEV so we don't busy
-          * spin unnecessarily we would need to do something more involved.
-          */
--    case 1: /* YIELD */
-         if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
-             s->base.is_jmp = DISAS_YIELD;
-         }
--        return;
--    case 2: /* WFE */
-+        break;
-+    case 0b00010: /* WFE */
-         if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
-             s->base.is_jmp = DISAS_WFE;
-         }
--        return;
--    case 4: /* SEV */
--    case 5: /* SEVL */
-+        break;
-+    case 0b00100: /* SEV */
-+    case 0b00101: /* SEVL */
-         /* we treat all as NOP at least for now */
--        return;
-+        break;
-+    case 0b00111: /* XPACLRI */
-+        if (s->pauth_active) {
-+            gen_helper_xpaci(cpu_X[30], cpu_env, cpu_X[30]);
-+        }
-+        break;
-+    case 0b01000: /* PACIA1716 */
-+        if (s->pauth_active) {
-+            gen_helper_pacia(cpu_X[17], cpu_env, cpu_X[17], cpu_X[16]);
-+        }
-+        break;
-+    case 0b01010: /* PACIB1716 */
-+        if (s->pauth_active) {
-+            gen_helper_pacib(cpu_X[17], cpu_env, cpu_X[17], cpu_X[16]);
-+        }
-+        break;
-+    case 0b01100: /* AUTIA1716 */
-+        if (s->pauth_active) {
-+            gen_helper_autia(cpu_X[17], cpu_env, cpu_X[17], cpu_X[16]);
-+        }
-+        break;
-+    case 0b01110: /* AUTIB1716 */
-+        if (s->pauth_active) {
-+            gen_helper_autib(cpu_X[17], cpu_env, cpu_X[17], cpu_X[16]);
-+        }
-+        break;
-+    case 0b11000: /* PACIAZ */
-+        if (s->pauth_active) {
-+            gen_helper_pacia(cpu_X[30], cpu_env, cpu_X[30],
-+                                new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case 0b11001: /* PACIASP */
-+        if (s->pauth_active) {
-+            gen_helper_pacia(cpu_X[30], cpu_env, cpu_X[30], cpu_X[31]);
-+        }
-+        break;
-+    case 0b11010: /* PACIBZ */
-+        if (s->pauth_active) {
-+            gen_helper_pacib(cpu_X[30], cpu_env, cpu_X[30],
-+                                new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case 0b11011: /* PACIBSP */
-+        if (s->pauth_active) {
-+            gen_helper_pacib(cpu_X[30], cpu_env, cpu_X[30], cpu_X[31]);
-+        }
-+        break;
-+    case 0b11100: /* AUTIAZ */
-+        if (s->pauth_active) {
-+            gen_helper_autia(cpu_X[30], cpu_env, cpu_X[30],
-+                              new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case 0b11101: /* AUTIASP */
-+        if (s->pauth_active) {
-+            gen_helper_autia(cpu_X[30], cpu_env, cpu_X[30], cpu_X[31]);
-+        }
-+        break;
-+    case 0b11110: /* AUTIBZ */
-+        if (s->pauth_active) {
-+            gen_helper_autib(cpu_X[30], cpu_env, cpu_X[30],
-+                              new_tmp_a64_zero(s));
-+        }
-+        break;
-+    case 0b11111: /* AUTIBSP */
-+        if (s->pauth_active) {
-+            gen_helper_autib(cpu_X[30], cpu_env, cpu_X[30], cpu_X[31]);
-+        }
-+        break;
-     default:
-         /* default specified as NOP equivalent */
--        return;
+     sf = extract32(insn, 31, 1);
+     opcode = extract32(insn, 10, 6);
++    opcode2 = extract32(insn, 16, 5);
+     rn = extract32(insn, 5, 5);
+     rd = extract32(insn, 0, 5);
+ 
+-    switch (opcode) {
+-    case 0: /* RBIT */
++#define MAP(SF, O2, O1) ((SF) | (O1 << 1) | (O2 << 7))
++
++    switch (MAP(sf, opcode2, opcode)) {
++    case MAP(0, 0x00, 0x00): /* RBIT */
++    case MAP(1, 0x00, 0x00):
+         handle_rbit(s, sf, rn, rd);
+         break;
+-    case 1: /* REV16 */
++    case MAP(0, 0x00, 0x01): /* REV16 */
++    case MAP(1, 0x00, 0x01):
+         handle_rev16(s, sf, rn, rd);
+         break;
+-    case 2: /* REV32 */
++    case MAP(0, 0x00, 0x02): /* REV/REV32 */
++    case MAP(1, 0x00, 0x02):
+         handle_rev32(s, sf, rn, rd);
+         break;
+-    case 3: /* REV64 */
++    case MAP(1, 0x00, 0x03): /* REV64 */
+         handle_rev64(s, sf, rn, rd);
+         break;
+-    case 4: /* CLZ */
++    case MAP(0, 0x00, 0x04): /* CLZ */
++    case MAP(1, 0x00, 0x04):
+         handle_clz(s, sf, rn, rd);
+         break;
+-    case 5: /* CLS */
++    case MAP(0, 0x00, 0x05): /* CLS */
++    case MAP(1, 0x00, 0x05):
+         handle_cls(s, sf, rn, rd);
+         break;
++    default:
++        unallocated_encoding(s);
 +        break;
      }
++
++#undef MAP
  }
  
+ static void handle_div(DisasContext *s, bool is_signed, unsigned int sf,
 -- 
 2.17.2
