@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42549)
+Received: from eggs.gnu.org ([209.51.188.92]:50908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gglvP-0005yx-HK
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:35:48 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1ggmQf-0003BQ-R0
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:08:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gglvO-00028l-VT
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:35:47 -0500
-Received: from mga04.intel.com ([192.55.52.120]:26048)
+	(envelope-from <yang.zhong@intel.com>) id 1ggmQf-0006oh-4U
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:08:05 -0500
+Received: from mga04.intel.com ([192.55.52.120]:28914)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gglvO-0001vt-Ms
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 02:35:46 -0500
-Date: Tue, 8 Jan 2019 15:32:08 +0800
+	id 1ggmQe-0006dJ-QR
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 03:08:05 -0500
+Date: Tue, 8 Jan 2019 16:04:26 +0800
 From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20190108073208.GA27840@yangzhon-Virtual>
+Message-ID: <20190108080426.GB27840@yangzhon-Virtual>
 References: <20181227063419.12981-1-yang.zhong@intel.com>
 	<20181227063419.12981-14-yang.zhong@intel.com>
-	<441bd501-6d1e-8b97-f275-75ad0ca66f25@redhat.com>
+	<fa9d19df-c373-f647-a732-9fc76d9b2f4b@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <441bd501-6d1e-8b97-f275-75ad0ca66f25@redhat.com>
+In-Reply-To: <fa9d19df-c373-f647-a732-9fc76d9b2f4b@redhat.com>
 Subject: Re: [Qemu-devel] [RFC PATCH 13/25] scsi: express dependencies with
  Kconfig
 List-Id: <qemu-devel.nongnu.org>
@@ -30,21 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, Thomas Huth <thuth@redhat.com>, yang.zhong@intel.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com, yang.zhong@intel.com
 
-On Fri, Jan 04, 2019 at 02:38:23PM +0100, Paolo Bonzini wrote:
-> On 27/12/18 07:34, Yang Zhong wrote:
+On Fri, Jan 04, 2019 at 02:39:50PM +0100, Thomas Huth wrote:
+> On 2018-12-27 07:34, Yang Zhong wrote:
 > > From: Paolo Bonzini <pbonzini@redhat.com>
 > > 
 > > This lets you disable SCSI altogether with "CONFIG_SCSI=n".
+> > 
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> > ---
+> >  hw/scsi/Kconfig       | 11 ++++++++++-
+> >  hw/scsi/Makefile.objs |  2 +-
+> >  2 files changed, 11 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
+> > index 6e7575397f..d669a4824e 100644
+> > --- a/hw/scsi/Kconfig
+> > +++ b/hw/scsi/Kconfig
+> >  
+> > -config PSERIES
+> > +config SPAPR_VSCSI
+> >      bool
+> > +    select SCSI
 > 
-> USB_STORAGE_BOT and USB_STORAGE_UAS must also select SCSI.
+> I think this should get "default y" and "depends on PSERIES" now.
 > 
-> Paolo
+>  Thomas
 
-  Thanks for Paolo's reminder, i will add this.
+   Hello Thomas,
+
+   I greped CONFIG_PSERIES from current Kconfig repo and got below list
+  ./hw/net/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_llan.o
+  ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
+  ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
+  ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o
+  ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o spapr_irq.o
+  ./hw/ppc/Makefile.objs:ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+  ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
+  ./hw/char/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_vty.o
+  ./hw/nvram/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_nvram.o
+  ./default-configs/ppc64-softmmu.mak:CONFIG_PSERIES=y
+  ./default-configs/ppc64-softmmu.mak:CONFIG_XICS=$(CONFIG_PSERIES)
+  ./default-configs/ppc64-softmmu.mak:CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+  ./default-configs/ppc64-softmmu.mak:CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+
+  Since this time is only for x86 and i did not add Kconfig file in hw/ppc/, i did not add 
+  this dependency too in here. 
+  
+  In previous plan, i will add "config PSERRIES" in hw/ppc/Kconfig file for PowerPC pSeries
+  and will add dependency in that time, thanks.
 
   Regards,
 
-  Yang 
+  Yang
