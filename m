@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50009)
+Received: from eggs.gnu.org ([209.51.188.92]:51372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gguDz-0000MQ-3s
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:27:34 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gguGf-0002gl-KO
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:30:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gguDu-0005cW-VH
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:27:30 -0500
-Date: Tue, 8 Jan 2019 16:27:06 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190108162706.GI32358@stefanha-x1.localdomain>
-References: <20190107120248.19491-1-kwolf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gguGc-0003iC-IM
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:30:16 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gguGc-0003dj-CF
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:30:14 -0500
+Received: by mail-wr1-x441.google.com with SMTP id v13so4692352wrw.5
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 08:30:13 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  8 Jan 2019 16:30:05 +0000
+Message-Id: <20190108163008.7006-2-peter.maydell@linaro.org>
+In-Reply-To: <20190108163008.7006-1-peter.maydell@linaro.org>
+References: <20190108163008.7006-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ijf6z65S790CMqo8"
-Content-Disposition: inline
-In-Reply-To: <20190107120248.19491-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: Fix hangs in synchronous APIs with
- iothreads
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/4] hw/arm/xlx-zynqmp: Realize cluster after
+ putting RPUs in it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <richard.henderson@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Emilio G . Cota" <cota@braap.org>
 
+Currently the cluster implementation doesn't have any constraints
+on the ordering of realizing the TYPE_CPU_CLUSTER and populating it
+with child objects. We want to impose a constraint that realize
+must happen only after all the child objects are added, so move
+the realize of rpu_cluster. (The apu_cluster is already
+realized after child population.)
 
---ijf6z65S790CMqo8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/xlnx-zynqmp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Mon, Jan 07, 2019 at 01:02:48PM +0100, Kevin Wolf wrote:
-> In the block layer, synchronous APIs are often implemented by creating a
-> coroutine that calls the asynchronous coroutine-based implementation and
-> then waiting for completion with BDRV_POLL_WHILE().
->=20
-> For this to work with iothreads (more specifically, when the synchronous
-> API is called in a thread that is not the home thread of the block
-> device, so that the coroutine will run in a different thread), we must
-> make sure to call aio_wait_kick() at the end of the operation. Many
-> places are missing this, so that BDRV_POLL_WHILE() keeps hanging even if
-> the condition has long become false.
->=20
-> Note that bdrv_dec_in_flight() involves an aio_wait_kick() call. This
-> corresponds to the BDRV_POLL_WHILE() in the drain functions, but it is
-> generally not enough for most other operations because they haven't set
-> the return value in the coroutine entry stub yet. To avoid race
-> conditions there, we need to kick after setting the return value.
->=20
-> The race window is small enough that the problem doesn't usually surface
-> in the common path. However, it does surface and causes easily
-> reproducible hangs if the operation can return early before even calling
-> bdrv_inc/dec_in_flight, which many of them do (trivial error or no-op
-> success paths).
->=20
-> The bug in bdrv_truncate(), bdrv_check() and bdrv_invalidate_cache() is
-> slightly different: These functions even neglected to schedule the
-> coroutine in the home thread of the node. This avoids the hang, but is
-> obviously wrong, too. Fix those to schedule the coroutine in the right
-> AioContext in addition to adding aio_wait_kick() calls.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c                     |   6 +-
->  block/block-backend.c       |   5 +
->  block/io.c                  |   8 +-
->  block/nbd-client.c          |   1 +
->  block/nvme.c                |   1 +
->  block/qcow2.c               |   1 +
->  block/qed.c                 |   1 +
->  tests/test-block-iothread.c | 372 ++++++++++++++++++++++++++++++++++++
->  tests/Makefile.include      |   2 +
->  9 files changed, 394 insertions(+), 3 deletions(-)
->  create mode 100644 tests/test-block-iothread.c
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---ijf6z65S790CMqo8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcNM9aAAoJEJykq7OBq3PIOY8IALau0JFpAYVcvJwhaKaa/TbS
-TIlOFX6s4ykmxTVwWoWFbLXLSeuYQ7mw7t37ugWFDu/NQ4L6M2oEAomkjNVcrWrY
-uf0WSQKHqfpFF07CixUd2prMQoM77XOdVbG9fYx03xOj+/auN81Gl2RBvwc2064l
-d3TfcHstUnRdVfcNpd/pNdWD9tQyRoJ4Pk7Frvc1G+g5OimDk8Ccbz0jIAWnCeig
-+VxyMOYVA1LoGi4VkesjYBBc0XlosPn15lCM+plpH5RzvN5Gpl4ubHi7In3eurkm
-MqQ8EjQCZLkGaaplFlaVIpmhIIo0YD4u3sdh1FYIG8uievqMwtwsS+n3OSoZzUA=
-=jpRS
------END PGP SIGNATURE-----
-
---ijf6z65S790CMqo8--
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index c67ac2e64ac..370b0e44a38 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -183,8 +183,6 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+                             &error_abort, NULL);
+     qdev_prop_set_uint32(DEVICE(&s->rpu_cluster), "cluster-id", 1);
+ 
+-    qdev_init_nofail(DEVICE(&s->rpu_cluster));
+-
+     for (i = 0; i < num_rpus; i++) {
+         char *name;
+ 
+@@ -212,6 +210,8 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+             return;
+         }
+     }
++
++    qdev_init_nofail(DEVICE(&s->rpu_cluster));
+ }
+ 
+ static void xlnx_zynqmp_init(Object *obj)
+-- 
+2.19.2
