@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36649)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ggush-0000s7-Py
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:09:37 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:37642)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1gguuw-00036C-Pz
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:11:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ggusW-00014K-2z
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:09:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ggusQ-0000pu-0U
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:09:19 -0500
-Date: Tue, 8 Jan 2019 10:09:11 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190108100911.6e089f8c@x1.home>
-In-Reply-To: <20190108060348.3359-2-yan.y.zhao@intel.com>
-References: <20190108060348.3359-1-yan.y.zhao@intel.com>
-	<20190108060348.3359-2-yan.y.zhao@intel.com>
+	(envelope-from <n54@gmx.com>) id 1gguut-0006LX-6D
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:11:52 -0500
+Received: from mout.gmx.net ([212.227.15.19]:32981)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gguus-0006Dj-S0
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:11:51 -0500
+References: <20181114130428.32326-1-asanchez@kryptoslogic.com>
+	<1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
+	<adc671f3-808a-59ef-2650-2b558958a00f@gmx.com>
+	<61ab003f-1b0d-c17d-8827-4d31bba0a53e@gmx.com>
+	<6408287c-15b5-3b44-dff8-b628c4244cd2@redhat.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <f5c6f0cc-1e45-c47d-724f-c50b27765f0f@gmx.com>
+Date: Tue, 8 Jan 2019 18:12:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vfio: assign idstr for VFIO's mmaped
- regions for migration
+In-Reply-To: <6408287c-15b5-3b44-dff8-b628c4244cd2@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="09ExMgzsUdpvVmgkxF8rIBBRpEbqm3QY3"
+Subject: Re: [Qemu-devel] [PATCH] hax: Support for Linux hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,151 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhao Yan <yan.y.zhao@intel.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Alexandro Sanchez Bach <asanchez@kryptoslogic.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, yu.ning@intel.com, Richard Henderson <rth@twiddle.net>
 
-On Tue,  8 Jan 2019 01:03:48 -0500
-Zhao Yan <yan.y.zhao@intel.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--09ExMgzsUdpvVmgkxF8rIBBRpEbqm3QY3
+From: Kamil Rytarowski <n54@gmx.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Alexandro Sanchez Bach <asanchez@kryptoslogic.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, yu.ning@intel.com,
+ Richard Henderson <rth@twiddle.net>
+Message-ID: <f5c6f0cc-1e45-c47d-724f-c50b27765f0f@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH] hax: Support for Linux hosts
+References: <20181114130428.32326-1-asanchez@kryptoslogic.com>
+ <1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
+ <adc671f3-808a-59ef-2650-2b558958a00f@gmx.com>
+ <61ab003f-1b0d-c17d-8827-4d31bba0a53e@gmx.com>
+ <6408287c-15b5-3b44-dff8-b628c4244cd2@redhat.com>
+In-Reply-To: <6408287c-15b5-3b44-dff8-b628c4244cd2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> if multiple regions in vfio are mmaped, their corresponding ramblocks
-> are like below, i.e. their idstrs are "".
+On 25.11.2018 18:14, Paolo Bonzini wrote:
+> On 25/11/18 00:50, Kamil Rytarowski wrote:
+>> On 22.11.2018 08:24, Kamil Rytarowski wrote:
+>>> On 16.11.2018 13:52, Paolo Bonzini wrote:
+>>>> On 14/11/18 14:04, Alexandro Sanchez Bach wrote:
+>>>>> Intel HAXM supports now 32-bit and 64-bit Linux hosts. This patch i=
+ncludes
+>>>>> the corresponding userland changes.
+>>>>>
+>>>>> Since the Darwin userland backend is POSIX-compliant, the hax-darwi=
+n.{c,h}
+>>>>> files have been renamed to hax-posix.{c,h}. This prefix is consiste=
+nt with
+>>>>> the naming used in the rest of QEMU.
+>>>>
+>>>> What's the advantage of HAXM when Linux hosts can just run KVM?  I g=
+uess
+>>>> avoiding bitrot?
+>>>>
+>>>> Paolo
+>>>>
+>>>
+>>> This patch is also useful for NetBSD, even if it's not a Linux host.
+>>> There is a driver in progress again (thanks to the newly added Linux
+>>> port, it's now much easier to get done).
+>>>
+>>> I recommend to merge this patch.
+>>>
+>>
+>> For the record, I've a functional version of HAXM for NetBSD as host.
+>> Once you will merge this patch, I will submit another one to configure=
+
+>> to enable haxm for NetBSD.
+>>
+>> I need to keep the patch by Alexandro in a local copy of qemu.
 >=20
-> (qemu) info ramblock
-> Block Name  PSize       Offset               Used            Total
-> pc.ram      4 KiB  0x0000000000000000 0x0000000020000000 0x00000000200000=
-00
->             4 KiB  0x0000000021100000 0x0000000020000000 0x00000000200000=
-00
->             4 KiB  0x0000000020900000 0x0000000000800000 0x00000000008000=
-00
->             4 KiB  0x0000000020240000 0x0000000000687000 0x00000000006870=
-00
->             4 KiB  0x00000000200c0000 0x0000000000178000 0x00000000001780=
-00
-> pc.bios     4 KiB  0x0000000020000000 0x0000000000040000 0x00000000000400=
-00
-> pc.rom      4 KiB  0x0000000020040000 0x0000000000020000 0x00000000000200=
-00
+> Sure, it will be accepted for the release after 3.1.
 >=20
-> This is because ramblocks' idstr are assigned by calling
-> vmstate_register_ram(), but memory region of type ram device ptr does not
-> call vmstate_register_ram().
-> vfio_region_mmap
->         |->memory_region_init_ram_device_ptr
->                |-> memory_region_init_ram_ptr
+> Paolo
 >=20
-> Without empty idstrs will cause problem to snapshot copying during
-> migration, because it uses ramblocks' idstr to identify ramblocks.
-> ram_save_setup {
->   =E2=80=A6
->   RAMBLOCK_FOREACH(block) {
->       qemu_put_byte(f, strlen(block->idstr));
->       qemu_put_buffer(f, (uint8_t *)block->idstr,strlen(block->idstr));
->       qemu_put_be64(f, block->used_length);
->   }
->   =E2=80=A6
-> }
-> ram_load() {
->     block =3D qemu_ram_block_by_name(id);
->     if (block) {
->         if (length !=3D block->used_length) {
->             qemu_ram_resize(block, length, &local_err);
->         }
->      =E2=80=A6.
->    }
-> }
 >=20
-> Therefore, in this patch,
-> vmstate_register_ram() is called for memory region of type ram ptr,
-> also a unique vfioid is assigned to vfio devices across source
-> and target vms.
-> e.g. in source vm, use qemu parameter
-> -device
-> vfio-pci,sysfsdev=3D/sys/bus/pci/devices/0000:00:02.0/
-> 882cc4da-dede-11e7-9180-078a62063ab1,vfioid=3Digd
->=20
-> and in target vm, use qemu paramter
-> -device
-> vfio-pci,sysfsdev=3D/sys/bus/pci/devices/0000:00:02.0/
-> 5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd,vfioid=3Digd
 
-Why wouldn't we just use the id=3D (DeviceState.id) value instead of
-adding yet another one?  I can't imagine anyone, especially libvirt,
-wants to deal with a vfio specific id for a device.
+Ping.
 
-> Signed-off-by: Zhao Yan <yan.y.zhao@intel.com>
-> ---
->  hw/vfio/pci.c                 | 8 +++++++-
->  include/hw/vfio/vfio-common.h | 1 +
->  memory.c                      | 4 ++++
->  3 files changed, 12 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index c0cb1ec289..7bc2ed0752 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2533,7 +2533,12 @@ static void vfio_populate_device(VFIOPCIDevice *vd=
-ev, Error **errp)
->      }
-> =20
->      for (i =3D VFIO_PCI_BAR0_REGION_INDEX; i < VFIO_PCI_ROM_REGION_INDEX=
-; i++) {
-> -        char *name =3D g_strdup_printf("%s BAR %d", vbasedev->name, i);
-> +        char *name;
-> +        if (vbasedev->vfioid) {
-> +            name =3D g_strdup_printf("%s BAR %d", vbasedev->vfioid, i);
-> +        } else {
-> +            name =3D g_strdup_printf("%s BAR %d", vbasedev->name, i);
-> +        }
-> =20
->          ret =3D vfio_region_setup(OBJECT(vdev), vbasedev,
->                                  &vdev->bars[i].region, i, name);
-> @@ -3180,6 +3185,7 @@ static void vfio_instance_init(Object *obj)
->  static Property vfio_pci_dev_properties[] =3D {
->      DEFINE_PROP_PCI_HOST_DEVADDR("host", VFIOPCIDevice, host),
->      DEFINE_PROP_STRING("sysfsdev", VFIOPCIDevice, vbasedev.sysfsdev),
-> +    DEFINE_PROP_STRING("vfioid", VFIOPCIDevice, vbasedev.vfioid),
->      DEFINE_PROP_ON_OFF_AUTO("display", VFIOPCIDevice,
->                              display, ON_OFF_AUTO_OFF),
->      DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index 1b434d02f6..84bab94f52 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -108,6 +108,7 @@ typedef struct VFIODevice {
->      struct VFIOGroup *group;
->      char *sysfsdev;
->      char *name;
-> +    char *vfioid;
->      DeviceState *dev;
->      int fd;
->      int type;
-> diff --git a/memory.c b/memory.c
-> index d14c6dec1d..dbb29fa989 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1588,6 +1588,7 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
->                                  uint64_t size,
->                                  void *ptr)
->  {
-> +    DeviceState *owner_dev;
->      memory_region_init(mr, owner, name, size);
->      mr->ram =3D true;
->      mr->terminates =3D true;
-> @@ -1597,6 +1598,9 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
->      /* qemu_ram_alloc_from_ptr cannot fail with ptr !=3D NULL.  */
->      assert(ptr !=3D NULL);
->      mr->ram_block =3D qemu_ram_alloc_from_ptr(size, ptr, mr, &error_fata=
-l);
-> +
-> +    owner_dev =3D DEVICE(owner);
-> +    vmstate_register_ram(mr, owner_dev);
 
-Where does the corresponding vmstate_unregister_ram() call occur when
-unplugged?  Thanks,
+--09ExMgzsUdpvVmgkxF8rIBBRpEbqm3QY3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Alex
+-----BEGIN PGP SIGNATURE-----
 
->  }
-> =20
->  void memory_region_init_ram_device_ptr(MemoryRegion *mr,
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlw02gAMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZs6awQAJVn+QzHnRXaIesg5LFMAL2F/mcy6QhEGiAQbKMj
+aZfMwp2hKmFP+aaipyi/Rr9dZck65Kj2uLhvfO/WlvPRqAs4X0RM8/sUkCiVJBHe
+h4Vilt5b/7DOgyeiDSaHBaNegTti7uF0atOdQIbq6OqaWwYEYqx1OWpqlIWSzVu4
+fWsBamXWOLDBfxTfT6D0wXK/L/x6aWe2EMHqjpAcS/0J39h3Ym9D07uE1+QA062I
+XYDt7M6Avg22zLpmvZwba980mFTL7XK/fYzY34tLrja99dYZAe8MMcQpFX1oVL30
+hmQm98GKffehTvPoy3UQs82ojvtifmzRNeAdJQ0pCUITn2mehgpGAwMr53dQhh6k
+IrDmRbjViaofDil6GzlxdfLs06CoSqS/ujPNYxukwXqX8k6qdcGU+6gIpDlJtBbf
+R3nFDREib3wzslzpwyZwkBIQ3tjYXOFaOD1JmNqeaVuz0GItdIxwV2/7Fbv8Tr13
+pgV4Dq3nkL/930KWxSbtfIBosvXRHrIQSXeNTZZ/Z3Vc2HRJhRwUChxZYt5ps1uD
+GMrbZEHLJBYzh/ePgrugtsVUPsfMSUqMJ8EEbEg5z9wt1gGn5SgJ0p1AWJ5HKcDY
+qBhp3TWa57+2KDTCCvlKG5c71SGkoc8+eWZ8724+s1OsVYbuHgOG2/A8qenoPcjs
+e32g
+=fXHB
+-----END PGP SIGNATURE-----
+
+--09ExMgzsUdpvVmgkxF8rIBBRpEbqm3QY3--
