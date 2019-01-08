@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43726)
+Received: from eggs.gnu.org ([209.51.188.92]:44457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ggtwf-0006u5-3J
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:09:39 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ggtyF-00083K-E6
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:11:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ggtwd-0006ti-Vj
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:09:37 -0500
-References: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <5a7e9130-30d1-84ad-0737-5023b718b99c@redhat.com>
-Date: Tue, 8 Jan 2019 17:09:26 +0100
+	(envelope-from <stefanha@redhat.com>) id 1ggtyE-0001yZ-Nn
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 11:11:15 -0500
+Date: Tue, 8 Jan 2019 16:11:02 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190108161102.GH32358@stefanha-x1.localdomain>
+References: <20190105084243.9524-1-npes87184@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x/vfio-ap: Implement hot plug/unplug
- of vfio-ap device
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="YrlhzR9YrZtruaFS"
+Content-Disposition: inline
+In-Reply-To: <20190105084243.9524-1-npes87184@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: add test case for dmg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, mjrosato@linux.ibm.com, jjherne@linux.ibm.com, pasic@linux.vnet.ibm.com, alex.williamson@redhat.com, peter.maydell@linaro.org, rth@twiddle.net, fiuczy@linux.ibm.com
+To: kwolf@redhat.com
+Cc: qemu-devel@nongnu.org, yuchenlin <npes87184@gmail.com>, mreitz@redhat.com, qemu-block@nongnu.org
 
-On 08.01.19 17:01, Tony Krowiak wrote:
-> Introduces hot plug/unplug support for the vfio-ap device. Note that only one
-> vfio-ap device can be attached to the ap-bus, so a vfio-ap device can only be
-> hot plugged if the '-device vfio-ap,sysfsdev=$path_to_mdev' option is not
-> specified on the QEMU command line.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+
+--YrlhzR9YrZtruaFS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Jan 05, 2019 at 04:42:43PM +0800, yuchenlin wrote:
+> Recently, some bugs in dmg file have been fixed. To prevent reading dmg
+> is broken someday in the future, add a simple test which ensures the
+> conversion from dmg to raw should not hang or face any I/O error.
+>=20
+> Signed-off-by: yuchenlin <npes87184@gmail.com>
 > ---
->  hw/s390x/ap-bridge.c | 12 +++++++++++-
->  hw/vfio/ap.c         |  2 +-
->  2 files changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
-> index 3795d30dd7c9..25a03412fcb9 100644
-> --- a/hw/s390x/ap-bridge.c
-> +++ b/hw/s390x/ap-bridge.c
-> @@ -39,6 +39,7 @@ static const TypeInfo ap_bus_info = {
->  void s390_init_ap(void)
->  {
->      DeviceState *dev;
-> +    BusState *bus;
->  
->      /* If no AP instructions then no need for AP bridge */
->      if (!s390_has_feat(S390_FEAT_AP)) {
-> @@ -52,13 +53,18 @@ void s390_init_ap(void)
->      qdev_init_nofail(dev);
->  
->      /* Create bus on bridge device */
-> -    qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
-> +    bus = qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
-> +
-> +    /* Enable hotplugging */
-> +    qbus_set_hotplug_handler(bus, dev, &error_abort);
->   }
->  
->  static void ap_bridge_class_init(ObjectClass *oc, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(oc);
-> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
->  
-> +    hc->unplug = qdev_simple_device_unplug_cb;
+>  tests/qemu-iotests/236                        |  53 ++++++++++++++++++
+>  tests/qemu-iotests/236.out                    |   4 ++
+>  tests/qemu-iotests/check                      |   7 +++
+>  tests/qemu-iotests/group                      |   1 +
+>  .../sample_images/simple-dmg.dmg.bz2          | Bin 0 -> 3479 bytes
+>  5 files changed, 65 insertions(+)
+>  create mode 100755 tests/qemu-iotests/236
+>  create mode 100644 tests/qemu-iotests/236.out
+>  create mode 100644 tests/qemu-iotests/sample_images/simple-dmg.dmg.bz2
 
-confused, why is there no plug action?
+Kevin: The prerequisite .dmg fixes are already in qemu.git/master.
+Please review and take this through your tree, thanks!
 
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->  }
->  
-> @@ -67,6 +73,10 @@ static const TypeInfo ap_bridge_info = {
->      .parent        = TYPE_SYS_BUS_DEVICE,
->      .instance_size = 0,
->      .class_init    = ap_bridge_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { TYPE_HOTPLUG_HANDLER },
-> +        { }
-> +    }
->  };
->  
->  static void ap_register(void)
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> index 6166ccd47a4a..d8b79ebe53ae 100644
-> --- a/hw/vfio/ap.c
-> +++ b/hw/vfio/ap.c
-> @@ -169,7 +169,7 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
->      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->      dc->realize = vfio_ap_realize;
->      dc->unrealize = vfio_ap_unrealize;
-> -    dc->hotpluggable = false;
-> +    dc->hotpluggable = true;
->      dc->reset = vfio_ap_reset;
->      dc->bus_type = TYPE_AP_BUS;
->  }
-> 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+--YrlhzR9YrZtruaFS
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
+iQEcBAEBAgAGBQJcNMuWAAoJEJykq7OBq3PIqeEIAMgEGiYxrG1brWcxT+50en7v
+l1qjuRKlnm6Ki/MIMwpxBxfItScsK9UZqLJXs/GSVfwa6ypgVoebUZNSMYVIWoc1
+Jolz1TBpdskhU+ioha7utHF+GuveHdFJY3jAufMWXjdTx8VWl00aMoZfbGHB7zff
+TXGdcb4MHVV3amH0X4G5Q7QfxvMmI6jnt+/Zdouu63FZ8txCBBZif7MLlM8YOlY/
+YTafzxECrMpK8f6NUfV39urMecWZSMb/Qs1TQAQ6TwtwKiq4tc3ip2crt8r22/pb
+8TDcH4Z+/K3Ycj00fm3I0b+yHRw1DpulzesgAAbwu7W7B+KqClSE8z5KKvO+0mk=
+=s9hg
+-----END PGP SIGNATURE-----
 
-David / dhildenb
+--YrlhzR9YrZtruaFS--
