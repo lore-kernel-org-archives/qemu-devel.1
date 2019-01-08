@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59945)
+Received: from eggs.gnu.org ([209.51.188.92]:60210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1ggtPn-0002yr-R3
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:35:42 -0500
+	(envelope-from <lhrazky@redhat.com>) id 1ggtQM-0003Ou-Mt
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:36:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1ggtPl-0000Sn-O9
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:35:38 -0500
-Date: Tue, 8 Jan 2019 15:35:32 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20190108153532.GQ27120@redhat.com>
-References: <20190103094728.31747-1-rjones@redhat.com>
-	<20190103094728.31747-2-rjones@redhat.com>
-	<cb7b80d8-e54f-5422-7029-47ee286dd25f@redhat.com>
-	<741a5843-a47a-6a02-c378-b778f7ffe172@redhat.com>
-	<f5aa2057-509b-28fa-d803-b18ca525ae73@redhat.com>
-	<20190107184058.GN27120@redhat.com>
-	<20190108121625.GA11492@linux.fritz.box>
-	<b6df06a8-4a68-e4ed-2101-d0e30759c8e0@redhat.com>
-	<20190108151309.GE11492@linux.fritz.box>
+	(envelope-from <lhrazky@redhat.com>) id 1ggtQL-0001Ys-SH
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:36:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1ggtQL-0001TM-M8
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 10:36:13 -0500
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Tue,  8 Jan 2019 16:26:47 +0100
+Message-Id: <20190108152648.32537-3-lhrazky@redhat.com>
+In-Reply-To: <20190108152648.32537-1-lhrazky@redhat.com>
+References: <20190108152648.32537-1-lhrazky@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190108151309.GE11492@linux.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-io: Reinitialize optind to 1 (not
- 0) before parsing inner command.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH spice 2/3] QXL interface: deprecate
+ spice_qxl_set_max_monitors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-On Tue, Jan 08, 2019 at 04:13:09PM +0100, Kevin Wolf wrote:
-> Am 08.01.2019 um 15:51 hat Eric Blake geschrieben:
-> > On 1/8/19 6:16 AM, Kevin Wolf wrote:
-> > > Unconditionally setting optind = 1 looks fine. I would, however, quote a
-> > > different part of the glibc man page (in addition or instead of the
-> > > paragraph you already quoted):
-> > > 
-> > >     The  variable  optind is the index of the next element to be
-> > >     processed in argv.  The system initializes this value to 1.  The
-> > >     caller can reset it to 1 to restart scanning of the same argv, or
-> > >     when scanning a new argument vector.
-> > > 
-> > > This makes it pretty clear that optind = 1 is fine for our case with
-> > > glibc. The FreeBSD man page still suggests that we need optreset = 1, so
-> > > I suppose we'd end up with something like:
-> > > 
-> > > ...
-> > > optind = 1;
-> > > #ifdef __FreeBSD__
-> > > optreset = 1;
-> > > #endif
-> > 
-> > If you really want to set optreset for BSD systems, I'd do a configure
-> > probe for whether optreset exists, and if so set it for ALL platforms
-> > that have optreset, not just for __FreeBSD__.  (That, and checkpatch.pl
-> > will gripe if you don't do it that way).
-> > 
-> > But I'm leaning towards not bothering with optreset UNLESS someone
-> > proves they have a case where it actually matters.
-> 
-> I don't mind either way as long as it works. Using optreset would be
-> following the spec by the letter.
-> 
-> In fact, I had already applied this patch because it's correct even if
-> possibly incomplete, depending on your interpretation, but I decided to
-> reply instead because the commit message didn't really describe that
-> optreset = 1 is correct for glibc, but that optreset = 0 is necessary in
-> some other case (which is irrelevant here). So the commit message was my
-> main point.
+Replace it by spice_qxl_set_device_info. Note we can't use
+monitors_count for what's stored in max_monitors, because monitors_count
+denotes the length of the device_display_ids array, which
+spice_qxl_set_max_monitors doesn't touch.
 
-I have tested it[1] on:
+Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
+---
+ server/red-qxl.c   | 1 +
+ server/spice-qxl.h | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-Linux, glibc 2.28
-FreeBSD 11.2-RELEASE
-OpenBSD 6.4
-
-Interestingly OpenBSD getopt works in this respect the same way as
-Linux, so it doesn't need any fix.  It's only FreeBSD which needs the
-fix.
-
-Rich.
-
-[1] "it" being v2 here:
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00189.html
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-libguestfs lets you edit virtual machines.  Supports shell scripting,
-bindings from many languages.  http://libguestfs.org
+diff --git a/server/red-qxl.c b/server/red-qxl.c
+index 0ea424cd..6ffd8286 100644
+--- a/server/red-qxl.c
++++ b/server/red-qxl.c
+@@ -888,6 +888,7 @@ void spice_qxl_set_device_info(QXLInstance *instance,
+     }
+=20
+     instance->st->monitors_count =3D device_display_id_count;
++    instance->st->max_monitors =3D device_display_id_count;
+ }
+=20
+ void red_qxl_init(RedsState *reds, QXLInstance *qxl)
+diff --git a/server/spice-qxl.h b/server/spice-qxl.h
+index 547d3d93..e7af5e5e 100644
+--- a/server/spice-qxl.h
++++ b/server/spice-qxl.h
+@@ -101,9 +101,9 @@ void spice_qxl_monitors_config_async(QXLInstance *ins=
+tance, QXLPHYSICAL monitors
+                                      int group_id, uint64_t cookie);
+ /* since spice 0.12.3 */
+ void spice_qxl_driver_unload(QXLInstance *instance);
+-/* since spice 0.12.6 */
++/* since spice 0.12.6, deprecated since 0.14.2, spice_qxl_set_device_inf=
+o replaces it */
+ void spice_qxl_set_max_monitors(QXLInstance *instance,
+-                                unsigned int max_monitors);
++                                unsigned int max_monitors) SPICE_GNUC_DE=
+PRECATED;
+ /* since spice 0.13.1 */
+ void spice_qxl_gl_scanout(QXLInstance *instance,
+                           int fd,
+--=20
+2.20.1
