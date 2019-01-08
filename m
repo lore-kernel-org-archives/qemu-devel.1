@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35536)
+Received: from eggs.gnu.org ([209.51.188.92]:35517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqM-00075U-PA
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:16 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqM-000751-6n
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqL-0004kg-HV
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gguqL-0004iL-4Q
 	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 12:07:10 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue,  8 Jan 2019 20:06:46 +0300
-Message-Id: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 0/9] qcow2: encryption threads
+Date: Tue,  8 Jan 2019 20:06:52 +0300
+Message-Id: <20190108170655.29766-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 6/9] qcow2: qcow2_co_preadv: improve locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,102 +22,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, berto@igalia.com, vsementsov@virtuozzo.com, den@openvz.org, pbonzini@redhat.com
 
-Hi all!
+Background: decryption will be done in threads, to take benefit of it,
+we should move it out of the lock first.
 
-The series brings threads to qcow2 encryption/decryption path,
-like it is already done for compression.
-Now, based on master
+But let's go further: it turns out, that for locking around switch
+cases we have only two variants: when we just do memset(0) not
+releasing the lock (it is useless) and when we actually can handle the
+whole case out of the lock. So, refactor the whole thing to reduce
+locked code region and make it clean.
 
-v3:
-01: drop 'include block_int.h' lines not needed more [Alberto]
-02: fix comments style (open/close on separate line), add Alberto's r-b
-03: improve commit message, add Alberto's r-b
-04: new, follows Paolo's comment
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2.c | 48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-
-v2: (not very careful change list)
-    - multiple cipher inside QCryptoBlock instead of multiple
-      blocks inside qcow2, as suggested by Daniel, and it is
-      done in separate series
-    - use threaded encryption in do_perform_cow_encrypt() too
-    - some renaming and refactoring and simplifications
-
-
-== Performance testing ==
-
-Hmm, do we have something like tests/qemu-iotests, but for performance?
-
-[root@kvm up-qcow2-encrypt-threads]# cat test.sh 
-    #!/bin/bash
-
-    size=1G
-    src=/ssd/src.raw
-    dst=/ssd/dst.enc.qcow2
-
-    # create source for tests
-    ./qemu-img create -f raw "$src" $size > /dev/null
-    ./qemu-io -f raw -c "write -P 0xa 0 $size" "$src" > /dev/null
-
-    for w in "" "-W"; do
-        echo -e "Test with additional paramter for qemu-img: '$w'"
-
-        # create target
-        ./qemu-img create -f qcow2 --object secret,id=sec0,data=test -o encrypt.format=luks,encrypt.key-secret=sec0 "$dst" $size > /dev/null
-
-        time ./qemu-img convert $w -f raw --object secret,id=sec0,data=test --target-image-opts -n "$src" "driver=qcow2,file.filename=$dst,encrypt.key-secret=sec0"
-        echo
-    done
-
-
-before the series:
-    Test with additional paramter for qemu-img: ''
-
-    real    0m14.318s
-    user    0m13.637s
-    sys     0m0.881s
-
-    Test with additional paramter for qemu-img: '-W'
-
-    real    0m13.962s
-    user    0m13.681s
-    sys     0m1.156s
-
-
-after the series:
-    Test with additional paramter for qemu-img: ''
-
-    real    0m14.382s
-    user    0m13.735s
-    sys     0m0.835s
-
-    Test with additional paramter for qemu-img: '-W'
-
-    real    0m5.696s
-    user    0m15.931s
-    sys     0m1.144s
-
-Vladimir Sementsov-Ogievskiy (9):
-  qcow2.h: add missing include
-  qcow2: add separate file for threaded data processing functions
-  qcow2-threads: use thread_pool_submit_co
-  qcow2-threads: qcow2_co_do_compress: protect queuing by mutex
-  qcow2-threads: split out generic path
-  qcow2: qcow2_co_preadv: improve locking
-  qcow2: qcow2_co_preadv: skip using hd_qiov when possible
-  qcow2: bdrv_co_pwritev: move encryption code out of the lock
-  qcow2: do encryption in threads
-
- block/qcow2.h          |  20 ++-
- block/qcow2-bitmap.c   |   1 -
- block/qcow2-cache.c    |   1 -
- block/qcow2-cluster.c  |   8 +-
- block/qcow2-refcount.c |   1 -
- block/qcow2-snapshot.c |   1 -
- block/qcow2-threads.c  | 268 +++++++++++++++++++++++++++++++++++++++
- block/qcow2.c          | 277 ++++++++---------------------------------
- block/Makefile.objs    |   2 +-
- 9 files changed, 343 insertions(+), 236 deletions(-)
- create mode 100644 block/qcow2-threads.c
-
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 2865903b0e..e650528af7 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1883,6 +1883,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+ 
+         ret = qcow2_get_cluster_offset(bs, offset, &cur_bytes, &cluster_offset);
+         if (ret < 0) {
++            qemu_co_mutex_unlock(&s->lock);
+             goto fail;
+         }
+ 
+@@ -1891,39 +1892,38 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+         qemu_iovec_reset(&hd_qiov);
+         qemu_iovec_concat(&hd_qiov, qiov, bytes_done, cur_bytes);
+ 
++        if (ret == QCOW2_CLUSTER_ZERO_PLAIN ||
++            ret == QCOW2_CLUSTER_ZERO_ALLOC ||
++            (ret == QCOW2_CLUSTER_UNALLOCATED && !bs->backing))
++        {
++            /* No sense in releasing the lock */
++
++            qemu_iovec_memset(&hd_qiov, 0, 0, cur_bytes);
++
++            bytes -= cur_bytes;
++            offset += cur_bytes;
++            bytes_done += cur_bytes;
++            continue;
++        }
++
++        qemu_co_mutex_unlock(&s->lock);
++
+         switch (ret) {
+         case QCOW2_CLUSTER_UNALLOCATED:
+-
+-            if (bs->backing) {
+-                BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
+-                qemu_co_mutex_unlock(&s->lock);
+-                ret = bdrv_co_preadv(bs->backing, offset, cur_bytes,
+-                                     &hd_qiov, 0);
+-                qemu_co_mutex_lock(&s->lock);
+-                if (ret < 0) {
+-                    goto fail;
+-                }
+-            } else {
+-                /* Note: in this case, no need to wait */
+-                qemu_iovec_memset(&hd_qiov, 0, 0, cur_bytes);
++            BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
++            ret = bdrv_co_preadv(bs->backing, offset, cur_bytes, &hd_qiov, 0);
++            if (ret < 0) {
++                goto fail;
+             }
+             break;
+ 
+-        case QCOW2_CLUSTER_ZERO_PLAIN:
+-        case QCOW2_CLUSTER_ZERO_ALLOC:
+-            qemu_iovec_memset(&hd_qiov, 0, 0, cur_bytes);
+-            break;
+-
+         case QCOW2_CLUSTER_COMPRESSED:
+-            qemu_co_mutex_unlock(&s->lock);
+             ret = qcow2_co_preadv_compressed(bs, cluster_offset,
+                                              offset, cur_bytes,
+                                              &hd_qiov);
+-            qemu_co_mutex_lock(&s->lock);
+             if (ret < 0) {
+                 goto fail;
+             }
+-
+             break;
+ 
+         case QCOW2_CLUSTER_NORMAL:
+@@ -1956,11 +1956,9 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+             }
+ 
+             BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+-            qemu_co_mutex_unlock(&s->lock);
+             ret = bdrv_co_preadv(bs->file,
+                                  cluster_offset + offset_in_cluster,
+                                  cur_bytes, &hd_qiov, 0);
+-            qemu_co_mutex_lock(&s->lock);
+             if (ret < 0) {
+                 goto fail;
+             }
+@@ -1991,12 +1989,14 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+         bytes -= cur_bytes;
+         offset += cur_bytes;
+         bytes_done += cur_bytes;
++
++        qemu_co_mutex_lock(&s->lock);
+     }
+     ret = 0;
+ 
+-fail:
+     qemu_co_mutex_unlock(&s->lock);
+ 
++fail:
+     qemu_iovec_destroy(&hd_qiov);
+     qemu_vfree(cluster_data);
+ 
 -- 
 2.18.0
