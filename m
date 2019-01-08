@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47410)
+Received: from eggs.gnu.org ([209.51.188.92]:48653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ggqER-0002vp-Kl
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:11:44 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggqIO-0004KE-CC
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:15:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ggqEP-0004RZ-R2
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:11:43 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:46919)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1ggqEO-00042W-MN
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:11:41 -0500
-Date: Tue, 8 Jan 2019 13:11:29 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20190108114208.y3cdrwf7yrsfft5w@sirius.home.kraxel.org>
-Message-ID: <alpine.BSF.2.21.9999.1901081302340.10380@zero.eik.bme.hu>
-References: <1546077657-22637-1-git-send-email-hongbo.zhang@linaro.org>
-	<20190108114208.y3cdrwf7yrsfft5w@sirius.home.kraxel.org>
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ggqIM-0004OL-SB
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:15:48 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45105)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1ggqIM-0004Kq-G2
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 07:15:46 -0500
+Received: by mail-oi1-x242.google.com with SMTP id y1so3082407oie.12
+	for <qemu-devel@nongnu.org>; Tue, 08 Jan 2019 04:15:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] hw/usb: Add generic sys-bus EHCI controller
+In-Reply-To: <1546533252-26601-2-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1546533252-26601-2-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 8 Jan 2019 13:15:43 +0100
+Message-ID: <CAL1e-=h7Pp3mBbxSY=NML_11FwqfzgZ7NXcCfHpU7TJKrQhKog@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/8] target/mips: Move comment containing
+ summary of CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +30,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, peter.maydell@linaro.org, radoslaw.biernacki@linaro.org, qemu-devel@nongnu.org, leif.lindholm@linaro.org, ard.biesheuvel@linaro.org
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "smarkovic@wavecomp.com" <smarkovic@wavecomp.com>, "arikalo@wavecomp.com" <arikalo@wavecomp.com>, "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-On Tue, 8 Jan 2019, Gerd Hoffmann wrote:
-> On Sat, Dec 29, 2018 at 06:00:57PM +0800, Hongbo Zhang wrote:
->> This patch introduces a new system bus generic EHCI controller.
->> For the system bus EHCI controller, we've already had "xlnx",
->> "exynos4210", "tegra2", "ppc4xx" and "fusbh200", they are specific and
->> only suitable for their own platforms, platforms such as an Arm server,
->> may need a generic system bus EHCI controller, this patch creates it,
->> and the kernel driver ehci_platform.c works well on it.
+On Thursday, January 3, 2019, Aleksandar Markovic <
+aleksandar.markovic@rt-rk.com> wrote:
+
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 >
-> Added to usb queue.
+> Move comment containing summary of CP0 registers. Checkpatch
+> script reported some tabs in the resutling diff, so convert
+> these tabs to spaces too.
+>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  target/mips/cpu.h | 165 +++++++++++++++++++++++++++---
+> ------------------------
+>  1 file changed, 84 insertions(+), 81 deletions(-)
+>
+>
+My original intention was moving a comment some 80 lines upwards, but git
+interpreted that I wanted to move these 80 lines below the comment - hence
+such strange diff, where no comment in question can be seen. The net result
+is same, I don't have objection about that, except that it is very unclear
+to reviewers.
 
-Most of these only differ in capsbase and opregbase and we only need a 
-separate subclass for them because ehci-sysbus is .abstract=true so cannot 
-be instantiated. I wonder if it would be simpler to add properties to 
-ehci-sysbus to allow setting these base values and allow it to be used 
-directly, then most of these subclasses could be removed and only need 
-subclass for those that are really do something more (maybe only fusbh200 
-currently).
+Aleksandaer
 
-(Just asking, I'm not volunteering to make a patch.)
 
-Regards,
-BALATON Zoltan
+
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index 03c03fd..6c2a7e4 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -123,87 +123,6 @@ typedef struct mips_def_t mips_def_t;
+>  #define MIPS_KSCRATCH_NUM 6
+>  #define MIPS_MAAR_MAX 16 /* Must be an even number. */
+>
+> -typedef struct TCState TCState;
+> -struct TCState {
+> -    target_ulong gpr[32];
+> -    target_ulong PC;
+> -    target_ulong HI[MIPS_DSP_ACC];
+> -    target_ulong LO[MIPS_DSP_ACC];
+> -    target_ulong ACX[MIPS_DSP_ACC];
+> -    target_ulong DSPControl;
+> -    int32_t CP0_TCStatus;
+> -#define CP0TCSt_TCU3   31
+> -#define CP0TCSt_TCU2   30
+> -#define CP0TCSt_TCU1   29
+> -#define CP0TCSt_TCU0   28
+> -#define CP0TCSt_TMX    27
+> -#define CP0TCSt_RNST   23
+> -#define CP0TCSt_TDS    21
+> -#define CP0TCSt_DT     20
+> -#define CP0TCSt_DA     15
+> -#define CP0TCSt_A      13
+> -#define CP0TCSt_TKSU   11
+> -#define CP0TCSt_IXMT   10
+> -#define CP0TCSt_TASID  0
+> -    int32_t CP0_TCBind;
+> -#define CP0TCBd_CurTC  21
+> -#define CP0TCBd_TBE    17
+> -#define CP0TCBd_CurVPE 0
+> -    target_ulong CP0_TCHalt;
+> -    target_ulong CP0_TCContext;
+> -    target_ulong CP0_TCSchedule;
+> -    target_ulong CP0_TCScheFBack;
+> -    int32_t CP0_Debug_tcstatus;
+> -    target_ulong CP0_UserLocal;
+> -
+> -    int32_t msacsr;
+> -
+> -#define MSACSR_FS       24
+> -#define MSACSR_FS_MASK  (1 << MSACSR_FS)
+> -#define MSACSR_NX       18
+> -#define MSACSR_NX_MASK  (1 << MSACSR_NX)
+> -#define MSACSR_CEF      2
+> -#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
+> -#define MSACSR_RM       0
+> -#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
+> -#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK |
+> MSACSR_NX_MASK | \
+> -        MSACSR_FS_MASK)
+> -
+> -    float_status msa_fp_status;
+> -
+> -#define NUMBER_OF_MXU_REGISTERS 16
+> -    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
+> -    target_ulong mxu_cr;
+> -#define MXU_CR_LC       31
+> -#define MXU_CR_RC       30
+> -#define MXU_CR_BIAS     2
+> -#define MXU_CR_RD_EN    1
+> -#define MXU_CR_MXU_EN   0
+> -
+> -};
+> -
+> -typedef struct CPUMIPSState CPUMIPSState;
+> -struct CPUMIPSState {
+> -    TCState active_tc;
+> -    CPUMIPSFPUContext active_fpu;
+> -
+> -    uint32_t current_tc;
+> -    uint32_t current_fpu;
+> -
+> -    uint32_t SEGBITS;
+> -    uint32_t PABITS;
+> -#if defined(TARGET_MIPS64)
+> -# define PABITS_BASE 36
+> -#else
+> -# define PABITS_BASE 32
+> -#endif
+> -    target_ulong SEGMask;
+> -    uint64_t PAMask;
+> -#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
+> -
+> -    int32_t msair;
+> -#define MSAIR_ProcID    8
+> -#define MSAIR_Rev       0
+>
+>  /*
+>   *     Summary of CP0 registers
+> @@ -314,6 +233,90 @@ struct CPUMIPSState {
+>   * 7   TagLo             TagHi                               KScratch<n>
+>   *
+>   */
+> +
+> +
+> +typedef struct TCState TCState;
+> +struct TCState {
+> +    target_ulong gpr[32];
+> +    target_ulong PC;
+> +    target_ulong HI[MIPS_DSP_ACC];
+> +    target_ulong LO[MIPS_DSP_ACC];
+> +    target_ulong ACX[MIPS_DSP_ACC];
+> +    target_ulong DSPControl;
+> +    int32_t CP0_TCStatus;
+> +#define CP0TCSt_TCU3    31
+> +#define CP0TCSt_TCU2    30
+> +#define CP0TCSt_TCU1    29
+> +#define CP0TCSt_TCU0    28
+> +#define CP0TCSt_TMX     27
+> +#define CP0TCSt_RNST    23
+> +#define CP0TCSt_TDS     21
+> +#define CP0TCSt_DT      20
+> +#define CP0TCSt_DA      15
+> +#define CP0TCSt_A       13
+> +#define CP0TCSt_TKSU    11
+> +#define CP0TCSt_IXMT    10
+> +#define CP0TCSt_TASID   0
+> +    int32_t CP0_TCBind;
+> +#define CP0TCBd_CurTC   21
+> +#define CP0TCBd_TBE     17
+> +#define CP0TCBd_CurVPE  0
+> +    target_ulong CP0_TCHalt;
+> +    target_ulong CP0_TCContext;
+> +    target_ulong CP0_TCSchedule;
+> +    target_ulong CP0_TCScheFBack;
+> +    int32_t CP0_Debug_tcstatus;
+> +    target_ulong CP0_UserLocal;
+> +
+> +    int32_t msacsr;
+> +
+> +#define MSACSR_FS       24
+> +#define MSACSR_FS_MASK  (1 << MSACSR_FS)
+> +#define MSACSR_NX       18
+> +#define MSACSR_NX_MASK  (1 << MSACSR_NX)
+> +#define MSACSR_CEF      2
+> +#define MSACSR_CEF_MASK (0xffff << MSACSR_CEF)
+> +#define MSACSR_RM       0
+> +#define MSACSR_RM_MASK  (0x3 << MSACSR_RM)
+> +#define MSACSR_MASK     (MSACSR_RM_MASK | MSACSR_CEF_MASK |
+> MSACSR_NX_MASK | \
+> +        MSACSR_FS_MASK)
+> +
+> +    float_status msa_fp_status;
+> +
+> +#define NUMBER_OF_MXU_REGISTERS 16
+> +    target_ulong mxu_gpr[NUMBER_OF_MXU_REGISTERS - 1];
+> +    target_ulong mxu_cr;
+> +#define MXU_CR_LC       31
+> +#define MXU_CR_RC       30
+> +#define MXU_CR_BIAS     2
+> +#define MXU_CR_RD_EN    1
+> +#define MXU_CR_MXU_EN   0
+> +
+> +};
+> +
+> +typedef struct CPUMIPSState CPUMIPSState;
+> +struct CPUMIPSState {
+> +    TCState active_tc;
+> +    CPUMIPSFPUContext active_fpu;
+> +
+> +    uint32_t current_tc;
+> +    uint32_t current_fpu;
+> +
+> +    uint32_t SEGBITS;
+> +    uint32_t PABITS;
+> +#if defined(TARGET_MIPS64)
+> +# define PABITS_BASE 36
+> +#else
+> +# define PABITS_BASE 32
+> +#endif
+> +    target_ulong SEGMask;
+> +    uint64_t PAMask;
+> +#define PAMASK_BASE ((1ULL << PABITS_BASE) - 1)
+> +
+> +    int32_t msair;
+> +#define MSAIR_ProcID    8
+> +#define MSAIR_Rev       0
+> +
+>  /*
+>   * CP0 Register 0
+>   */
+> --
+> 2.7.4
+>
+>
+>
