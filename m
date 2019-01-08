@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56411)
+Received: from eggs.gnu.org ([209.51.188.92]:57309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ggfqx-00029f-Os
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 20:06:48 -0500
+	(envelope-from <asmadeus@notk.org>) id 1ggftU-0004GE-5n
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 20:09:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ggfqx-0001Om-3Q
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 20:06:47 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:33496
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ggfqw-0000zG-K8
-	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 20:06:47 -0500
-References: <1544063533-10139-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1544063533-10139-2-git-send-email-lizhijian@cn.fujitsu.com>
-	<CAGxU2F59T+4a73vfd4mAGkC==dxqzhZKWA9sieFNPsZ2TVARCg@mail.gmail.com>
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <960576c6-ccbc-1ac7-582e-58272c6d03bb@cn.fujitsu.com>
-Date: Tue, 8 Jan 2019 09:06:28 +0800
+	(envelope-from <asmadeus@notk.org>) id 1ggftT-0005b4-IF
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 20:09:24 -0500
+Received: from nautica.notk.org ([91.121.71.147]:46701)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <asmadeus@notk.org>) id 1ggftT-0005Wg-CJ
+	for qemu-devel@nongnu.org; Mon, 07 Jan 2019 20:09:23 -0500
+Date: Tue, 8 Jan 2019 02:09:06 +0100
+From: Dominique Martinet <asmadeus@codewreck.org>
+Message-ID: <20190108010906.GA26465@nautica>
+References: <20180719205545.16512-1-pasha.tatashin@oracle.com>
+	<20180719205545.16512-24-pasha.tatashin@oracle.com>
+	<20181106054212.GA31768@nautica>
+	<95c3920e-bf80-0c7e-7854-01a1c3189c23@oracle.com>
+	<20190102202032.GA1034@eldamar.local>
+	<CA+CK2bC70pnL0Wimb0xt99J4nNfi8W3zuUHgAk-jsPuOP9jpHA@mail.gmail.com>
+	<20190103234339.GA17457@nautica>
+	<CA+CK2bDj1f=VpT+k-e8kSSaoLJ3W9-JPPq9udFdDwd6ijXi28g@mail.gmail.com>
+	<20190107234839.GA15269@nautica>
+	<CA+CK2bD3kbcNvkVf2kiKQYs+srcw7BdWngqt_wM7Z-QsBJyH6w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAGxU2F59T+4a73vfd4mAGkC==dxqzhZKWA9sieFNPsZ2TVARCg@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 1/4] unify len and addr type for
- memory/address APIs
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CA+CK2bD3kbcNvkVf2kiKQYs+srcw7BdWngqt_wM7Z-QsBJyH6w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v15 23/26] sched: early boot clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +35,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Tsirkin <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, philip.li@intel.com, zhijianx.li@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Philippe Mathieu Daude <philmd@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Pavel Tatashin <pasha.tatashin@soleen.com>
+Cc: Salvatore Bonaccorso <carnil@debian.org>, Steven Sistare <steven.sistare@oracle.com>, Pavel Tatashin <pavel.tatashin@microsoft.com>, Daniel Jordan <daniel.m.jordan@oracle.com>, linux@armlinux.org.uk, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, John Stultz <john.stultz@linaro.org>, sboyd@codeaurora.org, x86@kernel.org, LKML <linux-kernel@vger.kernel.org>, mingo@redhat.com, Thomas Gleixner <tglx@linutronix.de>, hpa@zytor.com, douly.fnst@cn.fujitsu.com, Peter Zijlstra <peterz@infradead.org>, prarit@redhat.com, feng.tang@intel.com, Petr Mladek <pmladek@suse.com>, gnomes@lxorguk.ukuu.org.uk, linux-s390@vger.kernel.org, boris.ostrovsky@oracle.com, jgross@suse.com, pbonzini@redhat.com, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
 
+Pavel Tatashin wrote on Mon, Jan 07, 2019:
+> I did exactly the same sequence on Kaby Lake CPU and could not
+> reproduce it. What is your host CPU?
 
-On 1/7/19 18:04, Stefano Garzarella wrote:
-> As Philippe already suggested,
-> s/espcially/especially
+skylake consumer laptop CPU: Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz
 
-Hi Stefano，
-
-thanks a lot, will update it at next version.
-
-Thanks
+I don't have any kaby lake around; I have access to older servers though...
+-- 
+Dominique
