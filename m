@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45684)
+Received: from eggs.gnu.org ([209.51.188.92]:45724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghF9p-00033D-Vg
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:39 -0500
+	(envelope-from <pagupta@redhat.com>) id 1ghF9r-000350-Vb
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghF9o-0006S2-55
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:29249)
+	(envelope-from <pagupta@redhat.com>) id 1ghF9q-0006Ta-1E
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40376)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ghF9n-0006Fe-Rg
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:36 -0500
-Date: Wed, 9 Jan 2019 15:48:18 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190109144818.GE4867@localhost.localdomain>
-References: <20180906111107.30684-1-danielhb413@gmail.com>
-	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
-	<20190109142140.GC4867@localhost.localdomain>
-	<095e7b09-5d84-3437-782d-97fa6ca372ee@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="jho1yZJdad60DJr+"
-Content-Disposition: inline
-In-Reply-To: <095e7b09-5d84-3437-782d-97fa6ca372ee@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
- ID anymore
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1ghF9o-0006Lf-41
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:37 -0500
+From: Pankaj Gupta <pagupta@redhat.com>
+Date: Wed,  9 Jan 2019 20:17:32 +0530
+Message-Id: <20190109144736.17452-2-pagupta@redhat.com>
+In-Reply-To: <20190109144736.17452-1-pagupta@redhat.com>
+References: <20190109144736.17452-1-pagupta@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/5] libnvdimm: nd_region flush callback
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +24,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-acpi@vger.kernel.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
+Cc: jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, david@redhat.com, jmoyer@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, mst@redhat.com, jasowang@redhat.com, lcapitulino@redhat.com, imammedo@redhat.com, eblake@redhat.com, willy@infradead.org, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, rjw@rjwysocki.net, pagupta@redhat.com
 
+This patch adds functionality to perform flush from guest
+to host over VIRTIO. We are registering a callback based
+on 'nd_region' type. virtio_pmem driver requires this special
+flush function. For rest of the region types we are registering
+existing flush function. Report error returned by host fsync
+failure to userspace.
 
---jho1yZJdad60DJr+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This also handles asynchronous flush requests from the block layer
+by creating a child bio and chaining it with parent bio.
 
-Am 09.01.2019 um 15:27 hat Max Reitz geschrieben:
-> On 09.01.19 15:21, Kevin Wolf wrote:
-> > Am 09.01.2019 um 15:10 hat Max Reitz geschrieben:
-> >> On 06.09.18 13:11, Daniel Henrique Barboza wrote:
-> >>> changes in v2:
-> >>> - removed the "RFC" marker;
-> >>> - added a new patch (patch 2) that removes
-> >>> bdrv_snapshot_delete_by_id_or_name from the code;
-> >>> - made changes in patch 1 as suggested by Murilo;
-> >>> - previous patch set link:
-> >>> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg04658.html
-> >>>
-> >>>
-> >>> It is not uncommon to see bugs being opened by testers that attempt to
-> >>> create VM snapshots using HMP. It turns out that "0" and "1" are quite
-> >>> common snapshot names and they trigger a lot of bugs. I gave an examp=
-le
-> >>> in the commit message of patch 1, but to sum up here: QEMU treats the
-> >>> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'. =
-It
-> >>> is documented as such, but this can lead to strange situations.
-> >>>
-> >>> Given that it is strange for an API to consider a parameter to be 2 f=
-ields
-> >>> at the same time, and inadvently treating them as one or the other, a=
-nd
-> >>> that removing the ID field is too drastic, my idea here is to keep the
-> >>> ID field for internal control, but do not let the user set it.
-> >>>
-> >>> I guess there's room for discussion about considering this change an =
-API
-> >>> change or not. It doesn't affect users of HMP and it doesn't affect L=
-ibvirt,
-> >>> but simplifying the meaning of the parameters of savevm/loadvm/delvm.
-> >>
-> >> (Yes, very late reply, I'm sorry...)
-> >>
-> >> I do think it affects users of HMP, because right now you can delete
-> >> snapshots with their ID, and after this series you cannot.
-> >=20
-> > Can there be snapshots that can't be identified by a snapshot name, but
-> > only by their ID?
->=20
-> I don't know, but what I meant is that if you have scripts to do all
-> this, you might have to adjust them with this change.
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+---
+ drivers/acpi/nfit/core.c     |  4 ++--
+ drivers/nvdimm/claim.c       |  6 ++++--
+ drivers/nvdimm/nd.h          |  1 +
+ drivers/nvdimm/pmem.c        | 12 ++++++++----
+ drivers/nvdimm/region_devs.c | 38 ++++++++++++++++++++++++++++++++++++--
+ include/linux/libnvdimm.h    |  5 ++++-
+ 6 files changed, 55 insertions(+), 11 deletions(-)
 
-That's what the H in HMP means.
-
-> >> I think we had a short discussion about just disallowing numeric
-> >> snapshot names.  How bad would that be?
-> >=20
-> > It would be incompatible with existing images and result in a more
-> > complex snapshot identifier resolution. Why would it be any better?
->=20
-> It wouldn't be incompatible with existing images if we'd just disallow
-> creating such snapshots.  I don't see how the identifier resolution
-> would be more complex.
->=20
-> I don't know if it'd be better.  I'd just find it simpler (for us, that
-> is -- for users, I'm not sure).
-
-Identifier resolution A:
-- Find a snapshot that has the given identifier as a name
-- If no such snapshot exists, it is an error
-
-Identifier resolution B:
-- If the identifier is a number, find a snapshot that has the given
-  identifier as its ID
-- If the identifier is not a number, find a snapshot that has the given
-  identifier as a name
-- If no such snapshot exists, it is an error
-
-Isn't it rather obvious that B is more complex than A?
-
-Kevin
-
---jho1yZJdad60DJr+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJcNgmyAAoJEH8JsnLIjy/WWCEQAJjB564d2JYHB8+hGSuvllud
-TEXXH3xGqWhsbTFk991SvoLrFIa3jO7pO2NMZyCbIjje+aIm+PkYFNAY1rSh5I6B
-Enl/fJtsyxPQCH+n9vXE212WHb5jT9R0VT7Lt+dyoRmciGQJ6y2nfWsybsuU/Ppo
-Tc6/Z+aDvo8W1Vued++n49G64F2haKRtix35Dekhjx752rPku3tplDLQRg76O/X0
-kKH7WsV+u3A/a8V6hPmMiQCGMMcLCRgCp4lRMbv0SppAP3zZNtWcO1aAY8q6HS5G
-EdB1ZlvdWs+1SZplA3P6Z77iSNLfFBrMBGUC5J2HKdi300LzCx02z8ml7NQGrm3Z
-0PV7r2Q2F+TDLRiabi9hfEc98pDH/tO/QZtQBYqY5bnvuMHHTqWcCdFX44N2MD5P
-eAUn1f66BQ8sgAE2nhdTKwh2XLaMEvSqz3RiY5AjEz6UoL5iswB6uqSIXbXDH+90
-qgBLAci/RkIMr/QspZHz4ez1QnPAXbnu/c+PCiiZVDUMkUPzyGGp4G1Ww3+IewQt
-O3lN67PAbm6Tx4fLVDD/s2T3q5tPrFiFEvs6lJ0zASH1QEtP9PJR8x0JYS1/b4VE
-j4lbi6IFyiqUZIrDw00r4h9QiFpuEwHpoOzVqJ1qusNWLXS8wPE49UA4FpznbRjW
-QuyjC3LSZGHEa11aci2w
-=X7Rg
------END PGP SIGNATURE-----
-
---jho1yZJdad60DJr+--
+diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
+index b072cfc..f154852 100644
+--- a/drivers/acpi/nfit/core.c
++++ b/drivers/acpi/nfit/core.c
+@@ -2234,7 +2234,7 @@ static void write_blk_ctl(struct nfit_blk *nfit_blk, unsigned int bw,
+ 		offset = to_interleave_offset(offset, mmio);
+ 
+ 	writeq(cmd, mmio->addr.base + offset);
+-	nvdimm_flush(nfit_blk->nd_region);
++	nvdimm_flush(nfit_blk->nd_region, NULL, false);
+ 
+ 	if (nfit_blk->dimm_flags & NFIT_BLK_DCR_LATCH)
+ 		readq(mmio->addr.base + offset);
+@@ -2283,7 +2283,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk *nfit_blk,
+ 	}
+ 
+ 	if (rw)
+-		nvdimm_flush(nfit_blk->nd_region);
++		nvdimm_flush(nfit_blk->nd_region, NULL, false);
+ 
+ 	rc = read_blk_stat(nfit_blk, lane) ? -EIO : 0;
+ 	return rc;
+diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
+index fb667bf..a1dfa06 100644
+--- a/drivers/nvdimm/claim.c
++++ b/drivers/nvdimm/claim.c
+@@ -263,7 +263,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
+ 	struct nd_namespace_io *nsio = to_nd_namespace_io(&ndns->dev);
+ 	unsigned int sz_align = ALIGN(size + (offset & (512 - 1)), 512);
+ 	sector_t sector = offset >> 9;
+-	int rc = 0;
++	int rc = 0, ret = 0;
+ 
+ 	if (unlikely(!size))
+ 		return 0;
+@@ -301,7 +301,9 @@ static int nsio_rw_bytes(struct nd_namespace_common *ndns,
+ 	}
+ 
+ 	memcpy_flushcache(nsio->addr + offset, buf, size);
+-	nvdimm_flush(to_nd_region(ndns->dev.parent));
++	ret = nvdimm_flush(to_nd_region(ndns->dev.parent), NULL, false);
++	if (ret)
++		rc = ret;
+ 
+ 	return rc;
+ }
+diff --git a/drivers/nvdimm/nd.h b/drivers/nvdimm/nd.h
+index 98317e7..d53a2d1 100644
+--- a/drivers/nvdimm/nd.h
++++ b/drivers/nvdimm/nd.h
+@@ -160,6 +160,7 @@ struct nd_region {
+ 	struct nd_interleave_set *nd_set;
+ 	struct nd_percpu_lane __percpu *lane;
+ 	struct nd_mapping mapping[0];
++	int (*flush)(struct nd_region *nd_region);
+ };
+ 
+ struct nd_blk_region {
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 6071e29..5d6a4a1 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -192,6 +192,7 @@ static blk_status_t pmem_do_bvec(struct pmem_device *pmem, struct page *page,
+ 
+ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ {
++	int ret = 0;
+ 	blk_status_t rc = 0;
+ 	bool do_acct;
+ 	unsigned long start;
+@@ -201,7 +202,7 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ 	struct nd_region *nd_region = to_region(pmem);
+ 
+ 	if (bio->bi_opf & REQ_PREFLUSH)
+-		nvdimm_flush(nd_region);
++		ret = nvdimm_flush(nd_region, bio, true);
+ 
+ 	do_acct = nd_iostat_start(bio, &start);
+ 	bio_for_each_segment(bvec, bio, iter) {
+@@ -216,7 +217,10 @@ static blk_qc_t pmem_make_request(struct request_queue *q, struct bio *bio)
+ 		nd_iostat_end(bio, start);
+ 
+ 	if (bio->bi_opf & REQ_FUA)
+-		nvdimm_flush(nd_region);
++		ret = nvdimm_flush(nd_region, bio, true);
++
++	if (ret)
++		bio->bi_status = errno_to_blk_status(ret);
+ 
+ 	bio_endio(bio);
+ 	return BLK_QC_T_NONE;
+@@ -528,14 +532,14 @@ static int nd_pmem_remove(struct device *dev)
+ 		sysfs_put(pmem->bb_state);
+ 		pmem->bb_state = NULL;
+ 	}
+-	nvdimm_flush(to_nd_region(dev->parent));
++	nvdimm_flush(to_nd_region(dev->parent), NULL, false);
+ 
+ 	return 0;
+ }
+ 
+ static void nd_pmem_shutdown(struct device *dev)
+ {
+-	nvdimm_flush(to_nd_region(dev->parent));
++	nvdimm_flush(to_nd_region(dev->parent), NULL, false);
+ }
+ 
+ static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
+diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+index fa37afc..5508727 100644
+--- a/drivers/nvdimm/region_devs.c
++++ b/drivers/nvdimm/region_devs.c
+@@ -290,7 +290,9 @@ static ssize_t deep_flush_store(struct device *dev, struct device_attribute *att
+ 		return rc;
+ 	if (!flush)
+ 		return -EINVAL;
+-	nvdimm_flush(nd_region);
++	rc = nvdimm_flush(nd_region, NULL, false);
++	if (rc)
++		return rc;
+ 
+ 	return len;
+ }
+@@ -1065,6 +1067,11 @@ static struct nd_region *nd_region_create(struct nvdimm_bus *nvdimm_bus,
+ 	dev->of_node = ndr_desc->of_node;
+ 	nd_region->ndr_size = resource_size(ndr_desc->res);
+ 	nd_region->ndr_start = ndr_desc->res->start;
++	if (ndr_desc->flush)
++		nd_region->flush = ndr_desc->flush;
++	else
++		nd_region->flush = generic_nvdimm_flush;
++
+ 	nd_device_register(dev);
+ 
+ 	return nd_region;
+@@ -1105,11 +1112,36 @@ struct nd_region *nvdimm_volatile_region_create(struct nvdimm_bus *nvdimm_bus,
+ }
+ EXPORT_SYMBOL_GPL(nvdimm_volatile_region_create);
+ 
++int nvdimm_flush(struct nd_region *nd_region, struct bio *bio, bool async)
++{
++	int rc = 0;
++
++	/* Create child bio for asynchronous flush and chain with
++	 * parent bio. Otherwise directly call nd_region flush.
++	 */
++	if (async && bio->bi_iter.bi_sector != -1) {
++
++		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
++
++		if (!child)
++			return -ENOMEM;
++		bio_copy_dev(child, bio);
++		child->bi_opf = REQ_PREFLUSH;
++		child->bi_iter.bi_sector = -1;
++		bio_chain(child, bio);
++		submit_bio(child);
++	} else {
++		if (nd_region->flush(nd_region))
++			rc = -EIO;
++	}
++
++	return rc;
++}
+ /**
+  * nvdimm_flush - flush any posted write queues between the cpu and pmem media
+  * @nd_region: blk or interleaved pmem region
+  */
+-void nvdimm_flush(struct nd_region *nd_region)
++int generic_nvdimm_flush(struct nd_region *nd_region)
+ {
+ 	struct nd_region_data *ndrd = dev_get_drvdata(&nd_region->dev);
+ 	int i, idx;
+@@ -1133,6 +1165,8 @@ void nvdimm_flush(struct nd_region *nd_region)
+ 		if (ndrd_get_flush_wpq(ndrd, i, 0))
+ 			writeq(1, ndrd_get_flush_wpq(ndrd, i, idx));
+ 	wmb();
++
++	return 0;
+ }
+ EXPORT_SYMBOL_GPL(nvdimm_flush);
+ 
+diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
+index 097072c..b49632c 100644
+--- a/include/linux/libnvdimm.h
++++ b/include/linux/libnvdimm.h
+@@ -115,6 +115,7 @@ struct nd_mapping_desc {
+ 	int position;
+ };
+ 
++struct nd_region;
+ struct nd_region_desc {
+ 	struct resource *res;
+ 	struct nd_mapping_desc *mapping;
+@@ -126,6 +127,7 @@ struct nd_region_desc {
+ 	int numa_node;
+ 	unsigned long flags;
+ 	struct device_node *of_node;
++	int (*flush)(struct nd_region *nd_region);
+ };
+ 
+ struct device;
+@@ -201,7 +203,8 @@ unsigned long nd_blk_memremap_flags(struct nd_blk_region *ndbr);
+ unsigned int nd_region_acquire_lane(struct nd_region *nd_region);
+ void nd_region_release_lane(struct nd_region *nd_region, unsigned int lane);
+ u64 nd_fletcher64(void *addr, size_t len, bool le);
+-void nvdimm_flush(struct nd_region *nd_region);
++int nvdimm_flush(struct nd_region *nd_region, struct bio *bio, bool async);
++int generic_nvdimm_flush(struct nd_region *nd_region);
+ int nvdimm_has_flush(struct nd_region *nd_region);
+ int nvdimm_has_cache(struct nd_region *nd_region);
+ 
+-- 
+2.9.3
