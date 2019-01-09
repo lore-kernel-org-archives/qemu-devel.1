@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55992)
+Received: from eggs.gnu.org ([209.51.188.92]:56718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghHKO-00066N-EG
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:07:41 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ghHMZ-0007xM-IJ
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:09:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghHKN-0002jB-JV
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:07:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49082)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ghHKN-0002iT-AU
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:07:39 -0500
-References: <20180906111107.30684-1-danielhb413@gmail.com>
-	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
-	<a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dabcb93d-050d-b64f-a995-8f066b325c70@redhat.com>
-Date: Wed, 9 Jan 2019 11:07:36 -0600
+	(envelope-from <kwolf@redhat.com>) id 1ghHMX-00045k-DN
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:09:55 -0500
+Date: Wed, 9 Jan 2019 18:09:29 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190109170929.GJ4867@localhost.localdomain>
+References: <20190108194552.45453-1-vsementsov@virtuozzo.com>
+	<20190109112311.GB4867@localhost.localdomain>
+	<5ddd78e0-90ed-a6e5-c454-f1a2e44c1a37@redhat.com>
+	<20190109165111.GI4867@localhost.localdomain>
+	<61f6ac4d-91ab-f9cb-67e5-e0f5ce17524d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="i1enR5EDGs9V78ZS8QJi0XHTaD6XgIJrL"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
- ID anymore
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <61f6ac4d-91ab-f9cb-67e5-e0f5ce17524d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] file-posix: add rough-block-status
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, muriloo@linux.ibm.com, dgilbert@redhat.com, armbru@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---i1enR5EDGs9V78ZS8QJi0XHTaD6XgIJrL
-From: Eric Blake <eblake@redhat.com>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>,
- Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, muriloo@linux.ibm.com, dgilbert@redhat.com,
- armbru@redhat.com
-Message-ID: <dabcb93d-050d-b64f-a995-8f066b325c70@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use ID
- anymore
-References: <20180906111107.30684-1-danielhb413@gmail.com>
- <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
- <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
-In-Reply-To: <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Am 09.01.2019 um 17:55 hat Paolo Bonzini geschrieben:
+> On 09/01/19 17:51, Kevin Wolf wrote:
+> > Am 09.01.2019 um 17:42 hat Paolo Bonzini geschrieben:
+> >> On 09/01/19 12:23, Kevin Wolf wrote:
+> >>> Also note that this is only metadata preallocation; full preallocation
+> >>> will still return allocated for the protocol layer and so it will always
+> >>> be slow.
+> >>
+> >> Full preallocation these days can create images with preallocated but
+> >> known-zero blocks, I think?
+> > 
+> > That would defeat one of the main purposes of preallocation because it
+> > would still require COW and metadata updates on the first write.
+> 
+> Sorry I mean at the protocol level, like FALLOC_FL_ZERO_RANGE.  It would
+> still require metadata updates on the filesystem level, unlike "real"
+> full preallocation, but no qcow2 metadata updates.
 
-On 1/9/19 10:57 AM, Daniel Henrique Barboza wrote:
+preallocation=full doesn't do that. preallocation=falloc is more like
+it, though that is just posix_fallocate(), not FALLOC_FL_ZERO_RANGE. But
+when called on a new file, it might result in the same thing? Not sure.
 
->> I think we had a short discussion about just disallowing numeric
->> snapshot names.=C2=A0 How bad would that be?
->=20
->=20
-> This was my first idea when evaluating what to do in this case. I gave
-> it up because
-> I found it to be too extreme. People would start complaining "I was abl=
-e
-> to do
-> savevm 0 and now I can't".
-
-I could live with that, especially if it serves to prevent even more
-bugs of "I did this and now my image is broken" (I, for one, have known
-about the confusion of breaking an image by using a number as a snapshot
-name as far back as 2011). What I can't live with is:
-
-"I have an old image where I did savevm 0, and now want to modernize the
-image, but the new tools refuse to even let me read from name 0".
-
-I also agree that the code is already so hairy, and the reason we have
-punted on solving the issue (for 8 years now!) is because there are so
-many corner cases to consider.  It also means that I'm reluctant to
-review the patch, because it will require a significant chunk of time
-and mental effort to ensure that whatever patch is proposed does not
-break something important.  But in general, I'm glad that you are trying
-to get the issue fixed, even if the conversation on HOW to fix it is
-still undergoing a choice of bikeshed paint colors.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---i1enR5EDGs9V78ZS8QJi0XHTaD6XgIJrL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw2KlgACgkQ3g5py3or
-ov1BQQgAl3ioenAVaPSUEigt/KJAYOSM1N0gig3zAu5e/s7Sfqth8/N9qIEmNN/G
-JvUrUCuLYY8yyB7o4v+muA6HXRiPGy5lwL93thpGt3ivK9/xdeIVJ05tW0JL4cbh
-O5HA7M4xq8SeDFhLsH1diG0b9UbvjbOilvql91l6MhVtNoBoY9GR+a4GKjmGWQdq
-zes4PKV+qUOA8gK7d48KX+zmn40SwNszQ/2Hl9A6gXdtWbQYP/lSzY4HhtUXxAoX
-xPpTb6y3JPEZvqEc/yX5nvIMiCRCererVnTKUL3oAIDQNLe+ma1bHZJXxoV1ErDo
-8WZtTFChDaeWPx+xALQfzYE3MryZ6w==
-=LtWg
------END PGP SIGNATURE-----
-
---i1enR5EDGs9V78ZS8QJi0XHTaD6XgIJrL--
+Kevin
