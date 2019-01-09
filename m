@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55992)
+Received: from eggs.gnu.org ([209.51.188.92]:56986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mmogilvi+qemu@zoho.com>) id 1ghEAd-0001ef-An
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:45:24 -0500
+	(envelope-from <berto@igalia.com>) id 1ghEF7-0002xt-Fd
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:50:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mmogilvi+qemu@zoho.com>) id 1ghEAc-0005FA-D1
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:45:23 -0500
-Received: from sender-pp-092.zoho.com ([135.84.80.237]:25426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mmogilvi+qemu@zoho.com>)
-	id 1ghEAb-00056X-UH
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:45:22 -0500
-Date: Tue, 8 Jan 2019 22:58:57 -0700
-From: Matthew Ogilvie <mmogilvi+qemu@zoho.com>
-Message-ID: <20190109055856.GA30631@comcast.net>
-References: <20190107163117.16269-1-peter.maydell@linaro.org>
-	<20190107163117.16269-25-peter.maydell@linaro.org>
+	(envelope-from <berto@igalia.com>) id 1ghEF5-0000ij-VZ
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:50:01 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190109110144.18633-1-stefanha@redhat.com>
+References: <20190109110144.18633-1-stefanha@redhat.com>
+Date: Wed, 09 Jan 2019 14:49:50 +0100
+Message-ID: <w51sgy26iv5.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190107163117.16269-25-peter.maydell@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 24/37] qtest: Add set_irq_in command to set
- IRQ/GPIO level
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
+ iothread race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +22,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Jan 07, 2019 at 04:31:04PM +0000, Peter Maydell wrote:
-> From: Steffen G=F6rtz <contrib@steffen-goertz.de>
->=20
-> Adds a new qtest command "set_irq_in" which allows
-> to set qemu gpio lines to a given level.
->=20
-> Based on https://lists.gnu.org/archive/html/qemu-devel/2012-12/msg02363=
-.html
-> which never got merged.
->=20
-> Signed-off-by: Steffen G=F6rtz <contrib@steffen-goertz.de>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Message-id: 20190103091119.9367-2-stefanha@redhat.com
-> Originally-by: Matthew Ogilvie <mmogilvi_qemu@miniinfo.net>
+On Wed 09 Jan 2019 12:01:44 PM CET, Stefan Hajnoczi wrote:
+> The following QMP command leads to a crash when iothreads are used:
+>
+>   { 'execute': 'device_del', 'arguments': {'id': 'data'} }
 
-It is kind of interesting to see a part of my old thread(s)
-resurrected, even if it isn't the part I was actually interested
-in.
+I was trying to reproduce this and I found this crashing in master:
 
-Note that my miniinfo email account no longer exists, but I
-can still be reached at mmogilvi+qemu@zoho.com if desired.
+$ qemu-system-x86_64 -enable-kvm -qmp stdio -display none
+{ "execute": "qmp_capabilities" }
+{ "execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "hd.qcow2"}, "node-name": "hd0"}}
+{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
+{ "execute": "x-blockdev-set-iothread", "arguments": {"node-name": "hd0", "iothread": "iothread0"}}
+{ "execute": "device_add", "arguments": {"id": "virtio0", "driver": "virtio-blk-pci", "drive": "hd0"}}
 
-Regarding the patch, I haven't kept up with changes to qemu
-well enough to really have a useful opinion, although superficially
-it looks good.  Perhaps it would make sense to include both
-my old and new email addresses in the sign-off section, to both
-tie it to the old threads and make it easier to reach me
-if someone wants to contact me?  (But I'm not sure of a "clean"
-way to do so, and it is probably low priority.  Perhaps this
-current email is good enough?)
+Thread 1 "qemu-system-x86" received signal SIGABRT, Aborted.
+__GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51
+51         ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+(gdb) bt
+#0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51
+#1  [...] in __GI_abort () at abort.c:89
+#2  [...] in error_exit () at util/qemu-thread-posix.c:36
+#3  [...] in qemu_mutex_unlock_impl () at util/qemu-thread-posix.c:96
+#4  [...] in aio_context_release () at util/async.c:516
+#5  [...] in blk_prw () at block/block-backend.c:1262
+#6  [...] in blk_pread () at block/block-backend.c:1424
+#7  [...] in blk_pread_unthrottled () at block/block-backend.c:1279
+#8  [...] in guess_disk_lchs () at hw/block/hd-geometry.c:71
+#9  [...] in hd_geometry_guess () at hw/block/hd-geometry.c:136
+#10 [...] in blkconf_geometry () at hw/block/block.c:99
+#11 [...] in virtio_blk_device_realize () at hw/block/virtio-blk.c:944
+#12 [...] in virtio_device_realize () at hw/virtio/virtio.c:2538
+[...]
 
-                - Matthew Ogilvie
-
-P.S.: Explanation and keywords to find this message (and me) with
-search tools:
-
-With regards to qemu, my primary interest (from that thread and
-related 2012 threads) is/was being able to run
-"Microport UNIX System V/386 v2.1" (ca. 1987) under qemu, which
-especially required:
-   - Fixing various inaccuracies in qemu's model of the i8259
-     interrupt controller.
-   - Implementing very old graphics card model(s) that Microport UNIX
-     actually knows how to control properly.  Perhaps original
-     IBM monochrome display adaptor (MDA), CGA, and/or hercules
-     graphics card.  Or else my nasty qemu hackish patches I wrote
-     that allowed VGA to work in text mode despite Microport driving
-     it like CGA in a way that didn't work with real VGA hardware.
+Berto
