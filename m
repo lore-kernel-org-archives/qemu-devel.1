@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51351)
+Received: from eggs.gnu.org ([209.51.188.92]:54677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghDtd-000704-0A
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:27:50 -0500
+	(envelope-from <mst@redhat.com>) id 1ghE5B-0006m6-39
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:39:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghDta-0004XU-Qo
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:27:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53370)
+	(envelope-from <mst@redhat.com>) id 1ghE59-0001Vh-N2
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:39:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghDta-0004Vz-IY
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:27:46 -0500
-Date: Wed, 9 Jan 2019 13:27:29 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190109132729.GN3998@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-	<20190109105818.GG3998@redhat.com>
-	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
-	<20190109114459.GK3998@redhat.com>
-	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
-	<20190109125854.GM3998@redhat.com>
-	<860317b6-6489-9c18-bdf8-95a70fbec9b3@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ghE59-0001UT-Dn
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:39:43 -0500
+Date: Wed, 9 Jan 2019 08:39:38 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190109083137-mutt-send-email-mst@kernel.org>
+References: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
+	<20190107182604-mutt-send-email-mst@kernel.org>
+	<7f230258-0950-9155-ec9c-6c6102ed2c2b@oracle.com>
+	<20190107212122-mutt-send-email-mst@kernel.org>
+	<96c1a360-3c21-a4ed-83ea-f094eeaf3b7c@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <860317b6-6489-9c18-bdf8-95a70fbec9b3@redhat.com>
+In-Reply-To: <96c1a360-3c21-a4ed-83ea-f094eeaf3b7c@oracle.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/5] Support for
+ datapath switching during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,110 +32,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
+To: si-wei liu <si-wei.liu@oracle.com>
+Cc: Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Liran Alon <liran.alon@oracle.com>
 
-On Wed, Jan 09, 2019 at 02:20:02PM +0100, Thomas Huth wrote:
-> On 2019-01-09 13:58, Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Jan 09, 2019 at 01:52:02PM +0100, Thomas Huth wrote:
-> >> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
-> >>> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
-> >>>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
-> >>>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
-> >>>>>> Different versions of GCC and Clang use different versions of th=
-e C standard.
-> >>>>>> This repeatedly caused problems already, e.g. with duplicated ty=
-pedefs:
-> >>>>>>
-> >>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.=
-html
-> >>>>>>
-> >>>>>> or with for-loop variable initializers:
-> >>>>>>
-> >>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.=
-html
-> >>>>>>
-> >>>>>> To avoid these problems, we should enforce the C language versio=
-n to the
-> >>>>>> same level for all compilers. Since our minimum compiler version=
-s are
-> >>>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" =
-already,
-> >>>>>> this seems to be a good choice.
-> >>>>>
-> >>>>> In 4.x   gnu11 is marked as experimental. I'm not really comforta=
-ble
-> >>>>> using experimental features - even if its warning free there's a =
-risk
-> >>>>> it would silently mis-compile something.
-> >>>>>
-> >>>>> gnu99 is ok with 4.x - it is merely "incomplete".
-> >>>>
-> >>>> gnu11 has the big advantage that it also fixes the problem with
-> >>>> duplicated typedefs that are reported by older versions of Clang.
-> >>>>
-> >>>> Are you sure about the experimental character in 4.x? I just looke=
-d at
-> >>>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it=
- says:
-> >>>>
-> >>>> "A fourth version of the C standard, known as C11, was published i=
-n 2011
-> >>>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts=
- of
-> >>>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
-> >>>>
-> >>>> It does not say anything about "experimental" there. The word
-> >>>> "experimental" is only used for the C++ support, but we hardly hav=
-e C++
-> >>>> code in QEMU -- if you worry about that, I could simply drop the
-> >>>> "-std=3Dgnu++11" part from my patch?
-> >>>
-> >>> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1=
-.x86_64:
-> >>>
-> >>>   "3.4 Options Controlling C Dialect
-> >>>
-> >>>        ....snip...
-> >>>
-> >>>      'gnu11'
-> >>>      'gnu1x'
-> >>>           GNU dialect of ISO C11.  Support is incomplete and
-> >>>           experimental.  The name 'gnu1x' is deprecated."
-> >>
-> >> Ok. Looks like the "Support is incomplete and experimental" sentence=
- has
-> >> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
-> >> already. IMHO we could give it a try and enable gnu11 for QEMU with =
-GCC
-> >> v4.8, too. If we later find problems, we could still switch back to
-> >> gnu99 instead. Other opinions?
-> >=20
-> > Our code is already cleanly compiling with gnu99 standard - the probl=
-em
-> > is merely that we sometimes introduce regressions due to not enforcin=
-g
-> > that standard level. I don't think the features in gnu11 are compelli=
-ng
-> > enough to justify using something that's declared experimental.
-> What about the duplicated typedef problem? See:
+On Tue, Jan 08, 2019 at 08:55:35PM -0800, si-wei liu wrote:
 >=20
->  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
 >=20
-> That one occured with Clang, but I think we've had plenty of these in
-> the past with GCC, too...
+> On 1/7/2019 6:25 PM, Michael S. Tsirkin wrote:
+>=20
+>     On Mon, Jan 07, 2019 at 05:45:22PM -0800, si-wei liu wrote:
+>=20
+>         On 01/07/2019 03:32 PM, Michael S. Tsirkin wrote:
+>=20
+>             On Mon, Jan 07, 2019 at 05:29:39PM -0500, Venu Busireddy wr=
+ote:
+>=20
+>                 Implement the infrastructure to support datapath switch=
+ing during live
+>                 migration involving SR-IOV devices.
+>=20
+>                 1. This patch is based off on the current VIRTIO_NET_F_=
+STANDBY feature
+>                     bit and MAC address device pairing.
+>=20
+>                 2. This set of events will be consumed by userspace man=
+agement software
+>                     to orchestrate all the hot plug and datapath switch=
+ing activities.
+>                     This scheme has the least QEMU modifications while =
+allowing userspace
+>                     software to build its own intelligence to control t=
+he whole process
+>                     of SR-IOV live migration.
+>=20
+>                 3. While the hidden device model (viz. coupled device m=
+odel) is still
+>                     being explored for automatic hot plugging (QEMU) an=
+d automatic datapath
+>                     switching (host-kernel), this series provides a sup=
+plemental set
+>                     of interfaces if management software wants to drive=
+ the SR-IOV live
+>                     migration on its own. It should not conflict with t=
+he hidden device
+>                     model but just offers simplicity of implementation.
+>=20
+>=20
+>                 Si-Wei Liu (2):
+>                    vfio-pci: Add FAILOVER_PRIMARY_CHANGED event to shor=
+ten downtime during failover
+>                    pci: query command extension to check the bus master=
+ enabling status of the failover-primary device
+>=20
+>                 Sridhar Samudrala (1):
+>                    virtio_net: Add VIRTIO_NET_F_STANDBY feature bit.
+>=20
+>                 Venu Busireddy (2):
+>                    virtio_net: Add support for "Data Path Switching" du=
+ring Live Migration.
+>                    virtio_net: Add a query command for FAILOVER_STANDBY=
+_CHANGED event.
+>=20
+>                 ---
+>                 Changes in v3:
+>                    Fix issues with coding style in patch 3/5.
+>=20
+>                 Changes in v2:
+>                    Added a query command for FAILOVER_STANDBY_CHANGED e=
+vent.
+>                    Added a query command for FAILOVER_PRIMARY_CHANGED e=
+vent.
+>=20
+>             Hmm it looks like all feedback I sent e.g. here:
+>             https://patchwork.kernel.org/patch/10721571/
+>             got ignored.
+>=20
+>             To summarize I suggest reworking the series adding a new co=
+mmand along
+>             the lines of (naming is up to you):
+>=20
+>             query-pci-master - this returns status for a device
+>                                and enables a *single* event after
+>                                it changes
+>=20
+>             and then removing all status data from the event,
+>             just notify about the change and *only once*.
+>=20
+>         Why removing all status data from the event?
+>=20
+>     To make sure users do not forget to call query-pci-master to
+>     re-enable more events.
+>=20
+> IMO the FAILOVER_PRIMARY_CHANGED event is on the performance path, it's=
+ an
+> overkill to enforce round trip query for each event in normal situation=
+s.
+>=20
+>         It does not hurt to keep them
+>         as the FAILOVER_PRIMARY_CHANGED event in general is of pretty l=
+ow-frequency.
+>=20
+>     A malicious guest can make it as frequent as it wants to.
+>     OTOH there is no way to limit.
+>=20
+> Will throttle the event rate (say, limiting to no more than 1 event per=
+ second)
 
-IIUC, That's only a problem because we don't pass any  -std  flag, and
-so get the compilers default, which may be gnu11.  If we explicitly
-set -std=3Dgnu99, that problem will be reported by patchew, travis and
-maintainers own build tests, and thus won't get anywhere near git master.
+And if guest *does* need the switch because e.g. attaching xdp wants to
+resent the card?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> a way to limit (as opposed to control guest behavior) ? The other simil=
+ar
+> events that apply rate limiting don't suppress event emission until the=
+ next
+> query at all.
+
+We have some problematic interfaces already, that's true.
+
+> Doing so would just cause more events missing. As stated in the
+> earlier example, we should give guest NIC a chance to flush queued pack=
+ets even
+> if ending state is same between two events.
+
+I haven't seen that requirement. I guess a reset just stops processing
+buffers rather than flush. Care to repeat?
+
+>=20
+>         As can be seen other similar low-frequent QMP events do have da=
+ta carried
+>         over.
+>=20
+>         As this event relates to datapath switching, there's implicatio=
+n to coalesce
+>         events as packets might not get a chance to send out as nothing=
+ would ever
+>         happen when=A0 going through quick transitions like
+>         disabled->enabled->disabled. I would allow at least few packets=
+ to be sent
+>         over wire rather than nothing. Who knows how fast management ca=
+n react and
+>         consume these events?
+>=20
+>         Thanks,
+>         -Siwei
+>=20
+>     OK if it's so important for latency let's include data in the event=
+.
+>     Please add comments explaining that you must always re-run query
+>     afterwards to make sure it's stable and re-enable more events.
+>=20
+> I can add comments describing why we need to carry data in the event, a=
+nd apply
+> rate limiting to events. But I don't follow why it must suppress event =
+until
+> next query.
+
+Rate limiting is fundamentally broken.
+Try a stress of resets and there goes your promise of low downtime.
+
+Let me try to re-state: state query is fundamentally required
+because otherwise e.g. management restarts do not work.
+And it is much better to force management to run query every event
+and every restart than just hope it handles racy corner cases correctly.
+
+If we do include data in the event then there is no real latency cost to
+that, since management can take action in response to the event then do
+the query asynchronously at leasure.
+So let me turn it around and say I don't follow why you have objections
+to blocking following events until query.
+
+
+>=20
+> Thanks,
+> -Siwei
+>=20
+>=20
+>=20
+>=20
+>=20
+>=20
+>=20
+>             upon event management does query-pci-master
+>             and acts accordingly.
+>=20
+>=20
+>=20
+>=20
+>=20
+>                   hmp.c                          |   5 +++
+>                   hw/acpi/pcihp.c                |  27 +++++++++++
+>                   hw/net/virtio-net.c            |  42 ++++++++++++++++=
++
+>                   hw/pci/pci.c                   |   5 +++
+>                   hw/vfio/pci.c                  |  60 ++++++++++++++++=
++++++++++
+>                   hw/vfio/pci.h                  |   1 +
+>                   include/hw/pci/pci.h           |   1 +
+>                   include/hw/virtio/virtio-net.h |   1 +
+>                   include/net/net.h              |   2 +
+>                   net/net.c                      |  61 ++++++++++++++++=
++++++++++
+>                   qapi/misc.json                 |   5 ++-
+>                   qapi/net.json                  | 100 ++++++++++++++++=
++++++++++++++++++++++++++
+>                   12 files changed, 309 insertions(+), 1 deletion(-)
+>=20
+>             -----------------------------------------------------------=
+----------
+>             To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-=
+open.org
+>             For additional commands, e-mail: virtio-dev-help@lists.oasi=
+s-open.org
+>=20
+>=20
+>     -------------------------------------------------------------------=
+--
+>     To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+>     For additional commands, e-mail: virtio-dev-help@lists.oasis-open.o=
+rg
+>=20
+>=20
+>=20
