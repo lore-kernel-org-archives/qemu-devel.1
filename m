@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41217)
+Received: from eggs.gnu.org ([209.51.188.92]:42261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1ghGWb-0000YK-Q6
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:16:16 -0500
+	(envelope-from <agraf@suse.de>) id 1ghGa7-0002a6-9b
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:19:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1ghGWa-0004uW-QX
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:16:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52986)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1ghGWa-0004sM-G6
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:16:12 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9979A368DD
-	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 16:07:48 +0000 (UTC)
-References: <20190109102311.7635-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-Message-ID: <6e3df370-15c7-3e58-6fba-b795131b8779@redhat.com>
-Date: Wed, 9 Jan 2019 17:07:31 +0100
+	(envelope-from <agraf@suse.de>) id 1ghGa6-0007qy-G8
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:19:51 -0500
+References: <20190109152430.32359-1-agraf@suse.de> <871s5lx14y.fsf@linaro.org>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <36959924-c384-5850-9bea-0060fe744f2e@suse.de>
+Date: Wed, 9 Jan 2019 17:19:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190109102311.7635-1-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bhoj5LY3XG96sbb9bxh2L6QjPCC5uYby8"
-Subject: Re: [Qemu-devel] [PATCH] qdev: fix -device scsi-hd,help regression
+In-Reply-To: <871s5lx14y.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow to switch from MON->HYP
+ on AArch32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,112 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, cohuck@redhat.com, ehabkost@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Tom Rini <trini@konsulko.com>, qemu-arm@nongnu.org, Michal Simek <michal.simek@xilinx.com>, Stephen Warren <swarren@wwwdotorg.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bhoj5LY3XG96sbb9bxh2L6QjPCC5uYby8
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, cohuck@redhat.com, ehabkost@redhat.com
-Message-ID: <6e3df370-15c7-3e58-6fba-b795131b8779@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qdev: fix -device scsi-hd,help regression
-References: <20190109102311.7635-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20190109102311.7635-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 01/09/2019 05:10 PM, Alex Benn=C3=A9e wrote:
+> Alexander Graf <agraf@suse.de> writes:
+>
+>> In U-boot, we switch from S-SVC -> MON -> HYP when we want to enter
+>> HYP mode. This dance seems to work ok (hence it's there in the code
+>> base), but breaks with current QEMU.
+> What EL is MON in this case? EL3? In which case I'm confused by the
+> terminology as the ARM ARM states:
+>
+>    The principles of the ARMv8-A security model are:
+>    =E2=80=A2 If the implementation includes EL3, then it has two Securi=
+ty states, Secure and Non-secure, and:
+>      =E2=80=94 EL3 exists only in Secure state.
+>      =E2=80=94 A change from Non-secure state to Secure state can only =
+occur on taking an exception to EL3.
+>      =E2=80=94 A change from Secure state to Non-secure state can only =
+occur on an exception return from EL3.
+>
+> We don't currently implement ARMv8.4-SecEL2 but that adds secure EL2 bu=
+t
+> as you can only switch security state in in/out of EL3 you have to be g=
+o
+> to the secure monitor before you enter it.
 
-Dne 09. 01. 19 v 11:23 Marc-Andr=C3=A9 Lureau napsal(a):
-> Since commit ea9ce8934, device_post_init() applies globals directly
-> from machines and accelerator classes.
->=20
-> There are cases, such as -device scsi-hd,help, where the machine is
-> setup but there in no accelerator.
->=20
-> Let's skip accelerator globals in this case.
->=20
-> Fixes SEGV:
->  #0  0x0000555558ea04ff in object_get_class (obj=3D0x0) at /home/elmarc=
-o/src/qemu/build/../qom/object.c:857
->  #1  0x000055555854c797 in object_apply_compat_props (obj=3D0x616000078=
-980) at /home/elmarco/src/qemu/build/../hw/core/qdev.c:978
->  #2  0x000055555854c797 in object_apply_compat_props (obj=3D0x616000078=
-980) at /home/elmarco/src/qemu/build/../hw/core/qdev.c:973
->  #3  0x000055555854c959 in device_post_init (obj=3D0x616000078980) at /=
-home/elmarco/src/qemu/build/../hw/core/qdev.c:989
->  #4  0x0000555558e9e250 in object_post_init_with_type (ti=3D<optimized =
-out>, obj=3D0x616000078980) at /home/elmarco/src/qemu/build/../qom/object=
-=2Ec:365
->  #5  0x0000555558e9e250 in object_initialize_with_type (data=3D0x616000=
-078980, size=3D616, type=3D<optimized out>) at /home/elmarco/src/qemu/bui=
-ld/../qom/object.c:425
->  #6  0x0000555558e9e571 in object_new_with_type (type=3D0x613000031900)=
- at /home/elmarco/src/qemu/build/../qom/object.c:588
->  #7  0x000055555830c048 in qmp_device_list_properties (typename=3Dtypen=
-ame@entry=3D0x60200000c2d0 "scsi-hd", errp=3Derrp@entry=3D0x7fffffffc540)=
- at /home/elmarco/src/qemu/qmp.c:519
->  #8  0x00005555582c4027 in qdev_device_help (opts=3D<optimized out>) at=
- /home/elmarco/src/qemu/qdev-monitor.c:283
->  #9  0x0000555559378fa2 in qemu_opts_foreach (list=3D<optimized out>, f=
-unc=3Dfunc@entry=3D0x5555582cfca0 <device_help_func>, opaque=3Dopaque@ent=
-ry=3D0x0, errp=3Derrp@entry=3D0x0) at /home/elmarco/src/qemu/util/qemu-op=
-tion.c:1171
->=20
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1664364
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/core/qdev.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 3769a2bccb..47bddacb4f 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -975,10 +975,13 @@ void object_apply_compat_props(Object *obj)
->      if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
->          MachineState *m =3D MACHINE(qdev_get_machine());
->          MachineClass *mc =3D MACHINE_GET_CLASS(m);
-> -        AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
-> =20
-> -        if (ac->compat_props) {
-> -            object_apply_global_props(obj, ac->compat_props, &error_ab=
-ort);
-> +        if (m->accelerator) {
-> +            AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
-> +
-> +            if (ac->compat_props) {
-> +                object_apply_global_props(obj, ac->compat_props, &erro=
-r_abort);
-> +            }
->          }
->          object_apply_global_props(obj, mc->compat_props, &error_abort)=
-;
->      }
->=20
+Right - and exactly that switch seems to be prohibited here.
 
-Thank you, this addresses my issue and doesn't seem to introduce new ones=
-=2E
+>
+>> The reason seems to be that we try to see whether we are entering
+>> HYP mode from the NS side. However, MON is always considered secure,
+>> so we always fall into an error case when going MON->HYP and never
+>> manage to actually do the switch.
+>>
+>> Fix this by not using a different helper function that does not bork
+>> when we're in MON state, as that switch is supposed to work.
+>>
+>> Signed-off-by: Alexander Graf <agraf@suse.de>
+>> ---
+>>   target/arm/helper.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>> index f00c141ef9..9bf8fbd8f9 100644
+>> --- a/target/arm/helper.c
+>> +++ b/target/arm/helper.c
+>> @@ -6297,7 +6297,7 @@ static int bad_mode_switch(CPUARMState *env, int=
+ mode, CPSRWriteType write_type)
+>>           return 0;
+>>       case ARM_CPU_MODE_HYP:
+>>           return !arm_feature(env, ARM_FEATURE_EL2)
+>> -            || arm_current_el(env) < 2 || arm_is_secure(env);
+>> +            || arm_current_el(env) < 2 ||
+>> arm_is_secure_below_el3(env);
+> This seems to violate the rule that you can enter a NS state from
+> anything other than EL3.
 
-Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>=20
+How so? This statement basically says "Only return to HYP from NS-HYP or=20
+EL3" now. Before it said "Only return to HYP from HYP".
 
+Alex
 
---bhoj5LY3XG96sbb9bxh2L6QjPCC5uYby8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEpApMRcQDTeAqWtSDJrNi5H/PIsEFAlw2HEMACgkQJrNi5H/P
-IsEvDQf/apVjYCKuBC5dSTOIUO30PkmVXy148FmAos9SoHrJphR9h0vjaAZHxewo
-uOHkB/YmO24cqv/EisG42K2cPbxLhBh5KhxIZoVK9ywLZRrs7AWNBY5XnBU9CKNs
-s1Q6lu698PJV7Q5MbAcLYXsE3FpoUtRTZ3i2tiqoeZflqHox59Cfqq2nKH8pjxXd
-SZ3SkRSArqiqb3hWyXjND7DDDtiGZtEezdp7p0N9OQHw/m8icq0kRu5mhoUhGrzl
-I88Tmw2PtnV3OteF3rbiryLOUvOIpP46WNtbiibTM431l+6jeIXP7BwoJKvtOs8j
-v1XoOAzzOe88+0upZqjFt7CrvPQUjQ==
-=BV4E
------END PGP SIGNATURE-----
-
---bhoj5LY3XG96sbb9bxh2L6QjPCC5uYby8--
+>
+>>       case ARM_CPU_MODE_MON:
+>>           return arm_current_el(env) < 3;
+>>       default:
+>
+> --
+> Alex Benn=C3=A9e
+>
