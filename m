@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47919)
+Received: from eggs.gnu.org ([209.51.188.92]:48972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ghFCA-0005Bt-0F
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:51:03 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghFCm-0005ve-8m
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:51:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ghFC9-0000wF-8s
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:51:01 -0500
-Date: Wed, 9 Jan 2019 14:50:56 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190109145056.GA21547@stefanha-x1.localdomain>
-References: <20190109142850.27727-1-berto@igalia.com>
+	(envelope-from <thuth@redhat.com>) id 1ghFCk-0002Jv-VV
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:51:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghFCk-0002Iz-M4
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:51:38 -0500
+References: <1547043869-10520-1-git-send-email-thuth@redhat.com>
+	<20190109143122.GR3998@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <21c94e77-ad1d-3ce2-72cd-fc86f6d619fc@redhat.com>
+Date: Wed, 9 Jan 2019 15:51:33 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="XsQoSWH+UP9D9v3l"
-Content-Disposition: inline
-In-Reply-To: <20190109142850.27727-1-berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH] block: Acquire the AioContext in
- guess_disk_lchs()
+In-Reply-To: <20190109143122.GR3998@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] configure: Force the C standard to gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-
---XsQoSWH+UP9D9v3l
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jan 09, 2019 at 04:28:50PM +0200, Alberto Garcia wrote:
-> This fixes the following crash:
+On 2019-01-09 15:31, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Jan 09, 2019 at 03:24:29PM +0100, Thomas Huth wrote:
+>> Different versions of GCC and Clang use different versions of the C st=
+andard.
+>> This repeatedly caused problems already, e.g. with duplicated typedefs=
+:
+>>
+>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+>>
+>> or with for-loop variable initializers:
+>>
+>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
+>>
+>> To avoid these problems, we should enforce the C language version to t=
+he
+>> same level for all compilers. Since our minimum compiler versions is
+>> GCC v4.8, our best option is "gnu99" right now ("gnu17" is not availab=
+le
+>> there yet, and "gnu11" is marked as "experimental").
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  v2: Use gnu99 instead of gnu11
+>>
+>>  configure | 5 +++--
+>>  1 file changed, 3 insertions(+), 2 deletions(-)
 >=20
-> { "execute": "blockdev-add",
->   "arguments": {"driver": "null-co", "node-name": "hd0"}}
-> { "execute": "object-add",
->   "arguments": {"qom-type": "iothread", "id": "iothread0"}}
-> { "execute": "x-blockdev-set-iothread",
->   "arguments": {"node-name": "hd0", "iothread": "iothread0"}}
-> { "execute": "device_add",
->   "arguments": {"id": "virtio0", "driver": "virtio-blk-pci",
->                 "drive": "hd0"}}
-> qemu: qemu_mutex_unlock_impl: Operation not permitted
-> Aborted
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 >=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  hw/block/hd-geometry.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>> diff --git a/configure b/configure
+>> index b9f34af..721ade7 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -105,7 +105,8 @@ update_cxxflags() {
+>>      for arg in $QEMU_CFLAGS; do
+>>          case $arg in
+>>              -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs=
+|\
+>> -            -Wold-style-declaration|-Wold-style-definition|-Wredundan=
+t-decls)
+>> +            -Wold-style-declaration|-Wold-style-definition|-Wredundan=
+t-decls|\
+>> +            -std=3Dgnu99)
+>=20
+> IIUC this is to  drop  -std=3Dgnu99 from CXXFLAGS, so C++ code (only th=
+e
+> guest-agent on Win32 IIUC) will use the compiler default still.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+We also use it for the capstone disassembler and disas/libvixl.
 
---XsQoSWH+UP9D9v3l
-Content-Type: application/pgp-signature; name="signature.asc"
+> We could consider also setting a suitable -std for CXXFLAGS too in futu=
+re
+> though...
 
------BEGIN PGP SIGNATURE-----
+Shall I send a v3 with "-std=3Dgnu++98" (which seems to be the only usabl=
+e
+option right now), or shall we wait until we really hit a problem with
+the C++ code?
 
-iQEcBAEBAgAGBQJcNgpQAAoJEJykq7OBq3PIZ74H/j9epTseD+Okje6n1EOxt6iu
-ygYbSlNtjrbv7SKbCrBsxB+BhtE6V2EHYgQTxhN+OHSWZfj37kv5BrDIiCNHwTV9
-UZ0ks0VDD0BJMI/H2r4gdOT/G0RV/NbGZI8YZG6ST7fk/YmmySczpZQxPylpDioL
-iCFFvcb7RreNA2T08O3vcE+HMqUZFE4Rp44xFnkxuN7f+idKI3vfFcVmlViDxW+o
-vUlXbnY1z73HQjRJrGF1Qaaz+GdUApubviQRGMv5gs/4zn039C7c9PqqW+UI781e
-rLfjq+DapmNqmwW/dL0r08XeWKammKFJRplZ985BqLa560q1Rs2cdu/XMTJHRKo=
-=j3/R
------END PGP SIGNATURE-----
-
---XsQoSWH+UP9D9v3l--
+ Thomas
