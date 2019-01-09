@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41828)
+Received: from eggs.gnu.org ([209.51.188.92]:41822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghDKD-0000Y4-Cf
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:51:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghDKJ-0000Y2-4o
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:51:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghDGT-0006Di-AY
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:47:24 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghDGL-0006D2-Nd
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:47:15 -0500
-Received: by mail-wr1-f68.google.com with SMTP id u4so7552665wrp.3
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 04:47:13 -0800 (PST)
-References: <cover.1546532844.git.balaton@eik.bme.hu>
-	<a977bd81f7c1f2896837671545fbb01ebf286f4a.1546532844.git.balaton@eik.bme.hu>
-	<6c6cdb4b-b15c-0152-2cfe-4ac813d15111@redhat.com>
-	<alpine.BSF.2.21.9999.1901091306020.28696@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d2644929-3e7e-af15-9256-342a09b4f63c@redhat.com>
-Date: Wed, 9 Jan 2019 13:47:09 +0100
+	(envelope-from <armbru@redhat.com>) id 1ghDFN-0005xX-KK
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:46:15 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1537848362.git.jcody@redhat.com>
+	<cover.1537848362.git.jcody@redhat.com>
+	<0e8a512d4c95094dc12f92390200c8e753c38248.1537848362.git.jcody@redhat.com>
+	<87efdiyxv9.fsf@dusky.pond.sub.org>
+	<20180925053204.GB4558@lemon.usersys.redhat.com>
+	<87va6uvxhv.fsf@dusky.pond.sub.org>
+	<87h8ejcbl1.fsf@dusky.pond.sub.org>
+	<20190108191216.GO11492@linux.fritz.box>
+	<20190109114319.GB7869@ndevos-x270>
+Date: Wed, 09 Jan 2019 13:46:03 +0100
+In-Reply-To: <20190109114319.GB7869@ndevos-x270> (Niels de Vos's message of
+	"Wed, 9 Jan 2019 12:43:19 +0100")
+Message-ID: <87y37ugfsk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1901091306020.28696@zero.eik.bme.hu>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] smbus: Add a helper to generate SPD
- EEPROM data
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] MAINTAINERS: Remove
+ myself as block maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,144 +31,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Niels de Vos <ndevos@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, Jeff Cody <jeff@codyprime.org>
 
-On 1/9/19 1:15 PM, BALATON Zoltan wrote:
-> On Wed, 9 Jan 2019, Philippe Mathieu-Daudé wrote:
->> On 1/3/19 5:27 PM, BALATON Zoltan wrote:
->>> There are several boards with SPD EEPROMs that are now using
->>> duplicated or slightly different hard coded data. Add a helper to
->>> generate SPD data for a memory module of given type and size that
->>> could be used by these boards (either as is or with further changes if
->>> needed) which should help cleaning this up and avoid further
->>> duplication.
->>>
->>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>> ---
->>> v3: Fixed a tab indent
->>> v2: Added errp parameter to pass errors back to caller
->>>
->>>  hw/i2c/smbus_eeprom.c  | 130
->>> +++++++++++++++++++++++++++++++++++++++++++++++++
->>>  include/hw/i2c/smbus.h |   3 ++
->>>  2 files changed, 133 insertions(+)
->>>
->>> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
->>> index f18aa3de35..bef24a1ca4 100644
->>> --- a/hw/i2c/smbus_eeprom.c
->>> +++ b/hw/i2c/smbus_eeprom.c
-> [...]
->>> +
->>> +    spd = g_malloc0(256);
->>
->> I think this buffer is eeprom-dependant, not SPD related.
-> 
-> This function is called spd_data_generate(). It specifically generates
-> SPD EEPROM data and nothing else. as you see below data is hardcoded so
-> would not work for other EEPROMs (the first two bytes even specify
-> EEPROM size, hence I don't think size needs to be passed as a parameter.
+Niels de Vos <ndevos@redhat.com> writes:
 
-Well this is why worried me at first, because you alloc 256 bytes ...
+> On Tue, Jan 08, 2019 at 08:12:16PM +0100, Kevin Wolf wrote:
+>> Am 08.01.2019 um 18:18 hat Markus Armbruster geschrieben:
+>> > This patch series got stuck.
+>> > 
+>> > Markus Armbruster <armbru@redhat.com> writes:
+>> > 
+>> > > Fam Zheng <famz@redhat.com> writes:
+>> > >
+>> > >> On Tue, 09/25 07:00, Markus Armbruster wrote:
+>> > >>> Jeff Cody <jcody@redhat.com> writes:
+>> > >>> 
+>> > >>> > I'll not be involved in day-to-day qemu development.  Remove
+>> > >>> > myself as maintainer from the remainder of the network block drivers
+>> > >>> > (and vhdx), and revert them to the general block layer maintainership.
+>> > >>> >
+>> > >>> > Signed-off-by: Jeff Cody <jcody@redhat.com>
+>> > >>> > ---
+>> > >>> >  MAINTAINERS | 14 --------------
+>> > >>> >  1 file changed, 14 deletions(-)
+>> > >>> >
+>> > >>> > diff --git a/MAINTAINERS b/MAINTAINERS
+>> > >>> > index e93f79672f..6ef6932628 100644
+>> > >>> > --- a/MAINTAINERS
+>> > >>> > +++ b/MAINTAINERS
+>> > >>> > @@ -1982,28 +1982,22 @@ F: block/vmdk.c
+>> > >>> >  
+>> > >>> >  RBD
+>> > >>> >  M: Josh Durgin <jdurgin@redhat.com>
+>> > >>> > -M: Jeff Cody <jcody@redhat.com>
+>> > >>> >  L: qemu-block@nongnu.org
+>> > >>> >  S: Supported
+>> > >>> >  F: block/rbd.c
+>> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+>> > >>> >  
+>> > >>> >  Sheepdog
+>> > >>> >  M: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
+>> > >>> >  M: Liu Yuan <namei.unix@gmail.com>
+>> > >>> > -M: Jeff Cody <jcody@redhat.com>
+>> > >>> >  L: qemu-block@nongnu.org
+>> > >>> >  L: sheepdog@lists.wpkg.org
+>> > >>> >  S: Supported
+>> > >>> >  F: block/sheepdog.c
+>> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+>> > >>> >  
+>> > >>> >  VHDX
+>> > >>> > -M: Jeff Cody <jcody@redhat.com>
+>> > >>> >  L: qemu-block@nongnu.org
+>> > >>> >  S: Supported
+>> > >>> >  F: block/vhdx*
+>> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+>> > >>> 
+>> > >>> Does "S: Supported" make sense without an M:?
+>> > >>> 
+>> > >>> >  
+>> > >>> >  VDI
+>> > >>> >  M: Stefan Weil <sw@weilnetz.de>
+>> > >>> > @@ -2034,34 +2028,26 @@ F: docs/interop/nbd.txt
+>> > >>> >  T: git git://repo.or.cz/qemu/ericb.git nbd
+>> > >>> >  
+>> > >>> >  NFS
+>> > >>> > -M: Jeff Cody <jcody@redhat.com>
+>> > >>> >  M: Peter Lieven <pl@kamp.de>
+>> > >>> >  L: qemu-block@nongnu.org
+>> > >>> >  S: Maintained
+>> > >>> >  F: block/nfs.c
+>> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+>> > >>> >  
+>> > >>> >  SSH
+>> > >>> >  M: Richard W.M. Jones <rjones@redhat.com>
+>> > >>> > -M: Jeff Cody <jcody@redhat.com>
+>> > >>> >  L: qemu-block@nongnu.org
+>> > >>> >  S: Supported
+>> > >>> >  F: block/ssh.c
+>> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+>> > >>> >  
+>> > >>> >  CURL
+>> > >>> > -M: Jeff Cody <jcody@redhat.com>
+>> > >>> >  L: qemu-block@nongnu.org
+>> > >>> >  S: Supported
+>> > >>> >  F: block/curl.c
+>> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+>> > >>> 
+>> > >>> Likewise.
+>> > >>> 
+>> > >>> >  GLUSTER
+>> > >>> > -M: Jeff Cody <jcody@redhat.com>
+>> > >>> >  L: qemu-block@nongnu.org
+>> > >>> >  S: Supported
+>> > >>> >  F: block/gluster.c
+>> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+>> > >>> 
+>> > >>> Likewise.
+>> > >>> 
+>> > >>> >  Null Block Driver
+>> > >>> >  M: Fam Zheng <famz@redhat.com>
+>> > >>> 
+>> > >>
+>> > >> Block drivers without an M: naturally fall under the overall maintainership of
+>> > >> block layer (Kevin&Max), so IMO keeping the statuses is fine. Maybe CURL can be
+>> > >> degraded to Maintained, though.
+>> > >
+>> > > Yes, get_maintainer.pl combines all applicable sections.  Human readers
+>> > > are left to wonder, unless they know to look for other matches.
+>> > >
+>> > > Do we want to have a dedicated network block driver submaintainer again,
+>> > > if we can find one?
+>> > >
+>> > > Do we want to have a dedicated VHDX driver submaintainer again?  Fam,
+>> > > you're maintaining VMDK, could you cover VHDX as well?
+>> > 
+>> > Fam can't.
+>> > 
+>> > I can see two sane options for the three sections that lose their sole
+>> > maintainer (VHDX, CURL, GLUSTER):
+>> > 
+>> > * Downgrade to S: Orphan
+>> > 
+>> >   This reflects the fact that we'd like to have dedicated maintainers
+>> >   for them.  It camouflages the fact that the "Block layer core"
+>> >   maintainers pick up the slack.
+>> > 
+>> > * Delete
+>> > 
+>> >   The opposite.
+>> > 
+>> > Kevin, Max, please pick your poison, or suggest one you find tastier.
+>> 
+>> Orphan is probably by far closer to the truth than Supported. But I
+>> think what we really do is Odd Fixes. Not sure if that's a status that
+>> works in any meaningful way without having a maintainer for the specific
+>> thing assigned?
+>
+> For Gluster we are interested in keeping it maintained in some form. At
+> least integration@gluster.org could be added as a list. I am not sure
+> there is anyone working on Gluster that would fit for a maintainer of
+> the driver. If you really want to put a name there, I can function as a
+> 'maintainer' and pull in other Gluster developers in case I am otherwise
+> occupied.
 
-> 
->> Wouldn't it be cleaner to pass the (previously created) buffer as
->> argument such:
->>
->>  /* return true on success */
->>  bool spd_data_fill(void *buf, size_t bufsize,
->>                     enum sdram_type type, ram_addr_t ram_size,
->>                     Error **errp);
-> 
-> It could take a previously created buffer but it's simpler this way and
-> one less error to handle by the caller so I don't like adding two more
-> parameters for this.
-> 
->> or return something else like ssize_t.
-> 
-> Again, the current version is simpler IMO so while this aims to be
-> generic to be used by other boards but still not completely generic for
-> all kinds of EEPROMs. Just for SPD EEPROMs commonly found on SDR, DDR
-> and DDR2 memory modules. Anything else (even DDR3) is too dissimilar so
-> those will need another function not this one.
-> 
-> Regards,
-> BALATON Zoltan
-> 
->>
->>> +    spd[0] = 128;   /* data bytes in EEPROM */
+Leads us to the question what it takes to be a maintainer.  I figure we
+need at least a commitment to get patches reviewed, plus the ability to
+get them reviewed competently.
 
-... for a 128 bytes EEPROM.
-
-Maybe we can find a compromise at a quick fix with:
-
-  /* no other size currently supported */
-  static const size_t spd_eeprom_size = 128;
-
-  spd = g_malloc0(spd_eeprom_size);
-  ...
-
-  spd[0] = spd_eeprom_size;
-  spd[1] = 1 + ctzl(spd_eeprom_size);
-
->>> +    spd[1] = 8;     /* log2 size of EEPROM */
->>> +    spd[2] = type;
->>> +    spd[3] = 13;    /* row address bits */
->>> +    spd[4] = 10;    /* column address bits */
->>> +    spd[5] = (type == DDR2 ? nbanks - 1 : nbanks);
->>> +    spd[6] = 64;    /* module data width */
->>> +                    /* reserved / data width high */
->>> +    spd[8] = 4;     /* interface voltage level */
->>> +    spd[9] = 0x25;  /* highest CAS latency */
->>> +    spd[10] = 1;    /* access time */
->>> +                    /* DIMM configuration 0 = non-ECC */
->>> +    spd[12] = 0x82; /* refresh requirements */
->>> +    spd[13] = 8;    /* primary SDRAM width */
->>> +                    /* ECC SDRAM width */
->>> +    spd[15] = (type == DDR2 ? 0 : 1); /* reserved / delay for random
->>> col rd */
->>> +    spd[16] = 12;   /* burst lengths supported */
->>> +    spd[17] = 4;    /* banks per SDRAM device */
->>> +    spd[18] = 12;   /* ~CAS latencies supported */
->>> +    spd[19] = (type == DDR2 ? 0 : 1); /* reserved / ~CS latencies
->>> supported */
->>> +    spd[20] = 2;    /* DIMM type / ~WE latencies */
->>> +                    /* module features */
->>> +                    /* memory chip features */
->>> +    spd[23] = 0x12; /* clock cycle time @ medium CAS latency */
->>> +                    /* data access time */
->>> +                    /* clock cycle time @ short CAS latency */
->>> +                    /* data access time */
->>> +    spd[27] = 20;   /* min. row precharge time */
->>> +    spd[28] = 15;   /* min. row active row delay */
->>> +    spd[29] = 20;   /* min. ~RAS to ~CAS delay */
->>> +    spd[30] = 45;   /* min. active to precharge time */
->>> +    spd[31] = density;
->>> +    spd[32] = 20;   /* addr/cmd setup time */
->>> +    spd[33] = 8;    /* addr/cmd hold time */
->>> +    spd[34] = 20;   /* data input setup time */
->>> +    spd[35] = 8;    /* data input hold time */
->>> +
->>> +    /* checksum */
->>> +    for (i = 0; i < 63; i++) {
->>> +        spd[63] += spd[i];
->>> +    }
->>> +    return spd;
->>> +}
->>> diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
->>> index d8b1b9ee81..d3dd0fcb14 100644
->>> --- a/include/hw/i2c/smbus.h
->>> +++ b/include/hw/i2c/smbus.h
->>> @@ -93,4 +93,7 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t
->>> address, uint8_t *eeprom_buf);
->>>  void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
->>>                         const uint8_t *eeprom_spd, int size);
->>>
->>> +enum sdram_type { SDR = 0x4, DDR = 0x7, DDR2 = 0x8 };
->>> +uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t size,
->>> Error **errp);
->>> +
->>>  #endif
->>>
->>
->>
+Note my careful use of the passive voice: whether the maintainer does it
+himself or herds a team of intelligent cats to do it may not matter all
+that much to us.
