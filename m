@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47001)
+Received: from eggs.gnu.org ([209.51.188.92]:47075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ghDeh-00032A-PT
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:12:24 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ghDer-00036I-GO
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:12:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ghDbx-0000Fe-LX
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:09:35 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed,  9 Jan 2019 14:08:44 +0100
-Message-Id: <20190109130844.5172-7-laurent@vivier.eu>
-In-Reply-To: <20190109130844.5172-1-laurent@vivier.eu>
-References: <20190109130844.5172-1-laurent@vivier.eu>
+	(envelope-from <mreitz@redhat.com>) id 1ghDZ4-0006nM-Id
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:06:36 -0500
+References: <20190102140535.11512-1-cfergeau@redhat.com>
+	<20190102180158.GA6015@natto.ory.fergeau.eu>
+	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
+	<87o98sii5b.fsf@dusky.pond.sub.org>
+	<20190107163606.GL23773@natto.ory.fergeau.eu>
+	<87pnt7bflk.fsf@dusky.pond.sub.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d8a41aa9-42bf-94f0-d6e6-347547dc39da@redhat.com>
+Date: Wed, 9 Jan 2019 14:06:22 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 6/6] ioapic: use TYPE_FOO MACRO than constant
- string
+In-Reply-To: <87pnt7bflk.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="r1YJLh0MQq6Njgvu6OtH0zDursJv3MaRH"
+Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,80 +28,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Anthony Green <green@moxielogic.com>, John Snow <jsnow@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=83=C2=A9?= <philmd@redhat.com>, Li Qiang <liq3ea@163.com>
+To: Markus Armbruster <armbru@redhat.com>, Christophe Fergeau <cfergeau@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-From: Li Qiang <liq3ea@163.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--r1YJLh0MQq6Njgvu6OtH0zDursJv3MaRH
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>,
+ Christophe Fergeau <cfergeau@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <d8a41aa9-42bf-94f0-d6e6-347547dc39da@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
+References: <20190102140535.11512-1-cfergeau@redhat.com>
+ <20190102180158.GA6015@natto.ory.fergeau.eu>
+ <4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
+ <87o98sii5b.fsf@dusky.pond.sub.org>
+ <20190107163606.GL23773@natto.ory.fergeau.eu>
+ <87pnt7bflk.fsf@dusky.pond.sub.org>
+In-Reply-To: <87pnt7bflk.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Make them more QOMConventional.
-Cc:qemu-trivial@nongnu.org
+On 08.01.19 11:36, Markus Armbruster wrote:
+> Copying block maintainers for help with assessing the bug's (non-)impac=
+t
+> on security.
+>=20
+> Christophe Fergeau <cfergeau@redhat.com> writes:
+>=20
+>> On Mon, Jan 07, 2019 at 04:47:44PM +0100, Markus Armbruster wrote:
+>>> Eric Blake <eblake@redhat.com> writes:
+>>>
+>>>> On 1/2/19 12:01 PM, Christophe Fergeau wrote:
+>>>>> Adding Markus to cc: list, I forgot to do it when sending the patch=
+=2E
+>>>>
+>>>> Also worth backporting via qemu-stable, now in cc.
+>>>>
+>>>>>
+>>>>> Christophe
+>>>>>
+>>>>> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:=
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20190105023831.66910-1-liq3ea@163.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- hw/i386/kvm/ioapic.c     | 2 +-
- hw/i386/pc.c             | 4 ++--
- hw/intc/ioapic.c         | 2 +-
- include/hw/i386/ioapic.h | 3 +++
- 4 files changed, 7 insertions(+), 4 deletions(-)
+>>>>>> commit 8bca4613 added support for %% in json strings when interpol=
+ating,
+>>>>>> but in doing so, this broke handling of % when not interpolating a=
+s the
+>>>>>> '%' is skipped in both cases.
+>>>>>> This commit ensures we only try to handle %% when interpolating.
+>>>
+>>> Impact?
+>>>
+>>> If you're unable to assess, could you give us at least a reproducer?
+>>
+>> This all came from https://lists.freedesktop.org/archives/spice-devel/=
+2018-December/046644.html
+>> Setting up a VM with libvirt with <graphics type=3D'spice' autoport=3D=
+'yes' passwd=3D'password%'/>
+>> fails to start with:
+>>   qemu-system-x86_64: qobject/json-parser.c:146: parse_string: Asserti=
+on `*ptr' failed.
+>>
+>> If you use 'password%%' as the password instead, when trying to connec=
+t
+>> to the VM, you type 'password%' as the password instead of 'password%%=
+'
+>> as configured in the domain XML.
+>=20
+> Thanks.
+>=20
+> As the commit message says, the bug bites when we parse a string
+> containing '%s' with !ctxt->ap.  The parser then swallows a character.
+> If it swallows the terminating '"', it fails the assertion.
+>=20
+> We parse with !ctxt->ap in the following cases:
+>=20
+> * Tests (tests/check-qjson.c, tests/test-qobject-input-visitor.c,
+>   tests/test-visitor-serialization.c)
+>=20
+>   Plenty of tests, but we still failed to cover the buggy case :(
+>=20
+> * QMP input (monitor.c)
+>=20
+> * QGA input (qga/main.c)
+>=20
+> * qobject_from_json()
+>=20
+>   - JSON pseudo-filenames (block.c)
+>=20
+>     These are pseudo-filenames starting with "json:".
+>=20
+>   - JSON key pairs (block/rbd.c)
+>=20
+>     As far as I can tell, these can come only from pseudo-filenames
+>     starting with "rbd:".
+>=20
+>   - JSON command line option arguments of -display and -blockdev
+>     (qobject-input-visitor.c)
+>=20
+>     Reproducer: -blockdev '{"%"}'
+>=20
+> Command line, QMP and QGA input are trusted.
+>=20
+> Filenames are trusted when they come from command line, QMP or HMP.
+> They are untrusted when they come from from image file headers.
+> Example: QCOW2 backing file name.  Note that this is *not* the security=
 
-diff --git a/hw/i386/kvm/ioapic.c b/hw/i386/kvm/ioapic.c
-index 5b40d75439..e453692199 100644
---- a/hw/i386/kvm/ioapic.c
-+++ b/hw/i386/kvm/ioapic.c
-@@ -163,7 +163,7 @@ static void kvm_ioapic_class_init(ObjectClass *klass, void *data)
- }
- 
- static const TypeInfo kvm_ioapic_info = {
--    .name  = "kvm-ioapic",
-+    .name  = TYPE_KVM_IOAPIC,
-     .parent = TYPE_IOAPIC_COMMON,
-     .instance_size = sizeof(KVMIOAPICState),
-     .class_init = kvm_ioapic_class_init,
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 4952feb476..3c9e20ad9c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2339,9 +2339,9 @@ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
-     unsigned int i;
- 
-     if (kvm_ioapic_in_kernel()) {
--        dev = qdev_create(NULL, "kvm-ioapic");
-+        dev = qdev_create(NULL, TYPE_KVM_IOAPIC);
-     } else {
--        dev = qdev_create(NULL, "ioapic");
-+        dev = qdev_create(NULL, TYPE_IOAPIC);
-     }
-     if (parent_name) {
-         object_property_add_child(object_resolve_path(parent_name, NULL),
-diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-index 4e529729b4..9d75f84d3b 100644
---- a/hw/intc/ioapic.c
-+++ b/hw/intc/ioapic.c
-@@ -429,7 +429,7 @@ static void ioapic_class_init(ObjectClass *klass, void *data)
- }
- 
- static const TypeInfo ioapic_info = {
--    .name          = "ioapic",
-+    .name          = TYPE_IOAPIC,
-     .parent        = TYPE_IOAPIC_COMMON,
-     .instance_size = sizeof(IOAPICCommonState),
-     .class_init    = ioapic_class_init,
-diff --git a/include/hw/i386/ioapic.h b/include/hw/i386/ioapic.h
-index 9c8816f11f..59fcb158a7 100644
---- a/include/hw/i386/ioapic.h
-+++ b/include/hw/i386/ioapic.h
-@@ -23,6 +23,9 @@
- #define IOAPIC_NUM_PINS 24
- #define IO_APIC_DEFAULT_ADDRESS 0xfec00000
- 
-+#define TYPE_KVM_IOAPIC "kvm-ioapic"
-+#define TYPE_IOAPIC "ioapic"
-+
- void ioapic_eoi_broadcast(int vector);
- 
- #endif /* HW_IOAPIC_H */
--- 
-2.20.1
+> boundary between host and guest.  It's the boundary between host and an=
+
+> image file from an untrusted source.
+>=20
+> I can't see how the bug could be exploited.  Neither failing an
+> assertion nor skipping a character in a filename of your choice is
+> interesting.  We don't support compiling with NDEBUG.
+>=20
+> Kevin, Max, do you agree?
+
+I wouldn't call it "not interesting" if adding an image to your VM at
+runtime can crash the whole thing.
+
+(qemu-img create -f qcow2 -u -b 'json:{"%"}' foo.qcow2 64M)
+
+Whether this is a security issue...  I don't know, but it is a DoS.
+
+Max
+
+
+--r1YJLh0MQq6Njgvu6OtH0zDursJv3MaRH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw18c4ACgkQ9AfbAGHV
+z0AnBgf/bVue5dg8bxbWChDYhKxCqiHlFVVKdJVPls6AqXhhaWuSaWpyerfnh30o
+u7FBkHnlzdAXRewE4f8fDSEf+59fswLKaNUXBvmMFgxAVNfK/kgsAlwQP8JIofz/
+DXZpNDwJ0Wtfz4uKPRPxTmw6f+Zjdg1iRnKOOLU4IBwPEGg8nBEWQh4GxiYYVZZA
+ezwDjreE2wCAwHX9IkBNxWZhhe/3y5Znwb/Umq8m5Uhc54bcC/gl8dF3fP7a4XJF
+D1O1AcHqte3ktYWhLdwNnpJfumXC8QEDKhhwfu5X5z3EZ/0BTobdl3mEzGiCWZrp
+wUet/0eHD9Cca7KZIDERqpVgxHYXug==
+=8ni1
+-----END PGP SIGNATURE-----
+
+--r1YJLh0MQq6Njgvu6OtH0zDursJv3MaRH--
