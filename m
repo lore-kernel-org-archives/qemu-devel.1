@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45531)
+Received: from eggs.gnu.org ([209.51.188.92]:45638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1ghF9F-0002ZO-Hn
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:02 -0500
+	(envelope-from <mst@redhat.com>) id 1ghF9i-0002wD-OX
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1ghF9E-00063Q-79
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42948)
+	(envelope-from <mst@redhat.com>) id 1ghF9e-0006JL-RH
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:17624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1ghF9D-00062l-Vg
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:00 -0500
-From: Pankaj Gupta <pagupta@redhat.com>
-Date: Wed,  9 Jan 2019 20:17:31 +0530
-Message-Id: <20190109144736.17452-1-pagupta@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ghF9Z-0006Ca-Se
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:48:23 -0500
+Date: Wed, 9 Jan 2019 09:48:08 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190109094732-mutt-send-email-mst@kernel.org>
+References: <20190109082902.32271-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190109082902.32271-1-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
+Subject: Re: [Qemu-devel] [PATCH v15 0/6] Add support for TPM Physical
+ Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,148 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-acpi@vger.kernel.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Cc: jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, david@redhat.com, jmoyer@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, mst@redhat.com, jasowang@redhat.com, lcapitulino@redhat.com, imammedo@redhat.com, eblake@redhat.com, willy@infradead.org, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, rjw@rjwysocki.net, pagupta@redhat.com
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, f4bug@amsat.org, Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
- This patch series has implementation for "virtio pmem".=20
- "virtio pmem" is fake persistent memory(nvdimm) in guest=20
- which allows to bypass the guest page cache. This also
- implements a VIRTIO based asynchronous flush mechanism. =20
-=20
- Sharing guest kernel driver in this patchset with the=20
- changes suggested in v2. Tested with Qemu side device=20
- emulation for virtio-pmem [6].=20
-=20
- Details of project idea for 'virtio pmem' flushing interface=20
- is shared [3] & [4].
+On Wed, Jan 09, 2019 at 12:28:56PM +0400, Marc-Andr=E9 Lureau wrote:
+> Hi,
+>=20
+> The following patches implement the TPM Physical Presence Interface
+> that allows a user to set a command via ACPI (sysfs entry in Linux)
+> that, upon the next reboot, the firmware looks for and acts upon by
+> sending sequences of commands to the TPM.
+>=20
+> A dedicated memory region is added to the TPM CRB & TIS devices, at
+> address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+> holds the location for that PPI region and some version details, to
+> allow for future flexibility.
+>=20
+> With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
+> now runs successfully.
+>=20
+> It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+> Implement Physical Presence interface for TPM 1.2 and 2")
+>=20
+> The edk2 support is merged upstream.
 
- Implementation is divided into two parts:
- New virtio pmem guest driver and qemu code changes for new=20
- virtio pmem paravirtualized device.
+So it looks good to me overall.
+Minor style comments.
 
-1. Guest virtio-pmem kernel driver
----------------------------------
-   - Reads persistent memory range from paravirt device and=20
-     registers with 'nvdimm_bus'. =20
-   - 'nvdimm/pmem' driver uses this information to allocate=20
-     persistent memory region and setup filesystem operations=20
-     to the allocated memory.=20
-   - virtio pmem driver implements asynchronous flushing=20
-     interface to flush from guest to host.
+With or without:
 
-2. Qemu virtio-pmem device
----------------------------------
-   - Creates virtio pmem device and exposes a memory range to=20
-     KVM guest.=20
-   - At host side this is file backed memory which acts as=20
-     persistent memory.=20
-   - Qemu side flush uses aio thread pool API's and virtio=20
-     for asynchronous guest multi request handling.=20
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-   David Hildenbrand CCed also posted a modified version[6] of=20
-   qemu virtio-pmem code based on updated Qemu memory device API.=20
 
- Virtio-pmem errors handling:
- ----------------------------------------
-  Checked behaviour of virtio-pmem for below types of errors
-  Need suggestions on expected behaviour for handling these errors?
 
-  - Hardware Errors: Uncorrectable recoverable Errors:=20
-  a] virtio-pmem:=20
-    - As per current logic if error page belongs to Qemu process,=20
-      host MCE handler isolates(hwpoison) that page and send SIGBUS.=20
-      Qemu SIGBUS handler injects exception to KVM guest.=20
-    - KVM guest then isolates the page and send SIGBUS to guest=20
-      userspace process which has mapped the page.=20
- =20
-  b] Existing implementation for ACPI pmem driver:=20
-    - Handles such errors with MCE notifier and creates a list=20
-      of bad blocks. Read/direct access DAX operation return EIO=20
-      if accessed memory page fall in bad block list.
-    - It also starts backgound scrubbing. =20
-    - Similar functionality can be reused in virtio-pmem with MCE=20
-      notifier but without scrubbing(no ACPI/ARS)? Need inputs to=20
-      confirm if this behaviour is ok or needs any change?
-
-Changes from PATCH v2: [1]
-- Disable MAP_SYNC for ext4 & XFS filesystems - [Dan]=20
-- Use name 'virtio pmem' in place of 'fake dax'=20
-
-Changes from PATCH v1: [2]
-- 0-day build test for build dependency on libnvdimm=20
-
- Changes suggested by - [Dan Williams]
-- Split the driver into two parts virtio & pmem =20
-- Move queuing of async block request to block layer
-- Add "sync" parameter in nvdimm_flush function
-- Use indirect call for nvdimm_flush
-- Don=E2=80=99t move declarations to common global header e.g nd.h
-- nvdimm_flush() return 0 or -EIO if it fails
-- Teach nsio_rw_bytes() that the flush can fail
-- Rename nvdimm_flush() to generic_nvdimm_flush()
-- Use 'nd_region->provider_data' for long dereferencing
-- Remove virtio_pmem_freeze/restore functions
-- Remove BSD license text with SPDX license text
-
-- Add might_sleep() in virtio_pmem_flush - [Luiz]
-- Make spin_lock_irqsave() narrow
-
-Changes from RFC v3
-- Rebase to latest upstream - Luiz
-- Call ndregion->flush in place of nvdimm_flush- Luiz
-- kmalloc return check - Luiz
-- virtqueue full handling - Stefan
-- Don't map entire virtio_pmem_req to device - Stefan
-- request leak, correct sizeof req- Stefan
-- Move declaration to virtio_pmem.c
-
-Changes from RFC v2:
-- Add flush function in the nd_region in place of switching
-  on a flag - Dan & Stefan
-- Add flush completion function with proper locking and wait
-  for host side flush completion - Stefan & Dan
-- Keep userspace API in uapi header file - Stefan, MST
-- Use LE fields & New device id - MST
-- Indentation & spacing suggestions - MST & Eric
-- Remove extra header files & add licensing - Stefan
-
-Changes from RFC v1:
-- Reuse existing 'pmem' code for registering persistent=20
-  memory and other operations instead of creating an entirely=20
-  new block driver.
-- Use VIRTIO driver to register memory information with=20
-  nvdimm_bus and create region_type accordingly.=20
-- Call VIRTIO flush from existing pmem driver.
-
-Pankaj Gupta (5):
-   libnvdimm: nd_region flush callback support
-   virtio-pmem: Add virtio-pmem guest driver
-   libnvdimm: add nd_region buffered dax_dev flag
-   ext4: disable map_sync for virtio pmem
-   xfs: disable map_sync for virtio pmem
-
-[2] https://lkml.org/lkml/2018/8/31/407
-[3] https://www.spinics.net/lists/kvm/msg149761.html
-[4] https://www.spinics.net/lists/kvm/msg153095.html =20
-[5] https://lkml.org/lkml/2018/8/31/413
-[6] https://marc.info/?l=3Dqemu-devel&m=3D153555721901824&w=3D2
-
- drivers/acpi/nfit/core.c         |    4 -
- drivers/dax/super.c              |   17 +++++
- drivers/nvdimm/claim.c           |    6 +
- drivers/nvdimm/nd.h              |    1=20
- drivers/nvdimm/pmem.c            |   15 +++-
- drivers/nvdimm/region_devs.c     |   45 +++++++++++++-
- drivers/nvdimm/virtio_pmem.c     |   84 ++++++++++++++++++++++++++
- drivers/virtio/Kconfig           |   10 +++
- drivers/virtio/Makefile          |    1=20
- drivers/virtio/pmem.c            |  125 ++++++++++++++++++++++++++++++++=
-+++++++
- fs/ext4/file.c                   |   11 +++
- fs/xfs/xfs_file.c                |    8 ++
- include/linux/dax.h              |    9 ++
- include/linux/libnvdimm.h        |   11 +++
- include/linux/virtio_pmem.h      |   60 ++++++++++++++++++
- include/uapi/linux/virtio_ids.h  |    1=20
- include/uapi/linux/virtio_pmem.h |   10 +++
- 17 files changed, 406 insertions(+), 12 deletions(-)
+> v15:
+> - fix crash on reset when PPI is disabled
+>=20
+> v14:
+> - rebased, fixing conflicts after compat-props refactoring
+> - fix build regression from v13 with --disable-tpm
+>=20
+> v13:
+> - removed needless error handling in tpm_ppi_init()
+> - splitted "add ACPI memory clear interface"
+> - moved acpi build function in dedicated hw/acpi/tpm.c
+> - added some function documentation in headers
+> - various code cleanups suggested by Philippe
+> - rebased
+>=20
+> Marc-Andr=E9 Lureau (3):
+>   tpm: add a "ppi" boolean property
+>   acpi: add ACPI memory clear interface
+>   tpm: clear RAM when "memory overwrite" requested
+>=20
+> Stefan Berger (3):
+>   tpm: allocate/map buffer for TPM Physical Presence interface
+>   acpi: expose TPM/PPI configuration parameters to firmware via fw_cfg
+>   acpi: build TPM Physical Presence interface
+>=20
+>  hw/tpm/tpm_ppi.h      |  46 +++++
+>  include/hw/acpi/tpm.h |  21 ++
+>  hw/acpi/tpm.c         | 448 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/core/machine.c     |   8 +
+>  hw/i386/acpi-build.c  |  29 ++-
+>  hw/tpm/tpm_crb.c      |  13 ++
+>  hw/tpm/tpm_ppi.c      |  53 +++++
+>  hw/tpm/tpm_tis.c      |  13 ++
+>  stubs/tpm.c           |   5 +
+>  docs/specs/tpm.txt    | 104 ++++++++++
+>  hw/acpi/Makefile.objs |   1 +
+>  hw/tpm/Makefile.objs  |   1 +
+>  hw/tpm/trace-events   |   3 +
+>  13 files changed, 743 insertions(+), 2 deletions(-)
+>  create mode 100644 hw/tpm/tpm_ppi.h
+>  create mode 100644 hw/acpi/tpm.c
+>  create mode 100644 hw/tpm/tpm_ppi.c
+>=20
+> --=20
+> 2.20.1.2.gb21ebb671b
