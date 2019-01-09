@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45847)
+Received: from eggs.gnu.org ([209.51.188.92]:45901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghGln-0002IJ-B6
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:56 -0500
+	(envelope-from <berrange@redhat.com>) id 1ghGlq-0002L2-69
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghGlm-0001L6-3U
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57086)
+	(envelope-from <berrange@redhat.com>) id 1ghGlo-0001NL-Gy
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40276)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghGll-0001Ka-SS
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:54 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghGlo-0001Ms-9l
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:56 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed,  9 Jan 2019 16:31:12 +0000
-Message-Id: <20190109163114.17010-12-berrange@redhat.com>
+Date: Wed,  9 Jan 2019 16:31:13 +0000
+Message-Id: <20190109163114.17010-13-berrange@redhat.com>
 In-Reply-To: <20190109163114.17010-1-berrange@redhat.com>
 References: <20190109163114.17010-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 11/13] travis: stop using container based envs
+Subject: [Qemu-devel] [PATCH 12/13] travis: run tests in verbose mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +29,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-The Travis container based envs are deprecated:
-
-  https://docs.travis-ci.com/user/reference/trusty/
-
-  "Container-based infrastructure is currently being deprecated.
-   Please remove any sudo: false keys in your .travis.yml file
-   to use the default fully-virtualized Linux infrastructure
-   instead."
+Travis sometimes fails a build because it produces no console output for
+over 10 minutes. If this is due to a genuine hang, it would be useful to
+have used verbose test output to see where it failed. If this is just
+due to tests being very slow, having verbose output might allow the
+build to succeed.
 
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- .travis.yml | 5 -----
- 1 file changed, 5 deletions(-)
+ .travis.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/.travis.yml b/.travis.yml
-index ddfef6d738..dc8b37db80 100644
+index dc8b37db80..a632fc0b3a 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -1,8 +1,4 @@
--# The current Travis default is a container based 14.04 Trust on EC2
--# Additional builds with specific requirements for a full VM need to
--# be added as additional matrix: entries later on
+@@ -55,7 +55,7 @@ env:
+   global:
+     - SRC_DIR=3D"."
+     - BUILD_DIR=3D"."
+-    - TEST_CMD=3D"make check -j3"
++    - TEST_CMD=3D"make check -j3 V=3D1"
 =20
--sudo: false
- dist: trusty
- language: c
- python:
-@@ -253,6 +249,5 @@ matrix:
+=20
+ git:
+@@ -248,6 +248,6 @@ matrix:
+=20
      - env:
          - CONFIG=3D"--disable-system --disable-docs"
-         - TEST_CMD=3D"make -j3 check-tcg"
--      sudo: required
+-        - TEST_CMD=3D"make -j3 check-tcg"
++        - TEST_CMD=3D"make -j3 check-tcg V=3D1"
        dist: trusty
        compiler: gcc
 --=20
