@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48830)
+Received: from eggs.gnu.org ([209.51.188.92]:49310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghDjw-0007Ms-OR
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:17:49 -0500
+	(envelope-from <lifei1214@126.com>) id 1ghDm7-0000h5-9d
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:20:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghDjv-0006Pd-Rz
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:17:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43304)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghDjv-0006P3-Jm
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:17:47 -0500
-References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-	<20190109105818.GG3998@redhat.com>
-	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
-	<20190109114459.GK3998@redhat.com>
-	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
-	<87y37udljk.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f45f44ab-d967-6702-e362-56612401c268@redhat.com>
-Date: Wed, 9 Jan 2019 14:17:42 +0100
+	(envelope-from <lifei1214@126.com>) id 1ghDm4-00018z-HG
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:20:02 -0500
+Received: from m50-110.126.com ([123.125.50.110]:39886)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1ghDm3-0000iT-77
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:20:00 -0500
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-7-fli@suse.com>
+	<87lg3wmln8.fsf@dusky.pond.sub.org>
+	<5DCFD2A7-85F6-42ED-8CBB-B42B6605BE6F@126.com>
+	<87ftu3kri2.fsf@dusky.pond.sub.org>
+From: Fei Li <lifei1214@126.com>
+Message-ID: <ab38ce34-1832-30e5-2649-f67b9b1755e4@126.com>
+Date: Wed, 9 Jan 2019 21:19:49 +0800
 MIME-Version: 1.0
-In-Reply-To: <87y37udljk.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+In-Reply-To: <87ftu3kri2.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 06/16] qemu_thread: Make
+ qemu_thread_create() handle errors properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +32,207 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Fei Li <fli@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com
 
-On 2019-01-09 14:10, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
->=20
->> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
->>> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
->>>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
->>>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
->>>>>> Different versions of GCC and Clang use different versions of the =
-C standard.
->>>>>> This repeatedly caused problems already, e.g. with duplicated type=
-defs:
->>>>>>
->>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.ht=
-ml
->>>>>>
->>>>>> or with for-loop variable initializers:
->>>>>>
->>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.ht=
-ml
->>>>>>
->>>>>> To avoid these problems, we should enforce the C language version =
-to the
->>>>>> same level for all compilers. Since our minimum compiler versions =
-are
->>>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" al=
-ready,
->>>>>> this seems to be a good choice.
->>>>>
->>>>> In 4.x   gnu11 is marked as experimental. I'm not really comfortabl=
-e
->>>>> using experimental features - even if its warning free there's a ri=
-sk
->>>>> it would silently mis-compile something.
->>>>>
->>>>> gnu99 is ok with 4.x - it is merely "incomplete".
->>>>
->>>> gnu11 has the big advantage that it also fixes the problem with
->>>> duplicated typedefs that are reported by older versions of Clang.
->>>>
->>>> Are you sure about the experimental character in 4.x? I just looked =
-at
->>>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it s=
-ays:
->>>>
->>>> "A fourth version of the C standard, known as C11, was published in =
-2011
->>>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts o=
-f
->>>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
->>>>
->>>> It does not say anything about "experimental" there. The word
->>>> "experimental" is only used for the C++ support, but we hardly have =
-C++
->>>> code in QEMU -- if you worry about that, I could simply drop the
->>>> "-std=3Dgnu++11" part from my patch?
->>>
->>> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1.x=
-86_64:
->>>
->>>   "3.4 Options Controlling C Dialect
->>>
->>>        ....snip...
->>>
->>>      'gnu11'
->>>      'gnu1x'
->>>           GNU dialect of ISO C11.  Support is incomplete and
->>>           experimental.  The name 'gnu1x' is deprecated."
->>
->> Ok. Looks like the "Support is incomplete and experimental" sentence h=
-as
->> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
->> already. IMHO we could give it a try and enable gnu11 for QEMU with GC=
-C
->> v4.8, too. If we later find problems, we could still switch back to
->> gnu99 instead. Other opinions?
->=20
-> Switchinh back could be somewhat painful if we already started using C1=
-1
-> features.  And if we don't plan to, then what exactly will -std=3Dgnu11
-> buy us?
 
-With C11, we get safety for the "duplicated typedef" problem that we run
-into regularly again and again, see e.g.:
+在 2019/1/9 上午1:07, Markus Armbruster 写道:
+> fei <lifei1214@126.com> writes:
+>
+>>> 在 2019年1月8日，01:18，Markus Armbruster <armbru@redhat.com> 写道：
+>>>
+>>> Fei Li <fli@suse.com> writes:
+>>>
+>>>> qemu_thread_create() abort()s on error. Not nice. Give it a return
+>>>> value and an Error ** argument, so it can return success/failure.
+>>>>
+>>>> Considering qemu_thread_create() is quite widely used in qemu, split
+>>>> this into two steps: this patch passes the &error_abort to
+>>>> qemu_thread_create() everywhere, and the next 9 patches will improve
+>>>> on &error_abort for callers who need.
+>>>>
+>>>> Cc: Markus Armbruster <armbru@redhat.com>
+>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>>> Signed-off-by: Fei Li <fli@suse.com>
+>>> The commit message's title promises more than the patch delivers.
+>>> Suggest:
+>>>
+>>>     qemu_thread: Make qemu_thread_create() take Error ** argument
+>> Ok, thanks for the suggestion. :)
+>>> The rest of the commit message is fine.
+>>>
+>>>> ---
+>>>> cpus.c                      | 23 +++++++++++++++--------
+>>>> dump.c                      |  3 ++-
+>>>> hw/misc/edu.c               |  4 +++-
+>>>> hw/ppc/spapr_hcall.c        |  4 +++-
+>>>> hw/rdma/rdma_backend.c      |  3 ++-
+>>>> hw/usb/ccid-card-emulated.c |  5 +++--
+>>>> include/qemu/thread.h       |  4 ++--
+>>>> io/task.c                   |  3 ++-
+>>>> iothread.c                  |  3 ++-
+>>>> migration/migration.c       | 11 ++++++++---
+>>>> migration/postcopy-ram.c    |  4 +++-
+>>>> migration/ram.c             | 12 ++++++++----
+>>>> migration/savevm.c          |  3 ++-
+>>>> tests/atomic_add-bench.c    |  3 ++-
+>>>> tests/iothread.c            |  2 +-
+>>>> tests/qht-bench.c           |  3 ++-
+>>>> tests/rcutorture.c          |  3 ++-
+>>>> tests/test-aio.c            |  2 +-
+>>>> tests/test-rcu-list.c       |  3 ++-
+>>>> ui/vnc-jobs.c               |  6 ++++--
+>>>> util/compatfd.c             |  6 ++++--
+>>>> util/oslib-posix.c          |  3 ++-
+>>>> util/qemu-thread-posix.c    | 27 ++++++++++++++++++++-------
+>>>> util/qemu-thread-win32.c    | 16 ++++++++++++----
+>>>> util/rcu.c                  |  3 ++-
+>>>> util/thread-pool.c          |  4 +++-
+>>>> 26 files changed, 112 insertions(+), 51 deletions(-)
+>>>>
+>>>> diff --git a/cpus.c b/cpus.c
+>>>> index 0ddeeefc14..25df03326b 100644
+>>>> --- a/cpus.c
+>>>> +++ b/cpus.c
+>>>> @@ -1961,15 +1961,17 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+>>>>              snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+>>>>                   cpu->cpu_index);
+>>>>
+>>>> +            /* TODO: let the callers handle the error instead of abort() here */
+>>>>              qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
+>>>> -                               cpu, QEMU_THREAD_JOINABLE);
+>>>> +                               cpu, QEMU_THREAD_JOINABLE, &error_abort);
+>>>>
+>>>>          } else {
+>>>>              /* share a single thread for all cpus with TCG */
+>>>>              snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
+>>>> +            /* TODO: let the callers handle the error instead of abort() here */
+>>>>              qemu_thread_create(cpu->thread, thread_name,
+>>>>                                 qemu_tcg_rr_cpu_thread_fn,
+>>>> -                               cpu, QEMU_THREAD_JOINABLE);
+>>>> +                               cpu, QEMU_THREAD_JOINABLE, &error_abort);
+>>>>
+>>>>              single_tcg_halt_cond = cpu->halt_cond;
+>>>>              single_tcg_cpu_thread = cpu->thread;
+>>> You add this TODO comment to 24 out of 37 calls.  Can you give your
+>>> reasons for adding it to some calls, but not to others?
+>> For those have TODO, I polish them in the next following patches, and for those do not have TODO I just let them use &error_abort.
+> Please mention that in the commit message.
+ok.
+>
+>>> [...]
+>>>> diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+>>>> index 55d83a907c..12291f4ccd 100644
+>>>> --- a/include/qemu/thread.h
+>>>> +++ b/include/qemu/thread.h
+>>>> @@ -152,9 +152,9 @@ void qemu_event_reset(QemuEvent *ev);
+>>>> void qemu_event_wait(QemuEvent *ev);
+>>>> void qemu_event_destroy(QemuEvent *ev);
+>>>>
+>>>> -void qemu_thread_create(QemuThread *thread, const char *name,
+>>>> +bool qemu_thread_create(QemuThread *thread, const char *name,
+>>>>                          void *(*start_routine)(void *),
+>>>> -                        void *arg, int mode);
+>>>> +                        void *arg, int mode, Error **errp);
+>>>> void *qemu_thread_join(QemuThread *thread);
+>>>> void qemu_thread_get_self(QemuThread *thread);
+>>>> bool qemu_thread_is_self(QemuThread *thread);
+>>> [...]
+>>>> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+>>>> index 865e476df5..39834b0551 100644
+>>>> --- a/util/qemu-thread-posix.c
+>>>> +++ b/util/qemu-thread-posix.c
+>>>> @@ -15,6 +15,7 @@
+>>>> #include "qemu/atomic.h"
+>>>> #include "qemu/notify.h"
+>>>> #include "qemu-thread-common.h"
+>>>> +#include "qapi/error.h"
+>>>>
+>>>> static bool name_threads;
+>>>>
+>>>> @@ -500,9 +501,13 @@ static void *qemu_thread_start(void *args)
+>>>>      return r;
+>>>> }
+>>>>
+>>>> -void qemu_thread_create(QemuThread *thread, const char *name,
+>>>> -                       void *(*start_routine)(void*),
+>>>> -                       void *arg, int mode)
+>>>> +/*
+>>>> + * Return a boolean: true/false to indicate whether it succeeds.
+>>>> + * If fails, propagate the error to Error **errp and set the errno.
+>>>> + */
+>>> Let's write something that can pass as a function contract:
+>>>
+>>>    /*
+>>>     * Create a new thread with name @name
+>>>     * The thread executes @start_routine() with argument @arg.
+>>>     * The thread will be created in a detached state if @mode is
+>>>     * QEMU_THREAD_DETACHED, and in a jounable state if it's
+>>>     * QEMU_THREAD_JOINABLE.
+>>>     * On success, return true.
+>>>     * On failure, set @errno, store an error through @errp and return
+>>>     * false.
+>>>     */
+>> Thanks so much for amending! :)
+>>> Personally, I'd return negative errno instead of false, and dispense
+>>> with setting errno.
+>> Emm, I think I have replied this in last version, but due to several reasons I did not wait for your feedback and sent the v9. Sorry for that.. And I like to paste my two considerations here:
+>> “- Actually only one caller needs the errno, that is the above qemu_signalfd_compat().
+> Yes.
+>
+>> - For the returning value, I remember there's once a email thread talking about it: returning a bool (and let the passed errp hold the error message) is to keep the consistency with glib.
+> GLib doesn't discourage return types other than boolean.  It only asks
+> that if you return boolean, then true should mean success and false
+> should mean failure.  See
+>
+>      https://developer.gnome.org/glib/stable/glib-Error-Reporting.html
+>
+> under "Rules for use of GError", item "By convention, if you return a
+> boolean value".
+>
+> The discussion you remember was about a convention we used to enforce in
+> QEMU, namely to avoid returning boolean success, and return void
+> instead.  That was basically a bad idea.
+>
+>> So IMO I am wondering whether it is really needed to change the bool (true/false) to int (0/-errno), just for that sole function: qemu_signalfd_compat() which needs the errno. Besides if we return -errno, for each caller we need add a local variable like “ret= qemu_thread_create()” to store the -errno.
+> Well, you either assign the error code to errno just for that caller, or
+> you return the error code just for that caller.  I'd do the latter
+> because I consider it slightly simpler.  Compare
+>
+>   * On success, return true.
+>   * On failure, set @errno, store an error through @errp and return
+>   * false.
+>
+> to
+>
+>   * On success, return zero.
+>   * On failure, store an error through @errp and return negative errno.
+>
+> where the second sentence describes just two instead of three actions.
+>
+> [...]
+Ok, decribing two actions than three is indeed simpler. But I still have 
+one uncertain:
+for those callers do not need the errno value, could we just check the 
+return value
+to see whether it is negative, but not cache the unused return value? I mean
 
-https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+In the caller:
 
- Thomas
+{...
+     if (qemu_thread_create() < 0) {// do some cleanup}
+...}
+
+instead of
+
+{    int ret;
+...
+     ret = qemu_thread_create();
+     if (ret < 0) { //do some cleanup }
+
+...}
+
+As the first one can lessen quite a lot of codes. :)
+
+Have a nice day, thanks
+
+Fei
