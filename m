@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56986)
+Received: from eggs.gnu.org ([209.51.188.92]:58431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ghEF7-0002xt-Fd
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:50:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghEJY-0005Wg-9z
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:54:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ghEF5-0000ij-VZ
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:50:01 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190109110144.18633-1-stefanha@redhat.com>
-References: <20190109110144.18633-1-stefanha@redhat.com>
-Date: Wed, 09 Jan 2019 14:49:50 +0100
-Message-ID: <w51sgy26iv5.fsf@maestria.local.igalia.com>
+	(envelope-from <thuth@redhat.com>) id 1ghEJV-00043Q-NJ
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:54:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghEJT-0003yL-Aa
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:54:32 -0500
+References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
+	<20190109105818.GG3998@redhat.com>
+	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
+	<20190109114459.GK3998@redhat.com>
+	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
+	<20190109125854.GM3998@redhat.com>
+	<860317b6-6489-9c18-bdf8-95a70fbec9b3@redhat.com>
+	<20190109132729.GN3998@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e8d5325c-5e2e-8fa0-06d4-0d685fcaf3dc@redhat.com>
+Date: Wed, 9 Jan 2019 14:54:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
- iothread race
+In-Reply-To: <20190109132729.GN3998@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +34,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
 
-On Wed 09 Jan 2019 12:01:44 PM CET, Stefan Hajnoczi wrote:
-> The following QMP command leads to a crash when iothreads are used:
->
->   { 'execute': 'device_del', 'arguments': {'id': 'data'} }
+On 2019-01-09 14:27, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Jan 09, 2019 at 02:20:02PM +0100, Thomas Huth wrote:
+>> On 2019-01-09 13:58, Daniel P. Berrang=C3=A9 wrote:
+>>> On Wed, Jan 09, 2019 at 01:52:02PM +0100, Thomas Huth wrote:
+>>>> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
+>>>>> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
+>>>>>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
+>>>>>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
+>>>>>>>> Different versions of GCC and Clang use different versions of th=
+e C standard.
+>>>>>>>> This repeatedly caused problems already, e.g. with duplicated ty=
+pedefs:
+>>>>>>>>
+>>>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.=
+html
+>>>>>>>>
+>>>>>>>> or with for-loop variable initializers:
+>>>>>>>>
+>>>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.=
+html
+>>>>>>>>
+>>>>>>>> To avoid these problems, we should enforce the C language versio=
+n to the
+>>>>>>>> same level for all compilers. Since our minimum compiler version=
+s are
+>>>>>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" =
+already,
+>>>>>>>> this seems to be a good choice.
+>>>>>>>
+>>>>>>> In 4.x   gnu11 is marked as experimental. I'm not really comforta=
+ble
+>>>>>>> using experimental features - even if its warning free there's a =
+risk
+>>>>>>> it would silently mis-compile something.
+>>>>>>>
+>>>>>>> gnu99 is ok with 4.x - it is merely "incomplete".
+>>>>>>
+>>>>>> gnu11 has the big advantage that it also fixes the problem with
+>>>>>> duplicated typedefs that are reported by older versions of Clang.
+>>>>>>
+>>>>>> Are you sure about the experimental character in 4.x? I just looke=
+d at
+>>>>>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it=
+ says:
+>>>>>>
+>>>>>> "A fourth version of the C standard, known as C11, was published i=
+n 2011
+>>>>>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts=
+ of
+>>>>>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
+>>>>>>
+>>>>>> It does not say anything about "experimental" there. The word
+>>>>>> "experimental" is only used for the C++ support, but we hardly hav=
+e C++
+>>>>>> code in QEMU -- if you worry about that, I could simply drop the
+>>>>>> "-std=3Dgnu++11" part from my patch?
+>>>>>
+>>>>> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1=
+.x86_64:
+>>>>>
+>>>>>   "3.4 Options Controlling C Dialect
+>>>>>
+>>>>>        ....snip...
+>>>>>
+>>>>>      'gnu11'
+>>>>>      'gnu1x'
+>>>>>           GNU dialect of ISO C11.  Support is incomplete and
+>>>>>           experimental.  The name 'gnu1x' is deprecated."
+>>>>
+>>>> Ok. Looks like the "Support is incomplete and experimental" sentence=
+ has
+>>>> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
+>>>> already. IMHO we could give it a try and enable gnu11 for QEMU with =
+GCC
+>>>> v4.8, too. If we later find problems, we could still switch back to
+>>>> gnu99 instead. Other opinions?
+>>>
+>>> Our code is already cleanly compiling with gnu99 standard - the probl=
+em
+>>> is merely that we sometimes introduce regressions due to not enforcin=
+g
+>>> that standard level. I don't think the features in gnu11 are compelli=
+ng
+>>> enough to justify using something that's declared experimental.
+>> What about the duplicated typedef problem? See:
+>>
+>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+>>
+>> That one occured with Clang, but I think we've had plenty of these in
+>> the past with GCC, too...
+>=20
+> IIUC, That's only a problem because we don't pass any  -std  flag, and
+> so get the compilers default, which may be gnu11.  If we explicitly
+> set -std=3Dgnu99, that problem will be reported by patchew, travis and
+> maintainers own build tests, and thus won't get anywhere near git maste=
+r.
 
-I was trying to reproduce this and I found this crashing in master:
+Ah, right, I just tried it with a newer version of Clang, and indeed it
+then prints out a warning if some code with a duplicated typedef is
+compiled with "-std=3Dgnu99" (while it remains silent without that
+option). So in that case I'm fine with gnu99, too. I'll send a v2 of the
+patch...
 
-$ qemu-system-x86_64 -enable-kvm -qmp stdio -display none
-{ "execute": "qmp_capabilities" }
-{ "execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"driver": "file", "filename": "hd.qcow2"}, "node-name": "hd0"}}
-{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
-{ "execute": "x-blockdev-set-iothread", "arguments": {"node-name": "hd0", "iothread": "iothread0"}}
-{ "execute": "device_add", "arguments": {"id": "virtio0", "driver": "virtio-blk-pci", "drive": "hd0"}}
-
-Thread 1 "qemu-system-x86" received signal SIGABRT, Aborted.
-__GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51
-51         ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
-(gdb) bt
-#0  __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51
-#1  [...] in __GI_abort () at abort.c:89
-#2  [...] in error_exit () at util/qemu-thread-posix.c:36
-#3  [...] in qemu_mutex_unlock_impl () at util/qemu-thread-posix.c:96
-#4  [...] in aio_context_release () at util/async.c:516
-#5  [...] in blk_prw () at block/block-backend.c:1262
-#6  [...] in blk_pread () at block/block-backend.c:1424
-#7  [...] in blk_pread_unthrottled () at block/block-backend.c:1279
-#8  [...] in guess_disk_lchs () at hw/block/hd-geometry.c:71
-#9  [...] in hd_geometry_guess () at hw/block/hd-geometry.c:136
-#10 [...] in blkconf_geometry () at hw/block/block.c:99
-#11 [...] in virtio_blk_device_realize () at hw/block/virtio-blk.c:944
-#12 [...] in virtio_device_realize () at hw/virtio/virtio.c:2538
-[...]
-
-Berto
+ Thomas
