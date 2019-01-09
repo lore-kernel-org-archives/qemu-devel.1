@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33070)
+Received: from eggs.gnu.org ([209.51.188.92]:33079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ghChu-00034n-HB
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ghChv-000356-SM
 	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:11:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ghChr-0001Ha-S3
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:11:37 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:36972)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ghCht-0001Jc-TD
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:11:39 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:37040)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ghChr-0001Bp-FN
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:11:35 -0500
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1ghCht-0001JQ-Ll
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:11:37 -0500
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Wed, 09 Jan 2019 15:11:18 +0300
-Message-ID: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
+Date: Wed, 09 Jan 2019 15:11:36 +0300
+Message-ID: <154703589647.13472.15561310749671136184.stgit@pasha-VirtualBox>
+In-Reply-To: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
+References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v9 00/21] Fixing record/replay and adding
- reverse debugging
+Subject: [Qemu-devel] [PATCH v9 03/21] replay: disable default snapshot for
+ record/replay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,152 +30,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-GDB remote protocol supports reverse debugging of the targets.
-It includes 'reverse step' and 'reverse continue' operations.
-The first one finds the previous step of the execution,
-and the second one is intended to stop at the last breakpoint that
-would happen when the program is executed normally.
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-Reverse debugging is possible in the replay mode, when at least
-one snapshot was created at the record or replay phase.
-QEMU can use these snapshots for travelling back in time with GDB.
+This patch disables setting '-snapshot' option on by default
+in record/replay mode. This is needed for creating vmstates in record
+and replay modes.
 
-Running the execution in replay mode allows using GDB reverse debugging
-commands:
- - reverse-stepi (or rsi): Steps one instruction to the past.
-   QEMU loads on of the prior snapshots and proceeds to the desired
-   instruction forward. When that step is reaches, execution stops.
- - reverse-continue (or rc): Runs execution "backwards".
-   QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
-   and replaying the execution. Then QEMU loads snapshots again and
-   replays to the latest breakpoint. When there are no breakpoints in
-   the examined section of the execution, QEMU finds one more snapshot
-   and tries again. After the first snapshot is processed, execution
-   stops at this snapshot.
-
-The set of patches include the following modifications:
- - gdbstub update for reverse debugging support
- - functions that automatically perform reverse step and reverse
-   continue operations
- - hmp/qmp commands for manipulating the replay process
- - improvement of the snapshotting for saving the execution step
-   in the snapshot parameters
- - other record/replay fixes
-
-The patches are available in the repository:
-https://github.com/ispras/qemu/tree/rr-190109
-
-v9 changes:
- - moved rr qapi stuff to the separate file (suggested by Markus Armbruster)
- - minor coding style fixes
-
-v8 changes:
- - rebased to the new master
- - added missing fix for prior rr patch
- - updated 'since' version number in json-related patches
-
-v7 changes:
- - rebased to the new master with upstreamed patches from the series
- - several improvements in hmp/qmp commands handling (suggested by Markus Armbruster)
- - fixed record/replay with '-rtc base' option enabled
- - added document with virtual hardware requirements
-
-v6 changes:
- - rebased to the new version of master
- - fixed build of linux-user configurations
- - added new clock for slirp and vnc timers
-
-v5 changes:
- - multiple fixes of record/replay bugs appeared after QEMU core update
- - changed reverse debugging to 'since 3.1'
-
-v4 changes:
- - changed 'since 2.13' to 'since 3.0' in json (as suggested by Eric Blake)
-
-v3 changes:
- - Fixed PS/2 bug with save/load vm, which caused failures of the replay.
- - Rebased to the new code base.
- - Minor fixes.
-
-v2 changes:
- - documented reverse debugging
- - fixed start vmstate loading in record mode
- - documented qcow2 changes (as suggested by Eric Blake)
- - made icount SnapshotInfo field optional (as suggested by Eric Blake)
- - renamed qmp commands (as suggested by Eric Blake)
- - minor changes
-
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
+ vl.c |   10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-Pavel Dovgalyuk (20):
-      block: implement bdrv_snapshot_goto for blkreplay
-      replay: disable default snapshot for record/replay
-      replay: update docs for record/replay with block devices
-      replay: don't drain/flush bdrv queue while RR is working
-      replay: finish record/replay before closing the disks
-      qcow2: introduce icount field for snapshots
-      migration: introduce icount field for snapshots
-      replay: provide and accessor for rr filename
-      qapi: introduce replay.json for record/replay-related stuff
-      replay: introduce info hmp/qmp command
-      replay: introduce breakpoint at the specified step
-      replay: implement replay-seek command to proceed to the desired step
-      replay: refine replay-time module
-      replay: flush rr queue before loading the vmstate
-      gdbstub: add reverse step support in replay mode
-      gdbstub: add reverse continue support in replay mode
-      replay: describe reverse debugging in docs/replay.txt
-      replay: add BH oneshot event for block layer
-      replay: init rtc after enabling the replay
-      replay: document development rules
-
-pbonzini@redhat.com (1):
-      replay: add missing fix for internal function
-
-
- MAINTAINERS               |    1 
- Makefile.objs             |    4 -
- accel/tcg/translator.c    |    1 
- block/blkreplay.c         |    8 +
- block/block-backend.c     |    5 -
- block/io.c                |   28 ++++
- block/qapi.c              |   18 ++-
- block/qcow2-snapshot.c    |    9 +
- block/qcow2.h             |    2 
- blockdev.c                |   10 +
- cpus.c                    |   21 ++-
- docs/devel/replay.txt     |   46 ++++++
- docs/interop/qcow2.txt    |    4 +
- docs/replay.txt           |   45 ++++++
- exec.c                    |    8 +
- gdbstub.c                 |   52 +++++++
- hmp-commands-info.hx      |   14 ++
- hmp-commands.hx           |   53 +++++++
- hmp.h                     |    4 +
- include/block/snapshot.h  |    1 
- include/sysemu/replay.h   |   27 ++++
- migration/savevm.c        |   11 ++
- qapi/block-core.json      |    8 +
- qapi/block.json           |    3 
- qapi/misc.json            |   18 ---
- qapi/qapi-schema.json     |    1 
- qapi/replay.json          |  121 +++++++++++++++++
- replay/Makefile.objs      |    3 
- replay/replay-debugging.c |  322 +++++++++++++++++++++++++++++++++++++++++++++
- replay/replay-events.c    |   16 ++
- replay/replay-internal.c  |    2 
- replay/replay-internal.h  |    7 +
- replay/replay-time.c      |   36 ++---
- replay/replay.c           |   26 +++-
- stubs/Makefile.objs       |    1 
- stubs/replay-user.c       |    9 +
- stubs/replay.c            |   10 +
- vl.c                      |   21 ++-
- 38 files changed, 907 insertions(+), 69 deletions(-)
- create mode 100644 docs/devel/replay.txt
- create mode 100644 qapi/replay.json
- create mode 100644 replay/replay-debugging.c
- create mode 100644 stubs/replay-user.c
-
--- 
-Pavel Dovgalyuk
+diff --git a/vl.c b/vl.c
+index 064872c..7de4f55 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3196,7 +3196,13 @@ int main(int argc, char **argv, char **envp)
+                 drive_add(IF_PFLASH, -1, optarg, PFLASH_OPTS);
+                 break;
+             case QEMU_OPTION_snapshot:
+-                snapshot = 1;
++                {
++                    Error *blocker = NULL;
++                    snapshot = 1;
++                    error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
++                               "-snapshot");
++                    replay_add_blocker(blocker);
++                }
+                 break;
+             case QEMU_OPTION_numa:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
+@@ -4472,7 +4478,7 @@ int main(int argc, char **argv, char **envp)
+         qapi_free_BlockdevOptions(bdo->bdo);
+         g_free(bdo);
+     }
+-    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
++    if (snapshot) {
+         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
+                           NULL, NULL);
+     }
