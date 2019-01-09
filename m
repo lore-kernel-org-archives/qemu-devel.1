@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50203)
+Received: from eggs.gnu.org ([209.51.188.92]:50278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1ghDpV-0003PP-5m
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:23:34 -0500
+	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghDpd-0003W9-A7
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:23:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1ghDpQ-0000zd-BJ
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:23:30 -0500
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Date: Wed,  9 Jan 2019 13:23:02 +0000
-Message-Id: <20190109132302.22634-2-rjones@redhat.com>
-In-Reply-To: <20190109132302.22634-1-rjones@redhat.com>
-References: <20190109132302.22634-1-rjones@redhat.com>
+	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghDpa-00017O-9q
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:23:41 -0500
+Received: from smtp67.cstnet.cn ([159.226.251.67]:42527 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghDpZ-0000yW-MG
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:23:38 -0500
+Date: Wed, 9 Jan 2019 21:23:25 +0800 (GMT+08:00)
+From: wuzhouhui <wuzhouhui14@mails.ucas.ac.cn>
+In-Reply-To: <20190109124258.GD18942@stefanha-x1.localdomain>
+References: <ae9873.3d686.1683223a356.Coremail.wuzhouhui14@mails.ucas.ac.cn>
+	<20190109124258.GD18942@stefanha-x1.localdomain>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] qemu-io: Add generic function for
- reinitializing optind.
+Message-ID: <234daa90.3dc4b.16832c82ae0.Coremail.wuzhouhui14@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] Qemu migration with vhost-user-blk on top of local
+ storage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,119 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: stefan hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, xieyongji@baidu.com, lilin24@baidu.com, libvir-list@redhat.com, spdk@lists.01.org
 
-On FreeBSD 11.2:
-
-  $ nbdkit memory size=3D1M --run './qemu-io -f raw -c "aio_write 0 512" =
-$nbd'
-  Parsing error: non-numeric argument, or extraneous/unrecognized suffix =
--- aio_write
-
-After main option parsing, we reinitialize optind so we can parse each
-command.  However reinitializing optind to 0 does not work on FreeBSD.
-What happens when you do this is optind remains 0 after the option
-parsing loop, and the result is we try to parse argv[optind] =3D=3D
-argv[0] =3D=3D "aio_write" as if it was the first parameter.
-
-The FreeBSD manual page says:
-
-  In order to use getopt() to evaluate multiple sets of arguments, or to
-  evaluate a single set of arguments multiple times, the variable optrese=
-t
-  must be set to 1 before the second and each additional set of calls to
-  getopt(), and the variable optind must be reinitialized.
-
-(From the rest of the man page it is clear that optind must be
-reinitialized to 1).
-
-The glibc man page says:
-
-  A program that scans multiple argument vectors,  or  rescans  the  same
-  vector  more than once, and wants to make use of GNU extensions such as
-  '+' and '-' at  the  start  of  optstring,  or  changes  the  value  of
-  POSIXLY_CORRECT  between scans, must reinitialize getopt() by resetting
-  optind to 0, rather than the traditional value of 1.  (Resetting  to  0
-  forces  the  invocation  of  an  internal  initialization  routine that
-  rechecks POSIXLY_CORRECT and checks for GNU extensions in optstring.)
-
-This commit introduces an OS-portability function called
-qemu_reset_optind which provides a way of resetting optind that works
-on FreeBSD, while keeping it the same on other OSes.
-
-Note that the qemu codebase sets optind in many other places, but in
-those other places it's setting a local variable and not using getopt.
-This change is only needed in places where we are using getopt and the
-associated global variable optind.
-
-Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
----
- include/qemu/osdep.h | 18 ++++++++++++++++++
- qemu-img.c           |  2 +-
- qemu-io-cmds.c       |  2 +-
- 3 files changed, 20 insertions(+), 2 deletions(-)
-
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 3bf48bcdec..ea4ce4db9e 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -92,6 +92,7 @@ extern int daemon(int, int);
- #include <ctype.h>
- #include <errno.h>
- #include <fcntl.h>
-+#include <getopt.h>
- #include <sys/stat.h>
- #include <sys/time.h>
- #include <assert.h>
-@@ -587,4 +588,21 @@ extern int qemu_icache_linesize_log;
- extern int qemu_dcache_linesize;
- extern int qemu_dcache_linesize_log;
-=20
-+/**
-+ * qemu_reset_optind:
-+ *
-+ * After using getopt or getopt_long, if you need to parse another set
-+ * of options, then you must reset optind.  Unfortunately the way to
-+ * do this varies between implementations of getopt.
-+ */
-+static inline void qemu_reset_optind(void)
-+{
-+#ifdef __FreeBSD__
-+    optind =3D 1;
-+    optreset =3D 1;
-+#else
-+    optind =3D 0;
-+#endif
-+}
-+
- #endif
-diff --git a/qemu-img.c b/qemu-img.c
-index ad04f59565..25288c4d18 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -4962,7 +4962,7 @@ int main(int argc, char **argv)
-         return 0;
-     }
-     argv +=3D optind;
--    optind =3D 0;
-+    qemu_reset_optind();
-=20
-     if (!trace_init_backends()) {
-         exit(1);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 2c39124036..ee8f56e46a 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -114,7 +114,7 @@ static int command(BlockBackend *blk, const cmdinfo_t=
- *ct, int argc,
-         }
-     }
-=20
--    optind =3D 0;
-+    qemu_reset_optind();
-     return ct->cfunc(blk, argc, argv);
- }
-=20
---=20
-2.20.1
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiU3RlZmFuIEhham5vY3ppIiA8
+c3RlZmFuaGFAZ21haWwuY29tPgo+IFNlbnQgVGltZTogMjAxOS0wMS0wOSAyMDo0Mjo1OCAoV2Vk
+bmVzZGF5KQo+IFRvOiB3dXpob3VodWkgPHd1emhvdWh1aTE0QG1haWxzLnVjYXMuYWMuY24+Cj4g
+Q2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZywgeGlleW9uZ2ppQGJhaWR1LmNvbSwgbGlsaW4yNEBi
+YWlkdS5jb20sIGxpYnZpci1saXN0QHJlZGhhdC5jb20sIHNwZGtAbGlzdHMuMDEub3JnCj4gU3Vi
+amVjdDogUmU6IFtRZW11LWRldmVsXSBRZW11IG1pZ3JhdGlvbiB3aXRoIHZob3N0LXVzZXItYmxr
+IG9uIHRvcCBvZiBsb2NhbCBzdG9yYWdlCj4gCj4gT24gV2VkLCBKYW4gMDksIDIwMTkgYXQgMDY6
+MjM6NDJQTSArMDgwMCwgd3V6aG91aHVpIHdyb3RlOgo+ID4gSGkgZXZlcnlvbmUsCj4gPiAKPiA+
+IEknbSB3b3JraW5nIHFlbXUgd2l0aCB2aG9zdCB0YXJnZXQgKGUuZy4gc3BkayksIGFuZCBJIGF0
+dGVtcHQgdG8gbWlncmF0ZSBWTSB3aXRoCj4gPiAyIGxvY2FsIHN0b3JhZ2VzLiBPbmUgbG9jYWwg
+c3RvcmFnZSBpcyBhIHJlZ3VsYXIgZmlsZSwgZS5nLiAvdG1wL2M3NC5xY293MiwgYW5kCj4gPiB0
+aGUgb3RoZXIgaXMgYSBtYWxsb2MgYmRldiB0aGF0IHNwZGsgY3JlYXRlZC4gVGhpcyBtYWxsb2Mg
+YmRldiB3aWxsIGV4cG9ydGVkIHRvCj4gPiBWTSB2aWEgdmhvc3QtdXNlci1ibGsuIFdoZW4gSSBl
+eGVjdXRlIGZvbGxvd2luZyBjb21tYW5kOgo+ID4gCj4gPiAgIHZpcnNoIG1pZ3JhdGUgLS1saXZl
+IC0tcGVyc2lzdGVudCAtLXVuc2FmZSAtLXVuZGVmaW5lc291cmNlIC0tY29weS1zdG9yYWdlLWFs
+bCBcCj4gPiAgICAgIC0tcDJwIC0tYXV0by1jb252ZXJnZSAtLXZlcmJvc2UgLS1kZXN0dXJpIHFl
+bXUrdGNwOi8vPHVyaT4vc3lzdGVtIHZtMAo+ID4gCj4gPiBUaGUgbGlidmlydCByZXBvcnRzOgo+
+ID4gCj4gPiAgIHFlbXUtMi4xMi4xOiBlcnJvcjogaW50ZXJuYWwgZXJyb3I6IHVuYWJsZSB0byBl
+eGVjdXRlIFFFTVUgY29tbWFuZCBcCj4gPiAgICAgJ25iZC1zZXJ2ZXItYWRkJzogQ2Fubm90IGZp
+bmQgZGV2aWNlPWRyaXZlLXZpcnRpby1kaXNrMSBub3IgXAo+ID4gICAgIG5vZGVfbmFtZT1kcml2
+ZS12aXJ0aW8tZGlzazEKPiAKPiBQbGVhc2UgcG9zdCB5b3VyIGxpYnZpcnQgZG9tYWluIFhNTC4K
+Ck15IGxpYnZpcnQgaXMgYmFzZWQgb24gbGlidmlydC0xLjEuMS0yOS5lbDcsIGFuZCBhZGQgbWFu
+eSBwYXRjaGVzIHRvIHNhdGlzZnkgb3VyCm93biBuZWVkcywgZS5nLiBhZGQgc3VwcG9ydCBmb3Ig
+dmhvc3QtdXNlci1ibGsuIFBvc3QgZG9tYWluIHhtbCBtYXkgbm90IHVzZWZ1bC4KQW55d2F5LCBm
+b2xsb3dpbmcgaXMgZnVsbCBjb250ZW50cyBvZiBYTUw6CgogIDxkb21haW4gdHlwZT0na3ZtJz4K
+ICAgIDxuYW1lPnd6aDwvbmFtZT4KICAgIDx1dWlkPmE4NGU5NmU2LTJjNTMtNDA4ZC05ODZiLWM3
+MDliYzZhMGU1MTwvdXVpZD4KICAgIDxtZW1vcnkgdW5pdD0nTWlCJz40MDk2PC9tZW1vcnk+CiAg
+ICA8bWVtb3J5QmFja2luZz4KICAgICAgPGh1Z2VwYWdlcy8+CiAgICA8L21lbW9yeUJhY2tpbmc+
+CiAgICA8Y3VycmVudE1lbW9yeSB1bml0PSdNaUInPjQwOTY8L2N1cnJlbnRNZW1vcnk+CiAgICA8
+dmNwdSBwbGFjZW1lbnQ9J3N0YXRpYycgY3B1c2V0PScxNi0zMSc+MjwvdmNwdT4KICAgIDxvcz4K
+ICAgICAgPHR5cGUgYXJjaD0neDg2XzY0JyBtYWNoaW5lPSdwYyc+aHZtPC90eXBlPgogICAgICA8
+Ym9vdCBkZXY9J2hkJy8+CiAgICA8L29zPgogICAgPGZlYXR1cmVzPgogICAgICA8YWNwaS8+CiAg
+ICA8L2ZlYXR1cmVzPgogICAgPGNsb2NrIG9mZnNldD0ndXRjJz4KICAgICAgPHRpbWVyIG5hbWU9
+J3J0YycgdGlja3BvbGljeT0nY2F0Y2h1cCcvPgogICAgPC9jbG9jaz4KICAgIDxvbl9wb3dlcm9m
+Zj5kZXN0cm95PC9vbl9wb3dlcm9mZj4KICAgIDxvbl9yZWJvb3Q+cmVzdGFydDwvb25fcmVib290
+PgogICAgPG9uX2NyYXNoPmRlc3Ryb3k8L29uX2NyYXNoPgogICAgPGRldmljZXM+CiAgICAgIDxl
+bXVsYXRvcj4vZGF0YS93emgveDg2XzY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0teDg2XzY0PC9lbXVs
+YXRvcj4KICAgICAgPGRpc2sgdHlwZT0nZmlsZScgZGV2aWNlPSdkaXNrJz4KCTxkcml2ZXIgbmFt
+ZT0ncWVtdScgdHlwZT0ncWNvdzInIGNhY2hlPSdub25lJy8+Cgk8c291cmNlIGZpbGU9Jy9kYXRh
+L3d6aC9jNzQucWNvdzInLz4KCTx0YXJnZXQgZGV2PSd2ZGEnIGJ1cz0ndmlydGlvJy8+Cgk8YWxp
+YXMgbmFtZT0ndmlydGlvLWRpc2swJy8+CiAgICAgIDwvZGlzaz4KCiAgICAgIDxkaXNrIHR5cGU9
+J3Zob3N0LXVzZXItYmxrJyBkZXZpY2U9J2Rpc2snPgoJPHNvdXJjZSB0eXBlPSd1bml4JyBwYXRo
+PScvdmFyL3RtcC9sdjAnIG1vZGU9J2NsaWVudCc+Cgk8L3NvdXJjZT4KCTx0YXJnZXQgZGV2PSd2
+ZGInIGJ1cz0ndmlydGlvJy8+Cgk8ZHJpdmVyIHF1ZXVlcz0nNCcvPgogICAgICA8L2Rpc2s+Cgog
+ICAgICA8Y29udHJvbGxlciB0eXBlPSd1c2InIGluZGV4PScwJz4KCTxhbGlhcyBuYW1lPSd1c2Iw
+Jy8+CiAgICAgIDwvY29udHJvbGxlcj4KICAgICAgPGNvbnRyb2xsZXIgdHlwZT0ncGNpJyBpbmRl
+eD0nMCcgbW9kZWw9J3BjaS1yb290Jz4KCTxhbGlhcyBuYW1lPSdwY2kuMCcvPgogICAgICA8L2Nv
+bnRyb2xsZXI+CiAgICAgIDxzZXJpYWwgdHlwZT0ncHR5Jz4KCTx0YXJnZXQgcG9ydD0nMCcvPgoJ
+PGFsaWFzIG5hbWU9J3NlcmlhbDAnLz4KICAgICAgPC9zZXJpYWw+CiAgICAgIDxzZXJpYWwgdHlw
+ZT0ncHR5Jz4KCTx0YXJnZXQgcG9ydD0nMScvPgoJPGFsaWFzIG5hbWU9J3NlcmlhbDEnLz4KICAg
+ICAgPC9zZXJpYWw+CiAgICAgIDxpbnB1dCB0eXBlPSd0YWJsZXQnIGJ1cz0ndXNiJz4KCTxhbGlh
+cyBuYW1lPSdpbnB1dDAnLz4KICAgICAgPC9pbnB1dD4KICAgICAgPGlucHV0IHR5cGU9J21vdXNl
+JyBidXM9J3BzMicvPgogICAgICA8Z3JhcGhpY3MgdHlwZT0ndm5jJyBhdXRvcG9ydD0neWVzJyBs
+aXN0ZW49JzAuMC4wLjAnIGtleW1hcD0nZW4tdXMnPgoJPGxpc3RlbiB0eXBlPSdhZGRyZXNzJyBh
+ZGRyZXNzPScwLjAuMC4wJy8+CiAgICAgIDwvZ3JhcGhpY3M+CiAgICAgIDx2aWRlbz4KCTxtb2Rl
+bCB0eXBlPSdjaXJydXMnIHZyYW09JzkyMTYnIGhlYWRzPScxJy8+Cgk8YWxpYXMgbmFtZT0ndmlk
+ZW8wJy8+CiAgICAgIDwvdmlkZW8+CiAgICA8L2RldmljZXM+CiAgICA8c2VjbGFiZWwgdHlwZT0n
+bm9uZScvPgogIDwvZG9tYWluPgoKPiAKPiA+IERvZXMgaXQgbWVhbnMgdGhhdCBxZW11IHdpdGgg
+c3BkayBvbiB0b3Agb2YgbG9jYWwgc3RvcmFnZSBkb24ndCBzdXBwb3J0IG1pZ3JhdGlvbj8KPiA+
+IAo+ID4gUUVNVTogMi4xMi4xCj4gPiBTUERLOiAxOC4xMAo+IAo+IHZob3N0LXVzZXItYmxrIGJ5
+cGFzc2VzIHRoZSBRRU1VIGJsb2NrIGxheWVyLCBzbyBOQkQgc3RvcmFnZSBtaWdyYXRpb24KPiBh
+dCB0aGUgUUVNVSBsZXZlbCB3aWxsIG5vdCB3b3JrIGZvciB0aGUgdmhvc3QtdXNlci1ibGsgZGlz
+ay4KPiAKPiBTdGVmYW4K
