@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50344)
+Received: from eggs.gnu.org ([209.51.188.92]:52011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghNGr-0007Kc-A2
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:28:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ghNMH-00017g-MR
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:34:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghNGp-000589-B4
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:28:25 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40037)
+	(envelope-from <peter.maydell@linaro.org>) id 1ghNMG-0000q6-LY
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:34:01 -0500
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:42200)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ghNGo-00057k-N9
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:28:23 -0500
-Received: by mail-oi1-x244.google.com with SMTP id t204so7793788oie.7
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 15:28:22 -0800 (PST)
+	id 1ghNMG-0000m4-Eb
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:34:00 -0500
+Received: by mail-ot1-x329.google.com with SMTP id v23so8313084otk.9
+	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 15:34:00 -0800 (PST)
 MIME-Version: 1.0
-References: <20190103094211.28473-1-geert+renesas@glider.be>
-	<acd10959-a781-d3bf-dc67-bda878740ec9@redhat.com>
-	<CAFEAcA9jk1ocW8h33-f9mRM52mT96o+bviaRe6MRErkyxBtqYQ@mail.gmail.com>
-	<CAMuHMdX6gwnw7RYQNik4QQmfWoTmemMgrUaPuW9Rgd56pW+4jQ@mail.gmail.com>
-In-Reply-To: <CAMuHMdX6gwnw7RYQNik4QQmfWoTmemMgrUaPuW9Rgd56pW+4jQ@mail.gmail.com>
+References: <20190108224600.23125-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20190108224600.23125-1-david@gibson.dropbear.id.au>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 9 Jan 2019 23:28:10 +0000
-Message-ID: <CAFEAcA9-eo7_1Wm20JkwCs_yG-r6v3aw19T0BVpp6qePw+JnmA@mail.gmail.com>
+Date: Wed, 9 Jan 2019 23:33:47 +0000
+Message-ID: <CAFEAcA-AK=HNBa1DOeEwKHP7D8fRxaUMB9HvBauOtiaWcKsPGg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH QEMU v5] hw/arm/sysbus-fdt: Add support for
- instantiating generic devices
+Subject: Re: [Qemu-devel] [PULL 00/29] ppc-for-4.0 queue 20190109
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Auger Eric <eric.auger@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Alex Williamson <alex.williamson@redhat.com>, Magnus Damm <damm+renesas@opensource.se>, Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
 
-So I should start out upfront by saying that I'm aware that
-the reality is that people do want to do passthrough with
-this kind of hardware, and that's not an unreasonable
-thing to do. I just don't really like the way that pushes
-the software into having to do ugly things...
-
-Overall I'll let Eric call the shots about how well this
-feature fits into our sysbus-fdt support; he knows this
-code much better than I do. (I would have preferred us
-not to have sysbus-fdt passthrough at all, in an
-ideal world :-))
-
-On Wed, 9 Jan 2019 at 16:30, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> On Wed, Jan 9, 2019 at 5:03 PM Peter Maydell <peter.maydell@linaro.org> wrote:
-> > whitelists for the devices we want to allow passthrough of and
-> > that we've tested to work.
+On Tue, 8 Jan 2019 at 22:46, David Gibson <david@gibson.dropbear.id.au> wrote:
 >
-> In the end, this will become a loooooong list (SoC x devices)...
+> The following changes since commit 147923b1a901a0370f83a0f4c58ec1baffef22f0:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20190108-pull-request' into staging (2019-01-08 16:07:32 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190109
+>
+> for you to fetch changes up to 3a8eb78e6c135422017888380db091793039b6dd:
+>
+>   spapr: enable XIVE MMIOs at reset (2019-01-09 09:28:14 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2019-01-09
+>
+> Second main pull request for qemu-4.0.  Highlights are:
+>  * Final parts of XIVE support for pseries (without KVM)
+>  * Preliminary work for PHB hotplug
+>  * Starting to use TCG vector operations
+>
+> This includes some changes in the PCI core, which Michael Tsirkin
+> requested come through this tree, since they're primarily of interest
+> for ppc.
+>
 
-Well, yes, but it deters people from trying to do passthrough
-with hardware that's not designed in a way that makes
-passthrough reasonably supportable at a software level.
+Applied, thanks.
 
-> Reality is that on embedded, on-SoC devices are usually not on a PCI bus.
-> But IOMMUs are present, and virtualization is wanted.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-I don't insist on PCI. Probeable, and consistent in
-terms of what they provide and how you interact with
-them, is what we want. Embedded on-SoC devices are
-generally neither. (The host kernel could in theory
-provide an API that exposed only devices that were safely
-pass-through-able in a consistent way, I suppose, but it
-doesn't, or we wouldn't be having to fish through the
-device tree nodes making guesses about what's safe to
-allow and what isn't and having heuristics about not
-providing clocks info being ok if we think the clock
-might only be used for power management...)
-
-thanks
 -- PMM
