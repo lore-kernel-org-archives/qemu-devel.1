@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60608)
+Received: from eggs.gnu.org ([209.51.188.92]:56981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gh7Gd-0005YA-JK
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 01:23:09 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gh94f-00080B-Dr
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:18:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gh7Gc-0002OI-3x
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 01:23:07 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:25728
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gh7Ga-0002K8-MR
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 01:23:06 -0500
-References: <1544063533-10139-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1544063533-10139-5-git-send-email-lizhijian@cn.fujitsu.com>
-	<20181221110913-mutt-send-email-mst@kernel.org>
-	<20181227203118.GA19442@habkost.net>
-	<CAGxU2F5BAyKBmkUGiUO1DN18RXhovijvJVAEYzrPw1ZE+9xOyw@mail.gmail.com>
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <116abb00-ab9d-d6dd-11f2-e2c5033627b1@cn.fujitsu.com>
-Date: Wed, 9 Jan 2019 14:22:54 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAGxU2F5BAyKBmkUGiUO1DN18RXhovijvJVAEYzrPw1ZE+9xOyw@mail.gmail.com>
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gh94e-0003VK-85
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:18:53 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Wed, 9 Jan 2019 08:18:45 +0000
+Message-ID: <9d97e822-7c9b-c095-6a27-a74facf21e47@virtuozzo.com>
+References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+	<20181207122647.GE5119@linux.fritz.box>
+	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
+	<20181212122457.GB5415@linux.fritz.box>
+	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
+	<20181213122039.GC5427@linux.fritz.box>
+	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
+	<2ee882bf-00cc-addf-d866-c5c916a00774@virtuozzo.com>
+In-Reply-To: <2ee882bf-00cc-addf-d866-c5c916a00774@virtuozzo.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v4 4/4] i386: allow to load initrd
- below 4G for recent linux
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EB145A8FCB93CA4084E402B2061086B9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
+ context protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,123 +32,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, philip.li@intel.com, zhijianx.li@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Philippe Mathieu Daude <philmd@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 1/7/19 20:11, Stefano Garzarella wrote:
-> Hi,
->
-> On Thu, Dec 27, 2018 at 9:32 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
->> On Fri, Dec 21, 2018 at 11:10:30AM -0500, Michael S. Tsirkin wrote:
->>> On Thu, Dec 06, 2018 at 10:32:13AM +0800, Li Zhijian wrote:
->>>> a new field xloadflags was added to recent x86 linux, and BIT 1:
->>>> XLF_CAN_BE_LOADED_ABOVE_4G is used to tell bootload that where initrd can be
->>>> loaded safely.
->>>>
->>>> Current QEMU/BIOS always loads initrd below below_4g_mem_size which is always
->>>> less than 4G, so here limiting initrd_max to 4G - 1 simply is enough if
->>>> this bit is set.
->>>>
->>>> CC: Paolo Bonzini <pbonzini@redhat.com>
->>>> CC: Richard Henderson <rth@twiddle.net>
->>>> CC: Eduardo Habkost <ehabkost@redhat.com>
->>>> CC: "Michael S. Tsirkin" <mst@redhat.com>
->>>> CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->>>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->>>>
->>>> ---
->>>> V3: correct grammar and check XLF_CAN_BE_LOADED_ABOVE_4G first (Michael S. Tsirkin)
->>>>
->>>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->>>> ---
->>>>   hw/i386/pc.c | 10 +++++++++-
->>>>   1 file changed, 9 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>>> index 3b10726..baa99c0 100644
->>>> --- a/hw/i386/pc.c
->>>> +++ b/hw/i386/pc.c
->>>> @@ -904,7 +904,15 @@ static void load_linux(PCMachineState *pcms,
->>>>   #endif
->>>>
->>>>       /* highest address for loading the initrd */
->>>> -    if (protocol >= 0x203) {
->>>> +    if (protocol >= 0x20c &&
->>>> +        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
->>>> +        /*
->>>> +         * Although kernel allows initrd loading to above 4G,
->>>> +         * it just makes it as large as possible while still staying below 4G
->>>> +         * since current BIOS always loads initrd below pcms->below_4g_mem_size
->>>> +         */
->>>> +        initrd_max = UINT32_MAX;
->>>> +    } else if (protocol >= 0x203) {
->>>>           initrd_max = ldl_p(header+0x22c);
->>>>       } else {
->>>>           initrd_max = 0x37ffffff;
->>>
->>> I still have trouble understanding the above.
->>> Anyone else wants to comment / help rephrase the comment
->>> and commit log so it's readable?
->>
->> The comment seems to contradict what I see on the code:
->>
->> | Although kernel allows initrd loading to above 4G,
->>
->> Sounds correct.
->>
->>
->> | it just makes it as large as possible while still staying below 4G
->>
->> I'm not a native English speaker, but I believe "it" here should
->> be interpreted as "the kernel", which would be incorrect.  It's
->> this QEMU function that limits initrd_max to a uint32 value, not
->> the kernel.
->>
->>
->> | since current BIOS always loads initrd below pcms->below_4g_mem_size
->>
->> I don't know why the BIOS is mentioned here.  The
->> below_4g_mem_size limit comes from these 2 lines inside
->> load_linux():
->>
->>      if (initrd_max >= pcms->below_4g_mem_size - pcmc->acpi_data_size) {
->>          initrd_max = pcms->below_4g_mem_size - pcmc->acpi_data_size - 1;
->>      }
->> In addition to that, initrd_max is uint32_t simply because QEMU
->> doesn't support the 64-bit boot protocol (specifically the
->> ext_ramdisk_image field), so all talk about below_4g_mem_size
->> seems to be just a distraction.
->>
->> All that said, I miss one piece of information here: is
->> XLF_CAN_BE_LOADED_ABOVE_4G really supposed to override
->> header+0x22c?  linux/Documentation/x86/boot.txt isn't clear about
->> that.  Is there any reference that can help us confirm this?
-> Looking at the following patch seems that we can confirm the assumption:
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=4bf7111f50167133a71c23530ca852a41355e739
->
-> Note: the patch was reverted due to bugs in some firmwares, but IMHO
-> the assumption is correct.
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=47226ad4f4cfd1e91ded7f2ec42f83ff1c624663
-
-thanks for you info.
-
-When use '-kernel vmlinux -initrd initrd.cgz' to launch a VM,
-the firmware(it could be linuxboot_dma.bin) helps to read initrd
-contents into guest memory(below ramdisk_max) and jump to kernel.
-that's similar with what bootloader does, like grub.
-
-And firmware can work well with some fixes in this patchset.
-
-Zhijian
-
-
->
-> Cheers,
-> Stefano
->
->> --
->> Eduardo
->>
->
-> .
->
+cGluZyBwaW5nISEhDQoNCk9uIDE4LjEyLjIwMTggMTE6NTMsIERlbmlzIFBsb3RuaWtvdiB3cm90
+ZToNCj4gcGluZyBwaW5nDQo+IA0KPiBPbiAxNC4xMi4yMDE4IDE0OjU0LCBEZW5pcyBQbG90bmlr
+b3Ygd3JvdGU6DQo+Pg0KPj4NCj4+IE9uIDEzLjEyLjIwMTggMTU6MjAsIEtldmluIFdvbGYgd3Jv
+dGU6DQo+Pj4gQW0gMTMuMTIuMjAxOCB1bSAxMjowNyBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2No
+cmllYmVuOg0KPj4+PiBPbiAxMi4xMi4yMDE4IDE1OjI0LCBLZXZpbiBXb2xmIHdyb3RlOg0KPj4+
+Pj4gQW0gMTEuMTIuMjAxOCB1bSAxNzo1NSBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2NocmllYmVu
+Og0KPj4+Pj4+PiBXaHkgaW52b2x2ZSB0aGUgQWlvQ29udGV4dCBhdCBhbGw/IFRoaXMgY291bGQg
+YWxsIGJlIGtlcHQgYXQgdGhlDQo+Pj4+Pj4+IEJsb2NrQmFja2VuZCBsZXZlbCB3aXRob3V0IGV4
+dGVuZGluZyB0aGUgbGF5ZXJpbmcgdmlvbGF0aW9uIHRoYXQNCj4+Pj4+Pj4gYWlvX2Rpc2FibGVf
+ZXh0ZXJuYWwoKSBpcy4NCj4+Pj4+Pj4NCj4+Pj4+Pj4gQmxvY2tCYWNrZW5kcyBnZXQgbm90aWZp
+ZWQgd2hlbiB0aGVpciByb290IG5vZGUgaXMgZHJhaW5lZCwgc28gDQo+Pj4+Pj4+IGhvb2tpbmcN
+Cj4+Pj4+Pj4gdGhpbmdzIHVwIHRoZXJlIHNob3VsZCBiZSBhcyBlYXN5LCBpZiBub3QgZXZlbiBl
+YXNpZXIgdGhhbiBpbg0KPj4+Pj4+PiBBaW9Db250ZXh0Lg0KPj4+Pj4+DQo+Pj4+Pj4gSnVzdCB3
+YW50IHRvIG1ha2Ugc3VyZSB0aGF0IEkgdW5kZXJzdG9vZCBjb3JyZWN0bHkgd2hhdCB5b3UgbWVh
+bnQgYnkNCj4+Pj4+PiAiQmxvY2tCYWNrZW5kcyBnZXQgbm90aWZpZWQiLiBEaWQgeW91IG1lYW4g
+dGhhdCBiZHJ2X2RyYWluX2VuZCBjYWxscw0KPj4+Pj4+IGNoaWxkJ3Mgcm9sZSBjYWxsYmFjayBi
+bGtfcm9vdF9kcmFpbmVkX2VuZCBieSBjYWxsaW5nDQo+Pj4+Pj4gYmRydl9wYXJlbnRfZHJhaW5l
+ZF9lbmQ/DQo+Pj4+Pg0KPj4+Pj4gWWVzLCBibGtfcm9vdF9kcmFpbmVkX2JlZ2luL2VuZCBjYWxs
+cyBhcmUgYWxsIHlvdSBuZWVkLiBTcGVjaWZpY2FsbHksDQo+Pj4+PiB0aGVpciBhZGp1c3RtZW50
+cyB0byBibGstPnF1aWVzY2VfY291bnRlciB0aGF0IGFyZSBhbHJlYWR5IHRoZXJlLCANCj4+Pj4+
+IGFuZCBpbg0KPj4+Pj4gdGhlICdpZiAoLS1ibGstPnF1aWVzY2VfY291bnRlciA9PSAwKScgYmxv
+Y2sgb2YgYmxrX3Jvb3RfZHJhaW5lZF9lbmQoKQ0KPj4+Pj4gd2UgY2FuIHJlc3VtZSB0aGUgcXVl
+dWVkIHJlcXVlc3RzLg0KPj4+PiBTb3VuZHMgaXQgc2hvdWxkIGJlIHNvLCBidXQgaXQgZG9lc24n
+dCB3b3JrIHRoYXQgd2F5IGFuZCB0aGF0J3Mgd2h5Og0KPj4+PiB3aGVuIGRvaW5nIG1pcnJvciB3
+ZSBtYXkgcmVzdW1lIHBvc3Rwb25lZCBjb3JvdXRpbmVzIHRvbyBlYXJseSB3aGVuIHRoZQ0KPj4+
+PiB1bmRlcmx5aW5nIGJzIGlzIHByb3RlY3RlZCBmcm9tIHdyaXRpbmcgYXQgYW5kIHRodXMgd2Ug
+ZW5jb3VudGVyIHRoZQ0KPj4+PiBhc3NlcnQgb24gYSB3cml0ZSByZXF1ZXN0IGV4ZWN1dGlvbiBh
+dCBiZHJ2X2NvX3dyaXRlX3JlcV9wcmVwYXJlIHdoZW4NCj4+Pj4gcmVzdW1pbmcgdGhlIHBvc3Rw
+b25lZCBjb3JvdXRpbmVzLg0KPj4+Pg0KPj4+PiBUaGUgdGhpbmcgaXMgdGhhdCB0aGUgYnMgaXMg
+cHJvdGVjdGVkIGZvciB3cml0aW5nIGJlZm9yZSBleGVjdXRpb24gb2YNCj4+Pj4gYmRydl9yZXBs
+YWNlX25vZGUgYXQgbWlycm9yX2V4aXRfY29tbW9uIGFuZCBiZHJ2X3JlcGxhY2Vfbm9kZSBjYWxs
+cw0KPj4+PiBiZHJ2X3JlcGxhY2VfY2hpbGRfbm9wZXJtIHdoaWNoLCBpbiB0dXJuLCBjYWxscyAN
+Cj4+Pj4gY2hpbGQtPnJvbGUtPmRyYWluZWRfZW5kDQo+Pj4+IHdoZXJlIG9uZSBvZiB0aGUgY2Fs
+bGJhY2tzIGlzIGJsa19yb290X2RyYWluZWRfZW5kIHdoaWNoIGNoZWNrDQo+Pj4+IGlmKC0tYmxr
+LT5xdWllc2NlX2NvdW50ZXIgPT0gMCkgYW5kIHJ1bnMgdGhlIHBvc3Rwb25lZCByZXF1ZXN0cw0K
+Pj4+PiAoY29yb3V0aW5lcykgaWYgdGhlIGNvdW5kaXRpb24gaXMgdHJ1ZS4NCj4+Pg0KPj4+IEht
+LCBzbyBzb21ldGhpbmcgaXMgbWVzc2VkIHVwIHdpdGggdGhlIGRyYWluIHNlY3Rpb25zIGluIHRo
+ZSBtaXJyb3INCj4+PiBkcml2ZXIuIFdlIGhhdmU6DQo+Pj4NCj4+PiDCoMKgwqDCoCBiZHJ2X2Ry
+YWluZWRfYmVnaW4odGFyZ2V0X2JzKTsNCj4+PiDCoMKgwqDCoCBiZHJ2X3JlcGxhY2Vfbm9kZSh0
+b19yZXBsYWNlLCB0YXJnZXRfYnMsICZsb2NhbF9lcnIpOw0KPj4+IMKgwqDCoMKgIGJkcnZfZHJh
+aW5lZF9lbmQodGFyZ2V0X2JzKTsNCj4+Pg0KPj4+IE9idmlvdXNseSwgdGhlIGludGVudGlvbiB3
+YXMgdG8ga2VlcCB0aGUgQmxvY2tCYWNrZW5kIGRyYWluZWQgZHVyaW5nDQo+Pj4gYmRydl9yZXBs
+YWNlX25vZGUoKS4gU28gaG93IGNvdWxkIGJsay0+cXVpZXNjZV9jb3VudGVyIGV2ZXIgZ2V0IHRv
+IDANCj4+PiBpbnNpZGUgYmRydl9yZXBsYWNlX25vZGUoKSB3aGVuIHRhcmdldF9icyBpcyBkcmFp
+bmVkPw0KPj4+DQo+Pj4gTG9va2luZyBhdCBiZHJ2X3JlcGxhY2VfY2hpbGRfbm9wZXJtKCksIGl0
+IHNlZW1zIHRoYXQgdGhlIGZ1bmN0aW9uIGhhcw0KPj4+IGEgYnVnOiBFdmVuIGlmIG9sZF9icyBh
+bmQgbmV3X2JzIGFyZSBib3RoIGRyYWluZWQsIHRoZSBxdWllc2NlX2NvdW50ZXINCj4+PiBmb3Ig
+dGhlIHBhcmVudCByZWFjaGVzIDAgZm9yIGEgbW9tZW50IGJlY2F1c2Ugd2UgY2FsbCAuZHJhaW5l
+ZF9lbmQgZm9yDQo+Pj4gdGhlIG9sZCBjaGlsZCBmaXJzdCBhbmQgLmRyYWluZWRfYmVnaW4gZm9y
+IHRoZSBuZXcgb25lIGxhdGVyLg0KPj4+DQo+Pj4gU28gaXQgc2VlbXMgdGhlIGZpeCB3b3VsZCBi
+ZSB0byByZXZlcnNlIHRoZSBvcmRlciBhbmQgZmlyc3QgY2FsbA0KPj4+IC5kcmFpbmVkX2JlZ2lu
+IGZvciB0aGUgbmV3IGNoaWxkIGFuZCB0aGVuIC5kcmFpbmVkX2VuZCBmb3IgdGhlIG9sZA0KPj4+
+IGNoaWxkLiBTb3VuZHMgbGlrZSBhIGdvb2QgbmV3IHRlc3RjYXNlIGZvciB0ZXN0cy90ZXN0LWJk
+cnYtZHJhaW4uYywgdG9vLg0KPj4gWWVzLCBpdCdzIHRydWUsIGJ1dCBpdCdzIG5vdCBlbm91Z2gu
+Li4NCj4+IEluIG1pcnJvcl9leGl0X2NvbW1vbigpIHdlIGFjdGl2ZWx5IG1hbmlwdWxhdGUgd2l0
+aCBibG9jayBkcml2ZXIgc3RhdGVzLg0KPj4gV2hlbiB3ZSByZXBsYWNlZCBhIG5vZGUgaW4gdGhl
+IHNuaXBwZXQgeW91IHNob3dlZCB3ZSBjYW4ndCBhbGxvdyB0aGUgDQo+PiBwb3N0cG9uZWQgY29y
+b3V0aW5lcyB0byBydW4gYmVjYXVzZSB0aGUgYmxvY2sgdHJlZSBpc24ndCByZWFkeSB0byANCj4+
+IHJlY2VpdmUgdGhlIHJlcXVlc3RzIHlldC4NCj4+IFRvIGJlIHJlYWR5LCB3ZSBuZWVkIHRvIGlu
+c2VydCBhIHByb3BlciBibG9jayBkcml2ZXIgc3RhdGUgdG8gdGhlIA0KPj4gYmxvY2sgYmFja2Vu
+ZCB3aGljaCBpcyBkb25lIGhlcmUNCj4+DQo+PiDCoMKgwqDCoCBibGtfcmVtb3ZlX2JzKGJqb2It
+PmJsayk7DQo+PiDCoMKgwqDCoCBibGtfc2V0X3Blcm0oYmpvYi0+YmxrLCAwLCBCTEtfUEVSTV9B
+TEwsICZlcnJvcl9hYm9ydCk7DQo+PiDCoMKgwqDCoCBibGtfaW5zZXJ0X2JzKGJqb2ItPmJsaywg
+bWlycm9yX3RvcF9icywgJmVycm9yX2Fib3J0KTsgPDwgPDwgPDwgPDwNCj4+DQo+PiDCoMKgwqDC
+oCBic19vcGFxdWUtPmpvYiA9IE5VTEw7DQo+Pg0KPj4gwqDCoMKgwqAgYmRydl9kcmFpbmVkX2Vu
+ZChzcmMpOw0KPj4NCj4+IElmIHRoZSB0cmVlIGlzbid0IHJlYWR5IGFuZCB3ZSByZXN1bWUgdGhl
+IGNvcm91dGluZXMsIHdlJ2xsIGVuZCB1cCANCj4+IHdpdGggdGhlIHJlcXVlc3QgbGFuZGVkIGlu
+IGEgd3JvbmcgYmxvY2sgZHJpdmVyIHN0YXRlLg0KPj4NCj4+IFNvLCB3ZSBleHBsaWNpdGx5IHNo
+b3VsZCBzdG9wIGFsbCBhY3Rpdml0aWVzIG9uIGFsbCB0aGUgZHJpdmVyIHN0YXRlcw0KPj4gYW5k
+IGl0cyBwYXJlbnRzIGFuZCBhbGxvdyB0aGUgYWN0aXZpdGllcyB3aGVuIGV2ZXJ5dGhpbmcgaXMg
+cmVhZHkgdG8gZ28uDQo+Pg0KPj4gV2h5IGV4cGxpY2l0bHksIGJlY2F1c2UgdGhlIGJsb2NrIGRy
+aXZlciBzdGF0ZXMgbWF5IGJlbG9uZyB0byANCj4+IGRpZmZlcmVudCBibG9jayBiYWNrZW5kcyBh
+dCB0aGUgbW9tZW50IG9mIHRoZSBtYW5pcHVsYXRpb24gYmVnaW5uaW5nLg0KPj4NCj4+IFNvLCBp
+dCBzZWVtcyB3ZSBuZWVkIHRvIGRpc2FibGUgYWxsIHRoZWlyIGNvbnRleHRzIHVudGlsIHRoZSAN
+Cj4+IG1hbmlwdWxhdGlvbiBlbmRzLg0KPj4NCj4+IFBsZWFzZSwgY29ycmVjdCBtZSBpZiBJJ20g
+d3JvbmcuDQo+Pg0KPj4+DQo+Pj4+IEluIHNlZW1zIHRoYXQgaWYgdGhlIGV4dGVybmFsIHJlcXVl
+c3RzIGRpc2FibGVkIG9uIHRoZSBjb250ZXh0IHdlIGNhbid0DQo+Pj4+IHJlbHkgb24gYW55dGhp
+bmcgb3Igc2hvdWxkIGNoZWNrIHdoZXJlIHRoZSB1bmRlcmx5aW5nIGJzIGFuZCBpdHMNCj4+Pj4g
+dW5kZXJseWluZyBub2RlcyBhcmUgcmVhZHkgdG8gcmVjZWl2ZSByZXF1ZXN0cyB3aGljaCBzb3Vu
+ZHMgcXVpdGUNCj4+Pj4gY29tcGxpY2F0ZWQuDQo+Pj4+IFBsZWFzZSBjb3JyZWN0IG1lIGlmIHN0
+aWxsIGRvbid0IHVuZGVyc3RhbmQgc29tZXRoaW5nIGluIHRoYXQgcm91dGluZS4NCj4+Pg0KPj4+
+IEkgdGhpbmsgdGhlIHJlYXNvbiB3aHkgcmV5bGluZyBvbiBhaW9fZGlzYWJsZV9leHRlcm5hbCgp
+IHdvcmtzIGlzIHNpbXBseQ0KPj4+IGJlY2F1c2Ugc3JjIGlzIGFsc28gZHJhaW5lZCwgd2hpY2gg
+a2VlcHMgZXh0ZXJuYWwgZXZlbnRzIGluIHRoZQ0KPj4+IEFpb0NvbnRleHQgZGlzYWJsZWQgZGVz
+cGl0ZSB0aGUgYnVnIGluIGRyYWluaW5nIHRoZSB0YXJnZXQgbm9kZS4NCj4+Pg0KPj4+IFRoZSBi
+dWcgd291bGQgYmVjb21lIGFwcGFyZW50IGV2ZW4gd2l0aCBhaW9fZGlzYWJsZV9leHRlcm5hbCgp
+IGlmIHdlDQo+Pj4gZGlkbid0IGRyYWluIHNyYywgb3IgZXZlbiBpZiB3ZSBqdXN0IHN1cHBvcnRl
+ZCBzcmMgYW5kIHRhcmdldCBiZWluZyBpbg0KPj4+IGRpZmZlcmVudCBBaW9Db250ZXh0cy4NCj4+
+DQo+PiBXaHkgZG9uJ3Qgd2UgZGlzYWJsZSBhbGwgdGhvc2UgY29udGV4dHMgaW52b2x2ZWQgdW50
+aWwgdGhlIGVuZCBvZiB0aGUgDQo+PiBibG9jayBkZXZpY2UgdHJlZSByZWNvbnN0cnVjdGlvbj8N
+Cj4+DQo+PiBUaGFua3MhDQo+Pg0KPj4gRGVuaXMNCj4+Pg0KPj4+IEtldmluDQo+Pj4NCj4+DQo+
+IA0KDQotLSANCkJlc3QsDQpEZW5pcw0K
