@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58431)
+Received: from eggs.gnu.org ([209.51.188.92]:58727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghEJY-0005Wg-9z
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:54:37 -0500
+	(envelope-from <berrange@redhat.com>) id 1ghEKX-00064e-B5
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:55:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghEJV-00043Q-NJ
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:54:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33274)
+	(envelope-from <berrange@redhat.com>) id 1ghEKV-000519-O0
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:55:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghEJT-0003yL-Aa
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:54:32 -0500
-References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-	<20190109105818.GG3998@redhat.com>
-	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
-	<20190109114459.GK3998@redhat.com>
-	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
-	<20190109125854.GM3998@redhat.com>
-	<860317b6-6489-9c18-bdf8-95a70fbec9b3@redhat.com>
-	<20190109132729.GN3998@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e8d5325c-5e2e-8fa0-06d4-0d685fcaf3dc@redhat.com>
-Date: Wed, 9 Jan 2019 14:54:21 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghEKM-0004qe-L2
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:55:28 -0500
+Date: Wed, 9 Jan 2019 13:55:04 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190109135504.GA12179@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181031025712.18602-1-famz@redhat.com>
+	<4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
+	<20181114095807.GB22784@magic>
 MIME-Version: 1.0
-In-Reply-To: <20190109132729.GN3998@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+Content-Disposition: inline
+In-Reply-To: <20181114095807.GB22784@magic>
+Subject: Re: [Qemu-devel] [PATCH v4] tests: vm: auto_install OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,110 +29,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Brad Smith <brad@comstyle.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 2019-01-09 14:27, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Jan 09, 2019 at 02:20:02PM +0100, Thomas Huth wrote:
->> On 2019-01-09 13:58, Daniel P. Berrang=C3=A9 wrote:
->>> On Wed, Jan 09, 2019 at 01:52:02PM +0100, Thomas Huth wrote:
->>>> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
->>>>> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
->>>>>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
->>>>>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
->>>>>>>> Different versions of GCC and Clang use different versions of th=
-e C standard.
->>>>>>>> This repeatedly caused problems already, e.g. with duplicated ty=
-pedefs:
->>>>>>>>
->>>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.=
-html
->>>>>>>>
->>>>>>>> or with for-loop variable initializers:
->>>>>>>>
->>>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.=
-html
->>>>>>>>
->>>>>>>> To avoid these problems, we should enforce the C language versio=
-n to the
->>>>>>>> same level for all compilers. Since our minimum compiler version=
-s are
->>>>>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" =
-already,
->>>>>>>> this seems to be a good choice.
->>>>>>>
->>>>>>> In 4.x   gnu11 is marked as experimental. I'm not really comforta=
-ble
->>>>>>> using experimental features - even if its warning free there's a =
-risk
->>>>>>> it would silently mis-compile something.
->>>>>>>
->>>>>>> gnu99 is ok with 4.x - it is merely "incomplete".
->>>>>>
->>>>>> gnu11 has the big advantage that it also fixes the problem with
->>>>>> duplicated typedefs that are reported by older versions of Clang.
->>>>>>
->>>>>> Are you sure about the experimental character in 4.x? I just looke=
-d at
->>>>>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it=
- says:
->>>>>>
->>>>>> "A fourth version of the C standard, known as C11, was published i=
-n 2011
->>>>>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts=
- of
->>>>>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
->>>>>>
->>>>>> It does not say anything about "experimental" there. The word
->>>>>> "experimental" is only used for the C++ support, but we hardly hav=
-e C++
->>>>>> code in QEMU -- if you worry about that, I could simply drop the
->>>>>> "-std=3Dgnu++11" part from my patch?
->>>>>
->>>>> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1=
-.x86_64:
->>>>>
->>>>>   "3.4 Options Controlling C Dialect
->>>>>
->>>>>        ....snip...
->>>>>
->>>>>      'gnu11'
->>>>>      'gnu1x'
->>>>>           GNU dialect of ISO C11.  Support is incomplete and
->>>>>           experimental.  The name 'gnu1x' is deprecated."
->>>>
->>>> Ok. Looks like the "Support is incomplete and experimental" sentence=
- has
->>>> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
->>>> already. IMHO we could give it a try and enable gnu11 for QEMU with =
-GCC
->>>> v4.8, too. If we later find problems, we could still switch back to
->>>> gnu99 instead. Other opinions?
->>>
->>> Our code is already cleanly compiling with gnu99 standard - the probl=
-em
->>> is merely that we sometimes introduce regressions due to not enforcin=
-g
->>> that standard level. I don't think the features in gnu11 are compelli=
-ng
->>> enough to justify using something that's declared experimental.
->> What about the duplicated typedef problem? See:
->>
->>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
->>
->> That one occured with Clang, but I think we've had plenty of these in
->> the past with GCC, too...
->=20
-> IIUC, That's only a problem because we don't pass any  -std  flag, and
-> so get the compilers default, which may be gnu11.  If we explicitly
-> set -std=3Dgnu99, that problem will be reported by patchew, travis and
-> maintainers own build tests, and thus won't get anywhere near git maste=
-r.
+On Wed, Nov 14, 2018 at 05:58:07PM +0800, Fam Zheng wrote:
+> On Sun, 11/11 18:20, Brad Smith wrote:
+> > ping.
+> 
+> Queued. Will send a pull request soon.
 
-Ah, right, I just tried it with a newer version of Clang, and indeed it
-then prints out a warning if some code with a duplicated typedef is
-compiled with "-std=3Dgnu99" (while it remains silent without that
-option). So in that case I'm fine with gnu99, too. I'll send a v2 of the
-patch...
+ping, this seems to have got lost, and is blocking us deleting SDL 1.2
+support from QEMU.
 
- Thomas
+> > On 10/30/2018 10:57 PM, Fam Zheng wrote:
+> > > Upgrade OpenBSD to 6.4 using auto_install. Especially, drop SDL1,
+> > > include SDL2.
+> > > 
+> > > Also do the build in $HOME since both /var/tmp and /tmp are tmpfs with
+> > > limited capacities.
+> > > 
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > 
+> > > ---
+> > > 
+> > > v4: Use 6.4. [Brad]
+> > > ---
+> > >   tests/vm/basevm.py |  6 ++--
+> > >   tests/vm/openbsd   | 85 +++++++++++++++++++++++++++++++++++++++-------
+> > >   2 files changed, 76 insertions(+), 15 deletions(-)
+> > > 
+> > > diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> > > index 5caf77d6b8..6fb446d4c5 100755
+> > > --- a/tests/vm/basevm.py
+> > > +++ b/tests/vm/basevm.py
+> > > @@ -68,8 +68,6 @@ class BaseVM(object):
+> > >           self._args = [ \
+> > >               "-nodefaults", "-m", "4G",
+> > >               "-cpu", "max",
+> > > -            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
+> > > -            "-device", "virtio-net-pci,netdev=vnet",
+> > >               "-vnc", "127.0.0.1:0,to=20",
+> > >               "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
+> > >           if vcpus and vcpus > 1:
+> > > @@ -146,8 +144,10 @@ class BaseVM(object):
+> > >                               "-device",
+> > >                               "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
+> > > -    def boot(self, img, extra_args=[]):
+> > > +    def boot(self, img, extra_args=[], extra_usernet_args=""):
+> > >           args = self._args + [
+> > > +            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22" + extra_usernet_args,
+> > > +            "-device", "virtio-net-pci,netdev=vnet",
+> > >               "-device", "VGA",
+> > >               "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
+> > >               "-device", "virtio-blk,drive=drive0,bootindex=0"]
+> > > diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+> > > index cfe0572c59..99a7e98d80 100755
+> > > --- a/tests/vm/openbsd
+> > > +++ b/tests/vm/openbsd
+> > > @@ -14,6 +14,9 @@
+> > >   import os
+> > >   import sys
+> > >   import subprocess
+> > > +import time
+> > > +import atexit
+> > > +import tempfile
+> > >   import basevm
+> > >   class OpenBSDVM(basevm.BaseVM):
+> > > @@ -21,25 +24,83 @@ class OpenBSDVM(basevm.BaseVM):
+> > >       arch = "x86_64"
+> > >       BUILD_SCRIPT = """
+> > >           set -e;
+> > > -        rm -rf /var/tmp/qemu-test.*
+> > > -        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+> > > +        rm -rf $HOME/qemu-test.*
+> > > +        cd $(mktemp -d $HOME/qemu-test.XXXXXX);
+> > >           tar -xf /dev/rsd1c;
+> > > -        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
+> > > +        ./configure {configure_opts};
+> > >           gmake --output-sync -j{jobs} {verbose};
+> > >           # XXX: "gmake check" seems to always hang or fail
+> > >           #gmake --output-sync -j{jobs} check {verbose};
+> > >       """
+> > > +    def _install_os(self, img):
+> > > +        tmpdir = tempfile.mkdtemp()
+> > > +        pxeboot = self._download_with_cache("https://fastly.cdn.openbsd.org/pub/OpenBSD/6.4/amd64/pxeboot",
+> > > +                sha256sum="d87ab39d941ff926d693943a927585945456ccedb76ea504a251b4b93cd4c266")
+> > > +        bsd_rd = self._download_with_cache("https://fastly.cdn.openbsd.org/pub/OpenBSD/6.4/amd64/bsd.rd",
+> > > +                sha256sum="89505c683cbcd75582fe475e847ed53d89e2b8180c3e3d61f4eb4b76b5e11f5c")
+> > > +        install = self._download_with_cache("https://fastly.cdn.openbsd.org/pub/OpenBSD/6.4/amd64/install64.iso",
+> > > +                sha256sum='81833b79e23dc0f961ac5fb34484bca66386deb3181ddb8236870fa4f488cdd2')
+> > > +        subprocess.check_call(["qemu-img", "create", img, "32G"])
+> > > +        subprocess.check_call(["cp", pxeboot, os.path.join(tmpdir, "auto_install")])
+> > > +        subprocess.check_call(["cp", bsd_rd, os.path.join(tmpdir, "bsd")])
+> > > +
+> > > +        self._gen_install_conf(tmpdir)
+> > > +        # BOOTP filename being auto_install makes sure OpenBSD installer
+> > > +        # not prompt for "auto install mode"
+> > > +        usernet_args = ",tftp=%s,bootfile=/auto_install" % tmpdir
+> > > +        usernet_args += ",tftp-server-name=10.0.2.4"
+> > > +        usernet_args += ",guestfwd=tcp:10.0.2.4:80-cmd:cat %s" % \
+> > > +            os.path.join(tmpdir, "install.conf")
+> > > +        self.boot(img,
+> > > +                  extra_args=["-boot", "once=n", "-no-reboot",
+> > > +                              "-cdrom", install],
+> > > +                  extra_usernet_args=usernet_args)
+> > > +        self.wait()
+> > > +
+> > > +    def _gen_install_conf(self, tmpdir):
+> > > +        contents = """\
+> > > +HTTP/1.0 200 OK
+> > > +
+> > > +System hostname = qemu-openbsd
+> > > +Password for root = qemupass
+> > > +Public ssh key for root = {pub_key}
+> > > +Allow root ssh login = yes
+> > > +Network interfaces = vio0
+> > > +IPv4 address for vio0 = dhcp
+> > > +Setup a user = qemu
+> > > +Password for user = qemupass
+> > > +Public ssh key for user = {pub_key}
+> > > +What timezone are you in = US/Eastern
+> > > +Server = fastly.cdn.openbsd.org
+> > > +Use http = yes
+> > > +Default IPv4 route = 10.0.2.2
+> > > +Location of sets = cd0
+> > > +Set name(s) = all
+> > > +Continue without verification = yes
+> > > +""".format(pub_key=basevm.SSH_PUB_KEY)
+> > > +        with open(os.path.join(tmpdir, "install.conf"), "w") as f:
+> > > +            f.write(contents)
+> > > +
+> > >       def build_image(self, img):
+> > > -        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
+> > > -                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
+> > > -        img_tmp_xz = img + ".tmp.xz"
+> > > -        img_tmp = img + ".tmp"
+> > > -        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+> > > -        subprocess.check_call(["xz", "-df", img_tmp_xz])
+> > > -        if os.path.exists(img):
+> > > -            os.remove(img)
+> > > -        os.rename(img_tmp, img)
+> > > +
+> > > +        self._install_os(img + ".tmp")
+> > > +
+> > > +        self.boot(img + ".tmp")
+> > > +        self.wait_ssh()
+> > > +
+> > > +        self.ssh_root("usermod -G operator qemu")
+> > > +        self.ssh_root("echo https://fastly.cdn.openbsd.org/pub/OpenBSD > /etc/installurl")
+> > > +        for pkg in ["git", "gmake", "glib2", "bison", "sdl2"]:
+> > > +            self.ssh_root("pkg_add " + pkg)
+> > > +        self.ssh_root("ln -sf /usr/local/bin/python2.7 /usr/local/bin/python")
+> > > +        self.ssh_root("ln -sf /usr/local/bin/python2.7-2to3 /usr/local/bin/2to3")
+> > > +        self.ssh_root("ln -sf /usr/local/bin/python2.7-config /usr/local/bin/python-config")
+> > > +        self.ssh_root("ln -sf /usr/local/bin/pydoc2.7 /usr/local/bin/pydoc")
+> > > +        self.ssh_root("shutdown -p now")
+> > > +        self.wait()
+> > > +
+> > > +        subprocess.check_call(["mv", img + ".tmp", img])
+> > >   if __name__ == "__main__":
+> > >       sys.exit(basevm.main(OpenBSDVM))
+> 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
