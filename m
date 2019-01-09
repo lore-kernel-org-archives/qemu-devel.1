@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60757)
+Received: from eggs.gnu.org ([209.51.188.92]:33917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gh9Hm-0004fg-8F
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:32:27 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gh9Nn-000086-Ho
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:38:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gh9Hh-0003rz-Ri
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:32:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gh9He-0003mp-IQ
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:32:20 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  9 Jan 2019 12:29:02 +0400
-Message-Id: <20190109082902.32271-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20190109082902.32271-1-marcandre.lureau@redhat.com>
-References: <20190109082902.32271-1-marcandre.lureau@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1gh9Nm-0002p0-O6
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:38:39 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:40103)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gh9Nm-0002js-E9
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:38:38 -0500
+References: <20190108184900.9654-1-peter.maydell@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <4d3ee63a-12c1-a3b3-c76f-15b8ed6b43a6@vivier.eu>
+Date: Wed, 9 Jan 2019 09:38:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v15 6/6] tpm: clear RAM when "memory overwrite"
- requested
+In-Reply-To: <20190108184900.9654-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: make pwrite64/pread64(fd, NULL,
+ 0, offset) return 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,126 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, f4bug@amsat.org, Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-Note: the "Platform Reset Attack Mitigation" specification isn't
-explicit about NVDIMM, since they could have different usages. It uses
-the term "system memory" generally (and also "volatile memory RAM" in
-its introduction). For initial support, I propose to consider
-non-volatile memory as not being subject to the memory clear. There is
-an on-going discussion in the TCG "pcclientwg" working group for
-future revisions.
+Le 08/01/2019 à 19:49, Peter Maydell a écrit :
+> Linux returns success if pwrite64() or pread64() are called with a
+> zero length NULL buffer, but QEMU was returning -TARGET_EFAULT.
+> 
+> This is the same bug that we fixed in commit 58cfa6c2e6eb51b23cc9
+> for the write syscall, and long before that in 38d840e6790c29f59
+> for the read syscall.
+> 
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1810433
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I chose to fix this by setting p to NULL and falling through
+> to the normal-case codepath rather than having a call to
+> pread/pwrite in the special-case if like 58cfa6c2e6eb5,
+> because here the normal-case is a bit more complicated as
+> it has the target_offset64() call in it.
+> 38d840e6790c29f59 has "just return 0" for the NULL buffer
+> case, but we can't do that here as that would not get the
+> "negative offset should return -EINVAL" case write.
+> ---
+>  linux-user/syscall.c | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
+> 
 
-CPU cache clearing is done unconditionally in edk2 since commit
-d20ae95a13e851 (edk2-stable201811).
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/tpm/tpm_ppi.h    | 10 ++++++++++
- hw/tpm/tpm_crb.c    |  3 +++
- hw/tpm/tpm_ppi.c    | 22 ++++++++++++++++++++++
- hw/tpm/tpm_tis.c    |  3 +++
- hw/tpm/trace-events |  3 +++
- 5 files changed, 41 insertions(+)
-
-diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-index c5e555fe2c..d33ef27de6 100644
---- a/hw/tpm/tpm_ppi.h
-+++ b/hw/tpm/tpm_ppi.h
-@@ -33,4 +33,14 @@ typedef struct TPMPPI {
- void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-                   hwaddr addr, Object *obj);
-=20
-+/**
-+ * tpm_ppi_reset:
-+ * @tpmppi: a TPMPPI
-+ *
-+ * Function to call on machine reset. It will check if the "Memory
-+ * overwrite" variable is set, and perform a memory clear on volatile
-+ * memory if requested.
-+ **/
-+void tpm_ppi_reset(TPMPPI *tpmppi);
-+
- #endif /* TPM_TPM_PPI_H */
-diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-index 012ec686d4..3087acc4ab 100644
---- a/hw/tpm/tpm_crb.c
-+++ b/hw/tpm/tpm_crb.c
-@@ -233,6 +233,9 @@ static void tpm_crb_reset(void *dev)
- {
-     CRBState *s =3D CRB(dev);
-=20
-+    if (s->ppi_enabled) {
-+        tpm_ppi_reset(&s->ppi);
-+    }
-     tpm_backend_reset(s->tpmbe);
-=20
-     memset(s->regs, 0, sizeof(s->regs));
-diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-index cf17779c20..cd8205f212 100644
---- a/hw/tpm/tpm_ppi.c
-+++ b/hw/tpm/tpm_ppi.c
-@@ -16,8 +16,30 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "sysemu/memory_mapping.h"
-+#include "sysemu/reset.h"
- #include "migration/vmstate.h"
- #include "tpm_ppi.h"
-+#include "trace.h"
-+
-+void tpm_ppi_reset(TPMPPI *tpmppi)
-+{
-+    if (tpmppi->buf[0x15a /* movv, docs/specs/tpm.txt */] & 0x1) {
-+        GuestPhysBlockList guest_phys_blocks;
-+        GuestPhysBlock *block;
-+
-+        guest_phys_blocks_init(&guest_phys_blocks);
-+        guest_phys_blocks_append(&guest_phys_blocks);
-+        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
-+            trace_tpm_ppi_memset(block->host_addr,
-+                                 block->target_end - block->target_start=
-);
-+            memset(block->host_addr, 0,
-+                   block->target_end - block->target_start);
-+            memory_region_set_dirty(block->mr, 0,
-+                                    block->target_end - block->target_st=
-art);
-+        }
-+        guest_phys_blocks_free(&guest_phys_blocks);
-+    }
-+}
-=20
- void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-                   hwaddr addr, Object *obj)
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 02d9d5c911..fd6bb9b59a 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -872,6 +872,9 @@ static void tpm_tis_reset(DeviceState *dev)
-     s->be_buffer_size =3D MIN(tpm_backend_get_buffer_size(s->be_driver),
-                             TPM_TIS_BUFFER_MAX);
-=20
-+    if (s->ppi_enabled) {
-+        tpm_ppi_reset(&s->ppi);
-+    }
-     tpm_backend_reset(s->be_driver);
-=20
-     s->active_locty =3D TPM_TIS_NO_LOCALITY;
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 25bee0cecf..920d32ad55 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
- tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
- tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
-d to TPM: 0x%08x (size=3D%d)"
- tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
-t =3D %u"
-+
-+# hw/tpm/tpm_ppi.c
-+tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
---=20
-2.20.1.2.gb21ebb671b
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
