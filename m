@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50278)
+Received: from eggs.gnu.org ([209.51.188.92]:51351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghDpd-0003W9-A7
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:23:42 -0500
+	(envelope-from <berrange@redhat.com>) id 1ghDtd-000704-0A
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:27:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghDpa-00017O-9q
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:23:41 -0500
-Received: from smtp67.cstnet.cn ([159.226.251.67]:42527 helo=cstnet.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghDpZ-0000yW-MG
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:23:38 -0500
-Date: Wed, 9 Jan 2019 21:23:25 +0800 (GMT+08:00)
-From: wuzhouhui <wuzhouhui14@mails.ucas.ac.cn>
-In-Reply-To: <20190109124258.GD18942@stefanha-x1.localdomain>
-References: <ae9873.3d686.1683223a356.Coremail.wuzhouhui14@mails.ucas.ac.cn>
-	<20190109124258.GD18942@stefanha-x1.localdomain>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <berrange@redhat.com>) id 1ghDta-0004XU-Qo
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:27:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53370)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghDta-0004Vz-IY
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:27:46 -0500
+Date: Wed, 9 Jan 2019 13:27:29 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190109132729.GN3998@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
+	<20190109105818.GG3998@redhat.com>
+	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
+	<20190109114459.GK3998@redhat.com>
+	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
+	<20190109125854.GM3998@redhat.com>
+	<860317b6-6489-9c18-bdf8-95a70fbec9b3@redhat.com>
 MIME-Version: 1.0
-Message-ID: <234daa90.3dc4b.16832c82ae0.Coremail.wuzhouhui14@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] Qemu migration with vhost-user-blk on top of local
- storage
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <860317b6-6489-9c18-bdf8-95a70fbec9b3@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +34,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefan hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, xieyongji@baidu.com, lilin24@baidu.com, libvir-list@redhat.com, spdk@lists.01.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiU3RlZmFuIEhham5vY3ppIiA8
-c3RlZmFuaGFAZ21haWwuY29tPgo+IFNlbnQgVGltZTogMjAxOS0wMS0wOSAyMDo0Mjo1OCAoV2Vk
-bmVzZGF5KQo+IFRvOiB3dXpob3VodWkgPHd1emhvdWh1aTE0QG1haWxzLnVjYXMuYWMuY24+Cj4g
-Q2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZywgeGlleW9uZ2ppQGJhaWR1LmNvbSwgbGlsaW4yNEBi
-YWlkdS5jb20sIGxpYnZpci1saXN0QHJlZGhhdC5jb20sIHNwZGtAbGlzdHMuMDEub3JnCj4gU3Vi
-amVjdDogUmU6IFtRZW11LWRldmVsXSBRZW11IG1pZ3JhdGlvbiB3aXRoIHZob3N0LXVzZXItYmxr
-IG9uIHRvcCBvZiBsb2NhbCBzdG9yYWdlCj4gCj4gT24gV2VkLCBKYW4gMDksIDIwMTkgYXQgMDY6
-MjM6NDJQTSArMDgwMCwgd3V6aG91aHVpIHdyb3RlOgo+ID4gSGkgZXZlcnlvbmUsCj4gPiAKPiA+
-IEknbSB3b3JraW5nIHFlbXUgd2l0aCB2aG9zdCB0YXJnZXQgKGUuZy4gc3BkayksIGFuZCBJIGF0
-dGVtcHQgdG8gbWlncmF0ZSBWTSB3aXRoCj4gPiAyIGxvY2FsIHN0b3JhZ2VzLiBPbmUgbG9jYWwg
-c3RvcmFnZSBpcyBhIHJlZ3VsYXIgZmlsZSwgZS5nLiAvdG1wL2M3NC5xY293MiwgYW5kCj4gPiB0
-aGUgb3RoZXIgaXMgYSBtYWxsb2MgYmRldiB0aGF0IHNwZGsgY3JlYXRlZC4gVGhpcyBtYWxsb2Mg
-YmRldiB3aWxsIGV4cG9ydGVkIHRvCj4gPiBWTSB2aWEgdmhvc3QtdXNlci1ibGsuIFdoZW4gSSBl
-eGVjdXRlIGZvbGxvd2luZyBjb21tYW5kOgo+ID4gCj4gPiAgIHZpcnNoIG1pZ3JhdGUgLS1saXZl
-IC0tcGVyc2lzdGVudCAtLXVuc2FmZSAtLXVuZGVmaW5lc291cmNlIC0tY29weS1zdG9yYWdlLWFs
-bCBcCj4gPiAgICAgIC0tcDJwIC0tYXV0by1jb252ZXJnZSAtLXZlcmJvc2UgLS1kZXN0dXJpIHFl
-bXUrdGNwOi8vPHVyaT4vc3lzdGVtIHZtMAo+ID4gCj4gPiBUaGUgbGlidmlydCByZXBvcnRzOgo+
-ID4gCj4gPiAgIHFlbXUtMi4xMi4xOiBlcnJvcjogaW50ZXJuYWwgZXJyb3I6IHVuYWJsZSB0byBl
-eGVjdXRlIFFFTVUgY29tbWFuZCBcCj4gPiAgICAgJ25iZC1zZXJ2ZXItYWRkJzogQ2Fubm90IGZp
-bmQgZGV2aWNlPWRyaXZlLXZpcnRpby1kaXNrMSBub3IgXAo+ID4gICAgIG5vZGVfbmFtZT1kcml2
-ZS12aXJ0aW8tZGlzazEKPiAKPiBQbGVhc2UgcG9zdCB5b3VyIGxpYnZpcnQgZG9tYWluIFhNTC4K
-Ck15IGxpYnZpcnQgaXMgYmFzZWQgb24gbGlidmlydC0xLjEuMS0yOS5lbDcsIGFuZCBhZGQgbWFu
-eSBwYXRjaGVzIHRvIHNhdGlzZnkgb3VyCm93biBuZWVkcywgZS5nLiBhZGQgc3VwcG9ydCBmb3Ig
-dmhvc3QtdXNlci1ibGsuIFBvc3QgZG9tYWluIHhtbCBtYXkgbm90IHVzZWZ1bC4KQW55d2F5LCBm
-b2xsb3dpbmcgaXMgZnVsbCBjb250ZW50cyBvZiBYTUw6CgogIDxkb21haW4gdHlwZT0na3ZtJz4K
-ICAgIDxuYW1lPnd6aDwvbmFtZT4KICAgIDx1dWlkPmE4NGU5NmU2LTJjNTMtNDA4ZC05ODZiLWM3
-MDliYzZhMGU1MTwvdXVpZD4KICAgIDxtZW1vcnkgdW5pdD0nTWlCJz40MDk2PC9tZW1vcnk+CiAg
-ICA8bWVtb3J5QmFja2luZz4KICAgICAgPGh1Z2VwYWdlcy8+CiAgICA8L21lbW9yeUJhY2tpbmc+
-CiAgICA8Y3VycmVudE1lbW9yeSB1bml0PSdNaUInPjQwOTY8L2N1cnJlbnRNZW1vcnk+CiAgICA8
-dmNwdSBwbGFjZW1lbnQ9J3N0YXRpYycgY3B1c2V0PScxNi0zMSc+MjwvdmNwdT4KICAgIDxvcz4K
-ICAgICAgPHR5cGUgYXJjaD0neDg2XzY0JyBtYWNoaW5lPSdwYyc+aHZtPC90eXBlPgogICAgICA8
-Ym9vdCBkZXY9J2hkJy8+CiAgICA8L29zPgogICAgPGZlYXR1cmVzPgogICAgICA8YWNwaS8+CiAg
-ICA8L2ZlYXR1cmVzPgogICAgPGNsb2NrIG9mZnNldD0ndXRjJz4KICAgICAgPHRpbWVyIG5hbWU9
-J3J0YycgdGlja3BvbGljeT0nY2F0Y2h1cCcvPgogICAgPC9jbG9jaz4KICAgIDxvbl9wb3dlcm9m
-Zj5kZXN0cm95PC9vbl9wb3dlcm9mZj4KICAgIDxvbl9yZWJvb3Q+cmVzdGFydDwvb25fcmVib290
-PgogICAgPG9uX2NyYXNoPmRlc3Ryb3k8L29uX2NyYXNoPgogICAgPGRldmljZXM+CiAgICAgIDxl
-bXVsYXRvcj4vZGF0YS93emgveDg2XzY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0teDg2XzY0PC9lbXVs
-YXRvcj4KICAgICAgPGRpc2sgdHlwZT0nZmlsZScgZGV2aWNlPSdkaXNrJz4KCTxkcml2ZXIgbmFt
-ZT0ncWVtdScgdHlwZT0ncWNvdzInIGNhY2hlPSdub25lJy8+Cgk8c291cmNlIGZpbGU9Jy9kYXRh
-L3d6aC9jNzQucWNvdzInLz4KCTx0YXJnZXQgZGV2PSd2ZGEnIGJ1cz0ndmlydGlvJy8+Cgk8YWxp
-YXMgbmFtZT0ndmlydGlvLWRpc2swJy8+CiAgICAgIDwvZGlzaz4KCiAgICAgIDxkaXNrIHR5cGU9
-J3Zob3N0LXVzZXItYmxrJyBkZXZpY2U9J2Rpc2snPgoJPHNvdXJjZSB0eXBlPSd1bml4JyBwYXRo
-PScvdmFyL3RtcC9sdjAnIG1vZGU9J2NsaWVudCc+Cgk8L3NvdXJjZT4KCTx0YXJnZXQgZGV2PSd2
-ZGInIGJ1cz0ndmlydGlvJy8+Cgk8ZHJpdmVyIHF1ZXVlcz0nNCcvPgogICAgICA8L2Rpc2s+Cgog
-ICAgICA8Y29udHJvbGxlciB0eXBlPSd1c2InIGluZGV4PScwJz4KCTxhbGlhcyBuYW1lPSd1c2Iw
-Jy8+CiAgICAgIDwvY29udHJvbGxlcj4KICAgICAgPGNvbnRyb2xsZXIgdHlwZT0ncGNpJyBpbmRl
-eD0nMCcgbW9kZWw9J3BjaS1yb290Jz4KCTxhbGlhcyBuYW1lPSdwY2kuMCcvPgogICAgICA8L2Nv
-bnRyb2xsZXI+CiAgICAgIDxzZXJpYWwgdHlwZT0ncHR5Jz4KCTx0YXJnZXQgcG9ydD0nMCcvPgoJ
-PGFsaWFzIG5hbWU9J3NlcmlhbDAnLz4KICAgICAgPC9zZXJpYWw+CiAgICAgIDxzZXJpYWwgdHlw
-ZT0ncHR5Jz4KCTx0YXJnZXQgcG9ydD0nMScvPgoJPGFsaWFzIG5hbWU9J3NlcmlhbDEnLz4KICAg
-ICAgPC9zZXJpYWw+CiAgICAgIDxpbnB1dCB0eXBlPSd0YWJsZXQnIGJ1cz0ndXNiJz4KCTxhbGlh
-cyBuYW1lPSdpbnB1dDAnLz4KICAgICAgPC9pbnB1dD4KICAgICAgPGlucHV0IHR5cGU9J21vdXNl
-JyBidXM9J3BzMicvPgogICAgICA8Z3JhcGhpY3MgdHlwZT0ndm5jJyBhdXRvcG9ydD0neWVzJyBs
-aXN0ZW49JzAuMC4wLjAnIGtleW1hcD0nZW4tdXMnPgoJPGxpc3RlbiB0eXBlPSdhZGRyZXNzJyBh
-ZGRyZXNzPScwLjAuMC4wJy8+CiAgICAgIDwvZ3JhcGhpY3M+CiAgICAgIDx2aWRlbz4KCTxtb2Rl
-bCB0eXBlPSdjaXJydXMnIHZyYW09JzkyMTYnIGhlYWRzPScxJy8+Cgk8YWxpYXMgbmFtZT0ndmlk
-ZW8wJy8+CiAgICAgIDwvdmlkZW8+CiAgICA8L2RldmljZXM+CiAgICA8c2VjbGFiZWwgdHlwZT0n
-bm9uZScvPgogIDwvZG9tYWluPgoKPiAKPiA+IERvZXMgaXQgbWVhbnMgdGhhdCBxZW11IHdpdGgg
-c3BkayBvbiB0b3Agb2YgbG9jYWwgc3RvcmFnZSBkb24ndCBzdXBwb3J0IG1pZ3JhdGlvbj8KPiA+
-IAo+ID4gUUVNVTogMi4xMi4xCj4gPiBTUERLOiAxOC4xMAo+IAo+IHZob3N0LXVzZXItYmxrIGJ5
-cGFzc2VzIHRoZSBRRU1VIGJsb2NrIGxheWVyLCBzbyBOQkQgc3RvcmFnZSBtaWdyYXRpb24KPiBh
-dCB0aGUgUUVNVSBsZXZlbCB3aWxsIG5vdCB3b3JrIGZvciB0aGUgdmhvc3QtdXNlci1ibGsgZGlz
-ay4KPiAKPiBTdGVmYW4K
+On Wed, Jan 09, 2019 at 02:20:02PM +0100, Thomas Huth wrote:
+> On 2019-01-09 13:58, Daniel P. Berrang=C3=A9 wrote:
+> > On Wed, Jan 09, 2019 at 01:52:02PM +0100, Thomas Huth wrote:
+> >> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
+> >>> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
+> >>>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
+> >>>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
+> >>>>>> Different versions of GCC and Clang use different versions of th=
+e C standard.
+> >>>>>> This repeatedly caused problems already, e.g. with duplicated ty=
+pedefs:
+> >>>>>>
+> >>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.=
+html
+> >>>>>>
+> >>>>>> or with for-loop variable initializers:
+> >>>>>>
+> >>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.=
+html
+> >>>>>>
+> >>>>>> To avoid these problems, we should enforce the C language versio=
+n to the
+> >>>>>> same level for all compilers. Since our minimum compiler version=
+s are
+> >>>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" =
+already,
+> >>>>>> this seems to be a good choice.
+> >>>>>
+> >>>>> In 4.x   gnu11 is marked as experimental. I'm not really comforta=
+ble
+> >>>>> using experimental features - even if its warning free there's a =
+risk
+> >>>>> it would silently mis-compile something.
+> >>>>>
+> >>>>> gnu99 is ok with 4.x - it is merely "incomplete".
+> >>>>
+> >>>> gnu11 has the big advantage that it also fixes the problem with
+> >>>> duplicated typedefs that are reported by older versions of Clang.
+> >>>>
+> >>>> Are you sure about the experimental character in 4.x? I just looke=
+d at
+> >>>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it=
+ says:
+> >>>>
+> >>>> "A fourth version of the C standard, known as C11, was published i=
+n 2011
+> >>>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts=
+ of
+> >>>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
+> >>>>
+> >>>> It does not say anything about "experimental" there. The word
+> >>>> "experimental" is only used for the C++ support, but we hardly hav=
+e C++
+> >>>> code in QEMU -- if you worry about that, I could simply drop the
+> >>>> "-std=3Dgnu++11" part from my patch?
+> >>>
+> >>> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1=
+.x86_64:
+> >>>
+> >>>   "3.4 Options Controlling C Dialect
+> >>>
+> >>>        ....snip...
+> >>>
+> >>>      'gnu11'
+> >>>      'gnu1x'
+> >>>           GNU dialect of ISO C11.  Support is incomplete and
+> >>>           experimental.  The name 'gnu1x' is deprecated."
+> >>
+> >> Ok. Looks like the "Support is incomplete and experimental" sentence=
+ has
+> >> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
+> >> already. IMHO we could give it a try and enable gnu11 for QEMU with =
+GCC
+> >> v4.8, too. If we later find problems, we could still switch back to
+> >> gnu99 instead. Other opinions?
+> >=20
+> > Our code is already cleanly compiling with gnu99 standard - the probl=
+em
+> > is merely that we sometimes introduce regressions due to not enforcin=
+g
+> > that standard level. I don't think the features in gnu11 are compelli=
+ng
+> > enough to justify using something that's declared experimental.
+> What about the duplicated typedef problem? See:
+>=20
+>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+>=20
+> That one occured with Clang, but I think we've had plenty of these in
+> the past with GCC, too...
+
+IIUC, That's only a problem because we don't pass any  -std  flag, and
+so get the compilers default, which may be gnu11.  If we explicitly
+set -std=3Dgnu99, that problem will be reported by patchew, travis and
+maintainers own build tests, and thus won't get anywhere near git master.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
