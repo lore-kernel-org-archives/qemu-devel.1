@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43192)
+Received: from eggs.gnu.org ([209.51.188.92]:32955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghLRR-0008Gf-Eq
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:31:14 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghMEf-0002on-U6
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 17:22:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghLRQ-0003uH-PH
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:31:13 -0500
-References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
-	<1547051976-13982-2-git-send-email-thuth@redhat.com>
-	<3316bf08-36c0-c3ce-4e4f-8244276c58d3@kaod.org>
-	<20190109172801.GB3998@redhat.com>
-	<d72673fa-52a5-a6ff-6aa8-34f2b4b6855f@redhat.com>
-	<60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1ghM2k-00035z-K0
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 17:09:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39002)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghM2k-00035g-Bs
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 17:09:46 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8636558E38
+	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 22:09:45 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <851c3bc6-8acd-f263-9b65-42942e144392@redhat.com>
-Date: Wed, 9 Jan 2019 22:31:04 +0100
+Date: Wed,  9 Jan 2019 23:09:41 +0100
+Message-Id: <20190109220942.23822-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GTzjKIqyFSQJp1T0VXpwtiEzrWmRFvRsD"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
- compilation with clang -std=gnu99
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v6 00/35] Misc patches for 2018-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +30,309 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Cc: peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GTzjKIqyFSQJp1T0VXpwtiEzrWmRFvRsD
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Cc: peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
-Message-ID: <851c3bc6-8acd-f263-9b65-42942e144392@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
- compilation with clang -std=gnu99
-References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
- <1547051976-13982-2-git-send-email-thuth@redhat.com>
- <3316bf08-36c0-c3ce-4e4f-8244276c58d3@kaod.org>
- <20190109172801.GB3998@redhat.com>
- <d72673fa-52a5-a6ff-6aa8-34f2b4b6855f@redhat.com>
- <60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
-In-Reply-To: <60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit c102d9471f8f02d9fbea72ec4505d7089173f4=
+70:
 
-On 09/01/19 22:25, Eric Blake wrote:
-> On 1/9/19 3:20 PM, Paolo Bonzini wrote:
->> On 09/01/19 18:28, Daniel P. Berrang=C3=A9 wrote:
->>>> so both files include each other, how nice ...
->>> If the header files are mutually dependent it makes me wonder what th=
-e
->>> point of having them split up is ?
->>>
->>> Feels like either they need to be merged, or they need to be split up=
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+90107' into staging (2019-01-07 16:56:33 +0000)
 
->>> and refactored even more to remove the mutual dependancy.
->>
->> If they include each other only for the typedefs, then prehaps the
->> solution is to change the coding style and allow using struct in
->> function prototypes.  I'm pretty sure there are several examples of th=
-is
->> already.
->=20
-> Or stick the typedef in <typedefs.h>, instead of trying to find (or
-> create) some other common header.
+are available in the Git repository at:
 
-Putting typedefs for a very specific machine or device in typedefs.h
-doesn't seem too clean.  Usually typedefs.h is used when things are
-shared by different subsystems (e.g. accelerator and device emulation,
-or frontend and backend), and I'm pretty sure that it could be made even
-smaller if someone was inclined to try.
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-Paolo
+for you to fetch changes up to 5eddc84292736dc57db341f9724395a29d3614f7:
 
+  avoid TABs in files that only contain a few (2019-01-09 23:01:14 +0100)
 
---GTzjKIqyFSQJp1T0VXpwtiEzrWmRFvRsD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+----------------------------------------------------------------
+* HAX support for Linux hosts (Alejandro)
+* esp bugfixes (Guenter)
+* Windows build cleanup (Marc-Andr=C3=A9)
+* checkpatch logic improvements (Paolo)
+* coalesced range bugfix (Paolo)
+* switch testsuite to TAP (Paolo)
+* QTAILQ rewrite (Paolo)
+* block/iscsi.c cancellation fixes (Stefan)
+* improve selection of the default accelerator (Thomas)
 
------BEGIN PGP SIGNATURE-----
+----------------------------------------------------------------
+Alexandro Sanchez Bach (1):
+      hax: Support for Linux hosts
 
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlw2aBgACgkQv/vSX3jH
-roPswgf/ZlWt7vHnkYuX5sfTrZ37N9CpVt1fL3KacbzEc/wdzy/7MBycL6mMLYMK
-FHNdp0K51jrE7B/NNmi0z5wSEneMgaCf5+e2vEQXX2gn4pjfDkuvjhwKFeOeEJQh
-A60N0zmbE3raUjbFMt6nrufjxY09T3a7MwHvcuOXqUoEIvF3ceFZV+uSTqBaw1op
-MlJV1pYFF0JmsIZLDtmVH1qJbRpV/1sCXOx0gPCBzSC+mHqhG5qwUmz7IKg43UMn
-h6nXFeB1/zCEAY/+uJ9Yzx0FCOBaOG53pFr2m0NeMHyepA1HyO3ky4un3bMMlCyI
-C8rpEUFkY4ulIVqQObPll4hkA7zJ1w==
-=D4WQ
------END PGP SIGNATURE-----
+Guenter Roeck (2):
+      esp-pci: Fix status register write erase control
+      scsi: esp: Defer command completion until previous interrupts have =
+been handled
 
---GTzjKIqyFSQJp1T0VXpwtiEzrWmRFvRsD--
+Marc-Andr=C3=A9 Lureau (4):
+      build-sys: don't include windows.h, osdep.h does it
+      build-sys: move windows defines in osdep.h header
+      build-sys: build with Vista API by default
+      qga: drop < Vista compatibility
+
+Paolo Bonzini (21):
+      checkpatch: fix premature exit when no input or --mailback
+      checkpatch: check Signed-off-by in --mailback mode
+      checkpatch: improve handling of multiple patches or files
+      checkpatch: colorize output to terminal
+      pam: wrap MemoryRegion initialization in a transaction
+      memory: extract flat_range_coalesced_io_{del,add}
+      memory: avoid unnecessary coalesced_io_del operations
+      memory: update coalesced_range on transaction_commit
+      test: execute g_test_run when tests are skipped
+      test: replace gtester with a TAP driver
+      qemu/queue.h: do not access tqe_prev directly
+      vfio: make vfio_address_spaces static
+      qemu/queue.h: leave head structs anonymous unless necessary
+      qemu/queue.h: typedef QTAILQ heads
+      qemu/queue.h: remove Q_TAILQ_{HEAD,ENTRY}
+      qemu/queue.h: reimplement QTAILQ without pointer-to-pointers
+      qemu/queue.h: simplify reverse access to QTAILQ
+      checkpatch: warn about qemu/queue.h head structs that are not typed=
+ef-ed
+      scripts: add script to convert multiline comments into 4-line forma=
+t
+      remove space-tab sequences
+      avoid TABs in files that only contain a few
+
+Peng Hao (1):
+      hw/watchdog/wdt_i6300esb: remove a unnecessary comment
+
+Stefan Hajnoczi (4):
+      block/iscsi: drop unused IscsiAIOCB->buf field
+      block/iscsi: take iscsilun->mutex in iscsi_timed_check_events()
+      block/iscsi: fix ioctl cancel use-after-free
+      block/iscsi: cancel libiscsi task when ABORT TASK TMF completes
+
+Thomas Huth (1):
+      accel: Improve selection of the default accelerator
+
+ accel/accel.c                                |  18 +-
+ accel/kvm/kvm-all.c                          |   4 +-
+ accel/tcg/translate-all.c                    |   4 -
+ block/bochs.c                                |  22 +-
+ block/file-posix.c                           |   2 +-
+ block/file-win32.c                           |   8 +-
+ block/gluster.c                              |   2 +-
+ block/iscsi.c                                |  47 +++-
+ block/linux-aio.c                            |   4 +-
+ block/mirror.c                               |   2 +-
+ block/qcow2-bitmap.c                         |   4 +-
+ block/qcow2-cluster.c                        |   2 +-
+ block/qcow2.h                                |   5 +-
+ block/sheepdog.c                             |   6 +-
+ block/vhdx.h                                 |   2 +-
+ block/vpc.c                                  |   2 +-
+ blockdev.c                                   |   4 +-
+ bsd-user/elfload.c                           |   2 +-
+ bsd-user/x86_64/target_syscall.h             |   2 +-
+ configure                                    |   3 -
+ contrib/elf2dmp/main.c                       |   2 +-
+ contrib/ivshmem-client/ivshmem-client.h      |   4 +-
+ contrib/ivshmem-server/ivshmem-server.h      |   5 +-
+ cpus-common.c                                |   2 +-
+ crypto/aes.c                                 |  28 +-
+ disas/alpha.c                                |   8 +-
+ disas/arm.c                                  |   2 +-
+ disas/i386.c                                 |   4 +-
+ disas/m68k.c                                 |   4 +-
+ dump.c                                       |   2 +-
+ exec.c                                       |   5 +-
+ fsdev/qemu-fsdev.c                           |   2 +-
+ hw/alpha/typhoon.c                           |  12 +-
+ hw/arm/stellaris.c                           |   2 +-
+ hw/block/nvme.h                              |   8 +-
+ hw/block/xen_disk.c                          |   6 +-
+ hw/char/sh_serial.c                          |  18 +-
+ hw/char/virtio-serial-bus.c                  |   2 +-
+ hw/char/xen_console.c                        |  58 ++--
+ hw/core/loader.c                             |  28 +-
+ hw/core/qdev.c                               |   4 +-
+ hw/core/reset.c                              |   2 +-
+ hw/display/tc6393xb.c                        |   6 +-
+ hw/display/vga.c                             |   8 +-
+ hw/display/virtio-gpu-3d.c                   |   6 +-
+ hw/dma/pxa2xx_dma.c                          |   4 +-
+ hw/dma/soc_dma.c                             |   2 +-
+ hw/gpio/max7310.c                            |   2 +-
+ hw/i386/xen/xen-hvm.c                        |   4 +-
+ hw/i386/xen/xen-mapcache.c                   |   2 +-
+ hw/ide/core.c                                |  94 +++----
+ hw/input/lm832x.c                            |   2 +-
+ hw/input/pckbd.c                             |   2 +-
+ hw/input/tsc210x.c                           |   2 +-
+ hw/intc/apic.c                               |   2 +-
+ hw/mips/gt64xxx_pci.c                        |   6 +-
+ hw/mips/mips_r4k.c                           |   4 +-
+ hw/misc/max111x.c                            |   6 +-
+ hw/misc/omap_l4.c                            |   4 +-
+ hw/net/mipsnet.c                             |  16 +-
+ hw/net/ne2000.c                              |  44 ++--
+ hw/net/rocker/rocker.c                       |   2 +-
+ hw/net/virtio-net.c                          |   4 +-
+ hw/net/vmxnet3.c                             |   6 +-
+ hw/pci-host/pam.c                            |   2 +
+ hw/pci/msix.c                                |   2 +-
+ hw/pci/pci.c                                 |  44 ++--
+ hw/pci/pci_bridge.c                          |   2 +-
+ hw/ppc/ppc405_uc.c                           |   2 +-
+ hw/ppc/prep.c                                |   4 +-
+ hw/ppc/spapr_iommu.c                         |   2 +-
+ hw/scsi/esp-pci.c                            |  10 +-
+ hw/scsi/esp.c                                |  33 ++-
+ hw/scsi/lsi53c895a.c                         |   6 +-
+ hw/scsi/scsi-bus.c                           |   2 +-
+ hw/scsi/trace-events                         |   1 +
+ hw/sh4/r2d.c                                 |  16 +-
+ hw/usb/ccid-card-emulated.c                  |   4 +-
+ hw/usb/combined-packet.c                     |   2 +-
+ hw/usb/dev-bluetooth.c                       |   2 +-
+ hw/usb/dev-hid.c                             |   6 +-
+ hw/usb/dev-hub.c                             |  14 +-
+ hw/usb/dev-mtp.c                             |   4 +-
+ hw/usb/dev-network.c                         |   2 +-
+ hw/usb/hcd-ehci.c                            |   2 +-
+ hw/usb/hcd-ehci.h                            |   2 +-
+ hw/usb/hcd-uhci.c                            |   8 +-
+ hw/usb/xen-usb.c                             |   6 +-
+ hw/vfio/common.c                             |   4 +-
+ hw/watchdog/watchdog.c                       |   2 +-
+ hw/watchdog/wdt_i6300esb.c                   |   1 -
+ hw/xen/xen_devconfig.c                       |   2 +-
+ hw/xen/xen_pvdev.c                           |   4 +-
+ hw/xenpv/xen_domainbuild.c                   |   8 +-
+ include/elf.h                                |  10 +-
+ include/exec/memory.h                        |   6 +-
+ include/hw/acpi/acpi.h                       |  14 +-
+ include/hw/elf_ops.h                         |   2 +-
+ include/hw/ide/internal.h                    |   2 +-
+ include/hw/qdev-core.h                       |   2 +-
+ include/hw/scsi/esp.h                        |   2 +
+ include/hw/sh4/sh_intc.h                     |  20 +-
+ include/hw/usb.h                             |   2 +-
+ include/hw/vfio/vfio-common.h                |   4 +-
+ include/hw/vfio/vfio-platform.h              |   2 +-
+ include/hw/xen/io/ring.h                     |   4 +-
+ include/net/net.h                            |   2 +-
+ include/qemu/acl.h                           |  14 +-
+ include/qemu/iov.h                           |   2 +-
+ include/qemu/option_int.h                    |   2 +-
+ include/qemu/osdep.h                         |  17 ++
+ include/qemu/queue.h                         | 153 +++++------
+ include/qemu/rcu_queue.h                     |  45 ++--
+ include/qom/cpu.h                            |   9 +-
+ include/scsi/constants.h                     |   2 +-
+ include/sysemu/accel.h                       |   2 +-
+ include/sysemu/balloon.h                     |   2 +-
+ include/sysemu/kvm.h                         |   2 -
+ include/sysemu/memory_mapping.h              |   2 +-
+ include/sysemu/rng.h                         |   2 +-
+ linux-user/elfload.c                         |   2 +-
+ linux-user/linuxload.c                       |  14 +-
+ linux-user/main.c                            |   4 +-
+ linux-user/mmap.c                            |  10 +-
+ linux-user/qemu.h                            |   4 +-
+ linux-user/signal.c                          |  16 +-
+ linux-user/strace.c                          |   4 +-
+ linux-user/syscall.c                         |   2 +-
+ linux-user/syscall_defs.h                    |   4 +-
+ linux-user/uaccess.c                         |   2 +-
+ linux-user/vm86.c                            |   2 +-
+ linux-user/x86_64/target_syscall.h           |   2 +-
+ memory.c                                     |  97 ++++---
+ memory_mapping.c                             |   2 +-
+ migration/block-dirty-bitmap.c               |   2 +-
+ migration/block.c                            |   4 +-
+ migration/ram.c                              |   2 +-
+ monitor.c                                    |   4 +-
+ net/checksum.c                               |   2 +-
+ net/filter.c                                 |   2 +-
+ net/net.c                                    |   2 +-
+ net/queue.c                                  |   2 +-
+ net/slirp.c                                  |   2 +-
+ qga/commands-posix.c                         |   2 +-
+ qga/commands-win32.c                         |  70 +----
+ qtest.c                                      |   4 +-
+ rules.mak                                    |   4 +-
+ scripts/checkpatch.pl                        |  95 +++++--
+ scripts/cocci-macro-file.h                   |  24 +-
+ scripts/fix-multiline-comments.sh            |  62 +++++
+ scripts/gtester-cat                          |  26 --
+ scripts/tap-driver.pl                        | 378 +++++++++++++++++++++=
+++++++
+ scripts/tap-merge.pl                         | 110 ++++++++
+ slirp/ip_input.c                             |   4 +-
+ slirp/slirp.c                                |   2 +-
+ slirp/tcp_input.c                            |  10 +-
+ slirp/tcp_output.c                           |   4 +-
+ slirp/tcp_timer.c                            |   2 +-
+ slirp/udp.c                                  |   2 +-
+ target/alpha/translate.c                     |   2 +-
+ target/arm/kvm.c                             |   2 +-
+ target/cris/helper.c                         |   2 +-
+ target/cris/mmu.h                            |  10 +-
+ target/cris/translate_v10.inc.c              |   2 +-
+ target/i386/Makefile.objs                    |   6 +-
+ target/i386/hax-i386.h                       |   6 +-
+ target/i386/hax-mem.c                        |   2 +-
+ target/i386/{hax-darwin.c =3D> hax-posix.c}    |   0
+ target/i386/{hax-darwin.h =3D> hax-posix.h}    |   0
+ target/i386/translate.c                      |  12 +-
+ target/mips/translate.c                      |   2 +-
+ target/tilegx/translate.c                    |   2 +-
+ tcg/i386/tcg-target.inc.c                    |   4 +-
+ tcg/tcg.c                                    |   4 +-
+ tcg/tcg.h                                    |   6 +-
+ tests/Makefile.include                       |  75 ++++--
+ tests/cdrom-test.c                           |   2 +-
+ tests/docker/dockerfiles/centos7.docker      |   1 +
+ tests/docker/dockerfiles/debian-amd64.docker |   1 +
+ tests/docker/dockerfiles/debian-ports.docker |   1 +
+ tests/docker/dockerfiles/debian-sid.docker   |   1 +
+ tests/docker/dockerfiles/debian8.docker      |   1 +
+ tests/docker/dockerfiles/debian9.docker      |   1 +
+ tests/docker/dockerfiles/fedora.docker       |   1 +
+ tests/docker/dockerfiles/ubuntu.docker       |   1 +
+ tests/ivshmem-test.c                         |   5 +-
+ tests/libqos/malloc.c                        |   2 +-
+ tests/migration-test.c                       |   8 +-
+ tests/tcg/alpha/test-cond.c                  |   4 +-
+ tests/tcg/arm/hello-arm.c                    |  20 +-
+ tests/tcg/cris/check_glibc_kernelversion.c   |   8 +-
+ tests/tcg/cris/check_mmap3.c                 |   2 +-
+ tests/tcg/cris/check_openpf1.c               |   2 +-
+ tests/tcg/cris/check_settls1.c               |   2 +-
+ tests/tcg/i386/hello-i386.c                  |  14 +-
+ tests/tcg/mips/hello-mips.c                  |  10 +-
+ tests/tcg/multiarch/sha1.c                   |  12 +-
+ tests/test-crypto-pbkdf.c                    |   3 +-
+ tests/test-rcu-list.c                        |   2 +-
+ tests/test-vmstate.c                         |   8 +-
+ tests/vhost-user-test.c                      |   4 +-
+ ui/console.c                                 |   4 +-
+ ui/input.c                                   |  14 +-
+ ui/keymaps.h                                 |   4 +-
+ ui/qemu-pixman.c                             |   2 +-
+ ui/vnc-enc-zywrle-template.c                 |   4 +-
+ ui/vnc.c                                     |   4 +-
+ util/bitops.c                                |   4 +-
+ util/osdep.c                                 |   4 +-
+ util/qemu-option.c                           |   4 +-
+ util/qemu-sockets.c                          |   4 +-
+ util/qemu-thread-win32.c                     |   4 -
+ vl.c                                         |   4 +-
+ 213 files changed, 1504 insertions(+), 897 deletions(-)
+ create mode 100755 scripts/fix-multiline-comments.sh
+ delete mode 100755 scripts/gtester-cat
+ create mode 100755 scripts/tap-driver.pl
+ create mode 100755 scripts/tap-merge.pl
+ rename target/i386/{hax-darwin.c =3D> hax-posix.c} (100%)
+ rename target/i386/{hax-darwin.h =3D> hax-posix.h} (100%)
+--=20
+2.20.1
+
+v5->v6: add </dev/null to avoid that stdin O_NONBLOCK affect the make pro=
+cess
