@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36387)
+Received: from eggs.gnu.org ([209.51.188.92]:38035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghL6g-0006Ow-UZ
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:09:49 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghLCs-0000Cg-F2
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:16:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghL6f-0008En-87
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:09:45 -0500
-Received: from mail-pl1-x635.google.com ([2607:f8b0:4864:20::635]:34924)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ghL6f-0008EL-1t
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:09:45 -0500
-Received: by mail-pl1-x635.google.com with SMTP id p8so4152835plo.2
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 13:09:44 -0800 (PST)
-References: <20190108162154.22259-1-alex.bennee@linaro.org>
-	<20190108162154.22259-6-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <11ee4fd1-391b-91da-31d8-fa929ba649f6@linaro.org>
-Date: Thu, 10 Jan 2019 08:09:38 +1100
+	(envelope-from <pbonzini@redhat.com>) id 1ghLCr-0003sD-P4
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:16:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghLCr-0003rx-HE
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:16:09 -0500
+References: <CAJSP0QVOnFchhTyJsVG5E=FrZ7Ti-_ve4t1WxqkFXO=XK-Sh6Q@mail.gmail.com>
+	<alpine.BSF.2.21.9999.1901091919140.41593@zero.eik.bme.hu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3f4f974a-2bd9-bf08-eef1-d89d2cf6cfa5@redhat.com>
+Date: Wed, 9 Jan 2019 22:16:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190108162154.22259-6-alex.bennee@linaro.org>
+In-Reply-To: <alpine.BSF.2.21.9999.1901091919140.41593@zero.eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 5/6] scripts/archive-source: include
- softfloat tests
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Internship idea: I2C passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: cota@braap.org
+To: BALATON Zoltan <balaton@eik.bme.hu>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, Jonathan Austin <jonny@microbit.org>
 
-On 1/9/19 3:21 AM, Alex Bennée wrote:
-> We need these if we want to run unit/softfloat tests in our docker
-> containers.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  scripts/archive-source.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 09/01/19 19:23, BALATON Zoltan wrote:
+>> '''Summary:''' Implement I2C bus passthrough on Linux hosts so that
+>> emulated Raspberry Pi or micro:bit boards can talk to real I2C
+>> devices. 
+>
+> How about implementing USB for raspi boards instead? Or is there a
+> project proposal (or even some code somewhere out of tree) for that
+> already? Seems more useful to allow having emulated keyboard and mouse
+> to use Raspbian for example or pass through USB devices. (I don't know
+> anything about this was just reminded to a recent discussion by this
+> message. If it's not relevant just disregard my comment and sorry for
+> the noise.)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+That's also a valid idea.  However, Stefan has misinterpreted the
+reference to the raspi that I quickly made on IRC.  The idea of I2C
+passthrough is that a single board computer like a Raspberry Pi can be
+used to develop application for a microcontroller such as micro:bit,
+without having to flash the firmware again and again, etc.
 
+Real I2C devices---for example a GPIO extender, a temperature sensor or
+a real-time clock---would be attached to the I2C bus on the single board
+computer's GPIO headers, exposed as an I2C device through /dev/i2c, and
+then driven by the emulated micro:bit through its own I2C controller (or
+bitbanged).
 
-r~
+(I've now updated the project idea).
+
+Paolo
