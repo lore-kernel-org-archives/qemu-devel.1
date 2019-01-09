@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34205)
+Received: from eggs.gnu.org ([209.51.188.92]:38781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gh4oL-0001Ab-So
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 22:45:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1gh5Gd-00069l-Ni
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 23:15:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gh4oJ-0000gm-RO
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 22:45:45 -0500
-Date: Wed, 9 Jan 2019 14:23:33 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190109032333.GA6682@umbus.fritz.box>
-References: <cover.1546532844.git.balaton@eik.bme.hu>
+	(envelope-from <eblake@redhat.com>) id 1gh5Gc-0005ZI-II
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 23:14:59 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Tue,  8 Jan 2019 22:14:47 -0600
+Message-Id: <20190109041452.31240-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="UlVJffcvxoiEqYs2"
-Content-Disposition: inline
-In-Reply-To: <cover.1546532844.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] Misc sam460ex related patches
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/5] Promote x-nbd-server-add-bitmap to stable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +19,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com
 
+Or rather, move its functionality into nbd-server-add.  And as
+a side effect, teach qemu-nbd how to export a persistent bitmap
+without having to go through a qemu process and several QMP
+commands.
 
---UlVJffcvxoiEqYs2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Based-on: <20181221093529.23855-1-jsnow@redhat.com>
+[0/11 bitmaps: remove x- prefix from QMP api]
 
-On Thu, Jan 03, 2019 at 05:27:24PM +0100, BALATON Zoltan wrote:
-> The last code patch in this series fixes memory size larger than 1GB
-> for sam460ex, other patches are just clean ups I've made along the way.
->=20
-> The first patch is intended to be generic and may be useful for other
-> boards which currently have their own SPD EEPROM data or don't yet
-> generate any SPD data just have TODO comments instead. These are MIPS
-> malta and fulong2e, ARM integratorcp and maybe aspeed, and the PIIX
-> and Q35 pc machines. I did not try to change these as I have no way to
-> test them throughly. Patch 2 converts sam460ex to use this function.
-> Other patches are misc cleanups.
+Patch 5 was very lightly tested; I hope to have more time to play
+with that patch alongside Andrey's pending [qemu-img info lists
+bitmap directory entries], with an update to iotests to
+demonstrate how it is possible to inspect dirty bitmaps by using
+qemu-img to learn what is available then qemu-nbd to expose them.
+It's still painful that there are no qemu-img commands for
+creating a new persistent bitmap; that still has to be done via
+QMP on a live guest.
 
-Applied to ppc-for-4.0 (missed the pull request I sent earlier today,
-though).
+Eric Blake (5):
+  nbd: Merge nbd_export_set_name into nbd_export_new
+  nbd: Allow bitmap export during QMP nbd-server-add
+  nbd: Remove x-nbd-server-add-bitmap
+  nbd: Merge nbd_export_bitmap into nbd_export_new
+  qemu-nbd: Add --bitmap=3DNAME option
 
-
->=20
-> Regards,
-> BALATON Zoltan
->=20
-> v3: A tab indent got in by accident hence v3 but also include smilar
->     cleanup for sdram_set_bcd() in another file
-> v2: Address review comments, omitting patches already merged
->=20
-> BALATON Zoltan (6):
->   smbus: Add a helper to generate SPD EEPROM data
->   sam460ex: Clean up SPD EEPROM creation
->   ppc4xx: Use ram_addr_t in ppc4xx_sdram_adjust()
->   ppc4xx: Rename ppc4xx_sdram_t in ppc440_uc.c to ppc440_sdram_t
->   ppc4xx: Pass array index to function instead of pointer into the array
->   sam460ex: Fix support for memory larger than 1GB
->=20
->  hw/i2c/smbus_eeprom.c   | 130 ++++++++++++++++++++++++++++++++++
->  hw/ppc/ppc440_bamboo.c  |   2 +-
->  hw/ppc/ppc440_uc.c      |  70 +++++++++----------
->  hw/ppc/ppc4xx_devs.c    |  48 ++++++-------
->  hw/ppc/sam460ex.c       | 181 +++++++-----------------------------------=
-------
->  include/hw/i2c/smbus.h  |   3 +
->  include/hw/ppc/ppc4xx.h |   2 +-
->  7 files changed, 216 insertions(+), 220 deletions(-)
->=20
+ qemu-nbd.texi              |   5 ++
+ qapi/block.json            |  35 ++++-------
+ include/block/nbd.h        |   7 +--
+ blockdev-nbd.c             |  44 ++++++--------
+ hmp.c                      |   6 +-
+ nbd/server.c               | 121 ++++++++++++++++---------------------
+ qemu-nbd.c                 |  19 ++++--
+ tests/qemu-iotests/223     |  11 ++--
+ tests/qemu-iotests/223.out |   2 -
+ 9 files changed, 109 insertions(+), 141 deletions(-)
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---UlVJffcvxoiEqYs2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlw1aSwACgkQbDjKyiDZ
-s5LtSRAArVsUwPu6A6YNmXJl9VCp01bi9kXgKOKBbGU1JaBR/+VHDBNQbgOOunBD
-d9WzbQy03K271GaAWdjyaICq3BIEYoP8T+VJPNwOQuv+Nvm2YknxLLI78vvFFWyo
-xtqe0/4UeaY+Xe8oT3Zx1W2a101cT27KT6QSE+wHBxtXWigEX2A+RLzTdnsofxoB
-fugK52bVZBicU5k68erSLmeVQeq5bKG4nRBWGYOmS1gu+ad4CljsxLKi8H39Gf3O
-sM7ixwsTllN/d4K1qf/9nXllJgLCxi0UgTQXYb9PiFYjbqaOIs3XuFa0IcPfgdjO
-xwr6/h2naNDer/GRAMPBlGBA2wgkxbxFdDR2VEaOe/m+CDaqCxJSULpDB/h/EVwU
-+5XY1Tc2nIZUXzUhAeIXiB0EsNfwgpX/5IVSjfQX1TOdRNdtKv2FOhZUojkwJ+Fs
-kcYBt5TBzj7rgyVnMbSXnQNIvqArwiaNK0TdToqhYVo/dzqYEAw82CIHGDsWr+AE
-GkLD3f54Y4L2wINPqxJk2EjnYLscLugBTfjmzBdnHQVLwhJA8mZqMaszfEF7BwRy
-bt+/rWFI6m8GW3ofPSFzSOoecvkJSuT6rgtr5jyqE17mPtYjVpyfw6nIx/noQRXF
-/btv98NA2y1gjeJ8mJvfSmysldFCXEYCobVhvspsPCvLKI6IKjQ=
-=PRKr
------END PGP SIGNATURE-----
-
---UlVJffcvxoiEqYs2--
+2.20.1
