@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38075)
+Received: from eggs.gnu.org ([209.51.188.92]:38918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghBCR-0006Di-6o
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:35:11 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ghBF3-00084E-2c
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:37:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghBCP-0004pp-5c
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:35:03 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44669)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghBCO-0004pP-Vz
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:35:01 -0500
-Received: by mail-wr1-f67.google.com with SMTP id z5so7072071wrt.11
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 02:35:00 -0800 (PST)
+	(envelope-from <laurent@vivier.eu>) id 1ghBF2-00082G-22
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:37:45 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:57185)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ghBF1-00081q-PG
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:37:44 -0500
 References: <20190108184900.9654-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <85b11940-88b8-9a8e-aa8c-f3e2a60a3d2c@redhat.com>
-Date: Wed, 9 Jan 2019 11:34:57 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <075be93d-d2b9-a9f0-961b-e796f158e274@vivier.eu>
+Date: Wed, 9 Jan 2019 11:37:31 +0100
 MIME-Version: 1.0
 In-Reply-To: <20190108184900.9654-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] linux-user: make pwrite64/pread64(fd, NULL,
  0, offset) return 0
 List-Id: <qemu-devel.nongnu.org>
@@ -31,9 +29,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>
 
-On 1/8/19 7:49 PM, Peter Maydell wrote:
+On 08/01/2019 19:49, Peter Maydell wrote:
 > Linux returns success if pwrite64() or pread64() are called with a
 > zero length NULL buffer, but QEMU was returning -TARGET_EFAULT.
 > 
@@ -73,11 +71,6 @@ On 1/8/19 7:49 PM, Peter Maydell wrote:
 > +        } else {
 > +            p = lock_user(VERIFY_WRITE, arg2, arg3, 0);
 > +            if (!p) {
-
-And this if() is now more readable, thanks.
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
 > +                return -TARGET_EFAULT;
 > +            }
 > +        }
@@ -103,3 +96,8 @@ Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >          unlock_user(p, arg2, 0);
 >          return ret;
 > 
+
+Applied to my linux-user branch.
+
+Thanks,
+Laurent
