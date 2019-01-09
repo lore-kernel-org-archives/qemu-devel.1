@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39822)
+Received: from eggs.gnu.org ([209.51.188.92]:40366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ghEtM-0001Ib-24
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:31:37 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghEua-0001xx-Hd
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:32:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ghEtL-0002PT-0N
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:31:36 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51036)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ghEtK-0002Oj-MQ
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:31:34 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x09ESxF4137368
-	for <qemu-devel@nongnu.org>; Wed, 9 Jan 2019 09:31:32 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pwj7u1xah-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 09:31:32 -0500
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Wed, 9 Jan 2019 14:31:30 -0000
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed,  9 Jan 2019 15:31:19 +0100
+	(envelope-from <armbru@redhat.com>) id 1ghEuZ-00044Y-0U
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:32:52 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190102140535.11512-1-cfergeau@redhat.com>
+	<20190102180158.GA6015@natto.ory.fergeau.eu>
+	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
+	<87o98sii5b.fsf@dusky.pond.sub.org>
+	<20190107163606.GL23773@natto.ory.fergeau.eu>
+	<87pnt7bflk.fsf@dusky.pond.sub.org>
+	<d8a41aa9-42bf-94f0-d6e6-347547dc39da@redhat.com>
+Date: Wed, 09 Jan 2019 15:32:47 +0100
+In-Reply-To: <d8a41aa9-42bf-94f0-d6e6-347547dc39da@redhat.com> (Max Reitz's
+	message of "Wed, 9 Jan 2019 14:06:22 +0100")
+Message-ID: <87bm4pewa8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190109143119.9972-1-clg@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] spapr/vio: remove the "irq" property"
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,112 +28,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Christophe Fergeau <cfergeau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-commit efe2add7cb7f ("spapr/vio: deprecate the "irq" property") was
-merged in QEMU version 3.0. The "irq" property" can be removed for
-QEMU version 4.0.
+Max Reitz <mreitz@redhat.com> writes:
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- qemu-deprecated.texi |  6 ------
- hw/ppc/spapr_vio.c   | 47 ++++++--------------------------------------
- 2 files changed, 6 insertions(+), 47 deletions(-)
+> On 08.01.19 11:36, Markus Armbruster wrote:
+>> Copying block maintainers for help with assessing the bug's (non-)impact
+>> on security.
+>> 
+>> Christophe Fergeau <cfergeau@redhat.com> writes:
+>> 
+>>> On Mon, Jan 07, 2019 at 04:47:44PM +0100, Markus Armbruster wrote:
+>>>> Eric Blake <eblake@redhat.com> writes:
+>>>>
+>>>>> On 1/2/19 12:01 PM, Christophe Fergeau wrote:
+>>>>>> Adding Markus to cc: list, I forgot to do it when sending the patch.
+>>>>>
+>>>>> Also worth backporting via qemu-stable, now in cc.
+>>>>>
+>>>>>>
+>>>>>> Christophe
+>>>>>>
+>>>>>> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
+>>>>>>> commit 8bca4613 added support for %% in json strings when interpolating,
+>>>>>>> but in doing so, this broke handling of % when not interpolating as the
+>>>>>>> '%' is skipped in both cases.
+>>>>>>> This commit ensures we only try to handle %% when interpolating.
+>>>>
+>>>> Impact?
+>>>>
+>>>> If you're unable to assess, could you give us at least a reproducer?
+>>>
+>>> This all came from https://lists.freedesktop.org/archives/spice-devel/2018-December/046644.html
+>>> Setting up a VM with libvirt with <graphics type='spice' autoport='yes' passwd='password%'/>
+>>> fails to start with:
+>>>   qemu-system-x86_64: qobject/json-parser.c:146: parse_string: Assertion `*ptr' failed.
+>>>
+>>> If you use 'password%%' as the password instead, when trying to connect
+>>> to the VM, you type 'password%' as the password instead of 'password%%'
+>>> as configured in the domain XML.
+>> 
+>> Thanks.
+>> 
+>> As the commit message says, the bug bites when we parse a string
+>> containing '%s' with !ctxt->ap.  The parser then swallows a character.
+>> If it swallows the terminating '"', it fails the assertion.
+>> 
+>> We parse with !ctxt->ap in the following cases:
+>> 
+>> * Tests (tests/check-qjson.c, tests/test-qobject-input-visitor.c,
+>>   tests/test-visitor-serialization.c)
+>> 
+>>   Plenty of tests, but we still failed to cover the buggy case :(
+>> 
+>> * QMP input (monitor.c)
+>> 
+>> * QGA input (qga/main.c)
+>> 
+>> * qobject_from_json()
+>> 
+>>   - JSON pseudo-filenames (block.c)
+>> 
+>>     These are pseudo-filenames starting with "json:".
+>> 
+>>   - JSON key pairs (block/rbd.c)
+>> 
+>>     As far as I can tell, these can come only from pseudo-filenames
+>>     starting with "rbd:".
+>> 
+>>   - JSON command line option arguments of -display and -blockdev
+>>     (qobject-input-visitor.c)
+>> 
+>>     Reproducer: -blockdev '{"%"}'
+>> 
+>> Command line, QMP and QGA input are trusted.
+>> 
+>> Filenames are trusted when they come from command line, QMP or HMP.
+>> They are untrusted when they come from from image file headers.
+>> Example: QCOW2 backing file name.  Note that this is *not* the security
+>> boundary between host and guest.  It's the boundary between host and an
+>> image file from an untrusted source.
+>> 
+>> I can't see how the bug could be exploited.  Neither failing an
+>> assertion nor skipping a character in a filename of your choice is
+>> interesting.  We don't support compiling with NDEBUG.
+>> 
+>> Kevin, Max, do you agree?
+>
+> I wouldn't call it "not interesting" if adding an image to your VM at
+> runtime can crash the whole thing.
+>
+> (qemu-img create -f qcow2 -u -b 'json:{"%"}' foo.qcow2 64M)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index c3735b698ee4..eb5cd2a72d41 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -168,9 +168,3 @@ Example of legacy encoding:
- The above, converted to the current supported format:
-=20
- @code{json:@{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"=
-@}}
--
--@subsection vio-spapr-device device options
--
--@subsubsection "irq": "" (since 3.0.0)
--
--The ``irq'' property is obsoleted.
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index 7e8a9ad09337..414673d31341 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -44,38 +44,6 @@
-=20
- #define SPAPR_VIO_REG_BASE 0x71000000
-=20
--static void spapr_vio_get_irq(Object *obj, Visitor *v, const char *name,
--                              void *opaque, Error **errp)
--{
--    Property *prop =3D opaque;
--    uint32_t *ptr =3D qdev_get_prop_ptr(DEVICE(obj), prop);
--
--    visit_type_uint32(v, name, ptr, errp);
--}
--
--static void spapr_vio_set_irq(Object *obj, Visitor *v, const char *name,
--                              void *opaque, Error **errp)
--{
--    Property *prop =3D opaque;
--    uint32_t *ptr =3D qdev_get_prop_ptr(DEVICE(obj), prop);
--
--    if (!qtest_enabled()) {
--        warn_report(TYPE_VIO_SPAPR_DEVICE " '%s' property is deprecated"=
-, name);
--    }
--    visit_type_uint32(v, name, ptr, errp);
--}
--
--static const PropertyInfo spapr_vio_irq_propinfo =3D {
--    .name =3D "irq",
--    .get =3D spapr_vio_get_irq,
--    .set =3D spapr_vio_set_irq,
--};
--
--static Property spapr_vio_props[] =3D {
--    DEFINE_PROP("irq", VIOsPAPRDevice, irq, spapr_vio_irq_propinfo, uint=
-32_t),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
- static char *spapr_vio_get_dev_name(DeviceState *qdev)
- {
-     VIOsPAPRDevice *dev =3D VIO_SPAPR_DEVICE(qdev);
-@@ -534,15 +502,13 @@ static void spapr_vio_busdev_realize(DeviceState *q=
-dev, Error **errp)
-         dev->qdev.id =3D id;
-     }
-=20
--    if (!dev->irq) {
--        dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
-+    dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
-=20
--        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
--            dev->irq =3D spapr_irq_findone(spapr, &local_err);
--            if (local_err) {
--                error_propagate(errp, local_err);
--                return;
--            }
-+    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-+        dev->irq =3D spapr_irq_findone(spapr, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return;
-         }
-     }
-=20
-@@ -668,7 +634,6 @@ static void vio_spapr_device_class_init(ObjectClass *=
-klass, void *data)
-     k->realize =3D spapr_vio_busdev_realize;
-     k->reset =3D spapr_vio_busdev_reset;
-     k->bus_type =3D TYPE_SPAPR_VIO_BUS;
--    k->props =3D spapr_vio_props;
- }
-=20
- static const TypeInfo spapr_vio_type_info =3D {
---=20
-2.20.1
+"Not interesting" strictly from the point of view of exploiting the bug
+to penetrate trust boundaries.
+
+> Whether this is a security issue...  I don't know, but it is a DoS.
+
+I'm not sure whether feeding untrusted images to QEMU is a good idea in
+general --- there's so much that could go wrong.  How hardened against
+abuse are out block drivers?
+
+I figure what distinguishes this case is how utterly trivial creating a
+"bad" image is.
+
+Anyway, you are the block layer maintainers, so you get to decide
+whether to give this the full security bug treatment.  I'm merely the
+clown who broke it %-/
