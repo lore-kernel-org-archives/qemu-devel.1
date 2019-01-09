@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34604)
+Received: from eggs.gnu.org ([209.51.188.92]:37006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghJQ4-0005SG-L8
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:21:41 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ghJZt-0008O9-8D
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:31:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghJQ1-0004ND-Uh
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:21:39 -0500
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
-	<20180609151758.17343-5-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
-Date: Wed, 9 Jan 2019 13:21:12 -0600
+	(envelope-from <marcandre.lureau@redhat.com>) id 1ghJZr-0004TP-Tq
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:31:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1ghJZr-0004So-OP
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:31:47 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed,  9 Jan 2019 23:31:09 +0400
+Message-Id: <20190109193115.20655-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180609151758.17343-5-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="d6Oicz2762RAR69TuTn3f1OYpM0MXfFWv"
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] nbd/server: implement dirty bitmap
- export
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v16 0/6] Add support for TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,134 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, f4bug@amsat.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---d6Oicz2762RAR69TuTn3f1OYpM0MXfFWv
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com,
- kwolf@redhat.com, den@openvz.org
-Message-ID: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
-Subject: Re: [PATCH v5 4/6] nbd/server: implement dirty bitmap export
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
- <20180609151758.17343-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20180609151758.17343-5-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Revisiting an older thread:
+The following patches implement the TPM Physical Presence Interface
+that allows a user to set a command via ACPI (sysfs entry in Linux)
+that, upon the next reboot, the firmware looks for and acts upon by
+sending sequences of commands to the TPM.
 
-On 6/9/18 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Handle new NBD meta namespace: "qemu", and corresponding queries:
-> "qemu:dirty-bitmap:<export bitmap name>".
->=20
-> With new metadata context negotiated, BLOCK_STATUS query will reply
-> with dirty-bitmap data, converted to extents. New public function
-> nbd_export_bitmap selects bitmap to export. For now, only one bitmap
-> may be exported.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+A dedicated memory region is added to the TPM CRB & TIS devices, at
+address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+holds the location for that PPI region and some version details, to
+allow for future flexibility.
 
-> @@ -2199,3 +2393,44 @@ void nbd_client_new(NBDExport *exp,
->      co =3D qemu_coroutine_create(nbd_co_client_start, client);
->      qemu_coroutine_enter(co);
->  }
-> +
-> +void nbd_export_bitmap(NBDExport *exp, const char *bitmap,
-> +                       const char *bitmap_export_name, Error **errp)
-> +{
-> +    BdrvDirtyBitmap *bm =3D NULL;
-> +    BlockDriverState *bs =3D blk_bs(exp->blk);
-> +
-> +    if (exp->export_bitmap) {
-> +        error_setg(errp, "Export bitmap is already set");
-> +        return;
-> +    }
-> +
-> +    while (true) {
-> +        bm =3D bdrv_find_dirty_bitmap(bs, bitmap);
-> +        if (bm !=3D NULL || bs->backing =3D=3D NULL) {
-> +            break;
-> +        }
-> +
-> +        bs =3D bs->backing->bs;
-> +    }
-> +
-> +    if (bm =3D=3D NULL) {
-> +        error_setg(errp, "Bitmap '%s' is not found", bitmap);
-> +        return;
-> +    }
-> +
-> +    if (bdrv_dirty_bitmap_enabled(bm)) {
-> +        error_setg(errp, "Bitmap '%s' is enabled", bitmap);
-> +        return;
-> +    }
+With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
+now runs successfully.
 
-Why are we restricting things to only export disabled bitmaps?
+It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+Implement Physical Presence interface for TPM 1.2 and 2")
 
-I can understand the argument that if the image being exported is
-read-only, then an enabled bitmap _that can be changed_ is probably a
-bad idea (it goes against the notion of the export being read only).
-But if we were to allow a writable access to an image, wouldn't we
-expect that writes be reflected into the bitmap, which means permitting
-an enabled bitmap?
+The edk2 support is merged upstream.
 
-Furthermore, consider the scenario:
+v16:
+- minor comments and stylistic changes
+- add r-b & t-b tags
 
-backing [with bitmap b0] <- active
+v15:
+- fix crash on reset when PPI is disabled
 
-If I request a bitmap add of b0 for an export of active, then it really
-shouldn't matter whether b0 is left enabled or disabled - the backing
-file is read-only, and so no changes will be made to bitmap b0.
+v14:
+- rebased, fixing conflicts after compat-props refactoring
+- fix build regression from v13 with --disable-tpm
 
-I stumbled into the latter scenario while testing my new 'qemu-nbd -B
-bitmap', but the problem appears anywhere that we have read-only access
-to an image, where we can't change the status of the bitmap from enabled
-to disabled (because the image is read-only) but where the bitmap
-shouldn't be changing anyways (because the image is read-only).
+v13:
+- removed needless error handling in tpm_ppi_init()
+- splitted "add ACPI memory clear interface"
+- moved acpi build function in dedicated hw/acpi/tpm.c
+- added some function documentation in headers
+- various code cleanups suggested by Philippe
+- rebased
 
-> +
-> +    if (bdrv_dirty_bitmap_qmp_locked(bm)) {
-> +        error_setg(errp, "Bitmap '%s' is locked", bitmap);
-> +        return;
-> +    }
-> +
-> +    bdrv_dirty_bitmap_set_qmp_locked(bm, true);
+Marc-Andr=C3=A9 Lureau (3):
+  tpm: add a "ppi" boolean property
+  acpi: add ACPI memory clear interface
+  tpm: clear RAM when "memory overwrite" requested
 
-Can we have an enabled-but-locked bitmap (one that we can't delete
-because some operation such as a writable NBD export is still using it,
-but one that is still being updated by active writes)?  If so, then it
-may make sense to drop the restriction that an exported bitmap must be
-disabled.  And even if it is not possible, I'd still like to loosen the
-restriction to require a disabled bitmap only if the image owning the
-bitmap is writable (making it easier to do read-only exports without
-having to first tweak the bitmap to be disabled).
+Stefan Berger (3):
+  tpm: allocate/map buffer for TPM Physical Presence interface
+  acpi: expose TPM/PPI configuration parameters to firmware via fw_cfg
+  acpi: build TPM Physical Presence interface
+
+ hw/tpm/tpm_ppi.h      |  46 +++++
+ include/hw/acpi/tpm.h |  21 ++
+ hw/acpi/tpm.c         | 459 ++++++++++++++++++++++++++++++++++++++++++
+ hw/core/machine.c     |   8 +
+ hw/i386/acpi-build.c  |  29 ++-
+ hw/tpm/tpm_crb.c      |  13 ++
+ hw/tpm/tpm_ppi.c      |  53 +++++
+ hw/tpm/tpm_tis.c      |  13 ++
+ stubs/tpm.c           |   5 +
+ docs/specs/tpm.txt    | 104 ++++++++++
+ hw/acpi/Makefile.objs |   1 +
+ hw/tpm/Makefile.objs  |   1 +
+ hw/tpm/trace-events   |   3 +
+ 13 files changed, 754 insertions(+), 2 deletions(-)
+ create mode 100644 hw/tpm/tpm_ppi.h
+ create mode 100644 hw/acpi/tpm.c
+ create mode 100644 hw/tpm/tpm_ppi.c
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---d6Oicz2762RAR69TuTn3f1OYpM0MXfFWv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw2SagACgkQ3g5py3or
-ov0T7wf/bvYx0dSCIxAgbmNit6Lh3YCM4LyzFnfOk85Asx9+bfSk8mpQp3N1YbDx
-E+KZSB+0VjC5l8vHhQMxhlf0p3qMmdm1MHRBfLwKeQd1pi/qWn1y7ZS6+XpvDJ2L
-FCg1qLODXIS0hseUX5emjKtHEmJ12JlqIEHrd+qB76GFLboquWLsrQN1ZHIGP8GE
-EMSM+s1JAJOOL2gR9NkqTg4XGTLK4oQagNF79FlynSnkpfWQDnWC0KziQRaNxEmN
-323n0W8S7q/J8S+iEu9Dp7ZmMvMgelG88zPNn9bHF/yapY9wDV/yceC3Gv5XH+Al
-5+WZ9BjQCD4wW+n5Sa2ZTSINS0lBjQ==
-=ol8R
------END PGP SIGNATURE-----
-
---d6Oicz2762RAR69TuTn3f1OYpM0MXfFWv--
+2.20.1.98.gecbdaf0899
