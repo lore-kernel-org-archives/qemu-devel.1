@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33917)
+Received: from eggs.gnu.org ([209.51.188.92]:35344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gh9Nn-000086-Ho
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:38:40 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gh9Ub-0002V6-60
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:45:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gh9Nm-0002p0-O6
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:38:39 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:40103)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gh9Nm-0002js-E9
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:38:38 -0500
-References: <20190108184900.9654-1-peter.maydell@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4d3ee63a-12c1-a3b3-c76f-15b8ed6b43a6@vivier.eu>
-Date: Wed, 9 Jan 2019 09:38:21 +0100
+	(envelope-from <kraxel@redhat.com>) id 1gh9Ua-0006Sn-GK
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:45:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40874)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gh9Ua-0006Rs-7n
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 03:45:40 -0500
+Date: Wed, 9 Jan 2019 09:45:01 +0100
+From: "Hoffmann, Gerd" <kraxel@redhat.com>
+Message-ID: <20190109084501.bp6m3rzp6xrqzn2r@sirius.home.kraxel.org>
+References: <20181211074241.ovuharwewaw22ygq@sirius.home.kraxel.org>
+	<20181211092944.GA921@redhat.com>
+	<20181211135230-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CKuoWWxLqZKQRU-g_144jX2bwsQJUzeW0W-QicNrbPfQw@mail.gmail.com>
+	<20181218181803-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CJmT5O3x84upBDhvvCPCK5x51RP0TxBMsodLzVeQgC-vw@mail.gmail.com>
+	<20181219103112-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CLKftEt8g5WyW8NPOPNsKPXhNnS3BkdVqjrny4cjb+kWw@mail.gmail.com>
+	<20181220113338-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CK1jeJgk07TXwHWpZLhO59Rrf7gSfpB6=J-NO+sYFfwpA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190108184900.9654-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: make pwrite64/pread64(fd, NULL,
- 0, offset) return 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CK1jeJgk07TXwHWpZLhO59Rrf7gSfpB6=J-NO+sYFfwpA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.2 01/11] vhost-user: define
+ conventions for vhost-user backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +36,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Le 08/01/2019 à 19:49, Peter Maydell a écrit :
-> Linux returns success if pwrite64() or pread64() are called with a
-> zero length NULL buffer, but QEMU was returning -TARGET_EFAULT.
-> 
-> This is the same bug that we fixed in commit 58cfa6c2e6eb51b23cc9
-> for the write syscall, and long before that in 38d840e6790c29f59
-> for the read syscall.
-> 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1810433
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> I chose to fix this by setting p to NULL and falling through
-> to the normal-case codepath rather than having a call to
-> pread/pwrite in the special-case if like 58cfa6c2e6eb5,
-> because here the normal-case is a bit more complicated as
-> it has the target_offset64() call in it.
-> 38d840e6790c29f59 has "just return 0" for the NULL buffer
-> case, but we can't do that here as that would not get the
-> "negative offset should return -EINVAL" case write.
-> ---
->  linux-user/syscall.c | 22 ++++++++++++++++++----
->  1 file changed, 18 insertions(+), 4 deletions(-)
-> 
+  Hi,
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> Unfortunately, vdev is not set before vhost_dev_start().
+> 
+> We could add the migration blocker there somehow?
+
+Sure.  Just use migrate_add_blocker() to do that at any time (see qxl.c
+for an example).
+
+HTH,
+  Gerd
