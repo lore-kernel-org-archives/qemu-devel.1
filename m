@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39221)
+Received: from eggs.gnu.org ([209.51.188.92]:39899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1ghLF2-0001ED-8g
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:18:25 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghLGz-0002pU-Ur
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:20:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maran.wilson@oracle.com>) id 1ghLF0-00052c-JW
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:18:24 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:40754)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
-	id 1ghLEz-00050k-JB
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:18:22 -0500
-References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
-	<CAGxU2F53zsuVRBbvGTOU81zObL+4tTg_FgE0i04G2eOWckc29Q@mail.gmail.com>
-	<aa1cbeec-bb31-8849-c34b-e2397dc1c475@oracle.com>
-	<CAGxU2F7rHv7HNNmvLSw9b5_GPEZqvo-XgCoc0penp8eFmWm6gw@mail.gmail.com>
-	<fb7e62ea-0d3e-9b6f-4f1c-4bd780e50398@oracle.com>
-From: Maran Wilson <maran.wilson@oracle.com>
-Message-ID: <d1877cd9-7374-1512-7b01-2a2fb184643a@oracle.com>
-Date: Wed, 9 Jan 2019 13:18:12 -0800
+	(envelope-from <pbonzini@redhat.com>) id 1ghLGx-000676-UZ
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:20:25 -0500
+References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
+	<1547051976-13982-2-git-send-email-thuth@redhat.com>
+	<3316bf08-36c0-c3ce-4e4f-8244276c58d3@kaod.org>
+	<20190109172801.GB3998@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d72673fa-52a5-a6ff-6aa8-34f2b4b6855f@redhat.com>
+Date: Wed, 9 Jan 2019 22:20:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <fb7e62ea-0d3e-9b6f-4f1c-4bd780e50398@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190109172801.GB3998@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC v2 0/4] QEMU changes to do PVH boot
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
+ compilation with clang -std=gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +27,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Boris Ostrovsky <boris.ostrovsky@oracle.com>, Stefano Garzarella <sgarzare@redhat.com>, Liam Merwick <liam.merwick@oracle.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 1/9/2019 11:53 AM, Boris Ostrovsky wrote:
-> On 1/9/19 6:53 AM, Stefano Garzarella wrote:
->> Hi Liam,
->>
->> On Tue, Jan 8, 2019 at 3:47 PM Liam Merwick <liam.merwick@oracle.com> wrote:
->>> QEMU sets the hvm_modlist_entry in load_linux() after the call to
->>> load_elfboot() and then qboot loads it in boot_pvh_from_fw_cfg()
->>>
->>> But the current PVH patches don't handle initrd (they have
->>> start_info.nr_modules == 1).
->> Looking in the linux kernel (arch/x86/platform/pvh/enlighten.c) I saw:
->>      /* The first module is always ramdisk. */
->>      if (pvh_start_info.nr_modules) {
->>          struct hvm_modlist_entry *modaddr =
->>              __va(pvh_start_info.modlist_paddr);
->>          pvh_bootparams.hdr.ramdisk_image = modaddr->paddr;
->>          pvh_bootparams.hdr.ramdisk_size = modaddr->size;
->>      }
->>
->> So, putting start_info.nr_modules = 1, means that the first
->> hvm_modlist_entry should have the ramdisk paddr and size. Is it
->> correct?
+On 09/01/19 18:28, Daniel P. Berrang=C3=A9 wrote:
+>> so both files include each other, how nice ...
+> If the header files are mutually dependent it makes me wonder what the
+> point of having them split up is ?
+>=20
+> Feels like either they need to be merged, or they need to be split up
+> and refactored even more to remove the mutual dependancy.
 
-That's my understanding.
+If they include each other only for the typedefs, then prehaps the
+solution is to change the coding style and allow using struct in
+function prototypes.  I'm pretty sure there are several examples of this
+already.
 
-I think what's missing, is that we just need Qemu or qboot/seabios to 
-properly populate the pvh_start_info.modlist_paddr with the address (as 
-usable by the guest) of the hvm_modlist_entry which correctly defines 
-the details of the initrd that has already been loaded into memory that 
-is accessible by the guest.
-
--Maran
-
->>> During (or after) the call to load_elfboot() it looks like we'd need to
->>> do something like what load_multiboot() does below (along with the
->>> associated initialisation)
->>>
->>> 400     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, ADDR_MBI);
->>> 401     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, sizeof(bootinfo));
->>> 402     fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, mb_bootinfo_data,
->>> 403                      sizeof(bootinfo));
->>>
->> In this case I think they used the FW_CFG_INITRD_* to pass bootinfo
->> varibales to the guest, maybe we could add something like what
->> linux_load() does:
->>
->>      /* load initrd */
->>      if (initrd_filename) {
->>          ...
->>          initrd_addr = (initrd_max-initrd_size) & ~4095;
->>
->>          fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
->>          fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
->>          fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data, initrd_size);
->>          ...
->>      }
->>
->> Then we can load the initrd in qboot or in the optionrom that I'm writing.
->>
->> What do you think?
->
-> Why not specify this in pvh_start_info? This will be much faster for
-> everyone, no need to go through fw_cfg.
->
-> -boris
->
+Paolo
