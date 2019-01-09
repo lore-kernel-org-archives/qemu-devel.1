@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37456)
+Received: from eggs.gnu.org ([209.51.188.92]:37965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghBAW-0004nr-9O
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:33:05 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ghBC4-0005wY-57
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:34:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghBAV-0003d6-FP
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:33:04 -0500
-References: <20190109103028.24723-1-clg@kaod.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e9db0167-4ece-da5d-6dcc-8bf00f97680e@redhat.com>
-Date: Wed, 9 Jan 2019 11:32:58 +0100
+	(envelope-from <laurent@vivier.eu>) id 1ghBC3-0004V7-5Z
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:34:40 -0500
+References: <20190105023831.66910-1-liq3ea@163.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a2c4b0e3-f850-8e8b-eeb9-25e77d06cfb6@vivier.eu>
+Date: Wed, 9 Jan 2019 11:34:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190109103028.24723-1-clg@kaod.org>
+In-Reply-To: <20190105023831.66910-1-liq3ea@163.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr/vio: remove the "irq" property"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] ioapic: use TYPE_FOO MACRO
+ than constant string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,104 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Li Qiang <liq3ea@163.com>, mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: qemu-trivial@nongnu.org, lvivier@redhat.com, qemu-devel@nongnu.org
 
-On 2019-01-09 11:30, C=C3=A9dric Le Goater wrote:
-> commit efe2add7cb7f ("spapr/vio: deprecate the "irq" property") was
-> merged in QEMU version 3.0. The "irq" property" can be removed for
-> QEMU version 4.0, 2 version later.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+On 05/01/2019 03:38, Li Qiang wrote:
+> Make them more QOMConventional.
+> Cc:qemu-trivial@nongnu.org
+> 
+> Signed-off-by: Li Qiang <liq3ea@163.com>
 > ---
->=20
->  The machine uselessly allocates an IRQ number for the sPAPR NVRAM.
->  This is harmless but still a little ugly.
->=20
->  hw/ppc/spapr_vio.c | 47 ++++++----------------------------------------
->  1 file changed, 6 insertions(+), 41 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-> index 7e8a9ad09337..414673d31341 100644
-> --- a/hw/ppc/spapr_vio.c
-> +++ b/hw/ppc/spapr_vio.c
-> @@ -44,38 +44,6 @@
-> =20
->  #define SPAPR_VIO_REG_BASE 0x71000000
-> =20
-> -static void spapr_vio_get_irq(Object *obj, Visitor *v, const char *nam=
-e,
-> -                              void *opaque, Error **errp)
-> -{
-> -    Property *prop =3D opaque;
-> -    uint32_t *ptr =3D qdev_get_prop_ptr(DEVICE(obj), prop);
-> -
-> -    visit_type_uint32(v, name, ptr, errp);
-> -}
-> -
-> -static void spapr_vio_set_irq(Object *obj, Visitor *v, const char *nam=
-e,
-> -                              void *opaque, Error **errp)
-> -{
-> -    Property *prop =3D opaque;
-> -    uint32_t *ptr =3D qdev_get_prop_ptr(DEVICE(obj), prop);
-> -
-> -    if (!qtest_enabled()) {
-> -        warn_report(TYPE_VIO_SPAPR_DEVICE " '%s' property is deprecate=
-d", name);
-> -    }
-> -    visit_type_uint32(v, name, ptr, errp);
-> -}
-> -
-> -static const PropertyInfo spapr_vio_irq_propinfo =3D {
-> -    .name =3D "irq",
-> -    .get =3D spapr_vio_get_irq,
-> -    .set =3D spapr_vio_set_irq,
-> -};
-> -
-> -static Property spapr_vio_props[] =3D {
-> -    DEFINE_PROP("irq", VIOsPAPRDevice, irq, spapr_vio_irq_propinfo, ui=
-nt32_t),
-> -    DEFINE_PROP_END_OF_LIST(),
-> -};
-> -
->  static char *spapr_vio_get_dev_name(DeviceState *qdev)
->  {
->      VIOsPAPRDevice *dev =3D VIO_SPAPR_DEVICE(qdev);
-> @@ -534,15 +502,13 @@ static void spapr_vio_busdev_realize(DeviceState =
-*qdev, Error **errp)
->          dev->qdev.id =3D id;
->      }
-> =20
-> -    if (!dev->irq) {
-> -        dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
-> +    dev->irq =3D spapr_vio_reg_to_irq(dev->reg);
-> =20
-> -        if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> -            dev->irq =3D spapr_irq_findone(spapr, &local_err);
-> -            if (local_err) {
-> -                error_propagate(errp, local_err);
-> -                return;
-> -            }
-> +    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +        dev->irq =3D spapr_irq_findone(spapr, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return;
->          }
->      }
-> =20
-> @@ -668,7 +634,6 @@ static void vio_spapr_device_class_init(ObjectClass=
- *klass, void *data)
->      k->realize =3D spapr_vio_busdev_realize;
->      k->reset =3D spapr_vio_busdev_reset;
->      k->bus_type =3D TYPE_SPAPR_VIO_BUS;
-> -    k->props =3D spapr_vio_props;
+>  hw/i386/kvm/ioapic.c     | 2 +-
+>  hw/i386/pc.c             | 4 ++--
+>  hw/intc/ioapic.c         | 2 +-
+>  include/hw/i386/ioapic.h | 3 +++
+>  4 files changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/i386/kvm/ioapic.c b/hw/i386/kvm/ioapic.c
+> index 5b40d75439..e453692199 100644
+> --- a/hw/i386/kvm/ioapic.c
+> +++ b/hw/i386/kvm/ioapic.c
+> @@ -163,7 +163,7 @@ static void kvm_ioapic_class_init(ObjectClass *klass, void *data)
 >  }
-> =20
->  static const TypeInfo spapr_vio_type_info =3D {
->=20
+>  
+>  static const TypeInfo kvm_ioapic_info = {
+> -    .name  = "kvm-ioapic",
+> +    .name  = TYPE_KVM_IOAPIC,
+>      .parent = TYPE_IOAPIC_COMMON,
+>      .instance_size = sizeof(KVMIOAPICState),
+>      .class_init = kvm_ioapic_class_init,
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f248662e97..af68a61615 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1665,9 +1665,9 @@ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
+>      unsigned int i;
+>  
+>      if (kvm_ioapic_in_kernel()) {
+> -        dev = qdev_create(NULL, "kvm-ioapic");
+> +        dev = qdev_create(NULL, TYPE_KVM_IOAPIC);
+>      } else {
+> -        dev = qdev_create(NULL, "ioapic");
+> +        dev = qdev_create(NULL, TYPE_IOAPIC);
+>      }
+>      if (parent_name) {
+>          object_property_add_child(object_resolve_path(parent_name, NULL),
+> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+> index 4e529729b4..9d75f84d3b 100644
+> --- a/hw/intc/ioapic.c
+> +++ b/hw/intc/ioapic.c
+> @@ -429,7 +429,7 @@ static void ioapic_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo ioapic_info = {
+> -    .name          = "ioapic",
+> +    .name          = TYPE_IOAPIC,
+>      .parent        = TYPE_IOAPIC_COMMON,
+>      .instance_size = sizeof(IOAPICCommonState),
+>      .class_init    = ioapic_class_init,
+> diff --git a/include/hw/i386/ioapic.h b/include/hw/i386/ioapic.h
+> index 9c8816f11f..59fcb158a7 100644
+> --- a/include/hw/i386/ioapic.h
+> +++ b/include/hw/i386/ioapic.h
+> @@ -23,6 +23,9 @@
+>  #define IOAPIC_NUM_PINS 24
+>  #define IO_APIC_DEFAULT_ADDRESS 0xfec00000
+>  
+> +#define TYPE_KVM_IOAPIC "kvm-ioapic"
+> +#define TYPE_IOAPIC "ioapic"
+> +
+>  void ioapic_eoi_broadcast(int vector);
+>  
+>  #endif /* HW_IOAPIC_H */
+> 
 
-Looks good to me.
+Applied to my trivial-patches branch.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thanks,
+Laurent
