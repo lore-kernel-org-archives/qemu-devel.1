@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41894)
+Received: from eggs.gnu.org ([209.51.188.92]:41910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fam@euphon.net>) id 1gh33z-00022W-Gr
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 20:53:48 -0500
+	(envelope-from <fam@euphon.net>) id 1gh342-00024L-Ak
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 20:53:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fam@euphon.net>) id 1gh33y-0005wk-LN
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 20:53:47 -0500
-Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17745
+	(envelope-from <fam@euphon.net>) id 1gh340-0005yE-6D
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 20:53:50 -0500
+Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17773
 	helo=sender1.zoho.com.cn) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fam@euphon.net>) id 1gh33x-0005kQ-CL
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 20:53:46 -0500
+	(envelope-from <fam@euphon.net>) id 1gh33z-0005jD-RH
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 20:53:48 -0500
 From: Fam Zheng <fam@euphon.net>
-Date: Wed,  9 Jan 2019 09:52:39 +0800
-Message-Id: <20190109015240.2116-2-fam@euphon.net>
-In-Reply-To: <20190109015240.2116-1-fam@euphon.net>
-References: <20190109015240.2116-1-fam@euphon.net>
-Subject: [Qemu-devel] [PULL 1/2] block/nvme: optimize the performance of
- nvme driver based on vfio-pci
+Message-ID: <20190109015240.2116-1-fam@euphon.net>
+Date: Wed,  9 Jan 2019 09:52:38 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/2] Block/testing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,80 +27,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, Fam Zheng <fam@euphon.net>
 
-From: Li Feng <lifeng1519@gmail.com>
+The following changes since commit 147923b1a901a0370f83a0f4c58ec1baffef22f0=
+:
 
-When the IO size is larger than 2 pages, we move the the pointer one by
-one in the pagelist, this is inefficient.
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20190108-pull-reque=
+st' into staging (2019-01-08 16:07:32 +0000)
 
-This is a simple benchmark result:
+are available in the git repository at:
 
-Before:
-$ qemu-io -c 'write 0 1G' nvme://0000:00:04.0/1
+  https://github.com/famz/qemu.git tags/staging-pull-request
 
-wrote 1073741824/1073741824 bytes at offset 0
-1 GiB, 1 ops; 0:00:02.41 (424.504 MiB/sec and 0.4146 ops/sec)
+for you to fetch changes up to 4ce58d861bf740bb893bd28b974675ad3d9f98b5:
 
- $ qemu-io -c 'read 0 1G' nvme://0000:00:04.0/1
+  docker: Use a stable snapshot for Debian Sid (2019-01-09 09:38:34 +0800)
 
-read 1073741824/1073741824 bytes at offset 0
-1 GiB, 1 ops; 0:00:02.03 (503.055 MiB/sec and 0.4913 ops/sec)
+----------------------------------------------------------------
+Block/testing patches
 
-After:
-$ qemu-io -c 'write 0 1G' nvme://0000:00:04.0/1
+v2: Fix URL.
+    Drop BSD patch.
 
-wrote 1073741824/1073741824 bytes at offset 0
-1 GiB, 1 ops; 0:00:02.17 (471.517 MiB/sec and 0.4605 ops/sec)
+----------------------------------------------------------------
 
- $ qemu-io -c 'read 0 1G' nvme://0000:00:04.0/1
+Li Feng (1):
+  block/nvme: optimize the performance of nvme driver based on vfio-pci
 
-read 1073741824/1073741824 bytes at offset 0
-1 GiB, 1 ops; 0:00:01.94 (526.770 MiB/sec and 0.5144 ops/sec)
+Philippe Mathieu-Daud=C3=A9 (1):
+  docker: Use a stable snapshot for Debian Sid
 
-Signed-off-by: Li Feng <lifeng1519@gmail.com>
-Message-Id: <20181101103807.25862-1-lifeng1519@gmail.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/nvme.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ block/nvme.c                               | 16 ++++++----------
+ tests/docker/dockerfiles/debian-sid.docker |  4 ++++
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 29294038fc..982097b5b1 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -837,7 +837,7 @@ try_map:
-         }
- 
-         for (j = 0; j < qiov->iov[i].iov_len / s->page_size; j++) {
--            pagelist[entries++] = iova + j * s->page_size;
-+            pagelist[entries++] = cpu_to_le64(iova + j * s->page_size);
-         }
-         trace_nvme_cmd_map_qiov_iov(s, i, qiov->iov[i].iov_base,
-                                     qiov->iov[i].iov_len / s->page_size);
-@@ -850,20 +850,16 @@ try_map:
-     case 0:
-         abort();
-     case 1:
--        cmd->prp1 = cpu_to_le64(pagelist[0]);
-+        cmd->prp1 = pagelist[0];
-         cmd->prp2 = 0;
-         break;
-     case 2:
--        cmd->prp1 = cpu_to_le64(pagelist[0]);
--        cmd->prp2 = cpu_to_le64(pagelist[1]);;
-+        cmd->prp1 = pagelist[0];
-+        cmd->prp2 = pagelist[1];
-         break;
-     default:
--        cmd->prp1 = cpu_to_le64(pagelist[0]);
--        cmd->prp2 = cpu_to_le64(req->prp_list_iova);
--        for (i = 0; i < entries - 1; ++i) {
--            pagelist[i] = cpu_to_le64(pagelist[i + 1]);
--        }
--        pagelist[entries - 1] = 0;
-+        cmd->prp1 = pagelist[0];
-+        cmd->prp2 = cpu_to_le64(req->prp_list_iova + sizeof(uint64_t));
-         break;
-     }
-     trace_nvme_cmd_map_qiov(s, cmd, req, qiov, entries);
--- 
+--=20
 2.11.0
