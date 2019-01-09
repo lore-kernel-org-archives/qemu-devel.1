@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40579)
+Received: from eggs.gnu.org ([209.51.188.92]:42740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ghBLt-0003Ue-FF
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:44:50 -0500
+	(envelope-from <philmd@redhat.com>) id 1ghBTT-0005ye-Ab
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:52:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1ghBLs-0002Ib-NX
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:44:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47224)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ghBLs-0002IQ-Ht
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:44:48 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CBF748830F
-	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 10:44:47 +0000 (UTC)
-Date: Wed, 9 Jan 2019 11:44:43 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20190109104443.GN3259@paraplu.home>
-References: <20190109085113.GA23677@paraplu>
-	<16805fd6-6326-4acc-ee99-ac0899a8cf1e@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1ghBTS-0005Yy-2p
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:52:39 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:56057)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghBTR-0005Yd-Tf
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:52:38 -0500
+Received: by mail-wm1-f68.google.com with SMTP id y139so7049773wmc.5
+	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 02:52:37 -0800 (PST)
+References: <cover.1546532844.git.balaton@eik.bme.hu>
+	<a977bd81f7c1f2896837671545fbb01ebf286f4a.1546532844.git.balaton@eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6c6cdb4b-b15c-0152-2cfe-4ac813d15111@redhat.com>
+Date: Wed, 9 Jan 2019 11:52:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <16805fd6-6326-4acc-ee99-ac0899a8cf1e@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Should the "props" be documented for QMP
- `object-add`?
+In-Reply-To: <a977bd81f7c1f2896837671545fbb01ebf286f4a.1546532844.git.balaton@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] smbus: Add a helper to generate SPD
+ EEPROM data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +31,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Jan 09, 2019 at 11:31:18AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Hi Kashyap,
+Hi Zoltan,
 
-Hi,
+On 1/3/19 5:27 PM, BALATON Zoltan wrote:
+> There are several boards with SPD EEPROMs that are now using
+> duplicated or slightly different hard coded data. Add a helper to
+> generate SPD data for a memory module of given type and size that
+> could be used by these boards (either as is or with further changes if
+> needed) which should help cleaning this up and avoid further duplication.
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+> v3: Fixed a tab indent
+> v2: Added errp parameter to pass errors back to caller
+> 
+>  hw/i2c/smbus_eeprom.c  | 130 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/i2c/smbus.h |   3 ++
+>  2 files changed, 133 insertions(+)
+> 
+> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+> index f18aa3de35..bef24a1ca4 100644
+> --- a/hw/i2c/smbus_eeprom.c
+> +++ b/hw/i2c/smbus_eeprom.c
+> @@ -23,6 +23,9 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/units.h"
+> +#include "qapi/error.h"
+>  #include "hw/hw.h"
+>  #include "hw/i2c/i2c.h"
+>  #include "hw/i2c/smbus.h"
+> @@ -162,3 +165,130 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+>          smbus_eeprom_init_one(smbus, 0x50 + i, eeprom_buf + (i * 256));
+>      }
+>  }
+> +
+> +/* Generate SDRAM SPD EEPROM data describing a module of type and size */
+> +uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size,
+> +                           Error **errp)
+> +{
+> +    uint8_t *spd;
+> +    uint8_t nbanks;
+> +    uint16_t density;
+> +    uint32_t size;
+> +    int min_log2, max_log2, sz_log2;
+> +    int i;
+> +
+> +    switch (type) {
+> +    case SDR:
+> +        min_log2 = 2;
+> +        max_log2 = 9;
+> +        break;
+> +    case DDR:
+> +        min_log2 = 5;
+> +        max_log2 = 12;
+> +        break;
+> +    case DDR2:
+> +        min_log2 = 7;
+> +        max_log2 = 14;
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +    size = ram_size >> 20; /* work in terms of megabytes */
+> +    if (size < 4) {
+> +        error_setg(errp, "SDRAM size is too small");
+> +        return NULL;
+> +    }
+> +    sz_log2 = 31 - clz32(size);
+> +    size = 1U << sz_log2;
+> +    if (ram_size > size * MiB) {
+> +        error_setg(errp, "SDRAM size 0x"RAM_ADDR_FMT" is not a power of 2, "
+> +                   "truncating to %u MB", ram_size, size);
+> +    }
+> +    if (sz_log2 < min_log2) {
+> +        error_setg(errp,
+> +                   "Memory size is too small for SDRAM type, adjusting type");
+> +        if (size >= 32) {
+> +            type = DDR;
+> +            min_log2 = 5;
+> +            max_log2 = 12;
+> +        } else {
+> +            type = SDR;
+> +            min_log2 = 2;
+> +            max_log2 = 9;
+> +        }
+> +    }
+> +
+> +    nbanks = 1;
+> +    while (sz_log2 > max_log2 && nbanks < 8) {
+> +        sz_log2--;
+> +        nbanks++;
+> +    }
+> +
+> +    if (size > (1ULL << sz_log2) * nbanks) {
+> +        error_setg(errp, "Memory size is too big for SDRAM, truncating");
+> +    }
+> +
+> +    /* split to 2 banks if possible to avoid a bug in MIPS Malta firmware */
+> +    if (nbanks == 1 && sz_log2 > min_log2) {
+> +        sz_log2--;
+> +        nbanks++;
+> +    }
+> +
+> +    density = 1ULL << (sz_log2 - 2);
+> +    switch (type) {
+> +    case DDR2:
+> +        density = (density & 0xe0) | (density >> 8 & 0x1f);
+> +        break;
+> +    case DDR:
+> +        density = (density & 0xf8) | (density >> 8 & 0x07);
+> +        break;
+> +    case SDR:
+> +    default:
+> +        density &= 0xff;
+> +        break;
+> +    }
+> +
+> +    spd = g_malloc0(256);
 
-> On 1/9/19 9:51 AM, Kashyap Chamarthy wrote:
+I think this buffer is eeprom-dependant, not SPD related.
+Wouldn't it be cleaner to pass the (previously created) buffer as
+argument such:
 
-[...]
+  /* return true on success */
+  bool spd_data_fill(void *buf, size_t bufsize,
+                     enum sdram_type type, ram_addr_t ram_size,
+                     Error **errp);
 
-> > That said, in qapi/misc.json "@object-add" doesn't document any of th=
-e
-> > "props".  Is it on purpose?  Maybe because it is a 1:1 mapping of the
-> > command-line `-object` (which _is_ documented in qemu-doc.texi).
-> >=20
-> > Is it a good idea to send a patch to document the "props" in
-> > qapi/misc.json?  Or would it be needless duplication?
->=20
-> IMHO the 1:1 mapping is only obvious for developpers who implement such
-> commands and for 3rd party libs using QMP.
+or return something else like ssize_t.
 
-Even for developers who use QMP to implement higher layer tools, it
-might take non-trivial amount of squinting to realize that it's a 1:1
-mapping.  It should at least be mentioned in the relevant QMP doc
-("explicit is better than implicit").  I'll submit a patch and see if it
-flies. :-)
-
-> For end-users, a command-line comment is helpful.
->=20
-> This remind me of this patch:
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg06623.html
->=20
-> +/**
-> + * QAuthZSimple:
-> + *
-> + * This authorization driver provides a simple mechanism
-> + * for granting access based on an exact matched username.
-> + *
-> + * To create an instance of this class via QMP:
-> + *
-> + *  {
-> + *    "execute": "object-add",
-> + *    "arguments": {
-> + *      "qom-type": "authz-simple",
-> + *      "id": "authz0",
-> + *      "parameters": {
-> + *        "identity": "fred"
-> + *      }
-> + *    }
-> + *  }
-> + *
-> + * Or via the command line
-> + *
-> + *   -object authz-simple,id=3Dauthz0,identity=3Dfred
-
-Yeah, that's a convenient example.  And in this specific case, it is
-useful for those reading the code.
-
---=20
-/kashyap
+> +    spd[0] = 128;   /* data bytes in EEPROM */
+> +    spd[1] = 8;     /* log2 size of EEPROM */
+> +    spd[2] = type;
+> +    spd[3] = 13;    /* row address bits */
+> +    spd[4] = 10;    /* column address bits */
+> +    spd[5] = (type == DDR2 ? nbanks - 1 : nbanks);
+> +    spd[6] = 64;    /* module data width */
+> +                    /* reserved / data width high */
+> +    spd[8] = 4;     /* interface voltage level */
+> +    spd[9] = 0x25;  /* highest CAS latency */
+> +    spd[10] = 1;    /* access time */
+> +                    /* DIMM configuration 0 = non-ECC */
+> +    spd[12] = 0x82; /* refresh requirements */
+> +    spd[13] = 8;    /* primary SDRAM width */
+> +                    /* ECC SDRAM width */
+> +    spd[15] = (type == DDR2 ? 0 : 1); /* reserved / delay for random col rd */
+> +    spd[16] = 12;   /* burst lengths supported */
+> +    spd[17] = 4;    /* banks per SDRAM device */
+> +    spd[18] = 12;   /* ~CAS latencies supported */
+> +    spd[19] = (type == DDR2 ? 0 : 1); /* reserved / ~CS latencies supported */
+> +    spd[20] = 2;    /* DIMM type / ~WE latencies */
+> +                    /* module features */
+> +                    /* memory chip features */
+> +    spd[23] = 0x12; /* clock cycle time @ medium CAS latency */
+> +                    /* data access time */
+> +                    /* clock cycle time @ short CAS latency */
+> +                    /* data access time */
+> +    spd[27] = 20;   /* min. row precharge time */
+> +    spd[28] = 15;   /* min. row active row delay */
+> +    spd[29] = 20;   /* min. ~RAS to ~CAS delay */
+> +    spd[30] = 45;   /* min. active to precharge time */
+> +    spd[31] = density;
+> +    spd[32] = 20;   /* addr/cmd setup time */
+> +    spd[33] = 8;    /* addr/cmd hold time */
+> +    spd[34] = 20;   /* data input setup time */
+> +    spd[35] = 8;    /* data input hold time */
+> +
+> +    /* checksum */
+> +    for (i = 0; i < 63; i++) {
+> +        spd[63] += spd[i];
+> +    }
+> +    return spd;
+> +}
+> diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
+> index d8b1b9ee81..d3dd0fcb14 100644
+> --- a/include/hw/i2c/smbus.h
+> +++ b/include/hw/i2c/smbus.h
+> @@ -93,4 +93,7 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t *eeprom_buf);
+>  void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+>                         const uint8_t *eeprom_spd, int size);
+>  
+> +enum sdram_type { SDR = 0x4, DDR = 0x7, DDR2 = 0x8 };
+> +uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t size, Error **errp);
+> +
+>  #endif
+> 
