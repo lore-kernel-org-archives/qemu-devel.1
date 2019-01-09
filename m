@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53342)
+Received: from eggs.gnu.org ([209.51.188.92]:56019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ghFFZ-0000ia-0X
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:54:33 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ghFHA-000268-SB
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ghFFX-0005sm-Oy
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:54:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40308)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ghFFV-0005pp-Ms
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:54:31 -0500
-References: <20180906111107.30684-1-danielhb413@gmail.com>
-	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
-	<20190109142140.GC4867@localhost.localdomain>
-	<095e7b09-5d84-3437-782d-97fa6ca372ee@redhat.com>
-	<20190109144818.GE4867@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <756f6997-cb66-a82b-ae13-babb0e5fa827@redhat.com>
-Date: Wed, 9 Jan 2019 15:54:06 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ghFH9-0007W0-UY
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:56:12 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ghFH9-0007UV-NT
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:56:11 -0500
+Received: by mail-wm1-x342.google.com with SMTP id m22so8596944wml.3
+	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 06:56:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190109144818.GE4867@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5eKuNbJlofeJdgAdGqCdkgJ0ND1p7IXg2"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
- ID anymore
+References: <20190109082902.32271-1-marcandre.lureau@redhat.com>
+	<20190109082902.32271-6-marcandre.lureau@redhat.com>
+	<20190109093518-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190109093518-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 9 Jan 2019 18:55:56 +0400
+Message-ID: <CAJ+F1CKTwO3zT+raRcEfuVPJz-5iVH8WkFDdSmNtkQZR45JorA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v15 5/6] acpi: add ACPI memory clear
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,132 +32,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5eKuNbJlofeJdgAdGqCdkgJ0ND1p7IXg2
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org,
- dgilbert@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com
-Message-ID: <756f6997-cb66-a82b-ae13-babb0e5fa827@redhat.com>
-Subject: Re: [PATCH v2 0/3] HMP/snapshot changes - do not use ID anymore
-References: <20180906111107.30684-1-danielhb413@gmail.com>
- <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
- <20190109142140.GC4867@localhost.localdomain>
- <095e7b09-5d84-3437-782d-97fa6ca372ee@redhat.com>
- <20190109144818.GE4867@localhost.localdomain>
-In-Reply-To: <20190109144818.GE4867@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 09.01.19 15:48, Kevin Wolf wrote:
-> Am 09.01.2019 um 15:27 hat Max Reitz geschrieben:
->> On 09.01.19 15:21, Kevin Wolf wrote:
->>> Am 09.01.2019 um 15:10 hat Max Reitz geschrieben:
->>>> On 06.09.18 13:11, Daniel Henrique Barboza wrote:
->>>>> changes in v2:
->>>>> - removed the "RFC" marker;
->>>>> - added a new patch (patch 2) that removes
->>>>> bdrv_snapshot_delete_by_id_or_name from the code;
->>>>> - made changes in patch 1 as suggested by Murilo;
->>>>> - previous patch set link:
->>>>> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg04658.html=
+On Wed, Jan 9, 2019 at 6:47 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Jan 09, 2019 at 12:29:01PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > The interface is described in the "TCG Platform Reset Attack
+> > Mitigation Specification", chapter 6 "ACPI _DSM Function". According
+> > to Laszlo, it's not so easy to implement in OVMF, he suggested to do
+> > it in qemu instead.
+> >
+> > See specification documentation for more details, and next commit for
+> > memory clear on reset handling.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  hw/acpi/tpm.c      | 48 ++++++++++++++++++++++++++++++++++++++++++++++
+> >  docs/specs/tpm.txt |  2 ++
+> >  2 files changed, 50 insertions(+)
+> >
+> > diff --git a/hw/acpi/tpm.c b/hw/acpi/tpm.c
+> > index fee9490306..61da1de97b 100644
+> > --- a/hw/acpi/tpm.c
+> > +++ b/hw/acpi/tpm.c
+> > @@ -53,6 +53,16 @@ void tpm_build_ppi_acpi(TPMIf *tpm, Aml *dev)
+> >      pprq =3D aml_name("PPRQ");
+> >      pprm =3D aml_name("PPRM");
+> >
+> > +    aml_append(dev,
+> > +               aml_operation_region(
+> > +                   "TPP3", AML_SYSTEM_MEMORY,
+> > +                   aml_int(TPM_PPI_ADDR_BASE +
+> > +                           0x15a /* movv, docs/specs/tpm.txt */),
+> > +                           0x1
+> > ));
+> > +    field =3D aml_field("TPP3", AML_BYTE_ACC, AML_NOLOCK, AML_PRESERVE=
+);
+> > +    aml_append(field, aml_named_field("MOVV", 8));
+> > +    aml_append(dev, field);
+> > +
+> >      /*
+> >       * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dynamic
+> >       * operation region inside of a method for getting FUNC[op].
+> > @@ -395,6 +405,44 @@ void tpm_build_ppi_acpi(TPMIf *tpm, Aml *dev)
+> >              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
+> >          }
+> >          aml_append(method, ifctx);
+> > +
+> > +        ifctx =3D aml_if(
+> > +            aml_equal(uuid,
+> > +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D45D=
+")));
+> > +        {
+> > +            /* standard DSM query function */
+>
+> refer to spec chapter here?
 
->>>>>
->>>>>
->>>>> It is not uncommon to see bugs being opened by testers that attempt=
- to
->>>>> create VM snapshots using HMP. It turns out that "0" and "1" are qu=
-ite
->>>>> common snapshot names and they trigger a lot of bugs. I gave an exa=
-mple
->>>>> in the commit message of patch 1, but to sum up here: QEMU treats t=
-he
->>>>> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'=
-=2E It
->>>>> is documented as such, but this can lead to strange situations.
->>>>>
->>>>> Given that it is strange for an API to consider a parameter to be 2=
- fields
->>>>> at the same time, and inadvently treating them as one or the other,=
- and
->>>>> that removing the ID field is too drastic, my idea here is to keep =
-the
->>>>> ID field for internal control, but do not let the user set it.
->>>>>
->>>>> I guess there's room for discussion about considering this change a=
-n API
->>>>> change or not. It doesn't affect users of HMP and it doesn't affect=
- Libvirt,
->>>>> but simplifying the meaning of the parameters of savevm/loadvm/delv=
-m.
->>>>
->>>> (Yes, very late reply, I'm sorry...)
->>>>
->>>> I do think it affects users of HMP, because right now you can delete=
-
->>>> snapshots with their ID, and after this series you cannot.
->>>
->>> Can there be snapshots that can't be identified by a snapshot name, b=
-ut
->>> only by their ID?
->>
->> I don't know, but what I meant is that if you have scripts to do all
->> this, you might have to adjust them with this change.
->=20
-> That's what the H in HMP means.
->=20
->>>> I think we had a short discussion about just disallowing numeric
->>>> snapshot names.  How bad would that be?
->>>
->>> It would be incompatible with existing images and result in a more
->>> complex snapshot identifier resolution. Why would it be any better?
->>
->> It wouldn't be incompatible with existing images if we'd just disallow=
-
->> creating such snapshots.  I don't see how the identifier resolution
->> would be more complex.
->>
->> I don't know if it'd be better.  I'd just find it simpler (for us, tha=
-t
->> is -- for users, I'm not sure).
->=20
-> Identifier resolution A:
-> - Find a snapshot that has the given identifier as a name
-> - If no such snapshot exists, it is an error
->=20
-> Identifier resolution B:
-> - If the identifier is a number, find a snapshot that has the given
->   identifier as its ID
-> - If the identifier is not a number, find a snapshot that has the given=
-
->   identifier as a name
-> - If no such snapshot exists, it is an error
-
-No, my idea was to keep the resolution the same as it is; just to forbid
-creating new snapshots with numeric names.  This would prevent users
-from getting into the whole situation.
-
-Max
+Yes, we could add a code comment such as:
+/* "TCG Platform Reset Attack Mitigation Specification", chapter 6
+"ACPI _DSM Function" */
 
 
---5eKuNbJlofeJdgAdGqCdkgJ0ND1p7IXg2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>
+> > +            ifctx2 =3D aml_if(aml_equal(function, zero));
+> > +            {
+> > +                uint8_t byte_list[1] =3D { 0x03 };
+>
+> and explain 3 above?
 
------BEGIN PGP SIGNATURE-----
+/* functions 1-2 are supported */
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw2Cw4ACgkQ9AfbAGHV
-z0Ar7Qf9FMihpzSIjPW8PAwLH4/EJkm7MG67s7GIeBjpDKh4BKMyrLsd2He04NFP
-z43iHuWjFICL+k3zvkNW7BJ26UBnbBjJq0Jm3iNg4vuAYFfVdArpAvKWVdEkLHHa
-/NaGf48iUOZw0QkmoTfMlEPTu+LNShf3jpclqHWp4tzcycBZCoHBiZiRxPQEcq5z
-pU/+iN+sGTPvUutvk0hExxqe1IebncQOFqsMvSKAvTe936D2P0xryGxLya96Zlna
-rR8XBQhdB1x55VOaIvrTDRw9SvP8A3yRlqBdeKihh62/qIRz4X3JNLuYOQAoSLhd
-0JMg4aFv6rk30hVJgdyUbecmGo2FVw==
-=tADK
------END PGP SIGNATURE-----
+>
+> > +                aml_append(ifctx2, aml_return(aml_buffer(1
+>
+> 1 -> sizeof(byte_list)?
 
---5eKuNbJlofeJdgAdGqCdkgJ0ND1p7IXg2--
+ok
+
+>
+> > + , byte_list)));
+> > +            }
+> > +            aml_append(ifctx, ifctx2);
+> > +
+> > +            /*
+> > +             * TCG Platform Reset Attack Mitigation Specification 1.0 =
+Ch.6
+> > +             *
+> > +             * Arg 2 (Integer): Function Index =3D 1
+> > +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
+> > +             *                  Operation Value of the Request
+> > +             * Returns: Type: Integer
+> > +             *          0: Success
+> > +             *          1: General Failure
+> > +             */
+> > +            ifctx2 =3D aml_if(aml_equal(function, one));
+> > +            {
+> > +                aml_append(ifctx2,
+> > +                           aml_store(aml_derefof(aml_index(arguments, =
+zero)),
+> > +                                     op));
+> > +                {
+> > +                    aml_append(ifctx2, aml_store(op, aml_name("MOVV"))=
+);
+> > +
+> > +                    /* 0: success */
+> > +                    aml_append(ifctx2, aml_return(zero));
+> > +                }
+> > +            }
+> > +            aml_append(ifctx, ifctx2);
+> > +        }
+> > +        aml_append(method, ifctx);
+> >      }
+> >      aml_append(dev, method);
+> >  }
+> > diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+> > index 424d1511fc..5d8c26b1ad 100644
+> > --- a/docs/specs/tpm.txt
+> > +++ b/docs/specs/tpm.txt
+> > @@ -135,6 +135,8 @@ layout:
+> >   +----------+--------+--------+---------------------------------------=
+----+
+> >   | next_step|   0x1  |  0x159 | Operation to execute after reboot by  =
+    |
+> >   |          |        |        | firmware. Used by firmware.           =
+    |
+> > + +----------+--------+--------+---------------------------------------=
+----+
+> > + | movv     |   0x1  |  0x15a | Memory overwrite variable             =
+    |
+> >   +----------+--------+--------+---------------------------------------=
+----+
+> >
+> >     The following values are supported for the 'func' field. They corre=
+spond
+> > --
+> > 2.20.1.2.gb21ebb671b
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
