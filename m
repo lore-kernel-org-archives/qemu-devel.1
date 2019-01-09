@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55334)
+Received: from eggs.gnu.org ([209.51.188.92]:55668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ghCH2-0000ur-D1
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:43:53 -0500
+	(envelope-from <berrange@redhat.com>) id 1ghCIQ-00020w-Ji
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:45:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ghCH1-0004mf-Fd
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:43:52 -0500
-From: David Hildenbrand <david@redhat.com>
-References: <1546969050-8884-1-git-send-email-pmorel@linux.ibm.com>
-	<1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
-	<be2d1126-45a9-ace2-bf85-18f255815572@redhat.com>
-Message-ID: <e5c4fa66-b83d-7f98-4f05-ccf26375a3ac@redhat.com>
-Date: Wed, 9 Jan 2019 12:43:43 +0100
+	(envelope-from <berrange@redhat.com>) id 1ghCIO-0005uB-Cs
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:45:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44418)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghCIO-0005tn-2W
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:45:16 -0500
+Date: Wed, 9 Jan 2019 11:44:59 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190109114459.GK3998@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
+	<20190109105818.GG3998@redhat.com>
+	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <be2d1126-45a9-ace2-bf85-18f255815572@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7] s390x/pci: add common function
- measurement block
+Content-Disposition: inline
+In-Reply-To: <ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>, walling@linux.ibm.com
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
 
-On 09.01.19 12:29, David Hildenbrand wrote:
-> On 08.01.19 18:37, Pierre Morel wrote:
->> From: Yi Min Zhao <zyimin@linux.ibm.com>
->>
->> Common function measurement block is used to report zPCI internal
->> counters of successful pcilg/stg/stb and rpcit instructions to
->> a memory location provided by the program.
->>
->> This patch introduces a new ZpciFmb structure and schedules a timer
->> callback to copy the zPCI measures to the FMB in the guest memory
->> at an interval time set to 4s.
->>
->> An error while attemping to update the FMB, would generate an error
->> event to the guest.
->>
->> The pcilg/stg/stb and rpcit interception handlers increase the
->> related counter on a successful call.
->> The guest shall pass a null FMBA (FMB address) in the FIB (Function
->> Information Block) when it issues a Modify PCI Function Control
->> instruction to switch off FMB and stop the corresponding timer.
->>
->> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>  hw/s390x/s390-pci-bus.c  |   4 +-
->>  hw/s390x/s390-pci-bus.h  |  29 +++++++++++
->>  hw/s390x/s390-pci-inst.c | 133 +++++++++++++++++++++++++++++++++++++++++++++--
->>  hw/s390x/s390-pci-inst.h |   1 +
->>  4 files changed, 163 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
->> index 060ff06..f0d34dd 100644
->> --- a/hw/s390x/s390-pci-bus.c
->> +++ b/hw/s390x/s390-pci-bus.c
->> @@ -989,6 +989,7 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
->>      bus = pci_get_bus(pci_dev);
->>      devfn = pci_dev->devfn;
->>      object_unparent(OBJECT(pci_dev));
->> +    fmb_timer_free(pbdev);
-> 
-> I still think this is the wrong place. it has nothing to do with
-> hotplug/unplug. This belongs into unrealize/finalize.
-> 
-> 
+On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
+> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
+> > On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
+> >> Different versions of GCC and Clang use different versions of the C =
+standard.
+> >> This repeatedly caused problems already, e.g. with duplicated typede=
+fs:
+> >>
+> >>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+> >>
+> >> or with for-loop variable initializers:
+> >>
+> >>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
+> >>
+> >> To avoid these problems, we should enforce the C language version to=
+ the
+> >> same level for all compilers. Since our minimum compiler versions ar=
+e
+> >> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" alre=
+ady,
+> >> this seems to be a good choice.
+> >=20
+> > In 4.x   gnu11 is marked as experimental. I'm not really comfortable
+> > using experimental features - even if its warning free there's a risk
+> > it would silently mis-compile something.
+> >=20
+> > gnu99 is ok with 4.x - it is merely "incomplete".
+>=20
+> gnu11 has the big advantage that it also fixes the problem with
+> duplicated typedefs that are reported by older versions of Clang.
+>=20
+> Are you sure about the experimental character in 4.x? I just looked at
+> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it says=
+:
+>=20
+> "A fourth version of the C standard, known as C11, was published in 201=
+1
+> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts of
+> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
+>=20
+> It does not say anything about "experimental" there. The word
+> "experimental" is only used for the C++ support, but we hardly have C++
+> code in QEMU -- if you worry about that, I could simply drop the
+> "-std=3Dgnu++11" part from my patch?
 
-... but I see the issue. It boils down to the bad design of zPCI. The
-PCI device has no clue about the pbdev. So this has to stay here because
-in unrealize of pbdev it would be wrong and into unrealize of pci_dev,
-we can't move it.
+I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1.x86_6=
+4:
 
--- 
+  "3.4 Options Controlling C Dialect
 
-Thanks,
+   ....snip...
 
-David / dhildenb
+     'c11'
+     'c1x'
+     'iso9899:2011'
+          ISO C11, the 2011 revision of the ISO C standard.  Support is
+          incomplete and experimental.  The name 'c1x' is deprecated.
+
+       ....snip...
+
+     'gnu11'
+     'gnu1x'
+          GNU dialect of ISO C11.  Support is incomplete and
+          experimental.  The name 'gnu1x' is deprecated."
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
