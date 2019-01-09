@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45676)
+Received: from eggs.gnu.org ([209.51.188.92]:45672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghGlV-00024E-ES
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:38 -0500
+	(envelope-from <berrange@redhat.com>) id 1ghGlV-00024C-DS
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghGlT-0001A7-30
+	(envelope-from <berrange@redhat.com>) id 1ghGlO-00016R-Eh
 	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40058)
+Received: from mx1.redhat.com ([209.132.183.28]:49672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghGlS-000126-6B
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:34 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghGlO-00012o-8y
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:31:30 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed,  9 Jan 2019 16:31:01 +0000
-Message-Id: <20190109163114.17010-1-berrange@redhat.com>
+Date: Wed,  9 Jan 2019 16:31:02 +0000
+Message-Id: <20190109163114.17010-2-berrange@redhat.com>
+In-Reply-To: <20190109163114.17010-1-berrange@redhat.com>
+References: <20190109163114.17010-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 00/13] Misc fixes / improvements for the docker
- and travis configs
+Subject: [Qemu-devel] [PATCH 01/13] tests: run ldconfig after installing
+ extra software
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +30,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-I've be exploring the possibility of using docker images from within
-travis to let us avoid the ancient versions of ubuntu travis requires.
+The docker file builds and installs software into /usr/local but does
+not run ldconfig. As a result QEMU links to libvirglrenderer.so, but
+then crashes in "make check" unable to find the library.
 
-As part of this I needed todo some refactoring of travis config to
-more consistently structure build / test commands and use of env
-variables. That resulted in this series of misc fixes and improvements
-for both docker & travis configs.
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ tests/docker/dockerfiles/debian-amd64.docker | 2 ++
+ 1 file changed, 2 insertions(+)
 
-I've struggled to get travis to complete successfully in testing this,
-but to best of my knowledge the problems I'm hitting are pre-existing.
-In particular the gprof test fails reliably with 10 min timeout. The
-OS-X build is failing fairly often with "make: write error" which looks
-like a possible travis infrastructure bug AFAICT.  Other tests get some
-non-deterministic failures too which are things we've seen often in
-QEMU.
-
-Daniel P. Berrang=C3=A9 (13):
-  tests: run ldconfig after installing extra software
-  tests: remove obsolete 'debian' dockerfile
-  tests: update Fedora dockerfile to use Fedora 29
-  tests: update Fedora i386 cross image to Fedora 29
-  travis: add whitespace between each major section & matrix entry
-  travis: define all the build matrix entries in one place
-  travis: standardize the syntax used for env variables
-  travis: don't clone git submodules upfront
-  travis: move macOS brew setup into the macOS matrix entries
-  travis: stop redefining the script commands
-  travis: stop using container based envs
-  travis: run tests in verbose mode
-  travis: remove matrix settings that duplicate global settings
-
- .travis.yml                                   | 164 ++++++++++++------
- tests/docker/dockerfiles/debian-amd64.docker  |   2 +
- tests/docker/dockerfiles/debian.docker        |  13 --
- .../dockerfiles/fedora-i386-cross.docker      |   2 +-
- tests/docker/dockerfiles/fedora.docker        |   4 +-
- 5 files changed, 117 insertions(+), 68 deletions(-)
- delete mode 100644 tests/docker/dockerfiles/debian.docker
-
+diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/=
+dockerfiles/debian-amd64.docker
+index 24b113b76f..1f597121dc 100644
+--- a/tests/docker/dockerfiles/debian-amd64.docker
++++ b/tests/docker/dockerfiles/debian-amd64.docker
+@@ -35,5 +35,7 @@ RUN git clone https://github.com/luigirizzo/netmap.git =
+/usr/src/netmap
+ RUN cd /usr/src/netmap/LINUX && ./configure --no-drivers --no-apps --ker=
+nel-dir=3D$(ls -d /usr/src/linux-headers-*-amd64) && make install
+ ENV QEMU_CONFIGURE_OPTS --enable-netmap
+=20
++RUN ldconfig
++
+ # gcrypt
+ ENV QEMU_CONFIGURE_OPTS $QEMU_CONFIGURE_OPTS --enable-gcrypt
 --=20
 2.19.2
