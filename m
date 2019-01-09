@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44762)
+Received: from eggs.gnu.org ([209.51.188.92]:44906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ghBcV-0001EF-Ru
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:02:04 -0500
+	(envelope-from <berrange@redhat.com>) id 1ghBcp-0001SX-6l
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:02:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ghBcT-0003TY-TT
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:01:59 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  9 Jan 2019 11:01:44 +0000
-Message-Id: <20190109110144.18633-1-stefanha@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1ghBco-0003ge-8K
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:02:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghBco-0003gM-1u
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:02:18 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 34034461F8
+	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 11:02:17 +0000 (UTC)
+Date: Wed, 9 Jan 2019 11:02:08 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190109110208.GH3998@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190109085113.GA23677@paraplu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
- iothread race
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190109085113.GA23677@paraplu>
+Subject: Re: [Qemu-devel] Should the "props" be documented for QMP
+ `object-add`?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,128 +34,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Alberto Garcia <berto@igalia.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com
 
-The following QMP command leads to a crash when iothreads are used:
+On Wed, Jan 09, 2019 at 09:51:13AM +0100, Kashyap Chamarthy wrote:
+> I notice that the following QMP command:
+> 
+>     {
+>       "execute":"object-add",
+>       "arguments":{
+>         "qom-type":"tls-creds-x509",
+>         "id":"objlibvirt_migrate_tls0",
+>         "props":{
+>           "dir":"/etc/pki/qemu",
+>           "endpoint":"server",
+>           "verify-peer":true
+>         }
+>       }
+>     }
+> 
+> ... is the same as its command-line equivalent:
+> 
+>     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=yes
+> 
+> That said, in qapi/misc.json "@object-add" doesn't document any of the
+> "props".  Is it on purpose?  Maybe because it is a 1:1 mapping of the
+> command-line `-object` (which _is_ documented in qemu-doc.texi).
+> 
+> Is it a good idea to send a patch to document the "props" in
+> qapi/misc.json?  Or would it be needless duplication?
 
-  { 'execute': 'device_del', 'arguments': {'id': 'data'} }
+It is not practical at this time because object_add uses QOM object
+properties and these are exclusively defined in code, not QAPI schema.
 
-The backtrace involves the queue restart coroutine where
-tgm->throttle_state is a NULL pointer because
-throttle_group_unregister_tgm() has already been called:
+There's a long term todo item to use QAPI schema to define QOM objects,
+which would then auto-generate the boilerplate QOM code, at which point
+it all becomes self-documenting. That's basically lacking dev resources
+to work on it though...
 
-  (gdb) bt full
-  #0  0x00005585a7a3b378 in qemu_mutex_lock_impl (mutex=3D0xfffffffffffff=
-fd0, file=3D0x5585a7bb3d54 "block/throttle-groups.c", line=3D412) at util=
-/qemu-thread-posix.c:64
-        err =3D <optimized out>
-        __PRETTY_FUNCTION__ =3D "qemu_mutex_lock_impl"
-        __func__ =3D "qemu_mutex_lock_impl"
-  #1  0x00005585a79be074 in throttle_group_restart_queue_entry (opaque=3D=
-0x5585a9de4eb0) at block/throttle-groups.c:412
-        _f =3D <optimized out>
-        data =3D 0x5585a9de4eb0
-        tgm =3D 0x5585a9079440
-        ts =3D 0x0
-        tg =3D 0xffffffffffffff98
-        is_write =3D false
-        empty_queue =3D 255
 
-This coroutine should not execute in the iothread after the throttle
-group member has been unregistered!
-
-The root cause is that the device_del code path schedules the restart
-coroutine in the iothread while holding the AioContext lock.  Therefore
-the iothread cannot execute the coroutine until after device_del
-releases the lock - by this time it's too late.
-
-This patch adds a reference count to ThrottleGroupMember so we can
-synchronously wait for restart coroutines to complete.  Once they are
-done it is safe to unregister the ThrottleGroupMember.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-I'm unhappy about adding another synchronous point but haven't found a
-nicer solution.  Only the main loop calls
-throttle_group_unregister_tgm() and the AioContext lock is held, so
-using AIO_WAIT_WHILE() is safe.
-
-Both iothread and non-iothread mode have been tested.  I also tested 2
-scsi-hd instances in the same throttling group to make sure that hot
-unplugging one drive doesn't interfere with the remaining drive in the
-throttling group.
-
- include/block/throttle-groups.h | 5 +++++
- block/throttle-groups.c         | 9 +++++++++
- 2 files changed, 14 insertions(+)
-
-diff --git a/include/block/throttle-groups.h b/include/block/throttle-gro=
-ups.h
-index e2fd0513c4..7492bbc8a8 100644
---- a/include/block/throttle-groups.h
-+++ b/include/block/throttle-groups.h
-@@ -43,6 +43,11 @@ typedef struct ThrottleGroupMember {
-      */
-     unsigned int io_limits_disabled;
-=20
-+    /* Number of pending throttle_group_restart_queue_entry() coroutines=
-.
-+     * Accessed under aio_context lock.
-+     */
-+    unsigned int restart_pending;
-+
-     /* The following fields are protected by the ThrottleGroup lock.
-      * See the ThrottleGroup documentation for details.
-      * throttle_state tells us if I/O limits are configured. */
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index 5d8213a443..a4b15ea428 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -415,6 +415,9 @@ static void coroutine_fn throttle_group_restart_queue=
-_entry(void *opaque)
-     }
-=20
-     g_free(data);
-+
-+    tgm->restart_pending--;
-+    aio_wait_kick();
- }
-=20
- static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool =
-is_write)
-@@ -430,6 +433,8 @@ static void throttle_group_restart_queue(ThrottleGrou=
-pMember *tgm, bool is_write
-      * be no timer pending on this tgm at this point */
-     assert(!timer_pending(tgm->throttle_timers.timers[is_write]));
-=20
-+    tgm->restart_pending++;
-+
-     co =3D qemu_coroutine_create(throttle_group_restart_queue_entry, rd)=
-;
-     aio_co_enter(tgm->aio_context, co);
- }
-@@ -538,6 +543,7 @@ void throttle_group_register_tgm(ThrottleGroupMember =
-*tgm,
-=20
-     tgm->throttle_state =3D ts;
-     tgm->aio_context =3D ctx;
-+    tgm->restart_pending =3D 0;
-=20
-     qemu_mutex_lock(&tg->lock);
-     /* If the ThrottleGroup is new set this ThrottleGroupMember as the t=
-oken */
-@@ -584,6 +590,9 @@ void throttle_group_unregister_tgm(ThrottleGroupMembe=
-r *tgm)
-         return;
-     }
-=20
-+    /* Wait for throttle_group_restart_queue_entry() coroutines to finis=
-h */
-+    AIO_WAIT_WHILE(tgm->aio_context, tgm->restart_pending > 0);
-+
-     qemu_mutex_lock(&tg->lock);
-     for (i =3D 0; i < 2; i++) {
-         assert(tgm->pending_reqs[i] =3D=3D 0);
---=20
-2.20.1
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
