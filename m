@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43992)
+Received: from eggs.gnu.org ([209.51.188.92]:44344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghBZI-0007xR-N0
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:58:41 -0500
+	(envelope-from <philmd@redhat.com>) id 1ghBah-0000EL-SB
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:00:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghBZF-0001bc-T8
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:58:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41142)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghBZ8-0001IQ-PL
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:58:32 -0500
-Date: Wed, 9 Jan 2019 10:58:18 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190109105818.GG3998@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1ghBag-0002Y0-R1
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:00:07 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghBag-0002Xc-Jk
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:00:06 -0500
+Received: by mail-wr1-f67.google.com with SMTP id q18so7184637wrx.9
+	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 03:00:06 -0800 (PST)
+References: <20181114130428.32326-1-asanchez@kryptoslogic.com>
+	<1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
+	<adc671f3-808a-59ef-2650-2b558958a00f@gmx.com>
+	<61ab003f-1b0d-c17d-8827-4d31bba0a53e@gmx.com>
+	<6408287c-15b5-3b44-dff8-b628c4244cd2@redhat.com>
+	<f5c6f0cc-1e45-c47d-724f-c50b27765f0f@gmx.com>
+	<075402ba-b1f1-b7d1-3a6a-47b6dd959133@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <af8e1f23-27e2-3a7e-b911-0abda449dbf2@redhat.com>
+Date: Wed, 9 Jan 2019 12:00:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+In-Reply-To: <075402ba-b1f1-b7d1-3a6a-47b6dd959133@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="whP5HsqlOf2rJ8UXxYYeY3zVgRExIPHoS"
+Subject: Re: [Qemu-devel] [PATCH] hax: Support for Linux hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +35,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Kamil Rytarowski <n54@gmx.com>, Alexandro Sanchez Bach <asanchez@kryptoslogic.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, yu.ning@intel.com, Richard Henderson <rth@twiddle.net>
 
-On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
-> Different versions of GCC and Clang use different versions of the C standard.
-> This repeatedly caused problems already, e.g. with duplicated typedefs:
-> 
->  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
-> 
-> or with for-loop variable initializers:
-> 
->  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
-> 
-> To avoid these problems, we should enforce the C language version to the
-> same level for all compilers. Since our minimum compiler versions are
-> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" already,
-> this seems to be a good choice.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--whP5HsqlOf2rJ8UXxYYeY3zVgRExIPHoS
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Kamil Rytarowski <n54@gmx.com>,
+ Alexandro Sanchez Bach <asanchez@kryptoslogic.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, yu.ning@intel.com,
+ Richard Henderson <rth@twiddle.net>
+Message-ID: <af8e1f23-27e2-3a7e-b911-0abda449dbf2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hax: Support for Linux hosts
+References: <20181114130428.32326-1-asanchez@kryptoslogic.com>
+ <1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
+ <adc671f3-808a-59ef-2650-2b558958a00f@gmx.com>
+ <61ab003f-1b0d-c17d-8827-4d31bba0a53e@gmx.com>
+ <6408287c-15b5-3b44-dff8-b628c4244cd2@redhat.com>
+ <f5c6f0cc-1e45-c47d-724f-c50b27765f0f@gmx.com>
+ <075402ba-b1f1-b7d1-3a6a-47b6dd959133@redhat.com>
+In-Reply-To: <075402ba-b1f1-b7d1-3a6a-47b6dd959133@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-In 4.x   gnu11 is marked as experimental. I'm not really comfortable
-using experimental features - even if its warning free there's a risk
-it would silently mis-compile something.
+On 1/8/19 7:27 PM, Paolo Bonzini wrote:
+> On 08/01/19 18:12, Kamil Rytarowski wrote:
+>> On 25.11.2018 18:14, Paolo Bonzini wrote:
+>>> On 25/11/18 00:50, Kamil Rytarowski wrote:
+>>>> On 22.11.2018 08:24, Kamil Rytarowski wrote:
+>>>>> On 16.11.2018 13:52, Paolo Bonzini wrote:
+>>>>>> On 14/11/18 14:04, Alexandro Sanchez Bach wrote:
+>>>>>>> Intel HAXM supports now 32-bit and 64-bit Linux hosts. This patch=
+ includes
+>>>>>>> the corresponding userland changes.
+>>>>>>>
+>>>>>>> Since the Darwin userland backend is POSIX-compliant, the hax-dar=
+win.{c,h}
+>>>>>>> files have been renamed to hax-posix.{c,h}. This prefix is consis=
+tent with
+>>>>>>> the naming used in the rest of QEMU.
+>>>>>>
+>>>>>> What's the advantage of HAXM when Linux hosts can just run KVM?  I=
+ guess
+>>>>>> avoiding bitrot?
+>>>>>>
+>>>>>> Paolo
+>>>>>>
+>>>>>
+>>>>> This patch is also useful for NetBSD, even if it's not a Linux host=
+=2E
+>>>>> There is a driver in progress again (thanks to the newly added Linu=
+x
+>>>>> port, it's now much easier to get done).
+>>>>>
+>>>>> I recommend to merge this patch.
+>>>>>
+>>>>
+>>>> For the record, I've a functional version of HAXM for NetBSD as host=
+=2E
+>>>> Once you will merge this patch, I will submit another one to configu=
+re
+>>>> to enable haxm for NetBSD.
+>>>>
+>>>> I need to keep the patch by Alexandro in a local copy of qemu.
+>>>
+>>> Sure, it will be accepted for the release after 3.1.
+>>>
+>>> Paolo
+>>>
+>>>
+>>
+>> Ping.
+>=20
+> It's already queued, but the pull request was pretty big and it had som=
+e
+> issues (quite an understatement).
 
-gnu99 is ok with 4.x - it is merely "incomplete".
+Hopefully you queued Alexandro's v2 (which isn't named v2) with Alex
+comments fixed, thanks!
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  configure | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 79375af..07f8105 100755
-> --- a/configure
-> +++ b/configure
-> @@ -107,6 +107,9 @@ update_cxxflags() {
->              -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
->              -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls)
->                  ;;
-> +            -std=gnu11)
-> +                QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }-std=gnu++11
-> +                ;;
->              *)
->                  QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
->                  ;;
-> @@ -585,7 +588,7 @@ ARFLAGS="${ARFLAGS-rv}"
->  # left shift of signed integers is well defined and has the expected
->  # 2s-complement style results. (Both clang and gcc agree that it
->  # provides these semantics.)
-> -QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
-> +QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv -std=gnu11 $QEMU_CFLAGS"
->  QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
->  QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
->  QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
-> -- 
-> 1.8.3.1
-> 
+Phil.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+--whP5HsqlOf2rJ8UXxYYeY3zVgRExIPHoS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEicHnj2Ae6GyGdJXLoqP9bt6twN4FAlw11DMACgkQoqP9bt6t
+wN4iKRAAlxxpMjhjrdcWXkqIrx/F9WfYDuMfn0X/D6Np6G9EmyuxhjO+ByhqQjyh
+nx6wzISoSkVX34gC29seoiD+MeP0uVS7sGEaMiCCOCTzGqN4hrRszHrvEzwa5vQH
+B27kHgJiXiIZ+2bOP/5jVQzAWmQ4kUPQooSSS5OCVUESYA9TZNdo4MoWY67Wwewz
+q8oZG8CptwgwEv65MHfPMRvBfO5vqoRHMABTSV1LZIsZ3yIVq/1d6IZ68j0LvbvI
+znfP4xeYrls8/ST7wVXErAEVGukjLbIVJRNl5qMpmyFXgsnUuDRZCS2T4y9NtRHY
+Z50aHhS+Z0gq3XM4sgxJc6VN7s++/XeuR8m/xipg9DGk+kPK7q7cshBYLN49vACJ
+Sas7L2x9bhoST8BrBHDh30JpaEqi484KypTNaJKJWAubD/DziubSbzUrvrIG1Lzf
+eaBpsQyaizUUog2vAKyrDl/UlI3ZCoJixADusnvKSkJnjitrZecaOSDUpoE3YmGy
+/6B0kJVpGlIP5kwcn7T161BiX5T0uCMhiYq6SLGIvjl9DH2P9wcL01RpvWttD33c
+PcdxLJQ+iXxgyWCEPeeks5Pu7cM02gOBpYOBUBjHZNBeWuVjZvx56v4sAczKQL4b
+rgRuoCMeOVBcZHUn0u8nyZNg8+9U/BEm4Ybg/TTlgalbmbH3IvY=
+=/G2y
+-----END PGP SIGNATURE-----
+
+--whP5HsqlOf2rJ8UXxYYeY3zVgRExIPHoS--
