@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36152)
+Received: from eggs.gnu.org ([209.51.188.92]:36425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghEiU-0001nZ-PW
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:20:23 -0500
+	(envelope-from <pkrempa@redhat.com>) id 1ghEjN-0002Rn-Mt
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:21:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghEiO-0004Q7-DY
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:20:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44310)
+	(envelope-from <pkrempa@redhat.com>) id 1ghEjL-0004yC-J8
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:21:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58498)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghEiJ-0004Nq-Go
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:20:13 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-	<20190109105818.GG3998@redhat.com>
-	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
-	<20190109114459.GK3998@redhat.com>
-	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
-	<87y37udljk.fsf@dusky.pond.sub.org>
-	<f45f44ab-d967-6702-e362-56612401c268@redhat.com>
-Date: Wed, 09 Jan 2019 15:20:07 +0100
-In-Reply-To: <f45f44ab-d967-6702-e362-56612401c268@redhat.com> (Thomas Huth's
-	message of "Wed, 9 Jan 2019 14:17:42 +0100")
-Message-ID: <87k1jdewvc.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1ghEjK-0004wA-JV
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:21:15 -0500
+Date: Wed, 9 Jan 2019 15:13:37 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20190109141337.GG3382@angien.pipo.sk>
+References: <ae9873.3d686.1683223a356.Coremail.wuzhouhui14@mails.ucas.ac.cn>
+	<20190109124258.GD18942@stefanha-x1.localdomain>
+	<234daa90.3dc4b.16832c82ae0.Coremail.wuzhouhui14@mails.ucas.ac.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="XaUbO9McV5wPQijU"
+Content-Disposition: inline
+In-Reply-To: <234daa90.3dc4b.16832c82ae0.Coremail.wuzhouhui14@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [libvirt] Qemu migration with vhost-user-blk on
+ top of local storage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: wuzhouhui <wuzhouhui14@mails.ucas.ac.cn>
+Cc: stefan hajnoczi <stefanha@gmail.com>, libvir-list@redhat.com, xieyongji@baidu.com, spdk@lists.01.org, qemu-devel@nongnu.org, lilin24@baidu.com
 
-Thomas Huth <thuth@redhat.com> writes:
 
-> On 2019-01-09 14:10, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
->>=20
->>> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
->>>> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
->>>>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
->>>>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
->>>>>>> Different versions of GCC and Clang use different versions of the C=
- standard.
->>>>>>> This repeatedly caused problems already, e.g. with duplicated typed=
-efs:
->>>>>>>
->>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
->>>>>>>
->>>>>>> or with for-loop variable initializers:
->>>>>>>
->>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
->>>>>>>
->>>>>>> To avoid these problems, we should enforce the C language version t=
-o the
->>>>>>> same level for all compilers. Since our minimum compiler versions a=
-re
->>>>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" alr=
-eady,
->>>>>>> this seems to be a good choice.
->>>>>>
->>>>>> In 4.x   gnu11 is marked as experimental. I'm not really comfortable
->>>>>> using experimental features - even if its warning free there's a risk
->>>>>> it would silently mis-compile something.
->>>>>>
->>>>>> gnu99 is ok with 4.x - it is merely "incomplete".
->>>>>
->>>>> gnu11 has the big advantage that it also fixes the problem with
->>>>> duplicated typedefs that are reported by older versions of Clang.
->>>>>
->>>>> Are you sure about the experimental character in 4.x? I just looked at
->>>>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it sa=
-ys:
->>>>>
->>>>> "A fourth version of the C standard, known as C11, was published in 2=
-011
->>>>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts of
->>>>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
->>>>>
->>>>> It does not say anything about "experimental" there. The word
->>>>> "experimental" is only used for the C++ support, but we hardly have C=
-++
->>>>> code in QEMU -- if you worry about that, I could simply drop the
->>>>> "-std=3Dgnu++11" part from my patch?
->>>>
->>>> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1.x8=
-6_64:
->>>>
->>>>   "3.4 Options Controlling C Dialect
->>>>
->>>>        ....snip...
->>>>
->>>>      'gnu11'
->>>>      'gnu1x'
->>>>           GNU dialect of ISO C11.  Support is incomplete and
->>>>           experimental.  The name 'gnu1x' is deprecated."
->>>
->>> Ok. Looks like the "Support is incomplete and experimental" sentence has
->>> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
->>> already. IMHO we could give it a try and enable gnu11 for QEMU with GCC
->>> v4.8, too. If we later find problems, we could still switch back to
->>> gnu99 instead. Other opinions?
->>=20
->> Switchinh back could be somewhat painful if we already started using C11
->> features.  And if we don't plan to, then what exactly will -std=3Dgnu11
->> buy us?
->
-> With C11, we get safety for the "duplicated typedef" problem that we run
-> into regularly again and again, see e.g.:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+--XaUbO9McV5wPQijU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-That's a compilation failure.  "Support is experimental" makes me afraid
-of run time failures.
+On Wed, Jan 09, 2019 at 21:23:25 +0800, wuzhouhui wrote:
+> > -----Original Messages-----
+> > From: "Stefan Hajnoczi" <stefanha@gmail.com>
+> > Sent Time: 2019-01-09 20:42:58 (Wednesday)
+> > To: wuzhouhui <wuzhouhui14@mails.ucas.ac.cn>
+> > Cc: qemu-devel@nongnu.org, xieyongji@baidu.com, lilin24@baidu.com, libv=
+ir-list@redhat.com, spdk@lists.01.org
+> > Subject: Re: [Qemu-devel] Qemu migration with vhost-user-blk on top of =
+local storage
+> >=20
+> > On Wed, Jan 09, 2019 at 06:23:42PM +0800, wuzhouhui wrote:
+> > > Hi everyone,
+> > >=20
+> > > I'm working qemu with vhost target (e.g. spdk), and I attempt to migr=
+ate VM with
+> > > 2 local storages. One local storage is a regular file, e.g. /tmp/c74.=
+qcow2, and
+> > > the other is a malloc bdev that spdk created. This malloc bdev will e=
+xported to
+> > > VM via vhost-user-blk. When I execute following command:
+> > >=20
+> > >   virsh migrate --live --persistent --unsafe --undefinesource --copy-=
+storage-all \
+> > >      --p2p --auto-converge --verbose --desturi qemu+tcp://<uri>/syste=
+m vm0
+> > >=20
+> > > The libvirt reports:
+> > >=20
+> > >   qemu-2.12.1: error: internal error: unable to execute QEMU command \
+> > >     'nbd-server-add': Cannot find device=3Ddrive-virtio-disk1 nor \
+> > >     node_name=3Ddrive-virtio-disk1
+> >=20
+> > Please post your libvirt domain XML.
+>=20
+> My libvirt is based on libvirt-1.1.1-29.el7, and add many patches to sati=
+sfy our
+> own needs, e.g. add support for vhost-user-blk. Post domain xml may not u=
+seful.
 
-If we truly want C11, shouldn't we bump minimum required GCC to 4.9?
+So you added support for vhost-user-blk, but did not fix the
+NBD migration code. You are on your own, sorry. We can't support
+arbitrary downstream changes.
+
+Please either upstream your patches or make sure to skip it for
+vhost-user.
+
+--XaUbO9McV5wPQijU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlw2AY0ACgkQHGwCByjY
+1GqX/BAAtmbX0vRyxN3iLDhqtF8aDLFz2vIvdbKTV61vCFRKp68pqdtoMppScwYc
+yVqbKqGssScVKFvDI3UvMYiQAKA/f25Pns9xobT9JKBaji3nbUGcSL/aDMcm7v4z
+tiXr3q8v402TF5zv9Odtg5KLUsjd35Ny3Dcw6DDcGqcckCmoAxSay0ieTrYpkb43
+ptoEncd3z0/BdXj/7p1WKtArfDR8whvVhO/5/kB0xXq9zjtgIggFonis+vaqcTqG
+chqXIGgM5nx6tI6iN2fbelBZOj89gxwTVfCqZqd0dY6x/s7HAs7L39/Y6QaEx8qo
+qsQ/3Iiqrr97ib8E67nIXrl8S7vahvXonlx9V91bbFdf/Uvdq0HqIvILY2/U03GG
+xuQI8QGZCLEbwUhg59yVvEQvy2Z6uktPytggUSL+j7G5YPQgLR/3iRvDT3SOShhQ
+VPMUmSpulkTKZH0f6z1wmYcSPWfUZKl/Ktba1eZhomuMU/kEUTA31A+W4Y1cboJp
+vnZrpg/rGsDbjCgIPin8XDE+JloZrctA/XijIDjxbzJCSTeapSjQqbMZC1gn0tVN
+ZBhdal+Mkjg1DCzC6629uqFGTnr6uQrR90Skz+duKqhTcLPTApCv7OBa2gVCsW8l
+d/uj3dgfKXw+/B9Xw/lqfBs9lVtuJKmLhqcMu6YjDPMifETsqcc=
+=PjtD
+-----END PGP SIGNATURE-----
+
+--XaUbO9McV5wPQijU--
