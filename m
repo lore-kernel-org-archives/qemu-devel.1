@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38516)
+Received: from eggs.gnu.org ([209.51.188.92]:40063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghHxS-0007su-Gt
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:48:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghI2C-0001Uj-BX
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:52:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghHxP-00068Y-OM
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:48:02 -0500
-Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:50182)
+	(envelope-from <eblake@redhat.com>) id 1ghI2B-0001G5-Gy
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:52:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57076)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ghHxP-00066s-J2
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:47:59 -0500
-Received: from player693.ha.ovh.net (unknown [10.109.143.109])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 60DBE1EC7A1
-	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 18:47:57 +0100 (CET)
-Date: Wed, 9 Jan 2019 18:47:45 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190109184745.1e61b5bf@bahia.lan>
-In-Reply-To: <ab4e0a6a-3a9f-8f27-a86e-e283bb737cf7@kaod.org>
-References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
-	<1547051976-13982-2-git-send-email-thuth@redhat.com>
-	<3316bf08-36c0-c3ce-4e4f-8244276c58d3@kaod.org>
-	<20190109172801.GB3998@redhat.com>
-	<ab4e0a6a-3a9f-8f27-a86e-e283bb737cf7@kaod.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ghI2B-0001Dw-88
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:52:55 -0500
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+	<a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+	<200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
+	<20190109172023.GK4867@localhost.localdomain>
+	<be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b8cc5195-d8f7-d971-f449-fa62e434437b@redhat.com>
+Date: Wed, 9 Jan 2019 11:52:52 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
- compilation with clang -std=gnu99
+In-Reply-To: <be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QNv66DgGkblyXh3wPTOabQps1zE6137ao"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
+ ID anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,139 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
+To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: armbru@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, muriloo@linux.ibm.com, dgilbert@redhat.com
 
-On Wed, 9 Jan 2019 18:40:48 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QNv66DgGkblyXh3wPTOabQps1zE6137ao
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: armbru@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>,
+ qemu-devel@nongnu.org, muriloo@linux.ibm.com, dgilbert@redhat.com
+Message-ID: <b8cc5195-d8f7-d971-f449-fa62e434437b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use ID
+ anymore
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+ <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+ <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+ <200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
+ <20190109172023.GK4867@localhost.localdomain>
+ <be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
+In-Reply-To: <be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-> On 1/9/19 6:28 PM, Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Jan 09, 2019 at 06:13:01PM +0100, C=C3=A9dric Le Goater wrote: =
-=20
-> >> On 1/9/19 5:39 PM, Thomas Huth wrote: =20
-> >>> When compiling with Clang and -std=3Dgnu99, I get the following error=
-s:
-> >>>
-> >>>   CC      ppc64-softmmu/hw/intc/xics_spapr.o
-> >>> In file included from hw/intc/xics_spapr.c:34:
-> >>> include/hw/ppc/xics.h:46:25: error: redefinition of typedef 'ICSState=
-' is a C11 feature
-> >>>       [-Werror,-Wtypedef-redefinition]
-> >>> typedef struct ICSState ICSState;
-> >>>                         ^
-> >>> include/hw/ppc/spapr.h:18:25: note: previous definition is here
-> >>> typedef struct ICSState ICSState;
-> >>>                         ^
-> >>> In file included from hw/intc/xics_spapr.c:34:
-> >>> include/hw/ppc/xics.h:203:34: error: redefinition of typedef 'sPAPRMa=
-chineState' is a C11 feature
-> >>>       [-Werror,-Wtypedef-redefinition]
-> >>> typedef struct sPAPRMachineState sPAPRMachineState;
-> >>>                                  ^
-> >>> include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
-> >>> typedef struct sPAPRMachineState sPAPRMachineState;
-> >>>                                  ^
-> >>>   CC      ppc64-softmmu/hw/intc/spapr_xive.o
-> >>> In file included from hw/intc/spapr_xive.c:19:
-> >>> include/hw/ppc/spapr_xive.h:38:3: error: redefinition of typedef 'sPA=
-PRXive' is a C11 feature
-> >>>       [-Werror,-Wtypedef-redefinition]
-> >>> } sPAPRXive;
-> >>>   ^
-> >>> include/hw/ppc/spapr.h:20:26: note: previous definition is here
-> >>> typedef struct sPAPRXive sPAPRXive;
-> >>>                          ^
-> >>> In file included from hw/intc/spapr_xive.c:19:
-> >>> include/hw/ppc/spapr_xive.h:45:34: error: redefinition of typedef 'sP=
-APRMachineState' is a C11 feature
-> >>>       [-Werror,-Wtypedef-redefinition]
-> >>> typedef struct sPAPRMachineState sPAPRMachineState;
-> >>>                                  ^
-> >>> include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
-> >>> typedef struct sPAPRMachineState sPAPRMachineState;
-> >>>                                  ^
-> >>>   CC      ppc64-softmmu/hw/char/spapr_vty.o
-> >>> In file included from hw/char/spapr_vty.c:8:
-> >>> In file included from include/hw/ppc/spapr.h:12:
-> >>> include/hw/ppc/spapr_xive.h:45:34: error: redefinition of typedef 'sP=
-APRMachineState' is a C11 feature
-> >>>       [-Werror,-Wtypedef-redefinition]
-> >>> typedef struct sPAPRMachineState sPAPRMachineState;
-> >>>                                  ^
-> >>> include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
-> >>> typedef struct sPAPRMachineState sPAPRMachineState;
-> >>>                                  ^
-> >>>
-> >>> Since we're going to make -std=3Dgnu99 mandatory, fix these issues
-> >>> by including the right header files indead of typedeffing stuff twice.
-> >>>
-> >>> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >>> ---
-> >>>  include/hw/ppc/spapr.h      | 4 ++--
-> >>>  include/hw/ppc/spapr_xive.h | 2 +-
-> >>>  include/hw/ppc/xics.h       | 4 ++--
-> >>>  3 files changed, 5 insertions(+), 5 deletions(-)
-> >>>
-> >>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >>> index 2c77a8b..6a5ae4f 100644
-> >>> --- a/include/hw/ppc/spapr.h
-> >>> +++ b/include/hw/ppc/spapr.h
-> >>> @@ -8,6 +8,8 @@
-> >>>  #include "hw/mem/pc-dimm.h"
-> >>>  #include "hw/ppc/spapr_ovec.h"
-> >>>  #include "hw/ppc/spapr_irq.h"
-> >>> +#include "hw/ppc/xics.h"
-> >>> +#include "hw/ppc/spapr_xive.h"
-> >>> =20
-> >>>  struct VIOsPAPRBus;
-> >>>  struct sPAPRPHBState;
-> >>> @@ -15,8 +17,6 @@ struct sPAPRNVRAM;
-> >>>  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
-> >>>  typedef struct sPAPREventSource sPAPREventSource;
-> >>>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
-> >>> -typedef struct ICSState ICSState;
-> >>> -typedef struct sPAPRXive sPAPRXive;
-> >>> =20
-> >>>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
-> >>>  #define SPAPR_ENTRY_POINT       0x100
-> >>> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> >>> index 728735d..aff4366 100644
-> >>> --- a/include/hw/ppc/spapr_xive.h
-> >>> +++ b/include/hw/ppc/spapr_xive.h
-> >>> @@ -42,7 +42,7 @@ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t =
-lisn);
-> >>>  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-> >>>  qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
-> >>> =20
-> >>> -typedef struct sPAPRMachineState sPAPRMachineState;
-> >>> +#include "hw/ppc/spapr.h"  /* for sPAPRMachineState */ =20
-> >>
-> >> so both files include each other, how nice ... =20
-> >=20
-> > If the header files are mutually dependent it makes me wonder what the
-> > point of having them split up is ? =20
+On 1/9/19 11:38 AM, Max Reitz wrote:
+
 >=20
-> The XICS interrupt controller models are used in two different machines,
-> sPAPR and PowerNV.
->=20
-> > Feels like either they need to be merged, or they need to be split up
-> > and refactored even more to remove the mutual dependancy. =20
->=20
-> yes or that some spapr_* definitions do not belong to the common xics.h
-> file.
+> <general whining>
+> Actually, to me what you're saying sounds more like "Our deprecation
+> policy is useless" to which I wholeheartedly agree.  I think we should
+> only remove things in major releases, and only if it was deprecated in
+> the previous major release already.  (So if you deprecate something in
+> 4.0, you can remove it in 5.0; but if you deprecate it in 4.1, you can
+> remove it only in 6.0.)  From a user standpoint I really think we
+> deprecate stuff too irregularly.
+> </general whining>
 
-Yeah,
+That's actually incorrect. Our current version numbering scheme is that
+the major version number is NOT synonymous with major releases: we just
+bump the major version number once per year, and ALL releases are on
+equal footing with no one release being more major than others.  Thus, a
+policy that (at least) 2 releases is needed for a deprecation is
+consistent, where one that requires waiting for a bump in the major
+version number (which is as short as one release and as long as 3, given
+that we bump every year with about 3 releases per year) is the one that
+is less predictable and less meaningful (why is waiting for January
+better than waiting for 2 releases?).
 
-These should move to a new xics_spapr.h or maybe even spapr.h for simplicit=
-y:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
-                   uint32_t phandle);
-int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-void xics_spapr_init(sPAPRMachineState *spapr);
 
-> =20
-> Thanks,
->=20
-> C.
->=20
+--QNv66DgGkblyXh3wPTOabQps1zE6137ao
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw2NPQACgkQ3g5py3or
+ov3TRggAgTo1KYBk/PHbtQeNwswmO28LDmgJPJmPthzPZWbS9zrPOYwX2WoGzNFp
+5SGJsmjx9ZgrxWgRX0YyDIfNCdWbM7B5+FhX/yejTwuDX2Iqxr5Ppdhi+rdUlrkx
+uoVEAx7HxXM8rHCoIdUej/KDPlTrW1eYbbcqAKsOIDCvIfzEhtxJxwmbRm+gc8kK
+MCIQE3mQYlsKl48mQ8cdUPmfAmB99kYQy7pjGX3FeRlsxVkpzzPNr+kHgnyqiUsD
+UGHfqxRxHgJeUEjijWWUyy/7r1Fm1lVL7E4Nf1uSZ5kwYd+qR8sWP4ZrNn5vyk+E
+Aaft1hiz72ei2myNkea8u5tT72Jgpg==
+=QEoI
+-----END PGP SIGNATURE-----
+
+--QNv66DgGkblyXh3wPTOabQps1zE6137ao--
