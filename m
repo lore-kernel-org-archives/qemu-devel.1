@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52467)
+Received: from eggs.gnu.org ([209.51.188.92]:52879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghH9I-0004rn-Ga
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:56:13 -0500
+	(envelope-from <danielhb413@gmail.com>) id 1ghHAl-000681-Mg
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:57:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghH9H-0005v8-Rb
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:56:12 -0500
-References: <20190108194552.45453-1-vsementsov@virtuozzo.com>
-	<20190109112311.GB4867@localhost.localdomain>
-	<5ddd78e0-90ed-a6e5-c454-f1a2e44c1a37@redhat.com>
-	<20190109165111.GI4867@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <61f6ac4d-91ab-f9cb-67e5-e0f5ce17524d@redhat.com>
-Date: Wed, 9 Jan 2019 17:55:41 +0100
+	(envelope-from <danielhb413@gmail.com>) id 1ghHAk-0006Sl-Kl
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:57:43 -0500
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:40343)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1ghHAk-0006SH-G8
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:57:42 -0500
+Received: by mail-qk1-x741.google.com with SMTP id y16so4803022qki.7
+	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 08:57:41 -0800 (PST)
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+Date: Wed, 9 Jan 2019 14:57:37 -0200
 MIME-Version: 1.0
-In-Reply-To: <20190109165111.GI4867@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] file-posix: add rough-block-status
- parameter
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
+ ID anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +32,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, fam@euphon.net, stefanha@redhat.com, den@openvz.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, kwolf@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com
 
-On 09/01/19 17:51, Kevin Wolf wrote:
-> Am 09.01.2019 um 17:42 hat Paolo Bonzini geschrieben:
->> On 09/01/19 12:23, Kevin Wolf wrote:
->>> Also note that this is only metadata preallocation; full preallocation
->>> will still return allocated for the protocol layer and so it will always
->>> be slow.
+
+
+On 1/9/19 12:10 PM, Max Reitz wrote:
+> On 06.09.18 13:11, Daniel Henrique Barboza wrote:
+>> changes in v2:
+>> - removed the "RFC" marker;
+>> - added a new patch (patch 2) that removes
+>> bdrv_snapshot_delete_by_id_or_name from the code;
+>> - made changes in patch 1 as suggested by Murilo;
+>> - previous patch set link:
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg04658.html
 >>
->> Full preallocation these days can create images with preallocated but
->> known-zero blocks, I think?
-> 
-> That would defeat one of the main purposes of preallocation because it
-> would still require COW and metadata updates on the first write.
+>>
+>> It is not uncommon to see bugs being opened by testers that attempt to
+>> create VM snapshots using HMP. It turns out that "0" and "1" are quite
+>> common snapshot names and they trigger a lot of bugs. I gave an example
+>> in the commit message of patch 1, but to sum up here: QEMU treats the
+>> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'. It
+>> is documented as such, but this can lead to strange situations.
+>>
+>> Given that it is strange for an API to consider a parameter to be 2 fields
+>> at the same time, and inadvently treating them as one or the other, and
+>> that removing the ID field is too drastic, my idea here is to keep the
+>> ID field for internal control, but do not let the user set it.
+>>
+>> I guess there's room for discussion about considering this change an API
+>> change or not. It doesn't affect users of HMP and it doesn't affect Libvirt,
+>> but simplifying the meaning of the parameters of savevm/loadvm/delvm.
+> (Yes, very late reply, I'm sorry...)
+>
+> I do think it affects users of HMP, because right now you can delete
+> snapshots with their ID, and after this series you cannot.
 
-Sorry I mean at the protocol level, like FALLOC_FL_ZERO_RANGE.  It would
-still require metadata updates on the filesystem level, unlike "real"
-full preallocation, but no qcow2 metadata updates.
-> If there is demand, we could add something like preallocation=data where
-> data clusters are preallocated but COW/metadata updates still happen at
-> runtime, but so far nobody has asked for it. Not sure when you would use
-> it either.
-> 
-> Kevin
-> 
+That's true. My idea here was simple: the user can't reliably exclude 
+via snapshot ID today
+because we're hiding the ID field in info snapshots:
+
+
+     (qemu) savevm 0
+     (qemu) info snapshots
+     List of snapshots present on all disks:
+     ID        TAG                 VM SIZE                DATE VM CLOCK
+     --        0                      741M 2018-07-31 13:39:56 00:41:25.313
+
+
+Thus, what will end up happening is that the user will be forced to use the
+TAG of the snapshot since this is the only available information.
+
+
+>
+> I think we had a short discussion about just disallowing numeric
+> snapshot names.  How bad would that be?
+
+
+This was my first idea when evaluating what to do in this case. I gave 
+it up because
+I found it to be too extreme. People would start complaining "I was able 
+to do
+savevm 0 and now I can't".
+
+
+
+>
+> Max
+>
