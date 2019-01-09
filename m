@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41046)
+Received: from eggs.gnu.org ([209.51.188.92]:41217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geert.uytterhoeven@gmail.com>) id 1ghGW2-0000Io-FT
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:15:40 -0500
+	(envelope-from <ldoktor@redhat.com>) id 1ghGWb-0000YK-Q6
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:16:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geert.uytterhoeven@gmail.com>) id 1ghGW0-0004Kg-GY
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:15:38 -0500
+	(envelope-from <ldoktor@redhat.com>) id 1ghGWa-0004uW-QX
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:16:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1ghGWa-0004sM-G6
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:16:12 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9979A368DD
+	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 16:07:48 +0000 (UTC)
+References: <20190109102311.7635-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <6e3df370-15c7-3e58-6fba-b795131b8779@redhat.com>
+Date: Wed, 9 Jan 2019 17:07:31 +0100
 MIME-Version: 1.0
-References: <20190103094211.28473-1-geert+renesas@glider.be>
-	<acd10959-a781-d3bf-dc67-bda878740ec9@redhat.com>
-In-Reply-To: <acd10959-a781-d3bf-dc67-bda878740ec9@redhat.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 9 Jan 2019 17:15:00 +0100
-Message-ID: <CAMuHMdXgoAL7B0F4pL51uLcQZWM0BLisDSAXMhW5O3s0yGVGMg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH QEMU v5] hw/arm/sysbus-fdt: Add support for
- instantiating generic devices
+In-Reply-To: <20190109102311.7635-1-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bhoj5LY3XG96sbb9bxh2L6QjPCC5uYby8"
+Subject: Re: [Qemu-devel] [PATCH] qdev: fix -device scsi-hd,help regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,298 +33,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Magnus Damm <damm+renesas@opensource.se>, Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, cohuck@redhat.com, ehabkost@redhat.com
 
-Hi Eric,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bhoj5LY3XG96sbb9bxh2L6QjPCC5uYby8
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, cohuck@redhat.com, ehabkost@redhat.com
+Message-ID: <6e3df370-15c7-3e58-6fba-b795131b8779@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qdev: fix -device scsi-hd,help regression
+References: <20190109102311.7635-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190109102311.7635-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for your comments!
+Dne 09. 01. 19 v 11:23 Marc-Andr=C3=A9 Lureau napsal(a):
+> Since commit ea9ce8934, device_post_init() applies globals directly
+> from machines and accelerator classes.
+>=20
+> There are cases, such as -device scsi-hd,help, where the machine is
+> setup but there in no accelerator.
+>=20
+> Let's skip accelerator globals in this case.
+>=20
+> Fixes SEGV:
+>  #0  0x0000555558ea04ff in object_get_class (obj=3D0x0) at /home/elmarc=
+o/src/qemu/build/../qom/object.c:857
+>  #1  0x000055555854c797 in object_apply_compat_props (obj=3D0x616000078=
+980) at /home/elmarco/src/qemu/build/../hw/core/qdev.c:978
+>  #2  0x000055555854c797 in object_apply_compat_props (obj=3D0x616000078=
+980) at /home/elmarco/src/qemu/build/../hw/core/qdev.c:973
+>  #3  0x000055555854c959 in device_post_init (obj=3D0x616000078980) at /=
+home/elmarco/src/qemu/build/../hw/core/qdev.c:989
+>  #4  0x0000555558e9e250 in object_post_init_with_type (ti=3D<optimized =
+out>, obj=3D0x616000078980) at /home/elmarco/src/qemu/build/../qom/object=
+=2Ec:365
+>  #5  0x0000555558e9e250 in object_initialize_with_type (data=3D0x616000=
+078980, size=3D616, type=3D<optimized out>) at /home/elmarco/src/qemu/bui=
+ld/../qom/object.c:425
+>  #6  0x0000555558e9e571 in object_new_with_type (type=3D0x613000031900)=
+ at /home/elmarco/src/qemu/build/../qom/object.c:588
+>  #7  0x000055555830c048 in qmp_device_list_properties (typename=3Dtypen=
+ame@entry=3D0x60200000c2d0 "scsi-hd", errp=3Derrp@entry=3D0x7fffffffc540)=
+ at /home/elmarco/src/qemu/qmp.c:519
+>  #8  0x00005555582c4027 in qdev_device_help (opts=3D<optimized out>) at=
+ /home/elmarco/src/qemu/qdev-monitor.c:283
+>  #9  0x0000555559378fa2 in qemu_opts_foreach (list=3D<optimized out>, f=
+unc=3Dfunc@entry=3D0x5555582cfca0 <device_help_func>, opaque=3Dopaque@ent=
+ry=3D0x0, errp=3Derrp@entry=3D0x0) at /home/elmarco/src/qemu/util/qemu-op=
+tion.c:1171
+>=20
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1664364
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/core/qdev.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 3769a2bccb..47bddacb4f 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -975,10 +975,13 @@ void object_apply_compat_props(Object *obj)
+>      if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
+>          MachineState *m =3D MACHINE(qdev_get_machine());
+>          MachineClass *mc =3D MACHINE_GET_CLASS(m);
+> -        AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
+> =20
+> -        if (ac->compat_props) {
+> -            object_apply_global_props(obj, ac->compat_props, &error_ab=
+ort);
+> +        if (m->accelerator) {
+> +            AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
+> +
+> +            if (ac->compat_props) {
+> +                object_apply_global_props(obj, ac->compat_props, &erro=
+r_abort);
+> +            }
+>          }
+>          object_apply_global_props(obj, mc->compat_props, &error_abort)=
+;
+>      }
+>=20
 
-On Wed, Jan 9, 2019 at 4:56 PM Auger Eric <eric.auger@redhat.com> wrote:
-> On 1/3/19 10:42 AM, Geert Uytterhoeven wrote:
-> > Add a fallback for instantiating generic devices without a type-specific
-> > or compatible-specific instantiation method.  This will be used when no
-> > other match is found.
-> >
-> > Generic device instantiation avoids having to write device-specific
-> > instantiation methods for each and every "simple" device using only a
-> > set of generic properties.  Devices that need more specialized handling
-> > can still provide their own instantiation methods.
-> >
-> > The generic instantiation method creates a device node with remapped
-> > "reg" and (optional) "interrupts" properties, and copies properties from
-> > the host, if deemed appropriate:
-> >   - In general, properties without phandles are safe to be copied.
-> >     Unfortunately, the FDT does not carry type information, hence an
-> >     explicit whitelist is used, which can be extended when needed.
-> >   - Properties related to power management (power and/or clock domain),
-> >     isolation, and pin control, are handled by the host, and must not to
-> >     be copied.
-> >
-> > Devices nodes with subnodes are rejected, as subnodes cannot easily be
-> > handled in a generic way.
-> >
-> > This has been tested on a Renesas Salvator-XS board (R-Car H3 ES2.0)
-> > with SATA, using:
-> >
-> >     -device vfio-platform,host=ee300000.sata
-> >
-> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > ---
-> > Note: Also tested with GPIO, which needs "vfio: No-IOMMU mode support":
-> >
-> >     -device vfio-platform,host=e6055400.gpio
-> >
-> > v5:
-> >   - Replace copying of a fixed list of properties (and ignoring all
-> >     others), by scanning all properties on the host, and deciding if
-> >     they need to be ignored, copied, or rejected,
-> >   - Reject device nodes with subnodes,
-> >   - Handle edge interrupts,
-> >
-> > v3:
-> >   - New.
+Thank you, this addresses my issue and doesn't seem to introduce new ones=
+=2E
 
-> > --- a/hw/arm/sysbus-fdt.c
-> > +++ b/hw/arm/sysbus-fdt.c
+Reviewed-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>=20
 
-> > +static struct {
-> > +    const char *name;
-> > +    enum GenericPropertyAction action;
-> > +} generic_properties[] = {
-> > +    { "name",            PROP_IGNORE }, /* handled automatically */
-> > +    { "phandle",         PROP_IGNORE }, /* not needed for the generic case */
-> > +
-> > +    /* The following are copied and remapped by dedicated code */
-> > +    { "reg",             PROP_IGNORE },
-> > +    { "interrupts",      PROP_IGNORE },
-> Shouldn't interrupt-parent be safely ignored as remapped?
 
-Probably. Typically interrupt-parent is present at a higher level.
-And interrupts-extended should be ignored, too.
+--bhoj5LY3XG96sbb9bxh2L6QjPCC5uYby8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> > +
-> > +    /* The following are handled by the host */
-> > +    { "power-domains",   PROP_IGNORE }, /* power management (+ opt. clocks) */
-> > +    { "iommus",          PROP_IGNORE }, /* isolation */
-> > +    { "resets",          PROP_IGNORE }, /* isolation */
-> > +    { "pinctrl-*",       PROP_IGNORE }, /* pin control */
-> > +
-> > +    /* Ignoring the following may or may not work, hence the warning */
-> > +    { "gpio-ranges",     PROP_WARN },   /* no support for pinctrl yet */
-> > +    { "dmas",            PROP_WARN },   /* no support for external DMACs yet */
-> I would be tempted to simply reject things that may not work.
+-----BEGIN PGP SIGNATURE-----
 
-I kept gpio-ranges, as it works with my rcar-gpio proof of concept
-(depends on with no-iommu support).
-Without dmas, drivers are supposed to fall back to PIO.  If a driver
-doesn't support that, it will complain.
+iQEzBAEBCAAdFiEEpApMRcQDTeAqWtSDJrNi5H/PIsEFAlw2HEMACgkQJrNi5H/P
+IsEvDQf/apVjYCKuBC5dSTOIUO30PkmVXy148FmAos9SoHrJphR9h0vjaAZHxewo
+uOHkB/YmO24cqv/EisG42K2cPbxLhBh5KhxIZoVK9ywLZRrs7AWNBY5XnBU9CKNs
+s1Q6lu698PJV7Q5MbAcLYXsE3FpoUtRTZ3i2tiqoeZflqHox59Cfqq2nKH8pjxXd
+SZ3SkRSArqiqb3hWyXjND7DDDtiGZtEezdp7p0N9OQHw/m8icq0kRu5mhoUhGrzl
+I88Tmw2PtnV3OteF3rbiryLOUvOIpP46WNtbiibTM431l+6jeIXP7BwoJKvtOs8j
+v1XoOAzzOe88+0upZqjFt7CrvPQUjQ==
+=BV4E
+-----END PGP SIGNATURE-----
 
-> > +
-> > +    /* The following are irrelevant, as corresponding specifiers are ignored */
-> > +    { "clock-names",     PROP_IGNORE },
-> > +    { "reset-names",     PROP_IGNORE },
-> > +    { "dma-names",       PROP_IGNORE },
-> > +
-> > +    /* Whitelist of properties not taking phandles, and thus safe to copy */
-> > +    { "compatible",      PROP_COPY },
-> > +    { "status",          PROP_COPY },
-> > +    { "reg-names",       PROP_COPY },
-> > +    { "interrupt-names", PROP_COPY },
-> > +    { "#*-cells",        PROP_COPY },
-> > +};
-> > +
-> > +#ifndef CONFIG_FNMATCH
-> > +/* Fall back to exact string matching instead of allowing wildcards */
-> > +static inline int fnmatch(const char *pattern, const char *string, int flags)
-> > +{
-> > +        return strcmp(pattern, string);
-> > +}
-> > +#endif
-
-> > +/**
-> > + * copy_generic_node
-> > + *
-> > + * Copy the generic part of a DT node from the host
-> > + */
-> > +static void copy_generic_node(void *host_fdt, void *guest_fdt, char *host_path,
-> > +                              char *guest_path)
-> > +{
-> > +    int node, prop, len;
-> > +    const void *data;
-> > +    const char *name;
-> > +    enum GenericPropertyAction action;
-> > +
-> > +    node = fdt_path_offset(host_fdt, host_path);
-> > +    if (node < 0) {
-> > +        error_report("Cannot find node %s: %s", host_path, fdt_strerror(node));
-> > +        exit(1);
-> > +    }
-> > +
-> > +    /* Submodes are not yet supported */
-> > +    if (fdt_first_subnode(host_fdt, node) >= 0) {
-> > +        error_report("%s has unsupported subnodes", host_path);
-> > +        goto unsupported;
-> > +    }
-> > +
-> > +    /* Copy generic properties */
-> > +    fdt_for_each_property_offset(prop, host_fdt, node) {
-> > +        data = fdt_getprop_by_offset(host_fdt, prop, &name, &len);
-> > +        if (!data) {
-> > +            error_report("Cannot get property of %s: %s", host_path,
-> > +                         fdt_strerror(len));
-> > +            exit(1);
-> > +        }
-> > +
-> > +        if (!len) {
-> > +            /* Zero-sized properties are safe to copy */
-> > +            action = PROP_COPY;
-> > +        } else if (!strcmp(name, "clocks")) {
-> > +            /* Reject "clocks" if "power-domains" is not present */
-> Could you elaborate on clock management with and without power-domain.
-> If clock handles can be found on host side, don't we need to generate
-> clock nodes on guest side (as what was done with the amd xgmac). And in
-> that case don't you need clock-names prop too?
->
-> Please can you explain how the fact power-domain is not present
-> simplifies the problem. It is not obvious to me.
-
-In the presence of a power-domains property, it's possible the clocks are
-used for power management only (if the device is part of a clock domain).
-In that case, the guest doesn't need to manage the clock.
-Qemu will still print a warning, as it cannot be 100% sure that the clocks
-are not needed.
-
-In the absence of a power-domains property, it is assumed the clocks are
-needed, and the device node is rejected.
-Qemu could be enhanced to inspect all clocks and copy fixed-rate clocks,
-like is done for xgmac, but that can be added later, if someone has a need
-for it.
-
-For an initial version, I try to keep it generic, but not too complicated ;-)
-
-For complex cases, you can always write a device-specific instantiation
-method.
-
-> > +            action = fdt_getprop(host_fdt, node, "power-domains", NULL)
-> > +                     ? PROP_WARN : PROP_REJECT;
-> > +        } else {
-> > +            action = get_generic_property_action(name);
-> > +        }
-> > +
-> > +        switch (action) {
-> > +        case PROP_WARN:
-> > +            warn_report("%s: Ignoring %s property", host_path, name);
-> > +        case PROP_IGNORE:
-> > +            break;
-> > +
-> > +        case PROP_COPY:
-> > +            qemu_fdt_setprop(guest_fdt, guest_path, name, data, len);
-> > +            break;
-> > +
-> > +        case PROP_REJECT:
-> > +            error_report("%s has unsupported %s property", host_path, name);
-> > +            goto unsupported;
-> > +        }
-> > +    }
-> > +    return;
-> > +
-> > +unsupported:
-> > +    error_report("You can ask a wizard to enhance me");
-> maybe report which property causes the assignment abort
-
-That's already done above.
-
-> > +    exit(1);
-> > +}
-> > +
-> > +/**
-> > + * add_generic_fdt_node
-> > + *
-> > + * Generates a generic DT node by copying properties from the host
-> > + */
-> > +static int add_generic_fdt_node(SysBusDevice *sbdev, void *opaque)
-> > +{
-> > +    PlatformBusFDTData *data = opaque;
-> > +    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
-> > +    const char *parent_node = data->pbus_node_name;
-> > +    void *guest_fdt = data->fdt, *host_fdt;
-> > +    VFIODevice *vbasedev = &vdev->vbasedev;
-> > +    char **node_path, *node_name, *dt_name;
-> > +    PlatformBusDevice *pbus = data->pbus;
-> > +    uint32_t *reg_attr, *irq_attr;
-> > +    uint64_t mmio_base;
-> > +    int i, irq_number;
-> > +    VFIOINTp *intp;
-> > +
-> > +    host_fdt = load_device_tree_from_sysfs();
-> > +
-> > +    dt_name = sysfs_to_dt_name(vbasedev->name);
-> > +    if (!dt_name) {
-> > +        error_report("%s incorrect sysfs device name %s", __func__,
-> > +                     vbasedev->name);
-> > +        exit(1);
-> > +    }
-> > +    node_path = qemu_fdt_node_path(host_fdt, dt_name, vdev->compat,
-> > +                                   &error_fatal);
-> > +    if (!node_path || !node_path[0]) {
-> > +        error_report("%s unable to retrieve node path for %s/%s", __func__,
-> > +                     dt_name, vdev->compat);
-> > +        exit(1);
-> > +    }
-> > +
-> > +    if (node_path[1]) {
-> > +        error_report("%s more than one node matching %s/%s!", __func__,
-> > +                     dt_name, vdev->compat);
-> > +        exit(1);
-> > +    }
-> The above part now is duplicated with code in add_amd_xgbe_fdt_node().
-> couldn't we factorize this into an helper such like
-> char [*]*get_host_node_path(VFIODevice *vbasedev).
-
-Sure.
-
-> Could you share the SATA node that was generated with the generic function.
-
-Sure. The original one on the host is
-(from arch/arm64/boot/dts/renesas/r8a7795-salvator-xs.dts):
-
-        sata@ee300000 {
-                compatible = "renesas,sata-r8a7795", "renesas,rcar-gen3-sata";
-                reg = <0 0xee300000 0 0x200000>;
-                interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
-                clocks = <&cpg CPG_MOD 815>;
-                power-domains = <&sysc R8A7795_PD_ALWAYS_ON>;
-                resets = <&cpg 815>;
-                status = "okay";
-                iommus = <&ipmmu_hc 2>;
-        };
-
-The one on the guest is (wrapped in the platform subnode):
-
-        platform@c000000 {
-                interrupt-parent = <0x8001>;
-                #address-cells = <0x1>;
-                #size-cells = <0x1>;
-                compatible = "qemu,platform", "simple-bus";
-                ranges = <0x0 0x0 0xc000000 0x2000000>;
-
-                ee300000.sata@0 {
-                        status = "okay";
-                        reg = <0x0 0x200000>;
-                        interrupts = <0x0 0x70 0x4>;
-                        compatible = "renesas,sata-r8a7795",
-"renesas,rcar-gen3-sata";
-                };
-        };
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+--bhoj5LY3XG96sbb9bxh2L6QjPCC5uYby8--
