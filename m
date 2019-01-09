@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40079)
+Received: from eggs.gnu.org ([209.51.188.92]:41046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1ghGU4-0007Xo-7y
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:13:37 -0500
+	(envelope-from <geert.uytterhoeven@gmail.com>) id 1ghGW2-0000Io-FT
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1ghGU3-0002i4-7k
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:13:36 -0500
-Received: from m15-111.126.com ([220.181.15.111]:59282)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1ghGU0-0002dc-5c
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:13:33 -0500
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (1.0)
-From: fei <lifei1214@126.com>
-In-Reply-To: <87k1jgjpzd.fsf@dusky.pond.sub.org>
-Date: Thu, 10 Jan 2019 00:13:19 +0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <BDD42565-9FDA-4EA0-9BF1-03ABB807D078@126.com>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-16-fli@suse.com>
-	<87k1jgjpzd.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 15/16] qemu_thread: supplement
- error handling for touch_all_pages
+	(envelope-from <geert.uytterhoeven@gmail.com>) id 1ghGW0-0004Kg-GY
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:15:38 -0500
+MIME-Version: 1.0
+References: <20190103094211.28473-1-geert+renesas@glider.be>
+	<acd10959-a781-d3bf-dc67-bda878740ec9@redhat.com>
+In-Reply-To: <acd10959-a781-d3bf-dc67-bda878740ec9@redhat.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 9 Jan 2019 17:15:00 +0100
+Message-ID: <CAMuHMdXgoAL7B0F4pL51uLcQZWM0BLisDSAXMhW5O3s0yGVGMg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH QEMU v5] hw/arm/sysbus-fdt: Add support for
+ instantiating generic devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,153 +23,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Fei Li <fli@suse.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Magnus Damm <damm+renesas@opensource.se>, Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>
 
+Hi Eric,
 
+Thanks for your comments!
 
-> =E5=9C=A8 2019=E5=B9=B41=E6=9C=888=E6=97=A5=EF=BC=8C02:13=EF=BC=8CMarkus A=
-rmbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> Fei Li <fli@suse.com> writes:
->=20
->> Supplement the error handling for touch_all_pages: add an Error
->> parameter for it to propagate the error to its caller to do the
->> handling in case it fails.
->>=20
->> Cc: Markus Armbruster <armbru@redhat.com>
->> Signed-off-by: Fei Li <fli@suse.com>
->> ---
->> util/oslib-posix.c | 25 ++++++++++++++++---------
->> 1 file changed, 16 insertions(+), 9 deletions(-)
->>=20
->> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
->> index 251e2f1aea..afc1d99093 100644
->> --- a/util/oslib-posix.c
->> +++ b/util/oslib-posix.c
->> @@ -431,15 +431,17 @@ static inline int get_memset_num_threads(int smp_cp=
-us)
->> }
->>=20
->> static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages=
-,
->> -                            int smp_cpus)
->> +                            int smp_cpus, Error **errp)
->> {
->>     size_t numpages_per_thread;
->>     size_t size_per_thread;
->>     char *addr =3D area;
->>     int i =3D 0;
->> +    int started_thread =3D 0;
->>=20
->>     memset_thread_failed =3D false;
->>     memset_num_threads =3D get_memset_num_threads(smp_cpus);
->> +    started_thread =3D memset_num_threads;
->>     memset_thread =3D g_new0(MemsetThread, memset_num_threads);
->>     numpages_per_thread =3D (numpages / memset_num_threads);
->>     size_per_thread =3D (hpagesize * numpages_per_thread);
->> @@ -448,14 +450,18 @@ static bool touch_all_pages(char *area, size_t hpag=
-esize, size_t numpages,
->>         memset_thread[i].numpages =3D (i =3D=3D (memset_num_threads - 1))=
- ?
->>                                     numpages : numpages_per_thread;
->>         memset_thread[i].hpagesize =3D hpagesize;
->> -        /* TODO: let the callers handle the error instead of abort() her=
-e */
->> -        qemu_thread_create(&memset_thread[i].pgthread, "touch_pages",
->> -                           do_touch_pages, &memset_thread[i],
->> -                           QEMU_THREAD_JOINABLE, &error_abort);
->> +        if (!qemu_thread_create(&memset_thread[i].pgthread, "touch_pages=
-",
->> +                                do_touch_pages, &memset_thread[i],
->> +                                QEMU_THREAD_JOINABLE, errp)) {
->> +            memset_thread_failed =3D true;
->> +            started_thread =3D i;
->> +            goto out;
->=20
-> break rather than goto, please.
-Ok
->=20
->> +        }
->>         addr +=3D size_per_thread;
->>         numpages -=3D numpages_per_thread;
->>     }
->> -    for (i =3D 0; i < memset_num_threads; i++) {
->> +out:
->> +    for (i =3D 0; i < started_thread; i++) {
->>         qemu_thread_join(&memset_thread[i].pgthread);
->>     }
->=20
-> I don't like how @started_thread is computed.  The name suggests it's
-> the number of threads started so far.  That's the case when you
-> initialize it to zero.  But then you immediately set it to
-> memset_thread().  It again becomes the case only when you break the loop
-> on error, or when you complete it successfully.
->=20
-> There's no need for @started_thread, since the number of threads created
-> is readily available as @i:
->=20
->       memset_num_threads =3D i;
-Thanks for this wonderful suggestion! This helps a lot! ;)
->       for (i =3D 0; i < memset_num_threads; i++) {
->           qemu_thread_join(&memset_thread[i].pgthread);
->       }
->=20
-> Rest of the function:
->=20
->>     g_free(memset_thread);
->       memset_thread =3D NULL;
->=20
->       return memset_thread_failed;
->   }
->=20
-> If do_touch_pages() set memset_thread_failed(), we return false without
-> setting an error.  I believe you should
->=20
->       if (memset_thread_failed) {
->           error_setg(errp, "os_mem_prealloc: Insufficient free host memory=
- "
->               "pages available to allocate guest RAM");
->           return false;
->       }
->       return true;
->=20
-Ok
-> here, and ...
->=20
->> @@ -471,6 +477,7 @@ void os_mem_prealloc(int fd, char *area, size_t memor=
-y, int smp_cpus,
->>     struct sigaction act, oldact;
->>     size_t hpagesize =3D qemu_fd_getpagesize(fd);
->>     size_t numpages =3D DIV_ROUND_UP(memory, hpagesize);
->> +    Error *local_err =3D NULL;
->>=20
->>     memset(&act, 0, sizeof(act));
->>     act.sa_handler =3D &sigbus_handler;
->> @@ -484,9 +491,9 @@ void os_mem_prealloc(int fd, char *area, size_t memor=
-y, int smp_cpus,
->>     }
->>=20
->>     /* touch pages simultaneously */
->> -    if (touch_all_pages(area, hpagesize, numpages, smp_cpus)) {
->> -        error_setg(errp, "os_mem_prealloc: Insufficient free host memory=
- "
->> -            "pages available to allocate guest RAM");
->> +    if (touch_all_pages(area, hpagesize, numpages, smp_cpus, &local_err)=
-) {
->> +        error_propagate_prepend(errp, local_err, "os_mem_prealloc: Insuf=
-ficient"
->> +            " free host memory pages available to allocate guest RAM: ")=
-;
->>     }
->=20
-> ... not mess with the error message here, i.e.
->=20
->       touch_all_pages(area, hpagesize, numpages, smp_cpus), errp);
-Ok, will amend this in the next version.=20
+On Wed, Jan 9, 2019 at 4:56 PM Auger Eric <eric.auger@redhat.com> wrote:
+> On 1/3/19 10:42 AM, Geert Uytterhoeven wrote:
+> > Add a fallback for instantiating generic devices without a type-specific
+> > or compatible-specific instantiation method.  This will be used when no
+> > other match is found.
+> >
+> > Generic device instantiation avoids having to write device-specific
+> > instantiation methods for each and every "simple" device using only a
+> > set of generic properties.  Devices that need more specialized handling
+> > can still provide their own instantiation methods.
+> >
+> > The generic instantiation method creates a device node with remapped
+> > "reg" and (optional) "interrupts" properties, and copies properties from
+> > the host, if deemed appropriate:
+> >   - In general, properties without phandles are safe to be copied.
+> >     Unfortunately, the FDT does not carry type information, hence an
+> >     explicit whitelist is used, which can be extended when needed.
+> >   - Properties related to power management (power and/or clock domain),
+> >     isolation, and pin control, are handled by the host, and must not to
+> >     be copied.
+> >
+> > Devices nodes with subnodes are rejected, as subnodes cannot easily be
+> > handled in a generic way.
+> >
+> > This has been tested on a Renesas Salvator-XS board (R-Car H3 ES2.0)
+> > with SATA, using:
+> >
+> >     -device vfio-platform,host=ee300000.sata
+> >
+> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> > ---
+> > Note: Also tested with GPIO, which needs "vfio: No-IOMMU mode support":
+> >
+> >     -device vfio-platform,host=e6055400.gpio
+> >
+> > v5:
+> >   - Replace copying of a fixed list of properties (and ignoring all
+> >     others), by scanning all properties on the host, and deciding if
+> >     they need to be ignored, copied, or rejected,
+> >   - Reject device nodes with subnodes,
+> >   - Handle edge interrupts,
+> >
+> > v3:
+> >   - New.
 
-Have a nice day, thanks again
-Fei
->=20
->>=20
->>     ret =3D sigaction(SIGBUS, &oldact, NULL);
+> > --- a/hw/arm/sysbus-fdt.c
+> > +++ b/hw/arm/sysbus-fdt.c
+
+> > +static struct {
+> > +    const char *name;
+> > +    enum GenericPropertyAction action;
+> > +} generic_properties[] = {
+> > +    { "name",            PROP_IGNORE }, /* handled automatically */
+> > +    { "phandle",         PROP_IGNORE }, /* not needed for the generic case */
+> > +
+> > +    /* The following are copied and remapped by dedicated code */
+> > +    { "reg",             PROP_IGNORE },
+> > +    { "interrupts",      PROP_IGNORE },
+> Shouldn't interrupt-parent be safely ignored as remapped?
+
+Probably. Typically interrupt-parent is present at a higher level.
+And interrupts-extended should be ignored, too.
+
+> > +
+> > +    /* The following are handled by the host */
+> > +    { "power-domains",   PROP_IGNORE }, /* power management (+ opt. clocks) */
+> > +    { "iommus",          PROP_IGNORE }, /* isolation */
+> > +    { "resets",          PROP_IGNORE }, /* isolation */
+> > +    { "pinctrl-*",       PROP_IGNORE }, /* pin control */
+> > +
+> > +    /* Ignoring the following may or may not work, hence the warning */
+> > +    { "gpio-ranges",     PROP_WARN },   /* no support for pinctrl yet */
+> > +    { "dmas",            PROP_WARN },   /* no support for external DMACs yet */
+> I would be tempted to simply reject things that may not work.
+
+I kept gpio-ranges, as it works with my rcar-gpio proof of concept
+(depends on with no-iommu support).
+Without dmas, drivers are supposed to fall back to PIO.  If a driver
+doesn't support that, it will complain.
+
+> > +
+> > +    /* The following are irrelevant, as corresponding specifiers are ignored */
+> > +    { "clock-names",     PROP_IGNORE },
+> > +    { "reset-names",     PROP_IGNORE },
+> > +    { "dma-names",       PROP_IGNORE },
+> > +
+> > +    /* Whitelist of properties not taking phandles, and thus safe to copy */
+> > +    { "compatible",      PROP_COPY },
+> > +    { "status",          PROP_COPY },
+> > +    { "reg-names",       PROP_COPY },
+> > +    { "interrupt-names", PROP_COPY },
+> > +    { "#*-cells",        PROP_COPY },
+> > +};
+> > +
+> > +#ifndef CONFIG_FNMATCH
+> > +/* Fall back to exact string matching instead of allowing wildcards */
+> > +static inline int fnmatch(const char *pattern, const char *string, int flags)
+> > +{
+> > +        return strcmp(pattern, string);
+> > +}
+> > +#endif
+
+> > +/**
+> > + * copy_generic_node
+> > + *
+> > + * Copy the generic part of a DT node from the host
+> > + */
+> > +static void copy_generic_node(void *host_fdt, void *guest_fdt, char *host_path,
+> > +                              char *guest_path)
+> > +{
+> > +    int node, prop, len;
+> > +    const void *data;
+> > +    const char *name;
+> > +    enum GenericPropertyAction action;
+> > +
+> > +    node = fdt_path_offset(host_fdt, host_path);
+> > +    if (node < 0) {
+> > +        error_report("Cannot find node %s: %s", host_path, fdt_strerror(node));
+> > +        exit(1);
+> > +    }
+> > +
+> > +    /* Submodes are not yet supported */
+> > +    if (fdt_first_subnode(host_fdt, node) >= 0) {
+> > +        error_report("%s has unsupported subnodes", host_path);
+> > +        goto unsupported;
+> > +    }
+> > +
+> > +    /* Copy generic properties */
+> > +    fdt_for_each_property_offset(prop, host_fdt, node) {
+> > +        data = fdt_getprop_by_offset(host_fdt, prop, &name, &len);
+> > +        if (!data) {
+> > +            error_report("Cannot get property of %s: %s", host_path,
+> > +                         fdt_strerror(len));
+> > +            exit(1);
+> > +        }
+> > +
+> > +        if (!len) {
+> > +            /* Zero-sized properties are safe to copy */
+> > +            action = PROP_COPY;
+> > +        } else if (!strcmp(name, "clocks")) {
+> > +            /* Reject "clocks" if "power-domains" is not present */
+> Could you elaborate on clock management with and without power-domain.
+> If clock handles can be found on host side, don't we need to generate
+> clock nodes on guest side (as what was done with the amd xgmac). And in
+> that case don't you need clock-names prop too?
+>
+> Please can you explain how the fact power-domain is not present
+> simplifies the problem. It is not obvious to me.
+
+In the presence of a power-domains property, it's possible the clocks are
+used for power management only (if the device is part of a clock domain).
+In that case, the guest doesn't need to manage the clock.
+Qemu will still print a warning, as it cannot be 100% sure that the clocks
+are not needed.
+
+In the absence of a power-domains property, it is assumed the clocks are
+needed, and the device node is rejected.
+Qemu could be enhanced to inspect all clocks and copy fixed-rate clocks,
+like is done for xgmac, but that can be added later, if someone has a need
+for it.
+
+For an initial version, I try to keep it generic, but not too complicated ;-)
+
+For complex cases, you can always write a device-specific instantiation
+method.
+
+> > +            action = fdt_getprop(host_fdt, node, "power-domains", NULL)
+> > +                     ? PROP_WARN : PROP_REJECT;
+> > +        } else {
+> > +            action = get_generic_property_action(name);
+> > +        }
+> > +
+> > +        switch (action) {
+> > +        case PROP_WARN:
+> > +            warn_report("%s: Ignoring %s property", host_path, name);
+> > +        case PROP_IGNORE:
+> > +            break;
+> > +
+> > +        case PROP_COPY:
+> > +            qemu_fdt_setprop(guest_fdt, guest_path, name, data, len);
+> > +            break;
+> > +
+> > +        case PROP_REJECT:
+> > +            error_report("%s has unsupported %s property", host_path, name);
+> > +            goto unsupported;
+> > +        }
+> > +    }
+> > +    return;
+> > +
+> > +unsupported:
+> > +    error_report("You can ask a wizard to enhance me");
+> maybe report which property causes the assignment abort
+
+That's already done above.
+
+> > +    exit(1);
+> > +}
+> > +
+> > +/**
+> > + * add_generic_fdt_node
+> > + *
+> > + * Generates a generic DT node by copying properties from the host
+> > + */
+> > +static int add_generic_fdt_node(SysBusDevice *sbdev, void *opaque)
+> > +{
+> > +    PlatformBusFDTData *data = opaque;
+> > +    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
+> > +    const char *parent_node = data->pbus_node_name;
+> > +    void *guest_fdt = data->fdt, *host_fdt;
+> > +    VFIODevice *vbasedev = &vdev->vbasedev;
+> > +    char **node_path, *node_name, *dt_name;
+> > +    PlatformBusDevice *pbus = data->pbus;
+> > +    uint32_t *reg_attr, *irq_attr;
+> > +    uint64_t mmio_base;
+> > +    int i, irq_number;
+> > +    VFIOINTp *intp;
+> > +
+> > +    host_fdt = load_device_tree_from_sysfs();
+> > +
+> > +    dt_name = sysfs_to_dt_name(vbasedev->name);
+> > +    if (!dt_name) {
+> > +        error_report("%s incorrect sysfs device name %s", __func__,
+> > +                     vbasedev->name);
+> > +        exit(1);
+> > +    }
+> > +    node_path = qemu_fdt_node_path(host_fdt, dt_name, vdev->compat,
+> > +                                   &error_fatal);
+> > +    if (!node_path || !node_path[0]) {
+> > +        error_report("%s unable to retrieve node path for %s/%s", __func__,
+> > +                     dt_name, vdev->compat);
+> > +        exit(1);
+> > +    }
+> > +
+> > +    if (node_path[1]) {
+> > +        error_report("%s more than one node matching %s/%s!", __func__,
+> > +                     dt_name, vdev->compat);
+> > +        exit(1);
+> > +    }
+> The above part now is duplicated with code in add_amd_xgbe_fdt_node().
+> couldn't we factorize this into an helper such like
+> char [*]*get_host_node_path(VFIODevice *vbasedev).
+
+Sure.
+
+> Could you share the SATA node that was generated with the generic function.
+
+Sure. The original one on the host is
+(from arch/arm64/boot/dts/renesas/r8a7795-salvator-xs.dts):
+
+        sata@ee300000 {
+                compatible = "renesas,sata-r8a7795", "renesas,rcar-gen3-sata";
+                reg = <0 0xee300000 0 0x200000>;
+                interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
+                clocks = <&cpg CPG_MOD 815>;
+                power-domains = <&sysc R8A7795_PD_ALWAYS_ON>;
+                resets = <&cpg 815>;
+                status = "okay";
+                iommus = <&ipmmu_hc 2>;
+        };
+
+The one on the guest is (wrapped in the platform subnode):
+
+        platform@c000000 {
+                interrupt-parent = <0x8001>;
+                #address-cells = <0x1>;
+                #size-cells = <0x1>;
+                compatible = "qemu,platform", "simple-bus";
+                ranges = <0x0 0x0 0xc000000 0x2000000>;
+
+                ee300000.sata@0 {
+                        status = "okay";
+                        reg = <0x0 0x200000>;
+                        interrupts = <0x0 0x70 0x4>;
+                        compatible = "renesas,sata-r8a7795",
+"renesas,rcar-gen3-sata";
+                };
+        };
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
