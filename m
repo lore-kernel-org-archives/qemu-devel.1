@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58900)
+Received: from eggs.gnu.org ([209.51.188.92]:34604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghJDS-0000Rh-Dd
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:08:39 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghJQ4-0005SG-L8
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:21:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghJ62-0006Bj-RA
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:00:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ghJ62-0006Ai-J6
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:00:58 -0500
-Date: Wed, 9 Jan 2019 20:00:53 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190109190053.GM4867@localhost.localdomain>
-References: <20180906111107.30684-1-danielhb413@gmail.com>
-	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
-	<a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
-	<200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
-	<20190109172023.GK4867@localhost.localdomain>
-	<be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
-	<b8cc5195-d8f7-d971-f449-fa62e434437b@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ghJQ1-0004ND-Uh
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 14:21:39 -0500
+References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
+	<20180609151758.17343-5-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
+Date: Wed, 9 Jan 2019 13:21:12 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="tvOENZuN7d6HfOWU"
-Content-Disposition: inline
-In-Reply-To: <b8cc5195-d8f7-d971-f449-fa62e434437b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
- ID anymore
+In-Reply-To: <20180609151758.17343-5-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="d6Oicz2762RAR69TuTn3f1OYpM0MXfFWv"
+Subject: Re: [Qemu-devel] [PATCH v5 4/6] nbd/server: implement dirty bitmap
+ export
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,78 +25,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, armbru@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, muriloo@linux.ibm.com, dgilbert@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-
---tvOENZuN7d6HfOWU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--d6Oicz2762RAR69TuTn3f1OYpM0MXfFWv
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com,
+ kwolf@redhat.com, den@openvz.org
+Message-ID: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
+Subject: Re: [PATCH v5 4/6] nbd/server: implement dirty bitmap export
+References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
+ <20180609151758.17343-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20180609151758.17343-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Am 09.01.2019 um 18:52 hat Eric Blake geschrieben:
-> On 1/9/19 11:38 AM, Max Reitz wrote:
+Revisiting an older thread:
+
+On 6/9/18 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Handle new NBD meta namespace: "qemu", and corresponding queries:
+> "qemu:dirty-bitmap:<export bitmap name>".
 >=20
-> >=20
-> > <general whining>
-> > Actually, to me what you're saying sounds more like "Our deprecation
-> > policy is useless" to which I wholeheartedly agree.
-
-If you restrict it to "Our deprecation policy is useless for user-facing
-changes", I might agree. I think the policy is fine for stuff like QMP
-where only the management layer needs to be aware of the change. We
-still have problems there, but these are not problems of the policy.
-
-> > I think we should only remove things in major releases, and only if
-> > it was deprecated in the previous major release already.  (So if you
-> > deprecate something in 4.0, you can remove it in 5.0; but if you
-> > deprecate it in 4.1, you can remove it only in 6.0.)  From a user
-> > standpoint I really think we deprecate stuff too irregularly.
-> > </general whining>
+> With new metadata context negotiated, BLOCK_STATUS query will reply
+> with dirty-bitmap data, converted to extents. New public function
+> nbd_export_bitmap selects bitmap to export. For now, only one bitmap
+> may be exported.
 >=20
-> That's actually incorrect. Our current version numbering scheme is that
-> the major version number is NOT synonymous with major releases: we just
-> bump the major version number once per year, and ALL releases are on
-> equal footing with no one release being more major than others.  Thus, a
-> policy that (at least) 2 releases is needed for a deprecation is
-> consistent, where one that requires waiting for a bump in the major
-> version number (which is as short as one release and as long as 3, given
-> that we bump every year with about 3 releases per year) is the one that
-> is less predictable and less meaningful (why is waiting for January
-> better than waiting for 2 releases?).
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 
-As someone who usually skips distro versions because he wants to have
-the change and necessary adaption only once instead of two or three
-times in the same timeframe, I can see some value for users in breaking
-stable APIs only in defined versions.
+> @@ -2199,3 +2393,44 @@ void nbd_client_new(NBDExport *exp,
+>      co =3D qemu_coroutine_create(nbd_co_client_start, client);
+>      qemu_coroutine_enter(co);
+>  }
+> +
+> +void nbd_export_bitmap(NBDExport *exp, const char *bitmap,
+> +                       const char *bitmap_export_name, Error **errp)
+> +{
+> +    BdrvDirtyBitmap *bm =3D NULL;
+> +    BlockDriverState *bs =3D blk_bs(exp->blk);
+> +
+> +    if (exp->export_bitmap) {
+> +        error_setg(errp, "Export bitmap is already set");
+> +        return;
+> +    }
+> +
+> +    while (true) {
+> +        bm =3D bdrv_find_dirty_bitmap(bs, bitmap);
+> +        if (bm !=3D NULL || bs->backing =3D=3D NULL) {
+> +            break;
+> +        }
+> +
+> +        bs =3D bs->backing->bs;
+> +    }
+> +
+> +    if (bm =3D=3D NULL) {
+> +        error_setg(errp, "Bitmap '%s' is not found", bitmap);
+> +        return;
+> +    }
+> +
+> +    if (bdrv_dirty_bitmap_enabled(bm)) {
+> +        error_setg(errp, "Bitmap '%s' is enabled", bitmap);
+> +        return;
+> +    }
 
-At the same time, I can also see the value in being able to break stable
-APIs without waiting for almost two years with Max' policy and bad
-timing.
+Why are we restricting things to only export disabled bitmaps?
 
-For software I develop I prefer the latter, for software that I use I
-prefer the former. ;-)
+I can understand the argument that if the image being exported is
+read-only, then an enabled bitmap _that can be changed_ is probably a
+bad idea (it goes against the notion of the export being read only).
+But if we were to allow a writable access to an image, wouldn't we
+expect that writes be reflected into the bitmap, which means permitting
+an enabled bitmap?
 
-Kevin
+Furthermore, consider the scenario:
 
---tvOENZuN7d6HfOWU
+backing [with bitmap b0] <- active
+
+If I request a bitmap add of b0 for an export of active, then it really
+shouldn't matter whether b0 is left enabled or disabled - the backing
+file is read-only, and so no changes will be made to bitmap b0.
+
+I stumbled into the latter scenario while testing my new 'qemu-nbd -B
+bitmap', but the problem appears anywhere that we have read-only access
+to an image, where we can't change the status of the bitmap from enabled
+to disabled (because the image is read-only) but where the bitmap
+shouldn't be changing anyways (because the image is read-only).
+
+> +
+> +    if (bdrv_dirty_bitmap_qmp_locked(bm)) {
+> +        error_setg(errp, "Bitmap '%s' is locked", bitmap);
+> +        return;
+> +    }
+> +
+> +    bdrv_dirty_bitmap_set_qmp_locked(bm, true);
+
+Can we have an enabled-but-locked bitmap (one that we can't delete
+because some operation such as a writable NBD export is still using it,
+but one that is still being updated by active writes)?  If so, then it
+may make sense to drop the restriction that an exported bitmap must be
+disabled.  And even if it is not possible, I'd still like to loosen the
+restriction to require a disabled bitmap only if the image owning the
+bitmap is writable (making it easier to do read-only exports without
+having to first tweak the bitmap to be disabled).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--d6Oicz2762RAR69TuTn3f1OYpM0MXfFWv
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBAgAGBQJcNkTlAAoJEH8JsnLIjy/W8SEQAI1NstBiUvXPWSsr96Ceyumm
-wlSewwrZpMpMg7/R4/h4Aq8nHc/TClk1KGY7nvVisKNl851v2fXZLNDKwJHtT914
-/hQC28IHEdLDI3lWD3xjDwOhS/XPPkIBa8kIGeiGr+UHWVBcuKMY2CQC+gPZfbPO
-8WoeeRNyjvreg/aPrPnT8qGvhEowcN2GXtLmJP8vsyjz4gHW1LH3L7m+ZIkn8hmh
-fxX9UlU2xwikZ1jy+2BwXf13IbQ2uG1M+ttTQIzftVzUm4LEhgZHJbZBaOS48E77
-HZGR7h7FSMs5azaLVZ7gnHc5bCXeTJ/1t2zevTQSXNsGTrlfE0awmuuLo4/3pWxR
-5BKZ2/WraPl4gEMv20UY02TAoG9vdqg2SqEZ/6BTofOKtN/aV6l584sIulXovuN9
-3kxIdmbHGTBCDDqHi5rWf+gIws3kH8NavuIT0RzFgYU54D+6BDwgZPje9YLwBrYT
-Xz99FZa+mwehpmLTUzNDyriBVvAqEdn3QmoN4wd2OmWfl54HOyPn3R/g5ZYUcEFn
-qp2kGS8viGS6ij30z5qaVrIwv+9M64P5P+311MRKvuNWipZYp/6FWEizcyxgCciV
-7DvB/m34iotwjMKqEKLVSSvf5JMKTXPFRTAw+uY0qASxyGyXjJoAlW7Gmz0VYrBQ
-OJZ8UQuRI6CIbDEZFlpN
-=8OrU
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw2SagACgkQ3g5py3or
+ov0T7wf/bvYx0dSCIxAgbmNit6Lh3YCM4LyzFnfOk85Asx9+bfSk8mpQp3N1YbDx
+E+KZSB+0VjC5l8vHhQMxhlf0p3qMmdm1MHRBfLwKeQd1pi/qWn1y7ZS6+XpvDJ2L
+FCg1qLODXIS0hseUX5emjKtHEmJ12JlqIEHrd+qB76GFLboquWLsrQN1ZHIGP8GE
+EMSM+s1JAJOOL2gR9NkqTg4XGTLK4oQagNF79FlynSnkpfWQDnWC0KziQRaNxEmN
+323n0W8S7q/J8S+iEu9Dp7ZmMvMgelG88zPNn9bHF/yapY9wDV/yceC3Gv5XH+Al
+5+WZ9BjQCD4wW+n5Sa2ZTSINS0lBjQ==
+=ol8R
 -----END PGP SIGNATURE-----
 
---tvOENZuN7d6HfOWU--
+--d6Oicz2762RAR69TuTn3f1OYpM0MXfFWv--
