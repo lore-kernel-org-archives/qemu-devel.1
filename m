@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49368)
+Received: from eggs.gnu.org ([209.51.188.92]:49913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghDmG-0000qr-7o
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:20:13 -0500
+	(envelope-from <lifei1214@126.com>) id 1ghDo9-0002M1-6K
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:22:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghDmE-0001nU-Ax
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:20:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40298)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghDmC-0001VC-Ba
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:20:10 -0500
-References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-	<20190109105818.GG3998@redhat.com>
-	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
-	<20190109114459.GK3998@redhat.com>
-	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
-	<20190109125854.GM3998@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <860317b6-6489-9c18-bdf8-95a70fbec9b3@redhat.com>
-Date: Wed, 9 Jan 2019 14:20:02 +0100
+	(envelope-from <lifei1214@126.com>) id 1ghDo7-0007wv-8v
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:22:09 -0500
+Received: from m50-110.126.com ([123.125.50.110]:41298)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1ghDo3-0007kg-89
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:22:05 -0500
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-12-fli@suse.com>
+	<875zv0ml13.fsf@dusky.pond.sub.org>
+From: Fei Li <lifei1214@126.com>
+Message-ID: <402192f7-80d9-778c-2855-6b2225ef0690@126.com>
+Date: Wed, 9 Jan 2019 21:21:57 +0800
 MIME-Version: 1.0
-In-Reply-To: <20190109125854.GM3998@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+In-Reply-To: <875zv0ml13.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 11/16] qemu_thread: supplement
+ error handling for emulated_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
+To: Markus Armbruster <armbru@redhat.com>, Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, Gerd Hoffmann <kraxel@redhat.com>
 
-On 2019-01-09 13:58, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Jan 09, 2019 at 01:52:02PM +0100, Thomas Huth wrote:
->> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
->>> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
->>>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
->>>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
->>>>>> Different versions of GCC and Clang use different versions of the =
-C standard.
->>>>>> This repeatedly caused problems already, e.g. with duplicated type=
-defs:
->>>>>>
->>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.ht=
-ml
->>>>>>
->>>>>> or with for-loop variable initializers:
->>>>>>
->>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.ht=
-ml
->>>>>>
->>>>>> To avoid these problems, we should enforce the C language version =
-to the
->>>>>> same level for all compilers. Since our minimum compiler versions =
-are
->>>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" al=
-ready,
->>>>>> this seems to be a good choice.
->>>>>
->>>>> In 4.x   gnu11 is marked as experimental. I'm not really comfortabl=
-e
->>>>> using experimental features - even if its warning free there's a ri=
-sk
->>>>> it would silently mis-compile something.
->>>>>
->>>>> gnu99 is ok with 4.x - it is merely "incomplete".
->>>>
->>>> gnu11 has the big advantage that it also fixes the problem with
->>>> duplicated typedefs that are reported by older versions of Clang.
->>>>
->>>> Are you sure about the experimental character in 4.x? I just looked =
-at
->>>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it s=
-ays:
->>>>
->>>> "A fourth version of the C standard, known as C11, was published in =
-2011
->>>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts o=
-f
->>>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
->>>>
->>>> It does not say anything about "experimental" there. The word
->>>> "experimental" is only used for the C++ support, but we hardly have =
-C++
->>>> code in QEMU -- if you worry about that, I could simply drop the
->>>> "-std=3Dgnu++11" part from my patch?
->>>
->>> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1.x=
-86_64:
->>>
->>>   "3.4 Options Controlling C Dialect
->>>
->>>        ....snip...
->>>
->>>      'gnu11'
->>>      'gnu1x'
->>>           GNU dialect of ISO C11.  Support is incomplete and
->>>           experimental.  The name 'gnu1x' is deprecated."
+
+ÔÚ 2019/1/8 ÉÏÎç1:31, Markus Armbruster Ð´µÀ:
+> Fei Li <fli@suse.com> writes:
+>
+>> Utilize the existed errp to propagate the error and do the
+>> corresponding cleanup to replace the temporary &error_abort.
 >>
->> Ok. Looks like the "Support is incomplete and experimental" sentence h=
-as
->> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
->> already. IMHO we could give it a try and enable gnu11 for QEMU with GC=
-C
->> v4.8, too. If we later find problems, we could still switch back to
->> gnu99 instead. Other opinions?
->=20
-> Our code is already cleanly compiling with gnu99 standard - the problem
-> is merely that we sometimes introduce regressions due to not enforcing
-> that standard level. I don't think the features in gnu11 are compelling
-> enough to justify using something that's declared experimental.
-What about the duplicated typedef problem? See:
+>> Cc: Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>> Signed-off-by: Fei Li <fli@suse.com>
+>> ---
+>>   hw/usb/ccid-card-emulated.c | 15 +++++++++------
+>>   1 file changed, 9 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
+>> index f8ff7ff4a3..9245b4fcad 100644
+>> --- a/hw/usb/ccid-card-emulated.c
+>> +++ b/hw/usb/ccid-card-emulated.c
+>> @@ -32,7 +32,6 @@
+>>   #include "qemu/thread.h"
+>>   #include "qemu/main-loop.h"
+>>   #include "ccid.h"
+>> -#include "qapi/error.h"
+>>   
+>>   #define DPRINTF(card, lvl, fmt, ...) \
+>>   do {\
+>> @@ -544,11 +543,15 @@ static void emulated_realize(CCIDCardState *base, Error **errp)
+>>           error_setg(errp, "%s: failed to initialize vcard", TYPE_EMULATED_CCID);
+>>           goto out2;
+>>       }
+>> -    /* TODO: let the further caller handle the error instead of abort() here */
+>> -    qemu_thread_create(&card->event_thread_id, "ccid/event", event_thread,
+>> -                       card, QEMU_THREAD_JOINABLE, &error_abort);
+>> -    qemu_thread_create(&card->apdu_thread_id, "ccid/apdu", handle_apdu_thread,
+>> -                       card, QEMU_THREAD_JOINABLE, &error_abort);
+>> +    if (!qemu_thread_create(&card->event_thread_id, "ccid/event", event_thread,
+>> +                            card, QEMU_THREAD_JOINABLE, errp)) {
+>> +        goto out2;
+>> +    }
+>> +    if (!qemu_thread_create(&card->apdu_thread_id, "ccid/apdu",
+>> +                            handle_apdu_thread, card,
+>> +                            QEMU_THREAD_JOINABLE, errp)) {
+>> +        goto out2;
+> You need to stop and join the first thread.
 
- https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+Thanks for pointing this out!
 
-That one occured with Clang, but I think we've had plenty of these in
-the past with GCC, too...
-
- Thomas
+Have a nice day
+Fei
+>
+>> +    }
+>>   
+>>   out2:
+>>       clean_event_notifier(card);
