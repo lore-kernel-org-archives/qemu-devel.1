@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47001)
+Received: from eggs.gnu.org ([209.51.188.92]:47922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghDf5-00032A-IQ
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:12:49 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ghDgN-0004hn-7g
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:14:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghDRm-0001qD-BQ
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:59:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37164)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghDRl-0001pd-Iu
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:59:01 -0500
-Date: Wed, 9 Jan 2019 12:58:54 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190109125854.GM3998@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-	<20190109105818.GG3998@redhat.com>
-	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
-	<20190109114459.GK3998@redhat.com>
-	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1ghDgL-0004EY-Bl
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 08:14:06 -0500
+References: <1546200557-774583-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1546200557-774583-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<872d42b0-c794-c104-30a9-fa1296f812d6@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <cfeff1a6-f515-f5cf-caa2-fb260c0cddc9@redhat.com>
+Date: Wed, 9 Jan 2019 14:13:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+In-Reply-To: <872d42b0-c794-c104-30a9-fa1296f812d6@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3oJfeooyB0ySxtwuXJcj6R1VQuLPBllAS"
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] Stream block job involves
+ copy-on-read filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,95 +26,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Wed, Jan 09, 2019 at 01:52:02PM +0100, Thomas Huth wrote:
-> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
-> >> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
-> >>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
-> >>>> Different versions of GCC and Clang use different versions of the =
-C standard.
-> >>>> This repeatedly caused problems already, e.g. with duplicated type=
-defs:
-> >>>>
-> >>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.ht=
-ml
-> >>>>
-> >>>> or with for-loop variable initializers:
-> >>>>
-> >>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.ht=
-ml
-> >>>>
-> >>>> To avoid these problems, we should enforce the C language version =
-to the
-> >>>> same level for all compilers. Since our minimum compiler versions =
-are
-> >>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" al=
-ready,
-> >>>> this seems to be a good choice.
-> >>>
-> >>> In 4.x   gnu11 is marked as experimental. I'm not really comfortabl=
-e
-> >>> using experimental features - even if its warning free there's a ri=
-sk
-> >>> it would silently mis-compile something.
-> >>>
-> >>> gnu99 is ok with 4.x - it is merely "incomplete".
-> >>
-> >> gnu11 has the big advantage that it also fixes the problem with
-> >> duplicated typedefs that are reported by older versions of Clang.
-> >>
-> >> Are you sure about the experimental character in 4.x? I just looked =
-at
-> >> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it s=
-ays:
-> >>
-> >> "A fourth version of the C standard, known as C11, was published in =
-2011
-> >> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts o=
-f
-> >> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
-> >>
-> >> It does not say anything about "experimental" there. The word
-> >> "experimental" is only used for the C++ support, but we hardly have =
-C++
-> >> code in QEMU -- if you worry about that, I could simply drop the
-> >> "-std=3Dgnu++11" part from my patch?
-> >=20
-> > I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1.x=
-86_64:
-> >=20
-> >   "3.4 Options Controlling C Dialect
-> >=20
-> >        ....snip...
-> >=20
-> >      'gnu11'
-> >      'gnu1x'
-> >           GNU dialect of ISO C11.  Support is incomplete and
-> >           experimental.  The name 'gnu1x' is deprecated."
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3oJfeooyB0ySxtwuXJcj6R1VQuLPBllAS
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com"
+ <kwolf@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+Message-ID: <cfeff1a6-f515-f5cf-caa2-fb260c0cddc9@redhat.com>
+Subject: Re: [PATCH v5 1/6] Stream block job involves copy-on-read filter
+ driver
+References: <1546200557-774583-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1546200557-774583-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <872d42b0-c794-c104-30a9-fa1296f812d6@virtuozzo.com>
+In-Reply-To: <872d42b0-c794-c104-30a9-fa1296f812d6@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 08.01.19 14:45, Vladimir Sementsov-Ogievskiy wrote:
+> 30.12.2018 23:09, Andrey Shinkevich wrote:
+>> The copy-on-read filter is applied to block-stream operation.
+>> It is necessary for further block discard option.
 >=20
-> Ok. Looks like the "Support is incomplete and experimental" sentence ha=
-s
-> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
-> already. IMHO we could give it a try and enable gnu11 for QEMU with GCC
-> v4.8, too. If we later find problems, we could still switch back to
-> gnu99 instead. Other opinions?
+> If we move to c-o-r filter in stream, I think we should:
+> 1. get rid of COPY_ON_READ flag in stream code (so, this thing to be do=
+ne in one place)
+> 2. add base parameter to c-o-r filter, to not copy things that are belo=
+w base.
+>=20
+> Current behavior of stream is enabling copy-on-read on bs during stream=
+ if base =3D=3D NULL.
+> So, if we just add c-o-r filter, we will copy extra blocks. On the othe=
+r hand, if we
+> support base parameter in c-o-r filter we will involve guest reads to t=
+he stream
+> process for cases with base !=3D NULL, so stream operation should becom=
+e more efficient.
+>=20
+> So for me the following sequence seems reasonable:
+>=20
+> - prepare iotests for graph changes
+> - add base parameter to c-o-r filter
+> - use c-o-r in stream and drop COPY_ON_READ flag from stream code
+>=20
+> then (may be in separate series) add discard functionality. And looks l=
+ike again, it should
+> be property of c-o-r filter, not stream job itself, to involve guest re=
+ads to discarding too.
+>=20
+> In general, Max, is that correspond to what you mean?
 
-Our code is already cleanly compiling with gnu99 standard - the problem
-is merely that we sometimes introduce regressions due to not enforcing
-that standard level. I don't think the features in gnu11 are compelling
-enough to justify using something that's declared experimental. As long
-as we always have a -std=3Dgnu99 flag set, it will avoid the regressions
-we've seen.
+Yep, that sounds good to me.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Max
+
+
+--3oJfeooyB0ySxtwuXJcj6R1VQuLPBllAS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw185IACgkQ9AfbAGHV
+z0BsmAf9GYxubR9Q+P3JqZoSoI5a+GUKtFeUR4j8JYrNzO3gBjXK445tbEc6ArbE
+3G2ZNDbw6xD8dkTH8PpKziRt7iZxbaDTD380RiQz70LC+UXXBcan/WZO25Xui0/s
+ZieIPcUu0IdNsmtyKOgG0d+XPVmZx6nLkAshjl2cRRnIHEobV4wu/24zhvyW3fx9
+vzaY+2GJtf1D3UzKqYtQsJwhHevmudc738zovnesD72S4qQsqJHRbB0zwEGNZT4J
+L+r0zXZCwsEPhMN8dTKraLIz5EZXmAzOaJh0iDHvkTMjNLtblz6eE/DhkSo/Me/6
+1glCO3HPFNdi95n7aqbrHmBlrHS9bg==
+=iYKB
+-----END PGP SIGNATURE-----
+
+--3oJfeooyB0ySxtwuXJcj6R1VQuLPBllAS--
