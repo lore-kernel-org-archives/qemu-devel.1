@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50316)
+Received: from eggs.gnu.org ([209.51.188.92]:50908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghBxQ-0007At-54
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:23:37 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghBzf-0008Iz-Ow
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:25:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghBxP-0002AS-9r
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:23:36 -0500
-Date: Wed, 9 Jan 2019 12:23:11 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190109112311.GB4867@localhost.localdomain>
-References: <20190108194552.45453-1-vsementsov@virtuozzo.com>
+	(envelope-from <thuth@redhat.com>) id 1ghBze-0003Q8-LY
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:25:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37904)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghBzd-0003Mg-1M
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:25:54 -0500
+References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
+	<20190109105818.GG3998@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
+Date: Wed, 9 Jan 2019 12:25:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190108194552.45453-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] file-posix: add rough-block-status
- parameter
+In-Reply-To: <20190109105818.GG3998@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, fam@euphon.net, stefanha@redhat.com, den@openvz.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
 
-Am 08.01.2019 um 20:45 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> bdrv_co_block_status digs bs->file for additional, more accurate search
-> for hole inside region, reported as DATA by bs since 5daa74a6ebc.
-> 
-> This accuracy is not free: assume we have qcow2 disk. Actually, qcow2
-> knows, where are holes and where is data. But every block_status
-> request calls lseek additionally. Assume a big disk, full of
-> data, in any iterative copying block job (or img convert) we'll call
-> lseek(HOLE) on every iteration, and each of these lseeks will have to
-> iterate through all metadata up to the end of file. It's obviously
-> ineffective behavior. And for many scenarios we don't need this lseek
-> at all.
-> 
-> So, add an option to omit calling lseek.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
+> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
+>> Different versions of GCC and Clang use different versions of the C st=
+andard.
+>> This repeatedly caused problems already, e.g. with duplicated typedefs=
+:
+>>
+>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+>>
+>> or with for-loop variable initializers:
+>>
+>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
+>>
+>> To avoid these problems, we should enforce the C language version to t=
+he
+>> same level for all compilers. Since our minimum compiler versions are
+>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" alread=
+y,
+>> this seems to be a good choice.
+>=20
+> In 4.x   gnu11 is marked as experimental. I'm not really comfortable
+> using experimental features - even if its warning free there's a risk
+> it would silently mis-compile something.
+>=20
+> gnu99 is ok with 4.x - it is merely "incomplete".
 
-I don't think adding an option is a good idea, people will not know this
-option or forget to add it. Also, it's an option that you want to
-specify almost always, so if we do add an option, maybe it should be the
-default and an option should be added to enable recursive mode?
+gnu11 has the big advantage that it also fixes the problem with
+duplicated typedefs that are reported by older versions of Clang.
 
-I haven't checked the full list of bdrv_co_block_status() callers yet.
-So far we're talking about 'qemu-img convert' or the mirror job. Maybe
-we need to check other callers, too, but for now I'll stick to these.
+Are you sure about the experimental character in 4.x? I just looked at
+https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it says:
 
-The interesting case seems to be preallocated qcow2 images, where the
-clusters are allocated on the qcow2 level, but not in the image file.
-If we don't do the lseek there, we'll have to read in the data and will
-only then detect that it is zero (qemu-img only, mirror doesn't do this
-yet - should it have an option to enable a zero-detecting mode? Can
-detect-zeroes on the target node achieve the same thing?). So at least
-in qemu-img, we don't get a different result, it's just a bit slower.
+"A fourth version of the C standard, known as C11, was published in 2011
+as ISO/IEC 9899:2011. GCC has limited incomplete support for parts of
+this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
 
-Also note that this is only metadata preallocation; full preallocation
-will still return allocated for the protocol layer and so it will always
-be slow.
+It does not say anything about "experimental" there. The word
+"experimental" is only used for the C++ support, but we hardly have C++
+code in QEMU -- if you worry about that, I could simply drop the
+"-std=3Dgnu++11" part from my patch?
 
-Now, if this isn't about correctness, but about performance, maybe we
-can do some heuristics instead of adding a user option? A very simple
-approach could be, look at the lower layers only if we got a large
-allocated area. If the image was preallocated, everything is allocated,
-so if bdrv_co_block_status() returns a short range, it's a hint that
-qcow2 knows _something_ at least. (That something could just be that
-someone discarded something from a preallocated image, so we can't jump
-to the conclusion that it's not preallocated - but it's certainly more
-likely). And for small buffer, just reading it in and checking whether
-it is zero can't be that much slower than finding a hole first.
-
-So how about we look at the protocol layer only if we got an allocated
-range of at least a megabyte or something? Or maybe make it depend on
-the cluster size because with 2 MB clusters that will be always the
-case, even if the image isn't preallocated.
-
-Kevin
+ Thomas
