@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35365)
+Received: from eggs.gnu.org ([209.51.188.92]:35513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghB1d-0000vr-Kw
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:23:54 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ghB2e-0001QW-V2
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:24:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghB1c-0003l6-Sl
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:23:53 -0500
-Received: from smtp67.cstnet.cn ([159.226.251.67]:53343 helo=cstnet.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghB1c-0003ct-95
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:23:52 -0500
-Date: Wed, 9 Jan 2019 18:23:42 +0800 (GMT+08:00)
-From: wuzhouhui <wuzhouhui14@mails.ucas.ac.cn>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <laurent@vivier.eu>) id 1ghB2e-0005Yu-8p
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:24:56 -0500
+References: <1546615943-16274-1-git-send-email-thuth@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <4b9b4d5a-d124-19df-46c9-f3b2a68f46d8@vivier.eu>
+Date: Wed, 9 Jan 2019 11:24:50 +0100
 MIME-Version: 1.0
-Message-ID: <ae9873.3d686.1683223a356.Coremail.wuzhouhui14@mails.ucas.ac.cn>
-Subject: [Qemu-devel] Qemu migration with vhost-user-blk on top of local
- storage
+In-Reply-To: <1546615943-16274-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] trivial: Don't include
+ isa.h if it is not really necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lilin24@baidu.com, xieyongji@baidu.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-SGkgZXZlcnlvbmUsCgpJJ20gd29ya2luZyBxZW11IHdpdGggdmhvc3QgdGFyZ2V0IChlLmcuIHNw
-ZGspLCBhbmQgSSBhdHRlbXB0IHRvIG1pZ3JhdGUgVk0gd2l0aAoyIGxvY2FsIHN0b3JhZ2VzLiBP
-bmUgbG9jYWwgc3RvcmFnZSBpcyBhIHJlZ3VsYXIgZmlsZSwgZS5nLiAvdG1wL2M3NC5xY293Miwg
-YW5kCnRoZSBvdGhlciBpcyBhIG1hbGxvYyBiZGV2IHRoYXQgc3BkayBjcmVhdGVkLiBUaGlzIG1h
-bGxvYyBiZGV2IHdpbGwgZXhwb3J0ZWQgdG8KVk0gdmlhIHZob3N0LXVzZXItYmxrLiBXaGVuIEkg
-ZXhlY3V0ZSBmb2xsb3dpbmcgY29tbWFuZDoKCiAgdmlyc2ggbWlncmF0ZSAtLWxpdmUgLS1wZXJz
-aXN0ZW50IC0tdW5zYWZlIC0tdW5kZWZpbmVzb3VyY2UgLS1jb3B5LXN0b3JhZ2UtYWxsIFwKICAg
-ICAtLXAycCAtLWF1dG8tY29udmVyZ2UgLS12ZXJib3NlIC0tZGVzdHVyaSBxZW11K3RjcDovLzx1
-cmk+L3N5c3RlbSB2bTAKClRoZSBsaWJ2aXJ0IHJlcG9ydHM6CgogIHFlbXUtMi4xMi4xOiBlcnJv
-cjogaW50ZXJuYWwgZXJyb3I6IHVuYWJsZSB0byBleGVjdXRlIFFFTVUgY29tbWFuZCBcCiAgICAn
-bmJkLXNlcnZlci1hZGQnOiBDYW5ub3QgZmluZCBkZXZpY2U9ZHJpdmUtdmlydGlvLWRpc2sxIG5v
-ciBcCiAgICBub2RlX25hbWU9ZHJpdmUtdmlydGlvLWRpc2sxCgpEb2VzIGl0IG1lYW5zIHRoYXQg
-cWVtdSB3aXRoIHNwZGsgb24gdG9wIG9mIGxvY2FsIHN0b3JhZ2UgZG9uJ3Qgc3VwcG9ydCBtaWdy
-YXRpb24/CgpRRU1VOiAyLjEyLjEKU1BESzogMTguMTAKClRoYW5rcy4=
+On 04/01/2019 16:32, Thomas Huth wrote:
+> These files don't seem to do anything related to ISA directly, so
+> there is no need to include isa.h here.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/display/ramfb-standalone.c | 1 -
+>  hw/ide/pci.c                  | 1 -
+>  hw/ide/piix.c                 | 1 -
+>  hw/ide/via.c                  | 1 -
+>  hw/misc/macio/mac_dbdma.c     | 1 -
+>  hw/moxie/moxiesim.c           | 1 -
+>  hw/nvram/fw_cfg.c             | 1 -
+>  hw/sparc/sun4m.c              | 1 -
+>  hw/timer/i8254.c              | 1 -
+>  9 files changed, 9 deletions(-)
+> 
+
+
+Applied to my trivial-patches branch.
+
+Thanks,
+Laurent
