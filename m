@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47719)
+Received: from eggs.gnu.org ([209.51.188.92]:48491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1ghITv-0002bz-J2
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:21:37 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1ghIWJ-0004Sh-TX
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:24:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1ghITu-0003Mn-9q
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:21:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47412)
+	(envelope-from <balaton@eik.bme.hu>) id 1ghIWI-0006Yo-1w
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:24:02 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:33356)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1ghITu-0003Cr-0j
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:21:34 -0500
-Date: Wed, 9 Jan 2019 13:21:29 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <888499462.61280342.1547058089165.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAPcyv4jsa709BVPAx_BT5eFrODf-PUPOZ4aguDsjZVawVXTVHQ@mail.gmail.com>
-References: <20190109135024.14093-1-pagupta@redhat.com>
-	<20190109135024.14093-4-pagupta@redhat.com>
-	<CAPcyv4jsa709BVPAx_BT5eFrODf-PUPOZ4aguDsjZVawVXTVHQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1ghIWH-0006X7-Ek
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:24:01 -0500
+Date: Wed, 9 Jan 2019 19:23:46 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAJSP0QVOnFchhTyJsVG5E=FrZ7Ti-_ve4t1WxqkFXO=XK-Sh6Q@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.9999.1901091919140.41593@zero.eik.bme.hu>
+References: <CAJSP0QVOnFchhTyJsVG5E=FrZ7Ti-_ve4t1WxqkFXO=XK-Sh6Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] libnvdimm: add nd_region buffered
- dax_dev flag
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] Internship idea: I2C passthrough
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, virtualization@lists.linux-foundation.org, Linux ACPI <linux-acpi@vger.kernel.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ross Zwisler <zwisler@kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, David Hildenbrand <david@redhat.com>, jmoyer <jmoyer@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, lcapitulino@redhat.com, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Matthew Wilcox <willy@infradead.org>, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, "Darrick J. Wong" <darrick.wong@oracle.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, Jonathan Austin <jonny@microbit.org>
 
+On Wed, 9 Jan 2019, Stefan Hajnoczi wrote:
+> Hi folks,
+> You may be interested in I2C passthrough support in QEMU.  Paolo and I
+> brainstormed the idea and I've written up a rough project summary
+> below.  It still needs some work to make this a solid internship
+> project idea.
+>
+> Any thoughts?  Would you like to co-mentor this summer?
+>
+> === I2C Passthrough ===
+>
+> '''Summary:''' Implement I2C bus passthrough on Linux hosts so that
+> emulated Raspberry Pi or micro:bit boards can talk to real I2C
+> devices.
 
-> >
-> > This patch adds 'DAXDEV_BUFFERED' flag which is set
-> > for virtio pmem corresponding nd_region. This later
-> > is used to disable MAP_SYNC functionality for ext4
-> > & xfs filesystem.
-> >
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> >  drivers/dax/super.c          | 17 +++++++++++++++++
-> >  drivers/nvdimm/pmem.c        |  3 +++
-> >  drivers/nvdimm/region_devs.c |  7 +++++++
-> >  drivers/virtio/pmem.c        |  1 +
-> >  include/linux/dax.h          |  9 +++++++++
-> >  include/linux/libnvdimm.h    |  6 ++++++
-> >  6 files changed, 43 insertions(+)
-> >
-> > diff --git a/drivers/dax/super.c b/drivers/dax/super.c
-> > index 6e928f3..9128740 100644
-> > --- a/drivers/dax/super.c
-> > +++ b/drivers/dax/super.c
-> > @@ -167,6 +167,8 @@ enum dax_device_flags {
-> >         DAXDEV_ALIVE,
-> >         /* gate whether dax_flush() calls the low level flush routine */
-> >         DAXDEV_WRITE_CACHE,
-> > +       /* flag to disable MAP_SYNC for virtio based host page cache flush
-> > */
-> > +       DAXDEV_BUFFERED,
-> >  };
-> >
-> >  /**
-> > @@ -335,6 +337,21 @@ bool dax_write_cache_enabled(struct dax_device
-> > *dax_dev)
-> >  }
-> >  EXPORT_SYMBOL_GPL(dax_write_cache_enabled);
-> >
-> > +void virtio_pmem_host_cache(struct dax_device *dax_dev, bool wc)
-> > +{
-> > +       if (wc)
-> > +               set_bit(DAXDEV_BUFFERED, &dax_dev->flags);
-> > +       else
-> > +               clear_bit(DAXDEV_BUFFERED, &dax_dev->flags);
-> > +}
-> > +EXPORT_SYMBOL_GPL(virtio_pmem_host_cache);
-> 
-> The "write_cache" property was structured this way because it can
-> conceivably change at runtime. The MAP_SYNC capability should be
-> static and never changed after init.
+How about implementing USB for raspi boards instead? Or is there a project 
+proposal (or even some code somewhere out of tree) for that already? Seems 
+more useful to allow having emulated keyboard and mouse to use Raspbian 
+for example or pass through USB devices. (I don't know anything about this 
+was just reminded to a recent discussion by this message. If it's not 
+relevant just disregard my comment and sorry for the noise.)
 
-o.k. Will change.
+Regards,
+BALATON Zoltan
 
-> 
-> > +bool virtio_pmem_host_cache_enabled(struct dax_device *dax_dev)
-> > +{
-> > +       return test_bit(DAXDEV_BUFFERED, &dax_dev->flags);
-> > +}
-> > +EXPORT_SYMBOL_GPL(virtio_pmem_host_cache_enabled);
-> 
-> Echoing Darrick and Jan this is should be a generic property of a
-> dax_device and not specific to virtio. I don't like the "buffered"
-> designation as that's not accurate. There may be hardware reasons why
-> a dax_device is not synchronous, like a requirement to flush a
-> write-pending queue or otherwise notify the device of new writes.
-
-Agree.
-
-> 
-> I would just have a dax_synchronous() helper and a DAXDEV_SYNC flag. I
-> would also modify alloc_dax() to take a flags argument so that the
-> capability can be instantiated when the dax_device is allocated.
-
-o.k. Will make the change.
-
-Thanks,
-Pankaj
-> 
+> QEMU emulates I2C devices in software but currently cannot pass
+> through real I2C devices from the host to the guest.  It would be
+> useful to access real I2C devices from inside the guest, for example
+> for developers writing and testing software under QEMU on their
+> computer.
+>
+> The project consists of the following tasks:
+> * Implement -object i2c-bus-passthrough,adapter=N,id=my-i2c-bus
+> * Add i2c-bus-passthrough support to at least 1 existing emulated I2C controller
+> * Implement micro:bit TWI controller emulation on the nRF51 system-on-chip
+>
+> This project will allow you to learn about the I2C bus and how to
+> write device emulation code in QEMU.  You will enjoy it if you like
+> working with physical hardware.
+>
+> '''Links:'''
+> * [https://en.wikipedia.org/wiki/I%C2%B2C I2C wikipedia page]
+> * [https://elinux.org/Interfacing_with_I2C_Devices Overview of Linux
+> I2C programming interfaces]
+> * [https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/Documentation/i2c/dev-interface
+> Linux I2C userspace interface documentation]
+>
+> '''Details:'''
+> * Skill level: intermediate
+> * Language: C
+> * Mentor: Paolo Bonzini <pbonzini@redhat.com> ("bonzini" on IRC),
+> Stefan Hajnoczi <stefanha@redhat.com> ("stefanha" on IRC)
+>
+>
