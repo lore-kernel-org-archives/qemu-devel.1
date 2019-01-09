@@ -1,43 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57829)
+Received: from eggs.gnu.org ([209.51.188.92]:57847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1ghHPm-0002JZ-P5
+	(envelope-from <clg@kaod.org>) id 1ghHPn-0002KB-GA
 	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:13:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1ghHPl-0006Jk-Gm
+	(envelope-from <clg@kaod.org>) id 1ghHPm-0006KG-Cb
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:13:15 -0500
+Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:55337)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ghHPm-0006Ir-77
 	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:13:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39340)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1ghHPl-0006Ik-6M
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:13:13 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x09H8mTa062555
-	for <qemu-devel@nongnu.org>; Wed, 9 Jan 2019 12:13:11 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pwjs4ypwd-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 12:13:11 -0500
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Wed, 9 Jan 2019 17:13:08 -0000
-Date: Wed, 9 Jan 2019 18:13:02 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <105c451b-6873-b7a9-1c3a-e3b8fe7d4af3@redhat.com>
-References: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
-	<5a7e9130-30d1-84ad-0737-5023b718b99c@redhat.com>
-	<54bc1f9c-e997-cb1b-77cb-0dce478fafdc@linux.ibm.com>
-	<d4599c55-2d71-e1e9-ec7a-cffbc7d06abe@redhat.com>
-	<20190109123037.7f51888f.cohuck@redhat.com>
-	<fb665b3b-9bbf-e2bd-8618-b080d4c2453d@linux.ibm.com>
-	<105c451b-6873-b7a9-1c3a-e3b8fe7d4af3@redhat.com>
+Received: from player787.ha.ovh.net (unknown [10.109.143.209])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 01D1844B37
+	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 18:13:11 +0100 (CET)
+References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
+	<1547051976-13982-2-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3316bf08-36c0-c3ce-4e4f-8244276c58d3@kaod.org>
+Date: Wed, 9 Jan 2019 18:13:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20190109181302.2ac8b249@oc2783563651>
-Subject: Re: [Qemu-devel] [PATCH] s390x/vfio-ap: Implement hot plug/unplug
- of vfio-ap device
+In-Reply-To: <1547051976-13982-2-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
+ compilation with clang -std=gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,141 +32,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, jjherne@linux.ibm.com, peter.maydell@linaro.org, pasic@linux.vnet.ibm.com, fiuczy@linux.ibm.com, alex.williamson@redhat.com, mjrosato@linux.ibm.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
 
-On Wed, 9 Jan 2019 17:37:49 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On 1/9/19 5:39 PM, Thomas Huth wrote:
+> When compiling with Clang and -std=3Dgnu99, I get the following errors:
+>=20
+>   CC      ppc64-softmmu/hw/intc/xics_spapr.o
+> In file included from hw/intc/xics_spapr.c:34:
+> include/hw/ppc/xics.h:46:25: error: redefinition of typedef 'ICSState' =
+is a C11 feature
+>       [-Werror,-Wtypedef-redefinition]
+> typedef struct ICSState ICSState;
+>                         ^
+> include/hw/ppc/spapr.h:18:25: note: previous definition is here
+> typedef struct ICSState ICSState;
+>                         ^
+> In file included from hw/intc/xics_spapr.c:34:
+> include/hw/ppc/xics.h:203:34: error: redefinition of typedef 'sPAPRMach=
+ineState' is a C11 feature
+>       [-Werror,-Wtypedef-redefinition]
+> typedef struct sPAPRMachineState sPAPRMachineState;
+>                                  ^
+> include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
+> typedef struct sPAPRMachineState sPAPRMachineState;
+>                                  ^
+>   CC      ppc64-softmmu/hw/intc/spapr_xive.o
+> In file included from hw/intc/spapr_xive.c:19:
+> include/hw/ppc/spapr_xive.h:38:3: error: redefinition of typedef 'sPAPR=
+Xive' is a C11 feature
+>       [-Werror,-Wtypedef-redefinition]
+> } sPAPRXive;
+>   ^
+> include/hw/ppc/spapr.h:20:26: note: previous definition is here
+> typedef struct sPAPRXive sPAPRXive;
+>                          ^
+> In file included from hw/intc/spapr_xive.c:19:
+> include/hw/ppc/spapr_xive.h:45:34: error: redefinition of typedef 'sPAP=
+RMachineState' is a C11 feature
+>       [-Werror,-Wtypedef-redefinition]
+> typedef struct sPAPRMachineState sPAPRMachineState;
+>                                  ^
+> include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
+> typedef struct sPAPRMachineState sPAPRMachineState;
+>                                  ^
+>   CC      ppc64-softmmu/hw/char/spapr_vty.o
+> In file included from hw/char/spapr_vty.c:8:
+> In file included from include/hw/ppc/spapr.h:12:
+> include/hw/ppc/spapr_xive.h:45:34: error: redefinition of typedef 'sPAP=
+RMachineState' is a C11 feature
+>       [-Werror,-Wtypedef-redefinition]
+> typedef struct sPAPRMachineState sPAPRMachineState;
+>                                  ^
+> include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
+> typedef struct sPAPRMachineState sPAPRMachineState;
+>                                  ^
+>=20
+> Since we're going to make -std=3Dgnu99 mandatory, fix these issues
+> by including the right header files indead of typedeffing stuff twice.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  include/hw/ppc/spapr.h      | 4 ++--
+>  include/hw/ppc/spapr_xive.h | 2 +-
+>  include/hw/ppc/xics.h       | 4 ++--
+>  3 files changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 2c77a8b..6a5ae4f 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -8,6 +8,8 @@
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/ppc/spapr_ovec.h"
+>  #include "hw/ppc/spapr_irq.h"
+> +#include "hw/ppc/xics.h"
+> +#include "hw/ppc/spapr_xive.h"
+> =20
+>  struct VIOsPAPRBus;
+>  struct sPAPRPHBState;
+> @@ -15,8 +17,6 @@ struct sPAPRNVRAM;
+>  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+>  typedef struct sPAPREventSource sPAPREventSource;
+>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+> -typedef struct ICSState ICSState;
+> -typedef struct sPAPRXive sPAPRXive;
+> =20
+>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+>  #define SPAPR_ENTRY_POINT       0x100
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 728735d..aff4366 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -42,7 +42,7 @@ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t li=
+sn);
+>  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+>  qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
+> =20
+> -typedef struct sPAPRMachineState sPAPRMachineState;
+> +#include "hw/ppc/spapr.h"  /* for sPAPRMachineState */
 
-> On 09.01.19 17:27, Tony Krowiak wrote:
-> > On 1/9/19 6:30 AM, Cornelia Huck wrote:
-> >> On Tue, 8 Jan 2019 23:13:39 +0100
-> >> David Hildenbrand <david@redhat.com> wrote:
-> >>
-> >>> On 08.01.19 20:52, Tony Krowiak wrote:
-> >>>> On 1/8/19 11:09 AM, David Hildenbrand wrote:
-> >>>>> On 08.01.19 17:01, Tony Krowiak wrote:
-> >>>>>> Introduces hot plug/unplug support for the vfio-ap device. Note that only one
-> >>>>>> vfio-ap device can be attached to the ap-bus, so a vfio-ap device can only be
-> >>>>>> hot plugged if the '-device vfio-ap,sysfsdev=$path_to_mdev' option is not
-> >>>>>> specified on the QEMU command line.
-> >>>>>>
-> >>>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> >>>>>> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-> >>>>>> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
-> >>>>>> ---
-> >>>>>>    hw/s390x/ap-bridge.c | 12 +++++++++++-
-> >>>>>>    hw/vfio/ap.c         |  2 +-
-> >>>>>>    2 files changed, 12 insertions(+), 2 deletions(-)
-> >>>>>>
-> >>>>>> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
-> >>>>>> index 3795d30dd7c9..25a03412fcb9 100644
-> >>>>>> --- a/hw/s390x/ap-bridge.c
-> >>>>>> +++ b/hw/s390x/ap-bridge.c
-> >>>>>> @@ -39,6 +39,7 @@ static const TypeInfo ap_bus_info = {
-> >>>>>>    void s390_init_ap(void)
-> >>>>>>    {
-> >>>>>>        DeviceState *dev;
-> >>>>>> +    BusState *bus;
-> >>>>>>    
-> >>>>>>        /* If no AP instructions then no need for AP bridge */
-> >>>>>>        if (!s390_has_feat(S390_FEAT_AP)) {
-> >>>>>> @@ -52,13 +53,18 @@ void s390_init_ap(void)
-> >>>>>>        qdev_init_nofail(dev);
-> >>>>>>    
-> >>>>>>        /* Create bus on bridge device */
-> >>>>>> -    qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
-> >>>>>> +    bus = qbus_create(TYPE_AP_BUS, dev, TYPE_AP_BUS);
-> >>>>>> +
-> >>>>>> +    /* Enable hotplugging */
-> >>>>>> +    qbus_set_hotplug_handler(bus, dev, &error_abort);
-> >>>>>>     }
-> >>>>>>    
-> >>>>>>    static void ap_bridge_class_init(ObjectClass *oc, void *data)
-> >>>>>>    {
-> >>>>>>        DeviceClass *dc = DEVICE_CLASS(oc);
-> >>>>>> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
-> >>>>>>    
-> >>>>>> +    hc->unplug = qdev_simple_device_unplug_cb;
-> >>>>>
-> >>>>> confused, why is there no plug action?
-> >>>>
-> >>>> You will find this is the case for several devices that are hot
-> >>>> pluggable.
-> >>>
-> >>> Usually missing hotplug handlers are an indication of legacy code ;)
-> >>>
-> >>>> The plug callback is invoked after the device is
-> >>>> attached to the bus and after the device is realized. Not having
-> >>>> a hot plug callback does not preclude hot plugging of a device.
-> >>>
-> >>> The hotplug handler is there to
-> >>>
-> >>> 1. Assign resources (e.g. ids etc)
-> >>> 2. Notify the system (e.g. hotplug interrupt)
-> >>>
-> >>> In legacy code (e.g. PCI) such stuff is usually still located in the
-> >>> realize function (where it doesn't belong anymore but factoring out is
-> >>> hard ...)
-> >>>
-> >>> Looking at hw/vfio/ap.c:realize(), there isn't really anything in there.
-> >>>
-> >>> So I assume that
-> >>>
-> >>> 1. No resources have to be assigned (for vfio-ap, I guess the IDs and
-> >>> such are implicit)
-> >>
-> >> That's my understanding as well. The interesting stuff will be
-> >> configured on kernel level before the device is even handed to QEMU for
-> >> consumption.
-> > 
-> > The vfio-ap device represents a VFIO mdev device. AP resources - i.e.,
-> > adapters, domains and control domains - are assigned to the mdev device
-> > via its sysfs interfaces. This is all handled by the vfio_ap kernel
-> > driver before a guest can use the mdev device. As part of vfio-ap device
-> > realization, a file descriptor is opened on the mdev device. When the 
-> > mdev device's fd is opened, a callback is invoked on the vfio_ap kernel
-> > device driver. The device driver then updates the guest's AP matrix
-> > configuration based on the configuration specified via the mdev
-> > device's sysfs interfaces.
-> > 
-> >>
-> >> (Would be nice to hint at that in the patch description.)
-> >>
-> >>> 2. No notification will happen. How will the guest know that a new AP
-> >>> adapter is available?
-> >>
-> >> My understanding is that hotplugging the matrix device will make the
-> >> guest go from "no adapters/domains are available" to "some
-> >> adapters/domains are available" (and unplug will do the reverse). I.e.,
-> >> no hot(un)plugging of individual queues (which would need to be done on
-> >> the kernel level, and is tricky IIRC.)
-> >>
-> >> I'm not sure what the architectured options for notifying the guest are
-> >> (I dimly recall some kind of "AP configuration has changed event").
-> >>
-> >> IIRC, the Linux guest driver scans for new queues periodically. Does it
-> >> even do that if no queues are available to start with?
-> > 
-> > The AP bus - in this case, running in the guest - does a periodic scan
-> > for AP devices. The bus relies on an AP instruction that queries the
-> > AP configuration information. When the guest's AP matrix is updated -
-> > see description of mdev device fd open processing above - the query
-> > will provide the newly configured AP matrix and the bus will create
-> > the adapter and queue devices on the guest. Consequently, there is
-> > nothing to do in a hot plug handler. If you'd like, I'd be more than
-> > happy to include a hot plug handler that does some logging (or nothing
-> > at all) so it doesn't look like legacy code ;)
-> 
-> Hehe, no it's fine for me.
-> 
-> Can you extend this patch description a little bit, including what we
-> discussed here? 
+so both files include each other, how nice ...
 
-Maybe a short comment that explains why qdev_simple_device_unplug_cb()
-is appropriate as well (i.e. hits that closing the mdev's fd is what
-triggers the cleanup of the actual resources)? I personally go log
-digging only once I get desperate.
+>  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
+>  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void=
+ *fdt,
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 14afda1..a7f49a4 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -47,6 +47,8 @@ typedef struct ICSState ICSState;
+>  typedef struct ICSIRQState ICSIRQState;
+>  typedef struct XICSFabric XICSFabric;
+> =20
+> +#include "hw/ppc/spapr.h"
+> +
 
-Regards,
-Halil
+and again ... I *really really* prefer forward declarations.
+
+
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Grumbles,
+
+C.
+
+
+>  #define TYPE_ICP "icp"
+>  #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
+> =20
+> @@ -200,8 +202,6 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon=
+);
+>  void ics_resend(ICSState *ics);
+>  void icp_resend(ICPState *ss);
+> =20
+> -typedef struct sPAPRMachineState sPAPRMachineState;
+> -
+>  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void=
+ *fdt,
+>                     uint32_t phandle);
+>  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
+>=20
