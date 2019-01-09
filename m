@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57427)
+Received: from eggs.gnu.org ([209.51.188.92]:60753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ghCQk-0004nn-Gc
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:53:55 -0500
+	(envelope-from <prvs=905b6060a=anthony.perard@citrix.com>)
+	id 1ghCfv-0001az-87
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:09:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ghCQj-0002GC-Ll
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:53:54 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:42314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ghCQj-0002Fn-Gs
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:53:53 -0500
-Received: by mail-oi1-f193.google.com with SMTP id w13so6039616oiw.9
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 03:53:52 -0800 (PST)
+	(envelope-from <prvs=905b6060a=anthony.perard@citrix.com>)
+	id 1ghCfs-0000Hh-GZ
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:09:35 -0500
+Date: Wed, 9 Jan 2019 12:09:16 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20190109120916.GI1508@perard.uk.xensource.com>
+References: <20190108144903.8249-1-paul.durrant@citrix.com>
+	<20190108144903.8249-17-paul.durrant@citrix.com>
 MIME-Version: 1.0
-References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
-	<CAGxU2F53zsuVRBbvGTOU81zObL+4tTg_FgE0i04G2eOWckc29Q@mail.gmail.com>
-	<aa1cbeec-bb31-8849-c34b-e2397dc1c475@oracle.com>
-In-Reply-To: <aa1cbeec-bb31-8849-c34b-e2397dc1c475@oracle.com>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Wed, 9 Jan 2019 12:53:40 +0100
-Message-ID: <CAGxU2F7rHv7HNNmvLSw9b5_GPEZqvo-XgCoc0penp8eFmWm6gw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v2 0/4] QEMU changes to do PVH boot
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190108144903.8249-17-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v9 16/18] xen: automatically create
+ XenBlockDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <liam.merwick@oracle.com>
-Cc: maran.wilson@oracle.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, xen-devel@lists.xenproject.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-Hi Liam,
+On Tue, Jan 08, 2019 at 02:49:01PM +0000, Paul Durrant wrote:
+> This patch adds create and destroy function for XenBlockDevice-s so that
+> they can be created automatically when the Xen toolstack instantiates a new
+> PV backend via xenstore. When the XenBlockDevice is created this way it is
+> also necessary to create a 'drive' which matches the configuration that the
+> Xen toolstack has written into xenstore. This is done by formulating the
+> parameters necessary for each 'blockdev' layer of the drive and then using
+> qmp_blockdev_add() to create the layers. Also, for compatibility with the
+> legacy 'xen_disk' implementation, an iothread is automatically created for
+> the new XenBlockDevice. This, like the driver layers, will be destroyed
+> after the XenBlockDevice is unrealized.
+> 
+> The legacy backend scan for 'qdisk' is removed by this patch, which makes
+> the 'xen_disk' code is redundant. The code will be removed by a subsequent
+> patch.
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> Signed-off-by: Anthony Perard <anthony.perard@citrix.com>
+> ---
 
-On Tue, Jan 8, 2019 at 3:47 PM Liam Merwick <liam.merwick@oracle.com> wrote:
-> QEMU sets the hvm_modlist_entry in load_linux() after the call to
-> load_elfboot() and then qboot loads it in boot_pvh_from_fw_cfg()
->
-> But the current PVH patches don't handle initrd (they have
-> start_info.nr_modules == 1).
+> diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+> index a7c37c185a..c6ec1d9543 100644
+> --- a/hw/block/xen-block.c
+> +++ b/hw/block/xen-block.c
+> @@ -7,12 +7,20 @@
+...
 
-Looking in the linux kernel (arch/x86/platform/pvh/enlighten.c) I saw:
-    /* The first module is always ramdisk. */
-    if (pvh_start_info.nr_modules) {
-        struct hvm_modlist_entry *modaddr =
-            __va(pvh_start_info.modlist_paddr);
-        pvh_bootparams.hdr.ramdisk_image = modaddr->paddr;
-        pvh_bootparams.hdr.ramdisk_size = modaddr->size;
-    }
+> +static XenBlockDrive *xen_block_drive_create(const char *id,
+> +                                             const char *device_type,
+> +                                             QDict *opts, Error **errp)
+> +{
+...
+> +    Error *local_err = NULL;
+...
+> +    if (!filename) {
+> +        error_setg(errp, "no filename");
+> +        goto done;
+> +    }
+...
+> +    drive->node_name = xen_block_blockdev_add(drive->id, driver_layer,
+> +                                              &local_err);
+> +
+> +done:
+> +    g_free(driver);
+> +    g_free(filename);
+> +
+> +    if (local_err) {
 
-So, putting start_info.nr_modules = 1, means that the first
-hvm_modlist_entry should have the ramdisk paddr and size. Is it
-correct?
+When xen_block_blockdev_add failed, it sets local_err, but nothing after
+sets errp. I'm going to add this while preparing the pull request:
 
+    error_propagate(errp, local_err);
 
->
-> During (or after) the call to load_elfboot() it looks like we'd need to
-> do something like what load_multiboot() does below (along with the
-> associated initialisation)
->
-> 400     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, ADDR_MBI);
-> 401     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, sizeof(bootinfo));
-> 402     fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, mb_bootinfo_data,
-> 403                      sizeof(bootinfo));
->
+Is this fine with you?
 
-In this case I think they used the FW_CFG_INITRD_* to pass bootinfo
-varibales to the guest, maybe we could add something like what
-linux_load() does:
+With that fix, I think the series is ready, so:
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
-    /* load initrd */
-    if (initrd_filename) {
-        ...
-        initrd_addr = (initrd_max-initrd_size) & ~4095;
+> +        xen_block_drive_destroy(drive, NULL);
+> +        return NULL;
+> +    }
+> +
+> +    return drive;
+> +}
 
-        fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
-        fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
-        fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data, initrd_size);
-        ...
-    }
-
-Then we can load the initrd in qboot or in the optionrom that I'm writing.
-
-What do you think?
+There is still the warning about using the 'file' driver when
+'host_device' should be use, but I think we can try to fix that later.
 
 Thanks,
-Stefano
-
-> I'm checking to see if that has any implications for the kernel side.
->
-> Regards,
-> Liam
->
-
 
 -- 
-Stefano Garzarella
-Red Hat
+Anthony PERARD
