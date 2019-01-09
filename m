@@ -1,44 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36086)
+Received: from eggs.gnu.org ([209.51.188.92]:36685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1ghHlb-0002tM-Hg
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:35:49 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ghHoM-00042R-Nf
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:38:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1ghHla-0005Fk-2M
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:35:47 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41296
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1ghHlZ-0005FV-Sj
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:35:46 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x09HSl5h019189
-	for <qemu-devel@nongnu.org>; Wed, 9 Jan 2019 12:35:45 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pwnay8f9n-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 12:35:44 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Wed, 9 Jan 2019 17:35:43 -0000
-Date: Wed, 9 Jan 2019 18:35:38 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <a59d5b64-0fb3-4b70-96ff-b1a0c037c6ac@linux.ibm.com>
-References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
-	<112a03e6-3d6c-1c14-10ab-c9cea09ad388@linux.ibm.com>
-	<20190108173113.3c2d830c.cohuck@redhat.com>
-	<20190108175021.003deab9@oc2783563651>
-	<20190108180615.7e48cf13.cohuck@redhat.com>
-	<4876194e-1a87-1491-a8b3-eed5b0a9afe6@linux.ibm.com>
-	<20190109111419.426ec6d7.cohuck@redhat.com>
-	<a59d5b64-0fb3-4b70-96ff-b1a0c037c6ac@linux.ibm.com>
+	(envelope-from <mreitz@redhat.com>) id 1ghHoL-0006X5-6g
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:38:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ghHoK-0006VC-Sw
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:38:37 -0500
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+	<a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+	<200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
+	<20190109172023.GK4867@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
+Date: Wed, 9 Jan 2019 18:38:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20190109183538.05bab3c8@oc2783563651>
-Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
+In-Reply-To: <20190109172023.GK4867@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="IAws6MXONgr3kcOxXvEjBOtqi1F0eFQr5"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
+ ID anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,168 +32,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, imammedo@redhat.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com
 
-On Wed, 9 Jan 2019 10:36:11 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IAws6MXONgr3kcOxXvEjBOtqi1F0eFQr5
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com
+Message-ID: <be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
+Subject: Re: [PATCH v2 0/3] HMP/snapshot changes - do not use ID anymore
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+ <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+ <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+ <200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
+ <20190109172023.GK4867@localhost.localdomain>
+In-Reply-To: <20190109172023.GK4867@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-> On 1/9/19 5:14 AM, Cornelia Huck wrote:
-> > On Tue, 8 Jan 2019 15:34:37 -0500
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> > 
-> >> On 1/8/19 12:06 PM, Cornelia Huck wrote:
-> >>> On Tue, 8 Jan 2019 17:50:21 +0100
-> >>> Halil Pasic <pasic@linux.ibm.com> wrote:
-> >>>    
-> >>>> On Tue, 8 Jan 2019 17:31:13 +0100
-> >>>> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>>>   
-> >>>>> On Tue, 8 Jan 2019 11:08:56 -0500
-> >>>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >>>>>       
-> >>>>>> On 12/17/18 10:57 AM, Tony Krowiak wrote:
-> >>>>>>> The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
-> >>>>>>> value of the BusState structure with the max_dev value of the BusClass structure
-> >>>>>>> to determine whether the maximum number of children has been reached for the
-> >>>>>>> bus. The problem is, the max_index field of the BusState structure does not
-> >>>>>>> necessarily reflect the number of devices that have been plugged into
-> >>>>>>> the bus.
-> >>>>>>>
-> >>>>>>> Whenever a child device is plugged into the bus, the bus's max_index value is
-> >>>>>>> assigned to the child device and then incremented. If the child is subsequently
-> >>>>>>> unplugged, the value of the max_index does not change and no longer reflects the
-> >>>>>>> number of children.
-> >>>>>>>
-> >>>>>>> When the bus's max_index value reaches the maximum number of devices
-> >>>>>>> allowed for the bus (i.e., the max_dev field in the BusClass structure),
-> >>>>>>> attempts to plug another device will be rejected claiming that the bus is
-> >>>>>>> full -- even if the bus is actually empty.
-> >>>>>>>
-> >>>>>>> To resolve the problem, a new 'num_children' field is being added to the
-> >>>>>>> BusState structure to keep track of the number of children plugged into the
-> >>>>>>> bus. It will be incremented when a child is plugged, and decremented when a
-> >>>>>>> child is unplugged.
-> >>>>>>>
-> >>>>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> >>>>>>> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-> >>>>>>> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> >>>>>>> ---
-> >>>>>>>     hw/core/qdev.c         | 3 +++
-> >>>>>>>     include/hw/qdev-core.h | 1 +
-> >>>>>>>     qdev-monitor.c         | 2 +-
-> >>>>>>>     3 files changed, 5 insertions(+), 1 deletion(-)
-> >>>>>>
-> >>>>>> Ping ...
-> >>>>>> I could not determine who the maintainer is for the three files
-> >>>>>> listed above. I checked the MAINTAINERS file and the prologue of each
-> >>>>>> individual file. Can someone please tell me who is responsible
-> >>>>>> for merging these changes? Any additional review comments?
-> >>>>>>       
-> >>>>>>>
-> >>>>>>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> >>>>>>> index 6b3cc55b27c2..956923f33520 100644
-> >>>>>>> --- a/hw/core/qdev.c
-> >>>>>>> +++ b/hw/core/qdev.c
-> >>>>>>> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
-> >>>>>>>                 snprintf(name, sizeof(name), "child[%d]", kid->index);
-> >>>>>>>                 QTAILQ_REMOVE(&bus->children, kid, sibling);
-> >>>>>>>     
-> >>>>>>> +            bus->num_children--;
-> >>>>>>> +
-> >>>>>>>                 /* This gives back ownership of kid->child back to us.  */
-> >>>>>>>                 object_property_del(OBJECT(bus), name, NULL);
-> >>>>>>>                 object_unref(OBJECT(kid->child));
-> >>>>>>> @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
-> >>>>>>>         char name[32];
-> >>>>>>>         BusChild *kid = g_malloc0(sizeof(*kid));
-> >>>>>>>     
-> >>>>>>> +    bus->num_children++;
-> >>>>>>>         kid->index = bus->max_index++;
-> >>>>>
-> >>>>> Hm... I'm wondering what happens for insane numbers of hotplugging
-> >>>>> operations here?
-> >>>>>
-> >>>>> (Preexisting problem for busses without limit, but busses with a limit
-> >>>>> could now run into that as well.)
-> >>>>>       
-> >>>>
-> >>>> How does this patch change things? I mean bus->num_children gets
-> >>>> decremented on unplug.
-> >>>
-> >>> We don't stop anymore if max_index >= max_dev, which means that we can
-> >>> now trigger that even if max_dev != 0.
-> >>
-> >> I guess I am missing your point. If max_dev == 0, then there is nothing
-> >> stopping an insane number of hot plug operations; either before this
-> >> patch, or with this patch. With the patch, once the number of children
-> >> hot plugged reaches max_dev, the qbus_is_full function will return false
-> >> and no more children can be plugged. If a child device is unplugged,
-> >> the num_children - which counts the number of children attached to the
-> >> bus - will be decremented, so it always reflects the number of children
-> >> added to the bus. Besides, checking max_index against max_dev
-> >> is erroneous, because max_index is incremented every time a child device
-> >> is plugged and is never decremented. It really operates as more of a
-> >> uinique identifier than a counter and is also used to create a unique
-> >> property name when the child device is linked to the bus as a property
-> >> (see bus_add_child function in hw/core/qdev.c).
-> > 
-> > Checking num_children against max_dev is the right thing to do, no
-> > argument here.
-> > 
-> > However, max_index continues to be incremented even if devices have
-> > been unplugged again. That means it can overflow, as it is never bound
-> > by the max_dev constraint.
-> > 
-> > This has been a problem before for busses with an unrestricted number of
-> > devices before, but with your patch, the problem is now triggerable for
-> > all busses.
-> > 
-> > Not a problem with your patch, but we might want to look into making
-> > max_index overflow/wraparound save.
-> 
-> I see your point. It does beg the question, what are the chances that
-> max_index reaches INT_MAX? In the interest of making this code more
-> bullet proof, I suppose it is something that should be dealt with.
-> 
-> A search reveals that max_index is used in only two places: It is used
-> to set the index for a child of the bus (i.e., bus_add_child function in
-> hw/core/qdev.c); and prior to this patch, to determine if max_dev has
-> been exceeded (i.e., qbus_is_full function in qdev_monitor.c). From
-> what I can see, the bus child index is used only to generate a property
-> name of the format "child[%d]" so the child can be linked as a property
-> of the bus (see bus_add_child and bus_remove_child functions in
-> hw/core/qdev.c). Wraparound of the max_index would most likely result in
-> generating a duplicate property name for the child.
-> 
-> I propose two possible solutions:
-> 
-> 1. When max_index reaches INT_MAX, do not allow any additional children
->     to be added to the bus.
-> 
-> 2. Set a max_dev value of INT_MAX for the BusClass instance if the value
->     is not set (in the bus_class_init function in hw/core/bus.c).
-> 
-> 3. Instead of generating the property name from the BusChild index
->     value, generate a UUID string. Since the index field of the BusChild
->     appears to be used only to generate the child's name, maybe change
->     the index field to a UUID field or a name field.
-> 
+On 09.01.19 18:20, Kevin Wolf wrote:
+> Am 09.01.2019 um 18:05 hat Max Reitz geschrieben:
+>> On 09.01.19 17:57, Daniel Henrique Barboza wrote:
+>>>
+>>>
+>>> On 1/9/19 12:10 PM, Max Reitz wrote:
+>>>> On 06.09.18 13:11, Daniel Henrique Barboza wrote:
+>>>>> changes in v2:
+>>>>> - removed the "RFC" marker;
+>>>>> - added a new patch (patch 2) that removes
+>>>>> bdrv_snapshot_delete_by_id_or_name from the code;
+>>>>> - made changes in patch 1 as suggested by Murilo;
+>>>>> - previous patch set link:
+>>>>> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg04658.html=
 
-Separate problem, separate patch, or?
+>>>>>
+>>>>>
+>>>>> It is not uncommon to see bugs being opened by testers that attempt=
+ to
+>>>>> create VM snapshots using HMP. It turns out that "0" and "1" are qu=
+ite
+>>>>> common snapshot names and they trigger a lot of bugs. I gave an exa=
+mple
+>>>>> in the commit message of patch 1, but to sum up here: QEMU treats t=
+he
+>>>>> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'=
+=2E It
+>>>>> is documented as such, but this can lead to strange situations.
+>>>>>
+>>>>> Given that it is strange for an API to consider a parameter to be 2=
 
-UUID instead of index solves the problem of unique names I guess, but I
-can't tell if that would be acceptable (interface stability, etc.).
+>>>>> fields
+>>>>> at the same time, and inadvently treating them as one or the other,=
+ and
+>>>>> that removing the ID field is too drastic, my idea here is to keep =
+the
+>>>>> ID field for internal control, but do not let the user set it.
+>>>>>
+>>>>> I guess there's room for discussion about considering this change a=
+n API
+>>>>> change or not. It doesn't affect users of HMP and it doesn't affect=
 
-The max_dev won't help because we can get a collision while maintaining
-the invariant 'not more than 2 devices on the bus'.
+>>>>> Libvirt,
+>>>>> but simplifying the meaning of the parameters of savevm/loadvm/delv=
+m.
+>>>> (Yes, very late reply, I'm sorry...)
+>>>>
+>>>> I do think it affects users of HMP, because right now you can delete=
 
-So if we don't want to limit the number of hotplug operations, and we do
-want to keep the allocation scheme before wrapping, the only solution I
-see is looking for the first free identifier after we wrap.
+>>>> snapshots with their ID, and after this series you cannot.
+>>>
+>>> That's true. My idea here was simple: the user can't reliably exclude=
 
-BTW I wonder if making max_index and index unsigned make things bit less
-ugly.
+>>> via snapshot ID today
+>>> because we're hiding the ID field in info snapshots:
+>>>
+>>>
+>>> =A0=A0=A0 (qemu) savevm 0
+>>> =A0=A0=A0 (qemu) info snapshots
+>>> =A0=A0=A0 List of snapshots present on all disks:
+>>> =A0=A0=A0 ID=A0=A0=A0=A0=A0=A0=A0 TAG=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0 VM SIZE=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 DATE=
+ VM CLOCK
+>>> =A0=A0=A0 --=A0=A0=A0=A0=A0=A0=A0 0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0 741M 2018-07-31 13:39:56 00:41:25.313
+>>>
+>>>
+>>> Thus, what will end up happening is that the user will be forced to u=
+se the
+>>> TAG of the snapshot since this is the only available information.
+>>
+>> But you can get it through e.g. qemu-img info.
+>>
+>> Snapshot list:
+>> ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>> 1         0                      1.6M 2019-01-09 18:01:21   00:00:02.6=
+57
+>>
+>> So it's not impossible to get.
+>=20
+> Is there a reason why we should display the ID at all when you can't us=
+e
+> it any more to identify snapshots?
 
-Regards,
-Halil
+I thought the long-term goal of this series really was to remove all
+mentions of the ID, yes.
+
+>>>> I think we had a short discussion about just disallowing numeric
+>>>> snapshot names.=A0 How bad would that be?
+>>>
+>>>
+>>> This was my first idea when evaluating what to do in this case. I gav=
+e
+>>> it up because
+>>> I found it to be too extreme. People would start complaining "I was a=
+ble
+>>> to do
+>>> savevm 0 and now I can't".
+>>
+>> True.  But it wouldn't be impossible to do, we'd need to deprecate
+>> numeric names, print a warning for two releases, and then we can make =
+it
+>> an error.
+>=20
+> This. Is. HMP.
+>=20
+> Not a stable ABI, no deprecation period of two releases.
+
+Well, if you want to do it.
+
+This may be HMP, but this is also the only interface to savevm, so it's
+not like users have a choice to use a more stable interface.  I know
+that was a conscious decision, more or less, but I don't see why we need
+to be so nasty when the hardest thing about doing a nice deprecation
+would be to remember to make it an error in half a year.
+
+>> Hm...  If we had a proper deprecation warning in this series, I suppos=
+e
+>> it wouldn't be dangerous anymore.  Can we just print a warning wheneve=
+r
+>> the user specified an ID?  (i.e. if some snapshot's ID matches the
+>> string given by the user and the snapshot's name does not)
+>=20
+> How is it less of a problem when a user gets QEMU from the distro and
+> skips five releases? They will never see the warning. This is different=
+
+> from QMP where things are fixed in libvirt, which is tested with every
+> single QEMU release.
+
+Well, then allowing users to accidentally specify the wrong snapshot
+remains adventurous.
+
+The thing is that this really is the only interface to savevm.  So while
+it may be HMP, it probably won't be used only by plain human end users
+who just don't want to deal with QMP.  I can imagine it is used with
+scripts and by people who regularly update their qemu because they have
+something important running on top of it.
+
+<general whining>
+Actually, to me what you're saying sounds more like "Our deprecation
+policy is useless" to which I wholeheartedly agree.  I think we should
+only remove things in major releases, and only if it was deprecated in
+the previous major release already.  (So if you deprecate something in
+4.0, you can remove it in 5.0; but if you deprecate it in 4.1, you can
+remove it only in 6.0.)  From a user standpoint I really think we
+deprecate stuff too irregularly.
+</general whining>
+
+OK, anyway, you're talking about stable distros.  But there are other
+users, too, so yes, this is less of a problem because it is a problem
+only for users of stable distros; so it's a problem for less users.
+
+
+But anyway, if you think deprecation is futile here, then I maintain
+that this series bears a bit of a risk.
+
+Max
+
+
+--IAws6MXONgr3kcOxXvEjBOtqi1F0eFQr5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw2MZIACgkQ9AfbAGHV
+z0D/8wgAk87gnwbPQReZMJOuiVLRyzgNEMVvfdVHSBqj43eKtE2eha0ohLc+DQgJ
+pO/M0mLvUHnYzLCNcD7AHa6VFvfHUOmkVLh2rIL4j5o/3yVeC+t9Du2hO+eTe5RT
+iPh9MTVGdfYax+c+7saYi2qa/2EUWt1fyQmiaHjrM8viSneF1ibIU8yMj3AUziOx
+zUOCZJpFoX+5SsFFzESgaDUUxKybN2gsexkVZhaRia46A4EjYbNryjcbTejhpiJc
+ADY0TL7pze0u6KwTqtLe/py8JZpSDAcjj2V91BYQxWD5TsLD4x4V1zLZH7bxv0Gy
+ijSDhDyKQmQtg7SmukLtP8PjJKGdUw==
+=UgyZ
+-----END PGP SIGNATURE-----
+
+--IAws6MXONgr3kcOxXvEjBOtqi1F0eFQr5--
