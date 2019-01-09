@@ -1,31 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38738)
+Received: from eggs.gnu.org ([209.51.188.92]:39278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghEpR-000779-Pw
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:27:34 -0500
+	(envelope-from <berto@igalia.com>) id 1ghEr3-0008NG-2L
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:29:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghEpQ-0007vS-LI
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:27:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37366)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghEpQ-0007um-DF
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:27:32 -0500
-References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-	<20190109105818.GG3998@redhat.com>
-	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
-	<20190109114459.GK3998@redhat.com>
-	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
-	<87y37udljk.fsf@dusky.pond.sub.org>
-	<f45f44ab-d967-6702-e362-56612401c268@redhat.com>
-	<87k1jdewvc.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cdb08ed1-4f0d-5328-3af5-dcdb3da1ec46@redhat.com>
-Date: Wed, 9 Jan 2019 15:27:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <87k1jdewvc.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+	(envelope-from <berto@igalia.com>) id 1ghEr0-000186-Dk
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:29:13 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed,  9 Jan 2019 16:28:50 +0200
+Message-Id: <20190109142850.27727-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] block: Acquire the AioContext in
+ guess_disk_lchs()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,107 +18,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 2019-01-09 15:20, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
->=20
->> On 2019-01-09 14:10, Markus Armbruster wrote:
->>> Thomas Huth <thuth@redhat.com> writes:
->>>
->>>> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
->>>>> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
->>>>>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
->>>>>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
->>>>>>>> Different versions of GCC and Clang use different versions of th=
-e C standard.
->>>>>>>> This repeatedly caused problems already, e.g. with duplicated ty=
-pedefs:
->>>>>>>>
->>>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.=
-html
->>>>>>>>
->>>>>>>> or with for-loop variable initializers:
->>>>>>>>
->>>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.=
-html
->>>>>>>>
->>>>>>>> To avoid these problems, we should enforce the C language versio=
-n to the
->>>>>>>> same level for all compilers. Since our minimum compiler version=
-s are
->>>>>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" =
-already,
->>>>>>>> this seems to be a good choice.
->>>>>>>
->>>>>>> In 4.x   gnu11 is marked as experimental. I'm not really comforta=
-ble
->>>>>>> using experimental features - even if its warning free there's a =
-risk
->>>>>>> it would silently mis-compile something.
->>>>>>>
->>>>>>> gnu99 is ok with 4.x - it is merely "incomplete".
->>>>>>
->>>>>> gnu11 has the big advantage that it also fixes the problem with
->>>>>> duplicated typedefs that are reported by older versions of Clang.
->>>>>>
->>>>>> Are you sure about the experimental character in 4.x? I just looke=
-d at
->>>>>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it=
- says:
->>>>>>
->>>>>> "A fourth version of the C standard, known as C11, was published i=
-n 2011
->>>>>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts=
- of
->>>>>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
->>>>>>
->>>>>> It does not say anything about "experimental" there. The word
->>>>>> "experimental" is only used for the C++ support, but we hardly hav=
-e C++
->>>>>> code in QEMU -- if you worry about that, I could simply drop the
->>>>>> "-std=3Dgnu++11" part from my patch?
->>>>>
->>>>> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1=
-.x86_64:
->>>>>
->>>>>   "3.4 Options Controlling C Dialect
->>>>>
->>>>>        ....snip...
->>>>>
->>>>>      'gnu11'
->>>>>      'gnu1x'
->>>>>           GNU dialect of ISO C11.  Support is incomplete and
->>>>>           experimental.  The name 'gnu1x' is deprecated."
->>>>
->>>> Ok. Looks like the "Support is incomplete and experimental" sentence=
- has
->>>> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
->>>> already. IMHO we could give it a try and enable gnu11 for QEMU with =
-GCC
->>>> v4.8, too. If we later find problems, we could still switch back to
->>>> gnu99 instead. Other opinions?
->>>
->>> Switchinh back could be somewhat painful if we already started using =
-C11
->>> features.  And if we don't plan to, then what exactly will -std=3Dgnu=
-11
->>> buy us?
->>
->> With C11, we get safety for the "duplicated typedef" problem that we r=
-un
->> into regularly again and again, see e.g.:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
->=20
-> That's a compilation failure.  "Support is experimental" makes me afrai=
-d
-> of run time failures.
->=20
-> If we truly want C11, shouldn't we bump minimum required GCC to 4.9?
+This fixes the following crash:
 
-That's not possible, since we claim to support RHEL7 / CentOS7 that is
-still using GCC v4.8.
+{ "execute": "blockdev-add",
+  "arguments": {"driver": "null-co", "node-name": "hd0"}}
+{ "execute": "object-add",
+  "arguments": {"qom-type": "iothread", "id": "iothread0"}}
+{ "execute": "x-blockdev-set-iothread",
+  "arguments": {"node-name": "hd0", "iothread": "iothread0"}}
+{ "execute": "device_add",
+  "arguments": {"id": "virtio0", "driver": "virtio-blk-pci",
+                "drive": "hd0"}}
+qemu: qemu_mutex_unlock_impl: Operation not permitted
+Aborted
 
- Thomas
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ hw/block/hd-geometry.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/hw/block/hd-geometry.c b/hw/block/hd-geometry.c
+index 79384a2b0a..0d9a7b7e7d 100644
+--- a/hw/block/hd-geometry.c
++++ b/hw/block/hd-geometry.c
+@@ -55,6 +55,7 @@ struct partition {
+ static int guess_disk_lchs(BlockBackend *blk,
+                            int *pcylinders, int *pheads, int *psectors)
+ {
++    AioContext *ctx = blk_get_aio_context(blk);
+     uint8_t buf[BDRV_SECTOR_SIZE];
+     int i, heads, sectors, cylinders;
+     struct partition *p;
+@@ -68,7 +69,10 @@ static int guess_disk_lchs(BlockBackend *blk,
+      * but also in async I/O mode. So the I/O throttling function has to
+      * be disabled temporarily here, not permanently.
+      */
+-    if (blk_pread_unthrottled(blk, 0, buf, BDRV_SECTOR_SIZE) < 0) {
++    aio_context_acquire(ctx);
++    i = blk_pread_unthrottled(blk, 0, buf, BDRV_SECTOR_SIZE);
++    aio_context_release(ctx);
++    if (i < 0) {
+         return -1;
+     }
+     /* test msdos magic */
+-- 
+2.11.0
