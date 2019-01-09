@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41380)
+Received: from eggs.gnu.org ([209.51.188.92]:41854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghEy9-00041B-VT
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:36:35 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ghF0C-0004wv-6e
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:38:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghEy8-0006Hn-3n
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:36:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47384)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghEy7-0006Fy-Qn
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:36:32 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-7-fli@suse.com>
-	<87lg3wmln8.fsf@dusky.pond.sub.org>
-	<5DCFD2A7-85F6-42ED-8CBB-B42B6605BE6F@126.com>
-	<87ftu3kri2.fsf@dusky.pond.sub.org>
-	<ab38ce34-1832-30e5-2649-f67b9b1755e4@126.com>
-Date: Wed, 09 Jan 2019 15:36:27 +0100
-In-Reply-To: <ab38ce34-1832-30e5-2649-f67b9b1755e4@126.com> (Fei Li's message
-	of "Wed, 9 Jan 2019 21:19:49 +0800")
-Message-ID: <875zuxew44.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1ghF0B-0007Hl-6S
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:38:40 -0500
+References: <1540876720-9574-1-git-send-email-liq3ea@gmail.com>
+	<1540876720-9574-3-git-send-email-liq3ea@gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b445d1bd-48ad-82a7-9775-53419ce1a4a2@redhat.com>
+Date: Wed, 9 Jan 2019 15:38:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 06/16] qemu_thread: Make
- qemu_thread_create() handle errors properly
+In-Reply-To: <1540876720-9574-3-git-send-email-liq3ea@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="q7l6ofKTCdqCjQhLt3hfKX16G7ZCPcSEI"
+Subject: Re: [Qemu-devel] [PATCH 2/4] nvme: ensure the num_queues is not zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,130 +24,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <lifei1214@126.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com
+To: Li Qiang <liq3ea@gmail.com>, keith.busch@intel.com, kwolf@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Fei Li <lifei1214@126.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--q7l6ofKTCdqCjQhLt3hfKX16G7ZCPcSEI
+From: Max Reitz <mreitz@redhat.com>
+To: Li Qiang <liq3ea@gmail.com>, keith.busch@intel.com, kwolf@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <b445d1bd-48ad-82a7-9775-53419ce1a4a2@redhat.com>
+Subject: Re: [PATCH 2/4] nvme: ensure the num_queues is not zero
+References: <1540876720-9574-1-git-send-email-liq3ea@gmail.com>
+ <1540876720-9574-3-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <1540876720-9574-3-git-send-email-liq3ea@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> =E5=9C=A8 2019/1/9 =E4=B8=8A=E5=8D=881:07, Markus Armbruster =E5=86=99=E9=
-=81=93:
->> fei <lifei1214@126.com> writes:
->>
->>>> =E5=9C=A8 2019=E5=B9=B41=E6=9C=888=E6=97=A5=EF=BC=8C01:18=EF=BC=8CMark=
-us Armbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->>>>
->>>> Fei Li <fli@suse.com> writes:
-[...]
->>>>> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
->>>>> index 865e476df5..39834b0551 100644
->>>>> --- a/util/qemu-thread-posix.c
->>>>> +++ b/util/qemu-thread-posix.c
->>>>> @@ -15,6 +15,7 @@
->>>>> #include "qemu/atomic.h"
->>>>> #include "qemu/notify.h"
->>>>> #include "qemu-thread-common.h"
->>>>> +#include "qapi/error.h"
->>>>>
->>>>> static bool name_threads;
->>>>>
->>>>> @@ -500,9 +501,13 @@ static void *qemu_thread_start(void *args)
->>>>>      return r;
->>>>> }
->>>>>
->>>>> -void qemu_thread_create(QemuThread *thread, const char *name,
->>>>> -                       void *(*start_routine)(void*),
->>>>> -                       void *arg, int mode)
->>>>> +/*
->>>>> + * Return a boolean: true/false to indicate whether it succeeds.
->>>>> + * If fails, propagate the error to Error **errp and set the errno.
->>>>> + */
->>>> Let's write something that can pass as a function contract:
->>>>
->>>>    /*
->>>>     * Create a new thread with name @name
->>>>     * The thread executes @start_routine() with argument @arg.
->>>>     * The thread will be created in a detached state if @mode is
->>>>     * QEMU_THREAD_DETACHED, and in a jounable state if it's
->>>>     * QEMU_THREAD_JOINABLE.
->>>>     * On success, return true.
->>>>     * On failure, set @errno, store an error through @errp and return
->>>>     * false.
->>>>     */
->>> Thanks so much for amending! :)
->>>> Personally, I'd return negative errno instead of false, and dispense
->>>> with setting errno.
->>> Emm, I think I have replied this in last version, but due to several re=
-asons I did not wait for your feedback and sent the v9. Sorry for that.. An=
-d I like to paste my two considerations here:
->>> =E2=80=9C- Actually only one caller needs the errno, that is the above =
-qemu_signalfd_compat().
->> Yes.
->>
->>> - For the returning value, I remember there's once a email thread talki=
-ng about it: returning a bool (and let the passed errp hold the error messa=
-ge) is to keep the consistency with glib.
->> GLib doesn't discourage return types other than boolean.  It only asks
->> that if you return boolean, then true should mean success and false
->> should mean failure.  See
->>
->>      https://developer.gnome.org/glib/stable/glib-Error-Reporting.html
->>
->> under "Rules for use of GError", item "By convention, if you return a
->> boolean value".
->>
->> The discussion you remember was about a convention we used to enforce in
->> QEMU, namely to avoid returning boolean success, and return void
->> instead.  That was basically a bad idea.
->>
->>> So IMO I am wondering whether it is really needed to change the bool (t=
-rue/false) to int (0/-errno), just for that sole function: qemu_signalfd_co=
-mpat() which needs the errno. Besides if we return -errno, for each caller =
-we need add a local variable like =E2=80=9Cret=3D qemu_thread_create()=E2=
-=80=9D to store the -errno.
->> Well, you either assign the error code to errno just for that caller, or
->> you return the error code just for that caller.  I'd do the latter
->> because I consider it slightly simpler.  Compare
->>
->>   * On success, return true.
->>   * On failure, set @errno, store an error through @errp and return
->>   * false.
->>
->> to
->>
->>   * On success, return zero.
->>   * On failure, store an error through @errp and return negative errno.
->>
->> where the second sentence describes just two instead of three actions.
->>
->> [...]
-> Ok, decribing two actions than three is indeed simpler. But I still
-> have one uncertain:
-> for those callers do not need the errno value, could we just check the
-> return value
-> to see whether it is negative, but not cache the unused return value? I m=
-ean
->
-> In the caller:
->
-> {...
-> =C2=A0=C2=A0=C2=A0 if (qemu_thread_create() < 0) {// do some cleanup}
-> ...}
+On 30.10.18 06:18, Li Qiang wrote:
+> When it is zero, it causes segv. Backtrack:
+> Thread 5 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.=
 
-This is just fine when you handle all errors the same.
+> [Switching to Thread 0x7fffc6c17700 (LWP 51808)]
+> 0x0000555555acbd90 in nvme_start_ctrl (n=3D0x6240000c8100) at hw/block/=
+nvme.c:820
+> warning: Source file is more recent than executable.
+> 820	    if (unlikely(n->cq[0])) {
+> (gdb) bt
+> 0  0x0000555555acbd90 in nvme_start_ctrl (n=3D0x6240000c8100) at hw/blo=
+ck/nvme.c:820
+> 1  0x0000555555accdbc in nvme_write_bar (n=3D0x6240000c8100, offset=3D2=
+0, data=3D4587521, size=3D4) at hw/block/nvme.c:964
+> 2  0x0000555555acdd2b in nvme_mmio_write (opaque=3D0x6240000c8100, addr=
+=3D20, data=3D4587521, size=3D4) at hw/block/nvme.c:1158
+> 3  0x00005555558973ed in memory_region_write_accessor (mr=3D0x6240000c8=
+9e0, addr=3D20, value=3D0x7fffc6c14428, size=3D4, shift=3D0, mask=3D42949=
+67295, attrs=3D...) at /home/liqiang02/qemu-upstream/qemu/memory.c:500
+> 4  0x0000555555897600 in access_with_adjusted_size (addr=3D20, value=3D=
+0x7fffc6c14428, size=3D4, access_size_min=3D2, access_size_max=3D8, acces=
+s_fn=3D0x555555897304 <memory_region_write_accessor>, mr=3D0x6240000c89e0=
+, attrs=3D...) at /home/liqiang02/qemu-upstream/qemu/memory.c:566
+> 5  0x000055555589a200 in memory_region_dispatch_write (mr=3D0x6240000c8=
+9e0, addr=3D20, data=3D4587521, size=3D4, attrs=3D...) at /home/liqiang02=
+/qemu-upstream/qemu/memory.c:1442
+> 6  0x0000555555835151 in flatview_write_continue (fv=3D0x6060000e6fc0, =
+addr=3D4273930260, attrs=3D..., buf=3D0x7fffc8a18028 "\001", len=3D4, add=
+r1=3D20, l=3D4, mr=3D0x6240000c89e0) at /home/liqiang02/qemu-upstream/qem=
+u/exec.c:3233
+> 7  0x000055555583529b in flatview_write (fv=3D0x6060000e6fc0, addr=3D42=
+73930260, attrs=3D..., buf=3D0x7fffc8a18028 "\001", len=3D4) at /home/liq=
+iang02/qemu-upstream/qemu/exec.c:3272
+> 8  0x00005555558355a1 in address_space_write (as=3D0x55555683ade0 <addr=
+ess_space_memory>, addr=3D4273930260, attrs=3D..., buf=3D0x7fffc8a18028 "=
+\001", len=3D4) at /home/liqiang02/qemu-upstream/qemu/exec.c:3362
+> 9  0x00005555558355f2 in address_space_rw (as=3D0x55555683ade0 <address=
+_space_memory>, addr=3D4273930260, attrs=3D..., buf=3D0x7fffc8a18028 "\00=
+1", len=3D4, is_write=3Dtrue) at /home/liqiang02/qemu-upstream/qemu/exec.=
+c:3373
+> 10 0x00005555558b66ac in kvm_cpu_exec (cpu=3D0x631000014800) at /home/l=
+iqiang02/qemu-upstream/qemu/accel/kvm/kvm-all.c:2031
+> 11 0x000055555587c3ac in qemu_kvm_cpu_thread_fn (arg=3D0x631000014800) =
+at /home/liqiang02/qemu-upstream/qemu/cpus.c:1277
+> 12 0x0000555555e54ae6 in qemu_thread_start (args=3D0x60300002c170) at u=
+til/qemu-thread-posix.c:504
+> 13 0x00007fffdadbd494 in start_thread () from /lib/x86_64-linux-gnu/lib=
+pthread.so.0
+> 14 0x00007fffdaaffacf in clone () from /lib/x86_64-linux-gnu/libc.so.6
+> (gdb) q
+>=20
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> ---
+>  hw/block/nvme.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 676cc48..72c9644 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1221,6 +1221,10 @@ static void nvme_realize(PCIDevice *pci_dev, Err=
+or **errp)
+>          error_setg(errp, "serial property not set");
+>          return;
+>      }
+> +
+> +    if (!n->num_queues) {
+> +        error_setg(errp, "num_queues can't be zero");
 
-> instead of
->
-> {=C2=A0=C2=A0=C2=A0 int ret;
-> ...
-> =C2=A0=C2=A0=C2=A0 ret =3D qemu_thread_create();
-> =C2=A0=C2=A0=C2=A0 if (ret < 0) { //do some cleanup }
->
-> ...}
+I think we should return here.
 
-I'd object to this one unless the value of @ret gets used elsewhere.
+(Sorry for the late review...)
 
-> As the first one can lessen quite a lot of codes. :)
->
-> Have a nice day, thanks
->
-> Fei
+Max
+
+> +    }
+>      blkconf_blocksizes(&n->conf);
+>      if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->c=
+onf.blk),
+>                                         false, errp)) {
+>=20
+
+
+
+--q7l6ofKTCdqCjQhLt3hfKX16G7ZCPcSEI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw2B0wACgkQ9AfbAGHV
+z0AEiAgAg7yPbi6ycFmVMKC6jzGWc0aOX24EmmV1PumXSt+qU+xr3yifrEo1z3oE
+q1y3u1AUvnM5jFEFC+YE4Mt0MmzVjBTDjYGR4wfu93bQbnNBcCwbvYllBavsI9nA
+DKstR2DVfBEZxQGzJlfVULaBc6NBFZvbqttFQkq2lcbWTywmmMg1M2Qc65qxu1Ii
+ul2sy3zjSDonm/h5LMuW/4MkCY3EY88FJfvfpFWG0KJ6Z2l8zuPxsdjYT8pxDIqS
+qdJ3E3S8k2U/1rLIOXlOD3QfcWmpEjkSsZn//1bEkD2kGAca1fPyf8JDEsUAxFIt
+1W3vdc04AwLZCVvyIpewb0cEUmDkkw==
+=58Rm
+-----END PGP SIGNATURE-----
+
+--q7l6ofKTCdqCjQhLt3hfKX16G7ZCPcSEI--
