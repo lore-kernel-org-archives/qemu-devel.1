@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43020)
+Received: from eggs.gnu.org ([209.51.188.92]:43864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ghGcK-00047D-Ui
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:22:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghGfh-0006wg-9H
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:25:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ghGcJ-0001Ls-4G
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:22:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34296)
+	(envelope-from <armbru@redhat.com>) id 1ghGfg-0005kE-2D
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:25:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33966)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ghGcH-0001K8-6w
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:22:05 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9FAAFA404E
-	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 16:12:29 +0000 (UTC)
-Date: Wed, 9 Jan 2019 17:12:24 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190109171224.292b8545@redhat.com>
-In-Reply-To: <20190109102311.7635-1-marcandre.lureau@redhat.com>
-References: <20190109102311.7635-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghGff-0005jN-QV
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:25:35 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+	<20190109142140.GC4867@localhost.localdomain>
+	<095e7b09-5d84-3437-782d-97fa6ca372ee@redhat.com>
+	<20190109144818.GE4867@localhost.localdomain>
+	<756f6997-cb66-a82b-ae13-babb0e5fa827@redhat.com>
+	<20190109151348.GG4867@localhost.localdomain>
+Date: Wed, 09 Jan 2019 17:25:29 +0100
+In-Reply-To: <20190109151348.GG4867@localhost.localdomain> (Kevin Wolf's
+	message of "Wed, 9 Jan 2019 16:13:48 +0100")
+Message-ID: <87lg3tbxxi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qdev: fix -device scsi-hd,help regression
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
+ ID anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,77 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, cohuck@redhat.com, ehabkost@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, armbru@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, muriloo@linux.ibm.com, dgilbert@redhat.com
 
-On Wed,  9 Jan 2019 14:23:11 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> Since commit ea9ce8934, device_post_init() applies globals directly
-> from machines and accelerator classes.
->=20
-> There are cases, such as -device scsi-hd,help, where the machine is
-> setup but there in no accelerator.
->=20
-> Let's skip accelerator globals in this case.
->=20
-> Fixes SEGV:
->  #0  0x0000555558ea04ff in object_get_class (obj=3D0x0) at /home/elmarco/=
-src/qemu/build/../qom/object.c:857
->  #1  0x000055555854c797 in object_apply_compat_props (obj=3D0x61600007898=
-0) at /home/elmarco/src/qemu/build/../hw/core/qdev.c:978
->  #2  0x000055555854c797 in object_apply_compat_props (obj=3D0x61600007898=
-0) at /home/elmarco/src/qemu/build/../hw/core/qdev.c:973
->  #3  0x000055555854c959 in device_post_init (obj=3D0x616000078980) at /ho=
-me/elmarco/src/qemu/build/../hw/core/qdev.c:989
->  #4  0x0000555558e9e250 in object_post_init_with_type (ti=3D<optimized ou=
-t>, obj=3D0x616000078980) at /home/elmarco/src/qemu/build/../qom/object.c:3=
-65
->  #5  0x0000555558e9e250 in object_initialize_with_type (data=3D0x61600007=
-8980, size=3D616, type=3D<optimized out>) at /home/elmarco/src/qemu/build/.=
-./qom/object.c:425
->  #6  0x0000555558e9e571 in object_new_with_type (type=3D0x613000031900) a=
-t /home/elmarco/src/qemu/build/../qom/object.c:588
->  #7  0x000055555830c048 in qmp_device_list_properties (typename=3Dtypenam=
-e@entry=3D0x60200000c2d0 "scsi-hd", errp=3Derrp@entry=3D0x7fffffffc540) at =
-/home/elmarco/src/qemu/qmp.c:519
->  #8  0x00005555582c4027 in qdev_device_help (opts=3D<optimized out>) at /=
-home/elmarco/src/qemu/qdev-monitor.c:283
->  #9  0x0000555559378fa2 in qemu_opts_foreach (list=3D<optimized out>, fun=
-c=3Dfunc@entry=3D0x5555582cfca0 <device_help_func>, opaque=3Dopaque@entry=
-=3D0x0, errp=3Derrp@entry=3D0x0) at /home/elmarco/src/qemu/util/qemu-option=
-.c:1171
->=20
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1664364
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Am 09.01.2019 um 15:54 hat Max Reitz geschrieben:
+>> On 09.01.19 15:48, Kevin Wolf wrote:
+>> > Am 09.01.2019 um 15:27 hat Max Reitz geschrieben:
+>> >> On 09.01.19 15:21, Kevin Wolf wrote:
+>> >>> Am 09.01.2019 um 15:10 hat Max Reitz geschrieben:
+>> >>>> On 06.09.18 13:11, Daniel Henrique Barboza wrote:
+>> >>>>> changes in v2:
+>> >>>>> - removed the "RFC" marker;
+>> >>>>> - added a new patch (patch 2) that removes
+>> >>>>> bdrv_snapshot_delete_by_id_or_name from the code;
+>> >>>>> - made changes in patch 1 as suggested by Murilo;
+>> >>>>> - previous patch set link:
+>> >>>>> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg04658.html
+>> >>>>>
+>> >>>>>
+>> >>>>> It is not uncommon to see bugs being opened by testers that attempt to
+>> >>>>> create VM snapshots using HMP. It turns out that "0" and "1" are quite
+>> >>>>> common snapshot names and they trigger a lot of bugs. I gave an example
+>> >>>>> in the commit message of patch 1, but to sum up here: QEMU treats the
+>> >>>>> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'. It
+>> >>>>> is documented as such, but this can lead to strange situations.
+>> >>>>>
+>> >>>>> Given that it is strange for an API to consider a parameter to be 2 fields
+>> >>>>> at the same time, and inadvently treating them as one or the other, and
+>> >>>>> that removing the ID field is too drastic, my idea here is to keep the
+>> >>>>> ID field for internal control, but do not let the user set it.
+>> >>>>>
+>> >>>>> I guess there's room for discussion about considering this change an API
+>> >>>>> change or not. It doesn't affect users of HMP and it doesn't affect Libvirt,
+>> >>>>> but simplifying the meaning of the parameters of savevm/loadvm/delvm.
+>> >>>>
+>> >>>> (Yes, very late reply, I'm sorry...)
+>> >>>>
+>> >>>> I do think it affects users of HMP, because right now you can delete
+>> >>>> snapshots with their ID, and after this series you cannot.
+>> >>>
+>> >>> Can there be snapshots that can't be identified by a snapshot name, but
+>> >>> only by their ID?
+>> >>
+>> >> I don't know, but what I meant is that if you have scripts to do all
+>> >> this, you might have to adjust them with this change.
+>> > 
+>> > That's what the H in HMP means.
+>> > 
+>> >>>> I think we had a short discussion about just disallowing numeric
+>> >>>> snapshot names.  How bad would that be?
+>> >>>
+>> >>> It would be incompatible with existing images and result in a more
+>> >>> complex snapshot identifier resolution. Why would it be any better?
+>> >>
+>> >> It wouldn't be incompatible with existing images if we'd just disallow
+>> >> creating such snapshots.  I don't see how the identifier resolution
+>> >> would be more complex.
+>> >>
+>> >> I don't know if it'd be better.  I'd just find it simpler (for us, that
+>> >> is -- for users, I'm not sure).
+>> > 
+>> > Identifier resolution A:
+>> > - Find a snapshot that has the given identifier as a name
+>> > - If no such snapshot exists, it is an error
+>> > 
+>> > Identifier resolution B:
+>> > - If the identifier is a number, find a snapshot that has the given
+>> >   identifier as its ID
+>> > - If the identifier is not a number, find a snapshot that has the given
+>> >   identifier as a name
+>> > - If no such snapshot exists, it is an error
+>> 
+>> No, my idea was to keep the resolution the same as it is; just to forbid
+>> creating new snapshots with numeric names.  This would prevent users
+>> from getting into the whole situation.
+>
+> That's the version with an even more complex resolution method C. :-)
+>
+> I actually think the current behaviour is more confusing than helpful.
+> Without looking into the code or trying it out, I couldn't even tell
+> whether ID or name takes precedence if there is a matching snapshot for
+> both.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Been there, done that, more than once.
 
-> ---
->  hw/core/qdev.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 3769a2bccb..47bddacb4f 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -975,10 +975,13 @@ void object_apply_compat_props(Object *obj)
->      if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
->          MachineState *m =3D MACHINE(qdev_get_machine());
->          MachineClass *mc =3D MACHINE_GET_CLASS(m);
-> -        AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
-> =20
-> -        if (ac->compat_props) {
-> -            object_apply_global_props(obj, ac->compat_props, &error_abor=
-t);
-> +        if (m->accelerator) {
-> +            AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
-> +
-> +            if (ac->compat_props) {
-> +                object_apply_global_props(obj, ac->compat_props, &error_=
-abort);
-> +            }
->          }
->          object_apply_global_props(obj, mc->compat_props, &error_abort);
->      }
+>       Considering your proposal, it's probably the ID, but how should a
+> user know that? (If against all expectations documentation exists, it
+> doesn't count because nobody reads that.)
+
+In this case, probably for the better --- I'd expect documentation of
+this mess (if any) to be rather losely related to the code.
