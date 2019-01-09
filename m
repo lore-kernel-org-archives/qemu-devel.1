@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38044)
+Received: from eggs.gnu.org ([209.51.188.92]:38131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ghHvg-0006or-Vu
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:46:14 -0500
+	(envelope-from <jjongsma@redhat.com>) id 1ghHvw-0006xp-Tf
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:46:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ghHvf-0004hJ-Cv
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:46:12 -0500
-Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:59123)
+	(envelope-from <jjongsma@redhat.com>) id 1ghHvv-0004tk-07
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:46:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ghHvf-0004gD-6f
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:46:11 -0500
-Received: from player750.ha.ovh.net (unknown [10.109.159.20])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id D8836178CE6
-	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 18:46:09 +0100 (CET)
-References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
-	<1547051976-13982-2-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <9ecf8678-d86d-85f2-1842-de0735b1f4c3@kaod.org>
-Date: Wed, 9 Jan 2019 18:46:00 +0100
-MIME-Version: 1.0
-In-Reply-To: <1547051976-13982-2-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
- compilation with clang -std=gnu99
+	(Exim 4.71) (envelope-from <jjongsma@redhat.com>) id 1ghHvr-0004oK-Bt
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:46:24 -0500
+Message-ID: <5109a83384d59675df22842ca7b2a4b81339fb8e.camel@redhat.com>
+From: Jonathon Jongsma <jjongsma@redhat.com>
+Date: Wed, 09 Jan 2019 11:37:19 -0600
+In-Reply-To: <20190108152648.32537-3-lhrazky@redhat.com>
+References: <20190108152648.32537-1-lhrazky@redhat.com>
+	<20190108152648.32537-3-lhrazky@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Spice-devel] [PATCH spice 2/3] QXL interface:
+ deprecate spice_qxl_set_max_monitors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,129 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-On 1/9/19 5:39 PM, Thomas Huth wrote:
-> When compiling with Clang and -std=gnu99, I get the following errors:
-> 
->   CC      ppc64-softmmu/hw/intc/xics_spapr.o
-> In file included from hw/intc/xics_spapr.c:34:
-> include/hw/ppc/xics.h:46:25: error: redefinition of typedef 'ICSState' is a C11 feature
->       [-Werror,-Wtypedef-redefinition]
-> typedef struct ICSState ICSState;
->                         ^
-> include/hw/ppc/spapr.h:18:25: note: previous definition is here
-> typedef struct ICSState ICSState;
->                         ^
-> In file included from hw/intc/xics_spapr.c:34:
-> include/hw/ppc/xics.h:203:34: error: redefinition of typedef 'sPAPRMachineState' is a C11 feature
->       [-Werror,-Wtypedef-redefinition]
-> typedef struct sPAPRMachineState sPAPRMachineState;
->                                  ^
-> include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
-> typedef struct sPAPRMachineState sPAPRMachineState;
->                                  ^
->   CC      ppc64-softmmu/hw/intc/spapr_xive.o
-> In file included from hw/intc/spapr_xive.c:19:
-> include/hw/ppc/spapr_xive.h:38:3: error: redefinition of typedef 'sPAPRXive' is a C11 feature
->       [-Werror,-Wtypedef-redefinition]
-> } sPAPRXive;
->   ^
-> include/hw/ppc/spapr.h:20:26: note: previous definition is here
-> typedef struct sPAPRXive sPAPRXive;
->                          ^
-> In file included from hw/intc/spapr_xive.c:19:
-> include/hw/ppc/spapr_xive.h:45:34: error: redefinition of typedef 'sPAPRMachineState' is a C11 feature
->       [-Werror,-Wtypedef-redefinition]
-> typedef struct sPAPRMachineState sPAPRMachineState;
->                                  ^
-> include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
-> typedef struct sPAPRMachineState sPAPRMachineState;
->                                  ^
->   CC      ppc64-softmmu/hw/char/spapr_vty.o
-> In file included from hw/char/spapr_vty.c:8:
-> In file included from include/hw/ppc/spapr.h:12:
-> include/hw/ppc/spapr_xive.h:45:34: error: redefinition of typedef 'sPAPRMachineState' is a C11 feature
->       [-Werror,-Wtypedef-redefinition]
-> typedef struct sPAPRMachineState sPAPRMachineState;
->                                  ^
-> include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
-> typedef struct sPAPRMachineState sPAPRMachineState;
->                                  ^
-> 
-> Since we're going to make -std=gnu99 mandatory, fix these issues
-> by including the right header files indead of typedeffing stuff twice.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Jonathon Jongsma <jjongsma@redhat.com>
+
+
+On Tue, 2019-01-08 at 16:26 +0100, Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD wrote=
+:
+> Replace it by spice_qxl_set_device_info. Note we can't use
+> monitors_count for what's stored in max_monitors, because
+> monitors_count
+> denotes the length of the device_display_ids array, which
+> spice_qxl_set_max_monitors doesn't touch.
+>=20
+> Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
 > ---
->  include/hw/ppc/spapr.h      | 4 ++--
->  include/hw/ppc/spapr_xive.h | 2 +-
->  include/hw/ppc/xics.h       | 4 ++--
->  3 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 2c77a8b..6a5ae4f 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -8,6 +8,8 @@
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/ppc/spapr_ovec.h"
->  #include "hw/ppc/spapr_irq.h"
-> +#include "hw/ppc/xics.h"
-> +#include "hw/ppc/spapr_xive.h"
->  
->  struct VIOsPAPRBus;
->  struct sPAPRPHBState;
-> @@ -15,8 +17,6 @@ struct sPAPRNVRAM;
->  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
->  typedef struct sPAPREventSource sPAPREventSource;
->  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
-> -typedef struct ICSState ICSState;
-> -typedef struct sPAPRXive sPAPRXive;
->  
->  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
->  #define SPAPR_ENTRY_POINT       0x100
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 728735d..aff4366 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -42,7 +42,7 @@ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
->  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
->  qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
->  
-> -typedef struct sPAPRMachineState sPAPRMachineState;
-> +#include "hw/ppc/spapr.h"  /* for sPAPRMachineState */
->  
->  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
->  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 14afda1..a7f49a4 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -47,6 +47,8 @@ typedef struct ICSState ICSState;
->  typedef struct ICSIRQState ICSIRQState;
->  typedef struct XICSFabric XICSFabric;
->  
-> +#include "hw/ppc/spapr.h"
-> +
->  #define TYPE_ICP "icp"
->  #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
->  
-> @@ -200,8 +202,6 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon);
->  void ics_resend(ICSState *ics);
->  void icp_resend(ICPState *ss);
-
-I think the definitions below belong to another header file, 
-may be "xics_spapr.h". That would be cleaner.
-
-Thanks,
-
-C. 
-
-> -typedef struct sPAPRMachineState sPAPRMachineState;
-> -
->  void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
->                     uint32_t phandle);
->  int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-> 
+>  server/red-qxl.c   | 1 +
+>  server/spice-qxl.h | 4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/server/red-qxl.c b/server/red-qxl.c
+> index 0ea424cd..6ffd8286 100644
+> --- a/server/red-qxl.c
+> +++ b/server/red-qxl.c
+> @@ -888,6 +888,7 @@ void spice_qxl_set_device_info(QXLInstance
+> *instance,
+>      }
+> =20
+>      instance->st->monitors_count =3D device_display_id_count;
+> +    instance->st->max_monitors =3D device_display_id_count;
+>  }
+> =20
+>  void red_qxl_init(RedsState *reds, QXLInstance *qxl)
+> diff --git a/server/spice-qxl.h b/server/spice-qxl.h
+> index 547d3d93..e7af5e5e 100644
+> --- a/server/spice-qxl.h
+> +++ b/server/spice-qxl.h
+> @@ -101,9 +101,9 @@ void spice_qxl_monitors_config_async(QXLInstance
+> *instance, QXLPHYSICAL monitors
+>                                       int group_id, uint64_t cookie);
+>  /* since spice 0.12.3 */
+>  void spice_qxl_driver_unload(QXLInstance *instance);
+> -/* since spice 0.12.6 */
+> +/* since spice 0.12.6, deprecated since 0.14.2,
+> spice_qxl_set_device_info replaces it */
+>  void spice_qxl_set_max_monitors(QXLInstance *instance,
+> -                                unsigned int max_monitors);
+> +                                unsigned int max_monitors)
+> SPICE_GNUC_DEPRECATED;
+>  /* since spice 0.13.1 */
+>  void spice_qxl_gl_scanout(QXLInstance *instance,
+>                            int fd,
