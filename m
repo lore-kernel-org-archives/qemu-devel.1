@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55668)
+Received: from eggs.gnu.org ([209.51.188.92]:56765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghCIQ-00020w-Ji
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:45:21 -0500
+	(envelope-from <ndevos@redhat.com>) id 1ghCMz-0003KP-SB
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:50:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghCIO-0005uB-Cs
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:45:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghCIO-0005tn-2W
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:45:16 -0500
-Date: Wed, 9 Jan 2019 11:44:59 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190109114459.GK3998@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
-	<20190109105818.GG3998@redhat.com>
-	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
+	(envelope-from <ndevos@redhat.com>) id 1ghCMx-0000SH-OD
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:50:01 -0500
+Date: Wed, 9 Jan 2019 12:43:19 +0100
+From: Niels de Vos <ndevos@redhat.com>
+Message-ID: <20190109114319.GB7869@ndevos-x270>
+References: <cover.1537848362.git.jcody@redhat.com>
+	<cover.1537848362.git.jcody@redhat.com>
+	<0e8a512d4c95094dc12f92390200c8e753c38248.1537848362.git.jcody@redhat.com>
+	<87efdiyxv9.fsf@dusky.pond.sub.org>
+	<20180925053204.GB4558@lemon.usersys.redhat.com>
+	<87va6uvxhv.fsf@dusky.pond.sub.org>
+	<87h8ejcbl1.fsf@dusky.pond.sub.org>
+	<20190108191216.GO11492@linux.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
+In-Reply-To: <20190108191216.GO11492@linux.fritz.box>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] MAINTAINERS: Remove
+ myself as block maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +30,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, Jeff Cody <jeff@codyprime.org>
 
-On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
-> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
-> > On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
-> >> Different versions of GCC and Clang use different versions of the C =
-standard.
-> >> This repeatedly caused problems already, e.g. with duplicated typede=
-fs:
-> >>
-> >>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
-> >>
-> >> or with for-loop variable initializers:
-> >>
-> >>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
-> >>
-> >> To avoid these problems, we should enforce the C language version to=
- the
-> >> same level for all compilers. Since our minimum compiler versions ar=
-e
-> >> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" alre=
-ady,
-> >> this seems to be a good choice.
-> >=20
-> > In 4.x   gnu11 is marked as experimental. I'm not really comfortable
-> > using experimental features - even if its warning free there's a risk
-> > it would silently mis-compile something.
-> >=20
-> > gnu99 is ok with 4.x - it is merely "incomplete".
->=20
-> gnu11 has the big advantage that it also fixes the problem with
-> duplicated typedefs that are reported by older versions of Clang.
->=20
-> Are you sure about the experimental character in 4.x? I just looked at
-> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it says=
-:
->=20
-> "A fourth version of the C standard, known as C11, was published in 201=
-1
-> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts of
-> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
->=20
-> It does not say anything about "experimental" there. The word
-> "experimental" is only used for the C++ support, but we hardly have C++
-> code in QEMU -- if you worry about that, I could simply drop the
-> "-std=3Dgnu++11" part from my patch?
+On Tue, Jan 08, 2019 at 08:12:16PM +0100, Kevin Wolf wrote:
+> Am 08.01.2019 um 18:18 hat Markus Armbruster geschrieben:
+> > This patch series got stuck.
+> > 
+> > Markus Armbruster <armbru@redhat.com> writes:
+> > 
+> > > Fam Zheng <famz@redhat.com> writes:
+> > >
+> > >> On Tue, 09/25 07:00, Markus Armbruster wrote:
+> > >>> Jeff Cody <jcody@redhat.com> writes:
+> > >>> 
+> > >>> > I'll not be involved in day-to-day qemu development.  Remove
+> > >>> > myself as maintainer from the remainder of the network block drivers
+> > >>> > (and vhdx), and revert them to the general block layer maintainership.
+> > >>> >
+> > >>> > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > >>> > ---
+> > >>> >  MAINTAINERS | 14 --------------
+> > >>> >  1 file changed, 14 deletions(-)
+> > >>> >
+> > >>> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > >>> > index e93f79672f..6ef6932628 100644
+> > >>> > --- a/MAINTAINERS
+> > >>> > +++ b/MAINTAINERS
+> > >>> > @@ -1982,28 +1982,22 @@ F: block/vmdk.c
+> > >>> >  
+> > >>> >  RBD
+> > >>> >  M: Josh Durgin <jdurgin@redhat.com>
+> > >>> > -M: Jeff Cody <jcody@redhat.com>
+> > >>> >  L: qemu-block@nongnu.org
+> > >>> >  S: Supported
+> > >>> >  F: block/rbd.c
+> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+> > >>> >  
+> > >>> >  Sheepdog
+> > >>> >  M: Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>
+> > >>> >  M: Liu Yuan <namei.unix@gmail.com>
+> > >>> > -M: Jeff Cody <jcody@redhat.com>
+> > >>> >  L: qemu-block@nongnu.org
+> > >>> >  L: sheepdog@lists.wpkg.org
+> > >>> >  S: Supported
+> > >>> >  F: block/sheepdog.c
+> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+> > >>> >  
+> > >>> >  VHDX
+> > >>> > -M: Jeff Cody <jcody@redhat.com>
+> > >>> >  L: qemu-block@nongnu.org
+> > >>> >  S: Supported
+> > >>> >  F: block/vhdx*
+> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+> > >>> 
+> > >>> Does "S: Supported" make sense without an M:?
+> > >>> 
+> > >>> >  
+> > >>> >  VDI
+> > >>> >  M: Stefan Weil <sw@weilnetz.de>
+> > >>> > @@ -2034,34 +2028,26 @@ F: docs/interop/nbd.txt
+> > >>> >  T: git git://repo.or.cz/qemu/ericb.git nbd
+> > >>> >  
+> > >>> >  NFS
+> > >>> > -M: Jeff Cody <jcody@redhat.com>
+> > >>> >  M: Peter Lieven <pl@kamp.de>
+> > >>> >  L: qemu-block@nongnu.org
+> > >>> >  S: Maintained
+> > >>> >  F: block/nfs.c
+> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+> > >>> >  
+> > >>> >  SSH
+> > >>> >  M: Richard W.M. Jones <rjones@redhat.com>
+> > >>> > -M: Jeff Cody <jcody@redhat.com>
+> > >>> >  L: qemu-block@nongnu.org
+> > >>> >  S: Supported
+> > >>> >  F: block/ssh.c
+> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+> > >>> >  
+> > >>> >  CURL
+> > >>> > -M: Jeff Cody <jcody@redhat.com>
+> > >>> >  L: qemu-block@nongnu.org
+> > >>> >  S: Supported
+> > >>> >  F: block/curl.c
+> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+> > >>> 
+> > >>> Likewise.
+> > >>> 
+> > >>> >  GLUSTER
+> > >>> > -M: Jeff Cody <jcody@redhat.com>
+> > >>> >  L: qemu-block@nongnu.org
+> > >>> >  S: Supported
+> > >>> >  F: block/gluster.c
+> > >>> > -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
+> > >>> 
+> > >>> Likewise.
+> > >>> 
+> > >>> >  Null Block Driver
+> > >>> >  M: Fam Zheng <famz@redhat.com>
+> > >>> 
+> > >>
+> > >> Block drivers without an M: naturally fall under the overall maintainership of
+> > >> block layer (Kevin&Max), so IMO keeping the statuses is fine. Maybe CURL can be
+> > >> degraded to Maintained, though.
+> > >
+> > > Yes, get_maintainer.pl combines all applicable sections.  Human readers
+> > > are left to wonder, unless they know to look for other matches.
+> > >
+> > > Do we want to have a dedicated network block driver submaintainer again,
+> > > if we can find one?
+> > >
+> > > Do we want to have a dedicated VHDX driver submaintainer again?  Fam,
+> > > you're maintaining VMDK, could you cover VHDX as well?
+> > 
+> > Fam can't.
+> > 
+> > I can see two sane options for the three sections that lose their sole
+> > maintainer (VHDX, CURL, GLUSTER):
+> > 
+> > * Downgrade to S: Orphan
+> > 
+> >   This reflects the fact that we'd like to have dedicated maintainers
+> >   for them.  It camouflages the fact that the "Block layer core"
+> >   maintainers pick up the slack.
+> > 
+> > * Delete
+> > 
+> >   The opposite.
+> > 
+> > Kevin, Max, please pick your poison, or suggest one you find tastier.
+> 
+> Orphan is probably by far closer to the truth than Supported. But I
+> think what we really do is Odd Fixes. Not sure if that's a status that
+> works in any meaningful way without having a maintainer for the specific
+> thing assigned?
 
-I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1.x86_6=
-4:
+For Gluster we are interested in keeping it maintained in some form. At
+least integration@gluster.org could be added as a list. I am not sure
+there is anyone working on Gluster that would fit for a maintainer of
+the driver. If you really want to put a name there, I can function as a
+'maintainer' and pull in other Gluster developers in case I am otherwise
+occupied.
 
-  "3.4 Options Controlling C Dialect
-
-   ....snip...
-
-     'c11'
-     'c1x'
-     'iso9899:2011'
-          ISO C11, the 2011 revision of the ISO C standard.  Support is
-          incomplete and experimental.  The name 'c1x' is deprecated.
-
-       ....snip...
-
-     'gnu11'
-     'gnu1x'
-          GNU dialect of ISO C11.  Support is incomplete and
-          experimental.  The name 'gnu1x' is deprecated."
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Niels
