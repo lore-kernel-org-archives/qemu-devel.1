@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59692)
+Received: from eggs.gnu.org ([209.51.188.92]:60012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghFJG-0003m4-S2
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:58:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1ghFJP-0003tx-2n
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:58:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghFJD-0000uN-PP
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:58:22 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55767)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1ghFJD-0000rF-ID
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:58:19 -0500
-Received: by mail-wm1-x342.google.com with SMTP id y139so7887471wmc.5
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 06:58:16 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1ghFJN-00013v-Pm
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:58:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:63271)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghFJN-000135-He
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:58:29 -0500
+Date: Wed, 9 Jan 2019 14:58:20 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190109145820.GV3998@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1547043869-10520-1-git-send-email-thuth@redhat.com>
+	<20190109143122.GR3998@redhat.com>
+	<21c94e77-ad1d-3ce2-72cd-fc86f6d619fc@redhat.com>
 MIME-Version: 1.0
-References: <20190109082902.32271-1-marcandre.lureau@redhat.com>
-	<20190109094732-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190109094732-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 9 Jan 2019 18:58:04 +0400
-Message-ID: <CAJ+F1CLKTS=TW4j52NgVDELw8DrBqMFrb04a6w-YkvkTE8dXHg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <21c94e77-ad1d-3ce2-72cd-fc86f6d619fc@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v15 0/6] Add support for TPM Physical
- Presence interface
+Subject: Re: [Qemu-devel] [PATCH v2] configure: Force the C standard to gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi
+On Wed, Jan 09, 2019 at 03:51:33PM +0100, Thomas Huth wrote:
+> On 2019-01-09 15:31, Daniel P. Berrang=C3=A9 wrote:
+> > On Wed, Jan 09, 2019 at 03:24:29PM +0100, Thomas Huth wrote:
+> >> Different versions of GCC and Clang use different versions of the C =
+standard.
+> >> This repeatedly caused problems already, e.g. with duplicated typede=
+fs:
+> >>
+> >>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+> >>
+> >> or with for-loop variable initializers:
+> >>
+> >>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
+> >>
+> >> To avoid these problems, we should enforce the C language version to=
+ the
+> >> same level for all compilers. Since our minimum compiler versions is
+> >> GCC v4.8, our best option is "gnu99" right now ("gnu17" is not avail=
+able
+> >> there yet, and "gnu11" is marked as "experimental").
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  v2: Use gnu99 instead of gnu11
+> >>
+> >>  configure | 5 +++--
+> >>  1 file changed, 3 insertions(+), 2 deletions(-)
+> >=20
+> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> >=20
+> >> diff --git a/configure b/configure
+> >> index b9f34af..721ade7 100755
+> >> --- a/configure
+> >> +++ b/configure
+> >> @@ -105,7 +105,8 @@ update_cxxflags() {
+> >>      for arg in $QEMU_CFLAGS; do
+> >>          case $arg in
+> >>              -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-exter=
+ns|\
+> >> -            -Wold-style-declaration|-Wold-style-definition|-Wredund=
+ant-decls)
+> >> +            -Wold-style-declaration|-Wold-style-definition|-Wredund=
+ant-decls|\
+> >> +            -std=3Dgnu99)
+> >=20
+> > IIUC this is to  drop  -std=3Dgnu99 from CXXFLAGS, so C++ code (only =
+the
+> > guest-agent on Win32 IIUC) will use the compiler default still.
+>=20
+> We also use it for the capstone disassembler and disas/libvixl.
+>=20
+> > We could consider also setting a suitable -std for CXXFLAGS too in fu=
+ture
+> > though...
+>=20
+> Shall I send a v3 with "-std=3Dgnu++98" (which seems to be the only usa=
+ble
+> option right now), or shall we wait until we really hit a problem with
+> the C++ code?
 
-On Wed, Jan 9, 2019 at 6:51 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Jan 09, 2019 at 12:28:56PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi,
-> >
-> > The following patches implement the TPM Physical Presence Interface
-> > that allows a user to set a command via ACPI (sysfs entry in Linux)
-> > that, upon the next reboot, the firmware looks for and acts upon by
-> > sending sequences of commands to the TPM.
-> >
-> > A dedicated memory region is added to the TPM CRB & TIS devices, at
-> > address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
-> > holds the location for that PPI region and some version details, to
-> > allow for future flexibility.
-> >
-> > With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
-> > now runs successfully.
-> >
-> > It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
-> > Implement Physical Presence interface for TPM 1.2 and 2")
-> >
-> > The edk2 support is merged upstream.
->
-> So it looks good to me overall.
-> Minor style comments.
->
-> With or without:
->
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+I'd have a slight preference for adding a C++ suitable -std now
+just to give us a more predictable build setup. I don't consider
+it a blocker though, hence my R-b on this v2 patch as it is now.
 
-Thanks Michael for the review!
-
-Would you take it in your next pull request? Or may I send a pull req?
-
-For the minor style comments, I can either let you do that on commit,
-resend, or together with a pullreq.
-
-thanks
-
->
->
-> > v15:
-> > - fix crash on reset when PPI is disabled
-> >
-> > v14:
-> > - rebased, fixing conflicts after compat-props refactoring
-> > - fix build regression from v13 with --disable-tpm
-> >
-> > v13:
-> > - removed needless error handling in tpm_ppi_init()
-> > - splitted "add ACPI memory clear interface"
-> > - moved acpi build function in dedicated hw/acpi/tpm.c
-> > - added some function documentation in headers
-> > - various code cleanups suggested by Philippe
-> > - rebased
-> >
-> > Marc-Andr=C3=A9 Lureau (3):
-> >   tpm: add a "ppi" boolean property
-> >   acpi: add ACPI memory clear interface
-> >   tpm: clear RAM when "memory overwrite" requested
-> >
-> > Stefan Berger (3):
-> >   tpm: allocate/map buffer for TPM Physical Presence interface
-> >   acpi: expose TPM/PPI configuration parameters to firmware via fw_cfg
-> >   acpi: build TPM Physical Presence interface
-> >
-> >  hw/tpm/tpm_ppi.h      |  46 +++++
-> >  include/hw/acpi/tpm.h |  21 ++
-> >  hw/acpi/tpm.c         | 448 ++++++++++++++++++++++++++++++++++++++++++
-> >  hw/core/machine.c     |   8 +
-> >  hw/i386/acpi-build.c  |  29 ++-
-> >  hw/tpm/tpm_crb.c      |  13 ++
-> >  hw/tpm/tpm_ppi.c      |  53 +++++
-> >  hw/tpm/tpm_tis.c      |  13 ++
-> >  stubs/tpm.c           |   5 +
-> >  docs/specs/tpm.txt    | 104 ++++++++++
-> >  hw/acpi/Makefile.objs |   1 +
-> >  hw/tpm/Makefile.objs  |   1 +
-> >  hw/tpm/trace-events   |   3 +
-> >  13 files changed, 743 insertions(+), 2 deletions(-)
-> >  create mode 100644 hw/tpm/tpm_ppi.h
-> >  create mode 100644 hw/acpi/tpm.c
-> >  create mode 100644 hw/tpm/tpm_ppi.c
-> >
-> > --
-> > 2.20.1.2.gb21ebb671b
->
-
-
+Regards,
+Daniel
 --=20
-Marc-Andr=C3=A9 Lureau
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
