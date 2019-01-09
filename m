@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60749)
+Received: from eggs.gnu.org ([209.51.188.92]:34384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghES9-0002hV-VM
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:03:31 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ghEZN-00076y-A2
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:10:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghES8-0003IF-FJ
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:03:29 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed,  9 Jan 2019 15:03:23 +0100
-Message-Id: <1547042603-21147-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/ppc/spapr: Encode the SCSI channel (bus) in
- the SRP LUNs
+	(envelope-from <mreitz@redhat.com>) id 1ghEZM-0007ZD-E5
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:10:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44140)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ghEZM-0007YY-59
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:10:56 -0500
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+Date: Wed, 9 Jan 2019 15:10:50 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180906111107.30684-1-danielhb413@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="YundUH3aPE2kGHFMn3YJDK2kANmLmXkTv"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
+ ID anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,39 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, kwolf@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com
 
-In hw/scsi/spapr_vio.c we declare that the controller supports multiple
-buses by specifying "max_channel = 7" there. So in the code that fixes
-up the device tree nodes, we must encode the channel number (a.k.a. bus
-number in the "Logical unit addressing format" table of SAM5) into the
-64-bit LUN, too.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YundUH3aPE2kGHFMn3YJDK2kANmLmXkTv
+From: Max Reitz <mreitz@redhat.com>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, kwolf@redhat.com, armbru@redhat.com,
+ muriloo@linux.ibm.com
+Message-ID: <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+Subject: Re: [PATCH v2 0/3] HMP/snapshot changes - do not use ID anymore
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+In-Reply-To: <20180906111107.30684-1-danielhb413@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1663160
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/ppc/spapr.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+On 06.09.18 13:11, Daniel Henrique Barboza wrote:
+> changes in v2:
+> - removed the "RFC" marker;
+> - added a new patch (patch 2) that removes
+> bdrv_snapshot_delete_by_id_or_name from the code;
+> - made changes in patch 1 as suggested by Murilo;
+> - previous patch set link:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg04658.html
+>=20
+>=20
+> It is not uncommon to see bugs being opened by testers that attempt to
+> create VM snapshots using HMP. It turns out that "0" and "1" are quite
+> common snapshot names and they trigger a lot of bugs. I gave an example=
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 5671608..1f49489 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2905,10 +2905,11 @@ static char *spapr_get_fw_dev_path(FWPathProvider *p, BusState *bus,
-         if (spapr) {
-             /*
-              * Replace "channel@0/disk@0,0" with "disk@8000000000000000":
--             * We use SRP luns of the form 8000 | (bus << 8) | (id << 5) | lun
--             * in the top 16 bits of the 64-bit LUN
-+             * In the top 16 bits of the 64-bit LUN, we use SRP luns of the form
-+             * 0x8000 | (target << 8) | (bus << 5) | lun
-+             * (see the "Logical unit addressing format" table in SAM5)
-              */
--            unsigned id = 0x8000 | (d->id << 8) | d->lun;
-+            unsigned id = 0x8000 | (d->id << 8) | (d->channel << 5) | d->lun;
-             return g_strdup_printf("%s@%"PRIX64, qdev_fw_name(dev),
-                                    (uint64_t)id << 48);
-         } else if (virtio) {
--- 
-1.8.3.1
+> in the commit message of patch 1, but to sum up here: QEMU treats the
+> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'. It=
+
+> is documented as such, but this can lead to strange situations.
+>=20
+> Given that it is strange for an API to consider a parameter to be 2 fie=
+lds
+> at the same time, and inadvently treating them as one or the other, and=
+
+> that removing the ID field is too drastic, my idea here is to keep the
+> ID field for internal control, but do not let the user set it.
+>=20
+> I guess there's room for discussion about considering this change an AP=
+I
+> change or not. It doesn't affect users of HMP and it doesn't affect Lib=
+virt,
+> but simplifying the meaning of the parameters of savevm/loadvm/delvm.
+
+(Yes, very late reply, I'm sorry...)
+
+I do think it affects users of HMP, because right now you can delete
+snapshots with their ID, and after this series you cannot.
+
+I think we had a short discussion about just disallowing numeric
+snapshot names.  How bad would that be?
+
+Max
+
+
+--YundUH3aPE2kGHFMn3YJDK2kANmLmXkTv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw2AOoACgkQ9AfbAGHV
+z0DkGgf+Kwd7TeA8/3JjzXQ/KSnC4ZzXvCY9y66+/1/Jm7rirTWUyuWxWlZr7Xft
+STTLEF6jq6Ty4e5knQR3ujfInWn1sMhMyPNUfP9+D5GK4Q0hVDe9hcFefnhXx4BB
++ppACTSYBaP9DFsXFznsrZQ33zlXqEvWt/Vc8Eys3sElnSQMTqyVtCNx5FYehNEQ
+FDjhUFQKSKNJC2bp0CMNBD6xRg21TGvF2IvWWhHGmAfxex/Nh4SQSqiqWAOkUZzu
+FVUTRQqHsZ6WhKvnuE0+/E9odtfbgxmXPLwg5yxY/GloWGz5lpk8CxRlXtTsHqAw
+KD5lZmEMqHL5xyzHyMmmrQ5Mz2Ticw==
+=mkN6
+-----END PGP SIGNATURE-----
+
+--YundUH3aPE2kGHFMn3YJDK2kANmLmXkTv--
