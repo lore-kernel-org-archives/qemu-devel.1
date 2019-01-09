@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43372)
+Received: from eggs.gnu.org ([209.51.188.92]:45027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1ghF4V-0007fi-Ty
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:43:09 -0500
+	(envelope-from <pagupta@redhat.com>) id 1ghF7o-0001ib-Gi
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:46:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1ghF4U-0002NZ-AG
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:43:07 -0500
-Received: from m15-111.126.com ([220.181.15.111]:45432)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1ghF4R-0001tr-4T
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:43:06 -0500
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (1.0)
-From: fei <lifei1214@126.com>
-In-Reply-To: <875zuxew44.fsf@dusky.pond.sub.org>
-Date: Wed, 9 Jan 2019 22:42:37 +0800
+	(envelope-from <pagupta@redhat.com>) id 1ghF7k-0004w4-2L
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:46:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44332)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1ghF7a-0004fS-Pr
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:46:22 -0500
+Date: Wed, 9 Jan 2019 09:46:08 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1814830087.61221572.1547045168645.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190109135024.14093-1-pagupta@redhat.com>
+References: <20190109135024.14093-1-pagupta@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <B57CAE3F-B0EC-4635-AB59-EDC462032CA4@126.com>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-7-fli@suse.com>
-	<87lg3wmln8.fsf@dusky.pond.sub.org>
-	<5DCFD2A7-85F6-42ED-8CBB-B42B6605BE6F@126.com>
-	<87ftu3kri2.fsf@dusky.pond.sub.org>
-	<ab38ce34-1832-30e5-2649-f67b9b1755e4@126.com>
-	<875zuxew44.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 06/16] qemu_thread: Make
- qemu_thread_create() handle errors properly
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,141 +26,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, shirley17fei@gmail.com
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-acpi@vger.kernel.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
+Cc: jack@suse.cz, david@redhat.com, jasowang@redhat.com, lcapitulino@redhat.com, adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org, dave jiang <dave.jiang@intel.com>, darrick wong <darrick.wong@oracle.com>, vishal l verma <vishal.l.verma@intel.com>, mst@redhat.com, willy@infradead.org, hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com, stefanha@redhat.com, imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>, kwolf@redhat.com, tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, rjw@rjwysocki.net, pbonzini@redhat.com
 
 
 
-> =E5=9C=A8 2019=E5=B9=B41=E6=9C=889=E6=97=A5=EF=BC=8C22:36=EF=BC=8CMarkus A=
-rmbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> Fei Li <lifei1214@126.com> writes:
->=20
->>> =E5=9C=A8 2019/1/9 =E4=B8=8A=E5=8D=881:07, Markus Armbruster =E5=86=99=E9=
-=81=93:
->>> fei <lifei1214@126.com> writes:
->>>=20
->>>>> =E5=9C=A8 2019=E5=B9=B41=E6=9C=888=E6=97=A5=EF=BC=8C01:18=EF=BC=8CMark=
-us Armbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->>>>>=20
->>>>> Fei Li <fli@suse.com> writes:
-> [...]
->>>>>> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
->>>>>> index 865e476df5..39834b0551 100644
->>>>>> --- a/util/qemu-thread-posix.c
->>>>>> +++ b/util/qemu-thread-posix.c
->>>>>> @@ -15,6 +15,7 @@
->>>>>> #include "qemu/atomic.h"
->>>>>> #include "qemu/notify.h"
->>>>>> #include "qemu-thread-common.h"
->>>>>> +#include "qapi/error.h"
->>>>>>=20
->>>>>> static bool name_threads;
->>>>>>=20
->>>>>> @@ -500,9 +501,13 @@ static void *qemu_thread_start(void *args)
->>>>>>     return r;
->>>>>> }
->>>>>>=20
->>>>>> -void qemu_thread_create(QemuThread *thread, const char *name,
->>>>>> -                       void *(*start_routine)(void*),
->>>>>> -                       void *arg, int mode)
->>>>>> +/*
->>>>>> + * Return a boolean: true/false to indicate whether it succeeds.
->>>>>> + * If fails, propagate the error to Error **errp and set the errno.
->>>>>> + */
->>>>> Let's write something that can pass as a function contract:
->>>>>=20
->>>>>   /*
->>>>>    * Create a new thread with name @name
->>>>>    * The thread executes @start_routine() with argument @arg.
->>>>>    * The thread will be created in a detached state if @mode is
->>>>>    * QEMU_THREAD_DETACHED, and in a jounable state if it's
->>>>>    * QEMU_THREAD_JOINABLE.
->>>>>    * On success, return true.
->>>>>    * On failure, set @errno, store an error through @errp and return
->>>>>    * false.
->>>>>    */
->>>> Thanks so much for amending! :)
->>>>> Personally, I'd return negative errno instead of false, and dispense
->>>>> with setting errno.
->>>> Emm, I think I have replied this in last version, but due to several re=
-asons I did not wait for your feedback and sent the v9. Sorry for that.. And=
- I like to paste my two considerations here:
->>>> =E2=80=9C- Actually only one caller needs the errno, that is the above q=
-emu_signalfd_compat().
->>> Yes.
->>>=20
->>>> - For the returning value, I remember there's once a email thread talki=
-ng about it: returning a bool (and let the passed errp hold the error messag=
-e) is to keep the consistency with glib.
->>> GLib doesn't discourage return types other than boolean.  It only asks
->>> that if you return boolean, then true should mean success and false
->>> should mean failure.  See
->>>=20
->>>     https://developer.gnome.org/glib/stable/glib-Error-Reporting.html
->>>=20
->>> under "Rules for use of GError", item "By convention, if you return a
->>> boolean value".
->>>=20
->>> The discussion you remember was about a convention we used to enforce in=
+Please ignore this series as my network went down while=20
+sending this. I will send this series again.
 
->>> QEMU, namely to avoid returning boolean success, and return void
->>> instead.  That was basically a bad idea.
->>>=20
->>>> So IMO I am wondering whether it is really needed to change the bool (t=
-rue/false) to int (0/-errno), just for that sole function: qemu_signalfd_com=
-pat() which needs the errno. Besides if we return -errno, for each caller we=
- need add a local variable like =E2=80=9Cret=3D qemu_thread_create()=E2=80=9D=
- to store the -errno.
->>> Well, you either assign the error code to errno just for that caller, or=
+Thanks,
+Pankaj =20
 
->>> you return the error code just for that caller.  I'd do the latter
->>> because I consider it slightly simpler.  Compare
->>>=20
->>>  * On success, return true.
->>>  * On failure, set @errno, store an error through @errp and return
->>>  * false.
->>>=20
->>> to
->>>=20
->>>  * On success, return zero.
->>>  * On failure, store an error through @errp and return negative errno.
->>>=20
->>> where the second sentence describes just two instead of three actions.
->>>=20
->>> [...]
->> Ok, decribing two actions than three is indeed simpler. But I still
->> have one uncertain:
->> for those callers do not need the errno value, could we just check the
->> return value
->> to see whether it is negative, but not cache the unused return value? I m=
-ean
->>=20
->> In the caller:
->>=20
->> {...
->>     if (qemu_thread_create() < 0) {// do some cleanup}
->> ...}
 >=20
-> This is just fine when you handle all errors the same.
+> This patch series has implementation for "virtio pmem".
+>  "virtio pmem" is fake persistent memory(nvdimm) in guest
+>  which allows to bypass the guest page cache. This also
+>  implements a VIRTIO based asynchronous flush mechanism.
+> =20
+>  Sharing guest kernel driver in this patchset with the
+>  changes suggested in v2. Tested with Qemu side device
+>  emulation for virtio-pmem [6].
+> =20
+>  Details of project idea for 'virtio pmem' flushing interface
+>  is shared [3] & [4].
 >=20
->> instead of
->>=20
->> {    int ret;
->> ...
->>     ret =3D qemu_thread_create();
->>     if (ret < 0) { //do some cleanup }
->>=20
->> ...}
+>  Implementation is divided into two parts:
+>  New virtio pmem guest driver and qemu code changes for new
+>  virtio pmem paravirtualized device.
 >=20
-> I'd object to this one unless the value of @ret gets used elsewhere.
-Ok, thanks for the review :)
-
-Have a nice day
-Fei
+> 1. Guest virtio-pmem kernel driver
+> ---------------------------------
+>    - Reads persistent memory range from paravirt device and
+>      registers with 'nvdimm_bus'.
+>    - 'nvdimm/pmem' driver uses this information to allocate
+>      persistent memory region and setup filesystem operations
+>      to the allocated memory.
+>    - virtio pmem driver implements asynchronous flushing
+>      interface to flush from guest to host.
 >=20
->> As the first one can lessen quite a lot of codes. :)
->>=20
->> Have a nice day, thanks
->>=20
->> Fei
+> 2. Qemu virtio-pmem device
+> ---------------------------------
+>    - Creates virtio pmem device and exposes a memory range to
+>      KVM guest.
+>    - At host side this is file backed memory which acts as
+>      persistent memory.
+>    - Qemu side flush uses aio thread pool API's and virtio
+>      for asynchronous guest multi request handling.
+>=20
+>    David Hildenbrand CCed also posted a modified version[6] of
+>    qemu virtio-pmem code based on updated Qemu memory device API.
+>=20
+>  Virtio-pmem errors handling:
+>  ----------------------------------------
+>   Checked behaviour of virtio-pmem for below types of errors
+>   Need suggestions on expected behaviour for handling these errors?
+>=20
+>   - Hardware Errors: Uncorrectable recoverable Errors:
+>   a] virtio-pmem:
+>     - As per current logic if error page belongs to Qemu process,
+>       host MCE handler isolates(hwpoison) that page and send SIGBUS.
+>       Qemu SIGBUS handler injects exception to KVM guest.
+>     - KVM guest then isolates the page and send SIGBUS to guest
+>       userspace process which has mapped the page.
+>  =20
+>   b] Existing implementation for ACPI pmem driver:
+>     - Handles such errors with MCE notifier and creates a list
+>       of bad blocks. Read/direct access DAX operation return EIO
+>       if accessed memory page fall in bad block list.
+>     - It also starts backgound scrubbing.
+>     - Similar functionality can be reused in virtio-pmem with MCE
+>       notifier but without scrubbing(no ACPI/ARS)? Need inputs to
+>       confirm if this behaviour is ok or needs any change?
+>=20
+> Changes from PATCH v2: [1]
+> - Disable MAP_SYNC for ext4 & XFS filesystems - [Dan]
+> - Use name 'virtio pmem' in place of 'fake dax'
+>=20
+> Changes from PATCH v1: [2]
+> - 0-day build test for build dependency on libnvdimm
+>=20
+>  Changes suggested by - [Dan Williams]
+> - Split the driver into two parts virtio & pmem
+> - Move queuing of async block request to block layer
+> - Add "sync" parameter in nvdimm_flush function
+> - Use indirect call for nvdimm_flush
+> - Don=E2=80=99t move declarations to common global header e.g nd.h
+> - nvdimm_flush() return 0 or -EIO if it fails
+> - Teach nsio_rw_bytes() that the flush can fail
+> - Rename nvdimm_flush() to generic_nvdimm_flush()
+> - Use 'nd_region->provider_data' for long dereferencing
+> - Remove virtio_pmem_freeze/restore functions
+> - Remove BSD license text with SPDX license text
+>=20
+> - Add might_sleep() in virtio_pmem_flush - [Luiz]
+> - Make spin_lock_irqsave() narrow
+>=20
+> Changes from RFC v3
+> - Rebase to latest upstream - Luiz
+> - Call ndregion->flush in place of nvdimm_flush- Luiz
+> - kmalloc return check - Luiz
+> - virtqueue full handling - Stefan
+> - Don't map entire virtio_pmem_req to device - Stefan
+> - request leak, correct sizeof req- Stefan
+> - Move declaration to virtio_pmem.c
+>=20
+> Changes from RFC v2:
+> - Add flush function in the nd_region in place of switching
+>   on a flag - Dan & Stefan
+> - Add flush completion function with proper locking and wait
+>   for host side flush completion - Stefan & Dan
+> - Keep userspace API in uapi header file - Stefan, MST
+> - Use LE fields & New device id - MST
+> - Indentation & spacing suggestions - MST & Eric
+> - Remove extra header files & add licensing - Stefan
+>=20
+> Changes from RFC v1:
+> - Reuse existing 'pmem' code for registering persistent
+>   memory and other operations instead of creating an entirely
+>   new block driver.
+> - Use VIRTIO driver to register memory information with
+>   nvdimm_bus and create region_type accordingly.
+> - Call VIRTIO flush from existing pmem driver.
+>=20
+> Pankaj Gupta (5):
+>    libnvdimm: nd_region flush callback support
+>    virtio-pmem: Add virtio-pmem guest driver
+>    libnvdimm: add nd_region buffered dax_dev flag
+>    ext4: disable map_sync for virtio pmem
+>    xfs: disable map_sync for virtio pmem
+>=20
+> [2] https://lkml.org/lkml/2018/8/31/407
+> [3] https://www.spinics.net/lists/kvm/msg149761.html
+> [4] https://www.spinics.net/lists/kvm/msg153095.html
+> [5] https://lkml.org/lkml/2018/8/31/413
+> [6] https://marc.info/?l=3Dqemu-devel&m=3D153555721901824&w=3D2
+>=20
+>  drivers/acpi/nfit/core.c         |    4 -
+>  drivers/dax/super.c              |   17 +++++
+>  drivers/nvdimm/claim.c           |    6 +
+>  drivers/nvdimm/nd.h              |    1
+>  drivers/nvdimm/pmem.c            |   15 +++-
+>  drivers/nvdimm/region_devs.c     |   45 +++++++++++++-
+>  drivers/nvdimm/virtio_pmem.c     |   84 ++++++++++++++++++++++++++
+>  drivers/virtio/Kconfig           |   10 +++
+>  drivers/virtio/Makefile          |    1
+>  drivers/virtio/pmem.c            |  125
+>  +++++++++++++++++++++++++++++++++++++++
+>  fs/ext4/file.c                   |   11 +++
+>  fs/xfs/xfs_file.c                |    8 ++
+>  include/linux/dax.h              |    9 ++
+>  include/linux/libnvdimm.h        |   11 +++
+>  include/linux/virtio_pmem.h      |   60 ++++++++++++++++++
+>  include/uapi/linux/virtio_ids.h  |    1
+>  include/uapi/linux/virtio_pmem.h |   10 +++
+>  17 files changed, 406 insertions(+), 12 deletions(-)
+>=20
+>=20
+>=20
