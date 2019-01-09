@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46488)
+Received: from eggs.gnu.org ([209.51.188.92]:50344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ghN02-0004nz-Sb
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:11:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ghNGr-0007Kc-A2
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:28:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1ghN01-0001ka-UM
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:11:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1ghN01-0001kH-Me
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:11:01 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 993CF88E51
-	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 23:10:59 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Wed, 09 Jan 2019 16:10:51 -0700
-Message-ID: <154707542737.22183.7160770678781819267.stgit@gimli.home>
+	(envelope-from <peter.maydell@linaro.org>) id 1ghNGp-000589-B4
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:28:25 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ghNGo-00057k-N9
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:28:23 -0500
+Received: by mail-oi1-x244.google.com with SMTP id t204so7793788oie.7
+	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 15:28:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] vfio/common: Work around kernel overflow bug
- in DMA unmap
+References: <20190103094211.28473-1-geert+renesas@glider.be>
+	<acd10959-a781-d3bf-dc67-bda878740ec9@redhat.com>
+	<CAFEAcA9jk1ocW8h33-f9mRM52mT96o+bviaRe6MRErkyxBtqYQ@mail.gmail.com>
+	<CAMuHMdX6gwnw7RYQNik4QQmfWoTmemMgrUaPuW9Rgd56pW+4jQ@mail.gmail.com>
+In-Reply-To: <CAMuHMdX6gwnw7RYQNik4QQmfWoTmemMgrUaPuW9Rgd56pW+4jQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 9 Jan 2019 23:28:10 +0000
+Message-ID: <CAFEAcA9-eo7_1Wm20JkwCs_yG-r6v3aw19T0BVpp6qePw+JnmA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH QEMU v5] hw/arm/sysbus-fdt: Add support for
+ instantiating generic devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.williamson@redhat.com
-Cc: qemu-devel@nongnu.org, peterx@redhat.com
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Auger Eric <eric.auger@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Alex Williamson <alex.williamson@redhat.com>, Magnus Damm <damm+renesas@opensource.se>, Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Linux-Renesas <linux-renesas-soc@vger.kernel.org>
 
-A kernel bug was introduced in v4.15 via commit 71a7d3d78e3c which
-adds a test for address space wrap-around in the vfio DMA unmap path.
-Unfortunately due to overflow, the kernel detects an unmap of the last
-page in the 64-bit address space as a wrap-around.  In QEMU, a Q35
-guest with VT-d emulation and guest IOMMU enabled will attempt to make
-such an unmap request during VM system reset, triggering an error:
+So I should start out upfront by saying that I'm aware that
+the reality is that people do want to do passthrough with
+this kind of hardware, and that's not an unreasonable
+thing to do. I just don't really like the way that pushes
+the software into having to do ugly things...
 
-  qemu-kvm: VFIO_UNMAP_DMA: -22
-  qemu-kvm: vfio_dma_unmap(0x561f059948f0, 0xfef00000, 0xffffffff01100000) = -22 (Invalid argument)
+Overall I'll let Eric call the shots about how well this
+feature fits into our sysbus-fdt support; he knows this
+code much better than I do. (I would have preferred us
+not to have sysbus-fdt passthrough at all, in an
+ideal world :-))
 
-Here the IOVA start address (0xfef00000) and the size parameter
-(0xffffffff01100000) add to exactly 2^64, triggering the bug.  A
-kernel fix is queued for the Linux v5.0 release to address this.
+On Wed, 9 Jan 2019 at 16:30, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> On Wed, Jan 9, 2019 at 5:03 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+> > whitelists for the devices we want to allow passthrough of and
+> > that we've tested to work.
+>
+> In the end, this will become a loooooong list (SoC x devices)...
 
-This patch implements a workaround to retry the unmap, excluding the
-final page of the range when we detect an unmap failing which matches
-the requirements for this issue.  This is expected to be a safe and
-complete workaround as the VT-d address space does not extend to the
-full 64-bit space and therefore the last page should never be mapped.
+Well, yes, but it deters people from trying to do passthrough
+with hardware that's not designed in a way that makes
+passthrough reasonably supportable at a software level.
 
-This workaround can be removed once all kernels with this bug are
-sufficiently deprecated.
+> Reality is that on embedded, on-SoC devices are usually not on a PCI bus.
+> But IOMMUs are present, and virtualization is wanted.
 
-Link: https://bugzilla.redhat.com/show_bug.cgi?id=1662291
-Reported-by: Pei Zhang <pezhang@redhat.com>
-Debugged-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/common.c     |   20 +++++++++++++++++++-
- hw/vfio/trace-events |    1 +
- 2 files changed, 20 insertions(+), 1 deletion(-)
+I don't insist on PCI. Probeable, and consistent in
+terms of what they provide and how you interact with
+them, is what we want. Embedded on-SoC devices are
+generally neither. (The host kernel could in theory
+provide an API that exposed only devices that were safely
+pass-through-able in a consistent way, I suppose, but it
+doesn't, or we wouldn't be having to fish through the
+device tree nodes making guesses about what's safe to
+allow and what isn't and having heuristics about not
+providing clocks info being ok if we think the clock
+might only be used for power management...)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7c185e5a2e79..820b839057c6 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -220,7 +220,25 @@ static int vfio_dma_unmap(VFIOContainer *container,
-         .size = size,
-     };
- 
--    if (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
-+    while (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
-+        /*
-+         * The type1 backend has an off-by-one bug in the kernel (71a7d3d78e3c
-+         * v4.15) where an overflow in its wrap-around check prevents us from
-+         * unmapping the last page of the address space.  Test for the error
-+         * condition and re-try the unmap excluding the last page.  The
-+         * expectation is that we've never mapped the last page anyway and this
-+         * unmap request comes via vIOMMU support which also makes it unlikely
-+         * that this page is used.  This bug was introduced well after type1 v2
-+         * support was introduced, so we shouldn't need to test for v1.  A fix
-+         * is queued for kernel v5.0 so this workaround can be removed once
-+         * affected kernels are sufficiently deprecated.
-+         */
-+        if (errno == EINVAL && unmap.size && !(unmap.iova + unmap.size) &&
-+            container->iommu_type == VFIO_TYPE1v2_IOMMU) {
-+            trace_vfio_dma_unmap_overflow_workaround();
-+            unmap.size -= 1ULL << ctz64(container->pgsizes);
-+            continue;
-+        }
-         error_report("VFIO_UNMAP_DMA: %d", -errno);
-         return -errno;
-     }
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index a85e8662eadb..a002c6af2dda 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -110,6 +110,7 @@ vfio_region_mmaps_set_enabled(const char *name, bool enabled) "Region %s mmaps e
- vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Device %s region %d: %d sparse mmap entries"
- vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
- vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
-+vfio_dma_unmap_overflow_workaround(void) ""
- 
- # hw/vfio/platform.c
- vfio_platform_base_device_init(char *name, int groupid) "%s belongs to group #%d"
+thanks
+-- PMM
