@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60524)
+Received: from eggs.gnu.org ([209.51.188.92]:60514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghKrM-0001X1-Cc
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 15:53:57 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghKrL-0007XV-K8
+	(envelope-from <richard.henderson@linaro.org>) id 1ghKrL-0001We-Om
 	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 15:53:56 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:35299)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1ghKrL-0007Wp-Ej
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1ghKrH-0007TY-FY
 	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 15:53:55 -0500
-Received: by mail-wr1-x435.google.com with SMTP id 96so9099606wrb.2
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 12:53:55 -0800 (PST)
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42334)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ghKrH-0007R0-8y
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 15:53:51 -0500
+Received: by mail-pg1-x542.google.com with SMTP id d72so3810862pga.9
+	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 12:53:50 -0800 (PST)
+References: <20190108163008.7006-1-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ebfdc4ad-3f40-a09b-ba40-db18ac5a6484@linaro.org>
+Date: Thu, 10 Jan 2019 07:53:41 +1100
 MIME-Version: 1.0
-References: <20181211074241.ovuharwewaw22ygq@sirius.home.kraxel.org>
-	<20181211092944.GA921@redhat.com>
-	<20181211135230-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CKuoWWxLqZKQRU-g_144jX2bwsQJUzeW0W-QicNrbPfQw@mail.gmail.com>
-	<20181218181803-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CJmT5O3x84upBDhvvCPCK5x51RP0TxBMsodLzVeQgC-vw@mail.gmail.com>
-	<20181219103112-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CLKftEt8g5WyW8NPOPNsKPXhNnS3BkdVqjrny4cjb+kWw@mail.gmail.com>
-	<20181220113338-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CK1jeJgk07TXwHWpZLhO59Rrf7gSfpB6=J-NO+sYFfwpA@mail.gmail.com>
-	<20190109084501.bp6m3rzp6xrqzn2r@sirius.home.kraxel.org>
-In-Reply-To: <20190109084501.bp6m3rzp6xrqzn2r@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 10 Jan 2019 00:53:41 +0400
-Message-ID: <CAJ+F1CKB0T12DhGLtwcv3DiLJWHp1QvL4SFpE4xwzN8oWRXmYA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 01/11] vhost-user: define
- conventions for vhost-user backends
+In-Reply-To: <20190108163008.7006-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/4] tcg: support heterogenous CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,36 +30,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Hoffmann, Gerd" <kraxel@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Emilio G . Cota" <cota@braap.org>
 
-Hi
+On 1/9/19 3:30 AM, Peter Maydell wrote:
+> Peter Maydell (4):
+>   hw/arm/xlx-zynqmp: Realize cluster after putting RPUs in it
+>   qom/cpu: Add cluster_index to CPUState
+>   accel/tcg: Add cluster number to TCG TB hash
+>   gdbstub: Simplify gdb_get_cpu_pid() to use cpu->cluster_index
 
-On Wed, Jan 9, 2019 at 12:45 PM Hoffmann, Gerd <kraxel@redhat.com> wrote:
->
->   Hi,
->
-> > Unfortunately, vdev is not set before vhost_dev_start().
-> >
-> > We could add the migration blocker there somehow?
->
-> Sure.  Just use migrate_add_blocker() to do that at any time (see qxl.c
-> for an example).
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-VhostUserInput inherits from VirtioInput, which implements vmsd.
 
-The "Add vhost-user-input-pci" patch override the DeviceClass vmsd to
-set it as unmigratable. If I understand correctly, Michael suggested
-to add a check for device vmsd =3D=3D NULL in hw/virtio/vhost-user.c
-instead.
-
-However, vhost-user devices would still need to overwrite vmsd to NULL.
-
-I don't think there is a benefit in the generic vmsd =3D=3D NULL check, as
-you still need not to forget to overwrite vmsd to NULL in the
-vhost-user device.
-
-Am I missing something?
-
---=20
-Marc-Andr=C3=A9 Lureau
+r~
