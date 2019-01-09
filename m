@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55513)
+Received: from eggs.gnu.org ([209.51.188.92]:55992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1ghHIv-0004yG-H3
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:06:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghHKO-00066N-EG
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:07:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1ghHIu-0001vD-LI
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:06:09 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1ghHIu-0001rY-8Y
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:06:08 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x09H4OaY078297
-	for <qemu-devel@nongnu.org>; Wed, 9 Jan 2019 12:06:00 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pwn18g37k-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 12:05:59 -0500
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Wed, 9 Jan 2019 17:05:57 -0000
-Date: Wed, 9 Jan 2019 18:05:51 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
-References: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
+	(envelope-from <eblake@redhat.com>) id 1ghHKN-0002jB-JV
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:07:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49082)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ghHKN-0002iT-AU
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:07:39 -0500
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+	<a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dabcb93d-050d-b64f-a995-8f066b325c70@redhat.com>
+Date: Wed, 9 Jan 2019 11:07:36 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20190109180551.5976c1f4@oc2783563651>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390x/vfio-ap: Implement hot
- plug/unplug of vfio-ap device
+In-Reply-To: <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="i1enR5EDGs9V78ZS8QJi0XHTaD6XgIJrL"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
+ ID anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,19 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, jjherne@linux.ibm.com, peter.maydell@linaro.org, pasic@linux.vnet.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com, pmorel@linux.ibm.com, david@redhat.com, alifm@linux.ibm.com, alex.williamson@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, fiuczy@linux.ibm.com, rth@twiddle.net
+To: Daniel Henrique Barboza <danielhb413@gmail.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, muriloo@linux.ibm.com, dgilbert@redhat.com, armbru@redhat.com
 
-On Tue,  8 Jan 2019 11:01:50 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--i1enR5EDGs9V78ZS8QJi0XHTaD6XgIJrL
+From: Eric Blake <eblake@redhat.com>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, muriloo@linux.ibm.com, dgilbert@redhat.com,
+ armbru@redhat.com
+Message-ID: <dabcb93d-050d-b64f-a995-8f066b325c70@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use ID
+ anymore
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+ <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+ <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+In-Reply-To: <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Introduces hot plug/unplug support for the vfio-ap device. Note that only one
-> vfio-ap device can be attached to the ap-bus, so a vfio-ap device can only be
-> hot plugged if the '-device vfio-ap,sysfsdev=$path_to_mdev' option is not
-> specified on the QEMU command line.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+On 1/9/19 10:57 AM, Daniel Henrique Barboza wrote:
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+>> I think we had a short discussion about just disallowing numeric
+>> snapshot names.=C2=A0 How bad would that be?
+>=20
+>=20
+> This was my first idea when evaluating what to do in this case. I gave
+> it up because
+> I found it to be too extreme. People would start complaining "I was abl=
+e
+> to do
+> savevm 0 and now I can't".
+
+I could live with that, especially if it serves to prevent even more
+bugs of "I did this and now my image is broken" (I, for one, have known
+about the confusion of breaking an image by using a number as a snapshot
+name as far back as 2011). What I can't live with is:
+
+"I have an old image where I did savevm 0, and now want to modernize the
+image, but the new tools refuse to even let me read from name 0".
+
+I also agree that the code is already so hairy, and the reason we have
+punted on solving the issue (for 8 years now!) is because there are so
+many corner cases to consider.  It also means that I'm reluctant to
+review the patch, because it will require a significant chunk of time
+and mental effort to ensure that whatever patch is proposed does not
+break something important.  But in general, I'm glad that you are trying
+to get the issue fixed, even if the conversation on HOW to fix it is
+still undergoing a choice of bikeshed paint colors.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--i1enR5EDGs9V78ZS8QJi0XHTaD6XgIJrL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw2KlgACgkQ3g5py3or
+ov1BQQgAl3ioenAVaPSUEigt/KJAYOSM1N0gig3zAu5e/s7Sfqth8/N9qIEmNN/G
+JvUrUCuLYY8yyB7o4v+muA6HXRiPGy5lwL93thpGt3ivK9/xdeIVJ05tW0JL4cbh
+O5HA7M4xq8SeDFhLsH1diG0b9UbvjbOilvql91l6MhVtNoBoY9GR+a4GKjmGWQdq
+zes4PKV+qUOA8gK7d48KX+zmn40SwNszQ/2Hl9A6gXdtWbQYP/lSzY4HhtUXxAoX
+xPpTb6y3JPEZvqEc/yX5nvIMiCRCererVnTKUL3oAIDQNLe+ma1bHZJXxoV1ErDo
+8WZtTFChDaeWPx+xALQfzYE3MryZ6w==
+=LtWg
+-----END PGP SIGNATURE-----
+
+--i1enR5EDGs9V78ZS8QJi0XHTaD6XgIJrL--
