@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38035)
+Received: from eggs.gnu.org ([209.51.188.92]:39221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghLCs-0000Cg-F2
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:16:11 -0500
+	(envelope-from <maran.wilson@oracle.com>) id 1ghLF2-0001ED-8g
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:18:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghLCr-0003sD-P4
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:16:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36156)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghLCr-0003rx-HE
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:16:09 -0500
-References: <CAJSP0QVOnFchhTyJsVG5E=FrZ7Ti-_ve4t1WxqkFXO=XK-Sh6Q@mail.gmail.com>
-	<alpine.BSF.2.21.9999.1901091919140.41593@zero.eik.bme.hu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3f4f974a-2bd9-bf08-eef1-d89d2cf6cfa5@redhat.com>
-Date: Wed, 9 Jan 2019 22:16:01 +0100
+	(envelope-from <maran.wilson@oracle.com>) id 1ghLF0-00052c-JW
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:18:24 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:40754)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maran.wilson@oracle.com>)
+	id 1ghLEz-00050k-JB
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 16:18:22 -0500
+References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
+	<CAGxU2F53zsuVRBbvGTOU81zObL+4tTg_FgE0i04G2eOWckc29Q@mail.gmail.com>
+	<aa1cbeec-bb31-8849-c34b-e2397dc1c475@oracle.com>
+	<CAGxU2F7rHv7HNNmvLSw9b5_GPEZqvo-XgCoc0penp8eFmWm6gw@mail.gmail.com>
+	<fb7e62ea-0d3e-9b6f-4f1c-4bd780e50398@oracle.com>
+From: Maran Wilson <maran.wilson@oracle.com>
+Message-ID: <d1877cd9-7374-1512-7b01-2a2fb184643a@oracle.com>
+Date: Wed, 9 Jan 2019 13:18:12 -0800
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1901091919140.41593@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <fb7e62ea-0d3e-9b6f-4f1c-4bd780e50398@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Internship idea: I2C passthrough
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RFC v2 0/4] QEMU changes to do PVH boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Jim Mussared <jim@groklearning.com>, Joel Stanley <joel@jms.id.au>, Jonathan Austin <jonny@microbit.org>
+To: Boris Ostrovsky <boris.ostrovsky@oracle.com>, Stefano Garzarella <sgarzare@redhat.com>, Liam Merwick <liam.merwick@oracle.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>
 
-On 09/01/19 19:23, BALATON Zoltan wrote:
->> '''Summary:''' Implement I2C bus passthrough on Linux hosts so that
->> emulated Raspberry Pi or micro:bit boards can talk to real I2C
->> devices. 
+On 1/9/2019 11:53 AM, Boris Ostrovsky wrote:
+> On 1/9/19 6:53 AM, Stefano Garzarella wrote:
+>> Hi Liam,
+>>
+>> On Tue, Jan 8, 2019 at 3:47 PM Liam Merwick <liam.merwick@oracle.com> wrote:
+>>> QEMU sets the hvm_modlist_entry in load_linux() after the call to
+>>> load_elfboot() and then qboot loads it in boot_pvh_from_fw_cfg()
+>>>
+>>> But the current PVH patches don't handle initrd (they have
+>>> start_info.nr_modules == 1).
+>> Looking in the linux kernel (arch/x86/platform/pvh/enlighten.c) I saw:
+>>      /* The first module is always ramdisk. */
+>>      if (pvh_start_info.nr_modules) {
+>>          struct hvm_modlist_entry *modaddr =
+>>              __va(pvh_start_info.modlist_paddr);
+>>          pvh_bootparams.hdr.ramdisk_image = modaddr->paddr;
+>>          pvh_bootparams.hdr.ramdisk_size = modaddr->size;
+>>      }
+>>
+>> So, putting start_info.nr_modules = 1, means that the first
+>> hvm_modlist_entry should have the ramdisk paddr and size. Is it
+>> correct?
+
+That's my understanding.
+
+I think what's missing, is that we just need Qemu or qboot/seabios to 
+properly populate the pvh_start_info.modlist_paddr with the address (as 
+usable by the guest) of the hvm_modlist_entry which correctly defines 
+the details of the initrd that has already been loaded into memory that 
+is accessible by the guest.
+
+-Maran
+
+>>> During (or after) the call to load_elfboot() it looks like we'd need to
+>>> do something like what load_multiboot() does below (along with the
+>>> associated initialisation)
+>>>
+>>> 400     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, ADDR_MBI);
+>>> 401     fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, sizeof(bootinfo));
+>>> 402     fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, mb_bootinfo_data,
+>>> 403                      sizeof(bootinfo));
+>>>
+>> In this case I think they used the FW_CFG_INITRD_* to pass bootinfo
+>> varibales to the guest, maybe we could add something like what
+>> linux_load() does:
+>>
+>>      /* load initrd */
+>>      if (initrd_filename) {
+>>          ...
+>>          initrd_addr = (initrd_max-initrd_size) & ~4095;
+>>
+>>          fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
+>>          fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
+>>          fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data, initrd_size);
+>>          ...
+>>      }
+>>
+>> Then we can load the initrd in qboot or in the optionrom that I'm writing.
+>>
+>> What do you think?
 >
-> How about implementing USB for raspi boards instead? Or is there a
-> project proposal (or even some code somewhere out of tree) for that
-> already? Seems more useful to allow having emulated keyboard and mouse
-> to use Raspbian for example or pass through USB devices. (I don't know
-> anything about this was just reminded to a recent discussion by this
-> message. If it's not relevant just disregard my comment and sorry for
-> the noise.)
-
-That's also a valid idea.  However, Stefan has misinterpreted the
-reference to the raspi that I quickly made on IRC.  The idea of I2C
-passthrough is that a single board computer like a Raspberry Pi can be
-used to develop application for a microcontroller such as micro:bit,
-without having to flash the firmware again and again, etc.
-
-Real I2C devices---for example a GPIO extender, a temperature sensor or
-a real-time clock---would be attached to the I2C bus on the single board
-computer's GPIO headers, exposed as an I2C device through /dev/i2c, and
-then driven by the emulated micro:bit through its own I2C controller (or
-bitbanged).
-
-(I've now updated the project idea).
-
-Paolo
+> Why not specify this in pvh_start_info? This will be much faster for
+> everyone, no need to go through fw_cfg.
+>
+> -boris
+>
