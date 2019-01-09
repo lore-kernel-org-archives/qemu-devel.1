@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41822)
+Received: from eggs.gnu.org ([209.51.188.92]:42330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1ghDKm-0000Y2-6C
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:51:49 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghDL5-0001Ao-Ca
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:52:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1ghDAs-0004Cf-6j
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:41:36 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41952)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1ghDAq-0004B7-E4
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:41:34 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x09CXowL045772
-	for <qemu-devel@nongnu.org>; Wed, 9 Jan 2019 07:41:30 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2pwepfq73v-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 07:41:30 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Wed, 9 Jan 2019 12:41:28 -0000
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Wed,  9 Jan 2019 13:41:19 +0100
-In-Reply-To: <1547037680-21458-1-git-send-email-pmorel@linux.ibm.com>
-References: <1547037680-21458-1-git-send-email-pmorel@linux.ibm.com>
-Message-Id: <1547037680-21458-3-git-send-email-pmorel@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 2/3] vfio/pci: Get real IOMMU information
- from container
+	(envelope-from <thuth@redhat.com>) id 1ghDL4-0007F1-Au
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:52:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47184)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghDL4-0007Et-2l
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 07:52:06 -0500
+References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
+	<20190109105818.GG3998@redhat.com>
+	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
+	<20190109114459.GK3998@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
+Date: Wed, 9 Jan 2019 13:52:02 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190109114459.GK3998@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,118 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: walling@linux.ibm.com
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
 
-When the vfio_iommu_type1 supports the VFIO_IOMMU_INFO_CAPABILITIES
-and the capability ID VFIO_IOMMU_INFO_CAP_DMA we can use an ioctl
-to retrieve this information from the real IOMMU device.
+On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
+>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
+>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
+>>>> Different versions of GCC and Clang use different versions of the C =
+standard.
+>>>> This repeatedly caused problems already, e.g. with duplicated typede=
+fs:
+>>>>
+>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+>>>>
+>>>> or with for-loop variable initializers:
+>>>>
+>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
+>>>>
+>>>> To avoid these problems, we should enforce the C language version to=
+ the
+>>>> same level for all compilers. Since our minimum compiler versions ar=
+e
+>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" alre=
+ady,
+>>>> this seems to be a good choice.
+>>>
+>>> In 4.x   gnu11 is marked as experimental. I'm not really comfortable
+>>> using experimental features - even if its warning free there's a risk
+>>> it would silently mis-compile something.
+>>>
+>>> gnu99 is ok with 4.x - it is merely "incomplete".
+>>
+>> gnu11 has the big advantage that it also fixes the problem with
+>> duplicated typedefs that are reported by older versions of Clang.
+>>
+>> Are you sure about the experimental character in 4.x? I just looked at
+>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it say=
+s:
+>>
+>> "A fourth version of the C standard, known as C11, was published in 20=
+11
+>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts of
+>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
+>>
+>> It does not say anything about "experimental" there. The word
+>> "experimental" is only used for the C++ support, but we hardly have C+=
++
+>> code in QEMU -- if you worry about that, I could simply drop the
+>> "-std=3Dgnu++11" part from my patch?
+>=20
+> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1.x86=
+_64:
+>=20
+>   "3.4 Options Controlling C Dialect
+>=20
+>        ....snip...
+>=20
+>      'gnu11'
+>      'gnu1x'
+>           GNU dialect of ISO C11.  Support is incomplete and
+>           experimental.  The name 'gnu1x' is deprecated."
 
-Let's use this information to add the host window associated with
-the container.
+Ok. Looks like the "Support is incomplete and experimental" sentence has
+been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
+already. IMHO we could give it a try and enable gnu11 for QEMU with GCC
+v4.8, too. If we later find problems, we could still switch back to
+gnu99 instead. Other opinions?
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- hw/vfio/common.c | 73 +++++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 56 insertions(+), 17 deletions(-)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7c185e5a..fd7e991 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1036,6 +1036,61 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
-     }
- }
- 
-+static void vfio_iommu_type1_get_info(int fd, VFIOContainer *container)
-+{
-+    struct vfio_iommu_type1_info *info;
-+    size_t argsz = sizeof(*info);
-+    struct vfio_info_cap_header *hdr;
-+    struct vfio_iommu_cap_dma *dma_info;
-+    int ret = 0;
-+
-+    info = g_malloc0(argsz);
-+
-+retry:
-+    info->argsz = argsz;
-+    info->flags = VFIO_IOMMU_INFO_CAPABILITIES;
-+
-+    ret = ioctl(fd, VFIO_IOMMU_GET_INFO, info);
-+    /* Ignore errors */
-+    if (ret) {
-+        goto out;
-+    }
-+    if (!(info->flags & VFIO_IOMMU_INFO_PGSIZES)) {
-+        info->iova_pgsizes = 4096;
-+    }
-+
-+    if (info->argsz > argsz) {
-+        argsz = info->argsz;
-+        info = g_realloc(info, argsz);
-+
-+        goto retry;
-+    }
-+    if (info->argsz != argsz) {
-+        goto out;
-+    }
-+    /* Now we have the capabilities */
-+    hdr = (struct vfio_info_cap_header *)((unsigned char *)info +
-+                                          sizeof(struct vfio_iommu_type1_info) +
-+                                          info->cap_offset);
-+    do {
-+        dma_info = (struct vfio_iommu_cap_dma *) (hdr);
-+        if (hdr->id == VFIO_IOMMU_INFO_CAP_DMA) {
-+            vfio_host_win_add(container, 0,
-+                              dma_info->dma_end - dma_info->dma_start,
-+                              info->iova_pgsizes);
-+            container->pgsizes = info->iova_pgsizes;
-+            return;
-+        }
-+        hdr = (struct vfio_info_cap_header *)((unsigned char *) dma_info +
-+                                              hdr->next);
-+    } while (hdr->next);
-+out:
-+    /* Assume 4k IOVA page size */
-+    vfio_host_win_add(container, 0, (hwaddr)-1,  4096);
-+    container->pgsizes = 4096;
-+    return;
-+}
-+
- static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-                                   Error **errp)
- {
-@@ -1104,7 +1159,6 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
-         ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
-         bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
--        struct vfio_iommu_type1_info info;
- 
-         ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
-         if (ret) {
-@@ -1121,22 +1175,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-             goto free_container_exit;
-         }
- 
--        /*
--         * FIXME: This assumes that a Type1 IOMMU can map any 64-bit
--         * IOVA whatsoever.  That's not actually true, but the current
--         * kernel interface doesn't tell us what it can map, and the
--         * existing Type1 IOMMUs generally support any IOVA we're
--         * going to actually try in practice.
--         */
--        info.argsz = sizeof(info);
--        ret = ioctl(fd, VFIO_IOMMU_GET_INFO, &info);
--        /* Ignore errors */
--        if (ret || !(info.flags & VFIO_IOMMU_INFO_PGSIZES)) {
--            /* Assume 4k IOVA page size */
--            info.iova_pgsizes = 4096;
--        }
--        vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
--        container->pgsizes = info.iova_pgsizes;
-+        vfio_iommu_type1_get_info(fd, container);
-     } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
-                ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
-         struct vfio_iommu_spapr_tce_info info;
--- 
-2.7.4
+ Thomas
