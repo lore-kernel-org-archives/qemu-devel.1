@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38668)
+Received: from eggs.gnu.org ([209.51.188.92]:38738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ghEpO-000754-CR
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:27:31 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghEpR-000779-Pw
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:27:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ghEpM-0007si-Hi
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:27:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34266)
+	(envelope-from <thuth@redhat.com>) id 1ghEpQ-0007vS-LI
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:27:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37366)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ghEpJ-0007mY-Tn
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:27:28 -0500
-References: <20180906111107.30684-1-danielhb413@gmail.com>
-	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
-	<20190109142140.GC4867@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <095e7b09-5d84-3437-782d-97fa6ca372ee@redhat.com>
-Date: Wed, 9 Jan 2019 15:27:11 +0100
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghEpQ-0007um-DF
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 09:27:32 -0500
+References: <1546857926-5958-1-git-send-email-thuth@redhat.com>
+	<20190109105818.GG3998@redhat.com>
+	<ac1072de-07a9-3630-bf97-fd04c9f2de8a@redhat.com>
+	<20190109114459.GK3998@redhat.com>
+	<89b89818-00b8-44b5-04db-4e2571533e84@redhat.com>
+	<87y37udljk.fsf@dusky.pond.sub.org>
+	<f45f44ab-d967-6702-e362-56612401c268@redhat.com>
+	<87k1jdewvc.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <cdb08ed1-4f0d-5328-3af5-dcdb3da1ec46@redhat.com>
+Date: Wed, 9 Jan 2019 15:27:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190109142140.GC4867@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="To9k9ZgKjYC5sqYOKBZJbP0tZs2xwwTz6"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
- ID anymore
+In-Reply-To: <87k1jdewvc.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] configure: Force the C standard to gnu11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,106 +34,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---To9k9ZgKjYC5sqYOKBZJbP0tZs2xwwTz6
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org,
- dgilbert@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com
-Message-ID: <095e7b09-5d84-3437-782d-97fa6ca372ee@redhat.com>
-Subject: Re: [PATCH v2 0/3] HMP/snapshot changes - do not use ID anymore
-References: <20180906111107.30684-1-danielhb413@gmail.com>
- <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
- <20190109142140.GC4867@localhost.localdomain>
-In-Reply-To: <20190109142140.GC4867@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 09.01.19 15:21, Kevin Wolf wrote:
-> Am 09.01.2019 um 15:10 hat Max Reitz geschrieben:
->> On 06.09.18 13:11, Daniel Henrique Barboza wrote:
->>> changes in v2:
->>> - removed the "RFC" marker;
->>> - added a new patch (patch 2) that removes
->>> bdrv_snapshot_delete_by_id_or_name from the code;
->>> - made changes in patch 1 as suggested by Murilo;
->>> - previous patch set link:
->>> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg04658.html
->>>
->>>
->>> It is not uncommon to see bugs being opened by testers that attempt t=
-o
->>> create VM snapshots using HMP. It turns out that "0" and "1" are quit=
-e
->>> common snapshot names and they trigger a lot of bugs. I gave an examp=
-le
->>> in the commit message of patch 1, but to sum up here: QEMU treats the=
-
->>> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'. =
-It
->>> is documented as such, but this can lead to strange situations.
->>>
->>> Given that it is strange for an API to consider a parameter to be 2 f=
-ields
->>> at the same time, and inadvently treating them as one or the other, a=
-nd
->>> that removing the ID field is too drastic, my idea here is to keep th=
-e
->>> ID field for internal control, but do not let the user set it.
->>>
->>> I guess there's room for discussion about considering this change an =
-API
->>> change or not. It doesn't affect users of HMP and it doesn't affect L=
-ibvirt,
->>> but simplifying the meaning of the parameters of savevm/loadvm/delvm.=
-
->>
->> (Yes, very late reply, I'm sorry...)
->>
->> I do think it affects users of HMP, because right now you can delete
->> snapshots with their ID, and after this series you cannot.
+On 2019-01-09 15:20, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
 >=20
-> Can there be snapshots that can't be identified by a snapshot name, but=
-
-> only by their ID?
-
-I don't know, but what I meant is that if you have scripts to do all
-this, you might have to adjust them with this change.
-
->> I think we had a short discussion about just disallowing numeric
->> snapshot names.  How bad would that be?
+>> On 2019-01-09 14:10, Markus Armbruster wrote:
+>>> Thomas Huth <thuth@redhat.com> writes:
+>>>
+>>>> On 2019-01-09 12:44, Daniel P. Berrang=C3=A9 wrote:
+>>>>> On Wed, Jan 09, 2019 at 12:25:43PM +0100, Thomas Huth wrote:
+>>>>>> On 2019-01-09 11:58, Daniel P. Berrang=C3=A9 wrote:
+>>>>>>> On Mon, Jan 07, 2019 at 11:45:26AM +0100, Thomas Huth wrote:
+>>>>>>>> Different versions of GCC and Clang use different versions of th=
+e C standard.
+>>>>>>>> This repeatedly caused problems already, e.g. with duplicated ty=
+pedefs:
+>>>>>>>>
+>>>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.=
+html
+>>>>>>>>
+>>>>>>>> or with for-loop variable initializers:
+>>>>>>>>
+>>>>>>>>  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.=
+html
+>>>>>>>>
+>>>>>>>> To avoid these problems, we should enforce the C language versio=
+n to the
+>>>>>>>> same level for all compilers. Since our minimum compiler version=
+s are
+>>>>>>>> GCC v4.8 and Clang v3.4 now, and both basically support "gnu11" =
+already,
+>>>>>>>> this seems to be a good choice.
+>>>>>>>
+>>>>>>> In 4.x   gnu11 is marked as experimental. I'm not really comforta=
+ble
+>>>>>>> using experimental features - even if its warning free there's a =
+risk
+>>>>>>> it would silently mis-compile something.
+>>>>>>>
+>>>>>>> gnu99 is ok with 4.x - it is merely "incomplete".
+>>>>>>
+>>>>>> gnu11 has the big advantage that it also fixes the problem with
+>>>>>> duplicated typedefs that are reported by older versions of Clang.
+>>>>>>
+>>>>>> Are you sure about the experimental character in 4.x? I just looke=
+d at
+>>>>>> https://gcc.gnu.org/onlinedocs/gcc-4.8.5/gcc/Standards.html and it=
+ says:
+>>>>>>
+>>>>>> "A fourth version of the C standard, known as C11, was published i=
+n 2011
+>>>>>> as ISO/IEC 9899:2011. GCC has limited incomplete support for parts=
+ of
+>>>>>> this standard, enabled with -std=3Dc11 or -std=3Diso9899:2011."
+>>>>>>
+>>>>>> It does not say anything about "experimental" there. The word
+>>>>>> "experimental" is only used for the C++ support, but we hardly hav=
+e C++
+>>>>>> code in QEMU -- if you worry about that, I could simply drop the
+>>>>>> "-std=3Dgnu++11" part from my patch?
+>>>>>
+>>>>> I was looking at the "info gcc" docs on RHEL7, gcc-4.8.5-16.el7_4.1=
+.x86_64:
+>>>>>
+>>>>>   "3.4 Options Controlling C Dialect
+>>>>>
+>>>>>        ....snip...
+>>>>>
+>>>>>      'gnu11'
+>>>>>      'gnu1x'
+>>>>>           GNU dialect of ISO C11.  Support is incomplete and
+>>>>>           experimental.  The name 'gnu1x' is deprecated."
+>>>>
+>>>> Ok. Looks like the "Support is incomplete and experimental" sentence=
+ has
+>>>> been removed with GCC 4.9.0 here. So GCC 4.8 is likely pretty close
+>>>> already. IMHO we could give it a try and enable gnu11 for QEMU with =
+GCC
+>>>> v4.8, too. If we later find problems, we could still switch back to
+>>>> gnu99 instead. Other opinions?
+>>>
+>>> Switchinh back could be somewhat painful if we already started using =
+C11
+>>> features.  And if we don't plan to, then what exactly will -std=3Dgnu=
+11
+>>> buy us?
+>>
+>> With C11, we get safety for the "duplicated typedef" problem that we r=
+un
+>> into regularly again and again, see e.g.:
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
 >=20
-> It would be incompatible with existing images and result in a more
-> complex snapshot identifier resolution. Why would it be any better?
+> That's a compilation failure.  "Support is experimental" makes me afrai=
+d
+> of run time failures.
+>=20
+> If we truly want C11, shouldn't we bump minimum required GCC to 4.9?
 
-It wouldn't be incompatible with existing images if we'd just disallow
-creating such snapshots.  I don't see how the identifier resolution
-would be more complex.
+That's not possible, since we claim to support RHEL7 / CentOS7 that is
+still using GCC v4.8.
 
-I don't know if it'd be better.  I'd just find it simpler (for us, that
-is -- for users, I'm not sure).
-
-Max
-
-
---To9k9ZgKjYC5sqYOKBZJbP0tZs2xwwTz6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw2BL8ACgkQ9AfbAGHV
-z0DZfwf/ePlPJsCnZf6abZKrAagtha1BiIWlsIoU3va0ksd8xl9e6RBA6GYSAdLv
-s7Y2ebJt0XF8HKOh82p41slub7bs2Af6ago/3p4zQ1ietQszfvoTL0LL0lpiqaSp
-K85K4jYHHidQk3k+yF6P2hHJWO1rr+Eo0G/7CEhy6fVN2blGdWlKatpjvhWHwk2F
-V64yK1e2sM7WEWt5XRdWjhKVa1tlDs6UVAbHxYKjCnRardaL5n3lnxCIpqau0iF0
-5OjeNIk04QpFxgNMMHvNi/dLw65idjb8HglOPDDoNGOKdZun2qBuQP05GAduWw2K
-NqY/7oRSNb+ChdtNHizFoz4iAfqP7Q==
-=hdyM
------END PGP SIGNATURE-----
-
---To9k9ZgKjYC5sqYOKBZJbP0tZs2xwwTz6--
+ Thomas
