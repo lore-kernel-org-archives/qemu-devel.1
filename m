@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42304)
+Received: from eggs.gnu.org ([209.51.188.92]:42431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pawelx.wodkowski@intel.com>) id 1ghGaF-0002fP-Nb
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:20:03 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghGam-0002zY-PH
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:20:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pawelx.wodkowski@intel.com>) id 1ghGaC-0007uY-9E
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:19:59 -0500
-Received: from mga07.intel.com ([134.134.136.100]:55134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pawelx.wodkowski@intel.com>)
-	id 1ghGaB-0007rL-TG
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:19:56 -0500
-From: "Wodkowski, PawelX" <pawelx.wodkowski@intel.com>
-Date: Wed, 9 Jan 2019 16:19:48 +0000
-Message-ID: <b6f9fccf992b03b762daecbae3a5fc80605e9b52.camel@intel.com>
-References: <ae9873.3d686.1683223a356.Coremail.wuzhouhui14@mails.ucas.ac.cn>
-	<20190109124258.GD18942@stefanha-x1.localdomain>
-	<234daa90.3dc4b.16832c82ae0.Coremail.wuzhouhui14@mails.ucas.ac.cn>
-In-Reply-To: <234daa90.3dc4b.16832c82ae0.Coremail.wuzhouhui14@mails.ucas.ac.cn>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7B7ADDDCB96EB94690E9BDB6B8ABDC16@intel.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1ghGai-0008O7-4x
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:20:31 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190102140535.11512-1-cfergeau@redhat.com>
+	<20190102180158.GA6015@natto.ory.fergeau.eu>
+	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
+	<87o98sii5b.fsf@dusky.pond.sub.org>
+	<20190107163606.GL23773@natto.ory.fergeau.eu>
+	<87pnt7bflk.fsf@dusky.pond.sub.org>
+	<d8a41aa9-42bf-94f0-d6e6-347547dc39da@redhat.com>
+	<87bm4pewa8.fsf@dusky.pond.sub.org>
+	<61b1ab31-e39d-1187-d8bd-42370eef5547@redhat.com>
+Date: Wed, 09 Jan 2019 17:20:17 +0100
+In-Reply-To: <61b1ab31-e39d-1187-d8bd-42370eef5547@redhat.com> (Max Reitz's
+	message of "Wed, 9 Jan 2019 15:41:03 +0100")
+Message-ID: <87pnt5by66.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [SPDK] Qemu migration with vhost-user-blk on top
- of local storage
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,102 +30,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "stefanha@gmail.com" <stefanha@gmail.com>, "spdk@lists.01.org" <spdk@lists.01.org>
-Cc: "libvir-list@redhat.com" <libvir-list@redhat.com>, "xieyongji@baidu.com" <xieyongji@baidu.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "lilin24@baidu.com" <lilin24@baidu.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>, qemu-stable@nongnu.org
 
-T24gV2VkLCAyMDE5LTAxLTA5IGF0IDIxOjIzICswODAwLCB3dXpob3VodWkgd3JvdGU6DQo+ID4g
-LS0tLS1PcmlnaW5hbCBNZXNzYWdlcy0tLS0tDQo+ID4gRnJvbTogIlN0ZWZhbiBIYWpub2N6aSIg
-PHN0ZWZhbmhhQGdtYWlsLmNvbT4NCj4gPiBTZW50IFRpbWU6IDIwMTktMDEtMDkgMjA6NDI6NTgg
-KFdlZG5lc2RheSkNCj4gPiBUbzogd3V6aG91aHVpIDx3dXpob3VodWkxNEBtYWlscy51Y2FzLmFj
-LmNuPg0KPiA+IENjOiBxZW11LWRldmVsQG5vbmdudS5vcmcsIHhpZXlvbmdqaUBiYWlkdS5jb20s
-IGxpbGluMjRAYmFpZHUuY29tLCANCj4gPiBsaWJ2aXItbGlzdEByZWRoYXQuY29tLCBzcGRrQGxp
-c3RzLjAxLm9yZw0KPiA+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gUWVtdSBtaWdyYXRpb24g
-d2l0aCB2aG9zdC11c2VyLWJsayBvbiB0b3ANCj4gPiBvZiBsb2NhbCBzdG9yYWdlDQo+ID4gDQo+
-ID4gT24gV2VkLCBKYW4gMDksIDIwMTkgYXQgMDY6MjM6NDJQTSArMDgwMCwgd3V6aG91aHVpIHdy
-b3RlOg0KPiA+ID4gSGkgZXZlcnlvbmUsDQo+ID4gPiANCj4gPiA+IEknbSB3b3JraW5nIHFlbXUg
-d2l0aCB2aG9zdCB0YXJnZXQgKGUuZy4gc3BkayksIGFuZCBJIGF0dGVtcHQgdG8NCj4gPiA+IG1p
-Z3JhdGUgVk0gd2l0aA0KPiA+ID4gMiBsb2NhbCBzdG9yYWdlcy4gT25lIGxvY2FsIHN0b3JhZ2Ug
-aXMgYSByZWd1bGFyIGZpbGUsIGUuZy4NCj4gPiA+IC90bXAvYzc0LnFjb3cyLCBhbmQNCj4gPiA+
-IHRoZSBvdGhlciBpcyBhIG1hbGxvYyBiZGV2IHRoYXQgc3BkayBjcmVhdGVkLiBUaGlzIG1hbGxv
-YyBiZGV2DQo+ID4gPiB3aWxsIGV4cG9ydGVkIHRvDQo+ID4gPiBWTSB2aWEgdmhvc3QtdXNlci1i
-bGsuIFdoZW4gSSBleGVjdXRlIGZvbGxvd2luZyBjb21tYW5kOg0KPiA+ID4gDQo+ID4gPiAgIHZp
-cnNoIG1pZ3JhdGUgLS1saXZlIC0tcGVyc2lzdGVudCAtLXVuc2FmZSAtLXVuZGVmaW5lc291cmNl
-IC0tDQo+ID4gPiBjb3B5LXN0b3JhZ2UtYWxsIFwNCj4gPiA+ICAgICAgLS1wMnAgLS1hdXRvLWNv
-bnZlcmdlIC0tdmVyYm9zZSAtLWRlc3R1cmkNCj4gPiA+IHFlbXUrdGNwOi8vPHVyaT4vc3lzdGVt
-IHZtMA0KPiA+ID4gDQo+ID4gPiBUaGUgbGlidmlydCByZXBvcnRzOg0KPiA+ID4gDQo+ID4gPiAg
-IHFlbXUtMi4xMi4xOiBlcnJvcjogaW50ZXJuYWwgZXJyb3I6IHVuYWJsZSB0byBleGVjdXRlIFFF
-TVUNCj4gPiA+IGNvbW1hbmQgXA0KPiA+ID4gICAgICduYmQtc2VydmVyLWFkZCc6IENhbm5vdCBm
-aW5kIGRldmljZT1kcml2ZS12aXJ0aW8tZGlzazEgbm9yIFwNCj4gPiA+ICAgICBub2RlX25hbWU9
-ZHJpdmUtdmlydGlvLWRpc2sxDQo+ID4gDQo+ID4gUGxlYXNlIHBvc3QgeW91ciBsaWJ2aXJ0IGRv
-bWFpbiBYTUwuDQo+IA0KPiBNeSBsaWJ2aXJ0IGlzIGJhc2VkIG9uIGxpYnZpcnQtMS4xLjEtMjku
-ZWw3LCBhbmQgYWRkIG1hbnkgcGF0Y2hlcyB0bw0KPiBzYXRpc2Z5IG91cg0KPiBvd24gbmVlZHMs
-IGUuZy4gYWRkIHN1cHBvcnQgZm9yIHZob3N0LXVzZXItYmxrLiBQb3N0IGRvbWFpbiB4bWwgbWF5
-DQo+IG5vdCB1c2VmdWwuDQo+IEFueXdheSwgZm9sbG93aW5nIGlzIGZ1bGwgY29udGVudHMgb2Yg
-WE1MOg0KPiANCj4gICA8ZG9tYWluIHR5cGU9J2t2bSc+DQo+ICAgICA8bmFtZT53emg8L25hbWU+
-DQo+ICAgICA8dXVpZD5hODRlOTZlNi0yYzUzLTQwOGQtOTg2Yi1jNzA5YmM2YTBlNTE8L3V1aWQ+
-DQo+ICAgICA8bWVtb3J5IHVuaXQ9J01pQic+NDA5NjwvbWVtb3J5Pg0KPiAgICAgPG1lbW9yeUJh
-Y2tpbmc+DQo+ICAgICAgIDxodWdlcGFnZXMvPg0KPiAgICAgPC9tZW1vcnlCYWNraW5nPg0KPiAg
-ICAgPGN1cnJlbnRNZW1vcnkgdW5pdD0nTWlCJz40MDk2PC9jdXJyZW50TWVtb3J5Pg0KPiAgICAg
-PHZjcHUgcGxhY2VtZW50PSdzdGF0aWMnIGNwdXNldD0nMTYtMzEnPjI8L3ZjcHU+DQo+ICAgICA8
-b3M+DQo+ICAgICAgIDx0eXBlIGFyY2g9J3g4Nl82NCcgbWFjaGluZT0ncGMnPmh2bTwvdHlwZT4N
-Cj4gICAgICAgPGJvb3QgZGV2PSdoZCcvPg0KPiAgICAgPC9vcz4NCj4gICAgIDxmZWF0dXJlcz4N
-Cj4gICAgICAgPGFjcGkvPg0KPiAgICAgPC9mZWF0dXJlcz4NCj4gICAgIDxjbG9jayBvZmZzZXQ9
-J3V0Yyc+DQo+ICAgICAgIDx0aW1lciBuYW1lPSdydGMnIHRpY2twb2xpY3k9J2NhdGNodXAnLz4N
-Cj4gICAgIDwvY2xvY2s+DQo+ICAgICA8b25fcG93ZXJvZmY+ZGVzdHJveTwvb25fcG93ZXJvZmY+
-DQo+ICAgICA8b25fcmVib290PnJlc3RhcnQ8L29uX3JlYm9vdD4NCj4gICAgIDxvbl9jcmFzaD5k
-ZXN0cm95PC9vbl9jcmFzaD4NCj4gICAgIDxkZXZpY2VzPg0KPiAgICAgICA8ZW11bGF0b3I+L2Rh
-dGEvd3poL3g4Nl82NC1zb2Z0bW11L3FlbXUtc3lzdGVtLQ0KPiB4ODZfNjQ8L2VtdWxhdG9yPg0K
-PiAgICAgICA8ZGlzayB0eXBlPSdmaWxlJyBkZXZpY2U9J2Rpc2snPg0KPiAJPGRyaXZlciBuYW1l
-PSdxZW11JyB0eXBlPSdxY293MicgY2FjaGU9J25vbmUnLz4NCj4gCTxzb3VyY2UgZmlsZT0nL2Rh
-dGEvd3poL2M3NC5xY293MicvPg0KPiAJPHRhcmdldCBkZXY9J3ZkYScgYnVzPSd2aXJ0aW8nLz4N
-Cj4gCTxhbGlhcyBuYW1lPSd2aXJ0aW8tZGlzazAnLz4NCj4gICAgICAgPC9kaXNrPg0KPiANCj4g
-ICAgICAgPGRpc2sgdHlwZT0ndmhvc3QtdXNlci1ibGsnIGRldmljZT0nZGlzayc+DQo+IAk8c291
-cmNlIHR5cGU9J3VuaXgnIHBhdGg9Jy92YXIvdG1wL2x2MCcgbW9kZT0nY2xpZW50Jz4NCj4gCTwv
-c291cmNlPg0KPiAJPHRhcmdldCBkZXY9J3ZkYicgYnVzPSd2aXJ0aW8nLz4NCj4gCTxkcml2ZXIg
-cXVldWVzPSc0Jy8+DQo+ICAgICAgIDwvZGlzaz4NCj4gDQo+ICAgICAgIDxjb250cm9sbGVyIHR5
-cGU9J3VzYicgaW5kZXg9JzAnPg0KPiAJPGFsaWFzIG5hbWU9J3VzYjAnLz4NCj4gICAgICAgPC9j
-b250cm9sbGVyPg0KPiAgICAgICA8Y29udHJvbGxlciB0eXBlPSdwY2knIGluZGV4PScwJyBtb2Rl
-bD0ncGNpLXJvb3QnPg0KPiAJPGFsaWFzIG5hbWU9J3BjaS4wJy8+DQo+ICAgICAgIDwvY29udHJv
-bGxlcj4NCj4gICAgICAgPHNlcmlhbCB0eXBlPSdwdHknPg0KPiAJPHRhcmdldCBwb3J0PScwJy8+
-DQo+IAk8YWxpYXMgbmFtZT0nc2VyaWFsMCcvPg0KPiAgICAgICA8L3NlcmlhbD4NCj4gICAgICAg
-PHNlcmlhbCB0eXBlPSdwdHknPg0KPiAJPHRhcmdldCBwb3J0PScxJy8+DQo+IAk8YWxpYXMgbmFt
-ZT0nc2VyaWFsMScvPg0KPiAgICAgICA8L3NlcmlhbD4NCj4gICAgICAgPGlucHV0IHR5cGU9J3Rh
-YmxldCcgYnVzPSd1c2InPg0KPiAJPGFsaWFzIG5hbWU9J2lucHV0MCcvPg0KPiAgICAgICA8L2lu
-cHV0Pg0KPiAgICAgICA8aW5wdXQgdHlwZT0nbW91c2UnIGJ1cz0ncHMyJy8+DQo+ICAgICAgIDxn
-cmFwaGljcyB0eXBlPSd2bmMnIGF1dG9wb3J0PSd5ZXMnIGxpc3Rlbj0nMC4wLjAuMCcNCj4ga2V5
-bWFwPSdlbi11cyc+DQo+IAk8bGlzdGVuIHR5cGU9J2FkZHJlc3MnIGFkZHJlc3M9JzAuMC4wLjAn
-Lz4NCj4gICAgICAgPC9ncmFwaGljcz4NCj4gICAgICAgPHZpZGVvPg0KPiAJPG1vZGVsIHR5cGU9
-J2NpcnJ1cycgdnJhbT0nOTIxNicgaGVhZHM9JzEnLz4NCj4gCTxhbGlhcyBuYW1lPSd2aWRlbzAn
-Lz4NCj4gICAgICAgPC92aWRlbz4NCj4gICAgIDwvZGV2aWNlcz4NCj4gICAgIDxzZWNsYWJlbCB0
-eXBlPSdub25lJy8+DQo+ICAgPC9kb21haW4+DQo+IA0KPiA+IA0KPiA+ID4gRG9lcyBpdCBtZWFu
-cyB0aGF0IHFlbXUgd2l0aCBzcGRrIG9uIHRvcCBvZiBsb2NhbCBzdG9yYWdlIGRvbid0DQo+ID4g
-PiBzdXBwb3J0IG1pZ3JhdGlvbj8NCj4gPiA+IA0KPiA+ID4gUUVNVTogMi4xMi4xDQo+ID4gPiBT
-UERLOiAxOC4xMA0KPiA+IA0KPiA+IHZob3N0LXVzZXItYmxrIGJ5cGFzc2VzIHRoZSBRRU1VIGJs
-b2NrIGxheWVyLCBzbyBOQkQgc3RvcmFnZQ0KPiA+IG1pZ3JhdGlvbg0KPiA+IGF0IHRoZSBRRU1V
-IGxldmVsIHdpbGwgbm90IHdvcmsgZm9yIHRoZSB2aG9zdC11c2VyLWJsayBkaXNrLg0KPiA+IA0K
-PiA+IFN0ZWZhbg0KDQoNCkRvbid0IGtub3cgaWYgdGhpcyBpcyB0aGUgY2FzZSB0aGF0IHd1emhv
-dWh1aSBpcyB1c2luZyBidXQgZ2VuZXJhbGx5DQptaWdyYXRpb24gc2hvdWxkIHdvcmsgaWYgYWxs
-IHN0b3JhZ2VzIGFyZSBhY2Nlc2libGUgZnJvbSBib3RoIG1hY2hpbmVzLg0KVGhlIFFFTVUgaW1h
-Z2UgYW5kIE1hbGxvYyBiZGV2IHNob3VsZCBiZSBleHBvc2VkIHVzaW5nIHNvbWUga2luZCBvZg0K
-bmV0d29yayBzaGFyaW5nLiBTUERLIG9uIG1pZ3JhdGlvbiB0YXJnZXQgc2hvdWxkIGJlIGNvbmZp
-Z3VyZWQgdGhlIHNhbWUNCndheSBhcyBvbiBzb3VyY2UgbWFjaGluZS4NCg0KV2UgYXJlIHRlc3Rp
-bmcgdGhpcyBpc3N1aW5nIFFFTVUgbW9uaXRvciBjb21tYW5kcyBzbyBJIGNhbid0IGhlbHAgd2l0
-aA0KbGlidmlydCBoZXJlLg0KDQpFeGFtcGxlIHNldHVwL3Rlc3QgY2FzZSB3ZSBhcmUgdXNpbmcg
-aW4gb25lIG9mIG91ciB0ZXN0czoNCg0KTWFjaGluZTE6DQogIEV4cG9zZSBWTSBpbWFnZSBvdmVy
-IFNTSEYNCiAgRXhwb3NlIHNvbWUgYmxvY2sgZGV2aWNlIHVzaW5nIFNQREsgbnZtZiB0YXJnZXQN
-CiAgU1BESyBudm1mIGluaXRpYXRvcjoNCiAgICAgLSBjb25uZWN0cyB0byBNYWNoaW5lMSBTUERL
-IG52bWYgdGFyZ2V0IHRvIGFjY2VzcyBibG9jayBkZXZpY2UNCiAgU1BESyB2aG9zdC1zY3NpOg0K
-ICAgIC0gcHJlc2VudHMgYmxvY2sgZGV2aWNlIHRvIFFFTVUgZnJvbSBTUERLIG52bWYgaW5pdGlh
-dG9yOg0KICBRRU1VIFZNIHVzZXMNCiAgICAtIHNoYXJlZCBWTSBpbWFnZQ0KICAgIC0gYmxvY2sg
-ZGV2aWNlIGZyb20gU1BESyBudm1mICBpbml0aWF0b3Igb3ZlciB2aG9zdC11c2VyLXNjc2kNCg0K
-TWFjaGluZTI6ICANCiAgU1BESyBudm1mIGluaXRpYXRvcjoNCiAgICAgLSBjb25uZWN0cyB0byBN
-YWNoaW5lMSBTUERLIG52bWYgdGFyZ2V0IHRvIGFjY2VzcyBibG9jayBkZXZpY2UNCiAgU1BESyB2
-aG9zdC1zY3NpOg0KICAgIC0gcHJlc2VudHMgYmxvY2sgZGV2aWNlIHRvIFFFTVUgZnJvbSBudm1m
-DQppbml0aWF0b3I6DQogIFFFTVUgaW5zdGFuY2UgLSB3YWl0aW5nIGZvciBpbmNvbWluZyBtaWdy
-YXRpb24NCiAgICAtIHNoYXJlZCBWTSBpbWFnZSBvdmVyIFNTSEZTDQogICAgLSBibG9jayBkZXZp
-Y2UgZnJvbSBTUERLIG52bWYgIGluaXRpYXRvciBvdmVyIHZob3N0LXVzZXItc2NzaQ0KDQpTb21l
-IHRyYWZmaWMgaXMgZ2VuZXJhdGVkIHVzaW5nIEZJTyBhbmQgdGhlbiB3ZSBqdXN0IG1pZ3JhdGUg
-Vk0gZnJvbQ0KTWFjaGluZTEgdG8gTWFjaGluZTIuDQoNClBhd2VsDQoNCj4gDQo+IF9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fDQo+IFNQREsgbWFpbGluZyBs
-aXN0DQo+IFNQREtAbGlzdHMuMDEub3JnDQo+IGh0dHBzOi8vbGlzdHMuMDEub3JnL21haWxtYW4v
-bGlzdGluZm8vc3Bkaw0K
+Max Reitz <mreitz@redhat.com> writes:
+
+> On 09.01.19 15:32, Markus Armbruster wrote:
+>> Max Reitz <mreitz@redhat.com> writes:
+>> 
+>>> On 08.01.19 11:36, Markus Armbruster wrote:
+>>>> Copying block maintainers for help with assessing the bug's (non-)impact
+>>>> on security.
+>>>>
+>>>> Christophe Fergeau <cfergeau@redhat.com> writes:
+>>>>
+>>>>> On Mon, Jan 07, 2019 at 04:47:44PM +0100, Markus Armbruster wrote:
+>>>>>> Eric Blake <eblake@redhat.com> writes:
+>>>>>>
+>>>>>>> On 1/2/19 12:01 PM, Christophe Fergeau wrote:
+>>>>>>>> Adding Markus to cc: list, I forgot to do it when sending the patch.
+>>>>>>>
+>>>>>>> Also worth backporting via qemu-stable, now in cc.
+>>>>>>>
+>>>>>>>>
+>>>>>>>> Christophe
+>>>>>>>>
+>>>>>>>> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wrote:
+>>>>>>>>> commit 8bca4613 added support for %% in json strings when interpolating,
+>>>>>>>>> but in doing so, this broke handling of % when not interpolating as the
+>>>>>>>>> '%' is skipped in both cases.
+>>>>>>>>> This commit ensures we only try to handle %% when interpolating.
+>>>>>>
+>>>>>> Impact?
+>>>>>>
+>>>>>> If you're unable to assess, could you give us at least a reproducer?
+>>>>>
+>>>>> This all came from https://lists.freedesktop.org/archives/spice-devel/2018-December/046644.html
+>>>>> Setting up a VM with libvirt with <graphics type='spice' autoport='yes' passwd='password%'/>
+>>>>> fails to start with:
+>>>>>   qemu-system-x86_64: qobject/json-parser.c:146: parse_string: Assertion `*ptr' failed.
+>>>>>
+>>>>> If you use 'password%%' as the password instead, when trying to connect
+>>>>> to the VM, you type 'password%' as the password instead of 'password%%'
+>>>>> as configured in the domain XML.
+>>>>
+>>>> Thanks.
+>>>>
+>>>> As the commit message says, the bug bites when we parse a string
+>>>> containing '%s' with !ctxt->ap.  The parser then swallows a character.
+>>>> If it swallows the terminating '"', it fails the assertion.
+>>>>
+>>>> We parse with !ctxt->ap in the following cases:
+>>>>
+>>>> * Tests (tests/check-qjson.c, tests/test-qobject-input-visitor.c,
+>>>>   tests/test-visitor-serialization.c)
+>>>>
+>>>>   Plenty of tests, but we still failed to cover the buggy case :(
+>>>>
+>>>> * QMP input (monitor.c)
+>>>>
+>>>> * QGA input (qga/main.c)
+>>>>
+>>>> * qobject_from_json()
+>>>>
+>>>>   - JSON pseudo-filenames (block.c)
+>>>>
+>>>>     These are pseudo-filenames starting with "json:".
+>>>>
+>>>>   - JSON key pairs (block/rbd.c)
+>>>>
+>>>>     As far as I can tell, these can come only from pseudo-filenames
+>>>>     starting with "rbd:".
+>>>>
+>>>>   - JSON command line option arguments of -display and -blockdev
+>>>>     (qobject-input-visitor.c)
+>>>>
+>>>>     Reproducer: -blockdev '{"%"}'
+>>>>
+>>>> Command line, QMP and QGA input are trusted.
+>>>>
+>>>> Filenames are trusted when they come from command line, QMP or HMP.
+>>>> They are untrusted when they come from from image file headers.
+>>>> Example: QCOW2 backing file name.  Note that this is *not* the security
+>>>> boundary between host and guest.  It's the boundary between host and an
+>>>> image file from an untrusted source.
+>>>>
+>>>> I can't see how the bug could be exploited.  Neither failing an
+>>>> assertion nor skipping a character in a filename of your choice is
+>>>> interesting.  We don't support compiling with NDEBUG.
+>>>>
+>>>> Kevin, Max, do you agree?
+>>>
+>>> I wouldn't call it "not interesting" if adding an image to your VM at
+>>> runtime can crash the whole thing.
+>>>
+>>> (qemu-img create -f qcow2 -u -b 'json:{"%"}' foo.qcow2 64M)
+>> 
+>> "Not interesting" strictly from the point of view of exploiting the bug
+>> to penetrate trust boundaries.
+>> 
+>>> Whether this is a security issue...  I don't know, but it is a DoS.
+>> 
+>> I'm not sure whether feeding untrusted images to QEMU is a good idea in
+>> general --- there's so much that could go wrong.  How hardened against
+>> abuse are out block drivers?
+>
+> They are supposed to handle such cases gracefully, that's for sure.  At
+> least for qcow2 we do care about it.
+>
+>> I figure what distinguishes this case is how utterly trivial creating a
+>> "bad" image is.
+>
+> I don't think an untrusted image should be able to crash qemu.
+
+"Should" in the sense of "if they don't, it's a bug, and we'll do what
+we can to fix it", or "if they don't, I'll be surprised"?
+
+>> Anyway, you are the block layer maintainers, so you get to decide
+>> whether to give this the full security bug treatment.  I'm merely the
+>> clown who broke it %-/
+>
+> Er, then I suppose it is no security bug? O:-)
+
+I'm not charging toll for the bridge I built for you ;)
