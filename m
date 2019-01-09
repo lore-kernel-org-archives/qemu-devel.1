@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32955)
+Received: from eggs.gnu.org ([209.51.188.92]:60785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghMEf-0002on-U6
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 17:22:08 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghMEf-0002YQ-Gv
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 17:22:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghM2k-00035z-K0
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 17:09:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39002)
+	(envelope-from <pbonzini@redhat.com>) id 1ghM2m-00036b-8z
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 17:09:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghM2k-00035g-Bs
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 17:09:46 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghM2l-00036H-Rg
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 17:09:48 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8636558E38
-	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 22:09:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2A7C1C05D410
+	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 22:09:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  9 Jan 2019 23:09:41 +0100
-Message-Id: <20190109220942.23822-1-pbonzini@redhat.com>
+Date: Wed,  9 Jan 2019 23:09:42 +0100
+Message-Id: <20190109220942.23822-2-pbonzini@redhat.com>
+In-Reply-To: <20190109220942.23822-1-pbonzini@redhat.com>
+References: <20190109220942.23822-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v6 00/35] Misc patches for 2018-12-18
+Subject: [Qemu-devel] [PULL 23/35] test: replace gtester with a TAP driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,261 +34,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-The following changes since commit c102d9471f8f02d9fbea72ec4505d7089173f4=
-70:
+gtester is deprecated by upstream glib (see for example the announcement
+at https://blog.gtk.org/2018/07/11/news-from-glib-2-58/) and it does
+not support tests that call g_test_skip in some glib stable releases.
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-90107' into staging (2019-01-07 16:56:33 +0000)
+glib suggests instead using Automake's TAP support, which gtest itself
+supports since version 2.38 (QEMU's minimum requirement is 2.40).
+We do not support Automake, but we can use Automake's code to beautify
+the TAP output.  I chose to use the Perl copy rather than the shell/awk
+one, with some changes so that it can accept TAP through stdin, in order
+to reuse Perl's TAP parsing package.  This also avoids duplicating the
+parser between tap-driver.pl and tap-merge.pl.
 
-are available in the Git repository at:
-
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to 5eddc84292736dc57db341f9724395a29d3614f7:
-
-  avoid TABs in files that only contain a few (2019-01-09 23:01:14 +0100)
-
-----------------------------------------------------------------
-* HAX support for Linux hosts (Alejandro)
-* esp bugfixes (Guenter)
-* Windows build cleanup (Marc-Andr=C3=A9)
-* checkpatch logic improvements (Paolo)
-* coalesced range bugfix (Paolo)
-* switch testsuite to TAP (Paolo)
-* QTAILQ rewrite (Paolo)
-* block/iscsi.c cancellation fixes (Stefan)
-* improve selection of the default accelerator (Thomas)
-
-----------------------------------------------------------------
-Alexandro Sanchez Bach (1):
-      hax: Support for Linux hosts
-
-Guenter Roeck (2):
-      esp-pci: Fix status register write erase control
-      scsi: esp: Defer command completion until previous interrupts have =
-been handled
-
-Marc-Andr=C3=A9 Lureau (4):
-      build-sys: don't include windows.h, osdep.h does it
-      build-sys: move windows defines in osdep.h header
-      build-sys: build with Vista API by default
-      qga: drop < Vista compatibility
-
-Paolo Bonzini (21):
-      checkpatch: fix premature exit when no input or --mailback
-      checkpatch: check Signed-off-by in --mailback mode
-      checkpatch: improve handling of multiple patches or files
-      checkpatch: colorize output to terminal
-      pam: wrap MemoryRegion initialization in a transaction
-      memory: extract flat_range_coalesced_io_{del,add}
-      memory: avoid unnecessary coalesced_io_del operations
-      memory: update coalesced_range on transaction_commit
-      test: execute g_test_run when tests are skipped
-      test: replace gtester with a TAP driver
-      qemu/queue.h: do not access tqe_prev directly
-      vfio: make vfio_address_spaces static
-      qemu/queue.h: leave head structs anonymous unless necessary
-      qemu/queue.h: typedef QTAILQ heads
-      qemu/queue.h: remove Q_TAILQ_{HEAD,ENTRY}
-      qemu/queue.h: reimplement QTAILQ without pointer-to-pointers
-      qemu/queue.h: simplify reverse access to QTAILQ
-      checkpatch: warn about qemu/queue.h head structs that are not typed=
-ef-ed
-      scripts: add script to convert multiline comments into 4-line forma=
-t
-      remove space-tab sequences
-      avoid TABs in files that only contain a few
-
-Peng Hao (1):
-      hw/watchdog/wdt_i6300esb: remove a unnecessary comment
-
-Stefan Hajnoczi (4):
-      block/iscsi: drop unused IscsiAIOCB->buf field
-      block/iscsi: take iscsilun->mutex in iscsi_timed_check_events()
-      block/iscsi: fix ioctl cancel use-after-free
-      block/iscsi: cancel libiscsi task when ABORT TASK TMF completes
-
-Thomas Huth (1):
-      accel: Improve selection of the default accelerator
-
- accel/accel.c                                |  18 +-
- accel/kvm/kvm-all.c                          |   4 +-
- accel/tcg/translate-all.c                    |   4 -
- block/bochs.c                                |  22 +-
- block/file-posix.c                           |   2 +-
- block/file-win32.c                           |   8 +-
- block/gluster.c                              |   2 +-
- block/iscsi.c                                |  47 +++-
- block/linux-aio.c                            |   4 +-
- block/mirror.c                               |   2 +-
- block/qcow2-bitmap.c                         |   4 +-
- block/qcow2-cluster.c                        |   2 +-
- block/qcow2.h                                |   5 +-
- block/sheepdog.c                             |   6 +-
- block/vhdx.h                                 |   2 +-
- block/vpc.c                                  |   2 +-
- blockdev.c                                   |   4 +-
- bsd-user/elfload.c                           |   2 +-
- bsd-user/x86_64/target_syscall.h             |   2 +-
- configure                                    |   3 -
- contrib/elf2dmp/main.c                       |   2 +-
- contrib/ivshmem-client/ivshmem-client.h      |   4 +-
- contrib/ivshmem-server/ivshmem-server.h      |   5 +-
- cpus-common.c                                |   2 +-
- crypto/aes.c                                 |  28 +-
- disas/alpha.c                                |   8 +-
- disas/arm.c                                  |   2 +-
- disas/i386.c                                 |   4 +-
- disas/m68k.c                                 |   4 +-
- dump.c                                       |   2 +-
- exec.c                                       |   5 +-
- fsdev/qemu-fsdev.c                           |   2 +-
- hw/alpha/typhoon.c                           |  12 +-
- hw/arm/stellaris.c                           |   2 +-
- hw/block/nvme.h                              |   8 +-
- hw/block/xen_disk.c                          |   6 +-
- hw/char/sh_serial.c                          |  18 +-
- hw/char/virtio-serial-bus.c                  |   2 +-
- hw/char/xen_console.c                        |  58 ++--
- hw/core/loader.c                             |  28 +-
- hw/core/qdev.c                               |   4 +-
- hw/core/reset.c                              |   2 +-
- hw/display/tc6393xb.c                        |   6 +-
- hw/display/vga.c                             |   8 +-
- hw/display/virtio-gpu-3d.c                   |   6 +-
- hw/dma/pxa2xx_dma.c                          |   4 +-
- hw/dma/soc_dma.c                             |   2 +-
- hw/gpio/max7310.c                            |   2 +-
- hw/i386/xen/xen-hvm.c                        |   4 +-
- hw/i386/xen/xen-mapcache.c                   |   2 +-
- hw/ide/core.c                                |  94 +++----
- hw/input/lm832x.c                            |   2 +-
- hw/input/pckbd.c                             |   2 +-
- hw/input/tsc210x.c                           |   2 +-
- hw/intc/apic.c                               |   2 +-
- hw/mips/gt64xxx_pci.c                        |   6 +-
- hw/mips/mips_r4k.c                           |   4 +-
- hw/misc/max111x.c                            |   6 +-
- hw/misc/omap_l4.c                            |   4 +-
- hw/net/mipsnet.c                             |  16 +-
- hw/net/ne2000.c                              |  44 ++--
- hw/net/rocker/rocker.c                       |   2 +-
- hw/net/virtio-net.c                          |   4 +-
- hw/net/vmxnet3.c                             |   6 +-
- hw/pci-host/pam.c                            |   2 +
- hw/pci/msix.c                                |   2 +-
- hw/pci/pci.c                                 |  44 ++--
- hw/pci/pci_bridge.c                          |   2 +-
- hw/ppc/ppc405_uc.c                           |   2 +-
- hw/ppc/prep.c                                |   4 +-
- hw/ppc/spapr_iommu.c                         |   2 +-
- hw/scsi/esp-pci.c                            |  10 +-
- hw/scsi/esp.c                                |  33 ++-
- hw/scsi/lsi53c895a.c                         |   6 +-
- hw/scsi/scsi-bus.c                           |   2 +-
- hw/scsi/trace-events                         |   1 +
- hw/sh4/r2d.c                                 |  16 +-
- hw/usb/ccid-card-emulated.c                  |   4 +-
- hw/usb/combined-packet.c                     |   2 +-
- hw/usb/dev-bluetooth.c                       |   2 +-
- hw/usb/dev-hid.c                             |   6 +-
- hw/usb/dev-hub.c                             |  14 +-
- hw/usb/dev-mtp.c                             |   4 +-
- hw/usb/dev-network.c                         |   2 +-
- hw/usb/hcd-ehci.c                            |   2 +-
- hw/usb/hcd-ehci.h                            |   2 +-
- hw/usb/hcd-uhci.c                            |   8 +-
- hw/usb/xen-usb.c                             |   6 +-
- hw/vfio/common.c                             |   4 +-
- hw/watchdog/watchdog.c                       |   2 +-
- hw/watchdog/wdt_i6300esb.c                   |   1 -
- hw/xen/xen_devconfig.c                       |   2 +-
- hw/xen/xen_pvdev.c                           |   4 +-
- hw/xenpv/xen_domainbuild.c                   |   8 +-
- include/elf.h                                |  10 +-
- include/exec/memory.h                        |   6 +-
- include/hw/acpi/acpi.h                       |  14 +-
- include/hw/elf_ops.h                         |   2 +-
- include/hw/ide/internal.h                    |   2 +-
- include/hw/qdev-core.h                       |   2 +-
- include/hw/scsi/esp.h                        |   2 +
- include/hw/sh4/sh_intc.h                     |  20 +-
- include/hw/usb.h                             |   2 +-
- include/hw/vfio/vfio-common.h                |   4 +-
- include/hw/vfio/vfio-platform.h              |   2 +-
- include/hw/xen/io/ring.h                     |   4 +-
- include/net/net.h                            |   2 +-
- include/qemu/acl.h                           |  14 +-
- include/qemu/iov.h                           |   2 +-
- include/qemu/option_int.h                    |   2 +-
- include/qemu/osdep.h                         |  17 ++
- include/qemu/queue.h                         | 153 +++++------
- include/qemu/rcu_queue.h                     |  45 ++--
- include/qom/cpu.h                            |   9 +-
- include/scsi/constants.h                     |   2 +-
- include/sysemu/accel.h                       |   2 +-
- include/sysemu/balloon.h                     |   2 +-
- include/sysemu/kvm.h                         |   2 -
- include/sysemu/memory_mapping.h              |   2 +-
- include/sysemu/rng.h                         |   2 +-
- linux-user/elfload.c                         |   2 +-
- linux-user/linuxload.c                       |  14 +-
- linux-user/main.c                            |   4 +-
- linux-user/mmap.c                            |  10 +-
- linux-user/qemu.h                            |   4 +-
- linux-user/signal.c                          |  16 +-
- linux-user/strace.c                          |   4 +-
- linux-user/syscall.c                         |   2 +-
- linux-user/syscall_defs.h                    |   4 +-
- linux-user/uaccess.c                         |   2 +-
- linux-user/vm86.c                            |   2 +-
- linux-user/x86_64/target_syscall.h           |   2 +-
- memory.c                                     |  97 ++++---
- memory_mapping.c                             |   2 +-
- migration/block-dirty-bitmap.c               |   2 +-
- migration/block.c                            |   4 +-
- migration/ram.c                              |   2 +-
- monitor.c                                    |   4 +-
- net/checksum.c                               |   2 +-
- net/filter.c                                 |   2 +-
- net/net.c                                    |   2 +-
- net/queue.c                                  |   2 +-
- net/slirp.c                                  |   2 +-
- qga/commands-posix.c                         |   2 +-
- qga/commands-win32.c                         |  70 +----
- qtest.c                                      |   4 +-
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1543513531-1151-3-git-send-email-pbonzini@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
  rules.mak                                    |   4 +-
- scripts/checkpatch.pl                        |  95 +++++--
- scripts/cocci-macro-file.h                   |  24 +-
- scripts/fix-multiline-comments.sh            |  62 +++++
  scripts/gtester-cat                          |  26 --
- scripts/tap-driver.pl                        | 378 +++++++++++++++++++++=
-++++++
- scripts/tap-merge.pl                         | 110 ++++++++
- slirp/ip_input.c                             |   4 +-
- slirp/slirp.c                                |   2 +-
- slirp/tcp_input.c                            |  10 +-
- slirp/tcp_output.c                           |   4 +-
- slirp/tcp_timer.c                            |   2 +-
- slirp/udp.c                                  |   2 +-
- target/alpha/translate.c                     |   2 +-
- target/arm/kvm.c                             |   2 +-
- target/cris/helper.c                         |   2 +-
- target/cris/mmu.h                            |  10 +-
- target/cris/translate_v10.inc.c              |   2 +-
- target/i386/Makefile.objs                    |   6 +-
- target/i386/hax-i386.h                       |   6 +-
- target/i386/hax-mem.c                        |   2 +-
- target/i386/{hax-darwin.c =3D> hax-posix.c}    |   0
- target/i386/{hax-darwin.h =3D> hax-posix.h}    |   0
- target/i386/translate.c                      |  12 +-
- target/mips/translate.c                      |   2 +-
- target/tilegx/translate.c                    |   2 +-
- tcg/i386/tcg-target.inc.c                    |   4 +-
- tcg/tcg.c                                    |   4 +-
- tcg/tcg.h                                    |   6 +-
- tests/Makefile.include                       |  75 ++++--
- tests/cdrom-test.c                           |   2 +-
+ scripts/tap-driver.pl                        | 378 +++++++++++++++++++
+ scripts/tap-merge.pl                         | 110 ++++++
+ tests/Makefile.include                       |  75 ++--
  tests/docker/dockerfiles/centos7.docker      |   1 +
  tests/docker/dockerfiles/debian-amd64.docker |   1 +
  tests/docker/dockerfiles/debian-ports.docker |   1 +
@@ -296,43 +64,797 @@ Thomas Huth (1):
  tests/docker/dockerfiles/debian9.docker      |   1 +
  tests/docker/dockerfiles/fedora.docker       |   1 +
  tests/docker/dockerfiles/ubuntu.docker       |   1 +
- tests/ivshmem-test.c                         |   5 +-
- tests/libqos/malloc.c                        |   2 +-
- tests/migration-test.c                       |   8 +-
- tests/tcg/alpha/test-cond.c                  |   4 +-
- tests/tcg/arm/hello-arm.c                    |  20 +-
- tests/tcg/cris/check_glibc_kernelversion.c   |   8 +-
- tests/tcg/cris/check_mmap3.c                 |   2 +-
- tests/tcg/cris/check_openpf1.c               |   2 +-
- tests/tcg/cris/check_settls1.c               |   2 +-
- tests/tcg/i386/hello-i386.c                  |  14 +-
- tests/tcg/mips/hello-mips.c                  |  10 +-
- tests/tcg/multiarch/sha1.c                   |  12 +-
- tests/test-crypto-pbkdf.c                    |   3 +-
- tests/test-rcu-list.c                        |   2 +-
- tests/test-vmstate.c                         |   8 +-
- tests/vhost-user-test.c                      |   4 +-
- ui/console.c                                 |   4 +-
- ui/input.c                                   |  14 +-
- ui/keymaps.h                                 |   4 +-
- ui/qemu-pixman.c                             |   2 +-
- ui/vnc-enc-zywrle-template.c                 |   4 +-
- ui/vnc.c                                     |   4 +-
- util/bitops.c                                |   4 +-
- util/osdep.c                                 |   4 +-
- util/qemu-option.c                           |   4 +-
- util/qemu-sockets.c                          |   4 +-
- util/qemu-thread-win32.c                     |   4 -
- vl.c                                         |   4 +-
- 213 files changed, 1504 insertions(+), 897 deletions(-)
- create mode 100755 scripts/fix-multiline-comments.sh
+ 13 files changed, 549 insertions(+), 52 deletions(-)
  delete mode 100755 scripts/gtester-cat
  create mode 100755 scripts/tap-driver.pl
  create mode 100755 scripts/tap-merge.pl
- rename target/i386/{hax-darwin.c =3D> hax-posix.c} (100%)
- rename target/i386/{hax-darwin.h =3D> hax-posix.h} (100%)
+
+diff --git a/rules.mak b/rules.mak
+index bbb2667928..86e033d815 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -132,7 +132,9 @@ modules:
+ #  otherwise print the 'quiet' output in the format "  NAME     args to =
+print"
+ # NAME should be a short name of the command, 7 letters or fewer.
+ # If called with only a single argument, will print nothing in quiet mod=
+e.
+-quiet-command =3D $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && =
+$1, @$1))
++quiet-command-run =3D $(if $(V),,$(if $2,printf "  %-7s %s\n" $2 $3 && )=
+)$1
++quiet-@ =3D $(if $(V),,@)
++quiet-command =3D $(quiet-@)$(call quiet-command-run,$1,$2,$3)
+=20
+ # cc-option
+ # Usage: CFLAGS+=3D$(call cc-option, -falign-functions=3D0, -malign-func=
+tions=3D0)
+diff --git a/scripts/gtester-cat b/scripts/gtester-cat
+deleted file mode 100755
+index 061a952cad..0000000000
+--- a/scripts/gtester-cat
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#!/bin/sh
+-#
+-# Copyright IBM, Corp. 2012
+-#
+-# Authors:
+-#  Anthony Liguori <aliguori@us.ibm.com>
+-#
+-# This work is licensed under the terms of the GNU GPLv2 or later.
+-# See the COPYING file in the top-level directory.
+-
+-cat <<EOF
+-<?xml version=3D"1.0"?>
+-<gtester>
+- <info>
+-  <package>qemu</package>
+-  <version>0.0</version>
+-  <revision>rev</revision>
+- </info>
+-EOF
+-
+-sed \
+-  -e '/<?xml/d' \
+-  -e '/^<gtester>$/d' \
+-  -e '/<info>/,/<\/info>/d' \
+-  -e '$b' \
+-  -e '/^<\/gtester>$/d' "$@"
+diff --git a/scripts/tap-driver.pl b/scripts/tap-driver.pl
+new file mode 100755
+index 0000000000..5e59b5db49
+--- /dev/null
++++ b/scripts/tap-driver.pl
+@@ -0,0 +1,378 @@
++#! /usr/bin/env perl
++# Copyright (C) 2011-2013 Free Software Foundation, Inc.
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2, or (at your option)
++# any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <https://www.gnu.org/licenses/>.
++
++# As a special exception to the GNU General Public License, if you
++# distribute this file as part of a program that contains a
++# configuration script generated by Autoconf, you may include it under
++# the same distribution terms that you use for the rest of that program.
++
++# ---------------------------------- #
++#  Imports, static data, and setup.  #
++# ---------------------------------- #
++
++use warnings FATAL =3D> 'all';
++use strict;
++use Getopt::Long ();
++use TAP::Parser;
++use Term::ANSIColor qw(:constants);
++
++my $ME =3D "tap-driver.pl";
++my $VERSION =3D "2018-11-30";
++
++my $USAGE =3D <<'END';
++Usage:
++  tap-driver [--test-name=3DTEST] [--color=3D{always|never|auto}]
++             [--verbose] [--show-failures-only]
++END
++
++my $HELP =3D "$ME: TAP-aware test driver for QEMU testsuite harness." .
++           "\n" . $USAGE;
++
++# It's important that NO_PLAN evaluates "false" as a boolean.
++use constant NO_PLAN =3D> 0;
++use constant EARLY_PLAN =3D> 1;
++use constant LATE_PLAN =3D> 2;
++
++use constant DIAG_STRING =3D> "#";
++
++# ------------------- #
++#  Global variables.  #
++# ------------------- #
++
++my $testno =3D 0;     # Number of test results seen so far.
++my $bailed_out =3D 0; # Whether a "Bail out!" directive has been seen.
++my $failed =3D 0;     # Final exit code
++
++# Whether the TAP plan has been seen or not, and if yes, which kind
++# it is ("early" is seen before any test result, "late" otherwise).
++my $plan_seen =3D NO_PLAN;
++
++# ----------------- #
++#  Option parsing.  #
++# ----------------- #
++
++my %cfg =3D (
++  "color" =3D> 0,
++  "verbose" =3D> 0,
++  "show-failures-only" =3D> 0,
++);
++
++my $color =3D "auto";
++my $test_name =3D undef;
++
++# Perl's Getopt::Long allows options to take optional arguments after a =
+space.
++# Prevent --color by itself from consuming other arguments
++foreach (@ARGV) {
++  if ($_ eq "--color" || $_ eq "-color") {
++    $_ =3D "--color=3D$color";
++  }
++}
++
++Getopt::Long::GetOptions
++  (
++    'help' =3D> sub { print $HELP; exit 0; },
++    'version' =3D> sub { print "$ME $VERSION\n"; exit 0; },
++    'test-name=3Ds' =3D> \$test_name,
++    'color=3Ds'  =3D> \$color,
++    'show-failures-only' =3D> sub { $cfg{"show-failures-only"} =3D 1; },
++    'verbose' =3D> sub { $cfg{"verbose"} =3D 1; },
++  ) or exit 1;
++
++if ($color =3D~ /^always$/i) {
++  $cfg{'color'} =3D 1;
++} elsif ($color =3D~ /^never$/i) {
++  $cfg{'color'} =3D 0;
++} elsif ($color =3D~ /^auto$/i) {
++  $cfg{'color'} =3D (-t STDOUT);
++} else {
++  die "Invalid color mode: $color\n";
++}
++
++# ------------- #
++#  Prototypes.  #
++# ------------- #
++
++sub colored ($$);
++sub decorate_result ($);
++sub extract_tap_comment ($);
++sub handle_tap_bailout ($);
++sub handle_tap_plan ($);
++sub handle_tap_result ($);
++sub is_null_string ($);
++sub main ();
++sub report ($;$);
++sub stringify_result_obj ($);
++sub testsuite_error ($);
++
++# -------------- #
++#  Subroutines.  #
++# -------------- #
++
++# If the given string is undefined or empty, return true, otherwise
++# return false.  This function is useful to avoid pitfalls like:
++#   if ($message) { print "$message\n"; }
++# which wouldn't print anything if $message is the literal "0".
++sub is_null_string ($)
++{
++  my $str =3D shift;
++  return ! (defined $str and length $str);
++}
++
++sub stringify_result_obj ($)
++{
++  my $result_obj =3D shift;
++  if ($result_obj->is_unplanned || $result_obj->number !=3D $testno)
++    {
++      return "ERROR";
++    }
++  elsif ($plan_seen =3D=3D LATE_PLAN)
++    {
++      return "ERROR";
++    }
++  elsif (!$result_obj->directive)
++    {
++      return $result_obj->is_ok ? "PASS" : "FAIL";
++    }
++  elsif ($result_obj->has_todo)
++    {
++      return $result_obj->is_actual_ok ? "XPASS" : "XFAIL";
++    }
++  elsif ($result_obj->has_skip)
++    {
++      return $result_obj->is_ok ? "SKIP" : "FAIL";
++    }
++  die "$ME: INTERNAL ERROR"; # NOTREACHED
++}
++
++sub colored ($$)
++{
++  my ($color_string, $text) =3D @_;
++  return $color_string . $text . RESET;
++}
++
++sub decorate_result ($)
++{
++  my $result =3D shift;
++  return $result unless $cfg{"color"};
++  my %color_for_result =3D
++    (
++      "ERROR" =3D> BOLD.MAGENTA,
++      "PASS"  =3D> GREEN,
++      "XPASS" =3D> BOLD.YELLOW,
++      "FAIL"  =3D> BOLD.RED,
++      "XFAIL" =3D> YELLOW,
++      "SKIP"  =3D> BLUE,
++    );
++  if (my $color =3D $color_for_result{$result})
++    {
++      return colored ($color, $result);
++    }
++  else
++    {
++      return $result; # Don't colorize unknown stuff.
++    }
++}
++
++sub report ($;$)
++{
++  my ($msg, $result, $explanation) =3D (undef, @_);
++  if ($result =3D~ /^(?:X?(?:PASS|FAIL)|SKIP|ERROR)/)
++    {
++      # Output on console might be colorized.
++      $msg =3D decorate_result($result);
++      if ($result =3D~ /^(?:PASS|XFAIL|SKIP)/)
++        {
++          return if $cfg{"show-failures-only"};
++        }
++      else
++        {
++          $failed =3D 1;
++        }
++    }
++  elsif ($result eq "#")
++    {
++      $msg =3D "  ";
++    }
++  else
++    {
++      die "$ME: INTERNAL ERROR"; # NOTREACHED
++    }
++  $msg .=3D " $explanation" if defined $explanation;
++  print $msg . "\n";
++}
++
++sub testsuite_error ($)
++{
++  report "ERROR", "- $_[0]";
++}
++
++sub handle_tap_result ($)
++{
++  $testno++;
++  my $result_obj =3D shift;
++
++  my $test_result =3D stringify_result_obj $result_obj;
++  my $string =3D $result_obj->number;
++
++  my $description =3D $result_obj->description;
++  $string .=3D " $test_name" unless is_null_string $test_name;
++  $string .=3D " $description" unless is_null_string $description;
++
++  if ($plan_seen =3D=3D LATE_PLAN)
++    {
++      $string .=3D " # AFTER LATE PLAN";
++    }
++  elsif ($result_obj->is_unplanned)
++    {
++      $string .=3D " # UNPLANNED";
++    }
++  elsif ($result_obj->number !=3D $testno)
++    {
++      $string .=3D " # OUT-OF-ORDER (expecting $testno)";
++    }
++  elsif (my $directive =3D $result_obj->directive)
++    {
++      $string .=3D " # $directive";
++      my $explanation =3D $result_obj->explanation;
++      $string .=3D " $explanation"
++        unless is_null_string $explanation;
++    }
++
++  report $test_result, $string;
++}
++
++sub handle_tap_plan ($)
++{
++  my $plan =3D shift;
++  if ($plan_seen)
++    {
++      # Error, only one plan per stream is acceptable.
++      testsuite_error "multiple test plans";
++      return;
++    }
++  # The TAP plan can come before or after *all* the TAP results; we spea=
+k
++  # respectively of an "early" or a "late" plan.  If we see the plan lin=
+e
++  # after at least one TAP result has been seen, assume we have a late
++  # plan; in this case, any further test result seen after the plan will
++  # be flagged as an error.
++  $plan_seen =3D ($testno >=3D 1 ? LATE_PLAN : EARLY_PLAN);
++  # If $testno > 0, we have an error ("too many tests run") that will be
++  # automatically dealt with later, so don't worry about it here.  If
++  # $plan_seen is true, we have an error due to a repeated plan, and tha=
+t
++  # has already been dealt with above.  Otherwise, we have a valid "plan
++  # with SKIP" specification, and should report it as a particular kind
++  # of SKIP result.
++  if ($plan->directive && $testno =3D=3D 0)
++    {
++      my $explanation =3D is_null_string ($plan->explanation) ?
++                        undef : "- " . $plan->explanation;
++      report "SKIP", $explanation;
++    }
++}
++
++sub handle_tap_bailout ($)
++{
++  my ($bailout, $msg) =3D ($_[0], "Bail out!");
++  $bailed_out =3D 1;
++  $msg .=3D " " . $bailout->explanation
++    unless is_null_string $bailout->explanation;
++  testsuite_error $msg;
++}
++
++sub extract_tap_comment ($)
++{
++  my $line =3D shift;
++  if (index ($line, DIAG_STRING) =3D=3D 0)
++    {
++      # Strip leading `DIAG_STRING' from `$line'.
++      $line =3D substr ($line, length (DIAG_STRING));
++      # And strip any leading and trailing whitespace left.
++      $line =3D~ s/(?:^\s*|\s*$)//g;
++      # Return what is left (if any).
++      return $line;
++    }
++  return "";
++}
++
++sub main ()
++{
++  my $iterator =3D TAP::Parser::Iterator::Stream->new(\*STDIN);
++  my $parser =3D TAP::Parser->new ({iterator =3D> $iterator });
++
++  while (defined (my $cur =3D $parser->next))
++    {
++      # Parsing of TAP input should stop after a "Bail out!" directive.
++      next if $bailed_out;
++
++      if ($cur->is_plan)
++        {
++          handle_tap_plan ($cur);
++        }
++      elsif ($cur->is_test)
++        {
++          handle_tap_result ($cur);
++        }
++      elsif ($cur->is_bailout)
++        {
++          handle_tap_bailout ($cur);
++        }
++      elsif ($cfg{"verbose"})
++        {
++          my $comment =3D extract_tap_comment ($cur->raw);
++          report "#", "$comment" if length $comment;
++       }
++    }
++  # A "Bail out!" directive should cause us to ignore any following TAP
++  # error.
++  if (!$bailed_out)
++    {
++      if (!$plan_seen)
++        {
++          testsuite_error "missing test plan";
++        }
++      elsif ($parser->tests_planned !=3D $parser->tests_run)
++        {
++          my ($planned, $run) =3D ($parser->tests_planned, $parser->test=
+s_run);
++          my $bad_amount =3D $run > $planned ? "many" : "few";
++          testsuite_error (sprintf "too %s tests run (expected %d, got %=
+d)",
++                                   $bad_amount, $planned, $run);
++        }
++    }
++}
++
++# ----------- #
++#  Main code. #
++# ----------- #
++
++main;
++exit($failed);
++
++# Local Variables:
++# perl-indent-level: 2
++# perl-continued-statement-offset: 2
++# perl-continued-brace-offset: 0
++# perl-brace-offset: 0
++# perl-brace-imaginary-offset: 0
++# perl-label-offset: -2
++# cperl-indent-level: 2
++# cperl-brace-offset: 0
++# cperl-continued-brace-offset: 0
++# cperl-label-offset: -2
++# cperl-extra-newline-before-brace: t
++# cperl-merge-trailing-else: nil
++# cperl-continued-statement-offset: 2
++# End:
+diff --git a/scripts/tap-merge.pl b/scripts/tap-merge.pl
+new file mode 100755
+index 0000000000..59e3fa5007
+--- /dev/null
++++ b/scripts/tap-merge.pl
+@@ -0,0 +1,110 @@
++#! /usr/bin/env perl
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# Author: Paolo Bonzini <pbonzini@redhat.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2, or (at your option)
++# any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <https://www.gnu.org/licenses/>.
++
++# ---------------------------------- #
++#  Imports, static data, and setup.  #
++# ---------------------------------- #
++
++use warnings FATAL =3D> 'all';
++use strict;
++use Getopt::Long ();
++use TAP::Parser;
++
++my $ME =3D "tap-merge.pl";
++my $VERSION =3D "2018-11-30";
++
++my $HELP =3D "$ME: merge multiple TAP inputs from stdin.";
++
++use constant DIAG_STRING =3D> "#";
++
++# ----------------- #
++#  Option parsing.  #
++# ----------------- #
++
++Getopt::Long::GetOptions
++  (
++    'help' =3D> sub { print $HELP; exit 0; },
++    'version' =3D> sub { print "$ME $VERSION\n"; exit 0; },
++  );
++
++# -------------- #
++#  Subroutines.  #
++# -------------- #
++
++sub main ()
++{
++  my $iterator =3D TAP::Parser::Iterator::Stream->new(\*STDIN);
++  my $parser =3D TAP::Parser->new ({iterator =3D> $iterator });
++  my $testno =3D 0;     # Number of test results seen so far.
++  my $bailed_out =3D 0; # Whether a "Bail out!" directive has been seen.
++
++  while (defined (my $cur =3D $parser->next))
++    {
++      if ($cur->is_bailout)
++        {
++          $bailed_out =3D 1;
++          print DIAG_STRING . " " . $cur->as_string . "\n";
++          next;
++        }
++      elsif ($cur->is_plan)
++        {
++          $bailed_out =3D 0;
++          next;
++        }
++      elsif ($cur->is_test)
++        {
++          $bailed_out =3D 0 if $cur->number =3D=3D 1;
++          $testno++;
++          $cur =3D TAP::Parser::Result::Test->new({
++                          ok =3D> $cur->ok,
++                          test_num =3D> $testno,
++                          directive =3D> $cur->directive,
++                          explanation =3D> $cur->explanation,
++                          description =3D> $cur->description
++                  });
++        }
++      elsif ($cur->is_version)
++        {
++          next if $testno > 0;
++        }
++      print $cur->as_string . "\n" unless $bailed_out;
++    }
++  print "1..$testno\n";
++}
++
++# ----------- #
++#  Main code. #
++# ----------- #
++
++main;
++
++# Local Variables:
++# perl-indent-level: 2
++# perl-continued-statement-offset: 2
++# perl-continued-brace-offset: 0
++# perl-brace-offset: 0
++# perl-brace-imaginary-offset: 0
++# perl-label-offset: -2
++# cperl-indent-level: 2
++# cperl-brace-offset: 0
++# cperl-continued-brace-offset: 0
++# cperl-label-offset: -2
++# cperl-extra-newline-before-brace: t
++# cperl-merge-trailing-else: nil
++# cperl-continued-statement-offset: 2
++# End:
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 9c84bbd829..c17f6d5dfa 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -810,41 +810,68 @@ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
+ tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+=20
+ SPEED =3D quick
+-GTESTER_OPTIONS =3D -k $(if $(V),--verbose,-q)
+-GCOV_OPTIONS =3D -n $(if $(V),-f,)
+=20
+ # gtester tests, possibly with verbose output
++# do_test_tap runs all tests, even if some of them fail, while do_test_h=
+uman
++# stops at the first failure unless -k is given on the command line
++
++define do_test_human_k
++        $(quiet-@)rc=3D0; $(foreach COMMAND, $1, \
++          $(call quiet-command-run, \
++            export MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:=
+-0} % 255 + 1))} $2; \
++              $(COMMAND) -m=3D$(SPEED) -k --tap < /dev/null \
++              | ./scripts/tap-driver.pl --test-name=3D"$(notdir $(COMMAN=
+D))" $(if $(V),, --show-failures-only) \
++              || rc=3D$$?;, "TEST", "$@: $(COMMAND)")) exit $$rc
++endef
++define do_test_human_no_k
++        $(foreach COMMAND, $1, \
++          $(call quiet-command, \
++            MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 2=
+55 + 1))} $2 \
++              $(COMMAND) -m=3D$(SPEED) -k --tap < /dev/null \
++              | ./scripts/tap-driver.pl --test-name=3D"$(notdir $(COMMAN=
+D))" $(if $(V),, --show-failures-only), \
++              "TEST", "$@: $(COMMAND)")
++)
++endef
++do_test_human =3D \
++        $(if $(findstring k, $(MAKEFLAGS)), $(do_test_human_k), $(do_tes=
+t_human_no_k))
++
++define do_test_tap
++	$(call quiet-command, \
++          { export MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:=
+-0} % 255 + 1))} $2; \
++            $(foreach COMMAND, $1, \
++	      $(COMMAND) -m=3D$(SPEED) -k --tap < /dev/null \
++	      | sed "s/^[a-z][a-z]* [0-9]* /&$(notdir $(COMMAND)) /" || true; )=
+ } \
++	      | ./scripts/tap-merge.pl | tee "$@" \
++	      | ./scripts/tap-driver.pl $(if $(V),, --show-failures-only), \
++	  "TAP","$@")
++endef
+=20
+ .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
+ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-=
+softmmu $(check-qtest-y)
+-	$(call quiet-command,QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
+-		QTEST_QEMU_IMG=3Dqemu-img$(EXESUF) \
+-		MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} =
+\
+-		gtester $(GTESTER_OPTIONS) -m=3D$(SPEED) $(check-qtest-$*-y) $(check-q=
+test-generic-y),"GTESTER","$@")
++	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
++	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
++	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
+=20
+-.PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
+-$(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
+-	$(call quiet-command, \
+-		MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} =
+\
+-		gtester $(GTESTER_OPTIONS) -m=3D$(SPEED) $*,"GTESTER","$*")
++check-unit: $(check-unit-y)
++	$(call do_test_human, $^)
+=20
+-# gtester tests with XML output
++check-speed: $(check-speed-y)
++	$(call do_test_human, $^)
+=20
+-$(patsubst %, check-report-qtest-%.xml, $(QTEST_TARGETS)): check-report-=
+qtest-%.xml: $(check-qtest-y)
+-	$(call quiet-command,QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
+-		QTEST_QEMU_IMG=3Dqemu-img$(EXESUF) \
+-	  gtester -q $(GTESTER_OPTIONS) -o $@ -m=3D$(SPEED) $(check-qtest-$*-y)=
+ $(check-qtest-generic-y),"GTESTER","$@")
++# gtester tests with TAP output
+=20
+-check-report-unit.xml: $(check-unit-y)
+-	$(call quiet-command,gtester -q $(GTESTER_OPTIONS) -o $@ -m=3D$(SPEED) =
+$^,"GTESTER","$@")
++$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
+qtest-%.tap: $(check-qtest-y)
++	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
++	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
++	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
+=20
+-# Reports and overall runs
++check-report-unit.tap: $(check-unit-y)
++	$(call do_test_tap,$^)
+=20
+-check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS=
+)) check-report-unit.xml
+-	$(call quiet-command,$(SRC_PATH)/scripts/gtester-cat $^ > $@,"GEN","$@"=
+)
++# Reports and overall runs
+=20
+-check-report.html: check-report.xml
+-	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
++check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS=
+)) check-report-unit.tap
++	$(call quiet-command,./scripts/tap-merge.py $^ > $@,"GEN","$@")
+=20
+ # Per guest TCG tests
+=20
+@@ -959,8 +986,6 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+ .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+ check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-t=
+ests/qapi-schema/doc-good.texi
+ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+-check-unit: $(patsubst %,check-%, $(check-unit-y))
+-check-speed: $(patsubst %,check-%, $(check-speed-y))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+ check: check-qapi-schema check-unit check-qtest check-decodetree
+ check-clean:
+diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/docke=
+rfiles/centos7.docker
+index 0a04bfbed8..e0f18f5a41 100644
+--- a/tests/docker/dockerfiles/centos7.docker
++++ b/tests/docker/dockerfiles/centos7.docker
+@@ -22,6 +22,7 @@ ENV PACKAGES \
+     mesa-libEGL-devel \
+     mesa-libgbm-devel \
+     nettle-devel \
++    perl-Test-Harness \
+     pixman-devel \
+     SDL-devel \
+     spice-glib-devel \
+diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/=
+dockerfiles/debian-amd64.docker
+index 24b113b76f..c66e341e5f 100644
+--- a/tests/docker/dockerfiles/debian-amd64.docker
++++ b/tests/docker/dockerfiles/debian-amd64.docker
+@@ -16,6 +16,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+         liblzo2-dev \
+         librdmacm-dev \
+         libsnappy-dev \
++        libtest-harness-perl \
+         libvte-dev
+=20
+ # virgl
+diff --git a/tests/docker/dockerfiles/debian-ports.docker b/tests/docker/=
+dockerfiles/debian-ports.docker
+index e05a9a9802..514ab53b80 100644
+--- a/tests/docker/dockerfiles/debian-ports.docker
++++ b/tests/docker/dockerfiles/debian-ports.docker
+@@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+         flex \
+         gettext \
+         git \
++        libtest-harness-perl \
+         pkg-config \
+         psmisc \
+         python \
+diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/do=
+ckerfiles/debian-sid.docker
+index 9a3d168705..b30cbe7fc0 100644
+--- a/tests/docker/dockerfiles/debian-sid.docker
++++ b/tests/docker/dockerfiles/debian-sid.docker
+@@ -26,6 +26,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+         ca-certificates \
+         flex \
+         git \
++        libtest-harness-perl \
+         pkg-config \
+         psmisc \
+         python \
+diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/docke=
+rfiles/debian8.docker
+index 52945631cd..cdc3f11e06 100644
+--- a/tests/docker/dockerfiles/debian8.docker
++++ b/tests/docker/dockerfiles/debian8.docker
+@@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+         gettext \
+         git \
+         gnupg \
++        libtest-harness-perl \
+         pkg-config \
+         python-minimal
+=20
+diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/docke=
+rfiles/debian9.docker
+index 154ae2a455..9561d4f225 100644
+--- a/tests/docker/dockerfiles/debian9.docker
++++ b/tests/docker/dockerfiles/debian9.docker
+@@ -24,6 +24,7 @@ RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+         flex \
+         gettext \
+         git \
++        libtest-harness-perl \
+         pkg-config \
+         psmisc \
+         python \
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
+files/fedora.docker
+index 0c4eb9e49c..1d0e3dc4ec 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -70,6 +70,7 @@ ENV PACKAGES \
+     nss-devel \
+     numactl-devel \
+     perl \
++    perl-Test-Harness \
+     pixman-devel \
+     python3 \
+     PyYAML \
+diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/docker=
+files/ubuntu.docker
+index 36e2b17de5..229add533c 100644
+--- a/tests/docker/dockerfiles/ubuntu.docker
++++ b/tests/docker/dockerfiles/ubuntu.docker
+@@ -45,6 +45,7 @@ ENV PACKAGES flex bison \
+     libspice-protocol-dev \
+     libspice-server-dev \
+     libssh2-1-dev \
++    libtest-harness-perl \
+     libusb-1.0-0-dev \
+     libusbredirhost-dev \
+     libvdeplug-dev \
 --=20
 2.20.1
-
-v5->v6: add </dev/null to avoid that stdin O_NONBLOCK affect the make pro=
-cess
