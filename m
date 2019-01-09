@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35336)
+Received: from eggs.gnu.org ([209.51.188.92]:35365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ghB1M-0000mk-Rl
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:23:37 -0500
+	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghB1d-0000vr-Kw
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:23:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1ghB1L-0003XM-ET
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:23:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42156)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1ghB1L-0003V8-7F
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:23:35 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DC971C05FFE0
-	for <qemu-devel@nongnu.org>; Wed,  9 Jan 2019 10:23:31 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  9 Jan 2019 14:23:11 +0400
-Message-Id: <20190109102311.7635-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghB1c-0003l6-Sl
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:23:53 -0500
+Received: from smtp67.cstnet.cn ([159.226.251.67]:53343 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghB1c-0003ct-95
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 05:23:52 -0500
+Date: Wed, 9 Jan 2019 18:23:42 +0800 (GMT+08:00)
+From: wuzhouhui <wuzhouhui14@mails.ucas.ac.cn>
+Content-Transfer-Encoding: base64
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qdev: fix -device scsi-hd,help regression
+MIME-Version: 1.0
+Message-ID: <ae9873.3d686.1683223a356.Coremail.wuzhouhui14@mails.ucas.ac.cn>
+Subject: [Qemu-devel] Qemu migration with vhost-user-blk on top of local
+ storage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +26,19 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, cohuck@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: lilin24@baidu.com, xieyongji@baidu.com
 
-Since commit ea9ce8934, device_post_init() applies globals directly
-from machines and accelerator classes.
-
-There are cases, such as -device scsi-hd,help, where the machine is
-setup but there in no accelerator.
-
-Let's skip accelerator globals in this case.
-
-Fixes SEGV:
- #0  0x0000555558ea04ff in object_get_class (obj=3D0x0) at /home/elmarco/=
-src/qemu/build/../qom/object.c:857
- #1  0x000055555854c797 in object_apply_compat_props (obj=3D0x61600007898=
-0) at /home/elmarco/src/qemu/build/../hw/core/qdev.c:978
- #2  0x000055555854c797 in object_apply_compat_props (obj=3D0x61600007898=
-0) at /home/elmarco/src/qemu/build/../hw/core/qdev.c:973
- #3  0x000055555854c959 in device_post_init (obj=3D0x616000078980) at /ho=
-me/elmarco/src/qemu/build/../hw/core/qdev.c:989
- #4  0x0000555558e9e250 in object_post_init_with_type (ti=3D<optimized ou=
-t>, obj=3D0x616000078980) at /home/elmarco/src/qemu/build/../qom/object.c=
-:365
- #5  0x0000555558e9e250 in object_initialize_with_type (data=3D0x61600007=
-8980, size=3D616, type=3D<optimized out>) at /home/elmarco/src/qemu/build=
-/../qom/object.c:425
- #6  0x0000555558e9e571 in object_new_with_type (type=3D0x613000031900) a=
-t /home/elmarco/src/qemu/build/../qom/object.c:588
- #7  0x000055555830c048 in qmp_device_list_properties (typename=3Dtypenam=
-e@entry=3D0x60200000c2d0 "scsi-hd", errp=3Derrp@entry=3D0x7fffffffc540) a=
-t /home/elmarco/src/qemu/qmp.c:519
- #8  0x00005555582c4027 in qdev_device_help (opts=3D<optimized out>) at /=
-home/elmarco/src/qemu/qdev-monitor.c:283
- #9  0x0000555559378fa2 in qemu_opts_foreach (list=3D<optimized out>, fun=
-c=3Dfunc@entry=3D0x5555582cfca0 <device_help_func>, opaque=3Dopaque@entry=
-=3D0x0, errp=3Derrp@entry=3D0x0) at /home/elmarco/src/qemu/util/qemu-opti=
-on.c:1171
-
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1664364
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/core/qdev.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 3769a2bccb..47bddacb4f 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -975,10 +975,13 @@ void object_apply_compat_props(Object *obj)
-     if (object_dynamic_cast(qdev_get_machine(), TYPE_MACHINE)) {
-         MachineState *m =3D MACHINE(qdev_get_machine());
-         MachineClass *mc =3D MACHINE_GET_CLASS(m);
--        AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
-=20
--        if (ac->compat_props) {
--            object_apply_global_props(obj, ac->compat_props, &error_abor=
-t);
-+        if (m->accelerator) {
-+            AccelClass *ac =3D ACCEL_GET_CLASS(m->accelerator);
-+
-+            if (ac->compat_props) {
-+                object_apply_global_props(obj, ac->compat_props, &error_=
-abort);
-+            }
-         }
-         object_apply_global_props(obj, mc->compat_props, &error_abort);
-     }
---=20
-2.20.1.2.gb21ebb671b
+SGkgZXZlcnlvbmUsCgpJJ20gd29ya2luZyBxZW11IHdpdGggdmhvc3QgdGFyZ2V0IChlLmcuIHNw
+ZGspLCBhbmQgSSBhdHRlbXB0IHRvIG1pZ3JhdGUgVk0gd2l0aAoyIGxvY2FsIHN0b3JhZ2VzLiBP
+bmUgbG9jYWwgc3RvcmFnZSBpcyBhIHJlZ3VsYXIgZmlsZSwgZS5nLiAvdG1wL2M3NC5xY293Miwg
+YW5kCnRoZSBvdGhlciBpcyBhIG1hbGxvYyBiZGV2IHRoYXQgc3BkayBjcmVhdGVkLiBUaGlzIG1h
+bGxvYyBiZGV2IHdpbGwgZXhwb3J0ZWQgdG8KVk0gdmlhIHZob3N0LXVzZXItYmxrLiBXaGVuIEkg
+ZXhlY3V0ZSBmb2xsb3dpbmcgY29tbWFuZDoKCiAgdmlyc2ggbWlncmF0ZSAtLWxpdmUgLS1wZXJz
+aXN0ZW50IC0tdW5zYWZlIC0tdW5kZWZpbmVzb3VyY2UgLS1jb3B5LXN0b3JhZ2UtYWxsIFwKICAg
+ICAtLXAycCAtLWF1dG8tY29udmVyZ2UgLS12ZXJib3NlIC0tZGVzdHVyaSBxZW11K3RjcDovLzx1
+cmk+L3N5c3RlbSB2bTAKClRoZSBsaWJ2aXJ0IHJlcG9ydHM6CgogIHFlbXUtMi4xMi4xOiBlcnJv
+cjogaW50ZXJuYWwgZXJyb3I6IHVuYWJsZSB0byBleGVjdXRlIFFFTVUgY29tbWFuZCBcCiAgICAn
+bmJkLXNlcnZlci1hZGQnOiBDYW5ub3QgZmluZCBkZXZpY2U9ZHJpdmUtdmlydGlvLWRpc2sxIG5v
+ciBcCiAgICBub2RlX25hbWU9ZHJpdmUtdmlydGlvLWRpc2sxCgpEb2VzIGl0IG1lYW5zIHRoYXQg
+cWVtdSB3aXRoIHNwZGsgb24gdG9wIG9mIGxvY2FsIHN0b3JhZ2UgZG9uJ3Qgc3VwcG9ydCBtaWdy
+YXRpb24/CgpRRU1VOiAyLjEyLjEKU1BESzogMTguMTAKClRoYW5rcy4=
