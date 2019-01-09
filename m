@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39883)
+Received: from eggs.gnu.org ([209.51.188.92]:45861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gh5JG-00089K-Nv
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 23:17:43 -0500
+	(envelope-from <si-wei.liu@oracle.com>) id 1gh5u8-0007X4-UQ
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 23:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gh5JF-0007ca-MN
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 23:17:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56410)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gh5JF-0007Zk-Dk
-	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 23:17:41 -0500
-Date: Tue, 8 Jan 2019 23:17:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190108231551-mutt-send-email-mst@kernel.org>
+	(envelope-from <si-wei.liu@oracle.com>) id 1gh5u7-0006IZ-1t
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 23:55:48 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:32952)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <si-wei.liu@oracle.com>)
+	id 1gh5u3-0006Ez-5G
+	for qemu-devel@nongnu.org; Tue, 08 Jan 2019 23:55:45 -0500
+From: si-wei liu <si-wei.liu@oracle.com>
 References: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
-	<1546900184-27403-2-git-send-email-venu.busireddy@oracle.com>
-	<6f5632f5-1469-7000-9b92-ef2564a63f63@oracle.com>
-	<20190108172522.GA28457@troi>
-	<41b85d40-0711-a0f3-6b45-bacd20644186@oracle.com>
-	<ae13f571-8359-24bb-a24f-cb5727a9623a@intel.com>
-	<17db1d06-f703-6ac6-57c7-0002eaf64a71@oracle.com>
+	<20190107182604-mutt-send-email-mst@kernel.org>
+	<7f230258-0950-9155-ec9c-6c6102ed2c2b@oracle.com>
+	<20190107212122-mutt-send-email-mst@kernel.org>
+Message-ID: <96c1a360-3c21-a4ed-83ea-f094eeaf3b7c@oracle.com>
+Date: Tue, 8 Jan 2019 20:55:35 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <17db1d06-f703-6ac6-57c7-0002eaf64a71@oracle.com>
+In-Reply-To: <20190107212122-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] virtio_net: Add
- VIRTIO_NET_F_STANDBY feature bit.
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 0/5] Support for
+ datapath switching during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,124 +32,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Venu Busireddy <venu.busireddy@oracle.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, si-wei.liu@oracle.com
-
-On Wed, Jan 09, 2019 at 08:39:07AM +0800, Dongli Zhang wrote:
-> Hi Samudrala,
->=20
-> On 2019/1/9 =E4=B8=8A=E5=8D=888:18, Samudrala, Sridhar wrote:
-> > On 1/8/2019 4:14 PM, Dongli Zhang wrote:
-> >> Hi Venu,
-> >>
-> >> On 2019/1/9 =E4=B8=8A=E5=8D=881:25, Venu Busireddy wrote:
-> >>> On 2019-01-09 00:56:38 +0800, Dongli Zhang wrote:
-> >>>> I am not familiar with libvirt and I would like to play with this =
-only with qemu.
-> >>>>
-> >>>> With failover, we need to hotplug the VF on destination server to =
-VM after live
-> >>>> migration. However, the VF on destination server would have differ=
-ent mac address.
-> >>>>
-> >>>> How can we specify the mac for the new VF to hotplug via qemu, as =
-VF is only a
-> >>>> vfio pci device?
-> >>> How is the VF device on the destination host any different from the=
- VF
-> >>> on the source host?
-> >>>
-> >>> As you do on the source host, you first assign the MAC address of
-> >>> 00:00:00:00:00:00 to the VF. After the migration, you assign the sa=
-me
-> >>> MAC address as that of the virtio_net device to the VF, and hotadd =
-the VF
-> >> This was what I was wondering.
-> >>
-> >> How the mac address is configured for VF (or any NIC like PF) after =
-it is
-> >> assigned to vfio?
-> >=20
-> > ip link set <pf> vf=C2=A0 <vf-num>=C2=A0 mac <MAC>
-> >=20
-> > See https://www.kernel.org/doc/html/latest/networking/net_failover.ht=
-ml
-> > for a sample script that shows the steps to initiate live migration w=
-ith VF=20
-> > and virtio-net in standby mode.
->=20
-> Thank you very much for the help!
->=20
-> Sorry that I did not ask the question in the right way.
->=20
-> Although I was talking about VF, I would like to passthrough the entire=
- PF (with
-> sriov_numvfs=3D0) to guest VM.
->=20
-> In this situation, I am not able to configure the mac address when the =
-entire PF
-> (or NIC) is assigned to VFIO. <pf> does not exist as it is belong to VF=
-IO.
->=20
-> Thank you very much!
->=20
-> Dongli Zhang
-
-I think that this mode isn't a good fit for the current (MAC address
-based) failover. There was talk about supporting other ways to match
-devices for failover, but no one implemented driver changes required
-for this yet.
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Liran Alon <liran.alon@oracle.com>
 
 
-> >=20
-> >=20
-> >> Thank you very much!
-> >>
-> >> Dongli Zhang
-> >>
-> >>
-> >>> device to the VM. And then, after you receive the FAILOVER_PRIMARY_=
-CHANGED
-> >>> event, set the macvtap device to down state.
-> >>>
-> >>> Venu
-> >>>
-> >>>> I am trying to play with this with only qemu (w/o libvirt).
-> >>>>
-> >>>> Thank you very much!
-> >>>>
-> >>>> Dongli Zhang
-> >>>>
-> >>>> On 01/08/2019 06:29 AM, Venu Busireddy wrote:
-> >>>>> From: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> >>>>>
-> >>>>> This feature bit can be used by a hypervisor to indicate to the v=
-irtio_net
-> >>>>> device that it can act as a standby for another device with the s=
-ame MAC
-> >>>>> address.
-> >>>>>
-> >>>>> Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> >>>>> Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
-> >>>>> ---
-> >>>>>  hw/net/virtio-net.c | 2 ++
-> >>>>>  1 file changed, 2 insertions(+)
-> >>>>>
-> >>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> >>>>> index 385b1a0..411f8fb 100644
-> >>>>> --- a/hw/net/virtio-net.c
-> >>>>> +++ b/hw/net/virtio-net.c
-> >>>>> @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] =3D=
- {
-> >>>>>                       true),
-> >>>>>      DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_=
-UNKNOWN),
-> >>>>>      DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str)=
-,
-> >>>>> +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIRTI=
-O_NET_F_STANDBY,
-> >>>>> +                      false),
-> >>>>>      DEFINE_PROP_END_OF_LIST(),
-> >>>>>  };
-> >>>>> =20
-> >>>>>
+
+On 1/7/2019 6:25 PM, Michael S. Tsirkin wrote:
+> On Mon, Jan 07, 2019 at 05:45:22PM -0800, si-wei liu wrote:
+>> On 01/07/2019 03:32 PM, Michael S. Tsirkin wrote:
+>>> On Mon, Jan 07, 2019 at 05:29:39PM -0500, Venu Busireddy wrote:
+>>>> Implement the infrastructure to support datapath switching during li=
+ve
+>>>> migration involving SR-IOV devices.
+>>>>
+>>>> 1. This patch is based off on the current VIRTIO_NET_F_STANDBY featu=
+re
+>>>>      bit and MAC address device pairing.
+>>>>
+>>>> 2. This set of events will be consumed by userspace management softw=
+are
+>>>>      to orchestrate all the hot plug and datapath switching activiti=
+es.
+>>>>      This scheme has the least QEMU modifications while allowing use=
+rspace
+>>>>      software to build its own intelligence to control the whole pro=
+cess
+>>>>      of SR-IOV live migration.
+>>>>
+>>>> 3. While the hidden device model (viz. coupled device model) is stil=
+l
+>>>>      being explored for automatic hot plugging (QEMU) and automatic =
+datapath
+>>>>      switching (host-kernel), this series provides a supplemental se=
+t
+>>>>      of interfaces if management software wants to drive the SR-IOV =
+live
+>>>>      migration on its own. It should not conflict with the hidden de=
+vice
+>>>>      model but just offers simplicity of implementation.
+>>>>
+>>>>
+>>>> Si-Wei Liu (2):
+>>>>     vfio-pci: Add FAILOVER_PRIMARY_CHANGED event to shorten downtime=
+ during failover
+>>>>     pci: query command extension to check the bus master enabling st=
+atus of the failover-primary device
+>>>>
+>>>> Sridhar Samudrala (1):
+>>>>     virtio_net: Add VIRTIO_NET_F_STANDBY feature bit.
+>>>>
+>>>> Venu Busireddy (2):
+>>>>     virtio_net: Add support for "Data Path Switching" during Live Mi=
+gration.
+>>>>     virtio_net: Add a query command for FAILOVER_STANDBY_CHANGED eve=
+nt.
+>>>>
+>>>> ---
+>>>> Changes in v3:
+>>>>     Fix issues with coding style in patch 3/5.
+>>>>
+>>>> Changes in v2:
+>>>>     Added a query command for FAILOVER_STANDBY_CHANGED event.
+>>>>     Added a query command for FAILOVER_PRIMARY_CHANGED event.
+>>> Hmm it looks like all feedback I sent e.g. here:
+>>> https://patchwork.kernel.org/patch/10721571/
+>>> got ignored.
+>>>
+>>> To summarize I suggest reworking the series adding a new command alon=
+g
+>>> the lines of (naming is up to you):
+>>>
+>>> query-pci-master - this returns status for a device
+>>> 		   and enables a *single* event after
+>>> 		   it changes
+>>>
+>>> and then removing all status data from the event,
+>>> just notify about the change and *only once*.
+>> Why removing all status data from the event?
+> To make sure users do not forget to call query-pci-master to
+> re-enable more events.
+IMO the FAILOVER_PRIMARY_CHANGED event is on the performance path, it's=20
+an overkill to enforce round trip query for each event in normal situatio=
+ns.
+>> It does not hurt to keep them
+>> as the FAILOVER_PRIMARY_CHANGED event in general is of pretty low-freq=
+uency.
+> A malicious guest can make it as frequent as it wants to.
+> OTOH there is no way to limit.
+Will throttle the event rate (say, limiting to no more than 1 event per=20
+second) a way to limit (as opposed to control guest behavior) ? The=20
+other similar events that apply rate limiting don't suppress event=20
+emission until the next query at all. Doing so would just cause more=20
+events missing. As stated in the earlier example, we should give guest=20
+NIC a chance to flush queued packets even if ending state is same=20
+between two events.
+
+>> As can be seen other similar low-frequent QMP events do have data carr=
+ied
+>> over.
+>>
+>> As this event relates to datapath switching, there's implication to co=
+alesce
+>> events as packets might not get a chance to send out as nothing would =
+ever
+>> happen when=C2=A0 going through quick transitions like
+>> disabled->enabled->disabled. I would allow at least few packets to be =
+sent
+>> over wire rather than nothing. Who knows how fast management can react=
+ and
+>> consume these events?
+>>
+>> Thanks,
+>> -Siwei
+> OK if it's so important for latency let's include data in the event.
+> Please add comments explaining that you must always re-run query
+> afterwards to make sure it's stable and re-enable more events.
+I can add comments describing why we need to carry data in the event,=20
+and apply rate limiting to events. But I don't follow why it must=20
+suppress event until next query.
+
+
+Thanks,
+-Siwei
+
+>
+>
+>>> =09
+>>>
+>>> upon event management does query-pci-master
+>>> and acts accordingly.
+>>>
+>>>
+>>>
+>>>
+>>>>    hmp.c                          |   5 +++
+>>>>    hw/acpi/pcihp.c                |  27 +++++++++++
+>>>>    hw/net/virtio-net.c            |  42 +++++++++++++++++
+>>>>    hw/pci/pci.c                   |   5 +++
+>>>>    hw/vfio/pci.c                  |  60 +++++++++++++++++++++++++
+>>>>    hw/vfio/pci.h                  |   1 +
+>>>>    include/hw/pci/pci.h           |   1 +
+>>>>    include/hw/virtio/virtio-net.h |   1 +
+>>>>    include/net/net.h              |   2 +
+>>>>    net/net.c                      |  61 +++++++++++++++++++++++++
+>>>>    qapi/misc.json                 |   5 ++-
+>>>>    qapi/net.json                  | 100 ++++++++++++++++++++++++++++=
++++++++++++++
+>>>>    12 files changed, 309 insertions(+), 1 deletion(-)
+>>> ---------------------------------------------------------------------
+>>> To unsubscribe, e-mail:virtio-dev-unsubscribe@lists.oasis-open.org
+>>> For additional commands, e-mail:virtio-dev-help@lists.oasis-open.org
+>>>
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail:virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail:virtio-dev-help@lists.oasis-open.org
+>
