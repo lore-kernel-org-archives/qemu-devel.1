@@ -1,28 +1,44 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45922)
+Received: from eggs.gnu.org ([209.51.188.92]:45913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghIPo-0007MQ-Db
+	(envelope-from <jjherne@linux.ibm.com>) id 1ghIPo-0007M8-Fs
 	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:17:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghIJK-0004QE-Sk
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:10:41 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:36131)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghIJK-0004Ok-L2
+	(envelope-from <jjherne@linux.ibm.com>) id 1ghIJK-0004Q7-RI
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:10:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51616
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1ghIJK-0004Og-Lo
 	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 13:10:38 -0500
-Received: by mail-wm1-f65.google.com with SMTP id p6so9295450wmc.1
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 10:10:35 -0800 (PST)
-References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
-	<1547051976-13982-3-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f1d83216-d9a8-605b-d87b-be6b96f42557@redhat.com>
-Date: Wed, 9 Jan 2019 19:10:32 +0100
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x09I3pBn141441
+	for <qemu-devel@nongnu.org>; Wed, 9 Jan 2019 13:10:34 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2pwn7pj8fy-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 13:10:33 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Wed, 9 Jan 2019 18:10:33 -0000
+Reply-To: jjherne@linux.ibm.com
+References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
+	<1544623878-11248-11-git-send-email-jjherne@linux.ibm.com>
+	<20181213182100.6da37a95.cohuck@redhat.com>
+	<bfde1bd3-0725-1085-8a98-eeaf2b0694ed@linux.ibm.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Wed, 9 Jan 2019 13:10:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <1547051976-13982-3-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <bfde1bd3-0725-1085-8a98-eeaf2b0694ed@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] configure: Force the C standard to
- gnu99
+Message-Id: <729790ec-a74a-2e6e-89ed-3d450c95f54f@linux.ibm.com>
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 10/15] s390-bios: Support for
+ running format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +47,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 1/9/19 5:39 PM, Thomas Huth wrote:
-> Different versions of GCC and Clang use different versions of the C standard.
-> This repeatedly caused problems already, e.g. with duplicated typedefs:
-> 
->  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
-> 
-> or with for-loop variable initializers:
-> 
->  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
-> 
-> To avoid these problems, we should enforce the C language version to the
-> same level for all compilers. Since our minimum compiler versions is
-> GCC v4.8, our best option is "gnu99" for C code right now ("gnu17" is not
-> available there yet, and "gnu11" is marked as "experimental"), and "gnu++98"
-> for the few C++ code that we have in the repository.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Raising from a 30 years old stantard to a 20 years old one is a great
-improvement (I used to be a defender of the C89, but I evolved and now
-admit C99 has helpful features).
-
-Using '-std=gnu++98' for g++ v4.8 looks like a good compromise to the
-issues Daniel mentioned (still 'experimental').
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  v3: Compile C++ code with -std=gnu++98
-> 
->  configure | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index b9f34af..448dbc8 100755
-> --- a/configure
-> +++ b/configure
-> @@ -107,6 +107,9 @@ update_cxxflags() {
->              -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
->              -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls)
->                  ;;
-> +            -std=gnu99)
-> +                QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }"-std=gnu++98"
-> +                ;;
->              *)
->                  QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
->                  ;;
-> @@ -585,7 +588,7 @@ ARFLAGS="${ARFLAGS-rv}"
->  # left shift of signed integers is well defined and has the expected
->  # 2s-complement style results. (Both clang and gcc agree that it
->  # provides these semantics.)
-> -QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
-> +QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv -std=gnu99 $QEMU_CFLAGS"
->  QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
->  QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
->  QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
-> 
+T24gMS83LzE5IDI6MDIgUE0sIEphc29uIEouIEhlcm5lIHdyb3RlOg0KPj4+ICsNCj4+PiDC
+oMKgLyoNCj4+PiDCoMKgwqAqwqBzZW5zZS1pZMKgcmVzcG9uc2XCoGJ1ZmZlcsKgbGF5b3V0
+DQo+Pj4gwqDCoMKgKi8NCj4+PiBAQMKgLTIwNSw2wqArMjY1LDYxwqBAQMKgdHlwZWRlZsKg
+c3RydWN0wqBzZW5zZWlkwqB7DQo+Pj4gwqDCoMKgwqDCoMKgc3RydWN0wqBjaXfCoGNpd1s2
+Ml07DQo+Pj4gwqDCoH3CoMKgX19hdHRyaWJ1dGVfX8KgKChwYWNrZWQswqBhbGlnbmVkKDQp
+KSnCoFNlbnNlSWQ7DQo+Pj4gKy8qwqBhcmNoaXRlY3RlZMKgdmFsdWVzwqBmb3LCoGZpcnN0
+wqBzZW5zZcKgYnl0ZcKgKi8NCj4+PiArI2RlZmluZcKgU05TMF9DTURfUkVKRUNUwqDCoMKg
+wqDCoMKgwqDCoMKgMHg4MA0KPj4+ICsjZGVmaW5lwqBTTlMwX0lOVEVSVkVOVElPTl9SRVHC
+oMKgwqAweDQwDQo+Pj4gKyNkZWZpbmXCoFNOUzBfQlVTX09VVF9DSEVDS8KgwqDCoMKgwqDC
+oDB4MjANCj4+PiArI2RlZmluZcKgU05TMF9FUVVJUE1FTlRfQ0hFQ0vCoMKgwqDCoDB4MTAN
+Cj4+PiArI2RlZmluZcKgU05TMF9EQVRBX0NIRUNLwqDCoMKgwqDCoMKgwqDCoMKgMHgwOA0K
+Pj4+ICsjZGVmaW5lwqBTTlMwX09WRVJSVU7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAweDA0
+DQo+Pj4gKyNkZWZpbmXCoFNOUzBfSU5DT01QTF9ET01BSU7CoMKgwqDCoMKgMHgwMQ0KPj4N
+Cj4+IElJUkMswqBvbmx5wqBieXRlwqAwwqBpc8KgZGV2aWNlwqBpbmRlcGVuZGVudCzCoGFu
+ZMKgdGhlwqBvdGhlcnPCoGJlbG93wqBhcmUNCj4+IChFQ0tEKcKgZGFzZMKgc3BlY2lmaWM/
+DQo+Pg0KPj4+ICsNCj4+PiArLyrCoGFyY2hpdGVjdHVyZWTCoHZhbHVlc8KgZm9ywqBzZWNv
+bmTCoHNlbnNlwqBieXRlwqAqLw0KPj4+ICsjZGVmaW5lwqBTTlMxX1BFUk1fRVJSwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoDB4ODANCj4+PiArI2RlZmluZcKgU05TMV9JTlZfVFJBQ0tfRk9S
+TUFUwqDCoMKgMHg0MA0KPj4+ICsjZGVmaW5lwqBTTlMxX0VPQ8KgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgMHgyMA0KPj4+ICsjZGVmaW5lwqBTTlMxX01FU1NBR0VfVE9fT1BF
+UsKgwqDCoMKgMHgxMA0KPj4+ICsjZGVmaW5lwqBTTlMxX05PX1JFQ19GT1VORMKgwqDCoMKg
+wqDCoMKgMHgwOA0KPj4+ICsjZGVmaW5lwqBTTlMxX0ZJTEVfUFJPVEVDVEVEwqDCoMKgwqDC
+oDB4MDQNCj4+PiArI2RlZmluZcKgU05TMV9XUklURV9JTkhJQklURUTCoMKgwqDCoDB4MDIN
+Cj4+PiArI2RlZmluZcKgU05TMV9JTlBSRUNJU0VfRU5EwqDCoMKgwqDCoMKgMHgwMQ0KPj4+
+ICsNCj4+PiArLyrCoGFyY2hpdGVjdHVyZWTCoHZhbHVlc8KgZm9ywqB0aGlyZMKgc2Vuc2XC
+oGJ5dGXCoCovDQo+Pj4gKyNkZWZpbmXCoFNOUzJfUkVRX0lOSF9XUklURcKgwqDCoMKgwqDC
+oDB4ODANCj4+PiArI2RlZmluZcKgU05TMl9DT1JSRUNUQUJMRcKgwqDCoMKgwqDCoMKgwqAw
+eDQwDQo+Pj4gKyNkZWZpbmXCoFNOUzJfRklSU1RfTE9HX0VSUsKgwqDCoMKgwqDCoDB4MjAN
+Cj4+PiArI2RlZmluZcKgU05TMl9FTlZfREFUQV9QUkVTRU5UwqDCoMKgMHgxMA0KPj4+ICsj
+ZGVmaW5lwqBTTlMyX0lOUFJFQ0lTRV9FTkTCoMKgwqDCoMKgwqAweDA0DQo+Pj4gKw0KPj4+
+ICsvKsKgMjQtYnl0ZcKgU2Vuc2XCoGZtdC9tc2fCoGNvZGVzwqAqLw0KPj4+ICsjZGVmaW5l
+wqBTRU5TRTI0X0ZNVF9QUk9HX1NZU8KgwqDCoMKgMHgwDQo+Pj4gKyNkZWZpbmXCoFNFTlNF
+MjRfRk1UX0VRVUlQTUVOVMKgwqDCoDB4Mg0KPj4+ICsjZGVmaW5lwqBTRU5TRTI0X0ZNVF9D
+T05UUk9MTEVSwqDCoDB4Mw0KPj4+ICsjZGVmaW5lwqBTRU5TRTI0X0ZNVF9NSVNDwqDCoMKg
+wqDCoMKgwqDCoDB4Rg0KPj4+ICsNCj4+PiArI2RlZmluZcKgU0VOU0UyNF9GTVQwX01TR19S
+RVNFVF9OT1RJRklDQVRJT07CoDB4MTYNCj4+PiArDQo+Pj4gKy8qwqBiYXNpY8Kgc2Vuc2XC
+oHJlc3BvbnNlwqBidWZmZXLCoGxheW91dMKgKi8NCj4+PiArdHlwZWRlZsKgc3RydWN0wqBz
+ZW5zZURhdGHCoHsNCj4+PiArwqDCoMKgwqB1aW50OF90wqBzdGF0dXNbM107DQo+Pj4gK8Kg
+wqDCoMKgdWludDhfdMKgcmVzX2NvdW50Ow0KPj4+ICvCoMKgwqDCoHVpbnQ4X3TCoHBoeXNf
+ZHJpdmVfaWQ7DQo+Pj4gK8KgwqDCoMKgdWludDhfdMKgbG93X2N5bF9hZGRyOw0KPj4+ICvC
+oMKgwqDCoHVpbnQ4X3TCoGhlYWRfaGlnaF9jeWxfYWRkcjsNCj4+PiArwqDCoMKgwqB1aW50
+OF90wqBmbXRfbXNnOw0KPj4+ICvCoMKgwqDCoHVpbnQ2NF90wqBmbXRfZGVwZW5kZW50X2lu
+Zm9bMl07DQo+Pj4gK8KgwqDCoMKgdWludDhfdMKgcmVzZXJ2ZWQ7DQo+Pj4gK8KgwqDCoMKg
+dWludDhfdMKgcHJvZ3JhbV9hY3Rpb25fY29kZTsNCj4+PiArwqDCoMKgwqB1aW50MTZfdMKg
+Y29uZmlnX2luZm87DQo+Pj4gK8KgwqDCoMKgdWludDhfdMKgbWNvZGVfaGljeWw7DQo+Pj4g
+K8KgwqDCoMKgdWludDhfdMKgY3lsX2hlYWRfYWRkclszXTsNCj4+PiArfcKgwqBfX2F0dHJp
+YnV0ZV9fwqAoKHBhY2tlZCzCoGFsaWduZWQoNCkpKcKgU2Vuc2VEYXRhOw0KPj4NCj4+IEFu
+ZMKgdGhpc8KgbG9va3MgX3JlYWxseV/CoGRhc2TCoHNwZWNpZmljLg0KPj4NCj4gDQo+IFll
+cCwgSSBnbG9zc2VkIG92ZXIgdGhvc2UgZGV0YWlscyB3aGlsZSBJIHdhcyBmdXJpb3VzbHkg
+dHJhY2tpbmcgZG93biB0aGUgcmVzZXQgYnVnLiBJJ2xsIA0KPiB0YWtlwqBhwqBsb29rwqBh
+dMKgcmVkZXNpZ25pbmfCoHRoaXMuDQoNCkFsbCBvZiBteSBpbmZvcm1hdGlvbiBmb3IgY3Jl
+YXRpbmcgdGhlc2UgZGF0YSBzdHJ1Y3R1cmVzIGNhbWUgZnJvbSBhbiBpbnRlcm5hbCBFQ0tE
+IERBU0QgDQpyZWZlcmVuY2UuIFRoZXJlIGFyZSBwcm9iYWJseSBzb21lIHRoaW5ncyB0aGF0
+IGNvdWxkIHN0YW5kIGEgYml0IG9mIGNsZWFudXAgb3IgcmVuYW1pbmcuIA0KQXNpZGUgZnJv
+bSB0aGF0LCBjb25zaWRlcmluZyB0aGlzIGlzIGluIGEgREFTRCBvbmx5IChFQ0tEIERBU0Qg
+b25seSBhdCB0aGUgbW9tZW50KSBjb2RlIA0KcGF0aCBhcmUgeW91IG9rYXkgd2l0aCBteSBy
+ZW5hbWluZyB0aGUgc3RydWN0IHRvIHNlbnNlRGF0YUVDS0Qgb3Igc29tZXRoaW5nIHNpbWls
+YXI/DQpJJ20gbm90IHN1cmUgd2hhdCB2YWx1ZSB0aGVyZSBpcyBpbiBhYnN0cmFjdGluZyBz
+ZW5zZSBhdCB0aGUgbW9tZW50LiBJJ20gbm90IGV2ZW4gc3VyZSANCndoYXQgb3RoZXIgZGV2
+aWNlJ3Mgc2Vuc2UgZGF0YSBsb29rcyBsaWtlLiBTaW5jZSBteSBkZXNjcmlwdGlvbiBvZiB0
+aGUgU0VOU0UgQ0NXIGNvbWVzIA0KZnJvbSBhbiBFQ0tEIHJlZmVyZW5jZSBJIGhhdmUgbm90
+IGJlZW4gYWJsZSB0byB2ZXJpZnkgYW55IGFyZWFzIG9mIHRoZSBkYXRhIHRoYXQgYXJlIA0K
+Y29tbW9uIGFjcm9zcyBkZXZpY2UgdHlwZXMuIFRob3VnaHRzPw0KDQoNCi0tIA0KLS0gSmFz
+b24gSi4gSGVybmUgKGpqaGVybmVAbGludXguaWJtLmNvbSkNCg0K
