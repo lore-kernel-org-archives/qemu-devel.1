@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42261)
+Received: from eggs.gnu.org ([209.51.188.92]:42304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1ghGa7-0002a6-9b
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:19:53 -0500
+	(envelope-from <pawelx.wodkowski@intel.com>) id 1ghGaF-0002fP-Nb
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:20:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1ghGa6-0007qy-G8
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:19:51 -0500
-References: <20190109152430.32359-1-agraf@suse.de> <871s5lx14y.fsf@linaro.org>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <36959924-c384-5850-9bea-0060fe744f2e@suse.de>
-Date: Wed, 9 Jan 2019 17:19:46 +0100
-MIME-Version: 1.0
-In-Reply-To: <871s5lx14y.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <pawelx.wodkowski@intel.com>) id 1ghGaC-0007uY-9E
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:19:59 -0500
+Received: from mga07.intel.com ([134.134.136.100]:55134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pawelx.wodkowski@intel.com>)
+	id 1ghGaB-0007rL-TG
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 11:19:56 -0500
+From: "Wodkowski, PawelX" <pawelx.wodkowski@intel.com>
+Date: Wed, 9 Jan 2019 16:19:48 +0000
+Message-ID: <b6f9fccf992b03b762daecbae3a5fc80605e9b52.camel@intel.com>
+References: <ae9873.3d686.1683223a356.Coremail.wuzhouhui14@mails.ucas.ac.cn>
+	<20190109124258.GD18942@stefanha-x1.localdomain>
+	<234daa90.3dc4b.16832c82ae0.Coremail.wuzhouhui14@mails.ucas.ac.cn>
+In-Reply-To: <234daa90.3dc4b.16832c82ae0.Coremail.wuzhouhui14@mails.ucas.ac.cn>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow to switch from MON->HYP
- on AArch32
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7B7ADDDCB96EB94690E9BDB6B8ABDC16@intel.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [SPDK] Qemu migration with vhost-user-blk on top
+ of local storage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +32,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: Tom Rini <trini@konsulko.com>, qemu-arm@nongnu.org, Michal Simek <michal.simek@xilinx.com>, Stephen Warren <swarren@wwwdotorg.org>
+To: "stefanha@gmail.com" <stefanha@gmail.com>, "spdk@lists.01.org" <spdk@lists.01.org>
+Cc: "libvir-list@redhat.com" <libvir-list@redhat.com>, "xieyongji@baidu.com" <xieyongji@baidu.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "lilin24@baidu.com" <lilin24@baidu.com>
 
-On 01/09/2019 05:10 PM, Alex Benn=C3=A9e wrote:
-> Alexander Graf <agraf@suse.de> writes:
->
->> In U-boot, we switch from S-SVC -> MON -> HYP when we want to enter
->> HYP mode. This dance seems to work ok (hence it's there in the code
->> base), but breaks with current QEMU.
-> What EL is MON in this case? EL3? In which case I'm confused by the
-> terminology as the ARM ARM states:
->
->    The principles of the ARMv8-A security model are:
->    =E2=80=A2 If the implementation includes EL3, then it has two Securi=
-ty states, Secure and Non-secure, and:
->      =E2=80=94 EL3 exists only in Secure state.
->      =E2=80=94 A change from Non-secure state to Secure state can only =
-occur on taking an exception to EL3.
->      =E2=80=94 A change from Secure state to Non-secure state can only =
-occur on an exception return from EL3.
->
-> We don't currently implement ARMv8.4-SecEL2 but that adds secure EL2 bu=
-t
-> as you can only switch security state in in/out of EL3 you have to be g=
-o
-> to the secure monitor before you enter it.
-
-Right - and exactly that switch seems to be prohibited here.
-
->
->> The reason seems to be that we try to see whether we are entering
->> HYP mode from the NS side. However, MON is always considered secure,
->> so we always fall into an error case when going MON->HYP and never
->> manage to actually do the switch.
->>
->> Fix this by not using a different helper function that does not bork
->> when we're in MON state, as that switch is supposed to work.
->>
->> Signed-off-by: Alexander Graf <agraf@suse.de>
->> ---
->>   target/arm/helper.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/target/arm/helper.c b/target/arm/helper.c
->> index f00c141ef9..9bf8fbd8f9 100644
->> --- a/target/arm/helper.c
->> +++ b/target/arm/helper.c
->> @@ -6297,7 +6297,7 @@ static int bad_mode_switch(CPUARMState *env, int=
- mode, CPSRWriteType write_type)
->>           return 0;
->>       case ARM_CPU_MODE_HYP:
->>           return !arm_feature(env, ARM_FEATURE_EL2)
->> -            || arm_current_el(env) < 2 || arm_is_secure(env);
->> +            || arm_current_el(env) < 2 ||
->> arm_is_secure_below_el3(env);
-> This seems to violate the rule that you can enter a NS state from
-> anything other than EL3.
-
-How so? This statement basically says "Only return to HYP from NS-HYP or=20
-EL3" now. Before it said "Only return to HYP from HYP".
-
-Alex
-
->
->>       case ARM_CPU_MODE_MON:
->>           return arm_current_el(env) < 3;
->>       default:
->
-> --
-> Alex Benn=C3=A9e
->
+T24gV2VkLCAyMDE5LTAxLTA5IGF0IDIxOjIzICswODAwLCB3dXpob3VodWkgd3JvdGU6DQo+ID4g
+LS0tLS1PcmlnaW5hbCBNZXNzYWdlcy0tLS0tDQo+ID4gRnJvbTogIlN0ZWZhbiBIYWpub2N6aSIg
+PHN0ZWZhbmhhQGdtYWlsLmNvbT4NCj4gPiBTZW50IFRpbWU6IDIwMTktMDEtMDkgMjA6NDI6NTgg
+KFdlZG5lc2RheSkNCj4gPiBUbzogd3V6aG91aHVpIDx3dXpob3VodWkxNEBtYWlscy51Y2FzLmFj
+LmNuPg0KPiA+IENjOiBxZW11LWRldmVsQG5vbmdudS5vcmcsIHhpZXlvbmdqaUBiYWlkdS5jb20s
+IGxpbGluMjRAYmFpZHUuY29tLCANCj4gPiBsaWJ2aXItbGlzdEByZWRoYXQuY29tLCBzcGRrQGxp
+c3RzLjAxLm9yZw0KPiA+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gUWVtdSBtaWdyYXRpb24g
+d2l0aCB2aG9zdC11c2VyLWJsayBvbiB0b3ANCj4gPiBvZiBsb2NhbCBzdG9yYWdlDQo+ID4gDQo+
+ID4gT24gV2VkLCBKYW4gMDksIDIwMTkgYXQgMDY6MjM6NDJQTSArMDgwMCwgd3V6aG91aHVpIHdy
+b3RlOg0KPiA+ID4gSGkgZXZlcnlvbmUsDQo+ID4gPiANCj4gPiA+IEknbSB3b3JraW5nIHFlbXUg
+d2l0aCB2aG9zdCB0YXJnZXQgKGUuZy4gc3BkayksIGFuZCBJIGF0dGVtcHQgdG8NCj4gPiA+IG1p
+Z3JhdGUgVk0gd2l0aA0KPiA+ID4gMiBsb2NhbCBzdG9yYWdlcy4gT25lIGxvY2FsIHN0b3JhZ2Ug
+aXMgYSByZWd1bGFyIGZpbGUsIGUuZy4NCj4gPiA+IC90bXAvYzc0LnFjb3cyLCBhbmQNCj4gPiA+
+IHRoZSBvdGhlciBpcyBhIG1hbGxvYyBiZGV2IHRoYXQgc3BkayBjcmVhdGVkLiBUaGlzIG1hbGxv
+YyBiZGV2DQo+ID4gPiB3aWxsIGV4cG9ydGVkIHRvDQo+ID4gPiBWTSB2aWEgdmhvc3QtdXNlci1i
+bGsuIFdoZW4gSSBleGVjdXRlIGZvbGxvd2luZyBjb21tYW5kOg0KPiA+ID4gDQo+ID4gPiAgIHZp
+cnNoIG1pZ3JhdGUgLS1saXZlIC0tcGVyc2lzdGVudCAtLXVuc2FmZSAtLXVuZGVmaW5lc291cmNl
+IC0tDQo+ID4gPiBjb3B5LXN0b3JhZ2UtYWxsIFwNCj4gPiA+ICAgICAgLS1wMnAgLS1hdXRvLWNv
+bnZlcmdlIC0tdmVyYm9zZSAtLWRlc3R1cmkNCj4gPiA+IHFlbXUrdGNwOi8vPHVyaT4vc3lzdGVt
+IHZtMA0KPiA+ID4gDQo+ID4gPiBUaGUgbGlidmlydCByZXBvcnRzOg0KPiA+ID4gDQo+ID4gPiAg
+IHFlbXUtMi4xMi4xOiBlcnJvcjogaW50ZXJuYWwgZXJyb3I6IHVuYWJsZSB0byBleGVjdXRlIFFF
+TVUNCj4gPiA+IGNvbW1hbmQgXA0KPiA+ID4gICAgICduYmQtc2VydmVyLWFkZCc6IENhbm5vdCBm
+aW5kIGRldmljZT1kcml2ZS12aXJ0aW8tZGlzazEgbm9yIFwNCj4gPiA+ICAgICBub2RlX25hbWU9
+ZHJpdmUtdmlydGlvLWRpc2sxDQo+ID4gDQo+ID4gUGxlYXNlIHBvc3QgeW91ciBsaWJ2aXJ0IGRv
+bWFpbiBYTUwuDQo+IA0KPiBNeSBsaWJ2aXJ0IGlzIGJhc2VkIG9uIGxpYnZpcnQtMS4xLjEtMjku
+ZWw3LCBhbmQgYWRkIG1hbnkgcGF0Y2hlcyB0bw0KPiBzYXRpc2Z5IG91cg0KPiBvd24gbmVlZHMs
+IGUuZy4gYWRkIHN1cHBvcnQgZm9yIHZob3N0LXVzZXItYmxrLiBQb3N0IGRvbWFpbiB4bWwgbWF5
+DQo+IG5vdCB1c2VmdWwuDQo+IEFueXdheSwgZm9sbG93aW5nIGlzIGZ1bGwgY29udGVudHMgb2Yg
+WE1MOg0KPiANCj4gICA8ZG9tYWluIHR5cGU9J2t2bSc+DQo+ICAgICA8bmFtZT53emg8L25hbWU+
+DQo+ICAgICA8dXVpZD5hODRlOTZlNi0yYzUzLTQwOGQtOTg2Yi1jNzA5YmM2YTBlNTE8L3V1aWQ+
+DQo+ICAgICA8bWVtb3J5IHVuaXQ9J01pQic+NDA5NjwvbWVtb3J5Pg0KPiAgICAgPG1lbW9yeUJh
+Y2tpbmc+DQo+ICAgICAgIDxodWdlcGFnZXMvPg0KPiAgICAgPC9tZW1vcnlCYWNraW5nPg0KPiAg
+ICAgPGN1cnJlbnRNZW1vcnkgdW5pdD0nTWlCJz40MDk2PC9jdXJyZW50TWVtb3J5Pg0KPiAgICAg
+PHZjcHUgcGxhY2VtZW50PSdzdGF0aWMnIGNwdXNldD0nMTYtMzEnPjI8L3ZjcHU+DQo+ICAgICA8
+b3M+DQo+ICAgICAgIDx0eXBlIGFyY2g9J3g4Nl82NCcgbWFjaGluZT0ncGMnPmh2bTwvdHlwZT4N
+Cj4gICAgICAgPGJvb3QgZGV2PSdoZCcvPg0KPiAgICAgPC9vcz4NCj4gICAgIDxmZWF0dXJlcz4N
+Cj4gICAgICAgPGFjcGkvPg0KPiAgICAgPC9mZWF0dXJlcz4NCj4gICAgIDxjbG9jayBvZmZzZXQ9
+J3V0Yyc+DQo+ICAgICAgIDx0aW1lciBuYW1lPSdydGMnIHRpY2twb2xpY3k9J2NhdGNodXAnLz4N
+Cj4gICAgIDwvY2xvY2s+DQo+ICAgICA8b25fcG93ZXJvZmY+ZGVzdHJveTwvb25fcG93ZXJvZmY+
+DQo+ICAgICA8b25fcmVib290PnJlc3RhcnQ8L29uX3JlYm9vdD4NCj4gICAgIDxvbl9jcmFzaD5k
+ZXN0cm95PC9vbl9jcmFzaD4NCj4gICAgIDxkZXZpY2VzPg0KPiAgICAgICA8ZW11bGF0b3I+L2Rh
+dGEvd3poL3g4Nl82NC1zb2Z0bW11L3FlbXUtc3lzdGVtLQ0KPiB4ODZfNjQ8L2VtdWxhdG9yPg0K
+PiAgICAgICA8ZGlzayB0eXBlPSdmaWxlJyBkZXZpY2U9J2Rpc2snPg0KPiAJPGRyaXZlciBuYW1l
+PSdxZW11JyB0eXBlPSdxY293MicgY2FjaGU9J25vbmUnLz4NCj4gCTxzb3VyY2UgZmlsZT0nL2Rh
+dGEvd3poL2M3NC5xY293MicvPg0KPiAJPHRhcmdldCBkZXY9J3ZkYScgYnVzPSd2aXJ0aW8nLz4N
+Cj4gCTxhbGlhcyBuYW1lPSd2aXJ0aW8tZGlzazAnLz4NCj4gICAgICAgPC9kaXNrPg0KPiANCj4g
+ICAgICAgPGRpc2sgdHlwZT0ndmhvc3QtdXNlci1ibGsnIGRldmljZT0nZGlzayc+DQo+IAk8c291
+cmNlIHR5cGU9J3VuaXgnIHBhdGg9Jy92YXIvdG1wL2x2MCcgbW9kZT0nY2xpZW50Jz4NCj4gCTwv
+c291cmNlPg0KPiAJPHRhcmdldCBkZXY9J3ZkYicgYnVzPSd2aXJ0aW8nLz4NCj4gCTxkcml2ZXIg
+cXVldWVzPSc0Jy8+DQo+ICAgICAgIDwvZGlzaz4NCj4gDQo+ICAgICAgIDxjb250cm9sbGVyIHR5
+cGU9J3VzYicgaW5kZXg9JzAnPg0KPiAJPGFsaWFzIG5hbWU9J3VzYjAnLz4NCj4gICAgICAgPC9j
+b250cm9sbGVyPg0KPiAgICAgICA8Y29udHJvbGxlciB0eXBlPSdwY2knIGluZGV4PScwJyBtb2Rl
+bD0ncGNpLXJvb3QnPg0KPiAJPGFsaWFzIG5hbWU9J3BjaS4wJy8+DQo+ICAgICAgIDwvY29udHJv
+bGxlcj4NCj4gICAgICAgPHNlcmlhbCB0eXBlPSdwdHknPg0KPiAJPHRhcmdldCBwb3J0PScwJy8+
+DQo+IAk8YWxpYXMgbmFtZT0nc2VyaWFsMCcvPg0KPiAgICAgICA8L3NlcmlhbD4NCj4gICAgICAg
+PHNlcmlhbCB0eXBlPSdwdHknPg0KPiAJPHRhcmdldCBwb3J0PScxJy8+DQo+IAk8YWxpYXMgbmFt
+ZT0nc2VyaWFsMScvPg0KPiAgICAgICA8L3NlcmlhbD4NCj4gICAgICAgPGlucHV0IHR5cGU9J3Rh
+YmxldCcgYnVzPSd1c2InPg0KPiAJPGFsaWFzIG5hbWU9J2lucHV0MCcvPg0KPiAgICAgICA8L2lu
+cHV0Pg0KPiAgICAgICA8aW5wdXQgdHlwZT0nbW91c2UnIGJ1cz0ncHMyJy8+DQo+ICAgICAgIDxn
+cmFwaGljcyB0eXBlPSd2bmMnIGF1dG9wb3J0PSd5ZXMnIGxpc3Rlbj0nMC4wLjAuMCcNCj4ga2V5
+bWFwPSdlbi11cyc+DQo+IAk8bGlzdGVuIHR5cGU9J2FkZHJlc3MnIGFkZHJlc3M9JzAuMC4wLjAn
+Lz4NCj4gICAgICAgPC9ncmFwaGljcz4NCj4gICAgICAgPHZpZGVvPg0KPiAJPG1vZGVsIHR5cGU9
+J2NpcnJ1cycgdnJhbT0nOTIxNicgaGVhZHM9JzEnLz4NCj4gCTxhbGlhcyBuYW1lPSd2aWRlbzAn
+Lz4NCj4gICAgICAgPC92aWRlbz4NCj4gICAgIDwvZGV2aWNlcz4NCj4gICAgIDxzZWNsYWJlbCB0
+eXBlPSdub25lJy8+DQo+ICAgPC9kb21haW4+DQo+IA0KPiA+IA0KPiA+ID4gRG9lcyBpdCBtZWFu
+cyB0aGF0IHFlbXUgd2l0aCBzcGRrIG9uIHRvcCBvZiBsb2NhbCBzdG9yYWdlIGRvbid0DQo+ID4g
+PiBzdXBwb3J0IG1pZ3JhdGlvbj8NCj4gPiA+IA0KPiA+ID4gUUVNVTogMi4xMi4xDQo+ID4gPiBT
+UERLOiAxOC4xMA0KPiA+IA0KPiA+IHZob3N0LXVzZXItYmxrIGJ5cGFzc2VzIHRoZSBRRU1VIGJs
+b2NrIGxheWVyLCBzbyBOQkQgc3RvcmFnZQ0KPiA+IG1pZ3JhdGlvbg0KPiA+IGF0IHRoZSBRRU1V
+IGxldmVsIHdpbGwgbm90IHdvcmsgZm9yIHRoZSB2aG9zdC11c2VyLWJsayBkaXNrLg0KPiA+IA0K
+PiA+IFN0ZWZhbg0KDQoNCkRvbid0IGtub3cgaWYgdGhpcyBpcyB0aGUgY2FzZSB0aGF0IHd1emhv
+dWh1aSBpcyB1c2luZyBidXQgZ2VuZXJhbGx5DQptaWdyYXRpb24gc2hvdWxkIHdvcmsgaWYgYWxs
+IHN0b3JhZ2VzIGFyZSBhY2Nlc2libGUgZnJvbSBib3RoIG1hY2hpbmVzLg0KVGhlIFFFTVUgaW1h
+Z2UgYW5kIE1hbGxvYyBiZGV2IHNob3VsZCBiZSBleHBvc2VkIHVzaW5nIHNvbWUga2luZCBvZg0K
+bmV0d29yayBzaGFyaW5nLiBTUERLIG9uIG1pZ3JhdGlvbiB0YXJnZXQgc2hvdWxkIGJlIGNvbmZp
+Z3VyZWQgdGhlIHNhbWUNCndheSBhcyBvbiBzb3VyY2UgbWFjaGluZS4NCg0KV2UgYXJlIHRlc3Rp
+bmcgdGhpcyBpc3N1aW5nIFFFTVUgbW9uaXRvciBjb21tYW5kcyBzbyBJIGNhbid0IGhlbHAgd2l0
+aA0KbGlidmlydCBoZXJlLg0KDQpFeGFtcGxlIHNldHVwL3Rlc3QgY2FzZSB3ZSBhcmUgdXNpbmcg
+aW4gb25lIG9mIG91ciB0ZXN0czoNCg0KTWFjaGluZTE6DQogIEV4cG9zZSBWTSBpbWFnZSBvdmVy
+IFNTSEYNCiAgRXhwb3NlIHNvbWUgYmxvY2sgZGV2aWNlIHVzaW5nIFNQREsgbnZtZiB0YXJnZXQN
+CiAgU1BESyBudm1mIGluaXRpYXRvcjoNCiAgICAgLSBjb25uZWN0cyB0byBNYWNoaW5lMSBTUERL
+IG52bWYgdGFyZ2V0IHRvIGFjY2VzcyBibG9jayBkZXZpY2UNCiAgU1BESyB2aG9zdC1zY3NpOg0K
+ICAgIC0gcHJlc2VudHMgYmxvY2sgZGV2aWNlIHRvIFFFTVUgZnJvbSBTUERLIG52bWYgaW5pdGlh
+dG9yOg0KICBRRU1VIFZNIHVzZXMNCiAgICAtIHNoYXJlZCBWTSBpbWFnZQ0KICAgIC0gYmxvY2sg
+ZGV2aWNlIGZyb20gU1BESyBudm1mICBpbml0aWF0b3Igb3ZlciB2aG9zdC11c2VyLXNjc2kNCg0K
+TWFjaGluZTI6ICANCiAgU1BESyBudm1mIGluaXRpYXRvcjoNCiAgICAgLSBjb25uZWN0cyB0byBN
+YWNoaW5lMSBTUERLIG52bWYgdGFyZ2V0IHRvIGFjY2VzcyBibG9jayBkZXZpY2UNCiAgU1BESyB2
+aG9zdC1zY3NpOg0KICAgIC0gcHJlc2VudHMgYmxvY2sgZGV2aWNlIHRvIFFFTVUgZnJvbSBudm1m
+DQppbml0aWF0b3I6DQogIFFFTVUgaW5zdGFuY2UgLSB3YWl0aW5nIGZvciBpbmNvbWluZyBtaWdy
+YXRpb24NCiAgICAtIHNoYXJlZCBWTSBpbWFnZSBvdmVyIFNTSEZTDQogICAgLSBibG9jayBkZXZp
+Y2UgZnJvbSBTUERLIG52bWYgIGluaXRpYXRvciBvdmVyIHZob3N0LXVzZXItc2NzaQ0KDQpTb21l
+IHRyYWZmaWMgaXMgZ2VuZXJhdGVkIHVzaW5nIEZJTyBhbmQgdGhlbiB3ZSBqdXN0IG1pZ3JhdGUg
+Vk0gZnJvbQ0KTWFjaGluZTEgdG8gTWFjaGluZTIuDQoNClBhd2VsDQoNCj4gDQo+IF9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fDQo+IFNQREsgbWFpbGluZyBs
+aXN0DQo+IFNQREtAbGlzdHMuMDEub3JnDQo+IGh0dHBzOi8vbGlzdHMuMDEub3JnL21haWxtYW4v
+bGlzdGluZm8vc3Bkaw0K
