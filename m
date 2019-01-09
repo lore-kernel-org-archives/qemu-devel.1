@@ -1,22 +1,44 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35852)
+Received: from eggs.gnu.org ([209.51.188.92]:36086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ghHkZ-00029P-UH
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:34:44 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1ghHlb-0002tM-Hg
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:35:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ghHkY-0004rt-W8
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:34:43 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:36232)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ghHkY-0004qx-PS
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:34:42 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id u4so8549121wrp.3
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 09:34:42 -0800 (PST)
+	(envelope-from <pasic@linux.ibm.com>) id 1ghHla-0005Fk-2M
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:35:47 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41296
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1ghHlZ-0005FV-Sj
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 12:35:46 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x09HSl5h019189
+	for <qemu-devel@nongnu.org>; Wed, 9 Jan 2019 12:35:45 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pwnay8f9n-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 12:35:44 -0500
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 9 Jan 2019 17:35:43 -0000
+Date: Wed, 9 Jan 2019 18:35:38 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <a59d5b64-0fb3-4b70-96ff-b1a0c037c6ac@linux.ibm.com>
+References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
+	<112a03e6-3d6c-1c14-10ab-c9cea09ad388@linux.ibm.com>
+	<20190108173113.3c2d830c.cohuck@redhat.com>
+	<20190108175021.003deab9@oc2783563651>
+	<20190108180615.7e48cf13.cohuck@redhat.com>
+	<4876194e-1a87-1491-a8b3-eed5b0a9afe6@linux.ibm.com>
+	<20190109111419.426ec6d7.cohuck@redhat.com>
+	<a59d5b64-0fb3-4b70-96ff-b1a0c037c6ac@linux.ibm.com>
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 9 Jan 2019 17:34:29 +0000
-Message-ID: <CAJSP0QUV39fK4L8MwQ-rGiR0ejUm0HCyKFqARh-SKRTuDPKOXg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Internship idea: virtio-blk oss-fuzz support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20190109183538.05bab3c8@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +47,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Bandan Das <bsd@redhat.com>, dvyukov@google.com
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, imammedo@redhat.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Hi folks,
-I'd like to start fuzzing emulated devices in QEMU.  Here is an
-internship project idea I'm proposing to do this.
+On Wed, 9 Jan 2019 10:36:11 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Any thoughts?  Want to co-mentor this in Google Summer of Code or Outreachy?
+> On 1/9/19 5:14 AM, Cornelia Huck wrote:
+> > On Tue, 8 Jan 2019 15:34:37 -0500
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> > 
+> >> On 1/8/19 12:06 PM, Cornelia Huck wrote:
+> >>> On Tue, 8 Jan 2019 17:50:21 +0100
+> >>> Halil Pasic <pasic@linux.ibm.com> wrote:
+> >>>    
+> >>>> On Tue, 8 Jan 2019 17:31:13 +0100
+> >>>> Cornelia Huck <cohuck@redhat.com> wrote:
+> >>>>   
+> >>>>> On Tue, 8 Jan 2019 11:08:56 -0500
+> >>>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >>>>>       
+> >>>>>> On 12/17/18 10:57 AM, Tony Krowiak wrote:
+> >>>>>>> The qbus_is_full(BusState *bus) function (qdev_monitor.c) compares the max_index
+> >>>>>>> value of the BusState structure with the max_dev value of the BusClass structure
+> >>>>>>> to determine whether the maximum number of children has been reached for the
+> >>>>>>> bus. The problem is, the max_index field of the BusState structure does not
+> >>>>>>> necessarily reflect the number of devices that have been plugged into
+> >>>>>>> the bus.
+> >>>>>>>
+> >>>>>>> Whenever a child device is plugged into the bus, the bus's max_index value is
+> >>>>>>> assigned to the child device and then incremented. If the child is subsequently
+> >>>>>>> unplugged, the value of the max_index does not change and no longer reflects the
+> >>>>>>> number of children.
+> >>>>>>>
+> >>>>>>> When the bus's max_index value reaches the maximum number of devices
+> >>>>>>> allowed for the bus (i.e., the max_dev field in the BusClass structure),
+> >>>>>>> attempts to plug another device will be rejected claiming that the bus is
+> >>>>>>> full -- even if the bus is actually empty.
+> >>>>>>>
+> >>>>>>> To resolve the problem, a new 'num_children' field is being added to the
+> >>>>>>> BusState structure to keep track of the number of children plugged into the
+> >>>>>>> bus. It will be incremented when a child is plugged, and decremented when a
+> >>>>>>> child is unplugged.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> >>>>>>> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+> >>>>>>> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+> >>>>>>> ---
+> >>>>>>>     hw/core/qdev.c         | 3 +++
+> >>>>>>>     include/hw/qdev-core.h | 1 +
+> >>>>>>>     qdev-monitor.c         | 2 +-
+> >>>>>>>     3 files changed, 5 insertions(+), 1 deletion(-)
+> >>>>>>
+> >>>>>> Ping ...
+> >>>>>> I could not determine who the maintainer is for the three files
+> >>>>>> listed above. I checked the MAINTAINERS file and the prologue of each
+> >>>>>> individual file. Can someone please tell me who is responsible
+> >>>>>> for merging these changes? Any additional review comments?
+> >>>>>>       
+> >>>>>>>
+> >>>>>>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> >>>>>>> index 6b3cc55b27c2..956923f33520 100644
+> >>>>>>> --- a/hw/core/qdev.c
+> >>>>>>> +++ b/hw/core/qdev.c
+> >>>>>>> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
+> >>>>>>>                 snprintf(name, sizeof(name), "child[%d]", kid->index);
+> >>>>>>>                 QTAILQ_REMOVE(&bus->children, kid, sibling);
+> >>>>>>>     
+> >>>>>>> +            bus->num_children--;
+> >>>>>>> +
+> >>>>>>>                 /* This gives back ownership of kid->child back to us.  */
+> >>>>>>>                 object_property_del(OBJECT(bus), name, NULL);
+> >>>>>>>                 object_unref(OBJECT(kid->child));
+> >>>>>>> @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
+> >>>>>>>         char name[32];
+> >>>>>>>         BusChild *kid = g_malloc0(sizeof(*kid));
+> >>>>>>>     
+> >>>>>>> +    bus->num_children++;
+> >>>>>>>         kid->index = bus->max_index++;
+> >>>>>
+> >>>>> Hm... I'm wondering what happens for insane numbers of hotplugging
+> >>>>> operations here?
+> >>>>>
+> >>>>> (Preexisting problem for busses without limit, but busses with a limit
+> >>>>> could now run into that as well.)
+> >>>>>       
+> >>>>
+> >>>> How does this patch change things? I mean bus->num_children gets
+> >>>> decremented on unplug.
+> >>>
+> >>> We don't stop anymore if max_index >= max_dev, which means that we can
+> >>> now trigger that even if max_dev != 0.
+> >>
+> >> I guess I am missing your point. If max_dev == 0, then there is nothing
+> >> stopping an insane number of hot plug operations; either before this
+> >> patch, or with this patch. With the patch, once the number of children
+> >> hot plugged reaches max_dev, the qbus_is_full function will return false
+> >> and no more children can be plugged. If a child device is unplugged,
+> >> the num_children - which counts the number of children attached to the
+> >> bus - will be decremented, so it always reflects the number of children
+> >> added to the bus. Besides, checking max_index against max_dev
+> >> is erroneous, because max_index is incremented every time a child device
+> >> is plugged and is never decremented. It really operates as more of a
+> >> uinique identifier than a counter and is also used to create a unique
+> >> property name when the child device is linked to the bus as a property
+> >> (see bus_add_child function in hw/core/qdev.c).
+> > 
+> > Checking num_children against max_dev is the right thing to do, no
+> > argument here.
+> > 
+> > However, max_index continues to be incremented even if devices have
+> > been unplugged again. That means it can overflow, as it is never bound
+> > by the max_dev constraint.
+> > 
+> > This has been a problem before for busses with an unrestricted number of
+> > devices before, but with your patch, the problem is now triggerable for
+> > all busses.
+> > 
+> > Not a problem with your patch, but we might want to look into making
+> > max_index overflow/wraparound save.
+> 
+> I see your point. It does beg the question, what are the chances that
+> max_index reaches INT_MAX? In the interest of making this code more
+> bullet proof, I suppose it is something that should be dealt with.
+> 
+> A search reveals that max_index is used in only two places: It is used
+> to set the index for a child of the bus (i.e., bus_add_child function in
+> hw/core/qdev.c); and prior to this patch, to determine if max_dev has
+> been exceeded (i.e., qbus_is_full function in qdev_monitor.c). From
+> what I can see, the bus child index is used only to generate a property
+> name of the format "child[%d]" so the child can be linked as a property
+> of the bus (see bus_add_child and bus_remove_child functions in
+> hw/core/qdev.c). Wraparound of the max_index would most likely result in
+> generating a duplicate property name for the child.
+> 
+> I propose two possible solutions:
+> 
+> 1. When max_index reaches INT_MAX, do not allow any additional children
+>     to be added to the bus.
+> 
+> 2. Set a max_dev value of INT_MAX for the BusClass instance if the value
+>     is not set (in the bus_class_init function in hw/core/bus.c).
+> 
+> 3. Instead of generating the property name from the BusChild index
+>     value, generate a UUID string. Since the index field of the BusChild
+>     appears to be used only to generate the child's name, maybe change
+>     the index field to a UUID field or a name field.
+> 
 
-Stefan
+Separate problem, separate patch, or?
 
-'''Summary:''' Integrate oss-fuzz into QEMU so that the virtio-blk
-device can be fuzz tested.
+UUID instead of index solves the problem of unique names I guess, but I
+can't tell if that would be acceptable (interface stability, etc.).
 
-oss-fuzz offers a fuzz testing service to open source projects.  This
-means random inputs are continuously tested against the program in
-order to find crashes and other bugs.  Fuzz testing complements
-hand-written test suites by exploring the input space of a program and
-therefore the code paths that may be taken.
+The max_dev won't help because we can get a collision while maintaining
+the invariant 'not more than 2 devices on the bus'.
 
-The goal of this project is to integrate oss-fuzz into QEMU so that
-the virtio-blk-pci device can be fuzzed at both the VIRTIO and PCI bus
-level.  virtio-blk-pci is a PCI device, which means it is connected to
-the virtual machine's PCI bus and has a certain set of registers that
-can be programmed by the guest.  Furthermore, it is a VIRTIO device -
-this is the specification the describes most of the functionality of
-virtio-blk.  Bugs exist at both the PCI and VIRTIO levels, so it's
-important to fuzz both of them.
+So if we don't want to limit the number of hotplug operations, and we do
+want to keep the allocation scheme before wrapping, the only solution I
+see is looking for the first free identifier after we wrap.
 
-Fuzzing emulated devices involves accessing their hardware registers
-randomly to make the device respond.  QEMU has a device testing
-interface called "qtest" that accepts read/write and other commands
-over a socket and is ideal for writing device-level tests.  You may
-find that oss-fuzz works better integrated directly into the QEMU
-program instead of as a separate qtest program, so you can consider
-adding a new command-line option to QEMU for running in oss-fuzz mode.
+BTW I wonder if making max_index and index unsigned make things bit less
+ugly.
 
-This project involves learning about VIRTIO and PCI devices, as well
-as figuring out how to integrate oss-fuzz into QEMU so that it can
-effective explore the code paths in virtio-blk device emulation code.
-You will enjoy this project if you want to learn how device emulation
-works and are interested in fuzzers.
-
-'''Links:'''
-* [https://github.com/google/oss-fuzz/blob/master/docs/ideal_integration.md
-oss-fuzz integration overview]
-* [https://github.com/google/fuzzer-test-suite/blob/master/tutorial/libFuzzerTutorial.md
-libfuzzer tutorial]
-* [http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html
-VIRTIO specification]
-* [https://wiki.osdev.org/PCI PCI bus overview]
-
-'''Details:'''
-* Skill level: intermediate
-* Language: C
-* Mentor: Stefan Hajnoczi <stefanha@redhat.com>
+Regards,
+Halil
