@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51707)
+Received: from eggs.gnu.org ([209.51.188.92]:52061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ghC1s-0000zg-N5
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:28:13 -0500
+	(envelope-from <david@redhat.com>) id 1ghC3H-0002J8-7E
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:29:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ghC1s-0004Lf-2c
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:28:12 -0500
-Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:36978)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1ghC1r-0004LB-Sq
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:28:12 -0500
-Received: by mail-pl1-x634.google.com with SMTP id b5so3464620plr.4
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 03:28:11 -0800 (PST)
-From: elohimes@gmail.com
-Date: Wed,  9 Jan 2019 19:27:28 +0800
-Message-Id: <20190109112728.9214-8-xieyongji@baidu.com>
-In-Reply-To: <20190109112728.9214-1-xieyongji@baidu.com>
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-Subject: [Qemu-devel] [PATCH v4 for-4.0 7/7] contrib/vhost-user-blk: enable
- inflight I/O tracking
+	(envelope-from <david@redhat.com>) id 1ghC3F-0004xZ-GY
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 06:29:39 -0500
+References: <1546969050-8884-1-git-send-email-pmorel@linux.ibm.com>
+	<1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <be2d1126-45a9-ace2-bf85-18f255815572@redhat.com>
+Date: Wed, 9 Jan 2019 12:29:19 +0100
+MIME-Version: 1.0
+In-Reply-To: <1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7] s390x/pci: add common function
+ measurement block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcandre.lureau@redhat.com, berrange@redhat.com, jasowang@redhat.com, maxime.coquelin@redhat.com, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru
-Cc: qemu-devel@nongnu.org, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Pierre Morel <pmorel@linux.ibm.com>, walling@linux.ibm.com
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
 
-From: Xie Yongji <xieyongji@baidu.com>
+On 08.01.19 18:37, Pierre Morel wrote:
+> From: Yi Min Zhao <zyimin@linux.ibm.com>
+> 
+> Common function measurement block is used to report zPCI internal
+> counters of successful pcilg/stg/stb and rpcit instructions to
+> a memory location provided by the program.
+> 
+> This patch introduces a new ZpciFmb structure and schedules a timer
+> callback to copy the zPCI measures to the FMB in the guest memory
+> at an interval time set to 4s.
+> 
+> An error while attemping to update the FMB, would generate an error
+> event to the guest.
+> 
+> The pcilg/stg/stb and rpcit interception handlers increase the
+> related counter on a successful call.
+> The guest shall pass a null FMBA (FMB address) in the FIB (Function
+> Information Block) when it issues a Modify PCI Function Control
+> instruction to switch off FMB and stop the corresponding timer.
+> 
+> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c  |   4 +-
+>  hw/s390x/s390-pci-bus.h  |  29 +++++++++++
+>  hw/s390x/s390-pci-inst.c | 133 +++++++++++++++++++++++++++++++++++++++++++++--
+>  hw/s390x/s390-pci-inst.h |   1 +
+>  4 files changed, 163 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 060ff06..f0d34dd 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -989,6 +989,7 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
+>      bus = pci_get_bus(pci_dev);
+>      devfn = pci_dev->devfn;
+>      object_unparent(OBJECT(pci_dev));
+> +    fmb_timer_free(pbdev);
 
-This patch enables inflight I/O tracking for
-vhost-user-blk backend so that we could restart it safely.
+I still think this is the wrong place. it has nothing to do with
+hotplug/unplug. This belongs into unrealize/finalize.
 
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
----
- contrib/vhost-user-blk/vhost-user-blk.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-index 858221ad95..8cc033946a 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -327,7 +327,8 @@ vub_get_features(VuDev *dev)
- static uint64_t
- vub_get_protocol_features(VuDev *dev)
- {
--    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG;
-+    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG |
-+           1ull << VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD;
- }
- 
- static int
 -- 
-2.17.1
+
+Thanks,
+
+David / dhildenb
