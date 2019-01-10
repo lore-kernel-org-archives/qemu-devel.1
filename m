@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60007)
+Received: from eggs.gnu.org ([209.51.188.92]:33957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ghb99-0001ua-Ru
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:17:24 -0500
+	(envelope-from <groug@kaod.org>) id 1ghbFe-0007CN-Gw
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:24:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ghb96-0004WU-IW
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:17:23 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:38915)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ghb93-0004Tp-ID
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:17:17 -0500
-References: <20181219042113.7364-1-richard.henderson@linaro.org>
-	<20181219042113.7364-9-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <7fc313fc-e9da-37fc-c632-62b846831c32@vivier.eu>
-Date: Thu, 10 Jan 2019 15:17:14 +0100
+	(envelope-from <groug@kaod.org>) id 1ghbFd-0001Af-4x
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:24:06 -0500
+Received: from 15.mo6.mail-out.ovh.net ([188.165.39.161]:40768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ghbFc-00018T-TY
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:24:05 -0500
+Received: from player786.ha.ovh.net (unknown [10.109.143.246])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 6A2541A2529
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 15:24:02 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 10 Jan 2019 15:23:58 +0100
+Message-ID: <154713023826.379171.4010754027183178230.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20181219042113.7364-9-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 8/8] linux-user: Split out some process
- syscalls
+Subject: [Qemu-devel] [PATCH] target/ppc/kvm: Drop useless include directive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On 19/12/2018 05:21, Richard Henderson wrote:
-> This includes clone, getgroups, gettid, setfsgid, setfsuid,
-> setgroups, setsid, setuid, fork, getegid, getegid32, geteuid,
-> geteuid32, getgid, getgid32, getgroups32, getpgrp, getpid,
-> getppid, getresgid, getresgid32, getresuid, getresuid32,
-> getuid, getuid32, getxgid, getxpid, getxuid, setfsgid32,
-> setgsuid32, setgid32, setgroups32, setregid, setregid32,
-> setresgid, setresgid32, setresuid, setresuid32, setreuid,
-> setreuid32, setuid32, vfork.
+It has been there since the enablement of PR KVM for PAPR, ie, commit
+f61b4bedaf35 in 2011. Not sure why at that time, but it is definitely
+not needed with the current code.
 
-I have errors with getgroups.
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ target/ppc/kvm.c |    1 -
+ 1 file changed, 1 deletion(-)
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/syscall-defs.h     | 121 +++++
->  linux-user/syscall.h          |   1 +
->  linux-user/strace.c           |  36 +-
->  linux-user/syscall-proc.inc.c | 861 ++++++++++++++++++++++++++++++++++
->  linux-user/syscall.c          | 677 +-------------------------
->  linux-user/strace.list        | 147 ------
->  6 files changed, 988 insertions(+), 855 deletions(-)
->  create mode 100644 linux-user/syscall-proc.inc.c
-...
-> diff --git a/linux-user/syscall-proc.inc.c b/linux-user/syscall-proc.inc.c
-> new file mode 100644
-> index 0000000000..dee441b4ff
-> --- /dev/null
-> +++ b/linux-user/syscall-proc.inc.c
-...
-> +
-> +SYSCALL_IMPL(getgroups)
-> +{
-> +    int gidsetsize = arg1;
-> +    gid_t *grouplist;
-> +    abi_long ret;
-> +
-
-kernel checks for gidsetsize < 0 and returns EINVAL in this case
-
-> +    grouplist = g_try_new(gid_t, gidsetsize);
-> +    if (!grouplist) {
-> +        return -TARGET_ENOMEM;
-> +    }
-
-gidsetsize == 0 is a valid case (see man) but it fails with g_try_new().
-Moreover, ENOMEM is not a valid error value for getgroups().
-
-> +    ret = get_errno(getgroups(gidsetsize, grouplist));
-> +
-> +    if (!is_error(ret) && gidsetsize != 0) {
-> +        size_t target_grouplist_size = gidsetsize * sizeof(target_id);
-> +        target_id *target_grouplist
-> +            = lock_user(VERIFY_WRITE, arg2, target_grouplist_size, 0);
-> +        if (target_grouplist) {
-> +            int i;
-> +            for (i = 0; i < ret; i++) {
-> +                target_grouplist[i] = tswapid(high2lowgid(grouplist[i]));
-> +            }
-> +            unlock_user(target_grouplist, arg2, target_grouplist_size);
-> +        } else {
-> +            ret = -TARGET_EFAULT;
-> +        }
-> +    }
-> +    g_free(grouplist);
-> +    return ret;
-> +}
-> +
-> +#ifdef TARGET_NR_getgroups32
-> +SYSCALL_IMPL(getgroups32)
-
-likewise.
-
-Thanks,
-Laurent
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index ebbb48c42f25..d01852fe3112 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -36,7 +36,6 @@
+ 
+ #include "hw/sysbus.h"
+ #include "hw/ppc/spapr.h"
+-#include "hw/ppc/spapr_vio.h"
+ #include "hw/ppc/spapr_cpu_core.h"
+ #include "hw/ppc/ppc.h"
+ #include "sysemu/watchdog.h"
