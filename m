@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60480)
+Received: from eggs.gnu.org ([209.51.188.92]:33233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1ghccf-0006DP-LK
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:51:58 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ghcem-00085E-AE
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1ghcOL-0001bC-63
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:37:11 -0500
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Thu, 10 Jan 2019 15:36:57 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F202045412@dggema523-mbx.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1ghcek-0005Xw-MT
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:54:07 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44434)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ghcek-0005Xd-Fs
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:54:06 -0500
+Received: by mail-ot1-x341.google.com with SMTP id f18so10299495otl.11
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 07:54:06 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v15 10/10] target-arm: kvm64: handle SIGBUS
- signal from kernel or KVM
+References: <20190107163117.16269-1-peter.maydell@linaro.org>
+	<20190107163117.16269-25-peter.maydell@linaro.org>
+	<20190109055856.GA30631@comcast.net>
+In-Reply-To: <20190109055856.GA30631@comcast.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 Jan 2019 15:53:53 +0000
+Message-ID: <CAFEAcA__X_w5Dk1FjM_-bF-Ged_uchjpMagxr27-PwcqNaokRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 24/37] qtest: Add set_irq_in command to set
+ IRQ/GPIO level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,49 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Matthew Ogilvie <mmogilvi+qemu@zoho.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-PiANCj4gT24gVGh1LCA4IE5vdiAyMDE4IGF0IDEwOjE4LCBEb25naml1IEdlbmcgPGdlbmdkb25n
-aml1QGh1YXdlaS5jb20+IHdyb3RlOg0KPiA+DQo+ID4gQWRkIFNJR0JVUyBzaWduYWwgaGFuZGxl
-ci4gSW4gdGhpcyBoYW5kbGVyLCBpdCBjaGVja3MgdGhlIFNJR0JVUyB0eXBlLA0KPiA+IHRyYW5z
-bGF0ZXMgdGhlIGhvc3QgVkEgZGVsaXZlcmVkIGJ5IGhvc3QgdG8gZ3Vlc3QgUEEsIHRoZW4gZmls
-bCB0aGlzDQo+ID4gUEEgdG8gZ3Vlc3QgQVBFSSBHSEVTIG1lbW9yeSwgdGhlbiBub3RpZnkgZ3Vl
-c3QgYWNjb3JkaW5nIHRvIHRoZSBTSUdCVVMgdHlwZS4NCj4gPiBUaGVyZSBhcmUgdHdvIGtpbmRz
-IG9mIFNJR0JVUyB0aGF0IFFFTVUgbmVlZHMgdG8gaGFuZGxlLCB3aGljaCBhcmUNCj4gPiBCVVNf
-TUNFRVJSX0FPIGFuZCBCVVNfTUNFRVJSX0FSLg0KPiANCj4gPiArYm9vbCBnaGVzX3JlY29yZF9l
-cnJvcnModWludDMyX3Qgbm90aWZ5LCB1aW50NjRfdCBwaHlzaWNhbF9hZGRyZXNzKSB7DQo+ID4g
-KyAgICB1aW50NjRfdCBlcnJvcl9ibG9ja19hZGRyLCByZWFkX2Fja19yZWdpc3Rlcl9hZGRyOw0K
-PiA+ICsgICAgaW50IHJlYWRfYWNrX3JlZ2lzdGVyID0gMCwgbG9vcCA9IDA7DQo+ID4gKyAgICB1
-aW50NjRfdCBzdGFydF9hZGRyID0gbGUzMl90b19jcHUoZ2VzLmdoZXNfYWRkcl9sZSk7DQo+ID4g
-KyAgICBib29sIHJldCA9IEdIRVNfQ1BFUl9GQUlMOw0KPiA+ICsgICAgY29uc3QgdWludDhfdCBl
-cnJvcl9zb3VyY2VfaWRbXSA9IHsgMHhmZiwgMHhmZiwgMHhmZiwgMHhmZiwNCj4gPiArICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDB4ZmYsIDB4ZmYsIDB4ZmYsIDAsIDF9
-Ow0KPiA+ICsNCj4gPiArICAgIC8qDQo+ID4gKyAgICAgKiB8ICstLS0tLS0tLS0tLS0tLS0tLS0t
-LS0rIGdlcy5naGVzX2FkZHJfbGUNCj4gPiArICAgICAqIHwgfGVycm9yX2Jsb2NrX2FkZHJlc3Mw
-fA0KPiA+ICsgICAgICogfCArLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0KPiA+ICsgICAgICogfCB8
-ZXJyb3JfYmxvY2tfYWRkcmVzczF8DQo+ID4gKyAgICAgKiB8ICstLS0tLS0tLS0tLS0tLS0tLS0t
-LS0rIC0tKy0tDQo+ID4gKyAgICAgKiB8IHwgICAgLi4uLi4uLi4uLi4uLiAgICB8IEdIRVNfQURE
-UkVTU19TSVpFDQo+ID4gKyAgICAgKiB8ICstLS0tLS0tLS0tLS0tLS0tLS0tLS0rIC0tKy0tDQo+
-ID4gKyAgICAgKiB8IHxlcnJvcl9ibG9ja19hZGRyZXNzTnwNCj4gPiArICAgICAqIHwgKy0tLS0t
-LS0tLS0tLS0tLS0tLS0tLSsNCj4gPiArICAgICAqIHwgfCByZWFkX2Fja19yZWdpc3RlcjAgIHwN
-Cj4gPiArICAgICAqIHwgKy0tLS0tLS0tLS0tLS0tLS0tLS0tLSsgLS0rLS0NCj4gPiArICAgICAq
-IHwgfCByZWFkX2Fja19yZWdpc3RlcjEgIHwgR0hFU19BRERSRVNTX1NJWkUNCj4gPiArICAgICAq
-IHwgKy0tLS0tLS0tLS0tLS0tLS0tLS0tLSsgLS0rLS0NCj4gPiArICAgICAqIHwgfCAgIC4uLi4u
-Li4uLi4uLi4gICAgIHwNCj4gPiArICAgICAqIHwgKy0tLS0tLS0tLS0tLS0tLS0tLS0tLSsNCj4g
-PiArICAgICAqIHwgfCByZWFkX2Fja19yZWdpc3Rlck4gIHwNCj4gPiArICAgICAqIHwgKy0tLS0t
-LS0tLS0tLS0tLS0tLS0tLSsgLS0rLS0NCj4gPiArICAgICAqIHwgfCAgICAgIENQRVIgICAgICAg
-ICAgIHwgICB8DQo+ID4gKyAgICAgKiB8IHwgICAgICAuLi4uICAgICAgICAgICB8IEdIRVNfTUFY
-X1JBV19EQVRBX0xFTkdUDQo+ID4gKyAgICAgKiB8IHwgICAgICBDUEVSICAgICAgICAgICB8ICAg
-fA0KPiA+ICsgICAgICogfCArLS0tLS0tLS0tLS0tLS0tLS0tLS0tKyAtLSstLQ0KPiA+ICsgICAg
-ICogfCB8ICAgIC4uLi4uLi4uLi4gICAgICAgfA0KPiA+ICsgICAgICogfCArLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tKw0KPiA+ICsgICAgICogfCB8ICAgICAgQ1BFUiAgICAgICAgICAgfA0KPiA+ICsg
-ICAgICogfCB8ICAgICAgLi4uLiAgICAgICAgICAgfA0KPiA+ICsgICAgICogfCB8ICAgICAgQ1BF
-UiAgICAgICAgICAgfA0KPiA+ICsgICAgICogfCArLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0KPiA+
-ICsgICAgICovDQo+ID4gKyAgICBpZiAocGh5c2ljYWxfYWRkcmVzcyAmJiBub3RpZnkgPCBBQ1BJ
-X0hFU1RfTk9USUZZX1JFU0VSVkVEKSB7DQo+IA0KPiBXaHkgaXMgYSB6ZXJvIHBoeXNpY2FsIGFk
-ZHJlc3Mgc3BlY2lhbCBoZXJlPyBTaG91bGRuJ3Qgd2UgYmUgYWJsZSB0byByZXBvcnQgInRoZSBt
-ZW1vcnkgYmFja2luZyBwaHlzYWRkciAwIGhhcyBhIGZhdWx0IiA/DQoNClRoYW5rcyBhIGxvdCBm
-b3IgdGhlIHJlbWluZGVyLCB0aGUgcGh5c2ljYWwgbWVtb3J5IGFkZHJlc3MgMCBjYW4gYWxzbyBo
-YXZlIGEgZmF1bHQuIEl0IHNob3VsZCBub3QgYSBzcGVjaWFsIGFkZHJlc3MuDQoNCj4gDQo+IHRo
-YW5rcw0KPiAtLSBQTU0NCg==
+On Wed, 9 Jan 2019 at 05:59, Matthew Ogilvie <mmogilvi+qemu@zoho.com> wrote=
+:
+>
+> On Mon, Jan 07, 2019 at 04:31:04PM +0000, Peter Maydell wrote:
+> > From: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+> >
+> > Adds a new qtest command "set_irq_in" which allows
+> > to set qemu gpio lines to a given level.
+> >
+> > Based on https://lists.gnu.org/archive/html/qemu-devel/2012-12/msg02363=
+.html
+> > which never got merged.
+> >
+> > Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> > Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Message-id: 20190103091119.9367-2-stefanha@redhat.com
+> > Originally-by: Matthew Ogilvie <mmogilvi_qemu@miniinfo.net>
+>
+> It is kind of interesting to see a part of my old thread(s)
+> resurrected, even if it isn't the part I was actually interested
+> in.
+>
+> Note that my miniinfo email account no longer exists, but I
+> can still be reached at mmogilvi+qemu@zoho.com if desired.
+>
+> Regarding the patch, I haven't kept up with changes to qemu
+> well enough to really have a useful opinion, although superficially
+> it looks good.  Perhaps it would make sense to include both
+> my old and new email addresses in the sign-off section, to both
+> tie it to the old threads and make it easier to reach me
+> if someone wants to contact me?  (But I'm not sure of a "clean"
+> way to do so, and it is probably low priority.  Perhaps this
+> current email is good enough?)
+
+Thanks for the followup. Unfortunately the commit is already
+in master so we can't tweak the commit message at this point.
+That shouldn't matter much, people don't often fish emails out
+of old commit message logs to email anyway :-)
+
+thanks
+-- PMM
