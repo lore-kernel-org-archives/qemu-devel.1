@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55771)
+Received: from eggs.gnu.org ([209.51.188.92]:55970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ghXhY-0005nV-Sp
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:36:41 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ghXiO-0006Os-HA
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ghXhY-0002HV-36
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:36:40 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:39769)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ghXhX-0002Gf-Sq
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:36:40 -0500
-Received: by mail-wr1-x434.google.com with SMTP id t27so10757112wra.6
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 02:36:39 -0800 (PST)
-Date: Thu, 10 Jan 2019 10:36:37 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190110103636.GG19025@stefanha-x1.localdomain>
-References: <20190110083753.GA31730@yangzhon-Virtual>
+	(envelope-from <kraxel@redhat.com>) id 1ghXiN-0002mN-IL
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:37:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50160)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghXiN-0002m0-Ce
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:37:31 -0500
+Date: Thu, 10 Jan 2019 11:37:29 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190110103729.ccneitzixs22mj25@sirius.home.kraxel.org>
+References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
+	<26b300d6c17e6ac015f1519d50151744cf806c03.1545598229.git.DirtY.iCE.hu@gmail.com>
+	<87sgy4k3u7.fsf@dusky.pond.sub.org>
+	<b050b973-e675-8114-fd8a-1878dbdb81d6@gmail.com>
+	<87va2zg6hh.fsf@dusky.pond.sub.org>
+	<6619c58a-3e5a-a302-9bf0-acac6f7870e9@gmail.com>
+	<20190110072536.d5da6zqos7euz3sa@sirius.home.kraxel.org>
+	<f433b8c2-1db4-0786-d335-42ba8a440dae@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DNUSDXU7R7AVVM8C"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190110083753.GA31730@yangzhon-Virtual>
-Subject: Re: [Qemu-devel] If Qemu support NVMe over Fabrics ?
+In-Reply-To: <f433b8c2-1db4-0786-d335-42ba8a440dae@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 06/52] audio: -audiodev command line
+ option basic implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, fam@euphon.net, pbonzini@redhat.com, keith.busch@intel.com
+To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
+> > Can we just drop the nesting?
+> > 
+> > Have a look at DisplayOptions (qapi struct used to store -display
+> > options).  It's a union, has some common base fields, and the
+> > discriminator field (type in that case) decides which of the data
+> > branches is used.  And on the command line I can do stuff like this:
+> > 
+> >   -display gtk,full-screen=on,zoom-to-fit=on
+> >                               ^^^^^^^^^^^     in struct DisplayGTK
+> >                ^^^^^^^^^^^                    common base field
+> > 
+> > Audiodev should be able to do the same to support backend-specific
+> > options without nesting.
+> 
+> I think that union thing works, the problem is with input and output
+> settings, because they're common.  Currently you can write in.frequency
+> and out.frequency, in and out are both AudiodevPerDirectionOptions.
 
---DNUSDXU7R7AVVM8C
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah, right, I remember now.
 
-On Thu, Jan 10, 2019 at 04:37:53PM +0800, Yang Zhong wrote:
-> Do you know if Qemu support NVMe over Fabrics(NVMe-oF)?
-> https://nvmexpress.org/wp-content/uploads/NVMe_Over_Fabrics.pdf
->=20
-> The Qemu has enabled RDMA in last year, and i am not sure if Qemu=20
-> should support NVME-oF. If Qemu support it, would you please share
-> me the qemu related command or guides? thanks a lot!
+> The alternative would be to flatten the whole structure and have
+> in_frequency, out_frequency and everything else duplicated in Audiodev
 
-QEMU supports many different storage configurations.  Can you be more
-specific?
+Which might be not that bad after all.  The parser code is generated.
+The audio drivers (where the settings are looked up) have separate code
+paths for in and out anyway.  So a per-direction struct probably
+wouldn't reduce the amout of code in the drivers.  Driver-specific
+per-direction options are easier to deal with too I think (not sure we
+have them though).
 
-For example, if your host has NVMe-oF set up then you can give the NVMe
-block devices to QEMU just like any other host block device (-drive
-file=3D/dev/sdc,...).
+Property names should use dashes not underscores btw (i.e.
+in-frequency).
 
-But maybe you are thinking about other configurations, like exposing
-NVMe-oF to the guest?
-
-Stefan
-
---DNUSDXU7R7AVVM8C
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcNyA0AAoJEJykq7OBq3PIMdQH/3qeicsf5+cMsVFCaVJ/ra20
-/NYnten/I9Y5AVv8oxH3RLGioc6yyNLvf3PHr8Oy/IP6gRBptb0nvG5CrZPAvH1k
-42UEAi7CTMinwxfnLYZK9Q/e9fSi9YJiDqjGB4xGLG9YuvAQ9EVB1gYhbcIVTu8M
-z8GMwI/uhrkB3Wi2cuzQrn1BNHJ2dah1bKhlRXx9Fa3ioN3WJLCvD4Beog/LutEP
-zn4L+8iTnU4HLLqcO8tk+qUtRgeuGb4aWEuoGkfn9uskG9Lgulqh4imJSGhK8P9R
-AG7pE3T56UM9j7TlZUiHvfGR+lA+wFU/BVLzGlnXdtJmrPW6eZSoShC8TP+tNs8=
-=VJce
------END PGP SIGNATURE-----
-
---DNUSDXU7R7AVVM8C--
+cheers,
+  Gerd
