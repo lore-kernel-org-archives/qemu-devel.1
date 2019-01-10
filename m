@@ -1,27 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:57997)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=906201598=anthony.perard@citrix.com>)
-	id 1ghb5B-0005zL-T4
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:13:19 -0500
+	id 1ghb58-0005zL-5c
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:13:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=906201598=anthony.perard@citrix.com>)
-	id 1gharN-0002Ly-Ky
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:03 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:12008)
+	id 1ghars-0002aZ-JB
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:34 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:12075)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=906201598=anthony.perard@citrix.com>)
-	id 1gharN-0001xV-9N
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:01 -0500
+	id 1gharp-0002Xf-Hi
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:30 -0500
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Thu, 10 Jan 2019 13:49:16 +0000
-Message-ID: <20190110134917.16425-25-anthony.perard@citrix.com>
+Date: Thu, 10 Jan 2019 13:49:09 +0000
+Message-ID: <20190110134917.16425-18-anthony.perard@citrix.com>
 In-Reply-To: <20190110134917.16425-1-anthony.perard@citrix.com>
 References: <20190110134917.16425-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 24/25] xen-block: improve response latency
+Subject: [Qemu-devel] [PULL 17/25] xen: add a mechanism to automatically
+ create XenDevice-s...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,174 +32,529 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Tim Smith <tim.smith@citrix.com>, Paul Durrant <paul.durrant@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>
+Cc: xen-devel@lists.xenproject.org, Paul Durrant <paul.durrant@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>
 
-From: Tim Smith <tim.smith@citrix.com>
+From: Paul Durrant <paul.durrant@citrix.com>
 
-If the I/O ring is full, the guest cannot send any more requests
-until some responses are sent. Only sending all available responses
-just before checking for new work does not leave much time for the
-guest to supply new work, so this will cause stalls if the ring gets
-full. Also, not completing reads as soon as possible adds latency
-to the guest.
+...that maintains compatibility with existing Xen toolstacks.
 
-To alleviate that, complete IO requests as soon as they come back.
-xen_block_send_response() already returns a value indicating whether
-a notify should be sent, which is all the batching we need.
+Xen toolstacks instantiate PV backends by simply writing information into
+xenstore and expecting a backend implementation to be watching for this.
 
-Signed-off-by: Tim Smith <tim.smith@citrix.com>
+This patch adds a new 'xen-backend' module to allow individual XenDevice
+implementations to register create and destroy functions. The creator
+will be called when a tool-stack instantiates a new backend in this way,
+and the destructor will then be called after the resulting XenDevice
+object is unrealized.
 
-Re-based and commit comment adjusted.
+To support this it is also necessary to add new watchers into the XenBus
+implementation to handle enumeration of new backends and also destruction
+of XenDevice-s when the toolstack sets the backend 'online' key to 0.
+
+NOTE: This patch only adds the framework. A subsequent patch will add a
+      creator function for xen-block devices.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
- hw/block/dataplane/xen-block.c | 56 +++++++++++-----------------------
- 1 file changed, 18 insertions(+), 38 deletions(-)
+ hw/xen/Makefile.objs         |   2 +-
+ hw/xen/trace-events          |   3 +
+ hw/xen/xen-backend.c         | 165 +++++++++++++++++++++++++++++++++++
+ hw/xen/xen-bus.c             | 164 +++++++++++++++++++++++++++++++++-
+ include/hw/xen/xen-backend.h |  39 +++++++++
+ include/hw/xen/xen-bus.h     |   1 +
+ include/qemu/module.h        |   3 +
+ 7 files changed, 375 insertions(+), 2 deletions(-)
+ create mode 100644 hw/xen/xen-backend.c
+ create mode 100644 include/hw/xen/xen-backend.h
 
-diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index acd23a74a8..35bfccfba7 100644
---- a/hw/block/dataplane/xen-block.c
-+++ b/hw/block/dataplane/xen-block.c
-@@ -55,11 +55,9 @@ struct XenBlockDataPlane {
-     blkif_back_rings_t rings;
-     int more_work;
-     QLIST_HEAD(inflight_head, XenBlockRequest) inflight;
--    QLIST_HEAD(finished_head, XenBlockRequest) finished;
-     QLIST_HEAD(freelist_head, XenBlockRequest) freelist;
-     int requests_total;
-     int requests_inflight;
--    int requests_finished;
-     unsigned int max_requests;
-     BlockBackend *blk;
-     QEMUBH *bh;
-@@ -116,12 +114,10 @@ static void xen_block_finish_request(XenBlockRequest *request)
-     XenBlockDataPlane *dataplane = request->dataplane;
+diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+index 77c0868190..84df60a928 100644
+--- a/hw/xen/Makefile.objs
++++ b/hw/xen/Makefile.objs
+@@ -1,5 +1,5 @@
+ # xen backend driver support
+-common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o
++common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o xen-backend.o
  
-     QLIST_REMOVE(request, list);
--    QLIST_INSERT_HEAD(&dataplane->finished, request, list);
-     dataplane->requests_inflight--;
--    dataplane->requests_finished++;
+ obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+ obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+index d4651bdb30..f6944624b2 100644
+--- a/hw/xen/trace-events
++++ b/hw/xen/trace-events
+@@ -16,6 +16,9 @@ xen_domid_restrict(int err) "err: %u"
+ # include/hw/xen/xen-bus.c
+ xen_bus_realize(void) ""
+ xen_bus_unrealize(void) ""
++xen_bus_enumerate(void) ""
++xen_bus_type_enumerate(const char *type) "type: %s"
++xen_bus_backend_create(const char *type, const char *path) "type: %s path: %s"
+ xen_bus_add_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
+ xen_bus_remove_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
+ xen_bus_watch(const char *token) "token: %s"
+diff --git a/hw/xen/xen-backend.c b/hw/xen/xen-backend.c
+new file mode 100644
+index 0000000000..da065f81b7
+--- /dev/null
++++ b/hw/xen/xen-backend.c
+@@ -0,0 +1,165 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++#include "hw/xen/xen-backend.h"
++#include "hw/xen/xen-bus.h"
++
++typedef struct XenBackendImpl {
++    const char *type;
++    XenBackendDeviceCreate create;
++    XenBackendDeviceDestroy destroy;
++} XenBackendImpl;
++
++struct XenBackendInstance {
++    QLIST_ENTRY(XenBackendInstance) entry;
++    const XenBackendImpl *impl;
++    XenBus *xenbus;
++    char *name;
++    XenDevice *xendev;
++};
++
++static GHashTable *xen_backend_table_get(void)
++{
++    static GHashTable *table;
++
++    if (table == NULL) {
++        table = g_hash_table_new(g_str_hash, g_str_equal);
++    }
++
++    return table;
++}
++
++static void xen_backend_table_add(XenBackendImpl *impl)
++{
++    g_hash_table_insert(xen_backend_table_get(), (void *)impl->type, impl);
++}
++
++static const XenBackendImpl *xen_backend_table_lookup(const char *type)
++{
++    return g_hash_table_lookup(xen_backend_table_get(), type);
++}
++
++void xen_backend_register(const XenBackendInfo *info)
++{
++    XenBackendImpl *impl = g_new0(XenBackendImpl, 1);
++
++    g_assert(info->type);
++
++    if (xen_backend_table_lookup(info->type)) {
++        error_report("attempt to register duplicate Xen backend type '%s'",
++                     info->type);
++        abort();
++    }
++
++    if (!info->create) {
++        error_report("backend type '%s' has no creator", info->type);
++        abort();
++    }
++
++    impl->type = info->type;
++    impl->create = info->create;
++    impl->destroy = info->destroy;
++
++    xen_backend_table_add(impl);
++}
++
++static QLIST_HEAD(, XenBackendInstance) backend_list;
++
++static void xen_backend_list_add(XenBackendInstance *backend)
++{
++    QLIST_INSERT_HEAD(&backend_list, backend, entry);
++}
++
++static XenBackendInstance *xen_backend_list_find(XenDevice *xendev)
++{
++    XenBackendInstance *backend;
++
++    QLIST_FOREACH(backend, &backend_list, entry) {
++        if (backend->xendev == xendev) {
++            return backend;
++        }
++    }
++
++    return NULL;
++}
++
++static void xen_backend_list_remove(XenBackendInstance *backend)
++{
++    QLIST_REMOVE(backend, entry);
++}
++
++void xen_backend_device_create(XenBus *xenbus, const char *type,
++                               const char *name, QDict *opts, Error **errp)
++{
++    const XenBackendImpl *impl = xen_backend_table_lookup(type);
++    XenBackendInstance *backend;
++    Error *local_error = NULL;
++
++    if (!impl) {
++        return;
++    }
++
++    backend = g_new0(XenBackendInstance, 1);
++    backend->xenbus = xenbus;
++    backend->name = g_strdup(name);
++
++    impl->create(backend, opts, &local_error);
++    if (local_error) {
++        error_propagate(errp, local_error);
++        g_free(backend->name);
++        g_free(backend);
++        return;
++    }
++
++    backend->impl = impl;
++    xen_backend_list_add(backend);
++}
++
++XenBus *xen_backend_get_bus(XenBackendInstance *backend)
++{
++    return backend->xenbus;
++}
++
++const char *xen_backend_get_name(XenBackendInstance *backend)
++{
++    return backend->name;
++}
++
++void xen_backend_set_device(XenBackendInstance *backend,
++                            XenDevice *xendev)
++{
++    g_assert(!backend->xendev);
++    backend->xendev = xendev;
++}
++
++XenDevice *xen_backend_get_device(XenBackendInstance *backend)
++{
++    return backend->xendev;
++}
++
++
++bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp)
++{
++    XenBackendInstance *backend = xen_backend_list_find(xendev);
++    const XenBackendImpl *impl;
++
++    if (!backend) {
++        return false;
++    }
++
++    impl = backend->impl;
++    impl->destroy(backend, errp);
++
++    xen_backend_list_remove(backend);
++    g_free(backend->name);
++    g_free(backend);
++
++    return true;
++}
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index a22aa49921..f90bcf2342 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -11,10 +11,12 @@
+ #include "hw/hw.h"
+ #include "hw/sysbus.h"
+ #include "hw/xen/xen.h"
++#include "hw/xen/xen-backend.h"
+ #include "hw/xen/xen-bus.h"
+ #include "hw/xen/xen-bus-helper.h"
+ #include "monitor/monitor.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qdict.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
+ 
+@@ -190,12 +192,151 @@ static void xen_bus_remove_watch(XenBus *xenbus, XenWatch *watch,
+     free_watch(watch);
  }
  
--static void xen_block_release_request(XenBlockRequest *request, bool finish)
-+static void xen_block_release_request(XenBlockRequest *request)
++static void xen_bus_backend_create(XenBus *xenbus, const char *type,
++                                   const char *name, char *path,
++                                   Error **errp)
++{
++    xs_transaction_t tid;
++    char **key;
++    QDict *opts;
++    unsigned int i, n;
++    Error *local_err = NULL;
++
++    trace_xen_bus_backend_create(type, path);
++
++again:
++    tid = xs_transaction_start(xenbus->xsh);
++    if (tid == XBT_NULL) {
++        error_setg(errp, "failed xs_transaction_start");
++        return;
++    }
++
++    key = xs_directory(xenbus->xsh, tid, path, &n);
++    if (!key) {
++        if (!xs_transaction_end(xenbus->xsh, tid, true)) {
++            error_setg_errno(errp, errno, "failed xs_transaction_end");
++        }
++        return;
++    }
++
++    opts = qdict_new();
++    for (i = 0; i < n; i++) {
++        char *val;
++
++        /*
++         * Assume anything found in the xenstore backend area, other than
++         * the keys created for a generic XenDevice, are parameters
++         * to be used to configure the backend.
++         */
++        if (!strcmp(key[i], "state") ||
++            !strcmp(key[i], "online") ||
++            !strcmp(key[i], "frontend") ||
++            !strcmp(key[i], "frontend-id") ||
++            !strcmp(key[i], "hotplug-status"))
++            continue;
++
++        if (xs_node_scanf(xenbus->xsh, tid, path, key[i], NULL, "%ms",
++                          &val) == 1) {
++            qdict_put_str(opts, key[i], val);
++            free(val);
++        }
++    }
++
++    free(key);
++
++    if (!xs_transaction_end(xenbus->xsh, tid, false)) {
++        qobject_unref(opts);
++
++        if (errno == EAGAIN) {
++            goto again;
++        }
++
++        error_setg_errno(errp, errno, "failed xs_transaction_end");
++        return;
++    }
++
++    xen_backend_device_create(xenbus, type, name, opts, &local_err);
++    qobject_unref(opts);
++
++    if (local_err) {
++        error_propagate_prepend(errp, local_err,
++                                "failed to create '%s' device '%s': ",
++                                type, name);
++    }
++}
++
++static void xen_bus_type_enumerate(XenBus *xenbus, const char *type)
++{
++    char *domain_path = g_strdup_printf("backend/%s/%u", type, xen_domid);
++    char **backend;
++    unsigned int i, n;
++
++    trace_xen_bus_type_enumerate(type);
++
++    backend = xs_directory(xenbus->xsh, XBT_NULL, domain_path, &n);
++    if (!backend) {
++        goto out;
++    }
++
++    for (i = 0; i < n; i++) {
++        char *backend_path = g_strdup_printf("%s/%s", domain_path,
++                                             backend[i]);
++        enum xenbus_state backend_state;
++
++        if (xs_node_scanf(xenbus->xsh, XBT_NULL, backend_path, "state",
++                          NULL, "%u", &backend_state) != 1)
++            backend_state = XenbusStateUnknown;
++
++        if (backend_state == XenbusStateInitialising) {
++            Error *local_err = NULL;
++
++            xen_bus_backend_create(xenbus, type, backend[i], backend_path,
++                                   &local_err);
++            if (local_err) {
++                error_report_err(local_err);
++            }
++        }
++
++        g_free(backend_path);
++    }
++
++    free(backend);
++
++out:
++    g_free(domain_path);
++}
++
++static void xen_bus_enumerate(void *opaque)
++{
++    XenBus *xenbus = opaque;
++    char **type;
++    unsigned int i, n;
++
++    trace_xen_bus_enumerate();
++
++    type = xs_directory(xenbus->xsh, XBT_NULL, "backend", &n);
++    if (!type) {
++        return;
++    }
++
++    for (i = 0; i < n; i++) {
++        xen_bus_type_enumerate(xenbus, type[i]);
++    }
++
++    free(type);
++}
++
+ static void xen_bus_unrealize(BusState *bus, Error **errp)
  {
-     XenBlockDataPlane *dataplane = request->dataplane;
+     XenBus *xenbus = XEN_BUS(bus);
  
-@@ -129,11 +125,7 @@ static void xen_block_release_request(XenBlockRequest *request, bool finish)
-     reset_request(request);
-     request->dataplane = dataplane;
-     QLIST_INSERT_HEAD(&dataplane->freelist, request, list);
--    if (finish) {
--        dataplane->requests_finished--;
--    } else {
--        dataplane->requests_inflight--;
--    }
-+    dataplane->requests_inflight--;
- }
+     trace_xen_bus_unrealize();
  
- /*
-@@ -248,6 +240,7 @@ static int xen_block_copy_request(XenBlockRequest *request)
- }
- 
- static int xen_block_do_aio(XenBlockRequest *request);
-+static int xen_block_send_response(XenBlockRequest *request);
- 
- static void xen_block_complete_aio(void *opaque, int ret)
- {
-@@ -312,6 +305,18 @@ static void xen_block_complete_aio(void *opaque, int ret)
-     default:
-         break;
++    if (xenbus->backend_watch) {
++        xen_bus_remove_watch(xenbus, xenbus->backend_watch, NULL);
++        xenbus->backend_watch = NULL;
++    }
++
+     if (!xenbus->xsh) {
+         return;
      }
-+    if (xen_block_send_response(request)) {
+@@ -231,6 +372,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
+ {
+     XenBus *xenbus = XEN_BUS(bus);
+     unsigned int domid;
++    Error *local_err = NULL;
+ 
+     trace_xen_bus_realize();
+ 
+@@ -250,6 +392,18 @@ static void xen_bus_realize(BusState *bus, Error **errp)
+     notifier_list_init(&xenbus->watch_notifiers);
+     qemu_set_fd_handler(xs_fileno(xenbus->xsh), xen_bus_watch, NULL,
+                         xenbus);
++
++    module_call_init(MODULE_INIT_XEN_BACKEND);
++
++    xenbus->backend_watch =
++        xen_bus_add_watch(xenbus, "", /* domain root node */
++                          "backend", xen_bus_enumerate, xenbus, &local_err);
++    if (local_err) {
++        /* This need not be treated as a hard error so don't propagate */
++        error_reportf_err(local_err,
++                          "failed to set up enumeration watch: ");
++    }
++
+     return;
+ 
+ fail:
+@@ -407,7 +561,15 @@ static void xen_device_backend_changed(void *opaque)
+                 xendev->backend_state == XenbusStateInitialising ||
+                 xendev->backend_state == XenbusStateInitWait ||
+                 xendev->backend_state == XenbusStateUnknown)) {
+-        object_unparent(OBJECT(xendev));
 +        Error *local_err = NULL;
 +
-+        xen_device_notify_event_channel(dataplane->xendev,
-+                                        dataplane->event_channel,
-+                                        &local_err);
++        if (!xen_backend_try_device_destroy(xendev, &local_err)) {
++            object_unparent(OBJECT(xendev));
++        }
++
 +        if (local_err) {
 +            error_report_err(local_err);
 +        }
-+    }
-+    xen_block_release_request(request);
+     }
+ }
+ 
+diff --git a/include/hw/xen/xen-backend.h b/include/hw/xen/xen-backend.h
+new file mode 100644
+index 0000000000..010d712638
+--- /dev/null
++++ b/include/hw/xen/xen-backend.h
+@@ -0,0 +1,39 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-     qemu_bh_schedule(dataplane->bh);
++#ifndef HW_XEN_BACKEND_H
++#define HW_XEN_BACKEND_H
++
++#include "hw/xen/xen-bus.h"
++
++typedef struct XenBackendInstance XenBackendInstance;
++
++typedef void (*XenBackendDeviceCreate)(XenBackendInstance *backend,
++                                       QDict *opts, Error **errp);
++typedef void (*XenBackendDeviceDestroy)(XenBackendInstance *backend,
++                                        Error **errp);
++
++typedef struct XenBackendInfo {
++    const char *type;
++    XenBackendDeviceCreate create;
++    XenBackendDeviceDestroy destroy;
++} XenBackendInfo;
++
++XenBus *xen_backend_get_bus(XenBackendInstance *backend);
++const char *xen_backend_get_name(XenBackendInstance *backend);
++
++void xen_backend_set_device(XenBackendInstance *backend,
++                            XenDevice *xendevice);
++XenDevice *xen_backend_get_device(XenBackendInstance *backend);
++
++void xen_backend_register(const XenBackendInfo *info);
++
++void xen_backend_device_create(XenBus *xenbus, const char *type,
++                               const char *name, QDict *opts, Error **errp);
++bool xen_backend_try_device_destroy(XenDevice *xendev, Error **errp);
++
++#endif /* HW_XEN_BACKEND_H */
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index 0834cb3a7e..e55a5de5f1 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -65,6 +65,7 @@ typedef struct XenBus {
+     domid_t backend_id;
+     struct xs_handle *xsh;
+     NotifierList watch_notifiers;
++    XenWatch *backend_watch;
+ } XenBus;
  
- done:
-@@ -419,7 +424,7 @@ static int xen_block_do_aio(XenBlockRequest *request)
-     return -1;
- }
+ typedef struct XenBusClass {
+diff --git a/include/qemu/module.h b/include/qemu/module.h
+index 54300ab6e5..55dd2beea8 100644
+--- a/include/qemu/module.h
++++ b/include/qemu/module.h
+@@ -44,6 +44,7 @@ typedef enum {
+     MODULE_INIT_OPTS,
+     MODULE_INIT_QOM,
+     MODULE_INIT_TRACE,
++    MODULE_INIT_XEN_BACKEND,
+     MODULE_INIT_MAX
+ } module_init_type;
  
--static int xen_block_send_response_one(XenBlockRequest *request)
-+static int xen_block_send_response(XenBlockRequest *request)
- {
-     XenBlockDataPlane *dataplane = request->dataplane;
-     int send_notify = 0;
-@@ -474,29 +479,6 @@ static int xen_block_send_response_one(XenBlockRequest *request)
-     return send_notify;
- }
+@@ -51,6 +52,8 @@ typedef enum {
+ #define opts_init(function) module_init(function, MODULE_INIT_OPTS)
+ #define type_init(function) module_init(function, MODULE_INIT_QOM)
+ #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
++#define xen_backend_init(function) module_init(function, \
++                                               MODULE_INIT_XEN_BACKEND)
  
--/* walk finished list, send outstanding responses, free requests */
--static void xen_block_send_response_all(XenBlockDataPlane *dataplane)
--{
--    XenBlockRequest *request;
--    int send_notify = 0;
--
--    while (!QLIST_EMPTY(&dataplane->finished)) {
--        request = QLIST_FIRST(&dataplane->finished);
--        send_notify += xen_block_send_response_one(request);
--        xen_block_release_request(request, true);
--    }
--    if (send_notify) {
--        Error *local_err = NULL;
--
--        xen_device_notify_event_channel(dataplane->xendev,
--                                        dataplane->event_channel,
--                                        &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--        }
--    }
--}
--
- static int xen_block_get_request(XenBlockDataPlane *dataplane,
-                                  XenBlockRequest *request, RING_IDX rc)
- {
-@@ -547,7 +529,6 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
-     rp = dataplane->rings.common.sring->req_prod;
-     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
- 
--    xen_block_send_response_all(dataplane);
-     /*
-      * If there was more than IO_PLUG_THRESHOLD requests in flight
-      * when we got here, this is an indication that there the bottleneck
-@@ -591,7 +572,7 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
-                 break;
-             };
- 
--            if (xen_block_send_response_one(request)) {
-+            if (xen_block_send_response(request)) {
-                 Error *local_err = NULL;
- 
-                 xen_device_notify_event_channel(dataplane->xendev,
-@@ -601,7 +582,7 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
-                     error_report_err(local_err);
-                 }
-             }
--            xen_block_release_request(request, false);
-+            xen_block_release_request(request);
-             continue;
-         }
- 
-@@ -657,7 +638,6 @@ XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
-     dataplane->file_size = blk_getlength(dataplane->blk);
- 
-     QLIST_INIT(&dataplane->inflight);
--    QLIST_INIT(&dataplane->finished);
-     QLIST_INIT(&dataplane->freelist);
- 
-     if (iothread) {
+ #define block_module_load_one(lib) module_load_one("block-", lib)
+ #define ui_module_load_one(lib) module_load_one("ui-", lib)
 -- 
 Anthony PERARD
