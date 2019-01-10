@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35140)
+Received: from eggs.gnu.org ([209.51.188.92]:35669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ghbJ2-0001tL-Gr
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:27:38 -0500
+	(envelope-from <elohimes@gmail.com>) id 1ghbL1-0003TD-Vt
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:29:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ghbJ0-0004jR-NO
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:27:36 -0500
-Received: from mail-yw1-f47.google.com ([209.85.161.47]:44519)
+	(envelope-from <elohimes@gmail.com>) id 1ghbL0-0005Vu-Pw
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:29:39 -0500
+Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:42789)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ghbJ0-0004ce-FH
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:27:34 -0500
-Received: by mail-yw1-f47.google.com with SMTP id b63so4430085ywc.11
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 06:27:25 -0800 (PST)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1ghbL0-0005Tc-HV
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:29:38 -0500
+Received: by mail-yw1-xc43.google.com with SMTP id x2so4435599ywc.9
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 06:29:32 -0800 (PST)
 MIME-Version: 1.0
-References: <20190109220942.23822-1-pbonzini@redhat.com>
-	<CAFEAcA9v3v3k_cFZCwvD5WD4FmiuFT=0UAjCBHEwpO+LuQWjAw@mail.gmail.com>
-In-Reply-To: <CAFEAcA9v3v3k_cFZCwvD5WD4FmiuFT=0UAjCBHEwpO+LuQWjAw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 10 Jan 2019 15:27:12 +0100
-Message-ID: <CAAdtpL5cuJdVgfgoo1oNfEpTZFkybLRn5MWqLna7osTUT=MCbg@mail.gmail.com>
+References: <20190109112728.9214-1-xieyongji@baidu.com>
+	<20190109112728.9214-2-xieyongji@baidu.com>
+	<20190110124946.GL2178@redhat.com>
+	<CAONzpcZCTqN3CN1DBd6WdjKoTSr257Y2vOCuLOh9LBb-5K_hpg@mail.gmail.com>
+	<20190110132443.GM2178@redhat.com>
+	<CAONzpcZ5HXP2-9PEZW=RwunviAcPL3kYosJhUWB0g09j=pf0oQ@mail.gmail.com>
+	<20190110141125.GP2178@redhat.com>
+In-Reply-To: <20190110141125.GP2178@redhat.com>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Thu, 10 Jan 2019 22:29:20 +0800
+Message-ID: <CAONzpcY8LdzEEqourAjw5mZR9fjtjv20HqvyOvaWVoriD4Cbjg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v6 00/35] Misc patches for 2018-12-18
+Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 1/7] char-socket: Enable
+ "nowait" option on client sockets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,108 +35,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
+	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-Le jeu. 10 janv. 2019 15:21, Peter Maydell <peter.maydell@linaro.org> a
-=C3=A9crit :
+On Thu, 10 Jan 2019 at 22:11, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>
+> On Thu, Jan 10, 2019 at 10:08:54PM +0800, Yongji Xie wrote:
+> > On Thu, 10 Jan 2019 at 21:24, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+> > >
+> > > On Thu, Jan 10, 2019 at 09:19:41PM +0800, Yongji Xie wrote:
+> > > > On Thu, 10 Jan 2019 at 20:50, Daniel P. Berrang=C3=A9 <berrange@red=
+hat.com> wrote:
+> > > > >
+> > > > > On Wed, Jan 09, 2019 at 07:27:22PM +0800, elohimes@gmail.com wrot=
+e:
+> > > > > > From: Xie Yongji <xieyongji@baidu.com>
+> > > > > >
+> > > > > > Enable "nowait" option to make QEMU not do a connect
+> > > > > > on client sockets during initialization of the chardev.
+> > > > > > Then we can use qemu_chr_fe_wait_connected() to connect
+> > > > > > when necessary. Now it would be used for unix domain
+> > > > > > socket of vhost-user-blk device to support reconnect.
+> > > > > >
+> > > > > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+> > > > > > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+> > > > > > ---
+> > > > > >  chardev/char-socket.c | 56 +++++++++++++++++++++--------------=
+--------
+> > > > > >  qapi/char.json        |  3 +--
+> > > > > >  qemu-options.hx       |  9 ++++---
+> > > > > >  3 files changed, 35 insertions(+), 33 deletions(-)
+> > > > > >
+> > > > > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > > > > > index eaa8e8b68f..f803f4f7d3 100644
+> > > > > > --- a/chardev/char-socket.c
+> > > > > > +++ b/chardev/char-socket.c
+> > > > > > @@ -1072,37 +1072,37 @@ static void qmp_chardev_open_socket(Cha=
+rdev *chr,
+> > > > > >          s->reconnect_time =3D reconnect;
+> > > > > >      }
+> > > > > >
+> > > > > > -    if (s->reconnect_time) {
+> > > > > > -        tcp_chr_connect_async(chr);
+> > > > > > -    } else {
+> > > > > > -        if (s->is_listen) {
+> > > > > > -            char *name;
+> > > > > > -            s->listener =3D qio_net_listener_new();
+> > > > > > +    if (s->is_listen) {
+> > > > > > +        char *name;
+> > > > > > +        s->listener =3D qio_net_listener_new();
+> > > > > >
+> > > > > > -            name =3D g_strdup_printf("chardev-tcp-listener-%s"=
+, chr->label);
+> > > > > > -            qio_net_listener_set_name(s->listener, name);
+> > > > > > -            g_free(name);
+> > > > > > +        name =3D g_strdup_printf("chardev-tcp-listener-%s", ch=
+r->label);
+> > > > > > +        qio_net_listener_set_name(s->listener, name);
+> > > > > > +        g_free(name);
+> > > > > >
+> > > > > > -            if (qio_net_listener_open_sync(s->listener, s->add=
+r, errp) < 0) {
+> > > > > > -                object_unref(OBJECT(s->listener));
+> > > > > > -                s->listener =3D NULL;
+> > > > > > -                goto error;
+> > > > > > -            }
+> > > > > > +        if (qio_net_listener_open_sync(s->listener, s->addr, e=
+rrp) < 0) {
+> > > > > > +            object_unref(OBJECT(s->listener));
+> > > > > > +            s->listener =3D NULL;
+> > > > > > +            goto error;
+> > > > > > +        }
+> > > > > >
+> > > > > > -            qapi_free_SocketAddress(s->addr);
+> > > > > > -            s->addr =3D socket_local_address(s->listener->sioc=
+[0]->fd, errp);
+> > > > > > -            update_disconnected_filename(s);
+> > > > > > +        qapi_free_SocketAddress(s->addr);
+> > > > > > +        s->addr =3D socket_local_address(s->listener->sioc[0]-=
+>fd, errp);
+> > > > > > +        update_disconnected_filename(s);
+> > > > > >
+> > > > > > -            if (is_waitconnect &&
+> > > > > > -                qemu_chr_wait_connected(chr, errp) < 0) {
+> > > > > > -                return;
+> > > > > > -            }
+> > > > > > -            if (!s->ioc) {
+> > > > > > -                qio_net_listener_set_client_func_full(s->liste=
+ner,
+> > > > > > -                                                      tcp_chr_=
+accept,
+> > > > > > -                                                      chr, NUL=
+L,
+> > > > > > -                                                      chr->gco=
+ntext);
+> > > > > > -            }
+> > > > > > +        if (is_waitconnect &&
+> > > > > > +            qemu_chr_wait_connected(chr, errp) < 0) {
+> > > > > > +            return;
+> > > > > > +        }
+> > > > > > +        if (!s->ioc) {
+> > > > > > +            qio_net_listener_set_client_func_full(s->listener,
+> > > > > > +                                                  tcp_chr_acce=
+pt,
+> > > > > > +                                                  chr, NULL,
+> > > > > > +                                                  chr->gcontex=
+t);
+> > > > > > +        }
+> > > > > > +    } else if (is_waitconnect) {
+> > > > > > +        if (s->reconnect_time) {
+> > > > > > +            tcp_chr_connect_async(chr);
+> > > > > >          } else if (qemu_chr_wait_connected(chr, errp) < 0) {
+> > > > > >              goto error;
+> > > > > >          }
+> > > > >
+> > > > > This skips everything when 'is_waitconnect' is false.
+> > > > >
+> > > > > This combines with a bug in tests/libqtest.c which adds the 'nowa=
+it'
+> > > > > flag to the -chardevs it cteates. This mistake was previously ign=
+ored
+> > > > > because the chardevs were socket clients, but now we honour it.
+> > > > >
+> > > > > We shoul remove 'nowait' from the qtest chardevs, but separately
+> > > > > from that this code should also still attempt a non-blocking
+> > > > > connect when is_waitconnect is false.
+> > > > >
+> > > >
+> > > > Do you mean we still need to connect server in background with
+> > > > "nowait" option? But my purpose is not to connect server until we
+> > > > manually call qemu_chr_fe_wait_connected() in other place.
+> > >
+> > > I don't see a need to delay the connect. We can start a
+> > > background connect right away. The later code you have
+> > > merely needs to wait for that background connect  to
+> > > finish, which qemu_chr_fe_wait_connected still accomplishes.
+> > > This keeps the chardev code clearer only having 2 distinct
+> > > code paths to worry about - blocking or non-blocking connect.
+> > >
+> >
+> > Now the problem is that we have a server that only accept one
+> > connection. And we want to read something from it during device
+> > initializtion.
+> >
+> > If background connect it before we call qemu_chr_fe_wait_connected()
+> > during device initializtion, qemu_chr_fe_wait_connected() will
+> > accomplish but we can't read anything. And we have no way to release
+> > the background connection. So what I want to do in this patch is to
+> > disable background connect.
+>
+> I'm not seeing the problem here. What I proposed results in
+>
+>   1. chardev starts connect()
 
-> On Wed, 9 Jan 2019 at 22:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > The following changes since commit
-> c102d9471f8f02d9fbea72ec4505d7089173f470:
-> >
-> >   Merge remote-tracking branch
-> 'remotes/pmaydell/tags/pull-target-arm-20190107' into staging (2019-01-07
-> 16:56:33 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/bonzini/qemu.git tags/for-upstream
-> >
-> > for you to fetch changes up to 5eddc84292736dc57db341f9724395a29d3614f7=
-:
-> >
-> >   avoid TABs in files that only contain a few (2019-01-09 23:01:14 +010=
-0)
-> >
-> > ----------------------------------------------------------------
-> > * HAX support for Linux hosts (Alejandro)
-> > * esp bugfixes (Guenter)
-> > * Windows build cleanup (Marc-Andr=C3=A9)
-> > * checkpatch logic improvements (Paolo)
-> > * coalesced range bugfix (Paolo)
-> > * switch testsuite to TAP (Paolo)
-> > * QTAILQ rewrite (Paolo)
-> > * block/iscsi.c cancellation fixes (Stefan)
-> > * improve selection of the default accelerator (Thomas)
-> >
-> > ----------------------------------------------------------------
->
-> This almost all works fine (there are some annoying intermittents
-> which mean that most of my full test runs fail somewhere for some
-> reason, but they aren't issues with this pullreq as far as I can
-> see[*]), but...
->
-> ...'make check-tcg' fails:
->
-> e104462:xenial:all-linux-static$ make check-tcg
->   BUILD   debian9
-> The command '/bin/sh -c DEBIAN_FRONTEND=3Dnoninteractive eatmydata
-> apt install -y --no-install-recommends         bison
-> build-essential         ca-certificates         clang         flex
->     gettext         git         libtest-harness-perl
-> pkg-config         psmisc         python         texinfo
-> $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\
-> -f2)' returned a non-zero code: 100
-> Traceback (most recent call last):
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 563, in <module>
->     sys.exit(main())
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 560, in main
->     return args.cmdobj.run(args, argv)
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 376, in run
->     extra_files_cksum=3Dcksum)
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 254, in build_image
->     quiet=3Dquiet)
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 181, in _do_check
->     return subprocess.check_call(self._command + cmd, **kwargs)
->   File "/usr/lib/python2.7/subprocess.py", line 541, in check_call
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
-> 'qemu:debian9', '-f', '/tmp/docker_build_cViZ6/tmpsvY3Oz.docker',
-> '/tmp/docker_build_cViZ6']' returned non-zero exit status 100
-> /home/petmay01/linaro/qemu-for-merges/tests/docker/Makefile.include:53:
-> recipe for target 'docker-image-debian9' failed
-> make: *** [docker-image-debian9] Error 1
->
+This should be asynchronous with "reconnect" option. Another thread
+may connect before vhost backend?
 
-This should work fine if you retry this PR after having merged Fam's PR
-which contains the fix.
+>   2. vhost backend waits for connect() to complete
 
+Sorry, I'm not sure I get your point here. Do you mean vhost backend
+call qemu_chr_fe_wait_connected()? Seems like
+qemu_chr_fe_wait_connected() will connect directly rather than wait
+for connect() to complete?
 
-> This seems to happen reliably with this pullreq merged
-> in, but master is OK.
->
-
-I guess Travis is using a cached image.
-
-
-> [*] intermittents I've seen recently (ie over the last
-> month or two):
->  + failures in the rcu torture-test
->  + the netbsd VM sometimes fails to start and the "wait 300
->    seconds while trying to ssh into it" timeout expires;
->    this might be load-related but it is always netbsd that
->    fails like this, never the openbsd or freebsd VMs
->  + test-filter-mirror sometimes seems to hang
->  + the migration test hangs sometimes with TCG
->
-> thanks
-> -- PMM
->
->
+Thanks,
+Yongji
