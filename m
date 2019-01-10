@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35146)
+Received: from eggs.gnu.org ([209.51.188.92]:35685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghUXE-0000ZN-Mi
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:13:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghUZH-0002FA-Ks
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghUXD-0001k8-8i
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:13:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghUZC-0002U4-0p
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:15:52 -0500
+References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
+	<20180609151758.17343-5-vsementsov@virtuozzo.com>
+	<91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 10 Jan 2019 01:13:25 -0600
-Message-Id: <20190110071330.28136-2-eblake@redhat.com>
-In-Reply-To: <20190110071330.28136-1-eblake@redhat.com>
-References: <20190110071330.28136-1-eblake@redhat.com>
+Message-ID: <4a689a27-645c-da07-4512-ba4ed7e212cb@redhat.com>
+Date: Thu, 10 Jan 2019 01:15:42 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/6] nbd: Only require disabled bitmap for
- read-only exports
+In-Reply-To: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vOkk1BeywDlAKrvxVNOMiZSqoqkGK7QeS"
+Subject: Re: [Qemu-devel] [PATCH v5 4/6] nbd/server: implement dirty bitmap
+ export
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,159 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, armbru@redhat.com, mreitz@redhat.com
 
-Our initial implementation of x-nbd-server-add-bitmap put
-in a restriction because of incremental backups: in that
-usage, we are exporting one qcow2 file (the temporary overlay
-target of a blockdev-backup sync:none job) and a dirty bitmap
-owned by a second qcow2 file (the source of the
-blockdev-backup, which is the backing file of the temporary).
-While both qcow2 files are still writable (the target capture
-copy-on-write of old contents, the source to track live guest
-writes in the meantime), the NBD client expects to see
-constant data, including the dirty bitmap.  An enabled bitmap
-in the source would be modified by guest writes, which is at
-odds with the NBD export being a read-only constant view,
-hence the initial code choice of enforcing a disabled bitmap
-(the intent is that the exposed bitmap was disabled in the
-same transaction that started the blockdev-backup job,
-although we don't want to actually track enough state to
-actually enforce that).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vOkk1BeywDlAKrvxVNOMiZSqoqkGK7QeS
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, armbru@redhat.com,
+ mreitz@redhat.com
+Message-ID: <4a689a27-645c-da07-4512-ba4ed7e212cb@redhat.com>
+Subject: Re: [PATCH v5 4/6] nbd/server: implement dirty bitmap export
+References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
+ <20180609151758.17343-5-vsementsov@virtuozzo.com>
+ <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
+In-Reply-To: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-However, in the case of image migration, where we WANT a
-writable export, it makes total sense that the NBD client
-could expect writes to change the status visible through
-the exposed dirty bitmap, and thus permitting an enabled
-bitmap for an export that is not read-only makes sense;
-although the current restriction prevents that usage.
+On 1/9/19 1:21 PM, Eric Blake wrote:
+> Revisiting an older thread:
+>=20
+> On 6/9/18 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Handle new NBD meta namespace: "qemu", and corresponding queries:
+>> "qemu:dirty-bitmap:<export bitmap name>".
+>>
+>> With new metadata context negotiated, BLOCK_STATUS query will reply
+>> with dirty-bitmap data, converted to extents. New public function
+>> nbd_export_bitmap selects bitmap to export. For now, only one bitmap
+>> may be exported.
+>>
 
-Alternatively, consider the case when the active layer does
-not contain the bitmap but the backing layer does.  If the
-backing layer is read-only (which is different from the
-backing layer of a blockdev-backup job being writable),
-we know the backing layer cannot be modified, and thus the
-bitmap will not change contents even if it is still marked
-enabled (for that matter, since the backing file is
-read-only, we couldn't change the bitmap to be disabled
-in the first place).  Again, the current restriction
-prevents this usage.
+>> +    if (bdrv_dirty_bitmap_enabled(bm)) {
+>> +        error_setg(errp, "Bitmap '%s' is enabled", bitmap);
+>> +        return;
+>> +    }
+>=20
+> Why are we restricting things to only export disabled bitmaps?
+>=20
+> I can understand the argument that if the image being exported is
+> read-only, then an enabled bitmap _that can be changed_ is probably a
+> bad idea (it goes against the notion of the export being read only).
+> But if we were to allow a writable access to an image, wouldn't we
+> expect that writes be reflected into the bitmap, which means permitting=
 
-Solve both issues by gating the restriction against a
-disabled bitmap to only happen when the caller has
-requested a read-only export, and where the BDS that owns
-the bitmap (which might be a backing file of the BDS
-handed to nbd_export_new) is still writable.
+> an enabled bitmap?
 
-Update iotest 223 to add some tests of the error paths.
+I've now addressed this in my v2 Promote x-nbd-server-add-bitmap to
+stable series.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-
----
-v2: new patch
----
- nbd/server.c               |  7 +++++--
- tests/qemu-iotests/223     | 14 ++++++++++++--
- tests/qemu-iotests/223.out |  4 ++++
- 3 files changed, 21 insertions(+), 4 deletions(-)
-
-diff --git a/nbd/server.c b/nbd/server.c
-index 7af0ddffb20..98327088cb4 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -2456,8 +2456,11 @@ void nbd_export_bitmap(NBDExport *exp, const char =
-*bitmap,
-         return;
-     }
-
--    if (bdrv_dirty_bitmap_enabled(bm)) {
--        error_setg(errp, "Bitmap '%s' is enabled", bitmap);
-+    if ((exp->nbdflags & NBD_FLAG_READ_ONLY) && bdrv_is_writable(bs) &&
-+        bdrv_dirty_bitmap_enabled(bm)) {
-+        error_setg(errp,
-+                   "Enabled bitmap '%s' incompatible with readonly expor=
-t",
-+                   bitmap);
-         return;
-     }
-
-diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
-index 5513dc62159..f1fbb9bc1c6 100755
---- a/tests/qemu-iotests/223
-+++ b/tests/qemu-iotests/223
-@@ -61,6 +61,8 @@ echo "=3D=3D=3D Create partially sparse image, then add=
- dirty bitmaps =3D=3D=3D"
- echo
-
- # Two bitmaps, to contrast granularity issues
-+# Also note that b will be disabled, while b2 is left enabled, to
-+# check for read-only interactions
- _make_test_img -o cluster_size=3D4k 4M
- $QEMU_IO -c 'w -P 0x11 1M 2M' "$TEST_IMG" | _filter_qemu_io
- run_qemu <<EOF
-@@ -114,17 +116,23 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"blockdev-a=
-dd",
-     "file":{"driver":"file", "filename":"'"$TEST_IMG"'"}}}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"block-dirty-bitmap-disable",
-   "arguments":{"node":"n", "name":"b"}}' "return"
--_send_qemu_cmd $QEMU_HANDLE '{"execute":"block-dirty-bitmap-disable",
--  "arguments":{"node":"n", "name":"b2"}}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
-   "arguments":{"addr":{"type":"unix",
-     "data":{"path":"'"$TEST_DIR/nbd"'"}}}}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-   "arguments":{"device":"n"}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-+  "arguments":{"device":"n"}}' "error"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
-   "arguments":{"name":"n", "bitmap":"b"}}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-   "arguments":{"device":"n", "name":"n2"}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
-+  "arguments":{"name":"n2", "bitmap":"b2"}}' "error"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
-+  "arguments":{"name":"n2"}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-+  "arguments":{"device":"n", "name":"n2", "writable":true}}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
-   "arguments":{"name":"n2", "bitmap":"b2"}}' "return"
-
-@@ -157,6 +165,8 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-r=
-emove",
-   "arguments":{"name":"n"}}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
-   "arguments":{"name":"n2"}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
-+  "arguments":{"name":"n2"}}' "error"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-stop"}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"quit"}' "return"
-
-diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
-index 99ca172fbb8..5ed2e322e19 100644
---- a/tests/qemu-iotests/223.out
-+++ b/tests/qemu-iotests/223.out
-@@ -29,8 +29,11 @@ wrote 2097152/2097152 bytes at offset 2097152
- {"return": {}}
- {"return": {}}
- {"return": {}}
-+{"error": {"class": "GenericError", "desc": "NBD server already has expo=
-rt named 'n'"}}
- {"return": {}}
- {"return": {}}
-+{"error": {"class": "GenericError", "desc": "Enabled bitmap 'b2' incompa=
-tible with readonly export"}}
-+{"return": {}}
- {"return": {}}
- {"return": {}}
-
-@@ -62,6 +65,7 @@ read 2097152/2097152 bytes at offset 2097152
-
- {"return": {}}
- {"return": {}}
-+{"error": {"class": "GenericError", "desc": "Export 'n2' is not found"}}
- {"return": {}}
- {"return": {}}
- *** done
 --=20
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--vOkk1BeywDlAKrvxVNOMiZSqoqkGK7QeS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw28R4ACgkQ3g5py3or
+ov278wf/QGYgFveU6Jxd0NDP+iYYqcCP3KOeMqU2JGiY7nrrmPvT2wfyMW38P0or
+hWZ+3Qo4g10IQvFo2QOer77B3OF+HJEXL+2s+JZuOMLf+hQPcVYg6DI5M+wMGPwp
+upcMSBVcFEElqtXL2p1DXPFYy3NfpgIRP/3Kd4V1g+sMkURCc7x3tkMBG87Shyao
+ql8EGrXhT3PORJiErR6Jqf4i/D6TyyU4wvhA+mkZ3naPU5leqd/Xu2AKuKO4cauU
+YyTJ26CErLj1oVXEqkfV4UqAsyj/QOi4QcSonCblDbFl3vUlxZls8VAXLucAkAoA
+JV6XzVsmRIV5km+Vnhwk4IBDJbIHXg==
+=OBvK
+-----END PGP SIGNATURE-----
+
+--vOkk1BeywDlAKrvxVNOMiZSqoqkGK7QeS--
