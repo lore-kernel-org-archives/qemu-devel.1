@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34017)
+Received: from eggs.gnu.org ([209.51.188.92]:34002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gheOi-0004mk-R3
+	(envelope-from <alex.bennee@linaro.org>) id 1gheOi-0004mF-9N
 	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:45:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gheOg-0008VC-Qh
+	(envelope-from <alex.bennee@linaro.org>) id 1gheOg-0008Sr-6y
 	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:45:40 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38428)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36206)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gheOg-0007Y0-JQ
+	id 1gheOf-0007hL-Tt
 	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:45:38 -0500
-Received: by mail-wr1-x444.google.com with SMTP id v13so12370346wrw.5
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 09:45:20 -0800 (PST)
+Received: by mail-wr1-x441.google.com with SMTP id u4so12387414wrp.3
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 09:45:24 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 10 Jan 2019 17:44:59 +0000
-Message-Id: <20190110174516.21586-3-alex.bennee@linaro.org>
+Date: Thu, 10 Jan 2019 17:45:04 +0000
+Message-Id: <20190110174516.21586-8-alex.bennee@linaro.org>
 In-Reply-To: <20190110174516.21586-1-alex.bennee@linaro.org>
 References: <20190110174516.21586-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 02/19] tests: run ldconfig after installing
- extra software
+Subject: [Qemu-devel] [PATCH v1 07/19] travis: add whitespace between each
+ major section & matrix entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +35,167 @@ Cc: ymankad@redhat.com, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redh
 
 From: Daniel P. Berrangé <berrange@redhat.com>
 
-The docker file builds and installs software into /usr/local but does
-not run ldconfig. As a result QEMU links to libvirglrenderer.so, but
-then crashes in "make check" unable to find the library.
+Improve the readability of the travis config by adding two blank lines
+between each major section and matrix entry.
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/dockerfiles/debian-amd64.docker | 2 ++
- 1 file changed, 2 insertions(+)
+ .travis.yml | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index 47a30adbdb..954fcf9606 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -36,5 +36,7 @@ RUN git clone https://github.com/luigirizzo/netmap.git /usr/src/netmap
- RUN cd /usr/src/netmap/LINUX && ./configure --no-drivers --no-apps --kernel-dir=$(ls -d /usr/src/linux-headers-*-amd64) && make install
- ENV QEMU_CONFIGURE_OPTS --enable-netmap
- 
-+RUN ldconfig
+diff --git a/.travis.yml b/.travis.yml
+index d472fd650b..bb43792627 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -1,6 +1,7 @@
+ # The current Travis default is a container based 14.04 Trust on EC2
+ # Additional builds with specific requirements for a full VM need to
+ # be added as additional matrix: entries later on
 +
- # gcrypt
- ENV QEMU_CONFIGURE_OPTS $QEMU_CONFIGURE_OPTS --enable-gcrypt
+ sudo: false
+ dist: trusty
+ language: c
+@@ -9,6 +10,8 @@ python:
+ compiler:
+   - gcc
+ cache: ccache
++
++
+ addons:
+   apt:
+     packages:
+@@ -40,6 +43,7 @@ addons:
+       - uuid-dev
+       - gcovr
+ 
++
+ # The channel name "irc.oftc.net#qemu" is encrypted against qemu/qemu
+ # to prevent IRC notifications from forks. This was created using:
+ # $ travis encrypt -r "qemu/qemu" "irc.oftc.net#qemu"
+@@ -49,6 +53,8 @@ notifications:
+       - secure: "F7GDRgjuOo5IUyRLqSkmDL7kvdU4UcH3Lm/W2db2JnDHTGCqgEdaYEYKciyCLZ57vOTsTsOgesN8iUT7hNHBd1KWKjZe9KDTZWppWRYVwAwQMzVeSOsbbU4tRoJ6Pp+3qhH1Z0eGYR9ZgKYAoTumDFgSAYRp4IscKS8jkoedOqM="
+     on_success: change
+     on_failure: always
++
++
+ env:
+   global:
+     - SRC_DIR="."
+@@ -63,9 +69,13 @@ env:
+     - CONFIG="--enable-modules --disable-linux-user"
+     - CONFIG="--with-coroutine=ucontext --disable-linux-user"
+     - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
++
++
+ git:
+   # we want to do this ourselves
+   submodules: false
++
++
+ before_install:
+   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update ; fi
+   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libffi gettext glib pixman ; fi
+@@ -75,54 +85,82 @@ before_script:
+   - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
+ script:
+   - make ${MAKEFLAGS} && ${TEST_CMD}
++
++
+ matrix:
+   include:
+     # Test out-of-tree builds
+     - env: CONFIG="--enable-debug --enable-debug-tcg"
+            BUILD_DIR="out-of-tree/build/dir" SRC_DIR="../../.."
++
++
+     # Test with Clang for compile portability (Travis uses clang-5.0)
+     - env: CONFIG="--disable-system"
+       compiler: clang
++
++
+     - env: CONFIG="--disable-user"
+       compiler: clang
++
++
+     # gprof/gcov are GCC features
+     - env: CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
+       after_success:
+         - ${SRC_DIR}/scripts/travis/coverage-summary.sh
+       compiler: gcc
++
++
+     # We manually include builds which we disable "make check" for
+     - env: CONFIG="--enable-debug --enable-tcg-interpreter"
+            TEST_CMD=""
+       compiler: gcc
++
++
+     # We don't need to exercise every backend with every front-end
+     - env: CONFIG="--enable-trace-backends=log,simple,syslog --disable-system"
+            TEST_CMD=""
+       compiler: gcc
++
++
+     - env: CONFIG="--enable-trace-backends=ftrace --target-list=x86_64-softmmu"
+            TEST_CMD=""
+       compiler: gcc
++
++
+     - env: CONFIG="--enable-trace-backends=ust --target-list=x86_64-softmmu"
+            TEST_CMD=""
+       compiler: gcc
++
++
+     - env: CONFIG="--disable-tcg"
+            TEST_CMD=""
+       compiler: gcc
++
++
+     # MacOSX builds
+     - env: CONFIG="--target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
+       os: osx
+       osx_image: xcode9.4
+       compiler: clang
++
++
+     - env: CONFIG="--target-list=i386-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,x86_64-softmmu"
+       os: osx
+       osx_image: xcode10
+       compiler: clang
++
++
+     # Python builds
+     - env: CONFIG="--target-list=x86_64-softmmu"
+       python:
+         - "3.0"
++
++
+     - env: CONFIG="--target-list=x86_64-softmmu"
+       python:
+         - "3.6"
++
++
+     # Acceptance (Functional) tests
+     - env: CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu"
+            TEST_CMD="make AVOCADO_SHOW=app check-acceptance"
+@@ -131,6 +169,8 @@ matrix:
+           packages:
+             - python3-pip
+             - python3.4-venv
++
++
+     # Using newer GCC with sanitizers
+     - addons:
+         apt:
+@@ -175,6 +215,8 @@ matrix:
+         - TEST_CMD=""
+       before_script:
+         - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || { cat config.log && exit 1; }
++
++
+     - env:
+         - CONFIG="--disable-system --disable-docs"
+         - TEST_CMD="make check-tcg"
 -- 
 2.17.1
