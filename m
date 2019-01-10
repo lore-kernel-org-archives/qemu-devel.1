@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56018)
+Received: from eggs.gnu.org ([209.51.188.92]:56021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghZHa-0004X4-UE
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZHb-0004XM-8j
 	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghZHZ-0007dE-Nk
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50624)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghZHZ-0007cS-Ea
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZHZ-0007dV-W8
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:59 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:32977)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ghZHZ-0007cu-N9
 	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:57 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A6DEA29A60
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 12:17:56 +0000 (UTC)
-Date: Thu, 10 Jan 2019 12:17:50 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190110121750.GK2178@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190110120843.3839-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190110120843.3839-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] usb: assign unique serial numbers to
- hid devices
+Received: by mail-pl1-x642.google.com with SMTP id z23so5134824plo.0
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:17:57 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 10 Jan 2019 23:17:30 +1100
+Message-Id: <20190110121736.23448-6-richard.henderson@linaro.org>
+In-Reply-To: <20190110121736.23448-1-richard.henderson@linaro.org>
+References: <20190110121736.23448-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 05/11] target/arm: Default handling of BTYPE
+ during translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,149 +27,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Thu, Jan 10, 2019 at 01:08:43PM +0100, Gerd Hoffmann wrote:
-> Windows guests have trouble dealing with usb devices having identical
-> serial numbers.  So, assign unique serial numbers to usb hid devices.
-> All other usb devices have this already.
-> 
-> In the past the fixed serial number has been used to indicate working
-> remote setup to linux guests.  Here is a bit of history:
-> 
->  * First there was nothing.
->  * Then I added a rule to udev checking for serial == 42.
->    (this is in rhel-6).
->  * Then systemd + udev merged.
->  * Then I changed the rule to check for serial != 1 instead, so we can
->    use any serial but "1" which is the one the old broken devices had
->    (this is in rhel-7).  March 2014 in upstream systemd.
->  * Then all usb power management rules where dropped from systemd (June
->    2015).  Which I figured today (Sept 2018), after wondering that the
->    rules are gone in fedora 28.
-> 
-> So, three years ago the serial number check was dropped upstream, yet I
-> hav't seen a single report about autosuspend issues (or cpu usage for
-> usb emulation going up, which is the typical symtom).
-> 
-> So I figured I can stop worring that changing the serial number will
-> break things and just do it.
-> 
-> And even if it turns out autosuspend is still an issue:  I think
-> meanwhile we can really stop worrying about guests running in old qemu
-> versions with broken usb suspend (fixed in 0.13 !).  If needed we can
-> enable autosuspend unconditionally in guests.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/usb/dev-hid.c | 26 +++++++++++++++-----------
->  1 file changed, 15 insertions(+), 11 deletions(-)
-> 
-> diff --git a/hw/usb/dev-hid.c b/hw/usb/dev-hid.c
-> index 62d18290dc..205236e9b1 100644
-> --- a/hw/usb/dev-hid.c
-> +++ b/hw/usb/dev-hid.c
-> @@ -61,10 +61,13 @@ enum {
->      STR_PRODUCT_MOUSE,
->      STR_PRODUCT_TABLET,
->      STR_PRODUCT_KEYBOARD,
-> -    STR_SERIALNUMBER,
-> +    STR_SERIAL_COMPAT,
->      STR_CONFIG_MOUSE,
->      STR_CONFIG_TABLET,
->      STR_CONFIG_KEYBOARD,
-> +    STR_SERIAL_MOUSE,
-> +    STR_SERIAL_TABLET,
-> +    STR_SERIAL_KEYBOARD,
->  };
->  
->  static const USBDescStrings desc_strings = {
-> @@ -72,10 +75,13 @@ static const USBDescStrings desc_strings = {
->      [STR_PRODUCT_MOUSE]    = "QEMU USB Mouse",
->      [STR_PRODUCT_TABLET]   = "QEMU USB Tablet",
->      [STR_PRODUCT_KEYBOARD] = "QEMU USB Keyboard",
-> -    [STR_SERIALNUMBER]     = "42", /* == remote wakeup works */
-> +    [STR_SERIAL_COMPAT]    = "42",
->      [STR_CONFIG_MOUSE]     = "HID Mouse",
->      [STR_CONFIG_TABLET]    = "HID Tablet",
->      [STR_CONFIG_KEYBOARD]  = "HID Keyboard",
-> +    [STR_SERIAL_MOUSE]     = "89126",
-> +    [STR_SERIAL_TABLET]    = "28754",
-> +    [STR_SERIAL_KEYBOARD]  = "68284",
->  };
->  
->  static const USBDescIface desc_iface_mouse = {
-> @@ -375,7 +381,7 @@ static const USBDesc desc_mouse = {
->          .bcdDevice         = 0,
->          .iManufacturer     = STR_MANUFACTURER,
->          .iProduct          = STR_PRODUCT_MOUSE,
-> -        .iSerialNumber     = STR_SERIALNUMBER,
-> +        .iSerialNumber     = STR_SERIAL_MOUSE,
->      },
->      .full = &desc_device_mouse,
->      .str  = desc_strings,
-> @@ -389,7 +395,7 @@ static const USBDesc desc_mouse2 = {
->          .bcdDevice         = 0,
->          .iManufacturer     = STR_MANUFACTURER,
->          .iProduct          = STR_PRODUCT_MOUSE,
-> -        .iSerialNumber     = STR_SERIALNUMBER,
-> +        .iSerialNumber     = STR_SERIAL_MOUSE,
->      },
->      .full = &desc_device_mouse,
->      .high = &desc_device_mouse2,
-> @@ -404,7 +410,7 @@ static const USBDesc desc_tablet = {
->          .bcdDevice         = 0,
->          .iManufacturer     = STR_MANUFACTURER,
->          .iProduct          = STR_PRODUCT_TABLET,
-> -        .iSerialNumber     = STR_SERIALNUMBER,
-> +        .iSerialNumber     = STR_SERIAL_TABLET,
->      },
->      .full = &desc_device_tablet,
->      .str  = desc_strings,
-> @@ -418,7 +424,7 @@ static const USBDesc desc_tablet2 = {
->          .bcdDevice         = 0,
->          .iManufacturer     = STR_MANUFACTURER,
->          .iProduct          = STR_PRODUCT_TABLET,
-> -        .iSerialNumber     = STR_SERIALNUMBER,
-> +        .iSerialNumber     = STR_SERIAL_TABLET,
->      },
->      .full = &desc_device_tablet,
->      .high = &desc_device_tablet2,
-> @@ -433,7 +439,7 @@ static const USBDesc desc_keyboard = {
->          .bcdDevice         = 0,
->          .iManufacturer     = STR_MANUFACTURER,
->          .iProduct          = STR_PRODUCT_KEYBOARD,
-> -        .iSerialNumber     = STR_SERIALNUMBER,
-> +        .iSerialNumber     = STR_SERIAL_KEYBOARD,
->      },
->      .full = &desc_device_keyboard,
->      .str  = desc_strings,
-> @@ -447,7 +453,7 @@ static const USBDesc desc_keyboard2 = {
->          .bcdDevice         = 0,
->          .iManufacturer     = STR_MANUFACTURER,
->          .iProduct          = STR_PRODUCT_KEYBOARD,
-> -        .iSerialNumber     = STR_SERIALNUMBER,
-> +        .iSerialNumber     = STR_SERIAL_KEYBOARD,
->      },
->      .full = &desc_device_keyboard,
->      .high = &desc_device_keyboard2,
-> @@ -718,9 +724,7 @@ static void usb_hid_initfn(USBDevice *dev, int kind,
->          return;
->      }
->  
-> -    if (dev->serial) {
-> -        usb_desc_set_string(dev, STR_SERIALNUMBER, dev->serial);
-> -    }
-> +    usb_desc_create_serial(dev);
+The branch target exception for guarded pages has high priority,
+and only 8 instructions are valid for that case.  Perform this
+check before doing any other decode.
 
-Don't we need some kind of machine type compat handling  to avoid
-the serial number being changed during migration ?
+Clear BTYPE after all insns that neither set BTYPE nor exit via
+exception (DISAS_NORETURN).
 
+Not yet handled are insns that exit via DISAS_NORETURN for some
+other reason, like direct branches.
 
-Regards,
-Daniel
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/internals.h     |   6 ++
+ target/arm/translate.h     |   9 ++-
+ target/arm/translate-a64.c | 139 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 152 insertions(+), 2 deletions(-)
+
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index a6fd4582b2..d01a3f9f44 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -268,6 +268,7 @@ enum arm_exception_class {
+     EC_FPIDTRAP               = 0x08,
+     EC_PACTRAP                = 0x09,
+     EC_CP14RRTTRAP            = 0x0c,
++    EC_BTITRAP                = 0x0d,
+     EC_ILLEGALSTATE           = 0x0e,
+     EC_AA32_SVC               = 0x11,
+     EC_AA32_HVC               = 0x12,
+@@ -439,6 +440,11 @@ static inline uint32_t syn_pactrap(void)
+     return EC_PACTRAP << ARM_EL_EC_SHIFT;
+ }
+ 
++static inline uint32_t syn_btitrap(int btype)
++{
++    return (EC_BTITRAP << ARM_EL_EC_SHIFT) | btype;
++}
++
+ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
+ {
+     return (EC_INSNABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 3d5e8bacac..f73939d7b4 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -71,8 +71,13 @@ typedef struct DisasContext {
+     bool pauth_active;
+     /* True with v8.5-BTI and SCTLR_ELx.BT* set.  */
+     bool bt;
+-    /* A copy of PSTATE.BTYPE, which will be 0 without v8.5-BTI.  */
+-    uint8_t btype;
++    /*
++     * >= 0, a copy of PSTATE.BTYPE, which will be 0 without v8.5-BTI.
++     *  < 0, set by the current instruction.
++     */
++    int8_t btype;
++    /* True if this page is guarded.  */
++    bool guarded_page;
+     /* Bottom two bits of XScale c15_cpar coprocessor access control reg */
+     int c15_cpar;
+     /* TCG op of the current insn_start.  */
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index ca2ae40701..68eb27089a 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -128,6 +128,16 @@ static inline int get_a64_user_mem_index(DisasContext *s)
+     return arm_to_core_mmu_idx(useridx);
+ }
+ 
++static void reset_btype(DisasContext *s)
++{
++    if (s->btype != 0) {
++        TCGv_i32 zero = tcg_const_i32(0);
++        tcg_gen_st_i32(zero, cpu_env, offsetof(CPUARMState, btype));
++        tcg_temp_free_i32(zero);
++        s->btype = 0;
++    }
++}
++
+ void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
+                             fprintf_function cpu_fprintf, int flags)
+ {
+@@ -13716,6 +13726,90 @@ static void disas_data_proc_simd_fp(DisasContext *s, uint32_t insn)
+     }
+ }
+ 
++/**
++ * is_guarded_page:
++ * @env: The cpu environment
++ * @s: The DisasContext
++ *
++ * Return true if the page is guarded.
++ */
++static bool is_guarded_page(CPUARMState *env, DisasContext *s)
++{
++#ifdef CONFIG_USER_ONLY
++    return false;  /* FIXME */
++#else
++    uint64_t addr = s->base.pc_first;
++    int mmu_idx = arm_to_core_mmu_idx(s->mmu_idx);
++    unsigned int index = tlb_index(env, mmu_idx, addr);
++    CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
++
++    /*
++     * We test this immediately after reading an insn, which means
++     * that any normal page must be in the TLB.  The only exception
++     * would be for executing from flash or device memory, which
++     * does not retain the TLB entry.
++     *
++     * FIXME: Assume false for those, for now.  We could use
++     * arm_cpu_get_phys_page_attrs_debug to re-read the page
++     * table entry even for that case.
++     */
++    return (tlb_hit(entry->addr_code, addr) &&
++            env->iotlb[mmu_idx][index].attrs.guarded);
++#endif
++}
++
++/**
++ * btype_destination_ok:
++ * @insn: The instruction at the branch destination
++ * @bt: SCTLR_ELx.BT
++ * @btype: PSTATE.BTYPE, and is non-zero
++ *
++ * On a guarded page, there are a limited number of insns
++ * that may be present at the branch target:
++ *   - branch target identifiers,
++ *   - paciasp, pacibsp,
++ *   - BRK insn
++ *   - HLT insn
++ * Anything else causes a Branch Target Exception.
++ *
++ * Return true if the branch is compatible, false to raise BTITRAP.
++ */
++static bool btype_destination_ok(uint32_t insn, bool bt, int btype)
++{
++    if ((insn & 0xfffff01fu) == 0xd503201fu) {
++        /* HINT space */
++        switch (extract32(insn, 5, 7)) {
++        case 031: /* PACIASP */
++        case 033: /* PACIBSP */
++            /*
++             * If SCTLR_ELx.BT, then PACI*SP are not compatible
++             * with btype == 3.  Otherwise all btype are ok.
++             */
++            return !bt || btype != 3;
++        case 040: /* BTI */
++            /* Not compatible with any btype.  */
++            return false;
++        case 042: /* BTI c */
++            /* Not compatible with btype == 3 */
++            return btype != 3;
++        case 044: /* BTI j */
++            /* Not compatible with btype == 2 */
++            return btype != 2;
++        case 046: /* BTI jc */
++            /* Compatible with any btype.  */
++            return true;
++        }
++    } else {
++        switch (insn & 0xffe0001fu) {
++        case 0xd4200000u: /* BRK */
++        case 0xd4400000u: /* HLT */
++            /* Give priority to the breakpoint exception.  */
++            return true;
++        }
++    }
++    return false;
++}
++
+ /* C3.1 A64 instruction index by encoding */
+ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
+ {
+@@ -13727,6 +13821,43 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
+ 
+     s->fp_access_checked = false;
+ 
++    if (dc_isar_feature(aa64_bti, s)) {
++        if (s->base.num_insns == 1) {
++            /*
++             * At the first insn of the TB, compute s->guarded_page.
++             * We delayed computing this until successfully reading
++             * the first insn of the TB, above.  This (mostly) ensures
++             * that the softmmu tlb entry has been populated, and the
++             * page table GP bit is available.
++             *
++             * Note that we need to compute this even if btype == 0,
++             * because this value is used for BR instructions later
++             * where ENV is not available.
++             */
++            s->guarded_page = is_guarded_page(env, s);
++
++            /* First insn can have btype set to non-zero.  */
++            tcg_debug_assert(s->btype >= 0);
++
++            /*
++             * Note that the Branch Target Exception has fairly high
++             * priority -- below debugging exceptions but above most
++             * everything else.  This allows us to handle this now
++             * instead of waiting until the insn is otherwise decoded.
++             */
++            if (s->btype != 0
++                && s->guarded_page
++                && !btype_destination_ok(insn, s->bt, s->btype)) {
++                gen_exception_insn(s, 4, EXCP_UDEF, syn_btitrap(s->btype),
++                                   default_exception_el(s));
++                return;
++            }
++        } else {
++            /* Not the first insn: btype must be 0.  */
++            tcg_debug_assert(s->btype == 0);
++        }
++    }
++
+     switch (extract32(insn, 25, 4)) {
+     case 0x0: case 0x1: case 0x3: /* UNALLOCATED */
+         unallocated_encoding(s);
+@@ -13763,6 +13894,14 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
+ 
+     /* if we allocated any temporaries, free them here */
+     free_tmp_a64(s);
++
++    /*
++     * After execution of most insns, btype is reset to 0.
++     * Note that we set btype == -1 when the insn sets btype.
++     */
++    if (s->btype > 0 && s->base.is_jmp != DISAS_NORETURN) {
++        reset_btype(s);
++    }
+ }
+ 
+ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.17.2
