@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52559)
+Received: from eggs.gnu.org ([209.51.188.92]:54026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ghZ8n-0007Bm-Dr
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:08:54 -0500
+	(envelope-from <groug@kaod.org>) id 1ghZCu-0001dZ-8i
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:13:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ghZ8m-0003Gy-El
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:08:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39754)
+	(envelope-from <groug@kaod.org>) id 1ghZCs-0004wb-Bb
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:13:08 -0500
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:52793)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghZ8k-0003Fw-Ed
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:08:52 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6F1298666B
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 12:08:49 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 10 Jan 2019 13:08:43 +0100
-Message-Id: <20190110120843.3839-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] usb: assign unique serial numbers to hid
- devices
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ghZCs-0004pT-4g
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:13:06 -0500
+Received: from player796.ha.ovh.net (unknown [10.109.159.7])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 8624D10C257
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 13:12:52 +0100 (CET)
+Date: Thu, 10 Jan 2019 13:12:38 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190110131238.7a65eb20@bahia.lan>
+In-Reply-To: <20190110101243.GE2178@redhat.com>
+References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
+	<1547051976-13982-2-git-send-email-thuth@redhat.com>
+	<3316bf08-36c0-c3ce-4e4f-8244276c58d3@kaod.org>
+	<20190109172801.GB3998@redhat.com>
+	<d72673fa-52a5-a6ff-6aa8-34f2b4b6855f@redhat.com>
+	<60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
+	<20190110101243.GE2178@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
+ compilation with clang -std=gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,142 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, dgilbert@redhat.com
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Windows guests have trouble dealing with usb devices having identical
-serial numbers.  So, assign unique serial numbers to usb hid devices.
-All other usb devices have this already.
+On Thu, 10 Jan 2019 10:12:43 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-In the past the fixed serial number has been used to indicate working
-remote setup to linux guests.  Here is a bit of history:
+> On Wed, Jan 09, 2019 at 03:25:53PM -0600, Eric Blake wrote:
+> > On 1/9/19 3:20 PM, Paolo Bonzini wrote: =20
+> > > On 09/01/19 18:28, Daniel P. Berrang=C3=A9 wrote: =20
+> > >>> so both files include each other, how nice ... =20
+> > >> If the header files are mutually dependent it makes me wonder what t=
+he
+> > >> point of having them split up is ?
+> > >>
+> > >> Feels like either they need to be merged, or they need to be split up
+> > >> and refactored even more to remove the mutual dependancy. =20
+> > >=20
+> > > If they include each other only for the typedefs, then prehaps the
+> > > solution is to change the coding style and allow using struct in
+> > > function prototypes.  I'm pretty sure there are several examples of t=
+his
+> > > already. =20
+> >=20
+> > Or stick the typedef in <typedefs.h>, instead of trying to find (or
+> > create) some other common header. =20
+>=20
+> Probably better to just have a local  spapr_types.h instead of
+> polluting the global namespace.
+>=20
 
- * First there was nothing.
- * Then I added a rule to udev checking for serial == 42.
-   (this is in rhel-6).
- * Then systemd + udev merged.
- * Then I changed the rule to check for serial != 1 instead, so we can
-   use any serial but "1" which is the one the old broken devices had
-   (this is in rhel-7).  March 2014 in upstream systemd.
- * Then all usb power management rules where dropped from systemd (June
-   2015).  Which I figured today (Sept 2018), after wondering that the
-   rules are gone in fedora 28.
+I personally like this approach because it would allow to use the
+typedefs everywhere, for the sake of consistency.
 
-So, three years ago the serial number check was dropped upstream, yet I
-hav't seen a single report about autosuspend issues (or cpu usage for
-usb emulation going up, which is the typical symtom).
-
-So I figured I can stop worring that changing the serial number will
-break things and just do it.
-
-And even if it turns out autosuspend is still an issue:  I think
-meanwhile we can really stop worrying about guests running in old qemu
-versions with broken usb suspend (fixed in 0.13 !).  If needed we can
-enable autosuspend unconditionally in guests.
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/dev-hid.c | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
-
-diff --git a/hw/usb/dev-hid.c b/hw/usb/dev-hid.c
-index 62d18290dc..205236e9b1 100644
---- a/hw/usb/dev-hid.c
-+++ b/hw/usb/dev-hid.c
-@@ -61,10 +61,13 @@ enum {
-     STR_PRODUCT_MOUSE,
-     STR_PRODUCT_TABLET,
-     STR_PRODUCT_KEYBOARD,
--    STR_SERIALNUMBER,
-+    STR_SERIAL_COMPAT,
-     STR_CONFIG_MOUSE,
-     STR_CONFIG_TABLET,
-     STR_CONFIG_KEYBOARD,
-+    STR_SERIAL_MOUSE,
-+    STR_SERIAL_TABLET,
-+    STR_SERIAL_KEYBOARD,
- };
- 
- static const USBDescStrings desc_strings = {
-@@ -72,10 +75,13 @@ static const USBDescStrings desc_strings = {
-     [STR_PRODUCT_MOUSE]    = "QEMU USB Mouse",
-     [STR_PRODUCT_TABLET]   = "QEMU USB Tablet",
-     [STR_PRODUCT_KEYBOARD] = "QEMU USB Keyboard",
--    [STR_SERIALNUMBER]     = "42", /* == remote wakeup works */
-+    [STR_SERIAL_COMPAT]    = "42",
-     [STR_CONFIG_MOUSE]     = "HID Mouse",
-     [STR_CONFIG_TABLET]    = "HID Tablet",
-     [STR_CONFIG_KEYBOARD]  = "HID Keyboard",
-+    [STR_SERIAL_MOUSE]     = "89126",
-+    [STR_SERIAL_TABLET]    = "28754",
-+    [STR_SERIAL_KEYBOARD]  = "68284",
- };
- 
- static const USBDescIface desc_iface_mouse = {
-@@ -375,7 +381,7 @@ static const USBDesc desc_mouse = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_MOUSE,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_MOUSE,
-     },
-     .full = &desc_device_mouse,
-     .str  = desc_strings,
-@@ -389,7 +395,7 @@ static const USBDesc desc_mouse2 = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_MOUSE,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_MOUSE,
-     },
-     .full = &desc_device_mouse,
-     .high = &desc_device_mouse2,
-@@ -404,7 +410,7 @@ static const USBDesc desc_tablet = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_TABLET,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_TABLET,
-     },
-     .full = &desc_device_tablet,
-     .str  = desc_strings,
-@@ -418,7 +424,7 @@ static const USBDesc desc_tablet2 = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_TABLET,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_TABLET,
-     },
-     .full = &desc_device_tablet,
-     .high = &desc_device_tablet2,
-@@ -433,7 +439,7 @@ static const USBDesc desc_keyboard = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_KEYBOARD,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_KEYBOARD,
-     },
-     .full = &desc_device_keyboard,
-     .str  = desc_strings,
-@@ -447,7 +453,7 @@ static const USBDesc desc_keyboard2 = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_KEYBOARD,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_KEYBOARD,
-     },
-     .full = &desc_device_keyboard,
-     .high = &desc_device_keyboard2,
-@@ -718,9 +724,7 @@ static void usb_hid_initfn(USBDevice *dev, int kind,
-         return;
-     }
- 
--    if (dev->serial) {
--        usb_desc_set_string(dev, STR_SERIALNUMBER, dev->serial);
--    }
-+    usb_desc_create_serial(dev);
-     usb_desc_init(dev);
-     us->intr = usb_ep_get(dev, USB_TOKEN_IN, 1);
-     hid_init(&us->hid, kind, usb_hid_changed);
--- 
-2.9.3
+>=20
+> Regards,
+> Daniel
