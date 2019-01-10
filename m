@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53274)
+Received: from eggs.gnu.org ([209.51.188.92]:37454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ghdms-0004dx-S5
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:06:35 -0500
+	(envelope-from <mmoroz@google.com>) id 1ghcsH-0005yf-AC
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:08:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ghdmr-0000wg-NZ
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:06:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54562)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ghdmr-0000wD-Ep
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:06:33 -0500
-Date: Thu, 10 Jan 2019 17:06:27 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190110170626.GH2589@work-vm>
-References: <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
-	<200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
-	<20190109172023.GK4867@localhost.localdomain>
-	<be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
-	<40ef0a8d-3a25-4cc3-95f8-82bc4513776c@redhat.com>
-	<20190109185154.GL4867@localhost.localdomain>
-	<56880d06-a214-2486-2e80-c565b33461b3@redhat.com>
-	<20190110112508.GA6361@linux.fritz.box>
-	<20190110114113.GC2589@work-vm>
-	<20190110151101.GB6361@linux.fritz.box>
+	(envelope-from <mmoroz@google.com>) id 1ghcs9-0004DN-C7
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:08:05 -0500
+Received: from mail-it1-x12a.google.com ([2607:f8b0:4864:20::12a]:37365)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mmoroz@google.com>) id 1ghcs7-00041w-AR
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:07:55 -0500
+Received: by mail-it1-x12a.google.com with SMTP id b5so16963322iti.2
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 08:07:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190110151101.GB6361@linux.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
- ID anymore
+References: <CAJSP0QUV39fK4L8MwQ-rGiR0ejUm0HCyKFqARh-SKRTuDPKOXg@mail.gmail.com>
+	<jpgsgy0aaw6.fsf@linux.bootlegged.copy>
+	<CACT4Y+YWVfg_PVh0=CTCgM9BRyCmKZB9N+_DBimaNKPE=y6r5Q@mail.gmail.com>
+In-Reply-To: <CACT4Y+YWVfg_PVh0=CTCgM9BRyCmKZB9N+_DBimaNKPE=y6r5Q@mail.gmail.com>
+From: Max Moroz <mmoroz@google.com>
+Date: Thu, 10 Jan 2019 08:07:09 -0800
+Message-ID: <CABiizEQ-O-Ro9cH3xqzZUB=c5k+oYJ-gdR7ssfbbn5kU_8GcAA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Internship idea: virtio-blk oss-fuzz support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,103 +29,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, armbru@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, muriloo@linux.ibm.com
+To: Dmitry Vyukov <dvyukov@google.com>, Oliver Chang <ochang@google.com>, Jonathan Metzman <metzman@google.com>
+Cc: Bandan Das <bsd@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Kostya Serebryany <kcc@google.com>, Andrey Konovalov <andreyknvl@google.com>
 
-* Kevin Wolf (kwolf@redhat.com) wrote:
-> Am 10.01.2019 um 12:41 hat Dr. David Alan Gilbert geschrieben:
-> > * Kevin Wolf (kwolf@redhat.com) wrote:
-> > > Am 09.01.2019 um 20:02 hat Eric Blake geschrieben:
-> > > > On 1/9/19 12:51 PM, Kevin Wolf wrote:
-> > > > 
-> > > > >> Indeed, and libvirt IS using 'savevm' via HMP via QMP's
-> > > > >> human-monitor-command, since there is no QMP counterpart for internal
-> > > > >> snapshot.  Even though lately we consistently tell people that internal
-> > > > >> snapshots are underdeveloped and you should use external snapshots, it
-> > > > >> does not get away from the fact that libvirt has been using 'savevm' to
-> > > > >> drive internal snapshots for years now, and that we MUST consider
-> > > > >> back-compat and/or add an introspectible QMP interface before making
-> > > > >> changes that would break libvirt.
-> > > > > 
-> > > > > Okay, so what does libvirt do when you request a snapshot with a
-> > > > > numerical name? Without having looked at the code, the best case I would
-> > > > > expect that it forbids them, and more realistically I suspect that we
-> > > > > may actually fix a bug for libvirt by changing the semantics.
-> > > > > 
-> > > > > Or does libvirt really use snapshot IDs rather than names?
-> > > > 
-> > > > At the moment, libvirt does not place any restriction on internal
-> > > > snapshot names, but passes the user's name through without thought of
-> > > > whether it is an id or a name.
-> > > > 
-> > > > So yes, arguably tightening the semantics fixes a libvirt bug for
-> > > > libvirt having allowed internal snapshots to get into an inconsistent
-> > > > state.
-> > > 
-> > > So there are two scenarios to consider with respect to breaking
-> > > backwards compatibility:
-> > > 
-> > > 1. There may be code out there that relies on numeric arguments being
-> > >    interpreted as IDs. This code will break if we make this change and
-> > >    numeric snapshot names exist. That such code exists is speculation
-> > >    (even though plausible) and we don't know how widespread it is.
-> > > 
-> > > 2. There may be code out there that blindly assumes that whatever it
-> > >    passes is interpreted as a name. Nobody considered that with a
-> > >    numeric snapshot name, it maybe misinterpreted as an ID. We know that
-> > >    this is true for libvirt, the single most used management tool for
-> > >    QEMU. More code like this may (and probably does) exist.
-> > > 
-> > > Essentially the same two categories exist for human users: those who
-> > > somehow found out that QEMU accepts IDs as monitor command arguments and
-> > > are using those (mitigated by not displaying IDs any more), and those
-> > > who are trapped because they wanted to access a numeric name, but
-> > > surprisingly got it interpreted as an ID. Both are speculation to some
-> > > degree, but my guess is that the latter group is larger.
-> > > 
-> > > Given all this, this is a no-brainer for me. We simplify the interface,
-> > > we simplify the code, we make things less confusing for manual users and
-> > > we fix the management tool that everybody uses. How could we not make
-> > > this change?
-> > > 
-> > > > But again, it falls in the category of "properly fixing this
-> > > > requires a lot of auditing, time, mental power, and unit tests", which
-> > > > makes it a rather daunting task to state for certain.
-> > > 
-> > > Fix the world before we can fix anything?
-> > 
-> > Can't we break this loop for the savevm command fairly easily; it's
-> > currently documnted as:
-> > 
-> > savevm [tag|id] 
-> > 
-> > If we made that:
-> > 
-> > savevm [-t] [-i] [tag|id]
-> > 
-> > then:
-> >   a) with neither -t or -i  it would behave in the same roulette way
-> >      as it does in the moment, and it might be a tag or id
-> > 
-> >   b) with -t we'd explicitly treat the parameter as a tag and it
-> >      would error if it wasn't found
-> > 
-> >   c) With -i we'd explicitly treat the parameter as an id and
-> >      it would error if it wasn't found
-> > 
-> > Since we still allow (a) it doesn't break any existing code.
-> 
-> If you can explain why we need both tag and id?
-> 
-> And by keeping the current behaviour, we might not break hypothetically
-> existing correct code, but we leave currently actually existing broken
-> code like libvirt broken.
++Oliver and Jonathan
 
-My only reason for leaving both tag & id was for the hypothetical
-existing current code; my assumption adding the above would be that we
-would then fix libvirt never to use (a),  probably always (b).
+I'm a little confused. Do you want to fuzz QEMU or to fuzz something else
+using QEMU? In case of the latter, there was some discussion on OSS-Fuzz
+and (I think) even a build support was (sort of) added:
+https://github.com/google/oss-fuzz/issues/1754
 
-Dave
-> Kevin
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+In any case, it would probably be "integrate QEMU into OSS-Fuzz" and not
+vice versa, since OSS-Fuzz is an infrastructure and you can't integrate it
+into QEMU.
+
+On Thu, Jan 10, 2019 at 6:02 AM Dmitry Vyukov <dvyukov@google.com> wrote:
+
+> On Thu, Jan 10, 2019 at 2:40 PM Bandan Das <bsd@redhat.com> wrote:
+> >
+> > Hi Stefan,
+> >
+> > Stefan Hajnoczi <stefanha@gmail.com> writes:
+> >
+> > > Hi folks,
+> > > I'd like to start fuzzing emulated devices in QEMU.  Here is an
+> > > internship project idea I'm proposing to do this.
+> > >
+> > > Any thoughts?  Want to co-mentor this in Google Summer of Code or
+> Outreachy?
+> > >
+> > > Stefan
+> > >
+> > > '''Summary:''' Integrate oss-fuzz into QEMU so that the virtio-blk
+> > > device can be fuzz tested.
+> > >
+> > > oss-fuzz offers a fuzz testing service to open source projects.  This
+> > > means random inputs are continuously tested against the program in
+> > > order to find crashes and other bugs.  Fuzz testing complements
+> > > hand-written test suites by exploring the input space of a program and
+> > > therefore the code paths that may be taken.
+> > >
+> > > The goal of this project is to integrate oss-fuzz into QEMU so that
+> > > the virtio-blk-pci device can be fuzzed at both the VIRTIO and PCI bus
+> > > level.  virtio-blk-pci is a PCI device, which means it is connected to
+> > > the virtual machine's PCI bus and has a certain set of registers that
+> > > can be programmed by the guest.  Furthermore, it is a VIRTIO device -
+> > > this is the specification the describes most of the functionality of
+> > > virtio-blk.  Bugs exist at both the PCI and VIRTIO levels, so it's
+> > > important to fuzz both of them.
+> > >
+> > > Fuzzing emulated devices involves accessing their hardware registers
+> > > randomly to make the device respond.  QEMU has a device testing
+> > > interface called "qtest" that accepts read/write and other commands
+> > > over a socket and is ideal for writing device-level tests.  You may
+> > > find that oss-fuzz works better integrated directly into the QEMU
+> > > program instead of as a separate qtest program, so you can consider
+> > > adding a new command-line option to QEMU for running in oss-fuzz mode.
+> >
+> > This sounds very interesting and if successful can easily be a stepping
+> stone
+> > to other sections. I would be interested in co-mentoring specifically
+> focusing
+> > on the PCI code.
+> >
+> > One of the things I remember getting into trouble with when I was trying
+> to hack
+> > on this, especially fuzzing Qemu as a whole is what would the run
+> environment
+> > be like ? Would Qemu attempt to run a regular guest in oss-fuzz mode or
+> only
+> > a certain part of Qemu (emulated devices for example) be somehow run
+> without
+> > interacting with other dependent components ?
+>
+> Ideally (from fuzzing perspective) we test just a single component and
+> everything else is stubbed out. But I don't know how feasible this is.
+> AFL can fork the whole process and then feed the input in some way.
+> This would allow to test the whole qemu without stubbing anything.
+> Should be possible with libFuzzer with some effort too.
+> I would say: start with whatever is simpler to do and then we will see
+> how good/bad it works.
+>
+> One thing I forgot to mention (though, not the top priority) is
+> libprotobuf-mutator:
+> https://github.com/google/libprotobuf-mutator#libprotobuf-mutator
+>
+> http://llvm.org/devmtg/2017-10/slides/Serebryany-Structure-aware%20fuzzing%20for%20Clang%20and%20LLVM%20with%20libprotobuf-mutator.pdf
+>
+> https://chromium.googlesource.com/chromium/src/testing/libfuzzer/+/HEAD/libprotobuf-mutator.md
+>
+> It allows fuzzer to work with structured inputs. Say, if you want as
+> input some sequence of actions (function calls) with some particular
+> arguments. This can be encoded as a protobuf message, and then fuzzer
+> function will interpret this protobuf message as actual actions. For
+> complex inputs this may be much more efficient than blob-mutations and
+> then some ad-hoc interpretation of that blob.
+>
+>
+>
+>
+> > > This project involves learning about VIRTIO and PCI devices, as well
+> > > as figuring out how to integrate oss-fuzz into QEMU so that it can
+> > > effective explore the code paths in virtio-blk device emulation code.
+> > > You will enjoy this project if you want to learn how device emulation
+> > > works and are interested in fuzzers.
+> > >
+> > > '''Links:'''
+> > > * [
+> https://github.com/google/oss-fuzz/blob/master/docs/ideal_integration.md
+> > > oss-fuzz integration overview]
+> > > * [
+> https://github.com/google/fuzzer-test-suite/blob/master/tutorial/libFuzzerTutorial.md
+> > > libfuzzer tutorial]
+> > > * [
+> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html
+> > > VIRTIO specification]
+> > > * [https://wiki.osdev.org/PCI PCI bus overview]
+> > >
+> > > '''Details:'''
+> > > * Skill level: intermediate
+> > > * Language: C
+> > > * Mentor: Stefan Hajnoczi <stefanha@redhat.com>
+>
