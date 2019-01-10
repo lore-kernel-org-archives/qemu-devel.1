@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47928)
+Received: from eggs.gnu.org ([209.51.188.92]:48482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghaNA-000624-JM
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:27:49 -0500
+	(envelope-from <lifei1214@126.com>) id 1ghaP2-0007Si-UZ
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:29:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghaN8-0005Z5-QG
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:27:48 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:47056)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ghaN7-0005Xt-A1
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:27:46 -0500
-Received: by mail-oi1-x241.google.com with SMTP id x202so9221019oif.13
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 05:27:43 -0800 (PST)
+	(envelope-from <lifei1214@126.com>) id 1ghaP1-0006DQ-VO
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:29:44 -0500
+Received: from m50-112.126.com ([123.125.50.112]:34900)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1ghaP0-0006CP-Vt
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:29:43 -0500
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-10-fli@suse.com>
+	<87a7kcml5i.fsf@dusky.pond.sub.org>
+	<36097839-654b-6d1f-b79e-f9bc174ec126@suse.cz>
+	<20190108065159.GA20511@xz-x1> <87o98ree00.fsf@dusky.pond.sub.org>
+From: Fei Li <lifei1214@126.com>
+Message-ID: <8e592b32-7984-7a02-10e9-45fb9eb248ef@126.com>
+Date: Thu, 10 Jan 2019 21:29:38 +0800
 MIME-Version: 1.0
-References: <1541672153-15529-1-git-send-email-gengdongjiu@huawei.com>
-	<1541672153-15529-11-git-send-email-gengdongjiu@huawei.com>
-In-Reply-To: <1541672153-15529-11-git-send-email-gengdongjiu@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 Jan 2019 13:27:31 +0000
-Message-ID: <CAFEAcA_toKXMDAcjTseB2WquCXkEKqh=GODiG1-tEUa32xy2bQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v15 10/10] target-arm: kvm64: handle SIGBUS
- signal from kernel or KVM
+In-Reply-To: <87o98ree00.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 09/16] qemu_thread: supplement
+ error handling for pci_edu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Jiri Slaby <jslaby@suse.cz>, shirley17fei@gmail.com, qemu-devel@nongnu.org
 
-On Thu, 8 Nov 2018 at 10:18, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+
+ÔÚ 2019/1/8 ÏÂÎç4:43, Markus Armbruster Ð´µÀ:
+> Peter Xu <peterx@redhat.com> writes:
 >
-> Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-> translates the host VA delivered by host to guest PA, then fill this PA
-> to guest APEI GHES memory, then notify guest according to the SIGBUS type.
-> There are two kinds of SIGBUS that QEMU needs to handle, which are
-> BUS_MCEERR_AO and BUS_MCEERR_AR.
+>> On Tue, Jan 08, 2019 at 07:14:11AM +0100, Jiri Slaby wrote:
+>>> On 07. 01. 19, 18:29, Markus Armbruster wrote:
+>>>>     static void pci_edu_uninit(PCIDevice *pdev)
+>>>>     {
+>>>>         EduState *edu = EDU(pdev);
+>>>>
+>>>>         qemu_mutex_lock(&edu->thr_mutex);
+>>>>         edu->stopping = true;
+>>>>         qemu_mutex_unlock(&edu->thr_mutex);
+>>>>         qemu_cond_signal(&edu->thr_cond);
+>>>>         qemu_thread_join(&edu->thread);
+>>>>
+>>>>         qemu_cond_destroy(&edu->thr_cond);
+>>>>         qemu_mutex_destroy(&edu->thr_mutex);
+>>>>
+>>>>         timer_del(&edu->dma_timer);
+>>>>     }
+>>>>
+>>>> Preexisting: pci_edu_uninit() neglects to call msi_uninit().  Jiri?\
+>>> I don't know, the MSI support was added in:
+>>> commit eabb5782f70b4a10975b24ccd7129929a05ac932
+>>> Author: Peter Xu <peterx@redhat.com>
+>>> Date:   Wed Sep 28 21:03:39 2016 +0800
+>>>
+>>>      hw/misc/edu: support MSI interrupt
+>>>
+>>> Hence CCing Peter.
+>> Hi, Jiri, Markus, Fei,
+>>
+>> IMHO msi_uninit() is optional since it only operates on the config
+>> space of the device to remove the capability or fix up the flags
+>> without really doing any real destruction of objects so nothing will
+>> be leaked (unlike msix_uninit, which should be required).
+> Michael, Marcel, is neglecting to call msi_uninit() okay, a harmless
+> bug, or a harmful bug?
 
-> +bool ghes_record_errors(uint32_t notify, uint64_t physical_address)
-> +{
-> +    uint64_t error_block_addr, read_ack_register_addr;
-> +    int read_ack_register = 0, loop = 0;
-> +    uint64_t start_addr = le32_to_cpu(ges.ghes_addr_le);
-> +    bool ret = GHES_CPER_FAIL;
-> +    const uint8_t error_source_id[] = { 0xff, 0xff, 0xff, 0xff,
-> +                                        0xff, 0xff, 0xff, 0, 1};
-> +
-> +    /*
-> +     * | +---------------------+ ges.ghes_addr_le
-> +     * | |error_block_address0|
-> +     * | +---------------------+
-> +     * | |error_block_address1|
-> +     * | +---------------------+ --+--
-> +     * | |    .............    | GHES_ADDRESS_SIZE
-> +     * | +---------------------+ --+--
-> +     * | |error_block_addressN|
-> +     * | +---------------------+
-> +     * | | read_ack_register0  |
-> +     * | +---------------------+ --+--
-> +     * | | read_ack_register1  | GHES_ADDRESS_SIZE
-> +     * | +---------------------+ --+--
-> +     * | |   .............     |
-> +     * | +---------------------+
-> +     * | | read_ack_registerN  |
-> +     * | +---------------------+ --+--
-> +     * | |      CPER           |   |
-> +     * | |      ....           | GHES_MAX_RAW_DATA_LENGT
-> +     * | |      CPER           |   |
-> +     * | +---------------------+ --+--
-> +     * | |    ..........       |
-> +     * | +---------------------+
-> +     * | |      CPER           |
-> +     * | |      ....           |
-> +     * | |      CPER           |
-> +     * | +---------------------+
-> +     */
-> +    if (physical_address && notify < ACPI_HEST_NOTIFY_RESERVED) {
+Kindly ping. :)
 
-Why is a zero physical address special here? Shouldn't we be
-able to report "the memory backing physaddr 0 has a fault" ?
+If corresponding change is needed, I'd like to do the update in the next 
+version.
 
-thanks
--- PMM
+>>                                                             But I do
+>> agree that calling msi_uninit() could be even nicer here.
+>>
+>> Anyone would like to post a patch? Or should I?
+> Please coordinate fixing this with Fei Li.
+Have a nice day, thanks all
+Fei
