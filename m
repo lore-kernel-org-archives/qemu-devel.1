@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55047)
+Received: from eggs.gnu.org ([209.51.188.92]:56490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghcGD-00023n-Ej
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:28:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ghcL1-0003fR-Dr
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:33:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghcGC-0006RW-Ic
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:28:45 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 10 Jan 2019 15:28:11 +0000
-Message-ID: <e2f687c3-ad05-8921-0528-8f28357542a6@virtuozzo.com>
-References: <20181214134240.217870-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20181214134240.217870-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <866D02A43AE8A14681E4CFAF9D663969@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1ghcL0-0008Sc-6M
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:33:43 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38020)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ghcKz-0008M3-Sz
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:33:42 -0500
+Received: by mail-ot1-x341.google.com with SMTP id e12so10274094otl.5
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 07:33:20 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] qcow2 check improvements part I
+References: <20190109015240.2116-1-fam@euphon.net>
+In-Reply-To: <20190109015240.2116-1-fam@euphon.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 Jan 2019 15:33:08 +0000
+Message-ID: <CAFEAcA93b2UTyJTN9Atswf7P75ARQExv9OTgTpt+zk9pwRYZdg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/2] Block/testing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,24 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Fam Zheng <fam@euphon.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-cGluZw0KDQoxNC4xMi4yMDE4IDE2OjQyLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiBIaSBhbGwhDQo+IA0KPiBUaGVzZSBzZXJpZXMgYXJlIGRlcml2ZWQgZnJvbSAiW1BB
-VENIIHYzIDAvOF0gcWNvdzIgY2hlY2sgaW1wcm92ZW1lbnRzIg0KPiAoaHR0cHM6Ly9saXN0cy5n
-bnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMTAvbXNnMDIyODQuaHRtbCkNCj4g
-DQo+IFNvbWUgcGF0Y2hlcyBhcmUgbmV3LCBzb21lIHBhdGNoZXMgYXJlIG5vdCBpbmNsdWRlZCBh
-bmQgYXJlIHBvc3Rwb25lZCB0bw0KPiBwYXJ0IElJLg0KPiANCj4gU28sIGhlcmU6DQo+IDAxLDAz
-IC0gdW5jaGFuZ2VkDQo+IDAyOiBoYW5kbGUgYnJva2VuIGlvdGVzdA0KPiAwNC0wNTogbmV3DQo+
-IA0KPiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICg1KToNCj4gICAgcWNvdzItcmVmY291
-bnQ6IGZpeCBjaGVja19vZmxhZ19jb3BpZWQNCj4gICAgcWNvdzItcmVmY291bnQ6IGF2b2lkIGVh
-dGluZyBSQU0NCj4gICAgcWNvdzItcmVmY291bnQ6IGNoZWNrX3JlZmNvdW50c19sMjogcmVkdWNl
-IGlnbm9yZWQgb3ZlcmxhcHMNCj4gICAgcWNvdzItcmVmY291bnQ6IGNoZWNrX3JlZmNvdW50c19s
-MjogZG9uJ3QgY291bnQgZml4ZWQgY2x1c3RlciBhcw0KPiAgICAgIGFsbG9jYXRlZA0KPiAgICBx
-Y293Mi1yZWZjb3VudDogZG9uJ3QgbWFzayBjb3JydXB0aW9ucyB1bmRlciBpbnRlcm5hbCBlcnJv
-cnMNCj4gDQo+ICAgYmxvY2svcWNvdzItcmVmY291bnQuYyAgICAgfCA4NyArKysrKysrKysrKysr
-KysrKysrKysrKy0tLS0tLS0tLS0tLS0tLQ0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8xMzggICAg
-IHwgMTIgKysrLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzEzOC5vdXQgfCAgNSArKy0NCj4g
-ICAzIGZpbGVzIGNoYW5nZWQsIDYxIGluc2VydGlvbnMoKyksIDQzIGRlbGV0aW9ucygtKQ0KPiAN
-Cg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Wed, 9 Jan 2019 at 01:53, Fam Zheng <fam@euphon.net> wrote:
+>
+> The following changes since commit 147923b1a901a0370f83a0f4c58ec1baffef22=
+f0:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20190108-pull-req=
+uest' into staging (2019-01-08 16:07:32 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/famz/qemu.git tags/staging-pull-request
+>
+> for you to fetch changes up to 4ce58d861bf740bb893bd28b974675ad3d9f98b5:
+>
+>   docker: Use a stable snapshot for Debian Sid (2019-01-09 09:38:34 +0800=
+)
+>
+> ----------------------------------------------------------------
+> Block/testing patches
+>
+> v2: Fix URL.
+>     Drop BSD patch.
+>
+> ----------------------------------------------------------------
+>
+> Li Feng (1):
+>   block/nvme: optimize the performance of nvme driver based on vfio-pci
+>
+> Philippe Mathieu-Daud=C3=A9 (1):
+>   docker: Use a stable snapshot for Debian Sid
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
