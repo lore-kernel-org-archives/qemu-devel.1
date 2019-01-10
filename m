@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56542)
+Received: from eggs.gnu.org ([209.51.188.92]:56761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghXkU-0008EO-3w
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:39:43 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghXl1-0000B9-QN
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:40:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghXkR-0003j3-KF
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:39:42 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34053)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1ghXkG-0003f6-L5
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:39:31 -0500
-Received: by mail-wm1-x343.google.com with SMTP id y185so13019124wmd.1
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 02:39:28 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghXl0-0004Eg-9h
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:40:15 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 10 Jan 2019 10:40:06 +0000
+Message-ID: <7bead05e-672a-fdc2-6291-e72090defb66@virtuozzo.com>
+References: <20190110071330.28136-1-eblake@redhat.com>
+	<20190110071330.28136-3-eblake@redhat.com>
+In-Reply-To: <20190110071330.28136-3-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B5AD32B65BB16D40BA8E02C7DDAED917@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-In-Reply-To: <20190109112728.9214-1-xieyongji@baidu.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 10 Jan 2019 14:39:13 +0400
-Message-ID: <CAJ+F1CLPFUnJANJs3SSine9YRXXqpR+gh6wHOLD=ivWpyURmJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 0/7] vhost-user-blk: Add support
- for backend reconnecting
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd: Merge nbd_export_set_name into
+ nbd_export_new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,110 +26,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongji Xie <elohimes@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, yury-kotov@yandex-team.ru, wrfsh@yandex-team.ru, nixun@baidu.com, QEMU <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Hi
-
-On Wed, Jan 9, 2019 at 3:28 PM <elohimes@gmail.com> wrote:
->
-> From: Xie Yongji <xieyongji@baidu.com>
->
-> This patchset is aimed at supporting qemu to reconnect
-> vhost-user-blk backend after vhost-user-blk backend crash or
-> restart.
->
-> The patch 1 uses exisiting wait/nowait options to make QEMU not
-> do a connect on client sockets during initialization of the chardev.
->
-> The patch 2 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
-> and VHOST_USER_SET_INFLIGHT_FD to support providing shared
-> memory to backend.
->
-> The patch 3,4 are the corresponding libvhost-user patches of
-> patch 2. Make libvhost-user support VHOST_USER_GET_INFLIGHT_FD
-> and VHOST_USER_SET_INFLIGHT_FD.
->
-> The patch 5 allows vhost-user-blk to use the two new messages
-> to get/set inflight buffer from/to backend.
->
-> The patch 6 supports vhost-user-blk to reconnect backend when
-> connection closed.
->
-> The patch 7 introduces VHOST_USER_PROTOCOL_F_SLAVE_SHMFD
-> to vhost-user-blk backend which is used to tell qemu that
-> we support reconnecting now.
->
-> To use it, we could start qemu with:
->
-> qemu-system-x86_64 \
->         -chardev socket,id=3Dchar0,path=3D/path/vhost.socket,nowait,recon=
-nect=3D1, \
->         -device vhost-user-blk-pci,chardev=3Dchar0 \
->
-> and start vhost-user-blk backend with:
->
-> vhost-user-blk -b /path/file -s /path/vhost.socket
->
-> Then we can restart vhost-user-blk at any time during VM running.
->
-> V3 to V4:
-> - Drop messages VHOST_USER_GET_SHM_SIZE and VHOST_USER_SET_SHM_FD
-> - Introduce two new messages VHOST_USER_GET_INFLIGHT_FD
->   and VHOST_USER_SET_INFLIGHT_FD
-> - Allocate inflight buffer in backend rather than in qemu
-> - Document a recommended format for inflight buffer
->
-> V2 to V3:
-> - Using exisiting wait/nowait options to control connection on
->   client sockets instead of introducing "disconnected" option.
-> - Support the case that vhost-user backend restart during initialzation
->   of vhost-user-blk device.
->
-> V1 to V2:
-> - Introduce "disconnected" option for chardev instead of reuse "wait"
->   option
-> - Support the case that QEMU starts before vhost-user backend
-> - Drop message VHOST_USER_SET_VRING_INFLIGHT
-> - Introduce two new messages VHOST_USER_GET_SHM_SIZE
->   and VHOST_USER_SET_SHM_FD
->
-> Xie Yongji (7):
->   char-socket: Enable "nowait" option on client sockets
-
-This patch breaks make check.
-
-It would be nice to add a test for the new nowait behaviour.
-
->   vhost-user: Support transferring inflight buffer between qemu and
->     backend
->   libvhost-user: Introduce vu_queue_map_desc()
->   libvhost-user: Support tracking inflight I/O in shared memory
->   vhost-user-blk: Add support to get/set inflight buffer
->   vhost-user-blk: Add support to reconnect backend
->   contrib/vhost-user-blk: enable inflight I/O tracking
->
->  Makefile                                |   2 +-
->  chardev/char-socket.c                   |  56 ++--
->  contrib/libvhost-user/libvhost-user.c   | 346 ++++++++++++++++++++----
->  contrib/libvhost-user/libvhost-user.h   |  29 ++
->  contrib/vhost-user-blk/vhost-user-blk.c |   3 +-
->  docs/interop/vhost-user.txt             |  60 ++++
->  hw/block/vhost-user-blk.c               | 223 ++++++++++++---
->  hw/virtio/vhost-user.c                  | 108 ++++++++
->  hw/virtio/vhost.c                       | 108 ++++++++
->  include/hw/virtio/vhost-backend.h       |   9 +
->  include/hw/virtio/vhost-user-blk.h      |   5 +
->  include/hw/virtio/vhost.h               |  19 ++
->  qapi/char.json                          |   3 +-
->  qemu-options.hx                         |   9 +-
->  14 files changed, 851 insertions(+), 129 deletions(-)
->
-> --
-> 2.17.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+MTAuMDEuMjAxOSAxMDoxMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gVGhlIGV4aXN0aW5nIE5CRCBj
+b2RlIGhhZCBhIHdlaXJkIHNwbGl0IHdoZXJlIG5iZF9leHBvcnRfbmV3KCkNCj4gY3JlYXRlZCBh
+biBleHBvcnQgYnV0IGRpZCBub3QgYWRkIGl0IHRvIHRoZSBsaXN0IG9mIGV4cG9ydGVkDQo+IG5h
+bWVzIHVudGlsIGEgbGF0ZXIgbmJkX2V4cG9ydF9zZXRfbmFtZSgpIGNhbWUgYWxvbmcgYW5kIGdy
+YWJiZWQNCj4gYSBzZWNvbmQgcmVmZXJlbmNlIG9uIHRoZSBvYmplY3Q7IGxhdGVyLCBuYmRfZXhw
+b3J0X2Nsb3NlKCkNCj4gZHJvcHMgdGhlIHNlY29uZCByZWZlcmVuY2UuICBCdXQgc2luY2Ugd2Ug
+bmV2ZXIgY2hhbmdlIHRoZQ0KPiBuYW1lIG9mIGFuIE5CRCBleHBvcnQgd2hpbGUgaXQgaXMgZXhw
+b3NlZCwgaXQgaXMgZWFzaWVyIHRvIGp1c3QNCj4gaW5saW5lIHRoZSBwcm9jZXNzIG9mIHNldHRp
+bmcgdGhlIG5hbWUgYXMgcGFydCBvZiBjcmVhdGluZyB0aGUNCj4gZXhwb3J0Lg0KPiANCj4gSW5s
+aW5lIHRoZSBjb250ZW50cyBvZiBuYmRfZXhwb3J0X3NldF9uYW1lKCkgYW5kDQo+IG5iZF9leHBv
+cnRfc2V0X2Rlc2NyaXB0aW9uKCkgaW50byB0aGUgdHdvIHBvaW50cyBpbiBhbiBleHBvcnQNCj4g
+bGlmZWN5Y2xlIHdoZXJlIHRoZXkgbWF0dGVyLCB0aGVuIGFkanVzdCBib3RoIGNhbGxlcnMgdG8g
+cGFzcw0KPiB0aGUgbmFtZSB1cCBmcm9udC4gIE5vdGUgdGhhdCBhbGwgY2FsbGVycyBwYXNzIGEg
+bm9uLU5VTEwgbmFtZSwNCj4gKHBhc3NpbmcgTlVMTCBhdCBjcmVhdGlvbiB3YXMgZm9yIG9sZCBz
+dHlsZSBzZXJ2ZXJzLCBidXQgd2UNCj4gcmVtb3ZlZCBzdXBwb3J0IGZvciB0aGF0IGluIGNvbW1p
+dCA3ZjdkZmUyYSkuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVk
+aGF0LmNvbT4NCj4gLS0tDQo+ICAgaW5jbHVkZS9ibG9jay9uYmQuaCB8ICAzICstLQ0KPiAgIGJs
+b2NrZGV2LW5iZC5jICAgICAgfCAgNSArKy0tLQ0KPiAgIG5iZC9zZXJ2ZXIuYyAgICAgICAgfCA0
+NSArKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gICBxZW11
+LW5iZC5jICAgICAgICAgIHwgIDUgKystLS0NCj4gICA0IGZpbGVzIGNoYW5nZWQsIDIxIGluc2Vy
+dGlvbnMoKyksIDM3IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvYmxv
+Y2svbmJkLmggYi9pbmNsdWRlL2Jsb2NrL25iZC5oDQo+IGluZGV4IDY1NDAyZDMzOTY0Li4yZjlh
+MmFlYjczYyAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9jay9uYmQuaA0KPiArKysgYi9pbmNs
+dWRlL2Jsb2NrL25iZC5oDQo+IEBAIC0yOTUsNiArMjk1LDcgQEAgdHlwZWRlZiBzdHJ1Y3QgTkJE
+RXhwb3J0IE5CREV4cG9ydDsNCj4gICB0eXBlZGVmIHN0cnVjdCBOQkRDbGllbnQgTkJEQ2xpZW50
+Ow0KPiANCj4gICBOQkRFeHBvcnQgKm5iZF9leHBvcnRfbmV3KEJsb2NrRHJpdmVyU3RhdGUgKmJz
+LCBvZmZfdCBkZXZfb2Zmc2V0LCBvZmZfdCBzaXplLA0KPiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICBjb25zdCBjaGFyICpuYW1lLCBjb25zdCBjaGFyICpkZXNjcmlwdGlvbiwNCj4gICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHVpbnQxNl90IG5iZGZsYWdzLCB2b2lkICgqY2xvc2UpKE5C
+REV4cG9ydCAqKSwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJvb2wgd3JpdGV0aHJv
+dWdoLCBCbG9ja0JhY2tlbmQgKm9uX2VqZWN0X2JsaywNCj4gICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIEVycm9yICoqZXJycCk7DQo+IEBAIC0zMDYsOCArMzA3LDYgQEAgdm9pZCBuYmRfZXhw
+b3J0X3B1dChOQkRFeHBvcnQgKmV4cCk7DQo+ICAgQmxvY2tCYWNrZW5kICpuYmRfZXhwb3J0X2dl
+dF9ibG9ja2RldihOQkRFeHBvcnQgKmV4cCk7DQo+IA0KPiAgIE5CREV4cG9ydCAqbmJkX2V4cG9y
+dF9maW5kKGNvbnN0IGNoYXIgKm5hbWUpOw0KPiAtdm9pZCBuYmRfZXhwb3J0X3NldF9uYW1lKE5C
+REV4cG9ydCAqZXhwLCBjb25zdCBjaGFyICpuYW1lKTsNCj4gLXZvaWQgbmJkX2V4cG9ydF9zZXRf
+ZGVzY3JpcHRpb24oTkJERXhwb3J0ICpleHAsIGNvbnN0IGNoYXIgKmRlc2NyaXB0aW9uKTsNCj4g
+ICB2b2lkIG5iZF9leHBvcnRfY2xvc2VfYWxsKHZvaWQpOw0KPiANCj4gICB2b2lkIG5iZF9jbGll
+bnRfbmV3KFFJT0NoYW5uZWxTb2NrZXQgKnNpb2MsDQo+IGRpZmYgLS1naXQgYS9ibG9ja2Rldi1u
+YmQuYyBiL2Jsb2NrZGV2LW5iZC5jDQo+IGluZGV4IDFkMTcwYzgwYjgyLi5mNWVkYmMyN2Q4OCAx
+MDA2NDQNCj4gLS0tIGEvYmxvY2tkZXYtbmJkLmMNCj4gKysrIGIvYmxvY2tkZXYtbmJkLmMNCj4g
+QEAgLTE3NCwxNCArMTc0LDEzIEBAIHZvaWQgcW1wX25iZF9zZXJ2ZXJfYWRkKGNvbnN0IGNoYXIg
+KmRldmljZSwgYm9vbCBoYXNfbmFtZSwgY29uc3QgY2hhciAqbmFtZSwNCj4gICAgICAgICAgIHdy
+aXRhYmxlID0gZmFsc2U7DQo+ICAgICAgIH0NCj4gDQo+IC0gICAgZXhwID0gbmJkX2V4cG9ydF9u
+ZXcoYnMsIDAsIC0xLCB3cml0YWJsZSA/IDAgOiBOQkRfRkxBR19SRUFEX09OTFksDQo+ICsgICAg
+ZXhwID0gbmJkX2V4cG9ydF9uZXcoYnMsIDAsIC0xLCBuYW1lLCBOVUxMLA0KPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgIHdyaXRhYmxlID8gMCA6IE5CRF9GTEFHX1JFQURfT05MWSwNCj4gICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgTlVMTCwgZmFsc2UsIG9uX2VqZWN0X2JsaywgZXJycCk7
+DQo+ICAgICAgIGlmICghZXhwKSB7DQo+ICAgICAgICAgICByZXR1cm47DQo+ICAgICAgIH0NCj4g
+DQo+IC0gICAgbmJkX2V4cG9ydF9zZXRfbmFtZShleHAsIG5hbWUpOw0KPiAtDQo+ICAgICAgIC8q
+IFRoZSBsaXN0IG9mIG5hbWVkIGV4cG9ydHMgaGFzIGEgc3Ryb25nIHJlZmVyZW5jZSB0byB0aGlz
+IGV4cG9ydCBub3cgYW5kDQo+ICAgICAgICAqIG91ciBvbmx5IHdheSBvZiBhY2Nlc3NpbmcgaXQg
+aXMgdGhyb3VnaCBuYmRfZXhwb3J0X2ZpbmQoKSwgc28gd2UgY2FuIGRyb3ANCj4gICAgICAgICog
+dGhlIHN0cm9uZyByZWZlcmVuY2UgdGhhdCBpcyBAZXhwLiAqLw0KPiBkaWZmIC0tZ2l0IGEvbmJk
+L3NlcnZlci5jIGIvbmJkL3NlcnZlci5jDQo+IGluZGV4IDk4MzI3MDg4Y2I0Li42NzZmYjQ4ODZk
+MCAxMDA2NDQNCj4gLS0tIGEvbmJkL3NlcnZlci5jDQo+ICsrKyBiL25iZC9zZXJ2ZXIuYw0KPiBA
+QCAtMTQ1Niw2ICsxNDU2LDcgQEAgc3RhdGljIHZvaWQgbmJkX2VqZWN0X25vdGlmaWVyKE5vdGlm
+aWVyICpuLCB2b2lkICpkYXRhKQ0KPiAgIH0NCj4gDQo+ICAgTkJERXhwb3J0ICpuYmRfZXhwb3J0
+X25ldyhCbG9ja0RyaXZlclN0YXRlICpicywgb2ZmX3QgZGV2X29mZnNldCwgb2ZmX3Qgc2l6ZSwN
+Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgY2hhciAqbmFtZSwgY29uc3QgY2hh
+ciAqZGVzY3JpcHRpb24sDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MTZfdCBu
+YmRmbGFncywgdm9pZCAoKmNsb3NlKShOQkRFeHBvcnQgKiksDQo+ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBib29sIHdyaXRldGhyb3VnaCwgQmxvY2tCYWNrZW5kICpvbl9lamVjdF9ibGss
+DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApDQo+IEBAIC0xNDcx
+LDYgKzE0NzIsNyBAQCBOQkRFeHBvcnQgKm5iZF9leHBvcnRfbmV3KEJsb2NrRHJpdmVyU3RhdGUg
+KmJzLCBvZmZfdCBkZXZfb2Zmc2V0LCBvZmZfdCBzaXplLA0KPiAgICAgICAgKiB0aGF0IEJEUlZf
+T19JTkFDVElWRSBpcyBjbGVhcmVkIGFuZCB0aGUgaW1hZ2UgaXMgcmVhZHkgZm9yIHdyaXRlDQo+
+ICAgICAgICAqIGFjY2VzcyBzaW5jZSB0aGUgZXhwb3J0IGNvdWxkIGJlIGF2YWlsYWJsZSBiZWZv
+cmUgbWlncmF0aW9uIGhhbmRvdmVyLg0KPiAgICAgICAgKi8NCj4gKyAgICBhc3NlcnQobmFtZSk7
+DQo+ICAgICAgIGN0eCA9IGJkcnZfZ2V0X2Fpb19jb250ZXh0KGJzKTsNCj4gICAgICAgYWlvX2Nv
+bnRleHRfYWNxdWlyZShjdHgpOw0KPiAgICAgICBiZHJ2X2ludmFsaWRhdGVfY2FjaGUoYnMsIE5V
+TEwpOw0KPiBAQCAtMTQ5NCw2ICsxNDk2LDggQEAgTkJERXhwb3J0ICpuYmRfZXhwb3J0X25ldyhC
+bG9ja0RyaXZlclN0YXRlICpicywgb2ZmX3QgZGV2X29mZnNldCwgb2ZmX3Qgc2l6ZSwNCj4gICAg
+ICAgUVRBSUxRX0lOSVQoJmV4cC0+Y2xpZW50cyk7DQo+ICAgICAgIGV4cC0+YmxrID0gYmxrOw0K
+PiAgICAgICBleHAtPmRldl9vZmZzZXQgPSBkZXZfb2Zmc2V0Ow0KPiArICAgIGV4cC0+bmFtZSA9
+IGdfc3RyZHVwKG5hbWUpOw0KPiArICAgIGV4cC0+ZGVzY3JpcHRpb24gPSBnX3N0cmR1cChkZXNj
+cmlwdGlvbik7DQo+ICAgICAgIGV4cC0+bmJkZmxhZ3MgPSBuYmRmbGFnczsNCj4gICAgICAgZXhw
+LT5zaXplID0gc2l6ZSA8IDAgPyBibGtfZ2V0bGVuZ3RoKGJsaykgOiBzaXplOw0KPiAgICAgICBp
+ZiAoZXhwLT5zaXplIDwgMCkgew0KPiBAQCAtMTUxMywxMCArMTUxNywxNCBAQCBOQkRFeHBvcnQg
+Km5iZF9leHBvcnRfbmV3KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBvZmZfdCBkZXZfb2Zmc2V0LCBv
+ZmZfdCBzaXplLA0KPiAgICAgICAgICAgZXhwLT5lamVjdF9ub3RpZmllci5ub3RpZnkgPSBuYmRf
+ZWplY3Rfbm90aWZpZXI7DQo+ICAgICAgICAgICBibGtfYWRkX3JlbW92ZV9ic19ub3RpZmllcihv
+bl9lamVjdF9ibGssICZleHAtPmVqZWN0X25vdGlmaWVyKTsNCj4gICAgICAgfQ0KPiArICAgIFFU
+QUlMUV9JTlNFUlRfVEFJTCgmZXhwb3J0cywgZXhwLCBuZXh0KTsNCj4gKyAgICBuYmRfZXhwb3J0
+X2dldChleHApOw0KPiAgICAgICByZXR1cm4gZXhwOw0KPiANCj4gICBmYWlsOg0KPiAgICAgICBi
+bGtfdW5yZWYoYmxrKTsNCj4gKyAgICBnX2ZyZWUoZXhwLT5uYW1lKTsNCj4gKyAgICBnX2ZyZWUo
+ZXhwLT5kZXNjcmlwdGlvbik7DQo+ICAgICAgIGdfZnJlZShleHApOw0KPiAgICAgICByZXR1cm4g
+TlVMTDsNCj4gICB9DQo+IEBAIC0xNTMzLDMzICsxNTQxLDYgQEAgTkJERXhwb3J0ICpuYmRfZXhw
+b3J0X2ZpbmQoY29uc3QgY2hhciAqbmFtZSkNCj4gICAgICAgcmV0dXJuIE5VTEw7DQo+ICAgfQ0K
+PiANCj4gLXZvaWQgbmJkX2V4cG9ydF9zZXRfbmFtZShOQkRFeHBvcnQgKmV4cCwgY29uc3QgY2hh
+ciAqbmFtZSkNCj4gLXsNCj4gLSAgICBpZiAoZXhwLT5uYW1lID09IG5hbWUpIHsNCj4gLSAgICAg
+ICAgcmV0dXJuOw0KPiAtICAgIH0NCj4gLQ0KPiAtICAgIG5iZF9leHBvcnRfZ2V0KGV4cCk7DQo+
+IC0gICAgaWYgKGV4cC0+bmFtZSAhPSBOVUxMKSB7DQo+IC0gICAgICAgIGdfZnJlZShleHAtPm5h
+bWUpOw0KPiAtICAgICAgICBleHAtPm5hbWUgPSBOVUxMOw0KPiAtICAgICAgICBRVEFJTFFfUkVN
+T1ZFKCZleHBvcnRzLCBleHAsIG5leHQpOw0KPiAtICAgICAgICBuYmRfZXhwb3J0X3B1dChleHAp
+Ow0KPiAtICAgIH0NCj4gLSAgICBpZiAobmFtZSAhPSBOVUxMKSB7DQo+IC0gICAgICAgIG5iZF9l
+eHBvcnRfZ2V0KGV4cCk7DQo+IC0gICAgICAgIGV4cC0+bmFtZSA9IGdfc3RyZHVwKG5hbWUpOw0K
+PiAtICAgICAgICBRVEFJTFFfSU5TRVJUX1RBSUwoJmV4cG9ydHMsIGV4cCwgbmV4dCk7DQo+IC0g
+ICAgfQ0KPiAtICAgIG5iZF9leHBvcnRfcHV0KGV4cCk7DQo+IC19DQo+IC0NCj4gLXZvaWQgbmJk
+X2V4cG9ydF9zZXRfZGVzY3JpcHRpb24oTkJERXhwb3J0ICpleHAsIGNvbnN0IGNoYXIgKmRlc2Ny
+aXB0aW9uKQ0KPiAtew0KPiAtICAgIGdfZnJlZShleHAtPmRlc2NyaXB0aW9uKTsNCj4gLSAgICBl
+eHAtPmRlc2NyaXB0aW9uID0gZ19zdHJkdXAoZGVzY3JpcHRpb24pOw0KPiAtfQ0KPiAtDQo+ICAg
+dm9pZCBuYmRfZXhwb3J0X2Nsb3NlKE5CREV4cG9ydCAqZXhwKQ0KPiAgIHsNCj4gICAgICAgTkJE
+Q2xpZW50ICpjbGllbnQsICpuZXh0Ow0KPiBAQCAtMTU2OCw4ICsxNTQ5LDE0IEBAIHZvaWQgbmJk
+X2V4cG9ydF9jbG9zZShOQkRFeHBvcnQgKmV4cCkNCj4gICAgICAgUVRBSUxRX0ZPUkVBQ0hfU0FG
+RShjbGllbnQsICZleHAtPmNsaWVudHMsIG5leHQsIG5leHQpIHsNCj4gICAgICAgICAgIGNsaWVu
+dF9jbG9zZShjbGllbnQsIHRydWUpOw0KPiAgICAgICB9DQo+IC0gICAgbmJkX2V4cG9ydF9zZXRf
+bmFtZShleHAsIE5VTEwpOw0KPiAtICAgIG5iZF9leHBvcnRfc2V0X2Rlc2NyaXB0aW9uKGV4cCwg
+TlVMTCk7DQo+ICsgICAgaWYgKGV4cC0+bmFtZSkgew0KPiArICAgICAgICBuYmRfZXhwb3J0X3B1
+dChleHApOw0KPiArICAgICAgICBnX2ZyZWUoZXhwLT5uYW1lKTsNCj4gKyAgICAgICAgZXhwLT5u
+YW1lID0gTlVMTDsNCj4gKyAgICAgICAgUVRBSUxRX1JFTU9WRSgmZXhwb3J0cywgZXhwLCBuZXh0
+KTsNCg0KZXhwLT5uYW1lIGlzIGFsd2F5cyBub24temVybywgYW5kIF9nZXQgYW5kIF9JTlNFUlRf
+VEFJTCB3ZXJlIGRvbmUgaW5kZXBlbmRlbnRseSBmcm9tIG5hbWUsDQpzbyB3aXRoIHRoZXNlIGZv
+dXIgbGluZXMgZG9uZSB1bmNvbmRpdGlvbmFsbHk6DQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2Vt
+ZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQo+ICsgICAgfQ0K
+PiArICAgIGdfZnJlZShleHAtPmRlc2NyaXB0aW9uKTsNCj4gKyAgICBleHAtPmRlc2NyaXB0aW9u
+ID0gTlVMTDsNCj4gICAgICAgbmJkX2V4cG9ydF9wdXQoZXhwKTsNCj4gICB9DQo+IA0KPiBkaWZm
+IC0tZ2l0IGEvcWVtdS1uYmQuYyBiL3FlbXUtbmJkLmMNCj4gaW5kZXggMjgwN2UxMzIzOTYuLjY5
+NmJkNzhhMmUyIDEwMDY0NA0KPiAtLS0gYS9xZW11LW5iZC5jDQo+ICsrKyBiL3FlbXUtbmJkLmMN
+Cj4gQEAgLTEwMTUsMTAgKzEwMTUsOSBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3Yp
+DQo+ICAgICAgICAgICB9DQo+ICAgICAgIH0NCj4gDQo+IC0gICAgZXhwID0gbmJkX2V4cG9ydF9u
+ZXcoYnMsIGRldl9vZmZzZXQsIGZkX3NpemUsIG5iZGZsYWdzLCBuYmRfZXhwb3J0X2Nsb3NlZCwN
+Cj4gKyAgICBleHAgPSBuYmRfZXhwb3J0X25ldyhicywgZGV2X29mZnNldCwgZmRfc2l6ZSwgZXhw
+b3J0X25hbWUsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgZXhwb3J0X2Rlc2NyaXB0aW9u
+LCBuYmRmbGFncywgbmJkX2V4cG9ydF9jbG9zZWQsDQo+ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHdyaXRldGhyb3VnaCwgTlVMTCwgJmVycm9yX2ZhdGFsKTsNCj4gLSAgICBuYmRfZXhwb3J0
+X3NldF9uYW1lKGV4cCwgZXhwb3J0X25hbWUpOw0KPiAtICAgIG5iZF9leHBvcnRfc2V0X2Rlc2Ny
+aXB0aW9uKGV4cCwgZXhwb3J0X2Rlc2NyaXB0aW9uKTsNCj4gDQo+ICAgICAgIGlmIChkZXZpY2Up
+IHsNCj4gICAjaWYgSEFWRV9OQkRfREVWSUNFDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0K
+VmxhZGltaXINCg==
