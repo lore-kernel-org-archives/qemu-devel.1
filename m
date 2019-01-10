@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36323)
+Received: from eggs.gnu.org ([209.51.188.92]:36357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gheXh-0004RA-Ge
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:54:58 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gheXi-0004SI-Mp
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:54:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gheXg-00017l-Mx
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:54:57 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37323)
+	(envelope-from <alex.bennee@linaro.org>) id 1gheXh-00018l-Hg
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:54:58 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:42357)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gheXg-00016a-Gv
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:54:56 -0500
-Received: by mail-wm1-x343.google.com with SMTP id g67so12893480wmd.2
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 09:54:56 -0800 (PST)
+	id 1gheXh-00017f-Aa
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:54:57 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id q18so12374342wrx.9
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 09:54:57 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 10 Jan 2019 17:45:16 +0000
-Message-Id: <20190110174516.21586-20-alex.bennee@linaro.org>
+Date: Thu, 10 Jan 2019 17:45:13 +0000
+Message-Id: <20190110174516.21586-17-alex.bennee@linaro.org>
 In-Reply-To: <20190110174516.21586-1-alex.bennee@linaro.org>
 References: <20190110174516.21586-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 19/19] tests/docker: remove SID_AGE test hack
+Subject: [Qemu-devel] [PATCH v1 16/19] docker: Use a stable snapshot for
+ Debian Sid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +31,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: ymankad@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: ymankad@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>
 
-Now we are using "named" snapshots of debian-sid we can rely on the
-existing checksum mechanism for detecting changes.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+The Debian Sid repository is not garanteed to be stable, as his
+'unstable' name suggest :)
+To allow quick testing, packages are pushed various time a day,
+which my be annoying when trying to use it for stable development
+(which is not recommended, but Sid provides edge packages we use
+for testing).
+
+Debian provides repositories snapshots which are suitable for our
+use. Pick a recent date that works. When required, update to newer
+releases will be easy.
+
+This fixes current issues with this image:
+
+  $ make docker-image-debian-sid
+  [...]
+  The following packages have unmet dependencies:
+   build-essential : Depends: dpkg-dev (>= 1.17.11) but it is not going to be installed
+   git : Depends: perl but it is not going to be installed
+         Depends: liberror-perl but it is not going to be installed
+   pkg-config : Depends: libdpkg-perl but it is not going to be installed
+   texinfo : Depends: perl (>= 5.26.2-6) but it is not going to be installed
+             Depends: libtext-unidecode-perl but it is not going to be installed
+             Depends: libxml-libxml-perl but it is not going to be installed
+  E: Unable to correct problems, you have held broken packages.
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+[AJB: also tweak FROM to a earlier snapshot]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include | 13 -------------
- 1 file changed, 13 deletions(-)
+ tests/docker/dockerfiles/debian-sid.docker | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 9467e9d088..7032c68895 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -98,19 +98,6 @@ docker-image-debian-s390x-cross: docker-image-debian9
- docker-image-debian-win32-cross: docker-image-debian8-mxe
- docker-image-debian-win64-cross: docker-image-debian8-mxe
+diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
+index 4e4cda0ba5..676941cb32 100644
+--- a/tests/docker/dockerfiles/debian-sid.docker
++++ b/tests/docker/dockerfiles/debian-sid.docker
+@@ -11,7 +11,12 @@
+ # updated and trigger a re-build.
+ #
  
--# Debian SID images - we are tracking a rolling distro so we want to
--# force a re-build of the base image if we ever need to build one of
--# its children.
--ifndef SKIP_DOCKER_BUILD
--ifeq ($(HAVE_USER_DOCKER),y)
--SID_AGE=$(shell $(DOCKER_SCRIPT) check --checktype=age --olderthan=180 --quiet qemu:debian-sid)
--ifeq ($(SID_AGE),)
--else
--docker-image-debian-sid: NOCACHE=1
--endif
--endif
--endif
--
- docker-image-debian-alpha-cross: docker-image-debian-sid
- docker-image-debian-hppa-cross: docker-image-debian-sid
- docker-image-debian-m68k-cross: docker-image-debian-sid
+-FROM debian:sid-slim
++# This must be earlier than the snapshot date we are aiming for
++FROM debian:sid-20181011-slim
++
++# Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
++ENV DEBIAN_SNAPSHOT_DATE "20181030"
++RUN sed -i "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [check-valid-until=no] \1snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT_DATE} \2%" /etc/apt/sources.list
+ 
+ # Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
+ ENV DEBIAN_SNAPSHOT_DATE "20181030"
 -- 
 2.17.1
