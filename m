@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54959)
+Received: from eggs.gnu.org ([209.51.188.92]:56447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghfk8-0002oe-8s
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:11:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghfr7-0004wK-M6
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:19:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghfk7-0001Ea-5h
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:11:52 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190103213320.2653-1-lbloch@janustech.com>
-	<20190103213320.2653-2-lbloch@janustech.com>
-	<8736q3ebs2.fsf@dusky.pond.sub.org>
-	<d0736347-867d-49f5-5615-dfe5f9b82412@janustech.com>
-	<87h8eghej3.fsf@dusky.pond.sub.org>
-	<2a653203-669e-f66e-cdab-82458ec72874@janustech.com>
-Date: Thu, 10 Jan 2019 20:11:41 +0100
-In-Reply-To: <2a653203-669e-f66e-cdab-82458ec72874@janustech.com> (Leonid
-	Bloch's message of "Thu, 10 Jan 2019 16:49:27 +0000")
-Message-ID: <87h8egba4y.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1ghfr6-0008MU-Tr
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:19:05 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 10 Jan 2019 13:18:54 -0600
+Message-Id: <20190110191901.5082-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Auto-generate the sizes
- lookup table
+Subject: [Qemu-devel] [PATCH v3 0/6] include: Auto-generate the sizes lookup
+ table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +20,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: lbloch@janustech.com, armbru@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org
 
-Leonid Bloch <lbloch@janustech.com> writes:
+Patches speak louder than words.  This is my counter-proposal to
+Leonid's thread on how best to respresent the S_*iB macros in units.h,
+where my proposal is that we don't need them at all. (hence my subject
+line, even though it is completely unrelated to the series)
 
-> On 1/10/19 2:40 PM, Markus Armbruster wrote:
->> Leonid Bloch <lbloch@janustech.com> writes:
->>=20
->>> Hi,
->>>
->>> On 1/8/19 11:31 AM, Markus Armbruster wrote:
->>>> I'd leave it hard-coded.  Replacing a few trivial defines by an arguab=
-ly
->>>> less trivial script doesn't feel like an improvement.  In this case, it
->>>> doesn't even save lines.
->>>
->>> As I've said, I'm fine with that. The autogeneration sounds the right
->>> thing to do here, as the table is autogenertaed anyway, but indeed it is
->>> already there, explained, and even the script for generating it appears
->>> in the comments for reproducibility.
->>>
->>>>
->>>> I'm not sure I'd use shell for this, but since you already wrote it and
->>>> it works...
->>>>
->>>
->>> If you've noticed, the original script was in AWK. But to be as generic
->>> as possible, I didn't write the generation script in AWK because even
->>> AWK is not guaranteed to be installed on the build system. The only
->>> interpreted language that is guaranteed to be there is shell (most basic
->>> shell) because .configure itself needs it.
->>=20
->> Well,
->>=20
->>      $ grep -w awk configure
->>          maj=3D`libgcrypt-config --version | awk -F . '{print $1}'`
->>          min=3D`libgcrypt-config --version | awk -F . '{print $2}'`
->>=20
->> The build also requires Python.
->
-> Not for critical things as this. I mean it can still build OK without=20
-> Python.
+True, my diffstat is even bigger, but I think it is more maintainable
+in the long run (if calling QemuOpts maintainable is even appropriate).
 
-You can=C3=83't.  Try it :)
+Eric Blake (6):
+  qemu-option: Allow integer defaults
+  block: Take advantage of QemuOpt default integers
+  Revert "vdi: Use a literal number of bytes for DEFAULT_CLUSTER_SIZE"
+  qemu: Prefer '(x * MiB)' over 'S_xiB'
+  Revert "include: Add a comment to explain the origin of sizes' lookup
+    table"
+  Revert "include: Add a lookup table of sizes"
 
->>=20
->> [...]
->>=20
+ block/qcow2.h         | 10 +++---
+ include/qemu/option.h | 12 +++++++
+ include/qemu/units.h  | 73 -------------------------------------------
+ block/parallels.c     |  2 +-
+ block/qcow2.c         |  2 +-
+ block/qed.c           |  2 +-
+ block/vdi.c           |  6 ++--
+ block/vhdx.c          |  3 +-
+ util/qemu-option.c    | 69 ++++++++++++++++++++++++++++++++++------
+ 9 files changed, 84 insertions(+), 95 deletions(-)
+
+--=20
+2.20.1
