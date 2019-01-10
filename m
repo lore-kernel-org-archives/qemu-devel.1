@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55944)
+Received: from eggs.gnu.org ([209.51.188.92]:55959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZHV-0004Uh-RW
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:54 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZHY-0004Wi-6w
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZHU-0007Yj-UE
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:53 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43506)
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZHX-0007bR-Fs
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:56 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35850)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ghZHU-0007Y8-Ne
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:52 -0500
-Received: by mail-pl1-x643.google.com with SMTP id gn14so5109073plb.10
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:17:52 -0800 (PST)
+	id 1ghZHX-0007al-AE
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:55 -0500
+Received: by mail-pl1-x644.google.com with SMTP id g9so5121865plo.3
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:17:55 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 Jan 2019 23:17:28 +1100
-Message-Id: <20190110121736.23448-4-richard.henderson@linaro.org>
+Date: Thu, 10 Jan 2019 23:17:29 +1100
+Message-Id: <20190110121736.23448-5-richard.henderson@linaro.org>
 In-Reply-To: <20190110121736.23448-1-richard.henderson@linaro.org>
 References: <20190110121736.23448-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 03/11] target/arm: Add BT and BTYPE to tb->flags
+Subject: [Qemu-devel] [PATCH 04/11] target/arm: Record the GP bit for a page
+ in MemTxAttrs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +30,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+This isn't really a transaction attribute, but that's the most
+convenient place to hold a random bit of information within the
+softmmu tlb.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h           |  2 ++
- target/arm/translate.h     |  4 ++++
- target/arm/helper.c        | 22 +++++++++++++++-------
- target/arm/translate-a64.c |  2 ++
- 4 files changed, 23 insertions(+), 7 deletions(-)
+ include/exec/memattrs.h | 2 ++
+ target/arm/helper.c     | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 8179c07250..506c490a16 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2990,6 +2990,8 @@ FIELD(TBFLAG_A64, TBII, 0, 2)
- FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
- FIELD(TBFLAG_A64, ZCR_LEN, 4, 4)
- FIELD(TBFLAG_A64, PAUTH_ACTIVE, 8, 1)
-+FIELD(TBFLAG_A64, BT, 9, 1)
-+FIELD(TBFLAG_A64, BTYPE, 10, 2)
- 
- static inline bool bswap_code(bool sctlr_b)
- {
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index bb37d35741..3d5e8bacac 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -69,6 +69,10 @@ typedef struct DisasContext {
-     bool ss_same_el;
-     /* True if v8.3-PAuth is active.  */
-     bool pauth_active;
-+    /* True with v8.5-BTI and SCTLR_ELx.BT* set.  */
-+    bool bt;
-+    /* A copy of PSTATE.BTYPE, which will be 0 without v8.5-BTI.  */
-+    uint8_t btype;
-     /* Bottom two bits of XScale c15_cpar coprocessor access control reg */
-     int c15_cpar;
-     /* TCG op of the current insn_start.  */
+diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+index d4a1642098..39d61188e1 100644
+--- a/include/exec/memattrs.h
++++ b/include/exec/memattrs.h
+@@ -35,6 +35,8 @@ typedef struct MemTxAttrs {
+     unsigned int secure:1;
+     /* Memory access is usermode (unprivileged) */
+     unsigned int user:1;
++    /* Page is marked as "guarded" */
++    unsigned int guarded:1;
+     /* Requester ID (for MSI for example) */
+     unsigned int requester_id:16;
+ } MemTxAttrs;
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 0e1bf521ab..138d9d5565 100644
+index 138d9d5565..4e9ea2ed39 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -13076,6 +13076,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+@@ -9927,6 +9927,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+     bool ttbr1_valid;
+     uint64_t descaddrmask;
+     bool aarch64 = arm_el_is_aa64(env, el);
++    bool guarded = false;
  
-     if (is_a64(env)) {
-         ARMCPU *cpu = arm_env_get_cpu(env);
-+        uint64_t sctlr;
- 
-         *pc = env->pc;
-         flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
-@@ -13120,6 +13121,12 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-             flags = FIELD_DP32(flags, TBFLAG_A64, ZCR_LEN, zcr_len);
+     /* TODO:
+      * This code does not handle the different format TCR for VTCR_EL2.
+@@ -10098,6 +10099,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
          }
+         /* Merge in attributes from table descriptors */
+         attrs |= nstable << 3; /* NS */
++        guarded |= extract64(descriptor, 50, 1);  /* GP */
+         if (param.hpd) {
+             /* HPD disables all the table attributes except NSTable.  */
+             break;
+@@ -10143,6 +10145,10 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+          */
+         txattrs->secure = false;
+     }
++    /* When in aarch64 mode, and BTI is enabled, remember GP in the IOTLB.  */
++    if (aarch64 && guarded && cpu_isar_feature(aa64_bti, cpu)) {
++        txattrs->guarded = true;
++    }
  
-+        if (current_el == 0) {
-+            /* FIXME: ARMv8.1-VHE S2 translation regime.  */
-+            sctlr = env->cp15.sctlr_el[1];
-+        } else {
-+            sctlr = env->cp15.sctlr_el[current_el];
-+        }
-         if (cpu_isar_feature(aa64_pauth, cpu)) {
-             /*
-              * In order to save space in flags, we record only whether
-@@ -13127,17 +13134,18 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-              * a nop, or "active" when some action must be performed.
-              * The decision of which action to take is left to a helper.
-              */
--            uint64_t sctlr;
--            if (current_el == 0) {
--                /* FIXME: ARMv8.1-VHE S2 translation regime.  */
--                sctlr = env->cp15.sctlr_el[1];
--            } else {
--                sctlr = env->cp15.sctlr_el[current_el];
--            }
-             if (sctlr & (SCTLR_EnIA | SCTLR_EnIB | SCTLR_EnDA | SCTLR_EnDB)) {
-                 flags = FIELD_DP32(flags, TBFLAG_A64, PAUTH_ACTIVE, 1);
-             }
-         }
-+
-+        if (cpu_isar_feature(aa64_bti, cpu)) {
-+            /* Note that SCTLR_EL[23].BT == SCTLR_BT1.  */
-+            if (sctlr & (current_el == 0 ? SCTLR_BT0 : SCTLR_BT1)) {
-+                flags = FIELD_DP32(flags, TBFLAG_A64, BT, 1);
-+            }
-+            flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
-+        }
-     } else {
-         *pc = env->regs[15];
-         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e43f0982f9..ca2ae40701 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -13800,6 +13800,8 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
-     dc->sve_excp_el = FIELD_EX32(tb_flags, TBFLAG_A64, SVEEXC_EL);
-     dc->sve_len = (FIELD_EX32(tb_flags, TBFLAG_A64, ZCR_LEN) + 1) * 16;
-     dc->pauth_active = FIELD_EX32(tb_flags, TBFLAG_A64, PAUTH_ACTIVE);
-+    dc->bt = FIELD_EX32(tb_flags, TBFLAG_A64, BT);
-+    dc->btype = FIELD_EX32(tb_flags, TBFLAG_A64, BTYPE);
-     dc->vec_len = 0;
-     dc->vec_stride = 0;
-     dc->cp_regs = arm_cpu->cp_regs;
+     if (cacheattrs != NULL) {
+         if (mmu_idx == ARMMMUIdx_S2NS) {
 -- 
 2.17.2
