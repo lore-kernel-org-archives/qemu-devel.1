@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32966)
+Received: from eggs.gnu.org ([209.51.188.92]:33354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ghY5p-0005fQ-Ma
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:01:47 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ghY6J-0005si-Kn
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:02:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ghY3o-0000Rr-2G
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:59:40 -0500
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:46055)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1ghY3n-0000RR-SF
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:59:40 -0500
-Received: by mail-yb1-xb44.google.com with SMTP id q2so4238809ybd.12
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 02:59:39 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1ghXwc-0004Gy-1x
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:52:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ghXwb-0004Go-S7
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:52:13 -0500
+Date: Thu, 10 Jan 2019 11:52:03 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190110115203.47ec729f.cohuck@redhat.com>
+In-Reply-To: <20190110020259.8492-3-ehabkost@redhat.com>
+References: <20190110020259.8492-1-ehabkost@redhat.com>
+	<20190110020259.8492-3-ehabkost@redhat.com>
 MIME-Version: 1.0
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<20190110102551.GD19025@stefanha-x1.localdomain>
-In-Reply-To: <20190110102551.GD19025@stefanha-x1.localdomain>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Thu, 10 Jan 2019 18:59:27 +0800
-Message-ID: <CAONzpcYgVWUFg1uSHOLzOS5en2vHP_=oNXQvWQEZd9FdYi2uxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 0/7] vhost-user-blk: Add support
- for backend reconnecting
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] globals: Allow global properties to
+ be optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
-	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, "Dr.
+	David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, 10 Jan 2019 at 18:25, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->
-> On Wed, Jan 09, 2019 at 07:27:21PM +0800, elohimes@gmail.com wrote:
-> > From: Xie Yongji <xieyongji@baidu.com>
-> >
-> > This patchset is aimed at supporting qemu to reconnect
-> > vhost-user-blk backend after vhost-user-blk backend crash or
-> > restart.
-> >
-> > The patch 1 uses exisiting wait/nowait options to make QEMU not
-> > do a connect on client sockets during initialization of the chardev.
-> >
-> > The patch 2 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
-> > and VHOST_USER_SET_INFLIGHT_FD to support providing shared
-> > memory to backend.
->
-> Can you describe the problem that the inflight I/O shared memory region
-> solves?
->
+On Thu, 10 Jan 2019 00:02:58 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-The backend need to get inflight I/O and do I/O replay after restart.
-Now we can only get used_idx in used_ring. It's not enough. Because we
-might not process descriptors in the same order which they have been
-made available sometimes. A simple example:
-https://patchwork.kernel.org/cover/10715305/#22375607. So we need a
-shared memory to track inflight I/O.
+> Making some global properties optional will let us simplify
+> compat code when a given property works on most (but not all)
+> subclasses of a given type.
+> 
+> Device types will be able to opt out from optional compat
+> properties by simply not registering those properties, or by
+> making the property setter report an error.
 
-Thanks,
-Yongji
+I'm not sure whether we want to conflate "property does not exist" and
+"setter returns an error". I can see the value in "apply a setting if
+the property exists; if it doesn't exist, the setting is not
+applicable". But if you also allow the setter to return an error, you
+will not notice if you e.g. have been providing junk in the value and
+it errors out everywhere.
+
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Note: the "An error is fatal for non-hotplugged devices [...]"
+> comment that appears in the diff scope is inaccurate, but I will
+> fix that in a separate patch because I don't want this to get
+> into the way of fixing the crash.
+> ---
+>  include/hw/qdev-core.h | 3 +++
+>  qom/object.c           | 4 +++-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index bc014c1c9f..463e1ddb1e 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -250,6 +250,8 @@ struct PropertyInfo {
+>  /**
+>   * GlobalProperty:
+>   * @used: Set to true if property was used when initializing a device.
+> + * @optional: If set to true, errors when applying the property won't be
+> + *            reported by object_apply_global_props().
+>   *
+>   * An error is fatal for non-hotplugged devices, when the global is applied.
+>   */
+> @@ -258,6 +260,7 @@ typedef struct GlobalProperty {
+>      const char *property;
+>      const char *value;
+>      bool used;
+> +    bool optional;
+>  } GlobalProperty;
+>  
+>  static inline void
+> diff --git a/qom/object.c b/qom/object.c
+> index 4e5226ca12..226ddf0189 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -387,7 +387,9 @@ void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp
+>          }
+>          p->used = true;
+>          object_property_parse(obj, p->value, p->property, &err);
+> -        if (err != NULL) {
+> +        if (p->optional) {
+> +            error_free(err);
+> +        } else if (err != NULL) {
+>              error_prepend(&err, "can't apply global %s.%s=%s: ",
+>                            p->driver, p->property, p->value);
+>              /*
