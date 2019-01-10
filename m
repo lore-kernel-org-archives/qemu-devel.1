@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55959)
+Received: from eggs.gnu.org ([209.51.188.92]:56018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZHY-0004Wi-6w
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:58 -0500
+	(envelope-from <berrange@redhat.com>) id 1ghZHa-0004X4-UE
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZHX-0007bR-Fs
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:56 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35850)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ghZHX-0007al-AE
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:55 -0500
-Received: by mail-pl1-x644.google.com with SMTP id g9so5121865plo.3
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:17:55 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 Jan 2019 23:17:29 +1100
-Message-Id: <20190110121736.23448-5-richard.henderson@linaro.org>
-In-Reply-To: <20190110121736.23448-1-richard.henderson@linaro.org>
-References: <20190110121736.23448-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 04/11] target/arm: Record the GP bit for a page
- in MemTxAttrs
+	(envelope-from <berrange@redhat.com>) id 1ghZHZ-0007dE-Nk
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50624)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghZHZ-0007cS-Ea
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:57 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A6DEA29A60
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 12:17:56 +0000 (UTC)
+Date: Thu, 10 Jan 2019 12:17:50 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190110121750.GK2178@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190110120843.3839-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190110120843.3839-1-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] usb: assign unique serial numbers to
+ hid devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +34,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
 
-This isn't really a transaction attribute, but that's the most
-convenient place to hold a random bit of information within the
-softmmu tlb.
+On Thu, Jan 10, 2019 at 01:08:43PM +0100, Gerd Hoffmann wrote:
+> Windows guests have trouble dealing with usb devices having identical
+> serial numbers.  So, assign unique serial numbers to usb hid devices.
+> All other usb devices have this already.
+> 
+> In the past the fixed serial number has been used to indicate working
+> remote setup to linux guests.  Here is a bit of history:
+> 
+>  * First there was nothing.
+>  * Then I added a rule to udev checking for serial == 42.
+>    (this is in rhel-6).
+>  * Then systemd + udev merged.
+>  * Then I changed the rule to check for serial != 1 instead, so we can
+>    use any serial but "1" which is the one the old broken devices had
+>    (this is in rhel-7).  March 2014 in upstream systemd.
+>  * Then all usb power management rules where dropped from systemd (June
+>    2015).  Which I figured today (Sept 2018), after wondering that the
+>    rules are gone in fedora 28.
+> 
+> So, three years ago the serial number check was dropped upstream, yet I
+> hav't seen a single report about autosuspend issues (or cpu usage for
+> usb emulation going up, which is the typical symtom).
+> 
+> So I figured I can stop worring that changing the serial number will
+> break things and just do it.
+> 
+> And even if it turns out autosuspend is still an issue:  I think
+> meanwhile we can really stop worrying about guests running in old qemu
+> versions with broken usb suspend (fixed in 0.13 !).  If needed we can
+> enable autosuspend unconditionally in guests.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/usb/dev-hid.c | 26 +++++++++++++++-----------
+>  1 file changed, 15 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/usb/dev-hid.c b/hw/usb/dev-hid.c
+> index 62d18290dc..205236e9b1 100644
+> --- a/hw/usb/dev-hid.c
+> +++ b/hw/usb/dev-hid.c
+> @@ -61,10 +61,13 @@ enum {
+>      STR_PRODUCT_MOUSE,
+>      STR_PRODUCT_TABLET,
+>      STR_PRODUCT_KEYBOARD,
+> -    STR_SERIALNUMBER,
+> +    STR_SERIAL_COMPAT,
+>      STR_CONFIG_MOUSE,
+>      STR_CONFIG_TABLET,
+>      STR_CONFIG_KEYBOARD,
+> +    STR_SERIAL_MOUSE,
+> +    STR_SERIAL_TABLET,
+> +    STR_SERIAL_KEYBOARD,
+>  };
+>  
+>  static const USBDescStrings desc_strings = {
+> @@ -72,10 +75,13 @@ static const USBDescStrings desc_strings = {
+>      [STR_PRODUCT_MOUSE]    = "QEMU USB Mouse",
+>      [STR_PRODUCT_TABLET]   = "QEMU USB Tablet",
+>      [STR_PRODUCT_KEYBOARD] = "QEMU USB Keyboard",
+> -    [STR_SERIALNUMBER]     = "42", /* == remote wakeup works */
+> +    [STR_SERIAL_COMPAT]    = "42",
+>      [STR_CONFIG_MOUSE]     = "HID Mouse",
+>      [STR_CONFIG_TABLET]    = "HID Tablet",
+>      [STR_CONFIG_KEYBOARD]  = "HID Keyboard",
+> +    [STR_SERIAL_MOUSE]     = "89126",
+> +    [STR_SERIAL_TABLET]    = "28754",
+> +    [STR_SERIAL_KEYBOARD]  = "68284",
+>  };
+>  
+>  static const USBDescIface desc_iface_mouse = {
+> @@ -375,7 +381,7 @@ static const USBDesc desc_mouse = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_MOUSE,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_MOUSE,
+>      },
+>      .full = &desc_device_mouse,
+>      .str  = desc_strings,
+> @@ -389,7 +395,7 @@ static const USBDesc desc_mouse2 = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_MOUSE,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_MOUSE,
+>      },
+>      .full = &desc_device_mouse,
+>      .high = &desc_device_mouse2,
+> @@ -404,7 +410,7 @@ static const USBDesc desc_tablet = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_TABLET,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_TABLET,
+>      },
+>      .full = &desc_device_tablet,
+>      .str  = desc_strings,
+> @@ -418,7 +424,7 @@ static const USBDesc desc_tablet2 = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_TABLET,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_TABLET,
+>      },
+>      .full = &desc_device_tablet,
+>      .high = &desc_device_tablet2,
+> @@ -433,7 +439,7 @@ static const USBDesc desc_keyboard = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_KEYBOARD,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_KEYBOARD,
+>      },
+>      .full = &desc_device_keyboard,
+>      .str  = desc_strings,
+> @@ -447,7 +453,7 @@ static const USBDesc desc_keyboard2 = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_KEYBOARD,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_KEYBOARD,
+>      },
+>      .full = &desc_device_keyboard,
+>      .high = &desc_device_keyboard2,
+> @@ -718,9 +724,7 @@ static void usb_hid_initfn(USBDevice *dev, int kind,
+>          return;
+>      }
+>  
+> -    if (dev->serial) {
+> -        usb_desc_set_string(dev, STR_SERIALNUMBER, dev->serial);
+> -    }
+> +    usb_desc_create_serial(dev);
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/exec/memattrs.h | 2 ++
- target/arm/helper.c     | 6 ++++++
- 2 files changed, 8 insertions(+)
+Don't we need some kind of machine type compat handling  to avoid
+the serial number being changed during migration ?
 
-diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
-index d4a1642098..39d61188e1 100644
---- a/include/exec/memattrs.h
-+++ b/include/exec/memattrs.h
-@@ -35,6 +35,8 @@ typedef struct MemTxAttrs {
-     unsigned int secure:1;
-     /* Memory access is usermode (unprivileged) */
-     unsigned int user:1;
-+    /* Page is marked as "guarded" */
-+    unsigned int guarded:1;
-     /* Requester ID (for MSI for example) */
-     unsigned int requester_id:16;
- } MemTxAttrs;
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 138d9d5565..4e9ea2ed39 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9927,6 +9927,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-     bool ttbr1_valid;
-     uint64_t descaddrmask;
-     bool aarch64 = arm_el_is_aa64(env, el);
-+    bool guarded = false;
- 
-     /* TODO:
-      * This code does not handle the different format TCR for VTCR_EL2.
-@@ -10098,6 +10099,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-         }
-         /* Merge in attributes from table descriptors */
-         attrs |= nstable << 3; /* NS */
-+        guarded |= extract64(descriptor, 50, 1);  /* GP */
-         if (param.hpd) {
-             /* HPD disables all the table attributes except NSTable.  */
-             break;
-@@ -10143,6 +10145,10 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
-          */
-         txattrs->secure = false;
-     }
-+    /* When in aarch64 mode, and BTI is enabled, remember GP in the IOTLB.  */
-+    if (aarch64 && guarded && cpu_isar_feature(aa64_bti, cpu)) {
-+        txattrs->guarded = true;
-+    }
- 
-     if (cacheattrs != NULL) {
-         if (mmu_idx == ARMMMUIdx_S2NS) {
+
+Regards,
+Daniel
 -- 
-2.17.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
