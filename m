@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46203)
+Received: from eggs.gnu.org ([209.51.188.92]:48693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ghbsN-00036w-Vx
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:04:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ghbzO-0007zc-Cv
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:11:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ghbsG-0007OR-Gm
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:04:06 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 10 Jan 2019 17:03:35 +0200
-Message-Id: <4a595def20efc9d1d076850d79a2c7e6d0996ffd.1547132561.git.berto@igalia.com>
-In-Reply-To: <cover.1547132561.git.berto@igalia.com>
-References: <cover.1547132561.git.berto@igalia.com>
-In-Reply-To: <cover.1547132561.git.berto@igalia.com>
-References: <cover.1547132561.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 1/6] block: Acquire the AioContext in
- virtio_blk_device_realize()
+	(envelope-from <kwolf@redhat.com>) id 1ghbzM-0003lw-Gu
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:11:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48230)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ghbzE-0003P1-BN
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:11:16 -0500
+Date: Thu, 10 Jan 2019 16:11:01 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190110151101.GB6361@linux.fritz.box>
+References: <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
+	<a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+	<200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
+	<20190109172023.GK4867@localhost.localdomain>
+	<be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
+	<40ef0a8d-3a25-4cc3-95f8-82bc4513776c@redhat.com>
+	<20190109185154.GL4867@localhost.localdomain>
+	<56880d06-a214-2486-2e80-c565b33461b3@redhat.com>
+	<20190110112508.GA6361@linux.fritz.box>
+	<20190110114113.GC2589@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190110114113.GC2589@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
+ ID anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,107 +36,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, armbru@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, muriloo@linux.ibm.com
 
-This fixes the following crash:
+Am 10.01.2019 um 12:41 hat Dr. David Alan Gilbert geschrieben:
+> * Kevin Wolf (kwolf@redhat.com) wrote:
+> > Am 09.01.2019 um 20:02 hat Eric Blake geschrieben:
+> > > On 1/9/19 12:51 PM, Kevin Wolf wrote:
+> > > 
+> > > >> Indeed, and libvirt IS using 'savevm' via HMP via QMP's
+> > > >> human-monitor-command, since there is no QMP counterpart for internal
+> > > >> snapshot.  Even though lately we consistently tell people that internal
+> > > >> snapshots are underdeveloped and you should use external snapshots, it
+> > > >> does not get away from the fact that libvirt has been using 'savevm' to
+> > > >> drive internal snapshots for years now, and that we MUST consider
+> > > >> back-compat and/or add an introspectible QMP interface before making
+> > > >> changes that would break libvirt.
+> > > > 
+> > > > Okay, so what does libvirt do when you request a snapshot with a
+> > > > numerical name? Without having looked at the code, the best case I would
+> > > > expect that it forbids them, and more realistically I suspect that we
+> > > > may actually fix a bug for libvirt by changing the semantics.
+> > > > 
+> > > > Or does libvirt really use snapshot IDs rather than names?
+> > > 
+> > > At the moment, libvirt does not place any restriction on internal
+> > > snapshot names, but passes the user's name through without thought of
+> > > whether it is an id or a name.
+> > > 
+> > > So yes, arguably tightening the semantics fixes a libvirt bug for
+> > > libvirt having allowed internal snapshots to get into an inconsistent
+> > > state.
+> > 
+> > So there are two scenarios to consider with respect to breaking
+> > backwards compatibility:
+> > 
+> > 1. There may be code out there that relies on numeric arguments being
+> >    interpreted as IDs. This code will break if we make this change and
+> >    numeric snapshot names exist. That such code exists is speculation
+> >    (even though plausible) and we don't know how widespread it is.
+> > 
+> > 2. There may be code out there that blindly assumes that whatever it
+> >    passes is interpreted as a name. Nobody considered that with a
+> >    numeric snapshot name, it maybe misinterpreted as an ID. We know that
+> >    this is true for libvirt, the single most used management tool for
+> >    QEMU. More code like this may (and probably does) exist.
+> > 
+> > Essentially the same two categories exist for human users: those who
+> > somehow found out that QEMU accepts IDs as monitor command arguments and
+> > are using those (mitigated by not displaying IDs any more), and those
+> > who are trapped because they wanted to access a numeric name, but
+> > surprisingly got it interpreted as an ID. Both are speculation to some
+> > degree, but my guess is that the latter group is larger.
+> > 
+> > Given all this, this is a no-brainer for me. We simplify the interface,
+> > we simplify the code, we make things less confusing for manual users and
+> > we fix the management tool that everybody uses. How could we not make
+> > this change?
+> > 
+> > > But again, it falls in the category of "properly fixing this
+> > > requires a lot of auditing, time, mental power, and unit tests", which
+> > > makes it a rather daunting task to state for certain.
+> > 
+> > Fix the world before we can fix anything?
+> 
+> Can't we break this loop for the savevm command fairly easily; it's
+> currently documnted as:
+> 
+> savevm [tag|id] 
+> 
+> If we made that:
+> 
+> savevm [-t] [-i] [tag|id]
+> 
+> then:
+>   a) with neither -t or -i  it would behave in the same roulette way
+>      as it does in the moment, and it might be a tag or id
+> 
+>   b) with -t we'd explicitly treat the parameter as a tag and it
+>      would error if it wasn't found
+> 
+>   c) With -i we'd explicitly treat the parameter as an id and
+>      it would error if it wasn't found
+> 
+> Since we still allow (a) it doesn't break any existing code.
 
-{ "execute": "blockdev-add",
-  "arguments": {"driver": "null-co", "node-name": "hd0"}}
-{ "execute": "object-add",
-  "arguments": {"qom-type": "iothread", "id": "iothread0"}}
-{ "execute": "x-blockdev-set-iothread",
-  "arguments": {"node-name": "hd0", "iothread": "iothread0"}}
-{ "execute": "device_add",
-  "arguments": {"id": "virtio0", "driver": "virtio-blk-pci",
-                "drive": "hd0"}}
-qemu: qemu_mutex_unlock_impl: Operation not permitted
-Aborted
+If you can explain why we need both tag and id?
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- hw/block/virtio-blk.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+And by keeping the current behaviour, we might not break hypothetically
+existing correct code, but we leave currently actually existing broken
+code like libvirt broken.
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index f208c6ddb9..5357da82af 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -912,6 +912,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOBlock *s = VIRTIO_BLK(dev);
-     VirtIOBlkConf *conf = &s->conf;
-+    AioContext *ctx;
-     Error *err = NULL;
-     unsigned i;
- 
-@@ -919,30 +920,34 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         error_setg(errp, "drive property not set");
-         return;
-     }
-+
-+    ctx = blk_get_aio_context(conf->conf.blk);
-+    aio_context_acquire(ctx);
-+
-     if (!blk_is_inserted(conf->conf.blk)) {
-         error_setg(errp, "Device needs media, but drive is empty");
--        return;
-+        goto out;
-     }
-     if (!conf->num_queues) {
-         error_setg(errp, "num-queues property must be larger than 0");
--        return;
-+        goto out;
-     }
-     if (!is_power_of_2(conf->queue_size) ||
-         conf->queue_size > VIRTQUEUE_MAX_SIZE) {
-         error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
-                    "must be a power of 2 (max %d)",
-                    conf->queue_size, VIRTQUEUE_MAX_SIZE);
--        return;
-+        goto out;
-     }
- 
-     if (!blkconf_apply_backend_options(&conf->conf,
-                                        blk_is_read_only(conf->conf.blk), true,
-                                        errp)) {
--        return;
-+        goto out;
-     }
-     s->original_wce = blk_enable_write_cache(conf->conf.blk);
-     if (!blkconf_geometry(&conf->conf, NULL, 65535, 255, 255, errp)) {
--        return;
-+        goto out;
-     }
- 
-     blkconf_blocksizes(&conf->conf);
-@@ -951,7 +956,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         conf->conf.physical_block_size) {
-         error_setg(errp,
-                    "logical_block_size > physical_block_size not supported");
--        return;
-+        goto out;
-     }
- 
-     virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-@@ -968,7 +973,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-     if (err != NULL) {
-         error_propagate(errp, err);
-         virtio_cleanup(vdev);
--        return;
-+        goto out;
-     }
- 
-     s->change = qemu_add_vm_change_state_handler(virtio_blk_dma_restart_cb, s);
-@@ -976,6 +981,9 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-     blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size);
- 
-     blk_iostatus_enable(s->blk);
-+
-+out:
-+    aio_context_release(ctx);
- }
- 
- static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
--- 
-2.11.0
+Kevin
