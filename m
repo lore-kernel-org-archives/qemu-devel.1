@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46165)
+Received: from eggs.gnu.org ([209.51.188.92]:48981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1ghXD5-0001Ji-BR
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:05:12 -0500
+	(envelope-from <jusual@mail.ru>) id 1ghXJI-0003MG-JB
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:11:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1ghXD4-0007x6-Eg
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:05:11 -0500
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Thu, 10 Jan 2019 10:04:59 +0000
-Message-ID: <91dfd3e9-7293-4301-e3ac-852d8a038d4e@janustech.com>
-References: <20190103213320.2653-1-lbloch@janustech.com>
-	<20190103213320.2653-2-lbloch@janustech.com>
-	<20190108122021.GB11492@linux.fritz.box>
-In-Reply-To: <20190108122021.GB11492@linux.fritz.box>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0E54482364786A44A9DF0AF147E28F99@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jusual@mail.ru>) id 1ghXJH-0002Na-0A
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:11:35 -0500
+References: <20190110094020.18354-1-stefanha@redhat.com>
+	<20190110094020.18354-3-stefanha@redhat.com>
+	<cd32de08-afd0-4b8b-a10a-99e1d88d1755@redhat.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <5cc00012-1929-22a0-cbf8-14573b083ae7@mail.ru>
+Date: Thu, 10 Jan 2019 13:11:05 +0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Auto-generate the sizes
- lookup table
+In-Reply-To: <cd32de08-afd0-4b8b-a10a-99e1d88d1755@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] tests/microbit-test: add TWI stub
+ device test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,24 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>, =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Alberto Garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, qemu-arm@nongnu.org, contrib@steffen-goertz.de
 
-SGksDQoNCk9uIDEvOC8xOSAyOjIwIFBNLCBLZXZpbiBXb2xmIHdyb3RlOg0KPiBBbSAwMy4wMS4y
-MDE5IHVtIDIyOjMzIGhhdCBMZW9uaWQgQmxvY2ggZ2VzY2hyaWViZW46DQo+PiBUaGUgbG9va3Vw
-IHRhYmxlIGZvciBwb3dlci1vZi10d28gc2l6ZXMgaXMgbm93IGF1dG8tZ2VuZXJhdGVkIGR1cmlu
-ZyB0aGUNCj4+IGJ1aWxkLCBhbmQgbm90IGhhcmQtY29kZWQgaW50byB0aGUgdW5pdHMuaCBmaWxl
-Lg0KPj4NCj4+IFRoaXMgcGFydGlhbGx5IHJldmVydHMgY29tbWl0IDU0MGI4NDkyNjE4ZWIuDQo+
-Pg0KPj4gU2lnbmVkLW9mZi1ieTogTGVvbmlkIEJsb2NoIDxsYmxvY2hAamFudXN0ZWNoLmNvbT4N
-Cj4gDQo+IER1cmluZyBhIGRvd25zdHJlYW0gcmV2aWV3LCBNYXggZm91bmQgYSBwcm9ibGVtIHdp
-dGggdGhlIHRhYmxlIHRoYXQgd2UNCj4gY291bGQgZml4IHdoaWxlIHdlJ3JlIHRvdWNoaW5nIGl0
-Og0KPiANCj4gICAgICBVcHN0cmVhbTogQWxsID49IFNfMkdpQiBhcmUgbm90IHZhbGlkIGludHMu
-ICAocWVtdSBhc3N1bWVzIHRoYXQNCj4gICAgICBzaXplb2YoaW50KSA9PSA0LCByaWdodD8pICBT
-byBTXzJHaUIgc2hvdWxkIGJlIDIxNDc0ODM2NDh1IGFuZCBhbGwNCj4gICAgICBhYm92ZSBzaG91
-bGQgYmUgLi4udWxsIG9yIGJldHRlciBVSU5UNjRfQygpLg0KDQpCdXQgdGhlIGluaXRpYWwgcmVh
-c29uaW5nIGZvciB0aGlzIHRhYmxlIHdhcyB0byBoYXZlIGEgcHVyZSBudW1iZXIgDQp0aGVyZS4g
-SWYgdGhlcmUgd2lsbCBiZSBzdHJpbmdzIGxpa2UgIjIxNDc0ODM2NDh1L3VsbCIgb3IgDQoiVUlO
-VDY0X0MoLi4uKSIgdGhlcmUsIHRoZXkgd2lsbCBiZSBzdHJpbmdpZmllZCwgbGl0ZXJhbGx5LCBh
-bmQgd2lsbCANCmFwcGVhciBhcyBzdWNoIGluc2lkZSB0aGUgYmluYXJ5LiBJZiBzcGVjaWZ5aW5n
-IHRoZSB1bml0NjQgdHlwZSBpcyANCnJlYWxseSBuZWVkZWQsIG9uZSBjYW4gYWx3YXlzIHVzZSwg
-ZS5nLiwgMiAqIEdpQiwgZnJvbSB1bml0cy5oLg0KDQpMZW9uaWQuDQo=
+
+
+On 10.01.2019 12:48, Thomas Huth wrote:
+> On 2019-01-10 10:40, Stefan Hajnoczi wrote:
+>> This test verifies that we read back the expected I2C WHO_AM_I register
+>> values for the accelerometer/magnetometer.
+>>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>>   tests/microbit-test.c | 44 +++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 44 insertions(+)
+>>
+>> diff --git a/tests/microbit-test.c b/tests/microbit-test.c
+>> index 0c125535f6..dcdc0cd41a 100644
+>> --- a/tests/microbit-test.c
+>> +++ b/tests/microbit-test.c
+>> @@ -21,6 +21,49 @@
+>>   #include "hw/arm/nrf51.h"
+>>   #include "hw/gpio/nrf51_gpio.h"
+>>   #include "hw/timer/nrf51_timer.h"
+>> +#include "hw/i2c/microbit_i2c.h"
+>> +
+>> +/* Read a byte from I2C device at @addr from register @reg */
+>> +static uint32_t i2c_read_byte(uint32_t addr, uint32_t reg)
+>> +{
+>> +    uint32_t val;
+>> +
+>> +    writel(NRF51_TWI_BASE + NRF51_TWI_REG_ADDRESS, addr);
+>> +    writel(NRF51_TWI_BASE + NRF51_TWI_TASK_STARTTX, 1);
+>> +    writel(NRF51_TWI_BASE + NRF51_TWI_REG_TXD, reg);
+>> +    val = readl(NRF51_TWI_BASE + NRF51_TWI_EVENT_TXDSENT);
+>> +    g_assert_cmpuint(val, ==, 1);
+>> +    writel(NRF51_TWI_BASE + NRF51_TWI_TASK_STOP, 1);
+>> +
+>> +    writel(NRF51_TWI_BASE + NRF51_TWI_TASK_STARTRX, 1);
+>> +    val = readl(NRF51_TWI_BASE + NRF51_TWI_EVENT_RXDREADY);
+>> +    g_assert_cmpuint(val, ==, 1);
+>> +    val = readl(NRF51_TWI_BASE + NRF51_TWI_REG_RXD);
+>> +    writel(NRF51_TWI_BASE + NRF51_TWI_TASK_STOP, 1);
+> 
+> Any chance that you could use qemu_writel() right from the start here?
+> That will make it easier to finally get rid of global_qtest one day...
+
+I'll send a patch soon to fix it.
+But this test can be merged without corrections.
+
+Best regards, Julia Suvorova.
