@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33548)
+Received: from eggs.gnu.org ([209.51.188.92]:33590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghWRH-000681-OD
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 04:15:48 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghWRM-0006BF-EJ
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 04:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghWRG-0006ik-Le
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 04:15:47 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghWRL-0006lB-Mj
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 04:15:52 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 10 Jan 2019 10:15:35 +0100
-Message-Id: <1547111736-3962-3-git-send-email-thuth@redhat.com>
+Date: Thu, 10 Jan 2019 10:15:36 +0100
+Message-Id: <1547111736-3962-4-git-send-email-thuth@redhat.com>
 In-Reply-To: <1547111736-3962-1-git-send-email-thuth@redhat.com>
 References: <1547111736-3962-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/3] ppc: Drop duplicated typedefs to be
- able to compile with Clang in gnu99 mode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 3/3] configure: Force the C standard to gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,113 +25,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, pbonzini@redhat.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>
 
-When compiling the ppc code with clang and -std=gnu99, there are a
-couple of warnings/errors like this one:
+Different versions of GCC and Clang use different versions of the C stand=
+ard.
+This repeatedly caused problems already, e.g. with duplicated typedefs:
 
-  CC      ppc64-softmmu/hw/intc/xics.o
-In file included from /home/thuth/devel/qemu/hw/intc/xics.c:35:
-/home/thuth/devel/qemu/include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is a C11 feature
-      [-Werror,-Wtypedef-redefinition]
-typedef struct ICPState ICPState;
-                        ^
-/home/thuth/devel/qemu/target/ppc/cpu.h:1181:25: note: previous definition is here
-typedef struct ICPState ICPState;
-                        ^
+ https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
 
-Drop the duplicated typedefs and use normal "struct" forward declarations
-like we already do it at the top of spapr.h for a couple of other definitions.
+or with for-loop variable initializers:
 
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
+
+To avoid these problems, we should enforce the C language version to the
+same level for all compilers. Since our minimum compiler versions is
+GCC v4.8, our best option is "gnu99" for C code right now ("gnu17" is not
+available there yet, and "gnu11" is marked as "experimental"), and "gnu++=
+98"
+for the few C++ code that we have in the repository.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/hw/ppc/spapr.h      | 9 +++++----
- include/hw/ppc/spapr_xive.h | 3 +--
- target/ppc/cpu.h            | 9 +++++----
- 3 files changed, 11 insertions(+), 10 deletions(-)
+ configure | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 9e01a5a..10d069e 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -12,11 +12,12 @@
- struct VIOsPAPRBus;
- struct sPAPRPHBState;
- struct sPAPRNVRAM;
-+struct ICSState;
-+struct sPAPRXive;
-+
- typedef struct sPAPREventLogEntry sPAPREventLogEntry;
- typedef struct sPAPREventSource sPAPREventSource;
- typedef struct sPAPRPendingHPT sPAPRPendingHPT;
--typedef struct ICSState ICSState;
--typedef struct sPAPRXive sPAPRXive;
- 
- #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
- #define SPAPR_ENTRY_POINT       0x100
-@@ -127,7 +128,7 @@ struct sPAPRMachineState {
-     struct VIOsPAPRBus *vio_bus;
-     QLIST_HEAD(, sPAPRPHBState) phbs;
-     struct sPAPRNVRAM *nvram;
--    ICSState *ics;
-+    struct ICSState *ics;
-     sPAPRRTCState rtc;
- 
-     sPAPRResizeHPT resize_hpt;
-@@ -180,7 +181,7 @@ struct sPAPRMachineState {
-     const char *icp_type;
-     int32_t irq_map_nr;
-     unsigned long *irq_map;
--    sPAPRXive  *xive;
-+    struct sPAPRXive  *xive;
-     sPAPRIrq *irq;
-     qemu_irq *qirqs;
- 
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 7fdc250..556b124 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -11,6 +11,7 @@
- #define PPC_SPAPR_XIVE_H
- 
- #include "hw/ppc/xive.h"
-+#include "hw/ppc/spapr.h"
- 
- #define TYPE_SPAPR_XIVE "spapr-xive"
- #define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIVE)
-@@ -41,8 +42,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
- bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
- void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
- 
--typedef struct sPAPRMachineState sPAPRMachineState;
--
- void spapr_xive_hcall_init(sPAPRMachineState *spapr);
- void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
-                    uint32_t phandle);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 486abaf..a62ff60 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1177,8 +1177,9 @@ do {                                            \
- 
- typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
- typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
--typedef struct XiveTCTX XiveTCTX;
--typedef struct ICPState ICPState;
-+
-+struct XiveTCTX;
-+struct ICPState;
- 
- /**
-  * PowerPCCPU:
-@@ -1197,8 +1198,8 @@ struct PowerPCCPU {
-     int vcpu_id;
-     uint32_t compat_pvr;
-     PPCVirtualHypervisor *vhyp;
--    ICPState *icp;
--    XiveTCTX *tctx;
-+    struct ICPState *icp;
-+    struct XiveTCTX *tctx;
-     void *machine_data;
-     int32_t node_id; /* NUMA node this CPU belongs to */
-     PPCHash64Options *hash64_opts;
--- 
+diff --git a/configure b/configure
+index 8049b71..f4078f6 100755
+--- a/configure
++++ b/configure
+@@ -107,6 +107,9 @@ update_cxxflags() {
+             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
+             -Wold-style-declaration|-Wold-style-definition|-Wredundant-d=
+ecls)
+                 ;;
++            -std=3Dgnu99)
++                QEMU_CXXFLAGS=3D${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }"-std=3D=
+gnu++98"
++                ;;
+             *)
+                 QEMU_CXXFLAGS=3D${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
+                 ;;
+@@ -585,7 +588,7 @@ ARFLAGS=3D"${ARFLAGS-rv}"
+ # left shift of signed integers is well defined and has the expected
+ # 2s-complement style results. (Both clang and gcc agree that it
+ # provides these semantics.)
+-QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
++QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common -fwrapv -std=3Dgnu99 $QE=
+MU_CFLAGS"
+ QEMU_CFLAGS=3D"-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_=
+CFLAGS"
+ QEMU_CFLAGS=3D"-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+ QEMU_CFLAGS=3D"-D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURC=
+E $QEMU_CFLAGS"
+--=20
 1.8.3.1
