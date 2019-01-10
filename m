@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52489)
+Received: from eggs.gnu.org ([209.51.188.92]:54462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ghc9P-0005iF-Eq
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:21:45 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ghcDW-00018R-QU
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ghc9O-0001hm-5e
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:21:43 -0500
-Date: Thu, 10 Jan 2019 16:21:37 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190110162137.7fbbbc00.cohuck@redhat.com>
-In-Reply-To: <ab861426-9a7e-ff00-e5de-0bcbef6d7f5f@linux.ibm.com>
-References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-	<1544623878-11248-11-git-send-email-jjherne@linux.ibm.com>
-	<20181213182100.6da37a95.cohuck@redhat.com>
-	<bfde1bd3-0725-1085-8a98-eeaf2b0694ed@linux.ibm.com>
-	<729790ec-a74a-2e6e-89ed-3d450c95f54f@linux.ibm.com>
-	<20190109193406.616fcf66.cohuck@redhat.com>
-	<18c1ba75-84f6-e928-64a9-ccf5044d92b5@linux.ibm.com>
-	<20190110131513.0d264b10.cohuck@redhat.com>
-	<ab861426-9a7e-ff00-e5de-0bcbef6d7f5f@linux.ibm.com>
+	(envelope-from <luc.michel@greensocs.com>) id 1ghcDV-0004ho-UX
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:25:58 -0500
+References: <20190108163008.7006-1-peter.maydell@linaro.org>
+	<20190108163008.7006-5-peter.maydell@linaro.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <ff365022-d3da-adc9-efcd-b8d013835b44@greensocs.com>
+Date: Thu, 10 Jan 2019 16:15:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190108163008.7006-5-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 10/15] s390-bios: Support for
- running format-0/1 channel programs
+Subject: Re: [Qemu-devel] [PATCH 4/4] gdbstub: Simplify gdb_get_cpu_pid() to
+ use cpu->cluster_index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, 10 Jan 2019 10:02:48 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-
-> On 1/10/19 7:15 AM, Cornelia Huck wrote:
-> > On Wed, 9 Jan 2019 15:01:19 -0500
-> > "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-> >   
-> >> On 1/9/19 1:34 PM, Cornelia Huck wrote:  
-> >>> On Wed, 9 Jan 2019 13:10:26 -0500
-> >>> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:  
-> >   
-> >>>> I'm not sure what value there is in abstracting sense at the moment. I'm not even sure
-> >>>> what other device's sense data looks like. Since my description of the SENSE CCW comes
-> >>>> from an ECKD reference I have not been able to verify any areas of the data that are
-> >>>> common across device types. Thoughts?  
-> >>>
-> >>> There's SA22-7204-01 ("Common I/O Device Commands"), which is from 1992
-> >>> (this is what I have on my disk -- is there anything newer?). It
-> >>> specifies what bits 0-5 of byte 0 mean and states that bytes 1-31 are
-> >>> optional and device-specific.
-> >>>
-> >>> Maybe some other bits have been specified after 1992, but I have not
-> >>> come across documentation for them.  
-> >>
-> >> That publication is no longer available. According to my quick research it has been
-> >> replaced by an internal only publication. I'll see what I can find.  
-> > 
-> > The publication no longer being available is not good, as it is a
-> > normative reference pointed to by the virtio standard (see
-> > http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-30001)
-> > :(
-> > 
-> > Is there any chance that at least that old version can be made
-> > available again?  
+On 1/8/19 5:30 PM, Peter Maydell wrote:
+> Now we're keeping the cluster index in the CPUState, we don't
+> need to jump through hoops in gdb_get_cpu_pid() to find the
+> associated cluster object.
+Aah better :-)
 > 
-> A quick web search turns up the following link:
-> http://publibz.boulder.ibm.com/support/libraryserver/FRAMESET/DZ9AR501/CCONTENTS?D
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+> ---
+>  gdbstub.c | 48 +++++-------------------------------------------
+>  1 file changed, 5 insertions(+), 43 deletions(-)
 > 
-> So I guess it is available, even if the document has been superseded internally.
-
-Cool, thanks for checking!
+> diff --git a/gdbstub.c b/gdbstub.c
+> index bfc7afb5096..5d6cbea9d35 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -644,50 +644,12 @@ static int memtox(char *buf, const char *mem, int len)
+>  
+>  static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
+>  {
+> -#ifndef CONFIG_USER_ONLY
+> -    gchar *path, *name = NULL;
+> -    Object *obj;
+> -    CPUClusterState *cluster;
+> -    uint32_t ret;
+> -
+> -    path = object_get_canonical_path(OBJECT(cpu));
+> -
+> -    if (path == NULL) {
+> -        /* Return the default process' PID */
+> -        ret = s->processes[s->process_num - 1].pid;
+> -        goto out;
+> -    }
+> -
+> -    name = object_get_canonical_path_component(OBJECT(cpu));
+> -    assert(name != NULL);
+> -
+> -    /*
+> -     * Retrieve the CPU parent path by removing the last '/' and the CPU name
+> -     * from the CPU canonical path.
+> -     */
+> -    path[strlen(path) - strlen(name) - 1] = '\0';
+> -
+> -    obj = object_resolve_path_type(path, TYPE_CPU_CLUSTER, NULL);
+> -
+> -    if (obj == NULL) {
+> -        /* Return the default process' PID */
+> -        ret = s->processes[s->process_num - 1].pid;
+> -        goto out;
+> -    }
+> -
+> -    cluster = CPU_CLUSTER(obj);
+> -    ret = cluster->cluster_id + 1;
+> -
+> -out:
+> -    g_free(name);
+> -    g_free(path);
+> -
+> -    return ret;
+> -
+> -#else
+>      /* TODO: In user mode, we should use the task state PID */
+> -    return s->processes[s->process_num - 1].pid;
+> -#endif
+> +    if (cpu->cluster_index == UNASSIGNED_CLUSTER_INDEX) {
+> +        /* Return the default process' PID */
+> +        return s->processes[s->process_num - 1].pid;
+> +    }
+> +    return cpu->cluster_index + 1;
+>  }
+>  
+>  static GDBProcess *gdb_get_process(const GDBState *s, uint32_t pid)
+> 
