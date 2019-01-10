@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55270)
+Received: from eggs.gnu.org ([209.51.188.92]:55286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghXfM-0004DH-T9
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:34:25 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ghXfQ-0004Ei-Is
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:34:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghXfI-00012E-FQ
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:34:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41208)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghXfI-00011v-65
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:34:20 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
-	<154703593746.13472.3886549854409661470.stgit@pasha-VirtualBox>
-Date: Thu, 10 Jan 2019 11:34:08 +0100
-In-Reply-To: <154703593746.13472.3886549854409661470.stgit@pasha-VirtualBox>
-	(Pavel Dovgalyuk's message of "Wed, 09 Jan 2019 15:12:17 +0300")
-Message-ID: <877efciyxr.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1ghXfM-00013D-TZ
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:34:26 -0500
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:45553)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ghXfJ-00012A-Aq
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:34:23 -0500
+Received: by mail-oi1-x231.google.com with SMTP id y1so8849869oie.12
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 02:34:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 10/21] qapi: introduce replay.json for
- record/replay-related stuff
+References: <20190109152430.32359-1-agraf@suse.de>
+	<CAFEAcA9zugZiWirk9QjqmAO9QKhLdCAWuG1PX5z7Nxm4O69aTg@mail.gmail.com>
+	<CAFEAcA8Xzi8GjzUtzxbFzxdCS4kn0Cps+_bF70ZS0KnH0W8SvQ@mail.gmail.com>
+	<92dba7da-f3fc-b7dc-6896-cf8d58cc7f17@suse.de>
+	<CAFEAcA_sxvfHG6ryA4xHMfbwhDaRrF_+6xaef_0RqqH-7JESzQ@mail.gmail.com>
+	<0673d8c0-16f0-49e7-f002-06491353cc6c@suse.de>
+In-Reply-To: <0673d8c0-16f0-49e7-f002-06491353cc6c@suse.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 Jan 2019 10:34:08 +0000
+Message-ID: <CAFEAcA-duBwj2-DG=dQLo-448ca--+C6Fu54avwEFQ5D-bwy8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow to switch from MON->HYP
+ on AArch32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,144 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: Alexander Graf <agraf@suse.de>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Tom Rini <trini@konsulko.com>, Michal Simek <michal.simek@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Stephen Warren <swarren@wwwdotorg.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
-
-> This patch adds replay.json file. It will be
-> used for adding record/replay-related data structures and commands.
+On Thu, 10 Jan 2019 at 06:43, Alexander Graf <agraf@suse.de> wrote:
 >
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> ---
->  MAINTAINERS             |    1 +
->  Makefile.objs           |    4 ++--
->  include/sysemu/replay.h |    1 +
->  qapi/misc.json          |   18 ------------------
->  qapi/qapi-schema.json   |    1 +
->  qapi/replay.json        |   26 ++++++++++++++++++++++++++
->  6 files changed, 31 insertions(+), 20 deletions(-)
->  create mode 100644 qapi/replay.json
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0bfd95a..7b0a1bc 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2122,6 +2122,7 @@ F: net/filter-replay.c
->  F: include/sysemu/replay.h
->  F: docs/replay.txt
->  F: stubs/replay.c
-> +F: qapi/replay.json
->  
->  IOVA Tree
->  M: Peter Xu <peterx@redhat.com>
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 4561159..8164b22 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -1,6 +1,6 @@
->  QAPI_MODULES = block-core block char common crypto introspect job migration
-> -QAPI_MODULES += misc net rdma rocker run-state sockets tpm trace transaction
-> -QAPI_MODULES += ui
-> +QAPI_MODULES += misc net rdma replay rocker run-state sockets tpm trace
-> +QAPI_MODULES += transaction ui
->  
->  #######################################################################
->  # Common libraries for tools and emulators
-> diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-> index b3f593f..2054296 100644
-> --- a/include/sysemu/replay.h
-> +++ b/include/sysemu/replay.h
-> @@ -13,6 +13,7 @@
->   */
->  
->  #include "sysemu.h"
-> +#include "qapi/qapi-types-replay.h"
->  #include "qapi/qapi-types-misc.h"
+>
+> On 10.01.19 00:08, Peter Maydell wrote:
+> > On Wed, 9 Jan 2019 at 17:14, Alexander Graf <agraf@suse.de> wrote:
+> >>
+> >> On 01/09/2019 05:59 PM, Peter Maydell wrote:
+> >>> On Wed, 9 Jan 2019 at 16:52, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >>>> On Wed, 9 Jan 2019 at 15:26, Alexander Graf <agraf@suse.de> wrote:
+> >>>>> In U-boot, we switch from S-SVC -> MON -> HYP when we want to enter
+> >>>>> HYP mode. This dance seems to work ok (hence it's there in the code
+> >>>>> base), but breaks with current QEMU.
+> >>> PS: it would be helpful if the commit message said how u-boot
+> >>> is trying to go from Mon to Hyp -- some ways to try to do
+> >>> this are OK, and some are not, so whether it's supposed to
+> >>> work or not depends on what u-boot is actually doing...
+> >>
+> >> I don't fully understand all of it to be honest :). But the code is here:
+> >>
+> >> http://git.denx.de/?p=u-boot.git;a=blob;f=arch/arm/cpu/armv7/nonsec_virt.S
+> >>
+> >> What I managed to understand so far is that it goes to MON using the smc
+> >> #0 call and then changes SPSR so that on return (movs pc) the mode will
+> >> be different.
+> >
+> > Thanks -- yes, that's an exception return so it's the
+> > expected way to go from Mon to Hyp.
+>
+> That was my understanding, yes. Do you still want me to change the
+> commit message to mention that or will you just do it when applying?
 
-I believe you can drop qapi/qapi-types-misc.h now.
+I'll add a note when I apply it; thanks.
 
->  #include "qapi/qapi-types-ui.h"
->  
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 24d20a8..e5e0bea 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -3125,24 +3125,6 @@
->    'data': { 'offset': 'int' } }
->  
->  ##
-> -# @ReplayMode:
-> -#
-> -# Mode of the replay subsystem.
-> -#
-> -# @none: normal execution mode. Replay or record are not enabled.
-> -#
-> -# @record: record mode. All non-deterministic data is written into the
-> -#          replay log.
-> -#
-> -# @play: replay mode. Non-deterministic data required for system execution
-> -#        is read from the log.
-> -#
-> -# Since: 2.5
-> -##
-> -{ 'enum': 'ReplayMode',
-> -  'data': [ 'none', 'record', 'play' ] }
-> -
-> -##
->  # @xen-load-devices-state:
->  #
->  # Load the state of all devices from file. The RAM and the block devices
-> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-> index 3bbdfce..b85fd04 100644
-> --- a/qapi/qapi-schema.json
-> +++ b/qapi/qapi-schema.json
-> @@ -95,3 +95,4 @@
-   # Documentation generated with qapi-gen.py is in source order, with
-   # included sub-schemas inserted at the first include directive
-   # (subsequent include directives have no effect).  To get a sane and
-   # stable order, it's best to include each sub-schema just once, or
-   # include it first right here.
-[...]
->  { 'include': 'trace.json' }
->  { 'include': 'introspect.json' }
->  { 'include': 'misc.json' }
-> +{ 'include': 'replay.json' }
-
-I doubt this the best spot for replay stuff in the generated
-documentation.
-
-Is there another chapter you'd consider related?
-
-> diff --git a/qapi/replay.json b/qapi/replay.json
-> new file mode 100644
-> index 0000000..9e13551
-> --- /dev/null
-> +++ b/qapi/replay.json
-> @@ -0,0 +1,26 @@
-> +# -*- Mode: Python -*-
-> +#
-> +
-> +##
-> +# = Record/replay
-> +##
-> +
-> +{ 'include': 'common.json' }
-> +
-> +##
-> +# @ReplayMode:
-> +#
-> +# Mode of the replay subsystem.
-> +#
-> +# @none: normal execution mode. Replay or record are not enabled.
-> +#
-> +# @record: record mode. All non-deterministic data is written into the
-> +#          replay log.
-> +#
-> +# @play: replay mode. Non-deterministic data required for system execution
-> +#        is read from the log.
-> +#
-> +# Since: 2.5
-> +##
-> +{ 'enum': 'ReplayMode',
-> +  'data': [ 'none', 'record', 'play' ] }
+-- PMM
