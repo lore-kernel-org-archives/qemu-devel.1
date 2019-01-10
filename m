@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53862)
+Received: from eggs.gnu.org ([209.51.188.92]:54376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghXYp-0000nJ-B1
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:27:40 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghXbF-0002Go-7y
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:30:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghXYn-00052N-F8
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:27:39 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 10 Jan 2019 10:27:11 +0000
-Message-ID: <3a2bac12-d3c2-8ce9-fc25-4a01c4ec1e3f@virtuozzo.com>
-References: <20190110071330.28136-1-eblake@redhat.com>
-	<20190110071330.28136-2-eblake@redhat.com>
-In-Reply-To: <20190110071330.28136-2-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <75F3DD552F2A4B45A3D4213F6825C919@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] nbd: Only require disabled bitmap
- for read-only exports
+	(envelope-from <thuth@redhat.com>) id 1ghXbE-0007DF-1L
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:30:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ghXbD-0007CV-S9
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:30:07 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 10 Jan 2019 11:23:02 +0100
+Message-Id: <1547115782-26271-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] linux-user: Fix compilation with clang 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,134 +21,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Peter Maydell <peter.maydell@linaro.org>
 
-MTAuMDEuMjAxOSAxMDoxMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT3VyIGluaXRpYWwgaW1wbGVt
-ZW50YXRpb24gb2YgeC1uYmQtc2VydmVyLWFkZC1iaXRtYXAgcHV0DQo+IGluIGEgcmVzdHJpY3Rp
-b24gYmVjYXVzZSBvZiBpbmNyZW1lbnRhbCBiYWNrdXBzOiBpbiB0aGF0DQo+IHVzYWdlLCB3ZSBh
-cmUgZXhwb3J0aW5nIG9uZSBxY293MiBmaWxlICh0aGUgdGVtcG9yYXJ5IG92ZXJsYXkNCj4gdGFy
-Z2V0IG9mIGEgYmxvY2tkZXYtYmFja3VwIHN5bmM6bm9uZSBqb2IpIGFuZCBhIGRpcnR5IGJpdG1h
-cA0KPiBvd25lZCBieSBhIHNlY29uZCBxY293MiBmaWxlICh0aGUgc291cmNlIG9mIHRoZQ0KPiBi
-bG9ja2Rldi1iYWNrdXAsIHdoaWNoIGlzIHRoZSBiYWNraW5nIGZpbGUgb2YgdGhlIHRlbXBvcmFy
-eSkuDQo+IFdoaWxlIGJvdGggcWNvdzIgZmlsZXMgYXJlIHN0aWxsIHdyaXRhYmxlICh0aGUgdGFy
-Z2V0IGNhcHR1cmUNCj4gY29weS1vbi13cml0ZSBvZiBvbGQgY29udGVudHMsIHRoZSBzb3VyY2Ug
-dG8gdHJhY2sgbGl2ZSBndWVzdA0KPiB3cml0ZXMgaW4gdGhlIG1lYW50aW1lKSwgdGhlIE5CRCBj
-bGllbnQgZXhwZWN0cyB0byBzZWUNCj4gY29uc3RhbnQgZGF0YSwgaW5jbHVkaW5nIHRoZSBkaXJ0
-eSBiaXRtYXAuICBBbiBlbmFibGVkIGJpdG1hcA0KPiBpbiB0aGUgc291cmNlIHdvdWxkIGJlIG1v
-ZGlmaWVkIGJ5IGd1ZXN0IHdyaXRlcywgd2hpY2ggaXMgYXQNCj4gb2RkcyB3aXRoIHRoZSBOQkQg
-ZXhwb3J0IGJlaW5nIGEgcmVhZC1vbmx5IGNvbnN0YW50IHZpZXcsDQo+IGhlbmNlIHRoZSBpbml0
-aWFsIGNvZGUgY2hvaWNlIG9mIGVuZm9yY2luZyBhIGRpc2FibGVkIGJpdG1hcA0KPiAodGhlIGlu
-dGVudCBpcyB0aGF0IHRoZSBleHBvc2VkIGJpdG1hcCB3YXMgZGlzYWJsZWQgaW4gdGhlDQo+IHNh
-bWUgdHJhbnNhY3Rpb24gdGhhdCBzdGFydGVkIHRoZSBibG9ja2Rldi1iYWNrdXAgam9iLA0KPiBh
-bHRob3VnaCB3ZSBkb24ndCB3YW50IHRvIGFjdHVhbGx5IHRyYWNrIGVub3VnaCBzdGF0ZSB0bw0K
-PiBhY3R1YWxseSBlbmZvcmNlIHRoYXQpLg0KPiANCj4gSG93ZXZlciwgaW4gdGhlIGNhc2Ugb2Yg
-aW1hZ2UgbWlncmF0aW9uLCB3aGVyZSB3ZSBXQU5UIGENCj4gd3JpdGFibGUgZXhwb3J0LCBpdCBt
-YWtlcyB0b3RhbCBzZW5zZSB0aGF0IHRoZSBOQkQgY2xpZW50DQo+IGNvdWxkIGV4cGVjdCB3cml0
-ZXMgdG8gY2hhbmdlIHRoZSBzdGF0dXMgdmlzaWJsZSB0aHJvdWdoDQo+IHRoZSBleHBvc2VkIGRp
-cnR5IGJpdG1hcCwNCg0KRG9uJ3QgZm9sbG93Li4gV2hpY2gga2luZCBvZiBtaWdyYXRpb24gZG8g
-eW91IG1lYW4/DQoNCiAgYW5kIHRodXMgcGVybWl0dGluZyBhbiBlbmFibGVkDQo+IGJpdG1hcCBm
-b3IgYW4gZXhwb3J0IHRoYXQgaXMgbm90IHJlYWQtb25seSBtYWtlcyBzZW5zZTsNCj4gYWx0aG91
-Z2ggdGhlIGN1cnJlbnQgcmVzdHJpY3Rpb24gcHJldmVudHMgdGhhdCB1c2FnZS4NCj4gDQo+IEFs
-dGVybmF0aXZlbHksIGNvbnNpZGVyIHRoZSBjYXNlIHdoZW4gdGhlIGFjdGl2ZSBsYXllciBkb2Vz
-DQo+IG5vdCBjb250YWluIHRoZSBiaXRtYXAgYnV0IHRoZSBiYWNraW5nIGxheWVyIGRvZXMuICBJ
-ZiB0aGUNCj4gYmFja2luZyBsYXllciBpcyByZWFkLW9ubHkgKHdoaWNoIGlzIGRpZmZlcmVudCBm
-cm9tIHRoZQ0KPiBiYWNraW5nIGxheWVyIG9mIGEgYmxvY2tkZXYtYmFja3VwIGpvYiBiZWluZyB3
-cml0YWJsZSksDQo+IHdlIGtub3cgdGhlIGJhY2tpbmcgbGF5ZXIgY2Fubm90IGJlIG1vZGlmaWVk
-LCANCg0KaG1tLCBzb3VuZHMgYSBiaXQgc3RyYW5nZSAiaW4gY2FzZSBvZiByZWFkLW9ubHkgYmFj
-a2luZywgd2Uga25vdw0KdGhhdCBpdCBjYW5ub3QgYmUgbW9kaWZpZWQiLiBJdCdzIHRydWUgZm9y
-IGFueSByZWFkLW9ubHkgbm9kZSwNCnNvIHlvdSBjYW4gc2F5IGp1c3Qgc29tZXRoaW5nIGxpa2Ug
-InJlYWQtb25seSBub2RlIChmb3IgZXhhbXBsZQ0KcmVndWxhciBiYWNraW5nIGZpbGUpIg0KDQph
-bmQgdGh1cyB0aGUNCj4gYml0bWFwIHdpbGwgbm90IGNoYW5nZSBjb250ZW50cyBldmVuIGlmIGl0
-IGlzIHN0aWxsIG1hcmtlZA0KPiBlbmFibGVkIChmb3IgdGhhdCBtYXR0ZXIsIHNpbmNlIHRoZSBi
-YWNraW5nIGZpbGUgaXMNCj4gcmVhZC1vbmx5LCB3ZSBjb3VsZG4ndCBjaGFuZ2UgdGhlIGJpdG1h
-cCB0byBiZSBkaXNhYmxlZA0KPiBpbiB0aGUgZmlyc3QgcGxhY2UpLiAgQWdhaW4sIHRoZSBjdXJy
-ZW50IHJlc3RyaWN0aW9uDQo+IHByZXZlbnRzIHRoaXMgdXNhZ2UuDQo+IA0KPiBTb2x2ZSBib3Ro
-IGlzc3VlcyBieSBnYXRpbmcgdGhlIHJlc3RyaWN0aW9uIGFnYWluc3QgYQ0KPiBkaXNhYmxlZCBi
-aXRtYXAgdG8gb25seSBoYXBwZW4gd2hlbiB0aGUgY2FsbGVyIGhhcw0KPiByZXF1ZXN0ZWQgYSBy
-ZWFkLW9ubHkgZXhwb3J0LCBhbmQgd2hlcmUgdGhlIEJEUyB0aGF0IG93bnMNCj4gdGhlIGJpdG1h
-cCAod2hpY2ggbWlnaHQgYmUgYSBiYWNraW5nIGZpbGUgb2YgdGhlIEJEUw0KPiBoYW5kZWQgdG8g
-bmJkX2V4cG9ydF9uZXcpIGlzIHN0aWxsIHdyaXRhYmxlLg0KPiANCj4gVXBkYXRlIGlvdGVzdCAy
-MjMgdG8gYWRkIHNvbWUgdGVzdHMgb2YgdGhlIGVycm9yIHBhdGhzLg0KPiANCj4gU2lnbmVkLW9m
-Zi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IA0KPiAtLS0NCj4gdjI6IG5l
-dyBwYXRjaA0KPiAtLS0NCj4gICBuYmQvc2VydmVyLmMgICAgICAgICAgICAgICB8ICA3ICsrKysr
-LS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjIzICAgICB8IDE0ICsrKysrKysrKysrKy0tDQo+
-ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMy5vdXQgfCAgNCArKysrDQo+ICAgMyBmaWxlcyBjaGFu
-Z2VkLCAyMSBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBh
-L25iZC9zZXJ2ZXIuYyBiL25iZC9zZXJ2ZXIuYw0KPiBpbmRleCA3YWYwZGRmZmIyMC4uOTgzMjcw
-ODhjYjQgMTAwNjQ0DQo+IC0tLSBhL25iZC9zZXJ2ZXIuYw0KPiArKysgYi9uYmQvc2VydmVyLmMN
-Cj4gQEAgLTI0NTYsOCArMjQ1NiwxMSBAQCB2b2lkIG5iZF9leHBvcnRfYml0bWFwKE5CREV4cG9y
-dCAqZXhwLCBjb25zdCBjaGFyICpiaXRtYXAsDQo+ICAgICAgICAgICByZXR1cm47DQo+ICAgICAg
-IH0NCj4gDQo+IC0gICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX2VuYWJsZWQoYm0pKSB7DQo+IC0g
-ICAgICAgIGVycm9yX3NldGcoZXJycCwgIkJpdG1hcCAnJXMnIGlzIGVuYWJsZWQiLCBiaXRtYXAp
-Ow0KPiArICAgIGlmICgoZXhwLT5uYmRmbGFncyAmIE5CRF9GTEFHX1JFQURfT05MWSkgJiYgYmRy
-dl9pc193cml0YWJsZShicykgJiYNCj4gKyAgICAgICAgYmRydl9kaXJ0eV9iaXRtYXBfZW5hYmxl
-ZChibSkpIHsNCj4gKyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLA0KPiArICAgICAgICAgICAgICAg
-ICAgICJFbmFibGVkIGJpdG1hcCAnJXMnIGluY29tcGF0aWJsZSB3aXRoIHJlYWRvbmx5IGV4cG9y
-dCIsDQo+ICsgICAgICAgICAgICAgICAgICAgYml0bWFwKTsNCj4gICAgICAgICAgIHJldHVybjsN
-Cj4gICAgICAgfQ0KPiANCj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMjMgYi90
-ZXN0cy9xZW11LWlvdGVzdHMvMjIzDQo+IGluZGV4IDU1MTNkYzYyMTU5Li5mMWZiYjliYzFjNiAx
-MDA3NTUNCj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMw0KPiArKysgYi90ZXN0cy9xZW11
-LWlvdGVzdHMvMjIzDQo+IEBAIC02MSw2ICs2MSw4IEBAIGVjaG8gIj09PSBDcmVhdGUgcGFydGlh
-bGx5IHNwYXJzZSBpbWFnZSwgdGhlbiBhZGQgZGlydHkgYml0bWFwcyA9PT0iDQo+ICAgZWNobw0K
-PiANCj4gICAjIFR3byBiaXRtYXBzLCB0byBjb250cmFzdCBncmFudWxhcml0eSBpc3N1ZXMNCj4g
-KyMgQWxzbyBub3RlIHRoYXQgYiB3aWxsIGJlIGRpc2FibGVkLCB3aGlsZSBiMiBpcyBsZWZ0IGVu
-YWJsZWQsIHRvDQo+ICsjIGNoZWNrIGZvciByZWFkLW9ubHkgaW50ZXJhY3Rpb25zDQo+ICAgX21h
-a2VfdGVzdF9pbWcgLW8gY2x1c3Rlcl9zaXplPTRrIDRNDQo+ICAgJFFFTVVfSU8gLWMgJ3cgLVAg
-MHgxMSAxTSAyTScgIiRURVNUX0lNRyIgfCBfZmlsdGVyX3FlbXVfaW8NCj4gICBydW5fcWVtdSA8
-PEVPRg0KPiBAQCAtMTE0LDE3ICsxMTYsMjMgQEAgX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExF
-ICd7ImV4ZWN1dGUiOiJibG9ja2Rldi1hZGQiLA0KPiAgICAgICAiZmlsZSI6eyJkcml2ZXIiOiJm
-aWxlIiwgImZpbGVuYW1lIjoiJyIkVEVTVF9JTUciJyJ9fX0nICJyZXR1cm4iDQo+ICAgX3NlbmRf
-cWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJibG9jay1kaXJ0eS1iaXRtYXAtZGlz
-YWJsZSIsDQo+ICAgICAiYXJndW1lbnRzIjp7Im5vZGUiOiJuIiwgIm5hbWUiOiJiIn19JyAicmV0
-dXJuIg0KPiAtX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJibG9jay1k
-aXJ0eS1iaXRtYXAtZGlzYWJsZSIsDQo+IC0gICJhcmd1bWVudHMiOnsibm9kZSI6Im4iLCAibmFt
-ZSI6ImIyIn19JyAicmV0dXJuIg0KPiAgIF9zZW5kX3FlbXVfY21kICRRRU1VX0hBTkRMRSAneyJl
-eGVjdXRlIjoibmJkLXNlcnZlci1zdGFydCIsDQo+ICAgICAiYXJndW1lbnRzIjp7ImFkZHIiOnsi
-dHlwZSI6InVuaXgiLA0KPiAgICAgICAiZGF0YSI6eyJwYXRoIjoiJyIkVEVTVF9ESVIvbmJkIici
-fX19fScgInJldHVybiINCj4gICBfc2VuZF9xZW11X2NtZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0
-ZSI6Im5iZC1zZXJ2ZXItYWRkIiwNCj4gICAgICJhcmd1bWVudHMiOnsiZGV2aWNlIjoibiJ9fScg
-InJldHVybiINCj4gK19zZW5kX3FlbXVfY21kICRRRU1VX0hBTkRMRSAneyJleGVjdXRlIjoibmJk
-LXNlcnZlci1hZGQiLA0KPiArICAiYXJndW1lbnRzIjp7ImRldmljZSI6Im4ifX0nICJlcnJvciIN
-Cg0KdHdpY2UgYWRkPw0KDQo+ICAgX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1
-dGUiOiJ4LW5iZC1zZXJ2ZXItYWRkLWJpdG1hcCIsDQo+ICAgICAiYXJndW1lbnRzIjp7Im5hbWUi
-OiJuIiwgImJpdG1hcCI6ImIifX0nICJyZXR1cm4iDQo+ICAgX3NlbmRfcWVtdV9jbWQgJFFFTVVf
-SEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLWFkZCIsDQo+ICAgICAiYXJndW1lbnRzIjp7
-ImRldmljZSI6Im4iLCAibmFtZSI6Im4yIn19JyAicmV0dXJuIg0KPiArX3NlbmRfcWVtdV9jbWQg
-JFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJ4LW5iZC1zZXJ2ZXItYWRkLWJpdG1hcCIsDQo+ICsg
-ICJhcmd1bWVudHMiOnsibmFtZSI6Im4yIiwgImJpdG1hcCI6ImIyIn19JyAiZXJyb3IiDQo+ICtf
-c2VuZF9xZW11X2NtZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0ZSI6Im5iZC1zZXJ2ZXItcmVtb3Zl
-IiwNCj4gKyAgImFyZ3VtZW50cyI6eyJuYW1lIjoibjIifX0nICJyZXR1cm4iDQo+ICtfc2VuZF9x
-ZW11X2NtZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0ZSI6Im5iZC1zZXJ2ZXItYWRkIiwNCj4gKyAg
-ImFyZ3VtZW50cyI6eyJkZXZpY2UiOiJuIiwgIm5hbWUiOiJuMiIsICJ3cml0YWJsZSI6dHJ1ZX19
-JyAicmV0dXJuIg0KPiAgIF9zZW5kX3FlbXVfY21kICRRRU1VX0hBTkRMRSAneyJleGVjdXRlIjoi
-eC1uYmQtc2VydmVyLWFkZC1iaXRtYXAiLA0KPiAgICAgImFyZ3VtZW50cyI6eyJuYW1lIjoibjIi
-LCAiYml0bWFwIjoiYjIifX0nICJyZXR1cm4iDQo+IA0KPiBAQCAtMTU3LDYgKzE2NSw4IEBAIF9z
-ZW5kX3FlbXVfY21kICRRRU1VX0hBTkRMRSAneyJleGVjdXRlIjoibmJkLXNlcnZlci1yZW1vdmUi
-LA0KPiAgICAgImFyZ3VtZW50cyI6eyJuYW1lIjoibiJ9fScgInJldHVybiINCj4gICBfc2VuZF9x
-ZW11X2NtZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0ZSI6Im5iZC1zZXJ2ZXItcmVtb3ZlIiwNCj4g
-ICAgICJhcmd1bWVudHMiOnsibmFtZSI6Im4yIn19JyAicmV0dXJuIg0KPiArX3NlbmRfcWVtdV9j
-bWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLXJlbW92ZSIsDQo+ICsgICJh
-cmd1bWVudHMiOnsibmFtZSI6Im4yIn19JyAiZXJyb3IiXQ0KDQphbmQgaGVyZT8NCg0KYWhhLCBJ
-J3ZlIGp1c3QgcmVhbGl6ZWQgdGhhdCBpdCdzICJzb21lIHRlc3RzIG9mIHRoZSBlcnJvciBwYXRo
-cyIgbm90IHJlbGF0ZWQgdG8gYml0bWFwcy4uDQoNClNvLCBJJ2QgcHJlZmVyIHRvIGtlZXAgdGhl
-bSBpbiBzZXBhcmF0ZSBwYXRjaA0KDQo+ICAgX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7
-ImV4ZWN1dGUiOiJuYmQtc2VydmVyLXN0b3AifScgInJldHVybiINCj4gICBfc2VuZF9xZW11X2Nt
-ZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0ZSI6InF1aXQifScgInJldHVybiINCj4gDQo+IGRpZmYg
-LS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvMjIzLm91dCBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8y
-MjMub3V0DQo+IGluZGV4IDk5Y2ExNzJmYmI4Li41ZWQyZTMyMmUxOSAxMDA2NDQNCj4gLS0tIGEv
-dGVzdHMvcWVtdS1pb3Rlc3RzLzIyMy5vdXQNCj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzIy
-My5vdXQNCj4gQEAgLTI5LDggKzI5LDExIEBAIHdyb3RlIDIwOTcxNTIvMjA5NzE1MiBieXRlcyBh
-dCBvZmZzZXQgMjA5NzE1Mg0KPiAgIHsicmV0dXJuIjoge319DQo+ICAgeyJyZXR1cm4iOiB7fX0N
-Cj4gICB7InJldHVybiI6IHt9fQ0KPiAreyJlcnJvciI6IHsiY2xhc3MiOiAiR2VuZXJpY0Vycm9y
-IiwgImRlc2MiOiAiTkJEIHNlcnZlciBhbHJlYWR5IGhhcyBleHBvcnQgbmFtZWQgJ24nIn19DQo+
-ICAgeyJyZXR1cm4iOiB7fX0NCj4gICB7InJldHVybiI6IHt9fQ0KPiAreyJlcnJvciI6IHsiY2xh
-c3MiOiAiR2VuZXJpY0Vycm9yIiwgImRlc2MiOiAiRW5hYmxlZCBiaXRtYXAgJ2IyJyBpbmNvbXBh
-dGlibGUgd2l0aCByZWFkb25seSBleHBvcnQifX0NCj4gK3sicmV0dXJuIjoge319DQo+ICAgeyJy
-ZXR1cm4iOiB7fX0NCj4gICB7InJldHVybiI6IHt9fQ0KPiANCj4gQEAgLTYyLDYgKzY1LDcgQEAg
-cmVhZCAyMDk3MTUyLzIwOTcxNTIgYnl0ZXMgYXQgb2Zmc2V0IDIwOTcxNTINCj4gDQo+ICAgeyJy
-ZXR1cm4iOiB7fX0NCj4gICB7InJldHVybiI6IHt9fQ0KPiAreyJlcnJvciI6IHsiY2xhc3MiOiAi
-R2VuZXJpY0Vycm9yIiwgImRlc2MiOiAiRXhwb3J0ICduMicgaXMgbm90IGZvdW5kIn19DQo+ICAg
-eyJyZXR1cm4iOiB7fX0NCj4gICB7InJldHVybiI6IHt9fQ0KPiAgICoqKiBkb25lDQo+IA0KDQpO
-ZXcgcmVzdHJpY3Rpb24gbG9va3MgT0sgZm9yIG1lLg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0K
-VmxhZGltaXINCg==
+Clang version 3.4.2 does not know the -Wpragmas option yet and bails
+out with an error when we try to disable it in linux-user/qemu.h.
+Fortunately, clang has a __has_warning() macro which allows us to add
+an explicit check for the warning that we like to disable. With that we
+can check for the availability of "-Waddress-of-packed-member" properly
+and do not need the "-Wpragmas" at all here.
+
+Fixes: 850d5e330a9c68cc998cecc02caf8a3c8d1ee8a3
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Drop -Wpragmas now completely
+
+ include/qemu/compiler.h | 4 ++++
+ linux-user/qemu.h       | 6 +-----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 261842b..28fa438 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -113,6 +113,10 @@
+ #define GCC_FMT_ATTR(n, m)
+ #endif
+ 
++#ifndef __has_warning
++#define __has_warning(x) 0 /* compatibility with non-clang compilers */
++#endif
++
+ #ifndef __has_feature
+ #define __has_feature(x) 0 /* compatibility with non-clang compilers */
+ #endif
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index dd5771c..63a8998 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -474,17 +474,13 @@ static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
+  *   functions than host-endian unaligned load/store plus tswapN.
+  * - The pragmas are necessary only to silence a clang false-positive
+  *   warning: see https://bugs.llvm.org/show_bug.cgi?id=39113 .
+- * - We have to disable -Wpragmas warnings to avoid a complaint about
+- *   an unknown warning type from older compilers that don't know about
+- *   -Waddress-of-packed-member.
+  * - gcc has bugs in its _Pragma() support in some versions, eg
+  *   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83256 -- so we only
+  *   include the warning-suppression pragmas for clang
+  */
+-#ifdef __clang__
++#if defined(__clang__) && __has_warning("-Waddress-of-packed-member")
+ #define PRAGMA_DISABLE_PACKED_WARNING                                   \
+     _Pragma("GCC diagnostic push");                                     \
+-    _Pragma("GCC diagnostic ignored \"-Wpragmas\"");                    \
+     _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"")
+ 
+ #define PRAGMA_REENABLE_PACKED_WARNING          \
+-- 
+1.8.3.1
