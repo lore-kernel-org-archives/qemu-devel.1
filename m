@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40675)
+Received: from eggs.gnu.org ([209.51.188.92]:41904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ghgjN-0003al-5K
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 15:15:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghgpi-00068q-VU
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 15:21:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ghgjM-0008Hx-93
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 15:15:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58246)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ghgjM-0008HV-0h
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 15:15:08 -0500
-Date: Thu, 10 Jan 2019 20:14:57 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190110201456.GL2589@work-vm>
-References: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
-	<20190110120120.9943-3-yury-kotov@yandex-team.ru>
+	(envelope-from <eblake@redhat.com>) id 1ghgpi-0005ok-4b
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 15:21:42 -0500
+References: <20190110191901.5082-1-eblake@redhat.com>
+	<edb4aed4-d032-2a8d-62d0-b5277ca137d5@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <23bcf66e-a485-0155-d808-ef7f436b56c8@redhat.com>
+Date: Thu, 10 Jan 2019 14:21:21 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190110120120.9943-3-yury-kotov@yandex-team.ru>
-Subject: Re: [Qemu-devel] [PATCH 2/4] exec: add RAM_EXTERNAL flag to mark
- non-QEMU allocated blocks
+In-Reply-To: <edb4aed4-d032-2a8d-62d0-b5277ca137d5@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="11POPtN59hjwcCQ3i4OmcfRxOwgXjN8ks"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/6] include: Auto-generate
+ the sizes lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, wrfsh@yandex-team.ru
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, lbloch@janustech.com, armbru@redhat.com, qemu-block@nongnu.org
 
-* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> This flag allows to determine whether RAM block is available from the outside.
-> E.g. when we use -object memory-backend-file or -mem-path options we have
-> a RAM block which is mapped to shared file.
-> 
-> We need this flag in the following commits.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--11POPtN59hjwcCQ3i4OmcfRxOwgXjN8ks
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, lbloch@janustech.com, armbru@redhat.com,
+ qemu-block@nongnu.org
+Message-ID: <23bcf66e-a485-0155-d808-ef7f436b56c8@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v3 0/6] include: Auto-generate the sizes
+ lookup table
+References: <20190110191901.5082-1-eblake@redhat.com>
+ <edb4aed4-d032-2a8d-62d0-b5277ca137d5@redhat.com>
+In-Reply-To: <edb4aed4-d032-2a8d-62d0-b5277ca137d5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-As I said in the cover letter, why not just use shared?
+On 1/10/19 1:26 PM, Eric Blake wrote:
+> On 1/10/19 1:18 PM, Eric Blake wrote:
+>> Patches speak louder than words.  This is my counter-proposal to
+>> Leonid's thread on how best to respresent the S_*iB macros in units.h,=
 
-Dave
+>> where my proposal is that we don't need them at all. (hence my subject=
 
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> ---
->  backends/hostmem-file.c | 3 ++-
->  exec.c                  | 2 +-
->  include/exec/memory.h   | 3 +++
->  numa.c                  | 4 ++--
->  4 files changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> index 7a34e25c43..37fe28f2ac 100644
-> --- a/backends/hostmem-file.c
-> +++ b/backends/hostmem-file.c
-> @@ -63,7 +63,8 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->                                       name,
->                                       backend->size, fb->align,
->                                       (backend->share ? RAM_SHARED : 0) |
-> -                                     (fb->is_pmem ? RAM_PMEM : 0),
-> +                                     (fb->is_pmem ? RAM_PMEM : 0) |
-> +                                     RAM_EXTERNAL,
->                                       fb->mem_path, errp);
->      g_free(name);
->  #endif
-> diff --git a/exec.c b/exec.c
-> index 6e875f0640..ef2f29d7cb 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2241,7 +2241,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
->      int64_t file_size;
->  
->      /* Just support these ram flags by now. */
-> -    assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
-> +    assert((ram_flags & ~(RAM_SHARED | RAM_PMEM | RAM_EXTERNAL)) == 0);
->  
->      if (xen_enabled()) {
->          error_setg(errp, "-mem-path not supported with Xen");
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index ffd23ed8d8..3a9cb34f1e 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -126,6 +126,9 @@ typedef struct IOMMUNotifier IOMMUNotifier;
->  /* RAM is a persistent kind memory */
->  #define RAM_PMEM (1 << 5)
->  
-> +/* RAM is from external source (e.g. from file) */
-> +#define RAM_EXTERNAL (1 << 6)
-> +
->  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
->                                         IOMMUNotifierFlag flags,
->                                         hwaddr start, hwaddr end,
-> diff --git a/numa.c b/numa.c
-> index 50ec016013..653c5a08de 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -482,8 +482,8 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
->      if (mem_path) {
->  #ifdef __linux__
->          Error *err = NULL;
-> -        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, 0,
-> -                                         mem_path, &err);
-> +        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0,
-> +                                         RAM_EXTERNAL, mem_path, &err);
->          if (err) {
->              error_report_err(err);
->              if (mem_prealloc) {
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> line, even though it is completely unrelated to the series)
+>>
+>> True, my diffstat is even bigger, but I think it is more maintainable
+>> in the long run (if calling QemuOpts maintainable is even appropriate)=
+=2E
+>=20
+> I wasn't brave enough to assert that def_value_str was used only with
+> QEMU_OPT_STRING, and that all uses of QEMU_OPT_{BOOL,NUMBER,SIZE} with =
+a
+> default value are either defaulting to 0 or using def_value_int; that's=
+
+> a bigger auditing task followup that could be given as a BiteSizedTask,=
+
+> if you like this series.
+
+Hmm - I wonder if Coccinelle is powerful enough to find all QemuOptDesc
+initializers that .type to something other than QEMU_OPT_STRING and also
+set .def_value_str; including initializers that did not use C99
+named-member initialization (if we have any of those). (Those are the
+candidates to start using .def_value_int)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--11POPtN59hjwcCQ3i4OmcfRxOwgXjN8ks
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw3qUEACgkQp6FrSiUn
+Q2pAIgf+Md5qT1K4/exh9uOSntH5a+R/lXYuCMQRfG7wQ+mAowu3lMxft5SsaIyE
+sRr4QR4LO+mT8DOIC6xhKp8ia7Y10U2uSJKjjop5CTxSqekQ/xM7/Q9KrFjGjZvR
+yUYAGT1NXVvJKinyGoGxgfTE3zxEILUaQMtsmSiuWQ+qKCkSpEXn6Rzec/TvIzfD
+uS2OxEUWLouGDv6RpE1QRmU9zYufn4lXk71cjtN2FOiYzcux68HCnKEYTglG5ldi
+uHz6wjvHAaVffJupZ5iK03PJDDzM72DDPiTyeZNIw8kSXAg0hx6SnNhcWnwrRUta
+hnTXqyS1zibzjrXNNn1K+JcEwDUGyQ==
+=Ml9n
+-----END PGP SIGNATURE-----
+
+--11POPtN59hjwcCQ3i4OmcfRxOwgXjN8ks--
