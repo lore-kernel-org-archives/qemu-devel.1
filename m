@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37634)
+Received: from eggs.gnu.org ([209.51.188.92]:37691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ghZnm-0004SJ-Ew
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:51:15 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghZo4-00053e-CJ
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:51:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ghZnl-0007s7-Dy
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:51:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghZnl-0007ru-6M
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:51:13 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 10 Jan 2019 13:51:08 +0100
-Message-Id: <20190110125108.22834-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v4] usb: assign unique serial numbers to hid
- devices
+	(envelope-from <armbru@redhat.com>) id 1ghZnw-0007vs-6i
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:51:26 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190103213320.2653-1-lbloch@janustech.com>
+	<20190103213320.2653-2-lbloch@janustech.com>
+	<20190108122021.GB11492@linux.fritz.box>
+	<91dfd3e9-7293-4301-e3ac-852d8a038d4e@janustech.com>
+Date: Thu, 10 Jan 2019 13:51:12 +0100
+In-Reply-To: <91dfd3e9-7293-4301-e3ac-852d8a038d4e@janustech.com> (Leonid
+	Bloch's message of "Thu, 10 Jan 2019 10:04:59 +0000")
+Message-ID: <87d0p4he0v.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Auto-generate the sizes
+ lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,166 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, dgilbert@redhat.com
+To: Leonid Bloch <lbloch@janustech.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Windows guests have trouble dealing with usb devices having identical
-serial numbers.  So, assign unique serial numbers to usb hid devices.
-All other usb devices have this already.
+Leonid Bloch <lbloch@janustech.com> writes:
 
-In the past the fixed serial number has been used to indicate working
-remote setup to linux guests.  Here is a bit of history:
+> Hi,
+>
+> On 1/8/19 2:20 PM, Kevin Wolf wrote:
+>> Am 03.01.2019 um 22:33 hat Leonid Bloch geschrieben:
+>>> The lookup table for power-of-two sizes is now auto-generated during the
+>>> build, and not hard-coded into the units.h file.
+>>>
+>>> This partially reverts commit 540b8492618eb.
+>>>
+>>> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+>> 
+>> During a downstream review, Max found a problem with the table that we
+>> could fix while we're touching it:
+>> 
+>>      Upstream: All >= S_2GiB are not valid ints.  (qemu assumes that
+>>      sizeof(int) == 4, right?)  So S_2GiB should be 2147483648u and all
+>>      above should be ...ull or better UINT64_C().
 
- * First there was nothing.
- * Then I added a rule to udev checking for serial == 42.
-   (this is in rhel-6).
- * Then systemd + udev merged.
- * Then I changed the rule to check for serial != 1 instead, so we can
-   use any serial but "1" which is the one the old broken devices had
-   (this is in rhel-7).  March 2014 in upstream systemd.
- * Then all usb power management rules where dropped from systemd (June
-   2015).  Which I figured today (Sept 2018), after wondering that the
-   rules are gone in fedora 28.
+So their (integer) type can vary.  Whether that's a problem depends on
+how the macros are used.
 
-So, three years ago the serial number check was dropped upstream, yet I
-hav't seen a single report about autosuspend issues (or cpu usage for
-usb emulation going up, which is the typical symtom).
+> But the initial reasoning for this table was to have a pure number 
+> there. If there will be strings like "2147483648u/ull" or 
+> "UINT64_C(...)" there, they will be stringified, literally, and will 
+> appear as such inside the binary.
 
-So I figured I can stop worring that changing the serial number will
-break things and just do it.
+"Macro that expands to an integer constant that stringify() turns into a
+decimal number" is a rather peculiar contract.
 
-And even if it turns out autosuspend is still an issue:  I think
-meanwhile we can really stop worrying about guests running in old qemu
-versions with broken usb suspend (fixed in 0.13 !).  If needed we can
-enable autosuspend unconditionally in guests.
+>                                   If specifying the unit64 type is 
+> really needed, one can always use, e.g., 2 * GiB, from units.h.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/core/machine.c | 12 ++++++++++++
- hw/usb/dev-hid.c  | 26 +++++++++++++++-----------
- 2 files changed, 27 insertions(+), 11 deletions(-)
+Right now I suspect these S_ macros should generally be avoided.
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index f8563efb86..7bb78eee9b 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -40,6 +40,18 @@ GlobalProperty hw_compat_3_1[] = {
-         .driver   = "memory-backend-memfd",
-         .property = "x-use-canonical-path-for-ramblock-id",
-         .value    = "true",
-+    },{
-+        .driver   = "usb-kbd",
-+        .property = "serial",
-+        .value    = "42",
-+    },{
-+        .driver   = "usb-mouse",
-+        .property = "serial",
-+        .value    = "42",
-+    },{
-+        .driver   = "usb-tablet",
-+        .property = "serial",
-+        .value    = "42",
-     },
- };
- const size_t hw_compat_3_1_len = G_N_ELEMENTS(hw_compat_3_1);
-diff --git a/hw/usb/dev-hid.c b/hw/usb/dev-hid.c
-index 62d18290dc..205236e9b1 100644
---- a/hw/usb/dev-hid.c
-+++ b/hw/usb/dev-hid.c
-@@ -61,10 +61,13 @@ enum {
-     STR_PRODUCT_MOUSE,
-     STR_PRODUCT_TABLET,
-     STR_PRODUCT_KEYBOARD,
--    STR_SERIALNUMBER,
-+    STR_SERIAL_COMPAT,
-     STR_CONFIG_MOUSE,
-     STR_CONFIG_TABLET,
-     STR_CONFIG_KEYBOARD,
-+    STR_SERIAL_MOUSE,
-+    STR_SERIAL_TABLET,
-+    STR_SERIAL_KEYBOARD,
- };
- 
- static const USBDescStrings desc_strings = {
-@@ -72,10 +75,13 @@ static const USBDescStrings desc_strings = {
-     [STR_PRODUCT_MOUSE]    = "QEMU USB Mouse",
-     [STR_PRODUCT_TABLET]   = "QEMU USB Tablet",
-     [STR_PRODUCT_KEYBOARD] = "QEMU USB Keyboard",
--    [STR_SERIALNUMBER]     = "42", /* == remote wakeup works */
-+    [STR_SERIAL_COMPAT]    = "42",
-     [STR_CONFIG_MOUSE]     = "HID Mouse",
-     [STR_CONFIG_TABLET]    = "HID Tablet",
-     [STR_CONFIG_KEYBOARD]  = "HID Keyboard",
-+    [STR_SERIAL_MOUSE]     = "89126",
-+    [STR_SERIAL_TABLET]    = "28754",
-+    [STR_SERIAL_KEYBOARD]  = "68284",
- };
- 
- static const USBDescIface desc_iface_mouse = {
-@@ -375,7 +381,7 @@ static const USBDesc desc_mouse = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_MOUSE,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_MOUSE,
-     },
-     .full = &desc_device_mouse,
-     .str  = desc_strings,
-@@ -389,7 +395,7 @@ static const USBDesc desc_mouse2 = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_MOUSE,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_MOUSE,
-     },
-     .full = &desc_device_mouse,
-     .high = &desc_device_mouse2,
-@@ -404,7 +410,7 @@ static const USBDesc desc_tablet = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_TABLET,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_TABLET,
-     },
-     .full = &desc_device_tablet,
-     .str  = desc_strings,
-@@ -418,7 +424,7 @@ static const USBDesc desc_tablet2 = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_TABLET,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_TABLET,
-     },
-     .full = &desc_device_tablet,
-     .high = &desc_device_tablet2,
-@@ -433,7 +439,7 @@ static const USBDesc desc_keyboard = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_KEYBOARD,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_KEYBOARD,
-     },
-     .full = &desc_device_keyboard,
-     .str  = desc_strings,
-@@ -447,7 +453,7 @@ static const USBDesc desc_keyboard2 = {
-         .bcdDevice         = 0,
-         .iManufacturer     = STR_MANUFACTURER,
-         .iProduct          = STR_PRODUCT_KEYBOARD,
--        .iSerialNumber     = STR_SERIALNUMBER,
-+        .iSerialNumber     = STR_SERIAL_KEYBOARD,
-     },
-     .full = &desc_device_keyboard,
-     .high = &desc_device_keyboard2,
-@@ -718,9 +724,7 @@ static void usb_hid_initfn(USBDevice *dev, int kind,
-         return;
-     }
- 
--    if (dev->serial) {
--        usb_desc_set_string(dev, STR_SERIALNUMBER, dev->serial);
--    }
-+    usb_desc_create_serial(dev);
-     usb_desc_init(dev);
-     us->intr = usb_ep_get(dev, USB_TOKEN_IN, 1);
-     hid_init(&us->hid, kind, usb_hid_changed);
--- 
-2.9.3
+We have 54 of them.  I count six uses:
+
+    block/qcow2.h:#define QCOW_MAX_REFTABLE_SIZE S_8MiB
+    block/qcow2.h:#define QCOW_MAX_L1_SIZE S_32MiB
+    block/qcow2.h:#define DEFAULT_L2_CACHE_MAX_SIZE S_32MiB
+    block/qcow2.h:#define DEFAULT_L2_CACHE_MAX_SIZE S_8MiB
+    block/qcow2.h:#define DEFAULT_CLUSTER_SIZE S_64KiB
+    block/vdi.c:#define DEFAULT_CLUSTER_SIZE S_1MiB
+
+Which if them truly need stringify-able integers?
