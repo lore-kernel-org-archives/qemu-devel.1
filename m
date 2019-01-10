@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35612)
+Received: from eggs.gnu.org ([209.51.188.92]:37341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ghYDp-0002VY-9L
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:10:02 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ghYJO-0004Vh-Qc
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:15:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ghYDo-0006xJ-Hr
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:10:01 -0500
-Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:35054)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1ghYDo-0006wN-96
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:10:00 -0500
-Received: by mail-yw1-xc41.google.com with SMTP id h32so4235883ywk.2
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 03:10:00 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1ghYJI-0001YX-SG
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:15:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ghYJG-0001Sy-Qs
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:15:40 -0500
+Date: Thu, 10 Jan 2019 11:15:17 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190110111517.GB2589@work-vm>
+References: <20190110020259.8492-1-ehabkost@redhat.com>
+	<20190110020259.8492-4-ehabkost@redhat.com>
+	<CAJ+F1C+cADS2WKysnEzH-ZD=C3uj5wymQFXtd4L9BOO2cjbjvA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<CAJ+F1CLPFUnJANJs3SSine9YRXXqpR+gh6wHOLD=ivWpyURmJA@mail.gmail.com>
-In-Reply-To: <CAJ+F1CLPFUnJANJs3SSine9YRXXqpR+gh6wHOLD=ivWpyURmJA@mail.gmail.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Thu, 10 Jan 2019 19:09:47 +0800
-Message-ID: <CAONzpcYAfHo+uWRZxVY6+iE2wyTtC7dpm-h+rU-Nipz3xz=RwA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1C+cADS2WKysnEzH-ZD=C3uj5wymQFXtd4L9BOO2cjbjvA@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 0/7] vhost-user-blk: Add support
- for backend reconnecting
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] virtio: Make
+ disable-legacy/disable-modern compat properties optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, QEMU <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-On Thu, 10 Jan 2019 at 18:39, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
+* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
 > Hi
->
-> On Wed, Jan 9, 2019 at 3:28 PM <elohimes@gmail.com> wrote:
+>=20
+> On Thu, Jan 10, 2019 at 6:05 AM Eduardo Habkost <ehabkost@redhat.com> w=
+rote:
 > >
-> > From: Xie Yongji <xieyongji@baidu.com>
+> > The disable-legacy and disable-modern properties apply only to
+> > some virtio-pci devices.  Make those properties optional.
 > >
-> > This patchset is aimed at supporting qemu to reconnect
-> > vhost-user-blk backend after vhost-user-blk backend crash or
-> > restart.
+> > This fixes the crash introduced by commit f6e501a28ef9 ("virtio: Prov=
+ide
+> > version-specific variants of virtio PCI devices"):
 > >
-> > The patch 1 uses exisiting wait/nowait options to make QEMU not
-> > do a connect on client sockets during initialization of the chardev.
+> >   $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
+> >     -device virtio-net-pci-non-transitional
+> >   Unexpected error in object_property_find() at qom/object.c:1092:
+> >   qemu-system-x86_64: -device virtio-net-pci-non-transitional: can't =
+apply \
+> >   global virtio-pci.disable-modern=3Don: Property '.disable-modern' n=
+ot found
+> >   Aborted (core dumped)
 > >
-> > The patch 2 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
-> > and VHOST_USER_SET_INFLIGHT_FD to support providing shared
-> > memory to backend.
+> > Reported-by: Thomas Huth <thuth@redhat.com>
+> > Fixes: f6e501a28ef9 ("virtio: Provide version-specific variants of vi=
+rtio PCI devices")
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  hw/core/machine.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
 > >
-> > The patch 3,4 are the corresponding libvhost-user patches of
-> > patch 2. Make libvhost-user support VHOST_USER_GET_INFLIGHT_FD
-> > and VHOST_USER_SET_INFLIGHT_FD.
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index 5530b71981..a19143aa44 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -91,8 +91,9 @@ const size_t hw_compat_2_7_len =3D G_N_ELEMENTS(hw_=
+compat_2_7);
 > >
-> > The patch 5 allows vhost-user-blk to use the two new messages
-> > to get/set inflight buffer from/to backend.
-> >
-> > The patch 6 supports vhost-user-blk to reconnect backend when
-> > connection closed.
-> >
-> > The patch 7 introduces VHOST_USER_PROTOCOL_F_SLAVE_SHMFD
-> > to vhost-user-blk backend which is used to tell qemu that
-> > we support reconnecting now.
-> >
-> > To use it, we could start qemu with:
-> >
-> > qemu-system-x86_64 \
-> >         -chardev socket,id=3Dchar0,path=3D/path/vhost.socket,nowait,rec=
-onnect=3D1, \
-> >         -device vhost-user-blk-pci,chardev=3Dchar0 \
-> >
-> > and start vhost-user-blk backend with:
-> >
-> > vhost-user-blk -b /path/file -s /path/vhost.socket
-> >
-> > Then we can restart vhost-user-blk at any time during VM running.
-> >
-> > V3 to V4:
-> > - Drop messages VHOST_USER_GET_SHM_SIZE and VHOST_USER_SET_SHM_FD
-> > - Introduce two new messages VHOST_USER_GET_INFLIGHT_FD
-> >   and VHOST_USER_SET_INFLIGHT_FD
-> > - Allocate inflight buffer in backend rather than in qemu
-> > - Document a recommended format for inflight buffer
-> >
-> > V2 to V3:
-> > - Using exisiting wait/nowait options to control connection on
-> >   client sockets instead of introducing "disconnected" option.
-> > - Support the case that vhost-user backend restart during initialzation
-> >   of vhost-user-blk device.
-> >
-> > V1 to V2:
-> > - Introduce "disconnected" option for chardev instead of reuse "wait"
-> >   option
-> > - Support the case that QEMU starts before vhost-user backend
-> > - Drop message VHOST_USER_SET_VRING_INFLIGHT
-> > - Introduce two new messages VHOST_USER_GET_SHM_SIZE
-> >   and VHOST_USER_SET_SHM_FD
-> >
-> > Xie Yongji (7):
-> >   char-socket: Enable "nowait" option on client sockets
->
-> This patch breaks make check.
->
-> It would be nice to add a test for the new nowait behaviour.
->
+> >  GlobalProperty hw_compat_2_6[] =3D {
+> >      { "virtio-mmio", "format_transport_address", "off" },
+> > -    { "virtio-pci", "disable-modern", "on" },
+> > -    { "virtio-pci", "disable-legacy", "off" },
+> > +    /* Optional because not all virtio-pci devices support legacy mo=
+de */
+> > +    { "virtio-pci", "disable-modern", "on",  .optional =3D true },
+> > +    { "virtio-pci", "disable-legacy", "off", .optional =3D true },
+>=20
+> Could the generic devices implement a specific interface instead?
+> virtio-pci-generic?
+>=20
+> Adding "optional" handling looks like it may hide some other errors.
 
-Oh, sorry. I'll fix this issue and add one test for "nowait" option. Thank =
-you!
+I think it would be OK if it only ignored the non-existent property
+errors (or better, tested for their existence and then skipped if
+they weren't there).
 
-Thanks,
-Yongji
+Dave
+
+> >  };
+> >  const size_t hw_compat_2_6_len =3D G_N_ELEMENTS(hw_compat_2_6);
+> >
+> > --
+> > 2.18.0.rc1.1.g3f1ff2140
+> >
+> >
+>=20
+>=20
+> --=20
+> Marc-Andr=E9 Lureau
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
