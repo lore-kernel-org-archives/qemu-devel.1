@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39253)
+Received: from eggs.gnu.org ([209.51.188.92]:39608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ghei2-0004dc-Rl
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:05:39 -0500
+	(envelope-from <philmd@redhat.com>) id 1ghejC-0005Rn-1F
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:06:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ghei2-00016W-0l
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:05:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ghei1-0000r0-QA
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:05:37 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 10 Jan 2019 16:04:58 -0200
-Message-Id: <20190110180458.18762-3-ehabkost@redhat.com>
-In-Reply-To: <20190110180458.18762-1-ehabkost@redhat.com>
-References: <20190110180458.18762-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] virtio: Make
- disable-legacy/disable-modern compat properties optional
+	(envelope-from <philmd@redhat.com>) id 1ghej9-0001tE-5w
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:06:48 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35675)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghej9-0001se-0L
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:06:47 -0500
+Received: by mail-wr1-f68.google.com with SMTP id 96so12465768wrb.2
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 10:06:46 -0800 (PST)
+References: <20190110174516.21586-1-alex.bennee@linaro.org>
+	<20190110174516.21586-16-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <bbd7b9dd-20ea-6237-c56a-9519413b67a9@redhat.com>
+Date: Thu, 10 Jan 2019 19:06:44 +0100
+MIME-Version: 1.0
+In-Reply-To: <20190110174516.21586-16-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 15/19] travis: remove matrix settings
+ that duplicate global settings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: ymankad@redhat.com, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Fam Zheng <fam@euphon.net>
 
-The disable-legacy and disable-modern properties apply only to
-some virtio-pci devices.  Make those properties optional.
+On 1/10/19 6:45 PM, Alex Bennée wrote:
+> From: Daniel P. Berrangé <berrange@redhat.com>
+> 
+> The global defaults request "trusty" and "gcc", so matrix entries do not
+> need to repeat this.
+> 
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-This fixes the crash introduced by commit f6e501a28ef9 ("virtio: Provide
-version-specific variants of virtio PCI devices"):
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-  $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
-    -device virtio-net-pci-non-transitional
-  Unexpected error in object_property_find() at qom/object.c:1092:
-  qemu-system-x86_64: -device virtio-net-pci-non-transitional: can't apply \
-  global virtio-pci.disable-modern=on: Property '.disable-modern' not found
-  Aborted (core dumped)
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Fixes: f6e501a28ef9 ("virtio: Provide version-specific variants of virtio PCI devices")
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/core/machine.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 5530b71981..a19143aa44 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -91,8 +91,9 @@ const size_t hw_compat_2_7_len = G_N_ELEMENTS(hw_compat_2_7);
- 
- GlobalProperty hw_compat_2_6[] = {
-     { "virtio-mmio", "format_transport_address", "off" },
--    { "virtio-pci", "disable-modern", "on" },
--    { "virtio-pci", "disable-legacy", "off" },
-+    /* Optional because not all virtio-pci devices support legacy mode */
-+    { "virtio-pci", "disable-modern", "on",  .optional = true },
-+    { "virtio-pci", "disable-legacy", "off", .optional = true },
- };
- const size_t hw_compat_2_6_len = G_N_ELEMENTS(hw_compat_2_6);
- 
--- 
-2.18.0.rc1.1.g3f1ff2140
+> ---
+>  .travis.yml | 8 --------
+>  1 file changed, 8 deletions(-)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index 39dbda7a0b..79da3a495a 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -128,39 +128,33 @@ matrix:
+>          - CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
+>        after_success:
+>          - ${SRC_DIR}/scripts/travis/coverage-summary.sh
+> -      compiler: gcc
+>  
+>  
+>      # We manually include builds which we disable "make check" for
+>      - env:
+>          - CONFIG="--enable-debug --enable-tcg-interpreter"
+>          - TEST_CMD=""
+> -      compiler: gcc
+>  
+>  
+>      # We don't need to exercise every backend with every front-end
+>      - env:
+>          - CONFIG="--enable-trace-backends=log,simple,syslog --disable-system"
+>          - TEST_CMD=""
+> -      compiler: gcc
+>  
+>  
+>      - env:
+>          - CONFIG="--enable-trace-backends=ftrace --target-list=x86_64-softmmu"
+>          - TEST_CMD=""
+> -      compiler: gcc
+>  
+>  
+>      - env:
+>          - CONFIG="--enable-trace-backends=ust --target-list=x86_64-softmmu"
+>          - TEST_CMD=""
+> -      compiler: gcc
+>  
+>  
+>      - env:
+>          - CONFIG="--disable-tcg"
+>          - TEST_CMD=""
+> -      compiler: gcc
+>  
+>  
+>      # MacOSX builds
+> @@ -251,5 +245,3 @@ matrix:
+>      - env:
+>          - CONFIG="--disable-system --disable-docs"
+>          - TEST_CMD="make -j3 check-tcg V=1"
+> -      dist: trusty
+> -      compiler: gcc
+> 
