@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35699)
+Received: from eggs.gnu.org ([209.51.188.92]:38232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghWZb-0002bQ-5w
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 04:24:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghWgA-000606-3N
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 04:31:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghWZa-0001lu-1Y
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 04:24:23 -0500
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:40780)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ghWZZ-0001gx-LR
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 04:24:21 -0500
-Received: from player788.ha.ovh.net (unknown [10.109.160.232])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 3ADE510F4E7
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 10:24:17 +0100 (CET)
-Date: Thu, 10 Jan 2019 10:24:04 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190110102404.00258577@bahia.lan>
-In-Reply-To: <1547111736-3962-2-git-send-email-thuth@redhat.com>
-References: <1547111736-3962-1-git-send-email-thuth@redhat.com>
-	<1547111736-3962-2-git-send-email-thuth@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1ghWg2-0007Dk-NI
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 04:31:10 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190102140535.11512-1-cfergeau@redhat.com>
+	<20190102180158.GA6015@natto.ory.fergeau.eu>
+	<4ff5eb04-e1e0-7126-c08d-58d1f28b4f27@redhat.com>
+	<87o98sii5b.fsf@dusky.pond.sub.org>
+	<20190107163606.GL23773@natto.ory.fergeau.eu>
+	<87pnt7bflk.fsf@dusky.pond.sub.org>
+	<d8a41aa9-42bf-94f0-d6e6-347547dc39da@redhat.com>
+	<87bm4pewa8.fsf@dusky.pond.sub.org> <20190109144925.GT3998@redhat.com>
+	<5ad4e813-64e4-4761-9675-7d73527ded9a@redhat.com>
+	<20190109165532.GX3998@redhat.com>
+Date: Thu, 10 Jan 2019 10:30:39 +0100
+In-Reply-To: <20190109165532.GX3998@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
+	=?utf-8?Q?ang=C3=A9=22's?=
+	message of "Wed, 9 Jan 2019 16:55:32 +0000")
+Message-ID: <87imyw7tc0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] ppc: Move spapr-related prototypes
- from xics.h into a seperate header file
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] json: Fix % handling when not interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,136 +33,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, "Daniel P.
-	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, pbonzini@redhat.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org, Christophe Fergeau <cfergeau@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, 10 Jan 2019 10:15:34 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-> When compiling with Clang in -std=gnu99 mode, there is a warning/error:
-> 
->   CC      ppc64-softmmu/hw/intc/xics_spapr.o
-> In file included from /home/thuth/devel/qemu/hw/intc/xics_spapr.c:34:
-> /home/thuth/devel/qemu/include/hw/ppc/xics.h:203:34: error: redefinition of typedef 'sPAPRMachineState' is a C11 feature
->       [-Werror,-Wtypedef-redefinition]
-> typedef struct sPAPRMachineState sPAPRMachineState;
->                                  ^
-> /home/thuth/devel/qemu/include/hw/ppc/spapr_irq.h:25:34: note: previous definition is here
-> typedef struct sPAPRMachineState sPAPRMachineState;
->                                  ^
-> 
-> We have to remove the duplicated typedef here and include "spapr.h" instead.
-> But "spapr.h" should not be included for the pnv machine files. So move
-> the spapr-related prototypes into a new file called "xics_spapr.h" instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
+> On Wed, Jan 09, 2019 at 04:02:28PM +0100, Max Reitz wrote:
+>> On 09.01.19 15:49, Daniel P. Berrang=C3=A9 wrote:
+>> > On Wed, Jan 09, 2019 at 03:32:47PM +0100, Markus Armbruster wrote:
+>> >> Max Reitz <mreitz@redhat.com> writes:
+>> >>
+>> >>> On 08.01.19 11:36, Markus Armbruster wrote:
+>> >>>> Copying block maintainers for help with assessing the bug's (non-)i=
+mpact
+>> >>>> on security.
+>> >>>>
+>> >>>> Christophe Fergeau <cfergeau@redhat.com> writes:
+>> >>>>
+>> >>>>> On Mon, Jan 07, 2019 at 04:47:44PM +0100, Markus Armbruster wrote:
+>> >>>>>> Eric Blake <eblake@redhat.com> writes:
+>> >>>>>>
+>> >>>>>>> On 1/2/19 12:01 PM, Christophe Fergeau wrote:
+>> >>>>>>>> Adding Markus to cc: list, I forgot to do it when sending the p=
+atch.
+>> >>>>>>>
+>> >>>>>>> Also worth backporting via qemu-stable, now in cc.
+>> >>>>>>>
+>> >>>>>>>>
+>> >>>>>>>> Christophe
+>> >>>>>>>>
+>> >>>>>>>> On Wed, Jan 02, 2019 at 03:05:35PM +0100, Christophe Fergeau wr=
+ote:
+>> >>>>>>>>> commit 8bca4613 added support for %% in json strings when inte=
+rpolating,
+>> >>>>>>>>> but in doing so, this broke handling of % when not interpolati=
+ng as the
+>> >>>>>>>>> '%' is skipped in both cases.
+>> >>>>>>>>> This commit ensures we only try to handle %% when interpolatin=
+g.
+>> >>>>>>
+>> >>>>>> Impact?
+>> >>>>>>
+>> >>>>>> If you're unable to assess, could you give us at least a reproduc=
+er?
+>> >>>>>
+>> >>>>> This all came from https://lists.freedesktop.org/archives/spice-de=
+vel/2018-December/046644.html
+>> >>>>> Setting up a VM with libvirt with <graphics type=3D'spice' autopor=
+t=3D'yes' passwd=3D'password%'/>
+>> >>>>> fails to start with:
+>> >>>>>   qemu-system-x86_64: qobject/json-parser.c:146: parse_string: Ass=
+ertion `*ptr' failed.
+>> >>>>>
+>> >>>>> If you use 'password%%' as the password instead, when trying to co=
+nnect
+>> >>>>> to the VM, you type 'password%' as the password instead of 'passwo=
+rd%%'
+>> >>>>> as configured in the domain XML.
+>> >>>>
+>> >>>> Thanks.
+>> >>>>
+>> >>>> As the commit message says, the bug bites when we parse a string
+>> >>>> containing '%s' with !ctxt->ap.  The parser then swallows a charact=
+er.
+>> >>>> If it swallows the terminating '"', it fails the assertion.
+>> >>>>
+>> >>>> We parse with !ctxt->ap in the following cases:
+>> >>>>
+>> >>>> * Tests (tests/check-qjson.c, tests/test-qobject-input-visitor.c,
+>> >>>>   tests/test-visitor-serialization.c)
+>> >>>>
+>> >>>>   Plenty of tests, but we still failed to cover the buggy case :(
+>> >>>>
+>> >>>> * QMP input (monitor.c)
+>> >>>>
+>> >>>> * QGA input (qga/main.c)
+>> >>>>
+>> >>>> * qobject_from_json()
+>> >>>>
+>> >>>>   - JSON pseudo-filenames (block.c)
+>> >>>>
+>> >>>>     These are pseudo-filenames starting with "json:".
+>> >>>>
+>> >>>>   - JSON key pairs (block/rbd.c)
+>> >>>>
+>> >>>>     As far as I can tell, these can come only from pseudo-filenames
+>> >>>>     starting with "rbd:".
+>> >>>>
+>> >>>>   - JSON command line option arguments of -display and -blockdev
+>> >>>>     (qobject-input-visitor.c)
+>> >>>>
+>> >>>>     Reproducer: -blockdev '{"%"}'
+>> >>>>
+>> >>>> Command line, QMP and QGA input are trusted.
+>> >>>>
+>> >>>> Filenames are trusted when they come from command line, QMP or HMP.
+>> >>>> They are untrusted when they come from from image file headers.
+>> >>>> Example: QCOW2 backing file name.  Note that this is *not* the secu=
+rity
+>> >>>> boundary between host and guest.  It's the boundary between host an=
+d an
+>> >>>> image file from an untrusted source.
+>> >>>>
+>> >>>> I can't see how the bug could be exploited.  Neither failing an
+>> >>>> assertion nor skipping a character in a filename of your choice is
+>> >>>> interesting.  We don't support compiling with NDEBUG.
+>> >>>>
+>> >>>> Kevin, Max, do you agree?
+>> >>>
+>> >>> I wouldn't call it "not interesting" if adding an image to your VM at
+>> >>> runtime can crash the whole thing.
+>> >>>
+>> >>> (qemu-img create -f qcow2 -u -b 'json:{"%"}' foo.qcow2 64M)
+>> >>
+>> >> "Not interesting" strictly from the point of view of exploiting the b=
+ug
+>> >> to penetrate trust boundaries.
+>> >>
+>> >>> Whether this is a security issue...  I don't know, but it is a DoS.
+>> >>
+>> >> I'm not sure whether feeding untrusted images to QEMU is a good idea =
+in
+>> >> general --- there's so much that could go wrong.  How hardened against
+>> >> abuse are out block drivers?
+>> >>
+>> >> I figure what distinguishes this case is how utterly trivial creating=
+ a
+>> >> "bad" image is.
+>> >=20
+>> > Consider that you can already create a qcow2 image with a backing file
+>> > of /etc/shadow.
+>>=20
+>> If you cannot access this file, then it should just be an error and not
+>> crash qemu.
+>>=20
+>> If you can access this file, that's your own fault for bad permissions.
+>>
+>> > Or create a qcow2 image many EB in size that causes QEMU=20
+>> > to allocate massive amounts of RAM and/or burn CPU time, and so on.
+>>=20
+>> That would be the qcow2 driver's fault.  We do try to open only images
+>> which are sane.
+>
+> The defintion of "sane" is quite hard though, as its contextual. There are
+> things that are sane when viewed from QEMU level, which can none the less
+> be considered a security bug from the mgmt app level. CPU/memory usage
+> associated with huge images is in this bucket I think, given how enourmous
+> some disk images can genuinely be.
+>
+>> And memory allocation failures should be handled gracefully, so the VM
+>> shouldn't crash.  Well, at least qcow2 does its best, what Linux makes
+>> of it, who knows.  (e.g. it may assign the memory to qemu and then the
+>> OOM killer may crash it later)
+>
+> Yep, you'll quite likely succeed and trigger the OOM killer, or=20
+> alternatively succeed and push other running VMs out to swap
+> effectively inflicting a denial of service on them.
+>
+>> > IOW, mgmt apps should never pass untrusted images to QEMU.  Crashing is
+>> > just one of many bad things, and probably not the worst that can happe=
+n.
+>> >=20
+>> > They need to do validation upfront in some manner if receiving an=20
+>> > untrustworthy image. Openstack does this by running qemu-img, with=20
+>> > limits set on virutal memory size, CPU time, and then rejecting any=20
+>> > image with a backing file from being used at all.
+>> >=20
+>> >> Anyway, you are the block layer maintainers, so you get to decide
+>> >> whether to give this the full security bug treatment.  I'm merely the
+>> >> clown who broke it %-/
+>> >=20
+>> > Accepting an image with any backing file at all from an untrusted user
+>> > would be a flaw in the layered management app itself, not QEMU.
+>> >=20
+>> > So I think it would only be considered a security bug in QEMU if there=
+ was=20
+>> > a way for an unprivileged user to trick QEMU into writing malformed JS=
+ON
+>> > into an otherwise trusted image.
+>>=20
+>> Not making it a security bug makes me happy, of course, but I don't
+>> quite agree that qemu is not to blame if you pass it some image which
+>> makes it crash.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+No argument, it's definitely a bug.  What we've been debating (as far as
+I'm concerned) is whether it's an exploitable security hole.  I don't
+think it is, and it sounds like nobody really disagrees.
 
->  hw/intc/xics_kvm.c          |  1 +
->  hw/intc/xics_spapr.c        |  1 +
->  hw/ppc/spapr_irq.c          |  1 +
->  include/hw/ppc/xics.h       |  7 -------
->  include/hw/ppc/xics_spapr.h | 37 +++++++++++++++++++++++++++++++++++++
->  5 files changed, 40 insertions(+), 7 deletions(-)
->  create mode 100644 include/hw/ppc/xics_spapr.h
-> 
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index ac94594..dff1330 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -34,6 +34,7 @@
->  #include "sysemu/kvm.h"
->  #include "hw/ppc/spapr.h"
->  #include "hw/ppc/xics.h"
-> +#include "hw/ppc/xics_spapr.h"
->  #include "kvm_ppc.h"
->  #include "qemu/config-file.h"
->  #include "qemu/error-report.h"
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index 9c1a90d..de6cc15 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -32,6 +32,7 @@
->  #include "qemu/timer.h"
->  #include "hw/ppc/spapr.h"
->  #include "hw/ppc/xics.h"
-> +#include "hw/ppc/xics_spapr.h"
->  #include "hw/ppc/fdt.h"
->  #include "qapi/visitor.h"
->  
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 5fce72f..1da7a32 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -14,6 +14,7 @@
->  #include "hw/ppc/spapr.h"
->  #include "hw/ppc/spapr_xive.h"
->  #include "hw/ppc/xics.h"
-> +#include "hw/ppc/xics_spapr.h"
->  #include "sysemu/kvm.h"
->  
->  #include "trace.h"
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 07508cb..fad786e 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -200,13 +200,6 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon);
->  void ics_resend(ICSState *ics);
->  void icp_resend(ICPState *ss);
->  
-> -typedef struct sPAPRMachineState sPAPRMachineState;
-> -
-> -void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
-> -                   uint32_t phandle);
-> -int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-> -void xics_spapr_init(sPAPRMachineState *spapr);
-> -
->  Object *icp_create(Object *cpu, const char *type, XICSFabric *xi,
->                     Error **errp);
->  
-> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
-> new file mode 100644
-> index 0000000..b1ab27d
-> --- /dev/null
-> +++ b/include/hw/ppc/xics_spapr.h
-> @@ -0,0 +1,37 @@
-> +/*
-> + * QEMU PowerPC pSeries Logical Partition (aka sPAPR) hardware System Emulator
-> + *
-> + * PAPR Virtualized Interrupt System, aka ICS/ICP aka xics
-> + *
-> + * Copyright (c) 2010, 2011 David Gibson, IBM Corporation.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef XICS_SPAPR_H
-> +#define XICS_SPAPR_H
-> +
-> +#include "hw/ppc/spapr.h"
-> +
-> +void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
-> +                   uint32_t phandle);
-> +int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-> +void xics_spapr_init(sPAPRMachineState *spapr);
-> +
-> +#endif /* XICS_SPAPR_H */
+The ability to run random crap downloaded from the internet as root with
+SELinux turned off is not a security hole.  It's to be filed under
+"don't do that".  Likewise, the ability to make a virtual machine
+abort() by feeding it untrusted images is not a security hole, it's a
+"don't do that".
+
+> Certainly QEMU should never crash on any input. I just think that wrt=20
+> untrustworthy disk images, you need security protection well before you=20
+> get to a live QEMU VM process, so I think this can be just a "normal" bug.
+
+Concur.
