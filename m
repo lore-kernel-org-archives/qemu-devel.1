@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54026)
+Received: from eggs.gnu.org ([209.51.188.92]:54869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghZCu-0001dZ-8i
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:13:08 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ghZF5-0003Xr-4c
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:15:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghZCs-0004wb-Bb
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:13:08 -0500
-Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:52793)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ghZCs-0004pT-4g
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:13:06 -0500
-Received: from player796.ha.ovh.net (unknown [10.109.159.7])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 8624D10C257
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 13:12:52 +0100 (CET)
-Date: Thu, 10 Jan 2019 13:12:38 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190110131238.7a65eb20@bahia.lan>
-In-Reply-To: <20190110101243.GE2178@redhat.com>
-References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
-	<1547051976-13982-2-git-send-email-thuth@redhat.com>
-	<3316bf08-36c0-c3ce-4e4f-8244276c58d3@kaod.org>
-	<20190109172801.GB3998@redhat.com>
-	<d72673fa-52a5-a6ff-6aa8-34f2b4b6855f@redhat.com>
-	<60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
-	<20190110101243.GE2178@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1ghZF3-000695-Ag
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:15:23 -0500
+Date: Thu, 10 Jan 2019 13:15:13 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190110131513.0d264b10.cohuck@redhat.com>
+In-Reply-To: <18c1ba75-84f6-e928-64a9-ccf5044d92b5@linux.ibm.com>
+References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
+	<1544623878-11248-11-git-send-email-jjherne@linux.ibm.com>
+	<20181213182100.6da37a95.cohuck@redhat.com>
+	<bfde1bd3-0725-1085-8a98-eeaf2b0694ed@linux.ibm.com>
+	<729790ec-a74a-2e6e-89ed-3d450c95f54f@linux.ibm.com>
+	<20190109193406.616fcf66.cohuck@redhat.com>
+	<18c1ba75-84f6-e928-64a9-ccf5044d92b5@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
- compilation with clang -std=gnu99
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 10/15] s390-bios: Support for
+ running format-0/1 channel programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc: pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Thu, 10 Jan 2019 10:12:43 +0000
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+On Wed, 9 Jan 2019 15:01:19 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-> On Wed, Jan 09, 2019 at 03:25:53PM -0600, Eric Blake wrote:
-> > On 1/9/19 3:20 PM, Paolo Bonzini wrote: =20
-> > > On 09/01/19 18:28, Daniel P. Berrang=C3=A9 wrote: =20
-> > >>> so both files include each other, how nice ... =20
-> > >> If the header files are mutually dependent it makes me wonder what t=
-he
-> > >> point of having them split up is ?
-> > >>
-> > >> Feels like either they need to be merged, or they need to be split up
-> > >> and refactored even more to remove the mutual dependancy. =20
-> > >=20
-> > > If they include each other only for the typedefs, then prehaps the
-> > > solution is to change the coding style and allow using struct in
-> > > function prototypes.  I'm pretty sure there are several examples of t=
-his
-> > > already. =20
-> >=20
-> > Or stick the typedef in <typedefs.h>, instead of trying to find (or
-> > create) some other common header. =20
->=20
-> Probably better to just have a local  spapr_types.h instead of
-> polluting the global namespace.
->=20
+> On 1/9/19 1:34 PM, Cornelia Huck wrote:
+> > On Wed, 9 Jan 2019 13:10:26 -0500
+> > "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-I personally like this approach because it would allow to use the
-typedefs everywhere, for the sake of consistency.
+> >> I'm not sure what value there is in abstracting sense at the moment. I'm not even sure
+> >> what other device's sense data looks like. Since my description of the SENSE CCW comes
+> >> from an ECKD reference I have not been able to verify any areas of the data that are
+> >> common across device types. Thoughts?  
+> > 
+> > There's SA22-7204-01 ("Common I/O Device Commands"), which is from 1992
+> > (this is what I have on my disk -- is there anything newer?). It
+> > specifies what bits 0-5 of byte 0 mean and states that bytes 1-31 are
+> > optional and device-specific.
+> > 
+> > Maybe some other bits have been specified after 1992, but I have not
+> > come across documentation for them.  
+> 
+> That publication is no longer available. According to my quick research it has been 
+> replaced by an internal only publication. I'll see what I can find.
 
->=20
-> Regards,
-> Daniel
+The publication no longer being available is not good, as it is a
+normative reference pointed to by the virtio standard (see
+http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-30001)
+:(
+
+Is there any chance that at least that old version can be made
+available again?
