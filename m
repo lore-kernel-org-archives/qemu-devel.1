@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44917)
+Received: from eggs.gnu.org ([209.51.188.92]:45663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghezS-000656-Ab
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:23:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ghf2G-0007pQ-61
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:26:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghezP-0007Ff-Fq
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:23:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ghezP-0007F4-8d
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:23:35 -0500
-Date: Thu, 10 Jan 2019 18:23:27 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190110182327.GW2178@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190110174516.21586-1-alex.bennee@linaro.org>
-	<20190110174516.21586-12-alex.bennee@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1ghf27-0000NY-3m
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:26:26 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44705)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ghf22-0000LX-FO
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:26:18 -0500
+Received: by mail-oi1-x243.google.com with SMTP id m6so10048674oig.11
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 10:26:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190110174516.21586-12-alex.bennee@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 11/19] travis: use homebrew addon for
- MacOSX
+References: <20190108163008.7006-1-peter.maydell@linaro.org>
+	<20190108163008.7006-4-peter.maydell@linaro.org>
+In-Reply-To: <20190108163008.7006-4-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 10 Jan 2019 18:26:05 +0000
+Message-ID: <CAFEAcA9xd-MJ7QHgYCyh0D+x_ooXYDCnKYTXELoxz3LbYO4SJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 3/4] accel/tcg: Add cluster number to TCG
+ TB hash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, ymankad@redhat.com, Fam Zheng <fam@euphon.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Emilio G . Cota" <cota@braap.org>
 
-On Thu, Jan 10, 2019 at 05:45:08PM +0000, Alex Benn=C3=A9e wrote:
-> Rather than poking homebrew manually we can specify the packages
-> needed via the homebrew addon. These are only installed on MacOS based
-> builds.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-Dupe
-
+On Tue, 8 Jan 2019 at 16:30, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> Include the cluster number in the hash we use to look
+> up TBs. This is important because a TB that is valid
+> for one cluster at a given physical address and set
+> of CPU flags is not necessarily valid for another:
+> the two clusters may have different views of physical
+> memory, or may have different CPU features (eg FPU
+> present or absent).
+>
+> We put the cluster number in the high 8 bits of the
+> TB cflags. This gives us up to 256 clusters, which should
+> be enough for anybody. If we ever need more, or need
+> more bits in cflags for other purposes, we could make
+> tb_hash_func() take more data (and expand qemu_xxhash7()
+> to qemu_xxhash8()).
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  .travis.yml | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
+>  include/exec/exec-all.h   | 4 +++-
+>  accel/tcg/cpu-exec.c      | 4 ++++
+>  accel/tcg/translate-all.c | 3 +++
+>  3 files changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index 815e5b1e838..aa7b81aaf01 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -351,9 +351,11 @@ struct TranslationBlock {
+>  #define CF_USE_ICOUNT  0x00020000
+>  #define CF_INVALID     0x00040000 /* TB is stale. Set with @jmp_lock held */
+>  #define CF_PARALLEL    0x00080000 /* Generate code for a parallel context */
+> +#define CF_CLUSTER_MASK 0xff000000 /* Top 8 bits are cluster ID */
+> +#define CF_CLUSTER_SHIFT 24
+>  /* cflags' mask for hashing/comparison */
+>  #define CF_HASH_MASK   \
+> -    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL)
+> +    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL | CF_CLUSTER_MASK)
+>
+>      /* Per-vCPU dynamic tracing state used to generate this TB */
+>      uint32_t trace_vcpu_dstate;
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 870027d4359..e578a1a3aee 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -336,6 +336,10 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+>          return NULL;
+>      }
+>      desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
+> +
+> +    cf_mask &= ~CF_CLUSTER_MASK;
+> +    cf_mask |= cpu->cluster_index << CF_CLUSTER_SHIFT;
+> +
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+This hunk turns out not to be quite right -- it needs to move
+to the top of the function, before the assignment
+"desc.flags = flags;". Otherwise tb_lookup_cmp() will
+spuriously fail, and execution becomes somewhat slower because
+we have to keep retranslating TBs rather than reusing them.
+(Surprisingly this is only noticeable in an ARM TFM image
+I happen to have, not in Linux kernel boot...)
 
-
->=20
-> diff --git a/.travis.yml b/.travis.yml
-> index fa70429459..2ef7997d25 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -42,6 +42,12 @@ addons:
->        - sparse
->        - uuid-dev
->        - gcovr
-> +  homebrew:
-> +    packages:
-> +      - libffi
-> +      - gettext
-
-A separate patch can also drop libffi & gettext since travis logs show
-they are already installed these days.
-
-> +      - glib
-> +      - pixman
-> =20
-> =20
->  # The channel name "irc.oftc.net#qemu" is encrypted against qemu/qemu
-> @@ -68,9 +74,6 @@ git:
->    submodules: false
-> =20
-> =20
-> -before_install:
-> -  - if [ "$TRAVIS_OS_NAME" =3D=3D "osx" ]; then brew update ; fi
-> -  - if [ "$TRAVIS_OS_NAME" =3D=3D "osx" ]; then brew install libffi ge=
-ttext glib pixman ; fi
->  before_script:
->    - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
->    - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+thanks
+-- PMM
