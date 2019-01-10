@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35685)
+Received: from eggs.gnu.org ([209.51.188.92]:37778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghUZH-0002FA-Ks
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:15:56 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ghUik-0006x6-6W
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:25:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghUZC-0002U4-0p
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:15:52 -0500
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
-	<20180609151758.17343-5-vsementsov@virtuozzo.com>
-	<91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4a689a27-645c-da07-4512-ba4ed7e212cb@redhat.com>
-Date: Thu, 10 Jan 2019 01:15:42 -0600
+	(envelope-from <kraxel@redhat.com>) id 1ghUij-00081b-Ds
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:25:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghUij-0007vA-7R
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:25:41 -0500
+Date: Thu, 10 Jan 2019 08:25:36 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190110072536.d5da6zqos7euz3sa@sirius.home.kraxel.org>
+References: <cover.1545598229.git.DirtY.iCE.hu@gmail.com>
+	<26b300d6c17e6ac015f1519d50151744cf806c03.1545598229.git.DirtY.iCE.hu@gmail.com>
+	<87sgy4k3u7.fsf@dusky.pond.sub.org>
+	<b050b973-e675-8114-fd8a-1878dbdb81d6@gmail.com>
+	<87va2zg6hh.fsf@dusky.pond.sub.org>
+	<6619c58a-3e5a-a302-9bf0-acac6f7870e9@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vOkk1BeywDlAKrvxVNOMiZSqoqkGK7QeS"
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] nbd/server: implement dirty bitmap
- export
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6619c58a-3e5a-a302-9bf0-acac6f7870e9@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 06/52] audio: -audiodev command line
+ option basic implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, armbru@redhat.com, mreitz@redhat.com
+To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vOkk1BeywDlAKrvxVNOMiZSqoqkGK7QeS
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, armbru@redhat.com,
- mreitz@redhat.com
-Message-ID: <4a689a27-645c-da07-4512-ba4ed7e212cb@redhat.com>
-Subject: Re: [PATCH v5 4/6] nbd/server: implement dirty bitmap export
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
- <20180609151758.17343-5-vsementsov@virtuozzo.com>
- <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
-In-Reply-To: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+  Hi,
 
-On 1/9/19 1:21 PM, Eric Blake wrote:
-> Revisiting an older thread:
->=20
-> On 6/9/18 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Handle new NBD meta namespace: "qemu", and corresponding queries:
->> "qemu:dirty-bitmap:<export bitmap name>".
->>
->> With new metadata context negotiated, BLOCK_STATUS query will reply
->> with dirty-bitmap data, converted to extents. New public function
->> nbd_export_bitmap selects bitmap to export. For now, only one bitmap
->> may be exported.
->>
+> I was thinking about creating an Audiodev (the qapi type) directly would
+> be better, then somehow print it with reflection.  While this is not a
+> typical use of qapi, at least qmp_qom_list creates qapi objects
+> directly, so I assume it's ok.
 
->> +    if (bdrv_dirty_bitmap_enabled(bm)) {
->> +        error_setg(errp, "Bitmap '%s' is enabled", bitmap);
->> +        return;
->> +    }
->=20
-> Why are we restricting things to only export disabled bitmaps?
->=20
-> I can understand the argument that if the image being exported is
-> read-only, then an enabled bitmap _that can be changed_ is probably a
-> bad idea (it goes against the notion of the export being read only).
-> But if we were to allow a writable access to an image, wouldn't we
-> expect that writes be reflected into the bitmap, which means permitting=
+Yes, it's perfectly fine.
 
-> an enabled bitmap?
+> The second problem: with my patched options visitor, nested structs were
+> required in qapi, the options visitor unconditionally filled them.  With
+> qobject_input_visitor, I have to mark them optional, otherwise the user
+> have to specify at least one option from the nested structs.
 
-I've now addressed this in my v2 Promote x-nbd-server-add-bitmap to
-stable series.
+Can we just drop the nesting?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Have a look at DisplayOptions (qapi struct used to store -display
+options).  It's a union, has some common base fields, and the
+discriminator field (type in that case) decides which of the data
+branches is used.  And on the command line I can do stuff like this:
 
+  -display gtk,full-screen=on,zoom-to-fit=on
+                              ^^^^^^^^^^^     in struct DisplayGTK
+               ^^^^^^^^^^^                    common base field
 
---vOkk1BeywDlAKrvxVNOMiZSqoqkGK7QeS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Audiodev should be able to do the same to support backend-specific
+options without nesting.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw28R4ACgkQ3g5py3or
-ov278wf/QGYgFveU6Jxd0NDP+iYYqcCP3KOeMqU2JGiY7nrrmPvT2wfyMW38P0or
-hWZ+3Qo4g10IQvFo2QOer77B3OF+HJEXL+2s+JZuOMLf+hQPcVYg6DI5M+wMGPwp
-upcMSBVcFEElqtXL2p1DXPFYy3NfpgIRP/3Kd4V1g+sMkURCc7x3tkMBG87Shyao
-ql8EGrXhT3PORJiErR6Jqf4i/D6TyyU4wvhA+mkZ3naPU5leqd/Xu2AKuKO4cauU
-YyTJ26CErLj1oVXEqkfV4UqAsyj/QOi4QcSonCblDbFl3vUlxZls8VAXLucAkAoA
-JV6XzVsmRIV5km+Vnhwk4IBDJbIHXg==
-=OBvK
------END PGP SIGNATURE-----
-
---vOkk1BeywDlAKrvxVNOMiZSqoqkGK7QeS--
+cheers,
+  Gerd
