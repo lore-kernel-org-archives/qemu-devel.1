@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37691)
+Received: from eggs.gnu.org ([209.51.188.92]:37913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghZo4-00053e-CJ
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:51:34 -0500
+	(envelope-from <berto@igalia.com>) id 1ghZoR-0005JO-90
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:51:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghZnw-0007vs-6i
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:51:26 -0500
-From: Markus Armbruster <armbru@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1ghZoO-0008C3-08
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:51:55 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190108122021.GB11492@linux.fritz.box>
 References: <20190103213320.2653-1-lbloch@janustech.com>
 	<20190103213320.2653-2-lbloch@janustech.com>
 	<20190108122021.GB11492@linux.fritz.box>
-	<91dfd3e9-7293-4301-e3ac-852d8a038d4e@janustech.com>
-Date: Thu, 10 Jan 2019 13:51:12 +0100
-In-Reply-To: <91dfd3e9-7293-4301-e3ac-852d8a038d4e@janustech.com> (Leonid
-	Bloch's message of "Thu, 10 Jan 2019 10:04:59 +0000")
-Message-ID: <87d0p4he0v.fsf@dusky.pond.sub.org>
+Date: Thu, 10 Jan 2019 13:51:43 +0100
+Message-ID: <w517efcekv4.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Auto-generate the sizes
@@ -26,52 +24,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Leonid Bloch <lbloch@janustech.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Mathi?= =?utf-8?Q?eu-Daud=C3=A9?= <philmd@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Leonid Bloch <lbloch@janustech.com> writes:
-
-> Hi,
+On Tue 08 Jan 2019 01:20:21 PM CET, Kevin Wolf wrote:
+> During a downstream review, Max found a problem with the table that we
+> could fix while we're touching it:
 >
-> On 1/8/19 2:20 PM, Kevin Wolf wrote:
->> Am 03.01.2019 um 22:33 hat Leonid Bloch geschrieben:
->>> The lookup table for power-of-two sizes is now auto-generated during the
->>> build, and not hard-coded into the units.h file.
->>>
->>> This partially reverts commit 540b8492618eb.
->>>
->>> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
->> 
->> During a downstream review, Max found a problem with the table that we
->> could fix while we're touching it:
->> 
->>      Upstream: All >= S_2GiB are not valid ints.  (qemu assumes that
->>      sizeof(int) == 4, right?)  So S_2GiB should be 2147483648u and all
->>      above should be ...ull or better UINT64_C().
+>     Upstream: All >= S_2GiB are not valid ints.  (qemu assumes that
+>     sizeof(int) == 4, right?)  So S_2GiB should be 2147483648u and all
+>     above should be ...ull or better UINT64_C().
 
-So their (integer) type can vary.  Whether that's a problem depends on
-how the macros are used.
+Should it? sizeof(S_2GiB) is already 8 without having to add any suffix.
 
-> But the initial reasoning for this table was to have a pure number 
-> there. If there will be strings like "2147483648u/ull" or 
-> "UINT64_C(...)" there, they will be stringified, literally, and will 
-> appear as such inside the binary.
-
-"Macro that expands to an integer constant that stringify() turns into a
-decimal number" is a rather peculiar contract.
-
->                                   If specifying the unit64 type is 
-> really needed, one can always use, e.g., 2 * GiB, from units.h.
-
-Right now I suspect these S_ macros should generally be avoided.
-
-We have 54 of them.  I count six uses:
-
-    block/qcow2.h:#define QCOW_MAX_REFTABLE_SIZE S_8MiB
-    block/qcow2.h:#define QCOW_MAX_L1_SIZE S_32MiB
-    block/qcow2.h:#define DEFAULT_L2_CACHE_MAX_SIZE S_32MiB
-    block/qcow2.h:#define DEFAULT_L2_CACHE_MAX_SIZE S_8MiB
-    block/qcow2.h:#define DEFAULT_CLUSTER_SIZE S_64KiB
-    block/vdi.c:#define DEFAULT_CLUSTER_SIZE S_1MiB
-
-Which if them truly need stringify-able integers?
+Berto
