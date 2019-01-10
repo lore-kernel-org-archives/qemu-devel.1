@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50506)
+Received: from eggs.gnu.org ([209.51.188.92]:53274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ghde8-0007ko-3u
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:57:33 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ghdms-0004dx-S5
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:06:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ghde6-0003b0-E5
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:57:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41420)
+	(envelope-from <dgilbert@redhat.com>) id 1ghdmr-0000wg-NZ
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:06:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ghde5-0003ZY-7Q
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:57:30 -0500
-Date: Thu, 10 Jan 2019 17:57:22 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190110175722.4ee8d4d6.cohuck@redhat.com>
-In-Reply-To: <04965ae7-da3d-a68a-ce0c-eb0b02e542ed@linux.ibm.com>
-References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
-	<112a03e6-3d6c-1c14-10ab-c9cea09ad388@linux.ibm.com>
-	<20190108173113.3c2d830c.cohuck@redhat.com>
-	<20190108175021.003deab9@oc2783563651>
-	<20190108180615.7e48cf13.cohuck@redhat.com>
-	<4876194e-1a87-1491-a8b3-eed5b0a9afe6@linux.ibm.com>
-	<20190109111419.426ec6d7.cohuck@redhat.com>
-	<a59d5b64-0fb3-4b70-96ff-b1a0c037c6ac@linux.ibm.com>
-	<20190109183538.05bab3c8@oc2783563651>
-	<04965ae7-da3d-a68a-ce0c-eb0b02e542ed@linux.ibm.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ghdmr-0000wD-Ep
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 12:06:33 -0500
+Date: Thu, 10 Jan 2019 17:06:27 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190110170626.GH2589@work-vm>
+References: <a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
+	<200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
+	<20190109172023.GK4867@localhost.localdomain>
+	<be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
+	<40ef0a8d-3a25-4cc3-95f8-82bc4513776c@redhat.com>
+	<20190109185154.GL4867@localhost.localdomain>
+	<56880d06-a214-2486-2e80-c565b33461b3@redhat.com>
+	<20190110112508.GA6361@linux.fritz.box>
+	<20190110114113.GC2589@work-vm>
+	<20190110151101.GB6361@linux.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190110151101.GB6361@linux.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
+ ID anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,187 +36,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, imammedo@redhat.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, armbru@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, muriloo@linux.ibm.com
 
-On Thu, 10 Jan 2019 10:50:30 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> On 1/9/19 12:35 PM, Halil Pasic wrote:
-> > On Wed, 9 Jan 2019 10:36:11 -0500
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >   
-> >> On 1/9/19 5:14 AM, Cornelia Huck wrote:  
-> >>> On Tue, 8 Jan 2019 15:34:37 -0500
-> >>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >>>  
-> >>>> On 1/8/19 12:06 PM, Cornelia Huck wrote:  
-> >>>>> On Tue, 8 Jan 2019 17:50:21 +0100
-> >>>>> Halil Pasic <pasic@linux.ibm.com> wrote:
-> >>>>>       
-> >>>>>> On Tue, 8 Jan 2019 17:31:13 +0100
-> >>>>>> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>>>>>      
-> >>>>>>> On Tue, 8 Jan 2019 11:08:56 -0500
-> >>>>>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >>>>>>>          
-> >>>>>>>> On 12/17/18 10:57 AM, Tony Krowiak wrote:  
-
-> >>>>>>>>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> >>>>>>>>> index 6b3cc55b27c2..956923f33520 100644
-> >>>>>>>>> --- a/hw/core/qdev.c
-> >>>>>>>>> +++ b/hw/core/qdev.c
-> >>>>>>>>> @@ -59,6 +59,8 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
-> >>>>>>>>>                  snprintf(name, sizeof(name), "child[%d]", kid->index);
-> >>>>>>>>>                  QTAILQ_REMOVE(&bus->children, kid, sibling);
-> >>>>>>>>>      
-> >>>>>>>>> +            bus->num_children--;
-> >>>>>>>>> +
-> >>>>>>>>>                  /* This gives back ownership of kid->child back to us.  */
-> >>>>>>>>>                  object_property_del(OBJECT(bus), name, NULL);
-> >>>>>>>>>                  object_unref(OBJECT(kid->child));
-> >>>>>>>>> @@ -73,6 +75,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
-> >>>>>>>>>          char name[32];
-> >>>>>>>>>          BusChild *kid = g_malloc0(sizeof(*kid));
-> >>>>>>>>>      
-> >>>>>>>>> +    bus->num_children++;
-> >>>>>>>>>          kid->index = bus->max_index++;  
-> >>>>>>>
-> >>>>>>> Hm... I'm wondering what happens for insane numbers of hotplugging
-> >>>>>>> operations here?
-> >>>>>>>
-> >>>>>>> (Preexisting problem for busses without limit, but busses with a limit
-> >>>>>>> could now run into that as well.)
-> >>>>>>>          
-> >>>>>>
-> >>>>>> How does this patch change things? I mean bus->num_children gets
-> >>>>>> decremented on unplug.  
-> >>>>>
-> >>>>> We don't stop anymore if max_index >= max_dev, which means that we can
-> >>>>> now trigger that even if max_dev != 0.  
-> >>>>
-> >>>> I guess I am missing your point. If max_dev == 0, then there is nothing
-> >>>> stopping an insane number of hot plug operations; either before this
-> >>>> patch, or with this patch. With the patch, once the number of children
-> >>>> hot plugged reaches max_dev, the qbus_is_full function will return false
-> >>>> and no more children can be plugged. If a child device is unplugged,
-> >>>> the num_children - which counts the number of children attached to the
-> >>>> bus - will be decremented, so it always reflects the number of children
-> >>>> added to the bus. Besides, checking max_index against max_dev
-> >>>> is erroneous, because max_index is incremented every time a child device
-> >>>> is plugged and is never decremented. It really operates as more of a
-> >>>> uinique identifier than a counter and is also used to create a unique
-> >>>> property name when the child device is linked to the bus as a property
-> >>>> (see bus_add_child function in hw/core/qdev.c).  
-> >>>
-> >>> Checking num_children against max_dev is the right thing to do, no
-> >>> argument here.
-> >>>
-> >>> However, max_index continues to be incremented even if devices have
-> >>> been unplugged again. That means it can overflow, as it is never bound
-> >>> by the max_dev constraint.
-> >>>
-> >>> This has been a problem before for busses with an unrestricted number of
-> >>> devices before, but with your patch, the problem is now triggerable for
-> >>> all busses.
-> >>>
-> >>> Not a problem with your patch, but we might want to look into making
-> >>> max_index overflow/wraparound save.  
-> >>
-> >> I see your point. It does beg the question, what are the chances that
-> >> max_index reaches INT_MAX? In the interest of making this code more
-> >> bullet proof, I suppose it is something that should be dealt with.
-
-Yes, there's a low chance of hitting this problem during normal
-operation, but you could do scripted plug/unplug to reach the limit
-(and test a possible fix).
-
-> >>
-> >> A search reveals that max_index is used in only two places: It is used
-> >> to set the index for a child of the bus (i.e., bus_add_child function in
-> >> hw/core/qdev.c); and prior to this patch, to determine if max_dev has
-> >> been exceeded (i.e., qbus_is_full function in qdev_monitor.c). From
-> >> what I can see, the bus child index is used only to generate a property
-> >> name of the format "child[%d]" so the child can be linked as a property
-> >> of the bus (see bus_add_child and bus_remove_child functions in
-> >> hw/core/qdev.c). Wraparound of the max_index would most likely result in
-> >> generating a duplicate property name for the child.
-> >>
-> >> I propose two possible solutions:
-> >>
-> >> 1. When max_index reaches INT_MAX, do not allow any additional children
-> >>      to be added to the bus.
-> >>
-> >> 2. Set a max_dev value of INT_MAX for the BusClass instance if the value
-> >>      is not set (in the bus_class_init function in hw/core/bus.c).
-> >>
-> >> 3. Instead of generating the property name from the BusChild index
-> >>      value, generate a UUID string. Since the index field of the BusChild
-> >>      appears to be used only to generate the child's name, maybe change
-> >>      the index field to a UUID field or a name field.
-> >>  
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Am 10.01.2019 um 12:41 hat Dr. David Alan Gilbert geschrieben:
+> > * Kevin Wolf (kwolf@redhat.com) wrote:
+> > > Am 09.01.2019 um 20:02 hat Eric Blake geschrieben:
+> > > > On 1/9/19 12:51 PM, Kevin Wolf wrote:
+> > > > 
+> > > > >> Indeed, and libvirt IS using 'savevm' via HMP via QMP's
+> > > > >> human-monitor-command, since there is no QMP counterpart for internal
+> > > > >> snapshot.  Even though lately we consistently tell people that internal
+> > > > >> snapshots are underdeveloped and you should use external snapshots, it
+> > > > >> does not get away from the fact that libvirt has been using 'savevm' to
+> > > > >> drive internal snapshots for years now, and that we MUST consider
+> > > > >> back-compat and/or add an introspectible QMP interface before making
+> > > > >> changes that would break libvirt.
+> > > > > 
+> > > > > Okay, so what does libvirt do when you request a snapshot with a
+> > > > > numerical name? Without having looked at the code, the best case I would
+> > > > > expect that it forbids them, and more realistically I suspect that we
+> > > > > may actually fix a bug for libvirt by changing the semantics.
+> > > > > 
+> > > > > Or does libvirt really use snapshot IDs rather than names?
+> > > > 
+> > > > At the moment, libvirt does not place any restriction on internal
+> > > > snapshot names, but passes the user's name through without thought of
+> > > > whether it is an id or a name.
+> > > > 
+> > > > So yes, arguably tightening the semantics fixes a libvirt bug for
+> > > > libvirt having allowed internal snapshots to get into an inconsistent
+> > > > state.
+> > > 
+> > > So there are two scenarios to consider with respect to breaking
+> > > backwards compatibility:
+> > > 
+> > > 1. There may be code out there that relies on numeric arguments being
+> > >    interpreted as IDs. This code will break if we make this change and
+> > >    numeric snapshot names exist. That such code exists is speculation
+> > >    (even though plausible) and we don't know how widespread it is.
+> > > 
+> > > 2. There may be code out there that blindly assumes that whatever it
+> > >    passes is interpreted as a name. Nobody considered that with a
+> > >    numeric snapshot name, it maybe misinterpreted as an ID. We know that
+> > >    this is true for libvirt, the single most used management tool for
+> > >    QEMU. More code like this may (and probably does) exist.
+> > > 
+> > > Essentially the same two categories exist for human users: those who
+> > > somehow found out that QEMU accepts IDs as monitor command arguments and
+> > > are using those (mitigated by not displaying IDs any more), and those
+> > > who are trapped because they wanted to access a numeric name, but
+> > > surprisingly got it interpreted as an ID. Both are speculation to some
+> > > degree, but my guess is that the latter group is larger.
+> > > 
+> > > Given all this, this is a no-brainer for me. We simplify the interface,
+> > > we simplify the code, we make things less confusing for manual users and
+> > > we fix the management tool that everybody uses. How could we not make
+> > > this change?
+> > > 
+> > > > But again, it falls in the category of "properly fixing this
+> > > > requires a lot of auditing, time, mental power, and unit tests", which
+> > > > makes it a rather daunting task to state for certain.
+> > > 
+> > > Fix the world before we can fix anything?
 > > 
-> > Separate problem, separate patch, or?  
-> 
-> Good question.
-
-I'd say it's definitely something that can be fixed separately, no need
-to hold up this patch.
-
-> 
+> > Can't we break this loop for the savevm command fairly easily; it's
+> > currently documnted as:
 > > 
-> > UUID instead of index solves the problem of unique names I guess, but I
-> > can't tell if that would be acceptable (interface stability, etc.).  
-> 
-> I may have missed something, but as currently used, the BusChild index
-> is accessed in only two places; when the child is added to the bus and
-> when it is removed from the bus. In both cases, it is used to derive
-> a unique property name for the child device.
-> 
-> Speaking of index, it implies ordering of the bus's children. IMHO, it
-> only makes semantical sense if the index changes when a child device
-> with a lower index value is removed from the bus. If a child device
-> has an index of 5 - i.e., the fifth child on the bus - and the child
-> device with index 4 is removed, then the child device with index 5 is
-> no longer the fifth child on the bus. Maybe its just the fact that
-> these fields are named 'index'. The fact that they are not really used
-> as indexes caused a bit of confusion for me when analyzing this code and
-> seems like a misnomer to me.
-
-Maybe the index tries to imply the order when they were added to the
-bus. But we probably should not read too much into the name; I would
-mainly expect them to use unique identifiers.
-
-> 
+> > savevm [tag|id] 
 > > 
-> > The max_dev won't help because we can get a collision while maintaining
-> > the invariant 'not more than 2 devices on the bus'.  
-> 
-> I don't understand, can you better explain what you mean? When you
-> say "we can get a collision", are you talking about the property
-> name? What does max_dev have to do with that? Please explain. What do
-> you mean by "maintaining the invariant 'not more than 2 devices on the
-> bus'"?
-> 
+> > If we made that:
 > > 
-> > So if we don't want to limit the number of hotplug operations, and we do
-> > want to keep the allocation scheme before wrapping, the only solution I
-> > see is looking for the first free identifier after we wrap.  
-> 
-> Are you are saying to look for the first index value that is not
-> assigned to a BusChild object?
-
-This seems to be the most sane solution.
-
-> 
+> > savevm [-t] [-i] [tag|id]
 > > 
-> > BTW I wonder if making max_index and index unsigned make things bit less
-> > ugly.  
+> > then:
+> >   a) with neither -t or -i  it would behave in the same roulette way
+> >      as it does in the moment, and it might be a tag or id
+> > 
+> >   b) with -t we'd explicitly treat the parameter as a tag and it
+> >      would error if it wasn't found
+> > 
+> >   c) With -i we'd explicitly treat the parameter as an id and
+> >      it would error if it wasn't found
+> > 
+> > Since we still allow (a) it doesn't break any existing code.
 > 
-> I thought the same. They could also be made unsigned long or
-> unsigned long long to increase the number of child devices that can be
-> plugged in before having to deal with exceeding the index value.
+> If you can explain why we need both tag and id?
+> 
+> And by keeping the current behaviour, we might not break hypothetically
+> existing correct code, but we leave currently actually existing broken
+> code like libvirt broken.
 
-Making them unsigned long long would push the problem out far enough to
-be irrelevant in practice. Not sure if we care about fixing it
-completely, though.
+My only reason for leaving both tag & id was for the hypothetical
+existing current code; my assumption adding the above would be that we
+would then fix libvirt never to use (a),  probably always (b).
+
+Dave
+> Kevin
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
