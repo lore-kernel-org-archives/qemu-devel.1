@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43371)
+Received: from eggs.gnu.org ([209.51.188.92]:44717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghgwP-00086l-29
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 15:28:37 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghh3A-0001da-7p
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 15:35:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghgwN-0001PJ-2O
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 15:28:36 -0500
-References: <20190110191901.5082-1-eblake@redhat.com>
-	<edb4aed4-d032-2a8d-62d0-b5277ca137d5@redhat.com>
-	<23bcf66e-a485-0155-d808-ef7f436b56c8@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <acebd481-9666-c3e4-527f-a291b4b047e2@redhat.com>
-Date: Thu, 10 Jan 2019 14:28:24 -0600
+	(envelope-from <pbonzini@redhat.com>) id 1ghh39-000520-AQ
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 15:35:36 -0500
+References: <1547111736-3962-1-git-send-email-thuth@redhat.com>
+	<1547111736-3962-3-git-send-email-thuth@redhat.com>
+	<20190110132838.31365c55@bahia.lan>
+	<8947b77e-41c7-5c1d-465f-a9bf1dd7d103@redhat.com>
+	<20190110170054.232da6a0@bahia.lan>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <120f1d93-7085-e5ee-18ee-e7b7b1a218ef@redhat.com>
+Date: Thu, 10 Jan 2019 21:35:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <23bcf66e-a485-0155-d808-ef7f436b56c8@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7IwbSvSTAbtlVVK9Jywh219IGAQDkUHF3"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/6] include: Auto-generate
- the sizes lookup table
+In-Reply-To: <20190110170054.232da6a0@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] ppc: Drop duplicated typedefs to be
+ able to compile with Clang in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, lbloch@janustech.com, armbru@redhat.com, qemu-block@nongnu.org
+To: Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7IwbSvSTAbtlVVK9Jywh219IGAQDkUHF3
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, lbloch@janustech.com, armbru@redhat.com,
- qemu-block@nongnu.org
-Message-ID: <acebd481-9666-c3e4-527f-a291b4b047e2@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v3 0/6] include: Auto-generate the sizes
- lookup table
-References: <20190110191901.5082-1-eblake@redhat.com>
- <edb4aed4-d032-2a8d-62d0-b5277ca137d5@redhat.com>
- <23bcf66e-a485-0155-d808-ef7f436b56c8@redhat.com>
-In-Reply-To: <23bcf66e-a485-0155-d808-ef7f436b56c8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/10/19 2:21 PM, Eric Blake wrote:
-> On 1/10/19 1:26 PM, Eric Blake wrote:
->> On 1/10/19 1:18 PM, Eric Blake wrote:
->>> Patches speak louder than words.  This is my counter-proposal to
->>> Leonid's thread on how best to respresent the S_*iB macros in units.h=
-,
->>> where my proposal is that we don't need them at all. (hence my subjec=
-t
->>> line, even though it is completely unrelated to the series)
->>>
->>> True, my diffstat is even bigger, but I think it is more maintainable=
-
->>> in the long run (if calling QemuOpts maintainable is even appropriate=
-).
+On 10/01/19 17:00, Greg Kurz wrote:
+>>> Hmm... so the choice here is to simply ignore the official coding
+>>> style ? =20
 >>
->> I wasn't brave enough to assert that def_value_str was used only with
->> QEMU_OPT_STRING, and that all uses of QEMU_OPT_{BOOL,NUMBER,SIZE} with=
- a
->> default value are either defaulting to 0 or using def_value_int; that'=
-s
->> a bigger auditing task followup that could be given as a BiteSizedTask=
-,
->> if you like this series.
+>> Are typedefs really our "official coding style"? It's mentioned in
+>> HACKING, not in CODING_STYLE, so I rather see this as a recommendation
 >=20
-> Hmm - I wonder if Coccinelle is powerful enough to find all QemuOptDesc=
+> Indeed.
+>=20
+>> only. (Otherwise, all the forward struct definitions at the beginning =
+of
+>> spapr.h are a plain violation of the coding style, too...)
+>>
+>=20
+> Yeah.
+>=20
+>> IMHO we should rather adopt the coding style of the kernel which rathe=
+r
+>> tries to avoid to typedef each and every struct.
+>>
+>=20
+> From https://www.kernel.org/doc/html/latest/process/coding-style.html#t=
+ypedefs :
+>=20
+> "In general, a pointer, or a struct that has elements that can reasonab=
+ly be
+>  directly accessed should never be a typedef."
+>=20
+> So if we were to adopt the coding style of the kernel, we'd have to fac=
+e a
+> lot more violations with the current QEMU code base :)
 
-> initializers that .type to something other than QEMU_OPT_STRING and als=
-o
-> set .def_value_str; including initializers that did not use C99
-> named-member initialization (if we have any of those). (Those are the
-> candidates to start using .def_value_int)
+Yes, that's just not going to happen.  QEMU has a different coding
+style; it's used consistently(*) and we'll live with it. I do like the
+kernel style too as well, but it's just too different for a transition
+to make sense and it may make even less sense if QEMU ever becomes
+multi-language.  To put it clearly, this is not multiline comments.
 
-Then again, if we were consistent at C99 initializers, a grep may be
-powerful enough:
+It's a different thing to allow struct in prototypes, that's a special
+case that already exists and can be adopted only if necessary.
 
-$ git grep -A3 '\.type *=3D *QEMU_OPT_\(BOOL\|NUMBER\|SIZE\)' | grep -B3
-def_value_str
---
-block/parallels.c:            .type =3D QEMU_OPT_SIZE,
-block/parallels.c-            .help =3D "Preallocation size on image
-expansion",
-block/parallels.c-            .def_value_str =3D "128M",
---
---
-block/qcow2.c:            .type =3D QEMU_OPT_BOOL,
-block/qcow2.c-            .help =3D "Postpone refcount updates",
-block/qcow2.c-            .def_value_str =3D "off"
---
---
-block/qcow2.c:            .type =3D QEMU_OPT_NUMBER,
-block/qcow2.c-            .help =3D "Width of a reference count entry in
-bits",
-block/qcow2.c-            .def_value_str =3D "16"
---
---
-block/vdi.c:            .type =3D QEMU_OPT_BOOL,
-block/vdi.c-            .help =3D "VDI static (pre-allocated) image",
-block/vdi.c-            .def_value_str =3D "off"
---
---
-block/vmdk.c:            .type =3D QEMU_OPT_BOOL,
-block/vmdk.c-            .help =3D "VMDK version 6 image",
-block/vmdk.c-            .def_value_str =3D "off"
---
---
-block/vxhs.c:            .type =3D QEMU_OPT_NUMBER,
-block/vxhs.c-            .help =3D "port number on which VxHSD is
-listening (default 9999)",
-block/vxhs.c-            .def_value_str =3D "9999"
+Paolo
 
-
-and where the def_value_str =3D "off" defaults can probably be deleted.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---7IwbSvSTAbtlVVK9Jywh219IGAQDkUHF3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw3qugACgkQp6FrSiUn
-Q2qqHwf9Hw0aiw/dCcIMXF/BUN9Vw3pK2wWxzg8ePcHud6YUPHT2A/jERnuUdNM/
-r4cpYICIn9HtRbRK2D4/WCJxYeu07pgoZrzSGe/Caa+GW37kkimGAIeDyrnzF7Vm
-DIdC07ofi7taHcMMucB9kjW6zrusrIWNvJVWUfOOnviUNQ/ayQ41JC1o2WgHd+CE
-8MCkfpqd6qFfVrV33LayTfCzOp0JJQGEDuqy7w9Y4kdzVQjmKqorMbUX/cvp+2i9
-gxuvCISfVgxKMBvAv1uJAvY/JN5G4dzFJskFKPyHRD0+FIAY1RxJKXPuspfaW78+
-riuYqSbV4tsif81Akhdv5NqQo0RPmg==
-=wLJx
------END PGP SIGNATURE-----
-
---7IwbSvSTAbtlVVK9Jywh219IGAQDkUHF3--
+    (*) camel-case type identifiers are also shared with GLib and many
+        other libraries we use, and they are pretty much a universal
+        convention in every language but C and C++.
