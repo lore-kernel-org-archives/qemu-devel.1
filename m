@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36929)
+Received: from eggs.gnu.org ([209.51.188.92]:38416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghcr1-0005Lg-2O
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:06:49 -0500
+	(envelope-from <david@redhat.com>) id 1ghcwF-0006Tm-0v
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghcqu-0003Le-9r
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:06:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51900)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghcqt-0003AC-Qj
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:06:40 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-17-fli@suse.com>
-	<874lakl5d2.fsf@dusky.pond.sub.org>
-	<5007FDD8-8D3A-4E3F-B5A6-9B7B3189238F@126.com>
-	<87pnt7awhg.fsf@dusky.pond.sub.org>
-	<cc1bec76-7724-2d0d-733c-e84f029776e4@126.com>
-	<87o98pdfbf.fsf@dusky.pond.sub.org>
-	<7A219BBE-8D9D-4B40-892E-AA48D22F5967@126.com>
-	<87tvig7tsu.fsf@dusky.pond.sub.org>
-	<016ae7bc-6271-59a7-36a1-c2b8a210020f@126.com>
-Date: Thu, 10 Jan 2019 17:06:16 +0100
-In-Reply-To: <016ae7bc-6271-59a7-36a1-c2b8a210020f@126.com> (Fei Li's message
-	of "Thu, 10 Jan 2019 21:24:54 +0800")
-Message-ID: <87tvigfqfb.fsf@dusky.pond.sub.org>
+	(envelope-from <david@redhat.com>) id 1ghcwC-0007ar-RX
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:12:11 -0500
+References: <20190109165349.23631-1-david@redhat.com>
+	<20190109165349.23631-6-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <9fef18b2-9d28-c66f-cc3a-0595d5e3572a@redhat.com>
+Date: Thu, 10 Jan 2019 17:12:04 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190109165349.23631-6-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 16/16] qemu_thread_join: fix
- segmentation fault
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 5/6] s390x/pci: Introduce unplug
+ requests and split unplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,294 +25,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <lifei1214@126.com>
-Cc: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org, shirley17fei@gmail.com
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Fei Li <lifei1214@126.com> writes:
+On 09.01.19 17:53, David Hildenbrand wrote:
+> PCI on s390x is really weird and how it was modeled in QEMU might not have
+> been the right choice. Anyhow, right now it is the case that:
+> - Hotplugging a PCI device will silently create a zPCI device
+>   (if none is provided)
+> - Hotunplugging a zPCI device will unplug the PCI device (if any)
+> - Hotunplugging a PCI device will unplug also the zPCI device
+> 
+> However both devices are handled via a single hotplug handler call. This
+> is problematic for various reasons:
+> 1. Unplugging via the zPCI device allows to unplug PCI bridges as
+>    checks are not performed - bad.
+> 2. Unplugging via the zPCI device allows to unplug devices that are not
+>    hot removable. (check performed in qdev_unplug()) - bad.
+> 3. Hotplug handler chains are not possible for the unplug case. In the
+>    future, the machine might want to override hotplug handlers, to
+>    process device specific stuff and to then branch off to the actual
+>    hotplug handler. We need separate hotplug handler calls for both the
+>    PCI and zPCI device to make this work reliably. All other PCI
+>    implementations are already prepared to handle this correctly, only
+>    s390x is missing.
+> 
+> Therefore, introduce the unplug_request handler and properly perform
+> unplug checks by redirecting to the separate unplug_request handlers.
+> When finally unplugging, perform two separate hotplug_handler_unplug()
+> calls, first for the PCI device, followed by the zPCI device. This now
+> nicely splits unplugging paths for both devices.
+> 
+> The redirect part is a little hairy, as the user is allowed to trigger
+> unplug either via the PCI or the zPCI device. So redirect always to the
+> PCI unplug request handler first and remember if that check has been
+> performed in the zPCI device. Redirect then to the zPCI device unplug
+> request handler to perform the magic. Otherwise we would have a redirect
+> loop.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 162 +++++++++++++++++++++++++++-------------
+>  hw/s390x/s390-pci-bus.h |   1 +
+>  2 files changed, 112 insertions(+), 51 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index f27c5852db..bcd8565a14 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -148,6 +148,23 @@ out:
+>      psccb->header.response_code = cpu_to_be16(rc);
+>  }
+>  
+> +static void s390_pci_perform_unplug(S390PCIBusDevice *pbdev)
+> +{
+> +    HotplugHandler *hotplug_ctrl;
+> +
 
-> =E5=9C=A8 2019/1/10 =E4=B8=8B=E5=8D=885:20, Markus Armbruster =E5=86=99=
-=E9=81=93:
->> fei <lifei1214@126.com> writes:
->>
->>>> =E5=9C=A8 2019=E5=B9=B41=E6=9C=889=E6=97=A5=EF=BC=8C23:24=EF=BC=8CMark=
-us Armbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->>>>
->>>> Fei Li <lifei1214@126.com> writes:
->>>>
->>>>>> =E5=9C=A8 2019/1/9 =E4=B8=8A=E5=8D=881:29, Markus Armbruster =E5=86=
-=99=E9=81=93:
->>>>>> fei <lifei1214@126.com> writes:
->>>>>>
->>>>>>>> =E5=9C=A8 2019=E5=B9=B41=E6=9C=888=E6=97=A5=EF=BC=8C01:55=EF=BC=8C=
-Markus Armbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
->>>>>>>>
->>>>>>>> Fei Li <fli@suse.com> writes:
->>>>>>>>
->>>>>>>>> To avoid the segmentation fault in qemu_thread_join(), just direc=
-tly
->>>>>>>>> return when the QemuThread *thread failed to be created in either
->>>>>>>>> qemu-thread-posix.c or qemu-thread-win32.c.
->>>>>>>>>
->>>>>>>>> Cc: Stefan Weil <sw@weilnetz.de>
->>>>>>>>> Signed-off-by: Fei Li <fli@suse.com>
->>>>>>>>> Reviewed-by: Fam Zheng <famz@redhat.com>
->>>>>>>>> ---
->>>>>>>>> util/qemu-thread-posix.c | 3 +++
->>>>>>>>> util/qemu-thread-win32.c | 2 +-
->>>>>>>>> 2 files changed, 4 insertions(+), 1 deletion(-)
->>>>>>>>>
->>>>>>>>> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
->>>>>>>>> index 39834b0551..3548935dac 100644
->>>>>>>>> --- a/util/qemu-thread-posix.c
->>>>>>>>> +++ b/util/qemu-thread-posix.c
->>>>>>>>> @@ -571,6 +571,9 @@ void *qemu_thread_join(QemuThread *thread)
->>>>>>>>>      int err;
->>>>>>>>>      void *ret;
->>>>>>>>>
->>>>>>>>> +    if (!thread->thread) {
->>>>>>>>> +        return NULL;
->>>>>>>>> +    }
->>>>>>>> How can this happen?
->>>>>>> I think I have answered this earlier, please check the following li=
-nk to see whether it helps:
->>>>>>> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg06554.ht=
-ml
->>>>>> Thanks for the pointer.  Unfortunately, I don't understand your
->>>>>> explanation.  You also wrote there "I will remove this patch in next
->>>>>> version"; looks like you've since changed your mind.
->>>>> Emm, issues left over from history.. The background is I was hurry to
->>>>> make those five
->>>>> Reviewed-by patches be merged, including this v9 16/16 patch but not
->>>>> the real
->>>>> qemu_thread_create() modification. But actually this patch is to fix
->>>>> the segmentation
->>>>> fault after we modified qemu_thread_create() related functions
->>>>> although it has got a
->>>>> Reviewed-by earlier. :) Thus to not make troube, I wrote the
->>>>> "remove..." sentence
->>>>> to separate it from those 5 Reviewed-by patches, and were plan to send
->>>>> only four patches.
->>>>> But later I got a message that these five patches are not that urgent
->>>>> to catch qemu v3.1,
->>>>> thus I joined the earlier 5 R-b patches into the later v8 & v9 to have
->>>>> a better review.
->>>>>
->>>>> Sorry for the trouble, I need to explain it without involving too much
->>>>> background..
->>>>>
->>>>> Back at the farm: in our current qemu code, some cleanups use a loop
->>>>> to join()
->>>>> the total number of threads if caller fails. This is not a problem
->>>>> until applying the
->>>>> qemu_thread_create() modification. E.g. when compress_threads_save_se=
-tup()
->>>>> fails while trying to create the last do_data_compress thread,
->>>>> segmentation fault
->>>>> will occur when join() is called (sadly there's not enough condition
->>>>> to filter this
->>>>> unsuccessful created thread) as this thread is actually not be create=
-d.
->>>>>
->>>>> Hope the above makes it clear. :)
->>>> Alright, let's have a look at compress_threads_save_setup():
->>>>
->>>>     static int compress_threads_save_setup(void)
->>>>     {
->>>>         int i, thread_count;
->>>>
->>>>         if (!migrate_use_compression()) {
->>>>             return 0;
->>>>         }
->>>>         thread_count =3D migrate_compress_threads();
->>>>         compress_threads =3D g_new0(QemuThread, thread_count);
->>>>         comp_param =3D g_new0(CompressParam, thread_count);
->>>>         qemu_cond_init(&comp_done_cond);
->>>>         qemu_mutex_init(&comp_done_lock);
->>>>         for (i =3D 0; i < thread_count; i++) {
->>>>             comp_param[i].originbuf =3D g_try_malloc(TARGET_PAGE_SIZE);
->>>>             if (!comp_param[i].originbuf) {
->>>>                 goto exit;
->>>>             }
->>>>
->>>>             if (deflateInit(&comp_param[i].stream,
->>>>                             migrate_compress_level()) !=3D Z_OK) {
->>>>                 g_free(comp_param[i].originbuf);
->>>>                 goto exit;
->>>>             }
->>>>
->>>>             /* comp_param[i].file is just used as a dummy buffer to sa=
-ve data,
->>>>              * set its ops to empty.
->>>>              */
->>>>             comp_param[i].file =3D qemu_fopen_ops(NULL, &empty_ops);
->>>>             comp_param[i].done =3D true;
->>>>             comp_param[i].quit =3D false;
->>>>             qemu_mutex_init(&comp_param[i].mutex);
->>>>             qemu_cond_init(&comp_param[i].cond);
->>>>             qemu_thread_create(compress_threads + i, "compress",
->>>>                                do_data_compress, comp_param + i,
->>>>                                QEMU_THREAD_JOINABLE);
->>>>         }
->>>>         return 0;
->>>>
->>>>     exit:
->>>>         compress_threads_save_cleanup();
->>>>         return -1;
->>>>     }
->>>>
->>>> At label exit, we have @i threads, all fully initialized.  That's an
->>>> invariant.
->>>>
->>>> compress_threads_save_cleanup() finds the threads to clean up by
->>>> checking comp_param[i].file:
->>>>
->>>>     static void compress_threads_save_cleanup(void)
->>>>     {
->>>>         int i, thread_count;
->>>>
->>>>         if (!migrate_use_compression() || !comp_param) {
->>>>             return;
->>>>         }
->>>>
->>>>         thread_count =3D migrate_compress_threads();
->>>>         for (i =3D 0; i < thread_count; i++) {
->>>>             /*
->>>>              * we use it as a indicator which shows if the thread is
->>>>              * properly init'd or not
->>>>              */
->>>> --->        if (!comp_param[i].file) {
->>>> --->            break;
->>>> --->        }
->>>>
->>>>             qemu_mutex_lock(&comp_param[i].mutex);
->>>>             comp_param[i].quit =3D true;
->>>>             qemu_cond_signal(&comp_param[i].cond);
->>>>             qemu_mutex_unlock(&comp_param[i].mutex);
->>>>
->>>>             qemu_thread_join(compress_threads + i);
->>>>             qemu_mutex_destroy(&comp_param[i].mutex);
->>>>             qemu_cond_destroy(&comp_param[i].cond);
->>>>             deflateEnd(&comp_param[i].stream);
->>>>             g_free(comp_param[i].originbuf);
->>>>             qemu_fclose(comp_param[i].file);
->>>>             comp_param[i].file =3D NULL;
->>>>         }
->>>>         qemu_mutex_destroy(&comp_done_lock);
->>>>         qemu_cond_destroy(&comp_done_cond);
->>>>         g_free(compress_threads);
->>>>         g_free(comp_param);
->>>>         compress_threads =3D NULL;
->>>>         comp_param =3D NULL;
->>>>     }
->>>>
->>>> Due to the invariant, a comp_param[i] with a null .file doesn't need
->>>> *any* cleanup.
->>>>
->>>> To maintain the invariant, compress_threads_save_setup() carefully
->>>> cleans up any partial initializations itself before a goto exit.  Since
->>>> the code is arranged smartly, the only such cleanup is the
->>>> g_free(comp_param[i].originbuf) before the second goto exit.
->>>>
->>>> Your PATCH 13 adds a third goto exit, but neglects to clean up partial
->>>> initializations.  Breaks the invariant.
->>>>
->>>> I see two sane solutions:
->>>>
->>>> 1. compress_threads_save_setup() carefully cleans up partial
->>>>    initializations itself.  compress_threads_save_cleanup() copes only
->>>>    with fully initialized comp_param[i].  This is how things work befo=
-re
->>>>    your series.
->>>>
->>>> 2. compress_threads_save_cleanup() copes with partially initialized
->>>>    comp_param[i], i.e. does the right thing for each goto exit in
->>>>    compress_threads_save_setup().  compress_threads_save_setup() doesn=
-'t
->>>>    clean up partial initializations.
->>>>
->>>> Your PATCH 13 together with the fixup PATCH 16 does
->>>>
->>>> 3. A confusing mix of the two.
->>>>
->>>> Don't.
->>> Thanks for the detail analysis! :)
->>> Emm.. Actually I have thought to do the cleanup in the setup() function=
- for the third =E2=80=98goto exit=E2=80=99 [1],  which is a partial initial=
-ization.
->>> But due to the below [1] is too long and seems not neat (I notice that =
-most cleanups for each thread are in the xxx_cleanup() function), I turned =
-to modify the join() function..
->>> Is the long [1] acceptable when the third =E2=80=98goto exit=E2=80=99 i=
-s called, or is there any other better way to do the cleanup?
->>>
->>> [1]
->>> qemu_mutex_lock(&comp_param[i].mutex);
->>>             comp_param[i].quit =3D true;
->>>             qemu_cond_signal(&comp_param[i].cond);
->>>             qemu_mutex_unlock(&comp_param[i].mutex);
->>>
->>> qemu_mutex_destroy(&comp_param[i].mutex);
->>>             qemu_cond_destroy(&comp_param[i].cond);
->>>             deflateEnd(&comp_param[i].stream);
->>>             g_free(comp_param[i].originbuf);
->>>             qemu_fclose(comp_param[i].file);
->>>             comp_param[i].file =3D NULL;
->> Have you considered creating the thread earlier, e.g. right after
->> initializing compression with deflateInit()?
-> I am afraid we can not do this, as the members of comp_param[i], like
-> file/done/quit/mutex/cond
-> will be used later in the new created thread: do_data_[de]compress via
-> qemu_thread_create().
+I'll turn this into
 
-You're right.
+if (pbdev->pdev)
 
-> Thus it seems we have to accept the above long [1] if we do want to
-> clean up partial initialization
-> in xxx_setup(). :(
->
-> BTW, there is no other argument can be used except the
-> "(compress_threads+i)->thread" to
-> differentiate whether should we join() the thread, just in case we
-> want to change the
-> xxx_cleanup() function.
+and drop the g_assert(). Straight forward than.
 
-We can try to make compress_threads_save_cleanup() cope with partially
-initialized comp_param[i].  Let's have a look at its members:
+> +    /* Unplug the PCI device */
+> +    if (pbdev->state == ZPCI_FS_STANDBY) {
+> +        hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(pbdev->pdev));
+> +        hotplug_handler_unplug(hotplug_ctrl, DEVICE(pbdev->pdev),
+> +                               &error_abort);
+> +    }
+> +    g_assert(pbdev->state == ZPCI_FS_RESERVED);
+> +
+> +    /* Unplug the zPCI device */
+> +    hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(pbdev));
+> +    hotplug_handler_unplug(hotplug_ctrl, DEVICE(pbdev), &error_abort);
+> +}
+> +
+>  void s390_pci_sclp_deconfigure(SCCB *sccb)
+>  {
+>      IoaCfgSccb *psccb = (IoaCfgSccb *)sccb;
+> @@ -179,7 +196,7 @@ void s390_pci_sclp_deconfigure(SCCB *sccb)
+>          rc = SCLP_RC_NORMAL_COMPLETION;
+>  
+>          if (pbdev->release_timer) {
+> -            qdev_unplug(DEVICE(pbdev->pdev), NULL);
+> +            s390_pci_perform_unplug(pbdev);
+>          }
+>      }
+>  out:
+> @@ -217,6 +234,24 @@ S390PCIBusDevice *s390_pci_find_dev_by_target(S390pciState *s,
+>      return NULL;
+>  }
+>  
+> +static S390PCIBusDevice *s390_pci_find_dev_by_pci(S390pciState *s,
+> +                                                  PCIDevice *pci_dev)
+> +{
+> +    S390PCIBusDevice *pbdev;
+> +
+> +    if (!pci_dev) {
+> +        return NULL;
+> +    }
+> +
+> +    QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
+> +        if (pbdev->pdev == pci_dev) {
+> +            return pbdev;
+> +        }
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+>  S390PCIBusDevice *s390_pci_find_dev_by_idx(S390pciState *s, uint32_t idx)
+>  {
+>      return g_hash_table_lookup(s->zpci_table, &idx);
+> @@ -937,74 +972,98 @@ static void s390_pcihost_timer_cb(void *opaque)
+>      pbdev->state = ZPCI_FS_STANDBY;
+>      s390_pci_generate_plug_event(HP_EVENT_CONFIGURED_TO_STBRES,
+>                                   pbdev->fh, pbdev->fid);
+> -    qdev_unplug(DEVICE(pbdev), NULL);
+> +    s390_pci_perform_unplug(pbdev);
+>  }
+>  
+>  static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                  Error **errp)
+>  {
+>      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+> -    PCIDevice *pci_dev = NULL;
+> -    PCIBus *bus;
+> -    int32_t devfn;
+>      S390PCIBusDevice *pbdev = NULL;
+>  
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> +        PCIDevice *pci_dev = PCI_DEVICE(dev);
+> +        PCIBus *bus;
+> +        int32_t devfn;
+> +
+> +        pbdev = s390_pci_find_dev_by_pci(s, PCI_DEVICE(dev));
+> +        g_assert(pbdev);
+> +
+> +        s390_pci_generate_plug_event(HP_EVENT_STANDBY_TO_RESERVED,
+> +                                     pbdev->fh, pbdev->fid);
+> +        bus = pci_get_bus(pci_dev);
+> +        devfn = pci_dev->devfn;
+> +        object_unparent(OBJECT(pci_dev));
+> +
+> +        s390_pci_msix_free(pbdev);
+> +        s390_pci_iommu_free(s, bus, devfn);
+> +        pbdev->pdev = NULL;
+> +        pbdev->state = ZPCI_FS_RESERVED;
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
+> +        pbdev = S390_PCI_DEVICE(dev);
+> +
+> +        if (pbdev->release_timer) {
+> +            timer_del(pbdev->release_timer);
+> +            timer_free(pbdev->release_timer);
+> +            pbdev->release_timer = NULL;
+> +        }
+> +        pbdev->fid = 0;
+> +        QTAILQ_REMOVE(&s->zpci_devs, pbdev, link);
+> +        g_hash_table_remove(s->zpci_table, &pbdev->idx);
+> +        object_unparent(OBJECT(pbdev));
+> +    }
+> +}
+> +
+> +static void s390_pcihost_unplug_request(HotplugHandler *hotplug_dev,
+> +                                        DeviceState *dev,
+> +                                        Error **errp)
+> +{
+> +    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+> +    S390PCIBusDevice *pbdev;
+> +
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+>          error_setg(errp, "PCI bridge hot unplug currently not supported");
+> -        return;
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> -        pci_dev = PCI_DEVICE(dev);
+> -
+> -        QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
+> -            if (pbdev->pdev == pci_dev) {
+> -                break;
+> -            }
+> -        }
+> -        assert(pbdev != NULL);
+> +        /*
+> +         * Redirect the unplug request to the zPCI device and remember that
+> +         * we've checked the PCI device already (to prevent endless recursion).
+> +         */
+> +        pbdev = s390_pci_find_dev_by_pci(s, PCI_DEVICE(dev));
+> +        g_assert(pbdev);
+> +        pbdev->pci_unplug_request_processed = true;
+> +        qdev_unplug(DEVICE(pbdev), errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
+>          pbdev = S390_PCI_DEVICE(dev);
+> -        pci_dev = pbdev->pdev;
+> -    }
+>  
+> -    switch (pbdev->state) {
+> -    case ZPCI_FS_RESERVED:
+> -        goto out;
+> -    case ZPCI_FS_STANDBY:
+> -        break;
+> -    default:
+> -        if (pbdev->release_timer) {
+> +        /*
+> +         * If unplug was initially requested for the zPCI device, we
+> +         * first have to redirect to the PCI device, which will in return
+> +         * redirect back to us after performing its checks (if the request
+> +         * is not blocked, e.g. because it's a PCI bridge).
+> +         */
+> +        if (pbdev->pdev && !pbdev->pci_unplug_request_processed) {
+> +            qdev_unplug(DEVICE(pbdev->pdev), errp);
+>              return;
+>          }
+> -        s390_pci_generate_plug_event(HP_EVENT_DECONFIGURE_REQUEST,
+> -                                     pbdev->fh, pbdev->fid);
+> -        pbdev->release_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+> -                                            s390_pcihost_timer_cb,
+> -                                            pbdev);
+> -        timer_mod(pbdev->release_timer,
+> -                  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + HOT_UNPLUG_TIMEOUT);
+> -        return;
+> -    }
+> +        pbdev->pci_unplug_request_processed = false;
+>  
+> -    if (pbdev->release_timer) {
+> -        timer_del(pbdev->release_timer);
+> -        timer_free(pbdev->release_timer);
+> -        pbdev->release_timer = NULL;
+> +        switch (pbdev->state) {
+> +        case ZPCI_FS_STANDBY:
+> +        case ZPCI_FS_RESERVED:
+> +            s390_pci_perform_unplug(pbdev);
+> +            break;
+> +        default:
+> +            if (pbdev->release_timer) {
+> +                return;
+> +            }
+> +            s390_pci_generate_plug_event(HP_EVENT_DECONFIGURE_REQUEST,
+> +                                         pbdev->fh, pbdev->fid);
+> +            pbdev->release_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+> +                                                s390_pcihost_timer_cb, pbdev);
+> +            timer_mod(pbdev->release_timer,
+> +                      qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + HOT_UNPLUG_TIMEOUT);
+> +        }
+>      }
+> -
+> -    s390_pci_generate_plug_event(HP_EVENT_STANDBY_TO_RESERVED,
+> -                                 pbdev->fh, pbdev->fid);
+> -    bus = pci_get_bus(pci_dev);
+> -    devfn = pci_dev->devfn;
+> -    object_unparent(OBJECT(pci_dev));
+> -    s390_pci_msix_free(pbdev);
+> -    s390_pci_iommu_free(s, bus, devfn);
+> -    pbdev->pdev = NULL;
+> -    pbdev->state = ZPCI_FS_RESERVED;
+> -out:
+> -    pbdev->fid = 0;
+> -    QTAILQ_REMOVE(&s->zpci_devs, pbdev, link);
+> -    g_hash_table_remove(s->zpci_table, &pbdev->idx);
+> -    object_unparent(OBJECT(pbdev));
+>  }
+>  
+>  static void s390_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
+> @@ -1054,6 +1113,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
+>      dc->realize = s390_pcihost_realize;
+>      hc->pre_plug = s390_pcihost_pre_plug;
+>      hc->plug = s390_pcihost_plug;
+> +    hc->unplug_request = s390_pcihost_unplug_request;
+>      hc->unplug = s390_pcihost_unplug;
+>      msi_nonbroken = true;
+>  }
+> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+> index f47a0f2da5..6987c31df2 100644
+> --- a/hw/s390x/s390-pci-bus.h
+> +++ b/hw/s390x/s390-pci-bus.h
+> @@ -307,6 +307,7 @@ struct S390PCIBusDevice {
+>      IndAddr *summary_ind;
+>      IndAddr *indicator;
+>      QEMUTimer *release_timer;
+> +    bool pci_unplug_request_processed;
+>      QTAILQ_ENTRY(S390PCIBusDevice) link;
+>  };
+>  
+> 
 
-    bool done;                          // no cleanup
-    bool quit;                          // see [2]
-    bool zero_page;                     // no cleanup
-    QEMUFile *file;                     // qemu_fclose() if non-null
-    QemuMutex mutex;                    // see [1]
-    QemuCond cond;                      // see [1]
-    RAMBlock *block;                    // no cleanup (must be null)
-    ram_addr_t offset;                  // no cleanup
 
-    /* internally used fields */
-    z_stream stream;                    // see [3]
-    uint8_t *originbuf;                 // unconditional g_free()
+-- 
 
-[1]: we could do something like
+Thanks,
 
-    if (comp_param[i].mutex.initialized) {
-        qemu_mutex_destroy(&comp_param[i].mutex);
-    }
-    if (comp_param[i].cond.initialized) {
-        qemu_cond_destroy(&comp_param[i].cond);
-    }
-
-but that would be unclean.  Instead, I'd initialize these guys first, so
-we can clean them up unconditionally.
-
-[2] This is used to make the thread terminate.  Must be done before we
-call qemu_thread_join().  I think it can safely be done always, as long
-as long as .mutex and .cond are initialized.  Trivial if we initialize
-them first.
-
-[3]: I can't see a squeaky clean way to detect whether .stream has been
-initialized with deflateInit().  Here's a slightly unclean way:
-deflateInit() sets .stream.msg to null on success, and to non-null on
-failure.  We can make it non-null until we're ready to call
-deflateInit(), then have compress_threads_save_cleanup() clean up
-.stream when it's null.  If that's too unclean for your or your
-reviewers' taste, add a boolean @stream_initialized flag.
+David / dhildenb
