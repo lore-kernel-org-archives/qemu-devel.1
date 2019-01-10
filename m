@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38856)
+Received: from eggs.gnu.org ([209.51.188.92]:40615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghbU1-0002tn-Rd
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:38:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghbZj-0007Mx-OZ
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:44:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghbU0-0002TB-1h
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:38:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghbZh-0006tY-SY
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:44:51 -0500
 References: <20190110071330.28136-1-eblake@redhat.com>
-	<20190110071330.28136-2-eblake@redhat.com>
-	<3a2bac12-d3c2-8ce9-fc25-4a01c4ec1e3f@virtuozzo.com>
+	<20190110071330.28136-3-eblake@redhat.com>
+	<7bead05e-672a-fdc2-6291-e72090defb66@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <b0e453b6-369e-11e3-e4b1-c6867b99d74a@redhat.com>
-Date: Thu, 10 Jan 2019 08:38:33 -0600
+Message-ID: <d4482d97-637f-edcd-a37d-af708c25f567@redhat.com>
+Date: Thu, 10 Jan 2019 08:44:38 -0600
 MIME-Version: 1.0
-In-Reply-To: <3a2bac12-d3c2-8ce9-fc25-4a01c4ec1e3f@virtuozzo.com>
+In-Reply-To: <7bead05e-672a-fdc2-6291-e72090defb66@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="DGaqVjkUwqsAwiZDJl5Mi6dgLFDVOSawv"
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] nbd: Only require disabled bitmap
- for read-only exports
+	boundary="bZdAlJ9mMGSsq9xDJsMB99e07PmD5ezpU"
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd: Merge nbd_export_set_name into
+ nbd_export_new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +30,114 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.
 Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DGaqVjkUwqsAwiZDJl5Mi6dgLFDVOSawv
+--bZdAlJ9mMGSsq9xDJsMB99e07PmD5ezpU
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "jsnow@redhat.com" <jsnow@redhat.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
  Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <b0e453b6-369e-11e3-e4b1-c6867b99d74a@redhat.com>
-Subject: Re: [PATCH v2 1/6] nbd: Only require disabled bitmap for read-only
- exports
+Message-ID: <d4482d97-637f-edcd-a37d-af708c25f567@redhat.com>
+Subject: Re: [PATCH v2 2/6] nbd: Merge nbd_export_set_name into nbd_export_new
 References: <20190110071330.28136-1-eblake@redhat.com>
- <20190110071330.28136-2-eblake@redhat.com>
- <3a2bac12-d3c2-8ce9-fc25-4a01c4ec1e3f@virtuozzo.com>
-In-Reply-To: <3a2bac12-d3c2-8ce9-fc25-4a01c4ec1e3f@virtuozzo.com>
+ <20190110071330.28136-3-eblake@redhat.com>
+ <7bead05e-672a-fdc2-6291-e72090defb66@virtuozzo.com>
+In-Reply-To: <7bead05e-672a-fdc2-6291-e72090defb66@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 1/10/19 4:27 AM, Vladimir Sementsov-Ogievskiy wrote:
+On 1/10/19 4:40 AM, Vladimir Sementsov-Ogievskiy wrote:
 > 10.01.2019 10:13, Eric Blake wrote:
->> Our initial implementation of x-nbd-server-add-bitmap put
->> in a restriction because of incremental backups: in that
->> usage, we are exporting one qcow2 file (the temporary overlay
->> target of a blockdev-backup sync:none job) and a dirty bitmap
->> owned by a second qcow2 file (the source of the
->> blockdev-backup, which is the backing file of the temporary).
->> While both qcow2 files are still writable (the target capture
->> copy-on-write of old contents, the source to track live guest
->> writes in the meantime), the NBD client expects to see
->> constant data, including the dirty bitmap.  An enabled bitmap
->> in the source would be modified by guest writes, which is at
->> odds with the NBD export being a read-only constant view,
->> hence the initial code choice of enforcing a disabled bitmap
->> (the intent is that the exposed bitmap was disabled in the
->> same transaction that started the blockdev-backup job,
->> although we don't want to actually track enough state to
->> actually enforce that).
+>> The existing NBD code had a weird split where nbd_export_new()
+>> created an export but did not add it to the list of exported
+>> names until a later nbd_export_set_name() came along and grabbed
+>> a second reference on the object; later, nbd_export_close()
+>> drops the second reference.  But since we never change the
+>> name of an NBD export while it is exposed, it is easier to just
+>> inline the process of setting the name as part of creating the
+>> export.
 >>
->> However, in the case of image migration, where we WANT a
->> writable export, it makes total sense that the NBD client
->> could expect writes to change the status visible through
->> the exposed dirty bitmap,
->=20
-> Don't follow.. Which kind of migration do you mean?
+>> Inline the contents of nbd_export_set_name() and
+>> nbd_export_set_description() into the two points in an export
+>> lifecycle where they matter, then adjust both callers to pass
+>> the name up front.  Note that all callers pass a non-NULL name,
+>> (passing NULL at creation was for old style servers, but we
+>> removed support for that in commit 7f7dfe2a).
 
-When libvirt does block migration, it opens up an NBD server on the
-destination, does a block-mirror from the source to copy the contents to
-the destination, then when the two are in sync does the actual VM state
-migration. There may be a use case where the destination already has
-some of the state (say that we started a migration, then got
-interrupted, and now want to restart but not lose the progress of what
-has already been sync'd previously) - in which case, the destination
-would expose a dirty bitmap of what has been already transferred, and
-the source can use that information to avoid re-sending data that has
-not changed since the previous partial transfer.  There may be other
-uses for exposing a live dirty bitmap for a writeable NBD export; and
-it's more a question of not forbidding this case even if I don't have a
-strong use case for why it will be useful.
+I need to fix that sentence:
 
->=20
->   and thus permitting an enabled
->> bitmap for an export that is not read-only makes sense;
->> although the current restriction prevents that usage.
->>
->> Alternatively, consider the case when the active layer does
->> not contain the bitmap but the backing layer does.  If the
->> backing layer is read-only (which is different from the
->> backing layer of a blockdev-backup job being writable),
->> we know the backing layer cannot be modified,=20
->=20
-> hmm, sounds a bit strange "in case of read-only backing, we know
-> that it cannot be modified". It's true for any read-only node,
-> so you can say just something like "read-only node (for example
-> regular backing file)"
 
-Nicer wording indeed. And, since my first paragraph was harder to
-justify, I'll swap the two in order to emphasize the case I actually hit
-over the one that is just hand-wavy "we might find a use for it".
+>> -void nbd_export_set_name(NBDExport *exp, const char *name)
+>> -{
+>> -    if (exp->name =3D=3D name) {
+>> -        return;
+>> -    }
+>> -
+>> -    nbd_export_get(exp);
+>> -    if (exp->name !=3D NULL) {
+>> -        g_free(exp->name);
+>> -        exp->name =3D NULL;
+>> -        QTAILQ_REMOVE(&exports, exp, next);
+>> -        nbd_export_put(exp);
+>> -    }
 
->=20
-> and thus the
->> bitmap will not change contents even if it is still marked
->> enabled (for that matter, since the backing file is
->> read-only, we couldn't change the bitmap to be disabled
->> in the first place).  Again, the current restriction
->> prevents this usage.
->>
->> Solve both issues by gating the restriction against a
->> disabled bitmap to only happen when the caller has
->> requested a read-only export, and where the BDS that owns
->> the bitmap (which might be a backing file of the BDS
->> handed to nbd_export_new) is still writable.
->>
->> Update iotest 223 to add some tests of the error paths.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
+In the old code, exp->name =3D=3D NULL was possible during a second
+nbd_export_close(), so this conditional needs to be preserved if
+nbd_export_close() can be called more than once on the same exp.
 
->>   _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
->>     "arguments":{"device":"n"}}' "return"
->> +_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
->> +  "arguments":{"device":"n"}}' "error"
->=20
-> twice add?
->=20
+>> -    if (name !=3D NULL) {
+>> -        nbd_export_get(exp);
+>> -        exp->name =3D g_strdup(name);
+>> -        QTAILQ_INSERT_TAIL(&exports, exp, next);
+>> -    }
 
->=20
-> aha, I've just realized that it's "some tests of the error paths" not r=
-elated to bitmaps..
->=20
-> So, I'd prefer to keep them in separate patch
+Whereas this conditional was only possible right after nbd_export_new(),
+and was always non-NULL, hence I converted it to an assert() for a
+non-NULL name and unconditional code.
 
-Could do.  I can split it if I have to respin.
+>> -    nbd_export_put(exp);
+>> -}
+>> -
+>> -void nbd_export_set_description(NBDExport *exp, const char *descripti=
+on)
+>> -{
+>> -    g_free(exp->description);
+>> -    exp->description =3D g_strdup(description);
+>> -}
+>> -
+>>   void nbd_export_close(NBDExport *exp)
+>>   {
+>>       NBDClient *client, *next;
+>> @@ -1568,8 +1549,14 @@ void nbd_export_close(NBDExport *exp)
+>>       QTAILQ_FOREACH_SAFE(client, &exp->clients, next, next) {
+>>           client_close(client, true);
+>>       }
+>> -    nbd_export_set_name(exp, NULL);
+>> -    nbd_export_set_description(exp, NULL);
+>> +    if (exp->name) {
+>> +        nbd_export_put(exp);
+>> +        g_free(exp->name);
+>> +        exp->name =3D NULL;
+>> +        QTAILQ_REMOVE(&exports, exp, next);
+>=20
+> exp->name is always non-zero, and _get and _INSERT_TAIL were done indep=
+endently from name,
+> so with these four lines done unconditionally:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Now, on to the analysis of whether the code in nbd_export_close() needs
+a conditional - yes, it does. Making it unconditional breaks the fact
+that we have nested referencing semantics: You can create an export,
+then call nbd_export_get(exp) to hold a second reference to it for as
+long as the export remains alive. The first time nbd_export_close() is
+called, you are telling the NBD server to no longer advertise the export
+(no new clients can connect, because exp->name is now NULL), but all
+existing clients continue to access the export just fine. The second
+time nbd_export_close() is called, exp->name is already NULL, and we are
+closing out all existing clients (if any are left) - it's how we
+implemented the nbd-server-remove safe vs. hard mode, and how we could
+add the hide/soft modes in the future (see block.json:NbdServerRemoveMode=
+).
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -149,21 +145,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---DGaqVjkUwqsAwiZDJl5Mi6dgLFDVOSawv
+--bZdAlJ9mMGSsq9xDJsMB99e07PmD5ezpU
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw3WOkACgkQ3g5py3or
-ov2daQf+M4WIIfY5jRCZdN/S5Z+PoGDEjg5xfsOBJdYzN/wVg6sg6LSX4jHQGeDh
-VsBqZYUPO6Edo/C+CLbclTexqzWecnf9ufRnhK9YQLHPNhWlIGResXiicsACJUZ9
-mtj/lWpSIjLWf9K8qFtmuw0MwWJCdtZSdbaZx9Ny0MdYqK5YvWunFu09wL/OvA5t
-XIFoktB4bWzl0SXsVDf4UF0JrF//rEt/ZuHXuB/Sz6J6MJ8SyEe6fp46nEGi6Jbg
-/ZiRVOcuqTxQO/1QB4b1n8/+0uhwz+Gu20qG54Ie5Q56CSPI1EiBcAsdizZ/AMI+
-/3XUUoAfbT4HuQbLB1CkWgGqaGNXhg==
-=7Qfg
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw3WlYACgkQ3g5py3or
+ov2t9gf/QAroPGJO5WzTS9OZhdYsWdSCDByEsPGJ7Ku2UuYYlkv3vLauBvslI+EP
+72S+0wQSgofz9Sj9eXV8guK/SbRMkxIZR5HH0EzZ1Xzwa3KbuKgyC5Tou+UEa/Eh
+b7jvgQzEh+O08Rcv5zBMTLPakipS8K9zKJEiOGcIEz+gbv/bX77R2A3aPZZGAevd
+Kh4DTOzwQB9ZaCMDRIvotNymA96HTCmI9ZGvIJJnbPd2Z2xUEf1DG+sBiZbFv8Bv
+bUO/D4B/CBlJjzlIy+Y3nRnoSi4/R6eRMBSXGmqb6DiIvDUhs9Ma3bIucBpGWvX7
+MO3EMRuGoyGWfqKZ3jpk1Yic/nQNlQ==
+=zlLK
 -----END PGP SIGNATURE-----
 
---DGaqVjkUwqsAwiZDJl5Mi6dgLFDVOSawv--
+--bZdAlJ9mMGSsq9xDJsMB99e07PmD5ezpU--
