@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42573)
+Received: from eggs.gnu.org ([209.51.188.92]:45155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghbgc-00040N-EF
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:51:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghbpB-0001WS-8r
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:00:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghbga-0001lN-2d
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:51:58 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 10 Jan 2019 14:51:42 +0000
-Message-ID: <fda42417-59a8-312a-be77-b89d703f641e@virtuozzo.com>
-References: <20190110071330.28136-1-eblake@redhat.com>
-	<20190110071330.28136-2-eblake@redhat.com>
-	<3a2bac12-d3c2-8ce9-fc25-4a01c4ec1e3f@virtuozzo.com>
-	<b0e453b6-369e-11e3-e4b1-c6867b99d74a@redhat.com>
-In-Reply-To: <b0e453b6-369e-11e3-e4b1-c6867b99d74a@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <05D6B309395DB44CA2FDB715A94FAE3E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1ghbp6-0005bk-3F
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:00:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54334)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ghbp5-0005aW-QO
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:00:44 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 14D9AC0C9A8B
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 15:00:36 +0000 (UTC)
+References: <20190110120047.25369-1-berrange@redhat.com>
+	<20190110120047.25369-2-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c471db17-bab0-21e7-d8c2-7f1b8c1ef742@redhat.com>
+Date: Thu, 10 Jan 2019 09:00:27 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] nbd: Only require disabled bitmap
- for read-only exports
+In-Reply-To: <20190110120047.25369-2-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hCuWFFX2Kc8dLLeweUpjlEdo1sIWhfKs5"
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] ui: install logo icons to
+ $prefix/share/icons
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +35,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-MTAuMDEuMjAxOSAxNzozOCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xMC8xOSA0OjI3IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTAuMDEuMjAxOSAxMDox
-MywgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBPdXIgaW5pdGlhbCBpbXBsZW1lbnRhdGlvbiBvZiB4
-LW5iZC1zZXJ2ZXItYWRkLWJpdG1hcCBwdXQNCj4+PiBpbiBhIHJlc3RyaWN0aW9uIGJlY2F1c2Ug
-b2YgaW5jcmVtZW50YWwgYmFja3VwczogaW4gdGhhdA0KPj4+IHVzYWdlLCB3ZSBhcmUgZXhwb3J0
-aW5nIG9uZSBxY293MiBmaWxlICh0aGUgdGVtcG9yYXJ5IG92ZXJsYXkNCj4+PiB0YXJnZXQgb2Yg
-YSBibG9ja2Rldi1iYWNrdXAgc3luYzpub25lIGpvYikgYW5kIGEgZGlydHkgYml0bWFwDQo+Pj4g
-b3duZWQgYnkgYSBzZWNvbmQgcWNvdzIgZmlsZSAodGhlIHNvdXJjZSBvZiB0aGUNCj4+PiBibG9j
-a2Rldi1iYWNrdXAsIHdoaWNoIGlzIHRoZSBiYWNraW5nIGZpbGUgb2YgdGhlIHRlbXBvcmFyeSku
-DQo+Pj4gV2hpbGUgYm90aCBxY293MiBmaWxlcyBhcmUgc3RpbGwgd3JpdGFibGUgKHRoZSB0YXJn
-ZXQgY2FwdHVyZQ0KPj4+IGNvcHktb24td3JpdGUgb2Ygb2xkIGNvbnRlbnRzLCB0aGUgc291cmNl
-IHRvIHRyYWNrIGxpdmUgZ3Vlc3QNCj4+PiB3cml0ZXMgaW4gdGhlIG1lYW50aW1lKSwgdGhlIE5C
-RCBjbGllbnQgZXhwZWN0cyB0byBzZWUNCj4+PiBjb25zdGFudCBkYXRhLCBpbmNsdWRpbmcgdGhl
-IGRpcnR5IGJpdG1hcC4gIEFuIGVuYWJsZWQgYml0bWFwDQo+Pj4gaW4gdGhlIHNvdXJjZSB3b3Vs
-ZCBiZSBtb2RpZmllZCBieSBndWVzdCB3cml0ZXMsIHdoaWNoIGlzIGF0DQo+Pj4gb2RkcyB3aXRo
-IHRoZSBOQkQgZXhwb3J0IGJlaW5nIGEgcmVhZC1vbmx5IGNvbnN0YW50IHZpZXcsDQo+Pj4gaGVu
-Y2UgdGhlIGluaXRpYWwgY29kZSBjaG9pY2Ugb2YgZW5mb3JjaW5nIGEgZGlzYWJsZWQgYml0bWFw
-DQo+Pj4gKHRoZSBpbnRlbnQgaXMgdGhhdCB0aGUgZXhwb3NlZCBiaXRtYXAgd2FzIGRpc2FibGVk
-IGluIHRoZQ0KPj4+IHNhbWUgdHJhbnNhY3Rpb24gdGhhdCBzdGFydGVkIHRoZSBibG9ja2Rldi1i
-YWNrdXAgam9iLA0KPj4+IGFsdGhvdWdoIHdlIGRvbid0IHdhbnQgdG8gYWN0dWFsbHkgdHJhY2sg
-ZW5vdWdoIHN0YXRlIHRvDQo+Pj4gYWN0dWFsbHkgZW5mb3JjZSB0aGF0KS4NCj4+Pg0KPj4+IEhv
-d2V2ZXIsIGluIHRoZSBjYXNlIG9mIGltYWdlIG1pZ3JhdGlvbiwgd2hlcmUgd2UgV0FOVCBhDQo+
-Pj4gd3JpdGFibGUgZXhwb3J0LCBpdCBtYWtlcyB0b3RhbCBzZW5zZSB0aGF0IHRoZSBOQkQgY2xp
-ZW50DQo+Pj4gY291bGQgZXhwZWN0IHdyaXRlcyB0byBjaGFuZ2UgdGhlIHN0YXR1cyB2aXNpYmxl
-IHRocm91Z2gNCj4+PiB0aGUgZXhwb3NlZCBkaXJ0eSBiaXRtYXAsDQo+Pg0KPj4gRG9uJ3QgZm9s
-bG93Li4gV2hpY2gga2luZCBvZiBtaWdyYXRpb24gZG8geW91IG1lYW4/DQo+IA0KPiBXaGVuIGxp
-YnZpcnQgZG9lcyBibG9jayBtaWdyYXRpb24sIGl0IG9wZW5zIHVwIGFuIE5CRCBzZXJ2ZXIgb24g
-dGhlDQo+IGRlc3RpbmF0aW9uLCBkb2VzIGEgYmxvY2stbWlycm9yIGZyb20gdGhlIHNvdXJjZSB0
-byBjb3B5IHRoZSBjb250ZW50cyB0bw0KPiB0aGUgZGVzdGluYXRpb24sIHRoZW4gd2hlbiB0aGUg
-dHdvIGFyZSBpbiBzeW5jIGRvZXMgdGhlIGFjdHVhbCBWTSBzdGF0ZQ0KPiBtaWdyYXRpb24uIFRo
-ZXJlIG1heSBiZSBhIHVzZSBjYXNlIHdoZXJlIHRoZSBkZXN0aW5hdGlvbiBhbHJlYWR5IGhhcw0K
-PiBzb21lIG9mIHRoZSBzdGF0ZSAoc2F5IHRoYXQgd2Ugc3RhcnRlZCBhIG1pZ3JhdGlvbiwgdGhl
-biBnb3QNCj4gaW50ZXJydXB0ZWQsIGFuZCBub3cgd2FudCB0byByZXN0YXJ0IGJ1dCBub3QgbG9z
-ZSB0aGUgcHJvZ3Jlc3Mgb2Ygd2hhdA0KPiBoYXMgYWxyZWFkeSBiZWVuIHN5bmMnZCBwcmV2aW91
-c2x5KSAtIGluIHdoaWNoIGNhc2UsIHRoZSBkZXN0aW5hdGlvbg0KPiB3b3VsZCBleHBvc2UgYSBk
-aXJ0eSBiaXRtYXAgb2Ygd2hhdCBoYXMgYmVlbiBhbHJlYWR5IHRyYW5zZmVycmVkLCBhbmQNCj4g
-dGhlIHNvdXJjZSBjYW4gdXNlIHRoYXQgaW5mb3JtYXRpb24gdG8gYXZvaWQgcmUtc2VuZGluZyBk
-YXRhIHRoYXQgaGFzDQo+IG5vdCBjaGFuZ2VkIHNpbmNlIHRoZSBwcmV2aW91cyBwYXJ0aWFsIHRy
-YW5zZmVyLiAgVGhlcmUgbWF5IGJlIG90aGVyDQo+IHVzZXMgZm9yIGV4cG9zaW5nIGEgbGl2ZSBk
-aXJ0eSBiaXRtYXAgZm9yIGEgd3JpdGVhYmxlIE5CRCBleHBvcnQ7IGFuZA0KPiBpdCdzIG1vcmUg
-YSBxdWVzdGlvbiBvZiBub3QgZm9yYmlkZGluZyB0aGlzIGNhc2UgZXZlbiBpZiBJIGRvbid0IGhh
-dmUgYQ0KPiBzdHJvbmcgdXNlIGNhc2UgZm9yIHdoeSBpdCB3aWxsIGJlIHVzZWZ1bC4NCj4gDQo+
-Pg0KPj4gICAgYW5kIHRodXMgcGVybWl0dGluZyBhbiBlbmFibGVkDQo+Pj4gYml0bWFwIGZvciBh
-biBleHBvcnQgdGhhdCBpcyBub3QgcmVhZC1vbmx5IG1ha2VzIHNlbnNlOw0KPj4+IGFsdGhvdWdo
-IHRoZSBjdXJyZW50IHJlc3RyaWN0aW9uIHByZXZlbnRzIHRoYXQgdXNhZ2UuDQo+Pj4NCj4+PiBB
-bHRlcm5hdGl2ZWx5LCBjb25zaWRlciB0aGUgY2FzZSB3aGVuIHRoZSBhY3RpdmUgbGF5ZXIgZG9l
-cw0KPj4+IG5vdCBjb250YWluIHRoZSBiaXRtYXAgYnV0IHRoZSBiYWNraW5nIGxheWVyIGRvZXMu
-ICBJZiB0aGUNCj4+PiBiYWNraW5nIGxheWVyIGlzIHJlYWQtb25seSAod2hpY2ggaXMgZGlmZmVy
-ZW50IGZyb20gdGhlDQo+Pj4gYmFja2luZyBsYXllciBvZiBhIGJsb2NrZGV2LWJhY2t1cCBqb2Ig
-YmVpbmcgd3JpdGFibGUpLA0KPj4+IHdlIGtub3cgdGhlIGJhY2tpbmcgbGF5ZXIgY2Fubm90IGJl
-IG1vZGlmaWVkLA0KPj4NCj4+IGhtbSwgc291bmRzIGEgYml0IHN0cmFuZ2UgImluIGNhc2Ugb2Yg
-cmVhZC1vbmx5IGJhY2tpbmcsIHdlIGtub3cNCj4+IHRoYXQgaXQgY2Fubm90IGJlIG1vZGlmaWVk
-Ii4gSXQncyB0cnVlIGZvciBhbnkgcmVhZC1vbmx5IG5vZGUsDQo+PiBzbyB5b3UgY2FuIHNheSBq
-dXN0IHNvbWV0aGluZyBsaWtlICJyZWFkLW9ubHkgbm9kZSAoZm9yIGV4YW1wbGUNCj4+IHJlZ3Vs
-YXIgYmFja2luZyBmaWxlKSINCj4gDQo+IE5pY2VyIHdvcmRpbmcgaW5kZWVkLiBBbmQsIHNpbmNl
-IG15IGZpcnN0IHBhcmFncmFwaCB3YXMgaGFyZGVyIHRvDQo+IGp1c3RpZnksIEknbGwgc3dhcCB0
-aGUgdHdvIGluIG9yZGVyIHRvIGVtcGhhc2l6ZSB0aGUgY2FzZSBJIGFjdHVhbGx5IGhpdA0KPiBv
-dmVyIHRoZSBvbmUgdGhhdCBpcyBqdXN0IGhhbmQtd2F2eSAid2UgbWlnaHQgZmluZCBhIHVzZSBm
-b3IgaXQiLg0KPiANCj4+DQo+PiBhbmQgdGh1cyB0aGUNCj4+PiBiaXRtYXAgd2lsbCBub3QgY2hh
-bmdlIGNvbnRlbnRzIGV2ZW4gaWYgaXQgaXMgc3RpbGwgbWFya2VkDQo+Pj4gZW5hYmxlZCAoZm9y
-IHRoYXQgbWF0dGVyLCBzaW5jZSB0aGUgYmFja2luZyBmaWxlIGlzDQo+Pj4gcmVhZC1vbmx5LCB3
-ZSBjb3VsZG4ndCBjaGFuZ2UgdGhlIGJpdG1hcCB0byBiZSBkaXNhYmxlZA0KPj4+IGluIHRoZSBm
-aXJzdCBwbGFjZSkuICBBZ2FpbiwgdGhlIGN1cnJlbnQgcmVzdHJpY3Rpb24NCj4+PiBwcmV2ZW50
-cyB0aGlzIHVzYWdlLg0KPj4+DQo+Pj4gU29sdmUgYm90aCBpc3N1ZXMgYnkgZ2F0aW5nIHRoZSBy
-ZXN0cmljdGlvbiBhZ2FpbnN0IGENCj4+PiBkaXNhYmxlZCBiaXRtYXAgdG8gb25seSBoYXBwZW4g
-d2hlbiB0aGUgY2FsbGVyIGhhcw0KPj4+IHJlcXVlc3RlZCBhIHJlYWQtb25seSBleHBvcnQsIGFu
-ZCB3aGVyZSB0aGUgQkRTIHRoYXQgb3ducw0KPj4+IHRoZSBiaXRtYXAgKHdoaWNoIG1pZ2h0IGJl
-IGEgYmFja2luZyBmaWxlIG9mIHRoZSBCRFMNCj4+PiBoYW5kZWQgdG8gbmJkX2V4cG9ydF9uZXcp
-IGlzIHN0aWxsIHdyaXRhYmxlLg0KPj4+DQo+Pj4gVXBkYXRlIGlvdGVzdCAyMjMgdG8gYWRkIHNv
-bWUgdGVzdHMgb2YgdGhlIGVycm9yIHBhdGhzLg0KPj4+DQo+Pj4gU2lnbmVkLW9mZi1ieTogRXJp
-YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+Pj4NCj4gDQo+Pj4gICAgX3NlbmRfcWVtdV9j
-bWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLWFkZCIsDQo+Pj4gICAgICAi
-YXJndW1lbnRzIjp7ImRldmljZSI6Im4ifX0nICJyZXR1cm4iDQo+Pj4gK19zZW5kX3FlbXVfY21k
-ICRRRU1VX0hBTkRMRSAneyJleGVjdXRlIjoibmJkLXNlcnZlci1hZGQiLA0KPj4+ICsgICJhcmd1
-bWVudHMiOnsiZGV2aWNlIjoibiJ9fScgImVycm9yIg0KPj4NCj4+IHR3aWNlIGFkZD8NCj4+DQo+
-IA0KPj4NCj4+IGFoYSwgSSd2ZSBqdXN0IHJlYWxpemVkIHRoYXQgaXQncyAic29tZSB0ZXN0cyBv
-ZiB0aGUgZXJyb3IgcGF0aHMiIG5vdCByZWxhdGVkIHRvIGJpdG1hcHMuLg0KPj4NCj4+IFNvLCBJ
-J2QgcHJlZmVyIHRvIGtlZXAgdGhlbSBpbiBzZXBhcmF0ZSBwYXRjaA0KPiANCj4gQ291bGQgZG8u
-ICBJIGNhbiBzcGxpdCBpdCBpZiBJIGhhdmUgdG8gcmVzcGluLg0KPiANCg0KT2suDQp3aXRoIG9y
-IHdpdGhvdXQgZHJvcHBlZCB1bnJlbGF0ZWQgZXJyb3IgcGF0aHM6DQpSZXZpZXdlZC1ieTogVmxh
-ZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoN
-Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hCuWFFX2Kc8dLLeweUpjlEdo1sIWhfKs5
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <c471db17-bab0-21e7-d8c2-7f1b8c1ef742@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] ui: install logo icons to
+ $prefix/share/icons
+References: <20190110120047.25369-1-berrange@redhat.com>
+ <20190110120047.25369-2-berrange@redhat.com>
+In-Reply-To: <20190110120047.25369-2-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/10/19 6:00 AM, Daniel P. Berrang=C3=A9 wrote:
+> QEMU currently installs loogs to $prefix/share/qemu/ which means no GUI=
+
+
+s/loogs/logos/
+
+> toolkit or applications can find them by default.
+>=20
+> The accepted standards for desktop applications declare that applicatio=
+n
+> logos / icons should be installed under $prefix/share/icons, so use thi=
+s
+> directory location.
+>=20
+> Pre-rendered icons are provided at the standard sizes expected for GUI
+> applications, along with the scalable SVG, to ensure maximum portabilit=
+y.
+>=20
+> The PNGs are rendered from the SVG using inkscape, however, this is not=
+
+> wired up into the default make rules to avoid requiring inkscape as a
+> mandatory tool in build systems / developer workstations..
+
+double trailing '.'. I like that the rules for automating it are there
+as a separate make target, and that they are not part of the default
+build (and hence the generated files must live in git).  That said,...
+
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+
+
+> +++ b/ui/icons/Makefile
+> @@ -0,0 +1,13 @@
+> +
+> +# Regenerate bitmaps from the SVG using inkscape CLI export
+> +# and ImageMagick. Don't use ImageMagick for the initial
+> +# SVG conversion, since it merely calls inkscape, but uses
+> +# 96 DPI res resulting in poor quality output.
+
+=2E..should this comment mention that it is intentional that this target
+is not part of 'make all'? Should the target be named 'maint-regenerate'
+to call attention to the fact that it is a maintainer-specific target?
+
+> +
+> +regenerate:
+> +	for s in 16 24 32 48 64 128 256 512; \
+> +	do \
+> +	    inkscape --without-gui --export-png=3Dqemu_$${s}x$${s}.png \
+> +		--export-width=3D$$s --export-height=3D$$s qemu.svg ; \
+> +	done
+> +	convert qemu_32x32.png qemu_32x32.bmp
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--hCuWFFX2Kc8dLLeweUpjlEdo1sIWhfKs5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw3XgsACgkQ3g5py3or
+ov2gjQf/RYraQuMZ7+4dZJalqshL+eUrQWouhzC1lGBlVjSiRlphl29ApjHf6/wV
+Iz3KrNtwkESqeDgwUTgBMLWIL100a2iKP0pFf0cv5b8d08fTe376a/QD6U4lOreE
+XOVo3PxojwmUDdl0v2rbY48xp65lkZah/QsHeZZEwrKBioQE6+7GUxATWnh1aflN
+39uV/ds2lC6hu6FsViuco4garJU4MKcb36Et0lfOk2nab/oOAk0GgBkU2snUOQQJ
+LRk2r8XOMGHSqigPZ/6F2PC83eM5zupnAQavyhupWWP2+oBMyonAzCR5ALa191Gw
+zNnkiSQYsCQpc4vjn0x+f+VhV/7kfw==
+=9e/G
+-----END PGP SIGNATURE-----
+
+--hCuWFFX2Kc8dLLeweUpjlEdo1sIWhfKs5--
