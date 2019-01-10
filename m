@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56529)
+Received: from eggs.gnu.org ([209.51.188.92]:56578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghfrH-00059O-HI
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:19:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghfra-0005Yo-3D
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:19:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghfrG-0008WK-N3
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:19:15 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghfrX-0000JL-OZ
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:19:33 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 10 Jan 2019 13:18:56 -0600
-Message-Id: <20190110191901.5082-3-eblake@redhat.com>
+Date: Thu, 10 Jan 2019 13:18:58 -0600
+Message-Id: <20190110191901.5082-5-eblake@redhat.com>
 In-Reply-To: <20190110191901.5082-1-eblake@redhat.com>
 References: <20190110191901.5082-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/6] block: Take advantage of QemuOpt
- default integers
+Subject: [Qemu-devel] [PATCH v3 4/6] qemu: Prefer '(x * MiB)' over 'S_xiB'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +22,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: lbloch@janustech.com, armbru@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>, Stefan Weil <sw@weilnetz.de>, Jeff Cody <jcody@redhat.com>
+Cc: lbloch@janustech.com, armbru@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Instead of defining an integer to a default string value (where we
-have to be careful how we spelled the integer because of the use of
-stringify), populate a default integer value instead.
-
-Drop a useless stringify(0); a missing default is just as easy to
-interpret as 0 as an explicit string 0.
+Now that QemuOpts can accept true integer defaults, we no longer
+have to be careful about the spelling of our default macros because
+we are no longer applying stringify() to any of the macros.
+Although it is slightly more verbose to call out an integer times
+a scale, it avoids the need to have a list of S_*iB macros that
+were used in commit b6a95c6d.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/parallels.c | 2 +-
- block/qcow2.c     | 2 +-
- block/qed.c       | 2 +-
- block/vdi.c       | 2 +-
- block/vhdx.c      | 3 +--
- 5 files changed, 5 insertions(+), 6 deletions(-)
+ block/qcow2.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index cc9445879d7..a7593310332 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -96,7 +96,7 @@ static QemuOptsList parallels_create_opts =3D {
-             .name =3D BLOCK_OPT_CLUSTER_SIZE,
-             .type =3D QEMU_OPT_SIZE,
-             .help =3D "Parallels image cluster size",
--            .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE),
-+            .def_value_int =3D DEFAULT_CLUSTER_SIZE,
-         },
-         { /* end of list */ }
-     }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4897abae5e8..c9b76a9ea93 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4892,7 +4892,7 @@ static QemuOptsList qcow2_create_opts =3D {
-             .name =3D BLOCK_OPT_CLUSTER_SIZE,
-             .type =3D QEMU_OPT_SIZE,
-             .help =3D "qcow2 cluster size",
--            .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)
-+            .def_value_int =3D DEFAULT_CLUSTER_SIZE,
-         },
-         {
-             .name =3D BLOCK_OPT_PREALLOC,
-diff --git a/block/qed.c b/block/qed.c
-index 9377c0b7ad8..9db36c39066 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1651,7 +1651,7 @@ static QemuOptsList qed_create_opts =3D {
-             .name =3D BLOCK_OPT_CLUSTER_SIZE,
-             .type =3D QEMU_OPT_SIZE,
-             .help =3D "Cluster size (in bytes)",
--            .def_value_str =3D stringify(QED_DEFAULT_CLUSTER_SIZE)
-+            .def_value_int =3D QED_DEFAULT_CLUSTER_SIZE,
-         },
-         {
-             .name =3D BLOCK_OPT_TABLE_SIZE,
-diff --git a/block/vdi.c b/block/vdi.c
-index 2380daa583e..65659c9b179 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -985,7 +985,7 @@ static QemuOptsList vdi_create_opts =3D {
-             .name =3D BLOCK_OPT_CLUSTER_SIZE,
-             .type =3D QEMU_OPT_SIZE,
-             .help =3D "VDI cluster (block) size",
--            .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)
-+            .def_value_int =3D DEFAULT_CLUSTER_SIZE,
-         },
+diff --git a/block/qcow2.h b/block/qcow2.h
+index a98d24500b2..d8db6622774 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -50,11 +50,11 @@
+
+ /* 8 MB refcount table is enough for 2 PB images at 64k cluster size
+  * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+-#define QCOW_MAX_REFTABLE_SIZE S_8MiB
++#define QCOW_MAX_REFTABLE_SIZE (8 * MiB)
+
+ /* 32 MB L1 table is enough for 2 PB images at 64k cluster size
+  * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+-#define QCOW_MAX_L1_SIZE S_32MiB
++#define QCOW_MAX_L1_SIZE (32 * MiB)
+
+ /* Allow for an average of 1k per snapshot table entry, should be plenty=
+ of
+  * space for snapshot names and IDs */
+@@ -81,15 +81,15 @@
+ #define MIN_REFCOUNT_CACHE_SIZE 4 /* clusters */
+
+ #ifdef CONFIG_LINUX
+-#define DEFAULT_L2_CACHE_MAX_SIZE S_32MiB
++#define DEFAULT_L2_CACHE_MAX_SIZE (32 * MiB)
+ #define DEFAULT_CACHE_CLEAN_INTERVAL 600  /* seconds */
+ #else
+-#define DEFAULT_L2_CACHE_MAX_SIZE S_8MiB
++#define DEFAULT_L2_CACHE_MAX_SIZE (8 * MiB)
+ /* Cache clean interval is currently available only on Linux, so must be=
+ 0 */
+ #define DEFAULT_CACHE_CLEAN_INTERVAL 0
  #endif
- #if defined(CONFIG_VDI_STATIC_IMAGE)
-diff --git a/block/vhdx.c b/block/vhdx.c
-index b785aef4b7b..54bf6805fc6 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -2085,13 +2085,12 @@ static QemuOptsList vhdx_create_opts =3D {
-        {
-            .name =3D VHDX_BLOCK_OPT_LOG_SIZE,
-            .type =3D QEMU_OPT_SIZE,
--           .def_value_str =3D stringify(DEFAULT_LOG_SIZE),
-+           .def_value_int =3D DEFAULT_LOG_SIZE,
-            .help =3D "Log size; min 1MB."
-        },
-        {
-            .name =3D VHDX_BLOCK_OPT_BLOCK_SIZE,
-            .type =3D QEMU_OPT_SIZE,
--           .def_value_str =3D stringify(0),
-            .help =3D "Block Size; min 1MB, max 256MB. " \
-                    "0 means auto-calculate based on image size."
-        },
+
+-#define DEFAULT_CLUSTER_SIZE S_64KiB
++#define DEFAULT_CLUSTER_SIZE (64 * KiB)
+
+ #define QCOW2_OPT_LAZY_REFCOUNTS "lazy-refcounts"
+ #define QCOW2_OPT_DISCARD_REQUEST "pass-discard-request"
 --=20
 2.20.1
