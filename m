@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49098)
+Received: from eggs.gnu.org ([209.51.188.92]:49213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1ghc0Z-0000SF-B2
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:36 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1ghc0m-0000cf-6B
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1ghc0T-0004GO-R9
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:35 -0500
-References: <20190108163008.7006-1-peter.maydell@linaro.org>
-	<20190108163008.7006-2-peter.maydell@linaro.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <3b738c7c-f42e-24c3-c8f6-74695e62c1dd@greensocs.com>
-Date: Thu, 10 Jan 2019 16:11:55 +0100
+	(envelope-from <sgarzare@redhat.com>) id 1ghc0l-0004Nq-3J
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:48 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55571)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ghc0k-0004N6-SG
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:47 -0500
+Received: by mail-wm1-f67.google.com with SMTP id y139so11514732wmc.5
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 07:12:46 -0800 (PST)
+Date: Thu, 10 Jan 2019 16:12:41 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190110151241.t5jxzsjsnujhkftw@steredhat>
+References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
+	<CAGxU2F53zsuVRBbvGTOU81zObL+4tTg_FgE0i04G2eOWckc29Q@mail.gmail.com>
+	<aa1cbeec-bb31-8849-c34b-e2397dc1c475@oracle.com>
+	<CAGxU2F7rHv7HNNmvLSw9b5_GPEZqvo-XgCoc0penp8eFmWm6gw@mail.gmail.com>
+	<fb7e62ea-0d3e-9b6f-4f1c-4bd780e50398@oracle.com>
+	<d1877cd9-7374-1512-7b01-2a2fb184643a@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20190108163008.7006-2-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="09mHiv8vIxoM7oU6FU2Hqz2za2XihTaja"
-Subject: Re: [Qemu-devel] [PATCH 1/4] hw/arm/xlx-zynqmp: Realize cluster
- after putting RPUs in it
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d1877cd9-7374-1512-7b01-2a2fb184643a@oracle.com>
+Subject: Re: [Qemu-devel] [RFC v2 0/4] QEMU changes to do PVH boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,92 +33,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Maran Wilson <maran.wilson@oracle.com>
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>, Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---09mHiv8vIxoM7oU6FU2Hqz2za2XihTaja
-From: Luc Michel <luc.michel@greensocs.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Emilio G . Cota" <cota@braap.org>, patches@linaro.org,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3b738c7c-f42e-24c3-c8f6-74695e62c1dd@greensocs.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] hw/arm/xlx-zynqmp: Realize cluster after
- putting RPUs in it
-References: <20190108163008.7006-1-peter.maydell@linaro.org>
- <20190108163008.7006-2-peter.maydell@linaro.org>
-In-Reply-To: <20190108163008.7006-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Jan 09, 2019 at 01:18:12PM -0800, Maran Wilson wrote:
+> On 1/9/2019 11:53 AM, Boris Ostrovsky wrote:
+> > On 1/9/19 6:53 AM, Stefano Garzarella wrote:
+> > > Hi Liam,
+> > > 
+> > > On Tue, Jan 8, 2019 at 3:47 PM Liam Merwick <liam.merwick@oracle.com> wrote:
+> > > > QEMU sets the hvm_modlist_entry in load_linux() after the call to
+> > > > load_elfboot() and then qboot loads it in boot_pvh_from_fw_cfg()
+> > > > 
+> > > > But the current PVH patches don't handle initrd (they have
+> > > > start_info.nr_modules == 1).
+> > > Looking in the linux kernel (arch/x86/platform/pvh/enlighten.c) I saw:
+> > >      /* The first module is always ramdisk. */
+> > >      if (pvh_start_info.nr_modules) {
+> > >          struct hvm_modlist_entry *modaddr =
+> > >              __va(pvh_start_info.modlist_paddr);
+> > >          pvh_bootparams.hdr.ramdisk_image = modaddr->paddr;
+> > >          pvh_bootparams.hdr.ramdisk_size = modaddr->size;
+> > >      }
+> > > 
+> > > So, putting start_info.nr_modules = 1, means that the first
+> > > hvm_modlist_entry should have the ramdisk paddr and size. Is it
+> > > correct?
+> 
+> That's my understanding.
+> 
+> I think what's missing, is that we just need Qemu or qboot/seabios to
+> properly populate the pvh_start_info.modlist_paddr with the address (as
+> usable by the guest) of the hvm_modlist_entry which correctly defines the
+> details of the initrd that has already been loaded into memory that is
+> accessible by the guest.
+> 
+> -Maran
+> 
 
-On 1/8/19 5:30 PM, Peter Maydell wrote:
-> Currently the cluster implementation doesn't have any constraints
-> on the ordering of realizing the TYPE_CPU_CLUSTER and populating it
-> with child objects. We want to impose a constraint that realize
-> must happen only after all the child objects are added, so move
-> the realize of rpu_cluster. (The apu_cluster is already
-> realized after child population.)
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+I tried and it works, I modified QEMU to load the initrd and to expose it
+through fw_cfg, then qboot loads it and set correctly the hvm_modlist_entry.
 
-> ---
->  hw/arm/xlnx-zynqmp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index c67ac2e64ac..370b0e44a38 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -183,8 +183,6 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState =
-*s, const char *boot_cpu,
->                              &error_abort, NULL);
->      qdev_prop_set_uint32(DEVICE(&s->rpu_cluster), "cluster-id", 1);
-> =20
-> -    qdev_init_nofail(DEVICE(&s->rpu_cluster));
-> -
->      for (i =3D 0; i < num_rpus; i++) {
->          char *name;
-> =20
-> @@ -212,6 +210,8 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState =
-*s, const char *boot_cpu,
->              return;
->          }
->      }
-> +
-> +    qdev_init_nofail(DEVICE(&s->rpu_cluster));
->  }
-> =20
->  static void xlnx_zynqmp_init(Object *obj)
->=20
+You can find the patch of QEMU at the end of this email and the qboot
+patch here: https://github.com/stefano-garzarella/qboot/commit/41e1fd765c8419e270fd79d9b3af5d53576e88a8
+
+Do you think can be a good approach? If you want, you can add this patch
+to your series.
+
+Thanks,
+Stefano
 
 
---09mHiv8vIxoM7oU6FU2Hqz2za2XihTaja
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>From d5c0d51768f5a8fb214be6c2bb0cb7e86e9917b7 Mon Sep 17 00:00:00 2001
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 10 Jan 2019 15:16:44 +0100
+Subject: [PATCH] pvh: load initrd and expose it through fw_cfg
 
------BEGIN PGP SIGNATURE-----
+When initrd is specified, load and expose it to the guest firmware
+through fw_cfg. The firmware will fill the hvm_start_info for the
+kernel.
 
-iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlw3YLsACgkQd8knW3Qn
-Tr5kpg//cZoxzFT5RgRq3XXiIL6xAX3Z3Spe8Ej15z66iu5UwhCdDnNiPFY5+vH3
-3TqqR8WxQJYWSJ6oBFQm4ptHHqhxIw9eVWd4+J91xl76OJ3VvckK5QkoaiWA0tiE
-0BNTUNRShckoAHJVj3/PnoyeqwFiUt45KBtTRZORnygi54bgdEZ2ysO0z6FKkqhS
-YAEtqDqVDqey9dj3UK5vA7EPqvpZejjbT5aqKsbRVVuCQxzFjz5j2gG4MsVt7Vpo
-20aJPnqHDr106Mu7Pi2Xc5yEHU1d7mpXNZHCJpxbtceIFOBC6mhMLsS0JdKrN1FI
-PXDOFVcrYKk5QqFaIuldh7/DR+3uXLv0Y73JhcJ0Ot3MIKutR/wkuCwNpD+5A/G9
-txL6Hy1XDAwVeI0rWJIz+meru0OpG9a3uHEsyI8bjeuRsXLPwPwPaxsWk6VjeOiY
-sibYxQnfo1cRhRsLXDVwdC24MReElGZI3MxPFYAbqqPprxQkGT+urnSG9rkDiRED
-WqzB0MKKHEDLhWPMXB9tyxiwn4TPPi1eu0avAx7U8MLbF+C/+4zCwiT8Oz6ZnhUO
-4Swek/udAgMiLtS0dNHLlnkkEiOtNgrIPp00yR8tL8jR15FHjh0qdiTZeGAsWgfG
-OQKQjgk6fYD3G3oK2yHHd2o3zwlBcENxAAj7B56E+1XOM7y6zdI=
-=42BG
------END PGP SIGNATURE-----
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Based-on: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
+---
+ hw/i386/pc.c | 38 +++++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
 
---09mHiv8vIxoM7oU6FU2Hqz2za2XihTaja--
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 06bce6a101..f6721f51be 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -986,25 +986,45 @@ static void load_linux(PCMachineState *pcms,
+          */
+         if (load_elfboot(kernel_filename, kernel_size,
+                          header, pvh_start_addr, fw_cfg)) {
+-            struct hvm_modlist_entry ramdisk_mod = { 0 };
+-
+             fclose(f);
+ 
+             fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+                 strlen(kernel_cmdline) + 1);
+             fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
+ 
+-            assert(machine->device_memory != NULL);
+-            ramdisk_mod.paddr = machine->device_memory->base;
+-            ramdisk_mod.size =
+-                memory_region_size(&machine->device_memory->mr);
+-
+-            fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, &ramdisk_mod,
+-                             sizeof(ramdisk_mod));
+             fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(header));
+             fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
+                              header, sizeof(header));
+ 
++            /* load initrd */
++            if (initrd_filename) {
++                gsize initrd_size;
++                gchar *initrd_data;
++                GError *gerr = NULL;
++
++                if (!g_file_get_contents(initrd_filename, &initrd_data,
++                            &initrd_size, &gerr)) {
++                    fprintf(stderr, "qemu: error reading initrd %s: %s\n",
++                            initrd_filename, gerr->message);
++                    exit(1);
++                }
++
++                initrd_max = pcms->below_4g_mem_size - pcmc->acpi_data_size - 1;
++                if (initrd_size >= initrd_max) {
++                    fprintf(stderr, "qemu: initrd is too large, cannot support."
++                            "(max: %"PRIu32", need %"PRId64")\n",
++                            initrd_max, (uint64_t)initrd_size);
++                    exit(1);
++                }
++
++                initrd_addr = (initrd_max - initrd_size) & ~4095;
++
++                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
++                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
++                fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data,
++                                 initrd_size);
++            }
++
+             return;
+         }
+         /* This looks like a multiboot kernel. If it is, let's stop
+-- 
+2.20.1
