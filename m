@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60181)
+Received: from eggs.gnu.org ([209.51.188.92]:33633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1ghQcT-0004aL-4Y
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 22:02:58 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ghQgJ-0005sr-Oo
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 22:06:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1ghQcR-0007jg-NR
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 22:02:57 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ghQgI-00017v-D2
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 22:06:55 -0500
+Date: Thu, 10 Jan 2019 12:52:55 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190110015255.GF6682@umbus.fritz.box>
+References: <20190109151532.20504-1-clg@kaod.org>
 MIME-Version: 1.0
-References: <1540876720-9574-1-git-send-email-liq3ea@gmail.com>
-	<1540876720-9574-3-git-send-email-liq3ea@gmail.com>
-	<b445d1bd-48ad-82a7-9775-53419ce1a4a2@redhat.com>
-In-Reply-To: <b445d1bd-48ad-82a7-9775-53419ce1a4a2@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 10 Jan 2019 11:02:14 +0800
-Message-ID: <CAKXe6SLhRoOj8OtZ4m6h0y=Bnid2aU1Apk_bcrrFAJNSsCr4mA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/4] nvme: ensure the num_queues is not zero
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ULyIDA2m8JTe+TiX"
+Content-Disposition: inline
+In-Reply-To: <20190109151532.20504-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/xive: fix remaining XiveFabric names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,109 +23,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: keith.busch@intel.com, kwolf@redhat.com, qemu-block@nongnu.org, Qemu Developers <qemu-devel@nongnu.org>
-
-Max Reitz <mreitz@redhat.com> =E4=BA=8E2019=E5=B9=B41=E6=9C=889=E6=97=A5=E5=
-=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:38=E5=86=99=E9=81=93=EF=BC=9A
-
-> On 30.10.18 06:18, Li Qiang wrote:
-> > When it is zero, it causes segv. Backtrack:
-> > Thread 5 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-> > [Switching to Thread 0x7fffc6c17700 (LWP 51808)]
-> > 0x0000555555acbd90 in nvme_start_ctrl (n=3D0x6240000c8100) at
-> hw/block/nvme.c:820
-> > warning: Source file is more recent than executable.
-> > 820       if (unlikely(n->cq[0])) {
-> > (gdb) bt
-> > 0  0x0000555555acbd90 in nvme_start_ctrl (n=3D0x6240000c8100) at
-> hw/block/nvme.c:820
-> > 1  0x0000555555accdbc in nvme_write_bar (n=3D0x6240000c8100, offset=3D2=
-0,
-> data=3D4587521, size=3D4) at hw/block/nvme.c:964
-> > 2  0x0000555555acdd2b in nvme_mmio_write (opaque=3D0x6240000c8100,
-> addr=3D20, data=3D4587521, size=3D4) at hw/block/nvme.c:1158
-> > 3  0x00005555558973ed in memory_region_write_accessor
-> (mr=3D0x6240000c89e0, addr=3D20, value=3D0x7fffc6c14428, size=3D4, shift=
-=3D0,
-> mask=3D4294967295, attrs=3D...) at
-> /home/liqiang02/qemu-upstream/qemu/memory.c:500
-> > 4  0x0000555555897600 in access_with_adjusted_size (addr=3D20,
-> value=3D0x7fffc6c14428, size=3D4, access_size_min=3D2, access_size_max=3D=
-8,
-> access_fn=3D0x555555897304 <memory_region_write_accessor>, mr=3D0x6240000=
-c89e0,
-> attrs=3D...) at /home/liqiang02/qemu-upstream/qemu/memory.c:566
-> > 5  0x000055555589a200 in memory_region_dispatch_write
-> (mr=3D0x6240000c89e0, addr=3D20, data=3D4587521, size=3D4, attrs=3D...) a=
-t
-> /home/liqiang02/qemu-upstream/qemu/memory.c:1442
-> > 6  0x0000555555835151 in flatview_write_continue (fv=3D0x6060000e6fc0,
-> addr=3D4273930260, attrs=3D..., buf=3D0x7fffc8a18028 "\001", len=3D4, add=
-r1=3D20,
-> l=3D4, mr=3D0x6240000c89e0) at /home/liqiang02/qemu-upstream/qemu/exec.c:=
-3233
-> > 7  0x000055555583529b in flatview_write (fv=3D0x6060000e6fc0,
-> addr=3D4273930260, attrs=3D..., buf=3D0x7fffc8a18028 "\001", len=3D4) at
-> /home/liqiang02/qemu-upstream/qemu/exec.c:3272
-> > 8  0x00005555558355a1 in address_space_write (as=3D0x55555683ade0
-> <address_space_memory>, addr=3D4273930260, attrs=3D..., buf=3D0x7fffc8a18=
-028
-> "\001", len=3D4) at /home/liqiang02/qemu-upstream/qemu/exec.c:3362
-> > 9  0x00005555558355f2 in address_space_rw (as=3D0x55555683ade0
-> <address_space_memory>, addr=3D4273930260, attrs=3D..., buf=3D0x7fffc8a18=
-028
-> "\001", len=3D4, is_write=3Dtrue) at
-> /home/liqiang02/qemu-upstream/qemu/exec.c:3373
-> > 10 0x00005555558b66ac in kvm_cpu_exec (cpu=3D0x631000014800) at
-> /home/liqiang02/qemu-upstream/qemu/accel/kvm/kvm-all.c:2031
-> > 11 0x000055555587c3ac in qemu_kvm_cpu_thread_fn (arg=3D0x631000014800) =
-at
-> /home/liqiang02/qemu-upstream/qemu/cpus.c:1277
-> > 12 0x0000555555e54ae6 in qemu_thread_start (args=3D0x60300002c170) at
-> util/qemu-thread-posix.c:504
-> > 13 0x00007fffdadbd494 in start_thread () from
-> /lib/x86_64-linux-gnu/libpthread.so.0
-> > 14 0x00007fffdaaffacf in clone () from /lib/x86_64-linux-gnu/libc.so.6
-> > (gdb) q
-> >
-> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> > ---
-> >  hw/block/nvme.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > index 676cc48..72c9644 100644
-> > --- a/hw/block/nvme.c
-> > +++ b/hw/block/nvme.c
-> > @@ -1221,6 +1221,10 @@ static void nvme_realize(PCIDevice *pci_dev,
-> Error **errp)
-> >          error_setg(errp, "serial property not set");
-> >          return;
-> >      }
-> > +
-> > +    if (!n->num_queues) {
-> > +        error_setg(errp, "num_queues can't be zero");
->
-> I think we should return here.
->
->
-Ok, forget this. will make a revised version later.
-
-Thanks,
-Li Qiang
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
-> (Sorry for the late review...)
->
-> Max
->
-> > +    }
-> >      blkconf_blocksizes(&n->conf);
-> >      if (!blkconf_apply_backend_options(&n->conf,
-> blk_is_read_only(n->conf.blk),
-> >                                         false, errp)) {
-> >
->
->
->
+--ULyIDA2m8JTe+TiX
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jan 09, 2019 at 04:15:32PM +0100, C=E9dric Le Goater wrote:
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Applied, thanks.
+
+> ---
+>  include/hw/ppc/xive.h | 2 +-
+>  hw/intc/xive.c        | 6 +++---
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index 4cd2e54c4958..0f935a146c66 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -146,7 +146,7 @@
+>  #include "hw/ppc/xive_regs.h"
+> =20
+>  /*
+> - * XIVE Fabric (Interface between Source and Router)
+> + * XIVE Notifier (Interface between Source and Router)
+>   */
+> =20
+>  typedef struct XiveNotifier {
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 469c90e50c6a..39aac9f89d2a 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -1659,9 +1659,9 @@ static const TypeInfo xive_end_source_info =3D {
+>  };
+> =20
+>  /*
+> - * XIVE Fabric
+> + * XIVE Notifier
+>   */
+> -static const TypeInfo xive_fabric_info =3D {
+> +static const TypeInfo xive_notifier_info =3D {
+>      .name =3D TYPE_XIVE_NOTIFIER,
+>      .parent =3D TYPE_INTERFACE,
+>      .class_size =3D sizeof(XiveNotifierClass),
+> @@ -1670,7 +1670,7 @@ static const TypeInfo xive_fabric_info =3D {
+>  static void xive_register_types(void)
+>  {
+>      type_register_static(&xive_source_info);
+> -    type_register_static(&xive_fabric_info);
+> +    type_register_static(&xive_notifier_info);
+>      type_register_static(&xive_router_info);
+>      type_register_static(&xive_end_source_info);
+>      type_register_static(&xive_tctx_info);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ULyIDA2m8JTe+TiX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlw2pXcACgkQbDjKyiDZ
+s5Ir4hAAkE/JA9IWczWYLjk1+oNNd5SCoiWD5tGLm5zmuE7mKZOHs2u4VSGODB3g
+n2o4jzbgcbv6YxdLSI38uLDO4ap2J1uygPuSiotlV+LtwyH/KZZ3KjypeLxEeTUD
+jnqccuccjlZhLwOUKevf/f2DJRWsWzDbmDt/OUbFCTvoAAKZ/fvR6qvqF7WkE2lR
+azVRIoy8jhnL1m+Sj2d+ob03743/l7A4UmLRKSJ9DjUBnUVUTl4sf7BHT2ZdgCta
+rzA+RQ8mZw17IxuOo6GeDvjD6Oa5MHoV0tBOmlPwCVyP3jV3NE/OsxDendseddKj
+C6suqf031xvLvb2lrYh2p1MUf1gnIEr9aGupIhGOZamHJjFsEG5I1+pqX5GSMrjr
+ZF6g9U7gA9qhg5xKx1Mkwuhg76W+rupzVrq3k+VfF7SIJzXt6dITBK7EyeWx2cDa
+VTOo+F2+YtEWnYQaOIwRyVLGGwvYz2An32e2rs6lSlDb95Yb1DB4f2SZh5bFWG1D
+bufH4eRi1oawLSHTIN1rRcXnWprTbtyrlccR+d+u5VXbB8O3IQFgtsTkmXQP7Z0n
+8uBEkUQCfvDr6d5gv22hISeXkzYW5Dk0kwUBL99eWjHk1dr0rvppOy6AleELVaDj
+ZNIhkvvdxLO8ckgffYGuagU1Fu0iMdFGkIAEwT7GNRyxgAkShno=
+=iESq
+-----END PGP SIGNATURE-----
+
+--ULyIDA2m8JTe+TiX--
