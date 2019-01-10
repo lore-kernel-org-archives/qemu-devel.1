@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56223)
+Received: from eggs.gnu.org ([209.51.188.92]:59051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZIC-0004ww-Ch
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:37 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghZP0-0002ek-M9
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:25:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZIA-0007vL-CE
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:36 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:39998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ghZIA-0007lM-5m
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:34 -0500
-Received: by mail-pf1-x441.google.com with SMTP id i12so5226894pfo.7
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:18:12 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 Jan 2019 23:17:36 +1100
-Message-Id: <20190110121736.23448-12-richard.henderson@linaro.org>
-In-Reply-To: <20190110121736.23448-1-richard.henderson@linaro.org>
-References: <20190110121736.23448-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 11/11] tests/tcg/aarch64: Add bti smoke test
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghZOy-0003Oh-Pr
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:25:38 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 10 Jan 2019 12:25:23 +0000
+Message-ID: <246062a9-2674-00e7-33ac-709c610efad6@virtuozzo.com>
+References: <20190110071330.28136-1-eblake@redhat.com>
+	<20190110071330.28136-6-eblake@redhat.com>
+In-Reply-To: <20190110071330.28136-6-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <90DFA8F8D1D6C047956A25C3172C2312@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] nbd: Merge nbd_export_bitmap into
+ nbd_export_new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,162 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tests/tcg/aarch64/bti-1.c         | 61 +++++++++++++++++++++++++++++++
- tests/tcg/aarch64/bti-crt.inc.c   | 51 ++++++++++++++++++++++++++
- tests/tcg/aarch64/Makefile.target |  7 +++-
- 3 files changed, 118 insertions(+), 1 deletion(-)
- create mode 100644 tests/tcg/aarch64/bti-1.c
- create mode 100644 tests/tcg/aarch64/bti-crt.inc.c
-
-diff --git a/tests/tcg/aarch64/bti-1.c b/tests/tcg/aarch64/bti-1.c
-new file mode 100644
-index 0000000000..fa8a521a47
---- /dev/null
-+++ b/tests/tcg/aarch64/bti-1.c
-@@ -0,0 +1,61 @@
-+/*
-+ * Branch target identification, basic notskip cases.
-+ */
-+
-+#include "bti-crt.inc.c"
-+
-+static void skip2_sigill(int sig, siginfo_t *info, ucontext_t *uc)
-+{
-+    uc->uc_mcontext.pc += 8;
-+}
-+
-+#define NOP       "nop"
-+#define BTI_N     "hint #32"
-+#define BTI_C     "hint #34"
-+#define BTI_J     "hint #36"
-+#define BTI_JC    "hint #38"
-+
-+#define BTYPE_1(DEST) \
-+    asm("mov %0,#1; adr x16, 1f; br x16; 1: " DEST "; mov %0,#0" \
-+        : "=r"(skipped) : : "x16")
-+
-+#define BTYPE_2(DEST) \
-+    asm("mov %0,#1; adr x16, 1f; blr x16; 1: " DEST "; mov %0,#0" \
-+        : "=r"(skipped) : : "x16", "x30")
-+
-+#define BTYPE_3(DEST) \
-+    asm("mov %0,#1; adr x15, 1f; br x15; 1: " DEST "; mov %0,#0" \
-+        : "=r"(skipped) : : "x15")
-+
-+#define TEST(WHICH, DEST, EXPECT) \
-+    do { WHICH(DEST); fail += skipped ^ EXPECT; } while (0)
-+
-+
-+int main()
-+{
-+    int fail = 0;
-+    int skipped;
-+
-+    /* Signal-like with SA_SIGINFO.  */
-+    signal_info(SIGILL, skip2_sigill);
-+
-+    TEST(BTYPE_1, NOP, 1);
-+    TEST(BTYPE_1, BTI_N, 1);
-+    TEST(BTYPE_1, BTI_C, 0);
-+    TEST(BTYPE_1, BTI_J, 0);
-+    TEST(BTYPE_1, BTI_JC, 0);
-+
-+    TEST(BTYPE_2, NOP, 1);
-+    TEST(BTYPE_2, BTI_N, 1);
-+    TEST(BTYPE_2, BTI_C, 0);
-+    TEST(BTYPE_2, BTI_J, 1);
-+    TEST(BTYPE_2, BTI_JC, 0);
-+
-+    TEST(BTYPE_3, NOP, 1);
-+    TEST(BTYPE_3, BTI_N, 1);
-+    TEST(BTYPE_3, BTI_C, 1);
-+    TEST(BTYPE_3, BTI_J, 0);
-+    TEST(BTYPE_3, BTI_JC, 0);
-+
-+    return fail;
-+}
-diff --git a/tests/tcg/aarch64/bti-crt.inc.c b/tests/tcg/aarch64/bti-crt.inc.c
-new file mode 100644
-index 0000000000..ef7831ad76
---- /dev/null
-+++ b/tests/tcg/aarch64/bti-crt.inc.c
-@@ -0,0 +1,51 @@
-+/*
-+ * Minimal user-environment for testing BTI.
-+ *
-+ * Normal libc is not built with BTI support enabled, and so could
-+ * generate a BTI TRAP before ever reaching main.
-+ */
-+
-+#include <stdlib.h>
-+#include <signal.h>
-+#include <ucontext.h>
-+#include <asm/unistd.h>
-+
-+int main(void);
-+
-+void _start(void)
-+{
-+    exit(main());
-+}
-+
-+void exit(int ret)
-+{
-+    register int x0 __asm__("x0") = ret;
-+    register int x8 __asm__("x8") = __NR_exit;
-+
-+    asm volatile("svc #0" : : "r"(x0), "r"(x8));
-+    __builtin_unreachable();
-+}
-+
-+/*
-+ * Irritatingly, the user API struct sigaction does not match the
-+ * kernel API struct sigaction.  So for simplicity, isolate the
-+ * kernel ABI here, and make this act like signal.
-+ */
-+void signal_info(int sig, void (*fn)(int, siginfo_t *, ucontext_t *))
-+{
-+    struct kernel_sigaction {
-+        void (*handler)(int, siginfo_t *, ucontext_t *);
-+        unsigned long flags;
-+        unsigned long restorer;
-+        unsigned long mask;
-+    } sa = { fn, SA_SIGINFO, 0, 0 };
-+
-+    register int x0 __asm__("x0") = sig;
-+    register void *x1 __asm__("x1") = &sa;
-+    register void *x2 __asm__("x2") = 0;
-+    register int x3 __asm__("x3") = sizeof(unsigned long);
-+    register int x8 __asm__("x8") = __NR_rt_sigaction;
-+
-+    asm volatile("svc #0"
-+                 : : "r"(x0), "r"(x1), "r"(x2), "r"(x3), "r"(x8) : "memory");
-+}
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 08c45b8470..3d56e7c6ea 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -8,10 +8,15 @@ VPATH 		+= $(AARCH64_SRC)
- # we don't build any of the ARM tests
- AARCH64_TESTS=$(filter-out $(ARM_TESTS), $(TESTS))
- AARCH64_TESTS+=fcvt
--TESTS:=$(AARCH64_TESTS)
- 
- fcvt: LDFLAGS+=-lm
- 
- run-fcvt: fcvt
- 	$(call run-test,$<,$(QEMU) $<, "$< on $(TARGET_NAME)")
- 	$(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
-+
-+AARCH64_TESTS += bti-1
-+bti-1: LDFLAGS += -nostartfiles -nodefaultlibs -nostdlib
-+run-bti-1: QEMU += -cpu max,guarded_pages=on
-+
-+TESTS:=$(AARCH64_TESTS)
--- 
-2.17.2
+MTAuMDEuMjAxOSAxMDoxMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2Ugb25seSBoYXZlIG9uZSBj
+YWxsZXIgdGhhdCB3YW50cyB0byBleHBvcnQgYSBiaXRtYXAgbmFtZSwNCj4gd2hpY2ggaXQgZG9l
+cyByaWdodCBhZnRlciBjcmVhdGlvbiBvZiB0aGUgZXhwb3J0LiBCdXQgdGhlcmUgaXMNCj4gc3Rp
+bGwgYSBicmllZiB3aW5kb3cgb2YgdGltZSB3aGVyZSBhbiBOQkQgY2xpZW50IGNvdWxkIHNlZSB0
+aGUNCj4gZXhwb3J0IGJ1dCBub3QgdGhlIGRpcnR5IGJpdG1hcCwgd2hpY2ggYSByb2J1c3QgY2xp
+ZW50IHdvdWxkDQo+IGhhdmUgdG8gaW50ZXJwcmV0IGFzIG1lYW5pbmcgdGhlIGVudGlyZSBpbWFn
+ZSBzaG91bGQgYmUgdHJlYXRlZA0KPiBhcyBkaXJ0eS4gIEJldHRlciBpcyB0byBlbGltaW5hdGUg
+dGhlIHdpbmRvdyBlbnRpcmVseSwgYnkNCj4gaW5saW5pbmcgbmJkX2V4cG9ydF9iaXRtYXAoKSBp
+bnRvIG5iZF9leHBvcnRfbmV3KCksIGFuZCByZWZ1c2luZw0KPiB0byBjcmVhdGUgdGhlIGJpdG1h
+cCBpbiB0aGUgZmlyc3QgcGxhY2UgaWYgdGhlIHJlcXVlc3RlZCBiaXRtYXANCj4gY2FuJ3QgYmUg
+bG9jYXRlZC4NCj4gDQo+IFdlIGFsc28gbm8gbG9uZ2VyIG5lZWQgbG9naWMgZm9yIHNldHRpbmcg
+YSBkaWZmZXJlbnQgYml0bWFwDQo+IG5hbWUgY29tcGFyZWQgdG8gdGhlIGJpdG1hcCBiZWluZyBl
+eHBvcnRlZC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQu
+Y29tPg0KPiAtLS0NCj4gICBpbmNsdWRlL2Jsb2NrL25iZC5oIHwgIDkgKystLS0NCj4gICBibG9j
+a2Rldi1uYmQuYyAgICAgIHwgMTEgKy0tLS0tDQo+ICAgbmJkL3NlcnZlci5jICAgICAgICB8IDg3
+ICsrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAgIHFlbXUt
+bmJkLmMgICAgICAgICAgfCAgNCArLS0NCj4gICA0IGZpbGVzIGNoYW5nZWQsIDQ2IGluc2VydGlv
+bnMoKyksIDY1IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvYmxvY2sv
+bmJkLmggYi9pbmNsdWRlL2Jsb2NrL25iZC5oDQo+IGluZGV4IDJmOWEyYWViNzNjLi4xOTcxYjU1
+Nzg5NiAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9jay9uYmQuaA0KPiArKysgYi9pbmNsdWRl
+L2Jsb2NrL25iZC5oDQo+IEBAIC0yOTYsOSArMjk2LDkgQEAgdHlwZWRlZiBzdHJ1Y3QgTkJEQ2xp
+ZW50IE5CRENsaWVudDsNCj4gDQo+ICAgTkJERXhwb3J0ICpuYmRfZXhwb3J0X25ldyhCbG9ja0Ry
+aXZlclN0YXRlICpicywgb2ZmX3QgZGV2X29mZnNldCwgb2ZmX3Qgc2l6ZSwNCj4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0IGNoYXIgKmRlc2NyaXB0
+aW9uLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MTZfdCBuYmRmbGFncywgdm9p
+ZCAoKmNsb3NlKShOQkRFeHBvcnQgKiksDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgIGJv
+b2wgd3JpdGV0aHJvdWdoLCBCbG9ja0JhY2tlbmQgKm9uX2VqZWN0X2JsaywNCj4gLSAgICAgICAg
+ICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKTsNCj4gKyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgY29uc3QgY2hhciAqYml0bWFwLCB1aW50MTZfdCBuYmRmbGFncywNCj4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgdm9pZCAoKmNsb3NlKShOQkRFeHBvcnQgKiksIGJvb2wgd3JpdGV0
+aHJvdWdoLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICBCbG9ja0JhY2tlbmQgKm9uX2Vq
+ZWN0X2JsaywgRXJyb3IgKiplcnJwKTsNCj4gICB2b2lkIG5iZF9leHBvcnRfY2xvc2UoTkJERXhw
+b3J0ICpleHApOw0KPiAgIHZvaWQgbmJkX2V4cG9ydF9yZW1vdmUoTkJERXhwb3J0ICpleHAsIE5i
+ZFNlcnZlclJlbW92ZU1vZGUgbW9kZSwgRXJyb3IgKiplcnJwKTsNCj4gICB2b2lkIG5iZF9leHBv
+cnRfZ2V0KE5CREV4cG9ydCAqZXhwKTsNCj4gQEAgLTMxOSw5ICszMTksNiBAQCB2b2lkIG5iZF9j
+bGllbnRfcHV0KE5CRENsaWVudCAqY2xpZW50KTsNCj4gICB2b2lkIG5iZF9zZXJ2ZXJfc3RhcnQo
+U29ja2V0QWRkcmVzcyAqYWRkciwgY29uc3QgY2hhciAqdGxzX2NyZWRzLA0KPiAgICAgICAgICAg
+ICAgICAgICAgICAgICBFcnJvciAqKmVycnApOw0KPiANCj4gLXZvaWQgbmJkX2V4cG9ydF9iaXRt
+YXAoTkJERXhwb3J0ICpleHAsIGNvbnN0IGNoYXIgKmJpdG1hcCwNCj4gLSAgICAgICAgICAgICAg
+ICAgICAgICAgY29uc3QgY2hhciAqYml0bWFwX2V4cG9ydF9uYW1lLCBFcnJvciAqKmVycnApOw0K
+PiAtDQo+ICAgLyogbmJkX3JlYWQNCj4gICAgKiBSZWFkcyBAc2l6ZSBieXRlcyBmcm9tIEBpb2Mu
+IFJldHVybnMgMCBvbiBzdWNjZXNzLg0KPiAgICAqLw0KPiBkaWZmIC0tZ2l0IGEvYmxvY2tkZXYt
+bmJkLmMgYi9ibG9ja2Rldi1uYmQuYw0KPiBpbmRleCAwMDNiYTdkNzE4MC4uMGRmNjMwN2JlMmQg
+MTAwNjQ0DQo+IC0tLSBhL2Jsb2NrZGV2LW5iZC5jDQo+ICsrKyBiL2Jsb2NrZGV2LW5iZC5jDQo+
+IEBAIC0xNzUsNyArMTc1LDcgQEAgdm9pZCBxbXBfbmJkX3NlcnZlcl9hZGQoY29uc3QgY2hhciAq
+ZGV2aWNlLCBib29sIGhhc19uYW1lLCBjb25zdCBjaGFyICpuYW1lLA0KPiAgICAgICAgICAgd3Jp
+dGFibGUgPSBmYWxzZTsNCj4gICAgICAgfQ0KPiANCj4gLSAgICBleHAgPSBuYmRfZXhwb3J0X25l
+dyhicywgMCwgLTEsIG5hbWUsIE5VTEwsDQo+ICsgICAgZXhwID0gbmJkX2V4cG9ydF9uZXcoYnMs
+IDAsIC0xLCBuYW1lLCBOVUxMLCBiaXRtYXAsDQoNCmJpdG1hcCBpcyBndWFyYW50ZWVkIHRvIGJl
+IE5VTEwgaWYgaGFzX2JpdG1hcCBpcyBmYWxzZT8gT3Igc2hvdWxkIHdlIGRvIGhhc19iaXRtYXAg
+PyBiaXRtYXAgOiBOVUxMPw0KDQppZiB5ZXMgb3Igd2l0aCBmaXhlZDoNClJldmlld2VkLWJ5OiBW
+bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoN
+Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
