@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39608)
+Received: from eggs.gnu.org ([209.51.188.92]:39957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghejC-0005Rn-1F
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:06:50 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ghekG-0006Gp-FU
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:07:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghej9-0001tE-5w
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:06:48 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35675)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghej9-0001se-0L
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:06:47 -0500
-Received: by mail-wr1-f68.google.com with SMTP id 96so12465768wrb.2
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 10:06:46 -0800 (PST)
-References: <20190110174516.21586-1-alex.bennee@linaro.org>
-	<20190110174516.21586-16-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bbd7b9dd-20ea-6237-c56a-9519413b67a9@redhat.com>
-Date: Thu, 10 Jan 2019 19:06:44 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1ghekD-0002xz-L7
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:07:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ghekC-0002vh-QO
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:07:53 -0500
+Date: Thu, 10 Jan 2019 16:07:49 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190110180749.GH4500@habkost.net>
+References: <20190110020259.8492-1-ehabkost@redhat.com>
+	<20190110020259.8492-4-ehabkost@redhat.com>
+	<CAJ+F1C+cADS2WKysnEzH-ZD=C3uj5wymQFXtd4L9BOO2cjbjvA@mail.gmail.com>
+	<20190110133123.GF4500@habkost.net>
+	<20190110091140-mutt-send-email-mst@kernel.org>
+	<20190110150125.GF2589@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20190110174516.21586-16-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 15/19] travis: remove matrix settings
- that duplicate global settings
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190110150125.GF2589@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] virtio: Make
+ disable-legacy/disable-modern compat properties optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +33,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: ymankad@redhat.com, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Fam Zheng <fam@euphon.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-On 1/10/19 6:45 PM, Alex Bennée wrote:
-> From: Daniel P. Berrangé <berrange@redhat.com>
-> 
-> The global defaults request "trusty" and "gcc", so matrix entries do not
-> need to repeat this.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On Thu, Jan 10, 2019 at 03:01:25PM +0000, Dr. David Alan Gilbert wrote:
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > On Thu, Jan 10, 2019 at 11:31:23AM -0200, Eduardo Habkost wrote:
+> > > On Thu, Jan 10, 2019 at 12:35:26PM +0400, Marc-Andr=E9 Lureau wrote=
+:
+> > > > Hi
+> > > >=20
+> > > > On Thu, Jan 10, 2019 at 6:05 AM Eduardo Habkost <ehabkost@redhat.=
+com> wrote:
+> > > > >
+> > > > > The disable-legacy and disable-modern properties apply only to
+> > > > > some virtio-pci devices.  Make those properties optional.
+> > > > >
+> > > > > This fixes the crash introduced by commit f6e501a28ef9 ("virtio=
+: Provide
+> > > > > version-specific variants of virtio PCI devices"):
+> > > > >
+> > > > >   $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
+> > > > >     -device virtio-net-pci-non-transitional
+> > > > >   Unexpected error in object_property_find() at qom/object.c:10=
+92:
+> > > > >   qemu-system-x86_64: -device virtio-net-pci-non-transitional: =
+can't apply \
+> > > > >   global virtio-pci.disable-modern=3Don: Property '.disable-mod=
+ern' not found
+> > > > >   Aborted (core dumped)
+> > > > >
+> > > > > Reported-by: Thomas Huth <thuth@redhat.com>
+> > > > > Fixes: f6e501a28ef9 ("virtio: Provide version-specific variants=
+ of virtio PCI devices")
+> > > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > ---
+> > > > >  hw/core/machine.c | 5 +++--
+> > > > >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > > > index 5530b71981..a19143aa44 100644
+> > > > > --- a/hw/core/machine.c
+> > > > > +++ b/hw/core/machine.c
+> > > > > @@ -91,8 +91,9 @@ const size_t hw_compat_2_7_len =3D G_N_ELEMEN=
+TS(hw_compat_2_7);
+> > > > >
+> > > > >  GlobalProperty hw_compat_2_6[] =3D {
+> > > > >      { "virtio-mmio", "format_transport_address", "off" },
+> > > > > -    { "virtio-pci", "disable-modern", "on" },
+> > > > > -    { "virtio-pci", "disable-legacy", "off" },
+> > > > > +    /* Optional because not all virtio-pci devices support leg=
+acy mode */
+> > > > > +    { "virtio-pci", "disable-modern", "on",  .optional =3D tru=
+e },
+> > > > > +    { "virtio-pci", "disable-legacy", "off", .optional =3D tru=
+e },
+> > > >=20
+> > > > Could the generic devices implement a specific interface instead?
+> > > > virtio-pci-generic?
+> > >=20
+> > > This is the kind of complexity I wanted to avoid.  We already
+> > > have too many interface names for subsets of PCI and virtio
+> > > devices.
+> > >=20
+> > > >=20
+> > > > Adding "optional" handling looks like it may hide some other erro=
+rs.
+> > >=20
+> > > What if we just make "optional" mean "skip if the property
+> > > doesn't exist", as suggested by Cornelia and Dave?
+> >=20
+> > That's the more standard meaning of the word optional, isn't it?
+>=20
+> Well the word is a separate issue; 'optional' is probably a bad choice
+> but that's less important than what it actually does.
+> I'd go for skip_if_missing  which is explicit.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I'm unsure about that.  To me "optional" means "it can be
+missing" and carries the same information as "skip if missing".
 
-> ---
->  .travis.yml | 8 --------
->  1 file changed, 8 deletions(-)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index 39dbda7a0b..79da3a495a 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -128,39 +128,33 @@ matrix:
->          - CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
->        after_success:
->          - ${SRC_DIR}/scripts/travis/coverage-summary.sh
-> -      compiler: gcc
->  
->  
->      # We manually include builds which we disable "make check" for
->      - env:
->          - CONFIG="--enable-debug --enable-tcg-interpreter"
->          - TEST_CMD=""
-> -      compiler: gcc
->  
->  
->      # We don't need to exercise every backend with every front-end
->      - env:
->          - CONFIG="--enable-trace-backends=log,simple,syslog --disable-system"
->          - TEST_CMD=""
-> -      compiler: gcc
->  
->  
->      - env:
->          - CONFIG="--enable-trace-backends=ftrace --target-list=x86_64-softmmu"
->          - TEST_CMD=""
-> -      compiler: gcc
->  
->  
->      - env:
->          - CONFIG="--enable-trace-backends=ust --target-list=x86_64-softmmu"
->          - TEST_CMD=""
-> -      compiler: gcc
->  
->  
->      - env:
->          - CONFIG="--disable-tcg"
->          - TEST_CMD=""
-> -      compiler: gcc
->  
->  
->      # MacOSX builds
-> @@ -251,5 +245,3 @@ matrix:
->      - env:
->          - CONFIG="--disable-system --disable-docs"
->          - TEST_CMD="make -j3 check-tcg V=1"
-> -      dist: trusty
-> -      compiler: gcc
-> 
+What do others think?
+
+--=20
+Eduardo
