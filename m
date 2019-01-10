@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59496)
+Received: from eggs.gnu.org ([209.51.188.92]:60007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ghb7Q-0000pJ-Oq
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:15:40 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ghb99-0001ua-Ru
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:17:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ghb7P-0003Bn-4b
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:15:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39188)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ghb7O-0003B7-UH
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:15:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ghb7N-0002tp-NQ
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 14:15:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AFD332E8053
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 14:15:33 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1ghb96-0004WU-IW
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:17:23 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:38915)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ghb93-0004Tp-ID
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:17:17 -0500
+References: <20181219042113.7364-1-richard.henderson@linaro.org>
+	<20181219042113.7364-9-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <7fc313fc-e9da-37fc-c632-62b846831c32@vivier.eu>
+Date: Thu, 10 Jan 2019 15:17:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 10 Jan 2019 14:01:13 -0000
-From: Jakub Jermar <1811244@bugs.launchpad.net>
-Reply-To: Bug 1811244 <1811244@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154712887375.19548.13853640095079074628.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1811244] [NEW] qemu 3.1/i386 crashes when MTTCG
- is enabled
+In-Reply-To: <20181219042113.7364-9-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 8/8] linux-user: Split out some process
+ syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,218 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-Public bug reported:
+On 19/12/2018 05:21, Richard Henderson wrote:
+> This includes clone, getgroups, gettid, setfsgid, setfsuid,
+> setgroups, setsid, setuid, fork, getegid, getegid32, geteuid,
+> geteuid32, getgid, getgid32, getgroups32, getpgrp, getpid,
+> getppid, getresgid, getresgid32, getresuid, getresuid32,
+> getuid, getuid32, getxgid, getxpid, getxuid, setfsgid32,
+> setgsuid32, setgid32, setgroups32, setregid, setregid32,
+> setresgid, setresgid32, setresuid, setresuid32, setreuid,
+> setreuid32, setuid32, vfork.
 
-When MTTCG is enabled, QEMU 3.1.0 sometimes crashes when running the
-following command line:
+I have errors with getgroups.
 
-qemu-system-i386 -kernel
-/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/bootstrap
--append bootstrap -initrd
-"/home/jermar/work/software/l4/fiasco/.build-i386/fiasco
--serial_esc,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4=
-f/sigma0
-,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/moe
-rom/ahci.cfg,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l=
-4f/ned
-,test_env.lua ,/home/jermar/Kernkonzept/software/l4/pkg/ahci-
-driver/examples/md5sum/ahci.cfg
-,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/l4re
-,/home/jermar/Kernkonzept/software/l4/pkg/ahci-
-driver/examples/md5sum/ahci.io
-,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/io
-,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/ahci-
-drv ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f
-/ahci-md5-sync" -smp 4 -accel tcg,thread=3Dmulti -device ahci,id=3Dahci0
--drive if=3Dnone,file=3D/home/jermar/Kernkonzept/software/l4/.build-i386/pkg
-/ahci-driver/test/examples/test_ahci.img,format=3Draw,id=3Ddrive-sata0-0-0
--device ide-drive,bus=3Dahci0.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 -ser=
-ial
-stdio -nographic -monitor none
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/syscall-defs.h     | 121 +++++
+>  linux-user/syscall.h          |   1 +
+>  linux-user/strace.c           |  36 +-
+>  linux-user/syscall-proc.inc.c | 861 ++++++++++++++++++++++++++++++++++
+>  linux-user/syscall.c          | 677 +-------------------------
+>  linux-user/strace.list        | 147 ------
+>  6 files changed, 988 insertions(+), 855 deletions(-)
+>  create mode 100644 linux-user/syscall-proc.inc.c
+...
+> diff --git a/linux-user/syscall-proc.inc.c b/linux-user/syscall-proc.inc.c
+> new file mode 100644
+> index 0000000000..dee441b4ff
+> --- /dev/null
+> +++ b/linux-user/syscall-proc.inc.c
+...
+> +
+> +SYSCALL_IMPL(getgroups)
+> +{
+> +    int gidsetsize = arg1;
+> +    gid_t *grouplist;
+> +    abi_long ret;
+> +
 
-The host is x86_64.
+kernel checks for gidsetsize < 0 and returns EINVAL in this case
 
-The stack at the time of the crash (core dump and debug binary linked
-below[1]):
+> +    grouplist = g_try_new(gid_t, gidsetsize);
+> +    if (!grouplist) {
+> +        return -TARGET_ENOMEM;
+> +    }
 
-Core was generated by `qemu-system-i386 -kernel /home/jermar/Kernkonzept/so=
-ftware/l4/.build-i386/bin/x'.
-Program terminated with signal SIGSEGV, Segmentation fault.
-#0  io_writex (env=3Denv@entry=3D0x565355ca0140, iotlbentry=3Diotlbentry@en=
-try=3D0x565355ca9120, mmu_idx=3D2, val=3Dval@entry=3D0, addr=3Daddr@entry=
-=3D3938451632, retaddr=3Dretaddr@entry=3D140487132809203, recheck=3Dfalse, =
-size=3D4)
-    at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/ac=
-cel/tcg/cputlb.c:791
-791	    if (mr->global_locking && !qemu_mutex_iothread_locked()) {
-[Current thread is 1 (Thread 0x7fc5af7fe700 (LWP 3625719))]
-Missing separate debuginfos, use: dnf debuginfo-install SDL2-2.0.9-1.fc29.x=
-86_64 at-spi2-atk-2.30.0-1.fc29.x86_64 at-spi2-core-2.30.0-2.fc29.x86_64 at=
-k-2.30.0-1.fc29.x86_64 bzip2-libs-1.0.6-28.fc29.x86_64 cairo4
-(gdb) bt
-#0  0x0000565354f5f365 in io_writex
-    (env=3Denv@entry=3D0x565355ca0140, iotlbentry=3Diotlbentry@entry=3D0x56=
-5355ca9120, mmu_idx=3D2, val=3Dval@entry=3D0, addr=3Daddr@entry=3D393845163=
-2, retaddr=3Dretaddr@entry=3D140487132809203, recheck=3Dfalse, size=3D4)
-    at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/ac=
-cel/tcg/cputlb.c:791
-#1  0x0000565354f621b2 in io_writel (recheck=3D<optimized out>, retaddr=3D1=
-40487132809203, addr=3D3938451632, val=3D0, index=3D0, mmu_idx=3D2, env=3D0=
-x565355ca0140)
-    at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/ac=
-cel/tcg/softmmu_template.h:310
-#2  0x0000565354f621b2 in helper_le_stl_mmu (env=3D0x565355ca0140, addr=3D<=
-optimized out>, val=3D0, oi=3D34, retaddr=3D140487132809203)
-    at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/ac=
-cel/tcg/softmmu_template.h:310
-#3  0x00007fc5b5a587f3 in code_gen_buffer ()
-#4  0x0000565354f75fd0 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x7fc5b=
-5a5aa40 <code_gen_buffer+12266006>) at /home/jermar/software/HelenOS/heleno=
-s.git/contrib/qemu/qemu-3.1.0/accel/tcg/cpu-exec.c:171
-#5  0x0000565354f75fd0 in cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, =
-last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D0x7fc5b5a5aa40 <=
-code_gen_buffer+12266006>)
-    at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/ac=
-cel/tcg/cpu-exec.c:615
-#6  0x0000565354f75fd0 in cpu_exec (cpu=3Dcpu@entry=3D0x565355c97e90) at /h=
-ome/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/accel/tcg/c=
-pu-exec.c:725
-#7  0x0000565354f33b1f in tcg_cpu_exec (cpu=3D0x565355c97e90) at /home/jerm=
-ar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/cpus.c:1429
-#8  0x0000565354f35e83 in qemu_tcg_cpu_thread_fn (arg=3D0x565355c97e90) at =
-/home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/cpus.c:17=
-33
-#9  0x0000565354f35e83 in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x56535=
-5c97e90) at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1=
-.0/cpus.c:1707
-#10 0x00005653552ec5da in qemu_thread_start (args=3D<optimized out>) at uti=
-l/qemu-thread-posix.c:498
-#11 0x00007fc5b858a58e in start_thread () at /lib64/libpthread.so.0
-#12 0x00007fc5b84b96a3 in clone () at /lib64/libc.so.6
+gidsetsize == 0 is a valid case (see man) but it fails with g_try_new().
+Moreover, ENOMEM is not a valid error value for getgroups().
 
-Another symptom that occurs more often than this crash is that the guest
-hangs while waiting for another CPU to complete a cross-CPU call.
-Disabling MTTCG makes both symptoms go away.
+> +    ret = get_errno(getgroups(gidsetsize, grouplist));
+> +
+> +    if (!is_error(ret) && gidsetsize != 0) {
+> +        size_t target_grouplist_size = gidsetsize * sizeof(target_id);
+> +        target_id *target_grouplist
+> +            = lock_user(VERIFY_WRITE, arg2, target_grouplist_size, 0);
+> +        if (target_grouplist) {
+> +            int i;
+> +            for (i = 0; i < ret; i++) {
+> +                target_grouplist[i] = tswapid(high2lowgid(grouplist[i]));
+> +            }
+> +            unlock_user(target_grouplist, arg2, target_grouplist_size);
+> +        } else {
+> +            ret = -TARGET_EFAULT;
+> +        }
+> +    }
+> +    g_free(grouplist);
+> +    return ret;
+> +}
+> +
+> +#ifdef TARGET_NR_getgroups32
+> +SYSCALL_IMPL(getgroups32)
 
-[1] Core file + debug binary: http://jermar.eu/ref/qemu-mttcg-
-core.tar.xz
+likewise.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: core i386 mttcg
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811244
-
-Title:
-  qemu 3.1/i386 crashes when MTTCG is enabled
-
-Status in QEMU:
-  New
-
-Bug description:
-  When MTTCG is enabled, QEMU 3.1.0 sometimes crashes when running the
-  following command line:
-
-  qemu-system-i386 -kernel
-  /home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/bootstrap
-  -append bootstrap -initrd
-  "/home/jermar/work/software/l4/fiasco/.build-i386/fiasco
-  -serial_esc,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/=
-l4f/sigma0
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/moe
-  rom/ahci.cfg,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen=
-/l4f/ned
-  ,test_env.lua ,/home/jermar/Kernkonzept/software/l4/pkg/ahci-
-  driver/examples/md5sum/ahci.cfg
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/l4re
-  ,/home/jermar/Kernkonzept/software/l4/pkg/ahci-
-  driver/examples/md5sum/ahci.io
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/io
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f
-  /ahci-drv
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f
-  /ahci-md5-sync" -smp 4 -accel tcg,thread=3Dmulti -device ahci,id=3Dahci0
-  -drive
-  if=3Dnone,file=3D/home/jermar/Kernkonzept/software/l4/.build-i386/pkg
-  /ahci-driver/test/examples/test_ahci.img,format=3Draw,id=3Ddrive-sata0-0-0
-  -device ide-drive,bus=3Dahci0.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0
-  -serial stdio -nographic -monitor none
-
-  The host is x86_64.
-
-  The stack at the time of the crash (core dump and debug binary linked
-  below[1]):
-
-  Core was generated by `qemu-system-i386 -kernel /home/jermar/Kernkonzept/=
-software/l4/.build-i386/bin/x'.
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  io_writex (env=3Denv@entry=3D0x565355ca0140, iotlbentry=3Diotlbentry@=
-entry=3D0x565355ca9120, mmu_idx=3D2, val=3Dval@entry=3D0, addr=3Daddr@entry=
-=3D3938451632, retaddr=3Dretaddr@entry=3D140487132809203, recheck=3Dfalse, =
-size=3D4)
-      at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/cputlb.c:791
-  791	    if (mr->global_locking && !qemu_mutex_iothread_locked()) {
-  [Current thread is 1 (Thread 0x7fc5af7fe700 (LWP 3625719))]
-  Missing separate debuginfos, use: dnf debuginfo-install SDL2-2.0.9-1.fc29=
-.x86_64 at-spi2-atk-2.30.0-1.fc29.x86_64 at-spi2-core-2.30.0-2.fc29.x86_64 =
-atk-2.30.0-1.fc29.x86_64 bzip2-libs-1.0.6-28.fc29.x86_64 cairo4
-  (gdb) bt
-  #0  0x0000565354f5f365 in io_writex
-      (env=3Denv@entry=3D0x565355ca0140, iotlbentry=3Diotlbentry@entry=3D0x=
-565355ca9120, mmu_idx=3D2, val=3Dval@entry=3D0, addr=3Daddr@entry=3D3938451=
-632, retaddr=3Dretaddr@entry=3D140487132809203, recheck=3Dfalse, size=3D4)
-      at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/cputlb.c:791
-  #1  0x0000565354f621b2 in io_writel (recheck=3D<optimized out>, retaddr=
-=3D140487132809203, addr=3D3938451632, val=3D0, index=3D0, mmu_idx=3D2, env=
-=3D0x565355ca0140)
-      at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/softmmu_template.h:310
-  #2  0x0000565354f621b2 in helper_le_stl_mmu (env=3D0x565355ca0140, addr=
-=3D<optimized out>, val=3D0, oi=3D34, retaddr=3D140487132809203)
-      at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/softmmu_template.h:310
-  #3  0x00007fc5b5a587f3 in code_gen_buffer ()
-  #4  0x0000565354f75fd0 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x7fc=
-5b5a5aa40 <code_gen_buffer+12266006>) at /home/jermar/software/HelenOS/hele=
-nos.git/contrib/qemu/qemu-3.1.0/accel/tcg/cpu-exec.c:171
-  #5  0x0000565354f75fd0 in cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>=
-, last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D0x7fc5b5a5aa40=
- <code_gen_buffer+12266006>)
-      at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/cpu-exec.c:615
-  #6  0x0000565354f75fd0 in cpu_exec (cpu=3Dcpu@entry=3D0x565355c97e90) at =
-/home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/accel/tcg=
-/cpu-exec.c:725
-  #7  0x0000565354f33b1f in tcg_cpu_exec (cpu=3D0x565355c97e90) at /home/je=
-rmar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/cpus.c:1429
-  #8  0x0000565354f35e83 in qemu_tcg_cpu_thread_fn (arg=3D0x565355c97e90) a=
-t /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/cpus.c:=
-1733
-  #9  0x0000565354f35e83 in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x565=
-355c97e90) at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3=
-.1.0/cpus.c:1707
-  #10 0x00005653552ec5da in qemu_thread_start (args=3D<optimized out>) at u=
-til/qemu-thread-posix.c:498
-  #11 0x00007fc5b858a58e in start_thread () at /lib64/libpthread.so.0
-  #12 0x00007fc5b84b96a3 in clone () at /lib64/libc.so.6
-
-  Another symptom that occurs more often than this crash is that the
-  guest hangs while waiting for another CPU to complete a cross-CPU
-  call. Disabling MTTCG makes both symptoms go away.
-
-  [1] Core file + debug binary: http://jermar.eu/ref/qemu-mttcg-
-  core.tar.xz
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811244/+subscriptions
+Thanks,
+Laurent
