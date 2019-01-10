@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48482)
+Received: from eggs.gnu.org ([209.51.188.92]:48734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1ghaP2-0007Si-UZ
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:29:45 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1ghaPx-000800-HQ
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:30:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1ghaP1-0006DQ-VO
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:29:44 -0500
-Received: from m50-112.126.com ([123.125.50.112]:34900)
+	(envelope-from <dovgaluk@ispras.ru>) id 1ghaPw-0006jF-7e
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:30:41 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:43036)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1ghaP0-0006CP-Vt
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:29:43 -0500
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-10-fli@suse.com>
-	<87a7kcml5i.fsf@dusky.pond.sub.org>
-	<36097839-654b-6d1f-b79e-f9bc174ec126@suse.cz>
-	<20190108065159.GA20511@xz-x1> <87o98ree00.fsf@dusky.pond.sub.org>
-From: Fei Li <lifei1214@126.com>
-Message-ID: <8e592b32-7984-7a02-10e9-45fb9eb248ef@126.com>
-Date: Thu, 10 Jan 2019 21:29:38 +0800
+	(envelope-from <dovgaluk@ispras.ru>) id 1ghaPv-0006eA-Qd
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:30:40 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+In-Reply-To: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+Date: Thu, 10 Jan 2019 16:30:30 +0300
+Message-ID: <000601d4a8e8$a8a10170$f9e30450$@ru>
 MIME-Version: 1.0
-In-Reply-To: <87o98ree00.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 09/16] qemu_thread: supplement
- error handling for pci_edu_realize
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce attributes for timers
+ subsystem and remove QEMU_CLOCK_VIRTUAL_EXT clock type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +29,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Jiri Slaby <jslaby@suse.cz>, shirley17fei@gmail.com, qemu-devel@nongnu.org
+To: 'Artem Pisarenko' <artem.k.pisarenko@gmail.com>, qemu-devel@nongnu.org
+Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>
 
+Hi,
 
-ÔÚ 2019/1/8 ÏÂÎç4:43, Markus Armbruster Ð´µÀ:
-> Peter Xu <peterx@redhat.com> writes:
->
->> On Tue, Jan 08, 2019 at 07:14:11AM +0100, Jiri Slaby wrote:
->>> On 07. 01. 19, 18:29, Markus Armbruster wrote:
->>>>     static void pci_edu_uninit(PCIDevice *pdev)
->>>>     {
->>>>         EduState *edu = EDU(pdev);
->>>>
->>>>         qemu_mutex_lock(&edu->thr_mutex);
->>>>         edu->stopping = true;
->>>>         qemu_mutex_unlock(&edu->thr_mutex);
->>>>         qemu_cond_signal(&edu->thr_cond);
->>>>         qemu_thread_join(&edu->thread);
->>>>
->>>>         qemu_cond_destroy(&edu->thr_cond);
->>>>         qemu_mutex_destroy(&edu->thr_mutex);
->>>>
->>>>         timer_del(&edu->dma_timer);
->>>>     }
->>>>
->>>> Preexisting: pci_edu_uninit() neglects to call msi_uninit().  Jiri?\
->>> I don't know, the MSI support was added in:
->>> commit eabb5782f70b4a10975b24ccd7129929a05ac932
->>> Author: Peter Xu <peterx@redhat.com>
->>> Date:   Wed Sep 28 21:03:39 2016 +0800
->>>
->>>      hw/misc/edu: support MSI interrupt
->>>
->>> Hence CCing Peter.
->> Hi, Jiri, Markus, Fei,
->>
->> IMHO msi_uninit() is optional since it only operates on the config
->> space of the device to remove the capability or fix up the flags
->> without really doing any real destruction of objects so nothing will
->> be leaked (unlike msix_uninit, which should be required).
-> Michael, Marcel, is neglecting to call msi_uninit() okay, a harmless
-> bug, or a harmful bug?
+It seems, that this approach is not always correct.
+Now timerlist_deadline_ns uses all virtual timers for deadline calculation (including external
+ones).
+qemu_start_warp_timer uses the deadline for setting warp timer (which should be deterministic).
+Therefore warp timer may become non-deterministic and replay may behave differently compared to
+recording phase.
 
-Kindly ping. :)
+We have to rollback these or improve somehow to avoid non-determinism.
 
-If corresponding change is needed, I'd like to do the update in the next 
-version.
+Pavel Dovgalyuk
 
->>                                                             But I do
->> agree that calling msi_uninit() could be even nicer here.
->>
->> Anyone would like to post a patch? Or should I?
-> Please coordinate fixing this with Fei Li.
-Have a nice day, thanks all
-Fei
+> -----Original Message-----
+> From: Artem Pisarenko [mailto:artem.k.pisarenko@gmail.com]
+> Sent: Thursday, October 18, 2018 2:04 PM
+> To: qemu-devel@nongnu.org
+> Cc: Pavel Dovgalyuk; Paolo Bonzini; Artem Pisarenko
+> Subject: [PATCH v3 0/4] Introduce attributes for timers subsystem and remove
+> QEMU_CLOCK_VIRTUAL_EXT clock type
+> 
+> Recent patches from series [PATCH v6] "Fixing record/replay and adding reverse debugging"
+> introduced new clock type QEMU_CLOCK_VIRTUAL_EXT and replaced virtual timers in some external
+> subsystems with it.
+> This resulted in small change to existing behavior, which I consider to be unacceptable.
+> Processing of virtual timers, belonging to new clock type, was kicked off to main loop, which
+> made them asynchronous with vCPU thread and, in icount mode, with whole guest execution. This
+> breaks expected determinism in non-record/replay icount mode of emulation where these
+> "external subsystems" are isolated from host (i.e. they external only to guest core, not to
+> emulation environment).
+> 
+> Example for slirp ("user" backend for network device):
+> User runs qemu in icount mode with rtc clock=vm without any external communication interfaces
+> but with "-netdev user,restrict=on". It expects deterministic execution, because network
+> services are emulated inside qemu and isolated from host. There are no reasons to get reply
+> from DHCP server with different delay or something like that.
+> 
+> These series of patches revert those commits and reimplement their modifications in a better
+> way.
+> 
+> Current implementation of timers/clock processing is confusing (at least for me) because of
+> exceptions from design concept behind them, which already introduced by icount mode (which
+> adds QEMU_CLOCK_VIRTUAL_RT). Adding QEMU_CLOCK_VIRTUAL_EXT just made things even more
+> complicated. I consider these "alternative" virtual clocks to be some kind of hacks being
+> convinient only to authors of relevant qemu features. Lets don't touch fundamental clock types
+> and keep them orthogonal to special cases of timers handling.
+> 
+> As far as I understand, original intention of author was just to make optimization in replay
+> log by avoiding storing extra events which don't change guest state directly. Indeed, for
+> example, ipv6 icmp timer in slirp does things which external to guest core and ends with
+> sending network packet to guest, but record/replay will anyway catch event, corresponding to
+> packet reception in guest network frontend, and store it to replay log, so there are no need
+> in making checkpoint for corresponding clock when that timer fires.
+> If so, then we just need to skip checkpoints for clock values, when only these specific timers
+> are run. It is individual timers which are specific, not clock.
+> Adding some kind of attribute/flag/property to individual timer allows any special qemu
+> feature (such as record/replay) to inspect it and handle as needed. This design achieves less
+> dependencies, more transparency and has more intuitive and clear sense. For record/replay
+> feature it's achieved with 'EXTERNAL' attribute. The only drawback is that it required to add
+> one extra mutex unlock/lock pair for virtual clock type in timerlist_run_timers() function
+> (see patch 3), but it's being added only when qemu runs in record/replay mode.
+> 
+> Finally, this patch series optimizes checkpointing for all other clocks it applies to.
+> 
+> 
+> v3 changes:
+>  - fixed failed build in last patch
+>  - attributes has been refactored and restricted to be used only within qemu-timer (as
+> suggested by Stefan Hajnoczi and Paolo Bonzini)
+> 
+> v2 changes:
+>  - timers/aio interface refactored and improved, addition to couroutines removed (as Paolo
+> Bonzini suggested)
+>  - fixed wrong reimplementation in qemu-timer.c caused race conditions
+>  - added bonus patch which optimizes checkpointing for other clocks
+> 
+> P.S. I've tried to test record/replay with slirp, but in replay mode qemu stucks at guest
+> linux boot after "Configuring network interfaces..." message, where DHCP communication takes
+> place. It's broken in a same way both in master and master with reverted commits being fixed.
+> 
+> P.S.2. I wasn't able to test these patches on purely clean master branch because of bugs
+> https://bugs.launchpad.net/qemu/+bug/1790460 and https://bugs.launchpad.net/qemu/+bug/1795369,
+> which workarounded by several not-accepted (yet?) modifications.
+> 
+> 
+> Artem Pisarenko (4):
+>   Revert some patches from recent [PATCH v6] "Fixing record/replay and
+>     adding reverse debugging"
+>   Introduce attributes to qemu timer subsystem
+>   Restores record/replay behavior related to special virtual clock
+>     processing for timers used in external subsystems.
+>   Optimize record/replay checkpointing for all clocks it applies to
+> 
+>  include/block/aio.h       |  59 ++++++++++++++++++---
+>  include/qemu/timer.h      | 128 +++++++++++++++++++++++-----------------------
+>  slirp/ip6_icmp.c          |   9 ++--
+>  tests/ptimer-test-stubs.c |  13 +++--
+>  ui/input.c                |   9 ++--
+>  util/qemu-timer.c         |  95 +++++++++++++++++++++++-----------
+>  6 files changed, 201 insertions(+), 112 deletions(-)
+> 
+> --
+> 2.7.4
