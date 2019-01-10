@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48693)
+Received: from eggs.gnu.org ([209.51.188.92]:48862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghbzO-0007zc-Cv
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:11:23 -0500
+	(envelope-from <nshirokovskiy@virtuozzo.com>) id 1ghbzl-0008Ed-6b
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:11:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghbzM-0003lw-Gu
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:11:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ghbzE-0003P1-BN
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:11:16 -0500
-Date: Thu, 10 Jan 2019 16:11:01 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190110151101.GB6361@linux.fritz.box>
-References: <47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
-	<a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
-	<200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
-	<20190109172023.GK4867@localhost.localdomain>
-	<be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
-	<40ef0a8d-3a25-4cc3-95f8-82bc4513776c@redhat.com>
-	<20190109185154.GL4867@localhost.localdomain>
-	<56880d06-a214-2486-2e80-c565b33461b3@redhat.com>
-	<20190110112508.GA6361@linux.fritz.box>
-	<20190110114113.GC2589@work-vm>
+	(envelope-from <nshirokovskiy@virtuozzo.com>) id 1ghbzj-00042q-Nw
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:11:45 -0500
+From: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+Date: Thu, 10 Jan 2019 15:11:21 +0000
+Message-ID: <078428bd-2e1a-a9e0-e580-c2d1dc56e44b@virtuozzo.com>
+References: <20190110071330.28136-1-eblake@redhat.com>
+	<20190110071330.28136-4-eblake@redhat.com>
+	<82d35e0c-6fda-f87b-586b-79952fcb37a3@virtuozzo.com>
+In-Reply-To: <82d35e0c-6fda-f87b-586b-79952fcb37a3@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EE58AB7FC70DDA4D9BFBC30E73B586E9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190110114113.GC2589@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
- ID anymore
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] nbd: Allow bitmap export during QMP
+ nbd-server-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,95 +27,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, armbru@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org, muriloo@linux.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Am 10.01.2019 um 12:41 hat Dr. David Alan Gilbert geschrieben:
-> * Kevin Wolf (kwolf@redhat.com) wrote:
-> > Am 09.01.2019 um 20:02 hat Eric Blake geschrieben:
-> > > On 1/9/19 12:51 PM, Kevin Wolf wrote:
-> > > 
-> > > >> Indeed, and libvirt IS using 'savevm' via HMP via QMP's
-> > > >> human-monitor-command, since there is no QMP counterpart for internal
-> > > >> snapshot.  Even though lately we consistently tell people that internal
-> > > >> snapshots are underdeveloped and you should use external snapshots, it
-> > > >> does not get away from the fact that libvirt has been using 'savevm' to
-> > > >> drive internal snapshots for years now, and that we MUST consider
-> > > >> back-compat and/or add an introspectible QMP interface before making
-> > > >> changes that would break libvirt.
-> > > > 
-> > > > Okay, so what does libvirt do when you request a snapshot with a
-> > > > numerical name? Without having looked at the code, the best case I would
-> > > > expect that it forbids them, and more realistically I suspect that we
-> > > > may actually fix a bug for libvirt by changing the semantics.
-> > > > 
-> > > > Or does libvirt really use snapshot IDs rather than names?
-> > > 
-> > > At the moment, libvirt does not place any restriction on internal
-> > > snapshot names, but passes the user's name through without thought of
-> > > whether it is an id or a name.
-> > > 
-> > > So yes, arguably tightening the semantics fixes a libvirt bug for
-> > > libvirt having allowed internal snapshots to get into an inconsistent
-> > > state.
-> > 
-> > So there are two scenarios to consider with respect to breaking
-> > backwards compatibility:
-> > 
-> > 1. There may be code out there that relies on numeric arguments being
-> >    interpreted as IDs. This code will break if we make this change and
-> >    numeric snapshot names exist. That such code exists is speculation
-> >    (even though plausible) and we don't know how widespread it is.
-> > 
-> > 2. There may be code out there that blindly assumes that whatever it
-> >    passes is interpreted as a name. Nobody considered that with a
-> >    numeric snapshot name, it maybe misinterpreted as an ID. We know that
-> >    this is true for libvirt, the single most used management tool for
-> >    QEMU. More code like this may (and probably does) exist.
-> > 
-> > Essentially the same two categories exist for human users: those who
-> > somehow found out that QEMU accepts IDs as monitor command arguments and
-> > are using those (mitigated by not displaying IDs any more), and those
-> > who are trapped because they wanted to access a numeric name, but
-> > surprisingly got it interpreted as an ID. Both are speculation to some
-> > degree, but my guess is that the latter group is larger.
-> > 
-> > Given all this, this is a no-brainer for me. We simplify the interface,
-> > we simplify the code, we make things less confusing for manual users and
-> > we fix the management tool that everybody uses. How could we not make
-> > this change?
-> > 
-> > > But again, it falls in the category of "properly fixing this
-> > > requires a lot of auditing, time, mental power, and unit tests", which
-> > > makes it a rather daunting task to state for certain.
-> > 
-> > Fix the world before we can fix anything?
-> 
-> Can't we break this loop for the savevm command fairly easily; it's
-> currently documnted as:
-> 
-> savevm [tag|id] 
-> 
-> If we made that:
-> 
-> savevm [-t] [-i] [tag|id]
-> 
-> then:
->   a) with neither -t or -i  it would behave in the same roulette way
->      as it does in the moment, and it might be a tag or id
-> 
->   b) with -t we'd explicitly treat the parameter as a tag and it
->      would error if it wasn't found
-> 
->   c) With -i we'd explicitly treat the parameter as an id and
->      it would error if it wasn't found
-> 
-> Since we still allow (a) it doesn't break any existing code.
-
-If you can explain why we need both tag and id?
-
-And by keeping the current behaviour, we might not break hypothetically
-existing correct code, but we leave currently actually existing broken
-code like libvirt broken.
-
-Kevin
+DQoNCk9uIDEwLjAxLjIwMTkgMTU6MDIsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3Jv
+dGU6DQo+IGNjIE5pa29sYXkNCj4gDQo+IDEwLjAxLjIwMTkgMTA6MTMsIEVyaWMgQmxha2Ugd3Jv
+dGU6DQo+PiBXaXRoIHRoZSBleHBlcmltZW50YWwgeC1uYmQtc2VydmVyLWFkZC1iaXRtYXAgY29t
+bWFuZCwgdGhlcmUgd2FzDQo+PiBhIHdpbmRvdyBvZiB0aW1lIHdoZXJlIGFuIE5CRCBjbGllbnQg
+Y291bGQgc2VlIHRoZSBleHBvcnQgYnV0IG5vdA0KPj4gdGhlIGFzc29jaWF0ZWQgZGlydHkgYml0
+bWFwLCB3aGljaCBjYW4gY2F1c2UgYSBjbGllbnQgdGhhdCBwbGFubmVkDQo+PiBvbiB1c2luZyB0
+aGUgZGlydHkgYml0bWFwIHRvIGJlIGZvcmNlZCB0byB0cmVhdCB0aGUgZW50aXJlIGltYWdlDQo+
+PiBhcyBkaXJ0eSBhcyBhIHNhZmV0eSBmYWxsYmFjay4gIEZ1cnRoZXJtb3JlLCBpZiB0aGUgUU1Q
+IGNsaWVudA0KPj4gc3VjY2Vzc2Z1bGx5IGV4cG9ydHMgYSBkaXNrIGJ1dCB0aGVuIGZhaWxzIHRv
+IGFkZCB0aGUgYml0bWFwLCBpdA0KPj4gaGFzIHRvIHRha2Ugb24gdGhlIGJ1cmRlbiBvZiByZW1v
+dmluZyB0aGUgZXhwb3J0LiAgU2luY2Ugd2UgZG9uJ3QNCj4+IGFsbG93IGNoYW5naW5nIHRoZSBl
+eHBvc2VkIGRpcnR5IGJpdG1hcCAod2hldGhlciB0byBhIGRpZmZlcmVudA0KPj4gYml0bWFwLCBv
+ciByZW1vdmluZyBhZHZlcnRpc2VtZW50IG9mIHRoZSBiaXRtYXApLCBpdCBpcyBuaWNlciB0bw0K
+Pj4gbWFrZSB0aGUgYml0bWFwIHRpZWQgdG8gdGhlIGV4cG9ydCBhdCB0aGUgdGltZSB0aGUgZXhw
+b3J0IGlzDQo+PiBjcmVhdGVkLCB3aXRoIGF1dG9tYXRpYyBmYWlsdXJlIHRvIGV4cG9ydCBpZiB0
+aGUgYml0bWFwIGlzIG5vdA0KPj4gYXZhaWxhYmxlLg0KPj4NCj4+IFRoZSBleHBlcmltZW50YWwg
+Y29tbWFuZCBpbmNsdWRlZCBhbiBvcHRpb25hbCAnYml0bWFwLWV4cG9ydC1uYW1lJw0KPj4gZmll
+bGQgZm9yIHJlbWFwcGluZyB0aGUgbmFtZSBleHBvc2VkIG92ZXIgTkJEIHRvIGJlIGRpZmZlcmVu
+dCBmcm9tDQo+PiB0aGUgYml0bWFwIG5hbWUgc3RvcmVkIG9uIGRpc2suDQo+IA0KPiANCj4gTmlr
+b2xheSwgZG8geW91IGhhdmUgY29tbWVudHMgb24gdGhpcz8NCj4gDQo+IA0KPiAgICBIb3dldmVy
+LCBteSBsaWJ2aXJ0IGRlbW8gY29kZQ0KPj4gZm9yIGltcGxlbWVudGluZyBkaWZmZXJlbnRpYWwg
+YmFja3VwcyBvbiB0b3Agb2YgcGVyc2lzdGVudCBiaXRtYXBzDQo+PiBkaWQgbm90IG5lZWQgdG8g
+dGFrZSBhZHZhbnRhZ2Ugb2YgdGhhdCBmZWF0dXJlIChpdCBpcyBpbnN0ZWFkDQo+PiBwb3NzaWJs
+ZSB0byBjcmVhdGUgYSBuZXcgdGVtcG9yYXJ5IGJpdG1hcCB3aXRoIHRoZSBkZXNpcmVkIG5hbWUs
+DQo+PiB1c2UgYmxvY2stZGlydHktYml0bWFwLW1lcmdlIHRvIG1lcmdlIG9uZSBvciBtb3JlIHBl
+cnNpc3RlbnQNCj4+IGJpdG1hcHMgaW50byB0aGUgdGVtcG9yYXJ5LCB0aGVuIGFzc29jaWF0ZSB0
+aGUgdGVtcG9yYXJ5IHdpdGggdGhlDQo+PiBOQkQgZXhwb3J0LCBpZiBjb250cm9sIGlzIG5lZWRl
+ZCBvdmVyIHRoZSBleHBvcnRlZCBiaXRtYXAgbmFtZSkuDQoNCldpdGggYml0bWFwLWV4cG9ydC1u
+YW1lIHdlIGNhbiB1c2Ugc2hvcnRlciBiaXRtYXAgbmFtZXMgaW4gTkJEIGV4cG9ydC4NCkZvciBl
+eGFtcGxlIGl0IGNhbiBiZSBqdXN0IFVVSUQgb2YgY29ycmVzcG9uZGluZyBzbmFwc2hvdC4gV2l0
+aCBtZXJnZQ0Kc3RyYXRlZ3kgdGhpcyBzaG91bGQgYmUgYXQgbGVhc3QgZXhwb3J0LSRVVUlEIGJl
+Y2F1c2UgJFVVSUQgaXMgYWxyZWFkeQ0KdXNlZCBmb3IgYml0bWFwcyBjcmVhdGVkIGR1cmluZyBz
+bmFwc2hvdHMuDQoNCk5pa29sYXkNCg0KPj4gSGVuY2UsIEknbSBub3QgY29weWluZyB0aGF0IHBh
+cnQgb2YgdGhlIGV4cGVyaW1lbnQgb3ZlciB0byB0aGUNCj4+IHN0YWJsZSBhZGRpdGlvbi4gRm9y
+IG1vcmUgZGV0YWlscyBvbiB0aGUgbGlidmlydCBkZW1vLCBzZWUNCj4+IGh0dHBzOi8vd3d3LnJl
+ZGhhdC5jb20vYXJjaGl2ZXMvbGlidmlyLWxpc3QvMjAxOC1PY3RvYmVyL21zZzAxMjU0Lmh0bWws
+DQo+PiBodHRwczovL2t2bWZvcnVtMjAxOC5zY2hlZC5jb20vZXZlbnQvRnp1Qi9mYWNpbGl0YXRp
+bmctaW5jcmVtZW50YWwtYmFja3VwLWVyaWMtYmxha2UtcmVkLWhhdA0KPj4NCj4+IFRoaXMgcGF0
+Y2ggZm9jdXNlcyBvbiB0aGUgdXNlciBpbnRlcmZhY2UsIGFuZCByZWR1Y2VzIChidXQgZG9lcw0K
+Pj4gbm90IGNvbXBsZXRlbHkgZWxpbWluYXRlKSB0aGUgd2luZG93IHdoZXJlIGFuIE5CRCBjbGll
+bnQgY2FuIHNlZQ0KPj4gdGhlIGV4cG9ydCBidXQgbm90IHRoZSBkaXJ0eSBiaXRtYXAuICBMYXRl
+ciBwYXRjaGVzIHdpbGwgYWRkDQo+PiBmdXJ0aGVyIGNsZWFudXBzIG5vdyB0aGF0IHRoaXMgaW50
+ZXJmYWNlIGlzIGRlY2xhcmVkIHN0YWJsZSB2aWEgYQ0KPj4gc2luZ2xlIFFNUCBjb21tYW5kLCBp
+bmNsdWRpbmcgcmVtb3ZpbmcgdGhlIHJhY2Ugd2luZG93Lg0KPj4NCj4+IFVwZGF0ZSB0ZXN0IDIy
+MyB0byB1c2UgdGhlIG5ldyBpbnRlcmZhY2UsIGluY2x1ZGluZyBhIGRlbW9uc3RyYXRpb24NCj4+
+IHRoYXQgaXQgaXMgbm93IGVhc2llciB0byBoYW5kbGUgZmFpbHVyZXMuDQo+Pg0KPj4gU2lnbmVk
+LW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+PiAtLS0NCj4+ICAgcWFw
+aS9ibG9jay5qc29uICAgICAgICAgICAgfCAgNyArKysrKystDQo+PiAgIGJsb2NrZGV2LW5iZC5j
+ICAgICAgICAgICAgIHwgMTIgKysrKysrKysrKystDQo+PiAgIGhtcC5jICAgICAgICAgICAgICAg
+ICAgICAgIHwgIDUgKysrLS0NCj4+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMyAgICAgfCAxNyAr
+KysrKystLS0tLS0tLS0tLQ0KPj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjIzLm91dCB8ICA1ICst
+LS0tDQo+PiAgIDUgZmlsZXMgY2hhbmdlZCwgMjcgaW5zZXJ0aW9ucygrKSwgMTkgZGVsZXRpb25z
+KC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2suanNvbiBiL3FhcGkvYmxvY2suanNv
+bg0KPj4gaW5kZXggMTFmMDFmMjhlZmUuLjNkNzA0MjBmNzYzIDEwMDY0NA0KPj4gLS0tIGEvcWFw
+aS9ibG9jay5qc29uDQo+PiArKysgYi9xYXBpL2Jsb2NrLmpzb24NCj4+IEBAIC0yNDYsNiArMjQ2
+LDEwIEBADQo+PiAgICMNCj4+ICAgIyBAd3JpdGFibGU6IFdoZXRoZXIgY2xpZW50cyBzaG91bGQg
+YmUgYWJsZSB0byB3cml0ZSB0byB0aGUgZGV2aWNlIHZpYSB0aGUNCj4+ICAgIyAgICAgTkJEIGNv
+bm5lY3Rpb24gKGRlZmF1bHQgZmFsc2UpLg0KPj4gKw0KPj4gKyMgQGJpdG1hcDogQWxzbyBleHBv
+cnQgdGhlIGRpcnR5IGJpdG1hcCByZWFjaGFibGUgZnJvbSBAZGV2aWNlLCBzbyB0aGUNCj4+ICsj
+ICAgICAgICAgIE5CRCBjbGllbnQgY2FuIHVzZSBOQkRfT1BUX1NFVF9NRVRBX0NPTlRFWFQgd2l0
+aA0KPj4gKyMgICAgICAgICAgInFlbXU6ZGlydHktYml0bWFwOk5BTUUiIHRvIGluc3BlY3QgdGhl
+IGJpdG1hcC4gKHNpbmNlIDQuMCkNCj4+ICAgIw0KPj4gICAjIFJldHVybnM6IGVycm9yIGlmIHRo
+ZSBzZXJ2ZXIgaXMgbm90IHJ1bm5pbmcsIG9yIGV4cG9ydCB3aXRoIHRoZSBzYW1lIG5hbWUNCj4+
+ICAgIyAgICAgICAgICBhbHJlYWR5IGV4aXN0cy4NCj4+IEBAIC0yNTMsNyArMjU3LDggQEANCj4+
+ICAgIyBTaW5jZTogMS4zLjANCj4+ICAgIyMNCj4+ICAgeyAnY29tbWFuZCc6ICduYmQtc2VydmVy
+LWFkZCcsDQo+PiAtICAnZGF0YSc6IHsnZGV2aWNlJzogJ3N0cicsICcqbmFtZSc6ICdzdHInLCAn
+KndyaXRhYmxlJzogJ2Jvb2wnfSB9DQo+PiArICAnZGF0YSc6IHsnZGV2aWNlJzogJ3N0cicsICcq
+bmFtZSc6ICdzdHInLCAnKndyaXRhYmxlJzogJ2Jvb2wnLA0KPj4gKyAgICAgICAgICAgJypiaXRt
+YXAnOiAnc3RyJyB9IH0NCj4+DQo+PiAgICMjDQo+PiAgICMgQE5iZFNlcnZlclJlbW92ZU1vZGU6
+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2tkZXYtbmJkLmMgYi9ibG9ja2Rldi1uYmQuYw0KPj4gaW5k
+ZXggZjVlZGJjMjdkODguLmFjN2U5OTNjMzVmIDEwMDY0NA0KPj4gLS0tIGEvYmxvY2tkZXYtbmJk
+LmMNCj4+ICsrKyBiL2Jsb2NrZGV2LW5iZC5jDQo+PiBAQCAtMTQwLDcgKzE0MCw4IEBAIHZvaWQg
+cW1wX25iZF9zZXJ2ZXJfc3RhcnQoU29ja2V0QWRkcmVzc0xlZ2FjeSAqYWRkciwNCj4+ICAgfQ0K
+Pj4NCj4+ICAgdm9pZCBxbXBfbmJkX3NlcnZlcl9hZGQoY29uc3QgY2hhciAqZGV2aWNlLCBib29s
+IGhhc19uYW1lLCBjb25zdCBjaGFyICpuYW1lLA0KPj4gLSAgICAgICAgICAgICAgICAgICAgICAg
+IGJvb2wgaGFzX3dyaXRhYmxlLCBib29sIHdyaXRhYmxlLCBFcnJvciAqKmVycnApDQo+PiArICAg
+ICAgICAgICAgICAgICAgICAgICAgYm9vbCBoYXNfd3JpdGFibGUsIGJvb2wgd3JpdGFibGUsDQo+
+PiArICAgICAgICAgICAgICAgICAgICAgICAgYm9vbCBoYXNfYml0bWFwLCBjb25zdCBjaGFyICpi
+aXRtYXAsIEVycm9yICoqZXJycCkNCj4+ICAgew0KPj4gICAgICAgQmxvY2tEcml2ZXJTdGF0ZSAq
+YnMgPSBOVUxMOw0KPj4gICAgICAgQmxvY2tCYWNrZW5kICpvbl9lamVjdF9ibGs7DQo+PiBAQCAt
+MTg1LDYgKzE4NiwxNSBAQCB2b2lkIHFtcF9uYmRfc2VydmVyX2FkZChjb25zdCBjaGFyICpkZXZp
+Y2UsIGJvb2wgaGFzX25hbWUsIGNvbnN0IGNoYXIgKm5hbWUsDQo+PiAgICAgICAgKiBvdXIgb25s
+eSB3YXkgb2YgYWNjZXNzaW5nIGl0IGlzIHRocm91Z2ggbmJkX2V4cG9ydF9maW5kKCksIHNvIHdl
+IGNhbiBkcm9wDQo+PiAgICAgICAgKiB0aGUgc3Ryb25nIHJlZmVyZW5jZSB0aGF0IGlzIEBleHAu
+ICovDQo+PiAgICAgICBuYmRfZXhwb3J0X3B1dChleHApOw0KPj4gKw0KPj4gKyAgICBpZiAoaGFz
+X2JpdG1hcCkgew0KPj4gKyAgICAgICAgRXJyb3IgKmVyciA9IE5VTEw7DQo+PiArICAgICAgICBu
+YmRfZXhwb3J0X2JpdG1hcChleHAsIGJpdG1hcCwgYml0bWFwLCAmZXJyKTsNCj4+ICsgICAgICAg
+IGlmIChlcnIpIHsNCj4+ICsgICAgICAgICAgICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgZXJyKTsN
+Cj4+ICsgICAgICAgICAgICBuYmRfZXhwb3J0X3JlbW92ZShleHAsIE5CRF9TRVJWRVJfUkVNT1ZF
+X01PREVfSEFSRCwgTlVMTCk7DQo+PiArICAgICAgICB9DQo+PiArICAgIH0NCj4+ICAgfQ0KPj4N
+Cj4+ICAgdm9pZCBxbXBfbmJkX3NlcnZlcl9yZW1vdmUoY29uc3QgY2hhciAqbmFtZSwNCj4+IGRp
+ZmYgLS1naXQgYS9obXAuYyBiL2htcC5jDQo+PiBpbmRleCA4MGFhNWFiNTA0Yi4uOGRhNWZkODc2
+MGEgMTAwNjQ0DQo+PiAtLS0gYS9obXAuYw0KPj4gKysrIGIvaG1wLmMNCj4+IEBAIC0yMzI2LDcg
+KzIzMjYsNyBAQCB2b2lkIGhtcF9uYmRfc2VydmVyX3N0YXJ0KE1vbml0b3IgKm1vbiwgY29uc3Qg
+UURpY3QgKnFkaWN0KQ0KPj4gICAgICAgICAgIH0NCj4+DQo+PiAgICAgICAgICAgcW1wX25iZF9z
+ZXJ2ZXJfYWRkKGluZm8tPnZhbHVlLT5kZXZpY2UsIGZhbHNlLCBOVUxMLA0KPj4gLSAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHRydWUsIHdyaXRhYmxlLCAmbG9jYWxfZXJyKTsNCj4+ICsgICAg
+ICAgICAgICAgICAgICAgICAgICAgICB0cnVlLCB3cml0YWJsZSwgZmFsc2UsIE5VTEwsICZsb2Nh
+bF9lcnIpOw0KPj4NCj4+ICAgICAgICAgICBpZiAobG9jYWxfZXJyICE9IE5VTEwpIHsNCj4+ICAg
+ICAgICAgICAgICAgcW1wX25iZF9zZXJ2ZXJfc3RvcChOVUxMKTsNCj4+IEBAIC0yMzQ3LDcgKzIz
+NDcsOCBAQCB2b2lkIGhtcF9uYmRfc2VydmVyX2FkZChNb25pdG9yICptb24sIGNvbnN0IFFEaWN0
+ICpxZGljdCkNCj4+ICAgICAgIGJvb2wgd3JpdGFibGUgPSBxZGljdF9nZXRfdHJ5X2Jvb2wocWRp
+Y3QsICJ3cml0YWJsZSIsIGZhbHNlKTsNCj4+ICAgICAgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxM
+Ow0KPj4NCj4+IC0gICAgcW1wX25iZF9zZXJ2ZXJfYWRkKGRldmljZSwgISFuYW1lLCBuYW1lLCB0
+cnVlLCB3cml0YWJsZSwgJmxvY2FsX2Vycik7DQo+PiArICAgIHFtcF9uYmRfc2VydmVyX2FkZChk
+ZXZpY2UsICEhbmFtZSwgbmFtZSwgdHJ1ZSwgd3JpdGFibGUsDQo+PiArICAgICAgICAgICAgICAg
+ICAgICAgICBmYWxzZSwgTlVMTCwgJmxvY2FsX2Vycik7DQo+PiAgICAgICBobXBfaGFuZGxlX2Vy
+cm9yKG1vbiwgJmxvY2FsX2Vycik7DQo+PiAgIH0NCj4+DQo+PiBkaWZmIC0tZ2l0IGEvdGVzdHMv
+cWVtdS1pb3Rlc3RzLzIyMyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMjMNCj4+IGluZGV4IGYxZmJi
+OWJjMWM2Li4xZjY4MjJmOTQ4OSAxMDA3NTUNCj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8y
+MjMNCj4+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMjMNCj4+IEBAIC0xMjAsMjEgKzEyMCwx
+NiBAQCBfc2VuZF9xZW11X2NtZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0ZSI6Im5iZC1zZXJ2ZXIt
+c3RhcnQiLA0KPj4gICAgICJhcmd1bWVudHMiOnsiYWRkciI6eyJ0eXBlIjoidW5peCIsDQo+PiAg
+ICAgICAiZGF0YSI6eyJwYXRoIjoiJyIkVEVTVF9ESVIvbmJkIicifX19fScgInJldHVybiINCj4+
+ICAgX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLWFk
+ZCIsDQo+PiAtICAiYXJndW1lbnRzIjp7ImRldmljZSI6Im4ifX0nICJyZXR1cm4iDQo+PiArICAi
+YXJndW1lbnRzIjp7ImRldmljZSI6Im4iLCAiYml0bWFwIjoiYiJ9fScgInJldHVybiINCj4+ICAg
+X3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLWFkZCIs
+DQo+PiAgICAgImFyZ3VtZW50cyI6eyJkZXZpY2UiOiJuIn19JyAiZXJyb3IiDQo+PiAtX3NlbmRf
+cWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJ4LW5iZC1zZXJ2ZXItYWRkLWJpdG1h
+cCIsDQo+PiAtICAiYXJndW1lbnRzIjp7Im5hbWUiOiJuIiwgImJpdG1hcCI6ImIifX0nICJyZXR1
+cm4iDQo+PiAgIF9zZW5kX3FlbXVfY21kICRRRU1VX0hBTkRMRSAneyJleGVjdXRlIjoibmJkLXNl
+cnZlci1hZGQiLA0KPj4gLSAgImFyZ3VtZW50cyI6eyJkZXZpY2UiOiJuIiwgIm5hbWUiOiJuMiJ9
+fScgInJldHVybiINCj4+IC1fc2VuZF9xZW11X2NtZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0ZSI6
+IngtbmJkLXNlcnZlci1hZGQtYml0bWFwIiwNCj4+IC0gICJhcmd1bWVudHMiOnsibmFtZSI6Im4y
+IiwgImJpdG1hcCI6ImIyIn19JyAiZXJyb3IiDQo+PiAtX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFO
+RExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLXJlbW92ZSIsDQo+PiAtICAiYXJndW1lbnRzIjp7
+Im5hbWUiOiJuMiJ9fScgInJldHVybiINCj4+ICsgICJhcmd1bWVudHMiOnsiZGV2aWNlIjoibiIs
+ICJuYW1lIjoibjIiLCAiYml0bWFwIjoiYjIifX0nICJlcnJvciINCj4+ICAgX3NlbmRfcWVtdV9j
+bWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLWFkZCIsDQo+PiAtICAiYXJn
+dW1lbnRzIjp7ImRldmljZSI6Im4iLCAibmFtZSI6Im4yIiwgIndyaXRhYmxlIjp0cnVlfX0nICJy
+ZXR1cm4iDQo+PiAtX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJ4LW5i
+ZC1zZXJ2ZXItYWRkLWJpdG1hcCIsDQo+PiAtICAiYXJndW1lbnRzIjp7Im5hbWUiOiJuMiIsICJi
+aXRtYXAiOiJiMiJ9fScgInJldHVybiINCj4+ICsgICJhcmd1bWVudHMiOnsiZGV2aWNlIjoibiIs
+ICJuYW1lIjoibjIiLCAiYml0bWFwIjoiYjMifX0nICJlcnJvciINCj4+ICtfc2VuZF9xZW11X2Nt
+ZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0ZSI6Im5iZC1zZXJ2ZXItYWRkIiwNCj4+ICsgICJhcmd1
+bWVudHMiOnsiZGV2aWNlIjoibiIsICJuYW1lIjoibjIiLCAid3JpdGFibGUiOnRydWUsDQo+PiAr
+ICAiYml0bWFwIjoiYjIifX0nICJyZXR1cm4iDQo+Pg0KPj4gICBlY2hvDQo+PiAgIGVjaG8gIj09
+PSBDb250cmFzdCBub3JtYWwgc3RhdHVzIHRvIGxhcmdlIGdyYW51bGFyaXR5IGRpcnR5LWJpdG1h
+cCA9PT0iDQo+PiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMy5vdXQgYi90ZXN0
+cy9xZW11LWlvdGVzdHMvMjIzLm91dA0KPj4gaW5kZXggNWVkMmUzMjJlMTkuLjcxMzViZjU5YmI4
+IDEwMDY0NA0KPj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMy5vdXQNCj4+ICsrKyBiL3Rl
+c3RzL3FlbXUtaW90ZXN0cy8yMjMub3V0DQo+PiBAQCAtMzAsMTEgKzMwLDggQEAgd3JvdGUgMjA5
+NzE1Mi8yMDk3MTUyIGJ5dGVzIGF0IG9mZnNldCAyMDk3MTUyDQo+PiAgIHsicmV0dXJuIjoge319
+DQo+PiAgIHsicmV0dXJuIjoge319DQo+PiAgIHsiZXJyb3IiOiB7ImNsYXNzIjogIkdlbmVyaWNF
+cnJvciIsICJkZXNjIjogIk5CRCBzZXJ2ZXIgYWxyZWFkeSBoYXMgZXhwb3J0IG5hbWVkICduJyJ9
+fQ0KPj4gLXsicmV0dXJuIjoge319DQo+PiAteyJyZXR1cm4iOiB7fX0NCj4+ICAgeyJlcnJvciI6
+IHsiY2xhc3MiOiAiR2VuZXJpY0Vycm9yIiwgImRlc2MiOiAiRW5hYmxlZCBiaXRtYXAgJ2IyJyBp
+bmNvbXBhdGlibGUgd2l0aCByZWFkb25seSBleHBvcnQifX0NCj4+IC17InJldHVybiI6IHt9fQ0K
+Pj4gLXsicmV0dXJuIjoge319DQo+PiAreyJlcnJvciI6IHsiY2xhc3MiOiAiR2VuZXJpY0Vycm9y
+IiwgImRlc2MiOiAiQml0bWFwICdiMycgaXMgbm90IGZvdW5kIn19DQo+PiAgIHsicmV0dXJuIjog
+e319DQo+Pg0KPj4gICA9PT0gQ29udHJhc3Qgbm9ybWFsIHN0YXR1cyB0byBsYXJnZSBncmFudWxh
+cml0eSBkaXJ0eS1iaXRtYXAgPT09DQo+Pg0KPiANCj4gDQo=
