@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59051)
+Received: from eggs.gnu.org ([209.51.188.92]:33126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghZP0-0002ek-M9
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:25:39 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghZVv-0006Tw-DA
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:32:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghZOy-0003Oh-Pr
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:25:38 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 10 Jan 2019 12:25:23 +0000
-Message-ID: <246062a9-2674-00e7-33ac-709c610efad6@virtuozzo.com>
-References: <20190110071330.28136-1-eblake@redhat.com>
-	<20190110071330.28136-6-eblake@redhat.com>
-In-Reply-To: <20190110071330.28136-6-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <90DFA8F8D1D6C047956A25C3172C2312@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] nbd: Merge nbd_export_bitmap into
- nbd_export_new
+	(envelope-from <thuth@redhat.com>) id 1ghZVu-0007an-C5
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:32:47 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 10 Jan 2019 13:32:39 +0100
+Message-Id: <1547123559-30476-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] pc-bios/s390-ccw: Use proper register names
+ for Clang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +18,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
-MTAuMDEuMjAxOSAxMDoxMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2Ugb25seSBoYXZlIG9uZSBj
-YWxsZXIgdGhhdCB3YW50cyB0byBleHBvcnQgYSBiaXRtYXAgbmFtZSwNCj4gd2hpY2ggaXQgZG9l
-cyByaWdodCBhZnRlciBjcmVhdGlvbiBvZiB0aGUgZXhwb3J0LiBCdXQgdGhlcmUgaXMNCj4gc3Rp
-bGwgYSBicmllZiB3aW5kb3cgb2YgdGltZSB3aGVyZSBhbiBOQkQgY2xpZW50IGNvdWxkIHNlZSB0
-aGUNCj4gZXhwb3J0IGJ1dCBub3QgdGhlIGRpcnR5IGJpdG1hcCwgd2hpY2ggYSByb2J1c3QgY2xp
-ZW50IHdvdWxkDQo+IGhhdmUgdG8gaW50ZXJwcmV0IGFzIG1lYW5pbmcgdGhlIGVudGlyZSBpbWFn
-ZSBzaG91bGQgYmUgdHJlYXRlZA0KPiBhcyBkaXJ0eS4gIEJldHRlciBpcyB0byBlbGltaW5hdGUg
-dGhlIHdpbmRvdyBlbnRpcmVseSwgYnkNCj4gaW5saW5pbmcgbmJkX2V4cG9ydF9iaXRtYXAoKSBp
-bnRvIG5iZF9leHBvcnRfbmV3KCksIGFuZCByZWZ1c2luZw0KPiB0byBjcmVhdGUgdGhlIGJpdG1h
-cCBpbiB0aGUgZmlyc3QgcGxhY2UgaWYgdGhlIHJlcXVlc3RlZCBiaXRtYXANCj4gY2FuJ3QgYmUg
-bG9jYXRlZC4NCj4gDQo+IFdlIGFsc28gbm8gbG9uZ2VyIG5lZWQgbG9naWMgZm9yIHNldHRpbmcg
-YSBkaWZmZXJlbnQgYml0bWFwDQo+IG5hbWUgY29tcGFyZWQgdG8gdGhlIGJpdG1hcCBiZWluZyBl
-eHBvcnRlZC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQu
-Y29tPg0KPiAtLS0NCj4gICBpbmNsdWRlL2Jsb2NrL25iZC5oIHwgIDkgKystLS0NCj4gICBibG9j
-a2Rldi1uYmQuYyAgICAgIHwgMTEgKy0tLS0tDQo+ICAgbmJkL3NlcnZlci5jICAgICAgICB8IDg3
-ICsrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAgIHFlbXUt
-bmJkLmMgICAgICAgICAgfCAgNCArLS0NCj4gICA0IGZpbGVzIGNoYW5nZWQsIDQ2IGluc2VydGlv
-bnMoKyksIDY1IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvYmxvY2sv
-bmJkLmggYi9pbmNsdWRlL2Jsb2NrL25iZC5oDQo+IGluZGV4IDJmOWEyYWViNzNjLi4xOTcxYjU1
-Nzg5NiAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9ibG9jay9uYmQuaA0KPiArKysgYi9pbmNsdWRl
-L2Jsb2NrL25iZC5oDQo+IEBAIC0yOTYsOSArMjk2LDkgQEAgdHlwZWRlZiBzdHJ1Y3QgTkJEQ2xp
-ZW50IE5CRENsaWVudDsNCj4gDQo+ICAgTkJERXhwb3J0ICpuYmRfZXhwb3J0X25ldyhCbG9ja0Ry
-aXZlclN0YXRlICpicywgb2ZmX3QgZGV2X29mZnNldCwgb2ZmX3Qgc2l6ZSwNCj4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0IGNoYXIgKmRlc2NyaXB0
-aW9uLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MTZfdCBuYmRmbGFncywgdm9p
-ZCAoKmNsb3NlKShOQkRFeHBvcnQgKiksDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgIGJv
-b2wgd3JpdGV0aHJvdWdoLCBCbG9ja0JhY2tlbmQgKm9uX2VqZWN0X2JsaywNCj4gLSAgICAgICAg
-ICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKTsNCj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgY29uc3QgY2hhciAqYml0bWFwLCB1aW50MTZfdCBuYmRmbGFncywNCj4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgdm9pZCAoKmNsb3NlKShOQkRFeHBvcnQgKiksIGJvb2wgd3JpdGV0
-aHJvdWdoLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICBCbG9ja0JhY2tlbmQgKm9uX2Vq
-ZWN0X2JsaywgRXJyb3IgKiplcnJwKTsNCj4gICB2b2lkIG5iZF9leHBvcnRfY2xvc2UoTkJERXhw
-b3J0ICpleHApOw0KPiAgIHZvaWQgbmJkX2V4cG9ydF9yZW1vdmUoTkJERXhwb3J0ICpleHAsIE5i
-ZFNlcnZlclJlbW92ZU1vZGUgbW9kZSwgRXJyb3IgKiplcnJwKTsNCj4gICB2b2lkIG5iZF9leHBv
-cnRfZ2V0KE5CREV4cG9ydCAqZXhwKTsNCj4gQEAgLTMxOSw5ICszMTksNiBAQCB2b2lkIG5iZF9j
-bGllbnRfcHV0KE5CRENsaWVudCAqY2xpZW50KTsNCj4gICB2b2lkIG5iZF9zZXJ2ZXJfc3RhcnQo
-U29ja2V0QWRkcmVzcyAqYWRkciwgY29uc3QgY2hhciAqdGxzX2NyZWRzLA0KPiAgICAgICAgICAg
-ICAgICAgICAgICAgICBFcnJvciAqKmVycnApOw0KPiANCj4gLXZvaWQgbmJkX2V4cG9ydF9iaXRt
-YXAoTkJERXhwb3J0ICpleHAsIGNvbnN0IGNoYXIgKmJpdG1hcCwNCj4gLSAgICAgICAgICAgICAg
-ICAgICAgICAgY29uc3QgY2hhciAqYml0bWFwX2V4cG9ydF9uYW1lLCBFcnJvciAqKmVycnApOw0K
-PiAtDQo+ICAgLyogbmJkX3JlYWQNCj4gICAgKiBSZWFkcyBAc2l6ZSBieXRlcyBmcm9tIEBpb2Mu
-IFJldHVybnMgMCBvbiBzdWNjZXNzLg0KPiAgICAqLw0KPiBkaWZmIC0tZ2l0IGEvYmxvY2tkZXYt
-bmJkLmMgYi9ibG9ja2Rldi1uYmQuYw0KPiBpbmRleCAwMDNiYTdkNzE4MC4uMGRmNjMwN2JlMmQg
-MTAwNjQ0DQo+IC0tLSBhL2Jsb2NrZGV2LW5iZC5jDQo+ICsrKyBiL2Jsb2NrZGV2LW5iZC5jDQo+
-IEBAIC0xNzUsNyArMTc1LDcgQEAgdm9pZCBxbXBfbmJkX3NlcnZlcl9hZGQoY29uc3QgY2hhciAq
-ZGV2aWNlLCBib29sIGhhc19uYW1lLCBjb25zdCBjaGFyICpuYW1lLA0KPiAgICAgICAgICAgd3Jp
-dGFibGUgPSBmYWxzZTsNCj4gICAgICAgfQ0KPiANCj4gLSAgICBleHAgPSBuYmRfZXhwb3J0X25l
-dyhicywgMCwgLTEsIG5hbWUsIE5VTEwsDQo+ICsgICAgZXhwID0gbmJkX2V4cG9ydF9uZXcoYnMs
-IDAsIC0xLCBuYW1lLCBOVUxMLCBiaXRtYXAsDQoNCmJpdG1hcCBpcyBndWFyYW50ZWVkIHRvIGJl
-IE5VTEwgaWYgaGFzX2JpdG1hcCBpcyBmYWxzZT8gT3Igc2hvdWxkIHdlIGRvIGhhc19iaXRtYXAg
-PyBiaXRtYXAgOiBOVUxMPw0KDQppZiB5ZXMgb3Igd2l0aCBmaXhlZDoNClJldmlld2VkLWJ5OiBW
-bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoN
-Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+When compiling the s390-ccw firmware with Clang 7.0.1, I get the
+following errors:
+
+pc-bios/s390-ccw/start.S:62:19: error: invalid use of length addressing
+        stctg 0,0,0(15)
+                  ^
+pc-bios/s390-ccw/start.S:63:12: error: invalid use of length addressing
+        oi 6(15), 0x2
+           ^
+pc-bios/s390-ccw/start.S:64:19: error: invalid use of length addressing
+        lctlg 0,0,0(15)
+                  ^
+pc-bios/s390-ccw/start.S:76:19: error: invalid use of length addressing
+        stctg 0,0,0(15)
+                  ^
+pc-bios/s390-ccw/start.S:77:12: error: invalid use of length addressing
+        ni 6(15), 0xfd
+           ^
+pc-bios/s390-ccw/start.S:78:19: error: invalid use of length addressing
+        lctlg 0,0,0(15)
+                  ^
+pc-bios/s390-ccw/start.S:79:12: error: invalid operand for instruction
+        br 14
+           ^
+
+Let's use proper register names like in the rest of this file to fix it.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/start.S | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+index eb8d024..3b7fa3f 100644
+--- a/pc-bios/s390-ccw/start.S
++++ b/pc-bios/s390-ccw/start.S
+@@ -59,9 +59,9 @@ disabled_wait:
+         .globl consume_sclp_int
+ consume_sclp_int:
+         /* enable service interrupts in cr0 */
+-        stctg 0,0,0(15)
+-        oi 6(15), 0x2
+-        lctlg 0,0,0(15)
++        stctg   %c0,%c0,0(%r15)
++        oi      6(%r15),0x2
++        lctlg   %c0,%c0,0(%r15)
+         /* prepare external call handler */
+         larl %r1, external_new_code
+         stg %r1, 0x1b8
+@@ -73,10 +73,10 @@ consume_sclp_int:
+ 
+ external_new_code:
+         /* disable service interrupts in cr0 */
+-        stctg 0,0,0(15)
+-        ni 6(15), 0xfd
+-        lctlg 0,0,0(15)
+-        br 14
++        stctg   %c0,%c0,0(%r15)
++        ni      6(%r15),0xfd
++        lctlg   %c0,%c0,0(%r15)
++        br      %r14
+ 
+         .align  8
+ disabled_wait_psw:
+-- 
+1.8.3.1
