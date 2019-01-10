@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52146)
+Received: from eggs.gnu.org ([209.51.188.92]:52185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1ghc8b-0005DL-Kk
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:20:54 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ghc8g-0005GQ-J1
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:21:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1ghc8Z-00018m-Mj
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:20:53 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ghc8f-0001D4-CN
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:20:58 -0500
 References: <20190108163008.7006-1-peter.maydell@linaro.org>
-	<20190108163008.7006-4-peter.maydell@linaro.org>
+	<20190108163008.7006-3-peter.maydell@linaro.org>
 From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <ba240a70-d51f-96d8-5edd-1178818978e4@greensocs.com>
-Date: Thu, 10 Jan 2019 16:14:46 +0100
+Message-ID: <67a24fdd-8f62-32c4-4623-f53cdb994938@greensocs.com>
+Date: Thu, 10 Jan 2019 16:13:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190108163008.7006-4-peter.maydell@linaro.org>
+In-Reply-To: <20190108163008.7006-3-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr-classic
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] accel/tcg: Add cluster number to TCG
- TB hash
+Subject: Re: [Qemu-devel] [PATCH 2/4] qom/cpu: Add cluster_index to CPUState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +28,165 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 On 1/8/19 5:30 PM, Peter Maydell wrote:
-> Include the cluster number in the hash we use to look
-> up TBs. This is important because a TB that is valid
-> for one cluster at a given physical address and set
-> of CPU flags is not necessarily valid for another:
-> the two clusters may have different views of physical
-> memory, or may have different CPU features (eg FPU
-> present or absent).
+> For TCG we want to distinguish which cluster a CPU is in, and
+> we need to do it quickly. Cache the cluster index in the CPUState
+> struct, by having the cluster object set cpu->cluster_index for
+> each CPU child when it is realized.
 > 
-> We put the cluster number in the high 8 bits of the
-> TB cflags. This gives us up to 256 clusters, which should
-> be enough for anybody. If we ever need more, or need
-> more bits in cflags for other purposes, we could make
-> tb_hash_func() take more data (and expand qemu_xxhash7()
-> to qemu_xxhash8()).
+> This means that board/SoC code must add all CPUs to the cluster
+> before realizing the cluster object. Regrettably QOM provides no
+> way to prevent adding children to a realized object and no way for
+> the parent to be notified when a new child is added to it, so
+> we don't have any way to enforce/assert this constraint; all
+> we can do is document it in a comment.
+> 
+> The restriction on how many clusters can exist in the system
+> is imposed by TCG code which will be added in a subsequent commit,
+> but the check to enforce it in cluster.c fits better in this one.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 > ---
->  include/exec/exec-all.h   | 4 +++-
->  accel/tcg/cpu-exec.c      | 4 ++++
->  accel/tcg/translate-all.c | 3 +++
->  3 files changed, 10 insertions(+), 1 deletion(-)
+>  include/hw/cpu/cluster.h | 19 +++++++++++++++++++
+>  include/qom/cpu.h        |  7 +++++++
+>  hw/cpu/cluster.c         | 33 +++++++++++++++++++++++++++++++++
+>  qom/cpu.c                |  1 +
+>  4 files changed, 60 insertions(+)
 > 
-> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-> index 815e5b1e838..aa7b81aaf01 100644
-> --- a/include/exec/exec-all.h
-> +++ b/include/exec/exec-all.h
-> @@ -351,9 +351,11 @@ struct TranslationBlock {
->  #define CF_USE_ICOUNT  0x00020000
->  #define CF_INVALID     0x00040000 /* TB is stale. Set with @jmp_lock held */
->  #define CF_PARALLEL    0x00080000 /* Generate code for a parallel context */
-> +#define CF_CLUSTER_MASK 0xff000000 /* Top 8 bits are cluster ID */
-> +#define CF_CLUSTER_SHIFT 24
->  /* cflags' mask for hashing/comparison */
->  #define CF_HASH_MASK   \
-> -    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL)
-> +    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL | CF_CLUSTER_MASK)
+> diff --git a/include/hw/cpu/cluster.h b/include/hw/cpu/cluster.h
+> index 73818232437..d1bef315d10 100644
+> --- a/include/hw/cpu/cluster.h
+> +++ b/include/hw/cpu/cluster.h
+> @@ -34,12 +34,31 @@
+>   * Arm big.LITTLE system) they should be in different clusters. If the CPUs do
+>   * not have the same view of memory (for example the main CPU and a management
+>   * controller processor) they should be in different clusters.
+> + *
+> + * A cluster is created by creating an object of TYPE_CPU_CLUSTER, and then
+> + * adding the CPUs to it as QOM child objects (e.g. using the
+> + * object_initialize_child() or object_property_add_child() functions).
+> + * All CPUs must be added as children before the cluster is realized.
+> + * (Regrettably QOM provides no way to prevent adding children to a realized
+> + * object and no way for the parent to be notified when a new child is added
+> + * to it, so this restriction is not checked for, but the system will not
+> + * behave correctly if it is not adhered to.)
+> + *
+> + * A CPU which is not put into any cluster will be considered implicitly
+> + * to be in a cluster with all the other "loose" CPUs, so all CPUs that are
+> + * not assigned to clusters must be identical.
+>   */
 >  
->      /* Per-vCPU dynamic tracing state used to generate this TB */
->      uint32_t trace_vcpu_dstate;
-> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> index 870027d4359..e578a1a3aee 100644
-> --- a/accel/tcg/cpu-exec.c
-> +++ b/accel/tcg/cpu-exec.c
-> @@ -336,6 +336,10 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
->          return NULL;
->      }
->      desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
+>  #define TYPE_CPU_CLUSTER "cpu-cluster"
+>  #define CPU_CLUSTER(obj) \
+>      OBJECT_CHECK(CPUClusterState, (obj), TYPE_CPU_CLUSTER)
+>  
+> +/*
+> + * This limit is imposed by TCG, which puts the cluster ID into an
+> + * 8 bit field (and uses all-1s for the default "not in any cluster").
+> + */
+> +#define MAX_CLUSTERS 255
 > +
-> +    cf_mask &= ~CF_CLUSTER_MASK;
-> +    cf_mask |= cpu->cluster_index << CF_CLUSTER_SHIFT;
+>  /**
+>   * CPUClusterState:
+>   * @cluster_id: The cluster ID. This value is for internal use only and should
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 1396f53e5b5..844becbcedc 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -279,6 +279,11 @@ struct qemu_work_item;
+>  /**
+>   * CPUState:
+>   * @cpu_index: CPU index (informative).
+> + * @cluster_index: Identifies which cluster this CPU is in.
+> + *   For boards which don't define clusters or for "loose" CPUs not assigned
+> + *   to a cluster this will be UNASSIGNED_CLUSTER_INDEX; otherwise it will
+> + *   be the same as the cluster-id property of the CPU object's TYPE_CPU_CLUSTER
+> + *   QOM parent.
+>   * @nr_cores: Number of cores within this CPU package.
+>   * @nr_threads: Number of threads within this CPU.
+>   * @running: #true if CPU is currently running (lockless).
+> @@ -404,6 +409,7 @@ struct CPUState {
+>  
+>      /* TODO Move common fields from CPUArchState here. */
+>      int cpu_index;
+> +    int cluster_index;
+>      uint32_t halted;
+>      uint32_t can_do_io;
+>      int32_t exception_index;
+> @@ -1109,5 +1115,6 @@ extern const struct VMStateDescription vmstate_cpu_common;
+>  #endif /* NEED_CPU_H */
+>  
+>  #define UNASSIGNED_CPU_INDEX -1
+> +#define UNASSIGNED_CLUSTER_INDEX -1
+>  
+>  #endif
+> diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
+> index 9d50a235d5c..d672f54a620 100644
+> --- a/hw/cpu/cluster.c
+> +++ b/hw/cpu/cluster.c
+> @@ -20,19 +20,52 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "hw/cpu/cluster.h"
+> +#include "qom/cpu.h"
+>  #include "qapi/error.h"
+>  #include "qemu/module.h"
+> +#include "qemu/cutils.h"
+>  
+>  static Property cpu_cluster_properties[] = {
+>      DEFINE_PROP_UINT32("cluster-id", CPUClusterState, cluster_id, 0),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> +static void cpu_cluster_realize(DeviceState *dev, Error **errp)
+> +{
+> +    /* Iterate through all our CPU children and set their cluster_index */
+> +    CPUClusterState *cluster = CPU_CLUSTER(dev);
+> +    ObjectPropertyIterator iter;
+> +    ObjectProperty *prop;
+> +    Object *cluster_obj = OBJECT(dev);
 > +
->      h = tb_hash_func(phys_pc, pc, flags, cf_mask, *cpu->trace_dstate);
->      return qht_lookup_custom(&tb_ctx.htable, &desc, h, tb_lookup_cmp);
+> +    if (cluster->cluster_id >= MAX_CLUSTERS) {
+> +        error_setg(errp, "cluster-id must be less than %d", MAX_CLUSTERS);
+> +        return;
+> +    }
+> +
+> +    object_property_iter_init(&iter, cluster_obj);
+> +    while ((prop = object_property_iter_next(&iter))) {
+> +        Object *cpu_obj;
+> +        CPUState *cpu;
+> +
+> +        if (!strstart(prop->type, "child<", NULL)) {
+> +            continue;
+> +        }
+> +        cpu_obj = object_property_get_link(cluster_obj, prop->name, NULL);
+> +        cpu = (CPUState *)object_dynamic_cast(cpu_obj, TYPE_CPU);
+> +        if (!cpu) {
+> +            continue;
+> +        }
+> +        cpu->cluster_index = cluster->cluster_id;
+> +    }
+> +}
+> +
+>  static void cpu_cluster_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+>      dc->props = cpu_cluster_properties;
+> +    dc->realize = cpu_cluster_realize;
 >  }
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 639f0b27287..ba27f5acc8c 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1692,6 +1692,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->          cflags |= CF_NOCACHE | 1;
->      }
 >  
-> +    cflags &= ~CF_CLUSTER_MASK;
-> +    cflags |= cpu->cluster_index << CF_CLUSTER_SHIFT;
-> +
->   buffer_overflow:
->      tb = tb_alloc(pc);
->      if (unlikely(!tb)) {
+>  static const TypeInfo cpu_cluster_type_info = {
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index 5442a7323be..f5579b1cd50 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -364,6 +364,7 @@ static void cpu_common_initfn(Object *obj)
+>      CPUClass *cc = CPU_GET_CLASS(obj);
+>  
+>      cpu->cpu_index = UNASSIGNED_CPU_INDEX;
+> +    cpu->cluster_index = UNASSIGNED_CLUSTER_INDEX;
+>      cpu->gdb_num_regs = cpu->gdb_num_g_regs = cc->gdb_num_core_regs;
+>      /* *-user doesn't have configurable SMP topology */
+>      /* the default value is changed by qemu_init_vcpu() for softmmu */
 > 
