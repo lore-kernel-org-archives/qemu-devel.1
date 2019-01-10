@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52011)
+Received: from eggs.gnu.org ([209.51.188.92]:58514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghNMH-00017g-MR
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:34:02 -0500
+	(envelope-from <prvs=906996e92=Alistair.Francis@wdc.com>)
+	id 1ghNn4-0006Pp-Eq
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 19:01:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghNMG-0000q6-LY
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:34:01 -0500
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:42200)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ghNMG-0000m4-Eb
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 18:34:00 -0500
-Received: by mail-ot1-x329.google.com with SMTP id v23so8313084otk.9
-	for <qemu-devel@nongnu.org>; Wed, 09 Jan 2019 15:34:00 -0800 (PST)
+	(envelope-from <prvs=906996e92=Alistair.Francis@wdc.com>)
+	id 1ghNn3-0000vQ-Nz
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 19:01:42 -0500
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Thu, 10 Jan 2019 00:01:34 +0000
+Message-ID: <c162ffeb1bb1cbcdeb47ea62a829294168a0ebdf.1547078463.git.alistair.francis@wdc.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190108224600.23125-1-david@gibson.dropbear.id.au>
-In-Reply-To: <20190108224600.23125-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 9 Jan 2019 23:33:47 +0000
-Message-ID: <CAFEAcA-AK=HNBa1DOeEwKHP7D8fRxaUMB9HvBauOtiaWcKsPGg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/29] ppc-for-4.0 queue 20190109
+Subject: [Qemu-devel] [PATCH v1 1/1] default-configs: Enable USB support for
+ RISC-V machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
 
-On Tue, 8 Jan 2019 at 22:46, David Gibson <david@gibson.dropbear.id.au> wrote:
->
-> The following changes since commit 147923b1a901a0370f83a0f4c58ec1baffef22f0:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20190108-pull-request' into staging (2019-01-08 16:07:32 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-4.0-20190109
->
-> for you to fetch changes up to 3a8eb78e6c135422017888380db091793039b6dd:
->
->   spapr: enable XIVE MMIOs at reset (2019-01-09 09:28:14 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2019-01-09
->
-> Second main pull request for qemu-4.0.  Highlights are:
->  * Final parts of XIVE support for pseries (without KVM)
->  * Preliminary work for PHB hotplug
->  * Starting to use TCG vector operations
->
-> This includes some changes in the PCI core, which Michael Tsirkin
-> requested come through this tree, since they're primarily of interest
-> for ppc.
->
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ default-configs/riscv32-softmmu.mak | 1 +
+ default-configs/riscv64-softmmu.mak | 1 +
+ 2 files changed, 2 insertions(+)
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-=
+softmmu.mak
+index dbc9398284..c9c5971409 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -1,6 +1,7 @@
+ # Default configuration for riscv-softmmu
+=20
+ include pci.mak
++include usb.mak
+=20
+ CONFIG_SERIAL=3Dy
+ CONFIG_VIRTIO_MMIO=3Dy
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-=
+softmmu.mak
+index dbc9398284..c9c5971409 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -1,6 +1,7 @@
+ # Default configuration for riscv-softmmu
+=20
+ include pci.mak
++include usb.mak
+=20
+ CONFIG_SERIAL=3Dy
+ CONFIG_VIRTIO_MMIO=3Dy
+--=20
+2.19.1
