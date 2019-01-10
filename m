@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48971)
+Received: from eggs.gnu.org ([209.51.188.92]:49494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ghaQn-0008RM-Vd
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:31:35 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghaT6-00018X-En
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:33:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ghaQi-000774-3H
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:31:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ghaQh-00075h-PG
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:31:27 -0500
-Date: Thu, 10 Jan 2019 11:31:23 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190110133123.GF4500@habkost.net>
-References: <20190110020259.8492-1-ehabkost@redhat.com>
-	<20190110020259.8492-4-ehabkost@redhat.com>
-	<CAJ+F1C+cADS2WKysnEzH-ZD=C3uj5wymQFXtd4L9BOO2cjbjvA@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1ghaT2-0000P1-Sr
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:33:54 -0500
+References: <20190103213320.2653-1-lbloch@janustech.com>
+	<20190103213320.2653-2-lbloch@janustech.com>
+	<8736q3ebs2.fsf@dusky.pond.sub.org>
+	<d0736347-867d-49f5-5615-dfe5f9b82412@janustech.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1551373d-91fa-1345-1757-7299b073d157@redhat.com>
+Date: Thu, 10 Jan 2019 07:33:45 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1C+cADS2WKysnEzH-ZD=C3uj5wymQFXtd4L9BOO2cjbjvA@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] virtio: Make
- disable-legacy/disable-modern compat properties optional
+In-Reply-To: <d0736347-867d-49f5-5615-dfe5f9b82412@janustech.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="cu6cYfhW21MgwvNLIH8cutBOoArVA4tNr"
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Auto-generate the sizes
+ lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Leonid Bloch <lbloch@janustech.com>, Markus Armbruster <armbru@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
-On Thu, Jan 10, 2019 at 12:35:26PM +0400, Marc-Andr=E9 Lureau wrote:
-> Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cu6cYfhW21MgwvNLIH8cutBOoArVA4tNr
+From: Eric Blake <eblake@redhat.com>
+To: Leonid Bloch <lbloch@janustech.com>, Markus Armbruster <armbru@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil
+ <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1551373d-91fa-1345-1757-7299b073d157@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Auto-generate the sizes
+ lookup table
+References: <20190103213320.2653-1-lbloch@janustech.com>
+ <20190103213320.2653-2-lbloch@janustech.com>
+ <8736q3ebs2.fsf@dusky.pond.sub.org>
+ <d0736347-867d-49f5-5615-dfe5f9b82412@janustech.com>
+In-Reply-To: <d0736347-867d-49f5-5615-dfe5f9b82412@janustech.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/10/19 3:42 AM, Leonid Bloch wrote:
+
+> If you've noticed, the original script was in AWK. But to be as generic=
+=20
+> as possible, I didn't write the generation script in AWK because even=20
+> AWK is not guaranteed to be installed on the build system. The only=20
+> interpreted language that is guaranteed to be there is shell (most basi=
+c=20
+> shell) because .configure itself needs it.
 >=20
-> On Thu, Jan 10, 2019 at 6:05 AM Eduardo Habkost <ehabkost@redhat.com> w=
-rote:
-> >
-> > The disable-legacy and disable-modern properties apply only to
-> > some virtio-pci devices.  Make those properties optional.
-> >
-> > This fixes the crash introduced by commit f6e501a28ef9 ("virtio: Prov=
-ide
-> > version-specific variants of virtio PCI devices"):
-> >
-> >   $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
-> >     -device virtio-net-pci-non-transitional
-> >   Unexpected error in object_property_find() at qom/object.c:1092:
-> >   qemu-system-x86_64: -device virtio-net-pci-non-transitional: can't =
-apply \
-> >   global virtio-pci.disable-modern=3Don: Property '.disable-modern' n=
-ot found
-> >   Aborted (core dumped)
-> >
-> > Reported-by: Thomas Huth <thuth@redhat.com>
-> > Fixes: f6e501a28ef9 ("virtio: Provide version-specific variants of vi=
-rtio PCI devices")
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  hw/core/machine.c | 5 +++--
-> >  1 file changed, 3 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index 5530b71981..a19143aa44 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -91,8 +91,9 @@ const size_t hw_compat_2_7_len =3D G_N_ELEMENTS(hw_=
-compat_2_7);
-> >
-> >  GlobalProperty hw_compat_2_6[] =3D {
-> >      { "virtio-mmio", "format_transport_address", "off" },
-> > -    { "virtio-pci", "disable-modern", "on" },
-> > -    { "virtio-pci", "disable-legacy", "off" },
-> > +    /* Optional because not all virtio-pci devices support legacy mo=
-de */
-> > +    { "virtio-pci", "disable-modern", "on",  .optional =3D true },
-> > +    { "virtio-pci", "disable-legacy", "off", .optional =3D true },
->=20
-> Could the generic devices implement a specific interface instead?
-> virtio-pci-generic?
+> Sure, the script could be prettier and shorter, but I wanted to keep it=
+=20
+> compatible with the most basic shell, not only Bash, and without needin=
+g=20
+> external programs.
 
-This is the kind of complexity I wanted to avoid.  We already
-have too many interface names for subsets of PCI and virtio
-devices.
+awk is portable - autoconf-generated scripts assume it exists (same as
+sed, grep, ls, ...) if you have a /bin/sh. In fact, the GNU Coding
+Standards has a nice list of programs that you can blindly assume exist.
+ It's true you may have to use a lowest-common-denominator when using
+the tools that are globally available to be portable (not all awk
+scripts are portable, even if awk is universally available on systems
+with a Bourne-like shell).  So avoiding awk on the grounds that it might
+not be present is the wrong approach.
 
->=20
-> Adding "optional" handling looks like it may hide some other errors.
+> Eric - thanks for the comment about 'local' - I will get rid of it if w=
+e=20
+> decide to include this patch.
 
-What if we just make "optional" mean "skip if the property
-doesn't exist", as suggested by Cornelia and Dave?
+I'm still not convinced we need it.  I would much rather see a patch
+that makes QemuOpt accept default integer values as integers rather than
+as strings, so we don't have to worry about stringifying special macros.
 
 --=20
-Eduardo
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--cu6cYfhW21MgwvNLIH8cutBOoArVA4tNr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEY3OaSlgimHGqKqRv3g5py3orov0FAlw3SbkACgkQ3g5py3or
+ov01Igf/cmdBZn5zXpNeLDFTuC8BghjLFIPJ4LYzCuXNt9P1w9X6G7dhVWW9Vwn3
+Qphe8wI8tAOZkSdRHngRUpG3/grRED8gETJaIK/tRmTnN2Qe3Ab7rMqIn2tHZ8Y5
+ZO4MstUVYKmh++vzTx3rGDHvM97GNua3FxaAi8PjoEP+Zk+F+UHTGGNyu7EDX1xg
+LtLzi0rYqix6ec+oB/ZYU+MBpvFsKag64DPw84Pg5wovxCGmg4RiPkIa4WeHA3l4
+z2CY5kXz8+25IxzeJAlObIH3zDQzzK0pedR8YcJe+fpCNVnXwM+h53irTi/xg+1f
+K0j8QuAps/VSEdShwrGQOIuihMvIYw==
+=6G+G
+-----END PGP SIGNATURE-----
+
+--cu6cYfhW21MgwvNLIH8cutBOoArVA4tNr--
