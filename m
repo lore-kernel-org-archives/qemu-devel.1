@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58072)
+Received: from eggs.gnu.org ([209.51.188.92]:58546)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=906201598=anthony.perard@citrix.com>)
-	id 1ghb5I-00062k-Vn
+	id 1ghb5L-0006cH-0m
 	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:13:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=906201598=anthony.perard@citrix.com>)
-	id 1gharM-0002LV-8v
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:02 -0500
+	id 1gharK-0002Km-7G
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:58:58 -0500
 Received: from smtp03.citrix.com ([162.221.156.55]:12008)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=906201598=anthony.perard@citrix.com>)
-	id 1gharL-0001xV-SA
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:00 -0500
+	id 1gharJ-0001xV-Vr
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:58:58 -0500
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Thu, 10 Jan 2019 13:49:13 +0000
-Message-ID: <20190110134917.16425-22-anthony.perard@citrix.com>
+Date: Thu, 10 Jan 2019 13:49:17 +0000
+Message-ID: <20190110134917.16425-26-anthony.perard@citrix.com>
 In-Reply-To: <20190110134917.16425-1-anthony.perard@citrix.com>
 References: <20190110134917.16425-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 21/25] Remove broken Xen PV domain builder
+Subject: [Qemu-devel] [PULL 25/25] xen-block: avoid repeated memory
+ allocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,541 +32,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Anthony PERARD <anthony.perard@citrix.com>
+Cc: xen-devel@lists.xenproject.org, Tim Smith <tim.smith@citrix.com>, Paul Durrant <paul.durrant@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>
 
-It is broken since Xen 4.9 [1] and it will not build in Xen 4.12. Also,
-it is not built by default since QEMU 2.6.
+From: Tim Smith <tim.smith@citrix.com>
 
-[1] https://lists.xenproject.org/archives/html/xen-devel/2018-09/msg00313.html
+The xen-block dataplane currently allocates memory to hold the data for
+each request as that request is used, and frees it afterwards. Because
+it requires page-aligned blocks, this interacts poorly with non-page-
+aligned allocations and balloons the heap.
 
+Instead, allocate the maximum possible buffer size required for the
+protocol, which is BLKIF_MAX_SEGMENTS_PER_REQUEST (currently 11) pages
+when the request structure is created, and keep that buffer until it is
+destroyed. Since the requests are re-used via a free list, this should
+actually improve memory usage.
+
+Signed-off-by: Tim Smith <tim.smith@citrix.com>
+
+Re-based and commit comment adjusted.
+
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- configure                   |  17 --
- hw/xenpv/Makefile.objs      |   2 -
- hw/xenpv/xen_domainbuild.c  | 299 ------------------------------------
- hw/xenpv/xen_domainbuild.h  |  13 --
- hw/xenpv/xen_machine_pv.c   |  14 --
- include/hw/xen/xen.h        |   1 -
- include/hw/xen/xen_common.h |  18 ---
- qemu-options.hx             |   8 -
- vl.c                        |   7 -
- 9 files changed, 379 deletions(-)
- delete mode 100644 hw/xenpv/xen_domainbuild.c
- delete mode 100644 hw/xenpv/xen_domainbuild.h
+ hw/block/dataplane/xen-block.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/configure b/configure
-index 8049b71eef..ba2b5f24c4 100755
---- a/configure
-+++ b/configure
-@@ -357,7 +357,6 @@ vnc_png=""
- xkbcommon=""
- xen=""
- xen_ctrl_version=""
--xen_pv_domain_build="no"
- xen_pci_passthrough=""
- linux_aio=""
- cap_ng=""
-@@ -1122,10 +1121,6 @@ for opt do
-   ;;
-   --enable-xen-pci-passthrough) xen_pci_passthrough="yes"
-   ;;
--  --disable-xen-pv-domain-build) xen_pv_domain_build="no"
--  ;;
--  --enable-xen-pv-domain-build) xen_pv_domain_build="yes"
--  ;;
-   --disable-brlapi) brlapi="no"
-   ;;
-   --enable-brlapi) brlapi="yes"
-@@ -1688,8 +1683,6 @@ Advanced options (experts only):
-   --tls-priority           default TLS protocol/cipher priority string
-   --enable-gprof           QEMU profiling with gprof
-   --enable-profiler        profiler support
--  --enable-xen-pv-domain-build
--                           xen pv domain builder
-   --enable-debug-stack-usage
-                            track the maximum stack usage of stacks created by qemu_alloc_stack
+diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
+index 35bfccfba7..d0d8905a33 100644
+--- a/hw/block/dataplane/xen-block.c
++++ b/hw/block/dataplane/xen-block.c
+@@ -70,7 +70,6 @@ static void reset_request(XenBlockRequest *request)
+     memset(&request->req, 0, sizeof(request->req));
+     request->status = 0;
+     request->start = 0;
+-    request->buf = NULL;
+     request->size = 0;
+     request->presync = 0;
  
-@@ -2681,12 +2674,6 @@ if test "$xen_pci_passthrough" != "no"; then
-   fi
- fi
- 
--if test "$xen_pv_domain_build" = "yes" &&
--   test "$xen" != "yes"; then
--    error_exit "User requested Xen PV domain builder support" \
--	       "which requires Xen support."
--fi
--
- ##########################################
- # Windows Hypervisor Platform accelerator (WHPX) check
- if test "$whpx" != "no" ; then
-@@ -6072,7 +6059,6 @@ fi
- echo "xen support       $xen"
- if test "$xen" = "yes" ; then
-   echo "xen ctrl version  $xen_ctrl_version"
--  echo "pv dom build      $xen_pv_domain_build"
- fi
- echo "brlapi support    $brlapi"
- echo "bluez  support    $bluez"
-@@ -6542,9 +6528,6 @@ fi
- if test "$xen" = "yes" ; then
-   echo "CONFIG_XEN_BACKEND=y" >> $config_host_mak
-   echo "CONFIG_XEN_CTRL_INTERFACE_VERSION=$xen_ctrl_version" >> $config_host_mak
--  if test "$xen_pv_domain_build" = "yes" ; then
--    echo "CONFIG_XEN_PV_DOMAIN_BUILD=y" >> $config_host_mak
--  fi
- fi
- if test "$linux_aio" = "yes" ; then
-   echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
-diff --git a/hw/xenpv/Makefile.objs b/hw/xenpv/Makefile.objs
-index bbf5873fd1..8bfa4586ab 100644
---- a/hw/xenpv/Makefile.objs
-+++ b/hw/xenpv/Makefile.objs
-@@ -1,4 +1,2 @@
- # Xen PV machine support
- obj-$(CONFIG_XEN) += xen_machine_pv.o
--# Xen PV machine builder support
--obj-$(CONFIG_XEN_PV_DOMAIN_BUILD) += xen_domainbuild.o
-diff --git a/hw/xenpv/xen_domainbuild.c b/hw/xenpv/xen_domainbuild.c
-deleted file mode 100644
-index deb28cf596..0000000000
---- a/hw/xenpv/xen_domainbuild.c
-+++ /dev/null
-@@ -1,299 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu/units.h"
--#include "hw/xen/xen-legacy-backend.h"
--#include "xen_domainbuild.h"
--#include "qemu/timer.h"
--#include "qemu/log.h"
--
--#include <xenguest.h>
--
--static int xenstore_domain_mkdir(char *path)
--{
--    struct xs_permissions perms_ro[] = {{
--            .id    = 0, /* set owner: dom0 */
--        },{
--            .id    = xen_domid,
--            .perms = XS_PERM_READ,
--        }};
--    struct xs_permissions perms_rw[] = {{
--            .id    = 0, /* set owner: dom0 */
--        },{
--            .id    = xen_domid,
--            .perms = XS_PERM_READ | XS_PERM_WRITE,
--        }};
--    const char *writable[] = { "device", "control", "error", NULL };
--    char subpath[256];
--    int i;
--
--    if (!xs_mkdir(xenstore, 0, path)) {
--        fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, path);
--	return -1;
--    }
--    if (!xs_set_permissions(xenstore, 0, path, perms_ro, 2)) {
--        fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
--	return -1;
--    }
--
--    for (i = 0; writable[i]; i++) {
--        snprintf(subpath, sizeof(subpath), "%s/%s", path, writable[i]);
--        if (!xs_mkdir(xenstore, 0, subpath)) {
--            fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, subpath);
--            return -1;
--        }
--        if (!xs_set_permissions(xenstore, 0, subpath, perms_rw, 2)) {
--            fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
--            return -1;
--        }
--    }
--    return 0;
--}
--
--int xenstore_domain_init1(const char *kernel, const char *ramdisk,
--                          const char *cmdline)
--{
--    char *dom, uuid_string[42], vm[256], path[256];
--    int i;
--
--    qemu_uuid_unparse(&qemu_uuid, uuid_string);
--    dom = xs_get_domain_path(xenstore, xen_domid);
--    snprintf(vm,  sizeof(vm),  "/vm/%s", uuid_string);
--
--    xenstore_domain_mkdir(dom);
--
--    xenstore_write_str(vm, "image/ostype",  "linux");
--    if (kernel)
--        xenstore_write_str(vm, "image/kernel",  kernel);
--    if (ramdisk)
--        xenstore_write_str(vm, "image/ramdisk", ramdisk);
--    if (cmdline)
--        xenstore_write_str(vm, "image/cmdline", cmdline);
--
--    /* name + id */
--    xenstore_write_str(vm,  "name",   qemu_name ? qemu_name : "no-name");
--    xenstore_write_str(vm,  "uuid",   uuid_string);
--    xenstore_write_str(dom, "name",   qemu_name ? qemu_name : "no-name");
--    xenstore_write_int(dom, "domid",  xen_domid);
--    xenstore_write_str(dom, "vm",     vm);
--
--    /* memory */
--    xenstore_write_int(dom, "memory/target", ram_size / KiB);
--    xenstore_write_int(vm, "memory",         ram_size / MiB);
--    xenstore_write_int(vm, "maxmem",         ram_size / MiB);
--
--    /* cpus */
--    for (i = 0; i < smp_cpus; i++) {
--	snprintf(path, sizeof(path), "cpu/%d/availability",i);
--	xenstore_write_str(dom, path, "online");
--    }
--    xenstore_write_int(vm, "vcpu_avail",  smp_cpus);
--    xenstore_write_int(vm, "vcpus",       smp_cpus);
--
--    /* vnc password */
--    xenstore_write_str(vm, "vncpassword", "" /* FIXME */);
--
--    free(dom);
--    return 0;
--}
--
--int xenstore_domain_init2(int xenstore_port, int xenstore_mfn,
--                          int console_port, int console_mfn)
--{
--    char *dom;
--
--    dom = xs_get_domain_path(xenstore, xen_domid);
--
--    /* signal new domain */
--    xs_introduce_domain(xenstore,
--                        xen_domid,
--                        xenstore_mfn,
--                        xenstore_port);
--
--    /* xenstore */
--    xenstore_write_int(dom, "store/ring-ref",   xenstore_mfn);
--    xenstore_write_int(dom, "store/port",       xenstore_port);
--
--    /* console */
--    xenstore_write_str(dom, "console/type",     "ioemu");
--    xenstore_write_int(dom, "console/limit",    128 * KiB);
--    xenstore_write_int(dom, "console/ring-ref", console_mfn);
--    xenstore_write_int(dom, "console/port",     console_port);
--    xen_config_dev_console(0);
--
--    free(dom);
--    return 0;
--}
--
--/* ------------------------------------------------------------- */
--
--static QEMUTimer *xen_poll;
--
--/* check domain state once per second */
--static void xen_domain_poll(void *opaque)
--{
--    struct xc_dominfo info;
--    int rc;
--
--    rc = xc_domain_getinfo(xen_xc, xen_domid, 1, &info);
--    if ((rc != 1) || (info.domid != xen_domid)) {
--        qemu_log("xen: domain %d is gone\n", xen_domid);
--        goto quit;
--    }
--    if (info.dying) {
--        qemu_log("xen: domain %d is dying (%s%s)\n", xen_domid,
--                 info.crashed  ? "crashed"  : "",
--                 info.shutdown ? "shutdown" : "");
--        goto quit;
--    }
--
--    timer_mod(xen_poll, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 1000);
--    return;
--
--quit:
--    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
--}
--
--static int xen_domain_watcher(void)
--{
--    int qemu_running = 1;
--    int fd[2], i, n, rc;
--    char byte;
--
--    if (pipe(fd) != 0) {
--        qemu_log("%s: Huh? pipe error: %s\n", __func__, strerror(errno));
--        return -1;
--    }
--    if (fork() != 0)
--        return 0; /* not child */
--
--    /* close all file handles, except stdio/out/err,
--     * our watch pipe and the xen interface handle */
--    n = getdtablesize();
--    for (i = 3; i < n; i++) {
--        if (i == fd[0])
--            continue;
--        close(i);
--    }
--
--    /*
--     * Reopen xc interface, since the original is unsafe after fork
--     * and was closed above.
--     */
--    xen_xc = xc_interface_open(0, 0, 0);
--
--    /* ignore term signals */
--    signal(SIGINT,  SIG_IGN);
--    signal(SIGTERM, SIG_IGN);
--
--    /* wait for qemu exiting */
--    while (qemu_running) {
--        rc = read(fd[0], &byte, 1);
--        switch (rc) {
--        case -1:
--            if (errno == EINTR)
--                continue;
--            qemu_log("%s: Huh? read error: %s\n", __func__, strerror(errno));
--            qemu_running = 0;
--            break;
--        case 0:
--            /* EOF -> qemu exited */
--            qemu_running = 0;
--            break;
--        default:
--            qemu_log("%s: Huh? data on the watch pipe?\n", __func__);
--            break;
--        }
--    }
--
--    /* cleanup */
--    qemu_log("%s: destroy domain %d\n", __func__, xen_domid);
--    xc_domain_destroy(xen_xc, xen_domid);
--    _exit(0);
--}
--
--/* normal cleanup */
--static void xen_domain_cleanup(void)
--{
--    char *dom;
--
--    dom = xs_get_domain_path(xenstore, xen_domid);
--    if (dom) {
--        xs_rm(xenstore, 0, dom);
--        free(dom);
--    }
--    xs_release_domain(xenstore, xen_domid);
--}
--
--int xen_domain_build_pv(const char *kernel, const char *ramdisk,
--                        const char *cmdline)
--{
--    uint32_t ssidref = 0;
--    uint32_t flags = 0;
--    xen_domain_handle_t uuid;
--    unsigned int xenstore_port = 0, console_port = 0;
--    unsigned long xenstore_mfn = 0, console_mfn = 0;
--    int rc;
--
--    memcpy(uuid, &qemu_uuid, sizeof(uuid));
--    rc = xen_domain_create(xen_xc, ssidref, uuid, flags, &xen_domid);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_create() failed\n");
--        goto err;
--    }
--    qemu_log("xen: created domain %d\n", xen_domid);
--    atexit(xen_domain_cleanup);
--    if (xen_domain_watcher() == -1) {
--        goto err;
--    }
--
--    xenstore_domain_init1(kernel, ramdisk, cmdline);
--
--    rc = xc_domain_max_vcpus(xen_xc, xen_domid, smp_cpus);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_max_vcpus() failed\n");
--        goto err;
--    }
--
--#if 0
--    rc = xc_domain_setcpuweight(xen_xc, xen_domid, 256);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_setcpuweight() failed\n");
--        goto err;
--    }
--#endif
--
--    rc = xc_domain_setmaxmem(xen_xc, xen_domid, ram_size / KiB);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_setmaxmem() failed\n");
--        goto err;
--    }
--
--    xenstore_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
--    console_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
--
--    rc = xc_linux_build(xen_xc, xen_domid, ram_size / MiB,
--                        kernel, ramdisk, cmdline,
--                        0, flags,
--                        xenstore_port, &xenstore_mfn,
--                        console_port, &console_mfn);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_linux_build() failed\n");
--        goto err;
--    }
--
--    xenstore_domain_init2(xenstore_port, xenstore_mfn,
--                          console_port, console_mfn);
--
--    qemu_log("xen: unpausing domain %d\n", xen_domid);
--    rc = xc_domain_unpause(xen_xc, xen_domid);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_unpause() failed\n");
--        goto err;
--    }
--
--    xen_poll = timer_new_ms(QEMU_CLOCK_REALTIME, xen_domain_poll, NULL);
--    timer_mod(xen_poll, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 1000);
--    return 0;
--
--err:
--    return -1;
--}
-diff --git a/hw/xenpv/xen_domainbuild.h b/hw/xenpv/xen_domainbuild.h
-deleted file mode 100644
-index 652d9b410f..0000000000
---- a/hw/xenpv/xen_domainbuild.h
-+++ /dev/null
-@@ -1,13 +0,0 @@
--#ifndef QEMU_HW_XEN_DOMAINBUILD_H
--#define QEMU_HW_XEN_DOMAINBUILD_H
--
--#include "hw/xen/xen_common.h"
--
--int xenstore_domain_init1(const char *kernel, const char *ramdisk,
--                          const char *cmdline);
--int xenstore_domain_init2(int xenstore_port, int xenstore_mfn,
--                          int console_port, int console_mfn);
--int xen_domain_build_pv(const char *kernel, const char *ramdisk,
--                        const char *cmdline);
--
--#endif /* QEMU_HW_XEN_DOMAINBUILD_H */
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 608e591bcc..8d68fef25e 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -28,7 +28,6 @@
- #include "hw/boards.h"
- #include "hw/xen/xen-legacy-backend.h"
- #include "hw/xen/xen-bus.h"
--#include "xen_domainbuild.h"
- #include "sysemu/block-backend.h"
- 
- static void xen_init_pv(MachineState *machine)
-@@ -46,19 +45,6 @@ static void xen_init_pv(MachineState *machine)
-     case XEN_ATTACH:
-         /* nothing to do, xend handles everything */
+@@ -95,6 +94,14 @@ static XenBlockRequest *xen_block_start_request(XenBlockDataPlane *dataplane)
+         /* allocate new struct */
+         request = g_malloc0(sizeof(*request));
+         request->dataplane = dataplane;
++        /*
++         * We cannot need more pages per requests than this, and since we
++         * re-use requests, allocate the memory once here. It will be freed
++         * xen_block_dataplane_destroy() when the request list is freed.
++         */
++        request->buf = qemu_memalign(XC_PAGE_SIZE,
++                                     BLKIF_MAX_SEGMENTS_PER_REQUEST *
++                                     XC_PAGE_SIZE);
+         dataplane->requests_total++;
+         qemu_iovec_init(&request->v, 1);
+     } else {
+@@ -272,14 +279,12 @@ static void xen_block_complete_aio(void *opaque, int ret)
+         if (ret == 0) {
+             xen_block_copy_request(request);
+         }
+-        qemu_vfree(request->buf);
          break;
--#ifdef CONFIG_XEN_PV_DOMAIN_BUILD
--    case XEN_CREATE: {
--        const char *kernel_filename = machine->kernel_filename;
--        const char *kernel_cmdline = machine->kernel_cmdline;
--        const char *initrd_filename = machine->initrd_filename;
--        if (xen_domain_build_pv(kernel_filename, initrd_filename,
--                                kernel_cmdline) < 0) {
--            error_report("xen pv domain creation failed");
--            exit(1);
--        }
--        break;
--    }
--#endif
-     case XEN_EMULATE:
-         error_report("xen emulation not implemented (yet)");
-         exit(1);
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index 7efcdaa8fe..978aaa31fb 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -15,7 +15,6 @@
- /* xen-machine.c */
- enum xen_mode {
-     XEN_EMULATE = 0,  // xen emulation, using xenner (default)
--    XEN_CREATE,       // create xen domain
-     XEN_ATTACH        // attach to xen domain created by xend
- };
+     case BLKIF_OP_WRITE:
+     case BLKIF_OP_FLUSH_DISKCACHE:
+         if (!request->req.nr_segments) {
+             break;
+         }
+-        qemu_vfree(request->buf);
+         break;
+     default:
+         break;
+@@ -360,12 +365,10 @@ static int xen_block_do_aio(XenBlockRequest *request)
+ {
+     XenBlockDataPlane *dataplane = request->dataplane;
  
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 93f631e5bf..2b91d199a1 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -661,24 +661,6 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
+-    request->buf = qemu_memalign(XC_PAGE_SIZE, request->size);
+     if (request->req.nr_segments &&
+         (request->req.operation == BLKIF_OP_WRITE ||
+          request->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
+         xen_block_copy_request(request)) {
+-        qemu_vfree(request->buf);
+         goto err;
+     }
  
- #endif
+@@ -665,6 +668,7 @@ void xen_block_dataplane_destroy(XenBlockDataPlane *dataplane)
+         request = QLIST_FIRST(&dataplane->freelist);
+         QLIST_REMOVE(request, list);
+         qemu_iovec_destroy(&request->v);
++        qemu_vfree(request->buf);
+         g_free(request);
+     }
  
--#ifdef CONFIG_XEN_PV_DOMAIN_BUILD
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40700
--static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
--                                    xen_domain_handle_t handle, uint32_t flags,
--                                    uint32_t *pdomid)
--{
--    return xc_domain_create(xc, ssidref, handle, flags, pdomid);
--}
--#else
--static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
--                                    xen_domain_handle_t handle, uint32_t flags,
--                                    uint32_t *pdomid)
--{
--    return xc_domain_create(xc, ssidref, handle, flags, pdomid, NULL);
--}
--#endif
--#endif
--
- /* Xen before 4.8 */
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40800
-diff --git a/qemu-options.hx b/qemu-options.hx
-index d4f3564b78..7c323c9406 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3394,10 +3394,6 @@ ETEXI
- 
- DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
-     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
--DEF("xen-create", 0, QEMU_OPTION_xen_create,
--    "-xen-create     create domain using xen hypercalls, bypassing xend\n"
--    "                warning: should not be used when xend is in use\n",
--    QEMU_ARCH_ALL)
- DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
-     "-xen-attach     attach to existing xen domain\n"
-     "                xend will use this when starting QEMU\n",
-@@ -3411,10 +3407,6 @@ STEXI
- @item -xen-domid @var{id}
- @findex -xen-domid
- Specify xen guest domain @var{id} (XEN only).
--@item -xen-create
--@findex -xen-create
--Create domain using xen hypercalls, bypassing xend.
--Warning: should not be used when xend is in use (XEN only).
- @item -xen-attach
- @findex -xen-attach
- Attach to existing xen domain.
-diff --git a/vl.c b/vl.c
-index 064872cc98..d3f74c051c 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3856,13 +3856,6 @@ int main(int argc, char **argv, char **envp)
-                 }
-                 xen_domid = atoi(optarg);
-                 break;
--            case QEMU_OPTION_xen_create:
--                if (!(xen_available())) {
--                    error_report("Option not supported for this target");
--                    exit(1);
--                }
--                xen_mode = XEN_CREATE;
--                break;
-             case QEMU_OPTION_xen_attach:
-                 if (!(xen_available())) {
-                     error_report("Option not supported for this target");
 -- 
 Anthony PERARD
