@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49731)
+Received: from eggs.gnu.org ([209.51.188.92]:54959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghfKd-0003u1-A2
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:45:32 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghfk8-0002oe-8s
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:11:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghfKY-0002ch-8R
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:45:29 -0500
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:35287)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ghfKV-0002Yp-C9
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:45:24 -0500
-Received: by mail-oi1-x22e.google.com with SMTP id v6so10126165oif.2
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 10:45:21 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1ghfk7-0001Ea-5h
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 14:11:52 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190103213320.2653-1-lbloch@janustech.com>
+	<20190103213320.2653-2-lbloch@janustech.com>
+	<8736q3ebs2.fsf@dusky.pond.sub.org>
+	<d0736347-867d-49f5-5615-dfe5f9b82412@janustech.com>
+	<87h8eghej3.fsf@dusky.pond.sub.org>
+	<2a653203-669e-f66e-cdab-82458ec72874@janustech.com>
+Date: Thu, 10 Jan 2019 20:11:41 +0100
+In-Reply-To: <2a653203-669e-f66e-cdab-82458ec72874@janustech.com> (Leonid
+	Bloch's message of "Thu, 10 Jan 2019 16:49:27 +0000")
+Message-ID: <87h8egba4y.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20190110083737.5036-1-laurent@vivier.eu>
-In-Reply-To: <20190110083737.5036-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 10 Jan 2019 18:45:09 +0000
-Message-ID: <CAFEAcA8sfEbEGEqKguXsqKJwapRZzUBi=_QEV6LcMe=mf_x0mw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Linux user for 4.0 patches
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Auto-generate the sizes
+ lookup table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: Leonid Bloch <lbloch@janustech.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Thu, 10 Jan 2019 at 09:01, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit 147923b1a901a0370f83a0f4c58ec1baffef22f0:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20190108-pull-request' into staging (2019-01-08 16:07:32 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-4.0-pull-request
->
-> for you to fetch changes up to 2bd3f8998e1e7dcd9afc29fab252fb9936f9e956:
->
->   linux-user: make pwrite64/pread64(fd, NULL, 0, offset) return 0 (2019-01-10 09:36:41 +0100)
->
-> ----------------------------------------------------------------
-> Minor linux-user update (2019-01-10)
-> Fixes LTP tests pwrite03 and pwrite03_64
->
-> ----------------------------------------------------------------
->
-> Peter Maydell (1):
->   linux-user: make pwrite64/pread64(fd, NULL, 0, offset) return 0
->
-> Tom Deseyn (1):
->   Add getsockopt for settable SOL_IPV6 options
->
->  linux-user/syscall.c | 61 +++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 57 insertions(+), 4 deletions(-)
+Leonid Bloch <lbloch@janustech.com> writes:
 
-Applied, thanks.
+> On 1/10/19 2:40 PM, Markus Armbruster wrote:
+>> Leonid Bloch <lbloch@janustech.com> writes:
+>>=20
+>>> Hi,
+>>>
+>>> On 1/8/19 11:31 AM, Markus Armbruster wrote:
+>>>> I'd leave it hard-coded.  Replacing a few trivial defines by an arguab=
+ly
+>>>> less trivial script doesn't feel like an improvement.  In this case, it
+>>>> doesn't even save lines.
+>>>
+>>> As I've said, I'm fine with that. The autogeneration sounds the right
+>>> thing to do here, as the table is autogenertaed anyway, but indeed it is
+>>> already there, explained, and even the script for generating it appears
+>>> in the comments for reproducibility.
+>>>
+>>>>
+>>>> I'm not sure I'd use shell for this, but since you already wrote it and
+>>>> it works...
+>>>>
+>>>
+>>> If you've noticed, the original script was in AWK. But to be as generic
+>>> as possible, I didn't write the generation script in AWK because even
+>>> AWK is not guaranteed to be installed on the build system. The only
+>>> interpreted language that is guaranteed to be there is shell (most basic
+>>> shell) because .configure itself needs it.
+>>=20
+>> Well,
+>>=20
+>>      $ grep -w awk configure
+>>          maj=3D`libgcrypt-config --version | awk -F . '{print $1}'`
+>>          min=3D`libgcrypt-config --version | awk -F . '{print $2}'`
+>>=20
+>> The build also requires Python.
+>
+> Not for critical things as this. I mean it can still build OK without=20
+> Python.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+You can=C3=83't.  Try it :)
 
--- PMM
+>>=20
+>> [...]
+>>=20
