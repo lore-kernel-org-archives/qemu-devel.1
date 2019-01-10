@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46868)
+Received: from eggs.gnu.org ([209.51.188.92]:50140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghjhk-00049i-GR
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 18:25:41 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghk0R-0001WB-Gc
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 18:45:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghjhi-0007UI-Dj
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 18:25:40 -0500
-Received: from mail-wm1-f43.google.com ([209.85.128.43]:39853)
+	(envelope-from <pbonzini@redhat.com>) id 1ghk0Q-0002jI-N9
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 18:44:59 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:44297)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghjhi-0007Sd-1d
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 18:25:38 -0500
-Received: by mail-wm1-f43.google.com with SMTP id y8so647628wmi.4
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 15:25:37 -0800 (PST)
-References: <CAJSP0QUV39fK4L8MwQ-rGiR0ejUm0HCyKFqARh-SKRTuDPKOXg@mail.gmail.com>
-	<jpgsgy0aaw6.fsf@linux.bootlegged.copy>
-	<CACT4Y+YWVfg_PVh0=CTCgM9BRyCmKZB9N+_DBimaNKPE=y6r5Q@mail.gmail.com>
-	<CABiizEQ-O-Ro9cH3xqzZUB=c5k+oYJ-gdR7ssfbbn5kU_8GcAA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghk0Q-0002iv-HE
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 18:44:58 -0500
+Received: by mail-wr1-f66.google.com with SMTP id z5so13280302wrt.11
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 15:44:58 -0800 (PST)
+References: <8e67afb3-46b4-9d04-552f-740331165f8f@cisco.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e4af7025-fa8c-1078-62de-f77a11a79fc0@redhat.com>
-Date: Fri, 11 Jan 2019 00:25:32 +0100
+Message-ID: <51071cba-c18f-e491-4d92-6a40130584a7@redhat.com>
+Date: Fri, 11 Jan 2019 00:44:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <CABiizEQ-O-Ro9cH3xqzZUB=c5k+oYJ-gdR7ssfbbn5kU_8GcAA@mail.gmail.com>
+In-Reply-To: <8e67afb3-46b4-9d04-552f-740331165f8f@cisco.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Internship idea: virtio-blk oss-fuzz support
+Subject: Re: [Qemu-devel] KVM serial8250: too much work for irq3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Moroz <mmoroz@google.com>, Dmitry Vyukov <dvyukov@google.com>, Oliver Chang <ochang@google.com>, Jonathan Metzman <metzman@google.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Bandan Das <bsd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Andrey Konovalov <andreyknvl@google.com>, Kostya Serebryany <kcc@google.com>
+To: Denys Zagorui <dzagorui@cisco.com>, hpa@zytor.com
+Cc: qemu-devel@nongnu.org
 
-On 10/01/19 17:07, Max Moroz via Qemu-devel wrote:
-> +Oliver and Jonathan
+On 22/09/17 15:28, Denys Zagorui wrote:
+> Hello
 > 
-> I'm a little confused. Do you want to fuzz QEMU or to fuzz something else
-> using QEMU? In case of the latter, there was some discussion on OSS-Fuzz
-> and (I think) even a build support was (sort of) added:
-> https://github.com/google/oss-fuzz/issues/1754
+> This is known issue, it was mentioned at first time about 9 years ago.
+> 
+> https://lkml.org/lkml/2008/2/5/401
+> 
+> https://bugzilla.redhat.com/show_bug.cgi?id=986761
 
-We want to fuzz QEMU.
+The issue is simply that QEMU disregards the baud rate that the guest
+programs into the serial port.  H. Peter Anvin's patch, which you
+mention, is only a band aid that is geared specifically at avoiding
+Linux's error.
 
-The input is a sequence of operations on a PCI device or on guest
-memory, and you try and crash QEMU by passing it crazy operations.
+It was fixed for real in commit 6936bfe514bbac7af4b24fad9ed9688b78b5be69
+by implementing a baud rate timer (May 2008), but then undone in
+fcfb4d6aae611d1f804d486d3c998000912c4c81 (March 2013) when the serial
+port got flow control support.
 
-The qtest mode that Stefan mentioned provides something like a "JTAG
-over ASCII" where a testcase can inject elementary I/O operations into
-QEMU.  However, that is certainly too much for AFL to fuzz effectively;
-it would have to "learn" the qtest protocol, how to drive the PCI host
-bridge, how to setup a PCI device, and only then it would be able to
-find bugs.  So one idea would be to build another layer on top of qtest,
-that accepts higher-level operations and builds the qtest ASCII input
-from those.
-
-However, compared to LLVM/Clang that were the motivation for
-libprotobuf-mutator, in our case the underlying operands to the
-operations are still binary.  So it may also be possible to use the
-usual AFL binary mutator, and encode the operations in a way that has
-very high entropy.  This way AFL can just throw crap at the qtest input
-generator, and the resulting input qtest will always represent some kind
-of interaction with a PCI device.
+Part of the reason may have been laziness, but also there are reasons to
+keep it this way.  Basically, the baud rate timer was implemented also
+in order to mitigate the problem with losing characters sent by the
+guest on the serial console; and thanks to flow control, QEMU will
+already slow down the transmit so that the other side never loses
+characters.  And because looking at logs on a serial console bps is slow
+and mildly annoying even at 115200 bps, it was decided that the "too
+much work" error was the lesser evil.
 
 Thanks,
 
 Paolo
-
-> In any case, it would probably be "integrate QEMU into OSS-Fuzz" and not
-> vice versa, since OSS-Fuzz is an infrastructure and you can't integrate it
-> into QEMU.
