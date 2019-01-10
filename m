@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49517)
+Received: from eggs.gnu.org ([209.51.188.92]:51241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghXKU-0003wn-A1
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:12:51 -0500
+	(envelope-from <jack@suse.cz>) id 1ghXPY-0005uU-CE
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:18:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ghXKS-00030l-LC
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:12:50 -0500
-Date: Thu, 10 Jan 2019 10:12:43 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190110101243.GE2178@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
-	<1547051976-13982-2-git-send-email-thuth@redhat.com>
-	<3316bf08-36c0-c3ce-4e4f-8244276c58d3@kaod.org>
-	<20190109172801.GB3998@redhat.com>
-	<d72673fa-52a5-a6ff-6aa8-34f2b4b6855f@redhat.com>
-	<60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
+	(envelope-from <jack@suse.cz>) id 1ghXPX-0005hI-3N
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:18:04 -0500
+Received: from mx2.suse.de ([195.135.220.15]:33736 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jack@suse.cz>) id 1ghXPV-0005ga-O0
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:18:03 -0500
+Date: Thu, 10 Jan 2019 11:17:57 +0100
+From: Jan Kara <jack@suse.cz>
+Message-ID: <20190110101757.GC15790@quack2.suse.cz>
+References: <20190109144736.17452-1-pagupta@redhat.com>
+	<20190110012617.GA4205@dastard>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
- compilation with clang -std=gnu99
+In-Reply-To: <20190110012617.GA4205@dastard>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-acpi@vger.kernel.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com, david@redhat.com, jmoyer@redhat.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, mst@redhat.com, jasowang@redhat.com, lcapitulino@redhat.com, imammedo@redhat.com, eblake@redhat.com, willy@infradead.org, tytso@mit.edu, adilger.kernel@dilger.ca, darrick.wong@oracle.com, rjw@rjwysocki.net
 
-On Wed, Jan 09, 2019 at 03:25:53PM -0600, Eric Blake wrote:
-> On 1/9/19 3:20 PM, Paolo Bonzini wrote:
-> > On 09/01/19 18:28, Daniel P. Berrang=C3=A9 wrote:
-> >>> so both files include each other, how nice ...
-> >> If the header files are mutually dependent it makes me wonder what t=
-he
-> >> point of having them split up is ?
-> >>
-> >> Feels like either they need to be merged, or they need to be split u=
-p
-> >> and refactored even more to remove the mutual dependancy.
-> >=20
-> > If they include each other only for the typedefs, then prehaps the
-> > solution is to change the coding style and allow using struct in
-> > function prototypes.  I'm pretty sure there are several examples of t=
-his
-> > already.
->=20
-> Or stick the typedef in <typedefs.h>, instead of trying to find (or
-> create) some other common header.
+On Thu 10-01-19 12:26:17, Dave Chinner wrote:
+> On Wed, Jan 09, 2019 at 08:17:31PM +0530, Pankaj Gupta wrote:
+> >  This patch series has implementation for "virtio pmem". 
+> >  "virtio pmem" is fake persistent memory(nvdimm) in guest 
+> >  which allows to bypass the guest page cache. This also
+> >  implements a VIRTIO based asynchronous flush mechanism.  
+> 
+> Hmmmm. Sharing the host page cache direct into the guest VM. Sounds
+> like a good idea, but.....
+> 
+> This means the guest VM can now run timing attacks to observe host
+> side page cache residency, and depending on the implementation I'm
+> guessing that the guest will be able to control host side page
+> cache eviction, too (e.g. via discard or hole punch operations).
+> 
+> Which means this functionality looks to me like a new vector for
+> information leakage into and out of the guest VM via guest
+> controlled host page cache manipulation.
+> 
+> https://arxiv.org/pdf/1901.01161
+> 
+> I might be wrong, but if I'm not we're going to have to be very
+> careful about how guest VMs can access and manipulate host side
+> resources like the page cache.....
 
-Probably better to just have a local  spapr_types.h instead of
-polluting the global namespace.
+Right. Thinking about this I would be more concerned about the fact that
+guest can effectively pin amount of host's page cache upto size of the
+device/file passed to guest as PMEM, can't it Pankaj? Or is there some QEMU
+magic that avoids this?
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
