@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55897)
+Received: from eggs.gnu.org ([209.51.188.92]:55944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZHT-0004ST-Aa
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:52 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZHV-0004Uh-RW
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZHS-0007WY-Ez
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:51 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34144)
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZHU-0007Yj-UE
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:53 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43506)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ghZHS-0007Vt-8K
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:50 -0500
-Received: by mail-pg1-x542.google.com with SMTP id j10so4776332pga.1
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:17:50 -0800 (PST)
+	id 1ghZHU-0007Y8-Ne
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:17:52 -0500
+Received: by mail-pl1-x643.google.com with SMTP id gn14so5109073plb.10
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:17:52 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 Jan 2019 23:17:27 +1100
-Message-Id: <20190110121736.23448-3-richard.henderson@linaro.org>
+Date: Thu, 10 Jan 2019 23:17:28 +1100
+Message-Id: <20190110121736.23448-4-richard.henderson@linaro.org>
 In-Reply-To: <20190110121736.23448-1-richard.henderson@linaro.org>
 References: <20190110121736.23448-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 02/11] target/arm: Add PSTATE.BTYPE
+Subject: [Qemu-devel] [PATCH 03/11] target/arm: Add BT and BTYPE to tb->flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +29,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Place this in its own field within ENV, as that will
-make it easier to reset from within TCG generated code.
-
-With the change to pstate_read/write, exception entry
-and return are automatically handled.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h           | 8 ++++++--
- target/arm/translate-a64.c | 3 +++
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ target/arm/cpu.h           |  2 ++
+ target/arm/translate.h     |  4 ++++
+ target/arm/helper.c        | 22 +++++++++++++++-------
+ target/arm/translate-a64.c |  2 ++
+ 4 files changed, 23 insertions(+), 7 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index fadb74d9a6..8179c07250 100644
+index 8179c07250..506c490a16 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -234,6 +234,7 @@ typedef struct CPUARMState {
-      *    semantics as for AArch32, as described in the comments on each field)
-      *  nRW (also known as M[4]) is kept, inverted, in env->aarch64
-      *  DAIF (exception masks) are kept in env->daif
-+     *  BTYPE is kept in env->btype
-      *  all other bits are stored in their correct places in env->pstate
-      */
-     uint32_t pstate;
-@@ -263,6 +264,7 @@ typedef struct CPUARMState {
-     uint32_t GE; /* cpsr[19:16] */
-     uint32_t thumb; /* cpsr[5]. 0 = arm mode, 1 = thumb mode. */
-     uint32_t condexec_bits; /* IT bits.  cpsr[15:10,26:25].  */
-+    uint32_t btype;  /* BTI branch type.  spsr[11:10].  */
-     uint64_t daif; /* exception masks, in the bits they are in PSTATE */
+@@ -2990,6 +2990,8 @@ FIELD(TBFLAG_A64, TBII, 0, 2)
+ FIELD(TBFLAG_A64, SVEEXC_EL, 2, 2)
+ FIELD(TBFLAG_A64, ZCR_LEN, 4, 4)
+ FIELD(TBFLAG_A64, PAUTH_ACTIVE, 8, 1)
++FIELD(TBFLAG_A64, BT, 9, 1)
++FIELD(TBFLAG_A64, BTYPE, 10, 2)
  
-     uint64_t elr_el[4]; /* AArch64 exception link regs  */
-@@ -1155,6 +1157,7 @@ void pmccntr_sync(CPUARMState *env);
- #define PSTATE_I (1U << 7)
- #define PSTATE_A (1U << 8)
- #define PSTATE_D (1U << 9)
-+#define PSTATE_BTYPE (3U << 10)
- #define PSTATE_IL (1U << 20)
- #define PSTATE_SS (1U << 21)
- #define PSTATE_V (1U << 28)
-@@ -1163,7 +1166,7 @@ void pmccntr_sync(CPUARMState *env);
- #define PSTATE_N (1U << 31)
- #define PSTATE_NZCV (PSTATE_N | PSTATE_Z | PSTATE_C | PSTATE_V)
- #define PSTATE_DAIF (PSTATE_D | PSTATE_A | PSTATE_I | PSTATE_F)
--#define CACHED_PSTATE_BITS (PSTATE_NZCV | PSTATE_DAIF)
-+#define CACHED_PSTATE_BITS (PSTATE_NZCV | PSTATE_DAIF | PSTATE_BTYPE)
- /* Mode values for AArch64 */
- #define PSTATE_MODE_EL3h 13
- #define PSTATE_MODE_EL3t 12
-@@ -1195,7 +1198,7 @@ static inline uint32_t pstate_read(CPUARMState *env)
-     ZF = (env->ZF == 0);
-     return (env->NF & 0x80000000) | (ZF << 30)
-         | (env->CF << 29) | ((env->VF & 0x80000000) >> 3)
--        | env->pstate | env->daif;
-+        | env->pstate | env->daif | (env->btype << 10);
- }
+ static inline bool bswap_code(bool sctlr_b)
+ {
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index bb37d35741..3d5e8bacac 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -69,6 +69,10 @@ typedef struct DisasContext {
+     bool ss_same_el;
+     /* True if v8.3-PAuth is active.  */
+     bool pauth_active;
++    /* True with v8.5-BTI and SCTLR_ELx.BT* set.  */
++    bool bt;
++    /* A copy of PSTATE.BTYPE, which will be 0 without v8.5-BTI.  */
++    uint8_t btype;
+     /* Bottom two bits of XScale c15_cpar coprocessor access control reg */
+     int c15_cpar;
+     /* TCG op of the current insn_start.  */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 0e1bf521ab..138d9d5565 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -13076,6 +13076,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
  
- static inline void pstate_write(CPUARMState *env, uint32_t val)
-@@ -1205,6 +1208,7 @@ static inline void pstate_write(CPUARMState *env, uint32_t val)
-     env->CF = (val >> 29) & 1;
-     env->VF = (val << 3) & 0x80000000;
-     env->daif = val & PSTATE_DAIF;
-+    env->btype = (val >> 10) & 3;
-     env->pstate = val & ~CACHED_PSTATE_BITS;
- }
+     if (is_a64(env)) {
+         ARMCPU *cpu = arm_env_get_cpu(env);
++        uint64_t sctlr;
  
+         *pc = env->pc;
+         flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
+@@ -13120,6 +13121,12 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+             flags = FIELD_DP32(flags, TBFLAG_A64, ZCR_LEN, zcr_len);
+         }
+ 
++        if (current_el == 0) {
++            /* FIXME: ARMv8.1-VHE S2 translation regime.  */
++            sctlr = env->cp15.sctlr_el[1];
++        } else {
++            sctlr = env->cp15.sctlr_el[current_el];
++        }
+         if (cpu_isar_feature(aa64_pauth, cpu)) {
+             /*
+              * In order to save space in flags, we record only whether
+@@ -13127,17 +13134,18 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+              * a nop, or "active" when some action must be performed.
+              * The decision of which action to take is left to a helper.
+              */
+-            uint64_t sctlr;
+-            if (current_el == 0) {
+-                /* FIXME: ARMv8.1-VHE S2 translation regime.  */
+-                sctlr = env->cp15.sctlr_el[1];
+-            } else {
+-                sctlr = env->cp15.sctlr_el[current_el];
+-            }
+             if (sctlr & (SCTLR_EnIA | SCTLR_EnIB | SCTLR_EnDA | SCTLR_EnDB)) {
+                 flags = FIELD_DP32(flags, TBFLAG_A64, PAUTH_ACTIVE, 1);
+             }
+         }
++
++        if (cpu_isar_feature(aa64_bti, cpu)) {
++            /* Note that SCTLR_EL[23].BT == SCTLR_BT1.  */
++            if (sctlr & (current_el == 0 ? SCTLR_BT0 : SCTLR_BT1)) {
++                flags = FIELD_DP32(flags, TBFLAG_A64, BT, 1);
++            }
++            flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
++        }
+     } else {
+         *pc = env->regs[15];
+         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 2c5ad1774a..e43f0982f9 100644
+index e43f0982f9..ca2ae40701 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -163,6 +163,9 @@ void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
-                 el,
-                 psr & PSTATE_SP ? 'h' : 't');
- 
-+    if (cpu_isar_feature(aa64_bti, cpu)) {
-+        cpu_fprintf(f, "  BTYPE=%d", (psr & PSTATE_BTYPE) >> 10);
-+    }
-     if (!(flags & CPU_DUMP_FPU)) {
-         cpu_fprintf(f, "\n");
-         return;
+@@ -13800,6 +13800,8 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+     dc->sve_excp_el = FIELD_EX32(tb_flags, TBFLAG_A64, SVEEXC_EL);
+     dc->sve_len = (FIELD_EX32(tb_flags, TBFLAG_A64, ZCR_LEN) + 1) * 16;
+     dc->pauth_active = FIELD_EX32(tb_flags, TBFLAG_A64, PAUTH_ACTIVE);
++    dc->bt = FIELD_EX32(tb_flags, TBFLAG_A64, BT);
++    dc->btype = FIELD_EX32(tb_flags, TBFLAG_A64, BTYPE);
+     dc->vec_len = 0;
+     dc->vec_stride = 0;
+     dc->cp_regs = arm_cpu->cp_regs;
 -- 
 2.17.2
