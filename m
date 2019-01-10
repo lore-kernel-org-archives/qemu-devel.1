@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34192)
+Received: from eggs.gnu.org ([209.51.188.92]:35612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ghY8p-0008G0-Fg
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:04:52 -0500
+	(envelope-from <elohimes@gmail.com>) id 1ghYDp-0002VY-9L
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:10:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ghY8o-0004LE-Hd
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:04:51 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:36037)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ghY8m-0004HL-GL
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:04:50 -0500
-References: <1547115782-26271-1-git-send-email-thuth@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <5dc4b081-ebd9-d7e7-7f5d-889d187500c8@vivier.eu>
-Date: Thu, 10 Jan 2019 12:04:00 +0100
+	(envelope-from <elohimes@gmail.com>) id 1ghYDo-0006xJ-Hr
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:10:01 -0500
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:35054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1ghYDo-0006wN-96
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 06:10:00 -0500
+Received: by mail-yw1-xc41.google.com with SMTP id h32so4235883ywk.2
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 03:10:00 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1547115782-26271-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Fix compilation with clang
- 3.4
+References: <20190109112728.9214-1-xieyongji@baidu.com>
+	<CAJ+F1CLPFUnJANJs3SSine9YRXXqpR+gh6wHOLD=ivWpyURmJA@mail.gmail.com>
+In-Reply-To: <CAJ+F1CLPFUnJANJs3SSine9YRXXqpR+gh6wHOLD=ivWpyURmJA@mail.gmail.com>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Thu, 10 Jan 2019 19:09:47 +0800
+Message-ID: <CAONzpcYAfHo+uWRZxVY6+iE2wyTtC7dpm-h+rU-Nipz3xz=RwA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 0/7] vhost-user-blk: Add support
+ for backend reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, QEMU <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-On 10/01/2019 11:23, Thomas Huth wrote:
-> Clang version 3.4.2 does not know the -Wpragmas option yet and bails
-> out with an error when we try to disable it in linux-user/qemu.h.
-> Fortunately, clang has a __has_warning() macro which allows us to add
-> an explicit check for the warning that we like to disable. With that we
-> can check for the availability of "-Waddress-of-packed-member" properly
-> and do not need the "-Wpragmas" at all here.
-> 
-> Fixes: 850d5e330a9c68cc998cecc02caf8a3c8d1ee8a3
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   v2: Drop -Wpragmas now completely
-> 
->   include/qemu/compiler.h | 4 ++++
->   linux-user/qemu.h       | 6 +-----
->   2 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-> index 261842b..28fa438 100644
-> --- a/include/qemu/compiler.h
-> +++ b/include/qemu/compiler.h
-> @@ -113,6 +113,10 @@
->   #define GCC_FMT_ATTR(n, m)
->   #endif
->   
-> +#ifndef __has_warning
-> +#define __has_warning(x) 0 /* compatibility with non-clang compilers */
-> +#endif
-> +
->   #ifndef __has_feature
->   #define __has_feature(x) 0 /* compatibility with non-clang compilers */
->   #endif
-> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-> index dd5771c..63a8998 100644
-> --- a/linux-user/qemu.h
-> +++ b/linux-user/qemu.h
-> @@ -474,17 +474,13 @@ static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
->    *   functions than host-endian unaligned load/store plus tswapN.
->    * - The pragmas are necessary only to silence a clang false-positive
->    *   warning: see https://bugs.llvm.org/show_bug.cgi?id=39113 .
-> - * - We have to disable -Wpragmas warnings to avoid a complaint about
-> - *   an unknown warning type from older compilers that don't know about
-> - *   -Waddress-of-packed-member.
->    * - gcc has bugs in its _Pragma() support in some versions, eg
->    *   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83256 -- so we only
->    *   include the warning-suppression pragmas for clang
->    */
-> -#ifdef __clang__
-> +#if defined(__clang__) && __has_warning("-Waddress-of-packed-member")
->   #define PRAGMA_DISABLE_PACKED_WARNING                                   \
->       _Pragma("GCC diagnostic push");                                     \
-> -    _Pragma("GCC diagnostic ignored \"-Wpragmas\"");                    \
->       _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"")
->   
->   #define PRAGMA_REENABLE_PACKED_WARNING          \
-> 
+On Thu, 10 Jan 2019 at 18:39, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+>
+> Hi
+>
+> On Wed, Jan 9, 2019 at 3:28 PM <elohimes@gmail.com> wrote:
+> >
+> > From: Xie Yongji <xieyongji@baidu.com>
+> >
+> > This patchset is aimed at supporting qemu to reconnect
+> > vhost-user-blk backend after vhost-user-blk backend crash or
+> > restart.
+> >
+> > The patch 1 uses exisiting wait/nowait options to make QEMU not
+> > do a connect on client sockets during initialization of the chardev.
+> >
+> > The patch 2 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
+> > and VHOST_USER_SET_INFLIGHT_FD to support providing shared
+> > memory to backend.
+> >
+> > The patch 3,4 are the corresponding libvhost-user patches of
+> > patch 2. Make libvhost-user support VHOST_USER_GET_INFLIGHT_FD
+> > and VHOST_USER_SET_INFLIGHT_FD.
+> >
+> > The patch 5 allows vhost-user-blk to use the two new messages
+> > to get/set inflight buffer from/to backend.
+> >
+> > The patch 6 supports vhost-user-blk to reconnect backend when
+> > connection closed.
+> >
+> > The patch 7 introduces VHOST_USER_PROTOCOL_F_SLAVE_SHMFD
+> > to vhost-user-blk backend which is used to tell qemu that
+> > we support reconnecting now.
+> >
+> > To use it, we could start qemu with:
+> >
+> > qemu-system-x86_64 \
+> >         -chardev socket,id=3Dchar0,path=3D/path/vhost.socket,nowait,rec=
+onnect=3D1, \
+> >         -device vhost-user-blk-pci,chardev=3Dchar0 \
+> >
+> > and start vhost-user-blk backend with:
+> >
+> > vhost-user-blk -b /path/file -s /path/vhost.socket
+> >
+> > Then we can restart vhost-user-blk at any time during VM running.
+> >
+> > V3 to V4:
+> > - Drop messages VHOST_USER_GET_SHM_SIZE and VHOST_USER_SET_SHM_FD
+> > - Introduce two new messages VHOST_USER_GET_INFLIGHT_FD
+> >   and VHOST_USER_SET_INFLIGHT_FD
+> > - Allocate inflight buffer in backend rather than in qemu
+> > - Document a recommended format for inflight buffer
+> >
+> > V2 to V3:
+> > - Using exisiting wait/nowait options to control connection on
+> >   client sockets instead of introducing "disconnected" option.
+> > - Support the case that vhost-user backend restart during initialzation
+> >   of vhost-user-blk device.
+> >
+> > V1 to V2:
+> > - Introduce "disconnected" option for chardev instead of reuse "wait"
+> >   option
+> > - Support the case that QEMU starts before vhost-user backend
+> > - Drop message VHOST_USER_SET_VRING_INFLIGHT
+> > - Introduce two new messages VHOST_USER_GET_SHM_SIZE
+> >   and VHOST_USER_SET_SHM_FD
+> >
+> > Xie Yongji (7):
+> >   char-socket: Enable "nowait" option on client sockets
+>
+> This patch breaks make check.
+>
+> It would be nice to add a test for the new nowait behaviour.
+>
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Oh, sorry. I'll fix this issue and add one test for "nowait" option. Thank =
+you!
+
+Thanks,
+Yongji
