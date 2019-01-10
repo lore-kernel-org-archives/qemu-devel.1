@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51033)
+Received: from eggs.gnu.org ([209.51.188.92]:51657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghVjb-0004Yl-Fu
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 03:30:40 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghVmG-0005E3-Lv
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 03:33:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghVja-0006GU-Gj
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 03:30:39 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34350)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1ghVjY-00065f-MD
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 03:30:38 -0500
-Received: by mail-wm1-x341.google.com with SMTP id y185so12772490wmd.1
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 00:30:31 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1ghVmD-0007G8-Qq
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 03:33:22 -0500
+References: <c162ffeb1bb1cbcdeb47ea62a829294168a0ebdf.1547078463.git.alistair.francis@wdc.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e319aa13-1a43-d369-1213-060cf85b13a4@redhat.com>
+Date: Thu, 10 Jan 2019 09:33:10 +0100
 MIME-Version: 1.0
-References: <20190110020259.8492-1-ehabkost@redhat.com>
-	<20190110020259.8492-2-ehabkost@redhat.com>
-In-Reply-To: <20190110020259.8492-2-ehabkost@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 10 Jan 2019 12:30:18 +0400
-Message-ID: <CAJ+F1CLZu1tnWc047xEBLT-K2LAwHL2+6TvS+UGuzGEBpHVRFQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] qom: Don't keep error value between
- object_property_parse() calls
+In-Reply-To: <c162ffeb1bb1cbcdeb47ea62a829294168a0ebdf.1547078463.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] default-configs: Enable USB support
+ for RISC-V machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-On Thu, Jan 10, 2019 at 6:04 AM Eduardo Habkost <ehabkost@redhat.com> wrote=
-:
->
-> When handling errp=3D=3DNULL at object_apply_global_props(), we are
-> leaving the old error value in `err` after printing a warning.
-> This makes QEMU crash if two global properties generate warnings:
->
->   $ echo device_add rtl8139 | qemu-system-x86_64 -monitor stdio -global r=
-tl8139.xxx=3Dyyy -global rtl8139.xxx=3Dzzz
->   warning: can't apply global rtl8139.xxx=3Dyyy: Property '.xxx' not foun=
-d
->   qemu-system-x86_64: util/error.c:57: error_setv: Assertion `*errp =3D=
-=3D NULL' failed.
->   Aborted (core dumped)
->
-> Fix that by making `err` go out of scope immediately after the
-> warn_report_err() call.
->
-> Fixes: 50545b2cc029 "qdev-props: call object_apply_global_props()"
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
+On 2019-01-10 01:01, Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  qom/object.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/qom/object.c b/qom/object.c
-> index aa6f3a2a71..4e5226ca12 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -372,7 +372,6 @@ static void object_post_init_with_type(Object *obj, T=
-ypeImpl *ti)
->
->  void object_apply_global_props(Object *obj, const GPtrArray *props, Erro=
-r **errp)
->  {
-> -    Error *err =3D NULL;
->      int i;
->
->      if (!props) {
-> @@ -381,6 +380,7 @@ void object_apply_global_props(Object *obj, const GPt=
-rArray *props, Error **errp
->
->      for (i =3D 0; i < props->len; i++) {
->          GlobalProperty *p =3D g_ptr_array_index(props, i);
-> +        Error *err =3D NULL;
->
->          if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
->              continue;
-> --
-> 2.18.0.rc1.1.g3f1ff2140
->
->
+>  default-configs/riscv32-softmmu.mak | 1 +
+>  default-configs/riscv64-softmmu.mak | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+> index dbc9398284..c9c5971409 100644
+> --- a/default-configs/riscv32-softmmu.mak
+> +++ b/default-configs/riscv32-softmmu.mak
+> @@ -1,6 +1,7 @@
+>  # Default configuration for riscv-softmmu
+>  
+>  include pci.mak
+> +include usb.mak
+>  
+>  CONFIG_SERIAL=y
+>  CONFIG_VIRTIO_MMIO=y
+> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+> index dbc9398284..c9c5971409 100644
+> --- a/default-configs/riscv64-softmmu.mak
+> +++ b/default-configs/riscv64-softmmu.mak
+> @@ -1,6 +1,7 @@
+>  # Default configuration for riscv-softmmu
+>  
+>  include pci.mak
+> +include usb.mak
+>  
+>  CONFIG_SERIAL=y
+>  CONFIG_VIRTIO_MMIO=y
 
+Makes sense if the PCI HCDs are already working.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Reviewed-by: Thomas Huth <thuth@redhat.com>
