@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44037)
+Received: from eggs.gnu.org ([209.51.188.92]:49287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghOm1-0001qr-Qn
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 20:04:44 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1ghP4r-0005Ze-Qo
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 20:24:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghOlz-00068B-6Y
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 20:04:41 -0500
-Received: from smtp65.cstnet.cn ([159.226.251.65]:48057 helo=cstnet.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wuzhouhui14@mails.ucas.ac.cn>) id 1ghOlx-0005wB-3V
-	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 20:04:39 -0500
-Date: Thu, 10 Jan 2019 09:04:06 +0800 (GMT+08:00)
-From: wuzhouhui <wuzhouhui14@mails.ucas.ac.cn>
-In-Reply-To: <b6f9fccf992b03b762daecbae3a5fc80605e9b52.camel@intel.com>
-References: <ae9873.3d686.1683223a356.Coremail.wuzhouhui14@mails.ucas.ac.cn>
-	<20190109124258.GD18942@stefanha-x1.localdomain>
-	<234daa90.3dc4b.16832c82ae0.Coremail.wuzhouhui14@mails.ucas.ac.cn>
-	<b6f9fccf992b03b762daecbae3a5fc80605e9b52.camel@intel.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <yan.y.zhao@intel.com>) id 1ghP4q-00043w-MI
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 20:24:09 -0500
+Received: from mga17.intel.com ([192.55.52.151]:5351)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1ghP4q-0003u2-Bd
+	for qemu-devel@nongnu.org; Wed, 09 Jan 2019 20:24:08 -0500
+Date: Wed, 9 Jan 2019 20:19:22 -0500
+From: Zhao Yan <yan.y.zhao@intel.com>
+Message-ID: <20190110011922.GA10707@joy-OptiPlex-7040>
+References: <20190108060348.3359-1-yan.y.zhao@intel.com>
+	<20190108060348.3359-2-yan.y.zhao@intel.com>
+	<20190108100911.6e089f8c@x1.home>
 MIME-Version: 1.0
-Message-ID: <2756b1c6.1cc6e.1683549aa6f.Coremail.wuzhouhui14@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] [SPDK] Qemu migration with vhost-user-blk on top
- of local storage
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190108100911.6e089f8c@x1.home>
+Subject: Re: [Qemu-devel] [PATCH] vfio: assign idstr for VFIO's mmaped
+ regions for migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,119 +31,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: storage performance development kit <spdk@lists.01.org>
-Cc: "stefanha@gmail.com" <stefanha@gmail.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "xieyongji@baidu.com" <xieyongji@baidu.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "lilin24@baidu.com" <lilin24@baidu.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiV29ka293c2tpLCBQYXdlbFgi
-IDxwYXdlbHgud29ka293c2tpQGludGVsLmNvbT4KPiBTZW50IFRpbWU6IDIwMTktMDEtMTAgMDA6
-MTk6NDggKFRodXJzZGF5KQo+IFRvOiAic3RlZmFuaGFAZ21haWwuY29tIiA8c3RlZmFuaGFAZ21h
-aWwuY29tPiwgInNwZGtAbGlzdHMuMDEub3JnIiA8c3Bka0BsaXN0cy4wMS5vcmc+Cj4gQ2M6ICJs
-aWJ2aXItbGlzdEByZWRoYXQuY29tIiA8bGlidmlyLWxpc3RAcmVkaGF0LmNvbT4sICJ4aWV5b25n
-amlAYmFpZHUuY29tIiA8eGlleW9uZ2ppQGJhaWR1LmNvbT4sICJxZW11LWRldmVsQG5vbmdudS5v
-cmciIDxxZW11LWRldmVsQG5vbmdudS5vcmc+LCAibGlsaW4yNEBiYWlkdS5jb20iIDxsaWxpbjI0
-QGJhaWR1LmNvbT4KPiBTdWJqZWN0OiBSZTogW1NQREtdIFtRZW11LWRldmVsXSBRZW11IG1pZ3Jh
-dGlvbiB3aXRoIHZob3N0LXVzZXItYmxrIG9uIHRvcCBvZiBsb2NhbCBzdG9yYWdlCj4gCj4gT24g
-V2VkLCAyMDE5LTAxLTA5IGF0IDIxOjIzICswODAwLCB3dXpob3VodWkgd3JvdGU6Cj4gPiA+IC0t
-LS0tT3JpZ2luYWwgTWVzc2FnZXMtLS0tLQo+ID4gPiBGcm9tOiAiU3RlZmFuIEhham5vY3ppIiA8
-c3RlZmFuaGFAZ21haWwuY29tPgo+ID4gPiBTZW50IFRpbWU6IDIwMTktMDEtMDkgMjA6NDI6NTgg
-KFdlZG5lc2RheSkKPiA+ID4gVG86IHd1emhvdWh1aSA8d3V6aG91aHVpMTRAbWFpbHMudWNhcy5h
-Yy5jbj4KPiA+ID4gQ2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZywgeGlleW9uZ2ppQGJhaWR1LmNv
-bSwgbGlsaW4yNEBiYWlkdS5jb20sIAo+ID4gPiBsaWJ2aXItbGlzdEByZWRoYXQuY29tLCBzcGRr
-QGxpc3RzLjAxLm9yZwo+ID4gPiBTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFFlbXUgbWlncmF0
-aW9uIHdpdGggdmhvc3QtdXNlci1ibGsgb24gdG9wCj4gPiA+IG9mIGxvY2FsIHN0b3JhZ2UKPiA+
-ID4gCj4gPiA+IE9uIFdlZCwgSmFuIDA5LCAyMDE5IGF0IDA2OjIzOjQyUE0gKzA4MDAsIHd1emhv
-dWh1aSB3cm90ZToKPiA+ID4gPiBIaSBldmVyeW9uZSwKPiA+ID4gPiAKPiA+ID4gPiBJJ20gd29y
-a2luZyBxZW11IHdpdGggdmhvc3QgdGFyZ2V0IChlLmcuIHNwZGspLCBhbmQgSSBhdHRlbXB0IHRv
-Cj4gPiA+ID4gbWlncmF0ZSBWTSB3aXRoCj4gPiA+ID4gMiBsb2NhbCBzdG9yYWdlcy4gT25lIGxv
-Y2FsIHN0b3JhZ2UgaXMgYSByZWd1bGFyIGZpbGUsIGUuZy4KPiA+ID4gPiAvdG1wL2M3NC5xY293
-MiwgYW5kCj4gPiA+ID4gdGhlIG90aGVyIGlzIGEgbWFsbG9jIGJkZXYgdGhhdCBzcGRrIGNyZWF0
-ZWQuIFRoaXMgbWFsbG9jIGJkZXYKPiA+ID4gPiB3aWxsIGV4cG9ydGVkIHRvCj4gPiA+ID4gVk0g
-dmlhIHZob3N0LXVzZXItYmxrLiBXaGVuIEkgZXhlY3V0ZSBmb2xsb3dpbmcgY29tbWFuZDoKPiA+
-ID4gPiAKPiA+ID4gPiAgIHZpcnNoIG1pZ3JhdGUgLS1saXZlIC0tcGVyc2lzdGVudCAtLXVuc2Fm
-ZSAtLXVuZGVmaW5lc291cmNlIC0tCj4gPiA+ID4gY29weS1zdG9yYWdlLWFsbCBcCj4gPiA+ID4g
-ICAgICAtLXAycCAtLWF1dG8tY29udmVyZ2UgLS12ZXJib3NlIC0tZGVzdHVyaQo+ID4gPiA+IHFl
-bXUrdGNwOi8vPHVyaT4vc3lzdGVtIHZtMAo+ID4gPiA+IAo+ID4gPiA+IFRoZSBsaWJ2aXJ0IHJl
-cG9ydHM6Cj4gPiA+ID4gCj4gPiA+ID4gICBxZW11LTIuMTIuMTogZXJyb3I6IGludGVybmFsIGVy
-cm9yOiB1bmFibGUgdG8gZXhlY3V0ZSBRRU1VCj4gPiA+ID4gY29tbWFuZCBcCj4gPiA+ID4gICAg
-ICduYmQtc2VydmVyLWFkZCc6IENhbm5vdCBmaW5kIGRldmljZT1kcml2ZS12aXJ0aW8tZGlzazEg
-bm9yIFwKPiA+ID4gPiAgICAgbm9kZV9uYW1lPWRyaXZlLXZpcnRpby1kaXNrMQo+ID4gPiAKPiA+
-ID4gUGxlYXNlIHBvc3QgeW91ciBsaWJ2aXJ0IGRvbWFpbiBYTUwuCj4gPiAKPiA+IE15IGxpYnZp
-cnQgaXMgYmFzZWQgb24gbGlidmlydC0xLjEuMS0yOS5lbDcsIGFuZCBhZGQgbWFueSBwYXRjaGVz
-IHRvCj4gPiBzYXRpc2Z5IG91cgo+ID4gb3duIG5lZWRzLCBlLmcuIGFkZCBzdXBwb3J0IGZvciB2
-aG9zdC11c2VyLWJsay4gUG9zdCBkb21haW4geG1sIG1heQo+ID4gbm90IHVzZWZ1bC4KPiA+IEFu
-eXdheSwgZm9sbG93aW5nIGlzIGZ1bGwgY29udGVudHMgb2YgWE1MOgo+ID4gCj4gPiAgIDxkb21h
-aW4gdHlwZT0na3ZtJz4KPiA+ICAgICA8bmFtZT53emg8L25hbWU+Cj4gPiAgICAgPHV1aWQ+YTg0
-ZTk2ZTYtMmM1My00MDhkLTk4NmItYzcwOWJjNmEwZTUxPC91dWlkPgo+ID4gICAgIDxtZW1vcnkg
-dW5pdD0nTWlCJz40MDk2PC9tZW1vcnk+Cj4gPiAgICAgPG1lbW9yeUJhY2tpbmc+Cj4gPiAgICAg
-ICA8aHVnZXBhZ2VzLz4KPiA+ICAgICA8L21lbW9yeUJhY2tpbmc+Cj4gPiAgICAgPGN1cnJlbnRN
-ZW1vcnkgdW5pdD0nTWlCJz40MDk2PC9jdXJyZW50TWVtb3J5Pgo+ID4gICAgIDx2Y3B1IHBsYWNl
-bWVudD0nc3RhdGljJyBjcHVzZXQ9JzE2LTMxJz4yPC92Y3B1Pgo+ID4gICAgIDxvcz4KPiA+ICAg
-ICAgIDx0eXBlIGFyY2g9J3g4Nl82NCcgbWFjaGluZT0ncGMnPmh2bTwvdHlwZT4KPiA+ICAgICAg
-IDxib290IGRldj0naGQnLz4KPiA+ICAgICA8L29zPgo+ID4gICAgIDxmZWF0dXJlcz4KPiA+ICAg
-ICAgIDxhY3BpLz4KPiA+ICAgICA8L2ZlYXR1cmVzPgo+ID4gICAgIDxjbG9jayBvZmZzZXQ9J3V0
-Yyc+Cj4gPiAgICAgICA8dGltZXIgbmFtZT0ncnRjJyB0aWNrcG9saWN5PSdjYXRjaHVwJy8+Cj4g
-PiAgICAgPC9jbG9jaz4KPiA+ICAgICA8b25fcG93ZXJvZmY+ZGVzdHJveTwvb25fcG93ZXJvZmY+
-Cj4gPiAgICAgPG9uX3JlYm9vdD5yZXN0YXJ0PC9vbl9yZWJvb3Q+Cj4gPiAgICAgPG9uX2NyYXNo
-PmRlc3Ryb3k8L29uX2NyYXNoPgo+ID4gICAgIDxkZXZpY2VzPgo+ID4gICAgICAgPGVtdWxhdG9y
-Pi9kYXRhL3d6aC94ODZfNjQtc29mdG1tdS9xZW11LXN5c3RlbS0KPiA+IHg4Nl82NDwvZW11bGF0
-b3I+Cj4gPiAgICAgICA8ZGlzayB0eXBlPSdmaWxlJyBkZXZpY2U9J2Rpc2snPgo+ID4gCTxkcml2
-ZXIgbmFtZT0ncWVtdScgdHlwZT0ncWNvdzInIGNhY2hlPSdub25lJy8+Cj4gPiAJPHNvdXJjZSBm
-aWxlPScvZGF0YS93emgvYzc0LnFjb3cyJy8+Cj4gPiAJPHRhcmdldCBkZXY9J3ZkYScgYnVzPSd2
-aXJ0aW8nLz4KPiA+IAk8YWxpYXMgbmFtZT0ndmlydGlvLWRpc2swJy8+Cj4gPiAgICAgICA8L2Rp
-c2s+Cj4gPiAKPiA+ICAgICAgIDxkaXNrIHR5cGU9J3Zob3N0LXVzZXItYmxrJyBkZXZpY2U9J2Rp
-c2snPgo+ID4gCTxzb3VyY2UgdHlwZT0ndW5peCcgcGF0aD0nL3Zhci90bXAvbHYwJyBtb2RlPSdj
-bGllbnQnPgo+ID4gCTwvc291cmNlPgo+ID4gCTx0YXJnZXQgZGV2PSd2ZGInIGJ1cz0ndmlydGlv
-Jy8+Cj4gPiAJPGRyaXZlciBxdWV1ZXM9JzQnLz4KPiA+ICAgICAgIDwvZGlzaz4KPiA+IAo+ID4g
-ICAgICAgPGNvbnRyb2xsZXIgdHlwZT0ndXNiJyBpbmRleD0nMCc+Cj4gPiAJPGFsaWFzIG5hbWU9
-J3VzYjAnLz4KPiA+ICAgICAgIDwvY29udHJvbGxlcj4KPiA+ICAgICAgIDxjb250cm9sbGVyIHR5
-cGU9J3BjaScgaW5kZXg9JzAnIG1vZGVsPSdwY2ktcm9vdCc+Cj4gPiAJPGFsaWFzIG5hbWU9J3Bj
-aS4wJy8+Cj4gPiAgICAgICA8L2NvbnRyb2xsZXI+Cj4gPiAgICAgICA8c2VyaWFsIHR5cGU9J3B0
-eSc+Cj4gPiAJPHRhcmdldCBwb3J0PScwJy8+Cj4gPiAJPGFsaWFzIG5hbWU9J3NlcmlhbDAnLz4K
-PiA+ICAgICAgIDwvc2VyaWFsPgo+ID4gICAgICAgPHNlcmlhbCB0eXBlPSdwdHknPgo+ID4gCTx0
-YXJnZXQgcG9ydD0nMScvPgo+ID4gCTxhbGlhcyBuYW1lPSdzZXJpYWwxJy8+Cj4gPiAgICAgICA8
-L3NlcmlhbD4KPiA+ICAgICAgIDxpbnB1dCB0eXBlPSd0YWJsZXQnIGJ1cz0ndXNiJz4KPiA+IAk8
-YWxpYXMgbmFtZT0naW5wdXQwJy8+Cj4gPiAgICAgICA8L2lucHV0Pgo+ID4gICAgICAgPGlucHV0
-IHR5cGU9J21vdXNlJyBidXM9J3BzMicvPgo+ID4gICAgICAgPGdyYXBoaWNzIHR5cGU9J3ZuYycg
-YXV0b3BvcnQ9J3llcycgbGlzdGVuPScwLjAuMC4wJwo+ID4ga2V5bWFwPSdlbi11cyc+Cj4gPiAJ
-PGxpc3RlbiB0eXBlPSdhZGRyZXNzJyBhZGRyZXNzPScwLjAuMC4wJy8+Cj4gPiAgICAgICA8L2dy
-YXBoaWNzPgo+ID4gICAgICAgPHZpZGVvPgo+ID4gCTxtb2RlbCB0eXBlPSdjaXJydXMnIHZyYW09
-JzkyMTYnIGhlYWRzPScxJy8+Cj4gPiAJPGFsaWFzIG5hbWU9J3ZpZGVvMCcvPgo+ID4gICAgICAg
-PC92aWRlbz4KPiA+ICAgICA8L2RldmljZXM+Cj4gPiAgICAgPHNlY2xhYmVsIHR5cGU9J25vbmUn
-Lz4KPiA+ICAgPC9kb21haW4+Cj4gPiAKPiA+ID4gCj4gPiA+ID4gRG9lcyBpdCBtZWFucyB0aGF0
-IHFlbXUgd2l0aCBzcGRrIG9uIHRvcCBvZiBsb2NhbCBzdG9yYWdlIGRvbid0Cj4gPiA+ID4gc3Vw
-cG9ydCBtaWdyYXRpb24/Cj4gPiA+ID4gCj4gPiA+ID4gUUVNVTogMi4xMi4xCj4gPiA+ID4gU1BE
-SzogMTguMTAKPiA+ID4gCj4gPiA+IHZob3N0LXVzZXItYmxrIGJ5cGFzc2VzIHRoZSBRRU1VIGJs
-b2NrIGxheWVyLCBzbyBOQkQgc3RvcmFnZQo+ID4gPiBtaWdyYXRpb24KPiA+ID4gYXQgdGhlIFFF
-TVUgbGV2ZWwgd2lsbCBub3Qgd29yayBmb3IgdGhlIHZob3N0LXVzZXItYmxrIGRpc2suCj4gPiA+
-IAo+ID4gPiBTdGVmYW4KPiAKPiAKPiBEb24ndCBrbm93IGlmIHRoaXMgaXMgdGhlIGNhc2UgdGhh
-dCB3dXpob3VodWkgaXMgdXNpbmcgYnV0IGdlbmVyYWxseQoKTXkgY2FzZSBpcyBkaWZmZXJlbnQg
-ZnJvbSB5b3Vycy4gQWxsIHN0b3JhZ2VzIChpbmNsdWRpbmcgcWVtdSBpbWFnZSBhbmQgbWFsbG9j
-CmJkZXYpIGFyZSBsb2NhbCwgYW5kIG9ubHkgYWNjZXNzaWJsZSBmcm9tIG9uZSBvZiBob3N0cy4g
-QW55d2F5LCB0aGFua3MgZm9yCmV2ZXJ5b25lJ3MgcmVzcG9uc2UuCgp3dXpob3VodWkKCj4gbWln
-cmF0aW9uIHNob3VsZCB3b3JrIGlmIGFsbCBzdG9yYWdlcyBhcmUgYWNjZXNpYmxlIGZyb20gYm90
-aCBtYWNoaW5lcy4KPiBUaGUgUUVNVSBpbWFnZSBhbmQgTWFsbG9jIGJkZXYgc2hvdWxkIGJlIGV4
-cG9zZWQgdXNpbmcgc29tZSBraW5kIG9mCj4gbmV0d29yayBzaGFyaW5nLiBTUERLIG9uIG1pZ3Jh
-dGlvbiB0YXJnZXQgc2hvdWxkIGJlIGNvbmZpZ3VyZWQgdGhlIHNhbWUKPiB3YXkgYXMgb24gc291
-cmNlIG1hY2hpbmUuCj4gCj4gV2UgYXJlIHRlc3RpbmcgdGhpcyBpc3N1aW5nIFFFTVUgbW9uaXRv
-ciBjb21tYW5kcyBzbyBJIGNhbid0IGhlbHAgd2l0aAo+IGxpYnZpcnQgaGVyZS4KPiAKPiBFeGFt
-cGxlIHNldHVwL3Rlc3QgY2FzZSB3ZSBhcmUgdXNpbmcgaW4gb25lIG9mIG91ciB0ZXN0czoKPiAK
-PiBNYWNoaW5lMToKPiAgIEV4cG9zZSBWTSBpbWFnZSBvdmVyIFNTSEYKPiAgIEV4cG9zZSBzb21l
-IGJsb2NrIGRldmljZSB1c2luZyBTUERLIG52bWYgdGFyZ2V0Cj4gICBTUERLIG52bWYgaW5pdGlh
-dG9yOgo+ICAgICAgLSBjb25uZWN0cyB0byBNYWNoaW5lMSBTUERLIG52bWYgdGFyZ2V0IHRvIGFj
-Y2VzcyBibG9jayBkZXZpY2UKPiAgIFNQREsgdmhvc3Qtc2NzaToKPiAgICAgLSBwcmVzZW50cyBi
-bG9jayBkZXZpY2UgdG8gUUVNVSBmcm9tIFNQREsgbnZtZiBpbml0aWF0b3I6Cj4gICBRRU1VIFZN
-IHVzZXMKPiAgICAgLSBzaGFyZWQgVk0gaW1hZ2UKPiAgICAgLSBibG9jayBkZXZpY2UgZnJvbSBT
-UERLIG52bWYgIGluaXRpYXRvciBvdmVyIHZob3N0LXVzZXItc2NzaQo+IAo+IE1hY2hpbmUyOiAg
-Cj4gICBTUERLIG52bWYgaW5pdGlhdG9yOgo+ICAgICAgLSBjb25uZWN0cyB0byBNYWNoaW5lMSBT
-UERLIG52bWYgdGFyZ2V0IHRvIGFjY2VzcyBibG9jayBkZXZpY2UKPiAgIFNQREsgdmhvc3Qtc2Nz
-aToKPiAgICAgLSBwcmVzZW50cyBibG9jayBkZXZpY2UgdG8gUUVNVSBmcm9tIG52bWYKPiBpbml0
-aWF0b3I6Cj4gICBRRU1VIGluc3RhbmNlIC0gd2FpdGluZyBmb3IgaW5jb21pbmcgbWlncmF0aW9u
-Cj4gICAgIC0gc2hhcmVkIFZNIGltYWdlIG92ZXIgU1NIRlMKPiAgICAgLSBibG9jayBkZXZpY2Ug
-ZnJvbSBTUERLIG52bWYgIGluaXRpYXRvciBvdmVyIHZob3N0LXVzZXItc2NzaQo+IAo+IFNvbWUg
-dHJhZmZpYyBpcyBnZW5lcmF0ZWQgdXNpbmcgRklPIGFuZCB0aGVuIHdlIGp1c3QgbWlncmF0ZSBW
-TSBmcm9tCj4gTWFjaGluZTEgdG8gTWFjaGluZTIuCj4gCj4gUGF3ZWwKPiAKPiA+IAo+ID4gX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiA+IFNQREsgbWFp
-bGluZyBsaXN0Cj4gPiBTUERLQGxpc3RzLjAxLm9yZwo+ID4gaHR0cHM6Ly9saXN0cy4wMS5vcmcv
-bWFpbG1hbi9saXN0aW5mby9zcGRrCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18KPiBTUERLIG1haWxpbmcgbGlzdAo+IFNQREtAbGlzdHMuMDEub3JnCj4g
-aHR0cHM6Ly9saXN0cy4wMS5vcmcvbWFpbG1hbi9saXN0aW5mby9zcGRrCg==
+On Tue, Jan 08, 2019 at 10:09:11AM -0700, Alex Williamson wrote:
+> On Tue,  8 Jan 2019 01:03:48 -0500
+> Zhao Yan <yan.y.zhao@intel.com> wrote:
+> 
+> > if multiple regions in vfio are mmaped, their corresponding ramblocks
+> > are like below, i.e. their idstrs are "".
+> > 
+> > (qemu) info ramblock
+> > Block Name  PSize       Offset               Used            Total
+> > pc.ram      4 KiB  0x0000000000000000 0x0000000020000000 0x0000000020000000
+> >             4 KiB  0x0000000021100000 0x0000000020000000 0x0000000020000000
+> >             4 KiB  0x0000000020900000 0x0000000000800000 0x0000000000800000
+> >             4 KiB  0x0000000020240000 0x0000000000687000 0x0000000000687000
+> >             4 KiB  0x00000000200c0000 0x0000000000178000 0x0000000000178000
+> > pc.bios     4 KiB  0x0000000020000000 0x0000000000040000 0x0000000000040000
+> > pc.rom      4 KiB  0x0000000020040000 0x0000000000020000 0x0000000000020000
+> > 
+> > This is because ramblocks' idstr are assigned by calling
+> > vmstate_register_ram(), but memory region of type ram device ptr does not
+> > call vmstate_register_ram().
+> > vfio_region_mmap
+> >         |->memory_region_init_ram_device_ptr
+> >                |-> memory_region_init_ram_ptr
+> > 
+> > Without empty idstrs will cause problem to snapshot copying during
+> > migration, because it uses ramblocks' idstr to identify ramblocks.
+> > ram_save_setup {
+> >   …
+> >   RAMBLOCK_FOREACH(block) {
+> >       qemu_put_byte(f, strlen(block->idstr));
+> >       qemu_put_buffer(f, (uint8_t *)block->idstr,strlen(block->idstr));
+> >       qemu_put_be64(f, block->used_length);
+> >   }
+> >   …
+> > }
+> > ram_load() {
+> >     block = qemu_ram_block_by_name(id);
+> >     if (block) {
+> >         if (length != block->used_length) {
+> >             qemu_ram_resize(block, length, &local_err);
+> >         }
+> >      ….
+> >    }
+> > }
+> > 
+> > Therefore, in this patch,
+> > vmstate_register_ram() is called for memory region of type ram ptr,
+> > also a unique vfioid is assigned to vfio devices across source
+> > and target vms.
+> > e.g. in source vm, use qemu parameter
+> > -device
+> > vfio-pci,sysfsdev=/sys/bus/pci/devices/0000:00:02.0/
+> > 882cc4da-dede-11e7-9180-078a62063ab1,vfioid=igd
+> > 
+> > and in target vm, use qemu paramter
+> > -device
+> > vfio-pci,sysfsdev=/sys/bus/pci/devices/0000:00:02.0/
+> > 5ac1fb20-2bbf-4842-bb7e-36c58c3be9cd,vfioid=igd
+> 
+> Why wouldn't we just use the id= (DeviceState.id) value instead of
+> adding yet another one?  I can't imagine anyone, especially libvirt,
+> wants to deal with a vfio specific id for a device.
+>
+hi Alex
+You are right! DeviceState.id can be used here. Thanks for your suggestion.
+
+
+> > Signed-off-by: Zhao Yan <yan.y.zhao@intel.com>
+> > ---
+> >  hw/vfio/pci.c                 | 8 +++++++-
+> >  include/hw/vfio/vfio-common.h | 1 +
+> >  memory.c                      | 4 ++++
+> >  3 files changed, 12 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index c0cb1ec289..7bc2ed0752 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -2533,7 +2533,12 @@ static void vfio_populate_device(VFIOPCIDevice *vdev, Error **errp)
+> >      }
+> >  
+> >      for (i = VFIO_PCI_BAR0_REGION_INDEX; i < VFIO_PCI_ROM_REGION_INDEX; i++) {
+> > -        char *name = g_strdup_printf("%s BAR %d", vbasedev->name, i);
+> > +        char *name;
+> > +        if (vbasedev->vfioid) {
+> > +            name = g_strdup_printf("%s BAR %d", vbasedev->vfioid, i);
+> > +        } else {
+> > +            name = g_strdup_printf("%s BAR %d", vbasedev->name, i);
+> > +        }
+> >  
+> >          ret = vfio_region_setup(OBJECT(vdev), vbasedev,
+> >                                  &vdev->bars[i].region, i, name);
+> > @@ -3180,6 +3185,7 @@ static void vfio_instance_init(Object *obj)
+> >  static Property vfio_pci_dev_properties[] = {
+> >      DEFINE_PROP_PCI_HOST_DEVADDR("host", VFIOPCIDevice, host),
+> >      DEFINE_PROP_STRING("sysfsdev", VFIOPCIDevice, vbasedev.sysfsdev),
+> > +    DEFINE_PROP_STRING("vfioid", VFIOPCIDevice, vbasedev.vfioid),
+> >      DEFINE_PROP_ON_OFF_AUTO("display", VFIOPCIDevice,
+> >                              display, ON_OFF_AUTO_OFF),
+> >      DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
+> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> > index 1b434d02f6..84bab94f52 100644
+> > --- a/include/hw/vfio/vfio-common.h
+> > +++ b/include/hw/vfio/vfio-common.h
+> > @@ -108,6 +108,7 @@ typedef struct VFIODevice {
+> >      struct VFIOGroup *group;
+> >      char *sysfsdev;
+> >      char *name;
+> > +    char *vfioid;
+> >      DeviceState *dev;
+> >      int fd;
+> >      int type;
+> > diff --git a/memory.c b/memory.c
+> > index d14c6dec1d..dbb29fa989 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -1588,6 +1588,7 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
+> >                                  uint64_t size,
+> >                                  void *ptr)
+> >  {
+> > +    DeviceState *owner_dev;
+> >      memory_region_init(mr, owner, name, size);
+> >      mr->ram = true;
+> >      mr->terminates = true;
+> > @@ -1597,6 +1598,9 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
+> >      /* qemu_ram_alloc_from_ptr cannot fail with ptr != NULL.  */
+> >      assert(ptr != NULL);
+> >      mr->ram_block = qemu_ram_alloc_from_ptr(size, ptr, mr, &error_fatal);
+> > +
+> > +    owner_dev = DEVICE(owner);
+> > +    vmstate_register_ram(mr, owner_dev);
+> 
+> Where does the corresponding vmstate_unregister_ram() call occur when
+> unplugged?  Thanks,
+>
+sorry, I just updated my qemu code base and found that in migration/ram.c
+now it will not save/restore ramblocks who do not call
+vmstate_regitser_ram().
+therefore, the vmstate_register_ram() may not be necessary for memory
+region mapped to device resources, as it's better to save/restore that part
+of memory from vendor driver side.
+So, do you think it's ok to just call qemu_ram_set_idstr() to set idstr for
+ramblocks of mmaped region?
+
+Thanks
+Yan
+
+> Alex
+> 
+> >  }
+> >  
+> >  void memory_region_init_ram_device_ptr(MemoryRegion *mr,
+> 
