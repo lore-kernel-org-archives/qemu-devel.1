@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35272)
+Received: from eggs.gnu.org ([209.51.188.92]:36929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghcmG-0003mj-TN
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:01:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghcr1-0005Lg-2O
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:06:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghcm9-0000Z8-Bh
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:01:49 -0500
-Received: from 16.mo5.mail-out.ovh.net ([87.98.174.144]:48853)
+	(envelope-from <armbru@redhat.com>) id 1ghcqu-0003Le-9r
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:06:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ghcm0-0000MB-2x
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:01:37 -0500
-Received: from player750.ha.ovh.net (unknown [10.109.159.136])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7AC7820E1E4
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 17:01:11 +0100 (CET)
-Date: Thu, 10 Jan 2019 17:00:54 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190110170054.232da6a0@bahia.lan>
-In-Reply-To: <8947b77e-41c7-5c1d-465f-a9bf1dd7d103@redhat.com>
-References: <1547111736-3962-1-git-send-email-thuth@redhat.com>
-	<1547111736-3962-3-git-send-email-thuth@redhat.com>
-	<20190110132838.31365c55@bahia.lan>
-	<8947b77e-41c7-5c1d-465f-a9bf1dd7d103@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghcqt-0003AC-Qj
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:06:40 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-17-fli@suse.com>
+	<874lakl5d2.fsf@dusky.pond.sub.org>
+	<5007FDD8-8D3A-4E3F-B5A6-9B7B3189238F@126.com>
+	<87pnt7awhg.fsf@dusky.pond.sub.org>
+	<cc1bec76-7724-2d0d-733c-e84f029776e4@126.com>
+	<87o98pdfbf.fsf@dusky.pond.sub.org>
+	<7A219BBE-8D9D-4B40-892E-AA48D22F5967@126.com>
+	<87tvig7tsu.fsf@dusky.pond.sub.org>
+	<016ae7bc-6271-59a7-36a1-c2b8a210020f@126.com>
+Date: Thu, 10 Jan 2019 17:06:16 +0100
+In-Reply-To: <016ae7bc-6271-59a7-36a1-c2b8a210020f@126.com> (Fei Li's message
+	of "Thu, 10 Jan 2019 21:24:54 +0800")
+Message-ID: <87tvigfqfb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] ppc: Drop duplicated typedefs to be
- able to compile with Clang in gnu99 mode
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 16/16] qemu_thread_join: fix
+ segmentation fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,156 +37,294 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, "Daniel P.
-	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, pbonzini@redhat.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Fei Li <lifei1214@126.com>
+Cc: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org, shirley17fei@gmail.com
 
-On Thu, 10 Jan 2019 15:07:59 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Fei Li <lifei1214@126.com> writes:
 
-> On 2019-01-10 14:15, Greg Kurz wrote:
-> > On Thu, 10 Jan 2019 10:15:35 +0100
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >  =20
-> >> When compiling the ppc code with clang and -std=3Dgnu99, there are a
-> >> couple of warnings/errors like this one:
-> >>
-> >>   CC      ppc64-softmmu/hw/intc/xics.o
-> >> In file included from /home/thuth/devel/qemu/hw/intc/xics.c:35:
-> >> /home/thuth/devel/qemu/include/hw/ppc/xics.h:43:25: error: redefinitio=
-n of typedef 'ICPState' is a C11 feature
-> >>       [-Werror,-Wtypedef-redefinition]
-> >> typedef struct ICPState ICPState;
-> >>                         ^
-> >> /home/thuth/devel/qemu/target/ppc/cpu.h:1181:25: note: previous defini=
-tion is here
-> >> typedef struct ICPState ICPState;
-> >>                         ^
-> >>
-> >> Drop the duplicated typedefs and use normal "struct" forward declarati=
-ons
-> >> like we already do it at the top of spapr.h for a couple of other defi=
-nitions.
-> >> =20
-> >=20
-> > Hmm... so the choice here is to simply ignore the official coding
-> > style ? =20
->=20
-> Are typedefs really our "official coding style"? It's mentioned in
-> HACKING, not in CODING_STYLE, so I rather see this as a recommendation
+> =E5=9C=A8 2019/1/10 =E4=B8=8B=E5=8D=885:20, Markus Armbruster =E5=86=99=
+=E9=81=93:
+>> fei <lifei1214@126.com> writes:
+>>
+>>>> =E5=9C=A8 2019=E5=B9=B41=E6=9C=889=E6=97=A5=EF=BC=8C23:24=EF=BC=8CMark=
+us Armbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>>>
+>>>> Fei Li <lifei1214@126.com> writes:
+>>>>
+>>>>>> =E5=9C=A8 2019/1/9 =E4=B8=8A=E5=8D=881:29, Markus Armbruster =E5=86=
+=99=E9=81=93:
+>>>>>> fei <lifei1214@126.com> writes:
+>>>>>>
+>>>>>>>> =E5=9C=A8 2019=E5=B9=B41=E6=9C=888=E6=97=A5=EF=BC=8C01:55=EF=BC=8C=
+Markus Armbruster <armbru@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>>>>>>>
+>>>>>>>> Fei Li <fli@suse.com> writes:
+>>>>>>>>
+>>>>>>>>> To avoid the segmentation fault in qemu_thread_join(), just direc=
+tly
+>>>>>>>>> return when the QemuThread *thread failed to be created in either
+>>>>>>>>> qemu-thread-posix.c or qemu-thread-win32.c.
+>>>>>>>>>
+>>>>>>>>> Cc: Stefan Weil <sw@weilnetz.de>
+>>>>>>>>> Signed-off-by: Fei Li <fli@suse.com>
+>>>>>>>>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>>>>>>>>> ---
+>>>>>>>>> util/qemu-thread-posix.c | 3 +++
+>>>>>>>>> util/qemu-thread-win32.c | 2 +-
+>>>>>>>>> 2 files changed, 4 insertions(+), 1 deletion(-)
+>>>>>>>>>
+>>>>>>>>> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+>>>>>>>>> index 39834b0551..3548935dac 100644
+>>>>>>>>> --- a/util/qemu-thread-posix.c
+>>>>>>>>> +++ b/util/qemu-thread-posix.c
+>>>>>>>>> @@ -571,6 +571,9 @@ void *qemu_thread_join(QemuThread *thread)
+>>>>>>>>>      int err;
+>>>>>>>>>      void *ret;
+>>>>>>>>>
+>>>>>>>>> +    if (!thread->thread) {
+>>>>>>>>> +        return NULL;
+>>>>>>>>> +    }
+>>>>>>>> How can this happen?
+>>>>>>> I think I have answered this earlier, please check the following li=
+nk to see whether it helps:
+>>>>>>> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg06554.ht=
+ml
+>>>>>> Thanks for the pointer.  Unfortunately, I don't understand your
+>>>>>> explanation.  You also wrote there "I will remove this patch in next
+>>>>>> version"; looks like you've since changed your mind.
+>>>>> Emm, issues left over from history.. The background is I was hurry to
+>>>>> make those five
+>>>>> Reviewed-by patches be merged, including this v9 16/16 patch but not
+>>>>> the real
+>>>>> qemu_thread_create() modification. But actually this patch is to fix
+>>>>> the segmentation
+>>>>> fault after we modified qemu_thread_create() related functions
+>>>>> although it has got a
+>>>>> Reviewed-by earlier. :) Thus to not make troube, I wrote the
+>>>>> "remove..." sentence
+>>>>> to separate it from those 5 Reviewed-by patches, and were plan to send
+>>>>> only four patches.
+>>>>> But later I got a message that these five patches are not that urgent
+>>>>> to catch qemu v3.1,
+>>>>> thus I joined the earlier 5 R-b patches into the later v8 & v9 to have
+>>>>> a better review.
+>>>>>
+>>>>> Sorry for the trouble, I need to explain it without involving too much
+>>>>> background..
+>>>>>
+>>>>> Back at the farm: in our current qemu code, some cleanups use a loop
+>>>>> to join()
+>>>>> the total number of threads if caller fails. This is not a problem
+>>>>> until applying the
+>>>>> qemu_thread_create() modification. E.g. when compress_threads_save_se=
+tup()
+>>>>> fails while trying to create the last do_data_compress thread,
+>>>>> segmentation fault
+>>>>> will occur when join() is called (sadly there's not enough condition
+>>>>> to filter this
+>>>>> unsuccessful created thread) as this thread is actually not be create=
+d.
+>>>>>
+>>>>> Hope the above makes it clear. :)
+>>>> Alright, let's have a look at compress_threads_save_setup():
+>>>>
+>>>>     static int compress_threads_save_setup(void)
+>>>>     {
+>>>>         int i, thread_count;
+>>>>
+>>>>         if (!migrate_use_compression()) {
+>>>>             return 0;
+>>>>         }
+>>>>         thread_count =3D migrate_compress_threads();
+>>>>         compress_threads =3D g_new0(QemuThread, thread_count);
+>>>>         comp_param =3D g_new0(CompressParam, thread_count);
+>>>>         qemu_cond_init(&comp_done_cond);
+>>>>         qemu_mutex_init(&comp_done_lock);
+>>>>         for (i =3D 0; i < thread_count; i++) {
+>>>>             comp_param[i].originbuf =3D g_try_malloc(TARGET_PAGE_SIZE);
+>>>>             if (!comp_param[i].originbuf) {
+>>>>                 goto exit;
+>>>>             }
+>>>>
+>>>>             if (deflateInit(&comp_param[i].stream,
+>>>>                             migrate_compress_level()) !=3D Z_OK) {
+>>>>                 g_free(comp_param[i].originbuf);
+>>>>                 goto exit;
+>>>>             }
+>>>>
+>>>>             /* comp_param[i].file is just used as a dummy buffer to sa=
+ve data,
+>>>>              * set its ops to empty.
+>>>>              */
+>>>>             comp_param[i].file =3D qemu_fopen_ops(NULL, &empty_ops);
+>>>>             comp_param[i].done =3D true;
+>>>>             comp_param[i].quit =3D false;
+>>>>             qemu_mutex_init(&comp_param[i].mutex);
+>>>>             qemu_cond_init(&comp_param[i].cond);
+>>>>             qemu_thread_create(compress_threads + i, "compress",
+>>>>                                do_data_compress, comp_param + i,
+>>>>                                QEMU_THREAD_JOINABLE);
+>>>>         }
+>>>>         return 0;
+>>>>
+>>>>     exit:
+>>>>         compress_threads_save_cleanup();
+>>>>         return -1;
+>>>>     }
+>>>>
+>>>> At label exit, we have @i threads, all fully initialized.  That's an
+>>>> invariant.
+>>>>
+>>>> compress_threads_save_cleanup() finds the threads to clean up by
+>>>> checking comp_param[i].file:
+>>>>
+>>>>     static void compress_threads_save_cleanup(void)
+>>>>     {
+>>>>         int i, thread_count;
+>>>>
+>>>>         if (!migrate_use_compression() || !comp_param) {
+>>>>             return;
+>>>>         }
+>>>>
+>>>>         thread_count =3D migrate_compress_threads();
+>>>>         for (i =3D 0; i < thread_count; i++) {
+>>>>             /*
+>>>>              * we use it as a indicator which shows if the thread is
+>>>>              * properly init'd or not
+>>>>              */
+>>>> --->        if (!comp_param[i].file) {
+>>>> --->            break;
+>>>> --->        }
+>>>>
+>>>>             qemu_mutex_lock(&comp_param[i].mutex);
+>>>>             comp_param[i].quit =3D true;
+>>>>             qemu_cond_signal(&comp_param[i].cond);
+>>>>             qemu_mutex_unlock(&comp_param[i].mutex);
+>>>>
+>>>>             qemu_thread_join(compress_threads + i);
+>>>>             qemu_mutex_destroy(&comp_param[i].mutex);
+>>>>             qemu_cond_destroy(&comp_param[i].cond);
+>>>>             deflateEnd(&comp_param[i].stream);
+>>>>             g_free(comp_param[i].originbuf);
+>>>>             qemu_fclose(comp_param[i].file);
+>>>>             comp_param[i].file =3D NULL;
+>>>>         }
+>>>>         qemu_mutex_destroy(&comp_done_lock);
+>>>>         qemu_cond_destroy(&comp_done_cond);
+>>>>         g_free(compress_threads);
+>>>>         g_free(comp_param);
+>>>>         compress_threads =3D NULL;
+>>>>         comp_param =3D NULL;
+>>>>     }
+>>>>
+>>>> Due to the invariant, a comp_param[i] with a null .file doesn't need
+>>>> *any* cleanup.
+>>>>
+>>>> To maintain the invariant, compress_threads_save_setup() carefully
+>>>> cleans up any partial initializations itself before a goto exit.  Since
+>>>> the code is arranged smartly, the only such cleanup is the
+>>>> g_free(comp_param[i].originbuf) before the second goto exit.
+>>>>
+>>>> Your PATCH 13 adds a third goto exit, but neglects to clean up partial
+>>>> initializations.  Breaks the invariant.
+>>>>
+>>>> I see two sane solutions:
+>>>>
+>>>> 1. compress_threads_save_setup() carefully cleans up partial
+>>>>    initializations itself.  compress_threads_save_cleanup() copes only
+>>>>    with fully initialized comp_param[i].  This is how things work befo=
+re
+>>>>    your series.
+>>>>
+>>>> 2. compress_threads_save_cleanup() copes with partially initialized
+>>>>    comp_param[i], i.e. does the right thing for each goto exit in
+>>>>    compress_threads_save_setup().  compress_threads_save_setup() doesn=
+'t
+>>>>    clean up partial initializations.
+>>>>
+>>>> Your PATCH 13 together with the fixup PATCH 16 does
+>>>>
+>>>> 3. A confusing mix of the two.
+>>>>
+>>>> Don't.
+>>> Thanks for the detail analysis! :)
+>>> Emm.. Actually I have thought to do the cleanup in the setup() function=
+ for the third =E2=80=98goto exit=E2=80=99 [1],  which is a partial initial=
+ization.
+>>> But due to the below [1] is too long and seems not neat (I notice that =
+most cleanups for each thread are in the xxx_cleanup() function), I turned =
+to modify the join() function..
+>>> Is the long [1] acceptable when the third =E2=80=98goto exit=E2=80=99 i=
+s called, or is there any other better way to do the cleanup?
+>>>
+>>> [1]
+>>> qemu_mutex_lock(&comp_param[i].mutex);
+>>>             comp_param[i].quit =3D true;
+>>>             qemu_cond_signal(&comp_param[i].cond);
+>>>             qemu_mutex_unlock(&comp_param[i].mutex);
+>>>
+>>> qemu_mutex_destroy(&comp_param[i].mutex);
+>>>             qemu_cond_destroy(&comp_param[i].cond);
+>>>             deflateEnd(&comp_param[i].stream);
+>>>             g_free(comp_param[i].originbuf);
+>>>             qemu_fclose(comp_param[i].file);
+>>>             comp_param[i].file =3D NULL;
+>> Have you considered creating the thread earlier, e.g. right after
+>> initializing compression with deflateInit()?
+> I am afraid we can not do this, as the members of comp_param[i], like
+> file/done/quit/mutex/cond
+> will be used later in the new created thread: do_data_[de]compress via
+> qemu_thread_create().
 
-Indeed.
+You're right.
 
-> only. (Otherwise, all the forward struct definitions at the beginning of
-> spapr.h are a plain violation of the coding style, too...)
->=20
+> Thus it seems we have to accept the above long [1] if we do want to
+> clean up partial initialization
+> in xxx_setup(). :(
+>
+> BTW, there is no other argument can be used except the
+> "(compress_threads+i)->thread" to
+> differentiate whether should we join() the thread, just in case we
+> want to change the
+> xxx_cleanup() function.
 
-Yeah.
+We can try to make compress_threads_save_cleanup() cope with partially
+initialized comp_param[i].  Let's have a look at its members:
 
-> IMHO we should rather adopt the coding style of the kernel which rather
-> tries to avoid to typedef each and every struct.
->=20
+    bool done;                          // no cleanup
+    bool quit;                          // see [2]
+    bool zero_page;                     // no cleanup
+    QEMUFile *file;                     // qemu_fclose() if non-null
+    QemuMutex mutex;                    // see [1]
+    QemuCond cond;                      // see [1]
+    RAMBlock *block;                    // no cleanup (must be null)
+    ram_addr_t offset;                  // no cleanup
 
-=46rom https://www.kernel.org/doc/html/latest/process/coding-style.html#typed=
-efs :
+    /* internally used fields */
+    z_stream stream;                    // see [3]
+    uint8_t *originbuf;                 // unconditional g_free()
 
-"In general, a pointer, or a struct that has elements that can reasonably be
- directly accessed should never be a typedef."
+[1]: we could do something like
 
-So if we were to adopt the coding style of the kernel, we'd have to face a
-lot more violations with the current QEMU code base :)
+    if (comp_param[i].mutex.initialized) {
+        qemu_mutex_destroy(&comp_param[i].mutex);
+    }
+    if (comp_param[i].cond.initialized) {
+        qemu_cond_destroy(&comp_param[i].cond);
+    }
 
-> > It is a bit confusing to end up with even more struct/non-struct
-> > inconsistency. It would be good at least to update HACKING so that
-> > people know when they can legitimately do that... or we simply don't
-> > care anymore for the typedef rule ? =20
->=20
-> We should maybe limit the recommendation for the typedefs to things that
-> we mainly need in common code and that also fit into
-> include/qemu/typedefs.h nicely. If we agree on that, I could send an
-> update for the HACKING file.
->=20
+but that would be unclean.  Instead, I'd initialize these guys first, so
+we can clean them up unconditionally.
 
-Makes sense.
+[2] This is used to make the thread terminate.  Must be done before we
+call qemu_thread_join().  I think it can safely be done always, as long
+as long as .mutex and .cond are initialized.  Trivial if we initialize
+them first.
 
-> > All these forward declarations could be typedefs in a "hw/ppc/spapr_typ=
-es.h"
-> > header as well, as suggested elsewhere by Daniel. =20
->=20
-> I'd prefer to rather get rid of the typedefs in this case instead of
-> introducing spapr_types.h ... but if other ppc folks are also keen on
-> that file (David?), I can rework my patch to introduce it.
->=20
-> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >> index 9e01a5a..10d069e 100644
-> >> --- a/include/hw/ppc/spapr.h
-> >> +++ b/include/hw/ppc/spapr.h
-> >> @@ -12,11 +12,12 @@
-> >>  struct VIOsPAPRBus;
-> >>  struct sPAPRPHBState;
-> >>  struct sPAPRNVRAM;
-> >> +struct ICSState;
-> >> +struct sPAPRXive;
-> >> +
-> >>  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
-> >>  typedef struct sPAPREventSource sPAPREventSource;
-> >>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
-> >> -typedef struct ICSState ICSState; =20
-> >=20
-> > Thanks to the previous patch, I guess the ICSState type could be
-> > obtained by including "hw/ppc/xics.h". =20
->=20
-> There are already plenty of other struct forward declarations without
-> typedefs here, so I assume my changes are ok here. David?
->=20
-> >> -typedef struct sPAPRXive sPAPRXive;
-> >> =20
-> >>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
-> >>  #define SPAPR_ENTRY_POINT       0x100
-> >> @@ -127,7 +128,7 @@ struct sPAPRMachineState {
-> >>      struct VIOsPAPRBus *vio_bus;
-> >>      QLIST_HEAD(, sPAPRPHBState) phbs;
-> >>      struct sPAPRNVRAM *nvram;
-> >> -    ICSState *ics;
-> >> +    struct ICSState *ics;
-> >>      sPAPRRTCState rtc;
-> >> =20
-> >>      sPAPRResizeHPT resize_hpt;
-> >> @@ -180,7 +181,7 @@ struct sPAPRMachineState {
-> >>      const char *icp_type;
-> >>      int32_t irq_map_nr;
-> >>      unsigned long *irq_map;
-> >> -    sPAPRXive  *xive;
-> >> +    struct sPAPRXive  *xive;
-> >>      sPAPRIrq *irq;
-> >>      qemu_irq *qirqs; =20
-> [...]
-> >> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> >> index 486abaf..a62ff60 100644
-> >> --- a/target/ppc/cpu.h
-> >> +++ b/target/ppc/cpu.h
-> >> @@ -1177,8 +1177,9 @@ do {                                            \
-> >> =20
-> >>  typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
-> >>  typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
-> >> -typedef struct XiveTCTX XiveTCTX;
-> >> -typedef struct ICPState ICPState;
-> >> +
-> >> +struct XiveTCTX;
-> >> +struct ICPState; =20
-> >=20
-> > These could be made available from the XICS/XIVE header files.
-> >=20
-> > #ifndef CONFIG_USER_ONLY
-> > #include "hw/ppc/xive.h" /* for XiveTCTX */
-> > #include "hw/ppc/xics.h" /* for ICPState */
-> > #endif =20
->=20
-> Ok, I can change it if we agree that normal struct forward declarations
-> are a no-go. Otherwise, I'd prefer the non-typedeffed struct forward
-> declarations here, I think.
->=20
-
-Sure.
-
->  Thomas
+[3]: I can't see a squeaky clean way to detect whether .stream has been
+initialized with deflateInit().  Here's a slightly unclean way:
+deflateInit() sets .stream.msg to null on success, and to non-null on
+failure.  We can make it non-null until we're ready to call
+deflateInit(), then have compress_threads_save_cleanup() clean up
+.stream when it's null.  If that's too unclean for your or your
+reviewers' taste, add a boolean @stream_initialized flag.
