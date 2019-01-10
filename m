@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56112)
+Received: from eggs.gnu.org ([209.51.188.92]:56128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZHf-0004bc-Mj
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:04 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZHi-0004dl-H1
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZHe-0007he-PN
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:03 -0500
-Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:45642)
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZHh-0007j5-O9
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:06 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35700)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ghZHe-0007gy-Ir
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:02 -0500
-Received: by mail-pf1-x42d.google.com with SMTP id g62so5212170pfd.12
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:18:02 -0800 (PST)
+	id 1ghZHh-0007iZ-8u
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:05 -0500
+Received: by mail-pf1-x442.google.com with SMTP id z9so5240333pfi.2
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:18:04 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 Jan 2019 23:17:32 +1100
-Message-Id: <20190110121736.23448-8-richard.henderson@linaro.org>
+Date: Thu, 10 Jan 2019 23:17:33 +1100
+Message-Id: <20190110121736.23448-9-richard.henderson@linaro.org>
 In-Reply-To: <20190110121736.23448-1-richard.henderson@linaro.org>
 References: <20190110121736.23448-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 07/11] target/arm: Set btype for indirect
- branches
+Subject: [Qemu-devel] [PATCH 08/11] target/arm: Add guarded_pages cpu
+ property for user-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +30,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+While waiting for a proper userland ABI, allow static test
+cases to be written assuming that GP is set for all pages.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+ target/arm/cpu.h           |  4 ++++
+ target/arm/cpu64.c         | 18 ++++++++++++++++++
+ target/arm/translate-a64.c |  8 +++++++-
+ 3 files changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index f319fa000e..5f0ecb297f 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -138,6 +138,19 @@ static void reset_btype(DisasContext *s)
-     }
- }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 506c490a16..929f16dd6b 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -882,6 +882,10 @@ struct ARMCPU {
+      */
+     bool cfgend;
  
-+static void set_btype(DisasContext *s, int val)
++#ifdef CONFIG_USER_ONLY
++    bool guarded_pages;
++#endif
++
+     QLIST_HEAD(, ARMELChangeHook) pre_el_change_hooks;
+     QLIST_HEAD(, ARMELChangeHook) el_change_hooks;
+ 
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index d0de0d5dcf..713d2d5579 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -315,6 +315,18 @@ static void cpu_max_set_packey(Object *obj, Visitor *v, const char *name,
+     }
+     error_propagate(errp, err);
+ }
++
++static bool aarch64_cpu_get_guarded_pages(Object *obj, Error **errp)
 +{
-+    TCGv_i32 tcg_val;
-+
-+    /* BTYPE is a 2-bit field, and 0 should be done with reset_btype.  */
-+    tcg_debug_assert(val >= 1 && val <= 3);
-+
-+    tcg_val = tcg_const_i32(val);
-+    tcg_gen_st_i32(tcg_val, cpu_env, offsetof(CPUARMState, btype));
-+    tcg_temp_free_i32(tcg_val);
-+    s->btype = -1;
++    ARMCPU *cpu = ARM_CPU(obj);
++    return cpu->guarded_pages;
 +}
 +
- void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
-                             fprintf_function cpu_fprintf, int flags)
- {
-@@ -1985,6 +1998,7 @@ static void disas_exc(DisasContext *s, uint32_t insn)
- static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
- {
-     unsigned int opc, op2, op3, rn, op4;
-+    unsigned btype_mod = 2;
-     TCGv_i64 dst;
-     TCGv_i64 modifier;
++static void aarch64_cpu_set_guarded_pages(Object *obj, bool val, Error **errp)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++    cpu->guarded_pages = val;
++}
+ #endif
  
-@@ -2002,6 +2016,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-     case 0: /* BR */
-     case 1: /* BLR */
-     case 2: /* RET */
-+        btype_mod = opc;
-         switch (op3) {
-         case 0:
-             /* BR, BLR, RET */
-@@ -2045,7 +2060,6 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         default:
-             goto do_unallocated;
+ /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+@@ -420,6 +432,12 @@ static void aarch64_max_initfn(Object *obj)
+             cpu->env.cp15.sctlr_el[1] |= SCTLR_EnIA | SCTLR_EnIB;
+             cpu->env.cp15.sctlr_el[1] |= SCTLR_EnDA | SCTLR_EnDB;
          }
--
-         gen_a64_set_pc(s, dst);
-         /* BLR also needs to load return address */
-         if (opc == 1) {
-@@ -2061,6 +2075,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         if (op3 != 2 || op3 != 3) {
-             goto do_unallocated;
-         }
-+        btype_mod = opc & 1;
-         if (s->pauth_active) {
-             dst = new_tmp_a64(s);
-             modifier = cpu_reg_sp(s, op4);
-@@ -2144,6 +2159,26 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         return;
-     }
++
++        object_property_add_bool(obj, "guarded_pages",
++                                 aarch64_cpu_get_guarded_pages,
++                                 aarch64_cpu_set_guarded_pages, NULL);
++        object_property_set_description(obj, "guarded_pages",
++            "Set on/off GuardPage bit for all pages", NULL);
+ #endif
  
-+    switch (btype_mod) {
-+    case 0: /* BR */
-+        if (dc_isar_feature(aa64_bti, s)) {
-+            /* BR to {x16,x17} or !guard -> 1, else 3.  */
-+            set_btype(s, rn == 16 || rn == 17 || !s->guarded_page ? 1 : 3);
-+        }
-+        break;
-+
-+    case 1: /* BLR */
-+        if (dc_isar_feature(aa64_bti, s)) {
-+            /* BLR sets BTYPE to 2, regardless of source guarded page.  */
-+            set_btype(s, 2);
-+        }
-+        break;
-+
-+    default: /* RET or none of the above.  */
-+        /* BTYPE will be set to 0 by normal end-of-insn processing.  */
-+        break;
-+    }
-+
-     s->base.is_jmp = DISAS_JUMP;
- }
- 
+         cpu->sve_max_vq = ARM_MAX_VQ;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 5f0ecb297f..f225517077 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -13780,7 +13780,13 @@ static void disas_data_proc_simd_fp(DisasContext *s, uint32_t insn)
+ static bool is_guarded_page(CPUARMState *env, DisasContext *s)
+ {
+ #ifdef CONFIG_USER_ONLY
+-    return false;  /* FIXME */
++    /*
++     * FIXME: What is the userland ABI for this?
++     * For the moment this is controlled by an attribute:
++     *   -cpu max,guarded_pages=on.
++     */
++    ARMCPU *cpu = arm_env_get_cpu(env);
++    return cpu->guarded_pages;
+ #else
+     uint64_t addr = s->base.pc_first;
+     int mmu_idx = arm_to_core_mmu_idx(s->mmu_idx);
 -- 
 2.17.2
