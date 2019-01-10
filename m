@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49213)
+Received: from eggs.gnu.org ([209.51.188.92]:51163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ghc0m-0000cf-6B
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:49 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ghc5Y-0003eH-T9
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:17:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ghc0l-0004Nq-3J
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:48 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55571)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ghc0k-0004N6-SG
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:47 -0500
-Received: by mail-wm1-f67.google.com with SMTP id y139so11514732wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 07:12:46 -0800 (PST)
-Date: Thu, 10 Jan 2019 16:12:41 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-Message-ID: <20190110151241.t5jxzsjsnujhkftw@steredhat>
-References: <1545422632-24444-1-git-send-email-liam.merwick@oracle.com>
-	<CAGxU2F53zsuVRBbvGTOU81zObL+4tTg_FgE0i04G2eOWckc29Q@mail.gmail.com>
-	<aa1cbeec-bb31-8849-c34b-e2397dc1c475@oracle.com>
-	<CAGxU2F7rHv7HNNmvLSw9b5_GPEZqvo-XgCoc0penp8eFmWm6gw@mail.gmail.com>
-	<fb7e62ea-0d3e-9b6f-4f1c-4bd780e50398@oracle.com>
-	<d1877cd9-7374-1512-7b01-2a2fb184643a@oracle.com>
+	(envelope-from <laurent@vivier.eu>) id 1ghc5S-0007uA-NA
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:17:44 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:42963)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ghc5M-0007or-0f
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:17:34 -0500
+References: <20181219042113.7364-1-richard.henderson@linaro.org>
+	<20181219042113.7364-5-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <4e89a2dd-47fb-29ac-aff2-5d506e3deebb@vivier.eu>
+Date: Thu, 10 Jan 2019 16:17:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d1877cd9-7374-1512-7b01-2a2fb184643a@oracle.com>
-Subject: Re: [Qemu-devel] [RFC v2 0/4] QEMU changes to do PVH boot
+In-Reply-To: <20181219042113.7364-5-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 4/8] linux-user: Split out preadv,
+ pwritev, readv, writev, pread64, pwrite64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,130 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maran Wilson <maran.wilson@oracle.com>
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>, Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-On Wed, Jan 09, 2019 at 01:18:12PM -0800, Maran Wilson wrote:
-> On 1/9/2019 11:53 AM, Boris Ostrovsky wrote:
-> > On 1/9/19 6:53 AM, Stefano Garzarella wrote:
-> > > Hi Liam,
-> > > 
-> > > On Tue, Jan 8, 2019 at 3:47 PM Liam Merwick <liam.merwick@oracle.com> wrote:
-> > > > QEMU sets the hvm_modlist_entry in load_linux() after the call to
-> > > > load_elfboot() and then qboot loads it in boot_pvh_from_fw_cfg()
-> > > > 
-> > > > But the current PVH patches don't handle initrd (they have
-> > > > start_info.nr_modules == 1).
-> > > Looking in the linux kernel (arch/x86/platform/pvh/enlighten.c) I saw:
-> > >      /* The first module is always ramdisk. */
-> > >      if (pvh_start_info.nr_modules) {
-> > >          struct hvm_modlist_entry *modaddr =
-> > >              __va(pvh_start_info.modlist_paddr);
-> > >          pvh_bootparams.hdr.ramdisk_image = modaddr->paddr;
-> > >          pvh_bootparams.hdr.ramdisk_size = modaddr->size;
-> > >      }
-> > > 
-> > > So, putting start_info.nr_modules = 1, means that the first
-> > > hvm_modlist_entry should have the ramdisk paddr and size. Is it
-> > > correct?
+On 19/12/2018 05:21, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/syscall-defs.h     |  14 ++++
+>  linux-user/syscall-file.inc.c | 124 ++++++++++++++++++++++++++++++++++
+>  linux-user/syscall.c          |  93 -------------------------
+>  linux-user/strace.list        |  18 -----
+>  4 files changed, 138 insertions(+), 111 deletions(-)
 > 
-> That's my understanding.
-> 
-> I think what's missing, is that we just need Qemu or qboot/seabios to
-> properly populate the pvh_start_info.modlist_paddr with the address (as
-> usable by the guest) of the hvm_modlist_entry which correctly defines the
-> details of the initrd that has already been loaded into memory that is
-> accessible by the guest.
-> 
-> -Maran
-> 
+...
+> diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
+> index 11e75044c1..410a763eee 100644
+> --- a/linux-user/syscall-file.inc.c
+> +++ b/linux-user/syscall-file.inc.c
+> @@ -315,6 +315,104 @@ SYSCALL_IMPL(openat)
+...
+> +
+> +/*
+> + * Both preadv and pwritev merge args 4/5 into a 64-bit offset.
+> + * Moreover, the parts are *always* in little-endian order.
+> + */
+> +#if TARGET_ABI_BITS == 32
+> +SYSCALL_ARGS(preadv_pwritev)
+> +{
+> +    /* We have already assigned out[0-2].  */
+> +    abi_ulong lo = in[3], hi = in[4];
+> +    out[3] = ((hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
+> +    return def;
+> +}
+> +#else
+> +#define args_preadv_pwritev NULL
+> +#endif
+> +
+> +/* Perform the inverse operation for the host.  */
+> +static inline void host_offset64_low_high(unsigned long *l, unsigned long *h,
+> +                                          uint64_t off)
+> +{
+> +    *l = off;
+> +    *h = (off >> (HOST_LONG_BITS - 1)) >> 1;
+> +}
 
-I tried and it works, I modified QEMU to load the initrd and to expose it
-through fw_cfg, then qboot loads it and set correctly the hvm_modlist_entry.
 
-You can find the patch of QEMU at the end of this email and the qboot
-patch here: https://github.com/stefano-garzarella/qboot/commit/41e1fd765c8419e270fd79d9b3af5d53576e88a8
+I have an error with preadv() on a 32bit target (powerpc, LTP test preadv02).
 
-Do you think can be a good approach? If you want, you can add this patch
-to your series.
+It works if I use:
 
-Thanks,
-Stefano
+static inline void host_offset64_low_high(unsigned long *hlow,
+                                          unsigned long *hhigh,
+                                          abi_ulong tlow,
+                                          abi_ulong thigh)
+{
+    uint64_t off = tlow |
+                   ((unsigned long long)thigh << TARGET_LONG_BITS / 2) <<
+                   TARGET_LONG_BITS / 2;
+    
+    *hlow = off;
+    *hhigh = (off >> HOST_LONG_BITS / 2) >> HOST_LONG_BITS / 2;
+}
 
 
->From d5c0d51768f5a8fb214be6c2bb0cb7e86e9917b7 Mon Sep 17 00:00:00 2001
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 10 Jan 2019 15:16:44 +0100
-Subject: [PATCH] pvh: load initrd and expose it through fw_cfg
 
-When initrd is specified, load and expose it to the guest firmware
-through fw_cfg. The firmware will fill the hvm_start_info for the
-kernel.
+> +
+> +SYSCALL_IMPL(preadv)
+> +{
+> +    struct iovec *vec = lock_iovec(VERIFY_WRITE, arg2, arg3, 0);
+> +    unsigned long lo, hi;
+> +    abi_long ret;
+> +
+> +    if (vec == NULL) {
+> +        return -host_to_target_errno(errno);
+> +    }
+> +
+> +    host_offset64_low_high(&lo, &hi, arg4);
+> +    ret = get_errno(safe_preadv(arg1, vec, arg3, lo, hi));
+> +    unlock_iovec(vec, arg2, arg3, 1);
+> +    return ret;
+> +}
+> +
+> +SYSCALL_IMPL(pwritev)
+> +{
+> +    struct iovec *vec = lock_iovec(VERIFY_READ, arg2, arg3, 1);
+> +    unsigned long lo, hi;
+> +    abi_long ret;
+> +
+> +    if (vec == NULL) {
+> +        ret = -host_to_target_errno(errno);
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Based-on: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
----
- hw/i386/pc.c | 38 +++++++++++++++++++++++++++++---------
- 1 file changed, 29 insertions(+), 9 deletions(-)
+           return -host_to_target_errno(errno);
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 06bce6a101..f6721f51be 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -986,25 +986,45 @@ static void load_linux(PCMachineState *pcms,
-          */
-         if (load_elfboot(kernel_filename, kernel_size,
-                          header, pvh_start_addr, fw_cfg)) {
--            struct hvm_modlist_entry ramdisk_mod = { 0 };
--
-             fclose(f);
- 
-             fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
-                 strlen(kernel_cmdline) + 1);
-             fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
- 
--            assert(machine->device_memory != NULL);
--            ramdisk_mod.paddr = machine->device_memory->base;
--            ramdisk_mod.size =
--                memory_region_size(&machine->device_memory->mr);
--
--            fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, &ramdisk_mod,
--                             sizeof(ramdisk_mod));
-             fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(header));
-             fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
-                              header, sizeof(header));
- 
-+            /* load initrd */
-+            if (initrd_filename) {
-+                gsize initrd_size;
-+                gchar *initrd_data;
-+                GError *gerr = NULL;
-+
-+                if (!g_file_get_contents(initrd_filename, &initrd_data,
-+                            &initrd_size, &gerr)) {
-+                    fprintf(stderr, "qemu: error reading initrd %s: %s\n",
-+                            initrd_filename, gerr->message);
-+                    exit(1);
-+                }
-+
-+                initrd_max = pcms->below_4g_mem_size - pcmc->acpi_data_size - 1;
-+                if (initrd_size >= initrd_max) {
-+                    fprintf(stderr, "qemu: initrd is too large, cannot support."
-+                            "(max: %"PRIu32", need %"PRId64")\n",
-+                            initrd_max, (uint64_t)initrd_size);
-+                    exit(1);
-+                }
-+
-+                initrd_addr = (initrd_max - initrd_size) & ~4095;
-+
-+                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
-+                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
-+                fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data,
-+                                 initrd_size);
-+            }
-+
-             return;
-         }
-         /* This looks like a multiboot kernel. If it is, let's stop
--- 
-2.20.1
+> +    }
+> +
+> +    host_offset64_low_high(&lo, &hi, arg4);
+> +    ret = get_errno(safe_pwritev(arg1, vec, arg3, lo, hi));
+> +    unlock_iovec(vec, arg2, arg3, 0);
+> +    return ret;
+> +}
+> +
+>  SYSCALL_IMPL(read)
+>  {
+>      abi_long ret;
