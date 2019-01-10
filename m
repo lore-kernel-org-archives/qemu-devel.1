@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48981)
+Received: from eggs.gnu.org ([209.51.188.92]:49517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1ghXJI-0003MG-JB
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:11:37 -0500
+	(envelope-from <berrange@redhat.com>) id 1ghXKU-0003wn-A1
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:12:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1ghXJH-0002Na-0A
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:11:35 -0500
-References: <20190110094020.18354-1-stefanha@redhat.com>
-	<20190110094020.18354-3-stefanha@redhat.com>
-	<cd32de08-afd0-4b8b-a10a-99e1d88d1755@redhat.com>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <5cc00012-1929-22a0-cbf8-14573b083ae7@mail.ru>
-Date: Thu, 10 Jan 2019 13:11:05 +0300
+	(envelope-from <berrange@redhat.com>) id 1ghXKS-00030l-LC
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 05:12:50 -0500
+Date: Thu, 10 Jan 2019 10:12:43 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190110101243.GE2178@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1547051976-13982-1-git-send-email-thuth@redhat.com>
+	<1547051976-13982-2-git-send-email-thuth@redhat.com>
+	<3316bf08-36c0-c3ce-4e4f-8244276c58d3@kaod.org>
+	<20190109172801.GB3998@redhat.com>
+	<d72673fa-52a5-a6ff-6aa8-34f2b4b6855f@redhat.com>
+	<60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cd32de08-afd0-4b8b-a10a-99e1d88d1755@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] tests/microbit-test: add TWI stub
- device test
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <60b7e2bf-6822-6e0b-7184-b38594eb38ed@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] include/hw/ppc: Fix
+ compilation with clang -std=gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, jim@groklearning.com, qemu-arm@nongnu.org, contrib@steffen-goertz.de
+To: Eric Blake <eblake@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>
+
+On Wed, Jan 09, 2019 at 03:25:53PM -0600, Eric Blake wrote:
+> On 1/9/19 3:20 PM, Paolo Bonzini wrote:
+> > On 09/01/19 18:28, Daniel P. Berrang=C3=A9 wrote:
+> >>> so both files include each other, how nice ...
+> >> If the header files are mutually dependent it makes me wonder what t=
+he
+> >> point of having them split up is ?
+> >>
+> >> Feels like either they need to be merged, or they need to be split u=
+p
+> >> and refactored even more to remove the mutual dependancy.
+> >=20
+> > If they include each other only for the typedefs, then prehaps the
+> > solution is to change the coding style and allow using struct in
+> > function prototypes.  I'm pretty sure there are several examples of t=
+his
+> > already.
+>=20
+> Or stick the typedef in <typedefs.h>, instead of trying to find (or
+> create) some other common header.
+
+Probably better to just have a local  spapr_types.h instead of
+polluting the global namespace.
 
 
-
-On 10.01.2019 12:48, Thomas Huth wrote:
-> On 2019-01-10 10:40, Stefan Hajnoczi wrote:
->> This test verifies that we read back the expected I2C WHO_AM_I register
->> values for the accelerometer/magnetometer.
->>
->> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->> ---
->>   tests/microbit-test.c | 44 +++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 44 insertions(+)
->>
->> diff --git a/tests/microbit-test.c b/tests/microbit-test.c
->> index 0c125535f6..dcdc0cd41a 100644
->> --- a/tests/microbit-test.c
->> +++ b/tests/microbit-test.c
->> @@ -21,6 +21,49 @@
->>   #include "hw/arm/nrf51.h"
->>   #include "hw/gpio/nrf51_gpio.h"
->>   #include "hw/timer/nrf51_timer.h"
->> +#include "hw/i2c/microbit_i2c.h"
->> +
->> +/* Read a byte from I2C device at @addr from register @reg */
->> +static uint32_t i2c_read_byte(uint32_t addr, uint32_t reg)
->> +{
->> +    uint32_t val;
->> +
->> +    writel(NRF51_TWI_BASE + NRF51_TWI_REG_ADDRESS, addr);
->> +    writel(NRF51_TWI_BASE + NRF51_TWI_TASK_STARTTX, 1);
->> +    writel(NRF51_TWI_BASE + NRF51_TWI_REG_TXD, reg);
->> +    val = readl(NRF51_TWI_BASE + NRF51_TWI_EVENT_TXDSENT);
->> +    g_assert_cmpuint(val, ==, 1);
->> +    writel(NRF51_TWI_BASE + NRF51_TWI_TASK_STOP, 1);
->> +
->> +    writel(NRF51_TWI_BASE + NRF51_TWI_TASK_STARTRX, 1);
->> +    val = readl(NRF51_TWI_BASE + NRF51_TWI_EVENT_RXDREADY);
->> +    g_assert_cmpuint(val, ==, 1);
->> +    val = readl(NRF51_TWI_BASE + NRF51_TWI_REG_RXD);
->> +    writel(NRF51_TWI_BASE + NRF51_TWI_TASK_STOP, 1);
-> 
-> Any chance that you could use qemu_writel() right from the start here?
-> That will make it easier to finally get rid of global_qtest one day...
-
-I'll send a patch soon to fix it.
-But this test can be merged without corrections.
-
-Best regards, Julia Suvorova.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
