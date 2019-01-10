@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35096)
+Received: from eggs.gnu.org ([209.51.188.92]:35123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghUXC-0000TR-Ug
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:13:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghUXD-0000WT-Rf
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:13:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghUXC-0001j8-6g
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:13:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghUXC-0001jP-KC
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 02:13:47 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 10 Jan 2019 01:13:28 -0600
-Message-Id: <20190110071330.28136-5-eblake@redhat.com>
+Date: Thu, 10 Jan 2019 01:13:30 -0600
+Message-Id: <20190110071330.28136-7-eblake@redhat.com>
 In-Reply-To: <20190110071330.28136-1-eblake@redhat.com>
 References: <20190110071330.28136-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 4/6] nbd: Remove x-nbd-server-add-bitmap
+Subject: [Qemu-devel] [PATCH v2 6/6] qemu-nbd: Add --bitmap=NAME option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,86 +22,183 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Now that nbd-server-add can do the same functionality, we no
-longer need the experimental separate command.
+Having to fire up qemu, then use QMP commands for nbd-server-start
+and nbd-server-add, just to expose a persistent dirty bitmap, is
+rather tedious.  Make it possible to expose a dirty bitmap using
+just qemu-nbd (of course, for now this only works when qemu-nbd is
+visiting a BDS formatted as qcow2).
+
+Of course, any good feature also needs unit testing, so expand
+iotest 223 to cover it.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/block.json | 23 -----------------------
- blockdev-nbd.c  | 23 -----------------------
- 2 files changed, 46 deletions(-)
+ qemu-nbd.texi              |  4 ++++
+ qemu-nbd.c                 | 10 ++++++++--
+ tests/qemu-iotests/223     | 18 +++++++++++++++++-
+ tests/qemu-iotests/223.out | 12 +++++++++++-
+ 4 files changed, 40 insertions(+), 4 deletions(-)
 
-diff --git a/qapi/block.json b/qapi/block.json
-index 3d70420f763..5a79d639e8c 100644
---- a/qapi/block.json
-+++ b/qapi/block.json
-@@ -301,29 +301,6 @@
- { 'command': 'nbd-server-remove',
-   'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
+diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+index 9a84e81eed9..96b1546006a 100644
+--- a/qemu-nbd.texi
++++ b/qemu-nbd.texi
+@@ -45,6 +45,10 @@ auto-detecting
+ Export the disk as read-only
+ @item -P, --partition=3D@var{num}
+ Only expose partition @var{num}
++@item -B, --bitmap=3D@var{name}
++If @var{filename} has a qcow2 persistent bitmap @var{name}, expose
++that bitmap via the ``qemu:dirty-bitmap:@var{name}'' context
++accessible through NBD_OPT_SET_META_CONTEXT.
+ @item -s, --snapshot
+ Use @var{filename} as an external snapshot, create a temporary
+ file with backing_file=3D@var{filename}, redirect the write to
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 03813187846..26f5c08821d 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -95,6 +95,7 @@ static void usage(const char *name)
+ "Exposing part of the image:\n"
+ "  -o, --offset=3DOFFSET       offset into the image\n"
+ "  -P, --partition=3DNUM       only expose partition NUM\n"
++"  -B, --bitmap=3DNAME         expose a persistent dirty bitmap\n"
+ "\n"
+ "General purpose options:\n"
+ "  --object type,id=3DID,...   define an object such as 'secret' for pro=
+viding\n"
+@@ -509,7 +510,7 @@ int main(int argc, char **argv)
+     off_t fd_size;
+     QemuOpts *sn_opts =3D NULL;
+     const char *sn_id_or_name =3D NULL;
+-    const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:";
++    const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:B:";
+     struct option lopt[] =3D {
+         { "help", no_argument, NULL, 'h' },
+         { "version", no_argument, NULL, 'V' },
+@@ -519,6 +520,7 @@ int main(int argc, char **argv)
+         { "offset", required_argument, NULL, 'o' },
+         { "read-only", no_argument, NULL, 'r' },
+         { "partition", required_argument, NULL, 'P' },
++        { "bitmap", required_argument, NULL, 'B' },
+         { "connect", required_argument, NULL, 'c' },
+         { "disconnect", no_argument, NULL, 'd' },
+         { "snapshot", no_argument, NULL, 's' },
+@@ -558,6 +560,7 @@ int main(int argc, char **argv)
+     QDict *options =3D NULL;
+     const char *export_name =3D ""; /* Default export name */
+     const char *export_description =3D NULL;
++    const char *bitmap =3D NULL;
+     const char *tlscredsid =3D NULL;
+     bool imageOpts =3D false;
+     bool writethrough =3D true;
+@@ -695,6 +698,9 @@ int main(int argc, char **argv)
+                 exit(EXIT_FAILURE);
+             }
+             break;
++        case 'B':
++            bitmap =3D optarg;
++            break;
+         case 'k':
+             sockpath =3D optarg;
+             if (sockpath[0] !=3D '/') {
+@@ -1016,7 +1022,7 @@ int main(int argc, char **argv)
+     }
 
--##
--# @x-nbd-server-add-bitmap:
--#
--# Expose a dirty bitmap associated with the selected export. The bitmap =
-search
--# starts at the device attached to the export, and includes all backing =
-files.
--# The exported bitmap is then locked until the NBD export is removed.
--#
--# @name: Export name.
--#
--# @bitmap: Bitmap name to search for.
--#
--# @bitmap-export-name: How the bitmap will be seen by nbd clients
--#                      (default @bitmap)
--#
--# Note: the client must use NBD_OPT_SET_META_CONTEXT with a query of
--# "qemu:dirty-bitmap:NAME" (where NAME matches @bitmap-export-name) to a=
-ccess
--# the exposed bitmap.
--#
--# Since: 3.0
--##
--  { 'command': 'x-nbd-server-add-bitmap',
--    'data': {'name': 'str', 'bitmap': 'str', '*bitmap-export-name': 'str=
-'} }
--
- ##
- # @nbd-server-stop:
- #
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index ac7e993c35f..003ba7d7180 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -228,26 +228,3 @@ void qmp_nbd_server_stop(Error **errp)
-     nbd_server_free(nbd_server);
-     nbd_server =3D NULL;
- }
--
--void qmp_x_nbd_server_add_bitmap(const char *name, const char *bitmap,
--                                 bool has_bitmap_export_name,
--                                 const char *bitmap_export_name,
--                                 Error **errp)
--{
--    NBDExport *exp;
--
--    if (!nbd_server) {
--        error_setg(errp, "NBD server not running");
--        return;
--    }
--
--    exp =3D nbd_export_find(name);
--    if (exp =3D=3D NULL) {
--        error_setg(errp, "Export '%s' is not found", name);
--        return;
--    }
--
--    nbd_export_bitmap(exp, bitmap,
--                      has_bitmap_export_name ? bitmap_export_name : bitm=
-ap,
--                      errp);
--}
+     exp =3D nbd_export_new(bs, dev_offset, fd_size, export_name,
+-                         export_description, NULL, nbdflags,
++                         export_description, bitmap, nbdflags,
+                          nbd_export_closed, writethrough, NULL, &error_f=
+atal);
+
+     if (device) {
+diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
+index 1f6822f9489..d7c4a31a181 100755
+--- a/tests/qemu-iotests/223
++++ b/tests/qemu-iotests/223
+@@ -25,6 +25,7 @@ status=3D1 # failure is the default!
+
+ _cleanup()
+ {
++    nbd_server_stop
+     _cleanup_test_img
+     _cleanup_qemu
+     rm -f "$TEST_DIR/nbd"
+@@ -35,6 +36,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.rc
+ . ./common.filter
+ . ./common.qemu
++. ./common.nbd
+
+ _supported_fmt qcow2
+ _supported_proto file # uses NBD as well
+@@ -153,7 +155,7 @@ $QEMU_IMG map --output=3Djson --image-opts \
+   "$IMG,x-dirty-bitmap=3Dqemu:dirty-bitmap:b2" | _filter_qemu_img_map
+
+ echo
+-echo "=3D=3D=3D End NBD server =3D=3D=3D"
++echo "=3D=3D=3D End qemu NBD server =3D=3D=3D"
+ echo
+
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
+@@ -165,6 +167,20 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-=
+remove",
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-stop"}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"quit"}' "return"
+
++echo
++echo "=3D=3D=3D Use qemu-nbd as server =3D=3D=3D"
++echo
++
++nbd_server_start_unix_socket -r -f $IMGFMT -B b "$TEST_IMG"
++IMG=3D"driver=3Dnbd,server.type=3Dunix,server.path=3D$nbd_unix_socket"
++$QEMU_IMG map --output=3Djson --image-opts \
++  "$IMG,x-dirty-bitmap=3Dqemu:dirty-bitmap:b" | _filter_qemu_img_map
++
++nbd_server_start_unix_socket -f $IMGFMT -B b2 "$TEST_IMG"
++IMG=3D"driver=3Dnbd,server.type=3Dunix,server.path=3D$nbd_unix_socket"
++$QEMU_IMG map --output=3Djson --image-opts \
++  "$IMG,x-dirty-bitmap=3Dqemu:dirty-bitmap:b2" | _filter_qemu_img_map
++
+ # success, all done
+ echo '*** done'
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
+index 7135bf59bb8..ad3b2727ba8 100644
+--- a/tests/qemu-iotests/223.out
++++ b/tests/qemu-iotests/223.out
+@@ -58,11 +58,21 @@ read 2097152/2097152 bytes at offset 2097152
+ { "start": 1024, "length": 2096128, "depth": 0, "zero": false, "data": t=
+rue},
+ { "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data"=
+: false}]
+
+-=3D=3D=3D End NBD server =3D=3D=3D
++=3D=3D=3D End qemu NBD server =3D=3D=3D
+
+ {"return": {}}
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "Export 'n2' is not found"}}
+ {"return": {}}
+ {"return": {}}
++
++=3D=3D=3D Use qemu-nbd as server =3D=3D=3D
++
++[{ "start": 0, "length": 65536, "depth": 0, "zero": false, "data": false=
+},
++{ "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": =
+true},
++{ "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data"=
+: false}]
++[{ "start": 0, "length": 512, "depth": 0, "zero": false, "data": true},
++{ "start": 512, "length": 512, "depth": 0, "zero": false, "data": false}=
+,
++{ "start": 1024, "length": 2096128, "depth": 0, "zero": false, "data": t=
+rue},
++{ "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data"=
+: false}]
+ *** done
 --=20
 2.20.1
