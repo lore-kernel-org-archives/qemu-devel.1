@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48993)
+Received: from eggs.gnu.org ([209.51.188.92]:49098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghc0C-00006k-Ry
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:14 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1ghc0Z-0000SF-B2
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghc0B-0004C9-JP
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:12 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 10 Jan 2019 15:12:01 +0000
-Message-ID: <d58c851a-1e69-ac9d-fb6b-2fcb58bfdecc@virtuozzo.com>
-References: <20190110071330.28136-1-eblake@redhat.com>
-	<20190110071330.28136-3-eblake@redhat.com>
-	<7bead05e-672a-fdc2-6291-e72090defb66@virtuozzo.com>
-	<d4482d97-637f-edcd-a37d-af708c25f567@redhat.com>
-In-Reply-To: <d4482d97-637f-edcd-a37d-af708c25f567@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EAAD2BF230AFEA44AF641B8DE5CEDF25@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <luc.michel@greensocs.com>) id 1ghc0T-0004GO-R9
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 10:12:35 -0500
+References: <20190108163008.7006-1-peter.maydell@linaro.org>
+	<20190108163008.7006-2-peter.maydell@linaro.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <3b738c7c-f42e-24c3-c8f6-74695e62c1dd@greensocs.com>
+Date: Thu, 10 Jan 2019 16:11:55 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd: Merge nbd_export_set_name into
- nbd_export_new
+In-Reply-To: <20190108163008.7006-2-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="09mHiv8vIxoM7oU6FU2Hqz2za2XihTaja"
+Subject: Re: [Qemu-devel] [PATCH 1/4] hw/arm/xlx-zynqmp: Realize cluster
+ after putting RPUs in it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +25,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MTAuMDEuMjAxOSAxNzo0NCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xMC8xOSA0OjQwIEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTAuMDEuMjAxOSAxMDox
-MywgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBUaGUgZXhpc3RpbmcgTkJEIGNvZGUgaGFkIGEgd2Vp
-cmQgc3BsaXQgd2hlcmUgbmJkX2V4cG9ydF9uZXcoKQ0KPj4+IGNyZWF0ZWQgYW4gZXhwb3J0IGJ1
-dCBkaWQgbm90IGFkZCBpdCB0byB0aGUgbGlzdCBvZiBleHBvcnRlZA0KPj4+IG5hbWVzIHVudGls
-IGEgbGF0ZXIgbmJkX2V4cG9ydF9zZXRfbmFtZSgpIGNhbWUgYWxvbmcgYW5kIGdyYWJiZWQNCj4+
-PiBhIHNlY29uZCByZWZlcmVuY2Ugb24gdGhlIG9iamVjdDsgbGF0ZXIsIG5iZF9leHBvcnRfY2xv
-c2UoKQ0KPj4+IGRyb3BzIHRoZSBzZWNvbmQgcmVmZXJlbmNlLiAgQnV0IHNpbmNlIHdlIG5ldmVy
-IGNoYW5nZSB0aGUNCj4+PiBuYW1lIG9mIGFuIE5CRCBleHBvcnQgd2hpbGUgaXQgaXMgZXhwb3Nl
-ZCwgaXQgaXMgZWFzaWVyIHRvIGp1c3QNCj4+PiBpbmxpbmUgdGhlIHByb2Nlc3Mgb2Ygc2V0dGlu
-ZyB0aGUgbmFtZSBhcyBwYXJ0IG9mIGNyZWF0aW5nIHRoZQ0KPj4+IGV4cG9ydC4NCj4+Pg0KPj4+
-IElubGluZSB0aGUgY29udGVudHMgb2YgbmJkX2V4cG9ydF9zZXRfbmFtZSgpIGFuZA0KPj4+IG5i
-ZF9leHBvcnRfc2V0X2Rlc2NyaXB0aW9uKCkgaW50byB0aGUgdHdvIHBvaW50cyBpbiBhbiBleHBv
-cnQNCj4+PiBsaWZlY3ljbGUgd2hlcmUgdGhleSBtYXR0ZXIsIHRoZW4gYWRqdXN0IGJvdGggY2Fs
-bGVycyB0byBwYXNzDQo+Pj4gdGhlIG5hbWUgdXAgZnJvbnQuICBOb3RlIHRoYXQgYWxsIGNhbGxl
-cnMgcGFzcyBhIG5vbi1OVUxMIG5hbWUsDQo+Pj4gKHBhc3NpbmcgTlVMTCBhdCBjcmVhdGlvbiB3
-YXMgZm9yIG9sZCBzdHlsZSBzZXJ2ZXJzLCBidXQgd2UNCj4+PiByZW1vdmVkIHN1cHBvcnQgZm9y
-IHRoYXQgaW4gY29tbWl0IDdmN2RmZTJhKS4NCj4gDQo+IEkgbmVlZCB0byBmaXggdGhhdCBzZW50
-ZW5jZToNCj4gDQo+IA0KPj4+IC12b2lkIG5iZF9leHBvcnRfc2V0X25hbWUoTkJERXhwb3J0ICpl
-eHAsIGNvbnN0IGNoYXIgKm5hbWUpDQo+Pj4gLXsNCj4+PiAtICAgIGlmIChleHAtPm5hbWUgPT0g
-bmFtZSkgew0KPj4+IC0gICAgICAgIHJldHVybjsNCj4+PiAtICAgIH0NCj4+PiAtDQo+Pj4gLSAg
-ICBuYmRfZXhwb3J0X2dldChleHApOw0KPj4+IC0gICAgaWYgKGV4cC0+bmFtZSAhPSBOVUxMKSB7
-DQo+Pj4gLSAgICAgICAgZ19mcmVlKGV4cC0+bmFtZSk7DQo+Pj4gLSAgICAgICAgZXhwLT5uYW1l
-ID0gTlVMTDsNCj4+PiAtICAgICAgICBRVEFJTFFfUkVNT1ZFKCZleHBvcnRzLCBleHAsIG5leHQp
-Ow0KPj4+IC0gICAgICAgIG5iZF9leHBvcnRfcHV0KGV4cCk7DQo+Pj4gLSAgICB9DQo+IA0KPiBJ
-biB0aGUgb2xkIGNvZGUsIGV4cC0+bmFtZSA9PSBOVUxMIHdhcyBwb3NzaWJsZSBkdXJpbmcgYSBz
-ZWNvbmQNCj4gbmJkX2V4cG9ydF9jbG9zZSgpLCBzbyB0aGlzIGNvbmRpdGlvbmFsIG5lZWRzIHRv
-IGJlIHByZXNlcnZlZCBpZg0KPiBuYmRfZXhwb3J0X2Nsb3NlKCkgY2FuIGJlIGNhbGxlZCBtb3Jl
-IHRoYW4gb25jZSBvbiB0aGUgc2FtZSBleHAuDQo+IA0KPj4+IC0gICAgaWYgKG5hbWUgIT0gTlVM
-TCkgew0KPj4+IC0gICAgICAgIG5iZF9leHBvcnRfZ2V0KGV4cCk7DQo+Pj4gLSAgICAgICAgZXhw
-LT5uYW1lID0gZ19zdHJkdXAobmFtZSk7DQo+Pj4gLSAgICAgICAgUVRBSUxRX0lOU0VSVF9UQUlM
-KCZleHBvcnRzLCBleHAsIG5leHQpOw0KPj4+IC0gICAgfQ0KPiANCj4gV2hlcmVhcyB0aGlzIGNv
-bmRpdGlvbmFsIHdhcyBvbmx5IHBvc3NpYmxlIHJpZ2h0IGFmdGVyIG5iZF9leHBvcnRfbmV3KCks
-DQo+IGFuZCB3YXMgYWx3YXlzIG5vbi1OVUxMLCBoZW5jZSBJIGNvbnZlcnRlZCBpdCB0byBhbiBh
-c3NlcnQoKSBmb3IgYQ0KPiBub24tTlVMTCBuYW1lIGFuZCB1bmNvbmRpdGlvbmFsIGNvZGUuDQo+
-IA0KPj4+IC0gICAgbmJkX2V4cG9ydF9wdXQoZXhwKTsNCj4+PiAtfQ0KPj4+IC0NCj4+PiAtdm9p
-ZCBuYmRfZXhwb3J0X3NldF9kZXNjcmlwdGlvbihOQkRFeHBvcnQgKmV4cCwgY29uc3QgY2hhciAq
-ZGVzY3JpcHRpb24pDQo+Pj4gLXsNCj4+PiAtICAgIGdfZnJlZShleHAtPmRlc2NyaXB0aW9uKTsN
-Cj4+PiAtICAgIGV4cC0+ZGVzY3JpcHRpb24gPSBnX3N0cmR1cChkZXNjcmlwdGlvbik7DQo+Pj4g
-LX0NCj4+PiAtDQo+Pj4gICAgdm9pZCBuYmRfZXhwb3J0X2Nsb3NlKE5CREV4cG9ydCAqZXhwKQ0K
-Pj4+ICAgIHsNCj4+PiAgICAgICAgTkJEQ2xpZW50ICpjbGllbnQsICpuZXh0Ow0KPj4+IEBAIC0x
-NTY4LDggKzE1NDksMTQgQEAgdm9pZCBuYmRfZXhwb3J0X2Nsb3NlKE5CREV4cG9ydCAqZXhwKQ0K
-Pj4+ICAgICAgICBRVEFJTFFfRk9SRUFDSF9TQUZFKGNsaWVudCwgJmV4cC0+Y2xpZW50cywgbmV4
-dCwgbmV4dCkgew0KPj4+ICAgICAgICAgICAgY2xpZW50X2Nsb3NlKGNsaWVudCwgdHJ1ZSk7DQo+
-Pj4gICAgICAgIH0NCj4+PiAtICAgIG5iZF9leHBvcnRfc2V0X25hbWUoZXhwLCBOVUxMKTsNCj4+
-PiAtICAgIG5iZF9leHBvcnRfc2V0X2Rlc2NyaXB0aW9uKGV4cCwgTlVMTCk7DQo+Pj4gKyAgICBp
-ZiAoZXhwLT5uYW1lKSB7DQo+Pj4gKyAgICAgICAgbmJkX2V4cG9ydF9wdXQoZXhwKTsNCj4+PiAr
-ICAgICAgICBnX2ZyZWUoZXhwLT5uYW1lKTsNCj4+PiArICAgICAgICBleHAtPm5hbWUgPSBOVUxM
-Ow0KPj4+ICsgICAgICAgIFFUQUlMUV9SRU1PVkUoJmV4cG9ydHMsIGV4cCwgbmV4dCk7DQo+Pg0K
-Pj4gZXhwLT5uYW1lIGlzIGFsd2F5cyBub24temVybywgYW5kIF9nZXQgYW5kIF9JTlNFUlRfVEFJ
-TCB3ZXJlIGRvbmUgaW5kZXBlbmRlbnRseSBmcm9tIG5hbWUsDQo+PiBzbyB3aXRoIHRoZXNlIGZv
-dXIgbGluZXMgZG9uZSB1bmNvbmRpdGlvbmFsbHk6DQo+PiBSZXZpZXdlZC1ieTogVmxhZGltaXIg
-U2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPiANCj4gTm93
-LCBvbiB0byB0aGUgYW5hbHlzaXMgb2Ygd2hldGhlciB0aGUgY29kZSBpbiBuYmRfZXhwb3J0X2Ns
-b3NlKCkgbmVlZHMNCj4gYSBjb25kaXRpb25hbCAtIHllcywgaXQgZG9lcy4gTWFraW5nIGl0IHVu
-Y29uZGl0aW9uYWwgYnJlYWtzIHRoZSBmYWN0DQo+IHRoYXQgd2UgaGF2ZSBuZXN0ZWQgcmVmZXJl
-bmNpbmcgc2VtYW50aWNzOiBZb3UgY2FuIGNyZWF0ZSBhbiBleHBvcnQsDQo+IHRoZW4gY2FsbCBu
-YmRfZXhwb3J0X2dldChleHApIHRvIGhvbGQgYSBzZWNvbmQgcmVmZXJlbmNlIHRvIGl0IGZvciBh
-cw0KPiBsb25nIGFzIHRoZSBleHBvcnQgcmVtYWlucyBhbGl2ZS4gVGhlIGZpcnN0IHRpbWUgbmJk
-X2V4cG9ydF9jbG9zZSgpIGlzDQo+IGNhbGxlZCwgeW91IGFyZSB0ZWxsaW5nIHRoZSBOQkQgc2Vy
-dmVyIHRvIG5vIGxvbmdlciBhZHZlcnRpc2UgdGhlIGV4cG9ydA0KPiAobm8gbmV3IGNsaWVudHMg
-Y2FuIGNvbm5lY3QsIGJlY2F1c2UgZXhwLT5uYW1lIGlzIG5vdyBOVUxMKSwgYnV0IGFsbA0KPiBl
-eGlzdGluZyBjbGllbnRzIGNvbnRpbnVlIHRvIGFjY2VzcyB0aGUgZXhwb3J0IGp1c3QgZmluZS4g
-VGhlIHNlY29uZA0KPiB0aW1lIG5iZF9leHBvcnRfY2xvc2UoKSBpcyBjYWxsZWQsIGV4cC0+bmFt
-ZSBpcyBhbHJlYWR5IE5VTEwsIGFuZCB3ZSBhcmUNCj4gY2xvc2luZyBvdXQgYWxsIGV4aXN0aW5n
-IGNsaWVudHMgKGlmIGFueSBhcmUgbGVmdCkgLSBpdCdzIGhvdyB3ZQ0KDQpobSwgbG9va3MgbGlr
-ZSBpdCB3b3JrcyBpbiBvdGhlciB3YXkNCnZvaWQgbmJkX2V4cG9ydF9jbG9zZShOQkRFeHBvcnQg
-KmV4cCkNCnsNCiAgICAgTkJEQ2xpZW50ICpjbGllbnQsICpuZXh0Ow0KDQogICAgIG5iZF9leHBv
-cnRfZ2V0KGV4cCk7DQogICAgIFFUQUlMUV9GT1JFQUNIX1NBRkUoY2xpZW50LCAmZXhwLT5jbGll
-bnRzLCBuZXh0LCBuZXh0KSB7DQogICAgICAgICBjbGllbnRfY2xvc2UoY2xpZW50LCB0cnVlKTsN
-CiAgICAgfQ0KICAgICBuYmRfZXhwb3J0X3NldF9uYW1lKGV4cCwgTlVMTCk7DQogICAgIG5iZF9l
-eHBvcnRfc2V0X2Rlc2NyaXB0aW9uKGV4cCwgTlVMTCk7DQogICAgIG5iZF9leHBvcnRfcHV0KGV4
-cCk7DQp9DQoNCmZpcnN0IG9yIHNlY29uZCB0aW1lIHlvdSBjYWxsIGl0LCBpdCB3aWxsIGNsb3Nl
-IGFsbCBjbGllbnRzLg0KDQo+IGltcGxlbWVudGVkIHRoZSBuYmQtc2VydmVyLXJlbW92ZSBzYWZl
-IHZzLiBoYXJkIG1vZGUsIGFuZCBob3cgd2UgY291bGQNCj4gYWRkIHRoZSBoaWRlL3NvZnQgbW9k
-ZXMgaW4gdGhlIGZ1dHVyZSAoc2VlIGJsb2NrLmpzb246TmJkU2VydmVyUmVtb3ZlTW9kZSkuDQo+
-IA0KDQphbmQgbmJkX2V4cG9ydF9yZW1vdmUgZG9uJ3QgY2FsbCBuYmRfZXhwb3J0X2Nsb3NlIGlm
-IGl0IGlzIHNhZmUgbW9kZSBhbmQgdGhlcmUgYXJlIGFjdGl2ZSBjbGllbnRzLg0KDQphaGEsIHJl
-bWVtYmVyLCB3ZSBkZWNpZGVkIHRvIG5vdCBpbXBsZW1lbnQgbWlkZGxlIG1vZGUsIHdoaWNoIHJl
-bW92ZXMgZXhwb3J0IGZyb20gdGhlIGxpc3QgYnV0IGtlZXBzDQpleGlzdGluZyBjb25uZWN0aW9u
-cy4NCg0KDQpCdXQgeW91IGFyZSByaWdodCB0aGF0IGl0IGlzIGF0IGxlYXN0IG5vdCBvYnZpb3Vz
-LCB0aGF0IG5iZF9leHBvcnRfY2xvc2Ugbm90IGNhbGxlZCB0d2ljZS4uIEFuZCB0aGUgZmFjdA0K
-dGhhdCBpdCBkZXBlbmRzIG9uIChzZWVtcyB1bnJlbGF0ZWQpIG5hbWUgdmFyaWFibGUgdG9nZXRo
-ZXIgd2l0aCBuYmRfZXhwb3J0X2Nsb3NlIGNhbGxlZCBmcm9tDQpuYmRfZXhwb3J0X3B1dCBhbmQg
-ZnJvbSBvdGhlciBwbGFjZXMgKGNvbnNpZGVyIGFsc28gbXkgY29tbWVudCBpbiBuYmRfZXhwb3J0
-X3B1dCkgLSB0aGlzIGFsbCBsb29rcyByZWFsbHkNCndlaXJkLCBhbmQgaG9wZSB3ZSdsbCByZWZh
-Y3RvciBpdCBvbmUgZGF5Lg0KDQpPaywgZm9yIG5vdyBpdCdzIHNhZmUgdG8ga2VlcCBvbGQgY29u
-ZGl0aW9uLCBzbyBleHAtPm5hbWUgIT0gTlVMTCBpcyBhIHNpZ24gdGhhdCBleHBvcnQgZXhpc3Rz
-IGluIHRoZSBsaXN0DQooaXQgd29ydGggYSBjb21tZW50LCBhcyBhZnRlciByZW1vdmluZyBuYmRf
-ZXhwb3J0X3NldF9uYW1lKCkgaXQgYmVjb21lcyBtb3JlIHdlaXJkKSwgYW55d2F5IHBhdGNoIG1h
-a2VzDQp0aGluZ3MgYmV0dGVyLCBob3BlIHlvdSdsbCBhZGQgYSBjb21tZW50Og0KDQpSZXZpZXdl
-ZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
-Y29tPg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--09mHiv8vIxoM7oU6FU2Hqz2za2XihTaja
+From: Luc Michel <luc.michel@greensocs.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Emilio G . Cota" <cota@braap.org>, patches@linaro.org,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3b738c7c-f42e-24c3-c8f6-74695e62c1dd@greensocs.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] hw/arm/xlx-zynqmp: Realize cluster after
+ putting RPUs in it
+References: <20190108163008.7006-1-peter.maydell@linaro.org>
+ <20190108163008.7006-2-peter.maydell@linaro.org>
+In-Reply-To: <20190108163008.7006-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/8/19 5:30 PM, Peter Maydell wrote:
+> Currently the cluster implementation doesn't have any constraints
+> on the ordering of realizing the TYPE_CPU_CLUSTER and populating it
+> with child objects. We want to impose a constraint that realize
+> must happen only after all the child objects are added, so move
+> the realize of rpu_cluster. (The apu_cluster is already
+> realized after child population.)
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+
+> ---
+>  hw/arm/xlnx-zynqmp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index c67ac2e64ac..370b0e44a38 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -183,8 +183,6 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState =
+*s, const char *boot_cpu,
+>                              &error_abort, NULL);
+>      qdev_prop_set_uint32(DEVICE(&s->rpu_cluster), "cluster-id", 1);
+> =20
+> -    qdev_init_nofail(DEVICE(&s->rpu_cluster));
+> -
+>      for (i =3D 0; i < num_rpus; i++) {
+>          char *name;
+> =20
+> @@ -212,6 +210,8 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState =
+*s, const char *boot_cpu,
+>              return;
+>          }
+>      }
+> +
+> +    qdev_init_nofail(DEVICE(&s->rpu_cluster));
+>  }
+> =20
+>  static void xlnx_zynqmp_init(Object *obj)
+>=20
+
+
+--09mHiv8vIxoM7oU6FU2Hqz2za2XihTaja
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlw3YLsACgkQd8knW3Qn
+Tr5kpg//cZoxzFT5RgRq3XXiIL6xAX3Z3Spe8Ej15z66iu5UwhCdDnNiPFY5+vH3
+3TqqR8WxQJYWSJ6oBFQm4ptHHqhxIw9eVWd4+J91xl76OJ3VvckK5QkoaiWA0tiE
+0BNTUNRShckoAHJVj3/PnoyeqwFiUt45KBtTRZORnygi54bgdEZ2ysO0z6FKkqhS
+YAEtqDqVDqey9dj3UK5vA7EPqvpZejjbT5aqKsbRVVuCQxzFjz5j2gG4MsVt7Vpo
+20aJPnqHDr106Mu7Pi2Xc5yEHU1d7mpXNZHCJpxbtceIFOBC6mhMLsS0JdKrN1FI
+PXDOFVcrYKk5QqFaIuldh7/DR+3uXLv0Y73JhcJ0Ot3MIKutR/wkuCwNpD+5A/G9
+txL6Hy1XDAwVeI0rWJIz+meru0OpG9a3uHEsyI8bjeuRsXLPwPwPaxsWk6VjeOiY
+sibYxQnfo1cRhRsLXDVwdC24MReElGZI3MxPFYAbqqPprxQkGT+urnSG9rkDiRED
+WqzB0MKKHEDLhWPMXB9tyxiwn4TPPi1eu0avAx7U8MLbF+C/+4zCwiT8Oz6ZnhUO
+4Swek/udAgMiLtS0dNHLlnkkEiOtNgrIPp00yR8tL8jR15FHjh0qdiTZeGAsWgfG
+OQKQjgk6fYD3G3oK2yHHd2o3zwlBcENxAAj7B56E+1XOM7y6zdI=
+=42BG
+-----END PGP SIGNATURE-----
+
+--09mHiv8vIxoM7oU6FU2Hqz2za2XihTaja--
