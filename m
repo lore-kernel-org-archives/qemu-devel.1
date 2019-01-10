@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38416)
+Received: from eggs.gnu.org ([209.51.188.92]:38531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ghcwF-0006Tm-0v
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:12:13 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ghcwx-0006sV-Az
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:12:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ghcwC-0007ar-RX
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:12:11 -0500
-References: <20190109165349.23631-1-david@redhat.com>
-	<20190109165349.23631-6-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9fef18b2-9d28-c66f-cc3a-0595d5e3572a@redhat.com>
-Date: Thu, 10 Jan 2019 17:12:04 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ghcww-0007uv-Ij
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:12:55 -0500
+Received: from mail-yb1-f194.google.com ([209.85.219.194]:44612)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ghcww-0007te-F0
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 11:12:54 -0500
+Received: by mail-yb1-f194.google.com with SMTP id e1so4619958ybn.11
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 08:12:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190109165349.23631-6-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 5/6] s390x/pci: Introduce unplug
- requests and split unplug handler
+References: <20190109220942.23822-1-pbonzini@redhat.com>
+	<CAFEAcA9v3v3k_cFZCwvD5WD4FmiuFT=0UAjCBHEwpO+LuQWjAw@mail.gmail.com>
+	<CAAdtpL5cuJdVgfgoo1oNfEpTZFkybLRn5MWqLna7osTUT=MCbg@mail.gmail.com>
+	<CAFEAcA9huyGyKeOfwX7ZKPc7620DaA6ZP7cUvNFmbxe4AB72fg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9huyGyKeOfwX7ZKPc7620DaA6ZP7cUvNFmbxe4AB72fg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 10 Jan 2019 17:12:40 +0100
+Message-ID: <CAAdtpL6VsQn1WKo9=a-UaRD_acn8a_XVA1R46YX+MCx9-89hHg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v6 00/35] Misc patches for 2018-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,293 +34,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 09.01.19 17:53, David Hildenbrand wrote:
-> PCI on s390x is really weird and how it was modeled in QEMU might not have
-> been the right choice. Anyhow, right now it is the case that:
-> - Hotplugging a PCI device will silently create a zPCI device
->   (if none is provided)
-> - Hotunplugging a zPCI device will unplug the PCI device (if any)
-> - Hotunplugging a PCI device will unplug also the zPCI device
-> 
-> However both devices are handled via a single hotplug handler call. This
-> is problematic for various reasons:
-> 1. Unplugging via the zPCI device allows to unplug PCI bridges as
->    checks are not performed - bad.
-> 2. Unplugging via the zPCI device allows to unplug devices that are not
->    hot removable. (check performed in qdev_unplug()) - bad.
-> 3. Hotplug handler chains are not possible for the unplug case. In the
->    future, the machine might want to override hotplug handlers, to
->    process device specific stuff and to then branch off to the actual
->    hotplug handler. We need separate hotplug handler calls for both the
->    PCI and zPCI device to make this work reliably. All other PCI
->    implementations are already prepared to handle this correctly, only
->    s390x is missing.
-> 
-> Therefore, introduce the unplug_request handler and properly perform
-> unplug checks by redirecting to the separate unplug_request handlers.
-> When finally unplugging, perform two separate hotplug_handler_unplug()
-> calls, first for the PCI device, followed by the zPCI device. This now
-> nicely splits unplugging paths for both devices.
-> 
-> The redirect part is a little hairy, as the user is allowed to trigger
-> unplug either via the PCI or the zPCI device. So redirect always to the
-> PCI unplug request handler first and remember if that check has been
-> performed in the zPCI device. Redirect then to the zPCI device unplug
-> request handler to perform the magic. Otherwise we would have a redirect
-> loop.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 162 +++++++++++++++++++++++++++-------------
->  hw/s390x/s390-pci-bus.h |   1 +
->  2 files changed, 112 insertions(+), 51 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index f27c5852db..bcd8565a14 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -148,6 +148,23 @@ out:
->      psccb->header.response_code = cpu_to_be16(rc);
->  }
->  
-> +static void s390_pci_perform_unplug(S390PCIBusDevice *pbdev)
-> +{
-> +    HotplugHandler *hotplug_ctrl;
-> +
+On Thu, Jan 10, 2019 at 3:31 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+> On Thu, 10 Jan 2019 at 14:27, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+> > Le jeu. 10 janv. 2019 15:21, Peter Maydell <peter.maydell@linaro.org> a=
+ =C3=A9crit :
+> >> ...'make check-tcg' fails:
+>
+> > This should work fine if you retry this PR after having merged
+> > Fam's PR which contains the fix.
+>
+> Cool. I will do that and retry.
+>
+> >> This seems to happen reliably with this pullreq merged
+> >> in, but master is OK.
+> >
+> >
+> > I guess Travis is using a cached image.
+>
+> I'm not using travis, this is a local run of the test.
+> But perhaps my system has a cached image. It seems a bit
+> odd that it uses that cached image when testing master
+> but not when testing Paolo's merge, though.
 
-I'll turn this into
+The patch "test: replace gtester with a TAP driver" contains docker
+changes (adding libtest-harness-perl) which trigger a rebuild, your
+builds using /master should use the cache.
 
-if (pbdev->pdev)
+This might be a problem with this new package (if so, Fam's PR isn't
+going to help here).
 
-and drop the g_assert(). Straight forward than.
+I'll check and if possible improve the docker.py output to get a more
+useful error message.
 
-> +    /* Unplug the PCI device */
-> +    if (pbdev->state == ZPCI_FS_STANDBY) {
-> +        hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(pbdev->pdev));
-> +        hotplug_handler_unplug(hotplug_ctrl, DEVICE(pbdev->pdev),
-> +                               &error_abort);
-> +    }
-> +    g_assert(pbdev->state == ZPCI_FS_RESERVED);
-> +
-> +    /* Unplug the zPCI device */
-> +    hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(pbdev));
-> +    hotplug_handler_unplug(hotplug_ctrl, DEVICE(pbdev), &error_abort);
-> +}
-> +
->  void s390_pci_sclp_deconfigure(SCCB *sccb)
->  {
->      IoaCfgSccb *psccb = (IoaCfgSccb *)sccb;
-> @@ -179,7 +196,7 @@ void s390_pci_sclp_deconfigure(SCCB *sccb)
->          rc = SCLP_RC_NORMAL_COMPLETION;
->  
->          if (pbdev->release_timer) {
-> -            qdev_unplug(DEVICE(pbdev->pdev), NULL);
-> +            s390_pci_perform_unplug(pbdev);
->          }
->      }
->  out:
-> @@ -217,6 +234,24 @@ S390PCIBusDevice *s390_pci_find_dev_by_target(S390pciState *s,
->      return NULL;
->  }
->  
-> +static S390PCIBusDevice *s390_pci_find_dev_by_pci(S390pciState *s,
-> +                                                  PCIDevice *pci_dev)
-> +{
-> +    S390PCIBusDevice *pbdev;
-> +
-> +    if (!pci_dev) {
-> +        return NULL;
-> +    }
-> +
-> +    QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
-> +        if (pbdev->pdev == pci_dev) {
-> +            return pbdev;
-> +        }
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
->  S390PCIBusDevice *s390_pci_find_dev_by_idx(S390pciState *s, uint32_t idx)
->  {
->      return g_hash_table_lookup(s->zpci_table, &idx);
-> @@ -937,74 +972,98 @@ static void s390_pcihost_timer_cb(void *opaque)
->      pbdev->state = ZPCI_FS_STANDBY;
->      s390_pci_generate_plug_event(HP_EVENT_CONFIGURED_TO_STBRES,
->                                   pbdev->fh, pbdev->fid);
-> -    qdev_unplug(DEVICE(pbdev), NULL);
-> +    s390_pci_perform_unplug(pbdev);
->  }
->  
->  static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
->                                  Error **errp)
->  {
->      S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
-> -    PCIDevice *pci_dev = NULL;
-> -    PCIBus *bus;
-> -    int32_t devfn;
->      S390PCIBusDevice *pbdev = NULL;
->  
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> +        PCIDevice *pci_dev = PCI_DEVICE(dev);
-> +        PCIBus *bus;
-> +        int32_t devfn;
-> +
-> +        pbdev = s390_pci_find_dev_by_pci(s, PCI_DEVICE(dev));
-> +        g_assert(pbdev);
-> +
-> +        s390_pci_generate_plug_event(HP_EVENT_STANDBY_TO_RESERVED,
-> +                                     pbdev->fh, pbdev->fid);
-> +        bus = pci_get_bus(pci_dev);
-> +        devfn = pci_dev->devfn;
-> +        object_unparent(OBJECT(pci_dev));
-> +
-> +        s390_pci_msix_free(pbdev);
-> +        s390_pci_iommu_free(s, bus, devfn);
-> +        pbdev->pdev = NULL;
-> +        pbdev->state = ZPCI_FS_RESERVED;
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
-> +        pbdev = S390_PCI_DEVICE(dev);
-> +
-> +        if (pbdev->release_timer) {
-> +            timer_del(pbdev->release_timer);
-> +            timer_free(pbdev->release_timer);
-> +            pbdev->release_timer = NULL;
-> +        }
-> +        pbdev->fid = 0;
-> +        QTAILQ_REMOVE(&s->zpci_devs, pbdev, link);
-> +        g_hash_table_remove(s->zpci_table, &pbdev->idx);
-> +        object_unparent(OBJECT(pbdev));
-> +    }
-> +}
-> +
-> +static void s390_pcihost_unplug_request(HotplugHandler *hotplug_dev,
-> +                                        DeviceState *dev,
-> +                                        Error **errp)
-> +{
-> +    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
-> +    S390PCIBusDevice *pbdev;
-> +
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
->          error_setg(errp, "PCI bridge hot unplug currently not supported");
-> -        return;
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> -        pci_dev = PCI_DEVICE(dev);
-> -
-> -        QTAILQ_FOREACH(pbdev, &s->zpci_devs, link) {
-> -            if (pbdev->pdev == pci_dev) {
-> -                break;
-> -            }
-> -        }
-> -        assert(pbdev != NULL);
-> +        /*
-> +         * Redirect the unplug request to the zPCI device and remember that
-> +         * we've checked the PCI device already (to prevent endless recursion).
-> +         */
-> +        pbdev = s390_pci_find_dev_by_pci(s, PCI_DEVICE(dev));
-> +        g_assert(pbdev);
-> +        pbdev->pci_unplug_request_processed = true;
-> +        qdev_unplug(DEVICE(pbdev), errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
->          pbdev = S390_PCI_DEVICE(dev);
-> -        pci_dev = pbdev->pdev;
-> -    }
->  
-> -    switch (pbdev->state) {
-> -    case ZPCI_FS_RESERVED:
-> -        goto out;
-> -    case ZPCI_FS_STANDBY:
-> -        break;
-> -    default:
-> -        if (pbdev->release_timer) {
-> +        /*
-> +         * If unplug was initially requested for the zPCI device, we
-> +         * first have to redirect to the PCI device, which will in return
-> +         * redirect back to us after performing its checks (if the request
-> +         * is not blocked, e.g. because it's a PCI bridge).
-> +         */
-> +        if (pbdev->pdev && !pbdev->pci_unplug_request_processed) {
-> +            qdev_unplug(DEVICE(pbdev->pdev), errp);
->              return;
->          }
-> -        s390_pci_generate_plug_event(HP_EVENT_DECONFIGURE_REQUEST,
-> -                                     pbdev->fh, pbdev->fid);
-> -        pbdev->release_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-> -                                            s390_pcihost_timer_cb,
-> -                                            pbdev);
-> -        timer_mod(pbdev->release_timer,
-> -                  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + HOT_UNPLUG_TIMEOUT);
-> -        return;
-> -    }
-> +        pbdev->pci_unplug_request_processed = false;
->  
-> -    if (pbdev->release_timer) {
-> -        timer_del(pbdev->release_timer);
-> -        timer_free(pbdev->release_timer);
-> -        pbdev->release_timer = NULL;
-> +        switch (pbdev->state) {
-> +        case ZPCI_FS_STANDBY:
-> +        case ZPCI_FS_RESERVED:
-> +            s390_pci_perform_unplug(pbdev);
-> +            break;
-> +        default:
-> +            if (pbdev->release_timer) {
-> +                return;
-> +            }
-> +            s390_pci_generate_plug_event(HP_EVENT_DECONFIGURE_REQUEST,
-> +                                         pbdev->fh, pbdev->fid);
-> +            pbdev->release_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-> +                                                s390_pcihost_timer_cb, pbdev);
-> +            timer_mod(pbdev->release_timer,
-> +                      qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + HOT_UNPLUG_TIMEOUT);
-> +        }
->      }
-> -
-> -    s390_pci_generate_plug_event(HP_EVENT_STANDBY_TO_RESERVED,
-> -                                 pbdev->fh, pbdev->fid);
-> -    bus = pci_get_bus(pci_dev);
-> -    devfn = pci_dev->devfn;
-> -    object_unparent(OBJECT(pci_dev));
-> -    s390_pci_msix_free(pbdev);
-> -    s390_pci_iommu_free(s, bus, devfn);
-> -    pbdev->pdev = NULL;
-> -    pbdev->state = ZPCI_FS_RESERVED;
-> -out:
-> -    pbdev->fid = 0;
-> -    QTAILQ_REMOVE(&s->zpci_devs, pbdev, link);
-> -    g_hash_table_remove(s->zpci_table, &pbdev->idx);
-> -    object_unparent(OBJECT(pbdev));
->  }
->  
->  static void s390_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
-> @@ -1054,6 +1113,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
->      dc->realize = s390_pcihost_realize;
->      hc->pre_plug = s390_pcihost_pre_plug;
->      hc->plug = s390_pcihost_plug;
-> +    hc->unplug_request = s390_pcihost_unplug_request;
->      hc->unplug = s390_pcihost_unplug;
->      msi_nonbroken = true;
->  }
-> diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-> index f47a0f2da5..6987c31df2 100644
-> --- a/hw/s390x/s390-pci-bus.h
-> +++ b/hw/s390x/s390-pci-bus.h
-> @@ -307,6 +307,7 @@ struct S390PCIBusDevice {
->      IndAddr *summary_ind;
->      IndAddr *indicator;
->      QEMUTimer *release_timer;
-> +    bool pci_unplug_request_processed;
->      QTAILQ_ENTRY(S390PCIBusDevice) link;
->  };
->  
-> 
+Regards,
 
-
--- 
-
-Thanks,
-
-David / dhildenb
+Phil.
