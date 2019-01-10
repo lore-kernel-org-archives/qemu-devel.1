@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38990)
+Received: from eggs.gnu.org ([209.51.188.92]:39172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghehA-0003yj-BI
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:04:45 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gheha-0004EU-21
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:05:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gheh8-0000Ot-Vy
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:04:43 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40949)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gheh7-0000NB-Fh
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:04:42 -0500
-Received: by mail-wr1-f66.google.com with SMTP id p4so12436993wrt.7
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 10:04:41 -0800 (PST)
-References: <20190110174516.21586-1-alex.bennee@linaro.org>
-	<20190110174516.21586-4-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2cea5a8c-abe1-9e19-3ba5-5c27f431a37c@redhat.com>
-Date: Thu, 10 Jan 2019 19:04:38 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190110174516.21586-4-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 03/19] tests: remove obsolete 'debian'
- dockerfile
+	(envelope-from <ehabkost@redhat.com>) id 1ghehZ-0000m7-89
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:05:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42832)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ghehY-0000lS-Uz
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 13:05:09 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu, 10 Jan 2019 16:04:56 -0200
+Message-Id: <20190110180458.18762-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/2] Fix virtio-*(-non)-transitional crash
+ on 2.6 machine-types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +22,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: ymankad@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-On 1/10/19 6:45 PM, Alex Bennée wrote:
-> From: Daniel P. Berrangé <berrange@redhat.com>
-> 
-> The 'debian' dockerfile was deprecated in favour of versioned
-> dockerfiles in July 2017. That is enough time for developers to
-> be warned about the rename.
-> 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Changes v2 -> v3:
+* Don't ignore all errors: only ignore optional properties if
+  they don't exist
+* Patch 1/3 from v2 was already merged on machine-next
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Description of v2:
 
-> ---
->  tests/docker/dockerfiles/debian.docker | 13 -------------
->  1 file changed, 13 deletions(-)
->  delete mode 100644 tests/docker/dockerfiles/debian.docker
-> 
-> diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
-> deleted file mode 100644
-> index fd32e71b79..0000000000
-> --- a/tests/docker/dockerfiles/debian.docker
-> +++ /dev/null
-> @@ -1,13 +0,0 @@
-> -# This template is deprecated and was previously based on Jessie on QEMU 2.9.
-> -# Now than Stretch is out, please use qemu:debian8 as base for Jessie,
-> -# and qemu:debian9 for Stretch.
-> -#
-> -FROM qemu:debian9
-> -
-> -MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
-> -
-> -RUN for n in $(seq 8); do echo; done && \
-> -    echo "\n\t\tThis image is deprecated." && echo && \
-> -    echo "\tUse 'FROM qemu:debian9' to use the stable Debian Stretch image" && \
-> -    echo "\tor 'FROM qemu:debian8' to use old Debian Jessie." && \
-> -    for n in $(seq 8); do echo; done
-> 
+This is a second attempt to fix the crash reported by Thomas[1].
+
+This keeps the compat property array simple, different from my
+first attempt[2].
+
+This also avoids extra complexity on the device code: we don't
+need interface name, inheritance tricks, or devices overriding a
+compat property after the fact.  The simple absence of the QOM
+properties on some device types is enough to make the compat code
+skip them.
+
+This series is based on my machine-next branch, because of
+conflicts with compat property array cleanups that are already
+queued.
+
+[1] http://mid.mail-archive.com/a28d196a-e2fe-a013-a6e2-99ac260f6279@redhat.com
+[2] http://mid.mail-archive.com/20190104032226.21428-1-ehabkost@redhat.com
+
+Eduardo Habkost (2):
+  globals: Allow global properties to be optional
+  virtio: Make disable-legacy/disable-modern compat properties optional
+
+ include/hw/qdev-core.h | 3 +++
+ hw/core/machine.c      | 5 +++--
+ qom/object.c           | 3 +++
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+
+-- 
+2.18.0.rc1.1.g3f1ff2140
