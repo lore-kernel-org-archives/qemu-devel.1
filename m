@@ -1,37 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41792)
+Received: from eggs.gnu.org ([209.51.188.92]:44630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1ghZzj-0005By-De
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:03:39 -0500
+	(envelope-from <groug@kaod.org>) id 1ghaBL-0008Gx-Jk
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:15:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1ghZzd-0006rb-Uz
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:03:33 -0500
-Received: from mail-qt1-x82e.google.com ([2607:f8b0:4864:20::82e]:40147)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1ghZzU-0006mn-HB
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:03:23 -0500
-Received: by mail-qt1-x82e.google.com with SMTP id k12so12494952qtf.7
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 05:03:15 -0800 (PST)
-References: <20180906111107.30684-1-danielhb413@gmail.com>
-	<47023eb5-41f1-1b60-1094-d607999e93b6@redhat.com>
-	<a030d899-5a1a-b8b9-4c59-cca4bc304c1d@gmail.com>
-	<200ecea3-1ef4-3ecf-6b37-f6e45fef3849@redhat.com>
-	<20190109172023.GK4867@localhost.localdomain>
-	<be8ac551-4cfd-db62-aa3d-0ca9b79e3e4f@redhat.com>
-	<40ef0a8d-3a25-4cc3-95f8-82bc4513776c@redhat.com>
-	<20190109185154.GL4867@localhost.localdomain>
-	<56880d06-a214-2486-2e80-c565b33461b3@redhat.com>
-	<20190110112508.GA6361@linux.fritz.box> <20190110114113.GC2589@work-vm>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <2c44ef87-d69e-4adb-ca6b-5bdf246c01bc@gmail.com>
-Date: Thu, 10 Jan 2019 11:03:09 -0200
+	(envelope-from <groug@kaod.org>) id 1ghaBJ-0006WC-B8
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:15:35 -0500
+Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:44831)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ghaBG-0006T3-I9
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:15:31 -0500
+Received: from player692.ha.ovh.net (unknown [10.109.143.146])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 2A84AE8DC7
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 14:15:23 +0100 (CET)
+Date: Thu, 10 Jan 2019 14:15:06 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190110132838.31365c55@bahia.lan>
+In-Reply-To: <1547111736-3962-3-git-send-email-thuth@redhat.com>
+References: <1547111736-3962-1-git-send-email-thuth@redhat.com>
+	<1547111736-3962-3-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190110114113.GC2589@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
- ID anymore
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] ppc: Drop duplicated typedefs to be
+ able to compile with Clang in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,131 +31,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, muriloo@linux.ibm.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, "Daniel P.
+	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, pbonzini@redhat.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
 
+On Thu, 10 Jan 2019 10:15:35 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
+> When compiling the ppc code with clang and -std=gnu99, there are a
+> couple of warnings/errors like this one:
+> 
+>   CC      ppc64-softmmu/hw/intc/xics.o
+> In file included from /home/thuth/devel/qemu/hw/intc/xics.c:35:
+> /home/thuth/devel/qemu/include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is a C11 feature
+>       [-Werror,-Wtypedef-redefinition]
+> typedef struct ICPState ICPState;
+>                         ^
+> /home/thuth/devel/qemu/target/ppc/cpu.h:1181:25: note: previous definition is here
+> typedef struct ICPState ICPState;
+>                         ^
+> 
+> Drop the duplicated typedefs and use normal "struct" forward declarations
+> like we already do it at the top of spapr.h for a couple of other definitions.
+> 
 
-On 1/10/19 9:41 AM, Dr. David Alan Gilbert wrote:
-> * Kevin Wolf (kwolf@redhat.com) wrote:
->> Am 09.01.2019 um 20:02 hat Eric Blake geschrieben:
->>> On 1/9/19 12:51 PM, Kevin Wolf wrote:
->>>
->>>>> Indeed, and libvirt IS using 'savevm' via HMP via QMP's
->>>>> human-monitor-command, since there is no QMP counterpart for internal
->>>>> snapshot.  Even though lately we consistently tell people that internal
->>>>> snapshots are underdeveloped and you should use external snapshots, it
->>>>> does not get away from the fact that libvirt has been using 'savevm' to
->>>>> drive internal snapshots for years now, and that we MUST consider
->>>>> back-compat and/or add an introspectible QMP interface before making
->>>>> changes that would break libvirt.
->>>> Okay, so what does libvirt do when you request a snapshot with a
->>>> numerical name? Without having looked at the code, the best case I would
->>>> expect that it forbids them, and more realistically I suspect that we
->>>> may actually fix a bug for libvirt by changing the semantics.
->>>>
->>>> Or does libvirt really use snapshot IDs rather than names?
->>> At the moment, libvirt does not place any restriction on internal
->>> snapshot names, but passes the user's name through without thought of
->>> whether it is an id or a name.
->>>
->>> So yes, arguably tightening the semantics fixes a libvirt bug for
->>> libvirt having allowed internal snapshots to get into an inconsistent
->>> state.
->> So there are two scenarios to consider with respect to breaking
->> backwards compatibility:
->>
->> 1. There may be code out there that relies on numeric arguments being
->>     interpreted as IDs. This code will break if we make this change and
->>     numeric snapshot names exist. That such code exists is speculation
->>     (even though plausible) and we don't know how widespread it is.
->>
->> 2. There may be code out there that blindly assumes that whatever it
->>     passes is interpreted as a name. Nobody considered that with a
->>     numeric snapshot name, it maybe misinterpreted as an ID. We know that
->>     this is true for libvirt, the single most used management tool for
->>     QEMU. More code like this may (and probably does) exist.
->>
->> Essentially the same two categories exist for human users: those who
->> somehow found out that QEMU accepts IDs as monitor command arguments and
->> are using those (mitigated by not displaying IDs any more), and those
->> who are trapped because they wanted to access a numeric name, but
->> surprisingly got it interpreted as an ID. Both are speculation to some
->> degree, but my guess is that the latter group is larger.
->>
->> Given all this, this is a no-brainer for me. We simplify the interface,
->> we simplify the code, we make things less confusing for manual users and
->> we fix the management tool that everybody uses. How could we not make
->> this change?
->>
->>> But again, it falls in the category of "properly fixing this
->>> requires a lot of auditing, time, mental power, and unit tests", which
->>> makes it a rather daunting task to state for certain.
->> Fix the world before we can fix anything?
-> Can't we break this loop for the savevm command fairly easily; it's
-> currently documnted as:
->
-> savevm [tag|id]
->
-> If we made that:
->
-> savevm [-t] [-i] [tag|id]
->
-> then:
->    a) with neither -t or -i  it would behave in the same roulette way
->       as it does in the moment, and it might be a tag or id
+Hmm... so the choice here is to simply ignore the official coding
+style ?
 
-The roulette we have today is too confusing IMO. For starters, we're not 
-creating
-snapshot using ID at this moment. The ID is being auto-generated by doing
-max_ID_found + 1.
+It is a bit confusing to end up with even more struct/non-struct
+inconsistency. It would be good at least to update HACKING so that
+people know when they can legitimately do that... or we simply don't
+care anymore for the typedef rule ?
 
-Quick example: savevm 4 isn't creating a snapshot with ID=4 and an empty 
-tag - it is
-creating a snapshot with ID=ID_MAX + 1 and tag = 4. Let's say that 
-ID_MAX was 9,
-so this new snapshot would be ID=10, tag=4.
+All these forward declarations could be typedefs in a "hw/ppc/spapr_types.h"
+header as well, as suggested elsewhere by Daniel.
 
-Now, the user wants to delete this snapshot. "delvm 4" will  first match 
-ID, then tag.
-If there is a snapshot with ID=4, it will be mistakenly erased. Note 
-that this isn't
-a bug - even with tweaks here and there, savevm/delvm (number) will always
-be ambiguous because the API is allowing the user to interpret an input 
-anyway
-he/she wants. This is an API design issue.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  include/hw/ppc/spapr.h      | 9 +++++----
+>  include/hw/ppc/spapr_xive.h | 3 +--
+>  target/ppc/cpu.h            | 9 +++++----
+>  3 files changed, 11 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 9e01a5a..10d069e 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -12,11 +12,12 @@
+>  struct VIOsPAPRBus;
+>  struct sPAPRPHBState;
+>  struct sPAPRNVRAM;
+> +struct ICSState;
+> +struct sPAPRXive;
+> +
+>  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+>  typedef struct sPAPREventSource sPAPREventSource;
+>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+> -typedef struct ICSState ICSState;
 
-The only way I see to reliably make this id|tag API to work is to always 
-interpret
-numerical arguments as ID. Then we can safely assume what the user wants 
-to do.
-We wouldn't even need the other 2 options you mentioned (-t and -i). But 
-then,
-as I've said somewhere in this thread, users would complain that "savevm 
-4" isn't
-doing what it was doing before. "savevm 4 is creating snapshots with 
-auto-generated
-tag instead of  tag=4". I can see the bugzillas already.
+Thanks to the previous patch, I guess the ICSState type could be
+obtained by including "hw/ppc/xics.h".
 
+> -typedef struct sPAPRXive sPAPRXive;
+>  
+>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+>  #define SPAPR_ENTRY_POINT       0x100
+> @@ -127,7 +128,7 @@ struct sPAPRMachineState {
+>      struct VIOsPAPRBus *vio_bus;
+>      QLIST_HEAD(, sPAPRPHBState) phbs;
+>      struct sPAPRNVRAM *nvram;
+> -    ICSState *ics;
+> +    struct ICSState *ics;
+>      sPAPRRTCState rtc;
+>  
+>      sPAPRResizeHPT resize_hpt;
+> @@ -180,7 +181,7 @@ struct sPAPRMachineState {
+>      const char *icp_type;
+>      int32_t irq_map_nr;
+>      unsigned long *irq_map;
+> -    sPAPRXive  *xive;
+> +    struct sPAPRXive  *xive;
+>      sPAPRIrq *irq;
+>      qemu_irq *qirqs;
+>  
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 7fdc250..556b124 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -11,6 +11,7 @@
+>  #define PPC_SPAPR_XIVE_H
+>  
+>  #include "hw/ppc/xive.h"
+> +#include "hw/ppc/spapr.h"
+>  
 
+The sPAPRMachineState typedef statement lies in "hw/ppc/spapr_irq.h"
+actually, which is a bit weird... Probably better to move the typedef
+to "hw/ppc/spapr_types.h" and include it here.
 
-DHB
+>  #define TYPE_SPAPR_XIVE "spapr-xive"
+>  #define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIVE)
+> @@ -41,8 +42,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
+>  bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
+>  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+>  
+> -typedef struct sPAPRMachineState sPAPRMachineState;
+> -
+>  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
+>  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
+>                     uint32_t phandle);
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 486abaf..a62ff60 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1177,8 +1177,9 @@ do {                                            \
+>  
+>  typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
+>  typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
+> -typedef struct XiveTCTX XiveTCTX;
+> -typedef struct ICPState ICPState;
+> +
+> +struct XiveTCTX;
+> +struct ICPState;
 
+These could be made available from the XICS/XIVE header files.
 
+#ifndef CONFIG_USER_ONLY
+#include "hw/ppc/xive.h" /* for XiveTCTX */
+#include "hw/ppc/xics.h" /* for ICPState */
+#endif
 
->
->    b) with -t we'd explicitly treat the parameter as a tag and it
->       would error if it wasn't found
->
->    c) With -i we'd explicitly treat the parameter as an id and
->       it would error if it wasn't found
->
-> Since we still allow (a) it doesn't break any existing code.
->
-> Dave
->
->
->> Kevin
->
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  
+>  /**
+>   * PowerPCCPU:
+> @@ -1197,8 +1198,8 @@ struct PowerPCCPU {
+>      int vcpu_id;
+>      uint32_t compat_pvr;
+>      PPCVirtualHypervisor *vhyp;
+> -    ICPState *icp;
+> -    XiveTCTX *tctx;
+> +    struct ICPState *icp;
+> +    struct XiveTCTX *tctx;
+
++#ifndef CONFIG_USER_ONLY
+     ICPState *icp;
+     XiveTCTX *tctx;
++#endif
+
+These aren't needed for user anyway.
+
+>      void *machine_data;
+>      int32_t node_id; /* NUMA node this CPU belongs to */
+>      PPCHash64Options *hash64_opts;
