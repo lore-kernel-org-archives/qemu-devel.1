@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58291)
+Received: from eggs.gnu.org ([209.51.188.92]:58072)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=906201598=anthony.perard@citrix.com>)
-	id 1ghb5B-0006I3-H4
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:13:23 -0500
+	id 1ghb5I-00062k-Vn
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 09:13:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=906201598=anthony.perard@citrix.com>)
-	id 1gharU-0002Qn-Py
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:11 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:12049)
+	id 1gharM-0002LV-8v
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:02 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:12008)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=906201598=anthony.perard@citrix.com>)
-	id 1gharU-0002QK-Ec
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:08 -0500
+	id 1gharL-0001xV-SA
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 08:59:00 -0500
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Thu, 10 Jan 2019 13:49:08 +0000
-Message-ID: <20190110134917.16425-17-anthony.perard@citrix.com>
+Date: Thu, 10 Jan 2019 13:49:13 +0000
+Message-ID: <20190110134917.16425-22-anthony.perard@citrix.com>
 In-Reply-To: <20190110134917.16425-1-anthony.perard@citrix.com>
 References: <20190110134917.16425-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 16/25] xen: add implementations of xen-block
- connect and disconnect functions...
+Subject: [Qemu-devel] [PULL 21/25] Remove broken Xen PV domain builder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,626 +31,541 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Paul Durrant <paul.durrant@citrix.com>, Anthony PERARD <anthony.perard@citrix.com>
+Cc: xen-devel@lists.xenproject.org, Anthony PERARD <anthony.perard@citrix.com>
 
-From: Paul Durrant <paul.durrant@citrix.com>
+It is broken since Xen 4.9 [1] and it will not build in Xen 4.12. Also,
+it is not built by default since QEMU 2.6.
 
-...and wire in the dataplane.
+[1] https://lists.xenproject.org/archives/html/xen-devel/2018-09/msg00313.html
 
-This patch adds the remaining code to make the xen-block XenDevice
-functional. The parameters that a block frontend expects to find are
-populated in the backend xenstore area, and the 'ring-ref' and
-'event-channel' values specified in the frontend xenstore area are
-mapped/bound and used to set up the dataplane.
-
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/block/xen-block.c       | 166 ++++++++++++++++++++++++++++++++
- hw/xen/trace-events        |   3 +
- hw/xen/xen-bus.c           | 187 ++++++++++++++++++++++++++++++++-----
- include/hw/xen/xen-block.h |   9 ++
- include/hw/xen/xen-bus.h   |  14 ++-
- 5 files changed, 353 insertions(+), 26 deletions(-)
+ configure                   |  17 --
+ hw/xenpv/Makefile.objs      |   2 -
+ hw/xenpv/xen_domainbuild.c  | 299 ------------------------------------
+ hw/xenpv/xen_domainbuild.h  |  13 --
+ hw/xenpv/xen_machine_pv.c   |  14 --
+ include/hw/xen/xen.h        |   1 -
+ include/hw/xen/xen_common.h |  18 ---
+ qemu-options.hx             |   8 -
+ vl.c                        |   7 -
+ 9 files changed, 379 deletions(-)
+ delete mode 100644 hw/xenpv/xen_domainbuild.c
+ delete mode 100644 hw/xenpv/xen_domainbuild.h
 
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 3a963b0383..a7c37c185a 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -10,7 +10,13 @@
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "hw/hw.h"
-+#include "hw/xen/xen_common.h"
-+#include "hw/block/xen_blkif.h"
- #include "hw/xen/xen-block.h"
-+#include "sysemu/blockdev.h"
-+#include "sysemu/block-backend.h"
-+#include "sysemu/iothread.h"
-+#include "dataplane/xen-block.h"
- #include "trace.h"
+diff --git a/configure b/configure
+index 8049b71eef..ba2b5f24c4 100755
+--- a/configure
++++ b/configure
+@@ -357,7 +357,6 @@ vnc_png=""
+ xkbcommon=""
+ xen=""
+ xen_ctrl_version=""
+-xen_pv_domain_build="no"
+ xen_pci_passthrough=""
+ linux_aio=""
+ cap_ng=""
+@@ -1122,10 +1121,6 @@ for opt do
+   ;;
+   --enable-xen-pci-passthrough) xen_pci_passthrough="yes"
+   ;;
+-  --disable-xen-pv-domain-build) xen_pv_domain_build="no"
+-  ;;
+-  --enable-xen-pv-domain-build) xen_pv_domain_build="yes"
+-  ;;
+   --disable-brlapi) brlapi="no"
+   ;;
+   --enable-brlapi) brlapi="yes"
+@@ -1688,8 +1683,6 @@ Advanced options (experts only):
+   --tls-priority           default TLS protocol/cipher priority string
+   --enable-gprof           QEMU profiling with gprof
+   --enable-profiler        profiler support
+-  --enable-xen-pv-domain-build
+-                           xen pv domain builder
+   --enable-debug-stack-usage
+                            track the maximum stack usage of stacks created by qemu_alloc_stack
  
- static char *xen_block_get_name(XenDevice *xendev, Error **errp)
-@@ -28,6 +34,8 @@ static void xen_block_disconnect(XenDevice *xendev, Error **errp)
-     XenBlockVdev *vdev = &blockdev->props.vdev;
+@@ -2681,12 +2674,6 @@ if test "$xen_pci_passthrough" != "no"; then
+   fi
+ fi
  
-     trace_xen_block_disconnect(type, vdev->disk, vdev->partition);
-+
-+    xen_block_dataplane_stop(blockdev->dataplane);
- }
- 
- static void xen_block_connect(XenDevice *xendev, Error **errp)
-@@ -35,8 +43,72 @@ static void xen_block_connect(XenDevice *xendev, Error **errp)
-     XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-     const char *type = object_get_typename(OBJECT(blockdev));
-     XenBlockVdev *vdev = &blockdev->props.vdev;
-+    unsigned int order, nr_ring_ref, *ring_ref, event_channel, protocol;
-+    char *str;
- 
-     trace_xen_block_connect(type, vdev->disk, vdev->partition);
-+
-+    if (xen_device_frontend_scanf(xendev, "ring-page-order", "%u",
-+                                  &order) != 1) {
-+        nr_ring_ref = 1;
-+        ring_ref = g_new(unsigned int, nr_ring_ref);
-+
-+        if (xen_device_frontend_scanf(xendev, "ring-ref", "%u",
-+                                      &ring_ref[0]) != 1) {
-+            error_setg(errp, "failed to read ring-ref");
-+            g_free(ring_ref);
-+            return;
-+        }
-+    } else if (order <= blockdev->props.max_ring_page_order) {
-+        unsigned int i;
-+
-+        nr_ring_ref = 1 << order;
-+        ring_ref = g_new(unsigned int, nr_ring_ref);
-+
-+        for (i = 0; i < nr_ring_ref; i++) {
-+            const char *key = g_strdup_printf("ring-ref%u", i);
-+
-+            if (xen_device_frontend_scanf(xendev, key, "%u",
-+                                          &ring_ref[i]) != 1) {
-+                error_setg(errp, "failed to read %s", key);
-+                g_free((gpointer)key);
-+                g_free(ring_ref);
-+                return;
-+            }
-+
-+            g_free((gpointer)key);
-+        }
-+    } else {
-+        error_setg(errp, "invalid ring-page-order (%d)", order);
-+        return;
-+    }
-+
-+    if (xen_device_frontend_scanf(xendev, "event-channel", "%u",
-+                                  &event_channel) != 1) {
-+        error_setg(errp, "failed to read event-channel");
-+        g_free(ring_ref);
-+        return;
-+    }
-+
-+    if (xen_device_frontend_scanf(xendev, "protocol", "%ms",
-+                                  &str) != 1) {
-+        protocol = BLKIF_PROTOCOL_NATIVE;
-+    } else {
-+        if (strcmp(str, XEN_IO_PROTO_ABI_X86_32) == 0) {
-+            protocol = BLKIF_PROTOCOL_X86_32;
-+        } else if (strcmp(str, XEN_IO_PROTO_ABI_X86_64) == 0) {
-+            protocol = BLKIF_PROTOCOL_X86_64;
-+        } else {
-+            protocol = BLKIF_PROTOCOL_NATIVE;
-+        }
-+
-+        free(str);
-+    }
-+
-+    xen_block_dataplane_start(blockdev->dataplane, ring_ref, nr_ring_ref,
-+                              event_channel, protocol, errp);
-+
-+    g_free(ring_ref);
- }
- 
- static void xen_block_unrealize(XenDevice *xendev, Error **errp)
-@@ -56,6 +128,9 @@ static void xen_block_unrealize(XenDevice *xendev, Error **errp)
-     /* Disconnect from the frontend in case this has not already happened */
-     xen_block_disconnect(xendev, NULL);
- 
-+    xen_block_dataplane_destroy(blockdev->dataplane);
-+    blockdev->dataplane = NULL;
-+
-     if (blockdev_class->unrealize) {
-         blockdev_class->unrealize(blockdev, errp);
-     }
-@@ -68,6 +143,7 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-         XEN_BLOCK_DEVICE_GET_CLASS(xendev);
-     const char *type = object_get_typename(OBJECT(blockdev));
-     XenBlockVdev *vdev = &blockdev->props.vdev;
-+    BlockConf *conf = &blockdev->props.conf;
-     Error *local_err = NULL;
- 
-     if (vdev->type == XEN_BLOCK_VDEV_TYPE_INVALID) {
-@@ -81,8 +157,62 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
-         blockdev_class->realize(blockdev, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-+            return;
-         }
-     }
-+
-+    /*
-+     * The blkif protocol does not deal with removable media, so it must
-+     * always be present, even for CDRom devices.
-+     */
-+    assert(conf->blk);
-+    if (!blk_is_inserted(conf->blk)) {
-+        error_setg(errp, "device needs media, but drive is empty");
-+        return;
-+    }
-+
-+    if (!blkconf_apply_backend_options(conf, blockdev->info & VDISK_READONLY,
-+                                       false, errp)) {
-+        return;
-+    }
-+
-+    if (!(blockdev->info & VDISK_CDROM) &&
-+        !blkconf_geometry(conf, NULL, 65535, 255, 255, errp)) {
-+        return;
-+    }
-+
-+    blkconf_blocksizes(conf);
-+
-+    if (conf->logical_block_size > conf->physical_block_size) {
-+        error_setg(
-+            errp, "logical_block_size > physical_block_size not supported");
-+        return;
-+    }
-+
-+    blk_set_guest_block_size(conf->blk, conf->logical_block_size);
-+
-+    if (conf->discard_granularity > 0) {
-+        xen_device_backend_printf(xendev, "feature-discard", "%u", 1);
-+    }
-+
-+    xen_device_backend_printf(xendev, "feature-flush-cache", "%u", 1);
-+    xen_device_backend_printf(xendev, "max-ring-page-order", "%u",
-+                              blockdev->props.max_ring_page_order);
-+    xen_device_backend_printf(xendev, "info", "%u", blockdev->info);
-+
-+    xen_device_frontend_printf(xendev, "virtual-device", "%lu",
-+                               vdev->number);
-+    xen_device_frontend_printf(xendev, "device-type", "%s",
-+                               blockdev->device_type);
-+
-+    xen_device_backend_printf(xendev, "sector-size", "%u",
-+                              conf->logical_block_size);
-+    xen_device_backend_printf(xendev, "sectors", "%lu",
-+                              blk_getlength(conf->blk) /
-+                              conf->logical_block_size);
-+
-+    blockdev->dataplane =
-+        xen_block_dataplane_create(xendev, conf, blockdev->props.iothread);
- }
- 
- static void xen_block_frontend_changed(XenDevice *xendev,
-@@ -331,6 +461,11 @@ const PropertyInfo xen_block_prop_vdev = {
- static Property xen_block_props[] = {
-     DEFINE_PROP("vdev", XenBlockDevice, props.vdev,
-                 xen_block_prop_vdev, XenBlockVdev),
-+    DEFINE_BLOCK_PROPERTIES(XenBlockDevice, props.conf),
-+    DEFINE_PROP_UINT32("max-ring-page-order", XenBlockDevice,
-+                       props.max_ring_page_order, 4),
-+    DEFINE_PROP_LINK("iothread", XenBlockDevice, props.iothread,
-+                     TYPE_IOTHREAD, IOThread *),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-@@ -339,6 +474,7 @@ static void xen_block_class_init(ObjectClass *class, void *data)
-     DeviceClass *dev_class = DEVICE_CLASS(class);
-     XenDeviceClass *xendev_class = XEN_DEVICE_CLASS(class);
- 
-+    xendev_class->device = "vbd";
-     xendev_class->get_name = xen_block_get_name;
-     xendev_class->realize = xen_block_realize;
-     xendev_class->frontend_changed = xen_block_frontend_changed;
-@@ -363,7 +499,18 @@ static void xen_disk_unrealize(XenBlockDevice *blockdev, Error **errp)
- 
- static void xen_disk_realize(XenBlockDevice *blockdev, Error **errp)
- {
-+    BlockConf *conf = &blockdev->props.conf;
-+
-     trace_xen_disk_realize();
-+
-+    blockdev->device_type = "disk";
-+
-+    if (!conf->blk) {
-+        error_setg(errp, "drive property not set");
-+        return;
-+    }
-+
-+    blockdev->info = blk_is_read_only(conf->blk) ? VDISK_READONLY : 0;
- }
- 
- static void xen_disk_class_init(ObjectClass *class, void *data)
-@@ -391,7 +538,26 @@ static void xen_cdrom_unrealize(XenBlockDevice *blockdev, Error **errp)
- 
- static void xen_cdrom_realize(XenBlockDevice *blockdev, Error **errp)
- {
-+    BlockConf *conf = &blockdev->props.conf;
-+
-     trace_xen_cdrom_realize();
-+
-+    blockdev->device_type = "cdrom";
-+
-+    if (!conf->blk) {
-+        int rc;
-+
-+        /* Set up an empty drive */
-+        conf->blk = blk_new(0, BLK_PERM_ALL);
-+
-+        rc = blk_attach_dev(conf->blk, DEVICE(blockdev));
-+        if (!rc) {
-+            error_setg_errno(errp, -rc, "failed to create drive");
-+            return;
-+        }
-+    }
-+
-+    blockdev->info = VDISK_READONLY | VDISK_CDROM;
- }
- 
- static void xen_cdrom_class_init(ObjectClass *class, void *data)
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index 22055b5894..d4651bdb30 100644
---- a/hw/xen/trace-events
-+++ b/hw/xen/trace-events
-@@ -22,8 +22,11 @@ xen_bus_watch(const char *token) "token: %s"
- xen_device_realize(const char *type, char *name) "type: %s name: %s"
- xen_device_unrealize(const char *type, char *name) "type: %s name: %s"
- xen_device_backend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
-+xen_device_backend_online(const char *type, char *name, bool online) "type: %s name: %s -> %u"
-+xen_device_backend_changed(const char *type, char *name) "type: %s name: %s"
- xen_device_frontend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
- xen_device_frontend_changed(const char *type, char *name) "type: %s name: %s"
-+xen_device_unplug(const char *type, char *name) "type: %s name: %s"
- 
- # include/hw/xen/xen-bus-helper.c
- xs_node_create(const char *node) "%s"
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 9443f27d44..a22aa49921 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -48,6 +48,54 @@ static char *xen_device_get_frontend_path(XenDevice *xendev)
-                            xendev->frontend_id, device, xendev->name);
- }
- 
-+static void xen_device_unplug(XenDevice *xendev, Error **errp)
-+{
-+    XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    Error *local_err = NULL;
-+    xs_transaction_t tid;
-+
-+    trace_xen_device_unplug(type, xendev->name);
-+
-+    /* Mimic the way the Xen toolstack does an unplug */
-+again:
-+    tid = xs_transaction_start(xenbus->xsh);
-+    if (tid == XBT_NULL) {
-+        error_setg_errno(errp, errno, "failed xs_transaction_start");
-+        return;
-+    }
-+
-+    xs_node_printf(xenbus->xsh, tid, xendev->backend_path, "online",
-+                   &local_err, "%u", 0);
-+    if (local_err) {
-+        goto abort;
-+    }
-+
-+    xs_node_printf(xenbus->xsh, tid, xendev->backend_path, "state",
-+                   &local_err, "%u", XenbusStateClosing);
-+    if (local_err) {
-+        goto abort;
-+    }
-+
-+    if (!xs_transaction_end(xenbus->xsh, tid, false)) {
-+        if (errno == EAGAIN) {
-+            goto again;
-+        }
-+
-+        error_setg_errno(errp, errno, "failed xs_transaction_end");
-+    }
-+
-+    return;
-+
-+abort:
-+    /*
-+     * We only abort if there is already a failure so ignore any error
-+     * from ending the transaction.
-+     */
-+    xs_transaction_end(xenbus->xsh, tid, true);
-+    error_propagate(errp, local_err);
-+}
-+
- static void xen_bus_print_dev(Monitor *mon, DeviceState *dev, int indent)
- {
-     XenDevice *xendev = XEN_DEVICE(dev);
-@@ -208,14 +256,26 @@ static void xen_bus_realize(BusState *bus, Error **errp)
-     xen_bus_unrealize(bus, &error_abort);
- }
- 
-+static void xen_bus_unplug_request(HotplugHandler *hotplug,
-+                                   DeviceState *dev,
-+                                   Error **errp)
-+{
-+    XenDevice *xendev = XEN_DEVICE(dev);
-+
-+    xen_device_unplug(xendev, errp);
-+}
-+
- static void xen_bus_class_init(ObjectClass *class, void *data)
- {
-     BusClass *bus_class = BUS_CLASS(class);
-+    HotplugHandlerClass *hotplug_class = HOTPLUG_HANDLER_CLASS(class);
- 
-     bus_class->print_dev = xen_bus_print_dev;
-     bus_class->get_dev_path = xen_bus_get_dev_path;
-     bus_class->realize = xen_bus_realize;
-     bus_class->unrealize = xen_bus_unrealize;
-+
-+    hotplug_class->unplug_request = xen_bus_unplug_request;
- }
- 
- static const TypeInfo xen_bus_type_info = {
-@@ -230,8 +290,8 @@ static const TypeInfo xen_bus_type_info = {
-     },
- };
- 
--static void xen_device_backend_printf(XenDevice *xendev, const char *key,
--                                      const char *fmt, ...)
-+void xen_device_backend_printf(XenDevice *xendev, const char *key,
-+                               const char *fmt, ...)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     Error *local_err = NULL;
-@@ -287,6 +347,70 @@ enum xenbus_state xen_device_backend_get_state(XenDevice *xendev)
-     return xendev->backend_state;
- }
- 
-+static void xen_device_backend_set_online(XenDevice *xendev, bool online)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+
-+    if (xendev->backend_online == online) {
-+        return;
-+    }
-+
-+    trace_xen_device_backend_online(type, xendev->name, online);
-+
-+    xendev->backend_online = online;
-+    xen_device_backend_printf(xendev, "online", "%u", online);
-+}
-+
-+static void xen_device_backend_changed(void *opaque)
-+{
-+    XenDevice *xendev = opaque;
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    enum xenbus_state state;
-+    unsigned int online;
-+
-+    trace_xen_device_backend_changed(type, xendev->name);
-+
-+    if (xen_device_backend_scanf(xendev, "state", "%u", &state) != 1) {
-+        state = XenbusStateUnknown;
-+    }
-+
-+    xen_device_backend_set_state(xendev, state);
-+
-+    if (xen_device_backend_scanf(xendev, "online", "%u", &online) != 1) {
-+        online = 0;
-+    }
-+
-+    xen_device_backend_set_online(xendev, !!online);
-+
-+    /*
-+     * If the toolstack (or unplug request callback) has set the backend
-+     * state to Closing, but there is no active frontend (i.e. the
-+     * state is not Connected) then set the backend state to Closed.
-+     */
-+    if (xendev->backend_state == XenbusStateClosing &&
-+        xendev->frontend_state != XenbusStateConnected) {
-+        xen_device_backend_set_state(xendev, XenbusStateClosed);
-+    }
-+
-+    /*
-+     * If a backend is still 'online' then its state should be cycled
-+     * back round to InitWait in order for a new frontend instance to
-+     * connect. This may happen when, for example, a frontend driver is
-+     * re-installed or updated.
-+     * If a backend is not 'online' then the device should be destroyed.
-+     */
-+    if (xendev->backend_online &&
-+        xendev->backend_state == XenbusStateClosed) {
-+        xen_device_backend_set_state(xendev, XenbusStateInitWait);
-+    } else if (!xendev->backend_online &&
-+               (xendev->backend_state == XenbusStateClosed ||
-+                xendev->backend_state == XenbusStateInitialising ||
-+                xendev->backend_state == XenbusStateInitWait ||
-+                xendev->backend_state == XenbusStateUnknown)) {
-+        object_unparent(OBJECT(xendev));
-+    }
-+}
-+
- static void xen_device_backend_create(XenDevice *xendev, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-@@ -307,6 +431,27 @@ static void xen_device_backend_create(XenDevice *xendev, Error **errp)
-     if (local_err) {
-         error_propagate_prepend(errp, local_err,
-                                 "failed to create backend: ");
-+        return;
-+    }
-+
-+    xendev->backend_state_watch =
-+        xen_bus_add_watch(xenbus, xendev->backend_path,
-+                          "state", xen_device_backend_changed,
-+                          xendev, &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to watch backend state: ");
-+        return;
-+    }
-+
-+    xendev->backend_online_watch =
-+        xen_bus_add_watch(xenbus, xendev->backend_path,
-+                          "online", xen_device_backend_changed,
-+                          xendev, &local_err);
-+    if (local_err) {
-+        error_propagate_prepend(errp, local_err,
-+                                "failed to watch backend online: ");
-+        return;
-     }
- }
- 
-@@ -315,6 +460,16 @@ static void xen_device_backend_destroy(XenDevice *xendev)
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     Error *local_err = NULL;
- 
-+    if (xendev->backend_online_watch) {
-+        xen_bus_remove_watch(xenbus, xendev->backend_online_watch, NULL);
-+        xendev->backend_online_watch = NULL;
-+    }
-+
-+    if (xendev->backend_state_watch) {
-+        xen_bus_remove_watch(xenbus, xendev->backend_state_watch, NULL);
-+        xendev->backend_state_watch = NULL;
-+    }
-+
-     if (!xendev->backend_path) {
-         return;
-     }
-@@ -331,8 +486,8 @@ static void xen_device_backend_destroy(XenDevice *xendev)
-     }
- }
- 
--static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
--                                       const char *fmt, ...)
-+void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-+                                const char *fmt, ...)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     Error *local_err = NULL;
-@@ -350,8 +505,8 @@ static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-     }
- }
- 
--static int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
--                                     const char *fmt, ...)
-+int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
-+                              const char *fmt, ...)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     va_list ap;
-@@ -407,24 +562,6 @@ static void xen_device_frontend_changed(void *opaque)
-             error_reportf_err(local_err, "frontend change error: ");
-         }
-     }
+-if test "$xen_pv_domain_build" = "yes" &&
+-   test "$xen" != "yes"; then
+-    error_exit "User requested Xen PV domain builder support" \
+-	       "which requires Xen support."
+-fi
 -
--    /*
--     * If a backend is still 'online' then its state should be cycled
--     * back round to InitWait in order for a new frontend instance to
--     * connect. This may happen when, for example, a frontend driver is
--     * re-installed or updated.
--     */
--    if (xendev->backend_state == XenbusStateClosed) {
--        unsigned int online;
+ ##########################################
+ # Windows Hypervisor Platform accelerator (WHPX) check
+ if test "$whpx" != "no" ; then
+@@ -6072,7 +6059,6 @@ fi
+ echo "xen support       $xen"
+ if test "$xen" = "yes" ; then
+   echo "xen ctrl version  $xen_ctrl_version"
+-  echo "pv dom build      $xen_pv_domain_build"
+ fi
+ echo "brlapi support    $brlapi"
+ echo "bluez  support    $bluez"
+@@ -6542,9 +6528,6 @@ fi
+ if test "$xen" = "yes" ; then
+   echo "CONFIG_XEN_BACKEND=y" >> $config_host_mak
+   echo "CONFIG_XEN_CTRL_INTERFACE_VERSION=$xen_ctrl_version" >> $config_host_mak
+-  if test "$xen_pv_domain_build" = "yes" ; then
+-    echo "CONFIG_XEN_PV_DOMAIN_BUILD=y" >> $config_host_mak
+-  fi
+ fi
+ if test "$linux_aio" = "yes" ; then
+   echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
+diff --git a/hw/xenpv/Makefile.objs b/hw/xenpv/Makefile.objs
+index bbf5873fd1..8bfa4586ab 100644
+--- a/hw/xenpv/Makefile.objs
++++ b/hw/xenpv/Makefile.objs
+@@ -1,4 +1,2 @@
+ # Xen PV machine support
+ obj-$(CONFIG_XEN) += xen_machine_pv.o
+-# Xen PV machine builder support
+-obj-$(CONFIG_XEN_PV_DOMAIN_BUILD) += xen_domainbuild.o
+diff --git a/hw/xenpv/xen_domainbuild.c b/hw/xenpv/xen_domainbuild.c
+deleted file mode 100644
+index deb28cf596..0000000000
+--- a/hw/xenpv/xen_domainbuild.c
++++ /dev/null
+@@ -1,299 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu/units.h"
+-#include "hw/xen/xen-legacy-backend.h"
+-#include "xen_domainbuild.h"
+-#include "qemu/timer.h"
+-#include "qemu/log.h"
 -
--        if (xen_device_backend_scanf(xendev, "online", "%u", &online) != 1) {
--            online = 0;
+-#include <xenguest.h>
+-
+-static int xenstore_domain_mkdir(char *path)
+-{
+-    struct xs_permissions perms_ro[] = {{
+-            .id    = 0, /* set owner: dom0 */
+-        },{
+-            .id    = xen_domid,
+-            .perms = XS_PERM_READ,
+-        }};
+-    struct xs_permissions perms_rw[] = {{
+-            .id    = 0, /* set owner: dom0 */
+-        },{
+-            .id    = xen_domid,
+-            .perms = XS_PERM_READ | XS_PERM_WRITE,
+-        }};
+-    const char *writable[] = { "device", "control", "error", NULL };
+-    char subpath[256];
+-    int i;
+-
+-    if (!xs_mkdir(xenstore, 0, path)) {
+-        fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, path);
+-	return -1;
+-    }
+-    if (!xs_set_permissions(xenstore, 0, path, perms_ro, 2)) {
+-        fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
+-	return -1;
+-    }
+-
+-    for (i = 0; writable[i]; i++) {
+-        snprintf(subpath, sizeof(subpath), "%s/%s", path, writable[i]);
+-        if (!xs_mkdir(xenstore, 0, subpath)) {
+-            fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, subpath);
+-            return -1;
 -        }
--
--        if (online) {
--            xen_device_backend_set_state(xendev, XenbusStateInitWait);
+-        if (!xs_set_permissions(xenstore, 0, subpath, perms_rw, 2)) {
+-            fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
+-            return -1;
 -        }
 -    }
- }
- 
- static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
-@@ -822,9 +959,9 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
-                               xendev->frontend_path);
-     xen_device_backend_printf(xendev, "frontend-id", "%u",
-                               xendev->frontend_id);
--    xen_device_backend_printf(xendev, "online", "%u", 1);
-     xen_device_backend_printf(xendev, "hotplug-status", "connected");
- 
-+    xen_device_backend_set_online(xendev, true);
-     xen_device_backend_set_state(xendev, XenbusStateInitWait);
- 
-     xen_device_frontend_printf(xendev, "backend", "%s",
-diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
-index 29413256e9..c4223f9be1 100644
---- a/include/hw/xen/xen-block.h
-+++ b/include/hw/xen/xen-block.h
-@@ -9,6 +9,9 @@
- #define HW_XEN_BLOCK_H
- 
+-    return 0;
+-}
+-
+-int xenstore_domain_init1(const char *kernel, const char *ramdisk,
+-                          const char *cmdline)
+-{
+-    char *dom, uuid_string[42], vm[256], path[256];
+-    int i;
+-
+-    qemu_uuid_unparse(&qemu_uuid, uuid_string);
+-    dom = xs_get_domain_path(xenstore, xen_domid);
+-    snprintf(vm,  sizeof(vm),  "/vm/%s", uuid_string);
+-
+-    xenstore_domain_mkdir(dom);
+-
+-    xenstore_write_str(vm, "image/ostype",  "linux");
+-    if (kernel)
+-        xenstore_write_str(vm, "image/kernel",  kernel);
+-    if (ramdisk)
+-        xenstore_write_str(vm, "image/ramdisk", ramdisk);
+-    if (cmdline)
+-        xenstore_write_str(vm, "image/cmdline", cmdline);
+-
+-    /* name + id */
+-    xenstore_write_str(vm,  "name",   qemu_name ? qemu_name : "no-name");
+-    xenstore_write_str(vm,  "uuid",   uuid_string);
+-    xenstore_write_str(dom, "name",   qemu_name ? qemu_name : "no-name");
+-    xenstore_write_int(dom, "domid",  xen_domid);
+-    xenstore_write_str(dom, "vm",     vm);
+-
+-    /* memory */
+-    xenstore_write_int(dom, "memory/target", ram_size / KiB);
+-    xenstore_write_int(vm, "memory",         ram_size / MiB);
+-    xenstore_write_int(vm, "maxmem",         ram_size / MiB);
+-
+-    /* cpus */
+-    for (i = 0; i < smp_cpus; i++) {
+-	snprintf(path, sizeof(path), "cpu/%d/availability",i);
+-	xenstore_write_str(dom, path, "online");
+-    }
+-    xenstore_write_int(vm, "vcpu_avail",  smp_cpus);
+-    xenstore_write_int(vm, "vcpus",       smp_cpus);
+-
+-    /* vnc password */
+-    xenstore_write_str(vm, "vncpassword", "" /* FIXME */);
+-
+-    free(dom);
+-    return 0;
+-}
+-
+-int xenstore_domain_init2(int xenstore_port, int xenstore_mfn,
+-                          int console_port, int console_mfn)
+-{
+-    char *dom;
+-
+-    dom = xs_get_domain_path(xenstore, xen_domid);
+-
+-    /* signal new domain */
+-    xs_introduce_domain(xenstore,
+-                        xen_domid,
+-                        xenstore_mfn,
+-                        xenstore_port);
+-
+-    /* xenstore */
+-    xenstore_write_int(dom, "store/ring-ref",   xenstore_mfn);
+-    xenstore_write_int(dom, "store/port",       xenstore_port);
+-
+-    /* console */
+-    xenstore_write_str(dom, "console/type",     "ioemu");
+-    xenstore_write_int(dom, "console/limit",    128 * KiB);
+-    xenstore_write_int(dom, "console/ring-ref", console_mfn);
+-    xenstore_write_int(dom, "console/port",     console_port);
+-    xen_config_dev_console(0);
+-
+-    free(dom);
+-    return 0;
+-}
+-
+-/* ------------------------------------------------------------- */
+-
+-static QEMUTimer *xen_poll;
+-
+-/* check domain state once per second */
+-static void xen_domain_poll(void *opaque)
+-{
+-    struct xc_dominfo info;
+-    int rc;
+-
+-    rc = xc_domain_getinfo(xen_xc, xen_domid, 1, &info);
+-    if ((rc != 1) || (info.domid != xen_domid)) {
+-        qemu_log("xen: domain %d is gone\n", xen_domid);
+-        goto quit;
+-    }
+-    if (info.dying) {
+-        qemu_log("xen: domain %d is dying (%s%s)\n", xen_domid,
+-                 info.crashed  ? "crashed"  : "",
+-                 info.shutdown ? "shutdown" : "");
+-        goto quit;
+-    }
+-
+-    timer_mod(xen_poll, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 1000);
+-    return;
+-
+-quit:
+-    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+-}
+-
+-static int xen_domain_watcher(void)
+-{
+-    int qemu_running = 1;
+-    int fd[2], i, n, rc;
+-    char byte;
+-
+-    if (pipe(fd) != 0) {
+-        qemu_log("%s: Huh? pipe error: %s\n", __func__, strerror(errno));
+-        return -1;
+-    }
+-    if (fork() != 0)
+-        return 0; /* not child */
+-
+-    /* close all file handles, except stdio/out/err,
+-     * our watch pipe and the xen interface handle */
+-    n = getdtablesize();
+-    for (i = 3; i < n; i++) {
+-        if (i == fd[0])
+-            continue;
+-        close(i);
+-    }
+-
+-    /*
+-     * Reopen xc interface, since the original is unsafe after fork
+-     * and was closed above.
+-     */
+-    xen_xc = xc_interface_open(0, 0, 0);
+-
+-    /* ignore term signals */
+-    signal(SIGINT,  SIG_IGN);
+-    signal(SIGTERM, SIG_IGN);
+-
+-    /* wait for qemu exiting */
+-    while (qemu_running) {
+-        rc = read(fd[0], &byte, 1);
+-        switch (rc) {
+-        case -1:
+-            if (errno == EINTR)
+-                continue;
+-            qemu_log("%s: Huh? read error: %s\n", __func__, strerror(errno));
+-            qemu_running = 0;
+-            break;
+-        case 0:
+-            /* EOF -> qemu exited */
+-            qemu_running = 0;
+-            break;
+-        default:
+-            qemu_log("%s: Huh? data on the watch pipe?\n", __func__);
+-            break;
+-        }
+-    }
+-
+-    /* cleanup */
+-    qemu_log("%s: destroy domain %d\n", __func__, xen_domid);
+-    xc_domain_destroy(xen_xc, xen_domid);
+-    _exit(0);
+-}
+-
+-/* normal cleanup */
+-static void xen_domain_cleanup(void)
+-{
+-    char *dom;
+-
+-    dom = xs_get_domain_path(xenstore, xen_domid);
+-    if (dom) {
+-        xs_rm(xenstore, 0, dom);
+-        free(dom);
+-    }
+-    xs_release_domain(xenstore, xen_domid);
+-}
+-
+-int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+-                        const char *cmdline)
+-{
+-    uint32_t ssidref = 0;
+-    uint32_t flags = 0;
+-    xen_domain_handle_t uuid;
+-    unsigned int xenstore_port = 0, console_port = 0;
+-    unsigned long xenstore_mfn = 0, console_mfn = 0;
+-    int rc;
+-
+-    memcpy(uuid, &qemu_uuid, sizeof(uuid));
+-    rc = xen_domain_create(xen_xc, ssidref, uuid, flags, &xen_domid);
+-    if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_create() failed\n");
+-        goto err;
+-    }
+-    qemu_log("xen: created domain %d\n", xen_domid);
+-    atexit(xen_domain_cleanup);
+-    if (xen_domain_watcher() == -1) {
+-        goto err;
+-    }
+-
+-    xenstore_domain_init1(kernel, ramdisk, cmdline);
+-
+-    rc = xc_domain_max_vcpus(xen_xc, xen_domid, smp_cpus);
+-    if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_max_vcpus() failed\n");
+-        goto err;
+-    }
+-
+-#if 0
+-    rc = xc_domain_setcpuweight(xen_xc, xen_domid, 256);
+-    if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_setcpuweight() failed\n");
+-        goto err;
+-    }
+-#endif
+-
+-    rc = xc_domain_setmaxmem(xen_xc, xen_domid, ram_size / KiB);
+-    if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_setmaxmem() failed\n");
+-        goto err;
+-    }
+-
+-    xenstore_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
+-    console_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
+-
+-    rc = xc_linux_build(xen_xc, xen_domid, ram_size / MiB,
+-                        kernel, ramdisk, cmdline,
+-                        0, flags,
+-                        xenstore_port, &xenstore_mfn,
+-                        console_port, &console_mfn);
+-    if (rc < 0) {
+-        fprintf(stderr, "xen: xc_linux_build() failed\n");
+-        goto err;
+-    }
+-
+-    xenstore_domain_init2(xenstore_port, xenstore_mfn,
+-                          console_port, console_mfn);
+-
+-    qemu_log("xen: unpausing domain %d\n", xen_domid);
+-    rc = xc_domain_unpause(xen_xc, xen_domid);
+-    if (rc < 0) {
+-        fprintf(stderr, "xen: xc_domain_unpause() failed\n");
+-        goto err;
+-    }
+-
+-    xen_poll = timer_new_ms(QEMU_CLOCK_REALTIME, xen_domain_poll, NULL);
+-    timer_mod(xen_poll, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 1000);
+-    return 0;
+-
+-err:
+-    return -1;
+-}
+diff --git a/hw/xenpv/xen_domainbuild.h b/hw/xenpv/xen_domainbuild.h
+deleted file mode 100644
+index 652d9b410f..0000000000
+--- a/hw/xenpv/xen_domainbuild.h
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#ifndef QEMU_HW_XEN_DOMAINBUILD_H
+-#define QEMU_HW_XEN_DOMAINBUILD_H
+-
+-#include "hw/xen/xen_common.h"
+-
+-int xenstore_domain_init1(const char *kernel, const char *ramdisk,
+-                          const char *cmdline);
+-int xenstore_domain_init2(int xenstore_port, int xenstore_mfn,
+-                          int console_port, int console_mfn);
+-int xen_domain_build_pv(const char *kernel, const char *ramdisk,
+-                        const char *cmdline);
+-
+-#endif /* QEMU_HW_XEN_DOMAINBUILD_H */
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 608e591bcc..8d68fef25e 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -28,7 +28,6 @@
+ #include "hw/boards.h"
+ #include "hw/xen/xen-legacy-backend.h"
  #include "hw/xen/xen-bus.h"
-+#include "hw/block/block.h"
-+#include "hw/block/dataplane/xen-block.h"
-+#include "sysemu/iothread.h"
+-#include "xen_domainbuild.h"
+ #include "sysemu/block-backend.h"
  
- typedef enum XenBlockVdevType {
-     XEN_BLOCK_VDEV_TYPE_INVALID,
-@@ -28,11 +31,17 @@ typedef struct XenBlockVdev {
+ static void xen_init_pv(MachineState *machine)
+@@ -46,19 +45,6 @@ static void xen_init_pv(MachineState *machine)
+     case XEN_ATTACH:
+         /* nothing to do, xend handles everything */
+         break;
+-#ifdef CONFIG_XEN_PV_DOMAIN_BUILD
+-    case XEN_CREATE: {
+-        const char *kernel_filename = machine->kernel_filename;
+-        const char *kernel_cmdline = machine->kernel_cmdline;
+-        const char *initrd_filename = machine->initrd_filename;
+-        if (xen_domain_build_pv(kernel_filename, initrd_filename,
+-                                kernel_cmdline) < 0) {
+-            error_report("xen pv domain creation failed");
+-            exit(1);
+-        }
+-        break;
+-    }
+-#endif
+     case XEN_EMULATE:
+         error_report("xen emulation not implemented (yet)");
+         exit(1);
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index 7efcdaa8fe..978aaa31fb 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -15,7 +15,6 @@
+ /* xen-machine.c */
+ enum xen_mode {
+     XEN_EMULATE = 0,  // xen emulation, using xenner (default)
+-    XEN_CREATE,       // create xen domain
+     XEN_ATTACH        // attach to xen domain created by xend
+ };
  
- typedef struct XenBlockProperties {
-     XenBlockVdev vdev;
-+    BlockConf conf;
-+    unsigned int max_ring_page_order;
-+    IOThread *iothread;
- } XenBlockProperties;
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 93f631e5bf..2b91d199a1 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -661,24 +661,6 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
  
- typedef struct XenBlockDevice {
-     XenDevice xendev;
-     XenBlockProperties props;
-+    const char *device_type;
-+    unsigned int info;
-+    XenBlockDataPlane *dataplane;
- } XenBlockDevice;
+ #endif
  
- typedef void (*XenBlockDeviceRealize)(XenBlockDevice *blockdev, Error **errp);
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index f83a95cebd..0834cb3a7e 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -23,7 +23,9 @@ typedef struct XenDevice {
-     char *backend_path, *frontend_path;
-     enum xenbus_state backend_state, frontend_state;
-     Notifier exit;
--    XenWatch *frontend_state_watch;
-+    XenWatch *backend_state_watch, *frontend_state_watch;
-+    bool backend_online;
-+    XenWatch *backend_online_watch;
-     xengnttab_handle *xgth;
-     bool feature_grant_copy;
-     xenevtchn_handle *xeh;
-@@ -84,6 +86,16 @@ void xen_device_backend_set_state(XenDevice *xendev,
-                                   enum xenbus_state state);
- enum xenbus_state xen_device_backend_get_state(XenDevice *xendev);
+-#ifdef CONFIG_XEN_PV_DOMAIN_BUILD
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40700
+-static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
+-                                    xen_domain_handle_t handle, uint32_t flags,
+-                                    uint32_t *pdomid)
+-{
+-    return xc_domain_create(xc, ssidref, handle, flags, pdomid);
+-}
+-#else
+-static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
+-                                    xen_domain_handle_t handle, uint32_t flags,
+-                                    uint32_t *pdomid)
+-{
+-    return xc_domain_create(xc, ssidref, handle, flags, pdomid, NULL);
+-}
+-#endif
+-#endif
+-
+ /* Xen before 4.8 */
  
-+void xen_device_backend_printf(XenDevice *xendev, const char *key,
-+                               const char *fmt, ...)
-+    GCC_FMT_ATTR(3, 4);
-+void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-+                                const char *fmt, ...)
-+    GCC_FMT_ATTR(3, 4);
-+
-+int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
-+                              const char *fmt, ...);
-+
- void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
-                                    Error **errp);
- void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40800
+diff --git a/qemu-options.hx b/qemu-options.hx
+index d4f3564b78..7c323c9406 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3394,10 +3394,6 @@ ETEXI
+ 
+ DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
+     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
+-DEF("xen-create", 0, QEMU_OPTION_xen_create,
+-    "-xen-create     create domain using xen hypercalls, bypassing xend\n"
+-    "                warning: should not be used when xend is in use\n",
+-    QEMU_ARCH_ALL)
+ DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
+     "-xen-attach     attach to existing xen domain\n"
+     "                xend will use this when starting QEMU\n",
+@@ -3411,10 +3407,6 @@ STEXI
+ @item -xen-domid @var{id}
+ @findex -xen-domid
+ Specify xen guest domain @var{id} (XEN only).
+-@item -xen-create
+-@findex -xen-create
+-Create domain using xen hypercalls, bypassing xend.
+-Warning: should not be used when xend is in use (XEN only).
+ @item -xen-attach
+ @findex -xen-attach
+ Attach to existing xen domain.
+diff --git a/vl.c b/vl.c
+index 064872cc98..d3f74c051c 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3856,13 +3856,6 @@ int main(int argc, char **argv, char **envp)
+                 }
+                 xen_domid = atoi(optarg);
+                 break;
+-            case QEMU_OPTION_xen_create:
+-                if (!(xen_available())) {
+-                    error_report("Option not supported for this target");
+-                    exit(1);
+-                }
+-                xen_mode = XEN_CREATE;
+-                break;
+             case QEMU_OPTION_xen_attach:
+                 if (!(xen_available())) {
+                     error_report("Option not supported for this target");
 -- 
 Anthony PERARD
