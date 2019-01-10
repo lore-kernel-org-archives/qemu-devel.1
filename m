@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56172)
+Received: from eggs.gnu.org ([209.51.188.92]:56223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZI2-0004nh-3S
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:26 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZIC-0004ww-Ch
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ghZHu-0007nY-I2
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:22 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38951)
+	(envelope-from <richard.henderson@linaro.org>) id 1ghZIA-0007vL-CE
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:36 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:39998)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ghZHo-0007kU-6W
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:13 -0500
-Received: by mail-pl1-x641.google.com with SMTP id 101so5114634pld.6
-	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:18:09 -0800 (PST)
+	id 1ghZIA-0007lM-5m
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 07:18:34 -0500
+Received: by mail-pf1-x441.google.com with SMTP id i12so5226894pfo.7
+	for <qemu-devel@nongnu.org>; Thu, 10 Jan 2019 04:18:12 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 10 Jan 2019 23:17:35 +1100
-Message-Id: <20190110121736.23448-11-richard.henderson@linaro.org>
+Date: Thu, 10 Jan 2019 23:17:36 +1100
+Message-Id: <20190110121736.23448-12-richard.henderson@linaro.org>
 In-Reply-To: <20190110121736.23448-1-richard.henderson@linaro.org>
 References: <20190110121736.23448-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 10/11] linux-user/aarch64: Reset btype for
- signal handlers
+Subject: [Qemu-devel] [PATCH 11/11] tests/tcg/aarch64: Add bti smoke test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +29,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-It does not make sense for a SIGILL handler to enter with the
-btype set as for the indirect branch that caused the SIGILL.
-
-Nor does it make sense to return from a handler with BTYPE set.
-This could be argued to be the handler's job, setting BTYPE
-within ucontext->uc_mcontext.pstate, but handling this here
-while the ABI is undiscussed.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/aarch64/signal.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/tcg/aarch64/bti-1.c         | 61 +++++++++++++++++++++++++++++++
+ tests/tcg/aarch64/bti-crt.inc.c   | 51 ++++++++++++++++++++++++++
+ tests/tcg/aarch64/Makefile.target |  7 +++-
+ 3 files changed, 118 insertions(+), 1 deletion(-)
+ create mode 100644 tests/tcg/aarch64/bti-1.c
+ create mode 100644 tests/tcg/aarch64/bti-crt.inc.c
 
-diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
-index f84a9cf28a..1fb229e696 100644
---- a/linux-user/aarch64/signal.c
-+++ b/linux-user/aarch64/signal.c
-@@ -218,6 +218,8 @@ static void target_restore_general_frame(CPUARMState *env,
-     __get_user(env->pc, &sf->uc.tuc_mcontext.pc);
-     __get_user(pstate, &sf->uc.tuc_mcontext.pstate);
-     pstate_write(env, pstate);
-+    /* Reset btype that might have been there going into the frame.  */
-+    env->btype = 0;
- }
+diff --git a/tests/tcg/aarch64/bti-1.c b/tests/tcg/aarch64/bti-1.c
+new file mode 100644
+index 0000000000..fa8a521a47
+--- /dev/null
++++ b/tests/tcg/aarch64/bti-1.c
+@@ -0,0 +1,61 @@
++/*
++ * Branch target identification, basic notskip cases.
++ */
++
++#include "bti-crt.inc.c"
++
++static void skip2_sigill(int sig, siginfo_t *info, ucontext_t *uc)
++{
++    uc->uc_mcontext.pc += 8;
++}
++
++#define NOP       "nop"
++#define BTI_N     "hint #32"
++#define BTI_C     "hint #34"
++#define BTI_J     "hint #36"
++#define BTI_JC    "hint #38"
++
++#define BTYPE_1(DEST) \
++    asm("mov %0,#1; adr x16, 1f; br x16; 1: " DEST "; mov %0,#0" \
++        : "=r"(skipped) : : "x16")
++
++#define BTYPE_2(DEST) \
++    asm("mov %0,#1; adr x16, 1f; blr x16; 1: " DEST "; mov %0,#0" \
++        : "=r"(skipped) : : "x16", "x30")
++
++#define BTYPE_3(DEST) \
++    asm("mov %0,#1; adr x15, 1f; br x15; 1: " DEST "; mov %0,#0" \
++        : "=r"(skipped) : : "x15")
++
++#define TEST(WHICH, DEST, EXPECT) \
++    do { WHICH(DEST); fail += skipped ^ EXPECT; } while (0)
++
++
++int main()
++{
++    int fail = 0;
++    int skipped;
++
++    /* Signal-like with SA_SIGINFO.  */
++    signal_info(SIGILL, skip2_sigill);
++
++    TEST(BTYPE_1, NOP, 1);
++    TEST(BTYPE_1, BTI_N, 1);
++    TEST(BTYPE_1, BTI_C, 0);
++    TEST(BTYPE_1, BTI_J, 0);
++    TEST(BTYPE_1, BTI_JC, 0);
++
++    TEST(BTYPE_2, NOP, 1);
++    TEST(BTYPE_2, BTI_N, 1);
++    TEST(BTYPE_2, BTI_C, 0);
++    TEST(BTYPE_2, BTI_J, 1);
++    TEST(BTYPE_2, BTI_JC, 0);
++
++    TEST(BTYPE_3, NOP, 1);
++    TEST(BTYPE_3, BTI_N, 1);
++    TEST(BTYPE_3, BTI_C, 1);
++    TEST(BTYPE_3, BTI_J, 0);
++    TEST(BTYPE_3, BTI_JC, 0);
++
++    return fail;
++}
+diff --git a/tests/tcg/aarch64/bti-crt.inc.c b/tests/tcg/aarch64/bti-crt.inc.c
+new file mode 100644
+index 0000000000..ef7831ad76
+--- /dev/null
++++ b/tests/tcg/aarch64/bti-crt.inc.c
+@@ -0,0 +1,51 @@
++/*
++ * Minimal user-environment for testing BTI.
++ *
++ * Normal libc is not built with BTI support enabled, and so could
++ * generate a BTI TRAP before ever reaching main.
++ */
++
++#include <stdlib.h>
++#include <signal.h>
++#include <ucontext.h>
++#include <asm/unistd.h>
++
++int main(void);
++
++void _start(void)
++{
++    exit(main());
++}
++
++void exit(int ret)
++{
++    register int x0 __asm__("x0") = ret;
++    register int x8 __asm__("x8") = __NR_exit;
++
++    asm volatile("svc #0" : : "r"(x0), "r"(x8));
++    __builtin_unreachable();
++}
++
++/*
++ * Irritatingly, the user API struct sigaction does not match the
++ * kernel API struct sigaction.  So for simplicity, isolate the
++ * kernel ABI here, and make this act like signal.
++ */
++void signal_info(int sig, void (*fn)(int, siginfo_t *, ucontext_t *))
++{
++    struct kernel_sigaction {
++        void (*handler)(int, siginfo_t *, ucontext_t *);
++        unsigned long flags;
++        unsigned long restorer;
++        unsigned long mask;
++    } sa = { fn, SA_SIGINFO, 0, 0 };
++
++    register int x0 __asm__("x0") = sig;
++    register void *x1 __asm__("x1") = &sa;
++    register void *x2 __asm__("x2") = 0;
++    register int x3 __asm__("x3") = sizeof(unsigned long);
++    register int x8 __asm__("x8") = __NR_rt_sigaction;
++
++    asm volatile("svc #0"
++                 : : "r"(x0), "r"(x1), "r"(x2), "r"(x3), "r"(x8) : "memory");
++}
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index 08c45b8470..3d56e7c6ea 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -8,10 +8,15 @@ VPATH 		+= $(AARCH64_SRC)
+ # we don't build any of the ARM tests
+ AARCH64_TESTS=$(filter-out $(ARM_TESTS), $(TESTS))
+ AARCH64_TESTS+=fcvt
+-TESTS:=$(AARCH64_TESTS)
  
- static void target_restore_fpsimd_record(CPUARMState *env,
-@@ -510,6 +512,8 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
-     env->xregs[29] = frame_addr + fr_ofs;
-     env->pc = ka->_sa_handler;
-     env->xregs[30] = return_addr;
-+    /* Reset btype going into the signal handler.  */
-+    env->btype = 0;
-     if (info) {
-         tswap_siginfo(&frame->info, info);
-         env->xregs[1] = frame_addr + offsetof(struct target_rt_sigframe, info);
+ fcvt: LDFLAGS+=-lm
+ 
+ run-fcvt: fcvt
+ 	$(call run-test,$<,$(QEMU) $<, "$< on $(TARGET_NAME)")
+ 	$(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
++
++AARCH64_TESTS += bti-1
++bti-1: LDFLAGS += -nostartfiles -nodefaultlibs -nostdlib
++run-bti-1: QEMU += -cpu max,guarded_pages=on
++
++TESTS:=$(AARCH64_TESTS)
 -- 
 2.17.2
