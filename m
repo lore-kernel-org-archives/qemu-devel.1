@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43579)
+Received: from eggs.gnu.org ([209.51.188.92]:44099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1ghtr3-0007Iq-8m
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:15:58 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghttm-000851-4i
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:18:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1ghtr2-0004Oe-0b
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:15:57 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36053)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1ghtr1-0004NZ-Oe
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:15:55 -0500
-Received: by mail-wr1-f68.google.com with SMTP id u4so14564495wrp.3
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 02:15:54 -0800 (PST)
-Message-ID: <1547201752.3768.256.camel@redhat.com>
-From: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Fri, 11 Jan 2019 11:15:52 +0100
-In-Reply-To: <98b89b44cdba6e7128381a5216ec955771c4caaa.camel@redhat.com>
-References: <20190108152648.32537-1-lhrazky@redhat.com>
-	<20190108152648.32537-2-lhrazky@redhat.com>
-	<98b89b44cdba6e7128381a5216ec955771c4caaa.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Spice-devel] [PATCH spice 1/3] QXL interface: add
- a function to identify monitors in the guest
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghtti-0005YR-4e
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:18:43 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 11 Jan 2019 10:13:17 +0000
+Message-ID: <b9bcc040-3831-d250-4b7f-ffe27984e243@virtuozzo.com>
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
+	<2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+In-Reply-To: <2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <79AE68D397EBE14BA659DBEA6432460B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,238 +27,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jonathon Jongsma <jjongsma@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Wed, 2019-01-09 at 11:36 -0600, Jonathon Jongsma wrote:
-> On Tue, 2019-01-08 at 16:26 +0100, Lukáš Hrázký wrote:
-> > Adds a function to let QEMU provide information to identify graphics
-> > devices and their monitors in the guest. The function
-> > (spice_qxl_set_device_info) sets the device address (e.g. a PCI path)
-> > and monitor ID -> device display ID mapping of displays exposed by
-> > given
-> > QXL interface.
-> 
-> 
-> In my previous review, I asked for a slightly more explicit explanation
-> of the phrase "monitor ID" in the commit log. In this case, "monitor
-> ID" is an ID specific to the QXL instance starting at 0 and represents
-> the displays that are associated with that particular QXL instance.
-> 
-> Perhaps it makes sense to rename this "Qxl monitor ID"?
-
-Sorry, I might have forgotten to incorporate some comments on the old
-series :/
-
-To reiterate, though, what do you find unclear about the "monitor ID"?
-I mean maybe it should be spelled "monitor_id" to make it clearer what
-it refers to... Not sure if "Qxl monitor ID" helps, since it is not
-strictly related to QXL, but more to the QXL interface (which is used
-for all graphic cards, which makes it more confusing)...
-
-> > Signed-off-by: Lukáš Hrázký <lhrazky@redhat.com>
-> > ---
-> >  server/red-qxl.c         | 44 ++++++++++++++++++++++++++++++++++++++
-> >  server/spice-qxl.h       | 46
-> > ++++++++++++++++++++++++++++++++++++++++
-> >  server/spice-server.syms |  5 +++++
-> >  3 files changed, 95 insertions(+)
-> > 
-> > diff --git a/server/red-qxl.c b/server/red-qxl.c
-> > index 97940611..0ea424cd 100644
-> > --- a/server/red-qxl.c
-> > +++ b/server/red-qxl.c
-> > @@ -41,6 +41,9 @@
-> >  #include "red-qxl.h"
-> >  
-> >  
-> > +#define MAX_DEVICE_ADDRESS_LEN 256
-> > +#define MAX_MONITORS_COUNT 16
-> > +
-> >  struct QXLState {
-> >      QXLWorker qxl_worker;
-> >      QXLInstance *qxl;
-> > @@ -53,6 +56,9 @@ struct QXLState {
-> >      unsigned int max_monitors;
-> >      RedsState *reds;
-> >      RedWorker *worker;
-> > +    char device_address[MAX_DEVICE_ADDRESS_LEN];
-> > +    uint32_t device_display_ids[MAX_MONITORS_COUNT];
-> > +    size_t monitors_count;  // length of ^^^
-> >  
-> >      pthread_mutex_t scanout_mutex;
-> >      SpiceMsgDisplayGlScanoutUnix scanout;
-> > @@ -846,6 +852,44 @@ void red_qxl_gl_draw_async_complete(QXLInstance
-> > *qxl)
-> >      red_qxl_async_complete(qxl, cookie);
-> >  }
-> >  
-> > +SPICE_GNUC_VISIBLE
-> > +void spice_qxl_set_device_info(QXLInstance *instance,
-> > +                               const char *device_address,
-> > +                               uint32_t device_display_id_start,
-> > +                               uint32_t device_display_id_count)
-> > +{
-> > +    g_return_if_fail(device_address != NULL);
-> 
-> Just a thought: what if qemu calls this function twice for the same
-> instance. In theory this shouldn't happen, but should we be defensive
-> and handle it somehow? Print a warning? Just overwrite the previous
-> mapping? Right now it looks like we would just overwrite.
-
-I'm pretty sure overwriting is the correct behavior here, no logging
-needed? There may be a situation where the info changes in the future,
-for whatever reasons. At least this part of the code should be fine
-with it (though I'm not sure atm. if e.g. the client would cope well).
-
-> > +
-> > +    size_t da_len = strnlen(device_address, MAX_DEVICE_ADDRESS_LEN);
-> > +    if (da_len >= MAX_DEVICE_ADDRESS_LEN) {
-> > +        spice_error("Device address too long: %lu > %u", da_len,
-> > MAX_DEVICE_ADDRESS_LEN);
-> 
-> Technically, I think the format string for a size_t variable is %zu,
-> not %lu
-
-You're right, didn't know that. I think I have some fixing to do :)
-
-> > +        return;
-> > +    }
-> > +
-> > +    if (device_display_id_count > MAX_MONITORS_COUNT) {
-> > +        spice_error("Device display ID count (%u) is greater than
-> > limit %u",
-> > +                    device_display_id_count,
-> > +                    MAX_MONITORS_COUNT);
-> > +        return;
-> > +    }
-> > +
-> > +    strncpy(instance->st->device_address, device_address,
-> > MAX_DEVICE_ADDRESS_LEN);
-> > +
-> > +    g_debug("QXL Instance %d setting device address \"%s\" and
-> > monitor -> device display mapping:",
-> > +            instance->id,
-> > +            device_address);
-> > +
-> > +    // store the mapping monitor_id -> device_display_id
-> > +    for (uint32_t monitor_id = 0; monitor_id <
-> > device_display_id_count; ++monitor_id) {
-> > +        uint32_t device_display_id = device_display_id_start +
-> > monitor_id;
-> > +        instance->st->device_display_ids[monitor_id] =
-> > device_display_id;
-> > +        g_debug("   monitor ID %u -> device display ID %u",
-> > +                monitor_id, device_display_id);
-> > +    }
-> > +
-> > +    instance->st->monitors_count = device_display_id_count;
-> > +}
-> > +
-> >  void red_qxl_init(RedsState *reds, QXLInstance *qxl)
-> >  {
-> >      QXLState *qxl_state;
-> > diff --git a/server/spice-qxl.h b/server/spice-qxl.h
-> > index 0c4e75fc..547d3d93 100644
-> > --- a/server/spice-qxl.h
-> > +++ b/server/spice-qxl.h
-> > @@ -115,6 +115,52 @@ void spice_qxl_gl_draw_async(QXLInstance
-> > *instance,
-> >                               uint32_t w, uint32_t h,
-> >                               uint64_t cookie);
-> >  
-> > +/* since spice 0.14.2 */
-> > +
-> > +/**
-> > + * spice_qxl_set_device_info:
-> > + * @instance the QXL instance to set the path to
-> > + * @device_address the path of the device this QXL instance belongs
-> > to
-> > + * @device_display_id_start the starting device display ID of this
-> > interface,
-> > + *                          i.e. the one monitor ID 0 maps to
-> 
-> perhaps reword this last line:
-> i.e. the device display ID of monitor ID 0
-
-Will do.
-
-> > + * @device_display_id_count the total number of device display IDs
-> > on this
-> > + *                          interface
-> > + *
-> > + * Sets the device information for this QXL interface, i.e. the
-> > hardware
-> > + * address (e.g. PCI) of the graphics device and the IDs of the
-> > displays of the
-> > + * graphics device that are exposed by this interface (device
-> > display IDs).
-> > + *
-> > + * The supported device address format is:
-> > + * "pci/<DOMAIN>/<SLOT>.<FUNCTION>/.../<SLOT>.<FUNCTION>"
-> > + *
-> > + * The "pci" identifies the rest of the string as a PCI address. It
-> > is the only
-> > + * supported address at the moment, other identifiers can be
-> > introduced later.
-> > + * <DOMAIN> is the PCI domain, followed by <SLOT>.<FUNCTION> of any
-> > PCI bridges
-> > + * in the chain leading to the device. The last <SLOT>.<FUNCTION> is
-> > the
-> > + * graphics device. All of <DOMAIN>, <SLOT>, <FUNCTION> are
-> > hexadecimal numbers
-> > + * with the following number of digits:
-> > + *   <DOMAIN>: 4
-> > + *   <SLOT>: 2
-> > + *   <FUNCTION>: 1
-> > + *
-> > + * The device_display_id_{start,count} denotes the sequence of
-> > device display
-> > + * IDs that map to the zero-based sequence of monitor IDs provided
-> > by monitors
-> > + * config on this interface. For example with
-> > device_display_id_start = 2 and
-> > + * device_display_id_count = 3 you get the following mapping:
-> > + * monitor_id  ->  device_display_id
-> > + *          0  ->  2
-> > + *          1  ->  3
-> > + *          2  ->  4
-> > + *
-> > + * Note this example is unsupported in practice. The only supported
-> > cases are
-> > + * either a single device display ID (count = 1) or multiple device
-> > display IDs
-> > + * in a sequence starting from 0.
-> > + */
-> 
-> Gerd previously objected to using an example of an unsupported
-> scenario. But it doesn't seem that you changed anything here. I don't
-> care too much, myself.
-
-Right, forgot about that.
-
-Thanks,
-Lukas
-
-> > +void spice_qxl_set_device_info(QXLInstance *instance,
-> > +                               const char *device_address,
-> > +                               uint32_t device_display_id_start,
-> > +                               uint32_t device_display_id_count);
-> > +
-> >  typedef struct QXLDevInitInfo {
-> >      uint32_t num_memslots_groups;
-> >      uint32_t num_memslots;
-> > diff --git a/server/spice-server.syms b/server/spice-server.syms
-> > index edf04a42..ac4d9b14 100644
-> > --- a/server/spice-server.syms
-> > +++ b/server/spice-server.syms
-> > @@ -173,3 +173,8 @@ SPICE_SERVER_0.13.2 {
-> >  global:
-> >      spice_server_set_video_codecs;
-> >  } SPICE_SERVER_0.13.1;
-> > +
-> > +SPICE_SERVER_0.14.2 {
-> > +global:
-> > +    spice_qxl_set_device_info;
-> > +} SPICE_SERVER_0.13.2;
-> 
-> 
+MTEuMDEuMjAxOSAxMDo1NCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MTAuMDEuMjAxOSAyMzo1MSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9uIDEvMTAvMTkgNzoyMCBB
+TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+PiBkcnZfY29fYmxvY2tf
+c3RhdHVzIGRpZ3MgYnMtPmZpbGUgZm9yIGFkZGl0aW9uYWwsIG1vcmUgYWNjdXJhdGUgc2VhcmNo
+DQo+Pj4gZm9yIGhvbGUgaW5zaWRlIHJlZ2lvbiwgcmVwb3J0ZWQgYXMgREFUQSBieSBicyBzaW5j
+ZSA1ZGFhNzRhNmViYy4NCj4+DQo+PiBzL3JlZ2lvbiwgcmVwb3J0ZWQvcmVnaW9ucyByZXBvcnRl
+ZC8NCj4+DQo+Pj4NCj4+PiBUaGlzIGFjY3VyYWN5IGlzIG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2
+ZSBxY293MiBkaXNrLiBBY3R1YWxseSwgcWNvdzINCj4+PiBrbm93cywgd2hlcmUgYXJlIGhvbGVz
+IGFuZCB3aGVyZSBpcyBkYXRhLiBCdXQgZXZlcnkgYmxvY2tfc3RhdHVzDQo+Pg0KPj4gTm90IHF1
+aXRlIHRydWUuIHFjb3cyIGtub3dzIHdoZXJlIHNvbWUgaG9sZXMgYXJlLCBidXQgZG9lcyBub3Qg
+a25vdyBpZg0KPj4gdGhlcmUgYXJlIGV2ZW4gbW9yZSBob2xlcyBoaWRpbmcgaW4gdGhlIHNlY3Rp
+b25zIG1hcmtlZCBkYXRhIChzdWNoIGFzDQo+PiBiZWNhdXNlIG9mIGhvdyB0aGUgZGlzayB3YXMg
+cHJlLWFsbG9jYXRlZCkuDQo+Pg0KPj4+IHJlcXVlc3QgY2FsbHMgbHNlZWsgYWRkaXRpb25hbGx5
+LiBBc3N1bWUgYSBiaWcgZGlzaywgZnVsbCBvZg0KPj4+IGRhdGEsIGluIGFueSBpdGVyYXRpdmUg
+Y29weWluZyBibG9jayBqb2IgKG9yIGltZyBjb252ZXJ0KSB3ZSdsbCBjYWxsDQo+Pj4gbHNlZWso
+SE9MRSkgb24gZXZlcnkgaXRlcmF0aW9uLCBhbmQgZWFjaCBvZiB0aGVzZSBsc2Vla3Mgd2lsbCBo
+YXZlIHRvDQo+Pj4gaXRlcmF0ZSB0aHJvdWdoIGFsbCBtZXRhZGF0YSB1cCB0byB0aGUgZW5kIG9m
+IGZpbGUuIEl0J3Mgb2J2aW91c2x5DQo+Pj4gaW5lZmZlY3RpdmUgYmVoYXZpb3IuIEFuZCBmb3Ig
+bWFueSBzY2VuYXJpb3Mgd2UgZG9uJ3QgbmVlZCB0aGlzIGxzZWVrDQo+Pj4gYXQgYWxsLg0KPj4N
+Cj4+IEhvdyBtdWNoIHBlcmZvcm1hbmNlIGNhbiB3ZSBidXkgYmFjayB3aXRob3V0IGFueSBrbm9i
+cyBhdCBhbGwsIGlmIHdlDQo+PiBqdXN0IHRhdWdodCBwb3NpeC1maWxlLmMgdG8gY2FjaGUgbHNl
+ZWsoKSByZXN1bHRzP8KgIFRoYXQgaXMsIHdoZW4NCj4+IHZpc2l0aW5nIGEgZmlsZSBzZXF1ZW50
+aWFsbHksIGlmIGxzZWVrKGZkLCAwLCBTRUVLX0hPTEUpIHJldHVybnMgRU9GIG9uDQo+PiBvdXIg
+Zmlyc3QgYmxvY2sgc3RhdHVzIHF1ZXJ5LCB0aGVuIGFsbCBzdWJzZXF1ZW50IGJsb2NrIHN0YXR1
+cyBxdWVyaWVzDQo+PiBmYWxsIHdpdGhpbiB3aGF0IHdlIGtub3cgdG8gYmUgZGF0YSwgYW5kIHdl
+IGNhbiBza2lwIHRoZSBsc2VlaygpIGNhbGxzLg0KPiANCj4gRU9GIGlzIGJhZCBtYXJrIEkgdGhp
+bmsuIFdlIG1heSBoYXZlIGEgc21hbGwgaG9sZSBub3QgZmFyIGZyb20gRU9GLCB3aGljaA0KPiB3
+aWxsIGxlYWQgdG8gdGhlIHNhbWUgcGVyZm9ybWFuY2UsIGJ1dCBub3QgRU9GIHJldHVybmVkLg0K
+PiANCj4gSSB0aGluaywgcHJvcGVyIGltcGxlbWVudGF0aW9uIG9mIGxzZWVrIGNhY2hlIHNob3Vs
+ZCB3b3JrLCBidXQgaXQgaXMgbW9yZQ0KPiBkaWZmaWN1bHQgdGhhbiBqdXN0IGRpc2FibGUgbHNl
+ZWsuIEFuZCBpbiBzY2VuYXJpb3Mgd2l0aG91dCBwcmVhbGxvY2F0aW9uDQo+IHdlIGRvbid0IG5l
+ZWQgbHNlZWssIHNvIGFnYWluIGJldHRlciBpcyBkaXNhYmxlIGl0Lg0KPiANCj4gQW5kIEkgZG9u
+J3Qgc3VyZSB0aGF0IHFlbXUgaXMgYSBwcm9wZXIgcGxhY2UgZm9yIGxzZWVrIG9wdGltaXphdGlv
+bnMuDQo+IA0KPiBBbmQgYW5vdGhlciB3YXkgbWF5IGJlIHRvIHNlbGVjdCBjYXNlcyB3aGVuIGZp
+ZW1hcCBpcyBzYWZlIGFuZCB1c2UgaXQuDQo+IA0KPiBBZ2FpbiwgZm9yIHNjZW5hcmlvcyB3aGVu
+IHdlIGRvbid0IG5lZWQgbm9yIGxzZWVrLCBub3IgZmllbWFwLCBuZWl0aGVyDQo+IGNhY2hlIGZv
+ciB0aGVtIHRoZSBiZXN0IG9wdGlvbiBpcyBub3QgdXNlIHRoZW0uDQo+IA0KPj4NCj4+Pg0KPj4+
+IFNvLCBsZXQncyAiNWRhYTc0YTZlYmMiIGJ5IGRlZmF1bHQsIGxlYXZpbmcgYW4gb3B0aW9uIHRv
+IHJldHVybg0KPj4NCj4+IHMvbGV0J3MvbGV0J3MgdW5kby8NCj4+DQo+Pj4gcHJldmlvdXMgYmVo
+YXZpb3IsIHdoaWNoIGlzIG5lZWRlZCBmb3Igc2NlbmFyaW9zIHdpdGggcHJlYWxsb2NhdGVkDQo+
+Pj4gaW1hZ2VzLg0KPj4+DQo+Pj4gQWRkIGlvdGVzdCBpbGx1c3RyYXRpbmcgbmV3IG9wdGlvbiBz
+ZW1hbnRpY3MuDQo+Pg0KPj4gQW5kIG5vbmUgb2YgdGhlIGV4aXN0aW5nIGlvdGVzdHMgZmFpbCBk
+dWUgdG8gY2hhbmdlZCBvdXRwdXQ/wqAgRG9lcyB0aGF0DQo+PiBtZWFuIG91ciB0ZXN0c3VpdGUg
+ZG9lcyBub3QgaGF2ZSBnb29kIGNvdmVyYWdlIG9mIHByZS1hbGxvY2F0aW9uIG1vZGVzDQo+PiB3
+aGVyZSB0aGUgemVybyBwcm9iZSBtYXR0ZXJlZD8NCj4gDQo+IFRvIGJlIGhvbmVzdCwgSSBkaWRu
+J3QgcnVuIGFsbCB0aGUgdGVzdHMsIG9ubHkgc2V2ZXJhbC4NCj4gDQo+IERvIGl0IG5vdywgYW5k
+IGZvdW5kIHRoYXQsIHllcywgYXQgbGVhc3QgMTAyIGJyb2tlbi4gV2lsbCBmaXggaXQgd2l0aCB0
+aGUgZm9sbG93aW5nDQo+IHZlcnNpb24uIFN0cmFuZ2UsIGRvIHBhdGNoZXcgcnVuIHRlc3RzIG9u
+IHBhdGNoZXMgaW4gbGlzdCBub3c/DQo+IA0KPj4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IFZs
+YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+
+PiAtLS0NCj4+Pg0KPj4NCj4+PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4+IEBAIC0z
+NjczLDYgKzM2NzMsOCBAQA0KPj4+IMKgICPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCAoZGVmYXVsdDogb2ZmKQ0KPj4+IMKgICMgQGZvcmNlLXNoYXJlOsKgwqAgZm9yY2Ugc2hhcmUg
+YWxsIHBlcm1pc3Npb24gb24gYWRkZWQgbm9kZXMuDQo+Pj4gwqAgI8KgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIFJlcXVpcmVzIHJlYWQtb25seT10cnVlLiAoU2luY2UgMi4xMCkNCj4+
+PiArIyBAcHJvYmUtemVyb2VzOsKgIFByb2JlIHplcm9lcyBvbiBwcm90b2NvbCBsYXllciBpZiBm
+b3JtYXQgcmVwb3J0cyBkYXRhDQo+Pj4gKyPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCAoZGVmYXVsdDogZmFsc2UpIChzaW5jZSA0LjApDQo+Pg0KPj4gV2h5IGRvIHdlIG5lZWQgYSBu
+ZXcgYm9vbD/CoCBDYW4gd2UgaW5zdGVhZC4uLg0KPj4NCj4+PiDCoCAjDQo+Pj4gwqAgIyBSZW1h
+aW5pbmcgb3B0aW9ucyBhcmUgZGV0ZXJtaW5lZCBieSB0aGUgYmxvY2sgZHJpdmVyLg0KPj4+IMKg
+ICMNCj4+PiBAQCAtMzY4Niw3ICszNjg4LDggQEANCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCAnKnJlYWQtb25seSc6ICdib29sJywNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCAnKmF1dG8tcmVhZC1vbmx5JzogJ2Jvb2wnLA0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgICcqZm9yY2Utc2hhcmUnOiAnYm9vbCcsDQo+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+JypkZXRlY3QtemVyb2VzJzogJ0Jsb2NrZGV2RGV0ZWN0WmVyb2VzT3B0aW9ucycgfSwNCj4+PiAr
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAnKmRldGVjdC16ZXJvZXMnOiAnQmxvY2tkZXZEZXRlY3Ra
+ZXJvZXNPcHRpb25zJywNCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAnKnByb2JlLXplcm9l
+cyc6ICdib29sJyB9LA0KPj4NCj4+IC4uLmFkZCBhbm90aGVyIGVudW0gdmFsdWUgdG8gJ2RldGVj
+dC16ZXJvZXMnLCBzaW5jZSBhZnRlciBhbGwsIHdoYXQgd2UNCj4+IGFyZSByZWFsbHkgZG9pbmcg
+aXMgZmluZS10dW5pbmcgd2hhdCBsZXZlbCBvZiB6ZXJvIHByb2Jpbmcgd2UgYXJlDQo+PiB3aWxs
+aW5nIHRvIGRvPw0KPiANCj4gU2hvdWxkIHdlPyBPciBJIGp1c3QgYmluZCBvbGQgYmVoYXZpb3Ig
+dG8gZGV0ZWN0LXplcm9lcz1vbj8gQW5kIHRoZW4sIGlmIG5lZWRlZCwNCj4gd2UnbGwgYWRkIGlu
+dGVybWVkaWF0ZSBtb2Rlcy4NCj4gDQo+Pg0KPj4NCj4+PiArKysgYi9xZW11LW9wdGlvbnMuaHgN
+Cj4+PiBAQCAtNjE1LDYgKzYxNSw3IEBAIERFRigiYmxvY2tkZXYiLCBIQVNfQVJHLCBRRU1VX09Q
+VElPTl9ibG9ja2RldiwNCj4+PiDCoMKgwqDCoMKgICItYmxvY2tkZXYgW2RyaXZlcj1dZHJpdmVy
+Wyxub2RlLW5hbWU9Tl1bLGRpc2NhcmQ9aWdub3JlfHVubWFwXVxuIg0KPj4+IMKgwqDCoMKgwqAg
+IsKgwqDCoMKgwqDCoMKgwqDCoCBbLGNhY2hlLmRpcmVjdD1vbnxvZmZdWyxjYWNoZS5uby1mbHVz
+aD1vbnxvZmZdXG4iDQo+Pj4gwqDCoMKgwqDCoCAiwqDCoMKgwqDCoMKgwqDCoMKgIFsscmVhZC1v
+bmx5PW9ufG9mZl1bLGRldGVjdC16ZXJvZXM9b258b2ZmfHVubWFwXVxuIg0KPj4+ICvCoMKgwqAg
+IsKgwqDCoMKgwqDCoMKgwqDCoCBbLHByb2JlLXplcm9lcz1vbnxvZmZdXG4iDQo+Pj4gwqDCoMKg
+wqDCoCAiwqDCoMKgwqDCoMKgwqDCoMKgIFssZHJpdmVyIHNwZWNpZmljIHBhcmFtZXRlcnMuLi5d
+XG4iDQo+Pj4gwqDCoMKgwqDCoCAiwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbmZp
+Z3VyZSBhIGJsb2NrIGJhY2tlbmRcbiIsIFFFTVVfQVJDSF9BTEwpDQo+Pj4gwqAgU1RFWEkNCj4+
+PiBAQCAtNjcwLDYgKzY3MSw4IEBAIGRpc2NhcmQgcmVxdWVzdHMuDQo+Pj4gwqAgY29udmVyc2lv
+biBvZiBwbGFpbiB6ZXJvIHdyaXRlcyBieSB0aGUgT1MgdG8gZHJpdmVyIHNwZWNpZmljIG9wdGlt
+aXplZA0KPj4+IMKgIHplcm8gd3JpdGUgY29tbWFuZHMuIFlvdSBtYXkgZXZlbiBjaG9vc2UgInVu
+bWFwIiBpZiBAdmFye2Rpc2NhcmR9IGlzIHNldA0KPj4+IMKgIHRvICJ1bm1hcCIgdG8gYWxsb3cg
+YSB6ZXJvIHdyaXRlIHRvIGJlIGNvbnZlcnRlZCB0byBhbiBAY29kZXt1bm1hcH0gb3BlcmF0aW9u
+Lg0KPj4+ICtAaXRlbSBwcm9iZS16ZXJvZXM9QHZhcntwcm9iZS16ZXJvZXN9DQo+Pj4gK1Byb2Jl
+IHplcm9lcyBvbiBwcm90b2NvbCBsYXllciBpZiBmb3JtYXQgcmVwb3J0cyBkYXRhLiBEZWZhdWx0
+IGlzICJvZmYiLg0KPj4NCj4+IEFnYWluLCBmaXR0aW5nIHRoaXMgaW50byBkZXRlY3QtemVyb2Vz
+IHNlZW1zIGJldHRlciB0aGFuIGludmVudGluZyBhIG5ldw0KPj4ga25vYi4NCj4+DQo+IA0KPiBO
+byBvYmplY3Rpb25zLiBCdXQgZGVzY3JpcHRpb24gb2YgZGV0ZWN0LXplcm9lcyBhcmUgbW9yZSBh
+Ym91dCB3cml0ZXMsIHNob3VsZA0KPiB3ZSBjaGFuZ2UgdGhlbSBzb21laG93Pw0KPiANCj4gIyBE
+ZXNjcmliZXMgdGhlIG9wZXJhdGlvbiBtb2RlIGZvciB0aGUgYXV0b21hdGljIGNvbnZlcnNpb24g
+b2YgcGxhaW4NCj4gIyB6ZXJvIHdyaXRlcyBieSB0aGUgT1MgdG8gZHJpdmVyIHNwZWNpZmljIG9w
+dGltaXplZCB6ZXJvIHdyaXRlIGNvbW1hbmRzLg0KPiANCj4gLi4uDQo+IA0KPiAjIEBkZXRlY3Qt
+emVyb2VzOiBkZXRlY3QgYW5kIG9wdGltaXplIHplcm8gd3JpdGVzIChTaW5jZSAyLjEpDQo+IA0K
+PiANCj4gDQoNCkhtLCBqdXN0IG5vdGUsIHRoYXQgZGV0ZWN0LXplcm9lcyB3YXMgYWJvdXQgd3Jp
+dGVzIGFuZCBzaG91bGQgYmUgc2V0IG9uIHRhcmdldCwgYW5kDQp0aGUgbmV3IHRoaW5nIGlzIGFi
+b3V0IGJsb2NrLXN0YXR1cyBhbmQgc2hvdWxkIGJlIHNldCBvbiBzb3VyY2UsIGFuZCB0aGlzIHRo
+aW5nIHNob3VsZA0KYmUgZGVzY3JpYmVkIGluIHNwZWMgYXMgd2VsbC4NCg0KDQotLSANCkJlc3Qg
+cmVnYXJkcywNClZsYWRpbWlyDQo=
