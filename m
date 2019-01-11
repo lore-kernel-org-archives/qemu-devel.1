@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37654)
+Received: from eggs.gnu.org ([209.51.188.92]:38991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gi0bB-0005mh-LO
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:28:02 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gi0gd-0007mL-F4
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:33:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gi0b9-0007Kz-NO
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:28:01 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 11 Jan 2019 17:27:46 +0000
-Message-ID: <f228d1c9-0d3a-3951-6ad2-f436fe4be8bd@virtuozzo.com>
-References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
-	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
-	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
-	<20190111122151.GF5010@dhcp-200-186.str.redhat.com>
-	<8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
-	<20190111131538.GH5010@dhcp-200-186.str.redhat.com>
-	<277fe3a0-9025-b96e-41b2-0388f491d724@virtuozzo.com>
-	<07274f18-f342-9f9f-7b9f-9b68100ae7d9@redhat.com>
-In-Reply-To: <07274f18-f342-9f9f-7b9f-9b68100ae7d9@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F94749DE7976E548853D61D65A308DC3@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pbonzini@redhat.com>) id 1gi0gc-0001AV-LL
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:33:39 -0500
+References: <20190111140857.4211-1-philmd@redhat.com>
+	<20190111140857.4211-16-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8a7ef73f-97a4-d270-9836-3936b7be1046@redhat.com>
+Date: Fri, 11 Jan 2019 18:32:55 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
- default on block_status
+In-Reply-To: <20190111140857.4211-16-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 15/15] ui/console: Add
+ "ui/pixelformat.h" to declare PixelFormat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
 
-DQoNCk9uIDExLjAxLjIwMTkgMTc6MDQsIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDEvMTEvMTkg
-MTA6MDkgQU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+IA0KPj4+Pj4g
-SSBzdWdnZXN0ZWQgb25lOiBQYXNzIGxhcmdlIGNvbnRpZ3VvdXMgYWxsb2NhdGVkIHJhbmdlcyB0
-byB0aGUgcHJvdG9jb2wNCj4+Pj4+IGRyaXZlciwgYnV0IGp1c3QgYXNzdW1lIHRoYXQgdGhlIGFs
-bG9jYXRpb24gc3RhdHVzIGlzIGNvcnJlY3QgaW4gdGhlDQo+Pj4+PiBmb3JtYXQgbGF5ZXIgaWYg
-dGhleSBhcmUgc21hbGwuDQo+Pj4+DQo+Pj4+IFNvLCBmb3IgZnVsbHkgYWxsb2NhdGVkIGltYWdl
-LCB3ZSB3aWxsIGNhbGwgbHNlZWsgYWx3YXlzPw0KPj4+DQo+Pj4gSWYgdGhleSBhcmUgZnVsbHkg
-Y29udGlndW91cywgeWVzLiBCdXQgdGhhdCdzIGEgc2luZ2xlIGxzZWVrKCkgY2FsbCBwZXINCj4+
-PiBpbWFnZSB0aGVuIGluc3RlYWQgb2YgYW4gbHNlZWsoKSBmb3IgZXZlcnkgNjRrLCBzbyBub3Qg
-YSBiaWcgcHJvYmxlbS4NCj4+DQo+PiBsc2VlayBpcyBjYWxsZWQgb24gZWFjaCBtaXJyb3IgaXRl
-cmF0aW9uLCB3aHkgb25lIHBlciBpbWFnZT8NCj4gDQo+IElmIHRoZSBpbWFnZSBoYXMgbm8gaG9s
-ZXMsIHRoZW4gbHNlZWsoMCwgU0VFS19IT0xFKSB3aWxsIHJldHVybiBFT0YsIGFuZA0KPiB0aGVu
-IHlvdSBrbm93IHRoYXQgdGhlcmUgYXJlIG5vIGhvbGVzLCBhbmQgeW91IGRvbid0IG5lZWQgdG8g
-bWFrZSBhbnkNCj4gZnVydGhlciBsc2VlaygpIGNhbGxzLiAgSGVuY2UsIG9uY2UgcGVyIGltYWdl
-LiAgQSBmdWxseS1hbGxvY2F0ZWQgZmlsZQ0KPiB0aGF0IGhhcyBhcmVhcyB0aGF0IHJlYWQgYXMg
-a25vd24gemVyb2VzIGNhbiBiZSBkZXRlcm1pbmVkIGJ5IGZpZW1hcA0KPiAoYnV0IG5vdCBieSBs
-c2Vlaywgd2hpY2ggY2FuIG9ubHkgZGV0ZWN0IHVuYWxsb2NhdGVkIGhvbGVzKSAtIGJ1dCB3ZQ0K
-PiBhbHJlYWR5IGtub3cgdGhhdCB3aGlsZSBmaWVtYXAgaGFzIG1vcmUgaW5mb3JtYXRpb24sIGl0
-IGFsc28gaGFzIG1vcmUNCj4gcHJvYmxlbXMgKHlvdSBjYW5ub3QgdXNlIGl0IHNhZmVseSB3aXRo
-b3V0IHN5bmMsIGJ1dCBzeW5jIG1ha2VzIGl0IHRvbw0KPiBzbG93IHRvIHVzZSksIHNvIHRoYXQg
-aXMgYSBub24tc3RhcnRlci4NCj4gDQo+Pj4NCj4+PiBJbiB0aGUgbW9yZSByZWFsaXN0aWMgY2Fz
-ZSwgeW91IHdpbGwgc3RpbGwgY2FsbCBsc2VlaygpIG9jY2FzaW9uYWxseQ0KPj4+IGJlY2F1c2Ug
-eW91IHdpbGwgaGF2ZSBzb21lIGZyYWdtZW50YXRpb24sIGJ1dCB0aGUgZnJhZ21lbnRzIGNhbiBi
-ZQ0KPj4+IHJhdGhlciBsYXJnZS4gQnV0IGl0IHNob3VsZCBzdGlsbCBzaWduaWZpY2FudGx5IHJl
-ZHVjZSB0aGVtIGNvbXBhcmVkIHRvDQo+Pj4gbm93IGJlY2F1c2UgeW91IHNraXAgaXQgZm9yIHRo
-b3NlIHBhcnRzIHdpdGggc21hbGwgY29udGlndW91cw0KPj4+IGFsbG9jYXRpb25zIHdoZXJlIGxz
-ZWVrKCkgd291bGQgYmUgY2FsbGVkIGEgbG90IHRvZGF5Lg0KPj4+DQo+Pj4gS2V2aW4NCj4+Pg0K
-Pj4NCj4+IE9rLCB5b3UgcHJvcG9zZSBub3QgdG8gY2FsbCBsc2VlayBmb3Igc21hbGwgZW5vdWdo
-IGRhdGEgcmVnaW9ucyByZXBvcnRlZCBieQ0KPj4gZm9ybWF0IGxheWVyLiBBbmQgZm9yIGltYWdl
-cyB3aGljaCBhcmUgbGVzcyBmcmFnbWVudGVkLCB0aGlzIGhlbHBzIGxlc3Mgb3IgZG9uJ3QNCj4+
-IGhlbHAuDQo+IA0KPiBJbmRlZWQgLSBwaWNrIHNvbWUgdGhyZXNob2xkIChtYXliZSAxNiBjbHVz
-dGVycyk7IGlmIGJsb2NrIHN0YXR1cyBvZiB0aGUNCj4gZm9ybWF0IGxheWVyIHJldHVybnMgc29t
-ZXRoaW5nIHNtYWxsZXIgdGhhbiB0aGUgdGhyZXNob2xkLCBkb24ndCBib3RoZXINCj4gcmVmaW5p
-bmcgdGhlIGFuc3dlciBmdXJ0aGVyIGJ5IGRvaW5nIGJsb2NrIHN0YXR1cyBvZiB0aGUgcHJvdG9j
-b2wgbGF5ZXINCj4gKGlmIHRoZSBjYWxsZXIgaXMgaXRlcmF0aW5nIG92ZXIgYW4gaW1hZ2UgMSBj
-bHVzdGVyIGF0IGEgdGltZSwgdGhlbiB0aGUNCj4gdGhyZXNob2xkIHdpbGwgbmV2ZXIgYmUgdHJp
-cHBlZCBhbmQgdGh1cyB5b3UnbGwgbmV2ZXIgZG8gYW4gbHNlZWspOyBidXQNCj4gd2hlcmUgdGhl
-IGJsb2NrIHN0YXR1cyBvZiB0aGUgZm9ybWF0IGxheWVyIGlzIGxhcmdlLCB3ZSBhcmUgcmVhZGlu
-ZyB0aGUNCj4gZmlsZSBpbiBsYXJnZXIgY2h1bmtzIHNvIHdlIGVuZCB1cCB3aXRoIGZld2VyIGxz
-ZWVrcyBpbiB0aGUgbG9uZyBydW4NCj4gYW55d2F5cy4NCj4gDQo+Pg0KPj4gV2h5IGRvIHlvdSB0
-aGluayBpdCBpcyBiZXR0ZXI/DQo+Pg0KPj4gRm9yIG5vdCBwcmVhbGxvY2F0ZWQgaW1hZ2VzIGl0
-IGlzIHdvcnNlLCBhcyBpdCBjb3ZlcnMgbGVzcyBjYXNlcy4gU28sIGZvciBvdXINCj4+IHNjZW5h
-cmlvcyBpdCBpcyB3b3JzZS4NCj4gDQo+IEFueXdoZXJlIHRoYXQgeW91IHNraXAgY2FsbGluZyBs
-c2VlaygpLCB5b3UgZW5kIHVwIG1pc3Npbmcgb3V0IG9uDQo+IG9wcG9ydHVuaXRpZXMgdG8gb3B0
-aW1pemUgaGFkIHlvdSBpbnN0ZWFkIGJlZW4gYWJsZSB0byBsZWFybiBmcm9tIGxzZWVrDQo+IHRo
-YXQgeW91IHdlcmUgb24gYSBob2xlIGFmdGVyIGFsbC4NCg0KV2hhdCBhcmUgdGhlIGNhc2VzIHdo
-ZW4gd2UnbGwgYmVuZWZpdCBmcm9tIGxzZWVrIGV4Y2VwdCBwcmVhbGxvY2F0ZWQgaW1hZ2VzPw0K
-DQogICBTbyBpdCBiZWNvbWVzIGEgYmFsYW5jaW5nIHF1ZXN0aW9uOg0KPiBob3cgbXVjaCB0aW1l
-IGlzIHNwZW50IG9uIHByb2JpbmcgZm9yIHdoZXRoZXIgYW4gb3B0aW1pemF0aW9uIGlzIGV2ZW4N
-Cj4gcG9zc2libGUsIHZzLiBob3cgbXVjaCB0aW1lIGlzIHNwZW50IGlmIHRoZSBwcm9iZSBzdWNj
-ZWVkZWQgYW5kIHlvdSBjYW4NCj4gdGhlbiBvcHRpbWl6ZS4gIEZvciBhIGZ1bGx5LWFsbG9jYXRl
-ZCBpbWFnZSwgYWxsIG9mIHRoZSB0aW1lIHNwZW50DQo+IHByb2JpbmcgaXMgd2FzdGVkICh5b3Ug
-bmV2ZXIgZmluZCBhIGhvbGUsIHNvIGV2ZXJ5IHByb2JlIHdhcyB3YXN0ZWQpLg0KPiBTbyBpdCBp
-cyBpbmRlZWQgYSB0cmFkZW9mZiB3aGVuIHBpY2tpbmcgeW91ciBoZXVyaXN0aWNzLCBvZiB0cnlp
-bmcgdG8NCj4gYmFsYW5jZSBob3cgbGlrZWx5IHRoZSBwcm9iZSB3aWxsIGp1c3RpZnkgdGhlIHRp
-bWUgc3BlbnQgb24gdGhlIHByb2JlLg0KPiANCj4+IFRoZSBvbmx5IGNhc2UsIHdoZW4gaGV1cmlz
-dGljIHdvcmtzIGJldHRlciwgaXMgd2hlbiB1c2VyIGhhdmUgcHJlYWxsb2NhdGVkIGltYWdlLA0K
-Pj4gYnV0IGRvbid0IGtub3cgYWJvdXQgbmV3IG9wdGlvbiwgd2hpY2ggcmV0dXJucyBvbGQgYmVo
-YXZpb3IuIFdlIGFyZSBub3QgaW50ZXJlc3RlZA0KPj4gaW4gdGhpcyBjYXNlIGFuZCBjYW4ndCBn
-byB0aGlzIHdheSwgYXMgaXQgZG9lc24ndCBndWFyYW50ZWUsIHRoYXQgc29tZSBjdXN0b21lciB3
-aWxsDQo+PiBub3QgY29tZSBhZ2FpbiB3aXRoIGxzZWVrLXJlbGF0ZWQgcHJvYmxlbXMuDQo+Pg0K
-Pj4gRG9uJ3QgeW91IGxpa2Ugd2hhdCBFcmljIHByb3Bvc2UsIGFib3V0IGJpbmRpbmcgYmVoYXZp
-b3Igc3dpdGNoIHRvIGV4aXN0aW5nDQo+PiBkZXRlY3QtemVyb2VzIG9wdGlvbj8NCj4+DQo+PiBP
-ciwgd2UgY2FuIGFkZCBhbiBvcHBvc2l0ZSBvcHRpb24sIHRvIGVuYWJsZSBuZXcgYmVoYXZpb3Is
-IGtlZXBpbmcgdGhlIG9sZCBvbmUgYnkNCj4+IGRlZmF1bHQuIFNvLCBhbGwgc3RheXMgYXMgaXMs
-IGFuZCB3aG8gbmVlZCB1c2VzIG5ldyBvcHRpb24uIEhldXJpc3RpYyBtYXkgYmUNCj4+IGltcGxl
-bWVudGVkIHRoZW4gdG9vLg0KPj4NCj4gDQo=
+On 11/01/19 15:08, Philippe Mathieu-Daud=C3=A9 wrote:
+> PixelFormat is used by "ui/console.h" and by "ui/qemu-pixman.h".
+
+ui/console.h already includes ui/qemu-pixman.h, just move it there?
+
+Paolo
+
+> Create the new header "ui/pixelformat.h" to declare this structure,
+> and remove the forward declaration from "qemu/typedefs.h".
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> RFC because "ui/console.h" has on license, so I added a default one.
