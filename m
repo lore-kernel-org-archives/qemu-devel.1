@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46145)
+Received: from eggs.gnu.org ([209.51.188.92]:53327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <metzman@google.com>) id 1gi5jj-00046b-LK
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:57:12 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gi6M7-0002O4-DZ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 18:36:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <metzman@google.com>) id 1gi5ji-0002OB-ML
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:57:11 -0500
-Received: from mail-yw1-xc29.google.com ([2607:f8b0:4864:20::c29]:42511)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <metzman@google.com>) id 1gi5ji-0002Nx-Fq
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:57:10 -0500
-Received: by mail-yw1-xc29.google.com with SMTP id x2so6445573ywc.9
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:57:10 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1gi6M3-0007pL-JQ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 18:36:49 -0500
+Resent-Message-Id: <E1gi6M3-0007pL-JQ@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21832)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gi6M2-0007hq-NK
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 18:36:47 -0500
+Message-ID: <154724978184.37.2012130392149971966@2d170d368aaa>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20190109193115.20655-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <CAJSP0QUV39fK4L8MwQ-rGiR0ejUm0HCyKFqARh-SKRTuDPKOXg@mail.gmail.com>
-	<jpgsgy0aaw6.fsf@linux.bootlegged.copy>
-	<CACT4Y+YWVfg_PVh0=CTCgM9BRyCmKZB9N+_DBimaNKPE=y6r5Q@mail.gmail.com>
-	<CABiizEQ-O-Ro9cH3xqzZUB=c5k+oYJ-gdR7ssfbbn5kU_8GcAA@mail.gmail.com>
-	<e4af7025-fa8c-1078-62de-f77a11a79fc0@redhat.com>
-	<CAJSP0QUFrs=rPvcSdNzwjk2Zyc2Sfu81SM_KZsO9djSGK1beUA@mail.gmail.com>
-	<CABiizES5O1zGF_7CxnSCfVQL39=Ov0Bf61-U2XwvoS1_xDi2ew@mail.gmail.com>
-	<8ebdfb3b-f99b-4dbc-0389-b96b3f9fb633@redhat.com>
-	<CABiizERPJa06YNEyUxEAgDaSgjJny4bTa4qpTDCwKzKMn5Ji=Q@mail.gmail.com>
-	<0387b8e9-2b4f-ce1a-05df-b508851b84f0@redhat.com>
-	<CAMAxoC1m2g3AB6X5u=+L+K1avq36gSHeBRv-nDXobAJNc2d3qA@mail.gmail.com>
-	<69559aca-a3e8-bf1e-7622-4b9ebe9f404e@redhat.com>
-In-Reply-To: <69559aca-a3e8-bf1e-7622-4b9ebe9f404e@redhat.com>
-From: Jonathan Metzman <metzman@google.com>
-Date: Fri, 11 Jan 2019 14:56:43 -0800
-Message-ID: <CAMAxoC0VwdU8qXQ+tMEMZdCPk7vr8yaxmgMNBfhLsbjP60uEgA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Internship idea: virtio-blk oss-fuzz support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 11 Jan 2019 15:36:23 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v16 0/6] Add support for TPM Physical
+ Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,49 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Max Moroz <mmoroz@google.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, Oliver Chang <ochang@google.com>, Bandan Das <bsd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Andrey Konovalov <andreyknvl@google.com>, Kostya Serebryany <kcc@google.com>, Abhishek Arya <aarya@google.com>
+To: marcandre.lureau@redhat.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, stefanb@linux.vnet.ibm.com, f4bug@amsat.org, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, stefanb@linux.ibm.com
 
->It should be possible to turn the qtest process into a test
-postprocessor,
-
-OSS-Fuzz doesn't support AFL's preprocessors, but adding support shouldn't
-be hard.
-
->It's much harder to
-remove the QEMU process as well and turn it into a TestOneInput function.
-
-Got it. I am not familiar with postprocessors but I guess this should work
-as long as the QEMU process can interpret the buffer output by the
-postprocessor.
-
-There may be some other complications with having an AFL-only fuzzer on
-OSS-Fuzz.
-The main one is no pruning. On OSS-Fuzz pruning is only done by libFuzzer,
-since AFL and libFuzzer share a corpus.
-I'm not sure how we would handle this.
-
-On Fri, Jan 11, 2019 at 12:27 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 11/01/19 20:09, Jonathan Metzman wrote:
-> > Could you clarify what you think the relationship between the qtest
-> > process, QEMU, and afl-fuzz will look like when fuzzing?
-> >
-> > Is it something like this:
-> > 1. afl-fuzz mutates a buffer, starts a qtest process, and gives the
-> > qtest process the mutated buffer.
-> > 2. The qtest process starts a QEMU process and interacts with QEMU
-> > process based on the buffer AFL gave it (qtest).
-> > 3. goto 1
-> >
-> > I don't think this works (under normal circumstances). AFL will think it
-> > is fuzzing qtest and will not learn about coverage or crashes from qsym.
-> > There probably are ways to get this working, but I just want to make
-> > sure I understand.
->
-> It should be possible to turn the qtest process into a test
-> postprocessor, and remove the second process.  It's much harder to
-> remove the QEMU process as well and turn it into a TestOneInput function.
->
-> Paolo
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEwOTE5MzExNS4yMDY1
+NS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTAxMDkxOTMxMTUuMjA2NTUtMS1t
+YXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRl
+dmVsXSBbUEFUQ0ggdjE2IDAvNl0gQWRkIHN1cHBvcnQgZm9yIFRQTSBQaHlzaWNhbCBQcmVzZW5j
+ZSBpbnRlcmZhY2UKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQou
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC0tY29sb3I9YWx3YXlzIGJhc2UuLgo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjE2ZGRhYzEg
+dHBtOiBjbGVhciBSQU0gd2hlbiAibWVtb3J5IG92ZXJ3cml0ZSIgcmVxdWVzdGVkCmJjMmNhY2Qg
+YWNwaTogYWRkIEFDUEkgbWVtb3J5IGNsZWFyIGludGVyZmFjZQo1ZTg2MmMwIGFjcGk6IGJ1aWxk
+IFRQTSBQaHlzaWNhbCBQcmVzZW5jZSBpbnRlcmZhY2UKZTEzN2E3MyBhY3BpOiBleHBvc2UgVFBN
+L1BQSSBjb25maWd1cmF0aW9uIHBhcmFtZXRlcnMgdG8gZmlybXdhcmUgdmlhIGZ3X2NmZwpjMjc4
+MGM5IHRwbTogYWxsb2NhdGUvbWFwIGJ1ZmZlciBmb3IgVFBNIFBoeXNpY2FsIFByZXNlbmNlIGlu
+dGVyZmFjZQo2ZWRkYTY4IHRwbTogYWRkIGEgInBwaSIgYm9vbGVhbiBwcm9wZXJ0eQoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KVW5rbm93biBvcHRpb246IGNvbG9yClVzYWdlOgoKICAgIGNoZWNrcGF0
+Y2gucGwgW09QVElPTl0uLi4gW0ZJTEVdLi4uCiAgICBjaGVja3BhdGNoLnBsIFtPUFRJT05dLi4u
+IFtHSVQtUkVWLUxJU1RdCgpWZXJzaW9uOiAwLjMxCgpPcHRpb25zOgogIC1xLCAtLXF1aWV0ICAg
+ICAgICAgICAgICAgIHF1aWV0CiAgLS1uby10cmVlICAgICAgICAgICAgICAgICAgcnVuIHdpdGhv
+dXQgYSBrZXJuZWwgdHJlZQogIC0tbm8tc2lnbm9mZiAgICAgICAgICAgICAgIGRvIG5vdCBjaGVj
+ayBmb3IgJ1NpZ25lZC1vZmYtYnknIGxpbmUKICAtLXBhdGNoICAgICAgICAgICAgICAgICAgICB0
+cmVhdCBGSUxFIGFzIHBhdGNoZmlsZQogIC0tYnJhbmNoICAgICAgICAgICAgICAgICAgIHRyZWF0
+IGFyZ3MgYXMgR0lUIHJldmlzaW9uIGxpc3QKICAtLWVtYWNzICAgICAgICAgICAgICAgICAgICBl
+bWFjcyBjb21waWxlIHdpbmRvdyBmb3JtYXQKICAtLXRlcnNlICAgICAgICAgICAgICAgICAgICBv
+bmUgbGluZSBwZXIgcmVwb3J0CiAgLWYsIC0tZmlsZSAgICAgICAgICAgICAgICAgdHJlYXQgRklM
+RSBhcyByZWd1bGFyIHNvdXJjZSBmaWxlCiAgLS1zdHJpY3QgICAgICAgICAgICAgICAgICAgZmFp
+bCBpZiBvbmx5IHdhcm5pbmdzIGFyZSBmb3VuZAogIC0tcm9vdD1QQVRIICAgICAgICAgICAgICAg
+IFBBVEggdG8gdGhlIGtlcm5lbCB0cmVlIHJvb3QKICAtLW5vLXN1bW1hcnkgICAgICAgICAgICAg
+ICBzdXBwcmVzcyB0aGUgcGVyLWZpbGUgc3VtbWFyeQogIC0tbWFpbGJhY2sgICAgICAgICAgICAg
+ICAgIG9ubHkgcHJvZHVjZSBhIHJlcG9ydCBpbiBjYXNlIG9mIHdhcm5pbmdzL2Vycm9ycwogIC0t
+c3VtbWFyeS1maWxlICAgICAgICAgICAgIGluY2x1ZGUgdGhlIGZpbGVuYW1lIGluIHN1bW1hcnkK
+ICAtLWRlYnVnIEtFWT1bMHwxXSAgICAgICAgICB0dXJuIG9uL29mZiBkZWJ1Z2dpbmcgb2YgS0VZ
+LCB3aGVyZSBLRVkgaXMgb25lIG9mCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJ3ZhbHVl
+cycsICdwb3NzaWJsZScsICd0eXBlJywgYW5kICdhdHRyJyAoZGVmYXVsdAogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIGlzIGFsbCBvZmYpCiAgLS10ZXN0LW9ubHk9V09SRCAgICAgICAgICAg
+cmVwb3J0IG9ubHkgd2FybmluZ3MvZXJyb3JzIGNvbnRhaW5pbmcgV09SRAogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIGxpdGVyYWxseQogIC1oLCAtLWhlbHAsIC0tdmVyc2lvbiAgICAgIGRp
+c3BsYXkgdGhpcyBoZWxwIGFuZCBleGl0CgpXaGVuIEZJTEUgaXMgLSByZWFkIHN0YW5kYXJkIGlu
+cHV0Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
+MDE5MDEwOTE5MzExNS4yMDY1NS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbS90ZXN0aW5n
+LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
