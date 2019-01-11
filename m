@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46271)
+Received: from eggs.gnu.org ([209.51.188.92]:46359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghzIz-0002gT-T2
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:05:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghzJU-00030Q-Jc
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:05:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ghzIy-0003uT-Aj
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:05:09 -0500
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:41339)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ghzIx-0003rp-Tl
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:05:08 -0500
-Received: by mail-ot1-x32f.google.com with SMTP id u16so13518651otk.8
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 08:05:06 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1ghzJS-0004Km-VD
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:05:40 -0500
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
+	<2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+	<5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4b400545-d3e4-0143-c341-34d6807da095@redhat.com>
+Date: Fri, 11 Jan 2019 10:05:17 -0600
 MIME-Version: 1.0
-References: <20190110134917.16425-1-anthony.perard@citrix.com>
-	<CAFEAcA-RQkXCvijrDkQY=QADq4O6c60ab1d-9oeq+vdObtQiUw@mail.gmail.com>
-	<20190111155531.GM1508@perard.uk.xensource.com>
-In-Reply-To: <20190111155531.GM1508@perard.uk.xensource.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 11 Jan 2019 16:04:52 +0000
-Message-ID: <CAFEAcA9e6J7LqjQSJNFL-_68UaSqkkvYEo9FajWT0-CTpPQL3A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/25] xen queue
+In-Reply-To: <5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="p9WxoZ1CzcDx0PG0vP2yRruPnEsoT38fc"
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Fri, 11 Jan 2019 at 15:55, Anthony PERARD <anthony.perard@citrix.com> wr=
-ote:
->
-> On Fri, Jan 11, 2019 at 01:35:29PM +0000, Peter Maydell wrote:
-> > On Thu, 10 Jan 2019 at 13:52, Anthony PERARD <anthony.perard@citrix.com=
-> wrote:
-> > >
-> > > The following changes since commit 8ae951fbc1068308313b2c57a4fc3c6845=
-1641f4:
-> > >
-> > >   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.0-2019=
-0109' into staging (2019-01-09 16:08:31 +0000)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pu=
-ll-xen-20190110
-> > >
-> > > for you to fetch changes up to 24edb91f5009fa941e1294aaf4bb2103d9ad07=
-7e:
-> > >
-> > >   xen-block: avoid repeated memory allocation (2019-01-10 11:25:17 +0=
-000)
-> > >
-> > > ----------------------------------------------------------------
-> > > xen queue
-> > >
-> > > * Xen PV backend 'qdevification'.
-> > >   Starting with xen_disk.
-> > > * Performance improvements for xen-block.
-> > > * Remove of the Xen PV domain builder.
-> > > * bug fixes.
-> > >
-> > > ----------------------------------------------------------------
-> >
-> > Hi. This fails to compile for me (x86-64 Linux host):
-> >
-> >   CC      hw/block/xen-block.o
-> > In file included from
-> > /home/petmay01/linaro/qemu-for-merges/include/hw/xen/xen-block.h:11:0,
-> >                  from
-> > /home/petmay01/linaro/qemu-for-merges/hw/block/xen-block.c:22:
-> > /home/petmay01/linaro/qemu-for-merges/include/hw/xen/xen-bus.h:32:5:
-> > error: unknown type name =E2=80=98xenevtchn_port_or_error_t=E2=80=99
-> >      xenevtchn_port_or_error_t local_port;
-> >      ^
-> > /home/petmay01/linaro/qemu-for-merges/rules.mak:69: recipe for target
-> > 'hw/block/xen-block.o' failed
-> >
-> > Probably the code is accidentally assuming a newer version
-> > of the Xen headers than this system has installed? This
-> > is Ubuntu 16.04.5 with libxen-dev  4.6.5-0ubuntu1.4.
->
-> Sorry, I did stop build testing againt 4.6 as it went out of security
-> support. Let me fix this and I'll resend a pull requests.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--p9WxoZ1CzcDx0PG0vP2yRruPnEsoT38fc
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net"
+ <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com"
+ <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>
+Message-ID: <4b400545-d3e4-0143-c341-34d6807da095@redhat.com>
+Subject: Re: [PATCH] block: don't probe zeroes in bs->file by default on
+ block_status
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+ <acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
+ <2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+ <5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
+In-Reply-To: <5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-No problem. For fixing this pullreq a simple fix may be best,
-but we should also consider dropping Xen 4.6 support from QEMU
-if it's no longer within security support. We'd want to
-make configure not enable Xen if the detected xenlibs are
-too old (with the usual semantics for our configure of
-silently just not building the Xen code by default but
-failing with an error if the user explicitly asked for
-Xen support to be enabled).
+On 1/11/19 10:02 AM, Eric Blake wrote:
 
-thanks
--- PMM
+> Even a dumb most-recent use cache will speed this up: both the second
+> and third queries above can be avoided because we know that both 0x4000=
+0
+> and 0x30000 the second query at 0x40000 can be skipped (0x40000 is
+> between our most recent lseek at 0x20000 and hole at 0x10000)
+>=20
+> Make the cache slightly larger, or use a bitmap with 2 bits per cluster=
+
+> (tracking unknown, known-data, known-hole), with proper flushing of the=
+
+> cache as we write to the image, or whatever, and we should automaticall=
+y
+> get some performance improvements by using fewer lseek() anywhere that
+> we remember what previous lseek() already told us, with no knobs needed=
+=2E
+
+In fact, block/iscsi.c has such a cache; look at iscsi_allocmap_update()
+and friends; maybe we should generalize that code in order to reuse the
+same concepts in file-posix.c.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--p9WxoZ1CzcDx0PG0vP2yRruPnEsoT38fc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw4vr0ACgkQp6FrSiUn
+Q2rpzAf3bbY7w64+3VExe+Eq91MIC05papN+xDWlRBDDQ3qsyzz/twPI9rxpCW1Y
+jDsLOxU4vEzOU2N1Ns0k7eluQbveYorvkoobRcSs4yaiQDHmo+KH8w4cSuwCDnc8
+gkgUHBsEBt8QtVbZ321KC1scRxfbOvUt6FuW/zLycpw4njRckpRAOyHA1uQTdIep
+GRG5hY5WydBTmnp0a3c6dDa5W3ex19rrmu/hkgBuq6Wh1KeXQAL8i4bxX32T1B3x
+FD5Deg8Iut7zhe2LJjd1eOuedM9Vs5IAqh+qog3QnoW03UvM7SP8NpHH10+I1HGF
+Y0cjzkByQVB/SCV+S891G6ZF+Idm
+=PfzZ
+-----END PGP SIGNATURE-----
+
+--p9WxoZ1CzcDx0PG0vP2yRruPnEsoT38fc--
