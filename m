@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49040)
+Received: from eggs.gnu.org ([209.51.188.92]:49155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gi3uZ-0003os-MC
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:00:16 -0500
+	(envelope-from <groug@kaod.org>) id 1gi3v0-000493-6m
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:00:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gi3uY-0000kb-Cz
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:00:15 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36635)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gi3uY-0000kL-5u
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:00:14 -0500
-Received: by mail-pf1-x441.google.com with SMTP id b85so7501297pfc.3
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 13:00:14 -0800 (PST)
-References: <20181031132029.4887-1-kbastian@mail.uni-paderborn.de>
-	<20181031132029.4887-25-kbastian@mail.uni-paderborn.de>
-	<16797a6b-1b0b-1f83-1aef-5cc5a8ff90e6@linaro.org>
-	<b0269eb1-9fa8-449e-68ee-adbc55d15e18@mail.uni-paderborn.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <555073af-e1f7-34f8-e4fd-c917e810f081@linaro.org>
-Date: Sat, 12 Jan 2019 08:00:04 +1100
+	(envelope-from <groug@kaod.org>) id 1gi3uy-0000wM-J2
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:00:42 -0500
+Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:59091)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gi3uy-0000lW-BT
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:00:40 -0500
+Received: from player729.ha.ovh.net (unknown [10.109.146.163])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 363E645AD3
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 22:00:16 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 11 Jan 2019 21:59:55 +0100
+Message-ID: <154724039526.525985.3172545257507998890.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <b0269eb1-9fa8-449e-68ee-adbc55d15e18@mail.uni-paderborn.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 24/35] target/riscv: Move
- gen_arith_imm() decoding into trans_* functions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2 00/13] spapr: Add support for PHB hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, mjc@sifive.com, sagark@eecs.berkeley.edu, palmer@sifive.com, Alistair.Francis@wdc.com
-Cc: peer.adelt@hni.uni-paderborn.de, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On 1/12/19 12:10 AM, Bastian Koppelmann wrote:
-> 
-> On 10/31/18 11:18 PM, Richard Henderson wrote:
->>
->> Surely the shri and sari functions need the same shamt >= TARGET_LONG_BITS
->> check as slli.  Otherwise RV32 shri should definitely produce an assert in
->> tcg_gen_shri_tl.
->>
->> I did wonder about changing the decode of the shift functions such that only
->> the top two bits of the imm are reserved for secondary parsing of the shift
->> type, and the other 10 bits are passed down into trans_foo.  At which point the
->> TARGET_LONG_BITS check takes care of other illegalities.
->>
->> Which means that the parsing for slli and slliw are identical, and also that
->> for the far future when RV128 is a thing, we don't have to change the parsing.
-> 
-> 
-> I don't quite understand this. Do you want to have one entry in the decode file
-> for slli and slliw?
-> 
-> How is the parsing of slli and slliw identical with this change? As far as I
-> see it, they are different at least in the opcode.
+This allows to hotplug/unplug PHBs. I could successfully test:
+- hotplug/unplug with e1000 device to validate LSIs
+- hotplug/unplug with virtio-net device to validate MSIs
+- some simple migration scenarios
 
-I meant in the extraction and validation of operands, I think.
-I'm not really sure where else I was going with this.  It has
-been two months and I don't have the decode in front of me.
+Changes in v2:
+- rebased on current ppc-for-4.0
+- added some preliminary cleanup
+- call unrealize from realize error path
+- advertise PHB hotplug in last patch
+- reworked phandle related code
+- sync LSIs to KVM
+
+Please comment.
+
+--
+Greg
+
+---
+
+Greg Kurz (5):
+      spapr: Rename xics to intc in interrupt controller agnostic code
+      spapr_pci: add PHB unrealize
+      spapr_irq: Expose the phandle of the interrupt controller
+      spapr_irq: Allow synchronization of a single irq state to KVM
+      spapr: add hotplug hooks for PHB hotplug
+
+Michael Roth (6):
+      spapr: create DR connectors for PHBs
+      spapr_events: add support for phb hotplug events
+      qdev: pass an Object * to qbus_set_hotplug_handler()
+      spapr_pci: provide node start offset via spapr_populate_pci_dt()
+      spapr_pci: add ibm, my-drc-index property for PHB hotplug
+      spapr: enable PHB hotplug for default pseries machine type
+
+Nathan Fontenot (1):
+      spapr: populate PHB DRC entries for root DT node
+
+Thomas Huth (1):
+      ppc: Move spapr-related prototypes from xics.h into a seperate header file
 
 
-r~
+ hw/acpi/pcihp.c               |    2 -
+ hw/acpi/piix4.c               |    2 -
+ hw/char/virtio-serial-bus.c   |    2 -
+ hw/core/bus.c                 |   11 +--
+ hw/intc/spapr_xive.c          |   34 ++++++++-
+ hw/intc/xics_kvm.c            |   68 ++++++++++--------
+ hw/intc/xics_spapr.c          |   29 +++++++-
+ hw/pci/pcie.c                 |    2 -
+ hw/pci/shpc.c                 |    2 -
+ hw/ppc/spapr.c                |  156 ++++++++++++++++++++++++++++++++++++++++-
+ hw/ppc/spapr_drc.c            |   18 +++++
+ hw/ppc/spapr_events.c         |    5 +
+ hw/ppc/spapr_irq.c            |   45 ++++++++++++
+ hw/ppc/spapr_pci.c            |  122 +++++++++++++++++++++++++-------
+ hw/ppc/spapr_vio.c            |    2 -
+ hw/s390x/css-bridge.c         |    2 -
+ hw/s390x/s390-pci-bus.c       |    6 +-
+ hw/scsi/virtio-scsi.c         |    2 -
+ hw/scsi/vmw_pvscsi.c          |    2 -
+ hw/usb/dev-smartcard-reader.c |    2 -
+ include/hw/pci-host/spapr.h   |    8 ++
+ include/hw/ppc/spapr.h        |    4 +
+ include/hw/ppc/spapr_drc.h    |    8 ++
+ include/hw/ppc/spapr_irq.h    |    3 +
+ include/hw/ppc/spapr_xive.h   |    2 +
+ include/hw/ppc/xics.h         |    9 +-
+ include/hw/ppc/xics_spapr.h   |   39 ++++++++++
+ include/hw/qdev-core.h        |    3 -
+ 28 files changed, 492 insertions(+), 98 deletions(-)
+ create mode 100644 include/hw/ppc/xics_spapr.h
