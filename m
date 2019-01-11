@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35870)
+Received: from eggs.gnu.org ([209.51.188.92]:35936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ghwiC-0002pB-Bd
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:19:01 -0500
+	(envelope-from <philmd@redhat.com>) id 1ghwiZ-00037a-Gj
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:19:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ghwiB-0000NF-MV
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:19:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51684)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ghwiB-0000Mx-HH
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:18:59 -0500
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri, 11 Jan 2019 14:18:33 +0100
-Message-Id: <20190111131836.107549-2-sgarzare@redhat.com>
-In-Reply-To: <20190111131836.107549-1-sgarzare@redhat.com>
-References: <20190111131836.107549-1-sgarzare@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1ghwiP-0000Se-9b
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:19:21 -0500
+Received: from mail-wr1-f47.google.com ([209.85.221.47]:35572)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghwiO-0000Rv-Mj
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:19:12 -0500
+Received: by mail-wr1-f47.google.com with SMTP id 96so15183246wrb.2
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 05:19:12 -0800 (PST)
+References: <20190110205129.22851-1-pbonzini@redhat.com>
+	<CAFEAcA8V+HNGS_8da2qHTAzj_Dxi8+s5xojq6dErRCpnC8ci_g@mail.gmail.com>
+	<832b5ca4-c671-e6ce-b0dd-0c02f8d4ed7b@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7c515dc1-3108-d62f-34d6-b0def0f5e951@redhat.com>
+Date: Fri, 11 Jan 2019 14:19:09 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/4] linuxboot_dma: remove duplicate
- definitions of FW_CFG
+In-Reply-To: <832b5ca4-c671-e6ce-b0dd-0c02f8d4ed7b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v7 00/35] Misc patches for 2018-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>, Maran Wilson <maran.wilson@oracle.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-FW_CFG_DMA_CTL_* bits and struct fw_cfg_dma_access are
-defined in the qemu_fw_cfg.h header file already included
-in linuxboot_dma.c, so we can remove the definition of
-BIOS_CFG_DMA_CTL_* and struct FWCfgDmaAccess.
+On 1/11/19 11:58 AM, Paolo Bonzini wrote:
+> On 11/01/19 11:51, Peter Maydell wrote:
+>> make: Entering directory
+>> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
+>>   BUILD   debian9
+>> The command '/bin/sh -c DEBIAN_FRONTEND=noninteractive eatmydata
+>> apt install -y --no-install-recommends         bison
+>> build-essential         ca-certificates         clang         flex
+>>     gettext         git         perl         pkg-config         psmisc
+>>         python         texinfo         $(apt-get -s build-dep qemu |
+>> egrep ^Inst | fgrep '[all]' | cut -d\  -f2)' returned a non-zero code:
+>> 100
+>> Traceback (most recent call last):
+>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>> line 563, in <module>
+>>     sys.exit(main())
+>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>> line 560, in main
+>>     return args.cmdobj.run(args, argv)
+>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>> line 376, in run
+>>     extra_files_cksum=cksum)
+>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>> line 254, in build_image
+>>     quiet=quiet)
+>>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+>> line 181, in _do_check
+>>     return subprocess.check_call(self._command + cmd, **kwargs)
+>>   File "/usr/lib/python2.7/subprocess.py", line 541, in check_call
+>>     raise CalledProcessError(retcode, cmd)
+>> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
+>> 'qemu:debian9', '-f', '/tmp/docker_buildsLHwaa/tmpXGE1LW.docker',
+>> '/tmp/docker_buildsLHwaa']' returned non-zero exit status 100
+>> /home/petmay01/linaro/qemu-for-merges/tests/docker/Makefile.include:53:
+>> recipe for target 'docker-image-debian9' failed
+>> make: *** [docker-image-debian9] Error 1
+>> make: Leaving directory
+>> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
+> 
+> Well, this time I absolutely cannot reproduce this...  can you try "make
+> docker-image-debian9 V=1"?
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+I can not reproduce it neither :/
+
+If this error is related to Docker cache, Alex noticed my patch merged
+by Fam isn't enough and suggested a better fix in
+20190110174516.21586-17-alex.bennee@linaro.org:
+
+-- >8 --
+diff --git a/tests/docker/dockerfiles/debian9.docker
+b/tests/docker/dockerfiles/debian9.docker
+index 154ae2a455..9b7e4523e2 100644
+@@ -7,7 +7,13 @@
+ # On its own you can't build much but the docker-foo-cross targets
+ # build on top of the base debian image.
+ #
+-FROM debian:stretch-slim
++
++# This must be earlier than the snapshot date we are aiming for
++FROM debian:sid-20181011-slim
++
++# Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
++ENV DEBIAN_SNAPSHOT_DATE "20181030"
++RUN sed -i "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb
+[check-valid-until=no]
+\1snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT_DATE} \2%"
+/etc/apt/sources.list
+
 ---
- pc-bios/optionrom/linuxboot_dma.c | 20 ++++----------------
- 1 file changed, 4 insertions(+), 16 deletions(-)
-
-diff --git a/pc-bios/optionrom/linuxboot_dma.c b/pc-bios/optionrom/linuxb=
-oot_dma.c
-index d856d41b55..f728dc839f 100644
---- a/pc-bios/optionrom/linuxboot_dma.c
-+++ b/pc-bios/optionrom/linuxboot_dma.c
-@@ -58,12 +58,6 @@ asm(
- "   jmp load_kernel\n"
- );
-=20
--/* QEMU_CFG_DMA_CONTROL bits */
--#define BIOS_CFG_DMA_CTL_ERROR   0x01
--#define BIOS_CFG_DMA_CTL_READ    0x02
--#define BIOS_CFG_DMA_CTL_SKIP    0x04
--#define BIOS_CFG_DMA_CTL_SELECT  0x08
--
- #define BIOS_CFG_DMA_ADDR_HIGH 0x514
- #define BIOS_CFG_DMA_ADDR_LOW  0x518
-=20
-@@ -75,12 +69,6 @@ asm(
-=20
- #define barrier() asm("" : : : "memory")
-=20
--typedef struct FWCfgDmaAccess {
--    uint32_t control;
--    uint32_t length;
--    uint64_t address;
--} __attribute__((packed)) FWCfgDmaAccess;
--
- static inline void outl(uint32_t value, uint16_t port)
- {
-     asm("outl %0, %w1" : : "a"(value), "Nd"(port));
-@@ -153,9 +141,9 @@ static inline uint32_t be32_to_cpu(uint32_t x)
- static __attribute__((__noinline__))
- void bios_cfg_read_entry(void *buf, uint16_t entry, uint32_t len)
- {
--    FWCfgDmaAccess access;
--    uint32_t control =3D (entry << 16) | BIOS_CFG_DMA_CTL_SELECT
--                        | BIOS_CFG_DMA_CTL_READ;
-+    struct fw_cfg_dma_access access;
-+    uint32_t control =3D (entry << 16) | FW_CFG_DMA_CTL_SELECT
-+                        | FW_CFG_DMA_CTL_READ;
-=20
-     access.address =3D cpu_to_be64((uint64_t)(uint32_t)buf);
-     access.length =3D cpu_to_be32(len);
-@@ -165,7 +153,7 @@ void bios_cfg_read_entry(void *buf, uint16_t entry, u=
-int32_t len)
-=20
-     outl(cpu_to_be32((uint32_t)&access), BIOS_CFG_DMA_ADDR_LOW);
-=20
--    while (be32_to_cpu(access.control) & ~BIOS_CFG_DMA_CTL_ERROR) {
-+    while (be32_to_cpu(access.control) & ~FW_CFG_DMA_CTL_ERROR) {
-         barrier();
-     }
- }
---=20
-2.20.1
