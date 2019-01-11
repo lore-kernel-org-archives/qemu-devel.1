@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48436)
+Received: from eggs.gnu.org ([209.51.188.92]:48780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1ghs3v-0005uf-8A
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:21:08 -0500
+	(envelope-from <cohuck@redhat.com>) id 1ghs5O-00072n-14
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:22:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1ghs3t-0001E6-WD
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:21:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37940)
+	(envelope-from <cohuck@redhat.com>) id 1ghs5M-0002Xq-VR
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:22:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1ghs3t-0001DO-O5
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:21:05 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F2A7230EF7F
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 08:21:04 +0000 (UTC)
-From: Bandan Das <bsd@redhat.com>
-Date: Fri, 11 Jan 2019 03:20:43 -0500
-Message-Id: <20190111082043.31412-3-bsd@redhat.com>
-In-Reply-To: <20190111082043.31412-1-bsd@redhat.com>
-References: <20190111082043.31412-1-bsd@redhat.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ghs5H-0002LH-Qz
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:22:34 -0500
+Date: Fri, 11 Jan 2019 09:22:12 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190111092212.6eee4d09.cohuck@redhat.com>
+In-Reply-To: <CAJ+F1CJrJ6W7TLc3vOk9sNZKEY5q_89FiDr-iPRt-W8_0cht6g@mail.gmail.com>
+References: <20190110020259.8492-1-ehabkost@redhat.com>
+	<20190110020259.8492-4-ehabkost@redhat.com>
+	<CAJ+F1C+cADS2WKysnEzH-ZD=C3uj5wymQFXtd4L9BOO2cjbjvA@mail.gmail.com>
+	<20190110133123.GF4500@habkost.net>
+	<20190110091140-mutt-send-email-mst@kernel.org>
+	<20190110150125.GF2589@work-vm> <20190110180749.GH4500@habkost.net>
+	<CAJ+F1CJrJ6W7TLc3vOk9sNZKEY5q_89FiDr-iPRt-W8_0cht6g@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/2 v2] usb-mtp: breakup MTP write into smaller
- chunks
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] virtio: Make
+ disable-legacy/disable-modern compat properties optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,259 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
 
-For every MTP_WRITE_BUF_SZ copied, this patch writes it to file before
-getting the next block of data. The file is kept opened for the
-duration of the operation but the sanity checks on the write operation
-are performed only once when the write operation starts. Additionally,
-we also update the file size in the object metadata once the file has
-completely been written.
+On Fri, 11 Jan 2019 01:06:45 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
 
-Suggested-by: Gerd Hoffman <kraxel@redhat.com>
-Signed-off-by: Bandan Das <bsd@redhat.com>
----
- hw/usb/dev-mtp.c | 134 ++++++++++++++++++++++++++++++++---------------
- 1 file changed, 91 insertions(+), 43 deletions(-)
+> On Thu, Jan 10, 2019 at 10:07 PM Eduardo Habkost <ehabkost@redhat.com> wr=
+ote:
+> >
+> > On Thu, Jan 10, 2019 at 03:01:25PM +0000, Dr. David Alan Gilbert wrote:=
+ =20
+> > > * Michael S. Tsirkin (mst@redhat.com) wrote: =20
+> > > > On Thu, Jan 10, 2019 at 11:31:23AM -0200, Eduardo Habkost wrote: =20
+> > > > > On Thu, Jan 10, 2019 at 12:35:26PM +0400, Marc-Andr=C3=A9 Lureau =
+wrote: =20
+> > > > > > Hi
+> > > > > >
+> > > > > > On Thu, Jan 10, 2019 at 6:05 AM Eduardo Habkost <ehabkost@redha=
+t.com> wrote: =20
+> > > > > > >
+> > > > > > > The disable-legacy and disable-modern properties apply only to
+> > > > > > > some virtio-pci devices.  Make those properties optional.
+> > > > > > >
+> > > > > > > This fixes the crash introduced by commit f6e501a28ef9 ("virt=
+io: Provide
+> > > > > > > version-specific variants of virtio PCI devices"):
+> > > > > > >
+> > > > > > >   $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
+> > > > > > >     -device virtio-net-pci-non-transitional
+> > > > > > >   Unexpected error in object_property_find() at qom/object.c:=
+1092:
+> > > > > > >   qemu-system-x86_64: -device virtio-net-pci-non-transitional=
+: can't apply \
+> > > > > > >   global virtio-pci.disable-modern=3Don: Property '.disable-m=
+odern' not found
+> > > > > > >   Aborted (core dumped)
+> > > > > > >
+> > > > > > > Reported-by: Thomas Huth <thuth@redhat.com>
+> > > > > > > Fixes: f6e501a28ef9 ("virtio: Provide version-specific varian=
+ts of virtio PCI devices")
+> > > > > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > > > ---
+> > > > > > >  hw/core/machine.c | 5 +++--
+> > > > > > >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > > > > > index 5530b71981..a19143aa44 100644
+> > > > > > > --- a/hw/core/machine.c
+> > > > > > > +++ b/hw/core/machine.c
+> > > > > > > @@ -91,8 +91,9 @@ const size_t hw_compat_2_7_len =3D G_N_ELEM=
+ENTS(hw_compat_2_7);
+> > > > > > >
+> > > > > > >  GlobalProperty hw_compat_2_6[] =3D {
+> > > > > > >      { "virtio-mmio", "format_transport_address", "off" },
+> > > > > > > -    { "virtio-pci", "disable-modern", "on" },
+> > > > > > > -    { "virtio-pci", "disable-legacy", "off" },
+> > > > > > > +    /* Optional because not all virtio-pci devices support l=
+egacy mode */
+> > > > > > > +    { "virtio-pci", "disable-modern", "on",  .optional =3D t=
+rue },
+> > > > > > > +    { "virtio-pci", "disable-legacy", "off", .optional =3D t=
+rue }, =20
+> > > > > >
+> > > > > > Could the generic devices implement a specific interface instea=
+d?
+> > > > > > virtio-pci-generic? =20
+> > > > >
+> > > > > This is the kind of complexity I wanted to avoid.  We already
+> > > > > have too many interface names for subsets of PCI and virtio
+> > > > > devices.
+> > > > > =20
+> > > > > >
+> > > > > > Adding "optional" handling looks like it may hide some other er=
+rors. =20
+> > > > >
+> > > > > What if we just make "optional" mean "skip if the property
+> > > > > doesn't exist", as suggested by Cornelia and Dave? =20
+> > > >
+> > > > That's the more standard meaning of the word optional, isn't it? =20
+> > >
+> > > Well the word is a separate issue; 'optional' is probably a bad choice
+> > > but that's less important than what it actually does.
+> > > I'd go for skip_if_missing  which is explicit. =20
+> >
+> > I'm unsure about that.  To me "optional" means "it can be
+> > missing" and carries the same information as "skip if missing".
+> >
+> > What do others think? =20
+>=20
+> skip_if_missing is more explicit.
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index a0d98c93ee..fcd7dcce5c 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -35,6 +35,13 @@ enum mtp_container_type {
-     TYPE_EVENT    =3D 4,
- };
-=20
-+/* MTP write stage, for internal use only */
-+enum mtp_write_status {
-+    WRITE_START    =3D 1,
-+    WRITE_CONTINUE =3D 2,
-+    WRITE_END      =3D 3,
-+};
-+
- enum mtp_code {
-     /* command codes */
-     CMD_GET_DEVICE_INFO            =3D 0x1001,
-@@ -153,6 +160,9 @@ struct MTPData {
-     /* Used for >4G file sizes */
-     bool         pending;
-     int          fd;
-+    uint8_t      write_status;
-+    /* Internal pointer per every MTP_WRITE_BUF_SZ */
-+    uint64_t     data_offset;
- };
-=20
- struct MTPObject {
-@@ -1618,10 +1628,14 @@ static char *utf16_to_str(uint8_t len, uint16_t *=
-arr)
- }
-=20
- /* Wrapper around write, returns 0 on failure */
--static uint64_t write_retry(int fd, void *buf, uint64_t size)
-+static uint64_t write_retry(int fd, void *buf, uint64_t size, off_t offs=
-et)
- {
-         uint64_t bytes_left =3D size, ret;
-=20
-+        if (lseek(fd, offset, SEEK_SET) < 0) {
-+            goto done;
-+        }
-+
-         while (bytes_left > 0) {
-                 ret =3D write(fd, buf, bytes_left);
-                 if ((ret =3D=3D -1) && (errno !=3D EINTR || errno !=3D E=
-AGAIN ||
-@@ -1632,9 +1646,20 @@ static uint64_t write_retry(int fd, void *buf, uin=
-t64_t size)
-                 buf +=3D ret;
-         }
-=20
-+done:
-         return size - bytes_left;
- }
-=20
-+static void usb_mtp_update_object(MTPObject *parent, char *name)
-+{
-+    MTPObject *o =3D
-+        usb_mtp_object_lookup_name(parent, name, strlen(name));
-+
-+    if (o) {
-+        lstat(o->path, &o->stat);
-+    }
-+}
-+
- static void usb_mtp_write_data(MTPState *s)
- {
-     MTPData *d =3D s->data_out;
-@@ -1646,48 +1671,56 @@ static void usb_mtp_write_data(MTPState *s)
-=20
-     assert(d !=3D NULL);
-=20
--    if (parent =3D=3D NULL || !s->write_pending) {
--        usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, d->trans,
--                             0, 0, 0, 0);
-+    switch (d->write_status) {
-+    case WRITE_START:
-+        if (!parent || !s->write_pending) {
-+            usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, d->trans,
-+                0, 0, 0, 0);
-         return;
--    }
--
--    if (s->dataset.filename) {
--        path =3D g_strdup_printf("%s/%s", parent->path, s->dataset.filen=
-ame);
--        if (s->dataset.format =3D=3D FMT_ASSOCIATION) {
--            d->fd =3D mkdir(path, mask);
--            goto free;
--        }
--        if ((s->dataset.size !=3D 0xFFFFFFFF) && (s->dataset.size !=3D d=
-->offset)) {
--            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
--                                 0, 0, 0, 0);
--            goto done;
--        }
--        d->fd =3D open(path, O_CREAT | O_WRONLY | O_CLOEXEC | O_NOFOLLOW=
-, mask);
--        if (d->fd =3D=3D -1) {
--            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
--                                 0, 0, 0, 0);
--            goto done;
-         }
-=20
--        /*
--         * Return success if initiator sent 0 sized data
--         */
--        if (!s->dataset.size) {
--            goto success;
--        }
-+        if (s->dataset.filename) {
-+            path =3D g_strdup_printf("%s/%s", parent->path, s->dataset.f=
-ilename);
-+            if (s->dataset.format =3D=3D FMT_ASSOCIATION) {
-+                d->fd =3D mkdir(path, mask);
-+                goto free;
-+            }
-+            d->fd =3D open(path, O_CREAT | O_WRONLY |
-+                         O_CLOEXEC | O_NOFOLLOW, mask);
-+            if (d->fd =3D=3D -1) {
-+                usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
-+                                     0, 0, 0, 0);
-+                goto done;
-+            }
-=20
--        rc =3D write_retry(d->fd, d->data, d->offset);
--        if (rc !=3D d->offset) {
-+            /* Return success if initiator sent 0 sized data */
-+            if (!s->dataset.size) {
-+                goto success;
-+            }
-+            if (d->length !=3D MTP_WRITE_BUF_SZ && !d->pending) {
-+                d->write_status =3D WRITE_END;
-+            }
-+        }
-+        /* fall through */
-+    case WRITE_CONTINUE:
-+    case WRITE_END:
-+        rc =3D write_retry(d->fd, d->data, d->data_offset,
-+                         d->offset - d->data_offset);
-+        if (rc !=3D d->data_offset) {
-             usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
-                                  0, 0, 0, 0);
-             goto done;
-+        }
-+        if (d->write_status !=3D WRITE_END) {
-+            return;
-+        } else {
-+            /* Only for < 4G file sizes */
-+            if (s->dataset.size !=3D 0xFFFFFFFF && d->offset !=3D s->dat=
-aset.size) {
-+                usb_mtp_queue_result(s, RES_INCOMPLETE_TRANSFER, d->tran=
-s,
-+                                     0, 0, 0, 0);
-+                goto done;
-             }
--        /* Only for < 4G file sizes */
--        if (s->dataset.size !=3D 0xFFFFFFFF && rc !=3D s->dataset.size) =
-{
--            usb_mtp_queue_result(s, RES_INCOMPLETE_TRANSFER, d->trans,
--                                 0, 0, 0, 0);
--            goto done;
-+            usb_mtp_update_object(parent, s->dataset.filename);
-         }
-     }
-=20
-@@ -1786,25 +1819,33 @@ static void usb_mtp_get_data(MTPState *s, mtp_con=
-tainer *container,
-         d->offset =3D 0;
-         d->first =3D false;
-         d->pending =3D false;
-+        d->data_offset =3D 0;
-+        d->write_status =3D WRITE_START;
-     }
-=20
-     if (d->pending) {
--        usb_mtp_realloc(d, MTP_WRITE_BUF_SZ);
--        d->length +=3D MTP_WRITE_BUF_SZ;
-+        memset(d->data, 0, d->length);
-+        if (d->length !=3D MTP_WRITE_BUF_SZ) {
-+            usb_mtp_realloc(d, MTP_WRITE_BUF_SZ - d->length);
-+            d->length +=3D (MTP_WRITE_BUF_SZ - d->length);
-+        }
-         d->pending =3D false;
-+        d->write_status =3D WRITE_CONTINUE;
-+        d->data_offset =3D 0;
-     }
-=20
--    if (d->length - d->offset > data_len) {
-+    if (d->length - d->data_offset > data_len) {
-         dlen =3D data_len;
-     } else {
--        dlen =3D d->length - d->offset;
-+        dlen =3D d->length - d->data_offset;
-     }
-=20
-     switch (d->code) {
-     case CMD_SEND_OBJECT_INFO:
--        usb_packet_copy(p, d->data + d->offset, dlen);
-+        usb_packet_copy(p, d->data + d->data_offset, dlen);
-         d->offset +=3D dlen;
--        if (d->offset =3D=3D d->length) {
-+        d->data_offset +=3D dlen;
-+        if (d->data_offset =3D=3D d->length) {
-             /* The operation might have already failed */
-             if (!s->result) {
-                 usb_mtp_write_metadata(s, dlen);
-@@ -1815,19 +1856,26 @@ static void usb_mtp_get_data(MTPState *s, mtp_con=
-tainer *container,
-         }
-         break;
-     case CMD_SEND_OBJECT:
--        usb_packet_copy(p, d->data + d->offset, dlen);
-+        usb_packet_copy(p, d->data + d->data_offset, dlen);
-         d->offset +=3D dlen;
-+        d->data_offset +=3D dlen;
-         if ((p->iov.size % 64) || !p->iov.size) {
-             assert((s->dataset.size =3D=3D 0xFFFFFFFF) ||
-                    (s->dataset.size =3D=3D d->offset));
-=20
-+            if (d->length =3D=3D MTP_WRITE_BUF_SZ) {
-+                d->write_status =3D WRITE_END;
-+            } else {
-+                d->write_status =3D WRITE_START;
-+            }
-             usb_mtp_write_data(s);
-             usb_mtp_data_free(s->data_out);
-             s->data_out =3D NULL;
-             return;
-         }
--        if (d->offset =3D=3D d->length) {
-+        if (d->data_offset =3D=3D d->length) {
-             d->pending =3D true;
-+            usb_mtp_write_data(s);
-         }
-         break;
-     default:
---=20
-2.19.2
+I'd slightly prefer optional, but skip_if_missing is fine.
