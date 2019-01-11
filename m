@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46267)
+Received: from eggs.gnu.org ([209.51.188.92]:46271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ghzIz-0002gR-GC
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:05:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ghzIz-0002gT-T2
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ghzIy-0003uI-7o
+	(envelope-from <peter.maydell@linaro.org>) id 1ghzIy-0003uT-Aj
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:05:09 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56212)
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:41339)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ghzIv-0003r7-W6
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ghzIx-0003rp-Tl
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:05:08 -0500
-Received: by mail-wm1-x343.google.com with SMTP id y139so2863344wmc.5
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 08:05:05 -0800 (PST)
-References: <20190111143815.26107-1-alex.bennee@linaro.org>
-	<89afa3af-940d-7f3b-ee7c-25027bfd18f5@redhat.com>
-	<87sgxzusb7.fsf@linaro.org>
-	<3b4aa1f9-c18a-e2d7-abdd-f688bed9f4a1@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <3b4aa1f9-c18a-e2d7-abdd-f688bed9f4a1@redhat.com>
-Date: Fri, 11 Jan 2019 16:05:02 +0000
-Message-ID: <87r2djuqmp.fsf@linaro.org>
+Received: by mail-ot1-x32f.google.com with SMTP id u16so13518651otk.8
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 08:05:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20190110134917.16425-1-anthony.perard@citrix.com>
+	<CAFEAcA-RQkXCvijrDkQY=QADq4O6c60ab1d-9oeq+vdObtQiUw@mail.gmail.com>
+	<20190111155531.GM1508@perard.uk.xensource.com>
+In-Reply-To: <20190111155531.GM1508@perard.uk.xensource.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 11 Jan 2019 16:04:52 +0000
+Message-ID: <CAFEAcA9e6J7LqjQSJNFL-_68UaSqkkvYEo9FajWT0-CTpPQL3A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] tests: replace rem = sleep(time) with
- g_timer
+Subject: Re: [Qemu-devel] [PULL 00/25] xen queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, cota@braap.org, ehabkost@redhat.com
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 11/01/19 16:28, Alex Benn=C3=A9e wrote:
->>> Why not g_usleep?  It already does a while loop around nanosleep (which
->>> returns the remaining time in the wait, like select but unlike sleep and
->>> poll).
->> Yeah I'm testing that now. However I have managed to trigger:
->>
->>   ERROR:tests/test-qht-par.c:20:test_qht: assertion failed (rc =3D=3D 0)=
-: (35584 =3D=3D 0)
+On Fri, 11 Jan 2019 at 15:55, Anthony PERARD <anthony.perard@citrix.com> wr=
+ote:
 >
-> I think that's a good old SIGSEGV (0x8B00).
+> On Fri, Jan 11, 2019 at 01:35:29PM +0000, Peter Maydell wrote:
+> > On Thu, 10 Jan 2019 at 13:52, Anthony PERARD <anthony.perard@citrix.com=
+> wrote:
+> > >
+> > > The following changes since commit 8ae951fbc1068308313b2c57a4fc3c6845=
+1641f4:
+> > >
+> > >   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.0-2019=
+0109' into staging (2019-01-09 16:08:31 +0000)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pu=
+ll-xen-20190110
+> > >
+> > > for you to fetch changes up to 24edb91f5009fa941e1294aaf4bb2103d9ad07=
+7e:
+> > >
+> > >   xen-block: avoid repeated memory allocation (2019-01-10 11:25:17 +0=
+000)
+> > >
+> > > ----------------------------------------------------------------
+> > > xen queue
+> > >
+> > > * Xen PV backend 'qdevification'.
+> > >   Starting with xen_disk.
+> > > * Performance improvements for xen-block.
+> > > * Remove of the Xen PV domain builder.
+> > > * bug fixes.
+> > >
+> > > ----------------------------------------------------------------
+> >
+> > Hi. This fails to compile for me (x86-64 Linux host):
+> >
+> >   CC      hw/block/xen-block.o
+> > In file included from
+> > /home/petmay01/linaro/qemu-for-merges/include/hw/xen/xen-block.h:11:0,
+> >                  from
+> > /home/petmay01/linaro/qemu-for-merges/hw/block/xen-block.c:22:
+> > /home/petmay01/linaro/qemu-for-merges/include/hw/xen/xen-bus.h:32:5:
+> > error: unknown type name =E2=80=98xenevtchn_port_or_error_t=E2=80=99
+> >      xenevtchn_port_or_error_t local_port;
+> >      ^
+> > /home/petmay01/linaro/qemu-for-merges/rules.mak:69: recipe for target
+> > 'hw/block/xen-block.o' failed
+> >
+> > Probably the code is accidentally assuming a newer version
+> > of the Xen headers than this system has installed? This
+> > is Ubuntu 16.04.5 with libxen-dev  4.6.5-0ubuntu1.4.
+>
+> Sorry, I did stop build testing againt 4.6 as it went out of security
+> support. Let me fix this and I'll resend a pull requests.
 
-Hmmm, but I haven't been able to trigger it running it directly:
+No problem. For fixing this pullreq a simple fix may be best,
+but we should also consider dropping Xen 4.6 support from QEMU
+if it's no longer within security support. We'd want to
+make configure not enable Xen if the detected xenlibs are
+too old (with the usual semantics for our configure of
+silently just not building the Xen code by default but
+failing with an error if the user explicitly asked for
+Xen support to be enabled).
 
-  retry.py -n 30 -c -- ./tests/qht-bench 1>/dev/null 2>&1 -R -S0.1 -D10000 =
--N1 -n 4 -u 20 -d 1
-
-Could this be some sort of weird interaction caused by using system()?
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
