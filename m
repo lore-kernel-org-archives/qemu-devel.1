@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56650)
+Received: from eggs.gnu.org ([209.51.188.92]:58150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ghwFZ-0007bN-JB
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:49:27 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghwLy-0000hD-BR
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ghwFW-0008BB-Eb
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:49:25 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghwLw-0003oO-O6
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:56:02 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:33219)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghwLw-0003nM-I3
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:56:00 -0500
+Received: by mail-wm1-f66.google.com with SMTP id r24so1961642wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 04:55:58 -0800 (PST)
+References: <20181207204107.GH7395@habkost.net>
+	<20181209222738.GA9292@flamenco> <20181210163601.GA4669@habkost.net>
+	<20181210170720.GA21344@flamenco> <20181210173427.GG4669@habkost.net>
+	<20181210190942.GL4669@habkost.net> <20190110205859.GL4500@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f504e634-a67f-0789-b691-e874d500a9cf@redhat.com>
+Date: Fri, 11 Jan 2019 13:55:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9xd-MJ7QHgYCyh0D+x_ooXYDCnKYTXELoxz3LbYO4SJw@mail.gmail.com>
-References: <20190108163008.7006-1-peter.maydell@linaro.org>
-	<20190108163008.7006-4-peter.maydell@linaro.org>
-	<CAFEAcA9xd-MJ7QHgYCyh0D+x_ooXYDCnKYTXELoxz3LbYO4SJw@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 11 Jan 2019 13:49:15 +0100
-Message-ID: <CAL1e-=gKA9dnfgcJ2QuvbWxjgHya1DfUz4VPRxqakyDVKzH1SA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [PATCH 3/4] accel/tcg: Add cluster number to TCG TB
- hash
+In-Reply-To: <20190110205859.GL4500@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Help needed: test-qht-par hangs on Travis
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,115 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, "patches@linaro.org" <patches@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Greg Kurz <groug@kaod.org>
 
-Hello, Peter.
+On 10/01/19 21:58, Eduardo Habkost wrote:
+> On Mon, Dec 10, 2018 at 05:09:42PM -0200, Eduardo Habkost wrote:
+>> On Mon, Dec 10, 2018 at 03:34:27PM -0200, Eduardo Habkost wrote:
+>>> On Mon, Dec 10, 2018 at 12:07:20PM -0500, Emilio G. Cota wrote:
+>>>> On Mon, Dec 10, 2018 at 14:36:01 -0200, Eduardo Habkost wrote:
+>>>>> On Sun, Dec 09, 2018 at 05:27:38PM -0500, Emilio G. Cota wrote:
+>>>>>> Can you try re-running the test, after applying the appended patch?
+>>>>>> (It disables the "resize" thread.)
+>>>>>
+>>>>> It is running right now, here:
+>>>>> https://travis-ci.org/ehabkost/qemu-hacks/jobs/466074591
+>>>>>
+>>>>>>
+>>>>>> Also, does it reliably hang on Travis, or are these hangs
+>>>>>> intermittent?
+>>>>>
+>>>>> It can be reproduced reliably.  qemu.git builds are failing since
+>>>>> Thursday:
+>>>>> https://travis-ci.org/qemu/qemu/builds
+>>>>
+>>>> I see the build you launched timed out. Can you try the following
+>>>> patch (after discarding the previous one)? Let's see if just by
+>>>> disabling the second test we can get the build to move ahead.
+>>>
+>>> I will try it.  I'm not sure yet if it's the first or the second
+>>> test case timing out.  Maybe the "OK\n" we see in the log file is
+>>> from another process running in parallel.
+>>
+>> Yeah, I think the first test case is the one hanging:
+>>
+>> https://travis-ci.org/ehabkost/qemu-hacks/jobs/466074591#L7741
+> 
+> Finally found out what's happening:
+> 
+> https://travis-ci.org/ehabkost/qemu-hacks/builds/478025908
+> 
+> sleep(1) is being interrupted before 1 second has elapsed, and
+> never exits the loop:
+> 
+>     do {
+>         remaining = sleep(duration);
+>     } while (remaining);
+> 
 
-First of all, I want to tell you that I support this series and I salute
-efforts in this and related areas. It is known that there have been strong
-trends towards asymmetric multi-core systems now for some longish time -
-and that QEMU support in that area will greately enhance QEMU itself.
+Great, then the solution is simply to switch to g_usleep!
 
-However, being unfamilliar with relevant parts of QEMU internals, allow me
-to ask a couple of basic questions:
-
-1. What would be, in more detail, if possible in layman terms, the "bad
-case" that this series fixes?
-
-2. Let's suppose, hypothetically, and based on your example from one of
-commit messages from this series, that we want to support two multicore
-systems:
-    A. Cluster 1: 1 core with FPU; cluster 2: 3 cores without FPU
-    B. Cluster 1: 2 cores with FPU; cluster 2: 1 core without FPU
-Is there an apparatus that would allow the end user specify these and
-similar cpnfigurations through command line or acsimilar mean (so, without
-QEMU explicitely supporting such core organization, but supporting the
-single core in question, of course)? If not, would that be a desirable QEMU
-feature?
-
-3. Is there a possibility to have two layer clustering sheme, instead of
-one layer? Cluster/subcluster/core instead of cluster/core? For MIPS, there
-is a need for such organization. It looks to me 8 bits for cluster id, and
-3 bits for subcluster id would be sufficient. In such scheme, the only
-change for TCG would be to check both cluster and subcluster id rather than
-only cluster id.
-
-Regards,
-Aleksandar
-
-
-On Thursday, January 10, 2019, Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On Tue, 8 Jan 2019 at 16:30, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> >
-> > Include the cluster number in the hash we use to look
-> > up TBs. This is important because a TB that is valid
-> > for one cluster at a given physical address and set
-> > of CPU flags is not necessarily valid for another:
-> > the two clusters may have different views of physical
-> > memory, or may have different CPU features (eg FPU
-> > present or absent).
-> >
-> > We put the cluster number in the high 8 bits of the
-> > TB cflags. This gives us up to 256 clusters, which should
-> > be enough for anybody. If we ever need more, or need
-> > more bits in cflags for other purposes, we could make
-> > tb_hash_func() take more data (and expand qemu_xxhash7()
-> > to qemu_xxhash8()).
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> >  include/exec/exec-all.h   | 4 +++-
-> >  accel/tcg/cpu-exec.c      | 4 ++++
-> >  accel/tcg/translate-all.c | 3 +++
-> >  3 files changed, 10 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-> > index 815e5b1e838..aa7b81aaf01 100644
-> > --- a/include/exec/exec-all.h
-> > +++ b/include/exec/exec-all.h
-> > @@ -351,9 +351,11 @@ struct TranslationBlock {
-> >  #define CF_USE_ICOUNT  0x00020000
-> >  #define CF_INVALID     0x00040000 /* TB is stale. Set with @jmp_lock
-> held */
-> >  #define CF_PARALLEL    0x00080000 /* Generate code for a parallel
-> context */
-> > +#define CF_CLUSTER_MASK 0xff000000 /* Top 8 bits are cluster ID */
-> > +#define CF_CLUSTER_SHIFT 24
-> >  /* cflags' mask for hashing/comparison */
-> >  #define CF_HASH_MASK   \
-> > -    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL)
-> > +    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL |
-> CF_CLUSTER_MASK)
-> >
-> >      /* Per-vCPU dynamic tracing state used to generate this TB */
-> >      uint32_t trace_vcpu_dstate;
-> > diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> > index 870027d4359..e578a1a3aee 100644
-> > --- a/accel/tcg/cpu-exec.c
-> > +++ b/accel/tcg/cpu-exec.c
-> > @@ -336,6 +336,10 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu,
-> target_ulong pc,
-> >          return NULL;
-> >      }
-> >      desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
-> > +
-> > +    cf_mask &= ~CF_CLUSTER_MASK;
-> > +    cf_mask |= cpu->cluster_index << CF_CLUSTER_SHIFT;
-> > +
->
-> This hunk turns out not to be quite right -- it needs to move
-> to the top of the function, before the assignment
-> "desc.flags = flags;". Otherwise tb_lookup_cmp() will
-> spuriously fail, and execution becomes somewhat slower because
-> we have to keep retranslating TBs rather than reusing them.
-> (Surprisingly this is only noticeable in an ARM TFM image
-> I happen to have, not in Linux kernel boot...)
->
-> thanks
-> -- PMM
->
->
+Paolo
