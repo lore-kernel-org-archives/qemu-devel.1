@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45479)
+Received: from eggs.gnu.org ([209.51.188.92]:46145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gi5fl-00033x-LA
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:53:07 -0500
+	(envelope-from <metzman@google.com>) id 1gi5jj-00046b-LK
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:57:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gi5fk-00019n-0O
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:53:05 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:38345)
+	(envelope-from <metzman@google.com>) id 1gi5ji-0002OB-ML
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:57:11 -0500
+Received: from mail-yw1-xc29.google.com ([2607:f8b0:4864:20::c29]:42511)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gi5fj-00019J-Io
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:53:03 -0500
-Received: by mail-lj1-x243.google.com with SMTP id c19-v6so14322684lja.5
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:53:03 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Fri, 11 Jan 2019 14:52:44 -0800
-Message-Id: <20190111225244.27619-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH v3] target/xtensa: rework zero overhead loops
- implementation
+	(Exim 4.71) (envelope-from <metzman@google.com>) id 1gi5ji-0002Nx-Fq
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:57:10 -0500
+Received: by mail-yw1-xc29.google.com with SMTP id x2so6445573ywc.9
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:57:10 -0800 (PST)
+MIME-Version: 1.0
+References: <CAJSP0QUV39fK4L8MwQ-rGiR0ejUm0HCyKFqARh-SKRTuDPKOXg@mail.gmail.com>
+	<jpgsgy0aaw6.fsf@linux.bootlegged.copy>
+	<CACT4Y+YWVfg_PVh0=CTCgM9BRyCmKZB9N+_DBimaNKPE=y6r5Q@mail.gmail.com>
+	<CABiizEQ-O-Ro9cH3xqzZUB=c5k+oYJ-gdR7ssfbbn5kU_8GcAA@mail.gmail.com>
+	<e4af7025-fa8c-1078-62de-f77a11a79fc0@redhat.com>
+	<CAJSP0QUFrs=rPvcSdNzwjk2Zyc2Sfu81SM_KZsO9djSGK1beUA@mail.gmail.com>
+	<CABiizES5O1zGF_7CxnSCfVQL39=Ov0Bf61-U2XwvoS1_xDi2ew@mail.gmail.com>
+	<8ebdfb3b-f99b-4dbc-0389-b96b3f9fb633@redhat.com>
+	<CABiizERPJa06YNEyUxEAgDaSgjJny4bTa4qpTDCwKzKMn5Ji=Q@mail.gmail.com>
+	<0387b8e9-2b4f-ce1a-05df-b508851b84f0@redhat.com>
+	<CAMAxoC1m2g3AB6X5u=+L+K1avq36gSHeBRv-nDXobAJNc2d3qA@mail.gmail.com>
+	<69559aca-a3e8-bf1e-7622-4b9ebe9f404e@redhat.com>
+In-Reply-To: <69559aca-a3e8-bf1e-7622-4b9ebe9f404e@redhat.com>
+From: Jonathan Metzman <metzman@google.com>
+Date: Fri, 11 Jan 2019 14:56:43 -0800
+Message-ID: <CAMAxoC0VwdU8qXQ+tMEMZdCPk7vr8yaxmgMNBfhLsbjP60uEgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Internship idea: virtio-blk oss-fuzz support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,326 +38,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Max Moroz <mmoroz@google.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, Oliver Chang <ochang@google.com>, Bandan Das <bsd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Andrey Konovalov <andreyknvl@google.com>, Kostya Serebryany <kcc@google.com>, Abhishek Arya <aarya@google.com>
 
-Don't invalidate TB with the end of zero overhead loop when LBEG or LEND
-change. Instead encode the distance from the start of the page where the
-TB starts to the LEND in the TB cs_base and generate loopback code when
-the next PC matches encoded LEND. Distance to a destination within the
-same page and up to a maximum instruction length into the next page is
-encoded literally, otherwise it's zero. The distance from LEND to LBEG
-is also encoded in the cs_base: it's encoded literally when less than
-256 or as 0 otherwise. This allows for TB chaining for the loopback
-branch at the end of a loop for the most common loop sizes.
+>It should be possible to turn the qtest process into a test
+postprocessor,
 
-With this change the resulting emulation speed is about 10% higher in
-softmmu mode on uClibc-ng and LTP tests. Emulation speed in linux
-user mode is a few percent lower because there's no direct TB chaining
-between different memory pages. Testing with lower limit on direct TB
-chaining range shows gradual slowdown to ~15% for the block size of 64
-bytes and ~50% for the block size of 32 bytes.
+OSS-Fuzz doesn't support AFL's preprocessors, but adding support shouldn't
+be hard.
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
-Changes v2->v3:
-- improve comment wording
+>It's much harder to
+remove the QEMU process as well and turn it into a TestOneInput function.
 
-Changes v1->v2:
-- drop LINKABLE_*;
-- add comment about LEND offset encoding;
+Got it. I am not familiar with postprocessors but I guess this should work
+as long as the QEMU process can interpret the buffer output by the
+postprocessor.
 
- target/xtensa/cpu.h          | 32 ++++++++++++++++++++++++++
- target/xtensa/helper.h       |  2 --
- target/xtensa/op_helper.c    | 24 --------------------
- target/xtensa/overlay_tool.h |  1 +
- target/xtensa/translate.c    | 53 +++++++++++++-------------------------------
- 5 files changed, 49 insertions(+), 63 deletions(-)
+There may be some other complications with having an AFL-only fuzzer on
+OSS-Fuzz.
+The main one is no pruning. On OSS-Fuzz pruning is only done by libFuzzer,
+since AFL and libFuzzer share a corpus.
+I'm not sure how we would handle this.
 
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index 34e5ccd9f1d6..bf6f9a09b62c 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -400,6 +400,7 @@ struct XtensaConfig {
-     int excm_level;
-     int ndepc;
-     unsigned inst_fetch_width;
-+    unsigned max_insn_size;
-     uint32_t vecbase;
-     uint32_t exception_vector[EXC_MAX];
-     unsigned ninterrupt;
-@@ -695,6 +696,11 @@ static inline int cpu_mmu_index(CPUXtensaState *env, bool ifetch)
- #define XTENSA_TBFLAG_CALLINC_MASK 0x180000
- #define XTENSA_TBFLAG_CALLINC_SHIFT 19
- 
-+#define XTENSA_CSBASE_LEND_MASK 0x0000ffff
-+#define XTENSA_CSBASE_LEND_SHIFT 0
-+#define XTENSA_CSBASE_LBEG_OFF_MASK 0x00ff0000
-+#define XTENSA_CSBASE_LBEG_OFF_SHIFT 16
-+
- static inline void cpu_get_tb_cpu_state(CPUXtensaState *env, target_ulong *pc,
-         target_ulong *cs_base, uint32_t *flags)
- {
-@@ -706,6 +712,32 @@ static inline void cpu_get_tb_cpu_state(CPUXtensaState *env, target_ulong *pc,
-     *flags |= xtensa_get_ring(env);
-     if (env->sregs[PS] & PS_EXCM) {
-         *flags |= XTENSA_TBFLAG_EXCM;
-+    } else if (xtensa_option_enabled(env->config, XTENSA_OPTION_LOOP)) {
-+        target_ulong lend_dist =
-+            env->sregs[LEND] - (env->pc & -(1u << TARGET_PAGE_BITS));
-+
-+        /*
-+         * 0 in the csbase_lend field means that there may not be a loopback
-+         * for any instruction that starts inside this page. Any other value
-+         * means that an instruction that ends at this offset from the page
-+         * start may loop back and will need loopback code to be generated.
-+         *
-+         * lend_dist is 0 when LEND points to the start of the page, but
-+         * no instruction that starts inside this page may end at offset 0,
-+         * so it's still correct.
-+         *
-+         * When an instruction ends at a page boundary it may only start in
-+         * the previous page. lend_dist will be encoded as TARGET_PAGE_SIZE
-+         * for the TB that contains this instruction.
-+         */
-+        if (lend_dist < (1u << TARGET_PAGE_BITS) + env->config->max_insn_size) {
-+            target_ulong lbeg_off = env->sregs[LEND] - env->sregs[LBEG];
-+
-+            *cs_base = lend_dist;
-+            if (lbeg_off < 256) {
-+                *cs_base |= lbeg_off << XTENSA_CSBASE_LBEG_OFF_SHIFT;
-+            }
-+        }
-     }
-     if (xtensa_option_enabled(env->config, XTENSA_OPTION_EXTENDED_L32R) &&
-             (env->sregs[LITBASE] & 1)) {
-diff --git a/target/xtensa/helper.h b/target/xtensa/helper.h
-index 10153c245360..2ebba0b2c2bf 100644
---- a/target/xtensa/helper.h
-+++ b/target/xtensa/helper.h
-@@ -12,8 +12,6 @@ DEF_HELPER_2(rotw, void, env, i32)
- DEF_HELPER_3(window_check, noreturn, env, i32, i32)
- DEF_HELPER_1(restore_owb, void, env)
- DEF_HELPER_2(movsp, void, env, i32)
--DEF_HELPER_2(wsr_lbeg, void, env, i32)
--DEF_HELPER_2(wsr_lend, void, env, i32)
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_1(simcall, void, env)
- #endif
-diff --git a/target/xtensa/op_helper.c b/target/xtensa/op_helper.c
-index e4b42ab3e56c..078aeb6c2c94 100644
---- a/target/xtensa/op_helper.c
-+++ b/target/xtensa/op_helper.c
-@@ -107,13 +107,6 @@ static void tb_invalidate_virtual_addr(CPUXtensaState *env, uint32_t vaddr)
-     }
- }
- 
--#else
--
--static void tb_invalidate_virtual_addr(CPUXtensaState *env, uint32_t vaddr)
--{
--    tb_invalidate_phys_addr(vaddr);
--}
--
- #endif
- 
- void HELPER(exception)(CPUXtensaState *env, uint32_t excp)
-@@ -370,23 +363,6 @@ void HELPER(movsp)(CPUXtensaState *env, uint32_t pc)
-     }
- }
- 
--void HELPER(wsr_lbeg)(CPUXtensaState *env, uint32_t v)
--{
--    if (env->sregs[LBEG] != v) {
--        tb_invalidate_virtual_addr(env, env->sregs[LEND] - 1);
--        env->sregs[LBEG] = v;
--    }
--}
--
--void HELPER(wsr_lend)(CPUXtensaState *env, uint32_t v)
--{
--    if (env->sregs[LEND] != v) {
--        tb_invalidate_virtual_addr(env, env->sregs[LEND] - 1);
--        env->sregs[LEND] = v;
--        tb_invalidate_virtual_addr(env, env->sregs[LEND] - 1);
--    }
--}
--
- void HELPER(dump_state)(CPUXtensaState *env)
- {
-     XtensaCPU *cpu = xtensa_env_get_cpu(env);
-diff --git a/target/xtensa/overlay_tool.h b/target/xtensa/overlay_tool.h
-index ee37a04a176c..12609a0d0c1e 100644
---- a/target/xtensa/overlay_tool.h
-+++ b/target/xtensa/overlay_tool.h
-@@ -457,6 +457,7 @@
-     .nareg = XCHAL_NUM_AREGS, \
-     .ndepc = (XCHAL_XEA_VERSION >= 2), \
-     .inst_fetch_width = XCHAL_INST_FETCH_WIDTH, \
-+    .max_insn_size = XCHAL_MAX_INSTRUCTION_SIZE, \
-     EXCEPTIONS_SECTION, \
-     INTERRUPTS_SECTION, \
-     TLB_SECTION, \
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 46e13384488e..a435d9c36cf1 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -53,7 +53,7 @@ struct DisasContext {
-     uint32_t pc;
-     int cring;
-     int ring;
--    uint32_t lbeg;
-+    uint32_t lbeg_off;
-     uint32_t lend;
- 
-     bool sar_5bit;
-@@ -390,11 +390,9 @@ static void gen_jump(DisasContext *dc, TCGv dest)
- static void gen_jumpi(DisasContext *dc, uint32_t dest, int slot)
- {
-     TCGv_i32 tmp = tcg_const_i32(dest);
--#ifndef CONFIG_USER_ONLY
-     if (((dc->base.pc_first ^ dest) & TARGET_PAGE_MASK) != 0) {
-         slot = -1;
-     }
--#endif
-     gen_jump_slot(dc, tmp, slot);
-     tcg_temp_free(tmp);
- }
-@@ -420,25 +418,25 @@ static void gen_callw(DisasContext *dc, int callinc, TCGv_i32 dest)
- static void gen_callwi(DisasContext *dc, int callinc, uint32_t dest, int slot)
- {
-     TCGv_i32 tmp = tcg_const_i32(dest);
--#ifndef CONFIG_USER_ONLY
-     if (((dc->base.pc_first ^ dest) & TARGET_PAGE_MASK) != 0) {
-         slot = -1;
-     }
--#endif
-     gen_callw_slot(dc, callinc, tmp, slot);
-     tcg_temp_free(tmp);
- }
- 
- static bool gen_check_loop_end(DisasContext *dc, int slot)
- {
--    if (option_enabled(dc, XTENSA_OPTION_LOOP) &&
--            !(dc->base.tb->flags & XTENSA_TBFLAG_EXCM) &&
--            dc->base.pc_next == dc->lend) {
-+    if (dc->base.pc_next == dc->lend) {
-         TCGLabel *label = gen_new_label();
- 
-         tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_SR[LCOUNT], 0, label);
-         tcg_gen_subi_i32(cpu_SR[LCOUNT], cpu_SR[LCOUNT], 1);
--        gen_jumpi(dc, dc->lbeg, slot);
-+        if (dc->lbeg_off) {
-+            gen_jumpi(dc, dc->base.pc_next - dc->lbeg_off, slot);
-+        } else {
-+            gen_jump(dc, cpu_SR[LBEG]);
-+        }
-         gen_set_label(label);
-         gen_jumpi(dc, dc->base.pc_next, -1);
-         return true;
-@@ -534,16 +532,6 @@ static void gen_rsr(DisasContext *dc, TCGv_i32 d, uint32_t sr)
-     }
- }
- 
--static void gen_wsr_lbeg(DisasContext *dc, uint32_t sr, TCGv_i32 s)
--{
--    gen_helper_wsr_lbeg(cpu_env, s);
--}
--
--static void gen_wsr_lend(DisasContext *dc, uint32_t sr, TCGv_i32 s)
--{
--    gen_helper_wsr_lend(cpu_env, s);
--}
--
- static void gen_wsr_sar(DisasContext *dc, uint32_t sr, TCGv_i32 s)
- {
-     tcg_gen_andi_i32(cpu_SR[sr], s, 0x3f);
-@@ -743,8 +731,6 @@ static void gen_wsr(DisasContext *dc, uint32_t sr, TCGv_i32 s)
- {
-     static void (* const wsr_handler[256])(DisasContext *dc,
-                                            uint32_t sr, TCGv_i32 v) = {
--        [LBEG] = gen_wsr_lbeg,
--        [LEND] = gen_wsr_lend,
-         [SAR] = gen_wsr_sar,
-         [BR] = gen_wsr_br,
-         [LITBASE] = gen_wsr_litbase,
-@@ -906,13 +892,6 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
-     }
- 
-     dc->base.pc_next = dc->pc + len;
--    if (xtensa_option_enabled(dc->config, XTENSA_OPTION_LOOP) &&
--        dc->lbeg == dc->pc &&
--        ((dc->pc ^ (dc->base.pc_next - 1)) & -dc->config->inst_fetch_width)) {
--        qemu_log_mask(LOG_GUEST_ERROR,
--                      "unaligned first instruction of a loop (pc = %08x)\n",
--                      dc->pc);
--    }
-     for (i = 1; i < len; ++i) {
-         b[i] = cpu_ldub_code(env, dc->pc + i);
-     }
-@@ -1097,8 +1076,10 @@ static void xtensa_tr_init_disas_context(DisasContextBase *dcbase,
-     dc->pc = dc->base.pc_first;
-     dc->ring = tb_flags & XTENSA_TBFLAG_RING_MASK;
-     dc->cring = (tb_flags & XTENSA_TBFLAG_EXCM) ? 0 : dc->ring;
--    dc->lbeg = env->sregs[LBEG];
--    dc->lend = env->sregs[LEND];
-+    dc->lbeg_off = (dc->base.tb->cs_base & XTENSA_CSBASE_LBEG_OFF_MASK) >>
-+        XTENSA_CSBASE_LBEG_OFF_SHIFT;
-+    dc->lend = (dc->base.tb->cs_base & XTENSA_CSBASE_LEND_MASK) +
-+        (dc->base.pc_first & TARGET_PAGE_MASK);
-     dc->debug = tb_flags & XTENSA_TBFLAG_DEBUG;
-     dc->icount = tb_flags & XTENSA_TBFLAG_ICOUNT;
-     dc->cpenable = (tb_flags & XTENSA_TBFLAG_CPENABLE_MASK) >>
-@@ -1712,12 +1693,10 @@ static void translate_loop(DisasContext *dc, const uint32_t arg[],
-                            const uint32_t par[])
- {
-     uint32_t lend = arg[1];
--    TCGv_i32 tmp = tcg_const_i32(lend);
- 
-     tcg_gen_subi_i32(cpu_SR[LCOUNT], cpu_R[arg[0]], 1);
-     tcg_gen_movi_i32(cpu_SR[LBEG], dc->base.pc_next);
--    gen_helper_wsr_lend(cpu_env, tmp);
--    tcg_temp_free(tmp);
-+    tcg_gen_movi_i32(cpu_SR[LEND], lend);
- 
-     if (par[0] != TCG_COND_NEVER) {
-         TCGLabel *label = gen_new_label();
-@@ -4609,7 +4588,7 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_wsr,
-         .test_ill = test_ill_wsr,
-         .par = (const uint32_t[]){LBEG},
--        .op_flags = XTENSA_OP_EXIT_TB_0,
-+        .op_flags = XTENSA_OP_EXIT_TB_M1,
-         .windowed_register_op = 0x1,
-     }, {
-         .name = "wsr.lcount",
-@@ -4622,7 +4601,7 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_wsr,
-         .test_ill = test_ill_wsr,
-         .par = (const uint32_t[]){LEND},
--        .op_flags = XTENSA_OP_EXIT_TB_0,
-+        .op_flags = XTENSA_OP_EXIT_TB_M1,
-         .windowed_register_op = 0x1,
-     }, {
-         .name = "wsr.litbase",
-@@ -5183,7 +5162,7 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_xsr,
-         .test_ill = test_ill_xsr,
-         .par = (const uint32_t[]){LBEG},
--        .op_flags = XTENSA_OP_EXIT_TB_0,
-+        .op_flags = XTENSA_OP_EXIT_TB_M1,
-         .windowed_register_op = 0x1,
-     }, {
-         .name = "xsr.lcount",
-@@ -5196,7 +5175,7 @@ static const XtensaOpcodeOps core_ops[] = {
-         .translate = translate_xsr,
-         .test_ill = test_ill_xsr,
-         .par = (const uint32_t[]){LEND},
--        .op_flags = XTENSA_OP_EXIT_TB_0,
-+        .op_flags = XTENSA_OP_EXIT_TB_M1,
-         .windowed_register_op = 0x1,
-     }, {
-         .name = "xsr.litbase",
--- 
-2.11.0
+On Fri, Jan 11, 2019 at 12:27 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> On 11/01/19 20:09, Jonathan Metzman wrote:
+> > Could you clarify what you think the relationship between the qtest
+> > process, QEMU, and afl-fuzz will look like when fuzzing?
+> >
+> > Is it something like this:
+> > 1. afl-fuzz mutates a buffer, starts a qtest process, and gives the
+> > qtest process the mutated buffer.
+> > 2. The qtest process starts a QEMU process and interacts with QEMU
+> > process based on the buffer AFL gave it (qtest).
+> > 3. goto 1
+> >
+> > I don't think this works (under normal circumstances). AFL will think it
+> > is fuzzing qtest and will not learn about coverage or crashes from qsym.
+> > There probably are ways to get this working, but I just want to make
+> > sure I understand.
+>
+> It should be possible to turn the qtest process into a test
+> postprocessor, and remove the second process.  It's much harder to
+> remove the QEMU process as well and turn it into a TestOneInput function.
+>
+> Paolo
+>
