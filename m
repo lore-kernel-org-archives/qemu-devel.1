@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36298)
+Received: from eggs.gnu.org ([209.51.188.92]:36776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ghr3f-0005f9-Gn
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 02:16:48 -0500
+	(envelope-from <laurent@vivier.eu>) id 1ghr6Y-0006gT-B1
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 02:19:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ghr3e-0001KS-S7
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 02:16:47 -0500
-References: <20190110210358.24035-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <4988f58e-4bc5-c622-53b7-cfda758304e1@redhat.com>
-Date: Fri, 11 Jan 2019 08:16:41 +0100
+	(envelope-from <laurent@vivier.eu>) id 1ghr6X-0003NZ-Qu
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 02:19:46 -0500
+References: <CALvuzg43uSodseEHjNaRcPFBKKPTY2mcppUbYgiLL=QO9RxX_Q@mail.gmail.com>
+	<e62bbdda-2ab9-b9a1-7843-0a3a40f56282@vivier.eu>
+	<4cfad0f8-1b66-b6be-693e-ba439e81f171@sysgo.com>
+	<f36c1752-98ad-7c44-4637-7186c7511f38@vivier.eu>
+	<20190111003527.GO6682@umbus.fritz.box>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <3ebb5fe7-5571-460f-9ee2-b667578816ff@vivier.eu>
+Date: Fri, 11 Jan 2019 08:19:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190110210358.24035-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190111003527.GO6682@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Send correct event on
- hotplug.
+Subject: Re: [Qemu-devel] [Qemu-trivial] ppc: e6500 registers SPR 604 twice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +27,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Roman Kapl <roman.kapl@sysgo.com>, Jon Diekema <jon.diekema@gmail.com>, qemu-trivial@nongnu.org, Roman Kapl <rka@sysgo.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 10.01.19 22:03, David Hildenbrand wrote:
-> Comit 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
-> changed the initial state of zPCI devices from ZPCI_FS_STANDBY to
-> ZPCI_FS_DISABLED (a.k.a. configured). However we still only send a
-> HP_EVENT_RESERVED_TO_STANDBY event to the guest, indicating a wrong
-> state.
+On 11/01/2019 01:35, David Gibson wrote:
+> On Wed, Jan 09, 2019 at 11:17:00AM +0100, Laurent Vivier wrote:
+>> David,
+>>
+>> will you take this through your ppc branch?
 > 
-> Let's send a HP_EVENT_TO_CONFIGURED event instead, to match the actual
-> state the device is in.
-> 
-> This fixes hotplugged devices having to be enabled explicitly in the
-> guest e.g. via echo 1 > /sys/bus/pci/slots/00000000/power.
-> 
-> Fixes: 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
-> Report-by: Cornelia Huck <cohuck@redhat.com>
+> Somehow I missed this one, sorry.  Even when I look back through my
+> mail archives I can't see the original message of this thread.  Can
+> you resend please?
 
-If this patch is the right thing to do, then
-
-1. s/Report-by/Reported-by/
-2. Dropping the "." from the subject
-
-(yes, it was late)
-
-I wonder if we should do both events sequentially, but as I don't have
-access to the architecture I have to rely on that this works :)
-
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 15759b6514..7f911b216a 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -899,7 +899,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->          }
->  
->          if (dev->hotplugged) {
-> -            s390_pci_generate_plug_event(HP_EVENT_RESERVED_TO_STANDBY,
-> +            s390_pci_generate_plug_event(HP_EVENT_TO_CONFIGURED ,
->                                           pbdev->fh, pbdev->fid);
->          }
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
-> 
-
-
--- 
+Yes, the original message has only be sent to qemu-trivial ML.
 
 Thanks,
-
-David / dhildenb
+Laurent
