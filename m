@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50478)
+Received: from eggs.gnu.org ([209.51.188.92]:50924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ghpeB-0000ZQ-EO
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 00:46:24 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1ghphW-0001Ir-EE
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 00:49:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ghpe5-0000wQ-12
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 00:46:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35312)
+	(envelope-from <yang.zhong@intel.com>) id 1ghphU-0002bW-Fm
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 00:49:50 -0500
+Received: from mga06.intel.com ([134.134.136.31]:14145)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghpe4-0000vT-Qp
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 00:46:16 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B365E8E67E
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 05:46:14 +0000 (UTC)
-Date: Fri, 11 Jan 2019 06:46:13 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190111054613.e2vka5ywjij53tjl@sirius.home.kraxel.org>
-References: <20190110120047.25369-1-berrange@redhat.com>
-	<20190110120047.25369-2-berrange@redhat.com>
-	<c471db17-bab0-21e7-d8c2-7f1b8c1ef742@redhat.com>
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1ghphS-0002Y9-P5
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 00:49:48 -0500
+Date: Fri, 11 Jan 2019 13:46:04 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190111054604.GA1038@yangzhon-Virtual>
+References: <20190110083753.GA31730@yangzhon-Virtual>
+	<20190110103636.GG19025@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c471db17-bab0-21e7-d8c2-7f1b8c1ef742@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] ui: install logo icons to
- $prefix/share/icons
+In-Reply-To: <20190110103636.GG19025@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] If Qemu support NVMe over Fabrics ?y
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, fam@euphon.net, pbonzini@redhat.com, keith.busch@intel.com, Yang Zhong <yang.zhong@intel.com>
 
-On Thu, Jan 10, 2019 at 09:00:27AM -0600, Eric Blake wrote:
-> On 1/10/19 6:00 AM, Daniel P. Berrang=E9 wrote:
-> > QEMU currently installs loogs to $prefix/share/qemu/ which means no G=
-UI
->=20
-> s/loogs/logos/
->=20
-> > toolkit or applications can find them by default.
-> >=20
-> > The accepted standards for desktop applications declare that applicat=
-ion
-> > logos / icons should be installed under $prefix/share/icons, so use t=
-his
-> > directory location.
-> >=20
-> > Pre-rendered icons are provided at the standard sizes expected for GU=
-I
-> > applications, along with the scalable SVG, to ensure maximum portabil=
-ity.
-> >=20
-> > The PNGs are rendered from the SVG using inkscape, however, this is n=
-ot
-> > wired up into the default make rules to avoid requiring inkscape as a
-> > mandatory tool in build systems / developer workstations..
->=20
-> double trailing '.'. I like that the rules for automating it are there
-> as a separate make target, and that they are not part of the default
-> build (and hence the generated files must live in git).  That said,...
+On Thu, Jan 10, 2019 at 10:36:37AM +0000, Stefan Hajnoczi wrote:
+> On Thu, Jan 10, 2019 at 04:37:53PM +0800, Yang Zhong wrote:
+> > Do you know if Qemu support NVMe over Fabrics(NVMe-oF)?
+> > https://nvmexpress.org/wp-content/uploads/NVMe_Over_Fabrics.pdf
+> > 
+> > The Qemu has enabled RDMA in last year, and i am not sure if Qemu 
+> > should support NVME-oF. If Qemu support it, would you please share
+> > me the qemu related command or guides? thanks a lot!
+> 
+> QEMU supports many different storage configurations.  Can you be more
+> specific?
+> 
+> For example, if your host has NVMe-oF set up then you can give the NVMe
+> block devices to QEMU just like any other host block device (-drive
+> file=/dev/sdc,...).
+> 
+> But maybe you are thinking about other configurations, like exposing
+> NVMe-oF to the guest?
+> 
+  Thanks Stefan's comments. We only want Qemu as NVMe-oF initiator to
+  access remote target's resource.
 
-/me can fix that on commit.
+  I checked the block/nvme.c and hw/block/nvme.c code, which seems do
+  not support NVMe-oF . If i am wrong please correct me.
 
-> > +++ b/ui/icons/Makefile
-> > @@ -0,0 +1,13 @@
-> > +
-> > +# Regenerate bitmaps from the SVG using inkscape CLI export
-> > +# and ImageMagick. Don't use ImageMagick for the initial
-> > +# SVG conversion, since it merely calls inkscape, but uses
-> > +# 96 DPI res resulting in poor quality output.
->=20
-> ...should this comment mention that it is intentional that this target
-> is not part of 'make all'? Should the target be named 'maint-regenerate=
-'
-> to call attention to the fact that it is a maintainer-specific target?
+  If Qemu support NVMe-oF initiator, please share me how to use it. 
+  If Qemu does not support it, please tell me if community has plan 
+  to implement it. thanks a lot!
+ 
+  Regards,
 
-roms/Makefile targets (which is basically the same, but for guest
-firmware) don't have a maint prefix either ...
-
-cheers,
-  Gerd
+  Yang
+ 
+> Stefan
