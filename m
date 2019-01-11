@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42659)
+Received: from eggs.gnu.org ([209.51.188.92]:44127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghrar-0004ni-5A
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 02:51:05 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghrj6-0007fA-Ou
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 02:59:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghraq-0002Nl-BE
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 02:51:05 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20190103213320.2653-1-lbloch@janustech.com>
-	<20190103213320.2653-2-lbloch@janustech.com>
-	<20190108122021.GB11492@linux.fritz.box>
-	<91dfd3e9-7293-4301-e3ac-852d8a038d4e@janustech.com>
-	<87d0p4he0v.fsf@dusky.pond.sub.org>
-	<316c67a6-54aa-3312-1994-64baec94c164@janustech.com>
-Date: Fri, 11 Jan 2019 08:50:55 +0100
-In-Reply-To: <316c67a6-54aa-3312-1994-64baec94c164@janustech.com> (Leonid
-	Bloch's message of "Thu, 10 Jan 2019 16:53:24 +0000")
-Message-ID: <87ef9jaazk.fsf@dusky.pond.sub.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghrj2-00089u-9m
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 02:59:34 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 11 Jan 2019 07:54:03 +0000
+Message-ID: <2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
+In-Reply-To: <acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F830199D372B4D479F20B73DC31B05FE@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] include: Auto-generate the sizes
- lookup table
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +26,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-Leonid Bloch <lbloch@janustech.com> writes:
-
-> On 1/10/19 2:51 PM,  wrote:
->> Leonid Bloch <lbloch@janustech.com> writes:
->> 
->>> Hi,
->>>
->>> On 1/8/19 2:20 PM, Kevin Wolf wrote:
->>>> Am 03.01.2019 um 22:33 hat Leonid Bloch geschrieben:
->>>>> The lookup table for power-of-two sizes is now auto-generated during the
->>>>> build, and not hard-coded into the units.h file.
->>>>>
->>>>> This partially reverts commit 540b8492618eb.
->>>>>
->>>>> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
->>>>
->>>> During a downstream review, Max found a problem with the table that we
->>>> could fix while we're touching it:
->>>>
->>>>       Upstream: All >= S_2GiB are not valid ints.  (qemu assumes that
->>>>       sizeof(int) == 4, right?)  So S_2GiB should be 2147483648u and all
->>>>       above should be ...ull or better UINT64_C().
->> 
->> So their (integer) type can vary.  Whether that's a problem depends on
->> how the macros are used.
->> 
->>> But the initial reasoning for this table was to have a pure number
->>> there. If there will be strings like "2147483648u/ull" or
->>> "UINT64_C(...)" there, they will be stringified, literally, and will
->>> appear as such inside the binary.
->> 
->> "Macro that expands to an integer constant that stringify() turns into a
->> decimal number" is a rather peculiar contract.
->> 
->>>                                    If specifying the unit64 type is
->>> really needed, one can always use, e.g., 2 * GiB, from units.h.
->> 
->> Right now I suspect these S_ macros should generally be avoided.
->> 
->> We have 54 of them.  I count six uses:
->> 
->>      block/qcow2.h:#define QCOW_MAX_REFTABLE_SIZE S_8MiB
->>      block/qcow2.h:#define QCOW_MAX_L1_SIZE S_32MiB
->>      block/qcow2.h:#define DEFAULT_L2_CACHE_MAX_SIZE S_32MiB
->>      block/qcow2.h:#define DEFAULT_L2_CACHE_MAX_SIZE S_8MiB
->>      block/qcow2.h:#define DEFAULT_CLUSTER_SIZE S_64KiB
->>      block/vdi.c:#define DEFAULT_CLUSTER_SIZE S_1MiB
->> 
->> Which if them truly need stringify-able integers?
->> 
->
-> These two:
->
-> block/qcow2.h:#define DEFAULT_CLUSTER_SIZE
-> block/vdi.c:#define DEFAULT_CLUSTER_SIZE.
-
-Compared to the complexity visible in this thread,
-
-    .def_value_str = "65536", /* must match DEFAULT_CLUSTER_SIZE */
-
-looks attractively stupid to me then.
+MTAuMDEuMjAxOSAyMzo1MSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xMC8xOSA3OjIwIEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gZHJ2X2NvX2Jsb2NrX3N0
+YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlvbmFsLCBtb3JlIGFjY3VyYXRlIHNlYXJjaA0K
+Pj4gZm9yIGhvbGUgaW5zaWRlIHJlZ2lvbiwgcmVwb3J0ZWQgYXMgREFUQSBieSBicyBzaW5jZSA1
+ZGFhNzRhNmViYy4NCj4gDQo+IHMvcmVnaW9uLCByZXBvcnRlZC9yZWdpb25zIHJlcG9ydGVkLw0K
+PiANCj4+DQo+PiBUaGlzIGFjY3VyYWN5IGlzIG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2ZSBxY293
+MiBkaXNrLiBBY3R1YWxseSwgcWNvdzINCj4+IGtub3dzLCB3aGVyZSBhcmUgaG9sZXMgYW5kIHdo
+ZXJlIGlzIGRhdGEuIEJ1dCBldmVyeSBibG9ja19zdGF0dXMNCj4gDQo+IE5vdCBxdWl0ZSB0cnVl
+LiBxY293MiBrbm93cyB3aGVyZSBzb21lIGhvbGVzIGFyZSwgYnV0IGRvZXMgbm90IGtub3cgaWYN
+Cj4gdGhlcmUgYXJlIGV2ZW4gbW9yZSBob2xlcyBoaWRpbmcgaW4gdGhlIHNlY3Rpb25zIG1hcmtl
+ZCBkYXRhIChzdWNoIGFzDQo+IGJlY2F1c2Ugb2YgaG93IHRoZSBkaXNrIHdhcyBwcmUtYWxsb2Nh
+dGVkKS4NCj4gDQo+PiByZXF1ZXN0IGNhbGxzIGxzZWVrIGFkZGl0aW9uYWxseS4gQXNzdW1lIGEg
+YmlnIGRpc2ssIGZ1bGwgb2YNCj4+IGRhdGEsIGluIGFueSBpdGVyYXRpdmUgY29weWluZyBibG9j
+ayBqb2IgKG9yIGltZyBjb252ZXJ0KSB3ZSdsbCBjYWxsDQo+PiBsc2VlayhIT0xFKSBvbiBldmVy
+eSBpdGVyYXRpb24sIGFuZCBlYWNoIG9mIHRoZXNlIGxzZWVrcyB3aWxsIGhhdmUgdG8NCj4+IGl0
+ZXJhdGUgdGhyb3VnaCBhbGwgbWV0YWRhdGEgdXAgdG8gdGhlIGVuZCBvZiBmaWxlLiBJdCdzIG9i
+dmlvdXNseQ0KPj4gaW5lZmZlY3RpdmUgYmVoYXZpb3IuIEFuZCBmb3IgbWFueSBzY2VuYXJpb3Mg
+d2UgZG9uJ3QgbmVlZCB0aGlzIGxzZWVrDQo+PiBhdCBhbGwuDQo+IA0KPiBIb3cgbXVjaCBwZXJm
+b3JtYW5jZSBjYW4gd2UgYnV5IGJhY2sgd2l0aG91dCBhbnkga25vYnMgYXQgYWxsLCBpZiB3ZQ0K
+PiBqdXN0IHRhdWdodCBwb3NpeC1maWxlLmMgdG8gY2FjaGUgbHNlZWsoKSByZXN1bHRzPyAgVGhh
+dCBpcywgd2hlbg0KPiB2aXNpdGluZyBhIGZpbGUgc2VxdWVudGlhbGx5LCBpZiBsc2VlayhmZCwg
+MCwgU0VFS19IT0xFKSByZXR1cm5zIEVPRiBvbg0KPiBvdXIgZmlyc3QgYmxvY2sgc3RhdHVzIHF1
+ZXJ5LCB0aGVuIGFsbCBzdWJzZXF1ZW50IGJsb2NrIHN0YXR1cyBxdWVyaWVzDQo+IGZhbGwgd2l0
+aGluIHdoYXQgd2Uga25vdyB0byBiZSBkYXRhLCBhbmQgd2UgY2FuIHNraXAgdGhlIGxzZWVrKCkg
+Y2FsbHMuDQoNCkVPRiBpcyBiYWQgbWFyayBJIHRoaW5rLiBXZSBtYXkgaGF2ZSBhIHNtYWxsIGhv
+bGUgbm90IGZhciBmcm9tIEVPRiwgd2hpY2gNCndpbGwgbGVhZCB0byB0aGUgc2FtZSBwZXJmb3Jt
+YW5jZSwgYnV0IG5vdCBFT0YgcmV0dXJuZWQuDQoNCkkgdGhpbmssIHByb3BlciBpbXBsZW1lbnRh
+dGlvbiBvZiBsc2VlayBjYWNoZSBzaG91bGQgd29yaywgYnV0IGl0IGlzIG1vcmUNCmRpZmZpY3Vs
+dCB0aGFuIGp1c3QgZGlzYWJsZSBsc2Vlay4gQW5kIGluIHNjZW5hcmlvcyB3aXRob3V0IHByZWFs
+bG9jYXRpb24NCndlIGRvbid0IG5lZWQgbHNlZWssIHNvIGFnYWluIGJldHRlciBpcyBkaXNhYmxl
+IGl0Lg0KDQpBbmQgSSBkb24ndCBzdXJlIHRoYXQgcWVtdSBpcyBhIHByb3BlciBwbGFjZSBmb3Ig
+bHNlZWsgb3B0aW1pemF0aW9ucy4NCg0KQW5kIGFub3RoZXIgd2F5IG1heSBiZSB0byBzZWxlY3Qg
+Y2FzZXMgd2hlbiBmaWVtYXAgaXMgc2FmZSBhbmQgdXNlIGl0Lg0KDQpBZ2FpbiwgZm9yIHNjZW5h
+cmlvcyB3aGVuIHdlIGRvbid0IG5lZWQgbm9yIGxzZWVrLCBub3IgZmllbWFwLCBuZWl0aGVyDQpj
+YWNoZSBmb3IgdGhlbSB0aGUgYmVzdCBvcHRpb24gaXMgbm90IHVzZSB0aGVtLg0KDQo+IA0KPj4N
+Cj4+IFNvLCBsZXQncyAiNWRhYTc0YTZlYmMiIGJ5IGRlZmF1bHQsIGxlYXZpbmcgYW4gb3B0aW9u
+IHRvIHJldHVybg0KPiANCj4gcy9sZXQncy9sZXQncyB1bmRvLw0KPiANCj4+IHByZXZpb3VzIGJl
+aGF2aW9yLCB3aGljaCBpcyBuZWVkZWQgZm9yIHNjZW5hcmlvcyB3aXRoIHByZWFsbG9jYXRlZA0K
+Pj4gaW1hZ2VzLg0KPj4NCj4+IEFkZCBpb3Rlc3QgaWxsdXN0cmF0aW5nIG5ldyBvcHRpb24gc2Vt
+YW50aWNzLg0KPiANCj4gQW5kIG5vbmUgb2YgdGhlIGV4aXN0aW5nIGlvdGVzdHMgZmFpbCBkdWUg
+dG8gY2hhbmdlZCBvdXRwdXQ/ICBEb2VzIHRoYXQNCj4gbWVhbiBvdXIgdGVzdHN1aXRlIGRvZXMg
+bm90IGhhdmUgZ29vZCBjb3ZlcmFnZSBvZiBwcmUtYWxsb2NhdGlvbiBtb2Rlcw0KPiB3aGVyZSB0
+aGUgemVybyBwcm9iZSBtYXR0ZXJlZD8NCg0KVG8gYmUgaG9uZXN0LCBJIGRpZG4ndCBydW4gYWxs
+IHRoZSB0ZXN0cywgb25seSBzZXZlcmFsLg0KDQpEbyBpdCBub3csIGFuZCBmb3VuZCB0aGF0LCB5
+ZXMsIGF0IGxlYXN0IDEwMiBicm9rZW4uIFdpbGwgZml4IGl0IHdpdGggdGhlIGZvbGxvd2luZw0K
+dmVyc2lvbi4gU3RyYW5nZSwgZG8gcGF0Y2hldyBydW4gdGVzdHMgb24gcGF0Y2hlcyBpbiBsaXN0
+IG5vdz8NCg0KPiANCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
+ZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+DQo+IA0KPj4gKysr
+IGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4+IEBAIC0zNjczLDYgKzM2NzMsOCBAQA0KPj4gICAj
+ICAgICAgICAgICAgICAgICAoZGVmYXVsdDogb2ZmKQ0KPj4gICAjIEBmb3JjZS1zaGFyZTogICBm
+b3JjZSBzaGFyZSBhbGwgcGVybWlzc2lvbiBvbiBhZGRlZCBub2Rlcy4NCj4+ICAgIyAgICAgICAg
+ICAgICAgICAgUmVxdWlyZXMgcmVhZC1vbmx5PXRydWUuIChTaW5jZSAyLjEwKQ0KPj4gKyMgQHBy
+b2JlLXplcm9lczogIFByb2JlIHplcm9lcyBvbiBwcm90b2NvbCBsYXllciBpZiBmb3JtYXQgcmVw
+b3J0cyBkYXRhDQo+PiArIyAgICAgICAgICAgICAgICAgKGRlZmF1bHQ6IGZhbHNlKSAoc2luY2Ug
+NC4wKQ0KPiANCj4gV2h5IGRvIHdlIG5lZWQgYSBuZXcgYm9vbD8gIENhbiB3ZSBpbnN0ZWFkLi4u
+DQo+IA0KPj4gICAjDQo+PiAgICMgUmVtYWluaW5nIG9wdGlvbnMgYXJlIGRldGVybWluZWQgYnkg
+dGhlIGJsb2NrIGRyaXZlci4NCj4+ICAgIw0KPj4gQEAgLTM2ODYsNyArMzY4OCw4IEBADQo+PiAg
+ICAgICAgICAgICAgICcqcmVhZC1vbmx5JzogJ2Jvb2wnLA0KPj4gICAgICAgICAgICAgICAnKmF1
+dG8tcmVhZC1vbmx5JzogJ2Jvb2wnLA0KPj4gICAgICAgICAgICAgICAnKmZvcmNlLXNoYXJlJzog
+J2Jvb2wnLA0KPj4gLSAgICAgICAgICAgICcqZGV0ZWN0LXplcm9lcyc6ICdCbG9ja2RldkRldGVj
+dFplcm9lc09wdGlvbnMnIH0sDQo+PiArICAgICAgICAgICAgJypkZXRlY3QtemVyb2VzJzogJ0Js
+b2NrZGV2RGV0ZWN0WmVyb2VzT3B0aW9ucycsDQo+PiArICAgICAgICAgICAgJypwcm9iZS16ZXJv
+ZXMnOiAnYm9vbCcgfSwNCj4gDQo+IC4uLmFkZCBhbm90aGVyIGVudW0gdmFsdWUgdG8gJ2RldGVj
+dC16ZXJvZXMnLCBzaW5jZSBhZnRlciBhbGwsIHdoYXQgd2UNCj4gYXJlIHJlYWxseSBkb2luZyBp
+cyBmaW5lLXR1bmluZyB3aGF0IGxldmVsIG9mIHplcm8gcHJvYmluZyB3ZSBhcmUNCj4gd2lsbGlu
+ZyB0byBkbz8NCg0KU2hvdWxkIHdlPyBPciBJIGp1c3QgYmluZCBvbGQgYmVoYXZpb3IgdG8gZGV0
+ZWN0LXplcm9lcz1vbj8gQW5kIHRoZW4sIGlmIG5lZWRlZCwNCndlJ2xsIGFkZCBpbnRlcm1lZGlh
+dGUgbW9kZXMuDQoNCj4gDQo+IA0KPj4gKysrIGIvcWVtdS1vcHRpb25zLmh4DQo+PiBAQCAtNjE1
+LDYgKzYxNSw3IEBAIERFRigiYmxvY2tkZXYiLCBIQVNfQVJHLCBRRU1VX09QVElPTl9ibG9ja2Rl
+diwNCj4+ICAgICAgICItYmxvY2tkZXYgW2RyaXZlcj1dZHJpdmVyWyxub2RlLW5hbWU9Tl1bLGRp
+c2NhcmQ9aWdub3JlfHVubWFwXVxuIg0KPj4gICAgICAgIiAgICAgICAgICBbLGNhY2hlLmRpcmVj
+dD1vbnxvZmZdWyxjYWNoZS5uby1mbHVzaD1vbnxvZmZdXG4iDQo+PiAgICAgICAiICAgICAgICAg
+IFsscmVhZC1vbmx5PW9ufG9mZl1bLGRldGVjdC16ZXJvZXM9b258b2ZmfHVubWFwXVxuIg0KPj4g
+KyAgICAiICAgICAgICAgIFsscHJvYmUtemVyb2VzPW9ufG9mZl1cbiINCj4+ICAgICAgICIgICAg
+ICAgICAgWyxkcml2ZXIgc3BlY2lmaWMgcGFyYW1ldGVycy4uLl1cbiINCj4+ICAgICAgICIgICAg
+ICAgICAgICAgICAgY29uZmlndXJlIGEgYmxvY2sgYmFja2VuZFxuIiwgUUVNVV9BUkNIX0FMTCkN
+Cj4+ICAgU1RFWEkNCj4+IEBAIC02NzAsNiArNjcxLDggQEAgZGlzY2FyZCByZXF1ZXN0cy4NCj4+
+ICAgY29udmVyc2lvbiBvZiBwbGFpbiB6ZXJvIHdyaXRlcyBieSB0aGUgT1MgdG8gZHJpdmVyIHNw
+ZWNpZmljIG9wdGltaXplZA0KPj4gICB6ZXJvIHdyaXRlIGNvbW1hbmRzLiBZb3UgbWF5IGV2ZW4g
+Y2hvb3NlICJ1bm1hcCIgaWYgQHZhcntkaXNjYXJkfSBpcyBzZXQNCj4+ICAgdG8gInVubWFwIiB0
+byBhbGxvdyBhIHplcm8gd3JpdGUgdG8gYmUgY29udmVydGVkIHRvIGFuIEBjb2Rle3VubWFwfSBv
+cGVyYXRpb24uDQo+PiArQGl0ZW0gcHJvYmUtemVyb2VzPUB2YXJ7cHJvYmUtemVyb2VzfQ0KPj4g
+K1Byb2JlIHplcm9lcyBvbiBwcm90b2NvbCBsYXllciBpZiBmb3JtYXQgcmVwb3J0cyBkYXRhLiBE
+ZWZhdWx0IGlzICJvZmYiLg0KPiANCj4gQWdhaW4sIGZpdHRpbmcgdGhpcyBpbnRvIGRldGVjdC16
+ZXJvZXMgc2VlbXMgYmV0dGVyIHRoYW4gaW52ZW50aW5nIGEgbmV3DQo+IGtub2IuDQo+IA0KDQpO
+byBvYmplY3Rpb25zLiBCdXQgZGVzY3JpcHRpb24gb2YgZGV0ZWN0LXplcm9lcyBhcmUgbW9yZSBh
+Ym91dCB3cml0ZXMsIHNob3VsZA0Kd2UgY2hhbmdlIHRoZW0gc29tZWhvdz8NCg0KIyBEZXNjcmli
+ZXMgdGhlIG9wZXJhdGlvbiBtb2RlIGZvciB0aGUgYXV0b21hdGljIGNvbnZlcnNpb24gb2YgcGxh
+aW4NCiMgemVybyB3cml0ZXMgYnkgdGhlIE9TIHRvIGRyaXZlciBzcGVjaWZpYyBvcHRpbWl6ZWQg
+emVybyB3cml0ZSBjb21tYW5kcy4NCg0KLi4uDQoNCiMgQGRldGVjdC16ZXJvZXM6IGRldGVjdCBh
+bmQgb3B0aW1pemUgemVybyB3cml0ZXMgKFNpbmNlIDIuMSkNCg0KDQoNCi0tIA0KQmVzdCByZWdh
+cmRzLA0KVmxhZGltaXINCg==
