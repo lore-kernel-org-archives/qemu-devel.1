@@ -1,26 +1,42 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42024)
+Received: from eggs.gnu.org ([209.51.188.92]:42350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1ghz4K-0002ae-2X
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:50:01 -0500
+	(envelope-from <frankja@linux.ibm.com>) id 1ghz5k-0003s9-MN
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:51:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1ghz4J-0002f1-2D
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:50:00 -0500
-Received: from forwardcorp1o.cmail.yandex.net ([2a02:6b8:0:1a72::290]:36228)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1ghz4I-0002bM-5F
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:49:58 -0500
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-In-Reply-To: <20190110201124.GJ2589@work-vm>
-References: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
-	<20190110201124.GJ2589@work-vm>
+	(envelope-from <frankja@linux.ibm.com>) id 1ghz5j-0003ls-RJ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:51:28 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48800
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+	id 1ghz5j-0003lB-I6
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:51:27 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0BFnK9g117876
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 10:51:26 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2pxuks8ujp-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 10:51:25 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+	Fri, 11 Jan 2019 15:51:23 -0000
+References: <20190111113657.66195-1-frankja@linux.ibm.com>
+	<20190111113657.66195-2-frankja@linux.ibm.com>
+	<2be2f28c-1c89-c985-7996-f30c25578446@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Date: Fri, 11 Jan 2019 16:51:19 +0100
 MIME-Version: 1.0
-Date: Fri, 11 Jan 2019 18:49:53 +0300
-Message-Id: <2578541547221793@myt5-68ad52a76c91.qloud-c.yandex.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/4] Add ignore-external migration
- capability
+In-Reply-To: <2be2f28c-1c89-c985-7996-f30c25578446@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hYUPomZYC5XKFeZrPx4UFwLCs9zLwtGsx"
+Message-Id: <df287522-75fd-30ff-f262-673958bdac7a@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x: Diag308 move common parameter
+ checking into function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,134 +45,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
 
-10.01.2019, 23:12, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
-> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
->>  Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hYUPomZYC5XKFeZrPx4UFwLCs9zLwtGsx
+From: Janosch Frank <frankja@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, qemu-s390x@nongnu.org,
+ qemu-stable@nongnu.org
+Message-ID: <df287522-75fd-30ff-f262-673958bdac7a@linux.ibm.com>
+Subject: Re: [PATCH 1/2] s390x: Diag308 move common parameter checking into
+ function
+References: <20190111113657.66195-1-frankja@linux.ibm.com>
+ <20190111113657.66195-2-frankja@linux.ibm.com>
+ <2be2f28c-1c89-c985-7996-f30c25578446@redhat.com>
+In-Reply-To: <2be2f28c-1c89-c985-7996-f30c25578446@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 11.01.19 16:40, David Hildenbrand wrote:
+> On 11.01.19 12:36, Janosch Frank wrote:
+>> Let's make that switch statement a bit shorter.
 >>
->>  The series adds migration capability which allows to skip 'external' =
-RAM blocks
->>  during migration. External block is a RAMBlock which available from t=
-he outside
->>  of current QEMU process (e.g. file in /dev/shm). It's useful for fast=
- local
->>  migration to update QEMU for the running guests.
->
-> Hi Yury,
->   There have been a few similar patch series around from people wanting
-> to do similar things.
->   In particular Lai Jiangshan's https://lists.nongnu.org/archive/html/q=
-emu-devel/2018-03/msg07511.html
-> and C=C3=A9dric Le Goater wanted to skip regions for a different reason=
-.
->
->   We merged some of C=C3=A9dric's code last year so that we now
-> have the qemu_ram_is_migratable() function - and we should be reusing
-> that to skip things rather than adding a new check that we have to add
-> everywhere.
->
-
-I didn't see the series, so I'll check it, thanks!
-But I saw qemu_ram_is_migratable() function and corresponding patch.
-It's very close to my needs, but it works a bit different IIUC:
-1. Not migratable blocks isn't validated (existence and size) during migr=
-ation,
-2. "Migratable" state is determined during the block creation time.
-   Such case isn't valid because of it:
-   * Source has one migratable and one not migratable RAM blocks,
-   * Target has the same (idstr) blocks, but both are not migratable.
-   Thus, target will not expect pages for not migratable blocks.
-
->   Also, ypu're skipping 'external' things, I think the other suggestion
-> was to skip 'shared' things (i.e. anything with share=3D0); skipping
-> share=3Don cases sounds easier to me.
-
-I agree that introducing new term is a complication, but 'share' and 'ext=
-ernal'
-terms have important differences (I'll describe it below).
-
-Just to clarify:
-* 'share' means that other processes has an access to such memory,
-* 'external' means file backed memory.
-
-There is another use case I wanted to support (I had to write about it in
-the cover letter, sorry..):
-1. Migrate source VM to file and kill source,
-2. Start target VM and migrate it from file.
-In such case source VM may have memory-backend-ram with share=3Doff, it's=
- ok.
-
-Thus, in the new migration capability I want to migrate memory that meets
-three conditions:
-1. The source will not use the memory after migration ends,
-2. The source may exit before target starts (migrate to file),
-3. The target has an access to the memory.
-
-I think 'external' fits them better than 'share'.
-
->
-> Dave
->
->>  Patches:
->>  1. Add offset validation to make sure that external RAM block has the=
- same
->>     physical offset on target side,
->>  2. Add RAM_EXTERNAL flag to determine external RAM blocks,
->>  3. Add ignore-external migration capability,
->>  4. Add a test.
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  target/s390x/diag.c | 34 ++++++++++++++++++----------------
+>>  1 file changed, 18 insertions(+), 16 deletions(-)
 >>
->>  Usage example:
->>  1. Start source VM:
->>     qemu-system-x86 \
->>       -m 4G \
->>       -object memory-backend-file,id=3Dmem0,size=3D4G,share=3Don,mem-p=
-ath=3D/dev/shm/mem0 \
->>       -numa node,memdev=3Dmem0 \
->>       -qmp unix:/tmp/qemu-qmp-1.sock,server,nowait \
->>
->>  2. Start target VM:
->>     qemu-system-x86 \
->>       -m 4G \
->>       -object memory-backend-file,id=3Dmem0,size=3D4G,share=3Don,mem-p=
-ath=3D/dev/shm/mem0 \
->>       -numa node,memdev=3Dmem0 \
->>       -qmp unix:/tmp/qemu-qmp-2.sock,server,nowait \
->>       -incoming defer
->>
->>  3. Enable ignore-external capability on both VMs:
->>     { "execute": "migrate-set-capabilities" , "arguments":
->>       { "capabilities": [ { "capability": "x-ignore-external", "state"=
-: true } ] } }
->>
->>  4. Start migration.
->>
->>  Regards,
->>  Yury
->>
->>  Yury Kotov (4):
->>    migration: add RAMBlock's offset validation
->>    exec: add RAM_EXTERNAL flag to mark non-QEMU allocated blocks
->>    migration: introduce ignore-external capability
->>    tests/migration-test: Add a test for ignore-external capability
->>
->>   backends/hostmem-file.c | 3 +-
->>   exec.c | 7 ++-
->>   include/exec/cpu-common.h | 1 +
->>   include/exec/memory.h | 3 ++
->>   migration/migration.c | 9 ++++
->>   migration/migration.h | 1 +
->>   migration/ram.c | 52 ++++++++++++++++--
->>   numa.c | 4 +-
->>   qapi/migration.json | 6 ++-
->>   tests/migration-test.c | 109 +++++++++++++++++++++++++++++++-------
->>   10 files changed, 165 insertions(+), 30 deletions(-)
->>
->>  --
->>  2.20.1
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+>> index acb0f3d4af..cfd7222ddd 100644
+>> --- a/target/s390x/diag.c
+>> +++ b/target/s390x/diag.c
+>> @@ -53,6 +53,22 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1=
+, uint64_t r3)
+>>  #define DIAG_308_RC_NO_CONF         0x0102
+>>  #define DIAG_308_RC_INVALID         0x0402
+>> =20
+>> +static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64=
+_t addr,
+>> +                              uintptr_t ra)
+>> +{
+>> +    if ((r1 & 1) || (addr & 0x0fffULL)) {
+>> +        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra)=
+;
+>> +        return -EINVAL;
+>> +    }
+>> +    if (!address_space_access_valid(&address_space_memory, addr,
+>> +                                    sizeof(IplParameterBlock), true,
+>=20
+> This is wrong, you would check for writing although you are only
+> reading. (true vs. false)
 
-Regards,
-Yury
+Friday morning patches are the best patches :)
+Let's drop that one for now, we'll touch it again, if we need to tinker
+there.
+
+
+--hYUPomZYC5XKFeZrPx4UFwLCs9zLwtGsx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJcOLt3AAoJEONU5rjiOLn4lq8QALyyrzUI0Sx/9ZMGHUKxF/LH
+Gi3Pc3XWuX/Z+xQ6o71QUwojiX2vDnGruFtBBRqmGa7RIT1NAUkO6Qi0YTJgT5OA
+ns9W8n20FbuuSair30eCxslxghK2lFxyc0uzjKxaMTG7FDJJ6qQOGZeOC1n07tci
+7W9BH+basQGRrQIHdpjQaOpBKbTPBnd8jwag1R8xiyrJ6LhIvH7E3nAeRjkxgena
+DvxrjzACSmksME9ITPsffRrfA08e4/zxM7QY/dCJuFBDxMs67Jjjc4TcokvP3akD
+EJAE96xBkbInGUs14y35eYu9mpW3QbahaUQvvGWSYrzfofpbsA02ukxEneOzv461
+jbddcAWsSwjSlQ9/CRD8UFrBLibxHOj3vWhCs+jlNSf06DVSAr5JeDMdhksgbc0N
+mvgDfe5ecyiYgyYYgQE94+a3vFE+ton3Tu7vJJbMZfegdcucKO77+doM7u0bDYbQ
+GzXK8vF/DGO06gWjQw3ghJ5aPK9xVQITSVZqbpsQhyPksPk1dmrZKa9KiksN53Ik
+y39yNAj4fNkBlWFOI77hIt8Q1JuAD1lsBz+KFXOW/rtkZtr98yqbtZBZWDnfG94x
+P53gVl/0nAd543jKO+w4JTtHqsOSp+AyHuZ/RVVaLtqZXJyZg+zGBYJCfl3yR1wY
+8RpulPXIJKsKglaNXTyZ
+=7rFW
+-----END PGP SIGNATURE-----
+
+--hYUPomZYC5XKFeZrPx4UFwLCs9zLwtGsx--
