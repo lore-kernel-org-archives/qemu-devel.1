@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46679)
+Received: from eggs.gnu.org ([209.51.188.92]:47354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghzLN-0004FD-L4
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:07:38 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghzNN-0005sR-Vy
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:09:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghzLL-0005VJ-CR
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:07:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghzLL-0005UP-1S
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:07:35 -0500
-References: <20190110083753.GA31730@yangzhon-Virtual>
-	<20190110103636.GG19025@stefanha-x1.localdomain>
-	<20190111054604.GA1038@yangzhon-Virtual>
-	<a7e15215-e2df-309b-b1f6-6741bfff7247@redhat.com>
-	<20190111155824.GB14776@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <72a500b8-4681-94c5-a258-5ba8b0e8fa9b@redhat.com>
-Date: Fri, 11 Jan 2019 17:07:26 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghzNN-0006qQ-1d
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:09:41 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 11 Jan 2019 16:09:33 +0000
+Message-ID: <277fe3a0-9025-b96e-41b2-0388f491d724@virtuozzo.com>
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
+	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
+	<20190111122151.GF5010@dhcp-200-186.str.redhat.com>
+	<8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
+	<20190111131538.GH5010@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20190111131538.GH5010@dhcp-200-186.str.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FD926BB86C128845B5288DA2B3B5C194@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190111155824.GB14776@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FwTjpQUWj6xytvCy9TEs7Os9azroPbr5l"
-Subject: Re: [Qemu-devel] If Qemu support NVMe over Fabrics ?y
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,105 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, QEMU Developers <qemu-devel@nongnu.org>, fam@euphon.net, keith.busch@intel.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FwTjpQUWj6xytvCy9TEs7Os9azroPbr5l
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, QEMU Developers
- <qemu-devel@nongnu.org>, fam@euphon.net, keith.busch@intel.com
-Message-ID: <72a500b8-4681-94c5-a258-5ba8b0e8fa9b@redhat.com>
-Subject: Re: [Qemu-devel] If Qemu support NVMe over Fabrics ?y
-References: <20190110083753.GA31730@yangzhon-Virtual>
- <20190110103636.GG19025@stefanha-x1.localdomain>
- <20190111054604.GA1038@yangzhon-Virtual>
- <a7e15215-e2df-309b-b1f6-6741bfff7247@redhat.com>
- <20190111155824.GB14776@stefanha-x1.localdomain>
-In-Reply-To: <20190111155824.GB14776@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 11/01/19 16:58, Stefan Hajnoczi wrote:
-> On Fri, Jan 11, 2019 at 11:48:52AM +0100, Paolo Bonzini wrote:
->> On 11/01/19 06:46, Yang Zhong wrote:
->>> On Thu, Jan 10, 2019 at 10:36:37AM +0000, Stefan Hajnoczi wrote:
->>>> On Thu, Jan 10, 2019 at 04:37:53PM +0800, Yang Zhong wrote:
->>>>> Do you know if Qemu support NVMe over Fabrics(NVMe-oF)?
->>>>> https://nvmexpress.org/wp-content/uploads/NVMe_Over_Fabrics.pdf
->>>>>
->>>>> The Qemu has enabled RDMA in last year, and i am not sure if Qemu=20
->>>>> should support NVME-oF. If Qemu support it, would you please share
->>>>> me the qemu related command or guides? thanks a lot!
->>>>
->>>> QEMU supports many different storage configurations.  Can you be mor=
-e
->>>> specific?
->>>>
->>>> For example, if your host has NVMe-oF set up then you can give the N=
-VMe
->>>> block devices to QEMU just like any other host block device (-drive
->>>> file=3D/dev/sdc,...).
->>>>
->>>> But maybe you are thinking about other configurations, like exposing=
-
->>>> NVMe-oF to the guest?
->>>>
->>>   Thanks Stefan's comments. We only want Qemu as NVMe-oF initiator to=
-
->>>   access remote target's resource.
->>>
->>>   I checked the block/nvme.c and hw/block/nvme.c code, which seems do=
-
->>>   not support NVMe-oF . If i am wrong please correct me.
->>>
->>>   If Qemu support NVMe-oF initiator, please share me how to use it.=20
->>>   If Qemu does not support it, please tell me if community has plan=20
->>>   to implement it. thanks a lot!
->>
->> QEMU's native NVMe driver only supports NVMe over PCI, but it should b=
-e
->> possible to extract common code if you want to add a native NVMe over
->> RDMA driver to QEMU.  There are currently no plans to add such a drive=
-r,
->> but it would certainly be a welcome addition.
->=20
-> Before investing time in doing that, what is the goal?
->=20
-> Is this for test and bring-up of NVMe-oF?  Or why does the guest need t=
-o
-> know that the storage is NVMe-oF?
->=20
-> As I mentioned before, if your host supports NVMe-oF you can simply giv=
-e
-> the block device to QEMU and let the guest access it via virtio-blk,
-> virtio-scsi, NVMe, etc.
-
-NVMe-OF is an RDMA protocol, basically a different transport for the
-NVMe command set and queue abstraction.  It would allow QEMU to access
-the device directly (similar to what block/nvme.c does for PCI using
-VFIO) without going through the host kernel.  The guest would see the
-device as virtio-blk/scsi, NVMe or anything else.
-
-Paolo
-
-
---FwTjpQUWj6xytvCy9TEs7Os9azroPbr5l
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlw4vz4ACgkQv/vSX3jH
-roOKkAf+Mq4+ucg+yfgqhz4ltadv9Ggv9DcfF/jmi4qKo4HV4Pp+0qNMgTKMZmmM
-aaGjkpUPZJI1K1wv1J20gGmvrXx9NufnoP6ZKwm5etABYJF94gE4PNErZDyiizRs
-s3NNa/DlMjyx1+PWi+WZwvicpL3lz20TlngdFs0gvy76ffA8wC6ko2sgpNfAr2gP
-+iM5E42BSWHkyNlbLRB8gIw4fsgpmTtor0nAtOpOWQgF1cjGojTsLdVJgPELF02Q
-L6F9T1OhorX9CbN7vehQf4r8/d9HTZqlM9tuANLF7wT+h7mM93qh34CAuOWrzbnL
-KjlX/96s9VMjm0FPgWyoFEtkWJIjfA==
-=a+kT
------END PGP SIGNATURE-----
-
---FwTjpQUWj6xytvCy9TEs7Os9azroPbr5l--
+MTEuMDEuMjAxOSAxNjoxNSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTEuMDEuMjAxOSB1bSAx
+Mzo1OSBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDEx
+LjAxLjIwMTkgMTU6MjEsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMTEuMDEuMjAxOSB1bSAx
+Mjo0MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+Pj4g
+MTEuMDEuMjAxOSAxMzo0MSwgS2V2aW4gV29sZiB3cm90ZToNCj4+Pj4+IEFtIDEwLjAxLjIwMTkg
+dW0gMTQ6MjAgaGF0IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgZ2VzY2hyaWViZW46DQo+
+Pj4+Pj4gZHJ2X2NvX2Jsb2NrX3N0YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlvbmFsLCBt
+b3JlIGFjY3VyYXRlIHNlYXJjaA0KPj4+Pj4+IGZvciBob2xlIGluc2lkZSByZWdpb24sIHJlcG9y
+dGVkIGFzIERBVEEgYnkgYnMgc2luY2UgNWRhYTc0YTZlYmMuDQo+Pj4+Pj4NCj4+Pj4+PiBUaGlz
+IGFjY3VyYWN5IGlzIG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2ZSBxY293MiBkaXNrLiBBY3R1YWxs
+eSwgcWNvdzINCj4+Pj4+PiBrbm93cywgd2hlcmUgYXJlIGhvbGVzIGFuZCB3aGVyZSBpcyBkYXRh
+LiBCdXQgZXZlcnkgYmxvY2tfc3RhdHVzDQo+Pj4+Pj4gcmVxdWVzdCBjYWxscyBsc2VlayBhZGRp
+dGlvbmFsbHkuIEFzc3VtZSBhIGJpZyBkaXNrLCBmdWxsIG9mDQo+Pj4+Pj4gZGF0YSwgaW4gYW55
+IGl0ZXJhdGl2ZSBjb3B5aW5nIGJsb2NrIGpvYiAob3IgaW1nIGNvbnZlcnQpIHdlJ2xsIGNhbGwN
+Cj4+Pj4+PiBsc2VlayhIT0xFKSBvbiBldmVyeSBpdGVyYXRpb24sIGFuZCBlYWNoIG9mIHRoZXNl
+IGxzZWVrcyB3aWxsIGhhdmUgdG8NCj4+Pj4+PiBpdGVyYXRlIHRocm91Z2ggYWxsIG1ldGFkYXRh
+IHVwIHRvIHRoZSBlbmQgb2YgZmlsZS4gSXQncyBvYnZpb3VzbHkNCj4+Pj4+PiBpbmVmZmVjdGl2
+ZSBiZWhhdmlvci4gQW5kIGZvciBtYW55IHNjZW5hcmlvcyB3ZSBkb24ndCBuZWVkIHRoaXMgbHNl
+ZWsNCj4+Pj4+PiBhdCBhbGwuDQo+Pj4+Pj4NCj4+Pj4+PiBTbywgbGV0J3MgIjVkYWE3NGE2ZWJj
+IiBieSBkZWZhdWx0LCBsZWF2aW5nIGFuIG9wdGlvbiB0byByZXR1cm4NCj4+Pj4+PiBwcmV2aW91
+cyBiZWhhdmlvciwgd2hpY2ggaXMgbmVlZGVkIGZvciBzY2VuYXJpb3Mgd2l0aCBwcmVhbGxvY2F0
+ZWQNCj4+Pj4+PiBpbWFnZXMuDQo+Pj4+Pj4NCj4+Pj4+PiBBZGQgaW90ZXN0IGlsbHVzdHJhdGlu
+ZyBuZXcgb3B0aW9uIHNlbWFudGljcy4NCj4+Pj4+Pg0KPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFZs
+YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+
+Pj4+DQo+Pj4+PiBJIHN0aWxsIHRoaW5rIHRoYXQgYW4gb3B0aW9uIGlzbid0IGEgZ29vZCBzb2x1
+dGlvbiBhbmQgd2Ugc2hvdWxkIHRyeSB1c2UNCj4+Pj4+IHNvbWUgaGV1cmlzdGljcyBpbnN0ZWFk
+Lg0KPj4+Pg0KPj4+PiBEbyB5b3UgdGhpbmsgdGhhdCBoZXVyaXN0aWNzIHdvdWxkIGJlIGJldHRl
+ciB0aGFuIGZhaXIgY2FjaGUgZm9yIGxzZWVrDQo+Pj4+IHJlc3VsdHM/DQo+Pj4NCj4+PiBJIGRv
+bid0IHRoaW5rIGxzZWVrKCkgcmVzdWx0cyBhcmUgY2FjaGFibGUsIGF0IGxlYXN0IGZvciBpbWFn
+ZXMgdGhhdCBjYW4NCj4+PiBzaGFyZSBCTEtfUEVSTV9XUklURSBiZXR3ZWVuIHByb2Nlc3Nlcy4N
+Cj4+Pg0KPj4+PiBJIGRvbid0IHNlZSBnb29kIGhldXJpc3RpY3MsIG5laXRoZXIgd2FudCB0byBp
+bXBsZW1lbnQgbHNlZWsgb3B0aW1pemF0aW9ucy4NCj4+Pj4gSW4gb3VyIGNhc2VzIHdlIGRvbid0
+IG5lZWQgbHNlZWsgdW5kZXIgcWNvdzIgYXQgYWxsLCBhbmQgaXQncyBvYnZpb3VzbHkgYmV0dGVy
+DQo+Pj4+IGp1c3QgZG9uJ3QgbHNlZWsgaW4gdGhlc2UgY2FzZXMuDQo+Pj4NCj4+PiBJIHN1Z2dl
+c3RlZCBvbmU6IFBhc3MgbGFyZ2UgY29udGlndW91cyBhbGxvY2F0ZWQgcmFuZ2VzIHRvIHRoZSBw
+cm90b2NvbA0KPj4+IGRyaXZlciwgYnV0IGp1c3QgYXNzdW1lIHRoYXQgdGhlIGFsbG9jYXRpb24g
+c3RhdHVzIGlzIGNvcnJlY3QgaW4gdGhlDQo+Pj4gZm9ybWF0IGxheWVyIGlmIHRoZXkgYXJlIHNt
+YWxsLg0KPj4NCj4+IFNvLCBmb3IgZnVsbHkgYWxsb2NhdGVkIGltYWdlLCB3ZSB3aWxsIGNhbGwg
+bHNlZWsgYWx3YXlzPw0KPiANCj4gSWYgdGhleSBhcmUgZnVsbHkgY29udGlndW91cywgeWVzLiBC
+dXQgdGhhdCdzIGEgc2luZ2xlIGxzZWVrKCkgY2FsbCBwZXINCj4gaW1hZ2UgdGhlbiBpbnN0ZWFk
+IG9mIGFuIGxzZWVrKCkgZm9yIGV2ZXJ5IDY0aywgc28gbm90IGEgYmlnIHByb2JsZW0uDQoNCmxz
+ZWVrIGlzIGNhbGxlZCBvbiBlYWNoIG1pcnJvciBpdGVyYXRpb24sIHdoeSBvbmUgcGVyIGltYWdl
+Pw0KDQo+IA0KPiBJbiB0aGUgbW9yZSByZWFsaXN0aWMgY2FzZSwgeW91IHdpbGwgc3RpbGwgY2Fs
+bCBsc2VlaygpIG9jY2FzaW9uYWxseQ0KPiBiZWNhdXNlIHlvdSB3aWxsIGhhdmUgc29tZSBmcmFn
+bWVudGF0aW9uLCBidXQgdGhlIGZyYWdtZW50cyBjYW4gYmUNCj4gcmF0aGVyIGxhcmdlLiBCdXQg
+aXQgc2hvdWxkIHN0aWxsIHNpZ25pZmljYW50bHkgcmVkdWNlIHRoZW0gY29tcGFyZWQgdG8NCj4g
+bm93IGJlY2F1c2UgeW91IHNraXAgaXQgZm9yIHRob3NlIHBhcnRzIHdpdGggc21hbGwgY29udGln
+dW91cw0KPiBhbGxvY2F0aW9ucyB3aGVyZSBsc2VlaygpIHdvdWxkIGJlIGNhbGxlZCBhIGxvdCB0
+b2RheS4NCj4gDQo+IEtldmluDQo+IA0KDQpPaywgeW91IHByb3Bvc2Ugbm90IHRvIGNhbGwgbHNl
+ZWsgZm9yIHNtYWxsIGVub3VnaCBkYXRhIHJlZ2lvbnMgcmVwb3J0ZWQgYnkNCmZvcm1hdCBsYXll
+ci4gQW5kIGZvciBpbWFnZXMgd2hpY2ggYXJlIGxlc3MgZnJhZ21lbnRlZCwgdGhpcyBoZWxwcyBs
+ZXNzIG9yIGRvbid0DQpoZWxwLg0KDQpXaHkgZG8geW91IHRoaW5rIGl0IGlzIGJldHRlcj8NCg0K
+Rm9yIG5vdCBwcmVhbGxvY2F0ZWQgaW1hZ2VzIGl0IGlzIHdvcnNlLCBhcyBpdCBjb3ZlcnMgbGVz
+cyBjYXNlcy4gU28sIGZvciBvdXINCnNjZW5hcmlvcyBpdCBpcyB3b3JzZS4NCg0KVGhlIG9ubHkg
+Y2FzZSwgd2hlbiBoZXVyaXN0aWMgd29ya3MgYmV0dGVyLCBpcyB3aGVuIHVzZXIgaGF2ZSBwcmVh
+bGxvY2F0ZWQgaW1hZ2UsDQpidXQgZG9uJ3Qga25vdyBhYm91dCBuZXcgb3B0aW9uLCB3aGljaCBy
+ZXR1cm5zIG9sZCBiZWhhdmlvci4gV2UgYXJlIG5vdCBpbnRlcmVzdGVkDQppbiB0aGlzIGNhc2Ug
+YW5kIGNhbid0IGdvIHRoaXMgd2F5LCBhcyBpdCBkb2Vzbid0IGd1YXJhbnRlZSwgdGhhdCBzb21l
+IGN1c3RvbWVyIHdpbGwNCm5vdCBjb21lIGFnYWluIHdpdGggbHNlZWstcmVsYXRlZCBwcm9ibGVt
+cy4NCg0KRG9uJ3QgeW91IGxpa2Ugd2hhdCBFcmljIHByb3Bvc2UsIGFib3V0IGJpbmRpbmcgYmVo
+YXZpb3Igc3dpdGNoIHRvIGV4aXN0aW5nDQpkZXRlY3QtemVyb2VzIG9wdGlvbj8NCg0KT3IsIHdl
+IGNhbiBhZGQgYW4gb3Bwb3NpdGUgb3B0aW9uLCB0byBlbmFibGUgbmV3IGJlaGF2aW9yLCBrZWVw
+aW5nIHRoZSBvbGQgb25lIGJ5DQpkZWZhdWx0LiBTbywgYWxsIHN0YXlzIGFzIGlzLCBhbmQgd2hv
+IG5lZWQgdXNlcyBuZXcgb3B0aW9uLiBIZXVyaXN0aWMgbWF5IGJlDQppbXBsZW1lbnRlZCB0aGVu
+IHRvby4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
