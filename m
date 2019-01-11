@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58967)
+Received: from eggs.gnu.org ([209.51.188.92]:59261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghwOw-0002B7-JZ
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:07 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghwPi-0002kW-HB
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghwOv-0005bd-NN
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:06 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44119)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghwOv-0005b7-Dd
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:05 -0500
-Received: by mail-wr1-f68.google.com with SMTP id z5so15052018wrt.11
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 04:59:05 -0800 (PST)
-References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
-	<1547194672-24169-3-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b259b70e-1c3c-1a6e-304e-ed45e561abd9@redhat.com>
-Date: Fri, 11 Jan 2019 13:59:02 +0100
-MIME-Version: 1.0
-In-Reply-To: <1547194672-24169-3-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghwPh-000647-7U
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:54 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 11 Jan 2019 12:59:37 +0000
+Message-ID: <8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
+	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
+	<20190111122151.GF5010@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20190111122151.GF5010@dhcp-200-186.str.redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] ppc: Fix duplicated typedefs to be
- able to compile with Clang in gnu99 mode
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <532AECE7150A69418FFD7841E9AD3834@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 1/11/19 9:17 AM, Thomas Huth wrote:
-> When compiling the ppc code with clang and -std=gnu99, there are a
-> couple of warnings/errors like this one:
-> 
->   CC      ppc64-softmmu/hw/intc/xics.o
-> In file included from hw/intc/xics.c:35:
-> include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is a C11 feature
->       [-Werror,-Wtypedef-redefinition]
-> typedef struct ICPState ICPState;
->                         ^
-> target/ppc/cpu.h:1181:25: note: previous definition is here
-> typedef struct ICPState ICPState;
->                         ^
-> Work around the problems by including the proper headers instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  include/hw/ppc/spapr.h      |  5 +++--
->  include/hw/ppc/spapr_xive.h |  2 --
->  target/ppc/cpu.h            | 13 +++++++++----
->  3 files changed, 12 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 9e01a5a..a947a0a 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -8,15 +8,16 @@
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/ppc/spapr_ovec.h"
->  #include "hw/ppc/spapr_irq.h"
-> +#include "hw/ppc/spapr_xive.h"  /* For sPAPRXive */
-> +#include "hw/ppc/xics.h"        /* For ICSState */
->  
->  struct VIOsPAPRBus;
->  struct sPAPRPHBState;
->  struct sPAPRNVRAM;
-> +
->  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
->  typedef struct sPAPREventSource sPAPREventSource;
->  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
-> -typedef struct ICSState ICSState;
-> -typedef struct sPAPRXive sPAPRXive;
->  
->  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
->  #define SPAPR_ENTRY_POINT       0x100
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 7fdc250..9bec919 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -41,8 +41,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
->  bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
->  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
->  
-> -typedef struct sPAPRMachineState sPAPRMachineState;
-> -
->  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
->  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
->                     uint32_t phandle);
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 486abaf..bde4dff 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -23,6 +23,11 @@
->  #include "qemu-common.h"
->  #include "qemu/int128.h"
->  
-> +#ifndef CONFIG_USER_ONLY
-> +#include "hw/ppc/xive.h" /* for XiveTCTX */
-> +#include "hw/ppc/xics.h" /* for ICPState */
-> +#endif
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> +
->  //#define PPC_EMULATE_32BITS_HYPV
->  
->  #if defined (TARGET_PPC64)
-> @@ -1177,8 +1182,6 @@ do {                                            \
->  
->  typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
->  typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
-> -typedef struct XiveTCTX XiveTCTX;
-> -typedef struct ICPState ICPState;
->  
->  /**
->   * PowerPCCPU:
-> @@ -1197,11 +1200,13 @@ struct PowerPCCPU {
->      int vcpu_id;
->      uint32_t compat_pvr;
->      PPCVirtualHypervisor *vhyp;
-> -    ICPState *icp;
-> -    XiveTCTX *tctx;
->      void *machine_data;
->      int32_t node_id; /* NUMA node this CPU belongs to */
->      PPCHash64Options *hash64_opts;
-> +#ifndef CONFIG_USER_ONLY
-> +    ICPState *icp;
-> +    XiveTCTX *tctx;
-> +#endif
->  
->      /* Fields related to migration compatibility hacks */
->      bool pre_2_8_migration;
-> 
+MTEuMDEuMjAxOSAxNToyMSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTEuMDEuMjAxOSB1bSAx
+Mjo0MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDEx
+LjAxLjIwMTkgMTM6NDEsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMTAuMDEuMjAxOSB1bSAx
+NDoyMCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+Pj4g
+ZHJ2X2NvX2Jsb2NrX3N0YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlvbmFsLCBtb3JlIGFj
+Y3VyYXRlIHNlYXJjaA0KPj4+PiBmb3IgaG9sZSBpbnNpZGUgcmVnaW9uLCByZXBvcnRlZCBhcyBE
+QVRBIGJ5IGJzIHNpbmNlIDVkYWE3NGE2ZWJjLg0KPj4+Pg0KPj4+PiBUaGlzIGFjY3VyYWN5IGlz
+IG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2ZSBxY293MiBkaXNrLiBBY3R1YWxseSwgcWNvdzINCj4+
+Pj4ga25vd3MsIHdoZXJlIGFyZSBob2xlcyBhbmQgd2hlcmUgaXMgZGF0YS4gQnV0IGV2ZXJ5IGJs
+b2NrX3N0YXR1cw0KPj4+PiByZXF1ZXN0IGNhbGxzIGxzZWVrIGFkZGl0aW9uYWxseS4gQXNzdW1l
+IGEgYmlnIGRpc2ssIGZ1bGwgb2YNCj4+Pj4gZGF0YSwgaW4gYW55IGl0ZXJhdGl2ZSBjb3B5aW5n
+IGJsb2NrIGpvYiAob3IgaW1nIGNvbnZlcnQpIHdlJ2xsIGNhbGwNCj4+Pj4gbHNlZWsoSE9MRSkg
+b24gZXZlcnkgaXRlcmF0aW9uLCBhbmQgZWFjaCBvZiB0aGVzZSBsc2Vla3Mgd2lsbCBoYXZlIHRv
+DQo+Pj4+IGl0ZXJhdGUgdGhyb3VnaCBhbGwgbWV0YWRhdGEgdXAgdG8gdGhlIGVuZCBvZiBmaWxl
+LiBJdCdzIG9idmlvdXNseQ0KPj4+PiBpbmVmZmVjdGl2ZSBiZWhhdmlvci4gQW5kIGZvciBtYW55
+IHNjZW5hcmlvcyB3ZSBkb24ndCBuZWVkIHRoaXMgbHNlZWsNCj4+Pj4gYXQgYWxsLg0KPj4+Pg0K
+Pj4+PiBTbywgbGV0J3MgIjVkYWE3NGE2ZWJjIiBieSBkZWZhdWx0LCBsZWF2aW5nIGFuIG9wdGlv
+biB0byByZXR1cm4NCj4+Pj4gcHJldmlvdXMgYmVoYXZpb3IsIHdoaWNoIGlzIG5lZWRlZCBmb3Ig
+c2NlbmFyaW9zIHdpdGggcHJlYWxsb2NhdGVkDQo+Pj4+IGltYWdlcy4NCj4+Pj4NCj4+Pj4gQWRk
+IGlvdGVzdCBpbGx1c3RyYXRpbmcgbmV3IG9wdGlvbiBzZW1hbnRpY3MuDQo+Pj4+DQo+Pj4+IFNp
+Z25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmly
+dHVvenpvLmNvbT4NCj4+Pg0KPj4+IEkgc3RpbGwgdGhpbmsgdGhhdCBhbiBvcHRpb24gaXNuJ3Qg
+YSBnb29kIHNvbHV0aW9uIGFuZCB3ZSBzaG91bGQgdHJ5IHVzZQ0KPj4+IHNvbWUgaGV1cmlzdGlj
+cyBpbnN0ZWFkLg0KPj4NCj4+IERvIHlvdSB0aGluayB0aGF0IGhldXJpc3RpY3Mgd291bGQgYmUg
+YmV0dGVyIHRoYW4gZmFpciBjYWNoZSBmb3IgbHNlZWsNCj4+IHJlc3VsdHM/DQo+IA0KPiBJIGRv
+bid0IHRoaW5rIGxzZWVrKCkgcmVzdWx0cyBhcmUgY2FjaGFibGUsIGF0IGxlYXN0IGZvciBpbWFn
+ZXMgdGhhdCBjYW4NCj4gc2hhcmUgQkxLX1BFUk1fV1JJVEUgYmV0d2VlbiBwcm9jZXNzZXMuDQo+
+IA0KPj4gSSBkb24ndCBzZWUgZ29vZCBoZXVyaXN0aWNzLCBuZWl0aGVyIHdhbnQgdG8gaW1wbGVt
+ZW50IGxzZWVrIG9wdGltaXphdGlvbnMuDQo+PiBJbiBvdXIgY2FzZXMgd2UgZG9uJ3QgbmVlZCBs
+c2VlayB1bmRlciBxY293MiBhdCBhbGwsIGFuZCBpdCdzIG9idmlvdXNseSBiZXR0ZXINCj4+IGp1
+c3QgZG9uJ3QgbHNlZWsgaW4gdGhlc2UgY2FzZXMuDQo+IA0KPiBJIHN1Z2dlc3RlZCBvbmU6IFBh
+c3MgbGFyZ2UgY29udGlndW91cyBhbGxvY2F0ZWQgcmFuZ2VzIHRvIHRoZSBwcm90b2NvbA0KPiBk
+cml2ZXIsIGJ1dCBqdXN0IGFzc3VtZSB0aGF0IHRoZSBhbGxvY2F0aW9uIHN0YXR1cyBpcyBjb3Jy
+ZWN0IGluIHRoZQ0KPiBmb3JtYXQgbGF5ZXIgaWYgdGhleSBhcmUgc21hbGwuDQoNClNvLCBmb3Ig
+ZnVsbHkgYWxsb2NhdGVkIGltYWdlLCB3ZSB3aWxsIGNhbGwgbHNlZWsgYWx3YXlzPw0KDQo+IA0K
+Pj4gTW9yZW92ZXIsIGFzIEkgdW5kZXJzdGFuZCwgdGhlIGNhc2VzIHdoZW4gd2UgbmVlZCBsc2Vl
+ayBhcmUgdGhvc2Ugd2hlbiBxY293MiB0aGlua3MNCj4+IHRoYXQgdGhlIGNsdXN0ZXIgaXMgZGF0
+YSwgYnV0IGFjdHVhbGx5IGl0J3MgYSBob2xlIG9uIGZzLi4uIElzbid0IGl0IGJldHRlciB0bw0K
+Pj4gc3VwcG9ydCB0aGlzIHRoaW5nIGluIHFjb3cyPyBBIGtpbmQgb2YgYWxsb2NhdGVkLXplcm9l
+cyBjbHVzdGVyPyBXZSBoYXZlIGVub3VnaA0KPj4gcmVzZXJ2ZWQgYml0cyBpbiBjbHVzdGVyIGRl
+c2NyaXB0b3IgdG8gYWRkIHRoaXMgZmVhdHVyZS4gQW5kIHRoYW4gd2UgZG9uJ3QgbmVlZA0KPj4g
+dGhpcyBraW5kIG9mIGNoZWF0aW5nIHdoZW4gdXNlciAiYmV0dGVyIGtub3dzIiB3aGVyZSBhcmUg
+aG9sZXMgdGhhbiBmb3JtYXQgbGF5ZXINCj4+IHdoaWNoIG93bnMgdGhlIGRhdGEuLg0KPiANCj4g
+VGhlIHBvaW50IG9mIG1ldGFkYXRhIHByZWFsbG9jYXRpb24gaXMgdGhhdCB5b3UgZG9uJ3QgaGF2
+ZSB0byB1cGRhdGUgdGhlDQo+IG1ldGFkYXRhIHdoZW4geW91IHdyaXRlIHRvIHRoZSBpbWFnZS4g
+SGF2aW5nIHRvIGNsZWFyIGEgYml0IGluIHRoZSBMMg0KPiBlbnRyeSB3b3VsZCBuZWdhdGUgdGhh
+dC4NCj4gDQo+IE1heWJlIGFub3RoZXIgb3B0aW9uIHdvdWxkIGJlIHRvIHVzZSBhIGNvbXBhdGli
+bGUgZmVhdHVyZSBmbGFnIGluIHFjb3cyDQo+IHRoYXQgaXMgc2V0IGR1cmluZyBjcmVhdGlvbiB3
+aXRoIHByZWFsbG9jYXRpb249bWV0YWRhdGEsIGFuZCB3ZSB3b3VsZA0KPiBvbmx5IGdvIHRvIHRo
+ZSBsb3dlciBsYXllciBpZiB0aGUgZmxhZyBpcyBzZXQuIFRoZSBkb3duc2lkZSBzaWRlIGlzIHRo
+YXQNCj4gdGhpcyB3b3VsZCBvbmx5IGJlIGVmZmVjdGl2ZSBmb3IgbmV3IGltYWdlcywgc28gY29w
+eWluZyBvbGQgcHJlYWxsb2NhdGVkDQo+IGltYWdlcyB3b3VsZCBiZSBzbG93ZWQgZG93biBjb25z
+aWRlcmFibHkuDQo+IA0KPiBLZXZpbg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
+bWlyDQo=
