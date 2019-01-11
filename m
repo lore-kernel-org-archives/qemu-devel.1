@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56273)
+Received: from eggs.gnu.org ([209.51.188.92]:58167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghy9K-0006vk-Ja
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:51:09 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ghyIq-0001lJ-Ai
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghy9H-0004Iv-RV
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:51:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghy9H-0004IY-Hw
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:51:03 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B462DAAA8C
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:51:02 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 11 Jan 2019 15:50:58 +0100
-Message-Id: <20190111145058.26715-2-pbonzini@redhat.com>
-In-Reply-To: <20190111145058.26715-1-pbonzini@redhat.com>
-References: <20190111145058.26715-1-pbonzini@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1ghyIm-0000aP-T7
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:00:54 -0500
+References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
+	<1542006398-30037-3-git-send-email-marcolso@amazon.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <72fed418-fb20-28cd-aa34-e1df84a9cba4@redhat.com>
+Date: Fri, 11 Jan 2019 16:00:37 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/35] test: replace gtester with a TAP driver
+In-Reply-To: <1542006398-30037-3-git-send-email-marcolso@amazon.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0qSaiP86cfacCb0Xe0CmEP5Dz2Da8JtZq"
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] blkdebug: Add latency injection
+ rule type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,745 +25,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Marc Olson <marcolso@amazon.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-gtester is deprecated by upstream glib (see for example the announcement
-at https://blog.gtk.org/2018/07/11/news-from-glib-2-58/) and it does
-not support tests that call g_test_skip in some glib stable releases.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0qSaiP86cfacCb0Xe0CmEP5Dz2Da8JtZq
+From: Max Reitz <mreitz@redhat.com>
+To: Marc Olson <marcolso@amazon.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <72fed418-fb20-28cd-aa34-e1df84a9cba4@redhat.com>
+Subject: Re: [PATCH v3 3/3] blkdebug: Add latency injection rule type
+References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
+ <1542006398-30037-3-git-send-email-marcolso@amazon.com>
+In-Reply-To: <1542006398-30037-3-git-send-email-marcolso@amazon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-glib suggests instead using Automake's TAP support, which gtest itself
-supports since version 2.38 (QEMU's minimum requirement is 2.40).
-We do not support Automake, but we can use Automake's code to beautify
-the TAP output.  I chose to use the Perl copy rather than the shell/awk
-one, with some changes so that it can accept TAP through stdin, in order
-to reuse Perl's TAP parsing package.  This also avoids duplicating the
-parser between tap-driver.pl and tap-merge.pl.
+On 12.11.18 08:06, Marc Olson wrote:
+> Add a new rule type for blkdebug that instead of returning an error, ca=
+n
+> inject latency to an IO.
+>=20
+> Signed-off-by: Marc Olson <marcolso@amazon.com>
+> ---
+>  block/blkdebug.c           | 79 ++++++++++++++++++++++++++++++++++++++=
++++++---
+>  docs/devel/blkdebug.txt    | 35 ++++++++++++++------
+>  qapi/block-core.json       | 31 ++++++++++++++++++
+>  tests/qemu-iotests/071     | 63 ++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/071.out | 31 ++++++++++++++++++
+>  5 files changed, 226 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/block/blkdebug.c b/block/blkdebug.c
+> index 7739849..6b1f2d6 100644
+> --- a/block/blkdebug.c
+> +++ b/block/blkdebug.c
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543513531-1151-3-git-send-email-pbonzini@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- rules.mak                               |   4 +-
- scripts/gtester-cat                     |  26 --
- scripts/tap-driver.pl                   | 378 ++++++++++++++++++++++++
- scripts/tap-merge.pl                    | 110 +++++++
- tests/Makefile.include                  |  75 +++--
- tests/docker/dockerfiles/centos7.docker |   1 +
- tests/docker/dockerfiles/fedora.docker  |   1 +
- 7 files changed, 543 insertions(+), 52 deletions(-)
- delete mode 100755 scripts/gtester-cat
- create mode 100755 scripts/tap-driver.pl
- create mode 100755 scripts/tap-merge.pl
+[...]
 
-diff --git a/rules.mak b/rules.mak
-index bbb2667928..86e033d815 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -132,7 +132,9 @@ modules:
- #  otherwise print the 'quiet' output in the format "  NAME     args to =
-print"
- # NAME should be a short name of the command, 7 letters or fewer.
- # If called with only a single argument, will print nothing in quiet mod=
-e.
--quiet-command =3D $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && =
-$1, @$1))
-+quiet-command-run =3D $(if $(V),,$(if $2,printf "  %-7s %s\n" $2 $3 && )=
-)$1
-+quiet-@ =3D $(if $(V),,@)
-+quiet-command =3D $(quiet-@)$(call quiet-command-run,$1,$2,$3)
-=20
- # cc-option
- # Usage: CFLAGS+=3D$(call cc-option, -falign-functions=3D0, -malign-func=
-tions=3D0)
-diff --git a/scripts/gtester-cat b/scripts/gtester-cat
-deleted file mode 100755
-index 061a952cad..0000000000
---- a/scripts/gtester-cat
-+++ /dev/null
-@@ -1,26 +0,0 @@
--#!/bin/sh
--#
--# Copyright IBM, Corp. 2012
--#
--# Authors:
--#  Anthony Liguori <aliguori@us.ibm.com>
--#
--# This work is licensed under the terms of the GNU GPLv2 or later.
--# See the COPYING file in the top-level directory.
--
--cat <<EOF
--<?xml version=3D"1.0"?>
--<gtester>
-- <info>
--  <package>qemu</package>
--  <version>0.0</version>
--  <revision>rev</revision>
-- </info>
--EOF
--
--sed \
--  -e '/<?xml/d' \
--  -e '/^<gtester>$/d' \
--  -e '/<info>/,/<\/info>/d' \
--  -e '$b' \
--  -e '/^<\/gtester>$/d' "$@"
-diff --git a/scripts/tap-driver.pl b/scripts/tap-driver.pl
-new file mode 100755
-index 0000000000..5e59b5db49
---- /dev/null
-+++ b/scripts/tap-driver.pl
-@@ -0,0 +1,378 @@
-+#! /usr/bin/env perl
-+# Copyright (C) 2011-2013 Free Software Foundation, Inc.
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2, or (at your option)
-+# any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+
-+# As a special exception to the GNU General Public License, if you
-+# distribute this file as part of a program that contains a
-+# configuration script generated by Autoconf, you may include it under
-+# the same distribution terms that you use for the rest of that program.
-+
-+# ---------------------------------- #
-+#  Imports, static data, and setup.  #
-+# ---------------------------------- #
-+
-+use warnings FATAL =3D> 'all';
-+use strict;
-+use Getopt::Long ();
-+use TAP::Parser;
-+use Term::ANSIColor qw(:constants);
-+
-+my $ME =3D "tap-driver.pl";
-+my $VERSION =3D "2018-11-30";
-+
-+my $USAGE =3D <<'END';
-+Usage:
-+  tap-driver [--test-name=3DTEST] [--color=3D{always|never|auto}]
-+             [--verbose] [--show-failures-only]
-+END
-+
-+my $HELP =3D "$ME: TAP-aware test driver for QEMU testsuite harness." .
-+           "\n" . $USAGE;
-+
-+# It's important that NO_PLAN evaluates "false" as a boolean.
-+use constant NO_PLAN =3D> 0;
-+use constant EARLY_PLAN =3D> 1;
-+use constant LATE_PLAN =3D> 2;
-+
-+use constant DIAG_STRING =3D> "#";
-+
-+# ------------------- #
-+#  Global variables.  #
-+# ------------------- #
-+
-+my $testno =3D 0;     # Number of test results seen so far.
-+my $bailed_out =3D 0; # Whether a "Bail out!" directive has been seen.
-+my $failed =3D 0;     # Final exit code
-+
-+# Whether the TAP plan has been seen or not, and if yes, which kind
-+# it is ("early" is seen before any test result, "late" otherwise).
-+my $plan_seen =3D NO_PLAN;
-+
-+# ----------------- #
-+#  Option parsing.  #
-+# ----------------- #
-+
-+my %cfg =3D (
-+  "color" =3D> 0,
-+  "verbose" =3D> 0,
-+  "show-failures-only" =3D> 0,
-+);
-+
-+my $color =3D "auto";
-+my $test_name =3D undef;
-+
-+# Perl's Getopt::Long allows options to take optional arguments after a =
-space.
-+# Prevent --color by itself from consuming other arguments
-+foreach (@ARGV) {
-+  if ($_ eq "--color" || $_ eq "-color") {
-+    $_ =3D "--color=3D$color";
-+  }
-+}
-+
-+Getopt::Long::GetOptions
-+  (
-+    'help' =3D> sub { print $HELP; exit 0; },
-+    'version' =3D> sub { print "$ME $VERSION\n"; exit 0; },
-+    'test-name=3Ds' =3D> \$test_name,
-+    'color=3Ds'  =3D> \$color,
-+    'show-failures-only' =3D> sub { $cfg{"show-failures-only"} =3D 1; },
-+    'verbose' =3D> sub { $cfg{"verbose"} =3D 1; },
-+  ) or exit 1;
-+
-+if ($color =3D~ /^always$/i) {
-+  $cfg{'color'} =3D 1;
-+} elsif ($color =3D~ /^never$/i) {
-+  $cfg{'color'} =3D 0;
-+} elsif ($color =3D~ /^auto$/i) {
-+  $cfg{'color'} =3D (-t STDOUT);
-+} else {
-+  die "Invalid color mode: $color\n";
-+}
-+
-+# ------------- #
-+#  Prototypes.  #
-+# ------------- #
-+
-+sub colored ($$);
-+sub decorate_result ($);
-+sub extract_tap_comment ($);
-+sub handle_tap_bailout ($);
-+sub handle_tap_plan ($);
-+sub handle_tap_result ($);
-+sub is_null_string ($);
-+sub main ();
-+sub report ($;$);
-+sub stringify_result_obj ($);
-+sub testsuite_error ($);
-+
-+# -------------- #
-+#  Subroutines.  #
-+# -------------- #
-+
-+# If the given string is undefined or empty, return true, otherwise
-+# return false.  This function is useful to avoid pitfalls like:
-+#   if ($message) { print "$message\n"; }
-+# which wouldn't print anything if $message is the literal "0".
-+sub is_null_string ($)
-+{
-+  my $str =3D shift;
-+  return ! (defined $str and length $str);
-+}
-+
-+sub stringify_result_obj ($)
-+{
-+  my $result_obj =3D shift;
-+  if ($result_obj->is_unplanned || $result_obj->number !=3D $testno)
-+    {
-+      return "ERROR";
-+    }
-+  elsif ($plan_seen =3D=3D LATE_PLAN)
-+    {
-+      return "ERROR";
-+    }
-+  elsif (!$result_obj->directive)
-+    {
-+      return $result_obj->is_ok ? "PASS" : "FAIL";
-+    }
-+  elsif ($result_obj->has_todo)
-+    {
-+      return $result_obj->is_actual_ok ? "XPASS" : "XFAIL";
-+    }
-+  elsif ($result_obj->has_skip)
-+    {
-+      return $result_obj->is_ok ? "SKIP" : "FAIL";
-+    }
-+  die "$ME: INTERNAL ERROR"; # NOTREACHED
-+}
-+
-+sub colored ($$)
-+{
-+  my ($color_string, $text) =3D @_;
-+  return $color_string . $text . RESET;
-+}
-+
-+sub decorate_result ($)
-+{
-+  my $result =3D shift;
-+  return $result unless $cfg{"color"};
-+  my %color_for_result =3D
-+    (
-+      "ERROR" =3D> BOLD.MAGENTA,
-+      "PASS"  =3D> GREEN,
-+      "XPASS" =3D> BOLD.YELLOW,
-+      "FAIL"  =3D> BOLD.RED,
-+      "XFAIL" =3D> YELLOW,
-+      "SKIP"  =3D> BLUE,
-+    );
-+  if (my $color =3D $color_for_result{$result})
-+    {
-+      return colored ($color, $result);
-+    }
-+  else
-+    {
-+      return $result; # Don't colorize unknown stuff.
-+    }
-+}
-+
-+sub report ($;$)
-+{
-+  my ($msg, $result, $explanation) =3D (undef, @_);
-+  if ($result =3D~ /^(?:X?(?:PASS|FAIL)|SKIP|ERROR)/)
-+    {
-+      # Output on console might be colorized.
-+      $msg =3D decorate_result($result);
-+      if ($result =3D~ /^(?:PASS|XFAIL|SKIP)/)
-+        {
-+          return if $cfg{"show-failures-only"};
-+        }
-+      else
-+        {
-+          $failed =3D 1;
-+        }
-+    }
-+  elsif ($result eq "#")
-+    {
-+      $msg =3D "  ";
-+    }
-+  else
-+    {
-+      die "$ME: INTERNAL ERROR"; # NOTREACHED
-+    }
-+  $msg .=3D " $explanation" if defined $explanation;
-+  print $msg . "\n";
-+}
-+
-+sub testsuite_error ($)
-+{
-+  report "ERROR", "- $_[0]";
-+}
-+
-+sub handle_tap_result ($)
-+{
-+  $testno++;
-+  my $result_obj =3D shift;
-+
-+  my $test_result =3D stringify_result_obj $result_obj;
-+  my $string =3D $result_obj->number;
-+
-+  my $description =3D $result_obj->description;
-+  $string .=3D " $test_name" unless is_null_string $test_name;
-+  $string .=3D " $description" unless is_null_string $description;
-+
-+  if ($plan_seen =3D=3D LATE_PLAN)
-+    {
-+      $string .=3D " # AFTER LATE PLAN";
-+    }
-+  elsif ($result_obj->is_unplanned)
-+    {
-+      $string .=3D " # UNPLANNED";
-+    }
-+  elsif ($result_obj->number !=3D $testno)
-+    {
-+      $string .=3D " # OUT-OF-ORDER (expecting $testno)";
-+    }
-+  elsif (my $directive =3D $result_obj->directive)
-+    {
-+      $string .=3D " # $directive";
-+      my $explanation =3D $result_obj->explanation;
-+      $string .=3D " $explanation"
-+        unless is_null_string $explanation;
-+    }
-+
-+  report $test_result, $string;
-+}
-+
-+sub handle_tap_plan ($)
-+{
-+  my $plan =3D shift;
-+  if ($plan_seen)
-+    {
-+      # Error, only one plan per stream is acceptable.
-+      testsuite_error "multiple test plans";
-+      return;
-+    }
-+  # The TAP plan can come before or after *all* the TAP results; we spea=
-k
-+  # respectively of an "early" or a "late" plan.  If we see the plan lin=
-e
-+  # after at least one TAP result has been seen, assume we have a late
-+  # plan; in this case, any further test result seen after the plan will
-+  # be flagged as an error.
-+  $plan_seen =3D ($testno >=3D 1 ? LATE_PLAN : EARLY_PLAN);
-+  # If $testno > 0, we have an error ("too many tests run") that will be
-+  # automatically dealt with later, so don't worry about it here.  If
-+  # $plan_seen is true, we have an error due to a repeated plan, and tha=
-t
-+  # has already been dealt with above.  Otherwise, we have a valid "plan
-+  # with SKIP" specification, and should report it as a particular kind
-+  # of SKIP result.
-+  if ($plan->directive && $testno =3D=3D 0)
-+    {
-+      my $explanation =3D is_null_string ($plan->explanation) ?
-+                        undef : "- " . $plan->explanation;
-+      report "SKIP", $explanation;
-+    }
-+}
-+
-+sub handle_tap_bailout ($)
-+{
-+  my ($bailout, $msg) =3D ($_[0], "Bail out!");
-+  $bailed_out =3D 1;
-+  $msg .=3D " " . $bailout->explanation
-+    unless is_null_string $bailout->explanation;
-+  testsuite_error $msg;
-+}
-+
-+sub extract_tap_comment ($)
-+{
-+  my $line =3D shift;
-+  if (index ($line, DIAG_STRING) =3D=3D 0)
-+    {
-+      # Strip leading `DIAG_STRING' from `$line'.
-+      $line =3D substr ($line, length (DIAG_STRING));
-+      # And strip any leading and trailing whitespace left.
-+      $line =3D~ s/(?:^\s*|\s*$)//g;
-+      # Return what is left (if any).
-+      return $line;
-+    }
-+  return "";
-+}
-+
-+sub main ()
-+{
-+  my $iterator =3D TAP::Parser::Iterator::Stream->new(\*STDIN);
-+  my $parser =3D TAP::Parser->new ({iterator =3D> $iterator });
-+
-+  while (defined (my $cur =3D $parser->next))
-+    {
-+      # Parsing of TAP input should stop after a "Bail out!" directive.
-+      next if $bailed_out;
-+
-+      if ($cur->is_plan)
-+        {
-+          handle_tap_plan ($cur);
-+        }
-+      elsif ($cur->is_test)
-+        {
-+          handle_tap_result ($cur);
-+        }
-+      elsif ($cur->is_bailout)
-+        {
-+          handle_tap_bailout ($cur);
-+        }
-+      elsif ($cfg{"verbose"})
-+        {
-+          my $comment =3D extract_tap_comment ($cur->raw);
-+          report "#", "$comment" if length $comment;
-+       }
-+    }
-+  # A "Bail out!" directive should cause us to ignore any following TAP
-+  # error.
-+  if (!$bailed_out)
-+    {
-+      if (!$plan_seen)
-+        {
-+          testsuite_error "missing test plan";
-+        }
-+      elsif ($parser->tests_planned !=3D $parser->tests_run)
-+        {
-+          my ($planned, $run) =3D ($parser->tests_planned, $parser->test=
-s_run);
-+          my $bad_amount =3D $run > $planned ? "many" : "few";
-+          testsuite_error (sprintf "too %s tests run (expected %d, got %=
-d)",
-+                                   $bad_amount, $planned, $run);
-+        }
-+    }
-+}
-+
-+# ----------- #
-+#  Main code. #
-+# ----------- #
-+
-+main;
-+exit($failed);
-+
-+# Local Variables:
-+# perl-indent-level: 2
-+# perl-continued-statement-offset: 2
-+# perl-continued-brace-offset: 0
-+# perl-brace-offset: 0
-+# perl-brace-imaginary-offset: 0
-+# perl-label-offset: -2
-+# cperl-indent-level: 2
-+# cperl-brace-offset: 0
-+# cperl-continued-brace-offset: 0
-+# cperl-label-offset: -2
-+# cperl-extra-newline-before-brace: t
-+# cperl-merge-trailing-else: nil
-+# cperl-continued-statement-offset: 2
-+# End:
-diff --git a/scripts/tap-merge.pl b/scripts/tap-merge.pl
-new file mode 100755
-index 0000000000..59e3fa5007
---- /dev/null
-+++ b/scripts/tap-merge.pl
-@@ -0,0 +1,110 @@
-+#! /usr/bin/env perl
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# Author: Paolo Bonzini <pbonzini@redhat.com>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2, or (at your option)
-+# any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-+
-+# ---------------------------------- #
-+#  Imports, static data, and setup.  #
-+# ---------------------------------- #
-+
-+use warnings FATAL =3D> 'all';
-+use strict;
-+use Getopt::Long ();
-+use TAP::Parser;
-+
-+my $ME =3D "tap-merge.pl";
-+my $VERSION =3D "2018-11-30";
-+
-+my $HELP =3D "$ME: merge multiple TAP inputs from stdin.";
-+
-+use constant DIAG_STRING =3D> "#";
-+
-+# ----------------- #
-+#  Option parsing.  #
-+# ----------------- #
-+
-+Getopt::Long::GetOptions
-+  (
-+    'help' =3D> sub { print $HELP; exit 0; },
-+    'version' =3D> sub { print "$ME $VERSION\n"; exit 0; },
-+  );
-+
-+# -------------- #
-+#  Subroutines.  #
-+# -------------- #
-+
-+sub main ()
-+{
-+  my $iterator =3D TAP::Parser::Iterator::Stream->new(\*STDIN);
-+  my $parser =3D TAP::Parser->new ({iterator =3D> $iterator });
-+  my $testno =3D 0;     # Number of test results seen so far.
-+  my $bailed_out =3D 0; # Whether a "Bail out!" directive has been seen.
-+
-+  while (defined (my $cur =3D $parser->next))
-+    {
-+      if ($cur->is_bailout)
-+        {
-+          $bailed_out =3D 1;
-+          print DIAG_STRING . " " . $cur->as_string . "\n";
-+          next;
-+        }
-+      elsif ($cur->is_plan)
-+        {
-+          $bailed_out =3D 0;
-+          next;
-+        }
-+      elsif ($cur->is_test)
-+        {
-+          $bailed_out =3D 0 if $cur->number =3D=3D 1;
-+          $testno++;
-+          $cur =3D TAP::Parser::Result::Test->new({
-+                          ok =3D> $cur->ok,
-+                          test_num =3D> $testno,
-+                          directive =3D> $cur->directive,
-+                          explanation =3D> $cur->explanation,
-+                          description =3D> $cur->description
-+                  });
-+        }
-+      elsif ($cur->is_version)
-+        {
-+          next if $testno > 0;
-+        }
-+      print $cur->as_string . "\n" unless $bailed_out;
-+    }
-+  print "1..$testno\n";
-+}
-+
-+# ----------- #
-+#  Main code. #
-+# ----------- #
-+
-+main;
-+
-+# Local Variables:
-+# perl-indent-level: 2
-+# perl-continued-statement-offset: 2
-+# perl-continued-brace-offset: 0
-+# perl-brace-offset: 0
-+# perl-brace-imaginary-offset: 0
-+# perl-label-offset: -2
-+# cperl-indent-level: 2
-+# cperl-brace-offset: 0
-+# cperl-continued-brace-offset: 0
-+# cperl-label-offset: -2
-+# cperl-extra-newline-before-brace: t
-+# cperl-merge-trailing-else: nil
-+# cperl-continued-statement-offset: 2
-+# End:
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 9c84bbd829..c17f6d5dfa 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -810,41 +810,68 @@ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
- tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
-=20
- SPEED =3D quick
--GTESTER_OPTIONS =3D -k $(if $(V),--verbose,-q)
--GCOV_OPTIONS =3D -n $(if $(V),-f,)
-=20
- # gtester tests, possibly with verbose output
-+# do_test_tap runs all tests, even if some of them fail, while do_test_h=
-uman
-+# stops at the first failure unless -k is given on the command line
-+
-+define do_test_human_k
-+        $(quiet-@)rc=3D0; $(foreach COMMAND, $1, \
-+          $(call quiet-command-run, \
-+            export MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:=
--0} % 255 + 1))} $2; \
-+              $(COMMAND) -m=3D$(SPEED) -k --tap < /dev/null \
-+              | ./scripts/tap-driver.pl --test-name=3D"$(notdir $(COMMAN=
-D))" $(if $(V),, --show-failures-only) \
-+              || rc=3D$$?;, "TEST", "$@: $(COMMAND)")) exit $$rc
-+endef
-+define do_test_human_no_k
-+        $(foreach COMMAND, $1, \
-+          $(call quiet-command, \
-+            MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 2=
-55 + 1))} $2 \
-+              $(COMMAND) -m=3D$(SPEED) -k --tap < /dev/null \
-+              | ./scripts/tap-driver.pl --test-name=3D"$(notdir $(COMMAN=
-D))" $(if $(V),, --show-failures-only), \
-+              "TEST", "$@: $(COMMAND)")
-+)
-+endef
-+do_test_human =3D \
-+        $(if $(findstring k, $(MAKEFLAGS)), $(do_test_human_k), $(do_tes=
-t_human_no_k))
-+
-+define do_test_tap
-+	$(call quiet-command, \
-+          { export MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:=
--0} % 255 + 1))} $2; \
-+            $(foreach COMMAND, $1, \
-+	      $(COMMAND) -m=3D$(SPEED) -k --tap < /dev/null \
-+	      | sed "s/^[a-z][a-z]* [0-9]* /&$(notdir $(COMMAND)) /" || true; )=
- } \
-+	      | ./scripts/tap-merge.pl | tee "$@" \
-+	      | ./scripts/tap-driver.pl $(if $(V),, --show-failures-only), \
-+	  "TAP","$@")
-+endef
-=20
- .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
- $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-=
-softmmu $(check-qtest-y)
--	$(call quiet-command,QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
--		QTEST_QEMU_IMG=3Dqemu-img$(EXESUF) \
--		MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} =
-\
--		gtester $(GTESTER_OPTIONS) -m=3D$(SPEED) $(check-qtest-$*-y) $(check-q=
-test-generic-y),"GTESTER","$@")
-+	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
-+	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
-+	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
-=20
--.PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
--$(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
--	$(call quiet-command, \
--		MALLOC_PERTURB_=3D$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} =
-\
--		gtester $(GTESTER_OPTIONS) -m=3D$(SPEED) $*,"GTESTER","$*")
-+check-unit: $(check-unit-y)
-+	$(call do_test_human, $^)
-=20
--# gtester tests with XML output
-+check-speed: $(check-speed-y)
-+	$(call do_test_human, $^)
-=20
--$(patsubst %, check-report-qtest-%.xml, $(QTEST_TARGETS)): check-report-=
-qtest-%.xml: $(check-qtest-y)
--	$(call quiet-command,QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
--		QTEST_QEMU_IMG=3Dqemu-img$(EXESUF) \
--	  gtester -q $(GTESTER_OPTIONS) -o $@ -m=3D$(SPEED) $(check-qtest-$*-y)=
- $(check-qtest-generic-y),"GTESTER","$@")
-+# gtester tests with TAP output
-=20
--check-report-unit.xml: $(check-unit-y)
--	$(call quiet-command,gtester -q $(GTESTER_OPTIONS) -o $@ -m=3D$(SPEED) =
-$^,"GTESTER","$@")
-+$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
-qtest-%.tap: $(check-qtest-y)
-+	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
-+	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
-+	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
-=20
--# Reports and overall runs
-+check-report-unit.tap: $(check-unit-y)
-+	$(call do_test_tap,$^)
-=20
--check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS=
-)) check-report-unit.xml
--	$(call quiet-command,$(SRC_PATH)/scripts/gtester-cat $^ > $@,"GEN","$@"=
-)
-+# Reports and overall runs
-=20
--check-report.html: check-report.xml
--	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
-+check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS=
-)) check-report-unit.tap
-+	$(call quiet-command,./scripts/tap-merge.py $^ > $@,"GEN","$@")
-=20
- # Per guest TCG tests
-=20
-@@ -959,8 +986,6 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
- .PHONY: check-qapi-schema check-qtest check-unit check check-clean
- check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-t=
-ests/qapi-schema/doc-good.texi
- check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
--check-unit: $(patsubst %,check-%, $(check-unit-y))
--check-speed: $(patsubst %,check-%, $(check-speed-y))
- check-block: $(patsubst %,check-%, $(check-block-y))
- check: check-qapi-schema check-unit check-qtest check-decodetree
- check-clean:
-diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/docke=
-rfiles/centos7.docker
-index 0a04bfbed8..e0f18f5a41 100644
---- a/tests/docker/dockerfiles/centos7.docker
-+++ b/tests/docker/dockerfiles/centos7.docker
-@@ -22,6 +22,7 @@ ENV PACKAGES \
-     mesa-libEGL-devel \
-     mesa-libgbm-devel \
-     nettle-devel \
-+    perl-Test-Harness \
-     pixman-devel \
-     SDL-devel \
-     spice-glib-devel \
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
-files/fedora.docker
-index 0c4eb9e49c..1d0e3dc4ec 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -70,6 +70,7 @@ ENV PACKAGES \
-     nss-devel \
-     numactl-devel \
-     perl \
-+    perl-Test-Harness \
-     pixman-devel \
-     python3 \
-     PyYAML \
---=20
-2.20.1
+> @@ -194,6 +227,11 @@ static int add_rule(void *opaque, QemuOpts *opts, =
+Error **errp)
+>              qemu_opt_get_bool(opts, "immediately", 0);
+>          break;
+> =20
+> +    case ACTION_INJECT_DELAY:
+> +        rule->options.delay.latency =3D
+> +            qemu_opt_get_number(opts, "latency", 100) * SCALE_US;
+
+Why the default of 100?  I think it would be best if this option were
+mandatory.
+
+> +        break;
+> +
+>      case ACTION_SET_STATE:
+>          rule->options.set_state.new_state =3D
+>              qemu_opt_get_number(opts, "new_state", 0);
+
+[...]
+
+> @@ -484,20 +538,36 @@ static int rule_check(BlockDriverState *bs, uint6=
+4_t offset, uint64_t bytes)
+>              (bytes && rule->offset >=3D offset &&
+>               rule->offset < offset + bytes))
+>          {
+> -            if (rule->action =3D=3D ACTION_INJECT_ERROR) {
+> +            if (!error_rule && rule->action =3D=3D ACTION_INJECT_ERROR=
+) {
+>                  error_rule =3D rule;
+> +            } else if (!delay_rule && rule->action =3D=3D ACTION_INJEC=
+T_DELAY) {
+> +                delay_rule =3D rule;
+> +            }
+> +
+
+How about handling "once" here?
+
+(by adding:
+
+else {
+    continue;
+}
+
+if (rule->once) {
+    remove_active_rule(s, rule);
+}
+
+and making the QSIMPLEQ_FOREACH a QSIMPLEQ_FOREACH_SAFE.
+
+(Or maybe in that case we want to inline remove_active_rule().))
+
+It isn't like the state here is too bad, but if we can't handle "once"
+in a common code path, I'm torn whether it has a place in the
+BlkdebugRule root.  (Doing that makes parsing a bit easier, but OTOH we
+just shouldn't parse it for set-state at all, so I'd keep it in the
+"unionized structs" if it isn't handled in a common code path.)
+
+> +            if (error_rule && delay_rule) {
+>                  break;
+>              }
+>          }
+>      }
+> =20
+> +    if (delay_rule) {
+> +        latency =3D delay_rule->options.delay.latency;
+> +
+> +        if (delay_rule->once) {
+> +            remove_active_rule(s, delay_rule);
+> +        }
+> +
+> +        if (latency !=3D 0) {
+> +            qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, latency);
+> +        }
+> +    }
+> +
+>      if (error_rule) {
+>          immediately =3D error_rule->options.inject_error.immediately;
+>          error =3D error_rule->options.inject_error.error;
+> =20
+>          if (error_rule->once) {
+> -            QSIMPLEQ_REMOVE(&s->active_rules, error_rule, BlkdebugRule=
+, active_next);
+> -            remove_rule(error_rule);
+> +            remove_active_rule(s, error_rule);
+>          }
+> =20
+>          if (error && !immediately) {
+
+[...]
+
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index d4fe710..72f7861 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3057,6 +3057,34 @@
+>              '*immediately': 'bool' } }
+> =20
+>  ##
+> +# @BlkdebugDelayOptions:
+> +#
+> +# Describes a single latency injection for blkdebug.
+> +#
+> +# @event:       trigger event
+> +#
+> +# @state:       the state identifier blkdebug needs to be in to
+> +#               actually trigger the event; defaults to "any"
+> +#
+> +# @latency:     The delay to add to an I/O, in microseconds.
+> +#
+> +# @sector:      specifies the sector index which has to be affected
+> +#               in order to actually trigger the event; defaults to "a=
+ny
+> +#               sector"
+> +#
+> +# @once:        disables further events after this one has been
+> +#               triggered; defaults to false
+> +#
+> +# Since: 3.1
+
+Well, 4.0 now, sorry...
+
+> +##
+> +{ 'struct': 'BlkdebugDelayOptions',
+> +  'data': { 'event': 'BlkdebugEvent',
+> +            '*state': 'int',
+> +            '*latency': 'int',
+
+I'd make this option mandatory.
+
+> +            '*sector': 'int',
+> +            '*once': 'bool' } }
+> +
+> +##
+>  # @BlkdebugSetStateOptions:
+>  #
+>  # Describes a single state-change event for blkdebug.
+> @@ -3115,6 +3143,8 @@
+>  #
+>  # @inject-error:    array of error injection descriptions
+>  #
+> +# @inject-delay:    array of delay injection descriptions
+
+This needs a "(Since 4.0)".
+
+> +#
+>  # @set-state:       array of state-change descriptions
+>  #
+>  # Since: 2.9
+
+[...]
+
+> diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
+> index 48b4955..976f747 100755
+> --- a/tests/qemu-iotests/071
+> +++ b/tests/qemu-iotests/071
+> @@ -100,6 +100,69 @@ $QEMU_IO -c "open -o driver=3D$IMGFMT,file.driver=3D=
+blkdebug,file.inject-error.event
+>           -c 'read -P 42 0x38000 512'
+> =20
+>  echo
+> +echo "=3D=3D=3D Testing blkdebug latency through filename =3D=3D=3D"
+> +echo
+> +
+> +$QEMU_IO -c "open -o file.driver=3Dblkdebug,file.inject-delay.event=3D=
+write_aio,file.inject-delay.latency=3D10000 $TEST_IMG" \
+> +         -c 'aio_write -P 42 0x28000 512' \
+> +         -c 'aio_read -P 42 0x38000 512' \
+> +         | _filter_qemu_io
+> +
+> +echo
+> +echo "=3D=3D=3D Testing blkdebug latency through file blockref =3D=3D=3D=
+"
+> +echo
+> +
+> +$QEMU_IO -c "open -o driver=3D$IMGFMT,file.driver=3Dblkdebug,file.inje=
+ct-delay.event=3Dwrite_aio,file.inject-delay.latency=3D10000,file.image.f=
+ilename=3D$TEST_IMG" \
+> +         -c 'aio_write -P 42 0x28000 512' \
+> +         -c 'aio_read -P 42 0x38000 512' \
+> +         | _filter_qemu_io
+> +
+> +# Using QMP is synchronous by default, so even though we would
+> +# expect reordering due to using the aio_* commands, they are
+> +# not. The purpose of this test is to verify that the driver
+> +# can be setup via QMP, and IO can complete. See the qemu-io
+> +# test above to prove delay functionality
+
+But it doesn't prove that because the output is filtered.  To prove it,
+you'd probably need to use null-co as the protocol (so there is as
+little noise as possible) and then parse the qemu-io output to show that
+the time is always above 10 ms.
+
+I leave it to you whether you'd like to go through that pain.
+
+[...]
+
+> diff --git a/tests/qemu-iotests/071.out b/tests/qemu-iotests/071.out
+> index 1d5e28d..1952990 100644
+> --- a/tests/qemu-iotests/071.out
+> +++ b/tests/qemu-iotests/071.out
+> @@ -36,6 +36,37 @@ read failed: Input/output error
+> =20
+>  read failed: Input/output error
+> =20
+> +=3D=3D=3D Testing blkdebug latency through filename =3D=3D=3D
+> +
+> +read 512/512 bytes at offset 229376
+> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +wrote 512/512 bytes at offset 163840
+> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +
+> +=3D=3D=3D Testing blkdebug latency through file blockref =3D=3D=3D
+> +
+> +read 512/512 bytes at offset 229376
+> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +wrote 512/512 bytes at offset 163840
+> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+
+(As you can see, the output is filtered.)
+
+Max
+
+
+--0qSaiP86cfacCb0Xe0CmEP5Dz2Da8JtZq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw4r5UACgkQ9AfbAGHV
+z0AEzAf9H9mNE1D+8TG4D+qgeninPjr8vx+rrmOWsjt+Kcl5V1rcRImkSJhOJBmS
+1TJLxp+Q9wVhP9r+DVDuAJq8YSRRv9CfUkqXXmyMs/ag9rTb9wVyUvpl0md8JcZd
+aZn9u5RHdp5a/5hD/rHKiRJg0PINWk+/KTzcMsY1j8xsqPuRxXT2T7oTL04wNNw3
+owmZVptliS2gqkAiUnEMDrR8Dkxb/1NYGnuUS8BIqoUjJ7Yw5iW10dab9aYEd4Lc
+eyP+Z6VsMT6OXm9TuK5e8758lrGeMhhWZsZHNf/LPCCFsBYu3dbBBM4Z8gxTqD3o
+cDivCoyCS5AMXgoh+DdJzCcqFY5G+Q==
+=afAk
+-----END PGP SIGNATURE-----
+
+--0qSaiP86cfacCb0Xe0CmEP5Dz2Da8JtZq--
