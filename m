@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52779)
+Received: from eggs.gnu.org ([209.51.188.92]:54746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghn57-0007IG-Ae
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:02:02 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1ghnFK-0001IM-7q
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:12:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghn55-0000Z3-Az
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:02:01 -0500
-References: <20181215135324.152629-1-eblake@redhat.com>
-	<20181215135324.152629-4-eblake@redhat.com>
-	<1ab7fd0f-fc28-6ff0-286e-27b966f85404@virtuozzo.com>
-	<719a11ad-7d01-e401-14c3-3bc4e9f88b54@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <be3b598e-21d1-f90e-d7ed-6324856043c5@redhat.com>
-Date: Thu, 10 Jan 2019 20:56:54 -0600
+	(envelope-from <yang.zhong@intel.com>) id 1ghnFI-0003kW-D4
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:12:34 -0500
+Received: from mga06.intel.com ([134.134.136.31]:1328)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1ghnFE-0003h1-RN
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:12:30 -0500
+Date: Fri, 11 Jan 2019 11:08:45 +0800
+From: Yang Zhong <yang.zhong@intel.com>
+Message-ID: <20190111030845.GB634@yangzhon-Virtual>
+References: <20181227063419.12981-1-yang.zhong@intel.com>
+	<20181227063419.12981-14-yang.zhong@intel.com>
+	<fa9d19df-c373-f647-a732-9fc76d9b2f4b@redhat.com>
+	<20190108080426.GB27840@yangzhon-Virtual>
+	<f5bb53e6-0ba0-57e5-f917-4c25ed53b562@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <719a11ad-7d01-e401-14c3-3bc4e9f88b54@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="tgIJfTFDiXQLDMrBuKzqSRnOPaLX2mVxs"
-Subject: Re: [Qemu-devel] [PATCH v2 03/22] maint: Allow for EXAMPLES in
- texi2pod
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f5bb53e6-0ba0-57e5-f917-4c25ed53b562@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 13/25] scsi: express dependencies with
+ Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, yang.zhong@intel.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tgIJfTFDiXQLDMrBuKzqSRnOPaLX2mVxs
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Message-ID: <be3b598e-21d1-f90e-d7ed-6324856043c5@redhat.com>
-Subject: Re: [PATCH v2 03/22] maint: Allow for EXAMPLES in texi2pod
-References: <20181215135324.152629-1-eblake@redhat.com>
- <20181215135324.152629-4-eblake@redhat.com>
- <1ab7fd0f-fc28-6ff0-286e-27b966f85404@virtuozzo.com>
- <719a11ad-7d01-e401-14c3-3bc4e9f88b54@redhat.com>
-In-Reply-To: <719a11ad-7d01-e401-14c3-3bc4e9f88b54@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 08, 2019 at 12:42:06PM +0100, Paolo Bonzini wrote:
+> On 08/01/19 09:04, Yang Zhong wrote:
+> > On Fri, Jan 04, 2019 at 02:39:50PM +0100, Thomas Huth wrote:
+> >> On 2018-12-27 07:34, Yang Zhong wrote:
+> >>> From: Paolo Bonzini <pbonzini@redhat.com>
+> >>>
+> >>> This lets you disable SCSI altogether with "CONFIG_SCSI=n".
+> >>>
+> >>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> >>> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> >>> ---
+> >>>  hw/scsi/Kconfig       | 11 ++++++++++-
+> >>>  hw/scsi/Makefile.objs |  2 +-
+> >>>  2 files changed, 11 insertions(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
+> >>> index 6e7575397f..d669a4824e 100644
+> >>> --- a/hw/scsi/Kconfig
+> >>> +++ b/hw/scsi/Kconfig
+> >>>  
+> >>> -config PSERIES
+> >>> +config SPAPR_VSCSI
+> >>>      bool
+> >>> +    select SCSI
+> >>
+> >> I think this should get "default y" and "depends on PSERIES" now.
+> >>
+> >>  Thomas
+> > 
+> >    Hello Thomas,
+> > 
+> >    I greped CONFIG_PSERIES from current Kconfig repo and got below list
+> >   ./hw/net/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_llan.o
+> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
+> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
+> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o
+> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o spapr_irq.o
+> >   ./hw/ppc/Makefile.objs:ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
+> >   ./hw/char/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_vty.o
+> >   ./hw/nvram/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_nvram.o
+> >   ./default-configs/ppc64-softmmu.mak:CONFIG_PSERIES=y
+> >   ./default-configs/ppc64-softmmu.mak:CONFIG_XICS=$(CONFIG_PSERIES)
+> >   ./default-configs/ppc64-softmmu.mak:CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+> >   ./default-configs/ppc64-softmmu.mak:CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+> > 
+> >   Since this time is only for x86 and i did not add Kconfig file in hw/ppc/, i did not add 
+> >   this dependency too in here. 
+> >   
+> >   In previous plan, i will add "config PSERRIES" in hw/ppc/Kconfig file for PowerPC pSeries
+> >   and will add dependency in that time, thanks.
+> 
+> You could skip the conversion to Kconfig of default-configs/, but
+> already add all "source hw/ARCH/Kconfig" statements to hw/Kconfig and
+> all "select" statements for buses.  Then, all machine types for example
+> could start removing CONFIG_SCSI=y and CONFIG_PCI=y, even if you do not
+> have the machines converted.
+> 
+  Hello Paolo,
 
-On 1/4/19 5:45 PM, Eric Blake wrote:
-> On 12/18/18 7:46 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 15.12.2018 16:53, Eric Blake wrote:
->>> The next commit will add an EXAMPLES section to qemu-nbd.8;
->>> for that to work, we need to recognize EXAMPLES in texi2pod,
->>> and we need to make all man pages be regenerated since the
->>> output of texi2pod can be different.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>>
->=20
->>> +qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi \
->>> +	qemu-monitor-info.texi scripts/texi2pod.pl
->>> +qemu.1: qemu-option-trace.texi scripts/texi2pod.pl
->>
->> I think, no needs to add scripts/texi2pod.pl to both qemu.1: lines, as=
- they should be
->> merged anyway. And if you want to add line breaking anyway, it looks b=
-etter to use one qemu.1:
->> dependency line.
->=20
-> Easy to fix.
->=20
->>
->> On the other hand, it may be better to add MANS variable as subset of =
-DOCS to combine all man page targets,
->> and than do like $(MANS): scripts/texi2pod.pl.. (and recombine DOCS, u=
-sing MANS ofcourse)
+  Okay, i will add extra patches for other machines and only keep ARCHs 
+  dependency for default-configs/*-softmmu.mak in next stage.
 
-Even easier (although it took me a while digging through 'info man' to
-learn it):
+  The new patches will include: 
+   1) hw/ARCH/Makefile configurable
+   2) Add Kconfig into hw/ARCH/
+   3) convert bus, like pci, usb in other ARCHs
 
-$(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
+  Regards,
 
-although the dependency must be listed AFTER any more specific rule
-(since rules.mak has a %.1: pattern rule which expands $< to the first
-dependency, and we do not want scripts/texi2pod.pl to be treated as our
-first dependency).
+  Yang
 
->> Hm, and I don't see here docs/interop/qemu-ga-ref.7 and docs/interop/q=
-emu-qmp-ref.7,
->> which exist in DOCS.
-
-They are there, just harder to see (hence why my v2 missed them). Of
-course, doing the generic dependency is better than editing every single
-man file listing.
-
->=20
-> Oh, good point. The .txt files should also have the dependency
-
-Or not. The .txt output files depend on the .texi source, not on the
-generated .1 page; only the files that used scripts/texi2pod.pl need to
-depend on that, and based on rules.mk, that is only the 3 man page
-categories.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---tgIJfTFDiXQLDMrBuKzqSRnOPaLX2mVxs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw4BfYACgkQp6FrSiUn
-Q2ppNgf/Wm4EVXdT3xyrYu2UaqzWd1ETHoGLY/MU7NTJkOoYVKNe4InT0GV4ZWD8
-/rJiDnshIgJjPGLVEhv5fi0Tbn1rqDt9DRAL0L2hsMnMdpvpg+ycGiOxFS0bEbkk
-3M3GToHLUbnZr3HxIiGcyl3NMJWVDVfrVW2mrqsY2iUSYa9NGfnz/3fpYpUSmvRa
-rHVZvFleMxD02W1+pbaXY3hWa5t2qZoZRLdvNR+TcJayNlIwNeacAAS1Qf96o2LW
-GJlDPOFZpP3WUqyeqQ1j4CnfeZIGqN6nWDJ28VGDLX2vq/FDAFQ6WBYhVtIy+adb
-52ZM0agBnLWKGT/R5Pjpaxe5fbazRQ==
-=vhg8
------END PGP SIGNATURE-----
-
---tgIJfTFDiXQLDMrBuKzqSRnOPaLX2mVxs--
+> Paolo
