@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49276)
+Received: from eggs.gnu.org ([209.51.188.92]:49456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gi3v4-0004BA-8D
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:00:48 -0500
+	(envelope-from <groug@kaod.org>) id 1gi3vR-0004Sl-L4
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:01:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gi3v1-00012T-JD
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:00:46 -0500
-Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:32823)
+	(envelope-from <groug@kaod.org>) id 1gi3vQ-0001Nh-Ej
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:01:09 -0500
+Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:47747)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gi3v1-0000zw-82
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:00:43 -0500
-Received: from player759.ha.ovh.net (unknown [10.109.146.53])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id CBA7F14E1E2
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 22:00:41 +0100 (CET)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gi3vQ-0001LF-7r
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 16:01:08 -0500
+Received: from player159.ha.ovh.net (unknown [10.109.146.163])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id A48BC45B00
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 22:01:06 +0100 (CET)
 From: Greg Kurz <groug@kaod.org>
-Date: Fri, 11 Jan 2019 22:00:20 +0100
-Message-ID: <154724042090.525985.13266460449119265532.stgit@bahia.lan>
+Date: Fri, 11 Jan 2019 22:00:46 +0100
+Message-ID: <154724044676.525985.4801504682864299114.stgit@bahia.lan>
 In-Reply-To: <154724039526.525985.3172545257507998890.stgit@bahia.lan>
 References: <154724039526.525985.3172545257507998890.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 01/13] ppc: Move spapr-related prototypes
- from xics.h into a seperate header file
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v2 02/13] spapr: Rename xics to intc in
+ interrupt controller agnostic code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,152 +33,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+All this code is used with both the XICS and XIVE interrupt controllers.
 
-When compiling with Clang in -std=3Dgnu99 mode, there is a warning/error:
-
-  CC      ppc64-softmmu/hw/intc/xics_spapr.o
-In file included from /home/thuth/devel/qemu/hw/intc/xics_spapr.c:34:
-/home/thuth/devel/qemu/include/hw/ppc/xics.h:203:34: error: redefinition =
-of typedef 'sPAPRMachineState' is a C11 feature
-      [-Werror,-Wtypedef-redefinition]
-typedef struct sPAPRMachineState sPAPRMachineState;
-                                 ^
-/home/thuth/devel/qemu/include/hw/ppc/spapr_irq.h:25:34: note: previous d=
-efinition is here
-typedef struct sPAPRMachineState sPAPRMachineState;
-                                 ^
-
-We have to remove the duplicated typedef here and include "spapr.h" inste=
-ad.
-But "spapr.h" should not be included for the pnv machine files. So move
-the spapr-related prototypes into a new file called "xics_spapr.h" instea=
-d.
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/xics_kvm.c          |    1 +
- hw/intc/xics_spapr.c        |    1 +
- hw/ppc/spapr_irq.c          |    1 +
- include/hw/ppc/xics.h       |    7 -------
- include/hw/ppc/xics_spapr.h |   37 +++++++++++++++++++++++++++++++++++++
- 5 files changed, 40 insertions(+), 7 deletions(-)
- create mode 100644 include/hw/ppc/xics_spapr.h
+ hw/ppc/spapr.c              |    6 +++---
+ hw/ppc/spapr_events.c       |    2 +-
+ hw/ppc/spapr_pci.c          |    6 +++---
+ hw/ppc/spapr_vio.c          |    2 +-
+ include/hw/pci-host/spapr.h |    2 +-
+ include/hw/ppc/spapr.h      |    2 +-
+ 6 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index ac94594b1919..dff13300504c 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -34,6 +34,7 @@
- #include "sysemu/kvm.h"
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/xics.h"
-+#include "hw/ppc/xics_spapr.h"
- #include "kvm_ppc.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 9c1a90d7094b..de6cc15b6474 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -32,6 +32,7 @@
- #include "qemu/timer.h"
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/xics.h"
-+#include "hw/ppc/xics_spapr.h"
- #include "hw/ppc/fdt.h"
- #include "qapi/visitor.h"
-=20
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 5fce72fe0f6c..1da7a32348fc 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -14,6 +14,7 @@
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/spapr_xive.h"
- #include "hw/ppc/xics.h"
-+#include "hw/ppc/xics_spapr.h"
- #include "sysemu/kvm.h"
-=20
- #include "trace.h"
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 07508cbd217e..fad786e8b22d 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -200,13 +200,6 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)=
-;
- void ics_resend(ICSState *ics);
- void icp_resend(ICPState *ss);
-=20
--typedef struct sPAPRMachineState sPAPRMachineState;
--
--void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
-fdt,
--                   uint32_t phandle);
--int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
--void xics_spapr_init(sPAPRMachineState *spapr);
--
- Object *icp_create(Object *cpu, const char *type, XICSFabric *xi,
-                    Error **errp);
-=20
-diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
-new file mode 100644
-index 000000000000..b1ab27d022cf
---- /dev/null
-+++ b/include/hw/ppc/xics_spapr.h
-@@ -0,0 +1,37 @@
-+/*
-+ * QEMU PowerPC pSeries Logical Partition (aka sPAPR) hardware System Em=
-ulator
-+ *
-+ * PAPR Virtualized Interrupt System, aka ICS/ICP aka xics
-+ *
-+ * Copyright (c) 2010, 2011 David Gibson, IBM Corporation.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef XICS_SPAPR_H
-+#define XICS_SPAPR_H
-+
-+#include "hw/ppc/spapr.h"
-+
-+void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
-fdt,
-+                   uint32_t phandle);
-+int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-+void xics_spapr_init(sPAPRMachineState *spapr);
-+
-+#endif /* XICS_SPAPR_H */
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 83081defde4e..26f8e55cc25e 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -96,7 +96,7 @@
+ 
+ #define MIN_RMA_SLOF            128UL
+ 
+-#define PHANDLE_XICP            0x00001111
++#define PHANDLE_INTC            0x00001111
+ 
+ /* These two functions implement the VCPU id numbering: one to compute them
+  * all and one to identify thread 0 of a VCORE. Any change to the first one
+@@ -1276,7 +1276,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
+ 
+     /* /interrupt controller */
+     spapr->irq->dt_populate(spapr, spapr_max_server_number(spapr), fdt,
+-                          PHANDLE_XICP);
++                          PHANDLE_INTC);
+ 
+     ret = spapr_populate_memory(spapr, fdt);
+     if (ret < 0) {
+@@ -1296,7 +1296,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
+     }
+ 
+     QLIST_FOREACH(phb, &spapr->phbs, list) {
+-        ret = spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt,
++        ret = spapr_populate_pci_dt(phb, PHANDLE_INTC, fdt,
+                                     spapr->irq->nr_msis);
+         if (ret < 0) {
+             error_report("couldn't setup PCI devices in fdt");
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index 32719a1b72d0..d4e75211954d 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -282,7 +282,7 @@ void spapr_dt_events(sPAPRMachineState *spapr, void *fdt)
+             continue;
+         }
+ 
+-        spapr_dt_xics_irq(interrupts, source->irq, false);
++        spapr_dt_intc_irq(interrupts, source->irq, false);
+ 
+         _FDT(node_offset = fdt_add_subnode(fdt, event_sources, source_name));
+         _FDT(fdt_setprop(fdt, node_offset, "interrupts", interrupts,
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index b74f2632ecc6..24f95a400623 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2066,7 +2066,7 @@ static void spapr_phb_pci_enumerate(sPAPRPHBState *phb)
+ 
+ }
+ 
+-int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, void *fdt,
++int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t intc_phandle, void *fdt,
+                           uint32_t nr_msis)
+ {
+     int bus_off, i, j, ret;
+@@ -2164,8 +2164,8 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, void *fdt,
+             irqmap[1] = 0;
+             irqmap[2] = 0;
+             irqmap[3] = cpu_to_be32(j+1);
+-            irqmap[4] = cpu_to_be32(xics_phandle);
+-            spapr_dt_xics_irq(&irqmap[5], phb->lsi_table[lsi_num].irq, true);
++            irqmap[4] = cpu_to_be32(intc_phandle);
++            spapr_dt_intc_irq(&irqmap[5], phb->lsi_table[lsi_num].irq, true);
+         }
+     }
+     /* Write interrupt map */
+diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+index 7e8a9ad09337..cfd9849d8dfb 100644
+--- a/hw/ppc/spapr_vio.c
++++ b/hw/ppc/spapr_vio.c
+@@ -158,7 +158,7 @@ static int vio_make_devnode(VIOsPAPRDevice *dev,
+     if (dev->irq) {
+         uint32_t ints_prop[2];
+ 
+-        spapr_dt_xics_irq(ints_prop, dev->irq, false);
++        spapr_dt_intc_irq(ints_prop, dev->irq, false);
+         ret = fdt_setprop(fdt, node_off, "interrupts", ints_prop,
+                           sizeof(ints_prop));
+         if (ret < 0) {
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index 4eb3a2ce3eb8..e0e683c32469 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -113,7 +113,7 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAPRPHBState *phb, int pin)
+     return spapr_qirq(spapr, phb->lsi_table[pin].irq);
+ }
+ 
+-int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, void *fdt,
++int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t intc_phandle, void *fdt,
+                           uint32_t nr_msis);
+ 
+ void spapr_pci_rtas_init(void);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 9e01a5a12e4a..7193ce094689 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -682,7 +682,7 @@ void spapr_load_rtas(sPAPRMachineState *spapr, void *fdt, hwaddr addr);
+  * "interrupt-controller" node has its "#interrupt-cells" property set to 2 (ie,
+  * VIO devices, RTAS event sources and PHBs).
+  */
+-static inline void spapr_dt_xics_irq(uint32_t *intspec, int irq, bool is_lsi)
++static inline void spapr_dt_intc_irq(uint32_t *intspec, int irq, bool is_lsi)
+ {
+     intspec[0] = cpu_to_be32(irq);
+     intspec[1] = is_lsi ? cpu_to_be32(1) : 0;
