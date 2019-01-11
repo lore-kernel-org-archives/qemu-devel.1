@@ -1,25 +1,22 @@
 Received: from eggs.gnu.org ([209.51.188.92]:55728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghsgW-0004BR-Ar
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:01:03 -0500
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghsgZ-0004BR-BJ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:01:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghseY-000149-5i
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55526)
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghseI-0000vv-MH
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:43 -0500
+Received: from mga11.intel.com ([192.55.52.93]:51737)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghseX-00013n-U8
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:58 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
-	<154703595509.13472.7357387659078524086.stgit@pasha-VirtualBox>
-Date: Fri, 11 Jan 2019 09:58:50 +0100
-In-Reply-To: <154703595509.13472.7357387659078524086.stgit@pasha-VirtualBox>
-	(Pavel Dovgalyuk's message of "Wed, 09 Jan 2019 15:12:35 +0300")
-Message-ID: <87wonb7eph.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 13/21] replay: implement replay-seek
- command to proceed to the desired step
+	(Exim 4.71) (envelope-from <lizhijian@cn.fujitsu.com>)
+	id 1ghseI-0000jA-BP
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:42 -0500
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Date: Fri, 11 Jan 2019 16:57:51 +0800
+Message-Id: <1547197071-14504-5-git-send-email-lizhijian@cn.fujitsu.com>
+In-Reply-To: <1547197071-14504-1-git-send-email-lizhijian@cn.fujitsu.com>
+References: <1547197071-14504-1-git-send-email-lizhijian@cn.fujitsu.com>
+Subject: [Qemu-devel] [PATCH v5 4/4] i386: allow to load initrd below 4G for
+ recent linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,131 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org
+Cc: philmd@redhat.com, zhijianx.li@intel.com, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+Since linux commit: cf8fa920cb42 ("i386: handle an initrd in highmem (version 2)")
+linux has supported initrd up to 4 GB, but the header field
+ramdisk_max is still set to 2 GB to avoid "possible bootloader bugs".
 
-> This patch adds hmp/qmp commands replay_seek/replay-seek that proceed
-> the execution to the specified step.
-> The command automatically loads nearest snapshot and replay the execution
-> to find the desired step.
+When use '-kernel vmlinux -initrd initrd.cgz' to launch a VM,
+the firmware(it could be linuxboot_dma.bin) helps to read initrd
+contents into guest memory(below ramdisk_max) and jump to kernel.
+that's similar with what bootloader does, like grub.
 
-"step" again.
+In addition, initrd_max is uint32_t simply because QEMU doesn't support
+the 64-bit boot protocol (specifically the ext_ramdisk_image field).
 
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> --
->
-> v2:
->  - renamed replay_seek qmp command into replay-seek
->    (suggested by Eric Blake)
-> v7:
->  - small fixes related to Markus Armbruster's review
-> v9:
->  - changed 'step' parameter name to 'icount'
->  - moved json stuff to replay.json and updated the description
->    (suggested by Markus Armbruster)
-> ---
->  hmp-commands.hx           |   19 +++++++++
->  hmp.h                     |    1 
->  qapi/replay.json          |   20 ++++++++++
->  replay/replay-debugging.c |   91 +++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 131 insertions(+)
->
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 6d04c02..2839acc 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1924,6 +1924,25 @@ The command is ignored when there are no replay breakpoints.
->  ETEXI
->  
->      {
-> +        .name       = "replay_seek",
-> +        .args_type  = "icount:i",
-> +        .params     = "icount",
-> +        .help       = "rewinds replay to the step specified by icount",
+Therefore here just limit initrd_max to UINT32_MAX simply as well to
+allow initrd to be loaded below 4 GB.
 
-We use imperative mood in .help: "rewind".
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 
-"Rewind" suggests going backward.  The command can do that.  But it can
-also go forward.  What about:
+---
+V5: udpate comments and changelog
+V3: correct grammar and check XLF_CAN_BE_LOADED_ABOVE_4G first (Michael S. Tsirkin)
 
-"replay execution to the specified intruction count"
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+---
+ hw/i386/pc.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-> +        .cmd        = hmp_replay_seek,
-> +    },
-> +
-> +STEXI
-> +@item replay_seek @var{icount}
-> +@findex replay_seek
-> +Automatically proceeds to the step specified by @var{icount}, when
-> +replaying the execution. The command automatically loads nearest
-> +snapshot and replay the execution to find the desired step.
-> +When there is no preceding snapshot or the execution is not replayed,
-> +then the command is ignored.
-
-Uh, why isn't that an error?
-
-> +icount for the reference may be observed with 'info replay' command.
-
-This still uses both "step" and "instruction count".
-
-I'm happy to help rephrasing, but first we need to nail down the failure
-modes.
-
-> +ETEXI
-> +
-> +    {
->          .name       = "info",
->          .args_type  = "item:s?",
->          .params     = "[subcommand]",
-> diff --git a/hmp.h b/hmp.h
-> index c9b9b4f..d6e1d7e 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -151,5 +151,6 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict);
->  void hmp_info_replay(Monitor *mon, const QDict *qdict);
->  void hmp_replay_break(Monitor *mon, const QDict *qdict);
->  void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
-> +void hmp_replay_seek(Monitor *mon, const QDict *qdict);
->  
->  #endif
-> diff --git a/qapi/replay.json b/qapi/replay.json
-> index a63219c..7390f88 100644
-> --- a/qapi/replay.json
-> +++ b/qapi/replay.json
-> @@ -99,3 +99,23 @@
->  #
->  ##
->  { 'command': 'replay-delete-break' }
-> +
-> +##
-> +# @replay-seek:
-> +#
-> +# Automatically proceeds to the step specified by @icount when replaying
-> +# the execution. The command automatically loads nearest
-> +# snapshot and replay the execution to find the desired step.
-> +# When there is no preceding snapshot or the execution is not replayed,
-> +# then the command is ignored.
-> +# icount for the reference may be obtained with @query-replay command.
-
-My comments on hmp-commands.hx apply.
-
-> +#
-> +# @icount: destination execution step
-
-s/execution step/instruction count/
-
-Maybe s/destination/target/
-
-> +#
-> +# Since: 4.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "replay-seek", "data": { "icount": 220414 } }
-> +##
-> +{ 'command': 'replay-seek', 'data': { 'icount': 'int' } }
-[...]
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 89c25b2..ea7a3c7 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -904,7 +904,29 @@ static void load_linux(PCMachineState *pcms,
+ #endif
+ 
+     /* highest address for loading the initrd */
+-    if (protocol >= 0x203) {
++    if (protocol >= 0x20c &&
++        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
++        /*
++         * Linux has supported initrd up to 4 GB for a very long time (2007,
++         * long before XLF_CAN_BE_LOADED_ABOVE_4G which was added in 2013),
++         * though it only sets initrd_max to 2 GB to "work around bootloader
++         * bugs". Luckily, QEMU firmware(which does something like bootloader)
++         * has supported this.
++         *
++         * It's believed that if XLF_CAN_BE_LOADED_ABOVE_4G is set, initrd can
++         * be loaded into any address.
++         *
++         * In addition, initrd_max is uint32_t simply because QEMU doesn't
++         * support the 64-bit boot protocol (specifically the ext_ramdisk_image
++         * field).
++         *
++         * Therefore here just limit initrd_max to UINT32_MAX simply as well.
++         *
++         * FIXME: it's possible that linux protocol within [0x208, 0x20c]
++         * supports up to 4G initrd as well.
++         */
++        initrd_max = UINT32_MAX;
++    } else if (protocol >= 0x203) {
+         initrd_max = ldl_p(header+0x22c);
+     } else {
+         initrd_max = 0x37ffffff;
+-- 
+2.7.4
