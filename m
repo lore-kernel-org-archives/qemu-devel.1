@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38058)
+Received: from eggs.gnu.org ([209.51.188.92]:38696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gi54V-00013H-6B
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:14:36 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gi57O-0002Hl-FD
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:17:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gi54N-0002Yt-86
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:14:29 -0500
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:45627)
+	(envelope-from <richard.henderson@linaro.org>) id 1gi57I-0004Cf-VC
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:17:32 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41943)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gi54J-0002Wz-Fi
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:14:26 -0500
-Received: by mail-yb1-xb41.google.com with SMTP id q2so6431016ybd.12
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:14:22 -0800 (PST)
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gi577-000499-UZ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:17:21 -0500
+Received: by mail-pf1-x443.google.com with SMTP id b7so7573168pfi.8
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:17:15 -0800 (PST)
 References: <20190111220131.27153-1-jcmvbkbc@gmail.com>
 	<2064503c-ed12-de29-59a9-46fa24d22f60@linaro.org>
-In-Reply-To: <2064503c-ed12-de29-59a9-46fa24d22f60@linaro.org>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Fri, 11 Jan 2019 14:14:09 -0800
-Message-ID: <CAMo8BfJaTbO0LSBWk7+WeFw7Oc6Sy2ykxaQcWTBeVGCdN9+aOg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAMo8BfJaTbO0LSBWk7+WeFw7Oc6Sy2ykxaQcWTBeVGCdN9+aOg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cdaaa0bc-8282-6a92-886a-7dd5f2adfa46@linaro.org>
+Date: Sat, 12 Jan 2019 09:17:08 +1100
+MIME-Version: 1.0
+In-Reply-To: <CAMo8BfJaTbO0LSBWk7+WeFw7Oc6Sy2ykxaQcWTBeVGCdN9+aOg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v2] target/xtensa: rework zero overhead
  loops implementation
 List-Id: <qemu-devel.nongnu.org>
@@ -29,49 +33,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
+To: Max Filippov <jcmvbkbc@gmail.com>
 Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Jan 11, 2019 at 2:09 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 1/12/19 9:01 AM, Max Filippov wrote:
-> > Don't invalidate TB with the end of zero overhead loop when LBEG or LEND
-> > change. Instead encode the distance from the start of the page where the
-> > TB starts to the LEND in the TB cs_base and generate loopback code when
-> > the next PC matches encoded LEND. Distance to a destination within the
-> > same page and up to a maximum instruction length into the next page is
-> > encoded literally, otherwise it's zero. The distance from LEND to LBEG
-> > is also encoded in the cs_base: it's encoded literally when less than
-> > 256 or as 0 otherwise. This allows for TB chaining for the loopback
-> > branch at the end of a loop for the most common loop sizes.
-> >
-> > With this change the resulting emulation speed is about 10% higher in
-> > softmmu mode on uClibc-ng and LTP tests. Emulation speed in linux
-> > user mode is a few percent lower because there's no direct TB chaining
-> > between different memory pages. Testing with lower limit on direct TB
-> > chainig range shows gradual slowdown to ~15% for the block size of 64
-> > bytes and ~50% for the block size of 32 bytes.
-> >
-> > Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->
->
-> > +        /*
-> > +         * 0 in the csbase_lend field means that there may not be a loopback
-> > +         * for any instruction that starts inside this page. Any other value
-> > +         * means that an instruction that ends at this offset from the page
-> > +         * start may loop back.
->
-> Nit: s/may/will/g
->
-> Using "may" makes it seem like we may have missed a case that should have
-> looped back.
+On 1/12/19 9:14 AM, Max Filippov wrote:
+>>> +        /*
+>>> +         * 0 in the csbase_lend field means that there may not be a loopback
+>>> +         * for any instruction that starts inside this page. Any other value
+>>> +         * means that an instruction that ends at this offset from the page
+>>> +         * start may loop back.
+>>
+>> Nit: s/may/will/g
+>>
+>> Using "may" makes it seem like we may have missed a case that should have
+>> looped back.
+> 
+> Using "will" makes it seem like it always loops back, but it doesn't do it
+> when LCOUNT is 0.
 
-Using "will" makes it seem like it always loops back, but it doesn't do it
-when LCOUNT is 0.
+Err, no, you covered that in the first sentence, where 0 means that it will not
+loop back.
 
--- 
-Thanks.
--- Max
+
+r~
