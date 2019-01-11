@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36057)
+Received: from eggs.gnu.org ([209.51.188.92]:37615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ghtGx-0004wy-8s
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:38:40 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1ghtQY-0006yi-Rq
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:48:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ghtGw-00089i-Dh
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:38:39 -0500
-Date: Fri, 11 Jan 2019 10:38:28 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190111103828.058ccc6c.cohuck@redhat.com>
-In-Reply-To: <4988f58e-4bc5-c622-53b7-cfda758304e1@redhat.com>
-References: <20190110210358.24035-1-david@redhat.com>
-	<4988f58e-4bc5-c622-53b7-cfda758304e1@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1ghtQX-0004ft-U0
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:48:34 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:41613)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ghtQW-0004dM-5i
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:48:33 -0500
+Received: by mail-ot1-f68.google.com with SMTP id u16so12592554otk.8
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 01:48:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Send correct event on
- hotplug.
+References: <1547197071-14504-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1547197071-14504-4-git-send-email-lizhijian@cn.fujitsu.com>
+In-Reply-To: <1547197071-14504-4-git-send-email-lizhijian@cn.fujitsu.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 11 Jan 2019 10:48:16 +0100
+Message-ID: <CAGxU2F4M22Vz6xTauvHAngzp6PMfzAkTqbmGfsA=5rwWYnZi_w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] i386: import & use bootparam.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +28,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, Michael Tsirkin <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, zhijianx.li@intel.com, Philippe Mathieu Daude <philmd@redhat.com>
 
-On Fri, 11 Jan 2019 08:16:41 +0100
-David Hildenbrand <david@redhat.com> wrote:
+Hi Li,
 
-> On 10.01.19 22:03, David Hildenbrand wrote:
-> > Comit 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
-> > changed the initial state of zPCI devices from ZPCI_FS_STANDBY to
-> > ZPCI_FS_DISABLED (a.k.a. configured). However we still only send a
-> > HP_EVENT_RESERVED_TO_STANDBY event to the guest, indicating a wrong
-> > state.
-> > 
-> > Let's send a HP_EVENT_TO_CONFIGURED event instead, to match the actual
-> > state the device is in.
-> > 
-> > This fixes hotplugged devices having to be enabled explicitly in the
-> > guest e.g. via echo 1 > /sys/bus/pci/slots/00000000/power.
-> > 
-> > Fixes: 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
-> > Report-by: Cornelia Huck <cohuck@redhat.com>  
+On Fri, Jan 11, 2019 at 10:06 AM Li Zhijian <lizhijian@cn.fujitsu.com> wrote:
+>
+> it's from v4.20-rc5.
+>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+> V5: add reviewed-by tag
+> V4: use scirpt to import bootparam.h (Michael S. Tsirkin)
+> V3: new patch
+> ---
+>  hw/i386/pc.c                                 |  8 +------
+>  include/standard-headers/asm-x86/bootparam.h | 34 ++++++++++++++++++++++++++++
+>  scripts/update-linux-headers.sh              |  4 ++++
+>  3 files changed, 39 insertions(+), 7 deletions(-)
+>  create mode 100644 include/standard-headers/asm-x86/bootparam.h
+>
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f248662..89c25b2 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -74,6 +74,7 @@
+>  #include "hw/nmi.h"
+>  #include "hw/i386/intel_iommu.h"
+>  #include "hw/net/ne2000-isa.h"
+> +#include "standard-headers/asm-x86/bootparam.h"
+>
+>  /* debug PC/ISA interrupts */
+>  //#define DEBUG_IRQ
+> @@ -820,13 +821,6 @@ static long get_file_size(FILE *f)
+>      return size;
+>  }
+>
+> -/* setup_data types */
+> -#define SETUP_NONE     0
+> -#define SETUP_E820_EXT 1
+> -#define SETUP_DTB      2
+> -#define SETUP_PCI      3
+> -#define SETUP_EFI      4
+> -
+>  struct setup_data {
+>      uint64_t next;
+>      uint32_t type;
+> diff --git a/include/standard-headers/asm-x86/bootparam.h b/include/standard-headers/asm-x86/bootparam.h
+> new file mode 100644
+> index 0000000..67d4f01
+> --- /dev/null
+> +++ b/include/standard-headers/asm-x86/bootparam.h
+> @@ -0,0 +1,34 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +#ifndef _ASM_X86_BOOTPARAM_H
+> +#define _ASM_X86_BOOTPARAM_H
+> +
+> +/* setup_data types */
+> +#define SETUP_NONE                     0
+> +#define SETUP_E820_EXT                 1
+> +#define SETUP_DTB                      2
+> +#define SETUP_PCI                      3
+> +#define SETUP_EFI                      4
+> +#define SETUP_APPLE_PROPERTIES         5
+> +#define SETUP_JAILHOUSE                        6
+> +
+> +/* ram_size flags */
+> +#define RAMDISK_IMAGE_START_MASK       0x07FF
+> +#define RAMDISK_PROMPT_FLAG            0x8000
+> +#define RAMDISK_LOAD_FLAG              0x4000
+> +
+> +/* loadflags */
+> +#define LOADED_HIGH    (1<<0)
+> +#define KASLR_FLAG     (1<<1)
+> +#define QUIET_FLAG     (1<<5)
+> +#define KEEP_SEGMENTS  (1<<6)
+> +#define CAN_USE_HEAP   (1<<7)
+> +
+> +/* xloadflags */
+> +#define XLF_KERNEL_64                  (1<<0)
+> +#define XLF_CAN_BE_LOADED_ABOVE_4G     (1<<1)
+> +#define XLF_EFI_HANDOVER_32            (1<<2)
+> +#define XLF_EFI_HANDOVER_64            (1<<3)
+> +#define XLF_EFI_KEXEC                  (1<<4)
+> +
+> +
+> +#endif /* _ASM_X86_BOOTPARAM_H */
+> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+> index 0a964fe..77ec108 100755
+> --- a/scripts/update-linux-headers.sh
+> +++ b/scripts/update-linux-headers.sh
+> @@ -120,6 +120,10 @@ for arch in $ARCHLIST; do
+>          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+>          cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+>          cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/standard-headers/asm-$arch"
+> +        # Remove everything except the macros from bootparam.h avoiding the
+> +        # unnecessary import of several video/ist/etc headers
+> +        sed -e '/__ASSEMBLY__/,/__ASSEMBLY__/d' $tmpdir/include/asm/bootparam.h > $tmpdir/bootparam.h
+> +        cp_portable $tmpdir/bootparam.h "$output/include/standard-headers/asm-$arch"
 
-Cool, works for me as well.
+Maybe you miss my comment. Anyway, IMHO is better to use the double
+quotes for all paths.
 
-Tested-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Do we want to cc:stable? Probably not, as it's more annoying than
-critical, and pci hotplug does not seem to be much used on s390x.
+>      fi
+>  done
 
-> 
-> If this patch is the right thing to do, then
-> 
-> 1. s/Report-by/Reported-by/
-> 2. Dropping the "." from the subject
-> 
-> (yes, it was late)
+>
+> --
+> 2.7.4
+>
+>
 
-:) Can do while applying.
 
-> 
-> I wonder if we should do both events sequentially, but as I don't have
-> access to the architecture I have to rely on that this works :)
-
-Yep, let's wait for feedback from folks with architecture access.
-
-> 
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
-> > ---
-> >  hw/s390x/s390-pci-bus.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> > index 15759b6514..7f911b216a 100644
-> > --- a/hw/s390x/s390-pci-bus.c
-> > +++ b/hw/s390x/s390-pci-bus.c
-> > @@ -899,7 +899,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >          }
-> >  
-> >          if (dev->hotplugged) {
-> > -            s390_pci_generate_plug_event(HP_EVENT_RESERVED_TO_STANDBY,
-> > +            s390_pci_generate_plug_event(HP_EVENT_TO_CONFIGURED ,
-> >                                           pbdev->fh, pbdev->fid);
-> >          }
-> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
-> >   
-> 
-> 
+--
+Stefano Garzarella
+Red Hat
