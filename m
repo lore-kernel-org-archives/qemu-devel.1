@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41476)
+Received: from eggs.gnu.org ([209.51.188.92]:43579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ghtiH-0005eB-9J
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:06:54 -0500
+	(envelope-from <lhrazky@redhat.com>) id 1ghtr3-0007Iq-8m
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:15:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ghtiG-0007Bb-B8
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:06:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49696)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ghtiG-0007AK-2o
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:06:52 -0500
-Date: Fri, 11 Jan 2019 11:06:44 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190111110644.19896d4d@redhat.com>
-In-Reply-To: <20190110201418.GK2589@work-vm>
-References: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
-	<20190110120120.9943-2-yury-kotov@yandex-team.ru>
-	<20190110201418.GK2589@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] migration: add RAMBlock's offset
- validation
+	(envelope-from <lhrazky@redhat.com>) id 1ghtr2-0004Oe-0b
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:15:57 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36053)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1ghtr1-0004NZ-Oe
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:15:55 -0500
+Received: by mail-wr1-f68.google.com with SMTP id u4so14564495wrp.3
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 02:15:54 -0800 (PST)
+Message-ID: <1547201752.3768.256.camel@redhat.com>
+From: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Fri, 11 Jan 2019 11:15:52 +0100
+In-Reply-To: <98b89b44cdba6e7128381a5216ec955771c4caaa.camel@redhat.com>
+References: <20190108152648.32537-1-lhrazky@redhat.com>
+	<20190108152648.32537-2-lhrazky@redhat.com>
+	<98b89b44cdba6e7128381a5216ec955771c4caaa.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Spice-devel] [PATCH spice 1/3] QXL interface: add
+ a function to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +31,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Yury Kotov <yury-kotov@yandex-team.ru>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, wrfsh@yandex-team.ru
+To: Jonathon Jongsma <jjongsma@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-On Thu, 10 Jan 2019 20:14:19 +0000
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+On Wed, 2019-01-09 at 11:36 -0600, Jonathon Jongsma wrote:
+> On Tue, 2019-01-08 at 16:26 +0100, Lukáš Hrázký wrote:
+> > Adds a function to let QEMU provide information to identify graphics
+> > devices and their monitors in the guest. The function
+> > (spice_qxl_set_device_info) sets the device address (e.g. a PCI path)
+> > and monitor ID -> device display ID mapping of displays exposed by
+> > given
+> > QXL interface.
+> 
+> 
+> In my previous review, I asked for a slightly more explicit explanation
+> of the phrase "monitor ID" in the commit log. In this case, "monitor
+> ID" is an ID specific to the QXL instance starting at 0 and represents
+> the displays that are associated with that particular QXL instance.
+> 
+> Perhaps it makes sense to rename this "Qxl monitor ID"?
 
-> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> > RAM migration has a RAMBlock validation stage (flag RAM_SAVE_FLAG_MEM_SIZE).
-> > In this stage QEMU checks further information about RAMBlock:
-> > 1. Presence (by idstr),
-> > 2. Length (trying to resize, when differs),
-> > 3. Optional page size.
-> > 
-> > This patch adds a check for RAMBlock's offset. Currently we check it during
-> > RAM pages loading - every RAM page has an offset in its header. But there is a
-> > case when we don't send RAM pages (see below).
-> > 
-> > The following commits introduce a capability (ignore-external) to skip some
-> > RAM blocks from migration. In such case the migration stream contains only
-> > meta information about RAM blocks to validate them. So, the only way to check
-> > block's offset is to send it explicitly.
-> > 
-> > Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>  
-> 
-> But why check that offsets match?  THey aren't supposed to!
-> Offset's are entirely private to each qemu and they're allowed to be
-> different; the only requirement is that the length and name of each
-> RAMBlock matches, then all the operations we do over the migration
-> stream are relative to the start of the block.
-> 
-> One example where they are validly different is where you hotplug some
-> RAM, so for example:
-> 
-> 
->   source qemu
->       -M 4G
->       hotplug PCI card
->       hotplug 2G
-> 
->   destination qemu
->       -M 4G
->       PCI card declared on the command line
->       extra 2G declared on the command line
-> 
-> The offsets are different but we can migrate that case fine.
-PCI mappings are updated after migration is done, to make DST match SRC
-(get_pci_config_device) that mapping is irrelevant here, but I was under
-impression that offset in terms of MemoryRegion (GPA) was passed in
-migration stream, even if we do not update memory mappings for RAM
-(mapping depends on hotplug/CLI order or explicit addr on CLI for memory
-devices).
+Sorry, I might have forgotten to incorporate some comments on the old
+series :/
 
-> 
-> Dave
-> 
+To reiterate, though, what do you find unclear about the "monitor ID"?
+I mean maybe it should be spelled "monitor_id" to make it clearer what
+it refers to... Not sure if "Qxl monitor ID" helps, since it is not
+strictly related to QXL, but more to the QXL interface (which is used
+for all graphic cards, which makes it more confusing)...
+
+> > Signed-off-by: Lukáš Hrázký <lhrazky@redhat.com>
 > > ---
-> >  migration/ram.c | 15 +++++++++++++--
-> >  1 file changed, 13 insertions(+), 2 deletions(-)
+> >  server/red-qxl.c         | 44 ++++++++++++++++++++++++++++++++++++++
+> >  server/spice-qxl.h       | 46
+> > ++++++++++++++++++++++++++++++++++++++++
+> >  server/spice-server.syms |  5 +++++
+> >  3 files changed, 95 insertions(+)
 > > 
-> > diff --git a/migration/ram.c b/migration/ram.c
-> > index 7e7deec4d8..39629254e1 100644
-> > --- a/migration/ram.c
-> > +++ b/migration/ram.c
-> > @@ -3171,6 +3171,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-> >          if (migrate_postcopy_ram() && block->page_size != qemu_host_page_size) {
-> >              qemu_put_be64(f, block->page_size);
-> >          }
-> > +        qemu_put_be64(f, block->offset);
-> >      }
+> > diff --git a/server/red-qxl.c b/server/red-qxl.c
+> > index 97940611..0ea424cd 100644
+> > --- a/server/red-qxl.c
+> > +++ b/server/red-qxl.c
+> > @@ -41,6 +41,9 @@
+> >  #include "red-qxl.h"
 > >  
-> >      rcu_read_unlock();
-> > @@ -4031,7 +4032,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
 > >  
-> >      seq_iter++;
+> > +#define MAX_DEVICE_ADDRESS_LEN 256
+> > +#define MAX_MONITORS_COUNT 16
+> > +
+> >  struct QXLState {
+> >      QXLWorker qxl_worker;
+> >      QXLInstance *qxl;
+> > @@ -53,6 +56,9 @@ struct QXLState {
+> >      unsigned int max_monitors;
+> >      RedsState *reds;
+> >      RedWorker *worker;
+> > +    char device_address[MAX_DEVICE_ADDRESS_LEN];
+> > +    uint32_t device_display_ids[MAX_MONITORS_COUNT];
+> > +    size_t monitors_count;  // length of ^^^
 > >  
-> > -    if (version_id != 4) {
-> > +    if (version_id < 4) {
-> >          ret = -EINVAL;
-> >      }
-> >  
-> > @@ -4132,6 +4133,16 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-> >                              ret = -EINVAL;
-> >                          }
-> >                      }
-> > +                    if (version_id >= 5) {
-> > +                        ram_addr_t offset;
-> > +                        offset = qemu_get_be64(f);
-> > +                        if (block->offset != offset) {
-> > +                            error_report("Mismatched RAM block offset %s "
-> > +                                         "%" PRId64 "!= %" PRId64,
-> > +                                         id, offset, (uint64_t)block->offset);
-> > +                            ret = -EINVAL;
-> > +                        }
-> > +                    }
-> >                      ram_control_load_hook(f, RAM_CONTROL_BLOCK_REG,
-> >                                            block->idstr);
-> >                  } else {
-> > @@ -4363,5 +4374,5 @@ static SaveVMHandlers savevm_ram_handlers = {
-> >  void ram_mig_init(void)
-> >  {
-> >      qemu_mutex_init(&XBZRLE.lock);
-> > -    register_savevm_live(NULL, "ram", 0, 4, &savevm_ram_handlers, &ram_state);
-> > +    register_savevm_live(NULL, "ram", 0, 5, &savevm_ram_handlers, &ram_state);
+> >      pthread_mutex_t scanout_mutex;
+> >      SpiceMsgDisplayGlScanoutUnix scanout;
+> > @@ -846,6 +852,44 @@ void red_qxl_gl_draw_async_complete(QXLInstance
+> > *qxl)
+> >      red_qxl_async_complete(qxl, cookie);
 > >  }
-> > -- 
-> > 2.20.1
-> >   
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >  
+> > +SPICE_GNUC_VISIBLE
+> > +void spice_qxl_set_device_info(QXLInstance *instance,
+> > +                               const char *device_address,
+> > +                               uint32_t device_display_id_start,
+> > +                               uint32_t device_display_id_count)
+> > +{
+> > +    g_return_if_fail(device_address != NULL);
+> 
+> Just a thought: what if qemu calls this function twice for the same
+> instance. In theory this shouldn't happen, but should we be defensive
+> and handle it somehow? Print a warning? Just overwrite the previous
+> mapping? Right now it looks like we would just overwrite.
+
+I'm pretty sure overwriting is the correct behavior here, no logging
+needed? There may be a situation where the info changes in the future,
+for whatever reasons. At least this part of the code should be fine
+with it (though I'm not sure atm. if e.g. the client would cope well).
+
+> > +
+> > +    size_t da_len = strnlen(device_address, MAX_DEVICE_ADDRESS_LEN);
+> > +    if (da_len >= MAX_DEVICE_ADDRESS_LEN) {
+> > +        spice_error("Device address too long: %lu > %u", da_len,
+> > MAX_DEVICE_ADDRESS_LEN);
+> 
+> Technically, I think the format string for a size_t variable is %zu,
+> not %lu
+
+You're right, didn't know that. I think I have some fixing to do :)
+
+> > +        return;
+> > +    }
+> > +
+> > +    if (device_display_id_count > MAX_MONITORS_COUNT) {
+> > +        spice_error("Device display ID count (%u) is greater than
+> > limit %u",
+> > +                    device_display_id_count,
+> > +                    MAX_MONITORS_COUNT);
+> > +        return;
+> > +    }
+> > +
+> > +    strncpy(instance->st->device_address, device_address,
+> > MAX_DEVICE_ADDRESS_LEN);
+> > +
+> > +    g_debug("QXL Instance %d setting device address \"%s\" and
+> > monitor -> device display mapping:",
+> > +            instance->id,
+> > +            device_address);
+> > +
+> > +    // store the mapping monitor_id -> device_display_id
+> > +    for (uint32_t monitor_id = 0; monitor_id <
+> > device_display_id_count; ++monitor_id) {
+> > +        uint32_t device_display_id = device_display_id_start +
+> > monitor_id;
+> > +        instance->st->device_display_ids[monitor_id] =
+> > device_display_id;
+> > +        g_debug("   monitor ID %u -> device display ID %u",
+> > +                monitor_id, device_display_id);
+> > +    }
+> > +
+> > +    instance->st->monitors_count = device_display_id_count;
+> > +}
+> > +
+> >  void red_qxl_init(RedsState *reds, QXLInstance *qxl)
+> >  {
+> >      QXLState *qxl_state;
+> > diff --git a/server/spice-qxl.h b/server/spice-qxl.h
+> > index 0c4e75fc..547d3d93 100644
+> > --- a/server/spice-qxl.h
+> > +++ b/server/spice-qxl.h
+> > @@ -115,6 +115,52 @@ void spice_qxl_gl_draw_async(QXLInstance
+> > *instance,
+> >                               uint32_t w, uint32_t h,
+> >                               uint64_t cookie);
+> >  
+> > +/* since spice 0.14.2 */
+> > +
+> > +/**
+> > + * spice_qxl_set_device_info:
+> > + * @instance the QXL instance to set the path to
+> > + * @device_address the path of the device this QXL instance belongs
+> > to
+> > + * @device_display_id_start the starting device display ID of this
+> > interface,
+> > + *                          i.e. the one monitor ID 0 maps to
+> 
+> perhaps reword this last line:
+> i.e. the device display ID of monitor ID 0
+
+Will do.
+
+> > + * @device_display_id_count the total number of device display IDs
+> > on this
+> > + *                          interface
+> > + *
+> > + * Sets the device information for this QXL interface, i.e. the
+> > hardware
+> > + * address (e.g. PCI) of the graphics device and the IDs of the
+> > displays of the
+> > + * graphics device that are exposed by this interface (device
+> > display IDs).
+> > + *
+> > + * The supported device address format is:
+> > + * "pci/<DOMAIN>/<SLOT>.<FUNCTION>/.../<SLOT>.<FUNCTION>"
+> > + *
+> > + * The "pci" identifies the rest of the string as a PCI address. It
+> > is the only
+> > + * supported address at the moment, other identifiers can be
+> > introduced later.
+> > + * <DOMAIN> is the PCI domain, followed by <SLOT>.<FUNCTION> of any
+> > PCI bridges
+> > + * in the chain leading to the device. The last <SLOT>.<FUNCTION> is
+> > the
+> > + * graphics device. All of <DOMAIN>, <SLOT>, <FUNCTION> are
+> > hexadecimal numbers
+> > + * with the following number of digits:
+> > + *   <DOMAIN>: 4
+> > + *   <SLOT>: 2
+> > + *   <FUNCTION>: 1
+> > + *
+> > + * The device_display_id_{start,count} denotes the sequence of
+> > device display
+> > + * IDs that map to the zero-based sequence of monitor IDs provided
+> > by monitors
+> > + * config on this interface. For example with
+> > device_display_id_start = 2 and
+> > + * device_display_id_count = 3 you get the following mapping:
+> > + * monitor_id  ->  device_display_id
+> > + *          0  ->  2
+> > + *          1  ->  3
+> > + *          2  ->  4
+> > + *
+> > + * Note this example is unsupported in practice. The only supported
+> > cases are
+> > + * either a single device display ID (count = 1) or multiple device
+> > display IDs
+> > + * in a sequence starting from 0.
+> > + */
+> 
+> Gerd previously objected to using an example of an unsupported
+> scenario. But it doesn't seem that you changed anything here. I don't
+> care too much, myself.
+
+Right, forgot about that.
+
+Thanks,
+Lukas
+
+> > +void spice_qxl_set_device_info(QXLInstance *instance,
+> > +                               const char *device_address,
+> > +                               uint32_t device_display_id_start,
+> > +                               uint32_t device_display_id_count);
+> > +
+> >  typedef struct QXLDevInitInfo {
+> >      uint32_t num_memslots_groups;
+> >      uint32_t num_memslots;
+> > diff --git a/server/spice-server.syms b/server/spice-server.syms
+> > index edf04a42..ac4d9b14 100644
+> > --- a/server/spice-server.syms
+> > +++ b/server/spice-server.syms
+> > @@ -173,3 +173,8 @@ SPICE_SERVER_0.13.2 {
+> >  global:
+> >      spice_server_set_video_codecs;
+> >  } SPICE_SERVER_0.13.1;
+> > +
+> > +SPICE_SERVER_0.14.2 {
+> > +global:
+> > +    spice_qxl_set_device_info;
+> > +} SPICE_SERVER_0.13.2;
+> 
+> 
