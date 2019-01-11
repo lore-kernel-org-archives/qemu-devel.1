@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44273)
+Received: from eggs.gnu.org ([209.51.188.92]:44329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1ghmG6-0008WR-4S
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 21:09:18 -0500
+	(envelope-from <si-wei.liu@oracle.com>) id 1ghmGQ-0000Yy-BM
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 21:09:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1ghmG5-0004kw-Fd
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 21:09:18 -0500
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 11 Jan 2019 10:08:49 +0800
-Message-Id: <20190111020849.22674-4-liq3ea@gmail.com>
-In-Reply-To: <20190111020849.22674-1-liq3ea@gmail.com>
-References: <20190111020849.22674-1-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] nvme: use pci_dev directly in
- nvme_realize
+	(envelope-from <si-wei.liu@oracle.com>) id 1ghmGO-00050f-JN
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 21:09:38 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:38552)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <si-wei.liu@oracle.com>)
+	id 1ghmGO-0004tU-7S
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 21:09:36 -0500
+References: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
+	<1546900184-27403-3-git-send-email-venu.busireddy@oracle.com>
+	<20190109105223-mutt-send-email-mst@kernel.org>
+From: si-wei liu <si-wei.liu@oracle.com>
+Message-ID: <e496ce78-462d-7675-9e97-6cbac2038489@oracle.com>
+Date: Thu, 10 Jan 2019 18:09:23 -0800
+MIME-Version: 1.0
+In-Reply-To: <20190109105223-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] virtio_net: Add support for "Data
+ Path Switching" during Live Migration.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,51 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: keith.busch@intel.com, kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Venu Busireddy <venu.busireddy@oracle.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-There is no need to make another reference.
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- hw/block/nvme.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 0ded74fa9a..0a1da749fc 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1238,7 +1238,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     pci_conf[PCI_INTERRUPT_PIN] = 1;
-     pci_config_set_prog_interface(pci_dev->config, 0x2);
-     pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
--    pcie_endpoint_cap_init(&n->parent_obj, 0x80);
-+    pcie_endpoint_cap_init(pci_dev, 0x80);
- 
-     n->num_namespaces = 1;
-     n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
-@@ -1250,10 +1250,10 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
- 
-     memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
-                           "nvme", n->reg_size);
--    pci_register_bar(&n->parent_obj, 0,
-+    pci_register_bar(pci_dev, 0,
-         PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
-         &n->iomem);
--    msix_init_exclusive_bar(&n->parent_obj, n->num_queues, 4, NULL);
-+    msix_init_exclusive_bar(pci_dev, n->num_queues, 4, NULL);
- 
-     id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
-     id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
-@@ -1308,7 +1308,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-         n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-         memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
-                               "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
--        pci_register_bar(&n->parent_obj, NVME_CMBLOC_BIR(n->bar.cmbloc),
-+        pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
-             PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
-             PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
- 
--- 
-2.17.1
+On 01/09/2019 07:56 AM, Michael S. Tsirkin wrote:
+> On Mon, Jan 07, 2019 at 05:29:41PM -0500, Venu Busireddy wrote:
+>> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+>> index 80d42e1..2a3ffd3 100644
+>> --- a/hw/acpi/pcihp.c
+>> +++ b/hw/acpi/pcihp.c
+>> @@ -176,6 +176,25 @@ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slo
+>>       }
+>>   }
+>>   
+>> +static void acpi_pcihp_cleanup_failover_primary(AcpiPciHpState *s, int bsel)
+>> +{
+>> +    BusChild *kid, *next;
+>> +    PCIBus *bus = acpi_pcihp_find_hotplug_bus(s, bsel);
+>> +
+>> +    if (!bus) {
+>> +        return;
+>> +    }
+>> +    QTAILQ_FOREACH_SAFE(kid, &bus->qbus.children, sibling, next) {
+>> +        DeviceState *qdev = kid->child;
+>> +        PCIDevice *pdev = PCI_DEVICE(qdev);
+>> +        int slot = PCI_SLOT(pdev->devfn);
+>> +
+>> +        if (pdev->failover_primary) {
+>> +            s->acpi_pcihp_pci_status[bsel].down |= (1U << slot);
+>> +        }
+>> +    }
+>> +}
+>> +
+>>   static void acpi_pcihp_update_hotplug_bus(AcpiPciHpState *s, int bsel)
+>>   {
+>>       BusChild *kid, *next;
+> So the result here will be that device will be deleted completely,
+> and will not reappear after guest reboot.
+The management stack will replug the VF until seeing the STANDBY_CHANGED 
+"enabled" event after guest driver finishes feature negotiation and sets 
+driver_ok.
+
+> I don't think this is what we wanted.
+> I think we wanted a special state that will hide device from guest until
+> guest acks the failover bit.
+What do we get by hiding? On the next reboot after system reset guest 
+may load an older OS instance without standby advertised. The VF can't 
+be plugged out then?
+
+The model we adopt here doesn't pair virtio with VF in the QEMU level. 
+If the VF isn't being used by guest, it would make sense to notify 
+management to release VF anyways.
+
+>
+>
+>> @@ -207,6 +226,14 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
+>>       int i;
+>>   
+>>       for (i = 0; i < ACPI_PCIHP_MAX_HOTPLUG_BUS; ++i) {
+>> +        /*
+>> +         * Set the acpi_pcihp_pci_status[].down bits of all the
+>> +         * failover_primary devices so that the devices are ejected
+>> +         * from the guest. We can't use the qdev_unplug() as well as the
+>> +         * hotplug_handler to unplug the devices, because the guest may
+>> +         * not be in a state to cooperate.
+>> +         */
+>> +        acpi_pcihp_cleanup_failover_primary(s, i);
+>>           acpi_pcihp_update_hotplug_bus(s, i);
+>>       }
+>>   }
+> I really don't want acpi to know anything about failover.
+>
+> All that needs to happen is sending a device delete request
+> to guest. Should work with any hotplug removal:
+> pci standard,acpi, etc.
+>
+As the code comments above indicated, there was issue uncovered that the 
+guest may not be in a state to respond to interrupt during reboot. 
+Actually management stack running fast enough is supposed to do this 
+graceful hot plug removal upon receiving the STANDBY_CHANGED "disabled" 
+event. However, if management stack's unable to do so, the code here 
+makes sure the VF can be deleted and won't be seen by an older kernel 
+after reboot.
+
+-Siwei
