@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51733)
+Received: from eggs.gnu.org ([209.51.188.92]:52095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ghsIl-00069a-4u
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:36:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghsL2-0006rx-NG
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:38:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1ghsIj-0005q3-AQ
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:36:27 -0500
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:42398)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1ghsIj-0005l0-4y
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:36:25 -0500
-Received: by mail-yb1-xb44.google.com with SMTP id q145so5529896ybq.9
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 00:36:23 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1ghsL1-0007si-NQ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:38:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40294)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghsL1-0007ra-CP
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:38:47 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
+	<154703594930.13472.14801510978993753998.stgit@pasha-VirtualBox>
+Date: Fri, 11 Jan 2019 09:38:39 +0100
+In-Reply-To: <154703594930.13472.14801510978993753998.stgit@pasha-VirtualBox>
+	(Pavel Dovgalyuk's message of "Wed, 09 Jan 2019 15:12:29 +0300")
+Message-ID: <87lg3r8u7k.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<20190109112728.9214-2-xieyongji@baidu.com>
-	<20190110124946.GL2178@redhat.com>
-	<CAONzpcZCTqN3CN1DBd6WdjKoTSr257Y2vOCuLOh9LBb-5K_hpg@mail.gmail.com>
-	<20190110132443.GM2178@redhat.com>
-	<CAONzpcZ5HXP2-9PEZW=RwunviAcPL3kYosJhUWB0g09j=pf0oQ@mail.gmail.com>
-	<20190110141125.GP2178@redhat.com>
-	<CAONzpcY8LdzEEqourAjw5mZR9fjtjv20HqvyOvaWVoriD4Cbjg@mail.gmail.com>
-	<20190110164125.GS2178@redhat.com>
-	<CAONzpcb4hk87JhF0Cuz4xWDto5EOaKQSVPvegiUVF+2TbYGouw@mail.gmail.com>
-	<20190111083237.GA18491@redhat.com>
-In-Reply-To: <20190111083237.GA18491@redhat.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Fri, 11 Jan 2019 16:36:11 +0800
-Message-ID: <CAONzpcaB=JVG2nkPMUUFLkGM14j=pZGSA8hyTBQ-+syL5J_WgA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 1/7] char-socket: Enable
- "nowait" option on client sockets
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v9 12/21] replay: introduce breakpoint at
+ the specified step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,251 +28,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
-	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Fri, 11 Jan 2019 at 16:32, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
->
-> On Fri, Jan 11, 2019 at 03:50:40PM +0800, Yongji Xie wrote:
-> > On Fri, 11 Jan 2019 at 00:41, Daniel P. Berrang=C3=A9 <berrange@redhat.=
-com> wrote:
-> > >
-> > > On Thu, Jan 10, 2019 at 10:29:20PM +0800, Yongji Xie wrote:
-> > > > On Thu, 10 Jan 2019 at 22:11, Daniel P. Berrang=C3=A9 <berrange@red=
-hat.com> wrote:
-> > > > >
-> > > > > On Thu, Jan 10, 2019 at 10:08:54PM +0800, Yongji Xie wrote:
-> > > > > > On Thu, 10 Jan 2019 at 21:24, Daniel P. Berrang=C3=A9 <berrange=
-@redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Thu, Jan 10, 2019 at 09:19:41PM +0800, Yongji Xie wrote:
-> > > > > > > > On Thu, 10 Jan 2019 at 20:50, Daniel P. Berrang=C3=A9 <berr=
-ange@redhat.com> wrote:
-> > > > > > > > >
-> > > > > > > > > On Wed, Jan 09, 2019 at 07:27:22PM +0800, elohimes@gmail.=
-com wrote:
-> > > > > > > > > > From: Xie Yongji <xieyongji@baidu.com>
-> > > > > > > > > >
-> > > > > > > > > > Enable "nowait" option to make QEMU not do a connect
-> > > > > > > > > > on client sockets during initialization of the chardev.
-> > > > > > > > > > Then we can use qemu_chr_fe_wait_connected() to connect
-> > > > > > > > > > when necessary. Now it would be used for unix domain
-> > > > > > > > > > socket of vhost-user-blk device to support reconnect.
-> > > > > > > > > >
-> > > > > > > > > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> > > > > > > > > > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-> > > > > > > > > > ---
-> > > > > > > > > >  chardev/char-socket.c | 56 +++++++++++++++++++++------=
-----------------
-> > > > > > > > > >  qapi/char.json        |  3 +--
-> > > > > > > > > >  qemu-options.hx       |  9 ++++---
-> > > > > > > > > >  3 files changed, 35 insertions(+), 33 deletions(-)
-> > > > > > > > > >
-> > > > > > > > > > diff --git a/chardev/char-socket.c b/chardev/char-socke=
-t.c
-> > > > > > > > > > index eaa8e8b68f..f803f4f7d3 100644
-> > > > > > > > > > --- a/chardev/char-socket.c
-> > > > > > > > > > +++ b/chardev/char-socket.c
-> > > > > > > > > > @@ -1072,37 +1072,37 @@ static void qmp_chardev_open_so=
-cket(Chardev *chr,
-> > > > > > > > > >          s->reconnect_time =3D reconnect;
-> > > > > > > > > >      }
-> > > > > > > > > >
-> > > > > > > > > > -    if (s->reconnect_time) {
-> > > > > > > > > > -        tcp_chr_connect_async(chr);
-> > > > > > > > > > -    } else {
-> > > > > > > > > > -        if (s->is_listen) {
-> > > > > > > > > > -            char *name;
-> > > > > > > > > > -            s->listener =3D qio_net_listener_new();
-> > > > > > > > > > +    if (s->is_listen) {
-> > > > > > > > > > +        char *name;
-> > > > > > > > > > +        s->listener =3D qio_net_listener_new();
-> > > > > > > > > >
-> > > > > > > > > > -            name =3D g_strdup_printf("chardev-tcp-list=
-ener-%s", chr->label);
-> > > > > > > > > > -            qio_net_listener_set_name(s->listener, nam=
-e);
-> > > > > > > > > > -            g_free(name);
-> > > > > > > > > > +        name =3D g_strdup_printf("chardev-tcp-listener=
--%s", chr->label);
-> > > > > > > > > > +        qio_net_listener_set_name(s->listener, name);
-> > > > > > > > > > +        g_free(name);
-> > > > > > > > > >
-> > > > > > > > > > -            if (qio_net_listener_open_sync(s->listener=
-, s->addr, errp) < 0) {
-> > > > > > > > > > -                object_unref(OBJECT(s->listener));
-> > > > > > > > > > -                s->listener =3D NULL;
-> > > > > > > > > > -                goto error;
-> > > > > > > > > > -            }
-> > > > > > > > > > +        if (qio_net_listener_open_sync(s->listener, s-=
->addr, errp) < 0) {
-> > > > > > > > > > +            object_unref(OBJECT(s->listener));
-> > > > > > > > > > +            s->listener =3D NULL;
-> > > > > > > > > > +            goto error;
-> > > > > > > > > > +        }
-> > > > > > > > > >
-> > > > > > > > > > -            qapi_free_SocketAddress(s->addr);
-> > > > > > > > > > -            s->addr =3D socket_local_address(s->listen=
-er->sioc[0]->fd, errp);
-> > > > > > > > > > -            update_disconnected_filename(s);
-> > > > > > > > > > +        qapi_free_SocketAddress(s->addr);
-> > > > > > > > > > +        s->addr =3D socket_local_address(s->listener->=
-sioc[0]->fd, errp);
-> > > > > > > > > > +        update_disconnected_filename(s);
-> > > > > > > > > >
-> > > > > > > > > > -            if (is_waitconnect &&
-> > > > > > > > > > -                qemu_chr_wait_connected(chr, errp) < 0=
-) {
-> > > > > > > > > > -                return;
-> > > > > > > > > > -            }
-> > > > > > > > > > -            if (!s->ioc) {
-> > > > > > > > > > -                qio_net_listener_set_client_func_full(=
-s->listener,
-> > > > > > > > > > -                                                      =
-tcp_chr_accept,
-> > > > > > > > > > -                                                      =
-chr, NULL,
-> > > > > > > > > > -                                                      =
-chr->gcontext);
-> > > > > > > > > > -            }
-> > > > > > > > > > +        if (is_waitconnect &&
-> > > > > > > > > > +            qemu_chr_wait_connected(chr, errp) < 0) {
-> > > > > > > > > > +            return;
-> > > > > > > > > > +        }
-> > > > > > > > > > +        if (!s->ioc) {
-> > > > > > > > > > +            qio_net_listener_set_client_func_full(s->l=
-istener,
-> > > > > > > > > > +                                                  tcp_=
-chr_accept,
-> > > > > > > > > > +                                                  chr,=
- NULL,
-> > > > > > > > > > +                                                  chr-=
->gcontext);
-> > > > > > > > > > +        }
-> > > > > > > > > > +    } else if (is_waitconnect) {
-> > > > > > > > > > +        if (s->reconnect_time) {
-> > > > > > > > > > +            tcp_chr_connect_async(chr);
-> > > > > > > > > >          } else if (qemu_chr_wait_connected(chr, errp) =
-< 0) {
-> > > > > > > > > >              goto error;
-> > > > > > > > > >          }
-> > > > > > > > >
-> > > > > > > > > This skips everything when 'is_waitconnect' is false.
-> > > > > > > > >
-> > > > > > > > > This combines with a bug in tests/libqtest.c which adds t=
-he 'nowait'
-> > > > > > > > > flag to the -chardevs it cteates. This mistake was previo=
-usly ignored
-> > > > > > > > > because the chardevs were socket clients, but now we hono=
-ur it.
-> > > > > > > > >
-> > > > > > > > > We shoul remove 'nowait' from the qtest chardevs, but sep=
-arately
-> > > > > > > > > from that this code should also still attempt a non-block=
-ing
-> > > > > > > > > connect when is_waitconnect is false.
-> > > > > > > > >
-> > > > > > > >
-> > > > > > > > Do you mean we still need to connect server in background w=
-ith
-> > > > > > > > "nowait" option? But my purpose is not to connect server un=
-til we
-> > > > > > > > manually call qemu_chr_fe_wait_connected() in other place.
-> > > > > > >
-> > > > > > > I don't see a need to delay the connect. We can start a
-> > > > > > > background connect right away. The later code you have
-> > > > > > > merely needs to wait for that background connect  to
-> > > > > > > finish, which qemu_chr_fe_wait_connected still accomplishes.
-> > > > > > > This keeps the chardev code clearer only having 2 distinct
-> > > > > > > code paths to worry about - blocking or non-blocking connect.
-> > > > > > >
-> > > > > >
-> > > > > > Now the problem is that we have a server that only accept one
-> > > > > > connection. And we want to read something from it during device
-> > > > > > initializtion.
-> > > > > >
-> > > > > > If background connect it before we call qemu_chr_fe_wait_connec=
-ted()
-> > > > > > during device initializtion, qemu_chr_fe_wait_connected() will
-> > > > > > accomplish but we can't read anything. And we have no way to re=
-lease
-> > > > > > the background connection. So what I want to do in this patch i=
-s to
-> > > > > > disable background connect.
-> > > > >
-> > > > > I'm not seeing the problem here. What I proposed results in
-> > > > >
-> > > > >   1. chardev starts connect()
-> > > >
-> > > > This should be asynchronous with "reconnect" option. Another thread
-> > > > may connect before vhost backend?
-> > > >
-> > > > >   2. vhost backend waits for connect() to complete
-> > > >
-> > > > Sorry, I'm not sure I get your point here. Do you mean vhost backen=
-d
-> > > > call qemu_chr_fe_wait_connected()? Seems like
-> > > > qemu_chr_fe_wait_connected() will connect directly rather than wait
-> > > > for connect() to complete?
-> > >
-> > > Ahhhh, yes, you are right.
-> > >
-> > > qemu_chr_fe_wait_connected will potentially cause a second connection=
- to
-> > > be established
-> > >
-> > > Looking at it the qemu_chr_fe_wait_connected() I believe it is seriou=
-sly
-> > > broken even before this patch series.
-> > >
-> > > The intended usage is that a device can all qemu_chr_fe_wait_connecte=
-d
-> > > to wait for a new connection to be established, and then do I/O on th=
-e
-> > > chardev.  This does not in fact work if TLS, websock or telnet modes
-> > > are enabled for the socket, due to a mistake introduced when we previ=
-ously
-> > > tried to fix this:
-> > >
-> > >   commit 1dc8a6695c731abb7461c637b2512c3670d82be4
-> > >   Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > >   Date:   Tue Aug 16 12:33:32 2016 +0400
-> > >
-> > >     char: fix waiting for TLS and telnet connection
-> > >
-> > > That commit fixed the problem where we continued to accept() new sock=
-ets
-> > > when TLS/telnet was enabled, because the 's->connected' flag isn't se=
-t
-> > > immediately.
-> > >
-> > > Unfortunately what this means is that when qemu_chr_fe_wait_connected
-> > > returns, the chardev is *not* ready to read/write data. The TLS/telne=
-t
-> > > handshake has not been run, and is still pending in the background.
-> > >
-> > > So we'll end up with device backend trying todo I/O on the chardev
-> > > at the same time as it is trying todo the TLS/telnet handshake.
-> > >
-> > > We need to fix qemu_chr_fe_wait_connected so that it does explicit
-> > > synchronization wrt to any ongoing background connection process.
-> > > It must only return once all TLS/telnet/websock handshakes have
-> > > completed.  If we fix that correctly, then I believe it will  also
-> > > solve the problem you're trying to address.
-> > >
-> >
-> > Yes, I think this should be the right way to go. To fix it, my thought
-> > is to track the async QIOChannelSocket in SocketChardev. Then we can
-> > easily get the connection progress in qemu_chr_fe_wait_connected(). Do
-> > you have any suggestion?
->
-> I've got a few patches that refactor the code to fix this. I'll send them
-> today and CC you on them.
->
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
 
-That would be great! Thank you.
+> This patch introduces replay_break, replay_delete_break
+> qmp and hmp commands.
+> These commands allow stopping at the specified instruction.
+> It may be useful for debugging when there are some known
+> events that should be investigated.
+> replay_break command has one argument - number of instructions
+> executed since the start of the replay.
+> replay_delete_break removes previously set breakpoint.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>
+> --
+>
+> v2:
+>  - renamed replay_break qmp command into replay-break
+>    (suggested by Eric Blake)
+> v7:
+>  - introduces replay_delete_break command
+> v9:
+>  - changed 'step' parameter name to 'icount'
+>  - moved json stuff to replay.json and updated the description
+>    (suggested by Markus Armbruster)
+> ---
+>  hmp-commands.hx           |   34 ++++++++++++++++++
+>  hmp.h                     |    2 +
+>  qapi/replay.json          |   36 +++++++++++++++++++
+>  replay/replay-debugging.c |   85 +++++++++++++++++++++++++++++++++++++++++++++
+>  replay/replay-internal.h  |    4 ++
+>  replay/replay.c           |   17 +++++++++
+>  6 files changed, 178 insertions(+)
+>
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index ba71558..6d04c02 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1890,6 +1890,40 @@ Set QOM property @var{property} of object at location @var{path} to value @var{v
+>  ETEXI
+>  
+>      {
+> +        .name       = "replay_break",
+> +        .args_type  = "icount:i",
+> +        .params     = "icount",
+> +        .help       = "sets breakpoint on the step specified by the icount of the replay",
 
-Thanks,
-Yongji
+"set replay breakpoint at the specified instruction count"
+
+> +        .cmd        = hmp_replay_break,
+> +    },
+> +
+> +STEXI
+> +@item replay_break @var{icount}
+> +@findex replay_break
+> +Set breakpoint on the step of the replay specified by @var{icount}.
+> +Execution stops when the specified @var{icount} is reached.
+> +icount for the reference may be observed with 'info replay' command.
+> +There could be at most one breakpoint. When breakpoint is set, the prior
+> +one is removed. The breakpoints may be set only in replay mode and only
+> +at the step in the future.
+
+This still uses both "step" and "instruction count".
+
+Suggest
+
+   Set replay breakpoint at instruction count @var{icount}.
+   Execution stops when the specified instruction is reached.
+   There can be at most one breakpoint.  When breakpoint is set, any prior
+   one is removed.  The breakpoint may be set only in replay mode and only
+   "in the future", i.e. at instruction counts greater than the current one.
+   The current instruction count can be observed with 'info replay'.
+
+
+> +ETEXI
+> +
+> +    {
+> +        .name       = "replay_delete_break",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "removes replay breakpoint",
+> +        .cmd        = hmp_replay_delete_break,
+> +    },
+> +
+> +STEXI
+> +@item replay_delete_break
+> +@findex replay_delete_break
+> +Removes replay breakpoint which was previously set with replay_break.
+> +The command is ignored when there are no replay breakpoints.
+> +ETEXI
+> +
+> +    {
+>          .name       = "info",
+>          .args_type  = "item:s?",
+>          .params     = "[subcommand]",
+> diff --git a/hmp.h b/hmp.h
+> index d792149..c9b9b4f 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -149,5 +149,7 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+>  void hmp_info_sev(Monitor *mon, const QDict *qdict);
+>  void hmp_info_replay(Monitor *mon, const QDict *qdict);
+> +void hmp_replay_break(Monitor *mon, const QDict *qdict);
+> +void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/qapi/replay.json b/qapi/replay.json
+> index d7e76cf..a63219c 100644
+> --- a/qapi/replay.json
+> +++ b/qapi/replay.json
+> @@ -63,3 +63,39 @@
+>  ##
+>  { 'command': 'query-replay',
+>    'returns': 'ReplayInfo' }
+> +
+> +##
+> +# @replay-break:
+> +#
+> +# Set breakpoint on the step of the replay specified by @icount.
+> +# Execution stops when the specified @icount is reached.
+> +# icount for the reference may be obtained with @query-replay command.
+> +# There could be at most one breakpoint. When breakpoint is set, the prior
+> +# one is removed. The breakpoints may be set only in replay mode and only
+> +# at the step in the future.
+
+My comment on hmp-commands.hx applies.
+
+> +#
+> +# @icount: execution step to stop at
+
+s/execution step/instruction count/
+
+> +#
+> +# Since: 4.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "replay-break", "data": { "icount": 220414 } }
+> +#
+> +##
+> +{ 'command': 'replay-break', 'data': { 'icount': 'int' } }
+> +
+> +##
+> +# @replay-delete-break:
+> +#
+> +# Removes replay breakpoint which was set with @replay-break.
+> +# The command is ignored when there are no replay breakpoints.
+> +#
+> +# Since: 4.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "replay-delete-break" }
+> +#
+> +##
+> +{ 'command': 'replay-delete-break' }
+[...]
+
+We're down to phrasing help and documentation.  Almost done :)
