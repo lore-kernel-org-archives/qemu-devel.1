@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52039)
+Received: from eggs.gnu.org ([209.51.188.92]:52142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ghuWH-0004yu-LW
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:58:34 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghuWg-0005Mw-Ga
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:58:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1ghuWE-0006cu-7D
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:58:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41462)
+	(envelope-from <pbonzini@redhat.com>) id 1ghuWf-0006nX-Is
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:58:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ghuW8-0006aa-Tr
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:58:27 -0500
-Date: Fri, 11 Jan 2019 10:58:15 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190111105815.GC2738@work-vm>
-References: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
-	<20190110120120.9943-2-yury-kotov@yandex-team.ru>
-	<20190110201418.GK2589@work-vm>
-	<20190111110644.19896d4d@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghuWf-0006nG-B1
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:58:57 -0500
+References: <20190110205129.22851-1-pbonzini@redhat.com>
+	<CAFEAcA8V+HNGS_8da2qHTAzj_Dxi8+s5xojq6dErRCpnC8ci_g@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <832b5ca4-c671-e6ce-b0dd-0c02f8d4ed7b@redhat.com>
+Date: Fri, 11 Jan 2019 11:58:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190111110644.19896d4d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] migration: add RAMBlock's offset
- validation
+In-Reply-To: <CAFEAcA8V+HNGS_8da2qHTAzj_Dxi8+s5xojq6dErRCpnC8ci_g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v7 00/35] Misc patches for 2018-12-18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Yury Kotov <yury-kotov@yandex-team.ru>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, wrfsh@yandex-team.ru
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Thu, 10 Jan 2019 20:14:19 +0000
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> > > RAM migration has a RAMBlock validation stage (flag RAM_SAVE_FLAG_MEM_SIZE).
-> > > In this stage QEMU checks further information about RAMBlock:
-> > > 1. Presence (by idstr),
-> > > 2. Length (trying to resize, when differs),
-> > > 3. Optional page size.
-> > > 
-> > > This patch adds a check for RAMBlock's offset. Currently we check it during
-> > > RAM pages loading - every RAM page has an offset in its header. But there is a
-> > > case when we don't send RAM pages (see below).
-> > > 
-> > > The following commits introduce a capability (ignore-external) to skip some
-> > > RAM blocks from migration. In such case the migration stream contains only
-> > > meta information about RAM blocks to validate them. So, the only way to check
-> > > block's offset is to send it explicitly.
-> > > 
-> > > Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>  
-> > 
-> > But why check that offsets match?  THey aren't supposed to!
-> > Offset's are entirely private to each qemu and they're allowed to be
-> > different; the only requirement is that the length and name of each
-> > RAMBlock matches, then all the operations we do over the migration
-> > stream are relative to the start of the block.
-> > 
-> > One example where they are validly different is where you hotplug some
-> > RAM, so for example:
-> > 
-> > 
-> >   source qemu
-> >       -M 4G
-> >       hotplug PCI card
-> >       hotplug 2G
-> > 
-> >   destination qemu
-> >       -M 4G
-> >       PCI card declared on the command line
-> >       extra 2G declared on the command line
-> > 
-> > The offsets are different but we can migrate that case fine.
-> PCI mappings are updated after migration is done, to make DST match SRC
-> (get_pci_config_device) that mapping is irrelevant here, but I was under
-> impression that offset in terms of MemoryRegion (GPA) was passed in
-> migration stream, even if we do not update memory mappings for RAM
-> (mapping depends on hotplug/CLI order or explicit addr on CLI for memory
-> devices).
+On 11/01/19 11:51, Peter Maydell wrote:
+> make: Entering directory
+> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
+>   BUILD   debian9
+> The command '/bin/sh -c DEBIAN_FRONTEND=noninteractive eatmydata
+> apt install -y --no-install-recommends         bison
+> build-essential         ca-certificates         clang         flex
+>     gettext         git         perl         pkg-config         psmisc
+>         python         texinfo         $(apt-get -s build-dep qemu |
+> egrep ^Inst | fgrep '[all]' | cut -d\  -f2)' returned a non-zero code:
+> 100
+> Traceback (most recent call last):
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 563, in <module>
+>     sys.exit(main())
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 560, in main
+>     return args.cmdobj.run(args, argv)
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 376, in run
+>     extra_files_cksum=cksum)
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 254, in build_image
+>     quiet=quiet)
+>   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
+> line 181, in _do_check
+>     return subprocess.check_call(self._command + cmd, **kwargs)
+>   File "/usr/lib/python2.7/subprocess.py", line 541, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
+> 'qemu:debian9', '-f', '/tmp/docker_buildsLHwaa/tmpXGE1LW.docker',
+> '/tmp/docker_buildsLHwaa']' returned non-zero exit status 100
+> /home/petmay01/linaro/qemu-for-merges/tests/docker/Makefile.include:53:
+> recipe for target 'docker-image-debian9' failed
+> make: *** [docker-image-debian9] Error 1
+> make: Leaving directory
+> '/home/petmay01/linaro/qemu-for-merges/build/all-linux-static'
 
-The GPA must match, but the offset within ram_addr_t space is abstract
-and isn't visible to the guest.
+Well, this time I absolutely cannot reproduce this...  can you try "make
+docker-image-debian9 V=1"?
 
-Dave
-
-> > 
-> > Dave
-> > 
-> > > ---
-> > >  migration/ram.c | 15 +++++++++++++--
-> > >  1 file changed, 13 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/migration/ram.c b/migration/ram.c
-> > > index 7e7deec4d8..39629254e1 100644
-> > > --- a/migration/ram.c
-> > > +++ b/migration/ram.c
-> > > @@ -3171,6 +3171,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-> > >          if (migrate_postcopy_ram() && block->page_size != qemu_host_page_size) {
-> > >              qemu_put_be64(f, block->page_size);
-> > >          }
-> > > +        qemu_put_be64(f, block->offset);
-> > >      }
-> > >  
-> > >      rcu_read_unlock();
-> > > @@ -4031,7 +4032,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-> > >  
-> > >      seq_iter++;
-> > >  
-> > > -    if (version_id != 4) {
-> > > +    if (version_id < 4) {
-> > >          ret = -EINVAL;
-> > >      }
-> > >  
-> > > @@ -4132,6 +4133,16 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-> > >                              ret = -EINVAL;
-> > >                          }
-> > >                      }
-> > > +                    if (version_id >= 5) {
-> > > +                        ram_addr_t offset;
-> > > +                        offset = qemu_get_be64(f);
-> > > +                        if (block->offset != offset) {
-> > > +                            error_report("Mismatched RAM block offset %s "
-> > > +                                         "%" PRId64 "!= %" PRId64,
-> > > +                                         id, offset, (uint64_t)block->offset);
-> > > +                            ret = -EINVAL;
-> > > +                        }
-> > > +                    }
-> > >                      ram_control_load_hook(f, RAM_CONTROL_BLOCK_REG,
-> > >                                            block->idstr);
-> > >                  } else {
-> > > @@ -4363,5 +4374,5 @@ static SaveVMHandlers savevm_ram_handlers = {
-> > >  void ram_mig_init(void)
-> > >  {
-> > >      qemu_mutex_init(&XBZRLE.lock);
-> > > -    register_savevm_live(NULL, "ram", 0, 4, &savevm_ram_handlers, &ram_state);
-> > > +    register_savevm_live(NULL, "ram", 0, 5, &savevm_ram_handlers, &ram_state);
-> > >  }
-> > > -- 
-> > > 2.20.1
-> > >   
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
