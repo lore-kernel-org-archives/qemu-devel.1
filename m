@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47512)
+Received: from eggs.gnu.org ([209.51.188.92]:47653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghuCz-0004cB-9Z
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:38:37 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ghuDX-0004tz-Am
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghuCy-0005yd-JT
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:38:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghuCy-0005xH-BW
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:38:36 -0500
-References: <1547196148-12250-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b1db55de-6741-76c7-33b1-74fc2692b82c@redhat.com>
-Date: Fri, 11 Jan 2019 11:38:21 +0100
+	(envelope-from <kwolf@redhat.com>) id 1ghuDW-0006hW-Gt
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:39:11 -0500
+Date: Fri, 11 Jan 2019 11:38:58 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190111103858.GB5010@dhcp-200-186.str.redhat.com>
+References: <20190110191901.5082-1-eblake@redhat.com>
+	<20190110191901.5082-3-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1547196148-12250-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] HACKING: Clarify the paragraph about
- typedefs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190110191901.5082-3-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] block: Take advantage of QemuOpt
+ default integers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, lbloch@janustech.com, armbru@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>, Stefan Weil <sw@weilnetz.de>, Jeff Cody <jcody@redhat.com>
 
-On 11/01/19 09:42, Thomas Huth wrote:
->  2.3. Typedefs
-> -Typedefs are used to eliminate the redundant 'struct' keyword.
-> +Typedefs can be used to eliminate the redundant 'struct' keyword. This=
- is
-> +especially helpful for common types that are used all over the place. =
-Since
-> +certain C compilers choke on duplicated typedefs, you should avoid the=
-m and
-> +declare a typedef only in one header file. For common types, you can u=
-se
-> +"include/qemu/typedefs.h" for example. Note that it is also perfectly =
-fine to
-> +use forward struct definitions without typedefs for references in head=
-ers
-> +to avoid the problem with duplicated typedefs.
-> =20
+Am 10.01.2019 um 20:18 hat Eric Blake geschrieben:
+> Instead of defining an integer to a default string value (where we
+> have to be careful how we spelled the integer because of the use of
+> stringify), populate a default integer value instead.
+> 
+> Drop a useless stringify(0); a missing default is just as easy to
+> interpret as 0 as an explicit string 0.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-I agree 100% with the wording after "Since".  However, I think the first
-part should be made stronger, not weaker.
+> diff --git a/block/vhdx.c b/block/vhdx.c
+> index b785aef4b7b..54bf6805fc6 100644
+> --- a/block/vhdx.c
+> +++ b/block/vhdx.c
+> @@ -2085,13 +2085,12 @@ static QemuOptsList vhdx_create_opts = {
+>         {
+>             .name = VHDX_BLOCK_OPT_LOG_SIZE,
+>             .type = QEMU_OPT_SIZE,
+> -           .def_value_str = stringify(DEFAULT_LOG_SIZE),
+> +           .def_value_int = DEFAULT_LOG_SIZE,
+>             .help = "Log size; min 1MB."
+>         },
+>         {
+>             .name = VHDX_BLOCK_OPT_BLOCK_SIZE,
+>             .type = QEMU_OPT_SIZE,
+> -           .def_value_str = stringify(0),
+>             .help = "Block Size; min 1MB, max 256MB. " \
+>                     "0 means auto-calculate based on image size."
+>         },
 
-Typedefs are use to eliminate the redundant 'struct' keyword, since type
-names have a different style than other identifiers ("CamelCase" versus
-"snake_case").  Each struct should have a CamelCase name and a
-corresponding typedef.
+Before the patch:
+$ ./qemu-img create -f vhdx /tmp/test.vhdx 64M
+Formatting '/tmp/test.vhdx', fmt=vhdx size=67108864 log_size=1048576 block_size=0
 
-Since certain C compilers choke on duplicated typedefs, you should avoid
-them and declare a typedef only in one header file.  For common types,
-you can use "include/qemu/typedefs.h" for example.  However, as a metter
-of convenience it is also perfectly fine to use forward struct
-definitions instead of typedefs in headers and function prototypes; this
-avoids problems with duplicated typedefs and reduces the need to include
-headers from other headers.
+After the patch:
+$ ./qemu-img create -f vhdx /tmp/test.vhdx 64M
+Formatting '/tmp/test.vhdx', fmt=vhdx size=67108864 log_size=1048576
 
-And, I would move it to CODING_STYLE since we are at it. :)
+Intentional?
 
-Paolo
+Kevin
