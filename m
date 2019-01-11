@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34560)
+Received: from eggs.gnu.org ([209.51.188.92]:34590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ghtAH-0000iw-Kz
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:31:48 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ghtAQ-0000mq-Pt
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:31:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ghtAB-0003GU-AK
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:31:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55356)
+	(envelope-from <kraxel@redhat.com>) id 1ghtAJ-0003Yk-HK
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:31:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghtA7-00035B-3r
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:31:37 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghtAD-000354-0Z
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:31:41 -0500
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 11 Jan 2019 10:31:13 +0100
-Message-Id: <20190111093116.17188-3-kraxel@redhat.com>
+Date: Fri, 11 Jan 2019 10:31:12 +0100
+Message-Id: <20190111093116.17188-2-kraxel@redhat.com>
 In-Reply-To: <20190111093116.17188-1-kraxel@redhat.com>
 References: <20190111093116.17188-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/5] vfio/display: add edid support.
+Subject: [Qemu-devel] [PATCH 1/5] vfio: update kernel headers.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,187 +26,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alex Williamson <alex.williamson@redhat.com>, intel-gvt-dev@lists.freedesktop.org, Gerd Hoffmann <kraxel@redhat.com>
 
-This patch adds EDID support to the vfio display (aka vgpu) code.
-When supported by the mdev driver qemu will generate a EDID blob
-and pass it on using the new vfio edid region.  The EDID blob will
-be updated on UI changes (i.e. window resize), so the guest can
-adapt.
+Temporary, for testing convinience.
+
+Once qemu master is synced with the linux 5.0-rc1 headers
+this is not needed any more.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/vfio/vfio-common.h |   3 ++
- hw/vfio/display.c             | 118 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 121 insertions(+)
+ linux-headers/linux/vfio.h | 50 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 1b434d02f6..ff5c425048 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -148,6 +148,9 @@ typedef struct VFIODMABuf {
- typedef struct VFIODisplay {
-     QemuConsole *con;
-     RAMFBState *ramfb;
-+    struct vfio_region_info *edid_info;
-+    struct vfio_region_gfx_edid *edid_regs;
-+    uint8_t *edid_blob;
-     struct {
-         VFIORegion buffer;
-         DisplaySurface *surface;
-diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index dead30e626..0ef4d77e21 100644
---- a/hw/vfio/display.c
-+++ b/hw/vfio/display.c
-@@ -15,6 +15,7 @@
- #include <sys/ioctl.h>
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index ceb6453394..51662a7209 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -303,6 +303,56 @@ struct vfio_region_info_cap_type {
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
  
- #include "sysemu/sysemu.h"
-+#include "hw/display/edid.h"
- #include "ui/console.h"
- #include "qapi/error.h"
- #include "pci.h"
-@@ -24,6 +25,120 @@
- # define DRM_PLANE_TYPE_CURSOR  2
- #endif
- 
-+#define pread_field(_fd, _reg, _ptr, _fld)                              \
-+    if (sizeof(_ptr->_fld) !=                                           \
-+        pread(_fd, &(_ptr->_fld), sizeof(_ptr->_fld),                   \
-+              _reg->offset + offsetof(typeof(*_ptr), _fld)))            \
-+        goto err;
-+#define pwrite_field(_fd, _reg, _ptr, _fld)                             \
-+    if (sizeof(_ptr->_fld) !=                                           \
-+        pwrite(_fd, &(_ptr->_fld), sizeof(_ptr->_fld),                  \
-+               _reg->offset + offsetof(typeof(*_ptr), _fld)))           \
-+        goto err;
++#define VFIO_REGION_TYPE_GFX                    (1)
++#define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
 +
++/**
++ * struct vfio_region_gfx_edid - EDID region layout.
++ *
++ * Set display link state and EDID blob.
++ *
++ * The EDID blob has monitor information such as brand, name, serial
++ * number, physical size, supported video modes and more.
++ *
++ * This special region allows userspace (typically qemu) set a virtual
++ * EDID for the virtual monitor, which allows a flexible display
++ * configuration.
++ *
++ * For the edid blob spec look here:
++ *    https://en.wikipedia.org/wiki/Extended_Display_Identification_Data
++ *
++ * On linux systems you can find the EDID blob in sysfs:
++ *    /sys/class/drm/${card}/${connector}/edid
++ *
++ * You can use the edid-decode ulility (comes with xorg-x11-utils) to
++ * decode the EDID blob.
++ *
++ * @edid_offset: location of the edid blob, relative to the
++ *               start of the region (readonly).
++ * @edid_max_size: max size of the edid blob (readonly).
++ * @edid_size: actual edid size (read/write).
++ * @link_state: display link state (read/write).
++ * VFIO_DEVICE_GFX_LINK_STATE_UP: Monitor is turned on.
++ * VFIO_DEVICE_GFX_LINK_STATE_DOWN: Monitor is turned off.
++ * @max_xres: max display width (0 == no limitation, readonly).
++ * @max_yres: max display height (0 == no limitation, readonly).
++ *
++ * EDID update protocol:
++ *   (1) set link-state to down.
++ *   (2) update edid blob and size.
++ *   (3) set link-state to up.
++ */
++struct vfio_region_gfx_edid {
++	__u32 edid_offset;
++	__u32 edid_max_size;
++	__u32 edid_size;
++	__u32 max_xres;
++	__u32 max_yres;
++	__u32 link_state;
++#define VFIO_DEVICE_GFX_LINK_STATE_UP    1
++#define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
++};
 +
-+static void vfio_display_edid_update(VFIOPCIDevice *vdev, bool enabled, int prefx, int prefy)
-+{
-+    VFIODisplay *dpy = vdev->dpy;
-+    qemu_edid_info edid = {
-+        .maxx  = dpy->edid_regs->max_xres,
-+        .maxy  = dpy->edid_regs->max_yres,
-+        .prefx = prefx,
-+        .prefy = prefy,
-+    };
-+
-+    dpy->edid_regs->link_state = VFIO_DEVICE_GFX_LINK_STATE_DOWN;
-+    pwrite_field(vdev->vbasedev.fd, dpy->edid_info, dpy->edid_regs, link_state);
-+
-+    if (!enabled) {
-+        return;
-+    }
-+
-+    if (edid.maxx && edid.prefx > edid.maxx) {
-+        edid.prefx = edid.maxx;
-+    }
-+    if (edid.maxy && edid.prefy > edid.maxy) {
-+        edid.prefy = edid.maxy;
-+    }
-+    qemu_edid_generate(dpy->edid_blob,
-+                       dpy->edid_regs->edid_max_size,
-+                       &edid);
-+
-+    dpy->edid_regs->edid_size = qemu_edid_size(dpy->edid_blob);
-+    pwrite_field(vdev->vbasedev.fd, dpy->edid_info, dpy->edid_regs, edid_size);
-+    if (pwrite(vdev->vbasedev.fd, dpy->edid_blob, dpy->edid_regs->edid_size,
-+               dpy->edid_info->offset + dpy->edid_regs->edid_offset)
-+        != dpy->edid_regs->edid_size) {
-+        goto err;
-+    }
-+
-+    dpy->edid_regs->link_state = VFIO_DEVICE_GFX_LINK_STATE_UP;
-+    pwrite_field(vdev->vbasedev.fd, dpy->edid_info, dpy->edid_regs, link_state);
-+    return;
-+
-+err:
-+    fprintf(stderr, "%s: Oops, pwrite error\n", __func__);
-+    return;
-+}
-+
-+static int vfio_display_edid_ui_info(void *opaque, uint32_t idx,
-+                                     QemuUIInfo *info)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+    VFIODisplay *dpy = vdev->dpy;
-+
-+    if (!dpy->edid_regs) {
-+        return 0;
-+    }
-+
-+    if (info->width && info->height) {
-+        vfio_display_edid_update(vdev, true, info->width, info->height);
-+    } else {
-+        vfio_display_edid_update(vdev, false, 0, 0);
-+    }
-+
-+    return 0;
-+}
-+
-+static void vfio_display_edid_init(VFIOPCIDevice *vdev)
-+{
-+    VFIODisplay *dpy = vdev->dpy;
-+    int ret;
-+
-+    ret = vfio_get_dev_region_info(&vdev->vbasedev,
-+                                   VFIO_REGION_TYPE_GFX,
-+                                   VFIO_REGION_SUBTYPE_GFX_EDID,
-+                                   &dpy->edid_info);
-+    if (ret) {
-+        return;
-+    }
-+
-+    dpy->edid_regs = g_new0(struct vfio_region_gfx_edid, 1);
-+    pread_field(vdev->vbasedev.fd, dpy->edid_info, dpy->edid_regs, edid_offset);
-+    pread_field(vdev->vbasedev.fd, dpy->edid_info, dpy->edid_regs, edid_max_size);
-+    pread_field(vdev->vbasedev.fd, dpy->edid_info, dpy->edid_regs, max_xres);
-+    pread_field(vdev->vbasedev.fd, dpy->edid_info, dpy->edid_regs, max_yres);
-+    dpy->edid_blob = g_malloc0(dpy->edid_regs->edid_max_size);
-+
-+    vfio_display_edid_update(vdev, true, 0, 0);
-+    return;
-+
-+err:
-+    fprintf(stderr, "%s: Oops, pread error\n", __func__);
-+    g_free(dpy->edid_regs);
-+    dpy->edid_regs = NULL;
-+    return;
-+}
-+
-+static void vfio_display_edid_exit(VFIODisplay *dpy)
-+{
-+    if (!dpy->edid_regs)
-+        return;
-+
-+    g_free(dpy->edid_regs);
-+    g_free(dpy->edid_blob);
-+}
-+
- static void vfio_display_update_cursor(VFIODMABuf *dmabuf,
-                                        struct vfio_device_gfx_plane_info *plane)
- {
-@@ -171,6 +286,7 @@ static void vfio_display_dmabuf_update(void *opaque)
- 
- static const GraphicHwOps vfio_display_dmabuf_ops = {
-     .gfx_update = vfio_display_dmabuf_update,
-+    .ui_info    = vfio_display_edid_ui_info,
- };
- 
- static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
-@@ -187,6 +303,7 @@ static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
-     if (vdev->enable_ramfb) {
-         vdev->dpy->ramfb = ramfb_setup(errp);
-     }
-+    vfio_display_edid_init(vdev);
-     return 0;
- }
- 
-@@ -366,5 +483,6 @@ void vfio_display_finalize(VFIOPCIDevice *vdev)
-     graphic_console_close(vdev->dpy->con);
-     vfio_display_dmabuf_exit(vdev->dpy);
-     vfio_display_region_exit(vdev->dpy);
-+    vfio_display_edid_exit(vdev->dpy);
-     g_free(vdev->dpy);
- }
+ /*
+  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+  * which allows direct access to non-MSIX registers which happened to be within
 -- 
 2.9.3
