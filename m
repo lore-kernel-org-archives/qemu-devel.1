@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55772)
+Received: from eggs.gnu.org ([209.51.188.92]:58654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gi1wn-0005bd-FY
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 13:54:26 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gi27Z-0007kR-MZ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:05:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gi1wg-0000si-NU
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 13:54:21 -0500
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Fri, 11 Jan 2019 18:54:12 +0000
-Message-ID: <bd304e3b-dad0-43de-5602-398111012967@janustech.com>
-References: <20190110191901.5082-1-eblake@redhat.com>
-	<20190110191901.5082-2-eblake@redhat.com>
-	<ee3dcc5c-23f6-e953-36f1-643c86bccbc0@janustech.com>
-	<236fdb34-e6e6-77bc-87e8-832ad2a6f1bd@redhat.com>
-In-Reply-To: <236fdb34-e6e6-77bc-87e8-832ad2a6f1bd@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D64CA2CC01E93E45BB990587849934E5@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ehabkost@redhat.com>) id 1gi27Y-0001jy-WC
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:05:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39040)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gi27Y-0001hl-P8
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:05:32 -0500
+Date: Fri, 11 Jan 2019 17:05:28 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190111190528.GQ4500@habkost.net>
+References: <20190111143815.26107-1-alex.bennee@linaro.org>
+	<89afa3af-940d-7f3b-ee7c-25027bfd18f5@redhat.com>
+	<87sgxzusb7.fsf@linaro.org>
+	<3b4aa1f9-c18a-e2d7-abdd-f688bed9f4a1@redhat.com>
+	<87pnt3uqjl.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] qemu-option: Allow integer defaults
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87pnt3uqjl.fsf@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] tests: replace rem = sleep(time) with
+ g_timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, cota@braap.org
 
-T24gMS8xMS8xOSA2OjIzIFBNLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBPbiAxLzExLzE5IDg6MTQg
-QU0sIExlb25pZCBCbG9jaCB3cm90ZToNCj4+IE9uIDEvMTAvMTkgOToxOCBQTSwgRXJpYyBCbGFr
-ZSB3cm90ZToNCj4+PiBTZXQgdGhlIGZyYW1ld29yayB1cCBmb3IgZGVjbGFyaW5nIGludGVnZXIg
-b3B0aW9ucyB3aXRoIGFuIGludGVnZXINCj4+PiBkZWZhdWx0LCBpbnN0ZWFkIG9mIG91ciBjdXJy
-ZW50IGluc2FuZSBhcHByb2FjaCBvZiByZXF1aXJpbmcgdGhlDQo+Pj4gZGVmYXVsdCB2YWx1ZSB0
-byBiZSBnaXZlbiBhcyBhIHN0cmluZyAod2hpY2ggdGhlbiBoYXMgdG8gYmUgcmVwYXJzZWQNCj4+
-PiBhdCBldmVyeSB1c2UgdGhhdCB3YW50cyBhIG51bWJlcikuICBnaXQgZ3JlcCAnW14uXWRlZl92
-YWx1ZV9zdHInIHNheXMNCj4+PiB0aGF0IHdlIGhhdmUgZG9uZSBhIGdvb2Qgam9iIG9mIE5PVCBh
-YnVzaW5nIHRoZSBpbnRlcm5hbCBmaWVsZA0KPj4+IG91dHNpZGUgb2YgdGhlIGltcGxlbWVudGF0
-aW9uIGluIHFlbXUtb3B0aW9uLmM7IHRoZXJlZm9yZSwgaXQgaXMgbm90DQo+Pj4gdG9vIGhhcmQg
-dG8gYXVkaXQgdGhhdCBhbGwgY29kZSBjYW4gZWl0aGVyIGhhbmRsZSB0aGUgbmV3IGludGVnZXIN
-Cj4+PiBkZWZhdWx0cyBjb3JyZWN0bHkgb3IgYWJvcnQgYmVjYXVzZSBhIGNhbGxlciB2aW9sYXRl
-ZCBjb25zdHJhaW50cy4NCj4+PiBTYWRseSwgd2UgRE8gaGF2ZSBhIGNvbnN0cmFpbnQgdGhhdCBx
-ZW11X29wdF9nZXQoKSBzaG91bGQgbm90IGJlDQo+Pj4gY2FsbGVkIG9uIGFuIG9wdGlvbiB0aGF0
-IGhhcyBhbiBpbnRlZ2VyIHR5cGUsIGJlY2F1c2Ugd2UgaGF2ZSBubw0KPj4+IHdoZXJlIHRvIHN0
-YXNoIGEgY2FjaGVkIGNvbnN0IGNoYXIgKiByZXN1bHQ7IGJ1dCBjYWxsZXJzIHRoYXQgd2FudA0K
-Pj4+IGFuIGludGVnZXIgc2hvdWxkIGJlIHVzaW5nIHFlbXVfb3B0X2dldF9udW1iZXIoKSBhbmQg
-ZnJpZW5kcw0KPj4+IGFueXdheXMuDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtl
-IDxlYmxha2VAcmVkaGF0LmNvbT4NCj4+PiAtLS0NCj4+PiAgICBpbmNsdWRlL3FlbXUvb3B0aW9u
-LmggfCAxMiArKysrKysrKw0KPj4+ICAgIHV0aWwvcWVtdS1vcHRpb24uYyAgICB8IDY5ICsrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0NCj4+PiAgICAyIGZpbGVzIGNo
-YW5nZWQsIDcyIGluc2VydGlvbnMoKyksIDkgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZmIC0t
-Z2l0IGEvaW5jbHVkZS9xZW11L29wdGlvbi5oIGIvaW5jbHVkZS9xZW11L29wdGlvbi5oDQo+Pj4g
-aW5kZXggODQ0NTg3Y2FiMzkuLjQ2YjgwZDVhNmUxIDEwMDY0NA0KPj4+IC0tLSBhL2luY2x1ZGUv
-cWVtdS9vcHRpb24uaA0KPj4+ICsrKyBiL2luY2x1ZGUvcWVtdS9vcHRpb24uaA0KPj4+IEBAIC00
-Niw2ICs0NiwxOCBAQCB0eXBlZGVmIHN0cnVjdCBRZW11T3B0RGVzYyB7DQo+Pj4gICAgICAgIGNv
-bnN0IGNoYXIgKm5hbWU7DQo+Pj4gICAgICAgIGVudW0gUWVtdU9wdFR5cGUgdHlwZTsNCj4+PiAg
-ICAgICAgY29uc3QgY2hhciAqaGVscDsNCj4+PiArICAgIC8qDQo+Pj4gKyAgICAgKiBGb3IgUUVN
-VV9PUFRfU1RSSU5HOiBMZWF2ZSBkZWZfdmFsdWVfaW50IDAsIGFuZCBzZXQgZGVmX3ZhbHVlX3N0
-cg0KPj4+ICsgICAgICogdG8gYSBkZWZhdWx0IHZhbHVlIG9yIGxlYXZlIE5VTEwgZm9yIG5vIGRl
-ZmF1bHQuDQo+Pj4gKyAgICAgKg0KPj4+ICsgICAgICogRm9yIG90aGVyIHR5cGVzOiBJbml0aWFs
-aXplIGF0IG1vc3Qgbm9uLXplcm8gZGVmX3ZhbHVlX2ludCBvciBhDQo+Pj4gKyAgICAgKiBwYXJz
-ZWFibGUgZGVmX3ZhbHVlX3N0ciBmb3IgYSBkZWZhdWx0IChtdXN0IHVzZSBhIHN0cmluZyBmb3Ig
-YW4NCj4+PiArICAgICAqIGV4cGxpY2l0IGRlZmF1bHQgb2YgMCwgYWx0aG91Z2ggYW4gaW1wbGlj
-aXQgZGVmYXVsdCBnZW5lcmFsbHkNCj4+PiArICAgICAqIHdvcmtzKS4gIElmIHNldHRpbmcgZGVm
-X3ZhbHVlX2ludCwgY2FsbGluZyBxZW11X29wdF9nZXQoKSBvbg0KPj4+ICsgICAgICogdGhhdCBv
-cHRpb24gd2lsbCBhYm9ydCgpOyBpbnN0ZWFkLCBjYWxsIHFlbXVfb3B0X2dldF9kZWwoKSBvciBh
-DQo+Pj4gKyAgICAgKiB0eXBlZCBnZXR0ZXIuDQo+Pj4gKyAgICAgKi8NCj4+PiArICAgIHVpbnQ2
-NF90IGRlZl92YWx1ZV9pbnQ7DQo+Pj4gICAgICAgIGNvbnN0IGNoYXIgKmRlZl92YWx1ZV9zdHI7
-DQo+Pj4gICAgfSBRZW11T3B0RGVzYzsNCj4+Pg0KPiANCj4+DQo+PiBJZiBJIHVuZGVyc3RhbmQg
-Y29ycmVjdGx5LCB0aGUgbnVtYmVyIHdpbGwgc3RpbGwgYmUgY29tcGlsZWQgaW50byB0aGUNCj4+
-IGJpbmFyeSBhcyBhbiBleHByZXNzaW9uIHN0cmluZywgYnV0IHdpbGwgYmUgcHJpbnRlZCBjb3Jy
-ZWN0bHkgZHVyaW5nDQo+PiBydW50aW1lPw0KPiANCj4gQW55b25lIHRoYXQgdXNlcyAuZGVmX3Zh
-bHVlX2ludCB3aWxsIGNvbXBpbGUgaW50byB0aGUgYmluYXJ5IGFzIGFuDQo+IDgtYnl0ZSBpbnRl
-Z2VyIChyZWdhcmRsZXNzIG9mIGhvdyB0aGF0IG51bWJlciB3YXMgc3BlbGxlZCBpbiBDLCBlaXRo
-ZXINCj4gYXMgYSBzaW5nbGUgY29uc3RhbnQsIG9yIGFzIGEgY29uc3RhbnQgZXhwcmVzc2lvbiks
-IGFuZCBOT1QgYXMgYSBkZWNpbWFsDQo+IHN0cmluZy4gIFN0cmluZyBjb252ZXJzaW9ucyBmb3Ig
-Y29kZSB0aGF0IGFza3MgZm9yIGEgc3RyaW5nIHdpbGwgaGFwcGVuDQo+IGJ5IGEgcnVudGltZSBw
-cmludGYoKSAoaWRlYWxseSwgc3VjaCBjb2RlIGlzIGxpbWl0ZWQgdG8gdGhlIGNhc2Ugb2YNCj4g
-cHJpbnRpbmcgb3V0IGluZm9ybWF0aW9uIGR1cmluZyBoZWxwIG91dHB1dCkuICBDb2RlIHRoYXQg
-aXMgc21hcnQgZW5vdWdoDQo+IHRvIHJlcXVlc3QgYSBudW1iZXIgbm93IGdldHMgdGhlIGRlZmF1
-bHQgdmFsdWUgZGlyZWN0bHksIHJhdGhlciB0aGFuIHRoZQ0KPiBvbGQgd2F5IG9mIGhhdmluZyB0
-byBzdHJ0b2xsKCkgZGVjb2RlIGEgZGVjaW1hbCBzdHJpbmcgYmFjayBpbnRvIGENCj4gbnVtYmVy
-LiAgTm8gb25lIHNob3VsZCBldmVyIGJlIHVzaW5nIC5kZWZfdmFsdWVfc3RyID0gc3RyaW5naWZ5
-KG1hY3JvKSwNCj4gd2hlbiB0aGV5IGNhbiBpbnN0ZWFkIGp1c3QgdXNlIC5kZWZfdmFsdWVfaW50
-ID0gbWFjcm8gKHdoaWNoIGlzIHdoYXQgdGhlDQo+IG5leHQgcGF0Y2ggZml4ZXMpLg0KDQpZZXMs
-IHlvdSdyZSByaWdodC4gVGhhbmtzIGZvciB0aGUgZXhwbGFuYXRpb24hDQo=
+On Fri, Jan 11, 2019 at 04:06:54PM +0000, Alex Benn=E9e wrote:
+>=20
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>=20
+> > On 11/01/19 16:28, Alex Benn=E9e wrote:
+> >>> Why not g_usleep?  It already does a while loop around nanosleep (w=
+hich
+> >>> returns the remaining time in the wait, like select but unlike slee=
+p and
+> >>> poll).
+> >> Yeah I'm testing that now. However I have managed to trigger:
+> >>
+> >>   ERROR:tests/test-qht-par.c:20:test_qht: assertion failed (rc =3D=3D=
+ 0): (35584 =3D=3D 0)
+> >
+> > I think that's a good old SIGSEGV (0x8B00).
+>=20
+> According to the PC in the logs:
+>=20
+>   Line 98 of "mcount.c" starts at address 0x7ffff6e15145 <__mcount_inte=
+rnal+69> and ends at 0x7ffff6e15148 <__mcount_internal+72>.
+
+Was this on Travis?  Which architecture?
+
+--=20
+Eduardo
