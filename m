@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40654)
+Received: from eggs.gnu.org ([209.51.188.92]:41476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghtfM-0004Od-7j
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:03:52 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ghtiH-0005eB-9J
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:06:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghtfL-0005Jo-EV
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:03:52 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:64396
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghtfK-0005Hy-UF
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:03:51 -0500
-References: <1547197071-14504-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1547197071-14504-4-git-send-email-lizhijian@cn.fujitsu.com>
-	<CAGxU2F4M22Vz6xTauvHAngzp6PMfzAkTqbmGfsA=5rwWYnZi_w@mail.gmail.com>
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <3517ec7b-87e7-bc38-0ec5-d85cf4fc6a31@cn.fujitsu.com>
-Date: Fri, 11 Jan 2019 18:03:41 +0800
+	(envelope-from <imammedo@redhat.com>) id 1ghtiG-0007Bb-B8
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:06:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ghtiG-0007AK-2o
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:06:52 -0500
+Date: Fri, 11 Jan 2019 11:06:44 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190111110644.19896d4d@redhat.com>
+In-Reply-To: <20190110201418.GK2589@work-vm>
+References: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
+	<20190110120120.9943-2-yury-kotov@yandex-team.ru>
+	<20190110201418.GK2589@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <CAGxU2F4M22Vz6xTauvHAngzp6PMfzAkTqbmGfsA=5rwWYnZi_w@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] i386: import & use bootparam.h
+Subject: Re: [Qemu-devel] [PATCH 1/4] migration: add RAMBlock's offset
+ validation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +29,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Tsirkin <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, zhijianx.li@intel.com, Philippe Mathieu Daude <philmd@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Yury Kotov <yury-kotov@yandex-team.ru>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, wrfsh@yandex-team.ru
 
-Hi Stefano
+On Thu, 10 Jan 2019 20:14:19 +0000
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
+> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> > RAM migration has a RAMBlock validation stage (flag RAM_SAVE_FLAG_MEM_SIZE).
+> > In this stage QEMU checks further information about RAMBlock:
+> > 1. Presence (by idstr),
+> > 2. Length (trying to resize, when differs),
+> > 3. Optional page size.
+> > 
+> > This patch adds a check for RAMBlock's offset. Currently we check it during
+> > RAM pages loading - every RAM page has an offset in its header. But there is a
+> > case when we don't send RAM pages (see below).
+> > 
+> > The following commits introduce a capability (ignore-external) to skip some
+> > RAM blocks from migration. In such case the migration stream contains only
+> > meta information about RAM blocks to validate them. So, the only way to check
+> > block's offset is to send it explicitly.
+> > 
+> > Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>  
+> 
+> But why check that offsets match?  THey aren't supposed to!
+> Offset's are entirely private to each qemu and they're allowed to be
+> different; the only requirement is that the length and name of each
+> RAMBlock matches, then all the operations we do over the migration
+> stream are relative to the start of the block.
+> 
+> One example where they are validly different is where you hotplug some
+> RAM, so for example:
+> 
+> 
+>   source qemu
+>       -M 4G
+>       hotplug PCI card
+>       hotplug 2G
+> 
+>   destination qemu
+>       -M 4G
+>       PCI card declared on the command line
+>       extra 2G declared on the command line
+> 
+> The offsets are different but we can migrate that case fine.
+PCI mappings are updated after migration is done, to make DST match SRC
+(get_pci_config_device) that mapping is irrelevant here, but I was under
+impression that offset in terms of MemoryRegion (GPA) was passed in
+migration stream, even if we do not update memory mappings for RAM
+(mapping depends on hotplug/CLI order or explicit addr on CLI for memory
+devices).
 
-On 1/11/19 17:48, Stefano Garzarella wrote:
-> Hi Li,
->
-> On Fri, Jan 11, 2019 at 10:06 AM Li Zhijian <lizhijian@cn.fujitsu.com> wrote:
->> +        # unnecessary import of several video/ist/etc headers
->> +        sed -e '/__ASSEMBLY__/,/__ASSEMBLY__/d' $tmpdir/include/asm/bootparam.h > $tmpdir/bootparam.h
->> +        cp_portable $tmpdir/bootparam.h "$output/include/standard-headers/asm-$arch"
-> Maybe you miss my comment. Anyway, IMHO is better to use the double
-> quotes for all paths.
->
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-So sorry about it, i folded it on a wrong branch at the beginning.
-
-will update it soon.
-
-
-Thanks
+> 
+> Dave
+> 
+> > ---
+> >  migration/ram.c | 15 +++++++++++++--
+> >  1 file changed, 13 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/migration/ram.c b/migration/ram.c
+> > index 7e7deec4d8..39629254e1 100644
+> > --- a/migration/ram.c
+> > +++ b/migration/ram.c
+> > @@ -3171,6 +3171,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+> >          if (migrate_postcopy_ram() && block->page_size != qemu_host_page_size) {
+> >              qemu_put_be64(f, block->page_size);
+> >          }
+> > +        qemu_put_be64(f, block->offset);
+> >      }
+> >  
+> >      rcu_read_unlock();
+> > @@ -4031,7 +4032,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> >  
+> >      seq_iter++;
+> >  
+> > -    if (version_id != 4) {
+> > +    if (version_id < 4) {
+> >          ret = -EINVAL;
+> >      }
+> >  
+> > @@ -4132,6 +4133,16 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> >                              ret = -EINVAL;
+> >                          }
+> >                      }
+> > +                    if (version_id >= 5) {
+> > +                        ram_addr_t offset;
+> > +                        offset = qemu_get_be64(f);
+> > +                        if (block->offset != offset) {
+> > +                            error_report("Mismatched RAM block offset %s "
+> > +                                         "%" PRId64 "!= %" PRId64,
+> > +                                         id, offset, (uint64_t)block->offset);
+> > +                            ret = -EINVAL;
+> > +                        }
+> > +                    }
+> >                      ram_control_load_hook(f, RAM_CONTROL_BLOCK_REG,
+> >                                            block->idstr);
+> >                  } else {
+> > @@ -4363,5 +4374,5 @@ static SaveVMHandlers savevm_ram_handlers = {
+> >  void ram_mig_init(void)
+> >  {
+> >      qemu_mutex_init(&XBZRLE.lock);
+> > -    register_savevm_live(NULL, "ram", 0, 4, &savevm_ram_handlers, &ram_state);
+> > +    register_savevm_live(NULL, "ram", 0, 5, &savevm_ram_handlers, &ram_state);
+> >  }
+> > -- 
+> > 2.20.1
+> >   
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
