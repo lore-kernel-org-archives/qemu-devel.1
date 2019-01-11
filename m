@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47354)
+Received: from eggs.gnu.org ([209.51.188.92]:48832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghzNN-0005sR-Vy
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:09:43 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ghzT9-0007hc-MU
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:15:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghzNN-0006qQ-1d
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:09:41 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 11 Jan 2019 16:09:33 +0000
-Message-ID: <277fe3a0-9025-b96e-41b2-0388f491d724@virtuozzo.com>
-References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
-	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
-	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
-	<20190111122151.GF5010@dhcp-200-186.str.redhat.com>
-	<8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
-	<20190111131538.GH5010@dhcp-200-186.str.redhat.com>
-In-Reply-To: <20190111131538.GH5010@dhcp-200-186.str.redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FD926BB86C128845B5288DA2B3B5C194@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <dgilbert@redhat.com>) id 1ghzT8-0002H8-6m
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:15:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ghzT7-00026K-Sq
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:15:38 -0500
+Date: Fri, 11 Jan 2019 16:15:15 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190111161515.GG2738@work-vm>
+References: <CAFEAcA_ZdOsXbKE=ZcOGUNB4LAnL_wZK5rdm+PvsaeBfyT0DSg@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
- default on block_status
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_ZdOsXbKE=ZcOGUNB4LAnL_wZK5rdm+PvsaeBfyT0DSg@mail.gmail.com>
+Subject: Re: [Qemu-devel] test-filter-mirror hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +26,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MTEuMDEuMjAxOSAxNjoxNSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTEuMDEuMjAxOSB1bSAx
-Mzo1OSBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDEx
-LjAxLjIwMTkgMTU6MjEsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMTEuMDEuMjAxOSB1bSAx
-Mjo0MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+Pj4g
-MTEuMDEuMjAxOSAxMzo0MSwgS2V2aW4gV29sZiB3cm90ZToNCj4+Pj4+IEFtIDEwLjAxLjIwMTkg
-dW0gMTQ6MjAgaGF0IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgZ2VzY2hyaWViZW46DQo+
-Pj4+Pj4gZHJ2X2NvX2Jsb2NrX3N0YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlvbmFsLCBt
-b3JlIGFjY3VyYXRlIHNlYXJjaA0KPj4+Pj4+IGZvciBob2xlIGluc2lkZSByZWdpb24sIHJlcG9y
-dGVkIGFzIERBVEEgYnkgYnMgc2luY2UgNWRhYTc0YTZlYmMuDQo+Pj4+Pj4NCj4+Pj4+PiBUaGlz
-IGFjY3VyYWN5IGlzIG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2ZSBxY293MiBkaXNrLiBBY3R1YWxs
-eSwgcWNvdzINCj4+Pj4+PiBrbm93cywgd2hlcmUgYXJlIGhvbGVzIGFuZCB3aGVyZSBpcyBkYXRh
-LiBCdXQgZXZlcnkgYmxvY2tfc3RhdHVzDQo+Pj4+Pj4gcmVxdWVzdCBjYWxscyBsc2VlayBhZGRp
-dGlvbmFsbHkuIEFzc3VtZSBhIGJpZyBkaXNrLCBmdWxsIG9mDQo+Pj4+Pj4gZGF0YSwgaW4gYW55
-IGl0ZXJhdGl2ZSBjb3B5aW5nIGJsb2NrIGpvYiAob3IgaW1nIGNvbnZlcnQpIHdlJ2xsIGNhbGwN
-Cj4+Pj4+PiBsc2VlayhIT0xFKSBvbiBldmVyeSBpdGVyYXRpb24sIGFuZCBlYWNoIG9mIHRoZXNl
-IGxzZWVrcyB3aWxsIGhhdmUgdG8NCj4+Pj4+PiBpdGVyYXRlIHRocm91Z2ggYWxsIG1ldGFkYXRh
-IHVwIHRvIHRoZSBlbmQgb2YgZmlsZS4gSXQncyBvYnZpb3VzbHkNCj4+Pj4+PiBpbmVmZmVjdGl2
-ZSBiZWhhdmlvci4gQW5kIGZvciBtYW55IHNjZW5hcmlvcyB3ZSBkb24ndCBuZWVkIHRoaXMgbHNl
-ZWsNCj4+Pj4+PiBhdCBhbGwuDQo+Pj4+Pj4NCj4+Pj4+PiBTbywgbGV0J3MgIjVkYWE3NGE2ZWJj
-IiBieSBkZWZhdWx0LCBsZWF2aW5nIGFuIG9wdGlvbiB0byByZXR1cm4NCj4+Pj4+PiBwcmV2aW91
-cyBiZWhhdmlvciwgd2hpY2ggaXMgbmVlZGVkIGZvciBzY2VuYXJpb3Mgd2l0aCBwcmVhbGxvY2F0
-ZWQNCj4+Pj4+PiBpbWFnZXMuDQo+Pj4+Pj4NCj4+Pj4+PiBBZGQgaW90ZXN0IGlsbHVzdHJhdGlu
-ZyBuZXcgb3B0aW9uIHNlbWFudGljcy4NCj4+Pj4+Pg0KPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFZs
-YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+
-Pj4+DQo+Pj4+PiBJIHN0aWxsIHRoaW5rIHRoYXQgYW4gb3B0aW9uIGlzbid0IGEgZ29vZCBzb2x1
-dGlvbiBhbmQgd2Ugc2hvdWxkIHRyeSB1c2UNCj4+Pj4+IHNvbWUgaGV1cmlzdGljcyBpbnN0ZWFk
-Lg0KPj4+Pg0KPj4+PiBEbyB5b3UgdGhpbmsgdGhhdCBoZXVyaXN0aWNzIHdvdWxkIGJlIGJldHRl
-ciB0aGFuIGZhaXIgY2FjaGUgZm9yIGxzZWVrDQo+Pj4+IHJlc3VsdHM/DQo+Pj4NCj4+PiBJIGRv
-bid0IHRoaW5rIGxzZWVrKCkgcmVzdWx0cyBhcmUgY2FjaGFibGUsIGF0IGxlYXN0IGZvciBpbWFn
-ZXMgdGhhdCBjYW4NCj4+PiBzaGFyZSBCTEtfUEVSTV9XUklURSBiZXR3ZWVuIHByb2Nlc3Nlcy4N
-Cj4+Pg0KPj4+PiBJIGRvbid0IHNlZSBnb29kIGhldXJpc3RpY3MsIG5laXRoZXIgd2FudCB0byBp
-bXBsZW1lbnQgbHNlZWsgb3B0aW1pemF0aW9ucy4NCj4+Pj4gSW4gb3VyIGNhc2VzIHdlIGRvbid0
-IG5lZWQgbHNlZWsgdW5kZXIgcWNvdzIgYXQgYWxsLCBhbmQgaXQncyBvYnZpb3VzbHkgYmV0dGVy
-DQo+Pj4+IGp1c3QgZG9uJ3QgbHNlZWsgaW4gdGhlc2UgY2FzZXMuDQo+Pj4NCj4+PiBJIHN1Z2dl
-c3RlZCBvbmU6IFBhc3MgbGFyZ2UgY29udGlndW91cyBhbGxvY2F0ZWQgcmFuZ2VzIHRvIHRoZSBw
-cm90b2NvbA0KPj4+IGRyaXZlciwgYnV0IGp1c3QgYXNzdW1lIHRoYXQgdGhlIGFsbG9jYXRpb24g
-c3RhdHVzIGlzIGNvcnJlY3QgaW4gdGhlDQo+Pj4gZm9ybWF0IGxheWVyIGlmIHRoZXkgYXJlIHNt
-YWxsLg0KPj4NCj4+IFNvLCBmb3IgZnVsbHkgYWxsb2NhdGVkIGltYWdlLCB3ZSB3aWxsIGNhbGwg
-bHNlZWsgYWx3YXlzPw0KPiANCj4gSWYgdGhleSBhcmUgZnVsbHkgY29udGlndW91cywgeWVzLiBC
-dXQgdGhhdCdzIGEgc2luZ2xlIGxzZWVrKCkgY2FsbCBwZXINCj4gaW1hZ2UgdGhlbiBpbnN0ZWFk
-IG9mIGFuIGxzZWVrKCkgZm9yIGV2ZXJ5IDY0aywgc28gbm90IGEgYmlnIHByb2JsZW0uDQoNCmxz
-ZWVrIGlzIGNhbGxlZCBvbiBlYWNoIG1pcnJvciBpdGVyYXRpb24sIHdoeSBvbmUgcGVyIGltYWdl
-Pw0KDQo+IA0KPiBJbiB0aGUgbW9yZSByZWFsaXN0aWMgY2FzZSwgeW91IHdpbGwgc3RpbGwgY2Fs
-bCBsc2VlaygpIG9jY2FzaW9uYWxseQ0KPiBiZWNhdXNlIHlvdSB3aWxsIGhhdmUgc29tZSBmcmFn
-bWVudGF0aW9uLCBidXQgdGhlIGZyYWdtZW50cyBjYW4gYmUNCj4gcmF0aGVyIGxhcmdlLiBCdXQg
-aXQgc2hvdWxkIHN0aWxsIHNpZ25pZmljYW50bHkgcmVkdWNlIHRoZW0gY29tcGFyZWQgdG8NCj4g
-bm93IGJlY2F1c2UgeW91IHNraXAgaXQgZm9yIHRob3NlIHBhcnRzIHdpdGggc21hbGwgY29udGln
-dW91cw0KPiBhbGxvY2F0aW9ucyB3aGVyZSBsc2VlaygpIHdvdWxkIGJlIGNhbGxlZCBhIGxvdCB0
-b2RheS4NCj4gDQo+IEtldmluDQo+IA0KDQpPaywgeW91IHByb3Bvc2Ugbm90IHRvIGNhbGwgbHNl
-ZWsgZm9yIHNtYWxsIGVub3VnaCBkYXRhIHJlZ2lvbnMgcmVwb3J0ZWQgYnkNCmZvcm1hdCBsYXll
-ci4gQW5kIGZvciBpbWFnZXMgd2hpY2ggYXJlIGxlc3MgZnJhZ21lbnRlZCwgdGhpcyBoZWxwcyBs
-ZXNzIG9yIGRvbid0DQpoZWxwLg0KDQpXaHkgZG8geW91IHRoaW5rIGl0IGlzIGJldHRlcj8NCg0K
-Rm9yIG5vdCBwcmVhbGxvY2F0ZWQgaW1hZ2VzIGl0IGlzIHdvcnNlLCBhcyBpdCBjb3ZlcnMgbGVz
-cyBjYXNlcy4gU28sIGZvciBvdXINCnNjZW5hcmlvcyBpdCBpcyB3b3JzZS4NCg0KVGhlIG9ubHkg
-Y2FzZSwgd2hlbiBoZXVyaXN0aWMgd29ya3MgYmV0dGVyLCBpcyB3aGVuIHVzZXIgaGF2ZSBwcmVh
-bGxvY2F0ZWQgaW1hZ2UsDQpidXQgZG9uJ3Qga25vdyBhYm91dCBuZXcgb3B0aW9uLCB3aGljaCBy
-ZXR1cm5zIG9sZCBiZWhhdmlvci4gV2UgYXJlIG5vdCBpbnRlcmVzdGVkDQppbiB0aGlzIGNhc2Ug
-YW5kIGNhbid0IGdvIHRoaXMgd2F5LCBhcyBpdCBkb2Vzbid0IGd1YXJhbnRlZSwgdGhhdCBzb21l
-IGN1c3RvbWVyIHdpbGwNCm5vdCBjb21lIGFnYWluIHdpdGggbHNlZWstcmVsYXRlZCBwcm9ibGVt
-cy4NCg0KRG9uJ3QgeW91IGxpa2Ugd2hhdCBFcmljIHByb3Bvc2UsIGFib3V0IGJpbmRpbmcgYmVo
-YXZpb3Igc3dpdGNoIHRvIGV4aXN0aW5nDQpkZXRlY3QtemVyb2VzIG9wdGlvbj8NCg0KT3IsIHdl
-IGNhbiBhZGQgYW4gb3Bwb3NpdGUgb3B0aW9uLCB0byBlbmFibGUgbmV3IGJlaGF2aW9yLCBrZWVw
-aW5nIHRoZSBvbGQgb25lIGJ5DQpkZWZhdWx0LiBTbywgYWxsIHN0YXlzIGFzIGlzLCBhbmQgd2hv
-IG5lZWQgdXNlcyBuZXcgb3B0aW9uLiBIZXVyaXN0aWMgbWF5IGJlDQppbXBsZW1lbnRlZCB0aGVu
-IHRvby4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> Recently I've noticed that test-filter-mirror has been hanging
+> intermittently, typically when run on some other TCG architecture.
+> In the instance I've just looked at, this was with s390x guest on
+> x86-64 host, though I've also seen it on other host archs and
+> perhaps with other guests.
+
+Watch out to see if you really do see it for other guests;
+it carefully avoids using virtio-net to avoid vhost; but on s390x it
+uses virtio-net-ccw - could that hit the vhost it was trying to avoid?
+
+> Below is a backtrace, though it seems to be pretty unhelpful.
+> Anybody got any theories ? Does the mirror test rely on dirty
+> memory bitmaps like the migration test (which also hangs
+> occasionally with TCG due to some bug I'm sure we've investigated
+> in the past) ?
+
+I don't think it relies on the CPU at all.
+
+Dave
+
+> Processes:
+> petmay01 10533  0.0  0.0  15624  1400 pts/16   S+   14:22   0:00
+>                            \_ tests/test-filter-mirror --quiet
+> --keep-going -m=quick --GTestLogFD=6
+> petmay01 10534  0.0  0.2 979892 36492 pts/16   Sl+  14:22   0:00
+>                                \_ s390x-softmmu/qemu-system-s390x
+> -qtest unix:/tmp/qtest-10533.sock,nowait -qtest-log /dev/null -chardev
+> socket,path=/tmp/qtest-10533.qmp,nowait,id=char0 -mon
+> chardev=char0,mode=control -machine accel=qtest -display none -netdev
+> socket,id=qtest-bn0,fd=4 -device
+> virtio-net-ccw,netdev=qtest-bn0,id=qtest-e0 -chardev
+> socket,id=mirror0,path=filter-mirror.Ongzms,server,nowait -object
+> filter-mirror,id=qtest-f0,netdev=qtest-bn0,queue=tx,outdev=mirror0
+> 
+> Backtrace of all threads in the QEMU process:
+> Thread 4 (Thread 0x7f59b67ff700 (LWP 10539)):
+> #0  0x00007f59cf908156 in __sigwait (sig=0x7f59b67fc510, set=<optimised out>)
+>     at ../sysdeps/unix/sysv/linux/sigwait.c:64
+> #1  0x00007f59cf908156 in __sigwait (set=<optimised out>, sig=0x7f59b67fc510)
+>     at ../sysdeps/unix/sysv/linux/sigwait.c:96
+> #2  0x00005639a87c4c8e in qemu_dummy_cpu_thread_fn (arg=0x5639aa544250)
+>     at /home/petmay01/linaro/qemu-for-merges/cpus.c:1326
+> #3  0x00005639a8b8b911 in qemu_thread_start (args=0x5639aa569010)
+>     at /home/petmay01/linaro/qemu-for-merges/util/qemu-thread-posix.c:502
+> #4  0x00007f59cf8fe6ba in start_thread (arg=0x7f59b67ff700) at
+> pthread_create.c:333
+> #5  0x00007f59cf63441d in clone () at
+> ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+> 
+> Thread 3 (Thread 0x7f59bf1f0700 (LWP 10538)):
+> #0  0x00007f59cf62874d in poll () at ../sysdeps/unix/syscall-template.S:84
+> #1  0x00007f59e64e638c in g_main_context_iterate (priority=2147483647,
+> n_fds=3, fds=0x7f59b0001300, timeout=<optimised out>,
+> context=0x7f59b00008c0)
+>     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gmain.c:4135
+> #2  0x00007f59e64e638c in g_main_context_iterate
+> (context=0x7f59b00008c0, block=block@entry=1,
+> dispatch=dispatch@entry=1, self=<optimised out>)
+>     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gmain.c:3835
+> #3  0x00007f59e64e6712 in g_main_loop_run (loop=0x7f59b00012e0)
+>     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gmain.c:4034
+> #4  0x00005639a88d187a in iothread_run (opaque=0x5639aa512710)
+>     at /home/petmay01/linaro/qemu-for-merges/iothread.c:74
+> #5  0x00005639a8b8b911 in qemu_thread_start (args=0x5639aa49d6a0)
+>     at /home/petmay01/linaro/qemu-for-merges/util/qemu-thread-posix.c:502
+> #6  0x00007f59cf8fe6ba in start_thread (arg=0x7f59bf1f0700) at
+> pthread_create.c:333
+> #7  0x00007f59cf63441d in clone () at
+> ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+> 
+> Thread 2 (Thread 0x7f59bf9f1700 (LWP 10537)):
+> #0  0x00007f59cf62e4d9 in syscall () at
+> ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+> #1  0x00005639a8b8b58f in qemu_futex_wait (f=0x5639a930a418
+> <rcu_call_ready_event>, val=4294967295)
+>     at /home/petmay01/linaro/qemu-for-merges/include/qemu/futex.h:29
+> #2  0x00005639a8b8b75e in qemu_event_wait (ev=0x5639a930a418
+> <rcu_call_ready_event>)
+>     at /home/petmay01/linaro/qemu-for-merges/util/qemu-thread-posix.c:442
+> #3  0x00005639a8ba41d3 in call_rcu_thread (opaque=0x0)
+>     at /home/petmay01/linaro/qemu-for-merges/util/rcu.c:261
+> #4  0x00005639a8b8b911 in qemu_thread_start (args=0x5639aa449ac0)
+>     at /home/petmay01/linaro/qemu-for-merges/util/qemu-thread-posix.c:502
+> #5  0x00007f59cf8fe6ba in start_thread (arg=0x7f59bf9f1700) at
+> pthread_create.c:333
+> #6  0x00007f59cf63441d in clone () at
+> ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+> 
+> Thread 1 (Thread 0x7f59e9017fc0 (LWP 10534)):
+> #0  0x00007f59cf628811 in __GI_ppoll (fds=0x5639aa5a1b90, nfds=6,
+> timeout=<optimised out>, sigmask=0x0) at
+> ../sysdeps/unix/sysv/linux/ppoll.c:50
+> #1  0x00005639a8b8534b in qemu_poll_ns (fds=0x5639aa5a1b90, nfds=6, timeout=-1)
+>     at /home/petmay01/linaro/qemu-for-merges/util/qemu-timer.c:322
+> ---Type <return> to continue, or q <return> to quit---
+> #2  0x00005639a8b86527 in os_host_main_loop_wait (timeout=-1)
+>     at /home/petmay01/linaro/qemu-for-merges/util/main-loop.c:233
+> #3  0x00005639a8b865fe in main_loop_wait (nonblocking=0)
+>     at /home/petmay01/linaro/qemu-for-merges/util/main-loop.c:497
+> #4  0x00005639a88dab83 in main_loop () at
+> /home/petmay01/linaro/qemu-for-merges/vl.c:1925
+> #5  0x00005639a88e25b9 in main (argc=21, argv=0x7ffd344d6138,
+> envp=0x7ffd344d61e8)
+>     at /home/petmay01/linaro/qemu-for-merges/vl.c:4669
+> 
+> Backtrace in test-filter-mirror:
+> Thread 1 (Thread 0x7fd24ab03740 (LWP 10533)):
+> #0  0x00007fd24a0eb81d in __libc_recv (fd=8, buf=0x7ffcef3a8c58, n=4, flags=0)
+>     at ../sysdeps/unix/sysv/linux/x86_64/recv.c:28
+> #1  0x000055e065d2d26a in test_mirror ()
+>     at /home/petmay01/linaro/qemu-for-merges/tests/test-filter-mirror.c:70
+> #2  0x00007fd24a67087b in test_case_run (tc=0x55e0676b6a00)
+>     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2158
+> #3  g_test_run_suite_internal (suite=suite@entry=0x55e0676b6060,
+> path=path@entry=0x0)
+>     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2241
+> #4  0x00007fd24a670a43 in g_test_run_suite_internal
+> (suite=suite@entry=0x55e0676b6040,
+>     path=path@entry=0x0) at
+> /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2253
+> #5  0x00007fd24a670a43 in g_test_run_suite_internal
+> (suite=suite@entry=0x55e0676b6020,
+>     path=path@entry=0x0) at
+> /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2253
+> #6  0x00007fd24a670c4e in g_test_run_suite (suite=0x55e0676b6020)
+>     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2328
+> #7  0x00007fd24a670c71 in g_test_run ()
+>     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:1596
+> #8  0x000055e065d2d4af in main (argc=1, argv=0x7ffcef3a9128)
+>     at /home/petmay01/linaro/qemu-for-merges/tests/test-filter-mirror.c:92
+> 
+> 
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
