@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55678)
+Received: from eggs.gnu.org ([209.51.188.92]:54424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=9072536af=Paul.Durrant@citrix.com>)
-	id 1gi3Eg-0002ev-Qj
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 15:16:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gi3P0-0005zq-7S
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 15:27:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=9072536af=Paul.Durrant@citrix.com>)
-	id 1gi3Ef-0007hL-DU
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 15:16:58 -0500
-Received: from smtp.eu.citrix.com ([185.25.65.24]:15125)
+	(envelope-from <pbonzini@redhat.com>) id 1gi3Oz-0005KC-Bn
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 15:27:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:64871)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=9072536af=Paul.Durrant@citrix.com>)
-	id 1gi3Ef-0007d0-4n
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 15:16:57 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 11 Jan 2019 20:16:53 +0000
-Message-ID: <8861ed81327240a5b93048763b6e5044@AMSPEX02CL03.citrite.net>
-References: <20190111180941.6198-1-anthony.perard@citrix.com>
-In-Reply-To: <20190111180941.6198-1-anthony.perard@citrix.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gi3Oz-0005J0-2B
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 15:27:37 -0500
+References: <CAJSP0QUV39fK4L8MwQ-rGiR0ejUm0HCyKFqARh-SKRTuDPKOXg@mail.gmail.com>
+	<jpgsgy0aaw6.fsf@linux.bootlegged.copy>
+	<CACT4Y+YWVfg_PVh0=CTCgM9BRyCmKZB9N+_DBimaNKPE=y6r5Q@mail.gmail.com>
+	<CABiizEQ-O-Ro9cH3xqzZUB=c5k+oYJ-gdR7ssfbbn5kU_8GcAA@mail.gmail.com>
+	<e4af7025-fa8c-1078-62de-f77a11a79fc0@redhat.com>
+	<CAJSP0QUFrs=rPvcSdNzwjk2Zyc2Sfu81SM_KZsO9djSGK1beUA@mail.gmail.com>
+	<CABiizES5O1zGF_7CxnSCfVQL39=Ov0Bf61-U2XwvoS1_xDi2ew@mail.gmail.com>
+	<8ebdfb3b-f99b-4dbc-0389-b96b3f9fb633@redhat.com>
+	<CABiizERPJa06YNEyUxEAgDaSgjJny4bTa4qpTDCwKzKMn5Ji=Q@mail.gmail.com>
+	<0387b8e9-2b4f-ce1a-05df-b508851b84f0@redhat.com>
+	<CAMAxoC1m2g3AB6X5u=+L+K1avq36gSHeBRv-nDXobAJNc2d3qA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <69559aca-a3e8-bf1e-7622-4b9ebe9f404e@redhat.com>
+Date: Fri, 11 Jan 2019 21:27:26 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] xen: Fix event channel interface for
- XenDevice-s
+In-Reply-To: <CAMAxoC1m2g3AB6X5u=+L+K1avq36gSHeBRv-nDXobAJNc2d3qA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Internship idea: virtio-blk oss-fuzz support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +37,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>
+To: Jonathan Metzman <metzman@google.com>
+Cc: Max Moroz <mmoroz@google.com>, Stefan Hajnoczi <stefanha@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, Oliver Chang <ochang@google.com>, Bandan Das <bsd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Andrey Konovalov <andreyknvl@google.com>, Kostya Serebryany <kcc@google.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 11 January 2019 18:10
-> To: qemu-devel@nongnu.org
-> Cc: Anthony Perard <anthony.perard@citrix.com>; Stefano Stabellini
-> <sstabellini@kernel.org>; Paul Durrant <Paul.Durrant@citrix.com>; open
-> list:X86 <xen-devel@lists.xenproject.org>
-> Subject: [PATCH] xen: Fix event channel interface for XenDevice-s
->=20
-> Patch "xen: add event channel interface for XenDevice-s" makes use of
-> the type xenevtchn_port_or_error_t, but this isn't avaiable before Xen
-> 4.7. Also the function xen_device_bind_event_channel assign the return
-> value of xenevtchn_bind_interdomain to channel->local_port but check the
-> result for error with xendev->local_port.
->=20
-> Fix by:
-> - removing local_port from struct XenDevice as it isn't use anywere.
-> - adding a compatibility typedef for xenevtchn_port_or_error_t for Xen
->   4.6 and earlier.
->=20
-> As extra, replace the type of XenEventChannel->local_port by
-> evtchn_port_t.
->=20
-> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+On 11/01/19 20:09, Jonathan Metzman wrote:
+> Could you clarify what you think the relationship between the qtest
+> process, QEMU, and afl-fuzz will look like when fuzzing?
+> 
+> Is it something like this:
+> 1. afl-fuzz mutates a buffer, starts a qtest process, and gives the
+> qtest process the mutated buffer.
+> 2. The qtest process starts a QEMU process and interacts with QEMU
+> process based on the buffer AFL gave it (qtest).
+> 3. goto 1
+> 
+> I don't think this works (under normal circumstances). AFL will think it
+> is fuzzing qtest and will not learn about coverage or crashes from qsym.
+> There probably are ways to get this working, but I just want to make
+> sure I understand.
 
-Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+It should be possible to turn the qtest process into a test
+postprocessor, and remove the second process.  It's much harder to
+remove the QEMU process as well and turn it into a TestOneInput function.
 
-> ---
->  hw/xen/xen-bus.c            | 12 +++++++-----
->  include/hw/xen/xen-bus.h    |  1 -
->  include/hw/xen/xen_common.h |  1 +
->  3 files changed, 8 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-> index f90bcf2342..3aeccec69c 100644
-> --- a/hw/xen/xen-bus.c
-> +++ b/hw/xen/xen-bus.c
-> @@ -917,7 +917,7 @@ void xen_device_copy_grant_refs(XenDevice *xendev,
-> bool to_domain,
->  }
->=20
->  struct XenEventChannel {
-> -    unsigned int local_port;
-> +    evtchn_port_t local_port;
->      XenEventHandler handler;
->      void *opaque;
->      Notifier notifier;
-> @@ -939,17 +939,19 @@ XenEventChannel
-> *xen_device_bind_event_channel(XenDevice *xendev,
->                                                 void *opaque, Error
-> **errp)
->  {
->      XenEventChannel *channel =3D g_new0(XenEventChannel, 1);
-> +    xenevtchn_port_or_error_t local_port;
->=20
-> -    channel->local_port =3D xenevtchn_bind_interdomain(xendev->xeh,
-> -                                                     xendev->frontend_id=
-,
-> -                                                     port);
-> -    if (xendev->local_port < 0) {
-> +    local_port =3D xenevtchn_bind_interdomain(xendev->xeh,
-> +                                            xendev->frontend_id,
-> +                                            port);
-> +    if (local_port < 0) {
->          error_setg_errno(errp, errno, "xenevtchn_bind_interdomain
-> failed");
->=20
->          g_free(channel);
->          return NULL;
->      }
->=20
-> +    channel->local_port =3D local_port;
->      channel->handler =3D handler;
->      channel->opaque =3D opaque;
->      channel->notifier.notify =3D event_notify;
-> diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-> index e55a5de5f1..3183f10e3c 100644
-> --- a/include/hw/xen/xen-bus.h
-> +++ b/include/hw/xen/xen-bus.h
-> @@ -29,7 +29,6 @@ typedef struct XenDevice {
->      xengnttab_handle *xgth;
->      bool feature_grant_copy;
->      xenevtchn_handle *xeh;
-> -    xenevtchn_port_or_error_t local_port;
->      NotifierList event_notifiers;
->  } XenDevice;
->=20
-> diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-> index 2b91d199a1..9a8155e172 100644
-> --- a/include/hw/xen/xen_common.h
-> +++ b/include/hw/xen/xen_common.h
-> @@ -32,6 +32,7 @@ extern xc_interface *xen_xc;
->  typedef xc_interface xenforeignmemory_handle;
->  typedef xc_evtchn xenevtchn_handle;
->  typedef xc_gnttab xengnttab_handle;
-> +typedef evtchn_port_or_error_t xenevtchn_port_or_error_t;
->=20
->  #define xenevtchn_open(l, f) xc_evtchn_open(l, f);
->  #define xenevtchn_close(h) xc_evtchn_close(h)
-> --
-> Anthony PERARD
+Paolo
