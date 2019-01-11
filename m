@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54746)
+Received: from eggs.gnu.org ([209.51.188.92]:56055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1ghnFK-0001IM-7q
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:12:35 -0500
+	(envelope-from <mst@redhat.com>) id 1ghnNE-00034Y-Hc
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:20:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1ghnFI-0003kW-D4
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:12:34 -0500
-Received: from mga06.intel.com ([134.134.136.31]:1328)
+	(envelope-from <mst@redhat.com>) id 1ghnNB-0006lY-Pl
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:20:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1ghnFE-0003h1-RN
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:12:30 -0500
-Date: Fri, 11 Jan 2019 11:08:45 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-Message-ID: <20190111030845.GB634@yangzhon-Virtual>
-References: <20181227063419.12981-1-yang.zhong@intel.com>
-	<20181227063419.12981-14-yang.zhong@intel.com>
-	<fa9d19df-c373-f647-a732-9fc76d9b2f4b@redhat.com>
-	<20190108080426.GB27840@yangzhon-Virtual>
-	<f5bb53e6-0ba0-57e5-f917-4c25ed53b562@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ghnNB-0006eC-Gb
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 22:20:41 -0500
+Date: Thu, 10 Jan 2019 22:20:20 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190110220906-mutt-send-email-mst@kernel.org>
+References: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
+	<1546900184-27403-3-git-send-email-venu.busireddy@oracle.com>
+	<20190109105223-mutt-send-email-mst@kernel.org>
+	<e496ce78-462d-7675-9e97-6cbac2038489@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f5bb53e6-0ba0-57e5-f917-4c25ed53b562@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 13/25] scsi: express dependencies with
- Kconfig
+In-Reply-To: <e496ce78-462d-7675-9e97-6cbac2038489@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] virtio_net: Add support for "Data
+ Path Switching" during Live Migration.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +30,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, yang.zhong@intel.com
+To: si-wei liu <si-wei.liu@oracle.com>
+Cc: Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On Tue, Jan 08, 2019 at 12:42:06PM +0100, Paolo Bonzini wrote:
-> On 08/01/19 09:04, Yang Zhong wrote:
-> > On Fri, Jan 04, 2019 at 02:39:50PM +0100, Thomas Huth wrote:
-> >> On 2018-12-27 07:34, Yang Zhong wrote:
-> >>> From: Paolo Bonzini <pbonzini@redhat.com>
-> >>>
-> >>> This lets you disable SCSI altogether with "CONFIG_SCSI=n".
-> >>>
-> >>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> >>> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> >>> ---
-> >>>  hw/scsi/Kconfig       | 11 ++++++++++-
-> >>>  hw/scsi/Makefile.objs |  2 +-
-> >>>  2 files changed, 11 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
-> >>> index 6e7575397f..d669a4824e 100644
-> >>> --- a/hw/scsi/Kconfig
-> >>> +++ b/hw/scsi/Kconfig
-> >>>  
-> >>> -config PSERIES
-> >>> +config SPAPR_VSCSI
-> >>>      bool
-> >>> +    select SCSI
-> >>
-> >> I think this should get "default y" and "depends on PSERIES" now.
-> >>
-> >>  Thomas
-> > 
-> >    Hello Thomas,
-> > 
-> >    I greped CONFIG_PSERIES from current Kconfig repo and got below list
-> >   ./hw/net/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_llan.o
-> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
-> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
-> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o
-> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o spapr_irq.o
-> >   ./hw/ppc/Makefile.objs:ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
-> >   ./hw/ppc/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
-> >   ./hw/char/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_vty.o
-> >   ./hw/nvram/Makefile.objs:obj-$(CONFIG_PSERIES) += spapr_nvram.o
-> >   ./default-configs/ppc64-softmmu.mak:CONFIG_PSERIES=y
-> >   ./default-configs/ppc64-softmmu.mak:CONFIG_XICS=$(CONFIG_PSERIES)
-> >   ./default-configs/ppc64-softmmu.mak:CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
-> >   ./default-configs/ppc64-softmmu.mak:CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
-> > 
-> >   Since this time is only for x86 and i did not add Kconfig file in hw/ppc/, i did not add 
-> >   this dependency too in here. 
-> >   
-> >   In previous plan, i will add "config PSERRIES" in hw/ppc/Kconfig file for PowerPC pSeries
-> >   and will add dependency in that time, thanks.
+On Thu, Jan 10, 2019 at 06:09:23PM -0800, si-wei liu wrote:
 > 
-> You could skip the conversion to Kconfig of default-configs/, but
-> already add all "source hw/ARCH/Kconfig" statements to hw/Kconfig and
-> all "select" statements for buses.  Then, all machine types for example
-> could start removing CONFIG_SCSI=y and CONFIG_PCI=y, even if you do not
-> have the machines converted.
 > 
-  Hello Paolo,
+> On 01/09/2019 07:56 AM, Michael S. Tsirkin wrote:
+> > On Mon, Jan 07, 2019 at 05:29:41PM -0500, Venu Busireddy wrote:
+> > > diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> > > index 80d42e1..2a3ffd3 100644
+> > > --- a/hw/acpi/pcihp.c
+> > > +++ b/hw/acpi/pcihp.c
+> > > @@ -176,6 +176,25 @@ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slo
+> > >       }
+> > >   }
+> > > +static void acpi_pcihp_cleanup_failover_primary(AcpiPciHpState *s, int bsel)
+> > > +{
+> > > +    BusChild *kid, *next;
+> > > +    PCIBus *bus = acpi_pcihp_find_hotplug_bus(s, bsel);
+> > > +
+> > > +    if (!bus) {
+> > > +        return;
+> > > +    }
+> > > +    QTAILQ_FOREACH_SAFE(kid, &bus->qbus.children, sibling, next) {
+> > > +        DeviceState *qdev = kid->child;
+> > > +        PCIDevice *pdev = PCI_DEVICE(qdev);
+> > > +        int slot = PCI_SLOT(pdev->devfn);
+> > > +
+> > > +        if (pdev->failover_primary) {
+> > > +            s->acpi_pcihp_pci_status[bsel].down |= (1U << slot);
+> > > +        }
+> > > +    }
+> > > +}
+> > > +
+> > >   static void acpi_pcihp_update_hotplug_bus(AcpiPciHpState *s, int bsel)
+> > >   {
+> > >       BusChild *kid, *next;
+> > So the result here will be that device will be deleted completely,
+> > and will not reappear after guest reboot.
+> The management stack will replug the VF until seeing the STANDBY_CHANGED
+> "enabled" event after guest driver finishes feature negotiation and sets
+> driver_ok.
+>
+> > I don't think this is what we wanted.
+> > I think we wanted a special state that will hide device from guest until
+> > guest acks the failover bit.
+> What do we get by hiding? On the next reboot after system reset guest may
+> load an older OS instance without standby advertised. The VF can't be
+> plugged out then?
+> 
+> The model we adopt here doesn't pair virtio with VF in the QEMU level. If
+> the VF isn't being used by guest, it would make sense to notify management
+> to release VF anyways.
 
-  Okay, i will add extra patches for other machines and only keep ARCHs 
-  dependency for default-configs/*-softmmu.mak in next stage.
+Hmm it's different from what I envisioned and more work for management,
+but maybe it's ok ... I will need to think about it.
 
-  The new patches will include: 
-   1) hw/ARCH/Makefile configurable
-   2) Add Kconfig into hw/ARCH/
-   3) convert bus, like pci, usb in other ARCHs
+> > 
+> > 
+> > > @@ -207,6 +226,14 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
+> > >       int i;
+> > >       for (i = 0; i < ACPI_PCIHP_MAX_HOTPLUG_BUS; ++i) {
+> > > +        /*
+> > > +         * Set the acpi_pcihp_pci_status[].down bits of all the
+> > > +         * failover_primary devices so that the devices are ejected
+> > > +         * from the guest. We can't use the qdev_unplug() as well as the
+> > > +         * hotplug_handler to unplug the devices, because the guest may
+> > > +         * not be in a state to cooperate.
+> > > +         */
+> > > +        acpi_pcihp_cleanup_failover_primary(s, i);
+> > >           acpi_pcihp_update_hotplug_bus(s, i);
+> > >       }
+> > >   }
+> > I really don't want acpi to know anything about failover.
+> > 
+> > All that needs to happen is sending a device delete request
+> > to guest. Should work with any hotplug removal:
+> > pci standard,acpi, etc.
+> > 
+> As the code comments above indicated, there was issue uncovered that the
+> guest may not be in a state to respond to interrupt during reboot.
 
-  Regards,
+If you request removal then hotplug machinery normally will eject
+the device on system reset. You need to request it early enough though.
+I guess this missing is what happened.
 
-  Yang
+> Actually
+> management stack running fast enough is supposed to do this graceful hot
+> plug removal upon receiving the STANDBY_CHANGED "disabled" event. However,
+> if management stack's unable to do so, the code here makes sure the VF can
+> be deleted and won't be seen by an older kernel after reboot.
+> 
+> -Siwei
 
-> Paolo
+I'm sorry I don't understand.  On a system with PCIe native hotplug
+poking at ACPI is just wrong.
+
+
+-- 
+MST
