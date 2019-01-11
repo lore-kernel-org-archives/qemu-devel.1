@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54166)
+Received: from eggs.gnu.org ([209.51.188.92]:54289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ghzlm-0001h0-Ed
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:34:55 -0500
+	(envelope-from <philmd@redhat.com>) id 1ghzmQ-00028n-LS
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:35:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ghzll-0004U2-H3
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:34:54 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46005)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1ghzll-0004Tg-BZ
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:34:53 -0500
-Received: by mail-oi1-x241.google.com with SMTP id y1so12647655oie.12
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 08:34:53 -0800 (PST)
+	(envelope-from <philmd@redhat.com>) id 1ghzmP-0004qh-Qh
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:35:34 -0500
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 11 Jan 2019 17:35:19 +0100
+Message-Id: <20190111163519.11457-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190107111129.2087-1-alex.bennee@linaro.org>
-References: <20190107111129.2087-1-alex.bennee@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 11 Jan 2019 17:34:51 +0100
-Message-ID: <CAL1e-=jZACpchHLoF_CtaLtLiySr0t527eao2wGci7Rsz1h2zg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 0/3] gitdm updates
+Subject: [Qemu-devel] [PATCH] qemu-nbd: Rename 'exp' variable clashing with
+ math::exp() symbol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +21,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cota@braap.org" <cota@braap.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-On Monday, January 7, 2019, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
-:
+The use of a variable named 'exp' prevents includes to import <math.h>.
 
->
-> Hi,
->
-> Added a few more updates mostly of IBMers with non corporate emails.
+Rename it to avoid:
 
+  qemu-nbd.c:64:19: error: =E2=80=98exp=E2=80=99 redeclared as different =
+kind of symbol
+   static NBDExport *exp;
+                     ^~~
+  In file included from /usr/include/features.h:428,
+                   from /usr/include/bits/libc-header-start.h:33,
+                   from /usr/include/stdint.h:26,
+                   from /usr/lib/gcc/x86_64-redhat-linux/8/include/stdint=
+.h:9,
+                   from /source/qemu/include/qemu/osdep.h:80,
+                   from /source/qemu/qemu-nbd.c:19:
+  /usr/include/bits/mathcalls.h:95:1: note: previous declaration of =E2=80=
+=98exp=E2=80=99 was here
+    __MATHCALL_VEC (exp,, (_Mdouble_ __x));
+    ^~~~~~~~~~~~~~
 
-Alex, it seems logical to me that you also create a section on gitdm in
-MAINTAINERS, and set yourself as the maintainer for contrib/gitdm/*.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ qemu-nbd.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-Alelsandar
-
-
-
-> The year-end stats as per:
->
->  git log --numstat --after=3D"1/1/2018 00:00" \
->                    --before=3D"31/12/2018 23:59" | gitdm -n -l 10
->
-> Are:
->
->   Top changeset contributors by employer
->   Red Hat                   3091 (43.3%)
->   Linaro                    1201 (16.8%)
->   (None)                     484 (6.8%)
->   IBM                        426 (6.0%)
->   Academics (various)        186 (2.6%)
->   Virtuozzo                  172 (2.4%)
->   Wave Computing             118 (1.7%)
->   Igalia                     109 (1.5%)
->   Xilinx                     102 (1.4%)
->   Cadence Design Systems      80 (1.1%)
->
->   Top lines changed by employer
->   Red Hat                   140523 (30.3%)
->   Cadence Design Systems    81010 (17.5%)
->   Linaro                    78098 (16.8%)
->   Wave Computing            33134 (7.1%)
->   IBM                       18918 (4.1%)
->   SiFive                    14436 (3.1%)
->   Academics (various)       11995 (2.6%)
->   (None)                    11458 (2.5%)
->   Virtuozzo                 10770 (2.3%)
->   Oracle                    6698 (1.4%)
->
-> Alex Benn=C3=A9e (2):
->   contrib/gitdm: add Nokia and Proxmox to the domain-map
->   contrib/gitdm: add two more IBM'ers to group-map-ibm
->
-> Joel Stanley (1):
->   contrib/gitdm: Add other IBMers
->
->  contrib/gitdm/domain-map    | 2 ++
->  contrib/gitdm/group-map-ibm | 7 +++++++
->  2 files changed, 9 insertions(+)
->
-> --
-> 2.17.1
->
->
->
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 2807e13239..6ca02b6d87 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -61,7 +61,7 @@
+=20
+ #define MBR_SIZE 512
+=20
+-static NBDExport *exp;
++static NBDExport *export;
+ static int verbose;
+ static char *srcpath;
+ static SocketAddress *saddr;
+@@ -335,7 +335,7 @@ static int nbd_can_accept(void)
+     return state =3D=3D RUNNING && nb_fds < shared;
+ }
+=20
+-static void nbd_export_closed(NBDExport *exp)
++static void nbd_export_closed(NBDExport *export)
+ {
+     assert(state =3D=3D TERMINATING);
+     state =3D TERMINATED;
+@@ -1015,10 +1015,11 @@ int main(int argc, char **argv)
+         }
+     }
+=20
+-    exp =3D nbd_export_new(bs, dev_offset, fd_size, nbdflags, nbd_export=
+_closed,
+-                         writethrough, NULL, &error_fatal);
+-    nbd_export_set_name(exp, export_name);
+-    nbd_export_set_description(exp, export_description);
++    export =3D nbd_export_new(bs, dev_offset, fd_size, nbdflags,
++                            nbd_export_closed, writethrough,
++                            NULL, &error_fatal);
++    nbd_export_set_name(export, export_name);
++    nbd_export_set_description(export, export_description);
+=20
+     if (device) {
+ #if HAVE_NBD_DEVICE
+@@ -1055,9 +1056,9 @@ int main(int argc, char **argv)
+         main_loop_wait(false);
+         if (state =3D=3D TERMINATE) {
+             state =3D TERMINATING;
+-            nbd_export_close(exp);
+-            nbd_export_put(exp);
+-            exp =3D NULL;
++            nbd_export_close(export);
++            nbd_export_put(export);
++            export =3D NULL;
+         }
+     } while (state !=3D TERMINATED);
+=20
+--=20
+2.17.2
