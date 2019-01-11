@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48252)
+Received: from eggs.gnu.org ([209.51.188.92]:48826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghuFt-0006Ku-Nf
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:41:38 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ghuHy-00079z-Ej
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:43:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghuFs-00087j-UL
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:41:37 -0500
-Date: Fri, 11 Jan 2019 11:41:26 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190111104126.GC5010@dhcp-200-186.str.redhat.com>
-References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	(envelope-from <kraxel@redhat.com>) id 1ghuHx-0000vF-P8
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:43:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghuHx-0000uo-Jf
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:43:45 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D1840C070E29
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 10:43:44 +0000 (UTC)
+Date: Fri, 11 Jan 2019 11:43:43 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190111104343.msaz2y7bacuzr65m@sirius.home.kraxel.org>
+References: <20190110120047.25369-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190110132048.49451-1-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
- default on block_status
+In-Reply-To: <20190110120047.25369-1-berrange@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Fix & improve icon display on GTK
+ and SDL frontends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +34,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Am 10.01.2019 um 14:20 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> drv_co_block_status digs bs->file for additional, more accurate search
-> for hole inside region, reported as DATA by bs since 5daa74a6ebc.
-> 
-> This accuracy is not free: assume we have qcow2 disk. Actually, qcow2
-> knows, where are holes and where is data. But every block_status
-> request calls lseek additionally. Assume a big disk, full of
-> data, in any iterative copying block job (or img convert) we'll call
-> lseek(HOLE) on every iteration, and each of these lseeks will have to
-> iterate through all metadata up to the end of file. It's obviously
-> ineffective behavior. And for many scenarios we don't need this lseek
-> at all.
-> 
-> So, let's "5daa74a6ebc" by default, leaving an option to return
-> previous behavior, which is needed for scenarios with preallocated
-> images.
-> 
-> Add iotest illustrating new option semantics.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Thu, Jan 10, 2019 at 12:00:44PM +0000, Daniel P. Berrang=E9 wrote:
+> This series improves the GTK and SDL frontends so that they display the
+> high quality QEMU logo.
+>=20
+> Changed in v2:
+>=20
+>   - Add a 'regenerate' make target in ui/icons to rebuild icons
+>     from SVG using inkscape.
+>   - Allow use of SDL_Image to be disabled with --enable-sdl-image
+>     configure arg
+>   - Reduce number of conditionals in SDL code
+>   - Fix variable name typo in SDL code
 
-I still think that an option isn't a good solution and we should try use
-some heuristics instead.
+Added to ui queue.
 
-Kevin
+thanks,
+  Gerd
