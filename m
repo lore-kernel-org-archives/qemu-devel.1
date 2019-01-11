@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58507)
+Received: from eggs.gnu.org ([209.51.188.92]:58435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ghkpc-0005bH-Uy
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 19:37:53 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ghkpb-0003UO-QB
+	(envelope-from <dgibson@ozlabs.org>) id 1ghkpb-0005ZR-DE
 	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 19:37:52 -0500
-Date: Fri, 11 Jan 2019 11:37:35 +1100
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1ghkpZ-0003SH-6e
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 19:37:50 -0500
+Date: Fri, 11 Jan 2019 11:21:55 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190111003735.GP6682@umbus.fritz.box>
-References: <5c2e6965.1c69fb81.b832c.13ee@mx.google.com>
-	<2c434536-6388-563f-344b-c6800769a733@vivier.eu>
+Message-ID: <20190111002155.GL6682@umbus.fritz.box>
+References: <20190109224919.2082F7456A2@zero.eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="EkxpYdHiqGHPYbUt"
+	protocol="application/pgp-signature"; boundary="Xb8pJpF45Qg/t7GZ"
 Content-Disposition: inline
-In-Reply-To: <2c434536-6388-563f-344b-c6800769a733@vivier.eu>
-Subject: Re: [Qemu-devel] [Qemu-trivial] Whitespace cleanup:
- target/ppc/translate_init.inc.c
+In-Reply-To: <20190109224919.2082F7456A2@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH] ppc440: Avoid reporting error when reading
+ non-existent RAM slot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Jon Diekema <jon.diekema@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-trivial@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---EkxpYdHiqGHPYbUt
+--Xb8pJpF45Qg/t7GZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 09, 2019 at 11:15:26AM +0100, Laurent Vivier wrote:
-> Hi Jon,
+On Wed, Jan 09, 2019 at 11:37:33PM +0100, BALATON Zoltan wrote:
+> When reading base register of RAM slot with no RAM we should not try
+> to calculate register value because that will result printing an error
+> due to invalid RAM size. Just return 0 without the error in this case.
 >=20
-> please cc: qemu-devel and MAINTAINERS when you send a patch.
->=20
-> You can have the list of maintainers using a script in qemu directory:
->=20
->    ./scripts/get_maintainer.pl XXXX.patch
->=20
-> Thanks,
-> Laurent
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-Hrm.  Like the other patch, I didn't seem to receive this - I checked
-back through my archives.  I think something must be not working with
-email from Jon to me, although I can't quite imagine what.
+Applied, thanks.
 
+> ---
+>  hw/ppc/ppc440_uc.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 >=20
-> On 03/01/2019 20:58, Jon Diekema wrote:
-> > From: Jon Diekema <jon.diekema@gmail.com>
-> > Date: Tue, 25 Dec 2018 04:03:04 -0500
-> > Subject: Whitespace cleanup: target/ppc/translate_init.inc.c
-> >=20
-> > Signed-off-by: Jon Diekema <jon.diekema@gmail.com>
-> > ---
-> >  target/ppc/translate_init.inc.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_ini=
-t.inc.c
-> > index c971a5faf7..b5f4c9bd55 100644
-> > --- a/target/ppc/translate_init.inc.c
-> > +++ b/target/ppc/translate_init.inc.c
-> > @@ -5237,7 +5237,7 @@ static void init_proc_601(CPUPPCState *env)
-> >                   0x00000000);
-> >      /* Memory management */
-> >      init_excp_601(env);
-> > -    /* XXX: beware that dcache line size is 64=20
-> > +    /* XXX: beware that dcache line size is 64
-> >       *      but dcbz uses 32 bytes "sectors"
-> >       * XXX: this breaks clcs instruction !
-> >       */
-> > @@ -10485,7 +10485,7 @@ static void ppc_cpu_class_init(ObjectClass *oc,=
- void *data)
-> >      cc->tcg_initialize =3D ppc_translate_init;
-> >  #endif
-> >      cc->disas_set_info =3D ppc_disas_set_info;
-> > -=20
-> > +
-> >      dc->fw_name =3D "PowerPC,UNKNOWN";
-> >  }
-> > =20
-> >=20
->=20
+> diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
+> index c489368905..9130eb314c 100644
+> --- a/hw/ppc/ppc440_uc.c
+> +++ b/hw/ppc/ppc440_uc.c
+> @@ -613,8 +613,10 @@ static uint32_t dcr_read_sdram(void *opaque, int dcr=
+n)
+>      case SDRAM_R1BAS:
+>      case SDRAM_R2BAS:
+>      case SDRAM_R3BAS:
+> -        ret =3D sdram_bcr(sdram->ram_bases[dcrn - SDRAM_R0BAS],
+> -                        sdram->ram_sizes[dcrn - SDRAM_R0BAS]);
+> +        if (sdram->ram_sizes[dcrn - SDRAM_R0BAS]) {
+> +            ret =3D sdram_bcr(sdram->ram_bases[dcrn - SDRAM_R0BAS],
+> +                            sdram->ram_sizes[dcrn - SDRAM_R0BAS]);
+> +        }
+>          break;
+>      case SDRAM_CONF1HB:
+>      case SDRAM_CONF1LL:
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -94,24 +71,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---EkxpYdHiqGHPYbUt
+--Xb8pJpF45Qg/t7GZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlw35U8ACgkQbDjKyiDZ
-s5IG1g//VvXNy8J7FYFtXA7vg7vNmovn6VVK0g4RdzegqTho0pnF7JMDsonsqsiX
-u0173dqIPGWzwY3qNaQgpdMS47hiqr2gZSwkXNCtJnQvSb6GJxKBLywDgdNjFmjS
-cWIDmzmSE7velgzozRwyEWGnQxtuv76r173VpDzRBDzt0V1v2OlIgeSKk8HL4REJ
-OT1ieyFtQLpPk+GqRzEWIezfwPRtmaRn65RK7V2qn6zKd2BcilSqNOqWWQZUhK60
-5VqLYaA6u5KKI6aPym5FP3H2oiggE0xYb1HLsn/Cjf3N22itC6PSrF116X0Yz/U7
-U9E3HTmeedzaAmOgUDVt4Bp6LwiXtXQPl97Kp3bZX6EQ5ZNsiK4wVdf9OPZxmeqr
-LbeOA2QWm5qK6Lqk+V45GhP6g0+BSncbiUZJxv6JalpzNc1PgV4g0ZHcwX9LTsTx
-qTb1X487ZhuTfZwltOFR+rbvKRfnhgarNVIbQIwiUWX2um4pH/onxar+6jFBGqOP
-KbSiSZZKwRz6IXUyQ6ZCGYAIojZPkMXgzmDBYhieK8Pn/TgkO8Qi4saHMHWTQ2sK
-xOOEX3wKaIBknu9lL2LrMbjAY0oimLX2baRmwaSyrq+WjtA0UY+rEiwryUCreFZB
-dJECEiInXJoQ5WfJN4iIHE5d9TquegN5cFEBVI+iIGikR1UmRh8=
-=4qbU
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlw34aMACgkQbDjKyiDZ
+s5JrIhAAuxMnK+XaEYJCJ3phM0lhDeNWmOL3Fs+b1XGLyz4Smv6pY1vv5c3cBNDn
+eWhlwake93iG7tBHSDs+gsb2IvyoULxUuRne75tV0azmd+IDJVscxITGCVIkRK/P
+q4dWV8e2OnCBvaaL/Dotm7pVSsTZMAAxtLcCxmYvTZtUZ+Pz0gjdRsnjZDxIbznq
+2PIj+7kXU7HySETDepNNDeOg4OS92BKz4CZ40ejrMMO7q4+m4Ex5OFn4QZLfY8Ic
+uy3d6zn4Ch3AUCvTKlrrn1otnpwdNOKV+0xwiuaIuqKBKd9kVKV+QRe0Qq4UX36k
+G26Nj9o7Ub1MVUiHXd/xbjv0r7/R29T5+KoeT+H0AvJS2fBpOAOwIM8ZcyiNsKvt
+3vvemvF6d8ZykzZphVK4z1eW2tR2mSrBrjtZwKOSvUitRYIxN+Z2SeYPpjadBaC1
+0Vlxy0ira4V6/7zu0erinlJNSZ+vv7f1vrSS0mzjnrUP45CcfFSVCeik3hDnTdr5
+2bUyodRGt7ttVnz8tChCRPilHYIQ4nwd7uBRHtprWbz+XklI7jCAxhZsy/a+LqS5
+i0jKINgmWQUDynzt3pXPpRbBWne+SjrU26XbaH961AiavKmZLZ0HBPXyZTJtEmjr
+7gvTu5dOQ6vZXewba4ttitM7Z2Bu7MyDFgT2QcX2IYKlAyCAUqg=
+=IIDN
 -----END PGP SIGNATURE-----
 
---EkxpYdHiqGHPYbUt--
+--Xb8pJpF45Qg/t7GZ--
