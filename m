@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51531)
+Received: from eggs.gnu.org ([209.51.188.92]:52039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ghuTh-0004Cj-NJ
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:55:54 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1ghuWH-0004yu-LW
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:58:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ghuTg-0005Yw-NM
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:55:53 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52299)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ghuTe-0005Y4-TN
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:55:52 -0500
-Received: by mail-wm1-x342.google.com with SMTP id m1so1949061wml.2
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 02:55:50 -0800 (PST)
-References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
-	<1547194672-24169-4-git-send-email-thuth@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1547194672-24169-4-git-send-email-thuth@redhat.com>
-Date: Fri, 11 Jan 2019 10:55:47 +0000
-Message-ID: <87tvifv4y4.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1ghuWE-0006cu-7D
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:58:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ghuW8-0006aa-Tr
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:58:27 -0500
+Date: Fri, 11 Jan 2019 10:58:15 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190111105815.GC2738@work-vm>
+References: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
+	<20190110120120.9943-2-yury-kotov@yandex-team.ru>
+	<20190110201418.GK2589@work-vm>
+	<20190111110644.19896d4d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/3] configure: Force the C standard to
- gnu99
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190111110644.19896d4d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] migration: add RAMBlock's offset
+ validation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +30,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Yury Kotov <yury-kotov@yandex-team.ru>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, wrfsh@yandex-team.ru
 
+* Igor Mammedov (imammedo@redhat.com) wrote:
+> On Thu, 10 Jan 2019 20:14:19 +0000
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> > > RAM migration has a RAMBlock validation stage (flag RAM_SAVE_FLAG_MEM_SIZE).
+> > > In this stage QEMU checks further information about RAMBlock:
+> > > 1. Presence (by idstr),
+> > > 2. Length (trying to resize, when differs),
+> > > 3. Optional page size.
+> > > 
+> > > This patch adds a check for RAMBlock's offset. Currently we check it during
+> > > RAM pages loading - every RAM page has an offset in its header. But there is a
+> > > case when we don't send RAM pages (see below).
+> > > 
+> > > The following commits introduce a capability (ignore-external) to skip some
+> > > RAM blocks from migration. In such case the migration stream contains only
+> > > meta information about RAM blocks to validate them. So, the only way to check
+> > > block's offset is to send it explicitly.
+> > > 
+> > > Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>  
+> > 
+> > But why check that offsets match?  THey aren't supposed to!
+> > Offset's are entirely private to each qemu and they're allowed to be
+> > different; the only requirement is that the length and name of each
+> > RAMBlock matches, then all the operations we do over the migration
+> > stream are relative to the start of the block.
+> > 
+> > One example where they are validly different is where you hotplug some
+> > RAM, so for example:
+> > 
+> > 
+> >   source qemu
+> >       -M 4G
+> >       hotplug PCI card
+> >       hotplug 2G
+> > 
+> >   destination qemu
+> >       -M 4G
+> >       PCI card declared on the command line
+> >       extra 2G declared on the command line
+> > 
+> > The offsets are different but we can migrate that case fine.
+> PCI mappings are updated after migration is done, to make DST match SRC
+> (get_pci_config_device) that mapping is irrelevant here, but I was under
+> impression that offset in terms of MemoryRegion (GPA) was passed in
+> migration stream, even if we do not update memory mappings for RAM
+> (mapping depends on hotplug/CLI order or explicit addr on CLI for memory
+> devices).
 
-Thomas Huth <thuth@redhat.com> writes:
+The GPA must match, but the offset within ram_addr_t space is abstract
+and isn't visible to the guest.
 
-> Different versions of GCC and Clang use different versions of the C stand=
-ard.
-> This repeatedly caused problems already, e.g. with duplicated typedefs:
->
->  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
->
-> or with for-loop variable initializers:
->
->  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
->
-> To avoid these problems, we should enforce the C language version to the
-> same level for all compilers. Since our minimum compiler versions is
-> GCC v4.8, our best option is "gnu99" for C code right now ("gnu17" is not
-> available there yet, and "gnu11" is marked as "experimental"), and "gnu++=
-98"
-> for the few C++ code that we have in the repository.
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  configure | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/configure b/configure
-> index cf763d4..f0b5dcd 100755
-> --- a/configure
-> +++ b/configure
-> @@ -107,6 +107,9 @@ update_cxxflags() {
->              -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
->              -Wold-style-declaration|-Wold-style-definition|-Wredundant-d=
-ecls)
->                  ;;
-> +            -std=3Dgnu99)
-> +                QEMU_CXXFLAGS=3D${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }"-std=
-=3Dgnu++98"
-> +                ;;
->              *)
->                  QEMU_CXXFLAGS=3D${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
->                  ;;
-> @@ -585,7 +588,7 @@ ARFLAGS=3D"${ARFLAGS-rv}"
->  # left shift of signed integers is well defined and has the expected
->  # 2s-complement style results. (Both clang and gcc agree that it
->  # provides these semantics.)
-> -QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
-> +QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common -fwrapv -std=3Dgnu99 $QE=
-MU_CFLAGS"
->  QEMU_CFLAGS=3D"-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_=
-CFLAGS"
->  QEMU_CFLAGS=3D"-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
->  QEMU_CFLAGS=3D"-D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURC=
-E $QEMU_CFLAGS"
+Dave
 
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+> > 
+> > Dave
+> > 
+> > > ---
+> > >  migration/ram.c | 15 +++++++++++++--
+> > >  1 file changed, 13 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/migration/ram.c b/migration/ram.c
+> > > index 7e7deec4d8..39629254e1 100644
+> > > --- a/migration/ram.c
+> > > +++ b/migration/ram.c
+> > > @@ -3171,6 +3171,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+> > >          if (migrate_postcopy_ram() && block->page_size != qemu_host_page_size) {
+> > >              qemu_put_be64(f, block->page_size);
+> > >          }
+> > > +        qemu_put_be64(f, block->offset);
+> > >      }
+> > >  
+> > >      rcu_read_unlock();
+> > > @@ -4031,7 +4032,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> > >  
+> > >      seq_iter++;
+> > >  
+> > > -    if (version_id != 4) {
+> > > +    if (version_id < 4) {
+> > >          ret = -EINVAL;
+> > >      }
+> > >  
+> > > @@ -4132,6 +4133,16 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+> > >                              ret = -EINVAL;
+> > >                          }
+> > >                      }
+> > > +                    if (version_id >= 5) {
+> > > +                        ram_addr_t offset;
+> > > +                        offset = qemu_get_be64(f);
+> > > +                        if (block->offset != offset) {
+> > > +                            error_report("Mismatched RAM block offset %s "
+> > > +                                         "%" PRId64 "!= %" PRId64,
+> > > +                                         id, offset, (uint64_t)block->offset);
+> > > +                            ret = -EINVAL;
+> > > +                        }
+> > > +                    }
+> > >                      ram_control_load_hook(f, RAM_CONTROL_BLOCK_REG,
+> > >                                            block->idstr);
+> > >                  } else {
+> > > @@ -4363,5 +4374,5 @@ static SaveVMHandlers savevm_ram_handlers = {
+> > >  void ram_mig_init(void)
+> > >  {
+> > >      qemu_mutex_init(&XBZRLE.lock);
+> > > -    register_savevm_live(NULL, "ram", 0, 4, &savevm_ram_handlers, &ram_state);
+> > > +    register_savevm_live(NULL, "ram", 0, 5, &savevm_ram_handlers, &ram_state);
+> > >  }
+> > > -- 
+> > > 2.20.1
+> > >   
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 --
-Alex Benn=C3=A9e
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
