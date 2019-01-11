@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53495)
+Received: from eggs.gnu.org ([209.51.188.92]:55728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghsR3-00015C-99
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:45:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1ghsgW-0004BR-Ar
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:01:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ghsR2-0005LT-1Z
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:45:01 -0500
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:35315)
+	(envelope-from <armbru@redhat.com>) id 1ghseY-000149-5i
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55526)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ghsR1-0005Jz-RL
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:44:59 -0500
-Received: from player732.ha.ovh.net (unknown [10.109.143.145])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id D0AAD20E907
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 09:44:57 +0100 (CET)
-Date: Fri, 11 Jan 2019 09:44:44 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190111094444.11ef8b47@bahia.lan>
-In-Reply-To: <1547194672-24169-4-git-send-email-thuth@redhat.com>
-References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
-	<1547194672-24169-4-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghseX-00013n-U8
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:58 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
+	<154703595509.13472.7357387659078524086.stgit@pasha-VirtualBox>
+Date: Fri, 11 Jan 2019 09:58:50 +0100
+In-Reply-To: <154703595509.13472.7357387659078524086.stgit@pasha-VirtualBox>
+	(Pavel Dovgalyuk's message of "Wed, 09 Jan 2019 15:12:35 +0300")
+Message-ID: <87wonb7eph.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/3] configure: Force the C standard to
- gnu99
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v9 13/21] replay: implement replay-seek
+ command to proceed to the desired step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +28,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, pbonzini@redhat.com, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Fri, 11 Jan 2019 09:17:52 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
 
-> Different versions of GCC and Clang use different versions of the C stand=
-ard.
-> This repeatedly caused problems already, e.g. with duplicated typedefs:
->=20
->  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
->=20
-> or with for-loop variable initializers:
->=20
->  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
->=20
-> To avoid these problems, we should enforce the C language version to the
-> same level for all compilers. Since our minimum compiler versions is
-> GCC v4.8, our best option is "gnu99" for C code right now ("gnu17" is not
-> available there yet, and "gnu11" is marked as "experimental"), and "gnu++=
-98"
-> for the few C++ code that we have in the repository.
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> This patch adds hmp/qmp commands replay_seek/replay-seek that proceed
+> the execution to the specified step.
+> The command automatically loads nearest snapshot and replay the execution
+> to find the desired step.
+
+"step" again.
+
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>
+> --
+>
+> v2:
+>  - renamed replay_seek qmp command into replay-seek
+>    (suggested by Eric Blake)
+> v7:
+>  - small fixes related to Markus Armbruster's review
+> v9:
+>  - changed 'step' parameter name to 'icount'
+>  - moved json stuff to replay.json and updated the description
+>    (suggested by Markus Armbruster)
 > ---
+>  hmp-commands.hx           |   19 +++++++++
+>  hmp.h                     |    1 
+>  qapi/replay.json          |   20 ++++++++++
+>  replay/replay-debugging.c |   91 +++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 131 insertions(+)
+>
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 6d04c02..2839acc 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1924,6 +1924,25 @@ The command is ignored when there are no replay breakpoints.
+>  ETEXI
+>  
+>      {
+> +        .name       = "replay_seek",
+> +        .args_type  = "icount:i",
+> +        .params     = "icount",
+> +        .help       = "rewinds replay to the step specified by icount",
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+We use imperative mood in .help: "rewind".
 
->  configure | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/configure b/configure
-> index cf763d4..f0b5dcd 100755
-> --- a/configure
-> +++ b/configure
-> @@ -107,6 +107,9 @@ update_cxxflags() {
->              -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
->              -Wold-style-declaration|-Wold-style-definition|-Wredundant-d=
-ecls)
->                  ;;
-> +            -std=3Dgnu99)
-> +                QEMU_CXXFLAGS=3D${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }"-std=
-=3Dgnu++98"
-> +                ;;
->              *)
->                  QEMU_CXXFLAGS=3D${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
->                  ;;
-> @@ -585,7 +588,7 @@ ARFLAGS=3D"${ARFLAGS-rv}"
->  # left shift of signed integers is well defined and has the expected
->  # 2s-complement style results. (Both clang and gcc agree that it
->  # provides these semantics.)
-> -QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
-> +QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common -fwrapv -std=3Dgnu99 $QE=
-MU_CFLAGS"
->  QEMU_CFLAGS=3D"-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_=
-CFLAGS"
->  QEMU_CFLAGS=3D"-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
->  QEMU_CFLAGS=3D"-D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURC=
-E $QEMU_CFLAGS"
+"Rewind" suggests going backward.  The command can do that.  But it can
+also go forward.  What about:
+
+"replay execution to the specified intruction count"
+
+> +        .cmd        = hmp_replay_seek,
+> +    },
+> +
+> +STEXI
+> +@item replay_seek @var{icount}
+> +@findex replay_seek
+> +Automatically proceeds to the step specified by @var{icount}, when
+> +replaying the execution. The command automatically loads nearest
+> +snapshot and replay the execution to find the desired step.
+> +When there is no preceding snapshot or the execution is not replayed,
+> +then the command is ignored.
+
+Uh, why isn't that an error?
+
+> +icount for the reference may be observed with 'info replay' command.
+
+This still uses both "step" and "instruction count".
+
+I'm happy to help rephrasing, but first we need to nail down the failure
+modes.
+
+> +ETEXI
+> +
+> +    {
+>          .name       = "info",
+>          .args_type  = "item:s?",
+>          .params     = "[subcommand]",
+> diff --git a/hmp.h b/hmp.h
+> index c9b9b4f..d6e1d7e 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -151,5 +151,6 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict);
+>  void hmp_info_replay(Monitor *mon, const QDict *qdict);
+>  void hmp_replay_break(Monitor *mon, const QDict *qdict);
+>  void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
+> +void hmp_replay_seek(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/qapi/replay.json b/qapi/replay.json
+> index a63219c..7390f88 100644
+> --- a/qapi/replay.json
+> +++ b/qapi/replay.json
+> @@ -99,3 +99,23 @@
+>  #
+>  ##
+>  { 'command': 'replay-delete-break' }
+> +
+> +##
+> +# @replay-seek:
+> +#
+> +# Automatically proceeds to the step specified by @icount when replaying
+> +# the execution. The command automatically loads nearest
+> +# snapshot and replay the execution to find the desired step.
+> +# When there is no preceding snapshot or the execution is not replayed,
+> +# then the command is ignored.
+> +# icount for the reference may be obtained with @query-replay command.
+
+My comments on hmp-commands.hx apply.
+
+> +#
+> +# @icount: destination execution step
+
+s/execution step/instruction count/
+
+Maybe s/destination/target/
+
+> +#
+> +# Since: 4.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "replay-seek", "data": { "icount": 220414 } }
+> +##
+> +{ 'command': 'replay-seek', 'data': { 'icount': 'int' } }
+[...]
