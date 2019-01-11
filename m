@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55768)
+Received: from eggs.gnu.org ([209.51.188.92]:59585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghshE-0004EB-5u
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:01:45 -0500
+	(envelope-from <ppandit@redhat.com>) id 1ghsxq-0002y8-Ra
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ghsXr-0003UG-52
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:52:04 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38745)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1ghsXq-0003Tq-Uw
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:52:03 -0500
-Received: by mail-wm1-x343.google.com with SMTP id m22so1540695wml.3
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 00:52:02 -0800 (PST)
-MIME-Version: 1.0
+	(envelope-from <ppandit@redhat.com>) id 1ghsxq-0003WV-As
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:18:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37996)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ghsxq-0003WK-50
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:18:54 -0500
+Date: Fri, 11 Jan 2019 14:48:41 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <CAJ+F1C+VM8KCw3uqphK3PrJ386jABmHDJLe0dySg6T1RVMuZiw@mail.gmail.com>
+Message-ID: <nycvar.YSQ.7.76.1901111444171.11857@xnncv>
 References: <20190111081909.11896-1-ppandit@redhat.com>
-In-Reply-To: <20190111081909.11896-1-ppandit@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 11 Jan 2019 12:51:50 +0400
-Message-ID: <CAJ+F1C+VM8KCw3uqphK3PrJ386jABmHDJLe0dySg6T1RVMuZiw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAJ+F1C+VM8KCw3uqphK3PrJ386jABmHDJLe0dySg6T1RVMuZiw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] slirp: check data length while emulating
  ident function
@@ -30,51 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, Kira <864786842@qq.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, Kira <864786842@qq.com>
 
-Hi
++-- On Fri, 11 Jan 2019, Marc-Andr=C3=A9 Lureau wrote --+
+| > +            if (m->m_len > so_rcv->sb_datalen
+| > +                            - (so_rcv->sb_wptr - so_rcv->sb_data)) {
+| > +                m_free(m);
+| > +                return 0;
+| > +            }
+|=20
+| Check looks correct, it should probably return 1.
 
-On Fri, Jan 11, 2019 at 12:31 PM P J P <ppandit@redhat.com> wrote:
->
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> While emulating identification protocol, tcp_emu() does not check
-> available space in the 'sc_rcv->sb_data' buffer. It could lead to
-> heap buffer overflow issue. Add check to avoid it.
->
-> Reported-by: Kira <864786842@qq.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  slirp/tcp_subr.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-> index fa61349cbb..4415801fbb 100644
-> --- a/slirp/tcp_subr.c
-> +++ b/slirp/tcp_subr.c
-> @@ -635,6 +635,11 @@ tcp_emu(struct socket *so, struct mbuf *m)
->                         socklen_t addrlen =3D sizeof(struct sockaddr_in);
->                         struct sbuf *so_rcv =3D &so->so_rcv;
->
-> +            if (m->m_len > so_rcv->sb_datalen
-> +                            - (so_rcv->sb_wptr - so_rcv->sb_data)) {
-> +                m_free(m);
-> +                return 0;
-> +            }
+Function comment says return 1 if 'm' is valid and should be appended via=
+=20
+sbappend(). Not sure if unprocessed 'm' should go to sbappend().
 
-Check looks correct, it should probably return 1.
+| Is there a reproducer?
 
-Is there a reproducer?
+Yes, I have one.
 
->                         memcpy(so_rcv->sb_wptr, m->m_data, m->m_len);
->                         so_rcv->sb_wptr +=3D m->m_len;
->                         so_rcv->sb_rptr +=3D m->m_len;
-> --
-> 2.20.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
