@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55728)
+Received: from eggs.gnu.org ([209.51.188.92]:55768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghsga-0004BR-7T
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:01:12 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ghshE-0004EB-5u
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:01:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghseI-0000vD-2D
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:43 -0500
-Received: from mga11.intel.com ([192.55.52.93]:51734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lizhijian@cn.fujitsu.com>)
-	id 1ghseH-0000hn-Ov
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:41 -0500
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Date: Fri, 11 Jan 2019 16:57:47 +0800
-Message-Id: <1547197071-14504-1-git-send-email-lizhijian@cn.fujitsu.com>
-Subject: [Qemu-devel] [PATCH v5 0/4] allow to load initrd below 4G for
- recent kernel
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ghsXr-0003UG-52
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:52:04 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38745)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1ghsXq-0003Tq-Uw
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:52:03 -0500
+Received: by mail-wm1-x343.google.com with SMTP id m22so1540695wml.3
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 00:52:02 -0800 (PST)
+MIME-Version: 1.0
+References: <20190111081909.11896-1-ppandit@redhat.com>
+In-Reply-To: <20190111081909.11896-1-ppandit@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 11 Jan 2019 12:51:50 +0400
+Message-ID: <CAJ+F1C+VM8KCw3uqphK3PrJ386jABmHDJLe0dySg6T1RVMuZiw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] slirp: check data length while emulating
+ ident function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,68 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org
-Cc: philmd@redhat.com, zhijianx.li@intel.com, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefano Garzarella <sgarzare@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: P J P <ppandit@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, Kira <864786842@qq.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-Long long ago, linux kernel has supported up to 4G initrd, but it's header
-still hard code to allow loading initrd below 2G only.
- cutting from arch/boot/x86/header.S:
- # (Header version 0x0203 or later) the highest safe address for the contents
- # of an initrd. The current kernel allows up to 4 GB, but leave it at 2 GB to
- # avoid possible bootloader bugs.
+Hi
 
-In order to support more than 2G initrd, qemu must allow loading initrd
-above 2G address. Luckly, recent kernel introduced a new field to linux header
-named xloadflags:XLF_CAN_BE_LOADED_ABOVE_4G which tells bootloader an optional
-and safe address to load initrd.
+On Fri, Jan 11, 2019 at 12:31 PM P J P <ppandit@redhat.com> wrote:
+>
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> While emulating identification protocol, tcp_emu() does not check
+> available space in the 'sc_rcv->sb_data' buffer. It could lead to
+> heap buffer overflow issue. Add check to avoid it.
+>
+> Reported-by: Kira <864786842@qq.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  slirp/tcp_subr.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+> index fa61349cbb..4415801fbb 100644
+> --- a/slirp/tcp_subr.c
+> +++ b/slirp/tcp_subr.c
+> @@ -635,6 +635,11 @@ tcp_emu(struct socket *so, struct mbuf *m)
+>                         socklen_t addrlen =3D sizeof(struct sockaddr_in);
+>                         struct sbuf *so_rcv =3D &so->so_rcv;
+>
+> +            if (m->m_len > so_rcv->sb_datalen
+> +                            - (so_rcv->sb_wptr - so_rcv->sb_data)) {
+> +                m_free(m);
+> +                return 0;
+> +            }
 
-It's believed that if XLF_CAN_BE_LOADED_ABOVE_4G is set, initrd can
-be loaded into any address.
+Check looks correct, it should probably return 1.
 
-Default roms(Seabios + optionrom(linuxboot_dma)) works as expected with this
-patchset.
+Is there a reproducer?
 
-I stole some comments from yours, fell free to let me know if you don't like this.
-
-changes:
-V5: add a few reviewed-tag and update 4/4 changelog and comments
-V4:
-  - add Reviwed-by tag to 1/4 and 2/4
-  - use scripts/update-linux-headers.sh to import bootparam.h
-  - minor fix at commit log
-V3:
- - rebase code basing on http://patchwork.ozlabs.org/cover/1005990 and
-   https://patchew.org/QEMU/20181122133507.30950-1-peter.maydell@linaro.org
- - add new patch 3/4 to import header bootparam.h (Michael S. Tsirkin)
-
-V2: add 2 patches(3/5, 4/5) to fix potential loading issue.
+>                         memcpy(so_rcv->sb_wptr, m->m_data, m->m_len);
+>                         so_rcv->sb_wptr +=3D m->m_len;
+>                         so_rcv->sb_rptr +=3D m->m_len;
+> --
+> 2.20.1
+>
+>
 
 
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Richard Henderson <rth@twiddle.net>
-CC: Eduardo Habkost <ehabkost@redhat.com>
-CC: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-CC: Stefano Garzarella <sgarzare@redhat.com>
-CC: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-CC: Peter Maydell <peter.maydell@linaro.org>
-
-Li Zhijian (4):
-  unify len and addr type for memory/address APIs
-  hw/core/loader.c: Read as long as possible in load_image_size()
-  i386: import & use bootparam.h
-  i386: allow to load initrd below 4G for recent linux
-
- exec.c                                       | 47 ++++++++++++++--------------
- hw/core/loader.c                             | 11 +++----
- hw/i386/pc.c                                 | 32 ++++++++++++++-----
- include/exec/cpu-all.h                       |  2 +-
- include/exec/cpu-common.h                    |  8 ++---
- include/exec/memory.h                        | 22 ++++++-------
- include/standard-headers/asm-x86/bootparam.h | 34 ++++++++++++++++++++
- scripts/update-linux-headers.sh              |  4 +++
- 8 files changed, 106 insertions(+), 54 deletions(-)
- create mode 100644 include/standard-headers/asm-x86/bootparam.h
-
--- 
-2.7.4
+--=20
+Marc-Andr=C3=A9 Lureau
