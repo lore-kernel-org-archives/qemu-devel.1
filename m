@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43017)
+Received: from eggs.gnu.org ([209.51.188.92]:43591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gi5Sn-0006xn-JP
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:39:42 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gi5Va-0007pD-TN
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:42:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gi5Sm-0004iy-AC
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:39:41 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33706)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gi5Sm-0004hm-2s
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:39:40 -0500
-Received: by mail-wr1-f66.google.com with SMTP id c14so16898014wrr.0
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:39:37 -0800 (PST)
-References: <154724210898.37.4367801081630939892@2d170d368aaa>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <834ad86b-27d1-ce01-91dc-a5c939061ce9@redhat.com>
-Date: Fri, 11 Jan 2019 23:39:34 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gi5VZ-00062k-Sd
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:42:34 -0500
+Resent-Message-Id: <E1gi5VZ-00062k-Sd@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21798)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gi5VX-00060l-J6
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:42:33 -0500
+Message-ID: <154724652089.37.17712705294503427547@2d170d368aaa>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20190110142955.23254-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <154724210898.37.4367801081630939892@2d170d368aaa>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] contrib/gitdm: Fix a typo
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 11 Jan 2019 14:42:01 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/10] Machine queue, 2019-01-10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: fam@euphon.net, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, alex.bennee@linaro.org
+To: ehabkost@redhat.com
+Cc: fam@euphon.net, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On 1/11/19 10:28 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20190111155555.8270-1-philmd@redhat.com/
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Message-id: 20190111155555.8270-1-philmd@redhat.com
-> Type: series
-> Subject: [Qemu-devel] [PATCH] contrib/gitdm: Fix a typo
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback --color=always base..
-
-I suppose Paolo expected his PR to land to upgrade patchew, and patchew
-is still processing from an old queue?
-
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> Switched to a new branch 'test'
-> c995f5f contrib/gitdm: Fix a typo
-> 
-> === OUTPUT BEGIN ===
-> Unknown option: color
-> Usage:
-> 
->     checkpatch.pl [OPTION]... [FILE]...
->     checkpatch.pl [OPTION]... [GIT-REV-LIST]
-> 
-> Version: 0.31
-> 
-> Options:
->   -q, --quiet                quiet
->   --no-tree                  run without a kernel tree
->   --no-signoff               do not check for 'Signed-off-by' line
->   --patch                    treat FILE as patchfile
->   --branch                   treat args as GIT revision list
->   --emacs                    emacs compile window format
->   --terse                    one line per report
->   -f, --file                 treat FILE as regular source file
->   --strict                   fail if only warnings are found
->   --root=PATH                PATH to the kernel tree root
->   --no-summary               suppress the per-file summary
->   --mailback                 only produce a report in case of warnings/errors
->   --summary-file             include the filename in summary
->   --debug KEY=[0|1]          turn on/off debugging of KEY, where KEY is one of
->                              'values', 'possible', 'type', and 'attr' (default
->                              is all off)
->   --test-only=WORD           report only warnings/errors containing WORD
->                              literally
->   -h, --help, --version      display this help and exit
-> 
-> When FILE is - read standard input.
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20190111155555.8270-1-philmd@redhat.com/testing.checkpatch/?type=message.
-> ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExMDE0Mjk1NS4yMzI1
+NC0xLWVoYWJrb3N0QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMTEwMTQyOTU1LjIzMjU0LTEtZWhhYmtvc3RA
+cmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzEw
+XSBNYWNoaW5lIHF1ZXVlLCAyMDE5LTAxLTEwCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
+aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtLWNvbG9y
+PWFsd2F5cyBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
+cGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE5MDEx
+MTIyMDEzMS4yNzE1My0xLWpjbXZia2JjQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkwMTExMjIw
+MTMxLjI3MTUzLTEtamNtdmJrYmNAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKNjI1NDRmZSBxb206IERvbid0IGtlZXAgZXJyb3IgdmFsdWUgYmV0d2VlbiBvYmplY3Rf
+cHJvcGVydHlfcGFyc2UoKSBjYWxscwphMzIwMTY4IHFkZXY6IGZpeCAtZGV2aWNlIHNjc2ktaGQs
+IGhlbHAgcmVncmVzc2lvbgo5MTdlNDZiIG1hY2hpbmU6IFVzZSBzaG9ydGVyIGZvcm1hdCBmb3Ig
+R2xvYmFsUHJvcGVydHkgYXJyYXlzCjQzMjY0OTcgbWFjaGluZTogRWxpbWluYXRlIHVubmVjZXNz
+YXJ5IHN0cmluZ2lmeSgpIHVzYWdlCmY0ZDhjM2Qgc3BhcHI6IEVsaW1pbmF0ZSBTUEFQUl9QQ0lf
+Ml83X01NSU9fV0lOX1NJWkUgbWFjcm8KNmNhNzJjNyBtZW1vcnktZGV2aWNlOiByZXdyaXRlIGFk
+ZHJlc3MgYXNzaWdubWVudCB1c2luZyByYW5nZXMKZTY2NjdkNyByYW5nZTogYWRkIHNvbWUgbW9y
+ZSBmdW5jdGlvbnMKNThiZGE3MSBNZW50aW9uIHRoYXQgUU1QICdjcHUtYWRkJyB3aWxsIGJlIGRl
+cHJlY2F0ZWQKY2ZjZTY4MyBVcGRhdGUgdGhhdCBITVAgJ2NwdS1hZGQnIGlzIGRlcHJlY2F0ZWQg
+aW4gNC4wCmZkNDZhYzMgcWVtdS1kZXByZWNhdGVkLnRleGk6IFJlbmFtZSB0aGUgSE1QIHNlY3Rp
+b24KCj09PSBPVVRQVVQgQkVHSU4gPT09ClVua25vd24gb3B0aW9uOiBjb2xvcgpVc2FnZToKCiAg
+ICBjaGVja3BhdGNoLnBsIFtPUFRJT05dLi4uIFtGSUxFXS4uLgogICAgY2hlY2twYXRjaC5wbCBb
+T1BUSU9OXS4uLiBbR0lULVJFVi1MSVNUXQoKVmVyc2lvbjogMC4zMQoKT3B0aW9uczoKICAtcSwg
+LS1xdWlldCAgICAgICAgICAgICAgICBxdWlldAogIC0tbm8tdHJlZSAgICAgICAgICAgICAgICAg
+IHJ1biB3aXRob3V0IGEga2VybmVsIHRyZWUKICAtLW5vLXNpZ25vZmYgICAgICAgICAgICAgICBk
+byBub3QgY2hlY2sgZm9yICdTaWduZWQtb2ZmLWJ5JyBsaW5lCiAgLS1wYXRjaCAgICAgICAgICAg
+ICAgICAgICAgdHJlYXQgRklMRSBhcyBwYXRjaGZpbGUKICAtLWJyYW5jaCAgICAgICAgICAgICAg
+ICAgICB0cmVhdCBhcmdzIGFzIEdJVCByZXZpc2lvbiBsaXN0CiAgLS1lbWFjcyAgICAgICAgICAg
+ICAgICAgICAgZW1hY3MgY29tcGlsZSB3aW5kb3cgZm9ybWF0CiAgLS10ZXJzZSAgICAgICAgICAg
+ICAgICAgICAgb25lIGxpbmUgcGVyIHJlcG9ydAogIC1mLCAtLWZpbGUgICAgICAgICAgICAgICAg
+IHRyZWF0IEZJTEUgYXMgcmVndWxhciBzb3VyY2UgZmlsZQogIC0tc3RyaWN0ICAgICAgICAgICAg
+ICAgICAgIGZhaWwgaWYgb25seSB3YXJuaW5ncyBhcmUgZm91bmQKICAtLXJvb3Q9UEFUSCAgICAg
+ICAgICAgICAgICBQQVRIIHRvIHRoZSBrZXJuZWwgdHJlZSByb290CiAgLS1uby1zdW1tYXJ5ICAg
+ICAgICAgICAgICAgc3VwcHJlc3MgdGhlIHBlci1maWxlIHN1bW1hcnkKICAtLW1haWxiYWNrICAg
+ICAgICAgICAgICAgICBvbmx5IHByb2R1Y2UgYSByZXBvcnQgaW4gY2FzZSBvZiB3YXJuaW5ncy9l
+cnJvcnMKICAtLXN1bW1hcnktZmlsZSAgICAgICAgICAgICBpbmNsdWRlIHRoZSBmaWxlbmFtZSBp
+biBzdW1tYXJ5CiAgLS1kZWJ1ZyBLRVk9WzB8MV0gICAgICAgICAgdHVybiBvbi9vZmYgZGVidWdn
+aW5nIG9mIEtFWSwgd2hlcmUgS0VZIGlzIG9uZSBvZgogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICd2YWx1ZXMnLCAncG9zc2libGUnLCAndHlwZScsIGFuZCAnYXR0cicgKGRlZmF1bHQKICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBpcyBhbGwgb2ZmKQogIC0tdGVzdC1vbmx5PVdPUkQg
+ICAgICAgICAgIHJlcG9ydCBvbmx5IHdhcm5pbmdzL2Vycm9ycyBjb250YWluaW5nIFdPUkQKICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBsaXRlcmFsbHkKICAtaCwgLS1oZWxwLCAtLXZlcnNp
+b24gICAgICBkaXNwbGF5IHRoaXMgaGVscCBhbmQgZXhpdAoKV2hlbiBGSUxFIGlzIC0gcmVhZCBz
+dGFuZGFyZCBpbnB1dC4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
+dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
+b3JnL2xvZ3MvMjAxOTAxMTAxNDI5NTUuMjMyNTQtMS1laGFia29zdEByZWRoYXQuY29tL3Rlc3Rp
+bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
