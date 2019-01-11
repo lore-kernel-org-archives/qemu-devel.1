@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59585)
+Received: from eggs.gnu.org ([209.51.188.92]:60552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ghsxq-0002y8-Ra
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:18:55 -0500
+	(envelope-from <berrange@redhat.com>) id 1ght1Q-0004VY-Jx
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:22:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ghsxq-0003WV-As
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:18:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ghsxq-0003WK-50
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:18:54 -0500
-Date: Fri, 11 Jan 2019 14:48:41 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <CAJ+F1C+VM8KCw3uqphK3PrJ386jABmHDJLe0dySg6T1RVMuZiw@mail.gmail.com>
-Message-ID: <nycvar.YSQ.7.76.1901111444171.11857@xnncv>
-References: <20190111081909.11896-1-ppandit@redhat.com>
-	<CAJ+F1C+VM8KCw3uqphK3PrJ386jABmHDJLe0dySg6T1RVMuZiw@mail.gmail.com>
+	(envelope-from <berrange@redhat.com>) id 1ght1O-0005PR-Ob
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:22:36 -0500
+Date: Fri, 11 Jan 2019 09:22:20 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190111092220.GB18491@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+	<1547194672-24169-2-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1547194672-24169-2-git-send-email-thuth@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: check data length while emulating
- ident function
+Subject: Re: [Qemu-devel] [PATCH v5 1/3] ppc: Move spapr-related prototypes
+ from xics.h into a seperate header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, Kira <864786842@qq.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-ppc@nongnu.org, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-+-- On Fri, 11 Jan 2019, Marc-Andr=C3=A9 Lureau wrote --+
-| > +            if (m->m_len > so_rcv->sb_datalen
-| > +                            - (so_rcv->sb_wptr - so_rcv->sb_data)) {
-| > +                m_free(m);
-| > +                return 0;
-| > +            }
-|=20
-| Check looks correct, it should probably return 1.
+On Fri, Jan 11, 2019 at 09:17:50AM +0100, Thomas Huth wrote:
+> When compiling with Clang in -std=3Dgnu99 mode, there is a warning/erro=
+r:
+>=20
+>   CC      ppc64-softmmu/hw/intc/xics_spapr.o
+> In file included from /home/thuth/devel/qemu/hw/intc/xics_spapr.c:34:
+> /home/thuth/devel/qemu/include/hw/ppc/xics.h:203:34: error: redefinitio=
+n of typedef 'sPAPRMachineState' is a C11 feature
+>       [-Werror,-Wtypedef-redefinition]
+> typedef struct sPAPRMachineState sPAPRMachineState;
+>                                  ^
+> /home/thuth/devel/qemu/include/hw/ppc/spapr_irq.h:25:34: note: previous=
+ definition is here
+> typedef struct sPAPRMachineState sPAPRMachineState;
+>                                  ^
+>=20
+> We have to remove the duplicated typedef here and include "spapr.h" ins=
+tead.
+> But "spapr.h" should not be included for the pnv machine files. So move
+> the spapr-related prototypes into a new file called "xics_spapr.h" inst=
+ead.
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/intc/xics_kvm.c          |  1 +
+>  hw/intc/xics_spapr.c        |  1 +
+>  hw/ppc/spapr_irq.c          |  1 +
+>  include/hw/ppc/xics.h       |  7 -------
+>  include/hw/ppc/xics_spapr.h | 37 +++++++++++++++++++++++++++++++++++++
+>  5 files changed, 40 insertions(+), 7 deletions(-)
+>  create mode 100644 include/hw/ppc/xics_spapr.h
 
-Function comment says return 1 if 'm' is valid and should be appended via=
-=20
-sbappend(). Not sure if unprocessed 'm' should go to sbappend().
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-| Is there a reproducer?
 
-Yes, I have one.
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
