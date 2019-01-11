@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37995)
+Received: from eggs.gnu.org ([209.51.188.92]:38058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gi548-0000oX-G7
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:14:13 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gi54V-00013H-6B
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:14:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gi547-0002N5-GI
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:14:12 -0500
-Resent-Message-Id: <E1gi547-0002N5-GI@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gi547-00029I-75
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:14:11 -0500
-Message-ID: <154724210898.37.4367801081630939892@2d170d368aaa>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190111155555.8270-1-philmd@redhat.com>
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gi54N-0002Yt-86
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:14:29 -0500
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:45627)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gi54J-0002Wz-Fi
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:14:26 -0500
+Received: by mail-yb1-xb41.google.com with SMTP id q2so6431016ybd.12
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:14:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 11 Jan 2019 13:28:30 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] contrib/gitdm: Fix a typo
+References: <20190111220131.27153-1-jcmvbkbc@gmail.com>
+	<2064503c-ed12-de29-59a9-46fa24d22f60@linaro.org>
+In-Reply-To: <2064503c-ed12-de29-59a9-46fa24d22f60@linaro.org>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Fri, 11 Jan 2019 14:14:09 -0800
+Message-ID: <CAMo8BfJaTbO0LSBWk7+WeFw7Oc6Sy2ykxaQcWTBeVGCdN9+aOg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] target/xtensa: rework zero overhead
+ loops implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, alex.bennee@linaro.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExMTE1NTU1NS44Mjcw
-LTEtcGhpbG1kQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMTExMTU1NTU1LjgyNzAtMS1waGlsbWRAcmVkaGF0
-LmNvbQpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gY29udHJpYi9n
-aXRkbTogRml4IGEgdHlwbwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLS1jb2xvcj1hbHdheXMgYmFz
-ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYzk5
-NWY1ZiBjb250cmliL2dpdGRtOiBGaXggYSB0eXBvCgo9PT0gT1VUUFVUIEJFR0lOID09PQpVbmtu
-b3duIG9wdGlvbjogY29sb3IKVXNhZ2U6CgogICAgY2hlY2twYXRjaC5wbCBbT1BUSU9OXS4uLiBb
-RklMRV0uLi4KICAgIGNoZWNrcGF0Y2gucGwgW09QVElPTl0uLi4gW0dJVC1SRVYtTElTVF0KClZl
-cnNpb246IDAuMzEKCk9wdGlvbnM6CiAgLXEsIC0tcXVpZXQgICAgICAgICAgICAgICAgcXVpZXQK
-ICAtLW5vLXRyZWUgICAgICAgICAgICAgICAgICBydW4gd2l0aG91dCBhIGtlcm5lbCB0cmVlCiAg
-LS1uby1zaWdub2ZmICAgICAgICAgICAgICAgZG8gbm90IGNoZWNrIGZvciAnU2lnbmVkLW9mZi1i
-eScgbGluZQogIC0tcGF0Y2ggICAgICAgICAgICAgICAgICAgIHRyZWF0IEZJTEUgYXMgcGF0Y2hm
-aWxlCiAgLS1icmFuY2ggICAgICAgICAgICAgICAgICAgdHJlYXQgYXJncyBhcyBHSVQgcmV2aXNp
-b24gbGlzdAogIC0tZW1hY3MgICAgICAgICAgICAgICAgICAgIGVtYWNzIGNvbXBpbGUgd2luZG93
-IGZvcm1hdAogIC0tdGVyc2UgICAgICAgICAgICAgICAgICAgIG9uZSBsaW5lIHBlciByZXBvcnQK
-ICAtZiwgLS1maWxlICAgICAgICAgICAgICAgICB0cmVhdCBGSUxFIGFzIHJlZ3VsYXIgc291cmNl
-IGZpbGUKICAtLXN0cmljdCAgICAgICAgICAgICAgICAgICBmYWlsIGlmIG9ubHkgd2FybmluZ3Mg
-YXJlIGZvdW5kCiAgLS1yb290PVBBVEggICAgICAgICAgICAgICAgUEFUSCB0byB0aGUga2VybmVs
-IHRyZWUgcm9vdAogIC0tbm8tc3VtbWFyeSAgICAgICAgICAgICAgIHN1cHByZXNzIHRoZSBwZXIt
-ZmlsZSBzdW1tYXJ5CiAgLS1tYWlsYmFjayAgICAgICAgICAgICAgICAgb25seSBwcm9kdWNlIGEg
-cmVwb3J0IGluIGNhc2Ugb2Ygd2FybmluZ3MvZXJyb3JzCiAgLS1zdW1tYXJ5LWZpbGUgICAgICAg
-ICAgICAgaW5jbHVkZSB0aGUgZmlsZW5hbWUgaW4gc3VtbWFyeQogIC0tZGVidWcgS0VZPVswfDFd
-ICAgICAgICAgIHR1cm4gb24vb2ZmIGRlYnVnZ2luZyBvZiBLRVksIHdoZXJlIEtFWSBpcyBvbmUg
-b2YKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAndmFsdWVzJywgJ3Bvc3NpYmxlJywgJ3R5
-cGUnLCBhbmQgJ2F0dHInIChkZWZhdWx0CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaXMg
-YWxsIG9mZikKICAtLXRlc3Qtb25seT1XT1JEICAgICAgICAgICByZXBvcnQgb25seSB3YXJuaW5n
-cy9lcnJvcnMgY29udGFpbmluZyBXT1JECiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbGl0
-ZXJhbGx5CiAgLWgsIC0taGVscCwgLS12ZXJzaW9uICAgICAgZGlzcGxheSB0aGlzIGhlbHAgYW5k
-IGV4aXQKCldoZW4gRklMRSBpcyAtIHJlYWQgc3RhbmRhcmQgaW5wdXQuCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMg
-YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTExMTU1NTU1LjgyNzAt
-MS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+On Fri, Jan 11, 2019 at 2:09 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 1/12/19 9:01 AM, Max Filippov wrote:
+> > Don't invalidate TB with the end of zero overhead loop when LBEG or LEND
+> > change. Instead encode the distance from the start of the page where the
+> > TB starts to the LEND in the TB cs_base and generate loopback code when
+> > the next PC matches encoded LEND. Distance to a destination within the
+> > same page and up to a maximum instruction length into the next page is
+> > encoded literally, otherwise it's zero. The distance from LEND to LBEG
+> > is also encoded in the cs_base: it's encoded literally when less than
+> > 256 or as 0 otherwise. This allows for TB chaining for the loopback
+> > branch at the end of a loop for the most common loop sizes.
+> >
+> > With this change the resulting emulation speed is about 10% higher in
+> > softmmu mode on uClibc-ng and LTP tests. Emulation speed in linux
+> > user mode is a few percent lower because there's no direct TB chaining
+> > between different memory pages. Testing with lower limit on direct TB
+> > chainig range shows gradual slowdown to ~15% for the block size of 64
+> > bytes and ~50% for the block size of 32 bytes.
+> >
+> > Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+>
+> > +        /*
+> > +         * 0 in the csbase_lend field means that there may not be a loopback
+> > +         * for any instruction that starts inside this page. Any other value
+> > +         * means that an instruction that ends at this offset from the page
+> > +         * start may loop back.
+>
+> Nit: s/may/will/g
+>
+> Using "may" makes it seem like we may have missed a case that should have
+> looped back.
+
+Using "will" makes it seem like it always loops back, but it doesn't do it
+when LCOUNT is 0.
+
+-- 
+Thanks.
+-- Max
