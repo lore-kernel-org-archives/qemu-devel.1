@@ -1,22 +1,22 @@
 Received: from eggs.gnu.org ([209.51.188.92]:48167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1ghxdW-0005cg-BC
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:18:15 -0500
+	(envelope-from <berto@igalia.com>) id 1ghxdi-0005cg-8G
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:18:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1ghxaJ-00017g-70
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:14:56 -0500
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Fri, 11 Jan 2019 14:14:48 +0000
-Message-ID: <ee3dcc5c-23f6-e953-36f1-643c86bccbc0@janustech.com>
-References: <20190110191901.5082-1-eblake@redhat.com>
-	<20190110191901.5082-2-eblake@redhat.com>
-In-Reply-To: <20190110191901.5082-2-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E671BE1CFDBB094F98A9AE320AAE50B6@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berto@igalia.com>) id 1ghxZc-0000jI-Ry
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:14:13 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190111132416.GI5010@dhcp-200-186.str.redhat.com>
+References: <20190109110144.18633-1-stefanha@redhat.com>
+	<w51pnt57slp.fsf@maestria.local.igalia.com>
+	<w51tvifqqlr.fsf@maestria.local.igalia.com>
+	<20190111132416.GI5010@dhcp-200-186.str.redhat.com>
+Date: Fri, 11 Jan 2019 15:14:08 +0100
+Message-ID: <w51pnt3qo27.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] qemu-option: Allow integer defaults
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
+ iothread race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,143 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-T24gMS8xMC8xOSA5OjE4IFBNLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBTZXQgdGhlIGZyYW1ld29y
-ayB1cCBmb3IgZGVjbGFyaW5nIGludGVnZXIgb3B0aW9ucyB3aXRoIGFuIGludGVnZXINCj4gZGVm
-YXVsdCwgaW5zdGVhZCBvZiBvdXIgY3VycmVudCBpbnNhbmUgYXBwcm9hY2ggb2YgcmVxdWlyaW5n
-IHRoZQ0KPiBkZWZhdWx0IHZhbHVlIHRvIGJlIGdpdmVuIGFzIGEgc3RyaW5nICh3aGljaCB0aGVu
-IGhhcyB0byBiZSByZXBhcnNlZA0KPiBhdCBldmVyeSB1c2UgdGhhdCB3YW50cyBhIG51bWJlciku
-ICBnaXQgZ3JlcCAnW14uXWRlZl92YWx1ZV9zdHInIHNheXMNCj4gdGhhdCB3ZSBoYXZlIGRvbmUg
-YSBnb29kIGpvYiBvZiBOT1QgYWJ1c2luZyB0aGUgaW50ZXJuYWwgZmllbGQNCj4gb3V0c2lkZSBv
-ZiB0aGUgaW1wbGVtZW50YXRpb24gaW4gcWVtdS1vcHRpb24uYzsgdGhlcmVmb3JlLCBpdCBpcyBu
-b3QNCj4gdG9vIGhhcmQgdG8gYXVkaXQgdGhhdCBhbGwgY29kZSBjYW4gZWl0aGVyIGhhbmRsZSB0
-aGUgbmV3IGludGVnZXINCj4gZGVmYXVsdHMgY29ycmVjdGx5IG9yIGFib3J0IGJlY2F1c2UgYSBj
-YWxsZXIgdmlvbGF0ZWQgY29uc3RyYWludHMuDQo+IFNhZGx5LCB3ZSBETyBoYXZlIGEgY29uc3Ry
-YWludCB0aGF0IHFlbXVfb3B0X2dldCgpIHNob3VsZCBub3QgYmUNCj4gY2FsbGVkIG9uIGFuIG9w
-dGlvbiB0aGF0IGhhcyBhbiBpbnRlZ2VyIHR5cGUsIGJlY2F1c2Ugd2UgaGF2ZSBubw0KPiB3aGVy
-ZSB0byBzdGFzaCBhIGNhY2hlZCBjb25zdCBjaGFyICogcmVzdWx0OyBidXQgY2FsbGVycyB0aGF0
-IHdhbnQNCj4gYW4gaW50ZWdlciBzaG91bGQgYmUgdXNpbmcgcWVtdV9vcHRfZ2V0X251bWJlcigp
-IGFuZCBmcmllbmRzDQo+IGFueXdheXMuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtl
-IDxlYmxha2VAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICAgaW5jbHVkZS9xZW11L29wdGlvbi5oIHwg
-MTIgKysrKysrKysNCj4gICB1dGlsL3FlbXUtb3B0aW9uLmMgICAgfCA2OSArKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tDQo+ICAgMiBmaWxlcyBjaGFuZ2VkLCA3MiBp
-bnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUv
-cWVtdS9vcHRpb24uaCBiL2luY2x1ZGUvcWVtdS9vcHRpb24uaA0KPiBpbmRleCA4NDQ1ODdjYWIz
-OS4uNDZiODBkNWE2ZTEgMTAwNjQ0DQo+IC0tLSBhL2luY2x1ZGUvcWVtdS9vcHRpb24uaA0KPiAr
-KysgYi9pbmNsdWRlL3FlbXUvb3B0aW9uLmgNCj4gQEAgLTQ2LDYgKzQ2LDE4IEBAIHR5cGVkZWYg
-c3RydWN0IFFlbXVPcHREZXNjIHsNCj4gICAgICAgY29uc3QgY2hhciAqbmFtZTsNCj4gICAgICAg
-ZW51bSBRZW11T3B0VHlwZSB0eXBlOw0KPiAgICAgICBjb25zdCBjaGFyICpoZWxwOw0KPiArICAg
-IC8qDQo+ICsgICAgICogRm9yIFFFTVVfT1BUX1NUUklORzogTGVhdmUgZGVmX3ZhbHVlX2ludCAw
-LCBhbmQgc2V0IGRlZl92YWx1ZV9zdHINCj4gKyAgICAgKiB0byBhIGRlZmF1bHQgdmFsdWUgb3Ig
-bGVhdmUgTlVMTCBmb3Igbm8gZGVmYXVsdC4NCj4gKyAgICAgKg0KPiArICAgICAqIEZvciBvdGhl
-ciB0eXBlczogSW5pdGlhbGl6ZSBhdCBtb3N0IG5vbi16ZXJvIGRlZl92YWx1ZV9pbnQgb3IgYQ0K
-PiArICAgICAqIHBhcnNlYWJsZSBkZWZfdmFsdWVfc3RyIGZvciBhIGRlZmF1bHQgKG11c3QgdXNl
-IGEgc3RyaW5nIGZvciBhbg0KPiArICAgICAqIGV4cGxpY2l0IGRlZmF1bHQgb2YgMCwgYWx0aG91
-Z2ggYW4gaW1wbGljaXQgZGVmYXVsdCBnZW5lcmFsbHkNCj4gKyAgICAgKiB3b3JrcykuICBJZiBz
-ZXR0aW5nIGRlZl92YWx1ZV9pbnQsIGNhbGxpbmcgcWVtdV9vcHRfZ2V0KCkgb24NCj4gKyAgICAg
-KiB0aGF0IG9wdGlvbiB3aWxsIGFib3J0KCk7IGluc3RlYWQsIGNhbGwgcWVtdV9vcHRfZ2V0X2Rl
-bCgpIG9yIGENCj4gKyAgICAgKiB0eXBlZCBnZXR0ZXIuDQo+ICsgICAgICovDQo+ICsgICAgdWlu
-dDY0X3QgZGVmX3ZhbHVlX2ludDsNCj4gICAgICAgY29uc3QgY2hhciAqZGVmX3ZhbHVlX3N0cjsN
-Cj4gICB9IFFlbXVPcHREZXNjOw0KPiANCj4gZGlmZiAtLWdpdCBhL3V0aWwvcWVtdS1vcHRpb24u
-YyBiL3V0aWwvcWVtdS1vcHRpb24uYw0KPiBpbmRleCBkZTQyZTJhNDA2YS4uMDZjNGU4MTAyYTgg
-MTAwNjQ0DQo+IC0tLSBhL3V0aWwvcWVtdS1vcHRpb24uYw0KPiArKysgYi91dGlsL3FlbXUtb3B0
-aW9uLmMNCj4gQEAgLTMyMSw3ICszMjEsOCBAQCBjb25zdCBjaGFyICpxZW11X29wdF9nZXQoUWVt
-dU9wdHMgKm9wdHMsIGNvbnN0IGNoYXIgKm5hbWUpDQo+ICAgICAgIG9wdCA9IHFlbXVfb3B0X2Zp
-bmQob3B0cywgbmFtZSk7DQo+ICAgICAgIGlmICghb3B0KSB7DQo+ICAgICAgICAgICBjb25zdCBR
-ZW11T3B0RGVzYyAqZGVzYyA9IGZpbmRfZGVzY19ieV9uYW1lKG9wdHMtPmxpc3QtPmRlc2MsIG5h
-bWUpOw0KPiAtICAgICAgICBpZiAoZGVzYyAmJiBkZXNjLT5kZWZfdmFsdWVfc3RyKSB7DQo+ICsg
-ICAgICAgIGlmIChkZXNjKSB7DQo+ICsgICAgICAgICAgICBhc3NlcnQoIWRlc2MtPmRlZl92YWx1
-ZV9pbnQpOw0KPiAgICAgICAgICAgICAgIHJldHVybiBkZXNjLT5kZWZfdmFsdWVfc3RyOw0KPiAg
-ICAgICAgICAgfQ0KPiAgICAgICB9DQo+IEBAIC0zNjQsOCArMzY1LDIyIEBAIGNoYXIgKnFlbXVf
-b3B0X2dldF9kZWwoUWVtdU9wdHMgKm9wdHMsIGNvbnN0IGNoYXIgKm5hbWUpDQo+ICAgICAgIG9w
-dCA9IHFlbXVfb3B0X2ZpbmQob3B0cywgbmFtZSk7DQo+ICAgICAgIGlmICghb3B0KSB7DQo+ICAg
-ICAgICAgICBkZXNjID0gZmluZF9kZXNjX2J5X25hbWUob3B0cy0+bGlzdC0+ZGVzYywgbmFtZSk7
-DQo+IC0gICAgICAgIGlmIChkZXNjICYmIGRlc2MtPmRlZl92YWx1ZV9zdHIpIHsNCj4gLSAgICAg
-ICAgICAgIHN0ciA9IGdfc3RyZHVwKGRlc2MtPmRlZl92YWx1ZV9zdHIpOw0KPiArICAgICAgICBp
-ZiAoZGVzYykgew0KPiArICAgICAgICAgICAgaWYgKGRlc2MtPmRlZl92YWx1ZV9zdHIpIHsNCj4g
-KyAgICAgICAgICAgICAgICBzdHIgPSBnX3N0cmR1cChkZXNjLT5kZWZfdmFsdWVfc3RyKTsNCj4g
-KyAgICAgICAgICAgIH0gZWxzZSBpZiAoZGVzYy0+ZGVmX3ZhbHVlX2ludCkgew0KPiArICAgICAg
-ICAgICAgICAgIHN3aXRjaCAoZGVzYy0+dHlwZSkgew0KPiArICAgICAgICAgICAgICAgIGNhc2Ug
-UUVNVV9PUFRfQk9PTDoNCj4gKyAgICAgICAgICAgICAgICAgICAgc3RyID0gZ19zdHJkdXAoIm9u
-Iik7DQo+ICsgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiArICAgICAgICAgICAgICAgIGNh
-c2UgUUVNVV9PUFRfTlVNQkVSOg0KPiArICAgICAgICAgICAgICAgIGNhc2UgUUVNVV9PUFRfU0la
-RToNCj4gKyAgICAgICAgICAgICAgICAgICAgc3RyID0gZ19zdHJkdXBfcHJpbnRmKCIlIiBQUklk
-NjQsIGRlc2MtPmRlZl92YWx1ZV9pbnQpOw0KPiArICAgICAgICAgICAgICAgICAgICBicmVhazsN
-Cj4gKyAgICAgICAgICAgICAgICBkZWZhdWx0Og0KPiArICAgICAgICAgICAgICAgICAgICBhYm9y
-dCgpOw0KPiArICAgICAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgIH0NCj4gICAgICAgICAg
-IH0NCj4gICAgICAgICAgIHJldHVybiBzdHI7DQo+ICAgICAgIH0NCj4gQEAgLTQwMCw4ICs0MTUs
-MTUgQEAgc3RhdGljIGJvb2wgcWVtdV9vcHRfZ2V0X2Jvb2xfaGVscGVyKFFlbXVPcHRzICpvcHRz
-LCBjb25zdCBjaGFyICpuYW1lLA0KPiAgICAgICBvcHQgPSBxZW11X29wdF9maW5kKG9wdHMsIG5h
-bWUpOw0KPiAgICAgICBpZiAob3B0ID09IE5VTEwpIHsNCj4gICAgICAgICAgIGNvbnN0IFFlbXVP
-cHREZXNjICpkZXNjID0gZmluZF9kZXNjX2J5X25hbWUob3B0cy0+bGlzdC0+ZGVzYywgbmFtZSk7
-DQo+IC0gICAgICAgIGlmIChkZXNjICYmIGRlc2MtPmRlZl92YWx1ZV9zdHIpIHsNCj4gLSAgICAg
-ICAgICAgIHBhcnNlX29wdGlvbl9ib29sKG5hbWUsIGRlc2MtPmRlZl92YWx1ZV9zdHIsICZyZXQs
-ICZlcnJvcl9hYm9ydCk7DQo+ICsgICAgICAgIGlmIChkZXNjKSB7DQo+ICsgICAgICAgICAgICBp
-ZiAoZGVzYy0+ZGVmX3ZhbHVlX2ludCkgew0KPiArICAgICAgICAgICAgICAgIGFzc2VydChkZXNj
-LT50eXBlICE9IFFFTVVfT1BUX1NUUklORyk7DQo+ICsgICAgICAgICAgICAgICAgcmV0dXJuIHRy
-dWU7DQo+ICsgICAgICAgICAgICB9DQo+ICsgICAgICAgICAgICBpZiAoZGVzYy0+ZGVmX3ZhbHVl
-X3N0cikgew0KPiArICAgICAgICAgICAgICAgIHBhcnNlX29wdGlvbl9ib29sKG5hbWUsIGRlc2Mt
-PmRlZl92YWx1ZV9zdHIsICZyZXQsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgJmVycm9yX2Fib3J0KTsNCj4gKyAgICAgICAgICAgIH0NCj4gICAgICAgICAgIH0NCj4gICAg
-ICAgICAgIHJldHVybiByZXQ7DQo+ICAgICAgIH0NCj4gQEAgLTQzNiw4ICs0NTgsMTUgQEAgc3Rh
-dGljIHVpbnQ2NF90IHFlbXVfb3B0X2dldF9udW1iZXJfaGVscGVyKFFlbXVPcHRzICpvcHRzLCBj
-b25zdCBjaGFyICpuYW1lLA0KPiAgICAgICBvcHQgPSBxZW11X29wdF9maW5kKG9wdHMsIG5hbWUp
-Ow0KPiAgICAgICBpZiAob3B0ID09IE5VTEwpIHsNCj4gICAgICAgICAgIGNvbnN0IFFlbXVPcHRE
-ZXNjICpkZXNjID0gZmluZF9kZXNjX2J5X25hbWUob3B0cy0+bGlzdC0+ZGVzYywgbmFtZSk7DQo+
-IC0gICAgICAgIGlmIChkZXNjICYmIGRlc2MtPmRlZl92YWx1ZV9zdHIpIHsNCj4gLSAgICAgICAg
-ICAgIHBhcnNlX29wdGlvbl9udW1iZXIobmFtZSwgZGVzYy0+ZGVmX3ZhbHVlX3N0ciwgJnJldCwg
-JmVycm9yX2Fib3J0KTsNCj4gKyAgICAgICAgaWYgKGRlc2MpIHsNCj4gKyAgICAgICAgICAgIGlm
-IChkZXNjLT5kZWZfdmFsdWVfaW50KSB7DQo+ICsgICAgICAgICAgICAgICAgYXNzZXJ0KGRlc2Mt
-PnR5cGUgIT0gUUVNVV9PUFRfU1RSSU5HKTsNCj4gKyAgICAgICAgICAgICAgICByZXR1cm4gZGVz
-Yy0+ZGVmX3ZhbHVlX2ludDsNCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgIGlmIChk
-ZXNjLT5kZWZfdmFsdWVfc3RyKSB7DQo+ICsgICAgICAgICAgICAgICAgcGFyc2Vfb3B0aW9uX251
-bWJlcihuYW1lLCBkZXNjLT5kZWZfdmFsdWVfc3RyLCAmcmV0LA0KPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgJmVycm9yX2Fib3J0KTsNCj4gKyAgICAgICAgICAgIH0NCj4g
-ICAgICAgICAgIH0NCj4gICAgICAgICAgIHJldHVybiByZXQ7DQo+ICAgICAgIH0NCj4gQEAgLTQ3
-Myw4ICs1MDIsMTUgQEAgc3RhdGljIHVpbnQ2NF90IHFlbXVfb3B0X2dldF9zaXplX2hlbHBlcihR
-ZW11T3B0cyAqb3B0cywgY29uc3QgY2hhciAqbmFtZSwNCj4gICAgICAgb3B0ID0gcWVtdV9vcHRf
-ZmluZChvcHRzLCBuYW1lKTsNCj4gICAgICAgaWYgKG9wdCA9PSBOVUxMKSB7DQo+ICAgICAgICAg
-ICBjb25zdCBRZW11T3B0RGVzYyAqZGVzYyA9IGZpbmRfZGVzY19ieV9uYW1lKG9wdHMtPmxpc3Qt
-PmRlc2MsIG5hbWUpOw0KPiAtICAgICAgICBpZiAoZGVzYyAmJiBkZXNjLT5kZWZfdmFsdWVfc3Ry
-KSB7DQo+IC0gICAgICAgICAgICBwYXJzZV9vcHRpb25fc2l6ZShuYW1lLCBkZXNjLT5kZWZfdmFs
-dWVfc3RyLCAmcmV0LCAmZXJyb3JfYWJvcnQpOw0KPiArICAgICAgICBpZiAoZGVzYykgew0KPiAr
-ICAgICAgICAgICAgaWYgKGRlc2MtPmRlZl92YWx1ZV9pbnQpIHsNCj4gKyAgICAgICAgICAgICAg
-ICBhc3NlcnQoZGVzYy0+dHlwZSAhPSBRRU1VX09QVF9TVFJJTkcpOw0KPiArICAgICAgICAgICAg
-ICAgIHJldHVybiBkZXNjLT5kZWZfdmFsdWVfaW50Ow0KPiArICAgICAgICAgICAgfQ0KPiArICAg
-ICAgICAgICAgaWYgKGRlc2MtPmRlZl92YWx1ZV9zdHIpIHsNCj4gKyAgICAgICAgICAgICAgICBw
-YXJzZV9vcHRpb25fc2l6ZShuYW1lLCBkZXNjLT5kZWZfdmFsdWVfc3RyLCAmcmV0LA0KPiArICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZlcnJvcl9hYm9ydCk7DQo+ICsgICAgICAg
-ICAgICB9DQo+ICAgICAgICAgICB9DQo+ICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiAgICAgICB9
-DQo+IEBAIC03ODcsOSArODIzLDIzIEBAIHZvaWQgcWVtdV9vcHRzX3ByaW50KFFlbXVPcHRzICpv
-cHRzLCBjb25zdCBjaGFyICpzZXBhcmF0b3IpDQo+ICAgICAgIH0NCj4gICAgICAgZm9yICg7IGRl
-c2MgJiYgZGVzYy0+bmFtZTsgZGVzYysrKSB7DQo+ICAgICAgICAgICBjb25zdCBjaGFyICp2YWx1
-ZTsNCj4gKyAgICAgICAgY2hhciAqdG1wID0gTlVMTDsNCj4gICAgICAgICAgIG9wdCA9IHFlbXVf
-b3B0X2ZpbmQob3B0cywgZGVzYy0+bmFtZSk7DQo+IA0KPiAgICAgICAgICAgdmFsdWUgPSBvcHQg
-PyBvcHQtPnN0ciA6IGRlc2MtPmRlZl92YWx1ZV9zdHI7DQo+ICsgICAgICAgIGlmICghdmFsdWUg
-JiYgZGVzYy0+ZGVmX3ZhbHVlX2ludCkgew0KPiArICAgICAgICAgICAgc3dpdGNoIChkZXNjLT50
-eXBlKSB7DQo+ICsgICAgICAgICAgICBjYXNlIFFFTVVfT1BUX0JPT0w6DQo+ICsgICAgICAgICAg
-ICAgICAgdmFsdWUgPSB0bXAgPSBnX3N0cmR1cCgib24iKTsNCj4gKyAgICAgICAgICAgICAgICBi
-cmVhazsNCj4gKyAgICAgICAgICAgIGNhc2UgUUVNVV9PUFRfTlVNQkVSOg0KPiArICAgICAgICAg
-ICAgY2FzZSBRRU1VX09QVF9TSVpFOg0KPiArICAgICAgICAgICAgICAgIHZhbHVlID0gdG1wID0g
-Z19zdHJkdXBfcHJpbnRmKCIlIiBQUklkNjQsIGRlc2MtPmRlZl92YWx1ZV9pbnQpOw0KPiArICAg
-ICAgICAgICAgICAgIGJyZWFrOw0KPiArICAgICAgICAgICAgZGVmYXVsdDoNCj4gKyAgICAgICAg
-ICAgICAgICBhYm9ydCgpOw0KPiArICAgICAgICAgICAgfQ0KPiArICAgICAgICB9DQo+ICAgICAg
-ICAgICBpZiAoIXZhbHVlKSB7DQo+ICAgICAgICAgICAgICAgY29udGludWU7DQo+ICAgICAgICAg
-ICB9DQo+IEBAIC04MDMsNiArODUzLDcgQEAgdm9pZCBxZW11X29wdHNfcHJpbnQoUWVtdU9wdHMg
-Km9wdHMsIGNvbnN0IGNoYXIgKnNlcGFyYXRvcikNCj4gICAgICAgICAgICAgICBwcmludGYoIiVz
-JXM9JXMiLCBzZXAsIGRlc2MtPm5hbWUsIHZhbHVlKTsNCj4gICAgICAgICAgIH0NCj4gICAgICAg
-ICAgIHNlcCA9IHNlcGFyYXRvcjsNCj4gKyAgICAgICAgZ19mcmVlKHRtcCk7DQo+ICAgICAgIH0N
-Cj4gICB9DQo+IA0KDQpJZiBJIHVuZGVyc3RhbmQgY29ycmVjdGx5LCB0aGUgbnVtYmVyIHdpbGwg
-c3RpbGwgYmUgY29tcGlsZWQgaW50byB0aGUgDQpiaW5hcnkgYXMgYW4gZXhwcmVzc2lvbiBzdHJp
-bmcsIGJ1dCB3aWxsIGJlIHByaW50ZWQgY29ycmVjdGx5IGR1cmluZyANCnJ1bnRpbWU/DQpJZiBz
-bywgaXQgc3RpbGwgZG9lc24ndCBmZWVsIHJpZ2h0IHRvIHB1dCBleHByZXNzaW9ucyBpbiBiaW5h
-cmllcywgYnV0IEkgDQphZ3JlZSB0aGF0IGl0J3MgbW9yZSBlbGVnYW50IHRoYW4gbXkgc29sdXRp
-b24gd2l0aCB0aGUgbG9va3VwIHRhYmxlLiBJJ2QgDQpzYXkgdGhlIHRhYmxlIHdvdWxkIGJlIG1v
-cmUgZWxlZ2FudCBpZiB0aGVyZSB3b3VsZCBiZSBtb3JlIGNhc2VzIGluIA0Kd2hpY2ggaXQncyBu
-ZWVkZWQsIGJ1dCB0aGF0J3Mgbm90IHRoZSBjYXNlLg0KDQpUaGUgc29sdXRpb24gd2hpY2ggTWFy
-a3VzIGRlc2NyaWJlZCBhcyAiYXR0cmFjdGl2ZWx5IHN0dXBpZCIgYWxzbyBjb3VsZCANCndvcmss
-IGFzIHRoZXJlIGFyZSBleGFjdGx5IDIgcGxhY2VzICh3aGljaCBJIGtub3cgb2YpIHdoZXJlIGl0
-J3MgcmVhbGx5IA0KbmVlZGVkLiBBbHNvLCBhYnNvbHV0ZWx5IG5vIGNoYW5nZXMgaXMgYW4gb3B0
-aW9uLCBhcyB3YXMgbWVudGlvbmVkIGJlZm9yZS4NCg0KTGVvbmlkLg0K
+On Fri 11 Jan 2019 02:24:16 PM CET, Kevin Wolf wrote:
+>> >> The following QMP command leads to a crash when iothreads are used:
+>> >>
+>> >>   { 'execute': 'device_del', 'arguments': {'id': 'data'} }
+>> >
+>> > How did you reproduce this? Do you have a test case?
+>> 
+>> Ok, I finally reproduced it, the patch looks good to me.
+>
+> Can it be turned into a qemu-iotests case or is it too complicated for
+> that?
+
+I can reproduce the problem reliably with this:
+
+{ "execute": "qmp_capabilities" }
+{ "execute": "blockdev-add",
+  "arguments": {"driver": "null-co", "node-name": "hd0"}}
+{ "execute": "object-add",
+  "arguments": {"qom-type": "iothread", "id": "iothread0"}}
+{ "execute": "device_add",
+  "arguments": {"id": "scsi0", "driver": "virtio-scsi-pci",
+                "iothread": "iothread0"}}
+{ "execute": "device_add",
+  "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
+{ "execute": "block_set_io_throttle",
+  "arguments": {"id": "scsi-hd0", "bps": 0, "bps_rd": 0, "bps_wr": 0,
+                "iops": 1000, "iops_rd": 0, "iops_wr": 0}}
+{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
+
+But this doesn't crash if I put it in an iotest.
+
+Berto
