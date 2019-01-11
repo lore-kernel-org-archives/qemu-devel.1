@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58694)
+Received: from eggs.gnu.org ([209.51.188.92]:58967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ghwO5-0001WX-K4
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:58:14 -0500
+	(envelope-from <philmd@redhat.com>) id 1ghwOw-0002B7-JZ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ghwO4-0005DK-Jc
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:58:13 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34168
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ghwO4-0005Ct-EG
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:58:12 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0BCvVHp104797
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 07:58:11 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2pxuks010q-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 07:58:10 -0500
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Fri, 11 Jan 2019 12:58:09 -0000
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 11 Jan 2019 13:57:59 +0100
+	(envelope-from <philmd@redhat.com>) id 1ghwOv-0005bd-NN
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:06 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44119)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghwOv-0005b7-Dd
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:05 -0500
+Received: by mail-wr1-f68.google.com with SMTP id z5so15052018wrt.11
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 04:59:05 -0800 (PST)
+References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+	<1547194672-24169-3-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b259b70e-1c3c-1a6e-304e-ed45e561abd9@redhat.com>
+Date: Fri, 11 Jan 2019 13:59:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190111125759.31577-1-clg@kaod.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] ftgmac100: implement the new MDIO interface on
- Aspeed SoC
+In-Reply-To: <1547194672-24169-3-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] ppc: Fix duplicated typedefs to be
+ able to compile with Clang in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,161 +31,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-The PHY behind the MAC of an Aspeed SoC can be controlled using two
-different MDC/MDIO interfaces. The same registers PHYCR (MAC60) and
-PHYDATA (MAC64) are involved but they have a different layout.
+On 1/11/19 9:17 AM, Thomas Huth wrote:
+> When compiling the ppc code with clang and -std=gnu99, there are a
+> couple of warnings/errors like this one:
+> 
+>   CC      ppc64-softmmu/hw/intc/xics.o
+> In file included from hw/intc/xics.c:35:
+> include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is a C11 feature
+>       [-Werror,-Wtypedef-redefinition]
+> typedef struct ICPState ICPState;
+>                         ^
+> target/ppc/cpu.h:1181:25: note: previous definition is here
+> typedef struct ICPState ICPState;
+>                         ^
+> Work around the problems by including the proper headers instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  include/hw/ppc/spapr.h      |  5 +++--
+>  include/hw/ppc/spapr_xive.h |  2 --
+>  target/ppc/cpu.h            | 13 +++++++++----
+>  3 files changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 9e01a5a..a947a0a 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -8,15 +8,16 @@
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/ppc/spapr_ovec.h"
+>  #include "hw/ppc/spapr_irq.h"
+> +#include "hw/ppc/spapr_xive.h"  /* For sPAPRXive */
+> +#include "hw/ppc/xics.h"        /* For ICSState */
+>  
+>  struct VIOsPAPRBus;
+>  struct sPAPRPHBState;
+>  struct sPAPRNVRAM;
+> +
+>  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+>  typedef struct sPAPREventSource sPAPREventSource;
+>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+> -typedef struct ICSState ICSState;
+> -typedef struct sPAPRXive sPAPRXive;
+>  
+>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+>  #define SPAPR_ENTRY_POINT       0x100
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 7fdc250..9bec919 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -41,8 +41,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
+>  bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
+>  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+>  
+> -typedef struct sPAPRMachineState sPAPRMachineState;
+> -
+>  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
+>  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
+>                     uint32_t phandle);
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 486abaf..bde4dff 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -23,6 +23,11 @@
+>  #include "qemu-common.h"
+>  #include "qemu/int128.h"
+>  
+> +#ifndef CONFIG_USER_ONLY
+> +#include "hw/ppc/xive.h" /* for XiveTCTX */
+> +#include "hw/ppc/xics.h" /* for ICPState */
+> +#endif
 
-BIT31 of the Feature Register (MAC40) controls which MDC/MDIO
-interface is active.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/net/ftgmac100.c | 80 +++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 68 insertions(+), 12 deletions(-)
-
-diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 909c1182eebe..790430346b51 100644
---- a/hw/net/ftgmac100.c
-+++ b/hw/net/ftgmac100.c
-@@ -89,6 +89,18 @@
- #define FTGMAC100_PHYDATA_MIIWDATA(x)       ((x) & 0xffff)
- #define FTGMAC100_PHYDATA_MIIRDATA(x)       (((x) >> 16) & 0xffff)
-=20
-+/*
-+ * PHY control register - New MDC/MDIO interface
-+ */
-+#define FTGMAC100_PHYCR_NEW_DATA(x)     (((x) >> 16) & 0xffff)
-+#define FTGMAC100_PHYCR_NEW_FIRE        (1 << 15)
-+#define FTGMAC100_PHYCR_NEW_ST_22       (1 << 12)
-+#define FTGMAC100_PHYCR_NEW_OP(x)       (((x) >> 10) & 3)
-+#define   FTGMAC100_PHYCR_NEW_OP_WRITE    0x1
-+#define   FTGMAC100_PHYCR_NEW_OP_READ     0x2
-+#define FTGMAC100_PHYCR_NEW_DEV(x)      (((x) >> 5) & 0x1f)
-+#define FTGMAC100_PHYCR_NEW_REG(x)      ((x) & 0x1f)
-+
- /*
-  * Feature Register
-  */
-@@ -269,9 +281,9 @@ static void phy_reset(FTGMAC100State *s)
-     s->phy_int =3D 0;
- }
-=20
--static uint32_t do_phy_read(FTGMAC100State *s, int reg)
-+static uint16_t do_phy_read(FTGMAC100State *s, uint8_t reg)
- {
--    uint32_t val;
-+    uint16_t val;
-=20
-     switch (reg) {
-     case MII_BMCR: /* Basic Control */
-@@ -336,7 +348,7 @@ static uint32_t do_phy_read(FTGMAC100State *s, int re=
-g)
-                        MII_BMCR_FD | MII_BMCR_CTST)
- #define MII_ANAR_MASK 0x2d7f
-=20
--static void do_phy_write(FTGMAC100State *s, int reg, uint32_t val)
-+static void do_phy_write(FTGMAC100State *s, uint8_t reg, uint16_t val)
- {
-     switch (reg) {
-     case MII_BMCR:     /* Basic Control */
-@@ -373,6 +385,55 @@ static void do_phy_write(FTGMAC100State *s, int reg,=
- uint32_t val)
-     }
- }
-=20
-+static void do_phy_new_ctl(FTGMAC100State *s)
-+{
-+    uint8_t reg;
-+    uint16_t data;
-+
-+    if (!(s->phycr & FTGMAC100_PHYCR_NEW_ST_22)) {
-+        qemu_log_mask(LOG_UNIMP, "%s: unsupported ST code\n", __func__);
-+        return;
-+    }
-+
-+    /* Nothing to do */
-+    if (!(s->phycr & FTGMAC100_PHYCR_NEW_FIRE)) {
-+        return;
-+    }
-+
-+    reg =3D FTGMAC100_PHYCR_NEW_REG(s->phycr);
-+    data =3D FTGMAC100_PHYCR_NEW_DATA(s->phycr);
-+
-+    switch (FTGMAC100_PHYCR_NEW_OP(s->phycr)) {
-+    case FTGMAC100_PHYCR_NEW_OP_WRITE:
-+        do_phy_write(s, reg, data);
-+        break;
-+    case FTGMAC100_PHYCR_NEW_OP_READ:
-+        s->phydata =3D do_phy_read(s, reg) & 0xffff;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid OP code %08x\n",
-+                      __func__, s->phycr);
-+    }
-+
-+    s->phycr &=3D ~FTGMAC100_PHYCR_NEW_FIRE;
-+}
-+
-+static void do_phy_ctl(FTGMAC100State *s)
-+{
-+    uint8_t reg =3D FTGMAC100_PHYCR_REG(s->phycr);
-+
-+    if (s->phycr & FTGMAC100_PHYCR_MIIWR) {
-+        do_phy_write(s, reg, s->phydata & 0xffff);
-+        s->phycr &=3D ~FTGMAC100_PHYCR_MIIWR;
-+    } else if (s->phycr & FTGMAC100_PHYCR_MIIRD) {
-+        s->phydata =3D do_phy_read(s, reg) << 16;
-+        s->phycr &=3D ~FTGMAC100_PHYCR_MIIRD;
-+    } else {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: no OP code %08x\n",
-+                      __func__, s->phycr);
-+    }
-+}
-+
- static int ftgmac100_read_bd(FTGMAC100Desc *bd, dma_addr_t addr)
- {
-     if (dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd))) {
-@@ -628,7 +689,6 @@ static void ftgmac100_write(void *opaque, hwaddr addr=
-,
-                           uint64_t value, unsigned size)
- {
-     FTGMAC100State *s =3D FTGMAC100(opaque);
--    int reg;
-=20
-     switch (addr & 0xff) {
-     case FTGMAC100_ISR: /* Interrupt status */
-@@ -711,14 +771,11 @@ static void ftgmac100_write(void *opaque, hwaddr ad=
-dr,
-         break;
-=20
-     case FTGMAC100_PHYCR:  /* PHY Device control */
--        reg =3D FTGMAC100_PHYCR_REG(value);
-         s->phycr =3D value;
--        if (value & FTGMAC100_PHYCR_MIIWR) {
--            do_phy_write(s, reg, s->phydata & 0xffff);
--            s->phycr &=3D ~FTGMAC100_PHYCR_MIIWR;
-+        if (s->revr & FTGMAC100_REVR_NEW_MDIO_INTERFACE) {
-+            do_phy_new_ctl(s);
-         } else {
--            s->phydata =3D do_phy_read(s, reg) << 16;
--            s->phycr &=3D ~FTGMAC100_PHYCR_MIIRD;
-+            do_phy_ctl(s);
-         }
-         break;
-     case FTGMAC100_PHYDATA:
-@@ -728,8 +785,7 @@ static void ftgmac100_write(void *opaque, hwaddr addr=
-,
-         s->dblac =3D value;
-         break;
-     case FTGMAC100_REVR:  /* Feature Register */
--        /* TODO: Only Old MDIO interface is supported */
--        s->revr =3D value & ~FTGMAC100_REVR_NEW_MDIO_INTERFACE;
-+        s->revr =3D value;
-         break;
-     case FTGMAC100_FEAR1: /* Feature Register 1 */
-         s->fear1 =3D value;
---=20
-2.20.1
+> +
+>  //#define PPC_EMULATE_32BITS_HYPV
+>  
+>  #if defined (TARGET_PPC64)
+> @@ -1177,8 +1182,6 @@ do {                                            \
+>  
+>  typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
+>  typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
+> -typedef struct XiveTCTX XiveTCTX;
+> -typedef struct ICPState ICPState;
+>  
+>  /**
+>   * PowerPCCPU:
+> @@ -1197,11 +1200,13 @@ struct PowerPCCPU {
+>      int vcpu_id;
+>      uint32_t compat_pvr;
+>      PPCVirtualHypervisor *vhyp;
+> -    ICPState *icp;
+> -    XiveTCTX *tctx;
+>      void *machine_data;
+>      int32_t node_id; /* NUMA node this CPU belongs to */
+>      PPCHash64Options *hash64_opts;
+> +#ifndef CONFIG_USER_ONLY
+> +    ICPState *icp;
+> +    XiveTCTX *tctx;
+> +#endif
+>  
+>      /* Fields related to migration compatibility hacks */
+>      bool pre_2_8_migration;
+> 
