@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38466)
+Received: from eggs.gnu.org ([209.51.188.92]:39125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ghysP-0001Mk-Ua
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:37:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghyuT-00038X-Nv
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:39:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ghysO-0004VY-6m
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:37:41 -0500
-References: <20190111113657.66195-1-frankja@linux.ibm.com>
-	<20190111113657.66195-3-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <7d151455-f7e6-2e0f-2929-c418a2aeaf89@redhat.com>
-Date: Fri, 11 Jan 2019 16:37:34 +0100
+	(envelope-from <eblake@redhat.com>) id 1ghyuT-0005NU-0s
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:39:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ghyuS-0005N3-O5
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:39:48 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EFC1D58E5B
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 15:39:47 +0000 (UTC)
+References: <20190111082043.31412-1-bsd@redhat.com>
+	<20190111082043.31412-2-bsd@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2770d0ef-fcce-e796-5038-bf92e3dfbdbf@redhat.com>
+Date: Fri, 11 Jan 2019 09:39:40 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190111113657.66195-3-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] s390x: Return specification exception
- for unimplemented diag 308 subcodes
+In-Reply-To: <20190111082043.31412-2-bsd@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SBcqFISqUu85cvQlK4XOH8kC7WeRNLJKw"
+Subject: Re: [Qemu-devel] [PATCH 1/2 v2] usb-mtp: Reallocate buffer in
+ multiples of MTP_WRITE_BUF_SZ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +35,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
+To: Bandan Das <bsd@redhat.com>, qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-On 11.01.19 12:36, Janosch Frank wrote:
-> The architecture specifies specification exceptions for all
-> unavailable subcodes.
-> 
-> The presence of subcodes is indicated by checking some query subcode.
-> For example 6 will indicate that 3-6 are available. So future systems
-> might call new subcodes to check for new features. This should not
-> trigger a hw error, instead we return the architectured specification
-> exception.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Cc: qemu-stable@nongnu.org
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SBcqFISqUu85cvQlK4XOH8kC7WeRNLJKw
+From: Eric Blake <eblake@redhat.com>
+To: Bandan Das <bsd@redhat.com>, qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
+Message-ID: <2770d0ef-fcce-e796-5038-bf92e3dfbdbf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2 v2] usb-mtp: Reallocate buffer in
+ multiples of MTP_WRITE_BUF_SZ
+References: <20190111082043.31412-1-bsd@redhat.com>
+ <20190111082043.31412-2-bsd@redhat.com>
+In-Reply-To: <20190111082043.31412-2-bsd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/11/19 2:20 AM, Bandan Das wrote:
+> This is a "pre-patch" to breaking up the write buffer for
+> MTP writes. Instead of allocating a mtp buffer equal to size
+> sent by the initiator, we start with a small size and reallocate
+> multiples (of that small size) as needed.
+>=20
+> Signed-off-by: Bandan Das <bsd@redhat.com>
 > ---
->  target/s390x/diag.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-> index cfd7222ddd..c28cf1d9f1 100644
-> --- a/target/s390x/diag.c
-> +++ b/target/s390x/diag.c
-> @@ -132,7 +132,7 @@ out:
->          }
->          return;
->      default:
-> -        hw_error("Unhandled diag308 subcode %" PRIx64, subcode);
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra);
->          break;
->      }
->  }
-> 
+>  hw/usb/dev-mtp.c | 26 ++++++++++++--------------
+>  1 file changed, 12 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index b19b576278..a0d98c93ee 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -152,7 +152,6 @@ struct MTPData {
+>      bool         first;
+>      /* Used for >4G file sizes */
+>      bool         pending;
+> -    uint64_t     cached_length;
+>      int          fd;
+>  };
+> =20
+> @@ -244,6 +243,7 @@ typedef struct {
+> =20
+>  #define MTP_MANUFACTURER  "QEMU"
+>  #define MTP_PRODUCT       "QEMU filesharing"
+> +#define MTP_WRITE_BUF_SZ  512000
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Why not a power of two?  Perhaps use units.h and spell it (512 * KiB) ?
 
--- 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Thanks,
 
-David / dhildenb
+--SBcqFISqUu85cvQlK4XOH8kC7WeRNLJKw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw4uLwACgkQp6FrSiUn
+Q2qHZwgApOGWepD7AqYsJpOwmpAjBFWvFSZ4f7rLQShy+HSofCJseLWqmxfRkeld
+pAY9pdKAiCo4F8mIY9mweVugkh7YOJgY7Zlt4zqIu1gbdXL32cKOzmleEX+PzLYP
+D19+t3l4054kolCt09sYPxsIuAF7YGIQif8MbyiNsIuENQLj2qVx2qz2XTEn5FLE
+AV+T/6yh9oMvHBf5YSi/QWLUR6FPa5HK3h73uXqTNbepVsfavE7dKQrnB81GMI0K
+WPFwTcGPL0SBrPA675sUqh3Dyv1efU4OkAxl4XnFixzkWV62DiaH08edr7sKVDU9
+Pb8gKmctFUHJqpPtLV56MEUWTc30rg==
+=XP2S
+-----END PGP SIGNATURE-----
+
+--SBcqFISqUu85cvQlK4XOH8kC7WeRNLJKw--
