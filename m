@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53184)
+Received: from eggs.gnu.org ([209.51.188.92]:53320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ghxvQ-0004Ia-Ce
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:36:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ghxvz-0004go-LN
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:37:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ghxvP-0004GI-Ob
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:36:44 -0500
-References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <34d19406-8ead-8168-18f6-453a822e5de2@redhat.com>
-Date: Fri, 11 Jan 2019 15:36:25 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1ghxvy-0004ug-GP
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:37:19 -0500
+References: <20190109110144.18633-1-stefanha@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9bf9a0c7-c04c-0c12-e58d-6a2e41b0af4f@redhat.com>
+Date: Fri, 11 Jan 2019 15:36:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RTw6XJABWNvZLkLRBc3essqW5UdEIqDqi"
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] blkdebug: fix one shot rule
- processing
+In-Reply-To: <20190109110144.18633-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
+ iothread race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc Olson <marcolso@amazon.com>, qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Alberto Garcia <berto@igalia.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RTw6XJABWNvZLkLRBc3essqW5UdEIqDqi
-From: Max Reitz <mreitz@redhat.com>
-To: Marc Olson <marcolso@amazon.com>, qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <34d19406-8ead-8168-18f6-453a822e5de2@redhat.com>
-Subject: Re: [PATCH v3 1/3] blkdebug: fix one shot rule processing
-References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
-In-Reply-To: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 09/01/19 12:01, Stefan Hajnoczi wrote:
+>      g_free(data);
+> +
+> +    tgm->restart_pending--;
+> +    aio_wait_kick();
+>  }
+>  
+>  static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool is_write)
+> @@ -430,6 +433,8 @@ static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool is_write
+>       * be no timer pending on this tgm at this point */
+>      assert(!timer_pending(tgm->throttle_timers.timers[is_write]));
+>  
+> +    tgm->restart_pending++;
+> +
+>      co = qemu_coroutine_create(throttle_group_restart_queue_entry, rd);
+>      aio_co_enter(tgm->aio_context, co);
+>  }
+> @@ -538,6 +543,7 @@ void throttle_group_register_tgm(ThrottleGroupMember *tgm,
+>  
+>      tgm->throttle_state = ts;
+>      tgm->aio_context = ctx;
+> +    tgm->restart_pending = 0;
+>  
+>      qemu_mutex_lock(&tg->lock);
+>      /* If the ThrottleGroup is new set this ThrottleGroupMember as the token */
+> @@ -584,6 +590,9 @@ void throttle_group_unregister_tgm(ThrottleGroupMember *tgm)
+>          return;
+>      }
+>  
+> +    /* Wait for throttle_group_restart_queue_entry() coroutines to finish */
+> +    AIO_WAIT_WHILE(tgm->aio_context, tgm->restart_pending > 0);
+> +
 
-On 12.11.18 08:06, Marc Olson wrote:
-> If 'once' is specified, the rule should execute just once, regardless i=
-f
-> it is supposed to return an error or not. Take the example where you
-> want the first IO to an LBA to succeed, but subsequent IOs to fail. You=
+Could you change this to atomic_inc/dec, and atomic_read here?  It would
+be nice to avoid more uses of the AioContext lock.
 
-> could either use state transitions, or create two rules, one with
-> error =3D 0 and once set to true, and one with a non-zero error.
->=20
-> Signed-off-by: Marc Olson <marcolso@amazon.com>
-> ---
->  block/blkdebug.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-
-I don't quite see the point, because the example in the commit message
-clearly should be done with a state transition, but the code change
-looks reasonable, so:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---RTw6XJABWNvZLkLRBc3essqW5UdEIqDqi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw4qekACgkQ9AfbAGHV
-z0AKsQgAwgYiEPHLPXKFERNKQ6SJxj2+fARFyW3Xe6Vdh03nXL7y0K4CBfb1dE+G
-xZhe32qVPr1EMhKW8NvHGqOve9eLAbKKX2XwmGPPy3bgDkci9GGB/n7tp3LHHE/H
-F8u22nF38DEHqH5zSELSpaqOlV6U1u2HEdVN/kqE/ogHsb/xwKzRdf4cYQI7C5VA
-Wn/y3vyZBxrEBjryyW23euxEkXCRlFVQsqCvemlRg8B9p80lBjPKH5IVw1oAvxwP
-UFOHY0hrz0SHzeYjlb2VYLdDRAhbNbWcQfnvxJ9yN2R7giudbe7MgPZXeRBxKyjP
-LdfJKO+Tzpm0XjGMbRQ+YSw5OYcJUQ==
-=J1V7
------END PGP SIGNATURE-----
-
---RTw6XJABWNvZLkLRBc3essqW5UdEIqDqi--
+Paolo
