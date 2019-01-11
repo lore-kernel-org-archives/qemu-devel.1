@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48240)
+Received: from eggs.gnu.org ([209.51.188.92]:48125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghxdw-0005j5-EU
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:18:41 -0500
+	(envelope-from <philmd@redhat.com>) id 1ghxdx-0005cP-7s
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:18:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghxX7-0005xL-Ow
+	(envelope-from <philmd@redhat.com>) id 1ghxX7-0005xV-PK
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:11:38 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 11 Jan 2019 15:08:52 +0100
-Message-Id: <20190111140857.4211-11-philmd@redhat.com>
+Date: Fri, 11 Jan 2019 15:08:51 +0100
+Message-Id: <20190111140857.4211-10-philmd@redhat.com>
 In-Reply-To: <20190111140857.4211-1-philmd@redhat.com>
 References: <20190111140857.4211-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 10/15] range: Remove Range from
+Subject: [Qemu-devel] [PATCH 09/15] hw/i386: Remove PCMachineClass from
  "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,78 +26,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
 
-Range is only used in "hw/pci-host/q35.h" in the MCHPCIState, and
-in "hw/pci/pci.h" by pci_bus_get_w64_range().  Let them include
-"qemu/range.h" directly to simplify "qemu/typedefs.h".
+Files requiring PCMachineClass already include "hw/i386/pc.h".
 
-To clean "qemu/typedefs.h", move the declaration to "qemu/range.h"
+To clean "qemu/typedefs.h", move the declaration to "hw/i386/pc.h"
 (removing the forward declaration).
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/hw/pci-host/q35.h | 1 +
- include/hw/pci/pci.h      | 1 +
- include/qemu/range.h      | 4 ++--
- include/qemu/typedefs.h   | 1 -
- 4 files changed, 4 insertions(+), 3 deletions(-)
+ include/hw/i386/pc.h    | 4 ++--
+ include/qemu/typedefs.h | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-index 8f4ddde393..236ff008c9 100644
---- a/include/hw/pci-host/q35.h
-+++ b/include/hw/pci-host/q35.h
-@@ -22,6 +22,7 @@
- #ifndef HW_Q35_H
- #define HW_Q35_H
-=20
-+#include "qemu/range.h"
- #include "hw/hw.h"
- #include "hw/isa/isa.h"
- #include "hw/sysbus.h"
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index d87f5f93e9..f9c020fd98 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -1,6 +1,7 @@
- #ifndef QEMU_PCI_H
- #define QEMU_PCI_H
-=20
-+#include "qemu/range.h"
- #include "hw/qdev.h"
- #include "exec/memory.h"
- #include "sysemu/dma.h"
-diff --git a/include/qemu/range.h b/include/qemu/range.h
-index 7e75f4e655..aaa09c8306 100644
---- a/include/qemu/range.h
-+++ b/include/qemu/range.h
-@@ -29,7 +29,7 @@
-  * - Ranges must not wrap around 0, but can include UINT64_MAX.
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 84720bede9..2c7a69b8f5 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -96,7 +96,7 @@ struct PCMachineState {
+  *                  way we can use 1GByte pages in the host.
+  *
   */
+-struct PCMachineClass {
++typedef struct PCMachineClass {
+     /*< private >*/
+     MachineClass parent_class;
 =20
--struct Range {
-+typedef struct Range {
-     /*
-      * Do not access members directly, use the functions!
-      * A non-empty range has @lob <=3D @upb.
-@@ -37,7 +37,7 @@ struct Range {
-      */
-     uint64_t lob;        /* inclusive lower bound */
-     uint64_t upb;        /* inclusive upper bound */
+@@ -133,7 +133,7 @@ struct PCMachineClass {
+=20
+     /* use DMA capable linuxboot option rom */
+     bool linuxboot_dma_enabled;
 -};
-+} Range;
++} PCMachineClass;
 =20
- static inline void range_invariant(const Range *range)
- {
+ #define TYPE_PC_MACHINE "generic-pc-machine"
+ #define PC_MACHINE(obj) \
 diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 5e9a070ff3..fb9f29d892 100644
+index 165d335f87..5e9a070ff3 100644
 --- a/include/qemu/typedefs.h
 +++ b/include/qemu/typedefs.h
-@@ -97,7 +97,6 @@ typedef struct QNum QNum;
- typedef struct QObject QObject;
- typedef struct QString QString;
- typedef struct RAMBlock RAMBlock;
--typedef struct Range Range;
- typedef struct SHPCDevice SHPCDevice;
- typedef struct uWireSlave uWireSlave;
- typedef struct VirtIODevice VirtIODevice;
+@@ -70,7 +70,6 @@ typedef struct PCIExpressDevice PCIExpressDevice;
+ typedef struct PCIExpressHost PCIExpressHost;
+ typedef struct PCIHostDeviceAddress PCIHostDeviceAddress;
+ typedef struct PCIHostState PCIHostState;
+-typedef struct PCMachineClass PCMachineClass;
+ typedef struct PCMachineState PCMachineState;
+ typedef struct PixelFormat PixelFormat;
+ typedef struct PostcopyDiscardState PostcopyDiscardState;
 --=20
 2.17.2
