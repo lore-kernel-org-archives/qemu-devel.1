@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38991)
+Received: from eggs.gnu.org ([209.51.188.92]:39626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gi0gd-0007mL-F4
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:33:40 -0500
+	(envelope-from <berrange@redhat.com>) id 1gi0k6-0000TW-BN
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:37:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gi0gc-0001AV-LL
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:33:39 -0500
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-16-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8a7ef73f-97a4-d270-9836-3936b7be1046@redhat.com>
-Date: Fri, 11 Jan 2019 18:32:55 +0100
+	(envelope-from <berrange@redhat.com>) id 1gi0k5-0002n7-A3
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:37:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46420)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gi0k5-0002mt-3K
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:37:13 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 375DBC0C4273
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 17:37:12 +0000 (UTC)
+Date: Fri, 11 Jan 2019 17:37:04 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190111173704.GB3705@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181217231629.24147-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190111140857.4211-16-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20181217231629.24147-1-pbonzini@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 15/15] ui/console: Add
- "ui/pixelformat.h" to declare PixelFormat
+Subject: Re: [Qemu-devel] [PATCH] ui: vnc: finish removing TABs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,19 +34,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 
-On 11/01/19 15:08, Philippe Mathieu-Daud=C3=A9 wrote:
-> PixelFormat is used by "ui/console.h" and by "ui/qemu-pixman.h".
-
-ui/console.h already includes ui/qemu-pixman.h, just move it there?
-
-Paolo
-
-> Create the new header "ui/pixelformat.h" to declare this structure,
-> and remove the forward declaration from "qemu/typedefs.h".
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Tue, Dec 18, 2018 at 12:16:29AM +0100, Paolo Bonzini wrote:
+> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
-> RFC because "ui/console.h" has on license, so I added a default one.
+>  ui/vnc-enc-hextile-template.h | 268 +++++++++++------------
+>  ui/vnc-enc-zywrle.h           | 394 +++++++++++++++++-----------------
+>  2 files changed, 331 insertions(+), 331 deletions(-)
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
