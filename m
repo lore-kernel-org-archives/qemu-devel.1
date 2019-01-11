@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48434)
+Received: from eggs.gnu.org ([209.51.188.92]:48436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1ghs3v-0005uS-2b
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:21:07 -0500
+	(envelope-from <bsd@redhat.com>) id 1ghs3v-0005uf-8A
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:21:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1ghs3t-0001DU-8R
+	(envelope-from <bsd@redhat.com>) id 1ghs3t-0001E6-WD
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:21:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42808)
+Received: from mx1.redhat.com ([209.132.183.28]:37940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1ghs3t-0001Cp-16
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1ghs3t-0001DO-O5
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:21:05 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 569089C17A
+	by mx1.redhat.com (Postfix) with ESMTPS id F2A7230EF7F
 	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 08:21:04 +0000 (UTC)
 From: Bandan Das <bsd@redhat.com>
-Date: Fri, 11 Jan 2019 03:20:42 -0500
-Message-Id: <20190111082043.31412-2-bsd@redhat.com>
+Date: Fri, 11 Jan 2019 03:20:43 -0500
+Message-Id: <20190111082043.31412-3-bsd@redhat.com>
 In-Reply-To: <20190111082043.31412-1-bsd@redhat.com>
 References: <20190111082043.31412-1-bsd@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/2 v2] usb-mtp: Reallocate buffer in multiples
- of MTP_WRITE_BUF_SZ
+Subject: [Qemu-devel] [PATCH 2/2 v2] usb-mtp: breakup MTP write into smaller
+ chunks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,101 +35,256 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kraxel@redhat.com
 
-This is a "pre-patch" to breaking up the write buffer for
-MTP writes. Instead of allocating a mtp buffer equal to size
-sent by the initiator, we start with a small size and reallocate
-multiples (of that small size) as needed.
+For every MTP_WRITE_BUF_SZ copied, this patch writes it to file before
+getting the next block of data. The file is kept opened for the
+duration of the operation but the sanity checks on the write operation
+are performed only once when the write operation starts. Additionally,
+we also update the file size in the object metadata once the file has
+completely been written.
 
+Suggested-by: Gerd Hoffman <kraxel@redhat.com>
 Signed-off-by: Bandan Das <bsd@redhat.com>
 ---
- hw/usb/dev-mtp.c | 26 ++++++++++++--------------
- 1 file changed, 12 insertions(+), 14 deletions(-)
+ hw/usb/dev-mtp.c | 134 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 91 insertions(+), 43 deletions(-)
 
 diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index b19b576278..a0d98c93ee 100644
+index a0d98c93ee..fcd7dcce5c 100644
 --- a/hw/usb/dev-mtp.c
 +++ b/hw/usb/dev-mtp.c
-@@ -152,7 +152,6 @@ struct MTPData {
-     bool         first;
-     /* Used for >4G file sizes */
-     bool         pending;
--    uint64_t     cached_length;
-     int          fd;
+@@ -35,6 +35,13 @@ enum mtp_container_type {
+     TYPE_EVENT    =3D 4,
  };
 =20
-@@ -244,6 +243,7 @@ typedef struct {
++/* MTP write stage, for internal use only */
++enum mtp_write_status {
++    WRITE_START    =3D 1,
++    WRITE_CONTINUE =3D 2,
++    WRITE_END      =3D 3,
++};
++
+ enum mtp_code {
+     /* command codes */
+     CMD_GET_DEVICE_INFO            =3D 0x1001,
+@@ -153,6 +160,9 @@ struct MTPData {
+     /* Used for >4G file sizes */
+     bool         pending;
+     int          fd;
++    uint8_t      write_status;
++    /* Internal pointer per every MTP_WRITE_BUF_SZ */
++    uint64_t     data_offset;
+ };
 =20
- #define MTP_MANUFACTURER  "QEMU"
- #define MTP_PRODUCT       "QEMU filesharing"
-+#define MTP_WRITE_BUF_SZ  512000
+ struct MTPObject {
+@@ -1618,10 +1628,14 @@ static char *utf16_to_str(uint8_t len, uint16_t *=
+arr)
+ }
 =20
- enum {
-     STR_MANUFACTURER =3D 1,
-@@ -1658,7 +1658,7 @@ static void usb_mtp_write_data(MTPState *s)
-             d->fd =3D mkdir(path, mask);
-             goto free;
+ /* Wrapper around write, returns 0 on failure */
+-static uint64_t write_retry(int fd, void *buf, uint64_t size)
++static uint64_t write_retry(int fd, void *buf, uint64_t size, off_t offs=
+et)
+ {
+         uint64_t bytes_left =3D size, ret;
+=20
++        if (lseek(fd, offset, SEEK_SET) < 0) {
++            goto done;
++        }
++
+         while (bytes_left > 0) {
+                 ret =3D write(fd, buf, bytes_left);
+                 if ((ret =3D=3D -1) && (errno !=3D EINTR || errno !=3D E=
+AGAIN ||
+@@ -1632,9 +1646,20 @@ static uint64_t write_retry(int fd, void *buf, uin=
+t64_t size)
+                 buf +=3D ret;
          }
--        if ((s->dataset.size !=3D 0xFFFFFFFF) && (s->dataset.size < d->l=
-ength)) {
-+        if ((s->dataset.size !=3D 0xFFFFFFFF) && (s->dataset.size !=3D d=
+=20
++done:
+         return size - bytes_left;
+ }
+=20
++static void usb_mtp_update_object(MTPObject *parent, char *name)
++{
++    MTPObject *o =3D
++        usb_mtp_object_lookup_name(parent, name, strlen(name));
++
++    if (o) {
++        lstat(o->path, &o->stat);
++    }
++}
++
+ static void usb_mtp_write_data(MTPState *s)
+ {
+     MTPData *d =3D s->data_out;
+@@ -1646,48 +1671,56 @@ static void usb_mtp_write_data(MTPState *s)
+=20
+     assert(d !=3D NULL);
+=20
+-    if (parent =3D=3D NULL || !s->write_pending) {
+-        usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, d->trans,
+-                             0, 0, 0, 0);
++    switch (d->write_status) {
++    case WRITE_START:
++        if (!parent || !s->write_pending) {
++            usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, d->trans,
++                0, 0, 0, 0);
+         return;
+-    }
+-
+-    if (s->dataset.filename) {
+-        path =3D g_strdup_printf("%s/%s", parent->path, s->dataset.filen=
+ame);
+-        if (s->dataset.format =3D=3D FMT_ASSOCIATION) {
+-            d->fd =3D mkdir(path, mask);
+-            goto free;
+-        }
+-        if ((s->dataset.size !=3D 0xFFFFFFFF) && (s->dataset.size !=3D d=
 ->offset)) {
+-            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
+-                                 0, 0, 0, 0);
+-            goto done;
+-        }
+-        d->fd =3D open(path, O_CREAT | O_WRONLY | O_CLOEXEC | O_NOFOLLOW=
+, mask);
+-        if (d->fd =3D=3D -1) {
+-            usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
+-                                 0, 0, 0, 0);
+-            goto done;
+         }
+=20
+-        /*
+-         * Return success if initiator sent 0 sized data
+-         */
+-        if (!s->dataset.size) {
+-            goto success;
+-        }
++        if (s->dataset.filename) {
++            path =3D g_strdup_printf("%s/%s", parent->path, s->dataset.f=
+ilename);
++            if (s->dataset.format =3D=3D FMT_ASSOCIATION) {
++                d->fd =3D mkdir(path, mask);
++                goto free;
++            }
++            d->fd =3D open(path, O_CREAT | O_WRONLY |
++                         O_CLOEXEC | O_NOFOLLOW, mask);
++            if (d->fd =3D=3D -1) {
++                usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
++                                     0, 0, 0, 0);
++                goto done;
++            }
+=20
+-        rc =3D write_retry(d->fd, d->data, d->offset);
+-        if (rc !=3D d->offset) {
++            /* Return success if initiator sent 0 sized data */
++            if (!s->dataset.size) {
++                goto success;
++            }
++            if (d->length !=3D MTP_WRITE_BUF_SZ && !d->pending) {
++                d->write_status =3D WRITE_END;
++            }
++        }
++        /* fall through */
++    case WRITE_CONTINUE:
++    case WRITE_END:
++        rc =3D write_retry(d->fd, d->data, d->data_offset,
++                         d->offset - d->data_offset);
++        if (rc !=3D d->data_offset) {
              usb_mtp_queue_result(s, RES_STORE_FULL, d->trans,
                                   0, 0, 0, 0);
              goto done;
-@@ -1776,17 +1776,21 @@ static void usb_mtp_get_data(MTPState *s, mtp_con=
-tainer *container,
-         total_len =3D cpu_to_le32(container->length) - sizeof(mtp_contai=
-ner);
-         /* Length of data in this packet */
-         data_len -=3D sizeof(mtp_container);
--        usb_mtp_realloc(d, total_len);
--        d->length +=3D total_len;
-+        if (total_len < MTP_WRITE_BUF_SZ) {
-+                usb_mtp_realloc(d, total_len);
-+                d->length +=3D total_len;
-+        } else {
-+                usb_mtp_realloc(d, MTP_WRITE_BUF_SZ - sizeof(mtp_contain=
-er));
-+                d->length +=3D MTP_WRITE_BUF_SZ - sizeof(mtp_container);
 +        }
++        if (d->write_status !=3D WRITE_END) {
++            return;
++        } else {
++            /* Only for < 4G file sizes */
++            if (s->dataset.size !=3D 0xFFFFFFFF && d->offset !=3D s->dat=
+aset.size) {
++                usb_mtp_queue_result(s, RES_INCOMPLETE_TRANSFER, d->tran=
+s,
++                                     0, 0, 0, 0);
++                goto done;
+             }
+-        /* Only for < 4G file sizes */
+-        if (s->dataset.size !=3D 0xFFFFFFFF && rc !=3D s->dataset.size) =
+{
+-            usb_mtp_queue_result(s, RES_INCOMPLETE_TRANSFER, d->trans,
+-                                 0, 0, 0, 0);
+-            goto done;
++            usb_mtp_update_object(parent, s->dataset.filename);
+         }
+     }
+=20
+@@ -1786,25 +1819,33 @@ static void usb_mtp_get_data(MTPState *s, mtp_con=
+tainer *container,
          d->offset =3D 0;
--        d->cached_length =3D total_len;
          d->first =3D false;
          d->pending =3D false;
++        d->data_offset =3D 0;
++        d->write_status =3D WRITE_START;
      }
 =20
      if (d->pending) {
--        usb_mtp_realloc(d, d->cached_length);
--        d->length +=3D d->cached_length;
-+        usb_mtp_realloc(d, MTP_WRITE_BUF_SZ);
-+        d->length +=3D MTP_WRITE_BUF_SZ;
+-        usb_mtp_realloc(d, MTP_WRITE_BUF_SZ);
+-        d->length +=3D MTP_WRITE_BUF_SZ;
++        memset(d->data, 0, d->length);
++        if (d->length !=3D MTP_WRITE_BUF_SZ) {
++            usb_mtp_realloc(d, MTP_WRITE_BUF_SZ - d->length);
++            d->length +=3D (MTP_WRITE_BUF_SZ - d->length);
++        }
          d->pending =3D false;
++        d->write_status =3D WRITE_CONTINUE;
++        d->data_offset =3D 0;
      }
 =20
-@@ -1794,12 +1798,6 @@ static void usb_mtp_get_data(MTPState *s, mtp_cont=
-ainer *container,
+-    if (d->length - d->offset > data_len) {
++    if (d->length - d->data_offset > data_len) {
          dlen =3D data_len;
      } else {
-         dlen =3D d->length - d->offset;
--        /* Check for cached data for large files */
--        if ((s->dataset.size =3D=3D 0xFFFFFFFF) && (dlen < p->iov.size))=
- {
--            usb_mtp_realloc(d, p->iov.size - dlen);
--            d->length +=3D p->iov.size - dlen;
--            dlen =3D p->iov.size;
--        }
+-        dlen =3D d->length - d->offset;
++        dlen =3D d->length - d->data_offset;
      }
 =20
      switch (d->code) {
-@@ -1821,7 +1819,7 @@ static void usb_mtp_get_data(MTPState *s, mtp_conta=
-iner *container,
+     case CMD_SEND_OBJECT_INFO:
+-        usb_packet_copy(p, d->data + d->offset, dlen);
++        usb_packet_copy(p, d->data + d->data_offset, dlen);
          d->offset +=3D dlen;
+-        if (d->offset =3D=3D d->length) {
++        d->data_offset +=3D dlen;
++        if (d->data_offset =3D=3D d->length) {
+             /* The operation might have already failed */
+             if (!s->result) {
+                 usb_mtp_write_metadata(s, dlen);
+@@ -1815,19 +1856,26 @@ static void usb_mtp_get_data(MTPState *s, mtp_con=
+tainer *container,
+         }
+         break;
+     case CMD_SEND_OBJECT:
+-        usb_packet_copy(p, d->data + d->offset, dlen);
++        usb_packet_copy(p, d->data + d->data_offset, dlen);
+         d->offset +=3D dlen;
++        d->data_offset +=3D dlen;
          if ((p->iov.size % 64) || !p->iov.size) {
              assert((s->dataset.size =3D=3D 0xFFFFFFFF) ||
--                   (s->dataset.size =3D=3D d->length));
-+                   (s->dataset.size =3D=3D d->offset));
+                    (s->dataset.size =3D=3D d->offset));
 =20
++            if (d->length =3D=3D MTP_WRITE_BUF_SZ) {
++                d->write_status =3D WRITE_END;
++            } else {
++                d->write_status =3D WRITE_START;
++            }
              usb_mtp_write_data(s);
              usb_mtp_data_free(s->data_out);
+             s->data_out =3D NULL;
+             return;
+         }
+-        if (d->offset =3D=3D d->length) {
++        if (d->data_offset =3D=3D d->length) {
+             d->pending =3D true;
++            usb_mtp_write_data(s);
+         }
+         break;
+     default:
 --=20
 2.19.2
