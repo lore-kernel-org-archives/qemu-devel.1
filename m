@@ -1,24 +1,46 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44099)
+Received: from eggs.gnu.org ([209.51.188.92]:44600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghttm-000851-4i
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:18:47 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1ghtwV-0000n6-IC
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:21:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghtti-0005YR-4e
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:18:43 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 11 Jan 2019 10:13:17 +0000
-Message-ID: <b9bcc040-3831-d250-4b7f-ffe27984e243@virtuozzo.com>
-References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
-	<acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
-	<2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
-In-Reply-To: <2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <79AE68D397EBE14BA659DBEA6432460B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pasic@linux.ibm.com>) id 1ghtwU-0006n8-3d
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:21:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38586
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1ghtwS-0006f7-UE
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:21:33 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0BAF9ac109429
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 05:21:17 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2pxqf2n95m-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 05:21:17 -0500
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Fri, 11 Jan 2019 10:21:15 -0000
+Date: Fri, 11 Jan 2019 11:21:03 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <04965ae7-da3d-a68a-ce0c-eb0b02e542ed@linux.ibm.com>
+References: <1545062250-7573-1-git-send-email-akrowiak@linux.ibm.com>
+	<112a03e6-3d6c-1c14-10ab-c9cea09ad388@linux.ibm.com>
+	<20190108173113.3c2d830c.cohuck@redhat.com>
+	<20190108175021.003deab9@oc2783563651>
+	<20190108180615.7e48cf13.cohuck@redhat.com>
+	<4876194e-1a87-1491-a8b3-eed5b0a9afe6@linux.ibm.com>
+	<20190109111419.426ec6d7.cohuck@redhat.com>
+	<a59d5b64-0fb3-4b70-96ff-b1a0c037c6ac@linux.ibm.com>
+	<20190109183538.05bab3c8@oc2783563651>
+	<04965ae7-da3d-a68a-ce0c-eb0b02e542ed@linux.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
- default on block_status
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20190111112103.693ac708@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH v3] qdev/core: fix qbus_is_full()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +49,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, imammedo@redhat.com, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-MTEuMDEuMjAxOSAxMDo1NCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MTAuMDEuMjAxOSAyMzo1MSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9uIDEvMTAvMTkgNzoyMCBB
-TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+PiBkcnZfY29fYmxvY2tf
-c3RhdHVzIGRpZ3MgYnMtPmZpbGUgZm9yIGFkZGl0aW9uYWwsIG1vcmUgYWNjdXJhdGUgc2VhcmNo
-DQo+Pj4gZm9yIGhvbGUgaW5zaWRlIHJlZ2lvbiwgcmVwb3J0ZWQgYXMgREFUQSBieSBicyBzaW5j
-ZSA1ZGFhNzRhNmViYy4NCj4+DQo+PiBzL3JlZ2lvbiwgcmVwb3J0ZWQvcmVnaW9ucyByZXBvcnRl
-ZC8NCj4+DQo+Pj4NCj4+PiBUaGlzIGFjY3VyYWN5IGlzIG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2
-ZSBxY293MiBkaXNrLiBBY3R1YWxseSwgcWNvdzINCj4+PiBrbm93cywgd2hlcmUgYXJlIGhvbGVz
-IGFuZCB3aGVyZSBpcyBkYXRhLiBCdXQgZXZlcnkgYmxvY2tfc3RhdHVzDQo+Pg0KPj4gTm90IHF1
-aXRlIHRydWUuIHFjb3cyIGtub3dzIHdoZXJlIHNvbWUgaG9sZXMgYXJlLCBidXQgZG9lcyBub3Qg
-a25vdyBpZg0KPj4gdGhlcmUgYXJlIGV2ZW4gbW9yZSBob2xlcyBoaWRpbmcgaW4gdGhlIHNlY3Rp
-b25zIG1hcmtlZCBkYXRhIChzdWNoIGFzDQo+PiBiZWNhdXNlIG9mIGhvdyB0aGUgZGlzayB3YXMg
-cHJlLWFsbG9jYXRlZCkuDQo+Pg0KPj4+IHJlcXVlc3QgY2FsbHMgbHNlZWsgYWRkaXRpb25hbGx5
-LiBBc3N1bWUgYSBiaWcgZGlzaywgZnVsbCBvZg0KPj4+IGRhdGEsIGluIGFueSBpdGVyYXRpdmUg
-Y29weWluZyBibG9jayBqb2IgKG9yIGltZyBjb252ZXJ0KSB3ZSdsbCBjYWxsDQo+Pj4gbHNlZWso
-SE9MRSkgb24gZXZlcnkgaXRlcmF0aW9uLCBhbmQgZWFjaCBvZiB0aGVzZSBsc2Vla3Mgd2lsbCBo
-YXZlIHRvDQo+Pj4gaXRlcmF0ZSB0aHJvdWdoIGFsbCBtZXRhZGF0YSB1cCB0byB0aGUgZW5kIG9m
-IGZpbGUuIEl0J3Mgb2J2aW91c2x5DQo+Pj4gaW5lZmZlY3RpdmUgYmVoYXZpb3IuIEFuZCBmb3Ig
-bWFueSBzY2VuYXJpb3Mgd2UgZG9uJ3QgbmVlZCB0aGlzIGxzZWVrDQo+Pj4gYXQgYWxsLg0KPj4N
-Cj4+IEhvdyBtdWNoIHBlcmZvcm1hbmNlIGNhbiB3ZSBidXkgYmFjayB3aXRob3V0IGFueSBrbm9i
-cyBhdCBhbGwsIGlmIHdlDQo+PiBqdXN0IHRhdWdodCBwb3NpeC1maWxlLmMgdG8gY2FjaGUgbHNl
-ZWsoKSByZXN1bHRzP8KgIFRoYXQgaXMsIHdoZW4NCj4+IHZpc2l0aW5nIGEgZmlsZSBzZXF1ZW50
-aWFsbHksIGlmIGxzZWVrKGZkLCAwLCBTRUVLX0hPTEUpIHJldHVybnMgRU9GIG9uDQo+PiBvdXIg
-Zmlyc3QgYmxvY2sgc3RhdHVzIHF1ZXJ5LCB0aGVuIGFsbCBzdWJzZXF1ZW50IGJsb2NrIHN0YXR1
-cyBxdWVyaWVzDQo+PiBmYWxsIHdpdGhpbiB3aGF0IHdlIGtub3cgdG8gYmUgZGF0YSwgYW5kIHdl
-IGNhbiBza2lwIHRoZSBsc2VlaygpIGNhbGxzLg0KPiANCj4gRU9GIGlzIGJhZCBtYXJrIEkgdGhp
-bmsuIFdlIG1heSBoYXZlIGEgc21hbGwgaG9sZSBub3QgZmFyIGZyb20gRU9GLCB3aGljaA0KPiB3
-aWxsIGxlYWQgdG8gdGhlIHNhbWUgcGVyZm9ybWFuY2UsIGJ1dCBub3QgRU9GIHJldHVybmVkLg0K
-PiANCj4gSSB0aGluaywgcHJvcGVyIGltcGxlbWVudGF0aW9uIG9mIGxzZWVrIGNhY2hlIHNob3Vs
-ZCB3b3JrLCBidXQgaXQgaXMgbW9yZQ0KPiBkaWZmaWN1bHQgdGhhbiBqdXN0IGRpc2FibGUgbHNl
-ZWsuIEFuZCBpbiBzY2VuYXJpb3Mgd2l0aG91dCBwcmVhbGxvY2F0aW9uDQo+IHdlIGRvbid0IG5l
-ZWQgbHNlZWssIHNvIGFnYWluIGJldHRlciBpcyBkaXNhYmxlIGl0Lg0KPiANCj4gQW5kIEkgZG9u
-J3Qgc3VyZSB0aGF0IHFlbXUgaXMgYSBwcm9wZXIgcGxhY2UgZm9yIGxzZWVrIG9wdGltaXphdGlv
-bnMuDQo+IA0KPiBBbmQgYW5vdGhlciB3YXkgbWF5IGJlIHRvIHNlbGVjdCBjYXNlcyB3aGVuIGZp
-ZW1hcCBpcyBzYWZlIGFuZCB1c2UgaXQuDQo+IA0KPiBBZ2FpbiwgZm9yIHNjZW5hcmlvcyB3aGVu
-IHdlIGRvbid0IG5lZWQgbm9yIGxzZWVrLCBub3IgZmllbWFwLCBuZWl0aGVyDQo+IGNhY2hlIGZv
-ciB0aGVtIHRoZSBiZXN0IG9wdGlvbiBpcyBub3QgdXNlIHRoZW0uDQo+IA0KPj4NCj4+Pg0KPj4+
-IFNvLCBsZXQncyAiNWRhYTc0YTZlYmMiIGJ5IGRlZmF1bHQsIGxlYXZpbmcgYW4gb3B0aW9uIHRv
-IHJldHVybg0KPj4NCj4+IHMvbGV0J3MvbGV0J3MgdW5kby8NCj4+DQo+Pj4gcHJldmlvdXMgYmVo
-YXZpb3IsIHdoaWNoIGlzIG5lZWRlZCBmb3Igc2NlbmFyaW9zIHdpdGggcHJlYWxsb2NhdGVkDQo+
-Pj4gaW1hZ2VzLg0KPj4+DQo+Pj4gQWRkIGlvdGVzdCBpbGx1c3RyYXRpbmcgbmV3IG9wdGlvbiBz
-ZW1hbnRpY3MuDQo+Pg0KPj4gQW5kIG5vbmUgb2YgdGhlIGV4aXN0aW5nIGlvdGVzdHMgZmFpbCBk
-dWUgdG8gY2hhbmdlZCBvdXRwdXQ/wqAgRG9lcyB0aGF0DQo+PiBtZWFuIG91ciB0ZXN0c3VpdGUg
-ZG9lcyBub3QgaGF2ZSBnb29kIGNvdmVyYWdlIG9mIHByZS1hbGxvY2F0aW9uIG1vZGVzDQo+PiB3
-aGVyZSB0aGUgemVybyBwcm9iZSBtYXR0ZXJlZD8NCj4gDQo+IFRvIGJlIGhvbmVzdCwgSSBkaWRu
-J3QgcnVuIGFsbCB0aGUgdGVzdHMsIG9ubHkgc2V2ZXJhbC4NCj4gDQo+IERvIGl0IG5vdywgYW5k
-IGZvdW5kIHRoYXQsIHllcywgYXQgbGVhc3QgMTAyIGJyb2tlbi4gV2lsbCBmaXggaXQgd2l0aCB0
-aGUgZm9sbG93aW5nDQo+IHZlcnNpb24uIFN0cmFuZ2UsIGRvIHBhdGNoZXcgcnVuIHRlc3RzIG9u
-IHBhdGNoZXMgaW4gbGlzdCBub3c/DQo+IA0KPj4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IFZs
-YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+
-PiAtLS0NCj4+Pg0KPj4NCj4+PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KPj4+IEBAIC0z
-NjczLDYgKzM2NzMsOCBAQA0KPj4+IMKgICPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCAoZGVmYXVsdDogb2ZmKQ0KPj4+IMKgICMgQGZvcmNlLXNoYXJlOsKgwqAgZm9yY2Ugc2hhcmUg
-YWxsIHBlcm1pc3Npb24gb24gYWRkZWQgbm9kZXMuDQo+Pj4gwqAgI8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIFJlcXVpcmVzIHJlYWQtb25seT10cnVlLiAoU2luY2UgMi4xMCkNCj4+
-PiArIyBAcHJvYmUtemVyb2VzOsKgIFByb2JlIHplcm9lcyBvbiBwcm90b2NvbCBsYXllciBpZiBm
-b3JtYXQgcmVwb3J0cyBkYXRhDQo+Pj4gKyPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCAoZGVmYXVsdDogZmFsc2UpIChzaW5jZSA0LjApDQo+Pg0KPj4gV2h5IGRvIHdlIG5lZWQgYSBu
-ZXcgYm9vbD/CoCBDYW4gd2UgaW5zdGVhZC4uLg0KPj4NCj4+PiDCoCAjDQo+Pj4gwqAgIyBSZW1h
-aW5pbmcgb3B0aW9ucyBhcmUgZGV0ZXJtaW5lZCBieSB0aGUgYmxvY2sgZHJpdmVyLg0KPj4+IMKg
-ICMNCj4+PiBAQCAtMzY4Niw3ICszNjg4LDggQEANCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCAnKnJlYWQtb25seSc6ICdib29sJywNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCAnKmF1dG8tcmVhZC1vbmx5JzogJ2Jvb2wnLA0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgICcqZm9yY2Utc2hhcmUnOiAnYm9vbCcsDQo+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-JypkZXRlY3QtemVyb2VzJzogJ0Jsb2NrZGV2RGV0ZWN0WmVyb2VzT3B0aW9ucycgfSwNCj4+PiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAnKmRldGVjdC16ZXJvZXMnOiAnQmxvY2tkZXZEZXRlY3Ra
-ZXJvZXNPcHRpb25zJywNCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAnKnByb2JlLXplcm9l
-cyc6ICdib29sJyB9LA0KPj4NCj4+IC4uLmFkZCBhbm90aGVyIGVudW0gdmFsdWUgdG8gJ2RldGVj
-dC16ZXJvZXMnLCBzaW5jZSBhZnRlciBhbGwsIHdoYXQgd2UNCj4+IGFyZSByZWFsbHkgZG9pbmcg
-aXMgZmluZS10dW5pbmcgd2hhdCBsZXZlbCBvZiB6ZXJvIHByb2Jpbmcgd2UgYXJlDQo+PiB3aWxs
-aW5nIHRvIGRvPw0KPiANCj4gU2hvdWxkIHdlPyBPciBJIGp1c3QgYmluZCBvbGQgYmVoYXZpb3Ig
-dG8gZGV0ZWN0LXplcm9lcz1vbj8gQW5kIHRoZW4sIGlmIG5lZWRlZCwNCj4gd2UnbGwgYWRkIGlu
-dGVybWVkaWF0ZSBtb2Rlcy4NCj4gDQo+Pg0KPj4NCj4+PiArKysgYi9xZW11LW9wdGlvbnMuaHgN
-Cj4+PiBAQCAtNjE1LDYgKzYxNSw3IEBAIERFRigiYmxvY2tkZXYiLCBIQVNfQVJHLCBRRU1VX09Q
-VElPTl9ibG9ja2RldiwNCj4+PiDCoMKgwqDCoMKgICItYmxvY2tkZXYgW2RyaXZlcj1dZHJpdmVy
-Wyxub2RlLW5hbWU9Tl1bLGRpc2NhcmQ9aWdub3JlfHVubWFwXVxuIg0KPj4+IMKgwqDCoMKgwqAg
-IsKgwqDCoMKgwqDCoMKgwqDCoCBbLGNhY2hlLmRpcmVjdD1vbnxvZmZdWyxjYWNoZS5uby1mbHVz
-aD1vbnxvZmZdXG4iDQo+Pj4gwqDCoMKgwqDCoCAiwqDCoMKgwqDCoMKgwqDCoMKgIFsscmVhZC1v
-bmx5PW9ufG9mZl1bLGRldGVjdC16ZXJvZXM9b258b2ZmfHVubWFwXVxuIg0KPj4+ICvCoMKgwqAg
-IsKgwqDCoMKgwqDCoMKgwqDCoCBbLHByb2JlLXplcm9lcz1vbnxvZmZdXG4iDQo+Pj4gwqDCoMKg
-wqDCoCAiwqDCoMKgwqDCoMKgwqDCoMKgIFssZHJpdmVyIHNwZWNpZmljIHBhcmFtZXRlcnMuLi5d
-XG4iDQo+Pj4gwqDCoMKgwqDCoCAiwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbmZp
-Z3VyZSBhIGJsb2NrIGJhY2tlbmRcbiIsIFFFTVVfQVJDSF9BTEwpDQo+Pj4gwqAgU1RFWEkNCj4+
-PiBAQCAtNjcwLDYgKzY3MSw4IEBAIGRpc2NhcmQgcmVxdWVzdHMuDQo+Pj4gwqAgY29udmVyc2lv
-biBvZiBwbGFpbiB6ZXJvIHdyaXRlcyBieSB0aGUgT1MgdG8gZHJpdmVyIHNwZWNpZmljIG9wdGlt
-aXplZA0KPj4+IMKgIHplcm8gd3JpdGUgY29tbWFuZHMuIFlvdSBtYXkgZXZlbiBjaG9vc2UgInVu
-bWFwIiBpZiBAdmFye2Rpc2NhcmR9IGlzIHNldA0KPj4+IMKgIHRvICJ1bm1hcCIgdG8gYWxsb3cg
-YSB6ZXJvIHdyaXRlIHRvIGJlIGNvbnZlcnRlZCB0byBhbiBAY29kZXt1bm1hcH0gb3BlcmF0aW9u
-Lg0KPj4+ICtAaXRlbSBwcm9iZS16ZXJvZXM9QHZhcntwcm9iZS16ZXJvZXN9DQo+Pj4gK1Byb2Jl
-IHplcm9lcyBvbiBwcm90b2NvbCBsYXllciBpZiBmb3JtYXQgcmVwb3J0cyBkYXRhLiBEZWZhdWx0
-IGlzICJvZmYiLg0KPj4NCj4+IEFnYWluLCBmaXR0aW5nIHRoaXMgaW50byBkZXRlY3QtemVyb2Vz
-IHNlZW1zIGJldHRlciB0aGFuIGludmVudGluZyBhIG5ldw0KPj4ga25vYi4NCj4+DQo+IA0KPiBO
-byBvYmplY3Rpb25zLiBCdXQgZGVzY3JpcHRpb24gb2YgZGV0ZWN0LXplcm9lcyBhcmUgbW9yZSBh
-Ym91dCB3cml0ZXMsIHNob3VsZA0KPiB3ZSBjaGFuZ2UgdGhlbSBzb21laG93Pw0KPiANCj4gIyBE
-ZXNjcmliZXMgdGhlIG9wZXJhdGlvbiBtb2RlIGZvciB0aGUgYXV0b21hdGljIGNvbnZlcnNpb24g
-b2YgcGxhaW4NCj4gIyB6ZXJvIHdyaXRlcyBieSB0aGUgT1MgdG8gZHJpdmVyIHNwZWNpZmljIG9w
-dGltaXplZCB6ZXJvIHdyaXRlIGNvbW1hbmRzLg0KPiANCj4gLi4uDQo+IA0KPiAjIEBkZXRlY3Qt
-emVyb2VzOiBkZXRlY3QgYW5kIG9wdGltaXplIHplcm8gd3JpdGVzIChTaW5jZSAyLjEpDQo+IA0K
-PiANCj4gDQoNCkhtLCBqdXN0IG5vdGUsIHRoYXQgZGV0ZWN0LXplcm9lcyB3YXMgYWJvdXQgd3Jp
-dGVzIGFuZCBzaG91bGQgYmUgc2V0IG9uIHRhcmdldCwgYW5kDQp0aGUgbmV3IHRoaW5nIGlzIGFi
-b3V0IGJsb2NrLXN0YXR1cyBhbmQgc2hvdWxkIGJlIHNldCBvbiBzb3VyY2UsIGFuZCB0aGlzIHRo
-aW5nIHNob3VsZA0KYmUgZGVzY3JpYmVkIGluIHNwZWMgYXMgd2VsbC4NCg0KDQotLSANCkJlc3Qg
-cmVnYXJkcywNClZsYWRpbWlyDQo=
+On Thu, 10 Jan 2019 10:50:30 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> On 1/9/19 12:35 PM, Halil Pasic wrote:
+> > On Wed, 9 Jan 2019 10:36:11 -0500
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> > 
+> >> On 1/9/19 5:14 AM, Cornelia Huck wrote:
+
+[..]
+
+> >> A search reveals that max_index is used in only two places: It is used
+> >> to set the index for a child of the bus (i.e., bus_add_child function in
+> >> hw/core/qdev.c); and prior to this patch, to determine if max_dev has
+> >> been exceeded (i.e., qbus_is_full function in qdev_monitor.c). From
+> >> what I can see, the bus child index is used only to generate a property
+> >> name of the format "child[%d]" so the child can be linked as a property
+> >> of the bus (see bus_add_child and bus_remove_child functions in
+> >> hw/core/qdev.c). Wraparound of the max_index would most likely result in
+> >> generating a duplicate property name for the child.
+> >>
+> >> I propose two possible solutions:
+> >>
+> >> 1. When max_index reaches INT_MAX, do not allow any additional children
+> >>      to be added to the bus.
+> >>
+> >> 2. Set a max_dev value of INT_MAX for the BusClass instance if the value
+> >>      is not set (in the bus_class_init function in hw/core/bus.c).
+> >>
+> >> 3. Instead of generating the property name from the BusChild index
+> >>      value, generate a UUID string. Since the index field of the BusChild
+> >>      appears to be used only to generate the child's name, maybe change
+> >>      the index field to a UUID field or a name field.
+> >>
+> > 
+> > Separate problem, separate patch, or?
+> 
+> Good question.
+>
+
+IMHO this patch should not be delayed because of the mostly unrelated
+discussion on max_index wrapping. BTW Tony do you want to do a patch on
+max_index?
+
+> > 
+> > UUID instead of index solves the problem of unique names I guess, but I
+> > can't tell if that would be acceptable (interface stability, etc.).
+> 
+> I may have missed something, but as currently used, the BusChild index
+> is accessed in only two places; when the child is added to the bus and
+> when it is removed from the bus. In both cases, it is used to derive
+> a unique property name for the child device.
+> 
+
+The name is probably externally observable (via QMP). It could be also a
+stable part of an (external) API. We would need damn good reasons to
+break an external API.
+
+> Speaking of index, it implies ordering of the bus's children. IMHO, it
+> only makes semantical sense if the index changes when a child device
+> with a lower index value is removed from the bus. If a child device
+> has an index of 5 - i.e., the fifth child on the bus - and the child
+> device with index 4 is removed, then the child device with index 5 is
+> no longer the fifth child on the bus. Maybe its just the fact that
+> these fields are named 'index'. The fact that they are not really used
+> as indexes caused a bit of confusion for me when analyzing this code and
+> seems like a misnomer to me.
+> 
+
+No comment.
+
+> > 
+> > The max_dev won't help because we can get a collision while maintaining
+> > the invariant 'not more than 2 devices on the bus'.
+> 
+> I don't understand, can you better explain what you mean? When you
+> say "we can get a collision", are you talking about the property
+> name? What does max_dev have to do with that? Please explain. 
+
+AFAIU the whole point of the exercise with max_index is to generate bus
+unique names. By we can get a collision (please see
+https://en.oxforddictionaries.com/definition/collision), I mean we can
+end up assigning the same name to more than one device on the very same
+bus.
+
+> What do
+> you mean by "maintaining the invariant 'not more than 2 devices on the
+> bus'"?
+> 
+
+Let me describe the scenario. Let's have a bus with dev_max == 2. We
+first add one device, then another to that bus. Then we unplug and replug
+the second device. The name goes from 'child[n]' to 'child[n+1]' with
+each iteration of unplug/replug with int arithmetic. That is after a
+number of iterations we will reach the name 'child[0]'. But we already
+have a child[0] on the bus.
+
+> > 
+> > So if we don't want to limit the number of hotplug operations, and we do
+> > want to keep the allocation scheme before wrapping, the only solution I
+> > see is looking for the first free identifier after we wrap.
+> 
+> Are you are saying to look for the first index value that is not
+> assigned to a BusChild object?
+> 
+
+Only after we reach the biggest integer. We want to keep everything as
+is for the cases that work today.
+
+> > 
+> > BTW I wonder if making max_index and index unsigned make things bit less
+> > ugly.
+> 
+> I thought the same. They could also be made unsigned long or
+> unsigned long long to increase the number of child devices that can be
+> plugged in before having to deal with exceeding the index value.
+> 
+
+My rationale is: names with the negatives would look weird.
+
+Regards,
+Halil
