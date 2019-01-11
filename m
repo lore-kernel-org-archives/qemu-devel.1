@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40162)
+Received: from eggs.gnu.org ([209.51.188.92]:40147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gi2mN-0006Q1-DE
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:47:44 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gi2mM-0004yN-9D
+	(envelope-from <eblake@redhat.com>) id 1gi2mM-0006Pd-UV
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:47:43 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1gi2mL-0004xv-Uq
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:47:42 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 11 Jan 2019 13:47:15 -0600
-Message-Id: <20190111194720.15671-4-eblake@redhat.com>
-In-Reply-To: <20190111194720.15671-1-eblake@redhat.com>
-References: <20190111194720.15671-1-eblake@redhat.com>
+Date: Fri, 11 Jan 2019 13:47:12 -0600
+Message-Id: <20190111194720.15671-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 3/8] nbd: Only require disabled bitmap for
- read-only exports
+Subject: [Qemu-devel] [PATCH v3 0/8] Promote x-nbd-server-add-bitmap to
+ stable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +21,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-block@nongnu.org
 
-Our initial implementation of x-nbd-server-add-bitmap put
-in a restriction because of incremental backups: in that
-usage, we are exporting one qcow2 file (the temporary overlay
-target of a blockdev-backup sync:none job) and a dirty bitmap
-owned by a second qcow2 file (the source of the
-blockdev-backup, which is the backing file of the temporary).
-While both qcow2 files are still writable (the target in
-order to capture copy-on-write of old contents, and the
-source in order to track live guest writes in the meantime),
-the NBD client expects to see constant data, including the
-dirty bitmap.  An enabled bitmap in the source would be
-modified by guest writes, which is at odds with the NBD
-export being a read-only constant view, hence the initial
-code choice of enforcing a disabled bitmap (the intent is
-that the exposed bitmap was disabled in the same transaction
-that started the blockdev-backup job, although we don't want
-to track enough state to actually enforce that).
+Or rather, move its functionality into nbd-server-add.  And as
+a side effect, teach qemu-nbd how to export a persistent bitmap
+without having to go through a qemu process and several QMP
+commands.
 
-However, consider the case of a bitmap contained in a read-only
-node (including when the bitmap is found in a backing layer of
-the active image).  Because the node can't be modified, the
-bitmap won't change due to writes, regardless of whether it is
-still enabled.  Forbidding the export unless the bitmap is
-disabled is awkward, paritcularly since we can't change the
-bitmap to be disabled (because the node is read-only).
+Based-on: <20181221093529.23855-1-jsnow@redhat.com>
+[jsnow: 0/11 bitmaps: remove x- prefix from QMP api]
+Based-on: <20190111163519.11457-1-philmd@redhat.com>
+[philmd: qemu-nbd: Rename 'exp' variable clashing with math::exp() symbol=
+]
 
-Alternatively, consider the case of live storage migration,
-where management directs the destination to create a writable
-NBD server, then performs a drive-mirror from the source to
-the mirror, prior to doing the rest of the live migration.
-Since storage migration can be time-consuming, it may be wise
-to let the destination include a dirty bitmap to track which
-portions it has already received, where even if the migration
-is interrupted and restarted, the source can query the
-destination block status in order to minimize re-sending
-data that has not changed in the meantime on a second attempt.
-Such code has not been written, but it makes sense that
-letting an active dirty bitmap be exposed and changing
-alongside writes may prove useful in the future.
+Available at: https://repo.or.cz/qemu/ericb.git nbd-bitmap-add-v3
 
-Solve both issues by gating the restriction against a
-disabled bitmap to only happen when the caller has requested
-a read-only export, and where the BDS that owns the bitmap
-(whether or not it is the BDS handed to nbd_export_new() or
-from its backing chain) is still writable.
+Since v2:
+- split old patch 1 into 3 parts
+- add even more tests of expected error messages
+- rebase on top of 'exp' rename
+- improve commit messages
+- add some R-b where it made sense
 
-Update iotest 223 to show the looser behavior by leaving
-a bitmap enabled the whole run; note that we have to tear
-down and re-export a node when handling an error.
+001/8:[down] 'nbd: Add some error case testing to iotests 223'
+002/8:[down] 'nbd: Forbid nbd-server-stop when server is not running'
+003/8:[0011] [FC] 'nbd: Only require disabled bitmap for read-only export=
+s'
+004/8:[0020] [FC] 'nbd: Merge nbd_export_set_name into nbd_export_new'
+005/8:[0008] [FC] 'nbd: Allow bitmap export during QMP nbd-server-add'
+006/8:[----] [--] 'nbd: Remove x-nbd-server-add-bitmap'
+007/8:[0009] [FC] 'nbd: Merge nbd_export_bitmap into nbd_export_new'
+008/8:[0004] [FC] 'qemu-nbd: Add --bitmap=3DNAME option'
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Eric Blake (8):
+  nbd: Add some error case testing to iotests 223
+  nbd: Forbid nbd-server-stop when server is not running
+  nbd: Only require disabled bitmap for read-only exports
+  nbd: Merge nbd_export_set_name into nbd_export_new
+  nbd: Allow bitmap export during QMP nbd-server-add
+  nbd: Remove x-nbd-server-add-bitmap
+  nbd: Merge nbd_export_bitmap into nbd_export_new
+  qemu-nbd: Add --bitmap=3DNAME option
 
----
-v3: split out unrelated test changes, improve commit message [Vladimir]
-v2: new patch
----
- nbd/server.c               |  7 +++++--
- tests/qemu-iotests/223     | 10 +++++++---
- tests/qemu-iotests/223.out |  3 ++-
- 3 files changed, 14 insertions(+), 6 deletions(-)
-
-diff --git a/nbd/server.c b/nbd/server.c
-index 7af0ddffb20..98327088cb4 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -2456,8 +2456,11 @@ void nbd_export_bitmap(NBDExport *exp, const char =
-*bitmap,
-         return;
-     }
-
--    if (bdrv_dirty_bitmap_enabled(bm)) {
--        error_setg(errp, "Bitmap '%s' is enabled", bitmap);
-+    if ((exp->nbdflags & NBD_FLAG_READ_ONLY) && bdrv_is_writable(bs) &&
-+        bdrv_dirty_bitmap_enabled(bm)) {
-+        error_setg(errp,
-+                   "Enabled bitmap '%s' incompatible with readonly expor=
-t",
-+                   bitmap);
-         return;
-     }
-
-diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
-index a4016091b21..f200e313c06 100755
---- a/tests/qemu-iotests/223
-+++ b/tests/qemu-iotests/223
-@@ -61,6 +61,8 @@ echo "=3D=3D=3D Create partially sparse image, then add=
- dirty bitmaps =3D=3D=3D"
- echo
-
- # Two bitmaps, to contrast granularity issues
-+# Also note that b will be disabled, while b2 is left enabled, to
-+# check for read-only interactions
- _make_test_img -o cluster_size=3D4k 4M
- $QEMU_IO -c 'w -P 0x11 1M 2M' "$TEST_IMG" | _filter_qemu_io
- run_qemu <<EOF
-@@ -134,9 +136,11 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-serve=
-r-add-bitmap",
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-   "arguments":{"device":"n", "name":"n2"}}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
--  "arguments":{"name":"n2", "bitmap":"b2"}}' "error" # Attempt enabled b=
-itmap
--_send_qemu_cmd $QEMU_HANDLE '{"execute":"block-dirty-bitmap-disable",
--  "arguments":{"node":"n", "name":"b2"}}' "return"
-+  "arguments":{"name":"n2", "bitmap":"b2"}}' "error" # Enabled vs. read-=
-only
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
-+  "arguments":{"name":"n2"}}' "return"
-+_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-+  "arguments":{"device":"n", "name":"n2", "writable":true}}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
-   "arguments":{"name":"n2", "bitmap":"b2"}}' "return"
-
-diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
-index 8a4d63a4fc2..7d147291d48 100644
---- a/tests/qemu-iotests/223.out
-+++ b/tests/qemu-iotests/223.out
-@@ -35,7 +35,8 @@ wrote 2097152/2097152 bytes at offset 2097152
- {"error": {"class": "GenericError", "desc": "NBD server already has expo=
-rt named 'n'"}}
- {"return": {}}
- {"return": {}}
--{"error": {"class": "GenericError", "desc": "Bitmap 'b2' is enabled"}}
-+{"error": {"class": "GenericError", "desc": "Enabled bitmap 'b2' incompa=
-tible with readonly export"}}
-+{"return": {}}
- {"return": {}}
- {"return": {}}
+ qemu-nbd.texi              |   4 ++
+ qapi/block.json            |  30 ++------
+ include/block/nbd.h        |  12 ++--
+ blockdev-nbd.c             |  36 +++-------
+ hmp.c                      |   5 +-
+ nbd/server.c               | 136 +++++++++++++++++--------------------
+ qemu-nbd.c                 |  17 +++--
+ tests/qemu-iotests/223     |  50 +++++++++++---
+ tests/qemu-iotests/223.out |  23 +++++--
+ 9 files changed, 160 insertions(+), 153 deletions(-)
 
 --=20
 2.20.1
