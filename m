@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43591)
+Received: from eggs.gnu.org ([209.51.188.92]:43976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gi5Va-0007pD-TN
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:42:36 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gi5Xo-0008WU-WF
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:44:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gi5VZ-00062k-Sd
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:42:34 -0500
-Resent-Message-Id: <E1gi5VZ-00062k-Sd@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gi5VX-00060l-J6
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:42:33 -0500
-Message-ID: <154724652089.37.17712705294503427547@2d170d368aaa>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190110142955.23254-1-ehabkost@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gi5Xo-0006hL-Af
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:44:52 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gi5Xn-0006gj-WB
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:44:52 -0500
+Received: by mail-pg1-x542.google.com with SMTP id v28so6885931pgk.10
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:44:51 -0800 (PST)
+References: <20190111220131.27153-1-jcmvbkbc@gmail.com>
+	<2064503c-ed12-de29-59a9-46fa24d22f60@linaro.org>
+	<CAMo8BfJaTbO0LSBWk7+WeFw7Oc6Sy2ykxaQcWTBeVGCdN9+aOg@mail.gmail.com>
+	<cdaaa0bc-8282-6a92-886a-7dd5f2adfa46@linaro.org>
+	<CAMo8Bf+FJUO46mv8bg7Rd2vH+noTsDHBrcfY=mbchaJoDd5eng@mail.gmail.com>
+	<CAMo8Bf+oiqDn9+RSiUXKwXfzWemJNrc6AQMRLMEbNSA3tfMavw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cd7d28cc-ef48-bc63-6e6f-248f3ec56e35@linaro.org>
+Date: Sat, 12 Jan 2019 09:44:45 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 11 Jan 2019 14:42:01 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/10] Machine queue, 2019-01-10
+In-Reply-To: <CAMo8Bf+oiqDn9+RSiUXKwXfzWemJNrc6AQMRLMEbNSA3tfMavw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] target/xtensa: rework zero overhead
+ loops implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +36,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ehabkost@redhat.com
-Cc: fam@euphon.net, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExMDE0Mjk1NS4yMzI1
-NC0xLWVoYWJrb3N0QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMTEwMTQyOTU1LjIzMjU0LTEtZWhhYmtvc3RA
-cmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzEw
-XSBNYWNoaW5lIHF1ZXVlLCAyMDE5LTAxLTEwCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtLWNvbG9y
-PWFsd2F5cyBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
-YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
-cGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE5MDEx
-MTIyMDEzMS4yNzE1My0xLWpjbXZia2JjQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTkwMTExMjIw
-MTMxLjI3MTUzLTEtamNtdmJrYmNAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKNjI1NDRmZSBxb206IERvbid0IGtlZXAgZXJyb3IgdmFsdWUgYmV0d2VlbiBvYmplY3Rf
-cHJvcGVydHlfcGFyc2UoKSBjYWxscwphMzIwMTY4IHFkZXY6IGZpeCAtZGV2aWNlIHNjc2ktaGQs
-IGhlbHAgcmVncmVzc2lvbgo5MTdlNDZiIG1hY2hpbmU6IFVzZSBzaG9ydGVyIGZvcm1hdCBmb3Ig
-R2xvYmFsUHJvcGVydHkgYXJyYXlzCjQzMjY0OTcgbWFjaGluZTogRWxpbWluYXRlIHVubmVjZXNz
-YXJ5IHN0cmluZ2lmeSgpIHVzYWdlCmY0ZDhjM2Qgc3BhcHI6IEVsaW1pbmF0ZSBTUEFQUl9QQ0lf
-Ml83X01NSU9fV0lOX1NJWkUgbWFjcm8KNmNhNzJjNyBtZW1vcnktZGV2aWNlOiByZXdyaXRlIGFk
-ZHJlc3MgYXNzaWdubWVudCB1c2luZyByYW5nZXMKZTY2NjdkNyByYW5nZTogYWRkIHNvbWUgbW9y
-ZSBmdW5jdGlvbnMKNThiZGE3MSBNZW50aW9uIHRoYXQgUU1QICdjcHUtYWRkJyB3aWxsIGJlIGRl
-cHJlY2F0ZWQKY2ZjZTY4MyBVcGRhdGUgdGhhdCBITVAgJ2NwdS1hZGQnIGlzIGRlcHJlY2F0ZWQg
-aW4gNC4wCmZkNDZhYzMgcWVtdS1kZXByZWNhdGVkLnRleGk6IFJlbmFtZSB0aGUgSE1QIHNlY3Rp
-b24KCj09PSBPVVRQVVQgQkVHSU4gPT09ClVua25vd24gb3B0aW9uOiBjb2xvcgpVc2FnZToKCiAg
-ICBjaGVja3BhdGNoLnBsIFtPUFRJT05dLi4uIFtGSUxFXS4uLgogICAgY2hlY2twYXRjaC5wbCBb
-T1BUSU9OXS4uLiBbR0lULVJFVi1MSVNUXQoKVmVyc2lvbjogMC4zMQoKT3B0aW9uczoKICAtcSwg
-LS1xdWlldCAgICAgICAgICAgICAgICBxdWlldAogIC0tbm8tdHJlZSAgICAgICAgICAgICAgICAg
-IHJ1biB3aXRob3V0IGEga2VybmVsIHRyZWUKICAtLW5vLXNpZ25vZmYgICAgICAgICAgICAgICBk
-byBub3QgY2hlY2sgZm9yICdTaWduZWQtb2ZmLWJ5JyBsaW5lCiAgLS1wYXRjaCAgICAgICAgICAg
-ICAgICAgICAgdHJlYXQgRklMRSBhcyBwYXRjaGZpbGUKICAtLWJyYW5jaCAgICAgICAgICAgICAg
-ICAgICB0cmVhdCBhcmdzIGFzIEdJVCByZXZpc2lvbiBsaXN0CiAgLS1lbWFjcyAgICAgICAgICAg
-ICAgICAgICAgZW1hY3MgY29tcGlsZSB3aW5kb3cgZm9ybWF0CiAgLS10ZXJzZSAgICAgICAgICAg
-ICAgICAgICAgb25lIGxpbmUgcGVyIHJlcG9ydAogIC1mLCAtLWZpbGUgICAgICAgICAgICAgICAg
-IHRyZWF0IEZJTEUgYXMgcmVndWxhciBzb3VyY2UgZmlsZQogIC0tc3RyaWN0ICAgICAgICAgICAg
-ICAgICAgIGZhaWwgaWYgb25seSB3YXJuaW5ncyBhcmUgZm91bmQKICAtLXJvb3Q9UEFUSCAgICAg
-ICAgICAgICAgICBQQVRIIHRvIHRoZSBrZXJuZWwgdHJlZSByb290CiAgLS1uby1zdW1tYXJ5ICAg
-ICAgICAgICAgICAgc3VwcHJlc3MgdGhlIHBlci1maWxlIHN1bW1hcnkKICAtLW1haWxiYWNrICAg
-ICAgICAgICAgICAgICBvbmx5IHByb2R1Y2UgYSByZXBvcnQgaW4gY2FzZSBvZiB3YXJuaW5ncy9l
-cnJvcnMKICAtLXN1bW1hcnktZmlsZSAgICAgICAgICAgICBpbmNsdWRlIHRoZSBmaWxlbmFtZSBp
-biBzdW1tYXJ5CiAgLS1kZWJ1ZyBLRVk9WzB8MV0gICAgICAgICAgdHVybiBvbi9vZmYgZGVidWdn
-aW5nIG9mIEtFWSwgd2hlcmUgS0VZIGlzIG9uZSBvZgogICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICd2YWx1ZXMnLCAncG9zc2libGUnLCAndHlwZScsIGFuZCAnYXR0cicgKGRlZmF1bHQKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBpcyBhbGwgb2ZmKQogIC0tdGVzdC1vbmx5PVdPUkQg
-ICAgICAgICAgIHJlcG9ydCBvbmx5IHdhcm5pbmdzL2Vycm9ycyBjb250YWluaW5nIFdPUkQKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBsaXRlcmFsbHkKICAtaCwgLS1oZWxwLCAtLXZlcnNp
-b24gICAgICBkaXNwbGF5IHRoaXMgaGVscCBhbmQgZXhpdAoKV2hlbiBGSUxFIGlzIC0gcmVhZCBz
-dGFuZGFyZCBpbnB1dC4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAxOTAxMTAxNDI5NTUuMjMyNTQtMS1laGFia29zdEByZWRoYXQuY29tL3Rlc3Rp
-bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 1/12/19 9:27 AM, Max Filippov wrote:
+> Maybe "Any other value means that an instruction that ends at this offset
+> from the page start may loop back and will need loopback code to be generated"?
+
+Much better, thanks.
+
+
+r~
