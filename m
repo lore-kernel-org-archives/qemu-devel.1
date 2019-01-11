@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47694)
+Received: from eggs.gnu.org ([209.51.188.92]:47733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghs0y-0003Ra-S9
+	(envelope-from <thuth@redhat.com>) id 1ghs14-0003Tn-QS
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:18:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghs0x-0007GK-5l
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:18:04 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghs13-0007L2-TA
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:18:10 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 11 Jan 2019 09:17:49 +0100
-Message-Id: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+Date: Fri, 11 Jan 2019 09:17:52 +0100
+Message-Id: <1547194672-24169-4-git-send-email-thuth@redhat.com>
+In-Reply-To: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 0/3] Force the C standard to gnu99
+Subject: [Qemu-devel] [PATCH v5 3/3] configure: Force the C standard to gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +25,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, pbonzini@redhat.com, qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Different versions of GCC and Clang use different versions of the C
-standard by default. To avoid compilation problems with different
-compilers in the future, we should enforce one language level
-for all compilers. Since "gnu99" is the only usable option right now
-(later versions are still marked as experimental in GCC v4.8),
-we enforce compiling with -std=3Dgnu99 now (in the third patch).
-This caused some new warnings/erros to appear with clang, which are
-fixed by the first two patches.
+Different versions of GCC and Clang use different versions of the C stand=
+ard.
+This repeatedly caused problems already, e.g. with duplicated typedefs:
 
-v5:
- - Prefer to include headers instead of plain struct forward declarations
-   in the second patch.
+ https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
 
-v4:
- - Avoid circular inclusion of headers and introduce xics_spapr.h
+or with for-loop variable initializers:
 
-v3:
- - Compile C++ code with -std=3Dgnu++98
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
 
-v2:
- - Use gnu99 instead of gnu11
+To avoid these problems, we should enforce the C language version to the
+same level for all compilers. Since our minimum compiler versions is
+GCC v4.8, our best option is "gnu99" for C code right now ("gnu17" is not
+available there yet, and "gnu11" is marked as "experimental"), and "gnu++=
+98"
+for the few C++ code that we have in the repository.
 
-Thomas Huth (3):
-  ppc: Move spapr-related prototypes from xics.h into a seperate header
-    file
-  ppc: Fix duplicated typedefs to be able to compile with Clang in gnu99
-    mode
-  configure: Force the C standard to gnu99
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ configure | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
- configure                   |  5 ++++-
- hw/intc/xics_kvm.c          |  1 +
- hw/intc/xics_spapr.c        |  1 +
- hw/ppc/spapr_irq.c          |  1 +
- include/hw/ppc/spapr.h      |  5 +++--
- include/hw/ppc/spapr_xive.h |  2 --
- include/hw/ppc/xics.h       |  7 -------
- include/hw/ppc/xics_spapr.h | 37 +++++++++++++++++++++++++++++++++++++
- target/ppc/cpu.h            | 13 +++++++++----
- 9 files changed, 56 insertions(+), 16 deletions(-)
- create mode 100644 include/hw/ppc/xics_spapr.h
-
+diff --git a/configure b/configure
+index cf763d4..f0b5dcd 100755
+--- a/configure
++++ b/configure
+@@ -107,6 +107,9 @@ update_cxxflags() {
+             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
+             -Wold-style-declaration|-Wold-style-definition|-Wredundant-d=
+ecls)
+                 ;;
++            -std=3Dgnu99)
++                QEMU_CXXFLAGS=3D${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }"-std=3D=
+gnu++98"
++                ;;
+             *)
+                 QEMU_CXXFLAGS=3D${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
+                 ;;
+@@ -585,7 +588,7 @@ ARFLAGS=3D"${ARFLAGS-rv}"
+ # left shift of signed integers is well defined and has the expected
+ # 2s-complement style results. (Both clang and gcc agree that it
+ # provides these semantics.)
+-QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
++QEMU_CFLAGS=3D"-fno-strict-aliasing -fno-common -fwrapv -std=3Dgnu99 $QE=
+MU_CFLAGS"
+ QEMU_CFLAGS=3D"-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_=
+CFLAGS"
+ QEMU_CFLAGS=3D"-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+ QEMU_CFLAGS=3D"-D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURC=
+E $QEMU_CFLAGS"
 --=20
 1.8.3.1
