@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50062)
+Received: from eggs.gnu.org ([209.51.188.92]:50184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghuN4-0000Uh-3L
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:49:03 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ghuNp-00013G-D8
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:49:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghuN3-0002yG-5H
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:49:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45308)
+	(envelope-from <kwolf@redhat.com>) id 1ghuNn-0003Dp-9v
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:49:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39892)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ghuN2-0002xu-TC
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:49:01 -0500
-References: <20190110083753.GA31730@yangzhon-Virtual>
-	<20190110103636.GG19025@stefanha-x1.localdomain>
-	<20190111054604.GA1038@yangzhon-Virtual>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a7e15215-e2df-309b-b1f6-6741bfff7247@redhat.com>
-Date: Fri, 11 Jan 2019 11:48:52 +0100
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ghuNh-0003B8-U4
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:49:42 -0500
+Date: Fri, 11 Jan 2019 11:49:23 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190111104923.GD5010@dhcp-200-186.str.redhat.com>
+References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
+	<154703599022.13472.1704009113561450219.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <20190111054604.GA1038@yangzhon-Virtual>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] If Qemu support NVMe over Fabrics ?y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <154703599022.13472.1704009113561450219.stgit@pasha-VirtualBox>
+Subject: Re: [Qemu-devel] [PATCH v9 19/21] replay: add BH oneshot event for
+ block layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, fam@euphon.net, keith.busch@intel.com
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-On 11/01/19 06:46, Yang Zhong wrote:
-> On Thu, Jan 10, 2019 at 10:36:37AM +0000, Stefan Hajnoczi wrote:
->> On Thu, Jan 10, 2019 at 04:37:53PM +0800, Yang Zhong wrote:
->>> Do you know if Qemu support NVMe over Fabrics(NVMe-oF)?
->>> https://nvmexpress.org/wp-content/uploads/NVMe_Over_Fabrics.pdf
->>>
->>> The Qemu has enabled RDMA in last year, and i am not sure if Qemu 
->>> should support NVME-oF. If Qemu support it, would you please share
->>> me the qemu related command or guides? thanks a lot!
->>
->> QEMU supports many different storage configurations.  Can you be more
->> specific?
->>
->> For example, if your host has NVMe-oF set up then you can give the NVMe
->> block devices to QEMU just like any other host block device (-drive
->> file=/dev/sdc,...).
->>
->> But maybe you are thinking about other configurations, like exposing
->> NVMe-oF to the guest?
->>
->   Thanks Stefan's comments. We only want Qemu as NVMe-oF initiator to
->   access remote target's resource.
+Am 09.01.2019 um 13:13 hat Pavel Dovgalyuk geschrieben:
+> Replay is capable of recording normal BH events, but sometimes
+> there are single use callbacks scheduled with aio_bh_schedule_oneshot
+> function. This patch enables recording and replaying such callbacks.
+> Block layer uses these events for calling the completion function.
+> Replaying these calls makes the execution deterministic.
 > 
->   I checked the block/nvme.c and hw/block/nvme.c code, which seems do
->   not support NVMe-oF . If i am wrong please correct me.
-> 
->   If Qemu support NVMe-oF initiator, please share me how to use it. 
->   If Qemu does not support it, please tell me if community has plan 
->   to implement it. thanks a lot!
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-QEMU's native NVMe driver only supports NVMe over PCI, but it should be
-possible to extract common code if you want to add a native NVMe over
-RDMA driver to QEMU.  There are currently no plans to add such a driver,
-but it would certainly be a welcome addition.
+This still doesn't come even close to catching all BHs that need to be
+caught. While you managed to show a few BHs that actually don't need to
+be considered for recording when I asked for this in v7, most BHs in the
+block layer can in some way lead to device callbacks and must therefore
+be recorded.
 
-Paolo
+How bad would it be to record some BHs even if recording them isn't
+necessary? I'd definitely try to err on the safe side here. Having two
+different sets of BH functions, you can't expect that people always use
+the right one (especially if you don't even make the existing code base
+consistently use the right one intially).
+
+Kevin
