@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39626)
+Received: from eggs.gnu.org ([209.51.188.92]:40789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gi0k6-0000TW-BN
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:37:14 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gi0pL-0001dY-S5
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:42:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gi0k5-0002n7-A3
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:37:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gi0k5-0002mt-3K
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:37:13 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 375DBC0C4273
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 17:37:12 +0000 (UTC)
-Date: Fri, 11 Jan 2019 17:37:04 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190111173704.GB3705@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181217231629.24147-1-pbonzini@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1gi0pK-00057H-VM
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:42:39 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:40780)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gi0pK-00056n-Qp
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:42:38 -0500
+Received: by mail-oi1-f195.google.com with SMTP id t204so12843509oie.7
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 09:42:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181217231629.24147-1-pbonzini@redhat.com>
+References: <20190111131836.107549-1-sgarzare@redhat.com>
+	<20190111131836.107549-3-sgarzare@redhat.com>
+	<20190111162649.GC14776@stefanha-x1.localdomain>
+In-Reply-To: <20190111162649.GC14776@stefanha-x1.localdomain>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 11 Jan 2019 18:42:25 +0100
+Message-ID: <CAGxU2F6mpxE7-xw1LWS3Q6R+NSPMnkrqo8mdhhgn-SfARN3XKQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ui: vnc: finish removing TABs
+Subject: Re: [Qemu-devel] [PATCH 2/4] linuxboot_dma: move common functions
+ in a new header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,26 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Maran Wilson <maran.wilson@oracle.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Dec 18, 2018 at 12:16:29AM +0100, Paolo Bonzini wrote:
-> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  ui/vnc-enc-hextile-template.h | 268 +++++++++++------------
->  ui/vnc-enc-zywrle.h           | 394 +++++++++++++++++-----------------
->  2 files changed, 331 insertions(+), 331 deletions(-)
+On Fri, Jan 11, 2019 at 5:27 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Fri, Jan 11, 2019 at 02:18:34PM +0100, Stefano Garzarella wrote:
+> > In order to allow other option roms to use these common
+> > useful functions and definitions, this patch put them
+> > in a new C header file called optrom.h, and also add
+> > useful out*() in*() functions for different size.
+>
+> It's usually helpful to modify code in a one patch and move it in a
+> separate patch.  This patch does both, so it's a harder to review.
+> Don't worry about changing it now, but something to try in the future.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Thanks for the tip!
+
+>
+> > +#include <stdint.h>
+> > +#include "optrom.h"
+> > +#include "optrom_fw_cfg.h"
+>
+> Can these be moved to the top of the file like a regular C source file?
+
+Yes, I'll move them to the top.
+
+>
+> > diff --git a/pc-bios/optionrom/optrom.h b/pc-bios/optionrom/optrom.h
+> > new file mode 100644
+> > index 0000000000..36f43b43fd
+> > --- /dev/null
+> > +++ b/pc-bios/optionrom/optrom.h
+> > @@ -0,0 +1,109 @@
+> > +/*
+> > + * Common Option ROM Functions for C code
+> > + *
+> > + * This program is free software; you can redistribute it and/or modif=
+y
+> > + * it under the terms of the GNU General Public License as published b=
+y
+> > + * the Free Software Foundation; either version 2 of the License, or
+> > + * (at your option) any later version.
+> > + *
+> > + * This program is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> > + * GNU General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License
+> > + * along with this program; if not, see <http://www.gnu.org/licenses/>=
+.
+> > + *
+> > + * Copyright (c) 2015-2019 Red Hat Inc.
+> > + *   Authors:
+> > + *     Marc Mar=C3=AD <marc.mari.barcelo@gmail.com>
+> > + *     Richard W.M. Jones <rjones@redhat.com>
+> > + *     Stefano Garzarella <sgarzare@redhat.com>
+> > + */
+> > +
+> > +#ifndef OPTROM_H
+> > +#define OPTROM_H
+> > +
+> > +#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
+>
+> This depends on <stdint.h>, please include it first.
+
+Sure.
 
 
-Regards,
-Daniel
+Thanks,
+Stefano
+
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Stefano Garzarella
+Red Hat
