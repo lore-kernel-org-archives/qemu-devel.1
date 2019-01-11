@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41999)
+Received: from eggs.gnu.org ([209.51.188.92]:42024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ghz4F-0002X8-Dg
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:49:56 -0500
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1ghz4K-0002ae-2X
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ghz4E-0002aa-0c
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:49:55 -0500
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1ghz4J-0002f1-2D
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:50:00 -0500
+Received: from forwardcorp1o.cmail.yandex.net ([2a02:6b8:0:1a72::290]:36228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+	id 1ghz4I-0002bM-5F
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:49:58 -0500
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+In-Reply-To: <20190110201124.GJ2589@work-vm>
+References: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
+	<20190110201124.GJ2589@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Mga7Y1x_eA-HMdTGhC26MZbHJpSyo01XuKFmRG8gzcw@mail.gmail.com>
-References: <20190108163008.7006-1-peter.maydell@linaro.org>
-	<20190108163008.7006-4-peter.maydell@linaro.org>
-	<CAFEAcA9xd-MJ7QHgYCyh0D+x_ooXYDCnKYTXELoxz3LbYO4SJw@mail.gmail.com>
-	<CAL1e-=gKA9dnfgcJ2QuvbWxjgHya1DfUz4VPRxqakyDVKzH1SA@mail.gmail.com>
-	<CAFEAcA_Mga7Y1x_eA-HMdTGhC26MZbHJpSyo01XuKFmRG8gzcw@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 11 Jan 2019 16:49:49 +0100
-Message-ID: <CAL1e-=iWty7_eGYvJGNQx0HRJZKjNhw7XMxd=58oyQMi-E5xXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 3/4] accel/tcg: Add cluster number to TCG
- TB hash
+Date: Fri, 11 Jan 2019 18:49:53 +0300
+Message-Id: <2578541547221793@myt5-68ad52a76c91.qloud-c.yandex.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/4] Add ignore-external migration
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,88 +29,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, "patches@linaro.org" <patches@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "wrfsh@yandex-team.ru" <wrfsh@yandex-team.ru>, Richard Henderson <rth@twiddle.net>
 
-On Friday, January 11, 2019, Peter Maydell <peter.maydell@linaro.org> wrote:
+10.01.2019, 23:12, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
+> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+>>  Hi,
+>>
+>>  The series adds migration capability which allows to skip 'external' =
+RAM blocks
+>>  during migration. External block is a RAMBlock which available from t=
+he outside
+>>  of current QEMU process (e.g. file in /dev/shm). It's useful for fast=
+ local
+>>  migration to update QEMU for the running guests.
+>
+> Hi Yury,
+>   There have been a few similar patch series around from people wanting
+> to do similar things.
+>   In particular Lai Jiangshan's https://lists.nongnu.org/archive/html/q=
+emu-devel/2018-03/msg07511.html
+> and C=C3=A9dric Le Goater wanted to skip regions for a different reason=
+.
+>
+>   We merged some of C=C3=A9dric's code last year so that we now
+> have the qemu_ram_is_migratable() function - and we should be reusing
+> that to skip things rather than adding a new check that we have to add
+> everywhere.
+>
 
-> On Fri, 11 Jan 2019 at 12:49, Aleksandar Markovic
-> <aleksandar.m.mail@gmail.com> wrote:
-> > 1. What would be, in more detail, if possible in layman terms,
-> > the "bad case" that this series fixes?
->
-> I describe this in the cover letter (which also has a link to
-> a tarball with a test case demonstrating it):
-> > TCG implicitly assumes that all CPUs are alike, because we have
-> > a single cache of generated TBs and we don't account for which
-> > CPU generated the code or is looking for the TB when adding or
-> > searching for generated TBs. This can go wrong in two situations:
-> > (1) two CPUs have different physical address spaces (eg CPU 1
-> > has one lot of RAM/ROM, and CPU 2 has different RAM/ROM): the
-> > physical address alone is then not sufficient to distinguish
-> > what code to run
-> > (2) two CPUs have different features (eg FPU
-> > vs no FPU): since our TCG frontends bake assumptions into the
-> > generated code about the presence/absence of features, if a
-> > CPU with FPU picks up a TB for one generated without an FPU
-> > it will behave wrongly
->
-> What happens is that CPU 1 picks up code that was generated
-> for CPU 2 and which is not correct for it, and thus does
-> not behave correctly. (In the test case, an instruction that
-> should UNDEF on the Cortex-R5F but not on the Cortex-A53 will
-> either UNDEF on the A53 or fail to UNDEF on the R5F, depending
-> on which CPU happened to get to the test code first.)
->
->
-Thanks, this example makes the intentions of the patch clearer to me.
+I didn't see the series, so I'll check it, thanks!
+But I saw qemu_ram_is_migratable() function and corresponding patch.
+It's very close to my needs, but it works a bit different IIUC:
+1. Not migratable blocks isn't validated (existence and size) during migr=
+ation,
+2. "Migratable" state is determined during the block creation time.
+   Such case isn't valid because of it:
+   * Source has one migratable and one not migratable RAM blocks,
+   * Target has the same (idstr) blocks, but both are not migratable.
+   Thus, target will not expect pages for not migratable blocks.
 
-If you don't mind, I may take a closer look at MIPS' (and perhaps some
-other targets' a little) multi-core design details in few coming weeks, and
-see if we could improve feightfulness of our emulation, or maybe make it
-more flexible, or scalable.
+>   Also, ypu're skipping 'external' things, I think the other suggestion
+> was to skip 'shared' things (i.e. anything with share=3D0); skipping
+> share=3Don cases sounds easier to me.
 
-Thanks again, and happy holiday season to all!!
+I agree that introducing new term is a complication, but 'share' and 'ext=
+ernal'
+terms have important differences (I'll describe it below).
 
-Aleksandar
+Just to clarify:
+* 'share' means that other processes has an access to such memory,
+* 'external' means file backed memory.
 
+There is another use case I wanted to support (I had to write about it in
+the cover letter, sorry..):
+1. Migrate source VM to file and kill source,
+2. Start target VM and migrate it from file.
+In such case source VM may have memory-backend-ram with share=3Doff, it's=
+ ok.
 
+Thus, in the new migration capability I want to migrate memory that meets
+three conditions:
+1. The source will not use the memory after migration ends,
+2. The source may exit before target starts (migrate to file),
+3. The target has an access to the memory.
 
+I think 'external' fits them better than 'share'.
 
-> > 2. Let's suppose, hypothetically, and based on your example
-> > from one of commit messages from this series, that we want to
-> > support two multicore systems:
-> >     A. Cluster 1: 1 core with FPU; cluster 2: 3 cores without FPU
-> >     B. Cluster 1: 2 cores with FPU; cluster 2: 1 core without FPU
-> > Is there an apparatus that would allow the end user specify these
-> > and similar cpnfigurations through command line or acsimilar mean
-> > (so, without QEMU explicitely supporting such core organization,
-> > but supporting the single core in question, of course)?
 >
-> The QEMU definition of "cluster" requires that all the CPUs
-> in the cluster must share (a) the same features (eg FPU)
-> and (b) the same view of physical memory -- this is what
-> defines that they are in the same cluster and not different
-> ones. So you'd model this as four clusters (assuming that
-> A and B have different views of physical memory. Otherwise
-> you could put all the with-FPU cores in one cluster and
-> the without-FPU cores in a second.)
+> Dave
 >
-> Real hardware might choose to define what it calls a "cluster"
-> differently, but that doesn't matter.
->
-> > 3. Is there a possibility to have two layer clustering sheme,
-> > instead of one layer? Cluster/subcluster/core instead of
-> > cluster/core? For MIPS, there is a need for such organization.
-> > It looks to me 8 bits for cluster id, and 3 bits for subcluster
-> > id would be sufficient.
->
-> My view is that there is no need for the internal "cluster ID"
-> to match what the hardware happens to do with SMP CPU IDs
-> and NUMA architecture. What do you think we miss by this?
-> (Handling of NUMA architecture is a distinct bit of QEMU code,
-> unrelated to this.)
->
-> thanks
-> -- PMM
->
+>>  Patches:
+>>  1. Add offset validation to make sure that external RAM block has the=
+ same
+>>     physical offset on target side,
+>>  2. Add RAM_EXTERNAL flag to determine external RAM blocks,
+>>  3. Add ignore-external migration capability,
+>>  4. Add a test.
+>>
+>>  Usage example:
+>>  1. Start source VM:
+>>     qemu-system-x86 \
+>>       -m 4G \
+>>       -object memory-backend-file,id=3Dmem0,size=3D4G,share=3Don,mem-p=
+ath=3D/dev/shm/mem0 \
+>>       -numa node,memdev=3Dmem0 \
+>>       -qmp unix:/tmp/qemu-qmp-1.sock,server,nowait \
+>>
+>>  2. Start target VM:
+>>     qemu-system-x86 \
+>>       -m 4G \
+>>       -object memory-backend-file,id=3Dmem0,size=3D4G,share=3Don,mem-p=
+ath=3D/dev/shm/mem0 \
+>>       -numa node,memdev=3Dmem0 \
+>>       -qmp unix:/tmp/qemu-qmp-2.sock,server,nowait \
+>>       -incoming defer
+>>
+>>  3. Enable ignore-external capability on both VMs:
+>>     { "execute": "migrate-set-capabilities" , "arguments":
+>>       { "capabilities": [ { "capability": "x-ignore-external", "state"=
+: true } ] } }
+>>
+>>  4. Start migration.
+>>
+>>  Regards,
+>>  Yury
+>>
+>>  Yury Kotov (4):
+>>    migration: add RAMBlock's offset validation
+>>    exec: add RAM_EXTERNAL flag to mark non-QEMU allocated blocks
+>>    migration: introduce ignore-external capability
+>>    tests/migration-test: Add a test for ignore-external capability
+>>
+>>   backends/hostmem-file.c | 3 +-
+>>   exec.c | 7 ++-
+>>   include/exec/cpu-common.h | 1 +
+>>   include/exec/memory.h | 3 ++
+>>   migration/migration.c | 9 ++++
+>>   migration/migration.h | 1 +
+>>   migration/ram.c | 52 ++++++++++++++++--
+>>   numa.c | 4 +-
+>>   qapi/migration.json | 6 ++-
+>>   tests/migration-test.c | 109 +++++++++++++++++++++++++++++++-------
+>>   10 files changed, 165 insertions(+), 30 deletions(-)
+>>
+>>  --
+>>  2.20.1
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Regards,
+Yury
