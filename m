@@ -1,42 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42350)
+Received: from eggs.gnu.org ([209.51.188.92]:43007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frankja@linux.ibm.com>) id 1ghz5k-0003s9-MN
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:51:32 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ghz8A-0005Tz-1w
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:53:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frankja@linux.ibm.com>) id 1ghz5j-0003ls-RJ
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:51:28 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48800
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
-	id 1ghz5j-0003lB-I6
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:51:27 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0BFnK9g117876
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 10:51:26 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2pxuks8ujp-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 10:51:25 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
-	Fri, 11 Jan 2019 15:51:23 -0000
-References: <20190111113657.66195-1-frankja@linux.ibm.com>
-	<20190111113657.66195-2-frankja@linux.ibm.com>
-	<2be2f28c-1c89-c985-7996-f30c25578446@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Date: Fri, 11 Jan 2019 16:51:19 +0100
+	(envelope-from <stefanha@gmail.com>) id 1ghz86-0005a9-3r
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:53:55 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56147)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ghz83-0005UG-Vh
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:53:52 -0500
+Received: by mail-wm1-x341.google.com with SMTP id y139so2826766wmc.5
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 07:53:45 -0800 (PST)
+Date: Fri, 11 Jan 2019 15:53:42 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190111155342.GA14776@stefanha-x1.localdomain>
+References: <20190109112728.9214-1-xieyongji@baidu.com>
+	<20190110102551.GD19025@stefanha-x1.localdomain>
+	<CAONzpcYgVWUFg1uSHOLzOS5en2vHP_=oNXQvWQEZd9FdYi2uxA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <2be2f28c-1c89-c985-7996-f30c25578446@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hYUPomZYC5XKFeZrPx4UFwLCs9zLwtGsx"
-Message-Id: <df287522-75fd-30ff-f262-673958bdac7a@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x: Diag308 move common parameter
- checking into function
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="rwEMma7ioTxnRzrJ"
+Content-Disposition: inline
+In-Reply-To: <CAONzpcYgVWUFg1uSHOLzOS5en2vHP_=oNXQvWQEZd9FdYi2uxA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 0/7] vhost-user-blk: Add support
+ for backend reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,84 +32,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
+To: Yongji Xie <elohimes@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hYUPomZYC5XKFeZrPx4UFwLCs9zLwtGsx
-From: Janosch Frank <frankja@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, qemu-s390x@nongnu.org,
- qemu-stable@nongnu.org
-Message-ID: <df287522-75fd-30ff-f262-673958bdac7a@linux.ibm.com>
-Subject: Re: [PATCH 1/2] s390x: Diag308 move common parameter checking into
- function
-References: <20190111113657.66195-1-frankja@linux.ibm.com>
- <20190111113657.66195-2-frankja@linux.ibm.com>
- <2be2f28c-1c89-c985-7996-f30c25578446@redhat.com>
-In-Reply-To: <2be2f28c-1c89-c985-7996-f30c25578446@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--rwEMma7ioTxnRzrJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 11.01.19 16:40, David Hildenbrand wrote:
-> On 11.01.19 12:36, Janosch Frank wrote:
->> Let's make that switch statement a bit shorter.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  target/s390x/diag.c | 34 ++++++++++++++++++----------------
->>  1 file changed, 18 insertions(+), 16 deletions(-)
->>
->> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
->> index acb0f3d4af..cfd7222ddd 100644
->> --- a/target/s390x/diag.c
->> +++ b/target/s390x/diag.c
->> @@ -53,6 +53,22 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1=
-, uint64_t r3)
->>  #define DIAG_308_RC_NO_CONF         0x0102
->>  #define DIAG_308_RC_INVALID         0x0402
->> =20
->> +static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64=
-_t addr,
->> +                              uintptr_t ra)
->> +{
->> +    if ((r1 & 1) || (addr & 0x0fffULL)) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra)=
-;
->> +        return -EINVAL;
->> +    }
->> +    if (!address_space_access_valid(&address_space_memory, addr,
->> +                                    sizeof(IplParameterBlock), true,
+On Thu, Jan 10, 2019 at 06:59:27PM +0800, Yongji Xie wrote:
+> On Thu, 10 Jan 2019 at 18:25, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> >
+> > On Wed, Jan 09, 2019 at 07:27:21PM +0800, elohimes@gmail.com wrote:
+> > > From: Xie Yongji <xieyongji@baidu.com>
+> > >
+> > > This patchset is aimed at supporting qemu to reconnect
+> > > vhost-user-blk backend after vhost-user-blk backend crash or
+> > > restart.
+> > >
+> > > The patch 1 uses exisiting wait/nowait options to make QEMU not
+> > > do a connect on client sockets during initialization of the chardev.
+> > >
+> > > The patch 2 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
+> > > and VHOST_USER_SET_INFLIGHT_FD to support providing shared
+> > > memory to backend.
+> >
+> > Can you describe the problem that the inflight I/O shared memory region
+> > solves?
+> >
 >=20
-> This is wrong, you would check for writing although you are only
-> reading. (true vs. false)
+> The backend need to get inflight I/O and do I/O replay after restart.
+> Now we can only get used_idx in used_ring. It's not enough. Because we
+> might not process descriptors in the same order which they have been
+> made available sometimes. A simple example:
+> https://patchwork.kernel.org/cover/10715305/#22375607. So we need a
+> shared memory to track inflight I/O.
 
-Friday morning patches are the best patches :)
-Let's drop that one for now, we'll touch it again, if we need to tinker
-there.
+The inflight shared memory region is something that needs to be
+discussed in detail to make sure it is correct not just for vhost-blk
+but also for other vhost-user devices in the future.
 
+Please expand the protocol documentation so that someone can implement
+this feature without looking at the code.  Explain the reason for the
+inflight shared memory region and how exactly it used.
 
---hYUPomZYC5XKFeZrPx4UFwLCs9zLwtGsx
+After a quick look at the shared memory region documentation I have a
+few questions:
+
+1. The avail ring only contains "head" indices, each of which may chain
+   non-head descriptors.  Does the inflight memory region track only the
+   heads?
+
+2. Does the inflight shared memory region preserve avail ring order?
+   For example, if the guest submitted 5 2 4, will the new vhost-user
+   backend keep that order or does it see 2 4 5?
+
+3. What are the exact memory region size requirements?  Imagine a device
+   with a large virtqueue.  Or a device with multiple virtqueues of
+   different sizes.  Can your structure hand those cases?
+
+I'm concerned that this approach to device recovery is invasive and hard
+to test.  Instead I would use VIRTIO's Device Status Field
+DEVICE_NEEDS_RESET bit to tell the guest driver that a reset is
+necessary.  This is more disruptive - drivers either have to resubmit or
+fail I/O with EIO - but it's also simple and more likely to work
+correctly (it only needs to be implemented correctly in the guest
+driver, not in the many available vhost-user backend implementations).
+
+Stefan
+
+--rwEMma7ioTxnRzrJ
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIcBAEBCAAGBQJcOLt3AAoJEONU5rjiOLn4lq8QALyyrzUI0Sx/9ZMGHUKxF/LH
-Gi3Pc3XWuX/Z+xQ6o71QUwojiX2vDnGruFtBBRqmGa7RIT1NAUkO6Qi0YTJgT5OA
-ns9W8n20FbuuSair30eCxslxghK2lFxyc0uzjKxaMTG7FDJJ6qQOGZeOC1n07tci
-7W9BH+basQGRrQIHdpjQaOpBKbTPBnd8jwag1R8xiyrJ6LhIvH7E3nAeRjkxgena
-DvxrjzACSmksME9ITPsffRrfA08e4/zxM7QY/dCJuFBDxMs67Jjjc4TcokvP3akD
-EJAE96xBkbInGUs14y35eYu9mpW3QbahaUQvvGWSYrzfofpbsA02ukxEneOzv461
-jbddcAWsSwjSlQ9/CRD8UFrBLibxHOj3vWhCs+jlNSf06DVSAr5JeDMdhksgbc0N
-mvgDfe5ecyiYgyYYgQE94+a3vFE+ton3Tu7vJJbMZfegdcucKO77+doM7u0bDYbQ
-GzXK8vF/DGO06gWjQw3ghJ5aPK9xVQITSVZqbpsQhyPksPk1dmrZKa9KiksN53Ik
-y39yNAj4fNkBlWFOI77hIt8Q1JuAD1lsBz+KFXOW/rtkZtr98yqbtZBZWDnfG94x
-P53gVl/0nAd543jKO+w4JTtHqsOSp+AyHuZ/RVVaLtqZXJyZg+zGBYJCfl3yR1wY
-8RpulPXIJKsKglaNXTyZ
-=7rFW
+iQEcBAEBAgAGBQJcOLwGAAoJEJykq7OBq3PIPDAIALmWnMr95QAMUz0X5V6gj7qL
+FGZgFv07N4Chwox7T2Vt/FYluWmkCpvATtX+hSuyHKV7DEePY7K4e4wNDBLH4N4g
+WWifZ2YJ9kGkQ6i0yJKImPAA9c+Xeg3nsh/SWQYxrQk6D0RlM0b+L8s78SgIo89w
+JNohYBrR/xCGTL+Ns+oIwXGvTyRwZLjR6kUdn6yxTT3Cz7DJYm68oceIQyocEj4N
+aAkDcbiqq0TA9mVU9AiZ+/eJMN89CgmCrLYyDJrIk7GwBSerZSrh82Xblm2jgOz3
+44WhFozK+vUvNBmvCNImpLzS6usBPJ3F/8LZvxisLR3lGfI9RsyTaboghpF9VBY=
+=4r9+
 -----END PGP SIGNATURE-----
 
---hYUPomZYC5XKFeZrPx4UFwLCs9zLwtGsx--
+--rwEMma7ioTxnRzrJ--
