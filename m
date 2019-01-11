@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55768)
+Received: from eggs.gnu.org ([209.51.188.92]:55728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghsgb-0004EB-43
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghsga-0004BR-7T
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:01:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghseI-0000vS-7x
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1ghseI-0000vD-2D
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:43 -0500
-Received: from mga11.intel.com ([192.55.52.93]:51739)
+Received: from mga11.intel.com ([192.55.52.93]:51734)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <lizhijian@cn.fujitsu.com>)
-	id 1ghseH-0000kA-W1
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:42 -0500
+	id 1ghseH-0000hn-Ov
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:58:41 -0500
 From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Date: Fri, 11 Jan 2019 16:57:49 +0800
-Message-Id: <1547197071-14504-3-git-send-email-lizhijian@cn.fujitsu.com>
-In-Reply-To: <1547197071-14504-1-git-send-email-lizhijian@cn.fujitsu.com>
-References: <1547197071-14504-1-git-send-email-lizhijian@cn.fujitsu.com>
-Subject: [Qemu-devel] [PATCH v5 2/4] hw/core/loader.c: Read as long as
- possible in load_image_size()
+Date: Fri, 11 Jan 2019 16:57:47 +0800
+Message-Id: <1547197071-14504-1-git-send-email-lizhijian@cn.fujitsu.com>
+Subject: [Qemu-devel] [PATCH v5 0/4] allow to load initrd below 4G for
+ recent kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +24,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org
-Cc: philmd@redhat.com, zhijianx.li@intel.com, Li Zhijian <lizhijian@cn.fujitsu.com>, Richard Henderson <richard.henderson@linaro.org>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: philmd@redhat.com, zhijianx.li@intel.com, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefano Garzarella <sgarzare@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Don't expect read(2) can always read as many as it's told.
+Long long ago, linux kernel has supported up to 4G initrd, but it's header
+still hard code to allow loading initrd below 2G only.
+ cutting from arch/boot/x86/header.S:
+ # (Header version 0x0203 or later) the highest safe address for the contents
+ # of an initrd. The current kernel allows up to 4 GB, but leave it at 2 GB to
+ # avoid possible bootloader bugs.
 
-CC: Richard Henderson <richard.henderson@linaro.org>
+In order to support more than 2G initrd, qemu must allow loading initrd
+above 2G address. Luckly, recent kernel introduced a new field to linux header
+named xloadflags:XLF_CAN_BE_LOADED_ABOVE_4G which tells bootloader an optional
+and safe address to load initrd.
+
+It's believed that if XLF_CAN_BE_LOADED_ABOVE_4G is set, initrd can
+be loaded into any address.
+
+Default roms(Seabios + optionrom(linuxboot_dma)) works as expected with this
+patchset.
+
+I stole some comments from yours, fell free to let me know if you don't like this.
+
+changes:
+V5: add a few reviewed-tag and update 4/4 changelog and comments
+V4:
+  - add Reviwed-by tag to 1/4 and 2/4
+  - use scripts/update-linux-headers.sh to import bootparam.h
+  - minor fix at commit log
+V3:
+ - rebase code basing on http://patchwork.ozlabs.org/cover/1005990 and
+   https://patchew.org/QEMU/20181122133507.30950-1-peter.maydell@linaro.org
+ - add new patch 3/4 to import header bootparam.h (Michael S. Tsirkin)
+
+V2: add 2 patches(3/5, 4/5) to fix potential loading issue.
+
+
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 CC: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+CC: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+CC: Peter Maydell <peter.maydell@linaro.org>
 
----
-V5: update subject and add reviewed-by tag (Stefano Garzarella)
-V4: add reviewed-by tag
----
- hw/core/loader.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+Li Zhijian (4):
+  unify len and addr type for memory/address APIs
+  hw/core/loader.c: Read as long as possible in load_image_size()
+  i386: import & use bootparam.h
+  i386: allow to load initrd below 4G for recent linux
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index fa41842..9cbceab 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -77,21 +77,20 @@ int64_t get_image_size(const char *filename)
- ssize_t load_image_size(const char *filename, void *addr, size_t size)
- {
-     int fd;
--    ssize_t actsize;
-+    ssize_t actsize, l = 0;
- 
-     fd = open(filename, O_RDONLY | O_BINARY);
-     if (fd < 0) {
-         return -1;
-     }
- 
--    actsize = read(fd, addr, size);
--    if (actsize < 0) {
--        close(fd);
--        return -1;
-+    while ((actsize = read(fd, addr + l, size - l)) > 0) {
-+        l += actsize;
-     }
-+
-     close(fd);
- 
--    return actsize;
-+    return actsize < 0 ? -1 : l;
- }
- 
- /* read()-like version */
+ exec.c                                       | 47 ++++++++++++++--------------
+ hw/core/loader.c                             | 11 +++----
+ hw/i386/pc.c                                 | 32 ++++++++++++++-----
+ include/exec/cpu-all.h                       |  2 +-
+ include/exec/cpu-common.h                    |  8 ++---
+ include/exec/memory.h                        | 22 ++++++-------
+ include/standard-headers/asm-x86/bootparam.h | 34 ++++++++++++++++++++
+ scripts/update-linux-headers.sh              |  4 +++
+ 8 files changed, 106 insertions(+), 54 deletions(-)
+ create mode 100644 include/standard-headers/asm-x86/bootparam.h
+
 -- 
 2.7.4
