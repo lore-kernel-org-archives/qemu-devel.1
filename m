@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34609)
+Received: from eggs.gnu.org ([209.51.188.92]:34995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghwd9-000819-Jf
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:13:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ghwfA-0000ee-7E
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:15:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghwd8-0005hl-K2
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:13:47 -0500
-Received: from mail-wr1-f43.google.com ([209.85.221.43]:36911)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ghwd8-0005hT-Bh
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:13:46 -0500
-Received: by mail-wr1-f43.google.com with SMTP id s12so15161698wrt.4
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 05:13:46 -0800 (PST)
-References: <20190110174516.21586-1-alex.bennee@linaro.org>
-	<20190110174516.21586-17-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <dd4fba2b-ed56-b715-04f4-c2489b5430f6@redhat.com>
-Date: Fri, 11 Jan 2019 14:13:43 +0100
+	(envelope-from <kwolf@redhat.com>) id 1ghwf9-0006rd-6d
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:15:52 -0500
+Date: Fri, 11 Jan 2019 14:15:38 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190111131538.GH5010@dhcp-200-186.str.redhat.com>
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
+	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
+	<20190111122151.GF5010@dhcp-200-186.str.redhat.com>
+	<8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20190110174516.21586-17-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 16/19] docker: Use a stable snapshot for
- Debian Sid
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-Cc: ymankad@redhat.com, Fam Zheng <fam@euphon.net>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 1/10/19 6:45 PM, Alex Bennée wrote:
-> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Am 11.01.2019 um 13:59 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 11.01.2019 15:21, Kevin Wolf wrote:
+> > Am 11.01.2019 um 12:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> >> 11.01.2019 13:41, Kevin Wolf wrote:
+> >>> Am 10.01.2019 um 14:20 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> >>>> drv_co_block_status digs bs->file for additional, more accurate search
+> >>>> for hole inside region, reported as DATA by bs since 5daa74a6ebc.
+> >>>>
+> >>>> This accuracy is not free: assume we have qcow2 disk. Actually, qcow2
+> >>>> knows, where are holes and where is data. But every block_status
+> >>>> request calls lseek additionally. Assume a big disk, full of
+> >>>> data, in any iterative copying block job (or img convert) we'll call
+> >>>> lseek(HOLE) on every iteration, and each of these lseeks will have to
+> >>>> iterate through all metadata up to the end of file. It's obviously
+> >>>> ineffective behavior. And for many scenarios we don't need this lseek
+> >>>> at all.
+> >>>>
+> >>>> So, let's "5daa74a6ebc" by default, leaving an option to return
+> >>>> previous behavior, which is needed for scenarios with preallocated
+> >>>> images.
+> >>>>
+> >>>> Add iotest illustrating new option semantics.
+> >>>>
+> >>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >>>
+> >>> I still think that an option isn't a good solution and we should try use
+> >>> some heuristics instead.
+> >>
+> >> Do you think that heuristics would be better than fair cache for lseek
+> >> results?
+> > 
+> > I don't think lseek() results are cachable, at least for images that can
+> > share BLK_PERM_WRITE between processes.
+> > 
+> >> I don't see good heuristics, neither want to implement lseek optimizations.
+> >> In our cases we don't need lseek under qcow2 at all, and it's obviously better
+> >> just don't lseek in these cases.
+> > 
+> > I suggested one: Pass large contiguous allocated ranges to the protocol
+> > driver, but just assume that the allocation status is correct in the
+> > format layer if they are small.
 > 
-> The Debian Sid repository is not garanteed to be stable, as his
-> 'unstable' name suggest :)
-> To allow quick testing, packages are pushed various time a day,
-> which my be annoying when trying to use it for stable development
-> (which is not recommended, but Sid provides edge packages we use
-> for testing).
-> 
-> Debian provides repositories snapshots which are suitable for our
-> use. Pick a recent date that works. When required, update to newer
-> releases will be easy.
-> 
-> This fixes current issues with this image:
-> 
->   $ make docker-image-debian-sid
->   [...]
->   The following packages have unmet dependencies:
->    build-essential : Depends: dpkg-dev (>= 1.17.11) but it is not going to be installed
->    git : Depends: perl but it is not going to be installed
->          Depends: liberror-perl but it is not going to be installed
->    pkg-config : Depends: libdpkg-perl but it is not going to be installed
->    texinfo : Depends: perl (>= 5.26.2-6) but it is not going to be installed
->              Depends: libtext-unidecode-perl but it is not going to be installed
->              Depends: libxml-libxml-perl but it is not going to be installed
->   E: Unable to correct problems, you have held broken packages.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> [AJB: also tweak FROM to a earlier snapshot]
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  tests/docker/dockerfiles/debian-sid.docker | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
-> index 4e4cda0ba5..676941cb32 100644
-> --- a/tests/docker/dockerfiles/debian-sid.docker
-> +++ b/tests/docker/dockerfiles/debian-sid.docker
-> @@ -11,7 +11,12 @@
->  # updated and trigger a re-build.
->  #
->  
-> -FROM debian:sid-slim
-> +# This must be earlier than the snapshot date we are aiming for
-> +FROM debian:sid-20181011-slim
-> +
-> +# Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
-> +ENV DEBIAN_SNAPSHOT_DATE "20181030"
-> +RUN sed -i "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [check-valid-until=no] \1snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT_DATE} \2%" /etc/apt/sources.list
+> So, for fully allocated image, we will call lseek always?
 
-These 2 lines are now dup (probably because Fam's PR entered before this
-series).
+If they are fully contiguous, yes. But that's a single lseek() call per
+image then instead of an lseek() for every 64k, so not a big problem.
 
->  
->  # Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
->  ENV DEBIAN_SNAPSHOT_DATE "20181030"
-> 
+In the more realistic case, you will still call lseek() occasionally
+because you will have some fragmentation, but the fragments can be
+rather large. But it should still significantly reduce them compared to
+now because you skip it for those parts with small contiguous
+allocations where lseek() would be called a lot today.
 
-Without the dup lines:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Kevin
