@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60874)
+Received: from eggs.gnu.org ([209.51.188.92]:34527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ght2O-0005A4-I3
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:23:39 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ghtAB-0000fZ-Fm
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:31:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ght2N-0005us-OD
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:23:36 -0500
-Date: Fri, 11 Jan 2019 09:23:13 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190111092313.GD18491@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
-	<1547194672-24169-4-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1547194672-24169-4-git-send-email-thuth@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/3] configure: Force the C standard to
- gnu99
+	(envelope-from <kraxel@redhat.com>) id 1ghtA7-0003EF-5P
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:31:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42992)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghtA3-00034n-1K
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:31:33 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 11 Jan 2019 10:31:11 +0100
+Message-Id: <20190111093116.17188-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/5] vfio/display: add edid support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +21,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-ppc@nongnu.org, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, intel-gvt-dev@lists.freedesktop.org, Gerd Hoffmann <kraxel@redhat.com>
 
-On Fri, Jan 11, 2019 at 09:17:52AM +0100, Thomas Huth wrote:
-> Different versions of GCC and Clang use different versions of the C sta=
-ndard.
-> This repeatedly caused problems already, e.g. with duplicated typedefs:
->=20
->  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
->=20
-> or with for-loop variable initializers:
->=20
->  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
->=20
-> To avoid these problems, we should enforce the C language version to th=
-e
-> same level for all compilers. Since our minimum compiler versions is
-> GCC v4.8, our best option is "gnu99" for C code right now ("gnu17" is n=
-ot
-> available there yet, and "gnu11" is marked as "experimental"), and "gnu=
-++98"
-> for the few C++ code that we have in the repository.
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  configure | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+The 5.0-rc1 linux kernel header update -- which contains the vfio api
+update for edid support -- is about to land in qemu master.  Intel just
+posted patches implementing EDID support.  Time to undust the test
+patches, polish them and post them for review & merge.
 
+This series adds EDID support to the qemu vfio display code.  Various
+display-reladed information -- most importantly the display resolution
+which should be used -- is passed to the guest that way.  The (initial)
+display resolution can be set using the new xres and yres properties.
+When supported by the UI it will also be updated on window resizes.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Gerd Hoffmann (5):
+  vfio: update kernel headers.
+  vfio/display: add edid support.
+  vfio/display: add xres + yres properties
+  vfio/display: delay link up event
+  [debug] some logging
 
+ hw/vfio/pci.h                 |   2 +
+ include/hw/vfio/vfio-common.h |   4 ++
+ linux-headers/linux/vfio.h    |  50 +++++++++++++
+ hw/vfio/display.c             | 158 ++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/pci.c                 |   2 +
+ 5 files changed, 216 insertions(+)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- 
+2.9.3
