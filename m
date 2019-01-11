@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47720)
+Received: from eggs.gnu.org ([209.51.188.92]:47731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghs13-0003Tf-Gz
+	(envelope-from <thuth@redhat.com>) id 1ghs14-0003Tl-H7
 	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:18:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ghs11-0007Jn-JI
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:18:09 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghs0y-0007HS-Am
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:18:10 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 11 Jan 2019 09:17:51 +0100
-Message-Id: <1547194672-24169-3-git-send-email-thuth@redhat.com>
+Date: Fri, 11 Jan 2019 09:17:50 +0100
+Message-Id: <1547194672-24169-2-git-send-email-thuth@redhat.com>
 In-Reply-To: <1547194672-24169-1-git-send-email-thuth@redhat.com>
 References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 2/3] ppc: Fix duplicated typedefs to be able
- to compile with Clang in gnu99 mode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 1/3] ppc: Move spapr-related prototypes from
+ xics.h into a seperate header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,103 +26,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, pbonzini@redhat.com, qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-When compiling the ppc code with clang and -std=gnu99, there are a
-couple of warnings/errors like this one:
+When compiling with Clang in -std=3Dgnu99 mode, there is a warning/error:
 
-  CC      ppc64-softmmu/hw/intc/xics.o
-In file included from hw/intc/xics.c:35:
-include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is a C11 feature
+  CC      ppc64-softmmu/hw/intc/xics_spapr.o
+In file included from /home/thuth/devel/qemu/hw/intc/xics_spapr.c:34:
+/home/thuth/devel/qemu/include/hw/ppc/xics.h:203:34: error: redefinition =
+of typedef 'sPAPRMachineState' is a C11 feature
       [-Werror,-Wtypedef-redefinition]
-typedef struct ICPState ICPState;
-                        ^
-target/ppc/cpu.h:1181:25: note: previous definition is here
-typedef struct ICPState ICPState;
-                        ^
-Work around the problems by including the proper headers instead.
+typedef struct sPAPRMachineState sPAPRMachineState;
+                                 ^
+/home/thuth/devel/qemu/include/hw/ppc/spapr_irq.h:25:34: note: previous d=
+efinition is here
+typedef struct sPAPRMachineState sPAPRMachineState;
+                                 ^
 
+We have to remove the duplicated typedef here and include "spapr.h" inste=
+ad.
+But "spapr.h" should not be included for the pnv machine files. So move
+the spapr-related prototypes into a new file called "xics_spapr.h" instea=
+d.
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/hw/ppc/spapr.h      |  5 +++--
- include/hw/ppc/spapr_xive.h |  2 --
- target/ppc/cpu.h            | 13 +++++++++----
- 3 files changed, 12 insertions(+), 8 deletions(-)
+ hw/intc/xics_kvm.c          |  1 +
+ hw/intc/xics_spapr.c        |  1 +
+ hw/ppc/spapr_irq.c          |  1 +
+ include/hw/ppc/xics.h       |  7 -------
+ include/hw/ppc/xics_spapr.h | 37 +++++++++++++++++++++++++++++++++++++
+ 5 files changed, 40 insertions(+), 7 deletions(-)
+ create mode 100644 include/hw/ppc/xics_spapr.h
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 9e01a5a..a947a0a 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -8,15 +8,16 @@
- #include "hw/mem/pc-dimm.h"
- #include "hw/ppc/spapr_ovec.h"
- #include "hw/ppc/spapr_irq.h"
-+#include "hw/ppc/spapr_xive.h"  /* For sPAPRXive */
-+#include "hw/ppc/xics.h"        /* For ICSState */
- 
- struct VIOsPAPRBus;
- struct sPAPRPHBState;
- struct sPAPRNVRAM;
-+
- typedef struct sPAPREventLogEntry sPAPREventLogEntry;
- typedef struct sPAPREventSource sPAPREventSource;
- typedef struct sPAPRPendingHPT sPAPRPendingHPT;
--typedef struct ICSState ICSState;
--typedef struct sPAPRXive sPAPRXive;
- 
- #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
- #define SPAPR_ENTRY_POINT       0x100
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 7fdc250..9bec919 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -41,8 +41,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
- bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
- void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
- 
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index ac94594..dff1330 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -34,6 +34,7 @@
+ #include "sysemu/kvm.h"
+ #include "hw/ppc/spapr.h"
+ #include "hw/ppc/xics.h"
++#include "hw/ppc/xics_spapr.h"
+ #include "kvm_ppc.h"
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 9c1a90d..de6cc15 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -32,6 +32,7 @@
+ #include "qemu/timer.h"
+ #include "hw/ppc/spapr.h"
+ #include "hw/ppc/xics.h"
++#include "hw/ppc/xics_spapr.h"
+ #include "hw/ppc/fdt.h"
+ #include "qapi/visitor.h"
+=20
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 5fce72f..1da7a32 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -14,6 +14,7 @@
+ #include "hw/ppc/spapr.h"
+ #include "hw/ppc/spapr_xive.h"
+ #include "hw/ppc/xics.h"
++#include "hw/ppc/xics_spapr.h"
+ #include "sysemu/kvm.h"
+=20
+ #include "trace.h"
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 07508cb..fad786e 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -200,13 +200,6 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)=
+;
+ void ics_resend(ICSState *ics);
+ void icp_resend(ICPState *ss);
+=20
 -typedef struct sPAPRMachineState sPAPRMachineState;
 -
- void spapr_xive_hcall_init(sPAPRMachineState *spapr);
- void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
-                    uint32_t phandle);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 486abaf..bde4dff 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -23,6 +23,11 @@
- #include "qemu-common.h"
- #include "qemu/int128.h"
- 
-+#ifndef CONFIG_USER_ONLY
-+#include "hw/ppc/xive.h" /* for XiveTCTX */
-+#include "hw/ppc/xics.h" /* for ICPState */
-+#endif
+-void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+-                   uint32_t phandle);
+-int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
+-void xics_spapr_init(sPAPRMachineState *spapr);
+-
+ Object *icp_create(Object *cpu, const char *type, XICSFabric *xi,
+                    Error **errp);
+=20
+diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+new file mode 100644
+index 0000000..b1ab27d
+--- /dev/null
++++ b/include/hw/ppc/xics_spapr.h
+@@ -0,0 +1,37 @@
++/*
++ * QEMU PowerPC pSeries Logical Partition (aka sPAPR) hardware System Em=
+ulator
++ *
++ * PAPR Virtualized Interrupt System, aka ICS/ICP aka xics
++ *
++ * Copyright (c) 2010, 2011 David Gibson, IBM Corporation.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
 +
- //#define PPC_EMULATE_32BITS_HYPV
- 
- #if defined (TARGET_PPC64)
-@@ -1177,8 +1182,6 @@ do {                                            \
- 
- typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
- typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
--typedef struct XiveTCTX XiveTCTX;
--typedef struct ICPState ICPState;
- 
- /**
-  * PowerPCCPU:
-@@ -1197,11 +1200,13 @@ struct PowerPCCPU {
-     int vcpu_id;
-     uint32_t compat_pvr;
-     PPCVirtualHypervisor *vhyp;
--    ICPState *icp;
--    XiveTCTX *tctx;
-     void *machine_data;
-     int32_t node_id; /* NUMA node this CPU belongs to */
-     PPCHash64Options *hash64_opts;
-+#ifndef CONFIG_USER_ONLY
-+    ICPState *icp;
-+    XiveTCTX *tctx;
-+#endif
- 
-     /* Fields related to migration compatibility hacks */
-     bool pre_2_8_migration;
--- 
++#ifndef XICS_SPAPR_H
++#define XICS_SPAPR_H
++
++#include "hw/ppc/spapr.h"
++
++void spapr_dt_xics(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
++                   uint32_t phandle);
++int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
++void xics_spapr_init(sPAPRMachineState *spapr);
++
++#endif /* XICS_SPAPR_H */
+--=20
 1.8.3.1
