@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36962)
+Received: from eggs.gnu.org ([209.51.188.92]:37214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gi0Xc-0003OP-UP
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:24:22 -0500
+	(envelope-from <berrange@redhat.com>) id 1gi0Z3-0004UY-Tw
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:25:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gi0Xb-0006Ah-2x
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:24:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33542)
+	(envelope-from <berrange@redhat.com>) id 1gi0Z2-0006Z1-OZ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:25:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gi0Xa-0006A2-Sr
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:24:19 -0500
-Date: Fri, 11 Jan 2019 12:24:00 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190111122047-mutt-send-email-mst@kernel.org>
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<20190110102551.GD19025@stefanha-x1.localdomain>
-	<CAONzpcYgVWUFg1uSHOLzOS5en2vHP_=oNXQvWQEZd9FdYi2uxA@mail.gmail.com>
-	<20190111155342.GA14776@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gi0Z2-0006Ye-Iq
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:25:48 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 48DADA0A4B
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 17:25:47 +0000 (UTC)
+Date: Fri, 11 Jan 2019 17:25:42 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190111172542.GA3705@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181217231639.24250-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190111155342.GA14776@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 0/7] vhost-user-blk: Add support
- for backend reconnecting
+In-Reply-To: <20181217231639.24250-1-pbonzini@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] crypto: finish removing TABs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Yongji Xie <elohimes@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, Jan 11, 2019 at 03:53:42PM +0000, Stefan Hajnoczi wrote:
-> I'm concerned that this approach to device recovery is invasive and hard
-> to test.  Instead I would use VIRTIO's Device Status Field
-> DEVICE_NEEDS_RESET bit to tell the guest driver that a reset is
-> necessary.  This is more disruptive - drivers either have to resubmit or
-> fail I/O with EIO - but it's also simple and more likely to work
-> correctly (it only needs to be implemented correctly in the guest
-> driver, not in the many available vhost-user backend implementations).
-> 
-> Stefan
+On Tue, Dec 18, 2018 at 12:16:39AM +0100, Paolo Bonzini wrote:
+> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  crypto/aes.c    | 414 ++++++++++++++++-----------------
+>  crypto/desrfb.c | 594 ++++++++++++++++++++++++------------------------
+>  2 files changed, 504 insertions(+), 504 deletions(-)
 
-Unfortunately drivers don't support DEVICE_NEEDS_RESET yet.
-I'll be happy to accept patches, but this means we
-can't depend on DEVICE_NEEDS_RESET for basic functionality
-like reconnect. And given virtio 1.0 has been there
-for a while now, I suspect the only way to start using
-it is by adding a new feature flag.
+Acked-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Unfortunate but true.
-
--- 
-MST
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
