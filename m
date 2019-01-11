@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40725)
+Received: from eggs.gnu.org ([209.51.188.92]:43017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gi5Gy-0004sL-PO
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:27:29 -0500
+	(envelope-from <philmd@redhat.com>) id 1gi5Sn-0006xn-JP
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:39:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gi5Gw-000814-40
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:27:28 -0500
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:35830)
+	(envelope-from <philmd@redhat.com>) id 1gi5Sm-0004iy-AC
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:39:41 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:33706)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gi5Gv-00080j-PA
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:27:25 -0500
-Received: by mail-yb1-xb44.google.com with SMTP id f187so6457270ybb.2
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:27:24 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gi5Sm-0004hm-2s
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 17:39:40 -0500
+Received: by mail-wr1-f66.google.com with SMTP id c14so16898014wrr.0
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 14:39:37 -0800 (PST)
+References: <154724210898.37.4367801081630939892@2d170d368aaa>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <834ad86b-27d1-ce01-91dc-a5c939061ce9@redhat.com>
+Date: Fri, 11 Jan 2019 23:39:34 +0100
 MIME-Version: 1.0
-References: <20190111220131.27153-1-jcmvbkbc@gmail.com>
-	<2064503c-ed12-de29-59a9-46fa24d22f60@linaro.org>
-	<CAMo8BfJaTbO0LSBWk7+WeFw7Oc6Sy2ykxaQcWTBeVGCdN9+aOg@mail.gmail.com>
-	<cdaaa0bc-8282-6a92-886a-7dd5f2adfa46@linaro.org>
-	<CAMo8Bf+FJUO46mv8bg7Rd2vH+noTsDHBrcfY=mbchaJoDd5eng@mail.gmail.com>
-In-Reply-To: <CAMo8Bf+FJUO46mv8bg7Rd2vH+noTsDHBrcfY=mbchaJoDd5eng@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Fri, 11 Jan 2019 14:27:12 -0800
-Message-ID: <CAMo8Bf+oiqDn9+RSiUXKwXfzWemJNrc6AQMRLMEbNSA3tfMavw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] target/xtensa: rework zero overhead
- loops implementation
+In-Reply-To: <154724210898.37.4367801081630939892@2d170d368aaa>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] contrib/gitdm: Fix a typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: fam@euphon.net, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, alex.bennee@linaro.org
 
-On Fri, Jan 11, 2019 at 2:23 PM Max Filippov <jcmvbkbc@gmail.com> wrote:
->
-> On Fri, Jan 11, 2019 at 2:17 PM Richard Henderson
-> <richard.henderson@linaro.org> wrote:
-> >
-> > On 1/12/19 9:14 AM, Max Filippov wrote:
-> > >>> +        /*
-> > >>> +         * 0 in the csbase_lend field means that there may not be a loopback
-> > >>> +         * for any instruction that starts inside this page. Any other value
-> > >>> +         * means that an instruction that ends at this offset from the page
-> > >>> +         * start may loop back.
-> > >>
-> > >> Nit: s/may/will/g
-> > >>
-> > >> Using "may" makes it seem like we may have missed a case that should have
-> > >> looped back.
-> > >
-> > > Using "will" makes it seem like it always loops back, but it doesn't do it
-> > > when LCOUNT is 0.
-> >
-> > Err, no, you covered that in the first sentence, where 0 means that it will not
-> > loop back.
->
-> What I'm saying is that "Any other value means that an instruction that ends
-> at this offset from the page start will loop back." sounds like that instruction
-> will loop back unconditionally. LCOUNT = 0 is the condition when this doesn't
-> happen, and it's not encoded in the TB flags. It's checked in the generated
-> loopback code.
+On 1/11/19 10:28 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20190111155555.8270-1-philmd@redhat.com/
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Message-id: 20190111155555.8270-1-philmd@redhat.com
+> Type: series
+> Subject: [Qemu-devel] [PATCH] contrib/gitdm: Fix a typo
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback --color=always base..
 
-Maybe "Any other value means that an instruction that ends at this offset
-from the page start may loop back and will need loopback code to be generated"?
+I suppose Paolo expected his PR to land to upgrade patchew, and patchew
+is still processing from an old queue?
 
-
--- 
-Thanks.
--- Max
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> c995f5f contrib/gitdm: Fix a typo
+> 
+> === OUTPUT BEGIN ===
+> Unknown option: color
+> Usage:
+> 
+>     checkpatch.pl [OPTION]... [FILE]...
+>     checkpatch.pl [OPTION]... [GIT-REV-LIST]
+> 
+> Version: 0.31
+> 
+> Options:
+>   -q, --quiet                quiet
+>   --no-tree                  run without a kernel tree
+>   --no-signoff               do not check for 'Signed-off-by' line
+>   --patch                    treat FILE as patchfile
+>   --branch                   treat args as GIT revision list
+>   --emacs                    emacs compile window format
+>   --terse                    one line per report
+>   -f, --file                 treat FILE as regular source file
+>   --strict                   fail if only warnings are found
+>   --root=PATH                PATH to the kernel tree root
+>   --no-summary               suppress the per-file summary
+>   --mailback                 only produce a report in case of warnings/errors
+>   --summary-file             include the filename in summary
+>   --debug KEY=[0|1]          turn on/off debugging of KEY, where KEY is one of
+>                              'values', 'possible', 'type', and 'attr' (default
+>                              is all off)
+>   --test-only=WORD           report only warnings/errors containing WORD
+>                              literally
+>   -h, --help, --version      display this help and exit
+> 
+> When FILE is - read standard input.
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20190111155555.8270-1-philmd@redhat.com/testing.checkpatch/?type=message.
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
