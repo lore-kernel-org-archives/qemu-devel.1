@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40147)
+Received: from eggs.gnu.org ([209.51.188.92]:40197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gi2mM-0006Pd-UV
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:47:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1gi2mP-0006RV-0B
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:47:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gi2mL-0004xv-Uq
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:47:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1gi2mN-0004zm-Jv
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 14:47:44 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 11 Jan 2019 13:47:12 -0600
-Message-Id: <20190111194720.15671-1-eblake@redhat.com>
+Date: Fri, 11 Jan 2019 13:47:16 -0600
+Message-Id: <20190111194720.15671-5-eblake@redhat.com>
+In-Reply-To: <20190111194720.15671-1-eblake@redhat.com>
+References: <20190111194720.15671-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/8] Promote x-nbd-server-add-bitmap to
- stable
+Subject: [Qemu-devel] [PATCH v3 4/8] nbd: Merge nbd_export_set_name into
+ nbd_export_new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,58 +23,224 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-block@nongnu.org
+Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Or rather, move its functionality into nbd-server-add.  And as
-a side effect, teach qemu-nbd how to export a persistent bitmap
-without having to go through a qemu process and several QMP
-commands.
+The existing NBD code had a weird split where nbd_export_new()
+created an export but did not add it to the list of exported
+names until a later nbd_export_set_name() came along and grabbed
+a second reference on the object; later, the first call to
+nbd_export_close() drops the second reference while removing
+the export from the list.  This is in part because the QAPI
+NbdServerRemoveNode enum documents the possibility of adding a
+mode where we could do a soft disconnect: preventing new clients,
+but waiting for existing clients to gracefully quit, based on
+the mode used when calling nbd_export_close().
 
-Based-on: <20181221093529.23855-1-jsnow@redhat.com>
-[jsnow: 0/11 bitmaps: remove x- prefix from QMP api]
-Based-on: <20190111163519.11457-1-philmd@redhat.com>
-[philmd: qemu-nbd: Rename 'exp' variable clashing with math::exp() symbol=
-]
+But in spite of all that, note that we never change the name of
+an NBD export while it is exposed, which means it is easier to
+just inline the process of setting the name as part of creating
+the export.
 
-Available at: https://repo.or.cz/qemu/ericb.git nbd-bitmap-add-v3
+Inline the contents of nbd_export_set_name() and
+nbd_export_set_description() into the two points in an export
+lifecycle where they matter, then adjust both callers to pass
+the name up front.  Note that for creation, all callers pass a
+non-NULL name, (passing NULL at creation was for old style
+servers, but we removed support for that in commit 7f7dfe2a),
+so we can add an assert and do things unconditionally; but for
+cleanup, because of the dual nature of nbd_export_close(), we
+still have to be careful to avoid use-after-free.  Along the
+way, add a comment reminding ourselves of the potential of
+adding a middle mode disconnect.
 
-Since v2:
-- split old patch 1 into 3 parts
-- add even more tests of expected error messages
-- rebase on top of 'exp' rename
-- improve commit messages
-- add some R-b where it made sense
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-001/8:[down] 'nbd: Add some error case testing to iotests 223'
-002/8:[down] 'nbd: Forbid nbd-server-stop when server is not running'
-003/8:[0011] [FC] 'nbd: Only require disabled bitmap for read-only export=
-s'
-004/8:[0020] [FC] 'nbd: Merge nbd_export_set_name into nbd_export_new'
-005/8:[0008] [FC] 'nbd: Allow bitmap export during QMP nbd-server-add'
-006/8:[----] [--] 'nbd: Remove x-nbd-server-add-bitmap'
-007/8:[0009] [FC] 'nbd: Merge nbd_export_bitmap into nbd_export_new'
-008/8:[0004] [FC] 'qemu-nbd: Add --bitmap=3DNAME option'
+---
+v3: add comment on potential close mode semantics [Vladimir],
+rebase to 'exp' rename [Phillipe]; no major code change so R-b added
+---
+ include/block/nbd.h |  3 +--
+ blockdev-nbd.c      |  5 ++---
+ nbd/server.c        | 52 ++++++++++++++++++++-------------------------
+ qemu-nbd.c          |  8 +++----
+ 4 files changed, 29 insertions(+), 39 deletions(-)
 
-Eric Blake (8):
-  nbd: Add some error case testing to iotests 223
-  nbd: Forbid nbd-server-stop when server is not running
-  nbd: Only require disabled bitmap for read-only exports
-  nbd: Merge nbd_export_set_name into nbd_export_new
-  nbd: Allow bitmap export during QMP nbd-server-add
-  nbd: Remove x-nbd-server-add-bitmap
-  nbd: Merge nbd_export_bitmap into nbd_export_new
-  qemu-nbd: Add --bitmap=3DNAME option
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 65402d33964..2f9a2aeb73c 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -295,6 +295,7 @@ typedef struct NBDExport NBDExport;
+ typedef struct NBDClient NBDClient;
 
- qemu-nbd.texi              |   4 ++
- qapi/block.json            |  30 ++------
- include/block/nbd.h        |  12 ++--
- blockdev-nbd.c             |  36 +++-------
- hmp.c                      |   5 +-
- nbd/server.c               | 136 +++++++++++++++++--------------------
- qemu-nbd.c                 |  17 +++--
- tests/qemu-iotests/223     |  50 +++++++++++---
- tests/qemu-iotests/223.out |  23 +++++--
- 9 files changed, 160 insertions(+), 153 deletions(-)
+ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
+size,
++                          const char *name, const char *description,
+                           uint16_t nbdflags, void (*close)(NBDExport *),
+                           bool writethrough, BlockBackend *on_eject_blk,
+                           Error **errp);
+@@ -306,8 +307,6 @@ void nbd_export_put(NBDExport *exp);
+ BlockBackend *nbd_export_get_blockdev(NBDExport *exp);
 
+ NBDExport *nbd_export_find(const char *name);
+-void nbd_export_set_name(NBDExport *exp, const char *name);
+-void nbd_export_set_description(NBDExport *exp, const char *description)=
+;
+ void nbd_export_close_all(void);
+
+ void nbd_client_new(QIOChannelSocket *sioc,
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index ca584919194..582ffded77f 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -174,14 +174,13 @@ void qmp_nbd_server_add(const char *device, bool ha=
+s_name, const char *name,
+         writable =3D false;
+     }
+
+-    exp =3D nbd_export_new(bs, 0, -1, writable ? 0 : NBD_FLAG_READ_ONLY,
++    exp =3D nbd_export_new(bs, 0, -1, name, NULL,
++                         writable ? 0 : NBD_FLAG_READ_ONLY,
+                          NULL, false, on_eject_blk, errp);
+     if (!exp) {
+         return;
+     }
+
+-    nbd_export_set_name(exp, name);
+-
+     /* The list of named exports has a strong reference to this export n=
+ow and
+      * our only way of accessing it is through nbd_export_find(), so we =
+can drop
+      * the strong reference that is @exp. */
+diff --git a/nbd/server.c b/nbd/server.c
+index 98327088cb4..bb5438c448b 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1456,6 +1456,7 @@ static void nbd_eject_notifier(Notifier *n, void *d=
+ata)
+ }
+
+ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
+size,
++                          const char *name, const char *description,
+                           uint16_t nbdflags, void (*close)(NBDExport *),
+                           bool writethrough, BlockBackend *on_eject_blk,
+                           Error **errp)
+@@ -1471,6 +1472,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off=
+_t dev_offset, off_t size,
+      * that BDRV_O_INACTIVE is cleared and the image is ready for write
+      * access since the export could be available before migration hando=
+ver.
+      */
++    assert(name);
+     ctx =3D bdrv_get_aio_context(bs);
+     aio_context_acquire(ctx);
+     bdrv_invalidate_cache(bs, NULL);
+@@ -1494,6 +1496,8 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off=
+_t dev_offset, off_t size,
+     QTAILQ_INIT(&exp->clients);
+     exp->blk =3D blk;
+     exp->dev_offset =3D dev_offset;
++    exp->name =3D g_strdup(name);
++    exp->description =3D g_strdup(description);
+     exp->nbdflags =3D nbdflags;
+     exp->size =3D size < 0 ? blk_getlength(blk) : size;
+     if (exp->size < 0) {
+@@ -1513,10 +1517,14 @@ NBDExport *nbd_export_new(BlockDriverState *bs, o=
+ff_t dev_offset, off_t size,
+         exp->eject_notifier.notify =3D nbd_eject_notifier;
+         blk_add_remove_bs_notifier(on_eject_blk, &exp->eject_notifier);
+     }
++    QTAILQ_INSERT_TAIL(&exports, exp, next);
++    nbd_export_get(exp);
+     return exp;
+
+ fail:
+     blk_unref(blk);
++    g_free(exp->name);
++    g_free(exp->description);
+     g_free(exp);
+     return NULL;
+ }
+@@ -1533,43 +1541,29 @@ NBDExport *nbd_export_find(const char *name)
+     return NULL;
+ }
+
+-void nbd_export_set_name(NBDExport *exp, const char *name)
+-{
+-    if (exp->name =3D=3D name) {
+-        return;
+-    }
+-
+-    nbd_export_get(exp);
+-    if (exp->name !=3D NULL) {
+-        g_free(exp->name);
+-        exp->name =3D NULL;
+-        QTAILQ_REMOVE(&exports, exp, next);
+-        nbd_export_put(exp);
+-    }
+-    if (name !=3D NULL) {
+-        nbd_export_get(exp);
+-        exp->name =3D g_strdup(name);
+-        QTAILQ_INSERT_TAIL(&exports, exp, next);
+-    }
+-    nbd_export_put(exp);
+-}
+-
+-void nbd_export_set_description(NBDExport *exp, const char *description)
+-{
+-    g_free(exp->description);
+-    exp->description =3D g_strdup(description);
+-}
+-
+ void nbd_export_close(NBDExport *exp)
+ {
+     NBDClient *client, *next;
+
+     nbd_export_get(exp);
++    /*
++     * TODO: Should we expand QMP NbdServerRemoveNode enum to allow a
++     * close mode that stops advertising the export to new clients but
++     * still permits existing clients to run to completion? Because of
++     * that possibility, nbd_export_close() can be called more than
++     * once on an export.
++     */
+     QTAILQ_FOREACH_SAFE(client, &exp->clients, next, next) {
+         client_close(client, true);
+     }
+-    nbd_export_set_name(exp, NULL);
+-    nbd_export_set_description(exp, NULL);
++    if (exp->name) {
++        nbd_export_put(exp);
++        g_free(exp->name);
++        exp->name =3D NULL;
++        QTAILQ_REMOVE(&exports, exp, next);
++    }
++    g_free(exp->description);
++    exp->description =3D NULL;
+     nbd_export_put(exp);
+ }
+
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 6ca02b6d87b..b93fa196dac 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -1015,11 +1015,9 @@ int main(int argc, char **argv)
+         }
+     }
+
+-    export =3D nbd_export_new(bs, dev_offset, fd_size, nbdflags,
+-                            nbd_export_closed, writethrough,
+-                            NULL, &error_fatal);
+-    nbd_export_set_name(export, export_name);
+-    nbd_export_set_description(export, export_description);
++    export =3D nbd_export_new(bs, dev_offset, fd_size, export_name,
++                            export_description, nbdflags, nbd_export_clo=
+sed,
++                            writethrough, NULL, &error_fatal);
+
+     if (device) {
+ #if HAVE_NBD_DEVICE
 --=20
 2.20.1
