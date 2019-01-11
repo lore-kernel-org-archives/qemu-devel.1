@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34995)
+Received: from eggs.gnu.org ([209.51.188.92]:35859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghwfA-0000ee-7E
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:15:53 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1ghwi8-0002ll-92
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:18:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghwf9-0006rd-6d
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:15:52 -0500
-Date: Fri, 11 Jan 2019 14:15:38 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190111131538.GH5010@dhcp-200-186.str.redhat.com>
-References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
-	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
-	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
-	<20190111122151.GF5010@dhcp-200-186.str.redhat.com>
-	<8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
+	(envelope-from <sgarzare@redhat.com>) id 1ghwi7-0000JU-K0
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:18:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ghwi7-0000JE-FA
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:18:55 -0500
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 11 Jan 2019 14:18:32 +0100
+Message-Id: <20190111131836.107549-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
- default on block_status
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/4] pvh: add new PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>, Maran Wilson <maran.wilson@oracle.com>
 
-Am 11.01.2019 um 13:59 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 11.01.2019 15:21, Kevin Wolf wrote:
-> > Am 11.01.2019 um 12:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >> 11.01.2019 13:41, Kevin Wolf wrote:
-> >>> Am 10.01.2019 um 14:20 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>> drv_co_block_status digs bs->file for additional, more accurate search
-> >>>> for hole inside region, reported as DATA by bs since 5daa74a6ebc.
-> >>>>
-> >>>> This accuracy is not free: assume we have qcow2 disk. Actually, qcow2
-> >>>> knows, where are holes and where is data. But every block_status
-> >>>> request calls lseek additionally. Assume a big disk, full of
-> >>>> data, in any iterative copying block job (or img convert) we'll call
-> >>>> lseek(HOLE) on every iteration, and each of these lseeks will have to
-> >>>> iterate through all metadata up to the end of file. It's obviously
-> >>>> ineffective behavior. And for many scenarios we don't need this lseek
-> >>>> at all.
-> >>>>
-> >>>> So, let's "5daa74a6ebc" by default, leaving an option to return
-> >>>> previous behavior, which is needed for scenarios with preallocated
-> >>>> images.
-> >>>>
-> >>>> Add iotest illustrating new option semantics.
-> >>>>
-> >>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >>>
-> >>> I still think that an option isn't a good solution and we should try use
-> >>> some heuristics instead.
-> >>
-> >> Do you think that heuristics would be better than fair cache for lseek
-> >> results?
-> > 
-> > I don't think lseek() results are cachable, at least for images that can
-> > share BLK_PERM_WRITE between processes.
-> > 
-> >> I don't see good heuristics, neither want to implement lseek optimizations.
-> >> In our cases we don't need lseek under qcow2 at all, and it's obviously better
-> >> just don't lseek in these cases.
-> > 
-> > I suggested one: Pass large contiguous allocated ranges to the protocol
-> > driver, but just assume that the allocation status is correct in the
-> > format layer if they are small.
-> 
-> So, for fully allocated image, we will call lseek always?
+This patch series is based on "[RFC v2 0/4] QEMU changes to do PVH boot" =
+and
+provides a PVH option rom that can be used with SeaBIOS to boot uncompres=
+sed
+kernel using the x86/HVM direct boot ABI.
 
-If they are fully contiguous, yes. But that's a single lseek() call per
-image then instead of an lseek() for every 64k, so not a big problem.
+Patches 1 and 2 are to prepare the PVH option rom, moving common function=
+s in a
+new header.  Patch 3 adds the new PVH option rom and patch 4 uses it when=
+ we
+are booting an uncompressed kernel using the x86/HVM direct boot ABI.
 
-In the more realistic case, you will still call lseek() occasionally
-because you will have some fragmentation, but the fragments can be
-rather large. But it should still significantly reduce them compared to
-now because you skip it for those parts with small contiguous
-allocations where lseek() would be called a lot today.
+Stefano Garzarella (4):
+  linuxboot_dma: remove duplicate definitions of FW_CFG
+  linuxboot_dma: move common functions in a new header
+  optionrom: add new PVH option rom
+  hw/i386/pc: use PVH option rom
 
-Kevin
+ hw/i386/pc.c                      |   4 +
+ pc-bios/optionrom/Makefile        |   5 +-
+ pc-bios/optionrom/linuxboot_dma.c | 110 +++-------------
+ pc-bios/optionrom/optrom.h        | 109 ++++++++++++++++
+ pc-bios/optionrom/optrom_fw_cfg.h |  92 ++++++++++++++
+ pc-bios/optionrom/pvh.S           | 200 ++++++++++++++++++++++++++++++
+ pc-bios/optionrom/pvh_main.c      | 117 +++++++++++++++++
+ 7 files changed, 541 insertions(+), 96 deletions(-)
+ create mode 100644 pc-bios/optionrom/optrom.h
+ create mode 100644 pc-bios/optionrom/optrom_fw_cfg.h
+ create mode 100644 pc-bios/optionrom/pvh.S
+ create mode 100644 pc-bios/optionrom/pvh_main.c
+
+--=20
+2.20.1
