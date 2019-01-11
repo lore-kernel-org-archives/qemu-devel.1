@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37359)
+Received: from eggs.gnu.org ([209.51.188.92]:37654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gi0Zv-00057k-1b
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:26:43 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gi0bB-0005mh-LO
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:28:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gi0Zt-0006pN-2H
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:26:42 -0500
-References: <20190111163519.11457-1-philmd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <55fa3efa-232f-afe3-3858-11a4b491317d@redhat.com>
-Date: Fri, 11 Jan 2019 11:26:31 -0600
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gi0b9-0007Kz-NO
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:28:01 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 11 Jan 2019 17:27:46 +0000
+Message-ID: <f228d1c9-0d3a-3951-6ad2-f436fe4be8bd@virtuozzo.com>
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
+	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
+	<20190111122151.GF5010@dhcp-200-186.str.redhat.com>
+	<8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
+	<20190111131538.GH5010@dhcp-200-186.str.redhat.com>
+	<277fe3a0-9025-b96e-41b2-0388f491d724@virtuozzo.com>
+	<07274f18-f342-9f9f-7b9f-9b68100ae7d9@redhat.com>
+In-Reply-To: <07274f18-f342-9f9f-7b9f-9b68100ae7d9@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F94749DE7976E548853D61D65A308DC3@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190111163519.11457-1-philmd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lwxqAxsVXAR9d7GMkMKufa5sjroF5PK3J"
-Subject: Re: [Qemu-devel] [PATCH] qemu-nbd: Rename 'exp' variable clashing
- with math::exp() symbol
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,125 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lwxqAxsVXAR9d7GMkMKufa5sjroF5PK3J
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <55fa3efa-232f-afe3-3858-11a4b491317d@redhat.com>
-Subject: Re: [PATCH] qemu-nbd: Rename 'exp' variable clashing with math::exp()
- symbol
-References: <20190111163519.11457-1-philmd@redhat.com>
-In-Reply-To: <20190111163519.11457-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/11/19 10:35 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> The use of a variable named 'exp' prevents includes to import <math.h>.=
-
->=20
-> Rename it to avoid:
->=20
->   qemu-nbd.c:64:19: error: =E2=80=98exp=E2=80=99 redeclared as differen=
-t kind of symbol
->    static NBDExport *exp;
->                      ^~~
->   In file included from /usr/include/features.h:428,
->                    from /usr/include/bits/libc-header-start.h:33,
->                    from /usr/include/stdint.h:26,
->                    from /usr/lib/gcc/x86_64-redhat-linux/8/include/stdi=
-nt.h:9,
->                    from /source/qemu/include/qemu/osdep.h:80,
->                    from /source/qemu/qemu-nbd.c:19:
->   /usr/include/bits/mathcalls.h:95:1: note: previous declaration of =E2=
-=80=98exp=E2=80=99 was here
->     __MATHCALL_VEC (exp,, (_Mdouble_ __x));
->     ^~~~~~~~~~~~~~
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  qemu-nbd.c | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
-
-Why did you need to import math.h?
-
-But it's reasonable enough. Will queue through my NBD tree; in part
-because it has conflicts with other pending NBD patches (so
-trivial-patches taking it would actually cost me more efforts than me
-just fixing the conflicts).
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> +++ b/qemu-nbd.c
-> @@ -61,7 +61,7 @@
-> =20
->  #define MBR_SIZE 512
-> =20
-> -static NBDExport *exp;
-> +static NBDExport *export;
-
-This one is a definite problem (POSIX says you shouldn't name any static
-variable the same as a standard function entry point, even if it happens
-to lnik)...
-
->  static int verbose;
->  static char *srcpath;
->  static SocketAddress *saddr;
-> @@ -335,7 +335,7 @@ static int nbd_can_accept(void)
->      return state =3D=3D RUNNING && nb_fds < shared;
->  }
-> =20
-> -static void nbd_export_closed(NBDExport *exp)
-> +static void nbd_export_closed(NBDExport *export)
-
-=2E..this one just silences a -Wshadow but is permitted by strict C. We
-have too many other -Wshadow violations in our code base, but I don't
-mind getting rid of this one.
-
-> @@ -1015,10 +1015,11 @@ int main(int argc, char **argv)
->          }
->      }
-> =20
-> -    exp =3D nbd_export_new(bs, dev_offset, fd_size, nbdflags, nbd_expo=
-rt_closed,
-> -                         writethrough, NULL, &error_fatal);
-> -    nbd_export_set_name(exp, export_name);
-> -    nbd_export_set_description(exp, export_description);
-> +    export =3D nbd_export_new(bs, dev_offset, fd_size, nbdflags,
-> +                            nbd_export_closed, writethrough,
-> +                            NULL, &error_fatal);
-> +    nbd_export_set_name(export, export_name);
-> +    nbd_export_set_description(export, export_description);
-
-Here's where my pending to add 'qemu-nbd --bitmap' conflict; I don't
-mind fixing it.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---lwxqAxsVXAR9d7GMkMKufa5sjroF5PK3J
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw40ccACgkQp6FrSiUn
-Q2qrogf/WzSWhmD9qeqttCq+rvQTSLN+NsuGReJkAaxm85oyhN95VfYvNFSKtrub
-7DZ+N24YPqgOB4PjvU3OPxE3awMp6gvMAP3nVX+Bmhl3q6brBvPpKgZrxsazp8z8
-2iBs7Fqlm24CnGM9KTMpzxcOCn5bZfERslCcn3Pv7SbPINOmHAQk0QPeKOxUJqsK
-k47QVQ2HMYyqskTSwEZjPWXnM4OcVBqR/vOgZCxIRW7rv8AtaqhKe7oAoZZsOPoA
-NJl259PG/5jrs6Pl7Fet6+pijz1Mzxi3VaBRn5qxxXtx7m5HuFoe9hHh9SjvO9VJ
-SKDbJFNXL9WF2YQjIDIRf6QHncGqlw==
-=ZFr5
------END PGP SIGNATURE-----
-
---lwxqAxsVXAR9d7GMkMKufa5sjroF5PK3J--
+DQoNCk9uIDExLjAxLjIwMTkgMTc6MDQsIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDEvMTEvMTkg
+MTA6MDkgQU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+IA0KPj4+Pj4g
+SSBzdWdnZXN0ZWQgb25lOiBQYXNzIGxhcmdlIGNvbnRpZ3VvdXMgYWxsb2NhdGVkIHJhbmdlcyB0
+byB0aGUgcHJvdG9jb2wNCj4+Pj4+IGRyaXZlciwgYnV0IGp1c3QgYXNzdW1lIHRoYXQgdGhlIGFs
+bG9jYXRpb24gc3RhdHVzIGlzIGNvcnJlY3QgaW4gdGhlDQo+Pj4+PiBmb3JtYXQgbGF5ZXIgaWYg
+dGhleSBhcmUgc21hbGwuDQo+Pj4+DQo+Pj4+IFNvLCBmb3IgZnVsbHkgYWxsb2NhdGVkIGltYWdl
+LCB3ZSB3aWxsIGNhbGwgbHNlZWsgYWx3YXlzPw0KPj4+DQo+Pj4gSWYgdGhleSBhcmUgZnVsbHkg
+Y29udGlndW91cywgeWVzLiBCdXQgdGhhdCdzIGEgc2luZ2xlIGxzZWVrKCkgY2FsbCBwZXINCj4+
+PiBpbWFnZSB0aGVuIGluc3RlYWQgb2YgYW4gbHNlZWsoKSBmb3IgZXZlcnkgNjRrLCBzbyBub3Qg
+YSBiaWcgcHJvYmxlbS4NCj4+DQo+PiBsc2VlayBpcyBjYWxsZWQgb24gZWFjaCBtaXJyb3IgaXRl
+cmF0aW9uLCB3aHkgb25lIHBlciBpbWFnZT8NCj4gDQo+IElmIHRoZSBpbWFnZSBoYXMgbm8gaG9s
+ZXMsIHRoZW4gbHNlZWsoMCwgU0VFS19IT0xFKSB3aWxsIHJldHVybiBFT0YsIGFuZA0KPiB0aGVu
+IHlvdSBrbm93IHRoYXQgdGhlcmUgYXJlIG5vIGhvbGVzLCBhbmQgeW91IGRvbid0IG5lZWQgdG8g
+bWFrZSBhbnkNCj4gZnVydGhlciBsc2VlaygpIGNhbGxzLiAgSGVuY2UsIG9uY2UgcGVyIGltYWdl
+LiAgQSBmdWxseS1hbGxvY2F0ZWQgZmlsZQ0KPiB0aGF0IGhhcyBhcmVhcyB0aGF0IHJlYWQgYXMg
+a25vd24gemVyb2VzIGNhbiBiZSBkZXRlcm1pbmVkIGJ5IGZpZW1hcA0KPiAoYnV0IG5vdCBieSBs
+c2Vlaywgd2hpY2ggY2FuIG9ubHkgZGV0ZWN0IHVuYWxsb2NhdGVkIGhvbGVzKSAtIGJ1dCB3ZQ0K
+PiBhbHJlYWR5IGtub3cgdGhhdCB3aGlsZSBmaWVtYXAgaGFzIG1vcmUgaW5mb3JtYXRpb24sIGl0
+IGFsc28gaGFzIG1vcmUNCj4gcHJvYmxlbXMgKHlvdSBjYW5ub3QgdXNlIGl0IHNhZmVseSB3aXRo
+b3V0IHN5bmMsIGJ1dCBzeW5jIG1ha2VzIGl0IHRvbw0KPiBzbG93IHRvIHVzZSksIHNvIHRoYXQg
+aXMgYSBub24tc3RhcnRlci4NCj4gDQo+Pj4NCj4+PiBJbiB0aGUgbW9yZSByZWFsaXN0aWMgY2Fz
+ZSwgeW91IHdpbGwgc3RpbGwgY2FsbCBsc2VlaygpIG9jY2FzaW9uYWxseQ0KPj4+IGJlY2F1c2Ug
+eW91IHdpbGwgaGF2ZSBzb21lIGZyYWdtZW50YXRpb24sIGJ1dCB0aGUgZnJhZ21lbnRzIGNhbiBi
+ZQ0KPj4+IHJhdGhlciBsYXJnZS4gQnV0IGl0IHNob3VsZCBzdGlsbCBzaWduaWZpY2FudGx5IHJl
+ZHVjZSB0aGVtIGNvbXBhcmVkIHRvDQo+Pj4gbm93IGJlY2F1c2UgeW91IHNraXAgaXQgZm9yIHRo
+b3NlIHBhcnRzIHdpdGggc21hbGwgY29udGlndW91cw0KPj4+IGFsbG9jYXRpb25zIHdoZXJlIGxz
+ZWVrKCkgd291bGQgYmUgY2FsbGVkIGEgbG90IHRvZGF5Lg0KPj4+DQo+Pj4gS2V2aW4NCj4+Pg0K
+Pj4NCj4+IE9rLCB5b3UgcHJvcG9zZSBub3QgdG8gY2FsbCBsc2VlayBmb3Igc21hbGwgZW5vdWdo
+IGRhdGEgcmVnaW9ucyByZXBvcnRlZCBieQ0KPj4gZm9ybWF0IGxheWVyLiBBbmQgZm9yIGltYWdl
+cyB3aGljaCBhcmUgbGVzcyBmcmFnbWVudGVkLCB0aGlzIGhlbHBzIGxlc3Mgb3IgZG9uJ3QNCj4+
+IGhlbHAuDQo+IA0KPiBJbmRlZWQgLSBwaWNrIHNvbWUgdGhyZXNob2xkIChtYXliZSAxNiBjbHVz
+dGVycyk7IGlmIGJsb2NrIHN0YXR1cyBvZiB0aGUNCj4gZm9ybWF0IGxheWVyIHJldHVybnMgc29t
+ZXRoaW5nIHNtYWxsZXIgdGhhbiB0aGUgdGhyZXNob2xkLCBkb24ndCBib3RoZXINCj4gcmVmaW5p
+bmcgdGhlIGFuc3dlciBmdXJ0aGVyIGJ5IGRvaW5nIGJsb2NrIHN0YXR1cyBvZiB0aGUgcHJvdG9j
+b2wgbGF5ZXINCj4gKGlmIHRoZSBjYWxsZXIgaXMgaXRlcmF0aW5nIG92ZXIgYW4gaW1hZ2UgMSBj
+bHVzdGVyIGF0IGEgdGltZSwgdGhlbiB0aGUNCj4gdGhyZXNob2xkIHdpbGwgbmV2ZXIgYmUgdHJp
+cHBlZCBhbmQgdGh1cyB5b3UnbGwgbmV2ZXIgZG8gYW4gbHNlZWspOyBidXQNCj4gd2hlcmUgdGhl
+IGJsb2NrIHN0YXR1cyBvZiB0aGUgZm9ybWF0IGxheWVyIGlzIGxhcmdlLCB3ZSBhcmUgcmVhZGlu
+ZyB0aGUNCj4gZmlsZSBpbiBsYXJnZXIgY2h1bmtzIHNvIHdlIGVuZCB1cCB3aXRoIGZld2VyIGxz
+ZWVrcyBpbiB0aGUgbG9uZyBydW4NCj4gYW55d2F5cy4NCj4gDQo+Pg0KPj4gV2h5IGRvIHlvdSB0
+aGluayBpdCBpcyBiZXR0ZXI/DQo+Pg0KPj4gRm9yIG5vdCBwcmVhbGxvY2F0ZWQgaW1hZ2VzIGl0
+IGlzIHdvcnNlLCBhcyBpdCBjb3ZlcnMgbGVzcyBjYXNlcy4gU28sIGZvciBvdXINCj4+IHNjZW5h
+cmlvcyBpdCBpcyB3b3JzZS4NCj4gDQo+IEFueXdoZXJlIHRoYXQgeW91IHNraXAgY2FsbGluZyBs
+c2VlaygpLCB5b3UgZW5kIHVwIG1pc3Npbmcgb3V0IG9uDQo+IG9wcG9ydHVuaXRpZXMgdG8gb3B0
+aW1pemUgaGFkIHlvdSBpbnN0ZWFkIGJlZW4gYWJsZSB0byBsZWFybiBmcm9tIGxzZWVrDQo+IHRo
+YXQgeW91IHdlcmUgb24gYSBob2xlIGFmdGVyIGFsbC4NCg0KV2hhdCBhcmUgdGhlIGNhc2VzIHdo
+ZW4gd2UnbGwgYmVuZWZpdCBmcm9tIGxzZWVrIGV4Y2VwdCBwcmVhbGxvY2F0ZWQgaW1hZ2VzPw0K
+DQogICBTbyBpdCBiZWNvbWVzIGEgYmFsYW5jaW5nIHF1ZXN0aW9uOg0KPiBob3cgbXVjaCB0aW1l
+IGlzIHNwZW50IG9uIHByb2JpbmcgZm9yIHdoZXRoZXIgYW4gb3B0aW1pemF0aW9uIGlzIGV2ZW4N
+Cj4gcG9zc2libGUsIHZzLiBob3cgbXVjaCB0aW1lIGlzIHNwZW50IGlmIHRoZSBwcm9iZSBzdWNj
+ZWVkZWQgYW5kIHlvdSBjYW4NCj4gdGhlbiBvcHRpbWl6ZS4gIEZvciBhIGZ1bGx5LWFsbG9jYXRl
+ZCBpbWFnZSwgYWxsIG9mIHRoZSB0aW1lIHNwZW50DQo+IHByb2JpbmcgaXMgd2FzdGVkICh5b3Ug
+bmV2ZXIgZmluZCBhIGhvbGUsIHNvIGV2ZXJ5IHByb2JlIHdhcyB3YXN0ZWQpLg0KPiBTbyBpdCBp
+cyBpbmRlZWQgYSB0cmFkZW9mZiB3aGVuIHBpY2tpbmcgeW91ciBoZXVyaXN0aWNzLCBvZiB0cnlp
+bmcgdG8NCj4gYmFsYW5jZSBob3cgbGlrZWx5IHRoZSBwcm9iZSB3aWxsIGp1c3RpZnkgdGhlIHRp
+bWUgc3BlbnQgb24gdGhlIHByb2JlLg0KPiANCj4+IFRoZSBvbmx5IGNhc2UsIHdoZW4gaGV1cmlz
+dGljIHdvcmtzIGJldHRlciwgaXMgd2hlbiB1c2VyIGhhdmUgcHJlYWxsb2NhdGVkIGltYWdlLA0K
+Pj4gYnV0IGRvbid0IGtub3cgYWJvdXQgbmV3IG9wdGlvbiwgd2hpY2ggcmV0dXJucyBvbGQgYmVo
+YXZpb3IuIFdlIGFyZSBub3QgaW50ZXJlc3RlZA0KPj4gaW4gdGhpcyBjYXNlIGFuZCBjYW4ndCBn
+byB0aGlzIHdheSwgYXMgaXQgZG9lc24ndCBndWFyYW50ZWUsIHRoYXQgc29tZSBjdXN0b21lciB3
+aWxsDQo+PiBub3QgY29tZSBhZ2FpbiB3aXRoIGxzZWVrLXJlbGF0ZWQgcHJvYmxlbXMuDQo+Pg0K
+Pj4gRG9uJ3QgeW91IGxpa2Ugd2hhdCBFcmljIHByb3Bvc2UsIGFib3V0IGJpbmRpbmcgYmVoYXZp
+b3Igc3dpdGNoIHRvIGV4aXN0aW5nDQo+PiBkZXRlY3QtemVyb2VzIG9wdGlvbj8NCj4+DQo+PiBP
+ciwgd2UgY2FuIGFkZCBhbiBvcHBvc2l0ZSBvcHRpb24sIHRvIGVuYWJsZSBuZXcgYmVoYXZpb3Is
+IGtlZXBpbmcgdGhlIG9sZCBvbmUgYnkNCj4+IGRlZmF1bHQuIFNvLCBhbGwgc3RheXMgYXMgaXMs
+IGFuZCB3aG8gbmVlZCB1c2VzIG5ldyBvcHRpb24uIEhldXJpc3RpYyBtYXkgYmUNCj4+IGltcGxl
+bWVudGVkIHRoZW4gdG9vLg0KPj4NCj4gDQo=
