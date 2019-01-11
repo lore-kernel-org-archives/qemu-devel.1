@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36071)
+Received: from eggs.gnu.org ([209.51.188.92]:36158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ghwiu-0003Nr-1e
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:19:44 -0500
+	(envelope-from <lifei1214@126.com>) id 1ghwjI-0003h0-T3
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:20:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1ghwit-0000cZ-B5
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:19:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55004)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ghwit-0000bm-5h
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:19:43 -0500
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri, 11 Jan 2019 14:18:36 +0100
-Message-Id: <20190111131836.107549-5-sgarzare@redhat.com>
-In-Reply-To: <20190111131836.107549-1-sgarzare@redhat.com>
-References: <20190111131836.107549-1-sgarzare@redhat.com>
+	(envelope-from <lifei1214@126.com>) id 1ghwjH-0000nM-0A
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:20:08 -0500
+Received: from m50-110.126.com ([123.125.50.110]:50391)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1ghwjD-0000jv-CB
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:20:06 -0500
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-10-fli@suse.com>
+	<87a7kcml5i.fsf@dusky.pond.sub.org>
+	<36097839-654b-6d1f-b79e-f9bc174ec126@suse.cz>
+	<20190108065159.GA20511@xz-x1> <87o98ree00.fsf@dusky.pond.sub.org>
+	<8e592b32-7984-7a02-10e9-45fb9eb248ef@126.com>
+	<20190111024911.GA24343@xz-x1>
+From: Fei Li <lifei1214@126.com>
+Message-ID: <9ebc60c5-fbb6-5cc7-f31a-be3c22399067@126.com>
+Date: Fri, 11 Jan 2019 21:19:35 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/4] hw/i386/pc: use PVH option rom
+In-Reply-To: <20190111024911.GA24343@xz-x1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 09/16] qemu_thread: supplement
+ error handling for pci_edu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +33,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>, Maran Wilson <maran.wilson@oracle.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Jiri Slaby <jslaby@suse.cz>, shirley17fei@gmail.com, qemu-devel@nongnu.org
 
-Use pvh.bin option rom when we are booting an uncompressed
-kernel using the x86/HVM direct boot ABI.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-Based-on: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
----
- hw/i386/pc.c | 4 ++++
- 1 file changed, 4 insertions(+)
+在 2019/1/11 上午10:49, Peter Xu 写道:
+> On Thu, Jan 10, 2019 at 09:29:38PM +0800, Fei Li wrote:
+>> 在 2019/1/8 下午4:43, Markus Armbruster 写道:
+>>> Peter Xu <peterx@redhat.com> writes:
+>>>
+>>>> On Tue, Jan 08, 2019 at 07:14:11AM +0100, Jiri Slaby wrote:
+>>>>> On 07. 01. 19, 18:29, Markus Armbruster wrote:
+>>>>>>      static void pci_edu_uninit(PCIDevice *pdev)
+>>>>>>      {
+>>>>>>          EduState *edu = EDU(pdev);
+>>>>>>
+>>>>>>          qemu_mutex_lock(&edu->thr_mutex);
+>>>>>>          edu->stopping = true;
+>>>>>>          qemu_mutex_unlock(&edu->thr_mutex);
+>>>>>>          qemu_cond_signal(&edu->thr_cond);
+>>>>>>          qemu_thread_join(&edu->thread);
+>>>>>>
+>>>>>>          qemu_cond_destroy(&edu->thr_cond);
+>>>>>>          qemu_mutex_destroy(&edu->thr_mutex);
+>>>>>>
+>>>>>>          timer_del(&edu->dma_timer);
+>>>>>>      }
+>>>>>>
+>>>>>> Preexisting: pci_edu_uninit() neglects to call msi_uninit().  Jiri?\
+>>>>> I don't know, the MSI support was added in:
+>>>>> commit eabb5782f70b4a10975b24ccd7129929a05ac932
+>>>>> Author: Peter Xu <peterx@redhat.com>
+>>>>> Date:   Wed Sep 28 21:03:39 2016 +0800
+>>>>>
+>>>>>       hw/misc/edu: support MSI interrupt
+>>>>>
+>>>>> Hence CCing Peter.
+>>>> Hi, Jiri, Markus, Fei,
+>>>>
+>>>> IMHO msi_uninit() is optional since it only operates on the config
+>>>> space of the device to remove the capability or fix up the flags
+>>>> without really doing any real destruction of objects so nothing will
+>>>> be leaked (unlike msix_uninit, which should be required).
+>>> Michael, Marcel, is neglecting to call msi_uninit() okay, a harmless
+>>> bug, or a harmful bug?
+>> Kindly ping. :)
+>>
+>> If corresponding change is needed, I'd like to do the update in the next
+>> version.
+> Fei,
+>
+> If you're going to post the edu patch, please post it as a standalone
+> patch.  More patches mean harder that the series could be accepted
+> quickly.  So it would be good to split patches sometimes especially if
+> they are irrelevant.
+>
+> Regards,
+>
+Ok, thanks for this helpful suggestion. Will send this patch alone in 
+the next version. :)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 06bce6a101..deab8a2816 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1005,6 +1005,10 @@ static void load_linux(PCMachineState *pcms,
-             fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
-                              header, sizeof(header));
-=20
-+            option_rom[nb_option_roms].bootindex =3D 0;
-+            option_rom[nb_option_roms].name =3D "pvh.bin";
-+            nb_option_roms++;
-+
-             return;
-         }
-         /* This looks like a multiboot kernel. If it is, let's stop
---=20
-2.20.1
+Have a nice day
+Fei
