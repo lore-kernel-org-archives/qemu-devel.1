@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43409)
+Received: from eggs.gnu.org ([209.51.188.92]:44349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gi11z-0004xl-BA
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:55:44 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gi16Q-00065P-GT
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 13:00:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gi11y-0003GJ-JH
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:55:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gi11y-0003Fr-9u
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 12:55:42 -0500
-References: <20190111131836.107549-1-sgarzare@redhat.com>
-	<20190111131836.107549-3-sgarzare@redhat.com>
-	<20190111162649.GC14776@stefanha-x1.localdomain>
-	<CAGxU2F6mpxE7-xw1LWS3Q6R+NSPMnkrqo8mdhhgn-SfARN3XKQ@mail.gmail.com>
-	<20190111124742-mutt-send-email-mst@kernel.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a313ccb0-4c81-5753-6ca7-95b6811d6f5d@redhat.com>
-Date: Fri, 11 Jan 2019 11:55:24 -0600
+	(envelope-from <alex.bennee@linaro.org>) id 1gi16P-0005iQ-LQ
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 13:00:18 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gi16O-0005fV-Pf
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 13:00:17 -0500
+Received: by mail-wm1-x341.google.com with SMTP id r24so2561277wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 10:00:11 -0800 (PST)
+References: <20190107111129.2087-1-alex.bennee@linaro.org>
+	<CAL1e-=jZACpchHLoF_CtaLtLiySr0t527eao2wGci7Rsz1h2zg@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAL1e-=jZACpchHLoF_CtaLtLiySr0t527eao2wGci7Rsz1h2zg@mail.gmail.com>
+Date: Fri, 11 Jan 2019 18:00:09 +0000
+Message-ID: <87muo7ulau.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190111124742-mutt-send-email-mst@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="YKIHAehlrdLB4ynjIo9sdrS4DNilR71cw"
-Subject: Re: [Qemu-devel] [PATCH 2/4] linuxboot_dma: move common functions
- in a new header
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 0/3] gitdm updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,84 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, George Kennedy <george.kennedy@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Richard Henderson <rth@twiddle.net>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cota@braap.org" <cota@braap.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YKIHAehlrdLB4ynjIo9sdrS4DNilR71cw
-From: Eric Blake <eblake@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi
- <stefanha@gmail.com>, qemu-devel@nongnu.org,
- George Kennedy <george.kennedy@oracle.com>, Gerd Hoffmann
- <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Marc-Andre Lureau <marcandre.lureau@redhat.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Richard Henderson <rth@twiddle.net>
-Message-ID: <a313ccb0-4c81-5753-6ca7-95b6811d6f5d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] linuxboot_dma: move common functions in
- a new header
-References: <20190111131836.107549-1-sgarzare@redhat.com>
- <20190111131836.107549-3-sgarzare@redhat.com>
- <20190111162649.GC14776@stefanha-x1.localdomain>
- <CAGxU2F6mpxE7-xw1LWS3Q6R+NSPMnkrqo8mdhhgn-SfARN3XKQ@mail.gmail.com>
- <20190111124742-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190111124742-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 1/11/19 11:48 AM, Michael S. Tsirkin wrote:
+Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
 
->>>
->>>> diff --git a/pc-bios/optionrom/optrom.h b/pc-bios/optionrom/optrom.h=
-
->>>> new file mode 100644
->>>> index 0000000000..36f43b43fd
->>>> --- /dev/null
->>>> +++ b/pc-bios/optionrom/optrom.h
-
->>>> +#include "../../include/standard-headers/linux/qemu_fw_cfg.h"
->>>
->>> This depends on <stdint.h>, please include it first.
+> On Monday, January 7, 2019, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
 >>
->> Sure.
+>> Hi,
+>>
+>> Added a few more updates mostly of IBMers with non corporate emails.
+>
+>
+> Alex, it seems logical to me that you also create a section on gitdm in
+> MAINTAINERS, and set yourself as the maintainer for contrib/gitdm/*.
+
+I guess - do we do that for other contrib stuff?
+
+>
+> Alelsandar
+>
+>
+>
+>> The year-end stats as per:
+>>
+>>  git log --numstat --after=3D"1/1/2018 00:00" \
+>>                    --before=3D"31/12/2018 23:59" | gitdm -n -l 10
+>>
+>> Are:
+>>
+>>   Top changeset contributors by employer
+>>   Red Hat                   3091 (43.3%)
+>>   Linaro                    1201 (16.8%)
+>>   (None)                     484 (6.8%)
+>>   IBM                        426 (6.0%)
+>>   Academics (various)        186 (2.6%)
+>>   Virtuozzo                  172 (2.4%)
+>>   Wave Computing             118 (1.7%)
+>>   Igalia                     109 (1.5%)
+>>   Xilinx                     102 (1.4%)
+>>   Cadence Design Systems      80 (1.1%)
+>>
+>>   Top lines changed by employer
+>>   Red Hat                   140523 (30.3%)
+>>   Cadence Design Systems    81010 (17.5%)
+>>   Linaro                    78098 (16.8%)
+>>   Wave Computing            33134 (7.1%)
+>>   IBM                       18918 (4.1%)
+>>   SiFive                    14436 (3.1%)
+>>   Academics (various)       11995 (2.6%)
+>>   (None)                    11458 (2.5%)
+>>   Virtuozzo                 10770 (2.3%)
+>>   Oracle                    6698 (1.4%)
+>>
+>> Alex Benn=C3=A9e (2):
+>>   contrib/gitdm: add Nokia and Proxmox to the domain-map
+>>   contrib/gitdm: add two more IBM'ers to group-map-ibm
+>>
+>> Joel Stanley (1):
+>>   contrib/gitdm: Add other IBMers
+>>
+>>  contrib/gitdm/domain-map    | 2 ++
+>>  contrib/gitdm/group-map-ibm | 7 +++++++
+>>  2 files changed, 9 insertions(+)
+>>
+>> --
+>> 2.17.1
 >>
 >>
->> Thanks,
->> Stefano
->=20
-> Better to just pull in qemu/osdep.h
-
-Except that qemu/osdep.h should already have been pulled in by whatever
-=2Ec file is including this header. We specifically document that .h file=
-s
-shouldn't need to include osdep.h (and in turn, anything that osdep.h
-already pulls in, like <stdint.h>).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+>>
 
 
---YKIHAehlrdLB4ynjIo9sdrS4DNilR71cw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw42IwACgkQp6FrSiUn
-Q2qG+wgAgBjzDSj9Odp9/w+Uubl1g61CGXIFwXyqNV52zEDPHAVSewLqby8vQRJy
-otT5Xj0dfDw4k/EGa2RVCC1xQL+oXKUfZ4bsJ/57ioao2x/jYMc+rvBbx/noLjS4
-MT/P1/HbIZqbS+7okoALyZGeVS37abWJUhFJ0QxbF3QiivsVmnfuTYHW9cmF2CSY
-d4yH66+9ZQtH09PhGszY3HRtAKFhashrDAvhZ0j7Q1ao+ao/ITIpw7ObfO6Xy7QJ
-x8P1NHtL6jnSyCZXBRt2LRmL0Xp2EmIN5jvHVpHOeYCHZHYfGSkI074Wepg11oam
-BBRx5VdOB6sfXnr3hBia9WN8ZWx0pQ==
-=RcYV
------END PGP SIGNATURE-----
-
---YKIHAehlrdLB4ynjIo9sdrS4DNilR71cw--
+--
+Alex Benn=C3=A9e
