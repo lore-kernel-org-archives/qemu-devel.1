@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38399)
+Received: from eggs.gnu.org ([209.51.188.92]:38466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghysG-0001Bt-4w
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:37:32 -0500
+	(envelope-from <david@redhat.com>) id 1ghysP-0001Mk-Ua
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:37:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ghysD-0004RY-Dt
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:37:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ghysD-0004Q6-4f
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:37:29 -0500
-References: <20190111063732.10484-1-xiaoguangrong@tencent.com>
-	<20190111063732.10484-2-xiaoguangrong@tencent.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fb4db77c-0cee-0f3b-d81a-0cc88d7f5406@redhat.com>
-Date: Fri, 11 Jan 2019 09:37:16 -0600
+	(envelope-from <david@redhat.com>) id 1ghysO-0004VY-6m
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:37:41 -0500
+References: <20190111113657.66195-1-frankja@linux.ibm.com>
+	<20190111113657.66195-3-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <7d151455-f7e6-2e0f-2929-c418a2aeaf89@redhat.com>
+Date: Fri, 11 Jan 2019 16:37:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190111063732.10484-2-xiaoguangrong@tencent.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RHTvSvPHyAkCpOt4S0LsNyOMcugPwr3Od"
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] migration: introduce
- pages-per-second
+In-Reply-To: <20190111113657.66195-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x: Return specification exception
+ for unimplemented diag 308 subcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, qemu-s390x@nongnu.org, qemu-stable@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RHTvSvPHyAkCpOt4S0LsNyOMcugPwr3Od
-From: Eric Blake <eblake@redhat.com>
-To: guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com,
- mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com,
- peterx@redhat.com, wei.w.wang@intel.com, quintela@redhat.com,
- cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
-Message-ID: <fb4db77c-0cee-0f3b-d81a-0cc88d7f5406@redhat.com>
-Subject: Re: [PATCH v2 1/3] migration: introduce pages-per-second
-References: <20190111063732.10484-1-xiaoguangrong@tencent.com>
- <20190111063732.10484-2-xiaoguangrong@tencent.com>
-In-Reply-To: <20190111063732.10484-2-xiaoguangrong@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/11/19 12:37 AM, guangrong.xiao@gmail.com wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->=20
-> It introduces a new statistic, pages-per-second, as bandwidth or mbps i=
-s
-> not enough to measure the performance of posting pages out as we have
-> compression, xbzrle, which can significantly reduce the amount of the
-> data size, instead, pages-per-second is the one we want
->=20
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+On 11.01.19 12:36, Janosch Frank wrote:
+> The architecture specifies specification exceptions for all
+> unavailable subcodes.
+> 
+> The presence of subcodes is indicated by checking some query subcode.
+> For example 6 will indicate that 3-6 are available. So future systems
+> might call new subcodes to check for new features. This should not
+> trigger a hw error, instead we return the architectured specification
+> exception.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Cc: qemu-stable@nongnu.org
 > ---
->  hmp.c                 |  2 ++
+>  target/s390x/diag.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+> index cfd7222ddd..c28cf1d9f1 100644
+> --- a/target/s390x/diag.c
+> +++ b/target/s390x/diag.c
+> @@ -132,7 +132,7 @@ out:
+>          }
+>          return;
+>      default:
+> -        hw_error("Unhandled diag308 subcode %" PRIx64, subcode);
+> +        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra);
+>          break;
+>      }
+>  }
+> 
 
-> +++ b/migration/migration.h
-> @@ -126,6 +126,12 @@ struct MigrationState
->       */
->      QemuSemaphore rate_limit_sem;
-> =20
-> +    /* pages already send at the beggining of current interation */
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-beginning, iteration
+-- 
 
-> +    uint64_t iteration_initial_pages;
-> +
-> +    /* pages transferred per second */
-> +    double pages_per_second;
-> +
->      /* bytes already send at the beggining of current interation */
+Thanks,
 
-although you copied the existing typos
-
-> +++ b/qapi/migration.json
-> @@ -41,6 +41,9 @@
->  #
->  # @multifd-bytes: The number of bytes sent through multifd (since 3.0)=
-
->  #
-> +# @pages-per-second: the number of memory pages transferred per second=
-
-> +#        (Since 3.2)
-> +#
-
-3.2 was last year; you'll need to update your series to use 4.0 on all
-new stuff
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---RHTvSvPHyAkCpOt4S0LsNyOMcugPwr3Od
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw4uCwACgkQp6FrSiUn
-Q2pF2Qf/XYDNU9b71Oc5S4KZXPL3juoCc89gvBqTFWmCZBtO3CyUTVbAmYjtEf5j
-RxO3copvcScQwvLQwqxRcCzhCevcD5bx7QS56BJQRvhq99lLeMTXkvnC67NSlOn3
-APYTooNSzKjSmTMUqXkNSYeYnDVBAx4l1lCZHjqQSZJNYNfgTVRDW+fxum62BTrj
-U+EH/g6zQQP4t0g06ey5kMDrHe5VE1NefrXaiC0sJisxKkkB9heKgJycExEbqVmd
-LKTPKyuMAmYsTI2SgGuxirTKgV0zu45nAWtF/cntQoxFgiaY7u7m4u2VBoMCS61v
-1p++8zNXID8WwFpxm+2bp8fzc8Ebhg==
-=Q3HT
------END PGP SIGNATURE-----
-
---RHTvSvPHyAkCpOt4S0LsNyOMcugPwr3Od--
+David / dhildenb
