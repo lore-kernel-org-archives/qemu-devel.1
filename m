@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50184)
+Received: from eggs.gnu.org ([209.51.188.92]:50351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghuNp-00013G-D8
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:49:50 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ghuOY-0001Pl-EH
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghuNn-0003Dp-9v
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:49:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39892)
+	(envelope-from <kraxel@redhat.com>) id 1ghuOU-0003WL-DX
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:50:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ghuNh-0003B8-U4
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:49:42 -0500
-Date: Fri, 11 Jan 2019 11:49:23 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190111104923.GD5010@dhcp-200-186.str.redhat.com>
-References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
-	<154703599022.13472.1704009113561450219.stgit@pasha-VirtualBox>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ghuOK-0003RT-PI
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 05:50:22 -0500
+Date: Fri, 11 Jan 2019 11:50:13 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190111105013.mhcdfkrjjtogaddf@sirius.home.kraxel.org>
+References: <20190103133113.49599-1-liq3ea@163.com>
+	<20190107102218.wzzcisnfqpasqjiq@sirius.home.kraxel.org>
+	<CAFEAcA_9jO1DEWvUNYdEvXbEWoDi+NR+ay6H21zaApoDdXKO4g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <154703599022.13472.1704009113561450219.stgit@pasha-VirtualBox>
-Subject: Re: [Qemu-devel] [PATCH v9 19/21] replay: add BH oneshot event for
- block layer
+In-Reply-To: <CAFEAcA_9jO1DEWvUNYdEvXbEWoDi+NR+ay6H21zaApoDdXKO4g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] usb: dev-mtp: close fd in
+ usb_mtp_object_readdir()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Li Qiang <liq3ea@163.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 09.01.2019 um 13:13 hat Pavel Dovgalyuk geschrieben:
-> Replay is capable of recording normal BH events, but sometimes
-> there are single use callbacks scheduled with aio_bh_schedule_oneshot
-> function. This patch enables recording and replaying such callbacks.
-> Block layer uses these events for calling the completion function.
-> Replaying these calls makes the execution deterministic.
+On Mon, Jan 07, 2019 at 10:35:30AM +0000, Peter Maydell wrote:
+> On Mon, 7 Jan 2019 at 10:22, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >
+> > On Thu, Jan 03, 2019 at 05:31:13AM -0800, Li Qiang wrote:
+> > > Spotted by Coverity: CID 1397070
 > 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > >  #ifdef CONFIG_INOTIFY1
+> > > @@ -682,6 +683,7 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
+> > >          usb_mtp_add_child(s, o, entry->d_name);
+> > >      }
+> > >      closedir(dir);
+> > > +    close(fd);
+> >
+> > Not fully sure this is correct.
+> >
+> > The fdopendir manpage says the app should not use fd any more after
+> > successfully calling fdopendir(), and I assumed that includes calling
+> > close().
+> 
+> Yes. The POSIX spec is clearer:
+> http://pubs.opengroup.org/onlinepubs/9699919799/functions/fdopendir.html
+> "Upon successful return from fdopendir(), the file descriptor is under
+>  the control of the system, and if any attempt is made to close the file
+>  descriptor, or to modify the state of the associated description, other
+>  than by means of closedir(), readdir(), readdir_r(), rewinddir(), or
+>  seekdir(), the behavior is undefined. Upon calling closedir() the file
+>  descriptor shall be closed."
 
-This still doesn't come even close to catching all BHs that need to be
-caught. While you managed to show a few BHs that actually don't need to
-be considered for recording when I asked for this in v7, most BHs in the
-block layer can in some way lead to device callbacks and must therefore
-be recorded.
+Thanks for looking it up.
 
-How bad would it be to record some BHs even if recording them isn't
-necessary? I'd definitely try to err on the safe side here. Having two
-different sets of BH functions, you can't expect that people always use
-the right one (especially if you don't even make the existing code base
-consistently use the right one intially).
+Patch added to usb queue, with the second chunk dropped.
 
-Kevin
+cheers,
+  Gerd
