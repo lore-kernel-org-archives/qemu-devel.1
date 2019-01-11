@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52597)
+Received: from eggs.gnu.org ([209.51.188.92]:58983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ghsNb-00084T-9A
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:41:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1ghsuI-0002WY-5M
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:15:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ghsNX-00022M-Dz
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:41:26 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36364)
+	(envelope-from <bounces@canonical.com>) id 1ghsuH-00025n-4r
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:15:14 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41216)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ghsNQ-0001u4-0A
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:41:17 -0500
+	id 1ghsuG-00024k-VO
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 04:15:13 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ghsNN-0003XM-OK
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 08:41:13 +0000
+	id 1ghsuF-0006mw-FY
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 09:15:11 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B52D42E80CB
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 08:41:13 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 725C52E80C7
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 09:15:11 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 Jan 2019 08:27:54 -0000
-From: brfengBrf <brfeng@163.com>
-Reply-To: Bug 1717708 <1717708@bugs.launchpad.net>
+Date: Fri, 11 Jan 2019 08:57:47 -0000
+From: =?utf-8?q?J=C3=BCrgen?= <j.w.ott@gmx.de>
+Reply-To: Bug 1086782 <1086782@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150558614762.29770.16367876405044972592.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154719527460.18956.2553704010171549341.malone@gac.canonical.com>
+References: <20121205125603.6348.62070.malonedeb@gac.canonical.com>
+Message-Id: <154719706788.18626.9643877721029992188.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1717708] Re: QEMU aarch64 can't run Windows ARM64
- iso's
+Subject: [Qemu-devel] [Bug 1086782] Re: HPET time drift windows 7 64bits
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,47 +39,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I encountered same problem. No video output when I start win10 with kvm ena=
-bled on arm64 host.
-Is there any update?
+I have this problem with Ubuntu 18.04
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1717708
+https://bugs.launchpad.net/bugs/1086782
 
 Title:
-  QEMU aarch64 can't run Windows ARM64 iso's
+  HPET time drift windows 7 64bits guest
 
 Status in QEMU:
-  New
+  Expired
 
 Bug description:
-  Hi,
-  recently Windows ARM64 ISOs have been posted on the internet..
-  just checked with latest QEMU 2.10 release from =
+  Using latest qemu-kvm (1.2.0), time drift (clock slow in guest) in Window=
+s 7 64 bits guest when HPET is enabled (default).
+  Disabling HPET (-no-hpet) solves the time drift.
 
-  https://qemu.weilnetz.de/w64/qemu-w64-setup-20170830.exe =
+  UsePlatformClock enable/disable doesn't make a difference in the guest.
+  bcdedit /set useplatformclock true
 
-  "h:\qemu\qemu-system-aarch64.exe" -boot d -cdrom h:\iso\16353.1000.170825=
--1423.RS_PRERELEASE_CLIENTPRO_OEMRET_ARM64FRE_ES-ES.ISO -m 2048 -cpu cortex=
--a57 -smp 1 -machine virt
-  seems no video output..
-  checked various machine options for example versatilepb (says guest has n=
-ot initialized the guest)..
-
-  so don't know if it's a QEMU bug or lacking feature but can support
-  running Windows ARM64 builds (would be nice if you can add a
-  Snapdragon835 machine type which is which first machines will be
-  running..)
+  Using driftfix slew doesn't make a difference too.
 
   =
 
-  note running a Windows x64 ISO with similar parameters works (removing -c=
-pu and -machine as not needed)
+  # qemu-system-x86_64 --version
+  QEMU emulator version 1.2.0 (qemu-kvm-1.2.0), Copyright (c) 2003-2008 Fab=
+rice Bellard
 
-  thanks..
+  Kernel is 3.6.8:
+  # uname -a
+  Linux pulsar 3.6.8 #1 SMP Sat Dec 1 16:26:10 CET 2012 x86_64 x86_64 x86_6=
+4 GNU/Linux
+
+  TSC is stable in the host:
+  =3D=3D=3D
+  # cat /sys/devices/system/clocksource/clocksource0/current_clocksource
+  tsc
+
+  Dmesg:
+  [    0.000000] hpet clockevent registered
+  [    0.000000] tsc: Fast TSC calibration using PIT
+  [    0.000000] tsc: Detected 2660.096 MHz processor
+  [    0.001002] Calibrating delay loop (skipped), value calculated using t=
+imer frequency.. 5320.19 BogoMIPS (lpj=3D2660096)
+  [    0.001138] pid_max: default: 32768 minimum: 301
+  ...
+  [    1.492019] tsc: Refined TSC clocksource calibration: 2659.973 MHz
+  [    1.492093] Switching to clocksource tsc
+
+  =
+
+  CPUinfo, constant_tsc:
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 23
+  model name      : Intel(R) Core(TM)2 Quad CPU    Q8400  @ 2.66GHz
+  stepping        : 10
+  microcode       : 0xa0b
+  cpu MHz         : 2667.000
+  cache size      : 2048 KB
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx=
+ lm constant_tsc arch_perfmon pebs bts rep_good nopl aperfmperf pni dtes64 =
+monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm sse4_1 xsave lahf_lm dtherm=
+ tpr_shadow vnmi flexpriority
+  bogomips        : 5320.19
+
+  # grep -i hpet .config
+  CONFIG_HPET_TIMER=3Dy
+  CONFIG_HPET_EMULATE_RTC=3Dy
+  CONFIG_HPET=3Dy
+  # CONFIG_HPET_MMAP is not set
+  =3D=3D=3D
+
+  Qemu command line:
+  /usr/bin/qemu-system-x86_64 -drive file=3D/dev/vol0/KVMORION01,cache=3Dno=
+ne,aio=3Dnative,if=3Dvirtio \
+    -drive file=3D/dev/vol0/KVMORION02,cache=3Dnone,aio=3Dnative,if=3Dvirti=
+o \
+    -cpu host \
+    -m 2048 \
+    -smp 4,maxcpus=3D4,cores=3D4,threads=3D1,sockets=3D1 \
+    -rtc base=3Dlocaltime,driftfix=3Dslew \
+    -vnc 10.124.241.211:0,password -k es \
+    -monitor telnet:localhost:37200,server,nowait \
+    -netdev tap,id=3Dkvmorion,ifname=3Dkvmorion,script=3D/etc/qemu-ifup-br0=
+,downscript=3D/etc/qemu-ifdown-br0 \
+    -device virtio-net-pci,netdev=3Dkvmorion,id=3Dvirtio-nic0,mac=3D02:85:6=
+4:02:c2:aa \
+    -device virtio-balloon-pci,id=3Dballoon0 \
+    -boot menu=3Don \
+    -pidfile /var/run/kvmorion.pid \
+    -daemonize
+
+  Using 1 CPU doesn't make a difference.
+  Only workaround is disabling hpet (-no-hpet)
+
+  Sample time drift in guest:
+  >ntpdate -q 10.124.241.211
+   5 Dec 13:36:06 ntpdate[3464]: Raised to realtime priority class
+  server 10.124.241.211, stratum 2, offset 3.694184, delay 0.02551
+   5 Dec 13:36:12 ntpdate[3464]: step time server 10.124.241.211 offset 3.6=
+94184 s
+  ec
+
+  >ntpdate -q 10.124.241.211
+   5 Dec 13:52:02 ntpdate[1964]: Raised to realtime priority class
+  server 10.124.241.211, stratum 2, offset 4.719968, delay 0.02554
+   5 Dec 13:52:08 ntpdate[1964]: step time server 10.124.241.211 offset 4.7=
+19968 s
+  ec
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1717708/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1086782/+subscriptions
