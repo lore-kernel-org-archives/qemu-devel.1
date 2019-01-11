@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48240)
+Received: from eggs.gnu.org ([209.51.188.92]:48384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghxe6-0005j5-Uw
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:18:51 -0500
+	(envelope-from <philmd@redhat.com>) id 1ghxeD-0005uM-3q
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:19:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1ghxV8-0000Oj-Ku
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:09:35 -0500
+	(envelope-from <philmd@redhat.com>) id 1ghxR8-0002Dl-5i
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 09:05:29 -0500
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 11 Jan 2019 15:08:42 +0100
-Message-Id: <20190111140857.4211-1-philmd@redhat.com>
+Date: Fri, 11 Jan 2019 15:04:23 +0100
+Message-Id: <20190111140457.2935-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH RESEND 00/15] typedefs: Remove scarcely used
+Subject: [Qemu-devel] [PATCH 00/33] typedefs: Remove scarcely used
  declarations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -22,7 +22,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>, Richard Henderson <rth@twiddle.net>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Artyom Tarasenko <atar4qemu@gmail.com>, Laszlo Ersek <lersek@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-ppc@nongnu.org
 
 Hi,
 
@@ -38,6 +38,30 @@ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02132.html
 [*] "Fix duplicated typedefs to be able to compile with Clang in gnu99 mo=
 de"
 https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02117.html
+
+Eric Blake (1):
+  typedefs: (Re-)sort entries alphabetically
+
+Frediano Ziglio (1):
+  spice: Remove unused include
+
+Gerd Hoffmann (6):
+  egl-headless: add egl_create_context
+  keymaps: remove modifiers include
+  keymaps: drop nl-be map
+  keymaps: remove common include
+  keymaps: drop support for include files
+  usb-audio: ignore usb packages with wrong size
+
+Li Qiang (1):
+  ioapic: use TYPE_FOO MACRO than constant string
+
+Marc-Andr=C3=A9 Lureau (1):
+  configure: bump spice-server required version to 0.12.5
+
+Peter Maydell (2):
+  ui/console: Remove qemu_create_display_surface_guestmem()
+  linux-user: make pwrite64/pread64(fd, NULL, 0, offset) return 0
 
 Philippe Mathieu-Daud=C3=A9 (15):
   hw/input/ps2: Remove PS2State from "qemu/typedefs.h"
@@ -56,32 +80,19 @@ Philippe Mathieu-Daud=C3=A9 (15):
   ui/console: Remove DisplayState/DisplaySurface from "qemu/typedefs.h"
   RFC ui/console: Add "ui/pixelformat.h" to declare PixelFormat
 
- audio/audio_int.h         |  4 ++--
- hw/arm/strongarm.h        |  1 +
- include/hw/acpi/vmgenid.h |  1 +
- include/hw/arm/pxa.h      |  2 ++
- include/hw/arm/virt.h     |  1 +
- include/hw/char/serial.h  |  4 ++--
- include/hw/devices.h      |  1 +
- include/hw/i2c/smbus.h    |  2 ++
- include/hw/i386/pc.h      |  4 ++--
- include/hw/ide/ahci.h     |  4 ++--
- include/hw/input/ps2.h    |  2 ++
- include/hw/mem/nvdimm.h   |  1 +
- include/hw/nvram/fw_cfg.h |  8 +++++++-
- include/hw/pci-host/q35.h |  1 +
- include/hw/pci/pci.h      |  1 +
- include/hw/pcmcia.h       |  4 ++--
- include/hw/ssi/pl022.h    |  1 +
- include/hw/ssi/ssi.h      |  1 +
- include/qemu/range.h      |  4 ++--
- include/qemu/typedefs.h   | 19 -------------------
- include/sysemu/bt.h       |  4 ++--
- include/ui/console.h      | 25 +++++++++----------------
- include/ui/pixelformat.h  | 31 +++++++++++++++++++++++++++++++
- include/ui/qemu-pixman.h  |  2 ++
- 24 files changed, 78 insertions(+), 50 deletions(-)
- create mode 100644 include/ui/pixelformat.h
+Priit Laes (1):
+  qom: Include qemu/fprintf-fn.h in cpu.h
+
+Thomas Huth (3):
+  hw/audio/marvell: Don't include unnecessary i2c.h header file
+  trivial: Don't include isa.h if it is not really necessary
+  hw/audio/marvell: Don't include unnecessary i2c.h header file
+
+Tom Deseyn (1):
+  Add getsockopt for settable SOL_IPV6 options
+
+Wainer dos Santos Moschetta (1):
+  hw/core: fix whitespace in a sentence
 
 --=20
 2.17.2
