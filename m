@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58750)
+Received: from eggs.gnu.org ([209.51.188.92]:59387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghyKL-0002aB-Sp
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:02:31 -0500
+	(envelope-from <mmoroz@google.com>) id 1ghyNO-0004eE-0r
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:05:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ghyKJ-0001cd-Sx
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:02:29 -0500
-Date: Fri, 11 Jan 2019 16:02:13 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190111150213.GK5010@dhcp-200-186.str.redhat.com>
-References: <cover.1547132561.git.berto@igalia.com>
-	<42c8dab1efbcd608a09a1d84468fc498b612bfa1.1547132561.git.berto@igalia.com>
+	(envelope-from <mmoroz@google.com>) id 1ghyNM-0003AZ-1b
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:05:37 -0500
+Received: from mail-io1-xd2b.google.com ([2607:f8b0:4864:20::d2b]:35655)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mmoroz@google.com>) id 1ghyNI-0002yu-Vi
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:05:34 -0500
+Received: by mail-io1-xd2b.google.com with SMTP id f4so12414516ion.2
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 07:05:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42c8dab1efbcd608a09a1d84468fc498b612bfa1.1547132561.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH 2/6] block: Acquire the AioContext in
- scsi_*_realize()
+References: <CAJSP0QUV39fK4L8MwQ-rGiR0ejUm0HCyKFqARh-SKRTuDPKOXg@mail.gmail.com>
+	<jpgsgy0aaw6.fsf@linux.bootlegged.copy>
+	<CACT4Y+YWVfg_PVh0=CTCgM9BRyCmKZB9N+_DBimaNKPE=y6r5Q@mail.gmail.com>
+	<CABiizEQ-O-Ro9cH3xqzZUB=c5k+oYJ-gdR7ssfbbn5kU_8GcAA@mail.gmail.com>
+	<e4af7025-fa8c-1078-62de-f77a11a79fc0@redhat.com>
+	<CAJSP0QUFrs=rPvcSdNzwjk2Zyc2Sfu81SM_KZsO9djSGK1beUA@mail.gmail.com>
+In-Reply-To: <CAJSP0QUFrs=rPvcSdNzwjk2Zyc2Sfu81SM_KZsO9djSGK1beUA@mail.gmail.com>
+From: Max Moroz <mmoroz@google.com>
+Date: Fri, 11 Jan 2019 07:04:48 -0800
+Message-ID: <CABiizES5O1zGF_7CxnSCfVQL39=Ov0Bf61-U2XwvoS1_xDi2ew@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Internship idea: virtio-blk oss-fuzz support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Dmitry Vyukov <dvyukov@google.com>, Oliver Chang <ochang@google.com>, Jonathan Metzman <metzman@google.com>, Bandan Das <bsd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Andrey Konovalov <andreyknvl@google.com>, Kostya Serebryany <kcc@google.com>
 
-Am 10.01.2019 um 16:03 hat Alberto Garcia geschrieben:
-> This fixes the following crash:
-> 
-> { "execute": "blockdev-add",
->   "arguments": {"driver": "null-co", "node-name": "hd0"}}
-> { "execute": "object-add",
->   "arguments": {"qom-type": "iothread", "id": "iothread0"}}
-> { "execute": "x-blockdev-set-iothread",
->   "arguments": {"node-name": "hd0", "iothread": "iothread0"}}
-> { "execute": "device_add",
->    "arguments": {"id": "scsi-pci0", "driver": "virtio-scsi-pci"}}
-> { "execute": "device_add",
->   "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
-> qemu: qemu_mutex_unlock_impl: Operation not permitted
-> Aborted
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+Paolo, thanks for clarifying, that makes total sense! I'd suggest not
+focusing on AFL, but go for a libFuzzer-based fuzz target (i.e.
+write LLVMFuzzerTestOneInput function), in that case you'll get both
+libFuzzer and AFL engines pluggable to that fuzz target. OSS-Fuzz runs both.
 
-> @@ -2553,6 +2563,7 @@ static int get_device_type(SCSIDiskState *s)
->  static void scsi_block_realize(SCSIDevice *dev, Error **errp)
->  {
->      SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-> +    AioContext *ctx;
->      int sg_version;
->      int rc;
->  
-> @@ -2568,7 +2579,10 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
->      }
->  
->      /* check we are using a driver managing SG_IO (version 3 and after) */
-> +    ctx = blk_get_aio_context(s->qdev.conf.blk);
-> +    aio_context_acquire(ctx);
->      rc = blk_ioctl(s->qdev.conf.blk, SG_GET_VERSION_NUM, &sg_version);
-> +    aio_context_release(ctx);
->      if (rc < 0) {
->          error_setg_errno(errp, -rc, "cannot get SG_IO version number");
->          if (rc != -EPERM) {
+On Thu, Jan 10, 2019 at 10:49 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-This is probably not enough. get_device_type() and
-scsi_generic_read_device_inquiry() below issue more ioctls (but we need
-to be careful not to include the scsi_realize() call in the locked
-section if you take the lock again there).
+> On Thu, Jan 10, 2019 at 11:25 PM Paolo Bonzini <pbonzini@redhat.com>
+> wrote:
+> > On 10/01/19 17:07, Max Moroz via Qemu-devel wrote:
+> > > +Oliver and Jonathan
+> > >
+> > > I'm a little confused. Do you want to fuzz QEMU or to fuzz something
+> else
+> > > using QEMU? In case of the latter, there was some discussion on
+> OSS-Fuzz
+> > > and (I think) even a build support was (sort of) added:
+> > > https://github.com/google/oss-fuzz/issues/1754
+> >
+> > We want to fuzz QEMU.
+> >
+> > The input is a sequence of operations on a PCI device or on guest
+> > memory, and you try and crash QEMU by passing it crazy operations.
+> >
+> > The qtest mode that Stefan mentioned provides something like a "JTAG
+> > over ASCII" where a testcase can inject elementary I/O operations into
+> > QEMU.  However, that is certainly too much for AFL to fuzz effectively;
+> > it would have to "learn" the qtest protocol, how to drive the PCI host
+> > bridge, how to setup a PCI device, and only then it would be able to
+> > find bugs.  So one idea would be to build another layer on top of qtest,
+> > that accepts higher-level operations and builds the qtest ASCII input
+> > from those.
+>
+> Question for the oss-fuzz folks: QEMU's qtest protocol involves a
+> 2-process architecture with a qtest process that connects to a QEMU
+> process.  We don't care about the code coverage/sanitizers/etc on the
+> test process, only the QEMU process.  The LLVMFuzzerTestOneInput()
+> entry point would nevertheless be in the qtest process.  Does this fit
+> into the oss-fuzz architecture?
+>
 
-Kevin
+We usually have a single fuzzing process, it starts with a fuzzing engine's
+main function and is calling LLVMFuzzerTestOneInput with various inputs and
+keep mutating them based on the coverage feedback. Running a second process
+which you don't care too much about might be fine, but the fuzzing process
+should be "replacing" or should I say "imitating" the process whose
+coverage you're interested in. Does it make any sense?
+
+
+
+>
+> Thanks,
+> Stefan
+>
