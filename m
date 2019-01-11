@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44470)
+Received: from eggs.gnu.org ([209.51.188.92]:45669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ghzCg-0000R7-EZ
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:58:39 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghzGr-0001zG-K4
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:02:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ghzCf-0000Bh-EG
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:58:38 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:51526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ghzCf-0008VZ-4a
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 10:58:37 -0500
-Received: by mail-wm1-x332.google.com with SMTP id b11so2883422wmj.1
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 07:58:27 -0800 (PST)
-Date: Fri, 11 Jan 2019 15:58:24 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190111155824.GB14776@stefanha-x1.localdomain>
-References: <20190110083753.GA31730@yangzhon-Virtual>
-	<20190110103636.GG19025@stefanha-x1.localdomain>
-	<20190111054604.GA1038@yangzhon-Virtual>
-	<a7e15215-e2df-309b-b1f6-6741bfff7247@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1ghzGn-0002T7-Sh
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:02:55 -0500
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
+	<2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
+Date: Fri, 11 Jan 2019 10:02:33 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="hQiwHBbRI9kgIhsi"
-Content-Disposition: inline
-In-Reply-To: <a7e15215-e2df-309b-b1f6-6741bfff7247@redhat.com>
-Subject: Re: [Qemu-devel] If Qemu support NVMe over Fabrics ?y
+In-Reply-To: <2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HASx7Z1SWXXP3nswDYLfPm6HIvhC68SjE"
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +26,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, QEMU Developers <qemu-devel@nongnu.org>, fam@euphon.net, keith.busch@intel.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-
---hQiwHBbRI9kgIhsi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HASx7Z1SWXXP3nswDYLfPm6HIvhC68SjE
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net"
+ <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com"
+ <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>
+Message-ID: <5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
+Subject: Re: [PATCH] block: don't probe zeroes in bs->file by default on
+ block_status
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+ <acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
+ <2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+In-Reply-To: <2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 11, 2019 at 11:48:52AM +0100, Paolo Bonzini wrote:
-> On 11/01/19 06:46, Yang Zhong wrote:
-> > On Thu, Jan 10, 2019 at 10:36:37AM +0000, Stefan Hajnoczi wrote:
-> >> On Thu, Jan 10, 2019 at 04:37:53PM +0800, Yang Zhong wrote:
-> >>> Do you know if Qemu support NVMe over Fabrics(NVMe-oF)?
-> >>> https://nvmexpress.org/wp-content/uploads/NVMe_Over_Fabrics.pdf
-> >>>
-> >>> The Qemu has enabled RDMA in last year, and i am not sure if Qemu=20
-> >>> should support NVME-oF. If Qemu support it, would you please share
-> >>> me the qemu related command or guides? thanks a lot!
-> >>
-> >> QEMU supports many different storage configurations.  Can you be more
-> >> specific?
-> >>
-> >> For example, if your host has NVMe-oF set up then you can give the NVMe
-> >> block devices to QEMU just like any other host block device (-drive
-> >> file=3D/dev/sdc,...).
-> >>
-> >> But maybe you are thinking about other configurations, like exposing
-> >> NVMe-oF to the guest?
-> >>
-> >   Thanks Stefan's comments. We only want Qemu as NVMe-oF initiator to
-> >   access remote target's resource.
-> >=20
-> >   I checked the block/nvme.c and hw/block/nvme.c code, which seems do
-> >   not support NVMe-oF . If i am wrong please correct me.
-> >=20
-> >   If Qemu support NVMe-oF initiator, please share me how to use it.=20
-> >   If Qemu does not support it, please tell me if community has plan=20
-> >   to implement it. thanks a lot!
+On 1/11/19 1:54 AM, Vladimir Sementsov-Ogievskiy wrote:
+
+>>
+>> How much performance can we buy back without any knobs at all, if we
+>> just taught posix-file.c to cache lseek() results?  That is, when
+>> visiting a file sequentially, if lseek(fd, 0, SEEK_HOLE) returns EOF o=
+n
+>> our first block status query, then all subsequent block status queries=
+
+>> fall within what we know to be data, and we can skip the lseek() calls=
+=2E
 >=20
-> QEMU's native NVMe driver only supports NVMe over PCI, but it should be
-> possible to extract common code if you want to add a native NVMe over
-> RDMA driver to QEMU.  There are currently no plans to add such a driver,
-> but it would certainly be a welcome addition.
+> EOF is bad mark I think. We may have a small hole not far from EOF, whi=
+ch
+> will lead to the same performance, but not EOF returned.
 
-Before investing time in doing that, what is the goal?
+EOF was just an example for a file that has no holes. But even for a
+file with holes, caching should help.  That is, if I have a raw file with=
+:
 
-Is this for test and bring-up of NVMe-oF?  Or why does the guest need to
-know that the storage is NVMe-oF?
+1M data | 1M hole | 1M data | EOF
 
-As I mentioned before, if your host supports NVMe-oF you can simply give
-the block device to QEMU and let the guest access it via virtio-blk,
-virtio-scsi, NVMe, etc.
+but a qcow2 file that was created in an out-of-order fashion, so that
+all clusters are discontiguous, then our current code may do something
+like the following sequence:
 
-Stefan
+block_status 0 - maps to 64k of host file at offset 0x20000
+ - lseek(0x20000) detects that we are in a data portion, and the next
+hole begins at 0x100000
+ - but because the next cluster is not at 0x30000, we throw away the
+information for 0x30000 to 0x100000
+block_status 64k - maps to 64k of host file at offset 0x40000
+ - lseek(0x40000) detects that we are in a data portion, and the next
+hole begins at 0x100000
+ - but because the next cluster is not at 0x50000, we throw away the
+information for 0x50000 to 0x100000
+block status 128k - maps to 64k of host file at offset 0x30000
+ - lseek(0x30000) detects that we are in a data portion, and the next
+hole begins at 0x100000
+=2E..
 
---hQiwHBbRI9kgIhsi
+Even a dumb most-recent use cache will speed this up: both the second
+and third queries above can be avoided because we know that both 0x40000
+and 0x30000 the second query at 0x40000 can be skipped (0x40000 is
+between our most recent lseek at 0x20000 and hole at 0x10000)
+
+Make the cache slightly larger, or use a bitmap with 2 bits per cluster
+(tracking unknown, known-data, known-hole), with proper flushing of the
+cache as we write to the image, or whatever, and we should automatically
+get some performance improvements by using fewer lseek() anywhere that
+we remember what previous lseek() already told us, with no knobs needed.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--HASx7Z1SWXXP3nswDYLfPm6HIvhC68SjE
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcOL0gAAoJEJykq7OBq3PIoysIAKj/5EcDXomgZmeuw0f34Lg+
-jGfqZOG6R8qWtZWgBBI9M4gJZhxQoMS15FJYinlPtkiHfLaeMPhis8zVYyuxbTOz
-iZbRLGeQvYDPr+lhzQ5Meri8iIzMHX7kk4EG0Qzx6oNY4gbNAr8sjMi1lKjP/ApD
-1pSQ6JmmXlB/SQDBCdGsxDMWHWR2AxqxK2wP7qju6p6wW0wi3BwNY1HvUp9XE563
-VePmylxNB/N+g2catiqKLevZubduaI+XDnj7nY7+bIr8gzYbwv49W1LZ7EYZ9r/o
-wX1ckRd0btcnu2FwOq5Wc3EZQz3hxvc9i3I6AzzOCL4azqcb7dUzxzc5BQf+6jo=
-=xtIe
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw4vhkACgkQp6FrSiUn
+Q2oczggAjhCZlIyOxFMLjlQjBlxVA9EMqMhnGxSxuPXAcTggWAWVI7/GXsF58AKP
+3Tm9lvMQ2aHn8SZPf4GdNFC6TT0bIJZu6hQEPfxD2SPthOF++ysBVrxRi7eI/5tI
+fxBvMuvv6Ee1MI6F9uVHJ6pJC5sXW9JPJ9zKptInmFFDcQLjnH1bam0ZkqzbP4mK
+H6+nmAePiDkE+XqpeKRIMMJ7ggKcsyL260KPC97VsmpbA7GhO0nRD9gD5lAnmLGF
+bEoIfwHIvUBMcJJYDhb9kLKN6lsFUkkebO+7eiN7/Zt/IhFx5n5b5KnVrpKK79l1
+uTG6VgboXCi10N99ecdmIZX5ronZ2Q==
+=ObOE
 -----END PGP SIGNATURE-----
 
---hQiwHBbRI9kgIhsi--
+--HASx7Z1SWXXP3nswDYLfPm6HIvhC68SjE--
