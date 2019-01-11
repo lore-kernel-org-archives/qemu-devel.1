@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50690)
+Received: from eggs.gnu.org ([209.51.188.92]:51051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghzZr-000261-Qp
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:22:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1ghzb3-0002pU-RI
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:23:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghzZq-0006Z3-Jk
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:22:35 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 11 Jan 2019 16:22:19 +0000
-Message-ID: <589853f3-847e-155b-7cdf-c4061522c8bc@virtuozzo.com>
-References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
-	<acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
-	<2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
-	<5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
-In-Reply-To: <5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1431E130339EE44E80C3AC7D82389085@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1ghzb2-0007Ao-CU
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:23:49 -0500
+References: <20190110191901.5082-1-eblake@redhat.com>
+	<20190110191901.5082-2-eblake@redhat.com>
+	<ee3dcc5c-23f6-e953-36f1-643c86bccbc0@janustech.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <236fdb34-e6e6-77bc-87e8-832ad2a6f1bd@redhat.com>
+Date: Fri, 11 Jan 2019 10:23:26 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
- default on block_status
+In-Reply-To: <ee3dcc5c-23f6-e953-36f1-643c86bccbc0@janustech.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="adeih1k2bNNG0HCTF1NtB6aUtmOLQKfVH"
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] qemu-option: Allow integer defaults
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +25,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Leonid Bloch <lbloch@janustech.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-MTEuMDEuMjAxOSAxOTowMiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xMS8xOSAxOjU0IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPiANCj4+Pg0KPj4+IEhvdyBt
-dWNoIHBlcmZvcm1hbmNlIGNhbiB3ZSBidXkgYmFjayB3aXRob3V0IGFueSBrbm9icyBhdCBhbGws
-IGlmIHdlDQo+Pj4ganVzdCB0YXVnaHQgcG9zaXgtZmlsZS5jIHRvIGNhY2hlIGxzZWVrKCkgcmVz
-dWx0cz8gIFRoYXQgaXMsIHdoZW4NCj4+PiB2aXNpdGluZyBhIGZpbGUgc2VxdWVudGlhbGx5LCBp
-ZiBsc2VlayhmZCwgMCwgU0VFS19IT0xFKSByZXR1cm5zIEVPRiBvbg0KPj4+IG91ciBmaXJzdCBi
-bG9jayBzdGF0dXMgcXVlcnksIHRoZW4gYWxsIHN1YnNlcXVlbnQgYmxvY2sgc3RhdHVzIHF1ZXJp
-ZXMNCj4+PiBmYWxsIHdpdGhpbiB3aGF0IHdlIGtub3cgdG8gYmUgZGF0YSwgYW5kIHdlIGNhbiBz
-a2lwIHRoZSBsc2VlaygpIGNhbGxzLg0KPj4NCj4+IEVPRiBpcyBiYWQgbWFyayBJIHRoaW5rLiBX
-ZSBtYXkgaGF2ZSBhIHNtYWxsIGhvbGUgbm90IGZhciBmcm9tIEVPRiwgd2hpY2gNCj4+IHdpbGwg
-bGVhZCB0byB0aGUgc2FtZSBwZXJmb3JtYW5jZSwgYnV0IG5vdCBFT0YgcmV0dXJuZWQuDQo+IA0K
-PiBFT0Ygd2FzIGp1c3QgYW4gZXhhbXBsZSBmb3IgYSBmaWxlIHRoYXQgaGFzIG5vIGhvbGVzLiBC
-dXQgZXZlbiBmb3IgYQ0KPiBmaWxlIHdpdGggaG9sZXMsIGNhY2hpbmcgc2hvdWxkIGhlbHAuICBU
-aGF0IGlzLCBpZiBJIGhhdmUgYSByYXcgZmlsZSB3aXRoOg0KPiANCj4gMU0gZGF0YSB8IDFNIGhv
-bGUgfCAxTSBkYXRhIHwgRU9GDQo+IA0KPiBidXQgYSBxY293MiBmaWxlIHRoYXQgd2FzIGNyZWF0
-ZWQgaW4gYW4gb3V0LW9mLW9yZGVyIGZhc2hpb24sIHNvIHRoYXQNCj4gYWxsIGNsdXN0ZXJzIGFy
-ZSBkaXNjb250aWd1b3VzLCB0aGVuIG91ciBjdXJyZW50IGNvZGUgbWF5IGRvIHNvbWV0aGluZw0K
-PiBsaWtlIHRoZSBmb2xsb3dpbmcgc2VxdWVuY2U6DQo+IA0KPiBibG9ja19zdGF0dXMgMCAtIG1h
-cHMgdG8gNjRrIG9mIGhvc3QgZmlsZSBhdCBvZmZzZXQgMHgyMDAwMA0KPiAgIC0gbHNlZWsoMHgy
-MDAwMCkgZGV0ZWN0cyB0aGF0IHdlIGFyZSBpbiBhIGRhdGEgcG9ydGlvbiwgYW5kIHRoZSBuZXh0
-DQo+IGhvbGUgYmVnaW5zIGF0IDB4MTAwMDAwDQo+ICAgLSBidXQgYmVjYXVzZSB0aGUgbmV4dCBj
-bHVzdGVyIGlzIG5vdCBhdCAweDMwMDAwLCB3ZSB0aHJvdyBhd2F5IHRoZQ0KPiBpbmZvcm1hdGlv
-biBmb3IgMHgzMDAwMCB0byAweDEwMDAwMA0KPiBibG9ja19zdGF0dXMgNjRrIC0gbWFwcyB0byA2
-NGsgb2YgaG9zdCBmaWxlIGF0IG9mZnNldCAweDQwMDAwDQo+ICAgLSBsc2VlaygweDQwMDAwKSBk
-ZXRlY3RzIHRoYXQgd2UgYXJlIGluIGEgZGF0YSBwb3J0aW9uLCBhbmQgdGhlIG5leHQNCj4gaG9s
-ZSBiZWdpbnMgYXQgMHgxMDAwMDANCj4gICAtIGJ1dCBiZWNhdXNlIHRoZSBuZXh0IGNsdXN0ZXIg
-aXMgbm90IGF0IDB4NTAwMDAsIHdlIHRocm93IGF3YXkgdGhlDQo+IGluZm9ybWF0aW9uIGZvciAw
-eDUwMDAwIHRvIDB4MTAwMDAwDQo+IGJsb2NrIHN0YXR1cyAxMjhrIC0gbWFwcyB0byA2NGsgb2Yg
-aG9zdCBmaWxlIGF0IG9mZnNldCAweDMwMDAwDQo+ICAgLSBsc2VlaygweDMwMDAwKSBkZXRlY3Rz
-IHRoYXQgd2UgYXJlIGluIGEgZGF0YSBwb3J0aW9uLCBhbmQgdGhlIG5leHQNCj4gaG9sZSBiZWdp
-bnMgYXQgMHgxMDAwMDANCj4gLi4uDQo+IA0KPiBFdmVuIGEgZHVtYiBtb3N0LXJlY2VudCB1c2Ug
-Y2FjaGUgd2lsbCBzcGVlZCB0aGlzIHVwOiBib3RoIHRoZSBzZWNvbmQNCj4gYW5kIHRoaXJkIHF1
-ZXJpZXMgYWJvdmUgY2FuIGJlIGF2b2lkZWQgYmVjYXVzZSB3ZSBrbm93IHRoYXQgYm90aCAweDQw
-MDAwDQo+IGFuZCAweDMwMDAwIHRoZSBzZWNvbmQgcXVlcnkgYXQgMHg0MDAwMCBjYW4gYmUgc2tp
-cHBlZCAoMHg0MDAwMCBpcw0KPiBiZXR3ZWVuIG91ciBtb3N0IHJlY2VudCBsc2VlayBhdCAweDIw
-MDAwIGFuZCBob2xlIGF0IDB4MTAwMDApDQoNCklzIGl0IGNvcnJlY3QganVzdCB1c2UgcmVzdWx0
-cyBmcm9tIHByZXZpb3VzIGl0ZXJhdGlvbnM/IEluIG1pcnJvciBzb3VyY2UNCmlzIGFjdGl2ZSBh
-bmQgbWF5IGNoYW5nZS4NCg0KPiANCj4gTWFrZSB0aGUgY2FjaGUgc2xpZ2h0bHkgbGFyZ2VyLCBv
-ciB1c2UgYSBiaXRtYXAgd2l0aCAyIGJpdHMgcGVyIGNsdXN0ZXINCj4gKHRyYWNraW5nIHVua25v
-d24sIGtub3duLWRhdGEsIGtub3duLWhvbGUpLCB3aXRoIHByb3BlciBmbHVzaGluZyBvZiB0aGUN
-Cj4gY2FjaGUgYXMgd2Ugd3JpdGUgdG8gdGhlIGltYWdlLCBvciB3aGF0ZXZlciwgYW5kIHdlIHNo
-b3VsZCBhdXRvbWF0aWNhbGx5DQo+IGdldCBzb21lIHBlcmZvcm1hbmNlIGltcHJvdmVtZW50cyBi
-eSB1c2luZyBmZXdlciBsc2VlaygpIGFueXdoZXJlIHRoYXQNCj4gd2UgcmVtZW1iZXIgd2hhdCBw
-cmV2aW91cyBsc2VlaygpIGFscmVhZHkgdG9sZCB1cywgd2l0aCBubyBrbm9icyBuZWVkZWQuDQo+
-IA0KDQpTbyB0aGUgY2FjaGUgc2hvdWxkIGNvbnNpZGVyIGFsbCB3cml0ZXMgYW5kIGRpc2NhcmRz
-LiBBbmQgaXQgaXMgb2J2aW91c2x5DQptb3JlIGRpZmZpY3VsdCB0byBpbXBsZW1lbnQgaXQsIHRo
-YW4ganVzdCBkb24ndCBjYWxsIHRoaXMgbHNlZWsuIEFuZCBJDQpkb24ndCB1bmRlcnN0YW5kLCB3
-aHkgY2FjaGUgKyBsc2VlayBpcyBiZXR0ZXIgZm9yIHRoZSBjYXNlIHdoZW4gd2UgZG9uJ3QNCm5l
-ZWQgbm9yIHRoZSBsc2VlayBuZWl0aGVyIHRoZSBjYWNoZS4gSXMgdGhpcyBhbGwgdG8gbm90IGFk
-ZCBhbiBvcHRpb24/DQpBbHNvIEtldmluIG9iamVjdHMgdG8gY2FjaGluZyBsc2VlayBpbiBwYXJh
-bGxlbCBzdWItdGhyZWFkLg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--adeih1k2bNNG0HCTF1NtB6aUtmOLQKfVH
+From: Eric Blake <eblake@redhat.com>
+To: Leonid Bloch <lbloch@janustech.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>,
+ "kwolf@redhat.com" <kwolf@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Message-ID: <236fdb34-e6e6-77bc-87e8-832ad2a6f1bd@redhat.com>
+Subject: Re: [PATCH v3 1/6] qemu-option: Allow integer defaults
+References: <20190110191901.5082-1-eblake@redhat.com>
+ <20190110191901.5082-2-eblake@redhat.com>
+ <ee3dcc5c-23f6-e953-36f1-643c86bccbc0@janustech.com>
+In-Reply-To: <ee3dcc5c-23f6-e953-36f1-643c86bccbc0@janustech.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/11/19 8:14 AM, Leonid Bloch wrote:
+> On 1/10/19 9:18 PM, Eric Blake wrote:
+>> Set the framework up for declaring integer options with an integer
+>> default, instead of our current insane approach of requiring the
+>> default value to be given as a string (which then has to be reparsed
+>> at every use that wants a number).  git grep '[^.]def_value_str' says
+>> that we have done a good job of NOT abusing the internal field
+>> outside of the implementation in qemu-option.c; therefore, it is not
+>> too hard to audit that all code can either handle the new integer
+>> defaults correctly or abort because a caller violated constraints.
+>> Sadly, we DO have a constraint that qemu_opt_get() should not be
+>> called on an option that has an integer type, because we have no
+>> where to stash a cached const char * result; but callers that want
+>> an integer should be using qemu_opt_get_number() and friends
+>> anyways.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>   include/qemu/option.h | 12 ++++++++
+>>   util/qemu-option.c    | 69 +++++++++++++++++++++++++++++++++++++----=
+--
+>>   2 files changed, 72 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/include/qemu/option.h b/include/qemu/option.h
+>> index 844587cab39..46b80d5a6e1 100644
+>> --- a/include/qemu/option.h
+>> +++ b/include/qemu/option.h
+>> @@ -46,6 +46,18 @@ typedef struct QemuOptDesc {
+>>       const char *name;
+>>       enum QemuOptType type;
+>>       const char *help;
+>> +    /*
+>> +     * For QEMU_OPT_STRING: Leave def_value_int 0, and set def_value_=
+str
+>> +     * to a default value or leave NULL for no default.
+>> +     *
+>> +     * For other types: Initialize at most non-zero def_value_int or =
+a
+>> +     * parseable def_value_str for a default (must use a string for a=
+n
+>> +     * explicit default of 0, although an implicit default generally
+>> +     * works).  If setting def_value_int, calling qemu_opt_get() on
+>> +     * that option will abort(); instead, call qemu_opt_get_del() or =
+a
+>> +     * typed getter.
+>> +     */
+>> +    uint64_t def_value_int;
+>>       const char *def_value_str;
+>>   } QemuOptDesc;
+>>
+
+>=20
+> If I understand correctly, the number will still be compiled into the=20
+> binary as an expression string, but will be printed correctly during=20
+> runtime?
+
+Anyone that uses .def_value_int will compile into the binary as an
+8-byte integer (regardless of how that number was spelled in C, either
+as a single constant, or as a constant expression), and NOT as a decimal
+string.  String conversions for code that asks for a string will happen
+by a runtime printf() (ideally, such code is limited to the case of
+printing out information during help output).  Code that is smart enough
+to request a number now gets the default value directly, rather than the
+old way of having to strtoll() decode a decimal string back into a
+number.  No one should ever be using .def_value_str =3D stringify(macro),=
+
+when they can instead just use .def_value_int =3D macro (which is what th=
+e
+next patch fixes).
+
+I split the addition of def_value_int from the use in order to ease revie=
+w.
+
+> If so, it still doesn't feel right to put expressions in binaries, but =
+I=20
+> agree that it's more elegant than my solution with the lookup table. I'=
+d=20
+> say the table would be more elegant if there would be more cases in=20
+> which it's needed, but that's not the case.
+>=20
+> The solution which Markus described as "attractively stupid" also could=
+=20
+> work, as there are exactly 2 places (which I know of) where it's really=
+=20
+> needed. Also, absolutely no changes is an option, as was mentioned befo=
+re.
+
+
+Markus' suggestion boils down to forgoing patch 1 and 2, rewriting patch
+3 and 4 to use hard-coded strings in the two spots that need them (more
+of a maintenance burden - if we ever change the macro's value, we have
+to also remember to change the string), but keeping patch 5 and 6 as-is.
+ It's a smaller diffstat, but less type-safe, and thus a slightly larger
+maintenance burden (more technical debt).  My approach is to get rid of
+the technical debt (use more type safety, so that we can catch bugs
+sooner, and avoid the risk of duplicated values getting out of sync ifa
+future patch changes a macro but not the corresponding string). I also
+replied to my thread about how we can make further enhancements by even
+more patches to FORCE that all integer-typed defaults use only
+def_value_int, all string-typed defaults use only def_value_str, at
+which point we could switch to using a union for def_value_str/int once
+we are sure our code base properly follows the safe typing rules.  But
+of course, doing it right costs more time up front (we're avoiding
+technical debt, but the patch is bigger and has to be reviewed).  So now
+it boils down to Markus' opinion on whether adding type-safe defaults to
+QemuOpts is worth it for less technical debt, or if it is adding too
+much burden to the fact that we already know that QemuOpts is a hack and
+we want to get rid of it in favor of QAPI.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--adeih1k2bNNG0HCTF1NtB6aUtmOLQKfVH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw4wv4ACgkQp6FrSiUn
+Q2o5Zwf/Uun3sC4weNw+Oy3NOzwbuy5K1Tw9N7nwXmrnRJ6HivynOIHhfuQi6+C4
+vuJHZc5uI+cTad1m49l05/UmzeSVyuEVpOG4VvtoYh7awCa4MzpvhpFTYFD1kfeK
+7xrY1wjdf8dkD/rhEOe4uYD9UDivX6rE9TONtW71d/CIePjKTVQYY+zW1EIp4lli
+lt4iZIDePOjXZLVFgi6QiFCpXvNtugMLqV8nF2R+xJxjxbOWHQ5K3u/gxqK1G3zo
+T2+vI/HYoA1aK2oQqsAJ/bJEpG7odAx0j8LJjABOUmoSoTrXIcAmi1nscw5a8yCh
+GqM7S+zPc13G+JvqlTwoP+G7MXRHWA==
+=5SF6
+-----END PGP SIGNATURE-----
+
+--adeih1k2bNNG0HCTF1NtB6aUtmOLQKfVH--
