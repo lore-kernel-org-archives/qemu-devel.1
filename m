@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59261)
+Received: from eggs.gnu.org ([209.51.188.92]:59455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghwPi-0002kW-HB
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ghwQS-0003O3-0B
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:00:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1ghwPh-000647-7U
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 07:59:54 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 11 Jan 2019 12:59:37 +0000
-Message-ID: <8a963e64-ca73-d1ff-0736-ade519d868e7@virtuozzo.com>
-References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
-	<20190111104126.GC5010@dhcp-200-186.str.redhat.com>
-	<b504e946-205c-8800-fe2c-e11f0b27c23a@virtuozzo.com>
-	<20190111122151.GF5010@dhcp-200-186.str.redhat.com>
-In-Reply-To: <20190111122151.GF5010@dhcp-200-186.str.redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <532AECE7150A69418FFD7841E9AD3834@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1ghwQQ-0006Zv-Sb
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:00:39 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:33443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ghwQQ-0006Wx-BA
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 08:00:38 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id i20so13059127otl.0
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 05:00:36 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
- default on block_status
+References: <20190108163008.7006-1-peter.maydell@linaro.org>
+	<20190108163008.7006-4-peter.maydell@linaro.org>
+	<CAFEAcA9xd-MJ7QHgYCyh0D+x_ooXYDCnKYTXELoxz3LbYO4SJw@mail.gmail.com>
+	<CAL1e-=gKA9dnfgcJ2QuvbWxjgHya1DfUz4VPRxqakyDVKzH1SA@mail.gmail.com>
+In-Reply-To: <CAL1e-=gKA9dnfgcJ2QuvbWxjgHya1DfUz4VPRxqakyDVKzH1SA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 11 Jan 2019 13:00:24 +0000
+Message-ID: <CAFEAcA_Mga7Y1x_eA-HMdTGhC26MZbHJpSyo01XuKFmRG8gzcw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 3/4] accel/tcg: Add cluster number to TCG
+ TB hash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +32,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, "patches@linaro.org" <patches@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MTEuMDEuMjAxOSAxNToyMSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTEuMDEuMjAxOSB1bSAx
-Mjo0MCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDEx
-LjAxLjIwMTkgMTM6NDEsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMTAuMDEuMjAxOSB1bSAx
-NDoyMCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+Pj4g
-ZHJ2X2NvX2Jsb2NrX3N0YXR1cyBkaWdzIGJzLT5maWxlIGZvciBhZGRpdGlvbmFsLCBtb3JlIGFj
-Y3VyYXRlIHNlYXJjaA0KPj4+PiBmb3IgaG9sZSBpbnNpZGUgcmVnaW9uLCByZXBvcnRlZCBhcyBE
-QVRBIGJ5IGJzIHNpbmNlIDVkYWE3NGE2ZWJjLg0KPj4+Pg0KPj4+PiBUaGlzIGFjY3VyYWN5IGlz
-IG5vdCBmcmVlOiBhc3N1bWUgd2UgaGF2ZSBxY293MiBkaXNrLiBBY3R1YWxseSwgcWNvdzINCj4+
-Pj4ga25vd3MsIHdoZXJlIGFyZSBob2xlcyBhbmQgd2hlcmUgaXMgZGF0YS4gQnV0IGV2ZXJ5IGJs
-b2NrX3N0YXR1cw0KPj4+PiByZXF1ZXN0IGNhbGxzIGxzZWVrIGFkZGl0aW9uYWxseS4gQXNzdW1l
-IGEgYmlnIGRpc2ssIGZ1bGwgb2YNCj4+Pj4gZGF0YSwgaW4gYW55IGl0ZXJhdGl2ZSBjb3B5aW5n
-IGJsb2NrIGpvYiAob3IgaW1nIGNvbnZlcnQpIHdlJ2xsIGNhbGwNCj4+Pj4gbHNlZWsoSE9MRSkg
-b24gZXZlcnkgaXRlcmF0aW9uLCBhbmQgZWFjaCBvZiB0aGVzZSBsc2Vla3Mgd2lsbCBoYXZlIHRv
-DQo+Pj4+IGl0ZXJhdGUgdGhyb3VnaCBhbGwgbWV0YWRhdGEgdXAgdG8gdGhlIGVuZCBvZiBmaWxl
-LiBJdCdzIG9idmlvdXNseQ0KPj4+PiBpbmVmZmVjdGl2ZSBiZWhhdmlvci4gQW5kIGZvciBtYW55
-IHNjZW5hcmlvcyB3ZSBkb24ndCBuZWVkIHRoaXMgbHNlZWsNCj4+Pj4gYXQgYWxsLg0KPj4+Pg0K
-Pj4+PiBTbywgbGV0J3MgIjVkYWE3NGE2ZWJjIiBieSBkZWZhdWx0LCBsZWF2aW5nIGFuIG9wdGlv
-biB0byByZXR1cm4NCj4+Pj4gcHJldmlvdXMgYmVoYXZpb3IsIHdoaWNoIGlzIG5lZWRlZCBmb3Ig
-c2NlbmFyaW9zIHdpdGggcHJlYWxsb2NhdGVkDQo+Pj4+IGltYWdlcy4NCj4+Pj4NCj4+Pj4gQWRk
-IGlvdGVzdCBpbGx1c3RyYXRpbmcgbmV3IG9wdGlvbiBzZW1hbnRpY3MuDQo+Pj4+DQo+Pj4+IFNp
-Z25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmly
-dHVvenpvLmNvbT4NCj4+Pg0KPj4+IEkgc3RpbGwgdGhpbmsgdGhhdCBhbiBvcHRpb24gaXNuJ3Qg
-YSBnb29kIHNvbHV0aW9uIGFuZCB3ZSBzaG91bGQgdHJ5IHVzZQ0KPj4+IHNvbWUgaGV1cmlzdGlj
-cyBpbnN0ZWFkLg0KPj4NCj4+IERvIHlvdSB0aGluayB0aGF0IGhldXJpc3RpY3Mgd291bGQgYmUg
-YmV0dGVyIHRoYW4gZmFpciBjYWNoZSBmb3IgbHNlZWsNCj4+IHJlc3VsdHM/DQo+IA0KPiBJIGRv
-bid0IHRoaW5rIGxzZWVrKCkgcmVzdWx0cyBhcmUgY2FjaGFibGUsIGF0IGxlYXN0IGZvciBpbWFn
-ZXMgdGhhdCBjYW4NCj4gc2hhcmUgQkxLX1BFUk1fV1JJVEUgYmV0d2VlbiBwcm9jZXNzZXMuDQo+
-IA0KPj4gSSBkb24ndCBzZWUgZ29vZCBoZXVyaXN0aWNzLCBuZWl0aGVyIHdhbnQgdG8gaW1wbGVt
-ZW50IGxzZWVrIG9wdGltaXphdGlvbnMuDQo+PiBJbiBvdXIgY2FzZXMgd2UgZG9uJ3QgbmVlZCBs
-c2VlayB1bmRlciBxY293MiBhdCBhbGwsIGFuZCBpdCdzIG9idmlvdXNseSBiZXR0ZXINCj4+IGp1
-c3QgZG9uJ3QgbHNlZWsgaW4gdGhlc2UgY2FzZXMuDQo+IA0KPiBJIHN1Z2dlc3RlZCBvbmU6IFBh
-c3MgbGFyZ2UgY29udGlndW91cyBhbGxvY2F0ZWQgcmFuZ2VzIHRvIHRoZSBwcm90b2NvbA0KPiBk
-cml2ZXIsIGJ1dCBqdXN0IGFzc3VtZSB0aGF0IHRoZSBhbGxvY2F0aW9uIHN0YXR1cyBpcyBjb3Jy
-ZWN0IGluIHRoZQ0KPiBmb3JtYXQgbGF5ZXIgaWYgdGhleSBhcmUgc21hbGwuDQoNClNvLCBmb3Ig
-ZnVsbHkgYWxsb2NhdGVkIGltYWdlLCB3ZSB3aWxsIGNhbGwgbHNlZWsgYWx3YXlzPw0KDQo+IA0K
-Pj4gTW9yZW92ZXIsIGFzIEkgdW5kZXJzdGFuZCwgdGhlIGNhc2VzIHdoZW4gd2UgbmVlZCBsc2Vl
-ayBhcmUgdGhvc2Ugd2hlbiBxY293MiB0aGlua3MNCj4+IHRoYXQgdGhlIGNsdXN0ZXIgaXMgZGF0
-YSwgYnV0IGFjdHVhbGx5IGl0J3MgYSBob2xlIG9uIGZzLi4uIElzbid0IGl0IGJldHRlciB0bw0K
-Pj4gc3VwcG9ydCB0aGlzIHRoaW5nIGluIHFjb3cyPyBBIGtpbmQgb2YgYWxsb2NhdGVkLXplcm9l
-cyBjbHVzdGVyPyBXZSBoYXZlIGVub3VnaA0KPj4gcmVzZXJ2ZWQgYml0cyBpbiBjbHVzdGVyIGRl
-c2NyaXB0b3IgdG8gYWRkIHRoaXMgZmVhdHVyZS4gQW5kIHRoYW4gd2UgZG9uJ3QgbmVlZA0KPj4g
-dGhpcyBraW5kIG9mIGNoZWF0aW5nIHdoZW4gdXNlciAiYmV0dGVyIGtub3dzIiB3aGVyZSBhcmUg
-aG9sZXMgdGhhbiBmb3JtYXQgbGF5ZXINCj4+IHdoaWNoIG93bnMgdGhlIGRhdGEuLg0KPiANCj4g
-VGhlIHBvaW50IG9mIG1ldGFkYXRhIHByZWFsbG9jYXRpb24gaXMgdGhhdCB5b3UgZG9uJ3QgaGF2
-ZSB0byB1cGRhdGUgdGhlDQo+IG1ldGFkYXRhIHdoZW4geW91IHdyaXRlIHRvIHRoZSBpbWFnZS4g
-SGF2aW5nIHRvIGNsZWFyIGEgYml0IGluIHRoZSBMMg0KPiBlbnRyeSB3b3VsZCBuZWdhdGUgdGhh
-dC4NCj4gDQo+IE1heWJlIGFub3RoZXIgb3B0aW9uIHdvdWxkIGJlIHRvIHVzZSBhIGNvbXBhdGli
-bGUgZmVhdHVyZSBmbGFnIGluIHFjb3cyDQo+IHRoYXQgaXMgc2V0IGR1cmluZyBjcmVhdGlvbiB3
-aXRoIHByZWFsbG9jYXRpb249bWV0YWRhdGEsIGFuZCB3ZSB3b3VsZA0KPiBvbmx5IGdvIHRvIHRo
-ZSBsb3dlciBsYXllciBpZiB0aGUgZmxhZyBpcyBzZXQuIFRoZSBkb3duc2lkZSBzaWRlIGlzIHRo
-YXQNCj4gdGhpcyB3b3VsZCBvbmx5IGJlIGVmZmVjdGl2ZSBmb3IgbmV3IGltYWdlcywgc28gY29w
-eWluZyBvbGQgcHJlYWxsb2NhdGVkDQo+IGltYWdlcyB3b3VsZCBiZSBzbG93ZWQgZG93biBjb25z
-aWRlcmFibHkuDQo+IA0KPiBLZXZpbg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
-bWlyDQo=
+On Fri, 11 Jan 2019 at 12:49, Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+> 1. What would be, in more detail, if possible in layman terms,
+> the "bad case" that this series fixes?
+
+I describe this in the cover letter (which also has a link to
+a tarball with a test case demonstrating it):
+> TCG implicitly assumes that all CPUs are alike, because we have
+> a single cache of generated TBs and we don't account for which
+> CPU generated the code or is looking for the TB when adding or
+> searching for generated TBs. This can go wrong in two situations:
+> (1) two CPUs have different physical address spaces (eg CPU 1
+> has one lot of RAM/ROM, and CPU 2 has different RAM/ROM): the
+> physical address alone is then not sufficient to distinguish
+> what code to run
+> (2) two CPUs have different features (eg FPU
+> vs no FPU): since our TCG frontends bake assumptions into the
+> generated code about the presence/absence of features, if a
+> CPU with FPU picks up a TB for one generated without an FPU
+> it will behave wrongly
+
+What happens is that CPU 1 picks up code that was generated
+for CPU 2 and which is not correct for it, and thus does
+not behave correctly. (In the test case, an instruction that
+should UNDEF on the Cortex-R5F but not on the Cortex-A53 will
+either UNDEF on the A53 or fail to UNDEF on the R5F, depending
+on which CPU happened to get to the test code first.)
+
+> 2. Let's suppose, hypothetically, and based on your example
+> from one of commit messages from this series, that we want to
+> support two multicore systems:
+>     A. Cluster 1: 1 core with FPU; cluster 2: 3 cores without FPU
+>     B. Cluster 1: 2 cores with FPU; cluster 2: 1 core without FPU
+> Is there an apparatus that would allow the end user specify these
+> and similar cpnfigurations through command line or acsimilar mean
+> (so, without QEMU explicitely supporting such core organization,
+> but supporting the single core in question, of course)?
+
+The QEMU definition of "cluster" requires that all the CPUs
+in the cluster must share (a) the same features (eg FPU)
+and (b) the same view of physical memory -- this is what
+defines that they are in the same cluster and not different
+ones. So you'd model this as four clusters (assuming that
+A and B have different views of physical memory. Otherwise
+you could put all the with-FPU cores in one cluster and
+the without-FPU cores in a second.)
+
+Real hardware might choose to define what it calls a "cluster"
+differently, but that doesn't matter.
+
+> 3. Is there a possibility to have two layer clustering sheme,
+> instead of one layer? Cluster/subcluster/core instead of
+> cluster/core? For MIPS, there is a need for such organization.
+> It looks to me 8 bits for cluster id, and 3 bits for subcluster
+> id would be sufficient.
+
+My view is that there is no need for the internal "cluster ID"
+to match what the hardware happens to do with SMP CPU IDs
+and NUMA architecture. What do you think we miss by this?
+(Handling of NUMA architecture is a distinct bit of QEMU code,
+unrelated to this.)
+
+thanks
+-- PMM
