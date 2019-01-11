@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52095)
+Received: from eggs.gnu.org ([209.51.188.92]:52563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghsL2-0006rx-NG
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:38:49 -0500
+	(envelope-from <groug@kaod.org>) id 1ghsNJ-0007z4-OY
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:41:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghsL1-0007si-NQ
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:38:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40294)
+	(envelope-from <groug@kaod.org>) id 1ghsNI-0001o5-Md
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:41:09 -0500
+Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:38571)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghsL1-0007ra-CP
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:38:47 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
-	<154703594930.13472.14801510978993753998.stgit@pasha-VirtualBox>
-Date: Fri, 11 Jan 2019 09:38:39 +0100
-In-Reply-To: <154703594930.13472.14801510978993753998.stgit@pasha-VirtualBox>
-	(Pavel Dovgalyuk's message of "Wed, 09 Jan 2019 15:12:29 +0300")
-Message-ID: <87lg3r8u7k.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ghsNI-0001lc-HG
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:41:08 -0500
+Received: from player159.ha.ovh.net (unknown [10.109.143.238])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id D2DDC1A2801
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 09:41:05 +0100 (CET)
+Date: Fri, 11 Jan 2019 09:40:54 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190111094054.3aa26223@bahia.lan>
+In-Reply-To: <1547194672-24169-3-git-send-email-thuth@redhat.com>
+References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+	<1547194672-24169-3-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 12/21] replay: introduce breakpoint at
- the specified step
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] ppc: Fix duplicated typedefs to be
+ able to compile with Clang in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,165 +31,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, pbonzini@redhat.com, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+On Fri, 11 Jan 2019 09:17:51 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-> This patch introduces replay_break, replay_delete_break
-> qmp and hmp commands.
-> These commands allow stopping at the specified instruction.
-> It may be useful for debugging when there are some known
-> events that should be investigated.
-> replay_break command has one argument - number of instructions
-> executed since the start of the replay.
-> replay_delete_break removes previously set breakpoint.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> --
->
-> v2:
->  - renamed replay_break qmp command into replay-break
->    (suggested by Eric Blake)
-> v7:
->  - introduces replay_delete_break command
-> v9:
->  - changed 'step' parameter name to 'icount'
->  - moved json stuff to replay.json and updated the description
->    (suggested by Markus Armbruster)
+> When compiling the ppc code with clang and -std=gnu99, there are a
+> couple of warnings/errors like this one:
+> 
+>   CC      ppc64-softmmu/hw/intc/xics.o
+> In file included from hw/intc/xics.c:35:
+> include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is a C11 feature
+>       [-Werror,-Wtypedef-redefinition]
+> typedef struct ICPState ICPState;
+>                         ^
+> target/ppc/cpu.h:1181:25: note: previous definition is here
+> typedef struct ICPState ICPState;
+>                         ^
+> Work around the problems by including the proper headers instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hmp-commands.hx           |   34 ++++++++++++++++++
->  hmp.h                     |    2 +
->  qapi/replay.json          |   36 +++++++++++++++++++
->  replay/replay-debugging.c |   85 +++++++++++++++++++++++++++++++++++++++++++++
->  replay/replay-internal.h  |    4 ++
->  replay/replay.c           |   17 +++++++++
->  6 files changed, 178 insertions(+)
->
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index ba71558..6d04c02 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1890,6 +1890,40 @@ Set QOM property @var{property} of object at location @var{path} to value @var{v
->  ETEXI
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  include/hw/ppc/spapr.h      |  5 +++--
+>  include/hw/ppc/spapr_xive.h |  2 --
+>  target/ppc/cpu.h            | 13 +++++++++----
+>  3 files changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 9e01a5a..a947a0a 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -8,15 +8,16 @@
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/ppc/spapr_ovec.h"
+>  #include "hw/ppc/spapr_irq.h"
+> +#include "hw/ppc/spapr_xive.h"  /* For sPAPRXive */
+> +#include "hw/ppc/xics.h"        /* For ICSState */
 >  
->      {
-> +        .name       = "replay_break",
-> +        .args_type  = "icount:i",
-> +        .params     = "icount",
-> +        .help       = "sets breakpoint on the step specified by the icount of the replay",
-
-"set replay breakpoint at the specified instruction count"
-
-> +        .cmd        = hmp_replay_break,
-> +    },
+>  struct VIOsPAPRBus;
+>  struct sPAPRPHBState;
+>  struct sPAPRNVRAM;
 > +
-> +STEXI
-> +@item replay_break @var{icount}
-> +@findex replay_break
-> +Set breakpoint on the step of the replay specified by @var{icount}.
-> +Execution stops when the specified @var{icount} is reached.
-> +icount for the reference may be observed with 'info replay' command.
-> +There could be at most one breakpoint. When breakpoint is set, the prior
-> +one is removed. The breakpoints may be set only in replay mode and only
-> +at the step in the future.
-
-This still uses both "step" and "instruction count".
-
-Suggest
-
-   Set replay breakpoint at instruction count @var{icount}.
-   Execution stops when the specified instruction is reached.
-   There can be at most one breakpoint.  When breakpoint is set, any prior
-   one is removed.  The breakpoint may be set only in replay mode and only
-   "in the future", i.e. at instruction counts greater than the current one.
-   The current instruction count can be observed with 'info replay'.
-
-
-> +ETEXI
-> +
-> +    {
-> +        .name       = "replay_delete_break",
-> +        .args_type  = "",
-> +        .params     = "",
-> +        .help       = "removes replay breakpoint",
-> +        .cmd        = hmp_replay_delete_break,
-> +    },
-> +
-> +STEXI
-> +@item replay_delete_break
-> +@findex replay_delete_break
-> +Removes replay breakpoint which was previously set with replay_break.
-> +The command is ignored when there are no replay breakpoints.
-> +ETEXI
-> +
-> +    {
->          .name       = "info",
->          .args_type  = "item:s?",
->          .params     = "[subcommand]",
-> diff --git a/hmp.h b/hmp.h
-> index d792149..c9b9b4f 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -149,5 +149,7 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
->  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
->  void hmp_info_sev(Monitor *mon, const QDict *qdict);
->  void hmp_info_replay(Monitor *mon, const QDict *qdict);
-> +void hmp_replay_break(Monitor *mon, const QDict *qdict);
-> +void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
+>  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+>  typedef struct sPAPREventSource sPAPREventSource;
+>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+> -typedef struct ICSState ICSState;
+> -typedef struct sPAPRXive sPAPRXive;
 >  
->  #endif
-> diff --git a/qapi/replay.json b/qapi/replay.json
-> index d7e76cf..a63219c 100644
-> --- a/qapi/replay.json
-> +++ b/qapi/replay.json
-> @@ -63,3 +63,39 @@
->  ##
->  { 'command': 'query-replay',
->    'returns': 'ReplayInfo' }
+>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+>  #define SPAPR_ENTRY_POINT       0x100
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 7fdc250..9bec919 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -41,8 +41,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
+>  bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
+>  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+>  
+> -typedef struct sPAPRMachineState sPAPRMachineState;
+> -
+>  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
+>  void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
+>                     uint32_t phandle);
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 486abaf..bde4dff 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -23,6 +23,11 @@
+>  #include "qemu-common.h"
+>  #include "qemu/int128.h"
+>  
+> +#ifndef CONFIG_USER_ONLY
+> +#include "hw/ppc/xive.h" /* for XiveTCTX */
+> +#include "hw/ppc/xics.h" /* for ICPState */
+> +#endif
 > +
-> +##
-> +# @replay-break:
-> +#
-> +# Set breakpoint on the step of the replay specified by @icount.
-> +# Execution stops when the specified @icount is reached.
-> +# icount for the reference may be obtained with @query-replay command.
-> +# There could be at most one breakpoint. When breakpoint is set, the prior
-> +# one is removed. The breakpoints may be set only in replay mode and only
-> +# at the step in the future.
-
-My comment on hmp-commands.hx applies.
-
-> +#
-> +# @icount: execution step to stop at
-
-s/execution step/instruction count/
-
-> +#
-> +# Since: 4.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "replay-break", "data": { "icount": 220414 } }
-> +#
-> +##
-> +{ 'command': 'replay-break', 'data': { 'icount': 'int' } }
-> +
-> +##
-> +# @replay-delete-break:
-> +#
-> +# Removes replay breakpoint which was set with @replay-break.
-> +# The command is ignored when there are no replay breakpoints.
-> +#
-> +# Since: 4.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "replay-delete-break" }
-> +#
-> +##
-> +{ 'command': 'replay-delete-break' }
-[...]
-
-We're down to phrasing help and documentation.  Almost done :)
+>  //#define PPC_EMULATE_32BITS_HYPV
+>  
+>  #if defined (TARGET_PPC64)
+> @@ -1177,8 +1182,6 @@ do {                                            \
+>  
+>  typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
+>  typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
+> -typedef struct XiveTCTX XiveTCTX;
+> -typedef struct ICPState ICPState;
+>  
+>  /**
+>   * PowerPCCPU:
+> @@ -1197,11 +1200,13 @@ struct PowerPCCPU {
+>      int vcpu_id;
+>      uint32_t compat_pvr;
+>      PPCVirtualHypervisor *vhyp;
+> -    ICPState *icp;
+> -    XiveTCTX *tctx;
+>      void *machine_data;
+>      int32_t node_id; /* NUMA node this CPU belongs to */
+>      PPCHash64Options *hash64_opts;
+> +#ifndef CONFIG_USER_ONLY
+> +    ICPState *icp;
+> +    XiveTCTX *tctx;
+> +#endif
+>  
+>      /* Fields related to migration compatibility hacks */
+>      bool pre_2_8_migration;
