@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53143)
+Received: from eggs.gnu.org ([209.51.188.92]:53598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ghzhB-000701-LU
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:30:10 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ghziw-0008EW-RP
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:31:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1ghzh8-0002DS-FR
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:30:09 -0500
+	(envelope-from <stefanha@gmail.com>) id 1ghziw-0003N3-2k
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:31:58 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36873)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ghziv-0003Mo-Sd
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:31:58 -0500
+Received: by mail-wm1-x344.google.com with SMTP id g67so2963035wmd.2
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 08:31:57 -0800 (PST)
+Date: Fri, 11 Jan 2019 16:31:55 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190111163155.GD14776@stefanha-x1.localdomain>
+References: <20190111131836.107549-1-sgarzare@redhat.com>
+	<20190111131836.107549-4-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190111155555.8270-1-philmd@redhat.com>
-References: <20190111155555.8270-1-philmd@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 11 Jan 2019 17:29:57 +0100
-Message-ID: <CAL1e-=hmJegfALunXYQLCMAutu9RS_61Te9azVpkqhgYCDU-xA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] contrib/gitdm: Fix a typo
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="4zI0WCX1RcnW9Hbu"
+Content-Disposition: inline
+In-Reply-To: <20190111131836.107549-4-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] optionrom: add new PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Maran Wilson <maran.wilson@oracle.com>, Richard Henderson <rth@twiddle.net>
 
-On Friday, January 11, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
->
-wrote:
 
-> Typo comes from upstream git://git.lwn.net/gitdm.git.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+--4zI0WCX1RcnW9Hbu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 11, 2019 at 02:18:35PM +0100, Stefano Garzarella wrote:
+> The new pvh.bin option rom can be used with SeaBIOS to boot
+> uncompressed kernel using the x86/HVM direct boot ABI.
+>=20
+> pvh.S contains the entry point of the option rom. It runs
+> in real mode, loads the e820 table querying the BIOS, and
+> then it switches to 32bit protect mode and jump to the
+> pvh_load_kernel() written in pvh_main.c.
+> pvh_load_kernel() loads the cmdline and kernel entry_point
+> using fw_cfg, then it looks for RSDP, fills the
+> hvm_start_info required by x86/HVM ABI, and finally jumps
+> to the kernel entry_point.
+>=20
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->  contrib/gitdm/filetypes.txt | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/contrib/gitdm/filetypes.txt b/contrib/gitdm/filetypes.txt
-> index 15d6f803b9..165b71b3f9 100644
-> --- a/contrib/gitdm/filetypes.txt
-> +++ b/contrib/gitdm/filetypes.txt
-> @@ -4,7 +4,7 @@
->  # This program is free software; you can redistribute it and/or modify
->  # it under the terms of the GNU General Public License as published by
->  # the Free Software Foundation; either version 2 of the License, or
-> -# (at your option  any later version.
-> +# (at your option) any later version.
->  #
->  # This program is distributed in the hope that it will be useful,
->  # but WITHOUT ANY WARRANTY; without even the implied warranty of
+>  pc-bios/optionrom/Makefile   |   5 +-
+>  pc-bios/optionrom/pvh.S      | 200 +++++++++++++++++++++++++++++++++++
+>  pc-bios/optionrom/pvh_main.c | 117 ++++++++++++++++++++
+>  3 files changed, 321 insertions(+), 1 deletion(-)
+>  create mode 100644 pc-bios/optionrom/pvh.S
+>  create mode 100644 pc-bios/optionrom/pvh_main.c
 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+--4zI0WCX1RcnW9Hbu
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-> --
-> 2.17.2
->
->
->
+iQEcBAEBAgAGBQJcOMT7AAoJEJykq7OBq3PIwmwH/16kjRZReY2VZdyJ/p/yAMch
+19aH409caGfyiwEhxLmrQcbXM1NcleOVc6AjmHqWBK8H5VLfqfcT+e+O/D9PYG3w
+rptzz6Hc/QCjIVwBGiMCqwWe7J6aMlyEFdqcUBZByRAblj6j5k83qVWsapTcdPpp
+gy5Li0PQEBHT5/vPPCQ5sN86ZShTHYSHtrqMNVp04jN3tZKlaPtABMtZLhleF3JD
+MQ6bJ/d4OQUdGAI4btFfsBzyi3lbC5hiMheJYpy3VrSnMC7RGsICLgvaN9dLoABa
+y1t+MbZezss6WozPeyijoSuz30tgn/e5Z7albLanPDB88FHwYSDuC13SGh7/BJg=
+=H03Z
+-----END PGP SIGNATURE-----
+
+--4zI0WCX1RcnW9Hbu--
