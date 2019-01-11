@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50558)
+Received: from eggs.gnu.org ([209.51.188.92]:50690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1ghzZl-00021q-G1
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:22:30 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghzZr-000261-Qp
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:22:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aaron@os.amperecomputing.com>) id 1ghzZj-0006SO-E8
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:22:29 -0500
-From: Aaron Lindsay <aaron@os.amperecomputing.com>
-Date: Fri, 11 Jan 2019 16:22:07 +0000
-Message-ID: <20190111162205.GB2819@quinoa.localdomain>
-References: <20181211151945.29137-1-aaron@os.amperecomputing.com>
-In-Reply-To: <20181211151945.29137-1-aaron@os.amperecomputing.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1ghzZq-0006Z3-Jk
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:22:35 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 11 Jan 2019 16:22:19 +0000
+Message-ID: <589853f3-847e-155b-7cdf-c4061522c8bc@virtuozzo.com>
+References: <20190110132048.49451-1-vsementsov@virtuozzo.com>
+	<acf4d082-dabd-55ec-4435-da3e93b6c4ab@redhat.com>
+	<2ad46997-01aa-7a7a-ed53-4463a60ca564@virtuozzo.com>
+	<5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
+In-Reply-To: <5854b5b8-4682-2188-0c00-55c8d413be5e@redhat.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3C19AC5E1A4D124298E0480D30770486@prod.exchangelabs.com>
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1431E130339EE44E80C3AC7D82389085@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 00/14] More fully implement ARM PMUv3
+Subject: Re: [Qemu-devel] [PATCH] block: don't probe zeroes in bs->file by
+ default on block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-Ping, just in case this got buried over the holidays...
-
--Aaron
-
-On Dec 11 10:20, Aaron Lindsay wrote:
-> The ARM PMU implementation currently contains a basic cycle counter, but
-> it is often useful to gather counts of other events, filter them based
-> on execution mode, and/or be notified on counter overflow. These patches
-> flesh out the implementations of various PMU registers including
-> PM[X]EVCNTR and PM[X]EVTYPER, add a struct definition to represent
-> arbitrary counter types, implement mode filtering, send interrupts on
-> counter overflow, and add instruction, cycle, and software increment
-> events.
->=20
-> Since v9 [1] I have made the following changes:
-> * Added a clarifying comment about how the PMU timer's migration is
->   handled
-> * Added a check against implementing PMCEID[23] if ID_DFR0.PerfMon =3D=3D
->   0xf
-> * Added TRACEFILT to the ID_DFR0 field definitions
->=20
-> [1] - https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00805.html
->=20
-> Aaron Lindsay (14):
->   migration: Add post_save function to VMStateDescription
->   target/arm: Reorganize PMCCNTR accesses
->   target/arm: Swap PMU values before/after migrations
->   target/arm: Filter cycle counter based on PMCCFILTR_EL0
->   target/arm: Allow AArch32 access for PMCCFILTR
->   target/arm: Implement PMOVSSET
->   target/arm: Define FIELDs for ID_DFR0
->   target/arm: Make PMCEID[01]_EL0 64 bit registers, add PMCEID[23]
->   target/arm: Add array for supported PMU events, generate
->     PMCEID[01]_EL0
->   target/arm: Finish implementation of PM[X]EVCNTR and PM[X]EVTYPER
->   target/arm: PMU: Add instruction and cycle events
->   target/arm: PMU: Set PMCR.N to 4
->   target/arm: Implement PMSWINC
->   target/arm: Send interrupts on PMU counter overflow
->=20
->  docs/devel/migration.rst    |   9 +-
->  include/migration/vmstate.h |   1 +
->  migration/vmstate.c         |  13 +-
->  target/arm/cpu.c            |  28 +-
->  target/arm/cpu.h            |  81 +++-
->  target/arm/cpu64.c          |   4 -
->  target/arm/helper.c         | 808 ++++++++++++++++++++++++++++++++----
->  target/arm/machine.c        |  24 ++
->  8 files changed, 863 insertions(+), 105 deletions(-)
->=20
-> --=20
-> 2.19.2
->=20
+MTEuMDEuMjAxOSAxOTowMiwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xMS8xOSAxOjU0IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPiANCj4+Pg0KPj4+IEhvdyBt
+dWNoIHBlcmZvcm1hbmNlIGNhbiB3ZSBidXkgYmFjayB3aXRob3V0IGFueSBrbm9icyBhdCBhbGws
+IGlmIHdlDQo+Pj4ganVzdCB0YXVnaHQgcG9zaXgtZmlsZS5jIHRvIGNhY2hlIGxzZWVrKCkgcmVz
+dWx0cz8gIFRoYXQgaXMsIHdoZW4NCj4+PiB2aXNpdGluZyBhIGZpbGUgc2VxdWVudGlhbGx5LCBp
+ZiBsc2VlayhmZCwgMCwgU0VFS19IT0xFKSByZXR1cm5zIEVPRiBvbg0KPj4+IG91ciBmaXJzdCBi
+bG9jayBzdGF0dXMgcXVlcnksIHRoZW4gYWxsIHN1YnNlcXVlbnQgYmxvY2sgc3RhdHVzIHF1ZXJp
+ZXMNCj4+PiBmYWxsIHdpdGhpbiB3aGF0IHdlIGtub3cgdG8gYmUgZGF0YSwgYW5kIHdlIGNhbiBz
+a2lwIHRoZSBsc2VlaygpIGNhbGxzLg0KPj4NCj4+IEVPRiBpcyBiYWQgbWFyayBJIHRoaW5rLiBX
+ZSBtYXkgaGF2ZSBhIHNtYWxsIGhvbGUgbm90IGZhciBmcm9tIEVPRiwgd2hpY2gNCj4+IHdpbGwg
+bGVhZCB0byB0aGUgc2FtZSBwZXJmb3JtYW5jZSwgYnV0IG5vdCBFT0YgcmV0dXJuZWQuDQo+IA0K
+PiBFT0Ygd2FzIGp1c3QgYW4gZXhhbXBsZSBmb3IgYSBmaWxlIHRoYXQgaGFzIG5vIGhvbGVzLiBC
+dXQgZXZlbiBmb3IgYQ0KPiBmaWxlIHdpdGggaG9sZXMsIGNhY2hpbmcgc2hvdWxkIGhlbHAuICBU
+aGF0IGlzLCBpZiBJIGhhdmUgYSByYXcgZmlsZSB3aXRoOg0KPiANCj4gMU0gZGF0YSB8IDFNIGhv
+bGUgfCAxTSBkYXRhIHwgRU9GDQo+IA0KPiBidXQgYSBxY293MiBmaWxlIHRoYXQgd2FzIGNyZWF0
+ZWQgaW4gYW4gb3V0LW9mLW9yZGVyIGZhc2hpb24sIHNvIHRoYXQNCj4gYWxsIGNsdXN0ZXJzIGFy
+ZSBkaXNjb250aWd1b3VzLCB0aGVuIG91ciBjdXJyZW50IGNvZGUgbWF5IGRvIHNvbWV0aGluZw0K
+PiBsaWtlIHRoZSBmb2xsb3dpbmcgc2VxdWVuY2U6DQo+IA0KPiBibG9ja19zdGF0dXMgMCAtIG1h
+cHMgdG8gNjRrIG9mIGhvc3QgZmlsZSBhdCBvZmZzZXQgMHgyMDAwMA0KPiAgIC0gbHNlZWsoMHgy
+MDAwMCkgZGV0ZWN0cyB0aGF0IHdlIGFyZSBpbiBhIGRhdGEgcG9ydGlvbiwgYW5kIHRoZSBuZXh0
+DQo+IGhvbGUgYmVnaW5zIGF0IDB4MTAwMDAwDQo+ICAgLSBidXQgYmVjYXVzZSB0aGUgbmV4dCBj
+bHVzdGVyIGlzIG5vdCBhdCAweDMwMDAwLCB3ZSB0aHJvdyBhd2F5IHRoZQ0KPiBpbmZvcm1hdGlv
+biBmb3IgMHgzMDAwMCB0byAweDEwMDAwMA0KPiBibG9ja19zdGF0dXMgNjRrIC0gbWFwcyB0byA2
+NGsgb2YgaG9zdCBmaWxlIGF0IG9mZnNldCAweDQwMDAwDQo+ICAgLSBsc2VlaygweDQwMDAwKSBk
+ZXRlY3RzIHRoYXQgd2UgYXJlIGluIGEgZGF0YSBwb3J0aW9uLCBhbmQgdGhlIG5leHQNCj4gaG9s
+ZSBiZWdpbnMgYXQgMHgxMDAwMDANCj4gICAtIGJ1dCBiZWNhdXNlIHRoZSBuZXh0IGNsdXN0ZXIg
+aXMgbm90IGF0IDB4NTAwMDAsIHdlIHRocm93IGF3YXkgdGhlDQo+IGluZm9ybWF0aW9uIGZvciAw
+eDUwMDAwIHRvIDB4MTAwMDAwDQo+IGJsb2NrIHN0YXR1cyAxMjhrIC0gbWFwcyB0byA2NGsgb2Yg
+aG9zdCBmaWxlIGF0IG9mZnNldCAweDMwMDAwDQo+ICAgLSBsc2VlaygweDMwMDAwKSBkZXRlY3Rz
+IHRoYXQgd2UgYXJlIGluIGEgZGF0YSBwb3J0aW9uLCBhbmQgdGhlIG5leHQNCj4gaG9sZSBiZWdp
+bnMgYXQgMHgxMDAwMDANCj4gLi4uDQo+IA0KPiBFdmVuIGEgZHVtYiBtb3N0LXJlY2VudCB1c2Ug
+Y2FjaGUgd2lsbCBzcGVlZCB0aGlzIHVwOiBib3RoIHRoZSBzZWNvbmQNCj4gYW5kIHRoaXJkIHF1
+ZXJpZXMgYWJvdmUgY2FuIGJlIGF2b2lkZWQgYmVjYXVzZSB3ZSBrbm93IHRoYXQgYm90aCAweDQw
+MDAwDQo+IGFuZCAweDMwMDAwIHRoZSBzZWNvbmQgcXVlcnkgYXQgMHg0MDAwMCBjYW4gYmUgc2tp
+cHBlZCAoMHg0MDAwMCBpcw0KPiBiZXR3ZWVuIG91ciBtb3N0IHJlY2VudCBsc2VlayBhdCAweDIw
+MDAwIGFuZCBob2xlIGF0IDB4MTAwMDApDQoNCklzIGl0IGNvcnJlY3QganVzdCB1c2UgcmVzdWx0
+cyBmcm9tIHByZXZpb3VzIGl0ZXJhdGlvbnM/IEluIG1pcnJvciBzb3VyY2UNCmlzIGFjdGl2ZSBh
+bmQgbWF5IGNoYW5nZS4NCg0KPiANCj4gTWFrZSB0aGUgY2FjaGUgc2xpZ2h0bHkgbGFyZ2VyLCBv
+ciB1c2UgYSBiaXRtYXAgd2l0aCAyIGJpdHMgcGVyIGNsdXN0ZXINCj4gKHRyYWNraW5nIHVua25v
+d24sIGtub3duLWRhdGEsIGtub3duLWhvbGUpLCB3aXRoIHByb3BlciBmbHVzaGluZyBvZiB0aGUN
+Cj4gY2FjaGUgYXMgd2Ugd3JpdGUgdG8gdGhlIGltYWdlLCBvciB3aGF0ZXZlciwgYW5kIHdlIHNo
+b3VsZCBhdXRvbWF0aWNhbGx5DQo+IGdldCBzb21lIHBlcmZvcm1hbmNlIGltcHJvdmVtZW50cyBi
+eSB1c2luZyBmZXdlciBsc2VlaygpIGFueXdoZXJlIHRoYXQNCj4gd2UgcmVtZW1iZXIgd2hhdCBw
+cmV2aW91cyBsc2VlaygpIGFscmVhZHkgdG9sZCB1cywgd2l0aCBubyBrbm9icyBuZWVkZWQuDQo+
+IA0KDQpTbyB0aGUgY2FjaGUgc2hvdWxkIGNvbnNpZGVyIGFsbCB3cml0ZXMgYW5kIGRpc2NhcmRz
+LiBBbmQgaXQgaXMgb2J2aW91c2x5DQptb3JlIGRpZmZpY3VsdCB0byBpbXBsZW1lbnQgaXQsIHRo
+YW4ganVzdCBkb24ndCBjYWxsIHRoaXMgbHNlZWsuIEFuZCBJDQpkb24ndCB1bmRlcnN0YW5kLCB3
+aHkgY2FjaGUgKyBsc2VlayBpcyBiZXR0ZXIgZm9yIHRoZSBjYXNlIHdoZW4gd2UgZG9uJ3QNCm5l
+ZWQgbm9yIHRoZSBsc2VlayBuZWl0aGVyIHRoZSBjYWNoZS4gSXMgdGhpcyBhbGwgdG8gbm90IGFk
+ZCBhbiBvcHRpb24/DQpBbHNvIEtldmluIG9iamVjdHMgdG8gY2FjaGluZyBsc2VlayBpbiBwYXJh
+bGxlbCBzdWItdGhyZWFkLg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
