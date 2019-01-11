@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44472)
+Received: from eggs.gnu.org ([209.51.188.92]:47720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghrkk-00009J-Dr
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:01:21 -0500
+	(envelope-from <thuth@redhat.com>) id 1ghs13-0003Tf-Gz
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:18:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ghrkj-0001g9-Fx
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:01:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50106)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ghrkj-0001d2-7C
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:01:17 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
-	<154703592583.13472.9297189413941172861.stgit@pasha-VirtualBox>
-Date: Fri, 11 Jan 2019 09:01:11 +0100
-In-Reply-To: <154703592583.13472.9297189413941172861.stgit@pasha-VirtualBox>
-	(Pavel Dovgalyuk's message of "Wed, 09 Jan 2019 15:12:05 +0300")
-Message-ID: <87a7k7aaig.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 08/21] migration: introduce icount field
- for snapshots
+	(envelope-from <thuth@redhat.com>) id 1ghs11-0007Jn-JI
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 03:18:09 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 11 Jan 2019 09:17:51 +0100
+Message-Id: <1547194672-24169-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 2/3] ppc: Fix duplicated typedefs to be able
+ to compile with Clang in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +20,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, armbru@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, pbonzini@redhat.com, qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+When compiling the ppc code with clang and -std=gnu99, there are a
+couple of warnings/errors like this one:
 
-> Saving icount as a parameters of the snapshot allows navigation between
-> them in the execution replay scenario.
-> This information can be used for finding a specific snapshot for rewinding
-> the recorded execution to the specific moment of the time.
-> E.g., 'reverse step' action needs to load the nearest snapshot which is
-> prior to the current moment of time .
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> --
->
-> v2:
->  - made icount in SnapshotInfo optional (suggested by Eric Blake)
-> v7:
->  - added more comments for icount member (suggested by Markus Armbruster)
-> v9:
->  - updated icount comment
-> ---
-[...]
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 762000f..a197e5f 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -26,13 +26,19 @@
->  #
->  # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
->  #
-> +# @icount: Current instruction count. Appears when execution record/replay
-> +#          is enabled. Used for "time-traveling" to match the moment
-> +#          in the recorded execution with the snapshots. This counter may
-> +#          be obtained through @query-replay command (since 4.0)
+  CC      ppc64-softmmu/hw/intc/xics.o
+In file included from hw/intc/xics.c:35:
+include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is a C11 feature
+      [-Werror,-Wtypedef-redefinition]
+typedef struct ICPState ICPState;
+                        ^
+target/ppc/cpu.h:1181:25: note: previous definition is here
+typedef struct ICPState ICPState;
+                        ^
+Work around the problems by including the proper headers instead.
 
-query-replay appears only in PATCH 11.  Please delay the last sentence
-until then.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ include/hw/ppc/spapr.h      |  5 +++--
+ include/hw/ppc/spapr_xive.h |  2 --
+ target/ppc/cpu.h            | 13 +++++++++----
+ 3 files changed, 12 insertions(+), 8 deletions(-)
 
-> +#
->  # Since: 1.3
->  #
->  ##
->  { 'struct': 'SnapshotInfo',
->    'data': { 'id': 'str', 'name': 'str', 'vm-state-size': 'int',
->              'date-sec': 'int', 'date-nsec': 'int',
-> -            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
-> +            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int',
-> +            '*icount': 'int' } }
->  
->  ##
->  # @ImageInfoSpecificQCow2EncryptionBase:
-> diff --git a/qapi/block.json b/qapi/block.json
-> index 11f01f2..a6396a9 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -176,7 +176,8 @@
->  #                    "date-sec": 1000012,
->  #                    "date-nsec": 10,
->  #                    "vm-clock-sec": 100,
-> -#                    "vm-clock-nsec": 20
-> +#                    "vm-clock-nsec": 20,
-> +#                    "icount": 220414
->  #      }
->  #    }
->  #
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 9e01a5a..a947a0a 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -8,15 +8,16 @@
+ #include "hw/mem/pc-dimm.h"
+ #include "hw/ppc/spapr_ovec.h"
+ #include "hw/ppc/spapr_irq.h"
++#include "hw/ppc/spapr_xive.h"  /* For sPAPRXive */
++#include "hw/ppc/xics.h"        /* For ICSState */
+ 
+ struct VIOsPAPRBus;
+ struct sPAPRPHBState;
+ struct sPAPRNVRAM;
++
+ typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+ typedef struct sPAPREventSource sPAPREventSource;
+ typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+-typedef struct ICSState ICSState;
+-typedef struct sPAPRXive sPAPRXive;
+ 
+ #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+ #define SPAPR_ENTRY_POINT       0x100
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 7fdc250..9bec919 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -41,8 +41,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lisn, bool lsi);
+ bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
+ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+ 
+-typedef struct sPAPRMachineState sPAPRMachineState;
+-
+ void spapr_xive_hcall_init(sPAPRMachineState *spapr);
+ void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *fdt,
+                    uint32_t phandle);
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 486abaf..bde4dff 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -23,6 +23,11 @@
+ #include "qemu-common.h"
+ #include "qemu/int128.h"
+ 
++#ifndef CONFIG_USER_ONLY
++#include "hw/ppc/xive.h" /* for XiveTCTX */
++#include "hw/ppc/xics.h" /* for ICPState */
++#endif
++
+ //#define PPC_EMULATE_32BITS_HYPV
+ 
+ #if defined (TARGET_PPC64)
+@@ -1177,8 +1182,6 @@ do {                                            \
+ 
+ typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
+ typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
+-typedef struct XiveTCTX XiveTCTX;
+-typedef struct ICPState ICPState;
+ 
+ /**
+  * PowerPCCPU:
+@@ -1197,11 +1200,13 @@ struct PowerPCCPU {
+     int vcpu_id;
+     uint32_t compat_pvr;
+     PPCVirtualHypervisor *vhyp;
+-    ICPState *icp;
+-    XiveTCTX *tctx;
+     void *machine_data;
+     int32_t node_id; /* NUMA node this CPU belongs to */
+     PPCHash64Options *hash64_opts;
++#ifndef CONFIG_USER_ONLY
++    ICPState *icp;
++    XiveTCTX *tctx;
++#endif
+ 
+     /* Fields related to migration compatibility hacks */
+     bool pre_2_8_migration;
+-- 
+1.8.3.1
