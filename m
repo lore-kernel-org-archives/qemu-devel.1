@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36707)
+Received: from eggs.gnu.org ([209.51.188.92]:38073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ghlQy-0003x4-Jj
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 20:16:29 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1ghlYv-0006SA-Md
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 20:24:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ghlQw-0003Oh-TN
-	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 20:16:28 -0500
-Date: Fri, 11 Jan 2019 11:50:01 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190111005001.GR6682@umbus.fritz.box>
-References: <20190104195654.19976-1-farosas@linux.ibm.com>
-	<20190104195654.19976-3-farosas@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="e7jIye1Ygp5H0AIi"
-Content-Disposition: inline
-In-Reply-To: <20190104195654.19976-3-farosas@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] target/ppc: Add GDB callbacks for SPRs
+	(envelope-from <balaton@eik.bme.hu>) id 1ghlYt-0000vr-Ru
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 20:24:41 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:50532)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1ghlYr-0000qb-Rn
+	for qemu-devel@nongnu.org; Thu, 10 Jan 2019 20:24:39 -0500
+Message-Id: <7a31c155c9899869794499d841d30c7ef32aae47.1547166960.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1547166960.git.balaton@eik.bme.hu>
+References: <cover.1547166960.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Fri, 11 Jan 2019 01:36:00 +0100
+Subject: [Qemu-devel] [PATCH 2/5] cmd646: Remove IDEBus from CMD646BAR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,125 +23,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fabiano Rosas <farosas@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: John Snow <jsnow@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>
 
+The cmd646 io mem ops callbacks only need the IDEBus which is
+currently passed via a CMD646BAR struct. No need to wrap it up like
+that, we can pass it directly to these callbacks which then allows to
+drop the IDEBus from the CMD646BAR.
 
---e7jIye1Ygp5H0AIi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/ide/cmd646.c      | 29 ++++++++++++++---------------
+ include/hw/ide/pci.h |  1 -
+ 2 files changed, 14 insertions(+), 16 deletions(-)
 
-On Fri, Jan 04, 2019 at 05:56:53PM -0200, Fabiano Rosas wrote:
-> These will be used to let GDB know about PPC's Special Purpose
-> Registers (SPR).
->=20
-> They take an index based on the order the registers appear in the XML
-> file sent by QEMU to GDB. This index does not match the actual
-> location of the registers in the env->spr array so the
-> gdb_find_spr_idx function does that conversion.
->=20
-> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
-> ---
->  target/ppc/translate_init.inc.c | 50 +++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
->=20
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-> index 03f1d34a97..f10a3637d9 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -9483,6 +9483,56 @@ static bool avr_need_swap(CPUPPCState *env)
->  #endif
->  }
-> =20
-> +#if !defined(CONFIG_USER_ONLY)
-> +static int gdb_find_spr_idx(CPUPPCState *env, int n)
-> +{
-> +    int idx =3D -1;
-> +    int i;
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(env->spr_cb); i++) {
-> +        ppc_spr_t *spr =3D &env->spr_cb[i];
-> +
-> +        if (spr->name && ++idx =3D=3D n) {
-> +            break;
-> +        }
-> +    }
-> +    return i;
-> +}
-
-This is very subtle - it relies on the fact that you also generate the
-XML in sequence, which makes for a very non-obvious dependency between
-different parts of the code.  At the very least this needs a big fat
-comment explaining how the gdb ids are allocated.
-
-I think better would be to explicitly put a gdb_id into the spr_cb
-structure - that would be filled in at the same time you generate the
-XML, then referenced here.
-
-> +static int gdb_get_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
-> +{
-> +    int reg;
-> +    int len;
-> +
-> +    reg =3D gdb_find_spr_idx(env, n);
-> +    if (!reg) {
-> +        return 0;
-> +    }
-> +
-> +    len =3D TARGET_LONG_SIZE;
-> +    stn_p(mem_buf, len, env->spr[reg]);
-> +    ppc_maybe_bswap_register(env, mem_buf, len);
-> +    return len;
-> +}
-> +
-> +static int gdb_set_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
-> +{
-> +    int reg;
-> +    int len;
-> +
-> +    reg =3D gdb_find_spr_idx(env, n);
-> +    if (!reg) {
-> +        return 0;
-> +    }
-> +
-> +    len =3D TARGET_LONG_SIZE;
-> +    ppc_maybe_bswap_register(env, mem_buf, len);
-> +    env->spr[reg] =3D ldn_p(mem_buf, len);
-> +
-> +    return len;
-> +}
-> +#endif
-> +
->  static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
->  {
->      if (n < 32) {
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---e7jIye1Ygp5H0AIi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlw36DkACgkQbDjKyiDZ
-s5LJlA/8Do3V++cuMLARywhoGMowat9nnjoQ3nF1bFuvyO6eOIB8WiD5YjNqwUDe
-JFl1qBym6Dd+bWr4hRWPBMIkVphm4g3STYhGf9iy5tFUfh6epxg+DABBWjnTglVU
-etPWMAlrKWs/eoz8D4SsrgFMbBf4cdI2gVMiyk2uAga1KLr3npZDDnICtYlUAVkn
-FT0Um6IbQCwCHltw3sIFGbqr/mZl+5Tdsjxq81hbGOxFK0L5Sj522aaM9iWHscEp
-EoiTzXs9fEiJacycRHEi6UH/RtcfmUBwWimA/5g31JpGhQcyLL2eD99s0b2DhvrA
-ZovgDzWqK+psBYA+NKRAJEUMh5VSfxPWrlIitBaG3oO+V7eCL2JiELc3kWZ0Ic3V
-vGc/lARnbt5a7y3Q/c8cpG0CJitY8eeEkxlYLyijxS+0JrNPBdlvgQMr5OnprZ4g
-QMTCnlIGOB9QYaSPOoirAsdC4eH0NFT4+mHIGf2kWXZXcOt0k/WyjvWveNCLpk5/
-y/DhXacIWz0c9MEIf8wPt7mky6Lg1sU7Dg5yvMhm9sNOzlWoaE6RG+w2iYGgOs77
-EC1apy0BKLeroa3FCad+t54JKb6GZ20eipZ9xvUcYCxWmuua2CmFtlkZKzTvlXjJ
-1GK3Et2bLFRlcJ1GkPvFhXt2tXOoQBpy4dblaaQgnbtpz5twPXE=
-=0ejD
------END PGP SIGNATURE-----
-
---e7jIye1Ygp5H0AIi--
+diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
+index 41c1831f9a..c24f71e219 100644
+--- a/hw/ide/cmd646.c
++++ b/hw/ide/cmd646.c
+@@ -53,23 +53,23 @@ static void cmd646_update_irq(PCIDevice *pd);
+ static uint64_t cmd646_cmd_read(void *opaque, hwaddr addr,
+                                 unsigned size)
+ {
+-    CMD646BAR *cmd646bar = opaque;
++    IDEBus *bus = opaque;
+ 
+     if (addr != 2 || size != 1) {
+         return ((uint64_t)1 << (size * 8)) - 1;
+     }
+-    return ide_status_read(cmd646bar->bus, addr + 2);
++    return ide_status_read(bus, addr + 2);
+ }
+ 
+ static void cmd646_cmd_write(void *opaque, hwaddr addr,
+                              uint64_t data, unsigned size)
+ {
+-    CMD646BAR *cmd646bar = opaque;
++    IDEBus *bus = opaque;
+ 
+     if (addr != 2 || size != 1) {
+         return;
+     }
+-    ide_cmd_write(cmd646bar->bus, addr + 2, data);
++    ide_cmd_write(bus, addr + 2, data);
+ }
+ 
+ static const MemoryRegionOps cmd646_cmd_ops = {
+@@ -81,15 +81,15 @@ static const MemoryRegionOps cmd646_cmd_ops = {
+ static uint64_t cmd646_data_read(void *opaque, hwaddr addr,
+                                  unsigned size)
+ {
+-    CMD646BAR *cmd646bar = opaque;
++    IDEBus *bus = opaque;
+ 
+     if (size == 1) {
+-        return ide_ioport_read(cmd646bar->bus, addr);
++        return ide_ioport_read(bus, addr);
+     } else if (addr == 0) {
+         if (size == 2) {
+-            return ide_data_readw(cmd646bar->bus, addr);
++            return ide_data_readw(bus, addr);
+         } else {
+-            return ide_data_readl(cmd646bar->bus, addr);
++            return ide_data_readl(bus, addr);
+         }
+     }
+     return ((uint64_t)1 << (size * 8)) - 1;
+@@ -98,15 +98,15 @@ static uint64_t cmd646_data_read(void *opaque, hwaddr addr,
+ static void cmd646_data_write(void *opaque, hwaddr addr,
+                              uint64_t data, unsigned size)
+ {
+-    CMD646BAR *cmd646bar = opaque;
++    IDEBus *bus = opaque;
+ 
+     if (size == 1) {
+-        ide_ioport_write(cmd646bar->bus, addr, data);
++        ide_ioport_write(bus, addr, data);
+     } else if (addr == 0) {
+         if (size == 2) {
+-            ide_data_writew(cmd646bar->bus, addr, data);
++            ide_data_writew(bus, addr, data);
+         } else {
+-            ide_data_writel(cmd646bar->bus, addr, data);
++            ide_data_writel(bus, addr, data);
+         }
+     }
+ }
+@@ -122,10 +122,9 @@ static void setup_cmd646_bar(PCIIDEState *d, int bus_num)
+     IDEBus *bus = &d->bus[bus_num];
+     CMD646BAR *bar = &d->cmd646_bar[bus_num];
+ 
+-    bar->bus = bus;
+-    memory_region_init_io(&bar->cmd, OBJECT(d), &cmd646_cmd_ops, bar,
++    memory_region_init_io(&bar->cmd, OBJECT(d), &cmd646_cmd_ops, bus,
+                           "cmd646-cmd", 4);
+-    memory_region_init_io(&bar->data, OBJECT(d), &cmd646_data_ops, bar,
++    memory_region_init_io(&bar->data, OBJECT(d), &cmd646_data_ops, bus,
+                           "cmd646-data", 8);
+ }
+ 
+diff --git a/include/hw/ide/pci.h b/include/hw/ide/pci.h
+index ed723acfb4..013d7937d2 100644
+--- a/include/hw/ide/pci.h
++++ b/include/hw/ide/pci.h
+@@ -40,7 +40,6 @@ typedef struct BMDMAState {
+ typedef struct CMD646BAR {
+     MemoryRegion cmd;
+     MemoryRegion data;
+-    IDEBus *bus;
+ } CMD646BAR;
+ 
+ #define TYPE_PCI_IDE "pci-ide"
+-- 
+2.13.7
