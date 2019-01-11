@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56642)
+Received: from eggs.gnu.org ([209.51.188.92]:56658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghzvs-0006Ob-6E
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:45:20 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ghzw8-0006ZF-1x
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:45:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ghzvo-0001KR-Lo
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:45:17 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 11 Jan 2019 17:45:06 +0100
-Message-Id: <20190111164506.15971-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] scsi-generic: avoid possible out-of-bounds
- access to r->buf
+	(envelope-from <eric.auger@redhat.com>) id 1ghzw6-0001Pm-98
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:45:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53438)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1ghzw3-0001Lf-1l
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 11:45:34 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Fri, 11 Jan 2019 17:45:03 +0100
+Message-Id: <20190111164503.14796-1-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/vfio/common: Refactor container
+ initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,80 +23,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
+Cc: groug@kaod.org
 
-Whenever the allocation length of a SCSI request is shorter than the size=
- of the
-VPD page list, page_idx is used blindly to index into r->buf.  Even thoug=
-h
-the stores in the insertion sort are protected against overflows, the sam=
-e is not
-true of the reads and the final store of 0xb0.
+In vfio_connect_container() the code that selects the
+iommu type can benefit from helpers such as
+vfio_iommu_get_type() and vfio_init_container(). As
+a result we end up with a switch/case on the iommu type
+that makes the code a little bit more readable and ready
+for addition of new iommu types. Also ioctl's get called
+once per iommu_type.
 
-This basically does the same thing as commit 57dbb58d80 ("scsi-generic: a=
-void
-out-of-bounds access to VPD page list", 2018-11-06), except that here the
-allocation length can be chosen by the guest.  Note that according to the=
- SCSI
-standard, the contents of the PAGE LENGTH field are not altered based
-on the allocation length.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-The code was introduced by commit 6c219fc8a1 ("scsi-generic: keep VPD
-page list sorted", 2018-11-06) but the overflow was already possible befo=
-re.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Fixes: a71c775b24ebc664129eb1d9b4c360590353efd5
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-generic.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index 7237b4162e..42700e8897 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -182,7 +182,7 @@ static void scsi_handle_inquiry_reply(SCSIGenericReq =
-*r, SCSIDevice *s)
-             /* Also take care of the opt xfer len. */
-             stl_be_p(&r->buf[12],
-                     MIN_NON_ZERO(max_transfer, ldl_be_p(&r->buf[12])));
--        } else if (s->needs_vpd_bl_emulation && page =3D=3D 0x00) {
-+        } else if (s->needs_vpd_bl_emulation && page =3D=3D 0x00 && r->b=
-uflen >=3D 4) {
-             /*
-              * Now we're capable of supplying the VPD Block Limits
-              * response if the hardware can't. Add it in the INQUIRY
-@@ -193,18 +193,20 @@ static void scsi_handle_inquiry_reply(SCSIGenericRe=
-q *r, SCSIDevice *s)
-              * and will use it to proper setup the SCSI device.
-              *
-              * VPD page numbers must be sorted, so insert 0xb0 at the
--             * right place with an in-place insert.  After the initializ=
-ation
--             * part of the for loop is executed, the device response is
--             * at r[0] to r[page_idx - 1].
-+             * right place with an in-place insert.  When the while loop
-+             * begins the device response is at r[0] to r[page_idx - 1].
-              */
--            for (page_idx =3D lduw_be_p(r->buf + 2) + 4;
--                 page_idx > 4 && r->buf[page_idx - 1] >=3D 0xb0;
--                 page_idx--) {
-+            page_idx =3D lduw_be_p(r->buf + 2) + 4;
-+            page_idx =3D MIN(page_idx, r->buflen);
-+            while (page_idx > 4 && r->buf[page_idx - 1] >=3D 0xb0) {
-                 if (page_idx < r->buflen) {
-                     r->buf[page_idx] =3D r->buf[page_idx - 1];
-                 }
-+                page_idx--;
-+            }
-+            if (page_idx < r->buflen) {
-+                r->buf[page_idx] =3D 0xb0;
-             }
--            r->buf[page_idx] =3D 0xb0;
-             stw_be_p(r->buf + 2, lduw_be_p(r->buf + 2) + 1);
-         }
+v2 -> v3:
+- originally submitted in [RFC v2 00/28] vSMMUv3/pSMMUv3
+  2 stage VFIO integration
+- remove "nested only is selected if requested by @force_nested"
+- added Greg's R-b
+---
+ hw/vfio/common.c | 101 ++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 64 insertions(+), 37 deletions(-)
+
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 7c185e5a2e..8535bfe66f 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1036,12 +1036,57 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
      }
---=20
-2.20.1
+ }
+ 
++/*
++ * vfio_iommu_get_type - selects the richest iommu_type (v2 first)
++ */
++static int vfio_iommu_get_type(VFIOContainer *container,
++                               Error **errp)
++{
++    int fd = container->fd;
++
++    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
++        return VFIO_TYPE1v2_IOMMU;
++    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU)) {
++        return VFIO_TYPE1_IOMMU;
++    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
++        return VFIO_SPAPR_TCE_v2_IOMMU;
++    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU)) {
++        return VFIO_SPAPR_TCE_IOMMU;
++    } else {
++        error_setg(errp, "No available IOMMU models");
++        return -EINVAL;
++    }
++}
++
++static int vfio_init_container(VFIOContainer *container, int group_fd,
++                               int iommu_type, Error **errp)
++{
++    int ret;
++
++    ret = ioctl(group_fd, VFIO_GROUP_SET_CONTAINER, &container->fd);
++    if (ret) {
++        error_setg_errno(errp, errno, "failed to set group container");
++        return -errno;
++    }
++
++    ret = ioctl(container->fd, VFIO_SET_IOMMU, iommu_type);
++    if (ret) {
++        error_setg_errno(errp, errno, "failed to set iommu for container");
++        return -errno;
++    }
++    container->iommu_type = iommu_type;
++    return 0;
++}
++
+ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+                                   Error **errp)
+ {
+     VFIOContainer *container;
+     int ret, fd;
+     VFIOAddressSpace *space;
++    int iommu_type;
++    bool v2 = false;
++
+ 
+     space = vfio_get_address_space(as);
+ 
+@@ -1101,23 +1146,20 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     container->fd = fd;
+     QLIST_INIT(&container->giommu_list);
+     QLIST_INIT(&container->hostwin_list);
+-    if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
+-        ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+-        bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU);
++
++    iommu_type = vfio_iommu_get_type(container, errp);
++    if (iommu_type < 0) {
++            goto free_container_exit;
++    }
++
++    switch (iommu_type) {
++    case VFIO_TYPE1v2_IOMMU:
++    case VFIO_TYPE1_IOMMU:
++    {
+         struct vfio_iommu_type1_info info;
+ 
+-        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
++        ret = vfio_init_container(container, group->fd, iommu_type, errp);
+         if (ret) {
+-            error_setg_errno(errp, errno, "failed to set group container");
+-            ret = -errno;
+-            goto free_container_exit;
+-        }
+-
+-        container->iommu_type = v2 ? VFIO_TYPE1v2_IOMMU : VFIO_TYPE1_IOMMU;
+-        ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+-        if (ret) {
+-            error_setg_errno(errp, errno, "failed to set iommu for container");
+-            ret = -errno;
+             goto free_container_exit;
+         }
+ 
+@@ -1137,28 +1179,16 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+         }
+         vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
+         container->pgsizes = info.iova_pgsizes;
+-    } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
+-               ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
++        break;
++    }
++    case VFIO_SPAPR_TCE_v2_IOMMU:
++        v2 = true;
++    case VFIO_SPAPR_TCE_IOMMU:
++    {
+         struct vfio_iommu_spapr_tce_info info;
+-        bool v2 = !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU);
+ 
+-        ret = ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
++        ret = vfio_init_container(container, group->fd, iommu_type, errp);
+         if (ret) {
+-            error_setg_errno(errp, errno, "failed to set group container");
+-            ret = -errno;
+-            goto free_container_exit;
+-        }
+-        container->iommu_type =
+-            v2 ? VFIO_SPAPR_TCE_v2_IOMMU : VFIO_SPAPR_TCE_IOMMU;
+-        ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+-        if (ret) {
+-            container->iommu_type = VFIO_SPAPR_TCE_IOMMU;
+-            v2 = false;
+-            ret = ioctl(fd, VFIO_SET_IOMMU, container->iommu_type);
+-        }
+-        if (ret) {
+-            error_setg_errno(errp, errno, "failed to set iommu for container");
+-            ret = -errno;
+             goto free_container_exit;
+         }
+ 
+@@ -1222,10 +1252,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+                               info.dma32_window_size - 1,
+                               0x1000);
+         }
+-    } else {
+-        error_setg(errp, "No available IOMMU models");
+-        ret = -EINVAL;
+-        goto free_container_exit;
++    }
+     }
+ 
+     vfio_kvm_device_add_group(group);
+-- 
+2.17.2
