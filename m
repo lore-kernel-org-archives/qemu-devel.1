@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45121)
+Received: from eggs.gnu.org ([209.51.188.92]:47435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1giBHu-0004ob-On
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 23:52:51 -0500
+	(envelope-from <stefanha@redhat.com>) id 1giEgL-00068c-U2
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 03:30:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1giBFf-0007tD-O5
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 23:50:32 -0500
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:39899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1giBFf-0007o9-Fl
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 23:50:31 -0500
-Received: by mail-yw1-xc42.google.com with SMTP id k188so6667018ywa.6
-	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 20:50:24 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1giEgK-0007Kx-Vi
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 03:30:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1giEgK-0007K3-KK
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 03:30:16 -0500
+Date: Sat, 12 Jan 2019 08:30:08 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190112083008.GA20193@stefanha-x1.localdomain>
+References: <20181220152030.28035-1-remy.noel@blade-group.com>
 MIME-Version: 1.0
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<20190110102551.GD19025@stefanha-x1.localdomain>
-	<CAONzpcYgVWUFg1uSHOLzOS5en2vHP_=oNXQvWQEZd9FdYi2uxA@mail.gmail.com>
-	<20190111155342.GA14776@stefanha-x1.localdomain>
-In-Reply-To: <20190111155342.GA14776@stefanha-x1.localdomain>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Sat, 12 Jan 2019 12:50:12 +0800
-Message-ID: <CAONzpca7NEzX-GZ4W5J328njEW_NpUXJphTNwzgqfXOS-f54-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 0/7] vhost-user-blk: Add support
- for backend reconnecting
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DocE+STaALJfprDB"
+Content-Disposition: inline
+In-Reply-To: <20181220152030.28035-1-remy.noel@blade-group.com>
+Subject: Re: [Qemu-devel] [QEMU-devel][PATCH v4 0/2] Fix concurrent
+ aio_poll/set_fd_handler.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
-	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: remy.noel@blade-group.com
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-On Fri, 11 Jan 2019 at 23:53, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->
-> On Thu, Jan 10, 2019 at 06:59:27PM +0800, Yongji Xie wrote:
-> > On Thu, 10 Jan 2019 at 18:25, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > >
-> > > On Wed, Jan 09, 2019 at 07:27:21PM +0800, elohimes@gmail.com wrote:
-> > > > From: Xie Yongji <xieyongji@baidu.com>
-> > > >
-> > > > This patchset is aimed at supporting qemu to reconnect
-> > > > vhost-user-blk backend after vhost-user-blk backend crash or
-> > > > restart.
-> > > >
-> > > > The patch 1 uses exisiting wait/nowait options to make QEMU not
-> > > > do a connect on client sockets during initialization of the chardev.
-> > > >
-> > > > The patch 2 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
-> > > > and VHOST_USER_SET_INFLIGHT_FD to support providing shared
-> > > > memory to backend.
-> > >
-> > > Can you describe the problem that the inflight I/O shared memory region
-> > > solves?
-> > >
-> >
-> > The backend need to get inflight I/O and do I/O replay after restart.
-> > Now we can only get used_idx in used_ring. It's not enough. Because we
-> > might not process descriptors in the same order which they have been
-> > made available sometimes. A simple example:
-> > https://patchwork.kernel.org/cover/10715305/#22375607. So we need a
-> > shared memory to track inflight I/O.
->
-> The inflight shared memory region is something that needs to be
-> discussed in detail to make sure it is correct not just for vhost-blk
-> but also for other vhost-user devices in the future.
->
-> Please expand the protocol documentation so that someone can implement
-> this feature without looking at the code.  Explain the reason for the
-> inflight shared memory region and how exactly it used.
->
 
-OK, will do it in v5.
+--DocE+STaALJfprDB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> After a quick look at the shared memory region documentation I have a
-> few questions:
->
-> 1. The avail ring only contains "head" indices, each of which may chain
->    non-head descriptors.  Does the inflight memory region track only the
->    heads?
->
+On Thu, Dec 20, 2018 at 04:20:28PM +0100, remy.noel@blade-group.com wrote:
+> From: Remy Noel <remy.noel@blade-group.com>
+>=20
+> It is possible for an io_poll/read/write callback to be concurrently exec=
+uted along
+> with an aio_set_fd_handlers. This can cause all sorts of problems, like
+> a NULL callback or a bad opaque pointer.
+>=20
+> V2:
+>     * Do not use RCU anymore as it inccurs a performance loss
+> V3:
+>     * Don't drop revents when a handler is modified [Stefan]
+> V4:
+>     * Unregister fd from ctx epoll when removing fd_handler [Paolo]
+>=20
+> Remy Noel (2):
+>   aio-posix: Unregister fd from ctx epoll when removing fd_handler.
+>   aio-posix: Fix concurrent aio_poll/set_fd_handler.
+>=20
+>  util/aio-posix.c | 90 +++++++++++++++++++++++++++++-------------------
+>  util/aio-win32.c | 67 ++++++++++++++++-------------------
+>  2 files changed, 84 insertions(+), 73 deletions(-)
+>=20
+> --=20
+> 2.19.2
+>=20
 
-Yes, we only track the head in inflight region.
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
-> 2. Does the inflight shared memory region preserve avail ring order?
->    For example, if the guest submitted 5 2 4, will the new vhost-user
->    backend keep that order or does it see 2 4 5?
->
+Stefan
 
-Now we don't support to resubmit I/O in order. But I think we can add
-a timestamp
-for each inflight descriptor in shared memory to achieve that.
+--DocE+STaALJfprDB
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> 3. What are the exact memory region size requirements?  Imagine a device
->    with a large virtqueue.  Or a device with multiple virtqueues of
->    different sizes.  Can your structure hand those cases?
->
+-----BEGIN PGP SIGNATURE-----
 
-Each available virtqueue should have a region in inflight memory. The
-size of region should be fixed and support handling max size elements
-in one virtqueue. There may be a little waste, but I think it make the
-structure more clear.
+iQEcBAEBAgAGBQJcOaWQAAoJEJykq7OBq3PI4P0H/2ODLDPlC9YKBO39rlwBK+EC
+8vz2Bf7UYbYZ1YCPjGZ0Kp9FbUfww5jmxWqnUIP17S7kuP3dwwIGVnUdFdTmz5i8
+XvRh+vkRP0CetgZWJnMkhXatjMa0ezb/LO8LZQKuYCOxJBlj6Zqin36ioX2J4gya
+r2IM4mbauUNo6F34TfOP5LYdBAnyzPUaeep48Egd1Xv/8/9hZNhU5nlOOKuAIfhF
+1AAakdTihlsxykeOBVmrkIP6sWLVV/fcrZSkuICOdV5PcIAulAXmKdbtfc4X0V+l
+lxTp9sNyrlm+C14ip+0dmiVBeQ9/N9SxDRzs4Kemm7ond5RBMlRqR4fyBay9uu4=
+=pdaJ
+-----END PGP SIGNATURE-----
 
-> I'm concerned that this approach to device recovery is invasive and hard
-> to test.  Instead I would use VIRTIO's Device Status Field
-> DEVICE_NEEDS_RESET bit to tell the guest driver that a reset is
-> necessary.  This is more disruptive - drivers either have to resubmit or
-> fail I/O with EIO - but it's also simple and more likely to work
-> correctly (it only needs to be implemented correctly in the guest
-> driver, not in the many available vhost-user backend implementations).
->
-
-So you mean adding one way to notify guest to resubmit inflight I/O. I
-think it's a good idea. But would it be more flexible to implement
-this in backend. We can support old guest. And it will be easy to fix
-bug or add feature.
-
-Thanks,
-Yongji
+--DocE+STaALJfprDB--
