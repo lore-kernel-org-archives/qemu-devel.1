@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59712)
+Received: from eggs.gnu.org ([209.51.188.92]:59671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1giNaO-0003bK-BK
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:00:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1giNaN-0003aA-H4
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:00:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1giNYS-0001zJ-Ma
+	(envelope-from <eblake@redhat.com>) id 1giNYS-0001zF-Lt
 	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:58:46 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Sat, 12 Jan 2019 11:58:02 -0600
-Message-Id: <20190112175812.27068-10-eblake@redhat.com>
+Date: Sat, 12 Jan 2019 11:58:08 -0600
+Message-Id: <20190112175812.27068-16-eblake@redhat.com>
 In-Reply-To: <20190112175812.27068-1-eblake@redhat.com>
 References: <20190112175812.27068-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 09/19] nbd/client: Change signature of
- nbd_negotiate_simple_meta_context()
+Subject: [Qemu-devel] [PATCH v3 15/19] nbd/client: Add
+ nbd_receive_export_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,189 +25,336 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Pass 'info' instead of three separate parameters related to info,
-when requesting the server to set the meta context.  Update the
-NBDExportInfo struct to rename the received id field to match the
-fact that we are currently overloading the field to match whatever
-context the user supplied through the x-dirty-bitmap hack, as well
-as adding a TODO comment to remind future patches about a desire
-to request two contexts at once.
+We want to be able to detect whether a given qemu NBD server is
+exposing the right export(s) and dirty bitmaps, at least for
+regression testing.  We could use 'nbd-client -l' from the upstream
+NBD project to list exports, but it's annoying to rely on
+out-of-tree binaries; furthermore, nbd-client doesn't necessarily
+know about all of the qemu NBD extensions.  Thus, we plan on adding
+a new mode to qemu-nbd that merely sniffs all possible information
+from the server during handshake phase, then disconnects and dumps
+the information.
+
+This patch adds the low-level client code for grabbing the list
+of exports.  It benefits from the recent refactoring patches, as
+well as a minor tweak of changing nbd_opt_go() to nbd_opt_info_or_go(),
+in order to share as much code as possible when it comes to doing
+validation of server replies.  The resulting information is stored
+in an array of NBDExportInfo which has been expanded to any
+description string, along with a convenience function for freeing
+the list.
+
+Note: a malicious server could exhaust memory of a client by feeding
+an unending loop of exports; perhaps we should place a limit on how
+many we are willing to receive. But note that a server could
+reasonably be serving an export for every file in a large directory,
+where an arbitrary limit in the client means we can't list anything
+from such a server; the same happens if we just run until the client
+fails to malloc() and thus dies by an abort(), where the limit is
+no longer arbitrary but determined by available memory.  Since the
+client is already planning on being short-lived, it's hard to call
+this a denial of service attack that would starve off other uses,
+so it does not appear to be a security issue.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181215135324.152629-12-eblake@redhat.com>
+Message-Id: <20181215135324.152629-19-eblake@redhat.com>
 Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
 ---
- include/block/nbd.h |  2 +-
- block/nbd-client.c  |  4 ++--
- nbd/client.c        | 53 +++++++++++++++++++++------------------------
- 3 files changed, 28 insertions(+), 31 deletions(-)
+v3: mention security (non-)issue in commit message [Rich], formatting
+tweaks
+---
+ include/block/nbd.h |  15 ++++-
+ nbd/client.c        | 144 +++++++++++++++++++++++++++++++++++++++++---
+ nbd/trace-events    |   2 +-
+ 3 files changed, 150 insertions(+), 11 deletions(-)
 
 diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 6d76d3dc221..bdc7ec7195a 100644
+index bdc7ec7195a..e9a442ce7e9 100644
 --- a/include/block/nbd.h
 +++ b/include/block/nbd.h
-@@ -276,7 +276,7 @@ struct NBDExportInfo {
-     uint32_t opt_block;
+@@ -1,5 +1,5 @@
+ /*
+- *  Copyright (C) 2016-2017 Red Hat, Inc.
++ *  Copyright (C) 2016-2019 Red Hat, Inc.
+  *  Copyright (C) 2005  Anthony Liguori <anthony@codemonkey.ws>
+  *
+  *  Network Block Device
+@@ -262,6 +262,9 @@ struct NBDExportInfo {
+     /* Set by client before nbd_receive_negotiate() */
+     bool request_sizes;
+     char *x_dirty_bitmap;
++
++    /* Set by client before nbd_receive_negotiate(), or by server result=
+s
++     * during nbd_receive_export_list() */
+     char *name; /* must be non-NULL */
+
+     /* In-out fields, set by client before nbd_receive_negotiate() and
+@@ -269,7 +272,8 @@ struct NBDExportInfo {
+     bool structured_reply;
+     bool base_allocation; /* base:allocation context for NBD_CMD_BLOCK_S=
+TATUS */
+
+-    /* Set by server results during nbd_receive_negotiate() */
++    /* Set by server results during nbd_receive_negotiate() and
++     * nbd_receive_export_list() */
+     uint64_t size;
+     uint16_t flags;
+     uint32_t min_block;
+@@ -277,12 +281,19 @@ struct NBDExportInfo {
      uint32_t max_block;
 
--    uint32_t meta_base_allocation_id;
-+    uint32_t context_id;
+     uint32_t context_id;
++
++    /* Set by server results during nbd_receive_export_list() */
++    char *description;
  };
  typedef struct NBDExportInfo NBDExportInfo;
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 3309376bc16..813539676d2 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -249,11 +249,11 @@ static int nbd_parse_blockstatus_payload(NBDClientS=
-ession *client,
-     }
-
-     context_id =3D payload_advance32(&payload);
--    if (client->info.meta_base_allocation_id !=3D context_id) {
-+    if (client->info.context_id !=3D context_id) {
-         error_setg(errp, "Protocol error: unexpected context id %d for "
-                          "NBD_REPLY_TYPE_BLOCK_STATUS, when negotiated c=
-ontext "
-                          "id is %d", context_id,
--                         client->info.meta_base_allocation_id);
-+                         client->info.context_id);
-         return -EINVAL;
-     }
-
+ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+                           const char *hostname, QIOChannel **outioc,
+                           NBDExportInfo *info, Error **errp);
++void nbd_free_export_list(NBDExportInfo *info, int count);
++int nbd_receive_export_list(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
++                            const char *hostname, NBDExportInfo **info,
++                            Error **errp);
+ int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
+              Error **errp);
+ int nbd_send_request(QIOChannel *ioc, NBDRequest *request);
 diff --git a/nbd/client.c b/nbd/client.c
-index 8227e69478a..77993890f04 100644
+index 620fbb5ef01..a5a705a67f7 100644
 --- a/nbd/client.c
 +++ b/nbd/client.c
-@@ -630,26 +630,30 @@ static QIOChannel *nbd_receive_starttls(QIOChannel =
-*ioc,
+@@ -330,11 +330,14 @@ static int nbd_receive_list(QIOChannel *ioc, char *=
+*name, char **description,
  }
 
- /* nbd_negotiate_simple_meta_context:
-- * Set one meta context. Simple means that reply must contain zero (not
-- * negotiated) or one (negotiated) contexts. More contexts would be cons=
-idered
-- * as a protocol error. It's also implied that meta-data query equals qu=
-eried
-- * context name, so, if server replies with something different than @co=
-ntext,
-- * it is considered an error too.
-- * return 1 for successful negotiation, context_id is set
-+ * Request the server to set the meta context for export @info->name
-+ * using @info->x_dirty_bitmap with a fallback to "base:allocation",
-+ * setting @info->context_id to the resulting id. Fail if the server
-+ * responds with more than one context or with a context different
-+ * than the query.
-+ * return 1 for successful negotiation,
-  *        0 if operation is unsupported,
-  *        -1 with errp set for any other error
-  */
- static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
--                                             const char *export,
--                                             const char *context,
--                                             uint32_t *context_id,
-+                                             NBDExportInfo *info,
-                                              Error **errp)
+
+-/* Returns -1 if NBD_OPT_GO proves the export @info->name cannot be
++/*
++ * Returns -1 if NBD_OPT_GO proves the export @info->name cannot be
+  * used, 0 if NBD_OPT_GO is unsupported (fall back to NBD_OPT_LIST and
+  * NBD_OPT_EXPORT_NAME in that case), and > 0 if the export is good to
+- * go (with the rest of @info populated). */
+-static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo *info, Error **errp=
+)
++ * go (with the rest of @info populated).
++ */
++static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
++                              NBDExportInfo *info, Error **errp)
  {
-+    /*
-+     * TODO: Removing the x_dirty_bitmap hack will mean refactoring
-+     * this function to request and store ids for multiple contexts
-+     * (both base:allocation and a dirty bitmap), at which point this
-+     * function should lose the term _simple.
-+     */
-     int ret;
      NBDOptionReply reply;
--    uint32_t received_id =3D 0;
-+    const char *context =3D info->x_dirty_bitmap ?: "base:allocation";
-     bool received =3D false;
--    uint32_t export_len =3D strlen(export);
-+    uint32_t export_len =3D strlen(info->name);
-     uint32_t context_len =3D strlen(context);
-     uint32_t data_len =3D sizeof(export_len) + export_len +
-                         sizeof(uint32_t) + /* number of queries */
-@@ -657,9 +661,9 @@ static int nbd_negotiate_simple_meta_context(QIOChann=
-el *ioc,
-     char *data =3D g_malloc(data_len);
-     char *p =3D data;
+     uint32_t len =3D strlen(info->name);
+@@ -347,7 +350,8 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
+*info, Error **errp)
+      * flags still 0 is a witness of a broken server. */
+     info->flags =3D 0;
 
--    trace_nbd_opt_meta_request(context, export);
-+    trace_nbd_opt_meta_request(context, info->name);
-     stl_be_p(p, export_len);
--    memcpy(p +=3D sizeof(export_len), export, export_len);
-+    memcpy(p +=3D sizeof(export_len), info->name, export_len);
-     stl_be_p(p +=3D export_len, 1);
-     stl_be_p(p +=3D sizeof(uint32_t), context_len);
-     memcpy(p +=3D sizeof(context_len), context, context_len);
-@@ -685,7 +689,7 @@ static int nbd_negotiate_simple_meta_context(QIOChann=
-el *ioc,
-     if (reply.type =3D=3D NBD_REP_META_CONTEXT) {
-         char *name;
-
--        if (reply.length !=3D sizeof(received_id) + context_len) {
-+        if (reply.length !=3D sizeof(info->context_id) + context_len) {
-             error_setg(errp, "Failed to negotiate meta context '%s', ser=
-ver "
-                        "answered with unexpected length %" PRIu32, conte=
-xt,
-                        reply.length);
-@@ -693,12 +697,13 @@ static int nbd_negotiate_simple_meta_context(QIOCha=
-nnel *ioc,
-             return -1;
-         }
-
--        if (nbd_read(ioc, &received_id, sizeof(received_id), errp) < 0) =
-{
-+        if (nbd_read(ioc, &info->context_id, sizeof(info->context_id),
-+                     errp) < 0) {
-             return -1;
-         }
--        received_id =3D be32_to_cpu(received_id);
-+        info->context_id =3D be32_to_cpu(info->context_id);
-
--        reply.length -=3D sizeof(received_id);
-+        reply.length -=3D sizeof(info->context_id);
-         name =3D g_malloc(reply.length + 1);
-         if (nbd_read(ioc, name, reply.length, errp) < 0) {
-             g_free(name);
-@@ -715,7 +720,7 @@ static int nbd_negotiate_simple_meta_context(QIOChann=
-el *ioc,
-         }
-         g_free(name);
-
--        trace_nbd_opt_meta_reply(context, received_id);
-+        trace_nbd_opt_meta_reply(context, info->context_id);
-         received =3D true;
-
-         /* receive NBD_REP_ACK */
-@@ -744,12 +749,7 @@ static int nbd_negotiate_simple_meta_context(QIOChan=
-nel *ioc,
-         return -1;
+-    trace_nbd_opt_go_start(info->name);
++    assert(opt =3D=3D NBD_OPT_GO || opt =3D=3D NBD_OPT_INFO);
++    trace_nbd_opt_go_start(nbd_opt_lookup(opt), info->name);
+     buf =3D g_malloc(4 + len + 2 + 2 * info->request_sizes + 1);
+     stl_be_p(buf, len);
+     memcpy(buf + 4, info->name, len);
+@@ -356,7 +360,7 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
+*info, Error **errp)
+     if (info->request_sizes) {
+         stw_be_p(buf + 4 + len + 2, NBD_INFO_BLOCK_SIZE);
+     }
+-    error =3D nbd_send_option_request(ioc, NBD_OPT_GO,
++    error =3D nbd_send_option_request(ioc, opt,
+                                     4 + len + 2 + 2 * info->request_size=
+s,
+                                     buf, errp);
+     g_free(buf);
+@@ -365,7 +369,7 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
+*info, Error **errp)
      }
 
--    if (received) {
--        *context_id =3D received_id;
--        return 1;
--    }
--
--    return 0;
-+    return received;
+     while (1) {
+-        if (nbd_receive_option_reply(ioc, NBD_OPT_GO, &reply, errp) < 0)=
+ {
++        if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
+             return -1;
+         }
+         error =3D nbd_handle_reply_err(ioc, &reply, errp);
+@@ -875,7 +879,9 @@ static int nbd_start_negotiate(QIOChannel *ioc, QCryp=
+toTLSCreds *tlscreds,
+             clientflags |=3D NBD_FLAG_C_FIXED_NEWSTYLE;
+         }
+         if (globalflags & NBD_FLAG_NO_ZEROES) {
+-            *zeroes =3D false;
++            if (zeroes) {
++                *zeroes =3D false;
++            }
+             clientflags |=3D NBD_FLAG_C_NO_ZEROES;
+         }
+         /* client requested flags */
+@@ -996,7 +1002,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTL=
+SCreds *tlscreds,
+          * TLS).  If it is not available, fall back to
+          * NBD_OPT_LIST for nicer error messages about a missing
+          * export, then use NBD_OPT_EXPORT_NAME.  */
+-        result =3D nbd_opt_go(ioc, info, errp);
++        result =3D nbd_opt_info_or_go(ioc, NBD_OPT_GO, info, errp);
+         if (result < 0) {
+             return -EINVAL;
+         }
+@@ -1054,6 +1060,128 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCrypt=
+oTLSCreds *tlscreds,
+     return 0;
  }
 
- int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-@@ -848,10 +848,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTL=
-SCreds *tlscreds,
-             }
-
-             if (info->structured_reply && base_allocation) {
--                result =3D nbd_negotiate_simple_meta_context(
--                        ioc, info->name,
--                        info->x_dirty_bitmap ?: "base:allocation",
--                        &info->meta_base_allocation_id, errp);
-+                result =3D nbd_negotiate_simple_meta_context(ioc, info, =
-errp);
-                 if (result < 0) {
-                     goto fail;
-                 }
++/* Clean up result of nbd_receive_export_list */
++void nbd_free_export_list(NBDExportInfo *info, int count)
++{
++    int i;
++
++    if (!info) {
++        return;
++    }
++
++    for (i =3D 0; i < count; i++) {
++        g_free(info[i].name);
++        g_free(info[i].description);
++    }
++    g_free(info);
++}
++
++/*
++ * nbd_receive_export_list:
++ * Query details about a server's exports, then disconnect without
++ * going into transmission phase. Return a count of the exports listed
++ * in @info by the server, or -1 on error. Caller must free @info using
++ * nbd_free_export_list().
++ */
++int nbd_receive_export_list(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
++                            const char *hostname, NBDExportInfo **info,
++                            Error **errp)
++{
++    int result;
++    int count =3D 0;
++    int i;
++    int rc;
++    int ret =3D -1;
++    NBDExportInfo *array =3D NULL;
++    QIOChannel *sioc =3D NULL;
++
++    *info =3D NULL;
++    result =3D nbd_start_negotiate(ioc, tlscreds, hostname, &sioc, true,=
+ NULL,
++                                 errp);
++    if (tlscreds && sioc) {
++        ioc =3D sioc;
++    }
++
++    switch (result) {
++    case 2:
++    case 3:
++        /* newstyle - use NBD_OPT_LIST to populate array, then try
++         * NBD_OPT_INFO on each array member. If structured replies
++         * are enabled, also try NBD_OPT_LIST_META_CONTEXT. */
++        if (nbd_send_option_request(ioc, NBD_OPT_LIST, 0, NULL, errp) < =
+0) {
++            goto out;
++        }
++        while (1) {
++            char *name;
++            char *desc;
++
++            rc =3D nbd_receive_list(ioc, &name, &desc, errp);
++            if (rc < 0) {
++                goto out;
++            } else if (rc =3D=3D 0) {
++                break;
++            }
++            array =3D g_renew(NBDExportInfo, array, ++count);
++            memset(&array[count - 1], 0, sizeof(*array));
++            array[count - 1].name =3D name;
++            array[count - 1].description =3D desc;
++            array[count - 1].structured_reply =3D result =3D=3D 3;
++        }
++
++        for (i =3D 0; i < count; i++) {
++            array[i].request_sizes =3D true;
++            rc =3D nbd_opt_info_or_go(ioc, NBD_OPT_INFO, &array[i], errp=
+);
++            if (rc < 0) {
++                goto out;
++            } else if (rc =3D=3D 0) {
++                /* Pointless to try rest of loop. If OPT_INFO doesn't wo=
+rk,
++                 * it's unlikely that meta contexts work either */
++                break;
++            }
++
++            /* TODO: Grab meta contexts */
++        }
++
++        /* Send NBD_OPT_ABORT as a courtesy before hanging up */
++        nbd_send_opt_abort(ioc);
++        break;
++    case 1: /* newstyle, but limited to EXPORT_NAME */
++        error_setg(errp, "Server does not support export lists");
++        /* We can't even send NBD_OPT_ABORT, so merely hang up */
++        goto out;
++    case 0: /* oldstyle, parse length and flags */
++        array =3D g_new0(NBDExportInfo, 1);
++        array->name =3D g_strdup("");
++        count =3D 1;
++
++        if (nbd_negotiate_finish_oldstyle(ioc, array, errp) < 0) {
++            return -EINVAL;
++        }
++
++        /* Send NBD_CMD_DISC as a courtesy to the server, but ignore all
++         * errors now that we have the information we wanted. */
++        if (nbd_drop(ioc, 124, NULL) =3D=3D 0) {
++            NBDRequest request =3D { .type =3D NBD_CMD_DISC };
++
++            nbd_send_request(ioc, &request);
++        }
++        break;
++    default:
++        goto out;
++    }
++
++    *info =3D array;
++    array =3D NULL;
++    ret =3D count;
++
++ out:
++    qio_channel_shutdown(ioc, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
++    qio_channel_close(ioc, NULL);
++    object_unref(OBJECT(sioc));
++    nbd_free_export_list(array, count);
++    return ret;
++}
++
+ #ifdef __linux__
+ int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
+              Error **errp)
+diff --git a/nbd/trace-events b/nbd/trace-events
+index 663d11687ab..cbe03da24e9 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -4,7 +4,7 @@ nbd_receive_option_reply(uint32_t option, const char *opt=
+name, uint32_t type, co
+ nbd_server_error_msg(uint32_t err, const char *type, const char *msg) "s=
+erver reported error 0x%" PRIx32 " (%s) with additional message: %s"
+ nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't u=
+nderstand request %" PRIu32 " (%s), attempting fallback"
+ nbd_receive_list(const char *name, const char *desc) "export list includ=
+es '%s', description '%s'"
+-nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s=
+'"
++nbd_opt_go_start(const char *opt, const char *name) "Attempting %s for e=
+xport '%s'"
+ nbd_opt_go_success(void) "Export is good to go"
+ nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown in=
+fo %d (%s)"
+ nbd_opt_go_info_block_size(uint32_t minimum, uint32_t preferred, uint32_=
+t maximum) "Block sizes are 0x%" PRIx32 ", 0x%" PRIx32 ", 0x%" PRIx32
 --=20
 2.20.1
