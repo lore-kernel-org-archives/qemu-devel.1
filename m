@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60920)
+Received: from eggs.gnu.org ([209.51.188.92]:45121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1giA0u-0003zW-4g
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 22:31:13 -0500
+	(envelope-from <elohimes@gmail.com>) id 1giBHu-0004ob-On
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 23:52:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gi9uf-0005nk-7a
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 22:24:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34432)
+	(envelope-from <elohimes@gmail.com>) id 1giBFf-0007tD-O5
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 23:50:32 -0500
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:39899)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gi9uf-0005nL-29
-	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 22:24:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gi9ud-0002n7-Fn
-	for <qemu-devel@nongnu.org>; Sat, 12 Jan 2019 03:24:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6D1FF2E80CD
-	for <qemu-devel@nongnu.org>; Sat, 12 Jan 2019 03:24:43 +0000 (UTC)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1giBFf-0007o9-Fl
+	for qemu-devel@nongnu.org; Fri, 11 Jan 2019 23:50:31 -0500
+Received: by mail-yw1-xc42.google.com with SMTP id k188so6667018ywa.6
+	for <qemu-devel@nongnu.org>; Fri, 11 Jan 2019 20:50:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 12 Jan 2019 03:12:54 -0000
-From: James Harvey <jamespharvey20@gmail.com>
-Reply-To: Bug 1523246 <1523246@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151206150708.14182.82430.malonedeb@wampee.canonical.com>
-Message-Id: <154726277476.20153.7045391250665026143.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1523246] Re: Virtio-blk does not support TRIM
+References: <20190109112728.9214-1-xieyongji@baidu.com>
+	<20190110102551.GD19025@stefanha-x1.localdomain>
+	<CAONzpcYgVWUFg1uSHOLzOS5en2vHP_=oNXQvWQEZd9FdYi2uxA@mail.gmail.com>
+	<20190111155342.GA14776@stefanha-x1.localdomain>
+In-Reply-To: <20190111155342.GA14776@stefanha-x1.localdomain>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Sat, 12 Jan 2019 12:50:12 +0800
+Message-ID: <CAONzpca7NEzX-GZ4W5J328njEW_NpUXJphTNwzgqfXOS-f54-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 0/7] vhost-user-blk: Add support
+ for backend reconnecting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
+	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, nixun@baidu.com, qemu-devel <qemu-devel@nongnu.org>, lilin24@baidu.com, zhangyu31@baidu.com, chaiwen@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-I believe this feature was just merged by Linus about a week ago, and is
-in linux 5.0-rc1:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
-id=3Dd548e65904ae43b0637d200a2441fc94e0589c30
+On Fri, 11 Jan 2019 at 23:53, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Thu, Jan 10, 2019 at 06:59:27PM +0800, Yongji Xie wrote:
+> > On Thu, 10 Jan 2019 at 18:25, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > >
+> > > On Wed, Jan 09, 2019 at 07:27:21PM +0800, elohimes@gmail.com wrote:
+> > > > From: Xie Yongji <xieyongji@baidu.com>
+> > > >
+> > > > This patchset is aimed at supporting qemu to reconnect
+> > > > vhost-user-blk backend after vhost-user-blk backend crash or
+> > > > restart.
+> > > >
+> > > > The patch 1 uses exisiting wait/nowait options to make QEMU not
+> > > > do a connect on client sockets during initialization of the chardev.
+> > > >
+> > > > The patch 2 introduces two new messages VHOST_USER_GET_INFLIGHT_FD
+> > > > and VHOST_USER_SET_INFLIGHT_FD to support providing shared
+> > > > memory to backend.
+> > >
+> > > Can you describe the problem that the inflight I/O shared memory region
+> > > solves?
+> > >
+> >
+> > The backend need to get inflight I/O and do I/O replay after restart.
+> > Now we can only get used_idx in used_ring. It's not enough. Because we
+> > might not process descriptors in the same order which they have been
+> > made available sometimes. A simple example:
+> > https://patchwork.kernel.org/cover/10715305/#22375607. So we need a
+> > shared memory to track inflight I/O.
+>
+> The inflight shared memory region is something that needs to be
+> discussed in detail to make sure it is correct not just for vhost-blk
+> but also for other vhost-user devices in the future.
+>
+> Please expand the protocol documentation so that someone can implement
+> this feature without looking at the code.  Explain the reason for the
+> inflight shared memory region and how exactly it used.
+>
 
--- =
+OK, will do it in v5.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1523246
+> After a quick look at the shared memory region documentation I have a
+> few questions:
+>
+> 1. The avail ring only contains "head" indices, each of which may chain
+>    non-head descriptors.  Does the inflight memory region track only the
+>    heads?
+>
 
-Title:
-  Virtio-blk does not support TRIM
+Yes, we only track the head in inflight region.
 
-Status in QEMU:
-  Confirmed
+> 2. Does the inflight shared memory region preserve avail ring order?
+>    For example, if the guest submitted 5 2 4, will the new vhost-user
+>    backend keep that order or does it see 2 4 5?
+>
 
-Bug description:
-  When model=3Dvirtio is used, TRIM is not supported.
+Now we don't support to resubmit I/O in order. But I think we can add
+a timestamp
+for each inflight descriptor in shared memory to achieve that.
 
-  # mount -o discard /dev/vda4 /mnt
-  # mount | tail -1
-  /dev/vda4 on /mnt type fuseblk (rw,nosuid,nodev,relatime,user_id=3D0,grou=
-p_id=3D0,allow_other,blksize=3D4096)
-  # fstrim /mnt/
-  fstrim: /mnt/: the discard operation is not supported
+> 3. What are the exact memory region size requirements?  Imagine a device
+>    with a large virtqueue.  Or a device with multiple virtqueues of
+>    different sizes.  Can your structure hand those cases?
+>
 
-  Booting without model=3Dvirtio allows using TRIM (in Windows as well).
+Each available virtqueue should have a region in inflight memory. The
+size of region should be fixed and support handling max size elements
+in one virtqueue. There may be a little waste, but I think it make the
+structure more clear.
 
-  Full QEMU line:
+> I'm concerned that this approach to device recovery is invasive and hard
+> to test.  Instead I would use VIRTIO's Device Status Field
+> DEVICE_NEEDS_RESET bit to tell the guest driver that a reset is
+> necessary.  This is more disruptive - drivers either have to resubmit or
+> fail I/O with EIO - but it's also simple and more likely to work
+> correctly (it only needs to be implemented correctly in the guest
+> driver, not in the many available vhost-user backend implementations).
+>
 
-  qemu-system-x86_64 -enable-kvm -cpu host -bios
-  /usr/share/ovmf/ovmf_x64.bin -smp 2 -m 7G -vga qxl -usbdevice tablet
-  -net nic,model=3Dvirtio -net user -drive discard=3Dunmap,detect-
-  zeroes=3Dunmap,cache=3Dnone,file=3Dvms/win10.hd.img.vmdk,format=3Dvmdk,if=
-=3Dvirtio
+So you mean adding one way to notify guest to resubmit inflight I/O. I
+think it's a good idea. But would it be more flexible to implement
+this in backend. We can support old guest. And it will be easy to fix
+bug or add feature.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1523246/+subscriptions
+Thanks,
+Yongji
