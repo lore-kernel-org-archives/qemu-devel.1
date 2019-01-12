@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59671)
+Received: from eggs.gnu.org ([209.51.188.92]:59629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1giNaL-0003aA-8t
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:00:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1giNaN-0003XG-Hh
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:00:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1giNYU-00020t-K3
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:58:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1giNYS-0001ze-TK
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:58:46 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Sat, 12 Jan 2019 11:58:00 -0600
-Message-Id: <20190112175812.27068-8-eblake@redhat.com>
+Date: Sat, 12 Jan 2019 11:58:03 -0600
+Message-Id: <20190112175812.27068-11-eblake@redhat.com>
 In-Reply-To: <20190112175812.27068-1-eblake@redhat.com>
 References: <20190112175812.27068-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 07/19] nbd/client: Refactor
- nbd_receive_list()
+Subject: [Qemu-devel] [PATCH v3 10/19] nbd/client: Split out
+ nbd_send_one_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,245 +25,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Right now, nbd_receive_list() is only called by
-nbd_receive_query_exports(), which in turn is only called if the
-server lacks NBD_OPT_GO but has working option negotiation, and is
-merely used as a quality-of-implementation trick since servers
-can't give decent errors for NBD_OPT_EXPORT_NAME.  However, servers
-that lack NBD_OPT_GO are becoming increasingly rare (nbdkit was a
-latecomer, in Aug 2018, but qemu has been such a server since commit
-f37708f6 in July 2017 and released in 2.10), so it no longer makes
-sense to micro-optimize that function for performance.
-
-Furthermore, when debugging a server's implementation, tracing the
-full reply (both names and descriptions) is useful, not to mention
-that upcoming patches adding 'qemu-nbd --list' will want to collect
-that data.  And when you consider that a server can send an export
-name up to the NBD protocol length limit of 4k; but our current
-NBD_MAX_NAME_SIZE is only 256, we can't trace all valid server
-names without more storage, but 4k is large enough that the heap
-is better than the stack for long names.
-
-Thus, I'm changing the division of labor, with nbd_receive_list()
-now always malloc'ing a result on success (the malloc is bounded
-by the fact that we reject servers with a reply length larger
-than 32M), and moving the comparison to 'wantname' to the caller.
-
-There is a minor change in behavior where a server with 0 exports
-(an immediate NBD_REP_ACK reply) is now no longer distinguished
-from a server without LIST support (NBD_REP_ERR_UNSUP); this
-information could be preserved with a complication to the calling
-contract to provide a bit more information, but I didn't see the
-point.  After all, the worst that can happen if our guess at a
-match is wrong is that the caller will get a cryptic disconnect
-when NBD_OPT_EXPORT_NAME fails (which is no different from what
-would happen if we had not tried LIST), while treating an empty
-list as immediate failure would prevent connecting to really old
-servers that really did lack LIST.  Besides, NBD servers with 0
-exports are rare (qemu can do it when using QMP nbd-server-start
-without nbd-server-add - but qemu understands NBD_OPT_GO and
-thus won't tickle this change in behavior).
-
-Fix the spelling of foundExport to match coding standards while
-in the area.
+Refactor nbd_negotiate_simple_meta_context() to pull out the
+code that can be reused to send a LIST request for 0 or 1 query.
+No semantic change.  The old comment about 'sizeof(uint32_t)'
+being equivalent to '/* number of queries */' is no longer
+needed, now that we are computing 'sizeof(queries)' instead.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181215135324.152629-10-eblake@redhat.com>
+Message-Id: <20181215135324.152629-14-eblake@redhat.com>
 Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 ---
-v3: comment tweak, s/listEmpty/list_empty/,
-s/foundExport/found_export/ [Vladimir]
+v3: Improve commit message [Rich], formatting tweak [checkpatch],
+rebase to dropped patch
 ---
- nbd/client.c     | 91 ++++++++++++++++++++++++++++++------------------
- nbd/trace-events |  1 +
- 2 files changed, 59 insertions(+), 33 deletions(-)
+ nbd/client.c     | 67 +++++++++++++++++++++++++++++++++---------------
+ nbd/trace-events |  2 +-
+ 2 files changed, 48 insertions(+), 21 deletions(-)
 
 diff --git a/nbd/client.c b/nbd/client.c
-index f625c207c54..fd4ba8dec37 100644
+index 77993890f04..3c716be2719 100644
 --- a/nbd/client.c
 +++ b/nbd/client.c
-@@ -234,18 +234,24 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NB=
-DOptionReply *reply,
-     return result;
+@@ -629,6 +629,49 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *=
+ioc,
+     return QIO_CHANNEL(tioc);
  }
 
--/* Process another portion of the NBD_OPT_LIST reply.  Set *@match if
-- * the current reply matches @want or if the server does not support
-- * NBD_OPT_LIST, otherwise leave @match alone.  Return 0 if iteration
-- * is complete, positive if more replies are expected, or negative
-- * with @errp set if an unrecoverable error occurred. */
--static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *mat=
-ch,
-+/* nbd_receive_list:
-+ * Process another portion of the NBD_OPT_LIST reply, populating any
-+ * name received into *@name. If @description is non-NULL, and the
-+ * server provided a description, that is also populated. The caller
-+ * must eventually call g_free() on success.
-+ * Returns 1 if name and description were set and iteration must continu=
-e,
-+ *         0 if iteration is complete (including if OPT_LIST unsupported=
-),
-+ *         -1 with @errp set if an unrecoverable error occurred.
++/*
++ * nbd_send_one_meta_context:
++ * Send 0 or 1 set/list meta context queries.
++ * Return 0 on success, -1 with errp set for any error
 + */
-+static int nbd_receive_list(QIOChannel *ioc, char **name, char **descrip=
-tion,
-                             Error **errp)
- {
-+    int ret =3D -1;
-     NBDOptionReply reply;
-     uint32_t len;
-     uint32_t namelen;
--    char name[NBD_MAX_NAME_SIZE + 1];
-+    char *local_name =3D NULL;
-+    char *local_desc =3D NULL;
-     int error;
-
-     if (nbd_receive_option_reply(ioc, NBD_OPT_LIST, &reply, errp) < 0) {
-@@ -253,9 +259,6 @@ static int nbd_receive_list(QIOChannel *ioc, const ch=
-ar *want, bool *match,
-     }
-     error =3D nbd_handle_reply_err(ioc, &reply, errp);
-     if (error <=3D 0) {
--        /* The server did not support NBD_OPT_LIST, so set *match on
--         * the assumption that any name will be accepted.  */
--        *match =3D true;
-         return error;
-     }
-     len =3D reply.length;
-@@ -292,33 +295,38 @@ static int nbd_receive_list(QIOChannel *ioc, const =
-char *want, bool *match,
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
--    if (namelen !=3D strlen(want)) {
--        if (nbd_drop(ioc, len, errp) < 0) {
--            error_prepend(errp,
--                          "failed to skip export name with wrong length:=
- ");
--            nbd_send_opt_abort(ioc);
--            return -1;
--        }
--        return 1;
--    }
-
--    assert(namelen < sizeof(name));
--    if (nbd_read(ioc, name, namelen, errp) < 0) {
-+    local_name =3D g_malloc(namelen + 1);
-+    if (nbd_read(ioc, local_name, namelen, errp) < 0) {
-         error_prepend(errp, "failed to read export name: ");
-         nbd_send_opt_abort(ioc);
--        return -1;
-+        goto out;
-     }
--    name[namelen] =3D '\0';
-+    local_name[namelen] =3D '\0';
-     len -=3D namelen;
--    if (nbd_drop(ioc, len, errp) < 0) {
--        error_prepend(errp, "failed to read export description: ");
--        nbd_send_opt_abort(ioc);
--        return -1;
-+    if (len) {
-+        local_desc =3D g_malloc(len + 1);
-+        if (nbd_read(ioc, local_desc, len, errp) < 0) {
-+            error_prepend(errp, "failed to read export description: ");
-+            nbd_send_opt_abort(ioc);
-+            goto out;
-+        }
-+        local_desc[len] =3D '\0';
-     }
--    if (!strcmp(name, want)) {
--        *match =3D true;
++static int nbd_send_one_meta_context(QIOChannel *ioc,
++                                     uint32_t opt,
++                                     const char *export,
++                                     const char *query,
++                                     Error **errp)
++{
++    int ret;
++    uint32_t export_len =3D strlen(export);
++    uint32_t queries =3D !!query;
++    uint32_t context_len =3D 0;
++    uint32_t data_len;
++    char *data;
++    char *p;
 +
-+    trace_nbd_receive_list(local_name, local_desc ?: "");
-+    *name =3D local_name;
-+    local_name =3D NULL;
-+    if (description) {
-+        *description =3D local_desc;
-+        local_desc =3D NULL;
-     }
--    return 1;
-+    ret =3D 1;
++    data_len =3D sizeof(export_len) + export_len + sizeof(queries);
++    if (query) {
++        context_len =3D strlen(query);
++        data_len +=3D sizeof(context_len) + context_len;
++    } else {
++        assert(opt =3D=3D NBD_OPT_LIST_META_CONTEXT);
++    }
++    data =3D g_malloc(data_len);
++    p =3D data;
 +
-+ out:
-+    g_free(local_name);
-+    g_free(local_desc);
++    trace_nbd_opt_meta_request(nbd_opt_lookup(opt), query ?: "(all)", ex=
+port);
++    stl_be_p(p, export_len);
++    memcpy(p +=3D sizeof(export_len), export, export_len);
++    stl_be_p(p +=3D export_len, queries);
++    if (query) {
++        stl_be_p(p +=3D sizeof(uint32_t), context_len);
++        memcpy(p +=3D sizeof(context_len), query, context_len);
++    }
++
++    ret =3D nbd_send_option_request(ioc, opt, data_len, data, errp);
++    g_free(data);
 +    return ret;
- }
++}
++
+ /* nbd_negotiate_simple_meta_context:
+  * Request the server to set the meta context for export @info->name
+  * using @info->x_dirty_bitmap with a fallback to "base:allocation",
+@@ -653,26 +696,10 @@ static int nbd_negotiate_simple_meta_context(QIOCha=
+nnel *ioc,
+     NBDOptionReply reply;
+     const char *context =3D info->x_dirty_bitmap ?: "base:allocation";
+     bool received =3D false;
+-    uint32_t export_len =3D strlen(info->name);
+-    uint32_t context_len =3D strlen(context);
+-    uint32_t data_len =3D sizeof(export_len) + export_len +
+-                        sizeof(uint32_t) + /* number of queries */
+-                        sizeof(context_len) + context_len;
+-    char *data =3D g_malloc(data_len);
+-    char *p =3D data;
 
-
-@@ -493,7 +501,8 @@ static int nbd_receive_query_exports(QIOChannel *ioc,
-                                      const char *wantname,
-                                      Error **errp)
- {
--    bool foundExport =3D false;
-+    bool list_empty =3D true;
-+    bool found_export =3D false;
-
-     trace_nbd_receive_query_exports_start(wantname);
-     if (nbd_send_option_request(ioc, NBD_OPT_LIST, 0, NULL, errp) < 0) {
-@@ -501,14 +510,25 @@ static int nbd_receive_query_exports(QIOChannel *io=
-c,
+-    trace_nbd_opt_meta_request(context, info->name);
+-    stl_be_p(p, export_len);
+-    memcpy(p +=3D sizeof(export_len), info->name, export_len);
+-    stl_be_p(p +=3D export_len, 1);
+-    stl_be_p(p +=3D sizeof(uint32_t), context_len);
+-    memcpy(p +=3D sizeof(context_len), context, context_len);
+-
+-    ret =3D nbd_send_option_request(ioc, NBD_OPT_SET_META_CONTEXT, data_=
+len, data,
+-                                  errp);
+-    g_free(data);
+-    if (ret < 0) {
+-        return ret;
++    if (nbd_send_one_meta_context(ioc, NBD_OPT_SET_META_CONTEXT,
++                                  info->name, context, errp) < 0) {
++        return -1;
      }
 
-     while (1) {
--        int ret =3D nbd_receive_list(ioc, wantname, &foundExport, errp);
-+        char *name;
-+        int ret =3D nbd_receive_list(ioc, &name, NULL, errp);
+     if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
+@@ -689,7 +716,7 @@ static int nbd_negotiate_simple_meta_context(QIOChann=
+el *ioc,
+     if (reply.type =3D=3D NBD_REP_META_CONTEXT) {
+         char *name;
 
-         if (ret < 0) {
-             /* Server gave unexpected reply */
-             return -1;
-         } else if (ret =3D=3D 0) {
-             /* Done iterating. */
--            if (!foundExport) {
-+            if (list_empty) {
-+                /*
-+                 * We don't have enough context to tell a server that
-+                 * sent an empty list apart from a server that does
-+                 * not support the list command; but as this function
-+                 * is just used to trigger a nicer error message
-+                 * before trying NBD_OPT_EXPORT_NAME, assume the
-+                 * export is available.
-+                 */
-+                return 0;
-+            } else if (!found_export) {
-                 error_setg(errp, "No export with name '%s' available",
-                            wantname);
-                 nbd_send_opt_abort(ioc);
-@@ -517,6 +537,11 @@ static int nbd_receive_query_exports(QIOChannel *ioc=
-,
-             trace_nbd_receive_query_exports_success(wantname);
-             return 0;
-         }
-+        list_empty =3D false;
-+        if (!strcmp(name, wantname)) {
-+            found_export =3D true;
-+        }
-+        g_free(name);
-     }
- }
-
+-        if (reply.length !=3D sizeof(info->context_id) + context_len) {
++        if (reply.length !=3D sizeof(info->context_id) + strlen(context)=
+) {
+             error_setg(errp, "Failed to negotiate meta context '%s', ser=
+ver "
+                        "answered with unexpected length %" PRIu32, conte=
+xt,
+                        reply.length);
 diff --git a/nbd/trace-events b/nbd/trace-events
-index 5492042acbf..d1e1ca64ee5 100644
+index c3966d2b653..59521e47a3d 100644
 --- a/nbd/trace-events
 +++ b/nbd/trace-events
-@@ -3,6 +3,7 @@ nbd_send_option_request(uint32_t opt, const char *name, u=
-int32_t len) "Sending o
- nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t =
-type, const char *typename, uint32_t length) "Received option reply %" PR=
-Iu32" (%s), type %" PRIu32" (%s), len %" PRIu32
- nbd_server_error_msg(uint32_t err, const char *type, const char *msg) "s=
-erver reported error 0x%" PRIx32 " (%s) with additional message: %s"
- nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't u=
-nderstand request %" PRIu32 " (%s), attempting fallback"
-+nbd_receive_list(const char *name, const char *desc) "export list includ=
-es '%s', description '%s'"
- nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s=
-'"
- nbd_opt_go_success(void) "Export is good to go"
- nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown in=
-fo %d (%s)"
+@@ -12,7 +12,7 @@ nbd_receive_query_exports_start(const char *wantname) "=
+Querying export list for
+ nbd_receive_query_exports_success(const char *wantname) "Found desired e=
+xport name '%s'"
+ nbd_receive_starttls_new_client(void) "Setting up TLS"
+ nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
+-nbd_opt_meta_request(const char *context, const char *export) "Requestin=
+g to set meta context %s for export %s"
++nbd_opt_meta_request(const char *optname, const char *context, const cha=
+r *export) "Requesting %s %s for export %s"
+ nbd_opt_meta_reply(const char *context, uint32_t id) "Received mapping o=
+f context %s to id %" PRIu32
+ nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving n=
+egotiation tlscreds=3D%p hostname=3D%s"
+ nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
 --=20
 2.20.1
