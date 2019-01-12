@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49864)
+Received: from eggs.gnu.org ([209.51.188.92]:49592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1giOMu-0000Zu-EE
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:50:53 -0500
+	(envelope-from <me@halfdog.net>) id 1giQVk-00080W-F3
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 16:08:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1giOMt-0001uq-9J
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:50:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38996)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1giOMt-0001eA-28
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:50:51 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1giOMc-0001UK-J1
-	for <qemu-devel@nongnu.org>; Sat, 12 Jan 2019 18:50:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8C74B2E80C9
-	for <qemu-devel@nongnu.org>; Sat, 12 Jan 2019 18:50:34 +0000 (UTC)
+	(envelope-from <me@halfdog.net>) id 1giQVj-0008J0-E2
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 16:08:08 -0500
+Received: from mail.halfdog.net ([37.186.9.82]:52917)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <me@halfdog.net>) id 1giQVj-0008Ex-5y
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 16:08:07 -0500
+Received: from [169.254.0.1] (helo=localhost) by mail.halfdog.net with esmtpsa
+	(TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92-RC4)
+	(envelope-from <me@halfdog.net>) id 1giQVa-0001nr-Gq
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 21:07:58 +0000
+From: halfdog <me@halfdog.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 12 Jan 2019 18:43:14 -0000
-From: =?utf-8?q?=C5=BDilvinas_=C5=BDaltiena?= <1811533@bugs.launchpad.net>
-Reply-To: Bug 1811533 <1811533@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154731859474.20612.3794172498936114295.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1811533] [NEW] Unstable Win10 guest with qemu 3.1
- + huge pages + hv_stimer
+Content-Type: text/plain; charset="us-ascii"
+Date: Sat, 12 Jan 2019 21:07:36 +0000
+Message-ID: <859-1547327256.809979@17Vl.Lel1.CWHZ>
+Subject: [Qemu-devel] Various GTK window display problems - sorting bugs
+ from features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,96 +30,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
+Hello List,
 
-Host:
-Gentoo linux x86_64, kernel 4.20.1
-Qemu 3.1.0 =
+After filing a Debian bug, the package maintainer gave a hint,
+that this might be more relevant here:
 
-CPU: Intel i7 6850K
-Chipset: X99
 
-Guest:
-Windows 10 Pro 64bit (1809)
-Machine type: pc-q35_3.1
-Hyper-V enlightenments: hv_stimer,hv_reenlightenment,hv_frequencies,hv_vapi=
-c,hv_reset,hv_synic,hv_runtime,hv_vpindex,hv_time,hv_relaxed,hv_spinlocks=
-=3D0x1fff
-Memory: 16GB backed by 2MB huge pages
+There seems to exist a (minor) usability issue with GTK frontend
+and detaching a window, that seems to lead to full loss of keyboard
+input to the guest, in the end.
 
-Issue:
-Once guest is started, log gets flooded with:
 
-qemu-system-x86_64: vhost_region_add_section: Overlapping but not
-coherent sections at 103000
 
-or
+With the first issue (usability), it is not clear if this is intended
+behaviour. Maybe someone can give a short opinion to finish this
+one as "little unexpected feature". See also [0].
 
-qemu-system-x86_64: vhost_region_add_section:Section rounded to 0 prior
-to previous 1f000
 
-(line endings change)
+When running a Qemu machine with "-display gtk" then selecting
 
-and as time goes guest loses network access (virtio-net-pci) and general
-performance diminishes to extent of freezing applications.
+Menu-bar -> View -> Detach tab
 
-Observations:
-1) problem disappears when hv_stimer is removed
-2) problem disappears when memory backing with huge pages is disabled
-3) problem disappears when machine type is downgraded to pc-q35_3.0
+and 
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Menu-bar -> View -> Fullscreen
 
--- =
+will then display the menu bar into fullscreen mode, not the virtual
+machine window.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811533
 
-Title:
-  Unstable Win10 guest with qemu 3.1 + huge pages + hv_stimer
 
-Status in QEMU:
-  New
+As it is impossible to bring the detached window to fullscreen
+mode, it has to be reattached to the main windows again, This
+can be done by closing the windows. Everything looks nice afterwards
+but keybord events are not forwarded to the guest any more
+(mouse is still working).
 
-Bug description:
-  Host:
-  Gentoo linux x86_64, kernel 4.20.1
-  Qemu 3.1.0 =
+There is no difference in behaviour when GTK window is scaling
+the guest screen, guest display is in full screen mode or not,
+input is grabbed.
 
-  CPU: Intel i7 6850K
-  Chipset: X99
+Using the qemu monitor (with "-monitor stdio") still transports
+the keystrokes, so the guest seems to be working still.
 
-  Guest:
-  Windows 10 Pro 64bit (1809)
-  Machine type: pc-q35_3.1
-  Hyper-V enlightenments: hv_stimer,hv_reenlightenment,hv_frequencies,hv_va=
-pic,hv_reset,hv_synic,hv_runtime,hv_vpindex,hv_time,hv_relaxed,hv_spinlocks=
-=3D0x1fff
-  Memory: 16GB backed by 2MB huge pages
+(qemu) sendkey x 
+(qemu) sendkey ret 
 
-  Issue:
-  Once guest is started, log gets flooded with:
+Can anyone reproduce this behaviour? See also [1].
 
-  qemu-system-x86_64: vhost_region_add_section: Overlapping but not
-  coherent sections at 103000
 
-  or
 
-  qemu-system-x86_64: vhost_region_add_section:Section rounded to 0
-  prior to previous 1f000
+Background: the initial reason for exploring all window/fullscreen
+variants was, that the mouse input stopped working with the
+sdl -> gtk switch. The Debian package maintainer seems very
+responsive and commited, so we are still sorting this one out
+in [2].
 
-  (line endings change)
 
-  and as time goes guest loses network access (virtio-net-pci) and
-  general performance diminishes to extent of freezing applications.
+Thanks for any feedback, opinions,
+hd
 
-  Observations:
-  1) problem disappears when hv_stimer is removed
-  2) problem disappears when memory backing with huge pages is disabled
-  3) problem disappears when machine type is downgraded to pc-q35_3.0
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811533/+subscriptions
+[0] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=919056
+[1] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=919116
+[2] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=919057
