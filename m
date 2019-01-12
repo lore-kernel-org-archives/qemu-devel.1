@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50841)
+Received: from eggs.gnu.org ([209.51.188.92]:59629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1giMr7-0003kw-Aj
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:13:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1giNaI-0003XG-4O
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:00:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1giMlu-0003bl-HL
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:08:35 -0500
-Received: from isrv.corpit.ru ([86.62.121.231]:34655)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mjt@tls.msk.ru>) id 1giMlr-0003Uz-S1
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:08:33 -0500
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <29ff1bde-73ab-3033-ac5d-1ecf79b523ee@msgid.tls.msk.ru>
-Date: Sat, 12 Jan 2019 20:08:14 +0300
+	(envelope-from <eblake@redhat.com>) id 1giNYU-000215-La
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:58:48 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Sat, 12 Jan 2019 11:58:09 -0600
+Message-Id: <20190112175812.27068-17-eblake@redhat.com>
+In-Reply-To: <20190112175812.27068-1-eblake@redhat.com>
+References: <20190112175812.27068-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: ru-RU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] block: Update flags in bdrv_set_read_only()
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 16/19] nbd/client: Add meta contexts to
+ nbd_receive_export_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +22,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-     commit eeae6a596b0efc092f5101c67683053e245e6250
-     Author: Kevin Wolf <kwolf@redhat.com>
-     Date:   Tue Oct 9 16:57:12 2018 +0200
+We want to be able to detect whether a given qemu NBD server is
+exposing the right export(s) and dirty bitmaps, at least for
+regression testing.  We could use 'nbd-client -l' from the upstream
+NBD project to list exports, but it's annoying to rely on
+out-of-tree binaries; furthermore, nbd-client doesn't necessarily
+know about all of the qemu NBD extensions.  Thus, we plan on adding
+a new mode to qemu-nbd that merely sniffs all possible information
+from the server during handshake phase, then disconnects and dumps
+the information.
 
-         block: Update flags in bdrv_set_read_only()
+This patch continues the work of the previous patch, by adding the
+ability to track the list of available meta contexts into
+NBDExportInfo.  It benefits from the recent refactoring patches
+with a new nbd_list_meta_contexts() that reuses much of the same
+framework as setting a meta context.
 
-         To fully change the read-only state of a node, we must not only change
-         bs->read_only, but also update bs->open_flags.
+Note: a malicious server could exhaust memory of a client by feeding
+an unending loop of contexts; perhaps we could place a limit on how
+many we are willing to receive. But this is no different from our
+earlier analysis on a server sending an unending list of exports,
+and the death of a client due to memory exhaustion when the client
+was going to exit soon anyways is not really a denial of service
+attack.
 
-sort of broke vfat support:
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20181215135324.152629-20-eblake@redhat.com>
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
 
-  $ qemu-system-x86_64 -hda fat:foo/
-  WARNING: Image format was not specified for 'json:{"fat-type": 0, "dir": "foo/", "driver": "vvfat", "floppy": false, "rw": false}' and probing guessed raw.
-           Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
-  qemu-system-x86_64: Initialization of device ide-hd failed: Block node is read-only
-  $ _
+---
+v3: mention security (non-)issue in commit message [Rich]
+---
+ include/block/nbd.h |  2 ++
+ nbd/client.c        | 41 +++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 41 insertions(+), 2 deletions(-)
 
-The warning is annoying but harmless, but the read-only error is fatal.
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index e9a442ce7e9..80ee3cc997e 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -284,6 +284,8 @@ struct NBDExportInfo {
 
-"Sort-of" is because there's a somewhat strange workaround:
+     /* Set by server results during nbd_receive_export_list() */
+     char *description;
++    int n_contexts;
++    char **contexts;
+ };
+ typedef struct NBDExportInfo NBDExportInfo;
 
-   -hda fat:rw:foo/
+diff --git a/nbd/client.c b/nbd/client.c
+index a5a705a67f7..2001e6e8160 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -817,6 +817,36 @@ static int nbd_negotiate_simple_meta_context(QIOChan=
+nel *ioc,
+     return received;
+ }
 
-but it is a bit more dangerous as well.
++/*
++ * nbd_list_meta_contexts:
++ * Request the server to list all meta contexts for export @info->name.
++ * return 0 if list is complete (even if empty),
++ *        -1 with errp set for any other error
++ */
++static int nbd_list_meta_contexts(QIOChannel *ioc,
++                                  NBDExportInfo *info,
++                                  Error **errp)
++{
++    int ret;
++
++    if (nbd_send_one_meta_context(ioc, NBD_OPT_LIST_META_CONTEXT,
++                                  info->name, NULL, errp) < 0) {
++        return -1;
++    }
++
++    while (1) {
++        char *context;
++
++        ret =3D nbd_receive_one_meta_context(ioc, NBD_OPT_LIST_META_CONT=
+EXT,
++                                           &context, NULL, errp);
++        if (ret <=3D 0) {
++            return ret;
++        }
++        info->contexts =3D g_renew(char *, info->contexts, ++info->n_con=
+texts);
++        info->contexts[info->n_contexts - 1] =3D context;
++    }
++}
++
+ /*
+  * nbd_start_negotiate:
+  * Start the handshake to the server.  After a positive return, the serv=
+er
+@@ -1063,7 +1093,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoT=
+LSCreds *tlscreds,
+ /* Clean up result of nbd_receive_export_list */
+ void nbd_free_export_list(NBDExportInfo *info, int count)
+ {
+-    int i;
++    int i, j;
 
-It looks like vfat should be handled differently somewhere, to
-eliminate both the warning and the error?
+     if (!info) {
+         return;
+@@ -1072,6 +1102,10 @@ void nbd_free_export_list(NBDExportInfo *info, int=
+ count)
+     for (i =3D 0; i < count; i++) {
+         g_free(info[i].name);
+         g_free(info[i].description);
++        for (j =3D 0; j < info[i].n_contexts; j++) {
++            g_free(info[i].contexts[j]);
++        }
++        g_free(info[i].contexts);
+     }
+     g_free(info);
+ }
+@@ -1139,7 +1173,10 @@ int nbd_receive_export_list(QIOChannel *ioc, QCryp=
+toTLSCreds *tlscreds,
+                 break;
+             }
 
-Thanks,
+-            /* TODO: Grab meta contexts */
++            if (result =3D=3D 3 &&
++                nbd_list_meta_contexts(ioc, &array[i], errp) < 0) {
++                goto out;
++            }
+         }
 
-/mjt
+         /* Send NBD_OPT_ABORT as a courtesy before hanging up */
+--=20
+2.20.1
