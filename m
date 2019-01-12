@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59671)
+Received: from eggs.gnu.org ([209.51.188.92]:59789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1giNaN-0003aA-H4
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:00:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1giNaS-0003dC-Iz
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:00:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1giNYS-0001zF-Lt
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:58:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1giNYM-0001sP-Py
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:58:40 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Sat, 12 Jan 2019 11:58:08 -0600
-Message-Id: <20190112175812.27068-16-eblake@redhat.com>
+Date: Sat, 12 Jan 2019 11:57:55 -0600
+Message-Id: <20190112175812.27068-3-eblake@redhat.com>
 In-Reply-To: <20190112175812.27068-1-eblake@redhat.com>
 References: <20190112175812.27068-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 15/19] nbd/client: Add
- nbd_receive_export_list()
+Subject: [Qemu-devel] [PATCH v3 02/19] qemu-nbd: Enhance man page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,338 +22,187 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-We want to be able to detect whether a given qemu NBD server is
-exposing the right export(s) and dirty bitmaps, at least for
-regression testing.  We could use 'nbd-client -l' from the upstream
-NBD project to list exports, but it's annoying to rely on
-out-of-tree binaries; furthermore, nbd-client doesn't necessarily
-know about all of the qemu NBD extensions.  Thus, we plan on adding
-a new mode to qemu-nbd that merely sniffs all possible information
-from the server during handshake phase, then disconnects and dumps
-the information.
-
-This patch adds the low-level client code for grabbing the list
-of exports.  It benefits from the recent refactoring patches, as
-well as a minor tweak of changing nbd_opt_go() to nbd_opt_info_or_go(),
-in order to share as much code as possible when it comes to doing
-validation of server replies.  The resulting information is stored
-in an array of NBDExportInfo which has been expanded to any
-description string, along with a convenience function for freeing
-the list.
-
-Note: a malicious server could exhaust memory of a client by feeding
-an unending loop of exports; perhaps we should place a limit on how
-many we are willing to receive. But note that a server could
-reasonably be serving an export for every file in a large directory,
-where an arbitrary limit in the client means we can't list anything
-from such a server; the same happens if we just run until the client
-fails to malloc() and thus dies by an abort(), where the limit is
-no longer arbitrary but determined by available memory.  Since the
-client is already planning on being short-lived, it's hard to call
-this a denial of service attack that would starve off other uses,
-so it does not appear to be a security issue.
+Document some useful qemu-nbd command lines. Mention some restrictions
+on particular options, like -p being only for MBR images, or -c/-d
+being Linux-only.  Update some text given the recent change to no
+longer serve oldstyle protocol (missed in commit 7f7dfe2a).  Also,
+consistently use trailing '.' in describing options.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181215135324.152629-19-eblake@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
 
 ---
-v3: mention security (non-)issue in commit message [Rich], formatting
-tweaks
+v3: wording improvements, use -t in more examples [Rich]
 ---
- include/block/nbd.h |  15 ++++-
- nbd/client.c        | 144 +++++++++++++++++++++++++++++++++++++++++---
- nbd/trace-events    |   2 +-
- 3 files changed, 150 insertions(+), 11 deletions(-)
+ qemu-nbd.texi | 91 ++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 72 insertions(+), 19 deletions(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index bdc7ec7195a..e9a442ce7e9 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -1,5 +1,5 @@
- /*
-- *  Copyright (C) 2016-2017 Red Hat, Inc.
-+ *  Copyright (C) 2016-2019 Red Hat, Inc.
-  *  Copyright (C) 2005  Anthony Liguori <anthony@codemonkey.ws>
-  *
-  *  Network Block Device
-@@ -262,6 +262,9 @@ struct NBDExportInfo {
-     /* Set by client before nbd_receive_negotiate() */
-     bool request_sizes;
-     char *x_dirty_bitmap;
-+
-+    /* Set by client before nbd_receive_negotiate(), or by server result=
-s
-+     * during nbd_receive_export_list() */
-     char *name; /* must be non-NULL */
+diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+index 96b1546006a..3f22559beb4 100644
+--- a/qemu-nbd.texi
++++ b/qemu-nbd.texi
+@@ -10,11 +10,17 @@
 
-     /* In-out fields, set by client before nbd_receive_negotiate() and
-@@ -269,7 +272,8 @@ struct NBDExportInfo {
-     bool structured_reply;
-     bool base_allocation; /* base:allocation context for NBD_CMD_BLOCK_S=
-TATUS */
+ Export a QEMU disk image using the NBD protocol.
 
--    /* Set by server results during nbd_receive_negotiate() */
-+    /* Set by server results during nbd_receive_negotiate() and
-+     * nbd_receive_export_list() */
-     uint64_t size;
-     uint16_t flags;
-     uint32_t min_block;
-@@ -277,12 +281,19 @@ struct NBDExportInfo {
-     uint32_t max_block;
++Other uses:
++@itemize
++@item
++Bind a /dev/nbdX block device to a QEMU server (on Linux).
++@end itemize
++
+ @c man end
 
-     uint32_t context_id;
-+
-+    /* Set by server results during nbd_receive_export_list() */
-+    char *description;
- };
- typedef struct NBDExportInfo NBDExportInfo;
+ @c man begin OPTIONS
+ @var{filename} is a disk image filename, or a set of block
+-driver options if @var{--image-opts} is specified.
++driver options if @option{--image-opts} is specified.
 
- int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-                           const char *hostname, QIOChannel **outioc,
-                           NBDExportInfo *info, Error **errp);
-+void nbd_free_export_list(NBDExportInfo *info, int count);
-+int nbd_receive_export_list(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-+                            const char *hostname, NBDExportInfo **info,
-+                            Error **errp);
- int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
-              Error **errp);
- int nbd_send_request(QIOChannel *ioc, NBDRequest *request);
-diff --git a/nbd/client.c b/nbd/client.c
-index 620fbb5ef01..a5a705a67f7 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -330,11 +330,14 @@ static int nbd_receive_list(QIOChannel *ioc, char *=
-*name, char **description,
- }
+ @var{dev} is an NBD device.
 
+@@ -27,24 +33,25 @@ supported. The common object types that it makes sens=
+e to define are the
+ keys, and the @code{tls-creds} object, which is used to supply TLS
+ credentials for the qemu-nbd server.
+ @item -p, --port=3D@var{port}
+-The TCP port to listen on (default @samp{10809})
++The TCP port to listen on (default @samp{10809}).
+ @item -o, --offset=3D@var{offset}
+-The offset into the image
++The offset into the image.
+ @item -b, --bind=3D@var{iface}
+-The interface to bind to (default @samp{0.0.0.0})
++The interface to bind to (default @samp{0.0.0.0}).
+ @item -k, --socket=3D@var{path}
+-Use a unix socket with path @var{path}
++Use a unix socket with path @var{path}.
+ @item --image-opts
+ Treat @var{filename} as a set of image options, instead of a plain
+ filename. If this flag is specified, the @var{-f} flag should
+ not be used, instead the '@code{format=3D}' option should be set.
+ @item -f, --format=3D@var{fmt}
+ Force the use of the block driver for format @var{fmt} instead of
+-auto-detecting
++auto-detecting.
+ @item -r, --read-only
+-Export the disk as read-only
++Export the disk as read-only.
+ @item -P, --partition=3D@var{num}
+-Only expose partition @var{num}
++Only expose MBR partition @var{num}.  Understands physical partitions
++1-4 and logical partitions 5-8.
+ @item -B, --bitmap=3D@var{name}
+ If @var{filename} has a qcow2 persistent bitmap @var{name}, expose
+ that bitmap via the ``qemu:dirty-bitmap:@var{name}'' context
+@@ -52,7 +59,7 @@ accessible through NBD_OPT_SET_META_CONTEXT.
+ @item -s, --snapshot
+ Use @var{filename} as an external snapshot, create a temporary
+ file with backing_file=3D@var{filename}, redirect the write to
+-the temporary one
++the temporary one.
+ @item -l, --load-snapshot=3D@var{snapshot_param}
+ Load an internal snapshot inside @var{filename} and export it
+ as an read-only device, @var{snapshot_param} format is
+@@ -76,19 +83,20 @@ driver-specific optimized zero write commands.  @var{=
+detect-zeroes} is one of
+ converts a zero write to an unmap operation and can only be used if
+ @var{discard} is set to @samp{unmap}.  The default is @samp{off}.
+ @item -c, --connect=3D@var{dev}
+-Connect @var{filename} to NBD device @var{dev}
++Connect @var{filename} to NBD device @var{dev} (Linux only).
+ @item -d, --disconnect
+-Disconnect the device @var{dev}
++Disconnect the device @var{dev} (Linux only).
+ @item -e, --shared=3D@var{num}
+-Allow up to @var{num} clients to share the device (default @samp{1})
++Allow up to @var{num} clients to share the device (default
++@samp{1}). Safe for readers, but for now, consistency is not
++guaranteed between multiple writers.
+ @item -t, --persistent
+-Don't exit on the last connection
++Don't exit on the last connection.
+ @item -x, --export-name=3D@var{name}
+-Set the NBD volume export name. This switches the server to use
+-the new style NBD protocol negotiation
++Set the NBD volume export name (default of a zero-length string).
+ @item -D, --description=3D@var{description}
+ Set the NBD volume export description, as a human-readable
+-string. Requires the use of @option{-x}
++string.
+ @item --tls-creds=3DID
+ Enable mandatory TLS encryption for the server by setting the ID
+ of the TLS credentials object previously created with the --object
+@@ -96,11 +104,11 @@ option.
+ @item --fork
+ Fork off the server process and exit the parent once the server is runni=
+ng.
+ @item -v, --verbose
+-Display extra debugging information
++Display extra debugging information.
+ @item -h, --help
+-Display this help and exit
++Display this help and exit.
+ @item -V, --version
+-Display version information and exit
++Display version information and exit.
+ @item -T, --trace [[enable=3D]@var{pattern}][,events=3D@var{file}][,file=
+=3D@var{file}]
+ @findex --trace
+ @include qemu-option-trace.texi
+@@ -108,6 +116,51 @@ Display version information and exit
 
--/* Returns -1 if NBD_OPT_GO proves the export @info->name cannot be
-+/*
-+ * Returns -1 if NBD_OPT_GO proves the export @info->name cannot be
-  * used, 0 if NBD_OPT_GO is unsupported (fall back to NBD_OPT_LIST and
-  * NBD_OPT_EXPORT_NAME in that case), and > 0 if the export is good to
-- * go (with the rest of @info populated). */
--static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo *info, Error **errp=
-)
-+ * go (with the rest of @info populated).
-+ */
-+static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
-+                              NBDExportInfo *info, Error **errp)
- {
-     NBDOptionReply reply;
-     uint32_t len =3D strlen(info->name);
-@@ -347,7 +350,8 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
-*info, Error **errp)
-      * flags still 0 is a witness of a broken server. */
-     info->flags =3D 0;
+ @c man end
 
--    trace_nbd_opt_go_start(info->name);
-+    assert(opt =3D=3D NBD_OPT_GO || opt =3D=3D NBD_OPT_INFO);
-+    trace_nbd_opt_go_start(nbd_opt_lookup(opt), info->name);
-     buf =3D g_malloc(4 + len + 2 + 2 * info->request_sizes + 1);
-     stl_be_p(buf, len);
-     memcpy(buf + 4, info->name, len);
-@@ -356,7 +360,7 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
-*info, Error **errp)
-     if (info->request_sizes) {
-         stw_be_p(buf + 4 + len + 2, NBD_INFO_BLOCK_SIZE);
-     }
--    error =3D nbd_send_option_request(ioc, NBD_OPT_GO,
-+    error =3D nbd_send_option_request(ioc, opt,
-                                     4 + len + 2 + 2 * info->request_size=
-s,
-                                     buf, errp);
-     g_free(buf);
-@@ -365,7 +369,7 @@ static int nbd_opt_go(QIOChannel *ioc, NBDExportInfo =
-*info, Error **errp)
-     }
++@c man begin EXAMPLES
++Start a server listening on port 10809 that exposes only the
++guest-visible contents of a qcow2 file, with no TLS encryption, and
++with the default export name (an empty string). The command is
++one-shot, and will block until the first successful client
++disconnects:
++
++@example
++qemu-nbd -f qcow2 file.qcow2
++@end example
++
++Start a long-running server listening with encryption on port 10810,
++and require clients to have a correct X.509 certificate to connect to
++a 1 megabyte subset of a raw file, using the export name 'subset':
++
++@example
++qemu-nbd \
++  --object tls-creds-x509,id=3Dtls0,endpoint=3Dserver,dir=3D/path/to/qem=
+utls \
++  --tls-creds tls0 -t -x subset -p 10810 \
++  --image-opts driver=3Draw,offset=3D1M,length=3D1M,file.driver=3Dfile,f=
+ile.filename=3Dfile.raw
++@end example
++
++Serve a read-only copy of just the first MBR partition of a guest
++image over a Unix socket with as many as 5 simultaneous readers, with
++a persistent process forked as a daemon:
++
++@example
++qemu-nbd --fork -t -e 5 -s /path/to/sock -p 1 -r -f qcow2 file.qcow2
++@end example
++
++Expose the guest-visible contents of a qcow2 file via a block device
++/dev/nbd0 (and possibly creating /dev/nbd0p1 and friends for
++partitions found within), then disconnect the device when done.
++@emph{CAUTION}: Do not use this method to mount filesystems from an
++untrusted guest image - a malicious guest may have prepared the image
++to attempt to trigger kernel bugs in partition probing or file system
++mounting.
++
++@example
++qemu-nbd -c /dev/nbd0 -f qcow2 file.qcow2
++qemu-nbd -d /dev/nbd0
++@end example
++
++@c man end
++
+ @ignore
 
-     while (1) {
--        if (nbd_receive_option_reply(ioc, NBD_OPT_GO, &reply, errp) < 0)=
- {
-+        if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
-             return -1;
-         }
-         error =3D nbd_handle_reply_err(ioc, &reply, errp);
-@@ -875,7 +879,9 @@ static int nbd_start_negotiate(QIOChannel *ioc, QCryp=
-toTLSCreds *tlscreds,
-             clientflags |=3D NBD_FLAG_C_FIXED_NEWSTYLE;
-         }
-         if (globalflags & NBD_FLAG_NO_ZEROES) {
--            *zeroes =3D false;
-+            if (zeroes) {
-+                *zeroes =3D false;
-+            }
-             clientflags |=3D NBD_FLAG_C_NO_ZEROES;
-         }
-         /* client requested flags */
-@@ -996,7 +1002,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTL=
-SCreds *tlscreds,
-          * TLS).  If it is not available, fall back to
-          * NBD_OPT_LIST for nicer error messages about a missing
-          * export, then use NBD_OPT_EXPORT_NAME.  */
--        result =3D nbd_opt_go(ioc, info, errp);
-+        result =3D nbd_opt_info_or_go(ioc, NBD_OPT_GO, info, errp);
-         if (result < 0) {
-             return -EINVAL;
-         }
-@@ -1054,6 +1060,128 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCrypt=
-oTLSCreds *tlscreds,
-     return 0;
- }
-
-+/* Clean up result of nbd_receive_export_list */
-+void nbd_free_export_list(NBDExportInfo *info, int count)
-+{
-+    int i;
-+
-+    if (!info) {
-+        return;
-+    }
-+
-+    for (i =3D 0; i < count; i++) {
-+        g_free(info[i].name);
-+        g_free(info[i].description);
-+    }
-+    g_free(info);
-+}
-+
-+/*
-+ * nbd_receive_export_list:
-+ * Query details about a server's exports, then disconnect without
-+ * going into transmission phase. Return a count of the exports listed
-+ * in @info by the server, or -1 on error. Caller must free @info using
-+ * nbd_free_export_list().
-+ */
-+int nbd_receive_export_list(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-+                            const char *hostname, NBDExportInfo **info,
-+                            Error **errp)
-+{
-+    int result;
-+    int count =3D 0;
-+    int i;
-+    int rc;
-+    int ret =3D -1;
-+    NBDExportInfo *array =3D NULL;
-+    QIOChannel *sioc =3D NULL;
-+
-+    *info =3D NULL;
-+    result =3D nbd_start_negotiate(ioc, tlscreds, hostname, &sioc, true,=
- NULL,
-+                                 errp);
-+    if (tlscreds && sioc) {
-+        ioc =3D sioc;
-+    }
-+
-+    switch (result) {
-+    case 2:
-+    case 3:
-+        /* newstyle - use NBD_OPT_LIST to populate array, then try
-+         * NBD_OPT_INFO on each array member. If structured replies
-+         * are enabled, also try NBD_OPT_LIST_META_CONTEXT. */
-+        if (nbd_send_option_request(ioc, NBD_OPT_LIST, 0, NULL, errp) < =
-0) {
-+            goto out;
-+        }
-+        while (1) {
-+            char *name;
-+            char *desc;
-+
-+            rc =3D nbd_receive_list(ioc, &name, &desc, errp);
-+            if (rc < 0) {
-+                goto out;
-+            } else if (rc =3D=3D 0) {
-+                break;
-+            }
-+            array =3D g_renew(NBDExportInfo, array, ++count);
-+            memset(&array[count - 1], 0, sizeof(*array));
-+            array[count - 1].name =3D name;
-+            array[count - 1].description =3D desc;
-+            array[count - 1].structured_reply =3D result =3D=3D 3;
-+        }
-+
-+        for (i =3D 0; i < count; i++) {
-+            array[i].request_sizes =3D true;
-+            rc =3D nbd_opt_info_or_go(ioc, NBD_OPT_INFO, &array[i], errp=
-);
-+            if (rc < 0) {
-+                goto out;
-+            } else if (rc =3D=3D 0) {
-+                /* Pointless to try rest of loop. If OPT_INFO doesn't wo=
-rk,
-+                 * it's unlikely that meta contexts work either */
-+                break;
-+            }
-+
-+            /* TODO: Grab meta contexts */
-+        }
-+
-+        /* Send NBD_OPT_ABORT as a courtesy before hanging up */
-+        nbd_send_opt_abort(ioc);
-+        break;
-+    case 1: /* newstyle, but limited to EXPORT_NAME */
-+        error_setg(errp, "Server does not support export lists");
-+        /* We can't even send NBD_OPT_ABORT, so merely hang up */
-+        goto out;
-+    case 0: /* oldstyle, parse length and flags */
-+        array =3D g_new0(NBDExportInfo, 1);
-+        array->name =3D g_strdup("");
-+        count =3D 1;
-+
-+        if (nbd_negotiate_finish_oldstyle(ioc, array, errp) < 0) {
-+            return -EINVAL;
-+        }
-+
-+        /* Send NBD_CMD_DISC as a courtesy to the server, but ignore all
-+         * errors now that we have the information we wanted. */
-+        if (nbd_drop(ioc, 124, NULL) =3D=3D 0) {
-+            NBDRequest request =3D { .type =3D NBD_CMD_DISC };
-+
-+            nbd_send_request(ioc, &request);
-+        }
-+        break;
-+    default:
-+        goto out;
-+    }
-+
-+    *info =3D array;
-+    array =3D NULL;
-+    ret =3D count;
-+
-+ out:
-+    qio_channel_shutdown(ioc, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-+    qio_channel_close(ioc, NULL);
-+    object_unref(OBJECT(sioc));
-+    nbd_free_export_list(array, count);
-+    return ret;
-+}
-+
- #ifdef __linux__
- int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
-              Error **errp)
-diff --git a/nbd/trace-events b/nbd/trace-events
-index 663d11687ab..cbe03da24e9 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -4,7 +4,7 @@ nbd_receive_option_reply(uint32_t option, const char *opt=
-name, uint32_t type, co
- nbd_server_error_msg(uint32_t err, const char *type, const char *msg) "s=
-erver reported error 0x%" PRIx32 " (%s) with additional message: %s"
- nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't u=
-nderstand request %" PRIu32 " (%s), attempting fallback"
- nbd_receive_list(const char *name, const char *desc) "export list includ=
-es '%s', description '%s'"
--nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s=
-'"
-+nbd_opt_go_start(const char *opt, const char *name) "Attempting %s for e=
-xport '%s'"
- nbd_opt_go_success(void) "Export is good to go"
- nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown in=
-fo %d (%s)"
- nbd_opt_go_info_block_size(uint32_t minimum, uint32_t preferred, uint32_=
-t maximum) "Block sizes are 0x%" PRIx32 ", 0x%" PRIx32 ", 0x%" PRIx32
+ @setfilename qemu-nbd
 --=20
 2.20.1
