@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57667)
+Received: from eggs.gnu.org ([209.51.188.92]:57640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1giL63-0008Mq-TY
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 10:21:16 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1giL6G-0008MP-Ca
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 10:21:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1giKxY-0008OF-Il
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 10:12:30 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34766)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1giKwc-00082p-M5
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 10:11:31 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41484)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1giKxV-0008MK-02
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 10:12:26 -0500
-Received: by mail-wr1-x443.google.com with SMTP id j2so18315325wrw.1
-	for <qemu-devel@nongnu.org>; Sat, 12 Jan 2019 07:12:23 -0800 (PST)
-References: <20190109201956.3982-1-yuval.shaia@oracle.com>
+	id 1giKwb-000821-LG
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 10:11:29 -0500
+Received: by mail-wr1-x442.google.com with SMTP id x10so18204960wrs.8
+	for <qemu-devel@nongnu.org>; Sat, 12 Jan 2019 07:11:28 -0800 (PST)
+References: <20190109201559.3906-1-yuval.shaia@oracle.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <c2941be9-9bfd-82a6-def3-9175415eaff7@gmail.com>
-Date: Sat, 12 Jan 2019 17:12:33 +0200
+Message-ID: <7b754432-7c1e-8f22-3410-d95c426c2d0b@gmail.com>
+Date: Sat, 12 Jan 2019 17:11:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190109201956.3982-1-yuval.shaia@oracle.com>
+In-Reply-To: <20190109201559.3906-1-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] hw/rdma: Delete unused struct member
+Subject: Re: [Qemu-devel] [PATCH] hw/pvrdma: Post CQE when receive invalid
+ gid index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +35,58 @@ To: Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org
 
 
 
-On 1/9/19 10:19 PM, Yuval Shaia wrote:
-> This member is used only in init_device_caps function, make it local.
+On 1/9/19 10:15 PM, Yuval Shaia wrote:
+> This error should propagate back to guest.
 >
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 > ---
->   hw/rdma/rdma_backend.c      | 26 ++++++++++++++------------
->   hw/rdma/rdma_backend_defs.h |  1 -
->   2 files changed, 14 insertions(+), 13 deletions(-)
+>   hw/rdma/rdma_backend.h      | 1 +
+>   hw/rdma/vmw/pvrdma_qp_ops.c | 6 ++++--
+>   2 files changed, 5 insertions(+), 2 deletions(-)
 >
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index 16dca69ee9..b49edaacaf 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -917,23 +917,25 @@ void rdma_backend_destroy_qp(RdmaBackendQP *qp)
->   static int init_device_caps(RdmaBackendDev *backend_dev,
->                               struct ibv_device_attr *dev_attr)
->   {
-> -    if (ibv_query_device(backend_dev->context, &backend_dev->dev_attr)) {
-> +    struct ibv_device_attr bk_dev_attr;
-> +
-> +    if (ibv_query_device(backend_dev->context, &bk_dev_attr)) {
->           return -EIO;
->       }
+> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+> index a9ba40ae48..5114c90e67 100644
+> --- a/hw/rdma/rdma_backend.h
+> +++ b/hw/rdma/rdma_backend.h
+> @@ -32,6 +32,7 @@
+>   #define VENDOR_ERR_INVLKEY          0x207
+>   #define VENDOR_ERR_MR_SMALL         0x208
+>   #define VENDOR_ERR_INV_MAD_BUFF     0x209
+> +#define VENDOR_ERR_INV_GID_IDX      0x210
 >   
->       dev_attr->max_sge = MAX_SGE;
->   
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_mr_size, "%" PRId64);
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_sge, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_wr, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_cq, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_cqe, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_mr, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_pd, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_rd_atom, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_init_rd_atom, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_ah, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_mr_size, "%" PRId64);
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_qp, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_sge, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_qp_wr, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_cq, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_cqe, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_mr, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_pd, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_qp_rd_atom, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_qp_init_rd_atom, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_ah, "%d");
->   
->       return 0;
->   }
-> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-> index 1e5c3dd3bf..15ae8b970e 100644
-> --- a/hw/rdma/rdma_backend_defs.h
-> +++ b/hw/rdma/rdma_backend_defs.h
-> @@ -41,7 +41,6 @@ typedef struct RdmaCmMux {
->   } RdmaCmMux;
->   
->   typedef struct RdmaBackendDev {
-> -    struct ibv_device_attr dev_attr;
->       RdmaBackendThread comp_thread;
->       PCIDevice *dev;
->       RdmaDeviceResources *rdma_dev_res;
+>   /* Add definition for QP0 and QP1 as there is no userspace enums for them */
+>   enum ibv_special_qp_type {
+> diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
+> index 465bee8641..0565eba981 100644
+> --- a/hw/rdma/vmw/pvrdma_qp_ops.c
+> +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
+> @@ -178,7 +178,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
+>           sgid = rdma_rm_get_gid(&dev->rdma_dev_res, wqe->hdr.wr.ud.av.gid_index);
+>           if (!sgid) {
+>               pr_dbg("Fail to get gid for idx %d\n", wqe->hdr.wr.ud.av.gid_index);
+> -            return -EIO;
+> +            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
 
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+Informing the guest is OK, but are you sure it makes sense
+to continue sending the other work requests?
+Is maybe safer to return with error as before?
+
+> +            continue;
+>           }
+>           pr_dbg("sgid_id=%d, sgid=0x%llx\n", wqe->hdr.wr.ud.av.gid_index,
+>                  sgid->global.interface_id);
+> @@ -189,7 +190,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
+>           if (sgid_idx <= 0) {
+>               pr_dbg("Fail to get bk sgid_idx for sgid_idx %d\n",
+>                      wqe->hdr.wr.ud.av.gid_index);
+> -            return -EIO;
+> +            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
+> +            continue;
+
+Same question here.
 
 Thanks,
 Marcel
+>           }
+>   
+>           if (wqe->hdr.num_sge > dev->dev_attr.max_sge) {
