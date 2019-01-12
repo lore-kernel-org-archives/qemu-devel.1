@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51285)
+Received: from eggs.gnu.org ([209.51.188.92]:54408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dhruv.agarwal_ug19@ashoka.edu.in>)
-	id 1giHy1-0003sE-Cm
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 07:00:46 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1giKo1-0003n7-UR
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 10:02:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dhruv.agarwal_ug19@ashoka.edu.in>)
-	id 1giHy0-0000gp-F0
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 07:00:45 -0500
-Received: from mail-ua1-x933.google.com ([2607:f8b0:4864:20::933]:42663)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dhruv.agarwal_ug19@ashoka.edu.in>)
-	id 1giHy0-0000gB-0Q
-	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 07:00:44 -0500
-Received: by mail-ua1-x933.google.com with SMTP id d21so5603633uap.9
-	for <qemu-devel@nongnu.org>; Sat, 12 Jan 2019 04:00:43 -0800 (PST)
-MIME-Version: 1.0
-From: Dhruv Agarwal <dhruv.agarwal_ug19@ashoka.edu.in>
-Date: Sat, 12 Jan 2019 17:30:31 +0530
-Message-ID: <CADKdUyQad_gm_z0GJC+XNV4EOw+U8Fb8uBHc-8=9pzTmBf+cpQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] QEMU 3.1 - Getting Instruction Traces
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1giKo1-0002sV-7b
+	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 10:02:37 -0500
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Date: Sat, 12 Jan 2019 17:02:25 +0200
+Message-Id: <20190112150225.20294-4-marcel.apfelbaum@gmail.com>
+In-Reply-To: <20190112150225.20294-1-marcel.apfelbaum@gmail.com>
+References: <20190112150225.20294-1-marcel.apfelbaum@gmail.com>
+Subject: [Qemu-devel] [PATCH 3/3] contrib/rdmacm-mux: fix clang compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +20,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: yuval.shaia@oracle.com, qemu-stable@nongnu.org, marcel.apfelbaum@gmail.com, cohuck@redhat.com
 
-Dear Developers,
+Fix Commit a5d2f6f877 (contrib/rdmacm-mux: Add implementation
+                       of RDMA User MAD multiplexer).
 
-I am an undergraduate student trying to generate *a trace of all
-instructions executed by the QEMU ARM emulator when it runs a given binary*.
+The above commit introduces a new contrib target, adding a global dependency
+to libumad library in case pvrdma configuration option is enabled.
+Clang forbids it:
+    clang-6.0: error: -libumad: 'linker' input unused
+              [-Werror,-Wunused-command-line-argument]
 
-I have been using the* following command* (from an out-of-tree build from
-source code):
-arm-linux-user/qemu-arm -d in_asm ~/Desktop/hello
-(hello is the name of my binary cross-compiled for ARM
-using gcc-arm-none-eabi on an x86 host machine).
+Fix by limiting the scope to the rdmacm-mux target itself.
 
-By doing this, I do get a list of translation blocks that are executed by
-the emulator, however I was told by a colleague that this trace/log is
-incomplete because of the following reason: the translation blocks already
-in the translation cache are not translated again, and hence are not logged
-to the screen by QEMU.
+Reported-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+---
+ Makefile                         | 2 ++
+ contrib/rdmacm-mux/Makefile.objs | 1 -
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-Hence, I am now stuck and r*equire a way to generate a complete instruction
-trace of all instructions that are executed by the ARM emulator for a given
-binary*. Has anyone done the same earlier and can guide me on how to get
-this trace?
-
-Thank you and best regards,
-Dhruv
+diff --git a/Makefile b/Makefile
+index a9ac16d94e..31e87e0c2d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -580,6 +580,8 @@ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a
+ 	$(call LINK, $^)
+ vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
+ 	$(call LINK, $^)
++
++rdmacm-mux$(EXESUF): LIBS += "-libumad"
+ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ 
+diff --git a/contrib/rdmacm-mux/Makefile.objs b/contrib/rdmacm-mux/Makefile.objs
+index e1ff4fe569..3df744af89 100644
+--- a/contrib/rdmacm-mux/Makefile.objs
++++ b/contrib/rdmacm-mux/Makefile.objs
+@@ -1,4 +1,3 @@
+ ifdef CONFIG_PVRDMA
+-CFLAGS += -libumad
+ rdmacm-mux-obj-y = main.o
+ endif
+-- 
+2.17.1
