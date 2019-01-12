@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59629)
+Received: from eggs.gnu.org ([209.51.188.92]:59671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1giNaL-0003XG-4k
+	(envelope-from <eblake@redhat.com>) id 1giNaL-0003aA-8t
 	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 13:00:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1giNYU-00021b-PA
+	(envelope-from <eblake@redhat.com>) id 1giNYU-00020t-K3
 	for qemu-devel@nongnu.org; Sat, 12 Jan 2019 12:58:48 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Sat, 12 Jan 2019 11:58:12 -0600
-Message-Id: <20190112175812.27068-20-eblake@redhat.com>
+Date: Sat, 12 Jan 2019 11:58:00 -0600
+Message-Id: <20190112175812.27068-8-eblake@redhat.com>
 In-Reply-To: <20190112175812.27068-1-eblake@redhat.com>
 References: <20190112175812.27068-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 19/19] iotests: Enhance 223,
- 233 to cover 'qemu-nbd --list'
+Subject: [Qemu-devel] [PATCH v3 07/19] nbd/client: Refactor
+ nbd_receive_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,198 +23,247 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Any good new feature deserves some regression testing :)
-Coverage includes:
-- 223: what happens when there are 0 or more than 1 export,
-proof that we can see multiple contexts including qemu:dirty-bitmap
-- 233: proof that we can list over TLS, and that mix-and-match of
-plain/TLS listings will behave sanely
+Right now, nbd_receive_list() is only called by
+nbd_receive_query_exports(), which in turn is only called if the
+server lacks NBD_OPT_GO but has working option negotiation, and is
+merely used as a quality-of-implementation trick since servers
+can't give decent errors for NBD_OPT_EXPORT_NAME.  However, servers
+that lack NBD_OPT_GO are becoming increasingly rare (nbdkit was a
+latecomer, in Aug 2018, but qemu has been such a server since commit
+f37708f6 in July 2017 and released in 2.10), so it no longer makes
+sense to micro-optimize that function for performance.
+
+Furthermore, when debugging a server's implementation, tracing the
+full reply (both names and descriptions) is useful, not to mention
+that upcoming patches adding 'qemu-nbd --list' will want to collect
+that data.  And when you consider that a server can send an export
+name up to the NBD protocol length limit of 4k; but our current
+NBD_MAX_NAME_SIZE is only 256, we can't trace all valid server
+names without more storage, but 4k is large enough that the heap
+is better than the stack for long names.
+
+Thus, I'm changing the division of labor, with nbd_receive_list()
+now always malloc'ing a result on success (the malloc is bounded
+by the fact that we reject servers with a reply length larger
+than 32M), and moving the comparison to 'wantname' to the caller.
+
+There is a minor change in behavior where a server with 0 exports
+(an immediate NBD_REP_ACK reply) is now no longer distinguished
+from a server without LIST support (NBD_REP_ERR_UNSUP); this
+information could be preserved with a complication to the calling
+contract to provide a bit more information, but I didn't see the
+point.  After all, the worst that can happen if our guess at a
+match is wrong is that the caller will get a cryptic disconnect
+when NBD_OPT_EXPORT_NAME fails (which is no different from what
+would happen if we had not tried LIST), while treating an empty
+list as immediate failure would prevent connecting to really old
+servers that really did lack LIST.  Besides, NBD servers with 0
+exports are rare (qemu can do it when using QMP nbd-server-start
+without nbd-server-add - but qemu understands NBD_OPT_GO and
+thus won't tickle this change in behavior).
+
+Fix the spelling of foundExport to match coding standards while
+in the area.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20181215135324.152629-10-eblake@redhat.com>
 Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
-Tested-by: Richard W.M. Jones <rjones@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 ---
-v3: Rebase to earlier changes
+v3: comment tweak, s/listEmpty/list_empty/,
+s/foundExport/found_export/ [Vladimir]
 ---
- tests/qemu-iotests/223     |  2 ++
- tests/qemu-iotests/223.out | 20 ++++++++++++++++++++
- tests/qemu-iotests/233     | 19 +++++++++++++------
- tests/qemu-iotests/233.out | 15 +++++++++++++++
- 4 files changed, 50 insertions(+), 6 deletions(-)
+ nbd/client.c     | 91 ++++++++++++++++++++++++++++++------------------
+ nbd/trace-events |  1 +
+ 2 files changed, 59 insertions(+), 33 deletions(-)
 
-diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
-index 773892dbe60..f120a016460 100755
---- a/tests/qemu-iotests/223
-+++ b/tests/qemu-iotests/223
-@@ -127,6 +127,7 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-s=
-tart",
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
-   "arguments":{"addr":{"type":"unix",
-     "data":{"path":"'"$TEST_DIR/nbd"1'"}}}}' "error" # Attempt second se=
-rver
-+$QEMU_NBD_PROG -L -k "$TEST_DIR/nbd"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-   "arguments":{"device":"n", "bitmap":"b"}}' "return"
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-@@ -142,6 +143,7 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-a=
-dd",
- _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-   "arguments":{"device":"n", "name":"n2", "writable":true,
-   "bitmap":"b2"}}' "return"
-+$QEMU_NBD_PROG -L -k "$TEST_DIR/nbd"
+diff --git a/nbd/client.c b/nbd/client.c
+index f625c207c54..fd4ba8dec37 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -234,18 +234,24 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NB=
+DOptionReply *reply,
+     return result;
+ }
 
- echo
- echo "=3D=3D=3D Contrast normal status to large granularity dirty-bitmap=
- =3D=3D=3D"
-diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
-index 0de5240a75e..6476b77ba20 100644
---- a/tests/qemu-iotests/223.out
-+++ b/tests/qemu-iotests/223.out
-@@ -30,12 +30,32 @@ wrote 2097152/2097152 bytes at offset 2097152
- {"error": {"class": "GenericError", "desc": "NBD server not running"}}
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "NBD server already running"=
-}}
-+exports available: 0
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "Cannot find device=3Dnosuch=
- nor node_name=3Dnosuch"}}
- {"error": {"class": "GenericError", "desc": "NBD server already has expo=
-rt named 'n'"}}
- {"error": {"class": "GenericError", "desc": "Enabled bitmap 'b2' incompa=
-tible with readonly export"}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'b3' is not found"}}
- {"return": {}}
-+exports available: 2
-+ export: 'n'
-+  size:  4194304
-+  flags: 0x4ef ( readonly flush fua trim zeroes df cache )
-+  min block: 512
-+  opt block: 4096
-+  max block: 33554432
-+  available meta contexts: 2
-+   base:allocation
-+   qemu:dirty-bitmap:b
-+ export: 'n2'
-+  size:  4194304
-+  flags: 0x4ed ( flush fua trim zeroes df cache )
-+  min block: 512
-+  opt block: 4096
-+  max block: 33554432
-+  available meta contexts: 2
-+   base:allocation
-+   qemu:dirty-bitmap:b2
+-/* Process another portion of the NBD_OPT_LIST reply.  Set *@match if
+- * the current reply matches @want or if the server does not support
+- * NBD_OPT_LIST, otherwise leave @match alone.  Return 0 if iteration
+- * is complete, positive if more replies are expected, or negative
+- * with @errp set if an unrecoverable error occurred. */
+-static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *mat=
+ch,
++/* nbd_receive_list:
++ * Process another portion of the NBD_OPT_LIST reply, populating any
++ * name received into *@name. If @description is non-NULL, and the
++ * server provided a description, that is also populated. The caller
++ * must eventually call g_free() on success.
++ * Returns 1 if name and description were set and iteration must continu=
+e,
++ *         0 if iteration is complete (including if OPT_LIST unsupported=
+),
++ *         -1 with @errp set if an unrecoverable error occurred.
++ */
++static int nbd_receive_list(QIOChannel *ioc, char **name, char **descrip=
+tion,
+                             Error **errp)
+ {
++    int ret =3D -1;
+     NBDOptionReply reply;
+     uint32_t len;
+     uint32_t namelen;
+-    char name[NBD_MAX_NAME_SIZE + 1];
++    char *local_name =3D NULL;
++    char *local_desc =3D NULL;
+     int error;
 
- =3D=3D=3D Contrast normal status to large granularity dirty-bitmap =3D=3D=
-=3D
+     if (nbd_receive_option_reply(ioc, NBD_OPT_LIST, &reply, errp) < 0) {
+@@ -253,9 +259,6 @@ static int nbd_receive_list(QIOChannel *ioc, const ch=
+ar *want, bool *match,
+     }
+     error =3D nbd_handle_reply_err(ioc, &reply, errp);
+     if (error <=3D 0) {
+-        /* The server did not support NBD_OPT_LIST, so set *match on
+-         * the assumption that any name will be accepted.  */
+-        *match =3D true;
+         return error;
+     }
+     len =3D reply.length;
+@@ -292,33 +295,38 @@ static int nbd_receive_list(QIOChannel *ioc, const =
+char *want, bool *match,
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+-    if (namelen !=3D strlen(want)) {
+-        if (nbd_drop(ioc, len, errp) < 0) {
+-            error_prepend(errp,
+-                          "failed to skip export name with wrong length:=
+ ");
+-            nbd_send_opt_abort(ioc);
+-            return -1;
+-        }
+-        return 1;
+-    }
 
-diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
-index 1814efe3333..a6ef7b20fb4 100755
---- a/tests/qemu-iotests/233
-+++ b/tests/qemu-iotests/233
-@@ -68,10 +68,12 @@ echo
- echo "=3D=3D check TLS client to plain server fails =3D=3D"
- nbd_server_start_tcp_socket -f $IMGFMT "$TEST_IMG"
+-    assert(namelen < sizeof(name));
+-    if (nbd_read(ioc, name, namelen, errp) < 0) {
++    local_name =3D g_malloc(namelen + 1);
++    if (nbd_read(ioc, local_name, namelen, errp) < 0) {
+         error_prepend(errp, "failed to read export name: ");
+         nbd_send_opt_abort(ioc);
+-        return -1;
++        goto out;
+     }
+-    name[namelen] =3D '\0';
++    local_name[namelen] =3D '\0';
+     len -=3D namelen;
+-    if (nbd_drop(ioc, len, errp) < 0) {
+-        error_prepend(errp, "failed to read export description: ");
+-        nbd_send_opt_abort(ioc);
+-        return -1;
++    if (len) {
++        local_desc =3D g_malloc(len + 1);
++        if (nbd_read(ioc, local_desc, len, errp) < 0) {
++            error_prepend(errp, "failed to read export description: ");
++            nbd_send_opt_abort(ioc);
++            goto out;
++        }
++        local_desc[len] =3D '\0';
+     }
+-    if (!strcmp(name, want)) {
+-        *match =3D true;
++
++    trace_nbd_receive_list(local_name, local_desc ?: "");
++    *name =3D local_name;
++    local_name =3D NULL;
++    if (description) {
++        *description =3D local_desc;
++        local_desc =3D NULL;
+     }
+-    return 1;
++    ret =3D 1;
++
++ out:
++    g_free(local_name);
++    g_free(local_desc);
++    return ret;
+ }
 
--$QEMU_IMG info --image-opts \
--    --object tls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,i=
-d=3Dtls0 \
-+obj=3Dtls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,id=3Dtls=
-0
-+$QEMU_IMG info --image-opts --object $obj \
-     driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-creds=3Dt=
-ls0 \
-     2>&1 | sed "s/$nbd_tcp_port/PORT/g"
-+$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port --object $obj \
-+    --tls-creds=3Dtls0
 
- nbd_server_stop
+@@ -493,7 +501,8 @@ static int nbd_receive_query_exports(QIOChannel *ioc,
+                                      const char *wantname,
+                                      Error **errp)
+ {
+-    bool foundExport =3D false;
++    bool list_empty =3D true;
++    bool found_export =3D false;
 
-@@ -84,20 +86,25 @@ nbd_server_start_tcp_socket \
-     -f $IMGFMT "$TEST_IMG"
+     trace_nbd_receive_query_exports_start(wantname);
+     if (nbd_send_option_request(ioc, NBD_OPT_LIST, 0, NULL, errp) < 0) {
+@@ -501,14 +510,25 @@ static int nbd_receive_query_exports(QIOChannel *io=
+c,
+     }
 
- $QEMU_IMG info nbd://localhost:$nbd_tcp_port 2>&1 | sed "s/$nbd_tcp_port=
-/PORT/g"
-+$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port
+     while (1) {
+-        int ret =3D nbd_receive_list(ioc, wantname, &foundExport, errp);
++        char *name;
++        int ret =3D nbd_receive_list(ioc, &name, NULL, errp);
 
- echo
- echo "=3D=3D check TLS works =3D=3D"
--$QEMU_IMG info --image-opts \
--    --object tls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,i=
-d=3Dtls0 \
-+obj=3Dtls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,id=3Dtls=
-0
-+$QEMU_IMG info --image-opts --object $obj \
-     driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-creds=3Dt=
-ls0 \
-     2>&1 | sed "s/$nbd_tcp_port/PORT/g"
-+$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port --object $obj \
-+    --tls-creds=3Dtls0
+         if (ret < 0) {
+             /* Server gave unexpected reply */
+             return -1;
+         } else if (ret =3D=3D 0) {
+             /* Done iterating. */
+-            if (!foundExport) {
++            if (list_empty) {
++                /*
++                 * We don't have enough context to tell a server that
++                 * sent an empty list apart from a server that does
++                 * not support the list command; but as this function
++                 * is just used to trigger a nicer error message
++                 * before trying NBD_OPT_EXPORT_NAME, assume the
++                 * export is available.
++                 */
++                return 0;
++            } else if (!found_export) {
+                 error_setg(errp, "No export with name '%s' available",
+                            wantname);
+                 nbd_send_opt_abort(ioc);
+@@ -517,6 +537,11 @@ static int nbd_receive_query_exports(QIOChannel *ioc=
+,
+             trace_nbd_receive_query_exports_success(wantname);
+             return 0;
+         }
++        list_empty =3D false;
++        if (!strcmp(name, wantname)) {
++            found_export =3D true;
++        }
++        g_free(name);
+     }
+ }
 
- echo
- echo "=3D=3D check TLS with different CA fails =3D=3D"
--$QEMU_IMG info --image-opts \
--    --object tls-creds-x509,dir=3D${tls_dir}/client2,endpoint=3Dclient,i=
-d=3Dtls0 \
-+obj=3Dtls-creds-x509,dir=3D${tls_dir}/client2,endpoint=3Dclient,id=3Dtls=
-0
-+$QEMU_IMG info --image-opts --object $obj \
-     driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-creds=3Dt=
-ls0 \
-     2>&1 | sed "s/$nbd_tcp_port/PORT/g"
-+$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port --object $obj \
-+    --tls-creds=3Dtls0
-
- echo
- echo "=3D=3D perform I/O over TLS =3D=3D"
-diff --git a/tests/qemu-iotests/233.out b/tests/qemu-iotests/233.out
-index 5f416721b03..ab669488669 100644
---- a/tests/qemu-iotests/233.out
-+++ b/tests/qemu-iotests/233.out
-@@ -15,20 +15,35 @@ wrote 1048576/1048576 bytes at offset 1048576
- =3D=3D check TLS client to plain server fails =3D=3D
- qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3DPORT,tls-=
-creds=3Dtls0': Denied by server for option 5 (starttls)
- server reported: TLS not configured
-+qemu-nbd: Denied by server for option 5 (starttls)
-+server reported: TLS not configured
-
- =3D=3D check plain client to TLS server fails =3D=3D
- qemu-img: Could not open 'nbd://localhost:PORT': TLS negotiation require=
-d before option 8 (structured reply)
- server reported: Option 0x8 not permitted before TLS
-+qemu-nbd: TLS negotiation required before option 8 (structured reply)
-+server reported: Option 0x8 not permitted before TLS
-
- =3D=3D check TLS works =3D=3D
- image: nbd://127.0.0.1:PORT
- file format: nbd
- virtual size: 64M (67108864 bytes)
- disk size: unavailable
-+exports available: 1
-+ export: ''
-+  size:  67108864
-+  flags: 0x4ed ( flush fua trim zeroes df cache )
-+  min block: 512
-+  opt block: 4096
-+  max block: 33554432
-+  available meta contexts: 1
-+   base:allocation
-
- =3D=3D check TLS with different CA fails =3D=3D
- qemu-nbd: option negotiation failed: Verify failed: No certificate was f=
-ound.
- qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3DPORT,tls-=
-creds=3Dtls0': The certificate hasn't got a known issuer
-+qemu-nbd: option negotiation failed: Verify failed: No certificate was f=
-ound.
-+qemu-nbd: The certificate hasn't got a known issuer
-
- =3D=3D perform I/O over TLS =3D=3D
- read 1048576/1048576 bytes at offset 1048576
+diff --git a/nbd/trace-events b/nbd/trace-events
+index 5492042acbf..d1e1ca64ee5 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -3,6 +3,7 @@ nbd_send_option_request(uint32_t opt, const char *name, u=
+int32_t len) "Sending o
+ nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t =
+type, const char *typename, uint32_t length) "Received option reply %" PR=
+Iu32" (%s), type %" PRIu32" (%s), len %" PRIu32
+ nbd_server_error_msg(uint32_t err, const char *type, const char *msg) "s=
+erver reported error 0x%" PRIx32 " (%s) with additional message: %s"
+ nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't u=
+nderstand request %" PRIu32 " (%s), attempting fallback"
++nbd_receive_list(const char *name, const char *desc) "export list includ=
+es '%s', description '%s'"
+ nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s=
+'"
+ nbd_opt_go_success(void) "Export is good to go"
+ nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown in=
+fo %d (%s)"
 --=20
 2.20.1
