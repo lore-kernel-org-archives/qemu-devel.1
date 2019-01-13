@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42940)
+Received: from eggs.gnu.org ([209.51.188.92]:42996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gidgD-00068v-6m
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 06:11:49 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gidgS-0006Kb-1l
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 06:12:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gidgC-0007Fb-CM
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 06:11:49 -0500
-Resent-Message-Id: <E1gidgC-0007Fb-CM@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gidgC-00070h-4M
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 06:11:48 -0500
-Message-ID: <154737786388.37.18229590914231354561@2d170d368aaa>
+	(envelope-from <no-reply@patchew.org>) id 1gidgR-0007V9-6w
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 06:12:04 -0500
+Resent-Message-Id: <E1gidgR-0007V9-6w@eggs.gnu.org>
+Message-ID: <154737786915.37.4929087063074509285@2d170d368aaa>
 Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190110120843.3839-1-kraxel@redhat.com>
+In-Reply-To: <154713023826.379171.4010754027183178230.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 From: no-reply@patchew.org
-Date: Sun, 13 Jan 2019 03:11:05 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3] usb: assign unique serial numbers to
- hid devices
+Date: Sun, 13 Jan 2019 03:11:10 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] target/ppc/kvm: Drop useless include
+ directive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: groug@kaod.org
+Cc: fam@euphon.net, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExMDEyMDg0My4zODM5
-LTEta3JheGVsQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
-bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
-IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEg
-U0hPV19FTlY9MSBKPTgKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMTAxMjA4NDMuMzgz
-OS0xLWtyYXhlbEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
-ZXZlbEByZWRoYXQuY29t
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ3MTMwMjM4MjYuMzc5MTcx
+LjQwMTA3NTQwMjcxODMxNzgyMzAuc3RnaXRAYmFoaWEubGFuLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
+b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSB0
+YXJnZXQvcHBjL2t2bTogRHJvcCB1c2VsZXNzIGluY2x1ZGUgZGlyZWN0aXZlClR5cGU6IHNlcmll
+cwpNZXNzYWdlLWlkOiAxNTQ3MTMwMjM4MjYuMzc5MTcxLjQwMTA3NTQwMjcxODMxNzgyMzAuc3Rn
+aXRAYmFoaWEubGFuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtLWNvbG9yPWFsd2F5cyBiYXNlLi4K
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
+ZWY3ZjQ0YmQ4ODg3MTMzODQKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZp
+bGUgInBhdGNoZXctdGVzdGVyOC9zcmMvcGF0Y2hldy1jbGkiLCBsaW5lIDUyMSwgaW4gdGVzdF9v
+bmUKICAgIGdpdF9jbG9uZV9yZXBvKGNsb25lLCByWyJyZXBvIl0sIHJbImhlYWQiXSwgbG9nZiwg
+VHJ1ZSkKICBGaWxlICJwYXRjaGV3LXRlc3Rlcjgvc3JjL3BhdGNoZXctY2xpIiwgbGluZSA0OCwg
+aW4gZ2l0X2Nsb25lX3JlcG8KICAgIHN0ZG91dD1sb2dmLCBzdGRlcnI9bG9nZikKICBGaWxlICIv
+dXNyL2xpYjY0L3B5dGhvbjMuMy9zdWJwcm9jZXNzLnB5IiwgbGluZSA1NDQsIGluIGNoZWNrX2Nh
+bGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3Mu
+Q2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ2dpdCcsICdyZW1vdGUnLCAnYWRkJywgJy1m
+JywgJy0tbWlycm9yPWZldGNoJywgJzNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQnLCAnaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11J10nIHJldHVy
+bmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIC05CgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
+YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU0NzEzMDIzODI2LjM3OTE3MS40MDEwNzU0MDI3
+MTgzMTc4MjMwLnN0Z2l0QGJhaGlhLmxhbi90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2Fn
+ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
