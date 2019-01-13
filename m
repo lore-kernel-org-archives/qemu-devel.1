@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42014)
+Received: from eggs.gnu.org ([209.51.188.92]:48461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gilq0-0002No-R8
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:54:29 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gimbn-0001kv-UR
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 15:43:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gilpz-0000me-Vq
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:54:28 -0500
-Resent-Message-Id: <E1gilpz-0000me-Vq@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21708)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gilpz-0000kF-NX
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:54:27 -0500
-Message-ID: <154740923477.25737.2651606827981130486@2d170d368aaa>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190109163114.17010-1-berrange@redhat.com>
+	(envelope-from <yuval.shaia@oracle.com>) id 1gimQw-0007pE-GS
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 15:32:39 -0500
+Date: Sun, 13 Jan 2019 22:32:23 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190113203222.GA11199@lap1>
+References: <20190112150225.20294-1-marcel.apfelbaum@gmail.com>
+	<20190112150225.20294-2-marcel.apfelbaum@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 13 Jan 2019 11:53:56 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/13] Misc fixes / improvements for the
- docker and travis configs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190112150225.20294-2-marcel.apfelbaum@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] contrib/rdmacm-mux: remove
+ Wno-format-truncation flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.orgfam@euphon.net, alex.bennee@linaro.org, philmd@redhat.com
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, cohuck@redhat.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDEwOTE2MzExNC4xNzAx
-MC0xLWJlcnJhbmdlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
-b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
-bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
-ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
-cmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTA5MTYzMTE0
-LjE3MDEwLTEtYmVycmFuZ2VAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Sat, Jan 12, 2019 at 05:02:23PM +0200, Marcel Apfelbaum wrote:
+> The flag is not recognized by some CLANG versions.
+> Add proper constraints in code instead.
+> 
+> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> ---
+>  contrib/rdmacm-mux/Makefile.objs | 2 +-
+>  contrib/rdmacm-mux/main.c        | 6 ++++--
+>  2 files changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/contrib/rdmacm-mux/Makefile.objs b/contrib/rdmacm-mux/Makefile.objs
+> index be3eacb6f7..e1ff4fe569 100644
+> --- a/contrib/rdmacm-mux/Makefile.objs
+> +++ b/contrib/rdmacm-mux/Makefile.objs
+> @@ -1,4 +1,4 @@
+>  ifdef CONFIG_PVRDMA
+> -CFLAGS += -libumad -Wno-format-truncation
+> +CFLAGS += -libumad
+>  rdmacm-mux-obj-y = main.o
+>  endif
+> diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
+> index 835a7f9214..64676030c5 100644
+> --- a/contrib/rdmacm-mux/main.c
+> +++ b/contrib/rdmacm-mux/main.c
+> @@ -42,6 +42,8 @@
+>  
+>  /* The below can be override by command line parameter */
+>  #define UNIX_SOCKET_PATH "/var/run/rdmacm-mux"
+> +/* Has format %s-%s-%d" <path>-<rdma-dev--name>-<port> */
+> +#define SOCKET_PATH_MAX (PATH_MAX - NAME_MAX - sizeof(int) - 2)
+>  #define RDMA_PORT_NUM 1
+>  
+>  typedef struct RdmaCmServerArgs {
+> @@ -95,7 +97,7 @@ static void help(const char *progname)
+>  static void parse_args(int argc, char *argv[])
+>  {
+>      int c;
+> -    char unix_socket_path[PATH_MAX];
+> +    char unix_socket_path[SOCKET_PATH_MAX];
+>  
+>      strcpy(server.args.rdma_dev_name, "");
+>      strcpy(unix_socket_path, UNIX_SOCKET_PATH);
+> @@ -113,7 +115,7 @@ static void parse_args(int argc, char *argv[])
+>  
+>          case 's':
+>              /* This is temporary, final name will build below */
+> -            strncpy(unix_socket_path, optarg, PATH_MAX);
+> +            strncpy(unix_socket_path, optarg, SOCKET_PATH_MAX);
+>              break;
+>  
+
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+
+>          case 'p':
+> -- 
+> 2.17.1
+> 
