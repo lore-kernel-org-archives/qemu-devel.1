@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41077)
+Received: from eggs.gnu.org ([209.51.188.92]:45379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1giohk-0000Ng-Ci
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 17:58:09 -0500
+	(envelope-from <david@fromorbit.com>) id 1gipBn-0004nF-DY
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 18:29:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1giohj-0003nX-C5
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 17:58:08 -0500
-Message-Id: <1547419964.2320441.1633570656.2776A395@webmail.messagingengine.com>
-From: Andrew Jeffery <andrew@aj.id.au>
+	(envelope-from <david@fromorbit.com>) id 1gipBm-0006jc-M2
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 18:29:11 -0500
+Received: from ipmail06.adl2.internode.on.net ([150.101.137.129]:34620)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <david@fromorbit.com>) id 1gipBm-0006iS-Ag
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 18:29:10 -0500
+Date: Mon, 14 Jan 2019 10:29:02 +1100
+From: Dave Chinner <david@fromorbit.com>
+Message-ID: <20190113232902.GD4205@dastard>
+References: <20190109144736.17452-1-pagupta@redhat.com>
+	<20190110012617.GA4205@dastard>
+	<1326478078.61913951.1547192704870.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-References: <20190111125759.31577-1-clg@kaod.org>
-Date: Mon, 14 Jan 2019 09:22:44 +1030
-In-Reply-To: <20190111125759.31577-1-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH] ftgmac100: implement the new MDIO
- interface on Aspeed SoC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1326478078.61913951.1547192704870.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,166 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>, Jason Wang <jasowang@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org, linux-fsdevel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-acpi@vger.kernel.org, linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, jack@suse.cz, stefanha@redhat.com, dan j williams <dan.j.williams@intel.com>, riel@surriel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, david@redhat.com, jmoyer@redhat.com, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, hch@infradead.org, mst@redhat.com, jasowang@redhat.com, lcapitulino@redhat.com, imammedo@redhat.com, eblake@redhat.com, willy@infradead.org, tytso@mit.edu, adilger kernel <adilger.kernel@dilger.ca>, darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net
 
+On Fri, Jan 11, 2019 at 02:45:04AM -0500, Pankaj Gupta wrote:
+> 
+> > 
+> > On Wed, Jan 09, 2019 at 08:17:31PM +0530, Pankaj Gupta wrote:
+> > >  This patch series has implementation for "virtio pmem".
+> > >  "virtio pmem" is fake persistent memory(nvdimm) in guest
+> > >  which allows to bypass the guest page cache. This also
+> > >  implements a VIRTIO based asynchronous flush mechanism.
+> > 
+> > Hmmmm. Sharing the host page cache direct into the guest VM. Sounds
+> > like a good idea, but.....
+> > 
+> > This means the guest VM can now run timing attacks to observe host
+> > side page cache residency, and depending on the implementation I'm
+> > guessing that the guest will be able to control host side page
+> > cache eviction, too (e.g. via discard or hole punch operations).
+> 
+> Not sure how? this is similar to mmapping virtual memory by any userspace 
+> process. Any host userspace process can do such attack on host page cache
+> using mincore & mmap shared file. 
 
+Mincore is for monitoring, not cached eviction. And it's not
+required to observe cache residency, either. That's a wide open
+field containing an uncountable number of moles...
 
-On Fri, 11 Jan 2019, at 23:27, C=C3=A9dric Le Goater wrote:
-> The PHY behind the MAC of an Aspeed SoC can be controlled using two
-> different MDC/MDIO interfaces. The same registers PHYCR (MAC60) and
-> PHYDATA (MAC64) are involved but they have a different layout.
->=20
-> BIT31 of the Feature Register (MAC40) controls which MDC/MDIO
-> interface is active.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> But i don't think guest can do this alone. For virtio-pmem usecase
+> guest won't be using page cache so timing attack from only guest
+> side is not possible unless host userspace can run checks on page
+> cache eviction state using mincore etc.  As rightly described by
+> Rik, guest will only access its own page cache pages and if guest
+> page cache is managed directly by host, this saves alot of effort
+> for guest in transferring guest state of page cache.  
 
-Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+Until you have images (and hence host page cache) shared between
+multiple guests. People will want to do this, because it means they
+only need a single set of pages in host memory for executable
+binaries rather than a set of pages per guest. Then you have
+multiple guests being able to detect residency of the same set of
+pages. If the guests can then, in any way, control eviction of the
+pages from the host cache, then we have a guest-to-guest information
+leak channel.
 
-> ---
->  hw/net/ftgmac100.c | 80 +++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 68 insertions(+), 12 deletions(-)
->=20
-> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-> index 909c1182eebe..790430346b51 100644
-> --- a/hw/net/ftgmac100.c
-> +++ b/hw/net/ftgmac100.c
-> @@ -89,6 +89,18 @@
->  #define FTGMAC100_PHYDATA_MIIWDATA(x)       ((x) & 0xffff)
->  #define FTGMAC100_PHYDATA_MIIRDATA(x)       (((x) >> 16) & 0xffff)
->=20=20
-> +/*
-> + * PHY control register - New MDC/MDIO interface
-> + */
-> +#define FTGMAC100_PHYCR_NEW_DATA(x)     (((x) >> 16) & 0xffff)
-> +#define FTGMAC100_PHYCR_NEW_FIRE        (1 << 15)
-> +#define FTGMAC100_PHYCR_NEW_ST_22       (1 << 12)
-> +#define FTGMAC100_PHYCR_NEW_OP(x)       (((x) >> 10) & 3)
-> +#define   FTGMAC100_PHYCR_NEW_OP_WRITE    0x1
-> +#define   FTGMAC100_PHYCR_NEW_OP_READ     0x2
-> +#define FTGMAC100_PHYCR_NEW_DEV(x)      (((x) >> 5) & 0x1f)
-> +#define FTGMAC100_PHYCR_NEW_REG(x)      ((x) & 0x1f)
-> +
->  /*
->   * Feature Register
->   */
-> @@ -269,9 +281,9 @@ static void phy_reset(FTGMAC100State *s)
->      s->phy_int =3D 0;
->  }
->=20=20
-> -static uint32_t do_phy_read(FTGMAC100State *s, int reg)
-> +static uint16_t do_phy_read(FTGMAC100State *s, uint8_t reg)
->  {
-> -    uint32_t val;
-> +    uint16_t val;
->=20=20
->      switch (reg) {
->      case MII_BMCR: /* Basic Control */
-> @@ -336,7 +348,7 @@ static uint32_t do_phy_read(FTGMAC100State *s, int re=
-g)
->                         MII_BMCR_FD | MII_BMCR_CTST)
->  #define MII_ANAR_MASK 0x2d7f
->=20=20
-> -static void do_phy_write(FTGMAC100State *s, int reg, uint32_t val)
-> +static void do_phy_write(FTGMAC100State *s, uint8_t reg, uint16_t val)
->  {
->      switch (reg) {
->      case MII_BMCR:     /* Basic Control */
-> @@ -373,6 +385,55 @@ static void do_phy_write(FTGMAC100State *s, int=20
-> reg, uint32_t val)
->      }
->  }
->=20=20
-> +static void do_phy_new_ctl(FTGMAC100State *s)
-> +{
-> +    uint8_t reg;
-> +    uint16_t data;
-> +
-> +    if (!(s->phycr & FTGMAC100_PHYCR_NEW_ST_22)) {
-> +        qemu_log_mask(LOG_UNIMP, "%s: unsupported ST code\n", __func__);
-> +        return;
-> +    }
-> +
-> +    /* Nothing to do */
-> +    if (!(s->phycr & FTGMAC100_PHYCR_NEW_FIRE)) {
-> +        return;
-> +    }
-> +
-> +    reg =3D FTGMAC100_PHYCR_NEW_REG(s->phycr);
-> +    data =3D FTGMAC100_PHYCR_NEW_DATA(s->phycr);
-> +
-> +    switch (FTGMAC100_PHYCR_NEW_OP(s->phycr)) {
-> +    case FTGMAC100_PHYCR_NEW_OP_WRITE:
-> +        do_phy_write(s, reg, data);
-> +        break;
-> +    case FTGMAC100_PHYCR_NEW_OP_READ:
-> +        s->phydata =3D do_phy_read(s, reg) & 0xffff;
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid OP code %08x\n",
-> +                      __func__, s->phycr);
-> +    }
-> +
-> +    s->phycr &=3D ~FTGMAC100_PHYCR_NEW_FIRE;
-> +}
-> +
-> +static void do_phy_ctl(FTGMAC100State *s)
-> +{
-> +    uint8_t reg =3D FTGMAC100_PHYCR_REG(s->phycr);
-> +
-> +    if (s->phycr & FTGMAC100_PHYCR_MIIWR) {
-> +        do_phy_write(s, reg, s->phydata & 0xffff);
-> +        s->phycr &=3D ~FTGMAC100_PHYCR_MIIWR;
-> +    } else if (s->phycr & FTGMAC100_PHYCR_MIIRD) {
-> +        s->phydata =3D do_phy_read(s, reg) << 16;
-> +        s->phycr &=3D ~FTGMAC100_PHYCR_MIIRD;
-> +    } else {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: no OP code %08x\n",
-> +                      __func__, s->phycr);
-> +    }
-> +}
-> +
->  static int ftgmac100_read_bd(FTGMAC100Desc *bd, dma_addr_t addr)
->  {
->      if (dma_memory_read(&address_space_memory, addr, bd, sizeof(*bd))) {
-> @@ -628,7 +689,6 @@ static void ftgmac100_write(void *opaque, hwaddr addr,
->                            uint64_t value, unsigned size)
->  {
->      FTGMAC100State *s =3D FTGMAC100(opaque);
-> -    int reg;
->=20=20
->      switch (addr & 0xff) {
->      case FTGMAC100_ISR: /* Interrupt status */
-> @@ -711,14 +771,11 @@ static void ftgmac100_write(void *opaque, hwaddr ad=
-dr,
->          break;
->=20=20
->      case FTGMAC100_PHYCR:  /* PHY Device control */
-> -        reg =3D FTGMAC100_PHYCR_REG(value);
->          s->phycr =3D value;
-> -        if (value & FTGMAC100_PHYCR_MIIWR) {
-> -            do_phy_write(s, reg, s->phydata & 0xffff);
-> -            s->phycr &=3D ~FTGMAC100_PHYCR_MIIWR;
-> +        if (s->revr & FTGMAC100_REVR_NEW_MDIO_INTERFACE) {
-> +            do_phy_new_ctl(s);
->          } else {
-> -            s->phydata =3D do_phy_read(s, reg) << 16;
-> -            s->phycr &=3D ~FTGMAC100_PHYCR_MIIRD;
-> +            do_phy_ctl(s);
->          }
->          break;
->      case FTGMAC100_PHYDATA:
-> @@ -728,8 +785,7 @@ static void ftgmac100_write(void *opaque, hwaddr addr,
->          s->dblac =3D value;
->          break;
->      case FTGMAC100_REVR:  /* Feature Register */
-> -        /* TODO: Only Old MDIO interface is supported */
-> -        s->revr =3D value & ~FTGMAC100_REVR_NEW_MDIO_INTERFACE;
-> +        s->revr =3D value;
->          break;
->      case FTGMAC100_FEAR1: /* Feature Register 1 */
->          s->fear1 =3D value;
-> --=20
-> 2.20.1
->=20
+i.e. it's something we need to be aware of and really careful about
+enabling infrastructure that /will/ be abused if guests can find a
+way to influence the host side cache residency.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
