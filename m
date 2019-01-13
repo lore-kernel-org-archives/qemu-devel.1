@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51927)
+Received: from eggs.gnu.org ([209.51.188.92]:39551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1giYSx-0005mF-JM
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 00:37:48 -0500
+	(envelope-from <matwey.kornilov@gmail.com>) id 1giaEx-0002NC-S3
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 02:31:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1giYSw-00066K-Pd
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 00:37:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1giYSw-00065W-KF
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 00:37:46 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 821BFC0C49E1
-	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 05:37:44 +0000 (UTC)
-From: Bandan Das <bsd@redhat.com>
-References: <20190111082043.31412-1-bsd@redhat.com>
-	<20190111082043.31412-2-bsd@redhat.com>
-	<2770d0ef-fcce-e796-5038-bf92e3dfbdbf@redhat.com>
-Date: Sun, 13 Jan 2019 00:37:40 -0500
-In-Reply-To: <2770d0ef-fcce-e796-5038-bf92e3dfbdbf@redhat.com> (Eric Blake's
-	message of "Fri, 11 Jan 2019 09:39:40 -0600")
-Message-ID: <jpgbm4lglsr.fsf@linux.bootlegged.copy>
+	(envelope-from <matwey.kornilov@gmail.com>) id 1giaEx-0005sm-1I
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 02:31:27 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <matwey.kornilov@gmail.com>)
+	id 1giaEw-0005ry-Si
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 02:31:26 -0500
+Received: by mail-ot1-x341.google.com with SMTP id k98so16775306otk.3
+	for <qemu-devel@nongnu.org>; Sat, 12 Jan 2019 23:31:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2 v2] usb-mtp: Reallocate buffer in
- multiples of MTP_WRITE_BUF_SZ
+References: <q186f8$1u3$1@blaine.gmane.org>
+	<CAFEAcA9F+57RZzRTga8BvY_zCf13WX8d3NF6HA8kChtcw9_v6w@mail.gmail.com>
+	<CAJs94EZbyyxoXROG8=y7sfrQhmLhNj-mbyz6DSryYOJgqkTpzw@mail.gmail.com>
+In-Reply-To: <CAJs94EZbyyxoXROG8=y7sfrQhmLhNj-mbyz6DSryYOJgqkTpzw@mail.gmail.com>
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Date: Sun, 13 Jan 2019 10:31:13 +0300
+Message-ID: <CAJs94EZORmm69g-O7ttVrtNW_gpDqs9h_HoxA2Qp_c0yFijZeg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] qemu-user-linux: how could I measure performance
+ for aarch64 and arm?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 1/11/19 2:20 AM, Bandan Das wrote:
->> This is a "pre-patch" to breaking up the write buffer for
->> MTP writes. Instead of allocating a mtp buffer equal to size
->> sent by the initiator, we start with a small size and reallocate
->> multiples (of that small size) as needed.
->> 
->> Signed-off-by: Bandan Das <bsd@redhat.com>
->> ---
->>  hw/usb/dev-mtp.c | 26 ++++++++++++--------------
->>  1 file changed, 12 insertions(+), 14 deletions(-)
->> 
->> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
->> index b19b576278..a0d98c93ee 100644
->> --- a/hw/usb/dev-mtp.c
->> +++ b/hw/usb/dev-mtp.c
->> @@ -152,7 +152,6 @@ struct MTPData {
->>      bool         first;
->>      /* Used for >4G file sizes */
->>      bool         pending;
->> -    uint64_t     cached_length;
->>      int          fd;
->>  };
->>  
->> @@ -244,6 +243,7 @@ typedef struct {
->>  
->>  #define MTP_MANUFACTURER  "QEMU"
->>  #define MTP_PRODUCT       "QEMU filesharing"
->> +#define MTP_WRITE_BUF_SZ  512000
+=D0=BF=D1=82, 11 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 22:24, Matwey V. K=
+ornilov <matwey.kornilov@gmail.com>:
 >
-> Why not a power of two?  Perhaps use units.h and spell it (512 * KiB) ?
+> =D0=BF=D1=82, 11 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 12:52, Peter May=
+dell <peter.maydell@linaro.org>:
+> >
+> > On Thu, 10 Jan 2019 at 19:33, Matwey V. Kornilov
+> > <matwey.kornilov@gmail.com> wrote:
+> > > I am running the same application compiled for aarch64 and armv7l on
+> > > x86_64 platform using qemu-user-linux tools.
+> > >
+> > > I see dramatic performance difference (30 times) between emulated
+> > > architectures: aarch64 runs for ~4 minutes, armv7l runs for ~2 hours.
+> > > I do understand that CPU architecture emulation is inherently slow
+> > > thing, but my question is about the difference.
+> > >
+> > > How could I debug to understand what is the reason for such a big
+> > > difference? I've already tried to run stress-ng compiled for this two
+> > > architectures, but it leads to the same performance per second.
+> > >
+> > > I am running qemu 2.11, should I try other version?
+> >
+> > Yes, do try 3.1 -- we have done some overall TCG performance
+> > improvements.
+>
+> Indeed, qemu-arm from master runs for 4 minutes where 2.11 runs for 2
+> hours for me. It is impressive improvement.
 
-Sure, I will change it in a later patch.
+I've managed to bisected the first good (fast) commit:
 
-Bandan
+commit 2a53535af471f4bee9d6cb5b363746b8d5ed21dd
+Author: Luke Shumaker <lukeshu@parabola.nu>
+Date:   Thu Dec 28 13:08:13 2017 -0500
+
+    linux-user: init_guest_space: Try to make ARM space+commpage continuous
+
+Though I am not sure, how does it help.
+
+>
+> >
+> > For a big difference between target architectures like that,
+> > I would try starting by using some host performance tools on
+> > the two runs to see where all the time is being taken in
+> > the armv7l guest run -- is it all in translated guest code,
+> > or is there more time (proportionally) spent in particular
+> > parts of the QEMU C code? Does the armv7l version do
+> > many more or different syscalls (check with the QEMU -strace
+> > option) ?
+> >
+> > Also you should check performance on h/w 32 bit vs
+> > 64-bit Arm if you can, to confirm that it's not just
+> > that the guest application runs much slower there.
+> > (If you don't have the arm hardware you could at least
+> > check x86 32-bit vs 64-bit.)
+> >
+> > thanks
+> > -- PMM
+>
+>
+>
+> --
+> With best regards,
+> Matwey V. Kornilov
+
+
+
+--=20
+With best regards,
+Matwey V. Kornilov
