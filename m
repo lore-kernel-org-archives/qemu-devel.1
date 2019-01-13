@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59633)
+Received: from eggs.gnu.org ([209.51.188.92]:33757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gicQk-0002Yz-3q
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 04:51:47 -0500
+	(envelope-from <basil@daynix.com>) id 1giceJ-0005lz-Pm
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 05:05:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lbloch@janustech.com>) id 1gicHD-0003Oo-Or
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 04:41:56 -0500
-From: Leonid Bloch <lbloch@janustech.com>
-Date: Sun, 13 Jan 2019 09:41:47 +0000
-Message-ID: <38d3856b-b763-3253-a6a8-10ea489ac0fa@janustech.com>
-References: <20190111191401.18317-1-armbru@redhat.com>
-	<20190111191401.18317-2-armbru@redhat.com>
-In-Reply-To: <20190111191401.18317-2-armbru@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F51C4B8F43777246921747CFE602C7D2@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: Eliminate the S_1KiB, S_2KiB,
- ... macros
+	(envelope-from <basil@daynix.com>) id 1giceI-0003Tg-JB
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 05:05:47 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <basil@daynix.com>) id 1giceH-0003SV-No
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 05:05:46 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t27so19596596wra.6
+	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 02:05:45 -0800 (PST)
+From: Basil Salman <basil@daynix.com>
+Date: Sun, 13 Jan 2019 12:05:28 +0200
+Message-Id: <20190113100531.1346024-2-basil@daynix.com>
+In-Reply-To: <20190113100531.1346024-1-basil@daynix.com>
+References: <20190113100531.1346024-1-basil@daynix.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] qga-win: prevent crash when executing
+ guest-file-read with large count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,114 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>, Bishara AbuHattoum <bishara@daynix.com>
 
-SGksDQoNCk9uIDEvMTEvMTkgOToxNCBQTSwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IFdl
-IGRlZmluZSA1NCBtYWNyb3MgZm9yIHRoZSBwb3dlcnMgb2YgdHdvID49IDEwMjQuICBXZSB1c2Ug
-c2l4LCBpbiBzaXgNCj4gbWFjcm8gZGVmaW5pdGlvbnMuICBGb3VyIG9mIHRoZW0gY291bGQganVz
-dCBhcyB3ZWxsIHVzZSB0aGUgY29tbW9uIE1pQg0KPiBtYWNybywgc28gZG8gdGhhdC4gIFRoZSBy
-ZW1haW5pbmcgdHdvIGNhbid0LCBiZWNhdXNlIHRoZXkgZ2V0IHBhc3NlZA0KPiB0byBzdHJpbmdp
-ZnkuICBSZXBsYWNlIHRoZSBtYWNybyBieSB0aGUgbGl0ZXJhbCBudW1iZXIgdGhlcmUuDQo+IFNs
-aWdodGx5IGhhcmRlciB0byByZWFkIGluIG9uZSBpbnN0YW5jZSAoMTA0ODU3NiB2cy4gU18xTWlC
-KSwgc28gYWRkIGENCj4gY29tbWVudCB0aGVyZS4gIFRoZSBvdGhlciBpbnN0YW5jZSBpcyBhIHdh
-c2g6IDY1NTM2IHZzIFNfNjRLaUIuICA2NTUzNg0KPiBoYXMgYmVlbiBnb29kIGVub3VnaCBmb3Ig
-bW9yZSB0aGFuIHNldmVuIHllYXJzIHRoZXJlLg0KPiANCj4gVGhpcyBlZmZlY3RpdmVseSByZXZl
-cnRzIGNvbW1pdCA1NDBiODQ5MjYxOCBhbmQgMTI0MGFjNTU4ZDMuDQo+IA0KPiBTaWduZWQtb2Zm
-LWJ5OiBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1QHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgIGJs
-b2NrL3Fjb3cyLmggICAgICAgIHwgMTAgKysrLS0tDQo+ICAgYmxvY2svdmRpLmMgICAgICAgICAg
-fCAgMyArLQ0KPiAgIGluY2x1ZGUvcWVtdS91bml0cy5oIHwgNzMgLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gICAzIGZpbGVzIGNoYW5nZWQsIDcgaW5zZXJ0
-aW9ucygrKSwgNzkgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzIu
-aCBiL2Jsb2NrL3Fjb3cyLmgNCj4gaW5kZXggYTk4ZDI0NTAwYi4uMjM4MGNiZmI0MSAxMDA2NDQN
-Cj4gLS0tIGEvYmxvY2svcWNvdzIuaA0KPiArKysgYi9ibG9jay9xY293Mi5oDQo+IEBAIC01MCwx
-MSArNTAsMTEgQEANCj4gICANCj4gICAvKiA4IE1CIHJlZmNvdW50IHRhYmxlIGlzIGVub3VnaCBm
-b3IgMiBQQiBpbWFnZXMgYXQgNjRrIGNsdXN0ZXIgc2l6ZQ0KPiAgICAqICgxMjggR0IgZm9yIDUx
-MiBieXRlIGNsdXN0ZXJzLCAyIEVCIGZvciAyIE1CIGNsdXN0ZXJzKSAqLw0KPiAtI2RlZmluZSBR
-Q09XX01BWF9SRUZUQUJMRV9TSVpFIFNfOE1pQg0KPiArI2RlZmluZSBRQ09XX01BWF9SRUZUQUJM
-RV9TSVpFICg4ICogTWlCKQ0KPiAgIA0KPiAgIC8qIDMyIE1CIEwxIHRhYmxlIGlzIGVub3VnaCBm
-b3IgMiBQQiBpbWFnZXMgYXQgNjRrIGNsdXN0ZXIgc2l6ZQ0KPiAgICAqICgxMjggR0IgZm9yIDUx
-MiBieXRlIGNsdXN0ZXJzLCAyIEVCIGZvciAyIE1CIGNsdXN0ZXJzKSAqLw0KPiAtI2RlZmluZSBR
-Q09XX01BWF9MMV9TSVpFIFNfMzJNaUINCj4gKyNkZWZpbmUgUUNPV19NQVhfTDFfU0laRSAoMzIg
-KiBNaUIpDQo+ICAgDQo+ICAgLyogQWxsb3cgZm9yIGFuIGF2ZXJhZ2Ugb2YgMWsgcGVyIHNuYXBz
-aG90IHRhYmxlIGVudHJ5LCBzaG91bGQgYmUgcGxlbnR5IG9mDQo+ICAgICogc3BhY2UgZm9yIHNu
-YXBzaG90IG5hbWVzIGFuZCBJRHMgKi8NCj4gQEAgLTgxLDE1ICs4MSwxNSBAQA0KPiAgICNkZWZp
-bmUgTUlOX1JFRkNPVU5UX0NBQ0hFX1NJWkUgNCAvKiBjbHVzdGVycyAqLw0KPiAgIA0KPiAgICNp
-ZmRlZiBDT05GSUdfTElOVVgNCj4gLSNkZWZpbmUgREVGQVVMVF9MMl9DQUNIRV9NQVhfU0laRSBT
-XzMyTWlCDQo+ICsjZGVmaW5lIERFRkFVTFRfTDJfQ0FDSEVfTUFYX1NJWkUgKDMyICogTWlCKQ0K
-PiAgICNkZWZpbmUgREVGQVVMVF9DQUNIRV9DTEVBTl9JTlRFUlZBTCA2MDAgIC8qIHNlY29uZHMg
-Ki8NCj4gICAjZWxzZQ0KPiAtI2RlZmluZSBERUZBVUxUX0wyX0NBQ0hFX01BWF9TSVpFIFNfOE1p
-Qg0KPiArI2RlZmluZSBERUZBVUxUX0wyX0NBQ0hFX01BWF9TSVpFICg4ICogTWlCKQ0KPiAgIC8q
-IENhY2hlIGNsZWFuIGludGVydmFsIGlzIGN1cnJlbnRseSBhdmFpbGFibGUgb25seSBvbiBMaW51
-eCwgc28gbXVzdCBiZSAwICovDQo+ICAgI2RlZmluZSBERUZBVUxUX0NBQ0hFX0NMRUFOX0lOVEVS
-VkFMIDANCj4gICAjZW5kaWYNCj4gICANCj4gLSNkZWZpbmUgREVGQVVMVF9DTFVTVEVSX1NJWkUg
-U182NEtpQg0KPiArI2RlZmluZSBERUZBVUxUX0NMVVNURVJfU0laRSA2NTUzNg0KDQovKiBOb3Rl
-OiBjYW4ndCB1c2UgNjQgKiBLaUIgaGVyZSwgYmVjYXVzZSBpdCdzIHBhc3NlZCB0byBzdHJpbmdp
-ZnkoKSAqLw0KDQpPdGhlcndpc2UgZmluZSB3aXRoIG1lLiBUaGUgb3RoZXIgc29sdXRpb25zIChp
-bmNsdWRpbmcgbWluZSkgaW5kZWVkIHNlZW0gDQpvdmVyZW5naW5lZXJlZCBjb21wYXJlZCB0byB0
-aGlzLg0KDQpMZW9uaWQuDQoNCj4gICANCj4gICAjZGVmaW5lIFFDT1cyX09QVF9MQVpZX1JFRkNP
-VU5UUyAibGF6eS1yZWZjb3VudHMiDQo+ICAgI2RlZmluZSBRQ09XMl9PUFRfRElTQ0FSRF9SRVFV
-RVNUICJwYXNzLWRpc2NhcmQtcmVxdWVzdCINCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3ZkaS5jIGIv
-YmxvY2svdmRpLmMNCj4gaW5kZXggMjM4MGRhYTU4My4uYmYxZDE5ZGQ2OCAxMDA2NDQNCj4gLS0t
-IGEvYmxvY2svdmRpLmMNCj4gKysrIGIvYmxvY2svdmRpLmMNCj4gQEAgLTg1LDcgKzg1LDggQEAN
-Cj4gICAjZGVmaW5lIEJMT0NLX09QVF9TVEFUSUMgInN0YXRpYyINCj4gICANCj4gICAjZGVmaW5l
-IFNFQ1RPUl9TSVpFIDUxMg0KPiAtI2RlZmluZSBERUZBVUxUX0NMVVNURVJfU0laRSBTXzFNaUIN
-Cj4gKyNkZWZpbmUgREVGQVVMVF9DTFVTVEVSX1NJWkUgMTA0ODU3Ng0KPiArLyogTm90ZTogY2Fu
-J3QgdXNlIDEgKiBNaUIsIGJlY2F1c2UgaXQncyBwYXNzZWQgdG8gc3RyaW5naWZ5KCkgKi8NCj4g
-ICANCj4gICAjaWYgZGVmaW5lZChDT05GSUdfVkRJX0RFQlVHKQ0KPiAgICNkZWZpbmUgVkRJX0RF
-QlVHIDENCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvcWVtdS91bml0cy5oIGIvaW5jbHVkZS9xZW11
-L3VuaXRzLmgNCj4gaW5kZXggMWM5NTlkMTgyZS4uNjkyZGIzZmJiMiAxMDA2NDQNCj4gLS0tIGEv
-aW5jbHVkZS9xZW11L3VuaXRzLmgNCj4gKysrIGIvaW5jbHVkZS9xZW11L3VuaXRzLmgNCj4gQEAg
-LTE3LDc3ICsxNyw0IEBADQo+ICAgI2RlZmluZSBQaUIgICAgIChJTlQ2NF9DKDEpIDw8IDUwKQ0K
-PiAgICNkZWZpbmUgRWlCICAgICAoSU5UNjRfQygxKSA8PCA2MCkNCj4gICANCj4gLS8qDQo+IC0g
-KiBUaGUgZm9sbG93aW5nIGxvb2t1cCB0YWJsZSBpcyBpbnRlbmRlZCB0byBiZSB1c2VkIHdoZW4g
-YSBsaXRlcmFsIHN0cmluZyBvZg0KPiAtICogdGhlIG51bWJlciBvZiBieXRlcyBpcyByZXF1aXJl
-ZCAoZm9yIGV4YW1wbGUgaWYgaXQgbmVlZHMgdG8gYmUgc3RyaW5naWZpZWQpLg0KPiAtICogSXQg
-Y2FuIGFsc28gYmUgdXNlZCBmb3IgZ2VuZXJpYyBzaG9ydGN1dHMgb2YgcG93ZXItb2YtdHdvIHNp
-emVzLg0KPiAtICogVGhpcyB0YWJsZSBpcyBnZW5lcmF0ZWQgdXNpbmcgdGhlIEFXSyBzY3JpcHQg
-YmVsb3c6DQo+IC0gKg0KPiAtICogIEJFR0lOIHsNCj4gLSAqICAgICAgc3VmZml4PSJLTUdUUEUi
-Ow0KPiAtICogICAgICBmb3IoaT0xMDsgaTw2NDsgaSsrKSB7DQo+IC0gKiAgICAgICAgICB2YWw9
-MioqaTsNCj4gLSAqICAgICAgICAgIHM9c3Vic3RyKHN1ZmZpeCwgaW50KGkvMTApLCAxKTsNCj4g
-LSAqICAgICAgICAgIG49MioqKGklMTApOw0KPiAtICogICAgICAgICAgcGFkPTIxLWludChsb2co
-bikvbG9nKDEwKSk7DQo+IC0gKiAgICAgICAgICBwcmludGYoIiNkZWZpbmUgU18lZCVzaUIgJSpk
-XG4iLCBuLCBzLCBwYWQsIHZhbCk7DQo+IC0gKiAgICAgIH0NCj4gLSAqICB9DQo+IC0gKi8NCj4g
-LQ0KPiAtI2RlZmluZSBTXzFLaUIgICAgICAgICAgICAgICAgICAxMDI0DQo+IC0jZGVmaW5lIFNf
-MktpQiAgICAgICAgICAgICAgICAgIDIwNDgNCj4gLSNkZWZpbmUgU180S2lCICAgICAgICAgICAg
-ICAgICAgNDA5Ng0KPiAtI2RlZmluZSBTXzhLaUIgICAgICAgICAgICAgICAgICA4MTkyDQo+IC0j
-ZGVmaW5lIFNfMTZLaUIgICAgICAgICAgICAgICAgMTYzODQNCj4gLSNkZWZpbmUgU18zMktpQiAg
-ICAgICAgICAgICAgICAzMjc2OA0KPiAtI2RlZmluZSBTXzY0S2lCICAgICAgICAgICAgICAgIDY1
-NTM2DQo+IC0jZGVmaW5lIFNfMTI4S2lCICAgICAgICAgICAgICAxMzEwNzINCj4gLSNkZWZpbmUg
-U18yNTZLaUIgICAgICAgICAgICAgIDI2MjE0NA0KPiAtI2RlZmluZSBTXzUxMktpQiAgICAgICAg
-ICAgICAgNTI0Mjg4DQo+IC0jZGVmaW5lIFNfMU1pQiAgICAgICAgICAgICAgIDEwNDg1NzYNCj4g
-LSNkZWZpbmUgU18yTWlCICAgICAgICAgICAgICAgMjA5NzE1Mg0KPiAtI2RlZmluZSBTXzRNaUIg
-ICAgICAgICAgICAgICA0MTk0MzA0DQo+IC0jZGVmaW5lIFNfOE1pQiAgICAgICAgICAgICAgIDgz
-ODg2MDgNCj4gLSNkZWZpbmUgU18xNk1pQiAgICAgICAgICAgICAxNjc3NzIxNg0KPiAtI2RlZmlu
-ZSBTXzMyTWlCICAgICAgICAgICAgIDMzNTU0NDMyDQo+IC0jZGVmaW5lIFNfNjRNaUIgICAgICAg
-ICAgICAgNjcxMDg4NjQNCj4gLSNkZWZpbmUgU18xMjhNaUIgICAgICAgICAgIDEzNDIxNzcyOA0K
-PiAtI2RlZmluZSBTXzI1Nk1pQiAgICAgICAgICAgMjY4NDM1NDU2DQo+IC0jZGVmaW5lIFNfNTEy
-TWlCICAgICAgICAgICA1MzY4NzA5MTINCj4gLSNkZWZpbmUgU18xR2lCICAgICAgICAgICAgMTA3
-Mzc0MTgyNA0KPiAtI2RlZmluZSBTXzJHaUIgICAgICAgICAgICAyMTQ3NDgzNjQ4DQo+IC0jZGVm
-aW5lIFNfNEdpQiAgICAgICAgICAgIDQyOTQ5NjcyOTYNCj4gLSNkZWZpbmUgU184R2lCICAgICAg
-ICAgICAgODU4OTkzNDU5Mg0KPiAtI2RlZmluZSBTXzE2R2lCICAgICAgICAgIDE3MTc5ODY5MTg0
-DQo+IC0jZGVmaW5lIFNfMzJHaUIgICAgICAgICAgMzQzNTk3MzgzNjgNCj4gLSNkZWZpbmUgU182
-NEdpQiAgICAgICAgICA2ODcxOTQ3NjczNg0KPiAtI2RlZmluZSBTXzEyOEdpQiAgICAgICAgMTM3
-NDM4OTUzNDcyDQo+IC0jZGVmaW5lIFNfMjU2R2lCICAgICAgICAyNzQ4Nzc5MDY5NDQNCj4gLSNk
-ZWZpbmUgU181MTJHaUIgICAgICAgIDU0OTc1NTgxMzg4OA0KPiAtI2RlZmluZSBTXzFUaUIgICAg
-ICAgICAxMDk5NTExNjI3Nzc2DQo+IC0jZGVmaW5lIFNfMlRpQiAgICAgICAgIDIxOTkwMjMyNTU1
-NTINCj4gLSNkZWZpbmUgU180VGlCICAgICAgICAgNDM5ODA0NjUxMTEwNA0KPiAtI2RlZmluZSBT
-XzhUaUIgICAgICAgICA4Nzk2MDkzMDIyMjA4DQo+IC0jZGVmaW5lIFNfMTZUaUIgICAgICAgMTc1
-OTIxODYwNDQ0MTYNCj4gLSNkZWZpbmUgU18zMlRpQiAgICAgICAzNTE4NDM3MjA4ODgzMg0KPiAt
-I2RlZmluZSBTXzY0VGlCICAgICAgIDcwMzY4NzQ0MTc3NjY0DQo+IC0jZGVmaW5lIFNfMTI4VGlC
-ICAgICAxNDA3Mzc0ODgzNTUzMjgNCj4gLSNkZWZpbmUgU18yNTZUaUIgICAgIDI4MTQ3NDk3Njcx
-MDY1Ng0KPiAtI2RlZmluZSBTXzUxMlRpQiAgICAgNTYyOTQ5OTUzNDIxMzEyDQo+IC0jZGVmaW5l
-IFNfMVBpQiAgICAgIDExMjU4OTk5MDY4NDI2MjQNCj4gLSNkZWZpbmUgU18yUGlCICAgICAgMjI1
-MTc5OTgxMzY4NTI0OA0KPiAtI2RlZmluZSBTXzRQaUIgICAgICA0NTAzNTk5NjI3MzcwNDk2DQo+
-IC0jZGVmaW5lIFNfOFBpQiAgICAgIDkwMDcxOTkyNTQ3NDA5OTINCj4gLSNkZWZpbmUgU18xNlBp
-QiAgICAxODAxNDM5ODUwOTQ4MTk4NA0KPiAtI2RlZmluZSBTXzMyUGlCICAgIDM2MDI4Nzk3MDE4
-OTYzOTY4DQo+IC0jZGVmaW5lIFNfNjRQaUIgICAgNzIwNTc1OTQwMzc5Mjc5MzYNCj4gLSNkZWZp
-bmUgU18xMjhQaUIgIDE0NDExNTE4ODA3NTg1NTg3Mg0KPiAtI2RlZmluZSBTXzI1NlBpQiAgMjg4
-MjMwMzc2MTUxNzExNzQ0DQo+IC0jZGVmaW5lIFNfNTEyUGlCICA1NzY0NjA3NTIzMDM0MjM0ODgN
-Cj4gLSNkZWZpbmUgU18xRWlCICAgMTE1MjkyMTUwNDYwNjg0Njk3Ng0KPiAtI2RlZmluZSBTXzJF
-aUIgICAyMzA1ODQzMDA5MjEzNjkzOTUyDQo+IC0jZGVmaW5lIFNfNEVpQiAgIDQ2MTE2ODYwMTg0
-MjczODc5MDQNCj4gLSNkZWZpbmUgU184RWlCICAgOTIyMzM3MjAzNjg1NDc3NTgwOA0KPiAtDQo+
-ICAgI2VuZGlmDQo+IA0K
+BZ: #1594054
+guest-file-read command is currently implelmented to read from a
+file handle count number of bytes. when executed with a very large count number
+qemu-ga crashes.
+after some digging turns out that qemu-ga crashes after trying to allocate
+a buffer large enough to save the data read in it, the buffer was allocated using
+g_malloc0 which is not fail safe, and results a crash in case of failure.
+g_malloc0 was replaced with g_try_malloc0() which returns NULL on failure,
+A check was added for that case in order to prevent qemu-ga from crashing
+and to send a response to the qemu-ga client accordingly.
+
+Signed-off-by: Basil Salman <basil@daynix.com>
+---
+ qga/commands-win32.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 62e1b51dfe..4260faa573 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -345,7 +345,13 @@ GuestFileRead *qmp_guest_file_read(int64_t handle, bool has_count,
+     }
+ 
+     fh = gfh->fh;
+-    buf = g_malloc0(count+1);
++    buf = g_try_malloc0(count + 1);
++    if (!buf) {
++        error_setg(errp,
++                   "failed to allocate sufficient memory"
++                   "to complete the requested service");
++        return read_data;
++    }
+     is_ok = ReadFile(fh, buf, count, &read_count, NULL);
+     if (!is_ok) {
+         error_setg_win32(errp, GetLastError(), "failed to read file");
+-- 
+2.17.2
