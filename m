@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36117)
+Received: from eggs.gnu.org ([209.51.188.92]:36887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gilHv-0002DH-9K
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:19:16 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gilNP-0004He-6t
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:24:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gilHu-0003MX-FI
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:19:15 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:50746)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gilHu-0003L1-2Q
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:19:14 -0500
-Date: Sun, 13 Jan 2019 21:19:02 +0200
+	(envelope-from <yuval.shaia@oracle.com>) id 1gilNN-0005wm-Qt
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:24:55 -0500
+Date: Sun, 13 Jan 2019 21:24:40 +0200
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190113191901.GA10017@lap1>
-References: <20190109201559.3906-1-yuval.shaia@oracle.com>
-	<7b754432-7c1e-8f22-3410-d95c426c2d0b@gmail.com>
+Message-ID: <20190113192439.GB10017@lap1>
+References: <20190112150225.20294-1-marcel.apfelbaum@gmail.com>
+	<20190112150225.20294-3-marcel.apfelbaum@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7b754432-7c1e-8f22-3410-d95c426c2d0b@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/pvrdma: Post CQE when receive invalid
- gid index
+In-Reply-To: <20190112150225.20294-3-marcel.apfelbaum@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] hw/rdma: modify struct initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +24,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, cohuck@redhat.com
 
-On Sat, Jan 12, 2019 at 05:11:39PM +0200, Marcel Apfelbaum wrote:
+On Sat, Jan 12, 2019 at 05:02:24PM +0200, Marcel Apfelbaum wrote:
+> Do not initialize structs with {0} since some
+> CLANG versions do not support it.
 > 
-> 
-> On 1/9/19 10:15 PM, Yuval Shaia wrote:
-> > This error should propagate back to guest.
-> > 
-> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > ---
-> >   hw/rdma/rdma_backend.h      | 1 +
-> >   hw/rdma/vmw/pvrdma_qp_ops.c | 6 ++++--
-> >   2 files changed, 5 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-> > index a9ba40ae48..5114c90e67 100644
-> > --- a/hw/rdma/rdma_backend.h
-> > +++ b/hw/rdma/rdma_backend.h
-> > @@ -32,6 +32,7 @@
-> >   #define VENDOR_ERR_INVLKEY          0x207
-> >   #define VENDOR_ERR_MR_SMALL         0x208
-> >   #define VENDOR_ERR_INV_MAD_BUFF     0x209
-> > +#define VENDOR_ERR_INV_GID_IDX      0x210
-> >   /* Add definition for QP0 and QP1 as there is no userspace enums for them */
-> >   enum ibv_special_qp_type {
-> > diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-> > index 465bee8641..0565eba981 100644
-> > --- a/hw/rdma/vmw/pvrdma_qp_ops.c
-> > +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-> > @@ -178,7 +178,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
-> >           sgid = rdma_rm_get_gid(&dev->rdma_dev_res, wqe->hdr.wr.ud.av.gid_index);
-> >           if (!sgid) {
-> >               pr_dbg("Fail to get gid for idx %d\n", wqe->hdr.wr.ud.av.gid_index);
-> > -            return -EIO;
-> > +            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
-> 
-> Informing the guest is OK, but are you sure it makes sense
-> to continue sending the other work requests?
+> Use memset instead.
 
-Yes, it is exactly what is expected. RDMA application (or driver) would
-usually push several work requests to ring (optimally populating the entire
-ring) and then ring the doorbell.
-An error in a specific WR does not means all WRs in ring should not be
-processed.
-
-> Is maybe safer to return with error as before?
-
-And what about the remaining WR in the ring? any way the device would have
-to process them on next doorbell.
+It is easier than patching CLANG ha? :)
 
 > 
-> > +            continue;
-> >           }
-> >           pr_dbg("sgid_id=%d, sgid=0x%llx\n", wqe->hdr.wr.ud.av.gid_index,
-> >                  sgid->global.interface_id);
-> > @@ -189,7 +190,8 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
-> >           if (sgid_idx <= 0) {
-> >               pr_dbg("Fail to get bk sgid_idx for sgid_idx %d\n",
-> >                      wqe->hdr.wr.ud.av.gid_index);
-> > -            return -EIO;
-> > +            complete_with_error(VENDOR_ERR_INV_GID_IDX, comp_ctx);
-> > +            continue;
+> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> ---
+>  contrib/rdmacm-mux/main.c | 12 +++++++++---
+>  hw/rdma/rdma_backend.c    | 16 ++++++++++++----
+>  2 files changed, 21 insertions(+), 7 deletions(-)
 > 
-> Same question here.
-> 
-> Thanks,
-> Marcel
-> >           }
-> >           if (wqe->hdr.num_sge > dev->dev_attr.max_sge) {
+> diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
+> index 64676030c5..d01dc76927 100644
+> --- a/contrib/rdmacm-mux/main.c
+> +++ b/contrib/rdmacm-mux/main.c
+> @@ -350,9 +350,11 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+>  static void *umad_recv_thread_func(void *args)
+>  {
+>      int rc;
+> -    RdmaCmMuxMsg msg = {0};
+> +    RdmaCmMuxMsg msg;
+>      int fd = -2;
+>  
+> +    memset(&msg, 0, sizeof(msg));
+> +
+>      msg.hdr.msg_type = RDMACM_MUX_MSG_TYPE_REQ;
+>      msg.hdr.op_code = RDMACM_MUX_OP_CODE_MAD;
+>  
+> @@ -387,11 +389,13 @@ static void *umad_recv_thread_func(void *args)
+>  static int read_and_process(int fd)
+>  {
+>      int rc;
+> -    RdmaCmMuxMsg msg = {0};
+> +    RdmaCmMuxMsg msg;
+>      struct umad_hdr *hdr;
+>      uint32_t *comm_id = 0;
+>      uint16_t attr_id;
+>  
+> +    memset(&msg, 0, sizeof(msg));
+> +
+>      rc = recv(fd, &msg, sizeof(msg), 0);
+>      syslog(LOG_DEBUG, "Socket %d, recv %d\n", fd, rc);
+>  
+> @@ -744,7 +748,9 @@ static void signal_handler(int sig, siginfo_t *siginfo, void *context)
+>  static int init(void)
+>  {
+>      int rc;
+> -    struct sigaction sig = {0};
+> +    struct sigaction sig;
+> +
+> +    memset(&sig, 0, sizeof(sig));
+>  
+>      rc = init_listener();
+>      if (rc) {
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index c28bfbd44d..92e95aa640 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -190,9 +190,11 @@ static inline int rdmacm_mux_can_process_async(RdmaBackendDev *backend_dev)
+>  
+>  static int check_mux_op_status(CharBackend *mad_chr_be)
+>  {
+> -    RdmaCmMuxMsg msg = {0};
+> +    RdmaCmMuxMsg msg;
+>      int ret;
+>  
+> +    memset(&msg, 0, sizeof(msg));
+> +
+>      pr_dbg("Reading response\n");
+>      ret = qemu_chr_fe_read_all(mad_chr_be, (uint8_t *)&msg, sizeof(msg));
+>      if (ret != sizeof(msg)) {
+> @@ -387,10 +389,12 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+>  static int mad_send(RdmaBackendDev *backend_dev, uint8_t sgid_idx,
+>                      union ibv_gid *sgid, struct ibv_sge *sge, uint32_t num_sge)
+>  {
+> -    RdmaCmMuxMsg msg = {0};
+> +    RdmaCmMuxMsg msg;
+>      char *hdr, *data;
+>      int ret;
+>  
+> +    memset(&msg, 0, sizeof(msg));
+> +
+>      pr_dbg("num_sge=%d\n", num_sge);
+>  
+>      if (num_sge != 2) {
+> @@ -1112,9 +1116,11 @@ int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+>  int rdma_backend_add_gid(RdmaBackendDev *backend_dev, const char *ifname,
+>                           union ibv_gid *gid)
+>  {
+> -    RdmaCmMuxMsg msg = {0};
+> +    RdmaCmMuxMsg msg;
+>      int ret;
+>  
+> +    memset(&msg, 0, sizeof(msg));
+> +
+>      pr_dbg("0x%llx, 0x%llx\n",
+>             (long long unsigned int)be64_to_cpu(gid->global.subnet_prefix),
+>             (long long unsigned int)be64_to_cpu(gid->global.interface_id));
+> @@ -1138,9 +1144,11 @@ int rdma_backend_add_gid(RdmaBackendDev *backend_dev, const char *ifname,
+>  int rdma_backend_del_gid(RdmaBackendDev *backend_dev, const char *ifname,
+>                           union ibv_gid *gid)
+>  {
+> -    RdmaCmMuxMsg msg = {0};
+> +    RdmaCmMuxMsg msg;
+>      int ret;
+>  
+> +    memset(&msg, 0, sizeof(msg));
+> +
+>      pr_dbg("0x%llx, 0x%llx\n",
+>             (long long unsigned int)be64_to_cpu(gid->global.subnet_prefix),
+>             (long long unsigned int)be64_to_cpu(gid->global.interface_id));
+
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+
+One comment though, should subject prefixed with hw/rdma or
+contrib/rdmacm-mux?
+
+> -- 
+> 2.17.1
 > 
