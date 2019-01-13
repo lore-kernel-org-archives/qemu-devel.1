@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39551)
+Received: from eggs.gnu.org ([209.51.188.92]:59633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <matwey.kornilov@gmail.com>) id 1giaEx-0002NC-S3
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 02:31:29 -0500
+	(envelope-from <lbloch@janustech.com>) id 1gicQj-0002Yz-AG
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 04:51:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <matwey.kornilov@gmail.com>) id 1giaEx-0005sm-1I
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 02:31:27 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35945)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <matwey.kornilov@gmail.com>)
-	id 1giaEw-0005ry-Si
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 02:31:26 -0500
-Received: by mail-ot1-x341.google.com with SMTP id k98so16775306otk.3
-	for <qemu-devel@nongnu.org>; Sat, 12 Jan 2019 23:31:25 -0800 (PST)
+	(envelope-from <lbloch@janustech.com>) id 1gicHw-0003ea-LC
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 04:42:41 -0500
+From: Leonid Bloch <lbloch@janustech.com>
+Date: Sun, 13 Jan 2019 09:42:27 +0000
+Message-ID: <5c18782a-4319-e87b-6b1f-6c808d837430@janustech.com>
+References: <20190111191401.18317-1-armbru@redhat.com>
+In-Reply-To: <20190111191401.18317-1-armbru@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <627AB34DBD30CA44ABB6375EA6619AE5@namprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <q186f8$1u3$1@blaine.gmane.org>
-	<CAFEAcA9F+57RZzRTga8BvY_zCf13WX8d3NF6HA8kChtcw9_v6w@mail.gmail.com>
-	<CAJs94EZbyyxoXROG8=y7sfrQhmLhNj-mbyz6DSryYOJgqkTpzw@mail.gmail.com>
-In-Reply-To: <CAJs94EZbyyxoXROG8=y7sfrQhmLhNj-mbyz6DSryYOJgqkTpzw@mail.gmail.com>
-From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
-Date: Sun, 13 Jan 2019 10:31:13 +0300
-Message-ID: <CAJs94EZORmm69g-O7ttVrtNW_gpDqs9h_HoxA2Qp_c0yFijZeg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu-user-linux: how could I measure performance
- for aarch64 and arm?
+Subject: Re: [Qemu-devel] [PATCH 0/1] block: Eliminate the S_1KiB, S_2KiB,
+ ... macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-=D0=BF=D1=82, 11 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 22:24, Matwey V. K=
-ornilov <matwey.kornilov@gmail.com>:
->
-> =D0=BF=D1=82, 11 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 12:52, Peter May=
-dell <peter.maydell@linaro.org>:
-> >
-> > On Thu, 10 Jan 2019 at 19:33, Matwey V. Kornilov
-> > <matwey.kornilov@gmail.com> wrote:
-> > > I am running the same application compiled for aarch64 and armv7l on
-> > > x86_64 platform using qemu-user-linux tools.
-> > >
-> > > I see dramatic performance difference (30 times) between emulated
-> > > architectures: aarch64 runs for ~4 minutes, armv7l runs for ~2 hours.
-> > > I do understand that CPU architecture emulation is inherently slow
-> > > thing, but my question is about the difference.
-> > >
-> > > How could I debug to understand what is the reason for such a big
-> > > difference? I've already tried to run stress-ng compiled for this two
-> > > architectures, but it leads to the same performance per second.
-> > >
-> > > I am running qemu 2.11, should I try other version?
-> >
-> > Yes, do try 3.1 -- we have done some overall TCG performance
-> > improvements.
->
-> Indeed, qemu-arm from master runs for 4 minutes where 2.11 runs for 2
-> hours for me. It is impressive improvement.
-
-I've managed to bisected the first good (fast) commit:
-
-commit 2a53535af471f4bee9d6cb5b363746b8d5ed21dd
-Author: Luke Shumaker <lukeshu@parabola.nu>
-Date:   Thu Dec 28 13:08:13 2017 -0500
-
-    linux-user: init_guest_space: Try to make ARM space+commpage continuous
-
-Though I am not sure, how does it help.
-
->
-> >
-> > For a big difference between target architectures like that,
-> > I would try starting by using some host performance tools on
-> > the two runs to see where all the time is being taken in
-> > the armv7l guest run -- is it all in translated guest code,
-> > or is there more time (proportionally) spent in particular
-> > parts of the QEMU C code? Does the armv7l version do
-> > many more or different syscalls (check with the QEMU -strace
-> > option) ?
-> >
-> > Also you should check performance on h/w 32 bit vs
-> > 64-bit Arm if you can, to confirm that it's not just
-> > that the guest application runs much slower there.
-> > (If you don't have the arm hardware you could at least
-> > check x86 32-bit vs 64-bit.)
-> >
-> > thanks
-> > -- PMM
->
->
->
-> --
-> With best regards,
-> Matwey V. Kornilov
-
-
-
---=20
-With best regards,
-Matwey V. Kornilov
+T24gMS8xMS8xOSA5OjE0IFBNLCBNYXJrdXMgQXJtYnJ1c3RlciB3cm90ZToNCj4gQmFjayBpbiBT
+ZXB0ZW1iZXIsIExlb25pZCBCbG9jayBhZGRlZCBhIHdob2xlIGJ1bmNoIG9mIG1hY3JvcyAoY29t
+bWl0DQoNCiogQmxvY2guIDopDQoNCj4gNTQwYjg0OTI2MTgpIHRvIGltcHJvdmUgcmVhZGFiaWxp
+dHkgb2YgcWNvdzIuaCBhIGJpdCAoY29tbWl0DQo+IGI2YTk1YzZkMTAwKS4gIEhlIGxhdGVyIHVz
+ZWQgdGhlbSB0byBmaXggdGhlICJ2ZGkiIGRyaXZlcidzIHBhcmFtZXRlcg0KPiBjbHVzdGVyX3Np
+emUncyBkZWZhdWx0IHZhbHVlIChjb21taXQgM2RkNWI4ZjQ3MTgpLiAgSGUgaGFzIG5vdw0KPiBw
+cm9wb3NlZCBhIGZ1cnRoZXIgcGF0Y2hbMV0gdG8gYXV0by1nZW5lcmF0ZSB0aGVzZSBtYWNyb3Mu
+ICBUaGF0IHBhdGNoDQo+IGZlZWxzIG92ZXJlbmdpbmVlcmVkIHRvIG1lLg0KPiANCj4gT24gY2xv
+c2VyIGV4YW1pbmF0aW9uLCBJIGZvdW5kIEkgZGlzbGlrZSB0aGUgbWFjcm9zIGJlZm9yZSBoaXMg
+bmV3DQo+IHBhdGNoLiAgU28gZGlkIEVyaWMgQmxha2UuDQo+IA0KPiBUaGUgbWFjcm9zIGV4aXN0
+IGJlY2F1c2UgdGhlIGNvbW1vbiBLaUIsIE1pQiwgLi4uIG1hY3JvcyBhcmVuJ3QgdXNhYmxlDQo+
+IHdoZW4geW91IG5lZWQgYSBsaXRlcmFsIHJhdGhlciB0aGFuIGEgY29uc3RhbnQgZXhwcmVzc2lv
+bi4NCj4gc3RyaW5naWZ5KCkgZG9lcywgYW5kIHdlIHVzZSBpdCB0byBkZWZpbmUgdGhlIFFlbXVP
+cHRzIGRlZmF1bHQgdmFsdWUuDQo+IA0KPiBFcmljIHByb3Bvc2VkIHRvIGltcHJvdmUgUWVtdU9w
+dHMgdG8gYWNjZXB0IGludGVnZXIgZGVmYXVsdCB2YWx1ZXMsDQo+IHRvb1syXS4gIEJlZm9yZSBJ
+IHJldmlldyB0aGF0IHBhdGNoIHNlcmllcywgSSB3YW50IHRvIGVzdGFibGlzaCBhDQo+ICJzdHVw
+aWRlc3Qgc29sdXRpb24gdGhhdCBjYW4gcG9zc2libHkgd29yayIgYmFzZWxpbmUuICBBbmQgdGhh
+dCdzIHdoYXQNCj4gdGhpcyBwYXRjaCBpcy4NCj4gDQo+IFsxXSBbUEFUQ0ggdjIgMC8xXSBpbmNs
+dWRlOiBBdXRvLWdlbmVyYXRlIHRoZSBzaXplcyBsb29rdXAgdGFibGUNCj4gTWVzc2FnZS1JRDog
+PDIwMTkwMTAzMjEzMzIwLjI2NTMtMS1sYmxvY2hAamFudXN0ZWNoLmNvbT4NCj4gDQo+IFsyXSBb
+UEFUQ0ggdjMgMC82XSBpbmNsdWRlOiBBdXRvLWdlbmVyYXRlIHRoZSBzaXplcyBsb29rdXAgdGFi
+bGUNCj4gTWVzc2FnZS1JZDogPDIwMTkwMTEwMTkxOTAxLjUwODItMS1lYmxha2VAcmVkaGF0LmNv
+bT4NCj4gDQo+IE1hcmt1cyBBcm1icnVzdGVyICgxKToNCj4gICAgYmxvY2s6IEVsaW1pbmF0ZSB0
+aGUgU18xS2lCLCBTXzJLaUIsIC4uLiBtYWNyb3MNCj4gDQo+ICAgYmxvY2svcWNvdzIuaCAgICAg
+ICAgfCAxMCArKystLS0NCj4gICBibG9jay92ZGkuYyAgICAgICAgICB8ICAzICstDQo+ICAgaW5j
+bHVkZS9xZW11L3VuaXRzLmggfCA3MyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLQ0KPiAgIDMgZmlsZXMgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCA3OSBkZWxl
+dGlvbnMoLSkNCj4gDQo=
