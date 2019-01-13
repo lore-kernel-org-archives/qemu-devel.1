@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43203)
+Received: from eggs.gnu.org ([209.51.188.92]:39970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gidhN-00070e-59
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 06:13:02 -0500
+	(envelope-from <lifei1214@126.com>) id 1gigRj-0002tx-0h
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 09:09:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gidhM-000852-GU
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 06:13:01 -0500
-Resent-Message-Id: <E1gidhM-000852-GU@eggs.gnu.org>
-Message-ID: <154737787435.37.15800339211428120976@2d170d368aaa>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <154713023826.379171.4010754027183178230.stgit@bahia.lan>
+	(envelope-from <lifei1214@126.com>) id 1gigRi-0002zW-Co
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 09:09:03 -0500
+Received: from m50-110.126.com ([123.125.50.110]:42740)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gigRh-0002vK-O8
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 09:09:02 -0500
+From: Fei Li <lifei1214@126.com>
+Date: Sun, 13 Jan 2019 22:08:44 +0800
+Message-Id: <20190113140849.38339-1-lifei1214@126.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 13 Jan 2019 03:11:15 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] target/ppc/kvm: Drop useless include
- directive
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-4.0 0/5] fix some segmentation faults and
+ migration issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,18 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org
-Cc: fam@euphon.net, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, shirley17fei@gmail.com
+Cc: Fei Li <lifei1214@126.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTQ3MTMwMjM4MjYuMzc5MTcx
-LjQwMTA3NTQwMjcxODMxNzgyMzAuc3RnaXRAYmFoaWEubGFuLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IGZhaWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0
-aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBE
-b2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRl
-c3QtbWluZ3dAZmVkb3JhIFNIT1dfRU5WPTEgSj04Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoK
-CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1
-NDcxMzAyMzgyNi4zNzkxNzEuNDAxMDc1NDAyNzE4MzE3ODIzMC5zdGdpdEBiYWhpYS5sYW4vdGVz
-dGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+All these five patches have gotten the Reviewed-by: the first patch
+is to fix one segmentation fault and the other four are to fix some
+migration issues.
+
+To be more detail, they are extracted from previous
+"[PATCH for-4.0 v9 16/16] qemu_thread_create: propagate errors to
+callers to handle.", but actually these five patches are derivative
+and not relevant to the mentioned qemu_thread_create patch series.
+Thus send them separately to make them be merged earlier.
+
+Fei Li (5):
+  Fix segmentation fault when qemu_signal_init fails
+  migration: fix the multifd code when receiving less channels
+  migration: multifd_save_cleanup() can't fail, simplify
+  migration: add more error handling for postcopy_ram_enable_notify
+  migration: unify error handling for process_incoming_migration_co
+
+ migration/channel.c      | 11 ++++++-----
+ migration/migration.c    | 40 +++++++++++++++++++++-------------------
+ migration/migration.h    |  2 +-
+ migration/postcopy-ram.c |  1 +
+ migration/ram.c          | 28 ++++++++++++++++++----------
+ migration/ram.h          |  4 ++--
+ migration/savevm.c       |  1 +
+ util/main-loop.c         |  8 ++++----
+ 8 files changed, 54 insertions(+), 41 deletions(-)
+
+-- 
+2.17.2 (Apple Git-113)
