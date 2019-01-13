@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36887)
+Received: from eggs.gnu.org ([209.51.188.92]:37252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gilNP-0004He-6t
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:24:56 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gilPU-0005HX-M8
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:27:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gilNN-0005wm-Qt
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:24:55 -0500
-Date: Sun, 13 Jan 2019 21:24:40 +0200
+	(envelope-from <yuval.shaia@oracle.com>) id 1gilPT-0006qj-Ec
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:27:04 -0500
+Date: Sun, 13 Jan 2019 21:26:45 +0200
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190113192439.GB10017@lap1>
+Message-ID: <20190113192644.GC10017@lap1>
 References: <20190112150225.20294-1-marcel.apfelbaum@gmail.com>
-	<20190112150225.20294-3-marcel.apfelbaum@gmail.com>
+	<20190112150225.20294-4-marcel.apfelbaum@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190112150225.20294-3-marcel.apfelbaum@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] hw/rdma: modify struct initialization
+In-Reply-To: <20190112150225.20294-4-marcel.apfelbaum@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] contrib/rdmacm-mux: fix clang
+ compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,127 +27,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, cohuck@redhat.com
 
-On Sat, Jan 12, 2019 at 05:02:24PM +0200, Marcel Apfelbaum wrote:
-> Do not initialize structs with {0} since some
-> CLANG versions do not support it.
+On Sat, Jan 12, 2019 at 05:02:25PM +0200, Marcel Apfelbaum wrote:
+> Fix Commit a5d2f6f877 (contrib/rdmacm-mux: Add implementation
+>                        of RDMA User MAD multiplexer).
 > 
-> Use memset instead.
-
-It is easier than patching CLANG ha? :)
-
+> The above commit introduces a new contrib target, adding a global dependency
+> to libumad library in case pvrdma configuration option is enabled.
+> Clang forbids it:
+>     clang-6.0: error: -libumad: 'linker' input unused
+>               [-Werror,-Wunused-command-line-argument]
 > 
+> Fix by limiting the scope to the rdmacm-mux target itself.
+> 
+> Reported-by: Cornelia Huck <cohuck@redhat.com>
 > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 > ---
->  contrib/rdmacm-mux/main.c | 12 +++++++++---
->  hw/rdma/rdma_backend.c    | 16 ++++++++++++----
->  2 files changed, 21 insertions(+), 7 deletions(-)
+>  Makefile                         | 2 ++
+>  contrib/rdmacm-mux/Makefile.objs | 1 -
+>  2 files changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
-> index 64676030c5..d01dc76927 100644
-> --- a/contrib/rdmacm-mux/main.c
-> +++ b/contrib/rdmacm-mux/main.c
-> @@ -350,9 +350,11 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
->  static void *umad_recv_thread_func(void *args)
->  {
->      int rc;
-> -    RdmaCmMuxMsg msg = {0};
-> +    RdmaCmMuxMsg msg;
->      int fd = -2;
->  
-> +    memset(&msg, 0, sizeof(msg));
+> diff --git a/Makefile b/Makefile
+> index a9ac16d94e..31e87e0c2d 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -580,6 +580,8 @@ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a
+>  	$(call LINK, $^)
+>  vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
+>  	$(call LINK, $^)
 > +
->      msg.hdr.msg_type = RDMACM_MUX_MSG_TYPE_REQ;
->      msg.hdr.op_code = RDMACM_MUX_OP_CODE_MAD;
+> +rdmacm-mux$(EXESUF): LIBS += "-libumad"
+>  rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+>  	$(call LINK, $^)
 >  
-> @@ -387,11 +389,13 @@ static void *umad_recv_thread_func(void *args)
->  static int read_and_process(int fd)
->  {
->      int rc;
-> -    RdmaCmMuxMsg msg = {0};
-> +    RdmaCmMuxMsg msg;
->      struct umad_hdr *hdr;
->      uint32_t *comm_id = 0;
->      uint16_t attr_id;
->  
-> +    memset(&msg, 0, sizeof(msg));
-> +
->      rc = recv(fd, &msg, sizeof(msg), 0);
->      syslog(LOG_DEBUG, "Socket %d, recv %d\n", fd, rc);
->  
-> @@ -744,7 +748,9 @@ static void signal_handler(int sig, siginfo_t *siginfo, void *context)
->  static int init(void)
->  {
->      int rc;
-> -    struct sigaction sig = {0};
-> +    struct sigaction sig;
-> +
-> +    memset(&sig, 0, sizeof(sig));
->  
->      rc = init_listener();
->      if (rc) {
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index c28bfbd44d..92e95aa640 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -190,9 +190,11 @@ static inline int rdmacm_mux_can_process_async(RdmaBackendDev *backend_dev)
->  
->  static int check_mux_op_status(CharBackend *mad_chr_be)
->  {
-> -    RdmaCmMuxMsg msg = {0};
-> +    RdmaCmMuxMsg msg;
->      int ret;
->  
-> +    memset(&msg, 0, sizeof(msg));
-> +
->      pr_dbg("Reading response\n");
->      ret = qemu_chr_fe_read_all(mad_chr_be, (uint8_t *)&msg, sizeof(msg));
->      if (ret != sizeof(msg)) {
-> @@ -387,10 +389,12 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
->  static int mad_send(RdmaBackendDev *backend_dev, uint8_t sgid_idx,
->                      union ibv_gid *sgid, struct ibv_sge *sge, uint32_t num_sge)
->  {
-> -    RdmaCmMuxMsg msg = {0};
-> +    RdmaCmMuxMsg msg;
->      char *hdr, *data;
->      int ret;
->  
-> +    memset(&msg, 0, sizeof(msg));
-> +
->      pr_dbg("num_sge=%d\n", num_sge);
->  
->      if (num_sge != 2) {
-> @@ -1112,9 +1116,11 @@ int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
->  int rdma_backend_add_gid(RdmaBackendDev *backend_dev, const char *ifname,
->                           union ibv_gid *gid)
->  {
-> -    RdmaCmMuxMsg msg = {0};
-> +    RdmaCmMuxMsg msg;
->      int ret;
->  
-> +    memset(&msg, 0, sizeof(msg));
-> +
->      pr_dbg("0x%llx, 0x%llx\n",
->             (long long unsigned int)be64_to_cpu(gid->global.subnet_prefix),
->             (long long unsigned int)be64_to_cpu(gid->global.interface_id));
-> @@ -1138,9 +1144,11 @@ int rdma_backend_add_gid(RdmaBackendDev *backend_dev, const char *ifname,
->  int rdma_backend_del_gid(RdmaBackendDev *backend_dev, const char *ifname,
->                           union ibv_gid *gid)
->  {
-> -    RdmaCmMuxMsg msg = {0};
-> +    RdmaCmMuxMsg msg;
->      int ret;
->  
-> +    memset(&msg, 0, sizeof(msg));
-> +
->      pr_dbg("0x%llx, 0x%llx\n",
->             (long long unsigned int)be64_to_cpu(gid->global.subnet_prefix),
->             (long long unsigned int)be64_to_cpu(gid->global.interface_id));
+> diff --git a/contrib/rdmacm-mux/Makefile.objs b/contrib/rdmacm-mux/Makefile.objs
+> index e1ff4fe569..3df744af89 100644
+> --- a/contrib/rdmacm-mux/Makefile.objs
+> +++ b/contrib/rdmacm-mux/Makefile.objs
+> @@ -1,4 +1,3 @@
+>  ifdef CONFIG_PVRDMA
+> -CFLAGS += -libumad
+
+My bad, thanks for doing it the right way.
 
 Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
 
-One comment though, should subject prefixed with hw/rdma or
-contrib/rdmacm-mux?
-
+>  rdmacm-mux-obj-y = main.o
+>  endif
 > -- 
 > 2.17.1
 > 
