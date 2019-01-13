@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49867)
+Received: from eggs.gnu.org ([209.51.188.92]:51885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gik21-0006OQ-HW
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 12:58:46 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gik5F-0007VL-12
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 13:02:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gik20-0002ER-HG
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 12:58:45 -0500
-Resent-Message-Id: <E1gik20-0002ER-HG@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21796)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gik20-0002Dj-BH
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 12:58:44 -0500
-Message-ID: <154739957604.25737.18230979149591086310@2d170d368aaa>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190111093116.17188-1-kraxel@redhat.com>
+	(envelope-from <ppandit@redhat.com>) id 1gik5D-0004ln-RX
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 13:02:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48816)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gik5D-0004h6-LU
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 13:02:03 -0500
+From: P J P <ppandit@redhat.com>
+Date: Sun, 13 Jan 2019 23:29:48 +0530
+Message-Id: <20190113175948.21076-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 13 Jan 2019 09:12:57 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/5] vfio/display: add edid support.
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] slirp: check data length while emulating
+ ident function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, alex.williamson@redhat.com, intel-gvt-dev@lists.freedesktop.org
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, Kira <864786842@qq.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Jan Kiszka <jan.kiszka@siemens.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExMTA5MzExNi4xNzE4
-OC0xLWtyYXhlbEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNV0gdmZpby9kaXNwbGF5
-OiBhZGQgZWRpZCBzdXBwb3J0LgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTAxMTEwOTMx
-MTYuMTcxODgtMS1rcmF4ZWxAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTAxMTMxNDM2NDEuMzg5MzYt
-MS1saWZlaTEyMTRAMTI2LmNvbSAtPiBwYXRjaGV3LzIwMTkwMTEzMTQzNjQxLjM4OTM2LTEtbGlm
-ZWkxMjE0QDEyNi5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkM2I4M2U5IHNv
-bWUgbG9nZ2luZwo0NmIzMTIzIHZmaW8vZGlzcGxheTogZGVsYXkgbGluayB1cCBldmVudAo2YWU3
-NzI2IHZmaW8vZGlzcGxheTogYWRkIHhyZXMgKyB5cmVzIHByb3BlcnRpZXMKZDgyMzRmYiB2Zmlv
-L2Rpc3BsYXk6IGFkZCBlZGlkIHN1cHBvcnQuCjQ1ZTFiYzEgdmZpbzogdXBkYXRlIGtlcm5lbCBo
-ZWFkZXJzLgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS81IENoZWNraW5nIGNvbW1pdCA0NWUxYmMx
-NjU1MmMgKHZmaW86IHVwZGF0ZSBrZXJuZWwgaGVhZGVycy4pCjIvNSBDaGVja2luZyBjb21taXQg
-ZDgyMzRmYjU3MjNjICh2ZmlvL2Rpc3BsYXk6IGFkZCBlZGlkIHN1cHBvcnQuKQpFUlJPUjogbGlu
-ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ0OiBGSUxFOiBody92ZmlvL2Rpc3BsYXkuYzo0MDoKK3N0
-YXRpYyB2b2lkIHZmaW9fZGlzcGxheV9lZGlkX3VwZGF0ZShWRklPUENJRGV2aWNlICp2ZGV2LCBi
-b29sIGVuYWJsZWQsIGludCBwcmVmeCwgaW50IHByZWZ5KQoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzEyMjogRklMRTogaHcvdmZpby9kaXNwbGF5LmM6MTE4OgorICAgIHByZWFk
-X2ZpZWxkKHZkZXYtPnZiYXNlZGV2LmZkLCBkcHktPmVkaWRfaW5mbywgZHB5LT5lZGlkX3JlZ3Ms
-IGVkaWRfbWF4X3NpemUpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwg
-YXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTM5OiBGSUxFOiBody92ZmlvL2Rpc3BsYXkuYzoxMzU6
-CisgICAgaWYgKCFkcHktPmVkaWRfcmVncykKWy4uLl0KCnRvdGFsOiAyIGVycm9ycywgMSB3YXJu
-aW5ncywgMTU2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKMy81IENoZWNraW5nIGNvbW1pdCA2YWU3NzI2MWQ1ZjMgKHZmaW8vZGlzcGxheTogYWRk
-IHhyZXMgKyB5cmVzIHByb3BlcnRpZXMpCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBm
-b3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzM0OiBGSUxFOiBody92ZmlvL2Rpc3BsYXku
-YzoxMjQ6CisgICAgaWYgKCF2ZGV2LT5kaXNwbGF5X3hyZXMpClsuLi5dCgpFUlJPUjogYnJhY2Vz
-IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzNjogRklM
-RTogaHcvdmZpby9kaXNwbGF5LmM6MTI2OgorICAgIGlmICghdmRldi0+ZGlzcGxheV95cmVzKQpb
-Li4uXQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAzOCBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAzLzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvNSBDaGVja2luZyBjb21taXQgNDZi
-MzEyMzkxYWU0ICh2ZmlvL2Rpc3BsYXk6IGRlbGF5IGxpbmsgdXAgZXZlbnQpCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1MTogRklMRTogaHcvdmZpby9kaXNwbGF5LmM6ODk6Cisg
-ICAgdGltZXJfbW9kKGRweS0+ZWRpZF9saW5rX3RpbWVyLCBxZW11X2Nsb2NrX2dldF9tcyhRRU1V
-X0NMT0NLX1JFQUxUSU1FKSArIDEwMCk7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDU5
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzUg
-Q2hlY2tpbmcgY29tbWl0IGQzYjgzZTlkNzhhMSAoc29tZSBsb2dnaW5nKQpFUlJPUjogTWlzc2lu
-ZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ2
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTAxMTEw
-OTMxMTYuMTcxODgtMS1rcmF4ZWxAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9
-bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+From: Prasad J Pandit <pjp@fedoraproject.org>
+
+While emulating identification protocol, tcp_emu() does not check
+available space in the 'sc_rcv->sb_data' buffer. It could lead to
+heap buffer overflow issue. Add check to avoid it.
+
+Reported-by: Kira <864786842@qq.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ slirp/tcp_subr.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+Update v2: return 1 instead of 0
+  -> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02182.html
+
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index fa61349cbb..8b1bd8c8c0 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -635,6 +635,10 @@ tcp_emu(struct socket *so, struct mbuf *m)
+ 			socklen_t addrlen =3D sizeof(struct sockaddr_in);
+ 			struct sbuf *so_rcv =3D &so->so_rcv;
+=20
++            if (m->m_len > so_rcv->sb_datalen
++                            - (so_rcv->sb_wptr - so_rcv->sb_data)) {
++                return 1;
++            }
+ 			memcpy(so_rcv->sb_wptr, m->m_data, m->m_len);
+ 			so_rcv->sb_wptr +=3D m->m_len;
+ 			so_rcv->sb_rptr +=3D m->m_len;
+--=20
+2.20.1
