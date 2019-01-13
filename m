@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54014)
+Received: from eggs.gnu.org ([209.51.188.92]:54725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gihsR-0002qu-FW
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 10:40:44 -0500
+	(envelope-from <lifei1214@126.com>) id 1gihwI-0003zt-5i
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 10:44:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gihsQ-00016Z-Hz
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 10:40:43 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:39405)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gihsQ-00015F-BT
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 10:40:42 -0500
-Received: by mail-wm1-f67.google.com with SMTP id y8so6528338wmi.4
-	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 07:40:40 -0800 (PST)
-References: <154724210898.37.4367801081630939892@2d170d368aaa>
-	<834ad86b-27d1-ce01-91dc-a5c939061ce9@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <14d1bd7f-caa5-ded6-21f4-b9fa6c0e03a7@redhat.com>
-Date: Sun, 13 Jan 2019 16:40:37 +0100
+	(envelope-from <lifei1214@126.com>) id 1gihwH-0002wM-BN
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 10:44:42 -0500
+Received: from m50-112.126.com ([123.125.50.112]:50932)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gihwF-0002rx-4G
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 10:44:41 -0500
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-10-fli@suse.com>
+	<87a7kcml5i.fsf@dusky.pond.sub.org>
+From: Fei Li <lifei1214@126.com>
+Message-ID: <f5631b6b-d313-88dc-f80a-890c26f109e4@126.com>
+Date: Sun, 13 Jan 2019 23:44:28 +0800
 MIME-Version: 1.0
-In-Reply-To: <834ad86b-27d1-ce01-91dc-a5c939061ce9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <87a7kcml5i.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] contrib/gitdm: Fix a typo
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 09/16] qemu_thread: supplement
+ error handling for pci_edu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, fam@euphon.net
-Cc: qemu-trivial@nongnu.org, alex.bennee@linaro.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, Jiri Slaby <jslaby@suse.cz>
 
-On 11/01/19 23:39, Philippe Mathieu-Daudé wrote:
-> On 1/11/19 10:28 PM, no-reply@patchew.org wrote:
->> Patchew URL: https://patchew.org/QEMU/20190111155555.8270-1-philmd@redhat.com/
+
+在 2019/1/8 上午1:29, Markus Armbruster 写道:
+> Fei Li <fli@suse.com> writes:
+>
+>> Utilize the existed errp to propagate the error instead of the
+>> temporary &error_abort.
 >>
->> Hi,
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Jiri Slaby <jslaby@suse.cz>
+>> Signed-off-by: Fei Li <fli@suse.com>
+>> ---
+>>   hw/misc/edu.c | 7 ++++---
+>>   1 file changed, 4 insertions(+), 3 deletions(-)
 >>
->> This series seems to have some coding style problems. See output below for
->> more information:
->>
->> Message-id: 20190111155555.8270-1-philmd@redhat.com
->> Type: series
->> Subject: [Qemu-devel] [PATCH] contrib/gitdm: Fix a typo
->>
->> === TEST SCRIPT BEGIN ===
->> #!/bin/bash
->> git config --local diff.renamelimit 0
->> git config --local diff.renames True
->> git config --local diff.algorithm histogram
->> ./scripts/checkpatch.pl --mailback --color=always base..
-> I suppose Paolo expected his PR to land to upgrade patchew, and patchew
-> is still processing from an old queue?
-> 
+>> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+>> index 3f4ba7ded3..011fe6e0b7 100644
+>> --- a/hw/misc/edu.c
+>> +++ b/hw/misc/edu.c
+>> @@ -356,9 +356,10 @@ static void pci_edu_realize(PCIDevice *pdev, Error **errp)
+>>   
+>>       qemu_mutex_init(&edu->thr_mutex);
+>>       qemu_cond_init(&edu->thr_cond);
+>> -    /* TODO: let the further caller handle the error instead of abort() here */
+>> -    qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+>> -                       edu, QEMU_THREAD_JOINABLE, &error_abort);
+>> +    if (!qemu_thread_create(&edu->thread, "edu", edu_fact_thread,
+>> +                            edu, QEMU_THREAD_JOINABLE, errp)) {
+>> +        return;
+> You need to clean up everything that got initialized so far.  You might
+> want to call qemu_thread_create() earlier so you have less to clean up.
 
-Yeah, patchew was still processing tags that didn't have my PR applied.
+Just to make sure about how to do the cleanup. I notice that in device_set_realized(),
+the current code does not call "dc->unrealize(dev, NULL);" when dc->realize() fails.
 
-Anyhow, I'll hijack this to note that now:
+         if (dc->realize) {
+             dc->realize(dev, &local_err);
+         }
 
-1) The test script for checkpatch is now much simple, compare
-https://patchew.org/QEMU/20190103085638.17600-1-philmd@redhat.com/ (old)
-to https://patchew.org/QEMU/20190109110144.18633-1-stefanha@redhat.com/
-(new).  Improvement of "cut and paste" ability was a nice side effect of
-the new TAP-based "make check", and this goes in the same direction.
+         if (local_err != NULL) {
+             goto fail;
+         }
 
-2) Patchew is showing colored output---for now only for checkpatch. :)
-More precisely, output is captured from a PTY, via script(1).  This
-turned out to be a bit more tricky than I expected (script doesn't like
-having its stdin redirected from /dev/null), but it's fixed now.
+Is this on purpose? (Maybe due to some devices' realize() do their own cleanup
+when fails? Sorry for the unsure, it is such a common function that I did not
+check all. :( ) Or else, I prefer to do the cleanup in a unified manner, e.g. call "dc->unrealize(dev, NULL);" which is the pci_qdev_unrealize() for pci devices.
 
-3) I bumped the tester from -j8 to -j14, hoping that the queue will be
-smaller, and temporarily deployed a second tester on my own workstation.
- This in turn caused some issues because pulling a git repo with 12000
-tags is not for the faint of heart, but everything should be running
-normally now and future deployments will optimize this (check
-https://patchew.org/Patchew/ to see the issues).
-
-Paolo
+Have a nice day
+Fei
