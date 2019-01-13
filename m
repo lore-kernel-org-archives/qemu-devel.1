@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34535)
+Received: from eggs.gnu.org ([209.51.188.92]:34735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gil7p-00073H-0m
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:08:49 -0500
+	(envelope-from <noring@nocrew.org>) id 1gil8o-0007r1-Nw
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:09:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gil7o-0006XM-4g
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:08:49 -0500
-Received: from pio-pvt-msa3.bahnhof.se ([79.136.2.42]:39152)
+	(envelope-from <noring@nocrew.org>) id 1gil8n-0006zH-1W
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:09:50 -0500
+Received: from pio-pvt-msa2.bahnhof.se ([79.136.2.41]:55846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gil7n-0006X4-QR
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:08:48 -0500
-Date: Sun, 13 Jan 2019 20:08:39 +0100
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gil8l-0006y4-5b
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:09:47 -0500
+Date: Sun, 13 Jan 2019 20:09:44 +0100
 From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <e1efe4eff36a4069bbf8411a09d01acd387fb49d.1547403692.git.noring@nocrew.org>
+Message-ID: <f12b05b6581daa925e253a9639dd44d34441a511.1547403692.git.noring@nocrew.org>
 References: <cover.1547403692.git.noring@nocrew.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <cover.1547403692.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH 8/9] tests/tcg/mips: Test R5900 multimedia
- instruction LQ
+Subject: [Qemu-devel] [PATCH 9/9] tests/tcg/mips: Test R5900 multimedia
+ instruction SQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +32,54 @@ Cc: =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <ma
 
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- tests/tcg/mips/mipsn32r5900/Makefile |   3 +-
- tests/tcg/mips/mipsn32r5900/lq.c     | 111 +++++++++++++++++++++++++++
- 2 files changed, 113 insertions(+), 1 deletion(-)
- create mode 100644 tests/tcg/mips/mipsn32r5900/lq.c
+ tests/tcg/mips/mipsn32r5900/Makefile |   1 +
+ tests/tcg/mips/mipsn32r5900/sq.c     | 105 +++++++++++++++++++++++++++
+ 2 files changed, 106 insertions(+)
+ create mode 100644 tests/tcg/mips/mipsn32r5900/sq.c
 
 diff --git a/tests/tcg/mips/mipsn32r5900/Makefile b/tests/tcg/mips/mipsn32r5900/Makefile
-index f4887678ae..cb3ef9d26a 100644
+index cb3ef9d26a..a9e9481457 100644
 --- a/tests/tcg/mips/mipsn32r5900/Makefile
 +++ b/tests/tcg/mips/mipsn32r5900/Makefile
-@@ -8,7 +8,8 @@ SIM_FLAGS=-cpu R5900
- CC      = $(CROSS)gcc
- CFLAGS  = -Wall -mabi=n32 -march=r5900 -static
+@@ -10,6 +10,7 @@ CFLAGS  = -Wall -mabi=n32 -march=r5900 -static
  
--TESTCASES = pcpyuld.tst
-+TESTCASES = lq.tst
-+TESTCASES += pcpyuld.tst
+ TESTCASES = lq.tst
+ TESTCASES += pcpyuld.tst
++TESTCASES += sq.tst
  
  all: $(TESTCASES)
  
-diff --git a/tests/tcg/mips/mipsn32r5900/lq.c b/tests/tcg/mips/mipsn32r5900/lq.c
+diff --git a/tests/tcg/mips/mipsn32r5900/sq.c b/tests/tcg/mips/mipsn32r5900/sq.c
 new file mode 100644
-index 0000000000..5a16b12450
+index 0000000000..97b21711ba
 --- /dev/null
-+++ b/tests/tcg/mips/mipsn32r5900/lq.c
-@@ -0,0 +1,111 @@
++++ b/tests/tcg/mips/mipsn32r5900/sq.c
+@@ -0,0 +1,105 @@
 +/*
-+ * Test LQ.
++ * Test SQ.
 + */
 +
 +#include <stdio.h>
++#include <string.h>
 +#include <inttypes.h>
 +#include <assert.h>
++
++#define GUARD_BYTE 0xA9
 +
 +/* 128-bit multimedia register */
 +struct mmr { uint64_t hi, lo; } __attribute__((aligned(16)));
 +
-+#define LQ(base, offset) \
-+    ({ \
-+        uint64_t hi, lo; \
-+    \
++static uint8_t data[64];
++
++#define SQ(value, base, offset) \
 +        __asm__ __volatile__ ( \
-+            "    pcpyld  %1, %1, %1\n" \
-+            "    lq %1, %3(%2)\n" \
-+            "    pcpyud  %0, %1, %1\n" \
-+            : "=r" (hi), "=r" (lo) \
-+            : "r" (base), "i" (offset)); \
-+    \
-+        (struct mmr) { .hi = hi, .lo = lo }; \
-+    })
++            "    pcpyld  %0, %0, %1\n" \
++            "    sq %0, %3(%2)\n" \
++            : \
++            : "r" (value.hi), "r" (value.lo), \
++              "r" (base), "i" (offset))
 +
-+static uint64_t ld_reference(const void *base, int16_t offset)
-+{
-+    const uint8_t *p = base;
-+    uint64_t r = 0;
-+    int i;
-+
-+    for (i = 0; i < 8; i++) {
-+        r |= (uint64_t)p[offset + i] << (8 * i);
-+    }
-+
-+    return r;
-+}
-+
-+static struct mmr lq_reference(const void *base, int16_t offset)
++static void verify_sq(struct mmr value, const void *base, int16_t offset)
 +{
 +    /*
 +     * The least significant four bits of the effective address are
@@ -104,66 +88,74 @@ index 0000000000..5a16b12450
 +     */
 +    const uint8_t *b = base;
 +    const uint8_t *o = &b[offset];
-+    const void *a = (const void*)((unsigned long)o & ~0xFUL);
++    const uint8_t *a = (const uint8_t*)((unsigned long)o & ~0xFUL);
++    size_t i;
 +
-+    return (struct mmr) {
-+        .hi = ld_reference(a, 8),
-+        .lo = ld_reference(a, 0)
-+    };
++    for (i = 0; i < sizeof(data); i++) {
++        ssize_t d = &data[i] - &a[0];
++
++        if (d < 0) {
++            assert(data[i] == GUARD_BYTE);
++        } else if (d < 8) {
++            assert(data[i] == ((value.lo >> (8 * (d - 0))) & 0xFF));
++        } else if (d < 16) {
++            assert(data[i] == ((value.hi >> (8 * (d - 8))) & 0xFF));
++        } else {
++            assert(data[i] == GUARD_BYTE);
++        }
++    }
 +}
 +
-+static void assert_equal_mmr(struct mmr a, struct mmr b)
-+{
-+    assert(a.hi == b.hi);
-+    assert(a.lo == b.lo);
-+}
-+
-+#define VERIFY_LQ(base, offset) \
-+    assert_equal_mmr(LQ(base, offset), lq_reference(base, offset))
++#define VERIFY_SQ(base, offset) \
++    do { \
++        struct mmr value = { \
++            .hi = 0x6665646362613938, \
++            .lo = 0x3736353433323130 \
++        }; \
++    \
++        memset(data, GUARD_BYTE, sizeof(data)); \
++        SQ(value, base, offset); \
++        verify_sq(value, base, offset); \
++    } while (0)
 +
 +int main()
 +{
-+    static const char data[] __attribute__((aligned(16)))=
-+        "0123456789abcdef"
-+        "ghijklmnopqrstuv"
-+        "wxyzABCDEFGHIJKL"
-+        "MNOPQRSTUVWXYZ.,";
 +    int i;
 +
 +    for (i = 16; i < 48; i++) {
-+        VERIFY_LQ(&data[i], -16);
-+        VERIFY_LQ(&data[i], -15);
-+        VERIFY_LQ(&data[i], -14);
-+        VERIFY_LQ(&data[i], -13);
-+        VERIFY_LQ(&data[i], -12);
-+        VERIFY_LQ(&data[i], -11);
-+        VERIFY_LQ(&data[i], -10);
-+        VERIFY_LQ(&data[i], -9);
-+        VERIFY_LQ(&data[i], -8);
-+        VERIFY_LQ(&data[i], -7);
-+        VERIFY_LQ(&data[i], -6);
-+        VERIFY_LQ(&data[i], -5);
-+        VERIFY_LQ(&data[i], -4);
-+        VERIFY_LQ(&data[i], -3);
-+        VERIFY_LQ(&data[i], -2);
-+        VERIFY_LQ(&data[i], -1);
-+        VERIFY_LQ(&data[i],  0);
-+        VERIFY_LQ(&data[i],  1);
-+        VERIFY_LQ(&data[i],  2);
-+        VERIFY_LQ(&data[i],  3);
-+        VERIFY_LQ(&data[i],  4);
-+        VERIFY_LQ(&data[i],  5);
-+        VERIFY_LQ(&data[i],  6);
-+        VERIFY_LQ(&data[i],  7);
-+        VERIFY_LQ(&data[i],  8);
-+        VERIFY_LQ(&data[i],  9);
-+        VERIFY_LQ(&data[i],  10);
-+        VERIFY_LQ(&data[i],  11);
-+        VERIFY_LQ(&data[i],  12);
-+        VERIFY_LQ(&data[i],  13);
-+        VERIFY_LQ(&data[i],  14);
-+        VERIFY_LQ(&data[i],  15);
-+        VERIFY_LQ(&data[i],  16);
++        VERIFY_SQ(&data[i], -16);
++        VERIFY_SQ(&data[i], -15);
++        VERIFY_SQ(&data[i], -14);
++        VERIFY_SQ(&data[i], -13);
++        VERIFY_SQ(&data[i], -12);
++        VERIFY_SQ(&data[i], -11);
++        VERIFY_SQ(&data[i], -10);
++        VERIFY_SQ(&data[i], -9);
++        VERIFY_SQ(&data[i], -8);
++        VERIFY_SQ(&data[i], -7);
++        VERIFY_SQ(&data[i], -6);
++        VERIFY_SQ(&data[i], -5);
++        VERIFY_SQ(&data[i], -4);
++        VERIFY_SQ(&data[i], -3);
++        VERIFY_SQ(&data[i], -2);
++        VERIFY_SQ(&data[i], -1);
++        VERIFY_SQ(&data[i],  0);
++        VERIFY_SQ(&data[i],  1);
++        VERIFY_SQ(&data[i],  2);
++        VERIFY_SQ(&data[i],  3);
++        VERIFY_SQ(&data[i],  4);
++        VERIFY_SQ(&data[i],  5);
++        VERIFY_SQ(&data[i],  6);
++        VERIFY_SQ(&data[i],  7);
++        VERIFY_SQ(&data[i],  8);
++        VERIFY_SQ(&data[i],  9);
++        VERIFY_SQ(&data[i],  10);
++        VERIFY_SQ(&data[i],  11);
++        VERIFY_SQ(&data[i],  12);
++        VERIFY_SQ(&data[i],  13);
++        VERIFY_SQ(&data[i],  14);
++        VERIFY_SQ(&data[i],  15);
++        VERIFY_SQ(&data[i],  16);
 +    }
 +
 +    return 0;
