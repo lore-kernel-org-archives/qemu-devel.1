@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33757)
+Received: from eggs.gnu.org ([209.51.188.92]:33748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <basil@daynix.com>) id 1giceJ-0005lz-Pm
+	(envelope-from <basil@daynix.com>) id 1giceJ-0005lv-Fg
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 05:05:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <basil@daynix.com>) id 1giceI-0003Tg-JB
+	(envelope-from <basil@daynix.com>) id 1giceI-0003Tn-Kb
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 05:05:47 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39010)
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38024)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <basil@daynix.com>) id 1giceH-0003SV-No
+	(Exim 4.71) (envelope-from <basil@daynix.com>) id 1giceI-0003TL-Cy
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 05:05:46 -0500
-Received: by mail-wr1-x441.google.com with SMTP id t27so19596596wra.6
-	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 02:05:45 -0800 (PST)
+Received: by mail-wr1-x442.google.com with SMTP id v13so19600566wrw.5
+	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 02:05:46 -0800 (PST)
 From: Basil Salman <basil@daynix.com>
-Date: Sun, 13 Jan 2019 12:05:28 +0200
-Message-Id: <20190113100531.1346024-2-basil@daynix.com>
+Date: Sun, 13 Jan 2019 12:05:29 +0200
+Message-Id: <20190113100531.1346024-3-basil@daynix.com>
 In-Reply-To: <20190113100531.1346024-1-basil@daynix.com>
 References: <20190113100531.1346024-1-basil@daynix.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] qga-win: prevent crash when executing
- guest-file-read with large count
+Subject: [Qemu-devel] [PATCH v2 2/4] qga: fix send_response error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +28,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 Cc: Yan Vugenfirer <yan@daynix.com>, Bishara AbuHattoum <bishara@daynix.com>
 
-BZ: #1594054
-guest-file-read command is currently implelmented to read from a
-file handle count number of bytes. when executed with a very large count number
-qemu-ga crashes.
-after some digging turns out that qemu-ga crashes after trying to allocate
-a buffer large enough to save the data read in it, the buffer was allocated using
-g_malloc0 which is not fail safe, and results a crash in case of failure.
-g_malloc0 was replaced with g_try_malloc0() which returns NULL on failure,
-A check was added for that case in order to prevent qemu-ga from crashing
-and to send a response to the qemu-ga client accordingly.
+Sometimes qemu-ga fails to send a response to client due to memory allocation
+issues due to a large response message, this can be experienced while trying
+to read large number of bytes using QMP command guest-file-read.
+
+Added a check to send an error response to qemu-ga client in such cases.
 
 Signed-off-by: Basil Salman <basil@daynix.com>
 ---
- qga/commands-win32.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ qga/main.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 62e1b51dfe..4260faa573 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -345,7 +345,13 @@ GuestFileRead *qmp_guest_file_read(int64_t handle, bool has_count,
-     }
+diff --git a/qga/main.c b/qga/main.c
+index 87a0711c14..964275c40c 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -561,6 +561,8 @@ static void process_command(GAState *s, QDict *req)
+ {
+     QDict *rsp;
+     int ret;
++    QDict *ersp;
++    Error *err = NULL;
  
-     fh = gfh->fh;
--    buf = g_malloc0(count+1);
-+    buf = g_try_malloc0(count + 1);
-+    if (!buf) {
-+        error_setg(errp,
-+                   "failed to allocate sufficient memory"
-+                   "to complete the requested service");
-+        return read_data;
+     g_assert(req);
+     g_debug("processing command");
+@@ -569,9 +571,20 @@ static void process_command(GAState *s, QDict *req)
+         ret = send_response(s, rsp);
+         if (ret < 0) {
+             g_warning("error sending response: %s", strerror(-ret));
++            goto err;
+         }
+         qobject_unref(rsp);
+     }
++    return;
++err:
++    error_setg(&err, "Insufficient system resources exist to "
++                      "complete the requested service");
++    ersp = qmp_error_response(err);
++    ret = send_response(s, ersp);
++    if (ret < 0) {
++        g_warning("error sending error response: %s", strerror(-ret));
 +    }
-     is_ok = ReadFile(fh, buf, count, &read_count, NULL);
-     if (!is_ok) {
-         error_setg_win32(errp, GetLastError(), "failed to read file");
++    qobject_unref(ersp);
+ }
+ 
+ /* handle requests/control events coming in over the channel */
 -- 
 2.17.2
