@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33381)
+Received: from eggs.gnu.org ([209.51.188.92]:33648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gil3H-0003zG-FK
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:04:08 -0500
+	(envelope-from <noring@nocrew.org>) id 1gil44-0004VJ-Av
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:04:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gil3G-0004IT-7L
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:04:07 -0500
-Received: from pio-pvt-msa3.bahnhof.se ([79.136.2.42]:38768)
+	(envelope-from <noring@nocrew.org>) id 1gil43-0004eX-0T
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:04:56 -0500
+Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:35884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gil3G-0004I0-0z
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:04:06 -0500
-Date: Sun, 13 Jan 2019 20:03:59 +0100
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gil42-0004e1-Pa
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 14:04:54 -0500
+Date: Sun, 13 Jan 2019 20:04:47 +0100
 From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <b05a382fc4a444e74b3787052248b1f9fda5ab88.1547403692.git.noring@nocrew.org>
+Message-ID: <25ac8b01ff9243ab79efdc6912ec165b12831531.1547403692.git.noring@nocrew.org>
 References: <cover.1547403692.git.noring@nocrew.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <cover.1547403692.git.noring@nocrew.org>
-Subject: [Qemu-devel] [PATCH 3/9] target/mips: Support the R5900 PCPYLD
+Subject: [Qemu-devel] [PATCH 4/9] target/mips: Support the R5900 PCPYUD
  multimedia instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,51 +36,51 @@ Signed-off-by: Fredrik Noring <noring@nocrew.org>
  1 file changed, 23 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 9d5150ec8b..40faf9cb36 100644
+index 40faf9cb36..8c350729bc 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -27293,11 +27293,34 @@ static void decode_mmi1(CPUMIPSState *env, DisasContext *ctx)
+@@ -27351,11 +27351,34 @@ static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
      }
  }
  
-+static void gen_mmi_pcpyld(DisasContext *ctx, int rd, int rs, int rt)
++static void gen_mmi_pcpyud(DisasContext *ctx, int rd, int rs, int rt)
 +{
 +    if (rd != 0) {
 +        if (rs != 0) {
-+            tcg_gen_mov_i64(cpu_mmr[rd], cpu_gpr[rs]);
++            tcg_gen_mov_i64(cpu_gpr[rd], cpu_mmr[rs]);
 +        } else {
-+            tcg_gen_movi_i64(cpu_mmr[rd], 0);
++            tcg_gen_movi_i64(cpu_gpr[rd], 0);
 +        }
 +
 +        if (rt != 0) {
-+            tcg_gen_mov_i64(cpu_gpr[rd], cpu_gpr[rt]);
++            tcg_gen_mov_i64(cpu_mmr[rd], cpu_mmr[rt]);
 +        } else {
-+            tcg_gen_movi_i64(cpu_gpr[rd], 0);
++            tcg_gen_movi_i64(cpu_mmr[rd], 0);
 +        }
 +    }
 +}
 +
- static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
+ static void decode_mmi3(CPUMIPSState *env, DisasContext *ctx)
  {
-     uint32_t opc = MASK_MMI2(ctx->opcode);
+     uint32_t opc = MASK_MMI3(ctx->opcode);
 +    int rs = extract32(ctx->opcode, 21, 5);
 +    int rt = extract32(ctx->opcode, 16, 5);
 +    int rd = extract32(ctx->opcode, 11, 5);
  
      switch (opc) {
-+    case MMI_OPC_2_PCPYLD:
-+        gen_mmi_pcpyld(ctx, rd, rs, rt);
++    case MMI_OPC_3_PCPYUD:
++        gen_mmi_pcpyud(ctx, rd, rs, rt);
 +        break;
-     case MMI_OPC_2_PMADDW:    /* TODO: MMI_OPC_2_PMADDW */
-     case MMI_OPC_2_PSLLVW:    /* TODO: MMI_OPC_2_PSLLVW */
-     case MMI_OPC_2_PSRLVW:    /* TODO: MMI_OPC_2_PSRLVW */
-@@ -27307,7 +27330,6 @@ static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
-     case MMI_OPC_2_PINTH:     /* TODO: MMI_OPC_2_PINTH */
-     case MMI_OPC_2_PMULTW:    /* TODO: MMI_OPC_2_PMULTW */
-     case MMI_OPC_2_PDIVW:     /* TODO: MMI_OPC_2_PDIVW */
--    case MMI_OPC_2_PCPYLD:    /* TODO: MMI_OPC_2_PCPYLD */
-     case MMI_OPC_2_PMADDH:    /* TODO: MMI_OPC_2_PMADDH */
-     case MMI_OPC_2_PHMADH:    /* TODO: MMI_OPC_2_PHMADH */
-     case MMI_OPC_2_PAND:      /* TODO: MMI_OPC_2_PAND */
+     case MMI_OPC_3_PMADDUW:    /* TODO: MMI_OPC_3_PMADDUW */
+     case MMI_OPC_3_PSRAVW:     /* TODO: MMI_OPC_3_PSRAVW */
+     case MMI_OPC_3_PMTHI:      /* TODO: MMI_OPC_3_PMTHI */
+@@ -27363,7 +27386,6 @@ static void decode_mmi3(CPUMIPSState *env, DisasContext *ctx)
+     case MMI_OPC_3_PINTEH:     /* TODO: MMI_OPC_3_PINTEH */
+     case MMI_OPC_3_PMULTUW:    /* TODO: MMI_OPC_3_PMULTUW */
+     case MMI_OPC_3_PDIVUW:     /* TODO: MMI_OPC_3_PDIVUW */
+-    case MMI_OPC_3_PCPYUD:     /* TODO: MMI_OPC_3_PCPYUD */
+     case MMI_OPC_3_POR:        /* TODO: MMI_OPC_3_POR */
+     case MMI_OPC_3_PNOR:       /* TODO: MMI_OPC_3_PNOR */
+     case MMI_OPC_3_PEXCH:      /* TODO: MMI_OPC_3_PEXCH */
 -- 
 2.19.2
