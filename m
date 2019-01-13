@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39984)
+Received: from eggs.gnu.org ([209.51.188.92]:39995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gigRj-0002ty-AI
+	(envelope-from <lifei1214@126.com>) id 1gigRj-0002tz-Kg
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 09:09:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gigRi-0002zP-By
+	(envelope-from <lifei1214@126.com>) id 1gigRi-000300-Rc
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 09:09:03 -0500
-Received: from m50-110.126.com ([123.125.50.110]:42741)
+Received: from m50-110.126.com ([123.125.50.110]:42735)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gigRh-0002vP-9U
+	(envelope-from <lifei1214@126.com>) id 1gigRi-0002vO-8o
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 09:09:02 -0500
 From: Fei Li <lifei1214@126.com>
-Date: Sun, 13 Jan 2019 22:08:47 +0800
-Message-Id: <20190113140849.38339-4-lifei1214@126.com>
+Date: Sun, 13 Jan 2019 22:08:45 +0800
+Message-Id: <20190113140849.38339-2-lifei1214@126.com>
 In-Reply-To: <20190113140849.38339-1-lifei1214@126.com>
 References: <20190113140849.38339-1-lifei1214@126.com>
-Subject: [Qemu-devel] [PATCH for-4.0 3/5] migration: multifd_save_cleanup()
- can't fail, simplify
+Subject: [Qemu-devel] [PATCH for-4.0 1/5] Fix segmentation fault when
+ qemu_signal_init fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +25,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, shirley17fei@gmail.com
-Cc: Fei Li <fli@suse.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Fei Li <fli@suse.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 From: Fei Li <fli@suse.com>
 
-multifd_save_cleanup() takes an Error ** argument and returns an
-error code even though it can't actually fail.  Its callers
-dutifully check for failure.  Remove the useless argument and return
-value, and simplify the callers.
+When qemu_signal_init() fails in qemu_init_main_loop(), we return
+without setting an error.  Its callers crash then when they try to
+report the error with error_report_err().
 
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+To avoid such segmentation fault, add a new Error parameter to make
+the call trace to propagate the err to the final caller.
+
+Fixes: 2f78e491d7b46542158ce0b8132ee4e05bc0ade4
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Fei Li <fli@suse.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- migration/migration.c |  5 +----
- migration/ram.c       | 11 ++++-------
- migration/ram.h       |  2 +-
- 3 files changed, 6 insertions(+), 12 deletions(-)
+ util/main-loop.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 24cb4b9d0d..5d322eb9d6 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1386,7 +1386,6 @@ static void migrate_fd_cleanup(void *opaque)
-     qemu_savevm_state_cleanup();
- 
-     if (s->to_dst_file) {
--        Error *local_err = NULL;
-         QEMUFile *tmp;
- 
-         trace_migrate_fd_cleanup();
-@@ -1397,9 +1396,7 @@ static void migrate_fd_cleanup(void *opaque)
-         }
-         qemu_mutex_lock_iothread();
- 
--        if (multifd_save_cleanup(&local_err) != 0) {
--            error_report_err(local_err);
--        }
-+        multifd_save_cleanup();
-         qemu_mutex_lock(&s->qemu_file_lock);
-         tmp = s->to_dst_file;
-         s->to_dst_file = NULL;
-diff --git a/migration/ram.c b/migration/ram.c
-index 47c7ab2229..43c2b442af 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -917,13 +917,12 @@ static void multifd_send_terminate_threads(Error *err)
+diff --git a/util/main-loop.c b/util/main-loop.c
+index affe0403c5..443cb4cfe8 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
      }
  }
  
--int multifd_save_cleanup(Error **errp)
-+void multifd_save_cleanup(void)
+-static int qemu_signal_init(void)
++static int qemu_signal_init(Error **errp)
  {
-     int i;
--    int ret = 0;
- 
-     if (!migrate_use_multifd()) {
--        return 0;
-+        return;
+     int sigfd;
+     sigset_t set;
+@@ -96,7 +96,7 @@ static int qemu_signal_init(void)
+     sigdelset(&set, SIG_IPI);
+     sigfd = qemu_signalfd(&set);
+     if (sigfd == -1) {
+-        fprintf(stderr, "failed to create signalfd\n");
++        error_setg_errno(errp, errno, "failed to create signalfd");
+         return -errno;
      }
-     multifd_send_terminate_threads(NULL);
-     for (i = 0; i < migrate_multifd_channels(); i++) {
-@@ -953,7 +952,6 @@ int multifd_save_cleanup(Error **errp)
-     multifd_send_state->pages = NULL;
-     g_free(multifd_send_state);
-     multifd_send_state = NULL;
--    return ret;
+ 
+@@ -109,7 +109,7 @@ static int qemu_signal_init(void)
+ 
+ #else /* _WIN32 */
+ 
+-static int qemu_signal_init(void)
++static int qemu_signal_init(Error **errp)
+ {
+     return 0;
  }
+@@ -148,7 +148,7 @@ int qemu_init_main_loop(Error **errp)
  
- static void multifd_send_sync_main(void)
-@@ -1071,9 +1069,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
-     Error *local_err = NULL;
+     init_clocks(qemu_timer_notify_cb);
  
-     if (qio_task_propagate_error(task, &local_err)) {
--        if (multifd_save_cleanup(&local_err) != 0) {
--            migrate_set_error(migrate_get_current(), local_err);
--        }
-+        migrate_set_error(migrate_get_current(), local_err);
-+        multifd_save_cleanup();
-     } else {
-         p->c = QIO_CHANNEL(sioc);
-         qio_channel_set_delay(p->c, false);
-diff --git a/migration/ram.h b/migration/ram.h
-index 046d3074be..936177b3e9 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -43,7 +43,7 @@ uint64_t ram_bytes_remaining(void);
- uint64_t ram_bytes_total(void);
- 
- int multifd_save_setup(void);
--int multifd_save_cleanup(Error **errp);
-+void multifd_save_cleanup(void);
- int multifd_load_setup(void);
- int multifd_load_cleanup(Error **errp);
- bool multifd_recv_all_channels_created(void);
+-    ret = qemu_signal_init();
++    ret = qemu_signal_init(errp);
+     if (ret) {
+         return ret;
+     }
 -- 
 2.17.2 (Apple Git-113)
