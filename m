@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34663)
+Received: from eggs.gnu.org ([209.51.188.92]:34678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0004BZ-GA
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0004Bc-05
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6g-00019v-EZ
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6g-00019a-Bi
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40210)
+Received: from hera.aquilenet.fr ([185.233.100.1]:40200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6g-00014h-2M
+	id 1gjB6f-00014B-UQ
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:22 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:03 +0100
-Message-Id: <20190114225306.21569-3-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
-References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:01 +0100
+Message-Id: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/65] slirp: remove do_pty from fork_exec()
+Subject: [Qemu-devel] [PULLv3 00/65] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,168 +26,279 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The following changes since commit 27df21ca3886fff4dd3d70e515517667963a52=
+f1:
 
-QEMU uses fork_exec() with do_pty values 0 or 3.
-Let's clean up some unused code.
+  Merge remote-tracking branch 'remotes/kraxel/tags/misc-20190111-pull-re=
+quest' into staging (2019-01-11 16:45:59 +0000)
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
- slirp/misc.c     | 55 ++++++++++++++----------------------------------
- slirp/misc.h     |  2 +-
- slirp/tcp_subr.c |  4 +---
- 3 files changed, 18 insertions(+), 43 deletions(-)
+are available in the Git repository at:
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 57bdd808e2..e69d5f42c3 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -63,7 +63,7 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, char =
-*exec,
- #ifdef _WIN32
-=20
- int
--fork_exec(struct socket *so, const char *ex, int do_pty)
-+fork_exec(struct socket *so, const char *ex)
- {
-     /* not implemented */
-     return 0;
-@@ -77,13 +77,9 @@ fork_exec(struct socket *so, const char *ex, int do_pt=
-y)
-  * process, which connects to this socket, after which we
-  * exec the wanted program.  If something (strange) happens,
-  * the accept() call could block us forever.
-- *
-- * do_pty =3D 0   Fork/exec inetd style
-- * do_pty =3D 1   Fork/exec using slirp.telnetd
-- * do_ptr =3D 2   Fork/exec using pty
-  */
- int
--fork_exec(struct socket *so, const char *ex, int do_pty)
-+fork_exec(struct socket *so, const char *ex)
- {
-         int s, cs;
-         struct sockaddr_in addr, csaddr;
-@@ -100,26 +96,20 @@ fork_exec(struct socket *so, const char *ex, int do_=
-pty)
- 	DEBUG_CALL("fork_exec");
- 	DEBUG_ARG("so =3D %p", so);
- 	DEBUG_ARG("ex =3D %p", ex);
--	DEBUG_ARG("do_pty =3D %x", do_pty);
--
--	if (do_pty =3D=3D 2) {
--                return 0;
--	} else {
--		addr.sin_family =3D AF_INET;
--		addr.sin_port =3D 0;
--		addr.sin_addr.s_addr =3D INADDR_ANY;
-=20
--		if ((s =3D qemu_socket(AF_INET, SOCK_STREAM, 0)) < 0 ||
--		    bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
--		    listen(s, 1) < 0) {
--			error_report("Error: inet socket: %s", strerror(errno));
--			if (s >=3D 0) {
--			    closesocket(s);
--			}
-+    addr.sin_family =3D AF_INET;
-+    addr.sin_port =3D 0;
-+    addr.sin_addr.s_addr =3D INADDR_ANY;
-=20
--			return 0;
--		}
--	}
-+    s =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
-+    if (s < 0 || bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
-+        listen(s, 1) < 0) {
-+        error_report("Error: inet socket: %s", strerror(errno));
-+        if (s >=3D 0) {
-+            closesocket(s);
-+        }
-+        return 0;
-+    }
-=20
-         if (getsockname(s, (struct sockaddr *)&csaddr, &csaddrlen) < 0) =
-{
-             closesocket(s);
-@@ -166,13 +156,7 @@ fork_exec(struct socket *so, const char *ex, int do_=
-pty)
-=20
- 		i =3D 0;
- 		bptr =3D g_strdup(ex); /* No need to free() this */
--		if (do_pty =3D=3D 1) {
--			/* Setup "slirp.telnetd -x" */
--			argv[i++] =3D "slirp.telnetd";
--			argv[i++] =3D "-x";
--			argv[i++] =3D bptr;
--		} else
--		   do {
-+        do {
- 			/* Change the string into argv[] */
- 			curarg =3D bptr;
- 			while (*bptr !=3D ' ' && *bptr !=3D (char)0)
-@@ -180,7 +164,7 @@ fork_exec(struct socket *so, const char *ex, int do_p=
-ty)
- 			c =3D *bptr;
- 			*bptr++ =3D (char)0;
- 			argv[i++] =3D g_strdup(curarg);
--		   } while (c);
-+        } while (c);
-=20
-                 argv[i] =3D NULL;
- 		execvp(argv[0], (char **)argv);
-@@ -206,13 +190,6 @@ fork_exec(struct socket *so, const char *ex, int do_=
-pty)
-                 opt =3D 1;
-                 qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, s=
-izeof(int));
- 		qemu_set_nonblock(so->s);
--
--		/* Append the telnet options now */
--                if (so->so_m !=3D NULL && do_pty =3D=3D 1)  {
--			sbappend(so, so->so_m);
--                        so->so_m =3D NULL;
--		}
--
- 		return 1;
- 	}
- }
-diff --git a/slirp/misc.h b/slirp/misc.h
-index 5211bbd30a..897650aea1 100644
---- a/slirp/misc.h
-+++ b/slirp/misc.h
-@@ -53,6 +53,6 @@ struct slirp_quehead {
- void slirp_insque(void *, void *);
- void slirp_remque(void *);
- int add_exec(struct ex_list **, int, char *, struct in_addr, int);
--int fork_exec(struct socket *so, const char *ex, int do_pty);
-+int fork_exec(struct socket *so, const char *ex);
-=20
- #endif
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index fa61349cbb..0ccd8e1a96 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -951,7 +951,6 @@ int tcp_ctl(struct socket *so)
-     Slirp *slirp =3D so->slirp;
-     struct sbuf *sb =3D &so->so_snd;
-     struct ex_list *ex_ptr;
--    int do_pty;
-=20
-     DEBUG_CALL("tcp_ctl");
-     DEBUG_ARG("so =3D %p", so);
-@@ -966,9 +965,8 @@ int tcp_ctl(struct socket *so)
-                     so->extra =3D (void *)ex_ptr->ex_exec;
-                     return 1;
-                 }
--                do_pty =3D ex_ptr->ex_pty;
-                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
--                return fork_exec(so, ex_ptr->ex_exec, do_pty);
-+                return fork_exec(so, ex_ptr->ex_exec);
-             }
-         }
-     }
---=20
+  https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+
+for you to fetch changes up to a7104eda7dab99d0cdbd3595c211864cba415905:
+
+  slirp: check data length while emulating ident function (2019-01-14 23:=
+36:38 +0100)
+
+----------------------------------------------------------------
+slirp updates
+
+Gerd Hoffmann (1):
+  slirp: add tftp tracing
+
+Marc-Andr=C3=A9 Lureau (61):
+  slirp: associate slirp_output callback with the Slirp context
+  slirp: remove do_pty from fork_exec()
+  slirp: replace ex_pty with ex_chardev
+  slirp: use a dedicated field for chardev pointer
+  slirp: remove unused EMU_RSH
+  slirp: rename /extra/chardev
+  slirp: move internal function declarations
+  slirp: remove Monitor dependency, return a string for info
+  slirp: fix slirp_add_exec() leaks
+  slirp: replace the poor-man string split with g_strsplit()
+  slirp: remove dead declarations
+  slirp: move socket pair creation in helper function
+  slirp: remove unused M_TRAILINGSPACE
+  slirp: use a callback structure to interface with qemu
+  slirp: remove PROBE_CONN dead-code
+  slirp: remove FULL_BOLT
+  slirp: remove the disabled readv()/writev() code path
+  slirp: remove HAVE_SYS_SIGNAL_H
+  slirp: remove unused HAVE_SYS_BITYPES_H
+  slirp: remove NO_UNIX_SOCKETS
+  slirp: remove unused HAVE_SYS_STROPTS_H
+  slirp: remove unused HAVE_ARPA_INET_H
+  slirp: remove unused HAVE_SYS_WAIT_H
+  slirp: remove unused HAVE_SYS_SELECT_H
+  slirp: remove HAVE_SYS_IOCTL_H
+  slirp: remove HAVE_SYS_FILIO_H
+  slirp: remove unused DECLARE_IOVEC
+  slirp: remove unused HAVE_INET_ATON
+  slirp: replace HOST_WORDS_BIGENDIAN with glib equivalent
+  slirp: replace SIZEOF_CHAR_P with glib equivalent
+  slirp: replace compile time DO_KEEPALIVE
+  slirp: remove unused global slirp_instance
+  slirp: replace error_report() with g_critical()
+  slirp: improve a bit the debug macros
+  slirp: add a callback to log guest errors
+  slirp: remove #if notdef dead code
+  slirp: remove unused sbflush()
+  slirp: NULL is defined by stddef.h
+  slirp: remove dead TCP_ACK_HACK code
+  slirp: replace ARRAY_SIZE with G_N_ELEMENTS
+  net: do not depend on slirp internals
+  glib-compat: add g_spawn_async_with_fds() fallback
+  slirp: simplify fork_exec()
+  slirp: replace error_report() with g_critical()
+  slirp: drop <Vista compatibility
+  slirp: rename exec_list
+  slirp: use virtual time for packet expiration
+  slirp: replace a fprintf with g_critical()
+  slirp: replace some fprintf() with DEBUG_MISC
+  slirp: replace a DEBUG block with WITH_ICMP_ERROR_MSG
+  slirp: no need to make DPRINTF conditional on DEBUG
+  slirp: always build with debug statements
+  slirp: introduce SLIRP_DEBUG environment variable
+  slirp: use %p for pointers format
+  slirp: remove remaining DEBUG blocks
+  slirp: replace DEBUG_ARGS with DEBUG_ARG
+  slirp: factor out guestfwd addition checks
+  slirp: add clock_get_ns() callback
+  build-sys: use a separate slirp-obj-y && slirp.mo
+  slirp: set G_LOG_DOMAIN
+  slirp: call into g_debug() for DEBUG macros
+
+Prasad J Pandit (1):
+  slirp: check data length while emulating ident function
+
+Samuel Thibault (2):
+  slirp: Enable fork_exec support on Windows
+  slirp: Mark debugging calls as unlikely
+
+ Makefile              |   5 +-
+ Makefile.objs         |   4 +-
+ Makefile.target       |   5 +-
+ include/glib-compat.h |  56 +++++++++
+ net/colo-compare.c    |  11 +-
+ net/colo.c            |   1 +
+ net/colo.h            |   7 +-
+ net/filter-rewriter.c |   9 +-
+ net/slirp.c           |  61 +++++----
+ net/util.h            |  55 ++++++++
+ slirp/Makefile.objs   |  37 +++++-
+ slirp/arp_table.c     |  12 +-
+ slirp/bootp.c         |  10 +-
+ slirp/cksum.c         |   8 +-
+ slirp/debug.h         |  47 ++++---
+ slirp/dhcpv6.c        |  17 ++-
+ slirp/if.c            |   4 +-
+ slirp/ip.h            |  10 +-
+ slirp/ip6.h           |   3 +-
+ slirp/ip6_icmp.c      |  27 ++--
+ slirp/ip6_icmp.h      |   6 +-
+ slirp/ip6_input.c     |   2 +-
+ slirp/ip6_output.c    |   4 +-
+ slirp/ip_icmp.c       |  31 ++---
+ slirp/ip_input.c      | 200 -----------------------------
+ slirp/libslirp.h      |  27 ++--
+ slirp/main.h          |  33 -----
+ slirp/mbuf.c          |   2 +-
+ slirp/mbuf.h          |   1 -
+ slirp/misc.c          | 286 +++++++++++++++++-------------------------
+ slirp/misc.h          |  13 +-
+ slirp/ncsi.c          |   4 +-
+ slirp/ndp_table.c     |  32 +++--
+ slirp/sbuf.h          |   1 -
+ slirp/slirp.c         | 177 +++++++++++++-------------
+ slirp/slirp.h         |  45 ++-----
+ slirp/slirp_config.h  |  86 -------------
+ slirp/socket.c        |  53 +++-----
+ slirp/socket.h        |   2 +-
+ slirp/tcp.h           |   4 +-
+ slirp/tcp_input.c     |  84 ++-----------
+ slirp/tcp_output.c    |   2 +-
+ slirp/tcp_subr.c      |  22 ++--
+ slirp/tcp_timer.c     |   2 +-
+ slirp/tftp.c          |   7 +-
+ slirp/trace-events    |   5 +
+ slirp/udp.c           |   5 +-
+ slirp/udp6.c          |  11 +-
+ stubs/slirp.c         |   2 +-
+ 49 files changed, 603 insertions(+), 935 deletions(-)
+ delete mode 100644 slirp/slirp_config.h
+ create mode 100644 slirp/trace-events
+
+--
 2.20.1
+
+----------------------------------------------------------------
+Gerd Hoffmann (1):
+      slirp: add tftp tracing
+
+Marc-Andr=C3=A9 Lureau (61):
+      slirp: associate slirp_output callback with the Slirp context
+      slirp: remove do_pty from fork_exec()
+      slirp: replace ex_pty with ex_chardev
+      slirp: use a dedicated field for chardev pointer
+      slirp: remove unused EMU_RSH
+      slirp: rename /extra/chardev
+      slirp: move internal function declarations
+      slirp: remove Monitor dependency, return a string for info
+      slirp: fix slirp_add_exec() leaks
+      slirp: replace the poor-man string split with g_strsplit()
+      slirp: remove dead declarations
+      slirp: move socket pair creation in helper function
+      slirp: remove unused M_TRAILINGSPACE
+      slirp: use a callback structure to interface with qemu
+      slirp: remove PROBE_CONN dead-code
+      slirp: remove FULL_BOLT
+      slirp: remove the disabled readv()/writev() code path
+      slirp: remove HAVE_SYS_SIGNAL_H
+      slirp: remove unused HAVE_SYS_BITYPES_H
+      slirp: remove NO_UNIX_SOCKETS
+      slirp: remove unused HAVE_SYS_STROPTS_H
+      slirp: remove unused HAVE_ARPA_INET_H
+      slirp: remove unused HAVE_SYS_WAIT_H
+      slirp: remove unused HAVE_SYS_SELECT_H
+      slirp: remove HAVE_SYS_IOCTL_H
+      slirp: remove HAVE_SYS_FILIO_H
+      slirp: remove unused DECLARE_IOVEC
+      slirp: remove unused HAVE_INET_ATON
+      slirp: replace HOST_WORDS_BIGENDIAN with glib equivalent
+      slirp: replace SIZEOF_CHAR_P with glib equivalent
+      slirp: replace compile time DO_KEEPALIVE
+      slirp: remove unused global slirp_instance
+      slirp: replace error_report() with g_critical()
+      slirp: improve a bit the debug macros
+      slirp: add a callback to log guest errors
+      slirp: remove #if notdef dead code
+      slirp: remove unused sbflush()
+      slirp: NULL is defined by stddef.h
+      slirp: remove dead TCP_ACK_HACK code
+      slirp: replace ARRAY_SIZE with G_N_ELEMENTS
+      net: do not depend on slirp internals
+      glib-compat: add g_spawn_async_with_fds() fallback
+      slirp: simplify fork_exec()
+      slirp: replace error_report() with g_critical()
+      slirp: drop <Vista compatibility
+      slirp: rename exec_list
+      slirp: use virtual time for packet expiration
+      slirp: replace a fprintf with g_critical()
+      slirp: replace some fprintf() with DEBUG_MISC
+      slirp: replace a DEBUG block with WITH_ICMP_ERROR_MSG
+      slirp: no need to make DPRINTF conditional on DEBUG
+      slirp: always build with debug statements
+      slirp: introduce SLIRP_DEBUG environment variable
+      slirp: use %p for pointers format
+      slirp: remove remaining DEBUG blocks
+      slirp: replace DEBUG_ARGS with DEBUG_ARG
+      slirp: factor out guestfwd addition checks
+      slirp: add clock_get_ns() callback
+      build-sys: use a separate slirp-obj-y && slirp.mo
+      slirp: set G_LOG_DOMAIN
+      slirp: call into g_debug() for DEBUG macros
+
+Prasad J Pandit (1):
+      slirp: check data length while emulating ident function
+
+Samuel Thibault (2):
+      slirp: Enable fork_exec support on Windows
+      slirp: Mark debugging calls as unlikely
+
+ Makefile              |   5 +-
+ Makefile.objs         |   4 +-
+ Makefile.target       |   5 +-
+ include/glib-compat.h |  56 ++++++++++
+ net/colo-compare.c    |  11 +-
+ net/colo.c            |   1 +
+ net/colo.h            |   7 +-
+ net/filter-rewriter.c |   9 +-
+ net/slirp.c           |  61 +++++------
+ net/util.h            |  55 ++++++++++
+ slirp/Makefile.objs   |  37 ++++++-
+ slirp/arp_table.c     |  12 +--
+ slirp/bootp.c         |  10 +-
+ slirp/cksum.c         |   8 +-
+ slirp/debug.h         |  47 +++++----
+ slirp/dhcpv6.c        |  17 ++-
+ slirp/if.c            |   4 +-
+ slirp/ip.h            |  10 +-
+ slirp/ip6.h           |   3 +-
+ slirp/ip6_icmp.c      |  27 +++--
+ slirp/ip6_icmp.h      |   6 +-
+ slirp/ip6_input.c     |   2 +-
+ slirp/ip6_output.c    |   4 +-
+ slirp/ip_icmp.c       |  31 +++---
+ slirp/ip_input.c      | 200 -----------------------------------
+ slirp/libslirp.h      |  27 +++--
+ slirp/main.h          |  33 ------
+ slirp/mbuf.c          |   2 +-
+ slirp/mbuf.h          |   1 -
+ slirp/misc.c          | 286 ++++++++++++++++++++------------------------=
+------
+ slirp/misc.h          |  13 ++-
+ slirp/ncsi.c          |   4 +-
+ slirp/ndp_table.c     |  32 +++---
+ slirp/sbuf.h          |   1 -
+ slirp/slirp.c         | 177 +++++++++++++++----------------
+ slirp/slirp.h         |  45 ++------
+ slirp/slirp_config.h  |  86 ---------------
+ slirp/socket.c        |  53 +++-------
+ slirp/socket.h        |   2 +-
+ slirp/tcp.h           |   4 +-
+ slirp/tcp_input.c     |  84 ++-------------
+ slirp/tcp_output.c    |   2 +-
+ slirp/tcp_subr.c      |  22 ++--
+ slirp/tcp_timer.c     |   2 +-
+ slirp/tftp.c          |   7 +-
+ slirp/trace-events    |   5 +
+ slirp/udp.c           |   5 +-
+ slirp/udp6.c          |  11 +-
+ stubs/slirp.c         |   2 +-
+ 49 files changed, 603 insertions(+), 935 deletions(-)
+ delete mode 100644 slirp/slirp_config.h
+ create mode 100644 slirp/trace-events
