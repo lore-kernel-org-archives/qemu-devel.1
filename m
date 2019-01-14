@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46039)
+Received: from eggs.gnu.org ([209.51.188.92]:46240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gj2jO-0004p7-Vc
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:56:47 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gj2jV-0005Eq-JS
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:56:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gj2Zx-0000D8-VJ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:47:02 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 14:46:54 +0100
-Message-Id: <1547473614-20033-1-git-send-email-thuth@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1gj2Ut-0006hw-U9
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:41:48 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 14 Jan 2019 13:32:56 +0000
+Message-Id: <20190114133257.30299-2-stefanha@redhat.com>
+In-Reply-To: <20190114133257.30299-1-stefanha@redhat.com>
+References: <20190114133257.30299-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] configure: Work-around a bug in libiscsi 1.9.0
- when used in gnu99 mode
+Subject: [Qemu-devel] [PATCH v2 1/2] throttle-groups: fix restart coroutine
+ iothread race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,50 +22,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, berrange@redhat.com
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The header "scsi-lowlevel.h" of libiscsi 1.9.0 contains some bad
-"inline" prototype definitions which GCC refuses to compile in its
-gnu99 mode:
+The following QMP command leads to a crash when iothreads are used:
 
-In file included from block/iscsi.c:52:0:
-/usr/include/iscsi/scsi-lowlevel.h:810:13: error: inline function
-=E2=80=98scsi_set_uint16=E2=80=99 declared but never defined [-Werror]
- inline void scsi_set_uint16(unsigned char *c, uint16_t val);
-             ^
-/usr/include/iscsi/scsi-lowlevel.h:809:13: error: inline function
-=E2=80=98scsi_set_uint32=E2=80=99 declared but never defined [-Werror]
- inline void scsi_set_uint32(unsigned char *c, uint32_t val);
-             ^
+  { 'execute': 'device_del', 'arguments': {'id': 'data'} }
 
-This has been fixed by upstream libiscsi in version 1.10.0 (see
-https://github.com/sahlberg/libiscsi/commit/7692027d6c11 ), but
-since we still want to support 1.9.0 for CentOS 7 / RHEL7, we
-have to work-around the issue by compiling with "-fgnu89-inline"
-in this case instead.
+The backtrace involves the queue restart coroutine where
+tgm->throttle_state is a NULL pointer because
+throttle_group_unregister_tgm() has already been called:
 
-Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+  (gdb) bt full
+  #0  0x00005585a7a3b378 in qemu_mutex_lock_impl (mutex=3D0xfffffffffffff=
+fd0, file=3D0x5585a7bb3d54 "block/throttle-groups.c", line=3D412) at util=
+/qemu-thread-posix.c:64
+        err =3D <optimized out>
+        __PRETTY_FUNCTION__ =3D "qemu_mutex_lock_impl"
+        __func__ =3D "qemu_mutex_lock_impl"
+  #1  0x00005585a79be074 in throttle_group_restart_queue_entry (opaque=3D=
+0x5585a9de4eb0) at block/throttle-groups.c:412
+        _f =3D <optimized out>
+        data =3D 0x5585a9de4eb0
+        tgm =3D 0x5585a9079440
+        ts =3D 0x0
+        tg =3D 0xffffffffffffff98
+        is_write =3D false
+        empty_queue =3D 255
+
+This coroutine should not execute in the iothread after the throttle
+group member has been unregistered!
+
+The root cause is that the device_del code path schedules the restart
+coroutine in the iothread while holding the AioContext lock.  Therefore
+the iothread cannot execute the coroutine until after device_del
+releases the lock - by this time it's too late.
+
+This patch adds a reference count to ThrottleGroupMember so we can
+synchronously wait for restart coroutines to complete.  Once they are
+done it is safe to unregister the ThrottleGroupMember.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- configure | 5 +++++
- 1 file changed, 5 insertions(+)
+v2:
+ * Use atomic operations instead of AioContext lock [Paolo]
+---
+ include/block/throttle-groups.h | 5 +++++
+ block/throttle-groups.c         | 9 +++++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/configure b/configure
-index 2b9ba7d..aa80c17 100755
---- a/configure
-+++ b/configure
-@@ -4562,6 +4562,11 @@ if test "$libiscsi" !=3D "no" ; then
-     libiscsi=3D"yes"
-     libiscsi_cflags=3D$($pkg_config --cflags libiscsi)
-     libiscsi_libs=3D$($pkg_config --libs libiscsi)
-+    if $pkg_config --exact-version=3D=3D1.9.0 libiscsi; then
-+      # There are some bad inline declarations in scsi-lowlevel.h of
-+      # libiscsi 1.9.0 which don't work in gnu99 mode without this:
-+      libiscsi_cflags=3D"-fgnu89-inline $libiscsi_cflags"
-+    fi
-   else
-     if test "$libiscsi" =3D "yes" ; then
-       feature_not_found "libiscsi" "Install libiscsi >=3D 1.9.0"
+diff --git a/include/block/throttle-groups.h b/include/block/throttle-gro=
+ups.h
+index e2fd0513c4..712a8e64b4 100644
+--- a/include/block/throttle-groups.h
++++ b/include/block/throttle-groups.h
+@@ -43,6 +43,11 @@ typedef struct ThrottleGroupMember {
+      */
+     unsigned int io_limits_disabled;
+=20
++    /* Number of pending throttle_group_restart_queue_entry() coroutines=
+.
++     * Accessed with atomic operations.
++     */
++    unsigned int restart_pending;
++
+     /* The following fields are protected by the ThrottleGroup lock.
+      * See the ThrottleGroup documentation for details.
+      * throttle_state tells us if I/O limits are configured. */
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index 5d8213a443..a5a2037924 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -415,6 +415,9 @@ static void coroutine_fn throttle_group_restart_queue=
+_entry(void *opaque)
+     }
+=20
+     g_free(data);
++
++    atomic_dec(&tgm->restart_pending);
++    aio_wait_kick();
+ }
+=20
+ static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool =
+is_write)
+@@ -430,6 +433,8 @@ static void throttle_group_restart_queue(ThrottleGrou=
+pMember *tgm, bool is_write
+      * be no timer pending on this tgm at this point */
+     assert(!timer_pending(tgm->throttle_timers.timers[is_write]));
+=20
++    atomic_inc(&tgm->restart_pending);
++
+     co =3D qemu_coroutine_create(throttle_group_restart_queue_entry, rd)=
+;
+     aio_co_enter(tgm->aio_context, co);
+ }
+@@ -538,6 +543,7 @@ void throttle_group_register_tgm(ThrottleGroupMember =
+*tgm,
+=20
+     tgm->throttle_state =3D ts;
+     tgm->aio_context =3D ctx;
++    atomic_set(&tgm->restart_pending, 0);
+=20
+     qemu_mutex_lock(&tg->lock);
+     /* If the ThrottleGroup is new set this ThrottleGroupMember as the t=
+oken */
+@@ -584,6 +590,9 @@ void throttle_group_unregister_tgm(ThrottleGroupMembe=
+r *tgm)
+         return;
+     }
+=20
++    /* Wait for throttle_group_restart_queue_entry() coroutines to finis=
+h */
++    AIO_WAIT_WHILE(tgm->aio_context, atomic_read(&tgm->restart_pending) =
+> 0);
++
+     qemu_mutex_lock(&tg->lock);
+     for (i =3D 0; i < 2; i++) {
+         assert(tgm->pending_reqs[i] =3D=3D 0);
 --=20
-1.8.3.1
+2.20.1
