@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52069)
+Received: from eggs.gnu.org ([209.51.188.92]:52534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gj4k1-0007OL-NN
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:05:37 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gj4l5-00086t-OA
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:06:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gj4jm-00009y-J4
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:05:24 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 17:04:32 +0100
-Message-Id: <1547481872-17870-1-git-send-email-thuth@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gj4l4-0000qE-Pq
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:06:39 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 14 Jan 2019 16:06:27 +0000
+Message-ID: <084ff0b6-1de8-1c17-f085-97a8b1aeb8b5@virtuozzo.com>
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-6-vsementsov@virtuozzo.com>
+	<a4565e50-b670-333e-a3db-72ff5a42b776@redhat.com>
+In-Reply-To: <a4565e50-b670-333e-a3db-72ff5a42b776@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E6610E4D2BA2B24B917314749D3A2B96@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] configure: Work-around a bug in libiscsi
- 1.9.0 when used in gnu99 mode
+Subject: Re: [Qemu-devel] [PATCH v5 05/11] iotests: allow resume_drive by
+ node name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,49 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, berrange@redhat.com
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-The header "scsi-lowlevel.h" of libiscsi 1.9.0 contains some bad
-"inline" prototype definitions which GCC refuses to compile in its
-gnu99 mode:
-
-In file included from block/iscsi.c:52:0:
-/usr/include/iscsi/scsi-lowlevel.h:810:13: error: inline function
-=E2=80=98scsi_set_uint16=E2=80=99 declared but never defined [-Werror]
- inline void scsi_set_uint16(unsigned char *c, uint16_t val);
-             ^
-/usr/include/iscsi/scsi-lowlevel.h:809:13: error: inline function
-=E2=80=98scsi_set_uint32=E2=80=99 declared but never defined [-Werror]
- inline void scsi_set_uint32(unsigned char *c, uint32_t val);
-             ^
-[...]
-
-This has been fixed by upstream libiscsi in version 1.10.0 (see
-https://github.com/sahlberg/libiscsi/commit/7692027d6c11 ), but
-since we still want to support 1.9.0 for CentOS 7 / RHEL7, we
-have to work-around the issue by redefining the "inline" keyword
-to use the old "gnu89" mode behavior via "gnu_inline" instead.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- block/iscsi.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/iscsi.c b/block/iscsi.c
-index a7e8c1f..ff47320 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -49,7 +49,9 @@
- /* Conflict between scsi/utils.h and libiscsi! :( */
- #define SCSI_XFER_NONE ISCSI_XFER_NONE
- #include <iscsi/iscsi.h>
-+#define inline __attribute__((gnu_inline))  /* required for libiscsi v1.=
-9.0 */
- #include <iscsi/scsi-lowlevel.h>
-+#undef inline
- #undef SCSI_XFER_NONE
- QEMU_BUILD_BUG_ON((int)SCSI_XFER_NONE !=3D (int)ISCSI_XFER_NONE);
-=20
---=20
-1.8.3.1
+MTQuMDEuMjAxOSAxNzo0NiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4xMi4xOCAxMzoyMCwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEFmdGVyIG5vZGUgZ3JhcGgg
+Y2hhbmdlcywgd2UgbWF5IG5vdCBiZSBhYmxlIHRvIHJlc3VtZV9kcml2ZSBieSBkZXZpY2UNCj4+
+IG5hbWUgKGJhY2tpbmcgZmlsZXMgYXJlIG5vdCByZWN1cnNpdmVseSBzZWFyY2hlZCkuIFNvLCBs
+ZXRzIGFsbG93IHRvDQo+PiByZXN1bWUgYnkgbm9kZS1uYW1lLiBTZXQgY29uc3RhbnQgbmFtZSBm
+b3IgYnJlYWtwb2ludHMsIHRvIGF2b2lkDQo+PiBpbnRyb2R1Y2luZyBleHRyYSBwYXJhbWV0ZXJz
+Lg0KPiANCj4gSG0sIEkgZG9uJ3QgcXVpdGUgdW5kZXJzdGFuZCB0aGlzIHJlYXNvbi4gIElzIHRo
+aXMgc28geW91IGNhbiBjcmVhdGUNCj4gYnJlYWtwb2ludHMgb24gb25lIG5vZGUgKHdoaWNoIGZh
+bGxzIHRocm91Z2ggdG8gdGhlIGZpcnN0IGJsa2RlYnVnIG5vZGUpDQo+IGFuZCB0aGVuIHJlbW92
+ZSB0aGVtIGZyb20gYW5vdGhlciAoZmFsbGluZyB0aHJvdWdoIHRvIHRoZSBzYW1lIGJsa2RlYnVn
+DQo+IG5vZGUpPw0KDQphZGQvcmVtb3ZlIGJyZWFrcG9pbnQgZ29lcyB0aHJvdWdoIC0+ZmlsZSBj
+aGlsZHJlbiwgYnV0IG15IGZpbHRlciBsaW5rcw0KYWN0aXZlIGRpc2sgYXMgLT5iYWNraW5nLiBT
+bywgYmVmb3JlIGJsb2NrLWpvYiBzdGFydCB3ZSBjYW4gaW5zZXJ0IGJyZWFrcG9pbnQNCmJ5IGRl
+dmljZSBuYW1lLiBCdXQgdGhlbiwgd2hlbiBmaWx0ZXIgaW5zZXJ0ZWQsIHdlIGNhbid0IHJlbW92
+ZSBicmVha3BvaW50LA0KYmVjYXVzZSBteSBmaWx0ZXIgaGlkZXMgYmxrZGVidWcgd2l0aCBhY3Rp
+dmUgZGlzayB1bmRlciAtPmJhY2tpbmcgbGluay4NCg0KTWF5YmUsIHJpZ2h0IHNvbHV0aW9uIHdv
+dWxkIGJlIHN1cHBvcnQgYmFja2luZyBsaW5rcyBpbiBiZHJ2X2RlYnVnX2JyZWFrcG9pbnQoKQ0K
+YW5kIGJkcnZfZGVidWdfcmVtb3ZlX2JyZWFrcG9pbnQoKSBmb3IgdGhlIGNhc2Ugd2hlbiB0aGVy
+ZSBpcyBubyBmaWxlIGNoaWxkLg0KDQpCdXQgYmVpbmcgdW5zdXJlIGFib3V0IHJpZ2h0IGJlaGF2
+aW9yLCBJJ3ZlIGRlY2lkZWQgdG8gYWRqdXN0IHRoZSB0ZXN0Lg0KDQpXaGF0IGFib3V0IGp1c3Qg
+ZG8gYm90aCAgYWRkL3JlbW92ZSBicmVha3BvaW50IHRocm91Z2ggYmxrZGVidWcgbm9kZS1uYW1l
+LCB0bw0KbWFrZSBpdCBsZXNzIHdlaXJkPw0KDQo+IA0KPiBXb3VsZG4ndCBpdCBiZSBiZXR0ZXIg
+dG8gbGV0IHRoZSB1c2VyIHNwZWNpZnkgdGhlIGJyZWFrcG9pbnQgbmFtZT8NCg0KaXQncyBub3Qg
+bmVlZGVkIG5vdy4gd2l0aCBjdXJyZW50IG5hbWluZyB3ZSBjYW4gaGF2ZSBvbmUgYnJlYWstcG9p
+bnQgaW4gZGV2aWNlLA0Kc28gd2UgZG9uJ3QgbmVlZCBkaWZmZXJlbnQgbmFtZXMuDQoNCj4gDQo+
+IE1heA0KPiANCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkg
+PHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICB0ZXN0cy9xZW11LWlvdGVz
+dHMvaW90ZXN0cy5weSB8IDkgKysrKystLS0tDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2Vy
+dGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUt
+aW90ZXN0cy9pb3Rlc3RzLnB5IGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkNCj4+IGlu
+ZGV4IDc2ODc3YWQ1ODQuLmM5Nzc5ZjQzMmYgMTAwNjQ0DQo+PiAtLS0gYS90ZXN0cy9xZW11LWlv
+dGVzdHMvaW90ZXN0cy5weQ0KPj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkN
+Cj4+IEBAIC00MTUsMTEgKzQxNSwxMSBAQCBjbGFzcyBWTShxdGVzdC5RRU1VUXRlc3RNYWNoaW5l
+KToNCj4+ICAgICAgICAgICAgICAgc2VsZi5wYXVzZV9kcml2ZShkcml2ZSwgIndyaXRlX2FpbyIp
+DQo+PiAgICAgICAgICAgICAgIHJldHVybg0KPj4gICAgICAgICAgIHNlbGYucW1wKCdodW1hbi1t
+b25pdG9yLWNvbW1hbmQnLA0KPj4gLSAgICAgICAgICAgICAgICAgICAgY29tbWFuZF9saW5lPSdx
+ZW11LWlvICVzICJicmVhayAlcyBicF8lcyInICUgKGRyaXZlLCBldmVudCwgZHJpdmUpKQ0KPj4g
+KyAgICAgICAgICAgICAgICAgICAgY29tbWFuZF9saW5lPSdxZW11LWlvICVzICJicmVhayAlcyBi
+cF8wIicgJSAoZHJpdmUsIGV2ZW50KSkNCj4+ICAgDQo+PiAgICAgICBkZWYgcmVzdW1lX2RyaXZl
+KHNlbGYsIGRyaXZlKToNCj4+ICAgICAgICAgICBzZWxmLnFtcCgnaHVtYW4tbW9uaXRvci1jb21t
+YW5kJywNCj4+IC0gICAgICAgICAgICAgICAgICAgIGNvbW1hbmRfbGluZT0ncWVtdS1pbyAlcyAi
+cmVtb3ZlX2JyZWFrIGJwXyVzIicgJSAoZHJpdmUsIGRyaXZlKSkNCj4+ICsgICAgICAgICAgICAg
+ICAgICAgIGNvbW1hbmRfbGluZT0ncWVtdS1pbyAlcyAicmVtb3ZlX2JyZWFrIGJwXzAiJyAlIChk
+cml2ZSkpDQo+PiAgIA0KPj4gICAgICAgZGVmIGhtcF9xZW11X2lvKHNlbGYsIGRyaXZlLCBjbWQp
+Og0KPj4gICAgICAgICAgICcnJ1dyaXRlIHRvIGEgZ2l2ZW4gZHJpdmUgdXNpbmcgYW4gSE1QIGNv
+bW1hbmQnJycNCj4+IEBAIC01NDMsMTMgKzU0MywxNCBAQCBjbGFzcyBRTVBUZXN0Q2FzZSh1bml0
+dGVzdC5UZXN0Q2FzZSk6DQo+PiAgICAgICAgICAgc2VsZi5hc3NlcnRFcXVhbChzZWxmLnZtLmZs
+YXR0ZW5fcW1wX29iamVjdChqc29uLmxvYWRzKGpzb25fZmlsZW5hbWVbNTpdKSksDQo+PiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBzZWxmLnZtLmZsYXR0ZW5fcW1wX29iamVjdChyZWZlcmVu
+Y2UpKQ0KPj4gICANCj4+IC0gICAgZGVmIGNhbmNlbF9hbmRfd2FpdChzZWxmLCBkcml2ZT0nZHJp
+dmUwJywgZm9yY2U9RmFsc2UsIHJlc3VtZT1GYWxzZSk6DQo+PiArICAgIGRlZiBjYW5jZWxfYW5k
+X3dhaXQoc2VsZiwgZHJpdmU9J2RyaXZlMCcsIGZvcmNlPUZhbHNlLCByZXN1bWU9RmFsc2UsDQo+
+PiArICAgICAgICAgICAgICAgICAgICAgICAgcmVzdW1lX25vZGU9Tm9uZSk6DQo+PiAgICAgICAg
+ICAgJycnQ2FuY2VsIGEgYmxvY2sgam9iIGFuZCB3YWl0IGZvciBpdCB0byBmaW5pc2gsIHJldHVy
+bmluZyB0aGUgZXZlbnQnJycNCj4+ICAgICAgICAgICByZXN1bHQgPSBzZWxmLnZtLnFtcCgnYmxv
+Y2stam9iLWNhbmNlbCcsIGRldmljZT1kcml2ZSwgZm9yY2U9Zm9yY2UpDQo+PiAgICAgICAgICAg
+c2VsZi5hc3NlcnRfcW1wKHJlc3VsdCwgJ3JldHVybicsIHt9KQ0KPj4gICANCj4+ICAgICAgICAg
+ICBpZiByZXN1bWU6DQo+PiAtICAgICAgICAgICAgc2VsZi52bS5yZXN1bWVfZHJpdmUoZHJpdmUp
+DQo+PiArICAgICAgICAgICAgc2VsZi52bS5yZXN1bWVfZHJpdmUocmVzdW1lX25vZGUgb3IgZHJp
+dmUpDQo+PiAgIA0KPj4gICAgICAgICAgIGNhbmNlbGxlZCA9IEZhbHNlDQo+PiAgICAgICAgICAg
+cmVzdWx0ID0gTm9uZQ0KPj4NCj4gDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGlt
+aXINCg==
