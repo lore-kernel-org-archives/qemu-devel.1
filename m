@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34668)
+Received: from eggs.gnu.org ([209.51.188.92]:34666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0004Bb-Mk
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0004Ba-LI
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6g-00019q-EF
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6g-0001A1-Fu
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40194)
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37192)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6g-000146-2N
+	id 1gjB6g-00015B-4u
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:22 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:02 +0100
-Message-Id: <20190114225306.21569-2-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:05 +0100
+Message-Id: <20190114225306.21569-5-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/65] slirp: associate slirp_output callback
- with the Slirp context
+Subject: [Qemu-devel] [PULL 04/65] slirp: use a dedicated field for chardev
+ pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,157 +33,167 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Let's make the slirp interface a bit more library-like.
-Associate the slirp_output() with a Slirp context.
+Let's not mix command line and chardev pointers.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c      |  5 +++--
- slirp/libslirp.h |  9 +++++----
- slirp/ncsi.c     |  2 +-
- slirp/slirp.c    | 11 +++++++----
- slirp/slirp.h    |  1 +
- 5 files changed, 17 insertions(+), 11 deletions(-)
+ net/slirp.c      |  8 ++++----
+ slirp/libslirp.h |  2 +-
+ slirp/misc.c     | 11 +++++++----
+ slirp/misc.h     |  4 ++--
+ slirp/slirp.c    |  5 +++--
+ slirp/tcp_subr.c |  2 +-
+ 6 files changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/net/slirp.c b/net/slirp.c
-index 38ae65e4a9..dd06b0189e 100644
+index dd06b0189e..58d880de8d 100644
 --- a/net/slirp.c
 +++ b/net/slirp.c
-@@ -99,7 +99,7 @@ static void slirp_smb_cleanup(SlirpState *s);
- static inline void slirp_smb_cleanup(SlirpState *s) { }
- #endif
+@@ -709,8 +709,8 @@ static int slirp_smb(SlirpState* s, const char *expor=
+ted_dir,
+              CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
+     g_free(smb_conf);
 =20
--void slirp_output(void *opaque, const uint8_t *pkt, int pkt_len)
-+static void net_slirp_output(void *opaque, const uint8_t *pkt, int pkt_l=
-en)
+-    if (slirp_add_exec(s->slirp, 0, smb_cmdline, &vserver_addr, 139) < 0=
+ ||
+-        slirp_add_exec(s->slirp, 0, smb_cmdline, &vserver_addr, 445) < 0=
+) {
++    if (slirp_add_exec(s->slirp, NULL, smb_cmdline, &vserver_addr, 139) =
+< 0 ||
++        slirp_add_exec(s->slirp, NULL, smb_cmdline, &vserver_addr, 445) =
+< 0) {
+         slirp_smb_cleanup(s);
+         g_free(smb_cmdline);
+         error_setg(errp, "Conflicting/invalid smbserver address");
+@@ -774,7 +774,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
+config_str, Error **errp)
+     snprintf(buf, sizeof(buf), "guestfwd.tcp.%d", port);
+=20
+     if ((strlen(p) > 4) && !strncmp(p, "cmd:", 4)) {
+-        if (slirp_add_exec(s->slirp, 0, &p[4], &server, port) < 0) {
++        if (slirp_add_exec(s->slirp, NULL, &p[4], &server, port) < 0) {
+             error_setg(errp, "Conflicting/invalid host:port in guest "
+                        "forwarding rule '%s'", config_str);
+             return -1;
+@@ -801,7 +801,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
+config_str, Error **errp)
+             return -1;
+         }
+=20
+-        if (slirp_add_exec(s->slirp, 3, &fwd->hd, &server, port) < 0) {
++        if (slirp_add_exec(s->slirp, &fwd->hd, NULL, &server, port) < 0)=
  {
-     SlirpState *s =3D opaque;
-=20
-@@ -378,7 +378,8 @@ static int net_slirp_init(NetClientState *peer, const=
- char *model,
-                           ipv6, ip6_prefix, vprefix6_len, ip6_host,
-                           vhostname, tftp_server_name,
-                           tftp_export, bootfile, dhcp,
--                          dns, ip6_dns, dnssearch, vdomainname, s);
-+                          dns, ip6_dns, dnssearch, vdomainname,
-+                          net_slirp_output, s);
-     QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
-=20
-     for (config =3D slirp_configs; config; config =3D config->next) {
+             error_setg(errp, "Conflicting/invalid host:port in guest "
+                        "forwarding rule '%s'", config_str);
+             g_free(fwd);
 diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 42e42e9a2a..52dbb9feb5 100644
+index 52dbb9feb5..3e88dbaa01 100644
 --- a/slirp/libslirp.h
 +++ b/slirp/libslirp.h
-@@ -5,6 +5,8 @@
-=20
- typedef struct Slirp Slirp;
-=20
-+typedef void (*slirp_output)(void *opaque, const uint8_t *pkt, int pkt_l=
-en);
-+
- int get_dns_addr(struct in_addr *pdns_addr);
- int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
-=20
-@@ -17,7 +19,9 @@ Slirp *slirp_init(int restricted, bool in_enabled, stru=
-ct in_addr vnetwork,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver=
-,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque);
-+                  const char *vdomainname,
-+                  slirp_output output,
-+                  void *opaque);
- void slirp_cleanup(Slirp *slirp);
-=20
- void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout);
-@@ -26,9 +30,6 @@ void slirp_pollfds_poll(GArray *pollfds, int select_err=
-or);
-=20
- void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
-=20
--/* you must provide the following functions: */
--void slirp_output(void *opaque, const uint8_t *pkt, int pkt_len);
--
- int slirp_add_hostfwd(Slirp *slirp, int is_udp,
-                       struct in_addr host_addr, int host_port,
+@@ -35,7 +35,7 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp,
                        struct in_addr guest_addr, int guest_port);
-diff --git a/slirp/ncsi.c b/slirp/ncsi.c
-index 7116034afc..d7701f7785 100644
---- a/slirp/ncsi.c
-+++ b/slirp/ncsi.c
-@@ -163,5 +163,5 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int=
- pkt_len)
-     *pchecksum =3D htonl(checksum);
-     ncsi_rsp_len +=3D 4;
+ int slirp_remove_hostfwd(Slirp *slirp, int is_udp,
+                          struct in_addr host_addr, int host_port);
+-int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
++int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
+                    struct in_addr *guest_addr, int guest_port);
 =20
--    slirp_output(slirp->opaque, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
-+    slirp->output(slirp->opaque, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
+ void slirp_connection_info(Slirp *slirp, Monitor *mon);
+diff --git a/slirp/misc.c b/slirp/misc.c
+index 8f0b6004bd..2784fc420f 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -37,7 +37,7 @@ remque(void *a)
+   element->qh_rlink =3D NULL;
  }
+=20
+-int add_exec(struct ex_list **ex_ptr, int do_pty, char *exec,
++int add_exec(struct ex_list **ex_ptr, void *chardev, const char *cmdline=
+,
+              struct in_addr addr, int port)
+ {
+ 	struct ex_list *tmp_ptr;
+@@ -50,11 +50,14 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, cha=
+r *exec,
+ 	}
+=20
+ 	tmp_ptr =3D *ex_ptr;
+-	*ex_ptr =3D g_new(struct ex_list, 1);
++	*ex_ptr =3D g_new0(struct ex_list, 1);
+ 	(*ex_ptr)->ex_fport =3D port;
+ 	(*ex_ptr)->ex_addr =3D addr;
+-	(*ex_ptr)->ex_chardev =3D do_pty =3D=3D 3;
+-	(*ex_ptr)->ex_exec =3D (do_pty =3D=3D 3) ? exec : g_strdup(exec);
++	if (chardev) {
++		(*ex_ptr)->ex_chardev =3D chardev;
++	} else {
++		(*ex_ptr)->ex_exec =3D g_strdup(cmdline);
++	}
+ 	(*ex_ptr)->ex_next =3D tmp_ptr;
+ 	return 0;
+ }
+diff --git a/slirp/misc.h b/slirp/misc.h
+index 1f8d11def6..64ca88c3b7 100644
+--- a/slirp/misc.h
++++ b/slirp/misc.h
+@@ -9,7 +9,7 @@
+ #define MISC_H
+=20
+ struct ex_list {
+-	int ex_chardev;
++	void *ex_chardev;
+ 	struct in_addr ex_addr;		/* Server address */
+ 	int ex_fport;                   /* Port to telnet to */
+ 	const char *ex_exec;            /* Command line of what to exec */
+@@ -52,7 +52,7 @@ struct slirp_quehead {
+=20
+ void slirp_insque(void *, void *);
+ void slirp_remque(void *);
+-int add_exec(struct ex_list **, int, char *, struct in_addr, int);
++int add_exec(struct ex_list **, void *, const char *, struct in_addr, in=
+t);
+ int fork_exec(struct socket *so, const char *ex);
+=20
+ #endif
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index ab2fc4eb8b..4d4c2c13b5 100644
+index 0498a092b9..0de46084c0 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -287,12 +287,15 @@ Slirp *slirp_init(int restricted, bool in_enabled, =
-struct in_addr vnetwork,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver=
-,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque)
-+                  const char *vdomainname,
-+                  slirp_output output,
-+                  void *opaque)
- {
-     Slirp *slirp =3D g_malloc0(sizeof(Slirp));
-=20
-     slirp_init_once();
-=20
-+    slirp->output =3D output;
-     slirp->grand =3D g_rand_new();
-     slirp->restricted =3D restricted;
-=20
-@@ -832,7 +835,7 @@ static void arp_input(Slirp *slirp, const uint8_t *pk=
-t, int pkt_len)
-             rah->ar_sip =3D ah->ar_tip;
-             memcpy(rah->ar_tha, ah->ar_sha, ETH_ALEN);
-             rah->ar_tip =3D ah->ar_sip;
--            slirp_output(slirp->opaque, arp_reply, sizeof(arp_reply));
-+            slirp->output(slirp->opaque, arp_reply, sizeof(arp_reply));
-         }
-         break;
-     case ARPOP_REPLY:
-@@ -932,7 +935,7 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, =
-struct ethhdr *eh,
-             /* target IP */
-             rah->ar_tip =3D iph->ip_dst.s_addr;
-             slirp->client_ipaddr =3D iph->ip_dst;
--            slirp_output(slirp->opaque, arp_req, sizeof(arp_req));
-+            slirp->output(slirp->opaque, arp_req, sizeof(arp_req));
-             ifm->resolution_requested =3D true;
-=20
-             /* Expire request and drop outgoing packet after 1 second */
-@@ -1018,7 +1021,7 @@ int if_encap(Slirp *slirp, struct mbuf *ifm)
-                 eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
-                 eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]));
-     memcpy(buf + sizeof(struct ethhdr), ifm->m_data, ifm->m_len);
--    slirp_output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
-+    slirp->output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
-     return 1;
+@@ -1068,7 +1068,7 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp, str=
+uct in_addr host_addr,
+     return 0;
  }
 =20
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index b80725a0d6..e3d65d68ec 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -220,6 +220,7 @@ struct Slirp {
-     GRand *grand;
-     QEMUTimer *ra_timer;
+-int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
++int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
+                    struct in_addr *guest_addr, int guest_port)
+ {
+     if (!guest_addr->s_addr) {
+@@ -1081,7 +1081,8 @@ int slirp_add_exec(Slirp *slirp, int do_pty, const =
+void *args,
+         guest_addr->s_addr =3D=3D slirp->vnameserver_addr.s_addr) {
+         return -1;
+     }
+-    return add_exec(&slirp->exec_list, do_pty, (char *)args, *guest_addr=
+,
++
++    return add_exec(&slirp->exec_list, chardev, cmdline, *guest_addr,
+                     htons(guest_port));
+ }
 =20
-+    slirp_output output;
-     void *opaque;
- };
-=20
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index dc19eea55a..e7b2baa087 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -962,7 +962,7 @@ int tcp_ctl(struct socket *so)
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+                 if (ex_ptr->ex_chardev) {
+                     so->s =3D -1;
+-                    so->extra =3D (void *)ex_ptr->ex_exec;
++                    so->extra =3D ex_ptr->ex_chardev;
+                     return 1;
+                 }
+                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
 --=20
 2.20.1
