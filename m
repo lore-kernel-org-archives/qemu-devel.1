@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34715)
+Received: from eggs.gnu.org ([209.51.188.92]:34708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Be-Up
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bd-Uo
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0001CJ-NB
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:25 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40286)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0001Cc-Qd
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:24 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37260)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6h-0001A7-9z
+	id 1gjB6h-0001AJ-HG
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:04 +0100
-Message-Id: <20190114225306.21569-4-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:11 +0100
+Message-Id: <20190114225306.21569-11-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/65] slirp: replace ex_pty with ex_chardev
+Subject: [Qemu-devel] [PULL 10/65] slirp: replace the poor-man string split
+ with g_strsplit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,83 +33,52 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-do_pty =3D=3D 3 means to talk to a chardev.
+Use the glib function for the work, fix a potential crash on >256 words.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/misc.c     | 2 +-
- slirp/misc.h     | 2 +-
- slirp/slirp.c    | 4 ++--
- slirp/tcp_subr.c | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ slirp/misc.c | 21 +++------------------
+ 1 file changed, 3 insertions(+), 18 deletions(-)
 
 diff --git a/slirp/misc.c b/slirp/misc.c
-index e69d5f42c3..8f0b6004bd 100644
+index ce323ef92e..4840187750 100644
 --- a/slirp/misc.c
 +++ b/slirp/misc.c
-@@ -53,7 +53,7 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, char =
-*exec,
- 	*ex_ptr =3D g_new(struct ex_list, 1);
- 	(*ex_ptr)->ex_fport =3D port;
- 	(*ex_ptr)->ex_addr =3D addr;
--	(*ex_ptr)->ex_pty =3D do_pty;
-+	(*ex_ptr)->ex_chardev =3D do_pty =3D=3D 3;
- 	(*ex_ptr)->ex_exec =3D (do_pty =3D=3D 3) ? exec : g_strdup(exec);
- 	(*ex_ptr)->ex_next =3D tmp_ptr;
- 	return 0;
-diff --git a/slirp/misc.h b/slirp/misc.h
-index 897650aea1..1f8d11def6 100644
---- a/slirp/misc.h
-+++ b/slirp/misc.h
-@@ -9,7 +9,7 @@
- #define MISC_H
+@@ -88,11 +88,8 @@ fork_exec(struct socket *so, const char *ex)
+ 	socklen_t addrlen =3D sizeof(addr);
+         socklen_t csaddrlen =3D sizeof(csaddr);
+ 	int opt;
+-	const char *argv[256];
+-	/* don't want to clobber the original */
+-	char *bptr;
+-	const char *curarg;
+-	int c, i, ret;
++	char **argv;
++	int ret;
+ 	pid_t pid;
 =20
- struct ex_list {
--	int ex_pty;			/* Do we want a pty? */
-+	int ex_chardev;
- 	struct in_addr ex_addr;		/* Server address */
- 	int ex_fport;                   /* Port to telnet to */
- 	const char *ex_exec;            /* Command line of what to exec */
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 4d4c2c13b5..0498a092b9 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -1455,7 +1455,7 @@ static void slirp_state_save(QEMUFile *f, void *opa=
-que)
-     struct ex_list *ex_ptr;
+ 	DEBUG_CALL("fork_exec");
+@@ -156,19 +153,7 @@ fork_exec(struct socket *so, const char *ex)
+ 		for (s =3D getdtablesize() - 1; s >=3D 3; s--)
+ 		   close(s);
 =20
-     for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_next=
-)
--        if (ex_ptr->ex_pty =3D=3D 3) {
-+        if (ex_ptr->ex_chardev) {
-             struct socket *so;
-             so =3D slirp_find_ctl_socket(slirp, ex_ptr->ex_addr,
-                                        ntohs(ex_ptr->ex_fport));
-@@ -1490,7 +1490,7 @@ static int slirp_state_load(QEMUFile *f, void *opaq=
-ue, int version_id)
-             return -EINVAL;
-         }
-         for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
-next) {
--            if (ex_ptr->ex_pty =3D=3D 3 &&
-+            if (ex_ptr->ex_chardev &&
-                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr &&
-                 so->so_fport =3D=3D ex_ptr->ex_fport) {
-                 break;
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index 0ccd8e1a96..dc19eea55a 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -960,7 +960,7 @@ int tcp_ctl(struct socket *so)
-         for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
-next) {
-             if (ex_ptr->ex_fport =3D=3D so->so_fport &&
-                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
--                if (ex_ptr->ex_pty =3D=3D 3) {
-+                if (ex_ptr->ex_chardev) {
-                     so->s =3D -1;
-                     so->extra =3D (void *)ex_ptr->ex_exec;
-                     return 1;
+-		i =3D 0;
+-		bptr =3D g_strdup(ex); /* No need to free() this */
+-        do {
+-			/* Change the string into argv[] */
+-			curarg =3D bptr;
+-			while (*bptr !=3D ' ' && *bptr !=3D (char)0)
+-			   bptr++;
+-			c =3D *bptr;
+-			*bptr++ =3D (char)0;
+-			argv[i++] =3D g_strdup(curarg);
+-        } while (c);
+-
+-                argv[i] =3D NULL;
++                argv =3D g_strsplit(ex, " ", -1);
+ 		execvp(argv[0], (char **)argv);
+=20
+ 		/* Ooops, failed, let's tell the user why */
 --=20
 2.20.1
