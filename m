@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51956)
+Received: from eggs.gnu.org ([209.51.188.92]:51998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gizZh-0006sq-HY
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:34:34 -0500
+	(envelope-from <thuth@redhat.com>) id 1gizZm-0006ys-DC
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:34:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gizZd-0006b9-R6
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:34:30 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gizZX-0006Ld-0Q
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:34:25 -0500
-Received: by mail-oi1-x242.google.com with SMTP id c206so17480290oib.0
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:34:22 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gizZi-0006mB-Q9
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:34:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gizZh-0006Pf-KX
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:34:34 -0500
+References: <cover.1514169758.git.maozy.fnst@cn.fujitsu.com>
+	<13419a5985e00c236467916d3b26af89bc2daacd.1514169758.git.maozy.fnst@cn.fujitsu.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f79013e3-2d7c-0bd2-d61a-6c46568e672b@redhat.com>
+Date: Mon, 14 Jan 2019 11:34:19 +0100
 MIME-Version: 1.0
-References: <20181031025712.18602-1-famz@redhat.com>
-	<4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
-	<20181114095807.GB22784@magic> <20190109135504.GA12179@redhat.com>
-	<20190109135917.GP3998@redhat.com>
-	<A3EA5405-A5EE-4E77-8C77-A67398756B96@euphon.net>
-	<20190114101515.GA3686@redhat.com>
-In-Reply-To: <20190114101515.GA3686@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Jan 2019 10:34:10 +0000
-Message-ID: <CAFEAcA9GirJMSOp284KbX8tGaQ9CxHWCq=_nAhvdyFM6Q0fvYA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] tests: vm: auto_install OpenBSD
+In-Reply-To: <13419a5985e00c236467916d3b26af89bc2daacd.1514169758.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] colo: compare the packet based on
+ the tcp sequence number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,25 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Brad Smith <brad@comstyle.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>, Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-On Mon, 14 Jan 2019 at 10:20, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
-> If you don't have SDL then there's no audio driver impl available for
-> QEMU, so configure fails with:
->
->   ERROR: sdl not found or disabled, can not use sdl audio driver
+On 2017-12-25 03:54, Mao Zhongyi wrote:
+> Packet size some time different or when network is busy.
+> Based on same payload size, but TCP protocol can not
+> guarantee send the same one packet in the same way,
+[...]
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> Reviewed-by: Zhang Chen <zhangckid@gmail.com>
+> Tested-by: Zhang Chen <zhangckid@gmail.com>
+> ---
+>  net/colo-compare.c | 343 +++++++++++++++++++++++++++++++++++------------------
+>  net/colo.c         |   9 ++
+>  net/colo.h         |  15 +++
+>  net/trace-events   |   2 +-
+>  4 files changed, 250 insertions(+), 119 deletions(-)
+> 
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index f39ca02..8622b0b 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+[...]
+> @@ -214,104 +254,175 @@ static int colo_compare_packet_payload(Packet *ppkt,
+>  }
+>  
+>  /*
+> - * Called from the compare thread on the primary
+> - * for compare tcp packet
+> - * compare_tcp copied from Dr. David Alan Gilbert's branch
+> - */
+> -static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+> + * return true means that the payload is consist and
+> + * need to make the next comparison, false means do
+> + * the checkpoint
+> +*/
+> +static bool colo_mark_tcp_pkt(Packet *ppkt, Packet *spkt,
+> +                              int8_t *mark, uint32_t max_ack)
+>  {
+> -    struct tcphdr *ptcp, *stcp;
+> -    int res;
+> +    *mark = 0;
+> +
+> +    if (ppkt->tcp_seq == spkt->tcp_seq && ppkt->seq_end == spkt->seq_end) {
+> +        if (colo_compare_packet_payload(ppkt, spkt,
+> +                                        ppkt->header_size, spkt->header_size,
+> +                                        ppkt->payload_size)) {
+> +            *mark = COLO_COMPARE_FREE_SECONDARY | COLO_COMPARE_FREE_PRIMARY;
+> +            return true;
+> +        }
+> +    }
+> +    if (ppkt->tcp_seq == spkt->tcp_seq && ppkt->seq_end == spkt->seq_end) {
+> +        if (colo_compare_packet_payload(ppkt, spkt,
+> +                                        ppkt->header_size, spkt->header_size,
+> +                                        ppkt->payload_size)) {
+> +            *mark = COLO_COMPARE_FREE_SECONDARY | COLO_COMPARE_FREE_PRIMARY;
+> +            return true;
+> +        }
+> +    }
 
-Ideally we should fix configure/the audio driver selection
-logic so that if SDL is not available or disabled then
-'sdl' is removed from the set of possible audio devices
-and not selected as the default for OpenBSD (and if necessary
-fix things so we can build a QEMU with no audio drivers at all,
-falling back to the null driver, ie no sound).
+ Hi,
 
-It would also be good to make the various BSD images have
-SDL2 installed, for the compile coverage.
+seems like this patch introduced some duplicated code, see this bug
+ticket here:
 
-thanks
--- PMM
+ https://bugs.launchpad.net/qemu/+bug/1811499
+
+Is the second if-statement here on purpose? If yes, maybe you could add
+a comment here? If no, could you please send a patch to remove it?
+
+ Thanks,
+  Thomas
