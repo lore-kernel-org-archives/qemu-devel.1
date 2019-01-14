@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44825)
+Received: from eggs.gnu.org ([209.51.188.92]:44877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz4z-0005dY-Km
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:50 -0500
+	(envelope-from <thuth@redhat.com>) id 1giz54-0005gr-JR
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz4x-0007Xv-Tg
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55246)
+	(envelope-from <thuth@redhat.com>) id 1giz53-0007bI-Od
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:4414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz4v-0007Vw-MO
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:47 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz53-0007aG-Iu
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:53 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 11:02:08 +0100
-Message-Id: <1547460140-1473-14-git-send-email-thuth@redhat.com>
+Date: Mon, 14 Jan 2019 11:02:13 +0100
+Message-Id: <1547460140-1473-19-git-send-email-thuth@redhat.com>
 In-Reply-To: <1547460140-1473-1-git-send-email-thuth@redhat.com>
 References: <1547460140-1473-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/25] hw/ide/ahci: Remove AllwinnerAHCIState
- from "qemu/typedefs.h"
+Subject: [Qemu-devel] [PULL 18/25] audio: Remove AudioState from
+ "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +30,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Files requiring AllwinnerAHCIState already include "hw/ide/ahci.h".
+Files requiring AudioState already include "audio_int.h".
 
-To clean "qemu/typedefs.h", move the declaration to "hw/ide/ahci.h"
+To clean "qemu/typedefs.h", move the declaration to "audio_int.h"
 (removing the forward declaration).
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/hw/ide/ahci.h   | 4 ++--
+ audio/audio_int.h       | 4 ++--
  include/qemu/typedefs.h | 1 -
  2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/ide/ahci.h b/include/hw/ide/ahci.h
-index b7bb2b0..b44e300 100644
---- a/include/hw/ide/ahci.h
-+++ b/include/hw/ide/ahci.h
-@@ -73,13 +73,13 @@ typedef struct SysbusAHCIState {
- #define ALLWINNER_AHCI_MMIO_OFF  0x80
- #define ALLWINNER_AHCI_MMIO_SIZE 0x80
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index 244b454..6c451b9 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -191,7 +191,7 @@ struct SWVoiceCap {
+     QLIST_ENTRY (SWVoiceCap) entries;
+ };
 =20
--struct AllwinnerAHCIState {
-+typedef struct AllwinnerAHCIState {
-     /*< private >*/
-     SysbusAHCIState parent_obj;
-     /*< public >*/
+-struct AudioState {
++typedef struct AudioState {
+     struct audio_driver *drv;
+     void *drv_opaque;
 =20
-     MemoryRegion mmio;
-     uint32_t regs[ALLWINNER_AHCI_MMIO_SIZE/4];
+@@ -203,7 +203,7 @@ struct AudioState {
+     int nb_hw_voices_out;
+     int nb_hw_voices_in;
+     int vm_running;
 -};
-+} AllwinnerAHCIState;
++} AudioState;
 =20
- #endif /* HW_IDE_AHCI_H */
+ extern const struct mixeng_volume nominal_volume;
+=20
 diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index c026229..3a5ca74 100644
+index 5edf44e..c6d1c1b 100644
 --- a/include/qemu/typedefs.h
 +++ b/include/qemu/typedefs.h
 @@ -8,7 +8,6 @@
  typedef struct AdapterInfo AdapterInfo;
  typedef struct AddressSpace AddressSpace;
  typedef struct AioContext AioContext;
--typedef struct AllwinnerAHCIState AllwinnerAHCIState;
- typedef struct AudioState AudioState;
+-typedef struct AudioState AudioState;
  typedef struct BdrvDirtyBitmap BdrvDirtyBitmap;
  typedef struct BdrvDirtyBitmapIter BdrvDirtyBitmapIter;
+ typedef struct BlockBackend BlockBackend;
 --=20
 1.8.3.1
