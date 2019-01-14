@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51097)
+Received: from eggs.gnu.org ([209.51.188.92]:51085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk3-0002v9-Ag
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk2-0002uz-TA
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk1-0006KH-Ty
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:35 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60200)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk1-0006K3-PR
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:34 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57164)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipk1-0006Fj-M1
+	id 1gipk1-0006Ff-H2
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:33 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:02:28 +0100
-Message-Id: <20190114000326.29847-8-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:02:30 +0100
+Message-Id: <20190114000326.29847-10-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/65] slirp: move internal function declarations
+Subject: [Qemu-devel] [PULL 09/65] slirp: fix slirp_add_exec() leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +32,47 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Clarify that those functions are internal to slirp.
+Free the list elements allocated in add_exec().
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/libslirp.h | 3 ---
- slirp/slirp.h    | 3 +++
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ slirp/misc.h  | 2 +-
+ slirp/slirp.c | 8 ++++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 3e88dbaa01..a4f390ee89 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -7,9 +7,6 @@ typedef struct Slirp Slirp;
+diff --git a/slirp/misc.h b/slirp/misc.h
+index 94829722cd..0bc5e74bc5 100644
+--- a/slirp/misc.h
++++ b/slirp/misc.h
+@@ -12,7 +12,7 @@ struct ex_list {
+ 	void *ex_chardev;
+ 	struct in_addr ex_addr;		/* Server address */
+ 	int ex_fport;                   /* Port to telnet to */
+-	const char *ex_exec;            /* Command line of what to exec */
++	char *ex_exec;                  /* Command line of what to exec */
+ 	struct ex_list *ex_next;
+ };
 =20
- typedef void (*slirp_output)(void *opaque, const uint8_t *pkt, int pkt_l=
-en);
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index ab08694e37..1627436e7d 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -342,6 +342,14 @@ Slirp *slirp_init(int restricted, bool in_enabled, s=
+truct in_addr vnetwork,
 =20
--int get_dns_addr(struct in_addr *pdns_addr);
--int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
--
- Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwo=
-rk,
-                   struct in_addr vnetmask, struct in_addr vhost,
-                   bool in6_enabled,
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index e3d65d68ec..de299aa36c 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -232,6 +232,9 @@ extern Slirp *slirp_instance;
-=20
- void if_start(Slirp *);
-=20
-+int get_dns_addr(struct in_addr *pdns_addr);
-+int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
+ void slirp_cleanup(Slirp *slirp)
+ {
++    struct ex_list *e, *next;
 +
- /* ncsi.c */
- void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
++    for (e =3D slirp->exec_list; e; e =3D next) {
++        next =3D e->ex_next;
++        g_free(e->ex_exec);
++        g_free(e);
++    }
++
+     QTAILQ_REMOVE(&slirp_instances, slirp, entry);
 =20
+     unregister_savevm(NULL, "slirp", slirp);
 --=20
 2.20.1
