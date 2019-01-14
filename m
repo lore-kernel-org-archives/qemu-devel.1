@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60089)
+Received: from eggs.gnu.org ([209.51.188.92]:60074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gj6po-0007Cu-IT
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 13:19:41 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gj6ps-0007Cj-6a
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 13:19:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gj6nD-0004Xa-Is
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 13:17:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48258)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gj6nD-0004X3-DP
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 13:16:59 -0500
-Date: Mon, 14 Jan 2019 16:16:55 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190114181655.GA28115@habkost.net>
-References: <20181227024304.12182-1-tao3.xu@intel.com>
+	(envelope-from <cohuck@redhat.com>) id 1gj6jv-0002si-J5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 13:13:36 -0500
+Date: Mon, 14 Jan 2019 19:13:30 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190114191330.1075ec7f.cohuck@redhat.com>
+In-Reply-To: <1547470346-18416-1-git-send-email-thuth@redhat.com>
+References: <1547470346-18416-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181227024304.12182-1-tao3.xu@intel.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] Add MSR based features on Cascadelake
- CPU model
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] configure: Only build the s390-ccw bios
+ if the compiler supports -march=z900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,14 +23,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tao Xu <tao3.xu@intel.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, robert.hu@linux.intel.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On Thu, Dec 27, 2018 at 10:43:02AM +0800, Tao Xu wrote:
-> These patches update the stepping and add some MSR based features 
-> enumerated by ARCH_CAPABILITIES on Cascadelake-Server CPU model.
+On Mon, 14 Jan 2019 13:52:26 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-Queued, thanks.
+> We want to build our s390-ccw bios with -march=z900 so that it also
+> works with the oldest s390x CPU that we support with TCG. However,
+> Clang on s390x does not support -march=z900 anymore, so we can not
+> use this compiler to build the s390-ccw bios. Thus add a proper test
+> to the configure script to see whether the compiler is usable.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2: Use compile_prog as suggested by Peter
+> 
+>  configure | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
--- 
-Eduardo
+Thanks, applied.
