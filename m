@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51744)
+Received: from eggs.gnu.org ([209.51.188.92]:53234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj1A4-0008VH-Mz
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:16:13 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gj1G5-0001o2-SY
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:22:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj1A2-0000HY-49
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:16:11 -0500
-Received: from mail-wm1-f49.google.com ([209.85.128.49]:36922)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj1A0-0000GZ-QL
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:16:10 -0500
-Received: by mail-wm1-f49.google.com with SMTP id g67so8593820wmd.2
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 04:16:08 -0800 (PST)
-References: <1547467955-17245-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <30917d5b-f8cb-e799-6c3e-3202195122b4@redhat.com>
-Date: Mon, 14 Jan 2019 13:16:06 +0100
-MIME-Version: 1.0
-In-Reply-To: <1547467955-17245-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gj1G2-0002Vi-6M
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:22:24 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 14 Jan 2019 12:22:05 +0000
+Message-ID: <963d830d-690a-09cd-4939-79096b62cf35@virtuozzo.com>
+References: <20190112175812.27068-1-eblake@redhat.com>
+In-Reply-To: <20190112175812.27068-1-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
- with Clang on s390x
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5133DC7C5F9BFE4D9706B7C36414B903@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 00/19] nbd: add qemu-nbd --list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 1/14/19 1:12 PM, Thomas Huth wrote:
-> Clang v7.0.1 does not like the __int128 variable type for inline
-> assembly on s390x:
-> 
-> In file included from fpu/softfloat.c:97:
-> include/fpu/softfloat-macros.h:647:9: error: inline asm error:
->  This value type register class is not natively supported!
->     asm("dlgr %0, %1" : "+r"(n) : "r"(d));
->         ^
-> 
-> Disable this code part there now when compiling with Clang, so that
-> the generic code gets used instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  include/fpu/softfloat-macros.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-> index b1d772e..bd5b641 100644
-> --- a/include/fpu/softfloat-macros.h
-> +++ b/include/fpu/softfloat-macros.h
-> @@ -641,7 +641,7 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
->      uint64_t q;
->      asm("divq %4" : "=a"(q), "=d"(*r) : "0"(n0), "1"(n1), "rm"(d));
->      return q;
-> -#elif defined(__s390x__)
-> +#elif defined(__s390x__) && !defined(__clang__)
-
-Can we rather check if __int128 is natively supported? So this part get
-compiled once Clang do support it, else we'll never use it...
-
->      /* Need to use a TImode type to get an even register pair for DLGR.  */
->      unsigned __int128 n = (unsigned __int128)n1 << 64 | n0;
->      asm("dlgr %0, %1" : "+r"(n) : "r"(d));
-> 
+MTIuMDEuMjAxOSAyMDo1NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gSSBnb3QgdGlyZWQgb2YgZGVi
+dWdnaW5nIHdoZXRoZXIgYSBzZXJ2ZXIgd2FzIGFkdmVydGlzaW5nIHRoZQ0KPiBjb3JyZWN0IHRo
+aW5ncyBkdXJpbmcgbmVnb3RpYXRpb24gYnkgaW5zcGVjdGluZyB0aGUgdHJhY2UNCj4gbG9ncyBv
+ZiBxZW11LWlvIGFzIGNsaWVudCAtIG5vdCB0byBtZW50aW9uIHRoYXQgd2l0aG91dCBTT01FDQo+
+IHNvcnQgb2YgY2xpZW50IHRyYWNpbmcgcGFydGljdWxhciBjb21tYW5kcywgd2UgY2FuJ3QgZWFz
+aWx5DQo+IHJlZ3Jlc3Npb24gdGVzdCB0aGUgc2VydmVyIGZvciBjb3JyZWN0IGJlaGF2aW9yLiAg
+VGhlIGZpbmFsDQo+IHN0cmF3IHdhcyBhdCBLVk0gRm9ydW0sIHdoZW4gTmlyIGFza2VkIG1lIHRv
+IG1ha2Ugc3VyZSB0aGVyZQ0KPiB3YXMgYSB3YXkgdG8gZWFzaWx5IGRldGVybWluZSBpZiBhbiBO
+QkQgc2VydmVyIGlzIGV4cG9zaW5nIHdoYXQNCj4gd2UgcmVhbGx5IHdhbnQgKGFuZCBmaXhpbmcg
+eC1kaXJ0eS1iaXRtYXAgdG8gYmVoYXZlIHNhbmVyIGZlbGwNCj4gb3V0IGFzIGEgcmVzdWx0IG9m
+IGFuc3dlcmluZyB0aGF0IHF1ZXN0aW9uKS4NCj4gDQo+IEkgbm90ZSB0aGF0IHVwc3RyZWFtIE5C
+RCBoYXMgJ25iZC1jbGllbnQgLWwgJGhvc3QnIGZvciBxdWVyeWluZw0KPiBqdXN0IGV4cG9ydCBu
+YW1lcyAod2l0aCBubyBxdW90aW5nLCBzbyB5b3UgaGF2ZSB0byBrbm93IHRoYXQNCj4gYSBibGFu
+ayBsaW5lIG1lYW5zIHRoZSBkZWZhdWx0IGV4cG9ydCksIGJ1dCBpdCB3YXNuJ3QgcG93ZXJmdWwN
+Cj4gZW5vdWdoLCBzbyBJIGltcGxlbWVudGVkICdxZW11LW5iZCAtTCcgdG8gZG9jdW1lbnQgZXZl
+cnl0aGluZy4NCj4gVXBzdHJlYW0gTkJEIGhhcyBzZXBhcmF0ZSAnbmJkLWNsaWVudCcgYW5kICdu
+YmQtc2VydmVyJyBiaW5hcmllcywNCj4gd2hpbGUgd2Ugb25seSBoYXZlICdxZW11LW5iZCcgKHdo
+aWNoIGlzIG5vcm1hbGx5IGp1c3QgYSBzZXJ2ZXIsDQo+IGJ1dCAncWVtdS1uYmQgLWMnIGFsc28g
+b3BlcmF0ZXMgYSBzZWNvbmQgdGhyZWFkIGFzIGEgY2xpZW50KS4NCj4gT3VyIG90aGVyIHVzZXMg
+b2YgcWVtdSBhcyBOQkQgY2xpZW50IGFyZSBmb3IgY29uc3VtaW5nIGEgYmxvY2sNCj4gZGV2aWNl
+IChhcyBpbiBxZW11LWlvLCBxZW11LWltZywgb3IgYSBkcml2ZSB0byBxZW11KSAtIGJ1dCB0aG9z
+ZQ0KPiBiaW5hcmllcyBhcmUgbGVzcyBzdWl0ZWQgdG8gc29tZXRoaW5nIHNvIHNwZWNpZmljIHRv
+IHRoZSBOQkQNCj4gcHJvdG9jb2wuDQo+IA0KPiBCb251czogQXMgYSByZXN1bHQgb2YgbXkgd29y
+ayBvbiB0aGlzIHNlcmllcywgbmJka2l0IG5vdyBzdXBwb3J0cw0KPiBOQkRfT1BUX0lORk8gKG15
+IGludGVyb3BlcmFiaWxpdHkgdGVzdGluZyBiZXR3ZWVuIHNlcnZlcg0KPiBpbXBsZW1lbnRhdGlv
+bnMgaGFzIGJlZW4gcGF5aW5nIG9mZiwgYm90aCBhdCBmaXhpbmcgc2VydmVyIGJ1Z3MsDQo+IGFu
+ZCBhdCBtYWtpbmcgdGhpcyBjb2RlIG1vcmUgcmVsaWFibGUgYWNyb3NzIGRpZmZlcmVuY2UgaW4g
+dmFsaWQNCj4gc2VydmVycykuDQo+IA0KPiBBbHNvIGF2YWlsYWJsZSBhdDoNCj4gaHR0cHM6Ly9y
+ZXBvLm9yLmN6L3FlbXUvZXJpY2IuZ2l0IHFlbXUtbmJkLWxpc3QtdjINCg0KaG1tLCBub3QgLXYy
+LiBCdXQgbm90IC12MyB0b28sIGFzICBJJ3ZlIHRyaWVkIHRvIGFwcGx5IHRoZXNlIHBhdGNoZXMg
+b24NCi12MyBiYXNlIChjb21taXQgdW5kZXIgIm1haW50OiBBbGxvdyBmb3IgRVhBTVBMRVMgaW4g
+dGV4aTJwb2QiKSBhbmQgaXQNCmZhaWxlZC4NCg0KQ291bGQgeW91IHBsZWFzZSBmaXggdGFnPw0K
+DQo+IA0KPiBCYXNlZC1vbjogPDIwMTgxMjIxMDkzNTI5LjIzODU1LTEtanNub3dAcmVkaGF0LmNv
+bT4NCj4gW2pzbm93OiAwLzExIGJpdG1hcHM6IHJlbW92ZSB4LSBwcmVmaXggZnJvbSBRTVAgYXBp
+XQ0KPiBCYXNlZC1vbjogPDIwMTkwMTExMTYzNTE5LjExNDU3LTEtcGhpbG1kQHJlZGhhdC5jb20+
+DQo+IFtwaGlsbWQ6IHFlbXUtbmJkOiBSZW5hbWUgJ2V4cCcgdmFyaWFibGUgY2xhc2hpbmcgd2l0
+aCBtYXRoOjpleHAoKSBzeW1ib2xdDQo+IEJhc2VkLW9uOiA8MjAxOTAxMTExOTQ3MjAuMTU2NzEt
+MS1lYmxha2VAcmVkaGF0LmNvbT4NCj4gW2VibGFrZTogMC84IFByb21vdGUgeC1uYmQtc2VydmVy
+LWFkZC1iaXRtYXAgdG8gc3RhYmxlXQ0KPiANCj4gU2luY2UgdjI6DQo+IC0gU2V2ZXJhbCBwYXRj
+aGVzIG1lcmdlZCBhbHJlYWR5DQo+IC0gMyBuZXcgcGF0Y2hlcyBiYXNlZCBvbiBhdWRpdCBvZiBv
+ZmZfdCB2cy4gc3RydG9sDQo+IC0gcmViYXNlIHBhdGNoZXMgb24gdG9wIG9mIG90aGVyIGNoYW5n
+ZXMsIHN1Y2ggYXMgcWVtdS1uYmQgLS1iaXRtYXANCj4gLSBhZGRyZXNzIHZhcmlvdXMgcmV2aWV3
+IGNvbW1lbnRzIFtWbGFkaW1pciwgUmljaF0NCj4gLSBkcm9wIHBhdGNoIDEyLzIyDQo+IA0KPiAw
+MDEvMTk6WzAwMjBdIFtGQ10gJ21haW50OiBBbGxvdyBmb3IgRVhBTVBMRVMgaW4gdGV4aTJwb2Qn
+DQo+IDAwMi8xOTpbMDAzMF0gW0ZDXSAncWVtdS1uYmQ6IEVuaGFuY2UgbWFuIHBhZ2UnDQo+IDAw
+My8xOTpbZG93bl0gJ3FlbXUtbmJkOiBTYW5pdHkgY2hlY2sgcGFydGl0aW9uIGJvdW5kcycNCj4g
+MDA0LzE5Oltkb3duXSAnbmJkL3NlcnZlcjogSG9pc3QgbGVuZ3RoIGNoZWNrIHRvIHFlbXBfbmJk
+X3NlcnZlcl9hZGQnDQo+IDAwNS8xOTpbZG93bl0gJ25iZC9zZXJ2ZXI6IEZhdm9yIFt1XWludDY0
+X3Qgb3ZlciBvZmZfdCcNCj4gMDA2LzE5OlswMDA3XSBbRkNdICdxZW11LW5iZDogQXZvaWQgc3Ry
+dG9sIG9wZW4tY29kaW5nJw0KPiAwMDcvMTk6WzAwMTZdIFtGQ10gJ25iZC9jbGllbnQ6IFJlZmFj
+dG9yIG5iZF9yZWNlaXZlX2xpc3QoKScNCj4gMDA4LzE5OlstLS0tXSBbLS1dICduYmQvY2xpZW50
+OiBNb3ZlIGV4cG9ydCBuYW1lIGludG8gTkJERXhwb3J0SW5mbycNCj4gMDA5LzE5OlstLS0tXSBb
+LS1dICduYmQvY2xpZW50OiBDaGFuZ2Ugc2lnbmF0dXJlIG9mIG5iZF9uZWdvdGlhdGVfc2ltcGxl
+X21ldGFfY29udGV4dCgpJw0KPiAwMTAvMTk6WzAwMDddIFtGQ10gJ25iZC9jbGllbnQ6IFNwbGl0
+IG91dCBuYmRfc2VuZF9vbmVfbWV0YV9jb250ZXh0KCknDQo+IDAxMS8xOTpbMDA0OF0gW0ZDXSAn
+bmJkL2NsaWVudDogU3BsaXQgb3V0IG5iZF9yZWNlaXZlX29uZV9tZXRhX2NvbnRleHQoKScNCj4g
+MDEyLzE5OlstLS0tXSBbLS1dICduYmQvY2xpZW50OiBSZWZhY3RvciByZXR1cm4gb2YgbmJkX3Jl
+Y2VpdmVfbmVnb3RpYXRlKCknDQo+IDAxMy8xOTpbLS0tLV0gWy1DXSAnbmJkL2NsaWVudDogU3Bs
+aXQgaGFuZHNoYWtlIGludG8gdHdvIGZ1bmN0aW9ucycNCj4gMDE0LzE5OlstLS0tXSBbLS1dICdu
+YmQvY2xpZW50OiBQdWxsIG91dCBvbGRzdHlsZSBzaXplIGRldGVybWluYXRpb24nDQo+IDAxNS8x
+OTpbMDAwOF0gW0ZDXSAnbmJkL2NsaWVudDogQWRkIG5iZF9yZWNlaXZlX2V4cG9ydF9saXN0KCkn
+DQo+IDAxNi8xOTpbLS0tLV0gWy1DXSAnbmJkL2NsaWVudDogQWRkIG1ldGEgY29udGV4dHMgdG8g
+bmJkX3JlY2VpdmVfZXhwb3J0X2xpc3QoKScNCj4gMDE3LzE5OlswMDE1XSBbRkNdICdxZW11LW5i
+ZDogQWRkIC0tbGlzdCBvcHRpb24nDQo+IDAxOC8xOTpbLS0tLV0gWy0tXSAnbmJkL2NsaWVudDog
+V29yayBhcm91bmQgMy4wIGJ1ZyBmb3IgbGlzdGluZyBtZXRhIGNvbnRleHRzJw0KPiAwMTkvMTk6
+WzAwMDJdIFtGQ10gJ2lvdGVzdHM6IEVuaGFuY2UgMjIzLCAyMzMgdG8gY292ZXIgJ3FlbXUtbmJk
+IC0tbGlzdCcnDQo+IA0KPiBFcmljIEJsYWtlICgxOSk6DQo+ICAgIG1haW50OiBBbGxvdyBmb3Ig
+RVhBTVBMRVMgaW4gdGV4aTJwb2QNCj4gICAgcWVtdS1uYmQ6IEVuaGFuY2UgbWFuIHBhZ2UNCj4g
+ICAgcWVtdS1uYmQ6IFNhbml0eSBjaGVjayBwYXJ0aXRpb24gYm91bmRzDQo+ICAgIG5iZC9zZXJ2
+ZXI6IEhvaXN0IGxlbmd0aCBjaGVjayB0byBxZW1wX25iZF9zZXJ2ZXJfYWRkDQo+ICAgIG5iZC9z
+ZXJ2ZXI6IEZhdm9yIFt1XWludDY0X3Qgb3ZlciBvZmZfdA0KPiAgICBxZW11LW5iZDogQXZvaWQg
+c3RydG9sIG9wZW4tY29kaW5nDQo+ICAgIG5iZC9jbGllbnQ6IFJlZmFjdG9yIG5iZF9yZWNlaXZl
+X2xpc3QoKQ0KPiAgICBuYmQvY2xpZW50OiBNb3ZlIGV4cG9ydCBuYW1lIGludG8gTkJERXhwb3J0
+SW5mbw0KPiAgICBuYmQvY2xpZW50OiBDaGFuZ2Ugc2lnbmF0dXJlIG9mIG5iZF9uZWdvdGlhdGVf
+c2ltcGxlX21ldGFfY29udGV4dCgpDQo+ICAgIG5iZC9jbGllbnQ6IFNwbGl0IG91dCBuYmRfc2Vu
+ZF9vbmVfbWV0YV9jb250ZXh0KCkNCj4gICAgbmJkL2NsaWVudDogU3BsaXQgb3V0IG5iZF9yZWNl
+aXZlX29uZV9tZXRhX2NvbnRleHQoKQ0KPiAgICBuYmQvY2xpZW50OiBSZWZhY3RvciByZXR1cm4g
+b2YgbmJkX3JlY2VpdmVfbmVnb3RpYXRlKCkNCj4gICAgbmJkL2NsaWVudDogU3BsaXQgaGFuZHNo
+YWtlIGludG8gdHdvIGZ1bmN0aW9ucw0KPiAgICBuYmQvY2xpZW50OiBQdWxsIG91dCBvbGRzdHls
+ZSBzaXplIGRldGVybWluYXRpb24NCj4gICAgbmJkL2NsaWVudDogQWRkIG5iZF9yZWNlaXZlX2V4
+cG9ydF9saXN0KCkNCj4gICAgbmJkL2NsaWVudDogQWRkIG1ldGEgY29udGV4dHMgdG8gbmJkX3Jl
+Y2VpdmVfZXhwb3J0X2xpc3QoKQ0KPiAgICBxZW11LW5iZDogQWRkIC0tbGlzdCBvcHRpb24NCj4g
+ICAgbmJkL2NsaWVudDogV29yayBhcm91bmQgMy4wIGJ1ZyBmb3IgbGlzdGluZyBtZXRhIGNvbnRl
+eHRzDQo+ICAgIGlvdGVzdHM6IEVuaGFuY2UgMjIzLCAyMzMgdG8gY292ZXIgJ3FlbXUtbmJkIC0t
+bGlzdCcNCj4gDQo+ICAgcWVtdS1uYmQudGV4aSAgICAgICAgICAgICAgfCAxMTQgKysrKy0tDQo+
+ICAgTWFrZWZpbGUgICAgICAgICAgICAgICAgICAgfCAgIDIgKw0KPiAgIGluY2x1ZGUvYmxvY2sv
+bmJkLmggICAgICAgIHwgIDMxICstDQo+ICAgYmxvY2svbmJkLWNsaWVudC5jICAgICAgICAgfCAg
+IDkgKy0NCj4gICBibG9ja2Rldi1uYmQuYyAgICAgICAgICAgICB8ICAxMCArLQ0KPiAgIG5iZC9j
+bGllbnQuYyAgICAgICAgICAgICAgIHwgNzU2ICsrKysrKysrKysrKysrKysrKysrKysrKysrLS0t
+LS0tLS0tLS0NCj4gICBuYmQvc2VydmVyLmMgICAgICAgICAgICAgICB8ICAyMyArLQ0KPiAgIHFl
+bXUtbmJkLmMgICAgICAgICAgICAgICAgIHwgMjIxICsrKysrKysrLS0tDQo+ICAgbmJkL3RyYWNl
+LWV2ZW50cyAgICAgICAgICAgfCAgMTEgKy0NCj4gICBzY3JpcHRzL3RleGkycG9kLnBsICAgICAg
+ICB8ICAgMiArLQ0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yMjMgICAgIHwgICAyICsNCj4gICB0
+ZXN0cy9xZW11LWlvdGVzdHMvMjIzLm91dCB8ICAyMCArDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3Rz
+LzIzMyAgICAgfCAgMTkgKy0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjMzLm91dCB8ICAxNSAr
+DQo+ICAgMTQgZmlsZXMgY2hhbmdlZCwgOTEwIGluc2VydGlvbnMoKyksIDMyNSBkZWxldGlvbnMo
+LSkNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
