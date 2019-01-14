@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44800)
+Received: from eggs.gnu.org ([209.51.188.92]:44848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz4z-0005dW-HZ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:50 -0500
+	(envelope-from <thuth@redhat.com>) id 1giz51-0005g4-R5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz4v-0007Wi-PQ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45792)
+	(envelope-from <thuth@redhat.com>) id 1giz4z-0007ZO-LA
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz4t-0007VC-PQ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:45 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz4z-0007Ye-DJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:49 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 11:02:07 +0100
-Message-Id: <1547460140-1473-13-git-send-email-thuth@redhat.com>
+Date: Mon, 14 Jan 2019 11:02:11 +0100
+Message-Id: <1547460140-1473-17-git-send-email-thuth@redhat.com>
 In-Reply-To: <1547460140-1473-1-git-send-email-thuth@redhat.com>
 References: <1547460140-1473-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/25] hw/ssi: Remove SSIBus from
+Subject: [Qemu-devel] [PULL 16/25] hw/char/serial: Remove SerialState from
  "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,84 +30,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-There are only three header files requiring this typedef, let them
-include "hw/ssi/ssi.h" directly to simplify "qemu/typedefs.h".
+Files requiring SerialState already include "hw/char/serial.h".
 
-To clean "qemu/typedefs.h", move the forward declaration
-to "hw/ssi/ssi.h".
+To clean "qemu/typedefs.h", move the declaration to "hw/char/serial.h"
+(removing the forward declaration).
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-[thuth: slightly tweaked commit message]
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/strongarm.h      | 1 +
- include/hw/arm/pxa.h    | 1 +
- include/hw/ssi/pl022.h  | 1 +
- include/hw/ssi/ssi.h    | 1 +
- include/qemu/typedefs.h | 1 -
- 5 files changed, 4 insertions(+), 1 deletion(-)
+ include/hw/char/serial.h | 4 ++--
+ include/qemu/typedefs.h  | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/arm/strongarm.h b/hw/arm/strongarm.h
-index e98840b..ae51a1a 100644
---- a/hw/arm/strongarm.h
-+++ b/hw/arm/strongarm.h
-@@ -3,6 +3,7 @@
+diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+index 0acfbbc..abd5cf7 100644
+--- a/include/hw/char/serial.h
++++ b/include/hw/char/serial.h
+@@ -35,7 +35,7 @@
 =20
- #include "exec/memory.h"
- #include "target/arm/cpu-qom.h"
-+#include "hw/ssi/ssi.h"
+ #define UART_FIFO_LENGTH    16      /* 16550A Fifo Length */
 =20
- #define SA_CS0          0x00000000
- #define SA_CS1          0x08000000
-diff --git a/include/hw/arm/pxa.h b/include/hw/arm/pxa.h
-index f6dfb5c..f184349 100644
---- a/include/hw/arm/pxa.h
-+++ b/include/hw/arm/pxa.h
-@@ -13,6 +13,7 @@
- #include "exec/memory.h"
- #include "target/arm/cpu-qom.h"
- #include "hw/pcmcia.h"
-+#include "hw/ssi/ssi.h"
+-struct SerialState {
++typedef struct SerialState {
+     uint16_t divider;
+     uint8_t rbr; /* receive register */
+     uint8_t thr; /* transmit holding register */
+@@ -77,7 +77,7 @@ struct SerialState {
 =20
- /* Interrupt numbers */
- # define PXA2XX_PIC_SSP3	0
-diff --git a/include/hw/ssi/pl022.h b/include/hw/ssi/pl022.h
-index a080519..1cf16f1 100644
---- a/include/hw/ssi/pl022.h
-+++ b/include/hw/ssi/pl022.h
-@@ -22,6 +22,7 @@
- #define HW_SSI_PL022_H
+     QEMUTimer *modem_status_poll;
+     MemoryRegion io;
+-};
++} SerialState;
 =20
- #include "hw/sysbus.h"
-+#include "hw/ssi/ssi.h"
-=20
- #define TYPE_PL022 "pl022"
- #define PL022(obj) OBJECT_CHECK(PL022State, (obj), TYPE_PL022)
-diff --git a/include/hw/ssi/ssi.h b/include/hw/ssi/ssi.h
-index 6a0c3c3..bdbf3c5 100644
---- a/include/hw/ssi/ssi.h
-+++ b/include/hw/ssi/ssi.h
-@@ -13,6 +13,7 @@
-=20
- #include "hw/qdev.h"
-=20
-+typedef struct SSIBus SSIBus;
- typedef struct SSISlave SSISlave;
- typedef struct SSISlaveClass SSISlaveClass;
- typedef enum SSICSMode SSICSMode;
+ extern const VMStateDescription vmstate_serial;
+ extern const MemoryRegionOps serial_io_ops;
 diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 3bd9215..c026229 100644
+index 7271e98..4c694b7 100644
 --- a/include/qemu/typedefs.h
 +++ b/include/qemu/typedefs.h
-@@ -108,7 +108,6 @@ typedef struct Range Range;
- typedef struct SerialState SerialState;
+@@ -103,7 +103,6 @@ typedef struct QObject QObject;
+ typedef struct QString QString;
+ typedef struct RAMBlock RAMBlock;
+ typedef struct Range Range;
+-typedef struct SerialState SerialState;
  typedef struct SHPCDevice SHPCDevice;
- typedef struct SMBusDevice SMBusDevice;
--typedef struct SSIBus SSIBus;
  typedef struct uWireSlave uWireSlave;
  typedef struct VirtIODevice VirtIODevice;
- typedef struct Visitor Visitor;
 --=20
 1.8.3.1
