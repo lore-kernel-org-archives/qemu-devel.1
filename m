@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50983)
+Received: from eggs.gnu.org ([209.51.188.92]:51036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gizW3-0003tt-Js
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:30:49 -0500
+	(envelope-from <matwey.kornilov@gmail.com>) id 1gizWH-00044T-3f
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gizW2-00088F-VJ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:30:47 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44262)
+	(envelope-from <matwey.kornilov@gmail.com>) id 1gizWB-0008QN-KW
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:31:01 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46889)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gizW2-00086w-P7
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:30:46 -0500
-Received: by mail-wr1-f68.google.com with SMTP id z5so22154638wrt.11
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:30:46 -0800 (PST)
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-11-philmd@redhat.com>
-	<3d52c4eb-1254-08e2-440c-3edb42c2ba01@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1588529c-2606-5994-2a25-10e3488e7f28@redhat.com>
-Date: Mon, 14 Jan 2019 11:30:44 +0100
+	(Exim 4.71) (envelope-from <matwey.kornilov@gmail.com>)
+	id 1gizWB-0008Fh-Cc
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:30:55 -0500
+Received: by mail-oi1-x242.google.com with SMTP id x202so17414316oif.13
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:30:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <3d52c4eb-1254-08e2-440c-3edb42c2ba01@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 10/15] range: Remove Range from
- "qemu/typedefs.h"
+References: <q186f8$1u3$1@blaine.gmane.org>
+	<CAFEAcA9F+57RZzRTga8BvY_zCf13WX8d3NF6HA8kChtcw9_v6w@mail.gmail.com>
+	<CAJs94EZbyyxoXROG8=y7sfrQhmLhNj-mbyz6DSryYOJgqkTpzw@mail.gmail.com>
+	<CAJs94EZORmm69g-O7ttVrtNW_gpDqs9h_HoxA2Qp_c0yFijZeg@mail.gmail.com>
+	<CAFEAcA91Gx-XEUhSDQqgxOjmRTNjn=2NZ9-xDO3bJNQ=3oFxKw@mail.gmail.com>
+In-Reply-To: <CAFEAcA91Gx-XEUhSDQqgxOjmRTNjn=2NZ9-xDO3bJNQ=3oFxKw@mail.gmail.com>
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Date: Mon, 14 Jan 2019 13:30:39 +0300
+Message-ID: <CAJs94Ea5qT3tGV9bHPmL2O7dL0x6x67nCqVR0SEjMDWizDJs-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] qemu-user-linux: how could I measure performance
+ for aarch64 and arm?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +34,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 1/14/19 9:56 AM, Thomas Huth wrote:
-> On 2019-01-11 15:08, Philippe Mathieu-Daudé wrote:
->> Range is only used in "hw/pci-host/q35.h" in the MCHPCIState, and
->> in "hw/pci/pci.h" by pci_bus_get_w64_range().  Let them include
->> "qemu/range.h" directly to simplify "qemu/typedefs.h".
->>
->> To clean "qemu/typedefs.h", move the declaration to "qemu/range.h"
->> (removing the forward declaration).
-> 
-> Since Range seems to be meant as a common type (i.e. not specific to any
-> device like the other typedefs that you move in this series), I think
-> it's should be OK if this resides in typedefs.h ?
+=D0=BF=D0=BD, 14 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 13:24, Peter Mayde=
+ll <peter.maydell@linaro.org>:
+>
+> On Sun, 13 Jan 2019 at 07:31, Matwey V. Kornilov
+> <matwey.kornilov@gmail.com> wrote:
+> >
+> > =D0=BF=D1=82, 11 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 22:24, Matwey =
+V. Kornilov <matwey.kornilov@gmail.com>:
+> > > Indeed, qemu-arm from master runs for 4 minutes where 2.11 runs for 2
+> > > hours for me. It is impressive improvement.
+> >
+> > I've managed to bisected the first good (fast) commit:
+> >
+> > commit 2a53535af471f4bee9d6cb5b363746b8d5ed21dd
+> > Author: Luke Shumaker <lukeshu@parabola.nu>
+> > Date:   Thu Dec 28 13:08:13 2017 -0500
+> >
+> >     linux-user: init_guest_space: Try to make ARM space+commpage contin=
+uous
+> >
+> > Though I am not sure, how does it help.
+>
+> Oh, right, you were running into that bug:
+> https://bugs.launchpad.net/qemu/+bug/1740219
+>
+> The problem was that we were not putting things in the right
+> place in memory for 32-bit Arm guest binaries in particular,
+> which could mean that we spent a long time trying a lot of
+> placements for memory mappings that failed instead of getting
+> an arrangement that worked first time. This meant startup
+> time for the guest binary was pretty slow. I guess your
+> application does a lot of exec()ing of new processes?
 
-My idea was to clean files not very used, and this one is only used
-twice. Why rebuild the World if someone add another function or fix a
-typo in "qemu/range.h"?
-I agree this typedef is meant for global use however.
+Indeed. Thank you.
 
-Since I don't have a strong opinion, I'll drop it (until someone else
-respond to this thread).
+>
+> thanks
+> -- PMM
+
+
+
+--=20
+With best regards,
+Matwey V. Kornilov
