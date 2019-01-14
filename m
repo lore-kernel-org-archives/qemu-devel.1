@@ -1,28 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:45938)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2il-0004hh-5L
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:56:08 -0500
+	id 1gj2in-0004hh-DB
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:56:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2fW-0002dO-Um
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:50 -0500
+	id 1gj2fY-0002eS-7W
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:49 -0500
 Received: from smtp03.citrix.com ([162.221.156.55]:65464)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2fW-0002cK-Ib
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:46 -0500
+	id 1gj2fX-0002cK-Sl
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:48 -0500
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Mon, 14 Jan 2019 13:51:34 +0000
-Message-ID: <20190114135154.16826-6-anthony.perard@citrix.com>
+Date: Mon, 14 Jan 2019 13:51:38 +0000
+Message-ID: <20190114135154.16826-10-anthony.perard@citrix.com>
 In-Reply-To: <20190114135154.16826-1-anthony.perard@citrix.com>
 References: <20190114135154.16826-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 05/25] xen: introduce 'xen-block',
- 'xen-disk' and 'xen-cdrom'
+Subject: [Qemu-devel] [PULL 09/25] xen: add event channel interface for
+ XenDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,507 +36,218 @@ Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, An
 
 From: Paul Durrant <paul.durrant@citrix.com>
 
-This patch adds new XenDevice-s: 'xen-disk' and 'xen-cdrom', both derived
-from a common 'xen-block' parent type. These will eventually replace the
-'xen_disk' (note the underscore rather than hyphen) legacy PV backend but
-it is illustrative to build up the implementation incrementally, along with
-the XenBus/XenDevice framework. Subsequent patches will therefore add to
-these devices' implementation as new features are added to the framework.
-
-After this patch has been applied it is possible to instantiate new
-'xen-disk' or 'xen-cdrom' devices with a single 'vdev' parameter, which
-accepts values adhering to the Xen VBD naming scheme [1]. For example, a
-command-line instantiation of a xen-disk can be done with an argument
-similar to the following:
-
--device xen-disk,vdev=hda
-
-The implementation of the vdev parameter formulates the appropriate VBD
-number for use in the PV protocol.
-
-[1] https://xenbits.xen.org/docs/unstable/man/xen-vbd-interface.7.html
+The legacy PV backend infrastructure provides functions to bind, unbind
+and send notifications to event channnels. Similar functionality will be
+required by XenDevice implementations so this patch adds the necessary
+support.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
----
- MAINTAINERS                |   2 +-
- hw/block/Makefile.objs     |   1 +
- hw/block/trace-events      |   8 +
- hw/block/xen-block.c       | 343 +++++++++++++++++++++++++++++++++++++
- include/hw/xen/xen-block.h |  73 ++++++++
- 5 files changed, 426 insertions(+), 1 deletion(-)
- create mode 100644 hw/block/xen-block.c
- create mode 100644 include/hw/xen/xen-block.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 87f90721b9..7514550c06 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -414,7 +414,7 @@ F: hw/9pfs/xen-9p-backend.c
- F: hw/char/xen_console.c
- F: hw/display/xenfb.c
- F: hw/net/xen_nic.c
--F: hw/block/xen_*
-+F: hw/block/xen*
- F: hw/xen/
- F: hw/xenpv/
- F: hw/i386/xen/
-diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-index 53ce5751ae..f34813a377 100644
---- a/hw/block/Makefile.objs
-+++ b/hw/block/Makefile.objs
-@@ -4,6 +4,7 @@ common-obj-$(CONFIG_SSI_M25P80) += m25p80.o
- common-obj-$(CONFIG_NAND) += nand.o
- common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
- common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
-+common-obj-$(CONFIG_XEN) += xen-block.o
- common-obj-$(CONFIG_XEN) += xen_disk.o
- common-obj-$(CONFIG_ECC) += ecc.o
- common-obj-$(CONFIG_ONENAND) += onenand.o
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 335c092450..4afbd62a88 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -127,3 +127,11 @@ xen_disk_init(char *name) "%s"
- xen_disk_connect(char *name) "%s"
- xen_disk_disconnect(char *name) "%s"
- xen_disk_free(char *name) "%s"
+Patch squashed with:
+
+Patch "xen: add event channel interface for XenDevice-s" makes use of
+the type xenevtchn_port_or_error_t, but this isn't avaiable before Xen
+4.7. Also the function xen_device_bind_event_channel assign the return
+value of xenevtchn_bind_interdomain to channel->local_port but check the
+result for error with xendev->local_port.
+
+Fix by:
+- removing local_port from struct XenDevice as it isn't use anywere.
+- adding a compatibility typedef for xenevtchn_port_or_error_t for Xen
+  4.6 and earlier.
+
+As extra, replace the type of XenEventChannel->local_port by
+evtchn_port_t.
+
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+---
+ hw/xen/xen-bus.c            | 103 ++++++++++++++++++++++++++++++++++++
+ include/hw/xen/xen-bus.h    |  17 ++++++
+ include/hw/xen/xen_common.h |   1 +
+ 3 files changed, 121 insertions(+)
+
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index faa9fd3577..14881126ff 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -617,6 +617,83 @@ void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
+     g_free(xengnttab_segs);
+ }
+ 
++struct XenEventChannel {
++    evtchn_port_t local_port;
++    XenEventHandler handler;
++    void *opaque;
++    Notifier notifier;
++};
 +
-+# hw/block/xen-block.c
-+xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-+xen_block_unrealize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-+xen_disk_realize(void) ""
-+xen_disk_unrealize(void) ""
-+xen_cdrom_realize(void) ""
-+xen_cdrom_unrealize(void) ""
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-new file mode 100644
-index 0000000000..8e78b6a034
---- /dev/null
-+++ b/hw/block/xen-block.c
-@@ -0,0 +1,343 @@
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/cutils.h"
-+#include "qapi/error.h"
-+#include "qapi/visitor.h"
-+#include "hw/hw.h"
-+#include "hw/xen/xen-block.h"
-+#include "trace.h"
-+
-+static void xen_block_unrealize(XenDevice *xendev, Error **errp)
++static void event_notify(Notifier *n, void *data)
 +{
-+    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-+    XenBlockDeviceClass *blockdev_class =
-+        XEN_BLOCK_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(blockdev));
-+    XenBlockVdev *vdev = &blockdev->props.vdev;
++    XenEventChannel *channel = container_of(n, XenEventChannel, notifier);
++    unsigned long port = (unsigned long)data;
 +
-+    if (vdev->type == XEN_BLOCK_VDEV_TYPE_INVALID) {
++    if (port == channel->local_port) {
++        channel->handler(channel->opaque);
++    }
++}
++
++XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
++                                               unsigned int port,
++                                               XenEventHandler handler,
++                                               void *opaque, Error **errp)
++{
++    XenEventChannel *channel = g_new0(XenEventChannel, 1);
++    xenevtchn_port_or_error_t local_port;
++
++    local_port = xenevtchn_bind_interdomain(xendev->xeh,
++                                            xendev->frontend_id,
++                                            port);
++    if (local_port < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_bind_interdomain failed");
++
++        g_free(channel);
++        return NULL;
++    }
++
++    channel->local_port = local_port;
++    channel->handler = handler;
++    channel->opaque = opaque;
++    channel->notifier.notify = event_notify;
++
++    notifier_list_add(&xendev->event_notifiers, &channel->notifier);
++
++    return channel;
++}
++
++void xen_device_notify_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp)
++{
++    if (!channel) {
++        error_setg(errp, "bad channel");
 +        return;
 +    }
 +
-+    trace_xen_block_unrealize(type, vdev->disk, vdev->partition);
-+
-+    if (blockdev_class->unrealize) {
-+        blockdev_class->unrealize(blockdev, errp);
++    if (xenevtchn_notify(xendev->xeh, channel->local_port) < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_notify failed");
 +    }
 +}
 +
-+static void xen_block_realize(XenDevice *xendev, Error **errp)
++void xen_device_unbind_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp)
 +{
-+    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
-+    XenBlockDeviceClass *blockdev_class =
-+        XEN_BLOCK_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(blockdev));
-+    XenBlockVdev *vdev = &blockdev->props.vdev;
-+    Error *local_err = NULL;
-+
-+    if (vdev->type == XEN_BLOCK_VDEV_TYPE_INVALID) {
-+        error_setg(errp, "vdev property not set");
++    if (!channel) {
++        error_setg(errp, "bad channel");
 +        return;
 +    }
 +
-+    trace_xen_block_realize(type, vdev->disk, vdev->partition);
++    notifier_remove(&channel->notifier);
 +
-+    if (blockdev_class->realize) {
-+        blockdev_class->realize(blockdev, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+        }
-+    }
-+}
-+
-+static char *disk_to_vbd_name(unsigned int disk)
-+{
-+    char *name, *prefix = (disk >= 26) ?
-+        disk_to_vbd_name((disk / 26) - 1) : g_strdup("");
-+
-+    name = g_strdup_printf("%s%c", prefix, 'a' + disk % 26);
-+    g_free(prefix);
-+
-+    return name;
-+}
-+
-+static void xen_block_get_vdev(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    DeviceState *dev = DEVICE(obj);
-+    Property *prop = opaque;
-+    XenBlockVdev *vdev = qdev_get_prop_ptr(dev, prop);
-+    char *str;
-+
-+    switch (vdev->type) {
-+    case XEN_BLOCK_VDEV_TYPE_DP:
-+        str = g_strdup_printf("d%lup%lu", vdev->disk, vdev->partition);
-+        break;
-+
-+    case XEN_BLOCK_VDEV_TYPE_XVD:
-+    case XEN_BLOCK_VDEV_TYPE_HD:
-+    case XEN_BLOCK_VDEV_TYPE_SD: {
-+        char *name = disk_to_vbd_name(vdev->disk);
-+
-+        str = g_strdup_printf("%s%s%lu",
-+                              (vdev->type == XEN_BLOCK_VDEV_TYPE_XVD) ?
-+                              "xvd" :
-+                              (vdev->type == XEN_BLOCK_VDEV_TYPE_HD) ?
-+                              "hd" :
-+                              "sd",
-+                              name, vdev->partition);
-+        g_free(name);
-+        break;
-+    }
-+    default:
-+        error_setg(errp, "invalid vdev type");
-+        return;
++    if (xenevtchn_unbind(xendev->xeh, channel->local_port) < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_unbind failed");
 +    }
 +
-+    visit_type_str(v, name, &str, errp);
-+    g_free(str);
++    g_free(channel);
 +}
 +
-+static unsigned int vbd_name_to_disk(const char *name, const char **endp)
-+{
-+    unsigned int disk = 0;
-+
-+    while (*name != '\0') {
-+        if (!g_ascii_isalpha(*name) || !g_ascii_islower(*name)) {
-+            break;
-+        }
-+
-+        disk *= 26;
-+        disk += *name++ - 'a' + 1;
-+    }
-+    *endp = name;
-+
-+    return disk - 1;
-+}
-+
-+static void xen_block_set_vdev(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    DeviceState *dev = DEVICE(obj);
-+    Property *prop = opaque;
-+    XenBlockVdev *vdev = qdev_get_prop_ptr(dev, prop);
-+    Error *local_err = NULL;
-+    char *str, *p;
-+    const char *end;
-+
-+    if (dev->realized) {
-+        qdev_prop_set_after_realize(dev, name, errp);
-+        return;
+ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+ {
+     XenDevice *xendev = XEN_DEVICE(dev);
+@@ -641,6 +718,12 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+     xen_device_frontend_destroy(xendev);
+     xen_device_backend_destroy(xendev);
+ 
++    if (xendev->xeh) {
++        qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), NULL, NULL, NULL);
++        xenevtchn_close(xendev->xeh);
++        xendev->xeh = NULL;
 +    }
 +
-+    visit_type_str(v, name, &str, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
+     if (xendev->xgth) {
+         xengnttab_close(xendev->xgth);
+         xendev->xgth = NULL;
+@@ -657,6 +740,16 @@ static void xen_device_exit(Notifier *n, void *data)
+     xen_device_unrealize(DEVICE(xendev), &error_abort);
+ }
+ 
++static void xen_device_event(void *opaque)
++{
++    XenDevice *xendev = opaque;
++    unsigned long port = xenevtchn_pending(xendev->xeh);
++
++    notifier_list_notify(&xendev->event_notifiers, (void *)port);
++
++    xenevtchn_unmask(xendev->xeh, port);
++}
++
+ static void xen_device_realize(DeviceState *dev, Error **errp)
+ {
+     XenDevice *xendev = XEN_DEVICE(dev);
+@@ -697,6 +790,16 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
+     xendev->feature_grant_copy =
+         (xengnttab_grant_copy(xendev->xgth, 0, NULL) == 0);
+ 
++    xendev->xeh = xenevtchn_open(NULL, 0);
++    if (!xendev->xeh) {
++        error_setg_errno(errp, errno, "failed xenevtchn_open");
++        goto unrealize;
 +    }
 +
-+    p = strchr(str, 'd');
-+    if (!p) {
-+        goto invalid;
-+    }
++    notifier_list_init(&xendev->event_notifiers);
++    qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), xen_device_event, NULL,
++                        xendev);
 +
-+    *p++ = '\0';
-+    if (*str == '\0') {
-+        vdev->type = XEN_BLOCK_VDEV_TYPE_DP;
-+    } else if (strcmp(str, "xv") == 0) {
-+        vdev->type = XEN_BLOCK_VDEV_TYPE_XVD;
-+    } else if (strcmp(str, "h") == 0) {
-+        vdev->type = XEN_BLOCK_VDEV_TYPE_HD;
-+    } else if (strcmp(str, "s") == 0) {
-+        vdev->type = XEN_BLOCK_VDEV_TYPE_SD;
-+    } else {
-+        goto invalid;
-+    }
+     xen_device_backend_create(xendev, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index 63a09b67ee..b554559e5b 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -26,6 +26,8 @@ typedef struct XenDevice {
+     XenWatch *frontend_state_watch;
+     xengnttab_handle *xgth;
+     bool feature_grant_copy;
++    xenevtchn_handle *xeh;
++    NotifierList event_notifiers;
+ } XenDevice;
+ 
+ typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
+@@ -104,4 +106,19 @@ void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
+                                 XenDeviceGrantCopySegment segs[],
+                                 unsigned int nr_segs, Error **errp);
+ 
++typedef struct XenEventChannel XenEventChannel;
 +
-+    if (vdev->type == XEN_BLOCK_VDEV_TYPE_DP) {
-+        if (qemu_strtoul(p, &end, 10, &vdev->disk)) {
-+            goto invalid;
-+        }
++typedef void (*XenEventHandler)(void *opaque);
 +
-+        if (*end == 'p') {
-+            p = (char *) ++end;
-+            if (*end == '\0') {
-+                goto invalid;
-+            }
-+        }
-+    } else {
-+        vdev->disk = vbd_name_to_disk(p, &end);
-+    }
++XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
++                                               unsigned int port,
++                                               XenEventHandler handler,
++                                               void *opaque, Error **errp);
++void xen_device_notify_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp);
++void xen_device_unbind_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel,
++                                     Error **errp);
 +
-+    if (*end != '\0') {
-+        p = (char *)end;
-+
-+        if (qemu_strtoul(p, &end, 10, &vdev->partition)) {
-+            goto invalid;
-+        }
-+
-+        if (*end != '\0') {
-+            goto invalid;
-+        }
-+    } else {
-+        vdev->partition = 0;
-+    }
-+
-+    switch (vdev->type) {
-+    case XEN_BLOCK_VDEV_TYPE_DP:
-+    case XEN_BLOCK_VDEV_TYPE_XVD:
-+        if (vdev->disk < (1 << 4) && vdev->partition < (1 << 4)) {
-+            vdev->number = (202 << 8) | (vdev->disk << 4) |
-+                vdev->partition;
-+        } else if (vdev->disk < (1 << 20) && vdev->partition < (1 << 8)) {
-+            vdev->number = (1 << 28) | (vdev->disk << 8) |
-+                vdev->partition;
-+        } else {
-+            goto invalid;
-+        }
-+        break;
-+
-+    case XEN_BLOCK_VDEV_TYPE_HD:
-+        if ((vdev->disk == 0 || vdev->disk == 1) &&
-+            vdev->partition < (1 << 6)) {
-+            vdev->number = (3 << 8) | (vdev->disk << 6) | vdev->partition;
-+        } else if ((vdev->disk == 2 || vdev->disk == 3) &&
-+                   vdev->partition < (1 << 6)) {
-+            vdev->number = (22 << 8) | ((vdev->disk - 2) << 6) |
-+                vdev->partition;
-+        } else {
-+            goto invalid;
-+        }
-+        break;
-+
-+    case XEN_BLOCK_VDEV_TYPE_SD:
-+        if (vdev->disk < (1 << 4) && vdev->partition < (1 << 4)) {
-+            vdev->number = (8 << 8) | (vdev->disk << 4) | vdev->partition;
-+        } else {
-+            goto invalid;
-+        }
-+        break;
-+
-+    default:
-+        goto invalid;
-+    }
-+
-+    g_free(str);
-+    return;
-+
-+invalid:
-+    error_setg(errp, "invalid virtual disk specifier");
-+
-+    vdev->type = XEN_BLOCK_VDEV_TYPE_INVALID;
-+    g_free(str);
-+}
-+
-+/*
-+ * This property deals with 'vdev' names adhering to the Xen VBD naming
-+ * scheme described in:
-+ *
-+ * https://xenbits.xen.org/docs/unstable/man/xen-vbd-interface.7.html
-+ */
-+const PropertyInfo xen_block_prop_vdev = {
-+    .name  = "str",
-+    .description = "Virtual Disk specifier: d*p*/xvd*/hd*/sd*",
-+    .get = xen_block_get_vdev,
-+    .set = xen_block_set_vdev,
-+};
-+
-+static Property xen_block_props[] = {
-+    DEFINE_PROP("vdev", XenBlockDevice, props.vdev,
-+                xen_block_prop_vdev, XenBlockVdev),
-+    DEFINE_PROP_END_OF_LIST()
-+};
-+
-+static void xen_block_class_init(ObjectClass *class, void *data)
-+{
-+    DeviceClass *dev_class = DEVICE_CLASS(class);
-+    XenDeviceClass *xendev_class = XEN_DEVICE_CLASS(class);
-+
-+    xendev_class->realize = xen_block_realize;
-+    xendev_class->unrealize = xen_block_unrealize;
-+
-+    dev_class->props = xen_block_props;
-+}
-+
-+static const TypeInfo xen_block_type_info = {
-+    .name = TYPE_XEN_BLOCK_DEVICE,
-+    .parent = TYPE_XEN_DEVICE,
-+    .instance_size = sizeof(XenBlockDevice),
-+    .abstract = true,
-+    .class_size = sizeof(XenBlockDeviceClass),
-+    .class_init = xen_block_class_init,
-+};
-+
-+static void xen_disk_unrealize(XenBlockDevice *blockdev, Error **errp)
-+{
-+    trace_xen_disk_unrealize();
-+}
-+
-+static void xen_disk_realize(XenBlockDevice *blockdev, Error **errp)
-+{
-+    trace_xen_disk_realize();
-+}
-+
-+static void xen_disk_class_init(ObjectClass *class, void *data)
-+{
-+    DeviceClass *dev_class = DEVICE_CLASS(class);
-+    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
-+
-+    blockdev_class->realize = xen_disk_realize;
-+    blockdev_class->unrealize = xen_disk_unrealize;
-+
-+    dev_class->desc = "Xen Disk Device";
-+}
-+
-+static const TypeInfo xen_disk_type_info = {
-+    .name = TYPE_XEN_DISK_DEVICE,
-+    .parent = TYPE_XEN_BLOCK_DEVICE,
-+    .instance_size = sizeof(XenDiskDevice),
-+    .class_init = xen_disk_class_init,
-+};
-+
-+static void xen_cdrom_unrealize(XenBlockDevice *blockdev, Error **errp)
-+{
-+    trace_xen_cdrom_unrealize();
-+}
-+
-+static void xen_cdrom_realize(XenBlockDevice *blockdev, Error **errp)
-+{
-+    trace_xen_cdrom_realize();
-+}
-+
-+static void xen_cdrom_class_init(ObjectClass *class, void *data)
-+{
-+    DeviceClass *dev_class = DEVICE_CLASS(class);
-+    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
-+
-+    blockdev_class->realize = xen_cdrom_realize;
-+    blockdev_class->unrealize = xen_cdrom_unrealize;
-+
-+    dev_class->desc = "Xen CD-ROM Device";
-+}
-+
-+static const TypeInfo xen_cdrom_type_info = {
-+    .name = TYPE_XEN_CDROM_DEVICE,
-+    .parent = TYPE_XEN_BLOCK_DEVICE,
-+    .instance_size = sizeof(XenCDRomDevice),
-+    .class_init = xen_cdrom_class_init,
-+};
-+
-+static void xen_block_register_types(void)
-+{
-+    type_register_static(&xen_block_type_info);
-+    type_register_static(&xen_disk_type_info);
-+    type_register_static(&xen_cdrom_type_info);
-+}
-+
-+type_init(xen_block_register_types)
-diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
-new file mode 100644
-index 0000000000..29413256e9
---- /dev/null
-+++ b/include/hw/xen/xen-block.h
-@@ -0,0 +1,73 @@
-+/*
-+ * Copyright (c) 2018  Citrix Systems Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_XEN_BLOCK_H
-+#define HW_XEN_BLOCK_H
-+
-+#include "hw/xen/xen-bus.h"
-+
-+typedef enum XenBlockVdevType {
-+    XEN_BLOCK_VDEV_TYPE_INVALID,
-+    XEN_BLOCK_VDEV_TYPE_DP,
-+    XEN_BLOCK_VDEV_TYPE_XVD,
-+    XEN_BLOCK_VDEV_TYPE_HD,
-+    XEN_BLOCK_VDEV_TYPE_SD,
-+    XEN_BLOCK_VDEV_TYPE__MAX
-+} XenBlockVdevType;
-+
-+typedef struct XenBlockVdev {
-+    XenBlockVdevType type;
-+    unsigned long disk;
-+    unsigned long partition;
-+    unsigned long number;
-+} XenBlockVdev;
-+
-+typedef struct XenBlockProperties {
-+    XenBlockVdev vdev;
-+} XenBlockProperties;
-+
-+typedef struct XenBlockDevice {
-+    XenDevice xendev;
-+    XenBlockProperties props;
-+} XenBlockDevice;
-+
-+typedef void (*XenBlockDeviceRealize)(XenBlockDevice *blockdev, Error **errp);
-+typedef void (*XenBlockDeviceUnrealize)(XenBlockDevice *blockdev, Error **errp);
-+
-+typedef struct XenBlockDeviceClass {
-+    /*< private >*/
-+    XenDeviceClass parent_class;
-+    /*< public >*/
-+    XenBlockDeviceRealize realize;
-+    XenBlockDeviceUnrealize unrealize;
-+} XenBlockDeviceClass;
-+
-+#define TYPE_XEN_BLOCK_DEVICE  "xen-block"
-+#define XEN_BLOCK_DEVICE(obj) \
-+     OBJECT_CHECK(XenBlockDevice, (obj), TYPE_XEN_BLOCK_DEVICE)
-+#define XEN_BLOCK_DEVICE_CLASS(class) \
-+     OBJECT_CLASS_CHECK(XenBlockDeviceClass, (class), TYPE_XEN_BLOCK_DEVICE)
-+#define XEN_BLOCK_DEVICE_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(XenBlockDeviceClass, (obj), TYPE_XEN_BLOCK_DEVICE)
-+
-+typedef struct XenDiskDevice {
-+    XenBlockDevice blockdev;
-+} XenDiskDevice;
-+
-+#define TYPE_XEN_DISK_DEVICE  "xen-disk"
-+#define XEN_DISK_DEVICE(obj) \
-+     OBJECT_CHECK(XenDiskDevice, (obj), TYPE_XEN_DISK_DEVICE)
-+
-+typedef struct XenCDRomDevice {
-+    XenBlockDevice blockdev;
-+} XenCDRomDevice;
-+
-+#define TYPE_XEN_CDROM_DEVICE  "xen-cdrom"
-+#define XEN_CDROM_DEVICE(obj) \
-+     OBJECT_CHECK(XenCDRomDevice, (obj), TYPE_XEN_CDROM_DEVICE)
-+
-+#endif /* HW_XEN_BLOCK_H */
+ #endif /* HW_XEN_BUS_H */
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 93f631e5bf..9c3ac07d78 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -32,6 +32,7 @@ extern xc_interface *xen_xc;
+ typedef xc_interface xenforeignmemory_handle;
+ typedef xc_evtchn xenevtchn_handle;
+ typedef xc_gnttab xengnttab_handle;
++typedef evtchn_port_or_error_t xenevtchn_port_or_error_t;
+ 
+ #define xenevtchn_open(l, f) xc_evtchn_open(l, f);
+ #define xenevtchn_close(h) xc_evtchn_close(h)
 -- 
 Anthony PERARD
