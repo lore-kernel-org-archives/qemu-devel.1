@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44698)
+Received: from eggs.gnu.org ([209.51.188.92]:44773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz4n-0005Xs-2s
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:42 -0500
+	(envelope-from <thuth@redhat.com>) id 1giz4v-0005c7-Ot
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz4k-0007QQ-Uv
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41628)
+	(envelope-from <thuth@redhat.com>) id 1giz4t-0007VQ-NH
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52490)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz4j-0007N1-S9
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:34 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz4r-0007Tt-NJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:41 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 11:01:59 +0100
-Message-Id: <1547460140-1473-5-git-send-email-thuth@redhat.com>
+Date: Mon, 14 Jan 2019 11:02:05 +0100
+Message-Id: <1547460140-1473-11-git-send-email-thuth@redhat.com>
 In-Reply-To: <1547460140-1473-1-git-send-email-thuth@redhat.com>
 References: <1547460140-1473-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 04/25] util: check the return value of fcntl in
- qemu_set_{block, nonblock}
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 10/25] hw/input/ps2: Remove PS2State from
+ "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +30,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>
 
-From: Li Qiang <liq3ea@163.com>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Assert that the return value is not an error. This is like commit
-7e6478e7d4f for qemu_set_cloexec.
+PS2State is only used in "hw/input/ps2.h", there is no
+need to expose it via "qemu/typedefs.h".
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
+To clean "qemu/typedefs.h", move the forward declaration
+to "hw/input/ps2.h".
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- util/oslib-posix.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ include/hw/input/ps2.h  | 2 ++
+ include/qemu/typedefs.h | 1 -
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index c1bee2a..4ce1ba9 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -233,14 +233,18 @@ void qemu_set_block(int fd)
- {
-     int f;
-     f = fcntl(fd, F_GETFL);
--    fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
-+    assert(f != -1);
-+    f = fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
-+    assert(f != -1);
- }
- 
- void qemu_set_nonblock(int fd)
- {
-     int f;
-     f = fcntl(fd, F_GETFL);
--    fcntl(fd, F_SETFL, f | O_NONBLOCK);
-+    assert(f != -1);
-+    f = fcntl(fd, F_SETFL, f | O_NONBLOCK);
-+    assert(f != -1);
- }
- 
- int socket_set_fast_reuse(int fd)
--- 
+diff --git a/include/hw/input/ps2.h b/include/hw/input/ps2.h
+index 213aa16..b60455d 100644
+--- a/include/hw/input/ps2.h
++++ b/include/hw/input/ps2.h
+@@ -31,6 +31,8 @@
+ #define PS2_MOUSE_BUTTON_SIDE   0x08
+ #define PS2_MOUSE_BUTTON_EXTRA  0x10
+=20
++typedef struct PS2State PS2State;
++
+ /* ps2.c */
+ void *ps2_kbd_init(void (*update_irq)(void *, int), void *update_arg);
+ void *ps2_mouse_init(void (*update_irq)(void *, int), void *update_arg);
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 741935f..28a8b9e 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -83,7 +83,6 @@ typedef struct PixelFormat PixelFormat;
+ typedef struct PostcopyDiscardState PostcopyDiscardState;
+ typedef struct Property Property;
+ typedef struct PropertyInfo PropertyInfo;
+-typedef struct PS2State PS2State;
+ typedef struct QBool QBool;
+ typedef struct QDict QDict;
+ typedef struct QEMUBH QEMUBH;
+--=20
 1.8.3.1
