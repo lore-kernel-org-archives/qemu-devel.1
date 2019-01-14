@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51173)
+Received: from eggs.gnu.org ([209.51.188.92]:51198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk5-0002xZ-Ps
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk6-0002xd-9W
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk3-0006OT-ES
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:37 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60306)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk3-0006OY-Ey
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:38 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:60310)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipk2-0006KS-W5
+	id 1gipk3-0006Kj-1d
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:35 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:02:31 +0100
-Message-Id: <20190114000326.29847-11-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:02:38 +0100
+Message-Id: <20190114000326.29847-18-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/65] slirp: replace the poor-man string split
- with g_strsplit()
+Subject: [Qemu-devel] [PULL 17/65] slirp: remove FULL_BOLT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +28,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Use the glib function for the work, fix a potential crash on >256 words.
+Looking at git history, this looks like something from the past, when
+there was a tty layer. Let's remove it.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/misc.c | 21 +++------------------
- 1 file changed, 3 insertions(+), 18 deletions(-)
+ slirp/if.c           | 2 --
+ slirp/slirp_config.h | 7 -------
+ 2 files changed, 9 deletions(-)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index ce323ef92e..4840187750 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -88,11 +88,8 @@ fork_exec(struct socket *so, const char *ex)
- 	socklen_t addrlen =3D sizeof(addr);
-         socklen_t csaddrlen =3D sizeof(csaddr);
- 	int opt;
--	const char *argv[256];
--	/* don't want to clobber the original */
--	char *bptr;
--	const char *curarg;
--	int c, i, ret;
-+	char **argv;
-+	int ret;
- 	pid_t pid;
+diff --git a/slirp/if.c b/slirp/if.c
+index 590753c658..aa88cc4e76 100644
+--- a/slirp/if.c
++++ b/slirp/if.c
+@@ -131,12 +131,10 @@ diddit:
+ 		}
+ 	}
 =20
- 	DEBUG_CALL("fork_exec");
-@@ -156,19 +153,7 @@ fork_exec(struct socket *so, const char *ex)
- 		for (s =3D getdtablesize() - 1; s >=3D 3; s--)
- 		   close(s);
+-#ifndef FULL_BOLT
+ 	/*
+ 	 * This prevents us from malloc()ing too many mbufs
+ 	 */
+ 	if_start(ifm->slirp);
+-#endif
+ }
 =20
--		i =3D 0;
--		bptr =3D g_strdup(ex); /* No need to free() this */
--        do {
--			/* Change the string into argv[] */
--			curarg =3D bptr;
--			while (*bptr !=3D ' ' && *bptr !=3D (char)0)
--			   bptr++;
--			c =3D *bptr;
--			*bptr++ =3D (char)0;
--			argv[i++] =3D g_strdup(curarg);
--        } while (c);
+ /*
+diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
+index 721667e3ef..f0cc1c781b 100644
+--- a/slirp/slirp_config.h
++++ b/slirp/slirp_config.h
+@@ -5,13 +5,6 @@
+ /* Define to 1 if you want KEEPALIVE timers */
+ #define DO_KEEPALIVE 0
+=20
+-/* Define this if you want slirp to write to the tty as fast as it can *=
+/
+-/* This should only be set if you are using load-balancing, slirp does a=
+ */
+-/* pretty good job on single modems already, and seting this will make *=
+/
+-/* interactive sessions less responsive */
+-/* XXXXX Talk about having fast modem as unit 0 */
+-#undef FULL_BOLT
 -
--                argv[i] =3D NULL;
-+                argv =3D g_strsplit(ex, " ", -1);
- 		execvp(argv[0], (char **)argv);
-=20
- 		/* Ooops, failed, let's tell the user why */
+ /*********************************************************/
+ /*
+  * Autoconf defined configuration options
 --=20
 2.20.1
