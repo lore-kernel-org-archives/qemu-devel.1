@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33257)
+Received: from eggs.gnu.org ([209.51.188.92]:33401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gj044-0006zF-EJ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:05:59 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gj04Z-0007MW-Eh
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:06:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gj043-000830-Hj
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:05:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46382)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gj043-00080e-Bx
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:05:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gj041-0007ew-QG
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 11:05:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B67E02E80CD
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 11:05:53 +0000 (UTC)
+	(envelope-from <kwolf@redhat.com>) id 1gj04U-0000Ts-SX
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:06:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gj04N-00009j-16
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:06:18 -0500
+Date: Mon, 14 Jan 2019 12:01:04 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190114110104.GB6837@linux.fritz.box>
+References: <29ff1bde-73ab-3033-ac5d-1ecf79b523ee@msgid.tls.msk.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Jan 2019 10:53:29 -0000
-From: Daniel Berrange <1795100@bugs.launchpad.net>
-Reply-To: Bug 1795100 <1795100@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153818746845.29396.3425570709275982365.malonedeb@soybean.canonical.com>
-Message-Id: <154746320989.20384.17728890769906581562.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1795100] Re: VNC unix-domain socket unlink()ed
- prematurely
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <29ff1bde-73ab-3033-ac5d-1ecf79b523ee@msgid.tls.msk.ru>
+Subject: Re: [Qemu-devel] block: Update flags in bdrv_set_read_only()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +26,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, armbru@redhat.com
 
-It only affects VNC, not chardevs because the chardevs fail to call
-qio_channel_close() and just rely on finalize() cleaning up the open
-socket. To fix this we just need to made the code conditional on it
-being a listener socket
+Am 12.01.2019 um 18:08 hat Michael Tokarev geschrieben:
+>     commit eeae6a596b0efc092f5101c67683053e245e6250
+>     Author: Kevin Wolf <kwolf@redhat.com>
+>     Date:   Tue Oct 9 16:57:12 2018 +0200
+> 
+>         block: Update flags in bdrv_set_read_only()
+> 
+>         To fully change the read-only state of a node, we must not only change
+>         bs->read_only, but also update bs->open_flags.
+> 
+> sort of broke vfat support:
+> 
+>  $ qemu-system-x86_64 -hda fat:foo/
+>  WARNING: Image format was not specified for 'json:{"fat-type": 0, "dir": "foo/", "driver": "vvfat", "floppy": false, "rw": false}' and probing guessed raw.
+>           Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+>           Specify the 'raw' format explicitly to remove the restrictions.
+>  qemu-system-x86_64: Initialization of device ide-hd failed: Block node is read-only
+>  $ _
+> 
+> The warning is annoying but harmless, but the read-only error is fatal.
+> 
+> "Sort-of" is because there's a somewhat strange workaround:
+> 
+>   -hda fat:rw:foo/
+> 
+> but it is a bit more dangerous as well.
+> 
+> It looks like vfat should be handled differently somewhere, to
+> eliminate both the warning and the error?
 
-  if (qio_channel_has_feature(ioc, QIO_CHANNEL_FEATURE_LISTEN)) {
-   ...
-  }
+Hm... This is not nice, but obviously that patch is still correct.
 
--- =
+Essentially what you're saying is either:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1795100
+1. We want to be able to attach read-only backends to read-write guest
+   devices sometimes. If you actually do a write request then, you'll
+   get an I/O error,
 
-Title:
-  VNC unix-domain socket unlink()ed prematurely
+   or
 
-Status in QEMU:
-  New
+2. vvfat shouldn't expose a read-only backend, but a read-write one that
+   always fails when you write.
 
-Bug description:
-  With qemu 3.0.0 (I don't believe this happened with previous
-  versions), if I tell it `-vnc unix:/path/to/vnc.sock`, qemu will
-  unlink() that file when the first client disconnects, meaning that
-  once I disconnect, I can't ever reconnect without restarting the VM.
+I think 2. is easier to implement, but it's special casing vvfat. Does
+this make sense or is it a problem that needs to be solved more
+generically? If it's okay for a read-only FAT backend to be attached to
+an IDE disk that really needs a read-write backend, why wouldn't it be
+okay to attach e.g. a read-only HTTP backend? Or even a read-only image
+file on the local filesystem?
 
-  A stupid testcase demonstrating the issue:
+On the other hand, usually users wouldn't want to silently get a guest
+started up that produces I/O errors on the first write request when they
+just configured things wrong or have the wrong file permissions.
 
-  In terminal A:
+We can't do both at the same time, though. So what is the behaviour that
+we actually want regarding read-only backends and read-write guest
+devices?
 
-      $ qemu-system-x86_64 -vnc unix:$PWD/vnc.sock
-
-  In terminal B:
-
-      $ ls vnc.sock
-      vnc.sock
-      $ socat STDIO UNIX-CONNECT:vnc.sock <<<''
-      RFB 003.008
-      $ ls vnc.sock
-      ls: cannot access 'vnc.sock': No such file or directory
-
-  I have determined that the offending unlink() call is the one in
-  io/channel-socket.c:qio_channel_socket_close().  That call was first
-  introduced in commit d66f78e1eaa832f73c771d9df1b606fe75d52a50, which
-  first appeared in version 3.0.0.
-
-  This type of premature unlink() does not happen on monitor.sock with
-  `-monitor unix:/path/to/monitor.sock,server,nowait`.
-
-  I am not familiar enough with the QIO subsystem to suggest a fix that
-  fixes VNC, but preserves the QMP fix targeted in the offending commit.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1795100/+subscriptions
+Kevin
