@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54412)
+Received: from eggs.gnu.org ([209.51.188.92]:54501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gixm5-0003gy-MB
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:39:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1gixmX-0003vX-P2
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:39:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gixm4-0006j9-R4
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:39:13 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 14 Jan 2019 08:39:07 +0000
-Message-ID: <c81e4f45-f7d8-783b-38da-cad3dfcd8716@virtuozzo.com>
-References: <20190111194720.15671-1-eblake@redhat.com>
-	<20190111194720.15671-3-eblake@redhat.com>
-In-Reply-To: <20190111194720.15671-3-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D9958AC7D9871641B8AAB94E5A175B35@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1gixmX-0006tB-0f
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:39:41 -0500
+References: <20190111140857.4211-1-philmd@redhat.com>
+	<20190111140857.4211-3-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0dcc1ca3-6379-896a-f3b0-b2f2826eb55f@redhat.com>
+Date: Mon, 14 Jan 2019 09:39:06 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/8] nbd: Forbid nbd-server-stop when
- server is not running
+In-Reply-To: <20190111140857.4211-3-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 02/15] hw/pcmcia: Remove PCMCIACardState
+ from "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +25,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Andrzej Zaborowski <balrogg@gmail.com>
 
-MTEuMDEuMjAxOSAyMjo0NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gU2luY2Ugd2UgYWxyZWFkeSBm
-b3JiaWQgb3RoZXIgbmJkLXNlcnZlciBjb21tYW5kcyB3aGVuIG5vdA0KPiBpbiB0aGUgcmlnaHQg
-c3RhdGUsIGl0IGlzIHVubGlrZWx5IHRoYXQgYW55IGNhbGxlciB3YXMgcmVseWluZw0KPiBvbiBh
-IHNlY29uZCBzdG9wIHRvIGJlaGF2ZSBhcyBhIHNpbGVudCBuby1vcC4gIFVwZGF0ZSBpb3Rlc3QN
-Cj4gMjIzIHRvIHNob3cgdGhlIGltcHJvdmVkIGJlaGF2aW9yLg0KPiANCj4gU2lnbmVkLW9mZi1i
-eTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQoNCg0KUmV2aWV3ZWQtYnk6IFZsYWRp
-bWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAN
-Cj4gLS0tDQo+IHYzOiBuZXcgcGF0Y2gNCj4gLS0tDQo+ICAgYmxvY2tkZXYtbmJkLmMgICAgICAg
-ICAgICAgfCA1ICsrKysrDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMyAgICAgfCAyICstDQo+
-ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMy5vdXQgfCAyICstDQo+ICAgMyBmaWxlcyBjaGFuZ2Vk
-LCA3IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxv
-Y2tkZXYtbmJkLmMgYi9ibG9ja2Rldi1uYmQuYw0KPiBpbmRleCAxZDE3MGM4MGI4Mi4uY2E1ODQ5
-MTkxOTQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrZGV2LW5iZC5jDQo+ICsrKyBiL2Jsb2NrZGV2LW5i
-ZC5jDQo+IEBAIC0yMTQsNiArMjE0LDExIEBAIHZvaWQgcW1wX25iZF9zZXJ2ZXJfcmVtb3ZlKGNv
-bnN0IGNoYXIgKm5hbWUsDQo+IA0KPiAgIHZvaWQgcW1wX25iZF9zZXJ2ZXJfc3RvcChFcnJvciAq
-KmVycnApDQo+ICAgew0KPiArICAgIGlmICghbmJkX3NlcnZlcikgew0KPiArICAgICAgICBlcnJv
-cl9zZXRnKGVycnAsICJOQkQgc2VydmVyIG5vdCBydW5uaW5nIik7DQo+ICsgICAgICAgIHJldHVy
-bjsNCj4gKyAgICB9DQoNCnllcywgZXhhY3RseSBsaWtlIGluIHFtcF9uYmRfc2VydmVyX3JlbW92
-ZQ0KDQo+ICsNCj4gICAgICAgbmJkX2V4cG9ydF9jbG9zZV9hbGwoKTsNCj4gDQo+ICAgICAgIG5i
-ZF9zZXJ2ZXJfZnJlZShuYmRfc2VydmVyKTsNCj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90
-ZXN0cy8yMjMgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjIzDQo+IGluZGV4IDYxYjQ2YTJmMDY2Li5h
-NDAxNjA5MWIyMSAxMDA3NTUNCj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMw0KPiArKysg
-Yi90ZXN0cy9xZW11LWlvdGVzdHMvMjIzDQo+IEBAIC0xNzIsNyArMTcyLDcgQEAgX3NlbmRfcWVt
-dV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLXJlbW92ZSIsDQo+ICAg
-X3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLXJlbW92
-ZSIsDQo+ICAgICAiYXJndW1lbnRzIjp7Im5hbWUiOiJuMiJ9fScgImVycm9yIiAjIEF0dGVtcHQg
-ZHVwbGljYXRlIGNsZWFuDQo+ICAgX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1
-dGUiOiJuYmQtc2VydmVyLXN0b3AifScgInJldHVybiINCj4gLV9zZW5kX3FlbXVfY21kICRRRU1V
-X0hBTkRMRSAneyJleGVjdXRlIjoibmJkLXNlcnZlci1zdG9wIn0nICJyZXR1cm4iICMgT29wcw0K
-PiArX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLXN0
-b3AifScgImVycm9yIiAjIEFnYWluDQoNCmhtLCBpbnRlcmVzdGluZywgYnV0IGxvb2tzIGxpa2Ug
-dGhlIGxhdGVzdCAicmV0dXJuIiBvciAiZXJyb3IiIGlzIGFuIGV4dHJhIHRoaW5nLA0Kd2UgY2Fu
-IHVzZSAifSIgZm9yIGFsbCBxbXAgY29tbWFuZHMsIGFuZCBpdCB3b3J0aCBhZGRpbmcgX3NlbmRf
-cW1wX2NtZCB3cmFwcGVyLi4NCkJ1dCwgb2YgY291cnNlLCBpdCdzIG5vdCBhYm91dCB0aGVzZSBz
-ZXJpZXMuDQoNCj4gICBfc2VuZF9xZW11X2NtZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0ZSI6InF1
-aXQifScgInJldHVybiINCj4gDQo+ICAgIyBzdWNjZXNzLCBhbGwgZG9uZQ0KPiBkaWZmIC0tZ2l0
-IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMy5vdXQgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjIzLm91
-dA0KPiBpbmRleCBlNmVkZTA1OTFjZC4uOGE0ZDYzYTRmYzIgMTAwNjQ0DQo+IC0tLSBhL3Rlc3Rz
-L3FlbXUtaW90ZXN0cy8yMjMub3V0DQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMjMub3V0
-DQo+IEBAIC02OSw2ICs2OSw2IEBAIHJlYWQgMjA5NzE1Mi8yMDk3MTUyIGJ5dGVzIGF0IG9mZnNl
-dCAyMDk3MTUyDQo+ICAgeyJyZXR1cm4iOiB7fX0NCj4gICB7ImVycm9yIjogeyJjbGFzcyI6ICJH
-ZW5lcmljRXJyb3IiLCAiZGVzYyI6ICJFeHBvcnQgJ24yJyBpcyBub3QgZm91bmQifX0NCj4gICB7
-InJldHVybiI6IHt9fQ0KPiAteyJyZXR1cm4iOiB7fX0NCj4gK3siZXJyb3IiOiB7ImNsYXNzIjog
-IkdlbmVyaWNFcnJvciIsICJkZXNjIjogIk5CRCBzZXJ2ZXIgbm90IHJ1bm5pbmcifX0NCj4gICB7
-InJldHVybiI6IHt9fQ0KPiAgICoqKiBkb25lDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0K
-VmxhZGltaXINCg==
+On 2019-01-11 15:08, Philippe Mathieu-Daud=C3=A9 wrote:
+> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
+> There is only one file requiring this typedef (hw/arm/pxa.h),
+
+I'd suggest to replace "file" with "header file" here.
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+> let it include "hw/pcmcia.h" directly to simplify "qemu/typedefs.h".
+>=20
+> To clean "qemu/typedefs.h", move the declaration to "hw/pcmcia.h"
+> (removing the forward declaration).
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  include/hw/arm/pxa.h    | 1 +
+>  include/hw/pcmcia.h     | 4 ++--
+>  include/qemu/typedefs.h | 1 -
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/include/hw/arm/pxa.h b/include/hw/arm/pxa.h
+> index 0df1199caa..f6dfb5c0cf 100644
+> --- a/include/hw/arm/pxa.h
+> +++ b/include/hw/arm/pxa.h
+> @@ -12,6 +12,7 @@
+> =20
+>  #include "exec/memory.h"
+>  #include "target/arm/cpu-qom.h"
+> +#include "hw/pcmcia.h"
+> =20
+>  /* Interrupt numbers */
+>  # define PXA2XX_PIC_SSP3	0
+> diff --git a/include/hw/pcmcia.h b/include/hw/pcmcia.h
+> index 79cac9c761..1b4080764f 100644
+> --- a/include/hw/pcmcia.h
+> +++ b/include/hw/pcmcia.h
+> @@ -18,13 +18,13 @@ typedef struct PCMCIASocket {
+>  #define PCMCIA_CARD_CLASS(cls) \
+>      OBJECT_CLASS_CHECK(PCMCIACardClass, cls, TYPE_PCMCIA_CARD)
+> =20
+> -struct PCMCIACardState {
+> +typedef struct PCMCIACardState {
+>      /*< private >*/
+>      DeviceState parent_obj;
+>      /*< public >*/
+> =20
+>      PCMCIASocket *slot;
+> -};
+> +} PCMCIACardState;
+> =20
+>  typedef struct PCMCIACardClass {
+>      /*< private >*/
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 28a8b9e7c2..3bd9215d55 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -78,7 +78,6 @@ typedef struct PCIHostDeviceAddress PCIHostDeviceAddr=
+ess;
+>  typedef struct PCIHostState PCIHostState;
+>  typedef struct PCMachineClass PCMachineClass;
+>  typedef struct PCMachineState PCMachineState;
+> -typedef struct PCMCIACardState PCMCIACardState;
+>  typedef struct PixelFormat PixelFormat;
+>  typedef struct PostcopyDiscardState PostcopyDiscardState;
+>  typedef struct Property Property;
+>=20
