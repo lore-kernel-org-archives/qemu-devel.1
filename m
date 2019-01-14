@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36901)
+Received: from eggs.gnu.org ([209.51.188.92]:36924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1giqn6-0005Vb-Cf
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:11:49 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1giqn8-0005Xc-PX
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:11:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1giqn5-0000ox-Jm
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:11:48 -0500
-Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:44269)
+	(envelope-from <richard.henderson@linaro.org>) id 1giqn7-0000qL-Nk
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:11:50 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:33362)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1giqn5-0000oT-EE
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:11:47 -0500
-Received: by mail-pl1-x636.google.com with SMTP id e11so9337510plt.11
-	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 17:11:47 -0800 (PST)
+	id 1giqn7-0000pj-Gi
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:11:49 -0500
+Received: by mail-pf1-x442.google.com with SMTP id c123so9556250pfb.0
+	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 17:11:49 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 Jan 2019 12:11:09 +1100
-Message-Id: <20190114011122.5995-5-richard.henderson@linaro.org>
+Date: Mon, 14 Jan 2019 12:11:10 +1100
+Message-Id: <20190114011122.5995-6-richard.henderson@linaro.org>
 In-Reply-To: <20190114011122.5995-1-richard.henderson@linaro.org>
 References: <20190114011122.5995-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 04/17] target/arm: Fill in helper_mte_check
+Subject: [Qemu-devel] [PATCH 05/17] target/arm: Suppress tag check for
+ sp+offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,109 +30,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-Implements the rules of "PE generation of Checked and
-Unchecked accesses" which aren't already covered by XXX.
-Implements the rules of "PE handling of Tag Check Failure".
-
-Does not implement tag physical address space, so all
-operations reduce to unchecked so far.
+R0078 specifies that base register, or base register plus immediate
+offset, is unchecked when the base register is SP.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/mte_helper.c | 80 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 79 insertions(+), 1 deletion(-)
+ target/arm/translate-a64.c | 37 ++++++++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
 
-diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index a3226c44a4..6f4bc0aa04 100644
---- a/target/arm/mte_helper.c
-+++ b/target/arm/mte_helper.c
-@@ -25,8 +25,86 @@
- #include "exec/helper-proto.h"
- 
- 
-+static int get_allocation_tag(CPUARMState *env, uint64_t ptr)
-+{
-+    /* Tag storage not implemented.  */
-+    return -1;
-+}
-+
-+static int allocation_tag_from_addr(uint64_t ptr)
-+{
-+    return (extract64(ptr, 56, 4) + extract64(ptr, 55, 1)) & 15;
-+}
-+
- uint64_t HELPER(mte_check)(CPUARMState *env, uint64_t ptr)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 5c2577a9ac..ee95ba7165 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -336,12 +336,11 @@ static void gen_a64_set_pc(DisasContext *s, TCGv_i64 src)
+  * This is always a fresh temporary, as we need to be able to
+  * increment this independently of a dirty write-back address.
+  */
+-static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
++static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr, bool sp_off)
  {
--    /* Only unchecked implemented so far.  */
-+    ARMMMUIdx mmu_idx = arm_stage1_mmu_idx(env);
-+    ARMVAParameters param = aa64_va_parameters(env, ptr, mmu_idx, true);
-+    int ptr_tag, mem_tag;
-+
-+    /*
-+     * If TBI is disabled, then the access is unchecked.
-+     * While we filtered out TBI0==0 && TBI1==0 in cpu_get_tb_cpu_state,
-+     * we did not save separate bits for TBI0 != TBI1.
-+     */
-+    if (!param.tbi) {
-+        /* Do not ignore the top byte.  */
-+        return ptr;
-+    }
-+
-+    /*
-+     * If TCMA is enabled, then physical tag 0 is unchecked.
-+     * Note the rules R0076 & R0077 are written with logical tags,
-+     * and we need the physical tag below anyway.
-+     */
-+    ptr_tag = allocation_tag_from_addr(ptr);
-+    if (param.tcma && ptr_tag == 0) {
-+        goto pass;
-+    }
-+
-+    /*
-+     * If an access is made to an address that does not provide tag storage,
-+     * the result is implementation defined (R0006).  We choose to treat the
-+     * access as unchecked.
-+     * This is similar to MemAttr != Tagged, which are also unchecked.
-+     */
-+    mem_tag = get_allocation_tag(env, ptr);
-+    if (mem_tag < 0) {
-+        goto pass;
-+    }
-+
-+    /* If the tags do not match, the tag check operation fails.  */
-+    if (ptr_tag != mem_tag) {
-+        int el = arm_current_el(env);
-+        int tcf;
-+
-+        /* Indicate the tag check fail, both async and sync reporting.  */
-+        env->cp15.tfsr_el[el] |= 1 << param.select;
-+
-+        if (el == 0) {
-+            /* FIXME: ARMv8.1-VHE S2 translation regime.  */
-+            tcf = extract64(env->cp15.sctlr_el[1], 38, 2);
-+        } else {
-+            tcf = extract64(env->cp15.sctlr_el[el], 40, 2);
-+        }
-+        if (tcf == 1) {
-+            /* Tag check fail causes a synchronous exception.  */
-+            CPUState *cs = ENV_GET_CPU(env);
-+
-+            /*
-+             * In restore_state_to_opc, we set the exception syndrome
-+             * for the load or store operation.  Do that first so we
-+             * may overwrite that with the syndrome for the tag check.
-+             */
-+            cpu_restore_state(cs, GETPC(), true);
-+            env->exception.vaddress = ptr;
-+            raise_exception(env, EXCP_DATA_ABORT,
-+                            syn_data_abort_no_iss(el != 0, 0, 0, 0, 0, 0x11),
-+                            exception_target_el(env));
-+        }
-+    }
-+
-+ pass:
-+    /* Unchecked, or tag check pass.  Ignore the top byte.  */
-     return sextract64(ptr, 0, 55);
+     TCGv_i64 clean = new_tmp_a64(s);
+ 
+-    /* FIXME: SP+OFS is always unchecked.  */
+-    if (s->tbid && s->mte_active) {
++    if (s->tbid && s->mte_active && !sp_off) {
+         gen_helper_mte_check(clean, cpu_env, addr);
+     } else {
+         gen_top_byte_ignore(s, clean, addr, s->tbid);
+@@ -2374,7 +2373,7 @@ static void gen_compare_and_swap(DisasContext *s, int rs, int rt,
+     if (rn == 31) {
+         gen_check_sp_alignment(s);
+     }
+-    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn == 31);
+     tcg_gen_atomic_cmpxchg_i64(tcg_rs, clean_addr, tcg_rs, tcg_rt, memidx,
+                                size | MO_ALIGN | s->be_data);
  }
+@@ -2392,7 +2391,7 @@ static void gen_compare_and_swap_pair(DisasContext *s, int rs, int rt,
+     if (rn == 31) {
+         gen_check_sp_alignment(s);
+     }
+-    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn == 31);
+ 
+     if (size == 2) {
+         TCGv_i64 cmp = tcg_temp_new_i64();
+@@ -2517,7 +2516,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+         if (is_lasr) {
+             tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+         }
+-        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn == 31);
+         gen_store_exclusive(s, rs, rt, rt2, clean_addr, size, false);
+         return;
+ 
+@@ -2526,7 +2525,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+         if (rn == 31) {
+             gen_check_sp_alignment(s);
+         }
+-        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn == 31);
+         s->is_ldex = true;
+         gen_load_exclusive(s, rt, rt2, clean_addr, size, false);
+         if (is_lasr) {
+@@ -2546,7 +2545,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+             gen_check_sp_alignment(s);
+         }
+         tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+-        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn == 31);
+         do_gpr_st(s, cpu_reg(s, rt), clean_addr, size, true, rt,
+                   disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
+         return;
+@@ -2562,7 +2561,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+         if (rn == 31) {
+             gen_check_sp_alignment(s);
+         }
+-        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn == 31);
+         do_gpr_ld(s, cpu_reg(s, rt), clean_addr, size, false, false, true, rt,
+                   disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
+         tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+@@ -2576,7 +2575,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+             if (is_lasr) {
+                 tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+             }
+-            clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++            clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn == 31);
+             gen_store_exclusive(s, rs, rt, rt2, clean_addr, size, true);
+             return;
+         }
+@@ -2594,7 +2593,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+             if (rn == 31) {
+                 gen_check_sp_alignment(s);
+             }
+-            clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++            clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn == 31);
+             s->is_ldex = true;
+             gen_load_exclusive(s, rt, rt2, clean_addr, size, true);
+             if (is_lasr) {
+@@ -2784,7 +2783,7 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+     if (!postindex) {
+         tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+     }
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, rn == 31);
+ 
+     if (is_vector) {
+         if (is_load) {
+@@ -2922,7 +2921,7 @@ static void disas_ldst_reg_imm9(DisasContext *s, uint32_t insn,
+     if (!post_index) {
+         tcg_gen_addi_i64(dirty_addr, dirty_addr, imm9);
+     }
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, rn == 31);
+ 
+     if (is_vector) {
+         if (is_store) {
+@@ -3029,7 +3028,7 @@ static void disas_ldst_reg_roffset(DisasContext *s, uint32_t insn,
+     ext_and_shift_reg(tcg_rm, tcg_rm, opt, shift ? size : 0);
+ 
+     tcg_gen_add_i64(dirty_addr, dirty_addr, tcg_rm);
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, false);
+ 
+     if (is_vector) {
+         if (is_store) {
+@@ -3114,7 +3113,7 @@ static void disas_ldst_reg_unsigned_imm(DisasContext *s, uint32_t insn,
+     dirty_addr = read_cpu_reg_sp(s, rn, 1);
+     offset = imm12 << size;
+     tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, rn == 31);
+ 
+     if (is_vector) {
+         if (is_store) {
+@@ -3198,7 +3197,7 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
+     if (rn == 31) {
+         gen_check_sp_alignment(s);
+     }
+-    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn == 31);
+     tcg_rs = read_cpu_reg(s, rs, true);
+ 
+     if (o3_opc == 1) { /* LDCLR */
+@@ -3259,7 +3258,7 @@ static void disas_ldst_pac(DisasContext *s, uint32_t insn,
+     tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+ 
+     /* Note that "clean" and "dirty" here refer to TBI not PAC.  */
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, rn == 31);
+ 
+     tcg_rt = cpu_reg(s, rt);
+     do_gpr_ld(s, tcg_rt, clean_addr, size, /* is_signed */ false,
+@@ -3413,7 +3412,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+     elements = (is_q ? 16 : 8) / ebytes;
+ 
+     tcg_rn = cpu_reg_sp(s, rn);
+-    clean_addr = clean_data_tbi(s, tcg_rn);
++    clean_addr = clean_data_tbi(s, tcg_rn, rn == 31);
+     tcg_ebytes = tcg_const_i64(ebytes);
+ 
+     for (r = 0; r < rpt; r++) {
+@@ -3547,7 +3546,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+     }
+ 
+     tcg_rn = cpu_reg_sp(s, rn);
+-    clean_addr = clean_data_tbi(s, tcg_rn);
++    clean_addr = clean_data_tbi(s, tcg_rn, rn == 31);
+     tcg_ebytes = tcg_const_i64(ebytes);
+ 
+     for (xs = 0; xs < selem; xs++) {
 -- 
 2.17.2
