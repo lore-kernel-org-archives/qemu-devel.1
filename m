@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47202)
+Received: from eggs.gnu.org ([209.51.188.92]:48252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj0rI-0006Y7-L4
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:56:50 -0500
+	(envelope-from <cfergeau@redhat.com>) id 1gj0uY-0000vf-6i
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:00:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj0rG-0005rk-Q8
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:56:48 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gj0rE-0005pz-Oa
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:56:46 -0500
-Received: by mail-wr1-x444.google.com with SMTP id s12so22515650wrt.4
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 03:56:44 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Jan 2019 11:56:35 +0000
-Message-Id: <20190114115637.6335-3-peter.maydell@linaro.org>
-In-Reply-To: <20190114115637.6335-1-peter.maydell@linaro.org>
-References: <20190114115637.6335-1-peter.maydell@linaro.org>
+	(envelope-from <cfergeau@redhat.com>) id 1gj0uW-0007up-9N
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:00:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37168)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gj0uW-0007sp-0M
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:00:08 -0500
+Date: Mon, 14 Jan 2019 12:54:20 +0100
+From: Christophe Fergeau <cfergeau@redhat.com>
+Message-ID: <20190114115420.GR23773@natto.ory.fergeau.eu>
+References: <20181214105642.673-1-cfergeau@redhat.com>
+	<20190103105425.GF7733@stefanha-x1.localdomain>
+	<20190103141455.GP20900@natto.ory.fergeau.eu>
+	<20190104154034.GK30381@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/4] qom/cpu: Add cluster_index to CPUState
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="XiEhargoktrmcCDa"
+Content-Disposition: inline
+In-Reply-To: <20190104154034.GK30381@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v4] log: Make glib logging go through QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,169 +30,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Emilio G . Cota" <cota@braap.org>, Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-For TCG we want to distinguish which cluster a CPU is in, and
-we need to do it quickly. Cache the cluster index in the CPUState
-struct, by having the cluster object set cpu->cluster_index for
-each CPU child when it is realized.
 
-This means that board/SoC code must add all CPUs to the cluster
-before realizing the cluster object. Regrettably QOM provides no
-way to prevent adding children to a realized object and no way for
-the parent to be notified when a new child is added to it, so
-we don't have any way to enforce/assert this constraint; all
-we can do is document it in a comment.
+--XiEhargoktrmcCDa
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The restriction on how many clusters can exist in the system
-is imposed by TCG code which will be added in a subsequent commit,
-but the check to enforce it in cluster.c fits better in this one.
+On Fri, Jan 04, 2019 at 03:40:34PM +0000, Stefan Hajnoczi wrote:
+> On Thu, Jan 03, 2019 at 03:14:55PM +0100, Christophe Fergeau wrote:
+> > Hey,
+> >=20
+> > On Thu, Jan 03, 2019 at 10:54:25AM +0000, Stefan Hajnoczi wrote:
+> > > On Fri, Dec 14, 2018 at 11:56:42AM +0100, Christophe Fergeau wrote:
+> > > > +static void qemu_log_func(const gchar *log_domain,
+> > > > +                          GLogLevelFlags log_level,
+> > > > +                          const gchar *message,
+> > > > +                          gpointer user_data)
+> > > > +{
+> > > > +    switch (log_level & G_LOG_LEVEL_MASK) {
+> > > > +    case G_LOG_LEVEL_DEBUG:
+> > > > +        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disab=
+le debug
+> > > > +         * messages
+> > > > +         */
+> > > > +        if (qemu_glog_domains =3D=3D NULL) {
+> > > > +            break;
+> > > > +        }
+> > > > +        if (strcmp(qemu_glog_domains, "all") !=3D 0 &&
+> > > > +          (log_domain =3D=3D NULL || !strstr(qemu_glog_domains, lo=
+g_domain))) {
+> > > > +            break;
+> > > > +        }
+> > > > +        /* Fall through */
+> > > > +    case G_LOG_LEVEL_INFO:
+> > > > +        /* Fall through */
+> > > > +    case G_LOG_LEVEL_MESSAGE:
+> > > > +        info_report("%s: %s", log_domain, message);
+> > >=20
+> > > QEMU itself uses glib, so what happens if *_report() emit more log
+> > > messages?  Can this result in an infinite loop?
+> >=20
+> > If *_report try to output messages through the g_log API, glib will
+> > catch it and will abort, so not an infinite loop, but not a
+> > desirable outcome either.
+> >=20
+> > Some low-level logging functions which are going to dump the message
+> > without glib (or using g_log_default_handler()) are needed.
+> > The timestamping/prepending of 'error:', 'warning:' to the error message
+> > is done right below *_report (in vreport) so this looked like a good
+> > place for that.
+>=20
+> If you're confident that QEMU will never (indirectly) emit a glib log
+> message from the *_report() code path, then I'm happy.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
----
- include/hw/cpu/cluster.h | 19 +++++++++++++++++++
- include/qom/cpu.h        |  7 +++++++
- hw/cpu/cluster.c         | 33 +++++++++++++++++++++++++++++++++
- qom/cpu.c                |  1 +
- 4 files changed, 60 insertions(+)
+In these codepaths, I'm confident up to
+void monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
+{
+    if (cur_mon && !monitor_cur_is_qmp()) {
+        monitor_vprintf(cur_mon, fmt, ap);
+    } else {
+        vfprintf(stream, fmt, ap);
+    }
+}
 
-diff --git a/include/hw/cpu/cluster.h b/include/hw/cpu/cluster.h
-index 73818232437..d1bef315d10 100644
---- a/include/hw/cpu/cluster.h
-+++ b/include/hw/cpu/cluster.h
-@@ -34,12 +34,31 @@
-  * Arm big.LITTLE system) they should be in different clusters. If the CPUs do
-  * not have the same view of memory (for example the main CPU and a management
-  * controller processor) they should be in different clusters.
-+ *
-+ * A cluster is created by creating an object of TYPE_CPU_CLUSTER, and then
-+ * adding the CPUs to it as QOM child objects (e.g. using the
-+ * object_initialize_child() or object_property_add_child() functions).
-+ * All CPUs must be added as children before the cluster is realized.
-+ * (Regrettably QOM provides no way to prevent adding children to a realized
-+ * object and no way for the parent to be notified when a new child is added
-+ * to it, so this restriction is not checked for, but the system will not
-+ * behave correctly if it is not adhered to.)
-+ *
-+ * A CPU which is not put into any cluster will be considered implicitly
-+ * to be in a cluster with all the other "loose" CPUs, so all CPUs that are
-+ * not assigned to clusters must be identical.
-  */
- 
- #define TYPE_CPU_CLUSTER "cpu-cluster"
- #define CPU_CLUSTER(obj) \
-     OBJECT_CHECK(CPUClusterState, (obj), TYPE_CPU_CLUSTER)
- 
-+/*
-+ * This limit is imposed by TCG, which puts the cluster ID into an
-+ * 8 bit field (and uses all-1s for the default "not in any cluster").
-+ */
-+#define MAX_CLUSTERS 255
-+
- /**
-  * CPUClusterState:
-  * @cluster_id: The cluster ID. This value is for internal use only and should
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 1396f53e5b5..844becbcedc 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -279,6 +279,11 @@ struct qemu_work_item;
- /**
-  * CPUState:
-  * @cpu_index: CPU index (informative).
-+ * @cluster_index: Identifies which cluster this CPU is in.
-+ *   For boards which don't define clusters or for "loose" CPUs not assigned
-+ *   to a cluster this will be UNASSIGNED_CLUSTER_INDEX; otherwise it will
-+ *   be the same as the cluster-id property of the CPU object's TYPE_CPU_CLUSTER
-+ *   QOM parent.
-  * @nr_cores: Number of cores within this CPU package.
-  * @nr_threads: Number of threads within this CPU.
-  * @running: #true if CPU is currently running (lockless).
-@@ -404,6 +409,7 @@ struct CPUState {
- 
-     /* TODO Move common fields from CPUArchState here. */
-     int cpu_index;
-+    int cluster_index;
-     uint32_t halted;
-     uint32_t can_do_io;
-     int32_t exception_index;
-@@ -1109,5 +1115,6 @@ extern const struct VMStateDescription vmstate_cpu_common;
- #endif /* NEED_CPU_H */
- 
- #define UNASSIGNED_CPU_INDEX -1
-+#define UNASSIGNED_CLUSTER_INDEX -1
- 
- #endif
-diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
-index 9d50a235d5c..d672f54a620 100644
---- a/hw/cpu/cluster.c
-+++ b/hw/cpu/cluster.c
-@@ -20,19 +20,52 @@
- 
- #include "qemu/osdep.h"
- #include "hw/cpu/cluster.h"
-+#include "qom/cpu.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
-+#include "qemu/cutils.h"
- 
- static Property cpu_cluster_properties[] = {
-     DEFINE_PROP_UINT32("cluster-id", CPUClusterState, cluster_id, 0),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-+static void cpu_cluster_realize(DeviceState *dev, Error **errp)
-+{
-+    /* Iterate through all our CPU children and set their cluster_index */
-+    CPUClusterState *cluster = CPU_CLUSTER(dev);
-+    ObjectPropertyIterator iter;
-+    ObjectProperty *prop;
-+    Object *cluster_obj = OBJECT(dev);
-+
-+    if (cluster->cluster_id >= MAX_CLUSTERS) {
-+        error_setg(errp, "cluster-id must be less than %d", MAX_CLUSTERS);
-+        return;
-+    }
-+
-+    object_property_iter_init(&iter, cluster_obj);
-+    while ((prop = object_property_iter_next(&iter))) {
-+        Object *cpu_obj;
-+        CPUState *cpu;
-+
-+        if (!strstart(prop->type, "child<", NULL)) {
-+            continue;
-+        }
-+        cpu_obj = object_property_get_link(cluster_obj, prop->name, NULL);
-+        cpu = (CPUState *)object_dynamic_cast(cpu_obj, TYPE_CPU);
-+        if (!cpu) {
-+            continue;
-+        }
-+        cpu->cluster_index = cluster->cluster_id;
-+    }
-+}
-+
- static void cpu_cluster_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->props = cpu_cluster_properties;
-+    dc->realize = cpu_cluster_realize;
- }
- 
- static const TypeInfo cpu_cluster_type_info = {
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 5442a7323be..f5579b1cd50 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -364,6 +364,7 @@ static void cpu_common_initfn(Object *obj)
-     CPUClass *cc = CPU_GET_CLASS(obj);
- 
-     cpu->cpu_index = UNASSIGNED_CPU_INDEX;
-+    cpu->cluster_index = UNASSIGNED_CLUSTER_INDEX;
-     cpu->gdb_num_regs = cpu->gdb_num_g_regs = cc->gdb_num_core_regs;
-     /* *-user doesn't have configurable SMP topology */
-     /* the default value is changed by qemu_init_vcpu() for softmmu */
--- 
-2.20.1
+=46rom there, it was not obvious to me whether the monitor_vprintf
+codepath can be triggered from info/warn/error_report or not. If they
+can, I'd feel less confident that monitor_vprintf will never indirectly
+call glib log functions.
+
+Christophe
+
+
+>=20
+> Stefan
+
+
+
+--XiEhargoktrmcCDa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlw8eGgACgkQqdjCFCms
+bII+sBAAjroxu5yB0n7A69XIMZBH+t8jZYWIVZNrOuq574iLe5Y0ljXcHxvc1zMa
+9yyx9ZTrhTK4kBRsiDMQPs9aJfDUPBlwSHGjoufrDQr+gHu5eNr1NTpAdK1AU4V0
+4QNtSMOYn7OEXtFvkmac9gU5Bt80JGSDQ60cUohFehAXGiv5j7tQpALOX1CABlZB
+bwFQHIf2pKF8cro6kNgZ52SzYzEuuNz2rnK2IHaFDRX06LjXnGtSv/QN8p3F6rUV
+NabZ5S2qRgROZn4QGQvraH9xuk5sSMc4Kpm1b0cizeRCK5cbvs7w9VwT63dyPI7W
+wxzWJD0+w4518xxyWk4UIhyAlRbAGoOdgbC/JOsrIaQKh8q73oWayZ1Qh5s7/q1C
+QE3ExvlcTVry7e+uZbB2QIJaukEg/KTKZDT/SKBHffI0d4zV90lGtoh3nUkskrTJ
+aSDgks676mCbrOuP0ABM+rLWgg5PsXEOuerL8AUUIJxQXkpIuyAOJGWKvUVY+lAx
+vpPNmXl6hH4P5LP9zD4dakhMJIwn+jrvKUU+0SWoaCLowZ7OGlxcEvLrTdiSAt2T
+k2zKerjHeBXewZysH7mjmdBAktbni5QVbYa6dCaG9F8LbgNUZb6vhjSfhtaLFOxH
+CSepCP6S+sxYyOjnsDIUOAdYB3caHBtrl1uXxcUMmHGk0yE0jRQ=
+=E9To
+-----END PGP SIGNATURE-----
+
+--XiEhargoktrmcCDa--
