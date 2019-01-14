@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51284)
+Received: from eggs.gnu.org ([209.51.188.92]:51895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gj2zw-0001NF-4d
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:13:55 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gj32k-0003Qu-L5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:16:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gj2zu-0003Jo-6b
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:13:52 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:54621)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gj2zs-0003Iy-5O
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:13:48 -0500
-Date: Mon, 14 Jan 2019 09:13:42 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20190114141342.GA27530@flamenco>
-References: <20190114104641.19186-1-alex.bennee@linaro.org>
+	(envelope-from <cohuck@redhat.com>) id 1gj32j-0004Mr-Us
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:16:46 -0500
+Date: Mon, 14 Jan 2019 15:16:36 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190114151636.630d4b31.cohuck@redhat.com>
+In-Reply-To: <6e0d217f-3027-bff8-b9fd-13469e940c97@linux.ibm.com>
+References: <1546963310-17024-1-git-send-email-akrowiak@linux.ibm.com>
+	<5a7e9130-30d1-84ad-0737-5023b718b99c@redhat.com>
+	<54bc1f9c-e997-cb1b-77cb-0dce478fafdc@linux.ibm.com>
+	<d4599c55-2d71-e1e9-ec7a-cffbc7d06abe@redhat.com>
+	<20190109123037.7f51888f.cohuck@redhat.com>
+	<fb665b3b-9bbf-e2bd-8618-b080d4c2453d@linux.ibm.com>
+	<105c451b-6873-b7a9-1c3a-e3b8fe7d4af3@redhat.com>
+	<20190109181302.2ac8b249@oc2783563651>
+	<bbcfd6dd-38b8-5d98-ac4b-3b17d63983fe@redhat.com>
+	<6e0d217f-3027-bff8-b9fd-13469e940c97@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190114104641.19186-1-alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] [RFC PATCH] tests: use g_usleep instead of rem =
- sleep(time)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x/vfio-ap: Implement hot plug/unplug
+ of vfio-ap device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,21 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, pbonzini@redhat.com
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, jjherne@linux.ibm.com, peter.maydell@linaro.org, pasic@linux.vnet.ibm.com, fiuczy@linux.ibm.com, alex.williamson@redhat.com, mjrosato@linux.ibm.com, pmorel@linux.ibm.com, alifm@linux.ibm.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-On Mon, Jan 14, 2019 at 10:46:41 +0000, Alex Bennée wrote:
-> Relying on sleep to always return having slept isn't safe as a signal
-> may have occurred. If signals are constantly incoming the program will
-> never reach it's termination condition. This is believed to be the
-> mechanism causing time outs for qht-test in Travis.
+On Thu, 10 Jan 2019 11:22:48 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> >>> Can you extend this patch description a little bit, including what we
+> >>> discussed here?  
+> >>
+> >> Maybe a short comment that explains why qdev_simple_device_unplug_cb()
+> >> is appropriate as well (i.e. hits that closing the mdev's fd is what
+> >> triggers the cleanup of the actual resources)? I personally go log
+> >> digging only once I get desperate.  
+> > 
+> > I go digging if I can't find a public document on how it works ;)  
 > 
-> The glib g_usleep() deals with all of this for us so lets use it instead.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Which reminds me, I will also need to update the docs/vfio-ap.txt
+> document.
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-
-Thanks,
-
-		E.
+So, I assume there will be a v2 with some documentation changes?
