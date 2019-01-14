@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42119)
+Received: from eggs.gnu.org ([209.51.188.92]:42710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gj0Wt-0004fH-6A
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:35:44 -0500
+	(envelope-from <berrange@redhat.com>) id 1gj0Zi-0006nd-SP
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:38:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gj0Wq-0001Y2-FG
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:35:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37106)
+	(envelope-from <berrange@redhat.com>) id 1gj0Zf-00036I-7O
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:38:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gj0Wq-0001Wc-4c
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:35:40 -0500
-Date: Mon, 14 Jan 2019 12:35:20 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190114113520.GC6837@linux.fritz.box>
-References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
-	<154703599022.13472.1704009113561450219.stgit@pasha-VirtualBox>
-	<20190111104923.GD5010@dhcp-200-186.str.redhat.com>
-	<001001d4abf9$b6ea93e0$24bfbba0$@ru>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gj0Zd-000348-8D
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:38:35 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 582A188E48
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 11:38:31 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 14 Jan 2019 11:38:27 +0000
+Message-Id: <20190114113827.24388-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <001001d4abf9$b6ea93e0$24bfbba0$@ru>
-Subject: Re: [Qemu-devel] [PATCH v9 19/21] replay: add BH oneshot event for
- block layer
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] io: ensure UNIX client doesn't unlink server
+ socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +31,297 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
-Am 14.01.2019 um 12:10 hat Pavel Dovgalyuk geschrieben:
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Am 09.01.2019 um 13:13 hat Pavel Dovgalyuk geschrieben:
-> > > Replay is capable of recording normal BH events, but sometimes
-> > > there are single use callbacks scheduled with aio_bh_schedule_oneshot
-> > > function. This patch enables recording and replaying such callbacks.
-> > > Block layer uses these events for calling the completion function.
-> > > Replaying these calls makes the execution deterministic.
-> > >
-> > > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > 
-> > This still doesn't come even close to catching all BHs that need to be
-> > caught. While you managed to show a few BHs that actually don't need to
-> > be considered for recording when I asked for this in v7, most BHs in the
-> > block layer can in some way lead to device callbacks and must therefore
-> > be recorded.
-> 
-> Let's have a brief review. I can change all the places, but how
-> should I make a test case to be sure, that all of them are working ok?
+The qio_channel_socket_close method for was mistakenly unlinking the
+UNIX server socket, even if the channel was a client connection. This
+was not noticed with chardevs, since they never call close, but with the
+VNC server, this caused the VNC server socket to be deleted after the
+first client quit.
 
-The list is changing all the time. This is why I am so concerned about
-special-casing a few callers instead of having a generic solution. I
-don't know how we could make sure that we call the right function
-everywhere.
+The qio_channel_socket_close method also needlessly reimplemented the
+logic that already exists in socket_listen_cleanup(). Just call that
+method directly, for listen sockets only.
 
-> aio_bh_schedule_oneshot is used in:
->  - blk_abort_aio_request
->  - bdrv_co_yield_to_drain
->  - iscsi_co_generic_cb
->  - nfs_co_generic_cb
->  - null_aio_common
->  - nvme_process_completion
->  - nvme_rw_cb
->  - rbd_finish_aiocb
->  - vxhs_iio_callback
->  - (and couple of others not in the block layer)
+This fixes a regression introduced in QEMU 3.0.0 with
 
-In addition to these, we have at least a few functions that just resume
-block layer coroutines rather than directly scheduling a BH with a
-callback somewhere in the block layer.
+  commit d66f78e1eaa832f73c771d9df1b606fe75d52a50
+  Author: Pavel Balaev <mail@void.so>
+  Date:   Mon May 21 19:17:35 2018 +0300
 
-> We must change this call to replay_bh_schedule_oneshot_event when
-> the result of the BH execution affects the replayed guest state
-> (e.g., interrupt request is generated or memory is written)
-> 
-> If you think that all of these can do that, then I should change
-> such function calls.
+    Delete AF_UNIX socket after close
 
-I haven't reviewed the code, but these names look like all of them can
-eventually call back into the guest devices. They won't do that always,
-but potentially.
+Fixes launchpad #1795100
 
-> > How bad would it be to record some BHs even if recording them isn't
-> > necessary? I'd definitely try to err on the safe side here. Having two
-> > different sets of BH functions, you can't expect that people always use
-> > the right one (especially if you don't even make the existing code base
-> > consistently use the right one intially).
-> 
-> There are two possible options:
-> 1. Execution hangs when recording. Kind of deadlock caused by the incorrect
->    management of the events. E.g., adding stopping the VM and trying to flush
->    the block layer queue.
-> 2. Execution hangs when replaying. 
->    One of the events that affect the guest state is missed or generated
->    at the other moment (e.g., when BH is not linked to the execution step).
->    Then the guest behaves differently and the order of the events in the log
->    does not match the guest state (e.g., interrupt processing is not matched).
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ io/channel-socket.c            | 19 ++------
+ tests/test-io-channel-socket.c | 86 ++++++++++++++++++++++++++++++----
+ 2 files changed, 80 insertions(+), 25 deletions(-)
 
-So basically when you have two events that are kind of nested? Operation
-A triggers event A, but in order to complete the operation, you call
-operation B with event B internally, which isn't available yet because
-we're still handling event A?
-
-Could this be solved by not having an order of events, but an order of
-sets of events?
-
-Kevin
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index b50e63a053..bc5f80e780 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -688,10 +688,13 @@ qio_channel_socket_close(QIOChannel *ioc,
+     int rc =3D 0;
+=20
+     if (sioc->fd !=3D -1) {
+-        SocketAddress *addr =3D socket_local_address(sioc->fd, errp);
+ #ifdef WIN32
+         WSAEventSelect(sioc->fd, NULL, 0);
+ #endif
++        if (qio_channel_has_feature(ioc, QIO_CHANNEL_FEATURE_LISTEN)) {
++            socket_listen_cleanup(sioc->fd, errp);
++        }
++
+         if (closesocket(sioc->fd) < 0) {
+             sioc->fd =3D -1;
+             error_setg_errno(errp, errno,
+@@ -699,20 +702,6 @@ qio_channel_socket_close(QIOChannel *ioc,
+             return -1;
+         }
+         sioc->fd =3D -1;
+-
+-        if (addr && addr->type =3D=3D SOCKET_ADDRESS_TYPE_UNIX
+-            && addr->u.q_unix.path) {
+-            if (unlink(addr->u.q_unix.path) < 0 && errno !=3D ENOENT) {
+-                error_setg_errno(errp, errno,
+-                                 "Failed to unlink socket %s",
+-                                 addr->u.q_unix.path);
+-                rc =3D -1;
+-            }
+-        }
+-
+-        if (addr) {
+-            qapi_free_SocketAddress(addr);
+-        }
+     }
+     return rc;
+ }
+diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socke=
+t.c
+index 0597213f93..c253ae30f5 100644
+--- a/tests/test-io-channel-socket.c
++++ b/tests/test-io-channel-socket.c
+@@ -49,6 +49,7 @@ static void test_io_channel_set_socket_bufs(QIOChannel =
+*src,
+=20
+ static void test_io_channel_setup_sync(SocketAddress *listen_addr,
+                                        SocketAddress *connect_addr,
++                                       QIOChannel **srv,
+                                        QIOChannel **src,
+                                        QIOChannel **dst)
+ {
+@@ -78,7 +79,7 @@ static void test_io_channel_setup_sync(SocketAddress *l=
+isten_addr,
+=20
+     test_io_channel_set_socket_bufs(*src, *dst);
+=20
+-    object_unref(OBJECT(lioc));
++    *srv =3D QIO_CHANNEL(lioc);
+ }
+=20
+=20
+@@ -99,6 +100,7 @@ static void test_io_channel_complete(QIOTask *task,
+=20
+ static void test_io_channel_setup_async(SocketAddress *listen_addr,
+                                         SocketAddress *connect_addr,
++                                        QIOChannel **srv,
+                                         QIOChannel **src,
+                                         QIOChannel **dst)
+ {
+@@ -146,21 +148,34 @@ static void test_io_channel_setup_async(SocketAddre=
+ss *listen_addr,
+     qio_channel_set_delay(*src, false);
+     test_io_channel_set_socket_bufs(*src, *dst);
+=20
+-    object_unref(OBJECT(lioc));
++    *srv =3D QIO_CHANNEL(lioc);
+=20
+     g_main_loop_unref(data.loop);
+ }
+=20
+=20
++static void test_io_channel_socket_path_exists(SocketAddress *addr,
++                                               bool expectExists)
++{
++    if (addr->type !=3D SOCKET_ADDRESS_TYPE_UNIX) {
++        return;
++    }
++
++    g_assert(g_file_test(addr->u.q_unix.path,
++                         G_FILE_TEST_EXISTS) =3D=3D expectExists);
++}
++
++
+ static void test_io_channel(bool async,
+                             SocketAddress *listen_addr,
+                             SocketAddress *connect_addr,
+                             bool passFD)
+ {
+-    QIOChannel *src, *dst;
++    QIOChannel *src, *dst, *srv;
+     QIOChannelTest *test;
+     if (async) {
+-        test_io_channel_setup_async(listen_addr, connect_addr, &src, &ds=
+t);
++        test_io_channel_setup_async(listen_addr, connect_addr,
++                                    &srv, &src, &dst);
+=20
+         g_assert(!passFD ||
+                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PAS=
+S));
+@@ -169,14 +184,25 @@ static void test_io_channel(bool async,
+         g_assert(qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_SHUTDO=
+WN));
+         g_assert(qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_SHUTDO=
+WN));
+=20
++        test_io_channel_socket_path_exists(listen_addr, true);
++
+         test =3D qio_channel_test_new();
+         qio_channel_test_run_threads(test, true, src, dst);
+         qio_channel_test_validate(test);
+=20
++        test_io_channel_socket_path_exists(listen_addr, true);
++
++        /* unref without close, to ensure finalize() cleans up */
++
+         object_unref(OBJECT(src));
+         object_unref(OBJECT(dst));
++        test_io_channel_socket_path_exists(listen_addr, true);
+=20
+-        test_io_channel_setup_async(listen_addr, connect_addr, &src, &ds=
+t);
++        object_unref(OBJECT(srv));
++        test_io_channel_socket_path_exists(listen_addr, false);
++
++        test_io_channel_setup_async(listen_addr, connect_addr,
++                                    &srv, &src, &dst);
+=20
+         g_assert(!passFD ||
+                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PAS=
+S));
+@@ -189,10 +215,24 @@ static void test_io_channel(bool async,
+         qio_channel_test_run_threads(test, false, src, dst);
+         qio_channel_test_validate(test);
+=20
++        /* close before unref, to ensure finalize copes with already clo=
+sed */
++
++        qio_channel_close(src, &error_abort);
++        qio_channel_close(dst, &error_abort);
++        test_io_channel_socket_path_exists(listen_addr, true);
++
+         object_unref(OBJECT(src));
+         object_unref(OBJECT(dst));
++        test_io_channel_socket_path_exists(listen_addr, true);
++
++        qio_channel_close(srv, &error_abort);
++        test_io_channel_socket_path_exists(listen_addr, false);
++
++        object_unref(OBJECT(srv));
++        test_io_channel_socket_path_exists(listen_addr, false);
+     } else {
+-        test_io_channel_setup_sync(listen_addr, connect_addr, &src, &dst=
+);
++        test_io_channel_setup_sync(listen_addr, connect_addr,
++                                   &srv, &src, &dst);
+=20
+         g_assert(!passFD ||
+                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PAS=
+S));
+@@ -201,14 +241,25 @@ static void test_io_channel(bool async,
+         g_assert(qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_SHUTDO=
+WN));
+         g_assert(qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_SHUTDO=
+WN));
+=20
++        test_io_channel_socket_path_exists(listen_addr, true);
++
+         test =3D qio_channel_test_new();
+         qio_channel_test_run_threads(test, true, src, dst);
+         qio_channel_test_validate(test);
+=20
++        test_io_channel_socket_path_exists(listen_addr, true);
++
++        /* unref without close, to ensure finalize() cleans up */
++
+         object_unref(OBJECT(src));
+         object_unref(OBJECT(dst));
++        test_io_channel_socket_path_exists(listen_addr, true);
++
++        object_unref(OBJECT(srv));
++        test_io_channel_socket_path_exists(listen_addr, false);
+=20
+-        test_io_channel_setup_sync(listen_addr, connect_addr, &src, &dst=
+);
++        test_io_channel_setup_sync(listen_addr, connect_addr,
++                                   &srv, &src, &dst);
+=20
+         g_assert(!passFD ||
+                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PAS=
+S));
+@@ -221,8 +272,23 @@ static void test_io_channel(bool async,
+         qio_channel_test_run_threads(test, false, src, dst);
+         qio_channel_test_validate(test);
+=20
++        test_io_channel_socket_path_exists(listen_addr, true);
++
++        /* close before unref, to ensure finalize copes with already clo=
+sed */
++
++        qio_channel_close(src, &error_abort);
++        qio_channel_close(dst, &error_abort);
++        test_io_channel_socket_path_exists(listen_addr, true);
++
+         object_unref(OBJECT(src));
+         object_unref(OBJECT(dst));
++        test_io_channel_socket_path_exists(listen_addr, true);
++
++        qio_channel_close(srv, &error_abort);
++        test_io_channel_socket_path_exists(listen_addr, false);
++
++        object_unref(OBJECT(srv));
++        test_io_channel_socket_path_exists(listen_addr, false);
+     }
+ }
+=20
+@@ -316,7 +382,6 @@ static void test_io_channel_unix(bool async)
+=20
+     qapi_free_SocketAddress(listen_addr);
+     qapi_free_SocketAddress(connect_addr);
+-    g_assert(g_file_test(TEST_SOCKET, G_FILE_TEST_EXISTS) =3D=3D FALSE);
+ }
+=20
+=20
+@@ -335,7 +400,7 @@ static void test_io_channel_unix_fd_pass(void)
+ {
+     SocketAddress *listen_addr =3D g_new0(SocketAddress, 1);
+     SocketAddress *connect_addr =3D g_new0(SocketAddress, 1);
+-    QIOChannel *src, *dst;
++    QIOChannel *src, *dst, *srv;
+     int testfd;
+     int fdsend[3];
+     int *fdrecv =3D NULL;
+@@ -359,7 +424,7 @@ static void test_io_channel_unix_fd_pass(void)
+     connect_addr->type =3D SOCKET_ADDRESS_TYPE_UNIX;
+     connect_addr->u.q_unix.path =3D g_strdup(TEST_SOCKET);
+=20
+-    test_io_channel_setup_sync(listen_addr, connect_addr, &src, &dst);
++    test_io_channel_setup_sync(listen_addr, connect_addr, &srv, &src, &d=
+st);
+=20
+     memcpy(bufsend, "Hello World", G_N_ELEMENTS(bufsend));
+=20
+@@ -412,6 +477,7 @@ static void test_io_channel_unix_fd_pass(void)
+=20
+     object_unref(OBJECT(src));
+     object_unref(OBJECT(dst));
++    object_unref(OBJECT(srv));
+     qapi_free_SocketAddress(listen_addr);
+     qapi_free_SocketAddress(connect_addr);
+     unlink(TEST_SOCKET);
+--=20
+2.19.2
