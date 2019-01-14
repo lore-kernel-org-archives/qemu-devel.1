@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36974)
+Received: from eggs.gnu.org ([209.51.188.92]:37485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj9Ig-0005pl-6Q
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:57:40 -0500
+	(envelope-from <david@redhat.com>) id 1gj9L4-000726-L5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:00:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj9If-00035r-3W
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:57:38 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190114133257.30299-3-stefanha@redhat.com>
-References: <20190114133257.30299-1-stefanha@redhat.com>
-	<20190114133257.30299-3-stefanha@redhat.com>
-Date: Mon, 14 Jan 2019 21:57:21 +0100
-Message-ID: <w51ef9f7ya6.fsf@maestria.local.igalia.com>
+	(envelope-from <david@redhat.com>) id 1gj9L2-0003nJ-FZ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:00:06 -0500
+References: <20190110210358.24035-1-david@redhat.com>
+	<4988f58e-4bc5-c622-53b7-cfda758304e1@redhat.com>
+	<20190111103828.058ccc6c.cohuck@redhat.com>
+	<c30709c1-9348-e4c9-22bb-95d6183163f3@linux.ibm.com>
+	<20190114184431.56795d44.cohuck@redhat.com>
+	<beff9759-d95f-4ba6-d049-aada148e162d@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8db3c201-e92f-4d1d-ff7b-bd6de4d37ebb@redhat.com>
+Date: Mon, 14 Jan 2019 21:59:58 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] iotests: add 238 for throttling tgm
- unregister iothread segfault
+In-Reply-To: <beff9759-d95f-4ba6-d049-aada148e162d@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1] s390x/pci: Send correct
+ event on hotplug.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +29,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Mon 14 Jan 2019 02:32:57 PM CET, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> Hot-unplug a scsi-hd using an iothread.  The previous patch fixes a
-> segfault in this scenario.
->
-> This patch adds a regression test.
->
-> Suggested-by: Alberto Garcia <berto@igalia.com>
-> Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 14.01.19 21:00, Collin Walling wrote:
+> On 1/14/19 12:44 PM, Cornelia Huck wrote:
+>> [restored cc:s]
+>>
+>> On Mon, 14 Jan 2019 11:06:19 +0100
+>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>
+>>> On 11/01/2019 10:38, Cornelia Huck wrote:
+>>>> On Fri, 11 Jan 2019 08:16:41 +0100
+>>>> David Hildenbrand <david@redhat.com> wrote:
+>>>>  =20
+>>>>> On 10.01.19 22:03, David Hildenbrand wrote: =20
+>>>>>> Comit 2c28c490571f ("s390x/pci: let pci devices start in configure=
+d mode")
+>>>>>> changed the initial state of zPCI devices from ZPCI_FS_STANDBY to
+>>>>>> ZPCI_FS_DISABLED (a.k.a. configured). However we still only send a
+>>>>>> HP_EVENT_RESERVED_TO_STANDBY event to the guest, indicating a wron=
+g
+>>>>>> state.
+>>>>>>
+>>>>>> Let's send a HP_EVENT_TO_CONFIGURED event instead, to match the ac=
+tual
+>>>>>> state the device is in.
+>>>>>>
+>>>>>> This fixes hotplugged devices having to be enabled explicitly in t=
+he
+>>>>>> guest e.g. via echo 1 > /sys/bus/pci/slots/00000000/power.
+>>>>>>
+>>>>>> Fixes: 2c28c490571f ("s390x/pci: let pci devices start in configur=
+ed mode")
+>>>>>> Report-by: Cornelia Huck <cohuck@redhat.com> =20
+>>>>
+>>>> Cool, works for me as well.
+>>>>
+>>>> Tested-by: Cornelia Huck <cohuck@redhat.com>
+>>>>
+>>>> Do we want to cc:stable? Probably not, as it's more annoying than
+>>>> critical, and pci hotplug does not seem to be much used on s390x.
+>>>>  =20
+>>>>>
+>>>>> If this patch is the right thing to do, then
+>>>>>
+>>>>> 1. s/Report-by/Reported-by/
+>>>>> 2. Dropping the "." from the subject
+>>>>>
+>>>>> (yes, it was late) =20
+>>>>
+>>>> :) Can do while applying.
+>>>>  =20
+>>>>>
+>>>>> I wonder if we should do both events sequentially, but as I don't h=
+ave
+>>>>> access to the architecture I have to rely on that this works :) =20
+>>>>
+>>>> Yep, let's wait for feedback from folks with architecture access.
+>>>>  =20
+>>>
+>>> Works fine on the architecture too.
+>>>
+>>> Seems the logical thing to do for me.
+>>>
+>>> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+>>
+>> Thanks for checking.
+>>
+>> I'd like to queue this, but I'd like an ack from Collin as well.
+>>
+>=20
+> Would you mind adding a comment somewhere that states something like
+> "we can safely bypass the standby state when PCI hotplugging for a gues=
+t"=20
+> just to be clear that QEMU is a bit different from how we handle it on =
+the LPAR
+> level?
+>=20
+> That comment would more-or-less clarify why we set the ZPCI_FS_<STATE> =
+directly
+> to disabled instead of to standby when hotplugging (which, AFAIU, is th=
+e order=20
+> how things occur at the LPAR level)
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+This patch relies on Christians patch, where the general concept was
+explained. As we changed the initial state, we have to send a
+corresponding hotplug event. But still we can add a comment to shine
+some light on the general concept.
 
-Berto
+@Conny, can you add after the first paragraph: (or let me know if you
+want a respin)
+
+"On real HW, a PCI device always pops up in the STANDBY state. In QEMU,
+we decided to let it show up directly in the configured state (as
+configuring it is otherwise just an extra burden for the admin). We can
+safely bypass the STANDBY state when hotplugging PCI devices to a guest."
+
+>=20
+> Otherwise,
+>=20
+> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+
+Thanks!
+
+--=20
+
+Thanks,
+
+David / dhildenb
