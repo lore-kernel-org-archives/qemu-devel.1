@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46164)
+Received: from eggs.gnu.org ([209.51.188.92]:46344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1gj9uG-0000na-Tc
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:36:29 -0500
+	(envelope-from <rth7680@gmail.com>) id 1gj9ug-00012G-AO
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:36:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1gj9uE-0005HQ-F0
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:36:27 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33033)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1gj9u9-00059j-1r
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:36:23 -0500
-Received: by mail-ot1-x341.google.com with SMTP id i20so590126otl.0
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 13:36:10 -0800 (PST)
+	(envelope-from <rth7680@gmail.com>) id 1gj9ud-0005WT-QP
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:36:53 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1547467955-17245-1-git-send-email-thuth@redhat.com>
+	<30917d5b-f8cb-e799-6c3e-3202195122b4@redhat.com>
+	<871s5fp54s.fsf@linaro.org>
+	<e94b51d7-c90f-b599-fb68-ea8c2603989b@redhat.com>
+	<87zhs3nk1m.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a0646a85-603d-99a8-c676-76e43a42e0fb@twiddle.net>
+Date: Tue, 15 Jan 2019 08:36:24 +1100
 MIME-Version: 1.0
-References: <20190109144736.17452-1-pagupta@redhat.com>
-	<20190110012617.GA4205@dastard>
-	<1326478078.61913951.1547192704870.JavaMail.zimbra@redhat.com>
-	<20190113232902.GD4205@dastard>
-	<20190113233820.GX6310@bombadil.infradead.org>
-	<942065073.64011540.1547450140670.JavaMail.zimbra@redhat.com>
-	<20190114212501.GG4205@dastard>
-In-Reply-To: <20190114212501.GG4205@dastard>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Mon, 14 Jan 2019 13:35:57 -0800
-Message-ID: <CAPcyv4jtPcLV-s0sKNHwwk0ug7GLBV6699dpm1h3r2xSo879dg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
+In-Reply-To: <87zhs3nk1m.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
+ with Clang on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Matthew Wilcox <willy@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, virtualization@lists.linux-foundation.org, Linux ACPI <linux-acpi@vger.kernel.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ross Zwisler <zwisler@kernel.org>, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, David Hildenbrand <david@redhat.com>, jmoyer <jmoyer@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, lcapitulino@redhat.com, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Theodore Ts'o <tytso@mit.edu>, adilger kernel <adilger.kernel@dilger.ca>, darrick wong <darrick.wong@oracle.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On Mon, Jan 14, 2019 at 1:25 PM Dave Chinner <david@fromorbit.com> wrote:
->
-> On Mon, Jan 14, 2019 at 02:15:40AM -0500, Pankaj Gupta wrote:
-> >
-> > > > Until you have images (and hence host page cache) shared between
-> > > > multiple guests. People will want to do this, because it means they
-> > > > only need a single set of pages in host memory for executable
-> > > > binaries rather than a set of pages per guest. Then you have
-> > > > multiple guests being able to detect residency of the same set of
-> > > > pages. If the guests can then, in any way, control eviction of the
-> > > > pages from the host cache, then we have a guest-to-guest information
-> > > > leak channel.
-> > >
-> > > I don't think we should ever be considering something that would allow a
-> > > guest to evict page's from the host's pagecache [1].  The guest should
-> > > be able to kick its own references to the host's pagecache out of its
-> > > own pagecache, but not be able to influence whether the host or another
-> > > guest has a read-only mapping cached.
-> > >
-> > > [1] Unless the guest is allowed to modify the host's file; obviously
-> > > truncation, holepunching, etc are going to evict pages from the host's
-> > > page cache.
-> >
-> > This is so correct. Guest does not not evict host page cache pages directly.
->
-> They don't right now.
->
-> But someone is going to end up asking for discard to work so that
-> the guest can free unused space in the underlying spares image (i.e.
-> make use of fstrim or mount -o discard) because they have workloads
-> that have bursts of space usage and they need to trim the image
-> files afterwards to keep their overall space usage under control.
->
-> And then....
+On 1/15/19 5:58 AM, Alex Bennée wrote:
+> 
+> Thomas Huth <thuth@redhat.com> writes:
+> 
+>> On 2019-01-14 17:37, Alex Bennée wrote:
+>>>
+>>> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+>>>
+>>>> On 1/14/19 1:12 PM, Thomas Huth wrote:
+>>>>> Clang v7.0.1 does not like the __int128 variable type for inline
+>>>>> assembly on s390x:
+>>>>>
+>>>>> In file included from fpu/softfloat.c:97:
+>>>>> include/fpu/softfloat-macros.h:647:9: error: inline asm error:
+>>>>>  This value type register class is not natively supported!
+>>>>>     asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+>>>>>         ^
+>>>>>
+>>>>> Disable this code part there now when compiling with Clang, so that
+>>>>> the generic code gets used instead.
+>>>>>
+>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>>> ---
+>>>>>  include/fpu/softfloat-macros.h | 2 +-
+>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
+>>>>> index b1d772e..bd5b641 100644
+>>>>> --- a/include/fpu/softfloat-macros.h
+>>>>> +++ b/include/fpu/softfloat-macros.h
+>>>>> @@ -641,7 +641,7 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
+>>>>>      uint64_t q;
+>>>>>      asm("divq %4" : "=a"(q), "=d"(*r) : "0"(n0), "1"(n1), "rm"(d));
+>>>>>      return q;
+>>>>> -#elif defined(__s390x__)
+>>>>> +#elif defined(__s390x__) && !defined(__clang__)
+>>>>
+>>>> Can we rather check if __int128 is natively supported? So this part get
+>>>> compiled once Clang do support it, else we'll never use it...
+>>>
+>>> We already define CONFIG_INT128 so you could just use that.
+>>>
+>>> Thomas does the s390 clang leave CONFIG_INT128=y in config-host.mak?
+>>
+>> Yes, CONFIG_INT128=y is also set with Clang on s390x. It's really just
+>> that it does not like __int128  to be passed as parameters for inline
+>> assembly...
+> 
+> What about something like this:
+> 
+> modified   include/fpu/softfloat-macros.h
+> @@ -641,12 +641,6 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
+>      uint64_t q;
+>      asm("divq %4" : "=a"(q), "=d"(*r) : "0"(n0), "1"(n1), "rm"(d));
+>      return q;
+> -#elif defined(__s390x__)
+> -    /* Need to use a TImode type to get an even register pair for DLGR.  */
+> -    unsigned __int128 n = (unsigned __int128)n1 << 64 | n0;
+> -    asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+> -    *r = n >> 64;
+> -    return n;
+>  #elif defined(_ARCH_PPC64) && defined(_ARCH_PWR7)
+>      /* From Power ISA 2.06, programming note for divdeu.  */
+>      uint64_t q1, q2, Q, r1, r2, R;
+> @@ -663,6 +657,11 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
+>      }
+>      *r = R;
+>      return Q;
+> +#elif defined(CONFIG_INT128)
+> +    unsigned __int128 n = (unsigned __int128)n1 << 64 | n0;
+> +    unsigned __int128 q = n / d;
+> +    *r = q >> 64;
+> +    return q;
 
-...we reject / push back on that patch citing the above concern.
+Because that is not what the assembly does, for one.
 
-> > In case of virtio-pmem & DAX, guest clears guest page cache exceptional entries.
-> > Its solely decision of host to take action on the host page cache pages.
-> >
-> > In case of virtio-pmem, guest does not modify host file directly i.e don't
-> > perform hole punch & truncation operation directly on host file.
->
-> ... this will no longer be true, and the nuclear landmine in this
-> driver interface will have been armed....
+But perhaps
 
-I agree with the need to be careful when / if explicit cache control
-is added, but that's not the case today.
+    unsigned __int128 n = (unsigned __int128)n1 << 64 | n0;
+    *r = n % d;
+    return n / d;
+
+will allow the compiler to do what the assembly does for some 64-bit hosts.
+
+
+r~
