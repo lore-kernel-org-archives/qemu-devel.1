@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39030)
+Received: from eggs.gnu.org ([209.51.188.92]:39943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj0L9-0004Lz-9B
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:23:39 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gj0OL-00073u-L2
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:26:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj0L8-0007df-9D
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:23:35 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:39536)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj0L8-0007cD-3N
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:23:34 -0500
-Received: by mail-wm1-f65.google.com with SMTP id y8so8414782wmi.4
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 03:23:33 -0800 (PST)
-References: <20181213162727.17438-1-lvivier@redhat.com>
-	<20181213162727.17438-2-lvivier@redhat.com>
-	<7aef3078-085d-b020-e89d-ae30082381b4@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <17f7469d-1ee0-b2e0-9866-c634f1d41832@redhat.com>
-Date: Mon, 14 Jan 2019 12:23:31 +0100
+	(envelope-from <eric.auger@redhat.com>) id 1gj0OJ-00031Z-OI
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:26:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38624)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gj0OH-0002sg-Fp
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:26:51 -0500
+References: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <dc702e9b-8416-e4da-b256-f5d58e2150fd@redhat.com>
+Date: Mon, 14 Jan 2019 12:26:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <7aef3078-085d-b020-e89d-ae30082381b4@redhat.com>
+In-Reply-To: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] block/ssh: Convert from DPRINTF()
- macro to trace events
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Questions about VFIO enabling MSIX vector
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,114 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Richard W.M. Jones" <rjones@redhat.com>, Liu Yuan <namei.unix@gmail.com>
+To: Heyi Guo <guoheyi@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, wanghaibin 00208455 <wanghaibin.wang@huawei.com>
 
-On 1/14/19 12:15 PM, Max Reitz wrote:
-> On 13.12.18 17:27, Laurent Vivier wrote:
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>
->> Notes:
->>     v2: use %zu with size_t
->>         change an uint64_t to int64_t to match % PRIi64
->>
->>  block/ssh.c        | 46 +++++++++++++++++-----------------------------
->>  block/trace-events | 17 +++++++++++++++++
->>  2 files changed, 34 insertions(+), 29 deletions(-)
->>
->> diff --git a/block/ssh.c b/block/ssh.c
->> index 7fbc27abdf..bbc513e095 100644
->> --- a/block/ssh.c
->> +++ b/block/ssh.c
-> 
-> [...]
-> 
->> @@ -1038,9 +1026,9 @@ static coroutine_fn int ssh_read(BDRVSSHState *s, BlockDriverState *bs,
->>       */
->>      for (got = 0; got < size; ) {
->>      again:
->> -        DPRINTF("sftp_read buf=%p size=%zu", buf, end_of_vec - buf);
->> +        trace_ssh_read_buf(buf, end_of_vec - buf);
->>          r = libssh2_sftp_read(s->sftp_handle, buf, end_of_vec - buf);
->> -        DPRINTF("sftp_read returned %zd", r);
->> +        trace_ssh_read_return(r);
-> 
-> (Here...
-> 
->>  
->>          if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
->>              co_yield(s, bs);
-> 
-> [...]
-> 
->> @@ -1108,9 +1096,9 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
->>  
->>      for (written = 0; written < size; ) {
->>      again:
->> -        DPRINTF("sftp_write buf=%p size=%zu", buf, end_of_vec - buf);
->> +        trace_ssh_write_buf(buf, end_of_vec - buf);
->>          r = libssh2_sftp_write(s->sftp_handle, buf, end_of_vec - buf);
->> -        DPRINTF("sftp_write returned %zd", r);
->> +        trace_ssh_write_return(r);
-> 
-> ...and here r is of type ssize_t)
-> 
->>  
->>          if (r == LIBSSH2_ERROR_EAGAIN || r == LIBSSH2_ERROR_TIMEOUT) {
->>              co_yield(s, bs);
-> 
-> [...]
-> 
->> diff --git a/block/trace-events b/block/trace-events
->> index 3e8c47bb24..e1dfd9713a 100644
->> --- a/block/trace-events
->> +++ b/block/trace-events
->> @@ -156,3 +156,20 @@ nvme_cmd_map_qiov_iov(void *s, int i, void *page, int pages) "s %p iov[%d] %p pa
->>  
->>  # block/iscsi.c
->>  iscsi_xcopy(void *src_lun, uint64_t src_off, void *dst_lun, uint64_t dst_off, uint64_t bytes, int ret) "src_lun %p offset %"PRIu64" dst_lun %p offset %"PRIu64" bytes %"PRIu64" ret %d"
->> +
->> +# block/ssh.c
->> +ssh_restart_coroutine(void *co) "co=%p"
->> +ssh_flush(void) "fsync"
->> +ssh_check_host_key_knownhosts(const char *key) "host key OK: %s"
->> +ssh_connect_to_ssh(char *path, int flags, int mode) "opening file %s flags=0x%x creat_mode=0%o"
->> +ssh_co_yield(int sock, void *rd_handler, void *wr_handler) "s->sock=%d rd_handler=%p wr_handler=%p"
->> +ssh_co_yield_back(int sock) "s->sock=%d - back"
->> +ssh_getlength(int64_t length) "length=%" PRIi64
->> +ssh_co_create_opts(uint64_t size) "total_size=%" PRIu64
->> +ssh_read(int64_t offset, size_t size) "offset=%" PRIi64 " size=%zu"
->> +ssh_read_buf(void *buf, size_t size) "sftp_read buf=%p size=%zu"
->> +ssh_read_return(size_t ret) "sftp_read returned %zu"
-> 
-> Shouldn't this be ssize_t and %zi/%zd?
+Hi,
 
-Oops good catch.
+On 1/12/19 3:30 AM, Heyi Guo wrote:
+> Hi folks,
+> 
+> I have some questions about vfio_msix_vector_do_use() in hw/vfio/pci.c,
+> could you help to explain?
+> 
+> We can see that when guest tries to enable one specific MSIX vector by
+> unmasking MSIX Vector Control, the access will be trapped and then into
+> function vfio_msix_vector_do_use(). And we may go to the below branch in
+> line 525:
+> 
+> 
+> 520
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l520>
+> /*
+> 521
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l521>
+> * We don't want to have the host allocate all possible MSI vectors
+> 522
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l522>
+> * for a device if they're not in use, so we shutdown and incrementally
+> 523
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l523>
+> * increase them as needed.
+> 524
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l524>
+> */
+> 525
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l525>
+> if (vdev->nr_vectors < nr + 1) {
+> 526
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l526>
+> vfio_disable_irqindex(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX);
+> 527
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l527>
+> vdev->nr_vectors = nr + 1;
+> 528
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l528>
+> ret = vfio_enable_vectors(vdev, true);
+> 529
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l529>
+> if (ret) {
+> 530
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l530>
+> error_report("vfio: failed to enable vectors, %d", ret);
+> 531
+> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l531>
+> }
+> 
+> Here all MSIX vectors will be disabled first and then enabled, with one
+> more MSIX. The comment is there but I still don't quite understand. It
+> makes sense for not allocating all possible MSI vectors, but why shall
+> we shutdown the whole MSI when being requested to enable one specific
+> vector? Can't we just enable the user specified vector indexed by "nr"?
+This is not obvious to me either. vfio_enable_vectors() seems to handle
+the nr_vectors as a whole since the origin of the code.
+> 
+> What's more, on ARM64 systems with GIC ITS, the kernel will issue an ITS
+> discard command when disabling a MSI vector, which will drop currently
+> pending MSI interrupt. If device driver in guest system enables some
+> MSIs first and interrupts may come at any time, and then it tries to
+> enable other MSIs, is it possible for the above code to cause interrupts
+> missing?
 
-The codebase uses %zd:
+Seems originally we considered this case of losing interrupts. This was
+then removed by "vfio-pci: No spurious MSIs" (98cd5a5eaf).
 
-$ git grep '%zi'|wc -l
-0
-$ git grep '%zd'|wc -l
-90
+Does this prevent any particular device from working?
 
-Can you directly fix this when applying?
+Thanks
 
-Thanks,
-
-Phil.
+Eric
 
 > 
->> +ssh_write(int64_t offset, size_t size) "offset=%" PRIi64 " size=%zu"
->> +ssh_write_buf(void *buf, size_t size) "sftp_write buf=%p size=%zu"
->> +ssh_write_return(size_t ret) "sftp_write returned %zu"
+> I may misunderstand the whole thing... Any comment is appreciated.
 > 
-> Same here.
+> Thanks,
 > 
-> Max
-> 
->> +ssh_seek(int64_t offset) "seeking to offset=%" PRIi6
+> Heyi
 > 
