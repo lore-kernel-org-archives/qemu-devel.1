@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37772)
+Received: from eggs.gnu.org ([209.51.188.92]:38565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gj3uR-00009c-Gf
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:12:17 -0500
+	(envelope-from <philmd@redhat.com>) id 1gj3xl-0002zc-Gp
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:15:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gj3uL-0001zc-4g
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:12:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48088)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gj3uK-0001zL-VI
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:12:09 -0500
-Date: Mon, 14 Jan 2019 15:12:01 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190114151201.GM3686@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <87lg3rui28.fsf@linaro.org>
- <20190114150206.GA11818@flamenco>
+	(envelope-from <philmd@redhat.com>) id 1gj3xk-0003Kj-Kv
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:15:41 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38305)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj3xk-0003I7-Dc
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:15:40 -0500
+Received: by mail-wr1-f67.google.com with SMTP id v13so23283196wrw.5
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:15:34 -0800 (PST)
+References: <1547473614-20033-1-git-send-email-thuth@redhat.com>
+	<2d8dad3d-05a1-7c16-4640-1df9e2b82642@redhat.com>
+	<baa8cae7-ad3c-aecb-7663-8bbe8beb739e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <64e4a141-c9e9-5e69-d2f8-d4a2fb79713b@redhat.com>
+Date: Mon, 14 Jan 2019 16:15:32 +0100
 MIME-Version: 1.0
+In-Reply-To: <baa8cae7-ad3c-aecb-7663-8bbe8beb739e@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190114150206.GA11818@flamenco>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Remaining CI failures
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] configure: Work-around a bug in libiscsi
+ 1.9.0 when used in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, berrange@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>
 
-On Mon, Jan 14, 2019 at 10:02:06AM -0500, Emilio G. Cota wrote:
-> On Fri, Jan 11, 2019 at 19:10:07 +0000, Alex Benn=C3=A9e wrote:
-> > So trying to narrow down the remaining failures in the CI system. The=
-re
-> > is one with a patch in flight (use g_usleep instead of sleep) but the=
-re
-> > remains two failure modes, both erratic.
-> >=20
-> > tests/qht-par:
-> >=20
-> > I can trigger this on my dev machine with a gprof enabled build:
-> >=20
-> >   # QEMU configure log Fri Jan 11 14:10:45 GMT 2019
-> >   # Configured with: './configure' '--disable-tools' '--disable-docs'=
- '--enable-gprof' '--enable-gcov'
-> >=20
-> > I only seem to be able to trigger it when running via the wrapper in =
-the
-> > make system:
-> >=20
-> >   retry.py -n 30 --invert make check-tests/test-qht-par
-> >=20
-> > Eventually this crashes with:
-> >=20
-> >   ERROR:tests/test-qht-par.c:20:test_qht: assertion failed (rc =3D=3D=
- 0): (35584 =3D=3D 0)
-> >=20
-> > Leaving a core dump for the child:
->=20
-> I can't replicate this on my machine :-(
->=20
-> I suspect this is probably related to the fact that gprof
-> is not even meant to support multi-threaded programs (like qht-bench).
->=20
-> Given that we've fixed the sleep issue (thanks!) and that there is no u=
-se
-> in running test-qht-par under gprof, I propose to permanently skip
-> it under gprof, e.g.:
->=20
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -88,7 +88,8 @@ check-unit-y +=3D tests/test-rcu-simpleq$(EXESUF)
->  check-unit-y +=3D tests/test-rcu-tailq$(EXESUF)
->  check-unit-y +=3D tests/test-qdist$(EXESUF)
->  check-unit-y +=3D tests/test-qht$(EXESUF)
-> -# FIXME: {test-qht-par + gprof} often break on Travis CI
-> +# test-qht-par invokes qht-bench, which is multi-threaded.
-> +# gprof doesn't support multi-threaded programs, so skip this test und=
-er gprof.
+On 1/14/19 3:36 PM, Thomas Huth wrote:
+> On 2019-01-14 15:31, Philippe Mathieu-Daudé wrote:
+>> On 1/14/19 2:46 PM, Thomas Huth wrote:
+>>> The header "scsi-lowlevel.h" of libiscsi 1.9.0 contains some bad
+>>> "inline" prototype definitions which GCC refuses to compile in its
+>>> gnu99 mode:
+>>>
+>>> In file included from block/iscsi.c:52:0:
+>>> /usr/include/iscsi/scsi-lowlevel.h:810:13: error: inline function
+>>> ‘scsi_set_uint16’ declared but never defined [-Werror]
+>>>  inline void scsi_set_uint16(unsigned char *c, uint16_t val);
+>>>              ^
+>>> /usr/include/iscsi/scsi-lowlevel.h:809:13: error: inline function
+>>> ‘scsi_set_uint32’ declared but never defined [-Werror]
+>>>  inline void scsi_set_uint32(unsigned char *c, uint32_t val);
+>>>              ^
+>>>
+>>> This has been fixed by upstream libiscsi in version 1.10.0 (see
+>>> https://github.com/sahlberg/libiscsi/commit/7692027d6c11 ), but
+>>> since we still want to support 1.9.0 for CentOS 7 / RHEL7, we
+>>> have to work-around the issue by compiling with "-fgnu89-inline"
+>>> in this case instead.
+>>>
+>>> Suggested-by: Daniel P. Berrangé <berrange@redhat.com>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  configure | 5 +++++
+>>>  1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/configure b/configure
+>>> index 2b9ba7d..aa80c17 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -4562,6 +4562,11 @@ if test "$libiscsi" != "no" ; then
+>>>      libiscsi="yes"
+>>>      libiscsi_cflags=$($pkg_config --cflags libiscsi)
+>>>      libiscsi_libs=$($pkg_config --libs libiscsi)
+>>> +    if $pkg_config --exact-version==1.9.0 libiscsi; then
+>>
+>> The first offending commit is d327ab09c which got included in 1.8.0, so
+>> using "exact" is not correct.
+> We require at least version 1.9.0, so the only version which can have
+> this problem when compiling QEMU is 1.9.0.
 
-If gprof doesn't support threads, then we potentially need to skip more
-of our tests. eg test-io-channel-socket uses APIs that spawn threads
-behind the scenes, not to mention the test-thread-pool test. Some
-chardev tests probably hit APIs that spawn background threads too.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Oh you are right, then:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
