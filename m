@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32934)
+Received: from eggs.gnu.org ([209.51.188.92]:33257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gj036-0006F9-5W
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:57 -0500
+	(envelope-from <bounces@canonical.com>) id 1gj044-0006zF-EJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:05:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gj035-0006N3-8s
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:56 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:43165)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gj034-0006Js-Vk
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:55 -0500
-References: <20181219042113.7364-1-richard.henderson@linaro.org>
-	<20181219042113.7364-5-richard.henderson@linaro.org>
-	<4e89a2dd-47fb-29ac-aff2-5d506e3deebb@vivier.eu>
-	<a03894da-d5cd-d82b-1c48-bd5059389c89@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <2bae1f2b-7268-c1e5-a85e-25731397da75@vivier.eu>
-Date: Mon, 14 Jan 2019 12:04:51 +0100
+	(envelope-from <bounces@canonical.com>) id 1gj043-000830-Hj
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:05:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46382)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gj043-00080e-Bx
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:05:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gj041-0007ew-QG
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 11:05:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B67E02E80CD
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 11:05:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <a03894da-d5cd-d82b-1c48-bd5059389c89@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 4/8] linux-user: Split out preadv,
- pwritev, readv, writev, pread64, pwrite64
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Jan 2019 10:53:29 -0000
+From: Daniel Berrange <1795100@bugs.launchpad.net>
+Reply-To: Bug 1795100 <1795100@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153818746845.29396.3425570709275982365.malonedeb@soybean.canonical.com>
+Message-Id: <154746320989.20384.17728890769906581562.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1795100] Re: VNC unix-domain socket unlink()ed
+ prematurely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +37,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 11/01/2019 22:31, Richard Henderson wrote:
-> On 1/11/19 2:17 AM, Laurent Vivier wrote:
->> On 19/12/2018 05:21, Richard Henderson wrote:
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>   linux-user/syscall-defs.h     |  14 ++++
->>>   linux-user/syscall-file.inc.c | 124 ++++++++++++++++++++++++++++++++++
->>>   linux-user/syscall.c          |  93 -------------------------
->>>   linux-user/strace.list        |  18 -----
->>>   4 files changed, 138 insertions(+), 111 deletions(-)
->>>
->> ...
->>> diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
->>> index 11e75044c1..410a763eee 100644
->>> --- a/linux-user/syscall-file.inc.c
->>> +++ b/linux-user/syscall-file.inc.c
->>> @@ -315,6 +315,104 @@ SYSCALL_IMPL(openat)
->> ...
->>> +
->>> +/*
->>> + * Both preadv and pwritev merge args 4/5 into a 64-bit offset.
->>> + * Moreover, the parts are *always* in little-endian order.
->>> + */
->>> +#if TARGET_ABI_BITS == 32
->>> +SYSCALL_ARGS(preadv_pwritev)
->>> +{
->>> +    /* We have already assigned out[0-2].  */
->>> +    abi_ulong lo = in[3], hi = in[4];
->>> +    out[3] = ((hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
->>> +    return def;
->>> +}
->>> +#else
->>> +#define args_preadv_pwritev NULL
->>> +#endif
->>> +
->>> +/* Perform the inverse operation for the host.  */
->>> +static inline void host_offset64_low_high(unsigned long *l, unsigned long *h,
->>> +                                          uint64_t off)
->>> +{
->>> +    *l = off;
->>> +    *h = (off >> (HOST_LONG_BITS - 1)) >> 1;
->>> +}
->>
->>
->> I have an error with preadv() on a 32bit target (powerpc, LTP test preadv02).
->>
->> It works if I use:
->>
->> static inline void host_offset64_low_high(unsigned long *hlow,
->>                                            unsigned long *hhigh,
->>                                            abi_ulong tlow,
->>                                            abi_ulong thigh)
->> {
->>      uint64_t off = tlow |
->>                     ((unsigned long long)thigh << TARGET_LONG_BITS / 2) <<
->>                     TARGET_LONG_BITS / 2;
->>      
->>      *hlow = off;
->>      *hhigh = (off >> HOST_LONG_BITS / 2) >> HOST_LONG_BITS / 2;
->> }
-> 
-> This doesn't make any sense.  Where are "tlow" and "thigh" coming from?
-> 
-> I think the bug will be
-> 
->   SYSCALL_ARGS(preadv_pwritev)
->   {
->       /* We have already assigned out[0-2].  */
->       abi_ulong lo = in[3], hi = in[4];
-> -    out[3] = ((hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
-> +    out[3] = (((uint64_t)hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
->       return def;
->   }
+It only affects VNC, not chardevs because the chardevs fail to call
+qio_channel_close() and just rely on finalize() cleaning up the open
+socket. To fix this we just need to made the code conditional on it
+being a listener socket
 
-Yes, this change fixes the problem.
+  if (qio_channel_has_feature(ioc, QIO_CHANNEL_FEATURE_LISTEN)) {
+   ...
+  }
 
-Thanks,
-Laurent
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1795100
+
+Title:
+  VNC unix-domain socket unlink()ed prematurely
+
+Status in QEMU:
+  New
+
+Bug description:
+  With qemu 3.0.0 (I don't believe this happened with previous
+  versions), if I tell it `-vnc unix:/path/to/vnc.sock`, qemu will
+  unlink() that file when the first client disconnects, meaning that
+  once I disconnect, I can't ever reconnect without restarting the VM.
+
+  A stupid testcase demonstrating the issue:
+
+  In terminal A:
+
+      $ qemu-system-x86_64 -vnc unix:$PWD/vnc.sock
+
+  In terminal B:
+
+      $ ls vnc.sock
+      vnc.sock
+      $ socat STDIO UNIX-CONNECT:vnc.sock <<<''
+      RFB 003.008
+      $ ls vnc.sock
+      ls: cannot access 'vnc.sock': No such file or directory
+
+  I have determined that the offending unlink() call is the one in
+  io/channel-socket.c:qio_channel_socket_close().  That call was first
+  introduced in commit d66f78e1eaa832f73c771d9df1b606fe75d52a50, which
+  first appeared in version 3.0.0.
+
+  This type of premature unlink() does not happen on monitor.sock with
+  `-monitor unix:/path/to/monitor.sock,server,nowait`.
+
+  I am not familiar enough with the QIO subsystem to suggest a fix that
+  fixes VNC, but preserves the QMP fix targeted in the offending commit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1795100/+subscriptions
