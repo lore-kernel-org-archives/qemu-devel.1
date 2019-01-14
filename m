@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43320)
+Received: from eggs.gnu.org ([209.51.188.92]:43725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj0cb-00006z-1k
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:41:37 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gj0e2-0000jt-Be
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:43:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj0ca-00051o-2h
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:41:37 -0500
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:42844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gj0cZ-000515-JG
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:41:35 -0500
-Received: by mail-ot1-x32e.google.com with SMTP id v23so18978894otk.9
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 03:41:35 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gj0e0-0005rt-BI
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:43:06 -0500
+Date: Mon, 14 Jan 2019 12:42:46 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190114124246.6de38d67.cohuck@redhat.com>
+In-Reply-To: <20190112150225.20294-1-marcel.apfelbaum@gmail.com>
+References: <20190112150225.20294-1-marcel.apfelbaum@gmail.com>
 MIME-Version: 1.0
-References: <20190111142702.25884-1-kraxel@redhat.com>
-In-Reply-To: <20190111142702.25884-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Jan 2019 11:41:23 +0000
-Message-ID: <CAFEAcA_C8vBxHc+52DBWikNWZyBGYjikPvj-CtquDrKnOZCnMA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] Input 20190111 patches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] contrib/rdmacm-mux: fix clang
+ compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: qemu-devel@nongnu.org, yuval.shaia@oracle.com, qemu-stable@nongnu.org
 
-On Fri, 11 Jan 2019 at 14:38, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit a311f891abf3833c1e4c5a62a6e5b0f1b81f22c3:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.0-pull-request' into staging (2019-01-10 17:49:54 +0000)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/input-20190111-pull-request
->
-> for you to fetch changes up to 7a1b46e09504419a3aa867dba3bcf23db5d6d956:
->
->   input: avoid malloc for mouse events (2019-01-11 11:57:17 +0100)
->
-> ----------------------------------------------------------------
-> input: avoid malloc for mouse events
->
-> ----------------------------------------------------------------
->
-> Gerd Hoffmann (1):
->   input: avoid malloc for mouse events
->
->  include/ui/input.h |  3 ---
->  ui/input.c         | 68 +++++++++++++++++++++++++-----------------------------
->  2 files changed, 31 insertions(+), 40 deletions(-)
->
+On Sat, 12 Jan 2019 17:02:22 +0200
+Marcel Apfelbaum <marcel.apfelbaum@gmail.com> wrote:
 
-Applied, thanks.
+> Fix Commit a5d2f6f877 (contrib/rdmacm-mux: Add implementation
+>                        of RDMA User MAD multiplexer).
+> 
+> The above commit introduces a new contrib target, adding a global dependency
+> to libumad library in case pvrdma configuration option is enabled.
+> Clang forbids it:
+>     clang-6.0: error: -libumad: 'linker' input unused
+>               [-Werror,-Wunused-command-line-argument]
+> 
+> Fix by limiting the scope to the rdmacm-mux target itself.
+> Fix related clang errors while at it.
+> 
+> Marcel Apfelbaum (3):
+>   contrib/rdmacm-mux: remove Wno-format-truncation flag
+>   hw/rdma: modify struct initialization
+>   contrib/rdmacm-mux: fix clang compilation
+> 
+>  Makefile                         |  2 ++
+>  contrib/rdmacm-mux/Makefile.objs |  1 -
+>  contrib/rdmacm-mux/main.c        | 18 +++++++++++++-----
+>  hw/rdma/rdma_backend.c           | 16 ++++++++++++----
+>  4 files changed, 27 insertions(+), 10 deletions(-)
+> 
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+This fixes building on x86 with clang 6 for me. On s390x with clang 7,
+I run into further problems when building the s390-ccw bios (the
+maintainers are aware of that), but the rdma-related errors are gone.
 
--- PMM
+Tested-by: Cornelia Huck <cohuck@redhat.com>
