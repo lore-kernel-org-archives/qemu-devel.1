@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51309)
+Received: from eggs.gnu.org ([209.51.188.92]:51203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkB-000335-GH
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:44 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk6-0002xi-BF
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk3-0006Og-I4
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:41 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:57270)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk2-0006LF-Bo
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:38 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:60030)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipk3-0006KQ-03
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:35 -0500
+	id 1gipk1-00069q-UW
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:34 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:02:29 +0100
-Message-Id: <20190114000326.29847-9-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:02:25 +0100
+Message-Id: <20190114000326.29847-5-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/65] slirp: remove Monitor dependency,
- return a string for info
+Subject: [Qemu-devel] [PULL 04/65] slirp: use a dedicated field for chardev
+ pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,134 +33,167 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-There is nothing performance-sensitive in returning an allocated
-string for info, and handling the monitor_printf() on the caller side.
+Let's not mix command line and chardev pointers.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c      |  7 ++++---
+ net/slirp.c      |  8 ++++----
  slirp/libslirp.h |  2 +-
- slirp/misc.c     | 23 +++++++++++++----------
- 3 files changed, 18 insertions(+), 14 deletions(-)
+ slirp/misc.c     | 11 +++++++----
+ slirp/misc.h     |  4 ++--
+ slirp/slirp.c    |  5 +++--
+ slirp/tcp_subr.c |  2 +-
+ 6 files changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/net/slirp.c b/net/slirp.c
-index 58d880de8d..b7319ca6b2 100644
+index dd06b0189e..58d880de8d 100644
 --- a/net/slirp.c
 +++ b/net/slirp.c
-@@ -828,10 +828,11 @@ void hmp_info_usernet(Monitor *mon, const QDict *qd=
-ict)
-     QTAILQ_FOREACH(s, &slirp_stacks, entry) {
-         int id;
-         bool got_hub_id =3D net_hub_id_for_client(&s->nc, &id) =3D=3D 0;
--        monitor_printf(mon, "Hub %d (%s):\n",
-+        char *info =3D slirp_connection_info(s->slirp);
-+        monitor_printf(mon, "Hub %d (%s):\n%s",
-                        got_hub_id ? id : -1,
--                       s->nc.name);
--        slirp_connection_info(s->slirp, mon);
-+                       s->nc.name, info);
-+        g_free(info);
-     }
- }
+@@ -709,8 +709,8 @@ static int slirp_smb(SlirpState* s, const char *expor=
+ted_dir,
+              CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
+     g_free(smb_conf);
 =20
+-    if (slirp_add_exec(s->slirp, 0, smb_cmdline, &vserver_addr, 139) < 0=
+ ||
+-        slirp_add_exec(s->slirp, 0, smb_cmdline, &vserver_addr, 445) < 0=
+) {
++    if (slirp_add_exec(s->slirp, NULL, smb_cmdline, &vserver_addr, 139) =
+< 0 ||
++        slirp_add_exec(s->slirp, NULL, smb_cmdline, &vserver_addr, 445) =
+< 0) {
+         slirp_smb_cleanup(s);
+         g_free(smb_cmdline);
+         error_setg(errp, "Conflicting/invalid smbserver address");
+@@ -774,7 +774,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
+config_str, Error **errp)
+     snprintf(buf, sizeof(buf), "guestfwd.tcp.%d", port);
+=20
+     if ((strlen(p) > 4) && !strncmp(p, "cmd:", 4)) {
+-        if (slirp_add_exec(s->slirp, 0, &p[4], &server, port) < 0) {
++        if (slirp_add_exec(s->slirp, NULL, &p[4], &server, port) < 0) {
+             error_setg(errp, "Conflicting/invalid host:port in guest "
+                        "forwarding rule '%s'", config_str);
+             return -1;
+@@ -801,7 +801,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
+config_str, Error **errp)
+             return -1;
+         }
+=20
+-        if (slirp_add_exec(s->slirp, 3, &fwd->hd, &server, port) < 0) {
++        if (slirp_add_exec(s->slirp, &fwd->hd, NULL, &server, port) < 0)=
+ {
+             error_setg(errp, "Conflicting/invalid host:port in guest "
+                        "forwarding rule '%s'", config_str);
+             g_free(fwd);
 diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index a4f390ee89..04b6db9f49 100644
+index 52dbb9feb5..3e88dbaa01 100644
 --- a/slirp/libslirp.h
 +++ b/slirp/libslirp.h
-@@ -35,7 +35,7 @@ int slirp_remove_hostfwd(Slirp *slirp, int is_udp,
- int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
+@@ -35,7 +35,7 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp,
+                       struct in_addr guest_addr, int guest_port);
+ int slirp_remove_hostfwd(Slirp *slirp, int is_udp,
+                          struct in_addr host_addr, int host_port);
+-int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
++int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
                     struct in_addr *guest_addr, int guest_port);
 =20
--void slirp_connection_info(Slirp *slirp, Monitor *mon);
-+char *slirp_connection_info(Slirp *slirp);
-=20
- void slirp_socket_recv(Slirp *slirp, struct in_addr guest_addr,
-                        int guest_port, const uint8_t *buf, int size);
+ void slirp_connection_info(Slirp *slirp, Monitor *mon);
 diff --git a/slirp/misc.c b/slirp/misc.c
-index 2784fc420f..ce323ef92e 100644
+index 8f0b6004bd..2784fc420f 100644
 --- a/slirp/misc.c
 +++ b/slirp/misc.c
-@@ -8,7 +8,6 @@
- #include "qemu/osdep.h"
- #include "slirp.h"
- #include "libslirp.h"
--#include "monitor/monitor.h"
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
-=20
-@@ -198,8 +197,9 @@ fork_exec(struct socket *so, const char *ex)
+@@ -37,7 +37,7 @@ remque(void *a)
+   element->qh_rlink =3D NULL;
  }
- #endif
 =20
--void slirp_connection_info(Slirp *slirp, Monitor *mon)
-+char *slirp_connection_info(Slirp *slirp)
+-int add_exec(struct ex_list **ex_ptr, int do_pty, char *exec,
++int add_exec(struct ex_list **ex_ptr, void *chardev, const char *cmdline=
+,
+              struct in_addr addr, int port)
  {
-+    GString *str =3D g_string_new(NULL);
-     const char * const tcpstates[] =3D {
-         [TCPS_CLOSED]       =3D "CLOSED",
-         [TCPS_LISTEN]       =3D "LISTEN",
-@@ -221,8 +221,9 @@ void slirp_connection_info(Slirp *slirp, Monitor *mon=
-)
-     const char *state;
-     char buf[20];
+ 	struct ex_list *tmp_ptr;
+@@ -50,11 +50,14 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, cha=
+r *exec,
+ 	}
 =20
--    monitor_printf(mon, "  Protocol[State]    FD  Source Address  Port  =
- "
--                        "Dest. Address  Port RecvQ SendQ\n");
-+    g_string_append_printf(str,
-+        "  Protocol[State]    FD  Source Address  Port   "
-+        "Dest. Address  Port RecvQ SendQ\n");
-=20
-     for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb; so =3D so->so_n=
-ext) {
-         if (so->so_state & SS_HOSTFWD) {
-@@ -244,10 +245,10 @@ void slirp_connection_info(Slirp *slirp, Monitor *m=
-on)
-             dst_port =3D so->so_fport;
-         }
-         snprintf(buf, sizeof(buf), "  TCP[%s]", state);
--        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
-+        g_string_append_printf(str, "%-19s %3d %15s %5d ", buf, so->s,
-                        src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "=
-*",
-                        ntohs(src.sin_port));
--        monitor_printf(mon, "%15s %5d %5d %5d\n",
-+        g_string_append_printf(str, "%15s %5d %5d %5d\n",
-                        inet_ntoa(dst_addr), ntohs(dst_port),
-                        so->so_rcv.sb_cc, so->so_snd.sb_cc);
-     }
-@@ -267,10 +268,10 @@ void slirp_connection_info(Slirp *slirp, Monitor *m=
-on)
-             dst_addr =3D so->so_faddr;
-             dst_port =3D so->so_fport;
-         }
--        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
-+        g_string_append_printf(str, "%-19s %3d %15s %5d ", buf, so->s,
-                        src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "=
-*",
-                        ntohs(src.sin_port));
--        monitor_printf(mon, "%15s %5d %5d %5d\n",
-+        g_string_append_printf(str, "%15s %5d %5d %5d\n",
-                        inet_ntoa(dst_addr), ntohs(dst_port),
-                        so->so_rcv.sb_cc, so->so_snd.sb_cc);
-     }
-@@ -280,9 +281,11 @@ void slirp_connection_info(Slirp *slirp, Monitor *mo=
-n)
-                      (so->so_expire - curtime) / 1000);
-         src.sin_addr =3D so->so_laddr;
-         dst_addr =3D so->so_faddr;
--        monitor_printf(mon, "%-19s %3d %15s  -    ", buf, so->s,
-+        g_string_append_printf(str, "%-19s %3d %15s  -    ", buf, so->s,
-                        src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "=
-*");
--        monitor_printf(mon, "%15s  -    %5d %5d\n", inet_ntoa(dst_addr),
-+        g_string_append_printf(str, "%15s  -    %5d %5d\n", inet_ntoa(ds=
-t_addr),
-                        so->so_rcv.sb_cc, so->so_snd.sb_cc);
-     }
-+
-+    return g_string_free(str, FALSE);
+ 	tmp_ptr =3D *ex_ptr;
+-	*ex_ptr =3D g_new(struct ex_list, 1);
++	*ex_ptr =3D g_new0(struct ex_list, 1);
+ 	(*ex_ptr)->ex_fport =3D port;
+ 	(*ex_ptr)->ex_addr =3D addr;
+-	(*ex_ptr)->ex_chardev =3D do_pty =3D=3D 3;
+-	(*ex_ptr)->ex_exec =3D (do_pty =3D=3D 3) ? exec : g_strdup(exec);
++	if (chardev) {
++		(*ex_ptr)->ex_chardev =3D chardev;
++	} else {
++		(*ex_ptr)->ex_exec =3D g_strdup(cmdline);
++	}
+ 	(*ex_ptr)->ex_next =3D tmp_ptr;
+ 	return 0;
  }
+diff --git a/slirp/misc.h b/slirp/misc.h
+index 1f8d11def6..64ca88c3b7 100644
+--- a/slirp/misc.h
++++ b/slirp/misc.h
+@@ -9,7 +9,7 @@
+ #define MISC_H
+=20
+ struct ex_list {
+-	int ex_chardev;
++	void *ex_chardev;
+ 	struct in_addr ex_addr;		/* Server address */
+ 	int ex_fport;                   /* Port to telnet to */
+ 	const char *ex_exec;            /* Command line of what to exec */
+@@ -52,7 +52,7 @@ struct slirp_quehead {
+=20
+ void slirp_insque(void *, void *);
+ void slirp_remque(void *);
+-int add_exec(struct ex_list **, int, char *, struct in_addr, int);
++int add_exec(struct ex_list **, void *, const char *, struct in_addr, in=
+t);
+ int fork_exec(struct socket *so, const char *ex);
+=20
+ #endif
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 0498a092b9..0de46084c0 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -1068,7 +1068,7 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp, str=
+uct in_addr host_addr,
+     return 0;
+ }
+=20
+-int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
++int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
+                    struct in_addr *guest_addr, int guest_port)
+ {
+     if (!guest_addr->s_addr) {
+@@ -1081,7 +1081,8 @@ int slirp_add_exec(Slirp *slirp, int do_pty, const =
+void *args,
+         guest_addr->s_addr =3D=3D slirp->vnameserver_addr.s_addr) {
+         return -1;
+     }
+-    return add_exec(&slirp->exec_list, do_pty, (char *)args, *guest_addr=
+,
++
++    return add_exec(&slirp->exec_list, chardev, cmdline, *guest_addr,
+                     htons(guest_port));
+ }
+=20
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index dc19eea55a..e7b2baa087 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -962,7 +962,7 @@ int tcp_ctl(struct socket *so)
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+                 if (ex_ptr->ex_chardev) {
+                     so->s =3D -1;
+-                    so->extra =3D (void *)ex_ptr->ex_exec;
++                    so->extra =3D ex_ptr->ex_chardev;
+                     return 1;
+                 }
+                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
 --=20
 2.20.1
