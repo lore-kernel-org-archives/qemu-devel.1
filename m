@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58809)
+Received: from eggs.gnu.org ([209.51.188.92]:58956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAo2-0001Nr-1K
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:06 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAoq-00020R-FM
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAo1-0005yN-4T
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32770)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAop-0006Cj-I9
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gjAo0-0005wz-Sb
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:05 -0500
+	id 1gjAop-0006C4-9g
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:55 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 15 Jan 2019 02:27:51 +0400
-Message-Id: <20190114222754.21701-4-marcandre.lureau@redhat.com>
+Date: Tue, 15 Jan 2019 02:27:54 +0400
+Message-Id: <20190114222754.21701-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20190114222754.21701-1-marcandre.lureau@redhat.com>
 References: <20190114222754.21701-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v17 3/6] acpi: expose TPM/PPI configuration
- parameters to firmware via fw_cfg
+Subject: [Qemu-devel] [PATCH v17 6/6] tpm: clear RAM when "memory overwrite"
+ requested
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,116 +31,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, f4bug@amsat.org, Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Note: the "Platform Reset Attack Mitigation" specification isn't
+explicit about NVDIMM, since they could have different usages. It uses
+the term "system memory" generally (and also "volatile memory RAM" in
+its introduction). For initial support, I propose to consider
+non-volatile memory as not being subject to the memory clear. There is
+an on-going discussion in the TCG "pcclientwg" working group for
+future revisions.
 
-To avoid having to hard code the base address of the PPI virtual
-memory device we introduce a fw_cfg file etc/tpm/config that holds the
-base address of the PPI device, the version of the PPI interface and
-the version of the attached TPM.
+CPU cache clearing is done unconditionally in edk2 since commit
+d20ae95a13e851 (edk2-stable201811).
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-[ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document it=
- ]
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Tested-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
- include/hw/acpi/tpm.h |  3 +++
- hw/i386/acpi-build.c  | 19 +++++++++++++++++++
- docs/specs/tpm.txt    | 19 +++++++++++++++++++
- 3 files changed, 41 insertions(+)
+ hw/tpm/tpm_ppi.h    | 10 ++++++++++
+ hw/tpm/tpm_crb.c    |  3 +++
+ hw/tpm/tpm_ppi.c    | 22 ++++++++++++++++++++++
+ hw/tpm/tpm_tis.c    |  3 +++
+ hw/tpm/trace-events |  3 +++
+ 5 files changed, 41 insertions(+)
 
-diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-index b8796df9166..a6109a97fcd 100644
---- a/include/hw/acpi/tpm.h
-+++ b/include/hw/acpi/tpm.h
-@@ -194,4 +194,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
- #define TPM_PPI_ADDR_SIZE           0x400
- #define TPM_PPI_ADDR_BASE           0xFED45000
+diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+index c5e555fe2c7..d33ef27de6d 100644
+--- a/hw/tpm/tpm_ppi.h
++++ b/hw/tpm/tpm_ppi.h
+@@ -33,4 +33,14 @@ typedef struct TPMPPI {
+ void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+                   hwaddr addr, Object *obj);
 =20
-+#define TPM_PPI_VERSION_NONE        0
-+#define TPM_PPI_VERSION_1_30        1
++/**
++ * tpm_ppi_reset:
++ * @tpmppi: a TPMPPI
++ *
++ * Function to call on machine reset. It will check if the "Memory
++ * overwrite" variable is set, and perform a memory clear on volatile
++ * memory if requested.
++ **/
++void tpm_ppi_reset(TPMPPI *tpmppi);
 +
- #endif /* HW_ACPI_TPM_H */
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 14f757fc36b..98982477057 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
-     bool pcihp_bridge_en;
- } AcpiBuildPciBusHotplugState;
-=20
-+typedef struct FwCfgTPMConfig {
-+    uint32_t tpmppi_address;
-+    uint8_t tpm_version;
-+    uint8_t tpmppi_version;
-+} QEMU_PACKED FwCfgTPMConfig;
-+
- static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+ #endif /* TPM_TPM_PPI_H */
+diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+index 012ec686d4b..3087acc4ab7 100644
+--- a/hw/tpm/tpm_crb.c
++++ b/hw/tpm/tpm_crb.c
+@@ -233,6 +233,9 @@ static void tpm_crb_reset(void *dev)
  {
-     uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
- NULL);
-@@ -2847,6 +2853,8 @@ void acpi_setup(void)
-     AcpiBuildTables tables;
-     AcpiBuildState *build_state;
-     Object *vmgenid_dev;
-+    TPMIf *tpm;
-+    static FwCfgTPMConfig tpm_config;
+     CRBState *s =3D CRB(dev);
 =20
-     if (!pcms->fw_cfg) {
-         ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
-@@ -2881,6 +2889,17 @@ void acpi_setup(void)
-     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
-                     tables.tcpalog->data, acpi_data_len(tables.tcpalog))=
-;
-=20
-+    tpm =3D tpm_find();
-+    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_abort=
-)) {
-+        tpm_config =3D (FwCfgTPMConfig) {
-+            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
-+            .tpm_version =3D tpm_get_version(tpm),
-+            .tpmppi_version =3D TPM_PPI_VERSION_NONE
-+        };
-+        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
-+                        &tpm_config, sizeof tpm_config);
++    if (s->ppi_enabled) {
++        tpm_ppi_reset(&s->ppi);
 +    }
-+
-     vmgenid_dev =3D find_vmgenid_dev();
-     if (vmgenid_dev) {
-         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 1af82bba862..e4bb0947001 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -34,6 +34,25 @@ The CRB interface makes a memory mapped IO region in t=
-he area 0xfed40000 -
- QEMU files related to TPM CRB interface:
-  - hw/tpm/tpm_crb.c
+     tpm_backend_reset(s->tpmbe);
 =20
-+=3D fw_cfg interface =3D
+     memset(s->regs, 0, sizeof(s->regs));
+diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+index cf17779c20f..cd8205f2120 100644
+--- a/hw/tpm/tpm_ppi.c
++++ b/hw/tpm/tpm_ppi.c
+@@ -16,8 +16,30 @@
+ #include "qapi/error.h"
+ #include "cpu.h"
+ #include "sysemu/memory_mapping.h"
++#include "sysemu/reset.h"
+ #include "migration/vmstate.h"
+ #include "tpm_ppi.h"
++#include "trace.h"
 +
-+The bios/firmware may read the "etc/tpm/config" fw_cfg entry for
-+configuring the guest appropriately.
++void tpm_ppi_reset(TPMPPI *tpmppi)
++{
++    if (tpmppi->buf[0x15a /* movv, docs/specs/tpm.txt */] & 0x1) {
++        GuestPhysBlockList guest_phys_blocks;
++        GuestPhysBlock *block;
 +
-+The entry of 6 bytes has the following content, in little-endian:
-+
-+    #define TPM_VERSION_UNSPEC          0
-+    #define TPM_VERSION_1_2             1
-+    #define TPM_VERSION_2_0             2
-+
-+    #define TPM_PPI_VERSION_NONE        0
-+    #define TPM_PPI_VERSION_1_30        1
-+
-+    struct FwCfgTPMConfig {
-+        uint32_t tpmppi_address;         /* PPI memory location */
-+        uint8_t tpm_version;             /* TPM version */
-+        uint8_t tpmppi_version;          /* PPI version */
-+    };
++        guest_phys_blocks_init(&guest_phys_blocks);
++        guest_phys_blocks_append(&guest_phys_blocks);
++        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
++            trace_tpm_ppi_memset(block->host_addr,
++                                 block->target_end - block->target_start=
+);
++            memset(block->host_addr, 0,
++                   block->target_end - block->target_start);
++            memory_region_set_dirty(block->mr, 0,
++                                    block->target_end - block->target_st=
+art);
++        }
++        guest_phys_blocks_free(&guest_phys_blocks);
++    }
++}
 =20
- =3D ACPI Interface =3D
+ void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+                   hwaddr addr, Object *obj)
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 02d9d5c911d..fd6bb9b59a9 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -872,6 +872,9 @@ static void tpm_tis_reset(DeviceState *dev)
+     s->be_buffer_size =3D MIN(tpm_backend_get_buffer_size(s->be_driver),
+                             TPM_TIS_BUFFER_MAX);
 =20
++    if (s->ppi_enabled) {
++        tpm_ppi_reset(&s->ppi);
++    }
+     tpm_backend_reset(s->be_driver);
+=20
+     s->active_locty =3D TPM_TIS_NO_LOCALITY;
+diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+index 25bee0cecf9..920d32ad551 100644
+--- a/hw/tpm/trace-events
++++ b/hw/tpm/trace-events
+@@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
+ tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
+ tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
+d to TPM: 0x%08x (size=3D%d)"
+ tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
+t =3D %u"
++
++# hw/tpm/tpm_ppi.c
++tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
 --=20
 2.20.1.98.gecbdaf0899
