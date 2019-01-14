@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42486)
+Received: from eggs.gnu.org ([209.51.188.92]:42667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gj2S6-0000M6-93
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:38:55 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gj2Sn-0000vj-6X
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:39:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gj2S5-00052v-FU
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:38:54 -0500
-Received: from m50-110.126.com ([123.125.50.110]:57233)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gj2S4-000527-9Q
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:38:53 -0500
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-10-fli@suse.com>
-	<87a7kcml5i.fsf@dusky.pond.sub.org>
-	<f5631b6b-d313-88dc-f80a-890c26f109e4@126.com>
-	<878sznquv6.fsf@dusky.pond.sub.org>
-From: Fei Li <lifei1214@126.com>
-Message-ID: <8504f713-0334-62b2-c462-4bdcb3c83caf@126.com>
-Date: Mon, 14 Jan 2019 21:38:46 +0800
+	(envelope-from <stefanha@redhat.com>) id 1gj2Sm-0005IX-IE
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:39:37 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 14 Jan 2019 13:32:55 +0000
+Message-Id: <20190114133257.30299-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <878sznquv6.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 09/16] qemu_thread: supplement
- error handling for pci_edu_realize
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/2] throttle-groups: fix restart coroutine
+ iothread race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +20,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Fei Li <fli@suse.com>, Jiri Slaby <jslaby@suse.cz>, qemu-devel@nongnu.org, shirley17fei@gmail.com
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+v2:
+ * Added qemu-iotests test case [Kevin, Alberto]
+ * Use atomic operations instead of AioContext lock [Paolo]
 
-在 2019/1/14 下午8:36, Markus Armbruster 写道:
-> Fei Li <lifei1214@126.com> writes:
->
->> Just to make sure about how to do the cleanup. I notice that in device_set_realized(),
->> the current code does not call "dc->unrealize(dev, NULL);" when dc->realize() fails.
-Sorry that I am still uncertain.. I guess the code below I pasted was 
-misleading,
-actually I want to stress the *dc->unrealize() is not called when 
-dc->realize() fails*
-and the incomplete below "goto fail" does not include the dc->unrealize(),
-but instead the dc->unrealize() is included in later child_realize_fail: 
-& post_realize_fail:.
+This patch series fixes a segfault upon device_del when virtio-scsi is us=
+ed
+with iothreads.
 
+Stefan Hajnoczi (2):
+  throttle-groups: fix restart coroutine iothread race
+  iotests: add 238 for throttling tgm unregister iothread segfault
 
-Emm, IMHO, I think when dc->realize() fails, the dc->unrealize() is 
-either should be
-called in the common function: device_set_realized() in a unified way, 
-that is
+ include/block/throttle-groups.h |  5 ++++
+ block/throttle-groups.c         |  9 +++++++
+ tests/qemu-iotests/238          | 47 +++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/238.out      |  6 +++++
+ tests/qemu-iotests/group        |  1 +
+ 5 files changed, 68 insertions(+)
+ create mode 100755 tests/qemu-iotests/238
+ create mode 100644 tests/qemu-iotests/238.out
 
-         if (local_err != NULL) {
-+          if (dc->unrealize) {
-+              dc->unrealize(dev, local_err);
-+          }
-             goto fail;
-         }
-
-or do the unrealize() locally for each device earlier when dc->realize() 
-fails.
-But I checked several dc->realize() function, they did not call unrealize()
-when fails. Besides, it may mean verbose code if unrealize() locally.
-Thus I think the above way is the right way to do the cleanup when 
-realize() fails.
->>
->>          if (dc->realize) {
->>              dc->realize(dev, &local_err);
->>          }
->>
->>          if (local_err != NULL) {
->>              goto fail;
->>          }
->>
->> Is this on purpose? (Maybe due to some devices' realize() do their own cleanup
->> when fails? Sorry for the unsure, it is such a common function that I did not
->> check all. :( ) Or else, I prefer to do the cleanup in a unified manner, e.g. call "dc->unrealize(dev, NULL);" which is the pci_qdev_unrealize() for pci devices.
-> Yes, this is on purpose.
->
-> When a realize() method fails, it must revert everything it has done so
-> far.  Results in sane "either succeed completely, or fail and do
-> nothing" semantics.
-
-Have a nice day, thanks
-
-Fei
+--=20
+2.20.1
