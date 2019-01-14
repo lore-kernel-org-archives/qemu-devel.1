@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37520)
+Received: from eggs.gnu.org ([209.51.188.92]:37633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3tJ-0007ft-Vo
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:11 -0500
+	(envelope-from <philmd@redhat.com>) id 1gj3tf-0007wJ-PK
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3tJ-0001Gb-9c
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:05 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43791)
+	(envelope-from <philmd@redhat.com>) id 1gj3te-0001Q9-0F
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:27 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34209)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gj3tJ-0001El-21
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:05 -0500
-Received: by mail-wr1-x443.google.com with SMTP id r10so23253275wrs.10
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:11:03 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 14 Jan 2019 15:01:25 +0000
-Message-Id: <20190114150129.1013-18-alex.bennee@linaro.org>
-In-Reply-To: <20190114150129.1013-1-alex.bennee@linaro.org>
-References: <20190114150129.1013-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj3td-0001Po-QE
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:25 -0500
+Received: by mail-wr1-f67.google.com with SMTP id j2so23352790wrw.1
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:11:25 -0800 (PST)
+References: <20190114141006.1841-1-yuval.shaia@oracle.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ad603032-6658-a1db-06fc-80ffa4dbd682@redhat.com>
+Date: Mon, 14 Jan 2019 16:11:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/21] travis: bump to Xenial baseline
+In-Reply-To: <20190114141006.1841-1-yuval.shaia@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/rdma: Verify that ptr is not NULL
+ before freeing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
 
-Travis is slowly catching up. Move to Xenial based images for our
-current builds. These are now all proper VMs.
+Hi Yuval,
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On 1/14/19 3:10 PM, Yuval Shaia wrote:
+> Make sure objects are not NULL before calling to non-nulll-safe
 
-diff --git a/.travis.yml b/.travis.yml
-index 79da3a495a..93fd0164a0 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -1,8 +1,8 @@
--
--dist: trusty
-+# The current Travis default is a VM based 16.04 Xenial on GCE
-+# Additional builds with specific requirements for a full VM need to
-+# be added as additional matrix: entries later on
-+dist: xenial
- language: c
--python:
--  - "2.6"
- compiler:
-   - gcc
- cache: ccache
-@@ -34,7 +34,7 @@ addons:
-       - libssh2-1-dev
-       - liburcu-dev
-       - libusb-1.0-0-dev
--      - libvte-2.90-dev
-+      - libvte-2.91-dev
-       - sparse
-       - uuid-dev
-       - gcovr
-@@ -193,9 +193,7 @@ matrix:
-         apt:
-           packages:
-             - python3-pip
--            - python3.4-venv
--
--
-+            - python3.5-venv
-     # Using newer GCC with sanitizers
-     - addons:
-         apt:
-@@ -229,7 +227,7 @@ matrix:
-             - libssh2-1-dev
-             - liburcu-dev
-             - libusb-1.0-0-dev
--            - libvte-2.90-dev
-+            - libvte-2.91-dev
-             - sparse
-             - uuid-dev
-       language: generic
--- 
-2.17.1
+null
+
+> destructors.
+> 
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> ---
+>  hw/rdma/rdma_backend.c | 6 ++++--
+>  hw/rdma/rdma_rm.c      | 7 ++++++-
+>  2 files changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index b49edaacaf..3ee5172c96 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -1066,8 +1066,10 @@ static void mad_fini(RdmaBackendDev *backend_dev)
+>      pr_dbg("Stopping MAD\n");
+>      disable_rdmacm_mux_async(backend_dev);
+>      qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
+> -    qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
+> -    qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
+> +    if (backend_dev->recv_mads_list.list) {
+
+This is only reachable when the backend didn't success at initializing,
+right?
+
+> +        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
+> +        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
+> +    }
+>  }
+>  
+>  int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> index f5b1295890..8bf241e91f 100644
+> --- a/hw/rdma/rdma_rm.c
+> +++ b/hw/rdma/rdma_rm.c
+> @@ -41,6 +41,9 @@ static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
+>  
+>  static inline void res_tbl_free(RdmaRmResTbl *tbl)
+>  {
+> +    if (!tbl->bitmap) {
+> +        return;
+> +    }
+>      qemu_mutex_destroy(&tbl->lock);
+>      g_free(tbl->tbl);
+>      g_free(tbl->bitmap);
+> @@ -655,5 +658,7 @@ void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+>      res_tbl_free(&dev_res->cq_tbl);
+>      res_tbl_free(&dev_res->pd_tbl);
+>  
+> -    g_hash_table_destroy(dev_res->qp_hash);
+> +    if (dev_res->qp_hash) {
+> +        g_hash_table_destroy(dev_res->qp_hash);
+> +    }
+>  }
+> 
