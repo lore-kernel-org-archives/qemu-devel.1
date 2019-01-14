@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35415)
+Received: from eggs.gnu.org ([209.51.188.92]:40135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-0004zo-Qe
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:11 -0500
+	(envelope-from <mst@redhat.com>) id 1gjBR6-00055R-2B
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 18:14:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-0001qo-1i
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:10 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37684)
+	(envelope-from <mst@redhat.com>) id 1gjBR4-00049u-4Z
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 18:14:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:1894)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB7R-0001eU-PX
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:09 -0500
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:53:00 +0100
-Message-Id: <20190114225306.21569-60-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
-References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjBQz-00046C-Vx
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 18:14:23 -0500
+Date: Mon, 14 Jan 2019 18:14:13 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190114175247-mutt-send-email-mst@kernel.org>
+References: <1545003279-17233-1-git-send-email-dongli.zhang@oracle.com>
+	<20181216212319-mutt-send-email-mst@kernel.org>
+	<a8026b40-9556-c9c1-1bbc-e2991d6473cb@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 59/65] slirp: factor out guestfwd addition checks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a8026b40-9556-c9c1-1bbc-e2991d6473cb@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] msix: correct pba size calculation
+ used for msix_exclusive_bar initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +29,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: qemu-devel@nongnu.org, marcel.apfelbaum@gmail.com, Jason Wang <jasowang@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Mon, Dec 17, 2018 at 11:15:46AM +0800, Dongli Zhang wrote:
+> Hi Michael,
+> 
+> CCed Jason as this is related to commit a0ccd2123ee2 "pci: remove hard-coded bar
+> size in msix_init_exclusive_bar()"
+> 
+> Please see my reply inline.
+> 
+> On 12/17/2018 10:24 AM, Michael S. Tsirkin wrote:
+> > On Mon, Dec 17, 2018 at 07:34:39AM +0800, Dongli Zhang wrote:
+> >> The bar_pba_size is more than what the pba is expected to have, although
+> >> this usually would not affect the bar_size used for dev->msix_exclusive_bar
+> >> initialization.
+> >>
+> >> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> > 
+> > 
+> > If this does ever have an effect, we need a compat config
+> > for old machine types.
+> > Could you explain a bit more? Are there configs affected?
+> > What are these?
+> 
+> Here I copy parts of msix_init_exclusive_bar() and msix_init().
+> 
+> 'bar_pba_size' is computed (line 348) in msix_init_exclusive_bar(), while
+> 'pba_size' is computed (line 291) in msix_init().
+> 
+> msix_init_exclusive_bar() is one of callers of msix_init().
+> 
+> I think both 'bar_pba_size' and 'pba_size' are indicating the size of pba. The
+> difference is, while 'bar_pba_size' is used to initialize the size of
+> MemoryRegion (dev->msix_exclusive_bar), 'pba_size' is used to initialize the
+> config space in msix_init().
+> 
+> However, the equations to compute the two variables are different. Why would we
+> use different size for MemoryRegion and config space?
 
-This will allow reusing the function in a following patch.
+The math in msix_init_exclusive_bar allocates
+too much memory in some cases.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
- slirp/misc.c  |  7 -------
- slirp/slirp.c | 23 +++++++++++++++++++++--
- 2 files changed, 21 insertions(+), 9 deletions(-)
+For example consider nentries = 8.
+msix_exclusive_bar will give us bar_pba_size = 16.
+So 16 bytes.  However 8 bytes would be enough - this
+is all that the spec requires.
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index a0f104be5e..eae9596a55 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -37,13 +37,6 @@ int add_exec(struct gfwd_list **ex_ptr, void *chardev,=
- const char *cmdline,
- {
- 	struct gfwd_list *tmp_ptr;
-=20
--	/* First, check if the port is "bound" */
--	for (tmp_ptr =3D *ex_ptr; tmp_ptr; tmp_ptr =3D tmp_ptr->ex_next) {
--		if (port =3D=3D tmp_ptr->ex_fport &&
--		    addr.s_addr =3D=3D tmp_ptr->ex_addr.s_addr)
--			return -1;
--	}
--
- 	tmp_ptr =3D *ex_ptr;
- 	*ex_ptr =3D g_new0(struct gfwd_list, 1);
- 	(*ex_ptr)->ex_fport =3D port;
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 851462a4cd..882d28a4de 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -1046,9 +1046,11 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp, st=
-ruct in_addr host_addr,
-     return 0;
- }
-=20
--int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
--                   struct in_addr *guest_addr, int guest_port)
-+static bool
-+check_guestfwd(Slirp *slirp, struct in_addr *guest_addr, int guest_port)
- {
-+    struct gfwd_list *tmp_ptr;
-+
-     if (!guest_addr->s_addr) {
-         guest_addr->s_addr =3D slirp->vnetwork_addr.s_addr |
-             (htonl(0x0204) & ~slirp->vnetwork_mask.s_addr);
-@@ -1057,6 +1059,23 @@ int slirp_add_exec(Slirp *slirp, void *chardev, co=
-nst char *cmdline,
-         slirp->vnetwork_addr.s_addr ||
-         guest_addr->s_addr =3D=3D slirp->vhost_addr.s_addr ||
-         guest_addr->s_addr =3D=3D slirp->vnameserver_addr.s_addr) {
-+        return false;
-+    }
-+
-+    /* check if the port is "bound" */
-+    for (tmp_ptr =3D slirp->guestfwd_list; tmp_ptr; tmp_ptr =3D tmp_ptr-=
->ex_next) {
-+        if (guest_port =3D=3D tmp_ptr->ex_fport &&
-+            guest_addr->s_addr =3D=3D tmp_ptr->ex_addr.s_addr)
-+            return false;
-+    }
-+
-+    return true;
-+}
-+
-+int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
-+                   struct in_addr *guest_addr, int guest_port)
-+{
-+    if (!check_guestfwd(slirp, guest_addr, guest_port)) {
-         return -1;
-     }
-=20
---=20
-2.20.1
+So in practice bar_pba_size sometimes allocates an
+extra 8 bytes but never more.
+
+Since each MSIX entry size is 16 bytes, and since
+we make sure that table+pba is a power of two,
+this always leaves a multiple of 16 bytes for the PBA,
+so extra 8 bytes have no effect.
+
+I have merged your patch with the above explanation.
+
+Thanks for the contribution!
+
+
+
+> 
+> Thanks to line 365, both equations would reach at the same bar_size.
+> 
+> For instance, assuming nvme with 1333 queues,
+> 
+> with "uint32_t bar_pba_size = (nentries / 8 + 1) * 8;", bar_pba_size=1336 (line
+> 348) and bar_size=32768 (line 365).
+> 
+> with "uint32_t bar_pba_size = QEMU_ALIGN_UP(nentries, 64) / 8;",
+> bar_pba_size=168 (line 348) and bar_size=32768 (line 365).
+> 
+> That's why I mentioned "this usually would not affect the bar_size used for
+> dev->msix_exclusive_bar initialization."
+> 
+> 
+> 
+> 341 int msix_init_exclusive_bar(PCIDevice *dev, unsigned short nentries,
+> 342                             uint8_t bar_nr, Error **errp)
+> 343 {
+> 344     int ret;
+> 345     char *name;
+> 346     uint32_t bar_size = 4096;
+> 347     uint32_t bar_pba_offset = bar_size / 2;
+> 348     uint32_t bar_pba_size = (nentries / 8 + 1) * 8;
+> 349
+> 350     /*
+> 351      * Migration compatibility dictates that this remains a 4k
+> 352      * BAR with the vector table in the lower half and PBA in
+> 353      * the upper half for nentries which is lower or equal to 128.
+> 354      * No need to care about using more than 65 entries for legacy
+> 355      * machine types who has at most 64 queues.
+> 356      */
+> 357     if (nentries * PCI_MSIX_ENTRY_SIZE > bar_pba_offset) {
+> 358         bar_pba_offset = nentries * PCI_MSIX_ENTRY_SIZE;
+> 359     }
+> 360
+> 361     if (bar_pba_offset + bar_pba_size > 4096) {
+> 362         bar_size = bar_pba_offset + bar_pba_size;
+> 363     }
+> 364
+> 365     bar_size = pow2ceil(bar_size);
+> 366
+> 367     name = g_strdup_printf("%s-msix", dev->name);
+> 368     memory_region_init(&dev->msix_exclusive_bar, OBJECT(dev), name, bar_size);
+> 369     g_free(name);
+> 370
+> 371     ret = msix_init(dev, nentries, &dev->msix_exclusive_bar, bar_nr,
+> 372                     0, &dev->msix_exclusive_bar,
+> 373                     bar_nr, bar_pba_offset,
+> 374                     0, errp);
+> 375     if (ret) {
+> 376         return ret;
+> 377     }
+> 378
+> 379     pci_register_bar(dev, bar_nr, PCI_BASE_ADDRESS_SPACE_MEMORY,
+> 380                      &dev->msix_exclusive_bar);
+> 381
+> 382     return 0;
+> 383 }
+> 
+> 
+> 269 int msix_init(struct PCIDevice *dev, unsigned short nentries,
+> 270               MemoryRegion *table_bar, uint8_t table_bar_nr,
+> 271               unsigned table_offset, MemoryRegion *pba_bar,
+> 272               uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
+> 273               Error **errp)
+> 274 {
+> 275     int cap;
+> 276     unsigned table_size, pba_size;
+> 277     uint8_t *config;
+> 278
+> 279     /* Nothing to do if MSI is not supported by interrupt controller */
+> 280     if (!msi_nonbroken) {
+> 281         error_setg(errp, "MSI-X is not supported by interrupt controller");
+> 282         return -ENOTSUP;
+> 283     }
+> 284
+> 285     if (nentries < 1 || nentries > PCI_MSIX_FLAGS_QSIZE + 1) {
+> 286         error_setg(errp, "The number of MSI-X vectors is invalid");
+> 287         return -EINVAL;
+> 288     }
+> 289
+> 290     table_size = nentries * PCI_MSIX_ENTRY_SIZE;
+> 291     pba_size = QEMU_ALIGN_UP(nentries, 64) / 8;
+> 
+> 
+> Dongli Zhang
+> 
+> 
+> > 
+> > 
+> >> ---
+> >>  hw/pci/msix.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> >> index 702dac4..234c0a3 100644
+> >> --- a/hw/pci/msix.c
+> >> +++ b/hw/pci/msix.c
+> >> @@ -345,7 +345,7 @@ int msix_init_exclusive_bar(PCIDevice *dev, unsigned short nentries,
+> >>      char *name;
+> >>      uint32_t bar_size = 4096;
+> >>      uint32_t bar_pba_offset = bar_size / 2;
+> >> -    uint32_t bar_pba_size = (nentries / 8 + 1) * 8;
+> >> +    uint32_t bar_pba_size = QEMU_ALIGN_UP(nentries, 64) / 8;
+> >>  
+> >>      /*
+> >>       * Migration compatibility dictates that this remains a 4k
+> >> -- 
+> >> 2.7.4
