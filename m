@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44660)
+Received: from eggs.gnu.org ([209.51.188.92]:44697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1giwzu-0006Oo-ES
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 02:49:27 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gix07-0006VL-VH
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 02:49:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1giwzp-0001p3-JN
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 02:49:23 -0500
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:34660)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gix06-000208-0M
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 02:49:39 -0500
+Received: from mail-lf1-x12c.google.com ([2a00:1450:4864:20::12c]:37914)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1giwzp-0001nr-8D
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 02:49:21 -0500
-Received: by mail-lf1-x144.google.com with SMTP id p6so14897449lfc.1
-	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 23:49:21 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gix05-0001tT-IE
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 02:49:37 -0500
+Received: by mail-lf1-x12c.google.com with SMTP id a8so14858430lfk.5
+	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 23:49:28 -0800 (PST)
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sun, 13 Jan 2019 23:48:49 -0800
-Message-Id: <20190114074855.16891-2-jcmvbkbc@gmail.com>
+Date: Sun, 13 Jan 2019 23:48:52 -0800
+Message-Id: <20190114074855.16891-5-jcmvbkbc@gmail.com>
 In-Reply-To: <20190114074855.16891-1-jcmvbkbc@gmail.com>
 References: <20190114074855.16891-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH 1/7] target/xtensa: extract FPU helpers
+Subject: [Qemu-devel] [PATCH 4/7] target/xtensa: extract debug helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +28,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Move FPU-related HELPER functions from op_helper.c to fpu_helper.c
-No functional changes.
+Move HELPER functions related to native debugging from op_helper.c to
+dbg_helper.c. No functional changes.
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
  target/xtensa/Makefile.objs |   1 +
- target/xtensa/fpu_helper.c  | 166 ++++++++++++++++++++++++++++++++++++++++++++
- target/xtensa/op_helper.c   | 135 -----------------------------------
- 3 files changed, 167 insertions(+), 135 deletions(-)
- create mode 100644 target/xtensa/fpu_helper.c
+ target/xtensa/dbg_helper.c  | 129 ++++++++++++++++++++++++++++++++++++++++++++
+ target/xtensa/op_helper.c   |  92 -------------------------------
+ 3 files changed, 130 insertions(+), 92 deletions(-)
+ create mode 100644 target/xtensa/dbg_helper.c
 
 diff --git a/target/xtensa/Makefile.objs b/target/xtensa/Makefile.objs
-index f63352cc04db..1508714c4475 100644
+index b2c720b2df9b..cfd33ba1d951 100644
 --- a/target/xtensa/Makefile.objs
 +++ b/target/xtensa/Makefile.objs
-@@ -7,4 +7,5 @@ obj-y += core-test_kc705_be.o
+@@ -7,6 +7,7 @@ obj-y += core-test_kc705_be.o
  obj-$(CONFIG_SOFTMMU) += monitor.o xtensa-semi.o
  obj-y += xtensa-isa.o
  obj-y += translate.o op_helper.o helper.o cpu.o
-+obj-y += fpu_helper.o
++obj-$(CONFIG_SOFTMMU) += dbg_helper.o
+ obj-y += fpu_helper.o
  obj-y += gdbstub.o
-diff --git a/target/xtensa/fpu_helper.c b/target/xtensa/fpu_helper.c
+ obj-$(CONFIG_SOFTMMU) += mmu_helper.o
+diff --git a/target/xtensa/dbg_helper.c b/target/xtensa/dbg_helper.c
 new file mode 100644
-index 000000000000..f8bbb6cdd824
+index 000000000000..cd8fbd653a1a
 --- /dev/null
-+++ b/target/xtensa/fpu_helper.c
-@@ -0,0 +1,166 @@
++++ b/target/xtensa/dbg_helper.c
+@@ -0,0 +1,129 @@
 +/*
 + * Copyright (c) 2011 - 2019, Max Filippov, Open Source and Linux Lab.
 + * All rights reserved.
@@ -88,291 +90,211 @@ index 000000000000..f8bbb6cdd824
 +#include "exec/helper-proto.h"
 +#include "qemu/host-utils.h"
 +#include "exec/exec-all.h"
-+#include "fpu/softfloat.h"
++#include "exec/address-spaces.h"
 +
-+void HELPER(wur_fcr)(CPUXtensaState *env, uint32_t v)
++static void tb_invalidate_virtual_addr(CPUXtensaState *env, uint32_t vaddr)
 +{
-+    static const int rounding_mode[] = {
-+        float_round_nearest_even,
-+        float_round_to_zero,
-+        float_round_up,
-+        float_round_down,
-+    };
-+
-+    env->uregs[FCR] = v & 0xfffff07f;
-+    set_float_rounding_mode(rounding_mode[v & 3], &env->fp_status);
-+}
-+
-+float32 HELPER(abs_s)(float32 v)
-+{
-+    return float32_abs(v);
-+}
-+
-+float32 HELPER(neg_s)(float32 v)
-+{
-+    return float32_chs(v);
-+}
-+
-+float32 HELPER(add_s)(CPUXtensaState *env, float32 a, float32 b)
-+{
-+    return float32_add(a, b, &env->fp_status);
-+}
-+
-+float32 HELPER(sub_s)(CPUXtensaState *env, float32 a, float32 b)
-+{
-+    return float32_sub(a, b, &env->fp_status);
-+}
-+
-+float32 HELPER(mul_s)(CPUXtensaState *env, float32 a, float32 b)
-+{
-+    return float32_mul(a, b, &env->fp_status);
-+}
-+
-+float32 HELPER(madd_s)(CPUXtensaState *env, float32 a, float32 b, float32 c)
-+{
-+    return float32_muladd(b, c, a, 0, &env->fp_status);
-+}
-+
-+float32 HELPER(msub_s)(CPUXtensaState *env, float32 a, float32 b, float32 c)
-+{
-+    return float32_muladd(b, c, a, float_muladd_negate_product,
-+                          &env->fp_status);
-+}
-+
-+uint32_t HELPER(ftoi)(float32 v, uint32_t rounding_mode, uint32_t scale)
-+{
-+    float_status fp_status = {0};
-+
-+    set_float_rounding_mode(rounding_mode, &fp_status);
-+    return float32_to_int32(float32_scalbn(v, scale, &fp_status), &fp_status);
-+}
-+
-+uint32_t HELPER(ftoui)(float32 v, uint32_t rounding_mode, uint32_t scale)
-+{
-+    float_status fp_status = {0};
-+    float32 res;
-+
-+    set_float_rounding_mode(rounding_mode, &fp_status);
-+
-+    res = float32_scalbn(v, scale, &fp_status);
-+
-+    if (float32_is_neg(v) && !float32_is_any_nan(v)) {
-+        return float32_to_int32(res, &fp_status);
-+    } else {
-+        return float32_to_uint32(res, &fp_status);
++    uint32_t paddr;
++    uint32_t page_size;
++    unsigned access;
++    int ret = xtensa_get_physical_addr(env, false, vaddr, 2, 0,
++                                       &paddr, &page_size, &access);
++    if (ret == 0) {
++        tb_invalidate_phys_addr(&address_space_memory, paddr,
++                                MEMTXATTRS_UNSPECIFIED);
 +    }
 +}
 +
-+float32 HELPER(itof)(CPUXtensaState *env, uint32_t v, uint32_t scale)
++void HELPER(wsr_ibreakenable)(CPUXtensaState *env, uint32_t v)
 +{
-+    return float32_scalbn(int32_to_float32(v, &env->fp_status),
-+                          (int32_t)scale, &env->fp_status);
++    uint32_t change = v ^ env->sregs[IBREAKENABLE];
++    unsigned i;
++
++    for (i = 0; i < env->config->nibreak; ++i) {
++        if (change & (1 << i)) {
++            tb_invalidate_virtual_addr(env, env->sregs[IBREAKA + i]);
++        }
++    }
++    env->sregs[IBREAKENABLE] = v & ((1 << env->config->nibreak) - 1);
 +}
 +
-+float32 HELPER(uitof)(CPUXtensaState *env, uint32_t v, uint32_t scale)
++void HELPER(wsr_ibreaka)(CPUXtensaState *env, uint32_t i, uint32_t v)
 +{
-+    return float32_scalbn(uint32_to_float32(v, &env->fp_status),
-+                          (int32_t)scale, &env->fp_status);
++    if (env->sregs[IBREAKENABLE] & (1 << i) && env->sregs[IBREAKA + i] != v) {
++        tb_invalidate_virtual_addr(env, env->sregs[IBREAKA + i]);
++        tb_invalidate_virtual_addr(env, v);
++    }
++    env->sregs[IBREAKA + i] = v;
 +}
 +
-+static inline void set_br(CPUXtensaState *env, bool v, uint32_t br)
++static void set_dbreak(CPUXtensaState *env, unsigned i, uint32_t dbreaka,
++        uint32_t dbreakc)
 +{
-+    if (v) {
-+        env->sregs[BR] |= br;
-+    } else {
-+        env->sregs[BR] &= ~br;
++    CPUState *cs = CPU(xtensa_env_get_cpu(env));
++    int flags = BP_CPU | BP_STOP_BEFORE_ACCESS;
++    uint32_t mask = dbreakc | ~DBREAKC_MASK;
++
++    if (env->cpu_watchpoint[i]) {
++        cpu_watchpoint_remove_by_ref(cs, env->cpu_watchpoint[i]);
++    }
++    if (dbreakc & DBREAKC_SB) {
++        flags |= BP_MEM_WRITE;
++    }
++    if (dbreakc & DBREAKC_LB) {
++        flags |= BP_MEM_READ;
++    }
++    /* contiguous mask after inversion is one less than some power of 2 */
++    if ((~mask + 1) & ~mask) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "DBREAKC mask is not contiguous: 0x%08x\n", dbreakc);
++        /* cut mask after the first zero bit */
++        mask = 0xffffffff << (32 - clo32(mask));
++    }
++    if (cpu_watchpoint_insert(cs, dbreaka & mask, ~mask + 1,
++                              flags, &env->cpu_watchpoint[i])) {
++        env->cpu_watchpoint[i] = NULL;
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "Failed to set data breakpoint at 0x%08x/%d\n",
++                      dbreaka & mask, ~mask + 1);
 +    }
 +}
 +
-+void HELPER(un_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
++void HELPER(wsr_dbreaka)(CPUXtensaState *env, uint32_t i, uint32_t v)
 +{
-+    set_br(env, float32_unordered_quiet(a, b, &env->fp_status), br);
++    uint32_t dbreakc = env->sregs[DBREAKC + i];
++
++    if ((dbreakc & DBREAKC_SB_LB) &&
++        env->sregs[DBREAKA + i] != v) {
++        set_dbreak(env, i, v, dbreakc);
++    }
++    env->sregs[DBREAKA + i] = v;
 +}
 +
-+void HELPER(oeq_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
++void HELPER(wsr_dbreakc)(CPUXtensaState *env, uint32_t i, uint32_t v)
 +{
-+    set_br(env, float32_eq_quiet(a, b, &env->fp_status), br);
-+}
++    if ((env->sregs[DBREAKC + i] ^ v) & (DBREAKC_SB_LB | DBREAKC_MASK)) {
++        if (v & DBREAKC_SB_LB) {
++            set_dbreak(env, i, env->sregs[DBREAKA + i], v);
++        } else {
++            if (env->cpu_watchpoint[i]) {
++                CPUState *cs = CPU(xtensa_env_get_cpu(env));
 +
-+void HELPER(ueq_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+{
-+    int v = float32_compare_quiet(a, b, &env->fp_status);
-+    set_br(env, v == float_relation_equal || v == float_relation_unordered, br);
-+}
-+
-+void HELPER(olt_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+{
-+    set_br(env, float32_lt_quiet(a, b, &env->fp_status), br);
-+}
-+
-+void HELPER(ult_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+{
-+    int v = float32_compare_quiet(a, b, &env->fp_status);
-+    set_br(env, v == float_relation_less || v == float_relation_unordered, br);
-+}
-+
-+void HELPER(ole_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+{
-+    set_br(env, float32_le_quiet(a, b, &env->fp_status), br);
-+}
-+
-+void HELPER(ule_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
-+{
-+    int v = float32_compare_quiet(a, b, &env->fp_status);
-+    set_br(env, v != float_relation_greater, br);
++                cpu_watchpoint_remove_by_ref(cs, env->cpu_watchpoint[i]);
++                env->cpu_watchpoint[i] = NULL;
++            }
++        }
++    }
++    env->sregs[DBREAKC + i] = v;
 +}
 diff --git a/target/xtensa/op_helper.c b/target/xtensa/op_helper.c
-index 078aeb6c2c94..47517359ca67 100644
+index 1d3d87012c4a..e13e686479db 100644
 --- a/target/xtensa/op_helper.c
 +++ b/target/xtensa/op_helper.c
-@@ -34,7 +34,6 @@
- #include "exec/cpu_ldst.h"
- #include "exec/address-spaces.h"
- #include "qemu/timer.h"
--#include "fpu/softfloat.h"
- 
- #ifndef CONFIG_USER_ONLY
- 
-@@ -890,140 +889,6 @@ void HELPER(wsr_dbreakc)(CPUXtensaState *env, uint32_t i, uint32_t v)
+@@ -93,19 +93,6 @@ void xtensa_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                   addr);
  }
+ 
+-static void tb_invalidate_virtual_addr(CPUXtensaState *env, uint32_t vaddr)
+-{
+-    uint32_t paddr;
+-    uint32_t page_size;
+-    unsigned access;
+-    int ret = xtensa_get_physical_addr(env, false, vaddr, 2, 0,
+-            &paddr, &page_size, &access);
+-    if (ret == 0) {
+-        tb_invalidate_phys_addr(&address_space_memory, paddr,
+-                                MEMTXATTRS_UNSPECIFIED);
+-    }
+-}
+-
  #endif
  
--void HELPER(wur_fcr)(CPUXtensaState *env, uint32_t v)
+ void HELPER(exception)(CPUXtensaState *env, uint32_t excp)
+@@ -325,85 +312,6 @@ void HELPER(wsr_memctl)(CPUXtensaState *env, uint32_t v)
+     env->sregs[MEMCTL] = v & env->config->memctl_mask;
+ }
+ 
+-void HELPER(wsr_ibreakenable)(CPUXtensaState *env, uint32_t v)
 -{
--    static const int rounding_mode[] = {
--        float_round_nearest_even,
--        float_round_to_zero,
--        float_round_up,
--        float_round_down,
--    };
+-    uint32_t change = v ^ env->sregs[IBREAKENABLE];
+-    unsigned i;
 -
--    env->uregs[FCR] = v & 0xfffff07f;
--    set_float_rounding_mode(rounding_mode[v & 3], &env->fp_status);
+-    for (i = 0; i < env->config->nibreak; ++i) {
+-        if (change & (1 << i)) {
+-            tb_invalidate_virtual_addr(env, env->sregs[IBREAKA + i]);
+-        }
+-    }
+-    env->sregs[IBREAKENABLE] = v & ((1 << env->config->nibreak) - 1);
 -}
 -
--float32 HELPER(abs_s)(float32 v)
+-void HELPER(wsr_ibreaka)(CPUXtensaState *env, uint32_t i, uint32_t v)
 -{
--    return float32_abs(v);
+-    if (env->sregs[IBREAKENABLE] & (1 << i) && env->sregs[IBREAKA + i] != v) {
+-        tb_invalidate_virtual_addr(env, env->sregs[IBREAKA + i]);
+-        tb_invalidate_virtual_addr(env, v);
+-    }
+-    env->sregs[IBREAKA + i] = v;
 -}
 -
--float32 HELPER(neg_s)(float32 v)
+-static void set_dbreak(CPUXtensaState *env, unsigned i, uint32_t dbreaka,
+-        uint32_t dbreakc)
 -{
--    return float32_chs(v);
--}
+-    CPUState *cs = CPU(xtensa_env_get_cpu(env));
+-    int flags = BP_CPU | BP_STOP_BEFORE_ACCESS;
+-    uint32_t mask = dbreakc | ~DBREAKC_MASK;
 -
--float32 HELPER(add_s)(CPUXtensaState *env, float32 a, float32 b)
--{
--    return float32_add(a, b, &env->fp_status);
--}
--
--float32 HELPER(sub_s)(CPUXtensaState *env, float32 a, float32 b)
--{
--    return float32_sub(a, b, &env->fp_status);
--}
--
--float32 HELPER(mul_s)(CPUXtensaState *env, float32 a, float32 b)
--{
--    return float32_mul(a, b, &env->fp_status);
--}
--
--float32 HELPER(madd_s)(CPUXtensaState *env, float32 a, float32 b, float32 c)
--{
--    return float32_muladd(b, c, a, 0,
--            &env->fp_status);
--}
--
--float32 HELPER(msub_s)(CPUXtensaState *env, float32 a, float32 b, float32 c)
--{
--    return float32_muladd(b, c, a, float_muladd_negate_product,
--            &env->fp_status);
--}
--
--uint32_t HELPER(ftoi)(float32 v, uint32_t rounding_mode, uint32_t scale)
--{
--    float_status fp_status = {0};
--
--    set_float_rounding_mode(rounding_mode, &fp_status);
--    return float32_to_int32(
--            float32_scalbn(v, scale, &fp_status), &fp_status);
--}
--
--uint32_t HELPER(ftoui)(float32 v, uint32_t rounding_mode, uint32_t scale)
--{
--    float_status fp_status = {0};
--    float32 res;
--
--    set_float_rounding_mode(rounding_mode, &fp_status);
--
--    res = float32_scalbn(v, scale, &fp_status);
--
--    if (float32_is_neg(v) && !float32_is_any_nan(v)) {
--        return float32_to_int32(res, &fp_status);
--    } else {
--        return float32_to_uint32(res, &fp_status);
+-    if (env->cpu_watchpoint[i]) {
+-        cpu_watchpoint_remove_by_ref(cs, env->cpu_watchpoint[i]);
+-    }
+-    if (dbreakc & DBREAKC_SB) {
+-        flags |= BP_MEM_WRITE;
+-    }
+-    if (dbreakc & DBREAKC_LB) {
+-        flags |= BP_MEM_READ;
+-    }
+-    /* contiguous mask after inversion is one less than some power of 2 */
+-    if ((~mask + 1) & ~mask) {
+-        qemu_log_mask(LOG_GUEST_ERROR, "DBREAKC mask is not contiguous: 0x%08x\n", dbreakc);
+-        /* cut mask after the first zero bit */
+-        mask = 0xffffffff << (32 - clo32(mask));
+-    }
+-    if (cpu_watchpoint_insert(cs, dbreaka & mask, ~mask + 1,
+-            flags, &env->cpu_watchpoint[i])) {
+-        env->cpu_watchpoint[i] = NULL;
+-        qemu_log_mask(LOG_GUEST_ERROR, "Failed to set data breakpoint at 0x%08x/%d\n",
+-                      dbreaka & mask, ~mask + 1);
 -    }
 -}
 -
--float32 HELPER(itof)(CPUXtensaState *env, uint32_t v, uint32_t scale)
+-void HELPER(wsr_dbreaka)(CPUXtensaState *env, uint32_t i, uint32_t v)
 -{
--    return float32_scalbn(int32_to_float32(v, &env->fp_status),
--            (int32_t)scale, &env->fp_status);
--}
+-    uint32_t dbreakc = env->sregs[DBREAKC + i];
 -
--float32 HELPER(uitof)(CPUXtensaState *env, uint32_t v, uint32_t scale)
--{
--    return float32_scalbn(uint32_to_float32(v, &env->fp_status),
--            (int32_t)scale, &env->fp_status);
--}
--
--static inline void set_br(CPUXtensaState *env, bool v, uint32_t br)
--{
--    if (v) {
--        env->sregs[BR] |= br;
--    } else {
--        env->sregs[BR] &= ~br;
+-    if ((dbreakc & DBREAKC_SB_LB) &&
+-            env->sregs[DBREAKA + i] != v) {
+-        set_dbreak(env, i, v, dbreakc);
 -    }
+-    env->sregs[DBREAKA + i] = v;
 -}
 -
--void HELPER(un_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
+-void HELPER(wsr_dbreakc)(CPUXtensaState *env, uint32_t i, uint32_t v)
 -{
--    set_br(env, float32_unordered_quiet(a, b, &env->fp_status), br);
--}
+-    if ((env->sregs[DBREAKC + i] ^ v) & (DBREAKC_SB_LB | DBREAKC_MASK)) {
+-        if (v & DBREAKC_SB_LB) {
+-            set_dbreak(env, i, env->sregs[DBREAKA + i], v);
+-        } else {
+-            if (env->cpu_watchpoint[i]) {
+-                CPUState *cs = CPU(xtensa_env_get_cpu(env));
 -
--void HELPER(oeq_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
--{
--    set_br(env, float32_eq_quiet(a, b, &env->fp_status), br);
+-                cpu_watchpoint_remove_by_ref(cs, env->cpu_watchpoint[i]);
+-                env->cpu_watchpoint[i] = NULL;
+-            }
+-        }
+-    }
+-    env->sregs[DBREAKC + i] = v;
 -}
--
--void HELPER(ueq_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
--{
--    int v = float32_compare_quiet(a, b, &env->fp_status);
--    set_br(env, v == float_relation_equal || v == float_relation_unordered, br);
--}
--
--void HELPER(olt_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
--{
--    set_br(env, float32_lt_quiet(a, b, &env->fp_status), br);
--}
--
--void HELPER(ult_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
--{
--    int v = float32_compare_quiet(a, b, &env->fp_status);
--    set_br(env, v == float_relation_less || v == float_relation_unordered, br);
--}
--
--void HELPER(ole_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
--{
--    set_br(env, float32_le_quiet(a, b, &env->fp_status), br);
--}
--
--void HELPER(ule_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
--{
--    int v = float32_compare_quiet(a, b, &env->fp_status);
--    set_br(env, v != float_relation_greater, br);
--}
--
+ #endif
+ 
  uint32_t HELPER(rer)(CPUXtensaState *env, uint32_t addr)
- {
- #ifndef CONFIG_USER_ONLY
 -- 
 2.11.0
