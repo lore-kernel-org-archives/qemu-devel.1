@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50895)
+Received: from eggs.gnu.org ([209.51.188.92]:52763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj8FF-0002ii-0S
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:50:01 -0500
+	(envelope-from <noring@nocrew.org>) id 1gj8Ng-0005Vq-OI
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:58:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj8FC-0007fC-W4
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:50:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59244)
+	(envelope-from <noring@nocrew.org>) id 1gj8Nf-000628-Ov
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:58:44 -0500
+Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:47542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gj8FB-0007dn-5T
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:49:58 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E7D8280495
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 19:49:54 +0000 (UTC)
-References: <20190114113827.24388-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <aa15d9b9-11ff-a21e-6ecb-ef73fcc7687a@redhat.com>
-Date: Mon, 14 Jan 2019 13:49:53 -0600
+	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gj8Nf-00060u-Bm
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:58:43 -0500
+Date: Mon, 14 Jan 2019 20:49:02 +0100
+From: Fredrik Noring <noring@nocrew.org>
+Message-ID: <20190114194902.GA29211@sx9>
+References: <cover.1541093316.git.noring@nocrew.org>
+	<eecae865fc8f7934cc2d51b24cba7d8ac3ec37c6.1541093316.git.noring@nocrew.org>
+	<BN6PR2201MB1251DBF84B71346A8B673CA6C6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20190101182745.GA17022@sx9>
+	<BN6PR2201MB1251C334FE66ADF677BAE8D2C68E0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20190113185708.GA27922@sx9>
+	<CAL1e-=je93qUvfcq3ftNxYucjLYPEZf=dPXv6tSuzsE3SdsWKw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190114113827.24388-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="N4LafukvbGtDjOBgMq7raQnXsOxZR3vqU"
-Subject: Re: [Qemu-devel] [PATCH] io: ensure UNIX client doesn't unlink
- server socket
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAL1e-=je93qUvfcq3ftNxYucjLYPEZf=dPXv6tSuzsE3SdsWKw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 09/12] tests/tcg/mips: Test R5900
+ three-operand MADDU1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,73 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Maciej W. Rozycki" <macro@linux-mips.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---N4LafukvbGtDjOBgMq7raQnXsOxZR3vqU
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <aa15d9b9-11ff-a21e-6ecb-ef73fcc7687a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] io: ensure UNIX client doesn't unlink server
- socket
-References: <20190114113827.24388-1-berrange@redhat.com>
-In-Reply-To: <20190114113827.24388-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Aleksandar,
 
-On 1/14/19 5:38 AM, Daniel P. Berrang=C3=A9 wrote:
-> The qio_channel_socket_close method for was mistakenly unlinking the
-> UNIX server socket, even if the channel was a client connection. This
-> was not noticed with chardevs, since they never call close, but with th=
-e
-> VNC server, this caused the VNC server socket to be deleted after the
-> first client quit.
->=20
-> The qio_channel_socket_close method also needlessly reimplemented the
-> logic that already exists in socket_listen_cleanup(). Just call that
-> method directly, for listen sockets only.
->=20
-> This fixes a regression introduced in QEMU 3.0.0 with
->=20
->   commit d66f78e1eaa832f73c771d9df1b606fe75d52a50
->   Author: Pavel Balaev <mail@void.so>
->   Date:   Mon May 21 19:17:35 2018 +0300
->=20
->     Delete AF_UNIX socket after close
->=20
-> Fixes launchpad #1795100
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  io/channel-socket.c            | 19 ++------
->  tests/test-io-channel-socket.c | 86 ++++++++++++++++++++++++++++++----=
+> Awesome!
+> 
+> I am especially happy with your choice of naming "mmr" (MultiMedia
+> Registers) for these fieilds, since that is what they really are (and they
+> are certainly not "gprs"). Right on the money!
 
->  2 files changed, 80 insertions(+), 25 deletions(-)
+Great, thanks!
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> > For HI1 and LO1 only? I'm asking since HI0 and LO0 are implemented with
+> > the DSP array anyway, for all ISAs.
+> 
+> I leave it to your judgement. If you are not sure (or you find the current
+> implementation too sensitive or contrieved to touch), you can leave HI1/LO1
+> fields implementation as it is now. My motivation was avoiding usage of the
+> same data fields for two relatively independant purposes.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+I think the change is simple, but what should we call the new variables?
 
+/* global register indices */
+static TCGv cpu_gpr[32], cpu_PC;
+static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
+static TCGv cpu_HI1, cpu_LO1;    /* Upper half of 128-bit TX79 HI and LO */
 
---N4LafukvbGtDjOBgMq7raQnXsOxZR3vqU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Something like the last line?
 
------BEGIN PGP SIGNATURE-----
+By the way, what are your thoughts on "[PATCH v2 3/6] target/mips: Fix
+HI[ac] and LO[ac] 32-bit truncation with MIPS64 DSP ASE"?
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw85+EACgkQp6FrSiUn
-Q2oG9Qf/XkQmoc3XHt++OZCzt6oTSi/bdSl654pv5yyBl/RjF6hM5jQeT8ehhyfq
-TaG2X3CwCHETQAmTpI0+sgh9YV+V1FS+0qR6VOAmoq4HUwVBQOBZilnmJptSzGdo
-uyBEOmm7ncu2Zo/To063VnvAGNEhiTxYKmp40h0hJXQNP5xVmDDmZPOvCmPhl/M/
-fF0i7pSYWojy843MN6irkIDUVjUha6wJLmm+MUpNeQnwMRY4PVuPMay7PS6sfRoH
-qpxr+X831xe5auOaQHm/eZp3xwWnqGWCOqDB5pFvsVmM7GETSuSOBv3FY+Dlnh1/
-nwJuNEZgjGjqegigSfC6277cF0jpJA==
-=oORF
------END PGP SIGNATURE-----
+https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg01287.html
 
---N4LafukvbGtDjOBgMq7raQnXsOxZR3vqU--
+> Outstanding! I salute your including PCPYUD and PCPYLD in this group - they
+> too can be considered "basic R/W access to mmr".
+
+Good, many thanks!
+
+> The goal right now is to prepare basic stuff related to SA register, even
+> though there is possibly no immediate any application use case. However,
+> this will make potential future development considerably easier, so please
+> include handling of this register and these instructions.
+
+Done, although I have some minor clean-ups left to do. I have checked with
+R5900 hardware to match the implementation defined value of the SA register.
+
+I will post MFSA, MTSA, MTSAB and MTSAH in v2 of this patch series.
+
+> Regarding segments:
+> 
+> +    int rs = extract32(ctx->opcode, 21, 5);
+> +    int rt = extract32(ctx->opcode, 16, 5);
+> +    int rd = extract32(ctx->opcode, 11, 5);
+> 
+> Please include them in gen_XXX() functions, rather than in decode_XXX()
+> functions. This will leave decode_XXX() functions with a single
+> responsibility of detecting what instruction is about to be processed,
+> which is cleaner from logical decomposition point of view (even if it would
+> sometimes result in the repetition of some code segments - logical
+> decomposition is of far greater importance).
+
+Done!
+
+Fredrik
