@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40076)
+Received: from eggs.gnu.org ([209.51.188.92]:40682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1giyoQ-00081F-Rr
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:45:45 -0500
+	(envelope-from <remy.noel@blade-group.com>) id 1giyqi-0000lj-OY
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:48:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1giyoO-0006NR-Ho
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:45:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48910)
+	(envelope-from <remy.noel@blade-group.com>) id 1giyqh-0008Dp-8c
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:48:04 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:34564)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1giyoO-0006Fi-5j
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:45:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1giyoC-0006A3-9A
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 09:45:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 354DC2E80CC
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 09:45:28 +0000 (UTC)
+	(Exim 4.71) (envelope-from <remy.noel@blade-group.com>)
+	id 1giyqg-00080v-Gu
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:48:03 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id j2so22107399wrw.1
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 01:47:41 -0800 (PST)
+From: remy.noel@blade-group.com
+Date: Mon, 14 Jan 2019 10:48:04 +0100
+Message-ID: <20190114094804.byut5p4hbyi6suit@gmail.com>
+References: <20181220152030.28035-1-remy.noel@blade-group.com>
+	<20190112083008.GA20193@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Jan 2019 09:30:40 -0000
-From: Stefan Hajnoczi <1523246@bugs.launchpad.net>
-Reply-To: Bug 1523246 <1523246@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151206150708.14182.82430.malonedeb@wampee.canonical.com>
-Message-Id: <154745824101.18746.11146165216539749242.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1523246] Re: Virtio-blk does not support TRIM
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20190112083008.GA20193@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [QEMU-devel][PATCH v4 0/2] Fix concurrent
+ aio_poll/set_fd_handler.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +31,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: remy.noel@blade-group.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>
 
-While the Linux virtio-blk guest driver now supports discard and write
-zeroes, QEMU's virtio-blk device emulation does not support it yet.
+On Sat, Jan 12, 2019 at 08:30:08AM +0000, Stefan Hajnoczi wrote:
+>Thanks, applied to my block tree:
+>https://github.com/stefanha/qemu/commits/block
+>
+Thanks !
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1523246
-
-Title:
-  Virtio-blk does not support TRIM
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  When model=3Dvirtio is used, TRIM is not supported.
-
-  # mount -o discard /dev/vda4 /mnt
-  # mount | tail -1
-  /dev/vda4 on /mnt type fuseblk (rw,nosuid,nodev,relatime,user_id=3D0,grou=
-p_id=3D0,allow_other,blksize=3D4096)
-  # fstrim /mnt/
-  fstrim: /mnt/: the discard operation is not supported
-
-  Booting without model=3Dvirtio allows using TRIM (in Windows as well).
-
-  Full QEMU line:
-
-  qemu-system-x86_64 -enable-kvm -cpu host -bios
-  /usr/share/ovmf/ovmf_x64.bin -smp 2 -m 7G -vga qxl -usbdevice tablet
-  -net nic,model=3Dvirtio -net user -drive discard=3Dunmap,detect-
-  zeroes=3Dunmap,cache=3Dnone,file=3Dvms/win10.hd.img.vmdk,format=3Dvmdk,if=
-=3Dvirtio
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1523246/+subscriptions
+Remy
