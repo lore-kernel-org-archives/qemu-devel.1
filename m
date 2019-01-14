@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53376)
+Received: from eggs.gnu.org ([209.51.188.92]:54453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj4oR-0001RX-4a
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:10:08 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gj4sH-0005ox-7q
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:14:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj4oO-0002ak-6U
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:10:05 -0500
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:56014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gj4oM-0002Wz-3c
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:10:04 -0500
-Received: by mail-wm1-x32c.google.com with SMTP id y139so92956wmc.5
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 08:10:00 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 14 Jan 2019 16:09:54 +0000
-Message-Id: <20190114160956.7513-4-alex.bennee@linaro.org>
-In-Reply-To: <20190114160956.7513-1-alex.bennee@linaro.org>
-References: <20190114160956.7513-1-alex.bennee@linaro.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gj4sG-0005Ct-EX
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:14:05 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 14 Jan 2019 16:13:59 +0000
+Message-ID: <72f0f931-4b0e-e2fc-6cd2-e70766c4a3b2@virtuozzo.com>
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-4-vsementsov@virtuozzo.com>
+	<02429c8e-6453-3160-df89-1ae51d1abf7b@redhat.com>
+In-Reply-To: <02429c8e-6453-3160-df89-1ae51d1abf7b@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4802E3D805563048AA4BBAD4DC51FAA6@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 3/5] contrib/gitdm: add two more IBM'ers to
- group-map-ibm
+Subject: Re: [Qemu-devel] [PATCH v5 03/11] block: improve should_update_child
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-diff --git a/contrib/gitdm/group-map-ibm b/contrib/gitdm/group-map-ibm
-index 6c0570107d..22727319b3 100644
---- a/contrib/gitdm/group-map-ibm
-+++ b/contrib/gitdm/group-map-ibm
-@@ -6,6 +6,8 @@ aik@ozlabs.ru
- andrew@aj.id.au
- benh@kernel.crashing.org
- clg@kaod.org
-+danielhb413@gmail.com
- groug@kaod.org
-+jcfaracco@gmail.com
- joel@jms.id.au
- sjitindarsingh@gmail.com
--- 
-2.17.1
+MTQuMDEuMjAxOSAxNzozMiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4xMi4xOCAxMzoyMCwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEFzIGl0IGFscmVhZHkgc2Fp
+ZCBpbiB0aGUgY29tbWVudCwgd2UgZG9uJ3Qgd2FudCB0byBjcmVhdGUgbG9vcHMgaW4NCj4+IHBh
+cmVudC0+Y2hpbGQgcmVsYXRpb25zLiBTbywgd2hlbiB3ZSB0cnkgdG8gYXBwZW5kIEB0byB0byBA
+Yywgd2Ugc2hvdWxkDQo+PiBjaGVjayB0aGF0IEBjIGlzIG5vdCBpbiBAdG8gY2hpbGRyZW4gc3Vi
+dHJlZSwgYW5kIHdlIHNob3VsZCBjaGVjayBpdA0KPj4gcmVjdXJzaXZlbHksIG5vdCBvbmx5IHRo
+ZSBmaXJzdCBsZXZlbC4gVGhlIHBhdGNoIHByb3ZpZGVzIEJGUy1iYXNlZA0KPj4gc2VhcmNoLCB0
+byBjaGVjayB0aGUgcmVsYXRpb25zLg0KPj4NCj4+IFRoaXMgaXMgbmVlZGVkIGZvciBmdXJ0aGVy
+IGZsZWVjaW5nLWhvb2sgZmlsdGVyIHVzYWdlOiB3ZSBuZWVkIHRvDQo+PiBhcHBlbmQgaXQgdG8g
+c291cmNlLCB3aGVuIHRoZSBob29rIGlzIGFscmVhZHkgYSBwYXJlbnQgb2YgdGFyZ2V0LCBhbmQN
+Cj4+IHNvdXJjZSBtYXkgYmUgaW4gYSBiYWNraW5nIGNoYWluIG9mIHRhcmdldCAoZmxlZWNpbmct
+c2NoZW1lKS4gU28sIG9uDQo+PiBhcHBlbmRpbmcsIHRoZSBob29rIHNob3VsZCBub3QgYmVjYW1l
+IGEgY2hpbGQgKGRpcmVjdCBvciB0aHJvdWdoDQo+PiBjaGlsZHJlbiBzdWJ0cmVlKSBvZiB0aGUg
+dGFyZ2V0Lg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
+aXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBibG9jay5jIHwgMzMg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAy
+OCBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPiANCj4gSnVzdCB0d28gdGVjaG5pY2Fs
+IGRldGFpbHM6DQo+IA0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrLmMgYi9ibG9jay5jDQo+PiBpbmRl
+eCA0ZjVmZjJjYzEyLi44ZjA0ZjI5M2RhIDEwMDY0NA0KPj4gLS0tIGEvYmxvY2suYw0KPj4gKysr
+IGIvYmxvY2suYw0KPj4gQEAgLTM1MzYsNyArMzUzNiw3IEBAIHZvaWQgYmRydl9jbG9zZV9hbGwo
+dm9pZCkNCj4+ICAgDQo+PiAgIHN0YXRpYyBib29sIHNob3VsZF91cGRhdGVfY2hpbGQoQmRydkNo
+aWxkICpjLCBCbG9ja0RyaXZlclN0YXRlICp0bykNCj4+ICAgew0KPj4gLSAgICBCZHJ2Q2hpbGQg
+KnRvX2M7DQo+PiArICAgIEdMaXN0ICpxdWV1ZSA9IE5VTEwsICpwb3M7DQo+IA0KPiBHU0xpc3Qg
+c2hvdWxkIGJlIHN1ZmZpY2llbnQsIEkgdGhpbmsuDQo+IA0KPj4gICANCj4+ICAgICAgIGlmIChj
+LT5yb2xlLT5zdGF5X2F0X25vZGUpIHsNCj4+ICAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+PiBA
+QCAtMzU3MiwxMyArMzU3MiwzNiBAQCBzdGF0aWMgYm9vbCBzaG91bGRfdXBkYXRlX2NoaWxkKEJk
+cnZDaGlsZCAqYywgQmxvY2tEcml2ZXJTdGF0ZSAqdG8pDQo+PiAgICAgICAgKiBpZiBBIGlzIGEg
+Y2hpbGQgb2YgQiwgdGhhdCBtZWFucyB3ZSBjYW5ub3QgcmVwbGFjZSBBIGJ5IEIgdGhlcmUNCj4+
+ICAgICAgICAqIGJlY2F1c2UgdGhhdCB3b3VsZCBjcmVhdGUgYSBsb29wLiAgU2lsZW50bHkgZGV0
+YWNoaW5nIEEgZnJvbSBCDQo+PiAgICAgICAgKiBpcyBhbHNvIG5vdCByZWFsbHkgYW4gb3B0aW9u
+LiAgU28gb3ZlcmFsbCBqdXN0IGxlYXZpbmcgQSBpbg0KPj4gLSAgICAgKiBwbGFjZSB0aGVyZSBp
+cyB0aGUgbW9zdCBzZW5zaWJsZSBjaG9pY2UuICovDQo+PiAtICAgIFFMSVNUX0ZPUkVBQ0godG9f
+YywgJnRvLT5jaGlsZHJlbiwgbmV4dCkgew0KPj4gLSAgICAgICAgaWYgKHRvX2MgPT0gYykgew0K
+Pj4gLSAgICAgICAgICAgIHJldHVybiBmYWxzZTsNCj4+ICsgICAgICogcGxhY2UgdGhlcmUgaXMg
+dGhlIG1vc3Qgc2Vuc2libGUgY2hvaWNlLg0KPj4gKyAgICAgKg0KPj4gKyAgICAgKiBXZSB3b3Vs
+ZCBhbHNvIGNyZWF0ZSBhIGxvb3AgaW4gYW55IGNhc2VzIHdoZXJlIEBjIGlzIG9ubHkNCj4+ICsg
+ICAgICogaW5kaXJlY3RseSByZWZlcmVuY2VkIGJ5IEB0by4gUHJldmVudCB0aGlzIGJ5IHJldHVy
+bmluZyBmYWxzZQ0KPj4gKyAgICAgKiBpZiBAYyBpcyBmb3VuZCAoYnkgYnJlYWR0aC1maXJzdCBz
+ZWFyY2gpIGFueXdoZXJlIGluIHRoZSB3aG9sZQ0KPj4gKyAgICAgKiBzdWJ0cmVlIG9mIEB0by4N
+Cj4+ICsgICAgICovDQo+PiArDQo+PiArICAgIHBvcyA9IHF1ZXVlID0gZ19saXN0X2FwcGVuZChx
+dWV1ZSwgdG8pOw0KPj4gKyAgICB3aGlsZSAocG9zKSB7DQo+PiArICAgICAgICBCbG9ja0RyaXZl
+clN0YXRlICp2ID0gcG9zLT5kYXRhOw0KPj4gKyAgICAgICAgQmRydkNoaWxkICpjMjsNCj4+ICsN
+Cj4+ICsgICAgICAgIFFMSVNUX0ZPUkVBQ0goYzIsICZ2LT5jaGlsZHJlbiwgbmV4dCkgew0KPj4g
+KyAgICAgICAgICAgIGlmIChjMiA9PSBjKSB7DQo+PiArICAgICAgICAgICAgICAgIGdfbGlzdF9m
+cmVlKHF1ZXVlKTsNCj4+ICsgICAgICAgICAgICAgICAgcmV0dXJuIGZhbHNlOw0KPj4gKyAgICAg
+ICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgICAgICBpZiAoZ19saXN0X2ZpbmQocXVldWUsIGMy
+LT5icykpIHsNCj4+ICsgICAgICAgICAgICAgICAgY29udGludWU7DQo+PiArICAgICAgICAgICAg
+fQ0KPj4gKw0KPj4gKyAgICAgICAgICAgIHF1ZXVlID0gZ19saXN0X2FwcGVuZChxdWV1ZSwgYzIt
+PmJzKTsNCj4gDQo+IEFwcGVuZGluZyB0byBwb3Mgc2hvdWxkIGJlIGEgYml0IHF1aWNrZXIsIEkg
+cHJlc3VtZS4gIChBbmQgeW91IGNhbg0KPiBwcm9iYWJseSBpZ25vcmUgdGhlIHJlc3VsdCwgb3Ig
+anVzdCBhc3NlcnQgdGhhdCB0aGUgZmlyc3QgYXJndW1lbnQgd2FzDQo+IHJldHVybmVkLikNCg0K
+U28sIGV2ZW4gYmV0dGVyIGlzIHRvIHVzZSBHUXVldWUsIHN0cmFuZ2UgdGhhdCBJIGRpZG4ndC4N
+Cg0KPiANCj4gTWF4DQo+IA0KPj4gICAgICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgIHBvcyA9
+IHBvcy0+bmV4dDsNCj4+ICAgICAgIH0NCj4+ICAgDQo+PiArICAgIGdfbGlzdF9mcmVlKHF1ZXVl
+KTsNCj4+ICAgICAgIHJldHVybiB0cnVlOw0KPj4gICB9DQo+PiAgIA0KPj4NCj4gDQo+IA0KDQoN
+Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
