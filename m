@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37580)
+Received: from eggs.gnu.org ([209.51.188.92]:37485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3tO-0007l4-Vo
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:13 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gj3tJ-0007fU-GR
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3tJ-0001GJ-2M
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:10 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:41051)
+	(envelope-from <alex.bennee@linaro.org>) id 1gj3tI-0001G0-PQ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:05 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:35404)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gj3tI-0001EO-R5
+	id 1gj3tH-0001D0-SB
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:11:04 -0500
-Received: by mail-wr1-x429.google.com with SMTP id x10so23227506wrs.8
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:11:02 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id t200so9264328wmt.0
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:11:01 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 14 Jan 2019 15:01:24 +0000
-Message-Id: <20190114150129.1013-17-alex.bennee@linaro.org>
+Date: Mon, 14 Jan 2019 15:01:19 +0000
+Message-Id: <20190114150129.1013-12-alex.bennee@linaro.org>
 In-Reply-To: <20190114150129.1013-1-alex.bennee@linaro.org>
 References: <20190114150129.1013-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/21] docker: Use a stable snapshot for Debian
- Sid
+Subject: [Qemu-devel] [PULL 11/21] travis: use homebrew addon for MacOSX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +30,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Rather than poking homebrew manually we can specify the packages
+needed via the homebrew addon. These are only installed on MacOS based
+builds.
 
-The Debian Sid repository is not garanteed to be stable, as his
-'unstable' name suggest :)
-To allow quick testing, packages are pushed various time a day,
-which my be annoying when trying to use it for stable development
-(which is not recommended, but Sid provides edge packages we use
-for testing).
-
-Debian provides repositories snapshots which are suitable for our
-use. Pick a recent date that works. When required, update to newer
-releases will be easy.
-
-This fixes current issues with this image:
-
-  $ make docker-image-debian-sid
-  [...]
-  The following packages have unmet dependencies:
-   build-essential : Depends: dpkg-dev (>= 1.17.11) but it is not going to be installed
-   git : Depends: perl but it is not going to be installed
-         Depends: liberror-perl but it is not going to be installed
-   pkg-config : Depends: libdpkg-perl but it is not going to be installed
-   texinfo : Depends: perl (>= 5.26.2-6) but it is not going to be installed
-             Depends: libtext-unidecode-perl but it is not going to be installed
-             Depends: libxml-libxml-perl but it is not going to be installed
-  E: Unable to correct problems, you have held broken packages.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-[AJB: also tweak FROM to a earlier snapshot]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
-index 4e4cda0ba5..676941cb32 100644
---- a/tests/docker/dockerfiles/debian-sid.docker
-+++ b/tests/docker/dockerfiles/debian-sid.docker
-@@ -11,7 +11,12 @@
- # updated and trigger a re-build.
- #
+diff --git a/.travis.yml b/.travis.yml
+index fa70429459..2ef7997d25 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -42,6 +42,12 @@ addons:
+       - sparse
+       - uuid-dev
+       - gcovr
++  homebrew:
++    packages:
++      - libffi
++      - gettext
++      - glib
++      - pixman
  
--FROM debian:sid-slim
-+# This must be earlier than the snapshot date we are aiming for
-+FROM debian:sid-20181011-slim
-+
-+# Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
-+ENV DEBIAN_SNAPSHOT_DATE "20181030"
-+RUN sed -i "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [check-valid-until=no] \1snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT_DATE} \2%" /etc/apt/sources.list
  
- # Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
- ENV DEBIAN_SNAPSHOT_DATE "20181030"
+ # The channel name "irc.oftc.net#qemu" is encrypted against qemu/qemu
+@@ -68,9 +74,6 @@ git:
+   submodules: false
+ 
+ 
+-before_install:
+-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update ; fi
+-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libffi gettext glib pixman ; fi
+ before_script:
+   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+   - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
 -- 
 2.17.1
