@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35152)
+Received: from eggs.gnu.org ([209.51.188.92]:35279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7F-0004l4-Tm
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:58 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7K-0004nX-C5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7E-0001e3-1V
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:57 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37518)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7I-0001iM-B5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:02 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:40604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB7A-0001VE-6d
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:53 -0500
+	id 1gjB7I-0001Xo-1C
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:00 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:46 +0100
-Message-Id: <20190114225306.21569-46-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:50 +0100
+Message-Id: <20190114225306.21569-50-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 45/65] slirp: replace error_report() with
- g_critical()
+Subject: [Qemu-devel] [PULL 49/65] slirp: use virtual time for packet
+ expiration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +29,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Paolo Bonzini <pbonzini@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Reduce dependency on QEMU. QEMU could use a custom log handler if it
-wants to redirect/filter it.
+Make all packets expiration time based on virtual clock.
 
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/misc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ slirp/if.c    | 2 +-
+ slirp/slirp.c | 7 ++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 753b3da25b..b141446319 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -162,7 +162,7 @@ fork_exec(struct socket *so, const char *ex)
-     g_strfreev(argv);
+diff --git a/slirp/if.c b/slirp/if.c
+index aa88cc4e76..ce4f5fac53 100644
+--- a/slirp/if.c
++++ b/slirp/if.c
+@@ -148,7 +148,7 @@ diddit:
+  */
+ void if_start(Slirp *slirp)
+ {
+-    uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++    uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     bool from_batchq =3D false;
+     struct mbuf *ifm, *ifm_next, *ifqt;
 =20
-     if (err) {
--        error_report("%s", err->message);
-+        g_critical("fork_exec: %s", err->message);
-         g_error_free(err);
-         closesocket(sp[0]);
-         closesocket(sp[1]);
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index e860750f72..7091c3998a 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -582,7 +582,7 @@ void slirp_pollfds_poll(GArray *pollfds, int select_e=
+rror)
+         return;
+     }
+=20
+-    curtime =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    curtime =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+=20
+     QTAILQ_FOREACH(slirp, &slirp_instances, entry) {
+         /*
+@@ -909,7 +909,8 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, =
+struct ethhdr *eh,
+             ifm->resolution_requested =3D true;
+=20
+             /* Expire request and drop outgoing packet after 1 second */
+-            ifm->expiration_date =3D qemu_clock_get_ns(QEMU_CLOCK_REALTI=
+ME) + 1000000000ULL;
++            ifm->expiration_date =3D
++                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 1000000000ULL;
+         }
+         return 0;
+     } else {
+@@ -936,7 +937,7 @@ static int if_encap6(Slirp *slirp, struct mbuf *ifm, =
+struct ethhdr *eh,
+             ndp_send_ns(slirp, ip6h->ip_dst);
+             ifm->resolution_requested =3D true;
+             ifm->expiration_date =3D
+-                qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + 1000000000ULL;
++                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 1000000000ULL;
+         }
+         return 0;
+     } else {
 --=20
 2.20.1
