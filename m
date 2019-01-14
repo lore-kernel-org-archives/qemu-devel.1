@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42792)
+Received: from eggs.gnu.org ([209.51.188.92]:44452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj5fm-0001IC-Vv
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:05:15 -0500
+	(envelope-from <bounces@canonical.com>) id 1gj5l5-0005Nw-Cl
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:10:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj5fl-0006NF-1J
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:05:14 -0500
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:34921)
+	(envelope-from <bounces@canonical.com>) id 1gj5l4-0001A0-4C
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:10:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36946)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gj5fj-0006BD-7v
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:05:12 -0500
-Received: by mail-ot1-x32d.google.com with SMTP id 81so19968945otj.2
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 09:05:05 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gj5l3-00019D-Uf
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:10:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gj5l2-0005ZZ-Ii
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 17:10:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 82A812E8050
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 17:10:40 +0000 (UTC)
 MIME-Version: 1.0
-References: <CAFEAcA8GE72MaUFvbfHUL7vwkBNzWh+q_0VgzbmLJ-StYhWM4Q@mail.gmail.com>
-	<a1dddb07-0602-f488-210e-e4f6611f64ae@redhat.com>
-In-Reply-To: <a1dddb07-0602-f488-210e-e4f6611f64ae@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Jan 2019 17:04:53 +0000
-Message-ID: <CAFEAcA9Fo4t4zN2CeoQyB1pJyM0XcKFgi73zyQuwZUxRhLN5XQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] -device foo,
- help shouldn't be allowed for devices where -device foo is forbidden
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Jan 2019 17:03:41 -0000
+From: Chris <1811711@bugs.launchpad.net>
+Reply-To: Bug 1811711 <1811711@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154748542167.20943.17238616375041067992.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1811711] [NEW] qemu-img can not convert
+ virtualbox virtual disk formats qcow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +36,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Mon, 14 Jan 2019 at 16:59, Thomas Huth <thuth@redhat.com> wrote:
->
-> On 2019-01-14 17:31, Peter Maydell wrote:
-> > We prohibit -device foo for non-pluggable devices:
-> > $ ./build/all/x86_64-softmmu/qemu-system-x86_64 -device i8257
-> > qemu-system-x86_64: -device i8257: Parameter 'driver' expects
-> > pluggable device type
-> >
-> > And we suppress them from "-device help" output too.
-> >
-> > But we still allow the user to do this:
-> >
-> > $ ./build/all/x86_64-softmmu/qemu-system-x86_64 -device i8257,help
-> > i8257 options:
-> >   dshift=<int32>
-> >   base=<int32>
-> >   pageh-base=<int32>
-> >   page-base=<int32>
->
-> Could this still be sometimes useful, e.g. when a device is configured
-> with the "-global" parameter?
+Public bug reported:
 
-Hmm, good point: some of the properties are usefully human
-changeable even for built-in devices. But a lot of them
-are not, if you look at the iotkit example.
-Perhaps a useful compromise would be filtering out the
-"child<" properties? (these are all created via
-object_property_add_child() and user changes to them seem
-unlikely to be ever something that would work).
+Hello, I'm working with QEMU on macOS, and am experiencing issues
+working with the `qemu-img` command.
 
-thanks
--- PMM
+Info
+----
+$ sw_vers
+ProductName:    Mac OS X
+ProductVersion: 10.13.6
+BuildVersion:   17G4015
+
+VirtualBox
+----------
+$ VBoxManage --version
+6.0.0r127566
+
+$ qemu-system-x86_64 --version
+QEMU emulator version 3.1.50 (v3.1.0-rc2-745-g147923b1a9-dirty)
+Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
+
+$ qemu-img --version
+qemu-img version 3.1.50 (v3.1.0-rc2-745-g147923b1a9-dirty)
+Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
+
+Steps to reproduce
+------------------
+
+> Prereq VirtualBox needs to be installed to run the `VBoxManage`
+command
+
+$ VBoxManage createmedium disk --filename vbox-vdisk-exp.qcow --format qcow=
+ --size 5
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+Medium created. UUID: e2b36955-3791-4c0e-93d4-913669b1d9fb
+
+$ file vbox-vdisk-exp.qcow
+vbox-vdisk-exp.qcow: QEMU QCOW Image (v1), 5242880 bytes
+
+$ qemu-img info vbox-vdisk-exp.qcow
+image: vbox-vdisk-exp.qcow
+file format: qcow
+virtual size: 5.0M (5242880 bytes)
+disk size: 8.0K
+cluster_size: 4096
+
+# Convert vbox virtualdisk to qcow2 format using `qemu-img`
+$ qemu-img convert -f qcow vbox-vdisk-exp.qcow -O qcow2 vbox-vdisk-exp-conv=
+ert.qcow2
+
+$ file vbox-vdisk-exp-convert.qcow2
+vbox-vdisk-exp-convert.qcow2: QEMU QCOW Image (v3), 5242880 bytes
+
+# Print info about qemu-img converted image from vbox created qcow image
+$ qemu-img info vbox-vdisk-exp-convert.qcow2                               =
+                    mutts-6 | 0 < 10:53:00
+image: vbox-vdisk-exp-convert.qcow2
+file format: qcow2
+virtual size: 5.0M (5242880 bytes)
+disk size: 196K
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    lazy refcounts: false
+    refcount bits: 16
+    corrupt: false
+
+# Print info about vbox created qcow image
+qemu-img info vbox-vdisk-exp.qcow                                          =
+                  mutts-6 | 0 < 10:53:19
+image: vbox-vdisk-exp.qcow
+file format: qcow
+virtual size: 5.0M (5242880 bytes)
+disk size: 8.0K
+cluster_size: 4096
+
+I've attached a zip file containing the vbox created qcow image along
+with the image that `qemu-img` converted.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "vdisks.zip"
+   https://bugs.launchpad.net/bugs/1811711/+attachment/5229022/+files/vdisk=
+s.zip
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1811711
+
+Title:
+  qemu-img can not convert virtualbox virtual disk formats qcow
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello, I'm working with QEMU on macOS, and am experiencing issues
+  working with the `qemu-img` command.
+
+  Info
+  ----
+  $ sw_vers
+  ProductName:    Mac OS X
+  ProductVersion: 10.13.6
+  BuildVersion:   17G4015
+
+  VirtualBox
+  ----------
+  $ VBoxManage --version
+  6.0.0r127566
+
+  $ qemu-system-x86_64 --version
+  QEMU emulator version 3.1.50 (v3.1.0-rc2-745-g147923b1a9-dirty)
+  Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
+
+  $ qemu-img --version
+  qemu-img version 3.1.50 (v3.1.0-rc2-745-g147923b1a9-dirty)
+  Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
+
+  Steps to reproduce
+  ------------------
+
+  > Prereq VirtualBox needs to be installed to run the `VBoxManage`
+  command
+
+  $ VBoxManage createmedium disk --filename vbox-vdisk-exp.qcow --format qc=
+ow --size 5
+  0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+  Medium created. UUID: e2b36955-3791-4c0e-93d4-913669b1d9fb
+
+  $ file vbox-vdisk-exp.qcow
+  vbox-vdisk-exp.qcow: QEMU QCOW Image (v1), 5242880 bytes
+
+  $ qemu-img info vbox-vdisk-exp.qcow
+  image: vbox-vdisk-exp.qcow
+  file format: qcow
+  virtual size: 5.0M (5242880 bytes)
+  disk size: 8.0K
+  cluster_size: 4096
+
+  # Convert vbox virtualdisk to qcow2 format using `qemu-img`
+  $ qemu-img convert -f qcow vbox-vdisk-exp.qcow -O qcow2 vbox-vdisk-exp-co=
+nvert.qcow2
+
+  $ file vbox-vdisk-exp-convert.qcow2
+  vbox-vdisk-exp-convert.qcow2: QEMU QCOW Image (v3), 5242880 bytes
+
+  # Print info about qemu-img converted image from vbox created qcow image
+  $ qemu-img info vbox-vdisk-exp-convert.qcow2                             =
+                      mutts-6 | 0 < 10:53:00
+  image: vbox-vdisk-exp-convert.qcow2
+  file format: qcow2
+  virtual size: 5.0M (5242880 bytes)
+  disk size: 196K
+  cluster_size: 65536
+  Format specific information:
+      compat: 1.1
+      lazy refcounts: false
+      refcount bits: 16
+      corrupt: false
+
+  # Print info about vbox created qcow image
+  qemu-img info vbox-vdisk-exp.qcow                                        =
+                    mutts-6 | 0 < 10:53:19
+  image: vbox-vdisk-exp.qcow
+  file format: qcow
+  virtual size: 5.0M (5242880 bytes)
+  disk size: 8.0K
+  cluster_size: 4096
+
+  I've attached a zip file containing the vbox created qcow image along
+  with the image that `qemu-img` converted.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1811711/+subscriptions
