@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44728)
+Received: from eggs.gnu.org ([209.51.188.92]:44825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz4q-0005Yy-Ru
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:49 -0500
+	(envelope-from <thuth@redhat.com>) id 1giz4z-0005dY-Km
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz4j-0007Ne-2F
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59384)
+	(envelope-from <thuth@redhat.com>) id 1giz4x-0007Xv-Tg
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz4g-0007LH-UW
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:32 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz4v-0007Vw-MO
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:47 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 11:01:56 +0100
-Message-Id: <1547460140-1473-2-git-send-email-thuth@redhat.com>
+Date: Mon, 14 Jan 2019 11:02:08 +0100
+Message-Id: <1547460140-1473-14-git-send-email-thuth@redhat.com>
 In-Reply-To: <1547460140-1473-1-git-send-email-thuth@redhat.com>
 References: <1547460140-1473-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 01/25] hw/misc/ivshmem: Remove deprecated
- "ivshmem" legacy device
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 13/25] hw/ide/ahci: Remove AllwinnerAHCIState
+ from "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,503 +30,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>
 
-It's been marked as deprecated in QEMU v2.6.0 already, so really nobody
-should use the legacy "ivshmem" device anymore (but use ivshmem-plain or
-ivshmem-doorbell instead). Time to remove the deprecated device now.
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Belatedly also update a mention of the deprecated "ivshmem" in the file
-docs/specs/ivshmem-spec.txt to "ivshmem-doorbell". Missed in commit
-5400c02b90b ("ivshmem: Split ivshmem-plain, ivshmem-doorbell off ivshmem").
+Files requiring AllwinnerAHCIState already include "hw/ide/ahci.h".
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+To clean "qemu/typedefs.h", move the declaration to "hw/ide/ahci.h"
+(removing the forward declaration).
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- docs/specs/ivshmem-spec.txt |   8 +-
- hw/i386/pc_piix.c           |   1 -
- hw/misc/ivshmem.c           | 210 ++------------------------------------------
- qemu-deprecated.texi        |   5 --
- scripts/device-crash-test   |   1 -
- tests/ivshmem-test.c        |  67 +++++---------
- 6 files changed, 34 insertions(+), 258 deletions(-)
+ include/hw/ide/ahci.h   | 4 ++--
+ include/qemu/typedefs.h | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/docs/specs/ivshmem-spec.txt b/docs/specs/ivshmem-spec.txt
-index a1f5499..042f7ea 100644
---- a/docs/specs/ivshmem-spec.txt
-+++ b/docs/specs/ivshmem-spec.txt
-@@ -17,12 +17,16 @@ get interrupted by its peers.
- 
- There are two basic configurations:
- 
--- Just shared memory: -device ivshmem-plain,memdev=HMB,...
-+- Just shared memory:
-+
-+      -device ivshmem-plain,memdev=HMB,...
- 
-   This uses host memory backend HMB.  It should have option "share"
-   set.
- 
--- Shared memory plus interrupts: -device ivshmem,chardev=CHR,vectors=N,...
-+- Shared memory plus interrupts:
-+
-+      -device ivshmem-doorbell,chardev=CHR,vectors=N,...
- 
-   An ivshmem server must already be running on the host.  The device
-   connects to the server's UNIX domain socket via character device
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 5088e2f..63c84e3 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -715,7 +715,6 @@ static void pc_i440fx_1_2_machine_options(MachineClass *m)
-         PC_CPU_MODEL_IDS("1.2.0")
-         { "nec-usb-xhci", "msi", "off" },
-         { "nec-usb-xhci", "msix", "off" },
--        { "ivshmem", "use64", "0" },
-         { "qxl", "revision", "3" },
-         { "qxl-vga", "revision", "3" },
-         { "VGA", "mmio", "off" },
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 8213659..c7b6bbc 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -112,13 +112,6 @@ typedef struct IVShmemState {
-     /* migration stuff */
-     OnOffAuto master;
-     Error *migration_blocker;
--
--    /* legacy cruft */
--    char *role;
--    char *shmobj;
--    char *sizearg;
--    size_t legacy_size;
--    uint32_t not_legacy_32bit;
- } IVShmemState;
- 
- /* registers for the Inter-VM shared memory device */
-@@ -529,17 +522,6 @@ static void process_msg_shmem(IVShmemState *s, int fd, Error **errp)
- 
-     size = buf.st_size;
- 
--    /* Legacy cruft */
--    if (s->legacy_size != SIZE_MAX) {
--        if (size < s->legacy_size) {
--            error_setg(errp, "server sent only %zd bytes of shared memory",
--                       (size_t)buf.st_size);
--            close(fd);
--            return;
--        }
--        size = s->legacy_size;
--    }
--
-     /* mmap the region and map into the BAR2 */
-     memory_region_init_ram_from_fd(&s->server_bar2, OBJECT(s),
-                                    "ivshmem.bar2", size, true, fd, &local_err);
-@@ -882,8 +864,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     IVShmemState *s = IVSHMEM_COMMON(dev);
-     Error *err = NULL;
-     uint8_t *pci_conf;
--    uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
--        PCI_BASE_ADDRESS_MEM_PREFETCH;
-     Error *local_err = NULL;
- 
-     /* IRQFD requires MSI */
-@@ -903,10 +883,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
-                      &s->ivshmem_mmio);
- 
--    if (s->not_legacy_32bit) {
--        attr |= PCI_BASE_ADDRESS_MEM_TYPE_64;
--    }
--
-     if (s->hostmem != NULL) {
-         IVSHMEM_DPRINTF("using hostmem\n");
- 
-@@ -964,7 +940,11 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     }
- 
-     vmstate_register_ram(s->ivshmem_bar2, DEVICE(s));
--    pci_register_bar(PCI_DEVICE(s), 2, attr, s->ivshmem_bar2);
-+    pci_register_bar(PCI_DEVICE(s), 2,
-+                     PCI_BASE_ADDRESS_SPACE_MEMORY |
-+                     PCI_BASE_ADDRESS_MEM_PREFETCH |
-+                     PCI_BASE_ADDRESS_MEM_TYPE_64,
-+                     s->ivshmem_bar2);
- }
- 
- static void ivshmem_exit(PCIDevice *dev)
-@@ -1084,13 +1064,6 @@ static Property ivshmem_plain_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--static void ivshmem_plain_init(Object *obj)
--{
--    IVShmemState *s = IVSHMEM_PLAIN(obj);
--
--    s->not_legacy_32bit = 1;
--}
--
- static void ivshmem_plain_realize(PCIDevice *dev, Error **errp)
- {
-     IVShmemState *s = IVSHMEM_COMMON(dev);
-@@ -1122,7 +1095,6 @@ static const TypeInfo ivshmem_plain_info = {
-     .name          = TYPE_IVSHMEM_PLAIN,
-     .parent        = TYPE_IVSHMEM_COMMON,
-     .instance_size = sizeof(IVShmemState),
--    .instance_init = ivshmem_plain_init,
-     .class_init    = ivshmem_plain_class_init,
- };
- 
-@@ -1155,8 +1127,6 @@ static void ivshmem_doorbell_init(Object *obj)
-     IVShmemState *s = IVSHMEM_DOORBELL(obj);
- 
-     s->features |= (1 << IVSHMEM_MSI);
--    s->legacy_size = SIZE_MAX;  /* whatever the server sends */
--    s->not_legacy_32bit = 1;
- }
- 
- static void ivshmem_doorbell_realize(PCIDevice *dev, Error **errp)
-@@ -1189,181 +1159,11 @@ static const TypeInfo ivshmem_doorbell_info = {
-     .class_init    = ivshmem_doorbell_class_init,
- };
- 
--static int ivshmem_load_old(QEMUFile *f, void *opaque, int version_id)
--{
--    IVShmemState *s = opaque;
--    PCIDevice *pdev = PCI_DEVICE(s);
--    int ret;
--
--    IVSHMEM_DPRINTF("ivshmem_load_old\n");
--
--    if (version_id != 0) {
--        return -EINVAL;
--    }
--
--    ret = ivshmem_pre_load(s);
--    if (ret) {
--        return ret;
--    }
--
--    ret = pci_device_load(pdev, f);
--    if (ret) {
--        return ret;
--    }
--
--    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
--        msix_load(pdev, f);
--        ivshmem_msix_vector_use(s);
--    } else {
--        s->intrstatus = qemu_get_be32(f);
--        s->intrmask = qemu_get_be32(f);
--    }
--
--    return 0;
--}
--
--static bool test_msix(void *opaque, int version_id)
--{
--    IVShmemState *s = opaque;
--
--    return ivshmem_has_feature(s, IVSHMEM_MSI);
--}
--
--static bool test_no_msix(void *opaque, int version_id)
--{
--    return !test_msix(opaque, version_id);
--}
--
--static const VMStateDescription ivshmem_vmsd = {
--    .name = "ivshmem",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .pre_load = ivshmem_pre_load,
--    .post_load = ivshmem_post_load,
--    .fields = (VMStateField[]) {
--        VMSTATE_PCI_DEVICE(parent_obj, IVShmemState),
--
--        VMSTATE_MSIX_TEST(parent_obj, IVShmemState, test_msix),
--        VMSTATE_UINT32_TEST(intrstatus, IVShmemState, test_no_msix),
--        VMSTATE_UINT32_TEST(intrmask, IVShmemState, test_no_msix),
--
--        VMSTATE_END_OF_LIST()
--    },
--    .load_state_old = ivshmem_load_old,
--    .minimum_version_id_old = 0
+diff --git a/include/hw/ide/ahci.h b/include/hw/ide/ahci.h
+index b7bb2b0..b44e300 100644
+--- a/include/hw/ide/ahci.h
++++ b/include/hw/ide/ahci.h
+@@ -73,13 +73,13 @@ typedef struct SysbusAHCIState {
+ #define ALLWINNER_AHCI_MMIO_OFF  0x80
+ #define ALLWINNER_AHCI_MMIO_SIZE 0x80
+=20
+-struct AllwinnerAHCIState {
++typedef struct AllwinnerAHCIState {
+     /*< private >*/
+     SysbusAHCIState parent_obj;
+     /*< public >*/
+=20
+     MemoryRegion mmio;
+     uint32_t regs[ALLWINNER_AHCI_MMIO_SIZE/4];
 -};
--
--static Property ivshmem_properties[] = {
--    DEFINE_PROP_CHR("chardev", IVShmemState, server_chr),
--    DEFINE_PROP_STRING("size", IVShmemState, sizearg),
--    DEFINE_PROP_UINT32("vectors", IVShmemState, vectors, 1),
--    DEFINE_PROP_BIT("ioeventfd", IVShmemState, features, IVSHMEM_IOEVENTFD,
--                    false),
--    DEFINE_PROP_BIT("msi", IVShmemState, features, IVSHMEM_MSI, true),
--    DEFINE_PROP_STRING("shm", IVShmemState, shmobj),
--    DEFINE_PROP_STRING("role", IVShmemState, role),
--    DEFINE_PROP_UINT32("use64", IVShmemState, not_legacy_32bit, 1),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void desugar_shm(IVShmemState *s)
--{
--    Object *obj;
--    char *path;
--
--    obj = object_new("memory-backend-file");
--    path = g_strdup_printf("/dev/shm/%s", s->shmobj);
--    object_property_set_str(obj, path, "mem-path", &error_abort);
--    g_free(path);
--    object_property_set_int(obj, s->legacy_size, "size", &error_abort);
--    object_property_set_bool(obj, true, "share", &error_abort);
--    object_property_add_child(OBJECT(s), "internal-shm-backend", obj,
--                              &error_abort);
--    object_unref(obj);
--    user_creatable_complete(USER_CREATABLE(obj), &error_abort);
--    s->hostmem = MEMORY_BACKEND(obj);
--}
--
--static void ivshmem_realize(PCIDevice *dev, Error **errp)
--{
--    IVShmemState *s = IVSHMEM_COMMON(dev);
--
--    if (!qtest_enabled()) {
--        warn_report("ivshmem is deprecated, please use ivshmem-plain"
--                    " or ivshmem-doorbell instead");
--    }
--
--    if (qemu_chr_fe_backend_connected(&s->server_chr) + !!s->shmobj != 1) {
--        error_setg(errp, "You must specify either 'shm' or 'chardev'");
--        return;
--    }
--
--    if (s->sizearg == NULL) {
--        s->legacy_size = 4 * MiB; /* 4 MB default */
--    } else {
--        int ret;
--        uint64_t size;
--
--        ret = qemu_strtosz_MiB(s->sizearg, NULL, &size);
--        if (ret < 0 || (size_t)size != size || !is_power_of_2(size)) {
--            error_setg(errp, "Invalid size %s", s->sizearg);
--            return;
--        }
--        s->legacy_size = size;
--    }
--
--    /* check that role is reasonable */
--    if (s->role) {
--        if (strncmp(s->role, "peer", 5) == 0) {
--            s->master = ON_OFF_AUTO_OFF;
--        } else if (strncmp(s->role, "master", 7) == 0) {
--            s->master = ON_OFF_AUTO_ON;
--        } else {
--            error_setg(errp, "'role' must be 'peer' or 'master'");
--            return;
--        }
--    } else {
--        s->master = ON_OFF_AUTO_AUTO;
--    }
--
--    if (s->shmobj) {
--        desugar_shm(s);
--    }
--
--    /*
--     * Note: we don't use INTx with IVSHMEM_MSI at all, so this is a
--     * bald-faced lie then.  But it's a backwards compatible lie.
--     */
--    pci_config_set_interrupt_pin(dev->config, 1);
--
--    ivshmem_common_realize(dev, errp);
--}
--
--static void ivshmem_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--
--    k->realize = ivshmem_realize;
--    k->revision = 0;
--    dc->desc = "Inter-VM shared memory (legacy)";
--    dc->props = ivshmem_properties;
--    dc->vmsd = &ivshmem_vmsd;
--}
--
--static const TypeInfo ivshmem_info = {
--    .name          = TYPE_IVSHMEM,
--    .parent        = TYPE_IVSHMEM_COMMON,
--    .instance_size = sizeof(IVShmemState),
--    .class_init    = ivshmem_class_init,
--};
--
- static void ivshmem_register_types(void)
- {
-     type_register_static(&ivshmem_common_info);
-     type_register_static(&ivshmem_plain_info);
-     type_register_static(&ivshmem_doorbell_info);
--    type_register_static(&ivshmem_info);
- }
- 
- type_init(ivshmem_register_types)
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 81de5fc..219206a 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -126,11 +126,6 @@ documentation of ``query-hotpluggable-cpus'' for additional details.
- 
- @section System emulator devices
- 
--@subsection ivshmem (since 2.6.0)
--
--The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
--or ``ivshmem-doorbell`` device types.
--
- @subsection bluetooth (since 3.1)
- 
- The bluetooth subsystem is unmaintained since many years and likely bitrotten
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index e93a7c0..a835772 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -83,7 +83,6 @@ ERROR_WHITELIST = [
-     {'device':'isa-ipmi-bt', 'expected':True},             # IPMI device requires a bmc attribute to be set
-     {'device':'isa-ipmi-kcs', 'expected':True},            # IPMI device requires a bmc attribute to be set
-     {'device':'isa-parallel', 'expected':True},            # Can't create serial device, empty char device
--    {'device':'ivshmem', 'expected':True},                 # You must specify either 'shm' or 'chardev'
-     {'device':'ivshmem-doorbell', 'expected':True},        # You must specify a 'chardev'
-     {'device':'ivshmem-plain', 'expected':True},           # You must specify a 'memdev'
-     {'device':'loader', 'expected':True},                  # please include valid arguments
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index fe5eb30..4911b69 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -291,20 +291,20 @@ static void *server_thread(void *data)
-     return NULL;
- }
- 
--static void setup_vm_with_server(IVState *s, int nvectors, bool msi)
-+static void setup_vm_with_server(IVState *s, int nvectors)
- {
--    char *cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait "
--                                "-device ivshmem%s,chardev=chr0,vectors=%d",
--                                tmpserver,
--                                msi ? "-doorbell" : ",size=1M,msi=off",
--                                nvectors);
-+    char *cmd;
- 
--    setup_vm_cmd(s, cmd, msi);
-+    cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait "
-+                          "-device ivshmem-doorbell,chardev=chr0,vectors=%d",
-+                          tmpserver, nvectors);
-+
-+    setup_vm_cmd(s, cmd, true);
- 
-     g_free(cmd);
- }
- 
--static void test_ivshmem_server(bool msi)
-+static void test_ivshmem_server(void)
- {
-     IVState state1, state2, *s1, *s2;
-     ServerThread thread;
-@@ -327,9 +327,9 @@ static void test_ivshmem_server(bool msi)
-     thread.thread = g_thread_new("ivshmem-server", server_thread, &thread);
-     g_assert(thread.thread != NULL);
- 
--    setup_vm_with_server(&state1, nvectors, msi);
-+    setup_vm_with_server(&state1, nvectors);
-     s1 = &state1;
--    setup_vm_with_server(&state2, nvectors, msi);
-+    setup_vm_with_server(&state2, nvectors);
-     s2 = &state2;
- 
-     /* check got different VM ids */
-@@ -340,38 +340,28 @@ static void test_ivshmem_server(bool msi)
-     g_assert_cmpint(vm1, !=, vm2);
- 
-     /* check number of MSI-X vectors */
--    if (msi) {
--        ret = qpci_msix_table_size(s1->dev);
--        g_assert_cmpuint(ret, ==, nvectors);
--    }
-+    ret = qpci_msix_table_size(s1->dev);
-+    g_assert_cmpuint(ret, ==, nvectors);
- 
-     /* TODO test behavior before MSI-X is enabled */
- 
-     /* ping vm2 -> vm1 on vector 0 */
--    if (msi) {
--        ret = qpci_msix_pending(s1->dev, 0);
--        g_assert_cmpuint(ret, ==, 0);
--    } else {
--        g_assert_cmpuint(in_reg(s1, INTRSTATUS), ==, 0);
--    }
-+    ret = qpci_msix_pending(s1->dev, 0);
-+    g_assert_cmpuint(ret, ==, 0);
-     out_reg(s2, DOORBELL, vm1 << 16);
-     do {
-         g_usleep(10000);
--        ret = msi ? qpci_msix_pending(s1->dev, 0) : in_reg(s1, INTRSTATUS);
-+        ret = qpci_msix_pending(s1->dev, 0);
-     } while (ret == 0 && g_get_monotonic_time() < end_time);
-     g_assert_cmpuint(ret, !=, 0);
- 
-     /* ping vm1 -> vm2 on vector 1 */
--    if (msi) {
--        ret = qpci_msix_pending(s2->dev, 1);
--        g_assert_cmpuint(ret, ==, 0);
--    } else {
--        g_assert_cmpuint(in_reg(s2, INTRSTATUS), ==, 0);
--    }
-+    ret = qpci_msix_pending(s2->dev, 1);
-+    g_assert_cmpuint(ret, ==, 0);
-     out_reg(s1, DOORBELL, vm2 << 16 | 1);
-     do {
-         g_usleep(10000);
--        ret = msi ? qpci_msix_pending(s2->dev, 1) : in_reg(s2, INTRSTATUS);
-+        ret = qpci_msix_pending(s2->dev, 1);
-     } while (ret == 0 && g_get_monotonic_time() < end_time);
-     g_assert_cmpuint(ret, !=, 0);
- 
-@@ -389,27 +379,17 @@ static void test_ivshmem_server(bool msi)
-     close(thread.pipe[0]);
- }
- 
--static void test_ivshmem_server_msi(void)
--{
--    test_ivshmem_server(true);
--}
--
--static void test_ivshmem_server_irq(void)
--{
--    test_ivshmem_server(false);
--}
--
- #define PCI_SLOT_HP             0x06
- 
- static void test_ivshmem_hotplug(void)
- {
-     const char *arch = qtest_get_arch();
- 
--    qtest_start("");
-+    qtest_start("-object memory-backend-ram,size=1M,id=mb1");
- 
--    qtest_qmp_device_add("ivshmem",
--                         "iv1", "{'addr': %s, 'shm': %s, 'size': '1M'}",
--                         stringify(PCI_SLOT_HP), tmpshm);
-+    qtest_qmp_device_add("ivshmem-plain", "iv1",
-+                         "{'addr': %s, 'memdev': 'mb1'}",
-+                         stringify(PCI_SLOT_HP));
-     if (strcmp(arch, "ppc64") != 0) {
-         qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-     }
-@@ -509,8 +489,7 @@ int main(int argc, char **argv)
-     if (g_test_slow()) {
-         qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
-         if (strcmp(arch, "ppc64") != 0) {
--            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
--            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
-+            qtest_add_func("/ivshmem/server", test_ivshmem_server);
-         }
-     }
- 
--- 
++} AllwinnerAHCIState;
+=20
+ #endif /* HW_IDE_AHCI_H */
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index c026229..3a5ca74 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -8,7 +8,6 @@
+ typedef struct AdapterInfo AdapterInfo;
+ typedef struct AddressSpace AddressSpace;
+ typedef struct AioContext AioContext;
+-typedef struct AllwinnerAHCIState AllwinnerAHCIState;
+ typedef struct AudioState AudioState;
+ typedef struct BdrvDirtyBitmap BdrvDirtyBitmap;
+ typedef struct BdrvDirtyBitmapIter BdrvDirtyBitmapIter;
+--=20
 1.8.3.1
