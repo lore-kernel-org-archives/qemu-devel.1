@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51740)
+Received: from eggs.gnu.org ([209.51.188.92]:52069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gj4ic-0006Zi-Vw
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:04:07 -0500
+	(envelope-from <thuth@redhat.com>) id 1gj4k1-0007OL-NN
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:05:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gj4ib-00085W-SV
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:04:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56882)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gj4ib-00084G-K7
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:04:05 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7187A3E7DF
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 15:55:21 +0000 (UTC)
-From: Caio Carrara <ccarrara@redhat.com>
-Date: Mon, 14 Jan 2019 13:55:10 -0200
-Message-Id: <20190114155510.23358-1-ccarrara@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1gj4jm-00009y-J4
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:05:24 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 14 Jan 2019 17:04:32 +0100
+Message-Id: <1547481872-17870-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] tests.acceptance: adds multi vm capability for
- acceptance tests
+Subject: [Qemu-devel] [PATCH v3] configure: Work-around a bug in libiscsi
+ 1.9.0 when used in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,130 +21,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: wainersm@redhat.com, ehabkost@redhat.com, crosa@redhat.com, philmd@redhat.com, Caio Carrara <ccarrara@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, berrange@redhat.com
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
 
-This change adds the possibility to write acceptance tests with multi
-virtual machine support. It's done keeping the virtual machines objects
-stored in a test attribute (dictionary). This dictionary shouldn't be
-accessed directly but through the new method added `get_vm`. This new
-method accept a list of args (that will be added as virtual machine
-arguments) and an optional name argument. The name is the key that
-identify a single virtual machine along the test machines available. If
-a name without a machine is informed a new machine will be instantiated.
+The header "scsi-lowlevel.h" of libiscsi 1.9.0 contains some bad
+"inline" prototype definitions which GCC refuses to compile in its
+gnu99 mode:
 
-The current usage of vm in tests will not be broken by this change since
-it keeps a property called vm in the base test class. This property only
-calls the new method `get_vm` with default parameters (no args and
-'default' as machine name).
+In file included from block/iscsi.c:52:0:
+/usr/include/iscsi/scsi-lowlevel.h:810:13: error: inline function
+=E2=80=98scsi_set_uint16=E2=80=99 declared but never defined [-Werror]
+ inline void scsi_set_uint16(unsigned char *c, uint16_t val);
+             ^
+/usr/include/iscsi/scsi-lowlevel.h:809:13: error: inline function
+=E2=80=98scsi_set_uint32=E2=80=99 declared but never defined [-Werror]
+ inline void scsi_set_uint32(unsigned char *c, uint32_t val);
+             ^
+[...]
 
-Signed-off-by: Caio Carrara <ccarrara@redhat.com>
+This has been fixed by upstream libiscsi in version 1.10.0 (see
+https://github.com/sahlberg/libiscsi/commit/7692027d6c11 ), but
+since we still want to support 1.9.0 for CentOS 7 / RHEL7, we
+have to work-around the issue by redefining the "inline" keyword
+to use the old "gnu89" mode behavior via "gnu_inline" instead.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- docs/devel/testing.rst                    | 40 ++++++++++++++++++++++-
- tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++---
- 2 files changed, 60 insertions(+), 5 deletions(-)
+ block/iscsi.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 18e2c0868a..b97c0368bc 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -634,7 +634,45 @@ instance, available at ``self.vm``.  Because many te=
-sts will tweak the
- QEMU command line, launching the QEMUMachine (by using ``self.vm.launch(=
-)``)
- is left to the test writer.
+diff --git a/block/iscsi.c b/block/iscsi.c
+index a7e8c1f..ff47320 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -49,7 +49,9 @@
+ /* Conflict between scsi/utils.h and libiscsi! :( */
+ #define SCSI_XFER_NONE ISCSI_XFER_NONE
+ #include <iscsi/iscsi.h>
++#define inline __attribute__((gnu_inline))  /* required for libiscsi v1.=
+9.0 */
+ #include <iscsi/scsi-lowlevel.h>
++#undef inline
+ #undef SCSI_XFER_NONE
+ QEMU_BUILD_BUG_ON((int)SCSI_XFER_NONE !=3D (int)ISCSI_XFER_NONE);
 =20
--At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
-+The base test class has also support for tests with more than one
-+QEMUMachine. The way to get machines is through the ``self.get_vm()``
-+method which will return a QEMUMachine instance. The ``self.get_vm()``
-+method also accepts an optional `name` attribute so you can identify a
-+specific machine and get it more than once through the tests methods. A
-+simple and hypothetical example follows:
-+
-+.. code::
-+
-+  from avocado_qemu import Test
-+
-+
-+  class MultipleMachines(Test):
-+      """
-+      :avocado: enable
-+      """
-+      def test_multiple_machines(self):
-+          first_machine =3D self.get_vm()
-+          second_machine =3D self.get_vm()
-+          self.get_vm(name=3D'third_machine').launch()
-+
-+          first_machine.launch()
-+          second_machine.launch()
-+
-+          first_res =3D first_machine.command(
-+              'human-monitor-command',
-+              command_line=3D'info version')
-+
-+          second_res =3D second_machine.command(
-+              'human-monitor-command',
-+              command_line=3D'info version')
-+
-+          third_res =3D self.get_vm(name=3D'third_machine').command(
-+              'human-monitor-command',
-+              command_line=3D'info version')
-+
-+          self.assertEquals(first_res, second_res, third_res)
-+
-+At test "tear down", ``avocado_qemu.Test`` handles all the QEMUMachines
- shutdown.
-=20
- QEMUMachine
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
-/avocado_qemu/__init__.py
-index 1e54fd5932..4c9e27feda 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -10,6 +10,7 @@
-=20
- import os
- import sys
-+import uuid
-=20
- import avocado
-=20
-@@ -42,13 +43,29 @@ def pick_default_qemu_bin():
-=20
- class Test(avocado.Test):
-     def setUp(self):
--        self.vm =3D None
-+        self._vms =3D {}
-         self.qemu_bin =3D self.params.get('qemu_bin',
-                                         default=3Dpick_default_qemu_bin(=
-))
-         if self.qemu_bin is None:
-             self.cancel("No QEMU binary defined or found in the source t=
-ree")
--        self.vm =3D QEMUMachine(self.qemu_bin)
-+
-+    def _new_vm(self, *args):
-+        vm =3D QEMUMachine(self.qemu_bin)
-+        if args:
-+            vm.add_args(*args)
-+        return vm
-+
-+    @property
-+    def vm(self):
-+        return self.get_vm(name=3D'default')
-+
-+    def get_vm(self, *args, name=3DNone):
-+        if not name:
-+            name =3D str(uuid.uuid4())
-+        if self._vms.get(name) is None:
-+            self._vms[name] =3D self._new_vm(*args)
-+        return self._vms[name]
-=20
-     def tearDown(self):
--        if self.vm is not None:
--            self.vm.shutdown()
-+        for vm in self._vms.values():
-+            vm.shutdown()
 --=20
-2.20.1
+1.8.3.1
