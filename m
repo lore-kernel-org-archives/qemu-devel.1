@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57824)
+Received: from eggs.gnu.org ([209.51.188.92]:58809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@fromorbit.com>) id 1gjAld-0007g7-5x
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:31:38 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAo2-0001Nr-1K
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@fromorbit.com>) id 1gjAc2-00019q-6a
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:21:43 -0500
-Received: from ipmail01.adl6.internode.on.net ([150.101.137.136]:27471)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@fromorbit.com>) id 1gjAc1-00016k-J9
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:21:42 -0500
-Date: Tue, 15 Jan 2019 09:21:32 +1100
-From: Dave Chinner <david@fromorbit.com>
-Message-ID: <20190114222132.GH4205@dastard>
-References: <20190109144736.17452-1-pagupta@redhat.com>
-	<20190110012617.GA4205@dastard>
-	<1326478078.61913951.1547192704870.JavaMail.zimbra@redhat.com>
-	<20190113232902.GD4205@dastard>
-	<20190113233820.GX6310@bombadil.infradead.org>
-	<942065073.64011540.1547450140670.JavaMail.zimbra@redhat.com>
-	<20190114212501.GG4205@dastard>
-	<CAPcyv4jtPcLV-s0sKNHwwk0ug7GLBV6699dpm1h3r2xSo879dg@mail.gmail.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAo1-0005yN-4T
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32770)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gjAo0-0005wz-Sb
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:05 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 15 Jan 2019 02:27:51 +0400
+Message-Id: <20190114222754.21701-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20190114222754.21701-1-marcandre.lureau@redhat.com>
+References: <20190114222754.21701-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4jtPcLV-s0sKNHwwk0ug7GLBV6699dpm1h3r2xSo879dg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v17 3/6] acpi: expose TPM/PPI configuration
+ parameters to firmware via fw_cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +28,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Matthew Wilcox <willy@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, virtualization@lists.linux-foundation.org, Linux ACPI <linux-acpi@vger.kernel.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ross Zwisler <zwisler@kernel.org>, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, David Hildenbrand <david@redhat.com>, jmoyer <jmoyer@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, lcapitulino@redhat.com, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Theodore Ts'o <tytso@mit.edu>, adilger kernel <adilger.kernel@dilger.ca>, darrick wong <darrick.wong@oracle.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, f4bug@amsat.org, Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Jan 14, 2019 at 01:35:57PM -0800, Dan Williams wrote:
-> On Mon, Jan 14, 2019 at 1:25 PM Dave Chinner <david@fromorbit.com> wrote:
-> >
-> > On Mon, Jan 14, 2019 at 02:15:40AM -0500, Pankaj Gupta wrote:
-> > >
-> > > > > Until you have images (and hence host page cache) shared between
-> > > > > multiple guests. People will want to do this, because it means they
-> > > > > only need a single set of pages in host memory for executable
-> > > > > binaries rather than a set of pages per guest. Then you have
-> > > > > multiple guests being able to detect residency of the same set of
-> > > > > pages. If the guests can then, in any way, control eviction of the
-> > > > > pages from the host cache, then we have a guest-to-guest information
-> > > > > leak channel.
-> > > >
-> > > > I don't think we should ever be considering something that would allow a
-> > > > guest to evict page's from the host's pagecache [1].  The guest should
-> > > > be able to kick its own references to the host's pagecache out of its
-> > > > own pagecache, but not be able to influence whether the host or another
-> > > > guest has a read-only mapping cached.
-> > > >
-> > > > [1] Unless the guest is allowed to modify the host's file; obviously
-> > > > truncation, holepunching, etc are going to evict pages from the host's
-> > > > page cache.
-> > >
-> > > This is so correct. Guest does not not evict host page cache pages directly.
-> >
-> > They don't right now.
-> >
-> > But someone is going to end up asking for discard to work so that
-> > the guest can free unused space in the underlying spares image (i.e.
-> > make use of fstrim or mount -o discard) because they have workloads
-> > that have bursts of space usage and they need to trim the image
-> > files afterwards to keep their overall space usage under control.
-> >
-> > And then....
-> 
-> ...we reject / push back on that patch citing the above concern.
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-So at what point do we draw the line?
+To avoid having to hard code the base address of the PPI virtual
+memory device we introduce a fw_cfg file etc/tpm/config that holds the
+base address of the PPI device, the version of the PPI interface and
+the version of the attached TPM.
 
-We're allowing writable DAX mappings, but as I've pointed out that
-means we are going to be allowing  a potential information leak via
-files with shared extents to be directly mapped and written to.
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+[ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document it=
+ ]
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ include/hw/acpi/tpm.h |  3 +++
+ hw/i386/acpi-build.c  | 19 +++++++++++++++++++
+ docs/specs/tpm.txt    | 19 +++++++++++++++++++
+ 3 files changed, 41 insertions(+)
 
-But we won't allow useful admin operations that allow better
-management of host side storage space similar to how normal image
-files are used by guests because it's an information leak vector?
-
-That's splitting some really fine hairs there...
-
-> > > In case of virtio-pmem & DAX, guest clears guest page cache exceptional entries.
-> > > Its solely decision of host to take action on the host page cache pages.
-> > >
-> > > In case of virtio-pmem, guest does not modify host file directly i.e don't
-> > > perform hole punch & truncation operation directly on host file.
-> >
-> > ... this will no longer be true, and the nuclear landmine in this
-> > driver interface will have been armed....
-> 
-> I agree with the need to be careful when / if explicit cache control
-> is added, but that's not the case today.
-
-"if"?
-
-I expect it to be "when", not if. Expect the worst, plan for it now.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+index b8796df9166..a6109a97fcd 100644
+--- a/include/hw/acpi/tpm.h
++++ b/include/hw/acpi/tpm.h
+@@ -194,4 +194,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+ #define TPM_PPI_ADDR_SIZE           0x400
+ #define TPM_PPI_ADDR_BASE           0xFED45000
+=20
++#define TPM_PPI_VERSION_NONE        0
++#define TPM_PPI_VERSION_1_30        1
++
+ #endif /* HW_ACPI_TPM_H */
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 14f757fc36b..98982477057 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
+     bool pcihp_bridge_en;
+ } AcpiBuildPciBusHotplugState;
+=20
++typedef struct FwCfgTPMConfig {
++    uint32_t tpmppi_address;
++    uint8_t tpm_version;
++    uint8_t tpmppi_version;
++} QEMU_PACKED FwCfgTPMConfig;
++
+ static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+ {
+     uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
+ NULL);
+@@ -2847,6 +2853,8 @@ void acpi_setup(void)
+     AcpiBuildTables tables;
+     AcpiBuildState *build_state;
+     Object *vmgenid_dev;
++    TPMIf *tpm;
++    static FwCfgTPMConfig tpm_config;
+=20
+     if (!pcms->fw_cfg) {
+         ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+@@ -2881,6 +2889,17 @@ void acpi_setup(void)
+     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+                     tables.tcpalog->data, acpi_data_len(tables.tcpalog))=
+;
+=20
++    tpm =3D tpm_find();
++    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_abort=
+)) {
++        tpm_config =3D (FwCfgTPMConfig) {
++            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
++            .tpm_version =3D tpm_get_version(tpm),
++            .tpmppi_version =3D TPM_PPI_VERSION_NONE
++        };
++        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
++                        &tpm_config, sizeof tpm_config);
++    }
++
+     vmgenid_dev =3D find_vmgenid_dev();
+     if (vmgenid_dev) {
+         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+index 1af82bba862..e4bb0947001 100644
+--- a/docs/specs/tpm.txt
++++ b/docs/specs/tpm.txt
+@@ -34,6 +34,25 @@ The CRB interface makes a memory mapped IO region in t=
+he area 0xfed40000 -
+ QEMU files related to TPM CRB interface:
+  - hw/tpm/tpm_crb.c
+=20
++=3D fw_cfg interface =3D
++
++The bios/firmware may read the "etc/tpm/config" fw_cfg entry for
++configuring the guest appropriately.
++
++The entry of 6 bytes has the following content, in little-endian:
++
++    #define TPM_VERSION_UNSPEC          0
++    #define TPM_VERSION_1_2             1
++    #define TPM_VERSION_2_0             2
++
++    #define TPM_PPI_VERSION_NONE        0
++    #define TPM_PPI_VERSION_1_30        1
++
++    struct FwCfgTPMConfig {
++        uint32_t tpmppi_address;         /* PPI memory location */
++        uint8_t tpm_version;             /* TPM version */
++        uint8_t tpmppi_version;          /* PPI version */
++    };
+=20
+ =3D ACPI Interface =3D
+=20
+--=20
+2.20.1.98.gecbdaf0899
