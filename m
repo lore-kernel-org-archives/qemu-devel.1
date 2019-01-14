@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53694)
+Received: from eggs.gnu.org ([209.51.188.92]:54156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gj39R-0000OZ-V8
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:23:43 -0500
+	(envelope-from <berto@igalia.com>) id 1gj3Ap-0001db-B4
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gj39Q-0007nR-M9
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:23:41 -0500
-References: <20190114130829.21790-1-philmd@redhat.com>
-	<20190114130829.21790-2-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <fdbd9b49-fbb4-1339-9d59-591ad5891a44@redhat.com>
-Date: Mon, 14 Jan 2019 15:23:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190114130829.21790-2-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] hw/nvram/fw_cfg: Remove various
- typedefs from "qemu/typedefs.h"
+	(envelope-from <berto@igalia.com>) id 1gj3Ao-0008Va-Du
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:07 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Mon, 14 Jan 2019 16:24:03 +0200
+Message-Id: <8bb7fd0e9188316446270873e10d6049b9a7d358.1547475602.git.berto@igalia.com>
+In-Reply-To: <cover.1547475602.git.berto@igalia.com>
+References: <cover.1547475602.git.berto@igalia.com>
+In-Reply-To: <cover.1547475602.git.berto@igalia.com>
+References: <cover.1547475602.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2 5/6] block: Acquire the AioContext in
+ ide_dev_initfn()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,168 +22,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "open list:Virt" <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Hi Phil,
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ hw/ide/qdev.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-On 01/14/19 14:08, Philippe Mathieu-Daud=C3=A9 wrote:
-> There are only three include files requiring these typedefs, let them
-> include "hw/nvram/fw_cfg.h" directly to simplify "qemu/typedefs.h".
->
-> To clean "qemu/typedefs.h", move the declarations to "hw/nvram/fw_cfg.h=
-".
-> Reorder two function declarations to avoid forward typedef declarations=
-.
-
-No, this is not what I meant. I didn't suggest that we should remove
-forward declarations.
-
-I suggested that we should place the forward declarations *ahead of* the
-first references to them:
-
-  http://mid.mail-archive.com/32678400-47af-a842-0563-0d1a72712b4a@redhat=
-.com
-
-See below.
-
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> ---
->  include/hw/acpi/vmgenid.h |  1 +
->  include/hw/arm/virt.h     |  1 +
->  include/hw/mem/nvdimm.h   |  1 +
->  include/hw/nvram/fw_cfg.h | 22 ++++++++++++----------
->  include/qemu/typedefs.h   |  4 ----
->  5 files changed, 15 insertions(+), 14 deletions(-)
-
-[...]
-
-> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-> index f5a6895a74..cc744d5268 100644
-> --- a/include/hw/nvram/fw_cfg.h
-> +++ b/include/hw/nvram/fw_cfg.h
-> @@ -14,15 +14,12 @@
->  #define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG=
-_IO)
->  #define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG=
-_MEM)
-
-On these lines, you have references to FWCfgState, FWCfgIoState,
-FWCfgMemState. Pre-patch, that is OK, because you get the types via the
-#includes, *and* the #include directives come first.
-
-(Note: this is not about compilation safety; it is about how a human
-reads this file.)
-
-Post-patch, however:
-
->
-> -typedef struct fw_cfg_file FWCfgFile;
-> -
->  #define FW_CFG_ORDER_OVERRIDE_VGA    70
->  #define FW_CFG_ORDER_OVERRIDE_NIC    80
->  #define FW_CFG_ORDER_OVERRIDE_USER   100
->  #define FW_CFG_ORDER_OVERRIDE_DEVICE 110
->
-> -void fw_cfg_set_order_override(FWCfgState *fw_cfg, int order);
-> -void fw_cfg_reset_order_override(FWCfgState *fw_cfg);
-> +typedef struct fw_cfg_file FWCfgFile;
->
->  typedef struct FWCfgFiles {
->      uint32_t  count;
-> @@ -34,7 +31,9 @@ typedef struct fw_cfg_dma_access FWCfgDmaAccess;
->  typedef void (*FWCfgCallback)(void *opaque);
->  typedef void (*FWCfgWriteCallback)(void *opaque, off_t start, size_t l=
-en);
->
-> -struct FWCfgState {
-> +typedef struct FWCfgEntry FWCfgEntry;
-> +
-> +typedef struct FWCfgState {
->      /*< private >*/
->      SysBusDevice parent_obj;
->      /*< public >*/
-> @@ -53,17 +52,17 @@ struct FWCfgState {
->      dma_addr_t dma_addr;
->      AddressSpace *dma_as;
->      MemoryRegion dma_iomem;
-> -};
-> +} FWCfgState;
->
-> -struct FWCfgIoState {
-> +typedef struct FWCfgIoState {
->      /*< private >*/
->      FWCfgState parent_obj;
->      /*< public >*/
->
->      MemoryRegion comb_iomem;
-> -};
-> +} FWCfgIoState;
->
-> -struct FWCfgMemState {
-> +typedef struct FWCfgMemState {
->      /*< private >*/
->      FWCfgState parent_obj;
->      /*< public >*/
-> @@ -71,7 +70,10 @@ struct FWCfgMemState {
->      MemoryRegion ctl_iomem, data_iomem;
->      uint32_t data_width;
->      MemoryRegionOps wide_data_ops;
-> -};
-> +} FWCfgMemState;
-> +
-> +void fw_cfg_set_order_override(FWCfgState *fw_cfg, int order);
-> +void fw_cfg_reset_order_override(FWCfgState *fw_cfg);
->
->  /**
->   * fw_cfg_add_bytes:
-
-the type names are introduced only later. Thus, when a human reads the
-file, the type references in the OBJECT_CHECK() macros appear before the
-same type names are introduced in any way.
-
-What I meant, for v1, was simply:
-
-> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-> index 244ed78afafb..063375e07b2d 100644
-> --- a/include/hw/nvram/fw_cfg.h
-> +++ b/include/hw/nvram/fw_cfg.h
-> @@ -5,20 +5,20 @@
->  #include "standard-headers/linux/qemu_fw_cfg.h"
->  #include "hw/sysbus.h"
->  #include "sysemu/dma.h"
->
-> +typedef struct FWCfgState FWCfgState;
-> +typedef struct FWCfgIoState FWCfgIoState;
-> +typedef struct FWCfgMemState FWCfgMemState;
-> +
->  #define TYPE_FW_CFG     "fw_cfg"
->  #define TYPE_FW_CFG_IO  "fw_cfg_io"
->  #define TYPE_FW_CFG_MEM "fw_cfg_mem"
->
->  #define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG=
-)
->  #define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG=
-_IO)
->  #define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG=
-_MEM)
->
-> -typedef struct FWCfgState FWCfgState;
-> -typedef struct FWCfgIoState FWCfgIoState;
-> -typedef struct FWCfgMemState FWCfgMemState;
-> -
->  #define FW_CFG_ORDER_OVERRIDE_VGA    70
->  #define FW_CFG_ORDER_OVERRIDE_NIC    80
->  #define FW_CFG_ORDER_OVERRIDE_USER   100
->  #define FW_CFG_ORDER_OVERRIDE_DEVICE 110
-
-Now, if you argued that this was not idiomatic for QEMU, or it was
-undesirable for some other reason, that could be a valid observation,
-and then we should discuss it further.
-
-My point here is that I didn't intend my v1 suggestion as, or my R-b
-for, the code that's visible in v2.
-
-Thanks,
-Laszlo
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 573b022e1e..f355f2a352 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -160,6 +160,7 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+ {
+     IDEBus *bus = DO_UPCAST(IDEBus, qbus, dev->qdev.parent_bus);
+     IDEState *s = bus->ifs + dev->unit;
++    AioContext *ctx;
+     int ret;
+ 
+     if (!dev->conf.blk) {
+@@ -174,36 +175,39 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+         }
+     }
+ 
++    ctx = blk_get_aio_context(dev->conf.blk);
++    aio_context_acquire(ctx);
++
+     if (dev->conf.discard_granularity == -1) {
+         dev->conf.discard_granularity = 512;
+     } else if (dev->conf.discard_granularity &&
+                dev->conf.discard_granularity != 512) {
+         error_setg(errp, "discard_granularity must be 512 for ide");
+-        return;
++        goto out;
+     }
+ 
+     blkconf_blocksizes(&dev->conf);
+     if (dev->conf.logical_block_size != 512) {
+         error_setg(errp, "logical_block_size must be 512 for IDE");
+-        return;
++        goto out;
+     }
+ 
+     if (kind != IDE_CD) {
+         if (!blkconf_geometry(&dev->conf, &dev->chs_trans, 65535, 16, 255,
+                               errp)) {
+-            return;
++            goto out;
+         }
+     }
+     if (!blkconf_apply_backend_options(&dev->conf, kind == IDE_CD,
+                                        kind != IDE_CD, errp)) {
+-        return;
++        goto out;
+     }
+ 
+     if (ide_init_drive(s, dev->conf.blk, kind,
+                        dev->version, dev->serial, dev->model, dev->wwn,
+                        dev->conf.cyls, dev->conf.heads, dev->conf.secs,
+                        dev->chs_trans, errp) < 0) {
+-        return;
++        goto out;
+     }
+ 
+     if (!dev->version) {
+@@ -215,6 +219,9 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+ 
+     add_boot_device_path(dev->conf.bootindex, &dev->qdev,
+                          dev->unit ? "/disk@1" : "/disk@0");
++
++out:
++    aio_context_release(ctx);
+ }
+ 
+ static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *name,
+-- 
+2.11.0
