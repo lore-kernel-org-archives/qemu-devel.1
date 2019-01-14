@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48534)
+Received: from eggs.gnu.org ([209.51.188.92]:49188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gj85L-00076G-3m
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:39:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1gj87I-0008Cj-Hm
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:41:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gj85K-0001kj-4m
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:39:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59070)
+	(envelope-from <eblake@redhat.com>) id 1gj87H-0003K8-Pd
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:41:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gj85J-0001kC-SJ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:39:46 -0500
-Date: Mon, 14 Jan 2019 17:39:38 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190114193938.GG28115@habkost.net>
-References: <cover.1546399191.git.yi.z.zhang@linux.intel.com>
-	<eb386264e7015f0a14c0c9686193555b3d2285e0.1546399191.git.yi.z.zhang@linux.intel.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gj87H-0003Jr-HB
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:41:47 -0500
+References: <20190114090324.16176-1-mhines@scalecomputing.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <95f3ade6-5a10-5ebf-7f8e-91fc40fd45bc@redhat.com>
+Date: Mon, 14 Jan 2019 13:41:45 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb386264e7015f0a14c0c9686193555b3d2285e0.1546399191.git.yi.z.zhang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH V8 5/5] hostmem-file: add 'sync' option
+In-Reply-To: <20190114090324.16176-1-mhines@scalecomputing.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XCxofIXptMMI6PVHYY5pZWyE6xmSrYYch"
+Subject: Re: [Qemu-devel] [PATCH] QGA: Fix guest-get-fsinfo PCI address
+ collection in Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Yi <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, mst@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com, qemu-devel@nongnu.org
+To: mhines@scalecomputing.com, qemu-devel@nongnu.org
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Wed, Jan 02, 2019 at 01:26:34PM +0800, Zhang Yi wrote:
-> This option controls will mmap the memory backend file with MAP_SYNC flag,
-> which can ensure filesystem metadata consistent even after a system crash
-> or power failure, if MAP_SYNC flag is supported by the host kernel(Linux
-> kernel 4.15 and later) and the backend is a file supporting DAX (e.g.,
-> file on ext4/xfs file system mounted with '-o dax').
-> 
-> It can take one of following values:
->  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
->         'share=off' or 'pmem!=on', QEMU will not pass this flags to
-> 	mmap(2)
->  - off: default, never pass MAP_SYNC to mmap(2)
-> 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XCxofIXptMMI6PVHYY5pZWyE6xmSrYYch
+From: Eric Blake <eblake@redhat.com>
+To: mhines@scalecomputing.com, qemu-devel@nongnu.org
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <95f3ade6-5a10-5ebf-7f8e-91fc40fd45bc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] QGA: Fix guest-get-fsinfo PCI address
+ collection in Windows
+References: <20190114090324.16176-1-mhines@scalecomputing.com>
+In-Reply-To: <20190114090324.16176-1-mhines@scalecomputing.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/14/19 3:03 AM, mhines@scalecomputing.com wrote:
+> From: Matt Hines <mhines@scalecomputing.com>
+>=20
+> Signed-off-by: Matt Hines <mhines@scalecomputing.com>
+
+The title says what (a fix), but no description of that fix or a "why"
+in the commit body.
+
 > ---
-[...]
-> +vNVDIMM is designed and implemented to guarantee the guest data
-> +persistence on the backends even on the host crash and power
-> +failures. However, there are still some requirements and limitations
-> +as explained below.
-> +
->  Though QEMU supports multiple types of vNVDIMM backends on Linux,
-> -currently the only one that can guarantee the guest write persistence
-> +if MAP_SYNC is not supported by the host kernel and the backends,
-> +the only backend that can guarantee the guest write persistence
->  is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
->  which all guest access do not involve any host-side kernel cache.
->  
-> +mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
-> +systems, QEMU can mmap(2) the backend with MAP_SYNC, which can ensure
-> +filesystem metadata consistent even after a system crash or power
-> +failure. Besides the host kernel support, enabling MAP_SYNC in QEMU
-> +also requires:
-> +
-> + - the backend is a file supporting DAX, e.g., a file on an ext4 or
-> +   xfs file system mounted with '-o dax',
-> +
-> + - 'sync' option of memory-backend-file is on, and
-> +
-> + - 'share' option of memory-backend-file is 'on'.
-> +
-> + - 'pmem' option of memory-backend-file is 'on'
+>  configure            |   2 +-
+>  qga/commands-win32.c | 295 +++++++++++++++++++++++++++++++++----------=
+--------
+>  qga/qapi-schema.json |   3 +-
+>  3 files changed, 197 insertions(+), 103 deletions(-)
 
-I miss one piece of information here: are there any negative
-side-effects of enabling MAP_SYNC on a pmem=on backend?  Could it
-affect performance?  If it has no negative effects, why don't we
-try to always enable it whenever possible?
+> +++ b/qga/qapi-schema.json
+> @@ -836,6 +836,7 @@
+>  # @unit: unit id
+>  # @serial: serial number (since: 3.1)
+>  # @dev: device node (POSIX) or device UNC (Windows) (since: 3.1)
+> +# @number: device slot index (Windows)
 
+Adding a member is more than just a fix.  Also, this is missing a
+'(since 4.0)' tag.
 
-> +
->  When using other types of backends, it's suggested to set 'unarmed'
->  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
->  guest NVDIMM region mapping structure.  This unarmed flag indicates
-[...]
-> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> index a9d5e56..33a7639 100644
-> --- a/util/mmap-alloc.c
-> +++ b/util/mmap-alloc.c
-> @@ -99,7 +99,7 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
->      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
->  #endif
->      bool shared = flags & RAM_SHARED;
-> -    bool is_pmem = flags & RAM_PMEM;
-> +    bool is_pmemsync = (flags & RAM_PMEM) && (flags & RAM_SYNC);
+>  #
+>  # Since: 2.2
+>  ##
+> @@ -843,7 +844,7 @@
+>    'data': {'pci-controller': 'GuestPCIAddress',
+>             'bus-type': 'GuestDiskBusType',
+>             'bus': 'int', 'target': 'int', 'unit': 'int',
+> -           '*serial': 'str', '*dev': 'str'} }
+> +           '*serial': 'str', '*dev': 'str', 'number':'int'} }
+> =20
+>  ##
+>  # @GuestFilesystemInfo:
+>=20
 
-You seem to be reverting what you did on patch 3/5.  In patch
-3/5, you were setting MAP_SYNC automatically on all pmem=on
-backends.  Now, you are only setting MAP_SYNC only if sync=on is
-set explicitly.
-
-I don't know which behavior is better (see question above), but
-it's better to start with the right behavior in the first place.
-
-Also, I don't think we should clear MAP_SYNC silently if sync=on
-was explicitly requested in the command-line.  If sync=on was
-set, we should do exactly as told, and require MAP_SYNC.  If we
-still want to support use cases where MAP_SYNC is desired but
-optional (do we?), we can make 'sync' a OnOffAuto option.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
->      int mmap_xflags = 0;
->      size_t offset;
->      void *ptr1;
-> @@ -111,7 +111,7 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
->      assert(is_power_of_2(align));
->      /* Always align to host page size */
->      assert(align >= getpagesize());
-> -    if (shared && is_pmem) {
-> +    if (shared && is_pmemsync) {
->          mmap_xflags |= MAP_SYNC;
->      }
->  
-> -- 
-> 2.7.4
-> 
-> 
+--XCxofIXptMMI6PVHYY5pZWyE6xmSrYYch
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Eduardo
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw85fkACgkQp6FrSiUn
+Q2p4VQf9GcJ2YIX5Tmz4yYV4eidjhGXfZiBHBfVe6BeVBDuF92YVt0r1FTLx58Op
+iO57ggMwENcpwiR0YoxQDDYmkGpKEYY24lpHS4MXBAESUGqyytmh5djcUrwexy8o
+ce/g1nLarfVJ2AQ9HKnkj4XSo6GkxkTl2nlKspW9Q/YYHL3mkK0GuQeY7GZrzG4X
+hXz4+U1xEnIieWtmYv0Pkgx3dLo6fpSFTiaAAmpPBpq/LTMtMmR9iMZmmfPjCg1e
+g2vXYkAWxpwSEBMbew2RQW7q9HCBnNoM9s/FNzBZLSzR6bt76XyR9M6b/deXZEbh
+8J5O+RZ+d8WpCHjBqw/DddQAvQ44Mg==
+=VR3X
+-----END PGP SIGNATURE-----
+
+--XCxofIXptMMI6PVHYY5pZWyE6xmSrYYch--
