@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53147)
+Received: from eggs.gnu.org ([209.51.188.92]:53623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gj6Hy-0003zS-1n
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:44:43 -0500
+	(envelope-from <thuth@redhat.com>) id 1gj6Iq-0004i4-NW
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:45:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gj6Hw-0007DQ-Ot
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:44:41 -0500
-Date: Mon, 14 Jan 2019 18:44:31 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190114184431.56795d44.cohuck@redhat.com>
-In-Reply-To: <c30709c1-9348-e4c9-22bb-95d6183163f3@linux.ibm.com>
-References: <20190110210358.24035-1-david@redhat.com>
-	<4988f58e-4bc5-c622-53b7-cfda758304e1@redhat.com>
-	<20190111103828.058ccc6c.cohuck@redhat.com>
-	<c30709c1-9348-e4c9-22bb-95d6183163f3@linux.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1gj6Ip-00085o-IG
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:45:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gj6Ip-00083i-6d
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:45:35 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 14 Jan 2019 18:45:20 +0100
+Message-Id: <1547487921-605-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1547487921-605-1-git-send-email-thuth@redhat.com>
+References: <1547487921-605-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Send correct event on
- hotplug.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 21/27] ui/console: Remove PixelFormat from
+ qemu/typedefs.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,93 +27,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>
 
-[restored cc:s]
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-On Mon, 14 Jan 2019 11:06:19 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+Header files requiring PixelFormat already include "ui/qemu-pixman.h".
 
-> On 11/01/2019 10:38, Cornelia Huck wrote:
-> > On Fri, 11 Jan 2019 08:16:41 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 10.01.19 22:03, David Hildenbrand wrote:  
-> >>> Comit 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
-> >>> changed the initial state of zPCI devices from ZPCI_FS_STANDBY to
-> >>> ZPCI_FS_DISABLED (a.k.a. configured). However we still only send a
-> >>> HP_EVENT_RESERVED_TO_STANDBY event to the guest, indicating a wrong
-> >>> state.
-> >>>
-> >>> Let's send a HP_EVENT_TO_CONFIGURED event instead, to match the actual
-> >>> state the device is in.
-> >>>
-> >>> This fixes hotplugged devices having to be enabled explicitly in the
-> >>> guest e.g. via echo 1 > /sys/bus/pci/slots/00000000/power.
-> >>>
-> >>> Fixes: 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
-> >>> Report-by: Cornelia Huck <cohuck@redhat.com>  
-> > 
-> > Cool, works for me as well.
-> > 
-> > Tested-by: Cornelia Huck <cohuck@redhat.com>
-> > 
-> > Do we want to cc:stable? Probably not, as it's more annoying than
-> > critical, and pci hotplug does not seem to be much used on s390x.
-> >   
-> >>
-> >> If this patch is the right thing to do, then
-> >>
-> >> 1. s/Report-by/Reported-by/
-> >> 2. Dropping the "." from the subject
-> >>
-> >> (yes, it was late)  
-> > 
-> > :) Can do while applying.
-> >   
-> >>
-> >> I wonder if we should do both events sequentially, but as I don't have
-> >> access to the architecture I have to rely on that this works :)  
-> > 
-> > Yep, let's wait for feedback from folks with architecture access.
-> >   
-> 
-> Works fine on the architecture too.
-> 
-> Seems the logical thing to do for me.
-> 
-> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+To clean "qemu/typedefs.h", move the declaration to "ui/qemu-pixman.h"
+(removing the forward declaration).
 
-Thanks for checking.
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ include/qemu/typedefs.h  |  1 -
+ include/ui/console.h     | 10 ----------
+ include/ui/qemu-pixman.h | 10 ++++++++++
+ 3 files changed, 10 insertions(+), 11 deletions(-)
 
-I'd like to queue this, but I'd like an ack from Collin as well.
-
-> 
-> 
-> >>  
-> >>> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >>> ---
-> >>>   hw/s390x/s390-pci-bus.c | 2 +-
-> >>>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> >>> index 15759b6514..7f911b216a 100644
-> >>> --- a/hw/s390x/s390-pci-bus.c
-> >>> +++ b/hw/s390x/s390-pci-bus.c
-> >>> @@ -899,7 +899,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >>>           }
-> >>>   
-> >>>           if (dev->hotplugged) {
-> >>> -            s390_pci_generate_plug_event(HP_EVENT_RESERVED_TO_STANDBY,
-> >>> +            s390_pci_generate_plug_event(HP_EVENT_TO_CONFIGURED ,
-> >>>                                            pbdev->fh, pbdev->fid);
-> >>>           }
-> >>>       } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
-> >>>      
-> >>
-> >>  
-> > 
-> >   
-> 
-> 
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 38ec1fd..5d1a2d8 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -71,7 +71,6 @@ typedef struct PCIExpressHost PCIExpressHost;
+ typedef struct PCIHostDeviceAddress PCIHostDeviceAddress;
+ typedef struct PCIHostState PCIHostState;
+ typedef struct PCMachineState PCMachineState;
+-typedef struct PixelFormat PixelFormat;
+ typedef struct PostcopyDiscardState PostcopyDiscardState;
+ typedef struct Property Property;
+ typedef struct PropertyInfo PropertyInfo;
+diff --git a/include/ui/console.h b/include/ui/console.h
+index aa9f975..fef900d 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -121,16 +121,6 @@ struct QemuConsoleClass {
+=20
+ #define QEMU_ALLOCATED_FLAG     0x01
+=20
+-struct PixelFormat {
+-    uint8_t bits_per_pixel;
+-    uint8_t bytes_per_pixel;
+-    uint8_t depth; /* color depth in bits */
+-    uint32_t rmask, gmask, bmask, amask;
+-    uint8_t rshift, gshift, bshift, ashift;
+-    uint8_t rmax, gmax, bmax, amax;
+-    uint8_t rbits, gbits, bbits, abits;
+-};
+-
+ typedef struct DisplaySurface {
+     pixman_format_code_t format;
+     pixman_image_t *image;
+diff --git a/include/ui/qemu-pixman.h b/include/ui/qemu-pixman.h
+index b7c82d1..0668109 100644
+--- a/include/ui/qemu-pixman.h
++++ b/include/ui/qemu-pixman.h
+@@ -53,6 +53,16 @@
+=20
+ /* -------------------------------------------------------------------- =
+*/
+=20
++typedef struct PixelFormat {
++    uint8_t bits_per_pixel;
++    uint8_t bytes_per_pixel;
++    uint8_t depth; /* color depth in bits */
++    uint32_t rmask, gmask, bmask, amask;
++    uint8_t rshift, gshift, bshift, ashift;
++    uint8_t rmax, gmax, bmax, amax;
++    uint8_t rbits, gbits, bbits, abits;
++} PixelFormat;
++
+ PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format);
+ pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_end=
+ian);
+ pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format);
+--=20
+1.8.3.1
