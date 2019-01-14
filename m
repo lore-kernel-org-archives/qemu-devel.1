@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37485)
+Received: from eggs.gnu.org ([209.51.188.92]:39002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gj9L4-000726-L5
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:00:10 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gj9Sc-0000J0-BY
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:07:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gj9L2-0003nJ-FZ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:00:06 -0500
-References: <20190110210358.24035-1-david@redhat.com>
-	<4988f58e-4bc5-c622-53b7-cfda758304e1@redhat.com>
-	<20190111103828.058ccc6c.cohuck@redhat.com>
-	<c30709c1-9348-e4c9-22bb-95d6183163f3@linux.ibm.com>
-	<20190114184431.56795d44.cohuck@redhat.com>
-	<beff9759-d95f-4ba6-d049-aada148e162d@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8db3c201-e92f-4d1d-ff7b-bd6de4d37ebb@redhat.com>
-Date: Mon, 14 Jan 2019 21:59:58 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1gj9Sb-0006Zo-B7
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:07:54 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44614)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gj9Sa-0006Yu-4j
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:07:53 -0500
+Received: by mail-pg1-x541.google.com with SMTP id t13so174892pgr.11
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 13:07:52 -0800 (PST)
+References: <20190114011122.5995-1-richard.henderson@linaro.org>
+	<20190114011122.5995-18-richard.henderson@linaro.org>
+	<878sznpbd0.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <57ff8f98-95c9-734d-99dd-22d4ff350951@linaro.org>
+Date: Tue, 15 Jan 2019 08:07:41 +1100
 MIME-Version: 1.0
-In-Reply-To: <beff9759-d95f-4ba6-d049-aada148e162d@linux.ibm.com>
+In-Reply-To: <878sznpbd0.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1] s390x/pci: Send correct
- event on hotplug.
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 17/17] tests/tcg/aarch64: Add mte smoke
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On 14.01.19 21:00, Collin Walling wrote:
-> On 1/14/19 12:44 PM, Cornelia Huck wrote:
->> [restored cc:s]
->>
->> On Mon, 14 Jan 2019 11:06:19 +0100
->> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>
->>> On 11/01/2019 10:38, Cornelia Huck wrote:
->>>> On Fri, 11 Jan 2019 08:16:41 +0100
->>>> David Hildenbrand <david@redhat.com> wrote:
->>>>  =20
->>>>> On 10.01.19 22:03, David Hildenbrand wrote: =20
->>>>>> Comit 2c28c490571f ("s390x/pci: let pci devices start in configure=
-d mode")
->>>>>> changed the initial state of zPCI devices from ZPCI_FS_STANDBY to
->>>>>> ZPCI_FS_DISABLED (a.k.a. configured). However we still only send a
->>>>>> HP_EVENT_RESERVED_TO_STANDBY event to the guest, indicating a wron=
-g
->>>>>> state.
->>>>>>
->>>>>> Let's send a HP_EVENT_TO_CONFIGURED event instead, to match the ac=
-tual
->>>>>> state the device is in.
->>>>>>
->>>>>> This fixes hotplugged devices having to be enabled explicitly in t=
-he
->>>>>> guest e.g. via echo 1 > /sys/bus/pci/slots/00000000/power.
->>>>>>
->>>>>> Fixes: 2c28c490571f ("s390x/pci: let pci devices start in configur=
-ed mode")
->>>>>> Report-by: Cornelia Huck <cohuck@redhat.com> =20
->>>>
->>>> Cool, works for me as well.
->>>>
->>>> Tested-by: Cornelia Huck <cohuck@redhat.com>
->>>>
->>>> Do we want to cc:stable? Probably not, as it's more annoying than
->>>> critical, and pci hotplug does not seem to be much used on s390x.
->>>>  =20
->>>>>
->>>>> If this patch is the right thing to do, then
->>>>>
->>>>> 1. s/Report-by/Reported-by/
->>>>> 2. Dropping the "." from the subject
->>>>>
->>>>> (yes, it was late) =20
->>>>
->>>> :) Can do while applying.
->>>>  =20
->>>>>
->>>>> I wonder if we should do both events sequentially, but as I don't h=
-ave
->>>>> access to the architecture I have to rely on that this works :) =20
->>>>
->>>> Yep, let's wait for feedback from folks with architecture access.
->>>>  =20
->>>
->>> Works fine on the architecture too.
->>>
->>> Seems the logical thing to do for me.
->>>
->>> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
->>
->> Thanks for checking.
->>
->> I'd like to queue this, but I'd like an ack from Collin as well.
->>
->=20
-> Would you mind adding a comment somewhere that states something like
-> "we can safely bypass the standby state when PCI hotplugging for a gues=
-t"=20
-> just to be clear that QEMU is a bit different from how we handle it on =
-the LPAR
-> level?
->=20
-> That comment would more-or-less clarify why we set the ZPCI_FS_<STATE> =
-directly
-> to disabled instead of to standby when hotplugging (which, AFAIU, is th=
-e order=20
-> how things occur at the LPAR level)
+On 1/15/19 1:22 AM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> ??? Requires a quite recent aarch64 assembler.  Use .inst instead?
+> 
+> How recent? Given buster is nearing release we could start using it as a
+> basis for the ARM cross compiler images. That is shipping gcc 8.2.0 as
+> of now.
 
-This patch relies on Christians patch, where the general concept was
-explained. As we changed the initial state, we have to send a
-corresponding hotplug event. But still we can add a comment to shine
-some light on the general concept.
+Not yet released.  The patches adding the support include
 
-@Conny, can you add after the first paragraph: (or let me know if you
-want a respin)
+commit 3a0f69be5589d351453afebd0974992cff3ee4d1
+Author: Sudakshina Das <sudi.das@arm.com>
+Date:   Mon Nov 12 13:29:38 2018 +0000
 
-"On real HW, a PCI device always pops up in the STANDBY state. In QEMU,
-we decided to let it show up directly in the configured state (as
-configuring it is otherwise just an extra burden for the admin). We can
-safely bypass the STANDBY state when hotplugging PCI devices to a guest."
+    [BINUTILS, AARCH64, 8/8] Add data cache instructions
+    for Memory Tagging Extension
 
->=20
-> Otherwise,
->=20
-> Reviewed-by: Collin Walling <walling@linux.ibm.com>
+but the most recent binutils release branch (2.31) is from June.
 
-Thanks!
 
---=20
-
-Thanks,
-
-David / dhildenb
+r~
