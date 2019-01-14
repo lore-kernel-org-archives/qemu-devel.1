@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59431)
+Received: from eggs.gnu.org ([209.51.188.92]:33108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1git75-0000Ij-NM
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:40:36 -0500
+	(envelope-from <fam@euphon.net>) id 1gitHl-0001s3-Pq
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:51:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1git74-0003P2-Gg
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:40:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1git72-0003Ej-5o
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:40:32 -0500
-Date: Mon, 14 Jan 2019 11:31:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190114033130.GE24343@xz-x1>
-References: <20190113143641.38936-1-lifei1214@126.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190113143641.38936-1-lifei1214@126.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/misc/edu: add msi_uninit() for
- pci_edu_uninit()
+	(envelope-from <fam@euphon.net>) id 1gitHk-00022z-T6
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:51:37 -0500
+Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17718
+	helo=sender1.zoho.com.cn) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fam@euphon.net>) id 1gitHj-0001ur-L6
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:51:36 -0500
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+From: Fam Zheng <fam@euphon.net>
+In-Reply-To: <20190109135917.GP3998@redhat.com>
+Date: Mon, 14 Jan 2019 11:50:08 +0800
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A3EA5405-A5EE-4E77-8C77-A67398756B96@euphon.net>
+References: <20181031025712.18602-1-famz@redhat.com>
+	<4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
+	<20181114095807.GB22784@magic> <20190109135504.GA12179@redhat.com>
+	<20190109135917.GP3998@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4] tests: vm: auto_install OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <lifei1214@126.com>
-Cc: qemu-devel@nongnu.org, shirley17fei@gmail.com, Markus Armbruster <armbru@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Fam Zheng <famz@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Brad Smith <brad@comstyle.com>, =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>, =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On Sun, Jan 13, 2019 at 10:36:41PM +0800, Fei Li wrote:
-> From: Fei Li <shirley17fei@gmail.com>
-> 
-> Let's supplement the msi_uninit() when failing to realize
-> the pci edu device.
-> 
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Signed-off-by: Fei Li <shirley17fei@gmail.com>
-> ---
->  hw/misc/edu.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-> index cdcf550dd7..4feb7503de 100644
-> --- a/hw/misc/edu.c
-> +++ b/hw/misc/edu.c
-> @@ -367,6 +367,7 @@ static void pci_edu_uninit(PCIDevice *pdev)
->  {
->      EduState *edu = EDU(pdev);
->  
-> +    msi_uninit(pdev);
 
-It would be cleaner to me to call this after the join() since
-edu_fact_thread() could potentially use msi_*() helpers then the
-destructions follow the reverse order of init.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+> On Jan 9, 2019, at 21:59, Daniel P. Berrang=C3=A9 =
+<berrange@redhat.com> wrote:
+>=20
+> On Wed, Jan 09, 2019 at 01:55:04PM +0000, Daniel P. Berrang=C3=A9 =
+wrote:
+>> On Wed, Nov 14, 2018 at 05:58:07PM +0800, Fam Zheng wrote:
+>>> On Sun, 11/11 18:20, Brad Smith wrote:
+>>>> ping.
+>>>=20
+>>> Queued. Will send a pull request soon.
+>>=20
+>> ping, this seems to have got lost, and is blocking us deleting SDL =
+1.2
+>> support from QEMU.
+>=20
+> Sigh, never mind, I found the PR is here:
+>=20
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00732.html
 
->      qemu_mutex_lock(&edu->thr_mutex);
->      edu->stopping = true;
->      qemu_mutex_unlock(&edu->thr_mutex);
-> -- 
-> 2.17.2 (Apple Git-113)
-> 
+I had to drop it from the queue because Peter didn=E2=80=99t like the =
+QEMU version requirement (for the slirp tftp parameters). :(
 
-Regards,
+What is the blocker for delete SDL 1.2? Is it breaking tests/vm/openbsd? =
+If so maybe we can add =E2=80=94disable-sdl to its configure command.
 
--- 
-Peter Xu
+Fam
+
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    =
+https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            =
+https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    =
+https://www.instagram.com/dberrange :|
+>=20
