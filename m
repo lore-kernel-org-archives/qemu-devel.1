@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55278)
+Received: from eggs.gnu.org ([209.51.188.92]:55491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gizlZ-0000Am-7b
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:46:50 -0500
+	(envelope-from <philmd@redhat.com>) id 1gizmb-0000yS-NE
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:47:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gizlY-0008OZ-GX
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:46:49 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37786)
+	(envelope-from <philmd@redhat.com>) id 1gizma-0002VK-SV
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:47:53 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33015)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gizlY-0008IU-Au
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:46:48 -0500
-Received: by mail-wm1-x342.google.com with SMTP id g67so8304267wmd.2
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:46:46 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 14 Jan 2019 10:46:41 +0000
-Message-Id: <20190114104641.19186-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gizma-0002Sx-MW
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:47:52 -0500
+Received: by mail-wr1-f65.google.com with SMTP id c14so22342630wrr.0
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:47:52 -0800 (PST)
+References: <20190111082043.31412-1-bsd@redhat.com>
+	<20190111104414.dlzzbc7djkn2va2f@sirius.home.kraxel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d6168907-ed94-887a-5133-8f1ff395e6fc@redhat.com>
+Date: Mon, 14 Jan 2019 11:47:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH] tests: use g_usleep instead of rem =
- sleep(time)
+In-Reply-To: <20190111104414.dlzzbc7djkn2va2f@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2 v2] Break down the MTP write operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cota@braap.org, ehabkost@redhat.com, pbonzini@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, Bandan Das <bsd@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Relying on sleep to always return having slept isn't safe as a signal
-may have occurred. If signals are constantly incoming the program will
-never reach it's termination condition. This is believed to be the
-mechanism causing time outs for qht-test in Travis.
+On 1/11/19 11:44 AM, Gerd Hoffmann wrote:
+> On Fri, Jan 11, 2019 at 03:20:41AM -0500, Bandan Das wrote:
+>> v2:
+>>   Rebased on top of master and retested
+> 
+> Thanks.  Added to usb queue.
 
-The glib g_usleep() deals with all of this for us so lets use it instead.
+Hi Gerd, did you update MTP_WRITE_BUF_SZ as suggested by Eric?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/atomic64-bench.c   | 6 ++----
- tests/atomic_add-bench.c | 6 ++----
- tests/qht-bench.c        | 6 ++----
- 3 files changed, 6 insertions(+), 12 deletions(-)
++#include "qemu/units.h"
 
-diff --git a/tests/atomic64-bench.c b/tests/atomic64-bench.c
-index 71692560ed..121a8c14f4 100644
---- a/tests/atomic64-bench.c
-+++ b/tests/atomic64-bench.c
-@@ -74,16 +74,14 @@ static void *thread_func(void *arg)
- 
- static void run_test(void)
- {
--    unsigned int remaining;
-     unsigned int i;
- 
-     while (atomic_read(&n_ready_threads) != n_threads) {
-         cpu_relax();
-     }
-+
-     atomic_set(&test_start, true);
--    do {
--        remaining = sleep(duration);
--    } while (remaining);
-+    g_usleep(duration * G_USEC_PER_SEC);
-     atomic_set(&test_stop, true);
- 
-     for (i = 0; i < n_threads; i++) {
-diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
-index 2f6c72f63a..5666f6bbff 100644
---- a/tests/atomic_add-bench.c
-+++ b/tests/atomic_add-bench.c
-@@ -76,16 +76,14 @@ static void *thread_func(void *arg)
- 
- static void run_test(void)
- {
--    unsigned int remaining;
-     unsigned int i;
- 
-     while (atomic_read(&n_ready_threads) != n_threads) {
-         cpu_relax();
-     }
-+
-     atomic_set(&test_start, true);
--    do {
--        remaining = sleep(duration);
--    } while (remaining);
-+    g_usleep(duration * G_USEC_PER_SEC);
-     atomic_set(&test_stop, true);
- 
-     for (i = 0; i < n_threads; i++) {
-diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-index ab4e708180..e3b512f26f 100644
---- a/tests/qht-bench.c
-+++ b/tests/qht-bench.c
-@@ -398,16 +398,14 @@ static void pr_stats(void)
- 
- static void run_test(void)
- {
--    unsigned int remaining;
-     int i;
- 
-     while (atomic_read(&n_ready_threads) != n_rw_threads + n_rz_threads) {
-         cpu_relax();
-     }
-+
-     atomic_set(&test_start, true);
--    do {
--        remaining = sleep(duration);
--    } while (remaining);
-+    g_usleep(duration * G_USEC_PER_SEC);
-     atomic_set(&test_stop, true);
- 
-     for (i = 0; i < n_rw_threads; i++) {
--- 
-2.17.1
+...
+
+-#define MTP_WRITE_BUF_SZ  512000
++#define MTP_WRITE_BUF_SZ  (512 * KiB)
