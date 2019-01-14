@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34678)
+Received: from eggs.gnu.org ([209.51.188.92]:34733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0004Bc-05
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:27 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bg-Uq
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6g-00019a-Bi
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40200)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0001D7-2y
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:25 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6f-00014B-UQ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:22 -0500
+	id 1gjB6h-0001Ag-Mq
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:01 +0100
-Message-Id: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:10 +0100
+Message-Id: <20190114225306.21569-10-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
+References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULLv3 00/65] slirp updates
+Subject: [Qemu-devel] [PULL 09/65] slirp: fix slirp_add_exec() leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,279 +28,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-The following changes since commit 27df21ca3886fff4dd3d70e515517667963a52=
-f1:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/misc-20190111-pull-re=
-quest' into staging (2019-01-11 16:45:59 +0000)
+Free the list elements allocated in add_exec().
 
-are available in the Git repository at:
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
+ slirp/misc.h  | 2 +-
+ slirp/slirp.c | 8 ++++++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-  https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
-
-for you to fetch changes up to a7104eda7dab99d0cdbd3595c211864cba415905:
-
-  slirp: check data length while emulating ident function (2019-01-14 23:=
-36:38 +0100)
-
-----------------------------------------------------------------
-slirp updates
-
-Gerd Hoffmann (1):
-  slirp: add tftp tracing
-
-Marc-Andr=C3=A9 Lureau (61):
-  slirp: associate slirp_output callback with the Slirp context
-  slirp: remove do_pty from fork_exec()
-  slirp: replace ex_pty with ex_chardev
-  slirp: use a dedicated field for chardev pointer
-  slirp: remove unused EMU_RSH
-  slirp: rename /extra/chardev
-  slirp: move internal function declarations
-  slirp: remove Monitor dependency, return a string for info
-  slirp: fix slirp_add_exec() leaks
-  slirp: replace the poor-man string split with g_strsplit()
-  slirp: remove dead declarations
-  slirp: move socket pair creation in helper function
-  slirp: remove unused M_TRAILINGSPACE
-  slirp: use a callback structure to interface with qemu
-  slirp: remove PROBE_CONN dead-code
-  slirp: remove FULL_BOLT
-  slirp: remove the disabled readv()/writev() code path
-  slirp: remove HAVE_SYS_SIGNAL_H
-  slirp: remove unused HAVE_SYS_BITYPES_H
-  slirp: remove NO_UNIX_SOCKETS
-  slirp: remove unused HAVE_SYS_STROPTS_H
-  slirp: remove unused HAVE_ARPA_INET_H
-  slirp: remove unused HAVE_SYS_WAIT_H
-  slirp: remove unused HAVE_SYS_SELECT_H
-  slirp: remove HAVE_SYS_IOCTL_H
-  slirp: remove HAVE_SYS_FILIO_H
-  slirp: remove unused DECLARE_IOVEC
-  slirp: remove unused HAVE_INET_ATON
-  slirp: replace HOST_WORDS_BIGENDIAN with glib equivalent
-  slirp: replace SIZEOF_CHAR_P with glib equivalent
-  slirp: replace compile time DO_KEEPALIVE
-  slirp: remove unused global slirp_instance
-  slirp: replace error_report() with g_critical()
-  slirp: improve a bit the debug macros
-  slirp: add a callback to log guest errors
-  slirp: remove #if notdef dead code
-  slirp: remove unused sbflush()
-  slirp: NULL is defined by stddef.h
-  slirp: remove dead TCP_ACK_HACK code
-  slirp: replace ARRAY_SIZE with G_N_ELEMENTS
-  net: do not depend on slirp internals
-  glib-compat: add g_spawn_async_with_fds() fallback
-  slirp: simplify fork_exec()
-  slirp: replace error_report() with g_critical()
-  slirp: drop <Vista compatibility
-  slirp: rename exec_list
-  slirp: use virtual time for packet expiration
-  slirp: replace a fprintf with g_critical()
-  slirp: replace some fprintf() with DEBUG_MISC
-  slirp: replace a DEBUG block with WITH_ICMP_ERROR_MSG
-  slirp: no need to make DPRINTF conditional on DEBUG
-  slirp: always build with debug statements
-  slirp: introduce SLIRP_DEBUG environment variable
-  slirp: use %p for pointers format
-  slirp: remove remaining DEBUG blocks
-  slirp: replace DEBUG_ARGS with DEBUG_ARG
-  slirp: factor out guestfwd addition checks
-  slirp: add clock_get_ns() callback
-  build-sys: use a separate slirp-obj-y && slirp.mo
-  slirp: set G_LOG_DOMAIN
-  slirp: call into g_debug() for DEBUG macros
-
-Prasad J Pandit (1):
-  slirp: check data length while emulating ident function
-
-Samuel Thibault (2):
-  slirp: Enable fork_exec support on Windows
-  slirp: Mark debugging calls as unlikely
-
- Makefile              |   5 +-
- Makefile.objs         |   4 +-
- Makefile.target       |   5 +-
- include/glib-compat.h |  56 +++++++++
- net/colo-compare.c    |  11 +-
- net/colo.c            |   1 +
- net/colo.h            |   7 +-
- net/filter-rewriter.c |   9 +-
- net/slirp.c           |  61 +++++----
- net/util.h            |  55 ++++++++
- slirp/Makefile.objs   |  37 +++++-
- slirp/arp_table.c     |  12 +-
- slirp/bootp.c         |  10 +-
- slirp/cksum.c         |   8 +-
- slirp/debug.h         |  47 ++++---
- slirp/dhcpv6.c        |  17 ++-
- slirp/if.c            |   4 +-
- slirp/ip.h            |  10 +-
- slirp/ip6.h           |   3 +-
- slirp/ip6_icmp.c      |  27 ++--
- slirp/ip6_icmp.h      |   6 +-
- slirp/ip6_input.c     |   2 +-
- slirp/ip6_output.c    |   4 +-
- slirp/ip_icmp.c       |  31 ++---
- slirp/ip_input.c      | 200 -----------------------------
- slirp/libslirp.h      |  27 ++--
- slirp/main.h          |  33 -----
- slirp/mbuf.c          |   2 +-
- slirp/mbuf.h          |   1 -
- slirp/misc.c          | 286 +++++++++++++++++-------------------------
- slirp/misc.h          |  13 +-
- slirp/ncsi.c          |   4 +-
- slirp/ndp_table.c     |  32 +++--
- slirp/sbuf.h          |   1 -
- slirp/slirp.c         | 177 +++++++++++++-------------
- slirp/slirp.h         |  45 ++-----
- slirp/slirp_config.h  |  86 -------------
- slirp/socket.c        |  53 +++-----
- slirp/socket.h        |   2 +-
- slirp/tcp.h           |   4 +-
- slirp/tcp_input.c     |  84 ++-----------
- slirp/tcp_output.c    |   2 +-
- slirp/tcp_subr.c      |  22 ++--
- slirp/tcp_timer.c     |   2 +-
- slirp/tftp.c          |   7 +-
- slirp/trace-events    |   5 +
- slirp/udp.c           |   5 +-
- slirp/udp6.c          |  11 +-
- stubs/slirp.c         |   2 +-
- 49 files changed, 603 insertions(+), 935 deletions(-)
- delete mode 100644 slirp/slirp_config.h
- create mode 100644 slirp/trace-events
-
---
+diff --git a/slirp/misc.h b/slirp/misc.h
+index 94829722cd..0bc5e74bc5 100644
+--- a/slirp/misc.h
++++ b/slirp/misc.h
+@@ -12,7 +12,7 @@ struct ex_list {
+ 	void *ex_chardev;
+ 	struct in_addr ex_addr;		/* Server address */
+ 	int ex_fport;                   /* Port to telnet to */
+-	const char *ex_exec;            /* Command line of what to exec */
++	char *ex_exec;                  /* Command line of what to exec */
+ 	struct ex_list *ex_next;
+ };
+=20
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index ab08694e37..1627436e7d 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -342,6 +342,14 @@ Slirp *slirp_init(int restricted, bool in_enabled, s=
+truct in_addr vnetwork,
+=20
+ void slirp_cleanup(Slirp *slirp)
+ {
++    struct ex_list *e, *next;
++
++    for (e =3D slirp->exec_list; e; e =3D next) {
++        next =3D e->ex_next;
++        g_free(e->ex_exec);
++        g_free(e);
++    }
++
+     QTAILQ_REMOVE(&slirp_instances, slirp, entry);
+=20
+     unregister_savevm(NULL, "slirp", slirp);
+--=20
 2.20.1
-
-----------------------------------------------------------------
-Gerd Hoffmann (1):
-      slirp: add tftp tracing
-
-Marc-Andr=C3=A9 Lureau (61):
-      slirp: associate slirp_output callback with the Slirp context
-      slirp: remove do_pty from fork_exec()
-      slirp: replace ex_pty with ex_chardev
-      slirp: use a dedicated field for chardev pointer
-      slirp: remove unused EMU_RSH
-      slirp: rename /extra/chardev
-      slirp: move internal function declarations
-      slirp: remove Monitor dependency, return a string for info
-      slirp: fix slirp_add_exec() leaks
-      slirp: replace the poor-man string split with g_strsplit()
-      slirp: remove dead declarations
-      slirp: move socket pair creation in helper function
-      slirp: remove unused M_TRAILINGSPACE
-      slirp: use a callback structure to interface with qemu
-      slirp: remove PROBE_CONN dead-code
-      slirp: remove FULL_BOLT
-      slirp: remove the disabled readv()/writev() code path
-      slirp: remove HAVE_SYS_SIGNAL_H
-      slirp: remove unused HAVE_SYS_BITYPES_H
-      slirp: remove NO_UNIX_SOCKETS
-      slirp: remove unused HAVE_SYS_STROPTS_H
-      slirp: remove unused HAVE_ARPA_INET_H
-      slirp: remove unused HAVE_SYS_WAIT_H
-      slirp: remove unused HAVE_SYS_SELECT_H
-      slirp: remove HAVE_SYS_IOCTL_H
-      slirp: remove HAVE_SYS_FILIO_H
-      slirp: remove unused DECLARE_IOVEC
-      slirp: remove unused HAVE_INET_ATON
-      slirp: replace HOST_WORDS_BIGENDIAN with glib equivalent
-      slirp: replace SIZEOF_CHAR_P with glib equivalent
-      slirp: replace compile time DO_KEEPALIVE
-      slirp: remove unused global slirp_instance
-      slirp: replace error_report() with g_critical()
-      slirp: improve a bit the debug macros
-      slirp: add a callback to log guest errors
-      slirp: remove #if notdef dead code
-      slirp: remove unused sbflush()
-      slirp: NULL is defined by stddef.h
-      slirp: remove dead TCP_ACK_HACK code
-      slirp: replace ARRAY_SIZE with G_N_ELEMENTS
-      net: do not depend on slirp internals
-      glib-compat: add g_spawn_async_with_fds() fallback
-      slirp: simplify fork_exec()
-      slirp: replace error_report() with g_critical()
-      slirp: drop <Vista compatibility
-      slirp: rename exec_list
-      slirp: use virtual time for packet expiration
-      slirp: replace a fprintf with g_critical()
-      slirp: replace some fprintf() with DEBUG_MISC
-      slirp: replace a DEBUG block with WITH_ICMP_ERROR_MSG
-      slirp: no need to make DPRINTF conditional on DEBUG
-      slirp: always build with debug statements
-      slirp: introduce SLIRP_DEBUG environment variable
-      slirp: use %p for pointers format
-      slirp: remove remaining DEBUG blocks
-      slirp: replace DEBUG_ARGS with DEBUG_ARG
-      slirp: factor out guestfwd addition checks
-      slirp: add clock_get_ns() callback
-      build-sys: use a separate slirp-obj-y && slirp.mo
-      slirp: set G_LOG_DOMAIN
-      slirp: call into g_debug() for DEBUG macros
-
-Prasad J Pandit (1):
-      slirp: check data length while emulating ident function
-
-Samuel Thibault (2):
-      slirp: Enable fork_exec support on Windows
-      slirp: Mark debugging calls as unlikely
-
- Makefile              |   5 +-
- Makefile.objs         |   4 +-
- Makefile.target       |   5 +-
- include/glib-compat.h |  56 ++++++++++
- net/colo-compare.c    |  11 +-
- net/colo.c            |   1 +
- net/colo.h            |   7 +-
- net/filter-rewriter.c |   9 +-
- net/slirp.c           |  61 +++++------
- net/util.h            |  55 ++++++++++
- slirp/Makefile.objs   |  37 ++++++-
- slirp/arp_table.c     |  12 +--
- slirp/bootp.c         |  10 +-
- slirp/cksum.c         |   8 +-
- slirp/debug.h         |  47 +++++----
- slirp/dhcpv6.c        |  17 ++-
- slirp/if.c            |   4 +-
- slirp/ip.h            |  10 +-
- slirp/ip6.h           |   3 +-
- slirp/ip6_icmp.c      |  27 +++--
- slirp/ip6_icmp.h      |   6 +-
- slirp/ip6_input.c     |   2 +-
- slirp/ip6_output.c    |   4 +-
- slirp/ip_icmp.c       |  31 +++---
- slirp/ip_input.c      | 200 -----------------------------------
- slirp/libslirp.h      |  27 +++--
- slirp/main.h          |  33 ------
- slirp/mbuf.c          |   2 +-
- slirp/mbuf.h          |   1 -
- slirp/misc.c          | 286 ++++++++++++++++++++------------------------=
-------
- slirp/misc.h          |  13 ++-
- slirp/ncsi.c          |   4 +-
- slirp/ndp_table.c     |  32 +++---
- slirp/sbuf.h          |   1 -
- slirp/slirp.c         | 177 +++++++++++++++----------------
- slirp/slirp.h         |  45 ++------
- slirp/slirp_config.h  |  86 ---------------
- slirp/socket.c        |  53 +++-------
- slirp/socket.h        |   2 +-
- slirp/tcp.h           |   4 +-
- slirp/tcp_input.c     |  84 ++-------------
- slirp/tcp_output.c    |   2 +-
- slirp/tcp_subr.c      |  22 ++--
- slirp/tcp_timer.c     |   2 +-
- slirp/tftp.c          |   7 +-
- slirp/trace-events    |   5 +
- slirp/udp.c           |   5 +-
- slirp/udp6.c          |  11 +-
- stubs/slirp.c         |   2 +-
- 49 files changed, 603 insertions(+), 935 deletions(-)
- delete mode 100644 slirp/slirp_config.h
- create mode 100644 slirp/trace-events
