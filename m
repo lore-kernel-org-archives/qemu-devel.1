@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36165)
+Received: from eggs.gnu.org ([209.51.188.92]:36681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj5M3-0002R9-W9
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:44:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1gj5Nj-0003lJ-0T
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:46:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj5M3-0007bQ-3V
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:44:52 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj5M2-0007aM-Ty
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:44:51 -0500
-Received: by mail-wm1-f68.google.com with SMTP id t200so252283wmt.0
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 08:44:50 -0800 (PST)
-References: <20190114140510.7161-1-chen.zhang@intel.com>
-	<0b78cb56-aab1-aa20-3e38-bf7db25151af@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <21eec332-311f-b5df-e4bc-1e7781b3ff35@redhat.com>
-Date: Mon, 14 Jan 2019 17:44:48 +0100
+	(envelope-from <eblake@redhat.com>) id 1gj5Ne-0000D7-JH
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:46:32 -0500
+References: <20190112175812.27068-1-eblake@redhat.com>
+	<963d830d-690a-09cd-4939-79096b62cf35@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8b84e314-db63-5125-b942-54732fc2a241@redhat.com>
+Date: Mon, 14 Jan 2019 10:46:07 -0600
 MIME-Version: 1.0
-In-Reply-To: <0b78cb56-aab1-aa20-3e38-bf7db25151af@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] net/colo-compare.c: Remove duplicated code
+In-Reply-To: <963d830d-690a-09cd-4939-79096b62cf35@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TdLNryfFpc0NKNdrR8keZ4a91Ynf37olN"
+Subject: Re: [Qemu-devel] [PATCH v3 00/19] nbd: add qemu-nbd --list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Zhang Chen <chen.zhang@intel.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, Jason Wang <jasowang@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 1/14/19 3:30 PM, Thomas Huth wrote:
-> On 2019-01-14 15:05, Zhang Chen wrote:
->> From: Zhang Chen <chen.zhang@intel.com>
->>
->> Fix duplicated code:
->> https://bugs.launchpad.net/qemu/+bug/1811499
->>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TdLNryfFpc0NKNdrR8keZ4a91Ynf37olN
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
+ "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
+ <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Message-ID: <8b84e314-db63-5125-b942-54732fc2a241@redhat.com>
+Subject: Re: [PATCH v3 00/19] nbd: add qemu-nbd --list
+References: <20190112175812.27068-1-eblake@redhat.com>
+ <963d830d-690a-09cd-4939-79096b62cf35@virtuozzo.com>
+In-Reply-To: <963d830d-690a-09cd-4939-79096b62cf35@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: f449c9e549c
+On 1/14/19 6:22 AM, Vladimir Sementsov-Ogievskiy wrote:
 
->> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
->> ---
->>  net/colo-compare.c | 8 --------
->>  1 file changed, 8 deletions(-)
 >>
->> diff --git a/net/colo-compare.c b/net/colo-compare.c
->> index 9156ab3349..fa3fd0632d 100644
->> --- a/net/colo-compare.c
->> +++ b/net/colo-compare.c
->> @@ -285,14 +285,6 @@ static bool colo_mark_tcp_pkt(Packet *ppkt, Packet *spkt,
->>  {
->>      *mark = 0;
->>  
->> -    if (ppkt->tcp_seq == spkt->tcp_seq && ppkt->seq_end == spkt->seq_end) {
->> -        if (colo_compare_packet_payload(ppkt, spkt,
->> -                                        ppkt->header_size, spkt->header_size,
->> -                                        ppkt->payload_size)) {
->> -            *mark = COLO_COMPARE_FREE_SECONDARY | COLO_COMPARE_FREE_PRIMARY;
->> -            return true;
->> -        }
->> -    }
->>      if (ppkt->tcp_seq == spkt->tcp_seq && ppkt->seq_end == spkt->seq_end) {
->>          if (colo_compare_packet_payload(ppkt, spkt,
->>                                          ppkt->header_size, spkt->header_size,
->>
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> Also available at:
+>> https://repo.or.cz/qemu/ericb.git qemu-nbd-list-v2
+>=20
+> hmm, not -v2. But not -v3 too, as  I've tried to apply these patches on=
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> -v3 base (commit under "maint: Allow for EXAMPLES in texi2pod") and it
+> failed.
+>=20
+> Could you please fix tag?
+
+Yes, I typo'd my intent to advertise a v3 tag.  To avoid confusion with
+anyone that may have already pulled the old tag, I've now pushed a
+qemu-nbd-list-v3a tag, on top of my most recent pull request.
+
+Based-on:
+https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02960.html
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--TdLNryfFpc0NKNdrR8keZ4a91Ynf37olN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw8vM8ACgkQp6FrSiUn
+Q2oWXAgAkWDGR3QfZYenUSohalLxu/gmdhghfU/OEtJJ6guurIPra3JD0p85MXWa
+pyEj/NZgTeA+lqhWqBOnS4JxJ5chFjpwFHCFhJ+gp+tJQBMfhe1T8bhRR0sy+2uN
+4SRXinXrtJ6DuAO8bp+N/b18rY3cafiQcepPXViTcibTtvhiSn98bVBP9GuHiR1L
+gTSOCl9cdG0NOD2nJjz1vCwddDOqeBAoOzlHbjF/jK8AB0cOhqTLskIeEgWUh4OH
+ipR9qZ1jmdvBXXb6A7P/l81zvAb6IdmLjxcnqonXLyMuhvcj5l2tfSbcQfDLsZMq
+DLW3NnoYBcDYSvatTTEqA2wmJQ7UmQ==
+=a7ur
+-----END PGP SIGNATURE-----
+
+--TdLNryfFpc0NKNdrR8keZ4a91Ynf37olN--
