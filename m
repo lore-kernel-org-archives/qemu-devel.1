@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35494)
+Received: from eggs.gnu.org ([209.51.188.92]:35473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3kG-0006L2-Rg
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:49 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3kB-0005Kh-8x
+	(envelope-from <alex.bennee@linaro.org>) id 1gj3kF-0006K0-UD
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:44 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:55486)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1gj3kF-0005PK-3Q
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:43 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:43460)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gj3kB-0005KB-2R
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:39 -0500
-Received: by mail-wm1-x331.google.com with SMTP id y139so9172102wmc.5
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:01:38 -0800 (PST)
+	id 1gj3kE-0005O9-Qu
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:42 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id r10so23213786wrs.10
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:01:42 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 14 Jan 2019 15:01:16 +0000
-Message-Id: <20190114150129.1013-9-alex.bennee@linaro.org>
+Date: Mon, 14 Jan 2019 15:01:28 +0000
+Message-Id: <20190114150129.1013-21-alex.bennee@linaro.org>
 In-Reply-To: <20190114150129.1013-1-alex.bennee@linaro.org>
 References: <20190114150129.1013-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/21] travis: define all the build matrix
- entries in one place
+Subject: [Qemu-devel] [PULL 20/21] tests: use g_usleep instead of rem =
+ sleep(time)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +31,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+Relying on sleep to always return having slept isn't safe as a signal
+may have occurred. If signals are constantly incoming the program will
+never reach its termination condition. This is believed to be the
+mechanism causing time outs for qht-test in Travis.
 
-The current build matrix is constructed from entries listed under the
-environment variable config section, as well as the general purpose
-build matrix section. Move everything under the general purpose section
-so it is clear at a glance what is in the matrix.
+The glib g_usleep() deals with all of this for us so lets use it instead.
 
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/.travis.yml b/.travis.yml
-index bb43792627..96917df9c5 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -61,14 +61,6 @@ env:
-     - BUILD_DIR="."
-     - TEST_CMD="make check"
-     - MAKEFLAGS="-j3"
--  matrix:
--    - CONFIG="--disable-system"
--    - CONFIG="--disable-user"
--    - CONFIG="--enable-debug --enable-debug-tcg"
--    - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-uuid --disable-libusb --disable-user"
--    - CONFIG="--enable-modules --disable-linux-user"
--    - CONFIG="--with-coroutine=ucontext --disable-linux-user"
--    - CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
+diff --git a/tests/atomic64-bench.c b/tests/atomic64-bench.c
+index 71692560ed..121a8c14f4 100644
+--- a/tests/atomic64-bench.c
++++ b/tests/atomic64-bench.c
+@@ -74,16 +74,14 @@ static void *thread_func(void *arg)
  
+ static void run_test(void)
+ {
+-    unsigned int remaining;
+     unsigned int i;
  
- git:
-@@ -89,6 +81,27 @@ script:
+     while (atomic_read(&n_ready_threads) != n_threads) {
+         cpu_relax();
+     }
++
+     atomic_set(&test_start, true);
+-    do {
+-        remaining = sleep(duration);
+-    } while (remaining);
++    g_usleep(duration * G_USEC_PER_SEC);
+     atomic_set(&test_stop, true);
  
- matrix:
-   include:
-+    - env: CONFIG="--disable-system"
+     for (i = 0; i < n_threads; i++) {
+diff --git a/tests/atomic_add-bench.c b/tests/atomic_add-bench.c
+index 2f6c72f63a..5666f6bbff 100644
+--- a/tests/atomic_add-bench.c
++++ b/tests/atomic_add-bench.c
+@@ -76,16 +76,14 @@ static void *thread_func(void *arg)
+ 
+ static void run_test(void)
+ {
+-    unsigned int remaining;
+     unsigned int i;
+ 
+     while (atomic_read(&n_ready_threads) != n_threads) {
+         cpu_relax();
+     }
 +
+     atomic_set(&test_start, true);
+-    do {
+-        remaining = sleep(duration);
+-    } while (remaining);
++    g_usleep(duration * G_USEC_PER_SEC);
+     atomic_set(&test_stop, true);
+ 
+     for (i = 0; i < n_threads; i++) {
+diff --git a/tests/qht-bench.c b/tests/qht-bench.c
+index ab4e708180..e3b512f26f 100644
+--- a/tests/qht-bench.c
++++ b/tests/qht-bench.c
+@@ -398,16 +398,14 @@ static void pr_stats(void)
+ 
+ static void run_test(void)
+ {
+-    unsigned int remaining;
+     int i;
+ 
+     while (atomic_read(&n_ready_threads) != n_rw_threads + n_rz_threads) {
+         cpu_relax();
+     }
 +
-+    - env: CONFIG="--disable-user"
-+
-+
-+    - env: CONFIG="--enable-debug --enable-debug-tcg"
-+
-+
-+    - env: CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-uuid --disable-libusb --disable-user"
-+
-+
-+    - env: CONFIG="--enable-modules --disable-linux-user"
-+
-+
-+    - env: CONFIG="--with-coroutine=ucontext --disable-linux-user"
-+
-+
-+    - env: CONFIG="--with-coroutine=sigaltstack --disable-linux-user"
-+
-+
-     # Test out-of-tree builds
-     - env: CONFIG="--enable-debug --enable-debug-tcg"
-            BUILD_DIR="out-of-tree/build/dir" SRC_DIR="../../.."
+     atomic_set(&test_start, true);
+-    do {
+-        remaining = sleep(duration);
+-    } while (remaining);
++    g_usleep(duration * G_USEC_PER_SEC);
+     atomic_set(&test_stop, true);
+ 
+     for (i = 0; i < n_rw_threads; i++) {
 -- 
 2.17.1
