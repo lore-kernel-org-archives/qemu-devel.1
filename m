@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35419)
+Received: from eggs.gnu.org ([209.51.188.92]:35427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-00050K-UA
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7T-00050r-7m
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-0001r4-5m
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:10 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37686)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-0001rA-67
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:11 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB7R-0001eW-TS
+	id 1gjB7R-0001ew-Un
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:10 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:57 +0100
-Message-Id: <20190114225306.21569-57-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:53:06 +0100
+Message-Id: <20190114225306.21569-66-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 56/65] slirp: use %p for pointers format
+Subject: [Qemu-devel] [PULL 65/65] slirp: check data length while emulating
+ ident function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +28,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Prasad J Pandit <pjp@fedoraproject.org>, stefanha@redhat.com, jan.kiszka@siemens.com, Kira <864786842@qq.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-This fixes some compilation warnings on mingw64.
+While emulating identification protocol, tcp_emu() does not check
+available space in the 'sc_rcv->sb_data' buffer. It could lead to
+heap buffer overflow issue. Add check to avoid it.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reported-by: Kira <864786842@qq.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/ip6_icmp.c   | 2 +-
- slirp/ip6_input.c  | 2 +-
- slirp/ip6_output.c | 4 ++--
- slirp/udp6.c       | 6 +++---
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ slirp/tcp_subr.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index 595a62c8d4..bce075913c 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -390,7 +390,7 @@ void icmp6_input(struct mbuf *m)
-     int hlen =3D sizeof(struct ip6);
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 4a9a5b5edc..23a841f26e 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -634,6 +634,11 @@ tcp_emu(struct socket *so, struct mbuf *m)
+ 			socklen_t addrlen =3D sizeof(struct sockaddr_in);
+ 			struct sbuf *so_rcv =3D &so->so_rcv;
 =20
-     DEBUG_CALL("icmp6_input");
--    DEBUG_ARG("m =3D %lx", (long) m);
-+    DEBUG_ARG("m =3D %p", m);
-     DEBUG_ARG("m_len =3D %d", m->m_len);
-=20
-     if (ntohs(ip->ip_pl) < ICMP6_MINLEN) {
-diff --git a/slirp/ip6_input.c b/slirp/ip6_input.c
-index ac2e3ea882..ab656a0a9d 100644
---- a/slirp/ip6_input.c
-+++ b/slirp/ip6_input.c
-@@ -31,7 +31,7 @@ void ip6_input(struct mbuf *m)
-     }
-=20
-     DEBUG_CALL("ip6_input");
--    DEBUG_ARG("m =3D %lx", (long)m);
-+    DEBUG_ARG("m =3D %p", m);
-     DEBUG_ARG("m_len =3D %d", m->m_len);
-=20
-     if (m->m_len < sizeof(struct ip6)) {
-diff --git a/slirp/ip6_output.c b/slirp/ip6_output.c
-index 762cbfe89c..52c88ad691 100644
---- a/slirp/ip6_output.c
-+++ b/slirp/ip6_output.c
-@@ -19,8 +19,8 @@ int ip6_output(struct socket *so, struct mbuf *m, int f=
-ast)
-     struct ip6 *ip =3D mtod(m, struct ip6 *);
-=20
-     DEBUG_CALL("ip6_output");
--    DEBUG_ARG("so =3D %lx", (long)so);
--    DEBUG_ARG("m =3D %lx", (long)m);
-+    DEBUG_ARG("so =3D %p", so);
-+    DEBUG_ARG("m =3D %p", m);
-=20
-     /* Fill IPv6 header */
-     ip->ip_v =3D IP6VERSION;
-diff --git a/slirp/udp6.c b/slirp/udp6.c
-index 473ba1586e..8cdb1892e2 100644
---- a/slirp/udp6.c
-+++ b/slirp/udp6.c
-@@ -20,7 +20,7 @@ void udp6_input(struct mbuf *m)
-     struct sockaddr_in6 lhost;
-=20
-     DEBUG_CALL("udp6_input");
--    DEBUG_ARG("m =3D %lx", (long)m);
-+    DEBUG_ARG("m =3D %p", m);
-=20
-     if (slirp->restricted) {
-         goto bad;
-@@ -144,8 +144,8 @@ int udp6_output(struct socket *so, struct mbuf *m,
-     struct udphdr *uh;
-=20
-     DEBUG_CALL("udp6_output");
--    DEBUG_ARG("so =3D %lx", (long)so);
--    DEBUG_ARG("m =3D %lx", (long)m);
-+    DEBUG_ARG("so =3D %p", so);
-+    DEBUG_ARG("m =3D %p", m);
-=20
-     /* adjust for header */
-     m->m_data -=3D sizeof(struct udphdr);
++			if (m->m_len > so_rcv->sb_datalen
++					- (so_rcv->sb_wptr - so_rcv->sb_data)) {
++			    return 1;
++			}
++
+ 			memcpy(so_rcv->sb_wptr, m->m_data, m->m_len);
+ 			so_rcv->sb_wptr +=3D m->m_len;
+ 			so_rcv->sb_rptr +=3D m->m_len;
 --=20
 2.20.1
