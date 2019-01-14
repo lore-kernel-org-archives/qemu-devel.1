@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41055)
+Received: from eggs.gnu.org ([209.51.188.92]:53923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1giu1h-0000Hu-Pm
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 23:39:06 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1givHe-0002Jl-3M
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 00:59:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1giu1g-00043R-QE
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 23:39:05 -0500
-Received: from mga05.intel.com ([192.55.52.43]:15386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
-	id 1giu1g-0002Qu-HT
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 23:39:04 -0500
-From: Like Xu <like.xu@linux.intel.com>
-Date: Mon, 14 Jan 2019 20:24:54 +0800
-Message-Id: <1547468699-17633-1-git-send-email-like.xu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v1 0/5] Introduce cpu die topology and enable
- CPUID.1F for i386
+	(envelope-from <dovgaluk@ispras.ru>) id 1givHd-0006rl-Bu
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 00:59:38 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:43442)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1givHZ-0006gk-DE
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 00:59:35 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+	<000601d4a8e8$a8a10170$f9e30450$@ru>
+	<fa160cd8-483c-2eba-b459-8a0f50fb5e6d@redhat.com>
+In-Reply-To: <fa160cd8-483c-2eba-b459-8a0f50fb5e6d@redhat.com>
+Date: Mon, 14 Jan 2019 08:59:22 +0300
+Message-ID: <000601d4abce$4bf706c0$e3e51440$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce attributes for timers
+ subsystem and remove QEMU_CLOCK_VIRTUAL_EXT clock type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: like.xu@intel.com, imammedo@redhat.com, drjones@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Artem Pisarenko' <artem.k.pisarenko@gmail.com>, qemu-devel@nongnu.org
+Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
 
-As we know, die is a rectangular piece of a semiconductor wafer. It's very common
-that chip manufacturers put a multi-core die in one package and one die always has
-a one-to-one relationship with one socket. Inside the die, it cotains multi-cores
-and core contains threads topologically. We apply this socket/core/thread model to
-the qemu -smp configurable space and save it into APIC_IDs for identification.
+> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+> On 10/01/19 14:30, Pavel Dovgalyuk wrote:
+> > Now timerlist_deadline_ns uses all virtual timers for deadline calculation (including
+> external
+> > ones).
+> > qemu_start_warp_timer uses the deadline for setting warp timer (which should be
+> deterministic).
+> 
+> Can you introduce a variant of qemu_clock_deadline_ns_all that ignores
+> external timers, and use it in qemu_start_warp_timer?
 
-The undercurrent Is surging. Multi-chip packaging technology allows for integration
-of multi-die devices in a single package, for example Intel CLX-AP or AMD EPYC.
-Integration can be enabled by high-performance, heterogeneous, multi-dies interconnect
-technology, providing a more cost-effective manner. QEMU and guests may take advantages
-of multi-dies host for such as guest placing or energy efficiency management...
+Ok.
 
-This patch series extend the CPU topology to the socket/dies/core/thread model,
-allowing the setting of dies number per one socket on -smp qemu command. For
-i386, it upgrades APIC_IDs generation and reversion functions with a new exposed
-leaf called CPUID.1F, which is a preferred superset to leaf 0BH. The CPUID.1F
-spec is on https://software.intel.com/en-us/articles/intel-sdm, 3-190 Vol 2A.
+> timerlist_deadline_ns can be made static, so adding a bool argument to
+> it is not a big issue for API cleanliness.
+> 
+> In fact, qemu_clock_deadline_ns_all is only ever used with
+> QEMU_CLOCK_VIRTUAL, so you could also change it to
+> 
+> uint64_t virtual_clock_deadline_ns(bool include_external);
 
-E.g. we use -smp 4,dies=2,cores=2,threads=1 to run an MCP kvm-guest,
-check raw cpuid data and the expected output from guest is following:
-0x0000001f 0x00: eax=0x00000000 ebx=0x00000001 ecx=0x00000100 edx=0x00000002
-0x0000001f 0x01: eax=0x00000001 ebx=0x00000002 ecx=0x00000201 edx=0x00000001
-0x0000001f 0x02: eax=0x00000002 ebx=0x00000004 ecx=0x00000502 edx=0x00000003
-0x0000001f 0x03: eax=0x00000000 ebx=0x00000000 ecx=0x00000003 edx=0x00000001
+I started making changes and it seems that this parameter should never be true,
+because this function is called either from cpus.c or from the tests.
 
-Like Xu (5):
-  cpu: introduce die, the new cpu toppolgy emulation level
-  vl.c: add -smp,dies=* command line support
-  i386: extend x86_apicid_* functions for smp_dies support
-  i386: enable CPUID.1F leaf generation based on spec
-  i386: add CPUID.1F to cpuid_data with host_cpuid check
-
- cpus.c                     |  1 +
- hmp.c                      |  3 ++
- hw/core/machine.c          | 12 +++++++
- hw/i386/pc.c               | 37 +++++++++++++++-------
- include/hw/i386/topology.h | 79 ++++++++++++++++++++++++++++++++++------------
- include/qom/cpu.h          |  1 +
- include/sysemu/cpus.h      |  1 +
- qapi/misc.json             |  1 +
- target/i386/cpu.c          | 57 +++++++++++++++++++++++++++++----
- target/i386/cpu.h          |  5 +++
- target/i386/kvm.c          | 34 +++++++++++++++++++-
- target/i386/kvm_i386.h     |  1 +
- vl.c                       | 33 +++++++++++--------
- 13 files changed, 213 insertions(+), 52 deletions(-)
-
--- 
-1.8.3.1
+Pavel Dovgalyuk
