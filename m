@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52647)
+Received: from eggs.gnu.org ([209.51.188.92]:53260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gixZQ-0001KS-Ls
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:26:09 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1gixex-0002VN-0P
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:31:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gixZQ-0000MY-01
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:26:08 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 14 Jan 2019 08:25:57 +0000
-Message-ID: <e96bdd9f-a470-8b12-0c27-275a608c4244@virtuozzo.com>
-References: <20190111194720.15671-1-eblake@redhat.com>
-	<20190111194720.15671-2-eblake@redhat.com>
-In-Reply-To: <20190111194720.15671-2-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DF0645808990BA4D8FEFA8A4A752DA35@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <dovgaluk@ispras.ru>) id 1gixev-0003Fu-UR
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:31:51 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:54456)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1gixev-0003EO-Jn
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:31:49 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>	<154703593746.13472.3886549854409661470.stgit@pasha-VirtualBox>
+	<877efciyxr.fsf@dusky.pond.sub.org>
+In-Reply-To: <877efciyxr.fsf@dusky.pond.sub.org>
+Date: Mon, 14 Jan 2019 11:31:47 +0300
+Message-ID: <000a01d4abe3$9744ee70$c5cecb50$@ru>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] nbd: Add some error case testing to
- iotests 223
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v9 10/21] qapi: introduce replay.json for
+ record/replay-related stuff
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +30,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: 'Markus Armbruster' <armbru@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-MTEuMDEuMjAxOSAyMjo0NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gVGVzdGluZyBzdWNjZXNzIHBh
-dGhzIGlzIGltcG9ydGFudCwgYnV0IGl0J3MgYWxzbyBuaWNlIHRvIGhpZ2hsaWdodA0KPiBleHBl
-Y3RlZCBmYWlsdXJlIGhhbmRsaW5nLCB0byBzaG93IHRoYXQgd2UgZG9uJ3QgY3Jhc2gsIGFuZCBz
-byB0aGF0DQo+IHVwY29taW5nIHRlc3RzIHRoYXQgY2hhbmdlIGJlaGF2aW9yIGNhbiBkZW1vbnN0
-cmF0ZSB0aGUgcmVzdWx0aW5nDQo+IGVmZmVjdHMgb24gZXJyb3IgcGF0aHMuDQo+IA0KPiBBZGQg
-dGhlIGZvbGxvd2luZyBlcnJvcnM6DQo+IEF0dGVtcHRpbmcgdG8gZXhwb3J0IHdpdGhvdXQgYSBy
-dW5uaW5nIHNlcnZlcg0KPiBBdHRlbXB0aW5nIHRvIHN0YXJ0IGEgc2Vjb25kIHNlcnZlcg0KPiBB
-dHRlbXB0aW5nIHRvIGV4cG9ydCBhIGJhZCBub2RlIG5hbWUNCj4gQXR0ZW1wdGluZyB0byBleHBv
-cnQgYSBuYW1lIHRoYXQgaXMgYWxyZWFkeSBleHBvcnRlZA0KPiBBdHRlbXB0aW5nIHRvIGV4cG9y
-dCBhbiBlbmFibGVkIGJpdG1hcA0KPiBBdHRlbXB0aW5nIHRvIGNsZWFuIGFuIGFscmVhZHkgY2xl
-YW5lZCBleHBvcnQNCg0KRm9yIG1lICJjbGVhbiIgc291bmRzIG5vdCB0aGUgc2FtZSBhcyAicmVt
-b3ZlIiAoSSB1c2VkIHRvIHRoZSB0aG91Z2h0IHRoYXQNCnJlbW92ZSBtZWFucyB0byByZW1vdmUg
-b2JqZWN0IGZyb20gbGFyZ2VyIG9iamVjdCwgYW5kIGNsZWFuIGlzIGNsZWFuIHRoZQ0Kb2JqZWN0
-IGludGVybmFsbHkgKHJlbW92ZSBpdHMgY29udGVudD8pLCBidXQgaXQgY29udGludWVzIHRvIGV4
-aXN0IGFuZCBhbGwNCml0cyByZWxhdGlvbnMgd2l0aCBwYXJlbnRzIGFyZSBub3QgdG91Y2hlZCks
-IGJ1dCBJJ20gcmVhbGx5IGZhciBmcm9tIGJlaW5nDQphbiBleHBlcnQgaW4gRW5nbGlzaC4NCg0K
-PiBBdHRlbXB0aW5nIHRvIHF1aXQgc2VydmVyIGEgc2Vjb25kIHRpbWUNCj4gDQo+IEFsbCBvZiB0
-aGVzZSBwcm9wZXJseSBjb21wbGFpbiBleGNlcHQgZm9yIGEgc2Vjb25kIHNlcnZlci1zdG9wLA0K
-PiB3aGljaCB3aWxsIGJlIGZpeGVkIG5leHQuDQoNCmhtLCBsb29rcyBhIGJpdCBzdHJhbmdlIHRv
-IGFkZCB0ZXN0IGZpcnN0IGFuZCB0aGVuIGZpeCBidWcsIGJ1dCBvbiB0aGUNCm90aGVyIGhhbmQg
-aXQncyBtb3JlIGRlbW9uc3RyYXRpdmUsIE9LIGZvciBtZS4NCg0KPiANCj4gU2lnbmVkLW9mZi1i
-eTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQoNCg0KUmV2aWV3ZWQtYnk6IFZsYWRp
-bWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KDQot
-LSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+> From: Markus Armbruster [mailto:armbru@redhat.com]
+> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+> 
+> > This patch adds replay.json file. It will be
+> > used for adding record/replay-related data structures and commands.
+> >
+> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+> > ---
+> >  MAINTAINERS             |    1 +
+> >  Makefile.objs           |    4 ++--
+> >  include/sysemu/replay.h |    1 +
+> >  qapi/misc.json          |   18 ------------------
+> >  qapi/qapi-schema.json   |    1 +
+> >  qapi/replay.json        |   26 ++++++++++++++++++++++++++
+> >  6 files changed, 31 insertions(+), 20 deletions(-)
+> >  create mode 100644 qapi/replay.json
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 0bfd95a..7b0a1bc 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -2122,6 +2122,7 @@ F: net/filter-replay.c
+> >  F: include/sysemu/replay.h
+> >  F: docs/replay.txt
+> >  F: stubs/replay.c
+> > +F: qapi/replay.json
+> >
+> >  IOVA Tree
+> >  M: Peter Xu <peterx@redhat.com>
+> > diff --git a/Makefile.objs b/Makefile.objs
+> > index 4561159..8164b22 100644
+> > --- a/Makefile.objs
+> > +++ b/Makefile.objs
+> > @@ -1,6 +1,6 @@
+> >  QAPI_MODULES = block-core block char common crypto introspect job migration
+> > -QAPI_MODULES += misc net rdma rocker run-state sockets tpm trace transaction
+> > -QAPI_MODULES += ui
+> > +QAPI_MODULES += misc net rdma replay rocker run-state sockets tpm trace
+> > +QAPI_MODULES += transaction ui
+> >
+> >  #######################################################################
+> >  # Common libraries for tools and emulators
+> > diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+> > index b3f593f..2054296 100644
+> > --- a/include/sysemu/replay.h
+> > +++ b/include/sysemu/replay.h
+> > @@ -13,6 +13,7 @@
+> >   */
+> >
+> >  #include "sysemu.h"
+> > +#include "qapi/qapi-types-replay.h"
+> >  #include "qapi/qapi-types-misc.h"
+> 
+> I believe you can drop qapi/qapi-types-misc.h now.
+
+Missed this one, thanks.
+
+> 
+> >  #include "qapi/qapi-types-ui.h"
+> >
+> > diff --git a/qapi/misc.json b/qapi/misc.json
+> > index 24d20a8..e5e0bea 100644
+> > --- a/qapi/misc.json
+> > +++ b/qapi/misc.json
+> > @@ -3125,24 +3125,6 @@
+> >    'data': { 'offset': 'int' } }
+> >
+> >  ##
+> > -# @ReplayMode:
+> > -#
+> > -# Mode of the replay subsystem.
+> > -#
+> > -# @none: normal execution mode. Replay or record are not enabled.
+> > -#
+> > -# @record: record mode. All non-deterministic data is written into the
+> > -#          replay log.
+> > -#
+> > -# @play: replay mode. Non-deterministic data required for system execution
+> > -#        is read from the log.
+> > -#
+> > -# Since: 2.5
+> > -##
+> > -{ 'enum': 'ReplayMode',
+> > -  'data': [ 'none', 'record', 'play' ] }
+> > -
+> > -##
+> >  # @xen-load-devices-state:
+> >  #
+> >  # Load the state of all devices from file. The RAM and the block devices
+> > diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+> > index 3bbdfce..b85fd04 100644
+> > --- a/qapi/qapi-schema.json
+> > +++ b/qapi/qapi-schema.json
+> > @@ -95,3 +95,4 @@
+>    # Documentation generated with qapi-gen.py is in source order, with
+>    # included sub-schemas inserted at the first include directive
+>    # (subsequent include directives have no effect).  To get a sane and
+>    # stable order, it's best to include each sub-schema just once, or
+>    # include it first right here.
+> [...]
+> >  { 'include': 'trace.json' }
+> >  { 'include': 'introspect.json' }
+> >  { 'include': 'misc.json' }
+> > +{ 'include': 'replay.json' }
+> 
+> I doubt this the best spot for replay stuff in the generated
+> documentation.
+> 
+> Is there another chapter you'd consider related?
+
+Do you mean, that replay should be located near some other topic?
+I don't think, that it related to anything.
+But I can put replay above misc, because it related to one concrete topic.
+
+Pavel Dovgalyuk
