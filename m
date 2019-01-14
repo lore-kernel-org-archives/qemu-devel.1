@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34870)
+Received: from eggs.gnu.org ([209.51.188.92]:34715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6n-0004Dq-4Y
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:29 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Be-Up
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6m-0001MU-1a
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:29 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37322)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0001CJ-NB
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:25 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:40286)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6l-0001Jf-Ll
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:27 -0500
+	id 1gjB6h-0001A7-9z
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:17 +0100
-Message-Id: <20190114225306.21569-17-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:04 +0100
+Message-Id: <20190114225306.21569-4-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 16/65] slirp: remove PROBE_CONN dead-code
+Subject: [Qemu-devel] [PULL 03/65] slirp: replace ex_pty with ex_chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +28,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Nobody cares for over 14y. Somebody can revert or rewrite if
-interested by that.
+do_pty =3D=3D 3 means to talk to a chardev.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.c        | 41 -----------------------------------------
- slirp/slirp_config.h |  4 ----
- 2 files changed, 45 deletions(-)
+ slirp/misc.c     | 2 +-
+ slirp/misc.h     | 2 +-
+ slirp/slirp.c    | 4 ++--
+ slirp/tcp_subr.c | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/slirp/misc.c b/slirp/misc.c
+index e69d5f42c3..8f0b6004bd 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -53,7 +53,7 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, char =
+*exec,
+ 	*ex_ptr =3D g_new(struct ex_list, 1);
+ 	(*ex_ptr)->ex_fport =3D port;
+ 	(*ex_ptr)->ex_addr =3D addr;
+-	(*ex_ptr)->ex_pty =3D do_pty;
++	(*ex_ptr)->ex_chardev =3D do_pty =3D=3D 3;
+ 	(*ex_ptr)->ex_exec =3D (do_pty =3D=3D 3) ? exec : g_strdup(exec);
+ 	(*ex_ptr)->ex_next =3D tmp_ptr;
+ 	return 0;
+diff --git a/slirp/misc.h b/slirp/misc.h
+index 897650aea1..1f8d11def6 100644
+--- a/slirp/misc.h
++++ b/slirp/misc.h
+@@ -9,7 +9,7 @@
+ #define MISC_H
+=20
+ struct ex_list {
+-	int ex_pty;			/* Do we want a pty? */
++	int ex_chardev;
+ 	struct in_addr ex_addr;		/* Server address */
+ 	int ex_fport;                   /* Port to telnet to */
+ 	const char *ex_exec;            /* Command line of what to exec */
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index bab49e83e3..76e94eb1cd 100644
+index 4d4c2c13b5..0498a092b9 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -699,47 +699,6 @@ void slirp_pollfds_poll(GArray *pollfds, int select_=
-error)
-                         }
-                     }
-                 }
--
--                /*
--                 * Probe a still-connecting, non-blocking socket
--                 * to check if it's still alive
--                 */
--#ifdef PROBE_CONN
--                if (so->so_state & SS_ISFCONNECTING) {
--                    ret =3D qemu_recv(so->s, &ret, 0, 0);
--
--                    if (ret < 0) {
--                        /* XXX */
--                        if (errno =3D=3D EAGAIN || errno =3D=3D EWOULDBL=
-OCK ||
--                            errno =3D=3D EINPROGRESS || errno =3D=3D ENO=
-TCONN) {
--                            continue; /* Still connecting, continue */
--                        }
--
--                        /* else failed */
--                        so->so_state &=3D SS_PERSISTENT_MASK;
--                        so->so_state |=3D SS_NOFDREF;
--
--                        /* tcp_input will take care of it */
--                    } else {
--                        ret =3D send(so->s, &ret, 0, 0);
--                        if (ret < 0) {
--                            /* XXX */
--                            if (errno =3D=3D EAGAIN || errno =3D=3D EWOU=
-LDBLOCK ||
--                                errno =3D=3D EINPROGRESS || errno =3D=3D=
- ENOTCONN) {
--                                continue;
--                            }
--                            /* else failed */
--                            so->so_state &=3D SS_PERSISTENT_MASK;
--                            so->so_state |=3D SS_NOFDREF;
--                        } else {
--                            so->so_state &=3D ~SS_ISFCONNECTING;
--                        }
--
--                    }
--                    tcp_input((struct mbuf *)NULL, sizeof(struct ip), so=
-,
--                              so->so_ffamily);
--                } /* SS_ISFCONNECTING */
--#endif
-             }
+@@ -1455,7 +1455,7 @@ static void slirp_state_save(QEMUFile *f, void *opa=
+que)
+     struct ex_list *ex_ptr;
 =20
-             /*
-diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
-index c59f655207..721667e3ef 100644
---- a/slirp/slirp_config.h
-+++ b/slirp/slirp_config.h
-@@ -2,10 +2,6 @@
-  * User definable configuration options
-  */
-=20
--/* Define if you want the connection to be probed */
--/* XXX Not working yet, so ignore this for now */
--#undef PROBE_CONN
--
- /* Define to 1 if you want KEEPALIVE timers */
- #define DO_KEEPALIVE 0
-=20
+     for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_next=
+)
+-        if (ex_ptr->ex_pty =3D=3D 3) {
++        if (ex_ptr->ex_chardev) {
+             struct socket *so;
+             so =3D slirp_find_ctl_socket(slirp, ex_ptr->ex_addr,
+                                        ntohs(ex_ptr->ex_fport));
+@@ -1490,7 +1490,7 @@ static int slirp_state_load(QEMUFile *f, void *opaq=
+ue, int version_id)
+             return -EINVAL;
+         }
+         for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
+next) {
+-            if (ex_ptr->ex_pty =3D=3D 3 &&
++            if (ex_ptr->ex_chardev &&
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr &&
+                 so->so_fport =3D=3D ex_ptr->ex_fport) {
+                 break;
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 0ccd8e1a96..dc19eea55a 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -960,7 +960,7 @@ int tcp_ctl(struct socket *so)
+         for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
+next) {
+             if (ex_ptr->ex_fport =3D=3D so->so_fport &&
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+-                if (ex_ptr->ex_pty =3D=3D 3) {
++                if (ex_ptr->ex_chardev) {
+                     so->s =3D -1;
+                     so->extra =3D (void *)ex_ptr->ex_exec;
+                     return 1;
 --=20
 2.20.1
