@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40752)
+Received: from eggs.gnu.org ([209.51.188.92]:40785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1giu0B-0007g9-KU
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 23:37:32 -0500
+	(envelope-from <like.xu@linux.intel.com>) id 1giu0D-0007hG-0M
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 23:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1giu01-0002ag-VG
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 23:37:25 -0500
-Received: from mga05.intel.com ([192.55.52.43]:15387)
+	(envelope-from <like.xu@linux.intel.com>) id 1giu0B-0002f9-LQ
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 23:37:32 -0500
+Received: from mga05.intel.com ([192.55.52.43]:15389)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
-	id 1gitzz-0002SG-Fs
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 23:37:21 -0500
+	id 1giu02-0002TQ-3Q
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 23:37:25 -0500
 From: Like Xu <like.xu@linux.intel.com>
-Date: Mon, 14 Jan 2019 20:24:58 +0800
-Message-Id: <1547468699-17633-5-git-send-email-like.xu@linux.intel.com>
+Date: Mon, 14 Jan 2019 20:24:59 +0800
+Message-Id: <1547468699-17633-6-git-send-email-like.xu@linux.intel.com>
 In-Reply-To: <1547468699-17633-1-git-send-email-like.xu@linux.intel.com>
 References: <1547468699-17633-1-git-send-email-like.xu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v1 4/5] i386: enable CPUID.1F leaf generation
- based on spec
+Subject: [Qemu-devel] [PATCH v1 5/5] i386: add CPUID.1F to cpuid_data with
+ host_cpuid check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,136 +28,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: like.xu@intel.com, imammedo@redhat.com, drjones@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-This patch uses the new socket/die/core/thread model to generate
-cpuid.1f eax/ebx/ecx/edx values especially the subleaf 2 which
-keeps die level information and adds an option in the cpu_x86_cpuid.
+When cs->nr_dies is larger than 1, the CPUID.1F should be generated
+and is added to cpuid_data.entries for guest awareness. This patch
+provides a return option in kvm_has_cpuid_1f for default choice.
 
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- target/i386/cpu.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 51 insertions(+), 6 deletions(-)
+ target/i386/kvm.c      | 34 +++++++++++++++++++++++++++++++++-
+ target/i386/kvm_i386.h |  1 +
+ 2 files changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index fa37203..85f9074 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4137,7 +4137,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
- {
-     X86CPU *cpu = x86_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
--    uint32_t pkg_offset;
-+    uint32_t die_offset;
-     uint32_t limit;
-     uint32_t signature[3];
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 739cf8c..eb0d1ee 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -120,6 +120,17 @@ bool kvm_has_smm(void)
+     return kvm_check_extension(kvm_state, KVM_CAP_X86_SMM);
+ }
  
-@@ -4152,7 +4152,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         limit = env->cpuid_level;
++bool kvm_has_cpuid_1f(void)
++{
++    uint32_t eax = 0x1f, ecx = 1, ebx = 0, edx = 0;
++    host_cpuid(0x1f, 0, &eax, &ebx, &ecx, &edx);
++    if (eax != 0) {
++        printf("It's recommended to disable CPUID.1F emulation \
++                                on Intel non-MCP platform.\n");
++    }
++    return true;
++}
++
+ bool kvm_has_adjust_clock_stable(void)
+ {
+     int ret = kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
+@@ -1035,7 +1046,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
      }
  
--    if (index > limit) {
-+    if (index > limit && index != 0x1F) {
-         /* Intel documentation states that invalid EAX input will
-          * return the same information as EAX=cpuid_level
-          * (Intel SDM Vol. 2A - Instruction Set Reference - CPUID)
-@@ -4226,10 +4226,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-                                     eax, ebx, ecx, edx);
-                 break;
-             case 3: /* L3 cache info */
--                pkg_offset = apicid_pkg_offset(cs->nr_cores, cs->nr_threads);
-+                die_offset = apicid_die_offset(cs->nr_dies, cs->nr_cores,
-+                                                            cs->nr_threads);
-                 if (cpu->enable_l3_cache) {
-                     encode_cache_cpuid4(env->cache_info_cpuid4.l3_cache,
--                                        (1 << pkg_offset), cs->nr_cores,
-+                                        (1 << die_offset), cs->nr_cores,
-                                         eax, ebx, ecx, edx);
-                     break;
-                 }
-@@ -4311,12 +4312,14 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
- 
-         switch (count) {
-         case 0:
--            *eax = apicid_core_offset(cs->nr_cores, cs->nr_threads);
-+            *eax = apicid_core_offset(cs->nr_dies, cs->nr_cores,
-+                                                   cs->nr_threads);
-             *ebx = cs->nr_threads;
-             *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
-             break;
-         case 1:
--            *eax = apicid_pkg_offset(cs->nr_cores, cs->nr_threads);
-+            *eax = apicid_pkg_offset(cs->nr_dies, cs->nr_cores,
-+                                                  cs->nr_threads);
-             *ebx = cs->nr_cores * cs->nr_threads;
-             *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
-             break;
-@@ -4325,7 +4328,46 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *ebx = 0;
-             *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
+     cpu_x86_cpuid(env, 0, 0, &limit, &unused, &unused, &unused);
+-
+     for (i = 0; i <= limit; i++) {
+         if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
+             fprintf(stderr, "unsupported level value: 0x%x\n", limit);
+@@ -1127,6 +1137,28 @@ int kvm_arch_init_vcpu(CPUState *cs)
          }
-+        assert(!(*eax & ~0x1f));
-+        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-+        break;
-+    case 0x1F:
-+        if (cs->nr_dies > 1 && !cpu->enable_cpuid_0x1f) {
-+            printf("Host CPU may not use multi-chip packaging technology.\n");
-+            exit(0);
-+        }
+     }
  
-+        if (cs->nr_dies < 2) {
-+            *eax = *ebx = *ecx = *edx = 0;
-+            break;
++    cpu->enable_cpuid_0x1f =  kvm_has_cpuid_1f();
++    if (cs->nr_dies > 1) {
++        i = 0x1f;
++        for (j = 0; ; j++) {
++            c->function = i;
++            c->flags = KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
++            c->index = j;
++            cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            if (i == 0x1f && j == 3) {
++                break;
++            }
++            if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
++                fprintf(stderr, "cpuid_data is full, no space for "
++                        "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
++                abort();
++            }
++            c = &cpuid_data.entries[cpuid_i++];
++            if (!cpu->enable_cpuid_0x1f)
++                break;
 +        }
++    }
 +
-+        *ecx = count & 0xff;
-+        *edx = cpu->apic_id;
-+        switch (count) {
-+        case 0:
-+            *eax = apicid_core_offset(cs->nr_dies, cs->nr_cores,
-+                                                   cs->nr_threads);
-+            *ebx = cs->nr_threads;
-+            *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
-+            break;
-+        case 1:
-+            *eax = apicid_die_offset(cs->nr_dies, cs->nr_cores,
-+                                                  cs->nr_threads);
-+            *ebx = cs->nr_cores * cs->nr_threads;
-+            *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
-+            break;
-+        case 2:
-+            *eax = apicid_pkg_offset(cs->nr_dies, cs->nr_cores,
-+                                                  cs->nr_threads);
-+            *ebx = cs->nr_dies * cs->nr_cores * cs->nr_threads;
-+            *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
-+            break;
-+        default:
-+            *eax = 0;
-+            *ebx = 0;
-+            *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
-+        }
-         assert(!(*eax & ~0x1f));
-         *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-         break;
-@@ -5709,11 +5751,13 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_UINT32("apic-id", X86CPU, apic_id, 0),
-     DEFINE_PROP_INT32("thread-id", X86CPU, thread_id, 0),
-     DEFINE_PROP_INT32("core-id", X86CPU, core_id, 0),
-+    DEFINE_PROP_INT32("die-id", X86CPU, die_id, 0),
-     DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, 0),
- #else
-     DEFINE_PROP_UINT32("apic-id", X86CPU, apic_id, UNASSIGNED_APIC_ID),
-     DEFINE_PROP_INT32("thread-id", X86CPU, thread_id, -1),
-     DEFINE_PROP_INT32("core-id", X86CPU, core_id, -1),
-+    DEFINE_PROP_INT32("die-id", X86CPU, die_id, -1),
-     DEFINE_PROP_INT32("socket-id", X86CPU, socket_id, -1),
- #endif
-     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-@@ -5748,6 +5792,7 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level, true),
-     DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor_id),
-     DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
-+    DEFINE_PROP_BOOL("cpuid-0x1f", X86CPU, enable_cpuid_0x1f, true),
-     DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
-     DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
-     DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
+     if (limit >= 0x0a) {
+         uint32_t eax, edx;
+ 
+diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
+index 3057ba4..ef9d41e 100644
+--- a/target/i386/kvm_i386.h
++++ b/target/i386/kvm_i386.h
+@@ -38,6 +38,7 @@ bool kvm_has_adjust_clock_stable(void);
+ void kvm_synchronize_all_tsc(void);
+ void kvm_arch_reset_vcpu(X86CPU *cs);
+ void kvm_arch_do_init_vcpu(X86CPU *cs);
++bool kvm_has_cpuid_1f(void);
+ 
+ int kvm_device_pci_assign(KVMState *s, PCIHostDeviceAddress *dev_addr,
+                           uint32_t flags, uint32_t *dev_id);
 -- 
 1.8.3.1
