@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38784)
+Received: from eggs.gnu.org ([209.51.188.92]:39040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1giyio-0005a3-LG
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:39:55 -0500
+	(envelope-from <bounces@canonical.com>) id 1giyjh-00062Y-TY
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:40:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1giyik-0002f7-HN
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:39:54 -0500
-Resent-Message-Id: <E1giyik-0002f7-HN@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21807)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1giyih-0002ak-97
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:39:48 -0500
-Message-ID: <154745785357.25737.17621990806894687213@2d170d368aaa>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190114090324.16176-1-mhines@scalecomputing.com>
+	(envelope-from <bounces@canonical.com>) id 1giyjg-0003Ij-46
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:40:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47450)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1giyje-0003Gy-Bh
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:40:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1giyjd-0005NN-6O
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 09:40:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2F4242E8050
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 09:40:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 14 Jan 2019 01:24:14 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] QGA: Fix guest-get-fsinfo PCI address
- collection in Windows
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Jan 2019 09:24:41 -0000
+From: feihu <feihu929@sina.com>
+Reply-To: Bug 1811653 <1811653@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154745735839.19444.13981937275377739043.malonedeb@gac.canonical.com>
+Message-Id: <154745788135.19082.9826262830512064230.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1811653] Re: usbredir slow when multi bulk packet
+ per second
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +37,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mhines@scalecomputing.com
-Cc: fam@euphon.net, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNDA5MDMyNC4xNjE3
-Ni0xLW1oaW5lc0BzY2FsZWNvbXB1dGluZy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
-dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
-bW9yZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMTE0MDkwMzI0LjE2MTc2LTEtbWhp
-bmVzQHNjYWxlY29tcHV0aW5nLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBRR0E6
-IEZpeCBndWVzdC1nZXQtZnNpbmZvIFBDSSBhZGRyZXNzIGNvbGxlY3Rpb24gaW4gV2luZG93cwpU
-eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQou
-L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjU4ZDhkODAgUUdBOiBGaXggZ3Vlc3Qt
-Z2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0aW9uIGluIFdpbmRvd3MKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBhbGlnbiB0aGUgKiBvbiBl
-YWNoIGxpbmUKIzE4OTogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NTkyOgorICAgICAgICAg
-ICAgLyoKKyAgICAgICAgICAgICogQ00gQVBJIHVzZWQgaGVyZSBhcyBvcHBvc2VkIHRvCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjkzOiBGSUxFOiBxZ2EvY29tbWFuZHMtd2lu
-MzIuYzo2NjE6CisgICAgICAgICAgICAvKiBUaGVyZSBpcyBubyBuZWVkIHRvIGFsbG9jYXRlIGJ1
-ZmZlciBpbiB0aGUgbmV4dCBmdW5jdGlvbnMuIFRoZSBzaXplCgpXQVJOSU5HOiBCbG9jayBjb21t
-ZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjkzOiBGSUxFOiBxZ2Ev
-Y29tbWFuZHMtd2luMzIuYzo2NjE6CisgICAgICAgICAgICAvKiBUaGVyZSBpcyBubyBuZWVkIHRv
-IGFsbG9jYXRlIGJ1ZmZlciBpbiB0aGUgbmV4dCBmdW5jdGlvbnMuIFRoZSBzaXplCgpXQVJOSU5H
-OiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMyOTQ6IEZJ
-TEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY2MjoKKyAgICAgICAgICAgIC8qIFRoZXJlIGlzIG5v
-IG5lZWQgdG8gYWxsb2NhdGUgYnVmZmVyIGluIHRoZSBuZXh0IGZ1bmN0aW9ucy4gVGhlIHNpemUK
-KyAgICAgICAgICAgICogaXMga25vd24gYW5kIFVMT05HIGFjY29yZGluZyB0bwoKRVJST1I6IHNw
-YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnJicgKGN0eDpWeFYpCiMyOTk6IEZJTEU6IHFnYS9j
-b21tYW5kcy13aW4zMi5jOjY2NzoKKyAgICAgICAgICAgICAgICAgICZ0eXBlLCAoUEJZVEUpJmJ1
-cywgc2l6ZSwgTlVMTCkpIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FS
-TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
-IzMxNzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NjczOgorICAgICAgICAgICAgLyogVGhl
-IGZ1bmN0aW9uIHJldHJpZXZlcyB0aGUgZGV2aWNlJ3MgYWRkcmVzcy4gVGhpcyB2YWx1ZSB3aWxs
-IGJlCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFy
-YXRlIGxpbmUKIzMxODogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njc0OgorICAgICAgICAg
-ICAgKiB0cmFuc2Zvcm1lZCBpbnRvIGRldmljZSBmdW5jdGlvbiBhbmQgbnVtYmVyICovCgpXQVJO
-SU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMzMTg6
-IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY3NDoKKyAgICAgICAgICAgIC8qIFRoZSBmdW5j
-dGlvbiByZXRyaWV2ZXMgdGhlIGRldmljZSdzIGFkZHJlc3MuIFRoaXMgdmFsdWUgd2lsbCBiZQor
-ICAgICAgICAgICAgKiB0cmFuc2Zvcm1lZCBpbnRvIGRldmljZSBmdW5jdGlvbiBhbmQgbnVtYmVy
-ICovCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcmJyAoY3R4OlZ4VikKIzMy
-MTogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njc3OgorICAgICAgICAgICAgICAgICAgICAm
-dHlwZSwgKFBCWVRFKSZhZGRyLCBzaXplLCBOVUxMKSkgewogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIF4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyog
-b24gYSBzZXBhcmF0ZSBsaW5lCiMzMjc6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY4MzoK
-KyAgICAgICAgICAgIC8qIFRoaXMgY2FsbCByZXR1cm5zIFVJTnVtYmVyIG9mIERFVklDRV9DQVBB
-QklMSVRJRVMgc3RydWN0dXJlLgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxp
-bmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMzMjg6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5j
-OjY4NDoKKyAgICAgICAgICAgICogVGhpcyBudW1iZXIgaXMgdHlwaWNhbGx5IGEgdXNlci1wZXJj
-ZWl2ZWQgc2xvdCBudW1iZXIuICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxp
-Z24gdGhlICogb24gZWFjaCBsaW5lCiMzMjg6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY4
-NDoKKyAgICAgICAgICAgIC8qIFRoaXMgY2FsbCByZXR1cm5zIFVJTnVtYmVyIG9mIERFVklDRV9D
-QVBBQklMSVRJRVMgc3RydWN0dXJlLgorICAgICAgICAgICAgKiBUaGlzIG51bWJlciBpcyB0eXBp
-Y2FsbHkgYSB1c2VyLXBlcmNlaXZlZCBzbG90IG51bWJlci4gKi8KCkVSUk9SOiBzcGFjZXMgcmVx
-dWlyZWQgYXJvdW5kIHRoYXQgJyYnIChjdHg6VnhWKQojMzMxOiBGSUxFOiBxZ2EvY29tbWFuZHMt
-d2luMzIuYzo2ODc6CisgICAgICAgICAgICAgICAgICAgICZ0eXBlLCAoUEJZVEUpJnNsb3QsIHNp
-emUsIE5VTEwpKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FSTklO
-RzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzMz
-NzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NjkzOgorICAgICAgICAgICAgLyogU2V0dXBB
-cGkgZ2l2ZXMgdXMgdGhlIHNhbWUgaW5mb3JtYXRpb24gYXMgZHJpdmVyIHdpdGgKCldBUk5JTkc6
-IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBhbGlnbiB0aGUgKiBvbiBlYWNoIGxpbmUKIzMzODogRklM
-RTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njk0OgorICAgICAgICAgICAgLyogU2V0dXBBcGkgZ2l2
-ZXMgdXMgdGhlIHNhbWUgaW5mb3JtYXRpb24gYXMgZHJpdmVyIHdpdGgKKyAgICAgICAgICAgICog
-SW9HZXREZXZpY2VQcm9wZXJ0eS4gQWNjb3JkaW5nIHRvIE1pY3Jvc29mdAoKV0FSTklORzogQmxv
-Y2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMzNDI6IEZJ
-TEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY5ODoKKyAgICAgICAgICAgICogU1BEUlBfQUREUkVT
-UyBpcyBwcm9wZXJ0eUFkZHJlc3MsIHNvIHdlIGRvIHRoZSBzYW1lLiovCgp0b3RhbDogMyBlcnJv
-cnMsIDEzIHdhcm5pbmdzLCAzOTEgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDU4ZDhkODAwZjMxYSAo
-UUdBOiBGaXggZ3Vlc3QtZ2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0aW9uIGluIFdpbmRv
-d3MpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTE0MDkwMzI0LjE2MTc2LTEtbWhpbmVzQHNj
-YWxlY29tcHV0aW5nLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
-Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
-bQ==
+** Description changed:
+
+  QEMU Ver: all version
+  Client: virt-viewer by spice
+  Guest VM: win7
+  Bug description:
+  =C2=A0=C2=A0Use Qemu 2.1 or later with usbredir, When I redirect a bulk u=
+sb-device from virt-viewer client,the bulk-usb-device driver or app in Gues=
+tVM will send 50 bulk-urb per times.
+- =C2=A0=C2=A0In VM, using the usblyzer to monitor the usb packet, it show =
+these 50 bulk-urb packet send in 1ms,
+- But in the QEMU VM log, It shows as below
++ =C2=A0=C2=A0In VM, using the usblyzer to monitor the usb packet, it show =
+these 50 bulk-urb packet send in 1ms, But in the QEMU VM log, It shows as b=
+elow
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+  2019-01-14T08:27:26.096809Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.105680Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.108219Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.116742Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.119242Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.129851Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.132349Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.141248Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.144932Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.154035Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+  =
+
+  =C2=A0It shows that the bulk packet is single thread send and recv, per b=
+ulk
+  packet will use 10-20ms, all 50 bulk-packets will use 500~1000ms, so the
+  in the VM, bulk-urb will timeout always!
+  =
+
+  =C2=A0=C2=A0How to send the bulk packet by multithread to speedup the bul=
+k-urb send and recv, for example:
+  ------------
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx1
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx2
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx3
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx4
+  =C2=A0bulk-out ...
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx50
+  ...
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx1
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx2
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx3
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx4
+  =C2=A0bulk-out ...
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx50
+  ------------
+
+** Description changed:
+
+  QEMU Ver: all version
+  Client: virt-viewer by spice
+  Guest VM: win7
+  Bug description:
+  =C2=A0=C2=A0Use Qemu 2.1 or later with usbredir, When I redirect a bulk u=
+sb-device from virt-viewer client,the bulk-usb-device driver or app in Gues=
+tVM will send 50 bulk-urb per times.
+- =C2=A0=C2=A0In VM, using the usblyzer to monitor the usb packet, it show =
+these 50 bulk-urb packet send in 1ms, But in the QEMU VM log, It shows as b=
+elow
++ =C2=A0=C2=A0In VM, using the usblyzer to monitor the usb packet, it show =
+these 50 bulk-urb packet (24576 bytes per urb) send in 1ms, But in the QEMU=
+ VM log, It shows as below
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+  2019-01-14T08:27:26.096809Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.105680Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.108219Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.116742Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.119242Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.129851Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.132349Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.141248Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.144932Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.154035Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+  =
+
+  =C2=A0It shows that the bulk packet is single thread send and recv, per b=
+ulk
+  packet will use 10-20ms, all 50 bulk-packets will use 500~1000ms, so the
+  in the VM, bulk-urb will timeout always!
+  =
+
+  =C2=A0=C2=A0How to send the bulk packet by multithread to speedup the bul=
+k-urb send and recv, for example:
+  ------------
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx1
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx2
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx3
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx4
+  =C2=A0bulk-out ...
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx50
+  ...
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx1
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx2
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx3
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx4
+  =C2=A0bulk-out ...
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx50
+  ------------
+
+** Description changed:
+
+  QEMU Ver: all version
+- Client: virt-viewer by spice
++ Client: virt-viewer with spice
+  Guest VM: win7
+  Bug description:
+  =C2=A0=C2=A0Use Qemu 2.1 or later with usbredir, When I redirect a bulk u=
+sb-device from virt-viewer client,the bulk-usb-device driver or app in Gues=
+tVM will send 50 bulk-urb per times.
+  =C2=A0=C2=A0In VM, using the usblyzer to monitor the usb packet, it show =
+these 50 bulk-urb packet (24576 bytes per urb) send in 1ms, But in the QEMU=
+ VM log, It shows as below
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+  2019-01-14T08:27:26.096809Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.105680Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.108219Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.116742Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.119242Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.129851Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.132349Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.141248Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.144932Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.154035Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+  =
+
+  =C2=A0It shows that the bulk packet is single thread send and recv, per b=
+ulk
+  packet will use 10-20ms, all 50 bulk-packets will use 500~1000ms, so the
+  in the VM, bulk-urb will timeout always!
+  =
+
+  =C2=A0=C2=A0How to send the bulk packet by multithread to speedup the bul=
+k-urb send and recv, for example:
+  ------------
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx1
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx2
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx3
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx4
+  =C2=A0bulk-out ...
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx50
+  ...
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx1
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx2
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx3
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx4
+  =C2=A0bulk-out ...
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx50
+  ------------
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1811653
+
+Title:
+  usbredir slow when multi bulk packet per second
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU Ver: all version
+  Client: virt-viewer with spice
+  Guest VM: win7
+  Bug description:
+  =C2=A0=C2=A0Use Qemu 2.1 or later with usbredir, When I redirect a bulk u=
+sb-device from virt-viewer client,the bulk-usb-device driver or app in Gues=
+tVM will send 50 bulk-urb per times.
+  =C2=A0=C2=A0In VM, using the usblyzer to monitor the usb packet, it show =
+these 50 bulk-urb packet (24576 bytes per urb) send in 1ms, But in the QEMU=
+ VM log, It shows as below
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+  2019-01-14T08:27:26.096809Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.105680Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.108219Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.116742Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.119242Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.129851Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.132349Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.141248Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.144932Z qemu-kvm: usb-redir: bulk-out ep 86 stream 0 =
+len 49152 id 2114122112 0x7f0ffa300b40
+  2019-01-14T08:27:26.154035Z qemu-kvm: usb-redir: bulk-in status 0 ep 86 s=
+tream 0 len 49152 id 2114122112 0x7f0ffa300b40
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+
+  =C2=A0It shows that the bulk packet is single thread send and recv, per
+  bulk packet will use 10-20ms, all 50 bulk-packets will use 500~1000ms,
+  so the in the VM, bulk-urb will timeout always!
+
+  =C2=A0=C2=A0How to send the bulk packet by multithread to speedup the bul=
+k-urb send and recv, for example:
+  ------------
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx1
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx2
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx3
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx4
+  =C2=A0bulk-out ...
+  =C2=A0bulk-out ep 86 stream 0 len 49152 id xxxx50
+  ...
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx1
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx2
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx3
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx4
+  =C2=A0bulk-out ...
+  =C2=A0bulk-in status 0 ep 86 stream 0 len 49152 id xxxx50
+  ------------
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1811653/+subscriptions
