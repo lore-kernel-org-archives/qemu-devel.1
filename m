@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57251)
+Received: from eggs.gnu.org ([209.51.188.92]:57457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj1Xk-0001KR-E0
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:40:44 -0500
+	(envelope-from <philmd@redhat.com>) id 1gj1Ya-0001jq-J9
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:41:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj1Xi-0002Eo-FN
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:40:40 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36379)
+	(envelope-from <philmd@redhat.com>) id 1gj1YX-0002t6-LX
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:41:31 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34634)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gj1Xi-00029Q-88
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:40:38 -0500
-Received: by mail-ot1-x343.google.com with SMTP id k98so19139926otk.3
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 04:40:18 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj1YV-0002rW-E6
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:41:27 -0500
+Received: by mail-wm1-f65.google.com with SMTP id y185so7266061wmd.1
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 04:41:25 -0800 (PST)
+References: <20190111140857.4211-1-philmd@redhat.com>
+	<20190111140857.4211-16-philmd@redhat.com>
+	<8a7ef73f-97a4-d270-9836-3936b7be1046@redhat.com>
+	<f91cbbae-c3a0-d182-6de9-4ddd0c3892fc@redhat.com>
+	<20190114123531.isddusgjtnl47wiv@sirius.home.kraxel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <63e2b2bb-c4ba-3d3c-0656-f5e10a8fd3f3@redhat.com>
+Date: Mon, 14 Jan 2019 13:41:22 +0100
 MIME-Version: 1.0
-References: <20190111180630.6433-1-palmer@sifive.com>
-In-Reply-To: <20190111180630.6433-1-palmer@sifive.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Jan 2019 12:40:06 +0000
-Message-ID: <CAFEAcA-yeQSbbhKXXJ0f961MJKC-v46DWgoaXcQUt64DZcdzqQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] RISC-V Updates for 3.2, Part 2
+In-Reply-To: <20190114123531.isddusgjtnl47wiv@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 15/15] ui/console: Add
+ "ui/pixelformat.h" to declare PixelFormat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: qemu-riscv@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Fri, 11 Jan 2019 at 18:06, Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> The following changes since commit 147923b1a901a0370f83a0f4c58ec1baffef22f0:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20190108-pull-request' into staging (2019-01-08 16:07:32 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-3.2-part2
->
-> for you to fetch changes up to f7cdfa38f37e0985457ac03c3238861144a58b4c:
->
->   default-configs: Enable USB support for RISC-V machines (2019-01-09 17:34:10 -0800)
->
-> ----------------------------------------------------------------
-> RISC-V Updates for 3.2, Part 2
->
-> This patch set contains a handful of Michael's CSR-related cleanups,
-> which should allow us to proceed with more outstanding bug fixes that
-> depend on them.
->
-> Additionally, there is a patch that turns on USB.  This works for me
-> when the kernel has the appropriate drivers (which will soon be in
-> defconfig) and I pass
->
->     -device usb-ehci
->     -drive id=my_usb_disk,file=usbdisk.img,if=none,format=raw
->     -device usb-storage,drive=my_usb_disk
->
-> to QEMU.
->
+On 1/14/19 1:35 PM, Gerd Hoffmann wrote:
+> On Mon, Jan 14, 2019 at 11:24:14AM +0100, Philippe Mathieu-Daudé wrote:
+>> On 1/11/19 6:32 PM, Paolo Bonzini wrote:
+>>> On 11/01/19 15:08, Philippe Mathieu-Daudé wrote:
+>>>> PixelFormat is used by "ui/console.h" and by "ui/qemu-pixman.h".
+>>>
+>>> ui/console.h already includes ui/qemu-pixman.h, just move it there?
+>>
+>> That was my first though but then noticed pixman seems a bit
+>> different/unrelated. If Gerd is OK I will do it. (I should have written
+>> that in the commit).
+> 
+> console depends on pixman anyway, so that move would be fine.
 
-Applied, thanks.
+Good.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
+> 
+> BTW: Should not be that hard to remove PixelFormat altogether, or move
+> the bits which are still needed to vnc which is the only user left
+> (beside deprecated sdl1 which should go away soon).
 
--- PMM
+I can help there once SDL1 got removed.
+
+Thanks,
+
+Phil.
