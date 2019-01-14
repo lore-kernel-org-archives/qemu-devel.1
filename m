@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54178)
+Received: from eggs.gnu.org ([209.51.188.92]:54223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj3Ar-0001f8-7A
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:11 -0500
+	(envelope-from <berto@igalia.com>) id 1gj3At-0001iv-L2
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj3Ao-0008Vq-EB
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:09 -0500
+	(envelope-from <berto@igalia.com>) id 1gj3Ao-0008Vp-E8
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:11 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon, 14 Jan 2019 16:24:01 +0200
-Message-Id: <af08f836feae53a54ec2abed93161fdfa381ad2c.1547475602.git.berto@igalia.com>
+Date: Mon, 14 Jan 2019 16:24:00 +0200
+Message-Id: <804cf3cff9712467993929d7563b510f77c5401f.1547475602.git.berto@igalia.com>
 In-Reply-To: <cover.1547475602.git.berto@igalia.com>
 References: <cover.1547475602.git.berto@igalia.com>
 In-Reply-To: <cover.1547475602.git.berto@igalia.com>
 References: <cover.1547475602.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 3/6] block: Acquire the AioContext in
- floppy_drive_realize()
+Subject: [Qemu-devel] [PATCH v2 2/6] block: Acquire the AioContext in
+ scsi_*_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +25,209 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alberto Garcia <berto@igalia.com>
 
+This fixes a crash when adding a virtio-scsi device with a drive that
+is using an iothread. Test case included.
+
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- hw/block/fdc.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ hw/scsi/scsi-disk.c        | 23 ++++++++++++++++++++---
+ tests/qemu-iotests/236     | 43 +++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/236.out | 30 ++++++++++++++++++++++++++++++
+ 3 files changed, 93 insertions(+), 3 deletions(-)
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 6f19f127a5..d9bc80de83 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -512,6 +512,7 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 0e9027c8f3..b049026219 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -2381,10 +2381,13 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
  {
-     FloppyDrive *dev = FLOPPY_DRIVE(qdev);
-     FloppyBus *bus = FLOPPY_BUS(qdev->parent_bus);
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
++    AioContext *ctx = NULL;
+     /* can happen for devices without drive. The error message for missing
+      * backend will be issued in scsi_realize
+      */
+     if (s->qdev.conf.blk) {
++        ctx = blk_get_aio_context(s->qdev.conf.blk);
++        aio_context_acquire(ctx);
+         blkconf_blocksizes(&s->qdev.conf);
+     }
+     s->qdev.blocksize = s->qdev.conf.logical_block_size;
+@@ -2393,11 +2396,15 @@ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
+         s->product = g_strdup("QEMU HARDDISK");
+     }
+     scsi_realize(&s->qdev, errp);
++    if (ctx) {
++        aio_context_release(ctx);
++    }
+ }
+ 
+ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
+ {
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
 +    AioContext *ctx;
-     FDrive *drive;
      int ret;
  
-@@ -543,13 +544,16 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
+     if (!dev->conf.blk) {
+@@ -2408,6 +2415,8 @@ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
          assert(ret == 0);
      }
  
 +    ctx = blk_get_aio_context(dev->conf.blk);
 +    aio_context_acquire(ctx);
+     s->qdev.blocksize = 2048;
+     s->qdev.type = TYPE_ROM;
+     s->features |= 1 << SCSI_DISK_F_REMOVABLE;
+@@ -2415,6 +2424,7 @@ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
+         s->product = g_strdup("QEMU CD-ROM");
+     }
+     scsi_realize(&s->qdev, errp);
++    aio_context_release(ctx);
+ }
+ 
+ static void scsi_disk_realize(SCSIDevice *dev, Error **errp)
+@@ -2553,6 +2563,7 @@ static int get_device_type(SCSIDiskState *s)
+ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+ {
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
++    AioContext *ctx;
+     int sg_version;
+     int rc;
+ 
+@@ -2567,6 +2578,9 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+                           "be removed in a future version");
+     }
+ 
++    ctx = blk_get_aio_context(s->qdev.conf.blk);
++    aio_context_acquire(ctx);
 +
-     blkconf_blocksizes(&dev->conf);
-     if (dev->conf.logical_block_size != 512 ||
-         dev->conf.physical_block_size != 512)
-     {
-         error_setg(errp, "Physical and logical block size must "
-                    "be 512 for floppy");
+     /* check we are using a driver managing SG_IO (version 3 and after) */
+     rc = blk_ioctl(s->qdev.conf.blk, SG_GET_VERSION_NUM, &sg_version);
+     if (rc < 0) {
+@@ -2574,18 +2588,18 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+         if (rc != -EPERM) {
+             error_append_hint(errp, "Is this a SCSI device?\n");
+         }
+-        return;
++        goto out;
+     }
+     if (sg_version < 30000) {
+         error_setg(errp, "scsi generic interface too old");
 -        return;
 +        goto out;
      }
  
-     /* rerror/werror aren't supported by fdc and therefore not even registered
-@@ -561,7 +565,7 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
-     if (!blkconf_apply_backend_options(&dev->conf,
-                                        blk_is_read_only(dev->conf.blk),
-                                        false, errp)) {
+     /* get device type from INQUIRY data */
+     rc = get_device_type(s);
+     if (rc < 0) {
+         error_setg(errp, "INQUIRY failed");
 -        return;
 +        goto out;
      }
  
-     /* 'enospc' is the default for -drive, 'report' is what blk_new() gives us
-@@ -569,11 +573,11 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
-     if (blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_ENOSPC &&
-         blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_REPORT) {
-         error_setg(errp, "fdc doesn't support drive option werror");
--        return;
-+        goto out;
-     }
-     if (blk_get_on_error(dev->conf.blk, 1) != BLOCKDEV_ON_ERROR_REPORT) {
-         error_setg(errp, "fdc doesn't support drive option rerror");
--        return;
-+        goto out;
-     }
+     /* Make a guess for the block size, we'll fix it when the guest sends.
+@@ -2605,6 +2619,9 @@ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
  
-     drive->conf = &dev->conf;
-@@ -589,6 +593,9 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
-     dev->type = drive->drive;
- 
-     fd_revalidate(drive);
+     scsi_realize(&s->qdev, errp);
+     scsi_generic_read_device_inquiry(&s->qdev);
 +
 +out:
 +    aio_context_release(ctx);
  }
  
- static void floppy_drive_class_init(ObjectClass *klass, void *data)
+ typedef struct SCSIBlockReq {
+diff --git a/tests/qemu-iotests/236 b/tests/qemu-iotests/236
+index c6a3415ffe..c2bf425491 100755
+--- a/tests/qemu-iotests/236
++++ b/tests/qemu-iotests/236
+@@ -72,6 +72,49 @@ run_qemu <<EOF
+ { "execute": "quit"}}
+ EOF
+ 
++case "$QEMU_DEFAULT_MACHINE" in
++  s390-ccw-virtio)
++      virtio_scsi=virtio-scsi-ccw
++      ;;
++  *)
++      virtio_scsi=virtio-scsi-pci
++      ;;
++esac
++
++echo
++echo === Try adding and removing a virtio-scsi device with a hard drive ===
++echo
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "hd0"}}
++{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
++{ "execute": "x-blockdev-set-iothread", "arguments": {"node-name": "hd0", "iothread": "iothread0"}}
++{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${virtio_scsi}"}}
++{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
++{ "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
++{ "execute": "device_del", "arguments": {"id": "scsi0"}}
++{ "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
++{ "execute": "quit"}}
++EOF
++
++echo
++echo === Try adding and removing a virtio-scsi device with a CD ===
++echo
++
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "cd0"}}
++{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "iothread0"}}
++{ "execute": "x-blockdev-set-iothread", "arguments": {"node-name": "cd0", "iothread": "iothread0"}}
++{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${virtio_scsi}"}}
++{ "execute": "device_add", "arguments": {"id": "scsi-cd0", "driver": "scsi-cd", "drive": "cd0"}}
++{ "execute": "device_del", "arguments": {"id": "scsi-cd0"}}
++{ "execute": "device_del", "arguments": {"id": "scsi0"}}
++{ "execute": "blockdev-del", "arguments": {"node-name": "cd0"}}
++{ "execute": "quit"}}
++EOF
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/236.out b/tests/qemu-iotests/236.out
+index 01ee7b0b0d..2ad5aabcb3 100644
+--- a/tests/qemu-iotests/236.out
++++ b/tests/qemu-iotests/236.out
+@@ -13,4 +13,34 @@ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
++
++=== Try adding and removing a virtio-scsi device with a hard drive ===
++
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++
++=== Try adding and removing a virtio-scsi device with a CD ===
++
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
+ *** done
 -- 
 2.11.0
