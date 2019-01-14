@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34191)
+Received: from eggs.gnu.org ([209.51.188.92]:34391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj3eT-000207-Op
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:55:46 -0500
+	(envelope-from <mst@redhat.com>) id 1gj3fR-0002hQ-0w
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:56:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj3eR-0002On-P8
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:55:45 -0500
-References: <1547473614-20033-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA9RQ+_vC3z4qxkX9Jsu4FKHGqi6qXxgbUKn=wpPzwy4Nw@mail.gmail.com>
-	<20190114143144.GH3686@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0afe72f6-05fe-9547-5f54-46a47ba1ff30@redhat.com>
-Date: Mon, 14 Jan 2019 08:50:16 -0600
+	(envelope-from <mst@redhat.com>) id 1gj3fP-0003CV-Og
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:56:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48116)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gj3fP-0003Aj-DL
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:56:43 -0500
+Date: Mon, 14 Jan 2019 09:47:58 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190114094746-mutt-send-email-mst@kernel.org>
+References: <20190109193115.20655-1-marcandre.lureau@redhat.com>
+	<20190109193115.20655-6-marcandre.lureau@redhat.com>
+	<20190114111735.531c4cca@redhat.com>
+	<CAMxuvaxyPdZtgWPXHwzzeJqaojBzjq3tKfw-kyow5eX_jCLfNw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190114143144.GH3686@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nEvP4Yldzx65dAHQIwpDmtP34xOhbQf0m"
-Subject: Re: [Qemu-devel] [PATCH] configure: Work-around a bug in libiscsi
- 1.9.0 when used in gnu99 mode
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAMxuvaxyPdZtgWPXHwzzeJqaojBzjq3tKfw-kyow5eX_jCLfNw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v16 5/6] acpi: add ACPI memory clear
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +31,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Peter Lieven <pl@kamp.de>, QEMU Developers <qemu-devel@nongnu.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?iso-8859-1?Q?Mathieu-Daud=E9=2C?= Philippe <f4bug@amsat.org>, Stefan Berger <stefanb@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nEvP4Yldzx65dAHQIwpDmtP34xOhbQf0m
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- Peter Lieven <pl@kamp.de>, QEMU Developers <qemu-devel@nongnu.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0afe72f6-05fe-9547-5f54-46a47ba1ff30@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] configure: Work-around a bug in libiscsi
- 1.9.0 when used in gnu99 mode
-References: <1547473614-20033-1-git-send-email-thuth@redhat.com>
- <CAFEAcA9RQ+_vC3z4qxkX9Jsu4FKHGqi6qXxgbUKn=wpPzwy4Nw@mail.gmail.com>
- <20190114143144.GH3686@redhat.com>
-In-Reply-To: <20190114143144.GH3686@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/14/19 8:31 AM, Daniel P. Berrang=C3=A9 wrote:
-
->>
->> Can we suppress the warnings with #pragma instead ?
->> That would avoid compiling the .o file with different
->> C semantics.
+On Mon, Jan 14, 2019 at 02:23:16PM +0400, Marc-Andr=E9 Lureau wrote:
+> Hi
 >=20
-> IIUC this is a built-in warning you can't disable, except by changing
-> the compilation mode to have gnu89 inline semantics :-(
+> On Mon, Jan 14, 2019 at 2:17 PM Igor Mammedov <imammedo@redhat.com> wro=
+te:
+> >
+> > On Wed,  9 Jan 2019 23:31:14 +0400
+> > Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com> wrote:
+> >
+> > > The interface is described in the "TCG Platform Reset Attack
+> > > Mitigation Specification", chapter 6 "ACPI _DSM Function". Accordin=
+g
+> > I'd add a spec version here as well adn maybe a link like it's
+> > in 4/6 (but links are often go stale so it's not must have, just name
+> > and version should be sufficient to find the spec)
+> >
+> > > to Laszlo, it's not so easy to implement in OVMF, he suggested to d=
+o
+> > > it in qemu instead.
+> > >
+> > > See specification documentation for more details, and next commit f=
+or
+> > > memory clear on reset handling.
+> > >
+> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > > Tested-by: Stefan Berger <stefanb@linux.ibm.com>
+> > With commit amended
+> >
+> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>=20
+> Specification Version 1.00
+> https://www.trustedcomputinggroup.org/wp-content/uploads/Platform-Reset=
+-Attack-Mitigation-Specification.pdf
+>=20
+> Michael, do you need me to resend the series or can you update the
+> commit message?
+>=20
+> thanks
 
-Could we instead fix the warning by one of:
+Pls resend in a ready form.
+Thanks!
 
-Using pragma to declare the header as a system header (used to silence
-warnings from misbehaving external headers),
-
-and/or adding #defines around the inclusion of the header to neutralize
-the poor warnings, but without changing the compilation mode of the
-entire project
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---nEvP4Yldzx65dAHQIwpDmtP34xOhbQf0m
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw8oagACgkQp6FrSiUn
-Q2ozmAf/RCqBhK/i2n32HnVKqAL3h98Eoqgj305uh66YFg44Zt8Fx1lxRHlIu3dP
-C37e1jADhH2PvtOEpIoNY5Y3X3oygior0TwLMyN/HUklDkqb1P3Q+dGeWdXenJF4
-sul7Pu+otEvUKkff5VxxgPmhnddLHcar4FNjv3FbO0kf3Yh6oWuGpRqqvE2SpC0B
-KItaBzSgh0LprKRhm/05EtPGvcMTdAM+JmEVh8Vl+krz99HbjcWfbqa5BaxQDdSL
-yWUt/OGVWOfeC8EUE0I95uutO2xe/DMRFnrrMdhtTjBz7COzXzT6zr3l9QAM4Pm8
-g6T+XC42ywAO2CNFfc+kBacAHrFBbA==
-=jCTr
------END PGP SIGNATURE-----
-
---nEvP4Yldzx65dAHQIwpDmtP34xOhbQf0m--
+> >
+> > > ---
+> > >  hw/acpi/tpm.c      | 55 ++++++++++++++++++++++++++++++++++++++++++=
+++++
+> > >  docs/specs/tpm.txt |  2 ++
+> > >  2 files changed, 57 insertions(+)
+> > >
+> > > diff --git a/hw/acpi/tpm.c b/hw/acpi/tpm.c
+> > > index 9f205378f2..b96459e45b 100644
+> > > --- a/hw/acpi/tpm.c
+> > > +++ b/hw/acpi/tpm.c
+> > > @@ -53,6 +53,16 @@ void tpm_build_ppi_acpi(TPMIf *tpm, Aml *dev)
+> > >      pprq =3D aml_name("PPRQ");
+> > >      pprm =3D aml_name("PPRM");
+> > >
+> > > +    aml_append(dev,
+> > > +               aml_operation_region(
+> > > +                   "TPP3", AML_SYSTEM_MEMORY,
+> > > +                   aml_int(TPM_PPI_ADDR_BASE +
+> > > +                           0x15a /* movv, docs/specs/tpm.txt */),
+> > > +                           0x1));
+> > > +    field =3D aml_field("TPP3", AML_BYTE_ACC, AML_NOLOCK, AML_PRES=
+ERVE);
+> > > +    aml_append(field, aml_named_field("MOVV", 8));
+> > > +    aml_append(dev, field);
+> > > +
+> > >      /*
+> > >       * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dyn=
+amic
+> > >       * operation region inside of a method for getting FUNC[op].
+> > > @@ -399,6 +409,51 @@ void tpm_build_ppi_acpi(TPMIf *tpm, Aml *dev)
+> > >              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)))=
+;
+> > >          }
+> > >          aml_append(method, ifctx);
+> > > +
+> > > +        /*
+> > > +         * "TCG Platform Reset Attack Mitigation Specification 1.0=
+0",
+> > > +         * Chapter 6 "ACPI _DSM Function"
+> > > +         */
+> > > +        ifctx =3D aml_if(
+> > > +            aml_equal(uuid,
+> > > +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2=
+D45D")));
+> > > +        {
+> > > +            /* standard DSM query function */
+> > > +            ifctx2 =3D aml_if(aml_equal(function, zero));
+> > > +            {
+> > > +                uint8_t byte_list[1] =3D { 0x03 }; /* functions 1-=
+2 supported */
+> > > +
+> > > +                aml_append(ifctx2,
+> > > +                           aml_return(aml_buffer(sizeof(byte_list)=
+,
+> > > +                                                 byte_list)));
+> > > +            }
+> > > +            aml_append(ifctx, ifctx2);
+> > > +
+> > > +            /*
+> > > +             * TCG Platform Reset Attack Mitigation Specification =
+1.0 Ch.6
+> > > +             *
+> > > +             * Arg 2 (Integer): Function Index =3D 1
+> > > +             * Arg 3 (Package): Arguments =3D Package: Type: Integ=
+er
+> > > +             *                  Operation Value of the Request
+> > > +             * Returns: Type: Integer
+> > > +             *          0: Success
+> > > +             *          1: General Failure
+> > > +             */
+> > > +            ifctx2 =3D aml_if(aml_equal(function, one));
+> > > +            {
+> > > +                aml_append(ifctx2,
+> > > +                           aml_store(aml_derefof(aml_index(argumen=
+ts, zero)),
+> > > +                                     op));
+> > > +                {
+> > > +                    aml_append(ifctx2, aml_store(op, aml_name("MOV=
+V")));
+> > > +
+> > > +                    /* 0: success */
+> > > +                    aml_append(ifctx2, aml_return(zero));
+> > > +                }
+> > > +            }
+> > > +            aml_append(ifctx, ifctx2);
+> > > +        }
+> > > +        aml_append(method, ifctx);
+> > >      }
+> > >      aml_append(dev, method);
+> > >  }
+> > > diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+> > > index 424d1511fc..5d8c26b1ad 100644
+> > > --- a/docs/specs/tpm.txt
+> > > +++ b/docs/specs/tpm.txt
+> > > @@ -135,6 +135,8 @@ layout:
+> > >   +----------+--------+--------+-----------------------------------=
+--------+
+> > >   | next_step|   0x1  |  0x159 | Operation to execute after reboot =
+by      |
+> > >   |          |        |        | firmware. Used by firmware.       =
+        |
+> > > + +----------+--------+--------+-----------------------------------=
+--------+
+> > > + | movv     |   0x1  |  0x15a | Memory overwrite variable         =
+        |
+> > >   +----------+--------+--------+-----------------------------------=
+--------+
+> > >
+> > >     The following values are supported for the 'func' field. They c=
+orrespond
+> >
