@@ -1,19 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54156)
+Received: from eggs.gnu.org ([209.51.188.92]:54159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj3Ap-0001db-B4
+	(envelope-from <berto@igalia.com>) id 1gj3Ap-0001de-DM
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj3Ao-0008Va-Du
+	(envelope-from <berto@igalia.com>) id 1gj3Ao-0008VW-De
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:07 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon, 14 Jan 2019 16:24:03 +0200
-Message-Id: <8bb7fd0e9188316446270873e10d6049b9a7d358.1547475602.git.berto@igalia.com>
-In-Reply-To: <cover.1547475602.git.berto@igalia.com>
-References: <cover.1547475602.git.berto@igalia.com>
-In-Reply-To: <cover.1547475602.git.berto@igalia.com>
-References: <cover.1547475602.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 5/6] block: Acquire the AioContext in
- ide_dev_initfn()
+Date: Mon, 14 Jan 2019 16:23:58 +0200
+Message-Id: <cover.1547475602.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2 0/6] Acquire the AioContext during _realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +20,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- hw/ide/qdev.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+This series acquires the AioContext in the _realize() functions of
+several devices before making use of their block backends. This fixes
+at least a couple of crashes (in virtio-blk and scsi). The other
+devices don't currently support iothreads so there's no crashes.
 
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index 573b022e1e..f355f2a352 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -160,6 +160,7 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
- {
-     IDEBus *bus = DO_UPCAST(IDEBus, qbus, dev->qdev.parent_bus);
-     IDEState *s = bus->ifs + dev->unit;
-+    AioContext *ctx;
-     int ret;
- 
-     if (!dev->conf.blk) {
-@@ -174,36 +175,39 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
-         }
-     }
- 
-+    ctx = blk_get_aio_context(dev->conf.blk);
-+    aio_context_acquire(ctx);
-+
-     if (dev->conf.discard_granularity == -1) {
-         dev->conf.discard_granularity = 512;
-     } else if (dev->conf.discard_granularity &&
-                dev->conf.discard_granularity != 512) {
-         error_setg(errp, "discard_granularity must be 512 for ide");
--        return;
-+        goto out;
-     }
- 
-     blkconf_blocksizes(&dev->conf);
-     if (dev->conf.logical_block_size != 512) {
-         error_setg(errp, "logical_block_size must be 512 for IDE");
--        return;
-+        goto out;
-     }
- 
-     if (kind != IDE_CD) {
-         if (!blkconf_geometry(&dev->conf, &dev->chs_trans, 65535, 16, 255,
-                               errp)) {
--            return;
-+            goto out;
-         }
-     }
-     if (!blkconf_apply_backend_options(&dev->conf, kind == IDE_CD,
-                                        kind != IDE_CD, errp)) {
--        return;
-+        goto out;
-     }
- 
-     if (ide_init_drive(s, dev->conf.blk, kind,
-                        dev->version, dev->serial, dev->model, dev->wwn,
-                        dev->conf.cyls, dev->conf.heads, dev->conf.secs,
-                        dev->chs_trans, errp) < 0) {
--        return;
-+        goto out;
-     }
- 
-     if (!dev->version) {
-@@ -215,6 +219,9 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
- 
-     add_boot_device_path(dev->conf.bootindex, &dev->qdev,
-                          dev->unit ? "/disk@1" : "/disk@0");
-+
-+out:
-+    aio_context_release(ctx);
- }
- 
- static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *name,
+Berto
+
+v2:
+- Patch 1: include a test case [Kevin]
+- Patch 2: include a test case and extend the locking to protect more
+  function calls [Kevin]
+
+v1: https://lists.gnu.org/archive/html/qemu-block/2019-01/msg00259.html
+- Initial version
+
+Output of backport-diff against v1:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/6:[0095] [FC] 'block: Acquire the AioContext in virtio_blk_device_realize()'
+002/6:[0094] [FC] 'block: Acquire the AioContext in scsi_*_realize()'
+003/6:[----] [--] 'block: Acquire the AioContext in floppy_drive_realize()'
+004/6:[----] [--] 'block: Acquire the AioContext in nvme_realize()'
+005/6:[----] [--] 'block: Acquire the AioContext in ide_dev_initfn()'
+006/6:[----] [--] 'block: Acquire the AioContext in usb_msd_storage_realize()'
+
+Alberto Garcia (6):
+  block: Acquire the AioContext in virtio_blk_device_realize()
+  block: Acquire the AioContext in scsi_*_realize()
+  block: Acquire the AioContext in floppy_drive_realize()
+  block: Acquire the AioContext in nvme_realize()
+  block: Acquire the AioContext in ide_dev_initfn()
+  block: Acquire the AioContext in usb_msd_storage_realize()
+
+ hw/block/fdc.c             |  15 ++++--
+ hw/block/nvme.c            |  13 +++--
+ hw/block/virtio-blk.c      |  22 ++++++---
+ hw/ide/qdev.c              |  17 +++++--
+ hw/scsi/scsi-disk.c        |  23 +++++++--
+ hw/usb/dev-storage.c       |   5 ++
+ tests/qemu-iotests/236     | 121 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/236.out |  46 +++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 9 files changed, 241 insertions(+), 22 deletions(-)
+ create mode 100755 tests/qemu-iotests/236
+ create mode 100644 tests/qemu-iotests/236.out
+
 -- 
 2.11.0
