@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58163)
+Received: from eggs.gnu.org ([209.51.188.92]:59293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gizui-0008I4-Fq
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:56:17 -0500
+	(envelope-from <philmd@redhat.com>) id 1gizxN-0001wZ-QS
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:59:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gizug-0005D6-N1
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:56:16 -0500
-References: <1543204678-26914-1-git-send-email-pizhenwei@bytedance.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e8b4c7e6-c218-b830-5f71-bb67c7a9939e@redhat.com>
-Date: Mon, 14 Jan 2019 11:46:34 +0100
+	(envelope-from <philmd@redhat.com>) id 1gizxK-0003Fh-1Z
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:59:00 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:34692)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gizxH-00037v-JJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:58:57 -0500
+Received: by mail-wr1-f65.google.com with SMTP id j2so22376599wrw.1
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:58:55 -0800 (PST)
+References: <d2ae859d3d73ec1897d78131e05a6cf6ba6c94b0.1547255794.git.alistair.francis@wdc.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <56d71bbd-e86b-db1c-8d45-7dd229b87081@redhat.com>
+Date: Mon, 14 Jan 2019 11:58:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <1543204678-26914-1-git-send-email-pizhenwei@bytedance.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2Ru8qtlwALoy3Kz6emd9PNv3rH2FnMDl2"
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Check effective size in
- truncate operation
+In-Reply-To: <d2ae859d3d73ec1897d78131e05a6cf6ba6c94b0.1547255794.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] riscv: Ensure the kernel start
+ address is correctly cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhenwei pi <pizhenwei@bytedance.com>, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "agraf@suse.de" <agraf@suse.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2Ru8qtlwALoy3Kz6emd9PNv3rH2FnMDl2
-From: Max Reitz <mreitz@redhat.com>
-To: zhenwei pi <pizhenwei@bytedance.com>, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <e8b4c7e6-c218-b830-5f71-bb67c7a9939e@redhat.com>
-Subject: Re: [PATCH] file-posix: Check effective size in truncate operation
-References: <1543204678-26914-1-git-send-email-pizhenwei@bytedance.com>
-In-Reply-To: <1543204678-26914-1-git-send-email-pizhenwei@bytedance.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Alistair,
 
-On 26.11.18 04:57, zhenwei pi wrote:
-> Function raw_co_truncate does not check effective size for BLK device f=
-ile,
-> and QEMU may notify guest without any size changing.
->=20
-> Two cases can be reproduced easily by qmp command:
-> CASE 1:
-> 1, create a logical volume(12M) by LVM, and guest uses this volume as "=
-vdb"
-> 2, run qmp command : virsh qemu-monitor-command INSTANCE '{"execute":
-> "block_resize", "arguments":{"device":"drive-virtio-disk1","size":12582=
-912}}'
->=20
-> The effective size(12M) is equal to the argument(12M) and the real devi=
-ce file
-> size(12M). QEMU should ignore this command and has no need to notify gu=
-est.
+On 1/12/19 2:17 AM, Alistair Francis wrote:
+> Cast the kernel start address to the target bit length.
+> 
+> This ensures that we calculate the initrd offset to a valid address for
+> the architecture.
 
-I don't quite see the issue here.  The command is valid, why would it be
-an error?  And I don't see the harm in notifying the guest either.
+Can you add an example of the failure symptoms?
 
-> CASE 2:
-> 1, create a logical volume(12M) by LVM, and guest uses this volume as "=
-vdb"
-> 2, resize LV to 16M by lvresize command
-> 3, run qmp command : virsh qemu-monitor-command INSTANCE '{"execute":
-> "block_resize", "arguments":{"device":"drive-virtio-disk1","size":10485=
-760}}'
->=20
-> The device file size actually grew, but the argument(10M) is less than =
-the
-> effective size(12M). This command should fail, but QEMU still report su=
-ccess.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Suggested-by: Alexander Graf <agraf@suse.de>
+> Reported-by: Alexander Graf <agraf@suse.de>
+> ---
+> v2:
+>  - Remove old comment
+>  hw/riscv/sifive_e.c | 2 +-
+>  hw/riscv/sifive_u.c | 2 +-
+>  hw/riscv/spike.c    | 2 +-
+>  hw/riscv/virt.c     | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 5d9d65ff29..e5d7fc548e 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -74,7 +74,7 @@ static const struct MemmapEntry {
+>      [SIFIVE_E_DTIM] =     { 0x80000000,     0x4000 }
+>  };
+>  
+> -static uint64_t load_kernel(const char *kernel_filename)
+> +static target_ulong load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
 
-Nor do I see a real problem here.  It isn't dangerous if qemu trusts the
-user, but it may break existing use cases to error out if the user
-specifies a length that's too short.
+Shouldn't you update load_elf() and co now to take target_ulong
+arguments? This would fix this error generically for all archs.
 
-In fact, I would suppose if you want to shrink an LVM volume, the
-correct way to do it is to first shrink the virtual device in qemu (with
-block_resize), and only then shrink the physical device on the host;
-otherwise, qemu might issue requests beyond the end of the physical
-disk.  This change would break that.
-
-Max
-
-
---2Ru8qtlwALoy3Kz6emd9PNv3rH2FnMDl2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw8aIoACgkQ9AfbAGHV
-z0CocwgApyygpPQoezr3USuxVSy/PNcKbqiGXcwGomLlph1rPgwkPdsrlCuWhweL
-CObFr68vbPJ3bu4eyVxngtfJKzDrQ9hvf0HW3fBTnu1AK6r7/VUHavXVEjgQ8YWU
-irk1yUWWkNMoYWIK1cP9ds4uhPO1Zi3I8rSUzU8nkZJU9agyTILAnP4L1Kc3r0Ey
-YCnmLfAq5rOhh8TBp7LV6cTBPxPESMrpifXI53CvTelVIYA04RvSjeUxTIknXC/e
-0Lw/fd4hkAZXvf+dXOtQSnxT+SFFnuqG2wJvoSftUjYOXnT7W+7JAca+EXlduMcD
-ULeuMQKsStgfsaC+A8fz5vuGoBLncw==
-=4A6A
------END PGP SIGNATURE-----
-
---2Ru8qtlwALoy3Kz6emd9PNv3rH2FnMDl2--
+>  
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 3bd3b67507..3b3acec377 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -65,7 +65,7 @@ static const struct MemmapEntry {
+>  
+>  #define GEM_REVISION        0x10070109
+>  
+> -static uint64_t load_kernel(const char *kernel_filename)
+> +static target_ulong load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
+>  
+> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> index 268df04c3c..79cb4c1282 100644
+> --- a/hw/riscv/spike.c
+> +++ b/hw/riscv/spike.c
+> @@ -53,7 +53,7 @@ static const struct MemmapEntry {
+>      [SPIKE_DRAM] =     { 0x80000000,        0x0 },
+>  };
+>  
+> -static uint64_t load_kernel(const char *kernel_filename)
+> +static target_ulong load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
+>  
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index e7f0716fb6..648462b18c 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -62,7 +62,7 @@ static const struct MemmapEntry {
+>      [VIRT_PCIE_ECAM] =   { 0x30000000,    0x10000000 },
+>  };
+>  
+> -static uint64_t load_kernel(const char *kernel_filename)
+> +static target_ulong load_kernel(const char *kernel_filename)
+>  {
+>      uint64_t kernel_entry, kernel_high;
+>  
+> 
