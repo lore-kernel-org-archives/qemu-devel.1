@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35085)
+Received: from eggs.gnu.org ([209.51.188.92]:35231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7D-0004io-Ou
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:57 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7I-0004nL-U1
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7A-0001bo-6A
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:53 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40526)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7I-0001hk-1I
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:00 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB78-0001Ta-6X
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:52 -0500
+	id 1gjB7H-0001Xd-O0
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:59 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:42 +0100
-Message-Id: <20190114225306.21569-42-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:52 +0100
+Message-Id: <20190114225306.21569-52-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 41/65] slirp: replace ARRAY_SIZE with
- G_N_ELEMENTS
+Subject: [Qemu-devel] [PULL 51/65] slirp: replace some fprintf() with
+ DEBUG_MISC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +29,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Do not require QEMU macro.
+Remove some clutter, and avoids direct call to fprintf().
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/ncsi.c | 2 +-
- slirp/tftp.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ slirp/slirp.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/slirp/ncsi.c b/slirp/ncsi.c
-index 10decfb5ef..8594382270 100644
---- a/slirp/ncsi.c
-+++ b/slirp/ncsi.c
-@@ -128,7 +128,7 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int=
- pkt_len)
-     memset(reh->h_source, 0xff, ETH_ALEN);
-     reh->h_proto =3D htons(ETH_P_NCSI);
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 7091c3998a..ce5f571d0f 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -164,9 +164,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
+s_addr, void *cached_addr,
+     if (!f)
+         return -1;
 =20
--    for (i =3D 0; i < ARRAY_SIZE(ncsi_rsp_handlers); i++) {
-+    for (i =3D 0; i < G_N_ELEMENTS(ncsi_rsp_handlers); i++) {
-         if (ncsi_rsp_handlers[i].type =3D=3D nh->type + 0x80) {
-             handler =3D &ncsi_rsp_handlers[i];
-             break;
-diff --git a/slirp/tftp.c b/slirp/tftp.c
-index 735b57aa55..a9ba1480db 100644
---- a/slirp/tftp.c
-+++ b/slirp/tftp.c
-@@ -359,7 +359,7 @@ static void tftp_handle_rrq(Slirp *slirp, struct sock=
-addr_storage *srcsas,
-       return;
-   }
-=20
--  while (k < pktlen && nb_options < ARRAY_SIZE(option_name)) {
-+  while (k < pktlen && nb_options < G_N_ELEMENTS(option_name)) {
-       const char *key, *value;
-=20
-       key =3D &tp->x.tp_buf[k];
-@@ -403,7 +403,7 @@ static void tftp_handle_rrq(Slirp *slirp, struct sock=
-addr_storage *srcsas,
-   }
-=20
-   if (nb_options > 0) {
--      assert(nb_options <=3D ARRAY_SIZE(option_name));
-+      assert(nb_options <=3D G_N_ELEMENTS(option_name));
-       tftp_send_oack(spt, option_name, option_value, nb_options, tp);
-       return;
-   }
+-#ifdef DEBUG
+-    fprintf(stderr, "IP address of your DNS(s): ");
+-#endif
++    DEBUG_MISC("IP address of your DNS(s): ");
+     while (fgets(buff, 512, f) !=3D NULL) {
+         if (sscanf(buff, "nameserver%*[ \t]%256s", buff2) =3D=3D 1) {
+             char *c =3D strchr(buff2, '%');
+@@ -188,15 +186,12 @@ static int get_dns_addr_resolv_conf(int af, void *p=
+dns_addr, void *cached_addr,
+                     *scope_id =3D if_index;
+                 }
+                 *cached_time =3D curtime;
++            } else {
++                DEBUG_MISC(", ");
+             }
+-#ifdef DEBUG
+-            else
+-                fprintf(stderr, ", ");
+-#endif
++
+             if (++found > 3) {
+-#ifdef DEBUG
+-                fprintf(stderr, "(more)");
+-#endif
++                DEBUG_MISC("(more)");
+                 break;
+             }
+ #ifdef DEBUG
+@@ -206,7 +201,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
+s_addr, void *cached_addr,
+                 if (!res) {
+                     res =3D "(string conversion error)";
+                 }
+-                fprintf(stderr, "%s", res);
++                DEBUG_MISC("%s", res);
+             }
+ #endif
+         }
 --=20
 2.20.1
