@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43619)
+Received: from eggs.gnu.org ([209.51.188.92]:44305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gj9k1-0005qR-IT
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:25:54 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gj9mn-00079p-Qp
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:28:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gj9k0-0006ZC-PK
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:25:53 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gj9mm-0008Ds-UH
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:28:45 -0500
 References: <20190112150225.20294-1-marcel.apfelbaum@gmail.com>
-	<20190114124246.6de38d67.cohuck@redhat.com>
+	<20190112150225.20294-3-marcel.apfelbaum@gmail.com>
+	<20190113192439.GB10017@lap1> <20190113193603.GA10282@lap1>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <ae958b25-8b96-75f0-0973-453a20af556e@gmail.com>
-Date: Mon, 14 Jan 2019 23:26:02 +0200
+Message-ID: <34bc1d2d-15f3-b5c9-c3ad-3a8bdb47b1c1@gmail.com>
+Date: Mon, 14 Jan 2019 23:23:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190114124246.6de38d67.cohuck@redhat.com>
+In-Reply-To: <20190113193603.GA10282@lap1>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 0/3] contrib/rdmacm-mux: fix clang
- compilation
+Subject: Re: [Qemu-devel] [PATCH 2/3] hw/rdma: modify struct initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +25,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, yuval.shaia@oracle.com, qemu-stable@nongnu.org
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: cohuck@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-Hi Cornelia,
 
-On 1/14/19 1:42 PM, Cornelia Huck wrote:
-> On Sat, 12 Jan 2019 17:02:22 +0200
-> Marcel Apfelbaum <marcel.apfelbaum@gmail.com> wrote:
->
->> Fix Commit a5d2f6f877 (contrib/rdmacm-mux: Add implementation
->>                         of RDMA User MAD multiplexer).
->>
->> The above commit introduces a new contrib target, adding a global dependency
->> to libumad library in case pvrdma configuration option is enabled.
->> Clang forbids it:
->>      clang-6.0: error: -libumad: 'linker' input unused
->>                [-Werror,-Wunused-command-line-argument]
->>
->> Fix by limiting the scope to the rdmacm-mux target itself.
->> Fix related clang errors while at it.
->>
->> Marcel Apfelbaum (3):
->>    contrib/rdmacm-mux: remove Wno-format-truncation flag
->>    hw/rdma: modify struct initialization
->>    contrib/rdmacm-mux: fix clang compilation
->>
->>   Makefile                         |  2 ++
->>   contrib/rdmacm-mux/Makefile.objs |  1 -
->>   contrib/rdmacm-mux/main.c        | 18 +++++++++++++-----
->>   hw/rdma/rdma_backend.c           | 16 ++++++++++++----
->>   4 files changed, 27 insertions(+), 10 deletions(-)
->>
-> This fixes building on x86 with clang 6 for me. On s390x with clang 7,
-> I run into further problems when building the s390-ccw bios (the
-> maintainers are aware of that), but the rdma-related errors are gone.
->
-> Tested-by: Cornelia Huck <cohuck@redhat.com>
 
-Appreciated,
+On 1/13/19 9:36 PM, Yuval Shaia wrote:
+> On Sun, Jan 13, 2019 at 09:24:40PM +0200, Yuval Shaia wrote:
+>> On Sat, Jan 12, 2019 at 05:02:24PM +0200, Marcel Apfelbaum wrote:
+>>> Do not initialize structs with {0} since some
+>>> CLANG versions do not support it.
+>>>
+>>> Use memset instead.
+>> It is easier than patching CLANG ha? :)
+>>
+>>> Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>>> ---
+>>>   contrib/rdmacm-mux/main.c | 12 +++++++++---
+>>>   hw/rdma/rdma_backend.c    | 16 ++++++++++++----
+>>>   2 files changed, 21 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
+>>> index 64676030c5..d01dc76927 100644
+>>> --- a/contrib/rdmacm-mux/main.c
+>>> +++ b/contrib/rdmacm-mux/main.c
+>>> @@ -350,9 +350,11 @@ static int get_fd(const char *mad, int *fd, __be64 *gid_ifid)
+>>>   static void *umad_recv_thread_func(void *args)
+>>>   {
+>>>       int rc;
+>>> -    RdmaCmMuxMsg msg = {0};
+>>> +    RdmaCmMuxMsg msg;
+>>>       int fd = -2;
+>>>   
+>>> +    memset(&msg, 0, sizeof(msg));
+>>> +
+>>>       msg.hdr.msg_type = RDMACM_MUX_MSG_TYPE_REQ;
+>>>       msg.hdr.op_code = RDMACM_MUX_OP_CODE_MAD;
+>>>   
+>>> @@ -387,11 +389,13 @@ static void *umad_recv_thread_func(void *args)
+>>>   static int read_and_process(int fd)
+>>>   {
+>>>       int rc;
+>>> -    RdmaCmMuxMsg msg = {0};
+>>> +    RdmaCmMuxMsg msg;
+>>>       struct umad_hdr *hdr;
+>>>       uint32_t *comm_id = 0;
+>>>       uint16_t attr_id;
+>>>   
+>>> +    memset(&msg, 0, sizeof(msg));
+>>> +
+>>>       rc = recv(fd, &msg, sizeof(msg), 0);
+>>>       syslog(LOG_DEBUG, "Socket %d, recv %d\n", fd, rc);
+>>>   
+>>> @@ -744,7 +748,9 @@ static void signal_handler(int sig, siginfo_t *siginfo, void *context)
+>>>   static int init(void)
+>>>   {
+>>>       int rc;
+>>> -    struct sigaction sig = {0};
+>>> +    struct sigaction sig;
+>>> +
+>>> +    memset(&sig, 0, sizeof(sig));
+>>>   
+>>>       rc = init_listener();
+>>>       if (rc) {
+>>> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+>>> index c28bfbd44d..92e95aa640 100644
+>>> --- a/hw/rdma/rdma_backend.c
+>>> +++ b/hw/rdma/rdma_backend.c
+>>> @@ -190,9 +190,11 @@ static inline int rdmacm_mux_can_process_async(RdmaBackendDev *backend_dev)
+>>>   
+>>>   static int check_mux_op_status(CharBackend *mad_chr_be)
+>>>   {
+>>> -    RdmaCmMuxMsg msg = {0};
+>>> +    RdmaCmMuxMsg msg;
+>>>       int ret;
+>>>   
+>>> +    memset(&msg, 0, sizeof(msg));
+>>> +
+>>>       pr_dbg("Reading response\n");
+>>>       ret = qemu_chr_fe_read_all(mad_chr_be, (uint8_t *)&msg, sizeof(msg));
+>>>       if (ret != sizeof(msg)) {
+>>> @@ -387,10 +389,12 @@ static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
+>>>   static int mad_send(RdmaBackendDev *backend_dev, uint8_t sgid_idx,
+>>>                       union ibv_gid *sgid, struct ibv_sge *sge, uint32_t num_sge)
+>>>   {
+>>> -    RdmaCmMuxMsg msg = {0};
+>>> +    RdmaCmMuxMsg msg;
+>>>       char *hdr, *data;
+>>>       int ret;
+>>>   
+>>> +    memset(&msg, 0, sizeof(msg));
+>>> +
+>>>       pr_dbg("num_sge=%d\n", num_sge);
+>>>   
+>>>       if (num_sge != 2) {
+>>> @@ -1112,9 +1116,11 @@ int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+>>>   int rdma_backend_add_gid(RdmaBackendDev *backend_dev, const char *ifname,
+>>>                            union ibv_gid *gid)
+>>>   {
+>>> -    RdmaCmMuxMsg msg = {0};
+>>> +    RdmaCmMuxMsg msg;
+>>>       int ret;
+>>>   
+>>> +    memset(&msg, 0, sizeof(msg));
+>>> +
+>>>       pr_dbg("0x%llx, 0x%llx\n",
+>>>              (long long unsigned int)be64_to_cpu(gid->global.subnet_prefix),
+>>>              (long long unsigned int)be64_to_cpu(gid->global.interface_id));
+>>> @@ -1138,9 +1144,11 @@ int rdma_backend_add_gid(RdmaBackendDev *backend_dev, const char *ifname,
+>>>   int rdma_backend_del_gid(RdmaBackendDev *backend_dev, const char *ifname,
+>>>                            union ibv_gid *gid)
+>>>   {
+>>> -    RdmaCmMuxMsg msg = {0};
+>>> +    RdmaCmMuxMsg msg;
+>>>       int ret;
+>>>   
+>>> +    memset(&msg, 0, sizeof(msg));
+>>> +
+>>>       pr_dbg("0x%llx, 0x%llx\n",
+>>>              (long long unsigned int)be64_to_cpu(gid->global.subnet_prefix),
+>>>              (long long unsigned int)be64_to_cpu(gid->global.interface_id));
+>> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+>>
+>> One comment though, should subject prefixed with hw/rdma or
+>> contrib/rdmacm-mux?
+> Just noticed that patch took care of both so would it be better to have two
+> separate patches instead?
+
+Since is an almost trivial commit I didn't bother... I hope is ok.
+
+Thanks,
 Marcel
+
+>
+>>> -- 
+>>> 2.17.1
+>>>
