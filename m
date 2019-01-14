@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51783)
+Received: from eggs.gnu.org ([209.51.188.92]:51841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkc-0003PG-Pk
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:12 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkj-0003X9-9P
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipka-0006n5-Vh
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:10 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60550)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipki-0006ua-FQ
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:17 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:60562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipka-0006br-Hh
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:08 -0500
+	id 1gipki-0006im-8Z
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:16 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:03:18 +0100
-Message-Id: <20190114000326.29847-58-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:03:25 +0100
+Message-Id: <20190114000326.29847-65-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 57/65] slirp: remove remaining DEBUG blocks
+Subject: [Qemu-devel] [PULL 64/65] slirp: Mark debugging calls as unlikely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +28,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+to get them out of the hot path.
 
-Instead, rely on slirp_debug flags, or compile unconditionally (the
-substraction in cksum is unlikely to affect any benchmark result).
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/cksum.c   | 4 ----
- slirp/ip_icmp.c | 5 ++---
- slirp/slirp.c   | 5 +----
- 3 files changed, 3 insertions(+), 11 deletions(-)
+ slirp/debug.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/slirp/cksum.c b/slirp/cksum.c
-index b9466485b5..0a988b845d 100644
---- a/slirp/cksum.c
-+++ b/slirp/cksum.c
-@@ -70,9 +70,7 @@ int cksum(struct mbuf *m, int len)
+diff --git a/slirp/debug.h b/slirp/debug.h
+index 25a5d59439..269d97d807 100644
+--- a/slirp/debug.h
++++ b/slirp/debug.h
+@@ -15,25 +15,25 @@
+ extern int slirp_debug;
 =20
- 	if (len < mlen)
- 	   mlen =3D len;
--#ifdef DEBUG
- 	len -=3D mlen;
--#endif
- 	/*
- 	 * Force to even boundary.
- 	 */
-@@ -122,12 +120,10 @@ int cksum(struct mbuf *m, int len)
- 	   s_util.c[0] =3D *(uint8_t *)w;
+ #define DEBUG_CALL(fmt, ...) do {               \
+-    if (slirp_debug & DBG_CALL) {               \
++    if (G_UNLIKELY(slirp_debug & DBG_CALL)) {   \
+         g_debug(fmt "...", ##__VA_ARGS__);      \
+     }                                           \
+ } while (0)
 =20
- cont:
--#ifdef DEBUG
- 	if (len) {
- 		DEBUG_ERROR("cksum: out of data\n");
- 		DEBUG_ERROR(" len =3D %d\n", len);
- 	}
--#endif
- 	if (mlen =3D=3D -1) {
- 		/* The last mbuf has odd # of bytes. Follow the
- 		 standard (the odd byte may be shifted left by 8 bits
-diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-index 6c7e375ff8..cd2faeacb6 100644
---- a/slirp/ip_icmp.c
-+++ b/slirp/ip_icmp.c
-@@ -257,13 +257,12 @@ icmp_send_error(struct mbuf *msrc, u_char type, u_c=
-har code, int minsize,
-   /* check msrc */
-   if(!msrc) goto end_error;
-   ip =3D mtod(msrc, struct ip *);
--#ifdef DEBUG
--  { char bufa[20], bufb[20];
-+  if (slirp_debug & DBG_MISC) {
-+    char bufa[20], bufb[20];
-     strcpy(bufa, inet_ntoa(ip->ip_src));
-     strcpy(bufb, inet_ntoa(ip->ip_dst));
-     DEBUG_MISC(" %.16s to %.16s\n", bufa, bufb);
-   }
--#endif
-   if(ip->ip_off & IP_OFFMASK) goto end_error;    /* Only reply to fragme=
-nt 0 */
+ #define DEBUG_ARG(fmt, ...) do {                \
+-    if (slirp_debug & DBG_CALL) {               \
++    if (G_UNLIKELY(slirp_debug & DBG_CALL)) {   \
+         g_debug(" " fmt, ##__VA_ARGS__);        \
+     }                                           \
+ } while (0)
 =20
-   /* Do not reply to source-only IPs */
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 0b70cb9fb6..6c732cd15b 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -195,9 +195,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
-s_addr, void *cached_addr,
-             if (++found > 3) {
-                 DEBUG_MISC("(more)");
-                 break;
--            }
--#ifdef DEBUG
--            else {
-+            } else if (slirp_debug & DBG_MISC) {
-                 char s[INET6_ADDRSTRLEN];
-                 const char *res =3D inet_ntop(af, tmp_addr, s, sizeof(s)=
-);
-                 if (!res) {
-@@ -205,7 +203,6 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
-s_addr, void *cached_addr,
-                 }
-                 DEBUG_MISC("%s", res);
-             }
--#endif
-         }
-     }
-     fclose(f);
+ #define DEBUG_MISC(fmt, ...) do {               \
+-    if (slirp_debug & DBG_MISC) {               \
++    if (G_UNLIKELY(slirp_debug & DBG_MISC)) {   \
+         g_debug(fmt, ##__VA_ARGS__);            \
+     }                                           \
+ } while (0)
+=20
+ #define DEBUG_ERROR(fmt, ...) do {              \
+-    if (slirp_debug & DBG_ERROR) {              \
++    if (G_UNLIKELY(slirp_debug & DBG_ERROR)) {  \
+         g_debug(fmt, ##__VA_ARGS__);            \
+     }                                           \
+ } while (0)
 --=20
 2.20.1
