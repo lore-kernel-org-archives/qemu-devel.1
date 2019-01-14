@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51453)
+Received: from eggs.gnu.org ([209.51.188.92]:51541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkQ-0003D7-GC
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:00 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkS-0003ER-3Y
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkP-0006aX-AU
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:58 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60378)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkP-0006bI-JA
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:00 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57314)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipkN-0006R0-1F
+	id 1gipkP-0006Or-8J
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:57 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:03:04 +0100
-Message-Id: <20190114000326.29847-44-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:02:55 +0100
+Message-Id: <20190114000326.29847-35-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 43/65] glib-compat: add g_spawn_async_with_fds()
- fallback
+Subject: [Qemu-devel] [PULL 34/65] slirp: replace error_report() with
+ g_critical()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +33,68 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+Reduce dependency on QEMU. QEMU could use a custom log handler if it
+wants to redirect/filter it.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- include/glib-compat.h | 56 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ slirp/ip6_icmp.c | 2 +-
+ slirp/misc.c     | 2 +-
+ slirp/slirp.c    | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index fdf95a255d..8a078c5288 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -83,6 +83,62 @@ static inline gboolean g_strv_contains_qemu(const gcha=
-r *const *strv,
- }
- #define g_strv_contains(a, b) g_strv_contains_qemu(a, b)
+diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
+index cd1e0b9fe1..3c424df591 100644
+--- a/slirp/ip6_icmp.c
++++ b/slirp/ip6_icmp.c
+@@ -417,7 +417,7 @@ void icmp6_input(struct mbuf *m)
+             icmp6_send_echoreply(m, slirp, ip, icmp);
+         } else {
+             /* TODO */
+-            error_report("external icmpv6 not supported yet");
++            g_critical("external icmpv6 not supported yet");
+         }
+         break;
 =20
-+#if !GLIB_CHECK_VERSION(2, 58, 0)
-+typedef struct QemuGSpawnFds {
-+    GSpawnChildSetupFunc child_setup;
-+    gpointer user_data;
-+    gint stdin_fd;
-+    gint stdout_fd;
-+    gint stderr_fd;
-+} QemuGSpawnFds;
-+
-+static inline void
-+qemu_gspawn_fds_setup(gpointer user_data)
-+{
-+    QemuGSpawnFds *q =3D (QemuGSpawnFds *)user_data;
-+
-+    dup2(q->stdin_fd, 0);
-+    dup2(q->stdout_fd, 1);
-+    dup2(q->stderr_fd, 2);
-+    q->child_setup(q->user_data);
-+}
-+#endif
-+
-+static inline gboolean
-+g_spawn_async_with_fds_qemu(const gchar *working_directory,
-+                            gchar **argv,
-+                            gchar **envp,
-+                            GSpawnFlags flags,
-+                            GSpawnChildSetupFunc child_setup,
-+                            gpointer user_data,
-+                            GPid *child_pid,
-+                            gint stdin_fd,
-+                            gint stdout_fd,
-+                            gint stderr_fd,
-+                            GError **error)
-+{
-+#if GLIB_CHECK_VERSION(2, 58, 0)
-+    return g_spawn_async_with_fds(working_directory, argv, envp, flags,
-+                                  child_setup, user_data,
-+                                  child_pid, stdin_fd, stdout_fd, stderr=
-_fd,
-+                                  error);
-+#else
-+    QemuGSpawnFds setup =3D {
-+        .child_setup =3D child_setup,
-+        .user_data =3D user_data,
-+        .stdin_fd =3D stdin_fd,
-+        .stdout_fd =3D stdout_fd,
-+        .stderr_fd =3D stderr_fd,
-+    };
-+
-+    return g_spawn_async(working_directory, argv, envp, flags,
-+                         qemu_gspawn_fds_setup, &setup,
-+                         child_pid, error);
-+#endif
-+}
-+
-+#define g_spawn_async_with_fds(wd, argv, env, f, c, d, p, ifd, ofd, efd,=
- err) \
-+    g_spawn_async_with_fds_qemu(wd, argv, env, f, c, d, p, ifd, ofd, efd=
-, err)
+diff --git a/slirp/misc.c b/slirp/misc.c
+index 7362e14339..ee3492a2ae 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -119,7 +119,7 @@ slirp_socketpair_with_oob(int sv[2])
+     return 0;
 =20
- #if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
- /*
+ err:
+-    error_report("Error: slirp_socketpair(): %s", strerror(errno));
++    g_critical("slirp_socketpair(): %s", strerror(errno));
+     if (s >=3D 0) {
+         closesocket(s);
+     }
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index f11f9e9e51..8391d18faf 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -1214,8 +1214,8 @@ static int sbuf_tmp_post_load(void *opaque, int ver=
+sion)
+     }
+     if (tmp->woff >=3D requested_len ||
+         tmp->roff >=3D requested_len) {
+-        error_report("invalid sbuf offsets r/w=3D%u/%u len=3D%u",
+-                     tmp->roff, tmp->woff, requested_len);
++        g_critical("invalid sbuf offsets r/w=3D%u/%u len=3D%u",
++                   tmp->roff, tmp->woff, requested_len);
+         return -EINVAL;
+     }
+=20
+@@ -1323,7 +1323,7 @@ static int ss_family_post_load(void *opaque, int ve=
+rsion_id)
+         tss->parent->ss.ss_family =3D AF_INET6;
+         break;
+     default:
+-        error_report("invalid ss_family type %x", tss->portable_family);
++        g_critical("invalid ss_family type %x", tss->portable_family);
+         return -EINVAL;
+     }
+=20
 --=20
 2.20.1
