@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51094)
+Received: from eggs.gnu.org ([209.51.188.92]:51120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gizWc-0004Id-A0
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:31:23 -0500
+	(envelope-from <david@redhat.com>) id 1gizWk-0004Of-HC
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:31:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gizWb-0000nT-KZ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:31:22 -0500
+	(envelope-from <david@redhat.com>) id 1gizWc-0000pe-Kp
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:31:25 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 14 Jan 2019 11:31:05 +0100
-Message-Id: <20190114103110.10909-2-david@redhat.com>
+Date: Mon, 14 Jan 2019 11:31:06 +0100
+Message-Id: <20190114103110.10909-3-david@redhat.com>
 In-Reply-To: <20190114103110.10909-1-david@redhat.com>
 References: <20190114103110.10909-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/6] s390x/pci: Use hotplug_dev instead of
- looking up the host bridge
+Subject: [Qemu-devel] [PATCH v2 2/6] s390x/pci: Move some hotplug checks to
+ the pre_plug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +23,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>
 
-We directly have it in our hands.
+Let's move most of the checks to the new pre_plug handler. As a PCI
+bridge is just a PCI device, we can simplify the code.
 
+Notes: We cannot yet move the MSIX check or device ID creation +
+zPCI device creation to the pre_plug handler as both parts are not
+fixed before actual device realization (and therefore after pre_plug and
+before plug). Once that part is factored out, we can move these parts to
+the pre_plug handler, too and therefore remove all possible errors from
+the plug handler.
+
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/s390x/s390-pci-bus.c | 41 +++++++++++++++++++++++++----------------
+ 1 file changed, 25 insertions(+), 16 deletions(-)
 
 diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 7f911b216a..86dda831f9 100644
+index 86dda831f9..1775388524 100644
 --- a/hw/s390x/s390-pci-bus.c
 +++ b/hw/s390x/s390-pci-bus.c
-@@ -826,9 +826,9 @@ static bool s390_pci_alloc_idx(S390pciState *s, S390PCIBusDevice *pbdev)
+@@ -818,11 +818,31 @@ static bool s390_pci_alloc_idx(S390pciState *s, S390PCIBusDevice *pbdev)
+     }
+ 
+     pbdev->idx = idx;
+-    s->next_idx = (idx + 1) & FH_MASK_INDEX;
+-
+     return true;
+ }
+ 
++static void s390_pcihost_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
++                                   Error **errp)
++{
++    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
++
++    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
++        PCIDevice *pdev = PCI_DEVICE(dev);
++
++        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
++            error_setg(errp, "multifunction not supported in s390");
++            return;
++        }
++    } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
++        S390PCIBusDevice *pbdev = S390_PCI_DEVICE(dev);
++
++        if (!s390_pci_alloc_idx(s, pbdev)) {
++            error_setg(errp, "no slot for plugging zpci device");
++            return;
++        }
++    }
++}
++
  static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
                                Error **errp)
  {
-+    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
-     PCIDevice *pdev = NULL;
-     S390PCIBusDevice *pbdev = NULL;
--    S390pciState *s = s390_get_phb();
+@@ -835,11 +855,6 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         PCIBridge *pb = PCI_BRIDGE(dev);
+         PCIDevice *pdev = PCI_DEVICE(dev);
  
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
-         BusState *bus;
-@@ -935,11 +935,11 @@ static void s390_pcihost_timer_cb(void *opaque)
- static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                 Error **errp)
- {
-+    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
-     PCIDevice *pci_dev = NULL;
-     PCIBus *bus;
-     int32_t devfn;
-     S390PCIBusDevice *pbdev = NULL;
--    S390pciState *s = s390_get_phb();
+-        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
+-            error_setg(errp, "multifunction not supported in s390");
+-            return;
+-        }
+-
+         pci_bridge_map_irq(pb, dev->id, s390_pci_map_irq);
+         pci_setup_iommu(&pb->sec_bus, s390_pci_dma_iommu, s);
  
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
-         error_setg(errp, "PCI bridge hot unplug currently not supported");
+@@ -859,11 +874,6 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+         pdev = PCI_DEVICE(dev);
+ 
+-        if (pdev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION) {
+-            error_setg(errp, "multifunction not supported in s390");
+-            return;
+-        }
+-
+         if (!dev->id) {
+             /* In the case the PCI device does not define an id */
+             /* we generate one based on the PCI address         */
+@@ -905,10 +915,8 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
+         pbdev = S390_PCI_DEVICE(dev);
+ 
+-        if (!s390_pci_alloc_idx(s, pbdev)) {
+-            error_setg(errp, "no slot for plugging zpci device");
+-            return;
+-        }
++        /* the allocated idx is actually getting used */
++        s->next_idx = (pbdev->idx + 1) & FH_MASK_INDEX;
+         pbdev->fh = pbdev->idx;
+         QTAILQ_INSERT_TAIL(&s->zpci_devs, pbdev, link);
+         g_hash_table_insert(s->zpci_table, &pbdev->idx, pbdev);
+@@ -1041,6 +1049,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
+ 
+     dc->reset = s390_pcihost_reset;
+     dc->realize = s390_pcihost_realize;
++    hc->pre_plug = s390_pcihost_pre_plug;
+     hc->plug = s390_pcihost_plug;
+     hc->unplug = s390_pcihost_unplug;
+     msi_nonbroken = true;
 -- 
 2.17.2
