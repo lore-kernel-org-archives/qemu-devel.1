@@ -1,24 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44935)
+Received: from eggs.gnu.org ([209.51.188.92]:45635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz59-0005lG-Tu
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:03:05 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1giz8W-0000PP-AB
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:06:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz59-0007fU-0P
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz58-0007dh-OW
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:58 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 11:02:18 +0100
-Message-Id: <1547460140-1473-24-git-send-email-thuth@redhat.com>
-In-Reply-To: <1547460140-1473-1-git-send-email-thuth@redhat.com>
-References: <1547460140-1473-1-git-send-email-thuth@redhat.com>
+	(envelope-from <pmorel@linux.ibm.com>) id 1giz8V-0000s2-FV
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:06:28 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51142
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1giz8U-0000qp-As
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:06:26 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0E9wcdV078880
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 05:06:24 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2q0pskm5rb-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 05:06:24 -0500
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Mon, 14 Jan 2019 10:06:22 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <20190110210358.24035-1-david@redhat.com>
+	<4988f58e-4bc5-c622-53b7-cfda758304e1@redhat.com>
+	<20190111103828.058ccc6c.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Mon, 14 Jan 2019 11:06:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20190111103828.058ccc6c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <c30709c1-9348-e4c9-22bb-95d6183163f3@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 23/25] ppc: Fix duplicated typedefs to be able
- to compile with Clang in gnu99 mode
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Send correct event on
+ hotplug.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +46,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>
+To: qemu-devel@nongnu.org
 
-When compiling the ppc code with clang and -std=3Dgnu99, there are a
-couple of warnings/errors like this one:
+On 11/01/2019 10:38, Cornelia Huck wrote:
+> On Fri, 11 Jan 2019 08:16:41 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> On 10.01.19 22:03, David Hildenbrand wrote:
+>>> Comit 2c28c490571f ("s390x/pci: let pci devices start in configured m=
+ode")
+>>> changed the initial state of zPCI devices from ZPCI_FS_STANDBY to
+>>> ZPCI_FS_DISABLED (a.k.a. configured). However we still only send a
+>>> HP_EVENT_RESERVED_TO_STANDBY event to the guest, indicating a wrong
+>>> state.
+>>>
+>>> Let's send a HP_EVENT_TO_CONFIGURED event instead, to match the actua=
+l
+>>> state the device is in.
+>>>
+>>> This fixes hotplugged devices having to be enabled explicitly in the
+>>> guest e.g. via echo 1 > /sys/bus/pci/slots/00000000/power.
+>>>
+>>> Fixes: 2c28c490571f ("s390x/pci: let pci devices start in configured =
+mode")
+>>> Report-by: Cornelia Huck <cohuck@redhat.com>
+>=20
+> Cool, works for me as well.
+>=20
+> Tested-by: Cornelia Huck <cohuck@redhat.com>
+>=20
+> Do we want to cc:stable? Probably not, as it's more annoying than
+> critical, and pci hotplug does not seem to be much used on s390x.
+>=20
+>>
+>> If this patch is the right thing to do, then
+>>
+>> 1. s/Report-by/Reported-by/
+>> 2. Dropping the "." from the subject
+>>
+>> (yes, it was late)
+>=20
+> :) Can do while applying.
+>=20
+>>
+>> I wonder if we should do both events sequentially, but as I don't have
+>> access to the architecture I have to rely on that this works :)
+>=20
+> Yep, let's wait for feedback from folks with architecture access.
+>=20
 
-  CC      ppc64-softmmu/hw/intc/xics.o
-In file included from hw/intc/xics.c:35:
-include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState' is=
- a C11 feature
-      [-Werror,-Wtypedef-redefinition]
-typedef struct ICPState ICPState;
-                        ^
-target/ppc/cpu.h:1181:25: note: previous definition is here
-typedef struct ICPState ICPState;
-                        ^
-Work around the problems by including the proper headers instead.
+Works fine on the architecture too.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- include/hw/ppc/spapr.h      |  5 +++--
- include/hw/ppc/spapr_xive.h |  2 --
- target/ppc/cpu.h            | 13 +++++++++----
- 3 files changed, 12 insertions(+), 8 deletions(-)
+Seems the logical thing to do for me.
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 9e01a5a..a947a0a 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -8,15 +8,16 @@
- #include "hw/mem/pc-dimm.h"
- #include "hw/ppc/spapr_ovec.h"
- #include "hw/ppc/spapr_irq.h"
-+#include "hw/ppc/spapr_xive.h"  /* For sPAPRXive */
-+#include "hw/ppc/xics.h"        /* For ICSState */
-=20
- struct VIOsPAPRBus;
- struct sPAPRPHBState;
- struct sPAPRNVRAM;
-+
- typedef struct sPAPREventLogEntry sPAPREventLogEntry;
- typedef struct sPAPREventSource sPAPREventSource;
- typedef struct sPAPRPendingHPT sPAPRPendingHPT;
--typedef struct ICSState ICSState;
--typedef struct sPAPRXive sPAPRXive;
-=20
- #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
- #define SPAPR_ENTRY_POINT       0x100
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 7fdc250..9bec919 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -41,8 +41,6 @@ bool spapr_xive_irq_claim(sPAPRXive *xive, uint32_t lis=
-n, bool lsi);
- bool spapr_xive_irq_free(sPAPRXive *xive, uint32_t lisn);
- void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-=20
--typedef struct sPAPRMachineState sPAPRMachineState;
--
- void spapr_xive_hcall_init(sPAPRMachineState *spapr);
- void spapr_dt_xive(sPAPRMachineState *spapr, uint32_t nr_servers, void *=
-fdt,
-                    uint32_t phandle);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 486abaf..bde4dff 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -23,6 +23,11 @@
- #include "qemu-common.h"
- #include "qemu/int128.h"
-=20
-+#ifndef CONFIG_USER_ONLY
-+#include "hw/ppc/xive.h" /* for XiveTCTX */
-+#include "hw/ppc/xics.h" /* for ICPState */
-+#endif
-+
- //#define PPC_EMULATE_32BITS_HYPV
-=20
- #if defined (TARGET_PPC64)
-@@ -1177,8 +1182,6 @@ do {                                            \
-=20
- typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
- typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
--typedef struct XiveTCTX XiveTCTX;
--typedef struct ICPState ICPState;
-=20
- /**
-  * PowerPCCPU:
-@@ -1197,11 +1200,13 @@ struct PowerPCCPU {
-     int vcpu_id;
-     uint32_t compat_pvr;
-     PPCVirtualHypervisor *vhyp;
--    ICPState *icp;
--    XiveTCTX *tctx;
-     void *machine_data;
-     int32_t node_id; /* NUMA node this CPU belongs to */
-     PPCHash64Options *hash64_opts;
-+#ifndef CONFIG_USER_ONLY
-+    ICPState *icp;
-+    XiveTCTX *tctx;
-+#endif
-=20
-     /* Fields related to migration compatibility hacks */
-     bool pre_2_8_migration;
+Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+
+
+>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>   hw/s390x/s390-pci-bus.c | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>> index 15759b6514..7f911b216a 100644
+>>> --- a/hw/s390x/s390-pci-bus.c
+>>> +++ b/hw/s390x/s390-pci-bus.c
+>>> @@ -899,7 +899,7 @@ static void s390_pcihost_plug(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+>>>           }
+>>>  =20
+>>>           if (dev->hotplugged) {
+>>> -            s390_pci_generate_plug_event(HP_EVENT_RESERVED_TO_STANDB=
+Y,
+>>> +            s390_pci_generate_plug_event(HP_EVENT_TO_CONFIGURED ,
+>>>                                            pbdev->fh, pbdev->fid);
+>>>           }
+>>>       } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVIC=
+E)) {
+>>>   =20
+>>
+>>
+>=20
+>=20
+
+
 --=20
-1.8.3.1
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
