@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56032)
+Received: from eggs.gnu.org ([209.51.188.92]:56594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gizoX-0002uQ-71
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:49:54 -0500
+	(envelope-from <philmd@redhat.com>) id 1gizqC-0004DK-6H
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:51:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gizoW-00071A-FH
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:49:53 -0500
-Received: from mail-wm1-f42.google.com ([209.85.128.42]:55877)
+	(envelope-from <philmd@redhat.com>) id 1gizqB-0002cF-Af
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:51:36 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36340)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gizoW-0006zH-9K
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:49:52 -0500
-Received: by mail-wm1-f42.google.com with SMTP id y139so8311885wmc.5
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:49:52 -0800 (PST)
-References: <20190109201956.3982-1-yuval.shaia@oracle.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gizqB-000230-3c
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:51:35 -0500
+Received: by mail-wr1-f68.google.com with SMTP id u4so22286030wrp.3
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:51:19 -0800 (PST)
+References: <20190112014156.6AA447456B3@zero.eik.bme.hu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0cd4a9fc-9f61-6bcd-915d-8532b5506a18@redhat.com>
-Date: Mon, 14 Jan 2019 11:49:49 +0100
+Message-ID: <1b5188cc-8b62-671e-65ce-6385110e3e02@redhat.com>
+Date: Mon, 14 Jan 2019 11:51:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190109201956.3982-1-yuval.shaia@oracle.com>
+In-Reply-To: <20190112014156.6AA447456B3@zero.eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/rdma: Delete unused struct member
+Subject: Re: [Qemu-devel] [PATCH] smbus: Remove unneeded include
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>
 
-On 1/9/19 9:19 PM, Yuval Shaia wrote:
-> This member is used only in init_device_caps function, make it local.
+On 1/12/19 2:32 AM, BALATON Zoltan wrote:
+> The file no longer uses error_report after review so the header is not
+> needed either.
 > 
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  hw/rdma/rdma_backend.c      | 26 ++++++++++++++------------
->  hw/rdma/rdma_backend_defs.h |  1 -
->  2 files changed, 14 insertions(+), 13 deletions(-)
+> Forgot to delete this when rewriting after review. This
+> can be squashed into 7713f5bed in dgibson/qemu/ppc-for-4.0
 > 
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index 16dca69ee9..b49edaacaf 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -917,23 +917,25 @@ void rdma_backend_destroy_qp(RdmaBackendQP *qp)
->  static int init_device_caps(RdmaBackendDev *backend_dev,
->                              struct ibv_device_attr *dev_attr)
->  {
-> -    if (ibv_query_device(backend_dev->context, &backend_dev->dev_attr)) {
-> +    struct ibv_device_attr bk_dev_attr;
-> +
-> +    if (ibv_query_device(backend_dev->context, &bk_dev_attr)) {
->          return -EIO;
->      }
+>  hw/i2c/smbus_eeprom.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+> index bef24a1ca4..01b9439014 100644
+> --- a/hw/i2c/smbus_eeprom.c
+> +++ b/hw/i2c/smbus_eeprom.c
+> @@ -23,7 +23,6 @@
+>   */
 >  
->      dev_attr->max_sge = MAX_SGE;
->  
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_mr_size, "%" PRId64);
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_sge, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_wr, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_cq, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_cqe, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_mr, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_pd, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_rd_atom, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_qp_init_rd_atom, "%d");
-> -    CHK_ATTR(dev_attr, backend_dev->dev_attr, max_ah, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_mr_size, "%" PRId64);
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_qp, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_sge, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_qp_wr, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_cq, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_cqe, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_mr, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_pd, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_qp_rd_atom, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_qp_init_rd_atom, "%d");
-> +    CHK_ATTR(dev_attr, bk_dev_attr, max_ah, "%d");
->  
->      return 0;
->  }
-> diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.h
-> index 1e5c3dd3bf..15ae8b970e 100644
-> --- a/hw/rdma/rdma_backend_defs.h
-> +++ b/hw/rdma/rdma_backend_defs.h
-> @@ -41,7 +41,6 @@ typedef struct RdmaCmMux {
->  } RdmaCmMux;
->  
->  typedef struct RdmaBackendDev {
-> -    struct ibv_device_attr dev_attr;
->      RdmaBackendThread comp_thread;
->      PCIDevice *dev;
->      RdmaDeviceResources *rdma_dev_res;
+>  #include "qemu/osdep.h"
+> -#include "qemu/error-report.h"
+>  #include "qemu/units.h"
+>  #include "qapi/error.h"
+>  #include "hw/hw.h"
 > 
