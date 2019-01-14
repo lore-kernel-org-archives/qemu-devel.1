@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51556)
+Received: from eggs.gnu.org ([209.51.188.92]:51646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkS-0003F1-F1
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:02 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipka-0003Kx-Bo
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkP-0006ah-Bo
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:00 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60366)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkZ-0006jm-EL
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:08 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:60528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipkN-0006Po-2W
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:57 -0500
+	id 1gipkZ-0006Yv-2o
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:07 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:02:58 +0100
-Message-Id: <20190114000326.29847-38-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:03:05 +0100
+Message-Id: <20190114000326.29847-45-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 37/65] slirp: remove #if notdef dead code
+Subject: [Qemu-devel] [PULL 44/65] slirp: simplify fork_exec()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,279 +28,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+Use g_spawn_async_with_fds() to setup the child.
+
+GSpawn handles reaping the child, and closing parent file descriptors.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/ip_input.c  | 200 ----------------------------------------------
- slirp/tcp_input.c |  39 ---------
- 2 files changed, 239 deletions(-)
+ slirp/misc.c | 75 +++++++++++++++++++++++++---------------------------
+ 1 file changed, 36 insertions(+), 39 deletions(-)
 
-diff --git a/slirp/ip_input.c b/slirp/ip_input.c
-index 094a807d41..d360620838 100644
---- a/slirp/ip_input.c
-+++ b/slirp/ip_input.c
-@@ -447,206 +447,6 @@ ip_slowtimo(Slirp *slirp)
+diff --git a/slirp/misc.c b/slirp/misc.c
+index ee3492a2ae..753b3da25b 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -129,56 +129,53 @@ err:
+     return -1;
+ }
+=20
++static void
++fork_exec_child_setup(gpointer data)
++{
++    setsid();
++}
++
+ int
+ fork_exec(struct socket *so, const char *ex)
+ {
+-	char **argv;
+-	int opt, c, sp[2];
+-	pid_t pid;
++    GError *err =3D NULL;
++    char **argv;
++    int opt, sp[2];
+=20
+-	DEBUG_CALL("fork_exec");
+-	DEBUG_ARG("so =3D %p", so);
+-	DEBUG_ARG("ex =3D %p", ex);
++    DEBUG_CALL("fork_exec");
++    DEBUG_ARG("so =3D %p", so);
++    DEBUG_ARG("ex =3D %p", ex);
+=20
+     if (slirp_socketpair_with_oob(sp) < 0) {
+         return 0;
      }
- }
 =20
--/*
-- * Do option processing on a datagram,
-- * possibly discarding it if bad options are encountered,
-- * or forwarding it if source-routed.
-- * Returns 1 if packet has been forwarded/freed,
-- * 0 if the packet should be processed further.
-- */
+-	pid =3D fork();
+-	switch(pid) {
+-	 case -1:
+-		error_report("Error: fork failed: %s", strerror(errno));
+-		closesocket(sp[0]);
+-		closesocket(sp[1]);
+-		return 0;
 -
--#ifdef notdef
--
--int
--ip_dooptions(m)
--	struct mbuf *m;
--{
--	register struct ip *ip =3D mtod(m, struct ip *);
--	register u_char *cp;
--	register struct ip_timestamp *ipt;
--	register struct in_ifaddr *ia;
--	int opt, optlen, cnt, off, code, type, forward =3D 0;
--	struct in_addr *sin, dst;
--typedef uint32_t n_time;
--	n_time ntime;
--
--	dst =3D ip->ip_dst;
--	cp =3D (u_char *)(ip + 1);
--	cnt =3D (ip->ip_hl << 2) - sizeof (struct ip);
--	for (; cnt > 0; cnt -=3D optlen, cp +=3D optlen) {
--		opt =3D cp[IPOPT_OPTVAL];
--		if (opt =3D=3D IPOPT_EOL)
--			break;
--		if (opt =3D=3D IPOPT_NOP)
--			optlen =3D 1;
--		else {
--			optlen =3D cp[IPOPT_OLEN];
--			if (optlen <=3D 0 || optlen > cnt) {
--				code =3D &cp[IPOPT_OLEN] - (u_char *)ip;
--				goto bad;
--			}
--		}
--		switch (opt) {
--
--		default:
--			break;
--
--		/*
--		 * Source routing with record.
--		 * Find interface with current destination address.
--		 * If none on this machine then drop if strictly routed,
--		 * or do nothing if loosely routed.
--		 * Record interface address and bring up next address
--		 * component.  If strictly routed make sure next
--		 * address is on directly accessible net.
--		 */
--		case IPOPT_LSRR:
--		case IPOPT_SSRR:
--			if ((off =3D cp[IPOPT_OFFSET]) < IPOPT_MINOFF) {
--				code =3D &cp[IPOPT_OFFSET] - (u_char *)ip;
--				goto bad;
--			}
--			ipaddr.sin_addr =3D ip->ip_dst;
--			ia =3D (struct in_ifaddr *)
--				ifa_ifwithaddr((struct sockaddr *)&ipaddr);
--			if (ia =3D=3D 0) {
--				if (opt =3D=3D IPOPT_SSRR) {
--					type =3D ICMP_UNREACH;
--					code =3D ICMP_UNREACH_SRCFAIL;
--					goto bad;
--				}
--				/*
--				 * Loose routing, and not at next destination
--				 * yet; nothing to do except forward.
--				 */
--				break;
--			}
--                        off--; /* 0 origin */
--			if (off > optlen - sizeof(struct in_addr)) {
--				/*
--				 * End of source route.  Should be for us.
--				 */
--				save_rte(cp, ip->ip_src);
--				break;
--			}
--			/*
--			 * locate outgoing interface
--			 */
--			bcopy((caddr_t)(cp + off), (caddr_t)&ipaddr.sin_addr,
--			    sizeof(ipaddr.sin_addr));
--			if (opt =3D=3D IPOPT_SSRR) {
--#define	INA	struct in_ifaddr *
--#define	SA	struct sockaddr *
--			    if ((ia =3D (INA)ifa_ifwithdstaddr((SA)&ipaddr)) =3D=3D 0)
--				ia =3D (INA)ifa_ifwithnet((SA)&ipaddr);
--			} else
--				ia =3D ip_rtaddr(ipaddr.sin_addr);
--			if (ia =3D=3D 0) {
--				type =3D ICMP_UNREACH;
--				code =3D ICMP_UNREACH_SRCFAIL;
--				goto bad;
--			}
--			ip->ip_dst =3D ipaddr.sin_addr;
--			bcopy((caddr_t)&(IA_SIN(ia)->sin_addr),
--			    (caddr_t)(cp + off), sizeof(struct in_addr));
--			cp[IPOPT_OFFSET] +=3D sizeof(struct in_addr);
--			/*
--			 * Let ip_intr's mcast routing check handle mcast pkts
--			 */
--			forward =3D !IN_MULTICAST(ntohl(ip->ip_dst.s_addr));
--			break;
--
--		case IPOPT_RR:
--			if ((off =3D cp[IPOPT_OFFSET]) < IPOPT_MINOFF) {
--				code =3D &cp[IPOPT_OFFSET] - (u_char *)ip;
--				goto bad;
--			}
--			/*
--			 * If no space remains, ignore.
--			 */
--                        off--; /* 0 origin */
--			if (off > optlen - sizeof(struct in_addr))
--				break;
--			bcopy((caddr_t)(&ip->ip_dst), (caddr_t)&ipaddr.sin_addr,
--			    sizeof(ipaddr.sin_addr));
--			/*
--			 * locate outgoing interface; if we're the destination,
--			 * use the incoming interface (should be same).
--			 */
--			if ((ia =3D (INA)ifa_ifwithaddr((SA)&ipaddr)) =3D=3D 0 &&
--			    (ia =3D ip_rtaddr(ipaddr.sin_addr)) =3D=3D 0) {
--				type =3D ICMP_UNREACH;
--				code =3D ICMP_UNREACH_HOST;
--				goto bad;
--			}
--			bcopy((caddr_t)&(IA_SIN(ia)->sin_addr),
--			    (caddr_t)(cp + off), sizeof(struct in_addr));
--			cp[IPOPT_OFFSET] +=3D sizeof(struct in_addr);
--			break;
--
--		case IPOPT_TS:
--			code =3D cp - (u_char *)ip;
--			ipt =3D (struct ip_timestamp *)cp;
--			if (ipt->ipt_len < 5)
--				goto bad;
--			if (ipt->ipt_ptr > ipt->ipt_len - sizeof (int32_t)) {
--				if (++ipt->ipt_oflw =3D=3D 0)
--					goto bad;
--				break;
--			}
--			sin =3D (struct in_addr *)(cp + ipt->ipt_ptr - 1);
--			switch (ipt->ipt_flg) {
--
--			case IPOPT_TS_TSONLY:
--				break;
--
--			case IPOPT_TS_TSANDADDR:
--				if (ipt->ipt_ptr + sizeof(n_time) +
--				    sizeof(struct in_addr) > ipt->ipt_len)
--					goto bad;
--				ipaddr.sin_addr =3D dst;
--				ia =3D (INA)ifaof_ i f p foraddr((SA)&ipaddr,
--							    m->m_pkthdr.rcvif);
--				if (ia =3D=3D 0)
--					continue;
--				bcopy((caddr_t)&IA_SIN(ia)->sin_addr,
--				    (caddr_t)sin, sizeof(struct in_addr));
--				ipt->ipt_ptr +=3D sizeof(struct in_addr);
--				break;
--
--			case IPOPT_TS_PRESPEC:
--				if (ipt->ipt_ptr + sizeof(n_time) +
--				    sizeof(struct in_addr) > ipt->ipt_len)
--					goto bad;
--				bcopy((caddr_t)sin, (caddr_t)&ipaddr.sin_addr,
--				    sizeof(struct in_addr));
--				if (ifa_ifwithaddr((SA)&ipaddr) =3D=3D 0)
--					continue;
--				ipt->ipt_ptr +=3D sizeof(struct in_addr);
--				break;
--
--			default:
--				goto bad;
--			}
--			ntime =3D iptime();
--			bcopy((caddr_t)&ntime, (caddr_t)cp + ipt->ipt_ptr - 1,
--			    sizeof(n_time));
--			ipt->ipt_ptr +=3D sizeof(n_time);
--		}
--	}
--	if (forward) {
--		ip_forward(m, 1);
--		return (1);
--	}
--	return (0);
--bad:
--	icmp_send_error(m, type, code, 0, 0);
--
--	return (1);
--}
--
--#endif /* notdef */
--
- /*
-  * Strip out IP options, at higher
-  * level protocol in the kernel.
-diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-index 39821e5a34..0f073d4b38 100644
---- a/slirp/tcp_input.c
-+++ b/slirp/tcp_input.c
-@@ -1441,45 +1441,6 @@ tcp_dooptions(struct tcpcb *tp, u_char *cp, int cn=
-t, struct tcpiphdr *ti)
- 	}
- }
+-	 case 0:
+-		setsid();
+-		dup2(sp[1], 0);
+-		dup2(sp[1], 1);
+-		dup2(sp[1], 2);
+-		for (c =3D getdtablesize() - 1; c >=3D 3; c--)
+-		   close(c);
++    argv =3D g_strsplit(ex, " ", -1);
++    g_spawn_async_with_fds(NULL /* cwd */,
++                           argv,
++                           NULL /* env */,
++                           G_SPAWN_SEARCH_PATH,
++                           fork_exec_child_setup, NULL /* data */,
++                           NULL /* child_pid */,
++                           sp[1], sp[1], sp[1],
++                           &err);
++    g_strfreev(argv);
 =20
+-                argv =3D g_strsplit(ex, " ", -1);
+-		execvp(argv[0], (char **)argv);
 -
--/*
-- * Pull out of band byte out of a segment so
-- * it doesn't appear in the user's data queue.
-- * It is still reflected in the segment length for
-- * sequencing purposes.
-- */
--
--#ifdef notdef
--
--void
--tcp_pulloutofband(so, ti, m)
--	struct socket *so;
--	struct tcpiphdr *ti;
--	register struct mbuf *m;
--{
--	int cnt =3D ti->ti_urp - 1;
--
--	while (cnt >=3D 0) {
--		if (m->m_len > cnt) {
--			char *cp =3D mtod(m, caddr_t) + cnt;
--			struct tcpcb *tp =3D sototcpcb(so);
--
--			tp->t_iobc =3D *cp;
--			tp->t_oobflags |=3D TCPOOB_HAVEDATA;
--			memcpy(sp, cp+1, (unsigned)(m->m_len - cnt - 1));
--			m->m_len--;
--			return;
--		}
--		cnt -=3D m->m_len;
--		m =3D m->m_next; /* XXX WRONG! Fix it! */
--		if (m =3D=3D 0)
--			break;
+-		/* Ooops, failed, let's tell the user why */
+-        fprintf(stderr, "Error: execvp of %s failed: %s\n",
+-                argv[0], strerror(errno));
+-		close(0); close(1); close(2); /* XXX */
+-		exit(1);
++    if (err) {
++        error_report("%s", err->message);
++        g_error_free(err);
++        closesocket(sp[0]);
++        closesocket(sp[1]);
++        return 0;
++    }
+=20
+-	 default:
+-		so->s =3D sp[0];
+-		closesocket(sp[1]);
+-		qemu_add_child_watch(pid);
+-		socket_set_fast_reuse(so->s);
+-		opt =3D 1;
+-		qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+-		qemu_set_nonblock(so->s);
+-		return 1;
 -	}
--	panic("tcp_pulloutofband");
--}
--
--#endif /* notdef */
--
- /*
-  * Collect new round-trip time estimate
-  * and update averages and current timeout.
++    so->s =3D sp[0];
++    closesocket(sp[1]);
++    socket_set_fast_reuse(so->s);
++    opt =3D 1;
++    qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
++    qemu_set_nonblock(so->s);
++    return 1;
+ }
+ #endif
+=20
 --=20
 2.20.1
