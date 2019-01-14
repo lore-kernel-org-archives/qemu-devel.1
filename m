@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45840)
+Received: from eggs.gnu.org ([209.51.188.92]:45938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gj2ih-0004go-8O
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:56:04 -0500
+	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
+	id 1gj2il-0004hh-5L
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:56:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gj2fu-0002n6-RX
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:53:13 -0500
-Received: from m50-110.126.com ([123.125.50.110]:51127)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gj2ft-0002lo-Cd
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:53:10 -0500
-References: <20181225140449.15786-1-fli@suse.com>
-	<20181225140449.15786-13-fli@suse.com>
-	<87h8ekl5l9.fsf@dusky.pond.sub.org>
-	<BF248B0E-5197-4777-8CE9-F9E43B7177C3@126.com>
-	<df98f3b8-a2c8-f3d8-1bfa-3929fff61621@126.com>
-	<871s5fqu2r.fsf@dusky.pond.sub.org>
-From: Fei Li <lifei1214@126.com>
-Message-ID: <faba252d-c6b3-b0ea-2b9a-1a940742f67f@126.com>
-Date: Mon, 14 Jan 2019 21:52:50 +0800
+	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
+	id 1gj2fW-0002dO-Um
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:50 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:65464)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
+	id 1gj2fW-0002cK-Ib
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:46 -0500
+From: Anthony PERARD <anthony.perard@citrix.com>
+Date: Mon, 14 Jan 2019 13:51:34 +0000
+Message-ID: <20190114135154.16826-6-anthony.perard@citrix.com>
+In-Reply-To: <20190114135154.16826-1-anthony.perard@citrix.com>
+References: <20190114135154.16826-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <871s5fqu2r.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 12/16] qemu_thread: supplement
- error handling for iothread_complete/qemu_signalfd_compat
+Content-Type: text/plain
+Subject: [Qemu-devel] [PULL 05/25] xen: introduce 'xen-block',
+ 'xen-disk' and 'xen-cdrom'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,106 +31,512 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, shirley17fei@gmail.com
+To: qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>
 
+From: Paul Durrant <paul.durrant@citrix.com>
 
-在 2019/1/14 下午8:53, Markus Armbruster 写道:
-> Fei Li <lifei1214@126.com> writes:
->
->> 在 2019/1/9 上午12:18, fei 写道:
->>>> 在 2019年1月8日，01:50，Markus Armbruster <armbru@redhat.com> 写道：
->>>>
->>>> Fei Li <fli@suse.com> writes:
->>>>
->>>>> For iothread_complete: utilize the existed errp to propagate the
->>>>> error and do the corresponding cleanup to replace the temporary
->>>>> &error_abort.
->>>>>
->>>>> For qemu_signalfd_compat: add a local_err to hold the error, and
->>>>> return the corresponding error code to replace the temporary
->>>>> &error_abort.
->>>> I'd split the patch.
->>> Ok.
->>>>> Cc: Markus Armbruster <armbru@redhat.com>
->>>>> Cc: Eric Blake <eblake@redhat.com>
->>>>> Signed-off-by: Fei Li <fli@suse.com>
->>>>> ---
->>>>> iothread.c      | 17 +++++++++++------
->>>>> util/compatfd.c | 11 ++++++++---
->>>>> 2 files changed, 19 insertions(+), 9 deletions(-)
->>>>>
->>>>> diff --git a/iothread.c b/iothread.c
->>>>> index 8e8aa01999..7335dacf0b 100644
->>>>> --- a/iothread.c
->>>>> +++ b/iothread.c
->>>>> @@ -164,9 +164,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
->>>>>                                   &local_error);
->>>>>       if (local_error) {
->>>>>           error_propagate(errp, local_error);
->>>>> -        aio_context_unref(iothread->ctx);
->>>>> -        iothread->ctx = NULL;
->>>>> -        return;
->>>>> +        goto fail;
->>>>>       }
->>>>>
->>>>>       qemu_mutex_init(&iothread->init_done_lock);
->>>>> @@ -178,9 +176,12 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
->>>>>        */
->>>>>       name = object_get_canonical_path_component(OBJECT(obj));
->>>>>       thread_name = g_strdup_printf("IO %s", name);
->>>>> -    /* TODO: let the further caller handle the error instead of abort() here */
->>>>> -    qemu_thread_create(&iothread->thread, thread_name, iothread_run,
->>>>> -                       iothread, QEMU_THREAD_JOINABLE, &error_abort);
->>>>> +    if (!qemu_thread_create(&iothread->thread, thread_name, iothread_run,
->>>>> +                            iothread, QEMU_THREAD_JOINABLE, errp)) {
->>>>> +        g_free(thread_name);
->>>>> +        g_free(name);
->>>> I suspect you're missing cleanup here:
->>>>
->>>>             qemu_cond_destroy(&iothread->init_done_cond);
->>>>             qemu_mutex_destroy(&iothread->init_done_lock);
->>> I remember I checked the code, when ucc->complete() fails, there’s a finalize() function to do the destroy.
->> To be specific, the qemu_xxx_destroy() is called by
->>
->> object_unref() => object_finalize() => object_deinit() =>
->> type->instance_finalize(obj); (that is, iothread_instance_finalize).
->>
->> For the iothread_complete(), it is only called in
->> user_creatable_complete() as ucc->complete().
->> I checked the code, when callers of user_creatable_complete() fails,
->> all of them will call
->> object_unref() to call the qemu_xxx_destroy(), except one &error_abort
->> case (e.i. desugar_shm()).
-> I'm not familiar with iothread.c.  But like anyone capable of reading C,
-> I can find out stuff.
->
-> iothread_instance_finalize() guards its cleanups.  In particular, it
-> cleans up ->init_done_cond and init_done_lock only when ->thread_id !=
-> -1.
-Ah, sorry that I overlooked the "if (iothread->thread_id != -1)".
-So embarrassed, and sorry for the trouble.. You are right, and I
-will add the qemu_xxx_destroy() in the next version. ;)
+This patch adds new XenDevice-s: 'xen-disk' and 'xen-cdrom', both derived
+from a common 'xen-block' parent type. These will eventually replace the
+'xen_disk' (note the underscore rather than hyphen) legacy PV backend but
+it is illustrative to build up the implementation incrementally, along with
+the XenBus/XenDevice framework. Subsequent patches will therefore add to
+these devices' implementation as new features are added to the framework.
 
+After this patch has been applied it is possible to instantiate new
+'xen-disk' or 'xen-cdrom' devices with a single 'vdev' parameter, which
+accepts values adhering to the Xen VBD naming scheme [1]. For example, a
+command-line instantiation of a xen-disk can be done with an argument
+similar to the following:
 
-Have a nice day, thanks so much!
-Fei
->
-> iothread_instance_init() initializes ->thread_id = -1.
->
-> iothread_run() sets it to the actual thread ID.
->
-> When iothread_instance_complete() succeeds, it has waited for
-> ->thread_id to become != -1, in the /* Wait for initialization to
-> complete */ loop.
->
-> When it fails, ->thread_id is still -1.
->
-> Therefore, you cannot rely on iothread_instance_finalize() for cleaning
-> up ->init_done_lock and ->init_done_cond on iothread_instance_complete()
-> failure.
->
-> I'm pretty sure you could've figured this out yourself instead of
-> relying on me.
->
-> [...]
+-device xen-disk,vdev=hda
+
+The implementation of the vdev parameter formulates the appropriate VBD
+number for use in the PV protocol.
+
+[1] https://xenbits.xen.org/docs/unstable/man/xen-vbd-interface.7.html
+
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+---
+ MAINTAINERS                |   2 +-
+ hw/block/Makefile.objs     |   1 +
+ hw/block/trace-events      |   8 +
+ hw/block/xen-block.c       | 343 +++++++++++++++++++++++++++++++++++++
+ include/hw/xen/xen-block.h |  73 ++++++++
+ 5 files changed, 426 insertions(+), 1 deletion(-)
+ create mode 100644 hw/block/xen-block.c
+ create mode 100644 include/hw/xen/xen-block.h
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 87f90721b9..7514550c06 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -414,7 +414,7 @@ F: hw/9pfs/xen-9p-backend.c
+ F: hw/char/xen_console.c
+ F: hw/display/xenfb.c
+ F: hw/net/xen_nic.c
+-F: hw/block/xen_*
++F: hw/block/xen*
+ F: hw/xen/
+ F: hw/xenpv/
+ F: hw/i386/xen/
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index 53ce5751ae..f34813a377 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -4,6 +4,7 @@ common-obj-$(CONFIG_SSI_M25P80) += m25p80.o
+ common-obj-$(CONFIG_NAND) += nand.o
+ common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
+ common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
++common-obj-$(CONFIG_XEN) += xen-block.o
+ common-obj-$(CONFIG_XEN) += xen_disk.o
+ common-obj-$(CONFIG_ECC) += ecc.o
+ common-obj-$(CONFIG_ONENAND) += onenand.o
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 335c092450..4afbd62a88 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -127,3 +127,11 @@ xen_disk_init(char *name) "%s"
+ xen_disk_connect(char *name) "%s"
+ xen_disk_disconnect(char *name) "%s"
+ xen_disk_free(char *name) "%s"
++
++# hw/block/xen-block.c
++xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
++xen_block_unrealize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
++xen_disk_realize(void) ""
++xen_disk_unrealize(void) ""
++xen_cdrom_realize(void) ""
++xen_cdrom_unrealize(void) ""
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+new file mode 100644
+index 0000000000..8e78b6a034
+--- /dev/null
++++ b/hw/block/xen-block.c
+@@ -0,0 +1,343 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/cutils.h"
++#include "qapi/error.h"
++#include "qapi/visitor.h"
++#include "hw/hw.h"
++#include "hw/xen/xen-block.h"
++#include "trace.h"
++
++static void xen_block_unrealize(XenDevice *xendev, Error **errp)
++{
++    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
++    XenBlockDeviceClass *blockdev_class =
++        XEN_BLOCK_DEVICE_GET_CLASS(xendev);
++    const char *type = object_get_typename(OBJECT(blockdev));
++    XenBlockVdev *vdev = &blockdev->props.vdev;
++
++    if (vdev->type == XEN_BLOCK_VDEV_TYPE_INVALID) {
++        return;
++    }
++
++    trace_xen_block_unrealize(type, vdev->disk, vdev->partition);
++
++    if (blockdev_class->unrealize) {
++        blockdev_class->unrealize(blockdev, errp);
++    }
++}
++
++static void xen_block_realize(XenDevice *xendev, Error **errp)
++{
++    XenBlockDevice *blockdev = XEN_BLOCK_DEVICE(xendev);
++    XenBlockDeviceClass *blockdev_class =
++        XEN_BLOCK_DEVICE_GET_CLASS(xendev);
++    const char *type = object_get_typename(OBJECT(blockdev));
++    XenBlockVdev *vdev = &blockdev->props.vdev;
++    Error *local_err = NULL;
++
++    if (vdev->type == XEN_BLOCK_VDEV_TYPE_INVALID) {
++        error_setg(errp, "vdev property not set");
++        return;
++    }
++
++    trace_xen_block_realize(type, vdev->disk, vdev->partition);
++
++    if (blockdev_class->realize) {
++        blockdev_class->realize(blockdev, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++        }
++    }
++}
++
++static char *disk_to_vbd_name(unsigned int disk)
++{
++    char *name, *prefix = (disk >= 26) ?
++        disk_to_vbd_name((disk / 26) - 1) : g_strdup("");
++
++    name = g_strdup_printf("%s%c", prefix, 'a' + disk % 26);
++    g_free(prefix);
++
++    return name;
++}
++
++static void xen_block_get_vdev(Object *obj, Visitor *v, const char *name,
++                               void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    XenBlockVdev *vdev = qdev_get_prop_ptr(dev, prop);
++    char *str;
++
++    switch (vdev->type) {
++    case XEN_BLOCK_VDEV_TYPE_DP:
++        str = g_strdup_printf("d%lup%lu", vdev->disk, vdev->partition);
++        break;
++
++    case XEN_BLOCK_VDEV_TYPE_XVD:
++    case XEN_BLOCK_VDEV_TYPE_HD:
++    case XEN_BLOCK_VDEV_TYPE_SD: {
++        char *name = disk_to_vbd_name(vdev->disk);
++
++        str = g_strdup_printf("%s%s%lu",
++                              (vdev->type == XEN_BLOCK_VDEV_TYPE_XVD) ?
++                              "xvd" :
++                              (vdev->type == XEN_BLOCK_VDEV_TYPE_HD) ?
++                              "hd" :
++                              "sd",
++                              name, vdev->partition);
++        g_free(name);
++        break;
++    }
++    default:
++        error_setg(errp, "invalid vdev type");
++        return;
++    }
++
++    visit_type_str(v, name, &str, errp);
++    g_free(str);
++}
++
++static unsigned int vbd_name_to_disk(const char *name, const char **endp)
++{
++    unsigned int disk = 0;
++
++    while (*name != '\0') {
++        if (!g_ascii_isalpha(*name) || !g_ascii_islower(*name)) {
++            break;
++        }
++
++        disk *= 26;
++        disk += *name++ - 'a' + 1;
++    }
++    *endp = name;
++
++    return disk - 1;
++}
++
++static void xen_block_set_vdev(Object *obj, Visitor *v, const char *name,
++                               void *opaque, Error **errp)
++{
++    DeviceState *dev = DEVICE(obj);
++    Property *prop = opaque;
++    XenBlockVdev *vdev = qdev_get_prop_ptr(dev, prop);
++    Error *local_err = NULL;
++    char *str, *p;
++    const char *end;
++
++    if (dev->realized) {
++        qdev_prop_set_after_realize(dev, name, errp);
++        return;
++    }
++
++    visit_type_str(v, name, &str, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    p = strchr(str, 'd');
++    if (!p) {
++        goto invalid;
++    }
++
++    *p++ = '\0';
++    if (*str == '\0') {
++        vdev->type = XEN_BLOCK_VDEV_TYPE_DP;
++    } else if (strcmp(str, "xv") == 0) {
++        vdev->type = XEN_BLOCK_VDEV_TYPE_XVD;
++    } else if (strcmp(str, "h") == 0) {
++        vdev->type = XEN_BLOCK_VDEV_TYPE_HD;
++    } else if (strcmp(str, "s") == 0) {
++        vdev->type = XEN_BLOCK_VDEV_TYPE_SD;
++    } else {
++        goto invalid;
++    }
++
++    if (vdev->type == XEN_BLOCK_VDEV_TYPE_DP) {
++        if (qemu_strtoul(p, &end, 10, &vdev->disk)) {
++            goto invalid;
++        }
++
++        if (*end == 'p') {
++            p = (char *) ++end;
++            if (*end == '\0') {
++                goto invalid;
++            }
++        }
++    } else {
++        vdev->disk = vbd_name_to_disk(p, &end);
++    }
++
++    if (*end != '\0') {
++        p = (char *)end;
++
++        if (qemu_strtoul(p, &end, 10, &vdev->partition)) {
++            goto invalid;
++        }
++
++        if (*end != '\0') {
++            goto invalid;
++        }
++    } else {
++        vdev->partition = 0;
++    }
++
++    switch (vdev->type) {
++    case XEN_BLOCK_VDEV_TYPE_DP:
++    case XEN_BLOCK_VDEV_TYPE_XVD:
++        if (vdev->disk < (1 << 4) && vdev->partition < (1 << 4)) {
++            vdev->number = (202 << 8) | (vdev->disk << 4) |
++                vdev->partition;
++        } else if (vdev->disk < (1 << 20) && vdev->partition < (1 << 8)) {
++            vdev->number = (1 << 28) | (vdev->disk << 8) |
++                vdev->partition;
++        } else {
++            goto invalid;
++        }
++        break;
++
++    case XEN_BLOCK_VDEV_TYPE_HD:
++        if ((vdev->disk == 0 || vdev->disk == 1) &&
++            vdev->partition < (1 << 6)) {
++            vdev->number = (3 << 8) | (vdev->disk << 6) | vdev->partition;
++        } else if ((vdev->disk == 2 || vdev->disk == 3) &&
++                   vdev->partition < (1 << 6)) {
++            vdev->number = (22 << 8) | ((vdev->disk - 2) << 6) |
++                vdev->partition;
++        } else {
++            goto invalid;
++        }
++        break;
++
++    case XEN_BLOCK_VDEV_TYPE_SD:
++        if (vdev->disk < (1 << 4) && vdev->partition < (1 << 4)) {
++            vdev->number = (8 << 8) | (vdev->disk << 4) | vdev->partition;
++        } else {
++            goto invalid;
++        }
++        break;
++
++    default:
++        goto invalid;
++    }
++
++    g_free(str);
++    return;
++
++invalid:
++    error_setg(errp, "invalid virtual disk specifier");
++
++    vdev->type = XEN_BLOCK_VDEV_TYPE_INVALID;
++    g_free(str);
++}
++
++/*
++ * This property deals with 'vdev' names adhering to the Xen VBD naming
++ * scheme described in:
++ *
++ * https://xenbits.xen.org/docs/unstable/man/xen-vbd-interface.7.html
++ */
++const PropertyInfo xen_block_prop_vdev = {
++    .name  = "str",
++    .description = "Virtual Disk specifier: d*p*/xvd*/hd*/sd*",
++    .get = xen_block_get_vdev,
++    .set = xen_block_set_vdev,
++};
++
++static Property xen_block_props[] = {
++    DEFINE_PROP("vdev", XenBlockDevice, props.vdev,
++                xen_block_prop_vdev, XenBlockVdev),
++    DEFINE_PROP_END_OF_LIST()
++};
++
++static void xen_block_class_init(ObjectClass *class, void *data)
++{
++    DeviceClass *dev_class = DEVICE_CLASS(class);
++    XenDeviceClass *xendev_class = XEN_DEVICE_CLASS(class);
++
++    xendev_class->realize = xen_block_realize;
++    xendev_class->unrealize = xen_block_unrealize;
++
++    dev_class->props = xen_block_props;
++}
++
++static const TypeInfo xen_block_type_info = {
++    .name = TYPE_XEN_BLOCK_DEVICE,
++    .parent = TYPE_XEN_DEVICE,
++    .instance_size = sizeof(XenBlockDevice),
++    .abstract = true,
++    .class_size = sizeof(XenBlockDeviceClass),
++    .class_init = xen_block_class_init,
++};
++
++static void xen_disk_unrealize(XenBlockDevice *blockdev, Error **errp)
++{
++    trace_xen_disk_unrealize();
++}
++
++static void xen_disk_realize(XenBlockDevice *blockdev, Error **errp)
++{
++    trace_xen_disk_realize();
++}
++
++static void xen_disk_class_init(ObjectClass *class, void *data)
++{
++    DeviceClass *dev_class = DEVICE_CLASS(class);
++    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
++
++    blockdev_class->realize = xen_disk_realize;
++    blockdev_class->unrealize = xen_disk_unrealize;
++
++    dev_class->desc = "Xen Disk Device";
++}
++
++static const TypeInfo xen_disk_type_info = {
++    .name = TYPE_XEN_DISK_DEVICE,
++    .parent = TYPE_XEN_BLOCK_DEVICE,
++    .instance_size = sizeof(XenDiskDevice),
++    .class_init = xen_disk_class_init,
++};
++
++static void xen_cdrom_unrealize(XenBlockDevice *blockdev, Error **errp)
++{
++    trace_xen_cdrom_unrealize();
++}
++
++static void xen_cdrom_realize(XenBlockDevice *blockdev, Error **errp)
++{
++    trace_xen_cdrom_realize();
++}
++
++static void xen_cdrom_class_init(ObjectClass *class, void *data)
++{
++    DeviceClass *dev_class = DEVICE_CLASS(class);
++    XenBlockDeviceClass *blockdev_class = XEN_BLOCK_DEVICE_CLASS(class);
++
++    blockdev_class->realize = xen_cdrom_realize;
++    blockdev_class->unrealize = xen_cdrom_unrealize;
++
++    dev_class->desc = "Xen CD-ROM Device";
++}
++
++static const TypeInfo xen_cdrom_type_info = {
++    .name = TYPE_XEN_CDROM_DEVICE,
++    .parent = TYPE_XEN_BLOCK_DEVICE,
++    .instance_size = sizeof(XenCDRomDevice),
++    .class_init = xen_cdrom_class_init,
++};
++
++static void xen_block_register_types(void)
++{
++    type_register_static(&xen_block_type_info);
++    type_register_static(&xen_disk_type_info);
++    type_register_static(&xen_cdrom_type_info);
++}
++
++type_init(xen_block_register_types)
+diff --git a/include/hw/xen/xen-block.h b/include/hw/xen/xen-block.h
+new file mode 100644
+index 0000000000..29413256e9
+--- /dev/null
++++ b/include/hw/xen/xen-block.h
+@@ -0,0 +1,73 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_XEN_BLOCK_H
++#define HW_XEN_BLOCK_H
++
++#include "hw/xen/xen-bus.h"
++
++typedef enum XenBlockVdevType {
++    XEN_BLOCK_VDEV_TYPE_INVALID,
++    XEN_BLOCK_VDEV_TYPE_DP,
++    XEN_BLOCK_VDEV_TYPE_XVD,
++    XEN_BLOCK_VDEV_TYPE_HD,
++    XEN_BLOCK_VDEV_TYPE_SD,
++    XEN_BLOCK_VDEV_TYPE__MAX
++} XenBlockVdevType;
++
++typedef struct XenBlockVdev {
++    XenBlockVdevType type;
++    unsigned long disk;
++    unsigned long partition;
++    unsigned long number;
++} XenBlockVdev;
++
++typedef struct XenBlockProperties {
++    XenBlockVdev vdev;
++} XenBlockProperties;
++
++typedef struct XenBlockDevice {
++    XenDevice xendev;
++    XenBlockProperties props;
++} XenBlockDevice;
++
++typedef void (*XenBlockDeviceRealize)(XenBlockDevice *blockdev, Error **errp);
++typedef void (*XenBlockDeviceUnrealize)(XenBlockDevice *blockdev, Error **errp);
++
++typedef struct XenBlockDeviceClass {
++    /*< private >*/
++    XenDeviceClass parent_class;
++    /*< public >*/
++    XenBlockDeviceRealize realize;
++    XenBlockDeviceUnrealize unrealize;
++} XenBlockDeviceClass;
++
++#define TYPE_XEN_BLOCK_DEVICE  "xen-block"
++#define XEN_BLOCK_DEVICE(obj) \
++     OBJECT_CHECK(XenBlockDevice, (obj), TYPE_XEN_BLOCK_DEVICE)
++#define XEN_BLOCK_DEVICE_CLASS(class) \
++     OBJECT_CLASS_CHECK(XenBlockDeviceClass, (class), TYPE_XEN_BLOCK_DEVICE)
++#define XEN_BLOCK_DEVICE_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(XenBlockDeviceClass, (obj), TYPE_XEN_BLOCK_DEVICE)
++
++typedef struct XenDiskDevice {
++    XenBlockDevice blockdev;
++} XenDiskDevice;
++
++#define TYPE_XEN_DISK_DEVICE  "xen-disk"
++#define XEN_DISK_DEVICE(obj) \
++     OBJECT_CHECK(XenDiskDevice, (obj), TYPE_XEN_DISK_DEVICE)
++
++typedef struct XenCDRomDevice {
++    XenBlockDevice blockdev;
++} XenCDRomDevice;
++
++#define TYPE_XEN_CDROM_DEVICE  "xen-cdrom"
++#define XEN_CDROM_DEVICE(obj) \
++     OBJECT_CHECK(XenCDRomDevice, (obj), TYPE_XEN_CDROM_DEVICE)
++
++#endif /* HW_XEN_BLOCK_H */
+-- 
+Anthony PERARD
