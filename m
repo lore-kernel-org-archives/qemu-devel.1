@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51773)
+Received: from eggs.gnu.org ([209.51.188.92]:51739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkc-0003PE-MG
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkc-0003Os-Av
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkb-0006nQ-6G
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipka-0006ml-Pe
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:10 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60560)
+Received: from hera.aquilenet.fr ([185.233.100.1]:60538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipka-0006bz-RN
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:09 -0500
+	id 1gipka-0006at-GK
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:08 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:03:23 +0100
-Message-Id: <20190114000326.29847-63-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:03:11 +0100
+Message-Id: <20190114000326.29847-51-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 62/65] slirp: set G_LOG_DOMAIN
+Subject: [Qemu-devel] [PULL 50/65] slirp: replace a fprintf with g_critical()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +32,27 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-We are moving to g_log() facilities to log errors and probably debug
-messages too. Let's have the "Slirp" prefix on messages slirp produces.
+Reduce dependency on QEMU. QEMU could use a custom glib log handler if
+it wants to redirect/filter it.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/Makefile.objs | 2 ++
- 1 file changed, 2 insertions(+)
+ slirp/socket.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/slirp/Makefile.objs b/slirp/Makefile.objs
-index 21653f69e9..959558c732 100644
---- a/slirp/Makefile.objs
-+++ b/slirp/Makefile.objs
-@@ -28,3 +28,5 @@ slirp.mo-objs =3D \
- 	udp.o \
- 	udp6.o \
- 	$(NULL)
-+
-+slirp.mo-cflags =3D -DG_LOG_DOMAIN=3D\"Slirp\"
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 677fd20c9d..08a065f6a7 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -285,7 +285,7 @@ err:
+=20
+     sofcantrcvmore(so);
+     tcp_sockclosed(sototcpcb(so));
+-    fprintf(stderr, "soreadbuf buffer to small");
++    g_critical("soreadbuf buffer too small");
+     return -1;
+ }
+=20
 --=20
 2.20.1
