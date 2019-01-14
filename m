@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37288)
+Received: from eggs.gnu.org ([209.51.188.92]:37282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gj0GW-0000QB-P0
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gj0GW-0000Q3-Kc
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:18:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gj0GS-0000vl-G5
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:18:48 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gj0GS-0000vk-G2
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:18:46 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 14 Jan 2019 11:18:30 +0000
-Message-ID: <20190114111744.113188-10-anton.nefedov@virtuozzo.com>
-References: <20190114111744.113188-1-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20190114111744.113188-1-anton.nefedov@virtuozzo.com>
+Date: Mon, 14 Jan 2019 11:18:22 +0000
+Message-ID: <20190114111744.113188-1-anton.nefedov@virtuozzo.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v12 09/10] qcow2: skip writing zero buffers to
- empty COW areas
+Subject: [Qemu-devel] [PATCH v12 00/10] qcow2: cluster space preallocation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,284 +24,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-If COW areas of the newly allocated clusters are zeroes on the backing imag=
-e,
-efficient bdrv_write_zeroes(flags=3DBDRV_REQ_ALLOCATE) can be used on the w=
-hole
-cluster instead of writing explicit zero buffers later in perform_cow().
+new in v12:
+   - patch 9: pre-write overlap check added
 
-iotest 060:
-write to the discarded cluster does not trigger COW anymore.
-Use a backing image instead.
+v11: http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg04342.html
+    - patch 4, 9: fixed commentary format
+    - patch 4: removed one hunk with a dead check
+    - patch 5: added commentary to BDRV_REQ_ALLOCATE definition
+    - new auxiliary patch 6 for the following patch-7 change:
+    - patch 7: reset BDRV_REQ_ALLOCATE from supported flag if CONFIG_FALLOC=
+ATE
+               is false
+    - patch 9: add commentary about missing qcow2_pre_write_overlap_check()=
+.
+               Omit redundant changes in the test 060.
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+v10: http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg00121.html
+    - patches 1-3,6,7: rebase after REQ_WRITE_UNCHANGED
+    - patch 3: drop supported_zero_flags. My bad, no write_zeroes in quorum=
+.
+    - patch 4: almost trivial rebase. RB-tags not stripped.
+               Choose another constant for BDRV_REQ_ALLOCATE
+    - patch 5: rebase. Instead of marking REQ_ALLOCATE serialising, accompa=
+ny
+               it with REQ_SERIALISING.
+    - patch 7: add symmetric copy-on-read change
+    - patch 8: trivial rebase. RB-tags not stripped.
+
+----
+
+This pull request is to start to improve a few performance points of
+qcow2 format:
+
+  1. non cluster-aligned write requests (to unallocated clusters) explicitl=
+y
+     pad data with zeroes if there is no backing data.
+     Resulting increase in ops number and potential cluster fragmentation
+     (on the host file) is already solved by:
+       ee22a9d qcow2: Merge the writing of the COW regions with the guest d=
+ata
+     However, in case of zero COW regions, that can be avoided at all
+     but the whole clusters are preallocated and zeroed in a single
+     efficient write_zeroes() operation
+
+  2. moreover, efficient write_zeroes() operation can be used to preallocat=
+e
+     space megabytes (*configurable number) ahead which gives noticeable
+     improvement on some storage types (e.g. distributed storage)
+     where the space allocation operation might be expensive)
+     (Not included in this patchset since v6).
+
+  3. this will also allow to enable simultaneous writes to the same unalloc=
+ated
+     cluster after the space has been allocated & zeroed but before
+     the first data is written and the cluster is linked to L2.
+     (Not included in this patchset).
+
+Efficient write_zeroes usually implies that the blocks are not actually
+written to but only reserved and marked as zeroed by the storage.
+In this patchset, file-posix driver is marked as supporting this operation
+if it supports (/configured to support) fallocate() operation.
+
+Existing bdrv_write_zeroes() falls back to writing zero buffers if
+write_zeroes is not supported by the driver.
+A new flag (BDRV_REQ_ALLOCATE) is introduced to avoid that but return ENOTS=
+UP.
+Such allocate requests are also implemented to possibly overlap with the
+other requests. No wait is performed but an error returned in such case as =
+well.
+So the operation should be considered advisory and a fallback scenario stil=
+l
+handled by the caller (in this case, qcow2 driver).
+
+simple perf test:
+
+  qemu-img create -f qcow2 test.img 4G && \
+  qemu-img bench -c $((1024*1024)) -f qcow2 -n -s 4k -t none -w test.img
+
+test results (seconds):
+
+    +-----------+-------+------+-------+------+------+
+    |   file    |    before    |     after    | gain |
+    +-----------+-------+------+-------+------+------+
+    |    ssd    |      61.153  |      36.313  |  41% |
+    |    hdd    |     112.676  |     122.056  |  -8% |
+    +-----------+--------------+--------------+------+
+
+Anton Nefedov (10):
+  mirror: inherit supported write/zero flags
+  blkverify: set supported write/zero flags
+  quorum: set supported write flags
+  block: introduce BDRV_REQ_ALLOCATE flag
+  block: treat BDRV_REQ_ALLOCATE as serialising
+  file-posix: reset fallocate-related flags without CONFIG_FALLOCATE*
+  file-posix: support BDRV_REQ_ALLOCATE
+  block: support BDRV_REQ_ALLOCATE in passthrough drivers
+  qcow2: skip writing zero buffers to empty COW areas
+  iotest 134: test cluster-misaligned encrypted write
+
  qapi/block-core.json       |  4 +-
  block/qcow2.h              |  6 +++
+ include/block/block.h      | 13 +++++-
+ include/block/block_int.h  |  3 +-
+ block/blkdebug.c           |  2 +-
+ block/blkverify.c          | 10 ++++-
+ block/copy-on-read.c       |  4 +-
+ block/file-posix.c         | 16 +++++--
+ block/io.c                 | 45 +++++++++++++++----
+ block/mirror.c             |  8 +++-
  block/qcow2-cluster.c      |  2 +-
  block/qcow2.c              | 91 +++++++++++++++++++++++++++++++++++++-
+ block/quorum.c             | 19 +++++++-
+ block/raw-format.c         |  2 +-
  block/trace-events         |  1 +
  tests/qemu-iotests/060     |  7 ++-
  tests/qemu-iotests/060.out |  5 ++-
- 7 files changed, 110 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/134     |  9 ++++
+ tests/qemu-iotests/134.out | 10 +++++
+ 19 files changed, 229 insertions(+), 28 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 762000f31f..204528b3f6 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3009,6 +3009,8 @@
- #
- # @cor_write: a write due to copy-on-read (since 2.11)
- #
-+# @cluster_alloc_space: an allocation of file space for a cluster (since 4=
-.0)
-+#
- # Since: 2.9
- ##
- { 'enum': 'BlkdebugEvent', 'prefix': 'BLKDBG',
-@@ -3027,7 +3029,7 @@
-             'pwritev_rmw_tail', 'pwritev_rmw_after_tail', 'pwritev',
-             'pwritev_zero', 'pwritev_done', 'empty_image_prepare',
-             'l1_shrink_write_table', 'l1_shrink_free_l2_clusters',
--            'cor_write'] }
-+            'cor_write', 'cluster_alloc_space'] }
-=20
- ##
- # @BlkdebugInjectErrorOptions:
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 438a1dee9e..dad4b1c7ca 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -389,6 +389,12 @@ typedef struct QCowL2Meta
-      */
-     Qcow2COWRegion cow_end;
-=20
-+    /*
-+     * Indicates that COW regions are already handled and do not require
-+     * any more processing.
-+     */
-+    bool skip_cow;
-+
-     /**
-      * The I/O vector with the data from the actual guest write request.
-      * If non-NULL, this is meant to be merged together with the data
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 30eca26c47..e5f936a82c 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -806,7 +806,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta=
- *m)
-     assert(start->offset + start->nb_bytes <=3D end->offset);
-     assert(!m->data_qiov || m->data_qiov->size =3D=3D data_bytes);
-=20
--    if (start->nb_bytes =3D=3D 0 && end->nb_bytes =3D=3D 0) {
-+    if ((start->nb_bytes =3D=3D 0 && end->nb_bytes =3D=3D 0) || m->skip_co=
-w) {
-         return 0;
-     }
-=20
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4897abae5e..05a7cbebbd 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2021,6 +2021,11 @@ static bool merge_cow(uint64_t offset, unsigned byte=
-s,
-             continue;
-         }
-=20
-+        /* If COW regions are handled already, skip this too */
-+        if (m->skip_cow) {
-+            continue;
-+        }
-+
-         /* The data (middle) region must be immediately after the
-          * start region */
-         if (l2meta_cow_start(m) + m->cow_start.nb_bytes !=3D offset) {
-@@ -2046,6 +2051,79 @@ static bool merge_cow(uint64_t offset, unsigned byte=
-s,
-     return false;
- }
-=20
-+static bool is_unallocated(BlockDriverState *bs, int64_t offset, int64_t b=
-ytes)
-+{
-+    int64_t nr;
-+    return !bytes ||
-+        (!bdrv_is_allocated_above(bs, NULL, offset, bytes, &nr) && nr =3D=
-=3D bytes);
-+}
-+
-+static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
-+{
-+    /*
-+     * This check is designed for optimization shortcut so it must be
-+     * efficient.
-+     * Instead of is_zero(), use is_unallocated() as it is faster (but not
-+     * as accurate and can result in false negatives).
-+     */
-+    return is_unallocated(bs, m->offset + m->cow_start.offset,
-+                          m->cow_start.nb_bytes) &&
-+           is_unallocated(bs, m->offset + m->cow_end.offset,
-+                          m->cow_end.nb_bytes);
-+}
-+
-+static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-+{
-+    BDRVQcow2State *s =3D bs->opaque;
-+    QCowL2Meta *m;
-+
-+    if (!(bs->file->bs->supported_zero_flags & BDRV_REQ_ALLOCATE)) {
-+        return 0;
-+    }
-+
-+    if (bs->encrypted) {
-+        return 0;
-+    }
-+
-+    for (m =3D l2meta; m !=3D NULL; m =3D m->next) {
-+        int ret;
-+
-+        if (!m->cow_start.nb_bytes && !m->cow_end.nb_bytes) {
-+            continue;
-+        }
-+
-+        if (!is_zero_cow(bs, m)) {
-+            continue;
-+        }
-+
-+        /*
-+         * instead of writing zero COW buffers,
-+         * efficiently zero out the whole clusters
-+         */
-+
-+        ret =3D qcow2_pre_write_overlap_check(bs, 0, m->alloc_offset,
-+                                            m->nb_clusters * s->cluster_si=
-ze);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC_SPACE);
-+        ret =3D bdrv_co_pwrite_zeroes(bs->file, m->alloc_offset,
-+                                    m->nb_clusters * s->cluster_size,
-+                                    BDRV_REQ_ALLOCATE);
-+        if (ret < 0) {
-+            if (ret !=3D -ENOTSUP && ret !=3D -EAGAIN) {
-+                return ret;
-+            }
-+            continue;
-+        }
-+
-+        trace_qcow2_skip_cow(qemu_coroutine_self(), m->offset, m->nb_clust=
-ers);
-+        m->skip_cow =3D true;
-+    }
-+    return 0;
-+}
-+
- static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t of=
-fset,
-                                          uint64_t bytes, QEMUIOVector *qio=
-v,
-                                          int flags)
-@@ -2126,24 +2204,33 @@ static coroutine_fn int qcow2_co_pwritev(BlockDrive=
-rState *bs, uint64_t offset,
-             goto fail;
-         }
-=20
-+        qemu_co_mutex_unlock(&s->lock);
-+
-+        ret =3D handle_alloc_space(bs, l2meta);
-+        if (ret < 0) {
-+            qemu_co_mutex_lock(&s->lock);
-+            goto fail;
-+        }
-+
-         /* If we need to do COW, check if it's possible to merge the
-          * writing of the guest data together with that of the COW regions=
-.
-          * If it's not possible (or not necessary) then write the
-          * guest data now. */
-         if (!merge_cow(offset, cur_bytes, &hd_qiov, l2meta)) {
--            qemu_co_mutex_unlock(&s->lock);
-             BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
-             trace_qcow2_writev_data(qemu_coroutine_self(),
-                                     cluster_offset + offset_in_cluster);
-             ret =3D bdrv_co_pwritev(bs->file,
-                                   cluster_offset + offset_in_cluster,
-                                   cur_bytes, &hd_qiov, 0);
--            qemu_co_mutex_lock(&s->lock);
-             if (ret < 0) {
-+                qemu_co_mutex_lock(&s->lock);
-                 goto fail;
-             }
-         }
-=20
-+        qemu_co_mutex_lock(&s->lock);
-+
-         ret =3D qcow2_handle_l2meta(bs, &l2meta, true);
-         if (ret) {
-             goto fail;
-diff --git a/block/trace-events b/block/trace-events
-index 693c14c443..4243c3469a 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -69,6 +69,7 @@ qcow2_writev_done_part(void *co, int cur_bytes) "co %p cu=
-r_bytes %d"
- qcow2_writev_data(void *co, uint64_t offset) "co %p offset 0x%" PRIx64
- qcow2_pwrite_zeroes_start_req(void *co, int64_t offset, int count) "co %p =
-offset 0x%" PRIx64 " count %d"
- qcow2_pwrite_zeroes(void *co, int64_t offset, int count) "co %p offset 0x%=
-" PRIx64 " count %d"
-+qcow2_skip_cow(void *co, uint64_t offset, int nb_clusters) "co %p offset 0=
-x%" PRIx64 " nb_clusters %d"
-=20
- # block/qcow2-cluster.c
- qcow2_alloc_clusters_offset(void *co, uint64_t offset, int bytes) "co %p o=
-ffset 0x%" PRIx64 " bytes %d"
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index af0588ae9a..163fb075ea 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -150,10 +150,15 @@ $QEMU_IO -c "$OPEN_RO" -c "read -P 1 0 512" | _filter=
-_qemu_io
- echo
- echo "=3D=3D=3D Testing overlap while COW is in flight =3D=3D=3D"
- echo
-+BACKING_IMG=3D$TEST_IMG.base
-+TEST_IMG=3D$BACKING_IMG _make_test_img 1G
-+
-+$QEMU_IO -c 'write 0k 64k' "$BACKING_IMG" | _filter_qemu_io
-+
- # compat=3D0.10 is required in order to make the following discard actuall=
-y
- # unallocate the sector rather than make it a zero sector - we want COW, a=
-fter
- # all.
--IMGOPTS=3D'compat=3D0.10' _make_test_img 1G
-+IMGOPTS=3D'compat=3D0.10' _make_test_img -b "$BACKING_IMG" 1G
- # Write two clusters, the second one enforces creation of an L2 table afte=
-r
- # the first data cluster.
- $QEMU_IO -c 'write 0k 64k' -c 'write 512M 64k' "$TEST_IMG" | _filter_qemu_=
-io
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index af623cfd86..afd9212c07 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -97,7 +97,10 @@ read 512/512 bytes at offset 0
-=20
- =3D=3D=3D Testing overlap while COW is in flight =3D=3D=3D
-=20
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D1073741824
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824 backing_fil=
-e=3DTEST_DIR/t.IMGFMT.base
- wrote 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- wrote 65536/65536 bytes at offset 536870912
 --=20
 2.17.1
