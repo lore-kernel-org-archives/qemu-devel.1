@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56675)
+Received: from eggs.gnu.org ([209.51.188.92]:56785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj1V1-0007Vi-92
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:37:52 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gj1V9-0007cO-6y
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:37:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj1Uz-00016i-5a
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:37:51 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40102)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gj1Uv-00014w-BG
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:37:47 -0500
-Received: by mail-oi1-x243.google.com with SMTP id t204so17685444oie.7
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 04:37:44 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1gj1V8-0001Bz-K6
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:37:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gj1V8-0001An-E7
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:37:58 -0500
+Date: Mon, 14 Jan 2019 13:37:53 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190114123753.h6sedkqlswxkikus@sirius.home.kraxel.org>
+References: <20190111093116.17188-1-kraxel@redhat.com>
+	<20190111093116.17188-6-kraxel@redhat.com>
+	<06341f73-6063-8cc3-dc1a-e5022ef2e032@redhat.com>
 MIME-Version: 1.0
-References: <1547468589-17579-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1547468589-17579-1-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Jan 2019 12:37:32 +0000
-Message-ID: <CAFEAcA-6Z2eeB6TEUVVPBk1pBEyy7vXh-cYfLaa=XEa1iUmzRg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] configure: Only build the s390-ccw bios if
- the compiler supports -march=z900
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <06341f73-6063-8cc3-dc1a-e5022ef2e032@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] [debug] some logging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, intel-gvt-dev@lists.freedesktop.org
 
-On Mon, 14 Jan 2019 at 12:24, Thomas Huth <thuth@redhat.com> wrote:
->
-> We want to build our s390-ccw bios with -march=z900 so that it also
-> works with the oldest s390x CPU that we support with TCG. However,
-> Clang on s390x does not support -march=z900 anymore, so we can not
-> use this compiler to build the s390-ccw bios. Thus add a proper test
-> to the configure script to see whether the compiler is usable.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  configure | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/configure b/configure
-> index 05b7e85..df34974 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5906,7 +5906,10 @@ if test "$cpu" = "ppc64" -a "$targetos" != "Darwin" ; then
->  fi
->
->  if test "$cpu" = "s390x" ; then
-> -  roms="$roms s390-ccw"
-> +  # Only build the s390-ccw bios if the compiler supports -march=z900
-> +  if "$cc" -dumpspecs 2>/dev/null | grep -q "march=z900"; then
-> +    roms="$roms s390-ccw"
-> +  fi
->  fi
+On Fri, Jan 11, 2019 at 09:33:40AM -0600, Eric Blake wrote:
+> On 1/11/19 3:31 AM, Gerd Hoffmann wrote:
+> > ---
+> >  hw/vfio/display.c | 16 ++++++++++++++++
+> >  1 file changed, 16 insertions(+)
+> > 
+> > diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+> > index a3a710b3ee..96b5474243 100644
+> > --- a/hw/vfio/display.c
+> > +++ b/hw/vfio/display.c
+> > @@ -42,6 +42,8 @@ static void vfio_display_edid_link_up(void *opaque)
+> >      VFIOPCIDevice *vdev = opaque;
+> >      VFIODisplay *dpy = vdev->dpy;
+> >  
+> > +    fprintf(stderr, "%s:\n", __func__);
+> 
+> Why fprintf() instead of trace points?
 
-clang doesn't support -dumpspecs at all, so you're implicitly
-saying "not clang" by doing the check this way... If you
-want to check "does the compiler supoprt -march=z900" why
-not do a test compile with that in the compile flags ?
+Easier for temporary stuff.  I don't plan to actually merge this one.
 
-   write_c_skeleton
-   if compile_prog "-march=z900" ""; then
-       roms="$roms s390-ccw"
-   fi
-
-?
-
-(untested)
-
-thanks
--- PMM
+cheers,
+  Gerd
