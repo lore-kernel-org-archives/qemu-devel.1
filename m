@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57751)
+Received: from eggs.gnu.org ([209.51.188.92]:57931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj54g-00042L-5v
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1gj550-0004JO-OS
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:27:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj54f-0005TP-1z
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:54 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190114161525.GA32304@stefanha-x1.localdomain>
-References: <20190109110144.18633-1-stefanha@redhat.com>
-	<w51pnt57slp.fsf@maestria.local.igalia.com>
-	<w51tvifqqlr.fsf@maestria.local.igalia.com>
-	<20190111132416.GI5010@dhcp-200-186.str.redhat.com>
-	<w51pnt3qo27.fsf@maestria.local.igalia.com>
-	<20190114133553.GE7038@stefanha-x1.localdomain>
-	<w51won7480o.fsf@maestria.local.igalia.com>
-	<20190114161525.GA32304@stefanha-x1.localdomain>
-Date: Mon, 14 Jan 2019 17:26:48 +0100
-Message-ID: <w51zhs32ojb.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1gj54z-0005ft-S3
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:27:14 -0500
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 14 Jan 2019 10:25:59 -0600
+Message-Id: <20190114162605.5330-15-eblake@redhat.com>
+In-Reply-To: <20190114162605.5330-1-eblake@redhat.com>
+References: <20190114162605.5330-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
- iothread race
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 14/20] nbd: Forbid nbd-server-stop when server
+ is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +22,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-On Mon 14 Jan 2019 05:15:25 PM CET, Stefan Hajnoczi wrote:
->> > I've been able to reproduce this in an iotest, please see v2 of this
->> > series.
->> 
->> That iotest doesn't crash for me :-?
->
-> Does my iotest pass for you?
+Since we already forbid other nbd-server commands when not
+in the right state, it is unlikely that any caller was relying
+on a second stop to behave as a silent no-op.  Update iotest
+223 to show the improved behavior.
 
-Yes, it does. I'm trying to figure out why because if I run the QMP
-commands by hand then it does crash.
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190111194720.15671-3-eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ blockdev-nbd.c             | 5 +++++
+ tests/qemu-iotests/223     | 2 +-
+ tests/qemu-iotests/223.out | 2 +-
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
-Berto
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 1d170c80b82..ca584919194 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -214,6 +214,11 @@ void qmp_nbd_server_remove(const char *name,
+
+ void qmp_nbd_server_stop(Error **errp)
+ {
++    if (!nbd_server) {
++        error_setg(errp, "NBD server not running");
++        return;
++    }
++
+     nbd_export_close_all();
+
+     nbd_server_free(nbd_server);
+diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
+index 61b46a2f066..a4016091b21 100755
+--- a/tests/qemu-iotests/223
++++ b/tests/qemu-iotests/223
+@@ -172,7 +172,7 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-r=
+emove",
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
+   "arguments":{"name":"n2"}}' "error" # Attempt duplicate clean
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-stop"}' "return"
+-_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-stop"}' "return" # O=
+ops
++_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-stop"}' "error" # Ag=
+ain
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"quit"}' "return"
+
+ # success, all done
+diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
+index e6ede0591cd..8a4d63a4fc2 100644
+--- a/tests/qemu-iotests/223.out
++++ b/tests/qemu-iotests/223.out
+@@ -69,6 +69,6 @@ read 2097152/2097152 bytes at offset 2097152
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "Export 'n2' is not found"}}
+ {"return": {}}
+-{"return": {}}
++{"error": {"class": "GenericError", "desc": "NBD server not running"}}
+ {"return": {}}
+ *** done
+--=20
+2.20.1
