@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34751)
+Received: from eggs.gnu.org ([209.51.188.92]:34797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bj-Us
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6l-0004CR-LD
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0001DI-5N
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:25 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40290)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0001Jb-Qv
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:27 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6h-0001AB-Oq
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
+	id 1gjB6k-0001Hn-KJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:26 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:07 +0100
-Message-Id: <20190114225306.21569-7-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:21 +0100
+Message-Id: <20190114225306.21569-21-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/65] slirp: rename /extra/chardev
+Subject: [Qemu-devel] [PULL 20/65] slirp: remove unused HAVE_SYS_BITYPES_H
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +28,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Now it's only used for the chardev pointer.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.c    | 4 ++--
- slirp/socket.h   | 2 +-
- slirp/tcp_subr.c | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ slirp/slirp.h        | 4 ----
+ slirp/slirp_config.h | 3 ---
+ 2 files changed, 7 deletions(-)
 
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index fac7849195..ab08694e37 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -1088,10 +1088,10 @@ int slirp_add_exec(Slirp *slirp, void *chardev, c=
-onst char *cmdline,
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index 4c3c672ee6..57955a8965 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -19,10 +19,6 @@ typedef char *caddr_t;
+ # endif
+ #endif
 =20
- ssize_t slirp_send(struct socket *so, const void *buf, size_t len, int f=
-lags)
- {
--    if (so->s =3D=3D -1 && so->extra) {
-+    if (so->s =3D=3D -1 && so->chardev) {
-         /* XXX this blocks entire thread. Rewrite to use
-          * qemu_chr_fe_write and background I/O callbacks */
--        qemu_chr_fe_write_all(so->extra, buf, len);
-+        qemu_chr_fe_write_all(so->chardev, buf, len);
-         return len;
-     }
+-#ifdef HAVE_SYS_BITYPES_H
+-# include <sys/bitypes.h>
+-#endif
+-
+ #ifndef _WIN32
+ #include <sys/uio.h>
+ #endif
+diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
+index 2605c4222b..a205dc8c28 100644
+--- a/slirp/slirp_config.h
++++ b/slirp/slirp_config.h
+@@ -23,9 +23,6 @@
+ #define HAVE_SYS_FILIO_H
+ #endif
 =20
-diff --git a/slirp/socket.h b/slirp/socket.h
-index 2f224bc34f..930ed95972 100644
---- a/slirp/socket.h
-+++ b/slirp/socket.h
-@@ -67,7 +67,7 @@ struct socket {
+-/* Define if you have sys/bitypes.h */
+-#undef HAVE_SYS_BITYPES_H
+-
+ /* Define if the machine is big endian */
+ //#undef HOST_WORDS_BIGENDIAN
 =20
-   struct sbuf so_rcv;		/* Receive buffer */
-   struct sbuf so_snd;		/* Send buffer */
--  void * extra;			/* Extra pointer */
-+  void * chardev;
- };
-=20
-=20
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index fd7521854e..4b40850c7a 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -961,7 +961,7 @@ int tcp_ctl(struct socket *so)
-                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
-                 if (ex_ptr->ex_chardev) {
-                     so->s =3D -1;
--                    so->extra =3D ex_ptr->ex_chardev;
-+                    so->chardev =3D ex_ptr->ex_chardev;
-                     return 1;
-                 }
-                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
 --=20
 2.20.1
