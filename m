@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35088)
+Received: from eggs.gnu.org ([209.51.188.92]:35337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj1zI-0005YA-S9
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:09:10 -0500
+	(envelope-from <lifei1214@126.com>) id 1gj20n-0006fC-UJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:10:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj1zI-0007Aq-3E
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:09:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj1zH-0007Af-Tv
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:09:08 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 30D50D7923
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 13:09:07 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Mon, 14 Jan 2019 14:08:29 +0100
-Message-Id: <20190114130829.21790-4-philmd@redhat.com>
-In-Reply-To: <20190114130829.21790-1-philmd@redhat.com>
-References: <20190114130829.21790-1-philmd@redhat.com>
+	(envelope-from <lifei1214@126.com>) id 1gj20m-0007sF-O4
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:10:41 -0500
+Received: from m50-111.126.com ([123.125.50.111]:51086)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lifei1214@126.com>) id 1gj20j-0007jC-F6
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:10:40 -0500
+From: Fei Li <lifei1214@126.com>
+Date: Mon, 14 Jan 2019 21:10:15 +0800
+Message-Id: <20190114131015.52967-1-lifei1214@126.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/3] ui/console: Remove PixelFormat from
- qemu/typedefs.h
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] hw/misc/edu: add msi_uninit() for
+ pci_edu_uninit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Jiri Slaby <jslaby@suse.cz>, shirley17fei@gmail.com
 
-Header files requiring PixelFormat already include "ui/qemu-pixman.h".
+From: Fei Li <shirley17fei@gmail.com>
 
-To clean "qemu/typedefs.h", move the declaration to "ui/qemu-pixman.h"
-(removing the forward declaration).
+Let's supplement the msi_uninit() when failing to realize
+the pci edu device.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reported-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Fei Li <shirley17fei@gmail.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- include/qemu/typedefs.h  |  1 -
- include/ui/console.h     | 10 ----------
- include/ui/qemu-pixman.h | 10 ++++++++++
- 3 files changed, 10 insertions(+), 11 deletions(-)
+ hw/misc/edu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 4cda7343bf..64b8386697 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -67,7 +67,6 @@ typedef struct PCIExpressHost PCIExpressHost;
- typedef struct PCIHostDeviceAddress PCIHostDeviceAddress;
- typedef struct PCIHostState PCIHostState;
- typedef struct PCMachineState PCMachineState;
--typedef struct PixelFormat PixelFormat;
- typedef struct PostcopyDiscardState PostcopyDiscardState;
- typedef struct Property Property;
- typedef struct PropertyInfo PropertyInfo;
-diff --git a/include/ui/console.h b/include/ui/console.h
-index aa9f975544..fef900db76 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -121,16 +121,6 @@ struct QemuConsoleClass {
-=20
- #define QEMU_ALLOCATED_FLAG     0x01
-=20
--struct PixelFormat {
--    uint8_t bits_per_pixel;
--    uint8_t bytes_per_pixel;
--    uint8_t depth; /* color depth in bits */
--    uint32_t rmask, gmask, bmask, amask;
--    uint8_t rshift, gshift, bshift, ashift;
--    uint8_t rmax, gmax, bmax, amax;
--    uint8_t rbits, gbits, bbits, abits;
--};
--
- typedef struct DisplaySurface {
-     pixman_format_code_t format;
-     pixman_image_t *image;
-diff --git a/include/ui/qemu-pixman.h b/include/ui/qemu-pixman.h
-index b7c82d17fc..0668109305 100644
---- a/include/ui/qemu-pixman.h
-+++ b/include/ui/qemu-pixman.h
-@@ -53,6 +53,16 @@
-=20
- /* -------------------------------------------------------------------- =
-*/
-=20
-+typedef struct PixelFormat {
-+    uint8_t bits_per_pixel;
-+    uint8_t bytes_per_pixel;
-+    uint8_t depth; /* color depth in bits */
-+    uint32_t rmask, gmask, bmask, amask;
-+    uint8_t rshift, gshift, bshift, ashift;
-+    uint8_t rmax, gmax, bmax, amax;
-+    uint8_t rbits, gbits, bbits, abits;
-+} PixelFormat;
-+
- PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format);
- pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_end=
-ian);
- pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format);
---=20
-2.17.2
+diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+index cdcf550dd7..ceaf688bfb 100644
+--- a/hw/misc/edu.c
++++ b/hw/misc/edu.c
+@@ -377,6 +377,7 @@ static void pci_edu_uninit(PCIDevice *pdev)
+     qemu_mutex_destroy(&edu->thr_mutex);
+ 
+     timer_del(&edu->dma_timer);
++    msi_uninit(pdev);
+ }
+ 
+ static void edu_obj_uint64(Object *obj, Visitor *v, const char *name,
+-- 
+2.17.2 (Apple Git-113)
