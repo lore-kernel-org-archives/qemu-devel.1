@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59293)
+Received: from eggs.gnu.org ([209.51.188.92]:32805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gizxN-0001wZ-QS
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:59:03 -0500
+	(envelope-from <vkuznets@redhat.com>) id 1gj02q-00065P-WE
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gizxK-0003Fh-1Z
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:59:00 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34692)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gizxH-00037v-JJ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:58:57 -0500
-Received: by mail-wr1-f65.google.com with SMTP id j2so22376599wrw.1
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:58:55 -0800 (PST)
-References: <d2ae859d3d73ec1897d78131e05a6cf6ba6c94b0.1547255794.git.alistair.francis@wdc.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <56d71bbd-e86b-db1c-8d45-7dd229b87081@redhat.com>
-Date: Mon, 14 Jan 2019 11:58:53 +0100
+	(envelope-from <vkuznets@redhat.com>) id 1gj02p-0005x1-UE
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gj02p-0005ZR-Nv
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:39 -0500
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <87y38j3r1c.fsf@vitty.brq.redhat.com>
+References: <20181126135958.20956-1-vkuznets@redhat.com>
+	<c30c335e-ca21-1179-670b-d4506ce14571@redhat.com>
+	<878t1chzj8.fsf@vitty.brq.redhat.com>
+	<20181130183608.GQ18284@habkost.net>
+	<871s6yy9st.fsf@vitty.brq.redhat.com>
+	<20181204180808.GC18284@habkost.net>
+	<875zvpl98t.fsf@vitty.brq.redhat.com>
+	<20181220120544.GL19442@habkost.net>
+	<87y38j3r1c.fsf@vitty.brq.redhat.com>
+Date: Mon, 14 Jan 2019 11:54:30 +0100
+Message-ID: <87h8eb4ihl.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d2ae859d3d73ec1897d78131e05a6cf6ba6c94b0.1547255794.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] riscv: Ensure the kernel start
- address is correctly cast
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] i386/kvm: expose
+ HV_CPUID_ENLIGHTMENT_INFO.EAX and HV_CPUID_NESTED_FEATURES.EAX as feature
+ words
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +35,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "agraf@suse.de" <agraf@suse.de>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Hi Alistair,
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-On 1/12/19 2:17 AM, Alistair Francis wrote:
-> Cast the kernel start address to the target bit length.
-> 
-> This ensures that we calculate the initrd offset to a valid address for
-> the architecture.
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+>
+>> On Wed, Dec 19, 2018 at 06:25:06PM +0100, Vitaly Kuznetsov wrote:
+>>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>> 
+>>> > On Mon, Dec 03, 2018 at 03:17:06PM +0100, Vitaly Kuznetsov wrote:
+>>> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>> > [...]
+>>> >> > But note that we might still be able to move the existing
+>>> >> > "hyperv_*" features to feature_word_info[].feat_names.  We just
+>>> >> > need to keep the same semantics (e.g. enable
+>>> >> > HV_HYPERCALL_AVAILABLE automatically when some features are set).
+>>> >> >
+>>> >> > Maybe we can make some of the feature properties read-only.  This
+>>> >> > way we can give them meaningful names for debugging and error
+>>> >> > messages, even if we don't want to make them configurable
+>>> >> > directly.
+>>> >> 
+>>> >> I'd suggest (if there are no objections of course) we do this separately
+>>> >> from this patch. [...]
+>>> >
+>>> > Agreed.
+>>> >
+>>> 
+>>> Paolo, Eduardo,
+>>> 
+>>> in case there are no concerns here, could you please pick this patch up?
+>>> Thanks!
+>>
+>> Queued, thanks!
+>>
+>> Can you please send the comment you wrote about feat_names as a
+>> follow-up patch?
+>
+> Oops, sorry, I just realized I promissed to send out v2 with it and
+> aparently never did. Will send out a follow-up patch shortly. Thanks!
 
-Can you add an example of the failure symptoms?
+Hey Eduardo,
 
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Suggested-by: Alexander Graf <agraf@suse.de>
-> Reported-by: Alexander Graf <agraf@suse.de>
-> ---
-> v2:
->  - Remove old comment
->  hw/riscv/sifive_e.c | 2 +-
->  hw/riscv/sifive_u.c | 2 +-
->  hw/riscv/spike.c    | 2 +-
->  hw/riscv/virt.c     | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-> index 5d9d65ff29..e5d7fc548e 100644
-> --- a/hw/riscv/sifive_e.c
-> +++ b/hw/riscv/sifive_e.c
-> @@ -74,7 +74,7 @@ static const struct MemmapEntry {
->      [SIFIVE_E_DTIM] =     { 0x80000000,     0x4000 }
->  };
->  
-> -static uint64_t load_kernel(const char *kernel_filename)
-> +static target_ulong load_kernel(const char *kernel_filename)
->  {
->      uint64_t kernel_entry, kernel_high;
+any news about the fate of this patch?
 
-Shouldn't you update load_elf() and co now to take target_ulong
-arguments? This would fix this error generically for all archs.
+(Correcting myself: there was v2 with the comment included:
+https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00355.html
 
->  
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 3bd3b67507..3b3acec377 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -65,7 +65,7 @@ static const struct MemmapEntry {
->  
->  #define GEM_REVISION        0x10070109
->  
-> -static uint64_t load_kernel(const char *kernel_filename)
-> +static target_ulong load_kernel(const char *kernel_filename)
->  {
->      uint64_t kernel_entry, kernel_high;
->  
-> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index 268df04c3c..79cb4c1282 100644
-> --- a/hw/riscv/spike.c
-> +++ b/hw/riscv/spike.c
-> @@ -53,7 +53,7 @@ static const struct MemmapEntry {
->      [SPIKE_DRAM] =     { 0x80000000,        0x0 },
->  };
->  
-> -static uint64_t load_kernel(const char *kernel_filename)
-> +static target_ulong load_kernel(const char *kernel_filename)
->  {
->      uint64_t kernel_entry, kernel_high;
->  
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index e7f0716fb6..648462b18c 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -62,7 +62,7 @@ static const struct MemmapEntry {
->      [VIRT_PCIE_ECAM] =   { 0x30000000,    0x10000000 },
->  };
->  
-> -static uint64_t load_kernel(const char *kernel_filename)
-> +static target_ulong load_kernel(const char *kernel_filename)
->  {
->      uint64_t kernel_entry, kernel_high;
->  
-> 
+but as I sent the follow-up patch you requested separately too:
+https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05463.html
+)
+
+-- 
+Vitaly
