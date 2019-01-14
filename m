@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51086)
+Received: from eggs.gnu.org ([209.51.188.92]:51173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk2-0002v0-UQ
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:38 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk5-0002xZ-Ps
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk1-0006K9-Qe
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:34 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60206)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk3-0006OT-ES
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:37 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:60306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipk1-0006Fl-IO
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:33 -0500
+	id 1gipk2-0006KS-W5
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:35 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:02:27 +0100
-Message-Id: <20190114000326.29847-7-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:02:31 +0100
+Message-Id: <20190114000326.29847-11-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/65] slirp: rename /extra/chardev
+Subject: [Qemu-devel] [PULL 10/65] slirp: replace the poor-man string split
+ with g_strsplit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +33,52 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Now it's only used for the chardev pointer.
+Use the glib function for the work, fix a potential crash on >256 words.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.c    | 4 ++--
- slirp/socket.h   | 2 +-
- slirp/tcp_subr.c | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ slirp/misc.c | 21 +++------------------
+ 1 file changed, 3 insertions(+), 18 deletions(-)
 
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index fac7849195..ab08694e37 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -1088,10 +1088,10 @@ int slirp_add_exec(Slirp *slirp, void *chardev, c=
-onst char *cmdline,
+diff --git a/slirp/misc.c b/slirp/misc.c
+index ce323ef92e..4840187750 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -88,11 +88,8 @@ fork_exec(struct socket *so, const char *ex)
+ 	socklen_t addrlen =3D sizeof(addr);
+         socklen_t csaddrlen =3D sizeof(csaddr);
+ 	int opt;
+-	const char *argv[256];
+-	/* don't want to clobber the original */
+-	char *bptr;
+-	const char *curarg;
+-	int c, i, ret;
++	char **argv;
++	int ret;
+ 	pid_t pid;
 =20
- ssize_t slirp_send(struct socket *so, const void *buf, size_t len, int f=
-lags)
- {
--    if (so->s =3D=3D -1 && so->extra) {
-+    if (so->s =3D=3D -1 && so->chardev) {
-         /* XXX this blocks entire thread. Rewrite to use
-          * qemu_chr_fe_write and background I/O callbacks */
--        qemu_chr_fe_write_all(so->extra, buf, len);
-+        qemu_chr_fe_write_all(so->chardev, buf, len);
-         return len;
-     }
+ 	DEBUG_CALL("fork_exec");
+@@ -156,19 +153,7 @@ fork_exec(struct socket *so, const char *ex)
+ 		for (s =3D getdtablesize() - 1; s >=3D 3; s--)
+ 		   close(s);
 =20
-diff --git a/slirp/socket.h b/slirp/socket.h
-index 2f224bc34f..930ed95972 100644
---- a/slirp/socket.h
-+++ b/slirp/socket.h
-@@ -67,7 +67,7 @@ struct socket {
+-		i =3D 0;
+-		bptr =3D g_strdup(ex); /* No need to free() this */
+-        do {
+-			/* Change the string into argv[] */
+-			curarg =3D bptr;
+-			while (*bptr !=3D ' ' && *bptr !=3D (char)0)
+-			   bptr++;
+-			c =3D *bptr;
+-			*bptr++ =3D (char)0;
+-			argv[i++] =3D g_strdup(curarg);
+-        } while (c);
+-
+-                argv[i] =3D NULL;
++                argv =3D g_strsplit(ex, " ", -1);
+ 		execvp(argv[0], (char **)argv);
 =20
-   struct sbuf so_rcv;		/* Receive buffer */
-   struct sbuf so_snd;		/* Send buffer */
--  void * extra;			/* Extra pointer */
-+  void * chardev;
- };
-=20
-=20
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index fd7521854e..4b40850c7a 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -961,7 +961,7 @@ int tcp_ctl(struct socket *so)
-                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
-                 if (ex_ptr->ex_chardev) {
-                     so->s =3D -1;
--                    so->extra =3D ex_ptr->ex_chardev;
-+                    so->chardev =3D ex_ptr->ex_chardev;
-                     return 1;
-                 }
-                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
+ 		/* Ooops, failed, let's tell the user why */
 --=20
 2.20.1
