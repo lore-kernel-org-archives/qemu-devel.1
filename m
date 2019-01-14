@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35226)
+Received: from eggs.gnu.org ([209.51.188.92]:35310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7I-0004nK-No
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:02 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7N-0004t4-4g
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7H-0001hb-TJ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:00 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40586)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7M-0001mu-8p
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:05 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB7F-0001XM-V3
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:59 -0500
+	id 1gjB7L-0001cA-VY
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:04 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:51 +0100
-Message-Id: <20190114225306.21569-51-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:53:01 +0100
+Message-Id: <20190114225306.21569-61-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 50/65] slirp: replace a fprintf with g_critical()
+Subject: [Qemu-devel] [PULL 60/65] slirp: add clock_get_ns() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +32,131 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Reduce dependency on QEMU. QEMU could use a custom glib log handler if
-it wants to redirect/filter it.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/socket.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/slirp.c      |  6 ++++++
+ slirp/if.c       |  2 +-
+ slirp/ip6_icmp.c |  4 ++--
+ slirp/libslirp.h |  2 ++
+ slirp/slirp.c    | 12 +++++-------
+ 5 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/slirp/socket.c b/slirp/socket.c
-index 677fd20c9d..08a065f6a7 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -285,7 +285,7 @@ err:
-=20
-     sofcantrcvmore(so);
-     tcp_sockclosed(sototcpcb(so));
--    fprintf(stderr, "soreadbuf buffer to small");
-+    g_critical("soreadbuf buffer too small");
-     return -1;
+diff --git a/net/slirp.c b/net/slirp.c
+index 2d5337da04..f98425ee9f 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -146,9 +146,15 @@ static void net_slirp_guest_error(const char *msg)
+     qemu_log_mask(LOG_GUEST_ERROR, "%s", msg);
  }
 =20
++static int64_t net_slirp_clock_get_ns(void)
++{
++    return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
++
+ static const SlirpCb slirp_cb =3D {
+     .output =3D net_slirp_output,
+     .guest_error =3D net_slirp_guest_error,
++    .clock_get_ns =3D net_slirp_clock_get_ns,
+ };
+=20
+ static int net_slirp_init(NetClientState *peer, const char *model,
+diff --git a/slirp/if.c b/slirp/if.c
+index ce4f5fac53..73e3705740 100644
+--- a/slirp/if.c
++++ b/slirp/if.c
+@@ -148,7 +148,7 @@ diddit:
+  */
+ void if_start(Slirp *slirp)
+ {
+-    uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    uint64_t now =3D slirp->cb->clock_get_ns();
+     bool from_batchq =3D false;
+     struct mbuf *ifm, *ifm_next, *ifqt;
+=20
+diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
+index 97304a9dd9..5261baae27 100644
+--- a/slirp/ip6_icmp.c
++++ b/slirp/ip6_icmp.c
+@@ -17,7 +17,7 @@ static void ra_timer_handler(void *opaque)
+ {
+     Slirp *slirp =3D opaque;
+     timer_mod(slirp->ra_timer,
+-              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + NDP_Interval);
++              slirp->cb->clock_get_ns() / SCALE_MS + NDP_Interval);
+     ndp_send_ra(slirp);
+ }
+=20
+@@ -31,7 +31,7 @@ void icmp6_init(Slirp *slirp)
+                                      SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
+                                      ra_timer_handler, slirp);
+     timer_mod(slirp->ra_timer,
+-              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + NDP_Interval);
++              slirp->cb->clock_get_ns() / SCALE_MS + NDP_Interval);
+ }
+=20
+ void icmp6_cleanup(Slirp *slirp)
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index 3e0aa19f4b..4611a7447b 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -15,6 +15,8 @@ typedef struct SlirpCb {
+     void (*output)(void *opaque, const uint8_t *pkt, int pkt_len);
+     /* Print a message for an error due to guest misbehavior.  */
+     void (*guest_error)(const char *msg);
++    /* Return the virtual clock value in nanoseconds */
++    int64_t (*clock_get_ns)(void);
+ } SlirpCb;
+=20
+=20
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 882d28a4de..535c8ad5f9 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -581,15 +581,15 @@ void slirp_pollfds_fill(GArray *pollfds, uint32_t *=
+timeout)
+=20
+ void slirp_pollfds_poll(GArray *pollfds, int select_error)
+ {
+-    Slirp *slirp;
++    Slirp *slirp =3D QTAILQ_FIRST(&slirp_instances);
+     struct socket *so, *so_next;
+     int ret;
+=20
+-    if (QTAILQ_EMPTY(&slirp_instances)) {
++    if (!slirp) {
+         return;
+     }
+=20
+-    curtime =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
++    curtime =3D slirp->cb->clock_get_ns() / SCALE_MS;
+=20
+     QTAILQ_FOREACH(slirp, &slirp_instances, entry) {
+         /*
+@@ -916,8 +916,7 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, =
+struct ethhdr *eh,
+             ifm->resolution_requested =3D true;
+=20
+             /* Expire request and drop outgoing packet after 1 second */
+-            ifm->expiration_date =3D
+-                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 1000000000ULL;
++            ifm->expiration_date =3D slirp->cb->clock_get_ns() + 1000000=
+000ULL;
+         }
+         return 0;
+     } else {
+@@ -943,8 +942,7 @@ static int if_encap6(Slirp *slirp, struct mbuf *ifm, =
+struct ethhdr *eh,
+         if (!ifm->resolution_requested) {
+             ndp_send_ns(slirp, ip6h->ip_dst);
+             ifm->resolution_requested =3D true;
+-            ifm->expiration_date =3D
+-                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 1000000000ULL;
++            ifm->expiration_date =3D slirp->cb->clock_get_ns() + 1000000=
+000ULL;
+         }
+         return 0;
+     } else {
 --=20
 2.20.1
