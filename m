@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51714)
+Received: from eggs.gnu.org ([209.51.188.92]:51728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkb-0003O7-Vq
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:12 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkc-0003Oj-8r
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipka-0006mY-Om
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:09 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:57510)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipka-0006l5-EV
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:10 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57496)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipka-0006ay-Eb
+	id 1gipka-0006ag-3n
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:08 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:03:17 +0100
-Message-Id: <20190114000326.29847-57-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:03:09 +0100
+Message-Id: <20190114000326.29847-49-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 56/65] slirp: use %p for pointers format
+Subject: [Qemu-devel] [PULL 48/65] slirp: rename exec_list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +32,237 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-This fixes some compilation warnings on mingw64.
+This list is not only used to handle command to execute on guest
+connection, it can also redirect to an arbitrary object, such as a
+chardev. Let's rename the struct and the field to "guestfwd".
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/ip6_icmp.c   | 2 +-
- slirp/ip6_input.c  | 2 +-
- slirp/ip6_output.c | 4 ++--
- slirp/udp6.c       | 6 +++---
- 4 files changed, 7 insertions(+), 7 deletions(-)
+ slirp/misc.c      |  6 +++---
+ slirp/misc.h      |  6 +++---
+ slirp/slirp.c     | 18 +++++++++---------
+ slirp/slirp.h     |  2 +-
+ slirp/tcp_input.c |  6 +++---
+ slirp/tcp_subr.c  |  4 ++--
+ 6 files changed, 21 insertions(+), 21 deletions(-)
 
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index 595a62c8d4..bce075913c 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -390,7 +390,7 @@ void icmp6_input(struct mbuf *m)
-     int hlen =3D sizeof(struct ip6);
+diff --git a/slirp/misc.c b/slirp/misc.c
+index 2d092624d3..526cefa0f1 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -36,10 +36,10 @@ remque(void *a)
+   element->qh_rlink =3D NULL;
+ }
 =20
-     DEBUG_CALL("icmp6_input");
--    DEBUG_ARG("m =3D %lx", (long) m);
-+    DEBUG_ARG("m =3D %p", m);
-     DEBUG_ARG("m_len =3D %d", m->m_len);
+-int add_exec(struct ex_list **ex_ptr, void *chardev, const char *cmdline=
+,
++int add_exec(struct gfwd_list **ex_ptr, void *chardev, const char *cmdli=
+ne,
+              struct in_addr addr, int port)
+ {
+-	struct ex_list *tmp_ptr;
++	struct gfwd_list *tmp_ptr;
 =20
-     if (ntohs(ip->ip_pl) < ICMP6_MINLEN) {
-diff --git a/slirp/ip6_input.c b/slirp/ip6_input.c
-index ac2e3ea882..ab656a0a9d 100644
---- a/slirp/ip6_input.c
-+++ b/slirp/ip6_input.c
-@@ -31,7 +31,7 @@ void ip6_input(struct mbuf *m)
+ 	/* First, check if the port is "bound" */
+ 	for (tmp_ptr =3D *ex_ptr; tmp_ptr; tmp_ptr =3D tmp_ptr->ex_next) {
+@@ -49,7 +49,7 @@ int add_exec(struct ex_list **ex_ptr, void *chardev, co=
+nst char *cmdline,
+ 	}
+=20
+ 	tmp_ptr =3D *ex_ptr;
+-	*ex_ptr =3D g_new0(struct ex_list, 1);
++	*ex_ptr =3D g_new0(struct gfwd_list, 1);
+ 	(*ex_ptr)->ex_fport =3D port;
+ 	(*ex_ptr)->ex_addr =3D addr;
+ 	if (chardev) {
+diff --git a/slirp/misc.h b/slirp/misc.h
+index 0bc5e74bc5..1df707c052 100644
+--- a/slirp/misc.h
++++ b/slirp/misc.h
+@@ -8,12 +8,12 @@
+ #ifndef MISC_H
+ #define MISC_H
+=20
+-struct ex_list {
++struct gfwd_list {
+ 	void *ex_chardev;
+ 	struct in_addr ex_addr;		/* Server address */
+ 	int ex_fport;                   /* Port to telnet to */
+ 	char *ex_exec;                  /* Command line of what to exec */
+-	struct ex_list *ex_next;
++	struct gfwd_list *ex_next;
+ };
+=20
+ #define EMU_NONE 0x0
+@@ -51,7 +51,7 @@ struct slirp_quehead {
+=20
+ void slirp_insque(void *, void *);
+ void slirp_remque(void *);
+-int add_exec(struct ex_list **, void *, const char *, struct in_addr, in=
+t);
++int add_exec(struct gfwd_list **, void *, const char *, struct in_addr, =
+int);
+ int fork_exec(struct socket *so, const char *ex);
+=20
+ #endif
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 591dd1fcb4..e860750f72 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -345,9 +345,9 @@ Slirp *slirp_init(int restricted, bool in_enabled, st=
+ruct in_addr vnetwork,
+=20
+ void slirp_cleanup(Slirp *slirp)
+ {
+-    struct ex_list *e, *next;
++    struct gfwd_list *e, *next;
+=20
+-    for (e =3D slirp->exec_list; e; e =3D next) {
++    for (e =3D slirp->guestfwd_list; e; e =3D next) {
+         next =3D e->ex_next;
+         g_free(e->ex_exec);
+         g_free(e);
+@@ -760,7 +760,7 @@ static void arp_input(Slirp *slirp, const uint8_t *pk=
+t, int pkt_len)
+     struct ethhdr *reh =3D (struct ethhdr *)arp_reply;
+     struct slirp_arphdr *rah =3D (struct slirp_arphdr *)(arp_reply + ETH=
+_HLEN);
+     int ar_op;
+-    struct ex_list *ex_ptr;
++    struct gfwd_list *ex_ptr;
+=20
+     if (!slirp->in_enabled) {
+         return;
+@@ -780,7 +780,7 @@ static void arp_input(Slirp *slirp, const uint8_t *pk=
+t, int pkt_len)
+             if (ah->ar_tip =3D=3D slirp->vnameserver_addr.s_addr ||
+                 ah->ar_tip =3D=3D slirp->vhost_addr.s_addr)
+                 goto arp_ok;
+-            for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr-=
+>ex_next) {
++            for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_=
+ptr->ex_next) {
+                 if (ex_ptr->ex_addr.s_addr =3D=3D ah->ar_tip)
+                     goto arp_ok;
+             }
+@@ -1052,7 +1052,7 @@ int slirp_add_exec(Slirp *slirp, void *chardev, con=
+st char *cmdline,
+         return -1;
      }
 =20
-     DEBUG_CALL("ip6_input");
--    DEBUG_ARG("m =3D %lx", (long)m);
-+    DEBUG_ARG("m =3D %p", m);
-     DEBUG_ARG("m_len =3D %d", m->m_len);
+-    return add_exec(&slirp->exec_list, chardev, cmdline, *guest_addr,
++    return add_exec(&slirp->guestfwd_list, chardev, cmdline, *guest_addr=
+,
+                     htons(guest_port));
+ }
 =20
-     if (m->m_len < sizeof(struct ip6)) {
-diff --git a/slirp/ip6_output.c b/slirp/ip6_output.c
-index 762cbfe89c..52c88ad691 100644
---- a/slirp/ip6_output.c
-+++ b/slirp/ip6_output.c
-@@ -19,8 +19,8 @@ int ip6_output(struct socket *so, struct mbuf *m, int f=
-ast)
-     struct ip6 *ip =3D mtod(m, struct ip6 *);
+@@ -1423,9 +1423,9 @@ static const VMStateDescription vmstate_slirp =3D {
+ static void slirp_state_save(QEMUFile *f, void *opaque)
+ {
+     Slirp *slirp =3D opaque;
+-    struct ex_list *ex_ptr;
++    struct gfwd_list *ex_ptr;
 =20
-     DEBUG_CALL("ip6_output");
--    DEBUG_ARG("so =3D %lx", (long)so);
--    DEBUG_ARG("m =3D %lx", (long)m);
-+    DEBUG_ARG("so =3D %p", so);
-+    DEBUG_ARG("m =3D %p", m);
+-    for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_next=
+)
++    for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
+next)
+         if (ex_ptr->ex_chardev) {
+             struct socket *so;
+             so =3D slirp_find_ctl_socket(slirp, ex_ptr->ex_addr,
+@@ -1445,7 +1445,7 @@ static void slirp_state_save(QEMUFile *f, void *opa=
+que)
+ static int slirp_state_load(QEMUFile *f, void *opaque, int version_id)
+ {
+     Slirp *slirp =3D opaque;
+-    struct ex_list *ex_ptr;
++    struct gfwd_list *ex_ptr;
 =20
-     /* Fill IPv6 header */
-     ip->ip_v =3D IP6VERSION;
-diff --git a/slirp/udp6.c b/slirp/udp6.c
-index 473ba1586e..8cdb1892e2 100644
---- a/slirp/udp6.c
-+++ b/slirp/udp6.c
-@@ -20,7 +20,7 @@ void udp6_input(struct mbuf *m)
-     struct sockaddr_in6 lhost;
+     while (qemu_get_byte(f)) {
+         int ret;
+@@ -1460,7 +1460,7 @@ static int slirp_state_load(QEMUFile *f, void *opaq=
+ue, int version_id)
+             slirp->vnetwork_addr.s_addr) {
+             return -EINVAL;
+         }
+-        for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
+next) {
++        for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr-=
+>ex_next) {
+             if (ex_ptr->ex_chardev &&
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr &&
+                 so->so_fport =3D=3D ex_ptr->ex_fport) {
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index fdf397256b..9aa245715d 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -147,7 +147,7 @@ struct Slirp {
+     char client_hostname[33];
 =20
-     DEBUG_CALL("udp6_input");
--    DEBUG_ARG("m =3D %lx", (long)m);
-+    DEBUG_ARG("m =3D %p", m);
+     int restricted;
+-    struct ex_list *exec_list;
++    struct gfwd_list *guestfwd_list;
 =20
-     if (slirp->restricted) {
-         goto bad;
-@@ -144,8 +144,8 @@ int udp6_output(struct socket *so, struct mbuf *m,
-     struct udphdr *uh;
+     /* mbuf states */
+     struct quehead m_freelist;
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index c4d7abf1fa..f1cddce992 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -211,7 +211,7 @@ tcp_input(struct mbuf *m, int iphlen, struct socket *=
+inso, unsigned short af)
+ 	struct sockaddr_storage lhost, fhost;
+ 	struct sockaddr_in *lhost4, *fhost4;
+ 	struct sockaddr_in6 *lhost6, *fhost6;
+-    struct ex_list *ex_ptr;
++    struct gfwd_list *ex_ptr;
+     Slirp *slirp;
 =20
-     DEBUG_CALL("udp6_output");
--    DEBUG_ARG("so =3D %lx", (long)so);
--    DEBUG_ARG("m =3D %lx", (long)m);
-+    DEBUG_ARG("so =3D %p", so);
-+    DEBUG_ARG("m =3D %p", m);
+ 	DEBUG_CALL("tcp_input");
+@@ -394,7 +394,7 @@ findso:
+              * for non-hostfwd connections. These should be dropped, unl=
+ess it
+              * happens to be a guestfwd.
+              */
+-            for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr-=
+>ex_next) {
++            for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_=
+ptr->ex_next) {
+                 if (ex_ptr->ex_fport =3D=3D ti->ti_dport &&
+                     ti->ti_dst.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+                     break;
+@@ -616,7 +616,7 @@ findso:
+ 	    if (so->so_faddr.s_addr !=3D slirp->vhost_addr.s_addr &&
+ 		so->so_faddr.s_addr !=3D slirp->vnameserver_addr.s_addr) {
+ 		/* May be an add exec */
+-		for (ex_ptr =3D slirp->exec_list; ex_ptr;
++		for (ex_ptr =3D slirp->guestfwd_list; ex_ptr;
+ 		     ex_ptr =3D ex_ptr->ex_next) {
+ 		  if(ex_ptr->ex_fport =3D=3D so->so_fport &&
+ 		     so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 00cee73163..3b14684107 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -949,14 +949,14 @@ int tcp_ctl(struct socket *so)
+ {
+     Slirp *slirp =3D so->slirp;
+     struct sbuf *sb =3D &so->so_snd;
+-    struct ex_list *ex_ptr;
++    struct gfwd_list *ex_ptr;
 =20
-     /* adjust for header */
-     m->m_data -=3D sizeof(struct udphdr);
+     DEBUG_CALL("tcp_ctl");
+     DEBUG_ARG("so =3D %p", so);
+=20
+     if (so->so_faddr.s_addr !=3D slirp->vhost_addr.s_addr) {
+         /* Check if it's pty_exec */
+-        for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
+next) {
++        for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr-=
+>ex_next) {
+             if (ex_ptr->ex_fport =3D=3D so->so_fport &&
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+                 if (ex_ptr->ex_chardev) {
 --=20
 2.20.1
