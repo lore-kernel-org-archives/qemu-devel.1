@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34708)
+Received: from eggs.gnu.org ([209.51.188.92]:34728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bd-Uo
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bf-V0
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0001Cc-Qd
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:24 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37260)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0001DD-4A
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:25 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:40284)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6h-0001AJ-HG
+	id 1gjB6h-0001A9-NL
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:11 +0100
-Message-Id: <20190114225306.21569-11-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:12 +0100
+Message-Id: <20190114225306.21569-12-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/65] slirp: replace the poor-man string split
- with g_strsplit()
+Subject: [Qemu-devel] [PULL 11/65] slirp: remove dead declarations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +32,58 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Use the glib function for the work, fix a potential crash on >256 words.
+An overdue cleanup. Remaining declarations could probably be moved in
+other headers, such as slirp.h.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/misc.c | 21 +++------------------
- 1 file changed, 3 insertions(+), 18 deletions(-)
+ slirp/main.h | 29 -----------------------------
+ 1 file changed, 29 deletions(-)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index ce323ef92e..4840187750 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -88,11 +88,8 @@ fork_exec(struct socket *so, const char *ex)
- 	socklen_t addrlen =3D sizeof(addr);
-         socklen_t csaddrlen =3D sizeof(csaddr);
- 	int opt;
--	const char *argv[256];
--	/* don't want to clobber the original */
--	char *bptr;
--	const char *curarg;
--	int c, i, ret;
-+	char **argv;
-+	int ret;
- 	pid_t pid;
+diff --git a/slirp/main.h b/slirp/main.h
+index 90053ce5ec..e04677944f 100644
+--- a/slirp/main.h
++++ b/slirp/main.h
+@@ -12,38 +12,9 @@
+ #include <sys/select.h>
+ #endif
 =20
- 	DEBUG_CALL("fork_exec");
-@@ -156,19 +153,7 @@ fork_exec(struct socket *so, const char *ex)
- 		for (s =3D getdtablesize() - 1; s >=3D 3; s--)
- 		   close(s);
-=20
--		i =3D 0;
--		bptr =3D g_strdup(ex); /* No need to free() this */
--        do {
--			/* Change the string into argv[] */
--			curarg =3D bptr;
--			while (*bptr !=3D ' ' && *bptr !=3D (char)0)
--			   bptr++;
--			c =3D *bptr;
--			*bptr++ =3D (char)0;
--			argv[i++] =3D g_strdup(curarg);
--        } while (c);
+-#define TOWRITEMAX 512
 -
--                argv[i] =3D NULL;
-+                argv =3D g_strsplit(ex, " ", -1);
- 		execvp(argv[0], (char **)argv);
+-extern int slirp_socket;
+-extern int slirp_socket_unit;
+-extern int slirp_socket_port;
+-extern uint32_t slirp_socket_addr;
+-extern char *slirp_socket_passwd;
+-extern int ctty_closed;
+-
+-/*
+- * Get the difference in 2 times from updtim()
+- * Allow for wraparound times, "just in case"
+- * x is the greater of the 2 (current time) and y is
+- * what it's being compared against.
+- */
+-#define TIME_DIFF(x,y) (x)-(y) < 0 ? ~0-(y)+(x) : (x)-(y)
+-
+-extern char *slirp_tty;
+-extern char *exec_shell;
+ extern u_int curtime;
+ extern struct in_addr loopback_addr;
+ extern unsigned long loopback_mask;
+-extern char *username;
+-extern char *socket_path;
+-extern int towrite_max;
+-extern int ppp_exit;
+-extern int tcp_keepintvl;
+-
+-#define PROTO_SLIP 0x1
+-#ifdef USE_PPP
+-#define PROTO_PPP 0x2
+-#endif
 =20
- 		/* Ooops, failed, let's tell the user why */
+ int if_encap(Slirp *slirp, struct mbuf *ifm);
+ ssize_t slirp_send(struct socket *so, const void *buf, size_t len, int f=
+lags);
 --=20
 2.20.1
