@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56406)
+Received: from eggs.gnu.org ([209.51.188.92]:57569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gissq-0005d6-Ea
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:25:53 -0500
+	(envelope-from <joel.stan@gmail.com>) id 1giswY-0006hE-CI
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:29:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1giskk-0006vv-Ey
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:17:32 -0500
-Resent-Message-Id: <E1giskk-0006vv-Ey@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21733)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1giskh-0006tS-0u
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:17:29 -0500
-Message-ID: <154743580351.25737.15317721560138541527@2d170d368aaa>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
+	(envelope-from <joel.stan@gmail.com>) id 1giswW-0004v6-Ss
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 22:29:42 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 13 Jan 2019 19:16:44 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULLv2 00/65] slirp updates
+References: <20190111125759.31577-1-clg@kaod.org>
+In-Reply-To: <20190111125759.31577-1-clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Mon, 14 Jan 2019 14:29:27 +1100
+Message-ID: <CACPK8Xdp8hCYCqWrVQeRuK819-EmNCuWJwF1jGSJfy5RzMUsXg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ftgmac100: implement the new MDIO
+ interface on Aspeed SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +23,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: samuel.thibault@ens-lyon.org
-Cc: fam@euphon.net, qemu-devel@nongnu.org, stefanha@redhat.com, jan.kiszka@siemens.com
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>, Jason Wang <jasowang@redhat.com>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNDAwMDMyNi4yOTg0
-Ny0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
-bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
-ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
-ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1t
-aW5nd0BmZWRvcmEgU0hPV19FTlY9MSBKPTE0Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
-MTE0MDAwMzI2LjI5ODQ3LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZy90ZXN0aW5nLmRv
-Y2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Fri, 11 Jan 2019 at 23:58, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> The PHY behind the MAC of an Aspeed SoC can be controlled using two
+> different MDC/MDIO interfaces. The same registers PHYCR (MAC60) and
+> PHYDATA (MAC64) are involved but they have a different layout.
+>
+> BIT31 of the Feature Register (MAC40) controls which MDC/MDIO
+> interface is active.
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/net/ftgmac100.c | 80 +++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 68 insertions(+), 12 deletions(-)
+
+> @@ -269,9 +281,9 @@ static void phy_reset(FTGMAC100State *s)
+>      s->phy_int =3D 0;
+>  }
+>
+> -static uint32_t do_phy_read(FTGMAC100State *s, int reg)
+> +static uint16_t do_phy_read(FTGMAC100State *s, uint8_t reg)
+>  {
+> -    uint32_t val;
+> +    uint16_t val;
+
+Unrelated?
+
+> @@ -336,7 +348,7 @@ static uint32_t do_phy_read(FTGMAC100State *s, int re=
+g)
+>                         MII_BMCR_FD | MII_BMCR_CTST)
+>  #define MII_ANAR_MASK 0x2d7f
+>
+> -static void do_phy_write(FTGMAC100State *s, int reg, uint32_t val)
+> +static void do_phy_write(FTGMAC100State *s, uint8_t reg, uint16_t val)
+
+Also unrelated?
+
+> @@ -711,14 +771,11 @@ static void ftgmac100_write(void *opaque, hwaddr ad=
+dr,
+>          break;
+>
+>      case FTGMAC100_PHYCR:  /* PHY Device control */
+> -        reg =3D FTGMAC100_PHYCR_REG(value);
+>          s->phycr =3D value;
+> -        if (value & FTGMAC100_PHYCR_MIIWR) {
+> -            do_phy_write(s, reg, s->phydata & 0xffff);
+> -            s->phycr &=3D ~FTGMAC100_PHYCR_MIIWR;
+> +        if (s->revr & FTGMAC100_REVR_NEW_MDIO_INTERFACE) {
+> +            do_phy_new_ctl(s);
+>          } else {
+> -            s->phydata =3D do_phy_read(s, reg) << 16;
+> -            s->phycr &=3D ~FTGMAC100_PHYCR_MIIRD;
+> +            do_phy_ctl(s);
+
+I assume the guest code programs the correct phy mode so this will
+work fine. This change appears to keep the existing default of the old
+mode.
+
+Did you give this a go with both -kernel and a u-boot mtd image?
+
+Looks good to me. If you feel like splitting out the unrelated changes
+do that, but I'm not fussed either way.
+
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+
+Cheers,
+
+Joel
