@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34750)
+Received: from eggs.gnu.org ([209.51.188.92]:34648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bi-Us
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0004BY-7R
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0001Cl-Up
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:25 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40300)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6g-00019f-CD
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37184)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6h-0001AM-HM
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
+	id 1gjB6g-000156-2S
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:22 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:14 +0100
-Message-Id: <20190114225306.21569-14-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:06 +0100
+Message-Id: <20190114225306.21569-6-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/65] slirp: move socket pair creation in
- helper function
+Subject: [Qemu-devel] [PULL 05/65] slirp: remove unused EMU_RSH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,206 +32,73 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Originally, the patch was fixing a bunch of issues, but Peter beat me
-to it with earlier commit "slirp: fork_exec(): create and connect
-child socket before fork()".
+EMU_RSH handling was dropped in commit
+0d62c4cfe21752df4c1d6e2c2398f15d5eaa794a.
 
-Factor out socket pair creation, to simplify the fork_exec() code.
-Use the name socketpair_with_oob() since the code is actually similar
-to what socketpair() would do, except that it uses TCP sockets, for
-SLIRP to be able to call send with MSG_OOB (since SO_OOBINLINE is set,
-this could probably be faked instead on regular unix sockets though).
+The assignment, and subsequent free() of ex_ptr->ex_exec to so->extra
+looks unsafe (double free is likely to occur).
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/misc.c | 142 +++++++++++++++++++++++++--------------------------
- 1 file changed, 71 insertions(+), 71 deletions(-)
+ slirp/misc.h     | 1 -
+ slirp/slirp.c    | 2 --
+ slirp/socket.c   | 4 ----
+ slirp/tcp_subr.c | 1 -
+ 4 files changed, 8 deletions(-)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 4840187750..7362e14339 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -73,85 +73,92 @@ fork_exec(struct socket *so, const char *ex)
+diff --git a/slirp/misc.h b/slirp/misc.h
+index 64ca88c3b7..94829722cd 100644
+--- a/slirp/misc.h
++++ b/slirp/misc.h
+@@ -26,7 +26,6 @@ struct ex_list {
+ #define EMU_REALAUDIO 0x5
+ #define EMU_RLOGIN 0x6
+ #define EMU_IDENT 0x7
+-#define EMU_RSH 0x8
 =20
- #else
+ #define EMU_NOCONNECT 0x10	/* Don't connect */
 =20
--/*
-- * XXX This is ugly
-- * We create and bind a socket, then fork off to another
-- * process, which connects to this socket, after which we
-- * exec the wanted program.  If something (strange) happens,
-- * the accept() call could block us forever.
-- */
-+static int
-+slirp_socketpair_with_oob(int sv[2])
-+{
-+    struct sockaddr_in addr =3D {
-+        .sin_family =3D AF_INET,
-+        .sin_port =3D 0,
-+        .sin_addr.s_addr =3D INADDR_ANY,
-+    };
-+    socklen_t addrlen =3D sizeof(addr);
-+    int ret, s;
-+
-+    sv[1] =3D -1;
-+    s =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
-+    if (s < 0 || bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
-+        listen(s, 1) < 0 ||
-+        getsockname(s, (struct sockaddr *)&addr, &addrlen) < 0) {
-+        goto err;
-+    }
-+
-+    sv[1] =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
-+    if (sv[1] < 0) {
-+        goto err;
-+    }
-+    /*
-+     * This connect won't block because we've already listen()ed on
-+     * the server end (even though we won't accept() the connection
-+     * until later on).
-+     */
-+    do {
-+        ret =3D connect(sv[1], (struct sockaddr *)&addr, addrlen);
-+    } while (ret < 0 && errno =3D=3D EINTR);
-+    if (ret < 0) {
-+        goto err;
-+    }
-+
-+    do {
-+        sv[0] =3D accept(s, (struct sockaddr *)&addr, &addrlen);
-+    } while (sv[0] < 0 && errno =3D=3D EINTR);
-+    if (sv[0] < 0) {
-+        goto err;
-+    }
-+
-+    closesocket(s);
-+    return 0;
-+
-+err:
-+    error_report("Error: slirp_socketpair(): %s", strerror(errno));
-+    if (s >=3D 0) {
-+        closesocket(s);
-+    }
-+    if (sv[1] >=3D 0) {
-+        closesocket(sv[1]);
-+    }
-+    return -1;
-+}
-+
- int
- fork_exec(struct socket *so, const char *ex)
- {
--        int s, cs;
--        struct sockaddr_in addr, csaddr;
--	socklen_t addrlen =3D sizeof(addr);
--        socklen_t csaddrlen =3D sizeof(csaddr);
--	int opt;
- 	char **argv;
--	int ret;
-+	int opt, c, sp[2];
- 	pid_t pid;
-=20
- 	DEBUG_CALL("fork_exec");
- 	DEBUG_ARG("so =3D %p", so);
- 	DEBUG_ARG("ex =3D %p", ex);
-=20
--    addr.sin_family =3D AF_INET;
--    addr.sin_port =3D 0;
--    addr.sin_addr.s_addr =3D INADDR_ANY;
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 0de46084c0..fac7849195 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -1499,8 +1499,6 @@ static int slirp_state_load(QEMUFile *f, void *opaq=
+ue, int version_id)
+         }
+         if (!ex_ptr)
+             return -EINVAL;
 -
--    s =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
--    if (s < 0 || bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
--        listen(s, 1) < 0) {
--        error_report("Error: inet socket: %s", strerror(errno));
--        if (s >=3D 0) {
--            closesocket(s);
--        }
-+    if (slirp_socketpair_with_oob(sp) < 0) {
-         return 0;
+-        so->extra =3D (void *)ex_ptr->ex_exec;
      }
 =20
--        if (getsockname(s, (struct sockaddr *)&csaddr, &csaddrlen) < 0) =
-{
--            closesocket(s);
--            return 0;
--        }
--        cs =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
--        if (cs < 0) {
--            closesocket(s);
--            return 0;
--        }
--        csaddr.sin_addr =3D loopback_addr;
--        /*
--         * This connect won't block because we've already listen()ed on
--         * the server end (even though we won't accept() the connection
--         * until later on).
--         */
--        do {
--            ret =3D connect(cs, (struct sockaddr *)&csaddr, csaddrlen);
--        } while (ret < 0 && errno =3D=3D EINTR);
--        if (ret < 0) {
--            closesocket(s);
--            closesocket(cs);
--            return 0;
--        }
--
- 	pid =3D fork();
- 	switch(pid) {
- 	 case -1:
- 		error_report("Error: fork failed: %s", strerror(errno));
--                closesocket(cs);
--		close(s);
-+		closesocket(sp[0]);
-+		closesocket(sp[1]);
- 		return 0;
+     return vmstate_load_state(f, &vmstate_slirp, slirp, version_id);
+diff --git a/slirp/socket.c b/slirp/socket.c
+index c01d8696af..041ec5061a 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -89,10 +89,6 @@ sofree(struct socket *so)
+   soqfree(so, &slirp->if_fastq);
+   soqfree(so, &slirp->if_batchq);
 =20
- 	 case 0:
--                setsid();
--
--		/* Set the DISPLAY */
--                close(s);
--                dup2(cs, 0);
--                dup2(cs, 1);
--                dup2(cs, 2);
--		for (s =3D getdtablesize() - 1; s >=3D 3; s--)
--		   close(s);
-+		setsid();
-+		dup2(sp[1], 0);
-+		dup2(sp[1], 1);
-+		dup2(sp[1], 2);
-+		for (c =3D getdtablesize() - 1; c >=3D 3; c--)
-+		   close(c);
-=20
-                 argv =3D g_strsplit(ex, " ", -1);
- 		execvp(argv[0], (char **)argv);
-@@ -163,19 +170,12 @@ fork_exec(struct socket *so, const char *ex)
- 		exit(1);
-=20
- 	 default:
-+		so->s =3D sp[0];
-+		closesocket(sp[1]);
- 		qemu_add_child_watch(pid);
--                closesocket(cs);
--                /*
--                 * This should never block, because we already connect()=
-ed
--                 * on the child end before we forked.
--                 */
--                do {
--                    so->s =3D accept(s, (struct sockaddr *)&addr, &addrl=
-en);
--                } while (so->s < 0 && errno =3D=3D EINTR);
--                closesocket(s);
--                socket_set_fast_reuse(so->s);
--                opt =3D 1;
--                qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, s=
-izeof(int));
-+		socket_set_fast_reuse(so->s);
-+		opt =3D 1;
-+		qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
- 		qemu_set_nonblock(so->s);
- 		return 1;
- 	}
+-  if (so->so_emu=3D=3DEMU_RSH && so->extra) {
+-	sofree(so->extra);
+-	so->extra=3DNULL;
+-  }
+   if (so =3D=3D slirp->tcp_last_so) {
+       slirp->tcp_last_so =3D &slirp->tcb;
+   } else if (so =3D=3D slirp->udp_last_so) {
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index e7b2baa087..fd7521854e 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -541,7 +541,6 @@ static const struct tos_t tcptos[] =3D {
+ 	  {0, 23, IPTOS_LOWDELAY, 0},	/* telnet */
+ 	  {0, 80, IPTOS_THROUGHPUT, 0},	/* WWW */
+ 	  {0, 513, IPTOS_LOWDELAY, EMU_RLOGIN|EMU_NOCONNECT},	/* rlogin */
+-	  {0, 514, IPTOS_LOWDELAY, EMU_RSH|EMU_NOCONNECT},	/* shell */
+ 	  {0, 544, IPTOS_LOWDELAY, EMU_KSH},		/* kshell */
+ 	  {0, 543, IPTOS_LOWDELAY, 0},	/* klogin */
+ 	  {0, 6667, IPTOS_THROUGHPUT, EMU_IRC},	/* IRC */
 --=20
 2.20.1
