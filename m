@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34748)
+Received: from eggs.gnu.org ([209.51.188.92]:34751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bh-V0
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bj-Us
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0001D2-44
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0001DI-5N
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:25 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40302)
+Received: from hera.aquilenet.fr ([185.233.100.1]:40290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6h-0001AO-Nq
+	id 1gjB6h-0001AB-Oq
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:13 +0100
-Message-Id: <20190114225306.21569-13-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:07 +0100
+Message-Id: <20190114225306.21569-7-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/65] slirp: add tftp tracing
+Subject: [Qemu-devel] [PULL 06/65] slirp: rename /extra/chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +28,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Liam Merwick <liam.merwick@oracle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Useful when debugging pxeboot, to see what the guest tries to do.
+Now it's only used for the chardev pointer.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- Makefile.objs      | 1 +
- slirp/tftp.c       | 3 +++
- slirp/trace-events | 5 +++++
- 3 files changed, 9 insertions(+)
- create mode 100644 slirp/trace-events
+ slirp/slirp.c    | 4 ++--
+ slirp/socket.h   | 2 +-
+ slirp/tcp_subr.c | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 456115992a..2121120492 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -193,6 +193,7 @@ trace-events-subdirs +=3D net
- trace-events-subdirs +=3D qapi
- trace-events-subdirs +=3D qom
- trace-events-subdirs +=3D scsi
-+trace-events-subdirs +=3D slirp
- trace-events-subdirs +=3D target/arm
- trace-events-subdirs +=3D target/i386
- trace-events-subdirs +=3D target/mips
-diff --git a/slirp/tftp.c b/slirp/tftp.c
-index a9bc4bb1b6..735b57aa55 100644
---- a/slirp/tftp.c
-+++ b/slirp/tftp.c
-@@ -26,6 +26,7 @@
- #include "slirp.h"
- #include "qemu-common.h"
- #include "qemu/cutils.h"
-+#include "trace.h"
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index fac7849195..ab08694e37 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -1088,10 +1088,10 @@ int slirp_add_exec(Slirp *slirp, void *chardev, c=
+onst char *cmdline,
 =20
- static inline int tftp_session_in_use(struct tftp_session *spt)
+ ssize_t slirp_send(struct socket *so, const void *buf, size_t len, int f=
+lags)
  {
-@@ -204,6 +205,7 @@ static void tftp_send_error(struct tftp_session *spt,
-   struct mbuf *m;
-   struct tftp_t *tp;
-=20
-+  trace_slirp_tftp_error(msg);
-   m =3D m_get(spt->slirp);
-=20
-   if (!m) {
-@@ -323,6 +325,7 @@ static void tftp_handle_rrq(Slirp *slirp, struct sock=
-addr_storage *srcsas,
-       break;
+-    if (so->s =3D=3D -1 && so->extra) {
++    if (so->s =3D=3D -1 && so->chardev) {
+         /* XXX this blocks entire thread. Rewrite to use
+          * qemu_chr_fe_write and background I/O callbacks */
+-        qemu_chr_fe_write_all(so->extra, buf, len);
++        qemu_chr_fe_write_all(so->chardev, buf, len);
+         return len;
      }
-   }
-+  trace_slirp_tftp_rrq(req_fname);
 =20
-   /* check mode */
-   if ((pktlen - k) < 6) {
-diff --git a/slirp/trace-events b/slirp/trace-events
-new file mode 100644
-index 0000000000..ff8f656e8c
---- /dev/null
-+++ b/slirp/trace-events
-@@ -0,0 +1,5 @@
-+# See docs/devel/tracing.txt for syntax documentation.
-+
-+# slirp/tftp.c
-+slirp_tftp_rrq(const char *file) "file: %s"
-+slirp_tftp_error(const char *file) "msg: %s"
+diff --git a/slirp/socket.h b/slirp/socket.h
+index 2f224bc34f..930ed95972 100644
+--- a/slirp/socket.h
++++ b/slirp/socket.h
+@@ -67,7 +67,7 @@ struct socket {
+=20
+   struct sbuf so_rcv;		/* Receive buffer */
+   struct sbuf so_snd;		/* Send buffer */
+-  void * extra;			/* Extra pointer */
++  void * chardev;
+ };
+=20
+=20
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index fd7521854e..4b40850c7a 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -961,7 +961,7 @@ int tcp_ctl(struct socket *so)
+                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
+                 if (ex_ptr->ex_chardev) {
+                     so->s =3D -1;
+-                    so->extra =3D ex_ptr->ex_chardev;
++                    so->chardev =3D ex_ptr->ex_chardev;
+                     return 1;
+                 }
+                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
 --=20
 2.20.1
