@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36072)
+Received: from eggs.gnu.org ([209.51.188.92]:37474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gj23n-0000Jo-Li
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:13:48 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gj26c-0002L8-08
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:16:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gj23l-000155-Gt
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:13:47 -0500
-From: Max Reitz <mreitz@redhat.com>
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-2-vsementsov@virtuozzo.com>
-	<cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
-Message-ID: <49d23317-61f9-4029-5f78-58fcfa9d27a5@redhat.com>
-Date: Mon, 14 Jan 2019 14:13:09 +0100
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gj26b-0002zh-74
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:16:41 -0500
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Mon, 14 Jan 2019 13:16:31 +0000
+Message-ID: <f557be19-e398-7f5d-2851-67928f33584f@virtuozzo.com>
+References: <20181130144705.77454-1-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20181130144705.77454-1-anton.nefedov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <28512A529343B24FB43FCF79F0888DCA@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="c8ag9T7fNgA50M2XuCr90WxKCYvmFRGjO"
-Subject: Re: [Qemu-devel] [PATCH v5 01/11] block/backup: simplify
- backup_incremental_init_copy_bitmap
+Subject: Re: [Qemu-devel] [PATCH v6 0/9] discard blockstats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---c8ag9T7fNgA50M2XuCr90WxKCYvmFRGjO
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com,
- den@openvz.org, eblake@redhat.com, jsnow@redhat.com
-Message-ID: <49d23317-61f9-4029-5f78-58fcfa9d27a5@redhat.com>
-Subject: Re: [PATCH v5 01/11] block/backup: simplify
- backup_incremental_init_copy_bitmap
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
- <20181229122027.42245-2-vsementsov@virtuozzo.com>
- <cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
-In-Reply-To: <cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 14.01.19 14:10, Max Reitz wrote:
-> On 29.12.18 13:20, Vladimir Sementsov-Ogievskiy wrote:
->> Simplify backup_incremental_init_copy_bitmap using the function
->> bdrv_dirty_bitmap_next_dirty_area.
->>
->> Note: move to job->len instead of bitmap size: it should not matter bu=
-t
->> less code.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
-
->> ---
->>  block/backup.c | 40 ++++++++++++----------------------------
->>  1 file changed, 12 insertions(+), 28 deletions(-)
->=20
-> Overall: What is this function even supposed to do?  To me, it looks
-> like it marks all areas in job->copy_bitmap dirty that are dirty in
-> job->sync_bitmap.
->=20
-> If so, wouldn't just replacing this by hbitmap_merge() simplify things
-> further?
-
-Ah, no, because they would need to have the same granularity...
-
-Max
-
-
---c8ag9T7fNgA50M2XuCr90WxKCYvmFRGjO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw8iuUACgkQ9AfbAGHV
-z0B+sQgAvSefw78TqOx/C0loJou5I5gMZ1krFeuRiO9/6TUt2E10M6TlQo65QRL4
-8kZSOPE0dv9vgSWioll8NE+Rd+xUz/Pwgc0ZshLXrRhEckzk7RB/FbGa843w1Yk0
-1fMETAQ+Qf38LBUHvD/7a0byUVktAyovoJus7MYGSi1E2KR536FDbjLUOkvuR9Fu
-1Ti/K7DXawVJqonJB3feJjjRBo6QPvUbVD6PKiRgJ/P2H+InWDzthWLU3XijFWUK
-uVArbO/EXphXB156LRd1yj0qeH4pmth/zTA6kb1lWvgiW69UTw+RqYsMOX4zYMIo
-W+HWcbSCXhS31t56/uzCJ424swHyNg==
-=SRQz
------END PGP SIGNATURE-----
-
---c8ag9T7fNgA50M2XuCr90WxKCYvmFRGjO--
+T24gMzAvMTEvMjAxOCA1OjQ3IFBNLCBBbnRvbiBOZWZlZG92IHdyb3RlOg0KPiBxbXAgcXVlcnkt
+YmxvY2tzdGF0cyBwcm92aWRlcyBzdGF0cyBpbmZvIGZvciB3cml0ZS9yZWFkL2ZsdXNoIG9wcy4N
+Cj4gDQo+IFBhdGNoZXMgMS03IGltcGxlbWVudCB0aGUgc2ltaWxhciBmb3IgZGlzY2FyZCAodW5t
+YXApIGNvbW1hbmQgZm9yIHNjc2kNCj4gYW5kIGlkZSBkaXNrcy4NCj4gRGlzY2FyZCBzdGF0ICJ1
+bm1hcF9vcHMgLyB1bm1hcF9ieXRlcyIgaXMgc3VwcG9zZWQgdG8gYWNjb3VudCB0aGUgb3BzIHRo
+YXQNCj4gaGF2ZSBjb21wbGV0ZWQgd2l0aG91dCBhbiBlcnJvci4NCj4gDQo+IEhvd2V2ZXIsIGRp
+c2NhcmQgb3BlcmF0aW9uIGlzIGFkdmlzb3J5LiBTcGVjaWZpY2FsbHksDQo+ICAgLSBjb21tb24g
+YmxvY2sgbGF5ZXIgaWdub3JlcyBFTk9UU1VQIGVycm9yIGNvZGUuDQo+ICAgICBUaGF0IG1pZ2h0
+IGJlIHJldHVybmVkIGlmIHRoZSBibG9jayBkcml2ZXIgZG9lcyBub3Qgc3VwcG9ydCBkaXNjYXJk
+LA0KPiAgICAgb3IgZGlzY2FyZCBoYXMgYmVlbiBjb25maWd1cmVkIHRvIGJlIGlnbm9yZWQuDQo+
+ICAgLSBmb3JtYXQgZHJpdmVycyBzdWNoIGFzIHFjb3cyIG1heSBpZ25vcmUgZGlzY2FyZCBpZiB0
+aGV5IHdlcmUgY29uZmlndXJlZA0KPiAgICAgdG8gaWdub3JlIHRoYXQsIG9yIGlmIHRoZSBjb3Jy
+ZXNwb25kaW5nIGFyZWEgaXMgYWxyZWFkeSBtYXJrZWQgdW51c2VkDQo+ICAgICAodW5hbGxvY2F0
+ZWQgLyB6ZXJvIGNsdXN0ZXJzKS4NCj4gDQo+IEFuZCB3aGF0IGlzIGFjdHVhbGx5IHVzZWZ1bCBp
+cyB0aGUgbnVtYmVyIG9mIGJ5dGVzIGFjdHVhbGx5IGRpc2NhcmRlZA0KPiBkb3duIG9uIHRoZSBo
+b3N0IGZpbGVzeXN0ZW0uDQo+IFRvIGFjaGlldmUgdGhhdCwgZHJpdmVyLXNwZWNpZmljIHN0YXRp
+c3RpY3MgaGFzIGJlZW4gYWRkZWQgdG8gYmxvY2tzdGF0cw0KPiAocGF0Y2ggOSkuDQo+IFdpdGgg
+cGF0Y2ggOCwgZmlsZS1wb3NpeCBkcml2ZXIgYWNjb3VudHMgZGlzY2FyZCBvcGVyYXRpb25zIG9u
+IGl0cyBsZXZlbCB0b28uDQo+IA0KDQpwaW5nDQo=
