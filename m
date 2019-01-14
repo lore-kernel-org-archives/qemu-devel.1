@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38269)
+Received: from eggs.gnu.org ([209.51.188.92]:38784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1giyfm-0004EP-JI
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:36:47 -0500
+	(envelope-from <no-reply@patchew.org>) id 1giyio-0005a3-LG
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:39:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1giyfk-0000zD-0E
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:36:46 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:60452)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1giyfj-0000y5-L3
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:36:43 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>	<154703595509.13472.7357387659078524086.stgit@pasha-VirtualBox>
-	<87wonb7eph.fsf@dusky.pond.sub.org>
-In-Reply-To: <87wonb7eph.fsf@dusky.pond.sub.org>
-Date: Mon, 14 Jan 2019 12:36:42 +0300
-Message-ID: <000f01d4abec$a8809e60$f981db20$@ru>
+	(envelope-from <no-reply@patchew.org>) id 1giyik-0002f7-HN
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:39:54 -0500
+Resent-Message-Id: <E1giyik-0002f7-HN@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21807)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1giyih-0002ak-97
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:39:48 -0500
+Message-ID: <154745785357.25737.17621990806894687213@2d170d368aaa>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20190114090324.16176-1-mhines@scalecomputing.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v9 13/21] replay: implement replay-seek
- command to proceed to the desired step
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 14 Jan 2019 01:24:14 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] QGA: Fix guest-get-fsinfo PCI address
+ collection in Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +29,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Markus Armbruster' <armbru@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: mhines@scalecomputing.com
+Cc: fam@euphon.net, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-> From: Markus Armbruster [mailto:armbru@redhat.com]
-> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
-> 
-> > This patch adds hmp/qmp commands replay_seek/replay-seek that proceed
-> > the execution to the specified step.
-> > The command automatically loads nearest snapshot and replay the execution
-> > to find the desired step.
-> 
-> "step" again.
-> 
-> >
-> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> >
-> > --
-> >
-> > v2:
-> >  - renamed replay_seek qmp command into replay-seek
-> >    (suggested by Eric Blake)
-> > v7:
-> >  - small fixes related to Markus Armbruster's review
-> > v9:
-> >  - changed 'step' parameter name to 'icount'
-> >  - moved json stuff to replay.json and updated the description
-> >    (suggested by Markus Armbruster)
-> > ---
-> >  hmp-commands.hx           |   19 +++++++++
-> >  hmp.h                     |    1
-> >  qapi/replay.json          |   20 ++++++++++
-> >  replay/replay-debugging.c |   91 +++++++++++++++++++++++++++++++++++++++++++++
-> >  4 files changed, 131 insertions(+)
-> >
-> > diff --git a/hmp-commands.hx b/hmp-commands.hx
-> > index 6d04c02..2839acc 100644
-> > --- a/hmp-commands.hx
-> > +++ b/hmp-commands.hx
-> > @@ -1924,6 +1924,25 @@ The command is ignored when there are no replay breakpoints.
-> >  ETEXI
-> >
-> >      {
-> > +        .name       = "replay_seek",
-> > +        .args_type  = "icount:i",
-> > +        .params     = "icount",
-> > +        .help       = "rewinds replay to the step specified by icount",
-> 
-> We use imperative mood in .help: "rewind".
-> 
-> "Rewind" suggests going backward.  The command can do that.  But it can
-> also go forward.  What about:
-> 
-> "replay execution to the specified intruction count"
-> 
-> > +        .cmd        = hmp_replay_seek,
-> > +    },
-> > +
-> > +STEXI
-> > +@item replay_seek @var{icount}
-> > +@findex replay_seek
-> > +Automatically proceeds to the step specified by @var{icount}, when
-> > +replaying the execution. The command automatically loads nearest
-> > +snapshot and replay the execution to find the desired step.
-> > +When there is no preceding snapshot or the execution is not replayed,
-> > +then the command is ignored.
-> 
-> Uh, why isn't that an error?
-
-What about this one?
-
-Automatically proceeds to the instruction count @var{icount}, when
-replaying the execution. The command automatically loads nearest
-snapshot and replays the execution to find the desired instruction.
-When there is no preceding snapshot or the execution is not replayed,
-then the command is ignored and error message is displayed.
-icount for the reference may be observed with 'info replay' command.
-
-
-Pavel Dovgalyuk
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExNDA5MDMyNC4xNjE3
+Ni0xLW1oaW5lc0BzY2FsZWNvbXB1dGluZy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
+dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
+bW9yZSBpbmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwMTE0MDkwMzI0LjE2MTc2LTEtbWhp
+bmVzQHNjYWxlY29tcHV0aW5nLmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBRR0E6
+IEZpeCBndWVzdC1nZXQtZnNpbmZvIFBDSSBhZGRyZXNzIGNvbGxlY3Rpb24gaW4gV2luZG93cwpU
+eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQou
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjU4ZDhkODAgUUdBOiBGaXggZ3Vlc3Qt
+Z2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0aW9uIGluIFdpbmRvd3MKCj09PSBPVVRQVVQg
+QkVHSU4gPT09CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBhbGlnbiB0aGUgKiBvbiBl
+YWNoIGxpbmUKIzE4OTogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NTkyOgorICAgICAgICAg
+ICAgLyoKKyAgICAgICAgICAgICogQ00gQVBJIHVzZWQgaGVyZSBhcyBvcHBvc2VkIHRvCgpXQVJO
+SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjkzOiBGSUxFOiBxZ2EvY29tbWFuZHMtd2lu
+MzIuYzo2NjE6CisgICAgICAgICAgICAvKiBUaGVyZSBpcyBubyBuZWVkIHRvIGFsbG9jYXRlIGJ1
+ZmZlciBpbiB0aGUgbmV4dCBmdW5jdGlvbnMuIFRoZSBzaXplCgpXQVJOSU5HOiBCbG9jayBjb21t
+ZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjkzOiBGSUxFOiBxZ2Ev
+Y29tbWFuZHMtd2luMzIuYzo2NjE6CisgICAgICAgICAgICAvKiBUaGVyZSBpcyBubyBuZWVkIHRv
+IGFsbG9jYXRlIGJ1ZmZlciBpbiB0aGUgbmV4dCBmdW5jdGlvbnMuIFRoZSBzaXplCgpXQVJOSU5H
+OiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMyOTQ6IEZJ
+TEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY2MjoKKyAgICAgICAgICAgIC8qIFRoZXJlIGlzIG5v
+IG5lZWQgdG8gYWxsb2NhdGUgYnVmZmVyIGluIHRoZSBuZXh0IGZ1bmN0aW9ucy4gVGhlIHNpemUK
+KyAgICAgICAgICAgICogaXMga25vd24gYW5kIFVMT05HIGFjY29yZGluZyB0bwoKRVJST1I6IHNw
+YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnJicgKGN0eDpWeFYpCiMyOTk6IEZJTEU6IHFnYS9j
+b21tYW5kcy13aW4zMi5jOjY2NzoKKyAgICAgICAgICAgICAgICAgICZ0eXBlLCAoUEJZVEUpJmJ1
+cywgc2l6ZSwgTlVMTCkpIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FS
+TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
+IzMxNzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NjczOgorICAgICAgICAgICAgLyogVGhl
+IGZ1bmN0aW9uIHJldHJpZXZlcyB0aGUgZGV2aWNlJ3MgYWRkcmVzcy4gVGhpcyB2YWx1ZSB3aWxs
+IGJlCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFy
+YXRlIGxpbmUKIzMxODogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njc0OgorICAgICAgICAg
+ICAgKiB0cmFuc2Zvcm1lZCBpbnRvIGRldmljZSBmdW5jdGlvbiBhbmQgbnVtYmVyICovCgpXQVJO
+SU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxpZ24gdGhlICogb24gZWFjaCBsaW5lCiMzMTg6
+IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY3NDoKKyAgICAgICAgICAgIC8qIFRoZSBmdW5j
+dGlvbiByZXRyaWV2ZXMgdGhlIGRldmljZSdzIGFkZHJlc3MuIFRoaXMgdmFsdWUgd2lsbCBiZQor
+ICAgICAgICAgICAgKiB0cmFuc2Zvcm1lZCBpbnRvIGRldmljZSBmdW5jdGlvbiBhbmQgbnVtYmVy
+ICovCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcmJyAoY3R4OlZ4VikKIzMy
+MTogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njc3OgorICAgICAgICAgICAgICAgICAgICAm
+dHlwZSwgKFBCWVRFKSZhZGRyLCBzaXplLCBOVUxMKSkgewogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIF4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyog
+b24gYSBzZXBhcmF0ZSBsaW5lCiMzMjc6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY4MzoK
+KyAgICAgICAgICAgIC8qIFRoaXMgY2FsbCByZXR1cm5zIFVJTnVtYmVyIG9mIERFVklDRV9DQVBB
+QklMSVRJRVMgc3RydWN0dXJlLgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxp
+bmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMzMjg6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5j
+OjY4NDoKKyAgICAgICAgICAgICogVGhpcyBudW1iZXIgaXMgdHlwaWNhbGx5IGEgdXNlci1wZXJj
+ZWl2ZWQgc2xvdCBudW1iZXIuICovCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyBzaG91bGQgYWxp
+Z24gdGhlICogb24gZWFjaCBsaW5lCiMzMjg6IEZJTEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY4
+NDoKKyAgICAgICAgICAgIC8qIFRoaXMgY2FsbCByZXR1cm5zIFVJTnVtYmVyIG9mIERFVklDRV9D
+QVBBQklMSVRJRVMgc3RydWN0dXJlLgorICAgICAgICAgICAgKiBUaGlzIG51bWJlciBpcyB0eXBp
+Y2FsbHkgYSB1c2VyLXBlcmNlaXZlZCBzbG90IG51bWJlci4gKi8KCkVSUk9SOiBzcGFjZXMgcmVx
+dWlyZWQgYXJvdW5kIHRoYXQgJyYnIChjdHg6VnhWKQojMzMxOiBGSUxFOiBxZ2EvY29tbWFuZHMt
+d2luMzIuYzo2ODc6CisgICAgICAgICAgICAgICAgICAgICZ0eXBlLCAoUEJZVEUpJnNsb3QsIHNp
+emUsIE5VTEwpKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKV0FSTklO
+RzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzMz
+NzogRklMRTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6NjkzOgorICAgICAgICAgICAgLyogU2V0dXBB
+cGkgZ2l2ZXMgdXMgdGhlIHNhbWUgaW5mb3JtYXRpb24gYXMgZHJpdmVyIHdpdGgKCldBUk5JTkc6
+IEJsb2NrIGNvbW1lbnRzIHNob3VsZCBhbGlnbiB0aGUgKiBvbiBlYWNoIGxpbmUKIzMzODogRklM
+RTogcWdhL2NvbW1hbmRzLXdpbjMyLmM6Njk0OgorICAgICAgICAgICAgLyogU2V0dXBBcGkgZ2l2
+ZXMgdXMgdGhlIHNhbWUgaW5mb3JtYXRpb24gYXMgZHJpdmVyIHdpdGgKKyAgICAgICAgICAgICog
+SW9HZXREZXZpY2VQcm9wZXJ0eS4gQWNjb3JkaW5nIHRvIE1pY3Jvc29mdAoKV0FSTklORzogQmxv
+Y2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMzNDI6IEZJ
+TEU6IHFnYS9jb21tYW5kcy13aW4zMi5jOjY5ODoKKyAgICAgICAgICAgICogU1BEUlBfQUREUkVT
+UyBpcyBwcm9wZXJ0eUFkZHJlc3MsIHNvIHdlIGRvIHRoZSBzYW1lLiovCgp0b3RhbDogMyBlcnJv
+cnMsIDEzIHdhcm5pbmdzLCAzOTEgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDU4ZDhkODAwZjMxYSAo
+UUdBOiBGaXggZ3Vlc3QtZ2V0LWZzaW5mbyBQQ0kgYWRkcmVzcyBjb2xsZWN0aW9uIGluIFdpbmRv
+d3MpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
+b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
+Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTE0MDkwMzI0LjE2MTc2LTEtbWhpbmVzQHNj
+YWxlY29tcHV0aW5nLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
+bQ==
