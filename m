@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51791)
+Received: from eggs.gnu.org ([209.51.188.92]:51851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkc-0003PK-Te
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:12 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkm-0003ad-5h
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkb-0006nG-07
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:10 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60552)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipki-0006ur-NA
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:19 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:60564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipka-0006bq-KM
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:08 -0500
+	id 1gipki-0006io-8v
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:16 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:03:19 +0100
-Message-Id: <20190114000326.29847-59-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:03:24 +0100
+Message-Id: <20190114000326.29847-64-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 58/65] slirp: replace DEBUG_ARGS with DEBUG_ARG
+Subject: [Qemu-devel] [PULL 63/65] slirp: call into g_debug() for DEBUG
+ macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,176 +33,440 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-There is no clear benefit in calling an alias DEBUG_ARGS(). Replace
-calls with DEBUG_ARG(), and fix the white-spacing while at it.
+Make slirp use GLib logging, instead of fprintf(), so that
+applications can filter log, process it etc.
+
+With recent versions of glib, G_MESSAGES_DEBUG must be set to "all" or
+"Slirp" to see slirp debug messages.
+
+Reformat DEBUG_MISC & DEBUG_ERROR calls to not need \n ending.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/arp_table.c | 12 ++++++------
- slirp/debug.h     |  2 --
- slirp/ip6_icmp.c  |  2 +-
- slirp/ndp_table.c | 18 +++++++++---------
- slirp/slirp.c     | 12 ++++++------
- slirp/tcp_input.c |  6 +++---
- 6 files changed, 25 insertions(+), 27 deletions(-)
+ slirp/cksum.c      |  4 ++--
+ slirp/debug.h      | 17 ++++-------------
+ slirp/dhcpv6.c     |  6 +++---
+ slirp/ip_icmp.c    | 10 +++++-----
+ slirp/slirp.c      | 10 ++++------
+ slirp/socket.c     | 24 ++++++++++++------------
+ slirp/tcp_input.c  |  7 +++----
+ slirp/tcp_output.c |  2 +-
+ slirp/tcp_subr.c   |  2 +-
+ slirp/udp.c        |  5 ++---
+ slirp/udp6.c       |  5 ++---
+ 11 files changed, 39 insertions(+), 53 deletions(-)
 
-diff --git a/slirp/arp_table.c b/slirp/arp_table.c
-index ce19e6e7c0..bf71b984ad 100644
---- a/slirp/arp_table.c
-+++ b/slirp/arp_table.c
-@@ -34,9 +34,9 @@ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint=
-8_t ethaddr[ETH_ALEN])
+diff --git a/slirp/cksum.c b/slirp/cksum.c
+index 0a988b845d..84c858fafb 100644
+--- a/slirp/cksum.c
++++ b/slirp/cksum.c
+@@ -121,8 +121,8 @@ int cksum(struct mbuf *m, int len)
 =20
-     DEBUG_CALL("arp_table_add");
-     DEBUG_ARG("ip =3D %s", inet_ntoa((struct in_addr){.s_addr =3D ip_add=
-r}));
--    DEBUG_ARGS(" hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
--               ethaddr[0], ethaddr[1], ethaddr[2],
--               ethaddr[3], ethaddr[4], ethaddr[5]);
-+    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+              ethaddr[0], ethaddr[1], ethaddr[2],
-+              ethaddr[3], ethaddr[4], ethaddr[5]);
-=20
-     if (ip_addr =3D=3D 0 || ip_addr =3D=3D 0xffffffff || ip_addr =3D=3D =
-broadcast_addr) {
-         /* Do not register broadcast addresses */
-@@ -79,9 +79,9 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
-     for (i =3D 0; i < ARP_TABLE_SIZE; i++) {
-         if (arptbl->table[i].ar_sip =3D=3D ip_addr) {
-             memcpy(out_ethaddr, arptbl->table[i].ar_sha,  ETH_ALEN);
--            DEBUG_ARGS(" found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x=
-\n",
--                       out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
--                       out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-+            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
-+                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-             return 1;
-         }
-     }
+ cont:
+ 	if (len) {
+-		DEBUG_ERROR("cksum: out of data\n");
+-		DEBUG_ERROR(" len =3D %d\n", len);
++		DEBUG_ERROR("cksum: out of data");
++		DEBUG_ERROR(" len =3D %d", len);
+ 	}
+ 	if (mlen =3D=3D -1) {
+ 		/* The last mbuf has odd # of bytes. Follow the
 diff --git a/slirp/debug.h b/slirp/debug.h
-index ff920f0b87..50f30898fb 100644
+index 50f30898fb..25a5d59439 100644
 --- a/slirp/debug.h
 +++ b/slirp/debug.h
-@@ -33,8 +33,6 @@ extern int slirp_debug;
+@@ -12,38 +12,29 @@
+ #define DBG_MISC 0x2
+ #define DBG_ERROR 0x4
+=20
+-#define dfd stderr
+-
+ extern int slirp_debug;
+=20
+ #define DEBUG_CALL(fmt, ...) do {               \
+     if (slirp_debug & DBG_CALL) {               \
+-        fprintf(dfd, fmt, ##__VA_ARGS__);       \
+-        fprintf(dfd, "...\n");                  \
+-        fflush(dfd);                            \
++        g_debug(fmt "...", ##__VA_ARGS__);      \
      }                                           \
  } while (0)
 =20
--#define DEBUG_ARGS(fmt, ...) DEBUG_ARG(fmt, ##__VA_ARGS__)
--
+ #define DEBUG_ARG(fmt, ...) do {                \
+     if (slirp_debug & DBG_CALL) {               \
+-        fputc(' ', dfd);                        \
+-        fprintf(dfd, fmt, ##__VA_ARGS__);       \
+-        fputc('\n', dfd);                       \
+-        fflush(dfd);                            \
++        g_debug(" " fmt, ##__VA_ARGS__);        \
+     }                                           \
+ } while (0)
+=20
  #define DEBUG_MISC(fmt, ...) do {               \
      if (slirp_debug & DBG_MISC) {               \
-         fprintf(dfd, fmt, ##__VA_ARGS__);       \
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index bce075913c..97304a9dd9 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -77,7 +77,7 @@ void icmp6_send_error(struct mbuf *m, uint8_t type, uin=
-t8_t code)
-     char addrstr[INET6_ADDRSTRLEN];
+-        fprintf(dfd, fmt, ##__VA_ARGS__);       \
+-        fflush(dfd);                            \
++        g_debug(fmt, ##__VA_ARGS__);            \
+     }                                           \
+ } while (0)
 =20
-     DEBUG_CALL("icmp6_send_error");
--    DEBUG_ARGS(" type =3D %d, code =3D %d\n", type, code);
-+    DEBUG_ARG("type =3D %d, code =3D %d", type, code);
+ #define DEBUG_ERROR(fmt, ...) do {              \
+     if (slirp_debug & DBG_ERROR) {              \
+-        fprintf(dfd, fmt, ##__VA_ARGS__);       \
+-        fflush(dfd);                            \
++        g_debug(fmt, ##__VA_ARGS__);            \
+     }                                           \
+ } while (0)
 =20
-     if (IN6_IS_ADDR_MULTICAST(&ip->ip_src) ||
-             in6_zero(&ip->ip_src)) {
-diff --git a/slirp/ndp_table.c b/slirp/ndp_table.c
-index 1401e1b322..b7b73722f7 100644
---- a/slirp/ndp_table.c
-+++ b/slirp/ndp_table.c
-@@ -18,9 +18,9 @@ void ndp_table_add(Slirp *slirp, struct in6_addr ip_add=
-r,
-=20
-     DEBUG_CALL("ndp_table_add");
-     DEBUG_ARG("ip =3D %s", addrstr);
--    DEBUG_ARGS(" hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
--               ethaddr[0], ethaddr[1], ethaddr[2],
--               ethaddr[3], ethaddr[4], ethaddr[5]);
-+    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+              ethaddr[0], ethaddr[1], ethaddr[2],
-+              ethaddr[3], ethaddr[4], ethaddr[5]);
-=20
-     if (IN6_IS_ADDR_MULTICAST(&ip_addr) || in6_zero(&ip_addr)) {
-         /* Do not register multicast or unspecified addresses */
-@@ -67,18 +67,18 @@ bool ndp_table_search(Slirp *slirp, struct in6_addr i=
-p_addr,
-         out_ethaddr[3] =3D ip_addr.s6_addr[13];
-         out_ethaddr[4] =3D ip_addr.s6_addr[14];
-         out_ethaddr[5] =3D ip_addr.s6_addr[15];
--        DEBUG_ARGS(" multicast addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n"=
+diff --git a/slirp/dhcpv6.c b/slirp/dhcpv6.c
+index 5d703e8ae6..752df40536 100644
+--- a/slirp/dhcpv6.c
++++ b/slirp/dhcpv6.c
+@@ -92,13 +92,13 @@ static int dhcpv6_parse_info_request(Slirp *slirp, ui=
+nt8_t *odata, int olen,
+                     ri->want_boot_url =3D true;
+                     break;
+                 default:
+-                    DEBUG_MISC("dhcpv6: Unsupported option request %d\n"=
 ,
--                   out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
--                   out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-+        DEBUG_ARG("multicast addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+                  out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
-+                  out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-         return 1;
-     }
-=20
-     for (i =3D 0; i < NDP_TABLE_SIZE; i++) {
-         if (in6_equal(&ndp_table->table[i].ip_addr, &ip_addr)) {
-             memcpy(out_ethaddr, ndp_table->table[i].eth_addr,  ETH_ALEN)=
-;
--            DEBUG_ARGS(" found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x=
++                    DEBUG_MISC("dhcpv6: Unsupported option request %d",
+                                req_opt);
+                 }
+             }
+             break;
+         default:
+-            DEBUG_MISC("dhcpv6 info req: Unsupported option %d, len=3D%d=
 \n",
--                       out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
--                       out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-+            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
-+                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-             return 1;
++            DEBUG_MISC("dhcpv6 info req: Unsupported option %d, len=3D%d=
+",
+                        option, len);
          }
+=20
+@@ -203,6 +203,6 @@ void dhcpv6_input(struct sockaddr_in6 *srcsas, struct=
+ mbuf *m)
+         dhcpv6_info_request(m->slirp, srcsas, xid, &data[4], data_len - =
+4);
+         break;
+     default:
+-        DEBUG_MISC("dhcpv6_input: Unsupported message type 0x%x\n", data=
+[0]);
++        DEBUG_MISC("dhcpv6_input: Unsupported message type 0x%x", data[0=
+]);
      }
+ }
+diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
+index cd2faeacb6..7c7e042049 100644
+--- a/slirp/ip_icmp.c
++++ b/slirp/ip_icmp.c
+@@ -103,7 +103,7 @@ static int icmp_send(struct socket *so, struct mbuf *=
+m, int hlen)
+=20
+     if (sendto(so->s, m->m_data + hlen, m->m_len - hlen, 0,
+                (struct sockaddr *)&addr, sizeof(addr)) =3D=3D -1) {
+-        DEBUG_MISC("icmp_input icmp sendto tx errno =3D %d-%s\n",
++        DEBUG_MISC("icmp_input icmp sendto tx errno =3D %d-%s",
+                    errno, strerror(errno));
+         icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0, strerror(e=
+rrno));
+         icmp_detach(so);
+@@ -169,7 +169,7 @@ icmp_input(struct mbuf *m, int hlen)
+         return;
+       }
+       if (udp_attach(so, AF_INET) =3D=3D -1) {
+-	DEBUG_MISC("icmp_input udp_attach errno =3D %d-%s\n",
++	DEBUG_MISC("icmp_input udp_attach errno =3D %d-%s",
+                errno,strerror(errno));
+ 	sofree(so);
+ 	m_free(m);
+@@ -192,7 +192,7 @@ icmp_input(struct mbuf *m, int hlen)
+=20
+       if(sendto(so->s, icmp_ping_msg, strlen(icmp_ping_msg), 0,
+ 		(struct sockaddr *)&addr, sockaddr_size(&addr)) =3D=3D -1) {
+-	DEBUG_MISC("icmp_input udp sendto tx errno =3D %d-%s\n",
++	DEBUG_MISC("icmp_input udp sendto tx errno =3D %d-%s",
+                errno,strerror(errno));
+ 	icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0, strerror(errno));
+ 	udp_detach(so);
+@@ -261,7 +261,7 @@ icmp_send_error(struct mbuf *msrc, u_char type, u_cha=
+r code, int minsize,
+     char bufa[20], bufb[20];
+     strcpy(bufa, inet_ntoa(ip->ip_src));
+     strcpy(bufb, inet_ntoa(ip->ip_dst));
+-    DEBUG_MISC(" %.16s to %.16s\n", bufa, bufb);
++    DEBUG_MISC(" %.16s to %.16s", bufa, bufb);
+   }
+   if(ip->ip_off & IP_OFFMASK) goto end_error;    /* Only reply to fragme=
+nt 0 */
+=20
+@@ -458,7 +458,7 @@ void icmp_receive(struct socket *so)
+         } else {
+             error_code =3D ICMP_UNREACH_HOST;
+         }
+-        DEBUG_MISC(" udp icmp rx errno =3D %d-%s\n", errno,
++        DEBUG_MISC(" udp icmp rx errno =3D %d-%s", errno,
+                    strerror(errno));
+         icmp_send_error(so->so_m, ICMP_UNREACH, error_code, 0, strerror(=
+errno));
+     } else {
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 6c732cd15b..851462a4cd 100644
+index 535c8ad5f9..a9674ab090 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -992,12 +992,12 @@ int if_encap(Slirp *slirp, struct mbuf *ifm)
-     }
+@@ -166,7 +166,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
+s_addr, void *cached_addr,
+     if (!f)
+         return -1;
 =20
-     memcpy(eh->h_dest, ethaddr, ETH_ALEN);
--    DEBUG_ARGS(" src =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
--               eh->h_source[0], eh->h_source[1], eh->h_source[2],
--               eh->h_source[3], eh->h_source[4], eh->h_source[5]);
--    DEBUG_ARGS(" dst =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
--               eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
--               eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
-+    DEBUG_ARG("src =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+              eh->h_source[0], eh->h_source[1], eh->h_source[2],
-+              eh->h_source[3], eh->h_source[4], eh->h_source[5]);
-+    DEBUG_ARG("dst =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+              eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
-+              eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
-     memcpy(buf + sizeof(struct ethhdr), ifm->m_data, ifm->m_len);
-     slirp->cb->output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
-     return 1;
+-    DEBUG_MISC("IP address of your DNS(s): ");
++    DEBUG_MISC("IP address of your DNS(s):");
+     while (fgets(buff, 512, f) !=3D NULL) {
+         if (sscanf(buff, "nameserver%*[ \t]%256s", buff2) =3D=3D 1) {
+             char *c =3D strchr(buff2, '%');
+@@ -188,20 +188,18 @@ static int get_dns_addr_resolv_conf(int af, void *p=
+dns_addr, void *cached_addr,
+                     *scope_id =3D if_index;
+                 }
+                 *cached_time =3D curtime;
+-            } else {
+-                DEBUG_MISC(", ");
+             }
+=20
+             if (++found > 3) {
+-                DEBUG_MISC("(more)");
++                DEBUG_MISC("  (more)");
+                 break;
+             } else if (slirp_debug & DBG_MISC) {
+                 char s[INET6_ADDRSTRLEN];
+                 const char *res =3D inet_ntop(af, tmp_addr, s, sizeof(s)=
+);
+                 if (!res) {
+-                    res =3D "(string conversion error)";
++                    res =3D "  (string conversion error)";
+                 }
+-                DEBUG_MISC("%s", res);
++                DEBUG_MISC("  %s", res);
+             }
+         }
+     }
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 08a065f6a7..5ffbaa064a 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -208,7 +208,8 @@ soread(struct socket *so)
+ 				}
+ 			}
+=20
+-			DEBUG_MISC(" --- soread() disconnected, nn =3D %d, errno =3D %d-%s\n"=
+, nn, errno,strerror(errno));
++			DEBUG_MISC(" --- soread() disconnected, nn =3D %d, errno =3D %d-%s",
++                       nn, errno,strerror(errno));
+ 			sofcantrcvmore(so);
+=20
+ 			if (err =3D=3D ECONNRESET || err =3D=3D ECONNREFUSED
+@@ -237,7 +238,7 @@ soread(struct socket *so)
+                 nn +=3D ret;
+         }
+=20
+-	DEBUG_MISC(" ... read nn =3D %d bytes\n", nn);
++	DEBUG_MISC(" ... read nn =3D %d bytes", nn);
+=20
+ 	/* Update fields */
+ 	sb->sb_cc +=3D nn;
+@@ -370,7 +371,7 @@ sosendoob(struct socket *so)
+ 		n =3D slirp_send(so, buff, len, (MSG_OOB)); /* |MSG_DONTWAIT)); */
+ #ifdef DEBUG
+ 		if (n !=3D len) {
+-			DEBUG_ERROR("Didn't send all data urgently XXXXX\n");
++			DEBUG_ERROR("Didn't send all data urgently XXXXX");
+ 		}
+ #endif
+ 	}
+@@ -379,7 +380,7 @@ sosendoob(struct socket *so)
+ 		return n;
+ 	}
+ 	so->so_urgc -=3D n;
+-	DEBUG_MISC(" ---2 sent %d bytes urgent data, %d urgent bytes left\n", n=
+, so->so_urgc);
++	DEBUG_MISC(" ---2 sent %d bytes urgent data, %d urgent bytes left", n, =
+so->so_urgc);
+=20
+ 	sb->sb_cc -=3D n;
+ 	sb->sb_rptr +=3D n;
+@@ -460,7 +461,7 @@ sowrite(struct socket *so)
+             if (ret > 0)
+                 nn +=3D ret;
+         }
+-        DEBUG_MISC("  ... wrote nn =3D %d bytes\n", nn);
++        DEBUG_MISC("  ... wrote nn =3D %d bytes", nn);
+=20
+ 	/* Update sbuf */
+ 	sb->sb_cc -=3D nn;
+@@ -478,7 +479,7 @@ sowrite(struct socket *so)
+ 	return nn;
+=20
+ err_disconnected:
+-	DEBUG_MISC(" --- sowrite disconnected, so->so_state =3D %x, errno =3D %=
+d\n",
++	DEBUG_MISC(" --- sowrite disconnected, so->so_state =3D %x, errno =3D %=
+d",
+                so->so_state, errno);
+ 	sofcantsendmore(so);
+ 	tcp_sockclosed(sototcpcb(so));
+@@ -512,7 +513,7 @@ sorecvfrom(struct socket *so)
+ 	    if(errno =3D=3D EHOSTUNREACH) code=3DICMP_UNREACH_HOST;
+ 	    else if(errno =3D=3D ENETUNREACH) code=3DICMP_UNREACH_NET;
+=20
+-	    DEBUG_MISC(" udp icmp rx errno =3D %d-%s\n",
++	    DEBUG_MISC(" udp icmp rx errno =3D %d-%s",
+                    errno,strerror(errno));
+ 	    icmp_send_error(so->so_m, ICMP_UNREACH, code, 0, strerror(errno));
+ 	  } else {
+@@ -564,7 +565,7 @@ sorecvfrom(struct socket *so)
+=20
+ 	  m->m_len =3D recvfrom(so->s, m->m_data, len, 0,
+ 			      (struct sockaddr *)&addr, &addrlen);
+-	  DEBUG_MISC(" did recvfrom %d, errno =3D %d-%s\n",
++	  DEBUG_MISC(" did recvfrom %d, errno =3D %d-%s",
+                  m->m_len, errno,strerror(errno));
+ 	  if(m->m_len<0) {
+ 	    /* Report error as ICMP */
+@@ -579,7 +580,7 @@ sorecvfrom(struct socket *so)
+ 		code =3D ICMP_UNREACH_NET;
+ 	      }
+=20
+-	      DEBUG_MISC(" rx error, tx icmp ICMP_UNREACH:%i\n", code);
++	      DEBUG_MISC(" rx error, tx icmp ICMP_UNREACH:%i", code);
+ 	      icmp_send_error(so->so_m, ICMP_UNREACH, code, 0, strerror(errno))=
+;
+ 	      break;
+ 	    case AF_INET6:
+@@ -591,7 +592,7 @@ sorecvfrom(struct socket *so)
+ 		code =3D ICMP6_UNREACH_NO_ROUTE;
+ 	      }
+=20
+-	      DEBUG_MISC(" rx error, tx icmp6 ICMP_UNREACH:%i\n", code);
++	      DEBUG_MISC(" rx error, tx icmp6 ICMP_UNREACH:%i", code);
+ 	      icmp6_send_error(so->so_m, ICMP6_UNREACH, code);
+ 	      break;
+ 	    default:
+@@ -839,8 +840,7 @@ void sotranslate_out(struct socket *so, struct sockad=
+dr_storage *addr)
+             }
+         }
+=20
+-        DEBUG_MISC(" addr.sin_port=3D%d, "
+-                   "addr.sin_addr.s_addr=3D%.16s\n",
++        DEBUG_MISC(" addr.sin_port=3D%d, addr.sin_addr.s_addr=3D%.16s",
+                    ntohs(sin->sin_port), inet_ntoa(sin->sin_addr));
+         break;
+=20
 diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-index f1cddce992..585ed1cb2f 100644
+index 585ed1cb2f..de5b74a52b 100644
 --- a/slirp/tcp_input.c
 +++ b/slirp/tcp_input.c
-@@ -215,8 +215,8 @@ tcp_input(struct mbuf *m, int iphlen, struct socket *=
-inso, unsigned short af)
-     Slirp *slirp;
+@@ -641,8 +641,7 @@ findso:
+               (errno !=3D EINPROGRESS) && (errno !=3D EWOULDBLOCK)
+           ) {
+ 	    uint8_t code;
+-	    DEBUG_MISC(" tcp fconnect errno =3D %d-%s\n",
+-                   errno,strerror(errno));
++	    DEBUG_MISC(" tcp fconnect errno =3D %d-%s", errno, strerror(errno))=
+;
+ 	    if(errno =3D=3D ECONNREFUSED) {
+ 	      /* ACK the SYN, send RST to refuse the connection */
+ 	      tcp_respond(tp, ti, m, ti->ti_seq + 1, (tcp_seq) 0,
+@@ -1011,7 +1010,7 @@ trimthenstep6:
 =20
- 	DEBUG_CALL("tcp_input");
--	DEBUG_ARGS(" m =3D %p  iphlen =3D %2d  inso =3D %p\n",
--               m, iphlen, inso);
-+	DEBUG_ARG("m =3D %p  iphlen =3D %2d  inso =3D %p",
-+              m, iphlen, inso);
+ 		if (SEQ_LEQ(ti->ti_ack, tp->snd_una)) {
+ 			if (ti->ti_len =3D=3D 0 && tiwin =3D=3D tp->snd_wnd) {
+-			  DEBUG_MISC(" dup ack  m =3D %p  so =3D %p\n", m, so);
++			  DEBUG_MISC(" dup ack  m =3D %p  so =3D %p", m, so);
+ 				/*
+ 				 * If we have outstanding data (other than
+ 				 * a window probe), this is a completely
+@@ -1550,7 +1549,7 @@ tcp_mss(struct tcpcb *tp, u_int offer)
+                                                (mss - (TCP_RCVSPACE % ms=
+s)) :
+                                                0));
+=20
+-	DEBUG_MISC(" returning mss =3D %d\n", mss);
++	DEBUG_MISC(" returning mss =3D %d", mss);
+=20
+ 	return mss;
+ }
+diff --git a/slirp/tcp_output.c b/slirp/tcp_output.c
+index ecc2d506b6..6dd1ecf5d9 100644
+--- a/slirp/tcp_output.c
++++ b/slirp/tcp_output.c
+@@ -92,7 +92,7 @@ again:
+=20
+ 	flags =3D tcp_outflags[tp->t_state];
+=20
+-	DEBUG_MISC(" --- tcp_output flags =3D 0x%x\n", flags);
++	DEBUG_MISC(" --- tcp_output flags =3D 0x%x", flags);
 =20
  	/*
- 	 * If called with m =3D=3D 0, then we're continuing the connect
-@@ -1389,7 +1389,7 @@ tcp_dooptions(struct tcpcb *tp, u_char *cp, int cnt=
-, struct tcpiphdr *ti)
- 	int opt, optlen;
-=20
- 	DEBUG_CALL("tcp_dooptions");
--	DEBUG_ARGS(" tp =3D %p  cnt=3D%i\n", tp, cnt);
-+	DEBUG_ARG("tp =3D %p  cnt=3D%i", tp, cnt);
-=20
- 	for (; cnt > 0; cnt -=3D optlen, cp +=3D optlen) {
- 		opt =3D cp[0];
+ 	 * If in persist timeout with window of 0, send 1 byte.
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 3b14684107..4a9a5b5edc 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -964,7 +964,7 @@ int tcp_ctl(struct socket *so)
+                     so->chardev =3D ex_ptr->ex_chardev;
+                     return 1;
+                 }
+-                DEBUG_MISC(" executing %s\n", ex_ptr->ex_exec);
++                DEBUG_MISC(" executing %s", ex_ptr->ex_exec);
+                 return fork_exec(so, ex_ptr->ex_exec);
+             }
+         }
+diff --git a/slirp/udp.c b/slirp/udp.c
+index 4853243d87..309feb9aae 100644
+--- a/slirp/udp.c
++++ b/slirp/udp.c
+@@ -172,8 +172,7 @@ udp_input(register struct mbuf *m, int iphlen)
+ 	   */
+ 	  so =3D socreate(slirp);
+ 	  if (udp_attach(so, AF_INET) =3D=3D -1) {
+-	    DEBUG_MISC(" udp_attach errno =3D %d-%s\n",
+-                   errno, strerror(errno));
++	    DEBUG_MISC(" udp_attach errno =3D %d-%s", errno, strerror(errno));
+ 	    sofree(so);
+ 	    goto bad;
+ 	  }
+@@ -209,7 +208,7 @@ udp_input(register struct mbuf *m, int iphlen)
+ 	  m->m_len +=3D iphlen;
+ 	  m->m_data -=3D iphlen;
+ 	  *ip=3Dsave_ip;
+-	  DEBUG_MISC("udp tx errno =3D %d-%s\n", errno, strerror(errno));
++	  DEBUG_MISC("udp tx errno =3D %d-%s", errno, strerror(errno));
+ 	  icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0,
+ 	                  strerror(errno));
+ 	  goto bad;
+diff --git a/slirp/udp6.c b/slirp/udp6.c
+index 8cdb1892e2..fa531e03c4 100644
+--- a/slirp/udp6.c
++++ b/slirp/udp6.c
+@@ -92,8 +92,7 @@ void udp6_input(struct mbuf *m)
+         /* If there's no socket for this packet, create one. */
+         so =3D socreate(slirp);
+         if (udp_attach(so, AF_INET6) =3D=3D -1) {
+-            DEBUG_MISC(" udp6_attach errno =3D %d-%s\n",
+-                       errno, strerror(errno));
++            DEBUG_MISC(" udp6_attach errno =3D %d-%s", errno, strerror(e=
+rrno));
+             sofree(so);
+             goto bad;
+         }
+@@ -119,7 +118,7 @@ void udp6_input(struct mbuf *m)
+         m->m_len +=3D iphlen;
+         m->m_data -=3D iphlen;
+         *ip =3D save_ip;
+-        DEBUG_MISC("udp tx errno =3D %d-%s\n", errno, strerror(errno));
++        DEBUG_MISC("udp tx errno =3D %d-%s", errno, strerror(errno));
+         icmp6_send_error(m, ICMP6_UNREACH, ICMP6_UNREACH_NO_ROUTE);
+         goto bad;
+     }
 --=20
 2.20.1
