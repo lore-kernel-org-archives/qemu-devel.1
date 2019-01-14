@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48252)
+Received: from eggs.gnu.org ([209.51.188.92]:49362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gj0uY-0000vf-6i
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:00:11 -0500
+	(envelope-from <bounces@canonical.com>) id 1gj0zq-0003fj-7R
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:05:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cfergeau@redhat.com>) id 1gj0uW-0007up-9N
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:00:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37168)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gj0uW-0007sp-0M
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:00:08 -0500
-Date: Mon, 14 Jan 2019 12:54:20 +0100
-From: Christophe Fergeau <cfergeau@redhat.com>
-Message-ID: <20190114115420.GR23773@natto.ory.fergeau.eu>
-References: <20181214105642.673-1-cfergeau@redhat.com>
-	<20190103105425.GF7733@stefanha-x1.localdomain>
-	<20190103141455.GP20900@natto.ory.fergeau.eu>
-	<20190104154034.GK30381@stefanha-x1.localdomain>
+	(envelope-from <bounces@canonical.com>) id 1gj0zp-0003k7-EF
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:05:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40338)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gj0zp-0003jE-8t
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:05:37 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gj0zo-0002TJ-1b
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 12:05:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id ED3582E80C7
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 12:05:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XiEhargoktrmcCDa"
-Content-Disposition: inline
-In-Reply-To: <20190104154034.GK30381@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v4] log: Make glib logging go through QEMU
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Jan 2019 11:55:03 -0000
+From: Daniel Berrange <1795100@bugs.launchpad.net>
+Reply-To: Bug 1795100 <1795100@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153818746845.29396.3425570709275982365.malonedeb@soybean.canonical.com>
+Message-Id: <154746690401.32326.11292435283753893310.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1795100] Re: VNC unix-domain socket unlink()ed
+ prematurely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+Patch proposed at
 
---XiEhargoktrmcCDa
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02774.html
 
-On Fri, Jan 04, 2019 at 03:40:34PM +0000, Stefan Hajnoczi wrote:
-> On Thu, Jan 03, 2019 at 03:14:55PM +0100, Christophe Fergeau wrote:
-> > Hey,
-> >=20
-> > On Thu, Jan 03, 2019 at 10:54:25AM +0000, Stefan Hajnoczi wrote:
-> > > On Fri, Dec 14, 2018 at 11:56:42AM +0100, Christophe Fergeau wrote:
-> > > > +static void qemu_log_func(const gchar *log_domain,
-> > > > +                          GLogLevelFlags log_level,
-> > > > +                          const gchar *message,
-> > > > +                          gpointer user_data)
-> > > > +{
-> > > > +    switch (log_level & G_LOG_LEVEL_MASK) {
-> > > > +    case G_LOG_LEVEL_DEBUG:
-> > > > +        /* Use same G_MESSAGES_DEBUG logic as glib to enable/disab=
-le debug
-> > > > +         * messages
-> > > > +         */
-> > > > +        if (qemu_glog_domains =3D=3D NULL) {
-> > > > +            break;
-> > > > +        }
-> > > > +        if (strcmp(qemu_glog_domains, "all") !=3D 0 &&
-> > > > +          (log_domain =3D=3D NULL || !strstr(qemu_glog_domains, lo=
-g_domain))) {
-> > > > +            break;
-> > > > +        }
-> > > > +        /* Fall through */
-> > > > +    case G_LOG_LEVEL_INFO:
-> > > > +        /* Fall through */
-> > > > +    case G_LOG_LEVEL_MESSAGE:
-> > > > +        info_report("%s: %s", log_domain, message);
-> > >=20
-> > > QEMU itself uses glib, so what happens if *_report() emit more log
-> > > messages?  Can this result in an infinite loop?
-> >=20
-> > If *_report try to output messages through the g_log API, glib will
-> > catch it and will abort, so not an infinite loop, but not a
-> > desirable outcome either.
-> >=20
-> > Some low-level logging functions which are going to dump the message
-> > without glib (or using g_log_default_handler()) are needed.
-> > The timestamping/prepending of 'error:', 'warning:' to the error message
-> > is done right below *_report (in vreport) so this looked like a good
-> > place for that.
->=20
-> If you're confident that QEMU will never (indirectly) emit a glib log
-> message from the *_report() code path, then I'm happy.
+-- =
 
-In these codepaths, I'm confident up to
-void monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
-{
-    if (cur_mon && !monitor_cur_is_qmp()) {
-        monitor_vprintf(cur_mon, fmt, ap);
-    } else {
-        vfprintf(stream, fmt, ap);
-    }
-}
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1795100
 
-=46rom there, it was not obvious to me whether the monitor_vprintf
-codepath can be triggered from info/warn/error_report or not. If they
-can, I'd feel less confident that monitor_vprintf will never indirectly
-call glib log functions.
+Title:
+  VNC unix-domain socket unlink()ed prematurely
 
-Christophe
+Status in QEMU:
+  New
 
+Bug description:
+  With qemu 3.0.0 (I don't believe this happened with previous
+  versions), if I tell it `-vnc unix:/path/to/vnc.sock`, qemu will
+  unlink() that file when the first client disconnects, meaning that
+  once I disconnect, I can't ever reconnect without restarting the VM.
 
->=20
-> Stefan
+  A stupid testcase demonstrating the issue:
 
+  In terminal A:
 
+      $ qemu-system-x86_64 -vnc unix:$PWD/vnc.sock
 
---XiEhargoktrmcCDa
-Content-Type: application/pgp-signature; name="signature.asc"
+  In terminal B:
 
------BEGIN PGP SIGNATURE-----
+      $ ls vnc.sock
+      vnc.sock
+      $ socat STDIO UNIX-CONNECT:vnc.sock <<<''
+      RFB 003.008
+      $ ls vnc.sock
+      ls: cannot access 'vnc.sock': No such file or directory
 
-iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlw8eGgACgkQqdjCFCms
-bII+sBAAjroxu5yB0n7A69XIMZBH+t8jZYWIVZNrOuq574iLe5Y0ljXcHxvc1zMa
-9yyx9ZTrhTK4kBRsiDMQPs9aJfDUPBlwSHGjoufrDQr+gHu5eNr1NTpAdK1AU4V0
-4QNtSMOYn7OEXtFvkmac9gU5Bt80JGSDQ60cUohFehAXGiv5j7tQpALOX1CABlZB
-bwFQHIf2pKF8cro6kNgZ52SzYzEuuNz2rnK2IHaFDRX06LjXnGtSv/QN8p3F6rUV
-NabZ5S2qRgROZn4QGQvraH9xuk5sSMc4Kpm1b0cizeRCK5cbvs7w9VwT63dyPI7W
-wxzWJD0+w4518xxyWk4UIhyAlRbAGoOdgbC/JOsrIaQKh8q73oWayZ1Qh5s7/q1C
-QE3ExvlcTVry7e+uZbB2QIJaukEg/KTKZDT/SKBHffI0d4zV90lGtoh3nUkskrTJ
-aSDgks676mCbrOuP0ABM+rLWgg5PsXEOuerL8AUUIJxQXkpIuyAOJGWKvUVY+lAx
-vpPNmXl6hH4P5LP9zD4dakhMJIwn+jrvKUU+0SWoaCLowZ7OGlxcEvLrTdiSAt2T
-k2zKerjHeBXewZysH7mjmdBAktbni5QVbYa6dCaG9F8LbgNUZb6vhjSfhtaLFOxH
-CSepCP6S+sxYyOjnsDIUOAdYB3caHBtrl1uXxcUMmHGk0yE0jRQ=
-=E9To
------END PGP SIGNATURE-----
+  I have determined that the offending unlink() call is the one in
+  io/channel-socket.c:qio_channel_socket_close().  That call was first
+  introduced in commit d66f78e1eaa832f73c771d9df1b606fe75d52a50, which
+  first appeared in version 3.0.0.
 
---XiEhargoktrmcCDa--
+  This type of premature unlink() does not happen on monitor.sock with
+  `-monitor unix:/path/to/monitor.sock,server,nowait`.
+
+  I am not familiar enough with the QIO subsystem to suggest a fix that
+  fixes VNC, but preserves the QMP fix targeted in the offending commit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1795100/+subscriptions
