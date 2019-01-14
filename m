@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58966)
+Received: from eggs.gnu.org ([209.51.188.92]:59465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gj57v-000746-Hh
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:30:20 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gj59H-0008AY-QB
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gj57u-0007a0-Pu
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:30:15 -0500
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:43538)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gj57u-0007Y4-KJ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:30:14 -0500
-Received: from player696.ha.ovh.net (unknown [10.109.146.82])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 966B9E93DD
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 17:30:11 +0100 (CET)
-References: <154724039526.525985.3172545257507998890.stgit@bahia.lan>
-	<154724066386.525985.7102226604937744914.stgit@bahia.lan>
-	<cdbc7f08-f0f7-725e-8511-6a303696c1ef@kaod.org>
-	<20190114161020.297ac3b2@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <eef8c4ba-ae32-6518-e93f-1dda1e9d914d@kaod.org>
-Date: Mon, 14 Jan 2019 17:29:48 +0100
+	(envelope-from <stefanha@redhat.com>) id 1gj59F-0008Sv-Te
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:39 -0500
+Date: Mon, 14 Jan 2019 16:31:17 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190114163117.GA521@stefanha-x1.localdomain>
+References: <20190109110144.18633-1-stefanha@redhat.com>
+	<w51pnt57slp.fsf@maestria.local.igalia.com>
+	<w51tvifqqlr.fsf@maestria.local.igalia.com>
+	<20190111132416.GI5010@dhcp-200-186.str.redhat.com>
+	<w51pnt3qo27.fsf@maestria.local.igalia.com>
+	<20190114133553.GE7038@stefanha-x1.localdomain>
+	<w51won7480o.fsf@maestria.local.igalia.com>
+	<20190114161525.GA32304@stefanha-x1.localdomain>
+	<w51zhs32ojb.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20190114161020.297ac3b2@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 11/13] spapr_irq: Allow synchronization
- of a single irq state to KVM
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="fUYQa+Pmc3FrFX/N"
+Content-Disposition: inline
+In-Reply-To: <w51zhs32ojb.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
+ iothread race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 1/14/19 4:10 PM, Greg Kurz wrote:
-> On Mon, 14 Jan 2019 09:19:50 +0100
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+
+--fUYQa+Pmc3FrFX/N
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jan 14, 2019 at 05:26:48PM +0100, Alberto Garcia wrote:
+> On Mon 14 Jan 2019 05:15:25 PM CET, Stefan Hajnoczi wrote:
+> >> > I've been able to reproduce this in an iotest, please see v2 of this
+> >> > series.
+> >>=20
+> >> That iotest doesn't crash for me :-?
+> >
+> > Does my iotest pass for you?
 >=20
->> On 1/11/19 10:04 PM, Greg Kurz wrote:
->>> When using the in-kernel interrupt controller, the state of all irqs =
-is
->>> synchronized to KVM at machine reset time. In the case of PHB hotplug=
-, we
->>> will need to synchronize LSIs manually. =20
->>
->> Yes. This is because the interrupt sources in the KVM XICS device have=
-=20
->> already been initialized as MSIs.=20
->>
->> Can not we reset the source when it is claimed ?=20
->>
->> An alternative solution would be to initialize the SPAPR_IRQ_PCI_LSI r=
-ange=20
->> as LSIs at a KVM level.
->>
->=20
-> I don't really want to add some dependency to sPAPR code in KVM XICS...=
- what
-> about claiming LSIs for all possible PHBs at machine init time ?
+> Yes, it does. I'm trying to figure out why because if I run the QMP
+> commands by hand then it does crash.
 
-you can not claim IRQ numbers twice. So if a new PHB is hot-plugged,=20
-it will fail the claim its LSIs.
+I ran the iotest 20 times on my machine and it segfaulted every time
+(with the fix not yet applied).
 
-C. =20
+Stefan
+
+--fUYQa+Pmc3FrFX/N
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcPLlVAAoJEJykq7OBq3PI3WwIAKi9n3eEt29sxUiwIcZCw2tG
+14IHtUFzOMgYWVCAzRHGQMx00MviMhdUWtKzSrjflV9q3hb8vCTqqCu7Q+v7HBvq
+/lM4jdGq8R60tZoazobhqaXTYXO82zFMy9s+WwwE1YqrR2sENbwUNcdq5EgVAlcN
+FXiWvHrPJoTrJhMJcNRDmWXV/s+Va0IgE6tj9MZs+g1Zt0qYD1VhWTfO8Ay6OCL5
+1F6Ke4yZykQnsmw8eAzTMeXrr1YeF9/B2idNkTKwDSyqiTYF0E3s+X3++6fP/ETZ
+cWP6UXfC3Y6cftk1nDoi07CjvQ8ycPWIRmPwosA71qi/tATaEzQeqwTYnrla0Aw=
+=fKj6
+-----END PGP SIGNATURE-----
+
+--fUYQa+Pmc3FrFX/N--
