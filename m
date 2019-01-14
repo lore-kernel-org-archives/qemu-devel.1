@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58956)
+Received: from eggs.gnu.org ([209.51.188.92]:58983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAoq-00020R-FM
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:58 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAov-00024R-ND
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:35:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAop-0006Cj-I9
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54150)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAou-0006E0-Sl
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:35:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42662)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gjAop-0006C4-9g
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:34:55 -0500
+	id 1gjAou-0006Dr-NO
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:35:00 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 15 Jan 2019 02:27:54 +0400
-Message-Id: <20190114222754.21701-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20190114222754.21701-1-marcandre.lureau@redhat.com>
-References: <20190114222754.21701-1-marcandre.lureau@redhat.com>
+Date: Tue, 15 Jan 2019 02:27:48 +0400
+Message-Id: <20190114222754.21701-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v17 6/6] tpm: clear RAM when "memory overwrite"
- requested
+Subject: [Qemu-devel] [PATCH v17 0/6] Add support for TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,125 +29,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, f4bug@amsat.org, Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Note: the "Platform Reset Attack Mitigation" specification isn't
-explicit about NVDIMM, since they could have different usages. It uses
-the term "system memory" generally (and also "volatile memory RAM" in
-its introduction). For initial support, I propose to consider
-non-volatile memory as not being subject to the memory clear. There is
-an on-going discussion in the TCG "pcclientwg" working group for
-future revisions.
+Hi,
 
-CPU cache clearing is done unconditionally in edk2 since commit
-d20ae95a13e851 (edk2-stable201811).
+The following patches implement the TPM Physical Presence Interface
+that allows a user to set a command via ACPI (sysfs entry in Linux)
+that, upon the next reboot, the firmware looks for and acts upon by
+sending sequences of commands to the TPM.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Tested-by: Stefan Berger <stefanb@linux.ibm.com>
----
- hw/tpm/tpm_ppi.h    | 10 ++++++++++
- hw/tpm/tpm_crb.c    |  3 +++
- hw/tpm/tpm_ppi.c    | 22 ++++++++++++++++++++++
- hw/tpm/tpm_tis.c    |  3 +++
- hw/tpm/trace-events |  3 +++
- 5 files changed, 41 insertions(+)
+A dedicated memory region is added to the TPM CRB & TIS devices, at
+address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+holds the location for that PPI region and some version details, to
+allow for future flexibility.
 
-diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-index c5e555fe2c7..d33ef27de6d 100644
---- a/hw/tpm/tpm_ppi.h
-+++ b/hw/tpm/tpm_ppi.h
-@@ -33,4 +33,14 @@ typedef struct TPMPPI {
- void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-                   hwaddr addr, Object *obj);
-=20
-+/**
-+ * tpm_ppi_reset:
-+ * @tpmppi: a TPMPPI
-+ *
-+ * Function to call on machine reset. It will check if the "Memory
-+ * overwrite" variable is set, and perform a memory clear on volatile
-+ * memory if requested.
-+ **/
-+void tpm_ppi_reset(TPMPPI *tpmppi);
-+
- #endif /* TPM_TPM_PPI_H */
-diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-index 012ec686d4b..3087acc4ab7 100644
---- a/hw/tpm/tpm_crb.c
-+++ b/hw/tpm/tpm_crb.c
-@@ -233,6 +233,9 @@ static void tpm_crb_reset(void *dev)
- {
-     CRBState *s =3D CRB(dev);
-=20
-+    if (s->ppi_enabled) {
-+        tpm_ppi_reset(&s->ppi);
-+    }
-     tpm_backend_reset(s->tpmbe);
-=20
-     memset(s->regs, 0, sizeof(s->regs));
-diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-index cf17779c20f..cd8205f2120 100644
---- a/hw/tpm/tpm_ppi.c
-+++ b/hw/tpm/tpm_ppi.c
-@@ -16,8 +16,30 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "sysemu/memory_mapping.h"
-+#include "sysemu/reset.h"
- #include "migration/vmstate.h"
- #include "tpm_ppi.h"
-+#include "trace.h"
-+
-+void tpm_ppi_reset(TPMPPI *tpmppi)
-+{
-+    if (tpmppi->buf[0x15a /* movv, docs/specs/tpm.txt */] & 0x1) {
-+        GuestPhysBlockList guest_phys_blocks;
-+        GuestPhysBlock *block;
-+
-+        guest_phys_blocks_init(&guest_phys_blocks);
-+        guest_phys_blocks_append(&guest_phys_blocks);
-+        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
-+            trace_tpm_ppi_memset(block->host_addr,
-+                                 block->target_end - block->target_start=
-);
-+            memset(block->host_addr, 0,
-+                   block->target_end - block->target_start);
-+            memory_region_set_dirty(block->mr, 0,
-+                                    block->target_end - block->target_st=
-art);
-+        }
-+        guest_phys_blocks_free(&guest_phys_blocks);
-+    }
-+}
-=20
- void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-                   hwaddr addr, Object *obj)
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 02d9d5c911d..fd6bb9b59a9 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -872,6 +872,9 @@ static void tpm_tis_reset(DeviceState *dev)
-     s->be_buffer_size =3D MIN(tpm_backend_get_buffer_size(s->be_driver),
-                             TPM_TIS_BUFFER_MAX);
-=20
-+    if (s->ppi_enabled) {
-+        tpm_ppi_reset(&s->ppi);
-+    }
-     tpm_backend_reset(s->be_driver);
-=20
-     s->active_locty =3D TPM_TIS_NO_LOCALITY;
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 25bee0cecf9..920d32ad551 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
- tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
- tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
-d to TPM: 0x%08x (size=3D%d)"
- tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
-t =3D %u"
-+
-+# hw/tpm/tpm_ppi.c
-+tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
+With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
+now runs successfully.
+
+It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+Implement Physical Presence interface for TPM 1.2 and 2")
+
+The edk2 support is merged upstream.
+
+v17:
+- rebased, minor conflicts
+- modify commit message in "acpi: add ACPI memory clear interface" to
+  add a link to the specification.
+- add some r-b
+
+v16:
+- minor comments and stylistic changes
+- add r-b & t-b tags
+
+v15:
+- fix crash on reset when PPI is disabled
+
+v14:
+- rebased, fixing conflicts after compat-props refactoring
+- fix build regression from v13 with --disable-tpm
+
+v13:
+- removed needless error handling in tpm_ppi_init()
+- splitted "add ACPI memory clear interface"
+- moved acpi build function in dedicated hw/acpi/tpm.c
+- added some function documentation in headers
+- various code cleanups suggested by Philippe
+- rebased
+
+Marc-Andr=C3=A9 Lureau (3):
+  tpm: add a "ppi" boolean property
+  acpi: add ACPI memory clear interface
+  tpm: clear RAM when "memory overwrite" requested
+
+Stefan Berger (3):
+  tpm: allocate/map buffer for TPM Physical Presence interface
+  acpi: expose TPM/PPI configuration parameters to firmware via fw_cfg
+  acpi: build TPM Physical Presence interface
+
+ hw/tpm/tpm_ppi.h      |  46 +++++
+ include/hw/acpi/tpm.h |  21 ++
+ hw/acpi/tpm.c         | 459 ++++++++++++++++++++++++++++++++++++++++++
+ hw/core/machine.c     |   2 +
+ hw/i386/acpi-build.c  |  29 ++-
+ hw/tpm/tpm_crb.c      |  13 ++
+ hw/tpm/tpm_ppi.c      |  53 +++++
+ hw/tpm/tpm_tis.c      |  13 ++
+ stubs/tpm.c           |   5 +
+ docs/specs/tpm.txt    | 104 ++++++++++
+ hw/acpi/Makefile.objs |   1 +
+ hw/tpm/Makefile.objs  |   1 +
+ hw/tpm/trace-events   |   3 +
+ 13 files changed, 748 insertions(+), 2 deletions(-)
+ create mode 100644 hw/tpm/tpm_ppi.h
+ create mode 100644 hw/acpi/tpm.c
+ create mode 100644 hw/tpm/tpm_ppi.c
+
 --=20
 2.20.1.98.gecbdaf0899
