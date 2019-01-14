@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34855)
+Received: from eggs.gnu.org ([209.51.188.92]:36141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1gj08y-0002ox-SW
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:11:01 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gj0DW-0006ih-HW
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:15:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1gj08y-0006pn-26
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:11:00 -0500
-Received: from mail-bgr052101133055.outbound.protection.outlook.com
-	([52.101.133.55]:6338
-	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1gj08x-0006je-68
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:10:59 -0500
-From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Mon, 14 Jan 2019 11:10:44 +0000
-Message-ID: <20190114111040.GA2480@rkaganb.sw.ru>
-References: <1546900184-27403-1-git-send-email-venu.busireddy@oracle.com>
-	<1546900184-27403-3-git-send-email-venu.busireddy@oracle.com>
-	<20190109105223-mutt-send-email-mst@kernel.org>
-	<e496ce78-462d-7675-9e97-6cbac2038489@oracle.com>
-	<20190110220906-mutt-send-email-mst@kernel.org>
-	<85064076-89af-028d-a614-e20f64830a66@oracle.com>
-In-Reply-To: <85064076-89af-028d-a614-e20f64830a66@oracle.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1CCA4DE58DFC1A46BD49881AADF7F811@eurprd08.prod.outlook.com>
+	(envelope-from <mreitz@redhat.com>) id 1gj0DV-0004ry-Du
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:15:42 -0500
+References: <20181213162727.17438-1-lvivier@redhat.com>
+	<20181213162727.17438-2-lvivier@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <7aef3078-085d-b020-e89d-ae30082381b4@redhat.com>
+Date: Mon, 14 Jan 2019 12:15:30 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 2/5] virtio_net: Add
- support for "Data Path Switching" during Live Migration.
+In-Reply-To: <20181213162727.17438-2-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] block/ssh: Convert from DPRINTF()
+ macro to trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +25,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: si-wei liu <si-wei.liu@oracle.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Venu Busireddy <venu.busireddy@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-block@nongnu.org, Liu Yuan <namei.unix@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
 
-On Thu, Jan 10, 2019 at 11:09:09PM -0800, si-wei liu wrote:
-> On 01/10/2019 07:20 PM, Michael S. Tsirkin wrote:
-> > On Thu, Jan 10, 2019 at 06:09:23PM -0800, si-wei liu wrote:
-> > > 
-> > > On 01/09/2019 07:56 AM, Michael S. Tsirkin wrote:
-> > > > On Mon, Jan 07, 2019 at 05:29:41PM -0500, Venu Busireddy wrote:
-> > > > > @@ -207,6 +226,14 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
-> > > > >        int i;
-> > > > >        for (i = 0; i < ACPI_PCIHP_MAX_HOTPLUG_BUS; ++i) {
-> > > > > +        /*
-> > > > > +         * Set the acpi_pcihp_pci_status[].down bits of all the
-> > > > > +         * failover_primary devices so that the devices are ejected
-> > > > > +         * from the guest. We can't use the qdev_unplug() as well as the
-> > > > > +         * hotplug_handler to unplug the devices, because the guest may
-> > > > > +         * not be in a state to cooperate.
-> > > > > +         */
-> > > > > +        acpi_pcihp_cleanup_failover_primary(s, i);
-> > > > >            acpi_pcihp_update_hotplug_bus(s, i);
-> > > > >        }
-> > > > >    }
-> > > > I really don't want acpi to know anything about failover.
-> > > > 
-> > > > All that needs to happen is sending a device delete request
-> > > > to guest. Should work with any hotplug removal:
-> > > > pci standard,acpi, etc.
-> > > > 
-> > > As the code comments above indicated, there was issue uncovered that the
-> > > guest may not be in a state to respond to interrupt during reboot.
-> > If you request removal then hotplug machinery normally will eject
-> > the device on system reset. You need to request it early enough though.
-> With asynchronous nature of interrupt injection and guest handling, there's
-> no way you can guarantee it's early enough, do you?
+On 13.12.18 17:27, Laurent Vivier wrote:
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>=20
+> Notes:
+>     v2: use %zu with size_t
+>         change an uint64_t to int64_t to match % PRIi64
+>=20
+>  block/ssh.c        | 46 +++++++++++++++++-----------------------------
+>  block/trace-events | 17 +++++++++++++++++
+>  2 files changed, 34 insertions(+), 29 deletions(-)
+>=20
+> diff --git a/block/ssh.c b/block/ssh.c
+> index 7fbc27abdf..bbc513e095 100644
+> --- a/block/ssh.c
+> +++ b/block/ssh.c
 
-I wonder if it can be better addressed by some "eject-on-parent-reset"
-or "eject-on-vm-reset" property which would automatically eject the
-device when the parent bridge or the vm is reset, so that the device is
-in predictably unplugged state on every boot?
+[...]
 
-Roman.
+> @@ -1038,9 +1026,9 @@ static coroutine_fn int ssh_read(BDRVSSHState *s,=
+ BlockDriverState *bs,
+>       */
+>      for (got =3D 0; got < size; ) {
+>      again:
+> -        DPRINTF("sftp_read buf=3D%p size=3D%zu", buf, end_of_vec - buf=
+);
+> +        trace_ssh_read_buf(buf, end_of_vec - buf);
+>          r =3D libssh2_sftp_read(s->sftp_handle, buf, end_of_vec - buf)=
+;
+> -        DPRINTF("sftp_read returned %zd", r);
+> +        trace_ssh_read_return(r);
+
+(Here...
+
+> =20
+>          if (r =3D=3D LIBSSH2_ERROR_EAGAIN || r =3D=3D LIBSSH2_ERROR_TI=
+MEOUT) {
+>              co_yield(s, bs);
+
+[...]
+
+> @@ -1108,9 +1096,9 @@ static int ssh_write(BDRVSSHState *s, BlockDriver=
+State *bs,
+> =20
+>      for (written =3D 0; written < size; ) {
+>      again:
+> -        DPRINTF("sftp_write buf=3D%p size=3D%zu", buf, end_of_vec - bu=
+f);
+> +        trace_ssh_write_buf(buf, end_of_vec - buf);
+>          r =3D libssh2_sftp_write(s->sftp_handle, buf, end_of_vec - buf=
+);
+> -        DPRINTF("sftp_write returned %zd", r);
+> +        trace_ssh_write_return(r);
+
+...and here r is of type ssize_t)
+
+> =20
+>          if (r =3D=3D LIBSSH2_ERROR_EAGAIN || r =3D=3D LIBSSH2_ERROR_TI=
+MEOUT) {
+>              co_yield(s, bs);
+
+[...]
+
+> diff --git a/block/trace-events b/block/trace-events
+> index 3e8c47bb24..e1dfd9713a 100644
+> --- a/block/trace-events
+> +++ b/block/trace-events
+> @@ -156,3 +156,20 @@ nvme_cmd_map_qiov_iov(void *s, int i, void *page, =
+int pages) "s %p iov[%d] %p pa
+> =20
+>  # block/iscsi.c
+>  iscsi_xcopy(void *src_lun, uint64_t src_off, void *dst_lun, uint64_t d=
+st_off, uint64_t bytes, int ret) "src_lun %p offset %"PRIu64" dst_lun %p =
+offset %"PRIu64" bytes %"PRIu64" ret %d"
+> +
+> +# block/ssh.c
+> +ssh_restart_coroutine(void *co) "co=3D%p"
+> +ssh_flush(void) "fsync"
+> +ssh_check_host_key_knownhosts(const char *key) "host key OK: %s"
+> +ssh_connect_to_ssh(char *path, int flags, int mode) "opening file %s f=
+lags=3D0x%x creat_mode=3D0%o"
+> +ssh_co_yield(int sock, void *rd_handler, void *wr_handler) "s->sock=3D=
+%d rd_handler=3D%p wr_handler=3D%p"
+> +ssh_co_yield_back(int sock) "s->sock=3D%d - back"
+> +ssh_getlength(int64_t length) "length=3D%" PRIi64
+> +ssh_co_create_opts(uint64_t size) "total_size=3D%" PRIu64
+> +ssh_read(int64_t offset, size_t size) "offset=3D%" PRIi64 " size=3D%zu=
+"
+> +ssh_read_buf(void *buf, size_t size) "sftp_read buf=3D%p size=3D%zu"
+> +ssh_read_return(size_t ret) "sftp_read returned %zu"
+
+Shouldn't this be ssize_t and %zi/%zd?
+
+> +ssh_write(int64_t offset, size_t size) "offset=3D%" PRIi64 " size=3D%z=
+u"
+> +ssh_write_buf(void *buf, size_t size) "sftp_write buf=3D%p size=3D%zu"
+> +ssh_write_return(size_t ret) "sftp_write returned %zu"
+
+Same here.
+
+Max
+
+> +ssh_seek(int64_t offset) "seeking to offset=3D%" PRIi6
