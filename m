@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35310)
+Received: from eggs.gnu.org ([209.51.188.92]:35337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7N-0004t4-4g
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:05 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7O-0004v2-JW
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7M-0001mu-8p
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:05 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37656)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7N-0001nm-G9
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:06 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB7L-0001cA-VY
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:04 -0500
+	id 1gjB7N-0001c7-6C
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:05 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:53:01 +0100
-Message-Id: <20190114225306.21569-61-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:59 +0100
+Message-Id: <20190114225306.21569-59-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 60/65] slirp: add clock_get_ns() callback
+Subject: [Qemu-devel] [PULL 58/65] slirp: replace DEBUG_ARGS with DEBUG_ARG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,131 +32,176 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+There is no clear benefit in calling an alias DEBUG_ARGS(). Replace
+calls with DEBUG_ARG(), and fix the white-spacing while at it.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c      |  6 ++++++
- slirp/if.c       |  2 +-
- slirp/ip6_icmp.c |  4 ++--
- slirp/libslirp.h |  2 ++
- slirp/slirp.c    | 12 +++++-------
- 5 files changed, 16 insertions(+), 10 deletions(-)
+ slirp/arp_table.c | 12 ++++++------
+ slirp/debug.h     |  2 --
+ slirp/ip6_icmp.c  |  2 +-
+ slirp/ndp_table.c | 18 +++++++++---------
+ slirp/slirp.c     | 12 ++++++------
+ slirp/tcp_input.c |  6 +++---
+ 6 files changed, 25 insertions(+), 27 deletions(-)
 
-diff --git a/net/slirp.c b/net/slirp.c
-index 2d5337da04..f98425ee9f 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -146,9 +146,15 @@ static void net_slirp_guest_error(const char *msg)
-     qemu_log_mask(LOG_GUEST_ERROR, "%s", msg);
- }
+diff --git a/slirp/arp_table.c b/slirp/arp_table.c
+index ce19e6e7c0..bf71b984ad 100644
+--- a/slirp/arp_table.c
++++ b/slirp/arp_table.c
+@@ -34,9 +34,9 @@ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint=
+8_t ethaddr[ETH_ALEN])
 =20
-+static int64_t net_slirp_clock_get_ns(void)
-+{
-+    return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+}
-+
- static const SlirpCb slirp_cb =3D {
-     .output =3D net_slirp_output,
-     .guest_error =3D net_slirp_guest_error,
-+    .clock_get_ns =3D net_slirp_clock_get_ns,
- };
+     DEBUG_CALL("arp_table_add");
+     DEBUG_ARG("ip =3D %s", inet_ntoa((struct in_addr){.s_addr =3D ip_add=
+r}));
+-    DEBUG_ARGS(" hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
+-               ethaddr[0], ethaddr[1], ethaddr[2],
+-               ethaddr[3], ethaddr[4], ethaddr[5]);
++    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++              ethaddr[0], ethaddr[1], ethaddr[2],
++              ethaddr[3], ethaddr[4], ethaddr[5]);
 =20
- static int net_slirp_init(NetClientState *peer, const char *model,
-diff --git a/slirp/if.c b/slirp/if.c
-index ce4f5fac53..73e3705740 100644
---- a/slirp/if.c
-+++ b/slirp/if.c
-@@ -148,7 +148,7 @@ diddit:
-  */
- void if_start(Slirp *slirp)
- {
--    uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    uint64_t now =3D slirp->cb->clock_get_ns();
-     bool from_batchq =3D false;
-     struct mbuf *ifm, *ifm_next, *ifqt;
+     if (ip_addr =3D=3D 0 || ip_addr =3D=3D 0xffffffff || ip_addr =3D=3D =
+broadcast_addr) {
+         /* Do not register broadcast addresses */
+@@ -79,9 +79,9 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
+     for (i =3D 0; i < ARP_TABLE_SIZE; i++) {
+         if (arptbl->table[i].ar_sip =3D=3D ip_addr) {
+             memcpy(out_ethaddr, arptbl->table[i].ar_sha,  ETH_ALEN);
+-            DEBUG_ARGS(" found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x=
+\n",
+-                       out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
+-                       out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
++            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
++                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
+             return 1;
+         }
+     }
+diff --git a/slirp/debug.h b/slirp/debug.h
+index ff920f0b87..50f30898fb 100644
+--- a/slirp/debug.h
++++ b/slirp/debug.h
+@@ -33,8 +33,6 @@ extern int slirp_debug;
+     }                                           \
+ } while (0)
 =20
+-#define DEBUG_ARGS(fmt, ...) DEBUG_ARG(fmt, ##__VA_ARGS__)
+-
+ #define DEBUG_MISC(fmt, ...) do {               \
+     if (slirp_debug & DBG_MISC) {               \
+         fprintf(dfd, fmt, ##__VA_ARGS__);       \
 diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index 97304a9dd9..5261baae27 100644
+index bce075913c..97304a9dd9 100644
 --- a/slirp/ip6_icmp.c
 +++ b/slirp/ip6_icmp.c
-@@ -17,7 +17,7 @@ static void ra_timer_handler(void *opaque)
- {
-     Slirp *slirp =3D opaque;
-     timer_mod(slirp->ra_timer,
--              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + NDP_Interval);
-+              slirp->cb->clock_get_ns() / SCALE_MS + NDP_Interval);
-     ndp_send_ra(slirp);
- }
+@@ -77,7 +77,7 @@ void icmp6_send_error(struct mbuf *m, uint8_t type, uin=
+t8_t code)
+     char addrstr[INET6_ADDRSTRLEN];
 =20
-@@ -31,7 +31,7 @@ void icmp6_init(Slirp *slirp)
-                                      SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
-                                      ra_timer_handler, slirp);
-     timer_mod(slirp->ra_timer,
--              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + NDP_Interval);
-+              slirp->cb->clock_get_ns() / SCALE_MS + NDP_Interval);
- }
+     DEBUG_CALL("icmp6_send_error");
+-    DEBUG_ARGS(" type =3D %d, code =3D %d\n", type, code);
++    DEBUG_ARG("type =3D %d, code =3D %d", type, code);
 =20
- void icmp6_cleanup(Slirp *slirp)
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 3e0aa19f4b..4611a7447b 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -15,6 +15,8 @@ typedef struct SlirpCb {
-     void (*output)(void *opaque, const uint8_t *pkt, int pkt_len);
-     /* Print a message for an error due to guest misbehavior.  */
-     void (*guest_error)(const char *msg);
-+    /* Return the virtual clock value in nanoseconds */
-+    int64_t (*clock_get_ns)(void);
- } SlirpCb;
+     if (IN6_IS_ADDR_MULTICAST(&ip->ip_src) ||
+             in6_zero(&ip->ip_src)) {
+diff --git a/slirp/ndp_table.c b/slirp/ndp_table.c
+index 1401e1b322..b7b73722f7 100644
+--- a/slirp/ndp_table.c
++++ b/slirp/ndp_table.c
+@@ -18,9 +18,9 @@ void ndp_table_add(Slirp *slirp, struct in6_addr ip_add=
+r,
 =20
+     DEBUG_CALL("ndp_table_add");
+     DEBUG_ARG("ip =3D %s", addrstr);
+-    DEBUG_ARGS(" hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
+-               ethaddr[0], ethaddr[1], ethaddr[2],
+-               ethaddr[3], ethaddr[4], ethaddr[5]);
++    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++              ethaddr[0], ethaddr[1], ethaddr[2],
++              ethaddr[3], ethaddr[4], ethaddr[5]);
 =20
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 882d28a4de..535c8ad5f9 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -581,15 +581,15 @@ void slirp_pollfds_fill(GArray *pollfds, uint32_t *=
-timeout)
-=20
- void slirp_pollfds_poll(GArray *pollfds, int select_error)
- {
--    Slirp *slirp;
-+    Slirp *slirp =3D QTAILQ_FIRST(&slirp_instances);
-     struct socket *so, *so_next;
-     int ret;
-=20
--    if (QTAILQ_EMPTY(&slirp_instances)) {
-+    if (!slirp) {
-         return;
+     if (IN6_IS_ADDR_MULTICAST(&ip_addr) || in6_zero(&ip_addr)) {
+         /* Do not register multicast or unspecified addresses */
+@@ -67,18 +67,18 @@ bool ndp_table_search(Slirp *slirp, struct in6_addr i=
+p_addr,
+         out_ethaddr[3] =3D ip_addr.s6_addr[13];
+         out_ethaddr[4] =3D ip_addr.s6_addr[14];
+         out_ethaddr[5] =3D ip_addr.s6_addr[15];
+-        DEBUG_ARGS(" multicast addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n"=
+,
+-                   out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
+-                   out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
++        DEBUG_ARG("multicast addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++                  out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
++                  out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
+         return 1;
      }
 =20
--    curtime =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+    curtime =3D slirp->cb->clock_get_ns() / SCALE_MS;
-=20
-     QTAILQ_FOREACH(slirp, &slirp_instances, entry) {
-         /*
-@@ -916,8 +916,7 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, =
-struct ethhdr *eh,
-             ifm->resolution_requested =3D true;
-=20
-             /* Expire request and drop outgoing packet after 1 second */
--            ifm->expiration_date =3D
--                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 1000000000ULL;
-+            ifm->expiration_date =3D slirp->cb->clock_get_ns() + 1000000=
-000ULL;
+     for (i =3D 0; i < NDP_TABLE_SIZE; i++) {
+         if (in6_equal(&ndp_table->table[i].ip_addr, &ip_addr)) {
+             memcpy(out_ethaddr, ndp_table->table[i].eth_addr,  ETH_ALEN)=
+;
+-            DEBUG_ARGS(" found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x=
+\n",
+-                       out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
+-                       out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
++            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
++                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
+             return 1;
          }
-         return 0;
-     } else {
-@@ -943,8 +942,7 @@ static int if_encap6(Slirp *slirp, struct mbuf *ifm, =
-struct ethhdr *eh,
-         if (!ifm->resolution_requested) {
-             ndp_send_ns(slirp, ip6h->ip_dst);
-             ifm->resolution_requested =3D true;
--            ifm->expiration_date =3D
--                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 1000000000ULL;
-+            ifm->expiration_date =3D slirp->cb->clock_get_ns() + 1000000=
-000ULL;
-         }
-         return 0;
-     } else {
+     }
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 6c732cd15b..851462a4cd 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -992,12 +992,12 @@ int if_encap(Slirp *slirp, struct mbuf *ifm)
+     }
+=20
+     memcpy(eh->h_dest, ethaddr, ETH_ALEN);
+-    DEBUG_ARGS(" src =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
+-               eh->h_source[0], eh->h_source[1], eh->h_source[2],
+-               eh->h_source[3], eh->h_source[4], eh->h_source[5]);
+-    DEBUG_ARGS(" dst =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
+-               eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
+-               eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
++    DEBUG_ARG("src =3D %02x:%02x:%02x:%02x:%02x:%02x",
++              eh->h_source[0], eh->h_source[1], eh->h_source[2],
++              eh->h_source[3], eh->h_source[4], eh->h_source[5]);
++    DEBUG_ARG("dst =3D %02x:%02x:%02x:%02x:%02x:%02x",
++              eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
++              eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
+     memcpy(buf + sizeof(struct ethhdr), ifm->m_data, ifm->m_len);
+     slirp->cb->output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
+     return 1;
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index f1cddce992..585ed1cb2f 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -215,8 +215,8 @@ tcp_input(struct mbuf *m, int iphlen, struct socket *=
+inso, unsigned short af)
+     Slirp *slirp;
+=20
+ 	DEBUG_CALL("tcp_input");
+-	DEBUG_ARGS(" m =3D %p  iphlen =3D %2d  inso =3D %p\n",
+-               m, iphlen, inso);
++	DEBUG_ARG("m =3D %p  iphlen =3D %2d  inso =3D %p",
++              m, iphlen, inso);
+=20
+ 	/*
+ 	 * If called with m =3D=3D 0, then we're continuing the connect
+@@ -1389,7 +1389,7 @@ tcp_dooptions(struct tcpcb *tp, u_char *cp, int cnt=
+, struct tcpiphdr *ti)
+ 	int opt, optlen;
+=20
+ 	DEBUG_CALL("tcp_dooptions");
+-	DEBUG_ARGS(" tp =3D %p  cnt=3D%i\n", tp, cnt);
++	DEBUG_ARG("tp =3D %p  cnt=3D%i", tp, cnt);
+=20
+ 	for (; cnt > 0; cnt -=3D optlen, cp +=3D optlen) {
+ 		opt =3D cp[0];
 --=20
 2.20.1
