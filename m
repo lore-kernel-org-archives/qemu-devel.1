@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42710)
+Received: from eggs.gnu.org ([209.51.188.92]:43320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gj0Zi-0006nd-SP
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:38:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gj0cb-00006z-1k
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:41:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gj0Zf-00036I-7O
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:38:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45268)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gj0Zd-000348-8D
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:38:35 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 582A188E48
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 11:38:31 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 14 Jan 2019 11:38:27 +0000
-Message-Id: <20190114113827.24388-1-berrange@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gj0ca-00051o-2h
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:41:37 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:42844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gj0cZ-000515-JG
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:41:35 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id v23so18978894otk.9
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 03:41:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] io: ensure UNIX client doesn't unlink server
- socket
+References: <20190111142702.25884-1-kraxel@redhat.com>
+In-Reply-To: <20190111142702.25884-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Jan 2019 11:41:23 +0000
+Message-ID: <CAFEAcA_C8vBxHc+52DBWikNWZyBGYjikPvj-CtquDrKnOZCnMA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Input 20190111 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,297 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-The qio_channel_socket_close method for was mistakenly unlinking the
-UNIX server socket, even if the channel was a client connection. This
-was not noticed with chardevs, since they never call close, but with the
-VNC server, this caused the VNC server socket to be deleted after the
-first client quit.
+On Fri, 11 Jan 2019 at 14:38, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit a311f891abf3833c1e4c5a62a6e5b0f1b81f22c3:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.0-pull-request' into staging (2019-01-10 17:49:54 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/input-20190111-pull-request
+>
+> for you to fetch changes up to 7a1b46e09504419a3aa867dba3bcf23db5d6d956:
+>
+>   input: avoid malloc for mouse events (2019-01-11 11:57:17 +0100)
+>
+> ----------------------------------------------------------------
+> input: avoid malloc for mouse events
+>
+> ----------------------------------------------------------------
+>
+> Gerd Hoffmann (1):
+>   input: avoid malloc for mouse events
+>
+>  include/ui/input.h |  3 ---
+>  ui/input.c         | 68 +++++++++++++++++++++++++-----------------------------
+>  2 files changed, 31 insertions(+), 40 deletions(-)
+>
 
-The qio_channel_socket_close method also needlessly reimplemented the
-logic that already exists in socket_listen_cleanup(). Just call that
-method directly, for listen sockets only.
+Applied, thanks.
 
-This fixes a regression introduced in QEMU 3.0.0 with
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-  commit d66f78e1eaa832f73c771d9df1b606fe75d52a50
-  Author: Pavel Balaev <mail@void.so>
-  Date:   Mon May 21 19:17:35 2018 +0300
-
-    Delete AF_UNIX socket after close
-
-Fixes launchpad #1795100
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- io/channel-socket.c            | 19 ++------
- tests/test-io-channel-socket.c | 86 ++++++++++++++++++++++++++++++----
- 2 files changed, 80 insertions(+), 25 deletions(-)
-
-diff --git a/io/channel-socket.c b/io/channel-socket.c
-index b50e63a053..bc5f80e780 100644
---- a/io/channel-socket.c
-+++ b/io/channel-socket.c
-@@ -688,10 +688,13 @@ qio_channel_socket_close(QIOChannel *ioc,
-     int rc =3D 0;
-=20
-     if (sioc->fd !=3D -1) {
--        SocketAddress *addr =3D socket_local_address(sioc->fd, errp);
- #ifdef WIN32
-         WSAEventSelect(sioc->fd, NULL, 0);
- #endif
-+        if (qio_channel_has_feature(ioc, QIO_CHANNEL_FEATURE_LISTEN)) {
-+            socket_listen_cleanup(sioc->fd, errp);
-+        }
-+
-         if (closesocket(sioc->fd) < 0) {
-             sioc->fd =3D -1;
-             error_setg_errno(errp, errno,
-@@ -699,20 +702,6 @@ qio_channel_socket_close(QIOChannel *ioc,
-             return -1;
-         }
-         sioc->fd =3D -1;
--
--        if (addr && addr->type =3D=3D SOCKET_ADDRESS_TYPE_UNIX
--            && addr->u.q_unix.path) {
--            if (unlink(addr->u.q_unix.path) < 0 && errno !=3D ENOENT) {
--                error_setg_errno(errp, errno,
--                                 "Failed to unlink socket %s",
--                                 addr->u.q_unix.path);
--                rc =3D -1;
--            }
--        }
--
--        if (addr) {
--            qapi_free_SocketAddress(addr);
--        }
-     }
-     return rc;
- }
-diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socke=
-t.c
-index 0597213f93..c253ae30f5 100644
---- a/tests/test-io-channel-socket.c
-+++ b/tests/test-io-channel-socket.c
-@@ -49,6 +49,7 @@ static void test_io_channel_set_socket_bufs(QIOChannel =
-*src,
-=20
- static void test_io_channel_setup_sync(SocketAddress *listen_addr,
-                                        SocketAddress *connect_addr,
-+                                       QIOChannel **srv,
-                                        QIOChannel **src,
-                                        QIOChannel **dst)
- {
-@@ -78,7 +79,7 @@ static void test_io_channel_setup_sync(SocketAddress *l=
-isten_addr,
-=20
-     test_io_channel_set_socket_bufs(*src, *dst);
-=20
--    object_unref(OBJECT(lioc));
-+    *srv =3D QIO_CHANNEL(lioc);
- }
-=20
-=20
-@@ -99,6 +100,7 @@ static void test_io_channel_complete(QIOTask *task,
-=20
- static void test_io_channel_setup_async(SocketAddress *listen_addr,
-                                         SocketAddress *connect_addr,
-+                                        QIOChannel **srv,
-                                         QIOChannel **src,
-                                         QIOChannel **dst)
- {
-@@ -146,21 +148,34 @@ static void test_io_channel_setup_async(SocketAddre=
-ss *listen_addr,
-     qio_channel_set_delay(*src, false);
-     test_io_channel_set_socket_bufs(*src, *dst);
-=20
--    object_unref(OBJECT(lioc));
-+    *srv =3D QIO_CHANNEL(lioc);
-=20
-     g_main_loop_unref(data.loop);
- }
-=20
-=20
-+static void test_io_channel_socket_path_exists(SocketAddress *addr,
-+                                               bool expectExists)
-+{
-+    if (addr->type !=3D SOCKET_ADDRESS_TYPE_UNIX) {
-+        return;
-+    }
-+
-+    g_assert(g_file_test(addr->u.q_unix.path,
-+                         G_FILE_TEST_EXISTS) =3D=3D expectExists);
-+}
-+
-+
- static void test_io_channel(bool async,
-                             SocketAddress *listen_addr,
-                             SocketAddress *connect_addr,
-                             bool passFD)
- {
--    QIOChannel *src, *dst;
-+    QIOChannel *src, *dst, *srv;
-     QIOChannelTest *test;
-     if (async) {
--        test_io_channel_setup_async(listen_addr, connect_addr, &src, &ds=
-t);
-+        test_io_channel_setup_async(listen_addr, connect_addr,
-+                                    &srv, &src, &dst);
-=20
-         g_assert(!passFD ||
-                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PAS=
-S));
-@@ -169,14 +184,25 @@ static void test_io_channel(bool async,
-         g_assert(qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_SHUTDO=
-WN));
-         g_assert(qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_SHUTDO=
-WN));
-=20
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-         test =3D qio_channel_test_new();
-         qio_channel_test_run_threads(test, true, src, dst);
-         qio_channel_test_validate(test);
-=20
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-+        /* unref without close, to ensure finalize() cleans up */
-+
-         object_unref(OBJECT(src));
-         object_unref(OBJECT(dst));
-+        test_io_channel_socket_path_exists(listen_addr, true);
-=20
--        test_io_channel_setup_async(listen_addr, connect_addr, &src, &ds=
-t);
-+        object_unref(OBJECT(srv));
-+        test_io_channel_socket_path_exists(listen_addr, false);
-+
-+        test_io_channel_setup_async(listen_addr, connect_addr,
-+                                    &srv, &src, &dst);
-=20
-         g_assert(!passFD ||
-                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PAS=
-S));
-@@ -189,10 +215,24 @@ static void test_io_channel(bool async,
-         qio_channel_test_run_threads(test, false, src, dst);
-         qio_channel_test_validate(test);
-=20
-+        /* close before unref, to ensure finalize copes with already clo=
-sed */
-+
-+        qio_channel_close(src, &error_abort);
-+        qio_channel_close(dst, &error_abort);
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-         object_unref(OBJECT(src));
-         object_unref(OBJECT(dst));
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-+        qio_channel_close(srv, &error_abort);
-+        test_io_channel_socket_path_exists(listen_addr, false);
-+
-+        object_unref(OBJECT(srv));
-+        test_io_channel_socket_path_exists(listen_addr, false);
-     } else {
--        test_io_channel_setup_sync(listen_addr, connect_addr, &src, &dst=
-);
-+        test_io_channel_setup_sync(listen_addr, connect_addr,
-+                                   &srv, &src, &dst);
-=20
-         g_assert(!passFD ||
-                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PAS=
-S));
-@@ -201,14 +241,25 @@ static void test_io_channel(bool async,
-         g_assert(qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_SHUTDO=
-WN));
-         g_assert(qio_channel_has_feature(dst, QIO_CHANNEL_FEATURE_SHUTDO=
-WN));
-=20
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-         test =3D qio_channel_test_new();
-         qio_channel_test_run_threads(test, true, src, dst);
-         qio_channel_test_validate(test);
-=20
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-+        /* unref without close, to ensure finalize() cleans up */
-+
-         object_unref(OBJECT(src));
-         object_unref(OBJECT(dst));
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-+        object_unref(OBJECT(srv));
-+        test_io_channel_socket_path_exists(listen_addr, false);
-=20
--        test_io_channel_setup_sync(listen_addr, connect_addr, &src, &dst=
-);
-+        test_io_channel_setup_sync(listen_addr, connect_addr,
-+                                   &srv, &src, &dst);
-=20
-         g_assert(!passFD ||
-                  qio_channel_has_feature(src, QIO_CHANNEL_FEATURE_FD_PAS=
-S));
-@@ -221,8 +272,23 @@ static void test_io_channel(bool async,
-         qio_channel_test_run_threads(test, false, src, dst);
-         qio_channel_test_validate(test);
-=20
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-+        /* close before unref, to ensure finalize copes with already clo=
-sed */
-+
-+        qio_channel_close(src, &error_abort);
-+        qio_channel_close(dst, &error_abort);
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-         object_unref(OBJECT(src));
-         object_unref(OBJECT(dst));
-+        test_io_channel_socket_path_exists(listen_addr, true);
-+
-+        qio_channel_close(srv, &error_abort);
-+        test_io_channel_socket_path_exists(listen_addr, false);
-+
-+        object_unref(OBJECT(srv));
-+        test_io_channel_socket_path_exists(listen_addr, false);
-     }
- }
-=20
-@@ -316,7 +382,6 @@ static void test_io_channel_unix(bool async)
-=20
-     qapi_free_SocketAddress(listen_addr);
-     qapi_free_SocketAddress(connect_addr);
--    g_assert(g_file_test(TEST_SOCKET, G_FILE_TEST_EXISTS) =3D=3D FALSE);
- }
-=20
-=20
-@@ -335,7 +400,7 @@ static void test_io_channel_unix_fd_pass(void)
- {
-     SocketAddress *listen_addr =3D g_new0(SocketAddress, 1);
-     SocketAddress *connect_addr =3D g_new0(SocketAddress, 1);
--    QIOChannel *src, *dst;
-+    QIOChannel *src, *dst, *srv;
-     int testfd;
-     int fdsend[3];
-     int *fdrecv =3D NULL;
-@@ -359,7 +424,7 @@ static void test_io_channel_unix_fd_pass(void)
-     connect_addr->type =3D SOCKET_ADDRESS_TYPE_UNIX;
-     connect_addr->u.q_unix.path =3D g_strdup(TEST_SOCKET);
-=20
--    test_io_channel_setup_sync(listen_addr, connect_addr, &src, &dst);
-+    test_io_channel_setup_sync(listen_addr, connect_addr, &srv, &src, &d=
-st);
-=20
-     memcpy(bufsend, "Hello World", G_N_ELEMENTS(bufsend));
-=20
-@@ -412,6 +477,7 @@ static void test_io_channel_unix_fd_pass(void)
-=20
-     object_unref(OBJECT(src));
-     object_unref(OBJECT(dst));
-+    object_unref(OBJECT(srv));
-     qapi_free_SocketAddress(listen_addr);
-     qapi_free_SocketAddress(connect_addr);
-     unlink(TEST_SOCKET);
---=20
-2.19.2
+-- PMM
