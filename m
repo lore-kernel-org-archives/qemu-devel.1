@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51069)
+Received: from eggs.gnu.org ([209.51.188.92]:51086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk2-0002uy-Fo
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk2-0002v0-UQ
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk1-0006Jk-FB
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk1-0006K9-Qe
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:34 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60054)
+Received: from hera.aquilenet.fr ([185.233.100.1]:60206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipjz-0006AK-I0
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:32 -0500
+	id 1gipk1-0006Fl-IO
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:33 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:02:24 +0100
-Message-Id: <20190114000326.29847-4-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:02:27 +0100
+Message-Id: <20190114000326.29847-7-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/65] slirp: replace ex_pty with ex_chardev
+Subject: [Qemu-devel] [PULL 06/65] slirp: rename /extra/chardev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,83 +32,60 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-do_pty =3D=3D 3 means to talk to a chardev.
+Now it's only used for the chardev pointer.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/misc.c     | 2 +-
- slirp/misc.h     | 2 +-
  slirp/slirp.c    | 4 ++--
+ slirp/socket.h   | 2 +-
  slirp/tcp_subr.c | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index e69d5f42c3..8f0b6004bd 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -53,7 +53,7 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, char =
-*exec,
- 	*ex_ptr =3D g_new(struct ex_list, 1);
- 	(*ex_ptr)->ex_fport =3D port;
- 	(*ex_ptr)->ex_addr =3D addr;
--	(*ex_ptr)->ex_pty =3D do_pty;
-+	(*ex_ptr)->ex_chardev =3D do_pty =3D=3D 3;
- 	(*ex_ptr)->ex_exec =3D (do_pty =3D=3D 3) ? exec : g_strdup(exec);
- 	(*ex_ptr)->ex_next =3D tmp_ptr;
- 	return 0;
-diff --git a/slirp/misc.h b/slirp/misc.h
-index 897650aea1..1f8d11def6 100644
---- a/slirp/misc.h
-+++ b/slirp/misc.h
-@@ -9,7 +9,7 @@
- #define MISC_H
-=20
- struct ex_list {
--	int ex_pty;			/* Do we want a pty? */
-+	int ex_chardev;
- 	struct in_addr ex_addr;		/* Server address */
- 	int ex_fport;                   /* Port to telnet to */
- 	const char *ex_exec;            /* Command line of what to exec */
 diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 4d4c2c13b5..0498a092b9 100644
+index fac7849195..ab08694e37 100644
 --- a/slirp/slirp.c
 +++ b/slirp/slirp.c
-@@ -1455,7 +1455,7 @@ static void slirp_state_save(QEMUFile *f, void *opa=
-que)
-     struct ex_list *ex_ptr;
+@@ -1088,10 +1088,10 @@ int slirp_add_exec(Slirp *slirp, void *chardev, c=
+onst char *cmdline,
 =20
-     for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_next=
-)
--        if (ex_ptr->ex_pty =3D=3D 3) {
-+        if (ex_ptr->ex_chardev) {
-             struct socket *so;
-             so =3D slirp_find_ctl_socket(slirp, ex_ptr->ex_addr,
-                                        ntohs(ex_ptr->ex_fport));
-@@ -1490,7 +1490,7 @@ static int slirp_state_load(QEMUFile *f, void *opaq=
-ue, int version_id)
-             return -EINVAL;
-         }
-         for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
-next) {
--            if (ex_ptr->ex_pty =3D=3D 3 &&
-+            if (ex_ptr->ex_chardev &&
-                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr &&
-                 so->so_fport =3D=3D ex_ptr->ex_fport) {
-                 break;
+ ssize_t slirp_send(struct socket *so, const void *buf, size_t len, int f=
+lags)
+ {
+-    if (so->s =3D=3D -1 && so->extra) {
++    if (so->s =3D=3D -1 && so->chardev) {
+         /* XXX this blocks entire thread. Rewrite to use
+          * qemu_chr_fe_write and background I/O callbacks */
+-        qemu_chr_fe_write_all(so->extra, buf, len);
++        qemu_chr_fe_write_all(so->chardev, buf, len);
+         return len;
+     }
+=20
+diff --git a/slirp/socket.h b/slirp/socket.h
+index 2f224bc34f..930ed95972 100644
+--- a/slirp/socket.h
++++ b/slirp/socket.h
+@@ -67,7 +67,7 @@ struct socket {
+=20
+   struct sbuf so_rcv;		/* Receive buffer */
+   struct sbuf so_snd;		/* Send buffer */
+-  void * extra;			/* Extra pointer */
++  void * chardev;
+ };
+=20
+=20
 diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index 0ccd8e1a96..dc19eea55a 100644
+index fd7521854e..4b40850c7a 100644
 --- a/slirp/tcp_subr.c
 +++ b/slirp/tcp_subr.c
-@@ -960,7 +960,7 @@ int tcp_ctl(struct socket *so)
-         for (ex_ptr =3D slirp->exec_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
-next) {
-             if (ex_ptr->ex_fport =3D=3D so->so_fport &&
+@@ -961,7 +961,7 @@ int tcp_ctl(struct socket *so)
                  so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
--                if (ex_ptr->ex_pty =3D=3D 3) {
-+                if (ex_ptr->ex_chardev) {
+                 if (ex_ptr->ex_chardev) {
                      so->s =3D -1;
-                     so->extra =3D (void *)ex_ptr->ex_exec;
+-                    so->extra =3D ex_ptr->ex_chardev;
++                    so->chardev =3D ex_ptr->ex_chardev;
                      return 1;
+                 }
+                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
 --=20
 2.20.1
