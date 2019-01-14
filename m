@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54453)
+Received: from eggs.gnu.org ([209.51.188.92]:54815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gj4sH-0005ox-7q
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:14:06 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gj4to-00075w-7s
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:15:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gj4sG-0005Ct-EX
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:14:05 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 14 Jan 2019 16:13:59 +0000
-Message-ID: <72f0f931-4b0e-e2fc-6cd2-e70766c4a3b2@virtuozzo.com>
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-4-vsementsov@virtuozzo.com>
-	<02429c8e-6453-3160-df89-1ae51d1abf7b@redhat.com>
-In-Reply-To: <02429c8e-6453-3160-df89-1ae51d1abf7b@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4802E3D805563048AA4BBAD4DC51FAA6@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@redhat.com>) id 1gj4tn-0006AU-9P
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:15:40 -0500
+Date: Mon, 14 Jan 2019 16:15:25 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190114161525.GA32304@stefanha-x1.localdomain>
+References: <20190109110144.18633-1-stefanha@redhat.com>
+	<w51pnt57slp.fsf@maestria.local.igalia.com>
+	<w51tvifqqlr.fsf@maestria.local.igalia.com>
+	<20190111132416.GI5010@dhcp-200-186.str.redhat.com>
+	<w51pnt3qo27.fsf@maestria.local.igalia.com>
+	<20190114133553.GE7038@stefanha-x1.localdomain>
+	<w51won7480o.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 03/11] block: improve should_update_child
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="X1bOJ3K7DJ5YkBrT"
+Content-Disposition: inline
+In-Reply-To: <w51won7480o.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
+ iothread race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com" <stefanha@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-MTQuMDEuMjAxOSAxNzozMiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4xMi4xOCAxMzoyMCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEFzIGl0IGFscmVhZHkgc2Fp
-ZCBpbiB0aGUgY29tbWVudCwgd2UgZG9uJ3Qgd2FudCB0byBjcmVhdGUgbG9vcHMgaW4NCj4+IHBh
-cmVudC0+Y2hpbGQgcmVsYXRpb25zLiBTbywgd2hlbiB3ZSB0cnkgdG8gYXBwZW5kIEB0byB0byBA
-Yywgd2Ugc2hvdWxkDQo+PiBjaGVjayB0aGF0IEBjIGlzIG5vdCBpbiBAdG8gY2hpbGRyZW4gc3Vi
-dHJlZSwgYW5kIHdlIHNob3VsZCBjaGVjayBpdA0KPj4gcmVjdXJzaXZlbHksIG5vdCBvbmx5IHRo
-ZSBmaXJzdCBsZXZlbC4gVGhlIHBhdGNoIHByb3ZpZGVzIEJGUy1iYXNlZA0KPj4gc2VhcmNoLCB0
-byBjaGVjayB0aGUgcmVsYXRpb25zLg0KPj4NCj4+IFRoaXMgaXMgbmVlZGVkIGZvciBmdXJ0aGVy
-IGZsZWVjaW5nLWhvb2sgZmlsdGVyIHVzYWdlOiB3ZSBuZWVkIHRvDQo+PiBhcHBlbmQgaXQgdG8g
-c291cmNlLCB3aGVuIHRoZSBob29rIGlzIGFscmVhZHkgYSBwYXJlbnQgb2YgdGFyZ2V0LCBhbmQN
-Cj4+IHNvdXJjZSBtYXkgYmUgaW4gYSBiYWNraW5nIGNoYWluIG9mIHRhcmdldCAoZmxlZWNpbmct
-c2NoZW1lKS4gU28sIG9uDQo+PiBhcHBlbmRpbmcsIHRoZSBob29rIHNob3VsZCBub3QgYmVjYW1l
-IGEgY2hpbGQgKGRpcmVjdCBvciB0aHJvdWdoDQo+PiBjaGlsZHJlbiBzdWJ0cmVlKSBvZiB0aGUg
-dGFyZ2V0Lg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBibG9jay5jIHwgMzMg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAy
-OCBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPiANCj4gSnVzdCB0d28gdGVjaG5pY2Fs
-IGRldGFpbHM6DQo+IA0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrLmMgYi9ibG9jay5jDQo+PiBpbmRl
-eCA0ZjVmZjJjYzEyLi44ZjA0ZjI5M2RhIDEwMDY0NA0KPj4gLS0tIGEvYmxvY2suYw0KPj4gKysr
-IGIvYmxvY2suYw0KPj4gQEAgLTM1MzYsNyArMzUzNiw3IEBAIHZvaWQgYmRydl9jbG9zZV9hbGwo
-dm9pZCkNCj4+ICAgDQo+PiAgIHN0YXRpYyBib29sIHNob3VsZF91cGRhdGVfY2hpbGQoQmRydkNo
-aWxkICpjLCBCbG9ja0RyaXZlclN0YXRlICp0bykNCj4+ICAgew0KPj4gLSAgICBCZHJ2Q2hpbGQg
-KnRvX2M7DQo+PiArICAgIEdMaXN0ICpxdWV1ZSA9IE5VTEwsICpwb3M7DQo+IA0KPiBHU0xpc3Qg
-c2hvdWxkIGJlIHN1ZmZpY2llbnQsIEkgdGhpbmsuDQo+IA0KPj4gICANCj4+ICAgICAgIGlmIChj
-LT5yb2xlLT5zdGF5X2F0X25vZGUpIHsNCj4+ICAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+PiBA
-QCAtMzU3MiwxMyArMzU3MiwzNiBAQCBzdGF0aWMgYm9vbCBzaG91bGRfdXBkYXRlX2NoaWxkKEJk
-cnZDaGlsZCAqYywgQmxvY2tEcml2ZXJTdGF0ZSAqdG8pDQo+PiAgICAgICAgKiBpZiBBIGlzIGEg
-Y2hpbGQgb2YgQiwgdGhhdCBtZWFucyB3ZSBjYW5ub3QgcmVwbGFjZSBBIGJ5IEIgdGhlcmUNCj4+
-ICAgICAgICAqIGJlY2F1c2UgdGhhdCB3b3VsZCBjcmVhdGUgYSBsb29wLiAgU2lsZW50bHkgZGV0
-YWNoaW5nIEEgZnJvbSBCDQo+PiAgICAgICAgKiBpcyBhbHNvIG5vdCByZWFsbHkgYW4gb3B0aW9u
-LiAgU28gb3ZlcmFsbCBqdXN0IGxlYXZpbmcgQSBpbg0KPj4gLSAgICAgKiBwbGFjZSB0aGVyZSBp
-cyB0aGUgbW9zdCBzZW5zaWJsZSBjaG9pY2UuICovDQo+PiAtICAgIFFMSVNUX0ZPUkVBQ0godG9f
-YywgJnRvLT5jaGlsZHJlbiwgbmV4dCkgew0KPj4gLSAgICAgICAgaWYgKHRvX2MgPT0gYykgew0K
-Pj4gLSAgICAgICAgICAgIHJldHVybiBmYWxzZTsNCj4+ICsgICAgICogcGxhY2UgdGhlcmUgaXMg
-dGhlIG1vc3Qgc2Vuc2libGUgY2hvaWNlLg0KPj4gKyAgICAgKg0KPj4gKyAgICAgKiBXZSB3b3Vs
-ZCBhbHNvIGNyZWF0ZSBhIGxvb3AgaW4gYW55IGNhc2VzIHdoZXJlIEBjIGlzIG9ubHkNCj4+ICsg
-ICAgICogaW5kaXJlY3RseSByZWZlcmVuY2VkIGJ5IEB0by4gUHJldmVudCB0aGlzIGJ5IHJldHVy
-bmluZyBmYWxzZQ0KPj4gKyAgICAgKiBpZiBAYyBpcyBmb3VuZCAoYnkgYnJlYWR0aC1maXJzdCBz
-ZWFyY2gpIGFueXdoZXJlIGluIHRoZSB3aG9sZQ0KPj4gKyAgICAgKiBzdWJ0cmVlIG9mIEB0by4N
-Cj4+ICsgICAgICovDQo+PiArDQo+PiArICAgIHBvcyA9IHF1ZXVlID0gZ19saXN0X2FwcGVuZChx
-dWV1ZSwgdG8pOw0KPj4gKyAgICB3aGlsZSAocG9zKSB7DQo+PiArICAgICAgICBCbG9ja0RyaXZl
-clN0YXRlICp2ID0gcG9zLT5kYXRhOw0KPj4gKyAgICAgICAgQmRydkNoaWxkICpjMjsNCj4+ICsN
-Cj4+ICsgICAgICAgIFFMSVNUX0ZPUkVBQ0goYzIsICZ2LT5jaGlsZHJlbiwgbmV4dCkgew0KPj4g
-KyAgICAgICAgICAgIGlmIChjMiA9PSBjKSB7DQo+PiArICAgICAgICAgICAgICAgIGdfbGlzdF9m
-cmVlKHF1ZXVlKTsNCj4+ICsgICAgICAgICAgICAgICAgcmV0dXJuIGZhbHNlOw0KPj4gKyAgICAg
-ICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgICAgICBpZiAoZ19saXN0X2ZpbmQocXVldWUsIGMy
-LT5icykpIHsNCj4+ICsgICAgICAgICAgICAgICAgY29udGludWU7DQo+PiArICAgICAgICAgICAg
-fQ0KPj4gKw0KPj4gKyAgICAgICAgICAgIHF1ZXVlID0gZ19saXN0X2FwcGVuZChxdWV1ZSwgYzIt
-PmJzKTsNCj4gDQo+IEFwcGVuZGluZyB0byBwb3Mgc2hvdWxkIGJlIGEgYml0IHF1aWNrZXIsIEkg
-cHJlc3VtZS4gIChBbmQgeW91IGNhbg0KPiBwcm9iYWJseSBpZ25vcmUgdGhlIHJlc3VsdCwgb3Ig
-anVzdCBhc3NlcnQgdGhhdCB0aGUgZmlyc3QgYXJndW1lbnQgd2FzDQo+IHJldHVybmVkLikNCg0K
-U28sIGV2ZW4gYmV0dGVyIGlzIHRvIHVzZSBHUXVldWUsIHN0cmFuZ2UgdGhhdCBJIGRpZG4ndC4N
-Cg0KPiANCj4gTWF4DQo+IA0KPj4gICAgICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgIHBvcyA9
-IHBvcy0+bmV4dDsNCj4+ICAgICAgIH0NCj4+ICAgDQo+PiArICAgIGdfbGlzdF9mcmVlKHF1ZXVl
-KTsNCj4+ICAgICAgIHJldHVybiB0cnVlOw0KPj4gICB9DQo+PiAgIA0KPj4NCj4gDQo+IA0KDQoN
-Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+
+--X1bOJ3K7DJ5YkBrT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jan 14, 2019 at 03:40:39PM +0100, Alberto Garcia wrote:
+> On Mon 14 Jan 2019 02:35:53 PM CET, Stefan Hajnoczi wrote:
+> > On Fri, Jan 11, 2019 at 03:14:08PM +0100, Alberto Garcia wrote:
+> >> On Fri 11 Jan 2019 02:24:16 PM CET, Kevin Wolf wrote:
+> >> >> >> The following QMP command leads to a crash when iothreads are us=
+ed:
+> >> >> >>
+> >> >> >>   { 'execute': 'device_del', 'arguments': {'id': 'data'} }
+> >> >> >
+> >> >> > How did you reproduce this? Do you have a test case?
+> >> >>=20
+> >> >> Ok, I finally reproduced it, the patch looks good to me.
+> >> >
+> >> > Can it be turned into a qemu-iotests case or is it too complicated f=
+or
+> >> > that?
+> >>=20
+> >> I can reproduce the problem reliably with this:
+> >>=20
+> >> { "execute": "qmp_capabilities" }
+> >> { "execute": "blockdev-add",
+> >>   "arguments": {"driver": "null-co", "node-name": "hd0"}}
+> >> { "execute": "object-add",
+> >>   "arguments": {"qom-type": "iothread", "id": "iothread0"}}
+> >> { "execute": "device_add",
+> >>   "arguments": {"id": "scsi0", "driver": "virtio-scsi-pci",
+> >>                 "iothread": "iothread0"}}
+> >> { "execute": "device_add",
+> >>   "arguments": {"id": "scsi-hd0", "driver": "scsi-hd", "drive": "hd0"}}
+> >> { "execute": "block_set_io_throttle",
+> >>   "arguments": {"id": "scsi-hd0", "bps": 0, "bps_rd": 0, "bps_wr": 0,
+> >>                 "iops": 1000, "iops_rd": 0, "iops_wr": 0}}
+> >> { "execute": "device_del", "arguments": {"id": "scsi-hd0"}}
+> >>=20
+> >> But this doesn't crash if I put it in an iotest.
+> >
+> > I've been able to reproduce this in an iotest, please see v2 of this
+> > series.
+>=20
+> That iotest doesn't crash for me :-?
+
+Does my iotest pass for you?
+
+On my machine the diff fails because signal 11 killed QEMU (and this
+prints a warning to the test output).
+
+Stefan
+
+--X1bOJ3K7DJ5YkBrT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcPLWdAAoJEJykq7OBq3PIYHoH/RX75f1DDxVdyo6KFPRxz1m0
+VkQBarTXGOxBOUX6uKQg15iuRz5bGBfmjjqCDpXSwh0C2hFs6IqG3a1ovzqiDH7x
+n20lorYb/dyEva+et7xBgPhEsDD4HaUPIFvMaxz6PKYx5qyU/I/HbUr7aUiB2PH9
+i1AgfV911miRSg8lDM/RBrH6F1ab37adVS6gjRv99Onw7c6sbaxvQTFnI7qOi+RS
+GaK5g2aK7imPuhGvdgq1dme1LDBCZ3dxsBq7bwIgwZDVp/FgMRx/uzHXCaqsGdlg
+kU1oeaAzM7Bl4RreQq66D876AKceeOZudEq61a/YtNqEh+j4YaqMCmuIrvcrtOQ=
+=5NHN
+-----END PGP SIGNATURE-----
+
+--X1bOJ3K7DJ5YkBrT--
