@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34666)
+Received: from eggs.gnu.org ([209.51.188.92]:34748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6h-0004Ba-LI
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:27 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bh-V0
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6g-0001A1-Fu
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37192)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0001D2-44
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:25 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:40302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6g-00015B-4u
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:22 -0500
+	id 1gjB6h-0001AO-Nq
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:05 +0100
-Message-Id: <20190114225306.21569-5-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:13 +0100
+Message-Id: <20190114225306.21569-13-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 04/65] slirp: use a dedicated field for chardev
- pointer
+Subject: [Qemu-devel] [PULL 12/65] slirp: add tftp tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,171 +28,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Liam Merwick <liam.merwick@oracle.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Let's not mix command line and chardev pointers.
+Useful when debugging pxeboot, to see what the guest tries to do.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- net/slirp.c      |  8 ++++----
- slirp/libslirp.h |  2 +-
- slirp/misc.c     | 11 +++++++----
- slirp/misc.h     |  4 ++--
- slirp/slirp.c    |  5 +++--
- slirp/tcp_subr.c |  2 +-
- 6 files changed, 18 insertions(+), 14 deletions(-)
+ Makefile.objs      | 1 +
+ slirp/tftp.c       | 3 +++
+ slirp/trace-events | 5 +++++
+ 3 files changed, 9 insertions(+)
+ create mode 100644 slirp/trace-events
 
-diff --git a/net/slirp.c b/net/slirp.c
-index dd06b0189e..58d880de8d 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -709,8 +709,8 @@ static int slirp_smb(SlirpState* s, const char *expor=
-ted_dir,
-              CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
-     g_free(smb_conf);
+diff --git a/Makefile.objs b/Makefile.objs
+index 456115992a..2121120492 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -193,6 +193,7 @@ trace-events-subdirs +=3D net
+ trace-events-subdirs +=3D qapi
+ trace-events-subdirs +=3D qom
+ trace-events-subdirs +=3D scsi
++trace-events-subdirs +=3D slirp
+ trace-events-subdirs +=3D target/arm
+ trace-events-subdirs +=3D target/i386
+ trace-events-subdirs +=3D target/mips
+diff --git a/slirp/tftp.c b/slirp/tftp.c
+index a9bc4bb1b6..735b57aa55 100644
+--- a/slirp/tftp.c
++++ b/slirp/tftp.c
+@@ -26,6 +26,7 @@
+ #include "slirp.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
++#include "trace.h"
 =20
--    if (slirp_add_exec(s->slirp, 0, smb_cmdline, &vserver_addr, 139) < 0=
- ||
--        slirp_add_exec(s->slirp, 0, smb_cmdline, &vserver_addr, 445) < 0=
-) {
-+    if (slirp_add_exec(s->slirp, NULL, smb_cmdline, &vserver_addr, 139) =
-< 0 ||
-+        slirp_add_exec(s->slirp, NULL, smb_cmdline, &vserver_addr, 445) =
-< 0) {
-         slirp_smb_cleanup(s);
-         g_free(smb_cmdline);
-         error_setg(errp, "Conflicting/invalid smbserver address");
-@@ -774,7 +774,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
-config_str, Error **errp)
-     snprintf(buf, sizeof(buf), "guestfwd.tcp.%d", port);
-=20
-     if ((strlen(p) > 4) && !strncmp(p, "cmd:", 4)) {
--        if (slirp_add_exec(s->slirp, 0, &p[4], &server, port) < 0) {
-+        if (slirp_add_exec(s->slirp, NULL, &p[4], &server, port) < 0) {
-             error_setg(errp, "Conflicting/invalid host:port in guest "
-                        "forwarding rule '%s'", config_str);
-             return -1;
-@@ -801,7 +801,7 @@ static int slirp_guestfwd(SlirpState *s, const char *=
-config_str, Error **errp)
-             return -1;
-         }
-=20
--        if (slirp_add_exec(s->slirp, 3, &fwd->hd, &server, port) < 0) {
-+        if (slirp_add_exec(s->slirp, &fwd->hd, NULL, &server, port) < 0)=
+ static inline int tftp_session_in_use(struct tftp_session *spt)
  {
-             error_setg(errp, "Conflicting/invalid host:port in guest "
-                        "forwarding rule '%s'", config_str);
-             g_free(fwd);
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 52dbb9feb5..3e88dbaa01 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -35,7 +35,7 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp,
-                       struct in_addr guest_addr, int guest_port);
- int slirp_remove_hostfwd(Slirp *slirp, int is_udp,
-                          struct in_addr host_addr, int host_port);
--int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
-+int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
-                    struct in_addr *guest_addr, int guest_port);
+@@ -204,6 +205,7 @@ static void tftp_send_error(struct tftp_session *spt,
+   struct mbuf *m;
+   struct tftp_t *tp;
 =20
- void slirp_connection_info(Slirp *slirp, Monitor *mon);
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 8f0b6004bd..2784fc420f 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -37,7 +37,7 @@ remque(void *a)
-   element->qh_rlink =3D NULL;
- }
++  trace_slirp_tftp_error(msg);
+   m =3D m_get(spt->slirp);
 =20
--int add_exec(struct ex_list **ex_ptr, int do_pty, char *exec,
-+int add_exec(struct ex_list **ex_ptr, void *chardev, const char *cmdline=
-,
-              struct in_addr addr, int port)
- {
- 	struct ex_list *tmp_ptr;
-@@ -50,11 +50,14 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, cha=
-r *exec,
- 	}
-=20
- 	tmp_ptr =3D *ex_ptr;
--	*ex_ptr =3D g_new(struct ex_list, 1);
-+	*ex_ptr =3D g_new0(struct ex_list, 1);
- 	(*ex_ptr)->ex_fport =3D port;
- 	(*ex_ptr)->ex_addr =3D addr;
--	(*ex_ptr)->ex_chardev =3D do_pty =3D=3D 3;
--	(*ex_ptr)->ex_exec =3D (do_pty =3D=3D 3) ? exec : g_strdup(exec);
-+	if (chardev) {
-+		(*ex_ptr)->ex_chardev =3D chardev;
-+	} else {
-+		(*ex_ptr)->ex_exec =3D g_strdup(cmdline);
-+	}
- 	(*ex_ptr)->ex_next =3D tmp_ptr;
- 	return 0;
- }
-diff --git a/slirp/misc.h b/slirp/misc.h
-index 1f8d11def6..64ca88c3b7 100644
---- a/slirp/misc.h
-+++ b/slirp/misc.h
-@@ -9,7 +9,7 @@
- #define MISC_H
-=20
- struct ex_list {
--	int ex_chardev;
-+	void *ex_chardev;
- 	struct in_addr ex_addr;		/* Server address */
- 	int ex_fport;                   /* Port to telnet to */
- 	const char *ex_exec;            /* Command line of what to exec */
-@@ -52,7 +52,7 @@ struct slirp_quehead {
-=20
- void slirp_insque(void *, void *);
- void slirp_remque(void *);
--int add_exec(struct ex_list **, int, char *, struct in_addr, int);
-+int add_exec(struct ex_list **, void *, const char *, struct in_addr, in=
-t);
- int fork_exec(struct socket *so, const char *ex);
-=20
- #endif
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 0498a092b9..0de46084c0 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -1068,7 +1068,7 @@ int slirp_add_hostfwd(Slirp *slirp, int is_udp, str=
-uct in_addr host_addr,
-     return 0;
- }
-=20
--int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
-+int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
-                    struct in_addr *guest_addr, int guest_port)
- {
-     if (!guest_addr->s_addr) {
-@@ -1081,7 +1081,8 @@ int slirp_add_exec(Slirp *slirp, int do_pty, const =
-void *args,
-         guest_addr->s_addr =3D=3D slirp->vnameserver_addr.s_addr) {
-         return -1;
+   if (!m) {
+@@ -323,6 +325,7 @@ static void tftp_handle_rrq(Slirp *slirp, struct sock=
+addr_storage *srcsas,
+       break;
      }
--    return add_exec(&slirp->exec_list, do_pty, (char *)args, *guest_addr=
-,
-+
-+    return add_exec(&slirp->exec_list, chardev, cmdline, *guest_addr,
-                     htons(guest_port));
- }
+   }
++  trace_slirp_tftp_rrq(req_fname);
 =20
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index dc19eea55a..e7b2baa087 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -962,7 +962,7 @@ int tcp_ctl(struct socket *so)
-                 so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr) {
-                 if (ex_ptr->ex_chardev) {
-                     so->s =3D -1;
--                    so->extra =3D (void *)ex_ptr->ex_exec;
-+                    so->extra =3D ex_ptr->ex_chardev;
-                     return 1;
-                 }
-                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
+   /* check mode */
+   if ((pktlen - k) < 6) {
+diff --git a/slirp/trace-events b/slirp/trace-events
+new file mode 100644
+index 0000000000..ff8f656e8c
+--- /dev/null
++++ b/slirp/trace-events
+@@ -0,0 +1,5 @@
++# See docs/devel/tracing.txt for syntax documentation.
++
++# slirp/tftp.c
++slirp_tftp_rrq(const char *file) "file: %s"
++slirp_tftp_error(const char *file) "msg: %s"
 --=20
 2.20.1
