@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53599)
+Received: from eggs.gnu.org ([209.51.188.92]:54499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gj1HJ-0002SP-BY
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:23:42 -0500
+	(envelope-from <philmd@redhat.com>) id 1gj1KX-0004Hp-Sb
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:27:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gj1HH-00031r-VD
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:23:41 -0500
-Date: Mon, 14 Jan 2019 13:23:09 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190114132309.14e7e9a0.cohuck@redhat.com>
-In-Reply-To: <154724057022.525985.2498693456915341883.stgit@bahia.lan>
-References: <154724039526.525985.3172545257507998890.stgit@bahia.lan>
-	<154724057022.525985.2498693456915341883.stgit@bahia.lan>
+	(envelope-from <philmd@redhat.com>) id 1gj1KW-0004WU-IE
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:27:01 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46158)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj1KW-0004Vr-Bk
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:27:00 -0500
+Received: by mail-wr1-f68.google.com with SMTP id l9so22567355wrt.13
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 04:26:59 -0800 (PST)
+References: <20181213162727.17438-1-lvivier@redhat.com>
+	<62bd556c-93e2-d5d0-117c-7e3b8a28ea1c@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <246ba1a4-a6a3-128d-c535-75674c6f2911@redhat.com>
+Date: Mon, 14 Jan 2019 13:26:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <62bd556c-93e2-d5d0-117c-7e3b8a28ea1c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 07/13] qdev: pass an Object * to
- qbus_set_hotplug_handler()
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] block: Convert from DPRINTF() macro
+ to trace event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Richard W.M. Jones" <rjones@redhat.com>, Liu Yuan <namei.unix@gmail.com>
 
-On Fri, 11 Jan 2019 22:02:50 +0100
-Greg Kurz <groug@kaod.org> wrote:
+On 1/14/19 1:14 PM, Max Reitz wrote:
+> On 13.12.18 17:27, Laurent Vivier wrote:
+>> Convert all the remaining uses of DPRINTF() in the directory block.
+>>
+>> Compiled for all target but only tested with "make check"
+>>
+>> v2: replace "sd_" prefix by "sheepdog_"
+>>     remove the dot at the end of the text strings
+>>     use %zu with size_t
+>>     change an uint64_t to int64_t to match % PRIi64
+>>
+>> Laurent Vivier (4):
+>>   block/ssh: Convert from DPRINTF() macro to trace events
+>>   block/curl: Convert from DPRINTF() macro to trace events
+>>   block/file-posix: Convert from DPRINTF() macro to trace events
+>>   block/sheepdog: Convert from DPRINTF() macro to trace events
+> 
+> Applied to my block branch, with three fixes (Philippe asked me to do
+> one, so what are two more O:-)):
+> - Patch 1: Fixed ssh_{read,write}_return's @ret sign
+> - Patch 3: Moved the pointer asterisk in file_xfs_discard from type to name
+> - Patch 4: Fixed sheepdog_snapshot_create_inode's format string to use
+> PRIx32 instead of %x for uint32_ts
 
-> From: Michael Roth <mdroth@linux.vnet.ibm.com>
-> 
-> Certain devices types, like memory/CPU, are now being handled using a
-> hotplug interface provided by a top-level MachineClass. Hotpluggable
-> host bridges are another such device where it makes sense to use a
-> machine-level hotplug handler. However, unlike those devices,
-> host-bridges have a parent bus (the main system bus), and devices with
-> a parent bus use a different mechanism for registering their hotplug
-> handlers: qbus_set_hotplug_handler(). This interface currently expects
-> a handler to be a subclass of DeviceClass, but this is not the case
-> for MachineClass, which derives directly from ObjectClass.
-> 
-> Internally, the interface only requires an ObjectClass, so expose that
-> in qbus_set_hotplug_handler().
-> 
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/acpi/pcihp.c               |    2 +-
->  hw/acpi/piix4.c               |    2 +-
->  hw/char/virtio-serial-bus.c   |    2 +-
->  hw/core/bus.c                 |   11 ++---------
->  hw/pci/pcie.c                 |    2 +-
->  hw/pci/shpc.c                 |    2 +-
->  hw/ppc/spapr_pci.c            |    2 +-
->  hw/s390x/css-bridge.c         |    2 +-
->  hw/s390x/s390-pci-bus.c       |    6 +++---
->  hw/scsi/virtio-scsi.c         |    2 +-
->  hw/scsi/vmw_pvscsi.c          |    2 +-
->  hw/usb/dev-smartcard-reader.c |    2 +-
->  include/hw/qdev-core.h        |    3 +--
->  13 files changed, 16 insertions(+), 24 deletions(-)
+Thank you Max!
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
+> (https://git.xanclic.moe/XanClic/qemu/commits/branch/block)
+> 
+> Thanks!
+> 
+> Max
+> 
