@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58983)
+Received: from eggs.gnu.org ([209.51.188.92]:59024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAov-00024R-ND
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:35:02 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAp1-0002Az-PA
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:35:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAou-0006E0-Sl
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:35:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42662)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gjAp0-0006Ju-Vh
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:35:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36768)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gjAou-0006Dr-NO
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:35:00 -0500
+	id 1gjAp0-0006Je-Pr
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:35:06 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 15 Jan 2019 02:27:48 +0400
-Message-Id: <20190114222754.21701-1-marcandre.lureau@redhat.com>
+Date: Tue, 15 Jan 2019 02:27:49 +0400
+Message-Id: <20190114222754.21701-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20190114222754.21701-1-marcandre.lureau@redhat.com>
+References: <20190114222754.21701-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v17 0/6] Add support for TPM Physical Presence
- interface
+Subject: [Qemu-devel] [PATCH v17 1/6] tpm: add a "ppi" boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +30,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, f4bug@amsat.org, Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi,
+The following patches implement the TPM Physical Presence Interface,
+make use of a new memory region and a fw_cfg entry. Enable PPI by
+default with >=3D4.0 machine type, to avoid migration issues.
 
-The following patches implement the TPM Physical Presence Interface
-that allows a user to set a command via ACPI (sysfs entry in Linux)
-that, upon the next reboot, the firmware looks for and acts upon by
-sending sequences of commands to the TPM.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ hw/core/machine.c | 2 ++
+ hw/tpm/tpm_crb.c  | 3 +++
+ hw/tpm/tpm_tis.c  | 3 +++
+ 3 files changed, 8 insertions(+)
 
-A dedicated memory region is added to the TPM CRB & TIS devices, at
-address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
-holds the location for that PPI region and some version details, to
-allow for future flexibility.
-
-With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
-now runs successfully.
-
-It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
-Implement Physical Presence interface for TPM 1.2 and 2")
-
-The edk2 support is merged upstream.
-
-v17:
-- rebased, minor conflicts
-- modify commit message in "acpi: add ACPI memory clear interface" to
-  add a link to the specification.
-- add some r-b
-
-v16:
-- minor comments and stylistic changes
-- add r-b & t-b tags
-
-v15:
-- fix crash on reset when PPI is disabled
-
-v14:
-- rebased, fixing conflicts after compat-props refactoring
-- fix build regression from v13 with --disable-tpm
-
-v13:
-- removed needless error handling in tpm_ppi_init()
-- splitted "add ACPI memory clear interface"
-- moved acpi build function in dedicated hw/acpi/tpm.c
-- added some function documentation in headers
-- various code cleanups suggested by Philippe
-- rebased
-
-Marc-Andr=C3=A9 Lureau (3):
-  tpm: add a "ppi" boolean property
-  acpi: add ACPI memory clear interface
-  tpm: clear RAM when "memory overwrite" requested
-
-Stefan Berger (3):
-  tpm: allocate/map buffer for TPM Physical Presence interface
-  acpi: expose TPM/PPI configuration parameters to firmware via fw_cfg
-  acpi: build TPM Physical Presence interface
-
- hw/tpm/tpm_ppi.h      |  46 +++++
- include/hw/acpi/tpm.h |  21 ++
- hw/acpi/tpm.c         | 459 ++++++++++++++++++++++++++++++++++++++++++
- hw/core/machine.c     |   2 +
- hw/i386/acpi-build.c  |  29 ++-
- hw/tpm/tpm_crb.c      |  13 ++
- hw/tpm/tpm_ppi.c      |  53 +++++
- hw/tpm/tpm_tis.c      |  13 ++
- stubs/tpm.c           |   5 +
- docs/specs/tpm.txt    | 104 ++++++++++
- hw/acpi/Makefile.objs |   1 +
- hw/tpm/Makefile.objs  |   1 +
- hw/tpm/trace-events   |   3 +
- 13 files changed, 748 insertions(+), 2 deletions(-)
- create mode 100644 hw/tpm/tpm_ppi.h
- create mode 100644 hw/acpi/tpm.c
- create mode 100644 hw/tpm/tpm_ppi.c
-
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 95dc7c3913c..92e58c81825 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -28,6 +28,8 @@ GlobalProperty hw_compat_3_1[] =3D {
+     { "pcie-root-port", "x-width", "1" },
+     { "memory-backend-file", "x-use-canonical-path-for-ramblock-id", "tr=
+ue" },
+     { "memory-backend-memfd", "x-use-canonical-path-for-ramblock-id", "t=
+rue" },
++    { "tpm-crb", "ppi", "false" },
++    { "tpm-tis", "ppi", "false" },
+ };
+ const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
+=20
+diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+index a92dd50437b..d5b0ac5920a 100644
+--- a/hw/tpm/tpm_crb.c
++++ b/hw/tpm/tpm_crb.c
+@@ -41,6 +41,8 @@ typedef struct CRBState {
+     MemoryRegion cmdmem;
+=20
+     size_t be_buffer_size;
++
++    bool ppi_enabled;
+ } CRBState;
+=20
+ #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+@@ -221,6 +223,7 @@ static const VMStateDescription vmstate_tpm_crb =3D {
+=20
+ static Property tpm_crb_properties[] =3D {
+     DEFINE_PROP_TPMBE("tpmdev", CRBState, tpmbe),
++    DEFINE_PROP_BOOL("ppi", CRBState, ppi_enabled, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 2563d7501fc..1698d83cd3f 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -81,6 +81,8 @@ typedef struct TPMState {
+     TPMVersion be_tpm_version;
+=20
+     size_t be_buffer_size;
++
++    bool ppi_enabled;
+ } TPMState;
+=20
+ #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+@@ -954,6 +956,7 @@ static const VMStateDescription vmstate_tpm_tis =3D {
+ static Property tpm_tis_properties[] =3D {
+     DEFINE_PROP_UINT32("irq", TPMState, irq_num, TPM_TIS_IRQ),
+     DEFINE_PROP_TPMBE("tpmdev", TPMState, be_driver),
++    DEFINE_PROP_BOOL("ppi", TPMState, ppi_enabled, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
 --=20
 2.20.1.98.gecbdaf0899
