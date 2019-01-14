@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32805)
+Received: from eggs.gnu.org ([209.51.188.92]:32841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gj02q-00065P-WE
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gj02s-00066W-6W
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gj02p-0005x1-UE
+	(envelope-from <peter.maydell@linaro.org>) id 1gj02q-0005xH-3o
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:42 -0500
+Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:41836)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gj02p-0005nA-LV
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34048)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gj02p-0005ZR-Nv
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:04:39 -0500
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <87y38j3r1c.fsf@vitty.brq.redhat.com>
-References: <20181126135958.20956-1-vkuznets@redhat.com>
-	<c30c335e-ca21-1179-670b-d4506ce14571@redhat.com>
-	<878t1chzj8.fsf@vitty.brq.redhat.com>
-	<20181130183608.GQ18284@habkost.net>
-	<871s6yy9st.fsf@vitty.brq.redhat.com>
-	<20181204180808.GC18284@habkost.net>
-	<875zvpl98t.fsf@vitty.brq.redhat.com>
-	<20181220120544.GL19442@habkost.net>
-	<87y38j3r1c.fsf@vitty.brq.redhat.com>
-Date: Mon, 14 Jan 2019 11:54:30 +0100
-Message-ID: <87h8eb4ihl.fsf@vitty.brq.redhat.com>
+Received: by mail-oi1-x22b.google.com with SMTP id j21so17488842oii.8
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 03:04:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] i386/kvm: expose
- HV_CPUID_ENLIGHTMENT_INFO.EAX and HV_CPUID_NESTED_FEATURES.EAX as feature
- words
+References: <20190111182533.31593-1-ehabkost@redhat.com>
+In-Reply-To: <20190111182533.31593-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Jan 2019 11:04:21 +0000
+Message-ID: <CAFEAcA-q-ZamiVtN6yLD9jFAywqLgo3aq6H7rukyBOZ62dQaDA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] Work around test-qht-par + gprof issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,57 +29,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
-
-> Eduardo Habkost <ehabkost@redhat.com> writes:
+On Fri, 11 Jan 2019 at 18:25, Eduardo Habkost <ehabkost@redhat.com> wrote:
 >
->> On Wed, Dec 19, 2018 at 06:25:06PM +0100, Vitaly Kuznetsov wrote:
->>> Eduardo Habkost <ehabkost@redhat.com> writes:
->>> 
->>> > On Mon, Dec 03, 2018 at 03:17:06PM +0100, Vitaly Kuznetsov wrote:
->>> >> Eduardo Habkost <ehabkost@redhat.com> writes:
->>> > [...]
->>> >> > But note that we might still be able to move the existing
->>> >> > "hyperv_*" features to feature_word_info[].feat_names.  We just
->>> >> > need to keep the same semantics (e.g. enable
->>> >> > HV_HYPERCALL_AVAILABLE automatically when some features are set).
->>> >> >
->>> >> > Maybe we can make some of the feature properties read-only.  This
->>> >> > way we can give them meaningful names for debugging and error
->>> >> > messages, even if we don't want to make them configurable
->>> >> > directly.
->>> >> 
->>> >> I'd suggest (if there are no objections of course) we do this separately
->>> >> from this patch. [...]
->>> >
->>> > Agreed.
->>> >
->>> 
->>> Paolo, Eduardo,
->>> 
->>> in case there are no concerns here, could you please pick this patch up?
->>> Thanks!
->>
->> Queued, thanks!
->>
->> Can you please send the comment you wrote about feat_names as a
->> follow-up patch?
+> The following changes since commit e53f7796fbe71a5c7c24ffebf04b4aa9a759da36:
 >
-> Oops, sorry, I just realized I promissed to send out v2 with it and
-> aparently never did. Will send out a follow-up patch shortly. Thanks!
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2019-01-11 13:35:48 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+>
+> for you to fetch changes up to ce2eefd7c21697fee87a0686353de881081d22c6:
+>
+>   tests: Disable qht-bench parallel test when using gprof (2019-01-11 16:21:45 -0200)
+>
+> ----------------------------------------------------------------
+> Work around test-qht-par + gprof issues
+>
+> Travis CI jobs are failing because of test-qht-par when gprof is
+> enabled.  Temporarily disable test-qht-par if gprof is enabled,
+> until we fix the bug.
+>
+> ----------------------------------------------------------------
 
-Hey Eduardo,
+Applied, thanks.
 
-any news about the fate of this patch?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
 
-(Correcting myself: there was v2 with the comment included:
-https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg00355.html
-
-but as I sent the follow-up patch you requested separately too:
-https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg05463.html
-)
-
--- 
-Vitaly
+-- PMM
