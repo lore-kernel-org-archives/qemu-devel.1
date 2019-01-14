@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35337)
+Received: from eggs.gnu.org ([209.51.188.92]:35340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gj20n-0006fC-UJ
+	(envelope-from <mreitz@redhat.com>) id 1gj20n-0006fF-VN
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:10:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gj20m-0007sF-O4
+	(envelope-from <mreitz@redhat.com>) id 1gj20m-0007s1-MR
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:10:41 -0500
-Received: from m50-111.126.com ([123.125.50.111]:51086)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lifei1214@126.com>) id 1gj20j-0007jC-F6
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:10:40 -0500
-From: Fei Li <lifei1214@126.com>
-Date: Mon, 14 Jan 2019 21:10:15 +0800
-Message-Id: <20190114131015.52967-1-lifei1214@126.com>
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-2-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
+Date: Mon, 14 Jan 2019 14:10:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] hw/misc/edu: add msi_uninit() for
- pci_edu_uninit()
+In-Reply-To: <20181229122027.42245-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ZeQXycoWFSQx31FzCmFWpWBXBt1PW4cZ7"
+Subject: Re: [Qemu-devel] [PATCH v5 01/11] block/backup: simplify
+ backup_incremental_init_copy_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jiri Slaby <jslaby@suse.cz>, shirley17fei@gmail.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-From: Fei Li <shirley17fei@gmail.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZeQXycoWFSQx31FzCmFWpWBXBt1PW4cZ7
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com,
+ den@openvz.org, eblake@redhat.com, jsnow@redhat.com
+Message-ID: <cc033e38-2790-6dcd-6401-191ce9bf8d81@redhat.com>
+Subject: Re: [PATCH v5 01/11] block/backup: simplify
+ backup_incremental_init_copy_bitmap
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+ <20181229122027.42245-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20181229122027.42245-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Let's supplement the msi_uninit() when failing to realize
-the pci edu device.
+On 29.12.18 13:20, Vladimir Sementsov-Ogievskiy wrote:
+> Simplify backup_incremental_init_copy_bitmap using the function
+> bdrv_dirty_bitmap_next_dirty_area.
+>=20
+> Note: move to job->len instead of bitmap size: it should not matter but=
 
-Reported-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Fei Li <shirley17fei@gmail.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
----
- hw/misc/edu.c | 1 +
- 1 file changed, 1 insertion(+)
+> less code.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 40 ++++++++++++----------------------------
+>  1 file changed, 12 insertions(+), 28 deletions(-)
 
-diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-index cdcf550dd7..ceaf688bfb 100644
---- a/hw/misc/edu.c
-+++ b/hw/misc/edu.c
-@@ -377,6 +377,7 @@ static void pci_edu_uninit(PCIDevice *pdev)
-     qemu_mutex_destroy(&edu->thr_mutex);
- 
-     timer_del(&edu->dma_timer);
-+    msi_uninit(pdev);
- }
- 
- static void edu_obj_uint64(Object *obj, Visitor *v, const char *name,
--- 
-2.17.2 (Apple Git-113)
+Overall: What is this function even supposed to do?  To me, it looks
+like it marks all areas in job->copy_bitmap dirty that are dirty in
+job->sync_bitmap.
+
+If so, wouldn't just replacing this by hbitmap_merge() simplify things
+further?
+
+> diff --git a/block/backup.c b/block/backup.c
+> index 435414e964..fbe7ce19e1 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -406,43 +406,27 @@ static int coroutine_fn backup_run_incremental(Ba=
+ckupBlockJob *job)
+
+[...]
+
+> +    while (bdrv_dirty_bitmap_next_dirty_area(job->sync_bitmap,
+> +                                             &offset, &bytes))
+> +    {
+> +        uint64_t cluster =3D offset / job->cluster_size;
+> +        uint64_t last_cluster =3D (offset + bytes) / job->cluster_size=
+;
+> =20
+> -        next_cluster =3D DIV_ROUND_UP(offset, job->cluster_size);
+> -        hbitmap_set(job->copy_bitmap, cluster, next_cluster - cluster)=
+;
+> -        if (next_cluster >=3D end) {
+> +        hbitmap_set(job->copy_bitmap, cluster, last_cluster - cluster =
++ 1);
+
+Why the +1?  Shouldn't the division for last_cluster round up instead?
+
+> +
+> +        offset =3D (last_cluster + 1) * job->cluster_size;
+
+Same here.
+
+Max
+
+
+--ZeQXycoWFSQx31FzCmFWpWBXBt1PW4cZ7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw8ij8ACgkQ9AfbAGHV
+z0ATbgf+P63VPPxmL6Y+F0AJmfTnX3lQujhDW1O3FqpZfN3UA3myARchoZxCokQI
+U2ZpaYI68pYDaX/5JQ2GG7ibKwk8PYB5bVrHw0BDlOYx7XhZXP1alfOf9BkgWBNF
+GeJGbFdsmwwpEpQs3lHNjY1IHSU4odLt5e4N5KmdLaqaK5izDiLqXq1Tg/HjIDOx
+Ft6Ed+Ps3B7wDuxuGwZFmQob6Cyb0xrEJlWCrNrc/g2n6t1AvPsy67+Xp+penER3
+5env6JJArXnY1whWT/tZFlRLWxw1COO2CftyGTRjIjVEYUl6eyw3xw0G7s/P0GJE
+PXkSVWSq7Za65xEN6VMJ0DGwPZgbEA==
+=3E6Y
+-----END PGP SIGNATURE-----
+
+--ZeQXycoWFSQx31FzCmFWpWBXBt1PW4cZ7--
