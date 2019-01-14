@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60095)
+Received: from eggs.gnu.org ([209.51.188.92]:36312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1giqMo-0008VH-2Z
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:44:39 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1giqkI-0004Ry-3e
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:08:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1giqMl-0001OK-PO
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:44:38 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1giqMg-0001Ko-SK
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:44:32 -0500
-Received: by mail-oi1-x243.google.com with SMTP id a77so16568445oii.5
-	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 16:44:28 -0800 (PST)
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1giqkG-0007eR-T3
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:08:54 -0500
 MIME-Version: 1.0
-In-Reply-To: <20190113185708.GA27922@sx9>
-References: <cover.1541093316.git.noring@nocrew.org>
-	<eecae865fc8f7934cc2d51b24cba7d8ac3ec37c6.1541093316.git.noring@nocrew.org>
-	<BN6PR2201MB1251DBF84B71346A8B673CA6C6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20190101182745.GA17022@sx9>
-	<BN6PR2201MB1251C334FE66ADF677BAE8D2C68E0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20190113185708.GA27922@sx9>
+In-Reply-To: <20190108163008.7006-4-peter.maydell@linaro.org>
+References: <20190108163008.7006-1-peter.maydell@linaro.org>
+	<20190108163008.7006-4-peter.maydell@linaro.org>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 14 Jan 2019 01:44:27 +0100
-Message-ID: <CAL1e-=je93qUvfcq3ftNxYucjLYPEZf=dPXv6tSuzsE3SdsWKw@mail.gmail.com>
+Date: Mon, 14 Jan 2019 02:08:48 +0100
+Message-ID: <CAL1e-=gtbka64eAhVdbPyLa4+HP-OSQRg7u6+SC-8MCRgoZ9Qw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 09/12] tests/tcg/mips: Test R5900
- three-operand MADDU1
+Subject: Re: [Qemu-devel] [PATCH 3/4] accel/tcg: Add cluster number to TCG
+ TB hash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,125 +23,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, "patches@linaro.org" <patches@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Sunday, January 13, 2019, Fredrik Noring <noring@nocrew.org> wrote:
+On Tuesday, January 8, 2019, Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> Hi Aleksandar,
+> Include the cluster number in the hash we use to look
+> up TBs. This is important because a TB that is valid
+> for one cluster at a given physical address and set
+> of CPU flags is not necessarily valid for another:
+> the two clusters may have different views of physical
+> memory, or may have different CPU features (eg FPU
+> present or absent).
 >
-> > - Suggestion: The next MIPS pull request is scehuled for Friday,
-> > Jan 18, 2018. It would be fantastic if you could prepare the
-> > following by Jan 14:
-> >
-> >   * Add 32 TCGv_i64 registers that would represent higher halves
-> >   of R5900 general purpose registers.
 >
-> Done!
+Hi, Peter.
 
+I do understand the definition of cluster_index in the sense of this
+series. However, it looks to me that the term "cluster" is generally
+overused in areas where we work. This may lead to some confusion for future
+developers, and let me suggest some other name, like "tcg_cluster_index" or
+"tcg_group_id", or "translation_group_id". Admitedly, they all sound ugly
+to me too. But having the name that would clearly separate this id from too
+generic "cluster_index" IMHO would save lots of time during potential
+related future development.
 
-Awesome!
+(Needled to say that,  for example, we in MIPS, for multi-core sustems,
+group cores in clusters, that actually do not have anything to do with
+clusters in TCG sense...)
 
-I am especially happy with your choice of naming "mmr" (MultiMedia
-Registers) for these fieilds, since that is what they really are (and they
-are certainly not "gprs"). Right on the money!
-
-
->
-> >   * Add TCGv_i32 register SA (shift amount).
->
-> See notes below.
->
-> >   * Perhaps consider adding higher halves of registers HI an LO
-> >   independently on HI/LO array used by DSP.
->
-> For HI1 and LO1 only? I'm asking since HI0 and LO0 are implemented with
-> the DSP array anyway, for all ISAs.
->
->
-I leave it to your judgement. If you are not sure (or you find the current
-implementation too sensitive or contrieved to touch), you can leave HI1/LO1
-fields implementation as it is now. My motivation was avoiding usage of the
-same data fields for two relatively independant purposes.
-
-
-> >   * It is customary to implement R/W access while introducing
-> >   such registers:
-> >     * Implement R/W access instructions to higher halves of
-> >     R5900 GPRs:
-> >       * LQ
->
-> Done, including PCPYUD and PCPYLD for proper testing!
->
->
-Outstanding! I salute your including PCPYUD and PCPYLD in this group - they
-too can be considered "basic R/W access to mmr".
-
-
-> >       * SQ
->
-> Done, including testing!
->
->
-Perfect!
-
-
-> >     * Implement R/W access instructions to SA register:
-> >       * MFSA
->
-> The TX79 manual says that "the sole purpose of this instruction is to
-> permit the shift amount to be saved during a context switch" and that
-> "the shift amount is encoded in SA in an implementation-defined manner"
-> so it seems to make more sense for system mode rather than user mode?
->
-> One may want to choose an implementation that matches the actual R5900
-> hardware, even though the manual says it's arbitrary.
->
-> >       * MTSA
->
-> Likewise.
->
-> >       * MTSAH
-> >       * MTSAB
->
-> These instructions do not appear to be usable unless the corresponding
-> shift instructions are implemented as well?
->
->
-The goal right now is to prepare basic stuff related to SA register, even
-though there is possibly no immediate any application use case. However,
-this will make potential future development considerably easier, so please
-include handling of this register and these instructions.
-
-
-> I will post an R5900 multimedia instruction patch series shortly.
->
->
-Yes, go ahead, please!
-
-I unfortunatelly will not have enough time for detailed review before
-Tuesday, but I have a relatively simple hint right now:
-
-Regarding segments:
-
-+    int rs = extract32(ctx->opcode, 21, 5);
-+    int rt = extract32(ctx->opcode, 16, 5);
-+    int rd = extract32(ctx->opcode, 11, 5);
-
-Please include them in gen_XXX() functions, rather than in decode_XXX()
-functions. This will leave decode_XXX() functions with a single
-responsibility of detecting what instruction is about to be processed,
-which is cleaner from logical decomposition point of view (even if it would
-sometimes result in the repetition of some code segments - logical
-decomposition is of far greater importance).
-
-Thanks for all efforts!!
+Sincerely,
 
 Aleksandar
 
 
 
-
-> Fredrik
+> We put the cluster number in the high 8 bits of the
+> TB cflags. This gives us up to 256 clusters, which should
+> be enough for anybody. If we ever need more, or need
+> more bits in cflags for other purposes, we could make
+> tb_hash_func() take more data (and expand qemu_xxhash7()
+> to qemu_xxhash8()).
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/exec/exec-all.h   | 4 +++-
+>  accel/tcg/cpu-exec.c      | 4 ++++
+>  accel/tcg/translate-all.c | 3 +++
+>  3 files changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index 815e5b1e838..aa7b81aaf01 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -351,9 +351,11 @@ struct TranslationBlock {
+>  #define CF_USE_ICOUNT  0x00020000
+>  #define CF_INVALID     0x00040000 /* TB is stale. Set with @jmp_lock held
+> */
+>  #define CF_PARALLEL    0x00080000 /* Generate code for a parallel context
+> */
+> +#define CF_CLUSTER_MASK 0xff000000 /* Top 8 bits are cluster ID */
+> +#define CF_CLUSTER_SHIFT 24
+>  /* cflags' mask for hashing/comparison */
+>  #define CF_HASH_MASK   \
+> -    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL)
+> +    (CF_COUNT_MASK | CF_LAST_IO | CF_USE_ICOUNT | CF_PARALLEL |
+> CF_CLUSTER_MASK)
+>
+>      /* Per-vCPU dynamic tracing state used to generate this TB */
+>      uint32_t trace_vcpu_dstate;
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 870027d4359..e578a1a3aee 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -336,6 +336,10 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu,
+> target_ulong pc,
+>          return NULL;
+>      }
+>      desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
+> +
+> +    cf_mask &= ~CF_CLUSTER_MASK;
+> +    cf_mask |= cpu->cluster_index << CF_CLUSTER_SHIFT;
+> +
+>      h = tb_hash_func(phys_pc, pc, flags, cf_mask, *cpu->trace_dstate);
+>      return qht_lookup_custom(&tb_ctx.htable, &desc, h, tb_lookup_cmp);
+>  }
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 639f0b27287..ba27f5acc8c 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1692,6 +1692,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+>          cflags |= CF_NOCACHE | 1;
+>      }
+>
+> +    cflags &= ~CF_CLUSTER_MASK;
+> +    cflags |= cpu->cluster_index << CF_CLUSTER_SHIFT;
+> +
+>   buffer_overflow:
+>      tb = tb_alloc(pc);
+>      if (unlikely(!tb)) {
+> --
+> 2.19.2
+>
 >
 >
