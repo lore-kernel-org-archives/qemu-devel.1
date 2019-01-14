@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44898)
+Received: from eggs.gnu.org ([209.51.188.92]:47485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz56-0005hi-PQ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:57 -0500
+	(envelope-from <berrange@redhat.com>) id 1gizHJ-0008CT-0c
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:15:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz54-0007cG-TX
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42024)
+	(envelope-from <berrange@redhat.com>) id 1gizHH-00064w-6s
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:15:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz54-0007bd-Nl
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:54 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 11:02:15 +0100
-Message-Id: <1547460140-1473-21-git-send-email-thuth@redhat.com>
-In-Reply-To: <1547460140-1473-1-git-send-email-thuth@redhat.com>
-References: <1547460140-1473-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gizHG-000608-7f
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:15:30 -0500
+Date: Mon, 14 Jan 2019 10:15:15 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190114101515.GA3686@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181031025712.18602-1-famz@redhat.com>
+	<4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
+	<20181114095807.GB22784@magic> <20190109135504.GA12179@redhat.com>
+	<20190109135917.GP3998@redhat.com>
+	<A3EA5405-A5EE-4E77-8C77-A67398756B96@euphon.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <A3EA5405-A5EE-4E77-8C77-A67398756B96@euphon.net>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/25] ui/console: Remove
- DisplayState/DisplaySurface from "qemu/typedefs.h"
+Subject: Re: [Qemu-devel] [PATCH v4] tests: vm: auto_install OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>
+To: Fam Zheng <fam@euphon.net>
+Cc: Fam Zheng <famz@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Brad Smith <brad@comstyle.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Mon, Jan 14, 2019 at 11:50:08AM +0800, Fam Zheng wrote:
+>=20
+>=20
+> > On Jan 9, 2019, at 21:59, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+> >=20
+> > On Wed, Jan 09, 2019 at 01:55:04PM +0000, Daniel P. Berrang=C3=A9 wro=
+te:
+> >> On Wed, Nov 14, 2018 at 05:58:07PM +0800, Fam Zheng wrote:
+> >>> On Sun, 11/11 18:20, Brad Smith wrote:
+> >>>> ping.
+> >>>=20
+> >>> Queued. Will send a pull request soon.
+> >>=20
+> >> ping, this seems to have got lost, and is blocking us deleting SDL 1=
+.2
+> >> support from QEMU.
+> >=20
+> > Sigh, never mind, I found the PR is here:
+> >=20
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00732.html
+>=20
+> I had to drop it from the queue because Peter didn=E2=80=99t like the Q=
+EMU version
+> requirement (for the slirp tftp parameters). :(
 
-Files requiring DisplayState/DisplaySurface already include "ui/console.h=
-".
+IIUC, currently we're just downloading
 
-To clean "qemu/typedefs.h", move the declarations to "ui/console.h"
-(removing DisplaySurface forward declaration).
+   http://download.patchew.org/openbsd-6.1-amd64.img.xz
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- include/qemu/typedefs.h | 2 --
- include/ui/console.h    | 6 ++++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+can't you just refresh that pre-built image to have SDL 2, based on your
+auto-install patches, so we don't have to wait for that to merge.
 
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 67dd04f..30ad8b2 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -24,8 +24,6 @@ typedef struct DeviceListener DeviceListener;
- typedef struct DeviceState DeviceState;
- typedef struct DirtyBitmapSnapshot DirtyBitmapSnapshot;
- typedef struct DisplayChangeListener DisplayChangeListener;
--typedef struct DisplayState DisplayState;
--typedef struct DisplaySurface DisplaySurface;
- typedef struct DriveInfo DriveInfo;
- typedef struct Error Error;
- typedef struct EventNotifier EventNotifier;
-diff --git a/include/ui/console.h b/include/ui/console.h
-index c4f497c..0a19037 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -131,7 +131,7 @@ struct PixelFormat {
-     uint8_t rbits, gbits, bbits, abits;
- };
-=20
--struct DisplaySurface {
-+typedef struct DisplaySurface {
-     pixman_format_code_t format;
-     pixman_image_t *image;
-     uint8_t flags;
-@@ -140,7 +140,7 @@ struct DisplaySurface {
-     GLenum gltype;
-     GLuint texture;
- #endif
--};
-+} DisplaySurface;
-=20
- typedef struct QemuUIInfo {
-     /* geometry */
-@@ -189,6 +189,8 @@ typedef struct QemuDmaBuf {
-     bool      y0_top;
- } QemuDmaBuf;
-=20
-+typedef struct DisplayState DisplayState;
-+
- typedef struct DisplayChangeListenerOps {
-     const char *dpy_name;
-=20
+> What is the blocker for delete SDL 1.2? Is it breaking tests/vm/openbsd=
+?
+> If so maybe we can add =E2=80=94disable-sdl to its configure command.
+
+If you don't have SDL then there's no audio driver impl available for
+QEMU, so configure fails with:
+
+  ERROR: sdl not found or disabled, can not use sdl audio driver
+
+
+Regards,
+Daniel
 --=20
-1.8.3.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
