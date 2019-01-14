@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50582)
+Received: from eggs.gnu.org ([209.51.188.92]:50619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gj2wp-0007PI-Pn
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:10:40 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gj2wr-0007Qe-7u
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:10:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gj2wo-0002Fh-Sm
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:10:39 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:46832)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gj2wo-0002Ao-IY
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:10:38 -0500
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Mon, 14 Jan 2019 16:10:06 +0200
-Message-Id: <20190114141006.1841-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH] hw/rdma: Verify that ptr is not NULL before
- freeing
+	(envelope-from <mreitz@redhat.com>) id 1gj2wq-0002Gl-G5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:10:41 -0500
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-3-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <385561a7-4dd2-914d-3027-e1a89c39b27e@redhat.com>
+Date: Mon, 14 Jan 2019 15:10:13 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181229122027.42245-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="V5z18tAr8fEn1I9nSzLqxsKxlok5orrZJ"
+Subject: Re: [Qemu-devel] [PATCH v5 02/11] block/backup: move to copy_bitmap
+ with granularity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-Make sure objects are not NULL before calling to non-nulll-safe
-destructors.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--V5z18tAr8fEn1I9nSzLqxsKxlok5orrZJ
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com,
+ den@openvz.org, eblake@redhat.com, jsnow@redhat.com
+Message-ID: <385561a7-4dd2-914d-3027-e1a89c39b27e@redhat.com>
+Subject: Re: [PATCH v5 02/11] block/backup: move to copy_bitmap with
+ granularity
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+ <20181229122027.42245-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20181229122027.42245-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
----
- hw/rdma/rdma_backend.c | 6 ++++--
- hw/rdma/rdma_rm.c      | 7 ++++++-
- 2 files changed, 10 insertions(+), 3 deletions(-)
+On 29.12.18 13:20, Vladimir Sementsov-Ogievskiy wrote:
+> We are going to share this bitmap between backup and backup-top filter
+> driver, so let's share something more meaningful. It also simplifies
+> some calculations.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 48 +++++++++++++++++++++++-------------------------
+>  1 file changed, 23 insertions(+), 25 deletions(-)
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index b49edaacaf..3ee5172c96 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -1066,8 +1066,10 @@ static void mad_fini(RdmaBackendDev *backend_dev)
-     pr_dbg("Stopping MAD\n");
-     disable_rdmacm_mux_async(backend_dev);
-     qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
--    qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
--    qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
-+    if (backend_dev->recv_mads_list.list) {
-+        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
-+        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
-+    }
- }
- 
- int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index f5b1295890..8bf241e91f 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -41,6 +41,9 @@ static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
- 
- static inline void res_tbl_free(RdmaRmResTbl *tbl)
- {
-+    if (!tbl->bitmap) {
-+        return;
-+    }
-     qemu_mutex_destroy(&tbl->lock);
-     g_free(tbl->tbl);
-     g_free(tbl->bitmap);
-@@ -655,5 +658,7 @@ void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-     res_tbl_free(&dev_res->cq_tbl);
-     res_tbl_free(&dev_res->pd_tbl);
- 
--    g_hash_table_destroy(dev_res->qp_hash);
-+    if (dev_res->qp_hash) {
-+        g_hash_table_destroy(dev_res->qp_hash);
-+    }
- }
--- 
-2.17.2
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--V5z18tAr8fEn1I9nSzLqxsKxlok5orrZJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw8mEUACgkQ9AfbAGHV
+z0AsKQf9EsJsMEebxJoRtNJ23IWNgKpKLOXa0Ooxk3pPuebBL6vE3vlFwMr3M3Ef
+cbWQ27Rw4tHlkA3PKre//H61L2IhzjWQl+eWdjJ48zV6D9ylHta0DkqAjUeWB1sa
+dTDbDccAG7AWYY8vy8G7ay4tdwhNfZf0YCErCG7iVfAuwGx725kczdvrXitt1Qwt
+OALkgl6+A0tjExwLX05ewaZaRMTGC81uJ7VV4THD+fxMZ8A2cqs4ck4LJldcxPfe
+D0e7O2UzCqJHkqZweKucu6ms5OH5heytaGD0xoA/cScfselOmWht+yCTVwrYjdHH
+9Ik1nh+k/PU8aknNdjSRLDYHMjMC8g==
+=8h/t
+-----END PGP SIGNATURE-----
+
+--V5z18tAr8fEn1I9nSzLqxsKxlok5orrZJ--
