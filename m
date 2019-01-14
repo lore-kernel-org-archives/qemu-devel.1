@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49968)
+Received: from eggs.gnu.org ([209.51.188.92]:51023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gipda-0001kE-VN
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 18:57:55 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipjz-0002uv-JA
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gipdZ-0002uw-ID
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 18:57:54 -0500
-Resent-Message-Id: <E1gipdZ-0002uw-ID@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21787)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gipdZ-0002uG-9c
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 18:57:53 -0500
-Message-ID: <154742382800.25737.17737335124374408478@2d170d368aaa>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20190110120120.9943-1-yury-kotov@yandex-team.ru>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipjt-0006FU-Rm
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:29 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57010)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gipjk-0006AB-Sb
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:19 -0500
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:02:21 +0100
+Message-Id: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 13 Jan 2019 15:57:10 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/4] Add ignore-external migration
- capability
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULLv2 00/65] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +25,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yury-kotov@yandex-team.ru
-Cc: fam@euphon.net, qemu-devel@nongnu.org, ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, quintela@redhat.com, dgilbert@redhat.com, eblake@redhat.com, armbru@redhat.com, thuth@redhat.com, lvivier@redhat.com, wrfsh@yandex-team.ru
+To: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDExMDEyMDEyMC45OTQz
-LTEteXVyeS1rb3RvdkB5YW5kZXgtdGVhbS5ydS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rp
-bmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGlu
-c3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3
-QGZlZG9yYSBTSE9XX0VOVj0xIEo9MTQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAg
-ICBhYXJjaDY0LXNvZnRtbXUvYmFsbG9vbi5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9i
-bG9jay92aXJ0aW8tYmxrLm8KL3RtcC9xZW11LXRlc3Qvc3JjL21pZ3JhdGlvbi9yYW0uYzogSW4g
-ZnVuY3Rpb24gJ3JhbV9sb2FkJzoKL3RtcC9xZW11LXRlc3Qvc3JjL21pZ3JhdGlvbi9yYW0uYzo0
-MTU5OjQyOiBlcnJvcjogZm9ybWF0ICclbGxkJyBleHBlY3RzIGFyZ3VtZW50IG9mIHR5cGUgJ2xv
-bmcgbG9uZyBpbnQnLCBidXQgYXJndW1lbnQgMyBoYXMgdHlwZSAncmFtX2FkZHJfdCB7YWthIHVu
-c2lnbmVkIGludH0nIFstV2Vycm9yPWZvcm1hdD1dCiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgZXJyb3JfcmVwb3J0KCJNaXNtYXRjaGVkIFJBTSBibG9jayBvZmZzZXQgJXMgIgogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC91c3IvaTY4Ni13NjQtbWluZ3czMi9z
-eXMtcm9vdC9taW5ndy9pbmNsdWRlL2ludHR5cGVzLmg6Mjk5OjAsCi0tLQogIENDICAgICAgYWFy
-Y2g2NC1zb2Z0bW11L2h3L2NwdS9hMTVtcGNvcmUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11
-L2h3L2Rpc3BsYXkvb21hcF9kc3MubwovdG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0aW9uL3JhbS5j
-OiBJbiBmdW5jdGlvbiAncmFtX2xvYWQnOgovdG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0aW9uL3Jh
-bS5jOjQxNTk6NDI6IGVycm9yOiBmb3JtYXQgJyVsbGQnIGV4cGVjdHMgYXJndW1lbnQgb2YgdHlw
-ZSAnbG9uZyBsb25nIGludCcsIGJ1dCBhcmd1bWVudCAzIGhhcyB0eXBlICdyYW1fYWRkcl90IHth
-a2EgdW5zaWduZWQgaW50fScgWy1XZXJyb3I9Zm9ybWF0PV0KICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBlcnJvcl9yZXBvcnQoIk1pc21hdGNoZWQgUkFNIGJsb2NrIG9mZnNldCAlcyAiCiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Vzci9pNjg2LXc2NC1taW5n
-dzMyL3N5cy1yb290L21pbmd3L2luY2x1ZGUvaW50dHlwZXMuaDoyOTk6MCwKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwMTEwMTIwMTIw
-Ljk5NDMtMS15dXJ5LWtvdG92QHlhbmRleC10ZWFtLnJ1L3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZl
-ZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
-dG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+The following changes since commit 27df21ca3886fff4dd3d70e515517667963a52=
+f1:
+
+  Merge remote-tracking branch 'remotes/kraxel/tags/misc-20190111-pull-re=
+quest' into staging (2019-01-11 16:45:59 +0000)
+
+are available in the Git repository at:
+
+  https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+
+for you to fetch changes up to 341cb5fd7a15ebdaa821ff068b517e120f22c412:
+
+  slirp: check data length while emulating ident function (2019-01-14 00:=
+44:29 +0100)
+
+----------------------------------------------------------------
+slirp updates
+
+Gerd Hoffmann (1):
+  slirp: add tftp tracing
+
+Marc-Andr=C3=A9 Lureau (61):
+  slirp: associate slirp_output callback with the Slirp context
+  slirp: remove do_pty from fork_exec()
+  slirp: replace ex_pty with ex_chardev
+  slirp: use a dedicated field for chardev pointer
+  slirp: remove unused EMU_RSH
+  slirp: rename /extra/chardev
+  slirp: move internal function declarations
+  slirp: remove Monitor dependency, return a string for info
+  slirp: fix slirp_add_exec() leaks
+  slirp: replace the poor-man string split with g_strsplit()
+  slirp: remove dead declarations
+  slirp: move socket pair creation in helper function
+  slirp: remove unused M_TRAILINGSPACE
+  slirp: use a callback structure to interface with qemu
+  slirp: remove PROBE_CONN dead-code
+  slirp: remove FULL_BOLT
+  slirp: remove the disabled readv()/writev() code path
+  slirp: remove HAVE_SYS_SIGNAL_H
+  slirp: remove unused HAVE_SYS_BITYPES_H
+  slirp: remove NO_UNIX_SOCKETS
+  slirp: remove unused HAVE_SYS_STROPTS_H
+  slirp: remove unused HAVE_ARPA_INET_H
+  slirp: remove unused HAVE_SYS_WAIT_H
+  slirp: remove unused HAVE_SYS_SELECT_H
+  slirp: remove HAVE_SYS_IOCTL_H
+  slirp: remove HAVE_SYS_FILIO_H
+  slirp: remove unused DECLARE_IOVEC
+  slirp: remove unused HAVE_INET_ATON
+  slirp: replace HOST_WORDS_BIGENDIAN with glib equivalent
+  slirp: replace SIZEOF_CHAR_P with glib equivalent
+  slirp: replace compile time DO_KEEPALIVE
+  slirp: remove unused global slirp_instance
+  slirp: replace error_report() with g_critical()
+  slirp: improve a bit the debug macros
+  slirp: add a callback to log guest errors
+  slirp: remove #if notdef dead code
+  slirp: remove unused sbflush()
+  slirp: NULL is defined by stddef.h
+  slirp: remove dead TCP_ACK_HACK code
+  slirp: replace ARRAY_SIZE with G_N_ELEMENTS
+  net: do not depend on slirp internals
+  glib-compat: add g_spawn_async_with_fds() fallback
+  slirp: simplify fork_exec()
+  slirp: replace error_report() with g_critical()
+  slirp: drop <Vista compatibility
+  slirp: rename exec_list
+  slirp: use virtual time for packet expiration
+  slirp: replace a fprintf with g_critical()
+  slirp: replace some fprintf() with DEBUG_MISC
+  slirp: replace a DEBUG block with WITH_ICMP_ERROR_MSG
+  slirp: no need to make DPRINTF conditional on DEBUG
+  slirp: always build with debug statements
+  slirp: introduce SLIRP_DEBUG environment variable
+  slirp: use %p for pointers format
+  slirp: remove remaining DEBUG blocks
+  slirp: replace DEBUG_ARGS with DEBUG_ARG
+  slirp: factor out guestfwd addition checks
+  slirp: add clock_get_ns() callback
+  build-sys: use a seperate slirp-obj-y && slirp.mo
+  slirp: set G_LOG_DOMAIN
+  slirp: call into g_debug() for DEBUG macros
+
+Prasad J Pandit (1):
+  slirp: check data length while emulating ident function
+
+Samuel Thibault (2):
+  slirp: Enable fork_exec support on Windows
+  slirp: Mark debugging calls as unlikely
+
+----------------------------------------------------------------
+Gerd Hoffmann (1):
+      slirp: add tftp tracing
+
+Marc-Andr=C3=A9 Lureau (61):
+      slirp: associate slirp_output callback with the Slirp context
+      slirp: remove do_pty from fork_exec()
+      slirp: replace ex_pty with ex_chardev
+      slirp: use a dedicated field for chardev pointer
+      slirp: remove unused EMU_RSH
+      slirp: rename /extra/chardev
+      slirp: move internal function declarations
+      slirp: remove Monitor dependency, return a string for info
+      slirp: fix slirp_add_exec() leaks
+      slirp: replace the poor-man string split with g_strsplit()
+      slirp: remove dead declarations
+      slirp: move socket pair creation in helper function
+      slirp: remove unused M_TRAILINGSPACE
+      slirp: use a callback structure to interface with qemu
+      slirp: remove PROBE_CONN dead-code
+      slirp: remove FULL_BOLT
+      slirp: remove the disabled readv()/writev() code path
+      slirp: remove HAVE_SYS_SIGNAL_H
+      slirp: remove unused HAVE_SYS_BITYPES_H
+      slirp: remove NO_UNIX_SOCKETS
+      slirp: remove unused HAVE_SYS_STROPTS_H
+      slirp: remove unused HAVE_ARPA_INET_H
+      slirp: remove unused HAVE_SYS_WAIT_H
+      slirp: remove unused HAVE_SYS_SELECT_H
+      slirp: remove HAVE_SYS_IOCTL_H
+      slirp: remove HAVE_SYS_FILIO_H
+      slirp: remove unused DECLARE_IOVEC
+      slirp: remove unused HAVE_INET_ATON
+      slirp: replace HOST_WORDS_BIGENDIAN with glib equivalent
+      slirp: replace SIZEOF_CHAR_P with glib equivalent
+      slirp: replace compile time DO_KEEPALIVE
+      slirp: remove unused global slirp_instance
+      slirp: replace error_report() with g_critical()
+      slirp: improve a bit the debug macros
+      slirp: add a callback to log guest errors
+      slirp: remove #if notdef dead code
+      slirp: remove unused sbflush()
+      slirp: NULL is defined by stddef.h
+      slirp: remove dead TCP_ACK_HACK code
+      slirp: replace ARRAY_SIZE with G_N_ELEMENTS
+      net: do not depend on slirp internals
+      glib-compat: add g_spawn_async_with_fds() fallback
+      slirp: simplify fork_exec()
+      slirp: replace error_report() with g_critical()
+      slirp: drop <Vista compatibility
+      slirp: rename exec_list
+      slirp: use virtual time for packet expiration
+      slirp: replace a fprintf with g_critical()
+      slirp: replace some fprintf() with DEBUG_MISC
+      slirp: replace a DEBUG block with WITH_ICMP_ERROR_MSG
+      slirp: no need to make DPRINTF conditional on DEBUG
+      slirp: always build with debug statements
+      slirp: introduce SLIRP_DEBUG environment variable
+      slirp: use %p for pointers format
+      slirp: remove remaining DEBUG blocks
+      slirp: replace DEBUG_ARGS with DEBUG_ARG
+      slirp: factor out guestfwd addition checks
+      slirp: add clock_get_ns() callback
+      build-sys: use a seperate slirp-obj-y && slirp.mo
+      slirp: set G_LOG_DOMAIN
+      slirp: call into g_debug() for DEBUG macros
+
+Prasad J Pandit (1):
+      slirp: check data length while emulating ident function
+
+Samuel Thibault (2):
+      slirp: Enable fork_exec support on Windows
+      slirp: Mark debugging calls as unlikely
+
+ Makefile.objs         |   4 +-
+ Makefile.target       |   5 +-
+ include/glib-compat.h |  56 ++++++++++
+ net/colo-compare.c    |  11 +-
+ net/colo.c            |   1 +
+ net/colo.h            |   7 +-
+ net/filter-rewriter.c |   9 +-
+ net/slirp.c           |  61 +++++------
+ net/util.h            |  55 ++++++++++
+ slirp/Makefile.objs   |  37 ++++++-
+ slirp/arp_table.c     |  12 +--
+ slirp/bootp.c         |  10 +-
+ slirp/cksum.c         |   8 +-
+ slirp/debug.h         |  47 +++++----
+ slirp/dhcpv6.c        |  17 ++-
+ slirp/if.c            |   4 +-
+ slirp/ip.h            |  10 +-
+ slirp/ip6.h           |   3 +-
+ slirp/ip6_icmp.c      |  27 +++--
+ slirp/ip6_icmp.h      |   6 +-
+ slirp/ip6_input.c     |   2 +-
+ slirp/ip6_output.c    |   4 +-
+ slirp/ip_icmp.c       |  31 +++---
+ slirp/ip_input.c      | 200 -----------------------------------
+ slirp/libslirp.h      |  27 +++--
+ slirp/main.h          |  33 ------
+ slirp/mbuf.c          |   2 +-
+ slirp/mbuf.h          |   1 -
+ slirp/misc.c          | 286 ++++++++++++++++++++------------------------=
+------
+ slirp/misc.h          |  13 ++-
+ slirp/ncsi.c          |   4 +-
+ slirp/ndp_table.c     |  32 +++---
+ slirp/sbuf.h          |   1 -
+ slirp/slirp.c         | 177 +++++++++++++++----------------
+ slirp/slirp.h         |  45 ++------
+ slirp/slirp_config.h  |  86 ---------------
+ slirp/socket.c        |  53 +++-------
+ slirp/socket.h        |   2 +-
+ slirp/tcp.h           |   4 +-
+ slirp/tcp_input.c     |  84 ++-------------
+ slirp/tcp_output.c    |   2 +-
+ slirp/tcp_subr.c      |  22 ++--
+ slirp/tcp_timer.c     |   2 +-
+ slirp/tftp.c          |   7 +-
+ slirp/trace-events    |   5 +
+ slirp/udp.c           |   5 +-
+ slirp/udp6.c          |  11 +-
+ stubs/slirp.c         |   2 +-
+ 48 files changed, 600 insertions(+), 933 deletions(-)
+ delete mode 100644 slirp/slirp_config.h
+ create mode 100644 slirp/trace-events
