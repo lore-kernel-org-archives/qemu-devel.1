@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51707)
+Received: from eggs.gnu.org ([209.51.188.92]:51785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkb-0003Ny-QL
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:12 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkc-0003PH-QL
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipka-0006mP-OE
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:09 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:57506)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipka-0006n6-Us
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:10 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:57516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipka-0006aw-EK
+	id 1gipka-0006bu-La
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:08 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:03:16 +0100
-Message-Id: <20190114000326.29847-56-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:03:13 +0100
+Message-Id: <20190114000326.29847-53-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 55/65] slirp: introduce SLIRP_DEBUG environment
- variable
+Subject: [Qemu-devel] [PULL 52/65] slirp: replace a DEBUG block with
+ WITH_ICMP_ERROR_MSG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +33,52 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Learn to read SLIRP_DEBUG=3Dcall,misc,error (all or help also handled)
-to set the slirp_debug flags.
+icmp_send_error() doesnt actually log messages when DEBUG is enabled.
+Let's use a different define that describes better the tweaked
+behaviour of the function, and avoid uncompiled code.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/misc.c  |  8 --------
- slirp/slirp.c | 15 +++++++++++++++
- 2 files changed, 15 insertions(+), 8 deletions(-)
+ slirp/ip_icmp.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index e30d2ceb2a..a0f104be5e 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -11,14 +11,6 @@
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
+diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
+index af11cfcefe..6c7e375ff8 100644
+--- a/slirp/ip_icmp.c
++++ b/slirp/ip_icmp.c
+@@ -34,6 +34,10 @@
+ #include "slirp.h"
+ #include "ip_icmp.h"
+=20
++#ifndef WITH_ICMP_ERROR_MSG
++#define WITH_ICMP_ERROR_MSG 0
++#endif
++
+ /* The message sent when emulating PING */
+ /* Be nice and tell them it's just a pseudo-ping packet */
+ static const char icmp_ping_msg[] =3D "This is a pseudo-PING packet used=
+ by Slirp to emulate ICMP ECHO-REQUEST packets.\n";
+@@ -319,8 +323,7 @@ icmp_send_error(struct mbuf *msrc, u_char type, u_cha=
+r code, int minsize,
+   HTONS(icp->icmp_ip.ip_id);
+   HTONS(icp->icmp_ip.ip_off);
 =20
 -#ifdef DEBUG
--#define SLIRP_DEBUG (DBG_CALL | DBG_MISC | DBG_ERROR)
--#else
--#define SLIRP_DEBUG 0
+-  if(message) {           /* DEBUG : append message to ICMP packet */
++  if (message && WITH_ICMP_ERROR_MSG) { /* append message to ICMP packet=
+ */
+     int message_len;
+     char *cpnt;
+     message_len=3Dstrlen(message);
+@@ -329,7 +332,6 @@ icmp_send_error(struct mbuf *msrc, u_char type, u_cha=
+r code, int minsize,
+     memcpy(cpnt, message, message_len);
+     m->m_len+=3Dmessage_len;
+   }
 -#endif
--
--int slirp_debug =3D SLIRP_DEBUG;
--
- inline void
- insque(void *a, void *b)
- {
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index ce5f571d0f..0b70cb9fb6 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -35,6 +35,8 @@
- #include <net/if.h>
- #endif
 =20
-+int slirp_debug;
-+
- /* Define to 1 if you want KEEPALIVE timers */
- bool slirp_do_keepalive;
-=20
-@@ -250,6 +252,7 @@ int get_dns6_addr(struct in6_addr *pdns6_addr, uint32=
-_t *scope_id)
- static void slirp_init_once(void)
- {
-     static int initialized;
-+    const char *debug;
- #ifdef _WIN32
-     WSADATA Data;
- #endif
-@@ -266,6 +269,18 @@ static void slirp_init_once(void)
-=20
-     loopback_addr.s_addr =3D htonl(INADDR_LOOPBACK);
-     loopback_mask =3D htonl(IN_CLASSA_NET);
-+
-+    debug =3D g_getenv("SLIRP_DEBUG");
-+    if (debug) {
-+        const GDebugKey keys[] =3D {
-+            { "call", DBG_CALL },
-+            { "misc", DBG_MISC },
-+            { "error", DBG_ERROR },
-+        };
-+        slirp_debug =3D g_parse_debug_string(debug, keys, G_N_ELEMENTS(k=
-eys));
-+    }
-+
-+
- }
-=20
- static void slirp_state_save(QEMUFile *f, void *opaque);
+   icp->icmp_cksum =3D 0;
+   icp->icmp_cksum =3D cksum(m, m->m_len);
 --=20
 2.20.1
