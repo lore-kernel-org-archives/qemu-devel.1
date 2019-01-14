@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44877)
+Received: from eggs.gnu.org ([209.51.188.92]:44898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz54-0005gr-JR
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:56 -0500
+	(envelope-from <thuth@redhat.com>) id 1giz56-0005hi-PQ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giz53-0007bI-Od
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:4414)
+	(envelope-from <thuth@redhat.com>) id 1giz54-0007cG-TX
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42024)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz53-0007aG-Iu
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:53 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz54-0007bd-Nl
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:54 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 11:02:13 +0100
-Message-Id: <1547460140-1473-19-git-send-email-thuth@redhat.com>
+Date: Mon, 14 Jan 2019 11:02:15 +0100
+Message-Id: <1547460140-1473-21-git-send-email-thuth@redhat.com>
 In-Reply-To: <1547460140-1473-1-git-send-email-thuth@redhat.com>
 References: <1547460140-1473-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/25] audio: Remove AudioState from
- "qemu/typedefs.h"
+Subject: [Qemu-devel] [PULL 20/25] ui/console: Remove
+ DisplayState/DisplaySurface from "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +32,62 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3e
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Files requiring AudioState already include "audio_int.h".
+Files requiring DisplayState/DisplaySurface already include "ui/console.h=
+".
 
-To clean "qemu/typedefs.h", move the declaration to "audio_int.h"
-(removing the forward declaration).
+To clean "qemu/typedefs.h", move the declarations to "ui/console.h"
+(removing DisplaySurface forward declaration).
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- audio/audio_int.h       | 4 ++--
- include/qemu/typedefs.h | 1 -
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ include/qemu/typedefs.h | 2 --
+ include/ui/console.h    | 6 ++++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index 244b454..6c451b9 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -191,7 +191,7 @@ struct SWVoiceCap {
-     QLIST_ENTRY (SWVoiceCap) entries;
- };
-=20
--struct AudioState {
-+typedef struct AudioState {
-     struct audio_driver *drv;
-     void *drv_opaque;
-=20
-@@ -203,7 +203,7 @@ struct AudioState {
-     int nb_hw_voices_out;
-     int nb_hw_voices_in;
-     int vm_running;
--};
-+} AudioState;
-=20
- extern const struct mixeng_volume nominal_volume;
-=20
 diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 5edf44e..c6d1c1b 100644
+index 67dd04f..30ad8b2 100644
 --- a/include/qemu/typedefs.h
 +++ b/include/qemu/typedefs.h
-@@ -8,7 +8,6 @@
- typedef struct AdapterInfo AdapterInfo;
- typedef struct AddressSpace AddressSpace;
- typedef struct AioContext AioContext;
--typedef struct AudioState AudioState;
- typedef struct BdrvDirtyBitmap BdrvDirtyBitmap;
- typedef struct BdrvDirtyBitmapIter BdrvDirtyBitmapIter;
- typedef struct BlockBackend BlockBackend;
+@@ -24,8 +24,6 @@ typedef struct DeviceListener DeviceListener;
+ typedef struct DeviceState DeviceState;
+ typedef struct DirtyBitmapSnapshot DirtyBitmapSnapshot;
+ typedef struct DisplayChangeListener DisplayChangeListener;
+-typedef struct DisplayState DisplayState;
+-typedef struct DisplaySurface DisplaySurface;
+ typedef struct DriveInfo DriveInfo;
+ typedef struct Error Error;
+ typedef struct EventNotifier EventNotifier;
+diff --git a/include/ui/console.h b/include/ui/console.h
+index c4f497c..0a19037 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -131,7 +131,7 @@ struct PixelFormat {
+     uint8_t rbits, gbits, bbits, abits;
+ };
+=20
+-struct DisplaySurface {
++typedef struct DisplaySurface {
+     pixman_format_code_t format;
+     pixman_image_t *image;
+     uint8_t flags;
+@@ -140,7 +140,7 @@ struct DisplaySurface {
+     GLenum gltype;
+     GLuint texture;
+ #endif
+-};
++} DisplaySurface;
+=20
+ typedef struct QemuUIInfo {
+     /* geometry */
+@@ -189,6 +189,8 @@ typedef struct QemuDmaBuf {
+     bool      y0_top;
+ } QemuDmaBuf;
+=20
++typedef struct DisplayState DisplayState;
++
+ typedef struct DisplayChangeListenerOps {
+     const char *dpy_name;
+=20
 --=20
 1.8.3.1
