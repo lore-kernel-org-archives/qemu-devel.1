@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51447)
+Received: from eggs.gnu.org ([209.51.188.92]:51453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkQ-0003D5-Bc
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:59 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkQ-0003D7-GC
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkP-0006ab-AZ
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkP-0006aX-AU
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:58 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60314)
+Received: from hera.aquilenet.fr ([185.233.100.1]:60378)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipkN-0006LQ-2M
+	id 1gipkN-0006R0-1F
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:57 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:02:40 +0100
-Message-Id: <20190114000326.29847-20-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:03:04 +0100
+Message-Id: <20190114000326.29847-44-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 19/65] slirp: remove HAVE_SYS_SIGNAL_H
+Subject: [Qemu-devel] [PULL 43/65] glib-compat: add g_spawn_async_with_fds()
+ fallback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +29,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.h        | 3 ---
- slirp/slirp_config.h | 3 ---
- 2 files changed, 6 deletions(-)
+ include/glib-compat.h | 56 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index f7c087456a..4c3c672ee6 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -35,9 +35,6 @@ typedef char *caddr_t;
- #ifndef NO_UNIX_SOCKETS
- #include <sys/un.h>
- #endif
--#ifdef HAVE_SYS_SIGNAL_H
--# include <sys/signal.h>
--#endif
- #ifndef _WIN32
- #include <sys/socket.h>
- #endif
-diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
-index 3ce64e088e..2605c4222b 100644
---- a/slirp/slirp_config.h
-+++ b/slirp/slirp_config.h
-@@ -50,9 +50,6 @@
- #define HAVE_ARPA_INET_H
- #endif
+diff --git a/include/glib-compat.h b/include/glib-compat.h
+index fdf95a255d..8a078c5288 100644
+--- a/include/glib-compat.h
++++ b/include/glib-compat.h
+@@ -83,6 +83,62 @@ static inline gboolean g_strv_contains_qemu(const gcha=
+r *const *strv,
+ }
+ #define g_strv_contains(a, b) g_strv_contains_qemu(a, b)
 =20
--/* Define if you have sys/signal.h */
--#undef HAVE_SYS_SIGNAL_H
--
- /* Define if you have sys/stropts.h */
- #undef HAVE_SYS_STROPTS_H
++#if !GLIB_CHECK_VERSION(2, 58, 0)
++typedef struct QemuGSpawnFds {
++    GSpawnChildSetupFunc child_setup;
++    gpointer user_data;
++    gint stdin_fd;
++    gint stdout_fd;
++    gint stderr_fd;
++} QemuGSpawnFds;
++
++static inline void
++qemu_gspawn_fds_setup(gpointer user_data)
++{
++    QemuGSpawnFds *q =3D (QemuGSpawnFds *)user_data;
++
++    dup2(q->stdin_fd, 0);
++    dup2(q->stdout_fd, 1);
++    dup2(q->stderr_fd, 2);
++    q->child_setup(q->user_data);
++}
++#endif
++
++static inline gboolean
++g_spawn_async_with_fds_qemu(const gchar *working_directory,
++                            gchar **argv,
++                            gchar **envp,
++                            GSpawnFlags flags,
++                            GSpawnChildSetupFunc child_setup,
++                            gpointer user_data,
++                            GPid *child_pid,
++                            gint stdin_fd,
++                            gint stdout_fd,
++                            gint stderr_fd,
++                            GError **error)
++{
++#if GLIB_CHECK_VERSION(2, 58, 0)
++    return g_spawn_async_with_fds(working_directory, argv, envp, flags,
++                                  child_setup, user_data,
++                                  child_pid, stdin_fd, stdout_fd, stderr=
+_fd,
++                                  error);
++#else
++    QemuGSpawnFds setup =3D {
++        .child_setup =3D child_setup,
++        .user_data =3D user_data,
++        .stdin_fd =3D stdin_fd,
++        .stdout_fd =3D stdout_fd,
++        .stderr_fd =3D stderr_fd,
++    };
++
++    return g_spawn_async(working_directory, argv, envp, flags,
++                         qemu_gspawn_fds_setup, &setup,
++                         child_pid, error);
++#endif
++}
++
++#define g_spawn_async_with_fds(wd, argv, env, f, c, d, p, ifd, ofd, efd,=
+ err) \
++    g_spawn_async_with_fds_qemu(wd, argv, env, f, c, d, p, ifd, ofd, efd=
+, err)
 =20
+ #if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
+ /*
 --=20
 2.20.1
