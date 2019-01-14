@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53623)
+Received: from eggs.gnu.org ([209.51.188.92]:53645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gj6Iq-0004i4-NW
+	(envelope-from <thuth@redhat.com>) id 1gj6Ir-0004iM-36
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:45:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gj6Ip-00085o-IG
+	(envelope-from <thuth@redhat.com>) id 1gj6Ip-00086N-Rz
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:45:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57000)
+Received: from mx1.redhat.com ([209.132.183.28]:56984)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gj6Ip-00083i-6d
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gj6Ip-00081j-HY
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:45:35 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 14 Jan 2019 18:45:20 +0100
-Message-Id: <1547487921-605-3-git-send-email-thuth@redhat.com>
+Date: Mon, 14 Jan 2019 18:45:19 +0100
+Message-Id: <1547487921-605-2-git-send-email-thuth@redhat.com>
 In-Reply-To: <1547487921-605-1-git-send-email-thuth@redhat.com>
 References: <1547487921-605-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 21/27] ui/console: Remove PixelFormat from
- qemu/typedefs.h
+Subject: [Qemu-devel] [PULL v2 20/27] ui/console: Remove MouseTransformInfo
+ from qemu/typedefs.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +32,65 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3e
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Header files requiring PixelFormat already include "ui/qemu-pixman.h".
+Header files requiring MouseTransformInfo already include "ui/console.h".
 
-To clean "qemu/typedefs.h", move the declaration to "ui/qemu-pixman.h"
+To clean "qemu/typedefs.h", move the declaration to "ui/console.h"
 (removing the forward declaration).
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/qemu/typedefs.h  |  1 -
- include/ui/console.h     | 10 ----------
- include/ui/qemu-pixman.h | 10 ++++++++++
- 3 files changed, 10 insertions(+), 11 deletions(-)
+ include/hw/devices.h    | 1 +
+ include/qemu/typedefs.h | 1 -
+ include/ui/console.h    | 4 ++--
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/include/hw/devices.h b/include/hw/devices.h
+index 0e27feb..b5f1662 100644
+--- a/include/hw/devices.h
++++ b/include/hw/devices.h
+@@ -4,6 +4,7 @@
+ /* Devices that have nowhere better to go.  */
+=20
+ #include "hw/hw.h"
++#include "ui/console.h"
+=20
+ /* smc91c111.c */
+ void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
 diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 38ec1fd..5d1a2d8 100644
+index 3a57dfd..38ec1fd 100644
 --- a/include/qemu/typedefs.h
 +++ b/include/qemu/typedefs.h
-@@ -71,7 +71,6 @@ typedef struct PCIExpressHost PCIExpressHost;
- typedef struct PCIHostDeviceAddress PCIHostDeviceAddress;
- typedef struct PCIHostState PCIHostState;
- typedef struct PCMachineState PCMachineState;
--typedef struct PixelFormat PixelFormat;
- typedef struct PostcopyDiscardState PostcopyDiscardState;
- typedef struct Property Property;
- typedef struct PropertyInfo PropertyInfo;
+@@ -51,7 +51,6 @@ typedef struct MigrationIncomingState MigrationIncoming=
+State;
+ typedef struct MigrationState MigrationState;
+ typedef struct Monitor Monitor;
+ typedef struct MonitorDef MonitorDef;
+-typedef struct MouseTransformInfo MouseTransformInfo;
+ typedef struct MSIMessage MSIMessage;
+ typedef struct NetClientState NetClientState;
+ typedef struct NetFilterState NetFilterState;
 diff --git a/include/ui/console.h b/include/ui/console.h
-index aa9f975..fef900d 100644
+index 0a19037..aa9f975 100644
 --- a/include/ui/console.h
 +++ b/include/ui/console.h
-@@ -121,16 +121,6 @@ struct QemuConsoleClass {
+@@ -65,13 +65,13 @@ void qemu_remove_led_event_handler(QEMUPutLEDEntry *e=
+ntry);
 =20
- #define QEMU_ALLOCATED_FLAG     0x01
+ void kbd_put_ledstate(int ledstate);
 =20
--struct PixelFormat {
--    uint8_t bits_per_pixel;
--    uint8_t bytes_per_pixel;
--    uint8_t depth; /* color depth in bits */
--    uint32_t rmask, gmask, bmask, amask;
--    uint8_t rshift, gshift, bshift, ashift;
--    uint8_t rmax, gmax, bmax, amax;
--    uint8_t rbits, gbits, bbits, abits;
+-struct MouseTransformInfo {
++typedef struct MouseTransformInfo {
+     /* Touchscreen resolution */
+     int x;
+     int y;
+     /* Calibration values as used/generated by tslib */
+     int a[7];
 -};
--
- typedef struct DisplaySurface {
-     pixman_format_code_t format;
-     pixman_image_t *image;
-diff --git a/include/ui/qemu-pixman.h b/include/ui/qemu-pixman.h
-index b7c82d1..0668109 100644
---- a/include/ui/qemu-pixman.h
-+++ b/include/ui/qemu-pixman.h
-@@ -53,6 +53,16 @@
++} MouseTransformInfo;
 =20
- /* -------------------------------------------------------------------- =
-*/
+ void hmp_mouse_set(Monitor *mon, const QDict *qdict);
 =20
-+typedef struct PixelFormat {
-+    uint8_t bits_per_pixel;
-+    uint8_t bytes_per_pixel;
-+    uint8_t depth; /* color depth in bits */
-+    uint32_t rmask, gmask, bmask, amask;
-+    uint8_t rshift, gshift, bshift, ashift;
-+    uint8_t rmax, gmax, bmax, amax;
-+    uint8_t rbits, gbits, bbits, abits;
-+} PixelFormat;
-+
- PixelFormat qemu_pixelformat_from_pixman(pixman_format_code_t format);
- pixman_format_code_t qemu_default_pixman_format(int bpp, bool native_end=
-ian);
- pixman_format_code_t qemu_drm_format_to_pixman(uint32_t drm_format);
 --=20
 1.8.3.1
