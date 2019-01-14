@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35427)
+Received: from eggs.gnu.org ([209.51.188.92]:35192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7T-00050r-7m
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:11 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7H-0004n1-Q1
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-0001rA-67
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:11 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37692)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7E-0001el-Bf
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:57 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB7R-0001ew-Un
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:10 -0500
+	id 1gjB7D-0001Us-VI
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:56 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:53:06 +0100
-Message-Id: <20190114225306.21569-66-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:45 +0100
+Message-Id: <20190114225306.21569-45-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 65/65] slirp: check data length while emulating
- ident function
+Subject: [Qemu-devel] [PULL 44/65] slirp: simplify fork_exec()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +28,116 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, stefanha@redhat.com, jan.kiszka@siemens.com, Kira <864786842@qq.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-While emulating identification protocol, tcp_emu() does not check
-available space in the 'sc_rcv->sb_data' buffer. It could lead to
-heap buffer overflow issue. Add check to avoid it.
+Use g_spawn_async_with_fds() to setup the child.
 
-Reported-by: Kira <864786842@qq.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+GSpawn handles reaping the child, and closing parent file descriptors.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/tcp_subr.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ slirp/misc.c | 75 +++++++++++++++++++++++++---------------------------
+ 1 file changed, 36 insertions(+), 39 deletions(-)
 
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index 4a9a5b5edc..23a841f26e 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -634,6 +634,11 @@ tcp_emu(struct socket *so, struct mbuf *m)
- 			socklen_t addrlen =3D sizeof(struct sockaddr_in);
- 			struct sbuf *so_rcv =3D &so->so_rcv;
+diff --git a/slirp/misc.c b/slirp/misc.c
+index ee3492a2ae..753b3da25b 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -129,56 +129,53 @@ err:
+     return -1;
+ }
 =20
-+			if (m->m_len > so_rcv->sb_datalen
-+					- (so_rcv->sb_wptr - so_rcv->sb_data)) {
-+			    return 1;
-+			}
++static void
++fork_exec_child_setup(gpointer data)
++{
++    setsid();
++}
 +
- 			memcpy(so_rcv->sb_wptr, m->m_data, m->m_len);
- 			so_rcv->sb_wptr +=3D m->m_len;
- 			so_rcv->sb_rptr +=3D m->m_len;
+ int
+ fork_exec(struct socket *so, const char *ex)
+ {
+-	char **argv;
+-	int opt, c, sp[2];
+-	pid_t pid;
++    GError *err =3D NULL;
++    char **argv;
++    int opt, sp[2];
+=20
+-	DEBUG_CALL("fork_exec");
+-	DEBUG_ARG("so =3D %p", so);
+-	DEBUG_ARG("ex =3D %p", ex);
++    DEBUG_CALL("fork_exec");
++    DEBUG_ARG("so =3D %p", so);
++    DEBUG_ARG("ex =3D %p", ex);
+=20
+     if (slirp_socketpair_with_oob(sp) < 0) {
+         return 0;
+     }
+=20
+-	pid =3D fork();
+-	switch(pid) {
+-	 case -1:
+-		error_report("Error: fork failed: %s", strerror(errno));
+-		closesocket(sp[0]);
+-		closesocket(sp[1]);
+-		return 0;
+-
+-	 case 0:
+-		setsid();
+-		dup2(sp[1], 0);
+-		dup2(sp[1], 1);
+-		dup2(sp[1], 2);
+-		for (c =3D getdtablesize() - 1; c >=3D 3; c--)
+-		   close(c);
++    argv =3D g_strsplit(ex, " ", -1);
++    g_spawn_async_with_fds(NULL /* cwd */,
++                           argv,
++                           NULL /* env */,
++                           G_SPAWN_SEARCH_PATH,
++                           fork_exec_child_setup, NULL /* data */,
++                           NULL /* child_pid */,
++                           sp[1], sp[1], sp[1],
++                           &err);
++    g_strfreev(argv);
+=20
+-                argv =3D g_strsplit(ex, " ", -1);
+-		execvp(argv[0], (char **)argv);
+-
+-		/* Ooops, failed, let's tell the user why */
+-        fprintf(stderr, "Error: execvp of %s failed: %s\n",
+-                argv[0], strerror(errno));
+-		close(0); close(1); close(2); /* XXX */
+-		exit(1);
++    if (err) {
++        error_report("%s", err->message);
++        g_error_free(err);
++        closesocket(sp[0]);
++        closesocket(sp[1]);
++        return 0;
++    }
+=20
+-	 default:
+-		so->s =3D sp[0];
+-		closesocket(sp[1]);
+-		qemu_add_child_watch(pid);
+-		socket_set_fast_reuse(so->s);
+-		opt =3D 1;
+-		qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+-		qemu_set_nonblock(so->s);
+-		return 1;
+-	}
++    so->s =3D sp[0];
++    closesocket(sp[1]);
++    socket_set_fast_reuse(so->s);
++    opt =3D 1;
++    qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
++    qemu_set_nonblock(so->s);
++    return 1;
+ }
+ #endif
+=20
 --=20
 2.20.1
