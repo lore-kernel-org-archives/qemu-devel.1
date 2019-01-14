@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54153)
+Received: from eggs.gnu.org ([209.51.188.92]:54178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj3Ap-0001dR-Tt
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:09 -0500
+	(envelope-from <berto@igalia.com>) id 1gj3Ar-0001f8-7A
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gj3Ao-0008Vj-E6
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:07 -0500
+	(envelope-from <berto@igalia.com>) id 1gj3Ao-0008Vq-EB
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 09:25:09 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon, 14 Jan 2019 16:24:02 +0200
-Message-Id: <8e40a9c26445563f719b4b89e0ed82ef1c8b50f1.1547475602.git.berto@igalia.com>
+Date: Mon, 14 Jan 2019 16:24:01 +0200
+Message-Id: <af08f836feae53a54ec2abed93161fdfa381ad2c.1547475602.git.berto@igalia.com>
 In-Reply-To: <cover.1547475602.git.berto@igalia.com>
 References: <cover.1547475602.git.berto@igalia.com>
 In-Reply-To: <cover.1547475602.git.berto@igalia.com>
 References: <cover.1547475602.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 4/6] block: Acquire the AioContext in
- nvme_realize()
+Subject: [Qemu-devel] [PATCH v2 3/6] block: Acquire the AioContext in
+ floppy_drive_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +27,71 @@ Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redh
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- hw/block/nvme.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ hw/block/fdc.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 7c8c63e8f5..72e94aff86 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1203,6 +1203,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index 6f19f127a5..d9bc80de83 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -512,6 +512,7 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
  {
-     NvmeCtrl *n = NVME(pci_dev);
-     NvmeIdCtrl *id = &n->id_ctrl;
+     FloppyDrive *dev = FLOPPY_DRIVE(qdev);
+     FloppyBus *bus = FLOPPY_BUS(qdev->parent_bus);
 +    AioContext *ctx;
+     FDrive *drive;
+     int ret;
  
-     int i;
-     int64_t bs_size;
-@@ -1213,20 +1214,23 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-         return;
+@@ -543,13 +544,16 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
+         assert(ret == 0);
      }
  
-+    ctx = blk_get_aio_context(n->conf.blk);
++    ctx = blk_get_aio_context(dev->conf.blk);
 +    aio_context_acquire(ctx);
 +
-     bs_size = blk_getlength(n->conf.blk);
-     if (bs_size < 0) {
-         error_setg(errp, "could not get backing file size");
+     blkconf_blocksizes(&dev->conf);
+     if (dev->conf.logical_block_size != 512 ||
+         dev->conf.physical_block_size != 512)
+     {
+         error_setg(errp, "Physical and logical block size must "
+                    "be 512 for floppy");
 -        return;
 +        goto out;
      }
  
-     if (!n->serial) {
-         error_setg(errp, "serial property not set");
--        return;
-+        goto out;
-     }
-     blkconf_blocksizes(&n->conf);
-     if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
+     /* rerror/werror aren't supported by fdc and therefore not even registered
+@@ -561,7 +565,7 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
+     if (!blkconf_apply_backend_options(&dev->conf,
+                                        blk_is_read_only(dev->conf.blk),
                                         false, errp)) {
 -        return;
 +        goto out;
      }
  
-     pci_conf = pci_dev->config;
-@@ -1323,6 +1327,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-             cpu_to_le64(n->ns_size >>
-                 id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds);
+     /* 'enospc' is the default for -drive, 'report' is what blk_new() gives us
+@@ -569,11 +573,11 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
+     if (blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_ENOSPC &&
+         blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_REPORT) {
+         error_setg(errp, "fdc doesn't support drive option werror");
+-        return;
++        goto out;
      }
+     if (blk_get_on_error(dev->conf.blk, 1) != BLOCKDEV_ON_ERROR_REPORT) {
+         error_setg(errp, "fdc doesn't support drive option rerror");
+-        return;
++        goto out;
+     }
+ 
+     drive->conf = &dev->conf;
+@@ -589,6 +593,9 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
+     dev->type = drive->drive;
+ 
+     fd_revalidate(drive);
 +
 +out:
 +    aio_context_release(ctx);
  }
  
- static void nvme_exit(PCIDevice *pci_dev)
+ static void floppy_drive_class_init(ObjectClass *klass, void *data)
 -- 
 2.11.0
