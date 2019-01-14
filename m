@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56785)
+Received: from eggs.gnu.org ([209.51.188.92]:57251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gj1V9-0007cO-6y
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:37:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gj1Xk-0001KR-E0
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:40:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gj1V8-0001Bz-K6
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:37:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40220)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gj1V8-0001An-E7
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:37:58 -0500
-Date: Mon, 14 Jan 2019 13:37:53 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190114123753.h6sedkqlswxkikus@sirius.home.kraxel.org>
-References: <20190111093116.17188-1-kraxel@redhat.com>
-	<20190111093116.17188-6-kraxel@redhat.com>
-	<06341f73-6063-8cc3-dc1a-e5022ef2e032@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gj1Xi-0002Eo-FN
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:40:40 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36379)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gj1Xi-00029Q-88
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:40:38 -0500
+Received: by mail-ot1-x343.google.com with SMTP id k98so19139926otk.3
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 04:40:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <06341f73-6063-8cc3-dc1a-e5022ef2e032@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/5] [debug] some logging
+References: <20190111180630.6433-1-palmer@sifive.com>
+In-Reply-To: <20190111180630.6433-1-palmer@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Jan 2019 12:40:06 +0000
+Message-ID: <CAFEAcA-yeQSbbhKXXJ0f961MJKC-v46DWgoaXcQUt64DZcdzqQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL] RISC-V Updates for 3.2, Part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, intel-gvt-dev@lists.freedesktop.org
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: qemu-riscv@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jan 11, 2019 at 09:33:40AM -0600, Eric Blake wrote:
-> On 1/11/19 3:31 AM, Gerd Hoffmann wrote:
-> > ---
-> >  hw/vfio/display.c | 16 ++++++++++++++++
-> >  1 file changed, 16 insertions(+)
-> > 
-> > diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-> > index a3a710b3ee..96b5474243 100644
-> > --- a/hw/vfio/display.c
-> > +++ b/hw/vfio/display.c
-> > @@ -42,6 +42,8 @@ static void vfio_display_edid_link_up(void *opaque)
-> >      VFIOPCIDevice *vdev = opaque;
-> >      VFIODisplay *dpy = vdev->dpy;
-> >  
-> > +    fprintf(stderr, "%s:\n", __func__);
-> 
-> Why fprintf() instead of trace points?
+On Fri, 11 Jan 2019 at 18:06, Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> The following changes since commit 147923b1a901a0370f83a0f4c58ec1baffef22f0:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20190108-pull-request' into staging (2019-01-08 16:07:32 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-3.2-part2
+>
+> for you to fetch changes up to f7cdfa38f37e0985457ac03c3238861144a58b4c:
+>
+>   default-configs: Enable USB support for RISC-V machines (2019-01-09 17:34:10 -0800)
+>
+> ----------------------------------------------------------------
+> RISC-V Updates for 3.2, Part 2
+>
+> This patch set contains a handful of Michael's CSR-related cleanups,
+> which should allow us to proceed with more outstanding bug fixes that
+> depend on them.
+>
+> Additionally, there is a patch that turns on USB.  This works for me
+> when the kernel has the appropriate drivers (which will soon be in
+> defconfig) and I pass
+>
+>     -device usb-ehci
+>     -drive id=my_usb_disk,file=usbdisk.img,if=none,format=raw
+>     -device usb-storage,drive=my_usb_disk
+>
+> to QEMU.
+>
 
-Easier for temporary stuff.  I don't plan to actually merge this one.
+Applied, thanks.
 
-cheers,
-  Gerd
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
