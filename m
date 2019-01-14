@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35520)
+Received: from eggs.gnu.org ([209.51.188.92]:35704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3kJ-0006NI-9H
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:53 -0500
+	(envelope-from <cota@braap.org>) id 1gj3kk-0006ih-8D
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:02:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3k9-0005JO-GH
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:47 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:45410)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gj3k9-0005FR-6N
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:37 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id t6so23161036wrr.12
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:01:32 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 14 Jan 2019 15:01:08 +0000
-Message-Id: <20190114150129.1013-1-alex.bennee@linaro.org>
+	(envelope-from <cota@braap.org>) id 1gj3kf-0005dz-CH
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:02:14 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:52605)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gj3kf-0005dQ-2g
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:02:09 -0500
+Date: Mon, 14 Jan 2019 10:02:06 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20190114150206.GA11818@flamenco>
+References: <87lg3rui28.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/21] misc testing fixes for Travis and docker
+In-Reply-To: <87lg3rui28.fsf@linaro.org>
+Subject: Re: [Qemu-devel] Remaining CI failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
 
-The following changes since commit 7260438b7056469610ee166f7abe9ff8a26b8b16:
+On Fri, Jan 11, 2019 at 19:10:07 +0000, Alex Benn�e wrote:
+> So trying to narrow down the remaining failures in the CI system. There
+> is one with a patch in flight (use g_usleep instead of sleep) but there
+> remains two failure modes, both erratic.
+> 
+> tests/qht-par:
+> 
+> I can trigger this on my dev machine with a gprof enabled build:
+> 
+>   # QEMU configure log Fri Jan 11 14:10:45 GMT 2019
+>   # Configured with: './configure' '--disable-tools' '--disable-docs' '--enable-gprof' '--enable-gcov'
+> 
+> I only seem to be able to trigger it when running via the wrapper in the
+> make system:
+> 
+>   retry.py -n 30 --invert make check-tests/test-qht-par
+> 
+> Eventually this crashes with:
+> 
+>   ERROR:tests/test-qht-par.c:20:test_qht: assertion failed (rc == 0): (35584 == 0)
+> 
+> Leaving a core dump for the child:
 
-  Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3.2-part2' into staging (2019-01-14 11:41:43 +0000)
+I can't replicate this on my machine :-(
 
-are available in the Git repository at:
+I suspect this is probably related to the fact that gprof
+is not even meant to support multi-threaded programs (like qht-bench).
 
-  https://github.com/stsquad/qemu.git tags/pull-testing-next-140119-1
+Given that we've fixed the sleep issue (thanks!) and that there is no use
+in running test-qht-par under gprof, I propose to permanently skip
+it under gprof, e.g.:
 
-for you to fetch changes up to a36270a4d1589b1ed309065fc8b3fe0ac8d6869d:
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -88,7 +88,8 @@ check-unit-y += tests/test-rcu-simpleq$(EXESUF)
+ check-unit-y += tests/test-rcu-tailq$(EXESUF)
+ check-unit-y += tests/test-qdist$(EXESUF)
+ check-unit-y += tests/test-qht$(EXESUF)
+-# FIXME: {test-qht-par + gprof} often break on Travis CI
++# test-qht-par invokes qht-bench, which is multi-threaded.
++# gprof doesn't support multi-threaded programs, so skip this test under gprof.
+ check-unit-$(call lnot,$(CONFIG_GPROF)) += tests/test-qht-par$(EXESUF)
+ check-unit-y += tests/test-bitops$(EXESUF)
+ check-unit-y += tests/test-bitcnt$(EXESUF)
 
-  Revert "tests: Disable qht-bench parallel test when using gprof" (2019-01-14 14:55:32 +0000)
+If you agree, I can submit a proper patch with the above.
 
-----------------------------------------------------------------
-A bunch of fixes for testing:
+Thanks,
 
-  - Various Travis updates
-  - "stable" SID snapshot for docker
-  - avoid :latest docker tags
-  - g_usleep fix for some tests
-
-----------------------------------------------------------------
-Alex Bennée (7):
-      tests: use in-place sed magic for enabling deb-src in travis image
-      travis: use homebrew addon for MacOSX
-      travis: bump to Xenial baseline
-      tests/docker: update our Travis image
-      tests/docker: remove SID_AGE test hack
-      tests: use g_usleep instead of rem = sleep(time)
-      Revert "tests: Disable qht-bench parallel test when using gprof"
-
-Daniel P. Berrangé (12):
-      tests: run ldconfig after installing extra software
-      tests: remove obsolete 'debian' dockerfile
-      tests: update Fedora dockerfile to use Fedora 29
-      tests: update Fedora i386 cross image to Fedora 29
-      travis: add whitespace between each major section & matrix entry
-      travis: define all the build matrix entries in one place
-      travis: standardize the syntax used for env variables
-      travis: don't clone git submodules upfront
-      travis: stop redefining the script commands
-      travis: stop using container based envs
-      travis: run tests in verbose mode
-      travis: remove matrix settings that duplicate global settings
-
-Philippe Mathieu-Daudé (2):
-      docker: Use stable git tag for virglrenderer
-      docker: Use a stable snapshot for Debian Sid
-
- .travis.yml                                       | 172 +++++++++++++++-------
- configure                                         |   1 -
- tests/Makefile.include                            |   3 +-
- tests/atomic64-bench.c                            |   6 +-
- tests/atomic_add-bench.c                          |   6 +-
- tests/docker/Makefile.include                     |  13 --
- tests/docker/dockerfiles/debian-amd64.docker      |   5 +-
- tests/docker/dockerfiles/debian-sid.docker        |   7 +-
- tests/docker/dockerfiles/debian.docker            |  13 --
- tests/docker/dockerfiles/fedora-i386-cross.docker |   2 +-
- tests/docker/dockerfiles/fedora.docker            |   4 +-
- tests/docker/dockerfiles/travis.docker            |   4 +-
- tests/qht-bench.c                                 |   6 +-
- 13 files changed, 138 insertions(+), 104 deletions(-)
- delete mode 100644 tests/docker/dockerfiles/debian.docker
-
---
-2.17.1
+		Emilio
