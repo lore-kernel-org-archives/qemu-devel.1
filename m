@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46184)
+Received: from eggs.gnu.org ([209.51.188.92]:44771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gizB1-0002j1-On
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:09:04 -0500
+	(envelope-from <thuth@redhat.com>) id 1giz4v-0005c6-O4
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gizB0-0002QD-O3
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:09:03 -0500
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:38741)
+	(envelope-from <thuth@redhat.com>) id 1giz4p-0007Th-Sk
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gizAy-0002LT-Ku
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:09:00 -0500
-Received: from player791.ha.ovh.net (unknown [10.109.143.18])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 04EB1E9482
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 11:08:57 +0100 (CET)
-Date: Mon, 14 Jan 2019 11:08:38 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20190114110838.4a491f07@bahia.lan>
-In-Reply-To: <108581ad-9190-b1eb-dcd4-b2ee356ae718@kaod.org>
-References: <154724039526.525985.3172545257507998890.stgit@bahia.lan>
-	<154724044676.525985.4801504682864299114.stgit@bahia.lan>
-	<108581ad-9190-b1eb-dcd4-b2ee356ae718@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 02/13] spapr: Rename xics to
- intc in interrupt controller agnostic code
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1giz4p-0007Sr-J4
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:02:39 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 14 Jan 2019 11:02:04 +0100
+Message-Id: <1547460140-1473-10-git-send-email-thuth@redhat.com>
+In-Reply-To: <1547460140-1473-1-git-send-email-thuth@redhat.com>
+References: <1547460140-1473-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PULL 09/25] tests/pnv-xscom: Make test independent of
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,166 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-s390x@nongnu.org, Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>
 
-On Mon, 14 Jan 2019 08:58:26 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+Pass around the QTestState, so that we can finally get rid of the
+out-of-favor global_qtest variable in this file, too.
 
-> On 1/11/19 10:00 PM, Greg Kurz wrote:
-> > All this code is used with both the XICS and XIVE interrupt controllers=
-. =20
->=20
-> I am not fond of the name : spapr_dt_intc_irq(), it seems a bit redundant.
->=20
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tests/pnv-xscom-test.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
-Yeah, I guess it could be spapr_dt_irq().
-
-> Nevertheless,
->=20
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
->=20
-> Thanks,
->=20
-> C.
->=20
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/ppc/spapr.c              |    6 +++---
-> >  hw/ppc/spapr_events.c       |    2 +-
-> >  hw/ppc/spapr_pci.c          |    6 +++---
-> >  hw/ppc/spapr_vio.c          |    2 +-
-> >  include/hw/pci-host/spapr.h |    2 +-
-> >  include/hw/ppc/spapr.h      |    2 +-
-> >  6 files changed, 10 insertions(+), 10 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 83081defde4e..26f8e55cc25e 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -96,7 +96,7 @@
-> > =20
-> >  #define MIN_RMA_SLOF            128UL
-> > =20
-> > -#define PHANDLE_XICP            0x00001111
-> > +#define PHANDLE_INTC            0x00001111
-> > =20
-> >  /* These two functions implement the VCPU id numbering: one to compute=
- them
-> >   * all and one to identify thread 0 of a VCORE. Any change to the firs=
-t one
-> > @@ -1276,7 +1276,7 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
-> > =20
-> >      /* /interrupt controller */
-> >      spapr->irq->dt_populate(spapr, spapr_max_server_number(spapr), fdt,
-> > -                          PHANDLE_XICP);
-> > +                          PHANDLE_INTC);
-> > =20
-> >      ret =3D spapr_populate_memory(spapr, fdt);
-> >      if (ret < 0) {
-> > @@ -1296,7 +1296,7 @@ static void *spapr_build_fdt(sPAPRMachineState *s=
-papr,
-> >      }
-> > =20
-> >      QLIST_FOREACH(phb, &spapr->phbs, list) {
-> > -        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt,
-> > +        ret =3D spapr_populate_pci_dt(phb, PHANDLE_INTC, fdt,
-> >                                      spapr->irq->nr_msis);
-> >          if (ret < 0) {
-> >              error_report("couldn't setup PCI devices in fdt");
-> > diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> > index 32719a1b72d0..d4e75211954d 100644
-> > --- a/hw/ppc/spapr_events.c
-> > +++ b/hw/ppc/spapr_events.c
-> > @@ -282,7 +282,7 @@ void spapr_dt_events(sPAPRMachineState *spapr, void=
- *fdt)
-> >              continue;
-> >          }
-> > =20
-> > -        spapr_dt_xics_irq(interrupts, source->irq, false);
-> > +        spapr_dt_intc_irq(interrupts, source->irq, false);
-> > =20
-> >          _FDT(node_offset =3D fdt_add_subnode(fdt, event_sources, sourc=
-e_name));
-> >          _FDT(fdt_setprop(fdt, node_offset, "interrupts", interrupts,
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index b74f2632ecc6..24f95a400623 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -2066,7 +2066,7 @@ static void spapr_phb_pci_enumerate(sPAPRPHBState=
- *phb)
-> > =20
-> >  }
-> > =20
-> > -int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, v=
-oid *fdt,
-> > +int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t intc_phandle, v=
-oid *fdt,
-> >                            uint32_t nr_msis)
-> >  {
-> >      int bus_off, i, j, ret;
-> > @@ -2164,8 +2164,8 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb, uin=
-t32_t xics_phandle, void *fdt,
-> >              irqmap[1] =3D 0;
-> >              irqmap[2] =3D 0;
-> >              irqmap[3] =3D cpu_to_be32(j+1);
-> > -            irqmap[4] =3D cpu_to_be32(xics_phandle);
-> > -            spapr_dt_xics_irq(&irqmap[5], phb->lsi_table[lsi_num].irq,=
- true);
-> > +            irqmap[4] =3D cpu_to_be32(intc_phandle);
-> > +            spapr_dt_intc_irq(&irqmap[5], phb->lsi_table[lsi_num].irq,=
- true);
-> >          }
-> >      }
-> >      /* Write interrupt map */
-> > diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-> > index 7e8a9ad09337..cfd9849d8dfb 100644
-> > --- a/hw/ppc/spapr_vio.c
-> > +++ b/hw/ppc/spapr_vio.c
-> > @@ -158,7 +158,7 @@ static int vio_make_devnode(VIOsPAPRDevice *dev,
-> >      if (dev->irq) {
-> >          uint32_t ints_prop[2];
-> > =20
-> > -        spapr_dt_xics_irq(ints_prop, dev->irq, false);
-> > +        spapr_dt_intc_irq(ints_prop, dev->irq, false);
-> >          ret =3D fdt_setprop(fdt, node_off, "interrupts", ints_prop,
-> >                            sizeof(ints_prop));
-> >          if (ret < 0) {
-> > diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-> > index 4eb3a2ce3eb8..e0e683c32469 100644
-> > --- a/include/hw/pci-host/spapr.h
-> > +++ b/include/hw/pci-host/spapr.h
-> > @@ -113,7 +113,7 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sP=
-APRPHBState *phb, int pin)
-> >      return spapr_qirq(spapr, phb->lsi_table[pin].irq);
-> >  }
-> > =20
-> > -int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, v=
-oid *fdt,
-> > +int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t intc_phandle, v=
-oid *fdt,
-> >                            uint32_t nr_msis);
-> > =20
-> >  void spapr_pci_rtas_init(void);
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index 9e01a5a12e4a..7193ce094689 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -682,7 +682,7 @@ void spapr_load_rtas(sPAPRMachineState *spapr, void=
- *fdt, hwaddr addr);
-> >   * "interrupt-controller" node has its "#interrupt-cells" property set=
- to 2 (ie,
-> >   * VIO devices, RTAS event sources and PHBs).
-> >   */
-> > -static inline void spapr_dt_xics_irq(uint32_t *intspec, int irq, bool =
-is_lsi)
-> > +static inline void spapr_dt_intc_irq(uint32_t *intspec, int irq, bool =
-is_lsi)
-> >  {
-> >      intspec[0] =3D cpu_to_be32(irq);
-> >      intspec[1] =3D is_lsi ? cpu_to_be32(1) : 0;
-> >  =20
->=20
->=20
+diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
+index 70f4c84..974f8da 100644
+--- a/tests/pnv-xscom-test.c
++++ b/tests/pnv-xscom-test.c
+@@ -63,14 +63,15 @@ static uint64_t pnv_xscom_addr(const PnvChip *chip, uint32_t pcba)
+     return addr;
+ }
+ 
+-static uint64_t pnv_xscom_read(const PnvChip *chip, uint32_t pcba)
++static uint64_t pnv_xscom_read(QTestState *qts, const PnvChip *chip,
++                               uint32_t pcba)
+ {
+-    return readq(pnv_xscom_addr(chip, pcba));
++    return qtest_readq(qts, pnv_xscom_addr(chip, pcba));
+ }
+ 
+-static void test_xscom_cfam_id(const PnvChip *chip)
++static void test_xscom_cfam_id(QTestState *qts, const PnvChip *chip)
+ {
+-    uint64_t f000f = pnv_xscom_read(chip, 0xf000f);
++    uint64_t f000f = pnv_xscom_read(qts, chip, 0xf000f);
+ 
+     g_assert_cmphex(f000f, ==, chip->cfam_id);
+ }
+@@ -78,11 +79,11 @@ static void test_xscom_cfam_id(const PnvChip *chip)
+ static void test_cfam_id(const void *data)
+ {
+     const PnvChip *chip = data;
++    QTestState *qts;
+ 
+-    global_qtest = qtest_initf("-M powernv,accel=tcg -cpu %s",
+-                               chip->cpu_model);
+-    test_xscom_cfam_id(chip);
+-    qtest_quit(global_qtest);
++    qts = qtest_initf("-M powernv,accel=tcg -cpu %s", chip->cpu_model);
++    test_xscom_cfam_id(qts, chip);
++    qtest_quit(qts);
+ }
+ 
+ 
+@@ -94,7 +95,7 @@ static void test_cfam_id(const void *data)
+ 
+ #define PNV_XSCOM_EX_DTS_RESULT0     0x50000
+ 
+-static void test_xscom_core(const PnvChip *chip)
++static void test_xscom_core(QTestState *qts, const PnvChip *chip)
+ {
+     uint32_t first_core_dts0 = PNV_XSCOM_EX_DTS_RESULT0;
+     uint64_t dts0;
+@@ -105,7 +106,7 @@ static void test_xscom_core(const PnvChip *chip)
+         first_core_dts0 |= PNV_XSCOM_P9_EC_BASE(chip->first_core);
+     }
+ 
+-    dts0 = pnv_xscom_read(chip, first_core_dts0);
++    dts0 = pnv_xscom_read(qts, chip, first_core_dts0);
+ 
+     g_assert_cmphex(dts0, ==, 0x26f024f023f0000ull);
+ }
+@@ -113,11 +114,11 @@ static void test_xscom_core(const PnvChip *chip)
+ static void test_core(const void *data)
+ {
+     const PnvChip *chip = data;
++    QTestState *qts;
+ 
+-    global_qtest = qtest_initf("-M powernv,accel=tcg -cpu %s",
+-                               chip->cpu_model);
+-    test_xscom_core(chip);
+-    qtest_quit(global_qtest);
++    qts = qtest_initf("-M powernv,accel=tcg -cpu %s", chip->cpu_model);
++    test_xscom_core(qts, chip);
++    qtest_quit(qts);
+ }
+ 
+ static void add_test(const char *name, void (*test)(const void *data))
+-- 
+1.8.3.1
