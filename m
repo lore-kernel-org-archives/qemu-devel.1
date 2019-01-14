@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45786)
+Received: from eggs.gnu.org ([209.51.188.92]:46039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj2iv-0004gJ-6e
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:56:19 -0500
+	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
+	id 1gj2iz-0004p7-8I
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:56:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj2ez-0002RB-MW
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:14 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33514)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gj2ez-0002Qv-IT
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:13 -0500
-Received: by mail-ot1-x343.google.com with SMTP id i20so19374717otl.0
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 05:52:13 -0800 (PST)
+	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
+	id 1gj2es-0002OB-UV
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:12 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:65429)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
+	id 1gj2es-0002N4-MI
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:06 -0500
+From: Anthony PERARD <anthony.perard@citrix.com>
+Date: Mon, 14 Jan 2019 13:51:29 +0000
+Message-ID: <20190114135154.16826-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
-References: <1547473614-20033-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1547473614-20033-1-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Jan 2019 13:52:01 +0000
-Message-ID: <CAFEAcA9RQ+_vC3z4qxkX9Jsu4FKHGqi6qXxgbUKn=wpPzwy4Nw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Work-around a bug in libiscsi
- 1.9.0 when used in gnu99 mode
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/25] Xen queue v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +28,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, 14 Jan 2019 at 13:47, Thomas Huth <thuth@redhat.com> wrote:
->
-> The header "scsi-lowlevel.h" of libiscsi 1.9.0 contains some bad
-> "inline" prototype definitions which GCC refuses to compile in its
-> gnu99 mode:
->
-> In file included from block/iscsi.c:52:0:
-> /usr/include/iscsi/scsi-lowlevel.h:810:13: error: inline function
-> =E2=80=98scsi_set_uint16=E2=80=99 declared but never defined [-Werror]
->  inline void scsi_set_uint16(unsigned char *c, uint16_t val);
->              ^
-> /usr/include/iscsi/scsi-lowlevel.h:809:13: error: inline function
-> =E2=80=98scsi_set_uint32=E2=80=99 declared but never defined [-Werror]
->  inline void scsi_set_uint32(unsigned char *c, uint32_t val);
->              ^
->
-> This has been fixed by upstream libiscsi in version 1.10.0 (see
-> https://github.com/sahlberg/libiscsi/commit/7692027d6c11 ), but
-> since we still want to support 1.9.0 for CentOS 7 / RHEL7, we
-> have to work-around the issue by compiling with "-fgnu89-inline"
-> in this case instead.
->
-> Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  configure | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/configure b/configure
-> index 2b9ba7d..aa80c17 100755
-> --- a/configure
-> +++ b/configure
-> @@ -4562,6 +4562,11 @@ if test "$libiscsi" !=3D "no" ; then
->      libiscsi=3D"yes"
->      libiscsi_cflags=3D$($pkg_config --cflags libiscsi)
->      libiscsi_libs=3D$($pkg_config --libs libiscsi)
-> +    if $pkg_config --exact-version=3D=3D1.9.0 libiscsi; then
-> +      # There are some bad inline declarations in scsi-lowlevel.h of
-> +      # libiscsi 1.9.0 which don't work in gnu99 mode without this:
-> +      libiscsi_cflags=3D"-fgnu89-inline $libiscsi_cflags"
-> +    fi
+The following changes since commit 7260438b7056469610ee166f7abe9ff8a26b8b16:
 
-Can we suppress the warnings with #pragma instead ?
-That would avoid compiling the .o file with different
-C semantics.
+  Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3.2-part2' into staging (2019-01-14 11:41:43 +0000)
 
-thanks
--- PMM
+are available in the Git repository at:
+
+  https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pull-xen-20190114
+
+for you to fetch changes up to c6025bd197d0dbcc5067553fd12538d8b29383c2:
+
+  xen-block: avoid repeated memory allocation (2019-01-14 13:45:40 +0000)
+
+----------------------------------------------------------------
+Xen queue
+
+* Xen PV backend 'qdevification'.
+  Starting with xen_disk.
+* Performance improvements for xen-block.
+* Remove of the Xen PV domain builder.
+* bug fixes.
+
+----------------------------------------------------------------
+Anthony PERARD (2):
+      Remove broken Xen PV domain builder
+      xen: Replace few mentions of xend by libxl
+
+Paul Durrant (18):
+      xen: re-name XenDevice to XenLegacyDevice...
+      xen: introduce new 'XenBus' and 'XenDevice' object hierarchy
+      xen: introduce 'xen-block', 'xen-disk' and 'xen-cdrom'
+      xen: create xenstore areas for XenDevice-s
+      xen: add xenstore watcher infrastructure
+      xen: add grant table interface for XenDevice-s
+      xen: add event channel interface for XenDevice-s
+      xen: duplicate xen_disk.c as basis of dataplane/xen-block.c
+      xen: remove unnecessary code from dataplane/xen-block.c
+      xen: add header and build dataplane/xen-block.c
+      xen: remove 'XenBlkDev' and 'blkdev' names from dataplane/xen-block
+      xen: remove 'ioreq' struct/varable/field names from dataplane/xen-block.c
+      xen: purge 'blk' and 'ioreq' from function names in dataplane/xen-block.c
+      xen: add implementations of xen-block connect and disconnect functions...
+      xen: add a mechanism to automatically create XenDevice-s...
+      xen: automatically create XenBlockDevice-s
+      MAINTAINERS: add myself as a Xen maintainer
+      xen: remove the legacy 'xen_disk' backend
+
+Peter Maydell (1):
+      hw/xen/xen_pt_graphics: Don't trust the BIOS ROM contents so much
+
+Tim Smith (3):
+      xen-block: improve batching behaviour
+      xen-block: improve response latency
+      xen-block: avoid repeated memory allocation
+
+Zhao Yan (1):
+      xen/pt: allow passthrough of devices with bogus interrupt pin
+
+ MAINTAINERS                                        |    5 +-
+ configure                                          |   17 -
+ hw/9pfs/xen-9p-backend.c                           |   16 +-
+ hw/block/Makefile.objs                             |    2 +-
+ hw/block/dataplane/Makefile.objs                   |    1 +
+ hw/block/dataplane/xen-block.c                     |  827 ++++++++++++++
+ hw/block/dataplane/xen-block.h                     |   29 +
+ hw/block/trace-events                              |   14 +
+ hw/block/xen-block.c                               |  963 ++++++++++++++++
+ hw/block/xen_disk.c                                | 1011 -----------------
+ hw/char/xen_console.c                              |   12 +-
+ hw/display/xenfb.c                                 |   25 +-
+ hw/i386/xen/xen-hvm.c                              |    5 +-
+ hw/i386/xen/xen-mapcache.c                         |    2 +-
+ hw/i386/xen/xen_platform.c                         |    2 +-
+ hw/net/xen_nic.c                                   |   14 +-
+ hw/usb/xen-usb.c                                   |   25 +-
+ hw/xen/Makefile.objs                               |    2 +-
+ hw/xen/trace-events                                |   26 +
+ hw/xen/xen-backend.c                               |  165 +++
+ hw/xen/xen-bus-helper.c                            |  184 +++
+ hw/xen/xen-bus.c                                   | 1199 ++++++++++++++++++++
+ hw/xen/xen-common.c                                |    2 +-
+ hw/xen/{xen_backend.c => xen-legacy-backend.c}     |   80 +-
+ hw/xen/xen_devconfig.c                             |    2 +-
+ hw/xen/xen_pt.c                                    |    8 +-
+ hw/xen/xen_pt_config_init.c                        |    6 +-
+ hw/xen/xen_pt_graphics.c                           |   18 +-
+ hw/xen/xen_pt_msi.c                                |    2 +-
+ hw/xen/xen_pvdev.c                                 |   20 +-
+ hw/xenpv/Makefile.objs                             |    2 -
+ hw/xenpv/xen_domainbuild.c                         |  299 -----
+ hw/xenpv/xen_domainbuild.h                         |   13 -
+ hw/xenpv/xen_machine_pv.c                          |   21 +-
+ include/hw/xen/xen-backend.h                       |   39 +
+ include/hw/xen/xen-block.h                         |   94 ++
+ include/hw/xen/xen-bus-helper.h                    |   45 +
+ include/hw/xen/xen-bus.h                           |  137 +++
+ .../hw/xen/{xen_backend.h => xen-legacy-backend.h} |   43 +-
+ include/hw/xen/xen.h                               |    3 +-
+ include/hw/xen/xen_common.h                        |   19 +-
+ include/hw/xen/xen_pvdev.h                         |   38 +-
+ include/qemu/module.h                              |    3 +
+ qemu-options.hx                                    |   12 +-
+ vl.c                                               |    7 -
+ 45 files changed, 3923 insertions(+), 1536 deletions(-)
+ create mode 100644 hw/block/dataplane/xen-block.c
+ create mode 100644 hw/block/dataplane/xen-block.h
+ create mode 100644 hw/block/xen-block.c
+ delete mode 100644 hw/block/xen_disk.c
+ create mode 100644 hw/xen/xen-backend.c
+ create mode 100644 hw/xen/xen-bus-helper.c
+ create mode 100644 hw/xen/xen-bus.c
+ rename hw/xen/{xen_backend.c => xen-legacy-backend.c} (89%)
+ delete mode 100644 hw/xenpv/xen_domainbuild.c
+ delete mode 100644 hw/xenpv/xen_domainbuild.h
+ create mode 100644 include/hw/xen/xen-backend.h
+ create mode 100644 include/hw/xen/xen-block.h
+ create mode 100644 include/hw/xen/xen-bus-helper.h
+ create mode 100644 include/hw/xen/xen-bus.h
+ rename include/hw/xen/{xen_backend.h => xen-legacy-backend.h} (61%)
