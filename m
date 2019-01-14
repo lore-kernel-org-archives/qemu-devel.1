@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59601)
+Received: from eggs.gnu.org ([209.51.188.92]:60232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj59S-0008GI-CF
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:51 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1gj5Az-0000uo-9v
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:33:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gj59R-0000A1-3r
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:50 -0500
-Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:33805)
+	(envelope-from <zhangckid@gmail.com>) id 1gj5Av-00014J-Tr
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:33:25 -0500
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39436)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gj59Q-00008i-B8
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:48 -0500
-Received: by mail-oi1-x22b.google.com with SMTP id r62so18383132oie.1
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 08:31:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gj5Av-00013z-KD
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:33:21 -0500
+Received: by mail-wr1-x436.google.com with SMTP id t27so23618946wra.6
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 08:33:21 -0800 (PST)
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Jan 2019 16:31:35 +0000
-Message-ID: <CAFEAcA8GE72MaUFvbfHUL7vwkBNzWh+q_0VgzbmLJ-StYhWM4Q@mail.gmail.com>
+References: <CAFEAcA_ZdOsXbKE=ZcOGUNB4LAnL_wZK5rdm+PvsaeBfyT0DSg@mail.gmail.com>
+	<20190111161515.GG2738@work-vm>
+In-Reply-To: <20190111161515.GG2738@work-vm>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Tue, 15 Jan 2019 00:33:08 +0800
+Message-ID: <CAK3tnvKL9QofBfg2-Dk_nJErNc2GeDh7_M2r+J3r-izMi4kyAw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] -device foo,
- help shouldn't be allowed for devices where -device foo is forbidden
+Subject: Re: [Qemu-devel] test-filter-mirror hangs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +28,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Thomas Huth <thuth@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-We prohibit -device foo for non-pluggable devices:
-$ ./build/all/x86_64-softmmu/qemu-system-x86_64 -device i8257
-qemu-system-x86_64: -device i8257: Parameter 'driver' expects
-pluggable device type
+On Sat, Jan 12, 2019 at 12:15 AM Dr. David Alan Gilbert <dgilbert@redhat.com>
+wrote:
 
-And we suppress them from "-device help" output too.
+> * Peter Maydell (peter.maydell@linaro.org) wrote:
+> > Recently I've noticed that test-filter-mirror has been hanging
+> > intermittently, typically when run on some other TCG architecture.
+> > In the instance I've just looked at, this was with s390x guest on
+> > x86-64 host, though I've also seen it on other host archs and
+> > perhaps with other guests.
+>
+> Watch out to see if you really do see it for other guests;
+> it carefully avoids using virtio-net to avoid vhost; but on s390x it
+> uses virtio-net-ccw - could that hit the vhost it was trying to avoid?
+>
+> > Below is a backtrace, though it seems to be pretty unhelpful.
+> > Anybody got any theories ? Does the mirror test rely on dirty
+> > memory bitmaps like the migration test (which also hangs
+> > occasionally with TCG due to some bug I'm sure we've investigated
+> > in the past) ?
+>
+> I don't think it relies on the CPU at all.
+>
+> Dave
+>
+>
+ I have no idea about this currently, but Jason and I designed the test
+case.
+Add Jason: Have any comments about this ?
 
-But we still allow the user to do this:
+Thanks
+Zhang Chen
 
-$ ./build/all/x86_64-softmmu/qemu-system-x86_64 -device i8257,help
-i8257 options:
-  dshift=<int32>
-  base=<int32>
-  pageh-base=<int32>
-  page-base=<int32>
 
-Does anybody know how best to fix this? I guess we want to check
-dc->user_creatable in qdev_device_help() and print "%s is not
-a pluggable device" or something similar instead ?
 
-(The output is particularly useless for some devices, eg
-
-$ ./build/all/arm-softmmu/qemu-system-arm -M virt -device iotkit,help
-iotkit options:
-  ppc-irq-splitter-5=<child<split-irq>>
-  nswatchdog=<child<cmsdk-apb-watchdog>>
-  iotkit-sysinfo=<child<iotkit-sysinfo>>
-  sec-resp-splitter=<child<split-irq>>
-  ppc-irq-splitter-6=<child<split-irq>>
-  mpc-irq-splitter-16=<child<split-irq>>
-  memory=<link<qemu:memory-region>>
-  mpc=<child<tz-mpc>>
-  dualtimer=<child<cmsdk-apb-dualtimer>>
-  ppc-irq-splitter-9=<child<split-irq>>
-  ppc-irq-splitter-8=<child<split-irq>>
-  ppc-irq-splitter-7=<child<split-irq>>
-  mpc-irq-splitter-6=<child<split-irq>>
-  ppc-irq-splitter-4=<child<split-irq>>
-  iotkit-container[0]=<child<qemu:memory-region>>
-  s32kwatchdog=<child<cmsdk-apb-watchdog>>
-  mpc-irq-splitter-5=<child<split-irq>>
-  iotkit-sysctl=<child<iotkit-sysctl>>
-  EXP_NUMIRQ=<uint32>
-  MAINCLK=<uint32>
-  mpc-irq-orgate=<child<or-irq>>
-  mpc-irq-splitter-9=<child<split-irq>>
-  mpc-irq-splitter-8=<child<split-irq>>
-  mpc-irq-splitter-7=<child<split-irq>>
-  mpc-irq-splitter-4=<child<split-irq>>
-  mpc-irq-splitter-2=<child<split-irq>>
-  mpc-irq-splitter-1=<child<split-irq>>
-  mpc-irq-splitter-3=<child<split-irq>>
-  apb-ppc1=<child<tz-ppc>>
-  apb-ppc0=<child<tz-ppc>>
-  mpc-irq-splitter-0=<child<split-irq>>
-  mpc-irq-splitter-15=<child<split-irq>>
-  mpc-irq-splitter-14=<child<split-irq>>
-  mpc-irq-splitter-13=<child<split-irq>>
-  mpc-irq-splitter-12=<child<split-irq>>
-  mpc-irq-splitter-11=<child<split-irq>>
-  mpc-irq-splitter-10=<child<split-irq>>
-  ppc-irq-splitter-3=<child<split-irq>>
-  ppc-irq-splitter-2=<child<split-irq>>
-  ppc-irq-splitter-1=<child<split-irq>>
-  swatchdog=<child<cmsdk-apb-watchdog>>
-  nmi-orgate=<child<or-irq>>
-  s32ktimer=<child<cmsdk-apb-timer>>
-  ppc-irq-splitter-0=<child<split-irq>>
-  timer1=<child<cmsdk-apb-timer>>
-  timer0=<child<cmsdk-apb-timer>>
-  secctl=<child<iotkit-secctl>>
-  armv7m=<child<armv7m>>
-  ppc-irq-orgate=<child<or-irq>>
-
-where the properties are all intended to be
-set up by QEMU code, not by a user.)
-
-thanks
--- PMM
+> > Processes:
+> > petmay01 10533  0.0  0.0  15624  1400 pts/16   S+   14:22   0:00
+> >                            \_ tests/test-filter-mirror --quiet
+> > --keep-going -m=quick --GTestLogFD=6
+> > petmay01 10534  0.0  0.2 979892 36492 pts/16   Sl+  14:22   0:00
+> >                                \_ s390x-softmmu/qemu-system-s390x
+> > -qtest unix:/tmp/qtest-10533.sock,nowait -qtest-log /dev/null -chardev
+> > socket,path=/tmp/qtest-10533.qmp,nowait,id=char0 -mon
+> > chardev=char0,mode=control -machine accel=qtest -display none -netdev
+> > socket,id=qtest-bn0,fd=4 -device
+> > virtio-net-ccw,netdev=qtest-bn0,id=qtest-e0 -chardev
+> > socket,id=mirror0,path=filter-mirror.Ongzms,server,nowait -object
+> > filter-mirror,id=qtest-f0,netdev=qtest-bn0,queue=tx,outdev=mirror0
+> >
+> > Backtrace of all threads in the QEMU process:
+> > Thread 4 (Thread 0x7f59b67ff700 (LWP 10539)):
+> > #0  0x00007f59cf908156 in __sigwait (sig=0x7f59b67fc510, set=<optimised
+> out>)
+> >     at ../sysdeps/unix/sysv/linux/sigwait.c:64
+> > #1  0x00007f59cf908156 in __sigwait (set=<optimised out>,
+> sig=0x7f59b67fc510)
+> >     at ../sysdeps/unix/sysv/linux/sigwait.c:96
+> > #2  0x00005639a87c4c8e in qemu_dummy_cpu_thread_fn (arg=0x5639aa544250)
+> >     at /home/petmay01/linaro/qemu-for-merges/cpus.c:1326
+> > #3  0x00005639a8b8b911 in qemu_thread_start (args=0x5639aa569010)
+> >     at /home/petmay01/linaro/qemu-for-merges/util/qemu-thread-posix.c:502
+> > #4  0x00007f59cf8fe6ba in start_thread (arg=0x7f59b67ff700) at
+> > pthread_create.c:333
+> > #5  0x00007f59cf63441d in clone () at
+> > ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+> >
+> > Thread 3 (Thread 0x7f59bf1f0700 (LWP 10538)):
+> > #0  0x00007f59cf62874d in poll () at
+> ../sysdeps/unix/syscall-template.S:84
+> > #1  0x00007f59e64e638c in g_main_context_iterate (priority=2147483647,
+> > n_fds=3, fds=0x7f59b0001300, timeout=<optimised out>,
+> > context=0x7f59b00008c0)
+> >     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gmain.c:4135
+> > #2  0x00007f59e64e638c in g_main_context_iterate
+> > (context=0x7f59b00008c0, block=block@entry=1,
+> > dispatch=dispatch@entry=1, self=<optimised out>)
+> >     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gmain.c:3835
+> > #3  0x00007f59e64e6712 in g_main_loop_run (loop=0x7f59b00012e0)
+> >     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gmain.c:4034
+> > #4  0x00005639a88d187a in iothread_run (opaque=0x5639aa512710)
+> >     at /home/petmay01/linaro/qemu-for-merges/iothread.c:74
+> > #5  0x00005639a8b8b911 in qemu_thread_start (args=0x5639aa49d6a0)
+> >     at /home/petmay01/linaro/qemu-for-merges/util/qemu-thread-posix.c:502
+> > #6  0x00007f59cf8fe6ba in start_thread (arg=0x7f59bf1f0700) at
+> > pthread_create.c:333
+> > #7  0x00007f59cf63441d in clone () at
+> > ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+> >
+> > Thread 2 (Thread 0x7f59bf9f1700 (LWP 10537)):
+> > #0  0x00007f59cf62e4d9 in syscall () at
+> > ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+> > #1  0x00005639a8b8b58f in qemu_futex_wait (f=0x5639a930a418
+> > <rcu_call_ready_event>, val=4294967295)
+> >     at /home/petmay01/linaro/qemu-for-merges/include/qemu/futex.h:29
+> > #2  0x00005639a8b8b75e in qemu_event_wait (ev=0x5639a930a418
+> > <rcu_call_ready_event>)
+> >     at /home/petmay01/linaro/qemu-for-merges/util/qemu-thread-posix.c:442
+> > #3  0x00005639a8ba41d3 in call_rcu_thread (opaque=0x0)
+> >     at /home/petmay01/linaro/qemu-for-merges/util/rcu.c:261
+> > #4  0x00005639a8b8b911 in qemu_thread_start (args=0x5639aa449ac0)
+> >     at /home/petmay01/linaro/qemu-for-merges/util/qemu-thread-posix.c:502
+> > #5  0x00007f59cf8fe6ba in start_thread (arg=0x7f59bf9f1700) at
+> > pthread_create.c:333
+> > #6  0x00007f59cf63441d in clone () at
+> > ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+> >
+> > Thread 1 (Thread 0x7f59e9017fc0 (LWP 10534)):
+> > #0  0x00007f59cf628811 in __GI_ppoll (fds=0x5639aa5a1b90, nfds=6,
+> > timeout=<optimised out>, sigmask=0x0) at
+> > ../sysdeps/unix/sysv/linux/ppoll.c:50
+> > #1  0x00005639a8b8534b in qemu_poll_ns (fds=0x5639aa5a1b90, nfds=6,
+> timeout=-1)
+> >     at /home/petmay01/linaro/qemu-for-merges/util/qemu-timer.c:322
+> > ---Type <return> to continue, or q <return> to quit---
+> > #2  0x00005639a8b86527 in os_host_main_loop_wait (timeout=-1)
+> >     at /home/petmay01/linaro/qemu-for-merges/util/main-loop.c:233
+> > #3  0x00005639a8b865fe in main_loop_wait (nonblocking=0)
+> >     at /home/petmay01/linaro/qemu-for-merges/util/main-loop.c:497
+> > #4  0x00005639a88dab83 in main_loop () at
+> > /home/petmay01/linaro/qemu-for-merges/vl.c:1925
+> > #5  0x00005639a88e25b9 in main (argc=21, argv=0x7ffd344d6138,
+> > envp=0x7ffd344d61e8)
+> >     at /home/petmay01/linaro/qemu-for-merges/vl.c:4669
+> >
+> > Backtrace in test-filter-mirror:
+> > Thread 1 (Thread 0x7fd24ab03740 (LWP 10533)):
+> > #0  0x00007fd24a0eb81d in __libc_recv (fd=8, buf=0x7ffcef3a8c58, n=4,
+> flags=0)
+> >     at ../sysdeps/unix/sysv/linux/x86_64/recv.c:28
+> > #1  0x000055e065d2d26a in test_mirror ()
+> >     at
+> /home/petmay01/linaro/qemu-for-merges/tests/test-filter-mirror.c:70
+> > #2  0x00007fd24a67087b in test_case_run (tc=0x55e0676b6a00)
+> >     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2158
+> > #3  g_test_run_suite_internal (suite=suite@entry=0x55e0676b6060,
+> > path=path@entry=0x0)
+> >     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2241
+> > #4  0x00007fd24a670a43 in g_test_run_suite_internal
+> > (suite=suite@entry=0x55e0676b6040,
+> >     path=path@entry=0x0) at
+> > /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2253
+> > #5  0x00007fd24a670a43 in g_test_run_suite_internal
+> > (suite=suite@entry=0x55e0676b6020,
+> >     path=path@entry=0x0) at
+> > /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2253
+> > #6  0x00007fd24a670c4e in g_test_run_suite (suite=0x55e0676b6020)
+> >     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:2328
+> > #7  0x00007fd24a670c71 in g_test_run ()
+> >     at /build/glib2.0-7ZsPUq/glib2.0-2.48.2/./glib/gtestutils.c:1596
+> > #8  0x000055e065d2d4af in main (argc=1, argv=0x7ffcef3a9128)
+> >     at
+> /home/petmay01/linaro/qemu-for-merges/tests/test-filter-mirror.c:92
+> >
+> >
+> > thanks
+> > -- PMM
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
