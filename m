@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33401)
+Received: from eggs.gnu.org ([209.51.188.92]:34127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gj04Z-0007MW-Eh
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:06:28 -0500
+	(envelope-from <philmd@redhat.com>) id 1gj06f-0000id-Rr
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gj04U-0000Ts-SX
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:06:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gj04N-00009j-16
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:06:18 -0500
-Date: Mon, 14 Jan 2019 12:01:04 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190114110104.GB6837@linux.fritz.box>
-References: <29ff1bde-73ab-3033-ac5d-1ecf79b523ee@msgid.tls.msk.ru>
+	(envelope-from <philmd@redhat.com>) id 1gj06f-0003kF-7m
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:08:37 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj06d-0003Vb-8Z
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:08:37 -0500
+Received: by mail-wm1-f65.google.com with SMTP id p6so8386463wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 03:08:26 -0800 (PST)
+References: <20190111020849.22674-1-liq3ea@gmail.com>
+	<20190111020849.22674-2-liq3ea@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c166eb4e-eb85-8e6d-c0ee-32ad74e40031@redhat.com>
+Date: Mon, 14 Jan 2019 12:08:24 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29ff1bde-73ab-3033-ac5d-1ecf79b523ee@msgid.tls.msk.ru>
-Subject: Re: [Qemu-devel] block: Update flags in bdrv_set_read_only()
+In-Reply-To: <20190111020849.22674-2-liq3ea@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] nvme: use TYPE_NVME instead of
+ constant string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, armbru@redhat.com
+To: Li Qiang <liq3ea@gmail.com>, keith.busch@intel.com, kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Am 12.01.2019 um 18:08 hat Michael Tokarev geschrieben:
->     commit eeae6a596b0efc092f5101c67683053e245e6250
->     Author: Kevin Wolf <kwolf@redhat.com>
->     Date:   Tue Oct 9 16:57:12 2018 +0200
+On 1/11/19 3:08 AM, Li Qiang wrote:
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  hw/block/nvme.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->         block: Update flags in bdrv_set_read_only()
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 7c8c63e8f5..f206391e8e 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1381,7 +1381,7 @@ static void nvme_instance_init(Object *obj)
+>  }
+>  
+>  static const TypeInfo nvme_info = {
+> -    .name          = "nvme",
+> +    .name          = TYPE_NVME,
+>      .parent        = TYPE_PCI_DEVICE,
+>      .instance_size = sizeof(NvmeCtrl),
+>      .class_init    = nvme_class_init,
 > 
->         To fully change the read-only state of a node, we must not only change
->         bs->read_only, but also update bs->open_flags.
-> 
-> sort of broke vfat support:
-> 
->  $ qemu-system-x86_64 -hda fat:foo/
->  WARNING: Image format was not specified for 'json:{"fat-type": 0, "dir": "foo/", "driver": "vvfat", "floppy": false, "rw": false}' and probing guessed raw.
->           Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
->           Specify the 'raw' format explicitly to remove the restrictions.
->  qemu-system-x86_64: Initialization of device ide-hd failed: Block node is read-only
->  $ _
-> 
-> The warning is annoying but harmless, but the read-only error is fatal.
-> 
-> "Sort-of" is because there's a somewhat strange workaround:
-> 
->   -hda fat:rw:foo/
-> 
-> but it is a bit more dangerous as well.
-> 
-> It looks like vfat should be handled differently somewhere, to
-> eliminate both the warning and the error?
-
-Hm... This is not nice, but obviously that patch is still correct.
-
-Essentially what you're saying is either:
-
-1. We want to be able to attach read-only backends to read-write guest
-   devices sometimes. If you actually do a write request then, you'll
-   get an I/O error,
-
-   or
-
-2. vvfat shouldn't expose a read-only backend, but a read-write one that
-   always fails when you write.
-
-I think 2. is easier to implement, but it's special casing vvfat. Does
-this make sense or is it a problem that needs to be solved more
-generically? If it's okay for a read-only FAT backend to be attached to
-an IDE disk that really needs a read-write backend, why wouldn't it be
-okay to attach e.g. a read-only HTTP backend? Or even a read-only image
-file on the local filesystem?
-
-On the other hand, usually users wouldn't want to silently get a guest
-started up that produces I/O errors on the first write request when they
-just configured things wrong or have the wrong file permissions.
-
-We can't do both at the same time, though. So what is the behaviour that
-we actually want regarding read-only backends and read-write guest
-devices?
-
-Kevin
