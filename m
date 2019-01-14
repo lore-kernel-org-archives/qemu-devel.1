@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57645)
+Received: from eggs.gnu.org ([209.51.188.92]:57652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj54V-0003om-QM
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:44 -0500
+	(envelope-from <eblake@redhat.com>) id 1gj54W-0003p8-0l
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj54U-0005OU-QW
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1gj54V-0005Og-5d
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:44 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 14 Jan 2019 10:25:53 -0600
-Message-Id: <20190114162605.5330-9-eblake@redhat.com>
+Date: Mon, 14 Jan 2019 10:25:52 -0600
+Message-Id: <20190114162605.5330-8-eblake@redhat.com>
 In-Reply-To: <20190114162605.5330-1-eblake@redhat.com>
 References: <20190114162605.5330-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/20] iotests: remove default filters from
- qmp_log
+Subject: [Qemu-devel] [PULL 07/20] iotests: add qmp recursive sorting
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +27,98 @@ Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtu
 
 From: John Snow <jsnow@redhat.com>
 
-Several places in iotests deal with serializing objects into JSON
-strings, but to add pretty-printing it seems desirable to localize
-all of those cases.
+Python before 3.6 does not sort dictionaries (including kwargs).
+Therefore, printing QMP objects involves sorting the keys to have
+a predictable ordering in the iotests output. This means that
+iotests output will sometimes show arguments in an order not
+specified by the test author.
 
-log() seems like a good candidate for that centralized behavior.
-log() can already serialize json objects, but when it does so,
-it assumes filters=3D[] operates on QMP objects, not strings.
+Presently, we accomplish this by using json.dumps' sort_keys argument,
+where we only serialize the arguments dictionary, but not the command.
 
-qmp_log currently operates by dumping outgoing and incoming QMP
-objects into strings and filtering them assuming that filters=3D[]
-are string filters.
+However, if we want to pretty-print QMP objects being sent to the
+QEMU process, we need to build the entire command before logging it.
+Ordinarily, this would then involve "arguments" being sorted above
+"execute", which would necessitate a rather ugly and harder-to-read
+change to many iotests outputs.
 
-To have qmp_log use log's serialization, qmp_log will need to
-accept only qmp filters, not text filters.
+To facilitate pretty-printing AND maintaining predictable output AND
+having "arguments" sort after "execute", add a custom sort function
+that takes a dictionary and recursively builds an OrderedDict that
+maintains the specific key order we wish to see in iotests output.
 
-However, only a single caller of qmp_log actually requires any
-filters at all. I remove the default filter and add it explicitly
-to the caller in preparation for refactoring qmp_log to use rich
-filters instead.
-
-test 206 is amended to name the filter explicitly and the default
-is removed.
+The qmp_log function uses this to build a QMP object that keeps
+"execute" above "arguments", but sorts all keys and keys in any
+subdicts in "arguments" lexicographically to maintain consistent
+iotests output, with no incompatible changes to any current test.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20181221093529.23855-9-jsnow@redhat.com>
+Message-Id: <20181221093529.23855-8-jsnow@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/206        | 8 ++++++--
- tests/qemu-iotests/iotests.py | 2 +-
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/iotests.py | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
-index 128c334c7c5..e92550fa59f 100755
---- a/tests/qemu-iotests/206
-+++ b/tests/qemu-iotests/206
-@@ -26,7 +26,9 @@ from iotests import imgfmt
- iotests.verify_image_format(supported_fmts=3D['qcow2'])
-
- def blockdev_create(vm, options):
--    result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
-options)
-+    result =3D vm.qmp_log('blockdev-create',
-+                        filters=3D[iotests.filter_testfiles],
-+                        job_id=3D'job0', options=3Doptions)
-
-     if 'return' in result:
-         assert result['return'] =3D=3D {}
-@@ -52,7 +54,9 @@ with iotests.FilePath('t.qcow2') as disk_path, \
-                           'filename': disk_path,
-                           'size': 0 })
-
--    vm.qmp_log('blockdev-add', driver=3D'file', filename=3Ddisk_path,
-+    vm.qmp_log('blockdev-add',
-+               filters=3D[iotests.filter_testfiles],
-+               driver=3D'file', filename=3Ddisk_path,
-                node_name=3D'imgfile')
-
-     blockdev_create(vm, { 'driver': imgfmt,
 diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
 y
-index 565eebb1ab5..57fe20db45a 100644
+index 9595429fea2..565eebb1ab5 100644
 --- a/tests/qemu-iotests/iotests.py
 +++ b/tests/qemu-iotests/iotests.py
-@@ -460,7 +460,7 @@ class VM(qtest.QEMUQtestMachine):
-             result.append(filter_qmp_event(ev))
+@@ -30,6 +30,7 @@ import signal
+ import logging
+ import atexit
+ import io
++from collections import OrderedDict
+
+ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scr=
+ipts'))
+ import qtest
+@@ -75,6 +76,16 @@ def qemu_img(*args):
+         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcod=
+e, ' '.join(qemu_img_args + list(args))))
+     return exitcode
+
++def ordered_kwargs(kwargs):
++    # kwargs prior to 3.6 are not ordered, so:
++    od =3D OrderedDict()
++    for k, v in sorted(kwargs.items()):
++        if isinstance(v, dict):
++            od[k] =3D ordered_kwargs(v)
++        else:
++            od[k] =3D v
++    return od
++
+ def qemu_img_create(*args):
+     args =3D list(args)
+
+@@ -257,8 +268,10 @@ def filter_img_info(output, filename):
+ def log(msg, filters=3D[]):
+     for flt in filters:
+         msg =3D flt(msg)
+-    if type(msg) is dict or type(msg) is list:
+-        print(json.dumps(msg, sort_keys=3DTrue))
++    if isinstance(msg, dict) or isinstance(msg, list):
++        # Don't sort if it's already sorted
++        do_sort =3D not isinstance(msg, OrderedDict)
++        print(json.dumps(msg, sort_keys=3Ddo_sort))
+     else:
+         print(msg)
+
+@@ -448,8 +461,11 @@ class VM(qtest.QEMUQtestMachine):
          return result
 
--    def qmp_log(self, cmd, filters=3D[filter_testfiles], **kwargs):
-+    def qmp_log(self, cmd, filters=3D[], **kwargs):
-         full_cmd =3D OrderedDict((
-             ("execute", cmd),
-             ("arguments", ordered_kwargs(kwargs))
+     def qmp_log(self, cmd, filters=3D[filter_testfiles], **kwargs):
+-        logmsg =3D '{"execute": "%s", "arguments": %s}' % \
+-            (cmd, json.dumps(kwargs, sort_keys=3DTrue))
++        full_cmd =3D OrderedDict((
++            ("execute", cmd),
++            ("arguments", ordered_kwargs(kwargs))
++        ))
++        logmsg =3D json.dumps(full_cmd)
+         log(logmsg, filters)
+         result =3D self.qmp(cmd, **kwargs)
+         log(json.dumps(result, sort_keys=3DTrue), filters)
 --=20
 2.20.1
