@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51785)
+Received: from eggs.gnu.org ([209.51.188.92]:51761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkc-0003PH-QL
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:11 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipkc-0003Oy-Ib
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipka-0006n6-Us
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipka-0006mq-Qj
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:10 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:57516)
+Received: from hera.aquilenet.fr ([185.233.100.1]:60540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipka-0006bu-La
+	id 1gipka-0006b2-GS
 	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:05:08 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:03:13 +0100
-Message-Id: <20190114000326.29847-53-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:03:12 +0100
+Message-Id: <20190114000326.29847-52-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 52/65] slirp: replace a DEBUG block with
- WITH_ICMP_ERROR_MSG
+Subject: [Qemu-devel] [PULL 51/65] slirp: replace some fprintf() with
+ DEBUG_MISC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +33,60 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-icmp_send_error() doesnt actually log messages when DEBUG is enabled.
-Let's use a different define that describes better the tweaked
-behaviour of the function, and avoid uncompiled code.
+Remove some clutter, and avoids direct call to fprintf().
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/ip_icmp.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ slirp/slirp.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-index af11cfcefe..6c7e375ff8 100644
---- a/slirp/ip_icmp.c
-+++ b/slirp/ip_icmp.c
-@@ -34,6 +34,10 @@
- #include "slirp.h"
- #include "ip_icmp.h"
-=20
-+#ifndef WITH_ICMP_ERROR_MSG
-+#define WITH_ICMP_ERROR_MSG 0
-+#endif
-+
- /* The message sent when emulating PING */
- /* Be nice and tell them it's just a pseudo-ping packet */
- static const char icmp_ping_msg[] =3D "This is a pseudo-PING packet used=
- by Slirp to emulate ICMP ECHO-REQUEST packets.\n";
-@@ -319,8 +323,7 @@ icmp_send_error(struct mbuf *msrc, u_char type, u_cha=
-r code, int minsize,
-   HTONS(icp->icmp_ip.ip_id);
-   HTONS(icp->icmp_ip.ip_off);
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 7091c3998a..ce5f571d0f 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -164,9 +164,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
+s_addr, void *cached_addr,
+     if (!f)
+         return -1;
 =20
 -#ifdef DEBUG
--  if(message) {           /* DEBUG : append message to ICMP packet */
-+  if (message && WITH_ICMP_ERROR_MSG) { /* append message to ICMP packet=
- */
-     int message_len;
-     char *cpnt;
-     message_len=3Dstrlen(message);
-@@ -329,7 +332,6 @@ icmp_send_error(struct mbuf *msrc, u_char type, u_cha=
-r code, int minsize,
-     memcpy(cpnt, message, message_len);
-     m->m_len+=3Dmessage_len;
-   }
+-    fprintf(stderr, "IP address of your DNS(s): ");
 -#endif
-=20
-   icp->icmp_cksum =3D 0;
-   icp->icmp_cksum =3D cksum(m, m->m_len);
++    DEBUG_MISC("IP address of your DNS(s): ");
+     while (fgets(buff, 512, f) !=3D NULL) {
+         if (sscanf(buff, "nameserver%*[ \t]%256s", buff2) =3D=3D 1) {
+             char *c =3D strchr(buff2, '%');
+@@ -188,15 +186,12 @@ static int get_dns_addr_resolv_conf(int af, void *p=
+dns_addr, void *cached_addr,
+                     *scope_id =3D if_index;
+                 }
+                 *cached_time =3D curtime;
++            } else {
++                DEBUG_MISC(", ");
+             }
+-#ifdef DEBUG
+-            else
+-                fprintf(stderr, ", ");
+-#endif
++
+             if (++found > 3) {
+-#ifdef DEBUG
+-                fprintf(stderr, "(more)");
+-#endif
++                DEBUG_MISC("(more)");
+                 break;
+             }
+ #ifdef DEBUG
+@@ -206,7 +201,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
+s_addr, void *cached_addr,
+                 if (!res) {
+                     res =3D "(string conversion error)";
+                 }
+-                fprintf(stderr, "%s", res);
++                DEBUG_MISC("%s", res);
+             }
+ #endif
+         }
 --=20
 2.20.1
