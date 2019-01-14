@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45938)
+Received: from eggs.gnu.org ([209.51.188.92]:46039)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2j5-0004hh-So
+	id 1gj2j3-0004p7-DW
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:56:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2es-0002Nv-Ch
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:07 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:65429)
+	id 1gj2et-0002Oc-Ne
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:08 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:65436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2es-0002N4-5F
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:06 -0500
+	id 1gj2et-0002O0-ET
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:52:07 -0500
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Mon, 14 Jan 2019 13:51:31 +0000
-Message-ID: <20190114135154.16826-3-anthony.perard@citrix.com>
+Date: Mon, 14 Jan 2019 13:51:33 +0000
+Message-ID: <20190114135154.16826-5-anthony.perard@citrix.com>
 In-Reply-To: <20190114135154.16826-1-anthony.perard@citrix.com>
 References: <20190114135154.16826-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/25] xen/pt: allow passthrough of devices with
- bogus interrupt pin
+Content-Type: text/plain
+Subject: [Qemu-devel] [PULL 04/25] xen: introduce new 'XenBus' and
+ 'XenDevice' object hierarchy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +34,291 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>
 
-From: Zhao Yan <yan.y.zhao@intel.com>
+From: Paul Durrant <paul.durrant@citrix.com>
 
-For some pci device, even its PCI_INTERRUPT_PIN is not 0, it actually
-doesn't support INTx mode, so its machine irq read from host sysfs is 0.
-In that case, report PCI_INTERRUPT_PIN as 0 to guest and let passthrough
-continue.
+This patch adds the basic boilerplate for a 'XenBus' object that will act
+as a parent to 'XenDevice' PV backends.
+A new 'XenBridge' object is also added to connect XenBus to the system bus.
 
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
-Signed-off-by: Zhao Yan <yan.y.zhao@intel.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+The XenBus object is instantiated by a new xen_bus_init() function called
+from the same sites as the legacy xen_be_init() function.
+
+Subsequent patches will flesh-out the functionality of these objects.
+
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
- hw/xen/xen_pt.c             | 6 ++++++
- hw/xen/xen_pt_config_init.c | 4 +++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ hw/i386/xen/xen-hvm.c     |   3 +
+ hw/xen/Makefile.objs      |   2 +-
+ hw/xen/trace-events       |   6 ++
+ hw/xen/xen-bus.c          | 127 ++++++++++++++++++++++++++++++++++++++
+ hw/xenpv/xen_machine_pv.c |   3 +
+ include/hw/xen/xen-bus.h  |  55 +++++++++++++++++
+ 6 files changed, 195 insertions(+), 1 deletion(-)
+ create mode 100644 hw/xen/xen-bus.c
+ create mode 100644 include/hw/xen/xen-bus.h
 
-diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
-index f1f3a3727c..815dc46ba7 100644
---- a/hw/xen/xen_pt.c
-+++ b/hw/xen/xen_pt.c
-@@ -847,6 +847,12 @@ static void xen_pt_realize(PCIDevice *d, Error **errp)
-     }
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index e579adb8b9..2939122e7c 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -17,6 +17,7 @@
+ #include "hw/i386/apic-msidef.h"
+ #include "hw/xen/xen_common.h"
+ #include "hw/xen/xen-legacy-backend.h"
++#include "hw/xen/xen-bus.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-misc.h"
+ #include "qemu/error-report.h"
+@@ -1484,6 +1485,8 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+     QLIST_INIT(&state->dev_list);
+     device_listener_register(&state->device_listener);
  
-     machine_irq = s->real_device.irq;
-+    if (machine_irq == 0) {
-+        XEN_PT_LOG(d, "machine irq is 0\n");
-+        cmd |= PCI_COMMAND_INTX_DISABLE;
-+        goto out;
++    xen_bus_init();
++
+     /* Initialize backend core & drivers */
+     if (xen_be_init() != 0) {
+         error_report("xen backend core setup failed");
+diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+index 3f64a44051..d9d6d7b4f9 100644
+--- a/hw/xen/Makefile.objs
++++ b/hw/xen/Makefile.objs
+@@ -1,5 +1,5 @@
+ # xen backend driver support
+-common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o
++common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o
+ 
+ obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+ obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+index c7e7a3b523..0172cd4e26 100644
+--- a/hw/xen/trace-events
++++ b/hw/xen/trace-events
+@@ -12,3 +12,9 @@ xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id:
+ xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_domid_restrict(int err) "err: %u"
++
++# include/hw/xen/xen-bus.c
++xen_bus_realize(void) ""
++xen_bus_unrealize(void) ""
++xen_device_realize(const char *type) "type: %s"
++xen_device_unrealize(const char *type) "type: %s"
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+new file mode 100644
+index 0000000000..bc04da748b
+--- /dev/null
++++ b/hw/xen/xen-bus.c
+@@ -0,0 +1,127 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/xen/xen-bus.h"
++#include "qapi/error.h"
++#include "trace.h"
++
++static void xen_bus_unrealize(BusState *bus, Error **errp)
++{
++    trace_xen_bus_unrealize();
++}
++
++static void xen_bus_realize(BusState *bus, Error **errp)
++{
++    trace_xen_bus_realize();
++}
++
++static void xen_bus_class_init(ObjectClass *class, void *data)
++{
++    BusClass *bus_class = BUS_CLASS(class);
++
++    bus_class->realize = xen_bus_realize;
++    bus_class->unrealize = xen_bus_unrealize;
++}
++
++static const TypeInfo xen_bus_type_info = {
++    .name = TYPE_XEN_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(XenBus),
++    .class_size = sizeof(XenBusClass),
++    .class_init = xen_bus_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_HOTPLUG_HANDLER },
++        { }
++    },
++};
++
++static void xen_device_unrealize(DeviceState *dev, Error **errp)
++{
++    XenDevice *xendev = XEN_DEVICE(dev);
++    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
++    const char *type = object_get_typename(OBJECT(xendev));
++
++    trace_xen_device_unrealize(type);
++
++    if (xendev_class->unrealize) {
++        xendev_class->unrealize(xendev, errp);
++    }
++}
++
++static void xen_device_realize(DeviceState *dev, Error **errp)
++{
++    XenDevice *xendev = XEN_DEVICE(dev);
++    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
++    const char *type = object_get_typename(OBJECT(xendev));
++    Error *local_err = NULL;
++
++    trace_xen_device_realize(type);
++
++    if (xendev_class->realize) {
++        xendev_class->realize(xendev, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            goto unrealize;
++        }
 +    }
 +
-     rc = xc_physdev_map_pirq(xen_xc, xen_domid, machine_irq, &pirq);
-     if (rc < 0) {
-         error_setg_errno(errp, errno, "Mapping machine irq %u to"
-diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
-index 47f9010c75..9fd953a689 100644
---- a/hw/xen/xen_pt_config_init.c
-+++ b/hw/xen/xen_pt_config_init.c
-@@ -300,7 +300,9 @@ static int xen_pt_irqpin_reg_init(XenPCIPassthroughState *s,
-                                   XenPTRegInfo *reg, uint32_t real_offset,
-                                   uint32_t *data)
- {
--    *data = xen_pt_pci_read_intx(s);
-+    if (s->real_device.irq) {
-+        *data = xen_pt_pci_read_intx(s);
-+    }
-     return 0;
- }
++    return;
++
++unrealize:
++    xen_device_unrealize(dev, &error_abort);
++}
++
++static void xen_device_class_init(ObjectClass *class, void *data)
++{
++    DeviceClass *dev_class = DEVICE_CLASS(class);
++
++    dev_class->realize = xen_device_realize;
++    dev_class->unrealize = xen_device_unrealize;
++    dev_class->bus_type = TYPE_XEN_BUS;
++}
++
++static const TypeInfo xen_device_type_info = {
++    .name = TYPE_XEN_DEVICE,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(XenDevice),
++    .abstract = true,
++    .class_size = sizeof(XenDeviceClass),
++    .class_init = xen_device_class_init,
++};
++
++typedef struct XenBridge {
++    SysBusDevice busdev;
++} XenBridge;
++
++#define TYPE_XEN_BRIDGE "xen-bridge"
++
++static const TypeInfo xen_bridge_type_info = {
++    .name = TYPE_XEN_BRIDGE,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(XenBridge),
++};
++
++static void xen_register_types(void)
++{
++    type_register_static(&xen_bridge_type_info);
++    type_register_static(&xen_bus_type_info);
++    type_register_static(&xen_device_type_info);
++}
++
++type_init(xen_register_types)
++
++void xen_bus_init(void)
++{
++    DeviceState *dev = qdev_create(NULL, TYPE_XEN_BRIDGE);
++    BusState *bus = qbus_create(TYPE_XEN_BUS, dev, NULL);
++
++    qdev_init_nofail(dev);
++    qbus_set_bus_hotplug_handler(bus, &error_abort);
++}
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 8c86fb7031..608e591bcc 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -27,6 +27,7 @@
+ #include "hw/hw.h"
+ #include "hw/boards.h"
+ #include "hw/xen/xen-legacy-backend.h"
++#include "hw/xen/xen-bus.h"
+ #include "xen_domainbuild.h"
+ #include "sysemu/block-backend.h"
  
+@@ -93,6 +94,8 @@ static void xen_init_pv(MachineState *machine)
+         xen_config_dev_nic(nd_table + i);
+     }
+ 
++    xen_bus_init();
++
+     /* config cleanup hook */
+     atexit(xen_config_cleanup);
+ }
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+new file mode 100644
+index 0000000000..0cb12464ce
+--- /dev/null
++++ b/include/hw/xen/xen-bus.h
+@@ -0,0 +1,55 @@
++/*
++ * Copyright (c) 2018  Citrix Systems Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_XEN_BUS_H
++#define HW_XEN_BUS_H
++
++#include "hw/sysbus.h"
++
++typedef struct XenDevice {
++    DeviceState qdev;
++} XenDevice;
++
++typedef void (*XenDeviceRealize)(XenDevice *xendev, Error **errp);
++typedef void (*XenDeviceUnrealize)(XenDevice *xendev, Error **errp);
++
++typedef struct XenDeviceClass {
++    /*< private >*/
++    DeviceClass parent_class;
++    /*< public >*/
++    XenDeviceRealize realize;
++    XenDeviceUnrealize unrealize;
++} XenDeviceClass;
++
++#define TYPE_XEN_DEVICE "xen-device"
++#define XEN_DEVICE(obj) \
++     OBJECT_CHECK(XenDevice, (obj), TYPE_XEN_DEVICE)
++#define XEN_DEVICE_CLASS(class) \
++     OBJECT_CLASS_CHECK(XenDeviceClass, (class), TYPE_XEN_DEVICE)
++#define XEN_DEVICE_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(XenDeviceClass, (obj), TYPE_XEN_DEVICE)
++
++typedef struct XenBus {
++    BusState qbus;
++} XenBus;
++
++typedef struct XenBusClass {
++    /*< private >*/
++    BusClass parent_class;
++} XenBusClass;
++
++#define TYPE_XEN_BUS "xen-bus"
++#define XEN_BUS(obj) \
++    OBJECT_CHECK(XenBus, (obj), TYPE_XEN_BUS)
++#define XEN_BUS_CLASS(class) \
++    OBJECT_CLASS_CHECK(XenBusClass, (class), TYPE_XEN_BUS)
++#define XEN_BUS_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(XenBusClass, (obj), TYPE_XEN_BUS)
++
++void xen_bus_init(void);
++
++#endif /* HW_XEN_BUS_H */
 -- 
 Anthony PERARD
