@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34902)
+Received: from eggs.gnu.org ([209.51.188.92]:34890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6s-0004JN-4h
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:35 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6o-0004Ez-4C
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6r-0001QC-3g
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:34 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37406)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6n-0001O3-A9
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:30 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37336)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6q-0001Pm-QE
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:33 -0500
+	id 1gjB6m-0001MY-Ue
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:29 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:31 +0100
-Message-Id: <20190114225306.21569-31-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:19 +0100
+Message-Id: <20190114225306.21569-19-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 30/65] slirp: replace HOST_WORDS_BIGENDIAN with
- glib equivalent
+Subject: [Qemu-devel] [PULL 18/65] slirp: remove the disabled
+ readv()/writev() code path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,146 +29,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-One more step towards making the project independent from QEMU.
+The soread() function may be used on datagram sockets, and would
+provide different behaviour if HAVE_READV was set, on empty datagrams.
+This looks like a minor optimization, that never has been a strong
+goal for slirp.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/ip.h           | 8 +++++---
- slirp/ip6.h          | 3 ++-
- slirp/ip6_icmp.h     | 6 +++---
- slirp/slirp_config.h | 3 ---
- slirp/tcp.h          | 4 +++-
- 5 files changed, 13 insertions(+), 11 deletions(-)
+ slirp/slirp_config.h |  3 ---
+ slirp/socket.c       | 15 ---------------
+ 2 files changed, 18 deletions(-)
 
-diff --git a/slirp/ip.h b/slirp/ip.h
-index 59cf4aa918..83fc9cdfbf 100644
---- a/slirp/ip.h
-+++ b/slirp/ip.h
-@@ -33,7 +33,9 @@
- #ifndef IP_H
- #define IP_H
-=20
--#ifdef HOST_WORDS_BIGENDIAN
-+#include <glib.h>
-+
-+#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
- # undef NTOHL
- # undef NTOHS
- # undef HTONL
-@@ -69,7 +71,7 @@ typedef uint32_t n_long;                 /* long as rec=
-eived from the net */
-  * Structure of an internet header, naked of options.
-  */
- struct ip {
--#ifdef HOST_WORDS_BIGENDIAN
-+#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
- 	uint8_t ip_v:4,			/* version */
- 		ip_hl:4;		/* header length */
- #else
-@@ -135,7 +137,7 @@ struct	ip_timestamp {
- 	uint8_t	ipt_code;		/* IPOPT_TS */
- 	uint8_t	ipt_len;		/* size of structure (variable) */
- 	uint8_t	ipt_ptr;		/* index of current entry */
--#ifdef HOST_WORDS_BIGENDIAN
-+#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
- 	uint8_t	ipt_oflw:4,		/* overflow counter */
- 		ipt_flg:4;		/* flags, see below */
- #else
-diff --git a/slirp/ip6.h b/slirp/ip6.h
-index b1bea43b3c..14e9c78735 100644
---- a/slirp/ip6.h
-+++ b/slirp/ip6.h
-@@ -6,6 +6,7 @@
- #ifndef SLIRP_IP6_H
- #define SLIRP_IP6_H
-=20
-+#include <glib.h>
- #include "net/eth.h"
-=20
- #define ALLNODES_MULTICAST  { .s6_addr =3D \
-@@ -113,7 +114,7 @@ static inline void in6_compute_ethaddr(struct in6_add=
-r ip,
-  * Structure of an internet header, naked of options.
-  */
- struct ip6 {
--#ifdef HOST_WORDS_BIGENDIAN
-+#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
-     uint32_t
-         ip_v:4,         /* version */
-         ip_tc_hi:4,     /* traffic class */
-diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
-index b3378b17b5..32b0914055 100644
---- a/slirp/ip6_icmp.h
-+++ b/slirp/ip6_icmp.h
-@@ -34,7 +34,7 @@ struct ndp_rs {     /* Router Solicitation Message */
-=20
- struct ndp_ra {     /* Router Advertisement Message */
-     uint8_t chl;    /* Cur Hop Limit */
--#ifdef HOST_WORDS_BIGENDIAN
-+#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
-     uint8_t
-         M:1,
-         O:1,
-@@ -56,7 +56,7 @@ struct ndp_ns {     /* Neighbor Solicitation Message */
- } QEMU_PACKED;
-=20
- struct ndp_na {     /* Neighbor Advertisement Message */
--#ifdef HOST_WORDS_BIGENDIAN
-+#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
-     uint32_t
-         R:1,                /* Router Flag */
-         S:1,                /* Solicited Flag */
-@@ -125,7 +125,7 @@ struct ndpopt {
- #define ndpopt_linklayer ndpopt_body.linklayer_addr
-         struct prefixinfo {                     /* Prefix Information */
-             uint8_t     prefix_length;
--#ifdef HOST_WORDS_BIGENDIAN
-+#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
-             uint8_t     L:1, A:1, reserved1:6;
- #else
-             uint8_t     reserved1:6, A:1, L:1;
 diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
-index 5126711849..b2def6d20c 100644
+index f0cc1c781b..3ce64e088e 100644
 --- a/slirp/slirp_config.h
 +++ b/slirp/slirp_config.h
-@@ -11,8 +11,5 @@
-  * You shouldn't need to touch any of these
-  */
+@@ -29,9 +29,6 @@
+ /* Define if the machine is big endian */
+ //#undef HOST_WORDS_BIGENDIAN
 =20
--/* Define if the machine is big endian */
--//#undef HOST_WORDS_BIGENDIAN
+-/* Define if you have readv */
+-#undef HAVE_READV
 -
- /* Define to sizeof(char *) */
- #define SIZEOF_CHAR_P (HOST_LONG_BITS / 8)
-diff --git a/slirp/tcp.h b/slirp/tcp.h
-index 174d3d960c..47aaea6c5b 100644
---- a/slirp/tcp.h
-+++ b/slirp/tcp.h
-@@ -33,6 +33,8 @@
- #ifndef TCP_H
- #define TCP_H
+ /* Define if iovec needs to be declared */
+ #undef DECLARE_IOVEC
+ #ifdef _WIN32
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 041ec5061a..7012c7c07d 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -187,12 +187,7 @@ soread(struct socket *so)
+ 	 */
+ 	sopreprbuf(so, iov, &n);
 =20
-+#include <glib.h>
-+
- typedef	uint32_t tcp_seq;
+-#ifdef HAVE_READV
+-	nn =3D readv(so->s, (struct iovec *)iov, n);
+-	DEBUG_MISC((dfd, " ... read nn =3D %d bytes\n", nn));
+-#else
+ 	nn =3D qemu_recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
+-#endif
+ 	if (nn <=3D 0) {
+ 		if (nn < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN))
+ 			return 0;
+@@ -226,7 +221,6 @@ soread(struct socket *so)
+ 		}
+ 	}
 =20
- #define      PR_SLOWHZ       2               /* 2 slow timeouts per seco=
-nd (approx) */
-@@ -51,7 +53,7 @@ struct tcphdr {
- 	uint16_t th_dport;              /* destination port */
- 	tcp_seq	th_seq;			/* sequence number */
- 	tcp_seq	th_ack;			/* acknowledgement number */
--#ifdef HOST_WORDS_BIGENDIAN
-+#if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
- 	uint8_t	th_off:4,		/* data offset */
- 		th_x2:4;		/* (unused) */
- #else
+-#ifndef HAVE_READV
+ 	/*
+ 	 * If there was no error, try and read the second time round
+ 	 * We read again if n =3D 2 (ie, there's another part of the buffer)
+@@ -244,7 +238,6 @@ soread(struct socket *so)
+         }
+=20
+ 	DEBUG_MISC((dfd, " ... read nn =3D %d bytes\n", nn));
+-#endif
+=20
+ 	/* Update fields */
+ 	sb->sb_cc +=3D nn;
+@@ -452,13 +445,7 @@ sowrite(struct socket *so)
+ 	}
+ 	/* Check if there's urgent data to send, and if so, send it */
+=20
+-#ifdef HAVE_READV
+-	nn =3D writev(so->s, (const struct iovec *)iov, n);
+-
+-	DEBUG_MISC((dfd, "  ... wrote nn =3D %d bytes\n", nn));
+-#else
+ 	nn =3D slirp_send(so, iov[0].iov_base, iov[0].iov_len,0);
+-#endif
+ 	/* This should never happen, but people tell me it does *shrug* */
+ 	if (nn < 0 && (errno =3D=3D EAGAIN || errno =3D=3D EINTR))
+ 		return 0;
+@@ -467,7 +454,6 @@ sowrite(struct socket *so)
+ 		goto err_disconnected;
+ 	}
+=20
+-#ifndef HAVE_READV
+ 	if (n =3D=3D 2 && nn =3D=3D iov[0].iov_len) {
+             int ret;
+             ret =3D slirp_send(so, iov[1].iov_base, iov[1].iov_len,0);
+@@ -475,7 +461,6 @@ sowrite(struct socket *so)
+                 nn +=3D ret;
+         }
+         DEBUG_MISC((dfd, "  ... wrote nn =3D %d bytes\n", nn));
+-#endif
+=20
+ 	/* Update sbuf */
+ 	sb->sb_cc -=3D nn;
 --=20
 2.20.1
