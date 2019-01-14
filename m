@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52915)
+Received: from eggs.gnu.org ([209.51.188.92]:53147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gj6HM-0003ei-7P
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:44:05 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gj6Hy-0003zS-1n
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:44:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gj6HI-0006n8-GW
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:44:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:21830)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gj6HG-0006gq-3Y
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:43:58 -0500
-Date: Mon, 14 Jan 2019 15:43:44 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190114174344.GX4500@habkost.net>
-References: <20190108123311.24456-1-anthony.perard@citrix.com>
-	<4de1c9d8-0409-8d79-8839-7ce05e71eff2@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gj6Hw-0007DQ-Ot
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 12:44:41 -0500
+Date: Mon, 14 Jan 2019 18:44:31 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190114184431.56795d44.cohuck@redhat.com>
+In-Reply-To: <c30709c1-9348-e4c9-22bb-95d6183163f3@linux.ibm.com>
+References: <20190110210358.24035-1-david@redhat.com>
+	<4988f58e-4bc5-c622-53b7-cfda758304e1@redhat.com>
+	<20190111103828.058ccc6c.cohuck@redhat.com>
+	<c30709c1-9348-e4c9-22bb-95d6183163f3@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4de1c9d8-0409-8d79-8839-7ce05e71eff2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qmp-shell: Fix example with objects as
- values
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/pci: Send correct event on
+ hotplug.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Pierre Morel <pmorel@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Jan 11, 2019 at 09:37:47AM -0500, Cleber Rosa wrote:
-> 
-> 
-> On 1/8/19 7:33 AM, Anthony PERARD wrote:
-> > The example shown that is suppose to let a user passes an object/array as
-> > argument doesn't work. The quotes get removed by shlex.split() and then
-> > both JSON parser complains. Fix the example by adding quotes and add
-> > examples with boolean and array.
+[restored cc:s]
+
+On Mon, 14 Jan 2019 11:06:19 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> On 11/01/2019 10:38, Cornelia Huck wrote:
+> > On Fri, 11 Jan 2019 08:16:41 +0100
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 10.01.19 22:03, David Hildenbrand wrote:  
+> >>> Comit 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
+> >>> changed the initial state of zPCI devices from ZPCI_FS_STANDBY to
+> >>> ZPCI_FS_DISABLED (a.k.a. configured). However we still only send a
+> >>> HP_EVENT_RESERVED_TO_STANDBY event to the guest, indicating a wrong
+> >>> state.
+> >>>
+> >>> Let's send a HP_EVENT_TO_CONFIGURED event instead, to match the actual
+> >>> state the device is in.
+> >>>
+> >>> This fixes hotplugged devices having to be enabled explicitly in the
+> >>> guest e.g. via echo 1 > /sys/bus/pci/slots/00000000/power.
+> >>>
+> >>> Fixes: 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
+> >>> Report-by: Cornelia Huck <cohuck@redhat.com>  
 > > 
-> > Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-> > ---
-> >  scripts/qmp/qmp-shell | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > Cool, works for me as well.
 > > 
-> > diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-> > index 770140772d..9937e3c888 100755
-> > --- a/scripts/qmp/qmp-shell
-> > +++ b/scripts/qmp/qmp-shell
-> > @@ -33,7 +33,11 @@
-> >  # key=value pairs also support Python or JSON object literal subset notations,
-> >  # without spaces. Dictionaries/objects {} are supported as are arrays [].
-
-The "without spaces" part is outdated.  Now we do support spaces as long as the
-argument is quoted.
-
-> >  #
-> > -#    example-command arg-name1={'key':'value','obj'={'prop':"value"}}
+> > Tested-by: Cornelia Huck <cohuck@redhat.com>
+> > 
+> > Do we want to cc:stable? Probably not, as it's more annoying than
+> > critical, and pci hotplug does not seem to be much used on s390x.
+> >   
+> >>
+> >> If this patch is the right thing to do, then
+> >>
+> >> 1. s/Report-by/Reported-by/
+> >> 2. Dropping the "." from the subject
+> >>
+> >> (yes, it was late)  
+> > 
+> > :) Can do while applying.
+> >   
+> >>
+> >> I wonder if we should do both events sequentially, but as I don't have
+> >> access to the architecture I have to rely on that this works :)  
+> > 
+> > Yep, let's wait for feedback from folks with architecture access.
+> >   
 > 
-> Yes, I can replicate that with a command such as:
+> Works fine on the architecture too.
 > 
-> (QEMU) object-add qom-type="rng-random" id="rng1" props={"filename":
-> "/dev/hwrng"}
+> Seems the logical thing to do for me.
 > 
-> That results in:
-> 
-> Error while parsing command line: Expected a key=value pair, got
-> '/dev/hwrng}'
-> command format: <command-name>  [arg-name1=arg1] ... [arg-nameN=argN]
+> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
 
-The example has no spaces, and you seem to have a whitespace
-before "/dev/rng" above.
+Thanks for checking.
 
-The problem here is that this worked before started using shlex.
-qmp-shell from QEMU 3.0 worked:
-
-  (QEMU) object-add qom-type=rng-random id="rng1" props={"filename":"/dev/hwrng"}
-  {"return": {}}
-
-Now we get this:
-
-  (QEMU) object-add qom-type=rng-random id="rng1" props={"filename":"/dev/hwrng"}
-  {"error": {"class": "GenericError", "desc": "Invalid parameter type for 'props', expected: dict"}}
-
-This means we lost the ability to write JSON without any extra
-quotes to gain the ability to have arguments with spaces.  How
-hard it would be to fix that?
-
+I'd like to queue this, but I'd like an ack from Collin as well.
 
 > 
-> > +#  JSON:
-> > +#    example-command arg-name1='{"key":"value","obj":{"prop":"value"}}'
-> > +#    example-command arg-name1='{"key":"value","obj":[1,true,"three"]}'
 > 
-> The usage fix is to have the dictionary quoted, indeed:
+> >>  
+> >>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >>> ---
+> >>>   hw/s390x/s390-pci-bus.c | 2 +-
+> >>>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> >>> index 15759b6514..7f911b216a 100644
+> >>> --- a/hw/s390x/s390-pci-bus.c
+> >>> +++ b/hw/s390x/s390-pci-bus.c
+> >>> @@ -899,7 +899,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >>>           }
+> >>>   
+> >>>           if (dev->hotplugged) {
+> >>> -            s390_pci_generate_plug_event(HP_EVENT_RESERVED_TO_STANDBY,
+> >>> +            s390_pci_generate_plug_event(HP_EVENT_TO_CONFIGURED ,
+> >>>                                            pbdev->fh, pbdev->fid);
+> >>>           }
+> >>>       } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
+> >>>      
+> >>
+> >>  
+> > 
+> >   
 > 
-> (QEMU) object-add qom-type="rng-random" id="rng4" props="{'filename':
-> '/dev/hwrng'}"
-> {"return": {}}
 > 
-> > +#  free style:
-> > +#    example-command arg-name1="{'key':'value',\"obj\":[1,True,\"three\"]}"
-> I just find the "free style" confusing... IMO how to be more creative
-> about escaping is optional, and adds noise to the most common use case.
-
-The example seems to be a simple demonstration of how escaping
-works, but maybe we shouldn't encourage people to try weird
-tricks with escaping.  Especially if we want to eventually make
-unquoted JSON data work again.
-
--- 
-Eduardo
