@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35376)
+Received: from eggs.gnu.org ([209.51.188.92]:35419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7Q-0004xP-WB
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:09 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-00050K-UA
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7Q-0001pd-6S
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:08 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40716)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-0001r4-5m
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:10 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37686)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB7P-0001eJ-Ro
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:08 -0500
+	id 1gjB7R-0001eW-TS
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:10 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:58 +0100
-Message-Id: <20190114225306.21569-58-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:57 +0100
+Message-Id: <20190114225306.21569-57-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 57/65] slirp: remove remaining DEBUG blocks
+Subject: [Qemu-devel] [PULL 56/65] slirp: use %p for pointers format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +32,82 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Instead, rely on slirp_debug flags, or compile unconditionally (the
-substraction in cksum is unlikely to affect any benchmark result).
+This fixes some compilation warnings on mingw64.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/cksum.c   | 4 ----
- slirp/ip_icmp.c | 5 ++---
- slirp/slirp.c   | 5 +----
- 3 files changed, 3 insertions(+), 11 deletions(-)
+ slirp/ip6_icmp.c   | 2 +-
+ slirp/ip6_input.c  | 2 +-
+ slirp/ip6_output.c | 4 ++--
+ slirp/udp6.c       | 6 +++---
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/slirp/cksum.c b/slirp/cksum.c
-index b9466485b5..0a988b845d 100644
---- a/slirp/cksum.c
-+++ b/slirp/cksum.c
-@@ -70,9 +70,7 @@ int cksum(struct mbuf *m, int len)
+diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
+index 595a62c8d4..bce075913c 100644
+--- a/slirp/ip6_icmp.c
++++ b/slirp/ip6_icmp.c
+@@ -390,7 +390,7 @@ void icmp6_input(struct mbuf *m)
+     int hlen =3D sizeof(struct ip6);
 =20
- 	if (len < mlen)
- 	   mlen =3D len;
--#ifdef DEBUG
- 	len -=3D mlen;
--#endif
- 	/*
- 	 * Force to even boundary.
- 	 */
-@@ -122,12 +120,10 @@ int cksum(struct mbuf *m, int len)
- 	   s_util.c[0] =3D *(uint8_t *)w;
+     DEBUG_CALL("icmp6_input");
+-    DEBUG_ARG("m =3D %lx", (long) m);
++    DEBUG_ARG("m =3D %p", m);
+     DEBUG_ARG("m_len =3D %d", m->m_len);
 =20
- cont:
--#ifdef DEBUG
- 	if (len) {
- 		DEBUG_ERROR("cksum: out of data\n");
- 		DEBUG_ERROR(" len =3D %d\n", len);
- 	}
--#endif
- 	if (mlen =3D=3D -1) {
- 		/* The last mbuf has odd # of bytes. Follow the
- 		 standard (the odd byte may be shifted left by 8 bits
-diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-index 6c7e375ff8..cd2faeacb6 100644
---- a/slirp/ip_icmp.c
-+++ b/slirp/ip_icmp.c
-@@ -257,13 +257,12 @@ icmp_send_error(struct mbuf *msrc, u_char type, u_c=
-har code, int minsize,
-   /* check msrc */
-   if(!msrc) goto end_error;
-   ip =3D mtod(msrc, struct ip *);
--#ifdef DEBUG
--  { char bufa[20], bufb[20];
-+  if (slirp_debug & DBG_MISC) {
-+    char bufa[20], bufb[20];
-     strcpy(bufa, inet_ntoa(ip->ip_src));
-     strcpy(bufb, inet_ntoa(ip->ip_dst));
-     DEBUG_MISC(" %.16s to %.16s\n", bufa, bufb);
-   }
--#endif
-   if(ip->ip_off & IP_OFFMASK) goto end_error;    /* Only reply to fragme=
-nt 0 */
-=20
-   /* Do not reply to source-only IPs */
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 0b70cb9fb6..6c732cd15b 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -195,9 +195,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
-s_addr, void *cached_addr,
-             if (++found > 3) {
-                 DEBUG_MISC("(more)");
-                 break;
--            }
--#ifdef DEBUG
--            else {
-+            } else if (slirp_debug & DBG_MISC) {
-                 char s[INET6_ADDRSTRLEN];
-                 const char *res =3D inet_ntop(af, tmp_addr, s, sizeof(s)=
-);
-                 if (!res) {
-@@ -205,7 +203,6 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
-s_addr, void *cached_addr,
-                 }
-                 DEBUG_MISC("%s", res);
-             }
--#endif
-         }
+     if (ntohs(ip->ip_pl) < ICMP6_MINLEN) {
+diff --git a/slirp/ip6_input.c b/slirp/ip6_input.c
+index ac2e3ea882..ab656a0a9d 100644
+--- a/slirp/ip6_input.c
++++ b/slirp/ip6_input.c
+@@ -31,7 +31,7 @@ void ip6_input(struct mbuf *m)
      }
-     fclose(f);
+=20
+     DEBUG_CALL("ip6_input");
+-    DEBUG_ARG("m =3D %lx", (long)m);
++    DEBUG_ARG("m =3D %p", m);
+     DEBUG_ARG("m_len =3D %d", m->m_len);
+=20
+     if (m->m_len < sizeof(struct ip6)) {
+diff --git a/slirp/ip6_output.c b/slirp/ip6_output.c
+index 762cbfe89c..52c88ad691 100644
+--- a/slirp/ip6_output.c
++++ b/slirp/ip6_output.c
+@@ -19,8 +19,8 @@ int ip6_output(struct socket *so, struct mbuf *m, int f=
+ast)
+     struct ip6 *ip =3D mtod(m, struct ip6 *);
+=20
+     DEBUG_CALL("ip6_output");
+-    DEBUG_ARG("so =3D %lx", (long)so);
+-    DEBUG_ARG("m =3D %lx", (long)m);
++    DEBUG_ARG("so =3D %p", so);
++    DEBUG_ARG("m =3D %p", m);
+=20
+     /* Fill IPv6 header */
+     ip->ip_v =3D IP6VERSION;
+diff --git a/slirp/udp6.c b/slirp/udp6.c
+index 473ba1586e..8cdb1892e2 100644
+--- a/slirp/udp6.c
++++ b/slirp/udp6.c
+@@ -20,7 +20,7 @@ void udp6_input(struct mbuf *m)
+     struct sockaddr_in6 lhost;
+=20
+     DEBUG_CALL("udp6_input");
+-    DEBUG_ARG("m =3D %lx", (long)m);
++    DEBUG_ARG("m =3D %p", m);
+=20
+     if (slirp->restricted) {
+         goto bad;
+@@ -144,8 +144,8 @@ int udp6_output(struct socket *so, struct mbuf *m,
+     struct udphdr *uh;
+=20
+     DEBUG_CALL("udp6_output");
+-    DEBUG_ARG("so =3D %lx", (long)so);
+-    DEBUG_ARG("m =3D %lx", (long)m);
++    DEBUG_ARG("so =3D %p", so);
++    DEBUG_ARG("m =3D %p", m);
+=20
+     /* adjust for header */
+     m->m_data -=3D sizeof(struct udphdr);
 --=20
 2.20.1
