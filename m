@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47399)
+Received: from eggs.gnu.org ([209.51.188.92]:47366)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2lp-0007EZ-9V
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:19 -0500
+	id 1gj2lm-0007BC-1g
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2lo-0004vR-4e
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:17 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:1402)
+	id 1gj2lj-0004tW-TQ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:13 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:1370)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2ln-0004v3-S3
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:16 -0500
+	id 1gj2lh-0004ll-Q8
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:11 -0500
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Mon, 14 Jan 2019 13:51:53 +0000
-Message-ID: <20190114135154.16826-25-anthony.perard@citrix.com>
+Date: Mon, 14 Jan 2019 13:51:40 +0000
+Message-ID: <20190114135154.16826-12-anthony.perard@citrix.com>
 In-Reply-To: <20190114135154.16826-1-anthony.perard@citrix.com>
 References: <20190114135154.16826-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 24/25] xen-block: improve response latency
+Subject: [Qemu-devel] [PULL 11/25] xen: remove unnecessary code from
+ dataplane/xen-block.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,172 +34,543 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>
 
-From: Tim Smith <tim.smith@citrix.com>
+From: Paul Durrant <paul.durrant@citrix.com>
 
-If the I/O ring is full, the guest cannot send any more requests
-until some responses are sent. Only sending all available responses
-just before checking for new work does not leave much time for the
-guest to supply new work, so this will cause stalls if the ring gets
-full. Also, not completing reads as soon as possible adds latency
-to the guest.
+Not all of the code duplicated from xen_disk.c is required as the basis for
+the new dataplane implementation so this patch removes extraneous code,
+along with the legacy #includes and calls to the legacy xen_pv_printf()
+function. Error messages are changed to be reported using error_report().
 
-To alleviate that, complete IO requests as soon as they come back.
-xen_block_send_response() already returns a value indicating whether
-a notify should be sent, which is all the batching we need.
-
-Signed-off-by: Tim Smith <tim.smith@citrix.com>
-
-Re-based and commit comment adjusted.
+NOTE: The code is still not yet built. Further transformations will be
+      required to make it correctly interface to the new XenBus/XenDevice
+      framework. They will be delivered in a subsequent patch.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Acked-by: Anthony Perard <anthony.perard@citrix.com>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
- hw/block/dataplane/xen-block.c | 56 +++++++++++-----------------------
- 1 file changed, 18 insertions(+), 38 deletions(-)
+ hw/block/dataplane/xen-block.c | 429 ++-------------------------------
+ 1 file changed, 23 insertions(+), 406 deletions(-)
 
 diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-block.c
-index acd23a74a8..35bfccfba7 100644
+index 9fae50534e..228472320a 100644
 --- a/hw/block/dataplane/xen-block.c
 +++ b/hw/block/dataplane/xen-block.c
-@@ -55,11 +55,9 @@ struct XenBlockDataPlane {
-     blkif_back_rings_t rings;
-     int more_work;
-     QLIST_HEAD(inflight_head, XenBlockRequest) inflight;
--    QLIST_HEAD(finished_head, XenBlockRequest) finished;
-     QLIST_HEAD(freelist_head, XenBlockRequest) freelist;
-     int requests_total;
-     int requests_inflight;
--    int requests_finished;
-     unsigned int max_requests;
-     BlockBackend *blk;
-     QEMUBH *bh;
-@@ -116,12 +114,10 @@ static void xen_block_finish_request(XenBlockRequest *request)
-     XenBlockDataPlane *dataplane = request->dataplane;
- 
-     QLIST_REMOVE(request, list);
--    QLIST_INSERT_HEAD(&dataplane->finished, request, list);
-     dataplane->requests_inflight--;
--    dataplane->requests_finished++;
- }
- 
--static void xen_block_release_request(XenBlockRequest *request, bool finish)
-+static void xen_block_release_request(XenBlockRequest *request)
- {
-     XenBlockDataPlane *dataplane = request->dataplane;
- 
-@@ -129,11 +125,7 @@ static void xen_block_release_request(XenBlockRequest *request, bool finish)
-     reset_request(request);
-     request->dataplane = dataplane;
-     QLIST_INSERT_HEAD(&dataplane->freelist, request, list);
--    if (finish) {
--        dataplane->requests_finished--;
--    } else {
--        dataplane->requests_inflight--;
--    }
-+    dataplane->requests_inflight--;
- }
- 
+@@ -1,45 +1,23 @@
  /*
-@@ -248,6 +240,7 @@ static int xen_block_copy_request(XenBlockRequest *request)
- }
+- *  xen paravirt block device backend
++ * Copyright (c) 2018  Citrix Systems Inc.
++ * (c) Gerd Hoffmann <kraxel@redhat.com>
+  *
+- *  (c) Gerd Hoffmann <kraxel@redhat.com>
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; under version 2 of the License.
+  *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; under version 2 of the License.
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
+  *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
+  *
+- *  You should have received a copy of the GNU General Public License along
+- *  with this program; if not, see <http://www.gnu.org/licenses/>.
+- *
+- *  Contributions after 2012-01-13 are licensed under the terms of the
+- *  GNU GPL, version 2 or (at your option) any later version.
++ * Contributions after 2012-01-13 are licensed under the terms of the
++ * GNU GPL, version 2 or (at your option) any later version.
+  */
  
- static int xen_block_do_aio(XenBlockRequest *request);
-+static int xen_block_send_response(XenBlockRequest *request);
+-#include "qemu/osdep.h"
+-#include "qemu/units.h"
+-#include <sys/ioctl.h>
+-#include <sys/uio.h>
+-
+-#include "hw/hw.h"
+-#include "hw/xen/xen_backend.h"
+-#include "xen_blkif.h"
+-#include "sysemu/blockdev.h"
+-#include "sysemu/iothread.h"
+-#include "sysemu/block-backend.h"
+-#include "qapi/error.h"
+-#include "qapi/qmp/qdict.h"
+-#include "qapi/qmp/qstring.h"
+-#include "trace.h"
+-
+-/* ------------------------------------------------------------- */
+-
+-#define BLOCK_SIZE  512
+-#define IOCB_COUNT  (BLKIF_MAX_SEGMENTS_PER_REQUEST + 2)
+-
+ struct ioreq {
+     blkif_request_t     req;
+     int16_t             status;
+@@ -101,8 +79,6 @@ struct XenBlkDev {
+     AioContext          *ctx;
+ };
  
- static void xen_block_complete_aio(void *opaque, int ret)
+-/* ------------------------------------------------------------- */
+-
+ static void ioreq_reset(struct ioreq *ioreq)
  {
-@@ -312,6 +305,18 @@ static void xen_block_complete_aio(void *opaque, int ret)
-     default:
+     memset(&ioreq->req, 0, sizeof(ioreq->req));
+@@ -183,11 +159,6 @@ static int ioreq_parse(struct ioreq *ioreq)
+     size_t len;
+     int i;
+ 
+-    xen_pv_printf(
+-        xendev, 3,
+-        "op %d, nr %d, handle %d, id %" PRId64 ", sector %" PRId64 "\n",
+-        ioreq->req.operation, ioreq->req.nr_segments,
+-        ioreq->req.handle, ioreq->req.id, ioreq->req.sector_number);
+     switch (ioreq->req.operation) {
+     case BLKIF_OP_READ:
          break;
+@@ -202,28 +173,27 @@ static int ioreq_parse(struct ioreq *ioreq)
+     case BLKIF_OP_DISCARD:
+         return 0;
+     default:
+-        xen_pv_printf(xendev, 0, "error: unknown operation (%d)\n",
+-                      ioreq->req.operation);
++        error_report("error: unknown operation (%d)", ioreq->req.operation);
+         goto err;
+     };
+ 
+     if (ioreq->req.operation != BLKIF_OP_READ && blkdev->mode[0] != 'w') {
+-        xen_pv_printf(xendev, 0, "error: write req for ro device\n");
++        error_report("error: write req for ro device");
+         goto err;
      }
-+    if (xen_block_send_response(request)) {
-+        Error *local_err = NULL;
-+
-+        xen_device_notify_event_channel(dataplane->xendev,
-+                                        dataplane->event_channel,
-+                                        &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
-+    }
-+    xen_block_release_request(request);
-+
-     qemu_bh_schedule(dataplane->bh);
  
- done:
-@@ -419,7 +424,7 @@ static int xen_block_do_aio(XenBlockRequest *request)
-     return -1;
+     ioreq->start = ioreq->req.sector_number * blkdev->file_blk;
+     for (i = 0; i < ioreq->req.nr_segments; i++) {
+         if (i == BLKIF_MAX_SEGMENTS_PER_REQUEST) {
+-            xen_pv_printf(xendev, 0, "error: nr_segments too big\n");
++            error_report("error: nr_segments too big");
+             goto err;
+         }
+         if (ioreq->req.seg[i].first_sect > ioreq->req.seg[i].last_sect) {
+-            xen_pv_printf(xendev, 0, "error: first > last sector\n");
++            error_report("error: first > last sector");
+             goto err;
+         }
+         if (ioreq->req.seg[i].last_sect * BLOCK_SIZE >= XC_PAGE_SIZE) {
+-            xen_pv_printf(xendev, 0, "error: page crossing\n");
++            error_report("error: page crossing");
+             goto err;
+         }
+ 
+@@ -232,7 +202,7 @@ static int ioreq_parse(struct ioreq *ioreq)
+         ioreq->size += len;
+     }
+     if (ioreq->start + ioreq->size > blkdev->file_size) {
+-        xen_pv_printf(xendev, 0, "error: access beyond end of file\n");
++        error_report("error: access beyond end of file");
+         goto err;
+     }
+     return 0;
+@@ -278,8 +248,7 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
+     rc = xen_be_copy_grant_refs(xendev, to_domain, segs, count);
+ 
+     if (rc) {
+-        xen_pv_printf(xendev, 0,
+-                      "failed to copy data %d\n", rc);
++        error_report("failed to copy data %d", rc);
+         ioreq->aio_errors++;
+         return -1;
+     }
+@@ -298,8 +267,9 @@ static void qemu_aio_complete(void *opaque, int ret)
+     aio_context_acquire(blkdev->ctx);
+ 
+     if (ret != 0) {
+-        xen_pv_printf(xendev, 0, "%s I/O error\n",
+-                      ioreq->req.operation == BLKIF_OP_READ ? "read" : "write");
++        error_report("%s I/O error",
++                     ioreq->req.operation == BLKIF_OP_READ ?
++                     "read" : "write");
+         ioreq->aio_errors++;
+     }
+ 
+@@ -605,8 +575,6 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
+     }
  }
  
--static int xen_block_send_response_one(XenBlockRequest *request)
-+static int xen_block_send_response(XenBlockRequest *request)
+-/* ------------------------------------------------------------- */
+-
+ static void blk_bh(void *opaque)
  {
-     XenBlockDataPlane *dataplane = request->dataplane;
-     int send_notify = 0;
-@@ -474,29 +479,6 @@ static int xen_block_send_response_one(XenBlockRequest *request)
-     return send_notify;
+     struct XenBlkDev *blkdev = opaque;
+@@ -634,346 +602,6 @@ static void blk_alloc(struct XenLegacyDevice *xendev)
+     blkdev->bh = aio_bh_new(blkdev->ctx, blk_bh, blkdev);
  }
  
--/* walk finished list, send outstanding responses, free requests */
--static void xen_block_send_response_all(XenBlockDataPlane *dataplane)
+-static void blk_parse_discard(struct XenBlkDev *blkdev)
 -{
--    XenBlockRequest *request;
--    int send_notify = 0;
+-    struct XenLegacyDevice *xendev = &blkdev->xendev;
+-    int enable;
 -
--    while (!QLIST_EMPTY(&dataplane->finished)) {
--        request = QLIST_FIRST(&dataplane->finished);
--        send_notify += xen_block_send_response_one(request);
--        xen_block_release_request(request, true);
+-    blkdev->feature_discard = true;
+-
+-    if (xenstore_read_be_int(xendev, "discard-enable", &enable) == 0) {
+-        blkdev->feature_discard = !!enable;
 -    }
--    if (send_notify) {
--        Error *local_err = NULL;
 -
--        xen_device_notify_event_channel(dataplane->xendev,
--                                        dataplane->event_channel,
--                                        &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--        }
+-    if (blkdev->feature_discard) {
+-        xenstore_write_be_int(xendev, "feature-discard", 1);
 -    }
 -}
 -
- static int xen_block_get_request(XenBlockDataPlane *dataplane,
-                                  XenBlockRequest *request, RING_IDX rc)
+-static int blk_init(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-    int info = 0;
+-    char *directiosafe = NULL;
+-
+-    trace_xen_disk_init(xendev->name);
+-
+-    /* read xenstore entries */
+-    if (blkdev->params == NULL) {
+-        char *h = NULL;
+-        blkdev->params = xenstore_read_be_str(xendev, "params");
+-        if (blkdev->params != NULL) {
+-            h = strchr(blkdev->params, ':');
+-        }
+-        if (h != NULL) {
+-            blkdev->fileproto = blkdev->params;
+-            blkdev->filename  = h + 1;
+-            *h = 0;
+-        } else {
+-            blkdev->fileproto = "<unset>";
+-            blkdev->filename  = blkdev->params;
+-        }
+-    }
+-    if (!strcmp("aio", blkdev->fileproto)) {
+-        blkdev->fileproto = "raw";
+-    }
+-    if (!strcmp("vhd", blkdev->fileproto)) {
+-        blkdev->fileproto = "vpc";
+-    }
+-    if (blkdev->mode == NULL) {
+-        blkdev->mode = xenstore_read_be_str(xendev, "mode");
+-    }
+-    if (blkdev->type == NULL) {
+-        blkdev->type = xenstore_read_be_str(xendev, "type");
+-    }
+-    if (blkdev->dev == NULL) {
+-        blkdev->dev = xenstore_read_be_str(xendev, "dev");
+-    }
+-    if (blkdev->devtype == NULL) {
+-        blkdev->devtype = xenstore_read_be_str(xendev, "device-type");
+-    }
+-    directiosafe = xenstore_read_be_str(xendev, "direct-io-safe");
+-    blkdev->directiosafe = (directiosafe && atoi(directiosafe));
+-
+-    /* do we have all we need? */
+-    if (blkdev->params == NULL ||
+-        blkdev->mode == NULL   ||
+-        blkdev->type == NULL   ||
+-        blkdev->dev == NULL) {
+-        goto out_error;
+-    }
+-
+-    /* read-only ? */
+-    if (strcmp(blkdev->mode, "w")) {
+-        info  |= VDISK_READONLY;
+-    }
+-
+-    /* cdrom ? */
+-    if (blkdev->devtype && !strcmp(blkdev->devtype, "cdrom")) {
+-        info  |= VDISK_CDROM;
+-    }
+-
+-    blkdev->file_blk  = BLOCK_SIZE;
+-
+-    /* fill info
+-     * blk_connect supplies sector-size and sectors
+-     */
+-    xenstore_write_be_int(xendev, "feature-flush-cache", 1);
+-    xenstore_write_be_int(xendev, "info", info);
+-
+-    xenstore_write_be_int(xendev, "max-ring-page-order",
+-                          MAX_RING_PAGE_ORDER);
+-
+-    blk_parse_discard(blkdev);
+-
+-    g_free(directiosafe);
+-    return 0;
+-
+-out_error:
+-    g_free(blkdev->params);
+-    blkdev->params = NULL;
+-    g_free(blkdev->mode);
+-    blkdev->mode = NULL;
+-    g_free(blkdev->type);
+-    blkdev->type = NULL;
+-    g_free(blkdev->dev);
+-    blkdev->dev = NULL;
+-    g_free(blkdev->devtype);
+-    blkdev->devtype = NULL;
+-    g_free(directiosafe);
+-    blkdev->directiosafe = false;
+-    return -1;
+-}
+-
+-static int blk_connect(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-    int index, qflags;
+-    bool readonly = true;
+-    bool writethrough = true;
+-    int order, ring_ref;
+-    unsigned int ring_size, max_grants;
+-    unsigned int i;
+-
+-    trace_xen_disk_connect(xendev->name);
+-
+-    /* read-only ? */
+-    if (blkdev->directiosafe) {
+-        qflags = BDRV_O_NOCACHE | BDRV_O_NATIVE_AIO;
+-    } else {
+-        qflags = 0;
+-        writethrough = false;
+-    }
+-    if (strcmp(blkdev->mode, "w") == 0) {
+-        qflags |= BDRV_O_RDWR;
+-        readonly = false;
+-    }
+-    if (blkdev->feature_discard) {
+-        qflags |= BDRV_O_UNMAP;
+-    }
+-
+-    /* init qemu block driver */
+-    index = (xendev->dev - 202 * 256) / 16;
+-    blkdev->dinfo = drive_get(IF_XEN, 0, index);
+-    if (!blkdev->dinfo) {
+-        Error *local_err = NULL;
+-        QDict *options = NULL;
+-
+-        if (strcmp(blkdev->fileproto, "<unset>")) {
+-            options = qdict_new();
+-            qdict_put_str(options, "driver", blkdev->fileproto);
+-        }
+-
+-        /* setup via xenbus -> create new block driver instance */
+-        xen_pv_printf(xendev, 2, "create new bdrv (xenbus setup)\n");
+-        blkdev->blk = blk_new_open(blkdev->filename, NULL, options,
+-                                   qflags, &local_err);
+-        if (!blkdev->blk) {
+-            xen_pv_printf(xendev, 0, "error: %s\n",
+-                          error_get_pretty(local_err));
+-            error_free(local_err);
+-            return -1;
+-        }
+-        blk_set_enable_write_cache(blkdev->blk, !writethrough);
+-    } else {
+-        /* setup via qemu cmdline -> already setup for us */
+-        xen_pv_printf(xendev, 2,
+-                      "get configured bdrv (cmdline setup)\n");
+-        blkdev->blk = blk_by_legacy_dinfo(blkdev->dinfo);
+-        if (blk_is_read_only(blkdev->blk) && !readonly) {
+-            xen_pv_printf(xendev, 0, "Unexpected read-only drive");
+-            blkdev->blk = NULL;
+-            return -1;
+-        }
+-        /* blkdev->blk is not create by us, we get a reference
+-         * so we can blk_unref() unconditionally */
+-        blk_ref(blkdev->blk);
+-    }
+-    blk_attach_dev_legacy(blkdev->blk, blkdev);
+-    blkdev->file_size = blk_getlength(blkdev->blk);
+-    if (blkdev->file_size < 0) {
+-        BlockDriverState *bs = blk_bs(blkdev->blk);
+-        const char *drv_name = bs ? bdrv_get_format_name(bs) : NULL;
+-        xen_pv_printf(xendev, 1, "blk_getlength: %d (%s) | drv %s\n",
+-                      (int)blkdev->file_size, strerror(-blkdev->file_size),
+-                      drv_name ?: "-");
+-        blkdev->file_size = 0;
+-    }
+-
+-    xen_pv_printf(xendev, 1, "type \"%s\", fileproto \"%s\", filename \"%s\","
+-                  " size %" PRId64 " (%" PRId64 " MB)\n",
+-                  blkdev->type, blkdev->fileproto, blkdev->filename,
+-                  blkdev->file_size, blkdev->file_size / MiB);
+-
+-    /* Fill in number of sector size and number of sectors */
+-    xenstore_write_be_int(xendev, "sector-size", blkdev->file_blk);
+-    xenstore_write_be_int64(xendev, "sectors",
+-                            blkdev->file_size / blkdev->file_blk);
+-
+-    if (xenstore_read_fe_int(xendev, "ring-page-order",
+-                             &order) == -1) {
+-        blkdev->nr_ring_ref = 1;
+-
+-        if (xenstore_read_fe_int(xendev, "ring-ref",
+-                                 &ring_ref) == -1) {
+-            return -1;
+-        }
+-        blkdev->ring_ref[0] = ring_ref;
+-
+-    } else if (order >= 0 && order <= MAX_RING_PAGE_ORDER) {
+-        blkdev->nr_ring_ref = 1 << order;
+-
+-        for (i = 0; i < blkdev->nr_ring_ref; i++) {
+-            char *key;
+-
+-            key = g_strdup_printf("ring-ref%u", i);
+-            if (!key) {
+-                return -1;
+-            }
+-
+-            if (xenstore_read_fe_int(xendev, key,
+-                                     &ring_ref) == -1) {
+-                g_free(key);
+-                return -1;
+-            }
+-            blkdev->ring_ref[i] = ring_ref;
+-
+-            g_free(key);
+-        }
+-    } else {
+-        xen_pv_printf(xendev, 0, "invalid ring-page-order: %d\n",
+-                      order);
+-        return -1;
+-    }
+-
+-    if (xenstore_read_fe_int(xendev, "event-channel",
+-                             &xendev->remote_port) == -1) {
+-        return -1;
+-    }
+-
+-    if (!xendev->protocol) {
+-        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+-    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_NATIVE) == 0) {
+-        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+-    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_32) == 0) {
+-        blkdev->protocol = BLKIF_PROTOCOL_X86_32;
+-    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_64) == 0) {
+-        blkdev->protocol = BLKIF_PROTOCOL_X86_64;
+-    } else {
+-        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+-    }
+-
+-    ring_size = XC_PAGE_SIZE * blkdev->nr_ring_ref;
+-    switch (blkdev->protocol) {
+-    case BLKIF_PROTOCOL_NATIVE:
+-    {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_32:
+-    {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_32, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_64:
+-    {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_64, ring_size);
+-        break;
+-    }
+-    default:
+-        return -1;
+-    }
+-
+-    /* Add on the number needed for the ring pages */
+-    max_grants = blkdev->nr_ring_ref;
+-
+-    xen_be_set_max_grant_refs(xendev, max_grants);
+-    blkdev->sring = xen_be_map_grant_refs(xendev, blkdev->ring_ref,
+-                                          blkdev->nr_ring_ref,
+-                                          PROT_READ | PROT_WRITE);
+-    if (!blkdev->sring) {
+-        return -1;
+-    }
+-
+-    switch (blkdev->protocol) {
+-    case BLKIF_PROTOCOL_NATIVE:
+-    {
+-        blkif_sring_t *sring_native = blkdev->sring;
+-        BACK_RING_INIT(&blkdev->rings.native, sring_native, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_32:
+-    {
+-        blkif_x86_32_sring_t *sring_x86_32 = blkdev->sring;
+-
+-        BACK_RING_INIT(&blkdev->rings.x86_32_part, sring_x86_32, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_64:
+-    {
+-        blkif_x86_64_sring_t *sring_x86_64 = blkdev->sring;
+-
+-        BACK_RING_INIT(&blkdev->rings.x86_64_part, sring_x86_64, ring_size);
+-        break;
+-    }
+-    }
+-
+-    blk_set_aio_context(blkdev->blk, blkdev->ctx);
+-
+-    xen_be_bind_evtchn(xendev);
+-
+-    xen_pv_printf(xendev, 1, "ok: proto %s, nr-ring-ref %u, "
+-                  "remote port %d, local port %d\n",
+-                  xendev->protocol, blkdev->nr_ring_ref,
+-                  xendev->remote_port, xendev->local_port);
+-    return 0;
+-}
+-
+-static void blk_disconnect(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-
+-    trace_xen_disk_disconnect(xendev->name);
+-
+-    aio_context_acquire(blkdev->ctx);
+-
+-    if (blkdev->blk) {
+-        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
+-        blk_detach_dev(blkdev->blk, blkdev);
+-        blk_unref(blkdev->blk);
+-        blkdev->blk = NULL;
+-    }
+-    xen_pv_unbind_evtchn(xendev);
+-
+-    aio_context_release(blkdev->ctx);
+-
+-    if (blkdev->sring) {
+-        xen_be_unmap_grant_refs(xendev, blkdev->sring,
+-                                blkdev->nr_ring_ref);
+-        blkdev->sring = NULL;
+-    }
+-}
+-
+ static int blk_free(struct XenLegacyDevice *xendev)
  {
-@@ -547,7 +529,6 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
-     rp = dataplane->rings.common.sring->req_prod;
-     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
+     struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+@@ -1006,14 +634,3 @@ static void blk_event(struct XenLegacyDevice *xendev)
  
--    xen_block_send_response_all(dataplane);
-     /*
-      * If there was more than IO_PLUG_THRESHOLD requests in flight
-      * when we got here, this is an indication that there the bottleneck
-@@ -591,7 +572,7 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
-                 break;
-             };
- 
--            if (xen_block_send_response_one(request)) {
-+            if (xen_block_send_response(request)) {
-                 Error *local_err = NULL;
- 
-                 xen_device_notify_event_channel(dataplane->xendev,
-@@ -601,7 +582,7 @@ static void xen_block_handle_requests(XenBlockDataPlane *dataplane)
-                     error_report_err(local_err);
-                 }
-             }
--            xen_block_release_request(request, false);
-+            xen_block_release_request(request);
-             continue;
-         }
- 
-@@ -657,7 +638,6 @@ XenBlockDataPlane *xen_block_dataplane_create(XenDevice *xendev,
-     dataplane->file_size = blk_getlength(dataplane->blk);
- 
-     QLIST_INIT(&dataplane->inflight);
--    QLIST_INIT(&dataplane->finished);
-     QLIST_INIT(&dataplane->freelist);
- 
-     if (iothread) {
+     qemu_bh_schedule(blkdev->bh);
+ }
+-
+-struct XenDevOps xen_blkdev_ops = {
+-    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
+-    .size       = sizeof(struct XenBlkDev),
+-    .alloc      = blk_alloc,
+-    .init       = blk_init,
+-    .initialise = blk_connect,
+-    .disconnect = blk_disconnect,
+-    .event      = blk_event,
+-    .free       = blk_free,
+-};
 -- 
 Anthony PERARD
