@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47465)
+Received: from eggs.gnu.org ([209.51.188.92]:50086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gj9yB-0003e9-Uq
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:40:34 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gjA9p-000756-KA
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:52:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gj9y7-0007wl-9X
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:40:31 -0500
-Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:37007)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gj9y4-0007mF-J6
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:40:25 -0500
-Received: by mail-pl1-x62d.google.com with SMTP id b5so237044plr.4
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 13:40:18 -0800 (PST)
-References: <1547467955-17245-1-git-send-email-thuth@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6fd5dadf-a0ff-ac50-b2a5-997c87f5aef4@linaro.org>
-Date: Tue, 15 Jan 2019 08:40:10 +1100
+	(envelope-from <ehabkost@redhat.com>) id 1gjA9o-0005KA-UU
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:52:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34052)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gjA9m-0005IW-Rq
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:52:31 -0500
+Date: Mon, 14 Jan 2019 19:52:25 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190114215225.GA16760@habkost.net>
 MIME-Version: 1.0
-In-Reply-To: <1547467955-17245-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
- with Clang on s390x
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] Meaning of "-smp threads" on mips_malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 1/14/19 11:12 PM, Thomas Huth wrote:
-> Clang v7.0.1 does not like the __int128 variable type for inline
-> assembly on s390x:
-> 
-> In file included from fpu/softfloat.c:97:
-> include/fpu/softfloat-macros.h:647:9: error: inline asm error:
->  This value type register class is not natively supported!
->     asm("dlgr %0, %1" : "+r"(n) : "r"(d));
->         ^
-> 
-> Disable this code part there now when compiling with Clang, so that
-> the generic code gets used instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  include/fpu/softfloat-macros.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Hi,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I'm trying to refactor the SMP topology code in QEMU and I found
+some suspicious code on mips_malta.c:
 
-Regardless of whatever follow-up we might do wrt CONFIG_INT128.
+static void malta_mips_config(MIPSCPU *cpu)
+{
+    CPUMIPSState *env = &cpu->env;
+    CPUState *cs = CPU(cpu);
+
+    env->mvp->CP0_MVPConf0 |= ((smp_cpus - 1) << CP0MVPC0_PVPE) |
+                         ((smp_cpus * cs->nr_threads - 1) << CP0MVPC0_PTC);
+}
 
 
-r~
+The (smp_cpus * cs->nr_threads) expression here doesn't make
+sense to me (because smp_cpus is already supposed to be a
+multiple of smp_threads), and seems to indicate that the code has
+some unusual assumptions about the semantics of the -smp option.
+
+So, I'd like to know: do all the examples below make sense for
+Malta?
+
+ -smp 1
+ -smp 2
+ -smp 2,threads=1
+ -smp 2,threads=2
+ -smp 1,threads=2 [*]
+ -smp 2,threads=3 [*]
+
+The generic -smp parsing code considers the last 2 entries
+above[*] to be invalid.  If they make sense for Malta, we need to
+find a way to fix that.  Replacing "-smp threads=..." with a
+"-cpu" or "-machine" option seems like the best alternative.
+
+-- 
+Eduardo
