@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57652)
+Received: from eggs.gnu.org ([209.51.188.92]:57659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj54W-0003p8-0l
+	(envelope-from <eblake@redhat.com>) id 1gj54W-0003pG-51
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj54V-0005Og-5d
+	(envelope-from <eblake@redhat.com>) id 1gj54V-0005Os-7e
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:44 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 14 Jan 2019 10:25:52 -0600
-Message-Id: <20190114162605.5330-8-eblake@redhat.com>
+Date: Mon, 14 Jan 2019 10:25:57 -0600
+Message-Id: <20190114162605.5330-13-eblake@redhat.com>
 In-Reply-To: <20190114162605.5330-1-eblake@redhat.com>
 References: <20190114162605.5330-1-eblake@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/20] iotests: add qmp recursive sorting
- function
+Subject: [Qemu-devel] [PULL 12/20] qemu-nbd: Rename 'exp' variable clashing
+ with math::exp() symbol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,102 +24,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-From: John Snow <jsnow@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Python before 3.6 does not sort dictionaries (including kwargs).
-Therefore, printing QMP objects involves sorting the keys to have
-a predictable ordering in the iotests output. This means that
-iotests output will sometimes show arguments in an order not
-specified by the test author.
+The use of a variable named 'exp' prevents includes to import <math.h>.
 
-Presently, we accomplish this by using json.dumps' sort_keys argument,
-where we only serialize the arguments dictionary, but not the command.
+Rename it to avoid:
 
-However, if we want to pretty-print QMP objects being sent to the
-QEMU process, we need to build the entire command before logging it.
-Ordinarily, this would then involve "arguments" being sorted above
-"execute", which would necessitate a rather ugly and harder-to-read
-change to many iotests outputs.
+  qemu-nbd.c:64:19: error: =E2=80=98exp=E2=80=99 redeclared as different =
+kind of symbol
+   static NBDExport *exp;
+                     ^~~
+  In file included from /usr/include/features.h:428,
+                   from /usr/include/bits/libc-header-start.h:33,
+                   from /usr/include/stdint.h:26,
+                   from /usr/lib/gcc/x86_64-redhat-linux/8/include/stdint=
+.h:9,
+                   from /source/qemu/include/qemu/osdep.h:80,
+                   from /source/qemu/qemu-nbd.c:19:
+  /usr/include/bits/mathcalls.h:95:1: note: previous declaration of =E2=80=
+=98exp=E2=80=99 was here
+    __MATHCALL_VEC (exp,, (_Mdouble_ __x));
+    ^~~~~~~~~~~~~~
 
-To facilitate pretty-printing AND maintaining predictable output AND
-having "arguments" sort after "execute", add a custom sort function
-that takes a dictionary and recursively builds an OrderedDict that
-maintains the specific key order we wish to see in iotests output.
-
-The qmp_log function uses this to build a QMP object that keeps
-"execute" above "arguments", but sorts all keys and keys in any
-subdicts in "arguments" lexicographically to maintain consistent
-iotests output, with no incompatible changes to any current test.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20181221093529.23855-8-jsnow@redhat.com>
+Message-Id: <20190111163519.11457-1-philmd@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
+ qemu-nbd.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 9595429fea2..565eebb1ab5 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -30,6 +30,7 @@ import signal
- import logging
- import atexit
- import io
-+from collections import OrderedDict
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 2807e132396..6ca02b6d87b 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -61,7 +61,7 @@
 
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scr=
-ipts'))
- import qtest
-@@ -75,6 +76,16 @@ def qemu_img(*args):
-         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcod=
-e, ' '.join(qemu_img_args + list(args))))
-     return exitcode
+ #define MBR_SIZE 512
 
-+def ordered_kwargs(kwargs):
-+    # kwargs prior to 3.6 are not ordered, so:
-+    od =3D OrderedDict()
-+    for k, v in sorted(kwargs.items()):
-+        if isinstance(v, dict):
-+            od[k] =3D ordered_kwargs(v)
-+        else:
-+            od[k] =3D v
-+    return od
-+
- def qemu_img_create(*args):
-     args =3D list(args)
+-static NBDExport *exp;
++static NBDExport *export;
+ static int verbose;
+ static char *srcpath;
+ static SocketAddress *saddr;
+@@ -335,7 +335,7 @@ static int nbd_can_accept(void)
+     return state =3D=3D RUNNING && nb_fds < shared;
+ }
 
-@@ -257,8 +268,10 @@ def filter_img_info(output, filename):
- def log(msg, filters=3D[]):
-     for flt in filters:
-         msg =3D flt(msg)
--    if type(msg) is dict or type(msg) is list:
--        print(json.dumps(msg, sort_keys=3DTrue))
-+    if isinstance(msg, dict) or isinstance(msg, list):
-+        # Don't sort if it's already sorted
-+        do_sort =3D not isinstance(msg, OrderedDict)
-+        print(json.dumps(msg, sort_keys=3Ddo_sort))
-     else:
-         print(msg)
+-static void nbd_export_closed(NBDExport *exp)
++static void nbd_export_closed(NBDExport *export)
+ {
+     assert(state =3D=3D TERMINATING);
+     state =3D TERMINATED;
+@@ -1015,10 +1015,11 @@ int main(int argc, char **argv)
+         }
+     }
 
-@@ -448,8 +461,11 @@ class VM(qtest.QEMUQtestMachine):
-         return result
+-    exp =3D nbd_export_new(bs, dev_offset, fd_size, nbdflags, nbd_export=
+_closed,
+-                         writethrough, NULL, &error_fatal);
+-    nbd_export_set_name(exp, export_name);
+-    nbd_export_set_description(exp, export_description);
++    export =3D nbd_export_new(bs, dev_offset, fd_size, nbdflags,
++                            nbd_export_closed, writethrough,
++                            NULL, &error_fatal);
++    nbd_export_set_name(export, export_name);
++    nbd_export_set_description(export, export_description);
 
-     def qmp_log(self, cmd, filters=3D[filter_testfiles], **kwargs):
--        logmsg =3D '{"execute": "%s", "arguments": %s}' % \
--            (cmd, json.dumps(kwargs, sort_keys=3DTrue))
-+        full_cmd =3D OrderedDict((
-+            ("execute", cmd),
-+            ("arguments", ordered_kwargs(kwargs))
-+        ))
-+        logmsg =3D json.dumps(full_cmd)
-         log(logmsg, filters)
-         result =3D self.qmp(cmd, **kwargs)
-         log(json.dumps(result, sort_keys=3DTrue), filters)
+     if (device) {
+ #if HAVE_NBD_DEVICE
+@@ -1055,9 +1056,9 @@ int main(int argc, char **argv)
+         main_loop_wait(false);
+         if (state =3D=3D TERMINATE) {
+             state =3D TERMINATING;
+-            nbd_export_close(exp);
+-            nbd_export_put(exp);
+-            exp =3D NULL;
++            nbd_export_close(export);
++            nbd_export_put(export);
++            export =3D NULL;
+         }
+     } while (state !=3D TERMINATED);
+
 --=20
 2.20.1
