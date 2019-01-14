@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36509)
+Received: from eggs.gnu.org ([209.51.188.92]:36736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gj9Gn-0004ep-1q
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:55:42 -0500
+	(envelope-from <berto@igalia.com>) id 1gj9He-00057o-W0
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:56:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gj9Gl-0002Rc-OW
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:55:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gj9Gl-0002QC-Iw
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:55:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gj9Gg-0004Os-Dx
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 20:55:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 66E742E80C8
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 20:55:34 +0000 (UTC)
+	(envelope-from <berto@igalia.com>) id 1gj9Hc-0002lP-3W
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:56:34 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190114163117.GA521@stefanha-x1.localdomain>
+References: <20190109110144.18633-1-stefanha@redhat.com>
+	<w51pnt57slp.fsf@maestria.local.igalia.com>
+	<w51tvifqqlr.fsf@maestria.local.igalia.com>
+	<20190111132416.GI5010@dhcp-200-186.str.redhat.com>
+	<w51pnt3qo27.fsf@maestria.local.igalia.com>
+	<20190114133553.GE7038@stefanha-x1.localdomain>
+	<w51won7480o.fsf@maestria.local.igalia.com>
+	<20190114161525.GA32304@stefanha-x1.localdomain>
+	<w51zhs32ojb.fsf@maestria.local.igalia.com>
+	<20190114163117.GA521@stefanha-x1.localdomain>
+Date: Mon, 14 Jan 2019 21:56:28 +0100
+Message-ID: <w51h8eb7ybn.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Jan 2019 20:49:20 -0000
-From: =?utf-8?b?0JrQvtGA0LXQvdCx0LXRgNCzINCc0LDRgNC6?=
-	<1811720@bugs.launchpad.net>
-Reply-To: Bug 1811720 <1811720@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154749896091.8755.12887494017193023179.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1811720] [NEW] storage physical_block_size is
- restricted to uint16_t
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
+ iothread race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Public bug reported:
+On Mon 14 Jan 2019 05:31:17 PM CET, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> On Mon, Jan 14, 2019 at 05:26:48PM +0100, Alberto Garcia wrote:
+>> On Mon 14 Jan 2019 05:15:25 PM CET, Stefan Hajnoczi wrote:
+>> >> > I've been able to reproduce this in an iotest, please see v2 of this
+>> >> > series.
+>> >> 
+>> >> That iotest doesn't crash for me :-?
+>> >
+>> > Does my iotest pass for you?
+>> 
+>> Yes, it does. I'm trying to figure out why because if I run the QMP
+>> commands by hand then it does crash.
+>
+> I ran the iotest 20 times on my machine and it segfaulted every time
+> (with the fix not yet applied).
 
-It is desirable to set -global scsi-hd.physical_block_size=3D4194304 for
-RBD-backed storage.
+Yeah I can also reproduce it all the time if I run it by hand...
 
-But unfortunatelly, this values is restricted with uint16_t, i.e. 65536
-maximum.
+I was debugging it and although I don't know why this is different when
+I run it through tests/qemu-iotests/check, here's why it doesn't crash:
 
-For example, scsi-hd.discard_granularity=3D4194304 is not so restricted
-(and works as expected)
+After the ThrottleGroupMember is unregistered and its BlockBackend is
+destroyed, the throttle_group_co_restart_queue() coroutine takes
+control.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+The first thing that it does is lock tgm->throttled_reqs_lock. It turns
+out that although this memory has been freed (it's part of the
+BlockBackend struct) it is still accessible but contains pure
+gargabe. 'Garbage' here means that the mutex counter contains some
+random value != 0, so the thread waits, it doesn't have a chance to
+crash the process, and QEMU shuts down cleanly.
 
--- =
+So if my understanding is correct QEMU can be shut down when there are
+iothreads waiting for a mutex. Is that something that we should be
+worried about?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811720
-
-Title:
-  storage physical_block_size is restricted to uint16_t
-
-Status in QEMU:
-  New
-
-Bug description:
-  It is desirable to set -global scsi-hd.physical_block_size=3D4194304 for
-  RBD-backed storage.
-
-  But unfortunatelly, this values is restricted with uint16_t, i.e.
-  65536 maximum.
-
-  For example, scsi-hd.discard_granularity=3D4194304 is not so restricted
-  (and works as expected)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811720/+subscriptions
+Berto
