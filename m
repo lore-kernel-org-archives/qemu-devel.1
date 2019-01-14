@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33516)
+Received: from eggs.gnu.org ([209.51.188.92]:33850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj1qH-00029J-AI
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:59:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1gj1rw-0003MT-8Z
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:01:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gj1qG-0003k3-DE
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:59:49 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50711)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gj1qG-0003iC-7W
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 07:59:48 -0500
-Received: by mail-wm1-f65.google.com with SMTP id n190so8815483wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 04:59:48 -0800 (PST)
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-13-philmd@redhat.com>
-	<4f2bc8e2-de3b-aaac-bc4a-e3f3b013b44e@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <68960d40-1ea9-47e5-0ab4-431a337d02de@redhat.com>
-Date: Mon, 14 Jan 2019 13:59:44 +0100
+	(envelope-from <armbru@redhat.com>) id 1gj1rm-0004YO-83
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:01:26 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190111191401.18317-1-armbru@redhat.com>
+	<20190111191401.18317-2-armbru@redhat.com>
+	<38d3856b-b763-3253-a6a8-10ea489ac0fa@janustech.com>
+	<435c327e-52d6-325c-0272-81378b93b935@redhat.com>
+Date: Mon, 14 Jan 2019 14:01:08 +0100
+In-Reply-To: <435c327e-52d6-325c-0272-81378b93b935@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon,
+	14 Jan 2019 11:36:51 +0100")
+Message-ID: <87lg3npf57.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <4f2bc8e2-de3b-aaac-bc4a-e3f3b013b44e@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 12/15] ui/console: Remove
- MouseTransformInfo from qemu/typedefs.h
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] block: Eliminate the S_1KiB, S_2KiB,
+ ... macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +28,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Leonid Bloch <lbloch@janustech.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 1/14/19 9:59 AM, Thomas Huth wrote:
-> On 2019-01-11 15:08, Philippe Mathieu-Daudé wrote:
->> MouseTransformInfo is only used in "ui/console.h", there is no
->> need to expose it via "qemu/typedefs.h".
-> 
-> You also touch devices.h here ... that should be mentioned, too?
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-It depends whichever of this series or 'remove "hw/devices.h"' enters
-first :)
+> On 1/13/19 10:41 AM, Leonid Bloch wrote:
+>> On 1/11/19 9:14 PM, Markus Armbruster wrote:
+>>> We define 54 macros for the powers of two >=3D 1024.  We use six, in six
+>>> macro definitions.  Four of them could just as well use the common MiB
+>>> macro, so do that.  The remaining two can't, because they get passed
+>>> to stringify.  Replace the macro by the literal number there.
+>>> Slightly harder to read in one instance (1048576 vs. S_1MiB), so add a
+>>> comment there.  The other instance is a wash: 65536 vs S_64KiB.  65536
+>>> has been good enough for more than seven years there.
+>>>
+>>> This effectively reverts commit 540b8492618 and 1240ac558d3.
+>>>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>   block/qcow2.h        | 10 +++---
+>>>   block/vdi.c          |  3 +-
+>>>   include/qemu/units.h | 73 --------------------------------------------
+>>>   3 files changed, 7 insertions(+), 79 deletions(-)
+>>>
+>>> diff --git a/block/qcow2.h b/block/qcow2.h
+>>> index a98d24500b..2380cbfb41 100644
+>>> --- a/block/qcow2.h
+>>> +++ b/block/qcow2.h
+>>> @@ -50,11 +50,11 @@
+>>>=20=20=20
+>>>   /* 8 MB refcount table is enough for 2 PB images at 64k cluster size
+>>>    * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+>>> -#define QCOW_MAX_REFTABLE_SIZE S_8MiB
+>>> +#define QCOW_MAX_REFTABLE_SIZE (8 * MiB)
+>>>=20=20=20
+>>>   /* 32 MB L1 table is enough for 2 PB images at 64k cluster size
+>>>    * (128 GB for 512 byte clusters, 2 EB for 2 MB clusters) */
+>>> -#define QCOW_MAX_L1_SIZE S_32MiB
+>>> +#define QCOW_MAX_L1_SIZE (32 * MiB)
+>>>=20=20=20
+>>>   /* Allow for an average of 1k per snapshot table entry, should be ple=
+nty of
+>>>    * space for snapshot names and IDs */
+>>> @@ -81,15 +81,15 @@
+>>>   #define MIN_REFCOUNT_CACHE_SIZE 4 /* clusters */
+>>>=20=20=20
+>>>   #ifdef CONFIG_LINUX
+>>> -#define DEFAULT_L2_CACHE_MAX_SIZE S_32MiB
+>>> +#define DEFAULT_L2_CACHE_MAX_SIZE (32 * MiB)
+>>>   #define DEFAULT_CACHE_CLEAN_INTERVAL 600  /* seconds */
+>>>   #else
+>>> -#define DEFAULT_L2_CACHE_MAX_SIZE S_8MiB
+>>> +#define DEFAULT_L2_CACHE_MAX_SIZE (8 * MiB)
+>>>   /* Cache clean interval is currently available only on Linux, so must=
+ be 0 */
+>>>   #define DEFAULT_CACHE_CLEAN_INTERVAL 0
+>>>   #endif
+>>>=20=20=20
+>>> -#define DEFAULT_CLUSTER_SIZE S_64KiB
+>>> +#define DEFAULT_CLUSTER_SIZE 65536
+>>=20
+>> /* Note: can't use 64 * KiB here, because it's passed to stringify() */
+>
+> Good idea.
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> 
->  Thomas
-> 
-> 
->> Move the declaration to "ui/console.h" (removing the forward
->> declaration).
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  include/hw/devices.h    | 1 +
->>  include/qemu/typedefs.h | 1 -
->>  include/ui/console.h    | 4 ++--
->>  3 files changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/hw/devices.h b/include/hw/devices.h
->> index 0e27feb0c2..b5f1662225 100644
->> --- a/include/hw/devices.h
->> +++ b/include/hw/devices.h
->> @@ -4,6 +4,7 @@
->>  /* Devices that have nowhere better to go.  */
->>  
->>  #include "hw/hw.h"
->> +#include "ui/console.h"
->>  
->>  /* smc91c111.c */
->>  void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
->> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
->> index 9baebe9d33..e44f1473a5 100644
->> --- a/include/qemu/typedefs.h
->> +++ b/include/qemu/typedefs.h
->> @@ -49,7 +49,6 @@ typedef struct MigrationIncomingState MigrationIncomingState;
->>  typedef struct MigrationState MigrationState;
->>  typedef struct Monitor Monitor;
->>  typedef struct MonitorDef MonitorDef;
->> -typedef struct MouseTransformInfo MouseTransformInfo;
->>  typedef struct MSIMessage MSIMessage;
->>  typedef struct NetClientState NetClientState;
->>  typedef struct NetFilterState NetFilterState;
->> diff --git a/include/ui/console.h b/include/ui/console.h
->> index 853fcf4eb7..b74246f0f5 100644
->> --- a/include/ui/console.h
->> +++ b/include/ui/console.h
->> @@ -65,13 +65,13 @@ void qemu_remove_led_event_handler(QEMUPutLEDEntry *entry);
->>  
->>  void kbd_put_ledstate(int ledstate);
->>  
->> -struct MouseTransformInfo {
->> +typedef struct MouseTransformInfo {
->>      /* Touchscreen resolution */
->>      int x;
->>      int y;
->>      /* Calibration values as used/generated by tslib */
->>      int a[7];
->> -};
->> +} MouseTransformInfo;
->>  
->>  void hmp_mouse_set(Monitor *mon, const QDict *qdict);
->>  
->>
-> 
+I omitted the comment here, because I find 64 * KiB hardly more readable
+than 65536.  We've done just fine with 65536 for more than seven years.
+But if you guys want the comment, you can certainly have it.
+
+>> Otherwise fine with me. The other solutions (including mine) indeed seem=
+=20
+>> overengineered compared to this.
+>>=20
+>> Leonid.
+>>=20
+>>>=20=20=20
+>>>   #define QCOW2_OPT_LAZY_REFCOUNTS "lazy-refcounts"
+>>>   #define QCOW2_OPT_DISCARD_REQUEST "pass-discard-request"
+>>> diff --git a/block/vdi.c b/block/vdi.c
+>>> index 2380daa583..bf1d19dd68 100644
+>>> --- a/block/vdi.c
+>>> +++ b/block/vdi.c
+>>> @@ -85,7 +85,8 @@
+>>>   #define BLOCK_OPT_STATIC "static"
+>>>=20=20=20
+>>>   #define SECTOR_SIZE 512
+>>> -#define DEFAULT_CLUSTER_SIZE S_1MiB
+>>> +#define DEFAULT_CLUSTER_SIZE 1048576
+>>> +/* Note: can't use 1 * MiB, because it's passed to stringify() */
+>>>=20=20=20
+>>>   #if defined(CONFIG_VDI_DEBUG)
+>>>   #define VDI_DEBUG 1
+>>> diff --git a/include/qemu/units.h b/include/qemu/units.h
+>>> index 1c959d182e..692db3fbb2 100644
+>>> --- a/include/qemu/units.h
+>>> +++ b/include/qemu/units.h
+>>> @@ -17,77 +17,4 @@
+>>>   #define PiB     (INT64_C(1) << 50)
+>>>   #define EiB     (INT64_C(1) << 60)
+>>>=20=20=20
+>>> -/*
+>>> - * The following lookup table is intended to be used when a literal st=
+ring of
+>>> - * the number of bytes is required (for example if it needs to be stri=
+ngified).
+>>> - * It can also be used for generic shortcuts of power-of-two sizes.
+>>> - * This table is generated using the AWK script below:
+>>> - *
+>>> - *  BEGIN {
+>>> - *      suffix=3D"KMGTPE";
+>>> - *      for(i=3D10; i<64; i++) {
+>>> - *          val=3D2**i;
+>>> - *          s=3Dsubstr(suffix, int(i/10), 1);
+>>> - *          n=3D2**(i%10);
+>>> - *          pad=3D21-int(log(n)/log(10));
+>>> - *          printf("#define S_%d%siB %*d\n", n, s, pad, val);
+>>> - *      }
+>>> - *  }
+>>> - */
+>>> -
+>>> -#define S_1KiB                  1024
+>>> -#define S_2KiB                  2048
+>>> -#define S_4KiB                  4096
+>>> -#define S_8KiB                  8192
+>>> -#define S_16KiB                16384
+>>> -#define S_32KiB                32768
+>>> -#define S_64KiB                65536
+>>> -#define S_128KiB              131072
+>>> -#define S_256KiB              262144
+>>> -#define S_512KiB              524288
+>>> -#define S_1MiB               1048576
+>>> -#define S_2MiB               2097152
+>>> -#define S_4MiB               4194304
+>>> -#define S_8MiB               8388608
+>>> -#define S_16MiB             16777216
+>>> -#define S_32MiB             33554432
+>>> -#define S_64MiB             67108864
+>>> -#define S_128MiB           134217728
+>>> -#define S_256MiB           268435456
+>>> -#define S_512MiB           536870912
+>>> -#define S_1GiB            1073741824
+>>> -#define S_2GiB            2147483648
+>>> -#define S_4GiB            4294967296
+>>> -#define S_8GiB            8589934592
+>>> -#define S_16GiB          17179869184
+>>> -#define S_32GiB          34359738368
+>>> -#define S_64GiB          68719476736
+>>> -#define S_128GiB        137438953472
+>>> -#define S_256GiB        274877906944
+>>> -#define S_512GiB        549755813888
+>>> -#define S_1TiB         1099511627776
+>>> -#define S_2TiB         2199023255552
+>>> -#define S_4TiB         4398046511104
+>>> -#define S_8TiB         8796093022208
+>>> -#define S_16TiB       17592186044416
+>>> -#define S_32TiB       35184372088832
+>>> -#define S_64TiB       70368744177664
+>>> -#define S_128TiB     140737488355328
+>>> -#define S_256TiB     281474976710656
+>>> -#define S_512TiB     562949953421312
+>>> -#define S_1PiB      1125899906842624
+>>> -#define S_2PiB      2251799813685248
+>>> -#define S_4PiB      4503599627370496
+>>> -#define S_8PiB      9007199254740992
+>>> -#define S_16PiB    18014398509481984
+>>> -#define S_32PiB    36028797018963968
+>>> -#define S_64PiB    72057594037927936
+>>> -#define S_128PiB  144115188075855872
+>>> -#define S_256PiB  288230376151711744
+>>> -#define S_512PiB  576460752303423488
+>>> -#define S_1EiB   1152921504606846976
+>>> -#define S_2EiB   2305843009213693952
+>>> -#define S_4EiB   4611686018427387904
+>>> -#define S_8EiB   9223372036854775808
+>>> -
+>>>   #endif
+>>>
+>
+> Thanks Markus, Eric and Leonid for this cleanup!
+>
+> I'm sorry all of you wasted so many ressources here.
+
+It happens :)
