@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32952)
+Received: from eggs.gnu.org ([209.51.188.92]:47465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mhines@scalecomputing.com>) id 1gj8zl-0007ce-0N
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:38:06 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gj9yB-0003e9-Uq
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mhines@scalecomputing.com>) id 1gj8zj-0001rB-NQ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:38:04 -0500
-Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:46777)
+	(envelope-from <richard.henderson@linaro.org>) id 1gj9y7-0007wl-9X
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:40:31 -0500
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:37007)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mhines@scalecomputing.com>)
-	id 1gj8zj-0001na-1N
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:38:03 -0500
-Received: by mail-pl1-x634.google.com with SMTP id t13so140518ply.13
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 12:37:59 -0800 (PST)
-Message-ID: <5c3cf325.1c69fb81.8b2b9.48d4@mx.google.com>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gj9y4-0007mF-J6
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 16:40:25 -0500
+Received: by mail-pl1-x62d.google.com with SMTP id b5so237044plr.4
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 13:40:18 -0800 (PST)
+References: <1547467955-17245-1-git-send-email-thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6fd5dadf-a0ff-ac50-b2a5-997c87f5aef4@linaro.org>
+Date: Tue, 15 Jan 2019 08:40:10 +1100
 MIME-Version: 1.0
-From: Matt Hines <mhines@scalecomputing.com>
-Date: Mon, 14 Jan 2019 12:37:56 -0800
-In-Reply-To: <95f3ade6-5a10-5ebf-7f8e-91fc40fd45bc@redhat.com>
-References: <20190114090324.16176-1-mhines@scalecomputing.com>
-	<95f3ade6-5a10-5ebf-7f8e-91fc40fd45bc@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] QGA: Fix guest-get-fsinfo PCI
- addresscollection in Windows
+In-Reply-To: <1547467955-17245-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
+ with Clang on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org
 
-Number here is specific to the device type (and otherwise opaque) unfortuna=
-tely per this IOCtl: https://docs.microsoft.com/en-us/windows/desktop/api/w=
-inioctl/ni-winioctl-ioctl_storage_get_device_number
-Should I put a comment in qapi-schema.json pointing to this?
-
-
-From: Eric Blake
-Sent: Monday, January 14, 2019 11:41
-To: mhines@scalecomputing.com; qemu-devel@nongnu.org
-Cc: Michael Roth
-Subject: Re: [Qemu-devel] [PATCH] QGA: Fix guest-get-fsinfo PCI addresscoll=
-ection in Windows
-
-On 1/14/19 3:03 AM, mhines@scalecomputing.com wrote:
-> From: Matt Hines <mhines@scalecomputing.com>
->=20
-> Signed-off-by: Matt Hines <mhines@scalecomputing.com>
-
-The title says what (a fix), but no description of that fix or a "why"
-in the commit body.
-
+On 1/14/19 11:12 PM, Thomas Huth wrote:
+> Clang v7.0.1 does not like the __int128 variable type for inline
+> assembly on s390x:
+> 
+> In file included from fpu/softfloat.c:97:
+> include/fpu/softfloat-macros.h:647:9: error: inline asm error:
+>  This value type register class is not natively supported!
+>     asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+>         ^
+> 
+> Disable this code part there now when compiling with Clang, so that
+> the generic code gets used instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  configure            |   2 +-
->  qga/commands-win32.c | 295 +++++++++++++++++++++++++++++++++------------=
-------
->  qga/qapi-schema.json |   3 +-
->  3 files changed, 197 insertions(+), 103 deletions(-)
+>  include/fpu/softfloat-macros.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +++ b/qga/qapi-schema.json
-> @@ -836,6 +836,7 @@
->  # @unit: unit id
->  # @serial: serial number (since: 3.1)
->  # @dev: device node (POSIX) or device UNC (Windows) (since: 3.1)
-> +# @number: device slot index (Windows)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Adding a member is more than just a fix.  Also, this is missing a
-'(since 4.0)' tag.
+Regardless of whatever follow-up we might do wrt CONFIG_INT128.
 
->  #
->  # Since: 2.2
->  ##
-> @@ -843,7 +844,7 @@
->    'data': {'pci-controller': 'GuestPCIAddress',
->             'bus-type': 'GuestDiskBusType',
->             'bus': 'int', 'target': 'int', 'unit': 'int',
-> -           '*serial': 'str', '*dev': 'str'} }
-> +           '*serial': 'str', '*dev': 'str', 'number':'int'} }
-> =20
->  ##
->  # @GuestFilesystemInfo:
->=20
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+r~
