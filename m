@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53260)
+Received: from eggs.gnu.org ([209.51.188.92]:54412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gixex-0002VN-0P
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:31:52 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gixm5-0003gy-MB
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:39:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gixev-0003Fu-UR
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:31:51 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:54456)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1gixev-0003EO-Jn
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:31:49 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>	<154703593746.13472.3886549854409661470.stgit@pasha-VirtualBox>
-	<877efciyxr.fsf@dusky.pond.sub.org>
-In-Reply-To: <877efciyxr.fsf@dusky.pond.sub.org>
-Date: Mon, 14 Jan 2019 11:31:47 +0300
-Message-ID: <000a01d4abe3$9744ee70$c5cecb50$@ru>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gixm4-0006j9-R4
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 03:39:13 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 14 Jan 2019 08:39:07 +0000
+Message-ID: <c81e4f45-f7d8-783b-38da-cad3dfcd8716@virtuozzo.com>
+References: <20190111194720.15671-1-eblake@redhat.com>
+	<20190111194720.15671-3-eblake@redhat.com>
+In-Reply-To: <20190111194720.15671-3-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D9958AC7D9871641B8AAB94E5A175B35@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v9 10/21] qapi: introduce replay.json for
- record/replay-related stuff
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] nbd: Forbid nbd-server-stop when
+ server is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Markus Armbruster' <armbru@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-> From: Markus Armbruster [mailto:armbru@redhat.com]
-> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
-> 
-> > This patch adds replay.json file. It will be
-> > used for adding record/replay-related data structures and commands.
-> >
-> > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> > ---
-> >  MAINTAINERS             |    1 +
-> >  Makefile.objs           |    4 ++--
-> >  include/sysemu/replay.h |    1 +
-> >  qapi/misc.json          |   18 ------------------
-> >  qapi/qapi-schema.json   |    1 +
-> >  qapi/replay.json        |   26 ++++++++++++++++++++++++++
-> >  6 files changed, 31 insertions(+), 20 deletions(-)
-> >  create mode 100644 qapi/replay.json
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 0bfd95a..7b0a1bc 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -2122,6 +2122,7 @@ F: net/filter-replay.c
-> >  F: include/sysemu/replay.h
-> >  F: docs/replay.txt
-> >  F: stubs/replay.c
-> > +F: qapi/replay.json
-> >
-> >  IOVA Tree
-> >  M: Peter Xu <peterx@redhat.com>
-> > diff --git a/Makefile.objs b/Makefile.objs
-> > index 4561159..8164b22 100644
-> > --- a/Makefile.objs
-> > +++ b/Makefile.objs
-> > @@ -1,6 +1,6 @@
-> >  QAPI_MODULES = block-core block char common crypto introspect job migration
-> > -QAPI_MODULES += misc net rdma rocker run-state sockets tpm trace transaction
-> > -QAPI_MODULES += ui
-> > +QAPI_MODULES += misc net rdma replay rocker run-state sockets tpm trace
-> > +QAPI_MODULES += transaction ui
-> >
-> >  #######################################################################
-> >  # Common libraries for tools and emulators
-> > diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-> > index b3f593f..2054296 100644
-> > --- a/include/sysemu/replay.h
-> > +++ b/include/sysemu/replay.h
-> > @@ -13,6 +13,7 @@
-> >   */
-> >
-> >  #include "sysemu.h"
-> > +#include "qapi/qapi-types-replay.h"
-> >  #include "qapi/qapi-types-misc.h"
-> 
-> I believe you can drop qapi/qapi-types-misc.h now.
-
-Missed this one, thanks.
-
-> 
-> >  #include "qapi/qapi-types-ui.h"
-> >
-> > diff --git a/qapi/misc.json b/qapi/misc.json
-> > index 24d20a8..e5e0bea 100644
-> > --- a/qapi/misc.json
-> > +++ b/qapi/misc.json
-> > @@ -3125,24 +3125,6 @@
-> >    'data': { 'offset': 'int' } }
-> >
-> >  ##
-> > -# @ReplayMode:
-> > -#
-> > -# Mode of the replay subsystem.
-> > -#
-> > -# @none: normal execution mode. Replay or record are not enabled.
-> > -#
-> > -# @record: record mode. All non-deterministic data is written into the
-> > -#          replay log.
-> > -#
-> > -# @play: replay mode. Non-deterministic data required for system execution
-> > -#        is read from the log.
-> > -#
-> > -# Since: 2.5
-> > -##
-> > -{ 'enum': 'ReplayMode',
-> > -  'data': [ 'none', 'record', 'play' ] }
-> > -
-> > -##
-> >  # @xen-load-devices-state:
-> >  #
-> >  # Load the state of all devices from file. The RAM and the block devices
-> > diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-> > index 3bbdfce..b85fd04 100644
-> > --- a/qapi/qapi-schema.json
-> > +++ b/qapi/qapi-schema.json
-> > @@ -95,3 +95,4 @@
->    # Documentation generated with qapi-gen.py is in source order, with
->    # included sub-schemas inserted at the first include directive
->    # (subsequent include directives have no effect).  To get a sane and
->    # stable order, it's best to include each sub-schema just once, or
->    # include it first right here.
-> [...]
-> >  { 'include': 'trace.json' }
-> >  { 'include': 'introspect.json' }
-> >  { 'include': 'misc.json' }
-> > +{ 'include': 'replay.json' }
-> 
-> I doubt this the best spot for replay stuff in the generated
-> documentation.
-> 
-> Is there another chapter you'd consider related?
-
-Do you mean, that replay should be located near some other topic?
-I don't think, that it related to anything.
-But I can put replay above misc, because it related to one concrete topic.
-
-Pavel Dovgalyuk
+MTEuMDEuMjAxOSAyMjo0NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gU2luY2Ugd2UgYWxyZWFkeSBm
+b3JiaWQgb3RoZXIgbmJkLXNlcnZlciBjb21tYW5kcyB3aGVuIG5vdA0KPiBpbiB0aGUgcmlnaHQg
+c3RhdGUsIGl0IGlzIHVubGlrZWx5IHRoYXQgYW55IGNhbGxlciB3YXMgcmVseWluZw0KPiBvbiBh
+IHNlY29uZCBzdG9wIHRvIGJlaGF2ZSBhcyBhIHNpbGVudCBuby1vcC4gIFVwZGF0ZSBpb3Rlc3QN
+Cj4gMjIzIHRvIHNob3cgdGhlIGltcHJvdmVkIGJlaGF2aW9yLg0KPiANCj4gU2lnbmVkLW9mZi1i
+eTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQoNCg0KUmV2aWV3ZWQtYnk6IFZsYWRp
+bWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAN
+Cj4gLS0tDQo+IHYzOiBuZXcgcGF0Y2gNCj4gLS0tDQo+ICAgYmxvY2tkZXYtbmJkLmMgICAgICAg
+ICAgICAgfCA1ICsrKysrDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMyAgICAgfCAyICstDQo+
+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMy5vdXQgfCAyICstDQo+ICAgMyBmaWxlcyBjaGFuZ2Vk
+LCA3IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxv
+Y2tkZXYtbmJkLmMgYi9ibG9ja2Rldi1uYmQuYw0KPiBpbmRleCAxZDE3MGM4MGI4Mi4uY2E1ODQ5
+MTkxOTQgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrZGV2LW5iZC5jDQo+ICsrKyBiL2Jsb2NrZGV2LW5i
+ZC5jDQo+IEBAIC0yMTQsNiArMjE0LDExIEBAIHZvaWQgcW1wX25iZF9zZXJ2ZXJfcmVtb3ZlKGNv
+bnN0IGNoYXIgKm5hbWUsDQo+IA0KPiAgIHZvaWQgcW1wX25iZF9zZXJ2ZXJfc3RvcChFcnJvciAq
+KmVycnApDQo+ICAgew0KPiArICAgIGlmICghbmJkX3NlcnZlcikgew0KPiArICAgICAgICBlcnJv
+cl9zZXRnKGVycnAsICJOQkQgc2VydmVyIG5vdCBydW5uaW5nIik7DQo+ICsgICAgICAgIHJldHVy
+bjsNCj4gKyAgICB9DQoNCnllcywgZXhhY3RseSBsaWtlIGluIHFtcF9uYmRfc2VydmVyX3JlbW92
+ZQ0KDQo+ICsNCj4gICAgICAgbmJkX2V4cG9ydF9jbG9zZV9hbGwoKTsNCj4gDQo+ICAgICAgIG5i
+ZF9zZXJ2ZXJfZnJlZShuYmRfc2VydmVyKTsNCj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90
+ZXN0cy8yMjMgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjIzDQo+IGluZGV4IDYxYjQ2YTJmMDY2Li5h
+NDAxNjA5MWIyMSAxMDA3NTUNCj4gLS0tIGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMw0KPiArKysg
+Yi90ZXN0cy9xZW11LWlvdGVzdHMvMjIzDQo+IEBAIC0xNzIsNyArMTcyLDcgQEAgX3NlbmRfcWVt
+dV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLXJlbW92ZSIsDQo+ICAg
+X3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLXJlbW92
+ZSIsDQo+ICAgICAiYXJndW1lbnRzIjp7Im5hbWUiOiJuMiJ9fScgImVycm9yIiAjIEF0dGVtcHQg
+ZHVwbGljYXRlIGNsZWFuDQo+ICAgX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1
+dGUiOiJuYmQtc2VydmVyLXN0b3AifScgInJldHVybiINCj4gLV9zZW5kX3FlbXVfY21kICRRRU1V
+X0hBTkRMRSAneyJleGVjdXRlIjoibmJkLXNlcnZlci1zdG9wIn0nICJyZXR1cm4iICMgT29wcw0K
+PiArX3NlbmRfcWVtdV9jbWQgJFFFTVVfSEFORExFICd7ImV4ZWN1dGUiOiJuYmQtc2VydmVyLXN0
+b3AifScgImVycm9yIiAjIEFnYWluDQoNCmhtLCBpbnRlcmVzdGluZywgYnV0IGxvb2tzIGxpa2Ug
+dGhlIGxhdGVzdCAicmV0dXJuIiBvciAiZXJyb3IiIGlzIGFuIGV4dHJhIHRoaW5nLA0Kd2UgY2Fu
+IHVzZSAifSIgZm9yIGFsbCBxbXAgY29tbWFuZHMsIGFuZCBpdCB3b3J0aCBhZGRpbmcgX3NlbmRf
+cW1wX2NtZCB3cmFwcGVyLi4NCkJ1dCwgb2YgY291cnNlLCBpdCdzIG5vdCBhYm91dCB0aGVzZSBz
+ZXJpZXMuDQoNCj4gICBfc2VuZF9xZW11X2NtZCAkUUVNVV9IQU5ETEUgJ3siZXhlY3V0ZSI6InF1
+aXQifScgInJldHVybiINCj4gDQo+ICAgIyBzdWNjZXNzLCBhbGwgZG9uZQ0KPiBkaWZmIC0tZ2l0
+IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMy5vdXQgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjIzLm91
+dA0KPiBpbmRleCBlNmVkZTA1OTFjZC4uOGE0ZDYzYTRmYzIgMTAwNjQ0DQo+IC0tLSBhL3Rlc3Rz
+L3FlbXUtaW90ZXN0cy8yMjMub3V0DQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMjMub3V0
+DQo+IEBAIC02OSw2ICs2OSw2IEBAIHJlYWQgMjA5NzE1Mi8yMDk3MTUyIGJ5dGVzIGF0IG9mZnNl
+dCAyMDk3MTUyDQo+ICAgeyJyZXR1cm4iOiB7fX0NCj4gICB7ImVycm9yIjogeyJjbGFzcyI6ICJH
+ZW5lcmljRXJyb3IiLCAiZGVzYyI6ICJFeHBvcnQgJ24yJyBpcyBub3QgZm91bmQifX0NCj4gICB7
+InJldHVybiI6IHt9fQ0KPiAteyJyZXR1cm4iOiB7fX0NCj4gK3siZXJyb3IiOiB7ImNsYXNzIjog
+IkdlbmVyaWNFcnJvciIsICJkZXNjIjogIk5CRCBzZXJ2ZXIgbm90IHJ1bm5pbmcifX0NCj4gICB7
+InJldHVybiI6IHt9fQ0KPiAgICoqKiBkb25lDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0K
+VmxhZGltaXINCg==
