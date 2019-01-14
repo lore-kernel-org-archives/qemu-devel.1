@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39934)
+Received: from eggs.gnu.org ([209.51.188.92]:40076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1giynX-0007Oq-CD
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:44:48 -0500
+	(envelope-from <bounces@canonical.com>) id 1giyoQ-00081F-Rr
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:45:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1giynW-0005dI-BZ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:44:47 -0500
-Date: Mon, 14 Jan 2019 10:44:36 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190114104436.46ab183c.cohuck@redhat.com>
-In-Reply-To: <879a92e3-cfd9-b26f-a45a-ab8c20c5ffaa@redhat.com>
-References: <1546969050-8884-1-git-send-email-pmorel@linux.ibm.com>
-	<1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
-	<be2d1126-45a9-ace2-bf85-18f255815572@redhat.com>
-	<e5c4fa66-b83d-7f98-4f05-ccf26375a3ac@redhat.com>
-	<3f286f5b-9403-4a4d-5af0-1c0297c0b97e@linux.ibm.com>
-	<879a92e3-cfd9-b26f-a45a-ab8c20c5ffaa@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1giyoO-0006NR-Ho
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:45:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48910)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1giyoO-0006Fi-5j
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:45:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1giyoC-0006A3-9A
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 09:45:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 354DC2E80CC
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 09:45:28 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7] s390x/pci: add common function
- measurement block
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Jan 2019 09:30:40 -0000
+From: Stefan Hajnoczi <1523246@bugs.launchpad.net>
+Reply-To: Bug 1523246 <1523246@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151206150708.14182.82430.malonedeb@wampee.canonical.com>
+Message-Id: <154745824101.18746.11146165216539749242.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1523246] Re: Virtio-blk does not support TRIM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: pmorel@linux.ibm.com, walling@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
+To: qemu-devel@nongnu.org
 
-On Mon, 14 Jan 2019 10:23:58 +0100
-David Hildenbrand <david@redhat.com> wrote:
+While the Linux virtio-blk guest driver now supports discard and write
+zeroes, QEMU's virtio-blk device emulation does not support it yet.
 
-> On 14.01.19 10:18, Pierre Morel wrote:
-> > On 09/01/2019 12:43, David Hildenbrand wrote:  
-> >> On 09.01.19 12:29, David Hildenbrand wrote:  
-> >>> On 08.01.19 18:37, Pierre Morel wrote:  
-> >>>> From: Yi Min Zhao <zyimin@linux.ibm.com>
-> >>>>
-> >>>> Common function measurement block is used to report zPCI internal
-> >>>> counters of successful pcilg/stg/stb and rpcit instructions to
-> >>>> a memory location provided by the program.
-> >>>>
-> >>>> This patch introduces a new ZpciFmb structure and schedules a timer
-> >>>> callback to copy the zPCI measures to the FMB in the guest memory
-> >>>> at an interval time set to 4s.
-> >>>>
-> >>>> An error while attemping to update the FMB, would generate an error
-> >>>> event to the guest.
-> >>>>
-> >>>> The pcilg/stg/stb and rpcit interception handlers increase the
-> >>>> related counter on a successful call.
-> >>>> The guest shall pass a null FMBA (FMB address) in the FIB (Function
-> >>>> Information Block) when it issues a Modify PCI Function Control
-> >>>> instruction to switch off FMB and stop the corresponding timer.
-> >>>>
-> >>>> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
-> >>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> >>>> ---
-> >>>>   hw/s390x/s390-pci-bus.c  |   4 +-
-> >>>>   hw/s390x/s390-pci-bus.h  |  29 +++++++++++
-> >>>>   hw/s390x/s390-pci-inst.c | 133 +++++++++++++++++++++++++++++++++++++++++++++--
-> >>>>   hw/s390x/s390-pci-inst.h |   1 +
-> >>>>   4 files changed, 163 insertions(+), 4 deletions(-)
-> >>>>
-> >>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> >>>> index 060ff06..f0d34dd 100644
-> >>>> --- a/hw/s390x/s390-pci-bus.c
-> >>>> +++ b/hw/s390x/s390-pci-bus.c
-> >>>> @@ -989,6 +989,7 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
-> >>>>       bus = pci_get_bus(pci_dev);
-> >>>>       devfn = pci_dev->devfn;
-> >>>>       object_unparent(OBJECT(pci_dev));
-> >>>> +    fmb_timer_free(pbdev);  
-> >>>
-> >>> I still think this is the wrong place. it has nothing to do with
-> >>> hotplug/unplug. This belongs into unrealize/finalize.
-> >>>
-> >>>  
-> >>
-> >> ... but I see the issue. It boils down to the bad design of zPCI. The
-> >> PCI device has no clue about the pbdev. So this has to stay here because
-> >> in unrealize of pbdev it would be wrong and into unrealize of pci_dev,
-> >> we can't move it.
-> >>  
-> > 
-> > OK, thanks.
-> > So is it a ack from you?  
-> 
-> Acked-by: David Hildenbrand <david@redhat.com>
-> 
-> :)
+-- =
 
-Great!
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1523246
 
-Still waiting for an ack from Collin (nudge, nudge :) before applying
-this.
+Title:
+  Virtio-blk does not support TRIM
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  When model=3Dvirtio is used, TRIM is not supported.
+
+  # mount -o discard /dev/vda4 /mnt
+  # mount | tail -1
+  /dev/vda4 on /mnt type fuseblk (rw,nosuid,nodev,relatime,user_id=3D0,grou=
+p_id=3D0,allow_other,blksize=3D4096)
+  # fstrim /mnt/
+  fstrim: /mnt/: the discard operation is not supported
+
+  Booting without model=3Dvirtio allows using TRIM (in Windows as well).
+
+  Full QEMU line:
+
+  qemu-system-x86_64 -enable-kvm -cpu host -bios
+  /usr/share/ovmf/ovmf_x64.bin -smp 2 -m 7G -vga qxl -usbdevice tablet
+  -net nic,model=3Dvirtio -net user -drive discard=3Dunmap,detect-
+  zeroes=3Dunmap,cache=3Dnone,file=3Dvms/win10.hd.img.vmdk,format=3Dvmdk,if=
+=3Dvirtio
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1523246/+subscriptions
