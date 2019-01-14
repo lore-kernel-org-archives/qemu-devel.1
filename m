@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34728)
+Received: from eggs.gnu.org ([209.51.188.92]:34783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0004Bf-V0
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6l-0004Bo-3Y
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0001DD-4A
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6i-0001DN-5F
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:25 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40284)
+Received: from hera.aquilenet.fr ([185.233.100.1]:40306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6h-0001A9-NL
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:23 -0500
+	id 1gjB6h-0001AV-QL
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:24 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:12 +0100
-Message-Id: <20190114225306.21569-12-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:08 +0100
+Message-Id: <20190114225306.21569-8-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/65] slirp: remove dead declarations
+Subject: [Qemu-devel] [PULL 07/65] slirp: move internal function declarations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +32,44 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-An overdue cleanup. Remaining declarations could probably be moved in
-other headers, such as slirp.h.
+Clarify that those functions are internal to slirp.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/main.h | 29 -----------------------------
- 1 file changed, 29 deletions(-)
+ slirp/libslirp.h | 3 ---
+ slirp/slirp.h    | 3 +++
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/slirp/main.h b/slirp/main.h
-index 90053ce5ec..e04677944f 100644
---- a/slirp/main.h
-+++ b/slirp/main.h
-@@ -12,38 +12,9 @@
- #include <sys/select.h>
- #endif
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index 3e88dbaa01..a4f390ee89 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -7,9 +7,6 @@ typedef struct Slirp Slirp;
 =20
--#define TOWRITEMAX 512
--
--extern int slirp_socket;
--extern int slirp_socket_unit;
--extern int slirp_socket_port;
--extern uint32_t slirp_socket_addr;
--extern char *slirp_socket_passwd;
--extern int ctty_closed;
--
--/*
-- * Get the difference in 2 times from updtim()
-- * Allow for wraparound times, "just in case"
-- * x is the greater of the 2 (current time) and y is
-- * what it's being compared against.
-- */
--#define TIME_DIFF(x,y) (x)-(y) < 0 ? ~0-(y)+(x) : (x)-(y)
--
--extern char *slirp_tty;
--extern char *exec_shell;
- extern u_int curtime;
- extern struct in_addr loopback_addr;
- extern unsigned long loopback_mask;
--extern char *username;
--extern char *socket_path;
--extern int towrite_max;
--extern int ppp_exit;
--extern int tcp_keepintvl;
--
--#define PROTO_SLIP 0x1
--#ifdef USE_PPP
--#define PROTO_PPP 0x2
--#endif
+ typedef void (*slirp_output)(void *opaque, const uint8_t *pkt, int pkt_l=
+en);
 =20
- int if_encap(Slirp *slirp, struct mbuf *ifm);
- ssize_t slirp_send(struct socket *so, const void *buf, size_t len, int f=
-lags);
+-int get_dns_addr(struct in_addr *pdns_addr);
+-int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
+-
+ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwo=
+rk,
+                   struct in_addr vnetmask, struct in_addr vhost,
+                   bool in6_enabled,
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index e3d65d68ec..de299aa36c 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -232,6 +232,9 @@ extern Slirp *slirp_instance;
+=20
+ void if_start(Slirp *);
+=20
++int get_dns_addr(struct in_addr *pdns_addr);
++int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
++
+ /* ncsi.c */
+ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
+=20
 --=20
 2.20.1
