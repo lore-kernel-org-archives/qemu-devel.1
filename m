@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39943)
+Received: from eggs.gnu.org ([209.51.188.92]:42119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gj0OL-00073u-L2
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:26:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gj0Wt-0004fH-6A
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:35:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gj0OJ-00031Z-OI
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:26:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38624)
+	(envelope-from <kwolf@redhat.com>) id 1gj0Wq-0001Y2-FG
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:35:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37106)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1gj0OH-0002sg-Fp
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:26:51 -0500
-References: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <dc702e9b-8416-e4da-b256-f5d58e2150fd@redhat.com>
-Date: Mon, 14 Jan 2019 12:26:39 +0100
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gj0Wq-0001Wc-4c
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 06:35:40 -0500
+Date: Mon, 14 Jan 2019 12:35:20 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190114113520.GC6837@linux.fritz.box>
+References: <154703587757.13472.3898702635363120794.stgit@pasha-VirtualBox>
+	<154703599022.13472.1704009113561450219.stgit@pasha-VirtualBox>
+	<20190111104923.GD5010@dhcp-200-186.str.redhat.com>
+	<001001d4abf9$b6ea93e0$24bfbba0$@ru>
 MIME-Version: 1.0
-In-Reply-To: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Questions about VFIO enabling MSIX vector
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <001001d4abf9$b6ea93e0$24bfbba0$@ru>
+Subject: Re: [Qemu-devel] [PATCH v9 19/21] replay: add BH oneshot event for
+ block layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Heyi Guo <guoheyi@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, wanghaibin 00208455 <wanghaibin.wang@huawei.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, armbru@redhat.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-Hi,
+Am 14.01.2019 um 12:10 hat Pavel Dovgalyuk geschrieben:
+> > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > Am 09.01.2019 um 13:13 hat Pavel Dovgalyuk geschrieben:
+> > > Replay is capable of recording normal BH events, but sometimes
+> > > there are single use callbacks scheduled with aio_bh_schedule_oneshot
+> > > function. This patch enables recording and replaying such callbacks.
+> > > Block layer uses these events for calling the completion function.
+> > > Replaying these calls makes the execution deterministic.
+> > >
+> > > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > 
+> > This still doesn't come even close to catching all BHs that need to be
+> > caught. While you managed to show a few BHs that actually don't need to
+> > be considered for recording when I asked for this in v7, most BHs in the
+> > block layer can in some way lead to device callbacks and must therefore
+> > be recorded.
+> 
+> Let's have a brief review. I can change all the places, but how
+> should I make a test case to be sure, that all of them are working ok?
 
-On 1/12/19 3:30 AM, Heyi Guo wrote:
-> Hi folks,
-> 
-> I have some questions about vfio_msix_vector_do_use() in hw/vfio/pci.c,
-> could you help to explain?
-> 
-> We can see that when guest tries to enable one specific MSIX vector by
-> unmasking MSIX Vector Control, the access will be trapped and then into
-> function vfio_msix_vector_do_use(). And we may go to the below branch in
-> line 525:
-> 
-> 
-> 520
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l520>
-> /*
-> 521
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l521>
-> * We don't want to have the host allocate all possible MSI vectors
-> 522
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l522>
-> * for a device if they're not in use, so we shutdown and incrementally
-> 523
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l523>
-> * increase them as needed.
-> 524
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l524>
-> */
-> 525
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l525>
-> if (vdev->nr_vectors < nr + 1) {
-> 526
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l526>
-> vfio_disable_irqindex(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX);
-> 527
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l527>
-> vdev->nr_vectors = nr + 1;
-> 528
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l528>
-> ret = vfio_enable_vectors(vdev, true);
-> 529
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l529>
-> if (ret) {
-> 530
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l530>
-> error_report("vfio: failed to enable vectors, %d", ret);
-> 531
-> <https://git.qemu.org/?p=qemu.git;a=blob;f=hw/vfio/pci.c;h=c0cb1ec289084eb1593f24dc423e647f4b29eb74;hb=HEAD#l531>
-> }
-> 
-> Here all MSIX vectors will be disabled first and then enabled, with one
-> more MSIX. The comment is there but I still don't quite understand. It
-> makes sense for not allocating all possible MSI vectors, but why shall
-> we shutdown the whole MSI when being requested to enable one specific
-> vector? Can't we just enable the user specified vector indexed by "nr"?
-This is not obvious to me either. vfio_enable_vectors() seems to handle
-the nr_vectors as a whole since the origin of the code.
-> 
-> What's more, on ARM64 systems with GIC ITS, the kernel will issue an ITS
-> discard command when disabling a MSI vector, which will drop currently
-> pending MSI interrupt. If device driver in guest system enables some
-> MSIs first and interrupts may come at any time, and then it tries to
-> enable other MSIs, is it possible for the above code to cause interrupts
-> missing?
+The list is changing all the time. This is why I am so concerned about
+special-casing a few callers instead of having a generic solution. I
+don't know how we could make sure that we call the right function
+everywhere.
 
-Seems originally we considered this case of losing interrupts. This was
-then removed by "vfio-pci: No spurious MSIs" (98cd5a5eaf).
+> aio_bh_schedule_oneshot is used in:
+>  - blk_abort_aio_request
+>  - bdrv_co_yield_to_drain
+>  - iscsi_co_generic_cb
+>  - nfs_co_generic_cb
+>  - null_aio_common
+>  - nvme_process_completion
+>  - nvme_rw_cb
+>  - rbd_finish_aiocb
+>  - vxhs_iio_callback
+>  - (and couple of others not in the block layer)
 
-Does this prevent any particular device from working?
+In addition to these, we have at least a few functions that just resume
+block layer coroutines rather than directly scheduling a BH with a
+callback somewhere in the block layer.
 
-Thanks
+> We must change this call to replay_bh_schedule_oneshot_event when
+> the result of the BH execution affects the replayed guest state
+> (e.g., interrupt request is generated or memory is written)
+> 
+> If you think that all of these can do that, then I should change
+> such function calls.
 
-Eric
+I haven't reviewed the code, but these names look like all of them can
+eventually call back into the guest devices. They won't do that always,
+but potentially.
 
+> > How bad would it be to record some BHs even if recording them isn't
+> > necessary? I'd definitely try to err on the safe side here. Having two
+> > different sets of BH functions, you can't expect that people always use
+> > the right one (especially if you don't even make the existing code base
+> > consistently use the right one intially).
 > 
-> I may misunderstand the whole thing... Any comment is appreciated.
-> 
-> Thanks,
-> 
-> Heyi
-> 
+> There are two possible options:
+> 1. Execution hangs when recording. Kind of deadlock caused by the incorrect
+>    management of the events. E.g., adding stopping the VM and trying to flush
+>    the block layer queue.
+> 2. Execution hangs when replaying. 
+>    One of the events that affect the guest state is missed or generated
+>    at the other moment (e.g., when BH is not linked to the execution step).
+>    Then the guest behaves differently and the order of the events in the log
+>    does not match the guest state (e.g., interrupt processing is not matched).
+
+So basically when you have two events that are kind of nested? Operation
+A triggers event A, but in order to complete the operation, you call
+operation B with event B internally, which isn't available yet because
+we're still handling event A?
+
+Could this be solved by not having an order of events, but an order of
+sets of events?
+
+Kevin
