@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50196)
+Received: from eggs.gnu.org ([209.51.188.92]:50983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gizT6-0001B0-RJ
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:27:46 -0500
+	(envelope-from <philmd@redhat.com>) id 1gizW3-0003tt-Js
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:30:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gizT5-0002qj-4y
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:27:43 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41642)
+	(envelope-from <philmd@redhat.com>) id 1gizW2-00088F-VJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:30:47 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44262)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gizT4-0002pN-VH
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:27:43 -0500
-Received: by mail-ot1-x343.google.com with SMTP id u16so18842857otk.8
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:27:42 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gizW2-00086w-P7
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:30:46 -0500
+Received: by mail-wr1-f68.google.com with SMTP id z5so22154638wrt.11
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:30:46 -0800 (PST)
+References: <20190111140857.4211-1-philmd@redhat.com>
+	<20190111140857.4211-11-philmd@redhat.com>
+	<3d52c4eb-1254-08e2-440c-3edb42c2ba01@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1588529c-2606-5994-2a25-10e3488e7f28@redhat.com>
+Date: Mon, 14 Jan 2019 11:30:44 +0100
 MIME-Version: 1.0
-References: <20190108163008.7006-1-peter.maydell@linaro.org>
-	<20190108163008.7006-4-peter.maydell@linaro.org>
-	<CAL1e-=gtbka64eAhVdbPyLa4+HP-OSQRg7u6+SC-8MCRgoZ9Qw@mail.gmail.com>
-In-Reply-To: <CAL1e-=gtbka64eAhVdbPyLa4+HP-OSQRg7u6+SC-8MCRgoZ9Qw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 14 Jan 2019 10:27:30 +0000
-Message-ID: <CAFEAcA-FoPTcqZ5FH8Si6LUcYZgKVNPfHDBzd=x8QL4x+HDLVA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] accel/tcg: Add cluster number to TCG
- TB hash
+In-Reply-To: <3d52c4eb-1254-08e2-440c-3edb42c2ba01@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 10/15] range: Remove Range from
+ "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, "patches@linaro.org" <patches@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Mon, 14 Jan 2019 at 01:08, Aleksandar Markovic
-<aleksandar.m.mail@gmail.com> wrote:
->
->
->
-> On Tuesday, January 8, 2019, Peter Maydell <peter.maydell@linaro.org> wro=
-te:
+On 1/14/19 9:56 AM, Thomas Huth wrote:
+> On 2019-01-11 15:08, Philippe Mathieu-Daudé wrote:
+>> Range is only used in "hw/pci-host/q35.h" in the MCHPCIState, and
+>> in "hw/pci/pci.h" by pci_bus_get_w64_range().  Let them include
+>> "qemu/range.h" directly to simplify "qemu/typedefs.h".
 >>
->> Include the cluster number in the hash we use to look
->> up TBs. This is important because a TB that is valid
->> for one cluster at a given physical address and set
->> of CPU flags is not necessarily valid for another:
->> the two clusters may have different views of physical
->> memory, or may have different CPU features (eg FPU
->> present or absent).
+>> To clean "qemu/typedefs.h", move the declaration to "qemu/range.h"
+>> (removing the forward declaration).
+> 
+> Since Range seems to be meant as a common type (i.e. not specific to any
+> device like the other typedefs that you move in this series), I think
+> it's should be OK if this resides in typedefs.h ?
 
-> I do understand the definition of cluster_index in the sense of this seri=
-es. However, it looks to me that the term "cluster" is generally overused i=
-n areas where we work. This may lead to some confusion for future developer=
-s, and let me suggest some other name, like "tcg_cluster_index" or "tcg_gro=
-up_id", or "translation_group_id". Admitedly, they all sound ugly to me too=
-. But having the name that would clearly separate this id from too generic =
-"cluster_index" IMHO would save lots of time during potential related futur=
-e development.
->
-> (Needled to say that,  for example, we in MIPS, for multi-core sustems, g=
-roup cores in clusters, that actually do not have anything to do with clust=
-ers in TCG sense...)
+My idea was to clean files not very used, and this one is only used
+twice. Why rebuild the World if someone add another function or fix a
+typo in "qemu/range.h"?
+I agree this typedef is meant for global use however.
 
-Yeah, the term is a bit overloaded. Arm also has clusters
-that are used more in the NUMA sense. However, the
-term we have is what is in git master currently...
-
-thanks
--- PMM
+Since I don't have a strong opinion, I'll drop it (until someone else
+respond to this thread).
