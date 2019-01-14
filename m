@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35350)
+Received: from eggs.gnu.org ([209.51.188.92]:35376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7P-0004vW-1a
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:07 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7Q-0004xP-WB
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7O-0001oI-8x
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:06 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37650)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7Q-0001pd-6S
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:08 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:40716)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB7O-0001c3-00
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:06 -0500
+	id 1gjB7P-0001eJ-Ro
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:08 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:55 +0100
-Message-Id: <20190114225306.21569-55-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:58 +0100
+Message-Id: <20190114225306.21569-58-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 54/65] slirp: always build with debug statements
+Subject: [Qemu-devel] [PULL 57/65] slirp: remove remaining DEBUG blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +32,91 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Make debug statements condiitonal only on slirp_debug flags, instead
-of the pre-processor DEBUG blocks, as it may introduce breakage
-easily, since the debug code isn't always compiled.
+Instead, rely on slirp_debug flags, or compile unconditionally (the
+substraction in cksum is unlikely to affect any benchmark result).
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/debug.h | 15 +++------------
- slirp/misc.c  |  6 +++++-
- 2 files changed, 8 insertions(+), 13 deletions(-)
+ slirp/cksum.c   | 4 ----
+ slirp/ip_icmp.c | 5 ++---
+ slirp/slirp.c   | 5 +----
+ 3 files changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/slirp/debug.h b/slirp/debug.h
-index ca3a4b04da..ff920f0b87 100644
---- a/slirp/debug.h
-+++ b/slirp/debug.h
-@@ -5,9 +5,8 @@
-  * terms and conditions of the copyright.
-  */
+diff --git a/slirp/cksum.c b/slirp/cksum.c
+index b9466485b5..0a988b845d 100644
+--- a/slirp/cksum.c
++++ b/slirp/cksum.c
+@@ -70,9 +70,7 @@ int cksum(struct mbuf *m, int len)
 =20
--//#define DEBUG 1
--
+ 	if (len < mlen)
+ 	   mlen =3D len;
 -#ifdef DEBUG
-+#ifndef DEBUG_H_
-+#define DEBUG_H_
-=20
- #define DBG_CALL 0x1
- #define DBG_MISC 0x2
-@@ -50,12 +49,4 @@ extern int slirp_debug;
-     }                                           \
- } while (0)
-=20
--#else
--
--#define DEBUG_CALL(fmt, ...)
--#define DEBUG_ARG(fmt, ...)
--#define DEBUG_ARGS(fmt, ...)
--#define DEBUG_MISC(fmt, ...)
--#define DEBUG_ERROR(fmt, ...)
--
+ 	len -=3D mlen;
 -#endif
-+#endif /* DEBUG_H_ */
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 526cefa0f1..e30d2ceb2a 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -12,9 +12,13 @@
- #include "qemu/main-loop.h"
+ 	/*
+ 	 * Force to even boundary.
+ 	 */
+@@ -122,12 +120,10 @@ int cksum(struct mbuf *m, int len)
+ 	   s_util.c[0] =3D *(uint8_t *)w;
 =20
- #ifdef DEBUG
--int slirp_debug =3D DBG_CALL|DBG_MISC|DBG_ERROR;
-+#define SLIRP_DEBUG (DBG_CALL | DBG_MISC | DBG_ERROR)
-+#else
-+#define SLIRP_DEBUG 0
- #endif
+ cont:
+-#ifdef DEBUG
+ 	if (len) {
+ 		DEBUG_ERROR("cksum: out of data\n");
+ 		DEBUG_ERROR(" len =3D %d\n", len);
+ 	}
+-#endif
+ 	if (mlen =3D=3D -1) {
+ 		/* The last mbuf has odd # of bytes. Follow the
+ 		 standard (the odd byte may be shifted left by 8 bits
+diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
+index 6c7e375ff8..cd2faeacb6 100644
+--- a/slirp/ip_icmp.c
++++ b/slirp/ip_icmp.c
+@@ -257,13 +257,12 @@ icmp_send_error(struct mbuf *msrc, u_char type, u_c=
+har code, int minsize,
+   /* check msrc */
+   if(!msrc) goto end_error;
+   ip =3D mtod(msrc, struct ip *);
+-#ifdef DEBUG
+-  { char bufa[20], bufb[20];
++  if (slirp_debug & DBG_MISC) {
++    char bufa[20], bufb[20];
+     strcpy(bufa, inet_ntoa(ip->ip_src));
+     strcpy(bufb, inet_ntoa(ip->ip_dst));
+     DEBUG_MISC(" %.16s to %.16s\n", bufa, bufb);
+   }
+-#endif
+   if(ip->ip_off & IP_OFFMASK) goto end_error;    /* Only reply to fragme=
+nt 0 */
 =20
-+int slirp_debug =3D SLIRP_DEBUG;
-+
- inline void
- insque(void *a, void *b)
- {
+   /* Do not reply to source-only IPs */
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 0b70cb9fb6..6c732cd15b 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -195,9 +195,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
+s_addr, void *cached_addr,
+             if (++found > 3) {
+                 DEBUG_MISC("(more)");
+                 break;
+-            }
+-#ifdef DEBUG
+-            else {
++            } else if (slirp_debug & DBG_MISC) {
+                 char s[INET6_ADDRSTRLEN];
+                 const char *res =3D inet_ntop(af, tmp_addr, s, sizeof(s)=
+);
+                 if (!res) {
+@@ -205,7 +203,6 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
+s_addr, void *cached_addr,
+                 }
+                 DEBUG_MISC("%s", res);
+             }
+-#endif
+         }
+     }
+     fclose(f);
 --=20
 2.20.1
