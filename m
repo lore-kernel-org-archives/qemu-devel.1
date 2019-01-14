@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35516)
+Received: from eggs.gnu.org ([209.51.188.92]:35448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3kJ-0006NC-3G
+	(envelope-from <alex.bennee@linaro.org>) id 1gj3kE-0006Iu-NX
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gj3kD-0005Me-BH
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:46 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:36111)
+	(envelope-from <alex.bennee@linaro.org>) id 1gj3k9-0005IV-41
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:42 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33536)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gj3kD-0005LT-5Z
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:41 -0500
-Received: by mail-wm1-x336.google.com with SMTP id p6so9158900wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:01:41 -0800 (PST)
+	id 1gj3k8-0005GA-S4
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:01:37 -0500
+Received: by mail-wr1-x444.google.com with SMTP id c14so23320190wrr.0
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 07:01:34 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 14 Jan 2019 15:01:18 +0000
-Message-Id: <20190114150129.1013-11-alex.bennee@linaro.org>
+Date: Mon, 14 Jan 2019 15:01:10 +0000
+Message-Id: <20190114150129.1013-3-alex.bennee@linaro.org>
 In-Reply-To: <20190114150129.1013-1-alex.bennee@linaro.org>
 References: <20190114150129.1013-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/21] travis: don't clone git submodules upfront
+Subject: [Qemu-devel] [PULL 02/21] tests: run ldconfig after installing
+ extra software
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,24 +35,25 @@ Cc: qemu-devel@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@r
 
 From: Daniel P. Berrangé <berrange@redhat.com>
 
-The configure script & Makefile are already capable of figuring out
-which git submodules are required for a given build platform, and
-cloning them at the right time.
+The docker file builds and installs software into /usr/local but does
+not run ldconfig. As a result QEMU links to libvirglrenderer.so, but
+then crashes in "make check" unable to find the library.
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-diff --git a/.travis.yml b/.travis.yml
-index f539f8b556..fa70429459 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -71,7 +71,6 @@ git:
- before_install:
-   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update ; fi
-   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libffi gettext glib pixman ; fi
--  - git submodule update --init --recursive capstone dtc ui/keycodemapdb
- before_script:
-   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-   - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
+diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
+index 47a30adbdb..954fcf9606 100644
+--- a/tests/docker/dockerfiles/debian-amd64.docker
++++ b/tests/docker/dockerfiles/debian-amd64.docker
+@@ -36,5 +36,7 @@ RUN git clone https://github.com/luigirizzo/netmap.git /usr/src/netmap
+ RUN cd /usr/src/netmap/LINUX && ./configure --no-drivers --no-apps --kernel-dir=$(ls -d /usr/src/linux-headers-*-amd64) && make install
+ ENV QEMU_CONFIGURE_OPTS --enable-netmap
+ 
++RUN ldconfig
++
+ # gcrypt
+ ENV QEMU_CONFIGURE_OPTS $QEMU_CONFIGURE_OPTS --enable-gcrypt
 -- 
 2.17.1
