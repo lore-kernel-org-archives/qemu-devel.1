@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37031)
+Received: from eggs.gnu.org ([209.51.188.92]:37057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1giqnH-0005gN-8a
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:12:00 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1giqnK-0005jP-D3
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:12:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1giqnG-0000x3-Ia
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:11:59 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:38310)
+	(envelope-from <richard.henderson@linaro.org>) id 1giqnJ-0000zB-Mu
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:12:02 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33364)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1giqnG-0000vd-DE
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:11:58 -0500
-Received: by mail-pg1-x543.google.com with SMTP id g189so8738527pgc.5
-	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 17:11:58 -0800 (PST)
+	id 1giqnJ-0000yk-Hl
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 20:12:01 -0500
+Received: by mail-pf1-x444.google.com with SMTP id c123so9556391pfb.0
+	for <qemu-devel@nongnu.org>; Sun, 13 Jan 2019 17:12:01 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 14 Jan 2019 12:11:13 +1100
-Message-Id: <20190114011122.5995-9-richard.henderson@linaro.org>
+Date: Mon, 14 Jan 2019 12:11:14 +1100
+Message-Id: <20190114011122.5995-10-richard.henderson@linaro.org>
 In-Reply-To: <20190114011122.5995-1-richard.henderson@linaro.org>
 References: <20190114011122.5995-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 08/17] target/arm: Implement the GMI instruction
+Subject: [Qemu-devel] [PATCH 09/17] target/arm: Implement the SUBP
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +32,54 @@ Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-a64.h    | 1 +
- target/arm/mte_helper.c    | 6 ++++++
- target/arm/translate-a64.c | 6 ++++++
- 3 files changed, 13 insertions(+)
+ target/arm/translate-a64.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 47577207b2..ef340cb6f9 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -107,3 +107,4 @@ DEF_HELPER_FLAGS_2(mte_check, TCG_CALL_NO_WG, i64, env, i64)
- DEF_HELPER_FLAGS_3(irg, TCG_CALL_NO_RWG, i64, env, i64, i64)
- DEF_HELPER_FLAGS_4(addg, TCG_CALL_NO_RWG_SE, i64, env, i64, i32, i32)
- DEF_HELPER_FLAGS_4(subg, TCG_CALL_NO_RWG_SE, i64, env, i64, i32, i32)
-+DEF_HELPER_FLAGS_2(gmi, TCG_CALL_NO_RWG_SE, i64, i64, i64)
-diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index e2b1a5dd40..2f6ac45150 100644
---- a/target/arm/mte_helper.c
-+++ b/target/arm/mte_helper.c
-@@ -197,3 +197,9 @@ uint64_t HELPER(subg)(CPUARMState *env, uint64_t ptr,
-     offset <<= LOG2_TAG_GRANULE;
-     return address_with_allocation_tag(ptr - offset, rtag);
- }
-+
-+uint64_t HELPER(gmi)(uint64_t ptr, uint64_t mask)
-+{
-+    int tag = allocation_tag_from_addr(ptr);
-+    return mask | (1ULL << tag);
-+}
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 879d6b8d46..6583ad93b1 100644
+index 6583ad93b1..98ff60c161 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -5137,6 +5137,12 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
-         gen_helper_irg(cpu_reg_sp(s, rd), cpu_env,
-                        cpu_reg_sp(s, rn), cpu_reg(s, rm));
-         break;
-+    case 5: /* GMI */
+@@ -5111,19 +5111,39 @@ static void handle_crc32(DisasContext *s,
+  */
+ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
+ {
+-    unsigned int sf, rm, opcode, rn, rd;
++    unsigned int sf, rm, opcode, rn, rd, setflag;
+     sf = extract32(insn, 31, 1);
++    setflag = extract32(insn, 29, 1);
+     rm = extract32(insn, 16, 5);
+     opcode = extract32(insn, 10, 6);
+     rn = extract32(insn, 5, 5);
+     rd = extract32(insn, 0, 5);
+ 
+-    if (extract32(insn, 29, 1)) {
++    if (setflag && opcode != 0) {
+         unallocated_encoding(s);
+         return;
+     }
+ 
+     switch (opcode) {
++    case 0: /* SUBP(S) */
 +        if (sf == 0 || !dc_isar_feature(aa64_mte_insn_reg, s)) {
 +            goto do_unallocated;
++        } else {
++            TCGv_i64 tcg_n, tcg_m, tcg_d;
++
++            tcg_n = read_cpu_reg_sp(s, rn, true);
++            tcg_m = read_cpu_reg_sp(s, rm, true);
++            tcg_gen_sextract_i64(tcg_n, tcg_n, 0, 55);
++            tcg_gen_sextract_i64(tcg_m, tcg_m, 0, 55);
++            tcg_d = cpu_reg(s, rd);
++
++            if (setflag) {
++                gen_sub_CC(true, tcg_d, tcg_n, tcg_m);
++            } else {
++                tcg_gen_sub_i64(tcg_d, tcg_n, tcg_m);
++            }
 +        }
-+        gen_helper_gmi(cpu_reg(s, rd), cpu_reg_sp(s, rn), cpu_reg(s, rm));
 +        break;
-     case 8: /* LSLV */
-         handle_shift_reg(s, A64_SHIFT_TYPE_LSL, sf, rm, rn, rd);
+     case 2: /* UDIV */
+         handle_div(s, false, sf, rm, rn, rd);
          break;
 -- 
 2.17.2
