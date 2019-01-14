@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35349)
+Received: from eggs.gnu.org ([209.51.188.92]:35418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7P-0004vV-15
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:07 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-00050F-Tz
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7O-0001oU-9j
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:06 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40690)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB7S-0001rG-7y
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:10 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB7O-0001c6-1P
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:06 -0500
+	id 1gjB7S-0001ep-0t
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:54:10 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:56 +0100
-Message-Id: <20190114225306.21569-56-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:53:05 +0100
+Message-Id: <20190114225306.21569-65-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 55/65] slirp: introduce SLIRP_DEBUG environment
- variable
+Subject: [Qemu-devel] [PULL 64/65] slirp: Mark debugging calls as unlikely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +28,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+to get them out of the hot path.
 
-Learn to read SLIRP_DEBUG=3Dcall,misc,error (all or help also handled)
-to set the slirp_debug flags.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/misc.c  |  8 --------
- slirp/slirp.c | 15 +++++++++++++++
- 2 files changed, 15 insertions(+), 8 deletions(-)
+ slirp/debug.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index e30d2ceb2a..a0f104be5e 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -11,14 +11,6 @@
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
+diff --git a/slirp/debug.h b/slirp/debug.h
+index 25a5d59439..269d97d807 100644
+--- a/slirp/debug.h
++++ b/slirp/debug.h
+@@ -15,25 +15,25 @@
+ extern int slirp_debug;
 =20
--#ifdef DEBUG
--#define SLIRP_DEBUG (DBG_CALL | DBG_MISC | DBG_ERROR)
--#else
--#define SLIRP_DEBUG 0
--#endif
--
--int slirp_debug =3D SLIRP_DEBUG;
--
- inline void
- insque(void *a, void *b)
- {
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index ce5f571d0f..0b70cb9fb6 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -35,6 +35,8 @@
- #include <net/if.h>
- #endif
+ #define DEBUG_CALL(fmt, ...) do {               \
+-    if (slirp_debug & DBG_CALL) {               \
++    if (G_UNLIKELY(slirp_debug & DBG_CALL)) {   \
+         g_debug(fmt "...", ##__VA_ARGS__);      \
+     }                                           \
+ } while (0)
 =20
-+int slirp_debug;
-+
- /* Define to 1 if you want KEEPALIVE timers */
- bool slirp_do_keepalive;
+ #define DEBUG_ARG(fmt, ...) do {                \
+-    if (slirp_debug & DBG_CALL) {               \
++    if (G_UNLIKELY(slirp_debug & DBG_CALL)) {   \
+         g_debug(" " fmt, ##__VA_ARGS__);        \
+     }                                           \
+ } while (0)
 =20
-@@ -250,6 +252,7 @@ int get_dns6_addr(struct in6_addr *pdns6_addr, uint32=
-_t *scope_id)
- static void slirp_init_once(void)
- {
-     static int initialized;
-+    const char *debug;
- #ifdef _WIN32
-     WSADATA Data;
- #endif
-@@ -266,6 +269,18 @@ static void slirp_init_once(void)
+ #define DEBUG_MISC(fmt, ...) do {               \
+-    if (slirp_debug & DBG_MISC) {               \
++    if (G_UNLIKELY(slirp_debug & DBG_MISC)) {   \
+         g_debug(fmt, ##__VA_ARGS__);            \
+     }                                           \
+ } while (0)
 =20
-     loopback_addr.s_addr =3D htonl(INADDR_LOOPBACK);
-     loopback_mask =3D htonl(IN_CLASSA_NET);
-+
-+    debug =3D g_getenv("SLIRP_DEBUG");
-+    if (debug) {
-+        const GDebugKey keys[] =3D {
-+            { "call", DBG_CALL },
-+            { "misc", DBG_MISC },
-+            { "error", DBG_ERROR },
-+        };
-+        slirp_debug =3D g_parse_debug_string(debug, keys, G_N_ELEMENTS(k=
-eys));
-+    }
-+
-+
- }
-=20
- static void slirp_state_save(QEMUFile *f, void *opaque);
+ #define DEBUG_ERROR(fmt, ...) do {              \
+-    if (slirp_debug & DBG_ERROR) {              \
++    if (G_UNLIKELY(slirp_debug & DBG_ERROR)) {  \
+         g_debug(fmt, ##__VA_ARGS__);            \
+     }                                           \
+ } while (0)
 --=20
 2.20.1
