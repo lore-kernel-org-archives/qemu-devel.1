@@ -1,22 +1,44 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60237)
+Received: from eggs.gnu.org ([209.51.188.92]:34482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giyC3-0004rY-Pn
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:06:04 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1giyOE-0007OR-BQ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1giyC1-0002dc-PW
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:06:03 -0500
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-13-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4f2bc8e2-de3b-aaac-bc4a-e3f3b013b44e@redhat.com>
-Date: Mon, 14 Jan 2019 09:59:54 +0100
+	(envelope-from <pmorel@linux.ibm.com>) id 1giyOD-0007fV-DB
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:18:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40970
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1giyOD-0007ee-6p
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 04:18:37 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0E9B6jI102037
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 04:18:34 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q0p98krsf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 04:18:34 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Mon, 14 Jan 2019 09:18:32 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <1546969050-8884-1-git-send-email-pmorel@linux.ibm.com>
+	<1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
+	<be2d1126-45a9-ace2-bf85-18f255815572@redhat.com>
+	<e5c4fa66-b83d-7f98-4f05-ccf26375a3ac@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Mon, 14 Jan 2019 10:18:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190111140857.4211-13-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <e5c4fa66-b83d-7f98-4f05-ccf26375a3ac@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Message-Id: <3f286f5b-9403-4a4d-5af0-1c0297c0b97e@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 12/15] ui/console: Remove
- MouseTransformInfo from qemu/typedefs.h
+Subject: Re: [Qemu-devel] [PATCH v7] s390x/pci: add common function
+ measurement block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +47,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>
+To: David Hildenbrand <david@redhat.com>, walling@linux.ibm.com
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, rth@twiddle.net, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
 
-On 2019-01-11 15:08, Philippe Mathieu-Daud=C3=A9 wrote:
-> MouseTransformInfo is only used in "ui/console.h", there is no
-> need to expose it via "qemu/typedefs.h".
-
-You also touch devices.h here ... that should be mentioned, too?
-
- Thomas
-
-
-> Move the declaration to "ui/console.h" (removing the forward
-> declaration).
+On 09/01/2019 12:43, David Hildenbrand wrote:
+> On 09.01.19 12:29, David Hildenbrand wrote:
+>> On 08.01.19 18:37, Pierre Morel wrote:
+>>> From: Yi Min Zhao <zyimin@linux.ibm.com>
+>>>
+>>> Common function measurement block is used to report zPCI internal
+>>> counters of successful pcilg/stg/stb and rpcit instructions to
+>>> a memory location provided by the program.
+>>>
+>>> This patch introduces a new ZpciFmb structure and schedules a timer
+>>> callback to copy the zPCI measures to the FMB in the guest memory
+>>> at an interval time set to 4s.
+>>>
+>>> An error while attemping to update the FMB, would generate an error
+>>> event to the guest.
+>>>
+>>> The pcilg/stg/stb and rpcit interception handlers increase the
+>>> related counter on a successful call.
+>>> The guest shall pass a null FMBA (FMB address) in the FIB (Function
+>>> Information Block) when it issues a Modify PCI Function Control
+>>> instruction to switch off FMB and stop the corresponding timer.
+>>>
+>>> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>> ---
+>>>   hw/s390x/s390-pci-bus.c  |   4 +-
+>>>   hw/s390x/s390-pci-bus.h  |  29 +++++++++++
+>>>   hw/s390x/s390-pci-inst.c | 133 ++++++++++++++++++++++++++++++++++++=
++++++++++--
+>>>   hw/s390x/s390-pci-inst.h |   1 +
+>>>   4 files changed, 163 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>> index 060ff06..f0d34dd 100644
+>>> --- a/hw/s390x/s390-pci-bus.c
+>>> +++ b/hw/s390x/s390-pci-bus.c
+>>> @@ -989,6 +989,7 @@ static void s390_pcihost_hot_unplug(HotplugHandle=
+r *hotplug_dev,
+>>>       bus =3D pci_get_bus(pci_dev);
+>>>       devfn =3D pci_dev->devfn;
+>>>       object_unparent(OBJECT(pci_dev));
+>>> +    fmb_timer_free(pbdev);
+>>
+>> I still think this is the wrong place. it has nothing to do with
+>> hotplug/unplug. This belongs into unrealize/finalize.
+>>
+>>
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  include/hw/devices.h    | 1 +
->  include/qemu/typedefs.h | 1 -
->  include/ui/console.h    | 4 ++--
->  3 files changed, 3 insertions(+), 3 deletions(-)
+> ... but I see the issue. It boils down to the bad design of zPCI. The
+> PCI device has no clue about the pbdev. So this has to stay here becaus=
+e
+> in unrealize of pbdev it would be wrong and into unrealize of pci_dev,
+> we can't move it.
 >=20
-> diff --git a/include/hw/devices.h b/include/hw/devices.h
-> index 0e27feb0c2..b5f1662225 100644
-> --- a/include/hw/devices.h
-> +++ b/include/hw/devices.h
-> @@ -4,6 +4,7 @@
->  /* Devices that have nowhere better to go.  */
-> =20
->  #include "hw/hw.h"
-> +#include "ui/console.h"
-> =20
->  /* smc91c111.c */
->  void smc91c111_init(NICInfo *, uint32_t, qemu_irq);
-> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-> index 9baebe9d33..e44f1473a5 100644
-> --- a/include/qemu/typedefs.h
-> +++ b/include/qemu/typedefs.h
-> @@ -49,7 +49,6 @@ typedef struct MigrationIncomingState MigrationIncomi=
-ngState;
->  typedef struct MigrationState MigrationState;
->  typedef struct Monitor Monitor;
->  typedef struct MonitorDef MonitorDef;
-> -typedef struct MouseTransformInfo MouseTransformInfo;
->  typedef struct MSIMessage MSIMessage;
->  typedef struct NetClientState NetClientState;
->  typedef struct NetFilterState NetFilterState;
-> diff --git a/include/ui/console.h b/include/ui/console.h
-> index 853fcf4eb7..b74246f0f5 100644
-> --- a/include/ui/console.h
-> +++ b/include/ui/console.h
-> @@ -65,13 +65,13 @@ void qemu_remove_led_event_handler(QEMUPutLEDEntry =
-*entry);
-> =20
->  void kbd_put_ledstate(int ledstate);
-> =20
-> -struct MouseTransformInfo {
-> +typedef struct MouseTransformInfo {
->      /* Touchscreen resolution */
->      int x;
->      int y;
->      /* Calibration values as used/generated by tslib */
->      int a[7];
-> -};
-> +} MouseTransformInfo;
-> =20
->  void hmp_mouse_set(Monitor *mon, const QDict *qdict);
-> =20
->=20
+
+OK, thanks.
+So is it a ack from you?
+
+regards,
+Pierre
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
