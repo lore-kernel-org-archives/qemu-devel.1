@@ -1,30 +1,43 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52763)
+Received: from eggs.gnu.org ([209.51.188.92]:53337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gj8Ng-0005Vq-OI
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:58:45 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gj8Po-0006cZ-8j
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gj8Nf-000628-Ov
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:58:44 -0500
-Received: from pio-pvt-msa1.bahnhof.se ([79.136.2.40]:47542)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gj8Nf-00060u-Bm
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:58:43 -0500
-Date: Mon, 14 Jan 2019 20:49:02 +0100
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20190114194902.GA29211@sx9>
-References: <cover.1541093316.git.noring@nocrew.org>
-	<eecae865fc8f7934cc2d51b24cba7d8ac3ec37c6.1541093316.git.noring@nocrew.org>
-	<BN6PR2201MB1251DBF84B71346A8B673CA6C6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20190101182745.GA17022@sx9>
-	<BN6PR2201MB1251C334FE66ADF677BAE8D2C68E0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20190113185708.GA27922@sx9>
-	<CAL1e-=je93qUvfcq3ftNxYucjLYPEZf=dPXv6tSuzsE3SdsWKw@mail.gmail.com>
+	(envelope-from <walling@linux.ibm.com>) id 1gj8Pn-0006kN-5m
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:00:56 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gj8Pm-0006ju-Pw
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 15:00:55 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0EJxMQV036689
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 15:00:52 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q10px0vkp-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 15:00:52 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Mon, 14 Jan 2019 20:00:50 -0000
+References: <20190110210358.24035-1-david@redhat.com>
+	<4988f58e-4bc5-c622-53b7-cfda758304e1@redhat.com>
+	<20190111103828.058ccc6c.cohuck@redhat.com>
+	<c30709c1-9348-e4c9-22bb-95d6183163f3@linux.ibm.com>
+	<20190114184431.56795d44.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Mon, 14 Jan 2019 15:00:43 -0500
 MIME-Version: 1.0
+In-Reply-To: <20190114184431.56795d44.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAL1e-=je93qUvfcq3ftNxYucjLYPEZf=dPXv6tSuzsE3SdsWKw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 09/12] tests/tcg/mips: Test R5900
- three-operand MADDU1
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <beff9759-d95f-4ba6-d049-aada148e162d@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1] s390x/pci: Send correct
+ event on hotplug.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,69 +46,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Maciej W. Rozycki" <macro@linux-mips.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Hi Aleksandar,
-
-> Awesome!
+On 1/14/19 12:44 PM, Cornelia Huck wrote:
+> [restored cc:s]
 > 
-> I am especially happy with your choice of naming "mmr" (MultiMedia
-> Registers) for these fieilds, since that is what they really are (and they
-> are certainly not "gprs"). Right on the money!
-
-Great, thanks!
-
-> > For HI1 and LO1 only? I'm asking since HI0 and LO0 are implemented with
-> > the DSP array anyway, for all ISAs.
+> On Mon, 14 Jan 2019 11:06:19 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 > 
-> I leave it to your judgement. If you are not sure (or you find the current
-> implementation too sensitive or contrieved to touch), you can leave HI1/LO1
-> fields implementation as it is now. My motivation was avoiding usage of the
-> same data fields for two relatively independant purposes.
-
-I think the change is simple, but what should we call the new variables?
-
-/* global register indices */
-static TCGv cpu_gpr[32], cpu_PC;
-static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
-static TCGv cpu_HI1, cpu_LO1;    /* Upper half of 128-bit TX79 HI and LO */
-
-Something like the last line?
-
-By the way, what are your thoughts on "[PATCH v2 3/6] target/mips: Fix
-HI[ac] and LO[ac] 32-bit truncation with MIPS64 DSP ASE"?
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg01287.html
-
-> Outstanding! I salute your including PCPYUD and PCPYLD in this group - they
-> too can be considered "basic R/W access to mmr".
-
-Good, many thanks!
-
-> The goal right now is to prepare basic stuff related to SA register, even
-> though there is possibly no immediate any application use case. However,
-> this will make potential future development considerably easier, so please
-> include handling of this register and these instructions.
-
-Done, although I have some minor clean-ups left to do. I have checked with
-R5900 hardware to match the implementation defined value of the SA register.
-
-I will post MFSA, MTSA, MTSAB and MTSAH in v2 of this patch series.
-
-> Regarding segments:
+>> On 11/01/2019 10:38, Cornelia Huck wrote:
+>>> On Fri, 11 Jan 2019 08:16:41 +0100
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   
+>>>> On 10.01.19 22:03, David Hildenbrand wrote:  
+>>>>> Comit 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
+>>>>> changed the initial state of zPCI devices from ZPCI_FS_STANDBY to
+>>>>> ZPCI_FS_DISABLED (a.k.a. configured). However we still only send a
+>>>>> HP_EVENT_RESERVED_TO_STANDBY event to the guest, indicating a wrong
+>>>>> state.
+>>>>>
+>>>>> Let's send a HP_EVENT_TO_CONFIGURED event instead, to match the actual
+>>>>> state the device is in.
+>>>>>
+>>>>> This fixes hotplugged devices having to be enabled explicitly in the
+>>>>> guest e.g. via echo 1 > /sys/bus/pci/slots/00000000/power.
+>>>>>
+>>>>> Fixes: 2c28c490571f ("s390x/pci: let pci devices start in configured mode")
+>>>>> Report-by: Cornelia Huck <cohuck@redhat.com>  
+>>>
+>>> Cool, works for me as well.
+>>>
+>>> Tested-by: Cornelia Huck <cohuck@redhat.com>
+>>>
+>>> Do we want to cc:stable? Probably not, as it's more annoying than
+>>> critical, and pci hotplug does not seem to be much used on s390x.
+>>>   
+>>>>
+>>>> If this patch is the right thing to do, then
+>>>>
+>>>> 1. s/Report-by/Reported-by/
+>>>> 2. Dropping the "." from the subject
+>>>>
+>>>> (yes, it was late)  
+>>>
+>>> :) Can do while applying.
+>>>   
+>>>>
+>>>> I wonder if we should do both events sequentially, but as I don't have
+>>>> access to the architecture I have to rely on that this works :)  
+>>>
+>>> Yep, let's wait for feedback from folks with architecture access.
+>>>   
+>>
+>> Works fine on the architecture too.
+>>
+>> Seems the logical thing to do for me.
+>>
+>> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
 > 
-> +    int rs = extract32(ctx->opcode, 21, 5);
-> +    int rt = extract32(ctx->opcode, 16, 5);
-> +    int rd = extract32(ctx->opcode, 11, 5);
+> Thanks for checking.
 > 
-> Please include them in gen_XXX() functions, rather than in decode_XXX()
-> functions. This will leave decode_XXX() functions with a single
-> responsibility of detecting what instruction is about to be processed,
-> which is cleaner from logical decomposition point of view (even if it would
-> sometimes result in the repetition of some code segments - logical
-> decomposition is of far greater importance).
+> I'd like to queue this, but I'd like an ack from Collin as well.
+> 
 
-Done!
+Would you mind adding a comment somewhere that states something like
+"we can safely bypass the standby state when PCI hotplugging for a guest" 
+just to be clear that QEMU is a bit different from how we handle it on the LPAR
+level?
 
-Fredrik
+That comment would more-or-less clarify why we set the ZPCI_FS_<STATE> directly
+to disabled instead of to standby when hotplugging (which, AFAIU, is the order 
+how things occur at the LPAR level)
+
+Otherwise,
+
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
+
+>>
+>>
+>>>>  
+>>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>>> ---
+>>>>>   hw/s390x/s390-pci-bus.c | 2 +-
+>>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>>>> index 15759b6514..7f911b216a 100644
+>>>>> --- a/hw/s390x/s390-pci-bus.c
+>>>>> +++ b/hw/s390x/s390-pci-bus.c
+>>>>> @@ -899,7 +899,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>>>>>           }
+>>>>>   
+>>>>>           if (dev->hotplugged) {
+>>>>> -            s390_pci_generate_plug_event(HP_EVENT_RESERVED_TO_STANDBY,
+>>>>> +            s390_pci_generate_plug_event(HP_EVENT_TO_CONFIGURED ,
+>>>>>                                            pbdev->fh, pbdev->fid);
+>>>>>           }
+>>>>>       } else if (object_dynamic_cast(OBJECT(dev), TYPE_S390_PCI_DEVICE)) {
+>>>>>      
+>>>>
+>>>>  
+>>>
+>>>   
+>>
+>>
+> 
+> 
+
+
+-- 
+Respectfully,
+- Collin Walling
