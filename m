@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36456)
+Received: from eggs.gnu.org ([209.51.188.92]:36528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gj3oO-0001rB-AP
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:06:01 -0500
+	(envelope-from <berrange@redhat.com>) id 1gj3op-0002Ws-0a
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:06:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gj3oK-0007Cz-Bx
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:06:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55982)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gj3oK-0007CA-4u
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:05:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gj3oH-0001jT-Jv
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 15:05:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 68E212E80D8
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 15:05:53 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1gj3oe-0007OC-JZ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 10:06:24 -0500
+Date: Mon, 14 Jan 2019 15:05:51 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190114150551.GK3686@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1547473614-20033-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA9RQ+_vC3z4qxkX9Jsu4FKHGqi6qXxgbUKn=wpPzwy4Nw@mail.gmail.com>
+	<20190114143144.GH3686@redhat.com>
+	<0afe72f6-05fe-9547-5f54-46a47ba1ff30@redhat.com>
+	<2d4074cf-2a2c-a4b7-ec50-3324af877ff9@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2d4074cf-2a2c-a4b7-ec50-3324af877ff9@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Jan 2019 14:54:09 -0000
-From: Zhang Chen <zhangckid@gmail.com>
-Reply-To: Bug 1811499 <1811499@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154728291472.21076.10443354877272687540.malonedeb@soybean.canonical.com>
-Message-Id: <154747764953.18786.725837638201913266.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1811499] Re: qemu/net/colo-compare.c:288:
- possible pointless code duplication ?
+Subject: Re: [Qemu-devel] [PATCH] configure: Work-around a bug in libiscsi
+ 1.9.0 when used in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Qemu-block <qemu-block@nongnu.org>, Peter Lieven <pl@kamp.de>, QEMU Developers <qemu-devel@nongnu.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Have fixed in this patch.
-https://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg02859.html
+On Mon, Jan 14, 2019 at 03:53:48PM +0100, Thomas Huth wrote:
+> On 2019-01-14 15:50, Eric Blake wrote:
+> > On 1/14/19 8:31 AM, Daniel P. Berrang=C3=A9 wrote:
+> >=20
+> >>>
+> >>> Can we suppress the warnings with #pragma instead ?
+> >>> That would avoid compiling the .o file with different
+> >>> C semantics.
+> >>
+> >> IIUC this is a built-in warning you can't disable, except by changin=
+g
+> >> the compilation mode to have gnu89 inline semantics :-(
+> >=20
+> > Could we instead fix the warning by one of:
+> >=20
+> > Using pragma to declare the header as a system header (used to silenc=
+e
+> > warnings from misbehaving external headers),
+>=20
+> How do you do that?
+>=20
+> > and/or adding #defines around the inclusion of the header to neutrali=
+ze
+> > the poor warnings,
+>=20
+> You mean something like:
+>=20
+> #define inline /* nothing */
+>=20
+> ?
+>=20
+> ... sounds quite ugly to me, too.
 
-Thanks
-Zhang Chen
+That actually works very nicely, as long as any system headers
+used by iscsi.h are already included by QEMU.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811499
-
-Title:
-  qemu/net/colo-compare.c:288: possible pointless code duplication ?
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu/net/colo-compare.c:288] -> [qemu/net/colo-compare.c:296]: (style)
-  The if condition is the same as the previous if condition
-
-  Source code is
-
-      if (ppkt->tcp_seq =3D=3D spkt->tcp_seq && ppkt->seq_end =3D=3D spkt->=
-seq_end) {
-          if (colo_compare_packet_payload(ppkt, spkt,
-                                          ppkt->header_size, spkt->header_s=
-ize,
-                                          ppkt->payload_size)) {
-              *mark =3D COLO_COMPARE_FREE_SECONDARY | COLO_COMPARE_FREE_PRI=
-MARY;
-              return true;
-          }
-      }
-      if (ppkt->tcp_seq =3D=3D spkt->tcp_seq && ppkt->seq_end =3D=3D spkt->=
-seq_end) {
-          if (colo_compare_packet_payload(ppkt, spkt,
-                                          ppkt->header_size, spkt->header_s=
-ize,
-                                          ppkt->payload_size)) {
-              *mark =3D COLO_COMPARE_FREE_SECONDARY | COLO_COMPARE_FREE_PRI=
-MARY;
-              return true;
-          }
-      }
-
-  Maybe the second block was supposed to be different ?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811499/+subscriptions
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
