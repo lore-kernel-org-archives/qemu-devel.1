@@ -1,19 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:43104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gj7kV-0005l6-DL
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:18:18 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gj7kZ-0005l6-9v
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:18:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gj7Zq-0001VE-8p
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:07:20 -0500
-Date: Mon, 14 Jan 2019 14:06:59 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190114140616-mutt-send-email-mst@kernel.org>
-References: <154724039526.525985.3172545257507998890.stgit@bahia.lan>
+	(envelope-from <ehabkost@redhat.com>) id 1gj7Zo-0001Tj-E1
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:07:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39914)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gj7Zo-0001T0-0O
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 14:07:12 -0500
+Date: Mon, 14 Jan 2019 17:07:02 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190114190702.GE28115@habkost.net>
+References: <cover.1546399191.git.yi.z.zhang@linux.intel.com>
+	<0b17cd9e914372c4790296b2cc21d6dd6e6d5466.1546399191.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <154724039526.525985.3172545257507998890.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v2 00/13] spapr: Add support for PHB hotplug
+In-Reply-To: <0b17cd9e914372c4790296b2cc21d6dd6e6d5466.1546399191.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V8 3/5] util/mmap-alloc: support MAP_SYNC
+ in qemu_ram_mmap()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,86 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Thomas Huth <thuth@redhat.com>
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, mst@redhat.com, imammedo@redhat.com, dan.j.williams@intel.com, qemu-devel@nongnu.org
 
-On Fri, Jan 11, 2019 at 09:59:55PM +0100, Greg Kurz wrote:
-> This allows to hotplug/unplug PHBs. I could successfully test:
-> - hotplug/unplug with e1000 device to validate LSIs
-> - hotplug/unplug with virtio-net device to validate MSIs
-> - some simple migration scenarios
+On Wed, Jan 02, 2019 at 01:26:15PM +0800, Zhang Yi wrote:
+> When a file supporting DAX is used as vNVDIMM backend, mmap it with
+> MAP_SYNC flag in addition which can ensure file system metadata
+> synced in each guest writes to the backend file, without other QEMU
+> actions (e.g., periodic fsync() by QEMU).
 > 
-> Changes in v2:
-> - rebased on current ppc-for-4.0
-> - added some preliminary cleanup
-> - call unrealize from realize error path
-> - advertise PHB hotplug in last patch
-> - reworked phandle related code
-> - sync LSIs to KVM
-> 
-> Please comment.
-
-PCI things all look fine:
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-Pls merge through the sPAPR tree.
-
-
-> --
-> Greg
-> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
 > ---
+>  include/qemu/osdep.h | 16 ++++++++++++++++
+>  util/mmap-alloc.c    | 12 +++++++++++-
+>  2 files changed, 27 insertions(+), 1 deletion(-)
 > 
-> Greg Kurz (5):
->       spapr: Rename xics to intc in interrupt controller agnostic code
->       spapr_pci: add PHB unrealize
->       spapr_irq: Expose the phandle of the interrupt controller
->       spapr_irq: Allow synchronization of a single irq state to KVM
->       spapr: add hotplug hooks for PHB hotplug
-> 
-> Michael Roth (6):
->       spapr: create DR connectors for PHBs
->       spapr_events: add support for phb hotplug events
->       qdev: pass an Object * to qbus_set_hotplug_handler()
->       spapr_pci: provide node start offset via spapr_populate_pci_dt()
->       spapr_pci: add ibm, my-drc-index property for PHB hotplug
->       spapr: enable PHB hotplug for default pseries machine type
-> 
-> Nathan Fontenot (1):
->       spapr: populate PHB DRC entries for root DT node
-> 
-> Thomas Huth (1):
->       ppc: Move spapr-related prototypes from xics.h into a seperate header file
-> 
-> 
->  hw/acpi/pcihp.c               |    2 -
->  hw/acpi/piix4.c               |    2 -
->  hw/char/virtio-serial-bus.c   |    2 -
->  hw/core/bus.c                 |   11 +--
->  hw/intc/spapr_xive.c          |   34 ++++++++-
->  hw/intc/xics_kvm.c            |   68 ++++++++++--------
->  hw/intc/xics_spapr.c          |   29 +++++++-
->  hw/pci/pcie.c                 |    2 -
->  hw/pci/shpc.c                 |    2 -
->  hw/ppc/spapr.c                |  156 ++++++++++++++++++++++++++++++++++++++++-
->  hw/ppc/spapr_drc.c            |   18 +++++
->  hw/ppc/spapr_events.c         |    5 +
->  hw/ppc/spapr_irq.c            |   45 ++++++++++++
->  hw/ppc/spapr_pci.c            |  122 +++++++++++++++++++++++++-------
->  hw/ppc/spapr_vio.c            |    2 -
->  hw/s390x/css-bridge.c         |    2 -
->  hw/s390x/s390-pci-bus.c       |    6 +-
->  hw/scsi/virtio-scsi.c         |    2 -
->  hw/scsi/vmw_pvscsi.c          |    2 -
->  hw/usb/dev-smartcard-reader.c |    2 -
->  include/hw/pci-host/spapr.h   |    8 ++
->  include/hw/ppc/spapr.h        |    4 +
->  include/hw/ppc/spapr_drc.h    |    8 ++
->  include/hw/ppc/spapr_irq.h    |    3 +
->  include/hw/ppc/spapr_xive.h   |    2 +
->  include/hw/ppc/xics.h         |    9 +-
->  include/hw/ppc/xics_spapr.h   |   39 ++++++++++
->  include/hw/qdev-core.h        |    3 -
->  28 files changed, 492 insertions(+), 98 deletions(-)
->  create mode 100644 include/hw/ppc/xics_spapr.h
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 3bf48bc..bb1eba1 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -410,6 +410,22 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>  #  define QEMU_VMALLOC_ALIGN getpagesize()
+>  #endif
+>  
+> +/*
+> + * MAP_SHARED_VALIDATE and MAP_SYNC are introduced in Linux kernel
+> + * 4.15, so they may not be defined when compiling on older kernels.
+> + */
+> +#ifdef CONFIG_LINUX
+> +
+> +#include <asm-generic/mman.h>
+> +
+> +#ifndef MAP_SYNC
+> +#define MAP_SYNC 0x0
+> +#endif
+> +
+> +#else  /* !CONFIG_LINUX */
+> +#define MAP_SYNC              0x0
+> +#endif /* CONFIG_LINUX */
+> +
+>  #ifdef CONFIG_POSIX
+>  struct qemu_signalfd_siginfo {
+>      uint32_t ssi_signo;   /* Signal number */
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index 8f0a740..a9d5e56 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -99,6 +99,8 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+>      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+>  #endif
+>      bool shared = flags & RAM_SHARED;
+> +    bool is_pmem = flags & RAM_PMEM;
+> +    int mmap_xflags = 0;
+>      size_t offset;
+>      void *ptr1;
+>  
+> @@ -109,13 +111,21 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+>      assert(is_power_of_2(align));
+>      /* Always align to host page size */
+>      assert(align >= getpagesize());
+> +    if (shared && is_pmem) {
+> +        mmap_xflags |= MAP_SYNC;
+> +    }
+>  
+>      offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
+> + retry_mmap_fd:
+>      ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
+>                  MAP_FIXED |
+>                  (fd == -1 ? MAP_ANONYMOUS : 0) |
+> -                (shared ? MAP_SHARED : MAP_PRIVATE),
+> +                (shared ? MAP_SHARED : MAP_PRIVATE) | mmap_xflags,
+>                  fd, 0);
+> +    if ((ptr1 == MAP_FAILED) && (mmap_xflags & MAP_SYNC)) {
+> +        mmap_xflags &= ~MAP_SYNC;
+> +        goto retry_mmap_fd;
+
+Do we have use cases where using pmem=on without MAP_SYNC isn't
+going to cause problems?  If not, shouldn't we at least print a
+warning here?  Otherwise, won't we still need an option for cases
+that require MAP_SYNC to be working?
+
+> +    }
+
+-- 
+Eduardo
