@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51021)
+Received: from eggs.gnu.org ([209.51.188.92]:51097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipjz-0002uu-Ie
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:34 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk3-0002v9-Ag
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipjt-0006FZ-SC
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:29 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:60064)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gipk1-0006KH-Ty
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:35 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:60200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gipjm-0006AT-Lh
-	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:21 -0500
+	id 1gipk1-0006Fj-M1
+	for qemu-devel@nongnu.org; Sun, 13 Jan 2019 19:04:33 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 01:02:23 +0100
-Message-Id: <20190114000326.29847-3-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 01:02:28 +0100
+Message-Id: <20190114000326.29847-8-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 References: <20190114000326.29847-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 02/65] slirp: remove do_pty from fork_exec()
+Subject: [Qemu-devel] [PULL 07/65] slirp: move internal function declarations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,164 +32,44 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-QEMU uses fork_exec() with do_pty values 0 or 3.
-Let's clean up some unused code.
+Clarify that those functions are internal to slirp.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/misc.c     | 55 ++++++++++++++----------------------------------
- slirp/misc.h     |  2 +-
- slirp/tcp_subr.c |  4 +---
- 3 files changed, 18 insertions(+), 43 deletions(-)
+ slirp/libslirp.h | 3 ---
+ slirp/slirp.h    | 3 +++
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 57bdd808e2..e69d5f42c3 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -63,7 +63,7 @@ int add_exec(struct ex_list **ex_ptr, int do_pty, char =
-*exec,
- #ifdef _WIN32
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index 3e88dbaa01..a4f390ee89 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -7,9 +7,6 @@ typedef struct Slirp Slirp;
 =20
- int
--fork_exec(struct socket *so, const char *ex, int do_pty)
-+fork_exec(struct socket *so, const char *ex)
- {
-     /* not implemented */
-     return 0;
-@@ -77,13 +77,9 @@ fork_exec(struct socket *so, const char *ex, int do_pt=
-y)
-  * process, which connects to this socket, after which we
-  * exec the wanted program.  If something (strange) happens,
-  * the accept() call could block us forever.
-- *
-- * do_pty =3D 0   Fork/exec inetd style
-- * do_pty =3D 1   Fork/exec using slirp.telnetd
-- * do_ptr =3D 2   Fork/exec using pty
-  */
- int
--fork_exec(struct socket *so, const char *ex, int do_pty)
-+fork_exec(struct socket *so, const char *ex)
- {
-         int s, cs;
-         struct sockaddr_in addr, csaddr;
-@@ -100,26 +96,20 @@ fork_exec(struct socket *so, const char *ex, int do_=
-pty)
- 	DEBUG_CALL("fork_exec");
- 	DEBUG_ARG("so =3D %p", so);
- 	DEBUG_ARG("ex =3D %p", ex);
--	DEBUG_ARG("do_pty =3D %x", do_pty);
+ typedef void (*slirp_output)(void *opaque, const uint8_t *pkt, int pkt_l=
+en);
+=20
+-int get_dns_addr(struct in_addr *pdns_addr);
+-int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
 -
--	if (do_pty =3D=3D 2) {
--                return 0;
--	} else {
--		addr.sin_family =3D AF_INET;
--		addr.sin_port =3D 0;
--		addr.sin_addr.s_addr =3D INADDR_ANY;
+ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwo=
+rk,
+                   struct in_addr vnetmask, struct in_addr vhost,
+                   bool in6_enabled,
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index e3d65d68ec..de299aa36c 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -232,6 +232,9 @@ extern Slirp *slirp_instance;
 =20
--		if ((s =3D qemu_socket(AF_INET, SOCK_STREAM, 0)) < 0 ||
--		    bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
--		    listen(s, 1) < 0) {
--			error_report("Error: inet socket: %s", strerror(errno));
--			if (s >=3D 0) {
--			    closesocket(s);
--			}
-+    addr.sin_family =3D AF_INET;
-+    addr.sin_port =3D 0;
-+    addr.sin_addr.s_addr =3D INADDR_ANY;
+ void if_start(Slirp *);
 =20
--			return 0;
--		}
--	}
-+    s =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
-+    if (s < 0 || bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
-+        listen(s, 1) < 0) {
-+        error_report("Error: inet socket: %s", strerror(errno));
-+        if (s >=3D 0) {
-+            closesocket(s);
-+        }
-+        return 0;
-+    }
++int get_dns_addr(struct in_addr *pdns_addr);
++int get_dns6_addr(struct in6_addr *pdns6_addr, uint32_t *scope_id);
++
+ /* ncsi.c */
+ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len);
 =20
-         if (getsockname(s, (struct sockaddr *)&csaddr, &csaddrlen) < 0) =
-{
-             closesocket(s);
-@@ -166,13 +156,7 @@ fork_exec(struct socket *so, const char *ex, int do_=
-pty)
-=20
- 		i =3D 0;
- 		bptr =3D g_strdup(ex); /* No need to free() this */
--		if (do_pty =3D=3D 1) {
--			/* Setup "slirp.telnetd -x" */
--			argv[i++] =3D "slirp.telnetd";
--			argv[i++] =3D "-x";
--			argv[i++] =3D bptr;
--		} else
--		   do {
-+        do {
- 			/* Change the string into argv[] */
- 			curarg =3D bptr;
- 			while (*bptr !=3D ' ' && *bptr !=3D (char)0)
-@@ -180,7 +164,7 @@ fork_exec(struct socket *so, const char *ex, int do_p=
-ty)
- 			c =3D *bptr;
- 			*bptr++ =3D (char)0;
- 			argv[i++] =3D g_strdup(curarg);
--		   } while (c);
-+        } while (c);
-=20
-                 argv[i] =3D NULL;
- 		execvp(argv[0], (char **)argv);
-@@ -206,13 +190,6 @@ fork_exec(struct socket *so, const char *ex, int do_=
-pty)
-                 opt =3D 1;
-                 qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, s=
-izeof(int));
- 		qemu_set_nonblock(so->s);
--
--		/* Append the telnet options now */
--                if (so->so_m !=3D NULL && do_pty =3D=3D 1)  {
--			sbappend(so, so->so_m);
--                        so->so_m =3D NULL;
--		}
--
- 		return 1;
- 	}
- }
-diff --git a/slirp/misc.h b/slirp/misc.h
-index 5211bbd30a..897650aea1 100644
---- a/slirp/misc.h
-+++ b/slirp/misc.h
-@@ -53,6 +53,6 @@ struct slirp_quehead {
- void slirp_insque(void *, void *);
- void slirp_remque(void *);
- int add_exec(struct ex_list **, int, char *, struct in_addr, int);
--int fork_exec(struct socket *so, const char *ex, int do_pty);
-+int fork_exec(struct socket *so, const char *ex);
-=20
- #endif
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index fa61349cbb..0ccd8e1a96 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -951,7 +951,6 @@ int tcp_ctl(struct socket *so)
-     Slirp *slirp =3D so->slirp;
-     struct sbuf *sb =3D &so->so_snd;
-     struct ex_list *ex_ptr;
--    int do_pty;
-=20
-     DEBUG_CALL("tcp_ctl");
-     DEBUG_ARG("so =3D %p", so);
-@@ -966,9 +965,8 @@ int tcp_ctl(struct socket *so)
-                     so->extra =3D (void *)ex_ptr->ex_exec;
-                     return 1;
-                 }
--                do_pty =3D ex_ptr->ex_pty;
-                 DEBUG_MISC((dfd, " executing %s\n", ex_ptr->ex_exec));
--                return fork_exec(so, ex_ptr->ex_exec, do_pty);
-+                return fork_exec(so, ex_ptr->ex_exec);
-             }
-         }
-     }
 --=20
 2.20.1
