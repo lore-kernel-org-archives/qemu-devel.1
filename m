@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34797)
+Received: from eggs.gnu.org ([209.51.188.92]:34779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6l-0004CR-LD
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6l-0004Bm-15
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0001Jb-Qv
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:27 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:37306)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6k-0001JE-Cq
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:26 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:37298)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6k-0001Hn-KJ
+	id 1gjB6k-0001Fa-6U
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:26 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:21 +0100
-Message-Id: <20190114225306.21569-21-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:20 +0100
+Message-Id: <20190114225306.21569-20-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/65] slirp: remove unused HAVE_SYS_BITYPES_H
+Subject: [Qemu-devel] [PULL 19/65] slirp: remove HAVE_SYS_SIGNAL_H
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +36,37 @@ Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/slirp.h        | 4 ----
+ slirp/slirp.h        | 3 ---
  slirp/slirp_config.h | 3 ---
- 2 files changed, 7 deletions(-)
+ 2 files changed, 6 deletions(-)
 
 diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 4c3c672ee6..57955a8965 100644
+index f7c087456a..4c3c672ee6 100644
 --- a/slirp/slirp.h
 +++ b/slirp/slirp.h
-@@ -19,10 +19,6 @@ typedef char *caddr_t;
- # endif
+@@ -35,9 +35,6 @@ typedef char *caddr_t;
+ #ifndef NO_UNIX_SOCKETS
+ #include <sys/un.h>
  #endif
-=20
--#ifdef HAVE_SYS_BITYPES_H
--# include <sys/bitypes.h>
+-#ifdef HAVE_SYS_SIGNAL_H
+-# include <sys/signal.h>
 -#endif
--
  #ifndef _WIN32
- #include <sys/uio.h>
+ #include <sys/socket.h>
  #endif
 diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
-index 2605c4222b..a205dc8c28 100644
+index 3ce64e088e..2605c4222b 100644
 --- a/slirp/slirp_config.h
 +++ b/slirp/slirp_config.h
-@@ -23,9 +23,6 @@
- #define HAVE_SYS_FILIO_H
+@@ -50,9 +50,6 @@
+ #define HAVE_ARPA_INET_H
  #endif
 =20
--/* Define if you have sys/bitypes.h */
--#undef HAVE_SYS_BITYPES_H
+-/* Define if you have sys/signal.h */
+-#undef HAVE_SYS_SIGNAL_H
 -
- /* Define if the machine is big endian */
- //#undef HOST_WORDS_BIGENDIAN
+ /* Define if you have sys/stropts.h */
+ #undef HAVE_SYS_STROPTS_H
 =20
 --=20
 2.20.1
