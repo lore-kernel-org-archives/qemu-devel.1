@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47915)
+Received: from eggs.gnu.org ([209.51.188.92]:48102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gizIj-0000pW-Mf
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:17:02 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gizJW-0001NB-4q
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:17:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gizIh-0006x8-S2
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:17:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44768)
+	(envelope-from <imammedo@redhat.com>) id 1gizJV-0007Kx-8E
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:17:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40412)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gizIg-0006ug-9b
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:16:59 -0500
-Date: Mon, 14 Jan 2019 05:16:55 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <2011860338.64100587.1547461015822.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190114095520.GC13316@quack2.suse.cz>
-References: <20190109144736.17452-1-pagupta@redhat.com>
-	<20190110012617.GA4205@dastard>
-	<20190110101757.GC15790@quack2.suse.cz>
-	<1354249849.63357171.1547343519970.JavaMail.zimbra@redhat.com>
-	<CAPcyv4hwcgTUpgNCefCGu4DvgkYBp5b=f+hJ+FC=s5APYKoycg@mail.gmail.com>
-	<540171952.63371441.1547345866585.JavaMail.zimbra@redhat.com>
-	<20190114095520.GC13316@quack2.suse.cz>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gizJV-0007KO-01
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:17:49 -0500
+Date: Mon, 14 Jan 2019 11:17:35 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190114111735.531c4cca@redhat.com>
+In-Reply-To: <20190109193115.20655-6-marcandre.lureau@redhat.com>
+References: <20190109193115.20655-1-marcandre.lureau@redhat.com>
+	<20190109193115.20655-6-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v16 5/6] acpi: add ACPI memory clear
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +28,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kara <jack@suse.cz>
-Cc: Dan Williams <dan.j.williams@intel.com>, KVM list <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>, linux-nvdimm <linux-nvdimm@ml01.01.org>, Jason Wang <jasowang@redhat.com>, Dave Chinner <david@fromorbit.com>, Qemu Developers <qemu-devel@nongnu.org>, virtualization@lists.linux-foundation.org, adilger kernel <adilger.kernel@dilger.ca>, Ross Zwisler <zwisler@kernel.org>, dave jiang <dave.jiang@intel.com>, darrick wong <darrick.wong@oracle.com>, vishal l verma <vishal.l.verma@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Matthew Wilcox <willy@infradead.org>, Christoph Hellwig <hch@infradead.org>, Linux ACPI <linux-acpi@vger.kernel.org>, jmoyer <jmoyer@redhat.com>, linux-ext4 <linux-ext4@vger.kernel.org>, Rik van Riel <riel@surriel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>, Nitesh Narayan Lal <nilal@redhat.com>, Theodore Ts'o <tytso@mit.edu>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, f4bug@amsat.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
+On Wed,  9 Jan 2019 23:31:14 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-> > > > > Right. Thinking about this I would be more concerned about the fact
-> > > > > that
-> > > > > guest can effectively pin amount of host's page cache upto size of
-> > > > > the
-> > > > > device/file passed to guest as PMEM, can't it Pankaj? Or is there
-> > > > > some
-> > > > > QEMU
-> > > > > magic that avoids this?
-> > > >
-> > > > Yes, guest will pin these host page cache pages using 'get_user_pages'
-> > > > by
-> > > > elevating the page reference count. But these pages can be reclaimed by
-> > > > host
-> > > > at any time when there is memory pressure.
-> > > 
-> > > Wait, how can the guest pin the host pages? I would expect this to
-> > > happen only when using vfio and device assignment. Otherwise, no the
-> > > host can't reclaim a pinned page, that's the whole point of a pin to
-> > > prevent the mm from reclaiming ownership.
-> > 
-> > yes. You are right I just used the pin word but it does not actually pin
-> > pages
-> > permanently. I had gone through the discussion on existing problems with
-> > get_user_pages and DMA e.g [1] to understand Jan's POV. It does mention GUP
-> > pin pages so I also used the word 'pin'. But guest does not permanently pin
-> > these pages and these pages can be reclaimed by host.
-> 
-> OK, then I was just confused how virtio-pmem is going to work. Thanks for
-> explanation! So can I imagine this as guest mmaping the host file and
-> providing the mapped range as "NVDIMM pages" to the kernel inside the
-> guest? Or is it more complex?
+> The interface is described in the "TCG Platform Reset Attack
+> Mitigation Specification", chapter 6 "ACPI _DSM Function". According
+I'd add a spec version here as well adn maybe a link like it's
+in 4/6 (but links are often go stale so it's not must have, just name
+and version should be sufficient to find the spec)
 
-yes, that's correct. Host's Qemu process virtual address range is used as guest physical 
-address and a direct mapping(EPT/NPT) is established. At guest side, this physical memory
-range is plugged into guest system memory map and DAX mapping is setup using nvdimm calls.
+> to Laszlo, it's not so easy to implement in OVMF, he suggested to do
+> it in qemu instead.
+>=20
+> See specification documentation for more details, and next commit for
+> memory clear on reset handling.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Tested-by: Stefan Berger <stefanb@linux.ibm.com>
+With commit amended=20
 
-Thanks,
-Pankaj
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/acpi/tpm.c      | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+>  docs/specs/tpm.txt |  2 ++
+>  2 files changed, 57 insertions(+)
+>=20
+> diff --git a/hw/acpi/tpm.c b/hw/acpi/tpm.c
+> index 9f205378f2..b96459e45b 100644
+> --- a/hw/acpi/tpm.c
+> +++ b/hw/acpi/tpm.c
+> @@ -53,6 +53,16 @@ void tpm_build_ppi_acpi(TPMIf *tpm, Aml *dev)
+>      pprq =3D aml_name("PPRQ");
+>      pprm =3D aml_name("PPRM");
+> =20
+> +    aml_append(dev,
+> +               aml_operation_region(
+> +                   "TPP3", AML_SYSTEM_MEMORY,
+> +                   aml_int(TPM_PPI_ADDR_BASE +
+> +                           0x15a /* movv, docs/specs/tpm.txt */),
+> +                           0x1));
+> +    field =3D aml_field("TPP3", AML_BYTE_ACC, AML_NOLOCK, AML_PRESERVE);
+> +    aml_append(field, aml_named_field("MOVV", 8));
+> +    aml_append(dev, field);
+> +
+>      /*
+>       * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dynamic
+>       * operation region inside of a method for getting FUNC[op].
+> @@ -399,6 +409,51 @@ void tpm_build_ppi_acpi(TPMIf *tpm, Aml *dev)
+>              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
+>          }
+>          aml_append(method, ifctx);
+> +
+> +        /*
+> +         * "TCG Platform Reset Attack Mitigation Specification 1.00",
+> +         * Chapter 6 "ACPI _DSM Function"
+> +         */
+> +        ifctx =3D aml_if(
+> +            aml_equal(uuid,
+> +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D45D")=
+));
+> +        {
+> +            /* standard DSM query function */
+> +            ifctx2 =3D aml_if(aml_equal(function, zero));
+> +            {
+> +                uint8_t byte_list[1] =3D { 0x03 }; /* functions 1-2 supp=
+orted */
+> +
+> +                aml_append(ifctx2,
+> +                           aml_return(aml_buffer(sizeof(byte_list),
+> +                                                 byte_list)));
+> +            }
+> +            aml_append(ifctx, ifctx2);
+> +
+> +            /*
+> +             * TCG Platform Reset Attack Mitigation Specification 1.0 Ch=
+.6
+> +             *
+> +             * Arg 2 (Integer): Function Index =3D 1
+> +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
+> +             *                  Operation Value of the Request
+> +             * Returns: Type: Integer
+> +             *          0: Success
+> +             *          1: General Failure
+> +             */
+> +            ifctx2 =3D aml_if(aml_equal(function, one));
+> +            {
+> +                aml_append(ifctx2,
+> +                           aml_store(aml_derefof(aml_index(arguments, ze=
+ro)),
+> +                                     op));
+> +                {
+> +                    aml_append(ifctx2, aml_store(op, aml_name("MOVV")));
+> +
+> +                    /* 0: success */
+> +                    aml_append(ifctx2, aml_return(zero));
+> +                }
+> +            }
+> +            aml_append(ifctx, ifctx2);
+> +        }
+> +        aml_append(method, ifctx);
+>      }
+>      aml_append(dev, method);
+>  }
+> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+> index 424d1511fc..5d8c26b1ad 100644
+> --- a/docs/specs/tpm.txt
+> +++ b/docs/specs/tpm.txt
+> @@ -135,6 +135,8 @@ layout:
+>   +----------+--------+--------+-----------------------------------------=
+--+
+>   | next_step|   0x1  |  0x159 | Operation to execute after reboot by    =
+  |
+>   |          |        |        | firmware. Used by firmware.             =
+  |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> + | movv     |   0x1  |  0x15a | Memory overwrite variable               =
+  |
+>   +----------+--------+--------+-----------------------------------------=
+--+
+> =20
+>     The following values are supported for the 'func' field. They corresp=
+ond
