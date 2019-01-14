@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58223)
+Received: from eggs.gnu.org ([209.51.188.92]:58225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj55V-0004nA-SK
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:27:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1gj55V-0004nC-SP
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:27:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gj55T-000612-SL
+	(envelope-from <eblake@redhat.com>) id 1gj55T-00061A-TH
 	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:27:45 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 14 Jan 2019 10:26:03 -0600
-Message-Id: <20190114162605.5330-19-eblake@redhat.com>
+Date: Mon, 14 Jan 2019 10:26:04 -0600
+Message-Id: <20190114162605.5330-20-eblake@redhat.com>
 In-Reply-To: <20190114162605.5330-1-eblake@redhat.com>
 References: <20190114162605.5330-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 18/20] nbd: Remove x-nbd-server-add-bitmap
+Subject: [Qemu-devel] [PULL 19/20] nbd: Merge nbd_export_bitmap into
+ nbd_export_new
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,91 +23,224 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-Now that nbd-server-add can do the same functionality (well, other
-than making the exported bitmap name different than the underlying
-bitamp - but we argued that was not essential, since it is just as
-easy to create a new non-persistent bitmap with the desired name),
-we no longer need the experimental separate command.
+We only have one caller that wants to export a bitmap name,
+which it does right after creation of the export. But there is
+still a brief window of time where an NBD client could see the
+export but not the dirty bitmap, which a robust client would
+have to interpret as meaning the entire image should be treated
+as dirty.  Better is to eliminate the window entirely, by
+inlining nbd_export_bitmap() into nbd_export_new(), and refusing
+to create the bitmap in the first place if the requested bitmap
+can't be located.
+
+We also no longer need logic for setting a different bitmap
+name compared to the bitmap being exported.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20190111194720.15671-7-eblake@redhat.com>
+Message-Id: <20190111194720.15671-8-eblake@redhat.com>
 ---
- qapi/block.json | 23 -----------------------
- blockdev-nbd.c  | 23 -----------------------
- 2 files changed, 46 deletions(-)
+ include/block/nbd.h |  9 ++---
+ blockdev-nbd.c      | 11 +-----
+ nbd/server.c        | 87 +++++++++++++++++++++------------------------
+ qemu-nbd.c          |  5 +--
+ 4 files changed, 47 insertions(+), 65 deletions(-)
 
-diff --git a/qapi/block.json b/qapi/block.json
-index 3d70420f763..5a79d639e8c 100644
---- a/qapi/block.json
-+++ b/qapi/block.json
-@@ -301,29 +301,6 @@
- { 'command': 'nbd-server-remove',
-   'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 2f9a2aeb73c..1971b557896 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -296,9 +296,9 @@ typedef struct NBDClient NBDClient;
 
--##
--# @x-nbd-server-add-bitmap:
--#
--# Expose a dirty bitmap associated with the selected export. The bitmap =
-search
--# starts at the device attached to the export, and includes all backing =
-files.
--# The exported bitmap is then locked until the NBD export is removed.
--#
--# @name: Export name.
--#
--# @bitmap: Bitmap name to search for.
--#
--# @bitmap-export-name: How the bitmap will be seen by nbd clients
--#                      (default @bitmap)
--#
--# Note: the client must use NBD_OPT_SET_META_CONTEXT with a query of
--# "qemu:dirty-bitmap:NAME" (where NAME matches @bitmap-export-name) to a=
-ccess
--# the exposed bitmap.
--#
--# Since: 3.0
--##
--  { 'command': 'x-nbd-server-add-bitmap',
--    'data': {'name': 'str', 'bitmap': 'str', '*bitmap-export-name': 'str=
-'} }
+ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
+size,
+                           const char *name, const char *description,
+-                          uint16_t nbdflags, void (*close)(NBDExport *),
+-                          bool writethrough, BlockBackend *on_eject_blk,
+-                          Error **errp);
++                          const char *bitmap, uint16_t nbdflags,
++                          void (*close)(NBDExport *), bool writethrough,
++                          BlockBackend *on_eject_blk, Error **errp);
+ void nbd_export_close(NBDExport *exp);
+ void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error *=
+*errp);
+ void nbd_export_get(NBDExport *exp);
+@@ -319,9 +319,6 @@ void nbd_client_put(NBDClient *client);
+ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+                       Error **errp);
+
+-void nbd_export_bitmap(NBDExport *exp, const char *bitmap,
+-                       const char *bitmap_export_name, Error **errp);
 -
- ##
- # @nbd-server-stop:
- #
+ /* nbd_read
+  * Reads @size bytes from @ioc. Returns 0 on success.
+  */
 diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index ec8cf0ab8c3..cd86b38cdaa 100644
+index cd86b38cdaa..c76d5416b90 100644
 --- a/blockdev-nbd.c
 +++ b/blockdev-nbd.c
-@@ -233,26 +233,3 @@ void qmp_nbd_server_stop(Error **errp)
-     nbd_server_free(nbd_server);
-     nbd_server =3D NULL;
+@@ -175,7 +175,7 @@ void qmp_nbd_server_add(const char *device, bool has_=
+name, const char *name,
+         writable =3D false;
+     }
+
+-    exp =3D nbd_export_new(bs, 0, -1, name, NULL,
++    exp =3D nbd_export_new(bs, 0, -1, name, NULL, bitmap,
+                          writable ? 0 : NBD_FLAG_READ_ONLY,
+                          NULL, false, on_eject_blk, errp);
+     if (!exp) {
+@@ -186,15 +186,6 @@ void qmp_nbd_server_add(const char *device, bool has=
+_name, const char *name,
+      * our only way of accessing it is through nbd_export_find(), so we =
+can drop
+      * the strong reference that is @exp. */
+     nbd_export_put(exp);
+-
+-    if (has_bitmap) {
+-        Error *err =3D NULL;
+-        nbd_export_bitmap(exp, bitmap, bitmap, &err);
+-        if (err) {
+-            error_propagate(errp, err);
+-            nbd_export_remove(exp, NBD_SERVER_REMOVE_MODE_HARD, NULL);
+-        }
+-    }
+ }
+
+ void qmp_nbd_server_remove(const char *name,
+diff --git a/nbd/server.c b/nbd/server.c
+index bb5438c448b..e8c56607eff 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1457,9 +1457,9 @@ static void nbd_eject_notifier(Notifier *n, void *d=
+ata)
+
+ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
+size,
+                           const char *name, const char *description,
+-                          uint16_t nbdflags, void (*close)(NBDExport *),
+-                          bool writethrough, BlockBackend *on_eject_blk,
+-                          Error **errp)
++                          const char *bitmap, uint16_t nbdflags,
++                          void (*close)(NBDExport *), bool writethrough,
++                          BlockBackend *on_eject_blk, Error **errp)
+ {
+     AioContext *ctx;
+     BlockBackend *blk;
+@@ -1507,6 +1507,43 @@ NBDExport *nbd_export_new(BlockDriverState *bs, of=
+f_t dev_offset, off_t size,
+     }
+     exp->size -=3D exp->size % BDRV_SECTOR_SIZE;
+
++    if (bitmap) {
++        BdrvDirtyBitmap *bm =3D NULL;
++        BlockDriverState *bs =3D blk_bs(blk);
++
++        while (true) {
++            bm =3D bdrv_find_dirty_bitmap(bs, bitmap);
++            if (bm !=3D NULL || bs->backing =3D=3D NULL) {
++                break;
++            }
++
++            bs =3D bs->backing->bs;
++        }
++
++        if (bm =3D=3D NULL) {
++            error_setg(errp, "Bitmap '%s' is not found", bitmap);
++            goto fail;
++        }
++
++        if ((nbdflags & NBD_FLAG_READ_ONLY) && bdrv_is_writable(bs) &&
++            bdrv_dirty_bitmap_enabled(bm)) {
++            error_setg(errp,
++                       "Enabled bitmap '%s' incompatible with readonly e=
+xport",
++                       bitmap);
++            goto fail;
++        }
++
++        if (bdrv_dirty_bitmap_user_locked(bm)) {
++            error_setg(errp, "Bitmap '%s' is in use", bitmap);
++            goto fail;
++        }
++
++        bdrv_dirty_bitmap_set_qmp_locked(bm, true);
++        exp->export_bitmap =3D bm;
++        exp->export_bitmap_context =3D g_strdup_printf("qemu:dirty-bitma=
+p:%s",
++                                                     bitmap);
++    }
++
+     exp->close =3D close;
+     exp->ctx =3D blk_get_aio_context(blk);
+     blk_add_aio_context_notifier(blk, blk_aio_attached, blk_aio_detach, =
+exp);
+@@ -2424,47 +2461,3 @@ void nbd_client_new(QIOChannelSocket *sioc,
+     co =3D qemu_coroutine_create(nbd_co_client_start, client);
+     qemu_coroutine_enter(co);
  }
 -
--void qmp_x_nbd_server_add_bitmap(const char *name, const char *bitmap,
--                                 bool has_bitmap_export_name,
--                                 const char *bitmap_export_name,
--                                 Error **errp)
+-void nbd_export_bitmap(NBDExport *exp, const char *bitmap,
+-                       const char *bitmap_export_name, Error **errp)
 -{
--    NBDExport *exp;
+-    BdrvDirtyBitmap *bm =3D NULL;
+-    BlockDriverState *bs =3D blk_bs(exp->blk);
 -
--    if (!nbd_server) {
--        error_setg(errp, "NBD server not running");
+-    if (exp->export_bitmap) {
+-        error_setg(errp, "Export bitmap is already set");
 -        return;
 -    }
 -
--    exp =3D nbd_export_find(name);
--    if (exp =3D=3D NULL) {
--        error_setg(errp, "Export '%s' is not found", name);
+-    while (true) {
+-        bm =3D bdrv_find_dirty_bitmap(bs, bitmap);
+-        if (bm !=3D NULL || bs->backing =3D=3D NULL) {
+-            break;
+-        }
+-
+-        bs =3D bs->backing->bs;
+-    }
+-
+-    if (bm =3D=3D NULL) {
+-        error_setg(errp, "Bitmap '%s' is not found", bitmap);
 -        return;
 -    }
 -
--    nbd_export_bitmap(exp, bitmap,
--                      has_bitmap_export_name ? bitmap_export_name : bitm=
-ap,
--                      errp);
+-    if ((exp->nbdflags & NBD_FLAG_READ_ONLY) && bdrv_is_writable(bs) &&
+-        bdrv_dirty_bitmap_enabled(bm)) {
+-        error_setg(errp,
+-                   "Enabled bitmap '%s' incompatible with readonly expor=
+t",
+-                   bitmap);
+-        return;
+-    }
+-
+-    if (bdrv_dirty_bitmap_user_locked(bm)) {
+-        error_setg(errp, "Bitmap '%s' is in use", bitmap);
+-        return;
+-    }
+-
+-    bdrv_dirty_bitmap_set_qmp_locked(bm, true);
+-    exp->export_bitmap =3D bm;
+-    exp->export_bitmap_context =3D
+-            g_strdup_printf("qemu:dirty-bitmap:%s", bitmap_export_name);
 -}
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index b93fa196dac..1552274c189 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -1016,8 +1016,9 @@ int main(int argc, char **argv)
+     }
+
+     export =3D nbd_export_new(bs, dev_offset, fd_size, export_name,
+-                            export_description, nbdflags, nbd_export_clo=
+sed,
+-                            writethrough, NULL, &error_fatal);
++                            export_description, NULL, nbdflags,
++                            nbd_export_closed, writethrough, NULL,
++                            &error_fatal);
+
+     if (device) {
+ #if HAVE_NBD_DEVICE
 --=20
 2.20.1
