@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47484)
+Received: from eggs.gnu.org ([209.51.188.92]:47492)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2mE-0007b1-Qy
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:45 -0500
+	id 1gj2mG-0007cI-8L
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2mC-000528-QW
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:42 -0500
-Received: from smtp03.citrix.com ([162.221.156.55]:1419)
+	id 1gj2mD-00052R-8U
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:44 -0500
+Received: from smtp03.citrix.com ([162.221.156.55]:1427)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=9106bec1f=anthony.perard@citrix.com>)
-	id 1gj2mB-0004zB-3c
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:40 -0500
+	id 1gj2mC-00050B-RR
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 08:59:41 -0500
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Mon, 14 Jan 2019 13:51:50 +0000
-Message-ID: <20190114135154.16826-22-anthony.perard@citrix.com>
+Date: Mon, 14 Jan 2019 13:51:49 +0000
+Message-ID: <20190114135154.16826-21-anthony.perard@citrix.com>
 In-Reply-To: <20190114135154.16826-1-anthony.perard@citrix.com>
 References: <20190114135154.16826-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 21/25] Remove broken Xen PV domain builder
+Subject: [Qemu-devel] [PULL 20/25] xen: remove the legacy 'xen_disk' backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,539 +33,1047 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>
 
-It is broken since Xen 4.9 [1] and it will not build in Xen 4.12. Also,
-it is not built by default since QEMU 2.6.
+From: Paul Durrant <paul.durrant@citrix.com>
 
-[1] https://lists.xenproject.org/archives/html/xen-devel/2018-09/msg00313.html
+This backend has now been replaced by the 'xen-qdisk' XenDevice.
 
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Acked-by: Anthony Perard <anthony.perard@citrix.com>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- configure                   |  17 --
- hw/xenpv/Makefile.objs      |   2 -
- hw/xenpv/xen_domainbuild.c  | 299 ------------------------------------
- hw/xenpv/xen_domainbuild.h  |  13 --
- hw/xenpv/xen_machine_pv.c   |  14 --
- include/hw/xen/xen.h        |   1 -
- include/hw/xen/xen_common.h |  18 ---
- qemu-options.hx             |   8 -
- vl.c                        |   7 -
- 9 files changed, 379 deletions(-)
- delete mode 100644 hw/xenpv/xen_domainbuild.c
- delete mode 100644 hw/xenpv/xen_domainbuild.h
+ hw/block/Makefile.objs |    1 -
+ hw/block/xen_disk.c    | 1011 ----------------------------------------
+ 2 files changed, 1012 deletions(-)
+ delete mode 100644 hw/block/xen_disk.c
 
-diff --git a/configure b/configure
-index 4ea3f14883..f992709b89 100755
---- a/configure
-+++ b/configure
-@@ -357,7 +357,6 @@ vnc_png=""
- xkbcommon=""
- xen=""
- xen_ctrl_version=""
--xen_pv_domain_build="no"
- xen_pci_passthrough=""
- linux_aio=""
- cap_ng=""
-@@ -1119,10 +1118,6 @@ for opt do
-   ;;
-   --enable-xen-pci-passthrough) xen_pci_passthrough="yes"
-   ;;
--  --disable-xen-pv-domain-build) xen_pv_domain_build="no"
--  ;;
--  --enable-xen-pv-domain-build) xen_pv_domain_build="yes"
--  ;;
-   --disable-brlapi) brlapi="no"
-   ;;
-   --enable-brlapi) brlapi="yes"
-@@ -1685,8 +1680,6 @@ Advanced options (experts only):
-   --tls-priority           default TLS protocol/cipher priority string
-   --enable-gprof           QEMU profiling with gprof
-   --enable-profiler        profiler support
--  --enable-xen-pv-domain-build
--                           xen pv domain builder
-   --enable-debug-stack-usage
-                            track the maximum stack usage of stacks created by qemu_alloc_stack
- 
-@@ -2678,12 +2671,6 @@ if test "$xen_pci_passthrough" != "no"; then
-   fi
- fi
- 
--if test "$xen_pv_domain_build" = "yes" &&
--   test "$xen" != "yes"; then
--    error_exit "User requested Xen PV domain builder support" \
--	       "which requires Xen support."
--fi
--
- ##########################################
- # Windows Hypervisor Platform accelerator (WHPX) check
- if test "$whpx" != "no" ; then
-@@ -6069,7 +6056,6 @@ fi
- echo "xen support       $xen"
- if test "$xen" = "yes" ; then
-   echo "xen ctrl version  $xen_ctrl_version"
--  echo "pv dom build      $xen_pv_domain_build"
- fi
- echo "brlapi support    $brlapi"
- echo "bluez  support    $bluez"
-@@ -6539,9 +6525,6 @@ fi
- if test "$xen" = "yes" ; then
-   echo "CONFIG_XEN_BACKEND=y" >> $config_host_mak
-   echo "CONFIG_XEN_CTRL_INTERFACE_VERSION=$xen_ctrl_version" >> $config_host_mak
--  if test "$xen_pv_domain_build" = "yes" ; then
--    echo "CONFIG_XEN_PV_DOMAIN_BUILD=y" >> $config_host_mak
--  fi
- fi
- if test "$linux_aio" = "yes" ; then
-   echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
-diff --git a/hw/xenpv/Makefile.objs b/hw/xenpv/Makefile.objs
-index bbf5873fd1..8bfa4586ab 100644
---- a/hw/xenpv/Makefile.objs
-+++ b/hw/xenpv/Makefile.objs
-@@ -1,4 +1,2 @@
- # Xen PV machine support
- obj-$(CONFIG_XEN) += xen_machine_pv.o
--# Xen PV machine builder support
--obj-$(CONFIG_XEN_PV_DOMAIN_BUILD) += xen_domainbuild.o
-diff --git a/hw/xenpv/xen_domainbuild.c b/hw/xenpv/xen_domainbuild.c
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index f34813a377..e206b8e712 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -5,7 +5,6 @@ common-obj-$(CONFIG_NAND) += nand.o
+ common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
+ common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
+ common-obj-$(CONFIG_XEN) += xen-block.o
+-common-obj-$(CONFIG_XEN) += xen_disk.o
+ common-obj-$(CONFIG_ECC) += ecc.o
+ common-obj-$(CONFIG_ONENAND) += onenand.o
+ common-obj-$(CONFIG_NVME_PCI) += nvme.o
+diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
 deleted file mode 100644
-index 1d9926e8d6..0000000000
---- a/hw/xenpv/xen_domainbuild.c
+index 477dfcca9f..0000000000
+--- a/hw/block/xen_disk.c
 +++ /dev/null
-@@ -1,299 +0,0 @@
+@@ -1,1011 +0,0 @@
+-/*
+- *  xen paravirt block device backend
+- *
+- *  (c) Gerd Hoffmann <kraxel@redhat.com>
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; under version 2 of the License.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License along
+- *  with this program; if not, see <http://www.gnu.org/licenses/>.
+- *
+- *  Contributions after 2012-01-13 are licensed under the terms of the
+- *  GNU GPL, version 2 or (at your option) any later version.
+- */
+-
 -#include "qemu/osdep.h"
 -#include "qemu/units.h"
+-#include <sys/ioctl.h>
+-#include <sys/uio.h>
+-
+-#include "hw/hw.h"
 -#include "hw/xen/xen-legacy-backend.h"
--#include "xen_domainbuild.h"
--#include "qemu/timer.h"
--#include "qemu/log.h"
+-#include "xen_blkif.h"
+-#include "sysemu/blockdev.h"
+-#include "sysemu/iothread.h"
+-#include "sysemu/block-backend.h"
+-#include "qapi/error.h"
+-#include "qapi/qmp/qdict.h"
+-#include "qapi/qmp/qstring.h"
+-#include "trace.h"
 -
--#include <xenguest.h>
+-/* ------------------------------------------------------------- */
 -
--static int xenstore_domain_mkdir(char *path)
+-#define BLOCK_SIZE  512
+-#define IOCB_COUNT  (BLKIF_MAX_SEGMENTS_PER_REQUEST + 2)
+-
+-struct ioreq {
+-    blkif_request_t     req;
+-    int16_t             status;
+-
+-    /* parsed request */
+-    off_t               start;
+-    QEMUIOVector        v;
+-    void                *buf;
+-    size_t              size;
+-    int                 presync;
+-
+-    /* aio status */
+-    int                 aio_inflight;
+-    int                 aio_errors;
+-
+-    struct XenBlkDev    *blkdev;
+-    QLIST_ENTRY(ioreq)   list;
+-    BlockAcctCookie     acct;
+-};
+-
+-#define MAX_RING_PAGE_ORDER 4
+-
+-struct XenBlkDev {
+-    struct XenLegacyDevice    xendev;  /* must be first */
+-    char                *params;
+-    char                *mode;
+-    char                *type;
+-    char                *dev;
+-    char                *devtype;
+-    bool                directiosafe;
+-    const char          *fileproto;
+-    const char          *filename;
+-    unsigned int        ring_ref[1 << MAX_RING_PAGE_ORDER];
+-    unsigned int        nr_ring_ref;
+-    void                *sring;
+-    int64_t             file_blk;
+-    int64_t             file_size;
+-    int                 protocol;
+-    blkif_back_rings_t  rings;
+-    int                 more_work;
+-
+-    /* request lists */
+-    QLIST_HEAD(, ioreq) inflight;
+-    QLIST_HEAD(, ioreq) finished;
+-    QLIST_HEAD(, ioreq) freelist;
+-    int                 requests_total;
+-    int                 requests_inflight;
+-    int                 requests_finished;
+-    unsigned int        max_requests;
+-
+-    gboolean            feature_discard;
+-
+-    /* qemu block driver */
+-    DriveInfo           *dinfo;
+-    BlockBackend        *blk;
+-    QEMUBH              *bh;
+-
+-    IOThread            *iothread;
+-    AioContext          *ctx;
+-};
+-
+-/* ------------------------------------------------------------- */
+-
+-static void ioreq_reset(struct ioreq *ioreq)
 -{
--    struct xs_permissions perms_ro[] = {{
--            .id    = 0, /* set owner: dom0 */
--        },{
--            .id    = xen_domid,
--            .perms = XS_PERM_READ,
--        }};
--    struct xs_permissions perms_rw[] = {{
--            .id    = 0, /* set owner: dom0 */
--        },{
--            .id    = xen_domid,
--            .perms = XS_PERM_READ | XS_PERM_WRITE,
--        }};
--    const char *writable[] = { "device", "control", "error", NULL };
--    char subpath[256];
+-    memset(&ioreq->req, 0, sizeof(ioreq->req));
+-    ioreq->status = 0;
+-    ioreq->start = 0;
+-    ioreq->buf = NULL;
+-    ioreq->size = 0;
+-    ioreq->presync = 0;
+-
+-    ioreq->aio_inflight = 0;
+-    ioreq->aio_errors = 0;
+-
+-    ioreq->blkdev = NULL;
+-    memset(&ioreq->list, 0, sizeof(ioreq->list));
+-    memset(&ioreq->acct, 0, sizeof(ioreq->acct));
+-
+-    qemu_iovec_reset(&ioreq->v);
+-}
+-
+-static struct ioreq *ioreq_start(struct XenBlkDev *blkdev)
+-{
+-    struct ioreq *ioreq = NULL;
+-
+-    if (QLIST_EMPTY(&blkdev->freelist)) {
+-        if (blkdev->requests_total >= blkdev->max_requests) {
+-            goto out;
+-        }
+-        /* allocate new struct */
+-        ioreq = g_malloc0(sizeof(*ioreq));
+-        ioreq->blkdev = blkdev;
+-        blkdev->requests_total++;
+-        qemu_iovec_init(&ioreq->v, 1);
+-    } else {
+-        /* get one from freelist */
+-        ioreq = QLIST_FIRST(&blkdev->freelist);
+-        QLIST_REMOVE(ioreq, list);
+-    }
+-    QLIST_INSERT_HEAD(&blkdev->inflight, ioreq, list);
+-    blkdev->requests_inflight++;
+-
+-out:
+-    return ioreq;
+-}
+-
+-static void ioreq_finish(struct ioreq *ioreq)
+-{
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-
+-    QLIST_REMOVE(ioreq, list);
+-    QLIST_INSERT_HEAD(&blkdev->finished, ioreq, list);
+-    blkdev->requests_inflight--;
+-    blkdev->requests_finished++;
+-}
+-
+-static void ioreq_release(struct ioreq *ioreq, bool finish)
+-{
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-
+-    QLIST_REMOVE(ioreq, list);
+-    ioreq_reset(ioreq);
+-    ioreq->blkdev = blkdev;
+-    QLIST_INSERT_HEAD(&blkdev->freelist, ioreq, list);
+-    if (finish) {
+-        blkdev->requests_finished--;
+-    } else {
+-        blkdev->requests_inflight--;
+-    }
+-}
+-
+-/*
+- * translate request into iovec + start offset
+- * do sanity checks along the way
+- */
+-static int ioreq_parse(struct ioreq *ioreq)
+-{
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-    struct XenLegacyDevice *xendev = &blkdev->xendev;
+-    size_t len;
 -    int i;
 -
--    if (!xs_mkdir(xenstore, 0, path)) {
--        fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, path);
--        return -1;
+-    xen_pv_printf(xendev, 3,
+-                  "op %d, nr %d, handle %d, id %" PRId64 ", sector %" PRId64 "\n",
+-                  ioreq->req.operation, ioreq->req.nr_segments,
+-                  ioreq->req.handle, ioreq->req.id, ioreq->req.sector_number);
+-    switch (ioreq->req.operation) {
+-    case BLKIF_OP_READ:
+-        break;
+-    case BLKIF_OP_FLUSH_DISKCACHE:
+-        ioreq->presync = 1;
+-        if (!ioreq->req.nr_segments) {
+-            return 0;
+-        }
+-        /* fall through */
+-    case BLKIF_OP_WRITE:
+-        break;
+-    case BLKIF_OP_DISCARD:
+-        return 0;
+-    default:
+-        xen_pv_printf(xendev, 0, "error: unknown operation (%d)\n",
+-                      ioreq->req.operation);
+-        goto err;
+-    };
+-
+-    if (ioreq->req.operation != BLKIF_OP_READ && blkdev->mode[0] != 'w') {
+-        xen_pv_printf(xendev, 0, "error: write req for ro device\n");
+-        goto err;
 -    }
--    if (!xs_set_permissions(xenstore, 0, path, perms_ro, 2)) {
--        fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
+-
+-    ioreq->start = ioreq->req.sector_number * blkdev->file_blk;
+-    for (i = 0; i < ioreq->req.nr_segments; i++) {
+-        if (i == BLKIF_MAX_SEGMENTS_PER_REQUEST) {
+-            xen_pv_printf(xendev, 0, "error: nr_segments too big\n");
+-            goto err;
+-        }
+-        if (ioreq->req.seg[i].first_sect > ioreq->req.seg[i].last_sect) {
+-            xen_pv_printf(xendev, 0, "error: first > last sector\n");
+-            goto err;
+-        }
+-        if (ioreq->req.seg[i].last_sect * BLOCK_SIZE >= XC_PAGE_SIZE) {
+-            xen_pv_printf(xendev, 0, "error: page crossing\n");
+-            goto err;
+-        }
+-
+-        len = (ioreq->req.seg[i].last_sect - ioreq->req.seg[i].first_sect + 1) * blkdev->file_blk;
+-        ioreq->size += len;
+-    }
+-    if (ioreq->start + ioreq->size > blkdev->file_size) {
+-        xen_pv_printf(xendev, 0, "error: access beyond end of file\n");
+-        goto err;
+-    }
+-    return 0;
+-
+-err:
+-    ioreq->status = BLKIF_RSP_ERROR;
+-    return -1;
+-}
+-
+-static int ioreq_grant_copy(struct ioreq *ioreq)
+-{
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-    struct XenLegacyDevice *xendev = &blkdev->xendev;
+-    XenGrantCopySegment segs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+-    int i, count, rc;
+-    int64_t file_blk = blkdev->file_blk;
+-    bool to_domain = (ioreq->req.operation == BLKIF_OP_READ);
+-    void *virt = ioreq->buf;
+-
+-    if (ioreq->req.nr_segments == 0) {
+-        return 0;
+-    }
+-
+-    count = ioreq->req.nr_segments;
+-
+-    for (i = 0; i < count; i++) {
+-        if (to_domain) {
+-            segs[i].dest.foreign.ref = ioreq->req.seg[i].gref;
+-            segs[i].dest.foreign.offset = ioreq->req.seg[i].first_sect * file_blk;
+-            segs[i].source.virt = virt;
+-        } else {
+-            segs[i].source.foreign.ref = ioreq->req.seg[i].gref;
+-            segs[i].source.foreign.offset = ioreq->req.seg[i].first_sect * file_blk;
+-            segs[i].dest.virt = virt;
+-        }
+-        segs[i].len = (ioreq->req.seg[i].last_sect
+-                       - ioreq->req.seg[i].first_sect + 1) * file_blk;
+-        virt += segs[i].len;
+-    }
+-
+-    rc = xen_be_copy_grant_refs(xendev, to_domain, segs, count);
+-
+-    if (rc) {
+-        xen_pv_printf(xendev, 0,
+-                      "failed to copy data %d\n", rc);
+-        ioreq->aio_errors++;
 -        return -1;
 -    }
 -
--    for (i = 0; writable[i]; i++) {
--        snprintf(subpath, sizeof(subpath), "%s/%s", path, writable[i]);
--        if (!xs_mkdir(xenstore, 0, subpath)) {
--            fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, subpath);
--            return -1;
--        }
--        if (!xs_set_permissions(xenstore, 0, subpath, perms_rw, 2)) {
--            fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
--            return -1;
--        }
+-    return rc;
+-}
+-
+-static int ioreq_runio_qemu_aio(struct ioreq *ioreq);
+-
+-static void qemu_aio_complete(void *opaque, int ret)
+-{
+-    struct ioreq *ioreq = opaque;
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-    struct XenLegacyDevice *xendev = &blkdev->xendev;
+-
+-    aio_context_acquire(blkdev->ctx);
+-
+-    if (ret != 0) {
+-        xen_pv_printf(xendev, 0, "%s I/O error\n",
+-                      ioreq->req.operation == BLKIF_OP_READ ? "read" : "write");
+-        ioreq->aio_errors++;
 -    }
+-
+-    ioreq->aio_inflight--;
+-    if (ioreq->presync) {
+-        ioreq->presync = 0;
+-        ioreq_runio_qemu_aio(ioreq);
+-        goto done;
+-    }
+-    if (ioreq->aio_inflight > 0) {
+-        goto done;
+-    }
+-
+-    switch (ioreq->req.operation) {
+-    case BLKIF_OP_READ:
+-        /* in case of failure ioreq->aio_errors is increased */
+-        if (ret == 0) {
+-            ioreq_grant_copy(ioreq);
+-        }
+-        qemu_vfree(ioreq->buf);
+-        break;
+-    case BLKIF_OP_WRITE:
+-    case BLKIF_OP_FLUSH_DISKCACHE:
+-        if (!ioreq->req.nr_segments) {
+-            break;
+-        }
+-        qemu_vfree(ioreq->buf);
+-        break;
+-    default:
+-        break;
+-    }
+-
+-    ioreq->status = ioreq->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
+-    ioreq_finish(ioreq);
+-
+-    switch (ioreq->req.operation) {
+-    case BLKIF_OP_WRITE:
+-    case BLKIF_OP_FLUSH_DISKCACHE:
+-        if (!ioreq->req.nr_segments) {
+-            break;
+-        }
+-    case BLKIF_OP_READ:
+-        if (ioreq->status == BLKIF_RSP_OKAY) {
+-            block_acct_done(blk_get_stats(blkdev->blk), &ioreq->acct);
+-        } else {
+-            block_acct_failed(blk_get_stats(blkdev->blk), &ioreq->acct);
+-        }
+-        break;
+-    case BLKIF_OP_DISCARD:
+-    default:
+-        break;
+-    }
+-    qemu_bh_schedule(blkdev->bh);
+-
+-done:
+-    aio_context_release(blkdev->ctx);
+-}
+-
+-static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t sector_number,
+-                              uint64_t nr_sectors)
+-{
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-    int64_t byte_offset;
+-    int byte_chunk;
+-    uint64_t byte_remaining, limit;
+-    uint64_t sec_start = sector_number;
+-    uint64_t sec_count = nr_sectors;
+-
+-    /* Wrap around, or overflowing byte limit? */
+-    if (sec_start + sec_count < sec_count ||
+-        sec_start + sec_count > INT64_MAX >> BDRV_SECTOR_BITS) {
+-        return false;
+-    }
+-
+-    limit = BDRV_REQUEST_MAX_SECTORS << BDRV_SECTOR_BITS;
+-    byte_offset = sec_start << BDRV_SECTOR_BITS;
+-    byte_remaining = sec_count << BDRV_SECTOR_BITS;
+-
+-    do {
+-        byte_chunk = byte_remaining > limit ? limit : byte_remaining;
+-        ioreq->aio_inflight++;
+-        blk_aio_pdiscard(blkdev->blk, byte_offset, byte_chunk,
+-                         qemu_aio_complete, ioreq);
+-        byte_remaining -= byte_chunk;
+-        byte_offset += byte_chunk;
+-    } while (byte_remaining > 0);
+-
+-    return true;
+-}
+-
+-static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+-{
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-
+-    ioreq->buf = qemu_memalign(XC_PAGE_SIZE, ioreq->size);
+-    if (ioreq->req.nr_segments &&
+-        (ioreq->req.operation == BLKIF_OP_WRITE ||
+-         ioreq->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
+-        ioreq_grant_copy(ioreq)) {
+-        qemu_vfree(ioreq->buf);
+-        goto err;
+-    }
+-
+-    ioreq->aio_inflight++;
+-    if (ioreq->presync) {
+-        blk_aio_flush(ioreq->blkdev->blk, qemu_aio_complete, ioreq);
+-        return 0;
+-    }
+-
+-    switch (ioreq->req.operation) {
+-    case BLKIF_OP_READ:
+-        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
+-        block_acct_start(blk_get_stats(blkdev->blk), &ioreq->acct,
+-                         ioreq->v.size, BLOCK_ACCT_READ);
+-        ioreq->aio_inflight++;
+-        blk_aio_preadv(blkdev->blk, ioreq->start, &ioreq->v, 0,
+-                       qemu_aio_complete, ioreq);
+-        break;
+-    case BLKIF_OP_WRITE:
+-    case BLKIF_OP_FLUSH_DISKCACHE:
+-        if (!ioreq->req.nr_segments) {
+-            break;
+-        }
+-
+-        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
+-        block_acct_start(blk_get_stats(blkdev->blk), &ioreq->acct,
+-                         ioreq->v.size,
+-                         ioreq->req.operation == BLKIF_OP_WRITE ?
+-                         BLOCK_ACCT_WRITE : BLOCK_ACCT_FLUSH);
+-        ioreq->aio_inflight++;
+-        blk_aio_pwritev(blkdev->blk, ioreq->start, &ioreq->v, 0,
+-                        qemu_aio_complete, ioreq);
+-        break;
+-    case BLKIF_OP_DISCARD:
+-    {
+-        struct blkif_request_discard *req = (void *)&ioreq->req;
+-        if (!blk_split_discard(ioreq, req->sector_number, req->nr_sectors)) {
+-            goto err;
+-        }
+-        break;
+-    }
+-    default:
+-        /* unknown operation (shouldn't happen -- parse catches this) */
+-        goto err;
+-    }
+-
+-    qemu_aio_complete(ioreq, 0);
+-
+-    return 0;
+-
+-err:
+-    ioreq_finish(ioreq);
+-    ioreq->status = BLKIF_RSP_ERROR;
+-    return -1;
+-}
+-
+-static int blk_send_response_one(struct ioreq *ioreq)
+-{
+-    struct XenBlkDev  *blkdev = ioreq->blkdev;
+-    int               send_notify   = 0;
+-    int               have_requests = 0;
+-    blkif_response_t  *resp;
+-
+-    /* Place on the response ring for the relevant domain. */
+-    switch (blkdev->protocol) {
+-    case BLKIF_PROTOCOL_NATIVE:
+-        resp = (blkif_response_t *) RING_GET_RESPONSE(&blkdev->rings.native,
+-                                 blkdev->rings.native.rsp_prod_pvt);
+-        break;
+-    case BLKIF_PROTOCOL_X86_32:
+-        resp = (blkif_response_t *) RING_GET_RESPONSE(&blkdev->rings.x86_32_part,
+-                                 blkdev->rings.x86_32_part.rsp_prod_pvt);
+-        break;
+-    case BLKIF_PROTOCOL_X86_64:
+-        resp = (blkif_response_t *) RING_GET_RESPONSE(&blkdev->rings.x86_64_part,
+-                                 blkdev->rings.x86_64_part.rsp_prod_pvt);
+-        break;
+-    default:
+-        return 0;
+-    }
+-
+-    resp->id        = ioreq->req.id;
+-    resp->operation = ioreq->req.operation;
+-    resp->status    = ioreq->status;
+-
+-    blkdev->rings.common.rsp_prod_pvt++;
+-
+-    RING_PUSH_RESPONSES_AND_CHECK_NOTIFY(&blkdev->rings.common, send_notify);
+-    if (blkdev->rings.common.rsp_prod_pvt == blkdev->rings.common.req_cons) {
+-        /*
+-         * Tail check for pending requests. Allows frontend to avoid
+-         * notifications if requests are already in flight (lower
+-         * overheads and promotes batching).
+-         */
+-        RING_FINAL_CHECK_FOR_REQUESTS(&blkdev->rings.common, have_requests);
+-    } else if (RING_HAS_UNCONSUMED_REQUESTS(&blkdev->rings.common)) {
+-        have_requests = 1;
+-    }
+-
+-    if (have_requests) {
+-        blkdev->more_work++;
+-    }
+-    return send_notify;
+-}
+-
+-/* walk finished list, send outstanding responses, free requests */
+-static void blk_send_response_all(struct XenBlkDev *blkdev)
+-{
+-    struct ioreq *ioreq;
+-    int send_notify = 0;
+-
+-    while (!QLIST_EMPTY(&blkdev->finished)) {
+-        ioreq = QLIST_FIRST(&blkdev->finished);
+-        send_notify += blk_send_response_one(ioreq);
+-        ioreq_release(ioreq, true);
+-    }
+-    if (send_notify) {
+-        xen_pv_send_notify(&blkdev->xendev);
+-    }
+-}
+-
+-static int blk_get_request(struct XenBlkDev *blkdev, struct ioreq *ioreq, RING_IDX rc)
+-{
+-    switch (blkdev->protocol) {
+-    case BLKIF_PROTOCOL_NATIVE:
+-        memcpy(&ioreq->req, RING_GET_REQUEST(&blkdev->rings.native, rc),
+-               sizeof(ioreq->req));
+-        break;
+-    case BLKIF_PROTOCOL_X86_32:
+-        blkif_get_x86_32_req(&ioreq->req,
+-                             RING_GET_REQUEST(&blkdev->rings.x86_32_part, rc));
+-        break;
+-    case BLKIF_PROTOCOL_X86_64:
+-        blkif_get_x86_64_req(&ioreq->req,
+-                             RING_GET_REQUEST(&blkdev->rings.x86_64_part, rc));
+-        break;
+-    }
+-    /* Prevent the compiler from accessing the on-ring fields instead. */
+-    barrier();
 -    return 0;
 -}
 -
--int xenstore_domain_init1(const char *kernel, const char *ramdisk,
--                          const char *cmdline)
+-static void blk_handle_requests(struct XenBlkDev *blkdev)
 -{
--    char *dom, uuid_string[42], vm[256], path[256];
--    int i;
+-    RING_IDX rc, rp;
+-    struct ioreq *ioreq;
 -
--    qemu_uuid_unparse(&qemu_uuid, uuid_string);
--    dom = xs_get_domain_path(xenstore, xen_domid);
--    snprintf(vm,  sizeof(vm),  "/vm/%s", uuid_string);
+-    blkdev->more_work = 0;
 -
--    xenstore_domain_mkdir(dom);
+-    rc = blkdev->rings.common.req_cons;
+-    rp = blkdev->rings.common.sring->req_prod;
+-    xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
 -
--    xenstore_write_str(vm, "image/ostype",  "linux");
--    if (kernel)
--        xenstore_write_str(vm, "image/kernel",  kernel);
--    if (ramdisk)
--        xenstore_write_str(vm, "image/ramdisk", ramdisk);
--    if (cmdline)
--        xenstore_write_str(vm, "image/cmdline", cmdline);
+-    blk_send_response_all(blkdev);
+-    while (rc != rp) {
+-        /* pull request from ring */
+-        if (RING_REQUEST_CONS_OVERFLOW(&blkdev->rings.common, rc)) {
+-            break;
+-        }
+-        ioreq = ioreq_start(blkdev);
+-        if (ioreq == NULL) {
+-            blkdev->more_work++;
+-            break;
+-        }
+-        blk_get_request(blkdev, ioreq, rc);
+-        blkdev->rings.common.req_cons = ++rc;
 -
--    /* name + id */
--    xenstore_write_str(vm,  "name",   qemu_name ? qemu_name : "no-name");
--    xenstore_write_str(vm,  "uuid",   uuid_string);
--    xenstore_write_str(dom, "name",   qemu_name ? qemu_name : "no-name");
--    xenstore_write_int(dom, "domid",  xen_domid);
--    xenstore_write_str(dom, "vm",     vm);
+-        /* parse them */
+-        if (ioreq_parse(ioreq) != 0) {
 -
--    /* memory */
--    xenstore_write_int(dom, "memory/target", ram_size / KiB);
--    xenstore_write_int(vm, "memory",         ram_size / MiB);
--    xenstore_write_int(vm, "maxmem",         ram_size / MiB);
+-            switch (ioreq->req.operation) {
+-            case BLKIF_OP_READ:
+-                block_acct_invalid(blk_get_stats(blkdev->blk),
+-                                   BLOCK_ACCT_READ);
+-                break;
+-            case BLKIF_OP_WRITE:
+-                block_acct_invalid(blk_get_stats(blkdev->blk),
+-                                   BLOCK_ACCT_WRITE);
+-                break;
+-            case BLKIF_OP_FLUSH_DISKCACHE:
+-                block_acct_invalid(blk_get_stats(blkdev->blk),
+-                                   BLOCK_ACCT_FLUSH);
+-            default:
+-                break;
+-            };
 -
--    /* cpus */
--    for (i = 0; i < smp_cpus; i++) {
--        snprintf(path, sizeof(path), "cpu/%d/availability",i);
--        xenstore_write_str(dom, path, "online");
+-            if (blk_send_response_one(ioreq)) {
+-                xen_pv_send_notify(&blkdev->xendev);
+-            }
+-            ioreq_release(ioreq, false);
+-            continue;
+-        }
+-
+-        ioreq_runio_qemu_aio(ioreq);
 -    }
--    xenstore_write_int(vm, "vcpu_avail",  smp_cpus);
--    xenstore_write_int(vm, "vcpus",       smp_cpus);
 -
--    /* vnc password */
--    xenstore_write_str(vm, "vncpassword", "" /* FIXME */);
--
--    free(dom);
--    return 0;
--}
--
--int xenstore_domain_init2(int xenstore_port, int xenstore_mfn,
--                          int console_port, int console_mfn)
--{
--    char *dom;
--
--    dom = xs_get_domain_path(xenstore, xen_domid);
--
--    /* signal new domain */
--    xs_introduce_domain(xenstore,
--                        xen_domid,
--                        xenstore_mfn,
--                        xenstore_port);
--
--    /* xenstore */
--    xenstore_write_int(dom, "store/ring-ref",   xenstore_mfn);
--    xenstore_write_int(dom, "store/port",       xenstore_port);
--
--    /* console */
--    xenstore_write_str(dom, "console/type",     "ioemu");
--    xenstore_write_int(dom, "console/limit",    128 * KiB);
--    xenstore_write_int(dom, "console/ring-ref", console_mfn);
--    xenstore_write_int(dom, "console/port",     console_port);
--    xen_config_dev_console(0);
--
--    free(dom);
--    return 0;
+-    if (blkdev->more_work && blkdev->requests_inflight < blkdev->max_requests) {
+-        qemu_bh_schedule(blkdev->bh);
+-    }
 -}
 -
 -/* ------------------------------------------------------------- */
 -
--static QEMUTimer *xen_poll;
--
--/* check domain state once per second */
--static void xen_domain_poll(void *opaque)
+-static void blk_bh(void *opaque)
 -{
--    struct xc_dominfo info;
--    int rc;
+-    struct XenBlkDev *blkdev = opaque;
 -
--    rc = xc_domain_getinfo(xen_xc, xen_domid, 1, &info);
--    if ((rc != 1) || (info.domid != xen_domid)) {
--        qemu_log("xen: domain %d is gone\n", xen_domid);
--        goto quit;
--    }
--    if (info.dying) {
--        qemu_log("xen: domain %d is dying (%s%s)\n", xen_domid,
--                 info.crashed  ? "crashed"  : "",
--                 info.shutdown ? "shutdown" : "");
--        goto quit;
--    }
--
--    timer_mod(xen_poll, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 1000);
--    return;
--
--quit:
--    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+-    aio_context_acquire(blkdev->ctx);
+-    blk_handle_requests(blkdev);
+-    aio_context_release(blkdev->ctx);
 -}
 -
--static int xen_domain_watcher(void)
+-static void blk_alloc(struct XenLegacyDevice *xendev)
 -{
--    int qemu_running = 1;
--    int fd[2], i, n, rc;
--    char byte;
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-    Error *err = NULL;
 -
--    if (pipe(fd) != 0) {
--        qemu_log("%s: Huh? pipe error: %s\n", __func__, strerror(errno));
--        return -1;
+-    trace_xen_disk_alloc(xendev->name);
+-
+-    QLIST_INIT(&blkdev->inflight);
+-    QLIST_INIT(&blkdev->finished);
+-    QLIST_INIT(&blkdev->freelist);
+-
+-    blkdev->iothread = iothread_create(xendev->name, &err);
+-    assert(!err);
+-
+-    blkdev->ctx = iothread_get_aio_context(blkdev->iothread);
+-    blkdev->bh = aio_bh_new(blkdev->ctx, blk_bh, blkdev);
+-}
+-
+-static void blk_parse_discard(struct XenBlkDev *blkdev)
+-{
+-    struct XenLegacyDevice *xendev = &blkdev->xendev;
+-    int enable;
+-
+-    blkdev->feature_discard = true;
+-
+-    if (xenstore_read_be_int(xendev, "discard-enable", &enable) == 0) {
+-        blkdev->feature_discard = !!enable;
 -    }
--    if (fork() != 0)
--        return 0; /* not child */
 -
--    /* close all file handles, except stdio/out/err,
--     * our watch pipe and the xen interface handle */
--    n = getdtablesize();
--    for (i = 3; i < n; i++) {
--        if (i == fd[0])
--            continue;
--        close(i);
+-    if (blkdev->feature_discard) {
+-        xenstore_write_be_int(xendev, "feature-discard", 1);
 -    }
+-}
 -
--    /*
--     * Reopen xc interface, since the original is unsafe after fork
--     * and was closed above.
--     */
--    xen_xc = xc_interface_open(0, 0, 0);
+-static int blk_init(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-    int info = 0;
+-    char *directiosafe = NULL;
 -
--    /* ignore term signals */
--    signal(SIGINT,  SIG_IGN);
--    signal(SIGTERM, SIG_IGN);
+-    trace_xen_disk_init(xendev->name);
 -
--    /* wait for qemu exiting */
--    while (qemu_running) {
--        rc = read(fd[0], &byte, 1);
--        switch (rc) {
--        case -1:
--            if (errno == EINTR)
--                continue;
--            qemu_log("%s: Huh? read error: %s\n", __func__, strerror(errno));
--            qemu_running = 0;
--            break;
--        case 0:
--            /* EOF -> qemu exited */
--            qemu_running = 0;
--            break;
--        default:
--            qemu_log("%s: Huh? data on the watch pipe?\n", __func__);
--            break;
+-    /* read xenstore entries */
+-    if (blkdev->params == NULL) {
+-        char *h = NULL;
+-        blkdev->params = xenstore_read_be_str(xendev, "params");
+-        if (blkdev->params != NULL) {
+-            h = strchr(blkdev->params, ':');
+-        }
+-        if (h != NULL) {
+-            blkdev->fileproto = blkdev->params;
+-            blkdev->filename  = h+1;
+-            *h = 0;
+-        } else {
+-            blkdev->fileproto = "<unset>";
+-            blkdev->filename  = blkdev->params;
 -        }
 -    }
--
--    /* cleanup */
--    qemu_log("%s: destroy domain %d\n", __func__, xen_domid);
--    xc_domain_destroy(xen_xc, xen_domid);
--    _exit(0);
--}
--
--/* normal cleanup */
--static void xen_domain_cleanup(void)
--{
--    char *dom;
--
--    dom = xs_get_domain_path(xenstore, xen_domid);
--    if (dom) {
--        xs_rm(xenstore, 0, dom);
--        free(dom);
+-    if (!strcmp("aio", blkdev->fileproto)) {
+-        blkdev->fileproto = "raw";
 -    }
--    xs_release_domain(xenstore, xen_domid);
--}
--
--int xen_domain_build_pv(const char *kernel, const char *ramdisk,
--                        const char *cmdline)
--{
--    uint32_t ssidref = 0;
--    uint32_t flags = 0;
--    xen_domain_handle_t uuid;
--    unsigned int xenstore_port = 0, console_port = 0;
--    unsigned long xenstore_mfn = 0, console_mfn = 0;
--    int rc;
--
--    memcpy(uuid, &qemu_uuid, sizeof(uuid));
--    rc = xen_domain_create(xen_xc, ssidref, uuid, flags, &xen_domid);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_create() failed\n");
--        goto err;
+-    if (!strcmp("vhd", blkdev->fileproto)) {
+-        blkdev->fileproto = "vpc";
 -    }
--    qemu_log("xen: created domain %d\n", xen_domid);
--    atexit(xen_domain_cleanup);
--    if (xen_domain_watcher() == -1) {
--        goto err;
+-    if (blkdev->mode == NULL) {
+-        blkdev->mode = xenstore_read_be_str(xendev, "mode");
+-    }
+-    if (blkdev->type == NULL) {
+-        blkdev->type = xenstore_read_be_str(xendev, "type");
+-    }
+-    if (blkdev->dev == NULL) {
+-        blkdev->dev = xenstore_read_be_str(xendev, "dev");
+-    }
+-    if (blkdev->devtype == NULL) {
+-        blkdev->devtype = xenstore_read_be_str(xendev, "device-type");
+-    }
+-    directiosafe = xenstore_read_be_str(xendev, "direct-io-safe");
+-    blkdev->directiosafe = (directiosafe && atoi(directiosafe));
+-
+-    /* do we have all we need? */
+-    if (blkdev->params == NULL ||
+-        blkdev->mode == NULL   ||
+-        blkdev->type == NULL   ||
+-        blkdev->dev == NULL) {
+-        goto out_error;
 -    }
 -
--    xenstore_domain_init1(kernel, ramdisk, cmdline);
--
--    rc = xc_domain_max_vcpus(xen_xc, xen_domid, smp_cpus);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_max_vcpus() failed\n");
--        goto err;
+-    /* read-only ? */
+-    if (strcmp(blkdev->mode, "w")) {
+-        info  |= VDISK_READONLY;
 -    }
 -
--#if 0
--    rc = xc_domain_setcpuweight(xen_xc, xen_domid, 256);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_setcpuweight() failed\n");
--        goto err;
--    }
--#endif
--
--    rc = xc_domain_setmaxmem(xen_xc, xen_domid, ram_size / KiB);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_setmaxmem() failed\n");
--        goto err;
+-    /* cdrom ? */
+-    if (blkdev->devtype && !strcmp(blkdev->devtype, "cdrom")) {
+-        info  |= VDISK_CDROM;
 -    }
 -
--    xenstore_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
--    console_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
+-    blkdev->file_blk  = BLOCK_SIZE;
 -
--    rc = xc_linux_build(xen_xc, xen_domid, ram_size / MiB,
--                        kernel, ramdisk, cmdline,
--                        0, flags,
--                        xenstore_port, &xenstore_mfn,
--                        console_port, &console_mfn);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_linux_build() failed\n");
--        goto err;
--    }
+-    /* fill info
+-     * blk_connect supplies sector-size and sectors
+-     */
+-    xenstore_write_be_int(xendev, "feature-flush-cache", 1);
+-    xenstore_write_be_int(xendev, "info", info);
 -
--    xenstore_domain_init2(xenstore_port, xenstore_mfn,
--                          console_port, console_mfn);
+-    xenstore_write_be_int(xendev, "max-ring-page-order",
+-                          MAX_RING_PAGE_ORDER);
 -
--    qemu_log("xen: unpausing domain %d\n", xen_domid);
--    rc = xc_domain_unpause(xen_xc, xen_domid);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_unpause() failed\n");
--        goto err;
--    }
+-    blk_parse_discard(blkdev);
 -
--    xen_poll = timer_new_ms(QEMU_CLOCK_REALTIME, xen_domain_poll, NULL);
--    timer_mod(xen_poll, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 1000);
+-    g_free(directiosafe);
 -    return 0;
 -
--err:
+-out_error:
+-    g_free(blkdev->params);
+-    blkdev->params = NULL;
+-    g_free(blkdev->mode);
+-    blkdev->mode = NULL;
+-    g_free(blkdev->type);
+-    blkdev->type = NULL;
+-    g_free(blkdev->dev);
+-    blkdev->dev = NULL;
+-    g_free(blkdev->devtype);
+-    blkdev->devtype = NULL;
+-    g_free(directiosafe);
+-    blkdev->directiosafe = false;
 -    return -1;
 -}
-diff --git a/hw/xenpv/xen_domainbuild.h b/hw/xenpv/xen_domainbuild.h
-deleted file mode 100644
-index 652d9b410f..0000000000
---- a/hw/xenpv/xen_domainbuild.h
-+++ /dev/null
-@@ -1,13 +0,0 @@
--#ifndef QEMU_HW_XEN_DOMAINBUILD_H
--#define QEMU_HW_XEN_DOMAINBUILD_H
 -
--#include "hw/xen/xen_common.h"
+-static int blk_connect(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-    int index, qflags;
+-    bool readonly = true;
+-    bool writethrough = true;
+-    int order, ring_ref;
+-    unsigned int ring_size, max_grants;
+-    unsigned int i;
 -
--int xenstore_domain_init1(const char *kernel, const char *ramdisk,
--                          const char *cmdline);
--int xenstore_domain_init2(int xenstore_port, int xenstore_mfn,
--                          int console_port, int console_mfn);
--int xen_domain_build_pv(const char *kernel, const char *ramdisk,
--                        const char *cmdline);
+-    trace_xen_disk_connect(xendev->name);
 -
--#endif /* QEMU_HW_XEN_DOMAINBUILD_H */
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 608e591bcc..8d68fef25e 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -28,7 +28,6 @@
- #include "hw/boards.h"
- #include "hw/xen/xen-legacy-backend.h"
- #include "hw/xen/xen-bus.h"
--#include "xen_domainbuild.h"
- #include "sysemu/block-backend.h"
- 
- static void xen_init_pv(MachineState *machine)
-@@ -46,19 +45,6 @@ static void xen_init_pv(MachineState *machine)
-     case XEN_ATTACH:
-         /* nothing to do, xend handles everything */
-         break;
--#ifdef CONFIG_XEN_PV_DOMAIN_BUILD
--    case XEN_CREATE: {
--        const char *kernel_filename = machine->kernel_filename;
--        const char *kernel_cmdline = machine->kernel_cmdline;
--        const char *initrd_filename = machine->initrd_filename;
--        if (xen_domain_build_pv(kernel_filename, initrd_filename,
--                                kernel_cmdline) < 0) {
--            error_report("xen pv domain creation failed");
--            exit(1);
+-    /* read-only ? */
+-    if (blkdev->directiosafe) {
+-        qflags = BDRV_O_NOCACHE | BDRV_O_NATIVE_AIO;
+-    } else {
+-        qflags = 0;
+-        writethrough = false;
+-    }
+-    if (strcmp(blkdev->mode, "w") == 0) {
+-        qflags |= BDRV_O_RDWR;
+-        readonly = false;
+-    }
+-    if (blkdev->feature_discard) {
+-        qflags |= BDRV_O_UNMAP;
+-    }
+-
+-    /* init qemu block driver */
+-    index = (xendev->dev - 202 * 256) / 16;
+-    blkdev->dinfo = drive_get(IF_XEN, 0, index);
+-    if (!blkdev->dinfo) {
+-        Error *local_err = NULL;
+-        QDict *options = NULL;
+-
+-        if (strcmp(blkdev->fileproto, "<unset>")) {
+-            options = qdict_new();
+-            qdict_put_str(options, "driver", blkdev->fileproto);
 -        }
+-
+-        /* setup via xenbus -> create new block driver instance */
+-        xen_pv_printf(xendev, 2, "create new bdrv (xenbus setup)\n");
+-        blkdev->blk = blk_new_open(blkdev->filename, NULL, options,
+-                                   qflags, &local_err);
+-        if (!blkdev->blk) {
+-            xen_pv_printf(xendev, 0, "error: %s\n",
+-                          error_get_pretty(local_err));
+-            error_free(local_err);
+-            return -1;
+-        }
+-        blk_set_enable_write_cache(blkdev->blk, !writethrough);
+-    } else {
+-        /* setup via qemu cmdline -> already setup for us */
+-        xen_pv_printf(xendev, 2,
+-                      "get configured bdrv (cmdline setup)\n");
+-        blkdev->blk = blk_by_legacy_dinfo(blkdev->dinfo);
+-        if (blk_is_read_only(blkdev->blk) && !readonly) {
+-            xen_pv_printf(xendev, 0, "Unexpected read-only drive");
+-            blkdev->blk = NULL;
+-            return -1;
+-        }
+-        /* blkdev->blk is not create by us, we get a reference
+-         * so we can blk_unref() unconditionally */
+-        blk_ref(blkdev->blk);
+-    }
+-    blk_attach_dev_legacy(blkdev->blk, blkdev);
+-    blkdev->file_size = blk_getlength(blkdev->blk);
+-    if (blkdev->file_size < 0) {
+-        BlockDriverState *bs = blk_bs(blkdev->blk);
+-        const char *drv_name = bs ? bdrv_get_format_name(bs) : NULL;
+-        xen_pv_printf(xendev, 1, "blk_getlength: %d (%s) | drv %s\n",
+-                      (int)blkdev->file_size, strerror(-blkdev->file_size),
+-                      drv_name ?: "-");
+-        blkdev->file_size = 0;
+-    }
+-
+-    xen_pv_printf(xendev, 1, "type \"%s\", fileproto \"%s\", filename \"%s\","
+-                  " size %" PRId64 " (%" PRId64 " MB)\n",
+-                  blkdev->type, blkdev->fileproto, blkdev->filename,
+-                  blkdev->file_size, blkdev->file_size / MiB);
+-
+-    /* Fill in number of sector size and number of sectors */
+-    xenstore_write_be_int(xendev, "sector-size", blkdev->file_blk);
+-    xenstore_write_be_int64(xendev, "sectors",
+-                            blkdev->file_size / blkdev->file_blk);
+-
+-    if (xenstore_read_fe_int(xendev, "ring-page-order",
+-                             &order) == -1) {
+-        blkdev->nr_ring_ref = 1;
+-
+-        if (xenstore_read_fe_int(xendev, "ring-ref",
+-                                 &ring_ref) == -1) {
+-            return -1;
+-        }
+-        blkdev->ring_ref[0] = ring_ref;
+-
+-    } else if (order >= 0 && order <= MAX_RING_PAGE_ORDER) {
+-        blkdev->nr_ring_ref = 1 << order;
+-
+-        for (i = 0; i < blkdev->nr_ring_ref; i++) {
+-            char *key;
+-
+-            key = g_strdup_printf("ring-ref%u", i);
+-            if (!key) {
+-                return -1;
+-            }
+-
+-            if (xenstore_read_fe_int(xendev, key,
+-                                     &ring_ref) == -1) {
+-                g_free(key);
+-                return -1;
+-            }
+-            blkdev->ring_ref[i] = ring_ref;
+-
+-            g_free(key);
+-        }
+-    } else {
+-        xen_pv_printf(xendev, 0, "invalid ring-page-order: %d\n",
+-                      order);
+-        return -1;
+-    }
+-
+-    if (xenstore_read_fe_int(xendev, "event-channel",
+-                             &xendev->remote_port) == -1) {
+-        return -1;
+-    }
+-
+-    if (!xendev->protocol) {
+-        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+-    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_NATIVE) == 0) {
+-        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+-    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_32) == 0) {
+-        blkdev->protocol = BLKIF_PROTOCOL_X86_32;
+-    } else if (strcmp(xendev->protocol, XEN_IO_PROTO_ABI_X86_64) == 0) {
+-        blkdev->protocol = BLKIF_PROTOCOL_X86_64;
+-    } else {
+-        blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+-    }
+-
+-    ring_size = XC_PAGE_SIZE * blkdev->nr_ring_ref;
+-    switch (blkdev->protocol) {
+-    case BLKIF_PROTOCOL_NATIVE:
+-    {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif, ring_size);
 -        break;
 -    }
--#endif
-     case XEN_EMULATE:
-         error_report("xen emulation not implemented (yet)");
-         exit(1);
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index 7efcdaa8fe..978aaa31fb 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -15,7 +15,6 @@
- /* xen-machine.c */
- enum xen_mode {
-     XEN_EMULATE = 0,  // xen emulation, using xenner (default)
--    XEN_CREATE,       // create xen domain
-     XEN_ATTACH        // attach to xen domain created by xend
- };
- 
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 9c3ac07d78..9a8155e172 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -662,24 +662,6 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
- 
- #endif
- 
--#ifdef CONFIG_XEN_PV_DOMAIN_BUILD
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40700
--static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
--                                    xen_domain_handle_t handle, uint32_t flags,
--                                    uint32_t *pdomid)
--{
--    return xc_domain_create(xc, ssidref, handle, flags, pdomid);
--}
--#else
--static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
--                                    xen_domain_handle_t handle, uint32_t flags,
--                                    uint32_t *pdomid)
--{
--    return xc_domain_create(xc, ssidref, handle, flags, pdomid, NULL);
--}
--#endif
--#endif
+-    case BLKIF_PROTOCOL_X86_32:
+-    {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_32, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_64:
+-    {
+-        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_64, ring_size);
+-        break;
+-    }
+-    default:
+-        return -1;
+-    }
 -
- /* Xen before 4.8 */
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40800
-diff --git a/qemu-options.hx b/qemu-options.hx
-index d4f3564b78..7c323c9406 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3394,10 +3394,6 @@ ETEXI
- 
- DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
-     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
--DEF("xen-create", 0, QEMU_OPTION_xen_create,
--    "-xen-create     create domain using xen hypercalls, bypassing xend\n"
--    "                warning: should not be used when xend is in use\n",
--    QEMU_ARCH_ALL)
- DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
-     "-xen-attach     attach to existing xen domain\n"
-     "                xend will use this when starting QEMU\n",
-@@ -3411,10 +3407,6 @@ STEXI
- @item -xen-domid @var{id}
- @findex -xen-domid
- Specify xen guest domain @var{id} (XEN only).
--@item -xen-create
--@findex -xen-create
--Create domain using xen hypercalls, bypassing xend.
--Warning: should not be used when xend is in use (XEN only).
- @item -xen-attach
- @findex -xen-attach
- Attach to existing xen domain.
-diff --git a/vl.c b/vl.c
-index 9b8ea3f654..bc9fbec654 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3856,13 +3856,6 @@ int main(int argc, char **argv, char **envp)
-                 }
-                 xen_domid = atoi(optarg);
-                 break;
--            case QEMU_OPTION_xen_create:
--                if (!(xen_available())) {
--                    error_report("Option not supported for this target");
--                    exit(1);
--                }
--                xen_mode = XEN_CREATE;
--                break;
-             case QEMU_OPTION_xen_attach:
-                 if (!(xen_available())) {
-                     error_report("Option not supported for this target");
+-    /* Add on the number needed for the ring pages */
+-    max_grants = blkdev->nr_ring_ref;
+-
+-    xen_be_set_max_grant_refs(xendev, max_grants);
+-    blkdev->sring = xen_be_map_grant_refs(xendev, blkdev->ring_ref,
+-                                          blkdev->nr_ring_ref,
+-                                          PROT_READ | PROT_WRITE);
+-    if (!blkdev->sring) {
+-        return -1;
+-    }
+-
+-    switch (blkdev->protocol) {
+-    case BLKIF_PROTOCOL_NATIVE:
+-    {
+-        blkif_sring_t *sring_native = blkdev->sring;
+-        BACK_RING_INIT(&blkdev->rings.native, sring_native, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_32:
+-    {
+-        blkif_x86_32_sring_t *sring_x86_32 = blkdev->sring;
+-
+-        BACK_RING_INIT(&blkdev->rings.x86_32_part, sring_x86_32, ring_size);
+-        break;
+-    }
+-    case BLKIF_PROTOCOL_X86_64:
+-    {
+-        blkif_x86_64_sring_t *sring_x86_64 = blkdev->sring;
+-
+-        BACK_RING_INIT(&blkdev->rings.x86_64_part, sring_x86_64, ring_size);
+-        break;
+-    }
+-    }
+-
+-    blk_set_aio_context(blkdev->blk, blkdev->ctx);
+-
+-    xen_be_bind_evtchn(xendev);
+-
+-    xen_pv_printf(xendev, 1, "ok: proto %s, nr-ring-ref %u, "
+-                  "remote port %d, local port %d\n",
+-                  xendev->protocol, blkdev->nr_ring_ref,
+-                  xendev->remote_port, xendev->local_port);
+-    return 0;
+-}
+-
+-static void blk_disconnect(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-
+-    trace_xen_disk_disconnect(xendev->name);
+-
+-    aio_context_acquire(blkdev->ctx);
+-
+-    if (blkdev->blk) {
+-        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
+-        blk_detach_dev(blkdev->blk, blkdev);
+-        blk_unref(blkdev->blk);
+-        blkdev->blk = NULL;
+-    }
+-    xen_pv_unbind_evtchn(xendev);
+-
+-    aio_context_release(blkdev->ctx);
+-
+-    if (blkdev->sring) {
+-        xen_be_unmap_grant_refs(xendev, blkdev->sring,
+-                                blkdev->nr_ring_ref);
+-        blkdev->sring = NULL;
+-    }
+-}
+-
+-static int blk_free(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-    struct ioreq *ioreq;
+-
+-    trace_xen_disk_free(xendev->name);
+-
+-    blk_disconnect(xendev);
+-
+-    while (!QLIST_EMPTY(&blkdev->freelist)) {
+-        ioreq = QLIST_FIRST(&blkdev->freelist);
+-        QLIST_REMOVE(ioreq, list);
+-        qemu_iovec_destroy(&ioreq->v);
+-        g_free(ioreq);
+-    }
+-
+-    g_free(blkdev->params);
+-    g_free(blkdev->mode);
+-    g_free(blkdev->type);
+-    g_free(blkdev->dev);
+-    g_free(blkdev->devtype);
+-    qemu_bh_delete(blkdev->bh);
+-    iothread_destroy(blkdev->iothread);
+-    return 0;
+-}
+-
+-static void blk_event(struct XenLegacyDevice *xendev)
+-{
+-    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-
+-    qemu_bh_schedule(blkdev->bh);
+-}
+-
+-struct XenDevOps xen_blkdev_ops = {
+-    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
+-    .size       = sizeof(struct XenBlkDev),
+-    .alloc      = blk_alloc,
+-    .init       = blk_init,
+-    .initialise = blk_connect,
+-    .disconnect = blk_disconnect,
+-    .event      = blk_event,
+-    .free       = blk_free,
+-};
 -- 
 Anthony PERARD
