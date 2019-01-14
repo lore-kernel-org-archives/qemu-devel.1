@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34938)
+Received: from eggs.gnu.org ([209.51.188.92]:35003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6x-0004Se-Ug
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:40 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB70-0004Vj-IF
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6x-0001TM-6V
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:39 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:40384)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjB6z-0001VT-PZ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:42 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:40428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjB6w-0001Mw-Ve
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:39 -0500
+	id 1gjB6z-0001PD-Fd
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 17:53:41 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 14 Jan 2019 23:52:24 +0100
-Message-Id: <20190114225306.21569-24-samuel.thibault@ens-lyon.org>
+Date: Mon, 14 Jan 2019 23:52:29 +0100
+Message-Id: <20190114225306.21569-29-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 References: <20190114225306.21569-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 23/65] slirp: remove unused HAVE_ARPA_INET_H
+Subject: [Qemu-devel] [PULL 28/65] slirp: remove unused DECLARE_IOVEC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,6 +32,10 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+It's actually qemu configure CONFIG_IOVEC that is being used.
+
+slirp/ does not use it anyway
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
@@ -40,17 +44,17 @@ Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
  1 file changed, 6 deletions(-)
 
 diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
-index 47811e36dc..e95284071a 100644
+index f1ee927c15..833f25a965 100644
 --- a/slirp/slirp_config.h
 +++ b/slirp/slirp_config.h
-@@ -41,12 +41,6 @@
- #define HAVE_SYS_SELECT_H
- #endif
+@@ -14,12 +14,6 @@
+ /* Define if the machine is big endian */
+ //#undef HOST_WORDS_BIGENDIAN
 =20
--/* Define if you have arpa/inet.h */
--#undef HAVE_ARPA_INET_H
--#ifndef _WIN32
--#define HAVE_ARPA_INET_H
+-/* Define if iovec needs to be declared */
+-#undef DECLARE_IOVEC
+-#ifdef _WIN32
+-#define DECLARE_IOVEC
 -#endif
 -
  /* Define to sizeof(char *) */
