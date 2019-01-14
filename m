@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59465)
+Received: from eggs.gnu.org ([209.51.188.92]:59601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gj59H-0008AY-QB
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gj59S-0008GI-CF
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gj59F-0008Sv-Te
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:39 -0500
-Date: Mon, 14 Jan 2019 16:31:17 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190114163117.GA521@stefanha-x1.localdomain>
-References: <20190109110144.18633-1-stefanha@redhat.com>
-	<w51pnt57slp.fsf@maestria.local.igalia.com>
-	<w51tvifqqlr.fsf@maestria.local.igalia.com>
-	<20190111132416.GI5010@dhcp-200-186.str.redhat.com>
-	<w51pnt3qo27.fsf@maestria.local.igalia.com>
-	<20190114133553.GE7038@stefanha-x1.localdomain>
-	<w51won7480o.fsf@maestria.local.igalia.com>
-	<20190114161525.GA32304@stefanha-x1.localdomain>
-	<w51zhs32ojb.fsf@maestria.local.igalia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gj59R-0000A1-3r
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:50 -0500
+Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:33805)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gj59Q-00008i-B8
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:31:48 -0500
+Received: by mail-oi1-x22b.google.com with SMTP id r62so18383132oie.1
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 08:31:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="fUYQa+Pmc3FrFX/N"
-Content-Disposition: inline
-In-Reply-To: <w51zhs32ojb.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH] throttle-groups: fix restart coroutine
- iothread race
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Jan 2019 16:31:35 +0000
+Message-ID: <CAFEAcA8GE72MaUFvbfHUL7vwkBNzWh+q_0VgzbmLJ-StYhWM4Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] -device foo,
+ help shouldn't be allowed for devices where -device foo is forbidden
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>
 
+We prohibit -device foo for non-pluggable devices:
+$ ./build/all/x86_64-softmmu/qemu-system-x86_64 -device i8257
+qemu-system-x86_64: -device i8257: Parameter 'driver' expects
+pluggable device type
 
---fUYQa+Pmc3FrFX/N
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+And we suppress them from "-device help" output too.
 
-On Mon, Jan 14, 2019 at 05:26:48PM +0100, Alberto Garcia wrote:
-> On Mon 14 Jan 2019 05:15:25 PM CET, Stefan Hajnoczi wrote:
-> >> > I've been able to reproduce this in an iotest, please see v2 of this
-> >> > series.
-> >>=20
-> >> That iotest doesn't crash for me :-?
-> >
-> > Does my iotest pass for you?
->=20
-> Yes, it does. I'm trying to figure out why because if I run the QMP
-> commands by hand then it does crash.
+But we still allow the user to do this:
 
-I ran the iotest 20 times on my machine and it segfaulted every time
-(with the fix not yet applied).
+$ ./build/all/x86_64-softmmu/qemu-system-x86_64 -device i8257,help
+i8257 options:
+  dshift=<int32>
+  base=<int32>
+  pageh-base=<int32>
+  page-base=<int32>
 
-Stefan
+Does anybody know how best to fix this? I guess we want to check
+dc->user_creatable in qdev_device_help() and print "%s is not
+a pluggable device" or something similar instead ?
 
---fUYQa+Pmc3FrFX/N
-Content-Type: application/pgp-signature; name="signature.asc"
+(The output is particularly useless for some devices, eg
 
------BEGIN PGP SIGNATURE-----
+$ ./build/all/arm-softmmu/qemu-system-arm -M virt -device iotkit,help
+iotkit options:
+  ppc-irq-splitter-5=<child<split-irq>>
+  nswatchdog=<child<cmsdk-apb-watchdog>>
+  iotkit-sysinfo=<child<iotkit-sysinfo>>
+  sec-resp-splitter=<child<split-irq>>
+  ppc-irq-splitter-6=<child<split-irq>>
+  mpc-irq-splitter-16=<child<split-irq>>
+  memory=<link<qemu:memory-region>>
+  mpc=<child<tz-mpc>>
+  dualtimer=<child<cmsdk-apb-dualtimer>>
+  ppc-irq-splitter-9=<child<split-irq>>
+  ppc-irq-splitter-8=<child<split-irq>>
+  ppc-irq-splitter-7=<child<split-irq>>
+  mpc-irq-splitter-6=<child<split-irq>>
+  ppc-irq-splitter-4=<child<split-irq>>
+  iotkit-container[0]=<child<qemu:memory-region>>
+  s32kwatchdog=<child<cmsdk-apb-watchdog>>
+  mpc-irq-splitter-5=<child<split-irq>>
+  iotkit-sysctl=<child<iotkit-sysctl>>
+  EXP_NUMIRQ=<uint32>
+  MAINCLK=<uint32>
+  mpc-irq-orgate=<child<or-irq>>
+  mpc-irq-splitter-9=<child<split-irq>>
+  mpc-irq-splitter-8=<child<split-irq>>
+  mpc-irq-splitter-7=<child<split-irq>>
+  mpc-irq-splitter-4=<child<split-irq>>
+  mpc-irq-splitter-2=<child<split-irq>>
+  mpc-irq-splitter-1=<child<split-irq>>
+  mpc-irq-splitter-3=<child<split-irq>>
+  apb-ppc1=<child<tz-ppc>>
+  apb-ppc0=<child<tz-ppc>>
+  mpc-irq-splitter-0=<child<split-irq>>
+  mpc-irq-splitter-15=<child<split-irq>>
+  mpc-irq-splitter-14=<child<split-irq>>
+  mpc-irq-splitter-13=<child<split-irq>>
+  mpc-irq-splitter-12=<child<split-irq>>
+  mpc-irq-splitter-11=<child<split-irq>>
+  mpc-irq-splitter-10=<child<split-irq>>
+  ppc-irq-splitter-3=<child<split-irq>>
+  ppc-irq-splitter-2=<child<split-irq>>
+  ppc-irq-splitter-1=<child<split-irq>>
+  swatchdog=<child<cmsdk-apb-watchdog>>
+  nmi-orgate=<child<or-irq>>
+  s32ktimer=<child<cmsdk-apb-timer>>
+  ppc-irq-splitter-0=<child<split-irq>>
+  timer1=<child<cmsdk-apb-timer>>
+  timer0=<child<cmsdk-apb-timer>>
+  secctl=<child<iotkit-secctl>>
+  armv7m=<child<armv7m>>
+  ppc-irq-orgate=<child<or-irq>>
 
-iQEcBAEBAgAGBQJcPLlVAAoJEJykq7OBq3PI3WwIAKi9n3eEt29sxUiwIcZCw2tG
-14IHtUFzOMgYWVCAzRHGQMx00MviMhdUWtKzSrjflV9q3hb8vCTqqCu7Q+v7HBvq
-/lM4jdGq8R60tZoazobhqaXTYXO82zFMy9s+WwwE1YqrR2sENbwUNcdq5EgVAlcN
-FXiWvHrPJoTrJhMJcNRDmWXV/s+Va0IgE6tj9MZs+g1Zt0qYD1VhWTfO8Ay6OCL5
-1F6Ke4yZykQnsmw8eAzTMeXrr1YeF9/B2idNkTKwDSyqiTYF0E3s+X3++6fP/ETZ
-cWP6UXfC3Y6cftk1nDoi07CjvQ8ycPWIRmPwosA71qi/tATaEzQeqwTYnrla0Aw=
-=fKj6
------END PGP SIGNATURE-----
+where the properties are all intended to be
+set up by QEMU code, not by a user.)
 
---fUYQa+Pmc3FrFX/N--
+thanks
+-- PMM
