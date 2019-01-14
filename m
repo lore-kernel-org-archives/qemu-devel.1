@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49874)
+Received: from eggs.gnu.org ([209.51.188.92]:50196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gizRj-0008Vi-AD
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:26:20 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gizT6-0001B0-RJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:27:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gizRh-0000e3-6Y
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:26:18 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39134)
+	(envelope-from <peter.maydell@linaro.org>) id 1gizT5-0002qj-4y
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:27:43 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41642)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gizRg-0000cg-Vu
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:26:17 -0500
-Received: by mail-wr1-f67.google.com with SMTP id t27so22163365wra.6
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:26:16 -0800 (PST)
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-6-philmd@redhat.com>
-	<32678400-47af-a842-0563-0d1a72712b4a@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7fb6c4f1-3a21-65ba-277f-8c2f53d2bb60@redhat.com>
-Date: Mon, 14 Jan 2019 11:26:14 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gizT4-0002pN-VH
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 05:27:43 -0500
+Received: by mail-ot1-x343.google.com with SMTP id u16so18842857otk.8
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 02:27:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <32678400-47af-a842-0563-0d1a72712b4a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 05/15] hw/nvram/fw_cfg: Remove various
- typedefs from "qemu/typedefs.h"
+References: <20190108163008.7006-1-peter.maydell@linaro.org>
+	<20190108163008.7006-4-peter.maydell@linaro.org>
+	<CAL1e-=gtbka64eAhVdbPyLa4+HP-OSQRg7u6+SC-8MCRgoZ9Qw@mail.gmail.com>
+In-Reply-To: <CAL1e-=gtbka64eAhVdbPyLa4+HP-OSQRg7u6+SC-8MCRgoZ9Qw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Jan 2019 10:27:30 +0000
+Message-ID: <CAFEAcA-FoPTcqZ5FH8Si6LUcYZgKVNPfHDBzd=x8QL4x+HDLVA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/4] accel/tcg: Add cluster number to TCG
+ TB hash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,129 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-arm@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Richard Henderson <richard.henderson@linaro.org>, "Emilio G . Cota" <cota@braap.org>, "patches@linaro.org" <patches@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 1/11/19 5:26 PM, Laszlo Ersek wrote:
-> On 01/11/19 15:08, Philippe Mathieu-Daudé wrote:
->> There are only three files requiring these typedefs, let them
->> include "hw/nvram/fw_cfg.h" directly to simplify "qemu/typedefs.h".
+On Mon, 14 Jan 2019 at 01:08, Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+>
+>
+>
+> On Tuesday, January 8, 2019, Peter Maydell <peter.maydell@linaro.org> wro=
+te:
 >>
->> To clean "qemu/typedefs.h", move the forward declarations
->> to "hw/nvram/fw_cfg.h".
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  include/hw/acpi/vmgenid.h | 1 +
->>  include/hw/arm/virt.h     | 1 +
->>  include/hw/mem/nvdimm.h   | 1 +
->>  include/hw/nvram/fw_cfg.h | 8 +++++++-
->>  include/qemu/typedefs.h   | 4 ----
->>  5 files changed, 10 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
->> index 38586ecbdf..be53de38f1 100644
->> --- a/include/hw/acpi/vmgenid.h
->> +++ b/include/hw/acpi/vmgenid.h
->> @@ -3,6 +3,7 @@
->>  
->>  #include "hw/acpi/bios-linker-loader.h"
->>  #include "hw/qdev.h"
->> +#include "hw/nvram/fw_cfg.h"
->>  #include "qemu/uuid.h"
->>  
->>  #define VMGENID_DEVICE           "vmgenid"
->> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
->> index 4cc57a7ef6..fef632dcf5 100644
->> --- a/include/hw/arm/virt.h
->> +++ b/include/hw/arm/virt.h
->> @@ -35,6 +35,7 @@
->>  #include "qemu/notify.h"
->>  #include "hw/boards.h"
->>  #include "hw/arm/arm.h"
->> +#include "hw/nvram/fw_cfg.h"
->>  #include "sysemu/kvm.h"
->>  #include "hw/intc/arm_gicv3_common.h"
->>  
->> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
->> index c5c9b3c7f8..51d3a52c4b 100644
->> --- a/include/hw/mem/nvdimm.h
->> +++ b/include/hw/mem/nvdimm.h
->> @@ -24,6 +24,7 @@
->>  #define QEMU_NVDIMM_H
->>  
->>  #include "hw/mem/pc-dimm.h"
->> +#include "hw/nvram/fw_cfg.h"
->>  #include "hw/acpi/bios-linker-loader.h"
->>  
->>  #define NVDIMM_DEBUG 0
->> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
->> index f5a6895a74..244ed78afa 100644
->> --- a/include/hw/nvram/fw_cfg.h
->> +++ b/include/hw/nvram/fw_cfg.h
->> @@ -14,7 +14,9 @@
->>  #define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
->>  #define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
->>  
->> -typedef struct fw_cfg_file FWCfgFile;
->> +typedef struct FWCfgState FWCfgState;
->> +typedef struct FWCfgIoState FWCfgIoState;
->> +typedef struct FWCfgMemState FWCfgMemState;
-> 
-> I think the resultant file would be easier to read if you moved the
-> State typedefs before the spot where we make the first references to
-> them, namely in the FW_CFG*() function-like macros.
+>> Include the cluster number in the hash we use to look
+>> up TBs. This is important because a TB that is valid
+>> for one cluster at a given physical address and set
+>> of CPU flags is not necessarily valid for another:
+>> the two clusters may have different views of physical
+>> memory, or may have different CPU features (eg FPU
+>> present or absent).
 
-I'm glad you suggested that, that is the style I like and how I went
-through first, but then changed to follow this file style. I'll update
-happily.
+> I do understand the definition of cluster_index in the sense of this seri=
+es. However, it looks to me that the term "cluster" is generally overused i=
+n areas where we work. This may lead to some confusion for future developer=
+s, and let me suggest some other name, like "tcg_cluster_index" or "tcg_gro=
+up_id", or "translation_group_id". Admitedly, they all sound ugly to me too=
+. But having the name that would clearly separate this id from too generic =
+"cluster_index" IMHO would save lots of time during potential related futur=
+e development.
+>
+> (Needled to say that,  for example, we in MIPS, for multi-core sustems, g=
+roup cores in clusters, that actually do not have anything to do with clust=
+ers in TCG sense...)
 
-> 
-> With that,
-> 
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Yeah, the term is a bit overloaded. Arm also has clusters
+that are used more in the NUMA sense. However, the
+term we have is what is in git master currently...
 
-Thanks!
-
-> 
-> Thanks
-> Laszlo
-> 
->>  
->>  #define FW_CFG_ORDER_OVERRIDE_VGA    70
->>  #define FW_CFG_ORDER_OVERRIDE_NIC    80
->> @@ -24,6 +26,8 @@ typedef struct fw_cfg_file FWCfgFile;
->>  void fw_cfg_set_order_override(FWCfgState *fw_cfg, int order);
->>  void fw_cfg_reset_order_override(FWCfgState *fw_cfg);
->>  
->> +typedef struct fw_cfg_file FWCfgFile;
->> +
->>  typedef struct FWCfgFiles {
->>      uint32_t  count;
->>      FWCfgFile f[];
->> @@ -34,6 +38,8 @@ typedef struct fw_cfg_dma_access FWCfgDmaAccess;
->>  typedef void (*FWCfgCallback)(void *opaque);
->>  typedef void (*FWCfgWriteCallback)(void *opaque, off_t start, size_t len);
->>  
->> +typedef struct FWCfgEntry FWCfgEntry;
->> +
->>  struct FWCfgState {
->>      /*< private >*/
->>      SysBusDevice parent_obj;
->> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
->> index 3a5ca74bd3..1c294c296c 100644
->> --- a/include/qemu/typedefs.h
->> +++ b/include/qemu/typedefs.h
->> @@ -31,10 +31,6 @@ typedef struct DriveInfo DriveInfo;
->>  typedef struct Error Error;
->>  typedef struct EventNotifier EventNotifier;
->>  typedef struct FlatView FlatView;
->> -typedef struct FWCfgEntry FWCfgEntry;
->> -typedef struct FWCfgIoState FWCfgIoState;
->> -typedef struct FWCfgMemState FWCfgMemState;
->> -typedef struct FWCfgState FWCfgState;
->>  typedef struct HCIInfo HCIInfo;
->>  typedef struct HVFX86EmulatorState HVFX86EmulatorState;
->>  typedef struct I2CBus I2CBus;
->>
-> 
+thanks
+-- PMM
