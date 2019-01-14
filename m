@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55227)
+Received: from eggs.gnu.org ([209.51.188.92]:57314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gj4ur-0007qz-1H
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:16:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1gj540-0003Rl-5c
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gj4uq-00077s-4w
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:16:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50362)
+	(envelope-from <eblake@redhat.com>) id 1gj53y-00050x-Db
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gj4up-00076Z-T2
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:16:44 -0500
-Date: Mon, 14 Jan 2019 09:07:57 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190114090757.68bfa839@x1.home>
-In-Reply-To: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
-References: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gj53x-0004zp-SU
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 11:26:10 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6037F58E59
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 16:26:08 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-117-16.phx2.redhat.com [10.3.117.16])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 205715C7A0
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 16:26:08 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 14 Jan 2019 10:25:45 -0600
+Message-Id: <20190114162605.5330-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Questions about VFIO enabling MSIX vector
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/20] NBD patches through 2019-01-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +33,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Heyi Guo <guoheyi@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, wanghaibin 00208455 <wanghaibin.wang@huawei.com>
+To: qemu-devel@nongnu.org
 
-On Sat, 12 Jan 2019 10:30:40 +0800
-Heyi Guo <guoheyi@huawei.com> wrote:
+The following changes since commit 7260438b7056469610ee166f7abe9ff8a26b8b=
+16:
 
-> Hi folks,
-> 
-> I have some questions about vfio_msix_vector_do_use() in
-> hw/vfio/pci.c, could you help to explain?
-> 
-> We can see that when guest tries to enable one specific MSIX vector
-> by unmasking MSIX Vector Control, the access will be trapped and then
-> into function vfio_msix_vector_do_use(). And we may go to the below
-> branch in line 525:
-> 
-> 
-> 520 /*
-> 521  * We don't want to have the host allocate all possible MSI vectors
-> 522  * for a device if they're not in use, so we shutdown and incrementally
-> 523  * increase them as needed.
-> 524  */
-> 525  if (vdev->nr_vectors < nr + 1) {
-> 526      vfio_disable_irqindex(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX);
-> 527      vdev->nr_vectors = nr + 1;
-> 528      ret = vfio_enable_vectors(vdev, true);
-> 529      if (ret) {
-> 530          error_report("vfio: failed to enable vectors, %d", ret);
-> 531      }
-> 
-> Here all MSIX vectors will be disabled first and then enabled, with
-> one more MSIX. The comment is there but I still don't quite
-> understand. It makes sense for not allocating all possible MSI
-> vectors, but why shall we shutdown the whole MSI when being requested
-> to enable one specific vector? Can't we just enable the user
-> specified vector indexed by "nr"?
+  Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3.2-=
+part2' into staging (2019-01-14 11:41:43 +0000)
 
-What internal kernel API would vfio-pci make use of to achieve that?
-We can't know the intentions of the guest and we have a limited set of
-tools to manage the MSI-X state in the host kernel.  It's generally the
-case that MSI-X vectors are only manipulated during driver setup and
-shutdown, so while the current behavior isn't necessarily efficient, it
-works within the constraints and generally doesn't have a runtime impact
-on performance.  We also recognize that this behavior may change in the
-future depending on more dynamic internal host kernel interfaces, thus
-we export the VFIO_IRQ_INFO_NORESIZE flag to indicate to userspace
-whether this procedure is required.
+are available in the Git repository at:
 
-> What's more, on ARM64 systems with GIC ITS, the kernel will issue an
-> ITS discard command when disabling a MSI vector, which will drop
-> currently pending MSI interrupt. If device driver in guest system
-> enables some MSIs first and interrupts may come at any time, and then
-> it tries to enable other MSIs, is it possible for the above code to
-> cause interrupts missing?
+  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-01-14
 
-Interrupt reconfiguration is generally during driver setup or teardown
-when the device is considered idle or lost interrupts are not a
-concern.  If you have a device which manipulates interrupt
-configuration runtime, you can expect that lost interrupts won't be the
-only problem, it's also likely to experience much more overhead in the
-interrupt manipulation path under assignment than on bare metal.  This
-is another reason that well behaved drivers generally use relatively
-static interrupt configurations initialized at driver setup time.
-Thanks,
+for you to fetch changes up to 636192c4b6052820ea126a5287c58a8f53f3c84f:
 
-Alex
+  qemu-nbd: Add --bitmap=3DNAME option (2019-01-14 10:09:46 -0600)
+
+----------------------------------------------------------------
+nbd patches for 2019-01-14
+
+Promote bitmap/NBD interfaces to stable for use in incremental
+backups. Add 'qemu-nbd --bitmap'.
+
+- John Snow: 0/11 bitmaps: remove x- prefix from QMP api
+- Philippe Mathieu-Daud=C3=A9: qemu-nbd: Rename 'exp' variable clashing w=
+ith math::exp() symbol
+- Eric Blake: 0/8 Promote x-nbd-server-add-bitmap to stable
+
+----------------------------------------------------------------
+Eric Blake (8):
+      nbd: Add some error case testing to iotests 223
+      nbd: Forbid nbd-server-stop when server is not running
+      nbd: Only require disabled bitmap for read-only exports
+      nbd: Merge nbd_export_set_name into nbd_export_new
+      nbd: Allow bitmap export during QMP nbd-server-add
+      nbd: Remove x-nbd-server-add-bitmap
+      nbd: Merge nbd_export_bitmap into nbd_export_new
+      qemu-nbd: Add --bitmap=3DNAME option
+
+John Snow (11):
+      blockdev: abort transactions in reverse order
+      block/dirty-bitmap: remove assertion from restore
+      blockdev: n-ary bitmap merge
+      block: remove 'x' prefix from experimental bitmap APIs
+      iotests.py: don't abort if IMGKEYSECRET is undefined
+      iotests: add filter_generated_node_ids
+      iotests: add qmp recursive sorting function
+      iotests: remove default filters from qmp_log
+      iotests: change qmp_log filters to expect QMP objects only
+      iotests: implement pretty-print for log and qmp_log
+      iotests: add iotest 236 for testing bitmap merge
+
+Philippe Mathieu-Daud=C3=A9 (1):
+      qemu-nbd: Rename 'exp' variable clashing with math::exp() symbol
+
+ qemu-nbd.texi                 |   4 +
+ qapi/block-core.json          |  56 +++----
+ qapi/block.json               |  30 +---
+ qapi/transaction.json         |  12 +-
+ include/block/nbd.h           |  12 +-
+ block/dirty-bitmap.c          |   1 -
+ blockdev-nbd.c                |  36 ++---
+ blockdev.c                    | 107 ++++++++-----
+ hmp.c                         |   5 +-
+ nbd/server.c                  | 136 ++++++++--------
+ qemu-nbd.c                    |  26 ++--
+ tests/qemu-iotests/206        |   8 +-
+ tests/qemu-iotests/223        |  52 +++++--
+ tests/qemu-iotests/223.out    |  23 ++-
+ tests/qemu-iotests/236        | 161 +++++++++++++++++++
+ tests/qemu-iotests/236.out    | 351 ++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/qemu-iotests/group      |   1 +
+ tests/qemu-iotests/iotests.py |  64 ++++++--
+ 18 files changed, 841 insertions(+), 244 deletions(-)
+ create mode 100755 tests/qemu-iotests/236
+ create mode 100644 tests/qemu-iotests/236.out
+
+--=20
+2.20.1
