@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41585)
+Received: from eggs.gnu.org ([209.51.188.92]:42658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjPll-0005kH-4b
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:32:46 -0500
+	(envelope-from <jusual@mail.ru>) id 1gjPq2-0000ex-5O
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:37:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjPlj-00049M-6K
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:32:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46320)
+	(envelope-from <jusual@mail.ru>) id 1gjPq1-0006bw-EE
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:37:10 -0500
+Received: from smtp39.i.mail.ru ([94.100.177.99]:47222)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjPli-000476-Km
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:32:43 -0500
-References: <1547487921-605-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-tPoQK+7GTesyqAVmoKm7g3SHoP2iz3R8k7WX=PW5q4w@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cdf8a1ab-c99b-789f-8325-f63d6da5e0c1@redhat.com>
-Date: Tue, 15 Jan 2019 15:32:10 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-tPoQK+7GTesyqAVmoKm7g3SHoP2iz3R8k7WX=PW5q4w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/27] ivshmem deprecation, qtests,
- typedefs and gnu99
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gjPq0-0006aI-NI
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:37:09 -0500
+From: Julia Suvorova <jusual@mail.ru>
+Date: Tue, 15 Jan 2019 17:36:50 +0300
+Message-Id: <20190115143650.15725-1-jusual@mail.ru>
+Subject: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix PC overwriting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +21,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>, Eduardo Otubo <otubo@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, Julia Suvorova <jusual@mail.ru>
 
-On 2019-01-15 14:16, Peter Maydell wrote:
-> On Mon, 14 Jan 2019 at 17:45, Thomas Huth <thuth@redhat.com> wrote:
->>
->>  Hi Peter!
->>
->> The following changes since commit 7260438b7056469610ee166f7abe9ff8a26=
-b8b16:
->>
->>   Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3=
-.2-part2' into staging (2019-01-14 11:41:43 +0000)
->>
->> are available in the git repository at:
->>
->>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-01-14v2
->>
->> for you to fetch changes up to 650db715681ad1a042705484776e1974f288f3d=
-4:
->>
->>   tests/hexloader-test: Don't pass -nographic to the QEMU under test (=
-2019-01-14 18:21:29 +0100)
->>
->> ----------------------------------------------------------------
->> - Remove deprecated "ivshmem" legacy device
->> - Bug fix for vhost-user-test
->> - Use more CONFIG Makefile switches for qtests
->> - Get rid of global_qtests in some more qtests
->> - typedef cleanups
->> - Fixes for compiling with Clang
->> - Force C standard to gnu99
->> ----------------------------------------------------------------
->=20
-> Hi; another compile failure on that ppc64 system, I'm afraid:
->=20
-> /home/pm215/qemu/qemu-seccomp.c:45:1: error: initializer element is not=
- constant
->  };
->  ^
-> /home/pm215/qemu/qemu-seccomp.c:45:1: error: (near initialization for
-> =E2=80=98sched_setscheduler_arg[0]=E2=80=99)
->=20
-> (I did a quick check with 'make -k' and it looks like there aren't
-> any more lurking after that one.)
->=20
-> The system libseccomp is libseccomp-2.3.1-3.el7.
+If the memory is set using a file, and PC is specified on the command
+line, it will be overwritten with the value 'entry'. This is not only
+illogical, but also incorrect, because the load_ * functions do not take
+into account the specifics of the ARM-M PC.
 
-Darn, I think this time it is a compiler bug:
+Signed-off-by: Julia Suvorova <jusual@mail.ru>
+---
+ hw/core/generic-loader.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D63567
-
-It's only fixed in GCC >=3D v5.0 :-(
-
-I see two options:
-
-1) Expand the macro manually:
-
-diff --git a/qemu-seccomp.c b/qemu-seccomp.c
---- a/qemu-seccomp.c
-+++ b/qemu-seccomp.c
-@@ -41,7 +41,7 @@ struct QemuSeccompSyscall {
- };
-
- const struct scmp_arg_cmp sched_setscheduler_arg[] =3D {
--    SCMP_A1(SCMP_CMP_NE, SCHED_IDLE)
-+    { .arg =3D 1, .op =3D SCMP_CMP_NE, .datum_a =3D SCHED_IDLE }
- };
-
-... then it compiles fine for me in gnu99 mode, too.
-
-2) Scratch the whole idea with gnu99 again ...
-
-Opinions?
-
- Thomas
+diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+index fbae05fb3b..fc81fd8e14 100644
+--- a/hw/core/generic-loader.c
++++ b/hw/core/generic-loader.c
+@@ -152,7 +152,7 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
+         if (size < 0 || s->force_raw) {
+             /* Default to the maximum size being the machine's ram size */
+             size = load_image_targphys_as(s->file, s->addr, ram_size, as);
+-        } else {
++        } else if (!s->addr) {
+             s->addr = entry;
+         }
+ 
+-- 
+2.17.1
