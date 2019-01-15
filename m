@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39900)
+Received: from eggs.gnu.org ([209.51.188.92]:43847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <emaste@freebsd.org>) id 1gjTfe-00009A-F8
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:42:43 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gjTkX-0002fJ-Jy
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:47:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <emaste@freebsd.org>) id 1gjTfd-0006wV-5l
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:42:42 -0500
-Received: from mx2.freebsd.org ([8.8.178.116]:26604)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <emaste@freebsd.org>) id 1gjTfc-0006sn-VF
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:42:41 -0500
-Received: from mx1.freebsd.org (mx1.freebsd.org [96.47.72.80])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(Client CN "mx1.freebsd.org",
-	Issuer "Let's Encrypt Authority X3" (verified OK))
-	by mx2.freebsd.org (Postfix) with ESMTPS id D2E3796E4D
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 18:42:32 +0000 (UTC)
-	(envelope-from emaste@freebsd.org)
-From: Ed Maste <emaste@freefall.freebsd.org>
-Date: Tue, 15 Jan 2019 18:42:29 +0000
-Message-Id: <20190115184229.73688-1-emaste@freefall.freebsd.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1gjTkW-0001bP-BF
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:47:45 -0500
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:38929)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gjTkV-0001a9-S8
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:47:44 -0500
+Received: by mail-oi1-x235.google.com with SMTP id i6so2958222oia.6
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:47:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for FreeBSD
+References: <CAPyFy2CWKEmYoYrDY=pHQVxXjMZnPts5qKVHL94yx0smTjx9bA@mail.gmail.com>
+	<20181207095417.GF13784@redhat.com>
+	<CAPyFy2AxmXSu8NsVpTWtKQYbjrL+72GvCUpQ=T=ffooyQPov4g@mail.gmail.com>
+	<CAPyFy2Dq_7K+4tZjvBcWxdyFJZzEV4Kz_C2dqQ0-Hu+BwOsDyA@mail.gmail.com>
+In-Reply-To: <CAPyFy2Dq_7K+4tZjvBcWxdyFJZzEV4Kz_C2dqQ0-Hu+BwOsDyA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 15 Jan 2019 18:47:29 +0000
+Message-ID: <CAFEAcA-VWHgcfmKTfjTGGQXKTp8V5thsFO0tJ6R-p+MQHkcm1g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Hosted CI for FreeBSD - Cirrus CI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ed Maste <emaste@freebsd.org>
+To: Ed Maste <emaste@freebsd.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-From: Ed Maste <emaste@freebsd.org>
+On Tue, 15 Jan 2019 at 18:34, Ed Maste <emaste@freebsd.org> wrote:
+> My most recent test build with cirrus-ci
+> (https://cirrus-ci.com/github/emaste/qemu) failed with:
+> /usr/bin/ld: error: undefined symbol: fdt_check_full
+> >>> referenced by spapr_hcall.c:1797 (/tmp/cirrus-ci-build/hw/ppc/spapr_hcall.c:1797)
+> >>>               hw/ppc/spapr_hcall.o:(h_update_dt)
+> c++: error: linker command failed with exit code 1 (use -v to see invocation)
+> gmake[1]: *** [Makefile:196: qemu-system-ppc64] Error 1
+> gmake: *** [Makefile:428: subdir-ppc64-softmmu] Error 2
+> gmake: *** Waiting for unfinished jobs....
+>
+> It looks like this was introduced between
+> 9b2e891ec5ccdb4a7d583b77988848282606fdea (works) and
+> 44ba6010635641a538c9b9b1f377dfa288751906 (fails). The .cirrus.yml file
+> in my branch is at least good enough to catch this sort of thing, so
+> I'll send the patch over (while trying to look into this).
 
-Cirrus-CI (https://cirrus-ci.org) is a hosted CI service which supports
-several platforms, including FreeBSD.  Later on we could build for other
-hosts in Cirrus-CI, but I'm starting with only FreeBSD as it is not
-supported by other CI services.
+Commit fea35ca4b8e68b4fa updates our configure test to require
+a libfdt version that has fdt_check_full() in it, so in theory
+what is supposed to happen is that we will use the local
+version in dtc/ if the system libfdt is not new enough.
+Has that process gone wrong? Is the build using the system
+libfdt or the one we provide in the submodule ?
 
-Signed-off-by: Ed Maste <emaste@freebsd.org>
----
- .cirrus.yml     | 16 ++++++++++++++++
- create mode 100644 .cirrus.yml
-
-diff --git a/.cirrus.yml b/.cirrus.yml
-new file mode 100644
-index 0000000000..ff4bf75ad1
---- /dev/null
-+++ b/.cirrus.yml
-@@ -0,0 +1,16 @@
-+freebsd_12_task:
-+  freebsd_instance:
-+    image: freebsd-12-0-release-amd64
-+    cpu: 8
-+    memory: 24G
-+  env:
-+    CIRRUS_CLONE_DEPTH: 1
-+  install_script: pkg install -y
-+    bison curl cyrus-sasl fontconfig freetype2 git glib gmake gnutls
-+    nettle perl5 pixman pkgconf png usbredir
-+  script:
-+    - mkdir build
-+    - cd build
-+    - ../configure || { cat config.log; exit 1; }
-+    - gmake -j8
-+    - gmake -j8 check
---=20
-2.20.1
+thanks
+-- PMM
