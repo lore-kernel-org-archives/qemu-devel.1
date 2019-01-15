@@ -1,26 +1,28 @@
 Received: from eggs.gnu.org ([209.51.188.92]:55747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjUTE-00052I-SW
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:34:00 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gjUTq-00052I-Gc
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:34:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjUSw-0005RZ-38
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:33:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gjUSs-0005OU-CS
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:33:38 -0500
-References: <20190115145256.9593-1-berrange@redhat.com>
-	<20190115145256.9593-5-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8dc5ad30-f15c-e2a0-b0bc-9af7a07854dd@redhat.com>
-Date: Tue, 15 Jan 2019 13:33:25 -0600
+	(envelope-from <mlureau@redhat.com>) id 1gjUIn-0006eq-US
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:23:11 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:36997)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gjUIl-0006ct-5e
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:23:08 -0500
+Received: by mail-qt1-f193.google.com with SMTP id t33so4320624qtt.4
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 11:23:05 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190115145256.9593-5-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nciPBoyQUG9H8qc5xdRFP00gmaFWoRYq2"
-Subject: Re: [Qemu-devel] [PATCH 04/12] chardev: remove many local variables
- in qemu_chr_parse_socket
+References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
+	<20181114123643.24091-10-marcandre.lureau@redhat.com>
+	<56d6d5ae-cc33-be46-1880-def10db32f41@redhat.com>
+In-Reply-To: <56d6d5ae-cc33-be46-1880-def10db32f41@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 15 Jan 2019 23:22:53 +0400
+Message-ID: <CAMxuvayXt3Eev8ZCKLL7HEjnr7XkFwXA9RHrKZEyVL8Y66Ct-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 09/41] slirp: add a set_nonblock()
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,121 +31,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Yongji Xie <elohimes@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Richard Jones <rjones@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, renzo@cs.unibo.it
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nciPBoyQUG9H8qc5xdRFP00gmaFWoRYq2
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Yongji Xie <elohimes@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <8dc5ad30-f15c-e2a0-b0bc-9af7a07854dd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/12] chardev: remove many local variables
- in qemu_chr_parse_socket
-References: <20190115145256.9593-1-berrange@redhat.com>
- <20190115145256.9593-5-berrange@redhat.com>
-In-Reply-To: <20190115145256.9593-5-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-[adding Markus in relation to a QemuOpts observation]
+On Thu, Nov 15, 2018 at 5:04 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 14/11/2018 13:36, Marc-Andr=C3=A9 Lureau wrote:
+> > qemu_set_nonblock() does some event registration with the main loop on
+> > win32, let's have a callback.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> Perhaps a better interface would be register_poll_fd, which is called
+> before a file descriptor can be returned to slirp_pollfds_fill?  And
+> perhaps a dual unregister_poll_fd, which QEMU would leave empty, to be
+> called before closing the file descriptor.
 
-On 1/15/19 8:52 AM, Daniel P. Berrang=C3=A9 wrote:
-> Now that all validation is separated off into a separate method,
-> we can directly populate the ChardevSocket struct from the
-> QemuOpts values, avoiding many local variables.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  chardev/char-socket.c | 40 ++++++++++++++++++----------------------
->  1 file changed, 18 insertions(+), 22 deletions(-)
->=20
+done
 
-> @@ -1216,26 +1208,30 @@ static void qemu_chr_parse_socket(QemuOpts *opt=
-s, ChardevBackend *backend,
->      sock =3D backend->u.socket.data =3D g_new0(ChardevSocket, 1);
->      qemu_chr_parse_common(opts, qapi_ChardevSocket_base(sock));
-> =20
-> -    sock->has_nodelay =3D true;
-> -    sock->nodelay =3D do_nodelay;
-> +    sock->has_nodelay =3D qemu_opt_get(opts, "delay");
-> +    sock->nodelay =3D !qemu_opt_get_bool(opts, "delay", true);
+thanks
 
-Unrelated to this patch, but my recent proposal to make QemuOpts be a
-bit more typesafe:
-
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02042.html
-
-does not like users calling qemu_opt_get() of an option that has an
-integer default (as opposed to a string default), even if the only
-reason the caller was doing it was to learn if the option is present.  I
-wonder if we should introduce
-
-bool qemu_opt_has(QemuOpts *opts, const char *name)
-
-and then replace existing callers which merely call qemu_opt_get() to
-learn whether an optional option was present/defaulted but without
-caring about its string value.  I also wonder if Coccinelle can be
-employed to determine which callers fit that bill (that is, detect when
-a const char * result is ignored or solely used in a bool context, vs.
-when it is actually used as a string parameter to another function
-and/or saved in a const char * variable).
-
-Now, on to actual review,
-
-> +    /*
-> +     * We have different default to QMP for 'server', hence
-> +     * we can't just check for existance of 'server'
-
-s/existance/existence/
-
-> +     */
->      sock->has_server =3D true;
-> -    sock->server =3D is_listen;
-> -    sock->has_telnet =3D true;
-> -    sock->telnet =3D is_telnet;
-> -    sock->has_tn3270 =3D true;
-> -    sock->tn3270 =3D is_tn3270;
-> -    sock->has_websocket =3D true;
-> -    sock->websocket =3D is_websock;
-> +    sock->server =3D qemu_opt_get_bool(opts, "server", false);
-> +    sock->has_telnet =3D qemu_opt_get(opts, "telnet");
-> +    sock->telnet =3D qemu_opt_get_bool(opts, "telnet", false);
-> +    sock->has_tn3270 =3D qemu_opt_get(opts, "tn3270");
-> +    sock->tn3270 =3D qemu_opt_get_bool(opts, "tn3270", false);
-> +    sock->has_websocket =3D qemu_opt_get(opts, "websocket");
-> +    sock->websocket =3D qemu_opt_get_bool(opts, "websocket", false);
->      /*
->       * We have different default to QMP for 'wait' when 'server'
->       * is set, hence we can't just check for existance of 'wait'
-
-but then again, you were copy-pasting an existing typo.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---nciPBoyQUG9H8qc5xdRFP00gmaFWoRYq2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw+NYUACgkQp6FrSiUn
-Q2qRVgf+OVlsVnPmoUDHp0cVuaijeqLzNrljtMKhEm8iKASnYpL6Q3S1E8/2Dv59
-4rfMpzpp1d61ZpkSZniuy7qKv9yVhJFnEOTR1G49OdGGseAPbzSt/v0gXO9UeD42
-e7RaVciQn1Gl6qJSNpWMCbGEz6bEW4mftqcok7I/BH9LUcoF7KVoOBRo4NBckUgA
-HBKX2n9qeD5RGWijZ38wXh6nWRl1S8dUQY62N53GB/EZnk9wE/EvN5hc5NL7ubkc
-LuoBkvDyOV6ZboPr5GL1z69aYsuv1CpC/kGTJetHYbTGQHlHeXv2JFmiMEbgwY/C
-6pZHzIToJv91v6SqQVJivJ+f5YbzWQ==
-=hWvC
------END PGP SIGNATURE-----
-
---nciPBoyQUG9H8qc5xdRFP00gmaFWoRYq2--
+>
+> Paolo
+>
+> > ---
+> >  slirp/libslirp.h | 1 +
+> >  net/slirp.c      | 1 +
+> >  slirp/misc.c     | 2 +-
+> >  slirp/tcp_subr.c | 4 ++--
+> >  4 files changed, 5 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+> > index 88185e6c33..f2e7f94ebb 100644
+> > --- a/slirp/libslirp.h
+> > +++ b/slirp/libslirp.h
+> > @@ -20,6 +20,7 @@ typedef struct SlirpCb {
+> >                        SlirpTimerCb cb, void *opaque);
+> >      void (*timer_free)(void *timer);
+> >      void (*timer_mod)(void *timer, int64_t expire_timer);
+> > +    void (*set_nonblock)(int fd);
+> >  } SlirpCb;
+> >
+> >
+> > diff --git a/net/slirp.c b/net/slirp.c
+> > index 7b28886802..5ea8c255f6 100644
+> > --- a/net/slirp.c
+> > +++ b/net/slirp.c
+> > @@ -190,6 +190,7 @@ static SlirpCb slirp_cb =3D {
+> >      .timer_new =3D net_slirp_timer_new,
+> >      .timer_free =3D net_slirp_timer_free,
+> >      .timer_mod =3D net_slirp_timer_mod,
+> > +    .set_nonblock =3D qemu_set_nonblock,
+> >  };
+> >
+> >  static int net_slirp_init(NetClientState *peer, const char *model,
+> > diff --git a/slirp/misc.c b/slirp/misc.c
+> > index 7972b9b05b..dd2b3512a8 100644
+> > --- a/slirp/misc.c
+> > +++ b/slirp/misc.c
+> > @@ -174,7 +174,7 @@ fork_exec(struct socket *so, const char *ex)
+> >      socket_set_fast_reuse(so->s);
+> >      opt =3D 1;
+> >      qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int)=
+);
+> > -    qemu_set_nonblock(so->s);
+> > +    so->slirp->cb->set_nonblock(so->s);
+> >      return 1;
+> >  }
+> >  #endif
+> > diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+> > index 4b40850c7a..8d97f1f54e 100644
+> > --- a/slirp/tcp_subr.c
+> > +++ b/slirp/tcp_subr.c
+> > @@ -412,7 +412,7 @@ int tcp_fconnect(struct socket *so, unsigned short =
+af)
+> >      int opt, s=3Dso->s;
+> >      struct sockaddr_storage addr;
+> >
+> > -    qemu_set_nonblock(s);
+> > +    so->slirp->cb->set_nonblock(s);
+> >      socket_set_fast_reuse(s);
+> >      opt =3D 1;
+> >      qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
+> > @@ -484,7 +484,7 @@ void tcp_connect(struct socket *inso)
+> >          tcp_close(sototcpcb(so)); /* This will sofree() as well */
+> >          return;
+> >      }
+> > -    qemu_set_nonblock(s);
+> > +    so->slirp->cb->set_nonblock(s);
+> >      socket_set_fast_reuse(s);
+> >      opt =3D 1;
+> >      qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+> >
+>
