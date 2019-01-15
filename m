@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42831)
+Received: from eggs.gnu.org ([209.51.188.92]:42866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjT3R-0005ta-92
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:03:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1gjT3S-0005uc-5d
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:03:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjT3P-00044Z-Pm
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:03:13 -0500
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-4-philmd@redhat.com>
-	<875zuqjea7.fsf@dusky.pond.sub.org>
-	<403ad2e4-3282-051c-1ff5-8a3a23899293@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <be75e72a-9f54-c9b5-4a1f-e87e28df8ba5@redhat.com>
-Date: Tue, 15 Jan 2019 19:02:33 +0100
+	(envelope-from <thuth@redhat.com>) id 1gjT3Q-00045u-D7
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:03:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54578)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjT3Q-00041G-2m
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:03:12 -0500
+References: <20190115141108.934-1-yang.zhong@intel.com>
+	<20190115141108.934-2-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6688ca8d-6aae-a40b-85fa-5910a6af4a53@redhat.com>
+Date: Tue, 15 Jan 2019 19:02:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <403ad2e4-3282-051c-1ff5-8a3a23899293@redhat.com>
+In-Reply-To: <20190115141108.934-2-yang.zhong@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/15] hw/ssi: Remove SSIBus from
- "qemu/typedefs.h"
+Subject: Re: [Qemu-devel] [RFC PATCH v2 01/37] build: actually use CONFIG_PAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
 
-On 15/01/19 13:56, Thomas Huth wrote:
-> Yes, agreed, removing things from typedefs.h just to add lots of
-> #includes in other files is not really the best idea. I also dropped
-> this patch in v2 of my current PULL request because of this reason.
-> Phil, I suggest to simply drop this patch. What we maybe could do is to
-> split up typedefs.h per subsystem, so that we additionally have a
-> hw/arm/typedefs.h, hw/ppc/typedefs.h etc. in the end, then the
-> target-specific typedefs would not clutter the common qemu/typedefs.h
-> file anymore.
+On 2019-01-15 15:10, Yang Zhong wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Do not link it unconditionally into all binaries.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I disagree.  The *inclusions* of target-specific typedefs.h would then
-clutter something.
+I think you should put your Signed-off-by below Paolo's S-o-b into this
+patch, too (since you've edited it).
 
-For the (important, mind) case of circular includes, allowing struct in
-prototypes pretty much solves the issues, and a subsystem-specific
-typedefs.h is another solution according to maintainer's discretion.
+> ---
+>  default-configs/i386-softmmu.mak | 1 +
+>  hw/pci-host/Makefile.objs        | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> index 64c998c4c8..4711155a33 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -67,3 +67,4 @@ CONFIG_I2C=y
+>  CONFIG_SEV=$(CONFIG_KVM)
+>  CONFIG_VTD=y
+>  CONFIG_AMD_IOMMU=y
+> +CONFIG_PAM=y
+> diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+> index 6d6597c065..9d7e7cd1b8 100644
+> --- a/hw/pci-host/Makefile.objs
+> +++ b/hw/pci-host/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -common-obj-y += pam.o
+> +common-obj-$(CONFIG_PAM) += pam.o
+>  
+>  # PPC devices
+>  common-obj-$(CONFIG_PREP_PCI) += prep.o
+> 
 
-In this case, however, keeping subsystems self-contained is a good
-reason to apply the patch.  Having SSIBus in typedefs.h means that the
-next SSI type has a higher chance of being added to typedefs.h even if
-it's not necessary.
-
-Sometimes we need to take patches that seem unnecessary in order to keep
-the codebase tidy.  Think of the churn that was the introduction of
-hw/SUBSYSTEM.  It was painful and it added all the complexity to the
-Makefiles in order to support recursive Makefile.objs in our
-not-that-recursive makefiles.  However, it made MAINTAINERS usable and
-now, a few years later, few of us would probably be happy to go back to
-the flat hw/ directory.
-
-Paolo
+Reviewed-by: Thomas Huth <thuth@redhat.com>
