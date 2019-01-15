@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39442)
+Received: from eggs.gnu.org ([209.51.188.92]:40133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gjPdk-0007Xy-G5
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:24:29 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gjPgz-0001lG-2I
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:27:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gjPdi-0007tb-ML
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:24:28 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42401)
+	(envelope-from <stefanha@gmail.com>) id 1gjPgt-0001At-5r
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:27:48 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42425)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gjPdi-0007sr-8s
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:24:26 -0500
-Received: by mail-wr1-x444.google.com with SMTP id q18so3150751wrx.9
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 06:24:25 -0800 (PST)
-Date: Tue, 15 Jan 2019 14:24:21 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gjPgs-0001AJ-VI
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:27:43 -0500
+Received: by mail-wr1-x442.google.com with SMTP id q18so3164343wrx.9
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 06:27:42 -0800 (PST)
+Date: Tue, 15 Jan 2019 14:27:39 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190115142421.GC29056@stefanha-x1.localdomain>
-References: <20190115100058.44712-1-sgarzare@redhat.com>
+Message-ID: <20190115142739.GD29056@stefanha-x1.localdomain>
+References: <1547546927-18006-1-git-send-email-dimastep@yandex-team.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gr/z0/N6AeWAPJVB"
+	protocol="application/pgp-signature"; boundary="fOHHtNG4YXGJ0yqR"
 Content-Disposition: inline
-In-Reply-To: <20190115100058.44712-1-sgarzare@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] pvh: add new PVH option rom
+In-Reply-To: <1547546927-18006-1-git-send-email-dimastep@yandex-team.ru>
+Subject: Re: [Qemu-devel] [PATCH v1] virtio: add checks for the size of the
+ indirect table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Maran Wilson <maran.wilson@oracle.com>, Richard Henderson <rth@twiddle.net>
+To: Dima Stepanov <dimastep@yandex-team.ru>
+Cc: mst@redhat.com, qemu-devel@nongnu.org, wrfsh@yandex-team.ru
 
 
---gr/z0/N6AeWAPJVB
+--fOHHtNG4YXGJ0yqR
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 15, 2019 at 11:00:54AM +0100, Stefano Garzarella wrote:
-> This patch series is based on "[RFC v2 0/4] QEMU changes to do PVH boot" =
-and
-> provides a PVH option rom that can be used with SeaBIOS to boot uncompres=
-sed
-> kernel using the x86/HVM direct boot ABI.
+On Tue, Jan 15, 2019 at 01:08:47PM +0300, Dima Stepanov wrote:
+> The virtqueue_pop() and virtqueue_get_avail_bytes() routines can use the
+> INDIRECT table to get the data. It is possible to create a packet which
+> will lead to the assert message like:
+>   include/exec/memory.h:1995: void
+>   address_space_read_cached(MemoryRegionCache *, hwaddr, void *, int):
+>   Assertion `addr < cache->len && len <=3D cache->len - addr' failed.
+>   Aborted
+> To do it the first descriptor should have a link to the INDIRECT table
+> and set the size of it to 0. It doesn't look good that the guest should
+> be able to trigger the assert in qemu. Add additional check for the size
+> of the INDIRECT table, which should not be 0.
 >=20
-> Patches 1 and 2 are to prepare the PVH option rom, moving common function=
-s in a
-> new header.  Patch 3 adds the new PVH option rom and patch 4 uses it when=
- we
-> are booting an uncompressed kernel using the x86/HVM direct boot ABI.
->=20
-> Changes in v2:
-> - addressed comments by Stefan and Eric:
->   - Patch 2: moved inludes on top of linuxboot_dma.c and add <stdint.h> in
->     optrom.h
->   - Patch 4: added check of pvh.bin in xen_load_linux()
-> - modified commit message of patch 2 to explain better the patch
->=20
-> Stefano Garzarella (4):
->   linuxboot_dma: remove duplicate definitions of FW_CFG
->   linuxboot_dma: move common functions in a new header
->   optionrom: add new PVH option rom
->   hw/i386/pc: use PVH option rom
->=20
->  hw/i386/pc.c                      |   5 +
->  pc-bios/optionrom/Makefile        |   5 +-
->  pc-bios/optionrom/linuxboot_dma.c | 112 +++--------------
->  pc-bios/optionrom/optrom.h        | 110 ++++++++++++++++
->  pc-bios/optionrom/optrom_fw_cfg.h |  92 ++++++++++++++
->  pc-bios/optionrom/pvh.S           | 200 ++++++++++++++++++++++++++++++
->  pc-bios/optionrom/pvh_main.c      | 117 +++++++++++++++++
->  7 files changed, 544 insertions(+), 97 deletions(-)
->  create mode 100644 pc-bios/optionrom/optrom.h
->  create mode 100644 pc-bios/optionrom/optrom_fw_cfg.h
->  create mode 100644 pc-bios/optionrom/pvh.S
->  create mode 100644 pc-bios/optionrom/pvh_main.c
->=20
-> --=20
-> 2.20.1
->=20
->=20
+> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> ---
+>  hw/virtio/virtio.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---gr/z0/N6AeWAPJVB
+--fOHHtNG4YXGJ0yqR
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJcPe0VAAoJEJykq7OBq3PIKW0IAIL/UpN+ihy9GsnhMzMPMFgQ
-uFPmagHkO2MX5GoZRB49/kdqOn0JJdDZ9WX6L1iZeJXOqU33hbVGGTOS0GVaKWqJ
-eLGI34Nm6wWDeOouH9vvb0OBOs0ybkCv1OV9cVDeKgRrwVkE/MvaPpyJ927E+0B8
-y7fPqneTk5ySs+aaf5iIpV9TfT67GF6gsjSD8g5F6e3ureWs3oLneM6Xczq0Jylc
-egkeHWVLg6FvSE01JI46zqrUNbxMiarnjF9/Lp5duXsOSU1Cy14YNK9Kg4IWOoqk
-98mk8CVn81yhmcnp0l+e86GMy5O3B1kVOixC5N5T3YQevCviS2iOvbgqhgQGTa4=
-=+yy1
+iQEcBAEBAgAGBQJcPe3bAAoJEJykq7OBq3PIrIsIAJdUHSq7JQX5oBueFpK8vpV2
+yVWJjH8uBvI+dC/5RaEWqn752bO3ARfPpDY6U9qJzPu/P2qlmAFKgGdWRVzuF8UP
+1U37vN3ot04MTKvQf4MGC2vTrVBWeWBxqnoJJIiUwAoEtUbW+EMeRcP/owaK/OBq
+j3zQg/qC7/YPfKl6/iZNCfVq7Mz8+1WYRejqU74AE0vFRuD6bFdb8SRXytbUGo37
+UyHz489DgyS+S+vT1XleDBNuMGeI2XMmwfZdLz7Tmq9SiOcKx3U7oCjI8/4AKdWT
+hOXpiXqcT7lxSLx9JIO8CaLj2ZzANspNGzKiJ6kP8ttuBBVfjs5RCDI7H3NOq4w=
+=Lg49
 -----END PGP SIGNATURE-----
 
---gr/z0/N6AeWAPJVB--
+--fOHHtNG4YXGJ0yqR--
