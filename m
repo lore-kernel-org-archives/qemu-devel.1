@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35484)
+Received: from eggs.gnu.org ([209.51.188.92]:37033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjU8e-0006mM-3Q
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:12:40 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gjUA6-0007Yp-Cw
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:14:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjU8d-00085P-5b
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:12:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gjU8c-00084L-Qh
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:12:39 -0500
-References: <20190115100058.44712-1-sgarzare@redhat.com>
-	<20190115100058.44712-5-sgarzare@redhat.com>
-	<20190115135548-mutt-send-email-mst@kernel.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3db58f6f-44fc-da64-2cfb-41404a9b2319@redhat.com>
-Date: Tue, 15 Jan 2019 13:12:21 -0600
+	(envelope-from <mlureau@redhat.com>) id 1gjUA1-0000ds-Iz
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:14:08 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:41382)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gjU9u-0000YT-05
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:14:01 -0500
+Received: by mail-qt1-f196.google.com with SMTP id l12so4253776qtf.8
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 11:13:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190115135548-mutt-send-email-mst@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FPVuBz9tMqygg4p1AFcTlxHiP4kf8SPqf"
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/i386/pc: use PVH option rom
+References: <20190115145256.9593-1-berrange@redhat.com>
+	<20190115145256.9593-2-berrange@redhat.com>
+In-Reply-To: <20190115145256.9593-2-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 15 Jan 2019 23:13:43 +0400
+Message-ID: <CAMxuvax-Uaey6gQk2Ox--r8n2WMShSSdD745Vhrbe_A0aAjQ+A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/12] chardev: fix validation of options
+ for QMP created chardevs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +30,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Maran Wilson <maran.wilson@oracle.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FPVuBz9tMqygg4p1AFcTlxHiP4kf8SPqf
-From: Eric Blake <eblake@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- George Kennedy <george.kennedy@oracle.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Marc-Andre Lureau <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Maran Wilson <maran.wilson@oracle.com>
-Message-ID: <3db58f6f-44fc-da64-2cfb-41404a9b2319@redhat.com>
-Subject: Re: [PATCH v2 4/4] hw/i386/pc: use PVH option rom
-References: <20190115100058.44712-1-sgarzare@redhat.com>
- <20190115100058.44712-5-sgarzare@redhat.com>
- <20190115135548-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190115135548-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 1/15/19 12:57 PM, Michael S. Tsirkin wrote:
-> On Tue, Jan 15, 2019 at 11:00:58AM +0100, Stefano Garzarella wrote:
->> Use pvh.bin option rom when we are booting an uncompressed
->> kernel using the x86/HVM direct boot ABI.
->>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> Based-on: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
->=20
-> I don't think this is a great way to give attribution.
-> Can you pls include the author name and the S.O.B from there as well?
->=20
->=20
->> ---
+On Tue, Jan 15, 2019 at 6:53 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> The TLS creds option is not valid with certain address types. The user
+> config was only checked for errors when parsing legacy QemuOpts, thus
+> the user could pass unsupported values via QMP.
+>
+> Pull all code for validating options out into a new method
+> qmp_chardev_validate_socket, that is called from the main
+> qmp_chardev_open_socket method. This adds a missing check for rejecting
+> TLS creds with the vsock address type.
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Patchew understands Based-on: tags as meaning a prerequisite patch on
-the list that must be applied first before this patch can apply (and NOT
-in the sense that this patch is an updated revision to replace an
-earlier revision posted by someone else) - but when using the annotation
-to keep Patchew happy, it should either be in a 0/N cover letter, or for
-a single patch, after the --- separator, as the condition of a
-prerequisite patch not being applied is a transient condition relevant
-to the current build but not something that needs to be recorded in
-long-term git history.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---FPVuBz9tMqygg4p1AFcTlxHiP4kf8SPqf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEyBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw+MJUACgkQp6FrSiUn
-Q2rZRAf48qHc66BrOPcGIx+pW+EFujkU1FCGELMg7wsWX3GKUshqAL0fIvCtMG8L
-SHelPnM5PuvMpUqPCK05RQenvuce18SUADgnrGB6R7RwVbvD+6ou5dnvuhoUaYPz
-GcCYpynlC/HFa93atjvbnKwDvf6lVzUf3C+V4Xfsx77ahv02UOuhpkTGOm/RGf3r
-zBxIYJ4arHvlmkc7FL3/AOeB7RjGH0zTs9hc8jDAPQfNr74Joi2EjziJiGtQjUBS
-YdfxtH0jTmqEwyNedC4OACbP2j27vqQPbkkec9NZXfR3FTGkvkSg3rPl86JNItDb
-qajezLxKk7lMRWGp0DP+C4QBqDbE
-=d6ip
------END PGP SIGNATURE-----
-
---FPVuBz9tMqygg4p1AFcTlxHiP4kf8SPqf--
+> ---
+>  chardev/char-socket.c | 92 +++++++++++++++++++++++++++++++------------
+>  1 file changed, 66 insertions(+), 26 deletions(-)
+>
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index eaa8e8b68f..6669acb35f 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -987,6 +987,65 @@ static gboolean socket_reconnect_timeout(gpointer op=
+aque)
+>      return false;
+>  }
+>
+> +
+> +static bool qmp_chardev_validate_socket(ChardevSocket *sock,
+> +                                        SocketAddress *addr,
+> +                                        Error **errp)
+> +{
+> +    /* Validate any options which have a dependancy on address type */
+> +    switch (addr->type) {
+> +    case SOCKET_ADDRESS_TYPE_FD:
+> +        if (sock->has_reconnect) {
+> +            error_setg(errp,
+> +                       "'reconnect' option is incompatible with "
+> +                       "'fd' address type");
+> +            return false;
+> +        }
+> +        if (sock->has_tls_creds &&
+> +            !(sock->has_server && sock->server)) {
+> +            error_setg(errp,
+> +                       "'tls_creds' option is incompatible with "
+> +                       "'fd' address type as client");
+> +            return false;
+> +        }
+> +        break;
+> +
+> +    case SOCKET_ADDRESS_TYPE_UNIX:
+> +        if (sock->has_tls_creds) {
+> +            error_setg(errp,
+> +                       "'tls_creds' option is incompatible with "
+> +                       "'unix' address type");
+> +            return false;
+> +        }
+> +        break;
+> +
+> +    case SOCKET_ADDRESS_TYPE_INET:
+> +        break;
+> +
+> +    case SOCKET_ADDRESS_TYPE_VSOCK:
+> +        if (sock->has_tls_creds) {
+> +            error_setg(errp,
+> +                       "'tls_creds' option is incompatible with "
+> +                       "'vsock' address type");
+> +            return false;
+> +        }
+> +
+> +    default:
+> +        break;
+> +    }
+> +
+> +    /* Validate any options which have a dependancy on client vs server =
+*/
+> +    if (!(sock->has_server && sock->server)) {
+> +        if (sock->has_websocket && sock->websocket) {
+> +            error_setg(errp, "%s", "Websocket client is not implemented"=
+);
+> +            return false;
+> +        }
+> +    }
+> +
+> +    return true;
+> +}
+> +
+> +
+>  static void qmp_chardev_open_socket(Chardev *chr,
+>                                      ChardevBackend *backend,
+>                                      bool *be_opened,
+> @@ -1004,11 +1063,6 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>      QIOChannelSocket *sioc =3D NULL;
+>      SocketAddress *addr;
+>
+> -    if (!is_listen && is_websock) {
+> -        error_setg(errp, "%s", "Websocket client is not implemented");
+> -        goto error;
+> -    }
+> -
+>      s->is_listen =3D is_listen;
+>      s->is_telnet =3D is_telnet;
+>      s->is_tn3270 =3D is_tn3270;
+> @@ -1049,10 +1103,10 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>
+>      s->addr =3D addr =3D socket_address_flatten(sock->addr);
+>
+> -    if (sock->has_reconnect && addr->type =3D=3D SOCKET_ADDRESS_TYPE_FD)=
+ {
+> -        error_setg(errp, "'reconnect' option is incompatible with 'fd'")=
+;
+> +    if (!qmp_chardev_validate_socket(sock, addr, errp)) {
+>          goto error;
+>      }
+> +
+>      qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_RECONNECTABLE);
+>      /* TODO SOCKET_ADDRESS_FD where fd has AF_UNIX */
+>      if (addr->type =3D=3D SOCKET_ADDRESS_TYPE_UNIX) {
+> @@ -1140,27 +1194,12 @@ static void qemu_chr_parse_socket(QemuOpts *opts,=
+ ChardevBackend *backend,
+>          return;
+>      }
+>
+> -    backend->type =3D CHARDEV_BACKEND_KIND_SOCKET;
+> -    if (path) {
+> -        if (tls_creds) {
+> -            error_setg(errp, "TLS can only be used over TCP socket");
+> -            return;
+> -        }
+> -    } else if (host) {
+> -        if (!port) {
+> -            error_setg(errp, "chardev: socket: no port given");
+> -            return;
+> -        }
+> -    } else if (fd) {
+> -        /* We don't know what host to validate against when in client mo=
+de */
+> -        if (tls_creds && !is_listen) {
+> -            error_setg(errp, "TLS can not be used with pre-opened client=
+ FD");
+> -            return;
+> -        }
+> -    } else {
+> -        g_assert_not_reached();
+> +    if (host && !port) {
+> +        error_setg(errp, "chardev: socket: no port given");
+> +        return;
+>      }
+>
+> +    backend->type =3D CHARDEV_BACKEND_KIND_SOCKET;
+>      sock =3D backend->u.socket.data =3D g_new0(ChardevSocket, 1);
+>      qemu_chr_parse_common(opts, qapi_ChardevSocket_base(sock));
+>
+> @@ -1178,6 +1217,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, C=
+hardevBackend *backend,
+>      sock->wait =3D is_waitconnect;
+>      sock->has_reconnect =3D qemu_opt_find(opts, "reconnect");
+>      sock->reconnect =3D reconnect;
+> +    sock->has_tls_creds =3D tls_creds;
+>      sock->tls_creds =3D g_strdup(tls_creds);
+>
+>      addr =3D g_new0(SocketAddressLegacy, 1);
+> --
+> 2.20.1
+>
