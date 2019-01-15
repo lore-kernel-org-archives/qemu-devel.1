@@ -1,26 +1,26 @@
 Received: from eggs.gnu.org ([209.51.188.92]:55550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gjSaF-00023v-LE
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:33:05 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gjSaT-00023v-Oo
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:33:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gjSRR-000412-0s
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:23:57 -0500
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:38646)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gjSOk-0002Tu-K2
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:21:11 -0500
+Received: from mail-yb1-xb2e.google.com ([2607:f8b0:4864:20::b2e]:45838)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gjSRQ-00040K-2D
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:23:56 -0500
-Received: by mail-ot1-x331.google.com with SMTP id e12so3212338otl.5
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 09:23:55 -0800 (PST)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gjSOk-0002TH-Em
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:21:10 -0500
+Received: by mail-yb1-xb2e.google.com with SMTP id n78so1331491yba.12
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 09:21:09 -0800 (PST)
 MIME-Version: 1.0
-References: <20190114162605.5330-1-eblake@redhat.com>
-In-Reply-To: <20190114162605.5330-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 Jan 2019 17:23:43 +0000
-Message-ID: <CAFEAcA8hR1aurEfv4qtx1LVV1W-F=NXHeRRjMH8BHJntgqFVsQ@mail.gmail.com>
+References: <CAMo8BfKWwT13TkBJ-C_kwYCkTcYY_Tq1vvGzanCzeDBRgTUzeg@mail.gmail.com>
+	<20190115145117.GA4535@flamenco>
+In-Reply-To: <20190115145117.GA4535@flamenco>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 15 Jan 2019 09:20:57 -0800
+Message-ID: <CAMo8BfJ6zVMucPyFiEK47MYaAxc+c0OTe_a8DhqWYQG5BH2WSw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/20] NBD patches through 2019-01-14
+Subject: Re: [Qemu-devel] MTTCG qemu-softmmu aborted on watchpoint hit by
+ atomic instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Mon, 14 Jan 2019 at 16:28, Eric Blake <eblake@redhat.com> wrote:
+On Tue, Jan 15, 2019 at 6:51 AM Emilio G. Cota <cota@braap.org> wrote:
+> Can you please try the appended?
 >
-> The following changes since commit 7260438b7056469610ee166f7abe9ff8a26b8b=
-16:
->
->   Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3.2-=
-part2' into staging (2019-01-14 11:41:43 +0000)
->
-> are available in the Git repository at:
->
->   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-01-14
->
-> for you to fetch changes up to 636192c4b6052820ea126a5287c58a8f53f3c84f:
->
->   qemu-nbd: Add --bitmap=3DNAME option (2019-01-14 10:09:46 -0600)
->
-> ----------------------------------------------------------------
-> nbd patches for 2019-01-14
->
-> Promote bitmap/NBD interfaces to stable for use in incremental
-> backups. Add 'qemu-nbd --bitmap'.
->
-> - John Snow: 0/11 bitmaps: remove x- prefix from QMP api
-> - Philippe Mathieu-Daud=C3=A9: qemu-nbd: Rename 'exp' variable clashing w=
-ith math::exp() symbol
-> - Eric Blake: 0/8 Promote x-nbd-server-add-bitmap to stable
->
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 870027d435..a5258bcbc8 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -266,6 +266,9 @@ void cpu_exec_step_atomic(CPUState *cpu)
+>  #ifndef CONFIG_SOFTMMU
+>          tcg_debug_assert(!have_mmap_lock());
+>  #endif
+> +        if (qemu_mutex_iothread_locked()) {
+> +            qemu_mutex_unlock_iothread();
+> +        }
+>          assert_no_pages_locked();
+>      }
 
-Applied, thanks.
+It works, thank you!
+Tested-by: Max Filippov <jcmvbkbc@gmail.com>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
-for any user-visible changes.
-
--- PMM
+-- 
+Thanks.
+-- Max
