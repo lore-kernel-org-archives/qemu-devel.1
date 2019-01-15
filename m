@@ -1,25 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:36654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDjW-0007cx-QB
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:39 -0500
+	(envelope-from <mst@redhat.com>) id 1gjDjY-0007cx-TS
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDfR-0000LV-HT
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:37:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:15373)
+	(envelope-from <mst@redhat.com>) id 1gjDfH-0000Be-Rh
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:37:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49046)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDfR-0000J1-8d
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:37:25 -0500
-Date: Mon, 14 Jan 2019 20:37:14 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDfH-0000BK-It
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:37:15 -0500
+Date: Mon, 14 Jan 2019 20:37:13 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115003812.11329-40-mst@redhat.com>
+Message-ID: <20190115003812.11329-39-mst@redhat.com>
 References: <20190115003812.11329-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20190115003812.11329-1-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 39/44] acpi: expose TPM/PPI configuration
- parameters to firmware via fw_cfg
+Subject: [Qemu-devel] [PULL 38/44] tpm: allocate/map buffer for TPM Physical
+ Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,120 +29,214 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-To avoid having to hard code the base address of the PPI virtual
-memory device we introduce a fw_cfg file etc/tpm/config that holds the
-base address of the PPI device, the version of the PPI interface and
-the version of the attached TPM.
+Implement a virtual memory device for the TPM Physical Presence interface=
+.
+The memory is located at 0xFED45000 and used by ACPI to send messages to =
+the
+firmware (BIOS) and by the firmware to provide parameters for each one of
+the supported codes.
+
+This interface should be used by all TPM devices on x86 and can be
+added by calling tpm_ppi_init_io().
+
+Note: bios_linker cannot be used to allocate the PPI memory region,
+since the reserved memory should stay stable across reboots, and might
+be needed before the ACPI tables are installed.
 
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-[ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document it=
- ]
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Tested-by: Stefan Berger <stefanb@linux.ibm.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- docs/specs/tpm.txt    | 19 +++++++++++++++++++
- include/hw/acpi/tpm.h |  3 +++
- hw/i386/acpi-build.c  | 19 +++++++++++++++++++
- 3 files changed, 41 insertions(+)
+ hw/tpm/tpm_ppi.h      | 36 ++++++++++++++++++++++++++++++++++++
+ include/hw/acpi/tpm.h |  6 ++++++
+ hw/tpm/tpm_crb.c      |  7 +++++++
+ hw/tpm/tpm_ppi.c      | 31 +++++++++++++++++++++++++++++++
+ hw/tpm/tpm_tis.c      |  7 +++++++
+ hw/tpm/Makefile.objs  |  1 +
+ 6 files changed, 88 insertions(+)
+ create mode 100644 hw/tpm/tpm_ppi.h
+ create mode 100644 hw/tpm/tpm_ppi.c
 
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 1af82bba86..e4bb094700 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -34,6 +34,25 @@ The CRB interface makes a memory mapped IO region in t=
-he area 0xfed40000 -
- QEMU files related to TPM CRB interface:
-  - hw/tpm/tpm_crb.c
-=20
-+=3D fw_cfg interface =3D
+diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+new file mode 100644
+index 0000000000..c5e555fe2c
+--- /dev/null
++++ b/hw/tpm/tpm_ppi.h
+@@ -0,0 +1,36 @@
++/*
++ * TPM Physical Presence Interface
++ *
++ * Copyright (C) 2018 IBM Corporation
++ *
++ * Authors:
++ *  Stefan Berger    <stefanb@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++#ifndef TPM_TPM_PPI_H
++#define TPM_TPM_PPI_H
 +
-+The bios/firmware may read the "etc/tpm/config" fw_cfg entry for
-+configuring the guest appropriately.
++#include "hw/acpi/tpm.h"
++#include "exec/address-spaces.h"
 +
-+The entry of 6 bytes has the following content, in little-endian:
++typedef struct TPMPPI {
++    MemoryRegion ram;
++    uint8_t *buf;
++} TPMPPI;
 +
-+    #define TPM_VERSION_UNSPEC          0
-+    #define TPM_VERSION_1_2             1
-+    #define TPM_VERSION_2_0             2
++/**
++ * tpm_ppi_init:
++ * @tpmppi: a TPMPPI
++ * @m: the address-space / MemoryRegion to use
++ * @addr: the address of the PPI region
++ * @obj: the owner object
++ *
++ * Register the TPM PPI memory region at @addr on the given address
++ * space for the object @obj.
++ **/
++void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
++                  hwaddr addr, Object *obj);
 +
-+    #define TPM_PPI_VERSION_NONE        0
-+    #define TPM_PPI_VERSION_1_30        1
-+
-+    struct FwCfgTPMConfig {
-+        uint32_t tpmppi_address;         /* PPI memory location */
-+        uint8_t tpm_version;             /* TPM version */
-+        uint8_t tpmppi_version;          /* PPI version */
-+    };
-=20
- =3D ACPI Interface =3D
-=20
++#endif /* TPM_TPM_PPI_H */
 diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-index b8796df916..a6109a97fc 100644
+index 3580ffd50c..b8796df916 100644
 --- a/include/hw/acpi/tpm.h
 +++ b/include/hw/acpi/tpm.h
-@@ -194,4 +194,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
- #define TPM_PPI_ADDR_SIZE           0x400
- #define TPM_PPI_ADDR_BASE           0xFED45000
+@@ -188,4 +188,10 @@ REG32(CRB_DATA_BUFFER, 0x80)
+ #define TPM2_START_METHOD_MMIO      6
+ #define TPM2_START_METHOD_CRB       7
 =20
-+#define TPM_PPI_VERSION_NONE        0
-+#define TPM_PPI_VERSION_1_30        1
++/*
++ * Physical Presence Interface
++ */
++#define TPM_PPI_ADDR_SIZE           0x400
++#define TPM_PPI_ADDR_BASE           0xFED45000
 +
  #endif /* HW_ACPI_TPM_H */
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 14f757fc36..9898247705 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
-     bool pcihp_bridge_en;
- } AcpiBuildPciBusHotplugState;
+diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+index d5b0ac5920..012ec686d4 100644
+--- a/hw/tpm/tpm_crb.c
++++ b/hw/tpm/tpm_crb.c
+@@ -29,6 +29,7 @@
+ #include "sysemu/reset.h"
+ #include "tpm_int.h"
+ #include "tpm_util.h"
++#include "tpm_ppi.h"
+ #include "trace.h"
 =20
-+typedef struct FwCfgTPMConfig {
-+    uint32_t tpmppi_address;
-+    uint8_t tpm_version;
-+    uint8_t tpmppi_version;
-+} QEMU_PACKED FwCfgTPMConfig;
-+
- static void init_common_fadt_data(Object *o, AcpiFadtData *data)
- {
-     uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
- NULL);
-@@ -2847,6 +2853,8 @@ void acpi_setup(void)
-     AcpiBuildTables tables;
-     AcpiBuildState *build_state;
-     Object *vmgenid_dev;
-+    TPMIf *tpm;
-+    static FwCfgTPMConfig tpm_config;
+ typedef struct CRBState {
+@@ -43,6 +44,7 @@ typedef struct CRBState {
+     size_t be_buffer_size;
 =20
-     if (!pcms->fw_cfg) {
-         ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
-@@ -2881,6 +2889,17 @@ void acpi_setup(void)
-     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
-                     tables.tcpalog->data, acpi_data_len(tables.tcpalog))=
-;
+     bool ppi_enabled;
++    TPMPPI ppi;
+ } CRBState;
 =20
-+    tpm =3D tpm_find();
-+    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_abort=
-)) {
-+        tpm_config =3D (FwCfgTPMConfig) {
-+            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
-+            .tpm_version =3D tpm_get_version(tpm),
-+            .tpmppi_version =3D TPM_PPI_VERSION_NONE
-+        };
-+        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
-+                        &tpm_config, sizeof tpm_config);
+ #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
+@@ -294,6 +296,11 @@ static void tpm_crb_realize(DeviceState *dev, Error =
+**errp)
+     memory_region_add_subregion(get_system_memory(),
+         TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
+=20
++    if (s->ppi_enabled) {
++        tpm_ppi_init(&s->ppi, get_system_memory(),
++                     TPM_PPI_ADDR_BASE, OBJECT(s));
 +    }
 +
-     vmgenid_dev =3D find_vmgenid_dev();
-     if (vmgenid_dev) {
-         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+     qemu_register_reset(tpm_crb_reset, dev);
+ }
+=20
+diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+new file mode 100644
+index 0000000000..cf17779c20
+--- /dev/null
++++ b/hw/tpm/tpm_ppi.c
+@@ -0,0 +1,31 @@
++/*
++ * tpm_ppi.c - TPM Physical Presence Interface
++ *
++ * Copyright (C) 2018 IBM Corporation
++ *
++ * Authors:
++ *  Stefan Berger <stefanb@us.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++
++#include "qapi/error.h"
++#include "cpu.h"
++#include "sysemu/memory_mapping.h"
++#include "migration/vmstate.h"
++#include "tpm_ppi.h"
++
++void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
++                  hwaddr addr, Object *obj)
++{
++    tpmppi->buf =3D g_malloc0(HOST_PAGE_ALIGN(TPM_PPI_ADDR_SIZE));
++    memory_region_init_ram_device_ptr(&tpmppi->ram, obj, "tpm-ppi",
++                                      TPM_PPI_ADDR_SIZE, tpmppi->buf);
++    vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
++
++    memory_region_add_subregion(m, addr, &tpmppi->ram);
++}
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 1698d83cd3..02d9d5c911 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -31,6 +31,7 @@
+ #include "sysemu/tpm_backend.h"
+ #include "tpm_int.h"
+ #include "tpm_util.h"
++#include "tpm_ppi.h"
+ #include "trace.h"
+=20
+ #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
+@@ -83,6 +84,7 @@ typedef struct TPMState {
+     size_t be_buffer_size;
+=20
+     bool ppi_enabled;
++    TPMPPI ppi;
+ } TPMState;
+=20
+ #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+@@ -983,6 +985,11 @@ static void tpm_tis_realizefn(DeviceState *dev, Erro=
+r **errp)
+=20
+     memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
+                                 TPM_TIS_ADDR_BASE, &s->mmio);
++
++    if (s->ppi_enabled) {
++        tpm_ppi_init(&s->ppi, isa_address_space(ISA_DEVICE(dev)),
++                     TPM_PPI_ADDR_BASE, OBJECT(s));
++    }
+ }
+=20
+ static void tpm_tis_initfn(Object *obj)
+diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+index 1dc9f8bf2c..700c878622 100644
+--- a/hw/tpm/Makefile.objs
++++ b/hw/tpm/Makefile.objs
+@@ -1,4 +1,5 @@
+ common-obj-y +=3D tpm_util.o
++obj-y +=3D tpm_ppi.o
+ common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
+ common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
+ common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
 --=20
 MST
