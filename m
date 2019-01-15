@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50250)
+Received: from eggs.gnu.org ([209.51.188.92]:52556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gjW8k-0001t2-5X
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:20:57 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gjWAR-00039B-Je
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:22:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gjW8i-0005LA-4i
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:20:54 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:46005)
+	(envelope-from <mlureau@redhat.com>) id 1gjWAA-0006Sw-CS
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:22:29 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:34356)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gjW8h-0005Gg-Mo
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:20:52 -0500
-Received: by mail-pl1-f194.google.com with SMTP id a14so1865204plm.12
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 13:20:49 -0800 (PST)
-References: <20190114115637.6335-1-peter.maydell@linaro.org>
-	<20190114115637.6335-4-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3ad15f62-ed82-0789-2366-cb4233179e6d@linaro.org>
-Date: Wed, 16 Jan 2019 08:20:40 +1100
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gjWA9-0006QV-4i
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:22:21 -0500
+Received: by mail-qt1-f194.google.com with SMTP id r14so4785100qtp.1
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 13:22:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190114115637.6335-4-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] accel/tcg: Add cluster number to
- TCG TB hash
+References: <20190115145256.9593-1-berrange@redhat.com>
+	<20190115145256.9593-11-berrange@redhat.com>
+In-Reply-To: <20190115145256.9593-11-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 16 Jan 2019 01:22:08 +0400
+Message-ID: <CAMxuvaz_Ywpq257mcwhZbuUN42=p01eG=ds9k0Xf0aQH1h8KqQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 10/12] chardev: honour the reconnect
+ setting in tcp_chr_wait_connected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Emilio G . Cota" <cota@braap.org>, Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 1/14/19 10:56 PM, Peter Maydell wrote:
-> Include the cluster number in the hash we use to look
-> up TBs. This is important because a TB that is valid
-> for one cluster at a given physical address and set
-> of CPU flags is not necessarily valid for another:
-> the two clusters may have different views of physical
-> memory, or may have different CPU features (eg FPU
-> present or absent).
-> 
-> We put the cluster number in the high 8 bits of the
-> TB cflags. This gives us up to 256 clusters, which should
-> be enough for anybody. If we ever need more, or need
-> more bits in cflags for other purposes, we could make
-> tb_hash_func() take more data (and expand qemu_xxhash7()
-> to qemu_xxhash8()).
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Hi
+
+On Tue, Jan 15, 2019 at 6:54 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> If establishing a client connection fails, the tcp_chr_wait_connected
+> method should sleep for the reconnect timeout and then retry the
+> attempt. This ensures the callers don't immediately abort with an
+> error when the initial connection fails.
+
+Obviously, that function is already a bit problematic, since it may
+block the thread with no easy way to cancel (well, the _sync functions
+in general..).
+
+You change doesn't make it much worse, but it will now loop also in
+case of errors. That's what reconnect_time is supposed to do, so
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > ---
-> v1->v2: move the setting of the cluster index in
-> cf_mask in tb_htable_lookup() up to before we
-> set desc.cf_mask from it...
-> ---
->  include/exec/exec-all.h   | 4 +++-
->  accel/tcg/cpu-exec.c      | 3 +++
->  accel/tcg/translate-all.c | 3 +++
->  3 files changed, 9 insertions(+), 1 deletion(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+>  chardev/char-socket.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 96a60eb105..91d775e9c5 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -957,8 +957,15 @@ static int tcp_chr_wait_connected(Chardev *chr, Erro=
+r **errp)
+>          if (s->is_listen) {
+>              tcp_chr_accept_server_sync(chr);
+>          } else {
+> -            if (tcp_chr_connect_client_sync(chr, errp) < 0) {
+> -                return -1;
+> +            Error *err =3D NULL;
+> +            if (tcp_chr_connect_client_sync(chr, &err) < 0) {
+> +                if (s->reconnect_time) {
+> +                    error_free(err);
+> +                    g_usleep(s->reconnect_time);
+> +                } else {
+> +                    error_propagate(errp, err);
+> +                    return -1;
+> +                }
+>              }
+>          }
+>      }
+> --
+> 2.20.1
+>
