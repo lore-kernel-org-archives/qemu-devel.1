@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53250)
+Received: from eggs.gnu.org ([209.51.188.92]:54134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1gjFIr-0003Sq-L0
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 22:22:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1gjFR3-0005Jh-G1
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 22:30:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1gjFIq-0008Vq-I5
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 22:22:13 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:36984 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1gjFIo-0008SS-Gs
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 22:22:12 -0500
-References: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
-	<20190114090757.68bfa839@x1.home>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <aeda1442-6fe9-c86a-dfae-8d46f47a9555@huawei.com>
-Date: Tue, 15 Jan 2019 11:21:51 +0800
+	(envelope-from <bounces@canonical.com>) id 1gjFR1-0004Xk-QM
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 22:30:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36136)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gjFR1-0004X8-Hm
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 22:30:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gjFR0-0001mU-CI
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 03:30:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 503592E8048
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 03:30:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190114090757.68bfa839@x1.home>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Questions about VFIO enabling MSIX vector
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 15 Jan 2019 03:22:43 -0000
+From: WHR <msl0000023508@gmail.com>
+Reply-To: Bug 1785698 <1785698@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153358448492.29549.3601216229452882398.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154752256368.32702.4242360391563457690.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] =?utf-8?q?=5BBug_1785698=5D_Re=3A_Solaris_build_erro?=
+ =?utf-8?b?cjogdW5rbm93biB0eXBlIG5hbWUg4oCYZ2NyeV9lcnJvcl904oCZ?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +37,285 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
+To: qemu-devel@nongnu.org
 
-Hi Alex,
+libutil should not be linked on Solaris, see
+https://bugs.launchpad.net/qemu/+bug/1777252
 
-Really appreciate your comments. I have some more questions below.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1785698
 
-On 2019/1/15 0:07, Alex Williamson wrote:
-> On Sat, 12 Jan 2019 10:30:40 +0800
-> Heyi Guo <guoheyi@huawei.com> wrote:
->
->> Hi folks,
->>
->> I have some questions about vfio_msix_vector_do_use() in
->> hw/vfio/pci.c, could you help to explain?
->>
->> We can see that when guest tries to enable one specific MSIX vector
->> by unmasking MSIX Vector Control, the access will be trapped and then
->> into function vfio_msix_vector_do_use(). And we may go to the below
->> branch in line 525:
->>
->>
->> 520 /*
->> 521  * We don't want to have the host allocate all possible MSI vectors
->> 522  * for a device if they're not in use, so we shutdown and incrementally
->> 523  * increase them as needed.
->> 524  */
->> 525  if (vdev->nr_vectors < nr + 1) {
->> 526      vfio_disable_irqindex(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX);
->> 527      vdev->nr_vectors = nr + 1;
->> 528      ret = vfio_enable_vectors(vdev, true);
->> 529      if (ret) {
->> 530          error_report("vfio: failed to enable vectors, %d", ret);
->> 531      }
->>
->> Here all MSIX vectors will be disabled first and then enabled, with
->> one more MSIX. The comment is there but I still don't quite
->> understand. It makes sense for not allocating all possible MSI
->> vectors, but why shall we shutdown the whole MSI when being requested
->> to enable one specific vector? Can't we just enable the user
->> specified vector indexed by "nr"?
-> What internal kernel API would vfio-pci make use of to achieve that?
-> We can't know the intentions of the guest and we have a limited set of
-> tools to manage the MSI-X state in the host kernel.  It's generally the
-> case that MSI-X vectors are only manipulated during driver setup and
-> shutdown, so while the current behavior isn't necessarily efficient, it
-> works within the constraints and generally doesn't have a runtime impact
-> on performance.  We also recognize that this behavior may change in the
-> future depending on more dynamic internal host kernel interfaces, thus
-> we export the VFIO_IRQ_INFO_NORESIZE flag to indicate to userspace
-> whether this procedure is required.
+Title:
+  Solaris build error: unknown type name =E2=80=98gcry_error_t=E2=80=99
 
-I tried to enable the specified MSIX vector only, and finally understood the original QEMU code after always getting EINVAL from ioctl->VFIO_DEVICE_SET_IRQS.
-Then I tried to allocate all MSIX vectors in vfio_msix_enable(), not only MSIX vector 0. The change works, but it definitely doesn't follow the comment in the code "We don't want to have the host allocate all possible MSI vectors for a device if they're not in use". May I ask what the side effect is if we really allocate all possible vectors at the beginning?
+Status in QEMU:
+  New
 
+Bug description:
+  Building qemu 2.12.0 on a Sun Oracle Enterprise M3000 SPARC64 VII,
+  Solaris 10 Update 11, opencsw toolchain and gcc 7.3.0, gmake fails
+  with a bunch of related errors all in cypher-gcrypt.c:
 
->
->> What's more, on ARM64 systems with GIC ITS, the kernel will issue an
->> ITS discard command when disabling a MSI vector, which will drop
->> currently pending MSI interrupt. If device driver in guest system
->> enables some MSIs first and interrupts may come at any time, and then
->> it tries to enable other MSIs, is it possible for the above code to
->> cause interrupts missing?
-> Interrupt reconfiguration is generally during driver setup or teardown
-> when the device is considered idle or lost interrupts are not a
-> concern.  If you have a device which manipulates interrupt
-> configuration runtime, you can expect that lost interrupts won't be the
-> only problem,
-On physical machine, if the driver enables vector 0 first, and then vector 1 later, will the vector 0 interrupt be lost for some possibility? In my opinion the manipulation of vector 1 should not affect the interrupt of vector 0, isn't it? But if this is possible in virtual world, what do we consider it as? A bug to be fixed in future, or a known limitation of virtualization that won't be fixed and all driver developers should pay attention to it?
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:262:32: error: =E2=
+=80=98gcry_cipher_hd_t=E2=80=99 undeclared (first use in this function); di=
+d you mean =E2=80=98gcry_cipher_info=E2=80=99?
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_encrypt((gcry_cipher_hd=
+_t)ctx, dst, length, src, length);                                ^~~~~~~~~=
+~~~~~~~
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_cipher_info
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:262:49: error: exp=
+ected =E2=80=98)=E2=80=99 before =E2=80=98ctx=E2=80=99
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_encrypt((gcry_cipher_hd=
+_t)ctx, dst, length, src, length);                                         =
+        ^~~
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:262:11: error: too=
+ few arguments to function =E2=80=98gcry_cipher_encrypt=E2=80=99
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_encrypt((gcry_cipher_hd=
+_t)ctx, dst, length, src, length);           ^~~~~~~~~~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
+t.c:25:0,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
+ipher.c:153:
+  /usr/include/gcrypt.h:566:5: note: declared here
+  =C2=A0int gcry_cipher_encrypt (GcryCipherHd h,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
+:0:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c: In function =E2=
+=80=98qcrypto_gcrypt_xts_decrypt=E2=80=99:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:271:5: error: unkn=
+own type name =E2=80=98gcry_error_t=E2=80=99; did you mean =E2=80=98g_error=
+=E2=80=99?
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_error_t err;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_error
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:272:32: error: =E2=
+=80=98gcry_cipher_hd_t=E2=80=99 undeclared (first use in this function); di=
+d you mean =E2=80=98gcry_cipher_info=E2=80=99?
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_decrypt((gcry_cipher_hd=
+_t)ctx, dst, length, src, length);                                ^~~~~~~~~=
+~~~~~~~
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_cipher_info
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:272:49: error: exp=
+ected =E2=80=98)=E2=80=99 before =E2=80=98ctx=E2=80=99
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_decrypt((gcry_cipher_hd=
+_t)ctx, dst, length, src, length);                                         =
+        ^~~
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:272:11: error: too=
+ few arguments to function =E2=80=98gcry_cipher_decrypt=E2=80=99
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher_decrypt((gcry_cipher_hd=
+_t)ctx, dst, length, src, length);           ^~~~~~~~~~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
+t.c:25:0,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
+ipher.c:153:
+  /usr/include/gcrypt.h:571:5: note: declared here
+  =C2=A0int gcry_cipher_decrypt (GcryCipherHd h,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
+:0:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c: In function =E2=
+=80=98qcrypto_gcrypt_cipher_encrypt=E2=80=99:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:284:5: error: unkn=
+own type name =E2=80=98gcry_error_t=E2=80=99; did you mean =E2=80=98g_error=
+=E2=80=99?
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_error_t err;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_error
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:293:21: warning: p=
+assing argument 1 of =E2=80=98xts_encrypt=E2=80=99 makes pointer from integ=
+er without a cast [-Wint-conversion]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0xts_encrypt(ctx->ha=
+ndle, ctx->tweakhandle,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
+t.c:22:0,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
+ipher.c:153:
+  /export/home/denber/qemu-2.12.0/include/crypto/xts.h:73:6: note: expected=
+ =E2=80=98const void *=E2=80=99 but argument is of type =E2=80=98int=E2=80=
+=99
+  =C2=A0void xts_encrypt(const void *datactx,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
+:0:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:293:34: warning: p=
+assing argument 2 of =E2=80=98xts_encrypt=E2=80=99 makes pointer from integ=
+er without a cast [-Wint-conversion]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0xts_encrypt(ctx->ha=
+ndle, ctx->tweakhandle,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
+t.c:22:0,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
+ipher.c:153:
+  /export/home/denber/qemu-2.12.0/include/crypto/xts.h:73:6: note: expected=
+ =E2=80=98const void *=E2=80=99 but argument is of type =E2=80=98int=E2=80=
+=99
+  =C2=A0void xts_encrypt(const void *datactx,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
+:0:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:298:35: warning: p=
+assing argument 1 of =E2=80=98gcry_cipher_encrypt=E2=80=99 makes pointer fr=
+om integer without a cast [-Wint-conversion]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher=
+_encrypt(ctx->handle,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
+t.c:25:0,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
+ipher.c:153:
+  /usr/include/gcrypt.h:566:5: note: expected =E2=80=98GcryCipherHd {aka st=
+ruct gcry_cipher_handle *}=E2=80=99 but argument is of type =E2=80=98int=E2=
+=80=99
+  =C2=A0int gcry_cipher_encrypt (GcryCipherHd h,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
+:0:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c: In function =E2=
+=80=98qcrypto_gcrypt_cipher_decrypt=E2=80=99:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:320:5: error: unkn=
+own type name =E2=80=98gcry_error_t=E2=80=99; did you mean =E2=80=98g_error=
+=E2=80=99?
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_error_t err;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_error
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:329:21: warning: p=
+assing argument 1 of =E2=80=98xts_decrypt=E2=80=99 makes pointer from integ=
+er without a cast [-Wint-conversion]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0xts_decrypt(ctx->ha=
+ndle, ctx->tweakhandle,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
+t.c:22:0,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
+ipher.c:153:
+  /export/home/denber/qemu-2.12.0/include/crypto/xts.h:51:6: note: expected=
+ =E2=80=98const void *=E2=80=99 but argument is of type =E2=80=98int=E2=80=
+=99
+  =C2=A0void xts_decrypt(const void *datactx,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
+:0:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:329:34: warning: p=
+assing argument 2 of =E2=80=98xts_decrypt=E2=80=99 makes pointer from integ=
+er without a cast [-Wint-conversion]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0xts_decrypt(ctx->ha=
+ndle, ctx->tweakhandle,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
+t.c:22:0,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
+ipher.c:153:
+  /export/home/denber/qemu-2.12.0/include/crypto/xts.h:51:6: note: expected=
+ =E2=80=98const void *=E2=80=99 but argument is of type =E2=80=98int=E2=80=
+=99
+  =C2=A0void xts_decrypt(const void *datactx,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
+:0:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:334:35: warning: p=
+assing argument 1 of =E2=80=98gcry_cipher_decrypt=E2=80=99 makes pointer fr=
+om integer without a cast [-Wint-conversion]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D gcry_cipher=
+_decrypt(ctx->handle,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
+t.c:25:0,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
+ipher.c:153:
+  /usr/include/gcrypt.h:571:5: note: expected =E2=80=98GcryCipherHd {aka st=
+ruct gcry_cipher_handle *}=E2=80=99 but argument is of type =E2=80=98int=E2=
+=80=99
+  =C2=A0int gcry_cipher_decrypt (GcryCipherHd h,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher.c:153=
+:0:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c: In function =E2=
+=80=98qcrypto_gcrypt_cipher_setiv=E2=80=99:
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:353:5: error: unkn=
+own type name =E2=80=98gcry_error_t=E2=80=99; did you mean =E2=80=98g_error=
+=E2=80=99?
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_error_t err;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_error
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:365:19: warning: i=
+mplicit declaration of function =E2=80=98gcry_cipher_setctr=E2=80=99; did y=
+ou mean =E2=80=98gcry_cipher_setiv=E2=80=99? [-Wimplicit-function-declarati=
+on]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0err =3D gcry_cipher_setctr(ctx->handle, iv, niv);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gcry_cipher_setiv
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:365:19: warning: n=
+ested extern declaration of =E2=80=98gcry_cipher_setctr=E2=80=99 [-Wnested-=
+externs]
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:372:13: warning: i=
+mplicit declaration of function =E2=80=98gcry_cipher_reset=E2=80=99; did yo=
+u mean =E2=80=98gcry_cipher_close=E2=80=99? [-Wimplicit-function-declaratio=
+n]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0gcry_cipher_reset(ctx->handle);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0^~~~~~~~~~~~~~~~~
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0gcry_cipher_close
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:372:13: warning: n=
+ested extern declaration of =E2=80=98gcry_cipher_reset=E2=80=99 [-Wnested-e=
+xterns]
+  /export/home/denber/qemu-2.12.0/crypto/cipher-gcrypt.c:373:19: warning: p=
+assing argument 1 of =E2=80=98gcry_cipher_ctl=E2=80=99 makes pointer from i=
+nteger without a cast [-Wint-conversion]
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0err =3D gcry_cipher_setiv(ctx->handle, iv, niv);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~
+  In file included from /export/home/denber/qemu-2.12.0/crypto/cipher-gcryp=
+t.c:25:0,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from /export/home/denber/qemu-2.12.0/crypto/c=
+ipher.c:153:
+  /usr/include/gcrypt.h:540:5: note: expected =E2=80=98GcryCipherHd {aka st=
+ruct gcry_cipher_handle *}=E2=80=99 but argument is of type =E2=80=98int=E2=
+=80=99
+  =C2=A0int gcry_cipher_ctl( GcryCipherHd h, int cmd, void *buffer, size_t =
+buflen);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~
+  gmake: *** [/export/home/denber/qemu-2.12.0/rules.mak:67: crypto/cipher.o=
+] Error 1
 
-Thanks,
+  ---------------------------------------------------------------------
 
-Heyi
+  I do have libgcrypt, libgcrypt_dev, and libgcrypt_utils installed from
+  opencsw.
 
-> it's also likely to experience much more overhead in the
-> interrupt manipulation path under assignment than on bare metal.  This
-> is another reason that well behaved drivers generally use relatively
-> static interrupt configurations initialized at driver setup time.
-> Thanks,
->
-> Alex
->
-> .
->
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1785698/+subscriptions
