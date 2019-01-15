@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48663)
+Received: from eggs.gnu.org ([209.51.188.92]:49546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjOHA-0004CU-PE
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:57:05 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gjOKs-0005VN-L2
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 08:00:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjOH8-0003kv-Ql
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:57:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55268)
+	(envelope-from <eric.auger@redhat.com>) id 1gjOKn-0005Nl-L1
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 08:00:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57140)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjOH7-0003ge-7m
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:57:02 -0500
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-4-philmd@redhat.com>
-	<875zuqjea7.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <403ad2e4-3282-051c-1ff5-8a3a23899293@redhat.com>
-Date: Tue, 15 Jan 2019 13:56:40 +0100
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1gjOKn-0005MX-CM
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 08:00:49 -0500
+References: <20190111165801.15181-1-eric.auger@redhat.com>
+	<20190111165801.15181-2-eric.auger@redhat.com>
+	<20190115130333.1ef1d461.cohuck@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <dc07083a-6e6c-a4a8-bec9-8b08cd0761fa@redhat.com>
+Date: Tue, 15 Jan 2019 14:00:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <875zuqjea7.fsf@dusky.pond.sub.org>
+In-Reply-To: <20190115130333.1ef1d461.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/15] hw/ssi: Remove SSIBus from
- "qemu/typedefs.h"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio-pci: Introduce
+ vfio_register_event_notifier helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +31,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: alex.williamson@redhat.com, qemu-devel@nongnu.org, eric.auger.pro@gmail.com
 
-On 2019-01-15 13:28, Markus Armbruster wrote:
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->=20
->> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Hi Cornelia,
+
+On 1/15/19 1:03 PM, Cornelia Huck wrote:
+> On Fri, 11 Jan 2019 17:58:00 +0100
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> The code used to attach the eventfd handler for the ERR and
+>> REQ irq indices can be factorized into a helper. In subsequent
+>> patches we will extend this helper to support other irq indices.
+> 
+> Looks like a nice refactoring to me.
+thank you
+> 
 >>
->> There are only three files requiring this typedef, let them
->> include "hw/ssi/ssi.h" directly to simplify "qemu/typedefs.h".
+>> We test the notification is allowed outside of the helper:
+> 
+> s/We test/We test whether/
+> 
+>> respectively check vdev->pci_aer and VFIO_FEATURE_ENABLE_REQ.
+>> Depending on the returned value we set vdev->pci_aer and
+>> vdev->req_enabled. An error handle is introduced for future usage
+>> although not strictly useful here.
 >>
->> To clean "qemu/typedefs.h", move the forward declaration
->> to "hw/ssi/ssi.h".
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >> ---
->>  hw/arm/strongarm.h      | 1 +
->>  include/hw/arm/pxa.h    | 1 +
->>  include/hw/ssi/pl022.h  | 1 +
->>  include/hw/ssi/ssi.h    | 1 +
->>  include/qemu/typedefs.h | 1 -
->>  5 files changed, 4 insertions(+), 1 deletion(-)
->=20
-> When typedefs.h changes, we recompile the world, but it pretty much onl=
-y
-> ever changes when new typedefs are added.  Thus, *keeping* a typedef
-> there is therefore pretty cheap.
->=20
-> Nevertheless, we shouldn't keep typedefs there without a real reason.
-> Being able to move one away without having to add any new #include
-> directives is a strong sign for "no real reason".  I like patches doing
-> that.
->=20
-> What I don't like is adding #include directives just so you can move
-> typedefs out of typedefs.h: it slows down the build.  Granted, the four
-> added by this patch are a drop in the bucket.  The point I'm trying to
-> make is typedefs.h's purpose: it's for avoiding #include directives.
-> Circular ones in particular, but others, too.
+>>  hw/vfio/pci.c | 291 ++++++++++++++++++++++----------------------------
+>>  1 file changed, 127 insertions(+), 164 deletions(-)
+>>
+>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>> index c0cb1ec289..c589a4e666 100644
+>> --- a/hw/vfio/pci.c
+>> +++ b/hw/vfio/pci.c
+>> @@ -105,6 +105,95 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+>>      vfio_unmask_single_irqindex(vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+>>  }
+>>  
+>> +/*
+>> + * vfio_register_event_notifier - setup/tear down eventfd
+>> + * notification and handling for IRQ indices that span over
+>> + * a single IRQ
+>> + *
+>> + * @vdev: VFIO device handle
+>> + * @index: IRQ index the eventfd/handler is associated to
+> 
+> s/to/with/ ?
+> 
+>> + * @target_state: true means notifier needs to be set up
+>> + * @handler to attach if @target_state is true
+>> + * @errp error handle
+>> + */
+>> +static int vfio_register_event_notifier(VFIOPCIDevice *vdev,
+>> +                                        int index,
+>> +                                        bool target_state,
+>> +                                        void (*handler)(void *opaque),
+>> +                                        Error **errp)
+> 
+> (...)
+> 
+>> @@ -3069,8 +2998,29 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>>          goto out_teardown;
+>>      }
+>>  
+>> -    vfio_register_err_notifier(vdev);
+>> -    vfio_register_req_notifier(vdev);
+>> +    if (vdev->pci_aer) {
+>> +        /*
+>> +         * Registers error notifier for devices supporting error recovery.
+>> +         * If we encounter a failure in this function, we report an error
+> 
+> s/in this function/while registering it/ ?
+> 
+>> +         * and continue after disabling error recovery support for the
+>> +         * device.
+>> +         */
+>> +        vdev->pci_aer =
+>> +            !vfio_register_event_notifier(vdev, VFIO_PCI_ERR_IRQ_INDEX, true,
+>> +                                          vfio_err_notifier_handler, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+> 
+> I think you need to reset err to NULL if you want to reuse the variable.
+Yes you're right. Thanks for spotting this.
 
-Yes, agreed, removing things from typedefs.h just to add lots of
-#includes in other files is not really the best idea. I also dropped
-this patch in v2 of my current PULL request because of this reason.
-Phil, I suggest to simply drop this patch. What we maybe could do is to
-split up typedefs.h per subsystem, so that we additionally have a
-hw/arm/typedefs.h, hw/ppc/typedefs.h etc. in the end, then the
-target-specific typedefs would not clutter the common qemu/typedefs.h
-file anymore.
+> 
+> Alternatively, you could keep the wrappers and define a local error
+> variable there.
+> 
+>> +    }
+>> +
+>> +    if (vdev->features & VFIO_FEATURE_ENABLE_REQ) {
+>> +        vdev->req_enabled =
+>> +            !vfio_register_event_notifier(vdev, VFIO_PCI_REQ_IRQ_INDEX, true,
+>> +                                          vfio_req_notifier_handler, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+>> +    }
+>>      vfio_setup_resetfn_quirk(vdev);
+>>  
+>>      return;
+>> @@ -3106,9 +3056,22 @@ static void vfio_instance_finalize(Object *obj)
+>>  static void vfio_exitfn(PCIDevice *pdev)
+>>  {
+>>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+>> +    Error *err = NULL;
+>>  
+>> -    vfio_unregister_req_notifier(vdev);
+>> -    vfio_unregister_err_notifier(vdev);
+>> +    if (vdev->req_enabled) {
+>> +        vfio_register_event_notifier(vdev, VFIO_PCI_REQ_IRQ_INDEX,
+>> +                                     false, NULL, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+> 
+> Likewise.
 
- Thomas
+Thank you for the review!
+
+Eric
+
+> 
+>> +    }
+>> +    if (vdev->pci_aer) {
+>> +        vfio_register_event_notifier(vdev, VFIO_PCI_ERR_IRQ_INDEX,
+>> +                                     false, NULL, &err);
+>> +        if (err) {
+>> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        }
+>> +    }
+>>      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+>>      vfio_disable_interrupts(vdev);
+>>      if (vdev->intx.mmap_timer) {
+> 
+> 
