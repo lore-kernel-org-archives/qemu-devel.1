@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56024)
+Received: from eggs.gnu.org ([209.51.188.92]:33682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gjMcJ-0002Yz-J3
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 06:10:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gjN3j-0007I8-U7
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 06:39:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gjMcI-0003Bl-Q6
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 06:10:47 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 15 Jan 2019 11:10:07 +0000
-Message-Id: <20190115111007.27159-3-stefanha@redhat.com>
-In-Reply-To: <20190115111007.27159-1-stefanha@redhat.com>
-References: <20190115111007.27159-1-stefanha@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gjN3h-00050r-3v
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 06:39:07 -0500
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:32785)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gjN3g-00050G-Dx
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 06:39:05 -0500
+Received: by mail-oi1-x22d.google.com with SMTP id c206so1894281oib.0
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 03:39:04 -0800 (PST)
 MIME-Version: 1.0
+References: <20190114150129.1013-1-alex.bennee@linaro.org>
+In-Reply-To: <20190114150129.1013-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 15 Jan 2019 11:38:51 +0000
+Message-ID: <CAFEAcA_Mh17ktcOMqVSR7LZP4QP+VpJPcpR5zjV1-rmeWS7T+A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/2] iotests: add LUKS payload overhead to 178
- qemu-img measure test
+Subject: Re: [Qemu-devel] [PULL 00/21] misc testing fixes for Travis and
+ docker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,95 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-The previous patch includes the LUKS payload overhead into the qemu-img
-measure calculation for qcow2.  Update qemu-iotests 178 to exercise this
-new code path.
+On Mon, 14 Jan 2019 at 15:01, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> The following changes since commit 7260438b7056469610ee166f7abe9ff8a26b8b=
+16:
+>
+>   Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3.2-=
+part2' into staging (2019-01-14 11:41:43 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-testing-next-140119-1
+>
+> for you to fetch changes up to a36270a4d1589b1ed309065fc8b3fe0ac8d6869d:
+>
+>   Revert "tests: Disable qht-bench parallel test when using gprof" (2019-=
+01-14 14:55:32 +0000)
+>
+> ----------------------------------------------------------------
+> A bunch of fixes for testing:
+>
+>   - Various Travis updates
+>   - "stable" SID snapshot for docker
+>   - avoid :latest docker tags
+>   - g_usleep fix for some tests
+>
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/178           |  8 ++++++++
- tests/qemu-iotests/178.out.qcow2 | 24 ++++++++++++++++++++++++
- 2 files changed, 32 insertions(+)
+Applied, thanks.
 
-diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
-index 3f4b4a4564..23eb017ea1 100755
---- a/tests/qemu-iotests/178
-+++ b/tests/qemu-iotests/178
-@@ -142,6 +142,14 @@ for ofmt in human json; do
-             # The backing file doesn't need to exist :)
-             $QEMU_IMG measure --output=3D$ofmt -o backing_file=3Dx \
-                               -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
-+
-+            echo
-+            echo "=3D=3D $fmt input image and LUKS encryption =3D=3D"
-+            echo
-+            $QEMU_IMG measure --output=3D$ofmt \
-+                              --object secret,id=3Dsec0,data=3Dbase \
-+                              -o encrypt.format=3Dluks,encrypt.key-secre=
-t=3Dsec0 \
-+                              -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
-         fi
-=20
-         echo
-diff --git a/tests/qemu-iotests/178.out.qcow2 b/tests/qemu-iotests/178.ou=
-t.qcow2
-index d42d4a4597..55a8dc926f 100644
---- a/tests/qemu-iotests/178.out.qcow2
-+++ b/tests/qemu-iotests/178.out.qcow2
-@@ -68,6 +68,11 @@ converted image file size in bytes: 458752
- required size: 1074135040
- fully allocated size: 1074135040
-=20
-+=3D=3D qcow2 input image and LUKS encryption =3D=3D
-+
-+required size: 2686976
-+fully allocated size: 1076232192
-+
- =3D=3D qcow2 input image and preallocation (human) =3D=3D
-=20
- required size: 1074135040
-@@ -114,6 +119,11 @@ converted image file size in bytes: 524288
- required size: 1074135040
- fully allocated size: 1074135040
-=20
-+=3D=3D raw input image and LUKS encryption =3D=3D
-+
-+required size: 2686976
-+fully allocated size: 1076232192
-+
- =3D=3D raw input image and preallocation (human) =3D=3D
-=20
- required size: 1074135040
-@@ -205,6 +215,13 @@ converted image file size in bytes: 458752
-     "fully-allocated": 1074135040
- }
-=20
-+=3D=3D qcow2 input image and LUKS encryption =3D=3D
-+
-+{
-+    "required": 2686976,
-+    "fully-allocated": 1076232192
-+}
-+
- =3D=3D qcow2 input image and preallocation (json) =3D=3D
-=20
- {
-@@ -263,6 +280,13 @@ converted image file size in bytes: 524288
-     "fully-allocated": 1074135040
- }
-=20
-+=3D=3D raw input image and LUKS encryption =3D=3D
-+
-+{
-+    "required": 2686976,
-+    "fully-allocated": 1076232192
-+}
-+
- =3D=3D raw input image and preallocation (json) =3D=3D
-=20
- {
---=20
-2.20.1
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.0
+for any user-visible changes.
+
+-- PMM
