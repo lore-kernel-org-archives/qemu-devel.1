@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44513)
+Received: from eggs.gnu.org ([209.51.188.92]:37018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjEK8-0003dE-Rg
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 21:19:30 -0500
+	(envelope-from <like.xu@intel.com>) id 1gjDjv-00085P-2N
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:42:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjEK7-0002ku-AH
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 21:19:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49596)
+	(envelope-from <like.xu@intel.com>) id 1gjDcU-0006kw-ST
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:34:26 -0500
+Received: from mga04.intel.com ([192.55.52.120]:60683)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjEK7-0002jh-1P
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 21:19:27 -0500
-Date: Mon, 14 Jan 2019 21:19:09 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190114205031-mutt-send-email-mst@kernel.org>
-References: <20190109144736.17452-1-pagupta@redhat.com>
-	<20190110012617.GA4205@dastard>
-	<1326478078.61913951.1547192704870.JavaMail.zimbra@redhat.com>
-	<20190113232902.GD4205@dastard>
-	<20190113233820.GX6310@bombadil.infradead.org>
-	<942065073.64011540.1547450140670.JavaMail.zimbra@redhat.com>
-	<20190114212501.GG4205@dastard>
-	<CAPcyv4jtPcLV-s0sKNHwwk0ug7GLBV6699dpm1h3r2xSo879dg@mail.gmail.com>
-	<20190114222132.GH4205@dastard>
+	(Exim 4.71) (envelope-from <like.xu@intel.com>) id 1gjDcS-0006gI-3A
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:34:20 -0500
+From: "Xu, Like" <like.xu@intel.com>
+Date: Tue, 15 Jan 2019 01:34:08 +0000
+Message-ID: <F7FC466FA1E455449AD0F9063BBE758E0BC3A340@SHSMSX101.ccr.corp.intel.com>
+References: <1547468699-17633-1-git-send-email-like.xu@linux.intel.com>
+	<1547468699-17633-2-git-send-email-like.xu@linux.intel.com>
+	<e0fe9258-dcb6-f0eb-edfc-bf158ba2dbb4@redhat.com>
+In-Reply-To: <e0fe9258-dcb6-f0eb-edfc-bf158ba2dbb4@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190114222132.GH4205@dastard>
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
+Subject: Re: [Qemu-devel] [PATCH v1 1/5] cpu: introduce die,
+ the new cpu toppolgy emulation level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,89 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, Pankaj Gupta <pagupta@redhat.com>, Matthew Wilcox <willy@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, virtualization@lists.linux-foundation.org, Linux ACPI <linux-acpi@vger.kernel.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ross Zwisler <zwisler@kernel.org>, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, David Hildenbrand <david@redhat.com>, jmoyer <jmoyer@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, Jason Wang <jasowang@redhat.com>, lcapitulino@redhat.com, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Theodore Ts'o <tytso@mit.edu>, adilger kernel <adilger.kernel@dilger.ca>, darrick wong <darrick.wong@oracle.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: Eric Blake <eblake@redhat.com>, Like Xu <like.xu@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "drjones@redhat.com" <drjones@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Jan 15, 2019 at 09:21:32AM +1100, Dave Chinner wrote:
-> On Mon, Jan 14, 2019 at 01:35:57PM -0800, Dan Williams wrote:
-> > On Mon, Jan 14, 2019 at 1:25 PM Dave Chinner <david@fromorbit.com> wrote:
-> > >
-> > > On Mon, Jan 14, 2019 at 02:15:40AM -0500, Pankaj Gupta wrote:
-> > > >
-> > > > > > Until you have images (and hence host page cache) shared between
-> > > > > > multiple guests. People will want to do this, because it means they
-> > > > > > only need a single set of pages in host memory for executable
-> > > > > > binaries rather than a set of pages per guest. Then you have
-> > > > > > multiple guests being able to detect residency of the same set of
-> > > > > > pages. If the guests can then, in any way, control eviction of the
-> > > > > > pages from the host cache, then we have a guest-to-guest information
-> > > > > > leak channel.
-> > > > >
-> > > > > I don't think we should ever be considering something that would allow a
-> > > > > guest to evict page's from the host's pagecache [1].  The guest should
-> > > > > be able to kick its own references to the host's pagecache out of its
-> > > > > own pagecache, but not be able to influence whether the host or another
-> > > > > guest has a read-only mapping cached.
-> > > > >
-> > > > > [1] Unless the guest is allowed to modify the host's file; obviously
-> > > > > truncation, holepunching, etc are going to evict pages from the host's
-> > > > > page cache.
-> > > >
-> > > > This is so correct. Guest does not not evict host page cache pages directly.
-> > >
-> > > They don't right now.
-> > >
-> > > But someone is going to end up asking for discard to work so that
-> > > the guest can free unused space in the underlying spares image (i.e.
-> > > make use of fstrim or mount -o discard) because they have workloads
-> > > that have bursts of space usage and they need to trim the image
-> > > files afterwards to keep their overall space usage under control.
-> > >
-> > > And then....
-> > 
-> > ...we reject / push back on that patch citing the above concern.
-> 
-> So at what point do we draw the line?
-> 
-> We're allowing writable DAX mappings, but as I've pointed out that
-> means we are going to be allowing  a potential information leak via
-> files with shared extents to be directly mapped and written to.
-> 
-> But we won't allow useful admin operations that allow better
-> management of host side storage space similar to how normal image
-> files are used by guests because it's an information leak vector?
-> 
-> That's splitting some really fine hairs there...
-
-May I summarize that th security implications need to
-be documented?
-
-In fact that would make a fine security implications section
-in the device specification.
-
-
-
-
-
-> > > > In case of virtio-pmem & DAX, guest clears guest page cache exceptional entries.
-> > > > Its solely decision of host to take action on the host page cache pages.
-> > > >
-> > > > In case of virtio-pmem, guest does not modify host file directly i.e don't
-> > > > perform hole punch & truncation operation directly on host file.
-> > >
-> > > ... this will no longer be true, and the nuclear landmine in this
-> > > driver interface will have been armed....
-> > 
-> > I agree with the need to be careful when / if explicit cache control
-> > is added, but that's not the case today.
-> 
-> "if"?
-> 
-> I expect it to be "when", not if. Expect the worst, plan for it now.
-> 
-> Cheers,
-> 
-> Dave.
-> -- 
-> Dave Chinner
-> david@fromorbit.com
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBFcmljIEJsYWtlIFttYWlsdG86
+ZWJsYWtlQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFR1ZXNkYXksIEphbnVhcnkgMTUsIDIwMTkgNDow
+OCBBTQ0KPiBUbzogTGlrZSBYdSA8bGlrZS54dUBsaW51eC5pbnRlbC5jb20+OyBxZW11LWRldmVs
+QG5vbmdudS5vcmcNCj4gQ2M6IGRyam9uZXNAcmVkaGF0LmNvbTsgUGV0ZXIgQ3Jvc3Rod2FpdGUN
+Cj4gPGNyb3N0aHdhaXRlLnBldGVyQGdtYWlsLmNvbT47IEVkdWFyZG8gSGFia29zdCA8ZWhhYmtv
+c3RAcmVkaGF0LmNvbT47DQo+IE1pY2hhZWwgUy4gVHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+OyBY
+dSwgTGlrZSA8bGlrZS54dUBpbnRlbC5jb20+Ow0KPiBNYXJjZWxvIFRvc2F0dGkgPG10b3NhdHRp
+QHJlZGhhdC5jb20+OyBQYW9sbyBCb256aW5pDQo+IDxwYm9uemluaUByZWRoYXQuY29tPjsgaW1h
+bW1lZG9AcmVkaGF0LmNvbTsgUmljaGFyZCBIZW5kZXJzb24NCj4gPHJ0aEB0d2lkZGxlLm5ldD4N
+Cj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjEgMS81XSBjcHU6IGludHJvZHVj
+ZSBkaWUsIHRoZSBuZXcgY3B1DQo+IHRvcHBvbGd5IGVtdWxhdGlvbiBsZXZlbA0KPiANCj4gT24g
+MS8xNC8xOSA2OjI0IEFNLCBMaWtlIFh1IHdyb3RlOg0KPiA+IEZvbGxvd2luZyBjb2RlcyBvbiBz
+bXBfY29yZXMsIHRoZSBzbXBfZGllcy9ucl9kaWVzL2RpZS1pZCBpcyBhZGRlZCB0bw0KPiA+IG1h
+Y2hpbmUgYW5kIENQVVN0YXRlLiBJbiBhZGRpdGlvbiB0byBlbmFibGVfY3B1aWRfMHhiLA0KPiBl
+bmFibGVfY3B1aWRfMHgxZg0KPiA+IGlzIGludHJvZHVjZWQgdG8gdHJhY2sgd2V0aGVyIGhvc3Qg
+aXMgYSBuZXcgTUNQIG1hY2luZSBvciBqdXN0IGlnbm9yZWQuDQo+IA0KPiBzL3dldGhlci93aGV0
+aGVyLywgcy9tYWNpbmUvbWFjaGluZS8NCltYdSwgTGlrZV0gU29ycnkgZm9yIHR5cG9zIGFuZCBp
+bmNvbnZlbmllbmNlLg0KPiANCj4gPiBUaGUgbnVtYmVyIGZvciBkaWUgbGV2ZWxfdHlwZSBvbiBJ
+bnRlbCBpcyA1IHdoaWxlIGNvcmUgdHlwZSBrZWVwcyAyLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1i
+eTogTGlrZSBYdSA8bGlrZS54dUBsaW51eC5pbnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gIGNwdXMu
+YyAgICAgICAgICAgICAgICB8IDEgKw0KPiA+ICBpbmNsdWRlL3FvbS9jcHUuaCAgICAgfCAxICsN
+Cj4gPiAgaW5jbHVkZS9zeXNlbXUvY3B1cy5oIHwgMSArDQo+ID4gIHFhcGkvbWlzYy5qc29uICAg
+ICAgICB8IDEgKw0KPiA+ICB0YXJnZXQvaTM4Ni9jcHUuaCAgICAgfCA1ICsrKysrDQo+ID4gIDUg
+ZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspDQo+ID4NCj4gDQo+ID4gKysrIGIvcWFwaS9t
+aXNjLmpzb24NCj4gPiBAQCAtMzIyOSw2ICszMjI5LDcgQEANCj4gPiAgeyAnc3RydWN0JzogJ0Nw
+dUluc3RhbmNlUHJvcGVydGllcycsDQo+ID4gICAgJ2RhdGEnOiB7ICcqbm9kZS1pZCc6ICdpbnQn
+LA0KPiA+ICAgICAgICAgICAgICAnKnNvY2tldC1pZCc6ICdpbnQnLA0KPiA+ICsgICAgICAgICAg
+ICAnKmRpZS1pZCc6ICdpbnQnLA0KPiANCj4gTWlzc2luZyBkb2N1bWVudGF0aW9uIG9mIHRoZSBu
+ZXcgZmllbGQsIGluY2x1ZGluZyBhICcoc2luY2UgNC4wKScgdGFnLg0KW1h1LCBMaWtlXSBMZXQg
+bWUgYWRkIG1vcmUgZG9jcyBpbiBuZXh0IHZlcnNpb24gYW5kIHRoYW5rcy4NCj4gDQo+ID4gICAg
+ICAgICAgICAgICcqY29yZS1pZCc6ICdpbnQnLA0KPiA+ICAgICAgICAgICAgICAnKnRocmVhZC1p
+ZCc6ICdpbnQnDQo+ID4gICAgfQ0KPiANCj4gDQo+IC0tDQo+IEVyaWMgQmxha2UsIFByaW5jaXBh
+bCBTb2Z0d2FyZSBFbmdpbmVlcg0KPiBSZWQgSGF0LCBJbmMuICAgICAgICAgICArMS05MTktMzAx
+LTMyMjYNCj4gVmlydHVhbGl6YXRpb246ICBxZW11Lm9yZyB8IGxpYnZpcnQub3JnDQoNCg==
