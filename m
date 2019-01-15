@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33679)
+Received: from eggs.gnu.org ([209.51.188.92]:33661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUxJ-0006Ow-Vg
+	(envelope-from <mst@redhat.com>) id 1gjUxJ-0006Og-Ni
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:05:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUxH-0002QC-Ka
+	(envelope-from <mst@redhat.com>) id 1gjUxG-0002Ok-Lm
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:05:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37776)
+Received: from mx1.redhat.com ([209.132.183.28]:43002)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUxG-0002He-Kf
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUxG-0002Ag-1L
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:04:58 -0500
-Date: Tue, 15 Jan 2019 15:04:44 -0500
+Date: Tue, 15 Jan 2019 15:04:24 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115200252.25911-14-mst@redhat.com>
+Message-ID: <20190115200252.25911-9-mst@redhat.com>
 References: <20190115200252.25911-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190115200252.25911-1-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 13/49] tests: smbios: fetch whole table in
- one step instead of reading it step by step
+Subject: [Qemu-devel] [PULL v2 08/49] tests: acpi: use AcpiSdtTable::aml in
+ consistent way
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +28,201 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-replace a bunch of ACPI_READ_ARRAY/ACPI_READ_FIELD macro, that read
-SMBIOS table field by field with one memread() to fetch whole table
-at once and drop no longer used ACPI_READ_ARRAY/ACPI_READ_FIELD macro.
+Currently in the 1st case we store table body fetched from QEMU in
+AcpiSdtTable::aml minus it's header but in the 2nd case when we
+load reference aml from disk, it holds whole blob including header.
+More over in the 1st case, we read header in separate AcpiSdtTable::header
+structure and then jump over hoops to fixup tables and combine both.
+
+Treat AcpiSdtTable::aml as whole table blob approach in both cases
+and when fetching tables from QEMU, first get table length and then
+fetch whole table into AcpiSdtTable::aml instead if doing it field
+by field.
+
+As result
+ * AcpiSdtTable::aml is used in consistent manner
+ * FADT fixups use offsets from spec instead of being shifted by
+   header length
+ * calculating checksums and dumping blobs becomes simpler
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/acpi-utils.h       | 17 -----------------
- tests/bios-tables-test.c | 15 +--------------
- 2 files changed, 1 insertion(+), 31 deletions(-)
+ tests/acpi-utils.h       |  6 ++--
+ tests/bios-tables-test.c | 62 +++++++++++++++-------------------------
+ 2 files changed, 27 insertions(+), 41 deletions(-)
 
 diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index 1aa00db2b6..cb7183e057 100644
+index c5b0e12aa2..1b0e80d45c 100644
 --- a/tests/acpi-utils.h
 +++ b/tests/acpi-utils.h
-@@ -30,23 +30,6 @@ typedef struct {
-     bool tmp_files_retain;   /* do not delete the temp asl/aml */
- } AcpiSdtTable;
-=20
--#define ACPI_READ_FIELD(qts, field, addr)                \
--    do {                                                 \
--        qtest_memread(qts, addr, &field, sizeof(field)); \
--        addr +=3D sizeof(field);                           \
--    } while (0)
--
--#define ACPI_READ_ARRAY_PTR(qts, arr, length, addr)      \
--    do {                                                 \
--        int idx;                                         \
--        for (idx =3D 0; idx < length; ++idx) {             \
--            ACPI_READ_FIELD(qts, arr[idx], addr);        \
--        }                                                \
--    } while (0)
--
--#define ACPI_READ_ARRAY(qts, arr, addr)                                 =
-\
--    ACPI_READ_ARRAY_PTR(qts, arr, sizeof(arr) / sizeof(arr[0]), addr)
--
- #define ACPI_ASSERT_CMP(actual, expected) do { \
-     char ACPI_ASSERT_CMP_str[5] =3D {}; \
-     memcpy(ACPI_ASSERT_CMP_str, &actual, 4); \
+@@ -18,8 +18,10 @@
+ 
+ /* DSDT and SSDTs format */
+ typedef struct {
+-    AcpiTableHeader header;
+-    gchar *aml;            /* aml bytecode from guest */
++    union {
++        AcpiTableHeader *header;
++        uint8_t *aml;            /* aml bytecode from guest */
++    };
+     gsize aml_len;
+     gchar *aml_file;
+     gchar *asl;            /* asl code generated from aml */
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 8fdd1c173a..dcd6be8bbd 100644
+index d455b2abfc..3f20bbd24e 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -406,32 +406,19 @@ static bool smbios_ep_table_ok(test_data *data)
-     struct smbios_21_entry_point *ep_table =3D &data->smbios_ep_table;
-     uint32_t addr =3D data->smbios_ep_addr;
-=20
--    ACPI_READ_ARRAY(data->qts, ep_table->anchor_string, addr);
-+    qtest_memread(data->qts, addr, ep_table, sizeof(*ep_table));
-     if (memcmp(ep_table->anchor_string, "_SM_", 4)) {
-         return false;
+@@ -163,29 +163,23 @@ static void sanitize_fadt_ptrs(test_data *data)
+     for (i = 0; i < data->tables->len; i++) {
+         AcpiSdtTable *sdt = &g_array_index(data->tables, AcpiSdtTable, i);
+ 
+-        if (memcmp(&sdt->header.signature, "FACP", 4)) {
++        if (memcmp(&sdt->header->signature, "FACP", 4)) {
+             continue;
+         }
+ 
+         /* check original FADT checksum before sanitizing table */
+-        g_assert(!(uint8_t)(
+-            acpi_calc_checksum((uint8_t *)sdt, sizeof(AcpiTableHeader)) +
+-            acpi_calc_checksum((uint8_t *)sdt->aml, sdt->aml_len)
+-        ));
++        g_assert(!acpi_calc_checksum(sdt->aml, sdt->aml_len));
+ 
+-        /* sdt->aml field offset := spec offset - header size */
+-        memset(sdt->aml + 0, 0, 4); /* sanitize FIRMWARE_CTRL(36) ptr */
+-        memset(sdt->aml + 4, 0, 4); /* sanitize DSDT(40) ptr */
+-        if (sdt->header.revision >= 3) {
+-            memset(sdt->aml + 96, 0, 8); /* sanitize X_FIRMWARE_CTRL(132) ptr */
+-            memset(sdt->aml + 104, 0, 8); /* sanitize X_DSDT(140) ptr */
++        memset(sdt->aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
++        memset(sdt->aml + 40, 0, 4); /* sanitize DSDT ptr */
++        if (sdt->header->revision >= 3) {
++            memset(sdt->aml + 132, 0, 8); /* sanitize X_FIRMWARE_CTRL ptr */
++            memset(sdt->aml + 140, 0, 8); /* sanitize X_DSDT ptr */
+         }
+ 
+         /* update checksum */
+-        sdt->header.checksum = 0;
+-        sdt->header.checksum -=
+-            acpi_calc_checksum((uint8_t *)sdt, sizeof(AcpiTableHeader)) +
+-            acpi_calc_checksum((uint8_t *)sdt->aml, sdt->aml_len);
++        sdt->header->checksum = 0;
++        sdt->header->checksum -= acpi_calc_checksum(sdt->aml, sdt->aml_len);
+         break;
      }
--    ACPI_READ_FIELD(data->qts, ep_table->checksum, addr);
--    ACPI_READ_FIELD(data->qts, ep_table->length, addr);
--    ACPI_READ_FIELD(data->qts, ep_table->smbios_major_version, addr);
--    ACPI_READ_FIELD(data->qts, ep_table->smbios_minor_version, addr);
--    ACPI_READ_FIELD(data->qts, ep_table->max_structure_size, addr);
--    ACPI_READ_FIELD(data->qts, ep_table->entry_point_revision, addr);
--    ACPI_READ_ARRAY(data->qts, ep_table->formatted_area, addr);
--    ACPI_READ_ARRAY(data->qts, ep_table->intermediate_anchor_string, add=
-r);
-     if (memcmp(ep_table->intermediate_anchor_string, "_DMI_", 5)) {
-         return false;
-     }
--    ACPI_READ_FIELD(data->qts, ep_table->intermediate_checksum, addr);
--    ACPI_READ_FIELD(data->qts, ep_table->structure_table_length, addr);
-     if (ep_table->structure_table_length =3D=3D 0) {
-         return false;
-     }
--    ACPI_READ_FIELD(data->qts, ep_table->structure_table_address, addr);
--    ACPI_READ_FIELD(data->qts, ep_table->number_of_structures, addr);
-     if (ep_table->number_of_structures =3D=3D 0) {
-         return false;
-     }
--    ACPI_READ_FIELD(data->qts, ep_table->smbios_bcd_revision, addr);
-     if (acpi_calc_checksum((uint8_t *)ep_table, sizeof *ep_table) ||
-         acpi_calc_checksum((uint8_t *)ep_table + 0x10,
-                            sizeof *ep_table - 0x10)) {
---=20
+ }
+@@ -212,30 +206,23 @@ static void test_acpi_facs_table(test_data *data)
+  */
+ static void fetch_table(QTestState *qts, AcpiSdtTable *sdt_table, uint32_t addr)
+ {
+-    uint8_t checksum;
+-
+-    memset(sdt_table, 0, sizeof(*sdt_table));
+-    ACPI_READ_TABLE_HEADER(qts, &sdt_table->header, addr);
+-
+-    sdt_table->aml_len = le32_to_cpu(sdt_table->header.length)
+-                         - sizeof(AcpiTableHeader);
++    qtest_memread(qts, addr + 4 /* Length of ACPI table */,
++                  &sdt_table->aml_len, 4);
++    sdt_table->aml_len = le32_to_cpu(sdt_table->aml_len);
+     sdt_table->aml = g_malloc0(sdt_table->aml_len);
+-    ACPI_READ_ARRAY_PTR(qts, sdt_table->aml, sdt_table->aml_len, addr);
++    /* get whole table */
++    qtest_memread(qts, addr, sdt_table->aml, sdt_table->aml_len);
+ 
+-    checksum = acpi_calc_checksum((uint8_t *)sdt_table,
+-                                  sizeof(AcpiTableHeader)) +
+-               acpi_calc_checksum((uint8_t *)sdt_table->aml,
+-                                  sdt_table->aml_len);
+-    g_assert(!checksum);
++    g_assert(!acpi_calc_checksum(sdt_table->aml, sdt_table->aml_len));
+ }
+ 
+ static void test_acpi_dsdt_table(test_data *data)
+ {
+-    AcpiSdtTable dsdt_table;
++    AcpiSdtTable dsdt_table = {};
+     uint32_t addr = le32_to_cpu(data->dsdt_addr);
+ 
+     fetch_table(data->qts, &dsdt_table, addr);
+-    ACPI_ASSERT_CMP(dsdt_table.header.signature, "DSDT");
++    ACPI_ASSERT_CMP(dsdt_table.header->signature, "DSDT");
+ 
+     /* Since DSDT isn't in RSDT, add DSDT to ASL test tables list manually */
+     g_array_append_val(data->tables, dsdt_table);
+@@ -248,7 +235,7 @@ static void fetch_rsdt_referenced_tables(test_data *data)
+     int i;
+ 
+     for (i = 0; i < tables_nr; i++) {
+-        AcpiSdtTable ssdt_table;
++        AcpiSdtTable ssdt_table = {};
+         uint32_t addr;
+ 
+         addr = le32_to_cpu(data->rsdt_tables_addr[i]);
+@@ -275,7 +262,7 @@ static void dump_aml_files(test_data *data, bool rebuild)
+ 
+         if (rebuild) {
+             aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
+-                                       (gchar *)&sdt->header.signature, ext);
++                                       (gchar *)&sdt->header->signature, ext);
+             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
+                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+         } else {
+@@ -284,8 +271,6 @@ static void dump_aml_files(test_data *data, bool rebuild)
+         }
+         g_assert(fd >= 0);
+ 
+-        ret = qemu_write_full(fd, sdt, sizeof(AcpiTableHeader));
+-        g_assert(ret == sizeof(AcpiTableHeader));
+         ret = qemu_write_full(fd, sdt->aml, sdt->aml_len);
+         g_assert(ret == sdt->aml_len);
+ 
+@@ -297,7 +282,7 @@ static void dump_aml_files(test_data *data, bool rebuild)
+ 
+ static bool compare_signature(AcpiSdtTable *sdt, const char *signature)
+ {
+-   return !memcmp(&sdt->header.signature, signature, 4);
++   return !memcmp(&sdt->header->signature, signature, 4);
+ }
+ 
+ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+@@ -395,11 +380,10 @@ static GArray *load_expected_aml(test_data *data)
+         sdt = &g_array_index(data->tables, AcpiSdtTable, i);
+ 
+         memset(&exp_sdt, 0, sizeof(exp_sdt));
+-        exp_sdt.header.signature = sdt->header.signature;
+ 
+ try_again:
+         aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
+-                                   (gchar *)&sdt->header.signature, ext);
++                                   (gchar *)&sdt->header->signature, ext);
+         if (getenv("V")) {
+             fprintf(stderr, "Looking for expected file '%s'\n", aml_file);
+         }
+@@ -415,7 +399,7 @@ try_again:
+         if (getenv("V")) {
+             fprintf(stderr, "Using expected file '%s'\n", aml_file);
+         }
+-        ret = g_file_get_contents(aml_file, &exp_sdt.aml,
++        ret = g_file_get_contents(aml_file, (gchar **)&exp_sdt.aml,
+                                   &exp_sdt.aml_len, &error);
+         g_assert(ret);
+         g_assert_no_error(error);
+@@ -459,7 +443,7 @@ static void test_acpi_asl(test_data *data)
+                 fprintf(stderr,
+                         "Warning! iasl couldn't parse the expected aml\n");
+             } else {
+-                uint32_t signature = cpu_to_le32(exp_sdt->header.signature);
++                uint32_t signature = cpu_to_le32(exp_sdt->header->signature);
+                 sdt->tmp_files_retain = true;
+                 exp_sdt->tmp_files_retain = true;
+                 fprintf(stderr,
+-- 
 MST
