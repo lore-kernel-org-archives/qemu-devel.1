@@ -1,18 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42658)
+Received: from eggs.gnu.org ([209.51.188.92]:45064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gjPq2-0000ex-5O
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:37:15 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gjPzW-0008He-HU
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:46:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1gjPq1-0006bw-EE
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:37:10 -0500
-Received: from smtp39.i.mail.ru ([94.100.177.99]:47222)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gjPq0-0006aI-NI
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:37:09 -0500
-From: Julia Suvorova <jusual@mail.ru>
-Date: Tue, 15 Jan 2019 17:36:50 +0300
-Message-Id: <20190115143650.15725-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix PC overwriting
+	(envelope-from <alex.bennee@linaro.org>) id 1gjPzV-0002Rd-88
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:46:58 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46812)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gjPzU-0002Q8-Ea
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:46:56 -0500
+Received: by mail-wr1-x442.google.com with SMTP id l9so3208021wrt.13
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 06:46:53 -0800 (PST)
+References: <1547467955-17245-1-git-send-email-thuth@redhat.com>
+	<30917d5b-f8cb-e799-6c3e-3202195122b4@redhat.com>
+	<871s5fp54s.fsf@linaro.org>
+	<e94b51d7-c90f-b599-fb68-ea8c2603989b@redhat.com>
+	<87zhs3nk1m.fsf@linaro.org>
+	<a0646a85-603d-99a8-c676-76e43a42e0fb@twiddle.net>
+	<87y37monyr.fsf@linaro.org>
+	<CAFEAcA8u4AdhW-MF6uMP7=B4iYVO9ZEQCtcQKpN6KWALwAfLnw@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA8u4AdhW-MF6uMP7=B4iYVO9ZEQCtcQKpN6KWALwAfLnw@mail.gmail.com>
+Date: Tue, 15 Jan 2019 14:46:50 +0000
+Message-ID: <87won6nfl1.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
+ with Clang on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,31 +37,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, Julia Suvorova <jusual@mail.ru>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>
 
-If the memory is set using a file, and PC is specified on the command
-line, it will be overwritten with the value 'entry'. This is not only
-illogical, but also incorrect, because the load_ * functions do not take
-into account the specifics of the ARM-M PC.
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
----
- hw/core/generic-loader.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
-index fbae05fb3b..fc81fd8e14 100644
---- a/hw/core/generic-loader.c
-+++ b/hw/core/generic-loader.c
-@@ -152,7 +152,7 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
-         if (size < 0 || s->force_raw) {
-             /* Default to the maximum size being the machine's ram size */
-             size = load_image_targphys_as(s->file, s->addr, ram_size, as);
--        } else {
-+        } else if (!s->addr) {
-             s->addr = entry;
-         }
- 
--- 
-2.17.1
+> On Mon, 14 Jan 2019 at 22:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>>
+>> Richard Henderson <rth@twiddle.net> writes:
+>> > But perhaps
+>> >
+>> >     unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
+>> >     *r =3D n % d;
+>> >     return n / d;
+>> >
+>> > will allow the compiler to do what the assembly does for some 64-bit
+>> > hosts.
+>>
+>> I wonder how much cost is incurred by the jumping to the (libgcc?) div
+>> helper? Anyone got an s390x about so we can benchmark the two
+>> approaches?
+>
+> The project has an s390x system available; however it's usually
+> running merge build tests so not so useful for benchmarking.
+> (I can set up accounts on it but that requires me to faff about
+> figuring out how to create new accounts :-))
+
+I'm happy to leave this up to those who care about s390x host
+performance (Thomas, Cornelia?). I'm just keen to avoid the divide
+helper getting too #ifdefy.
+
+I'll include a CONFIG_INT128 patch in my next patch queue review once
+I've double checked and tested under linux-user ;-)
+
+--
+Alex Benn=C3=A9e
