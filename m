@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55660)
+Received: from eggs.gnu.org ([209.51.188.92]:57793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gjKUz-0003ET-UP
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 03:55:06 -0500
+	(envelope-from <bounces@canonical.com>) id 1gjKff-0005OR-Uf
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 04:06:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gjKUx-00046n-SS
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 03:55:05 -0500
-Date: Tue, 15 Jan 2019 09:54:57 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190115095457.02ea9189.cohuck@redhat.com>
-In-Reply-To: <81fc43ea-f141-1c76-d217-6c1880ece901@linux.ibm.com>
-References: <1544623878-11248-1-git-send-email-jjherne@linux.ibm.com>
-	<1544623878-11248-11-git-send-email-jjherne@linux.ibm.com>
-	<20181213182100.6da37a95.cohuck@redhat.com>
-	<bfde1bd3-0725-1085-8a98-eeaf2b0694ed@linux.ibm.com>
-	<81fc43ea-f141-1c76-d217-6c1880ece901@linux.ibm.com>
+	(envelope-from <bounces@canonical.com>) id 1gjKfe-00010g-3A
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 04:06:07 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57116)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gjKfc-0000xv-A6
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 04:06:05 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gjKfZ-0006fu-Aj
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 09:06:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3A2662E80CC
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 09:06:01 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 10/15] s390-bios: Support for
- running format-0/1 channel programs
+Date: Tue, 15 Jan 2019 08:56:20 -0000
+From: Thomas Huth <1777252@bugs.launchpad.net>
+Reply-To: Bug 1777252 <1777252@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152916202234.7686.15264921741576357687.malonedeb@wampee.canonical.com>
+Message-Id: <154754258028.32422.6669368576771224047.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777252] Re: tests/Makefile.include trying to add
+ linking library '-lutil' that break the build on Solaris
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Mon, 14 Jan 2019 13:44:12 -0500
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+Does something like this work for you?
 
-> On 1/7/19 2:02 PM, Jason J. Herne wrote:
-> >>> @@=C2=A0-190,6=C2=A0+247,9=C2=A0@@=C2=A0struct=C2=A0ciw=C2=A0{
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0__u16=C2=A0count;
-> >>> =C2=A0=C2=A0};
-> >>> +#define=C2=A0CU_TYPE_VIRTIO=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A00x3832
-> >>> +#define=C2=A0CU_TYPE_DASD=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00x3990 =20
-> >>
-> >> No=C2=A0other=C2=A0dasd=C2=A0types=C2=A0we=C2=A0want=C2=A0to=C2=A0supp=
-ort? :)=C2=A0(Not=C2=A0sure=C2=A0if=C2=A0others=C2=A0are=C2=A0out
-> >> in=C2=A0the=C2=A0wild.=C2=A0Maybe=C2=A0FBA?)
-> >> =20
-> >=20
-> > I have no idea. I assumed 3390 was the only thing we supported. Perhaps=
- 3380? I'd need to=20
-> > find=C2=A0a=C2=A0test=C2=A0device,=C2=A0which=C2=A0I=C2=A0could=C2=A0pr=
-obably=C2=A0do=C2=A0...=C2=A0I'll=C2=A0look=C2=A0more=C2=A0into=C2=A0this. =
-=20
->=20
-> After a few discussions with folks in the lab we've decided that we don't=
- see a ton of=20
-> value in supporting anything other than 3990 at the moment. Anything else=
- would be older=20
-> (3380) and/or rare to see in the wild (and very difficult to test). As fo=
-r emulated setups=20
-> like z/VM, a user can just use 3390 instead of FBA. So I recommend we mov=
-e forward with=20
-> 3390/3990 support for now. We can always add in others types if/when we n=
-eed them.
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -777,7 +777,7 @@ tests/migration/initrd-stress.img: tests/migration/stre=
+ss$(EXESUF)
+        rm $(INITRD_WORK_DIR)/init
+        rmdir $(INITRD_WORK_DIR)
+ =
 
-Sounds reasonable.
+-ifeq ($(CONFIG_POSIX),y)
++ifeq ($(CONFIG_POSIX)$(call lnot,$(CONFIG_SOLARIS)),yy)
+ LIBS +=3D -lutil
+ endif
 
-What about calling the #define above CU_TYPE_DASD_3990 instead? Just to
-make clear that there are other dasd types out there, but we only
-support that particular one (at least at the moment).
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777252
+
+Title:
+  tests/Makefile.include trying to add linking library '-lutil' that
+  break the build on Solaris
+
+Status in QEMU:
+  New
+
+Bug description:
+  Building script 'tests/Makefile.include' contains following code
+  ```
+  ifeq ($(CONFIG_POSIX),y)
+  LIBS +=3D -lutil
+  endif
+  ```
+
+  library -lutil is not available on Solaris, so the building will failed, =
+like
+  ```
+  ld: fatal: library -lutil: not found
+  make: *** [SOMEWHERE/src/qemu-2.12.0/rules.mak:121: qemu-nbd] Error 1
+  ```
+
+  Commenting those code out fixed the error.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777252/+subscriptions
