@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36781)
+Received: from eggs.gnu.org ([209.51.188.92]:36654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDjl-0007oY-0R
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:54 -0500
+	(envelope-from <mst@redhat.com>) id 1gjDjm-0007cx-Gh
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDec-0008FU-Fr
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42710)
+	(envelope-from <mst@redhat.com>) id 1gjDeE-00080c-KJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52234)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDeX-0008Ab-Ht
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:32 -0500
-Date: Mon, 14 Jan 2019 20:36:22 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDeE-00080E-B5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:10 -0500
+Date: Mon, 14 Jan 2019 20:36:02 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115003812.11329-22-mst@redhat.com>
+Message-ID: <20190115003812.11329-14-mst@redhat.com>
 References: <20190115003812.11329-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20190115003812.11329-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 21/44] virtio: split virtio rng bits from
- virtio-pci
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 13/44] tests: smbios: fetch whole table in one
+ step instead of reading it step by step
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,252 +29,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Juan Quintela <quintela@redhat.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+replace a bunch of ACPI_READ_ARRAY/ACPI_READ_FIELD macro, that read
+SMBIOS table field by field with one memread() to fetch whole table
+at once and drop no longer used ACPI_READ_ARRAY/ACPI_READ_FIELD macro.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-pci.h     | 14 ------
- hw/virtio/virtio-pci.c     | 54 -----------------------
- hw/virtio/virtio-rng-pci.c | 88 ++++++++++++++++++++++++++++++++++++++
- hw/virtio/Makefile.objs    |  1 +
- tests/Makefile.include     |  2 +-
- 5 files changed, 90 insertions(+), 69 deletions(-)
- create mode 100644 hw/virtio/virtio-rng-pci.c
+ tests/acpi-utils.h       | 17 -----------------
+ tests/bios-tables-test.c | 15 +--------------
+ 2 files changed, 1 insertion(+), 31 deletions(-)
 
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index f1c75b0a89..a8b2e491c8 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -18,7 +18,6 @@
- #include "hw/pci/msi.h"
- #include "hw/virtio/virtio-blk.h"
- #include "hw/virtio/virtio-net.h"
--#include "hw/virtio/virtio-rng.h"
- #include "hw/virtio/virtio-serial.h"
- #include "hw/virtio/virtio-scsi.h"
- #include "hw/virtio/virtio-balloon.h"
-@@ -46,7 +45,6 @@ typedef struct VirtIONetPCI VirtIONetPCI;
- typedef struct VHostSCSIPCI VHostSCSIPCI;
- typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
- typedef struct VHostUserBlkPCI VHostUserBlkPCI;
--typedef struct VirtIORngPCI VirtIORngPCI;
- typedef struct VirtIOGPUPCI VirtIOGPUPCI;
- typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
- 
-@@ -319,18 +317,6 @@ typedef struct V9fsPCIState {
- 
- #endif
- 
--/*
-- * virtio-rng-pci: This extends VirtioPCIProxy.
-- */
--#define TYPE_VIRTIO_RNG_PCI "virtio-rng-pci-base"
--#define VIRTIO_RNG_PCI(obj) \
--        OBJECT_CHECK(VirtIORngPCI, (obj), TYPE_VIRTIO_RNG_PCI)
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index 1aa00db2b6..cb7183e057 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -30,23 +30,6 @@ typedef struct {
+     bool tmp_files_retain;   /* do not delete the temp asl/aml */
+ } AcpiSdtTable;
+=20
+-#define ACPI_READ_FIELD(qts, field, addr)                \
+-    do {                                                 \
+-        qtest_memread(qts, addr, &field, sizeof(field)); \
+-        addr +=3D sizeof(field);                           \
+-    } while (0)
 -
--struct VirtIORngPCI {
--    VirtIOPCIProxy parent_obj;
--    VirtIORNG vdev;
--};
+-#define ACPI_READ_ARRAY_PTR(qts, arr, length, addr)      \
+-    do {                                                 \
+-        int idx;                                         \
+-        for (idx =3D 0; idx < length; ++idx) {             \
+-            ACPI_READ_FIELD(qts, arr[idx], addr);        \
+-        }                                                \
+-    } while (0)
 -
- /*
-  * virtio-input-pci: This extends VirtioPCIProxy.
-  */
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 185db53bc0..2e3eafd8b2 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -2546,59 +2546,6 @@ static const VirtioPCIDeviceTypeInfo virtio_net_pci_info = {
-     .class_init    = virtio_net_pci_class_init,
- };
- 
--/* virtio-rng-pci */
+-#define ACPI_READ_ARRAY(qts, arr, addr)                                 =
+\
+-    ACPI_READ_ARRAY_PTR(qts, arr, sizeof(arr) / sizeof(arr[0]), addr)
 -
--static void virtio_rng_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
--{
--    VirtIORngPCI *vrng = VIRTIO_RNG_PCI(vpci_dev);
--    DeviceState *vdev = DEVICE(&vrng->vdev);
--    Error *err = NULL;
--
--    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
--    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--
--    object_property_set_link(OBJECT(vrng),
--                             OBJECT(vrng->vdev.conf.rng), "rng",
--                             NULL);
--}
--
--static void virtio_rng_pci_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
--    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
--
--    k->realize = virtio_rng_pci_realize;
--    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
--
--    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
--    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_RNG;
--    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
--    pcidev_k->class_id = PCI_CLASS_OTHERS;
--}
--
--static void virtio_rng_initfn(Object *obj)
--{
--    VirtIORngPCI *dev = VIRTIO_RNG_PCI(obj);
--
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_RNG);
--}
--
--static const VirtioPCIDeviceTypeInfo virtio_rng_pci_info = {
--    .base_name             = TYPE_VIRTIO_RNG_PCI,
--    .generic_name          = "virtio-rng-pci",
--    .transitional_name     = "virtio-rng-pci-transitional",
--    .non_transitional_name = "virtio-rng-pci-non-transitional",
--    .instance_size = sizeof(VirtIORngPCI),
--    .instance_init = virtio_rng_initfn,
--    .class_init    = virtio_rng_pci_class_init,
--};
--
- /* virtio-pci-bus */
- 
- static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
-@@ -2651,7 +2598,6 @@ static void virtio_pci_register_types(void)
-     type_register_static(&virtio_pci_info);
- 
-     /* Implementations: */
--    virtio_pci_types_register(&virtio_rng_pci_info);
- #ifdef CONFIG_VIRTFS
-     virtio_pci_types_register(&virtio_9p_pci_info);
- #endif
-diff --git a/hw/virtio/virtio-rng-pci.c b/hw/virtio/virtio-rng-pci.c
-new file mode 100644
-index 0000000000..6cc6374289
---- /dev/null
-+++ b/hw/virtio/virtio-rng-pci.c
-@@ -0,0 +1,88 @@
-+/*
-+ * Virtio rng PCI Bindings
-+ *
-+ * Copyright 2012 Red Hat, Inc.
-+ * Copyright 2012 Amit Shah <amit.shah@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "virtio-pci.h"
-+#include "hw/virtio/virtio-rng.h"
-+#include "qapi/error.h"
-+
-+typedef struct VirtIORngPCI VirtIORngPCI;
-+
-+/*
-+ * virtio-rng-pci: This extends VirtioPCIProxy.
-+ */
-+#define TYPE_VIRTIO_RNG_PCI "virtio-rng-pci-base"
-+#define VIRTIO_RNG_PCI(obj) \
-+        OBJECT_CHECK(VirtIORngPCI, (obj), TYPE_VIRTIO_RNG_PCI)
-+
-+struct VirtIORngPCI {
-+    VirtIOPCIProxy parent_obj;
-+    VirtIORNG vdev;
-+};
-+
-+static void virtio_rng_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-+{
-+    VirtIORngPCI *vrng = VIRTIO_RNG_PCI(vpci_dev);
-+    DeviceState *vdev = DEVICE(&vrng->vdev);
-+    Error *err = NULL;
-+
-+    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    object_property_set_link(OBJECT(vrng),
-+                             OBJECT(vrng->vdev.conf.rng), "rng",
-+                             NULL);
-+}
-+
-+static void virtio_rng_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
-+    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-+
-+    k->realize = virtio_rng_pci_realize;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+
-+    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-+    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_RNG;
-+    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
-+    pcidev_k->class_id = PCI_CLASS_OTHERS;
-+}
-+
-+static void virtio_rng_initfn(Object *obj)
-+{
-+    VirtIORngPCI *dev = VIRTIO_RNG_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_RNG);
-+}
-+
-+static const VirtioPCIDeviceTypeInfo virtio_rng_pci_info = {
-+    .base_name             = TYPE_VIRTIO_RNG_PCI,
-+    .generic_name          = "virtio-rng-pci",
-+    .transitional_name     = "virtio-rng-pci-transitional",
-+    .non_transitional_name = "virtio-rng-pci-non-transitional",
-+    .instance_size = sizeof(VirtIORngPCI),
-+    .instance_init = virtio_rng_initfn,
-+    .class_init    = virtio_rng_pci_class_init,
-+};
-+
-+static void virtio_rng_pci_register(void)
-+{
-+    virtio_pci_types_register(&virtio_rng_pci_info);
-+}
-+
-+type_init(virtio_rng_pci_register)
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index c61bcd106b..032ba2ff0e 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -15,6 +15,7 @@ ifeq ($(CONFIG_PCI),y)
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
- obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
- obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
-+obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
- endif
- endif
- 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 601ef4f64c..3a50b3ba79 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -149,7 +149,7 @@ check-qtest-virtioserial-y += tests/virtio-console-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-balloon-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
--check-qtest-virtio-y += tests/virtio-rng-test$(EXESUF)
-+check-qtest-virtio-$(CONFIG_VIRTIO_RNG) += tests/virtio-rng-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
- ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
- check-qtest-virtio-y += tests/virtio-9p-test$(EXESUF)
--- 
+ #define ACPI_ASSERT_CMP(actual, expected) do { \
+     char ACPI_ASSERT_CMP_str[5] =3D {}; \
+     memcpy(ACPI_ASSERT_CMP_str, &actual, 4); \
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 8fdd1c173a..dcd6be8bbd 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -406,32 +406,19 @@ static bool smbios_ep_table_ok(test_data *data)
+     struct smbios_21_entry_point *ep_table =3D &data->smbios_ep_table;
+     uint32_t addr =3D data->smbios_ep_addr;
+=20
+-    ACPI_READ_ARRAY(data->qts, ep_table->anchor_string, addr);
++    qtest_memread(data->qts, addr, ep_table, sizeof(*ep_table));
+     if (memcmp(ep_table->anchor_string, "_SM_", 4)) {
+         return false;
+     }
+-    ACPI_READ_FIELD(data->qts, ep_table->checksum, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->length, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->smbios_major_version, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->smbios_minor_version, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->max_structure_size, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->entry_point_revision, addr);
+-    ACPI_READ_ARRAY(data->qts, ep_table->formatted_area, addr);
+-    ACPI_READ_ARRAY(data->qts, ep_table->intermediate_anchor_string, add=
+r);
+     if (memcmp(ep_table->intermediate_anchor_string, "_DMI_", 5)) {
+         return false;
+     }
+-    ACPI_READ_FIELD(data->qts, ep_table->intermediate_checksum, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->structure_table_length, addr);
+     if (ep_table->structure_table_length =3D=3D 0) {
+         return false;
+     }
+-    ACPI_READ_FIELD(data->qts, ep_table->structure_table_address, addr);
+-    ACPI_READ_FIELD(data->qts, ep_table->number_of_structures, addr);
+     if (ep_table->number_of_structures =3D=3D 0) {
+         return false;
+     }
+-    ACPI_READ_FIELD(data->qts, ep_table->smbios_bcd_revision, addr);
+     if (acpi_calc_checksum((uint8_t *)ep_table, sizeof *ep_table) ||
+         acpi_calc_checksum((uint8_t *)ep_table + 0x10,
+                            sizeof *ep_table - 0x10)) {
+--=20
 MST
