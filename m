@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37384)
+Received: from eggs.gnu.org ([209.51.188.92]:37462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPYZ-0002rf-MT
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:19:08 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gjPYa-0002wr-Du
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:19:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPRJ-000180-KU
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:11:42 -0500
-Received: from mga05.intel.com ([192.55.52.43]:56300)
+	(envelope-from <yang.zhong@intel.com>) id 1gjPRK-00018y-FW
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:11:39 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56304)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gjPRJ-000130-Bx
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:11:37 -0500
+	id 1gjPRK-00013D-4A
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:11:38 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Tue, 15 Jan 2019 22:10:36 +0800
-Message-Id: <20190115141108.934-6-yang.zhong@intel.com>
+Date: Tue, 15 Jan 2019 22:10:40 +0800
+Message-Id: <20190115141108.934-10-yang.zhong@intel.com>
 In-Reply-To: <20190115141108.934-1-yang.zhong@intel.com>
 References: <20190115141108.934-1-yang.zhong@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v2 05/37] hw/microblaze/Makefile.objs:
- Create configs for petalogix and xilinx boards
+Subject: [Qemu-devel] [RFC PATCH v2 09/37] hw/sparc/Makefile.objs: CONFIG_*
+ for sun4m and leon3 created
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +33,34 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Ákos Kovács <akoskovacs@gmx.com>
 
-CONFIG_PETALOGIX_* and CONFIG_XLNX_*  configs added to
-default-configs/microblaze-softmmu.mak and
-default-configs/microblazeel-softmmu.mak.
+CONFIG_LEON3 added to default-configs/sparc-softmmu.mak.
 
 Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- default-configs/microblaze-softmmu.mak | 3 +++
- hw/microblaze/Makefile.objs            | 6 +++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ default-configs/sparc-softmmu.mak | 2 ++
+ hw/sparc/Makefile.objs            | 4 +++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/microblaze-softmmu.mak
-index 7fca8e4c99..14837cf74a 100644
---- a/default-configs/microblaze-softmmu.mak
-+++ b/default-configs/microblaze-softmmu.mak
-@@ -10,3 +10,6 @@ CONFIG_XILINX_ETHLITE=y
- CONFIG_SSI=y
- CONFIG_SSI_M25P80=y
- CONFIG_XLNX_ZYNQMP=y
-+CONFIG_PETALOGIX_S3ADSP1800=y
-+CONFIG_PETALOGIX_ML605=y
-+CONFIG_XLNX_ZYNQMP_PMU=y
-diff --git a/hw/microblaze/Makefile.objs b/hw/microblaze/Makefile.objs
-index ae9fd40de7..8595a62f6c 100644
---- a/hw/microblaze/Makefile.objs
-+++ b/hw/microblaze/Makefile.objs
-@@ -1,4 +1,4 @@
--obj-y += petalogix_s3adsp1800_mmu.o
--obj-y += petalogix_ml605_mmu.o
--obj-y += xlnx-zynqmp-pmu.o
-+obj-$(CONFIG_PETALOGIX_S3ADSP1800) += petalogix_s3adsp1800_mmu.o
-+obj-$(CONFIG_PETALOGIX_ML605) += petalogix_ml605_mmu.o
-+obj-$(CONFIG_XLNX_ZYNQMP_PMU) += xlnx-zynqmp-pmu.o
- obj-y += boot.o
+diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
+index 12f97eeb20..59a4a3d693 100644
+--- a/default-configs/sparc-softmmu.mak
++++ b/default-configs/sparc-softmmu.mak
+@@ -18,4 +18,6 @@ CONFIG_CS4231=y
+ CONFIG_GRLIB=y
+ CONFIG_STP2000=y
+ CONFIG_ECCMEMCTL=y
++
+ CONFIG_SUN4M=y
++CONFIG_LEON3=y
+diff --git a/hw/sparc/Makefile.objs b/hw/sparc/Makefile.objs
+index e2d0828c39..d57e33f83e 100644
+--- a/hw/sparc/Makefile.objs
++++ b/hw/sparc/Makefile.objs
+@@ -1 +1,3 @@
+-obj-y += sun4m_iommu.o sun4m.o leon3.o
++obj-$(CONFIG_SUN4M) += sun4m_iommu.o
++obj-$(CONFIG_SUN4M) += sun4m.o
++obj-$(CONFIG_LEON3) += leon3.o
 -- 
 2.17.1
