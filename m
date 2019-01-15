@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34017)
+Received: from eggs.gnu.org ([209.51.188.92]:34058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjR2P-00023c-7P
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:54:02 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjR2T-000262-O1
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:54:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjR2O-0006aw-AT
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:54:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47620)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjR2O-0006an-0g
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:54:00 -0500
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 15 Jan 2019 16:41:04 +0100
-Message-Id: <1547566866-129386-13-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/14] tests: acpi: prepare AVMF firmware blobs
- to be used by bios-tables-test
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjR2S-0006db-MU
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:54:05 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 15 Jan 2019 15:53:56 +0000
+Message-ID: <34cb1f6b-0ac0-b62c-9e48-35b19cd3a035@virtuozzo.com>
+References: <20190112175812.27068-1-eblake@redhat.com>
+	<20190112175812.27068-12-eblake@redhat.com>
+	<5d182b61-b17a-fefb-4f9f-c4e697bba8a7@virtuozzo.com>
+	<ce3e0fa8-4b7e-4dd9-e191-6ade2cb5bb2f@redhat.com>
+In-Reply-To: <ce3e0fa8-4b7e-4dd9-e191-6ade2cb5bb2f@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5253E8E059A5194C94F8D4A5F6DFD70A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 11/19] nbd/client: Split out
+ nbd_receive_one_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gonglei <arei.gonglei@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-Copy blobs in ACPI test data directory and pad them up to 64Mb
-so that QEMU run by test could use them.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- tests/Makefile.include | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index aa68eb5..e1201d9 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -295,6 +295,7 @@ check-qtest-aarch64-y = tests/numa-test$(EXESUF)
- check-qtest-aarch64-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
- check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
- check-qtest-aarch64-y += tests/migration-test$(EXESUF)
-+qtest-uefi-images-aarch64 = avmf.img avmf_vars.img
- 
- check-qtest-microblazeel-y += $(check-qtest-microblaze-y)
- 
-@@ -710,7 +711,8 @@ tests/hd-geo-test$(EXESUF): tests/hd-geo-test.o
- tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
- tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
- tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
--	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
-+	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y) \
-+	| prep-uefi-images
- tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
- tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
- tests/pca9552-test$(EXESUF): tests/pca9552-test.o $(libqos-omap-obj-y)
-@@ -936,6 +938,18 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
- 	@diff -u $(SRC_PATH)/$*.out $*.test.out
- 	@diff -u $(SRC_PATH)/$*.exit $*.test.exit
- 
-+qtest-uefi-images = $(foreach target,$(QTEST_TARGETS), $(strip $(qtest-uefi-images-$(target))))
-+# Suppress implicit pc-bios/foo rules
-+$(patsubst %,pc-bios/%,$(qtest-uefi-images)): ;
-+
-+# create rules for expanding UEFI images for configured targets
-+$(foreach uefi-img, $(qtest-uefi-images), \
-+    $(eval tests/data/acpi/$(uefi-img): pc-bios/$(uefi-img) ; \
-+              $(call quiet-command, cat $$< /dev/zero | head -c 67108864 > $$@)))
-+
-+.PHONY: prep-uefi-images
-+prep-uefi-images: $(patsubst %, tests/data/acpi/%, $(qtest-uefi-images))
-+
- .PHONY: check-tests/qapi-schema/doc-good.texi
- check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
- 	@diff -u $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
-@@ -999,6 +1013,7 @@ check-clean:
- 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
- 	rm -f tests/test-qapi-gen-timestamp
- 	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
-+	rm -f $(patsubst %,tests/data/acpi/%, $(qtest-uefi-images))
- 
- clean: check-clean
- 
-@@ -1009,4 +1024,5 @@ all: $(QEMU_IOTESTS_HELPERS-y)
- -include $(wildcard tests/*.d)
- -include $(wildcard tests/libqos/*.d)
- 
-+
- endif
--- 
-2.7.4
+MTUuMDEuMjAxOSAxODo1MCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xNS8xOSA5OjA1IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTIuMDEuMjAxOSAyMDo1
+OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBFeHRyYWN0IHBvcnRpb25zIG9mIG5iZF9uZWdvdGlh
+dGVfc2ltcGxlX21ldGFfY29udGV4dCgpIHRvDQo+Pj4gYSBuZXcgZnVuY3Rpb24gbmJkX3JlY2Vp
+dmVfb25lX21ldGFfY29udGV4dCgpIHRoYXQgY29waWVzIHRoZQ0KPj4+IHBhdHRlcm4gb2YgbmJk
+X3JlY2VpdmVfbGlzdCgpIGZvciBwZXJmb3JtaW5nIHRoZSBhcmd1bWVudA0KPj4+IHZhbGlkYXRp
+b24gb2Ygb25lIHJlcGx5LiAgVGhlIGVycm9yIG1lc3NhZ2Ugd2hlbiB0aGUgc2VydmVyDQo+Pj4g
+cmVwbGllcyB3aXRoIG1vcmUgdGhhbiBvbmUgY29udGV4dCBjaGFuZ2VzIHNsaWdodGx5LCBidXQN
+Cj4+PiB0aGF0IHNob3VsZG4ndCBoYXBwZW4gaW4gdGhlIGNvbW1vbiBjYXNlLg0KPj4+DQo+Pj4g
+U2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+Pj4gTWVzc2Fn
+ZS1JZDogPDIwMTgxMjE1MTM1MzI0LjE1MjYyOS0xNS1lYmxha2VAcmVkaGF0LmNvbT4NCj4+Pg0K
+Pj4+IC0tLQ0KPj4+IHYzOiByZWJhc2UsIHdpdGhvdXQgY2hhbmdpbmcgaW50byBhIGxvb3ANCj4+
+PiAtLS0NCj4gDQo+Pj4NCj4+PiArc3RhdGljIGludCBuYmRfcmVjZWl2ZV9vbmVfbWV0YV9jb250
+ZXh0KFFJT0NoYW5uZWwgKmlvYywNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIHVpbnQzMl90IG9wdCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIGNoYXIgKipuYW1lLA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgdWludDMyX3QgKmlkLA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPj4+ICt7DQo+IA0KPj4+ICsgICAgcmVw
+bHkubGVuZ3RoIC09IHNpemVvZihsb2NhbF9pZCk7DQo+Pj4gKyAgICBsb2NhbF9uYW1lID0gZ19t
+YWxsb2MocmVwbHkubGVuZ3RoICsgMSk7DQo+Pj4gKyAgICBpZiAobmJkX3JlYWQoaW9jLCBsb2Nh
+bF9uYW1lLCByZXBseS5sZW5ndGgsIGVycnApIDwgMCkgew0KPj4+ICsgICAgICAgIGdfZnJlZShs
+b2NhbF9uYW1lKTsNCj4+PiArICAgICAgICByZXR1cm4gLTE7DQo+Pj4gKyAgICB9DQo+Pj4gKyAg
+ICBsb2NhbF9uYW1lW3JlcGx5Lmxlbmd0aF0gPSAnXDAnOw0KPj4+ICsgICAgdHJhY2VfbmJkX29w
+dF9tZXRhX3JlcGx5KG5iZF9vcHRfbG9va3VwKG9wdCksIGxvY2FsX25hbWUsIGxvY2FsX2lkKTsN
+Cj4+PiArDQo+IA0KPiBbMV0NCj4gDQo+Pj4gQEAgLTc0NiwzNiArNzk2LDIwIEBAIHN0YXRpYyBp
+bnQgbmJkX25lZ290aWF0ZV9zaW1wbGVfbWV0YV9jb250ZXh0KFFJT0NoYW5uZWwgKmlvYywNCj4+
+PiAgICAgICAgICAgICAgICByZXR1cm4gLTE7DQo+Pj4gICAgICAgICAgICB9DQo+Pj4gICAgICAg
+ICAgICBnX2ZyZWUobmFtZSk7DQo+Pj4gLQ0KPj4+IC0gICAgICAgIHRyYWNlX25iZF9vcHRfbWV0
+YV9yZXBseShjb250ZXh0LCBpbmZvLT5jb250ZXh0X2lkKTsNCj4+PiAgICAgICAgICAgIHJlY2Vp
+dmVkID0gdHJ1ZTsNCj4+Pg0KPj4+IC0gICAgICAgIC8qIHJlY2VpdmUgTkJEX1JFUF9BQ0sgKi8N
+Cj4+PiAtICAgICAgICBpZiAobmJkX3JlY2VpdmVfb3B0aW9uX3JlcGx5KGlvYywgTkJEX09QVF9T
+RVRfTUVUQV9DT05URVhULCAmcmVwbHksDQo+Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBlcnJwKSA8IDApDQo+Pj4gLSAgICAgICAgew0KPj4+ICsgICAgICAgIHJldCA9
+IG5iZF9yZWNlaXZlX29uZV9tZXRhX2NvbnRleHQoaW9jLCBOQkRfT1BUX1NFVF9NRVRBX0NPTlRF
+WFQsDQo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZuYW1lLCAm
+aW5mby0+Y29udGV4dF9pZCwgZXJycCk7DQo+Pg0KPj4gaW5kZW50LCBhbmQsIG5vIHJlYXNvbnMg
+dG8gdXNlIHZhcmlhYmxlcyBpbnN0ZWFkIG9mIE5VTEwsIE5VTEwsIGFzIHN1Y2Nlc3MgaGVyZSBp
+cyBhbiBlcnJvcg0KPj4gcGF0aCBhbnl3YXkNCj4gDQo+IE5vdCBzdXJlIGhvdyBJIG1pc3NlZCB0
+aGUgaW5kZW50LCBhbmQgZ29vZCBwb2ludCBhYm91dCBub3QgbmVlZGluZyAmbmFtZQ0KPiBvciAm
+aW5mby0+Y29udGV4dF9pZCBvbiB0aGlzIHNlY29uZCBjYWxsLg0KPiANCj4+PiArKysgYi9uYmQv
+dHJhY2UtZXZlbnRzDQo+Pj4gQEAgLTEzLDcgKzEzLDcgQEAgbmJkX3JlY2VpdmVfcXVlcnlfZXhw
+b3J0c19zdWNjZXNzKGNvbnN0IGNoYXIgKndhbnRuYW1lKSAiRm91bmQgZGVzaXJlZCBleHBvcnQg
+bmENCj4+PiAgICBuYmRfcmVjZWl2ZV9zdGFydHRsc19uZXdfY2xpZW50KHZvaWQpICJTZXR0aW5n
+IHVwIFRMUyINCj4+PiAgICBuYmRfcmVjZWl2ZV9zdGFydHRsc190bHNfaGFuZHNoYWtlKHZvaWQp
+ICJTdGFydGluZyBUTFMgaGFuZHNoYWtlIg0KPj4+ICAgIG5iZF9vcHRfbWV0YV9yZXF1ZXN0KGNv
+bnN0IGNoYXIgKm9wdG5hbWUsIGNvbnN0IGNoYXIgKmNvbnRleHQsIGNvbnN0IGNoYXIgKmV4cG9y
+dCkgIlJlcXVlc3RpbmcgJXMgJXMgZm9yIGV4cG9ydCAlcyINCj4+PiAtbmJkX29wdF9tZXRhX3Jl
+cGx5KGNvbnN0IGNoYXIgKmNvbnRleHQsIHVpbnQzMl90IGlkKSAiUmVjZWl2ZWQgbWFwcGluZyBv
+ZiBjb250ZXh0ICVzIHRvIGlkICUiIFBSSXUzMg0KPj4+ICtuYmRfb3B0X21ldGFfcmVwbHkoY29u
+c3QgY2hhciAqb3B0bmFtZSwgY29uc3QgY2hhciAqY29udGV4dCwgdWludDMyX3QgaWQpICJSZWNl
+aXZlZCAlcyBtYXBwaW5nIG9mICVzIHRvIGlkICUiIFBSSXUzMg0KPj4NCj4+IG5iZF9vcHRfbG9v
+a3VwDQo+IA0KPiBBZGRlZCBhdCBbMV0sIHNvIEknbSBub3Qgc3VyZSB3aGF0IHlvdSBhcmUgc3Rp
+bGwgd2FudGluZyBoZXJlLg0KDQpZZXMsIG15IGZhdWx0LCBpdCdzIE9LLg0KDQo+IA0KPj4NCj4+
+PiAgICBuYmRfcmVjZWl2ZV9uZWdvdGlhdGUodm9pZCAqdGxzY3JlZHMsIGNvbnN0IGNoYXIgKmhv
+c3RuYW1lKSAiUmVjZWl2aW5nIG5lZ290aWF0aW9uIHRsc2NyZWRzPSVwIGhvc3RuYW1lPSVzIg0K
+Pj4+ICAgIG5iZF9yZWNlaXZlX25lZ290aWF0ZV9tYWdpYyh1aW50NjRfdCBtYWdpYykgIk1hZ2lj
+IGlzIDB4JSIgUFJJeDY0DQo+Pj4gICAgbmJkX3JlY2VpdmVfbmVnb3RpYXRlX3NlcnZlcl9mbGFn
+cyh1aW50MzJfdCBnbG9iYWxmbGFncykgIkdsb2JhbCBmbGFncyBhcmUgMHglIiBQUkl4MzINCj4+
+Pg0KPj4NCj4+IFdpdGggYXQgbGVhc3QgbmJkX29wdF9sb29rdXA6DQo+PiBSZXZpZXdlZC1ieTog
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0K
+Pj4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
