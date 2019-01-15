@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47582)
+Received: from eggs.gnu.org ([209.51.188.92]:49339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gjJkM-00041U-EP
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 03:06:56 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gjJth-0006TL-LE
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 03:16:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gjJkL-0002AS-IW
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 03:06:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gjJkL-00029w-B8
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 03:06:53 -0500
-References: <20190114140510.7161-1-chen.zhang@intel.com>
-	<0b78cb56-aab1-aa20-3e38-bf7db25151af@redhat.com>
-	<21eec332-311f-b5df-e4bc-1e7781b3ff35@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <cadce6f6-c624-152f-ef10-40a338b60271@redhat.com>
-Date: Tue, 15 Jan 2019 16:06:45 +0800
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gjJtf-0007RO-0D
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 03:16:32 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37212)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gjJte-0007Lz-K0
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 03:16:30 -0500
+Received: by mail-wm1-x342.google.com with SMTP id g67so2207710wmd.2
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 00:16:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <21eec332-311f-b5df-e4bc-1e7781b3ff35@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+References: <20180927143338.GA56570@bogon>
+	<CAJ+F1CKf5625pUPBvxv6gCX0eVeDEYBj9s08phpGe8sh4LvWaQ@mail.gmail.com>
+	<20190114225732-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190114225732-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 15 Jan 2019 12:16:11 +0400
+Message-ID: <CAJ+F1C+nYNKtcNFiWSELrBOLUxR069AWOm4bDh7WDy5RwcAy9A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net/colo-compare.c: Remove duplicated code
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: fix qemu crash caused by
+ failed backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +32,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, Zhang Chen <chen.zhang@intel.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, qemu-dev <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-
-On 2019/1/15 =E4=B8=8A=E5=8D=8812:44, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 1/14/19 3:30 PM, Thomas Huth wrote:
->> On 2019-01-14 15:05, Zhang Chen wrote:
->>> From: Zhang Chen <chen.zhang@intel.com>
->>>
->>> Fix duplicated code:
->>> https://bugs.launchpad.net/qemu/+bug/1811499
->>>
-> Fixes: f449c9e549c
+On Tue, Jan 15, 2019 at 7:59 AM Michael S. Tsirkin <mst@redhat.com> wrote:
 >
->>> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
->>> ---
->>>   net/colo-compare.c | 8 --------
->>>   1 file changed, 8 deletions(-)
->>>
->>> diff --git a/net/colo-compare.c b/net/colo-compare.c
->>> index 9156ab3349..fa3fd0632d 100644
->>> --- a/net/colo-compare.c
->>> +++ b/net/colo-compare.c
->>> @@ -285,14 +285,6 @@ static bool colo_mark_tcp_pkt(Packet *ppkt, Pack=
-et *spkt,
->>>   {
->>>       *mark =3D 0;
->>>  =20
->>> -    if (ppkt->tcp_seq =3D=3D spkt->tcp_seq && ppkt->seq_end =3D=3D s=
-pkt->seq_end) {
->>> -        if (colo_compare_packet_payload(ppkt, spkt,
->>> -                                        ppkt->header_size, spkt->hea=
-der_size,
->>> -                                        ppkt->payload_size)) {
->>> -            *mark =3D COLO_COMPARE_FREE_SECONDARY | COLO_COMPARE_FRE=
-E_PRIMARY;
->>> -            return true;
->>> -        }
->>> -    }
->>>       if (ppkt->tcp_seq =3D=3D spkt->tcp_seq && ppkt->seq_end =3D=3D =
-spkt->seq_end) {
->>>           if (colo_compare_packet_payload(ppkt, spkt,
->>>                                           ppkt->header_size, spkt->he=
-ader_size,
->>>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> On Tue, Oct 02, 2018 at 01:54:25PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Thu, Sep 27, 2018 at 7:37 PM Liang Li <liliangleo@didiglobal.com> wr=
+ote:
+> > >
+> > > During live migration, when stopping vhost-user device, 'vhost_dev_st=
+op'
+> > > will be called, 'vhost_dev_stop' will call a batch of 'vhost_user_rea=
+d'
+> > > and 'vhost_user_write'. If a previous 'vhost_user_read' or 'vhost_use=
+r_write'
+> > > failed because the vhost user backend failed, the 'CHR_EVENT_CLOSED' =
+event
+> > > will be triggerd, followed by the call chain chr_closed_bh()->vhost_u=
+ser_stop()->
+> > > vhost_net_cleanup()->vhost_dev_cleanup()
+> > >
+> > > vhost_dev_cleanup will clear vhost_dev struct, so the later 'vhost_us=
+er_read'
+> > > or 'vhost_user_read' will reference null pointer and cause qemu crash
+> >
+> > Do you have a backtrace to help understand the issue?
+> > thanks
 >
+> Marc-Andr=C3=A9, Maxime any input on this patch?
 
-Applied.
+It looks like this may be reproducible today. It would be great to
+have a test or an easy way to reproduce it on master. It could be
+based on existing vhost-user-test migration test.
 
-Thanks
+> I agree flags like break_down don't exactly look elegant ...
+
+Indeed, and its state is somehow managed by both vhost-user and
+vhost-net. I wonder if vhost_dev_cleanup() shouldn't set it, instead
+of vhost_net_mark_break_down().
+
+>
+>
+> > >
+> > > Signed-off-by: Liang Li <liliangleo@didiglobal.com>
+> > > ---
+> > >  hw/net/vhost_net.c        |  6 ++++++
+> > >  hw/virtio/vhost-user.c    | 15 +++++++++++++--
+> > >  include/hw/virtio/vhost.h |  1 +
+> > >  include/net/vhost_net.h   |  1 +
+> > >  net/vhost-user.c          |  3 +++
+> > >  5 files changed, 24 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> > > index e037db6..77994e9 100644
+> > > --- a/hw/net/vhost_net.c
+> > > +++ b/hw/net/vhost_net.c
+> > > @@ -113,6 +113,11 @@ uint64_t vhost_net_get_features(struct vhost_net=
+ *net, uint64_t features)
+> > >              features);
+> > >  }
+> > >
+> > > +void vhost_net_mark_break_down(struct vhost_net *net)
+> > > +{
+> > > +    net->dev.break_down =3D true;
+> > > +}
+> > > +
+> > >  void vhost_net_ack_features(struct vhost_net *net, uint64_t features=
+)
+> > >  {
+> > >      net->dev.acked_features =3D net->dev.backend_features;
+> > > @@ -156,6 +161,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions =
+*options)
+> > >      net->dev.max_queues =3D 1;
+> > >      net->dev.nvqs =3D 2;
+> > >      net->dev.vqs =3D net->vqs;
+> > > +    net->dev.break_down =3D false;
+> > >
+> > >      if (backend_kernel) {
+> > >          r =3D vhost_net_get_fd(options->net_backend);
+> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> > > index b041343..1394719 100644
+> > > --- a/hw/virtio/vhost-user.c
+> > > +++ b/hw/virtio/vhost-user.c
+> > > @@ -213,14 +213,20 @@ static bool ioeventfd_enabled(void)
+> > >  static int vhost_user_read(struct vhost_dev *dev, VhostUserMsg *msg)
+> > >  {
+> > >      struct vhost_user *u =3D dev->opaque;
+> > > -    CharBackend *chr =3D u->user->chr;
+> > > +    CharBackend *chr;
+> > >      uint8_t *p =3D (uint8_t *) msg;
+> > >      int r, size =3D VHOST_USER_HDR_SIZE;
+> > >
+> > > +    if (dev->break_down) {
+> > > +        goto fail;
+> > > +    }
+> > > +
+> > > +    chr =3D u->user->chr;
+> > >      r =3D qemu_chr_fe_read_all(chr, p, size);
+> > >      if (r !=3D size) {
+> > >          error_report("Failed to read msg header. Read %d instead of =
+%d."
+> > >                       " Original request %d.", r, size, msg->hdr.requ=
+est);
+> > > +        dev->break_down =3D true;
+> > >          goto fail;
+> > >      }
+> > >
+> > > @@ -299,9 +305,12 @@ static int vhost_user_write(struct vhost_dev *de=
+v, VhostUserMsg *msg,
+> > >                              int *fds, int fd_num)
+> > >  {
+> > >      struct vhost_user *u =3D dev->opaque;
+> > > -    CharBackend *chr =3D u->user->chr;
+> > > +    CharBackend *chr;
+> > >      int ret, size =3D VHOST_USER_HDR_SIZE + msg->hdr.size;
+> > >
+> > > +    if (dev->break_down) {
+> > > +        return -1;
+> > > +    }
+> > >      /*
+> > >       * For non-vring specific requests, like VHOST_USER_SET_MEM_TABL=
+E,
+> > >       * we just need send it once in the first time. For later such
+> > > @@ -312,6 +321,7 @@ static int vhost_user_write(struct vhost_dev *dev=
+, VhostUserMsg *msg,
+> > >          return 0;
+> > >      }
+> > >
+> > > +    chr =3D u->user->chr;
+> > >      if (qemu_chr_fe_set_msgfds(chr, fds, fd_num) < 0) {
+> > >          error_report("Failed to set msg fds.");
+> > >          return -1;
+> > > @@ -319,6 +329,7 @@ static int vhost_user_write(struct vhost_dev *dev=
+, VhostUserMsg *msg,
+> > >
+> > >      ret =3D qemu_chr_fe_write_all(chr, (const uint8_t *) msg, size);
+> > >      if (ret !=3D size) {
+> > > +        dev->break_down =3D true;
+> > >          error_report("Failed to write msg."
+> > >                       " Wrote %d instead of %d.", ret, size);
+> > >          return -1;
+> > > diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+> > > index a7f449f..86d0dc5 100644
+> > > --- a/include/hw/virtio/vhost.h
+> > > +++ b/include/hw/virtio/vhost.h
+> > > @@ -74,6 +74,7 @@ struct vhost_dev {
+> > >      bool started;
+> > >      bool log_enabled;
+> > >      uint64_t log_size;
+> > > +    bool break_down;
+> > >      Error *migration_blocker;
+> > >      const VhostOps *vhost_ops;
+> > >      void *opaque;
+> > > diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+> > > index 77e4739..06f2c08 100644
+> > > --- a/include/net/vhost_net.h
+> > > +++ b/include/net/vhost_net.h
+> > > @@ -27,6 +27,7 @@ void vhost_net_cleanup(VHostNetState *net);
+> > >
+> > >  uint64_t vhost_net_get_features(VHostNetState *net, uint64_t feature=
+s);
+> > >  void vhost_net_ack_features(VHostNetState *net, uint64_t features);
+> > > +void vhost_net_mark_break_down(VHostNetState *net);
+> > >
+> > >  bool vhost_net_virtqueue_pending(VHostNetState *net, int n);
+> > >  void vhost_net_virtqueue_mask(VHostNetState *net, VirtIODevice *dev,
+> > > diff --git a/net/vhost-user.c b/net/vhost-user.c
+> > > index a39f9c9..b99e20b 100644
+> > > --- a/net/vhost-user.c
+> > > +++ b/net/vhost-user.c
+> > > @@ -270,6 +270,9 @@ static void net_vhost_user_event(void *opaque, in=
+t event)
+> > >          if (s->watch) {
+> > >              AioContext *ctx =3D qemu_get_current_aio_context();
+> > >
+> > > +            if (s->vhost_net) {
+> > > +                vhost_net_mark_break_down(s->vhost_net);
+> > > +            }
+> > >              g_source_remove(s->watch);
+> > >              s->watch =3D 0;
+> > >              qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, NULL, NULL=
+,
+> > > --
+> > > 1.8.3.1
+> > >
+> > >
+> >
+> >
+> > --
+> > Marc-Andr=C3=A9 Lureau
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
