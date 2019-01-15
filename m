@@ -1,27 +1,24 @@
 Received: from eggs.gnu.org ([209.51.188.92]:36781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gjDjt-0007oY-QT
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:42:02 -0500
+	(envelope-from <mst@redhat.com>) id 1gjDjq-0007oY-VN
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gjDdW-0007NE-EX
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:35:28 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:43778
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gjDdR-0007Gs-HU
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:35:23 -0500
-References: <1547197071-14504-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1547197071-14504-5-git-send-email-lizhijian@cn.fujitsu.com>
-	<20190114175348.GY4500@habkost.net>
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <6a1206be-d363-ff73-595c-fde52a3dab66@cn.fujitsu.com>
-Date: Tue, 15 Jan 2019 09:35:09 +0800
+	(envelope-from <mst@redhat.com>) id 1gjDdq-0007Xm-J1
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:35:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDdq-0007WU-DI
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:35:46 -0500
+Date: Mon, 14 Jan 2019 20:35:33 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190115003812.11329-8-mst@redhat.com>
+References: <20190115003812.11329-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190114175348.GY4500@habkost.net>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 4/4] i386: allow to load initrd below 4G
- for recent linux
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190115003812.11329-1-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 07/44] util: check the return value of fcntl in
+ qemu_set_{block, nonblock}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org, philmd@redhat.com, zhijianx.li@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Li Qiang <liq3ea@163.com>, Thomas Huth <thuth@redhat.com>, Kamil Rytarowski <n54@gmx.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Hi Eduardo
+From: Li Qiang <liq3ea@163.com>
 
+Assert that the return value is not an error. This is like commit
+7e6478e7d4f for qemu_set_cloexec.
 
-On 1/15/19 01:53, Eduardo Habkost wrote:
->> +    if (protocol >= 0x20c &&
->> +        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
->> +        /*
->> +         * Linux has supported initrd up to 4 GB for a very long time (2007,
->> +         * long before XLF_CAN_BE_LOADED_ABOVE_4G which was added in 2013),
->> +         * though it only sets initrd_max to 2 GB to "work around bootloader
->> +         * bugs". Luckily, QEMU firmware(which does something like bootloader)
->> +         * has supported this.
->> +         *
->> +         * It's believed that if XLF_CAN_BE_LOADED_ABOVE_4G is set, initrd can
->> +         * be loaded into any address.
->> +         *
->> +         * In addition, initrd_max is uint32_t simply because QEMU doesn't
->> +         * support the 64-bit boot protocol (specifically the ext_ramdisk_image
->> +         * field).
->> +         *
->> +         * Therefore here just limit initrd_max to UINT32_MAX simply as well.
->> +         *
->> +         * FIXME: it's possible that linux protocol within [0x208, 0x20c]
->> +         * supports up to 4G initrd as well.
-> I don't understand what exactly this FIXME comment is
-> documenting.  What exactly needs to be fixed?
->
-XLF_CAN_BE_LOADED_ABOVE_4G is one of the indicators, actually as comments said,
-linux has supported up to 4 GB initrd since linux-2.26(protocol version 0x208).
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ util/oslib-posix.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-
-I just want to comment that linux with protocol within [0x208, 0x20c] supports up to 4 GB initrd as well.
-
-Is documenting with FIXME appropriate?
-
-
-Thanks
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index c1bee2a581..4ce1ba9ca4 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -233,14 +233,18 @@ void qemu_set_block(int fd)
+ {
+     int f;
+     f = fcntl(fd, F_GETFL);
+-    fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
++    assert(f != -1);
++    f = fcntl(fd, F_SETFL, f & ~O_NONBLOCK);
++    assert(f != -1);
+ }
+ 
+ void qemu_set_nonblock(int fd)
+ {
+     int f;
+     f = fcntl(fd, F_GETFL);
+-    fcntl(fd, F_SETFL, f | O_NONBLOCK);
++    assert(f != -1);
++    f = fcntl(fd, F_SETFL, f | O_NONBLOCK);
++    assert(f != -1);
+ }
+ 
+ int socket_set_fast_reuse(int fd)
+-- 
+MST
