@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49386)
+Received: from eggs.gnu.org ([209.51.188.92]:50366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gjEnd-0005By-G7
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 21:49:59 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gjEwS-0007Fo-Sx
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 21:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gjEnc-0007Kh-Fm
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 21:49:57 -0500
-Received: from mail-yb1-xb30.google.com ([2607:f8b0:4864:20::b30]:45087)
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gjEwQ-0002cF-Ty
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 21:59:04 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gjEnc-0007KV-Bi
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 21:49:56 -0500
-Received: by mail-yb1-xb30.google.com with SMTP id n78so473162yba.12
-	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 18:49:56 -0800 (PST)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1gjEwN-0002Z9-5X
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 21:59:01 -0500
+Received: by mail-ot1-x343.google.com with SMTP id s13so1204376otq.4
+	for <qemu-devel@nongnu.org>; Mon, 14 Jan 2019 18:58:58 -0800 (PST)
 MIME-Version: 1.0
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 14 Jan 2019 18:49:43 -0800
-Message-ID: <CAMo8BfKWwT13TkBJ-C_kwYCkTcYY_Tq1vvGzanCzeDBRgTUzeg@mail.gmail.com>
+In-Reply-To: <20190114194902.GA29211@sx9>
+References: <cover.1541093316.git.noring@nocrew.org>
+	<eecae865fc8f7934cc2d51b24cba7d8ac3ec37c6.1541093316.git.noring@nocrew.org>
+	<BN6PR2201MB1251DBF84B71346A8B673CA6C6B60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20190101182745.GA17022@sx9>
+	<BN6PR2201MB1251C334FE66ADF677BAE8D2C68E0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20190113185708.GA27922@sx9>
+	<CAL1e-=je93qUvfcq3ftNxYucjLYPEZf=dPXv6tSuzsE3SdsWKw@mail.gmail.com>
+	<20190114194902.GA29211@sx9>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 15 Jan 2019 03:58:56 +0100
+Message-ID: <CAL1e-=hywbRh3FSBsBFCJqwvXf8WGpcbbYkaa3qEZ51FMnhiCQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] MTTCG qemu-softmmu aborted on watchpoint hit by atomic
- instruction
+Subject: Re: [Qemu-devel] [PATCH v2 09/12] tests/tcg/mips: Test R5900
+ three-operand MADDU1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +36,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: "Emilio G . Cota" <cota@braap.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Maciej W. Rozycki" <macro@linux-mips.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-Hello,
+On Monday, January 14, 2019, Fredrik Noring <noring@nocrew.org> wrote:
 
-I tried to debug guest application on SMP xtensa softmmu QEMU
-through the gdbserver and found that QEMU aborts when guest
-uses atomic operation to modify memory location watched by the
-debugger. It exits with the following message:
-
-ERROR: cpus.c:1848:qemu_mutex_lock_iothread_impl: assertion failed:
-(!qemu_mutex_iothread_locked())
-
-and the reason is that io_writex invoked from the atomic operation
-calls qemu_mutex_lock_iothread but doesn't have a chance to call
-qemu_mutex_unlock_iothread, because it exits the cpu loop at the
-following place:
-
-#0  __libc_siglongjmp (env=0x55555628c720, val=1) at longjmp.c:28
-#1  0x000055555577ef24 in cpu_loop_exit (cpu=0x55555628c660) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/accel/tcg/cpu-exec-common.c:68
-#2  0x00005555556e23dd in check_watchpoint (offset=3700, len=4,
-attrs=..., flags=2) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/exec.c:2762
-#3  0x00005555556e2603 in watch_mem_write (opaque=0x0, addr=14687860,
-val=1, size=4, attrs=...) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/exec.c:2815
-#4  0x0000555555744f8e in memory_region_write_with_attrs_accessor
-(mr=0x5555561c6c00 <io_mem_watch>, addr=14687860,
-value=0x7fffecfcb348, size=4, shift=0, mask=4294967295, attrs=...) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/memory.c:529
-#5  0x00005555557450ad in access_with_adjusted_size (addr=14687860,
-value=0x7fffecfcb348, size=4, access_size_min=1, access_size_max=8,
-access_fn=0x555555744ea1 <memory_region_write_with_attrs_accessor>,
-mr=0x5555561c6c00 <io_mem_watch>, attrs=...)
-    at /home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/memory.c:570
-#6  0x0000555555747d2c in memory_region_dispatch_write
-(mr=0x5555561c6c00 <io_mem_watch>, addr=14687860, data=1, size=4,
-attrs=...) at /home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/memory.c:1459
-#7  0x000055555576075e in io_writex (env=0x555556294910,
-iotlbentry=0x55555629de50, mmu_idx=0, val=1, addr=3504348788,
-retaddr=140737170398881, recheck=false, size=4) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/accel/tcg/cputlb.c:795
-#8  0x0000555555762652 in io_writel (env=0x555556294910, mmu_idx=0,
-index=1, val=1, addr=3504348788, retaddr=140737170398881,
-recheck=false) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/accel/tcg/softmmu_template.h:273
-#9  0x00005555557627fe in helper_le_stl_mmu (env=0x555556294910,
-addr=3504348788, val=1, oi=32, retaddr=140737170398881) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/accel/tcg/softmmu_template.h:310
-#10 0x00007fffed0c5ea1 in code_gen_buffer ()
-#11 0x000055555577dc59 in cpu_tb_exec (cpu=0x55555628c660,
-itb=0x7fffed0c5d40 <code_gen_buffer+1019155>) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/accel/tcg/cpu-exec.c:171
-#12 0x000055555577dfa1 in cpu_exec_step_atomic (cpu=0x55555628c660) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/accel/tcg/cpu-exec.c:259
-#13 0x000055555572ab43 in qemu_tcg_cpu_thread_fn (arg=0x55555628c660)
-at /home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/cpus.c:1751
-#14 0x0000555555a6052e in qemu_thread_start (args=0x5555562ad9f0) at
-/home/jcmvbkbc/ws/m/awt/emu/xtensa/qemu/util/qemu-thread-posix.c:498
-#15 0x00007ffff52f5494 in start_thread (arg=0x7fffecfcc700) at
-pthread_create.c:333
-#16 0x00007ffff5037acf in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:97
+> Hi Aleksandar,
+>
+> > Awesome!
+> >
+> > I am especially happy with your choice of naming "mmr" (MultiMedia
+> > Registers) for these fieilds, since that is what they really are (and
+> they
+> > are certainly not "gprs"). Right on the money!
+>
+> Great, thanks!
+>
+> > > For HI1 and LO1 only? I'm asking since HI0 and LO0 are implemented with
+> > > the DSP array anyway, for all ISAs.
+> >
+> > I leave it to your judgement. If you are not sure (or you find the
+> current
+> > implementation too sensitive or contrieved to touch), you can leave
+> HI1/LO1
+> > fields implementation as it is now. My motivation was avoiding usage of
+> the
+> > same data fields for two relatively independant purposes.
+>
+> I think the change is simple, but what should we call the new variables?
+>
+> /* global register indices */
+> static TCGv cpu_gpr[32], cpu_PC;
+> static TCGv cpu_HI[MIPS_DSP_ACC], cpu_LO[MIPS_DSP_ACC];
+> static TCGv cpu_HI1, cpu_LO1;    /* Upper half of 128-bit TX79 HI and LO */
+>
+> Something like the last line?
+>
+>
+Correct.
 
 
-It doesn't look like an xtensa-specific issue, any idea how to fix it?
+> By the way, what are your thoughts on "[PATCH v2 3/6] target/mips: Fix
+> HI[ac] and LO[ac] 32-bit truncation with MIPS64 DSP ASE"?
+>
+> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg01287.html
+>
+>
+Still taking a closer look. Didn't forget.
 
--- 
-Thanks.
--- Max
+
+> > Outstanding! I salute your including PCPYUD and PCPYLD in this group -
+> they
+> > too can be considered "basic R/W access to mmr".
+>
+> Good, many thanks!
+>
+> > The goal right now is to prepare basic stuff related to SA register, even
+> > though there is possibly no immediate any application use case. However,
+> > this will make potential future development considerably easier, so
+> please
+> > include handling of this register and these instructions.
+>
+> Done, although I have some minor clean-ups left to do. I have checked with
+> R5900 hardware to match the implementation defined value of the SA
+> register.
+>
+> I will post MFSA, MTSA, MTSAB and MTSAH in v2 of this patch series.
+>
+>
+Magnificent!
+
+
+> > Regarding segments:
+> >
+> > +    int rs = extract32(ctx->opcode, 21, 5);
+> > +    int rt = extract32(ctx->opcode, 16, 5);
+> > +    int rd = extract32(ctx->opcode, 11, 5);
+> >
+> > Please include them in gen_XXX() functions, rather than in decode_XXX()
+> > functions. This will leave decode_XXX() functions with a single
+> > responsibility of detecting what instruction is about to be processed,
+> > which is cleaner from logical decomposition point of view (even if it
+> would
+> > sometimes result in the repetition of some code segments - logical
+> > decomposition is of far greater importance).
+>
+> Done!
+>
+> Fredrik
+>
