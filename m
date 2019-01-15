@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48049)
+Received: from eggs.gnu.org ([209.51.188.92]:48283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjOEk-0002o1-DN
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:54:35 -0500
+	(envelope-from <armbru@redhat.com>) id 1gjOFR-0003AG-8q
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:55:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjOEg-0001sx-7y
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:54:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41682)
+	(envelope-from <armbru@redhat.com>) id 1gjOFQ-0002Qi-7w
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:55:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45785)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjOEX-0001h5-H7
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:54:26 -0500
-Date: Tue, 15 Jan 2019 07:54:10 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115075022-mutt-send-email-mst@kernel.org>
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<20190109112728.9214-3-xieyongji@baidu.com>
-	<20190114172157-mutt-send-email-mst@kernel.org>
-	<CAONzpca2=Y+KbWCkF4YVmCU3_+X3KTBBupmeFmrPodMaFUs-cw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gjOFP-0002QE-Vo
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:55:16 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181225140449.15786-1-fli@suse.com>
+	<20181225140449.15786-10-fli@suse.com>
+	<87a7kcml5i.fsf@dusky.pond.sub.org>
+	<f5631b6b-d313-88dc-f80a-890c26f109e4@126.com>
+	<878sznquv6.fsf@dusky.pond.sub.org>
+	<8504f713-0334-62b2-c462-4bdcb3c83caf@126.com>
+Date: Tue, 15 Jan 2019 13:55:12 +0100
+In-Reply-To: <8504f713-0334-62b2-c462-4bdcb3c83caf@126.com> (Fei Li's message
+	of "Mon, 14 Jan 2019 21:38:46 +0800")
+Message-ID: <871s5ejd1r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAONzpca2=Y+KbWCkF4YVmCU3_+X3KTBBupmeFmrPodMaFUs-cw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 2/7] vhost-user: Support
- transferring inflight buffer between qemu and backend
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v9 09/16] qemu_thread: supplement
+ error handling for pci_edu_realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +33,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongji Xie <elohimes@gmail.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: Fei Li <lifei1214@126.com>
+Cc: Jiri Slaby <jslaby@suse.cz>, qemu-devel@nongnu.org, shirley17fei@gmail.com
 
-On Tue, Jan 15, 2019 at 02:46:42PM +0800, Yongji Xie wrote:
-> On Tue, 15 Jan 2019 at 06:25, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Wed, Jan 09, 2019 at 07:27:23PM +0800, elohimes@gmail.com wrote:
-> > > @@ -382,6 +397,30 @@ If VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD protocol feature is negotiated,
-> > >  slave can send file descriptors (at most 8 descriptors in each message)
-> > >  to master via ancillary data using this fd communication channel.
-> > >
-> > > +Inflight I/O tracking
-> > > +---------------------
-> > > +
-> > > +To support slave reconnecting, slave need to track inflight I/O in a
-> > > +shared memory. VHOST_USER_GET_INFLIGHT_FD and VHOST_USER_SET_INFLIGHT_FD
-> > > +are used to transfer the memory between master and slave. And to encourage
-> > > +consistency, we provide a recommended format for this memory:
-> >
-> > I think we should make a stronger statement and actually
-> > just say what the format is. Not recommend it weakly.
-> >
-> 
-> Okey, will do it.
-> 
-> > > +
-> > > +offset        width    description
-> > > +0x0      0x400    region for queue0
-> > > +0x400    0x400    region for queue1
-> > > +0x800    0x400    region for queue2
-> > > +...      ...      ...
-> > > +
-> > > +For each virtqueue, we have a 1024 bytes region.
-> >
-> >
-> > Why is the size hardcoded? Why not a function of VQ size?
-> >
-> 
-> Sorry, I didn't get your point. Should the region's size be fixed? Do
-> you mean we need to document a function for the region's size?
+Fei Li <lifei1214@126.com> writes:
 
+> =E5=9C=A8 2019/1/14 =E4=B8=8B=E5=8D=888:36, Markus Armbruster =E5=86=99=
+=E9=81=93:
+>> Fei Li <lifei1214@126.com> writes:
+>>
+>>> Just to make sure about how to do the cleanup. I notice that in device_=
+set_realized(),
+>>> the current code does not call "dc->unrealize(dev, NULL);" when dc->rea=
+lize() fails.
+> Sorry that I am still uncertain.. I guess the code below I pasted was
+> misleading,
+> actually I want to stress the *dc->unrealize() is not called when
+> dc->realize() fails*
+> and the incomplete below "goto fail" does not include the dc->unrealize(),
+> but instead the dc->unrealize() is included in later
+> child_realize_fail: & post_realize_fail:.
+>
+>
+> Emm, IMHO, I think when dc->realize() fails, the dc->unrealize() is
+> either should be
+> called in the common function: device_set_realized() in a unified way,
+> that is
+>
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err !=3D NULL) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dc->unrealize=
+) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 dc->unrealize(dev, local_err);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto f=
+ail;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>
+> or do the unrealize() locally for each device earlier when
+> dc->realize() fails.
+>
+> But I checked several dc->realize() function, they did not call unrealize=
+()
+> when fails. Besides, it may mean verbose code if unrealize() locally.
+> Thus I think the above way is the right way to do the cleanup when
+> realize() fails.
 
-Well you are saying 0x0 to 0x400 is for queue0.
-How do you know that's enough? And why are 0x400
-bytes necessary? After all max queue size can be very small.
+The realize() method is specified to either succeed completely or fail
+completely, i.e. fail and do nothing.  The "either succeed completely or
+fail completely" aspect of the specification is sane and perfectly
+ordinary.
 
+How a concrete implementation accomplishes "fail completely" is up to
+the implementation.
 
+An implementation may choose to structure its FOO_realize() and
+FOO_unrealize() in a way that lets FOO_realize() call FOO_unrealize() to
+clean up on failure.
 
-> >
-> > > The region's format is like:
-> > > +
-> > > +offset   width    description
-> > > +0x0      0x1      descriptor 0 is in use or not
-> > > +0x1      0x1      descriptor 1 is in use or not
-> > > +0x2      0x1      descriptor 2 is in use or not
-> > > +...      ...      ...
-> > > +
-> > > +For each descriptor, we use one byte to specify whether it's in use or not.
-> > > +
-> > >  Protocol features
-> > >  -----------------
-> > >
-> >
-> > I think that it's a good idea to have a version in this region.
-> > Otherwise how are you going to handle compatibility when
-> > this needs to be extended?
-> >
-> 
-> I have put the version into the message's payload: VhostUserInflight. Is it OK?
-> 
-> Thanks,
-> Yongji
+An implementation may also choose to clean up differently.
 
-I'm not sure I like it.  So is qemu expected to maintain it? Reset it?
-Also don't you want to be able to detect that qemu has reset the buffer?
-If we have version 1 at a known offset that can serve both purposes.
-Given it only has value within the buffer why not store it there?
+This freedom of choice is by design.
 
--- 
-MST
+Changing the specification now would involve auditing and updating all
+realize() and unrealize() methods.  Not going to happen without an
+extremely compelling reason.
+
+>>>
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dc->realize) {
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dc-=
+>realize(dev, &local_err);
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err !=3D NULL) {
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 got=
+o fail;
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>
+>>> Is this on purpose? (Maybe due to some devices' realize() do their own =
+cleanup
+>>> when fails? Sorry for the unsure, it is such a common function that I d=
+id not
+>>> check all. :( ) Or else, I prefer to do the cleanup in a unified manner=
+, e.g. call "dc->unrealize(dev, NULL);" which is the pci_qdev_unrealize() f=
+or pci devices.
+>> Yes, this is on purpose.
+>>
+>> When a realize() method fails, it must revert everything it has done so
+>> far.  Results in sane "either succeed completely, or fail and do
+>> nothing" semantics.
+>
+> Have a nice day, thanks
+>
+> Fei
