@@ -1,24 +1,24 @@
 Received: from eggs.gnu.org ([209.51.188.92]:36781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDjc-0007oY-Ks
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:45 -0500
+	(envelope-from <mst@redhat.com>) id 1gjDje-0007oY-6r
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDey-0008U2-KB
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57204)
+	(envelope-from <mst@redhat.com>) id 1gjDeq-0008Pv-PG
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48482)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDey-0008Th-EO
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:56 -0500
-Date: Mon, 14 Jan 2019 20:36:50 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDeo-0008Ms-Mj
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:48 -0500
+Date: Mon, 14 Jan 2019 20:36:43 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115003812.11329-36-mst@redhat.com>
+Message-ID: <20190115003812.11329-33-mst@redhat.com>
 References: <20190115003812.11329-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190115003812.11329-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 35/44] virtio: Make
- disable-legacy/disable-modern compat properties optional
+Subject: [Qemu-devel] [PULL 32/44] virtio: split virtio crypto bits from
+ virtio-pci.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +28,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Gonglei <arei.gonglei@huawei.com>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: Juan Quintela <quintela@redhat.com>
 
-The disable-legacy and disable-modern properties apply only to
-some virtio-pci devices.  Make those properties optional.
-
-This fixes the crash introduced by commit f6e501a28ef9 ("virtio: Provide
-version-specific variants of virtio PCI devices"):
-
-  $ qemu-system-x86_64 -machine pc-i440fx-2.6 \
-    -device virtio-net-pci-non-transitional
-  Unexpected error in object_property_find() at qom/object.c:1092:
-  qemu-system-x86_64: -device virtio-net-pci-non-transitional: can't apply \
-  global virtio-pci.disable-modern=on: Property '.disable-modern' not found
-  Aborted (core dumped)
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Fixes: f6e501a28ef9 ("virtio: Provide version-specific variants of virtio PCI devices")
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/core/machine.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ hw/virtio/virtio-pci.h        | 14 --------------
+ hw/virtio/virtio-crypto-pci.c | 14 ++++++++++++++
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 95dc7c3913..f0c0ae6be8 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -91,8 +91,9 @@ const size_t hw_compat_2_7_len = G_N_ELEMENTS(hw_compat_2_7);
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 2f7605590d..bd223a6e3b 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -17,10 +17,8 @@
  
- GlobalProperty hw_compat_2_6[] = {
-     { "virtio-mmio", "format_transport_address", "off" },
--    { "virtio-pci", "disable-modern", "on" },
--    { "virtio-pci", "disable-legacy", "off" },
-+    /* Optional because not all virtio-pci devices support legacy mode */
-+    { "virtio-pci", "disable-modern", "on",  .optional = true },
-+    { "virtio-pci", "disable-legacy", "off", .optional = true },
- };
- const size_t hw_compat_2_6_len = G_N_ELEMENTS(hw_compat_2_6);
+ #include "hw/pci/msi.h"
+ #include "hw/virtio/virtio-bus.h"
+-#include "hw/virtio/virtio-crypto.h"
  
+ typedef struct VirtIOPCIProxy VirtIOPCIProxy;
+-typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
+ 
+ /* virtio-pci-bus */
+ 
+@@ -182,18 +180,6 @@ static inline void virtio_pci_disable_modern(VirtIOPCIProxy *proxy)
+  */
+ #define TYPE_VIRTIO_INPUT_PCI "virtio-input-pci"
+ 
+-/*
+- * virtio-crypto-pci: This extends VirtioPCIProxy.
+- */
+-#define TYPE_VIRTIO_CRYPTO_PCI "virtio-crypto-pci"
+-#define VIRTIO_CRYPTO_PCI(obj) \
+-        OBJECT_CHECK(VirtIOCryptoPCI, (obj), TYPE_VIRTIO_CRYPTO_PCI)
+-
+-struct VirtIOCryptoPCI {
+-    VirtIOPCIProxy parent_obj;
+-    VirtIOCrypto vdev;
+-};
+-
+ /* Virtio ABI version, if we increment this, we break the guest driver. */
+ #define VIRTIO_PCI_ABI_VERSION          0
+ 
+diff --git a/hw/virtio/virtio-crypto-pci.c b/hw/virtio/virtio-crypto-pci.c
+index 8cc3fa3ef7..90a6e0dc2e 100644
+--- a/hw/virtio/virtio-crypto-pci.c
++++ b/hw/virtio/virtio-crypto-pci.c
+@@ -19,6 +19,20 @@
+ #include "hw/virtio/virtio-crypto.h"
+ #include "qapi/error.h"
+ 
++typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
++
++/*
++ * virtio-crypto-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VIRTIO_CRYPTO_PCI "virtio-crypto-pci"
++#define VIRTIO_CRYPTO_PCI(obj) \
++        OBJECT_CHECK(VirtIOCryptoPCI, (obj), TYPE_VIRTIO_CRYPTO_PCI)
++
++struct VirtIOCryptoPCI {
++    VirtIOPCIProxy parent_obj;
++    VirtIOCrypto vdev;
++};
++
+ static Property virtio_crypto_pci_properties[] = {
+     DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
+                     VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
 -- 
 MST
