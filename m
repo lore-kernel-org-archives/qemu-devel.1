@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36781)
+Received: from eggs.gnu.org ([209.51.188.92]:36654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDjj-0007oY-SD
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:52 -0500
+	(envelope-from <mst@redhat.com>) id 1gjDjl-0007cx-A4
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDee-0008Gi-By
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46582)
+	(envelope-from <mst@redhat.com>) id 1gjDeW-0008Cz-Pr
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:22854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDec-00088a-M9
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:35 -0500
-Date: Mon, 14 Jan 2019 20:36:19 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDeS-00085m-LJ
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:26 -0500
+Date: Mon, 14 Jan 2019 20:36:17 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115003812.11329-20-mst@redhat.com>
+Message-ID: <20190115003812.11329-19-mst@redhat.com>
 References: <20190115003812.11329-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190115003812.11329-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 19/44] virtio: split virtio input host bits from
+Subject: [Qemu-devel] [PULL 18/44] virtio: split vhost vsock bits from
  virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,71 +32,74 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com
 
 From: Juan Quintela <quintela@redhat.com>
 
-For consistency with other devices, rename
-virtio_host_{initfn,pci_info} to virtio_input_host_{initfn,info}.
-
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- default-configs/virtio.mak        |  1 +
- hw/virtio/virtio-pci.h            | 14 ---------
- hw/virtio/virtio-input-host-pci.c | 48 +++++++++++++++++++++++++++++++
- hw/virtio/virtio-pci.c            | 23 ---------------
- hw/virtio/Makefile.objs           |  1 +
- 5 files changed, 50 insertions(+), 37 deletions(-)
- create mode 100644 hw/virtio/virtio-input-host-pci.c
+ hw/virtio/virtio-pci.h      | 18 --------
+ hw/virtio/vhost-vsock-pci.c | 86 +++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c      | 53 -----------------------
+ hw/virtio/Makefile.objs     |  3 ++
+ 4 files changed, 89 insertions(+), 71 deletions(-)
+ create mode 100644 hw/virtio/vhost-vsock-pci.c
 
-diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
-index 1304849018..5ae4a61018 100644
---- a/default-configs/virtio.mak
-+++ b/default-configs/virtio.mak
-@@ -12,3 +12,4 @@ CONFIG_VIRTIO_RNG=y
- CONFIG_SCSI=y
- CONFIG_VIRTIO_SCSI=y
- CONFIG_VIRTIO_SERIAL=y
-+CONFIG_VIRTIO_INPUT_HOST=$(CONFIG_LINUX)
 diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index 2109d002df..fb10afe160 100644
+index 29b4216107..2109d002df 100644
 --- a/hw/virtio/virtio-pci.h
 +++ b/hw/virtio/virtio-pci.h
-@@ -50,7 +50,6 @@ typedef struct VHostUserBlkPCI VHostUserBlkPCI;
- typedef struct VirtIORngPCI VirtIORngPCI;
- typedef struct VirtIOInputPCI VirtIOInputPCI;
+@@ -37,9 +37,6 @@
+ #ifdef CONFIG_VHOST_SCSI
+ #include "hw/virtio/vhost-scsi.h"
+ #endif
+-#ifdef CONFIG_VHOST_VSOCK
+-#include "hw/virtio/vhost-vsock.h"
+-#endif
+ 
+ typedef struct VirtIOPCIProxy VirtIOPCIProxy;
+ typedef struct VirtIOBlkPCI VirtIOBlkPCI;
+@@ -55,7 +52,6 @@ typedef struct VirtIOInputPCI VirtIOInputPCI;
  typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
--typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
+ typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
  typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+-typedef struct VHostVSockPCI VHostVSockPCI;
  typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
  
-@@ -359,19 +358,6 @@ struct VirtIOInputHIDPCI {
-     VirtIOInputHID vdev;
+ /* virtio-pci-bus */
+@@ -388,20 +384,6 @@ struct VirtIOGPUPCI {
+     VirtIOGPU vdev;
  };
  
--#ifdef CONFIG_LINUX
+-#ifdef CONFIG_VHOST_VSOCK
+-/*
+- * vhost-vsock-pci: This extends VirtioPCIProxy.
+- */
+-#define TYPE_VHOST_VSOCK_PCI "vhost-vsock-pci-base"
+-#define VHOST_VSOCK_PCI(obj) \
+-        OBJECT_CHECK(VHostVSockPCI, (obj), TYPE_VHOST_VSOCK_PCI)
 -
--#define TYPE_VIRTIO_INPUT_HOST_PCI "virtio-input-host-pci-base"
--#define VIRTIO_INPUT_HOST_PCI(obj) \
--        OBJECT_CHECK(VirtIOInputHostPCI, (obj), TYPE_VIRTIO_INPUT_HOST_PCI)
--
--struct VirtIOInputHostPCI {
+-struct VHostVSockPCI {
 -    VirtIOPCIProxy parent_obj;
--    VirtIOInputHost vdev;
+-    VHostVSock vdev;
 -};
--
 -#endif
 -
  /*
-  * virtio-gpu-pci: This extends VirtioPCIProxy.
+  * virtio-crypto-pci: This extends VirtioPCIProxy.
   */
-diff --git a/hw/virtio/virtio-input-host-pci.c b/hw/virtio/virtio-input-host-pci.c
+diff --git a/hw/virtio/vhost-vsock-pci.c b/hw/virtio/vhost-vsock-pci.c
 new file mode 100644
-index 0000000000..725a51ad30
+index 0000000000..6f43ca35fb
 --- /dev/null
-+++ b/hw/virtio/virtio-input-host-pci.c
-@@ -0,0 +1,48 @@
++++ b/hw/virtio/vhost-vsock-pci.c
+@@ -0,0 +1,86 @@
 +/*
-+ * Virtio input host PCI Bindings
++ * Vhost vsock PCI Bindings
++ *
++ * Copyright 2015 Red Hat, Inc.
++ *
++ * Authors:
++ *  Stefan Hajnoczi <stefanha@redhat.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or
 + * (at your option) any later version.  See the COPYING file in the
@@ -106,95 +109,160 @@ index 0000000000..725a51ad30
 +#include "qemu/osdep.h"
 +
 +#include "virtio-pci.h"
-+#include "hw/virtio/virtio-input.h"
++#include "hw/virtio/vhost-vsock.h"
 +
-+typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
++typedef struct VHostVSockPCI VHostVSockPCI;
 +
-+#define TYPE_VIRTIO_INPUT_HOST_PCI "virtio-input-host-pci-base"
-+#define VIRTIO_INPUT_HOST_PCI(obj) \
-+        OBJECT_CHECK(VirtIOInputHostPCI, (obj), TYPE_VIRTIO_INPUT_HOST_PCI)
++/*
++ * vhost-vsock-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VHOST_VSOCK_PCI "vhost-vsock-pci-base"
++#define VHOST_VSOCK_PCI(obj) \
++        OBJECT_CHECK(VHostVSockPCI, (obj), TYPE_VHOST_VSOCK_PCI)
 +
-+struct VirtIOInputHostPCI {
++struct VHostVSockPCI {
 +    VirtIOPCIProxy parent_obj;
-+    VirtIOInputHost vdev;
++    VHostVSock vdev;
 +};
 +
-+static void virtio_host_initfn(Object *obj)
++/* vhost-vsock-pci */
++
++static Property vhost_vsock_pci_properties[] = {
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 +{
-+    VirtIOInputHostPCI *dev = VIRTIO_INPUT_HOST_PCI(obj);
++    VHostVSockPCI *dev = VHOST_VSOCK_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_vsock_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    k->realize = vhost_vsock_pci_realize;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->props = vhost_vsock_pci_properties;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_VSOCK;
++    pcidev_k->revision = 0x00;
++    pcidev_k->class_id = PCI_CLASS_COMMUNICATION_OTHER;
++}
++
++static void vhost_vsock_pci_instance_init(Object *obj)
++{
++    VHostVSockPCI *dev = VHOST_VSOCK_PCI(obj);
 +
 +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_INPUT_HOST);
++                                TYPE_VHOST_VSOCK);
 +}
 +
-+static const VirtioPCIDeviceTypeInfo virtio_input_host_pci_info = {
-+    .base_name             = TYPE_VIRTIO_INPUT_HOST_PCI,
-+    .generic_name          = "virtio-input-host-pci",
-+    .transitional_name     = "virtio-input-host-pci-transitional",
-+    .non_transitional_name = "virtio-input-host-pci-non-transitional",
-+    .parent        = TYPE_VIRTIO_INPUT_PCI,
-+    .instance_size = sizeof(VirtIOInputHostPCI),
-+    .instance_init = virtio_host_initfn,
++static const VirtioPCIDeviceTypeInfo vhost_vsock_pci_info = {
++    .base_name             = TYPE_VHOST_VSOCK_PCI,
++    .generic_name          = "vhost-vsock-pci",
++    .transitional_name     = "vhost-vsock-pci-transitional",
++    .non_transitional_name = "vhost-vsock-pci-non-transitional",
++    .instance_size = sizeof(VHostVSockPCI),
++    .instance_init = vhost_vsock_pci_instance_init,
++    .class_init    = vhost_vsock_pci_class_init,
 +};
 +
-+static void virtio_input_host_pci_register(void)
++static void virtio_pci_vhost_register(void)
 +{
-+    virtio_pci_types_register(&virtio_input_host_pci_info);
++    virtio_pci_types_register(&vhost_vsock_pci_info);
 +}
 +
-+type_init(virtio_input_host_pci_register)
++type_init(virtio_pci_vhost_register)
 diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 4312d95fe9..d951f278a2 100644
+index d05066deb8..4312d95fe9 100644
 --- a/hw/virtio/virtio-pci.c
 +++ b/hw/virtio/virtio-pci.c
-@@ -2707,26 +2707,6 @@ static const VirtioPCIDeviceTypeInfo virtio_tablet_pci_info = {
-     .instance_init = virtio_tablet_initfn,
+@@ -2357,56 +2357,6 @@ static const VirtioPCIDeviceTypeInfo vhost_user_scsi_pci_info = {
  };
+ #endif
  
--#ifdef CONFIG_LINUX
--static void virtio_host_initfn(Object *obj)
--{
--    VirtIOInputHostPCI *dev = VIRTIO_INPUT_HOST_PCI(obj);
+-/* vhost-vsock-pci */
 -
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_INPUT_HOST);
+-#ifdef CONFIG_VHOST_VSOCK
+-static Property vhost_vsock_pci_properties[] = {
+-    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+-static void vhost_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+-{
+-    VHostVSockPCI *dev = VHOST_VSOCK_PCI(vpci_dev);
+-    DeviceState *vdev = DEVICE(&dev->vdev);
+-
+-    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+-    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 -}
 -
--static const VirtioPCIDeviceTypeInfo virtio_host_pci_info = {
--    .base_name             = TYPE_VIRTIO_INPUT_HOST_PCI,
--    .generic_name          = "virtio-input-host-pci",
--    .transitional_name     = "virtio-input-host-pci-transitional",
--    .non_transitional_name = "virtio-input-host-pci-non-transitional",
--    .parent        = TYPE_VIRTIO_INPUT_PCI,
--    .instance_size = sizeof(VirtIOInputHostPCI),
--    .instance_init = virtio_host_initfn,
+-static void vhost_vsock_pci_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+-    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+-    k->realize = vhost_vsock_pci_realize;
+-    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+-    dc->props = vhost_vsock_pci_properties;
+-    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+-    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_VSOCK;
+-    pcidev_k->revision = 0x00;
+-    pcidev_k->class_id = PCI_CLASS_COMMUNICATION_OTHER;
+-}
+-
+-static void vhost_vsock_pci_instance_init(Object *obj)
+-{
+-    VHostVSockPCI *dev = VHOST_VSOCK_PCI(obj);
+-
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VHOST_VSOCK);
+-}
+-
+-static const VirtioPCIDeviceTypeInfo vhost_vsock_pci_info = {
+-    .base_name             = TYPE_VHOST_VSOCK_PCI,
+-    .generic_name          = "vhost-vsock-pci",
+-    .transitional_name     = "vhost-vsock-pci-transitional",
+-    .non_transitional_name = "vhost-vsock-pci-non-transitional",
+-    .instance_size = sizeof(VHostVSockPCI),
+-    .instance_init = vhost_vsock_pci_instance_init,
+-    .class_init    = vhost_vsock_pci_class_init,
 -};
 -#endif
 -
- /* virtio-pci-bus */
+ /* virtio-balloon-pci */
  
- static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
-@@ -2785,9 +2765,6 @@ static void virtio_pci_register_types(void)
-     virtio_pci_types_register(&virtio_keyboard_pci_info);
-     virtio_pci_types_register(&virtio_mouse_pci_info);
-     virtio_pci_types_register(&virtio_tablet_pci_info);
--#ifdef CONFIG_LINUX
--    virtio_pci_types_register(&virtio_host_pci_info);
--#endif
- #ifdef CONFIG_VIRTFS
-     virtio_pci_types_register(&virtio_9p_pci_info);
+ static Property virtio_balloon_pci_properties[] = {
+@@ -2855,9 +2805,6 @@ static void virtio_pci_register_types(void)
+ #if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+     virtio_pci_types_register(&vhost_user_scsi_pci_info);
  #endif
+-#ifdef CONFIG_VHOST_VSOCK
+-    virtio_pci_types_register(&vhost_vsock_pci_info);
+-#endif
+ }
+ 
+ type_init(virtio_pci_register_types)
 diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 39884c5f7b..a6b850ed09 100644
+index 1b2799cfd8..39884c5f7b 100644
 --- a/hw/virtio/Makefile.objs
 +++ b/hw/virtio/Makefile.objs
-@@ -13,6 +13,7 @@ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+@@ -11,6 +11,9 @@ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-p
+ 
+ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
- ifeq ($(CONFIG_PCI),y)
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
-+obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
- endif
++ifeq ($(CONFIG_PCI),y)
++obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
++endif
  endif
  
+ common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO),$(CONFIG_LINUX))) += vhost-stub.o
 -- 
 MST
