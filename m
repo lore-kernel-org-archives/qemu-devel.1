@@ -1,24 +1,24 @@
 Received: from eggs.gnu.org ([209.51.188.92]:36782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDjs-0007oZ-Re
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:42:02 -0500
+	(envelope-from <mst@redhat.com>) id 1gjDjk-0007oZ-9T
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDdf-0007RV-71
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:35:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53102)
+	(envelope-from <mst@redhat.com>) id 1gjDee-0008GS-At
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48342)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDde-0007N4-M0
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:35:34 -0500
-Date: Mon, 14 Jan 2019 20:35:18 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDec-0008Dx-0l
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:34 -0500
+Date: Mon, 14 Jan 2019 20:36:29 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115003812.11329-4-mst@redhat.com>
+Message-ID: <20190115003812.11329-27-mst@redhat.com>
 References: <20190115003812.11329-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190115003812.11329-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 03/44] hw/misc/ivshmem: Remove deprecated
- "ivshmem" legacy device
+Subject: [Qemu-devel] [PULL 26/44] virtio: split vhost scsi bits from
+ virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,509 +28,257 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, libvir-list@redhat.com, Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Juan Quintela <quintela@redhat.com>
 
-It's been marked as deprecated in QEMU v2.6.0 already, so really nobody
-should use the legacy "ivshmem" device anymore (but use ivshmem-plain or
-ivshmem-doorbell instead). Time to remove the deprecated device now.
-
-Belatedly also update a mention of the deprecated "ivshmem" in the file
-docs/specs/ivshmem-spec.txt to "ivshmem-doorbell". Missed in commit
-5400c02b90b ("ivshmem: Split ivshmem-plain, ivshmem-doorbell off ivshmem").
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- docs/specs/ivshmem-spec.txt |   8 +-
- hw/i386/pc_piix.c           |   1 -
- hw/misc/ivshmem.c           | 210 +-----------------------------------
- tests/ivshmem-test.c        |  67 ++++--------
- qemu-deprecated.texi        |   5 -
- scripts/device-crash-test   |   1 -
- 6 files changed, 34 insertions(+), 258 deletions(-)
+ hw/virtio/virtio-pci.h     | 19 --------
+ hw/virtio/vhost-scsi-pci.c | 97 ++++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c     | 61 ------------------------
+ hw/virtio/Makefile.objs    |  1 +
+ 4 files changed, 98 insertions(+), 80 deletions(-)
+ create mode 100644 hw/virtio/vhost-scsi-pci.c
 
-diff --git a/docs/specs/ivshmem-spec.txt b/docs/specs/ivshmem-spec.txt
-index a1f5499796..042f7eae22 100644
---- a/docs/specs/ivshmem-spec.txt
-+++ b/docs/specs/ivshmem-spec.txt
-@@ -17,12 +17,16 @@ get interrupted by its peers.
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index ce6c194f1c..b14d83a454 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -24,16 +24,11 @@
+ #include "hw/virtio/virtio-gpu.h"
+ #include "hw/virtio/virtio-crypto.h"
  
- There are two basic configurations:
- 
--- Just shared memory: -device ivshmem-plain,memdev=HMB,...
-+- Just shared memory:
-+
-+      -device ivshmem-plain,memdev=HMB,...
- 
-   This uses host memory backend HMB.  It should have option "share"
-   set.
- 
--- Shared memory plus interrupts: -device ivshmem,chardev=CHR,vectors=N,...
-+- Shared memory plus interrupts:
-+
-+      -device ivshmem-doorbell,chardev=CHR,vectors=N,...
- 
-   An ivshmem server must already be running on the host.  The device
-   connects to the server's UNIX domain socket via character device
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 5088e2f492..63c84e3827 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -715,7 +715,6 @@ static void pc_i440fx_1_2_machine_options(MachineClass *m)
-         PC_CPU_MODEL_IDS("1.2.0")
-         { "nec-usb-xhci", "msi", "off" },
-         { "nec-usb-xhci", "msix", "off" },
--        { "ivshmem", "use64", "0" },
-         { "qxl", "revision", "3" },
-         { "qxl-vga", "revision", "3" },
-         { "VGA", "mmio", "off" },
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 8213659602..c7b6bbc974 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -112,13 +112,6 @@ typedef struct IVShmemState {
-     /* migration stuff */
-     OnOffAuto master;
-     Error *migration_blocker;
+-#ifdef CONFIG_VHOST_SCSI
+-#include "hw/virtio/vhost-scsi.h"
+-#endif
 -
--    /* legacy cruft */
--    char *role;
--    char *shmobj;
--    char *sizearg;
--    size_t legacy_size;
--    uint32_t not_legacy_32bit;
- } IVShmemState;
+ typedef struct VirtIOPCIProxy VirtIOPCIProxy;
+ typedef struct VirtIOBlkPCI VirtIOBlkPCI;
+ typedef struct VirtIOSCSIPCI VirtIOSCSIPCI;
+ typedef struct VirtIOSerialPCI VirtIOSerialPCI;
+ typedef struct VirtIONetPCI VirtIONetPCI;
+-typedef struct VHostSCSIPCI VHostSCSIPCI;
+ typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+ typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
  
- /* registers for the Inter-VM shared memory device */
-@@ -529,17 +522,6 @@ static void process_msg_shmem(IVShmemState *s, int fd, Error **errp)
- 
-     size = buf.st_size;
- 
--    /* Legacy cruft */
--    if (s->legacy_size != SIZE_MAX) {
--        if (size < s->legacy_size) {
--            error_setg(errp, "server sent only %zd bytes of shared memory",
--                       (size_t)buf.st_size);
--            close(fd);
--            return;
--        }
--        size = s->legacy_size;
--    }
--
-     /* mmap the region and map into the BAR2 */
-     memory_region_init_ram_from_fd(&s->server_bar2, OBJECT(s),
-                                    "ivshmem.bar2", size, true, fd, &local_err);
-@@ -882,8 +864,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     IVShmemState *s = IVSHMEM_COMMON(dev);
-     Error *err = NULL;
-     uint8_t *pci_conf;
--    uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
--        PCI_BASE_ADDRESS_MEM_PREFETCH;
-     Error *local_err = NULL;
- 
-     /* IRQFD requires MSI */
-@@ -903,10 +883,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
-                      &s->ivshmem_mmio);
- 
--    if (s->not_legacy_32bit) {
--        attr |= PCI_BASE_ADDRESS_MEM_TYPE_64;
--    }
--
-     if (s->hostmem != NULL) {
-         IVSHMEM_DPRINTF("using hostmem\n");
- 
-@@ -964,7 +940,11 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     }
- 
-     vmstate_register_ram(s->ivshmem_bar2, DEVICE(s));
--    pci_register_bar(PCI_DEVICE(s), 2, attr, s->ivshmem_bar2);
-+    pci_register_bar(PCI_DEVICE(s), 2,
-+                     PCI_BASE_ADDRESS_SPACE_MEMORY |
-+                     PCI_BASE_ADDRESS_MEM_PREFETCH |
-+                     PCI_BASE_ADDRESS_MEM_TYPE_64,
-+                     s->ivshmem_bar2);
- }
- 
- static void ivshmem_exit(PCIDevice *dev)
-@@ -1084,13 +1064,6 @@ static Property ivshmem_plain_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
+@@ -204,20 +199,6 @@ struct VirtIOSCSIPCI {
+     VirtIOSCSI vdev;
  };
  
--static void ivshmem_plain_init(Object *obj)
--{
--    IVShmemState *s = IVSHMEM_PLAIN(obj);
+-#ifdef CONFIG_VHOST_SCSI
+-/*
+- * vhost-scsi-pci: This extends VirtioPCIProxy.
+- */
+-#define TYPE_VHOST_SCSI_PCI "vhost-scsi-pci-base"
+-#define VHOST_SCSI_PCI(obj) \
+-        OBJECT_CHECK(VHostSCSIPCI, (obj), TYPE_VHOST_SCSI_PCI)
 -
--    s->not_legacy_32bit = 1;
--}
--
- static void ivshmem_plain_realize(PCIDevice *dev, Error **errp)
- {
-     IVShmemState *s = IVSHMEM_COMMON(dev);
-@@ -1122,7 +1095,6 @@ static const TypeInfo ivshmem_plain_info = {
-     .name          = TYPE_IVSHMEM_PLAIN,
-     .parent        = TYPE_IVSHMEM_COMMON,
-     .instance_size = sizeof(IVShmemState),
--    .instance_init = ivshmem_plain_init,
-     .class_init    = ivshmem_plain_class_init,
- };
- 
-@@ -1155,8 +1127,6 @@ static void ivshmem_doorbell_init(Object *obj)
-     IVShmemState *s = IVSHMEM_DOORBELL(obj);
- 
-     s->features |= (1 << IVSHMEM_MSI);
--    s->legacy_size = SIZE_MAX;  /* whatever the server sends */
--    s->not_legacy_32bit = 1;
- }
- 
- static void ivshmem_doorbell_realize(PCIDevice *dev, Error **errp)
-@@ -1189,181 +1159,11 @@ static const TypeInfo ivshmem_doorbell_info = {
-     .class_init    = ivshmem_doorbell_class_init,
- };
- 
--static int ivshmem_load_old(QEMUFile *f, void *opaque, int version_id)
--{
--    IVShmemState *s = opaque;
--    PCIDevice *pdev = PCI_DEVICE(s);
--    int ret;
--
--    IVSHMEM_DPRINTF("ivshmem_load_old\n");
--
--    if (version_id != 0) {
--        return -EINVAL;
--    }
--
--    ret = ivshmem_pre_load(s);
--    if (ret) {
--        return ret;
--    }
--
--    ret = pci_device_load(pdev, f);
--    if (ret) {
--        return ret;
--    }
--
--    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
--        msix_load(pdev, f);
--        ivshmem_msix_vector_use(s);
--    } else {
--        s->intrstatus = qemu_get_be32(f);
--        s->intrmask = qemu_get_be32(f);
--    }
--
--    return 0;
--}
--
--static bool test_msix(void *opaque, int version_id)
--{
--    IVShmemState *s = opaque;
--
--    return ivshmem_has_feature(s, IVSHMEM_MSI);
--}
--
--static bool test_no_msix(void *opaque, int version_id)
--{
--    return !test_msix(opaque, version_id);
--}
--
--static const VMStateDescription ivshmem_vmsd = {
--    .name = "ivshmem",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .pre_load = ivshmem_pre_load,
--    .post_load = ivshmem_post_load,
--    .fields = (VMStateField[]) {
--        VMSTATE_PCI_DEVICE(parent_obj, IVShmemState),
--
--        VMSTATE_MSIX_TEST(parent_obj, IVShmemState, test_msix),
--        VMSTATE_UINT32_TEST(intrstatus, IVShmemState, test_no_msix),
--        VMSTATE_UINT32_TEST(intrmask, IVShmemState, test_no_msix),
--
--        VMSTATE_END_OF_LIST()
--    },
--    .load_state_old = ivshmem_load_old,
--    .minimum_version_id_old = 0
+-struct VHostSCSIPCI {
+-    VirtIOPCIProxy parent_obj;
+-    VHostSCSI vdev;
 -};
+-#endif
 -
--static Property ivshmem_properties[] = {
--    DEFINE_PROP_CHR("chardev", IVShmemState, server_chr),
--    DEFINE_PROP_STRING("size", IVShmemState, sizearg),
--    DEFINE_PROP_UINT32("vectors", IVShmemState, vectors, 1),
--    DEFINE_PROP_BIT("ioeventfd", IVShmemState, features, IVSHMEM_IOEVENTFD,
--                    false),
--    DEFINE_PROP_BIT("msi", IVShmemState, features, IVSHMEM_MSI, true),
--    DEFINE_PROP_STRING("shm", IVShmemState, shmobj),
--    DEFINE_PROP_STRING("role", IVShmemState, role),
--    DEFINE_PROP_UINT32("use64", IVShmemState, not_legacy_32bit, 1),
+ /*
+  * virtio-blk-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/hw/virtio/vhost-scsi-pci.c b/hw/virtio/vhost-scsi-pci.c
+new file mode 100644
+index 0000000000..523f7cb3ce
+--- /dev/null
++++ b/hw/virtio/vhost-scsi-pci.c
+@@ -0,0 +1,97 @@
++/*
++ * Vhost scsi PCI bindings
++ *
++ * Copyright IBM, Corp. 2011
++ *
++ * Authors:
++ *  Stefan Hajnoczi   <stefanha@linux.vnet.ibm.com>
++ *
++ * Changes for QEMU mainline + tcm_vhost kernel upstream:
++ *  Nicholas Bellinger <nab@risingtidesystems.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++
++#include "standard-headers/linux/virtio_pci.h"
++#include "hw/virtio/vhost-scsi.h"
++#include "qapi/error.h"
++#include "virtio-pci.h"
++
++typedef struct VHostSCSIPCI VHostSCSIPCI;
++
++/*
++ * vhost-scsi-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VHOST_SCSI_PCI "vhost-scsi-pci-base"
++#define VHOST_SCSI_PCI(obj) \
++        OBJECT_CHECK(VHostSCSIPCI, (obj), TYPE_VHOST_SCSI_PCI)
++
++struct VHostSCSIPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostSCSI vdev;
++};
++
++static Property vhost_scsi_pci_properties[] = {
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
++                       DEV_NVECTORS_UNSPECIFIED),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VHostSCSIPCI *dev = VHOST_SCSI_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
++    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
++
++    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
++        vpci_dev->nvectors = vs->conf.num_queues + 3;
++    }
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_scsi_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    k->realize = vhost_scsi_pci_realize;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props = vhost_scsi_pci_properties;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
++    pcidev_k->revision = 0x00;
++    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
++}
++
++static void vhost_scsi_pci_instance_init(Object *obj)
++{
++    VHostSCSIPCI *dev = VHOST_SCSI_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_SCSI);
++    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
++                              "bootindex", &error_abort);
++}
++
++static const VirtioPCIDeviceTypeInfo vhost_scsi_pci_info = {
++    .base_name             = TYPE_VHOST_SCSI_PCI,
++    .generic_name          = "vhost-scsi-pci",
++    .transitional_name     = "vhost-scsi-pci-transitional",
++    .non_transitional_name = "vhost-scsi-pci-non-transitional",
++    .instance_size = sizeof(VHostSCSIPCI),
++    .instance_init = vhost_scsi_pci_instance_init,
++    .class_init    = vhost_scsi_pci_class_init,
++};
++
++static void vhost_scsi_pci_register(void)
++{
++    virtio_pci_types_register(&vhost_scsi_pci_info);
++}
++
++type_init(vhost_scsi_pci_register)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 13cb13274e..b2ed6b3942 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2130,64 +2130,6 @@ static const VirtioPCIDeviceTypeInfo virtio_scsi_pci_info = {
+     .class_init    = virtio_scsi_pci_class_init,
+ };
+ 
+-/* vhost-scsi-pci */
+-
+-#ifdef CONFIG_VHOST_SCSI
+-static Property vhost_scsi_pci_properties[] = {
+-    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
+-                       DEV_NVECTORS_UNSPECIFIED),
 -    DEFINE_PROP_END_OF_LIST(),
 -};
 -
--static void desugar_shm(IVShmemState *s)
+-static void vhost_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 -{
--    Object *obj;
--    char *path;
+-    VHostSCSIPCI *dev = VHOST_SCSI_PCI(vpci_dev);
+-    DeviceState *vdev = DEVICE(&dev->vdev);
+-    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
 -
--    obj = object_new("memory-backend-file");
--    path = g_strdup_printf("/dev/shm/%s", s->shmobj);
--    object_property_set_str(obj, path, "mem-path", &error_abort);
--    g_free(path);
--    object_property_set_int(obj, s->legacy_size, "size", &error_abort);
--    object_property_set_bool(obj, true, "share", &error_abort);
--    object_property_add_child(OBJECT(s), "internal-shm-backend", obj,
--                              &error_abort);
--    object_unref(obj);
--    user_creatable_complete(USER_CREATABLE(obj), &error_abort);
--    s->hostmem = MEMORY_BACKEND(obj);
+-    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+-        vpci_dev->nvectors = vs->conf.num_queues + 3;
+-    }
+-
+-    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+-    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 -}
 -
--static void ivshmem_realize(PCIDevice *dev, Error **errp)
--{
--    IVShmemState *s = IVSHMEM_COMMON(dev);
--
--    if (!qtest_enabled()) {
--        warn_report("ivshmem is deprecated, please use ivshmem-plain"
--                    " or ivshmem-doorbell instead");
--    }
--
--    if (qemu_chr_fe_backend_connected(&s->server_chr) + !!s->shmobj != 1) {
--        error_setg(errp, "You must specify either 'shm' or 'chardev'");
--        return;
--    }
--
--    if (s->sizearg == NULL) {
--        s->legacy_size = 4 * MiB; /* 4 MB default */
--    } else {
--        int ret;
--        uint64_t size;
--
--        ret = qemu_strtosz_MiB(s->sizearg, NULL, &size);
--        if (ret < 0 || (size_t)size != size || !is_power_of_2(size)) {
--            error_setg(errp, "Invalid size %s", s->sizearg);
--            return;
--        }
--        s->legacy_size = size;
--    }
--
--    /* check that role is reasonable */
--    if (s->role) {
--        if (strncmp(s->role, "peer", 5) == 0) {
--            s->master = ON_OFF_AUTO_OFF;
--        } else if (strncmp(s->role, "master", 7) == 0) {
--            s->master = ON_OFF_AUTO_ON;
--        } else {
--            error_setg(errp, "'role' must be 'peer' or 'master'");
--            return;
--        }
--    } else {
--        s->master = ON_OFF_AUTO_AUTO;
--    }
--
--    if (s->shmobj) {
--        desugar_shm(s);
--    }
--
--    /*
--     * Note: we don't use INTx with IVSHMEM_MSI at all, so this is a
--     * bald-faced lie then.  But it's a backwards compatible lie.
--     */
--    pci_config_set_interrupt_pin(dev->config, 1);
--
--    ivshmem_common_realize(dev, errp);
--}
--
--static void ivshmem_class_init(ObjectClass *klass, void *data)
+-static void vhost_scsi_pci_class_init(ObjectClass *klass, void *data)
 -{
 -    DeviceClass *dc = DEVICE_CLASS(klass);
--    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--
--    k->realize = ivshmem_realize;
--    k->revision = 0;
--    dc->desc = "Inter-VM shared memory (legacy)";
--    dc->props = ivshmem_properties;
--    dc->vmsd = &ivshmem_vmsd;
+-    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+-    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+-    k->realize = vhost_scsi_pci_realize;
+-    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+-    dc->props = vhost_scsi_pci_properties;
+-    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+-    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
+-    pcidev_k->revision = 0x00;
+-    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
 -}
 -
--static const TypeInfo ivshmem_info = {
--    .name          = TYPE_IVSHMEM,
--    .parent        = TYPE_IVSHMEM_COMMON,
--    .instance_size = sizeof(IVShmemState),
--    .class_init    = ivshmem_class_init,
+-static void vhost_scsi_pci_instance_init(Object *obj)
+-{
+-    VHostSCSIPCI *dev = VHOST_SCSI_PCI(obj);
+-
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VHOST_SCSI);
+-    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
+-                              "bootindex", &error_abort);
+-}
+-
+-static const VirtioPCIDeviceTypeInfo vhost_scsi_pci_info = {
+-    .base_name             = TYPE_VHOST_SCSI_PCI,
+-    .generic_name          = "vhost-scsi-pci",
+-    .transitional_name     = "vhost-scsi-pci-transitional",
+-    .non_transitional_name = "vhost-scsi-pci-non-transitional",
+-    .instance_size = sizeof(VHostSCSIPCI),
+-    .instance_init = vhost_scsi_pci_instance_init,
+-    .class_init    = vhost_scsi_pci_class_init,
 -};
+-#endif
 -
- static void ivshmem_register_types(void)
- {
-     type_register_static(&ivshmem_common_info);
-     type_register_static(&ivshmem_plain_info);
-     type_register_static(&ivshmem_doorbell_info);
--    type_register_static(&ivshmem_info);
+ /* virtio-serial-pci */
+ 
+ static void virtio_serial_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+@@ -2376,9 +2318,6 @@ static void virtio_pci_register_types(void)
+     virtio_pci_types_register(&virtio_scsi_pci_info);
+     virtio_pci_types_register(&virtio_serial_pci_info);
+     virtio_pci_types_register(&virtio_net_pci_info);
+-#ifdef CONFIG_VHOST_SCSI
+-    virtio_pci_types_register(&vhost_scsi_pci_info);
+-#endif
  }
  
- type_init(ivshmem_register_types)
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index fe5eb304b1..4911b69317 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -291,20 +291,20 @@ static void *server_thread(void *data)
-     return NULL;
- }
- 
--static void setup_vm_with_server(IVState *s, int nvectors, bool msi)
-+static void setup_vm_with_server(IVState *s, int nvectors)
- {
--    char *cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait "
--                                "-device ivshmem%s,chardev=chr0,vectors=%d",
--                                tmpserver,
--                                msi ? "-doorbell" : ",size=1M,msi=off",
--                                nvectors);
-+    char *cmd;
- 
--    setup_vm_cmd(s, cmd, msi);
-+    cmd = g_strdup_printf("-chardev socket,id=chr0,path=%s,nowait "
-+                          "-device ivshmem-doorbell,chardev=chr0,vectors=%d",
-+                          tmpserver, nvectors);
-+
-+    setup_vm_cmd(s, cmd, true);
- 
-     g_free(cmd);
- }
- 
--static void test_ivshmem_server(bool msi)
-+static void test_ivshmem_server(void)
- {
-     IVState state1, state2, *s1, *s2;
-     ServerThread thread;
-@@ -327,9 +327,9 @@ static void test_ivshmem_server(bool msi)
-     thread.thread = g_thread_new("ivshmem-server", server_thread, &thread);
-     g_assert(thread.thread != NULL);
- 
--    setup_vm_with_server(&state1, nvectors, msi);
-+    setup_vm_with_server(&state1, nvectors);
-     s1 = &state1;
--    setup_vm_with_server(&state2, nvectors, msi);
-+    setup_vm_with_server(&state2, nvectors);
-     s2 = &state2;
- 
-     /* check got different VM ids */
-@@ -340,38 +340,28 @@ static void test_ivshmem_server(bool msi)
-     g_assert_cmpint(vm1, !=, vm2);
- 
-     /* check number of MSI-X vectors */
--    if (msi) {
--        ret = qpci_msix_table_size(s1->dev);
--        g_assert_cmpuint(ret, ==, nvectors);
--    }
-+    ret = qpci_msix_table_size(s1->dev);
-+    g_assert_cmpuint(ret, ==, nvectors);
- 
-     /* TODO test behavior before MSI-X is enabled */
- 
-     /* ping vm2 -> vm1 on vector 0 */
--    if (msi) {
--        ret = qpci_msix_pending(s1->dev, 0);
--        g_assert_cmpuint(ret, ==, 0);
--    } else {
--        g_assert_cmpuint(in_reg(s1, INTRSTATUS), ==, 0);
--    }
-+    ret = qpci_msix_pending(s1->dev, 0);
-+    g_assert_cmpuint(ret, ==, 0);
-     out_reg(s2, DOORBELL, vm1 << 16);
-     do {
-         g_usleep(10000);
--        ret = msi ? qpci_msix_pending(s1->dev, 0) : in_reg(s1, INTRSTATUS);
-+        ret = qpci_msix_pending(s1->dev, 0);
-     } while (ret == 0 && g_get_monotonic_time() < end_time);
-     g_assert_cmpuint(ret, !=, 0);
- 
-     /* ping vm1 -> vm2 on vector 1 */
--    if (msi) {
--        ret = qpci_msix_pending(s2->dev, 1);
--        g_assert_cmpuint(ret, ==, 0);
--    } else {
--        g_assert_cmpuint(in_reg(s2, INTRSTATUS), ==, 0);
--    }
-+    ret = qpci_msix_pending(s2->dev, 1);
-+    g_assert_cmpuint(ret, ==, 0);
-     out_reg(s1, DOORBELL, vm2 << 16 | 1);
-     do {
-         g_usleep(10000);
--        ret = msi ? qpci_msix_pending(s2->dev, 1) : in_reg(s2, INTRSTATUS);
-+        ret = qpci_msix_pending(s2->dev, 1);
-     } while (ret == 0 && g_get_monotonic_time() < end_time);
-     g_assert_cmpuint(ret, !=, 0);
- 
-@@ -389,27 +379,17 @@ static void test_ivshmem_server(bool msi)
-     close(thread.pipe[0]);
- }
- 
--static void test_ivshmem_server_msi(void)
--{
--    test_ivshmem_server(true);
--}
--
--static void test_ivshmem_server_irq(void)
--{
--    test_ivshmem_server(false);
--}
--
- #define PCI_SLOT_HP             0x06
- 
- static void test_ivshmem_hotplug(void)
- {
-     const char *arch = qtest_get_arch();
- 
--    qtest_start("");
-+    qtest_start("-object memory-backend-ram,size=1M,id=mb1");
- 
--    qtest_qmp_device_add("ivshmem",
--                         "iv1", "{'addr': %s, 'shm': %s, 'size': '1M'}",
--                         stringify(PCI_SLOT_HP), tmpshm);
-+    qtest_qmp_device_add("ivshmem-plain", "iv1",
-+                         "{'addr': %s, 'memdev': 'mb1'}",
-+                         stringify(PCI_SLOT_HP));
-     if (strcmp(arch, "ppc64") != 0) {
-         qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-     }
-@@ -509,8 +489,7 @@ int main(int argc, char **argv)
-     if (g_test_slow()) {
-         qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
-         if (strcmp(arch, "ppc64") != 0) {
--            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
--            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
-+            qtest_add_func("/ivshmem/server", test_ivshmem_server);
-         }
-     }
- 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 81de5fc019..219206a836 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -126,11 +126,6 @@ documentation of ``query-hotpluggable-cpus'' for additional details.
- 
- @section System emulator devices
- 
--@subsection ivshmem (since 2.6.0)
--
--The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
--or ``ivshmem-doorbell`` device types.
--
- @subsection bluetooth (since 3.1)
- 
- The bluetooth subsystem is unmaintained since many years and likely bitrotten
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index e93a7c0c84..a835772ac5 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -83,7 +83,6 @@ ERROR_WHITELIST = [
-     {'device':'isa-ipmi-bt', 'expected':True},             # IPMI device requires a bmc attribute to be set
-     {'device':'isa-ipmi-kcs', 'expected':True},            # IPMI device requires a bmc attribute to be set
-     {'device':'isa-parallel', 'expected':True},            # Can't create serial device, empty char device
--    {'device':'ivshmem', 'expected':True},                 # You must specify either 'shm' or 'chardev'
-     {'device':'ivshmem-doorbell', 'expected':True},        # You must specify a 'chardev'
-     {'device':'ivshmem-plain', 'expected':True},           # You must specify a 'memdev'
-     {'device':'loader', 'expected':True},                  # please include valid arguments
+ type_init(virtio_pci_register_types)
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index f851a6f2b5..0a56946c1a 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -15,6 +15,7 @@ ifeq ($(CONFIG_PCI),y)
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+ obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
+ obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
++obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-pci.o
+ obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+ obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
+ obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
 -- 
 MST
