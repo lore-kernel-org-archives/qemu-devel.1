@@ -1,36 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60053)
+Received: from eggs.gnu.org ([209.51.188.92]:60047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gjUXN-0008UQ-Bv
+	(envelope-from <farosas@linux.ibm.com>) id 1gjUXN-0008UE-6J
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gjUXL-0000I5-6Q
+	(envelope-from <farosas@linux.ibm.com>) id 1gjUXL-0000Hy-5j
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:13 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39982
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gjUXK-0000Cu-Am
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:11 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0FJaGvv091526
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 14:38:07 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q1jqam56d-1
+	id 1gjUXK-000063-9A
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:10 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0FJZZ3p051254
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 14:37:57 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q1nt4g587-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 14:38:06 -0500
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 14:37:57 -0500
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Tue, 15 Jan 2019 19:38:04 -0000
+	Tue, 15 Jan 2019 19:37:55 -0000
 From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Tue, 15 Jan 2019 17:37:50 -0200
-In-Reply-To: <20190115193750.17234-1-farosas@linux.ibm.com>
-References: <20190115193750.17234-1-farosas@linux.ibm.com>
-Message-Id: <20190115193750.17234-4-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] target/ppc: Enable reporting of SPRs to
- GDB
+Date: Tue, 15 Jan 2019 17:37:47 -0200
+Message-Id: <20190115193750.17234-1-farosas@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] ppc/gdbstub: Expose SPRs to GDB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,39 +38,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-This allows reading and writing of SPRs via GDB:
+This series implements the reading and writing of Special Purpose
+Registers in PPC's gdbstub.
 
-(gdb) p/x $srr1
-$1 = 0x8000000002803033
+How it works generally [1]:
 
-(gdb) p/x $pvr
-$2 = 0x4b0201
-(gdb) set $pvr=0x4b0000
-(gdb) p/x $pvr
-$3 = 0x4b0000
+GDB asks for the target.xml file which contains the target description
+along with the list of available feature XMLs. GDB then asks for each
+of the XML files in sequence.
 
-They can also be shown as a group:
-(gdb) info reg spr
+The XML files contain a list of registers descriptions:
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- target/ppc/translate_init.inc.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+  <reg name="msr" bitsize="64" type="uint64"/>
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 9c6c935204..ebf202e54d 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -10527,7 +10527,9 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
- #endif
- 
-     cc->gdb_num_core_regs = 71;
--
-+#ifndef CONFIG_USER_ONLY
-+    cc->gdb_get_dynamic_xml = ppc_gdb_get_dynamic_xml;
-+#endif
- #ifdef USE_APPLE_GDB
-     cc->gdb_read_register = ppc_cpu_gdb_read_register_apple;
-     cc->gdb_write_register = ppc_cpu_gdb_write_register_apple;
--- 
+When the user tries to access a register, GDB reads the XML file in
+sequence and sends QEMU the number of the register. This number is
+sequential across all feature files.
+
+The index provided by GDB must be converted by QEMU to match QEMU's
+internal representation.
+
+A set of callbacks are implemented to read/write the register.
+
+In this series:
+
+The first patch implements the dynamic generation of the power-spr.xml
+file. Making it dynamically facilitates converting the GDB index to an
+index useful for addressing the env->spr array.
+
+The second patch implements the gdb_{get,set}_spr_reg callbacks along
+with the convertion from GDB index to QEMU index.
+
+The third patch enables the functionality.
+
+1- https://sourceware.org/gdb/current/onlinedocs/gdb/Target-Descriptions.html
+
+v1 -> v2:
+ - patch 1: explicitly store the gdb_id and add comment explaining why
+            we need it
+ - patch 2: use gdb_id to find the correct env->spr array's index
+
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00648.html
+
+v2 -> v3:
+ - patch 2: move gdb_register_coprocessor call from patch 3 so that
+            all patches build independently
+
+ https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02939.html
+
+
+Fabiano Rosas (3):
+  target/ppc: Add SPRs XML generation code for gdbstub
+  target/ppc: Add GDB callbacks for SPRs
+  target/ppc: Enable reporting of SPRs to GDB
+
+ target/ppc/cpu.h                |  8 +++++
+ target/ppc/gdbstub.c            | 54 ++++++++++++++++++++++++++++++
+ target/ppc/translate_init.inc.c | 58 +++++++++++++++++++++++++++++++--
+ 3 files changed, 118 insertions(+), 2 deletions(-)
+
+--
 2.17.1
