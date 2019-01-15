@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40563)
+Received: from eggs.gnu.org ([209.51.188.92]:41069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gjRQ1-0001pB-HF
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:18:32 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjRST-0002gM-KU
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:20:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gjRPy-0000fN-S3
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:18:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35774)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gjRPx-0000d5-6r
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:18:22 -0500
-Date: Tue, 15 Jan 2019 09:18:17 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190115091817.07d9916c@x1.home>
-In-Reply-To: <aeda1442-6fe9-c86a-dfae-8d46f47a9555@huawei.com>
-References: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
-	<20190114090757.68bfa839@x1.home>
-	<aeda1442-6fe9-c86a-dfae-8d46f47a9555@huawei.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjRSS-00024M-LI
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:20:57 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 15 Jan 2019 16:20:46 +0000
+Message-ID: <134a0393-e661-5f8f-55ae-8dd6c1e9ec97@virtuozzo.com>
+References: <20190112175812.27068-1-eblake@redhat.com>
+	<20190112175812.27068-4-eblake@redhat.com>
+In-Reply-To: <20190112175812.27068-4-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D7E153A52DF46B43B284A6828D7CB0B2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Questions about VFIO enabling MSIX vector
+Subject: Re: [Qemu-devel] [PATCH v3 03/19] qemu-nbd: Sanity check partition
+ bounds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Heyi Guo <guoheyi@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On Tue, 15 Jan 2019 11:21:51 +0800
-Heyi Guo <guoheyi@huawei.com> wrote:
-
-> Hi Alex,
-> 
-> Really appreciate your comments. I have some more questions below.
-> 
-> 
-> On 2019/1/15 0:07, Alex Williamson wrote:
-> > On Sat, 12 Jan 2019 10:30:40 +0800
-> > Heyi Guo <guoheyi@huawei.com> wrote:
-> >  
-> >> Hi folks,
-> >>
-> >> I have some questions about vfio_msix_vector_do_use() in
-> >> hw/vfio/pci.c, could you help to explain?
-> >>
-> >> We can see that when guest tries to enable one specific MSIX vector
-> >> by unmasking MSIX Vector Control, the access will be trapped and then
-> >> into function vfio_msix_vector_do_use(). And we may go to the below
-> >> branch in line 525:
-> >>
-> >>
-> >> 520 /*
-> >> 521  * We don't want to have the host allocate all possible MSI vectors
-> >> 522  * for a device if they're not in use, so we shutdown and incrementally
-> >> 523  * increase them as needed.
-> >> 524  */
-> >> 525  if (vdev->nr_vectors < nr + 1) {
-> >> 526      vfio_disable_irqindex(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX);
-> >> 527      vdev->nr_vectors = nr + 1;
-> >> 528      ret = vfio_enable_vectors(vdev, true);
-> >> 529      if (ret) {
-> >> 530          error_report("vfio: failed to enable vectors, %d", ret);
-> >> 531      }
-> >>
-> >> Here all MSIX vectors will be disabled first and then enabled, with
-> >> one more MSIX. The comment is there but I still don't quite
-> >> understand. It makes sense for not allocating all possible MSI
-> >> vectors, but why shall we shutdown the whole MSI when being requested
-> >> to enable one specific vector? Can't we just enable the user
-> >> specified vector indexed by "nr"?  
-> >
-> > What internal kernel API would vfio-pci make use of to achieve that?
-> > We can't know the intentions of the guest and we have a limited set of
-> > tools to manage the MSI-X state in the host kernel.  It's generally the
-> > case that MSI-X vectors are only manipulated during driver setup and
-> > shutdown, so while the current behavior isn't necessarily efficient, it
-> > works within the constraints and generally doesn't have a runtime impact
-> > on performance.  We also recognize that this behavior may change in the
-> > future depending on more dynamic internal host kernel interfaces, thus
-> > we export the VFIO_IRQ_INFO_NORESIZE flag to indicate to userspace
-> > whether this procedure is required.  
-> 
-> I tried to enable the specified MSIX vector only, and finally
-> understood the original QEMU code after always getting EINVAL from
-> ioctl->VFIO_DEVICE_SET_IRQS. Then I tried to allocate all MSIX
-> vectors in vfio_msix_enable(), not only MSIX vector 0. The change
-> works, but it definitely doesn't follow the comment in the code "We
-> don't want to have the host allocate all possible MSI vectors for a
-> device if they're not in use". May I ask what the side effect is if
-> we really allocate all possible vectors at the beginning?
-
-Host IRQ vector exhaustion.  Very few devices seem to make use of the
-their full compliment of available vectors and some devices support a
-very, very large number of vectors.  The current approach only consumes
-the host resources that the guest is actually making use of.
-
-> >> What's more, on ARM64 systems with GIC ITS, the kernel will issue
-> >> an ITS discard command when disabling a MSI vector, which will drop
-> >> currently pending MSI interrupt. If device driver in guest system
-> >> enables some MSIs first and interrupts may come at any time, and
-> >> then it tries to enable other MSIs, is it possible for the above
-> >> code to cause interrupts missing?  
-> >
-> > Interrupt reconfiguration is generally during driver setup or
-> > teardown when the device is considered idle or lost interrupts are
-> > not a concern.  If you have a device which manipulates interrupt
-> > configuration runtime, you can expect that lost interrupts won't be
-> > the only problem,  
->
-> On physical machine, if the driver enables vector 0 first, and then
-> vector 1 later, will the vector 0 interrupt be lost for some
-> possibility? In my opinion the manipulation of vector 1 should not
-> affect the interrupt of vector 0, isn't it? But if this is possible
-> in virtual world, what do we consider it as? A bug to be fixed in
-> future, or a known limitation of virtualization that won't be fixed
-> and all driver developers should pay attention to it?
-
-Are you experiencing an actual problem with lost interrupts or is this
-a theoretical question?  There is a difference in programming of MSI-X
-for an assigned device because we cannot know the intentions of the
-guest with respect to how many vectors they intend to use.  We can only
-know as individual vectors are unmasked that a vector is now used.
-Allocating the maximum compliment of interrupts supported on the device
-is wasteful of host resources.  Given this, combined with the fact that
-drivers generally configure vectors only at device setup time, the
-existing code generally works well.  Ideally drivers should not be
-required to modify their behavior to support device assignment, but
-certain actions, like high frequency masking/unmasking of interrupts
-through the vector table impose unavoidable virtualization overhead
-and should be avoided.  I believe older Linux guests (RHEL5 time frame)
-had such behavior.
-
-It's possible that current IRQ domains alleviate some of the concern
-for host IRQ exhaustion and that vfio-pci could be made to allocate the
-maximum supported vectors per device, removing the use of the NORESIZE
-flag for the index.  Userspace would need to continue to support both
-modes of operation and the kernel would need to continue to be
-compatible with that.  Thanks,
-
-Alex
+MTIuMDEuMjAxOSAyMDo1NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2hlbiB0aGUgdXNlciByZXF1
+ZXN0cyBhIHBhcnRpdGlvbiwgd2Ugd2VyZSB1c2luZyBkYXRhIHJlYWQNCj4gZnJvbSB0aGUgZGlz
+ayBhcyBkaXNrIG9mZnNldHMgd2l0aG91dCBhIGJvdW5kcyBjaGVjay4gV2UgZ290DQo+IGx1Y2t5
+IHRoYXQgZXZlbiB3aGVuIGNvbXB1dGVkIG9mZnNldHMgYXJlIG91dC1vZi1ib3VuZHMsDQo+IGJs
+a19wcmVhZCgpIHdpbGwgZ3JhY2VmdWxseSBjYXRjaCB0aGUgZXJyb3IgbGF0ZXIgKHNvIEkgZG9u
+J3QNCj4gdGhpbmsgYSBtYWxpY2lvdXMgaW1hZ2UgY2FuIGNyYXNoIG9yIGV4cGxvaXQgcWVtdS1u
+YmQsIGFuZCBhbQ0KPiBub3QgdHJlYXRpbmcgdGhpcyBhcyBhIHNlY3VyaXR5IGZsYXcpLCBidXQg
+aXQncyBiZXR0ZXIgdG8NCj4gZmxhZyB0aGUgcHJvYmxlbSB1cCBmcm9udCB0aGFuIHRvIHJpc2sg
+cGVybWFuZW50IEVJTyBkZWF0aCBvZg0KPiB0aGUgYmxvY2sgZGV2aWNlIGRvd24gdGhlIHJvYWQu
+ICBBbHNvLCBub3RlIHRoYXQgdGhlDQo+IHBhcnRpdGlvbiBjb2RlIGJsaW5kbHkgb3ZlcndyaXRl
+cyBhbnkgb2Zmc2V0IHBhc3NlZCBpbiBieSB0aGUNCj4gdXNlcjsgc28gbWFrZSB0aGUgLW8vLVAg
+Y29tYm8gYW4gZXJyb3IgZm9yIGxlc3MgY29uZnVzaW9uLg0KPiANCj4gVGhpcyBjYW4gYmUgdGVz
+dGVkIHdpdGggbmJka2l0Og0KPiAkIGVjaG8gaGkgPiBmaWxlDQo+ICQgbmJka2l0IC1mdiAtLWZp
+bHRlcj10cnVuY2F0ZSBwYXJ0aXRpb25pbmcgZmlsZSB0cnVuY2F0ZT02NGsNCj4gDQo+IFByZS1w
+YXRjaDoNCj4gJCBxZW11LW5iZCAtcCAxMDgxMCAtUCAxIC1mIHJhdyBuYmQ6Ly9sb2NhbGhvc3Q6
+MTA4MDkgJg0KPiAkIHFlbXUtaW8gLWYgcmF3IG5iZDovL2xvY2FsaG9zdDoxMDgxMA0KPiBxZW11
+LWlvPiByIC12IDAgMQ0KPiBEaXNjb25uZWN0IGNsaWVudCwgZHVlIHRvOiBGYWlsZWQgdG8gc2Vu
+ZCByZXBseTogcmVhZGluZyBmcm9tIGZpbGUgZmFpbGVkOiBJbnB1dC9vdXRwdXQgZXJyb3INCj4g
+Q29ubmVjdGlvbiBjbG9zZWQNCj4gcmVhZCBmYWlsZWQ6IElucHV0L291dHB1dCBlcnJvcg0KPiBx
+ZW11LWlvPiBxDQo+IFsxXSsgIERvbmUgICAgICAgICAgICAgICAgICAgIHFlbXUtbmJkIC1wIDEw
+ODEwIC1QIDEgLWYgcmF3IG5iZDovL2xvY2FsaG9zdDoxMDgwOQ0KPiANCj4gUG9zdC1wYXRjaDoN
+Cj4gJCBxZW11LW5iZCAtcCAxMDgxMCAtUCAxIC1mIHJhdyBuYmQ6Ly9sb2NhbGhvc3Q6MTA4MDkN
+Cj4gcWVtdS1uYmQ6IERpc2NvdmVyZWQgcGFydGl0aW9uIDEgYXQgb2Zmc2V0IDEwNDg1NzYgc2l6
+ZSA1MTIsIGJ1dCBzaXplIGV4Y2VlZHMgZmlsZSBsZW5ndGggNjU1MzYNCj4gDQo+IFNpZ25lZC1v
+ZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiAtLS0NCj4gdjM6IG5ldyBw
+YXRjaA0KPiAtLS0NCj4gICBxZW11LW5iZC5jIHwgMTggKysrKysrKysrKysrKysrKystDQo+ICAg
+MSBmaWxlIGNoYW5nZWQsIDE3IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRp
+ZmYgLS1naXQgYS9xZW11LW5iZC5jIGIvcWVtdS1uYmQuYw0KPiBpbmRleCA1MWI1NWYyZTA2Ni4u
+ZmY0YWRiOWIzZWIgMTAwNjQ0DQo+IC0tLSBhL3FlbXUtbmJkLmMNCj4gKysrIGIvcWVtdS1uYmQu
+Yw0KPiBAQCAtMTAxMywxMiArMTAxMywyOCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFy
+Z3YpDQo+ICAgICAgIGZkX3NpemUgLT0gZGV2X29mZnNldDsNCj4gDQo+ICAgICAgIGlmIChwYXJ0
+aXRpb24gIT0gLTEpIHsNCj4gLSAgICAgICAgcmV0ID0gZmluZF9wYXJ0aXRpb24oYmxrLCBwYXJ0
+aXRpb24sICZkZXZfb2Zmc2V0LCAmZmRfc2l6ZSk7DQo+ICsgICAgICAgIG9mZl90IGxpbWl0Ow0K
+PiArDQo+ICsgICAgICAgIGlmIChkZXZfb2Zmc2V0KSB7DQo+ICsgICAgICAgICAgICBlcnJvcl9y
+ZXBvcnQoIkNhbm5vdCByZXF1ZXN0IHBhcnRpdGlvbiBhbmQgb2Zmc2V0IHRvZ2V0aGVyIik7DQoN
+CmhtbSwgYnV0IHlvdSBzdGlsbCBhbGxvdyB0byByZXF1ZXN0IHBhcnRpdGlvbiBhbmQgc2V0IC1v
+IDAsIEkgdGhpbmsgaXQncyBiZXR0ZXINCnRvIGZvcmJpZCBpdCB0b28uDQoNCj4gKyAgICAgICAg
+ICAgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4gKyAgICAgICAgfQ0KPiArICAgICAgICByZXQgPSBm
+aW5kX3BhcnRpdGlvbihibGssIHBhcnRpdGlvbiwgJmRldl9vZmZzZXQsICZsaW1pdCk7DQo+ICAg
+ICAgICAgICBpZiAocmV0IDwgMCkgew0KPiAgICAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiQ291
+bGQgbm90IGZpbmQgcGFydGl0aW9uICVkOiAlcyIsIHBhcnRpdGlvbiwNCj4gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgc3RyZXJyb3IoLXJldCkpOw0KPiAgICAgICAgICAgICAgIGV4aXQoRVhJ
+VF9GQUlMVVJFKTsNCj4gICAgICAgICAgIH0NCj4gKyAgICAgICAgLyogcGFydGl0aW9uIGxpbWl0
+cyBhcmUgKDMyLWJpdCA8PCA5KTsgY2FuJ3Qgb3ZlcmZsb3cgNjQgYml0cyAqLw0KPiArICAgICAg
+ICBhc3NlcnQoZGV2X29mZnNldCA+PSAwICYmIGRldl9vZmZzZXQgKyBsaW1pdCA+PSBkZXZfb2Zm
+c2V0KTsNCg0KaG1tLCBzbyB0aGVzZSB2YWx1ZXMgYXJlIHJlYWQgZnJvbSBmaWxlIGFuZCBtYXkg
+YmUgd2hhdHNvZXZlci4gV2h5IHRvIGFzc2VydCBpbnN0ZWFkDQpvZiBlcnJvcl9yZXBvcnQgYW5k
+IGV4aXQoKSA/DQoNCj4gKyAgICAgICAgaWYgKGRldl9vZmZzZXQgKyBsaW1pdCA+IGZkX3NpemUp
+IHsNCj4gKyAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiRGlzY292ZXJlZCBwYXJ0aXRpb24gJWQg
+YXQgb2Zmc2V0ICVsbGQgc2l6ZSAlbGxkLCAiDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ImJ1dCBzaXplIGV4Y2VlZHMgZmlsZSBsZW5ndGggJWxsZCIsIHBhcnRpdGlvbiwNCj4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAobG9uZyBsb25nIGludCkgZGV2X29mZnNldCwgKGxvbmcgbG9u
+ZyBpbnQpIGxpbWl0LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgIChsb25nIGxvbmcgaW50
+KSBmZF9zaXplKTsNCj4gKyAgICAgICAgICAgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4gKyAgICAg
+ICAgfQ0KPiArICAgICAgICBmZF9zaXplID0gbGltaXQ7DQo+ICAgICAgIH0NCj4gDQo+ICAgICAg
+IGV4cG9ydCA9IG5iZF9leHBvcnRfbmV3KGJzLCBkZXZfb2Zmc2V0LCBmZF9zaXplLCBleHBvcnRf
+bmFtZSwNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
