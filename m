@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50387)
+Received: from eggs.gnu.org ([209.51.188.92]:53137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gjTEx-0003zs-LL
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:15:11 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gjTIx-0005E5-4H
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:19:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gjTEt-00032F-Ns
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:15:07 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:60030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gjTEr-0002yR-Kr
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:15:03 -0500
-Date: Tue, 15 Jan 2019 19:14:51 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <1547554687-12687-2-git-send-email-liam.merwick@oracle.com>
-Message-ID: <alpine.BSF.2.21.9999.1901151854360.72972@zero.eik.bme.hu>
-References: <1547554687-12687-1-git-send-email-liam.merwick@oracle.com>
-	<1547554687-12687-2-git-send-email-liam.merwick@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] elf: Add optional function ptr to
- load_elf() to parse ELF notes
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gjTIv-0005BY-C0
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:19:15 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:35139)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gjTIv-0005AF-0g
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:19:13 -0500
+Received: by mail-wm1-x335.google.com with SMTP id t200so4295218wmt.0
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:19:12 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 15 Jan 2019 19:19:04 +0100
+Message-Id: <1547576349-13337-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/5] qtest driver framework (core only)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,871 +25,351 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <liam.merwick@oracle.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, maran.wilson@oracle.com, george.kennedy@oracle.com, stefanha@redhat.com, xen-devel@lists.xenproject.org, pbonzini@redhat.com, boris.ostrovsky@oracle.com, rth@twiddle.net, sgarzare@redhat.com
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, lvivier@redhat.com
 
-On Tue, 15 Jan 2019, Liam Merwick wrote:
-> This patch adds an optional function pointer, 'elf_note_fn', to
-> load_elf() which causes load_elf() to additionally parse any
-> ELF program headers of type PT_NOTE and check to see if the ELF
-> Note is of the type specified by the 'translate_opaque' arg.
-> If a matching ELF Note is found then the specfied function pointer
-> is called to process the ELF note.
->
-> Passing a NULL function pointer results in ELF Notes being skipped.
->
-> The first consumer of this functionality is the PVHboot support
+As promised, this is the implementation of the core qtest driver
+framework API.
 
-Will there be more consumers? If not I wonder if there's another way to do 
-this without so much code churn. Maybe like adding this extra parameter 
-only to load_elf_ram_sym() and calling that directly from the one caller 
-that needs it? That would leave the prototypes of all existing load_elf_* 
-wrappers (and all its current callers) undisturbed. Or maybe adding a new 
-wrapper like load_elf_notes() with the extra parameter if calling 
-load_elf_ram_sym directly is not desired instead of changing load_elf and 
-all its callers?
+The diff of patch 5 from the previous post is at the end of the
+cover letter.
 
-If others think it's not a problem to change so many files for this, then 
-I don't mind but load_elf already seems to have too many usually NULL 
-parameters so not adding one more which needs changing so many files seems 
-like a good idea to me and it seems previously adding wrappers for this 
-was the preferred way..
+Emanuele Giuseppe Esposito (3):
+  tests/libqos: introduce virtio_start_device
+  tests/libqos: rename qpci_init_pc and qpci_init_spapr functions
+  tests: qgraph API for the qtest driver framework
 
-Regards,
-BALATON Zoltan
+Paolo Bonzini (2):
+  tests: remove rule for nonexisting qdev-monitor-test
+  tests/libqos: embed allocators instead of malloc-ing them separately
 
-> which needs to read the XEN_ELFNOTE_PHYS32_ENTRY ELF Note while
-> loading the uncompressed kernel binary in order to discover the
-> boot entry address for the x86/HVM direct boot ABI.
->
-> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
-> ---
-> hw/alpha/dp264.c               |  4 ++--
-> hw/arm/armv7m.c                |  3 ++-
-> hw/arm/boot.c                  |  2 +-
-> hw/core/generic-loader.c       |  2 +-
-> hw/core/loader.c               | 24 ++++++++++++++++--------
-> hw/cris/boot.c                 |  3 ++-
-> hw/hppa/machine.c              |  6 +++---
-> hw/i386/multiboot.c            |  2 +-
-> hw/lm32/lm32_boards.c          |  6 ++++--
-> hw/lm32/milkymist.c            |  3 ++-
-> hw/m68k/an5206.c               |  2 +-
-> hw/m68k/mcf5208.c              |  2 +-
-> hw/microblaze/boot.c           |  7 ++++---
-> hw/mips/mips_fulong2e.c        |  5 +++--
-> hw/mips/mips_malta.c           |  5 +++--
-> hw/mips/mips_mipssim.c         |  5 +++--
-> hw/mips/mips_r4k.c             |  5 +++--
-> hw/moxie/moxiesim.c            |  2 +-
-> hw/nios2/boot.c                |  7 ++++---
-> hw/openrisc/openrisc_sim.c     |  2 +-
-> hw/pci-host/prep.c             |  2 +-
-> hw/ppc/e500.c                  |  3 ++-
-> hw/ppc/mac_newworld.c          |  5 +++--
-> hw/ppc/mac_oldworld.c          |  5 +++--
-> hw/ppc/ppc440_bamboo.c         |  2 +-
-> hw/ppc/sam460ex.c              |  3 ++-
-> hw/ppc/spapr.c                 |  7 ++++---
-> hw/ppc/virtex_ml507.c          |  2 +-
-> hw/riscv/sifive_e.c            |  2 +-
-> hw/riscv/sifive_u.c            |  2 +-
-> hw/riscv/spike.c               |  2 +-
-> hw/riscv/virt.c                |  2 +-
-> hw/s390x/ipl.c                 |  9 ++++++---
-> hw/sparc/leon3.c               |  3 ++-
-> hw/sparc/sun4m.c               |  6 ++++--
-> hw/sparc64/sun4u.c             |  4 ++--
-> hw/tricore/tricore_testboard.c |  2 +-
-> hw/xtensa/sim.c                | 12 ++++++++----
-> hw/xtensa/xtfpga.c             |  2 +-
-> include/hw/elf_ops.h           |  2 ++
-> include/hw/loader.h            |  9 ++++++++-
-> 41 files changed, 113 insertions(+), 70 deletions(-)
->
-> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-> index dd62f2a4050c..0347eb897c8a 100644
-> --- a/hw/alpha/dp264.c
-> +++ b/hw/alpha/dp264.c
-> @@ -114,7 +114,7 @@ static void clipper_init(MachineState *machine)
->         error_report("no palcode provided");
->         exit(1);
->     }
-> -    size = load_elf(palcode_filename, cpu_alpha_superpage_to_phys,
-> +    size = load_elf(palcode_filename, NULL, cpu_alpha_superpage_to_phys,
->                     NULL, &palcode_entry, &palcode_low, &palcode_high,
->                     0, EM_ALPHA, 0, 0);
->     if (size < 0) {
-> @@ -133,7 +133,7 @@ static void clipper_init(MachineState *machine)
->     if (kernel_filename) {
->         uint64_t param_offset;
->
-> -        size = load_elf(kernel_filename, cpu_alpha_superpage_to_phys,
-> +        size = load_elf(kernel_filename, NULL, cpu_alpha_superpage_to_phys,
->                         NULL, &kernel_entry, &kernel_low, &kernel_high,
->                         0, EM_ALPHA, 0, 0);
->         if (size < 0) {
-> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-> index f4446528307f..ae68aadef965 100644
-> --- a/hw/arm/armv7m.c
-> +++ b/hw/arm/armv7m.c
-> @@ -293,7 +293,8 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
->     as = cpu_get_address_space(cs, asidx);
->
->     if (kernel_filename) {
-> -        image_size = load_elf_as(kernel_filename, NULL, NULL, &entry, &lowaddr,
-> +        image_size = load_elf_as(kernel_filename, NULL, NULL, NULL,
-> +                                 &entry, &lowaddr,
->                                  NULL, big_endian, EM_ARM, 1, 0, as);
->         if (image_size < 0) {
->             image_size = load_image_targphys_as(kernel_filename, 0,
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index c7a67af7a97c..9d8746f7613f 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -885,7 +885,7 @@ static int64_t arm_load_elf(struct arm_boot_info *info, uint64_t *pentry,
->         }
->     }
->
-> -    ret = load_elf_as(info->kernel_filename, NULL, NULL,
-> +    ret = load_elf_as(info->kernel_filename, NULL, NULL, NULL,
->                       pentry, lowaddr, highaddr, big_endian, elf_machine,
->                       1, data_swab, as);
->     if (ret <= 0) {
-> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
-> index fbae05fb3b64..3695dd439cd0 100644
-> --- a/hw/core/generic-loader.c
-> +++ b/hw/core/generic-loader.c
-> @@ -136,7 +136,7 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
->         AddressSpace *as = s->cpu ? s->cpu->as :  NULL;
->
->         if (!s->force_raw) {
-> -            size = load_elf_as(s->file, NULL, NULL, &entry, NULL, NULL,
-> +            size = load_elf_as(s->file, NULL, NULL, NULL, &entry, NULL, NULL,
->                                big_endian, 0, 0, 0, as);
->
->             if (size < 0) {
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index c4f62fe42770..3a000d576b35 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -396,37 +396,42 @@ fail:
-> }
->
-> /* return < 0 if error, otherwise the number of bytes loaded in memory */
-> -int load_elf(const char *filename, uint64_t (*translate_fn)(void *, uint64_t),
-> +int load_elf(const char *filename,
-> +             uint64_t (*elf_note_fn)(void *, void *, bool),
-> +             uint64_t (*translate_fn)(void *, uint64_t),
->              void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
->              uint64_t *highaddr, int big_endian, int elf_machine,
->              int clear_lsb, int data_swab)
-> {
-> -    return load_elf_as(filename, translate_fn, translate_opaque, pentry,
-> -                       lowaddr, highaddr, big_endian, elf_machine, clear_lsb,
-> -                       data_swab, NULL);
-> +    return load_elf_as(filename, elf_note_fn, translate_fn, translate_opaque,
-> +                       pentry, lowaddr, highaddr, big_endian, elf_machine,
-> +                       clear_lsb, data_swab, NULL);
-> }
->
-> /* return < 0 if error, otherwise the number of bytes loaded in memory */
-> int load_elf_as(const char *filename,
-> +                uint64_t (*elf_note_fn)(void *, void *, bool),
->                 uint64_t (*translate_fn)(void *, uint64_t),
->                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
->                 uint64_t *highaddr, int big_endian, int elf_machine,
->                 int clear_lsb, int data_swab, AddressSpace *as)
-> {
-> -    return load_elf_ram(filename, translate_fn, translate_opaque,
-> +    return load_elf_ram(filename, elf_note_fn, translate_fn, translate_opaque,
->                         pentry, lowaddr, highaddr, big_endian, elf_machine,
->                         clear_lsb, data_swab, as, true);
-> }
->
-> /* return < 0 if error, otherwise the number of bytes loaded in memory */
-> int load_elf_ram(const char *filename,
-> +                 uint64_t (*elf_note_fn)(void *, void *, bool),
->                  uint64_t (*translate_fn)(void *, uint64_t),
->                  void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
->                  uint64_t *highaddr, int big_endian, int elf_machine,
->                  int clear_lsb, int data_swab, AddressSpace *as,
->                  bool load_rom)
-> {
-> -    return load_elf_ram_sym(filename, translate_fn, translate_opaque,
-> +    return load_elf_ram_sym(filename, elf_note_fn,
-> +                            translate_fn, translate_opaque,
->                             pentry, lowaddr, highaddr, big_endian,
->                             elf_machine, clear_lsb, data_swab, as,
->                             load_rom, NULL);
-> @@ -434,6 +439,7 @@ int load_elf_ram(const char *filename,
->
-> /* return < 0 if error, otherwise the number of bytes loaded in memory */
-> int load_elf_ram_sym(const char *filename,
-> +                     uint64_t (*elf_note_fn)(void *, void *, bool),
->                      uint64_t (*translate_fn)(void *, uint64_t),
->                      void *translate_opaque, uint64_t *pentry,
->                      uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
-> @@ -476,11 +482,13 @@ int load_elf_ram_sym(const char *filename,
->
->     lseek(fd, 0, SEEK_SET);
->     if (e_ident[EI_CLASS] == ELFCLASS64) {
-> -        ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
-> +        ret = load_elf64(filename, fd, elf_note_fn,
-> +                         translate_fn, translate_opaque, must_swab,
->                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
->                          data_swab, as, load_rom, sym_cb);
->     } else {
-> -        ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
-> +        ret = load_elf32(filename, fd, elf_note_fn,
-> +                         translate_fn, translate_opaque, must_swab,
->                          pentry, lowaddr, highaddr, elf_machine, clear_lsb,
->                          data_swab, as, load_rom, sym_cb);
->     }
-> diff --git a/hw/cris/boot.c b/hw/cris/boot.c
-> index f896ed7f8635..95cba2151b79 100644
-> --- a/hw/cris/boot.c
-> +++ b/hw/cris/boot.c
-> @@ -75,7 +75,8 @@ void cris_load_image(CRISCPU *cpu, struct cris_load_info *li)
->     env->load_info = li;
->     /* Boots a kernel elf binary, os/linux-2.6/vmlinux from the axis
->        devboard SDK.  */
-> -    image_size = load_elf(li->image_filename, translate_kernel_address, NULL,
-> +    image_size = load_elf(li->image_filename, NULL,
-> +                          translate_kernel_address, NULL,
->                           &entry, NULL, &high, 0, EM_CRIS, 0, 0);
->     li->entry = entry;
->     if (image_size < 0) {
-> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-> index ac6dd7f6abdc..d1b1d3caa40d 100644
-> --- a/hw/hppa/machine.c
-> +++ b/hw/hppa/machine.c
-> @@ -135,8 +135,8 @@ static void machine_hppa_init(MachineState *machine)
->         exit(1);
->     }
->
-> -    size = load_elf(firmware_filename, NULL,
-> -                    NULL, &firmware_entry, &firmware_low, &firmware_high,
-> +    size = load_elf(firmware_filename, NULL, NULL, NULL,
-> +                    &firmware_entry, &firmware_low, &firmware_high,
->                     true, EM_PARISC, 0, 0);
->
->     /* Unfortunately, load_elf sign-extends reading elf32.  */
-> @@ -165,7 +165,7 @@ static void machine_hppa_init(MachineState *machine)
->
->     /* Load kernel */
->     if (kernel_filename) {
-> -        size = load_elf(kernel_filename, &cpu_hppa_to_phys,
-> +        size = load_elf(kernel_filename, NULL, &cpu_hppa_to_phys,
->                         NULL, &kernel_entry, &kernel_low, &kernel_high,
->                         true, EM_PARISC, 0, 0);
->
-> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-> index 62340687e8ed..a3e33fbe5e18 100644
-> --- a/hw/i386/multiboot.c
-> +++ b/hw/i386/multiboot.c
-> @@ -199,7 +199,7 @@ int load_multiboot(FWCfgState *fw_cfg,
->             exit(1);
->         }
->
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, &elf_entry,
->                                &elf_low, &elf_high, 0, I386_ELF_MACHINE,
->                                0, 0);
->         if (kernel_size < 0) {
-> diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-> index fd8eccca14d9..05157f8eab76 100644
-> --- a/hw/lm32/lm32_boards.c
-> +++ b/hw/lm32/lm32_boards.c
-> @@ -138,7 +138,8 @@ static void lm32_evr_init(MachineState *machine)
->         uint64_t entry;
->         int kernel_size;
->
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL, &entry, NULL, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-> +                               &entry, NULL, NULL,
->                                1, EM_LATTICEMICO32, 0, 0);
->         reset_info->bootstrap_pc = entry;
->
-> @@ -231,7 +232,8 @@ static void lm32_uclinux_init(MachineState *machine)
->         uint64_t entry;
->         int kernel_size;
->
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL, &entry, NULL, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-> +                               &entry, NULL, NULL,
->                                1, EM_LATTICEMICO32, 0, 0);
->         reset_info->bootstrap_pc = entry;
->
-> diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-> index 63c6894c9559..7b0046b3e821 100644
-> --- a/hw/lm32/milkymist.c
-> +++ b/hw/lm32/milkymist.c
-> @@ -175,7 +175,8 @@ milkymist_init(MachineState *machine)
->         uint64_t entry;
->
->         /* Boots a kernel elf binary.  */
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL, &entry, NULL, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-> +                               &entry, NULL, NULL,
->                                1, EM_LATTICEMICO32, 0, 0);
->         reset_info->bootstrap_pc = entry;
->
-> diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-> index 5e067ea1c356..06e380325885 100644
-> --- a/hw/m68k/an5206.c
-> +++ b/hw/m68k/an5206.c
-> @@ -66,7 +66,7 @@ static void an5206_init(MachineState *machine)
->         exit(1);
->     }
->
-> -    kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
-> +    kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, &elf_entry,
->                            NULL, NULL, 1, EM_68K, 0, 0);
->     entry = elf_entry;
->     if (kernel_size < 0) {
-> diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
-> index 0f2245dd8177..8531e07e5b57 100644
-> --- a/hw/m68k/mcf5208.c
-> +++ b/hw/m68k/mcf5208.c
-> @@ -294,7 +294,7 @@ static void mcf5208evb_init(MachineState *machine)
->         exit(1);
->     }
->
-> -    kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
-> +    kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, &elf_entry,
->                            NULL, NULL, 1, EM_68K, 0, 0);
->     entry = elf_entry;
->     if (kernel_size < 0) {
-> diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
-> index 489ab839b7c2..a7af4c070486 100644
-> --- a/hw/microblaze/boot.c
-> +++ b/hw/microblaze/boot.c
-> @@ -142,13 +142,14 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
-> #endif
->
->         /* Boots a kernel elf binary.  */
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
->                                &entry, &low, &high,
->                                big_endian, EM_MICROBLAZE, 0, 0);
->         base32 = entry;
->         if (base32 == 0xc0000000) {
-> -            kernel_size = load_elf(kernel_filename, translate_kernel_address,
-> -                                   NULL, &entry, NULL, NULL,
-> +            kernel_size = load_elf(kernel_filename, NULL,
-> +                                   translate_kernel_address, NULL,
-> +                                   &entry, NULL, NULL,
->                                    big_endian, EM_MICROBLAZE, 0, 0);
->         }
->         /* Always boot into physical ram.  */
-> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index 2fbba32c4819..1f24a9fc2e13 100644
-> --- a/hw/mips/mips_fulong2e.c
-> +++ b/hw/mips/mips_fulong2e.c
-> @@ -111,8 +111,9 @@ static int64_t load_kernel (CPUMIPSState *env)
->     uint32_t *prom_buf;
->     long prom_size;
->
-> -    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
-> -                           NULL, (uint64_t *)&kernel_entry,
-> +    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
-> +                           cpu_mips_kseg0_to_phys, NULL,
-> +                           (uint64_t *)&kernel_entry,
->                            (uint64_t *)&kernel_low, (uint64_t *)&kernel_high,
->                            0, EM_MIPS, 1, 0);
->     if (kernel_size < 0) {
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index c1cf0fe12e95..74667766c277 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -1010,8 +1010,9 @@ static int64_t load_kernel (void)
->     big_endian = 0;
-> #endif
->
-> -    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
-> -                           NULL, (uint64_t *)&kernel_entry, NULL,
-> +    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
-> +                           cpu_mips_kseg0_to_phys, NULL,
-> +                           (uint64_t *)&kernel_entry, NULL,
->                            (uint64_t *)&kernel_high, big_endian, EM_MIPS, 1, 0);
->     if (kernel_size < 0) {
->         error_report("could not load kernel '%s': %s",
-> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-> index f665752a2fc6..824abda65748 100644
-> --- a/hw/mips/mips_mipssim.c
-> +++ b/hw/mips/mips_mipssim.c
-> @@ -69,8 +69,9 @@ static int64_t load_kernel(void)
->     big_endian = 0;
-> #endif
->
-> -    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
-> -                           NULL, (uint64_t *)&entry, NULL,
-> +    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
-> +                           cpu_mips_kseg0_to_phys, NULL,
-> +                           (uint64_t *)&entry, NULL,
->                            (uint64_t *)&kernel_high, big_endian,
->                            EM_MIPS, 1, 0);
->     if (kernel_size >= 0) {
-> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-> index 19224073947d..a015a6d14ee6 100644
-> --- a/hw/mips/mips_r4k.c
-> +++ b/hw/mips/mips_r4k.c
-> @@ -92,8 +92,9 @@ static int64_t load_kernel(void)
-> #else
->     big_endian = 0;
-> #endif
-> -    kernel_size = load_elf(loaderparams.kernel_filename, cpu_mips_kseg0_to_phys,
-> -                           NULL, (uint64_t *)&entry, NULL,
-> +    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
-> +                           cpu_mips_kseg0_to_phys, NULL,
-> +                           (uint64_t *)&entry, NULL,
->                            (uint64_t *)&kernel_high, big_endian,
->                            EM_MIPS, 1, 0);
->     if (kernel_size >= 0) {
-> diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-> index c6b6f7262dce..eddeed915d3b 100644
-> --- a/hw/moxie/moxiesim.c
-> +++ b/hw/moxie/moxiesim.c
-> @@ -57,7 +57,7 @@ static void load_kernel(MoxieCPU *cpu, LoaderParams *loader_params)
->     long kernel_size;
->     ram_addr_t initrd_offset;
->
-> -    kernel_size = load_elf(loader_params->kernel_filename,  NULL, NULL,
-> +    kernel_size = load_elf(loader_params->kernel_filename,  NULL, NULL, NULL,
->                            &entry, &kernel_low, &kernel_high, 1, EM_MOXIE,
->                            0, 0);
->
-> diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
-> index ed5cb28e942b..5f0ab2fbb9c2 100644
-> --- a/hw/nios2/boot.c
-> +++ b/hw/nios2/boot.c
-> @@ -146,13 +146,14 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
-> #endif
->
->         /* Boots a kernel elf binary. */
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
->                                &entry, &low, &high,
->                                big_endian, EM_ALTERA_NIOS2, 0, 0);
->         base32 = entry;
->         if (base32 == 0xc0000000) {
-> -            kernel_size = load_elf(kernel_filename, translate_kernel_address,
-> -                                   NULL, &entry, NULL, NULL,
-> +            kernel_size = load_elf(kernel_filename, NULL,
-> +                                   translate_kernel_address, NULL,
-> +                                   &entry, NULL, NULL,
->                                    big_endian, EM_ALTERA_NIOS2, 0, 0);
->         }
->
-> diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-> index a495a84a41d9..7d3b734d24fb 100644
-> --- a/hw/openrisc/openrisc_sim.c
-> +++ b/hw/openrisc/openrisc_sim.c
-> @@ -96,7 +96,7 @@ static void openrisc_load_kernel(ram_addr_t ram_size,
->     hwaddr entry;
->
->     if (kernel_filename && !qtest_enabled()) {
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
->                                &elf_entry, NULL, NULL, 1, EM_OPENRISC,
->                                1, 0);
->         entry = elf_entry;
-> diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-> index b1b6b16badb3..8b9e1fd0d343 100644
-> --- a/hw/pci-host/prep.c
-> +++ b/hw/pci-host/prep.c
-> @@ -331,7 +331,7 @@ static void raven_realize(PCIDevice *d, Error **errp)
->         filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, s->bios_name);
->         if (filename) {
->             if (s->elf_machine != EM_NONE) {
-> -                bios_size = load_elf(filename, NULL, NULL, NULL,
-> +                bios_size = load_elf(filename, NULL, NULL, NULL, NULL,
->                                      NULL, NULL, 1, s->elf_machine, 0, 0);
->             }
->             if (bios_size < 0) {
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index 0581e9e3d4c3..7553f674c990 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -988,7 +988,8 @@ void ppce500_init(MachineState *machine)
->
->     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, payload_name);
->
-> -    payload_size = load_elf(filename, NULL, NULL, &bios_entry, &loadaddr, NULL,
-> +    payload_size = load_elf(filename, NULL, NULL, NULL,
-> +                            &bios_entry, &loadaddr, NULL,
->                             1, PPC_ELF_MACHINE, 0, 0);
->     if (payload_size < 0) {
->         /*
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index bb19eaba36b4..40be6d0b2aba 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -165,7 +165,7 @@ static void ppc_core99_init(MachineState *machine)
->
->     /* Load OpenBIOS (ELF) */
->     if (filename) {
-> -        bios_size = load_elf(filename, NULL, NULL, NULL,
-> +        bios_size = load_elf(filename, NULL, NULL, NULL, NULL,
->                              NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
->
->         g_free(filename);
-> @@ -188,7 +188,8 @@ static void ppc_core99_init(MachineState *machine)
-> #endif
->         kernel_base = KERNEL_LOAD_ADDR;
->
-> -        kernel_size = load_elf(kernel_filename, translate_kernel_address, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL,
-> +                               translate_kernel_address, NULL,
->                                NULL, &lowaddr, NULL, 1, PPC_ELF_MACHINE,
->                                0, 0);
->         if (kernel_size < 0)
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index 817f70e52cf3..c28dde1992f4 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -140,7 +140,7 @@ static void ppc_heathrow_init(MachineState *machine)
->
->     /* Load OpenBIOS (ELF) */
->     if (filename) {
-> -        bios_size = load_elf(filename, 0, NULL, NULL, NULL, NULL,
-> +        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, NULL,
->                              1, PPC_ELF_MACHINE, 0, 0);
->         g_free(filename);
->     } else {
-> @@ -161,7 +161,8 @@ static void ppc_heathrow_init(MachineState *machine)
->         bswap_needed = 0;
-> #endif
->         kernel_base = KERNEL_LOAD_ADDR;
-> -        kernel_size = load_elf(kernel_filename, translate_kernel_address, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL,
-> +                               translate_kernel_address, NULL,
->                                NULL, &lowaddr, NULL, 1, PPC_ELF_MACHINE,
->                                0, 0);
->         if (kernel_size < 0)
-> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-> index fc0619158879..6318301c81c9 100644
-> --- a/hw/ppc/ppc440_bamboo.c
-> +++ b/hw/ppc/ppc440_bamboo.c
-> @@ -256,7 +256,7 @@ static void bamboo_init(MachineState *machine)
->         success = load_uimage(kernel_filename, &entry, &loadaddr, NULL,
->                               NULL, NULL);
->         if (success < 0) {
-> -            success = load_elf(kernel_filename, NULL, NULL, &elf_entry,
-> +            success = load_elf(kernel_filename, NULL, NULL, NULL, &elf_entry,
->                                &elf_lowaddr, NULL, 1, PPC_ELF_MACHINE,
->                                0, 0);
->             entry = elf_entry;
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> index 84ea592749c4..934674fd2da8 100644
-> --- a/hw/ppc/sam460ex.c
-> +++ b/hw/ppc/sam460ex.c
-> @@ -557,7 +557,8 @@ static void sam460ex_init(MachineState *machine)
->         if (success < 0) {
->             uint64_t elf_entry, elf_lowaddr;
->
-> -            success = load_elf(machine->kernel_filename, NULL, NULL, &elf_entry,
-> +            success = load_elf(machine->kernel_filename, NULL,
-> +                               NULL, NULL, &elf_entry,
->                                &elf_lowaddr, NULL, 1, PPC_ELF_MACHINE, 0, 0);
->             entry = elf_entry;
->             loadaddr = elf_lowaddr;
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0942f35bf87e..3cbc44c70fb7 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2852,11 +2852,12 @@ static void spapr_machine_init(MachineState *machine)
->     if (kernel_filename) {
->         uint64_t lowaddr = 0;
->
-> -        spapr->kernel_size = load_elf(kernel_filename, translate_kernel_address,
-> -                                      NULL, NULL, &lowaddr, NULL, 1,
-> +        spapr->kernel_size = load_elf(kernel_filename, NULL,
-> +                                      translate_kernel_address, NULL,
-> +                                      NULL, &lowaddr, NULL, 1,
->                                       PPC_ELF_MACHINE, 0, 0);
->         if (spapr->kernel_size == ELF_LOAD_WRONG_ENDIAN) {
-> -            spapr->kernel_size = load_elf(kernel_filename,
-> +            spapr->kernel_size = load_elf(kernel_filename, NULL,
->                                           translate_kernel_address, NULL, NULL,
->                                           &lowaddr, NULL, 0, PPC_ELF_MACHINE,
->                                           0, 0);
-> diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-> index 517712057434..5a711cb3d941 100644
-> --- a/hw/ppc/virtex_ml507.c
-> +++ b/hw/ppc/virtex_ml507.c
-> @@ -258,7 +258,7 @@ static void virtex_init(MachineState *machine)
->         hwaddr boot_offset;
->
->         /* Boots a kernel elf binary.  */
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
->                                &entry, &low, &high, 1, PPC_ELF_MACHINE,
->                                0, 0);
->         boot_info.bootstrap_pc = entry & 0x00ffffff;
-> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-> index 5d9d65ff29ab..bfc086609cb9 100644
-> --- a/hw/riscv/sifive_e.c
-> +++ b/hw/riscv/sifive_e.c
-> @@ -78,7 +78,7 @@ static uint64_t load_kernel(const char *kernel_filename)
-> {
->     uint64_t kernel_entry, kernel_high;
->
-> -    if (load_elf(kernel_filename, NULL, NULL,
-> +    if (load_elf(kernel_filename, NULL, NULL, NULL,
->                  &kernel_entry, NULL, &kernel_high,
->                  0, EM_RISCV, 1, 0) < 0) {
->         error_report("could not load kernel '%s'", kernel_filename);
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 3bd3b67507f8..2730b25b6032 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -69,7 +69,7 @@ static uint64_t load_kernel(const char *kernel_filename)
-> {
->     uint64_t kernel_entry, kernel_high;
->
-> -    if (load_elf(kernel_filename, NULL, NULL,
-> +    if (load_elf(kernel_filename, NULL, NULL, NULL,
->                  &kernel_entry, NULL, &kernel_high,
->                  0, EM_RISCV, 1, 0) < 0) {
->         error_report("could not load kernel '%s'", kernel_filename);
-> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index 268df04c3c7d..c66ffc50cc74 100644
-> --- a/hw/riscv/spike.c
-> +++ b/hw/riscv/spike.c
-> @@ -57,7 +57,7 @@ static uint64_t load_kernel(const char *kernel_filename)
-> {
->     uint64_t kernel_entry, kernel_high;
->
-> -    if (load_elf_ram_sym(kernel_filename, NULL, NULL,
-> +    if (load_elf_ram_sym(kernel_filename, NULL, NULL, NULL,
->             &kernel_entry, NULL, &kernel_high, 0, EM_RISCV, 1, 0,
->             NULL, true, htif_symbol_callback) < 0) {
->         error_report("could not load kernel '%s'", kernel_filename);
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index e7f0716fb667..3e8b19c66898 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -66,7 +66,7 @@ static uint64_t load_kernel(const char *kernel_filename)
-> {
->     uint64_t kernel_entry, kernel_high;
->
-> -    if (load_elf(kernel_filename, NULL, NULL,
-> +    if (load_elf(kernel_filename, NULL, NULL, NULL,
->                  &kernel_entry, NULL, &kernel_high,
->                  0, EM_RISCV, 1, 0) < 0) {
->         error_report("could not load kernel '%s'", kernel_filename);
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 21f64ad26aae..896888bf8f00 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -131,7 +131,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->             goto error;
->         }
->
-> -        bios_size = load_elf(bios_filename, bios_translate_addr, &fwbase,
-> +        bios_size = load_elf(bios_filename, NULL,
-> +                             bios_translate_addr, &fwbase,
->                              &ipl->bios_start_addr, NULL, NULL, 1,
->                              EM_S390, 0, 0);
->         if (bios_size > 0) {
-> @@ -155,7 +156,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->     }
->
->     if (ipl->kernel) {
-> -        kernel_size = load_elf(ipl->kernel, NULL, NULL, &pentry, NULL,
-> +        kernel_size = load_elf(ipl->kernel, NULL, NULL, NULL,
-> +                               &pentry, NULL,
->                                NULL, 1, EM_S390, 0, 0);
->         if (kernel_size < 0) {
->             kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
-> @@ -436,7 +438,8 @@ static int load_netboot_image(Error **errp)
->         goto unref_mr;
->     }
->
-> -    img_size = load_elf_ram(netboot_filename, NULL, NULL, &ipl->start_addr,
-> +    img_size = load_elf_ram(netboot_filename, NULL, NULL, NULL,
-> +                            &ipl->start_addr,
->                             NULL, NULL, 1, EM_S390, 0, 0, NULL, false);
->
->     if (img_size < 0) {
-> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-> index fa98ab81776c..774639af3393 100644
-> --- a/hw/sparc/leon3.c
-> +++ b/hw/sparc/leon3.c
-> @@ -190,7 +190,8 @@ static void leon3_generic_hw_init(MachineState *machine)
->         long     kernel_size;
->         uint64_t entry;
->
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL, &entry, NULL, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-> +                               &entry, NULL, NULL,
->                                1 /* big endian */, EM_SPARC, 0, 0);
->         if (kernel_size < 0) {
->             error_report("could not load kernel '%s'", kernel_filename);
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index 709ee37e08a4..779f3f97d5d4 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -242,7 +242,8 @@ static unsigned long sun4m_load_kernel(const char *kernel_filename,
-> #else
->         bswap_needed = 0;
-> #endif
-> -        kernel_size = load_elf(kernel_filename, translate_kernel_address, NULL,
-> +        kernel_size = load_elf(kernel_filename, NULL,
-> +                               translate_kernel_address, NULL,
->                                NULL, NULL, NULL, 1, EM_SPARC, 0, 0);
->         if (kernel_size < 0)
->             kernel_size = load_aout(kernel_filename, KERNEL_LOAD_ADDR,
-> @@ -692,7 +693,8 @@ static void prom_init(hwaddr addr, const char *bios_name)
->     }
->     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
->     if (filename) {
-> -        ret = load_elf(filename, translate_prom_address, &addr, NULL,
-> +        ret = load_elf(filename, NULL,
-> +                       translate_prom_address, &addr, NULL,
->                        NULL, NULL, 1, EM_SPARC, 0, 0);
->         if (ret < 0 || ret > PROM_SIZE_MAX) {
->             ret = load_image_targphys(filename, addr, PROM_SIZE_MAX);
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index f76b19e4e93b..b9bd4be5d512 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -153,7 +153,7 @@ static uint64_t sun4u_load_kernel(const char *kernel_filename,
-> #else
->         bswap_needed = 0;
-> #endif
-> -        kernel_size = load_elf(kernel_filename, NULL, NULL, kernel_entry,
-> +        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL, kernel_entry,
->                                kernel_addr, &kernel_top, 1, EM_SPARCV9, 0, 0);
->         if (kernel_size < 0) {
->             *kernel_addr = KERNEL_LOAD_ADDR;
-> @@ -411,7 +411,7 @@ static void prom_init(hwaddr addr, const char *bios_name)
->     }
->     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
->     if (filename) {
-> -        ret = load_elf(filename, translate_prom_address, &addr,
-> +        ret = load_elf(filename, NULL, translate_prom_address, &addr,
->                        NULL, NULL, NULL, 1, EM_SPARCV9, 0, 0);
->         if (ret < 0 || ret > PROM_SIZE_MAX) {
->             ret = load_image_targphys(filename, addr, PROM_SIZE_MAX);
-> diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboard.c
-> index a58096f05e72..003592af27a6 100644
-> --- a/hw/tricore/tricore_testboard.c
-> +++ b/hw/tricore/tricore_testboard.c
-> @@ -45,7 +45,7 @@ static void tricore_load_kernel(CPUTriCoreState *env)
->     long kernel_size;
->
->     kernel_size = load_elf(tricoretb_binfo.kernel_filename, NULL,
-> -                           NULL, &entry, NULL,
-> +                           NULL, NULL, &entry, NULL,
->                            NULL, 0,
->                            EM_TRICORE, 1, 0);
->     if (kernel_size <= 0) {
-> diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-> index b6ccb3cd4ae9..12c7437398e8 100644
-> --- a/hw/xtensa/sim.c
-> +++ b/hw/xtensa/sim.c
-> @@ -97,11 +97,15 @@ static void xtensa_sim_init(MachineState *machine)
->         uint64_t elf_entry;
->         uint64_t elf_lowaddr;
-> #ifdef TARGET_WORDS_BIGENDIAN
-> -        int success = load_elf(kernel_filename, translate_phys_addr, cpu,
-> -                &elf_entry, &elf_lowaddr, NULL, 1, EM_XTENSA, 0, 0);
-> +        int success = load_elf(kernel_filename, NULL,
-> +                               translate_phys_addr, cpu,
-> +                               &elf_entry, &elf_lowaddr,
-> +                               NULL, 1, EM_XTENSA, 0, 0);
-> #else
-> -        int success = load_elf(kernel_filename, translate_phys_addr, cpu,
-> -                &elf_entry, &elf_lowaddr, NULL, 0, EM_XTENSA, 0, 0);
-> +        int success = load_elf(kernel_filename, NULL,
-> +                               translate_phys_addr, cpu,
-> +                               &elf_entry, &elf_lowaddr,
-> +                               NULL, 0, EM_XTENSA, 0, 0);
-> #endif
->         if (success > 0) {
->             env->pc = elf_entry;
-> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-> index 21094319a659..cec5bda3fc73 100644
-> --- a/hw/xtensa/xtfpga.c
-> +++ b/hw/xtensa/xtfpga.c
-> @@ -378,7 +378,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
->
->         uint64_t elf_entry;
->         uint64_t elf_lowaddr;
-> -        int success = load_elf(kernel_filename, translate_phys_addr, cpu,
-> +        int success = load_elf(kernel_filename, NULL, translate_phys_addr, cpu,
->                 &elf_entry, &elf_lowaddr, NULL, be, EM_XTENSA, 0, 0);
->         if (success > 0) {
->             entry_point = elf_entry;
-> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-> index e2cb67519551..3438d6f69e8d 100644
-> --- a/include/hw/elf_ops.h
-> +++ b/include/hw/elf_ops.h
-> @@ -266,6 +266,7 @@ fail:
-> }
->
-> static int glue(load_elf, SZ)(const char *name, int fd,
-> +                              uint64_t (*elf_note_fn)(void *, void *, bool),
->                               uint64_t (*translate_fn)(void *, uint64_t),
->                               void *translate_opaque,
->                               int must_swab, uint64_t *pentry,
-> @@ -498,6 +499,7 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->             data = NULL;
->         }
->     }
-> +
->     g_free(phdr);
->     if (lowaddr)
->         *lowaddr = (uint64_t)(elf_sword)low;
-> diff --git a/include/hw/loader.h b/include/hw/loader.h
-> index de8a29603b0d..3e1b3a4566c9 100644
-> --- a/include/hw/loader.h
-> +++ b/include/hw/loader.h
-> @@ -93,6 +93,8 @@ const char *load_elf_strerror(int error);
->
-> /** load_elf_ram_sym:
->  * @filename: Path of ELF file
-> + * @elf_note_fn: optional function to parse ELF Note type
-> + *               passed via @translate_opaque
->  * @translate_fn: optional function to translate load addresses
->  * @translate_opaque: opaque data passed to @translate_fn
->  * @pentry: Populated with program entry point. Ignored if NULL.
-> @@ -125,6 +127,7 @@ typedef void (*symbol_fn_t)(const char *st_name, int st_info,
->                             uint64_t st_value, uint64_t st_size);
->
-> int load_elf_ram_sym(const char *filename,
-> +                     uint64_t (*elf_note_fn)(void *, void *, bool),
->                      uint64_t (*translate_fn)(void *, uint64_t),
->                      void *translate_opaque, uint64_t *pentry,
->                      uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
-> @@ -136,6 +139,7 @@ int load_elf_ram_sym(const char *filename,
->  * symbol callback function
->  */
-> int load_elf_ram(const char *filename,
-> +                 uint64_t (*elf_note_fn)(void *, void *, bool),
->                  uint64_t (*translate_fn)(void *, uint64_t),
->                  void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
->                  uint64_t *highaddr, int big_endian, int elf_machine,
-> @@ -146,6 +150,7 @@ int load_elf_ram(const char *filename,
->  * Same as load_elf_ram(), but always loads the elf as ROM
->  */
-> int load_elf_as(const char *filename,
-> +                uint64_t (*elf_note_fn)(void *, void *, bool),
->                 uint64_t (*translate_fn)(void *, uint64_t),
->                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
->                 uint64_t *highaddr, int big_endian, int elf_machine,
-> @@ -155,7 +160,9 @@ int load_elf_as(const char *filename,
->  * Same as load_elf_as(), but doesn't allow the caller to specify an
->  * AddressSpace.
->  */
-> -int load_elf(const char *filename, uint64_t (*translate_fn)(void *, uint64_t),
-> +int load_elf(const char *filename,
-> +             uint64_t (*elf_note_fn)(void *, void *, bool),
-> +             uint64_t (*translate_fn)(void *, uint64_t),
->              void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
->              uint64_t *highaddr, int big_endian, int elf_machine,
->              int clear_lsb, int data_swab);
->
+ configure                      |   2 +-
+ include/qemu/module.h          |   2 +
+ tests/Makefile.include         |  14 +-
+ tests/ahci-test.c              |   6 +-
+ tests/e1000e-test.c            |  22 +-
+ tests/i440fx-test.c            |   2 +-
+ tests/ide-test.c               |  19 +-
+ tests/libqos/ahci.c            |   2 +-
+ tests/libqos/libqos-pc.c       |   5 +-
+ tests/libqos/libqos-spapr.c    |   5 +-
+ tests/libqos/libqos.c          |  13 +-
+ tests/libqos/libqos.h          |  13 +-
+ tests/libqos/malloc-generic.c  |  21 +-
+ tests/libqos/malloc-generic.h  |   7 +-
+ tests/libqos/malloc-pc.c       |  18 +-
+ tests/libqos/malloc-pc.h       |   4 +-
+ tests/libqos/malloc-spapr.c    |  19 +-
+ tests/libqos/malloc-spapr.h    |   4 +-
+ tests/libqos/malloc.c          |  41 +--
+ tests/libqos/malloc.h          |  21 +-
+ tests/libqos/pci-pc.c          |   2 +-
+ tests/libqos/pci-pc.h          |   9 +-
+ tests/libqos/pci-spapr.c       |   2 +-
+ tests/libqos/pci-spapr.h       |   2 +-
+ tests/libqos/qgraph.c          | 756 +++++++++++++++++++++++++++++++++++++++++
+ tests/libqos/qgraph.h          | 575 +++++++++++++++++++++++++++++++
+ tests/libqos/qgraph_internal.h | 257 ++++++++++++++
+ tests/libqos/virtio.c          |   7 +
+ tests/libqos/virtio.h          |   1 +
+ tests/libqtest.h               |   3 +
+ tests/q35-test.c               |   4 +-
+ tests/qos-test.c               | 449 ++++++++++++++++++++++++
+ tests/rtas-test.c              |   2 +-
+ tests/rtl8139-test.c           |   2 +-
+ tests/sdhci-test.c             |   2 +-
+ tests/tco-test.c               |   2 +-
+ tests/test-qgraph.c            | 434 +++++++++++++++++++++++
+ tests/usb-hcd-ehci-test.c      |   2 +-
+ tests/vhost-user-test.c        |  16 +-
+ tests/virtio-9p-test.c         |  16 +-
+ tests/virtio-blk-test.c        |  79 +++--
+ tests/virtio-net-test.c        |  14 +-
+ tests/virtio-scsi-test.c       |  18 +-
+ 43 files changed, 2650 insertions(+), 244 deletions(-)
+ create mode 100644 tests/libqos/qgraph.c
+ create mode 100644 tests/libqos/qgraph.h
+ create mode 100644 tests/libqos/qgraph_internal.h
+ create mode 100644 tests/qos-test.c
+ create mode 100644 tests/test-qgraph.c
+
+-- 
+1.8.3.1
+
+diff --git a/tests/libqos/qgraph.c b/tests/libqos/qgraph.c
+index 6a750aa..cc42641 100644
+--- a/tests/libqos/qgraph.c
++++ b/tests/libqos/qgraph.c
+@@ -247,7 +247,7 @@ static void create_interface(const char *node)
+     if (!interface) {
+         create_node(node, QNODE_INTERFACE);
+     } else if (interface->type != QNODE_INTERFACE) {
+-        printf("Error: Node %s is not an interface\n", node);
++        fprintf(stderr, "Error: Node %s is not an interface\n", node);
+         abort();
+     }
+ }
+@@ -265,8 +265,7 @@ static void create_interface(const char *node)
+  */
+ static void build_machine_cmd_line(QOSGraphNode *node, const char *args)
+ {
+-    char *arch, *machine;
+-    qos_separate_arch_machine(node->name, &arch, &machine);
++    char *machine = qos_get_machine_type(node->name);
+     if (args) {
+         node->command_line = g_strconcat("-M ", machine, ",", args, NULL);
+     } else {
+@@ -343,7 +342,7 @@ static void qos_push(QOSGraphNode *el, QOSStackElement *parent,
+ /* qos_tos(): returns the top of stack, without popping */
+ static QOSStackElement *qos_tos(void)
+ {
+-    return &qos_node_stack[(qos_node_tos - 1)];
++    return &qos_node_stack[qos_node_tos - 1];
+ }
+ 
+ /* qos_pop(): pops an element from the tos, setting it unvisited*/
+@@ -419,7 +418,7 @@ static void qos_traverse_graph(QOSGraphNode *root, QOSTestCallback callback)
+                 dest_node = search_node(e->dest);
+ 
+                 if (!dest_node) {
+-                    printf("node %s in %s -> %s does not exist\n",
++                    fprintf(stderr, "node %s in %s -> %s does not exist\n",
+                             e->dest, v->name, e->dest);
+                     abort();
+                 }
+@@ -733,25 +732,24 @@ void qos_object_start_hw(QOSGraphObject *obj)
+     }
+ }
+ 
+-void qos_separate_arch_machine(char *name, char **arch, char **machine)
++char *qos_get_machine_type(char *name)
+ {
+-    *arch = name;
+     while (*name != '\0' && *name != '/') {
+         name++;
+     }
+ 
+-    if (*name == '/' && (*name + 1) != '\0') {
+-        *machine = name + 1;
+-    } else {
+-        printf("Machine name has to be of the form <arch>/<machine>\n");
++    if (!*name || !name[1]) {
++        fprintf(stderr, "Machine name has to be of the form <arch>/<machine>\n");
+         abort();
+     }
++
++    return name + 1;
+ }
+ 
+-void qos_delete_abstract_cmd_line(const char *name, bool abstract)
++void qos_delete_cmd_line(const char *name)
+ {
+     QOSGraphNode *node = search_node(name);
+-    if (node && abstract) {
++    if (node) {
+         g_free(node->command_line);
+         node->command_line = NULL;
+     }
+diff --git a/tests/libqos/qgraph.h b/tests/libqos/qgraph.h
+index 8d68314..ccc30ee 100644
+--- a/tests/libqos/qgraph.h
++++ b/tests/libqos/qgraph.h
+@@ -243,7 +243,7 @@ typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
+  * There are three types of command line arguments:
+  * - in node      : created from the node name. For example, machines will
+  *                  have "-M <machine>" to its command line, while devices
+- *                  "- device <device>". It is automatically done by the
++ *                  "-device <device>". It is automatically done by the
+  *                   framework.
+  * - after node   : added as additional argument to the node name.
+  *                  This argument is added optionally when creating edges,
+@@ -466,7 +466,7 @@ void qos_node_create_driver(const char *name, QOSCreateDriverFunc function);
+  * It also has the possibility to add optional NULL-terminated
+  * @opts parameters (see %QOSGraphEdgeOptions)
+  *
+- * This function can be useful whrn there are multiple devices
++ * This function can be useful when there are multiple devices
+  * with the same node name contained in a machine/other node
+  *
+  * For example, if "arm/raspi2" contains 2 "generic-sdhci"
+diff --git a/tests/libqos/qgraph_internal.h b/tests/libqos/qgraph_internal.h
+index 3728a25..2ef748b 100644
+--- a/tests/libqos/qgraph_internal.h
++++ b/tests/libqos/qgraph_internal.h
+@@ -227,32 +227,26 @@ void qos_print_graph(void);
+ void qos_graph_foreach_test_path(QOSTestCallback fn);
+ 
+ /**
+- * qos_separate_arch_machine(): separate arch from machine.
++ * qos_get_machine_type(): return QEMU machine type for a machine node.
+  * This function requires every machine @name to be in the form
+  * <arch>/<machine_name>, like "arm/raspi2" or "x86_64/pc".
+  *
+- * The function will split then the string in two parts,
+- * assigning @arch to point to <arch>/<machine_name>, and
+- * @machine to <machine_name>.
++ * The function will validate the format and return a pointer to
++ * @machine to <machine_name>.  For example, when passed "x86_64/pc"
++ * it will return "pc".
+  *
+- * For example, "x86_64/pc" will be split in this way:
+- * *arch = "x86_64/pc"
+- * *machine = "pc"
+- *
+- * Note that this function *does not* allocate any new string,
+- * but just sets the pointer *arch and *machine to the respective
+- * part of the string.
++ * Note that this function *does not* allocate any new string.
+  */
+-void qos_separate_arch_machine(char *name, char **arch, char **machine);
++char *qos_get_machine_type(char *name);
+ 
+ /**
+- * qos_delete_abstract_cmd_line(): if @abstract is #TRUE, delete the
++ * qos_delete_cmd_line(): delete the
+  * command line present in node mapped with key @name.
+  *
+  * This function is called when the QMP query returns a node with
+- * { "abstract" : <boolean> } attribute.
++ * { "abstract" : true } attribute.
+  */
+-void qos_delete_abstract_cmd_line(const char *name, bool abstract);
++void qos_delete_cmd_line(const char *name);
+ 
+ /**
+  * qos_graph_node_set_availability(): sets the node identified
+diff --git a/tests/qos-test.c b/tests/qos-test.c
+index d85ed71..386c399 100644
+--- a/tests/qos-test.c
++++ b/tests/qos-test.c
+@@ -29,30 +29,19 @@
+ 
+ static char *old_path;
+ 
+-/**
+- * create_machine_name(): appends the architecture to @name if
+- * @is_machine is valid.
+- */
+-static void create_machine_name(const char **name, bool is_machine)
++static void apply_to_node(const char *name, bool is_machine, bool is_abstract)
+ {
+-    const char *arch;
+-    if (!is_machine) {
+-        return;
++    char *machine_name = NULL;
++    if (is_machine) {
++        const char *arch = qtest_get_arch();
++        machine_name = g_strconcat(arch, "/", name, NULL);
++        name = machine_name;
+     }
+-    arch = qtest_get_arch();
+-    *name = g_strconcat(arch, "/", *name, NULL);
+-}
+-
+-/**
+- * destroy_machine_name(): frees the given @name if
+- * @is_machine is valid.
+- */
+-static void destroy_machine_name(const char *name, bool is_machine)
+-{
+-    if (!is_machine) {
+-        return;
++    qos_graph_node_set_availability(name, TRUE);
++    if (is_abstract) {
++        qos_delete_cmd_line(name);
+     }
+-    g_free((char *)name);
++    g_free(machine_name);
+ }
+ 
+ /**
+@@ -71,7 +60,7 @@ static void apply_to_qlist(QList *list, bool is_machine)
+     QDict *minfo;
+     QObject *qobj;
+     QString *qstr;
+-    QBool *qbol;
++    QBool *qbool;
+ 
+     for (p = qlist_first(list); p; p = qlist_next(p)) {
+         minfo = qobject_to(QDict, qlist_entry_obj(p));
+@@ -79,28 +68,21 @@ static void apply_to_qlist(QList *list, bool is_machine)
+         qstr = qobject_to(QString, qobj);
+         name = qstring_get_str(qstr);
+ 
+-        create_machine_name(&name, is_machine);
+-        qos_graph_node_set_availability(name, TRUE);
++        qobj = qdict_get(minfo, "abstract");
++        if (qobj) {
++            qbool = qobject_to(QBool, qobj);
++            abstract = qbool_get_bool(qbool);
++        } else {
++            abstract = false;
++        }
+ 
++        apply_to_node(name, is_machine, abstract);
+         qobj = qdict_get(minfo, "alias");
+         if (qobj) {
+             qstr = qobject_to(QString, qobj);
+-
+-            destroy_machine_name(name, is_machine);
+             name = qstring_get_str(qstr);
+-
+-            create_machine_name(&name, is_machine);
+-            qos_graph_node_set_availability(name, TRUE);
+-        }
+-
+-        qobj = qdict_get(minfo, "abstract");
+-        if (qobj) {
+-            qbol = qobject_to(QBool, qobj);
+-            abstract = qbool_get_bool(qbol);
+-            qos_delete_abstract_cmd_line(name, abstract);
++            apply_to_node(name, is_machine, abstract);
+         }
+-
+-        destroy_machine_name(name, is_machine);
+     }
+ }
+ 
+@@ -363,7 +345,6 @@ static void walk_path(QOSGraphNode *orig_path, int len)
+     char **path_vec = g_new0(char *, (QOS_PATH_MAX_ELEMENT_SIZE * 2));
+     int path_vec_size = 0;
+ 
+-    char *machine = NULL, *arch = NULL;
+     char *after_cmd = NULL, *before_cmd = NULL, *after_device = NULL;
+     char *node_name = orig_path->name, *path_str;
+ 
+@@ -373,9 +354,8 @@ static void walk_path(QOSGraphNode *orig_path, int len)
+     path = qos_graph_get_node(node_name); /* root */
+     node_name = qos_graph_edge_get_dest(path->path_edge); /* machine name */
+ 
+-    qos_separate_arch_machine(node_name, &arch, &machine);
+-    path_vec[path_vec_size++] = arch;
+-    path_vec[path_vec_size++] = machine;
++    path_vec[path_vec_size++] = node_name;
++    path_vec[path_vec_size++] = qos_get_machine_type(node_name);
+ 
+     for (;;) {
+         path = qos_graph_get_node(node_name);
+@@ -417,19 +397,19 @@ static void walk_path(QOSGraphNode *orig_path, int len)
+     g_string_free(cmd_line2, TRUE);
+ 
+     /* here position 0 has <arch>/<machine>, position 1 has <machine>.
+-     * The path must not have the <arch>
++     * The path must not have the <arch>, qtest_add_data_func adds it.
+      */
+     path_str = g_strjoinv("/", path_vec + 1);
+ 
+     /* put arch/machine in position 1 so run_one_test can do its work
+      * and add the command line at position 0.
+      */
++    path_vec[1] = path_vec[0];
+     path_vec[0] = g_string_free(cmd_line, FALSE);
+-    path_vec[1] = arch;
+ 
+     if (path->u.test.subprocess) {
+         gchar *subprocess_path = g_strdup_printf("/%s/%s/subprocess",
+-                                                 qtest_get_arch(), path_str);
++						 qtest_get_arch(), path_str);
+         qtest_add_data_func(path_str, subprocess_path, subprocess_run_one_test);
+         g_test_add_data_func(subprocess_path, path_vec, run_one_test);
+     } else {
