@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36005)
+Received: from eggs.gnu.org ([209.51.188.92]:40170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gjUyy-0008JT-0p
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:46 -0500
+	(envelope-from <lersek@redhat.com>) id 1gjV1R-0002Rt-17
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:09:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gjUyu-0003sR-ES
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34576)
+	(envelope-from <lersek@redhat.com>) id 1gjV1P-0006Cz-8y
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:09:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59366)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gjUyt-0003bA-T1
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:40 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gjV1O-0006BZ-UI
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:09:15 -0500
 References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-2-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-5-git-send-email-imammedo@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8bbf34cf-3e6b-5204-dd78-f8d17ce2e337@redhat.com>
-Date: Tue, 15 Jan 2019 21:06:16 +0100
+Message-ID: <458a77e3-6802-6e33-1117-746d18851557@redhat.com>
+Date: Tue, 15 Jan 2019 21:09:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <1547566866-129386-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1547566866-129386-5-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/14] tests: acpi: add
- uefi_find_rsdp_addr() helper
+Subject: Re: [Qemu-devel] [PATCH 04/14] tests: acpi: make pointer to RSDP
+ 64bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,114 +32,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 Cc: Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-Hi Igor,
-
 On 01/15/19 16:40, Igor Mammedov wrote:
-> introduce UEFI specific counterpart to acpi_find_rsdp_address()
-> that will help to find RSDP address when [OA]VMF is used as
-> firmware. It requires a [OA]VMF built with PcdAcpiTestSupport=TRUE,
-> to locate RSDP address within 1Mb aligned ACPI test structure, tagged
-> with GUID AB87A6B1-2034-BDA0-71BD-375007757785
+> In case of UEFI RSDP doesn't have to be located in lowmem,
+
+I suggest inserting a comma (,) after "UEFI". Currently the message
+reads like
+
+  in case of UEFI RSDP, doesn't have to... ENOPARSE
+
+:) It should be
+
+  in case of UEFI, RSDP doesn't have to...
+
+Thanks
+Laszlo
+
+> it could be placed at any address. Make sure that test won't
+> break if it is placed above the first 4Gb of address space.
+> 
+> PS:
+> While at it cleanup some local variables as we don't really
+> need them.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  tests/acpi-utils.h |  1 +
->  tests/acpi-utils.c | 43 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 44 insertions(+)
-
-I'm not promising to review all of this patch set (Phil, feel free to
-chime in); I'll just make some quick comments below:
-
-> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-> index ef388bb..3b11f47 100644
-> --- a/tests/acpi-utils.h
-> +++ b/tests/acpi-utils.h
-> @@ -46,6 +46,7 @@ typedef struct {
->  
->  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
->  uint32_t acpi_find_rsdp_address(QTestState *qts);
-> +uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size);
-
-I think it would make sense to keep the "acpi_find_rsdp_address" prefix
-for the new function name; maybe append "_uefi"? Because now "acpi" is
-replaced with "uefi , plus "address" is truncated to "addr"; those don't
-seem overly logical.
-
-Anyway, up to you.
-
->  uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
->  void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
->  void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
-> diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-> index cc33b46..b9ff9df 100644
-> --- a/tests/acpi-utils.c
-> +++ b/tests/acpi-utils.c
-> @@ -111,3 +111,46 @@ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
->          g_assert(!acpi_calc_checksum(*aml, *aml_len));
->      }
->  }
-> +
-> +#define GUID_SIZE 16
-> +static uint8_t AcpiTestSupportGuid[GUID_SIZE] =
-> +     { 0xb1, 0xa6, 0x87, 0xab,
-> +       0x34, 0x20,
-> +       0xa0, 0xbd,
-> +       0x71, 0xbd, 0x37, 0x50, 0x07, 0x75, 0x77, 0x85 };
-
-I think this is generally good. QEMU has some utilities/helpers for
-working with UUIDs; however, for the test infrastructure, I think this
-should be good enough.
-
-Suggestion: make the GUID "const" as well.
-
-> +
-> +typedef struct {
-> +    uint8_t signature_guid[16];
-
-s/16/GUID_SIZE/?
-
-> +    uint64_t rsdp10;
-> +    uint64_t rsdp20;
-> +} __attribute__((packed)) UefiTestSupport;
-> +
-> +/* Wait at most 600 seconds (test is slow with TCI and --enable-debug) */
-
-Do you specifically mean "Tiny Code Interpreter" here?
-
-> +#define TEST_DELAY (1 * G_USEC_PER_SEC / 10)
-> +#define TEST_CYCLES MAX((600 * G_USEC_PER_SEC / TEST_DELAY), 1)
-> +#define MB 0x100000ULL
-> +uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size)
-> +{
-> +    int i, j;
-> +    uint8_t data[GUID_SIZE];
-> +
-> +    for (i = 0; i < TEST_CYCLES; ++i) {
-> +        for (j = 0; j < size / MB; j++) {
-> +            /* look for GUID at every 1Mb block */
-> +            uint64_t addr = start + j * MB;
-> +
-> +            qtest_memread(qts, addr, data, sizeof(data));
-> +            if (!memcmp(AcpiTestSupportGuid, data, sizeof(data))) {
-> +                UefiTestSupport ret;
-> +
-> +                qtest_memread(qts, addr, &ret, sizeof(ret));
-> +                ret.rsdp10 = le64_to_cpu(ret.rsdp10);
-> +                ret.rsdp20 = le64_to_cpu(ret.rsdp20);
-> +                return ret.rsdp20 ? ret.rsdp20 : ret.rsdp10;
-> +            }
-> +        }
-> +        g_usleep(TEST_DELAY);
-> +    }
-> +    g_assert_not_reached();
-> +    return 0;
-> +}
+>  tests/bios-tables-test.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
 > 
-
-Apart from my hair-splitting, it looks good. If you update
-16-->GUID_SIZE, then you can add
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks,
-Laszlo
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 99d7bf8..c28c5c7 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -26,7 +26,7 @@
+>  typedef struct {
+>      const char *machine;
+>      const char *variant;
+> -    uint32_t rsdp_addr;
+> +    uint64_t rsdp_addr;
+>      uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+>      GArray *tables;
+>      uint32_t smbios_ep_addr;
+> @@ -86,13 +86,11 @@ static void test_acpi_rsdp_address(test_data *data)
+>  
+>  static void test_acpi_rsdp_table(test_data *data)
+>  {
+> -    uint8_t *rsdp_table = data->rsdp_table, revision;
+> -    uint32_t addr = data->rsdp_addr;
+> +    uint8_t *rsdp_table = data->rsdp_table;
+>  
+> -    acpi_fetch_rsdp_table(data->qts, addr, rsdp_table);
+> -    revision = rsdp_table[15 /* Revision offset */];
+> +    acpi_fetch_rsdp_table(data->qts, data->rsdp_addr, rsdp_table);
+>  
+> -    switch (revision) {
+> +    switch (rsdp_table[15 /* Revision offset */]) {
+>      case 0: /* ACPI 1.0 RSDP */
+>          /* With rev 1, checksum is only for the first 20 bytes */
+>          g_assert(!acpi_calc_checksum(rsdp_table,  20));
+> 
