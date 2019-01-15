@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38119)
+Received: from eggs.gnu.org ([209.51.188.92]:42184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <carpeddiem@gmail.com>) id 1gjUAr-00088j-4N
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:14:58 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gjUEV-00021F-Go
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:18:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <carpeddiem@gmail.com>) id 1gjUAl-0001Ck-73
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:14:55 -0500
-Received: from mail-io1-f44.google.com ([209.85.166.44]:40028)
+	(envelope-from <mlureau@redhat.com>) id 1gjUET-0003ko-VC
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:18:43 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:41083)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <carpeddiem@gmail.com>)
-	id 1gjUAh-00019v-Ae
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:14:47 -0500
-Received: by mail-io1-f44.google.com with SMTP id k2so2953970iog.7
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 11:14:44 -0800 (PST)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gjUET-0003hS-Mq
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:18:41 -0500
+Received: by mail-qt1-f194.google.com with SMTP id l12so4271945qtf.8
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 11:18:33 -0800 (PST)
 MIME-Version: 1.0
-References: <20190115184229.73688-1-emaste@freefall.freebsd.org>
-	<CAJ+F1CKEhb0hKSvbwYfjEojqJ9K8Jbtit5oW8CTBmcSHSjVrNg@mail.gmail.com>
-In-Reply-To: <CAJ+F1CKEhb0hKSvbwYfjEojqJ9K8Jbtit5oW8CTBmcSHSjVrNg@mail.gmail.com>
-From: Ed Maste <emaste@freebsd.org>
-Date: Tue, 15 Jan 2019 14:14:30 -0500
-Message-ID: <CAPyFy2C9RDsq21h-b8w+QULzr3H-GSFE80LkkS_g7WHs6BcPdQ@mail.gmail.com>
+References: <20190115145256.9593-1-berrange@redhat.com>
+	<20190115145256.9593-5-berrange@redhat.com>
+In-Reply-To: <20190115145256.9593-5-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 15 Jan 2019 23:18:21 +0400
+Message-ID: <CAMxuvazF37LX1a-KRmSy+==Rg8jOJ-57kYvORASkoP04qbjTjQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for
- FreeBSD
+Subject: Re: [Qemu-devel] [PATCH 04/12] chardev: remove many local variables
+ in qemu_chr_parse_socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +30,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, 15 Jan 2019 at 13:59, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
+Hi
+
+On Tue, Jan 15, 2019 at 6:53 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
 >
-> Hi
+> Now that all validation is separated off into a separate method,
+> we can directly populate the ChardevSocket struct from the
+> QemuOpts values, avoiding many local variables.
 >
-> On Tue, Jan 15, 2019 at 10:42 PM Ed Maste <emaste@freefall.freebsd.org> w=
-rote:
-> >
-> > From: Ed Maste <emaste@freebsd.org>
-> >
-> > Cirrus-CI (https://cirrus-ci.org) is a hosted CI service which supports
-> > several platforms, including FreeBSD.  Later on we could build for othe=
-r
-> > hosts in Cirrus-CI, but I'm starting with only FreeBSD as it is not
-> > supported by other CI services.
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  chardev/char-socket.c | 40 ++++++++++++++++++----------------------
+>  1 file changed, 18 insertions(+), 22 deletions(-)
 >
-> Although I have never tested it, gitlab CI supports FreeBSD, macosx, wind=
-ows...
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index 233f16f72d..ba86284ea9 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -1186,18 +1186,10 @@ error:
+>  static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backen=
+d,
+>                                    Error **errp)
+>  {
+> -    bool is_listen      =3D qemu_opt_get_bool(opts, "server", false);
+> -    bool is_waitconnect =3D is_listen && qemu_opt_get_bool(opts, "wait",=
+ true);
+> -    bool is_telnet      =3D qemu_opt_get_bool(opts, "telnet", false);
+> -    bool is_tn3270      =3D qemu_opt_get_bool(opts, "tn3270", false);
+> -    bool is_websock     =3D qemu_opt_get_bool(opts, "websocket", false);
+> -    bool do_nodelay     =3D !qemu_opt_get_bool(opts, "delay", true);
+> -    int64_t reconnect   =3D qemu_opt_get_number(opts, "reconnect", 0);
+>      const char *path =3D qemu_opt_get(opts, "path");
+>      const char *host =3D qemu_opt_get(opts, "host");
+>      const char *port =3D qemu_opt_get(opts, "port");
+>      const char *fd =3D qemu_opt_get(opts, "fd");
+> -    const char *tls_creds =3D qemu_opt_get(opts, "tls-creds");
+>      SocketAddressLegacy *addr;
+>      ChardevSocket *sock;
+>
+> @@ -1216,26 +1208,30 @@ static void qemu_chr_parse_socket(QemuOpts *opts,=
+ ChardevBackend *backend,
+>      sock =3D backend->u.socket.data =3D g_new0(ChardevSocket, 1);
+>      qemu_chr_parse_common(opts, qapi_ChardevSocket_base(sock));
+>
+> -    sock->has_nodelay =3D true;
+> -    sock->nodelay =3D do_nodelay;
+> +    sock->has_nodelay =3D qemu_opt_get(opts, "delay");
+> +    sock->nodelay =3D !qemu_opt_get_bool(opts, "delay", true);
+> +    /*
+> +     * We have different default to QMP for 'server', hence
+> +     * we can't just check for existance of 'server'
+> +     */
+>      sock->has_server =3D true;
+> -    sock->server =3D is_listen;
+> -    sock->has_telnet =3D true;
+> -    sock->telnet =3D is_telnet;
+> -    sock->has_tn3270 =3D true;
+> -    sock->tn3270 =3D is_tn3270;
+> -    sock->has_websocket =3D true;
+> -    sock->websocket =3D is_websock;
+> +    sock->server =3D qemu_opt_get_bool(opts, "server", false);
+> +    sock->has_telnet =3D qemu_opt_get(opts, "telnet");
+> +    sock->telnet =3D qemu_opt_get_bool(opts, "telnet", false);
+> +    sock->has_tn3270 =3D qemu_opt_get(opts, "tn3270");
+> +    sock->tn3270 =3D qemu_opt_get_bool(opts, "tn3270", false);
+> +    sock->has_websocket =3D qemu_opt_get(opts, "websocket");
+> +    sock->websocket =3D qemu_opt_get_bool(opts, "websocket", false);
+>      /*
+>       * We have different default to QMP for 'wait' when 'server'
+>       * is set, hence we can't just check for existance of 'wait'
+>       */
+> -    sock->has_wait =3D qemu_opt_find(opts, "wait") || is_listen;
+> -    sock->wait =3D is_waitconnect;
+> +    sock->has_wait =3D qemu_opt_find(opts, "wait") || sock->server;
+> +    sock->wait =3D qemu_opt_get_bool(opts, "wait", true);
 
-I haven't looked into it in great detail. As far as I can tell it
-supports running tests on a provided FreeBSD instance via
-gitlab-runner, and is not a fully hosted CI service like Cirrus-CI,
-Travis, etc.
+That changes slightly the behaviour, since wait was not parsed before
+when !is_listen.
 
-> What about patchew?
+Since we are "correcting" (breaking?) things anyway in previous patches too=
+:
 
-I'm also not very familiar with patchew. I did look at the three VM
-BSD scripts (tests/vm/*bsd) reported in my Cirrus-CI thread, but am
-not sure how they're invoked or how results are reported.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+>      sock->has_reconnect =3D qemu_opt_find(opts, "reconnect");
+> -    sock->reconnect =3D reconnect;
+> -    sock->has_tls_creds =3D tls_creds;
+> -    sock->tls_creds =3D g_strdup(tls_creds);
+> +    sock->reconnect =3D qemu_opt_get_number(opts, "reconnect", 0);
+> +    sock->has_tls_creds =3D qemu_opt_get(opts, "tls-creds");
+> +    sock->tls_creds =3D g_strdup(qemu_opt_get(opts, "tls-creds"));
+>
+>      addr =3D g_new0(SocketAddressLegacy, 1);
+>      if (path) {
+> --
+> 2.20.1
+>
