@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52675)
+Received: from eggs.gnu.org ([209.51.188.92]:54924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjTwA-0007QT-Ef
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:59:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1gjTyk-0000jF-IV
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:02:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjTw8-00082G-VC
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:59:46 -0500
-Received: from mail-wm1-f50.google.com ([209.85.128.50]:33232)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gjTw8-0007xw-Ji
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:59:44 -0500
-Received: by mail-wm1-f50.google.com with SMTP id r24so1741618wmh.0
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:59:38 -0800 (PST)
-References: <1547574976-6372-1-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f3a03f92-a71b-2032-2a81-715d222d0cf5@redhat.com>
-Date: Tue, 15 Jan 2019 19:59:36 +0100
+	(envelope-from <eblake@redhat.com>) id 1gjTyi-0001Ym-MW
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:02:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gjTya-0001QO-JJ
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:02:18 -0500
+References: <20190115184229.73688-1-emaste@freefall.freebsd.org>
+	<CAPyFy2Dw2F3ks_5f8cvWjrsOTS0_Ybr5kELUpyHQmOQWUaeuFg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <15cf568b-b914-b48a-79db-4cc9a761654c@redhat.com>
+Date: Tue, 15 Jan 2019 13:02:09 -0600
 MIME-Version: 1.0
-In-Reply-To: <1547574976-6372-1-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tap: flush STDOUT on newline
+In-Reply-To: <CAPyFy2Dw2F3ks_5f8cvWjrsOTS0_Ybr5kELUpyHQmOQWUaeuFg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iuq18YgHO1GGu8tTwPIsGERvRcsV4fT2J"
+Subject: Re: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for
+ FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com
+To: Ed Maste <emaste@freebsd.org>, qemu-devel <qemu-devel@nongnu.org>
 
-On 1/15/19 6:56 PM, Paolo Bonzini wrote:
-> This makes it easier to follow what is going on.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iuq18YgHO1GGu8tTwPIsGERvRcsV4fT2J
+From: Eric Blake <eblake@redhat.com>
+To: Ed Maste <emaste@freebsd.org>, qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <15cf568b-b914-b48a-79db-4cc9a761654c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for
+ FreeBSD
+References: <20190115184229.73688-1-emaste@freefall.freebsd.org>
+ <CAPyFy2Dw2F3ks_5f8cvWjrsOTS0_Ybr5kELUpyHQmOQWUaeuFg@mail.gmail.com>
+In-Reply-To: <CAPyFy2Dw2F3ks_5f8cvWjrsOTS0_Ybr5kELUpyHQmOQWUaeuFg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On 1/15/19 12:51 PM, Ed Maste wrote:
+> On Tue, 15 Jan 2019 at 13:42, Ed Maste <emaste@freebsd.org> wrote:
+>>
+>> From: Ed Maste <emaste@freebsd.org>
+>=20
+> I'm not sure what part of the path between `git send-email` and the
+> list moved this From: into the message body, but it's not intentional.
 
-> ---
->  scripts/tap-driver.pl | 1 +
->  scripts/tap-merge.pl  | 1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/scripts/tap-driver.pl b/scripts/tap-driver.pl
-> index 5e59b5d..6621a5c 100755
-> --- a/scripts/tap-driver.pl
-> +++ b/scripts/tap-driver.pl
-> @@ -313,6 +313,7 @@ sub main ()
->    my $iterator = TAP::Parser::Iterator::Stream->new(\*STDIN);
->    my $parser = TAP::Parser->new ({iterator => $iterator });
->  
-> +  STDOUT->autoflush(1);
->    while (defined (my $cur = $parser->next))
->      {
->        # Parsing of TAP input should stop after a "Bail out!" directive.
-> diff --git a/scripts/tap-merge.pl b/scripts/tap-merge.pl
-> index 59e3fa5..10ccf57 100755
-> --- a/scripts/tap-merge.pl
-> +++ b/scripts/tap-merge.pl
-> @@ -53,6 +53,7 @@ sub main ()
->    my $testno = 0;     # Number of test results seen so far.
->    my $bailed_out = 0; # Whether a "Bail out!" directive has been seen.
->  
-> +  STDOUT->autoflush(1);
->    while (defined (my $cur = $parser->next))
->      {
->        if ($cur->is_bailout)
-> 
+It doesn't hurt. 'git am' prefers the From: in the message body over the
+From: from the message headers, if the two differ, because that is the
+only way some people have to get git to record their commits correctly
+due to the list having to rewrite their headers to avoid the mail being
+rejected from over-strict SPF settings.  In your case, the two lines
+look identical (the list didn't rewrite your header From: to work around
+SPF); but it may be due to your 'git config format.from' settings.
+
+> If someone's going to pick up this patch please edit the commit
+> message.
+
+'git am' already does it automatically.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--iuq18YgHO1GGu8tTwPIsGERvRcsV4fT2J
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw+LjEACgkQp6FrSiUn
+Q2o1GQgAnBm+awVwm4h60y0G8fDGdENhORAOrsB6ae+RTgbVI6ga0Vl4+mUu8NFX
+BHAE1lNx1C0zuuYR0NvYS/sHe1Mi+loFq8I6Wc2bG+a4WO2JV5kdkrjV6vT2RWyh
+gd2K9UysLUOr/fk4Mxr8sIsdrunrq4p/tpsbO59XXOcUrmOE0i77rjxyB4pDZYab
+1NNpav6cqgsme4O6zIRDY3zxRdE0ZbjLXzba8qGM7aqYRZqMhligcP8yEZuJEift
+PplaIk4oXM3kZFAr1aX3cHEy8J5pupJhOdTyZSYVV/H0oALi/13MJr5RIFQlXbkF
+aLJaJf+cEibOGpxrjxyfb4racZqyNA==
+=UUdf
+-----END PGP SIGNATURE-----
+
+--iuq18YgHO1GGu8tTwPIsGERvRcsV4fT2J--
