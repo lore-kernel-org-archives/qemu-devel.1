@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44507)
+Received: from eggs.gnu.org ([209.51.188.92]:47398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjNsw-0005WD-FR
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:32:05 -0500
+	(envelope-from <mst@redhat.com>) id 1gjOAN-0001RW-Pg
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:50:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjNsv-0004Ms-Gl
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:32:02 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 15 Jan 2019 12:31:54 +0000
-Message-ID: <04ba8330-ac60-4f7a-2f99-64d0290e1c19@virtuozzo.com>
-References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-7-eblake@redhat.com>
-In-Reply-To: <20190112175812.27068-7-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <07B63F530BD42B4C870E55B1145207D7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mst@redhat.com>) id 1gjOAM-0006JF-QD
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:50:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjOAM-0006D3-Jd
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:50:02 -0500
+Date: Tue, 15 Jan 2019 07:49:53 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190115074907-mutt-send-email-mst@kernel.org>
+References: <20190115003812.11329-1-mst@redhat.com>
+	<20190115053802.GH24343@xz-x1>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 06/19] qemu-nbd: Avoid strtol open-coding
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190115053802.GH24343@xz-x1>
+Subject: Re: [Qemu-devel] [PULL 00/44] pci, pc, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-MTIuMDEuMjAxOSAyMDo1NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT3VyIGNvcHktYW5kLXBhc3Rl
-ZCBvcGVuLWNvZGluZyBvZiBzdHJ0b2wgaGFuZGxpbmcgZm9yZ290IHRvDQo+IGhhbmRsZSBvdmVy
-ZmxvdyBjb25kaXRpb25zLiAgVXNlIHFlbXVfc3RydG8qKCkgaW5zdGVhZC4NCj4gDQo+IEluIHRo
-ZSBjYXNlIG9mIC0tcGFydGl0aW9uLCBzaW5jZSB3ZSBpbnNpc3Qgb24gYSB1c2VyLXN1cHBsaWVk
-DQo+IHBhcnRpdGlvbiB0byBiZSBub24temVybywgd2UgY2FuIHVzZSAwIHJhdGhlciB0aGFuIC0x
-IGZvciBvdXINCj4gaW5pdGlhbCB2YWx1ZSB0byBkaXN0aW5ndWlzaCB3aGVuIGEgcGFydGl0aW9u
-IGlzIG5vdCBiZWluZw0KPiBzZXJ2ZWQsIGZvciBzbGlnaHRseSBtb3JlIG9wdGltYWwgY29kZS4N
-Cj4gDQo+IFRoZSBlcnJvciBtZXNzYWdlcyBmb3Igb3V0LW9mLWJvdW5kcyB2YWx1ZXMgYXJlIGxl
-c3Mgc3BlY2lmaWMsDQo+IGJ1dCBzaG91bGQgbm90IGJlIGEgdGVycmlibGUgbG9zcyBpbiBxdWFs
-aXR5Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+
-DQo+IE1lc3NhZ2UtSWQ6IDwyMDE4MTIxNTEzNTMyNC4xNTI2MjktOC1lYmxha2VAcmVkaGF0LmNv
-bT4NCj4gDQo+IC0tLQ0KPiB2MzogcmViYXNlIHRvIHVzZSBpbnQ2NF90IHJhdGhlciB0aGFuIG9m
-Zl90IFtWbGFkaW1pcl0NCj4gLS0tDQo+ICAgcWVtdS1uYmQuYyB8IDI4ICsrKysrKysrKy0tLS0t
-LS0tLS0tLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAxOSBk
-ZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9xZW11LW5iZC5jIGIvcWVtdS1uYmQuYw0K
-PiBpbmRleCA5NmMwODI5OTcwYy4uNDY3MGI2NTkxNjcgMTAwNjQ0DQo+IC0tLSBhL3FlbXUtbmJk
-LmMNCj4gKysrIGIvcWVtdS1uYmQuYw0KPiBAQCAtNTQ2LDkgKzU0Niw4IEBAIGludCBtYWluKGlu
-dCBhcmdjLCBjaGFyICoqYXJndikNCj4gICAgICAgfTsNCj4gICAgICAgaW50IGNoOw0KPiAgICAg
-ICBpbnQgb3B0X2luZCA9IDA7DQo+IC0gICAgY2hhciAqZW5kOw0KPiAgICAgICBpbnQgZmxhZ3Mg
-PSBCRFJWX09fUkRXUjsNCj4gLSAgICBpbnQgcGFydGl0aW9uID0gLTE7DQo+ICsgICAgaW50IHBh
-cnRpdGlvbiA9IDA7DQo+ICAgICAgIGludCByZXQgPSAwOw0KPiAgICAgICBib29sIHNlZW5fY2Fj
-aGUgPSBmYWxzZTsNCj4gICAgICAgYm9vbCBzZWVuX2Rpc2NhcmQgPSBmYWxzZTsNCj4gQEAgLTY2
-MCw5ICs2NTksOCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQo+ICAgICAgICAg
-ICAgICAgcG9ydCA9IG9wdGFyZzsNCj4gICAgICAgICAgICAgICBicmVhazsNCj4gICAgICAgICAg
-IGNhc2UgJ28nOg0KPiAtICAgICAgICAgICAgICAgIGRldl9vZmZzZXQgPSBzdHJ0b2xsIChvcHRh
-cmcsICZlbmQsIDApOw0KPiAtICAgICAgICAgICAgaWYgKCplbmQpIHsNCj4gLSAgICAgICAgICAg
-ICAgICBlcnJvcl9yZXBvcnQoIkludmFsaWQgb2Zmc2V0IGAlcyciLCBvcHRhcmcpOw0KPiArICAg
-ICAgICAgICAgaWYgKHFlbXVfc3RydG91NjQob3B0YXJnLCBOVUxMLCAwLCAmZGV2X29mZnNldCkg
-PCAwKSB7DQo+ICsgICAgICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJJbnZhbGlkIG9mZnNldCAn
-JXMnIiwgb3B0YXJnKTsNCj4gICAgICAgICAgICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0K
-PiAgICAgICAgICAgICAgIH0NCj4gICAgICAgICAgICAgICBicmVhazsNCj4gQEAgLTY4NCwxMyAr
-NjgyLDkgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPiAgICAgICAgICAgICAg
-IGZsYWdzICY9IH5CRFJWX09fUkRXUjsNCj4gICAgICAgICAgICAgICBicmVhazsNCj4gICAgICAg
-ICAgIGNhc2UgJ1AnOg0KPiAtICAgICAgICAgICAgcGFydGl0aW9uID0gc3RydG9sKG9wdGFyZywg
-JmVuZCwgMCk7DQo+IC0gICAgICAgICAgICBpZiAoKmVuZCkgew0KPiAtICAgICAgICAgICAgICAg
-IGVycm9yX3JlcG9ydCgiSW52YWxpZCBwYXJ0aXRpb24gYCVzJyIsIG9wdGFyZyk7DQo+IC0gICAg
-ICAgICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPiAtICAgICAgICAgICAgfQ0KPiAtICAg
-ICAgICAgICAgaWYgKHBhcnRpdGlvbiA8IDEgfHwgcGFydGl0aW9uID4gOCkgew0KPiAtICAgICAg
-ICAgICAgICAgIGVycm9yX3JlcG9ydCgiSW52YWxpZCBwYXJ0aXRpb24gJWQiLCBwYXJ0aXRpb24p
-Ow0KPiArICAgICAgICAgICAgaWYgKHFlbXVfc3RydG9pKG9wdGFyZywgTlVMTCwgMCwgJnBhcnRp
-dGlvbikgPCAwIHx8DQoNCndlIGNhbiB1c2UgdW5zaWduZWQgY29udmVyc2lvbiBsaWtlIGZvciBv
-ZmZzZXQgKGFuZCB1bnNpZ25lZCB0eXBlIGZvciBwYXJ0aXRpb24pLCBidXQgdGhpcyBkb2Vzbid0
-IHJlYWxseSBtYXR0ZXIuDQoNCj4gKyAgICAgICAgICAgICAgICBwYXJ0aXRpb24gPCAxIHx8IHBh
-cnRpdGlvbiA+IDgpIHsNCj4gKyAgICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkludmFsaWQg
-cGFydGl0aW9uICclcyciLCBvcHRhcmcpOw0KPiAgICAgICAgICAgICAgICAgICBleGl0KEVYSVRf
-RkFJTFVSRSk7DQo+ICAgICAgICAgICAgICAgfQ0KPiAgICAgICAgICAgICAgIGJyZWFrOw0KPiBA
-QCAtNzExLDE1ICs3MDUsMTEgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPiAg
-ICAgICAgICAgICAgIGRldmljZSA9IG9wdGFyZzsNCj4gICAgICAgICAgICAgICBicmVhazsNCj4g
-ICAgICAgICAgIGNhc2UgJ2UnOg0KPiAtICAgICAgICAgICAgc2hhcmVkID0gc3RydG9sKG9wdGFy
-ZywgJmVuZCwgMCk7DQo+IC0gICAgICAgICAgICBpZiAoKmVuZCkgew0KPiArICAgICAgICAgICAg
-aWYgKHFlbXVfc3RydG9pKG9wdGFyZywgTlVMTCwgMCwgJnNoYXJlZCkgPCAwIHx8DQoNCmFuZCBo
-ZXJlDQoNCj4gKyAgICAgICAgICAgICAgICBzaGFyZWQgPCAxKSB7DQo+ICAgICAgICAgICAgICAg
-ICAgIGVycm9yX3JlcG9ydCgiSW52YWxpZCBzaGFyZWQgZGV2aWNlIG51bWJlciAnJXMnIiwgb3B0
-YXJnKTsNCj4gICAgICAgICAgICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPiAgICAgICAg
-ICAgICAgIH0NCj4gLSAgICAgICAgICAgIGlmIChzaGFyZWQgPCAxKSB7DQo+IC0gICAgICAgICAg
-ICAgICAgZXJyb3JfcmVwb3J0KCJTaGFyZWQgZGV2aWNlIG51bWJlciBtdXN0IGJlIGdyZWF0ZXIg
-dGhhbiAwIik7DQo+IC0gICAgICAgICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPiAtICAg
-ICAgICAgICAgfQ0KPiAgICAgICAgICAgICAgIGJyZWFrOw0KPiAgICAgICAgICAgY2FzZSAnZic6
-DQo+ICAgICAgICAgICAgICAgZm10ID0gb3B0YXJnOw0KPiBAQCAtMTAwNyw3ICs5OTcsNyBAQCBp
-bnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQo+ICAgICAgIH0NCj4gICAgICAgZmRfc2l6
-ZSAtPSBkZXZfb2Zmc2V0Ow0KPiANCj4gLSAgICBpZiAocGFydGl0aW9uICE9IC0xKSB7DQo+ICsg
-ICAgaWYgKHBhcnRpdGlvbikgew0KPiAgICAgICAgICAgaW50NjRfdCBsaW1pdDsNCj4gDQo+ICAg
-ICAgICAgICBpZiAoZGV2X29mZnNldCkgew0KPiANCg0KYW55d2F5LA0KUmV2aWV3ZWQtYnk6IFZs
-YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0K
-LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Tue, Jan 15, 2019 at 01:38:02PM +0800, Peter Xu wrote:
+> On Mon, Jan 14, 2019 at 08:35:11PM -0500, Michael S. Tsirkin wrote:
+> > The following changes since commit 89bd861c2b470e3fb45596945509079c72af3ac2:
+> > 
+> >   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2019-01-14 17:35:00 +0000)
+> > 
+> > are available in the Git repository at:
+> > 
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> > 
+> > for you to fetch changes up to b421506a3ac2f1b2a4f18d6f423a92dfa16e2645:
+> > 
+> >   acpi: update expected files (2019-01-14 19:31:05 -0500)
+> > 
+> > ----------------------------------------------------------------
+> > pci, pc, virtio: fixes, features
+> > 
+> > tpm physical presence interface
+> > rsc support in virtio net
+> > ivshmem is removed
+> > misc cleanups and fixes all over the place
+> 
+> Hi, Michael,
+> 
+> Do you want to review/queue some VT-d patches that I posted recently?
+> 
+> [PATCH 0/5] intel_iommu: misc fixes for error exposed after error_report_once()
+> (https://patchwork.kernel.org/cover/10751913/, patch 5 dropped though)
+> 
+> They fix some bugs that were recently exposed.  Currently only the
+> first two patches got acked-by from Jason.
+> 
+> They don't worth to block the pull but IMHO they fix real problems so
+> just to make sure they won't fall through the cracks.
+> 
+> Thanks!
+> 
+> -- 
+> Peter Xu
+
+Assuming you have arrived at a consensus with Alex, pls
+post a series that either doesn't affect vfio or
+has his ack.
+
+Thanks!
+
+-- 
+MST
