@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37438)
+Received: from eggs.gnu.org ([209.51.188.92]:38756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjWbr-00035d-OC
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:51:00 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gjWcZ-0003Ux-99
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:51:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjWbq-00044k-SQ
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:50:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gjWbq-00041N-J1
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:50:58 -0500
-References: <20190115100058.44712-1-sgarzare@redhat.com>
-	<20190115100058.44712-5-sgarzare@redhat.com>
-	<20190115135548-mutt-send-email-mst@kernel.org>
-	<3db58f6f-44fc-da64-2cfb-41404a9b2319@redhat.com>
-	<20190115150238-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bb11afcb-ea7a-d553-0e9d-051cf71e6b93@redhat.com>
-Date: Tue, 15 Jan 2019 22:50:40 +0100
+	(envelope-from <alistair23@gmail.com>) id 1gjWcY-0004nJ-5l
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:51:43 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:43224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1gjWcX-0004hr-RK
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:51:42 -0500
+Received: by mail-lj1-f193.google.com with SMTP id q2-v6so3673664lji.10
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 13:51:33 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190115150238-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/i386/pc: use PVH option rom
+References: <20190115143650.15725-1-jusual@mail.ru>
+In-Reply-To: <20190115143650.15725-1-jusual@mail.ru>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 15 Jan 2019 13:51:05 -0800
+Message-ID: <CAKmqyKOyfP=ZT-diiFFfAieYKt98DPSxf0HyVdwYE4g+jv5w0w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix PC overwriting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Maran Wilson <maran.wilson@oracle.com>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>
 
-On 15/01/19 21:05, Michael S. Tsirkin wrote:
-> On Tue, Jan 15, 2019 at 01:12:21PM -0600, Eric Blake wrote:
->> On 1/15/19 12:57 PM, Michael S. Tsirkin wrote:
->>> On Tue, Jan 15, 2019 at 11:00:58AM +0100, Stefano Garzarella wrote:
->>>> Use pvh.bin option rom when we are booting an uncompressed
->>>> kernel using the x86/HVM direct boot ABI.
->>>>
->>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->>>> Based-on: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
->>>
->>> I don't think this is a great way to give attribution.
->>> Can you pls include the author name and the S.O.B from there as well?
+On Tue, Jan 15, 2019 at 7:04 AM Julia Suvorova via Qemu-devel
+<qemu-devel@nongnu.org> wrote:
 >
-> Good to know.
-> But I still think listing the original author (e.g. Based on patches by
-> Foo Bar) or such is the nice thing to do.
+> If the memory is set using a file, and PC is specified on the command
+> line, it will be overwritten with the value 'entry'. This is not only
+> illogical, but also incorrect, because the load_ * functions do not take
+> into account the specifics of the ARM-M PC.
 
-It's not based on patches from another author, the work is entirely
-Stefano's.  It must be applied on top of those patches.
+How does this come up?
+I see that the value of entry will force overwrite the PC addr, but
+doesn't force_raw fix that? Is there a common use case of loading an
+ELF/uimage but having to manually specify a start address?
 
-Paolo
+Alistair
+
+>
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> ---
+>  hw/core/generic-loader.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+> index fbae05fb3b..fc81fd8e14 100644
+> --- a/hw/core/generic-loader.c
+> +++ b/hw/core/generic-loader.c
+> @@ -152,7 +152,7 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
+>          if (size < 0 || s->force_raw) {
+>              /* Default to the maximum size being the machine's ram size */
+>              size = load_image_targphys_as(s->file, s->addr, ram_size, as);
+> -        } else {
+> +        } else if (!s->addr) {
+>              s->addr = entry;
+>          }
+>
+> --
+> 2.17.1
+>
+>
