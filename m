@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51517)
+Received: from eggs.gnu.org ([209.51.188.92]:36654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=910900a2a=Alistair.Francis@wdc.com>)
-	id 1gjC8I-0004H6-Mc
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 18:59:07 -0500
+	(envelope-from <mst@redhat.com>) id 1gjDjJ-0007cx-7S
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=910900a2a=Alistair.Francis@wdc.com>)
-	id 1gjC8H-0001Cc-Cx
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 18:59:06 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Mon, 14 Jan 2019 23:59:00 +0000
-Message-ID: <f7184f107ba99dab6b85da6916fc09663ffd3e21.1547510220.git.alistair.francis@wdc.com>
-References: <cover.1547510220.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1547510220.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mst@redhat.com>) id 1gjDfo-0000bQ-DU
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:37:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDfo-0000ZM-7T
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:37:48 -0500
+Date: Mon, 14 Jan 2019 20:37:43 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190115003812.11329-45-mst@redhat.com>
+References: <20190115003812.11329-1-mst@redhat.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 8/8] RISC-V: Add misa runtime write support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190115003812.11329-1-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 44/44] acpi: update expected files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,172 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Michael Clark <mjc@sifive.com>
+Update expected files affected by:
+hw: acpi: Fix memory hotplug AML generation error
 
-This patch adds support for writing misa. misa is validated based
-on rules in the ISA specification. 'E' is mutually exclusive with
-all other extensions. 'D' depends on 'F' so 'D' bit is dropped
-if 'F' is not present. A conservative approach to consistency is
-taken by flushing the translation cache on misa writes. misa_mask
-is added to the CPU struct to store the original set of extensions.
-
-Cc: Palmer Dabbelt <palmer@sifive.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- target/riscv/cpu.c      |  2 +-
- target/riscv/cpu.h      |  4 ++-
- target/riscv/cpu_bits.h | 11 +++++++++
- target/riscv/csr.c      | 54 ++++++++++++++++++++++++++++++++++++++++-
- 4 files changed, 68 insertions(+), 3 deletions(-)
+ tests/data/acpi/pc/DSDT.dimmpxm  | Bin 6790 -> 6784 bytes
+ tests/data/acpi/pc/DSDT.memhp    | Bin 6496 -> 6490 bytes
+ tests/data/acpi/q35/DSDT.dimmpxm | Bin 9474 -> 9468 bytes
+ tests/data/acpi/q35/DSDT.memhp   | Bin 9180 -> 9174 bytes
+ tests/data/acpi/q35/DSDT.mmio64  | Bin 8947 -> 8945 bytes
+ 5 files changed, 0 insertions(+), 0 deletions(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 28d7e5302f..cc3ddc0ae4 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -88,7 +88,7 @@ typedef struct RISCVCPUInfo {
-=20
- static void set_misa(CPURISCVState *env, target_ulong misa)
- {
--    env->misa =3D misa;
-+    env->misa_mask =3D env->misa =3D misa;
- }
-=20
- static void set_versions(CPURISCVState *env, int user_ver, int priv_ver)
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index a97435bd7b..5c2aebf132 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -86,7 +86,8 @@
-    so a cpu features bitfield is required, likewise for optional PMP suppo=
-rt */
- enum {
-     RISCV_FEATURE_MMU,
--    RISCV_FEATURE_PMP
-+    RISCV_FEATURE_PMP,
-+    RISCV_FEATURE_MISA
- };
-=20
- #define USER_VERSION_2_02_0 0x00020200
-@@ -118,6 +119,7 @@ struct CPURISCVState {
-     target_ulong user_ver;
-     target_ulong priv_ver;
-     target_ulong misa;
-+    target_ulong misa_mask;
-=20
-     uint32_t features;
-=20
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 5439f4719e..7afcb2468d 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -311,10 +311,21 @@
- #define MSTATUS32_SD        0x80000000
- #define MSTATUS64_SD        0x8000000000000000ULL
-=20
-+#define MISA32_MXL          0xC0000000
-+#define MISA64_MXL          0xC000000000000000ULL
-+
-+#define MXL_RV32            1
-+#define MXL_RV64            2
-+#define MXL_RV128           3
-+
- #if defined(TARGET_RISCV32)
- #define MSTATUS_SD MSTATUS32_SD
-+#define MISA_MXL MISA32_MXL
-+#define MXL_VAL MXL_RV32
- #elif defined(TARGET_RISCV64)
- #define MSTATUS_SD MSTATUS64_SD
-+#define MISA_MXL MISA64_MXL
-+#define MXL_VAL MXL_RV64
- #endif
-=20
- /* sstatus CSR bits */
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index e2bd374f09..e72fcf1265 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -332,6 +332,58 @@ static int read_misa(CPURISCVState *env, int csrno, ta=
-rget_ulong *val)
-     return 0;
- }
-=20
-+static int write_misa(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    if (!riscv_feature(env, RISCV_FEATURE_MISA)) {
-+        /* drop write to misa */
-+        return 0;
-+    }
-+
-+    /* 'I' or 'E' must be present */
-+    if (!(val & (RVI | RVE))) {
-+        /* It is not, drop write to misa */
-+        return 0;
-+    }
-+
-+    /* 'E' excludes all other extensions */
-+    if (val & RVE) {
-+        /* when we support 'E' we can do "val =3D RVE;" however
-+         * for now we just drop writes if 'E' is present.
-+         */
-+        return 0;
-+    }
-+
-+    /* Mask extensions that are not supported by this hart */
-+    val &=3D env->misa_mask;
-+
-+    /* Mask extensions that are not supported by QEMU */
-+    val &=3D (RVI | RVE | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
-+
-+    /* 'D' depends on 'F', so clear 'D' if 'F' is not present */
-+    if ((val & RVD) && !(val & RVF)) {
-+        val &=3D ~RVD;
-+    }
-+
-+    /* Suppress 'C' if next instruction is not aligned
-+     * TODO: this should check next_pc
-+     */
-+    if ((val & RVC) && (GETPC() & ~3) !=3D 0) {
-+        val &=3D ~RVC;
-+    }
-+
-+    /* misa.MXL writes are not supported by QEMU */
-+    val =3D (env->misa & MISA_MXL) | (val & ~MISA_MXL);
-+
-+    /* flush translation cache */
-+    if (val !=3D env->misa) {
-+        tb_flush(CPU(riscv_env_get_cpu(env)));
-+    }
-+
-+    env->misa =3D val;
-+
-+    return 0;
-+}
-+
- static int read_medeleg(CPURISCVState *env, int csrno, target_ulong *val)
- {
-     *val =3D env->medeleg;
-@@ -810,7 +862,7 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] =3D=
- {
-=20
-     /* Machine Trap Setup */
-     [CSR_MSTATUS] =3D             { any,  read_mstatus,     write_mstatus =
-    },
--    [CSR_MISA] =3D                { any,  read_misa                       =
-    },
-+    [CSR_MISA] =3D                { any,  read_misa,        write_misa    =
-    },
-     [CSR_MIDELEG] =3D             { any,  read_mideleg,     write_mideleg =
-    },
-     [CSR_MEDELEG] =3D             { any,  read_medeleg,     write_medeleg =
-    },
-     [CSR_MIE] =3D                 { any,  read_mie,         write_mie     =
-    },
---=20
-2.19.1
+diff --git a/tests/data/acpi/pc/DSDT.dimmpxm b/tests/data/acpi/pc/DSDT.dimmpxm
+index f6ec911b1180a409e61ef8d50279ab6dba7f1bdd..ad2800de672534dc87012f03e27b19671a330083 100644
+GIT binary patch
+delta 159
+zcmZoOZ7}6>33dr-kYZq96xzsD#lz#{6QdU&>=f_o5#T&|qL9euB|H|)jJ}ia@_VZY
+z#`_0{F#7_D_)t%mjLa+%{&-g}14dsU0TzjF@}2A_K%~O`0^Sn1Ox&y@n8XPH@s=#v
+
+delta 151
+zcmZoLZ8PO^33dr-lVV_CG~CEl#lz&}ySa@gjG57Y@?Cy!HKBO_;1K2|zCbcQ)YBy+
+nGfPAu-qp*1afvUG1Pets`A_x{AX@2e0dFbXrf!xKOyUFp_>(Mp
+
+diff --git a/tests/data/acpi/pc/DSDT.memhp b/tests/data/acpi/pc/DSDT.memhp
+index e31ef502968b14e2146cb1a1328dc0ce555b1d7f..9e75ac96e15730f245ff6730bd28127ad827119a 100644
+GIT binary patch
+delta 159
+zcmaE0bjyg#CD<h-N|J$raq&j33~nADpBTOPV5fLrj{xV%8w5o*PvW*<X7rtWn$KHB
+zFy22ngxMEJ#D{viWMpQE@W;D)88G?+39v|Xlka33ej*jF<@c7rW#VQb0Y6Rvf}Aah
+
+delta 151
+zcmca*^uUPACD<h-L6U)i@z6%D3~nYT-_0f5Va$yFlTY(`s|m&X2Zt~(@dc9cp`I=o
+nnOPzN@vdG5j7xlhBv>fA$$zpHKha88@_S3+Hgz+PfFCCSaaJu1
+
+diff --git a/tests/data/acpi/q35/DSDT.dimmpxm b/tests/data/acpi/q35/DSDT.dimmpxm
+index 3837792dec13c4c77c66b140f68959d86a09de8e..7177116a21969fa3649053ec83a8704b0d84b9c5 100644
+GIT binary patch
+delta 145
+zcmZqj`s2yv66_N4M}>ib@$g126FDXypUn<(Va$xalcy_ss|d#X2Zu2G0*UxgPnV3$
+lED`>AS1$ubUmyV%iEi?p%%Mc2!b&A?30x*_zNe(Z1ON^VDcS%4
+
+delta 151
+zcmez4+2qCL66_Mfq{_g+_;4eai5!!Y?`8+NFlI*o$<r0R)r8{xgF~2?_yWoJP*0bP
+n%q$Uscvmk2#wET$5-b$m<Ug5BiD;#zO5ReqP2GG$Nredj57R8v
+
+diff --git a/tests/data/acpi/q35/DSDT.memhp b/tests/data/acpi/q35/DSDT.memhp
+index 8fba0baf79de0239f2630035afeee78f3e7f43c2..0235461391c90d577c3d533c2fd29ce50f1e2981 100644
+GIT binary patch
+delta 145
+zcmccPe$AcBCD<k8nlb|eW6?$~C0QmPpUrx*Va$xalUo(MRRrVxgF~2ofkb?$r%Og=
+kmI!~mtCs<zFOUF>L^t_P{zk0AbVY9oTqbTlqbR@x01+4}3IG5A
+
+delta 151
+zcmccSe#f25CD<k8jxqxS<HU_zO0rB&zMJ)A!<ZTUC$}nis|m&X2Zt~(@dc9cp`I=o
+mnOPzN@vdG5j7xlhBv>fA$$#<};*};VdQ0Ipb@MSr0VV*TS}p_t
+
+diff --git a/tests/data/acpi/q35/DSDT.mmio64 b/tests/data/acpi/q35/DSDT.mmio64
+index a058ff2ee31a22a55b5b198bc1531c7f20b243f6..f60ee77fb4d655e77c7ef1e8c205d741cc288939 100644
+GIT binary patch
+delta 62
+zcmezD`q7okCD<k8qY?uHquxd?C0Rzd&APH-%#6O1TNJz{1mpdKLzsPmM0}{HOGajv
+Q2!Fh*mjUDEmkL}=0723bn*aa+
+
+delta 64
+zcmez9`q`DsCD<k8vl0UX<GqbsO0tX|n{{Qwm>K;iw<vf^3B~&dhcGYk1(NZho-P@g
+TSt0`Qu3iR=OEy1O;9>#*lp+(G
+
+-- 
+MST
