@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57696)
+Received: from eggs.gnu.org ([209.51.188.92]:57706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjQkJ-0008VG-MQ
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjQkK-0008Vt-AJ
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjQkI-0007ED-Rm
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:19 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjQkJ-0007EL-6t
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:20 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 15 Jan 2019 15:35:07 +0000
+Message-ID: <cca07ea7-4778-1469-fd36-b6f4f7691476@virtuozzo.com>
 References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-7-eblake@redhat.com>
-	<04ba8330-ac60-4f7a-2f99-64d0290e1c19@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5fa84914-aada-36c2-b647-85b887d51cc4@redhat.com>
-Date: Tue, 15 Jan 2019 09:35:14 -0600
+	<20190112175812.27068-15-eblake@redhat.com>
+In-Reply-To: <20190112175812.27068-15-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C1B1F43CF25B584E9449321E81675233@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <04ba8330-ac60-4f7a-2f99-64d0290e1c19@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IvWFGIEAb7SqljHJ2Tr9fiItoTDEI4dmr"
-Subject: Re: [Qemu-devel] [PATCH v3 06/19] qemu-nbd: Avoid strtol open-coding
+Subject: Re: [Qemu-devel] [PATCH v3 14/19] nbd/client: Pull out oldstyle
+ size determination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IvWFGIEAb7SqljHJ2Tr9fiItoTDEI4dmr
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
- <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Message-ID: <5fa84914-aada-36c2-b647-85b887d51cc4@redhat.com>
-Subject: Re: [PATCH v3 06/19] qemu-nbd: Avoid strtol open-coding
-References: <20190112175812.27068-1-eblake@redhat.com>
- <20190112175812.27068-7-eblake@redhat.com>
- <04ba8330-ac60-4f7a-2f99-64d0290e1c19@virtuozzo.com>
-In-Reply-To: <04ba8330-ac60-4f7a-2f99-64d0290e1c19@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/15/19 6:31 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 12.01.2019 20:57, Eric Blake wrote:
->> Our copy-and-pasted open-coding of strtol handling forgot to
->> handle overflow conditions.  Use qemu_strto*() instead.
->>
->> In the case of --partition, since we insist on a user-supplied
->> partition to be non-zero, we can use 0 rather than -1 for our
->> initial value to distinguish when a partition is not being
->> served, for slightly more optimal code.
->>
->> The error messages for out-of-bounds values are less specific,
->> but should not be a terrible loss in quality.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> Message-Id: <20181215135324.152629-8-eblake@redhat.com>
->>
-
->> -            if (partition < 1 || partition > 8) {
->> -                error_report("Invalid partition %d", partition);
->> +            if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
->=20
-> we can use unsigned conversion like for offset (and unsigned type for p=
-artition), but this doesn't really matter.
-
-Yes, but I didn't see the point in changing the variable types in this
-patch.
-
->=20
-> anyway,
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---IvWFGIEAb7SqljHJ2Tr9fiItoTDEI4dmr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw9/bIACgkQp6FrSiUn
-Q2qSQAf+JPtxxe7RNB4WHLywudGJ3p006U6e32p03iqHARE7Jq/8R/YOlKyz/ODe
-NMjQ+5DfkFLSsmWpfBN+cxPTIs8pTjNBY7xlS7U9Jt1sroI7IY/42xWtb8Lht8WB
-weaYNwMBnDrPcwjGgbMVAJ3UUVa5tY41jyqs7Snhp8pZjvLo4bUaH0ezvzGXftrj
-hxnHdQNhG+9ebKX3p44Q8AZ/UO3CX+7FzM9ylmXkwkpPRSUYIz+qdDClOVuHrx8B
-lFoqtFUlt86/YZNQrBkR2Q158w8B7tbHNhQxi/IXnOcLpSt9jnnMQXEB4+W+DW/a
-UypxXaHWaUwtcfkAYcwDUbzFCc9F7Q==
-=5Zzn
------END PGP SIGNATURE-----
-
---IvWFGIEAb7SqljHJ2Tr9fiItoTDEI4dmr--
+MTIuMDEuMjAxOSAyMDo1OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gQW5vdGhlciByZWZhY3Rvcmlu
+ZyBjcmVhdGluZyBuYmRfbmVnb3RpYXRlX2ZpbmlzaF9vbGRzdHlsZSgpDQo+IGZvciBmdXJ0aGVy
+IHJldXNlIGR1cmluZyAncWVtdS1uYmQgLS1saXN0Jy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVy
+aWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiBNZXNzYWdlLUlkOiA8MjAxODEyMTUxMzUz
+MjQuMTUyNjI5LTE4LWVibGFrZUByZWRoYXQuY29tPg0KPiBSZXZpZXdlZC1ieTogUmljaGFyZCBX
+Lk0uIEpvbmVzIDxyam9uZXNAcmVkaGF0LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNl
+bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KSG1tLCBsb29r
+aW5nIGF0IHRoaXMsIEkgZm91bmQgdGhhdCBuYmRfc3RhcnRfbmVnb3RpYXRlKCkgaGFzIHZlcnkg
+dW51c3VhbCBzZW1hbnRpY3MNCmZvciBAemVyb2VzIGZpZWxkLCB3aXRob3V0IGFueSBjb21tZW50
+IGFib3V0IGl0Og0KDQpJdCBtdXN0IGJlIHNldCB0byB0cnVlIGJlZm9yZSBjYWxsaW5nLCBhbmQg
+bmJkX3N0YXJ0X25lZ290aWF0ZSBtYXkgc2V0IGl0IHRvIHRydWUuDQoNCkkgdGhpbmsgYmV0dGVy
+IGlzIG5vdCB0byByZWx5IG9uIGNhbGxlciBpbml0aWFsaXphdGlvbiBhbmQgc2V0IHplcm9lcyB0
+byB0cnVlIGF0IHRoZQ0KYmVnaW5uaW5nIG9mIG5iZF9zdGFydF9uZWdvdGlhdGUoKS4NCg0KPiAt
+LS0NCj4gICBuYmQvY2xpZW50LmMgfCA0OSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+Ky0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDMyIGluc2VydGlvbnMoKyks
+IDE3IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL25iZC9jbGllbnQuYyBiL25iZC9j
+bGllbnQuYw0KPiBpbmRleCA1MDUzNDMzZWE1ZS4uNjIwZmJiNWVmMDEgMTAwNjQ0DQo+IC0tLSBh
+L25iZC9jbGllbnQuYw0KPiArKysgYi9uYmQvY2xpZW50LmMNCj4gQEAgLTgxOCw3ICs4MTgsNyBA
+QCBzdGF0aWMgaW50IG5iZF9uZWdvdGlhdGVfc2ltcGxlX21ldGFfY29udGV4dChRSU9DaGFubmVs
+ICppb2MsDQo+ICAgICogU3RhcnQgdGhlIGhhbmRzaGFrZSB0byB0aGUgc2VydmVyLiAgQWZ0ZXIg
+YSBwb3NpdGl2ZSByZXR1cm4sIHRoZSBzZXJ2ZXINCj4gICAgKiBpcyByZWFkeSB0byBhY2NlcHQg
+YWRkaXRpb25hbCBOQkRfT1BUIHJlcXVlc3RzLg0KPiAgICAqIFJldHVybnM6IG5lZ2F0aXZlIGVy
+cm5vOiBmYWlsdXJlIHRhbGtpbmcgdG8gc2VydmVyDQo+IC0gKiAgICAgICAgICAwOiBzZXJ2ZXIg
+aXMgb2xkc3R5bGUsIGNsaWVudCBtdXN0IHN0aWxsIHBhcnNlIGV4cG9ydCBzaXplDQo+ICsgKiAg
+ICAgICAgICAwOiBzZXJ2ZXIgaXMgb2xkc3R5bGUsIG11c3QgY2FsbCBuYmRfbmVnb3RpYXRlX2Zp
+bmlzaF9vbGRzdHlsZQ0KPiAgICAqICAgICAgICAgIDE6IHNlcnZlciBpcyBuZXdzdHlsZSwgYnV0
+IGNhbiBvbmx5IGFjY2VwdCBFWFBPUlRfTkFNRQ0KPiAgICAqICAgICAgICAgIDI6IHNlcnZlciBp
+cyBuZXdzdHlsZSwgYnV0IGxhY2tzIHN0cnVjdHVyZWQgcmVwbGllcw0KPiAgICAqICAgICAgICAg
+IDM6IHNlcnZlciBpcyBuZXdzdHlsZSBhbmQgc2V0IHVwIGZvciBzdHJ1Y3R1cmVkIHJlcGxpZXMN
+Cj4gQEAgLTkyMyw2ICs5MjMsMzYgQEAgc3RhdGljIGludCBuYmRfc3RhcnRfbmVnb3RpYXRlKFFJ
+T0NoYW5uZWwgKmlvYywgUUNyeXB0b1RMU0NyZWRzICp0bHNjcmVkcywNCj4gICAgICAgfQ0KPiAg
+IH0NCj4gDQo+ICsvKg0KPiArICogbmJkX25lZ290aWF0ZV9maW5pc2hfb2xkc3R5bGU6DQo+ICsg
+KiBQb3B1bGF0ZSBAaW5mbyB3aXRoIHRoZSBzaXplIGFuZCBleHBvcnQgZmxhZ3MgZnJvbSBhbiBv
+bGRzdHlsZSBzZXJ2ZXIsDQo+ICsgKiBidXQgZG9lcyBub3QgY29uc3VtZSAxMjQgYnl0ZXMgb2Yg
+cmVzZXJ2ZWQgemVybyBwYWRkaW5nLg0KPiArICogUmV0dXJucyAwIG9uIHN1Y2Nlc3MsIC0xIHdp
+dGggQGVycnAgc2V0IG9uIGZhaWx1cmUNCj4gKyAqLw0KPiArc3RhdGljIGludCBuYmRfbmVnb3Rp
+YXRlX2ZpbmlzaF9vbGRzdHlsZShRSU9DaGFubmVsICppb2MsIE5CREV4cG9ydEluZm8gKmluZm8s
+DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJy
+cCkNCj4gK3sNCj4gKyAgICB1aW50MzJfdCBvbGRmbGFnczsNCj4gKw0KPiArICAgIGlmIChuYmRf
+cmVhZChpb2MsICZpbmZvLT5zaXplLCBzaXplb2YoaW5mby0+c2l6ZSksIGVycnApIDwgMCkgew0K
+PiArICAgICAgICBlcnJvcl9wcmVwZW5kKGVycnAsICJGYWlsZWQgdG8gcmVhZCBleHBvcnQgbGVu
+Z3RoOiAiKTsNCj4gKyAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+ICsgICAgfQ0KPiArICAgIGlu
+Zm8tPnNpemUgPSBiZTY0X3RvX2NwdShpbmZvLT5zaXplKTsNCj4gKw0KPiArICAgIGlmIChuYmRf
+cmVhZChpb2MsICZvbGRmbGFncywgc2l6ZW9mKG9sZGZsYWdzKSwgZXJycCkgPCAwKSB7DQo+ICsg
+ICAgICAgIGVycm9yX3ByZXBlbmQoZXJycCwgIkZhaWxlZCB0byByZWFkIGV4cG9ydCBmbGFnczog
+Iik7DQo+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiArICAgIH0NCj4gKyAgICBvbGRmbGFn
+cyA9IGJlMzJfdG9fY3B1KG9sZGZsYWdzKTsNCj4gKyAgICBpZiAob2xkZmxhZ3MgJiB+MHhmZmZm
+KSB7DQo+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0ZWQgZXhwb3J0IGZsYWdz
+ICUweCIgUFJJeDMyLCBvbGRmbGFncyk7DQo+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiAr
+ICAgIH0NCj4gKyAgICBpbmZvLT5mbGFncyA9IG9sZGZsYWdzOw0KPiArICAgIHJldHVybiAwOw0K
+PiArfQ0KPiArDQo+ICAgLyoNCj4gICAgKiBuYmRfcmVjZWl2ZV9uZWdvdGlhdGU6DQo+ICAgICog
+Q29ubmVjdCB0byBzZXJ2ZXIsIGNvbXBsZXRlIG5lZ290aWF0aW9uLCBhbmQgbW92ZSBpbnRvIHRy
+YW5zbWlzc2lvbiBwaGFzZS4NCj4gQEAgLTkzNiw3ICs5NjYsNiBAQCBpbnQgbmJkX3JlY2VpdmVf
+bmVnb3RpYXRlKFFJT0NoYW5uZWwgKmlvYywgUUNyeXB0b1RMU0NyZWRzICp0bHNjcmVkcywNCj4g
+ICAgICAgaW50IHJlc3VsdDsNCj4gICAgICAgYm9vbCB6ZXJvZXMgPSB0cnVlOw0KPiAgICAgICBi
+b29sIGJhc2VfYWxsb2NhdGlvbiA9IGluZm8tPmJhc2VfYWxsb2NhdGlvbjsNCj4gLSAgICB1aW50
+MzJfdCBvbGRmbGFnczsNCj4gDQo+ICAgICAgIGFzc2VydChpbmZvLT5uYW1lKTsNCj4gICAgICAg
+dHJhY2VfbmJkX3JlY2VpdmVfbmVnb3RpYXRlX25hbWUoaW5mby0+bmFtZSk7DQo+IEBAIC0xMDA5
+LDIzICsxMDM4LDkgQEAgaW50IG5iZF9yZWNlaXZlX25lZ290aWF0ZShRSU9DaGFubmVsICppb2Ms
+IFFDcnlwdG9UTFNDcmVkcyAqdGxzY3JlZHMsDQo+ICAgICAgICAgICAgICAgZXJyb3Jfc2V0Zyhl
+cnJwLCAiU2VydmVyIGRvZXMgbm90IHN1cHBvcnQgbm9uLWVtcHR5IGV4cG9ydCBuYW1lcyIpOw0K
+PiAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiAgICAgICAgICAgfQ0KPiAtDQo+IC0g
+ICAgICAgIGlmIChuYmRfcmVhZChpb2MsICZpbmZvLT5zaXplLCBzaXplb2YoaW5mby0+c2l6ZSks
+IGVycnApIDwgMCkgew0KPiAtICAgICAgICAgICAgZXJyb3JfcHJlcGVuZChlcnJwLCAiRmFpbGVk
+IHRvIHJlYWQgZXhwb3J0IGxlbmd0aDogIik7DQo+ICsgICAgICAgIGlmIChuYmRfbmVnb3RpYXRl
+X2ZpbmlzaF9vbGRzdHlsZShpb2MsIGluZm8sIGVycnApIDwgMCkgew0KPiAgICAgICAgICAgICAg
+IHJldHVybiAtRUlOVkFMOw0KPiAgICAgICAgICAgfQ0KPiAtICAgICAgICBpbmZvLT5zaXplID0g
+YmU2NF90b19jcHUoaW5mby0+c2l6ZSk7DQo+IC0NCj4gLSAgICAgICAgaWYgKG5iZF9yZWFkKGlv
+YywgJm9sZGZsYWdzLCBzaXplb2Yob2xkZmxhZ3MpLCBlcnJwKSA8IDApIHsNCj4gLSAgICAgICAg
+ICAgIGVycm9yX3ByZXBlbmQoZXJycCwgIkZhaWxlZCB0byByZWFkIGV4cG9ydCBmbGFnczogIik7
+DQo+IC0gICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gLSAgICAgICAgfQ0KPiAtICAgICAg
+ICBvbGRmbGFncyA9IGJlMzJfdG9fY3B1KG9sZGZsYWdzKTsNCj4gLSAgICAgICAgaWYgKG9sZGZs
+YWdzICYgfjB4ZmZmZikgew0KPiAtICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVW5leHBl
+Y3RlZCBleHBvcnQgZmxhZ3MgJTB4IiBQUkl4MzIsIG9sZGZsYWdzKTsNCj4gLSAgICAgICAgICAg
+IHJldHVybiAtRUlOVkFMOw0KPiAtICAgICAgICB9DQo+IC0gICAgICAgIGluZm8tPmZsYWdzID0g
+b2xkZmxhZ3M7DQo+ICAgICAgICAgICBicmVhazsNCj4gICAgICAgZGVmYXVsdDoNCj4gICAgICAg
+ICAgIHJldHVybiByZXN1bHQ7DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
+Cg==
