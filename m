@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37255)
+Received: from eggs.gnu.org ([209.51.188.92]:39018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gjNJE-0002Bn-6a
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 06:55:09 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gjNRh-0003rD-JG
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:03:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gjNJB-0004D7-9f
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 06:55:07 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57320
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1gjNJ9-00045c-9w
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 06:55:03 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0FBn2Ri019095
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 06:54:50 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q1dmec6et-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 06:54:50 -0500
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 15 Jan 2019 11:54:48 -0000
-References: <1547470346-18416-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 15 Jan 2019 12:54:44 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gjNRf-0001py-7k
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:03:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40296)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gjNRe-0001ku-LW
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 07:03:50 -0500
+Date: Tue, 15 Jan 2019 13:03:33 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190115130333.1ef1d461.cohuck@redhat.com>
+In-Reply-To: <20190111165801.15181-2-eric.auger@redhat.com>
+References: <20190111165801.15181-1-eric.auger@redhat.com>
+	<20190111165801.15181-2-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1547470346-18416-1-git-send-email-thuth@redhat.com>
-Content-Language: en-US
-Message-Id: <9f0e2e04-4dec-c958-740f-e27268f1b462@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] configure: Only build the
- s390-ccw bios if the compiler supports -march=z900
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio-pci: Introduce
+ vfio_register_event_notifier helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,44 +28,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
 
+On Fri, 11 Jan 2019 17:58:00 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
+> The code used to attach the eventfd handler for the ERR and
+> REQ irq indices can be factorized into a helper. In subsequent
+> patches we will extend this helper to support other irq indices.
 
-On 14.01.2019 13:52, Thomas Huth wrote:
-> We want to build our s390-ccw bios with -march=z900 so that it also
-> works with the oldest s390x CPU that we support with TCG. However,
-> Clang on s390x does not support -march=z900 anymore, so we can not
-> use this compiler to build the s390-ccw bios. Thus add a proper test
-> to the configure script to see whether the compiler is usable.
+Looks like a nice refactoring to me.
+
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> We test the notification is allowed outside of the helper:
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+s/We test/We test whether/
 
+> respectively check vdev->pci_aer and VFIO_FEATURE_ENABLE_REQ.
+> Depending on the returned value we set vdev->pci_aer and
+> vdev->req_enabled. An error handle is introduced for future usage
+> although not strictly useful here.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->  v2: Use compile_prog as suggested by Peter
+>  hw/vfio/pci.c | 291 ++++++++++++++++++++++----------------------------
+>  1 file changed, 127 insertions(+), 164 deletions(-)
 > 
->  configure | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 05b7e85..2b9ba7d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5905,8 +5905,12 @@ if test "$cpu" = "ppc64" -a "$targetos" != "Darwin" ; then
->    roms="$roms spapr-rtas"
->  fi
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index c0cb1ec289..c589a4e666 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -105,6 +105,95 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
+>      vfio_unmask_single_irqindex(vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
+>  }
 >  
-> +# Only build s390-ccw bios if we're on s390x and the compiler has -march=z900
->  if test "$cpu" = "s390x" ; then
-> -  roms="$roms s390-ccw"
-> +  write_c_skeleton
-> +  if compile_prog "-march=z900" ""; then
-> +    roms="$roms s390-ccw"
-> +  fi
->  fi
+> +/*
+> + * vfio_register_event_notifier - setup/tear down eventfd
+> + * notification and handling for IRQ indices that span over
+> + * a single IRQ
+> + *
+> + * @vdev: VFIO device handle
+> + * @index: IRQ index the eventfd/handler is associated to
+
+s/to/with/ ?
+
+> + * @target_state: true means notifier needs to be set up
+> + * @handler to attach if @target_state is true
+> + * @errp error handle
+> + */
+> +static int vfio_register_event_notifier(VFIOPCIDevice *vdev,
+> +                                        int index,
+> +                                        bool target_state,
+> +                                        void (*handler)(void *opaque),
+> +                                        Error **errp)
+
+(...)
+
+> @@ -3069,8 +2998,29 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>          goto out_teardown;
+>      }
 >  
->  # Probe for the need for relocating the user-only binary.
-> 
+> -    vfio_register_err_notifier(vdev);
+> -    vfio_register_req_notifier(vdev);
+> +    if (vdev->pci_aer) {
+> +        /*
+> +         * Registers error notifier for devices supporting error recovery.
+> +         * If we encounter a failure in this function, we report an error
+
+s/in this function/while registering it/ ?
+
+> +         * and continue after disabling error recovery support for the
+> +         * device.
+> +         */
+> +        vdev->pci_aer =
+> +            !vfio_register_event_notifier(vdev, VFIO_PCI_ERR_IRQ_INDEX, true,
+> +                                          vfio_err_notifier_handler, &err);
+> +        if (err) {
+> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+> +        }
+
+I think you need to reset err to NULL if you want to reuse the variable.
+
+Alternatively, you could keep the wrappers and define a local error
+variable there.
+
+> +    }
+> +
+> +    if (vdev->features & VFIO_FEATURE_ENABLE_REQ) {
+> +        vdev->req_enabled =
+> +            !vfio_register_event_notifier(vdev, VFIO_PCI_REQ_IRQ_INDEX, true,
+> +                                          vfio_req_notifier_handler, &err);
+> +        if (err) {
+> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+> +        }
+> +    }
+>      vfio_setup_resetfn_quirk(vdev);
+>  
+>      return;
+> @@ -3106,9 +3056,22 @@ static void vfio_instance_finalize(Object *obj)
+>  static void vfio_exitfn(PCIDevice *pdev)
+>  {
+>      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> +    Error *err = NULL;
+>  
+> -    vfio_unregister_req_notifier(vdev);
+> -    vfio_unregister_err_notifier(vdev);
+> +    if (vdev->req_enabled) {
+> +        vfio_register_event_notifier(vdev, VFIO_PCI_REQ_IRQ_INDEX,
+> +                                     false, NULL, &err);
+> +        if (err) {
+> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+> +        }
+
+Likewise.
+
+> +    }
+> +    if (vdev->pci_aer) {
+> +        vfio_register_event_notifier(vdev, VFIO_PCI_ERR_IRQ_INDEX,
+> +                                     false, NULL, &err);
+> +        if (err) {
+> +            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+> +        }
+> +    }
+>      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+>      vfio_disable_interrupts(vdev);
+>      if (vdev->intx.mmap_timer) {
