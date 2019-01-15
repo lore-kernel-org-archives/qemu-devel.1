@@ -1,23 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57706)
+Received: from eggs.gnu.org ([209.51.188.92]:57817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjQkK-0008Vt-AJ
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:27 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gjQkp-0000Vu-Kh
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjQkJ-0007EL-6t
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:20 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 15 Jan 2019 15:35:07 +0000
-Message-ID: <cca07ea7-4778-1469-fd36-b6f4f7691476@virtuozzo.com>
-References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-15-eblake@redhat.com>
-In-Reply-To: <20190112175812.27068-15-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C1B1F43CF25B584E9449321E81675233@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <walling@linux.ibm.com>) id 1gjQko-0007a8-R7
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:51 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33822)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gjQko-0007Zj-Gi
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:50 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0FFTHMm099836
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:35:48 -0500
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q1h3hvgkc-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:35:48 -0500
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Tue, 15 Jan 2019 15:35:47 -0000
+References: <1547125207-16907-1-git-send-email-pmorel@linux.ibm.com>
+	<1547125207-16907-2-git-send-email-pmorel@linux.ibm.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Tue, 15 Jan 2019 10:35:42 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 14/19] nbd/client: Pull out oldstyle
- size determination
+In-Reply-To: <1547125207-16907-2-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <f6a5491a-1859-8e0a-7357-901d47ee8304@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: Set the iommu region size
+ mpcifc request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +43,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-MTIuMDEuMjAxOSAyMDo1OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gQW5vdGhlciByZWZhY3Rvcmlu
-ZyBjcmVhdGluZyBuYmRfbmVnb3RpYXRlX2ZpbmlzaF9vbGRzdHlsZSgpDQo+IGZvciBmdXJ0aGVy
-IHJldXNlIGR1cmluZyAncWVtdS1uYmQgLS1saXN0Jy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEVy
-aWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiBNZXNzYWdlLUlkOiA8MjAxODEyMTUxMzUz
-MjQuMTUyNjI5LTE4LWVibGFrZUByZWRoYXQuY29tPg0KPiBSZXZpZXdlZC1ieTogUmljaGFyZCBX
-Lk0uIEpvbmVzIDxyam9uZXNAcmVkaGF0LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNl
-bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KSG1tLCBsb29r
-aW5nIGF0IHRoaXMsIEkgZm91bmQgdGhhdCBuYmRfc3RhcnRfbmVnb3RpYXRlKCkgaGFzIHZlcnkg
-dW51c3VhbCBzZW1hbnRpY3MNCmZvciBAemVyb2VzIGZpZWxkLCB3aXRob3V0IGFueSBjb21tZW50
-IGFib3V0IGl0Og0KDQpJdCBtdXN0IGJlIHNldCB0byB0cnVlIGJlZm9yZSBjYWxsaW5nLCBhbmQg
-bmJkX3N0YXJ0X25lZ290aWF0ZSBtYXkgc2V0IGl0IHRvIHRydWUuDQoNCkkgdGhpbmsgYmV0dGVy
-IGlzIG5vdCB0byByZWx5IG9uIGNhbGxlciBpbml0aWFsaXphdGlvbiBhbmQgc2V0IHplcm9lcyB0
-byB0cnVlIGF0IHRoZQ0KYmVnaW5uaW5nIG9mIG5iZF9zdGFydF9uZWdvdGlhdGUoKS4NCg0KPiAt
-LS0NCj4gICBuYmQvY2xpZW50LmMgfCA0OSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-Ky0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDMyIGluc2VydGlvbnMoKyks
-IDE3IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL25iZC9jbGllbnQuYyBiL25iZC9j
-bGllbnQuYw0KPiBpbmRleCA1MDUzNDMzZWE1ZS4uNjIwZmJiNWVmMDEgMTAwNjQ0DQo+IC0tLSBh
-L25iZC9jbGllbnQuYw0KPiArKysgYi9uYmQvY2xpZW50LmMNCj4gQEAgLTgxOCw3ICs4MTgsNyBA
-QCBzdGF0aWMgaW50IG5iZF9uZWdvdGlhdGVfc2ltcGxlX21ldGFfY29udGV4dChRSU9DaGFubmVs
-ICppb2MsDQo+ICAgICogU3RhcnQgdGhlIGhhbmRzaGFrZSB0byB0aGUgc2VydmVyLiAgQWZ0ZXIg
-YSBwb3NpdGl2ZSByZXR1cm4sIHRoZSBzZXJ2ZXINCj4gICAgKiBpcyByZWFkeSB0byBhY2NlcHQg
-YWRkaXRpb25hbCBOQkRfT1BUIHJlcXVlc3RzLg0KPiAgICAqIFJldHVybnM6IG5lZ2F0aXZlIGVy
-cm5vOiBmYWlsdXJlIHRhbGtpbmcgdG8gc2VydmVyDQo+IC0gKiAgICAgICAgICAwOiBzZXJ2ZXIg
-aXMgb2xkc3R5bGUsIGNsaWVudCBtdXN0IHN0aWxsIHBhcnNlIGV4cG9ydCBzaXplDQo+ICsgKiAg
-ICAgICAgICAwOiBzZXJ2ZXIgaXMgb2xkc3R5bGUsIG11c3QgY2FsbCBuYmRfbmVnb3RpYXRlX2Zp
-bmlzaF9vbGRzdHlsZQ0KPiAgICAqICAgICAgICAgIDE6IHNlcnZlciBpcyBuZXdzdHlsZSwgYnV0
-IGNhbiBvbmx5IGFjY2VwdCBFWFBPUlRfTkFNRQ0KPiAgICAqICAgICAgICAgIDI6IHNlcnZlciBp
-cyBuZXdzdHlsZSwgYnV0IGxhY2tzIHN0cnVjdHVyZWQgcmVwbGllcw0KPiAgICAqICAgICAgICAg
-IDM6IHNlcnZlciBpcyBuZXdzdHlsZSBhbmQgc2V0IHVwIGZvciBzdHJ1Y3R1cmVkIHJlcGxpZXMN
-Cj4gQEAgLTkyMyw2ICs5MjMsMzYgQEAgc3RhdGljIGludCBuYmRfc3RhcnRfbmVnb3RpYXRlKFFJ
-T0NoYW5uZWwgKmlvYywgUUNyeXB0b1RMU0NyZWRzICp0bHNjcmVkcywNCj4gICAgICAgfQ0KPiAg
-IH0NCj4gDQo+ICsvKg0KPiArICogbmJkX25lZ290aWF0ZV9maW5pc2hfb2xkc3R5bGU6DQo+ICsg
-KiBQb3B1bGF0ZSBAaW5mbyB3aXRoIHRoZSBzaXplIGFuZCBleHBvcnQgZmxhZ3MgZnJvbSBhbiBv
-bGRzdHlsZSBzZXJ2ZXIsDQo+ICsgKiBidXQgZG9lcyBub3QgY29uc3VtZSAxMjQgYnl0ZXMgb2Yg
-cmVzZXJ2ZWQgemVybyBwYWRkaW5nLg0KPiArICogUmV0dXJucyAwIG9uIHN1Y2Nlc3MsIC0xIHdp
-dGggQGVycnAgc2V0IG9uIGZhaWx1cmUNCj4gKyAqLw0KPiArc3RhdGljIGludCBuYmRfbmVnb3Rp
-YXRlX2ZpbmlzaF9vbGRzdHlsZShRSU9DaGFubmVsICppb2MsIE5CREV4cG9ydEluZm8gKmluZm8s
-DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJy
-cCkNCj4gK3sNCj4gKyAgICB1aW50MzJfdCBvbGRmbGFnczsNCj4gKw0KPiArICAgIGlmIChuYmRf
-cmVhZChpb2MsICZpbmZvLT5zaXplLCBzaXplb2YoaW5mby0+c2l6ZSksIGVycnApIDwgMCkgew0K
-PiArICAgICAgICBlcnJvcl9wcmVwZW5kKGVycnAsICJGYWlsZWQgdG8gcmVhZCBleHBvcnQgbGVu
-Z3RoOiAiKTsNCj4gKyAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+ICsgICAgfQ0KPiArICAgIGlu
-Zm8tPnNpemUgPSBiZTY0X3RvX2NwdShpbmZvLT5zaXplKTsNCj4gKw0KPiArICAgIGlmIChuYmRf
-cmVhZChpb2MsICZvbGRmbGFncywgc2l6ZW9mKG9sZGZsYWdzKSwgZXJycCkgPCAwKSB7DQo+ICsg
-ICAgICAgIGVycm9yX3ByZXBlbmQoZXJycCwgIkZhaWxlZCB0byByZWFkIGV4cG9ydCBmbGFnczog
-Iik7DQo+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiArICAgIH0NCj4gKyAgICBvbGRmbGFn
-cyA9IGJlMzJfdG9fY3B1KG9sZGZsYWdzKTsNCj4gKyAgICBpZiAob2xkZmxhZ3MgJiB+MHhmZmZm
-KSB7DQo+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlVuZXhwZWN0ZWQgZXhwb3J0IGZsYWdz
-ICUweCIgUFJJeDMyLCBvbGRmbGFncyk7DQo+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiAr
-ICAgIH0NCj4gKyAgICBpbmZvLT5mbGFncyA9IG9sZGZsYWdzOw0KPiArICAgIHJldHVybiAwOw0K
-PiArfQ0KPiArDQo+ICAgLyoNCj4gICAgKiBuYmRfcmVjZWl2ZV9uZWdvdGlhdGU6DQo+ICAgICog
-Q29ubmVjdCB0byBzZXJ2ZXIsIGNvbXBsZXRlIG5lZ290aWF0aW9uLCBhbmQgbW92ZSBpbnRvIHRy
-YW5zbWlzc2lvbiBwaGFzZS4NCj4gQEAgLTkzNiw3ICs5NjYsNiBAQCBpbnQgbmJkX3JlY2VpdmVf
-bmVnb3RpYXRlKFFJT0NoYW5uZWwgKmlvYywgUUNyeXB0b1RMU0NyZWRzICp0bHNjcmVkcywNCj4g
-ICAgICAgaW50IHJlc3VsdDsNCj4gICAgICAgYm9vbCB6ZXJvZXMgPSB0cnVlOw0KPiAgICAgICBi
-b29sIGJhc2VfYWxsb2NhdGlvbiA9IGluZm8tPmJhc2VfYWxsb2NhdGlvbjsNCj4gLSAgICB1aW50
-MzJfdCBvbGRmbGFnczsNCj4gDQo+ICAgICAgIGFzc2VydChpbmZvLT5uYW1lKTsNCj4gICAgICAg
-dHJhY2VfbmJkX3JlY2VpdmVfbmVnb3RpYXRlX25hbWUoaW5mby0+bmFtZSk7DQo+IEBAIC0xMDA5
-LDIzICsxMDM4LDkgQEAgaW50IG5iZF9yZWNlaXZlX25lZ290aWF0ZShRSU9DaGFubmVsICppb2Ms
-IFFDcnlwdG9UTFNDcmVkcyAqdGxzY3JlZHMsDQo+ICAgICAgICAgICAgICAgZXJyb3Jfc2V0Zyhl
-cnJwLCAiU2VydmVyIGRvZXMgbm90IHN1cHBvcnQgbm9uLWVtcHR5IGV4cG9ydCBuYW1lcyIpOw0K
-PiAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiAgICAgICAgICAgfQ0KPiAtDQo+IC0g
-ICAgICAgIGlmIChuYmRfcmVhZChpb2MsICZpbmZvLT5zaXplLCBzaXplb2YoaW5mby0+c2l6ZSks
-IGVycnApIDwgMCkgew0KPiAtICAgICAgICAgICAgZXJyb3JfcHJlcGVuZChlcnJwLCAiRmFpbGVk
-IHRvIHJlYWQgZXhwb3J0IGxlbmd0aDogIik7DQo+ICsgICAgICAgIGlmIChuYmRfbmVnb3RpYXRl
-X2ZpbmlzaF9vbGRzdHlsZShpb2MsIGluZm8sIGVycnApIDwgMCkgew0KPiAgICAgICAgICAgICAg
-IHJldHVybiAtRUlOVkFMOw0KPiAgICAgICAgICAgfQ0KPiAtICAgICAgICBpbmZvLT5zaXplID0g
-YmU2NF90b19jcHUoaW5mby0+c2l6ZSk7DQo+IC0NCj4gLSAgICAgICAgaWYgKG5iZF9yZWFkKGlv
-YywgJm9sZGZsYWdzLCBzaXplb2Yob2xkZmxhZ3MpLCBlcnJwKSA8IDApIHsNCj4gLSAgICAgICAg
-ICAgIGVycm9yX3ByZXBlbmQoZXJycCwgIkZhaWxlZCB0byByZWFkIGV4cG9ydCBmbGFnczogIik7
-DQo+IC0gICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gLSAgICAgICAgfQ0KPiAtICAgICAg
-ICBvbGRmbGFncyA9IGJlMzJfdG9fY3B1KG9sZGZsYWdzKTsNCj4gLSAgICAgICAgaWYgKG9sZGZs
-YWdzICYgfjB4ZmZmZikgew0KPiAtICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVW5leHBl
-Y3RlZCBleHBvcnQgZmxhZ3MgJTB4IiBQUkl4MzIsIG9sZGZsYWdzKTsNCj4gLSAgICAgICAgICAg
-IHJldHVybiAtRUlOVkFMOw0KPiAtICAgICAgICB9DQo+IC0gICAgICAgIGluZm8tPmZsYWdzID0g
-b2xkZmxhZ3M7DQo+ICAgICAgICAgICBicmVhazsNCj4gICAgICAgZGVmYXVsdDoNCj4gICAgICAg
-ICAgIHJldHVybiByZXN1bHQ7DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
-Cg==
+On 1/10/19 8:00 AM, Pierre Morel wrote:
+> The size of the accessible iommu memory region in the guest
+> is given to the IOMMU by the guest through the mpcifc request
+> specifying the PCI Base Address and the PCI Address Limit.
+> 
+> Let set the size of the IOMMU region to:
+>      (PCI Address Limit) - (PCI Base Address) + 1.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   hw/s390x/s390-pci-bus.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 69e0671..e97696a 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -660,7 +660,7 @@ void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
+>       char *name = g_strdup_printf("iommu-s390-%04x", iommu->pbdev->uid);
+>       memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr),
+>                                TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&iommu->mr),
+> -                             name, iommu->pal + 1);
+> +                             name, iommu->pal - iommu->pba + 1);
+>       iommu->enabled = true;
+>       memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->iommu_mr));
+>       g_free(name);
+> 
+
+Acked-by: Collin Walling <walling@linux.ibm.com>
