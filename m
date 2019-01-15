@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35463)
+Received: from eggs.gnu.org ([209.51.188.92]:35506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUym-00080H-Fx
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:35 -0500
+	(envelope-from <mst@redhat.com>) id 1gjUyn-00081P-TE
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUyO-0003L1-5Y
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45378)
+	(envelope-from <mst@redhat.com>) id 1gjUyT-0003Ux-Dx
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58310)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUyL-0002vB-H4
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:06 -0500
-Date: Tue, 15 Jan 2019 15:05:30 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUyR-0003Pg-9m
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:12 -0500
+Date: Tue, 15 Jan 2019 15:06:08 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115200252.25911-23-mst@redhat.com>
+Message-ID: <20190115200252.25911-43-mst@redhat.com>
 References: <20190115200252.25911-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20190115200252.25911-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 22/49] virtio: split virtio balloon bits from
- virtio-pci
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 42/49] tpm: clear RAM when "memory overwrite"
+ requested
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,278 +29,131 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 
-From: Juan Quintela <quintela@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+Note: the "Platform Reset Attack Mitigation" specification isn't
+explicit about NVDIMM, since they could have different usages. It uses
+the term "system memory" generally (and also "volatile memory RAM" in
+its introduction). For initial support, I propose to consider
+non-volatile memory as not being subject to the memory clear. There is
+an on-going discussion in the TCG "pcclientwg" working group for
+future revisions.
+
+CPU cache clearing is done unconditionally in edk2 since commit
+d20ae95a13e851 (edk2-stable201811).
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Stefan Berger <stefanb@linux.ibm.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-pci.h         | 14 -----
- hw/virtio/virtio-balloon-pci.c | 95 ++++++++++++++++++++++++++++++++++
- hw/virtio/virtio-pci.c         | 61 +---------------------
- hw/virtio/Makefile.objs        |  1 +
- tests/Makefile.include         |  2 +-
- 5 files changed, 98 insertions(+), 75 deletions(-)
- create mode 100644 hw/virtio/virtio-balloon-pci.c
+ hw/tpm/tpm_ppi.h    | 10 ++++++++++
+ hw/tpm/tpm_crb.c    |  3 +++
+ hw/tpm/tpm_ppi.c    | 22 ++++++++++++++++++++++
+ hw/tpm/tpm_tis.c    |  3 +++
+ hw/tpm/trace-events |  3 +++
+ 5 files changed, 41 insertions(+)
 
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index a8b2e491c8..a2988ef309 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -20,7 +20,6 @@
- #include "hw/virtio/virtio-net.h"
- #include "hw/virtio/virtio-serial.h"
- #include "hw/virtio/virtio-scsi.h"
--#include "hw/virtio/virtio-balloon.h"
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-gpu.h"
- #include "hw/virtio/virtio-crypto.h"
-@@ -39,7 +38,6 @@
- typedef struct VirtIOPCIProxy VirtIOPCIProxy;
- typedef struct VirtIOBlkPCI VirtIOBlkPCI;
- typedef struct VirtIOSCSIPCI VirtIOSCSIPCI;
--typedef struct VirtIOBalloonPCI VirtIOBalloonPCI;
- typedef struct VirtIOSerialPCI VirtIOSerialPCI;
- typedef struct VirtIONetPCI VirtIONetPCI;
- typedef struct VHostSCSIPCI VHostSCSIPCI;
-@@ -264,18 +262,6 @@ struct VirtIOBlkPCI {
-     VirtIOBlock vdev;
- };
- 
--/*
-- * virtio-balloon-pci: This extends VirtioPCIProxy.
-- */
--#define TYPE_VIRTIO_BALLOON_PCI "virtio-balloon-pci-base"
--#define VIRTIO_BALLOON_PCI(obj) \
--        OBJECT_CHECK(VirtIOBalloonPCI, (obj), TYPE_VIRTIO_BALLOON_PCI)
--
--struct VirtIOBalloonPCI {
--    VirtIOPCIProxy parent_obj;
--    VirtIOBalloon vdev;
--};
--
- /*
-  * virtio-serial-pci: This extends VirtioPCIProxy.
-  */
-diff --git a/hw/virtio/virtio-balloon-pci.c b/hw/virtio/virtio-balloon-pci.c
-new file mode 100644
-index 0000000000..2a213bbb38
---- /dev/null
-+++ b/hw/virtio/virtio-balloon-pci.c
-@@ -0,0 +1,95 @@
-+/*
-+ * Virtio balloon PCI Bindings
+diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+index c5e555fe2c..d33ef27de6 100644
+--- a/hw/tpm/tpm_ppi.h
++++ b/hw/tpm/tpm_ppi.h
+@@ -33,4 +33,14 @@ typedef struct TPMPPI {
+ void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+                   hwaddr addr, Object *obj);
+=20
++/**
++ * tpm_ppi_reset:
++ * @tpmppi: a TPMPPI
 + *
-+ * Copyright IBM, Corp. 2007
-+ * Copyright (c) 2009 CodeSourcery
-+ *
-+ * Authors:
-+ *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *  Paul Brook        <paul@codesourcery.com>
-+ *
-+ * Contributions after 2012-01-13 are licensed under the terms of the
-+ * GNU GPL, version 2 or (at your option) any later version.
-+ */
++ * Function to call on machine reset. It will check if the "Memory
++ * overwrite" variable is set, and perform a memory clear on volatile
++ * memory if requested.
++ **/
++void tpm_ppi_reset(TPMPPI *tpmppi);
 +
-+#include "qemu/osdep.h"
-+
-+#include "virtio-pci.h"
-+#include "hw/virtio/virtio-balloon.h"
-+#include "qapi/error.h"
-+
-+typedef struct VirtIOBalloonPCI VirtIOBalloonPCI;
-+
-+/*
-+ * virtio-balloon-pci: This extends VirtioPCIProxy.
-+ */
-+#define TYPE_VIRTIO_BALLOON_PCI "virtio-balloon-pci-base"
-+#define VIRTIO_BALLOON_PCI(obj) \
-+        OBJECT_CHECK(VirtIOBalloonPCI, (obj), TYPE_VIRTIO_BALLOON_PCI)
-+
-+struct VirtIOBalloonPCI {
-+    VirtIOPCIProxy parent_obj;
-+    VirtIOBalloon vdev;
-+};
-+static Property virtio_balloon_pci_properties[] = {
-+    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virtio_balloon_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-+{
-+    VirtIOBalloonPCI *dev = VIRTIO_BALLOON_PCI(vpci_dev);
-+    DeviceState *vdev = DEVICE(&dev->vdev);
-+
-+    if (vpci_dev->class_code != PCI_CLASS_OTHERS &&
-+        vpci_dev->class_code != PCI_CLASS_MEMORY_RAM) { /* qemu < 1.1 */
-+        vpci_dev->class_code = PCI_CLASS_OTHERS;
+ #endif /* TPM_TPM_PPI_H */
+diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+index 012ec686d4..3087acc4ab 100644
+--- a/hw/tpm/tpm_crb.c
++++ b/hw/tpm/tpm_crb.c
+@@ -233,6 +233,9 @@ static void tpm_crb_reset(void *dev)
+ {
+     CRBState *s =3D CRB(dev);
+=20
++    if (s->ppi_enabled) {
++        tpm_ppi_reset(&s->ppi);
 +    }
-+
-+    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-+}
-+
-+static void virtio_balloon_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
-+    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-+    k->realize = virtio_balloon_pci_realize;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->props = virtio_balloon_pci_properties;
-+    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-+    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BALLOON;
-+    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
-+    pcidev_k->class_id = PCI_CLASS_OTHERS;
-+}
-+
-+static void virtio_balloon_pci_instance_init(Object *obj)
-+{
-+    VirtIOBalloonPCI *dev = VIRTIO_BALLOON_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_BALLOON);
-+    object_property_add_alias(obj, "guest-stats", OBJECT(&dev->vdev),
-+                                  "guest-stats", &error_abort);
-+    object_property_add_alias(obj, "guest-stats-polling-interval",
-+                              OBJECT(&dev->vdev),
-+                              "guest-stats-polling-interval", &error_abort);
-+}
-+
-+static const VirtioPCIDeviceTypeInfo virtio_balloon_pci_info = {
-+    .base_name             = TYPE_VIRTIO_BALLOON_PCI,
-+    .generic_name          = "virtio-balloon-pci",
-+    .transitional_name     = "virtio-balloon-pci-transitional",
-+    .non_transitional_name = "virtio-balloon-pci-non-transitional",
-+    .instance_size = sizeof(VirtIOBalloonPCI),
-+    .instance_init = virtio_balloon_pci_instance_init,
-+    .class_init    = virtio_balloon_pci_class_init,
-+};
-+
-+static void virtio_balloon_pci_register(void)
-+{
-+    virtio_pci_types_register(&virtio_balloon_pci_info);
-+}
-+
-+type_init(virtio_balloon_pci_register)
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 2e3eafd8b2..a01c9dd46f 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -23,7 +23,6 @@
- #include "hw/virtio/virtio-net.h"
- #include "hw/virtio/virtio-serial.h"
- #include "hw/virtio/virtio-scsi.h"
--#include "hw/virtio/virtio-balloon.h"
- #include "hw/pci/pci.h"
+     tpm_backend_reset(s->tpmbe);
+=20
+     memset(s->regs, 0, sizeof(s->regs));
+diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+index cf17779c20..cd8205f212 100644
+--- a/hw/tpm/tpm_ppi.c
++++ b/hw/tpm/tpm_ppi.c
+@@ -16,8 +16,30 @@
  #include "qapi/error.h"
- #include "qemu/error-report.h"
-@@ -2356,64 +2355,6 @@ static const VirtioPCIDeviceTypeInfo vhost_user_scsi_pci_info = {
- };
- #endif
- 
--/* virtio-balloon-pci */
--
--static Property virtio_balloon_pci_properties[] = {
--    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void virtio_balloon_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
--{
--    VirtIOBalloonPCI *dev = VIRTIO_BALLOON_PCI(vpci_dev);
--    DeviceState *vdev = DEVICE(&dev->vdev);
--
--    if (vpci_dev->class_code != PCI_CLASS_OTHERS &&
--        vpci_dev->class_code != PCI_CLASS_MEMORY_RAM) { /* qemu < 1.1 */
--        vpci_dev->class_code = PCI_CLASS_OTHERS;
--    }
--
--    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
--    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
--}
--
--static void virtio_balloon_pci_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
--    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
--    k->realize = virtio_balloon_pci_realize;
--    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
--    dc->props = virtio_balloon_pci_properties;
--    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
--    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BALLOON;
--    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
--    pcidev_k->class_id = PCI_CLASS_OTHERS;
--}
--
--static void virtio_balloon_pci_instance_init(Object *obj)
--{
--    VirtIOBalloonPCI *dev = VIRTIO_BALLOON_PCI(obj);
--
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_BALLOON);
--    object_property_add_alias(obj, "guest-stats", OBJECT(&dev->vdev),
--                                  "guest-stats", &error_abort);
--    object_property_add_alias(obj, "guest-stats-polling-interval",
--                              OBJECT(&dev->vdev),
--                              "guest-stats-polling-interval", &error_abort);
--}
--
--static const VirtioPCIDeviceTypeInfo virtio_balloon_pci_info = {
--    .base_name             = TYPE_VIRTIO_BALLOON_PCI,
--    .generic_name          = "virtio-balloon-pci",
--    .transitional_name     = "virtio-balloon-pci-transitional",
--    .non_transitional_name = "virtio-balloon-pci-non-transitional",
--    .instance_size = sizeof(VirtIOBalloonPCI),
--    .instance_init = virtio_balloon_pci_instance_init,
--    .class_init    = virtio_balloon_pci_class_init,
--};
--
- /* virtio-serial-pci */
- 
- static void virtio_serial_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-@@ -2606,7 +2547,6 @@ static void virtio_pci_register_types(void)
-     virtio_pci_types_register(&vhost_user_blk_pci_info);
- #endif
-     virtio_pci_types_register(&virtio_scsi_pci_info);
--    virtio_pci_types_register(&virtio_balloon_pci_info);
-     virtio_pci_types_register(&virtio_serial_pci_info);
-     virtio_pci_types_register(&virtio_net_pci_info);
- #ifdef CONFIG_VHOST_SCSI
-@@ -2618,3 +2558,4 @@ static void virtio_pci_register_types(void)
- }
- 
- type_init(virtio_pci_register_types)
+ #include "cpu.h"
+ #include "sysemu/memory_mapping.h"
++#include "sysemu/reset.h"
+ #include "migration/vmstate.h"
+ #include "tpm_ppi.h"
++#include "trace.h"
 +
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 032ba2ff0e..9e33104ce6 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -16,6 +16,7 @@ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
- obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
- obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
- obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
-+obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
- endif
- endif
- 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3a50b3ba79..0d76ec6a74 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -147,7 +147,7 @@ check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
- check-qtest-virtioserial-y += tests/virtio-console-test$(EXESUF)
- 
- check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
--check-qtest-virtio-y += tests/virtio-balloon-test$(EXESUF)
-+check-qtest-virtio-$(CONFIG_VIRTIO_BALLOON) += tests/virtio-balloon-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
- check-qtest-virtio-$(CONFIG_VIRTIO_RNG) += tests/virtio-rng-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
--- 
++void tpm_ppi_reset(TPMPPI *tpmppi)
++{
++    if (tpmppi->buf[0x15a /* movv, docs/specs/tpm.txt */] & 0x1) {
++        GuestPhysBlockList guest_phys_blocks;
++        GuestPhysBlock *block;
++
++        guest_phys_blocks_init(&guest_phys_blocks);
++        guest_phys_blocks_append(&guest_phys_blocks);
++        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
++            trace_tpm_ppi_memset(block->host_addr,
++                                 block->target_end - block->target_start=
+);
++            memset(block->host_addr, 0,
++                   block->target_end - block->target_start);
++            memory_region_set_dirty(block->mr, 0,
++                                    block->target_end - block->target_st=
+art);
++        }
++        guest_phys_blocks_free(&guest_phys_blocks);
++    }
++}
+=20
+ void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+                   hwaddr addr, Object *obj)
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 02d9d5c911..fd6bb9b59a 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -872,6 +872,9 @@ static void tpm_tis_reset(DeviceState *dev)
+     s->be_buffer_size =3D MIN(tpm_backend_get_buffer_size(s->be_driver),
+                             TPM_TIS_BUFFER_MAX);
+=20
++    if (s->ppi_enabled) {
++        tpm_ppi_reset(&s->ppi);
++    }
+     tpm_backend_reset(s->be_driver);
+=20
+     s->active_locty =3D TPM_TIS_NO_LOCALITY;
+diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+index 25bee0cecf..920d32ad55 100644
+--- a/hw/tpm/trace-events
++++ b/hw/tpm/trace-events
+@@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
+ tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
+ tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
+d to TPM: 0x%08x (size=3D%d)"
+ tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
+t =3D %u"
++
++# hw/tpm/tpm_ppi.c
++tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
+--=20
 MST
