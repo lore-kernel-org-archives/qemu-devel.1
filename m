@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33951)
+Received: from eggs.gnu.org ([209.51.188.92]:33974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUxO-0006TJ-6s
+	(envelope-from <mst@redhat.com>) id 1gjUxO-0006TR-C7
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:05:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUxK-0002WL-3r
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:05:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43170)
+	(envelope-from <mst@redhat.com>) id 1gjUxL-0002ZV-2y
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:05:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUxI-0002Bb-D9
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:05:01 -0500
-Date: Tue, 15 Jan 2019 15:04:30 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUxI-0002Rp-Pd
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:05:02 -0500
+Date: Tue, 15 Jan 2019 15:04:54 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115200252.25911-10-mst@redhat.com>
+Message-ID: <20190115200252.25911-16-mst@redhat.com>
 References: <20190115200252.25911-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190115200252.25911-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 09/49] tests: acpi: make sure FADT is fetched
- only once
+Subject: [Qemu-devel] [PULL v2 15/49] tests: acpi: use AcpiSdtTable::aml
+ instead of AcpiSdtTable::header::signature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,70 +32,112 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Whole FADT is fetched as part of RSDT referenced tables in
-fetch_rsdt_referenced_tables() albeit a bit later than when FADT
-is partially parsed in fadt_fetch_facs_and_dsdt_ptrs().
-However there is no reason for calling fetch_rsdt_referenced_tables()
-so late, just move it right after we fetched RSDT and before
-fadt_fetch_facs_and_dsdt_ptrs(). That way we can reuse whole FADT
-fetched by fetch_rsdt_referenced_tables() and avoid duplicate
-custom fields fetching in fadt_fetch_facs_and_dsdt_ptrs().
-
-While at it rename fadt_fetch_facs_and_dsdt_ptrs() to
-test_acpi_fadt_table(). The follow up patch will merge
-fadt_fetch_facs_and_dsdt_ptrs() into test_acpi_rsdt_table(),
-so that we would end up calling only test_acpi_FOO_table()
-for consistency for tables that require special processing.
+AcpiSdtTable::header::signature is the only remained field from
+AcpiTableHeader structure used by tests. Instead of using packed
+structure to access signature, just read it directly from table
+blob and remove no longer used AcpiSdtTable::header / union and
+keep only AcpiSdtTable::aml byte array.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/bios-tables-test.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ tests/acpi-utils.h       |  6 +-----
+ tests/bios-tables-test.c | 20 +++++++++-----------
+ 2 files changed, 10 insertions(+), 16 deletions(-)
 
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index cb7183e057..ef388bbf12 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -13,15 +13,11 @@
+ #ifndef TEST_ACPI_UTILS_H
+ #define TEST_ACPI_UTILS_H
+ 
+-#include "hw/acpi/acpi-defs.h"
+ #include "libqtest.h"
+ 
+ /* DSDT and SSDTs format */
+ typedef struct {
+-    union {
+-        AcpiTableHeader *header;
+-        uint8_t *aml;            /* aml bytecode from guest */
+-    };
++    uint8_t *aml;            /* aml bytecode from guest */
+     uint32_t aml_len;
+     gchar *aml_file;
+     gchar *asl;            /* asl code generated from aml */
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 3f20bbd24e..b2a40bbda3 100644
+index 9139decc68..0bf7164590 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -141,18 +141,15 @@ static void test_acpi_rsdt_table(test_data *data)
-     data->rsdt_tables_nr = tables_nr;
- }
+@@ -44,6 +44,11 @@ static const char *iasl = stringify(CONFIG_IASL);
+ static const char *iasl;
+ #endif
  
--static void fadt_fetch_facs_and_dsdt_ptrs(test_data *data)
-+static void test_acpi_fadt_table(test_data *data)
++static bool compare_signature(const AcpiSdtTable *sdt, const char *signature)
++{
++   return !memcmp(sdt->aml, signature, 4);
++}
++
+ static void cleanup_table_descriptor(AcpiSdtTable *table)
  {
--    uint32_t addr;
--    AcpiTableHeader hdr;
-+    /* FADT table is 1st */
-+    AcpiSdtTable *fadt = &g_array_index(data->tables, typeof(*fadt), 0);
+     g_free(table->aml);
+@@ -130,7 +135,7 @@ static void test_acpi_fadt_table(test_data *data)
+     uint8_t *fadt_aml = table.aml;
+     uint32_t fadt_len = table.aml_len;
  
--    /* FADT table comes first */
--    addr = le32_to_cpu(data->rsdt_tables_addr[0]);
--    ACPI_READ_TABLE_HEADER(data->qts, &hdr, addr);
--    ACPI_ASSERT_CMP(hdr.signature, "FACP");
-+    ACPI_ASSERT_CMP(fadt->header->signature, "FACP");
+-    ACPI_ASSERT_CMP(table.header->signature, "FACP");
++    g_assert(compare_signature(&table, "FACP"));
  
--    ACPI_READ_FIELD(data->qts, data->facs_addr, addr);
--    ACPI_READ_FIELD(data->qts, data->dsdt_addr, addr);
-+    memcpy(&data->facs_addr, fadt->aml + 36 /* FIRMWARE_CTRL */, 4);
-+    memcpy(&data->dsdt_addr, fadt->aml + 40 /* DSDT */, 4);
+     /* Since DSDT/FACS isn't in RSDT, add them to ASL test list manually */
+     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+@@ -169,7 +174,7 @@ static void dump_aml_files(test_data *data, bool rebuild)
+ 
+         if (rebuild) {
+             aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
+-                                       (gchar *)&sdt->header->signature, ext);
++                                       sdt->aml, ext);
+             fd = g_open(aml_file, O_WRONLY|O_TRUNC|O_CREAT,
+                         S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+         } else {
+@@ -187,11 +192,6 @@ static void dump_aml_files(test_data *data, bool rebuild)
+     }
  }
  
- static void sanitize_fadt_ptrs(test_data *data)
-@@ -628,10 +625,10 @@ static void test_acpi_one(const char *params, test_data *data)
-     test_acpi_rsdp_address(data);
-     test_acpi_rsdp_table(data);
-     test_acpi_rsdt_table(data);
--    fadt_fetch_facs_and_dsdt_ptrs(data);
-+    fetch_rsdt_referenced_tables(data);
-+    test_acpi_fadt_table(data);
-     test_acpi_facs_table(data);
-     test_acpi_dsdt_table(data);
--    fetch_rsdt_referenced_tables(data);
+-static bool compare_signature(AcpiSdtTable *sdt, const char *signature)
+-{
+-   return !memcmp(&sdt->header->signature, signature, 4);
+-}
+-
+ static bool load_asl(GArray *sdts, AcpiSdtTable *sdt)
+ {
+     AcpiSdtTable *temp;
+@@ -290,7 +290,7 @@ static GArray *load_expected_aml(test_data *data)
  
-     sanitize_fadt_ptrs(data);
- 
+ try_again:
+         aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
+-                                   (gchar *)&sdt->header->signature, ext);
++                                   sdt->aml, ext);
+         if (getenv("V")) {
+             fprintf(stderr, "Looking for expected file '%s'\n", aml_file);
+         }
+@@ -350,14 +350,12 @@ static void test_acpi_asl(test_data *data)
+                 fprintf(stderr,
+                         "Warning! iasl couldn't parse the expected aml\n");
+             } else {
+-                uint32_t signature = cpu_to_le32(exp_sdt->header->signature);
+                 sdt->tmp_files_retain = true;
+                 exp_sdt->tmp_files_retain = true;
+                 fprintf(stderr,
+                         "acpi-test: Warning! %.4s mismatch. "
+                         "Actual [asl:%s, aml:%s], Expected [asl:%s, aml:%s].\n",
+-                        (gchar *)&signature,
+-                        sdt->asl_file, sdt->aml_file,
++                        exp_sdt->aml, sdt->asl_file, sdt->aml_file,
+                         exp_sdt->asl_file, exp_sdt->aml_file);
+                 if (getenv("V")) {
+                     const char *diff_cmd = getenv("DIFF");
 -- 
 MST
