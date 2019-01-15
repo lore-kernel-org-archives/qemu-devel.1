@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33711)
+Received: from eggs.gnu.org ([209.51.188.92]:33735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjR1i-0001Qm-F1
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:19 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gjR1t-0001WX-G9
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjR1e-0006Gn-HH
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47040)
+	(envelope-from <imammedo@redhat.com>) id 1gjR1n-0006Ik-35
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjR1d-0006Ga-Vr
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:14 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjR1h-0006H7-DI
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:21 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 15 Jan 2019 16:40:53 +0100
-Message-Id: <1547566866-129386-2-git-send-email-imammedo@redhat.com>
+Date: Tue, 15 Jan 2019 16:40:54 +0100
+Message-Id: <1547566866-129386-3-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
 References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 01/14] tests: acpi: add uefi_find_rsdp_addr()
- helper
+Subject: [Qemu-devel] [PATCH 02/14] tests: acpi: make RSDT test routine
+ handle XSDT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,80 +27,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gonglei <arei.gonglei@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-introduce UEFI specific counterpart to acpi_find_rsdp_address()
-that will help to find RSDP address when [OA]VMF is used as
-firmware. It requires a [OA]VMF built with PcdAcpiTestSupport=TRUE,
-to locate RSDP address within 1Mb aligned ACPI test structure, tagged
-with GUID AB87A6B1-2034-BDA0-71BD-375007757785
+If RSDP revision is more than 0 fetch table pointed by XSDT
+and fallback to legacy RSDT table otherwise.
+
+While at it drop unused acpi_get_xsdt_address().
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/acpi-utils.h |  1 +
- tests/acpi-utils.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+)
+PS:
+ it doesn't affect existing pc/q35 machines as they use RSDP.revision == 0
+ but it will be used by followup patch to enable testing arm/virt
+ board which uses provides XSDT table.
+---
+ tests/acpi-utils.h       |  3 +--
+ tests/acpi-utils.c       | 14 +-------------
+ tests/bios-tables-test.c | 18 +++++++++++++-----
+ 3 files changed, 15 insertions(+), 20 deletions(-)
 
 diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index ef388bb..3b11f47 100644
+index 3b11f47..398900c 100644
 --- a/tests/acpi-utils.h
 +++ b/tests/acpi-utils.h
-@@ -46,6 +46,7 @@ typedef struct {
- 
+@@ -47,8 +47,7 @@ typedef struct {
  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
  uint32_t acpi_find_rsdp_address(QTestState *qts);
-+uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size);
- uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
- void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
+ uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size);
+-uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
+-void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
++void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
  void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+                       const uint8_t *addr_ptr, const char *sig,
+                       bool verify_checksum);
 diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index cc33b46..b9ff9df 100644
+index b9ff9df..84068a8 100644
 --- a/tests/acpi-utils.c
 +++ b/tests/acpi-utils.c
-@@ -111,3 +111,46 @@ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
-         g_assert(!acpi_calc_checksum(*aml, *aml_len));
+@@ -51,19 +51,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
+     return off;
+ }
+ 
+-uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
+-{
+-    uint64_t xsdt_physical_address;
+-    uint8_t revision = rsdp_table[15 /* Revision offset */];
+-
+-    /* We must have revision 2 if we're looking for an XSDT pointer */
+-    g_assert(revision == 2);
+-
+-    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
+-    return le64_to_cpu(xsdt_physical_address);
+-}
+-
+-void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table)
++void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
+ {
+     uint8_t revision;
+ 
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 0bf7164..529bfc4 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -107,17 +107,25 @@ static void test_acpi_rsdp_table(test_data *data)
      }
  }
-+
-+#define GUID_SIZE 16
-+static uint8_t AcpiTestSupportGuid[GUID_SIZE] =
-+     { 0xb1, 0xa6, 0x87, 0xab,
-+       0x34, 0x20,
-+       0xa0, 0xbd,
-+       0x71, 0xbd, 0x37, 0x50, 0x07, 0x75, 0x77, 0x85 };
-+
-+typedef struct {
-+    uint8_t signature_guid[16];
-+    uint64_t rsdp10;
-+    uint64_t rsdp20;
-+} __attribute__((packed)) UefiTestSupport;
-+
-+/* Wait at most 600 seconds (test is slow with TCI and --enable-debug) */
-+#define TEST_DELAY (1 * G_USEC_PER_SEC / 10)
-+#define TEST_CYCLES MAX((600 * G_USEC_PER_SEC / TEST_DELAY), 1)
-+#define MB 0x100000ULL
-+uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size)
-+{
-+    int i, j;
-+    uint8_t data[GUID_SIZE];
-+
-+    for (i = 0; i < TEST_CYCLES; ++i) {
-+        for (j = 0; j < size / MB; j++) {
-+            /* look for GUID at every 1Mb block */
-+            uint64_t addr = start + j * MB;
-+
-+            qtest_memread(qts, addr, data, sizeof(data));
-+            if (!memcmp(AcpiTestSupportGuid, data, sizeof(data))) {
-+                UefiTestSupport ret;
-+
-+                qtest_memread(qts, addr, &ret, sizeof(ret));
-+                ret.rsdp10 = le64_to_cpu(ret.rsdp10);
-+                ret.rsdp20 = le64_to_cpu(ret.rsdp20);
-+                return ret.rsdp20 ? ret.rsdp20 : ret.rsdp10;
-+            }
-+        }
-+        g_usleep(TEST_DELAY);
+ 
+-static void test_acpi_rsdt_table(test_data *data)
++static void test_acpi_rxsdt_table(test_data *data)
+ {
++    const char *sig = "RSDT";
+     AcpiSdtTable rsdt = {};
++    int entry_size = 4;
++    int addr_off = 16 /* RsdtAddress */;
+     uint8_t *ent;
+ 
+-    /* read RSDT table */
++    if (data->rsdp_table[15 /* Revision offset */] != 0) {
++        addr_off = 24 /* XsdtAddress */;
++        entry_size = 8;
++        sig = "XSDT";
 +    }
-+    g_assert_not_reached();
-+    return 0;
-+}
++    /* read [RX]SDT table */
+     acpi_fetch_table(data->qts, &rsdt.aml, &rsdt.aml_len,
+-                     &data->rsdp_table[16 /* RsdtAddress */], "RSDT", true);
++                     &data->rsdp_table[addr_off], sig, true);
+ 
+     /* Load all tables and add to test list directly RSDT referenced tables */
+-    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, 4 /* Entry size */) {
++    ACPI_FOREACH_RSDT_ENTRY(rsdt.aml, rsdt.aml_len, ent, entry_size) {
+         AcpiSdtTable ssdt_table = {};
+ 
+         acpi_fetch_table(data->qts, &ssdt_table.aml, &ssdt_table.aml_len, ent,
+@@ -519,7 +527,7 @@ static void test_acpi_one(const char *params, test_data *data)
+     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
+     test_acpi_rsdp_address(data);
+     test_acpi_rsdp_table(data);
+-    test_acpi_rsdt_table(data);
++    test_acpi_rxsdt_table(data);
+     test_acpi_fadt_table(data);
+ 
+     if (iasl) {
 -- 
 2.7.4
