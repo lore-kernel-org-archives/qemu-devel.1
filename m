@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48778)
+Received: from eggs.gnu.org ([209.51.188.92]:49402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjM5Z-0003wa-Sl
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:37:00 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gjM8l-0005Hj-Gu
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:40:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjM5Z-0001es-3A
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:36:57 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38749)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gjM5Y-0001dE-U2
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:36:57 -0500
-Received: by mail-wr1-f67.google.com with SMTP id v13so2346026wrw.5
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 02:36:55 -0800 (PST)
-References: <1547546927-18006-1-git-send-email-dimastep@yandex-team.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <fe074b97-8af7-ebbf-4f03-7519cc007a87@redhat.com>
-Date: Tue, 15 Jan 2019 11:36:52 +0100
-MIME-Version: 1.0
+	(envelope-from <cohuck@redhat.com>) id 1gjM8k-0003mi-Na
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:40:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:18341)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gjM8k-0003lv-HS
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:40:14 -0500
+Date: Tue, 15 Jan 2019 11:40:09 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190115114009.0a09eac1.cohuck@redhat.com>
 In-Reply-To: <1547546927-18006-1-git-send-email-dimastep@yandex-team.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <1547546927-18006-1-git-send-email-dimastep@yandex-team.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v1] virtio: add checks for the size of the
  indirect table
 List-Id: <qemu-devel.nongnu.org>
@@ -30,10 +27,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dima Stepanov <dimastep@yandex-team.ru>, mst@redhat.com, qemu-devel@nongnu.org
-Cc: wrfsh@yandex-team.ru
+To: Dima Stepanov <dimastep@yandex-team.ru>
+Cc: mst@redhat.com, qemu-devel@nongnu.org, wrfsh@yandex-team.ru
 
-On 1/15/19 11:08 AM, Dima Stepanov wrote:
+On Tue, 15 Jan 2019 13:08:47 +0300
+Dima Stepanov <dimastep@yandex-team.ru> wrote:
+
 > The virtqueue_pop() and virtqueue_get_avail_bytes() routines can use the
 > INDIRECT table to get the data. It is possible to create a packet which
 > will lead to the assert message like:
@@ -45,11 +44,16 @@ On 1/15/19 11:08 AM, Dima Stepanov wrote:
 > and set the size of it to 0. It doesn't look good that the guest should
 > be able to trigger the assert in qemu. Add additional check for the size
 > of the INDIRECT table, which should not be 0.
+
+Ouch, being able to crash QEMU by a specially crafted descriptor is bad.
+
+Looking at the virtio spec, we don't seem to explicitly disallow
+indirect descriptors with a zero-length table. So, as an alternative to
+marking the device broken, we could also skip over such a descriptor.
+Not sure whether that makes sense, though.
+
 > 
 > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
 > ---
 >  hw/virtio/virtio.c | 4 ++--
 >  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -76,4 +80,3 @@ Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >              virtio_error(vdev, "Invalid size for indirect buffer table");
 >              goto done;
 >          }
-> 
