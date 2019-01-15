@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37384)
+Received: from eggs.gnu.org ([209.51.188.92]:37336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gjPY5-0002rf-3c
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:39 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gjPYK-0002jb-BM
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1gjPY3-0003sC-P8
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:37 -0500
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:38314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gjPY3-0003r6-FW
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:35 -0500
-Received: by mail-yw1-xc44.google.com with SMTP id d190so1078334ywb.5
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 06:18:33 -0800 (PST)
-MIME-Version: 1.0
-References: <20190109112728.9214-1-xieyongji@baidu.com>
-	<20190109112728.9214-3-xieyongji@baidu.com>
-	<20190114172157-mutt-send-email-mst@kernel.org>
-	<CAONzpca2=Y+KbWCkF4YVmCU3_+X3KTBBupmeFmrPodMaFUs-cw@mail.gmail.com>
-	<20190115075022-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190115075022-mutt-send-email-mst@kernel.org>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Tue, 15 Jan 2019 22:18:20 +0800
-Message-ID: <CAONzpcbnGbe-qjZdiBdjrrWbnhCBy+zGTtZ_qOjNoBecC+1r6A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 2/7] vhost-user: Support
- transferring inflight buffer between qemu and backend
+	(envelope-from <yang.zhong@intel.com>) id 1gjPTJ-0001pg-Md
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:13:42 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56326)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1gjPTJ-0001A9-Ec
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:13:41 -0500
+From: Yang Zhong <yang.zhong@intel.com>
+Date: Tue, 15 Jan 2019 22:11:08 +0800
+Message-Id: <20190115141108.934-38-yang.zhong@intel.com>
+In-Reply-To: <20190115141108.934-1-yang.zhong@intel.com>
+References: <20190115141108.934-1-yang.zhong@intel.com>
+Subject: [Qemu-devel] [RFC PATCH v2 37/37] Makefile: only support defconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +24,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
-	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, yang.zhong@intel.com
 
-On Tue, 15 Jan 2019 at 20:54, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, Jan 15, 2019 at 02:46:42PM +0800, Yongji Xie wrote:
-> > On Tue, 15 Jan 2019 at 06:25, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Wed, Jan 09, 2019 at 07:27:23PM +0800, elohimes@gmail.com wrote:
-> > > > @@ -382,6 +397,30 @@ If VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD protocol feature is negotiated,
-> > > >  slave can send file descriptors (at most 8 descriptors in each message)
-> > > >  to master via ancillary data using this fd communication channel.
-> > > >
-> > > > +Inflight I/O tracking
-> > > > +---------------------
-> > > > +
-> > > > +To support slave reconnecting, slave need to track inflight I/O in a
-> > > > +shared memory. VHOST_USER_GET_INFLIGHT_FD and VHOST_USER_SET_INFLIGHT_FD
-> > > > +are used to transfer the memory between master and slave. And to encourage
-> > > > +consistency, we provide a recommended format for this memory:
-> > >
-> > > I think we should make a stronger statement and actually
-> > > just say what the format is. Not recommend it weakly.
-> > >
-> >
-> > Okey, will do it.
-> >
-> > > > +
-> > > > +offset        width    description
-> > > > +0x0      0x400    region for queue0
-> > > > +0x400    0x400    region for queue1
-> > > > +0x800    0x400    region for queue2
-> > > > +...      ...      ...
-> > > > +
-> > > > +For each virtqueue, we have a 1024 bytes region.
-> > >
-> > >
-> > > Why is the size hardcoded? Why not a function of VQ size?
-> > >
-> >
-> > Sorry, I didn't get your point. Should the region's size be fixed? Do
-> > you mean we need to document a function for the region's size?
->
->
-> Well you are saying 0x0 to 0x400 is for queue0.
-> How do you know that's enough? And why are 0x400
-> bytes necessary? After all max queue size can be very small.
->
->
+add CONFIG_VHOST_USER and CONFIG_LINUX in Kconfig.host, the
+current Makefile only support defconfig because of randconfig
+does not work.
 
-OK, I think I get your point. So we need something like:
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+---
+ Kconfig.host     |  6 ++++++
+ Makefile         | 16 ++++++++--------
+ hw/block/Kconfig |  2 ++
+ hw/scsi/Kconfig  |  2 ++
+ hw/tpm/Kconfig   |  2 ++
+ 5 files changed, 20 insertions(+), 8 deletions(-)
 
-region's size = max_queue_size * 32 byte + xxx byte (if any)
-
-Right?
-
->
-> > >
-> > > > The region's format is like:
-> > > > +
-> > > > +offset   width    description
-> > > > +0x0      0x1      descriptor 0 is in use or not
-> > > > +0x1      0x1      descriptor 1 is in use or not
-> > > > +0x2      0x1      descriptor 2 is in use or not
-> > > > +...      ...      ...
-> > > > +
-> > > > +For each descriptor, we use one byte to specify whether it's in use or not.
-> > > > +
-> > > >  Protocol features
-> > > >  -----------------
-> > > >
-> > >
-> > > I think that it's a good idea to have a version in this region.
-> > > Otherwise how are you going to handle compatibility when
-> > > this needs to be extended?
-> > >
-> >
-> > I have put the version into the message's payload: VhostUserInflight. Is it OK?
-> >
-> > Thanks,
-> > Yongji
->
-> I'm not sure I like it.  So is qemu expected to maintain it? Reset it?
-> Also don't you want to be able to detect that qemu has reset the buffer?
-> If we have version 1 at a known offset that can serve both purposes.
-> Given it only has value within the buffer why not store it there?
->
-
-Yes, that looks better. Will update it in v5.
-
-Thanks,
-Yongji
+diff --git a/Kconfig.host b/Kconfig.host
+index d7f503d0ca..3772627a3a 100644
+--- a/Kconfig.host
++++ b/Kconfig.host
+@@ -16,3 +16,9 @@ config TPM
+ 
+ config XEN
+     bool
++
++config VHOST_USER
++    bool
++
++config LINUX
++    bool
+diff --git a/Makefile b/Makefile
+index b2d45aa6d4..d8fe6df696 100644
+--- a/Makefile
++++ b/Makefile
+@@ -312,6 +312,9 @@ endif
+ SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
+ SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
+ SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_DIRS))
++SUBDIR_TARGET_MAK=$(patsubst %, %/config-target.mak, $(TARGET_DIRS))
++
++-include $(SUBDIR_TARGET_MAK)
+ 
+ ifeq ($(SUBDIR_DEVICES_MAK),)
+ config-all-devices.mak:
+@@ -332,16 +335,13 @@ MINIKCONF_ARGS = \
+     CONFIG_SPICE=$(CONFIG_SPICE) \
+     CONFIG_TPM=$(CONFIG_TPM) \
+     CONFIG_XEN=$(CONFIG_XEN) \
+-    CONFIG_OPENGL=$(CONFIG_OPENGL)
+-
+-MINIKCONF = $(SHELL) $(SRC_PATH)/scripts/minikconf.sh
++    CONFIG_OPENGL=$(CONFIG_OPENGL) \
++    CONFIG_VHOST_USER=$(CONFIG_VHOST_USER) \
++    CONFIG_LINUX=$(CONFIG_LINUX)
+ 
+-.PHONY: allyesconfig allnoconfig defconfig randconfig
+-allyesconfig allnoconfig defconfig randconfig:
+-	rm */config-devices.mak config-all-devices.mak
+-	$(MAKE) MINIKCONF="$(MINIKCONF) --$<" config-all-devices.mak
++MINIKCONF = $(PYTHON) $(SRC_PATH)/scripts/minikconf.py --defconfig
+ 
+-%/config-devices.mak: default-configs/%-softmmu.mak Kconfig.host hw/Kconfig
++%/config-devices.mak: default-configs/%.mak Kconfig.host $(SRC_PATH)/hw/Kconfig
+ 	$(call quiet-command, \
+             $(MINIKCONF) $@ $*-config-devices.mak.d $^ $(MINIKCONF_ARGS) > $@.tmp, "  GEN   $@.tmp")
+ 	$(call quiet-command, if test -f $@; then \
+diff --git a/hw/block/Kconfig b/hw/block/Kconfig
+index 771967ad9f..b2f1de9eca 100644
+--- a/hw/block/Kconfig
++++ b/hw/block/Kconfig
+@@ -33,3 +33,5 @@ config VIRTIO_BLK
+ 
+ config VHOST_USER_BLK
+     bool
++    default y
++    depends on VHOST_USER && LINUX
+diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
+index 22281213ba..e5d5bcaa5c 100644
+--- a/hw/scsi/Kconfig
++++ b/hw/scsi/Kconfig
+@@ -48,3 +48,5 @@ config VIRTIO_SCSI
+ 
+ config VHOST_USER_SCSI
+     bool
++    default y
++    depends on VHOST_USER && LINUX
+diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
+index 28acdb745e..6d383b7209 100644
+--- a/hw/tpm/Kconfig
++++ b/hw/tpm/Kconfig
+@@ -13,6 +13,8 @@ config TPM_CRB
+ 
+ config TPM_PASSTHROUGH
+     bool
++    depends on TPM
+ 
+ config TPM_EMULATOR
+     bool
++    depends on TPM
+-- 
+2.17.1
