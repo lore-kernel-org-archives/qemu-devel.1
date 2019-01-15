@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37336)
+Received: from eggs.gnu.org ([209.51.188.92]:37384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gjPXy-0002jb-Q3
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:31 -0500
+	(envelope-from <elohimes@gmail.com>) id 1gjPY5-0002rf-3c
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gjPXY-0003ek-Bo
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:09 -0500
-Date: Tue, 15 Jan 2019 14:18:00 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190115141800.GB29056@stefanha-x1.localdomain>
-References: <w51pnt57slp.fsf@maestria.local.igalia.com>
-	<w51tvifqqlr.fsf@maestria.local.igalia.com>
-	<20190111132416.GI5010@dhcp-200-186.str.redhat.com>
-	<w51pnt3qo27.fsf@maestria.local.igalia.com>
-	<20190114133553.GE7038@stefanha-x1.localdomain>
-	<w51won7480o.fsf@maestria.local.igalia.com>
-	<20190114161525.GA32304@stefanha-x1.localdomain>
-	<w51zhs32ojb.fsf@maestria.local.igalia.com>
-	<20190114163117.GA521@stefanha-x1.localdomain>
-	<w51h8eb7ybn.fsf@maestria.local.igalia.com>
+	(envelope-from <elohimes@gmail.com>) id 1gjPY3-0003sC-P8
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:37 -0500
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:38314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1gjPY3-0003r6-FW
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:35 -0500
+Received: by mail-yw1-xc44.google.com with SMTP id d190so1078334ywb.5
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 06:18:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="IrhDeMKUP4DT/M7F"
-Content-Disposition: inline
-In-Reply-To: <w51h8eb7ybn.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] throttle-groups: fix restart
- coroutine iothread race
+References: <20190109112728.9214-1-xieyongji@baidu.com>
+	<20190109112728.9214-3-xieyongji@baidu.com>
+	<20190114172157-mutt-send-email-mst@kernel.org>
+	<CAONzpca2=Y+KbWCkF4YVmCU3_+X3KTBBupmeFmrPodMaFUs-cw@mail.gmail.com>
+	<20190115075022-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190115075022-mutt-send-email-mst@kernel.org>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Tue, 15 Jan 2019 22:18:20 +0800
+Message-ID: <CAONzpcbnGbe-qjZdiBdjrrWbnhCBy+zGTtZ_qOjNoBecC+1r6A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 2/7] vhost-user: Support
+ transferring inflight buffer between qemu and backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +32,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin,
+	Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?UTF-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-
---IrhDeMKUP4DT/M7F
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jan 14, 2019 at 09:56:28PM +0100, Alberto Garcia wrote:
-> On Mon 14 Jan 2019 05:31:17 PM CET, Stefan Hajnoczi <stefanha@redhat.com>=
- wrote:
-> > On Mon, Jan 14, 2019 at 05:26:48PM +0100, Alberto Garcia wrote:
-> >> On Mon 14 Jan 2019 05:15:25 PM CET, Stefan Hajnoczi wrote:
-> >> >> > I've been able to reproduce this in an iotest, please see v2 of t=
-his
-> >> >> > series.
-> >> >>=20
-> >> >> That iotest doesn't crash for me :-?
-> >> >
-> >> > Does my iotest pass for you?
-> >>=20
-> >> Yes, it does. I'm trying to figure out why because if I run the QMP
-> >> commands by hand then it does crash.
+On Tue, 15 Jan 2019 at 20:54, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Tue, Jan 15, 2019 at 02:46:42PM +0800, Yongji Xie wrote:
+> > On Tue, 15 Jan 2019 at 06:25, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Wed, Jan 09, 2019 at 07:27:23PM +0800, elohimes@gmail.com wrote:
+> > > > @@ -382,6 +397,30 @@ If VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD protocol feature is negotiated,
+> > > >  slave can send file descriptors (at most 8 descriptors in each message)
+> > > >  to master via ancillary data using this fd communication channel.
+> > > >
+> > > > +Inflight I/O tracking
+> > > > +---------------------
+> > > > +
+> > > > +To support slave reconnecting, slave need to track inflight I/O in a
+> > > > +shared memory. VHOST_USER_GET_INFLIGHT_FD and VHOST_USER_SET_INFLIGHT_FD
+> > > > +are used to transfer the memory between master and slave. And to encourage
+> > > > +consistency, we provide a recommended format for this memory:
+> > >
+> > > I think we should make a stronger statement and actually
+> > > just say what the format is. Not recommend it weakly.
+> > >
 > >
-> > I ran the iotest 20 times on my machine and it segfaulted every time
-> > (with the fix not yet applied).
->=20
-> Yeah I can also reproduce it all the time if I run it by hand...
->=20
-> I was debugging it and although I don't know why this is different when
-> I run it through tests/qemu-iotests/check, here's why it doesn't crash:
->=20
-> After the ThrottleGroupMember is unregistered and its BlockBackend is
-> destroyed, the throttle_group_co_restart_queue() coroutine takes
-> control.
->=20
-> The first thing that it does is lock tgm->throttled_reqs_lock. It turns
-> out that although this memory has been freed (it's part of the
-> BlockBackend struct) it is still accessible but contains pure
-> gargabe. 'Garbage' here means that the mutex counter contains some
-> random value !=3D 0, so the thread waits, it doesn't have a chance to
-> crash the process, and QEMU shuts down cleanly.
->=20
-> So if my understanding is correct QEMU can be shut down when there are
-> iothreads waiting for a mutex. Is that something that we should be
-> worried about?
+> > Okey, will do it.
+> >
+> > > > +
+> > > > +offset        width    description
+> > > > +0x0      0x400    region for queue0
+> > > > +0x400    0x400    region for queue1
+> > > > +0x800    0x400    region for queue2
+> > > > +...      ...      ...
+> > > > +
+> > > > +For each virtqueue, we have a 1024 bytes region.
+> > >
+> > >
+> > > Why is the size hardcoded? Why not a function of VQ size?
+> > >
+> >
+> > Sorry, I didn't get your point. Should the region's size be fixed? Do
+> > you mean we need to document a function for the region's size?
+>
+>
+> Well you are saying 0x0 to 0x400 is for queue0.
+> How do you know that's enough? And why are 0x400
+> bytes necessary? After all max queue size can be very small.
+>
+>
 
-Nothing joins the iothreads in vl.c:main().
+OK, I think I get your point. So we need something like:
 
-The assumption is that anything using iothreads will detach from them.
-For example, the vm runstate changes during shutdown so devices can
-disable the iothread code path (and this involves draining in-flight
-requests).
+region's size = max_queue_size * 32 byte + xxx byte (if any)
 
-My fix effectively does this by waiting for in-flight throttling restart
-coroutines.
+Right?
 
-Stefan
+>
+> > >
+> > > > The region's format is like:
+> > > > +
+> > > > +offset   width    description
+> > > > +0x0      0x1      descriptor 0 is in use or not
+> > > > +0x1      0x1      descriptor 1 is in use or not
+> > > > +0x2      0x1      descriptor 2 is in use or not
+> > > > +...      ...      ...
+> > > > +
+> > > > +For each descriptor, we use one byte to specify whether it's in use or not.
+> > > > +
+> > > >  Protocol features
+> > > >  -----------------
+> > > >
+> > >
+> > > I think that it's a good idea to have a version in this region.
+> > > Otherwise how are you going to handle compatibility when
+> > > this needs to be extended?
+> > >
+> >
+> > I have put the version into the message's payload: VhostUserInflight. Is it OK?
+> >
+> > Thanks,
+> > Yongji
+>
+> I'm not sure I like it.  So is qemu expected to maintain it? Reset it?
+> Also don't you want to be able to detect that qemu has reset the buffer?
+> If we have version 1 at a known offset that can serve both purposes.
+> Given it only has value within the buffer why not store it there?
+>
 
---IrhDeMKUP4DT/M7F
-Content-Type: application/pgp-signature; name="signature.asc"
+Yes, that looks better. Will update it in v5.
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcPeuYAAoJEJykq7OBq3PIv/sH/1uB5H/Fry2TeX7OfdPtcR5r
-x1zYGseI9pTjd4DvvW8M15VUt4BivofyuLVPhsmy8hNjNafEhOZnvtdEve7iZQWz
-fg7QqodMxTOywMKbvaEPsBhAexnZVSFZX+VecBU6jT+JShoEXbPtOTk8zHtj4Xrz
-IU/bSh0xH4BmGCJXBHKew+QVxHivBAfmsZMoS1OyzMwIxmy8fg6Rxbg2fsMQqofW
-novMILX+cqxzQv5T2dlOk2R2jEF5Jp0Y6alG/ZjLtIJtTj7h5F2QBL8Kn/oXEgSD
-Uz1/sWUNsGa3q/4XUtVKOpE60Yq6wZgG6g2RdLEgZaJOVj9rxNd1vqFaXxJ+f1A=
-=J6/Q
------END PGP SIGNATURE-----
-
---IrhDeMKUP4DT/M7F--
+Thanks,
+Yongji
