@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39811)
+Received: from eggs.gnu.org ([209.51.188.92]:39372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.kanavin@gmail.com>) id 1gjVix-0004bU-Dr
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:54:16 -0500
+	(envelope-from <david@fromorbit.com>) id 1gjVji-0004M3-H2
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:55:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.kanavin@gmail.com>) id 1gjVcJ-00056M-GJ
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:47:25 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37304)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.kanavin@gmail.com>)
-	id 1gjVcJ-00054F-63
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:47:23 -0500
-Received: by mail-ot1-x344.google.com with SMTP id s13so3840154otq.4
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 12:47:21 -0800 (PST)
+	(envelope-from <david@fromorbit.com>) id 1gjVXg-00012O-Et
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:42:37 -0500
+Received: from ipmail02.adl2.internode.on.net ([150.101.137.139]:46922)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <david@fromorbit.com>) id 1gjVXe-0000td-IB
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:42:36 -0500
+Date: Wed, 16 Jan 2019 07:42:23 +1100
+From: Dave Chinner <david@fromorbit.com>
+Message-ID: <20190115204222.GK4205@dastard>
+References: <20190109144736.17452-1-pagupta@redhat.com>
+	<1326478078.61913951.1547192704870.JavaMail.zimbra@redhat.com>
+	<20190113232902.GD4205@dastard>
+	<20190113233820.GX6310@bombadil.infradead.org>
+	<942065073.64011540.1547450140670.JavaMail.zimbra@redhat.com>
+	<20190114212501.GG4205@dastard>
+	<CAPcyv4jtPcLV-s0sKNHwwk0ug7GLBV6699dpm1h3r2xSo879dg@mail.gmail.com>
+	<20190114222132.GH4205@dastard>
+	<1684638419.64320214.1547530506805.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-References: <20190115115047.39326-1-alex.kanavin@gmail.com>
-	<bde5dc1a-2ec3-98fa-1b4c-9147ddbadd86@redhat.com>
-In-Reply-To: <bde5dc1a-2ec3-98fa-1b4c-9147ddbadd86@redhat.com>
-From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Tue, 15 Jan 2019 21:47:08 +0100
-Message-ID: <CANNYZj8RLr0ZQJjgXD065WzuYUHbi-dCN1-j_gQNq+28U9h6Qw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] egl-helpers.h: add a missing X11 include
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1684638419.64320214.1547530506805.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +34,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, Matthew Wilcox <willy@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, virtualization@lists.linux-foundation.org, Linux ACPI <linux-acpi@vger.kernel.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ross Zwisler <zwisler@kernel.org>, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, David Hildenbrand <david@redhat.com>, jmoyer <jmoyer@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, lcapitulino@redhat.com, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Theodore Ts'o <tytso@mit.edu>, adilger kernel <adilger.kernel@dilger.ca>, darrick wong <darrick.wong@oracle.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>
 
-On Tue, 15 Jan 2019 at 20:58, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
-> Cc'ing Gerd (the maintainer) and Marc-Andr=C3=A9.
->
-> On 1/15/19 12:50 PM, Alexander Kanavin wrote:
-> > Otherwise these errors occur, when qemu is built in the Yocto project:
-> > | In file included from /home/alexander/development/poky/build-virgl-gt=
-k-64/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-qemu/3.1.0-r0/qemu-3=
-.1.0/include/ui/egl-context.h:5,
-> > |                  from /home/alexander/development/poky/build-virgl-gt=
-k-64/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-qemu/3.1.0-r0/qemu-3=
-.1.0/ui/egl-context.c:3:
-> > | /home/alexander/development/poky/build-virgl-gtk-64/tmp/work/x86_64-n=
-ativesdk-pokysdk-linux/nativesdk-qemu/3.1.0-r0/qemu-3.1.0/include/ui/egl-he=
-lpers.h:46:55: error: unknown type name 'Window'; did you mean 'minor'?
-> > |  EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win);
-> > |                                                        ^~~~~~
-> > |                                                        minor
->
-> Can you provide more information to reproduce this failure?
->
-> It seems some dependency is missing in your build setup. Missing headers
-> would trigger the definition of MESA_EGL_NO_X11_HEADERS and this error.
->
-> <epoxy/egl.h> includes <EGL/eglplatform.h> which contains:
->
->   #if defined(MESA_EGL_NO_X11_HEADERS)
->   typedef void            *EGLNativeDisplayType;
->   typedef khronos_uintptr_t EGLNativePixmapType;
->   typedef khronos_uintptr_t EGLNativeWindowType;
->   #else
->   /* X11 (tentative)  */
->   #include <X11/Xlib.h>
->
-> So Window should already be declared.
+On Tue, Jan 15, 2019 at 12:35:06AM -0500, Pankaj Gupta wrote:
+> 
+> > > > On Mon, Jan 14, 2019 at 02:15:40AM -0500, Pankaj Gupta wrote:
+> > > > >
+> > > > > > > Until you have images (and hence host page cache) shared between
+> > > > > > > multiple guests. People will want to do this, because it means they
+> > > > > > > only need a single set of pages in host memory for executable
+> > > > > > > binaries rather than a set of pages per guest. Then you have
+> > > > > > > multiple guests being able to detect residency of the same set of
+> > > > > > > pages. If the guests can then, in any way, control eviction of the
+> > > > > > > pages from the host cache, then we have a guest-to-guest
+> > > > > > > information
+> > > > > > > leak channel.
+> > > > > >
+> > > > > > I don't think we should ever be considering something that would
+> > > > > > allow a
+> > > > > > guest to evict page's from the host's pagecache [1].  The guest
+> > > > > > should
+> > > > > > be able to kick its own references to the host's pagecache out of its
+> > > > > > own pagecache, but not be able to influence whether the host or
+> > > > > > another
+> > > > > > guest has a read-only mapping cached.
+> > > > > >
+> > > > > > [1] Unless the guest is allowed to modify the host's file; obviously
+> > > > > > truncation, holepunching, etc are going to evict pages from the
+> > > > > > host's
+> > > > > > page cache.
+> > > > >
+> > > > > This is so correct. Guest does not not evict host page cache pages
+> > > > > directly.
+> > > >
+> > > > They don't right now.
+> > > >
+> > > > But someone is going to end up asking for discard to work so that
+> > > > the guest can free unused space in the underlying spares image (i.e.
+> > > > make use of fstrim or mount -o discard) because they have workloads
+> > > > that have bursts of space usage and they need to trim the image
+> > > > files afterwards to keep their overall space usage under control.
+> > > >
+> > > > And then....
+> > > 
+> > > ...we reject / push back on that patch citing the above concern.
+> > 
+> > So at what point do we draw the line?
+> > 
+> > We're allowing writable DAX mappings, but as I've pointed out that
+> > means we are going to be allowing  a potential information leak via
+> > files with shared extents to be directly mapped and written to.
+> > 
+> > But we won't allow useful admin operations that allow better
+> > management of host side storage space similar to how normal image
+> > files are used by guests because it's an information leak vector?
+> 
+> First of all Thank you for all the useful discussions. 
+> I am summarizing here:
+> 
+> - We have to live with the limitation to not support fstrim and 
+>   mount -o discard options with virtio-pmem as they will evict 
+>   host page cache pages. We cannot allow this for virtio-pmem
+>   for security reasons. These filesystem commands will just zero out 
+>   unused pages currently.
 
-Hello Philippe,
+Not sure I follow you here - what pages are going to be zeroed and
+when will they be zeroed? If discard is not allowed, filesystems
+just don't issue such commands and the underlying device will never
+seen them.
 
-we build mesa explicitly using "--with-platforms=3D'drm surfaceless'"
-(x11 is not in the list), which means MESA_EGL_NO_X11_HEADERS is
-indeed defined according to [1]. We also enable opengl and gtk in
-qemu.
-I believe this is a valid configuration, and so should not lead to
-compile errors (we're fine if it will cause run-time errors for some
-combinations of qemu options). A header should not rely on a
-conditional include happening somewhere else.
+> - If alot of space is unused and not freed guest can request host 
+>   Administrator for truncating the host backing image. 
 
-[1] https://cgit.freedesktop.org/mesa/mesa/tree/configure.ac#n2533
+You can't use truncate to free space in a disk image file. The only
+way to do it safely in a generic, filesystem agnositic way is to
+mount the disk image (e.g. on loopback) and run fstrim on it. The
+loopback device will punches holes in the file where all the free
+space is reported by the filesystem via discard requests.
 
-Thanks,
-Alex
+Which is kinda my point - this could only be done if the guest is
+shut down, which makes it very difficult for admins to manage. 
+
+>   We are also planning to support qcow2 sparse image format at 
+>   host side with virtio-pmem.
+
+So you're going to be remapping a huge number of disjoint regions
+into a linear pmem mapping? ISTR discussions about similar things
+for virtio+fuse+dax that came up against "large numbers of mapped
+regions don't scale" and so it wasn't a practical solution compared
+to a just using raw sparse files....
+
+> - There is no existing solution for Qemu persistent memory 
+>   emulation with write support currently. This solution provides 
+>   us the paravartualized way of emulating persistent memory.
+
+Sure, but the question is why do you need to create an emulation
+that doesn't actually perform like pmem? The whole point of pmem is
+performance, and emulating pmem by mmap() of a file on spinning
+disks is going to be horrible for performance. Even on SSDs it's
+going to be orders of magnitudes slower than real pmem.
+
+So exactly what problem are you trying to solve with this driver?
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
