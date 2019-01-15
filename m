@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40133)
+Received: from eggs.gnu.org ([209.51.188.92]:41585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gjPgz-0001lG-2I
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:27:50 -0500
+	(envelope-from <thuth@redhat.com>) id 1gjPll-0005kH-4b
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:32:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gjPgt-0001At-5r
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:27:48 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42425)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gjPgs-0001AJ-VI
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:27:43 -0500
-Received: by mail-wr1-x442.google.com with SMTP id q18so3164343wrx.9
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 06:27:42 -0800 (PST)
-Date: Tue, 15 Jan 2019 14:27:39 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190115142739.GD29056@stefanha-x1.localdomain>
-References: <1547546927-18006-1-git-send-email-dimastep@yandex-team.ru>
+	(envelope-from <thuth@redhat.com>) id 1gjPlj-00049M-6K
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:32:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46320)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjPli-000476-Km
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:32:43 -0500
+References: <1547487921-605-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-tPoQK+7GTesyqAVmoKm7g3SHoP2iz3R8k7WX=PW5q4w@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <cdf8a1ab-c99b-789f-8325-f63d6da5e0c1@redhat.com>
+Date: Tue, 15 Jan 2019 15:32:10 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="fOHHtNG4YXGJ0yqR"
-Content-Disposition: inline
-In-Reply-To: <1547546927-18006-1-git-send-email-dimastep@yandex-team.ru>
-Subject: Re: [Qemu-devel] [PATCH v1] virtio: add checks for the size of the
- indirect table
+In-Reply-To: <CAFEAcA-tPoQK+7GTesyqAVmoKm7g3SHoP2iz3R8k7WX=PW5q4w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/27] ivshmem deprecation, qtests,
+ typedefs and gnu99
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dima Stepanov <dimastep@yandex-team.ru>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, wrfsh@yandex-team.ru
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Li Qiang <liq3ea@163.com>, Eduardo Otubo <otubo@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-
---fOHHtNG4YXGJ0yqR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jan 15, 2019 at 01:08:47PM +0300, Dima Stepanov wrote:
-> The virtqueue_pop() and virtqueue_get_avail_bytes() routines can use the
-> INDIRECT table to get the data. It is possible to create a packet which
-> will lead to the assert message like:
->   include/exec/memory.h:1995: void
->   address_space_read_cached(MemoryRegionCache *, hwaddr, void *, int):
->   Assertion `addr < cache->len && len <=3D cache->len - addr' failed.
->   Aborted
-> To do it the first descriptor should have a link to the INDIRECT table
-> and set the size of it to 0. It doesn't look good that the guest should
-> be able to trigger the assert in qemu. Add additional check for the size
-> of the INDIRECT table, which should not be 0.
+On 2019-01-15 14:16, Peter Maydell wrote:
+> On Mon, 14 Jan 2019 at 17:45, Thomas Huth <thuth@redhat.com> wrote:
+>>
+>>  Hi Peter!
+>>
+>> The following changes since commit 7260438b7056469610ee166f7abe9ff8a26=
+b8b16:
+>>
+>>   Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-3=
+.2-part2' into staging (2019-01-14 11:41:43 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-01-14v2
+>>
+>> for you to fetch changes up to 650db715681ad1a042705484776e1974f288f3d=
+4:
+>>
+>>   tests/hexloader-test: Don't pass -nographic to the QEMU under test (=
+2019-01-14 18:21:29 +0100)
+>>
+>> ----------------------------------------------------------------
+>> - Remove deprecated "ivshmem" legacy device
+>> - Bug fix for vhost-user-test
+>> - Use more CONFIG Makefile switches for qtests
+>> - Get rid of global_qtests in some more qtests
+>> - typedef cleanups
+>> - Fixes for compiling with Clang
+>> - Force C standard to gnu99
+>> ----------------------------------------------------------------
 >=20
-> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-> ---
->  hw/virtio/virtio.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Hi; another compile failure on that ppc64 system, I'm afraid:
+>=20
+> /home/pm215/qemu/qemu-seccomp.c:45:1: error: initializer element is not=
+ constant
+>  };
+>  ^
+> /home/pm215/qemu/qemu-seccomp.c:45:1: error: (near initialization for
+> =E2=80=98sched_setscheduler_arg[0]=E2=80=99)
+>=20
+> (I did a quick check with 'make -k' and it looks like there aren't
+> any more lurking after that one.)
+>=20
+> The system libseccomp is libseccomp-2.3.1-3.el7.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Darn, I think this time it is a compiler bug:
 
---fOHHtNG4YXGJ0yqR
-Content-Type: application/pgp-signature; name="signature.asc"
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D63567
 
------BEGIN PGP SIGNATURE-----
+It's only fixed in GCC >=3D v5.0 :-(
 
-iQEcBAEBAgAGBQJcPe3bAAoJEJykq7OBq3PIrIsIAJdUHSq7JQX5oBueFpK8vpV2
-yVWJjH8uBvI+dC/5RaEWqn752bO3ARfPpDY6U9qJzPu/P2qlmAFKgGdWRVzuF8UP
-1U37vN3ot04MTKvQf4MGC2vTrVBWeWBxqnoJJIiUwAoEtUbW+EMeRcP/owaK/OBq
-j3zQg/qC7/YPfKl6/iZNCfVq7Mz8+1WYRejqU74AE0vFRuD6bFdb8SRXytbUGo37
-UyHz489DgyS+S+vT1XleDBNuMGeI2XMmwfZdLz7Tmq9SiOcKx3U7oCjI8/4AKdWT
-hOXpiXqcT7lxSLx9JIO8CaLj2ZzANspNGzKiJ6kP8ttuBBVfjs5RCDI7H3NOq4w=
-=Lg49
------END PGP SIGNATURE-----
+I see two options:
 
---fOHHtNG4YXGJ0yqR--
+1) Expand the macro manually:
+
+diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+--- a/qemu-seccomp.c
++++ b/qemu-seccomp.c
+@@ -41,7 +41,7 @@ struct QemuSeccompSyscall {
+ };
+
+ const struct scmp_arg_cmp sched_setscheduler_arg[] =3D {
+-    SCMP_A1(SCMP_CMP_NE, SCHED_IDLE)
++    { .arg =3D 1, .op =3D SCMP_CMP_NE, .datum_a =3D SCHED_IDLE }
+ };
+
+... then it compiles fine for me in gnu99 mode, too.
+
+2) Scratch the whole idea with gnu99 again ...
+
+Opinions?
+
+ Thomas
