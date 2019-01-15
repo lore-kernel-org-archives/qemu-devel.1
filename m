@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56409)
+Received: from eggs.gnu.org ([209.51.188.92]:56792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjQeS-0005WJ-Sa
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:29:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1gjQfq-0006NY-N6
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:30:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjQeR-0004fS-SC
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:29:16 -0500
-References: <1547467955-17245-1-git-send-email-thuth@redhat.com>
-	<30917d5b-f8cb-e799-6c3e-3202195122b4@redhat.com>
-	<871s5fp54s.fsf@linaro.org>
-	<e94b51d7-c90f-b599-fb68-ea8c2603989b@redhat.com>
-	<87zhs3nk1m.fsf@linaro.org>
-	<a0646a85-603d-99a8-c676-76e43a42e0fb@twiddle.net>
-	<87y37monyr.fsf@linaro.org>
-	<CAFEAcA8u4AdhW-MF6uMP7=B4iYVO9ZEQCtcQKpN6KWALwAfLnw@mail.gmail.com>
-	<87won6nfl1.fsf@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6cb80b50-0352-430e-0c46-85ed69f95c88@redhat.com>
-Date: Tue, 15 Jan 2019 16:29:08 +0100
+	(envelope-from <eblake@redhat.com>) id 1gjQfo-0005Fe-K6
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:30:42 -0500
+References: <20190112175812.27068-1-eblake@redhat.com>
+	<20190112175812.27068-5-eblake@redhat.com>
+	<3342cf43-21ba-60aa-4ca2-ed0e5b0ea4ae@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8312fb33-1724-d0b0-c5af-763963250ced@redhat.com>
+Date: Tue, 15 Jan 2019 09:25:10 -0600
 MIME-Version: 1.0
-In-Reply-To: <87won6nfl1.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
- with Clang on s390x
+In-Reply-To: <3342cf43-21ba-60aa-4ca2-ed0e5b0ea4ae@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XrCfHqzaIvJNoGbHGNpVLb5bM0qDlbGKS"
+Subject: Re: [Qemu-devel] [PATCH v3 04/19] nbd/server: Hoist length check to
+ qemp_nbd_server_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,177 +26,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 2019-01-15 15:46, Alex Benn=C3=A9e wrote:
->=20
-> Peter Maydell <peter.maydell@linaro.org> writes:
->=20
->> On Mon, 14 Jan 2019 at 22:48, Alex Benn=C3=A9e <alex.bennee@linaro.org=
-> wrote:
->>>
->>>
->>> Richard Henderson <rth@twiddle.net> writes:
->>>> But perhaps
->>>>
->>>>     unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
->>>>     *r =3D n % d;
->>>>     return n / d;
->>>>
->>>> will allow the compiler to do what the assembly does for some 64-bit
->>>> hosts.
->>>
->>> I wonder how much cost is incurred by the jumping to the (libgcc?) di=
-v
->>> helper? Anyone got an s390x about so we can benchmark the two
->>> approaches?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XrCfHqzaIvJNoGbHGNpVLb5bM0qDlbGKS
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
+ "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
+ <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <8312fb33-1724-d0b0-c5af-763963250ced@redhat.com>
+Subject: Re: [PATCH v3 04/19] nbd/server: Hoist length check to
+ qemp_nbd_server_add
+References: <20190112175812.27068-1-eblake@redhat.com>
+ <20190112175812.27068-5-eblake@redhat.com>
+ <3342cf43-21ba-60aa-4ca2-ed0e5b0ea4ae@virtuozzo.com>
+In-Reply-To: <3342cf43-21ba-60aa-4ca2-ed0e5b0ea4ae@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/15/19 3:44 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 12.01.2019 20:57, Eric Blake wrote:
+>> We only had two callers to nbd_export_new; qemu-nbd.c always
+>> passed a valid offset/length pair (because it already checked
+>> the file length, to ensure that offset was in bounds), while
+>> blockdev-nbd always passed 0/-1.  Then nbd_export_new reduces
+>> the size to a multiple of BDRV_SECTOR_SIZE (can only happen
+>> when offset is not sector-aligned, since bdrv_getlength()
+>> currently rounds up), which can result in offset being greater
+>> than the enforced length, but that's not fatal (the server
+>> rejects client requests that exceed the advertised length).
 >>
->> The project has an s390x system available; however it's usually
->> running merge build tests so not so useful for benchmarking.
->> (I can set up accounts on it but that requires me to faff about
->> figuring out how to create new accounts :-))
+>> However, I'm finding it easier to work with the code if we are
+>> consistent on having both callers pass in a valid length, and
+>> just assert that things are sane in nbd_export_new.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+
+>> +++ b/nbd/server.c
+>> @@ -1499,13 +1499,8 @@ NBDExport *nbd_export_new(BlockDriverState *bs,=
+ off_t dev_offset, off_t size,
+>>       exp->name =3D g_strdup(name);
+>>       exp->description =3D g_strdup(description);
+>>       exp->nbdflags =3D nbdflags;
+>> -    exp->size =3D size < 0 ? blk_getlength(blk) : size;
+>> -    if (exp->size < 0) {
+>> -        error_setg_errno(errp, -exp->size,
+>> -                         "Failed to determine the NBD export's length=
+");
+>> -        goto fail;
+>> -    }
+>> -    exp->size -=3D exp->size % BDRV_SECTOR_SIZE;
+>> +    assert(dev_offset <=3D size);
 >=20
-> I'm happy to leave this up to those who care about s390x host
-> performance (Thomas, Cornelia?). I'm just keen to avoid the divide
-> helper getting too #ifdefy.
+> @size is not size of the image, but size of the export, so it may be le=
+ss than dev_offset
+> (qemu-nbd.c do "fd_size -=3D dev_offset" before "nbd_export_new(bs, dev=
+_offset, fd_size, "
 
-Ok, I just did a quick'n'dirty "benchmark" on the s390x that I've got ava=
-ilable:
+But the assert is fine because patch 3/19 fixed qemu-nbd.c to never pass
+in dev_offset larger than size (it fails up front if dev_offset is out
+of bounds, whether from the -o command line option or from what it read
+from the partition header with the -P command line option).
 
-#include <stdio.h>
-#include <time.h>
-#include <stdint.h>
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-uint64_t udiv_qrnnd1(uint64_t *r, uint64_t n1, uint64_t n0, uint64_t d)
-{
-    unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
-    asm("dlgr %0, %1" : "+r"(n) : "r"(d));
-    *r =3D n >> 64;
-    return n;
-}
 
-uint64_t udiv_qrnnd2(uint64_t *r, uint64_t n1, uint64_t n0, uint64_t d)
-{
-    unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
-    *r =3D n % d;
-    return n / d;
-}
+--XrCfHqzaIvJNoGbHGNpVLb5bM0qDlbGKS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-uint64_t udiv_qrnnd3(uint64_t *r, uint64_t n1, uint64_t n0, uint64_t d)
-{
-    uint64_t d0, d1, q0, q1, r1, r0, m;
+-----BEGIN PGP SIGNATURE-----
 
-    d0 =3D (uint32_t)d;
-    d1 =3D d >> 32;
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw9+1YACgkQp6FrSiUn
+Q2qpXAf7BcnnqiufeBog1UoKYEg0Bg/2pMSgzKaiu0mwBMgaEyNACwZLQRveEg/o
+TmeEihwTxDzWGQQp5vtfK0/mYBjZStHAwLnzJN1MPZ83OyuLrY6XwNCiYwT4Ehaz
+3GrPzqlbmmEulaj+ZGbV7DpZ/p0Ppm66LYNSq123FxhdrCMeDnX0NVDT5Th72JEd
+txhufi+8q/DaiS/MBHKnrIAr/Qwper4BvS+svqb5+cx9jCXM6fmYnER/erqaEplH
+f+8U85cdA1BpEVTmuF8rFHL8cZDr4cJbvLtf+yFeRJl39vVyIBsb3KGvMqCpWs0h
+6oeMgqyccJwjoLGHiWU7xn3h5RktBA==
+=aRQY
+-----END PGP SIGNATURE-----
 
-    r1 =3D n1 % d1;
-    q1 =3D n1 / d1;
-    m =3D q1 * d0;
-    r1 =3D (r1 << 32) | (n0 >> 32);
-    if (r1 < m) {
-        q1 -=3D 1;
-        r1 +=3D d;
-        if (r1 >=3D d) {
-            if (r1 < m) {
-                q1 -=3D 1;
-                r1 +=3D d;
-            }
-        }
-    }
-    r1 -=3D m;
-
-    r0 =3D r1 % d1;
-    q0 =3D r1 / d1;
-    m =3D q0 * d0;
-    r0 =3D (r0 << 32) | (uint32_t)n0;
-    if (r0 < m) {
-        q0 -=3D 1;
-        r0 +=3D d;
-        if (r0 >=3D d) {
-            if (r0 < m) {
-                q0 -=3D 1;
-                r0 +=3D d;
-            }
-        }
-    }
-    r0 -=3D m;
-
-    *r =3D r0;
-    return (q1 << 32) | q0;
-
-}
-
-int main()
-{
-	uint64_t r =3D 0, n1 =3D 0, n0 =3D 0, d =3D 0;
-	uint64_t rs =3D 0, rn =3D 0;
-	clock_t start, end;
-	long i;
-
-	start =3D clock();
-	for (i=3D0; i<200000000L; i++) {
-		n1 +=3D 3;
-		n0 +=3D 987654321;
-		d +=3D 0x123456789;
-		rs +=3D udiv_qrnnd1(&r, n1, n0, d);
-		rn +=3D r;
-	}
-	end =3D clock();
-	printf("test 1: time=3D%li\t, rs=3D%li , rn =3D %li\n", (end-start)/1000=
-, rs, rn);
-
-	r =3D n1 =3D n0 =3D d =3D rs =3D rn =3D 0;
-
-	start =3D clock();
-	for (i=3D0; i<200000000L; i++) {
-		n1 +=3D 3;
-		n0 +=3D 987654321;
-		d +=3D 0x123456789;
-		rs +=3D udiv_qrnnd2(&r, n1, n0, d);
-		rn +=3D r;
-	}
-	end =3D clock();
-	printf("test 2: time=3D%li\t, rs=3D%li , rn =3D %li\n", (end-start)/1000=
-, rs, rn);
-
-	r =3D n1 =3D n0 =3D d =3D rs =3D rn =3D 0;
-
-	start =3D clock();
-	for (i=3D0; i<200000000L; i++) {
-		n1 +=3D 3;
-		n0 +=3D 987654321;
-		d +=3D 0x123456789;
-		rs +=3D udiv_qrnnd3(&r, n1, n0, d);
-		rn +=3D r;
-	}
-	end =3D clock();
-	printf("test 3: time=3D%li\t, rs=3D%li , rn =3D %li\n", (end-start)/1000=
-, rs, rn);
-
-	return 0;
-}
-
-... and results with GCC v8.2.1 are (using -O2):
-
-test 1: time=3D609	, rs=3D2264924160200000000 , rn =3D 613621899752716083=
-2
-test 2: time=3D10127	, rs=3D2264924160200000000 , rn =3D 6136218997527160=
-832
-test 3: time=3D2350	, rs=3D2264924183048928865 , rn =3D 48428220481623110=
-89
-
-Thus the int128 version is the slowest!
-
-... but at least it gives the same results as the DLGR instruction. The 6=
-4-bit
-version gives different results - do we have a bug here?
-
-Results with Clang v7.0.1 (using -O2, too) are these:
-
-test 2: time=3D5035	, rs=3D2264924160200000000 , rn =3D 61362189975271608=
-32
-test 3: time=3D1970	, rs=3D2264924183048928865 , rn =3D 48428220481623110=
-89
-
- Thomas
+--XrCfHqzaIvJNoGbHGNpVLb5bM0qDlbGKS--
