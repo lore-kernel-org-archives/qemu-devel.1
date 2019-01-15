@@ -1,24 +1,25 @@
 Received: from eggs.gnu.org ([209.51.188.92]:36654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDja-0007cx-Pm
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:43 -0500
+	(envelope-from <mst@redhat.com>) id 1gjDjc-0007cx-O5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDfG-0000Al-0j
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:37:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49004)
+	(envelope-from <mst@redhat.com>) id 1gjDet-0008Ra-Me
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48842)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDfF-0000AS-P6
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:37:13 -0500
-Date: Mon, 14 Jan 2019 20:37:05 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDet-0008RF-H5
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:51 -0500
+Date: Mon, 14 Jan 2019 20:36:47 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115003812.11329-38-mst@redhat.com>
+Message-ID: <20190115003812.11329-35-mst@redhat.com>
 References: <20190115003812.11329-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20190115003812.11329-1-mst@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 37/44] tpm: add a "ppi" boolean property
+Subject: [Qemu-devel] [PULL 34/44] globals: Allow global properties to be
+ optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +29,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-The following patches implement the TPM Physical Presence Interface,
-make use of a new memory region and a fw_cfg entry. Enable PPI by
-default with >=3D4.0 machine type, to avoid migration issues.
+Making some global properties optional will let us simplify
+compat code when a given property works on most (but not all)
+subclasses of a given type.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Tested-by: Stefan Berger <stefanb@linux.ibm.com>
+Device types will be able to opt out from optional compat
+properties by simply not registering those properties.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/core/machine.c | 2 ++
- hw/tpm/tpm_crb.c  | 3 +++
- hw/tpm/tpm_tis.c  | 3 +++
- 3 files changed, 8 insertions(+)
+ include/hw/qdev-core.h | 3 +++
+ qom/object.c           | 3 +++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index f0c0ae6be8..2629515363 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -28,6 +28,8 @@ GlobalProperty hw_compat_3_1[] =3D {
-     { "pcie-root-port", "x-width", "1" },
-     { "memory-backend-file", "x-use-canonical-path-for-ramblock-id", "tr=
-ue" },
-     { "memory-backend-memfd", "x-use-canonical-path-for-ramblock-id", "t=
-rue" },
-+    { "tpm-crb", "ppi", "false" },
-+    { "tpm-tis", "ppi", "false" },
- };
- const size_t hw_compat_3_1_len =3D G_N_ELEMENTS(hw_compat_3_1);
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 9614f76ae6..0a84c42756 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -250,6 +250,8 @@ struct PropertyInfo {
+ /**
+  * GlobalProperty:
+  * @used: Set to true if property was used when initializing a device.
++ * @optional: If set to true, GlobalProperty will be skipped without err=
+ors
++ *            if the property doesn't exist.
+  *
+  * An error is fatal for non-hotplugged devices, when the global is appl=
+ied.
+  */
+@@ -258,6 +260,7 @@ typedef struct GlobalProperty {
+     const char *property;
+     const char *value;
+     bool used;
++    bool optional;
+ } GlobalProperty;
 =20
-diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-index a92dd50437..d5b0ac5920 100644
---- a/hw/tpm/tpm_crb.c
-+++ b/hw/tpm/tpm_crb.c
-@@ -41,6 +41,8 @@ typedef struct CRBState {
-     MemoryRegion cmdmem;
-=20
-     size_t be_buffer_size;
-+
-+    bool ppi_enabled;
- } CRBState;
-=20
- #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
-@@ -221,6 +223,7 @@ static const VMStateDescription vmstate_tpm_crb =3D {
-=20
- static Property tpm_crb_properties[] =3D {
-     DEFINE_PROP_TPMBE("tpmdev", CRBState, tpmbe),
-+    DEFINE_PROP_BOOL("ppi", CRBState, ppi_enabled, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 2563d7501f..1698d83cd3 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -81,6 +81,8 @@ typedef struct TPMState {
-     TPMVersion be_tpm_version;
-=20
-     size_t be_buffer_size;
-+
-+    bool ppi_enabled;
- } TPMState;
-=20
- #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
-@@ -954,6 +956,7 @@ static const VMStateDescription vmstate_tpm_tis =3D {
- static Property tpm_tis_properties[] =3D {
-     DEFINE_PROP_UINT32("irq", TPMState, irq_num, TPM_TIS_IRQ),
-     DEFINE_PROP_TPMBE("tpmdev", TPMState, be_driver),
-+    DEFINE_PROP_BOOL("ppi", TPMState, ppi_enabled, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
+ static inline void
+diff --git a/qom/object.c b/qom/object.c
+index 4e5226ca12..b8c732063b 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -385,6 +385,9 @@ void object_apply_global_props(Object *obj, const GPt=
+rArray *props, Error **errp
+         if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
+             continue;
+         }
++        if (p->optional && !object_property_find(obj, p->property, NULL)=
+) {
++            continue;
++        }
+         p->used =3D true;
+         object_property_parse(obj, p->value, p->property, &err);
+         if (err !=3D NULL) {
 --=20
 MST
