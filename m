@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46997)
+Received: from eggs.gnu.org ([209.51.188.92]:49045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <carpeddiem@gmail.com>) id 1gjToh-0004I0-BP
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:52:04 -0500
+	(envelope-from <philmd@redhat.com>) id 1gjTrE-0005Cf-8y
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:54:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <carpeddiem@gmail.com>) id 1gjTof-0003yn-8N
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:52:03 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:35774)
+	(envelope-from <philmd@redhat.com>) id 1gjTrC-0005GG-7j
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:54:40 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:37371)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <carpeddiem@gmail.com>)
-	id 1gjTod-0003y5-H4
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:51:59 -0500
-Received: by mail-it1-f194.google.com with SMTP id p197so5896745itp.0
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:51:58 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gjTr7-0005D1-4y
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:54:34 -0500
+Received: by mail-wm1-f66.google.com with SMTP id g67so4353655wmd.2
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:54:32 -0800 (PST)
+References: <alpine.BSF.2.21.9999.1811292101280.5887@zero.eik.bme.hu>
+	<alpine.BSF.2.21.9999.1901151926320.72972@zero.eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e72fd744-3440-a684-38c4-75d6d604cddb@redhat.com>
+Date: Tue, 15 Jan 2019 19:54:29 +0100
 MIME-Version: 1.0
-References: <20190115184229.73688-1-emaste@freefall.freebsd.org>
-In-Reply-To: <20190115184229.73688-1-emaste@freefall.freebsd.org>
-From: Ed Maste <emaste@freebsd.org>
-Date: Tue, 15 Jan 2019 13:51:44 -0500
-Message-ID: <CAPyFy2Dw2F3ks_5f8cvWjrsOTS0_Ybr5kELUpyHQmOQWUaeuFg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for
- FreeBSD
+In-Reply-To: <alpine.BSF.2.21.9999.1901151926320.72972@zero.eik.bme.hu>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,17 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
 
-On Tue, 15 Jan 2019 at 13:42, Ed Maste <emaste@freebsd.org> wrote:
->
-> From: Ed Maste <emaste@freebsd.org>
+On 1/15/19 7:29 PM, BALATON Zoltan wrote:
+> On Thu, 29 Nov 2018, BALATON Zoltan wrote:
+>> Then I've tried the same with the pll patches posted by Philippe
+>> Mathieu-Daudé here:
+>>
+>> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg00191.html
+>>
+>> on top of v3.1.0-rc3 which helped to get rid of the cprman warnings
+> 
+> Will these patches be merged eventually? These seem to at least get rid
+> of some annoying warnings in Linux boot dmesg.
 
-I'm not sure what part of the path between `git send-email` and the
-list moved this From: into the message body, but it's not intentional.
-If someone's going to pick up this patch please edit the commit
-message.
+I'll respin this series addressing Peter's comments.
 
-> Cirrus-CI (https://cirrus-ci.org) is a hosted CI service which supports
-> several platforms, including FreeBSD.  Later on we could build for other
-...
+Thanks for reminding me ;)
+
+Phil.
