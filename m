@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:32929)
+Received: from eggs.gnu.org ([209.51.188.92]:33593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjQyy-0008JP-JC
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:50:29 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjR1A-00013o-In
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:52:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjQyp-0004zQ-Fv
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:50:22 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjR19-000680-Aj
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:52:44 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 15 Jan 2019 15:52:11 +0000
+Message-ID: <52cbe9ac-0b58-e545-4b50-ab03fee642d4@virtuozzo.com>
 References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-12-eblake@redhat.com>
-	<5d182b61-b17a-fefb-4f9f-c4e697bba8a7@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ce3e0fa8-4b7e-4dd9-e191-6ade2cb5bb2f@redhat.com>
-Date: Tue, 15 Jan 2019 09:50:03 -0600
+	<20190112175812.27068-11-eblake@redhat.com>
+	<e24c7f01-a203-c6ce-ac95-77cb74c590df@virtuozzo.com>
+	<c0ab928c-3efc-41fd-f16f-6a6b4e465e9a@redhat.com>
+In-Reply-To: <c0ab928c-3efc-41fd-f16f-6a6b4e465e9a@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C1D774AC94D0794CBA2244E5A6D00014@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <5d182b61-b17a-fefb-4f9f-c4e697bba8a7@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mTAT0TcYtizXdkXNh5wLQ9mFjYr7nKNk7"
-Subject: Re: [Qemu-devel] [PATCH v3 11/19] nbd/client: Split out
- nbd_receive_one_meta_context()
+Subject: Re: [Qemu-devel] [PATCH v3 10/19] nbd/client: Split out
+ nbd_send_one_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,139 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mTAT0TcYtizXdkXNh5wLQ9mFjYr7nKNk7
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
- <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Message-ID: <ce3e0fa8-4b7e-4dd9-e191-6ade2cb5bb2f@redhat.com>
-Subject: Re: [PATCH v3 11/19] nbd/client: Split out
- nbd_receive_one_meta_context()
-References: <20190112175812.27068-1-eblake@redhat.com>
- <20190112175812.27068-12-eblake@redhat.com>
- <5d182b61-b17a-fefb-4f9f-c4e697bba8a7@virtuozzo.com>
-In-Reply-To: <5d182b61-b17a-fefb-4f9f-c4e697bba8a7@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 1/15/19 9:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 12.01.2019 20:58, Eric Blake wrote:
->> Extract portions of nbd_negotiate_simple_meta_context() to
->> a new function nbd_receive_one_meta_context() that copies the
->> pattern of nbd_receive_list() for performing the argument
->> validation of one reply.  The error message when the server
->> replies with more than one context changes slightly, but
->> that shouldn't happen in the common case.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> Message-Id: <20181215135324.152629-15-eblake@redhat.com>
->>
->> ---
->> v3: rebase, without changing into a loop
->> ---
-
->>=20
->> +static int nbd_receive_one_meta_context(QIOChannel *ioc,
->> +                                        uint32_t opt,
->> +                                        char **name,
->> +                                        uint32_t *id,
->> +                                        Error **errp)
->> +{
-
->> +    reply.length -=3D sizeof(local_id);
->> +    local_name =3D g_malloc(reply.length + 1);
->> +    if (nbd_read(ioc, local_name, reply.length, errp) < 0) {
->> +        g_free(local_name);
->> +        return -1;
->> +    }
->> +    local_name[reply.length] =3D '\0';
->> +    trace_nbd_opt_meta_reply(nbd_opt_lookup(opt), local_name, local_i=
-d);
->> +
-
-[1]
-
->> @@ -746,36 +796,20 @@ static int nbd_negotiate_simple_meta_context(QIO=
-Channel *ioc,
->>               return -1;
->>           }
->>           g_free(name);
->> -
->> -        trace_nbd_opt_meta_reply(context, info->context_id);
->>           received =3D true;
->>
->> -        /* receive NBD_REP_ACK */
->> -        if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &=
-reply,
->> -                                     errp) < 0)
->> -        {
->> +        ret =3D nbd_receive_one_meta_context(ioc, NBD_OPT_SET_META_CO=
-NTEXT,
->> +                                       &name, &info->context_id, errp=
-);
->=20
-> indent, and, no reasons to use variables instead of NULL, NULL, as succ=
-ess here is an error
-> path anyway
-
-Not sure how I missed the indent, and good point about not needing &name
-or &info->context_id on this second call.
-
->> +++ b/nbd/trace-events
->> @@ -13,7 +13,7 @@ nbd_receive_query_exports_success(const char *wantna=
-me) "Found desired export na
->>   nbd_receive_starttls_new_client(void) "Setting up TLS"
->>   nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
->>   nbd_opt_meta_request(const char *optname, const char *context, const=
- char *export) "Requesting %s %s for export %s"
->> -nbd_opt_meta_reply(const char *context, uint32_t id) "Received mappin=
-g of context %s to id %" PRIu32
->> +nbd_opt_meta_reply(const char *optname, const char *context, uint32_t=
- id) "Received %s mapping of %s to id %" PRIu32
->=20
-> nbd_opt_lookup
-
-Added at [1], so I'm not sure what you are still wanting here.
-
->=20
->>   nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receivi=
-ng negotiation tlscreds=3D%p hostname=3D%s"
->>   nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
->>   nbd_receive_negotiate_server_flags(uint32_t globalflags) "Global fla=
-gs are 0x%" PRIx32
->>
->=20
-> With at least nbd_opt_lookup:
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---mTAT0TcYtizXdkXNh5wLQ9mFjYr7nKNk7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw+ASsACgkQp6FrSiUn
-Q2pulQf/XjaAJcYen+jcHq6ZlE0Vxu5+9lC5G2Zpx40zaohv1gJKqZ0hjBAiXgN7
-GEA5XO5dAaIAwvh9S1EQts1kHQVYbfjmu8+Zs7y53lLWVskyjvvbiHOC09UlpAoX
-fCSwGFh30SO7tcf2Truvljr8QKFJC67AA3Lq6k8U9WHGHmnMKmf6sI+UOc7zk/QG
-esLEmNWW1YAlPOo4gjlAzaEzQpttw35NDb+RCNOQKzsdon9/nDFTxOSGi+YEgiwG
-NIasn8pgQ7vzipnDFoztU9WEG6QLEJWeinN6ZyE14vPuKIOPoejzP75U2jArh412
-6oF2R1EcQsyR8B4T7wRXNF0d5jxZ+Q==
-=docw
------END PGP SIGNATURE-----
-
---mTAT0TcYtizXdkXNh5wLQ9mFjYr7nKNk7--
+MTUuMDEuMjAxOSAxODo0NCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xNS8xOSA3OjE4IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTIuMDEuMjAxOSAyMDo1
+OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBSZWZhY3RvciBuYmRfbmVnb3RpYXRlX3NpbXBsZV9t
+ZXRhX2NvbnRleHQoKSB0byBwdWxsIG91dCB0aGUNCj4+PiBjb2RlIHRoYXQgY2FuIGJlIHJldXNl
+ZCB0byBzZW5kIGEgTElTVCByZXF1ZXN0IGZvciAwIG9yIDEgcXVlcnkuDQo+Pj4gTm8gc2VtYW50
+aWMgY2hhbmdlLiAgVGhlIG9sZCBjb21tZW50IGFib3V0ICdzaXplb2YodWludDMyX3QpJw0KPj4+
+IGJlaW5nIGVxdWl2YWxlbnQgdG8gJy8qIG51bWJlciBvZiBxdWVyaWVzICovJyBpcyBubyBsb25n
+ZXINCj4+PiBuZWVkZWQsIG5vdyB0aGF0IHdlIGFyZSBjb21wdXRpbmcgJ3NpemVvZihxdWVyaWVz
+KScgaW5zdGVhZC4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUBy
+ZWRoYXQuY29tPg0KPj4+IE1lc3NhZ2UtSWQ6IDwyMDE4MTIxNTEzNTMyNC4xNTI2MjktMTQtZWJs
+YWtlQHJlZGhhdC5jb20+DQo+Pj4gUmV2aWV3ZWQtYnk6IFJpY2hhcmQgVy5NLiBKb25lcyA8cmpv
+bmVzQHJlZGhhdC5jb20+DQo+Pj4NCj4+PiAtLS0NCj4+PiB2MzogSW1wcm92ZSBjb21taXQgbWVz
+c2FnZSBbUmljaF0sIGZvcm1hdHRpbmcgdHdlYWsgW2NoZWNrcGF0Y2hdLA0KPj4+IHJlYmFzZSB0
+byBkcm9wcGVkIHBhdGNoDQo+Pj4gLS0tDQo+IA0KPj4+ICsrKyBiL25iZC9jbGllbnQuYw0KPj4+
+IEBAIC02MjksNiArNjI5LDQ5IEBAIHN0YXRpYyBRSU9DaGFubmVsICpuYmRfcmVjZWl2ZV9zdGFy
+dHRscyhRSU9DaGFubmVsICppb2MsDQo+Pj4gICAgICAgIHJldHVybiBRSU9fQ0hBTk5FTCh0aW9j
+KTsNCj4+PiAgICB9DQo+Pj4NCj4+PiArLyoNCj4+PiArICogbmJkX3NlbmRfb25lX21ldGFfY29u
+dGV4dDoNCj4+PiArICogU2VuZCAwIG9yIDEgc2V0L2xpc3QgbWV0YSBjb250ZXh0IHF1ZXJpZXMu
+DQo+Pj4gKyAqIFJldHVybiAwIG9uIHN1Y2Nlc3MsIC0xIHdpdGggZXJycCBzZXQgZm9yIGFueSBl
+cnJvcg0KPj4+ICsgKi8NCj4+PiArc3RhdGljIGludCBuYmRfc2VuZF9vbmVfbWV0YV9jb250ZXh0
+KFFJT0NoYW5uZWwgKmlvYywNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHVpbnQzMl90IG9wdCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIGNvbnN0IGNoYXIgKmV4cG9ydCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIGNvbnN0IGNoYXIgKnF1ZXJ5LA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPj4+ICt7DQo+Pj4gKyAgICBpbnQgcmV0Ow0K
+Pj4+ICsgICAgdWludDMyX3QgZXhwb3J0X2xlbiA9IHN0cmxlbihleHBvcnQpOw0KPj4+ICsgICAg
+dWludDMyX3QgcXVlcmllcyA9ICEhcXVlcnk7DQo+Pg0KPj4gbl8gb3IgbmJfIHByZWZpeCBtYXkg
+bWFrZSBpdCBtb3JlIGNsZWFyDQo+Pg0KPj4+ICsgICAgdWludDMyX3QgY29udGV4dF9sZW4gPSAw
+Ow0KPj4+ICsgICAgdWludDMyX3QgZGF0YV9sZW47DQo+Pj4gKyAgICBjaGFyICpkYXRhOw0KPj4+
+ICsgICAgY2hhciAqcDsNCj4+PiArDQo+Pj4gKyAgICBkYXRhX2xlbiA9IHNpemVvZihleHBvcnRf
+bGVuKSArIGV4cG9ydF9sZW4gKyBzaXplb2YocXVlcmllcyk7DQo+IA0KPiBbMV0NCj4gDQo+Pj4g
+KyAgICBpZiAocXVlcnkpIHsNCj4+PiArICAgICAgICBjb250ZXh0X2xlbiA9IHN0cmxlbihxdWVy
+eSk7DQo+Pg0KPj4gbG9va3MgbGlrZSBpdCB0aGVuIHNob3VsZCBiZSBxdWVyeV9sZW4NCj4gDQo+
+IFN1cmUsIGFuIGFsdGVybmF0aXZlIG5hbWUgbWF5IG1ha2UgdGhpbmdzIGVhc2llciB0byByZWFk
+IChJIHRoaW5rIHRoaXMNCj4gaXMgc29tZXdoYXQgZmFsbG91dCBmcm9tIG15IHJlYmFzZSBjaHVy
+biwgd2hlcmUgZWFybGllciB2ZXJzaW9ucyBvZiB0aGUNCj4gcGF0Y2ggc2hhcmVkIGFzIG11Y2gg
+Y29kZSB3aXRoIE5CRF9PUFRfU0VUX01FVEFfQ09OVEVYVCwgYW5kIHRoYXQgY29kZQ0KPiB1c2Vk
+IHRoZSBuYW1lICdjb250ZXh0JyByYXRoZXIgdGhhbiAncXVlcnknOyBidXQgbm93IHRoYXQgSSd2
+ZSBzcGxpdA0KPiB0aGluZ3MgdG8gYWRkIGEgbmV3IGZ1bmN0aW9uLCBpdCBkb2Vzbid0IGhhdmUg
+dG8gbWFpbnRhaW4gdGhlIG9sZCBuYW1pbmcpLg0KPiANCj4+DQo+Pj4gKyAgICAgICAgZGF0YV9s
+ZW4gKz0gc2l6ZW9mKGNvbnRleHRfbGVuKSArIGNvbnRleHRfbGVuOw0KPj4+ICsgICAgfSBlbHNl
+IHsNCj4+PiArICAgICAgICBhc3NlcnQob3B0ID09IE5CRF9PUFRfTElTVF9NRVRBX0NPTlRFWFQp
+Ow0KPj4+ICsgICAgfQ0KPj4+ICsgICAgZGF0YSA9IGdfbWFsbG9jKGRhdGFfbGVuKTsNCj4+PiAr
+ICAgIHAgPSBkYXRhOw0KPj4NCj4+IG1heSB1c2UgcCA9IGRhdGEgPSBnX21hbGxvYw0KPiANCj4g
+V2lsbCBkby4NCj4gDQo+Pg0KPj4+ICsNCj4+PiArICAgIHRyYWNlX25iZF9vcHRfbWV0YV9yZXF1
+ZXN0KG5iZF9vcHRfbG9va3VwKG9wdCksIHF1ZXJ5ID86ICIoYWxsKSIsIGV4cG9ydCk7DQo+IA0K
+PiBbMl0NCj4gDQo+Pj4gKyAgICBzdGxfYmVfcChwLCBleHBvcnRfbGVuKTsNCj4+PiArICAgIG1l
+bWNweShwICs9IHNpemVvZihleHBvcnRfbGVuKSwgZXhwb3J0LCBleHBvcnRfbGVuKTsNCj4+PiAr
+ICAgIHN0bF9iZV9wKHAgKz0gZXhwb3J0X2xlbiwgcXVlcmllcyk7DQo+Pj4gKyAgICBpZiAocXVl
+cnkpIHsNCj4+PiArICAgICAgICBzdGxfYmVfcChwICs9IHNpemVvZih1aW50MzJfdCksIGNvbnRl
+eHRfbGVuKTsNCj4+DQo+PiA6KSwgYWhhLCBwbGVhc2UsIHMvdWludDMyX3QvcXVlcmllcywgYXMg
+eW91IHByb21pc2VkDQo+IA0KPiBJIGRpZCB1cCBhdCBbMV0sIGJ1dCBzaG91bGQgaW5kZWVkIGRv
+IHNvIGFnYWluIGhlcmUuDQo+IA0KPj4NCj4+IEhtbSwgaXRzIG15IGNvZGUuIEl0J3MgaGFyZCB0
+byByZWFkIGFuZCBub3QgdmVyeSBjb21mb3J0YWJsZSB0byBtYWludGFpbi4uDQo+Pg0KPj4gSW4g
+YmxvY2svbmJkLWNsaWVudC5jIHdlIGhhdmUNCj4+IHBheWxvYWRfYWR2YW5jZSogZnVuY3Rpb25z
+LCB0byByZWFkIHN1Y2ggZm9ybWF0dGVkIGRhdGEsIEkgdGhpbmssIGl0IHNob3VsZCBiZQ0KPj4g
+Z29vZCB0byBtYWtlIHNvbWV0aGluZyBsaWtlIHRoaXMgZm9yIHNlcnZlci1wYXJ0LiBOb3QgYWJv
+dXQgdGhlc2Ugc2VyaWVzLCBvZiBjb3Vyc2UuDQo+IA0KPiBZZXMsIEkgd291bGRuJ3Qgb2JqZWN0
+IHRvIGV2ZW4gbW9yZSBjbGVhbnVwcyB0byBtYWtlIHRoZSBjb2RlIGVhc2llciB0bw0KPiBtYWlu
+dGFpbiwgYnV0IG5vdCBhcyBwYXJ0IG9mIHRoaXMgc2VyaWVzLg0KPiANCj4+DQo+PiBJbnRlcmVz
+dGluZywgdHJvdWJsZXMgYXJvdW5kICJkb24ndCB1c2UgYmU2NF90b19jcHVTLCB1c2Ugb25seSBi
+ZTY0X3RvX2NwdSIsDQo+PiBkbyB0aGV5IGFwcGx5IHNvbWVob3cgdG8gKl9iZV9wIGZ1bmN0aW9u
+cyBmYW1pbHk/DQo+IA0KPiBUaGUgcHJvYmxlbSB3YXMgaW4gdGhlIGluLXBsYWNlIGNvbnZlcnNp
+b24gcm91dGluZXMgd2hlcmUgdGhlDQo+IGRlc3RpbmF0aW9uIHR5cGUgd2FzIHN0cm9uZ2x5IHR5
+cGVkIHRvIHNvbWV0aGluZyB3aWRlciB0aGFuIGNoYXIqLiAgVGhpcw0KPiBpcyBub3QgYW4gaW5w
+bGFjZSBjb252ZXJzaW9uLCBiZWNhdXNlIHN0Kl9wIHRha2VzIGEgcmF3IHBvaW50ZXINCj4gaW50
+ZXJwcmV0ZWQgYXMgY2hhciogYXMgaXRzIGRlc3RpbmF0aW9uLiAgU28gbm8sIGNsYW5nIGRvZXMg
+bm90IGhhdmUNCj4gcHJvYmxlbXMgd2l0aCB0aGlzIGNvbnN0cnVjdC4NCj4gDQo+Pg0KPj4+ICsg
+ICAgICAgIG1lbWNweShwICs9IHNpemVvZihjb250ZXh0X2xlbiksIHF1ZXJ5LCBjb250ZXh0X2xl
+bik7DQo+Pj4gKyAgICB9DQo+Pj4gKw0KPj4+ICsgICAgcmV0ID0gbmJkX3NlbmRfb3B0aW9uX3Jl
+cXVlc3QoaW9jLCBvcHQsIGRhdGFfbGVuLCBkYXRhLCBlcnJwKTsNCj4+PiArICAgIGdfZnJlZShk
+YXRhKTsNCj4+PiArICAgIHJldHVybiByZXQ7DQo+Pj4gK30NCj4+PiArDQo+Pj4gICAgLyogbmJk
+X25lZ290aWF0ZV9zaW1wbGVfbWV0YV9jb250ZXh0Og0KPj4+ICAgICAqIFJlcXVlc3QgdGhlIHNl
+cnZlciB0byBzZXQgdGhlIG1ldGEgY29udGV4dCBmb3IgZXhwb3J0IEBpbmZvLT5uYW1lDQo+Pj4g
+ICAgICogdXNpbmcgQGluZm8tPnhfZGlydHlfYml0bWFwIHdpdGggYSBmYWxsYmFjayB0byAiYmFz
+ZTphbGxvY2F0aW9uIiwNCj4+PiBAQCAtNjUzLDI2ICs2OTYsMTAgQEAgc3RhdGljIGludCBuYmRf
+bmVnb3RpYXRlX3NpbXBsZV9tZXRhX2NvbnRleHQoUUlPQ2hhbm5lbCAqaW9jLA0KPj4+ICAgICAg
+ICBOQkRPcHRpb25SZXBseSByZXBseTsNCj4+PiAgICAgICAgY29uc3QgY2hhciAqY29udGV4dCA9
+IGluZm8tPnhfZGlydHlfYml0bWFwID86ICJiYXNlOmFsbG9jYXRpb24iOw0KPj4+ICAgICAgICBi
+b29sIHJlY2VpdmVkID0gZmFsc2U7DQo+Pj4gLSAgICB1aW50MzJfdCBleHBvcnRfbGVuID0gc3Ry
+bGVuKGluZm8tPm5hbWUpOw0KPj4+IC0gICAgdWludDMyX3QgY29udGV4dF9sZW4gPSBzdHJsZW4o
+Y29udGV4dCk7DQo+Pj4gLSAgICB1aW50MzJfdCBkYXRhX2xlbiA9IHNpemVvZihleHBvcnRfbGVu
+KSArIGV4cG9ydF9sZW4gKw0KPj4+IC0gICAgICAgICAgICAgICAgICAgICAgICBzaXplb2YodWlu
+dDMyX3QpICsgLyogbnVtYmVyIG9mIHF1ZXJpZXMgKi8NCj4+PiAtICAgICAgICAgICAgICAgICAg
+ICAgICAgc2l6ZW9mKGNvbnRleHRfbGVuKSArIGNvbnRleHRfbGVuOw0KPj4+IC0gICAgY2hhciAq
+ZGF0YSA9IGdfbWFsbG9jKGRhdGFfbGVuKTsNCj4+PiAtICAgIGNoYXIgKnAgPSBkYXRhOw0KPj4+
+DQo+Pj4gLSAgICB0cmFjZV9uYmRfb3B0X21ldGFfcmVxdWVzdChjb250ZXh0LCBpbmZvLT5uYW1l
+KTsNCj4+PiAtICAgIHN0bF9iZV9wKHAsIGV4cG9ydF9sZW4pOw0KPj4+IC0gICAgbWVtY3B5KHAg
+Kz0gc2l6ZW9mKGV4cG9ydF9sZW4pLCBpbmZvLT5uYW1lLCBleHBvcnRfbGVuKTsNCj4+PiAtICAg
+IHN0bF9iZV9wKHAgKz0gZXhwb3J0X2xlbiwgMSk7DQo+Pj4gLSAgICBzdGxfYmVfcChwICs9IHNp
+emVvZih1aW50MzJfdCksIGNvbnRleHRfbGVuKTsNCj4+PiAtICAgIG1lbWNweShwICs9IHNpemVv
+Zihjb250ZXh0X2xlbiksIGNvbnRleHQsIGNvbnRleHRfbGVuKTsNCj4+PiAtDQo+Pj4gLSAgICBy
+ZXQgPSBuYmRfc2VuZF9vcHRpb25fcmVxdWVzdChpb2MsIE5CRF9PUFRfU0VUX01FVEFfQ09OVEVY
+VCwgZGF0YV9sZW4sIGRhdGEsDQo+Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBlcnJwKTsNCj4+PiAtICAgIGdfZnJlZShkYXRhKTsNCj4+PiAtICAgIGlmIChyZXQgPCAwKSB7
+DQo+Pj4gLSAgICAgICAgcmV0dXJuIHJldDsNCj4+PiArICAgIGlmIChuYmRfc2VuZF9vbmVfbWV0
+YV9jb250ZXh0KGlvYywgTkJEX09QVF9TRVRfTUVUQV9DT05URVhULA0KPj4+ICsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgaW5mby0+bmFtZSwgY29udGV4dCwgZXJycCkgPCAwKSB7
+DQo+Pj4gKyAgICAgICAgcmV0dXJuIC0xOw0KPj4+ICAgICAgICB9DQo+Pj4NCj4+PiAgICAgICAg
+aWYgKG5iZF9yZWNlaXZlX29wdGlvbl9yZXBseShpb2MsIE5CRF9PUFRfU0VUX01FVEFfQ09OVEVY
+VCwgJnJlcGx5LA0KPj4+IEBAIC02ODksNyArNzE2LDcgQEAgc3RhdGljIGludCBuYmRfbmVnb3Rp
+YXRlX3NpbXBsZV9tZXRhX2NvbnRleHQoUUlPQ2hhbm5lbCAqaW9jLA0KPj4+ICAgICAgICBpZiAo
+cmVwbHkudHlwZSA9PSBOQkRfUkVQX01FVEFfQ09OVEVYVCkgew0KPj4+ICAgICAgICAgICAgY2hh
+ciAqbmFtZTsNCj4+Pg0KPj4+IC0gICAgICAgIGlmIChyZXBseS5sZW5ndGggIT0gc2l6ZW9mKGlu
+Zm8tPmNvbnRleHRfaWQpICsgY29udGV4dF9sZW4pIHsNCj4+PiArICAgICAgICBpZiAocmVwbHku
+bGVuZ3RoICE9IHNpemVvZihpbmZvLT5jb250ZXh0X2lkKSArIHN0cmxlbihjb250ZXh0KSkgew0K
+Pj4+ICAgICAgICAgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkZhaWxlZCB0byBuZWdvdGlhdGUg
+bWV0YSBjb250ZXh0ICclcycsIHNlcnZlciAiDQo+Pj4gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAiYW5zd2VyZWQgd2l0aCB1bmV4cGVjdGVkIGxlbmd0aCAlIiBQUkl1MzIsIGNvbnRleHQsDQo+
+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICByZXBseS5sZW5ndGgpOw0KPj4+IGRpZmYgLS1n
+aXQgYS9uYmQvdHJhY2UtZXZlbnRzIGIvbmJkL3RyYWNlLWV2ZW50cw0KPj4+IGluZGV4IGMzOTY2
+ZDJiNjUzLi41OTUyMWU0N2EzZCAxMDA2NDQNCj4+PiAtLS0gYS9uYmQvdHJhY2UtZXZlbnRzDQo+
+Pj4gKysrIGIvbmJkL3RyYWNlLWV2ZW50cw0KPj4+IEBAIC0xMiw3ICsxMiw3IEBAIG5iZF9yZWNl
+aXZlX3F1ZXJ5X2V4cG9ydHNfc3RhcnQoY29uc3QgY2hhciAqd2FudG5hbWUpICJRdWVyeWluZyBl
+eHBvcnQgbGlzdCBmb3INCj4+PiAgICBuYmRfcmVjZWl2ZV9xdWVyeV9leHBvcnRzX3N1Y2Nlc3Mo
+Y29uc3QgY2hhciAqd2FudG5hbWUpICJGb3VuZCBkZXNpcmVkIGV4cG9ydCBuYW1lICclcyciDQo+
+Pj4gICAgbmJkX3JlY2VpdmVfc3RhcnR0bHNfbmV3X2NsaWVudCh2b2lkKSAiU2V0dGluZyB1cCBU
+TFMiDQo+Pj4gICAgbmJkX3JlY2VpdmVfc3RhcnR0bHNfdGxzX2hhbmRzaGFrZSh2b2lkKSAiU3Rh
+cnRpbmcgVExTIGhhbmRzaGFrZSINCj4+PiAtbmJkX29wdF9tZXRhX3JlcXVlc3QoY29uc3QgY2hh
+ciAqY29udGV4dCwgY29uc3QgY2hhciAqZXhwb3J0KSAiUmVxdWVzdGluZyB0byBzZXQgbWV0YSBj
+b250ZXh0ICVzIGZvciBleHBvcnQgJXMiDQo+Pj4gK25iZF9vcHRfbWV0YV9yZXF1ZXN0KGNvbnN0
+IGNoYXIgKm9wdG5hbWUsIGNvbnN0IGNoYXIgKmNvbnRleHQsIGNvbnN0IGNoYXIgKmV4cG9ydCkg
+IlJlcXVlc3RpbmcgJXMgJXMgZm9yIGV4cG9ydCAlcyINCj4+DQo+PiBIbW0sIHlvdSBmb3JnZXQg
+bmJkX29wdF9sb29rdXAoKQ0KPiANCj4gV2hlcmU/IFRoZSB1cGRhdGVkIHRyYWNlIHBvaW50IGF0
+IFsyXSBoYXMgbmJkX29wdF9sb29rdXAoKSBmb3INCj4gZGV0ZXJtaW5pbmcgb3B0bmFtZS4NCg0K
+WW91ciBtb3JuaW5nIGlzIG15IGV2ZW5pbmcpDQoNClllcywgaXQncyBvaywgYW5kIGluIHRoZSBu
+ZXh0IHBhdGNoIHRvby4gQnV0IHlvdSB1c3VhbGx5IHRyYWNlIGJvdGggbnVtYmVyICsgbG9va3Vw
+LXN0cmluZywNCmFuZCBoZXJlIG9ubHkgc3RyaW5nLiBJcyB0aGVyZSBhIHJlYXNvbiB0bz8NCg0K
+PiANCj4+DQo+PiBXaXRoIHRoaXMgYW5kIHMvdWludDMyX3QvcXVlcmllcyAob3RoZXIgdGlueSB0
+aGluZ3MgdXAgdG8geW91KToNCj4+IFJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
+ZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+Pg0KPj4+ICAgIG5iZF9vcHRfbWV0
+YV9yZXBseShjb25zdCBjaGFyICpjb250ZXh0LCB1aW50MzJfdCBpZCkgIlJlY2VpdmVkIG1hcHBp
+bmcgb2YgY29udGV4dCAlcyB0byBpZCAlIiBQUkl1MzINCj4+PiAgICBuYmRfcmVjZWl2ZV9uZWdv
+dGlhdGUodm9pZCAqdGxzY3JlZHMsIGNvbnN0IGNoYXIgKmhvc3RuYW1lKSAiUmVjZWl2aW5nIG5l
+Z290aWF0aW9uIHRsc2NyZWRzPSVwIGhvc3RuYW1lPSVzIg0KPj4+ICAgIG5iZF9yZWNlaXZlX25l
+Z290aWF0ZV9tYWdpYyh1aW50NjRfdCBtYWdpYykgIk1hZ2ljIGlzIDB4JSIgUFJJeDY0DQo+Pj4N
+Cj4+DQo+Pg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
