@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36499)
+Received: from eggs.gnu.org ([209.51.188.92]:37394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjIzC-0002pZ-U0
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 02:18:11 -0500
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gjJ3S-0004BR-9g
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 02:22:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjIzB-0004VP-Ue
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 02:18:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gjIzB-0004U7-Kc
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 02:18:09 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B26397CDE4
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 07:18:08 +0000 (UTC)
-References: <20181115143124.19234-1-pbonzini@redhat.com>
-	<20181115143124.19234-4-pbonzini@redhat.com>
-	<13a533b2-89da-683c-0bae-02d7597c9032@redhat.com>
-	<20190114225028-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c45d1790-5f4b-73bd-ea18-468dd39916b5@redhat.com>
-Date: Tue, 15 Jan 2019 08:18:00 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190114225028-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1gjJ3Q-0000am-Ci
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 02:22:34 -0500
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Date: Tue, 15 Jan 2019 07:22:16 +0000
+Message-ID: <ccb5e146-a601-81d6-28ca-8717adbdb701@virtuozzo.com>
+References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
+	<20181207122647.GE5119@linux.fritz.box>
+	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
+	<20181212122457.GB5415@linux.fritz.box>
+	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
+	<20181213122039.GC5427@linux.fritz.box>
+	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
+	<2ee882bf-00cc-addf-d866-c5c916a00774@virtuozzo.com>
+	<9d97e822-7c9b-c095-6a27-a74facf21e47@virtuozzo.com>
+In-Reply-To: <9d97e822-7c9b-c095-6a27-a74facf21e47@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/10] vhost-net: compile it for all targets
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <855CF9A6924E9142A160CB9A1F757838@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] blk: postpone request execution on a
+ context protected with "drained section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,105 +33,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, jasowang@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 15/01/19 04:50, Michael S. Tsirkin wrote:
-> On Thu, Nov 15, 2018 at 07:42:20PM +0100, Paolo Bonzini wrote:
->> On 15/11/2018 15:31, Paolo Bonzini wrote:
->>> Currently vhost-net is compiled only for KVM-enabled targets.  This is
->>> not needed anymore because ioeventfd is supported and emulated by the
->>> memory core.  Compile it and vhost-user-test for all targets.
->>> While at it, fix the annoying typo CONFIG_VHOST_NET_USED.
->>>
->>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>> ---
->>>  configure              | 13 +++++--------
->>>  include/exec/poison.h  |  1 -
->>>  net/net.c              |  2 +-
->>>  tests/Makefile.include |  5 +----
->>>  4 files changed, 7 insertions(+), 14 deletions(-)
->>>
->>> diff --git a/configure b/configure
->>> index 5b1d83ea26..d8317e1832 100755
->>> --- a/configure
->>> +++ b/configure
->>> @@ -6512,8 +6512,11 @@ fi
->>>  if test "$vhost_scsi" = "yes" ; then
->>>    echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
->>>  fi
->>> -if test "$vhost_net" = "yes" -a "$vhost_user" = "yes"; then
->>> -  echo "CONFIG_VHOST_NET_USED=y" >> $config_host_mak
->>> +if test "$vhost_net" = "yes" ; then
->>> +  echo "CONFIG_VHOST_NET=y" >> $config_host_mak
->>> +  if test "$vhost_user" = "yes"; then
->>> +    echo "CONFIG_VHOST_NET_USER=y" >> $config_host_mak
->>> +  fi
->>>  fi
->>>  if test "$vhost_crypto" = "yes" ; then
->>>    echo "CONFIG_VHOST_CRYPTO=y" >> $config_host_mak
->>> @@ -7275,12 +7278,6 @@ if supported_xen_target $target; then
->>>  fi
->>>  if supported_kvm_target $target; then
->>>      echo "CONFIG_KVM=y" >> $config_target_mak
->>> -    if test "$vhost_net" = "yes" ; then
->>> -        echo "CONFIG_VHOST_NET=y" >> $config_target_mak
->>> -        if test "$vhost_user" = "yes" ; then
->>> -            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
->>> -        fi
->>> -    fi
->>>  fi
->>>  if supported_hax_target $target; then
->>>      echo "CONFIG_HAX=y" >> $config_target_mak
->>> diff --git a/include/exec/poison.h b/include/exec/poison.h
->>> index 32d53789f8..b158632791 100644
->>> --- a/include/exec/poison.h
->>> +++ b/include/exec/poison.h
->>> @@ -85,7 +85,6 @@
->>>  #pragma GCC poison CONFIG_XTENSA_DIS
->>>  
->>>  #pragma GCC poison CONFIG_LINUX_USER
->>> -#pragma GCC poison CONFIG_VHOST_NET
->>>  #pragma GCC poison CONFIG_KVM
->>>  #pragma GCC poison CONFIG_SOFTMMU
->>>  
->>> diff --git a/net/net.c b/net/net.c
->>> index 07c194a8f6..95a74add6c 100644
->>> --- a/net/net.c
->>> +++ b/net/net.c
->>> @@ -955,7 +955,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
->>>          [NET_CLIENT_DRIVER_BRIDGE]    = net_init_bridge,
->>>  #endif
->>>          [NET_CLIENT_DRIVER_HUBPORT]   = net_init_hubport,
->>> -#ifdef CONFIG_VHOST_NET_USED
->>> +#ifdef CONFIG_VHOST_NET_USER
->>>          [NET_CLIENT_DRIVER_VHOST_USER] = net_init_vhost_user,
->>>  #endif
->>>  #ifdef CONFIG_L2TPV3
->>> diff --git a/tests/Makefile.include b/tests/Makefile.include
->>> index fb0b449c02..03a64ce9c8 100644
->>> --- a/tests/Makefile.include
->>> +++ b/tests/Makefile.include
->>> @@ -204,10 +204,7 @@ check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
->>>  check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
->>>  check-qtest-i386-y += tests/q35-test$(EXESUF)
->>>  check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
->>> -check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
->>> -ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
->>> -check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
->>> -endif
->>> +check-qtest-i386-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test$(EXESUF)
->>>  check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-swtpm-test$(EXESUF)
->>>  check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-test$(EXESUF)
->>>  check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-swtpm-test$(EXESUF)
->>>
->>
->> FWIW this is unfortunately not that simple.  Patchew will surely notice.
->> :)  I will post v2 when I get reviews for everything else.
-> 
-> So with the header split this can now go in I guess?
-> Want to repost?
-
-Yes.  I'll do it later today after testing.
-
-Paolo
+cGluZyBwaW5nIHBpbmcgcGluZyEhISENCg0KT24gMDkuMDEuMjAxOSAxMToxOCwgRGVuaXMgUGxv
+dG5pa292IHdyb3RlOg0KPiBwaW5nIHBpbmchISENCj4gDQo+IE9uIDE4LjEyLjIwMTggMTE6NTMs
+IERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4+IHBpbmcgcGluZw0KPj4NCj4+IE9uIDE0LjEyLjIw
+MTggMTQ6NTQsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4+Pg0KPj4+DQo+Pj4gT24gMTMuMTIu
+MjAxOCAxNToyMCwgS2V2aW4gV29sZiB3cm90ZToNCj4+Pj4gQW0gMTMuMTIuMjAxOCB1bSAxMjow
+NyBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2NocmllYmVuOg0KPj4+Pj4gT24gMTIuMTIuMjAxOCAx
+NToyNCwgS2V2aW4gV29sZiB3cm90ZToNCj4+Pj4+PiBBbSAxMS4xMi4yMDE4IHVtIDE3OjU1IGhh
+dCBEZW5pcyBQbG90bmlrb3YgZ2VzY2hyaWViZW46DQo+Pj4+Pj4+PiBXaHkgaW52b2x2ZSB0aGUg
+QWlvQ29udGV4dCBhdCBhbGw/IFRoaXMgY291bGQgYWxsIGJlIGtlcHQgYXQgdGhlDQo+Pj4+Pj4+
+PiBCbG9ja0JhY2tlbmQgbGV2ZWwgd2l0aG91dCBleHRlbmRpbmcgdGhlIGxheWVyaW5nIHZpb2xh
+dGlvbiB0aGF0DQo+Pj4+Pj4+PiBhaW9fZGlzYWJsZV9leHRlcm5hbCgpIGlzLg0KPj4+Pj4+Pj4N
+Cj4+Pj4+Pj4+IEJsb2NrQmFja2VuZHMgZ2V0IG5vdGlmaWVkIHdoZW4gdGhlaXIgcm9vdCBub2Rl
+IGlzIGRyYWluZWQsIHNvIA0KPj4+Pj4+Pj4gaG9va2luZw0KPj4+Pj4+Pj4gdGhpbmdzIHVwIHRo
+ZXJlIHNob3VsZCBiZSBhcyBlYXN5LCBpZiBub3QgZXZlbiBlYXNpZXIgdGhhbiBpbg0KPj4+Pj4+
+Pj4gQWlvQ29udGV4dC4NCj4+Pj4+Pj4NCj4+Pj4+Pj4gSnVzdCB3YW50IHRvIG1ha2Ugc3VyZSB0
+aGF0IEkgdW5kZXJzdG9vZCBjb3JyZWN0bHkgd2hhdCB5b3UgbWVhbnQgYnkNCj4+Pj4+Pj4gIkJs
+b2NrQmFja2VuZHMgZ2V0IG5vdGlmaWVkIi4gRGlkIHlvdSBtZWFuIHRoYXQgYmRydl9kcmFpbl9l
+bmQgY2FsbHMNCj4+Pj4+Pj4gY2hpbGQncyByb2xlIGNhbGxiYWNrIGJsa19yb290X2RyYWluZWRf
+ZW5kIGJ5IGNhbGxpbmcNCj4+Pj4+Pj4gYmRydl9wYXJlbnRfZHJhaW5lZF9lbmQ/DQo+Pj4+Pj4N
+Cj4+Pj4+PiBZZXMsIGJsa19yb290X2RyYWluZWRfYmVnaW4vZW5kIGNhbGxzIGFyZSBhbGwgeW91
+IG5lZWQuIFNwZWNpZmljYWxseSwNCj4+Pj4+PiB0aGVpciBhZGp1c3RtZW50cyB0byBibGstPnF1
+aWVzY2VfY291bnRlciB0aGF0IGFyZSBhbHJlYWR5IHRoZXJlLCANCj4+Pj4+PiBhbmQgaW4NCj4+
+Pj4+PiB0aGUgJ2lmICgtLWJsay0+cXVpZXNjZV9jb3VudGVyID09IDApJyBibG9jayBvZiANCj4+
+Pj4+PiBibGtfcm9vdF9kcmFpbmVkX2VuZCgpDQo+Pj4+Pj4gd2UgY2FuIHJlc3VtZSB0aGUgcXVl
+dWVkIHJlcXVlc3RzLg0KPj4+Pj4gU291bmRzIGl0IHNob3VsZCBiZSBzbywgYnV0IGl0IGRvZXNu
+J3Qgd29yayB0aGF0IHdheSBhbmQgdGhhdCdzIHdoeToNCj4+Pj4+IHdoZW4gZG9pbmcgbWlycm9y
+IHdlIG1heSByZXN1bWUgcG9zdHBvbmVkIGNvcm91dGluZXMgdG9vIGVhcmx5IHdoZW4gDQo+Pj4+
+PiB0aGUNCj4+Pj4+IHVuZGVybHlpbmcgYnMgaXMgcHJvdGVjdGVkIGZyb20gd3JpdGluZyBhdCBh
+bmQgdGh1cyB3ZSBlbmNvdW50ZXIgdGhlDQo+Pj4+PiBhc3NlcnQgb24gYSB3cml0ZSByZXF1ZXN0
+IGV4ZWN1dGlvbiBhdCBiZHJ2X2NvX3dyaXRlX3JlcV9wcmVwYXJlIHdoZW4NCj4+Pj4+IHJlc3Vt
+aW5nIHRoZSBwb3N0cG9uZWQgY29yb3V0aW5lcy4NCj4+Pj4+DQo+Pj4+PiBUaGUgdGhpbmcgaXMg
+dGhhdCB0aGUgYnMgaXMgcHJvdGVjdGVkIGZvciB3cml0aW5nIGJlZm9yZSBleGVjdXRpb24gb2YN
+Cj4+Pj4+IGJkcnZfcmVwbGFjZV9ub2RlIGF0IG1pcnJvcl9leGl0X2NvbW1vbiBhbmQgYmRydl9y
+ZXBsYWNlX25vZGUgY2FsbHMNCj4+Pj4+IGJkcnZfcmVwbGFjZV9jaGlsZF9ub3Blcm0gd2hpY2gs
+IGluIHR1cm4sIGNhbGxzIA0KPj4+Pj4gY2hpbGQtPnJvbGUtPmRyYWluZWRfZW5kDQo+Pj4+PiB3
+aGVyZSBvbmUgb2YgdGhlIGNhbGxiYWNrcyBpcyBibGtfcm9vdF9kcmFpbmVkX2VuZCB3aGljaCBj
+aGVjaw0KPj4+Pj4gaWYoLS1ibGstPnF1aWVzY2VfY291bnRlciA9PSAwKSBhbmQgcnVucyB0aGUg
+cG9zdHBvbmVkIHJlcXVlc3RzDQo+Pj4+PiAoY29yb3V0aW5lcykgaWYgdGhlIGNvdW5kaXRpb24g
+aXMgdHJ1ZS4NCj4+Pj4NCj4+Pj4gSG0sIHNvIHNvbWV0aGluZyBpcyBtZXNzZWQgdXAgd2l0aCB0
+aGUgZHJhaW4gc2VjdGlvbnMgaW4gdGhlIG1pcnJvcg0KPj4+PiBkcml2ZXIuIFdlIGhhdmU6DQo+
+Pj4+DQo+Pj4+IMKgwqDCoMKgIGJkcnZfZHJhaW5lZF9iZWdpbih0YXJnZXRfYnMpOw0KPj4+PiDC
+oMKgwqDCoCBiZHJ2X3JlcGxhY2Vfbm9kZSh0b19yZXBsYWNlLCB0YXJnZXRfYnMsICZsb2NhbF9l
+cnIpOw0KPj4+PiDCoMKgwqDCoCBiZHJ2X2RyYWluZWRfZW5kKHRhcmdldF9icyk7DQo+Pj4+DQo+
+Pj4+IE9idmlvdXNseSwgdGhlIGludGVudGlvbiB3YXMgdG8ga2VlcCB0aGUgQmxvY2tCYWNrZW5k
+IGRyYWluZWQgZHVyaW5nDQo+Pj4+IGJkcnZfcmVwbGFjZV9ub2RlKCkuIFNvIGhvdyBjb3VsZCBi
+bGstPnF1aWVzY2VfY291bnRlciBldmVyIGdldCB0byAwDQo+Pj4+IGluc2lkZSBiZHJ2X3JlcGxh
+Y2Vfbm9kZSgpIHdoZW4gdGFyZ2V0X2JzIGlzIGRyYWluZWQ/DQo+Pj4+DQo+Pj4+IExvb2tpbmcg
+YXQgYmRydl9yZXBsYWNlX2NoaWxkX25vcGVybSgpLCBpdCBzZWVtcyB0aGF0IHRoZSBmdW5jdGlv
+biBoYXMNCj4+Pj4gYSBidWc6IEV2ZW4gaWYgb2xkX2JzIGFuZCBuZXdfYnMgYXJlIGJvdGggZHJh
+aW5lZCwgdGhlIHF1aWVzY2VfY291bnRlcg0KPj4+PiBmb3IgdGhlIHBhcmVudCByZWFjaGVzIDAg
+Zm9yIGEgbW9tZW50IGJlY2F1c2Ugd2UgY2FsbCAuZHJhaW5lZF9lbmQgZm9yDQo+Pj4+IHRoZSBv
+bGQgY2hpbGQgZmlyc3QgYW5kIC5kcmFpbmVkX2JlZ2luIGZvciB0aGUgbmV3IG9uZSBsYXRlci4N
+Cj4+Pj4NCj4+Pj4gU28gaXQgc2VlbXMgdGhlIGZpeCB3b3VsZCBiZSB0byByZXZlcnNlIHRoZSBv
+cmRlciBhbmQgZmlyc3QgY2FsbA0KPj4+PiAuZHJhaW5lZF9iZWdpbiBmb3IgdGhlIG5ldyBjaGls
+ZCBhbmQgdGhlbiAuZHJhaW5lZF9lbmQgZm9yIHRoZSBvbGQNCj4+Pj4gY2hpbGQuIFNvdW5kcyBs
+aWtlIGEgZ29vZCBuZXcgdGVzdGNhc2UgZm9yIHRlc3RzL3Rlc3QtYmRydi1kcmFpbi5jLCANCj4+
+Pj4gdG9vLg0KPj4+IFllcywgaXQncyB0cnVlLCBidXQgaXQncyBub3QgZW5vdWdoLi4uDQo+Pj4g
+SW4gbWlycm9yX2V4aXRfY29tbW9uKCkgd2UgYWN0aXZlbHkgbWFuaXB1bGF0ZSB3aXRoIGJsb2Nr
+IGRyaXZlciBzdGF0ZXMuDQo+Pj4gV2hlbiB3ZSByZXBsYWNlZCBhIG5vZGUgaW4gdGhlIHNuaXBw
+ZXQgeW91IHNob3dlZCB3ZSBjYW4ndCBhbGxvdyB0aGUgDQo+Pj4gcG9zdHBvbmVkIGNvcm91dGlu
+ZXMgdG8gcnVuIGJlY2F1c2UgdGhlIGJsb2NrIHRyZWUgaXNuJ3QgcmVhZHkgdG8gDQo+Pj4gcmVj
+ZWl2ZSB0aGUgcmVxdWVzdHMgeWV0Lg0KPj4+IFRvIGJlIHJlYWR5LCB3ZSBuZWVkIHRvIGluc2Vy
+dCBhIHByb3BlciBibG9jayBkcml2ZXIgc3RhdGUgdG8gdGhlIA0KPj4+IGJsb2NrIGJhY2tlbmQg
+d2hpY2ggaXMgZG9uZSBoZXJlDQo+Pj4NCj4+PiDCoMKgwqDCoCBibGtfcmVtb3ZlX2JzKGJqb2It
+PmJsayk7DQo+Pj4gwqDCoMKgwqAgYmxrX3NldF9wZXJtKGJqb2ItPmJsaywgMCwgQkxLX1BFUk1f
+QUxMLCAmZXJyb3JfYWJvcnQpOw0KPj4+IMKgwqDCoMKgIGJsa19pbnNlcnRfYnMoYmpvYi0+Ymxr
+LCBtaXJyb3JfdG9wX2JzLCAmZXJyb3JfYWJvcnQpOyA8PCA8PCA8PCA8PA0KPj4+DQo+Pj4gwqDC
+oMKgwqAgYnNfb3BhcXVlLT5qb2IgPSBOVUxMOw0KPj4+DQo+Pj4gwqDCoMKgwqAgYmRydl9kcmFp
+bmVkX2VuZChzcmMpOw0KPj4+DQo+Pj4gSWYgdGhlIHRyZWUgaXNuJ3QgcmVhZHkgYW5kIHdlIHJl
+c3VtZSB0aGUgY29yb3V0aW5lcywgd2UnbGwgZW5kIHVwIA0KPj4+IHdpdGggdGhlIHJlcXVlc3Qg
+bGFuZGVkIGluIGEgd3JvbmcgYmxvY2sgZHJpdmVyIHN0YXRlLg0KPj4+DQo+Pj4gU28sIHdlIGV4
+cGxpY2l0bHkgc2hvdWxkIHN0b3AgYWxsIGFjdGl2aXRpZXMgb24gYWxsIHRoZSBkcml2ZXIgc3Rh
+dGVzDQo+Pj4gYW5kIGl0cyBwYXJlbnRzIGFuZCBhbGxvdyB0aGUgYWN0aXZpdGllcyB3aGVuIGV2
+ZXJ5dGhpbmcgaXMgcmVhZHkgdG8gZ28uDQo+Pj4NCj4+PiBXaHkgZXhwbGljaXRseSwgYmVjYXVz
+ZSB0aGUgYmxvY2sgZHJpdmVyIHN0YXRlcyBtYXkgYmVsb25nIHRvIA0KPj4+IGRpZmZlcmVudCBi
+bG9jayBiYWNrZW5kcyBhdCB0aGUgbW9tZW50IG9mIHRoZSBtYW5pcHVsYXRpb24gYmVnaW5uaW5n
+Lg0KPj4+DQo+Pj4gU28sIGl0IHNlZW1zIHdlIG5lZWQgdG8gZGlzYWJsZSBhbGwgdGhlaXIgY29u
+dGV4dHMgdW50aWwgdGhlIA0KPj4+IG1hbmlwdWxhdGlvbiBlbmRzLg0KPj4+DQo+Pj4gUGxlYXNl
+LCBjb3JyZWN0IG1lIGlmIEknbSB3cm9uZy4NCj4+Pg0KPj4+Pg0KPj4+Pj4gSW4gc2VlbXMgdGhh
+dCBpZiB0aGUgZXh0ZXJuYWwgcmVxdWVzdHMgZGlzYWJsZWQgb24gdGhlIGNvbnRleHQgd2UgDQo+
+Pj4+PiBjYW4ndA0KPj4+Pj4gcmVseSBvbiBhbnl0aGluZyBvciBzaG91bGQgY2hlY2sgd2hlcmUg
+dGhlIHVuZGVybHlpbmcgYnMgYW5kIGl0cw0KPj4+Pj4gdW5kZXJseWluZyBub2RlcyBhcmUgcmVh
+ZHkgdG8gcmVjZWl2ZSByZXF1ZXN0cyB3aGljaCBzb3VuZHMgcXVpdGUNCj4+Pj4+IGNvbXBsaWNh
+dGVkLg0KPj4+Pj4gUGxlYXNlIGNvcnJlY3QgbWUgaWYgc3RpbGwgZG9uJ3QgdW5kZXJzdGFuZCBz
+b21ldGhpbmcgaW4gdGhhdCByb3V0aW5lLg0KPj4+Pg0KPj4+PiBJIHRoaW5rIHRoZSByZWFzb24g
+d2h5IHJleWxpbmcgb24gYWlvX2Rpc2FibGVfZXh0ZXJuYWwoKSB3b3JrcyBpcyANCj4+Pj4gc2lt
+cGx5DQo+Pj4+IGJlY2F1c2Ugc3JjIGlzIGFsc28gZHJhaW5lZCwgd2hpY2gga2VlcHMgZXh0ZXJu
+YWwgZXZlbnRzIGluIHRoZQ0KPj4+PiBBaW9Db250ZXh0IGRpc2FibGVkIGRlc3BpdGUgdGhlIGJ1
+ZyBpbiBkcmFpbmluZyB0aGUgdGFyZ2V0IG5vZGUuDQo+Pj4+DQo+Pj4+IFRoZSBidWcgd291bGQg
+YmVjb21lIGFwcGFyZW50IGV2ZW4gd2l0aCBhaW9fZGlzYWJsZV9leHRlcm5hbCgpIGlmIHdlDQo+
+Pj4+IGRpZG4ndCBkcmFpbiBzcmMsIG9yIGV2ZW4gaWYgd2UganVzdCBzdXBwb3J0ZWQgc3JjIGFu
+ZCB0YXJnZXQgYmVpbmcgaW4NCj4+Pj4gZGlmZmVyZW50IEFpb0NvbnRleHRzLg0KPj4+DQo+Pj4g
+V2h5IGRvbid0IHdlIGRpc2FibGUgYWxsIHRob3NlIGNvbnRleHRzIGludm9sdmVkIHVudGlsIHRo
+ZSBlbmQgb2YgdGhlIA0KPj4+IGJsb2NrIGRldmljZSB0cmVlIHJlY29uc3RydWN0aW9uPw0KPj4+
+DQo+Pj4gVGhhbmtzIQ0KPj4+DQo+Pj4gRGVuaXMNCj4+Pj4NCj4+Pj4gS2V2aW4NCj4+Pj4NCj4+
+Pg0KPj4NCj4gDQoNCi0tIA0KQmVzdCwNCkRlbmlzDQo=
