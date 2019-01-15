@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49045)
+Received: from eggs.gnu.org ([209.51.188.92]:51154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjTrE-0005Cf-8y
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:54:40 -0500
+	(envelope-from <mst@redhat.com>) id 1gjTu9-00064u-7k
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:57:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjTrC-0005GG-7j
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:54:40 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37371)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gjTr7-0005D1-4y
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:54:34 -0500
-Received: by mail-wm1-f66.google.com with SMTP id g67so4353655wmd.2
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:54:32 -0800 (PST)
-References: <alpine.BSF.2.21.9999.1811292101280.5887@zero.eik.bme.hu>
-	<alpine.BSF.2.21.9999.1901151926320.72972@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e72fd744-3440-a684-38c4-75d6d604cddb@redhat.com>
-Date: Tue, 15 Jan 2019 19:54:29 +0100
+	(envelope-from <mst@redhat.com>) id 1gjTu8-0006wu-39
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:57:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjTu7-0006tm-Ih
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:57:39 -0500
+Date: Tue, 15 Jan 2019 13:57:22 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190115135548-mutt-send-email-mst@kernel.org>
+References: <20190115100058.44712-1-sgarzare@redhat.com>
+	<20190115100058.44712-5-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1901151926320.72972@zero.eik.bme.hu>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190115100058.44712-5-sgarzare@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/i386/pc: use PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-devel@nongnu.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Maran Wilson <maran.wilson@oracle.com>
 
-On 1/15/19 7:29 PM, BALATON Zoltan wrote:
-> On Thu, 29 Nov 2018, BALATON Zoltan wrote:
->> Then I've tried the same with the pll patches posted by Philippe
->> Mathieu-Daudé here:
->>
->> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg00191.html
->>
->> on top of v3.1.0-rc3 which helped to get rid of the cprman warnings
+On Tue, Jan 15, 2019 at 11:00:58AM +0100, Stefano Garzarella wrote:
+> Use pvh.bin option rom when we are booting an uncompressed
+> kernel using the x86/HVM direct boot ABI.
 > 
-> Will these patches be merged eventually? These seem to at least get rid
-> of some annoying warnings in Linux boot dmesg.
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> Based-on: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
 
-I'll respin this series addressing Peter's comments.
+I don't think this is a great way to give attribution.
+Can you pls include the author name and the S.O.B from there as well?
 
-Thanks for reminding me ;)
 
-Phil.
+> ---
+>  hw/i386/pc.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 06bce6a101..7564ba51d2 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1005,6 +1005,10 @@ static void load_linux(PCMachineState *pcms,
+>              fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
+>                               header, sizeof(header));
+>  
+> +            option_rom[nb_option_roms].bootindex = 0;
+> +            option_rom[nb_option_roms].name = "pvh.bin";
+> +            nb_option_roms++;
+> +
+>              return;
+>          }
+>          /* This looks like a multiboot kernel. If it is, let's stop
+> @@ -1456,6 +1460,7 @@ void xen_load_linux(PCMachineState *pcms)
+>      for (i = 0; i < nb_option_roms; i++) {
+>          assert(!strcmp(option_rom[i].name, "linuxboot.bin") ||
+>                 !strcmp(option_rom[i].name, "linuxboot_dma.bin") ||
+> +               !strcmp(option_rom[i].name, "pvh.bin") ||
+>                 !strcmp(option_rom[i].name, "multiboot.bin"));
+>          rom_add_option(option_rom[i].name, option_rom[i].bootindex);
+>      }
+
+OK but this is guest visible so needs to be guarded by the
+new machine type.
+
+
+> -- 
+> 2.20.1
