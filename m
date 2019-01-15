@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59329)
+Received: from eggs.gnu.org ([209.51.188.92]:59983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjQqn-0004On-85
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:42:02 -0500
+	(envelope-from <eblake@redhat.com>) id 1gjQtt-0005MV-Mq
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:45:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjQqm-0001zJ-0W
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:42:01 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 15 Jan 2019 15:41:52 +0000
-Message-ID: <c8391d8b-28bc-d145-f18b-811aa6083ce8@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1gjQtq-0003Cn-FT
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:45:13 -0500
 References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-6-eblake@redhat.com>
-	<acc77355-221d-0497-4b14-6b3c1bb79c7d@virtuozzo.com>
-	<f42d51fa-1268-0abf-11b8-7661655e995d@redhat.com>
-In-Reply-To: <f42d51fa-1268-0abf-11b8-7661655e995d@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F2BCC2193AA831449C34CC4CB8A4E7EA@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<20190112175812.27068-11-eblake@redhat.com>
+	<e24c7f01-a203-c6ce-ac95-77cb74c590df@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c0ab928c-3efc-41fd-f16f-6a6b4e465e9a@redhat.com>
+Date: Tue, 15 Jan 2019 09:44:56 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 05/19] nbd/server: Favor [u]int64_t over
- off_t
+In-Reply-To: <e24c7f01-a203-c6ce-ac95-77cb74c590df@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="njA5IAPOBdyHJqXaMnNm5J86XcdOjy9ck"
+Subject: Re: [Qemu-devel] [PATCH v3 10/19] nbd/client: Split out
+ nbd_send_one_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,126 +26,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-MTUuMDEuMjAxOSAxODozMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xNS8xOSA0OjE5IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTIuMDEuMjAxOSAyMDo1
-NywgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBBbHRob3VnaCBvdXIgY29tcGlsZS10aW1lIGVudmly
-b25tZW50IGlzIHNldCB1cCBzbyB0aGF0IHdlIGFsd2F5cw0KPj4+IHN1cHBvcnQgbG9uZyBmaWxl
-cyB3aXRoIDY0LWJpdCBvZmZfdCwgd2UgaGF2ZSBubyBndWFyYW50ZWUgd2hldGhlcg0KPj4+IG9m
-Zl90IGlzIHRoZSBzYW1lIHR5cGUgYXMgaW50NjRfdC4gIFRoaXMgcmVxdWlyZXMgY2FzdHMgd2hl
-bg0KPj4+IHByaW50aW5nIHZhbHVlcywgYW5kIHByZXZlbnRzIHVzIGZyb20gZGlyZWN0bHkgdXNp
-bmcgcWVtdV9zdHJ0b2k2NCgpLg0KPj4+IExldCdzIGp1c3QgZmxpcCB0byBbdV1pbnQ2NF90IChz
-aWduZWQgZm9yIGxlbmd0aCwgYmVjYXVzZSB3ZSBoYXZlIHRvDQo+Pj4gZGV0ZWN0IGZhaWx1cmUg
-b2YgYmxrX2dldGxlbmd0aCgpDQo+Pg0KPj4gd2UgaGF2ZSBub3QsIGFmdGVyIHByZXZpb3VzIHBh
-dGNoDQo+IA0KPiBuYmQvc2VydmVyLmMgbm8gbG9uZ2VyIGhhcyB0byBjaGVjayBmb3IgYmxrX2dl
-dGxlbmd0aCgpIGZhaWx1cmVzLCBidXQNCj4gYmxvY2tkZXYtbmJkLmMgYW5kIHFlbXUtbmJkLmMg
-c3RpbGwgZG8uICBTaW5jZSB0aGUgY2FsbGVycyBoYXZlIHRvIHVzZQ0KPiBhbiBpbnQ2NF90IHR5
-cGUgZm9yIHRoZSBsZW5ndGggYXMgcGFydCBvZiB0aGVpciBlcnJvciBjaGVja2luZywgaXQncw0K
-PiBlYXNpZXIgdG8gYWNjZXB0IGFuIGludDY0X3QgbGVuZ3RoIHRvIG5iZF9leHBvcnRfbmV3KCks
-IGV2ZW4gaWYNCj4gbmJkX2V4cG9ydF9uZXcoKSBjb3VsZCBhbHNvIHVzZSBhbiB1bnNpZ25lZCB0
-eXBlLg0KPiANCj4+DQo+PiBhbmQgYmVjYXVzZSBvZmZfdCB3YXMgc2lnbmVkOw0KPj4+IHVuc2ln
-bmVkIGZvciBvZmZzZXQgYmVjYXVzZSBpdCBsZXRzIHVzIHNpbXBsaWZ5IHNvbWUgbWF0aCB3aXRo
-b3V0DQo+Pj4gaGF2aW5nIHRvIHdvcnJ5IGFib3V0IHNpZ25lZCBvdmVyZmxvdykuDQo+Pj4NCj4+
-PiBTdWdnZXN0ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZA
-dmlydHVvenpvLmNvbT4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVk
-aGF0LmNvbT4NCj4+Pg0KPj4+IC0tLQ0KPj4+IHYzOiBuZXcgcGF0Y2gNCj4+PiAtLS0NCj4+PiAg
-ICBpbmNsdWRlL2Jsb2NrL25iZC5oIHwgIDQgKystLQ0KPj4+ICAgIG5iZC9zZXJ2ZXIuYyAgICAg
-ICAgfCAxNCArKysrKysrLS0tLS0tLQ0KPj4+ICAgIHFlbXUtbmJkLmMgICAgICAgICAgfCAyNiAr
-KysrKysrKysrLS0tLS0tLS0tLS0tLS0tLQ0KPj4+ICAgIDMgZmlsZXMgY2hhbmdlZCwgMTkgaW5z
-ZXJ0aW9ucygrKSwgMjUgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS9ibG9jay9uYmQuaCBiL2luY2x1ZGUvYmxvY2svbmJkLmgNCj4+PiBpbmRleCAxOTcxYjU1Nzg5
-Ni4uMGYyNTI4MjkzNzYgMTAwNjQ0DQo+Pj4gLS0tIGEvaW5jbHVkZS9ibG9jay9uYmQuaA0KPj4+
-ICsrKyBiL2luY2x1ZGUvYmxvY2svbmJkLmgNCj4+PiBAQCAtMjk0LDggKzI5NCw4IEBAIGludCBu
-YmRfZXJybm9fdG9fc3lzdGVtX2Vycm5vKGludCBlcnIpOw0KPj4+ICAgIHR5cGVkZWYgc3RydWN0
-IE5CREV4cG9ydCBOQkRFeHBvcnQ7DQo+Pj4gICAgdHlwZWRlZiBzdHJ1Y3QgTkJEQ2xpZW50IE5C
-RENsaWVudDsNCj4+Pg0KPj4+IC1OQkRFeHBvcnQgKm5iZF9leHBvcnRfbmV3KEJsb2NrRHJpdmVy
-U3RhdGUgKmJzLCBvZmZfdCBkZXZfb2Zmc2V0LCBvZmZfdCBzaXplLA0KPj4+IC0gICAgICAgICAg
-ICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0IGNoYXIgKmRlc2NyaXB0aW9u
-LA0KPj4+ICtOQkRFeHBvcnQgKm5iZF9leHBvcnRfbmV3KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1
-aW50NjRfdCBkZXZfb2Zmc2V0LA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgIGludDY0
-X3Qgc2l6ZSwgY29uc3QgY2hhciAqbmFtZSwgY29uc3QgY2hhciAqZGVzYywNCj4+DQo+PiBpbiBw
-cmV2aW91cyBwYXRjaCB5b3UgZHJvcCB1c2Ugb2YgbmVnYXRpdmUgQHNpemUgcGFyYW1ldGVyLCBz
-byBpdCBsb29rcyBiZXR0ZXINCj4+IHRvIHVzZSB1bnNpZ25lZCBmb3Igc2l6ZSBsaWtlIGZvciBv
-ZmZzZXQNCj4gDQo+IFlvdSBjYW4ndCBoYXZlIGEgc2l6ZSBsYXJnZXIgdGhhbiAyXjYzOyBidXQg
-YW4gdW5zaWduZWQgdHlwZSBob2xkcw0KPiBuZWFybHkgMl42NC4gIEkgcHJlZmVyIGEgc2lnbmVk
-IHNpemUsIGZvciB0aGUgc2FtZSByZWFzb24gdGhhdCBvZmZfdCBpcw0KPiBzaWduZWQsIGluIHRo
-YXQgY2hlY2tpbmcgZm9yIGEgbmVnYXRpdmUgc2l6ZSBpcyBlYXNpZXIgdG8gcnVsZSBvdXQgc2l6
-ZXMNCj4gdGhhdCBhcmUgdG9vIGxhcmdlLg0KPiANCj4gDQo+Pj4NCj4+PiAgICBzdGF0aWMgaW50
-IGZpbmRfcGFydGl0aW9uKEJsb2NrQmFja2VuZCAqYmxrLCBpbnQgcGFydGl0aW9uLA0KPj4+IC0g
-ICAgICAgICAgICAgICAgICAgICAgICAgIG9mZl90ICpvZmZzZXQsIG9mZl90ICpzaXplKQ0KPj4+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90ICpvZmZzZXQsIGludDY0X3QgKnNp
-emUpDQo+Pg0KPj4gZnVuY3Rpb24gbmV2ZXIgcmV0dXJuIG5lZ2F0aXZlIEBzaXplLCBzbyB3aGF0
-IGlzIHRoZSByZWFzb24gdG8ga2VlcCBpdCBzaWduZWQ/DQo+IA0KPiBCZWNhdXNlIHRoZSBDIGNv
-bXBpbGVyIGRvZXMgTk9UIGxpa2U6DQo+IA0KPiBpbnQ2NF90IGxlbjsNCj4gZmluZF9wYXJ0aXRp
-b24oLi4uLCAmbGVuKTsNCj4gDQo+IHdpdGggYSB1aW50NjRfdCogcGFyYW1ldGVyIHR5cGUgLSB5
-b3UgSEFWRSB0byBtYXRjaCB0aGUgc2lnbmVkLW5lc3Mgb2YNCj4geW91ciBjYWxsZXIncyBwYXJh
-bWV0ZXIgd2l0aCB5b3VyIHBvaW50ZXIgdHlwZS4gU2luY2UgdGhlIGNhbGxlciBhbHJlYWR5DQo+
-IGhhcyB0byB1c2UgYSBzaWduZWQgdHlwZSAodG8gY2hlY2sgZm9yIGJsa19nZXRsZW5ndGgoKSBm
-YWlsdXJlIEFORA0KPiBiZWNhdXNlIHNpemVzIHJlYWxseSBjYW5ub3QgZXhjZWVkIDJeNjMpLCBp
-dCdzIGVhc2llciB0byBrZWVwIGl0IHNpZ25lZA0KPiBoZXJlLg0KPiANCj4+DQo+PiBBbHNvLCB0
-eXBlIGNvbnZlcnNpb24gKHVpbnQ2NF90KSBzaG91bGQgYmUgZHJvcHBlZCBmcm9tIHRoZSBmdW5j
-dGlvbiBjb2RlIEkgdGhpbmsuDQo+IA0KPiBBcmUgeW91IHRhbGtpbmcgYWJvdXQgdGhpcyBwYXJ0
-Og0KPiANCj4gICAgICAgICAgICAgICAgICBpZiAoKGV4dF9wYXJ0bnVtICsgaiArIDEpID09IHBh
-cnRpdGlvbikgew0KPiAgICAgICAgICAgICAgICAgICAgICAqb2Zmc2V0ID0gKHVpbnQ2NF90KWV4
-dFtqXS5zdGFydF9zZWN0b3JfYWJzIDw8IDk7DQo+ICAgICAgICAgICAgICAgICAgICAgICpzaXpl
-ID0gKHVpbnQ2NF90KWV4dFtqXS5uYl9zZWN0b3JzX2FicyA8PCA5Ow0KPiAgICAgICAgICAgICAg
-ICAgICAgICByZXR1cm4gMDsNCj4gICAgICAgICAgICAgICAgICB9DQo+ICAgICAgICAgICAgICB9
-DQo+ICAgICAgICAgICAgICBleHRfcGFydG51bSArPSA0Ow0KPiAgICAgICAgICB9IGVsc2UgaWYg
-KChpICsgMSkgPT0gcGFydGl0aW9uKSB7DQo+ICAgICAgICAgICAgICAqb2Zmc2V0ID0gKHVpbnQ2
-NF90KW1icltpXS5zdGFydF9zZWN0b3JfYWJzIDw8IDk7DQo+ICAgICAgICAgICAgICAqc2l6ZSA9
-ICh1aW50NjRfdCltYnJbaV0ubmJfc2VjdG9yc19hYnMgPDwgOTsNCj4gICAgICAgICAgICAgIHJl
-dHVybiAwOw0KPiANCj4gTm8gLSB0aGF0IGhhcyB0byBrZWVwIHRoZSBjYXN0LCBiZWNhdXNlIC5z
-dGFydF9zZWN0b3JfYWJzIGFuZA0KPiAubmJfc2VjdG9yc19hYnMgYXJlIHVpbnQzMl90IHZhbHVl
-cywgYnV0IHdlIHdhbnQgdG8gc2hpZnQgaW50byA2NC1iaXQNCj4gcmVzdWx0cy4gIFlvdSBuZWVk
-IHRoZSBjYXN0IHRvIGZvcmNlIHRoZSBjb3JyZWN0IGFyaXRobWV0aWMgcmF0aGVyIHRoYW4NCj4g
-dHJ1bmNhdGluZyBpbnRvIGEgMzItYml0IHZhbHVlIHRoYXQgdGhlbiBnZXRzIHdpZGVuZWQgaW50
-byA2NC1iaXQgc3RvcmFnZS4NCg0KT29wcywgSSdtIHN0dXBpZCkNCg0KSSB0aG91Z2h0IGFib3V0
-IHNvbWV0aGluZyBsaWtlICh1aW50NjRfdCk8dmFyaWFibGUgdGhhdCB3YXMgb2ZmX3QsIGJ1dCBu
-b3cgaXQgaXMgdWludDY0X3Q+LA0KYnV0IHBvaW50ZWQgdG8gPHZhcmlhYmxlIHRoYXQgd2FzIG9m
-Zl90LCBidXQgbm93IGl0IGlzIHVpbnQ2NF90PiA9ICh1aW50NjRfdCk8c29tZXRoaW5nIG90aGVy
-Pg0KDQo+IA0KPj4+IEBAIC02NjUsMTAgKzY2NSw2IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFy
-ICoqYXJndikNCj4+PiAgICAgICAgICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJJbnZhbGlkIG9m
-ZnNldCBgJXMnIiwgb3B0YXJnKTsNCj4+PiAgICAgICAgICAgICAgICAgICAgZXhpdChFWElUX0ZB
-SUxVUkUpOw0KPj4+ICAgICAgICAgICAgICAgIH0NCj4+PiAtICAgICAgICAgICAgaWYgKGRldl9v
-ZmZzZXQgPCAwKSB7DQo+Pj4gLSAgICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIk9mZnNldCBt
-dXN0IGJlIHBvc2l0aXZlIGAlcyciLCBvcHRhcmcpOw0KPj4+IC0gICAgICAgICAgICAgICAgZXhp
-dChFWElUX0ZBSUxVUkUpOw0KPj4+IC0gICAgICAgICAgICB9DQo+Pg0KPj4gaG0sIHRoZW4sIG1h
-eSBiZSwgcy9zdHJ0b2xsL3N0cnRvdWxsIGJlZm9yZSB0aGlzPw0KPiANCj4gSSBjbGVhbiB0aGF0
-IHVwIGluIHBhdGNoIDYvMTkuDQo+IA0KPj4NCj4+PiAgICAgICAgICAgICAgICBicmVhazsNCj4+
-PiAgICAgICAgICAgIGNhc2UgJ2wnOg0KPj4+ICAgICAgICAgICAgICAgIGlmIChzdHJzdGFydChv
-cHRhcmcsIFNOQVBTSE9UX09QVF9CQVNFLCBOVUxMKSkgew0KPj4+IEBAIC0xMDA1LDE1ICsxMDAx
-LDE0IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4+PiAgICAgICAgfQ0KPj4+
-DQo+Pj4gICAgICAgIGlmIChkZXZfb2Zmc2V0ID49IGZkX3NpemUpIHsNCj4+PiAtICAgICAgICBl
-cnJvcl9yZXBvcnQoIk9mZnNldCAoJWxsZCkgaGFzIHRvIGJlIHNtYWxsZXIgdGhhbiB0aGUgaW1h
-Z2Ugc2l6ZSAiDQo+Pj4gLSAgICAgICAgICAgICAgICAgICAgICIoJWxsZCkiLA0KPj4+IC0gICAg
-ICAgICAgICAgICAgICAgICAobG9uZyBsb25nIGludClkZXZfb2Zmc2V0LCAobG9uZyBsb25nIGlu
-dClmZF9zaXplKTsNCj4+PiArICAgICAgICBlcnJvcl9yZXBvcnQoIk9mZnNldCAoJSIgUFJJdTY0
-ICIpIGhhcyB0byBiZSBzbWFsbGVyIHRoYW4gdGhlIGltYWdlICINCj4+PiArICAgICAgICAgICAg
-ICAgICAgICAgInNpemUgKCUiIFBSSXU2NCAiKSIsIGRldl9vZmZzZXQsIGZkX3NpemUpOw0KPj4N
-Cj4+IFBSSWQ2NCBmb3IgZmRfc2l6ZQ0KPiANCj4gU3VyZS4NCj4gDQo+IA0KPj4+IEBAIC0xMDI2
-LDEyICsxMDIxLDExIEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4+PiAgICAg
-ICAgICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQo+Pj4gICAgICAgICAgICB9DQo+Pj4gICAg
-ICAgICAgICAvKiBwYXJ0aXRpb24gbGltaXRzIGFyZSAoMzItYml0IDw8IDkpOyBjYW4ndCBvdmVy
-ZmxvdyA2NCBiaXRzICovDQo+Pj4gLSAgICAgICAgYXNzZXJ0KGRldl9vZmZzZXQgPj0gMCAmJiBk
-ZXZfb2Zmc2V0ICsgbGltaXQgPj0gZGV2X29mZnNldCk7DQo+Pj4gKyAgICAgICAgYXNzZXJ0KGRl
-dl9vZmZzZXQgKyBsaW1pdCA+PSBkZXZfb2Zmc2V0KTsNCj4+PiAgICAgICAgICAgIGlmIChkZXZf
-b2Zmc2V0ICsgbGltaXQgPiBmZF9zaXplKSB7DQo+Pj4gLSAgICAgICAgICAgIGVycm9yX3JlcG9y
-dCgiRGlzY292ZXJlZCBwYXJ0aXRpb24gJWQgYXQgb2Zmc2V0ICVsbGQgc2l6ZSAlbGxkLCAiDQo+
-Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAiYnV0IHNpemUgZXhjZWVkcyBmaWxlIGxlbmd0
-aCAlbGxkIiwgcGFydGl0aW9uLA0KPj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgKGxvbmcg
-bG9uZyBpbnQpIGRldl9vZmZzZXQsIChsb25nIGxvbmcgaW50KSBsaW1pdCwNCj4+PiAtICAgICAg
-ICAgICAgICAgICAgICAgICAgIChsb25nIGxvbmcgaW50KSBmZF9zaXplKTsNCj4+PiArICAgICAg
-ICAgICAgZXJyb3JfcmVwb3J0KCJEaXNjb3ZlcmVkIHBhcnRpdGlvbiAlZCBhdCBvZmZzZXQgJSIg
-UFJJdTY0DQo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAiIHNpemUgJSIgUFJJZDY0ICIs
-IGJ1dCBzaXplIGV4Y2VlZHMgZmlsZSBsZW5ndGggJSINCj4+PiArICAgICAgICAgICAgICAgICAg
-ICAgICAgIFBSSWQ2NCwgcGFydGl0aW9uLCBkZXZfb2Zmc2V0LCBsaW1pdCwgZmRfc2l6ZSk7DQo+
-Pj4gICAgICAgICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPj4NCj4+IGhtbSwgaXQgbWF5
-IGJlIGJldHRlciB0byBwbGFjZSB0aGlzIHBhdGNoIGJlZm9yZSBbMDNdLCB0byBzcXVhc2ggdGhp
-cyBjaHVuayBpbnRvIFswM10NCj4gDQo+IEkgZGlkbid0IG1pbmQgdGhlIGNodXJuOyBhbHNvLCBJ
-IHByZWZlciBwYXRjaCAzIGZpcnN0LCBiZWNhdXNlIGl0J3MgbW9yZQ0KPiBsaWtlbHkgdG8gZ2V0
-IGJhY2twb3J0ZWQgYXMgYSBidWcgZml4IHRoYW4gdGhlIHJlc3Qgb2YgdGhlIHNlcmllcyAoYW5k
-DQo+IHRoZSBlYXJsaWVyIHlvdSBzdGljayBiYWNrcG9ydCBjYW5kaWRhdGVzIGluIGEgc2VyaWVz
-LCB0aGUgZWFzaWVyIGl0IGlzDQo+IHRvIGJhY2twb3J0KS4NCj4gDQoNCg0KLS0gDQpCZXN0IHJl
-Z2FyZHMsDQpWbGFkaW1pcg0K
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--njA5IAPOBdyHJqXaMnNm5J86XcdOjy9ck
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
+ "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
+ <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Message-ID: <c0ab928c-3efc-41fd-f16f-6a6b4e465e9a@redhat.com>
+Subject: Re: [PATCH v3 10/19] nbd/client: Split out
+ nbd_send_one_meta_context()
+References: <20190112175812.27068-1-eblake@redhat.com>
+ <20190112175812.27068-11-eblake@redhat.com>
+ <e24c7f01-a203-c6ce-ac95-77cb74c590df@virtuozzo.com>
+In-Reply-To: <e24c7f01-a203-c6ce-ac95-77cb74c590df@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/15/19 7:18 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 12.01.2019 20:58, Eric Blake wrote:
+>> Refactor nbd_negotiate_simple_meta_context() to pull out the
+>> code that can be reused to send a LIST request for 0 or 1 query.
+>> No semantic change.  The old comment about 'sizeof(uint32_t)'
+>> being equivalent to '/* number of queries */' is no longer
+>> needed, now that we are computing 'sizeof(queries)' instead.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> Message-Id: <20181215135324.152629-14-eblake@redhat.com>
+>> Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+>>
+>> ---
+>> v3: Improve commit message [Rich], formatting tweak [checkpatch],
+>> rebase to dropped patch
+>> ---
+
+>> +++ b/nbd/client.c
+>> @@ -629,6 +629,49 @@ static QIOChannel *nbd_receive_starttls(QIOChanne=
+l *ioc,
+>>       return QIO_CHANNEL(tioc);
+>>   }
+>>
+>> +/*
+>> + * nbd_send_one_meta_context:
+>> + * Send 0 or 1 set/list meta context queries.
+>> + * Return 0 on success, -1 with errp set for any error
+>> + */
+>> +static int nbd_send_one_meta_context(QIOChannel *ioc,
+>> +                                     uint32_t opt,
+>> +                                     const char *export,
+>> +                                     const char *query,
+>> +                                     Error **errp)
+>> +{
+>> +    int ret;
+>> +    uint32_t export_len =3D strlen(export);
+>> +    uint32_t queries =3D !!query;
+>=20
+> n_ or nb_ prefix may make it more clear
+>=20
+>> +    uint32_t context_len =3D 0;
+>> +    uint32_t data_len;
+>> +    char *data;
+>> +    char *p;
+>> +
+>> +    data_len =3D sizeof(export_len) + export_len + sizeof(queries);
+
+[1]
+
+>> +    if (query) {
+>> +        context_len =3D strlen(query);
+>=20
+> looks like it then should be query_len
+
+Sure, an alternative name may make things easier to read (I think this
+is somewhat fallout from my rebase churn, where earlier versions of the
+patch shared as much code with NBD_OPT_SET_META_CONTEXT, and that code
+used the name 'context' rather than 'query'; but now that I've split
+things to add a new function, it doesn't have to maintain the old naming)=
+=2E
+
+>=20
+>> +        data_len +=3D sizeof(context_len) + context_len;
+>> +    } else {
+>> +        assert(opt =3D=3D NBD_OPT_LIST_META_CONTEXT);
+>> +    }
+>> +    data =3D g_malloc(data_len);
+>> +    p =3D data;
+>=20
+> may use p =3D data =3D g_malloc
+
+Will do.
+
+>=20
+>> +
+>> +    trace_nbd_opt_meta_request(nbd_opt_lookup(opt), query ?: "(all)",=
+ export);
+
+[2]
+
+>> +    stl_be_p(p, export_len);
+>> +    memcpy(p +=3D sizeof(export_len), export, export_len);
+>> +    stl_be_p(p +=3D export_len, queries);
+>> +    if (query) {
+>> +        stl_be_p(p +=3D sizeof(uint32_t), context_len);
+>=20
+> :), aha, please, s/uint32_t/queries, as you promised
+
+I did up at [1], but should indeed do so again here.
+
+>=20
+> Hmm, its my code. It's hard to read and not very comfortable to maintai=
+n..
+>=20
+> In block/nbd-client.c we have
+> payload_advance* functions, to read such formatted data, I think, it sh=
+ould be
+> good to make something like this for server-part. Not about these serie=
+s, of course.
+
+Yes, I wouldn't object to even more cleanups to make the code easier to
+maintain, but not as part of this series.
+
+>=20
+> Interesting, troubles around "don't use be64_to_cpuS, use only be64_to_=
+cpu",
+> do they apply somehow to *_be_p functions family?
+
+The problem was in the in-place conversion routines where the
+destination type was strongly typed to something wider than char*.  This
+is not an inplace conversion, because st*_p takes a raw pointer
+interpreted as char* as its destination.  So no, clang does not have
+problems with this construct.
+
+>=20
+>> +        memcpy(p +=3D sizeof(context_len), query, context_len);
+>> +    }
+>> +
+>> +    ret =3D nbd_send_option_request(ioc, opt, data_len, data, errp);
+>> +    g_free(data);
+>> +    return ret;
+>> +}
+>> +
+>>   /* nbd_negotiate_simple_meta_context:
+>>    * Request the server to set the meta context for export @info->name=
+
+>>    * using @info->x_dirty_bitmap with a fallback to "base:allocation",=
+
+>> @@ -653,26 +696,10 @@ static int nbd_negotiate_simple_meta_context(QIO=
+Channel *ioc,
+>>       NBDOptionReply reply;
+>>       const char *context =3D info->x_dirty_bitmap ?: "base:allocation=
+";
+>>       bool received =3D false;
+>> -    uint32_t export_len =3D strlen(info->name);
+>> -    uint32_t context_len =3D strlen(context);
+>> -    uint32_t data_len =3D sizeof(export_len) + export_len +
+>> -                        sizeof(uint32_t) + /* number of queries */
+>> -                        sizeof(context_len) + context_len;
+>> -    char *data =3D g_malloc(data_len);
+>> -    char *p =3D data;
+>>
+>> -    trace_nbd_opt_meta_request(context, info->name);
+>> -    stl_be_p(p, export_len);
+>> -    memcpy(p +=3D sizeof(export_len), info->name, export_len);
+>> -    stl_be_p(p +=3D export_len, 1);
+>> -    stl_be_p(p +=3D sizeof(uint32_t), context_len);
+>> -    memcpy(p +=3D sizeof(context_len), context, context_len);
+>> -
+>> -    ret =3D nbd_send_option_request(ioc, NBD_OPT_SET_META_CONTEXT, da=
+ta_len, data,
+>> -                                  errp);
+>> -    g_free(data);
+>> -    if (ret < 0) {
+>> -        return ret;
+>> +    if (nbd_send_one_meta_context(ioc, NBD_OPT_SET_META_CONTEXT,
+>> +                                  info->name, context, errp) < 0) {
+>> +        return -1;
+>>       }
+>>
+>>       if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &rep=
+ly,
+>> @@ -689,7 +716,7 @@ static int nbd_negotiate_simple_meta_context(QIOCh=
+annel *ioc,
+>>       if (reply.type =3D=3D NBD_REP_META_CONTEXT) {
+>>           char *name;
+>>
+>> -        if (reply.length !=3D sizeof(info->context_id) + context_len)=
+ {
+>> +        if (reply.length !=3D sizeof(info->context_id) + strlen(conte=
+xt)) {
+>>               error_setg(errp, "Failed to negotiate meta context '%s',=
+ server "
+>>                          "answered with unexpected length %" PRIu32, c=
+ontext,
+>>                          reply.length);
+>> diff --git a/nbd/trace-events b/nbd/trace-events
+>> index c3966d2b653..59521e47a3d 100644
+>> --- a/nbd/trace-events
+>> +++ b/nbd/trace-events
+>> @@ -12,7 +12,7 @@ nbd_receive_query_exports_start(const char *wantname=
+) "Querying export list for
+>>   nbd_receive_query_exports_success(const char *wantname) "Found desir=
+ed export name '%s'"
+>>   nbd_receive_starttls_new_client(void) "Setting up TLS"
+>>   nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
+>> -nbd_opt_meta_request(const char *context, const char *export) "Reques=
+ting to set meta context %s for export %s"
+>> +nbd_opt_meta_request(const char *optname, const char *context, const =
+char *export) "Requesting %s %s for export %s"
+>=20
+> Hmm, you forget nbd_opt_lookup()
+
+Where? The updated trace point at [2] has nbd_opt_lookup() for
+determining optname.
+
+>=20
+> With this and s/uint32_t/queries (other tiny things up to you):
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+>>   nbd_opt_meta_reply(const char *context, uint32_t id) "Received mappi=
+ng of context %s to id %" PRIu32
+>>   nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receivi=
+ng negotiation tlscreds=3D%p hostname=3D%s"
+>>   nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
+>>
+>=20
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--njA5IAPOBdyHJqXaMnNm5J86XcdOjy9ck
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw9//gACgkQp6FrSiUn
+Q2rp5Af+Mg8K8YtrBRl9EE2orbTm6zqqPGd/dX9NqlwjAOAyumRKbSXI3A0cQFcg
+noxPxpLQi+X9z/BtjY7JAeJBeFsZL4VJWiiUIWlV1jButL3epVdMwSkVyatAS6+Z
+heCrbPkKajy6kyVGtt9Jdb4vd5+eaiYhHvEn+jQsPF6WoTE3gLMWgDTiC2jxwXWq
+dYIWaifcDeQ2/1DJ9zj68lKG0aJqyagMPj+uhXgkEvo8IY7d5FFufKEBC5kKKeEs
+0wwQnFARvEHJkqeeu4LI5ro5Cmk3S7L4mo41xSYW0Yyvdl9EL3gorZpI4pXPnwvG
+zgCp1aJbaMOZdAm/ig0z+n0e6iK9Kw==
+=MvT2
+-----END PGP SIGNATURE-----
+
+--njA5IAPOBdyHJqXaMnNm5J86XcdOjy9ck--
