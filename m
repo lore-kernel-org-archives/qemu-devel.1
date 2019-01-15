@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56127)
+Received: from eggs.gnu.org ([209.51.188.92]:56109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gjSaq-0002kE-Fu
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gjSaq-0002k8-1g
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:33:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gjSao-0007p8-Mc
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gjSao-0007oO-D7
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:33:40 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53626)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38197)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gjSao-0007jE-DT
+	id 1gjSao-0007kN-5w
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:33:38 -0500
-Received: by mail-wm1-x343.google.com with SMTP id d15so4159937wmb.3
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 09:33:30 -0800 (PST)
+Received: by mail-wr1-x444.google.com with SMTP id v13so3931906wrw.5
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 09:33:31 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 15 Jan 2019 18:33:21 +0100
-Message-Id: <1547573605-25711-2-git-send-email-pbonzini@redhat.com>
+Date: Tue, 15 Jan 2019 18:33:22 +0100
+Message-Id: <1547573605-25711-3-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1547573605-25711-1-git-send-email-pbonzini@redhat.com>
 References: <1547573605-25711-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/5] vhost-net: move stubs to a separate file
+Subject: [Qemu-devel] [PATCH 2/5] vhost-net-user: add stubs for when no
+ virtio-net device is present
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,228 +34,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, philmd@redhat.com
 
-There is no reason for CONFIG_VHOST_NET to be specific to a single target;
-it is a host feature that can be add to all targets, as long as they support
-the virtio-net device.  Currently CONFIG_VHOST_NET depends on CONFIG_KVM,
-but ioeventfd support is present in the core memory API and works with
-other accelerators as well.
+hw/net/vhost_net.c needs functions that are declared in net/vhost-user.c: the
+vhost-user code is always compiled into QEMU, only the constructor
+net_init_vhost_user is unreachable.  Also, net/vhost-user.c needs functions
+declared in hw/virtio/vhost-stub.c even if no virtio device exists.
 
-As a first step, move the vhost-net stubs to a separate file.  Later, they
-will become conditional on CONFIG_VIRTIO_NET, which is not available in .c
-files.
+Break this dependency.  First, add a minimal version of net/vhost-user.c,
+with no functionality and no dependency on vhost code.  Second, #ifdef out
+the calls back to net/vhost-user.c from hw/net/vhost_net.c.
+
+While at it, this patch fixes the CONFIG_VHOST_NET_USE*D* typo.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <1543851204-41186-3-git-send-email-pbonzini@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <1543851204-41186-2-git-send-email-pbonzini@redhat.com>
 ---
- hw/net/Makefile.objs    |  4 ++-
- hw/net/vhost_net-stub.c | 92 +++++++++++++++++++++++++++++++++++++++++++++++++
- hw/net/vhost_net.c      | 74 ---------------------------------------
- 3 files changed, 95 insertions(+), 75 deletions(-)
- create mode 100644 hw/net/vhost_net-stub.c
+ configure             |  2 +-
+ hw/net/vhost_net.c    |  4 ++++
+ net/Makefile.objs     |  4 +++-
+ net/net.c             |  2 +-
+ net/vhost-user-stub.c | 23 +++++++++++++++++++++++
+ 5 files changed, 32 insertions(+), 3 deletions(-)
+ create mode 100644 net/vhost-user-stub.c
 
-diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-index fa461d4..c2705e6 100644
---- a/hw/net/Makefile.objs
-+++ b/hw/net/Makefile.objs
-@@ -37,7 +37,9 @@ obj-$(CONFIG_PSERIES) += spapr_llan.o
- obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
+diff --git a/configure b/configure
+index e0915da..e3e6dd3 100755
+--- a/configure
++++ b/configure
+@@ -6565,7 +6565,7 @@ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+ fi
+ if test "$vhost_net" = "yes" -a "$vhost_user" = "yes"; then
+-  echo "CONFIG_VHOST_NET_USED=y" >> $config_host_mak
++  echo "CONFIG_VHOST_NET_USER=y" >> $config_host_mak
+ fi
+ if test "$vhost_crypto" = "yes" ; then
+   echo "CONFIG_VHOST_CRYPTO=y" >> $config_host_mak
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index b901306..2a300ee 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -193,6 +193,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
+     }
  
- obj-$(CONFIG_VIRTIO_NET) += virtio-net.o
--obj-y += vhost_net.o
-+obj-$(CONFIG_VHOST_NET) += vhost_net.o
-+common-obj-$(call lnot,$(CONFIG_VHOST_NET)) += vhost_net-stub.o
-+common-obj-$(CONFIG_ALL) += vhost_net-stub.o
+     /* Set sane init value. Override when guest acks. */
++#ifdef CONFIG_VHOST_NET_USER
+     if (net->nc->info->type == NET_CLIENT_DRIVER_VHOST_USER) {
+         features = vhost_user_get_acked_features(net->nc);
+         if (~net->dev.features & features) {
+@@ -202,6 +203,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
+             goto fail;
+         }
+     }
++#endif
  
- obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
- 			fsl_etsec/rings.o fsl_etsec/miim.o
-diff --git a/hw/net/vhost_net-stub.c b/hw/net/vhost_net-stub.c
+     vhost_net_ack_features(net, features);
+ 
+@@ -413,10 +415,12 @@ VHostNetState *get_vhost_net(NetClientState *nc)
+     case NET_CLIENT_DRIVER_TAP:
+         vhost_net = tap_get_vhost_net(nc);
+         break;
++#ifdef CONFIG_VHOST_NET_USER
+     case NET_CLIENT_DRIVER_VHOST_USER:
+         vhost_net = vhost_user_get_vhost_net(nc);
+         assert(vhost_net);
+         break;
++#endif
+     default:
+         break;
+     }
+diff --git a/net/Makefile.objs b/net/Makefile.objs
+index b2bf88a..df2b409 100644
+--- a/net/Makefile.objs
++++ b/net/Makefile.objs
+@@ -3,7 +3,9 @@ common-obj-y += socket.o
+ common-obj-y += dump.o
+ common-obj-y += eth.o
+ common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
+-common-obj-$(CONFIG_POSIX) += vhost-user.o
++common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET_USER)) += vhost-user.o
++common-obj-$(call land,$(call lnot,$(CONFIG_VIRTIO_NET)),$(CONFIG_VHOST_NET_USER)) += vhost-user-stub.o
++common-obj-$(CONFIG_ALL) += vhost-user-stub.o
+ common-obj-$(CONFIG_SLIRP) += slirp.o
+ common-obj-$(CONFIG_VDE) += vde.o
+ common-obj-$(CONFIG_NETMAP) += netmap.o
+diff --git a/net/net.c b/net/net.c
+index 3acbdcc..ca0e14c 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -961,7 +961,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
+         [NET_CLIENT_DRIVER_BRIDGE]    = net_init_bridge,
+ #endif
+         [NET_CLIENT_DRIVER_HUBPORT]   = net_init_hubport,
+-#ifdef CONFIG_VHOST_NET_USED
++#ifdef CONFIG_VHOST_NET_USER
+         [NET_CLIENT_DRIVER_VHOST_USER] = net_init_vhost_user,
+ #endif
+ #ifdef CONFIG_L2TPV3
+diff --git a/net/vhost-user-stub.c b/net/vhost-user-stub.c
 new file mode 100644
-index 0000000..aac0e98
+index 0000000..52ab4e1
 --- /dev/null
-+++ b/hw/net/vhost_net-stub.c
-@@ -0,0 +1,92 @@
++++ b/net/vhost-user-stub.c
+@@ -0,0 +1,23 @@
 +/*
-+ * vhost-net support
++ * vhost-user-stub.c
 + *
-+ * Copyright Red Hat, Inc. 2010
-+ *
-+ * Authors:
-+ *  Michael S. Tsirkin <mst@redhat.com>
++ * Copyright (c) 2018 Red Hat, Inc.
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
++ *
 + */
 +
 +#include "qemu/osdep.h"
-+#include "net/net.h"
-+#include "net/tap.h"
-+#include "net/vhost-user.h"
-+
-+#include "hw/virtio/virtio-net.h"
++#include "clients.h"
 +#include "net/vhost_net.h"
++#include "net/vhost-user.h"
 +#include "qemu/error-report.h"
++#include "qapi/error.h"
 +
-+
-+uint64_t vhost_net_get_max_queues(VHostNetState *net)
++int net_init_vhost_user(const Netdev *netdev, const char *name,
++                        NetClientState *peer, Error **errp)
 +{
-+    return 1;
-+}
-+
-+struct vhost_net *vhost_net_init(VhostNetOptions *options)
-+{
-+    error_report("vhost-net support is not compiled in");
-+    return NULL;
-+}
-+
-+int vhost_net_start(VirtIODevice *dev,
-+                    NetClientState *ncs,
-+                    int total_queues)
-+{
-+    return -ENOSYS;
-+}
-+void vhost_net_stop(VirtIODevice *dev,
-+                    NetClientState *ncs,
-+                    int total_queues)
-+{
-+}
-+
-+void vhost_net_cleanup(struct vhost_net *net)
-+{
-+}
-+
-+uint64_t vhost_net_get_features(struct vhost_net *net, uint64_t features)
-+{
-+    return features;
-+}
-+
-+void vhost_net_ack_features(struct vhost_net *net, uint64_t features)
-+{
-+}
-+
-+uint64_t vhost_net_get_acked_features(VHostNetState *net)
-+{
-+    return 0;
-+}
-+
-+bool vhost_net_virtqueue_pending(VHostNetState *net, int idx)
-+{
-+    return false;
-+}
-+
-+void vhost_net_virtqueue_mask(VHostNetState *net, VirtIODevice *dev,
-+                              int idx, bool mask)
-+{
-+}
-+
-+int vhost_net_notify_migration_done(struct vhost_net *net, char* mac_addr)
-+{
++    error_setg(errp, "vhost-user requires frontend driver virtio-net-*");
 +    return -1;
 +}
-+
-+VHostNetState *get_vhost_net(NetClientState *nc)
-+{
-+    return 0;
-+}
-+
-+int vhost_set_vring_enable(NetClientState *nc, int enable)
-+{
-+    return 0;
-+}
-+
-+int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
-+{
-+    return 0;
-+}
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index e037db6..b901306 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -23,7 +23,6 @@
- #include "qemu/error-report.h"
- 
- 
--#ifdef CONFIG_VHOST_NET
- #include <linux/vhost.h>
- #include <sys/socket.h>
- #include <linux/kvm.h>
-@@ -449,76 +448,3 @@ int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
- 
-     return vhost_ops->vhost_net_set_mtu(&net->dev, mtu);
- }
--
--#else
--uint64_t vhost_net_get_max_queues(VHostNetState *net)
--{
--    return 1;
--}
--
--struct vhost_net *vhost_net_init(VhostNetOptions *options)
--{
--    error_report("vhost-net support is not compiled in");
--    return NULL;
--}
--
--int vhost_net_start(VirtIODevice *dev,
--                    NetClientState *ncs,
--                    int total_queues)
--{
--    return -ENOSYS;
--}
--void vhost_net_stop(VirtIODevice *dev,
--                    NetClientState *ncs,
--                    int total_queues)
--{
--}
--
--void vhost_net_cleanup(struct vhost_net *net)
--{
--}
--
--uint64_t vhost_net_get_features(struct vhost_net *net, uint64_t features)
--{
--    return features;
--}
--
--void vhost_net_ack_features(struct vhost_net *net, uint64_t features)
--{
--}
--
--uint64_t vhost_net_get_acked_features(VHostNetState *net)
--{
--    return 0;
--}
--
--bool vhost_net_virtqueue_pending(VHostNetState *net, int idx)
--{
--    return false;
--}
--
--void vhost_net_virtqueue_mask(VHostNetState *net, VirtIODevice *dev,
--                              int idx, bool mask)
--{
--}
--
--int vhost_net_notify_migration_done(struct vhost_net *net, char* mac_addr)
--{
--    return -1;
--}
--
--VHostNetState *get_vhost_net(NetClientState *nc)
--{
--    return 0;
--}
--
--int vhost_set_vring_enable(NetClientState *nc, int enable)
--{
--    return 0;
--}
--
--int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
--{
--    return 0;
--}
--#endif
 -- 
 1.8.3.1
