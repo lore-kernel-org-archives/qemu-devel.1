@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:43056)
+Received: from eggs.gnu.org ([209.51.188.92]:42735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dimastep@yandex-team.ru>) id 1gjLeh-0001wz-NW
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:09:14 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gjLen-0001mR-Hj
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:09:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dimastep@yandex-team.ru>) id 1gjLeg-0001uC-U6
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:09:11 -0500
-Received: from forwardcorp1j.cmail.yandex.net ([2a02:6b8:0:1630::190]:56881)
+	(envelope-from <sgarzare@redhat.com>) id 1gjLYP-0006T5-Px
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:02:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43380)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dimastep@yandex-team.ru>)
-	id 1gjLeg-0001iz-8A
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:09:10 -0500
-From: Dima Stepanov <dimastep@yandex-team.ru>
-Date: Tue, 15 Jan 2019 13:08:47 +0300
-Message-Id: <1547546927-18006-1-git-send-email-dimastep@yandex-team.ru>
-Subject: [Qemu-devel] [PATCH v1] virtio: add checks for the size of the
- indirect table
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gjLYP-0006Ng-JR
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 05:02:41 -0500
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Tue, 15 Jan 2019 11:00:58 +0100
+Message-Id: <20190115100058.44712-5-sgarzare@redhat.com>
+In-Reply-To: <20190115100058.44712-1-sgarzare@redhat.com>
+References: <20190115100058.44712-1-sgarzare@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 4/4] hw/i386/pc: use PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, qemu-devel@nongnu.org
-Cc: wrfsh@yandex-team.ru, dimastep@yandex-team.ru
+To: qemu-devel@nongnu.org
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Maran Wilson <maran.wilson@oracle.com>
 
-The virtqueue_pop() and virtqueue_get_avail_bytes() routines can use the
-INDIRECT table to get the data. It is possible to create a packet which
-will lead to the assert message like:
-  include/exec/memory.h:1995: void
-  address_space_read_cached(MemoryRegionCache *, hwaddr, void *, int):
-  Assertion `addr < cache->len && len <= cache->len - addr' failed.
-  Aborted
-To do it the first descriptor should have a link to the INDIRECT table
-and set the size of it to 0. It doesn't look good that the guest should
-be able to trigger the assert in qemu. Add additional check for the size
-of the INDIRECT table, which should not be 0.
+Use pvh.bin option rom when we are booting an uncompressed
+kernel using the x86/HVM direct boot ABI.
 
-Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Based-on: <1545422632-24444-5-git-send-email-liam.merwick@oracle.com>
 ---
- hw/virtio/virtio.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/i386/pc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 22bd1ac..a1ff647 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -646,7 +646,7 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
-         vring_desc_read(vdev, &desc, desc_cache, i);
- 
-         if (desc.flags & VRING_DESC_F_INDIRECT) {
--            if (desc.len % sizeof(VRingDesc)) {
-+            if (!desc.len || (desc.len % sizeof(VRingDesc))) {
-                 virtio_error(vdev, "Invalid size for indirect buffer table");
-                 goto err;
-             }
-@@ -902,7 +902,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
-     desc_cache = &caches->desc;
-     vring_desc_read(vdev, &desc, desc_cache, i);
-     if (desc.flags & VRING_DESC_F_INDIRECT) {
--        if (desc.len % sizeof(VRingDesc)) {
-+        if (!desc.len || (desc.len % sizeof(VRingDesc))) {
-             virtio_error(vdev, "Invalid size for indirect buffer table");
-             goto done;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 06bce6a101..7564ba51d2 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1005,6 +1005,10 @@ static void load_linux(PCMachineState *pcms,
+             fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
+                              header, sizeof(header));
+=20
++            option_rom[nb_option_roms].bootindex =3D 0;
++            option_rom[nb_option_roms].name =3D "pvh.bin";
++            nb_option_roms++;
++
+             return;
          }
--- 
-2.7.4
+         /* This looks like a multiboot kernel. If it is, let's stop
+@@ -1456,6 +1460,7 @@ void xen_load_linux(PCMachineState *pcms)
+     for (i =3D 0; i < nb_option_roms; i++) {
+         assert(!strcmp(option_rom[i].name, "linuxboot.bin") ||
+                !strcmp(option_rom[i].name, "linuxboot_dma.bin") ||
++               !strcmp(option_rom[i].name, "pvh.bin") ||
+                !strcmp(option_rom[i].name, "multiboot.bin"));
+         rom_add_option(option_rom[i].name, option_rom[i].bootindex);
+     }
+--=20
+2.20.1
