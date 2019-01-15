@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([209.51.188.92]:41755)
+Received: from eggs.gnu.org ([209.51.188.92]:57803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjW3m-0007Sb-BM
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:15:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1gjUUx-0006W9-Ta
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjW3k-0001TG-QP
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:15:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46282)
+	(envelope-from <bounces@canonical.com>) id 1gjUUv-00078f-1e
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:35:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58566)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gjW3k-0001RS-HT
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:15:44 -0500
+	id 1gjUUt-0006u6-Nr
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:35:40 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gjW3c-0005eY-66
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 21:15:36 +0000
+	id 1gjUUk-0005k3-Ty
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 19:35:30 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2C55E2E8029
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 21:15:36 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D1BB62E80C8
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 19:35:30 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Jan 2019 21:04:01 -0000
-From: Chris Ward <1811782@bugs.launchpad.net>
-Reply-To: Bug 1811782 <1811782@bugs.launchpad.net>
+Date: Tue, 15 Jan 2019 19:25:33 -0000
+From: Lukasz Janyst <xyz@jany.st>
+Reply-To: Bug 1811888 <1811888@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <154754407492.19252.12061263609650359528.malonedeb@gac.canonical.com>
-Message-Id: <154758624202.9333.5319831698206961618.malone@chaenomeles.canonical.com>
+Message-Id: <154758033350.20612.10612778559248871550.malonedeb@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1811782] Re: QEMU Windows fails to mount rootfs
- on an ISO where QEMU Linux works normally
+Subject: [Qemu-devel] [Bug 1811888] [NEW] Qemu refuses to multiboot Elf64
+ kernels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,35 +38,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This turned out to be not enough memory allocated to the virtual
-machine. When I added "-m 1024" to the parameters, all was well.
+Public bug reported:
+
+Qemu does not multiboot Elf64 bit kernels when emulating x86_64 systems.
+This is unfortunate because it renders the `-kernel` option quite
+useless. It's true that a multiboot compatible bootloader puts you in
+protected mode by default, and you have to set up the long mode
+yourself. While it is easy to put such 32-bit bootstrap code in a 64 bit
+binary, it is not possible to compile a 64 bit kernel into a 32 bit
+binary.
+
+After quick search, it turned out that loading 64 bit elf binaries has
+been disabled to be compatible with GRUB. However, since that time, both
+GRUB and Syslinux load 64 bit ELF kernels just fine, which makes qemu
+incompatible with them. Furthermore, it seems that this feature does and
+has always worked fine and that people have since submitted patches to
+re-enable it.
+
+https://patchwork.ozlabs.org/patch/62142/
+https://patchwork.kernel.org/patch/9770523/
+
+Please consider applying the attached patch.
+
+Best Regards,
+Lukasz Janyst
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "0001-hw-i386-multiboot.c-Don-t-refuse-to-boot-ELF64-b=
+inar.patch"
+   https://bugs.launchpad.net/bugs/1811888/+attachment/5229414/+files/0001-=
+hw-i386-multiboot.c-Don-t-refuse-to-boot-ELF64-binar.patch
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811782
+https://bugs.launchpad.net/bugs/1811888
 
 Title:
-  QEMU Windows fails to mount rootfs on an ISO where QEMU Linux works
-  normally
+  Qemu refuses to multiboot Elf64 kernels
 
 Status in QEMU:
   New
 
 Bug description:
-  I have installed QEMU 3.1.0 for Microsoft Windows from https://qemu.weiln=
-etz.de/w64/ . When I give the command "qemu-system-x86_64.exe -cdrom ..\Qem=
-uSaver\freeduc2.iso", qemu boots the ISO, but the resulting Linux kernel pa=
-nics when trying to mount the root file system. Running the equivalent comm=
-and under Linux (OpenSuSE Leap 15.0) results in success.
-  I will attach a screenshot of the command and the kernel panic message.
-  To reproduce the problem, download the zip file from Google Drive here ht=
-tps://drive.google.com/file/d/1bAozvGeRF7PbkOnJKzrFHxhUh2kDLz6L/view?usp=3D=
-sharing, and unpack it under Microsoft Windows. You can either run the inst=
-aller (which will install QEMU 3.0.0 and an ISO image in C:\QemuSaver) or y=
-ou can run the command I gave from the directory where your QEMU is install=
-ed.
+  Qemu does not multiboot Elf64 bit kernels when emulating x86_64
+  systems. This is unfortunate because it renders the `-kernel` option
+  quite useless. It's true that a multiboot compatible bootloader puts
+  you in protected mode by default, and you have to set up the long mode
+  yourself. While it is easy to put such 32-bit bootstrap code in a 64
+  bit binary, it is not possible to compile a 64 bit kernel into a 32
+  bit binary.
+
+  After quick search, it turned out that loading 64 bit elf binaries has
+  been disabled to be compatible with GRUB. However, since that time,
+  both GRUB and Syslinux load 64 bit ELF kernels just fine, which makes
+  qemu incompatible with them. Furthermore, it seems that this feature
+  does and has always worked fine and that people have since submitted
+  patches to re-enable it.
+
+  https://patchwork.ozlabs.org/patch/62142/
+  https://patchwork.kernel.org/patch/9770523/
+
+  Please consider applying the attached patch.
+
+  Best Regards,
+  Lukasz Janyst
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811782/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1811888/+subscriptions
