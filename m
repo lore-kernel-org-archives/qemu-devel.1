@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35506)
+Received: from eggs.gnu.org ([209.51.188.92]:35508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUyn-00081P-TE
+	(envelope-from <mst@redhat.com>) id 1gjUyn-00081Q-TE
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUyT-0003Ux-Dx
+	(envelope-from <mst@redhat.com>) id 1gjUyR-0003RF-3r
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58310)
+Received: from mx1.redhat.com ([209.132.183.28]:39002)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUyR-0003Pg-9m
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:12 -0500
-Date: Tue, 15 Jan 2019 15:06:08 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUyP-0002wW-Lk
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:10 -0500
+Date: Tue, 15 Jan 2019 15:05:32 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115200252.25911-43-mst@redhat.com>
+Message-ID: <20190115200252.25911-25-mst@redhat.com>
 References: <20190115200252.25911-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190115200252.25911-1-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 42/49] tpm: clear RAM when "memory overwrite"
- requested
+Subject: [Qemu-devel] [PULL v2 24/49] virtio: split vhost user blk bits from
+ virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,131 +28,266 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Juan Quintela <quintela@redhat.com>
 
-Note: the "Platform Reset Attack Mitigation" specification isn't
-explicit about NVDIMM, since they could have different usages. It uses
-the term "system memory" generally (and also "volatile memory RAM" in
-its introduction). For initial support, I propose to consider
-non-volatile memory as not being subject to the memory clear. There is
-an on-going discussion in the TCG "pcclientwg" working group for
-future revisions.
-
-CPU cache clearing is done unconditionally in edk2 since commit
-d20ae95a13e851 (edk2-stable201811).
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Tested-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/tpm/tpm_ppi.h    | 10 ++++++++++
- hw/tpm/tpm_crb.c    |  3 +++
- hw/tpm/tpm_ppi.c    | 22 ++++++++++++++++++++++
- hw/tpm/tpm_tis.c    |  3 +++
- hw/tpm/trace-events |  3 +++
- 5 files changed, 41 insertions(+)
+ hw/virtio/virtio-pci.h         |  18 ------
+ hw/virtio/vhost-user-blk-pci.c | 103 +++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c         |  62 --------------------
+ hw/virtio/Makefile.objs        |   1 +
+ 4 files changed, 104 insertions(+), 80 deletions(-)
+ create mode 100644 hw/virtio/vhost-user-blk-pci.c
 
-diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-index c5e555fe2c..d33ef27de6 100644
---- a/hw/tpm/tpm_ppi.h
-+++ b/hw/tpm/tpm_ppi.h
-@@ -33,4 +33,14 @@ typedef struct TPMPPI {
- void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-                   hwaddr addr, Object *obj);
-=20
-+/**
-+ * tpm_ppi_reset:
-+ * @tpmppi: a TPMPPI
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 94af08410a..acbbe5c4e8 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -24,9 +24,6 @@
+ #include "hw/virtio/virtio-gpu.h"
+ #include "hw/virtio/virtio-crypto.h"
+ #include "hw/virtio/vhost-user-scsi.h"
+-#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+-#include "hw/virtio/vhost-user-blk.h"
+-#endif
+ 
+ #ifdef CONFIG_VHOST_SCSI
+ #include "hw/virtio/vhost-scsi.h"
+@@ -39,7 +36,6 @@ typedef struct VirtIOSerialPCI VirtIOSerialPCI;
+ typedef struct VirtIONetPCI VirtIONetPCI;
+ typedef struct VHostSCSIPCI VHostSCSIPCI;
+ typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
+-typedef struct VHostUserBlkPCI VHostUserBlkPCI;
+ typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+ typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
+ 
+@@ -233,20 +229,6 @@ struct VHostUserSCSIPCI {
+     VHostUserSCSI vdev;
+ };
+ 
+-#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+-/*
+- * vhost-user-blk-pci: This extends VirtioPCIProxy.
+- */
+-#define TYPE_VHOST_USER_BLK_PCI "vhost-user-blk-pci-base"
+-#define VHOST_USER_BLK_PCI(obj) \
+-        OBJECT_CHECK(VHostUserBlkPCI, (obj), TYPE_VHOST_USER_BLK_PCI)
+-
+-struct VHostUserBlkPCI {
+-    VirtIOPCIProxy parent_obj;
+-    VHostUserBlk vdev;
+-};
+-#endif
+-
+ /*
+  * virtio-blk-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/hw/virtio/vhost-user-blk-pci.c b/hw/virtio/vhost-user-blk-pci.c
+new file mode 100644
+index 0000000000..ca66c217a7
+--- /dev/null
++++ b/hw/virtio/vhost-user-blk-pci.c
+@@ -0,0 +1,103 @@
++/*
++ * Vhost user blk PCI Bindings
 + *
-+ * Function to call on machine reset. It will check if the "Memory
-+ * overwrite" variable is set, and perform a memory clear on volatile
-+ * memory if requested.
-+ **/
-+void tpm_ppi_reset(TPMPPI *tpmppi);
++ * Copyright(C) 2017 Intel Corporation.
++ *
++ * Authors:
++ *  Changpeng Liu <changpeng.liu@intel.com>
++ *
++ * Largely based on the "vhost-user-scsi.c" and "vhost-scsi.c" implemented by:
++ * Felipe Franciosi <felipe@nutanix.com>
++ * Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
++ * Nicholas Bellinger <nab@risingtidesystems.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
 +
- #endif /* TPM_TPM_PPI_H */
-diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-index 012ec686d4..3087acc4ab 100644
---- a/hw/tpm/tpm_crb.c
-+++ b/hw/tpm/tpm_crb.c
-@@ -233,6 +233,9 @@ static void tpm_crb_reset(void *dev)
- {
-     CRBState *s =3D CRB(dev);
-=20
-+    if (s->ppi_enabled) {
-+        tpm_ppi_reset(&s->ppi);
-+    }
-     tpm_backend_reset(s->tpmbe);
-=20
-     memset(s->regs, 0, sizeof(s->regs));
-diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-index cf17779c20..cd8205f212 100644
---- a/hw/tpm/tpm_ppi.c
-+++ b/hw/tpm/tpm_ppi.c
-@@ -16,8 +16,30 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "sysemu/memory_mapping.h"
-+#include "sysemu/reset.h"
- #include "migration/vmstate.h"
- #include "tpm_ppi.h"
-+#include "trace.h"
++#include "qemu/osdep.h"
 +
-+void tpm_ppi_reset(TPMPPI *tpmppi)
++#include "standard-headers/linux/virtio_pci.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/vhost-user-blk.h"
++#include "hw/pci/pci.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "virtio-pci.h"
++
++typedef struct VHostUserBlkPCI VHostUserBlkPCI;
++
++/*
++ * vhost-user-blk-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VHOST_USER_BLK_PCI "vhost-user-blk-pci-base"
++#define VHOST_USER_BLK_PCI(obj) \
++        OBJECT_CHECK(VHostUserBlkPCI, (obj), TYPE_VHOST_USER_BLK_PCI)
++
++struct VHostUserBlkPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserBlk vdev;
++};
++
++static Property vhost_user_blk_pci_properties[] = {
++    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
++                       DEV_NVECTORS_UNSPECIFIED),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 +{
-+    if (tpmppi->buf[0x15a /* movv, docs/specs/tpm.txt */] & 0x1) {
-+        GuestPhysBlockList guest_phys_blocks;
-+        GuestPhysBlock *block;
++    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
 +
-+        guest_phys_blocks_init(&guest_phys_blocks);
-+        guest_phys_blocks_append(&guest_phys_blocks);
-+        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
-+            trace_tpm_ppi_memset(block->host_addr,
-+                                 block->target_end - block->target_start=
-);
-+            memset(block->host_addr, 0,
-+                   block->target_end - block->target_start);
-+            memory_region_set_dirty(block->mr, 0,
-+                                    block->target_end - block->target_st=
-art);
-+        }
-+        guest_phys_blocks_free(&guest_phys_blocks);
++    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
++        vpci_dev->nvectors = dev->vdev.num_queues + 1;
 +    }
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 +}
-=20
- void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-                   hwaddr addr, Object *obj)
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 02d9d5c911..fd6bb9b59a 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -872,6 +872,9 @@ static void tpm_tis_reset(DeviceState *dev)
-     s->be_buffer_size =3D MIN(tpm_backend_get_buffer_size(s->be_driver),
-                             TPM_TIS_BUFFER_MAX);
-=20
-+    if (s->ppi_enabled) {
-+        tpm_ppi_reset(&s->ppi);
-+    }
-     tpm_backend_reset(s->be_driver);
-=20
-     s->active_locty =3D TPM_TIS_NO_LOCALITY;
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 25bee0cecf..920d32ad55 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
- tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
- tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
-d to TPM: 0x%08x (size=3D%d)"
- tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
-t =3D %u"
 +
-+# hw/tpm/tpm_ppi.c
-+tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
---=20
++static void vhost_user_blk_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props = vhost_user_blk_pci_properties;
++    k->realize = vhost_user_blk_pci_realize;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BLOCK;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
++}
++
++static void vhost_user_blk_pci_instance_init(Object *obj)
++{
++    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_BLK);
++    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
++                              "bootindex", &error_abort);
++}
++
++static const VirtioPCIDeviceTypeInfo vhost_user_blk_pci_info = {
++    .base_name               = TYPE_VHOST_USER_BLK_PCI,
++    .generic_name            = "vhost-user-blk-pci",
++    .transitional_name       = "vhost-user-blk-pci-transitional",
++    .non_transitional_name   = "vhost-user-blk-pci-non-transitional",
++    .instance_size  = sizeof(VHostUserBlkPCI),
++    .instance_init  = vhost_user_blk_pci_instance_init,
++    .class_init     = vhost_user_blk_pci_class_init,
++};
++
++static void vhost_user_blk_pci_register(void)
++{
++    virtio_pci_types_register(&vhost_user_blk_pci_info);
++}
++
++type_init(vhost_user_blk_pci_register)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index a62006c72c..44cc022a28 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2061,65 +2061,6 @@ static const VirtioPCIDeviceTypeInfo virtio_blk_pci_info = {
+     .class_init    = virtio_blk_pci_class_init,
+ };
+ 
+-#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+-/* vhost-user-blk */
+-
+-static Property vhost_user_blk_pci_properties[] = {
+-    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
+-    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
+-                       DEV_NVECTORS_UNSPECIFIED),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+-static void vhost_user_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+-{
+-    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(vpci_dev);
+-    DeviceState *vdev = DEVICE(&dev->vdev);
+-
+-    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+-        vpci_dev->nvectors = dev->vdev.num_queues + 1;
+-    }
+-
+-    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+-    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+-}
+-
+-static void vhost_user_blk_pci_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+-    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+-
+-    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+-    dc->props = vhost_user_blk_pci_properties;
+-    k->realize = vhost_user_blk_pci_realize;
+-    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+-    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BLOCK;
+-    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
+-    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
+-}
+-
+-static void vhost_user_blk_pci_instance_init(Object *obj)
+-{
+-    VHostUserBlkPCI *dev = VHOST_USER_BLK_PCI(obj);
+-
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VHOST_USER_BLK);
+-    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
+-                              "bootindex", &error_abort);
+-}
+-
+-static const VirtioPCIDeviceTypeInfo vhost_user_blk_pci_info = {
+-    .base_name               = TYPE_VHOST_USER_BLK_PCI,
+-    .generic_name            = "vhost-user-blk-pci",
+-    .transitional_name       = "vhost-user-blk-pci-transitional",
+-    .non_transitional_name   = "vhost-user-blk-pci-non-transitional",
+-    .instance_size  = sizeof(VHostUserBlkPCI),
+-    .instance_init  = vhost_user_blk_pci_instance_init,
+-    .class_init     = vhost_user_blk_pci_class_init,
+-};
+-#endif
+-
+ /* virtio-scsi-pci */
+ 
+ static Property virtio_scsi_pci_properties[] = {
+@@ -2489,9 +2430,6 @@ static void virtio_pci_register_types(void)
+ 
+     /* Implementations: */
+     virtio_pci_types_register(&virtio_blk_pci_info);
+-#if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+-    virtio_pci_types_register(&vhost_user_blk_pci_info);
+-#endif
+     virtio_pci_types_register(&virtio_scsi_pci_info);
+     virtio_pci_types_register(&virtio_serial_pci_info);
+     virtio_pci_types_register(&virtio_net_pci_info);
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 3e655fdce6..35b7698446 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -13,6 +13,7 @@ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+ ifeq ($(CONFIG_PCI),y)
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
++obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
+ obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+ obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
+ obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
+-- 
 MST
