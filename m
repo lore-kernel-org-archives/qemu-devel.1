@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36305)
+Received: from eggs.gnu.org ([209.51.188.92]:36005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUz5-00007H-IF
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:53 -0500
+	(envelope-from <lersek@redhat.com>) id 1gjUyy-0008JT-0p
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUz1-00044K-3s
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:49 -0500
-Date: Tue, 15 Jan 2019 15:06:15 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115200252.25911-47-mst@redhat.com>
-References: <20190115200252.25911-1-mst@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1gjUyu-0003sR-ES
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gjUyt-0003bA-T1
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:40 -0500
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-2-git-send-email-imammedo@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <8bbf34cf-3e6b-5204-dd78-f8d17ce2e337@redhat.com>
+Date: Tue, 15 Jan 2019 21:06:16 +0100
 MIME-Version: 1.0
+In-Reply-To: <1547566866-129386-2-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190115200252.25911-1-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 46/49] block/sheepdog: Use QEMU_NONSTRING for
- non NUL-terminated arrays
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/14] tests: acpi: add
+ uefi_find_rsdp_addr() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +29,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Hi Igor,
 
-GCC 8 added a -Wstringop-truncation warning:
+On 01/15/19 16:40, Igor Mammedov wrote:
+> introduce UEFI specific counterpart to acpi_find_rsdp_address()
+> that will help to find RSDP address when [OA]VMF is used as
+> firmware. It requires a [OA]VMF built with PcdAcpiTestSupport=TRUE,
+> to locate RSDP address within 1Mb aligned ACPI test structure, tagged
+> with GUID AB87A6B1-2034-BDA0-71BD-375007757785
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  tests/acpi-utils.h |  1 +
+>  tests/acpi-utils.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 44 insertions(+)
 
-  The -Wstringop-truncation warning added in GCC 8.0 via r254630 for
-  bug 81117 is specifically intended to highlight likely unintended
-  uses of the strncpy function that truncate the terminating NUL
-  character from the source string.
+I'm not promising to review all of this patch set (Phil, feel free to
+chime in); I'll just make some quick comments below:
 
-This new warning leads to compilation failures:
+> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+> index ef388bb..3b11f47 100644
+> --- a/tests/acpi-utils.h
+> +++ b/tests/acpi-utils.h
+> @@ -46,6 +46,7 @@ typedef struct {
+>  
+>  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
+>  uint32_t acpi_find_rsdp_address(QTestState *qts);
+> +uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size);
 
-    CC      block/sheepdog.o
-  qemu/block/sheepdog.c: In function 'find_vdi_name':
-  qemu/block/sheepdog.c:1239:5: error: 'strncpy' specified bound 256 equa=
-ls destination size [-Werror=3Dstringop-truncation]
-       strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  make: *** [qemu/rules.mak:69: block/sheepdog.o] Error 1
+I think it would make sense to keep the "acpi_find_rsdp_address" prefix
+for the new function name; maybe append "_uefi"? Because now "acpi" is
+replaced with "uefi , plus "address" is truncated to "addr"; those don't
+seem overly logical.
 
-As described previous to the strncpy() calls, the use of strncpy() is
-correct here:
+Anyway, up to you.
 
-    /* This pair of strncpy calls ensures that the buffer is zero-filled,
-     * which is desirable since we'll soon be sending those bytes, and
-     * don't want the send_req to read uninitialized data.
-     */
-    strncpy(buf, filename, SD_MAX_VDI_LEN);
-    strncpy(buf + SD_MAX_VDI_LEN, tag, SD_MAX_VDI_TAG_LEN);
+>  uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
+>  void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
+>  void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+> diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+> index cc33b46..b9ff9df 100644
+> --- a/tests/acpi-utils.c
+> +++ b/tests/acpi-utils.c
+> @@ -111,3 +111,46 @@ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+>          g_assert(!acpi_calc_checksum(*aml, *aml_len));
+>      }
+>  }
+> +
+> +#define GUID_SIZE 16
+> +static uint8_t AcpiTestSupportGuid[GUID_SIZE] =
+> +     { 0xb1, 0xa6, 0x87, 0xab,
+> +       0x34, 0x20,
+> +       0xa0, 0xbd,
+> +       0x71, 0xbd, 0x37, 0x50, 0x07, 0x75, 0x77, 0x85 };
 
-Use the QEMU_NONSTRING attribute, since this array is intended to store
-character arrays that do not necessarily contain a terminating NUL.
+I think this is generally good. QEMU has some utilities/helpers for
+working with UUIDs; however, for the test infrastructure, I think this
+should be good enough.
 
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- block/sheepdog.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Suggestion: make the GUID "const" as well.
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 90ab43baa4..ed14f7afbe 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1224,7 +1224,7 @@ static int find_vdi_name(BDRVSheepdogState *s, cons=
-t char *filename,
-     SheepdogVdiReq hdr;
-     SheepdogVdiRsp *rsp =3D (SheepdogVdiRsp *)&hdr;
-     unsigned int wlen, rlen =3D 0;
--    char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN];
-+    char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN] QEMU_NONSTRING;
-=20
-     fd =3D connect_to_sdog(s, errp);
-     if (fd < 0) {
---=20
-MST
+> +
+> +typedef struct {
+> +    uint8_t signature_guid[16];
+
+s/16/GUID_SIZE/?
+
+> +    uint64_t rsdp10;
+> +    uint64_t rsdp20;
+> +} __attribute__((packed)) UefiTestSupport;
+> +
+> +/* Wait at most 600 seconds (test is slow with TCI and --enable-debug) */
+
+Do you specifically mean "Tiny Code Interpreter" here?
+
+> +#define TEST_DELAY (1 * G_USEC_PER_SEC / 10)
+> +#define TEST_CYCLES MAX((600 * G_USEC_PER_SEC / TEST_DELAY), 1)
+> +#define MB 0x100000ULL
+> +uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size)
+> +{
+> +    int i, j;
+> +    uint8_t data[GUID_SIZE];
+> +
+> +    for (i = 0; i < TEST_CYCLES; ++i) {
+> +        for (j = 0; j < size / MB; j++) {
+> +            /* look for GUID at every 1Mb block */
+> +            uint64_t addr = start + j * MB;
+> +
+> +            qtest_memread(qts, addr, data, sizeof(data));
+> +            if (!memcmp(AcpiTestSupportGuid, data, sizeof(data))) {
+> +                UefiTestSupport ret;
+> +
+> +                qtest_memread(qts, addr, &ret, sizeof(ret));
+> +                ret.rsdp10 = le64_to_cpu(ret.rsdp10);
+> +                ret.rsdp20 = le64_to_cpu(ret.rsdp20);
+> +                return ret.rsdp20 ? ret.rsdp20 : ret.rsdp10;
+> +            }
+> +        }
+> +        g_usleep(TEST_DELAY);
+> +    }
+> +    g_assert_not_reached();
+> +    return 0;
+> +}
+> 
+
+Apart from my hair-splitting, it looks good. If you update
+16-->GUID_SIZE, then you can add
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks,
+Laszlo
