@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36654)
+Received: from eggs.gnu.org ([209.51.188.92]:36781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDjc-0007cx-O5
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:45 -0500
+	(envelope-from <mst@redhat.com>) id 1gjDjd-0007oY-Gl
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:41:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjDet-0008Ra-Me
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48842)
+	(envelope-from <mst@redhat.com>) id 1gjDer-0008Q8-0W
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38610)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDet-0008RF-H5
-	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:51 -0500
-Date: Mon, 14 Jan 2019 20:36:47 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjDeq-0008Nf-Nk
+	for qemu-devel@nongnu.org; Mon, 14 Jan 2019 20:36:48 -0500
+Date: Mon, 14 Jan 2019 20:36:45 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115003812.11329-35-mst@redhat.com>
+Message-ID: <20190115003812.11329-34-mst@redhat.com>
 References: <20190115003812.11329-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190115003812.11329-1-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 34/44] globals: Allow global properties to be
- optional
+Subject: [Qemu-devel] [PULL 33/44] virtio: virtio 9p really requires
+ CONFIG_VIRTFS to work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +28,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: Juan Quintela <quintela@redhat.com>
 
-Making some global properties optional will let us simplify
-compat code when a given property works on most (but not all)
-subclasses of a given type.
-
-Device types will be able to opt out from optional compat
-properties by simply not registering those properties.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/qdev-core.h | 3 +++
- qom/object.c           | 3 +++
- 2 files changed, 6 insertions(+)
+ default-configs/virtio.mak | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 9614f76ae6..0a84c42756 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -250,6 +250,8 @@ struct PropertyInfo {
- /**
-  * GlobalProperty:
-  * @used: Set to true if property was used when initializing a device.
-+ * @optional: If set to true, GlobalProperty will be skipped without err=
-ors
-+ *            if the property doesn't exist.
-  *
-  * An error is fatal for non-hotplugged devices, when the global is appl=
-ied.
-  */
-@@ -258,6 +260,7 @@ typedef struct GlobalProperty {
-     const char *property;
-     const char *value;
-     bool used;
-+    bool optional;
- } GlobalProperty;
-=20
- static inline void
-diff --git a/qom/object.c b/qom/object.c
-index 4e5226ca12..b8c732063b 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -385,6 +385,9 @@ void object_apply_global_props(Object *obj, const GPt=
-rArray *props, Error **errp
-         if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
-             continue;
-         }
-+        if (p->optional && !object_property_find(obj, p->property, NULL)=
-) {
-+            continue;
-+        }
-         p->used =3D true;
-         object_property_parse(obj, p->value, p->property, &err);
-         if (err !=3D NULL) {
---=20
+diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+index 5ae4a61018..ecb4420e74 100644
+--- a/default-configs/virtio.mak
++++ b/default-configs/virtio.mak
+@@ -1,7 +1,7 @@
+ CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+ CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+ CONFIG_VIRTIO=y
+-CONFIG_VIRTIO_9P=y
++CONFIG_VIRTIO_9P=$(CONFIG_VIRTFS)
+ CONFIG_VIRTIO_BALLOON=y
+ CONFIG_VIRTIO_BLK=y
+ CONFIG_VIRTIO_CRYPTO=y
+-- 
 MST
