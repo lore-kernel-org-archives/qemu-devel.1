@@ -1,22 +1,21 @@
 Received: from eggs.gnu.org ([209.51.188.92]:37462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPYQ-0002wr-8t
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:19:01 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gjPYX-0002wr-83
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:19:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPSJ-0001SR-VP
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:40 -0500
-Received: from mga05.intel.com ([192.55.52.43]:56304)
+	(envelope-from <yang.zhong@intel.com>) id 1gjPRm-0001IO-53
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:07 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56327)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gjPSJ-00013D-Nh
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:39 -0500
+	id 1gjPRl-0001AS-GX
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:06 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Tue, 15 Jan 2019 22:10:55 +0800
-Message-Id: <20190115141108.934-25-yang.zhong@intel.com>
+Date: Tue, 15 Jan 2019 22:10:48 +0800
+Message-Id: <20190115141108.934-18-yang.zhong@intel.com>
 In-Reply-To: <20190115141108.934-1-yang.zhong@intel.com>
 References: <20190115141108.934-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v2 24/37] build: convert sound.mak to
- Kconfig
+Subject: [Qemu-devel] [RFC PATCH v2 17/37] minikconfig: add semantic analysis
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +29,259 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-There is really nothing special in these devices; they are just
-ISA devices.  Instead of including them for each target,
-set CONFIG_ISA to true, and make the devices default to present
-whenever ISA is available.  More conversion of ISA devices will
-follow.
+There are three parts in the semantic analysis:
 
-Done with the following script:
+1) evaluating expressions.  This is done as a simple visit
+of the Expr nodes.
 
-  while read i; do
-     i=${i%=y}; i=${i#CONFIG_}
-     sed -i -e'/^config '$i'$/!b' -en \
-            -e'a\' -e'    default y\' -e'    depends on ISA' \
-          `grep -lw $i hw/*/Kconfig`
-  done < default-configs/sound.mak
+2) ordering clauses.  This is done by constructing a graph of variables.
+There is an edge from X to Y if Y depends on X, if X selects Y, or if
+X appears in a conditional selection of Y; in other words, if the value
+of X can affect the value of Y.  Each clause has a "destination" variable
+whose value can be affected by the clause, and clauses will be processed
+according to a topological sorting of their destination variables.
+Defaults are processed after all other clauses with the same destination.
+
+3) deriving the value of the variables.  This is done by processing
+the clauses in the topological order provided by the previous step.
+A "depends on" clause will force a variable to False, a "select" clause
+will force a variable to True, an assignment will force a variable
+to its RHS.  A default will set a variable to its RHS if it has not
+been set before.  Because all variables have a default, after visiting
+all clauses all variables will have been set.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/i386-softmmu.mak        | 2 +-
- default-configs/mips-softmmu-common.mak | 2 +-
- default-configs/ppc-softmmu.mak         | 2 +-
- default-configs/sound.mak               | 4 ----
- hw/audio/Kconfig                        | 8 ++++++++
- 5 files changed, 11 insertions(+), 7 deletions(-)
- delete mode 100644 default-configs/sound.mak
+ scripts/minikconf.py | 129 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 124 insertions(+), 5 deletions(-)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 554dbd8c6b..cf49e3fae7 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -1,7 +1,7 @@
- # Default configuration for i386-softmmu
+diff --git a/scripts/minikconf.py b/scripts/minikconf.py
+index a6a28c9c47..48800591e2 100644
+--- a/scripts/minikconf.py
++++ b/scripts/minikconf.py
+@@ -15,6 +15,10 @@ import sys
  
- CONFIG_PCI=y
--include sound.mak
-+CONFIG_ISA=y
- include usb.mak
- include hyperv.mak
- CONFIG_VGA_ISA=y
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
-index 5ef6d49e66..03c7a08d1a 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -1,7 +1,7 @@
- # Common mips*-softmmu CONFIG defines
+ __all__ = [ 'KconfigParserError', 'KconfigData', 'KconfigParser' ]
  
--include sound.mak
- include usb.mak
-+CONFIG_ISA=y
- CONFIG_PCI=y
- CONFIG_ESP=y
- CONFIG_SCSI=y
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 301cc83279..c7003e4284 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -1,8 +1,8 @@
- # Default configuration for ppc-softmmu
++def debug_print(*args):
++    #print ' '.join(str(x) for x in args)
++    pass
++
+ # -------------------------------------------
+ # KconfigData implements the Kconfig semantics.  For now it can only
+ # detect undefined symbols, i.e. symbols that were referenced in
+@@ -34,6 +38,12 @@ class KconfigData:
+         def __invert__(self):
+             return KconfigData.NOT(self)
  
--include sound.mak
- include usb.mak
- CONFIG_PCI=y
-+ONFIG_ISA=y
++        # Abstract methods
++        def add_edges_to(self, var):
++            pass
++        def evaluate(self):
++            assert False
++
+     class AND(Expr):
+         def __init__(self, lhs, rhs):
+             self.lhs = lhs
+@@ -41,6 +51,12 @@ class KconfigData:
+         def __str__(self):
+             return "(%s && %s)" % (self.lhs, self.rhs)
  
- # For embedded PPCs:
- CONFIG_PPC4XX=y
-diff --git a/default-configs/sound.mak b/default-configs/sound.mak
-deleted file mode 100644
-index 4f22c34b5d..0000000000
---- a/default-configs/sound.mak
-+++ /dev/null
-@@ -1,4 +0,0 @@
--CONFIG_SB16=y
--CONFIG_ADLIB=y
--CONFIG_GUS=y
--CONFIG_CS4231A=y
-diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
-index af34bbcf0c..bfb30276ec 100644
---- a/hw/audio/Kconfig
-+++ b/hw/audio/Kconfig
-@@ -1,5 +1,7 @@
- config SB16
-     bool
-+    default y
-+    depends on ISA_BUS
++        def add_edges_to(self, var):
++            self.lhs.add_edges_to(var)
++            self.rhs.add_edges_to(var)
++        def evaluate(self):
++            return self.lhs.evaluate() and self.rhs.evaluate()
++
+     class OR(Expr):
+         def __init__(self, lhs, rhs):
+             self.lhs = lhs
+@@ -48,22 +64,62 @@ class KconfigData:
+         def __str__(self):
+             return "(%s || %s)" % (self.lhs, self.rhs)
  
- config ES1370
-     bool
-@@ -13,12 +15,18 @@ config AC97
++        def add_edges_to(self, var):
++            self.lhs.add_edges_to(var)
++            self.rhs.add_edges_to(var)
++        def evaluate(self):
++            return self.lhs.evaluate() or self.rhs.evaluate()
++
+     class NOT(Expr):
+         def __init__(self, lhs):
+             self.lhs = lhs
+         def __str__(self):
+             return "!%s" % (self.lhs)
  
- config ADLIB
-     bool
-+    default y
-+    depends on ISA_BUS
++        def add_edges_to(self, var):
++            self.lhs.add_edges_to(var)
++        def evaluate(self):
++            return not self.lhs.evaluate()
++
+     class Var(Expr):
+         def __init__(self, name):
+             self.name = name
+             self.value = None
++            self.outgoing = set()
+         def __str__(self):
+             return self.name
  
- config GUS
-     bool
-+    default y
-+    depends on ISA_BUS
++        def has_value(self):
++            return not (self.value is None)
++        def set_value(self, val):
++            if self.has_value() and self.value != val:
++                raise Exception('contradiction between clauses when setting %s' % self)
++            debug_print("=> %s is now %s" % (self.name, val))
++            self.value = val
++
++        # depth first search of the dependency graph
++        def dfs(self, visited, f):
++            if self in visited:
++                return
++            visited.add(self)
++            for v in self.outgoing:
++                v.dfs(visited, f)
++            f(self)
++
++        def add_edges_to(self, var):
++            self.outgoing.add(var)
++        def evaluate(self):
++            if not self.has_value():
++                raise Exception('cycle found including %s' % self)
++            return self.value
++
+     class Clause:
+         def __init__(self, dest):
+             self.dest = dest
++        def priority(self):
++            return 0
++        def process(self):
++            pass
  
- config CS4231A
-     bool
-+    default y
-+    depends on ISA_BUS
+     class AssignmentClause(Clause):
+         def __init__(self, dest, value):
+@@ -72,11 +128,16 @@ class KconfigData:
+         def __str__(self):
+             return "%s=%s" % (self.dest, 'y' if self.value else 'n')
  
- config HDA
-     bool
++        def process(self):
++            self.dest.set_value(self.value)
++
+     class DefaultClause(Clause):
+         def __init__(self, dest, value, cond=None):
+             KconfigData.Clause.__init__(self, dest)
+             self.value = value
+             self.cond = cond
++            if not (self.cond is None):
++                self.cond.add_edges_to(self.dest)
+         def __str__(self):
+             value = 'y' if self.value else 'n'
+             if self.cond is None:
+@@ -84,20 +145,38 @@ class KconfigData:
+             else:
+                 return "config %s default %s if %s" % (self.dest, value, self.cond)
+ 
++        def priority(self):
++            # Defaults are processed just before leaving the variable
++            return -1
++        def process(self):
++            if not self.dest.has_value() and \
++                    (self.cond is None or self.cond.evaluate()):
++                self.dest.set_value(self.value)
++
+     class DependsOnClause(Clause):
+         def __init__(self, dest, expr):
+             KconfigData.Clause.__init__(self, dest)
+             self.expr = expr
++            self.expr.add_edges_to(self.dest)
+         def __str__(self):
+             return "config %s depends on %s" % (self.dest, self.expr)
+ 
++        def process(self):
++            if not self.expr.evaluate():
++                self.dest.set_value(False)
++
+     class SelectClause(Clause):
+         def __init__(self, dest, cond):
+             KconfigData.Clause.__init__(self, dest)
+             self.cond = cond
++            self.cond.add_edges_to(self.dest)
+         def __str__(self):
+             return "select %s if %s" % (self.dest, self.cond)
+ 
++        def process(self):
++            if self.cond.evaluate():
++                self.dest.set_value(True)
++
+     def __init__(self):
+         self.previously_included = []
+         self.incl_info = None
+@@ -115,6 +194,50 @@ class KconfigData:
+                 undef = True
+         return undef
+ 
++    def compute_config(self):
++        if self.check_undefined():
++            raise Exception(parser, "there were undefined symbols")
++            return None
++
++        debug_print("Input:")
++        for clause in self.clauses:
++            debug_print(clause)
++
++        debug_print("\nDependency graph:")
++        for i in self.referenced_vars:
++            debug_print(i, "->", [str(x) for x in self.referenced_vars[i].outgoing])
++
++        # The reverse of the depth-first order is the topological sort
++        dfo = dict()
++        visited = set()
++        debug_print("\n")
++        def visit_fn(var):
++            debug_print(var, "has DFS number", len(dfo))
++            dfo[var] = len(dfo)
++
++        for name in self.referenced_vars:
++            v = self.referenced_vars[name]
++            v.dfs(visited, visit_fn)
++
++        # Put higher DFS numbers and higher priorities first.  This
++        # places the clauses in topological order and places defaults
++        # after assignments and dependencies.
++        self.clauses.sort(key=lambda x: (-dfo[x.dest], -x.priority()))
++
++        debug_print("\nSorted clauses:")
++        for clause in self.clauses:
++            debug_print(clause)
++            clause.process()
++
++        debug_print("")
++        values = dict()
++        for name in self.referenced_vars:
++            debug_print("Evaluating", name)
++            v = self.referenced_vars[name]
++            values[name] = v.evaluate()
++
++        return values
++
+     # semantic actions -------------
+ 
+     def do_declaration(self, var):
+@@ -188,9 +311,6 @@ class KconfigParser:
+         data = KconfigData()
+         parser = KconfigParser(data)
+         parser.parse_file(fp)
+-        if data.check_undefined():
+-            raise KconfigParserError(parser, "there were undefined symbols")
+-
+         return data
+ 
+     def __init__(self, data):
+@@ -499,5 +619,4 @@ class KconfigParser:
+ if __name__ == '__main__':
+     fname = len(sys.argv) > 1 and sys.argv[1] or 'Kconfig.test'
+     data = KconfigParser.parse(open(fname, 'r'))
+-    for i in data.clauses:
+-        print i
++    print data.compute_config()
 -- 
 2.17.1
