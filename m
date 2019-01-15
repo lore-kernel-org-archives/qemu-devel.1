@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34913)
+Received: from eggs.gnu.org ([209.51.188.92]:35243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUyO-0007TS-Tc
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:14 -0500
+	(envelope-from <mst@redhat.com>) id 1gjUyU-0007ac-4P
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjUyL-0003HB-H4
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46354)
+	(envelope-from <mst@redhat.com>) id 1gjUyO-0003LR-D3
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39608)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUyF-0002xv-HN
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:01 -0500
-Date: Tue, 15 Jan 2019 15:05:37 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjUyL-0003DQ-KW
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:06:08 -0500
+Date: Tue, 15 Jan 2019 15:05:59 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190115200252.25911-28-mst@redhat.com>
+Message-ID: <20190115200252.25911-40-mst@redhat.com>
 References: <20190115200252.25911-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20190115200252.25911-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL v2 27/49] virtio: split virtio scsi bits from
- virtio-pci
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 39/49] acpi: expose TPM/PPI configuration
+ parameters to firmware via fw_cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,298 +29,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Juan Quintela <quintela@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-Notice that we can't still run tests with it disabled.  Both cdrom-test and
-drive_del-test use virtio-scsi without checking if it is enabled.
+To avoid having to hard code the base address of the PPI virtual
+memory device we introduce a fw_cfg file etc/tpm/config that holds the
+base address of the PPI device, the version of the PPI interface and
+the version of the attached TPM.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+[ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document it=
+ ]
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Stefan Berger <stefanb@linux.ibm.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-pci.h      |  14 -----
- hw/virtio/virtio-pci.c      |  71 ------------------------
- hw/virtio/virtio-scsi-pci.c | 107 ++++++++++++++++++++++++++++++++++++
- hw/virtio/Makefile.objs     |   1 +
- tests/Makefile.include      |   2 +-
- 5 files changed, 109 insertions(+), 86 deletions(-)
- create mode 100644 hw/virtio/virtio-scsi-pci.c
+ docs/specs/tpm.txt    | 19 +++++++++++++++++++
+ include/hw/acpi/tpm.h |  3 +++
+ hw/i386/acpi-build.c  | 19 +++++++++++++++++++
+ 3 files changed, 41 insertions(+)
 
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index b14d83a454..d00f6d6b9d 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -19,14 +19,12 @@
- #include "hw/virtio/virtio-blk.h"
- #include "hw/virtio/virtio-net.h"
- #include "hw/virtio/virtio-serial.h"
--#include "hw/virtio/virtio-scsi.h"
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-gpu.h"
- #include "hw/virtio/virtio-crypto.h"
- 
- typedef struct VirtIOPCIProxy VirtIOPCIProxy;
- typedef struct VirtIOBlkPCI VirtIOBlkPCI;
--typedef struct VirtIOSCSIPCI VirtIOSCSIPCI;
- typedef struct VirtIOSerialPCI VirtIOSerialPCI;
- typedef struct VirtIONetPCI VirtIONetPCI;
- typedef struct VirtIOGPUPCI VirtIOGPUPCI;
-@@ -187,18 +185,6 @@ static inline void virtio_pci_disable_modern(VirtIOPCIProxy *proxy)
-     proxy->disable_modern = true;
- }
- 
--/*
-- * virtio-scsi-pci: This extends VirtioPCIProxy.
-- */
--#define TYPE_VIRTIO_SCSI_PCI "virtio-scsi-pci-base"
--#define VIRTIO_SCSI_PCI(obj) \
--        OBJECT_CHECK(VirtIOSCSIPCI, (obj), TYPE_VIRTIO_SCSI_PCI)
--
--struct VirtIOSCSIPCI {
--    VirtIOPCIProxy parent_obj;
--    VirtIOSCSI vdev;
--};
--
- /*
-  * virtio-blk-pci: This extends VirtioPCIProxy.
-  */
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index b2ed6b3942..da812b7844 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -22,7 +22,6 @@
- #include "hw/virtio/virtio-blk.h"
- #include "hw/virtio/virtio-net.h"
- #include "hw/virtio/virtio-serial.h"
--#include "hw/virtio/virtio-scsi.h"
- #include "hw/pci/pci.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
-@@ -2061,75 +2060,6 @@ static const VirtioPCIDeviceTypeInfo virtio_blk_pci_info = {
-     .class_init    = virtio_blk_pci_class_init,
- };
- 
--/* virtio-scsi-pci */
--
--static Property virtio_scsi_pci_properties[] = {
--    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
--                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
--    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
--                       DEV_NVECTORS_UNSPECIFIED),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void virtio_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
--{
--    VirtIOSCSIPCI *dev = VIRTIO_SCSI_PCI(vpci_dev);
--    DeviceState *vdev = DEVICE(&dev->vdev);
--    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
--    DeviceState *proxy = DEVICE(vpci_dev);
--    char *bus_name;
--
--    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
--        vpci_dev->nvectors = vs->conf.num_queues + 3;
--    }
--
--    /*
--     * For command line compatibility, this sets the virtio-scsi-device bus
--     * name as before.
--     */
--    if (proxy->id) {
--        bus_name = g_strdup_printf("%s.0", proxy->id);
--        virtio_device_set_child_bus_name(VIRTIO_DEVICE(vdev), bus_name);
--        g_free(bus_name);
--    }
--
--    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
--    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
--}
--
--static void virtio_scsi_pci_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
--    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
--
--    k->realize = virtio_scsi_pci_realize;
--    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
--    dc->props = virtio_scsi_pci_properties;
--    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
--    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
--    pcidev_k->revision = 0x00;
--    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
--}
--
--static void virtio_scsi_pci_instance_init(Object *obj)
--{
--    VirtIOSCSIPCI *dev = VIRTIO_SCSI_PCI(obj);
--
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_SCSI);
--}
--
--static const VirtioPCIDeviceTypeInfo virtio_scsi_pci_info = {
--    .base_name              = TYPE_VIRTIO_SCSI_PCI,
--    .generic_name           = "virtio-scsi-pci",
--    .transitional_name      = "virtio-scsi-pci-transitional",
--    .non_transitional_name  = "virtio-scsi-pci-non-transitional",
--    .instance_size = sizeof(VirtIOSCSIPCI),
--    .instance_init = virtio_scsi_pci_instance_init,
--    .class_init    = virtio_scsi_pci_class_init,
--};
--
- /* virtio-serial-pci */
- 
- static void virtio_serial_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-@@ -2315,7 +2245,6 @@ static void virtio_pci_register_types(void)
- 
-     /* Implementations: */
-     virtio_pci_types_register(&virtio_blk_pci_info);
--    virtio_pci_types_register(&virtio_scsi_pci_info);
-     virtio_pci_types_register(&virtio_serial_pci_info);
-     virtio_pci_types_register(&virtio_net_pci_info);
- }
-diff --git a/hw/virtio/virtio-scsi-pci.c b/hw/virtio/virtio-scsi-pci.c
-new file mode 100644
-index 0000000000..2830849729
---- /dev/null
-+++ b/hw/virtio/virtio-scsi-pci.c
-@@ -0,0 +1,107 @@
-+/*
-+ * Virtio scsi PCI Bindings
-+ *
-+ * Copyright IBM, Corp. 2007
-+ * Copyright (c) 2009 CodeSourcery
-+ *
-+ * Authors:
-+ *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *  Paul Brook        <paul@codesourcery.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
+diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+index 1af82bba86..e4bb094700 100644
+--- a/docs/specs/tpm.txt
++++ b/docs/specs/tpm.txt
+@@ -34,6 +34,25 @@ The CRB interface makes a memory mapped IO region in t=
+he area 0xfed40000 -
+ QEMU files related to TPM CRB interface:
+  - hw/tpm/tpm_crb.c
+=20
++=3D fw_cfg interface =3D
 +
-+#include "qemu/osdep.h"
++The bios/firmware may read the "etc/tpm/config" fw_cfg entry for
++configuring the guest appropriately.
 +
-+#include "hw/virtio/virtio-scsi.h"
-+#include "virtio-pci.h"
++The entry of 6 bytes has the following content, in little-endian:
 +
-+typedef struct VirtIOSCSIPCI VirtIOSCSIPCI;
++    #define TPM_VERSION_UNSPEC          0
++    #define TPM_VERSION_1_2             1
++    #define TPM_VERSION_2_0             2
 +
-+/*
-+ * virtio-scsi-pci: This extends VirtioPCIProxy.
-+ */
-+#define TYPE_VIRTIO_SCSI_PCI "virtio-scsi-pci-base"
-+#define VIRTIO_SCSI_PCI(obj) \
-+        OBJECT_CHECK(VirtIOSCSIPCI, (obj), TYPE_VIRTIO_SCSI_PCI)
++    #define TPM_PPI_VERSION_NONE        0
++    #define TPM_PPI_VERSION_1_30        1
 +
-+struct VirtIOSCSIPCI {
-+    VirtIOPCIProxy parent_obj;
-+    VirtIOSCSI vdev;
-+};
++    struct FwCfgTPMConfig {
++        uint32_t tpmppi_address;         /* PPI memory location */
++        uint8_t tpm_version;             /* TPM version */
++        uint8_t tpmppi_version;          /* PPI version */
++    };
+=20
+ =3D ACPI Interface =3D
+=20
+diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+index b8796df916..a6109a97fc 100644
+--- a/include/hw/acpi/tpm.h
++++ b/include/hw/acpi/tpm.h
+@@ -194,4 +194,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+ #define TPM_PPI_ADDR_SIZE           0x400
+ #define TPM_PPI_ADDR_BASE           0xFED45000
+=20
++#define TPM_PPI_VERSION_NONE        0
++#define TPM_PPI_VERSION_1_30        1
 +
-+static Property virtio_scsi_pci_properties[] = {
-+    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
-+                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
-+    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
-+                       DEV_NVECTORS_UNSPECIFIED),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
+ #endif /* HW_ACPI_TPM_H */
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 14f757fc36..9898247705 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
+     bool pcihp_bridge_en;
+ } AcpiBuildPciBusHotplugState;
+=20
++typedef struct FwCfgTPMConfig {
++    uint32_t tpmppi_address;
++    uint8_t tpm_version;
++    uint8_t tpmppi_version;
++} QEMU_PACKED FwCfgTPMConfig;
 +
-+static void virtio_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-+{
-+    VirtIOSCSIPCI *dev = VIRTIO_SCSI_PCI(vpci_dev);
-+    DeviceState *vdev = DEVICE(&dev->vdev);
-+    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
-+    DeviceState *proxy = DEVICE(vpci_dev);
-+    char *bus_name;
-+
-+    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
-+        vpci_dev->nvectors = vs->conf.num_queues + 3;
+ static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+ {
+     uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
+ NULL);
+@@ -2847,6 +2853,8 @@ void acpi_setup(void)
+     AcpiBuildTables tables;
+     AcpiBuildState *build_state;
+     Object *vmgenid_dev;
++    TPMIf *tpm;
++    static FwCfgTPMConfig tpm_config;
+=20
+     if (!pcms->fw_cfg) {
+         ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+@@ -2881,6 +2889,17 @@ void acpi_setup(void)
+     fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+                     tables.tcpalog->data, acpi_data_len(tables.tcpalog))=
+;
+=20
++    tpm =3D tpm_find();
++    if (tpm && object_property_get_bool(OBJECT(tpm), "ppi", &error_abort=
+)) {
++        tpm_config =3D (FwCfgTPMConfig) {
++            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
++            .tpm_version =3D tpm_get_version(tpm),
++            .tpmppi_version =3D TPM_PPI_VERSION_NONE
++        };
++        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
++                        &tpm_config, sizeof tpm_config);
 +    }
 +
-+    /*
-+     * For command line compatibility, this sets the virtio-scsi-device bus
-+     * name as before.
-+     */
-+    if (proxy->id) {
-+        bus_name = g_strdup_printf("%s.0", proxy->id);
-+        virtio_device_set_child_bus_name(VIRTIO_DEVICE(vdev), bus_name);
-+        g_free(bus_name);
-+    }
-+
-+    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-+}
-+
-+static void virtio_scsi_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
-+    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-+
-+    k->realize = virtio_scsi_pci_realize;
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-+    dc->props = virtio_scsi_pci_properties;
-+    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-+    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
-+    pcidev_k->revision = 0x00;
-+    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
-+}
-+
-+static void virtio_scsi_pci_instance_init(Object *obj)
-+{
-+    VirtIOSCSIPCI *dev = VIRTIO_SCSI_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_SCSI);
-+}
-+
-+static const VirtioPCIDeviceTypeInfo virtio_scsi_pci_info = {
-+    .base_name              = TYPE_VIRTIO_SCSI_PCI,
-+    .generic_name           = "virtio-scsi-pci",
-+    .transitional_name      = "virtio-scsi-pci-transitional",
-+    .non_transitional_name  = "virtio-scsi-pci-non-transitional",
-+    .instance_size = sizeof(VirtIOSCSIPCI),
-+    .instance_init = virtio_scsi_pci_instance_init,
-+    .class_init    = virtio_scsi_pci_class_init,
-+};
-+
-+static void virtio_scsi_pci_register(void)
-+{
-+    virtio_pci_types_register(&virtio_scsi_pci_info);
-+}
-+
-+type_init(virtio_scsi_pci_register)
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 0a56946c1a..012b6f74a7 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -21,6 +21,7 @@ obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
- obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
- obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
- obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
-+obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
- endif
- endif
- 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c2845b67aa..ba82235bd4 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -150,7 +150,7 @@ check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
- check-qtest-virtio-$(CONFIG_VIRTIO_BALLOON) += tests/virtio-balloon-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
- check-qtest-virtio-$(CONFIG_VIRTIO_RNG) += tests/virtio-rng-test$(EXESUF)
--check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
-+check-qtest-virtio-$(CONFIG_VIRTIO_SCSI) += tests/virtio-scsi-test$(EXESUF)
- ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
- check-qtest-virtio-$(CONFIG_VIRTIO_9P) += tests/virtio-9p-test$(EXESUF)
- endif
--- 
+     vmgenid_dev =3D find_vmgenid_dev();
+     if (vmgenid_dev) {
+         vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+--=20
 MST
