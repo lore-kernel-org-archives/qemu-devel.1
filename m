@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56109)
+Received: from eggs.gnu.org ([209.51.188.92]:56119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gjSaq-0002k8-1g
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gjSaq-0002kB-AE
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:33:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gjSao-0007oO-D7
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gjSao-0007ok-Ji
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:33:40 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38197)
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37032)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gjSao-0007kN-5w
+	id 1gjSao-0007lo-7Z
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 12:33:38 -0500
-Received: by mail-wr1-x444.google.com with SMTP id v13so3931906wrw.5
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 09:33:31 -0800 (PST)
+Received: by mail-wm1-x343.google.com with SMTP id g67so4095260wmd.2
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 09:33:33 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 15 Jan 2019 18:33:22 +0100
-Message-Id: <1547573605-25711-3-git-send-email-pbonzini@redhat.com>
+Date: Tue, 15 Jan 2019 18:33:24 +0100
+Message-Id: <1547573605-25711-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1547573605-25711-1-git-send-email-pbonzini@redhat.com>
 References: <1547573605-25711-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/5] vhost-net-user: add stubs for when no
- virtio-net device is present
+Subject: [Qemu-devel] [PATCH 4/5] vhost-net: compile it on all targets that
+ have virtio-net.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,132 +34,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mst@redhat.com, philmd@redhat.com
 
-hw/net/vhost_net.c needs functions that are declared in net/vhost-user.c: the
-vhost-user code is always compiled into QEMU, only the constructor
-net_init_vhost_user is unreachable.  Also, net/vhost-user.c needs functions
-declared in hw/virtio/vhost-stub.c even if no virtio device exists.
-
-Break this dependency.  First, add a minimal version of net/vhost-user.c,
-with no functionality and no dependency on vhost code.  Second, #ifdef out
-the calls back to net/vhost-user.c from hw/net/vhost_net.c.
-
-While at it, this patch fixes the CONFIG_VHOST_NET_USE*D* typo.
+This shows a preexisting bug: if a KVM target did not have virtio-net enabled,
+it would fail with undefined symbols when vhost was enabled.  This must now
+be fixed, lest targets that have no virtio-net fail to compile.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <1543851204-41186-3-git-send-email-pbonzini@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1543851204-41186-5-git-send-email-pbonzini@redhat.com>
 ---
- configure             |  2 +-
- hw/net/vhost_net.c    |  4 ++++
- net/Makefile.objs     |  4 +++-
- net/net.c             |  2 +-
- net/vhost-user-stub.c | 23 +++++++++++++++++++++++
- 5 files changed, 32 insertions(+), 3 deletions(-)
- create mode 100644 net/vhost-user-stub.c
+ configure               | 11 ++++-------
+ hw/net/Makefile.objs    |  4 ++--
+ hw/net/vhost_net.c      |  4 +---
+ include/exec/poison.h   |  1 -
+ tests/Makefile.include  |  5 +----
+ tests/vhost-user-test.c | 16 +++++++++++-----
+ 6 files changed, 19 insertions(+), 22 deletions(-)
 
 diff --git a/configure b/configure
-index e0915da..e3e6dd3 100755
+index e3e6dd3..87f2d15 100755
 --- a/configure
 +++ b/configure
-@@ -6565,7 +6565,7 @@ if test "$vhost_scsi" = "yes" ; then
+@@ -6564,7 +6564,10 @@ fi
+ if test "$vhost_scsi" = "yes" ; then
    echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
  fi
- if test "$vhost_net" = "yes" -a "$vhost_user" = "yes"; then
--  echo "CONFIG_VHOST_NET_USED=y" >> $config_host_mak
-+  echo "CONFIG_VHOST_NET_USER=y" >> $config_host_mak
+-if test "$vhost_net" = "yes" -a "$vhost_user" = "yes"; then
++if test "$vhost_net" = "yes" ; then
++  echo "CONFIG_VHOST_NET=y" >> $config_host_mak
++fi
++if test "$vhost_net_user" = "yes" ; then
+   echo "CONFIG_VHOST_NET_USER=y" >> $config_host_mak
  fi
  if test "$vhost_crypto" = "yes" ; then
-   echo "CONFIG_VHOST_CRYPTO=y" >> $config_host_mak
+@@ -7336,12 +7339,6 @@ if supported_xen_target $target; then
+ fi
+ if supported_kvm_target $target; then
+     echo "CONFIG_KVM=y" >> $config_target_mak
+-    if test "$vhost_net" = "yes" ; then
+-        echo "CONFIG_VHOST_NET=y" >> $config_target_mak
+-        if test "$vhost_user" = "yes" ; then
+-            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
+-        fi
+-    fi
+ fi
+ if supported_hax_target $target; then
+     echo "CONFIG_HAX=y" >> $config_target_mak
+diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+index c2705e6..2d7ee0a 100644
+--- a/hw/net/Makefile.objs
++++ b/hw/net/Makefile.objs
+@@ -37,8 +37,8 @@ obj-$(CONFIG_PSERIES) += spapr_llan.o
+ obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
+ 
+ obj-$(CONFIG_VIRTIO_NET) += virtio-net.o
+-obj-$(CONFIG_VHOST_NET) += vhost_net.o
+-common-obj-$(call lnot,$(CONFIG_VHOST_NET)) += vhost_net-stub.o
++common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET)) += vhost_net.o
++common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET))) += vhost_net-stub.o
+ common-obj-$(CONFIG_ALL) += vhost_net-stub.o
+ 
+ obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
 diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index b901306..2a300ee 100644
+index ae3ca23..be3cc88 100644
 --- a/hw/net/vhost_net.c
 +++ b/hw/net/vhost_net.c
-@@ -193,6 +193,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
-     }
+@@ -25,8 +25,6 @@
  
-     /* Set sane init value. Override when guest acks. */
-+#ifdef CONFIG_VHOST_NET_USER
-     if (net->nc->info->type == NET_CLIENT_DRIVER_VHOST_USER) {
-         features = vhost_user_get_acked_features(net->nc);
-         if (~net->dev.features & features) {
-@@ -202,6 +203,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
-             goto fail;
-         }
-     }
-+#endif
  
-     vhost_net_ack_features(net, features);
+ #include <sys/socket.h>
+-#include <netpacket/packet.h>
+-#include <net/ethernet.h>
+ #include <net/if.h>
+ #include <netinet/in.h>
  
-@@ -413,10 +415,12 @@ VHostNetState *get_vhost_net(NetClientState *nc)
-     case NET_CLIENT_DRIVER_TAP:
-         vhost_net = tap_get_vhost_net(nc);
-         break;
-+#ifdef CONFIG_VHOST_NET_USER
-     case NET_CLIENT_DRIVER_VHOST_USER:
-         vhost_net = vhost_user_get_vhost_net(nc);
-         assert(vhost_net);
-         break;
-+#endif
+@@ -134,7 +132,7 @@ static int vhost_net_get_fd(NetClientState *backend)
+         return tap_get_fd(backend);
      default:
-         break;
+         fprintf(stderr, "vhost-net requires tap backend\n");
+-        return -EBADFD;
++        return -ENOSYS;
      }
-diff --git a/net/Makefile.objs b/net/Makefile.objs
-index b2bf88a..df2b409 100644
---- a/net/Makefile.objs
-+++ b/net/Makefile.objs
-@@ -3,7 +3,9 @@ common-obj-y += socket.o
- common-obj-y += dump.o
- common-obj-y += eth.o
- common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
--common-obj-$(CONFIG_POSIX) += vhost-user.o
-+common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET_USER)) += vhost-user.o
-+common-obj-$(call land,$(call lnot,$(CONFIG_VIRTIO_NET)),$(CONFIG_VHOST_NET_USER)) += vhost-user-stub.o
-+common-obj-$(CONFIG_ALL) += vhost-user-stub.o
- common-obj-$(CONFIG_SLIRP) += slirp.o
- common-obj-$(CONFIG_VDE) += vde.o
- common-obj-$(CONFIG_NETMAP) += netmap.o
-diff --git a/net/net.c b/net/net.c
-index 3acbdcc..ca0e14c 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -961,7 +961,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
-         [NET_CLIENT_DRIVER_BRIDGE]    = net_init_bridge,
- #endif
-         [NET_CLIENT_DRIVER_HUBPORT]   = net_init_hubport,
--#ifdef CONFIG_VHOST_NET_USED
-+#ifdef CONFIG_VHOST_NET_USER
-         [NET_CLIENT_DRIVER_VHOST_USER] = net_init_vhost_user,
- #endif
- #ifdef CONFIG_L2TPV3
-diff --git a/net/vhost-user-stub.c b/net/vhost-user-stub.c
-new file mode 100644
-index 0000000..52ab4e1
---- /dev/null
-+++ b/net/vhost-user-stub.c
-@@ -0,0 +1,23 @@
-+/*
-+ * vhost-user-stub.c
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
+ }
+ 
+diff --git a/include/exec/poison.h b/include/exec/poison.h
+index ecdc83c..1a7a57b 100644
+--- a/include/exec/poison.h
++++ b/include/exec/poison.h
+@@ -86,7 +86,6 @@
+ #pragma GCC poison CONFIG_XTENSA_DIS
+ 
+ #pragma GCC poison CONFIG_LINUX_USER
+-#pragma GCC poison CONFIG_VHOST_NET
+ #pragma GCC poison CONFIG_KVM
+ #pragma GCC poison CONFIG_SOFTMMU
+ 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index c17f6d5..195af1f 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -204,10 +204,7 @@ check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
+ check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
+ check-qtest-i386-y += tests/q35-test$(EXESUF)
+ check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+-check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
+-ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
+-check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
+-endif
++check-qtest-i386-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-swtpm-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-swtpm-test$(EXESUF)
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 54982f6..ab87865 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -27,10 +27,13 @@
+ #include "libqos/malloc-pc.h"
+ #include "hw/virtio/virtio-net.h"
+ 
+-#include <linux/vhost.h>
+-#include <linux/virtio_ids.h>
+-#include <linux/virtio_net.h>
++#include "standard-headers/linux/vhost_types.h"
++#include "standard-headers/linux/virtio_ids.h"
++#include "standard-headers/linux/virtio_net.h"
 +
-+#include "qemu/osdep.h"
-+#include "clients.h"
-+#include "net/vhost_net.h"
-+#include "net/vhost-user.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+
-+int net_init_vhost_user(const Netdev *netdev, const char *name,
-+                        NetClientState *peer, Error **errp)
-+{
-+    error_setg(errp, "vhost-user requires frontend driver virtio-net-*");
-+    return -1;
-+}
++#ifdef CONFIG_LINUX
+ #include <sys/vfs.h>
++#endif
+ 
+ 
+ #define QEMU_CMD_MEM    " -m %d -object memory-backend-file,id=mem,size=%dM," \
+@@ -442,6 +445,7 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
+     g_mutex_unlock(&s->data_mutex);
+ }
+ 
++#ifdef CONFIG_LINUX
+ static const char *init_hugepagefs(const char *path)
+ {
+     struct statfs fs;
+@@ -468,6 +472,7 @@ static const char *init_hugepagefs(const char *path)
+ 
+     return path;
+ }
++#endif
+ 
+ static TestServer *test_server_new(const gchar *name)
+ {
+@@ -951,13 +956,14 @@ int main(int argc, char **argv)
+     }
+     g_assert(tmpfs);
+ 
++    root = tmpfs;
++#ifdef CONFIG_LINUX
+     hugefs = getenv("QTEST_HUGETLBFS_PATH");
+     if (hugefs) {
+         root = init_hugepagefs(hugefs);
+         g_assert(root);
+-    } else {
+-        root = tmpfs;
+     }
++#endif
+ 
+     loop = g_main_loop_new(NULL, FALSE);
+     /* run the main loop thread so the chardev may operate */
 -- 
 1.8.3.1
