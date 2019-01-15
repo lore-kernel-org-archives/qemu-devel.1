@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36807)
+Received: from eggs.gnu.org ([209.51.188.92]:40563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjRCJ-0002As-If
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:04:17 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gjRQ1-0001pB-HF
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:18:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjRCH-0001eX-LJ
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:04:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40390)
+	(envelope-from <alex.williamson@redhat.com>) id 1gjRPy-0000fN-S3
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:18:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35774)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gjRCD-0001b5-Sw
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:04:11 -0500
-References: <20190111063732.10484-1-xiaoguangrong@tencent.com>
-	<20190111063732.10484-3-xiaoguangrong@tencent.com>
-	<20190115075154.GI24343@xz-x1> <20190115102404.GA2135@work-vm>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2caebc3a-ccd0-d8c6-0368-4f339f326cdf@redhat.com>
-Date: Tue, 15 Jan 2019 10:03:53 -0600
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gjRPx-0000d5-6r
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:18:22 -0500
+Date: Tue, 15 Jan 2019 09:18:17 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190115091817.07d9916c@x1.home>
+In-Reply-To: <aeda1442-6fe9-c86a-dfae-8d46f47a9555@huawei.com>
+References: <648fabd1-b598-02a9-14f6-02ed2c767b2a@huawei.com>
+	<20190114090757.68bfa839@x1.home>
+	<aeda1442-6fe9-c86a-dfae-8d46f47a9555@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190115102404.GA2135@work-vm>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IMyc29XdVyJwXxfEmJ3gg0CcK8m7WTgPC"
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] migration: fix memory leak when
- updating tls-creds and tls-hostname
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Questions about VFIO enabling MSIX vector
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +29,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc: guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, wei.w.wang@intel.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>, Markus Armbruster <armbru@redhat.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IMyc29XdVyJwXxfEmJ3gg0CcK8m7WTgPC
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Peter Xu <peterx@redhat.com>
-Cc: guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org,
- wei.w.wang@intel.com, quintela@redhat.com, cota@braap.org,
- Xiao Guangrong <xiaoguangrong@tencent.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <2caebc3a-ccd0-d8c6-0368-4f339f326cdf@redhat.com>
-Subject: Re: [PATCH v2 2/3] migration: fix memory leak when updating tls-creds
- and tls-hostname
-References: <20190111063732.10484-1-xiaoguangrong@tencent.com>
- <20190111063732.10484-3-xiaoguangrong@tencent.com>
- <20190115075154.GI24343@xz-x1> <20190115102404.GA2135@work-vm>
-In-Reply-To: <20190115102404.GA2135@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 15 Jan 2019 11:21:51 +0800
+Heyi Guo <guoheyi@huawei.com> wrote:
 
-On 1/15/19 4:24 AM, Dr. David Alan Gilbert wrote:
+> Hi Alex,
+> 
+> Really appreciate your comments. I have some more questions below.
+> 
+> 
+> On 2019/1/15 0:07, Alex Williamson wrote:
+> > On Sat, 12 Jan 2019 10:30:40 +0800
+> > Heyi Guo <guoheyi@huawei.com> wrote:
+> >  
+> >> Hi folks,
+> >>
+> >> I have some questions about vfio_msix_vector_do_use() in
+> >> hw/vfio/pci.c, could you help to explain?
+> >>
+> >> We can see that when guest tries to enable one specific MSIX vector
+> >> by unmasking MSIX Vector Control, the access will be trapped and then
+> >> into function vfio_msix_vector_do_use(). And we may go to the below
+> >> branch in line 525:
+> >>
+> >>
+> >> 520 /*
+> >> 521  * We don't want to have the host allocate all possible MSI vectors
+> >> 522  * for a device if they're not in use, so we shutdown and incrementally
+> >> 523  * increase them as needed.
+> >> 524  */
+> >> 525  if (vdev->nr_vectors < nr + 1) {
+> >> 526      vfio_disable_irqindex(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX);
+> >> 527      vdev->nr_vectors = nr + 1;
+> >> 528      ret = vfio_enable_vectors(vdev, true);
+> >> 529      if (ret) {
+> >> 530          error_report("vfio: failed to enable vectors, %d", ret);
+> >> 531      }
+> >>
+> >> Here all MSIX vectors will be disabled first and then enabled, with
+> >> one more MSIX. The comment is there but I still don't quite
+> >> understand. It makes sense for not allocating all possible MSI
+> >> vectors, but why shall we shutdown the whole MSI when being requested
+> >> to enable one specific vector? Can't we just enable the user
+> >> specified vector indexed by "nr"?  
+> >
+> > What internal kernel API would vfio-pci make use of to achieve that?
+> > We can't know the intentions of the guest and we have a limited set of
+> > tools to manage the MSI-X state in the host kernel.  It's generally the
+> > case that MSI-X vectors are only manipulated during driver setup and
+> > shutdown, so while the current behavior isn't necessarily efficient, it
+> > works within the constraints and generally doesn't have a runtime impact
+> > on performance.  We also recognize that this behavior may change in the
+> > future depending on more dynamic internal host kernel interfaces, thus
+> > we export the VFIO_IRQ_INFO_NORESIZE flag to indicate to userspace
+> > whether this procedure is required.  
+> 
+> I tried to enable the specified MSIX vector only, and finally
+> understood the original QEMU code after always getting EINVAL from
+> ioctl->VFIO_DEVICE_SET_IRQS. Then I tried to allocate all MSIX
+> vectors in vfio_msix_enable(), not only MSIX vector 0. The change
+> works, but it definitely doesn't follow the comment in the code "We
+> don't want to have the host allocate all possible MSI vectors for a
+> device if they're not in use". May I ask what the side effect is if
+> we really allocate all possible vectors at the beginning?
 
-> I think the problem is that
-> migrate_params_check checks a MigrationParameters
->=20
-> while the QMP command gives us a MigrateSetParameters; but we also use
-> migrate_params_check for the global check you added (8b0b29dc) which is=
+Host IRQ vector exhaustion.  Very few devices seem to make use of the
+their full compliment of available vectors and some devices support a
+very, very large number of vectors.  The current approach only consumes
+the host resources that the guest is actually making use of.
 
-> against migrationParameters; so that's why migrate_params_check takes
-> a MigrationParameters.
->=20
-> It's horrible we've got stuff duped so much.
+> >> What's more, on ARM64 systems with GIC ITS, the kernel will issue
+> >> an ITS discard command when disabling a MSI vector, which will drop
+> >> currently pending MSI interrupt. If device driver in guest system
+> >> enables some MSIs first and interrupts may come at any time, and
+> >> then it tries to enable other MSIs, is it possible for the above
+> >> code to cause interrupts missing?  
+> >
+> > Interrupt reconfiguration is generally during driver setup or
+> > teardown when the device is considered idle or lost interrupts are
+> > not a concern.  If you have a device which manipulates interrupt
+> > configuration runtime, you can expect that lost interrupts won't be
+> > the only problem,  
+>
+> On physical machine, if the driver enables vector 0 first, and then
+> vector 1 later, will the vector 0 interrupt be lost for some
+> possibility? In my opinion the manipulation of vector 1 should not
+> affect the interrupt of vector 0, isn't it? But if this is possible
+> in virtual world, what do we consider it as? A bug to be fixed in
+> future, or a known limitation of virtualization that won't be fixed
+> and all driver developers should pay attention to it?
 
-Indeed.
+Are you experiencing an actual problem with lost interrupts or is this
+a theoretical question?  There is a difference in programming of MSI-X
+for an assigned device because we cannot know the intentions of the
+guest with respect to how many vectors they intend to use.  We can only
+know as individual vectors are unmasked that a vector is now used.
+Allocating the maximum compliment of interrupts supported on the device
+is wasteful of host resources.  Given this, combined with the fact that
+drivers generally configure vectors only at device setup time, the
+existing code generally works well.  Ideally drivers should not be
+required to modify their behavior to support device assignment, but
+certain actions, like high frequency masking/unmasking of interrupts
+through the vector table impose unavoidable virtualization overhead
+and should be avoided.  I believe older Linux guests (RHEL5 time frame)
+had such behavior.
 
->=20
-> However, I don't like this fix because if someone later was to add
-> a test for tls parameters to migrate_params_check, then they would be
-> confused why the hostname/creds weren't checked.
-> So while we have migrate_params_test_apply, it should cover all
-> parameters.
->=20
-> I think a cleaner check would be to write a MigrateParameters_free
-> that free'd any strings, and call that in qmp_migrate_set_parameters
-> on both exit paths.
+It's possible that current IRQ domains alleviate some of the concern
+for host IRQ exhaustion and that vfio-pci could be made to allocate the
+maximum supported vectors per device, removing the use of the NORESIZE
+flag for the index.  Userspace would need to continue to support both
+modes of operation and the kernel would need to continue to be
+compatible with that.  Thanks,
 
-We already have it; it's named qapi_free_MigrationParameters(),
-generated in qapi-types-migration.h.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---IMyc29XdVyJwXxfEmJ3gg0CcK8m7WTgPC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw+BGkACgkQp6FrSiUn
-Q2rangf9EQ9Dyg76gDPabR8OQn3EnpNce0s6+cD1nVGHqZGUl+ZSF2Ex+orkaAWg
-ftBgBzXFqqnoFEynweXvuGtf6/w9gb6V6yEPpxVp/qwB1lAT9TYu5j/bedYoITae
-FVy4/ippcudesUKXPC0HxXLebFu0iAfmVRZZEwI952vL0Oloqe7jFAz2awhoUJTe
-zQDFTaE2dNHt9WSb5S2mB2Ue0pTSC21iidyHXLfP2Bg04rNzs9sY+7HMx1njfQ80
-dy6gV+84zu0BsjF/6QMUzFuAa0KJavbRT9hIPZtDSxhZyMQ1HfmES6knSrOZcwb+
-DaSJ7lb2JKKsP6OHmqGYcoR2LuXkrQ==
-=1t6r
------END PGP SIGNATURE-----
-
---IMyc29XdVyJwXxfEmJ3gg0CcK8m7WTgPC--
+Alex
