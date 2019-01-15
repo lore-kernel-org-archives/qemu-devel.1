@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37581)
+Received: from eggs.gnu.org ([209.51.188.92]:37462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPYQ-00037A-0T
+	(envelope-from <yang.zhong@intel.com>) id 1gjPYQ-0002wr-8t
 	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:19:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPSS-0001VT-LW
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:49 -0500
-Received: from mga05.intel.com ([192.55.52.43]:56327)
+	(envelope-from <yang.zhong@intel.com>) id 1gjPSJ-0001SR-VP
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:40 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56304)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gjPSS-0001AS-D3
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:48 -0500
+	id 1gjPSJ-00013D-Nh
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:39 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Tue, 15 Jan 2019 22:10:57 +0800
-Message-Id: <20190115141108.934-27-yang.zhong@intel.com>
+Date: Tue, 15 Jan 2019 22:10:55 +0800
+Message-Id: <20190115141108.934-25-yang.zhong@intel.com>
 In-Reply-To: <20190115141108.934-1-yang.zhong@intel.com>
 References: <20190115141108.934-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v2 26/37] scsi: express dependencies with
+Subject: [Qemu-devel] [RFC PATCH v2 24/37] build: convert sound.mak to
  Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,96 +30,112 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-This lets you disable SCSI altogether with "CONFIG_SCSI=n".
+There is really nothing special in these devices; they are just
+ISA devices.  Instead of including them for each target,
+set CONFIG_ISA to true, and make the devices default to present
+whenever ISA is available.  More conversion of ISA devices will
+follow.
+
+Done with the following script:
+
+  while read i; do
+     i=${i%=y}; i=${i#CONFIG_}
+     sed -i -e'/^config '$i'$/!b' -en \
+            -e'a\' -e'    default y\' -e'    depends on ISA' \
+          `grep -lw $i hw/*/Kconfig`
+  done < default-configs/sound.mak
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/scsi/Kconfig       | 12 ++++++++++++
- hw/scsi/Makefile.objs |  2 +-
- hw/usb/Kconfig        |  2 ++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ default-configs/i386-softmmu.mak        | 2 +-
+ default-configs/mips-softmmu-common.mak | 2 +-
+ default-configs/ppc-softmmu.mak         | 2 +-
+ default-configs/sound.mak               | 4 ----
+ hw/audio/Kconfig                        | 8 ++++++++
+ 5 files changed, 11 insertions(+), 7 deletions(-)
+ delete mode 100644 default-configs/sound.mak
 
-diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
-index 812a12522b..7a9d373382 100644
---- a/hw/scsi/Kconfig
-+++ b/hw/scsi/Kconfig
-@@ -5,24 +5,29 @@ config LSI_SCSI_PCI
-     bool
-     default y
-     depends on PCI
-+    select SCSI
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index 554dbd8c6b..cf49e3fae7 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -1,7 +1,7 @@
+ # Default configuration for i386-softmmu
  
- config MPTSAS_SCSI_PCI
-     bool
-     default y
-     depends on PCI
-+    select SCSI
+ CONFIG_PCI=y
+-include sound.mak
++CONFIG_ISA=y
+ include usb.mak
+ include hyperv.mak
+ CONFIG_VGA_ISA=y
+diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+index 5ef6d49e66..03c7a08d1a 100644
+--- a/default-configs/mips-softmmu-common.mak
++++ b/default-configs/mips-softmmu-common.mak
+@@ -1,7 +1,7 @@
+ # Common mips*-softmmu CONFIG defines
  
- config MEGASAS_SCSI_PCI
-     bool
-     default y
-     depends on PCI
-+    select SCSI
+-include sound.mak
+ include usb.mak
++CONFIG_ISA=y
+ CONFIG_PCI=y
+ CONFIG_ESP=y
+ CONFIG_SCSI=y
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 301cc83279..c7003e4284 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -1,8 +1,8 @@
+ # Default configuration for ppc-softmmu
  
- config VMW_PVSCSI_SCSI_PCI
-     bool
-     default y
-     depends on PCI
-+    select SCSI
+-include sound.mak
+ include usb.mak
+ CONFIG_PCI=y
++ONFIG_ISA=y
  
- config ESP
-     bool
-+    select SCSI
- 
- config ESP_PCI
-     bool
-@@ -30,8 +35,15 @@ config ESP_PCI
-     depends on PCI
-     select ESP
- 
-+config SPAPR_VSCSI
-+    bool
-+    depends on PSERIES
-+    select SCSI
-+
- config VIRTIO_SCSI
+ # For embedded PPCs:
+ CONFIG_PPC4XX=y
+diff --git a/default-configs/sound.mak b/default-configs/sound.mak
+deleted file mode 100644
+index 4f22c34b5d..0000000000
+--- a/default-configs/sound.mak
++++ /dev/null
+@@ -1,4 +0,0 @@
+-CONFIG_SB16=y
+-CONFIG_ADLIB=y
+-CONFIG_GUS=y
+-CONFIG_CS4231A=y
+diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
+index af34bbcf0c..bfb30276ec 100644
+--- a/hw/audio/Kconfig
++++ b/hw/audio/Kconfig
+@@ -1,5 +1,7 @@
+ config SB16
      bool
 +    default y
-+    select SCSI
++    depends on ISA_BUS
  
- config VHOST_USER_SCSI
+ config ES1370
      bool
-diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
-index 45167baeaf..54b36ed8b1 100644
---- a/hw/scsi/Makefile.objs
-+++ b/hw/scsi/Makefile.objs
-@@ -6,7 +6,7 @@ common-obj-$(CONFIG_MEGASAS_SCSI_PCI) += megasas.o
- common-obj-$(CONFIG_VMW_PVSCSI_SCSI_PCI) += vmw_pvscsi.o
- common-obj-$(CONFIG_ESP) += esp.o
- common-obj-$(CONFIG_ESP_PCI) += esp-pci.o
--obj-$(CONFIG_PSERIES) += spapr_vscsi.o
-+obj-$(CONFIG_SPAPR_VSCSI) += spapr_vscsi.o
+@@ -13,12 +15,18 @@ config AC97
  
- ifeq ($(CONFIG_VIRTIO_SCSI),y)
- obj-y += virtio-scsi.o virtio-scsi-dataplane.o
-diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index 0b8f41040e..db46c56cc8 100644
---- a/hw/usb/Kconfig
-+++ b/hw/usb/Kconfig
-@@ -52,11 +52,13 @@ config USB_STORAGE_BOT
+ config ADLIB
      bool
-     default y
-     depends on USB
-+    select SCSI
++    default y
++    depends on ISA_BUS
  
- config USB_STORAGE_UAS
+ config GUS
      bool
-     default y
-     depends on USB
-+    select SCSI
++    default y
++    depends on ISA_BUS
  
- config USB_AUDIO
+ config CS4231A
+     bool
++    default y
++    depends on ISA_BUS
+ 
+ config HDA
      bool
 -- 
 2.17.1
