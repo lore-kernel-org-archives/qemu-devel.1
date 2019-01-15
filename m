@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55842)
+Received: from eggs.gnu.org ([209.51.188.92]:34143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gjVuM-0003Qd-GQ
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:06:05 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gjVyA-0005OC-Ue
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:10:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gjVuI-0002bK-Dc
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:06:02 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:40109)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gjVuI-0002a1-7N
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:05:58 -0500
-Received: by mail-qt1-f195.google.com with SMTP id k12so4672469qtf.7
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 13:05:58 -0800 (PST)
+	(envelope-from <alistair23@gmail.com>) id 1gjVy9-00067o-QT
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:09:58 -0500
 MIME-Version: 1.0
-References: <20190115145256.9593-1-berrange@redhat.com>
-	<20190115145256.9593-10-berrange@redhat.com>
-In-Reply-To: <20190115145256.9593-10-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 16 Jan 2019 01:05:44 +0400
-Message-ID: <CAMxuvayKGMTBXk85PrMR8XmuLq0h2TcehFd+ZTTVsuqOxhZKQQ@mail.gmail.com>
+References: <d2ae859d3d73ec1897d78131e05a6cf6ba6c94b0.1547255794.git.alistair.francis@wdc.com>
+	<56d71bbd-e86b-db1c-8d45-7dd229b87081@redhat.com>
+In-Reply-To: <56d71bbd-e86b-db1c-8d45-7dd229b87081@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 15 Jan 2019 13:09:28 -0800
+Message-ID: <CAKmqyKN+PEt8=z_OUHngj5w6V6ZQ4r+U4uEDFrFayWXo8S+1tA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/12] chardev: use a state machine for
- socket connection state
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] riscv: Ensure the kernel start
+ address is correctly cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,275 +24,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "agraf@suse.de" <agraf@suse.de>
 
-Hi
+On Mon, Jan 14, 2019 at 2:58 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> Hi Alistair,
+>
+> On 1/12/19 2:17 AM, Alistair Francis wrote:
+> > Cast the kernel start address to the target bit length.
+> >
+> > This ensures that we calculate the initrd offset to a valid address for
+> > the architecture.
+>
+> Can you add an example of the failure symptoms?
 
-On Tue, Jan 15, 2019 at 6:54 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->
-> The socket connection state is indicated via the 'bool connected' field
-> in the SocketChardev struct. This variable is somewhat misleading
-> though, as it is only set to true once the connection has completed all
-> required handshakes (eg for TLS, telnet or websockets). IOW there is a
-> period of time in which the socket is connected, but the "connected"
-> flag is still false.
->
-> The socket chardev really has three states that it can be in,
-> disconnected, connecting and connected and those should be tracked
-> explicitly.
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+I can.
 
-You could split that patch, to introduce CONNECTING in a separate step.
+>
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > Suggested-by: Alexander Graf <agraf@suse.de>
+> > Reported-by: Alexander Graf <agraf@suse.de>
+> > ---
+> > v2:
+> >  - Remove old comment
+> >  hw/riscv/sifive_e.c | 2 +-
+> >  hw/riscv/sifive_u.c | 2 +-
+> >  hw/riscv/spike.c    | 2 +-
+> >  hw/riscv/virt.c     | 2 +-
+> >  4 files changed, 4 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> > index 5d9d65ff29..e5d7fc548e 100644
+> > --- a/hw/riscv/sifive_e.c
+> > +++ b/hw/riscv/sifive_e.c
+> > @@ -74,7 +74,7 @@ static const struct MemmapEntry {
+> >      [SIFIVE_E_DTIM] =3D     { 0x80000000,     0x4000 }
+> >  };
+> >
+> > -static uint64_t load_kernel(const char *kernel_filename)
+> > +static target_ulong load_kernel(const char *kernel_filename)
+> >  {
+> >      uint64_t kernel_entry, kernel_high;
+>
+> Shouldn't you update load_elf() and co now to take target_ulong
+> arguments? This would fix this error generically for all archs.
 
-But lgtm so,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+That is an option, but as load_elf() is called by every other machine
+I don't want to break them. It's entirely possible that other machines
+rely on this behaviour and changing it will break them.
 
-> ---
->  chardev/char-socket.c | 63 +++++++++++++++++++++++++++++++++----------
->  1 file changed, 49 insertions(+), 14 deletions(-)
+Alistair
+
 >
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 385504b021..96a60eb105 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -46,6 +46,12 @@ typedef struct {
->      size_t buflen;
->  } TCPChardevTelnetInit;
->
-> +typedef enum {
-> +    TCP_CHARDEV_STATE_DISCONNECTED,
-> +    TCP_CHARDEV_STATE_CONNECTING,
-> +    TCP_CHARDEV_STATE_CONNECTED,
-> +} TCPChardevState;
-> +
->  typedef struct {
->      Chardev parent;
->      QIOChannel *ioc; /* Client I/O channel */
-> @@ -53,7 +59,7 @@ typedef struct {
->      QIONetListener *listener;
->      GSource *hup_source;
->      QCryptoTLSCreds *tls_creds;
-> -    int connected;
-> +    TCPChardevState state;
->      int max_size;
->      int do_telnetopt;
->      int do_nodelay;
-> @@ -82,6 +88,21 @@ typedef struct {
->  static gboolean socket_reconnect_timeout(gpointer opaque);
->  static void tcp_chr_telnet_init(Chardev *chr);
->
-> +static void tcp_chr_change_state(SocketChardev *s, TCPChardevState state=
-)
-> +{
-> +    switch (state) {
-> +    case TCP_CHARDEV_STATE_DISCONNECTED:
-> +        break;
-> +    case TCP_CHARDEV_STATE_CONNECTING:
-> +        assert(s->state =3D=3D TCP_CHARDEV_STATE_DISCONNECTED);
-> +        break;
-> +    case TCP_CHARDEV_STATE_CONNECTED:
-> +        assert(s->state =3D=3D TCP_CHARDEV_STATE_CONNECTING);
-> +        break;
-> +    }
-> +    s->state =3D state;
-> +}
-> +
->  static void tcp_chr_reconn_timer_cancel(SocketChardev *s)
->  {
->      if (s->reconnect_timer) {
-> @@ -96,7 +117,7 @@ static void qemu_chr_socket_restart_timer(Chardev *chr=
-)
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->      char *name;
->
-> -    assert(s->connected =3D=3D 0);
-> +    assert(s->state =3D=3D TCP_CHARDEV_STATE_DISCONNECTED);
->      name =3D g_strdup_printf("chardev-socket-reconnect-%s", chr->label);
->      s->reconnect_timer =3D qemu_chr_timeout_add_ms(chr,
->                                                   s->reconnect_time * 100=
-0,
-> @@ -131,7 +152,7 @@ static int tcp_chr_write(Chardev *chr, const uint8_t =
-*buf, int len)
->  {
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->
-> -    if (s->connected) {
-> +    if (s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED) {
->          int ret =3D  io_channel_send_full(s->ioc, buf, len,
->                                          s->write_msgfds,
->                                          s->write_msgfds_num);
-> @@ -164,7 +185,7 @@ static int tcp_chr_read_poll(void *opaque)
->  {
->      Chardev *chr =3D CHARDEV(opaque);
->      SocketChardev *s =3D SOCKET_CHARDEV(opaque);
-> -    if (!s->connected) {
-> +    if (s->state !=3D TCP_CHARDEV_STATE_CONNECTED) {
->          return 0;
->      }
->      s->max_size =3D qemu_chr_be_can_write(chr);
-> @@ -277,7 +298,7 @@ static int tcp_set_msgfds(Chardev *chr, int *fds, int=
- num)
->      s->write_msgfds =3D NULL;
->      s->write_msgfds_num =3D 0;
->
-> -    if (!s->connected ||
-> +    if ((s->state !=3D TCP_CHARDEV_STATE_CONNECTED) ||
->          !qio_channel_has_feature(s->ioc,
->                                   QIO_CHANNEL_FEATURE_FD_PASS)) {
->          return -1;
-> @@ -389,7 +410,7 @@ static void tcp_chr_free_connection(Chardev *chr)
->      s->ioc =3D NULL;
->      g_free(chr->filename);
->      chr->filename =3D NULL;
-> -    s->connected =3D 0;
-> +    tcp_chr_change_state(s, TCP_CHARDEV_STATE_DISCONNECTED);
->  }
->
->  static const char *qemu_chr_socket_protocol(SocketChardev *s)
-> @@ -442,12 +463,12 @@ static void update_disconnected_filename(SocketChar=
-dev *s)
->
->  /* NB may be called even if tcp_chr_connect has not been
->   * reached, due to TLS or telnet initialization failure,
-> - * so can *not* assume s->connected =3D=3D true
-> + * so can *not* assume s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED
->   */
->  static void tcp_chr_disconnect(Chardev *chr)
->  {
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
-> -    bool emit_close =3D s->connected;
-> +    bool emit_close =3D s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED;
->
->      tcp_chr_free_connection(chr);
->
-> @@ -471,7 +492,8 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCon=
-dition cond, void *opaque)
->      uint8_t buf[CHR_READ_BUF_LEN];
->      int len, size;
->
-> -    if (!s->connected || s->max_size <=3D 0) {
-> +    if ((s->state !=3D TCP_CHARDEV_STATE_CONNECTED) ||
-> +        s->max_size <=3D 0) {
->          return TRUE;
->      }
->      len =3D sizeof(buf);
-> @@ -508,7 +530,7 @@ static int tcp_chr_sync_read(Chardev *chr, const uint=
-8_t *buf, int len)
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->      int size;
->
-> -    if (!s->connected) {
-> +    if (s->state !=3D TCP_CHARDEV_STATE_CONNECTED) {
->          return 0;
->      }
->
-> @@ -564,7 +586,7 @@ static void update_ioc_handlers(SocketChardev *s)
->  {
->      Chardev *chr =3D CHARDEV(s);
->
-> -    if (!s->connected) {
-> +    if (s->state !=3D TCP_CHARDEV_STATE_CONNECTED) {
->          return;
->      }
->
-> @@ -589,7 +611,7 @@ static void tcp_chr_connect(void *opaque)
->      g_free(chr->filename);
->      chr->filename =3D qemu_chr_compute_filename(s);
->
-> -    s->connected =3D 1;
-> +    tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTED);
->      update_ioc_handlers(s);
->      qemu_chr_be_event(chr, CHR_EVENT_OPENED);
->  }
-> @@ -828,7 +850,7 @@ static int tcp_chr_new_client(Chardev *chr, QIOChanne=
-lSocket *sioc)
->  {
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->
-> -    if (s->ioc !=3D NULL) {
-> +    if (s->state !=3D TCP_CHARDEV_STATE_CONNECTING) {
->          return -1;
->      }
->
-> @@ -865,11 +887,17 @@ static int tcp_chr_add_client(Chardev *chr, int fd)
->  {
->      int ret;
->      QIOChannelSocket *sioc;
-> +    SocketChardev *s =3D SOCKET_CHARDEV(chr);
-> +
-> +    if (s->state !=3D TCP_CHARDEV_STATE_DISCONNECTED) {
-> +        return -1;
-> +    }
->
->      sioc =3D qio_channel_socket_new_fd(fd, NULL);
->      if (!sioc) {
->          return -1;
->      }
-> +    tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
->      tcp_chr_set_client_ioc_name(chr, sioc);
->      ret =3D tcp_chr_new_client(chr, sioc);
->      object_unref(OBJECT(sioc));
-> @@ -881,7 +909,9 @@ static void tcp_chr_accept(QIONetListener *listener,
->                             void *opaque)
->  {
->      Chardev *chr =3D CHARDEV(opaque);
-> +    SocketChardev *s =3D SOCKET_CHARDEV(chr);
->
-> +    tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
->      tcp_chr_set_client_ioc_name(chr, cioc);
->      tcp_chr_new_client(chr, cioc);
->  }
-> @@ -891,8 +921,10 @@ static int tcp_chr_connect_client_sync(Chardev *chr,=
- Error **errp)
->  {
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->      QIOChannelSocket *sioc =3D qio_channel_socket_new();
-> +    tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
->      tcp_chr_set_client_ioc_name(chr, sioc);
->      if (qio_channel_socket_connect_sync(sioc, s->addr, errp) < 0) {
-> +        tcp_chr_change_state(s, TCP_CHARDEV_STATE_DISCONNECTED);
->          object_unref(OBJECT(sioc));
->          return -1;
->      }
-> @@ -908,6 +940,7 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
->      QIOChannelSocket *sioc;
->      info_report("QEMU waiting for connection on: %s",
->                  chr->filename);
-> +    tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
->      sioc =3D qio_net_listener_wait_client(s->listener);
->      tcp_chr_set_client_ioc_name(chr, sioc);
->      tcp_chr_new_client(chr, sioc);
-> @@ -963,6 +996,7 @@ static void qemu_chr_socket_connected(QIOTask *task, =
-void *opaque)
->      Error *err =3D NULL;
->
->      if (qio_task_propagate_error(task, &err)) {
-> +        tcp_chr_change_state(s, TCP_CHARDEV_STATE_DISCONNECTED);
->          check_report_connect_error(chr, err);
->          error_free(err);
->          goto cleanup;
-> @@ -980,6 +1014,7 @@ static void tcp_chr_connect_client_async(Chardev *ch=
-r)
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->      QIOChannelSocket *sioc;
->
-> +    tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
->      sioc =3D qio_channel_socket_new();
->      tcp_chr_set_client_ioc_name(chr, sioc);
->      qio_channel_socket_connect_async(sioc, s->addr,
-> @@ -1307,7 +1342,7 @@ char_socket_get_connected(Object *obj, Error **errp=
-)
->  {
->      SocketChardev *s =3D SOCKET_CHARDEV(obj);
->
-> -    return s->connected;
-> +    return s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED;
->  }
->
->  static void char_socket_class_init(ObjectClass *oc, void *data)
-> --
-> 2.20.1
->
+> >
+> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> > index 3bd3b67507..3b3acec377 100644
+> > --- a/hw/riscv/sifive_u.c
+> > +++ b/hw/riscv/sifive_u.c
+> > @@ -65,7 +65,7 @@ static const struct MemmapEntry {
+> >
+> >  #define GEM_REVISION        0x10070109
+> >
+> > -static uint64_t load_kernel(const char *kernel_filename)
+> > +static target_ulong load_kernel(const char *kernel_filename)
+> >  {
+> >      uint64_t kernel_entry, kernel_high;
+> >
+> > diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> > index 268df04c3c..79cb4c1282 100644
+> > --- a/hw/riscv/spike.c
+> > +++ b/hw/riscv/spike.c
+> > @@ -53,7 +53,7 @@ static const struct MemmapEntry {
+> >      [SPIKE_DRAM] =3D     { 0x80000000,        0x0 },
+> >  };
+> >
+> > -static uint64_t load_kernel(const char *kernel_filename)
+> > +static target_ulong load_kernel(const char *kernel_filename)
+> >  {
+> >      uint64_t kernel_entry, kernel_high;
+> >
+> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> > index e7f0716fb6..648462b18c 100644
+> > --- a/hw/riscv/virt.c
+> > +++ b/hw/riscv/virt.c
+> > @@ -62,7 +62,7 @@ static const struct MemmapEntry {
+> >      [VIRT_PCIE_ECAM] =3D   { 0x30000000,    0x10000000 },
+> >  };
+> >
+> > -static uint64_t load_kernel(const char *kernel_filename)
+> > +static target_ulong load_kernel(const char *kernel_filename)
+> >  {
+> >      uint64_t kernel_entry, kernel_high;
+> >
+> >
