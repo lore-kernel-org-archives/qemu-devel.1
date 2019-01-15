@@ -1,33 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36038)
+Received: from eggs.gnu.org ([209.51.188.92]:36328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjR99-0008Ek-50
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:01:04 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gjRA1-0000S8-Ux
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:01:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjR93-0000Xe-Ej
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:00:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34684)
+	(envelope-from <alex.bennee@linaro.org>) id 1gjR9p-0000nE-DI
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:01:52 -0500
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:43032)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gjR93-0000Wx-8T
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:00:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gjR91-0007Em-HO
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 16:00:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 68C352E80D3
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 16:00:51 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gjR9p-0000l9-2d
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:01:41 -0500
+Received: by mail-wr1-x431.google.com with SMTP id r10so3535277wrs.10
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 08:01:34 -0800 (PST)
+References: <1547467955-17245-1-git-send-email-thuth@redhat.com>
+	<30917d5b-f8cb-e799-6c3e-3202195122b4@redhat.com>
+	<871s5fp54s.fsf@linaro.org>
+	<e94b51d7-c90f-b599-fb68-ea8c2603989b@redhat.com>
+	<87zhs3nk1m.fsf@linaro.org>
+	<a0646a85-603d-99a8-c676-76e43a42e0fb@twiddle.net>
+	<87y37monyr.fsf@linaro.org>
+	<CAFEAcA8u4AdhW-MF6uMP7=B4iYVO9ZEQCtcQKpN6KWALwAfLnw@mail.gmail.com>
+	<87won6nfl1.fsf@linaro.org>
+	<6cb80b50-0352-430e-0c46-85ed69f95c88@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <6cb80b50-0352-430e-0c46-85ed69f95c88@redhat.com>
+Date: Tue, 15 Jan 2019 16:01:32 +0000
+Message-ID: <87va2poqoz.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Jan 2019 15:47:15 -0000
-From: Michael Ablassmeier <1811862@bugs.launchpad.net>
-Reply-To: Bug 1811862 <1811862@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154756723569.32460.9318945599039422988.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1811862] [NEW] microcode version stays 0x1 even
- if -cpu host is used
+Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
+ with Clang on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,116 +39,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
-
-The microcode version of my host cpu has the following version:
-
-grep microcode /proc/cpuinfo | head -1
-microcode       : 0x3d
-
-while trying to run ESXi in an nested VM, the boot bailed out with
-error message that at least microcode version 0x19 is needed. It =
-
-seems they have introduced such a check on certain CPU types.
-
-The VM in question is using the "host-passthrough" option in libvirt
-and the qemu command line reads as this:
-
-21172 ?        Sl     0:09 /usr/libexec/qemu-kvm -name guest=3Dhpe-env-
-client1,debug-threads=3Don -S -object
-secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-33
--hpe-env-client1/master-key.aes -machine pc-i440fx-
-rhel7.6.0,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff -cpu host <rest
-stripped>
-
-Running a regular Linux VM with `host-passthrough` shows that the
-microcode version is still reported as 0x1.
-
-Within the VM:
-
-[root@hpe-env-client1 ~]# cat /proc/cpuinfo =
-
-processor       : 0
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 63
-model name      : Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz
-stepping        : 2
-microcode       : 0x1
-cpu MHz         : 2397.222
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>
 
 
-My impression is qemu should copy the hosts microcode version in this case?
+Thomas Huth <thuth@redhat.com> writes:
 
-Running Qemu von RHEl8 beta here.
+> On 2019-01-15 15:46, Alex Benn=C3=A9e wrote:
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> On Mon, 14 Jan 2019 at 22:48, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>>>>
+>>>>
+>>>> Richard Henderson <rth@twiddle.net> writes:
+>>>>> But perhaps
+>>>>>
+>>>>>     unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
+>>>>>     *r =3D n % d;
+>>>>>     return n / d;
+>>>>>
+>>>>> will allow the compiler to do what the assembly does for some 64-bit
+>>>>> hosts.
+>>>>
+>>>> I wonder how much cost is incurred by the jumping to the (libgcc?) div
+>>>> helper? Anyone got an s390x about so we can benchmark the two
+>>>> approaches?
+>>>
+>>> The project has an s390x system available; however it's usually
+>>> running merge build tests so not so useful for benchmarking.
+>>> (I can set up accounts on it but that requires me to faff about
+>>> figuring out how to create new accounts :-))
+>>
+>> I'm happy to leave this up to those who care about s390x host
+>> performance (Thomas, Cornelia?). I'm just keen to avoid the divide
+>> helper getting too #ifdefy.
+>
+> Ok, I just did a quick'n'dirty "benchmark" on the s390x that I've got
+> available:
 
-[root@3parserver ~]# /usr/libexec/qemu-kvm --version
-QEMU emulator version 2.12.0 (qemu-kvm-2.12.0-41.el8+2104+3e32e6f8)
+Ahh I should have mentioned we already have the technology for this ;-)
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+If you build the fpu/next tree on a s390x you can then run:
 
--- =
+  ./tests/fp/fp-bench f64_div
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811862
+with and without the CONFIG_128 path. To get an idea of the real world
+impact you can compile a foreign binary and run it on a s390x system
+with:
 
-Title:
-  microcode version stays 0x1 even if -cpu host is used
+  $QEMU ./tests/fp/fp-bench f64_div -t host
 
-Status in QEMU:
-  New
+And that will give you the peak performance assuming your program is
+doing nothing but f64_div operations. If the two QEMU's are basically in
+the same ballpark then it doesn't make enough difference. That said:
 
-Bug description:
-  The microcode version of my host cpu has the following version:
+> #include <stdio.h>
+> #include <time.h>
+> #include <stdint.h>
+>
+> uint64_t udiv_qrnnd1(uint64_t *r, uint64_t n1, uint64_t n0, uint64_t d)
+> {
+>     unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
+>     asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+>     *r =3D n >> 64;
+>     return n;
+> }
+>
+> uint64_t udiv_qrnnd2(uint64_t *r, uint64_t n1, uint64_t n0, uint64_t d)
+> {
+>     unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
+>     *r =3D n % d;
+>     return n / d;
+> }
+>
+<snip>
+>
+> int main()
+> {
+> 	uint64_t r =3D 0, n1 =3D 0, n0 =3D 0, d =3D 0;
+> 	uint64_t rs =3D 0, rn =3D 0;
+> 	clock_t start, end;
+> 	long i;
+>
+> 	start =3D clock();
+> 	for (i=3D0; i<200000000L; i++) {
+> 		n1 +=3D 3;
+> 		n0 +=3D 987654321;
+> 		d +=3D 0x123456789;
+> 		rs +=3D udiv_qrnnd1(&r, n1, n0, d);
+> 		rn +=3D r;
+> 	}
+> 	end =3D clock();
+> 	printf("test 1: time=3D%li\t, rs=3D%li , rn =3D %li\n", (end-start)/1000=
+, rs, rn);
+>
+> 	r =3D n1 =3D n0 =3D d =3D rs =3D rn =3D 0;
+>
+> 	start =3D clock();
+> 	for (i=3D0; i<200000000L; i++) {
+> 		n1 +=3D 3;
+> 		n0 +=3D 987654321;
+> 		d +=3D 0x123456789;
+> 		rs +=3D udiv_qrnnd2(&r, n1, n0, d);
+> 		rn +=3D r;
+> 	}
+> 	end =3D clock();
+> 	printf("test 2: time=3D%li\t, rs=3D%li , rn =3D %li\n", (end-start)/1000=
+, rs, rn);
+>
+> 	r =3D n1 =3D n0 =3D d =3D rs =3D rn =3D 0;
+>
+> 	start =3D clock();
+> 	for (i=3D0; i<200000000L; i++) {
+> 		n1 +=3D 3;
+> 		n0 +=3D 987654321;
+> 		d +=3D 0x123456789;
+> 		rs +=3D udiv_qrnnd3(&r, n1, n0, d);
+> 		rn +=3D r;
+> 	}
+> 	end =3D clock();
+> 	printf("test 3: time=3D%li\t, rs=3D%li , rn =3D %li\n", (end-start)/1000=
+, rs, rn);
+>
+> 	return 0;
+> }
+>
+> ... and results with GCC v8.2.1 are (using -O2):
+>
+> test 1: time=3D609	, rs=3D2264924160200000000 , rn =3D 6136218997527160832
+> test 2: time=3D10127	, rs=3D2264924160200000000 , rn =3D 6136218997527160=
+832
+> test 3: time=3D2350	, rs=3D2264924183048928865 , rn =3D 48428220481623110=
+89
+>
+> Thus the int128 version is the slowest!
 
-  grep microcode /proc/cpuinfo | head -1
-  microcode       : 0x3d
+I'd expect a little slow down due to the indirection into libgcc.. but
+that seems pretty high.
 
-  while trying to run ESXi in an nested VM, the boot bailed out with
-  error message that at least microcode version 0x19 is needed. It =
+>
+> ... but at least it gives the same results as the DLGR instruction. The 6=
+4-bit
+> version gives different results - do we have a bug here?
+>
+> Results with Clang v7.0.1 (using -O2, too) are these:
+>
+> test 2: time=3D5035	, rs=3D2264924160200000000 , rn =3D 61362189975271608=
+32
+> test 3: time=3D1970	, rs=3D2264924183048928865 , rn =3D
+> 4842822048162311089
 
-  seems they have introduced such a check on certain CPU types.
+You can run:
 
-  The VM in question is using the "host-passthrough" option in libvirt
-  and the qemu command line reads as this:
+  ./tests/fp/fp-test f64_div -l 2 -r all
 
-  21172 ?        Sl     0:09 /usr/libexec/qemu-kvm -name guest=3Dhpe-env-
-  client1,debug-threads=3Don -S -object
-  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-33
-  -hpe-env-client1/master-key.aes -machine pc-i440fx-
-  rhel7.6.0,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff -cpu host <rest
-  stripped>
+For a proper comprehensive test.
 
-  Running a regular Linux VM with `host-passthrough` shows that the
-  microcode version is still reported as 0x1.
-
-  Within the VM:
-
-  [root@hpe-env-client1 ~]# cat /proc/cpuinfo =
-
-  processor       : 0
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 63
-  model name      : Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz
-  stepping        : 2
-  microcode       : 0x1
-  cpu MHz         : 2397.222
-
-  =
-
-  My impression is qemu should copy the hosts microcode version in this cas=
-e?
-
-  Running Qemu von RHEl8 beta here.
-
-  [root@3parserver ~]# /usr/libexec/qemu-kvm --version
-  QEMU emulator version 2.12.0 (qemu-kvm-2.12.0-41.el8+2104+3e32e6f8)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811862/+subscriptions
+--
+Alex Benn=C3=A9e
