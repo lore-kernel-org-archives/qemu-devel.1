@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60026)
+Received: from eggs.gnu.org ([209.51.188.92]:33636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gjUXM-0008Tj-Ns
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:15 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gjUZ5-0001a6-6U
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:40:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gjUXK-0000Ge-Cr
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gjUXH-00007N-TO
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:10 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0FJZcqD103021
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 14:38:01 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q1nbw9q2h-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 14:38:01 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Tue, 15 Jan 2019 19:37:59 -0000
-From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Tue, 15 Jan 2019 17:37:48 -0200
-In-Reply-To: <20190115193750.17234-1-farosas@linux.ibm.com>
-References: <20190115193750.17234-1-farosas@linux.ibm.com>
-Message-Id: <20190115193750.17234-2-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 1/3] target/ppc: Add SPRs XML generation
- code for gdbstub
+	(envelope-from <mlureau@redhat.com>) id 1gjUZ4-0001X3-4a
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:39:59 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:42534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gjUZ3-0001W6-Us
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:39:58 -0500
+Received: by mail-qt1-f195.google.com with SMTP id d19so4345957qtq.9
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 11:39:57 -0800 (PST)
+MIME-Version: 1.0
+References: <20190115145256.9593-1-berrange@redhat.com>
+	<20190115145256.9593-7-berrange@redhat.com>
+In-Reply-To: <20190115145256.9593-7-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 15 Jan 2019 23:39:45 +0400
+Message-ID: <CAMxuvaxfpEiT97VC0UbGip-wjk6HNasONXvhVyLyN8T=phuf0w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 06/12] chardev: remove unused 'sioc'
+ variable & cleanup paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,121 +30,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-A following patch will add support for handling the Special Purpose
-Registers (SPR) in GDB via gdbstub. For that purpose, GDB needs to be
-provided with an XML description of the registers (see gdb-xml
-directory).
+On Tue, Jan 15, 2019 at 6:53 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> The 'sioc' variable in qmp_chardev_open_socket was unused since
+>
+>   commit 3e7d4d20d3a528b1ed10b1dc3d83119bfb0c5f24
+>   Author: Peter Xu <peterx@redhat.com>
+>   Date:   Tue Mar 6 13:33:17 2018 +0800
+>
+>     chardev: use chardev's gcontext for async connect
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-This patch adds the code that generates the XML dynamically based on
-the SPRs already defined in the machine. This eliminates the need for
-several XML files to match each possible ppc machine.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-A "group" is defined so that the GDB command `info registers spr` can
-be used.
-
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- target/ppc/cpu.h     |  8 +++++++
- target/ppc/gdbstub.c | 54 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 62 insertions(+)
-
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 486abaf99b..34f0d2d419 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -230,6 +230,7 @@ struct ppc_spr_t {
-     void (*oea_write)(DisasContext *ctx, int spr_num, int gpr_num);
-     void (*hea_read)(DisasContext *ctx, int gpr_num, int spr_num);
-     void (*hea_write)(DisasContext *ctx, int spr_num, int gpr_num);
-+    unsigned int gdb_id;
- #endif
-     const char *name;
-     target_ulong default_value;
-@@ -1053,6 +1054,9 @@ struct CPUPPCState {
-     /* Special purpose registers */
-     target_ulong spr[1024];
-     ppc_spr_t spr_cb[1024];
-+#if !defined(CONFIG_USER_ONLY)
-+    const char *gdb_spr_xml;
-+#endif
-     /* Vector status and control register */
-     uint32_t vscr;
-     /* VSX registers (including FP and AVR) */
-@@ -1267,6 +1271,10 @@ int ppc_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
- int ppc_cpu_gdb_read_register_apple(CPUState *cpu, uint8_t *buf, int reg);
- int ppc_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- int ppc_cpu_gdb_write_register_apple(CPUState *cpu, uint8_t *buf, int reg);
-+#ifndef CONFIG_USER_ONLY
-+int ppc_gdb_gen_spr_xml(CPUState *cpu);
-+const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name);
-+#endif
- int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                                int cpuid, void *opaque);
- int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
-index 19565b584d..ce4b728028 100644
---- a/target/ppc/gdbstub.c
-+++ b/target/ppc/gdbstub.c
-@@ -319,3 +319,57 @@ int ppc_cpu_gdb_write_register_apple(CPUState *cs, uint8_t *mem_buf, int n)
-     }
-     return r;
- }
-+
-+#ifndef CONFIG_USER_ONLY
-+int ppc_gdb_gen_spr_xml(CPUState *cs)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    GString *s = g_string_new(NULL);
-+    unsigned int num_regs = 0;
-+    int i;
-+
-+    g_string_printf(s, "<?xml version=\"1.0\"?>");
-+    g_string_append_printf(s, "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">");
-+    g_string_append_printf(s, "<feature name=\"org.qemu.power.spr\">");
-+
-+    for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
-+        ppc_spr_t *spr = &env->spr_cb[i];
-+
-+        if (!spr->name) {
-+            continue;
-+        }
-+
-+        g_string_append_printf(s, "<reg name=\"%s\"",
-+                               g_ascii_strdown(spr->name, -1));
-+        g_string_append_printf(s, " bitsize=\"%d\"", TARGET_LONG_BITS);
-+        g_string_append_printf(s, " group=\"spr\"/>");
-+
-+        /*
-+         * GDB identifies registers based on the order they are
-+         * presented in the XML. These ids will not match QEMU's
-+         * representation (which follows the PowerISA).
-+         *
-+         * Store the position of the current register description so
-+         * we can make the correspondence later.
-+         */
-+        spr->gdb_id = num_regs;
-+        num_regs++;
-+    }
-+
-+    g_string_append_printf(s, "</feature>");
-+    env->gdb_spr_xml = g_string_free(s, false);
-+    return num_regs;
-+}
-+
-+const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+
-+    if (strcmp(xml_name, "power-spr.xml") == 0) {
-+        return env->gdb_spr_xml;
-+    }
-+    return NULL;
-+}
-+#endif
--- 
-2.17.1
+> ---
+>  chardev/char-socket.c | 22 +++++++---------------
+>  1 file changed, 7 insertions(+), 15 deletions(-)
+>
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index ba86284ea9..3b6ff6619b 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -1073,7 +1073,6 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>      bool is_waitconnect =3D sock->has_wait    ? sock->wait    : false;
+>      bool is_websock     =3D sock->has_websocket ? sock->websocket : fals=
+e;
+>      int64_t reconnect   =3D sock->has_reconnect ? sock->reconnect : 0;
+> -    QIOChannelSocket *sioc =3D NULL;
+>      SocketAddress *addr;
+>
+>      s->is_listen =3D is_listen;
+> @@ -1088,7 +1087,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>          if (!creds) {
+>              error_setg(errp, "No TLS credentials with id '%s'",
+>                         sock->tls_creds);
+> -            goto error;
+> +            return;
+>          }
+>          s->tls_creds =3D (QCryptoTLSCreds *)
+>              object_dynamic_cast(creds,
+> @@ -1096,20 +1095,20 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>          if (!s->tls_creds) {
+>              error_setg(errp, "Object with id '%s' is not TLS credentials=
+",
+>                         sock->tls_creds);
+> -            goto error;
+> +            return;
+>          }
+>          object_ref(OBJECT(s->tls_creds));
+>          if (is_listen) {
+>              if (s->tls_creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_S=
+ERVER) {
+>                  error_setg(errp, "%s",
+>                             "Expected TLS credentials for server endpoint=
+");
+> -                goto error;
+> +                return;
+>              }
+>          } else {
+>              if (s->tls_creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_C=
+LIENT) {
+>                  error_setg(errp, "%s",
+>                             "Expected TLS credentials for client endpoint=
+");
+> -                goto error;
+> +                return;
+>              }
+>          }
+>      }
+> @@ -1117,7 +1116,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>      s->addr =3D addr =3D socket_address_flatten(sock->addr);
+>
+>      if (!qmp_chardev_validate_socket(sock, addr, errp)) {
+> -        goto error;
+> +        return;
+>      }
+>
+>      qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_RECONNECTABLE);
+> @@ -1153,7 +1152,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>              if (qio_net_listener_open_sync(s->listener, s->addr, errp) <=
+ 0) {
+>                  object_unref(OBJECT(s->listener));
+>                  s->listener =3D NULL;
+> -                goto error;
+> +                return;
+>              }
+>
+>              qapi_free_SocketAddress(s->addr);
+> @@ -1171,16 +1170,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
+>                                                        chr->gcontext);
+>              }
+>          } else if (qemu_chr_wait_connected(chr, errp) < 0) {
+> -            goto error;
+> +            return;
+>          }
+>      }
+> -
+> -    return;
+> -
+> -error:
+> -    if (sioc) {
+> -        object_unref(OBJECT(sioc));
+> -    }
+>  }
+>
+>  static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backen=
+d,
+> --
+> 2.20.1
+>
