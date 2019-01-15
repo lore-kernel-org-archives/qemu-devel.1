@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54606)
+Received: from eggs.gnu.org ([209.51.188.92]:58834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kamalkakri2017@yahoo.com>) id 1gjXYE-0004YW-8K
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:51:19 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gjXaZ-0005wO-Ds
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kamalkakri2017@yahoo.com>) id 1gjXYB-00055Z-A2
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:51:17 -0500
-Received: from sonic307-12.consmr.mail.ne1.yahoo.com ([66.163.190.35]:36242)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kamalkakri2017@yahoo.com>)
-	id 1gjXYA-0004wY-EV
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:51:14 -0500
-Date: Tue, 15 Jan 2019 22:51:09 +0000 (UTC)
-From: Kamal Kakri <kamalkakri2017@yahoo.com>
-Message-ID: <2050085823.124754.1547592669568@mail.yahoo.com>
-In-Reply-To: <1888836717.9067.1547583207433@mail.yahoo.com>
-References: <1888836717.9067.1547583207433.ref@mail.yahoo.com>
-	<1888836717.9067.1547583207433@mail.yahoo.com>
+	(envelope-from <walling@linux.ibm.com>) id 1gjXaW-0007Za-Ks
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:53:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34702
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gjXaW-0007ML-DE
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:53:40 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0FMngo1071223
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 17:53:23 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2q1nqtgyx0-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 17:53:22 -0500
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Tue, 15 Jan 2019 22:53:22 -0000
+References: <20190114103110.10909-1-david@redhat.com>
+	<20190114103110.10909-5-david@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Tue, 15 Jan 2019 17:53:17 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Devdax backend for vnvdimm not working
+In-Reply-To: <20190114103110.10909-5-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <e897906c-9e69-16e2-9039-1e55fbac576e@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] s390x/pci: Ignore the unplug call
+ if we already have a release_timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +44,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
- My devdax device is 2MB aligned so I dont think this is alignment related.=
-# ndctl list -X -n namespace0.0
-[
-=C2=A0 {
-=C2=A0=C2=A0=C2=A0 "dev":"namespace0.0",
-=C2=A0=C2=A0=C2=A0 "mode":"devdax",
-=C2=A0=C2=A0=C2=A0 "map":"dev",
-=C2=A0=C2=A0=C2=A0 "size":16909336576,
-=C2=A0=C2=A0=C2=A0 "uuid":"e5265c0a-d902-41ce-b1d1-87a78c358aa4",
-=C2=A0=C2=A0=C2=A0 "daxregion":{
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "id":0,
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "size":16909336576,
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "align":2097152,=C2=A0 ---------------------=
----->
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "devices":[
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "chardev":"dax0.0",
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "size":16909336576
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ]
-=C2=A0=C2=A0=C2=A0 }
-=C2=A0 }
-]
+On 1/14/19 5:31 AM, David Hildenbrand wrote:
+> ... otherwise two successive calls to qdev_unplug() (e.g. by an impatient
+> user) will effectively overwrite pbdev->release_timer, resulting in a
+> memory leak. We are already processing the unplug.
+> 
 
+Does QEMU not have a way to detect if a device is already in the process 
+of being unplugged? Seems like not having that kind of protection could 
+cause many problems.
 
-I even tried to create vnvdimm of exact same size as my devdax namespace, t=
-hinking that it would not need to ftruncate in that case but I still get th=
-e same error:
-# virsh start fox22vm
-start: domain(optdata): fox22vm
-start: found option <domain>: fox22vm
-start: <domain> trying as domain NAME
-error: Failed to start domain fox22vm
-error: internal error: qemu unexpectedly closed the monitor: ftruncate: Inv=
-alid argument
-2019-01-15T21:58:52.647221Z qemu-kvm: -object memory-backend-file,id=3Dmemn=
-vdimm0,prealloc=3Dyes,mem-path=3D/dev/dax0.0,share=3Dyes,size=3D16909336576=
-: unable to map backing store for guest RAM: Invalid argument
+Perhaps that effort would be arduous.
 
+> If there is already a release_timer, the unplug will be performed after
+> the timeout.
+> 
+> Can be easily triggered by
+> (hmp) device_add virtio-mouse-pci,id=test
+> (hmp) stop
+> (hmp) device_del test
+> (hmp) device_del test
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>   hw/s390x/s390-pci-bus.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 59325cae3b..34a9cb2a80 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -972,6 +972,9 @@ static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>       case ZPCI_FS_STANDBY:
+>           break;
+>       default:
+> +        if (pbdev->release_timer) {
+> +            return;
+> +        }
+>           s390_pci_generate_plug_event(HP_EVENT_DECONFIGURE_REQUEST,
+>                                        pbdev->fh, pbdev->fid);
+>           pbdev->release_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+> 
 
-Has anyone ever got devdax backed vnvdimm configured and working?=20
-If yes then pls let me know what libvirt/qemu/kernel version you have used =
-to get it working.
+Looks good to me.
 
-Thanks.
-    On Tuesday, January 15, 2019, 3:13:27 PM EST, Kamal Kakri <kamalkakri20=
-17@yahoo.com> wrote: =20
-=20
- Hi,
-
-I have a namespace (backed by real nvdimm h/w) configured in devdax mode:
-# ndctl list -N -n namespace0.0
-[
-=C2=A0 {
-=C2=A0=C2=A0=C2=A0 "dev":"namespace0.0",
-=C2=A0=C2=A0=C2=A0 "mode":"devdax",
-=C2=A0=C2=A0=C2=A0 "map":"dev",
-=C2=A0=C2=A0=C2=A0 "size":16909336576,
-=C2=A0=C2=A0=C2=A0 "uuid":"e5265c0a-d902-41ce-b1d1-87a78c358aa4",
-=C2=A0=C2=A0=C2=A0 "chardev":"dax0.0"
-=C2=A0 }
-]
-
-
-When I try to configure my vm using "virsh" with something like this:
-=C2=A0=C2=A0=C2=A0 <memory model=3D'nvdimm' access=3D'shared'>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <source>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <path>/dev/dax0.0</path>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <align unit=3D'KiB'>2048</align>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <pmem/>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 </source>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <target>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <size unit=3D'KiB'>2097152</size=
->
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <node>0</node>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 </target>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <alias name=3D'nvdimm0'/>
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 <address type=3D'dimm' slot=3D'0'/>
-=C2=A0=C2=A0=C2=A0 </memory>
-
-
-I get an error while starting my vm:
-# virsh start fox22vm
-start: domain(optdata): fox22vm
-start: found option <domain>: fox22vm
-start: <domain> trying as domain NAME
-error: Failed to start domain fox22vm
-error: internal error: qemu unexpectedly closed the monitor: ftruncate: Inv=
-alid argument
-2019-01-15T18:00:36.587467Z qemu-kvm: -object memory-backend-file,id=3Dmemn=
-vdimm0,prealloc=3Dyes,mem-path=3D/dev/dax0.0,share=3Dyes,size=3D2147483648:=
- unable to map backing store for guest RAM: Invalid argument
-
-I have tried to add "align unit" to my virsh xml but it does not seem to pa=
-ss it onto qemu (as much as I can see from the qemu cmd line in the logs at=
- /var/log/libvirt/qemu)
-
-
-Can anyone pls hint as to what possibly could be the issue ? Is this alignm=
-ent related or something else ?
-
-Here are my versions:
-# virsh --version
-4.5.0
-[root@fox22hv libexec]# /usr/libexec/qemu-kvm --version
-QEMU emulator version 2.12.0 (qemu-kvm-rhev-2.12.0-18.el7_6.1)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-# uname -a
-Linux fox22hv 4.19.0-1.el7.elrepo.x86_64 #1 SMP Mon Oct 22 10:40:32 EDT 201=
-8 x86_64 x86_64 x86_64 GNU/Linux
-
-
-
-
- =20
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
