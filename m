@@ -1,40 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57817)
+Received: from eggs.gnu.org ([209.51.188.92]:58759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gjQkp-0000Vu-Kh
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:52 -0500
+	(envelope-from <berrange@redhat.com>) id 1gjQoW-0003IA-6i
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1gjQko-0007a8-R7
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:51 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33822)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1gjQko-0007Zj-Gi
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:35:50 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0FFTHMm099836
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:35:48 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2q1h3hvgkc-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:35:48 -0500
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Tue, 15 Jan 2019 15:35:47 -0000
-References: <1547125207-16907-1-git-send-email-pmorel@linux.ibm.com>
-	<1547125207-16907-2-git-send-email-pmorel@linux.ibm.com>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Tue, 15 Jan 2019 10:35:42 -0500
+	(envelope-from <berrange@redhat.com>) id 1gjQoV-0000gE-6t
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:39:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33136)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gjQoV-0000fH-0w
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:39:39 -0500
+Date: Tue, 15 Jan 2019 15:39:21 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190115153921.GD16157@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190110124946.GL2178@redhat.com>
+	<CAONzpcZCTqN3CN1DBd6WdjKoTSr257Y2vOCuLOh9LBb-5K_hpg@mail.gmail.com>
+	<20190110132443.GM2178@redhat.com>
+	<CAONzpcZ5HXP2-9PEZW=RwunviAcPL3kYosJhUWB0g09j=pf0oQ@mail.gmail.com>
+	<20190110141125.GP2178@redhat.com>
+	<CAONzpcY8LdzEEqourAjw5mZR9fjtjv20HqvyOvaWVoriD4Cbjg@mail.gmail.com>
+	<20190110164125.GS2178@redhat.com>
+	<CAONzpcb4hk87JhF0Cuz4xWDto5EOaKQSVPvegiUVF+2TbYGouw@mail.gmail.com>
+	<20190111083237.GA18491@redhat.com>
+	<CAONzpcaB=JVG2nkPMUUFLkGM14j=pZGSA8hyTBQ-+syL5J_WgA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1547125207-16907-2-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <f6a5491a-1859-8e0a-7357-901d47ee8304@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: Set the iommu region size
- mpcifc request
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAONzpcaB=JVG2nkPMUUFLkGM14j=pZGSA8hyTBQ-+syL5J_WgA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 for-4.0 1/7] char-socket: Enable
+ "nowait" option on client sockets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,35 +38,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+To: Yongji Xie <elohimes@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Jason Wang <jasowang@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Yury Kotov <yury-kotov@yandex-team.ru>, =?utf-8?B?0JXQstCz0LXQvdC40Lkg0K/QutC+0LLQu9C10LI=?= <wrfsh@yandex-team.ru>, qemu-devel <qemu-devel@nongnu.org>, zhangyu31@baidu.com, chaiwen@baidu.com, nixun@baidu.com, lilin24@baidu.com, Xie Yongji <xieyongji@baidu.com>
 
-On 1/10/19 8:00 AM, Pierre Morel wrote:
-> The size of the accessible iommu memory region in the guest
-> is given to the IOMMU by the guest through the mpcifc request
-> specifying the PCI Base Address and the PCI Address Limit.
-> 
-> Let set the size of the IOMMU region to:
->      (PCI Address Limit) - (PCI Base Address) + 1.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   hw/s390x/s390-pci-bus.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 69e0671..e97696a 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -660,7 +660,7 @@ void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
->       char *name = g_strdup_printf("iommu-s390-%04x", iommu->pbdev->uid);
->       memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr),
->                                TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&iommu->mr),
-> -                             name, iommu->pal + 1);
-> +                             name, iommu->pal - iommu->pba + 1);
->       iommu->enabled = true;
->       memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->iommu_mr));
->       g_free(name);
-> 
+On Fri, Jan 11, 2019 at 04:36:11PM +0800, Yongji Xie wrote:
+> On Fri, 11 Jan 2019 at 16:32, Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+> >
+> > On Fri, Jan 11, 2019 at 03:50:40PM +0800, Yongji Xie wrote:
+> > > On Fri, 11 Jan 2019 at 00:41, Daniel P. Berrang=C3=A9 <berrange@red=
+hat.com> wrote:
+> > > >
+> > > > We need to fix qemu_chr_fe_wait_connected so that it does explici=
+t
+> > > > synchronization wrt to any ongoing background connection process.
+> > > > It must only return once all TLS/telnet/websock handshakes have
+> > > > completed.  If we fix that correctly, then I believe it will  als=
+o
+> > > > solve the problem you're trying to address.
+> > > >
+> > >
+> > > Yes, I think this should be the right way to go. To fix it, my thou=
+ght
+> > > is to track the async QIOChannelSocket in SocketChardev. Then we ca=
+n
+> > > easily get the connection progress in qemu_chr_fe_wait_connected().=
+ Do
+> > > you have any suggestion?
+> >
+> > I've got a few patches that refactor the code to fix this. I'll send =
+them
+> > today and CC you on them.
+> >
+>=20
+> That would be great! Thank you.
 
-Acked-by: Collin Walling <walling@linux.ibm.com>
+It took me rather longer than expected to fully debug all scenarios, but
+I've finally sent patches:
+
+https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03344.html
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
