@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53307)
+Received: from eggs.gnu.org ([209.51.188.92]:53485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gjTJ2-0005HP-Uo
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:19:24 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gjTJF-0005PL-Bh
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:19:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gjTIz-0005FT-Fz
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:19:20 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51491)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gjTJ3-0005Iw-5y
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:19:29 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42828)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gjTIz-0005EL-4R
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:19:17 -0500
-Received: by mail-wm1-x343.google.com with SMTP id b11so4331087wmj.1
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:19:17 -0800 (PST)
+	id 1gjTJ2-0005HQ-Io
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:19:21 -0500
+Received: by mail-wr1-x432.google.com with SMTP id q18so4064495wrx.9
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 10:19:20 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 15 Jan 2019 19:19:08 +0100
-Message-Id: <1547576349-13337-5-git-send-email-pbonzini@redhat.com>
+Date: Tue, 15 Jan 2019 19:19:09 +0100
+Message-Id: <1547576349-13337-6-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1547576349-13337-1-git-send-email-pbonzini@redhat.com>
 References: <1547576349-13337-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/5] tests/libqos: embed allocators instead of
- malloc-ing them separately
+Subject: [Qemu-devel] [PATCH 5/5] tests: qgraph API for the qtest driver
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,1044 +29,2625 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, lvivier@redhat.com
+Cc: thuth@redhat.com, lvivier@redhat.com, Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-qgraph will embed these objects instead of allocating them in a separate
-object.  Expose a new API "generic_alloc_init" and "generic_alloc_destroy"
-for that, and rename the existing API with s/init/new/ and s/uninit/free/.
+From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+
+Add qgraph API that allows to add/remove nodes and edges from the graph,
+implementation of Depth First Search to discover the paths and basic unit
+test to check correctness of the API.
+Included also a main executable that takes care of starting the framework,
+create the nodes, set the available drivers/machines, discover the path and
+run tests.
+
+graph.h provides the public API to manage the graph nodes/edges
+graph_extra.h provides a more private API used successively by the gtest integration part
+qos-test.c provides the main executable
+
+Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+[Paolo's changes compared to the Google Summer of Code submission:
+ * added subprocess to test options
+ * refactored object creation to support live migration tests
+ * removed driver .before callback (unused)
+ * removed test .after callbacks (replaced by GTest destruction queue)]
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/ahci-test.c             |  6 ++--
- tests/e1000e-test.c           | 22 +++++++-------
- tests/ide-test.c              | 17 +++++------
- tests/libqos/libqos-pc.c      |  3 +-
- tests/libqos/libqos-spapr.c   |  3 +-
- tests/libqos/libqos.c         | 13 ++++----
- tests/libqos/libqos.h         | 11 ++++---
- tests/libqos/malloc-generic.c | 21 ++-----------
- tests/libqos/malloc-generic.h |  7 ++---
- tests/libqos/malloc-pc.c      | 18 ++---------
- tests/libqos/malloc-pc.h      |  4 +--
- tests/libqos/malloc-spapr.c   | 19 ++----------
- tests/libqos/malloc-spapr.h   |  4 +--
- tests/libqos/malloc.c         | 41 ++++---------------------
- tests/libqos/malloc.h         | 21 +++++++++----
- tests/rtas-test.c             |  2 +-
- tests/vhost-user-test.c       | 10 +++----
- tests/virtio-9p-test.c        | 12 ++++----
- tests/virtio-blk-test.c       | 69 ++++++++++++++++++++++---------------------
- tests/virtio-net-test.c       | 10 +++----
- tests/virtio-scsi-test.c      | 14 ++++-----
- 21 files changed, 123 insertions(+), 204 deletions(-)
+ configure                      |   2 +-
+ include/qemu/module.h          |   2 +
+ tests/Makefile.include         |  13 +-
+ tests/libqos/qgraph.c          | 756 +++++++++++++++++++++++++++++++++++++++++
+ tests/libqos/qgraph.h          | 575 +++++++++++++++++++++++++++++++
+ tests/libqos/qgraph_internal.h | 257 ++++++++++++++
+ tests/libqtest.h               |   3 +
+ tests/qos-test.c               | 450 ++++++++++++++++++++++++
+ tests/test-qgraph.c            | 434 +++++++++++++++++++++++
+ 9 files changed, 2489 insertions(+), 3 deletions(-)
+ create mode 100644 tests/libqos/qgraph.c
+ create mode 100644 tests/libqos/qgraph.h
+ create mode 100644 tests/libqos/qgraph_internal.h
+ create mode 100644 tests/qos-test.c
+ create mode 100644 tests/test-qgraph.c
 
-diff --git a/tests/ahci-test.c b/tests/ahci-test.c
-index 5dd380e..9f07e6f 100644
---- a/tests/ahci-test.c
-+++ b/tests/ahci-test.c
-@@ -162,7 +162,7 @@ static AHCIQState *ahci_vboot(const char *cli, va_list ap)
-     s = g_new0(AHCIQState, 1);
-     s->parent = qtest_pc_vboot(cli, ap);
-     global_qtest = s->parent->qts;
--    alloc_set_flags(s->parent->alloc, ALLOC_LEAK_ASSERT);
-+    alloc_set_flags(&s->parent->alloc, ALLOC_LEAK_ASSERT);
- 
-     /* Verify that we have an AHCI device present. */
-     s->dev = get_ahci_device(s->parent->qts, &s->fingerprint);
-@@ -1039,7 +1039,7 @@ static void test_dma_fragmented(void)
-     generate_pattern(tx, bufsize, AHCI_SECTOR_SIZE);
- 
-     /* Create a DMA buffer in guest memory, and write our pattern to it. */
--    ptr = guest_alloc(ahci->parent->alloc, bufsize);
-+    ptr = guest_alloc(&ahci->parent->alloc, bufsize);
-     g_assert(ptr);
-     bufwrite(ptr, tx, bufsize);
- 
-@@ -1059,7 +1059,7 @@ static void test_dma_fragmented(void)
- 
-     /* Read back the guest's receive buffer into local memory */
-     bufread(ptr, rx, bufsize);
--    guest_free(ahci->parent->alloc, ptr);
-+    guest_free(&ahci->parent->alloc, ptr);
- 
-     g_assert_cmphex(memcmp(tx, rx, bufsize), ==, 0);
- 
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index 5525589..17a12b8 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -94,7 +94,7 @@ typedef struct e1000e_device {
- } e1000e_device;
- 
- static int test_sockets[2];
--static QGuestAllocator *test_alloc;
-+static QGuestAllocator test_alloc;
- static QPCIBus *test_bus;
- 
- static void e1000e_pci_foreach_callback(QPCIDevice *dev, int devfn, void *data)
-@@ -165,7 +165,7 @@ static void e1000e_device_init(QPCIBus *bus, e1000e_device *d)
-         val | E1000E_CTRL_EXT_DRV_LOAD | E1000E_CTRL_EXT_TXLSFLOW);
- 
-     /* Allocate and setup TX ring */
--    d->tx_ring = guest_alloc(test_alloc, E1000E_RING_LEN);
-+    d->tx_ring = guest_alloc(&test_alloc, E1000E_RING_LEN);
-     g_assert(d->tx_ring != 0);
- 
-     e1000e_macreg_write(d, E1000E_TDBAL, (uint32_t) d->tx_ring);
-@@ -178,7 +178,7 @@ static void e1000e_device_init(QPCIBus *bus, e1000e_device *d)
-     e1000e_macreg_write(d, E1000E_TCTL, E1000E_TCTL_EN);
- 
-     /* Allocate and setup RX ring */
--    d->rx_ring = guest_alloc(test_alloc, E1000E_RING_LEN);
-+    d->rx_ring = guest_alloc(&test_alloc, E1000E_RING_LEN);
-     g_assert(d->rx_ring != 0);
- 
-     e1000e_macreg_write(d, E1000E_RDBAL, (uint32_t)d->rx_ring);
-@@ -268,7 +268,7 @@ static void e1000e_send_verify(e1000e_device *d)
-     uint32_t recv_len;
- 
-     /* Prepare test data buffer */
--    uint64_t data = guest_alloc(test_alloc, data_len);
-+    uint64_t data = guest_alloc(&test_alloc, data_len);
-     memwrite(data, "TEST", 5);
- 
-     /* Prepare TX descriptor */
-@@ -296,7 +296,7 @@ static void e1000e_send_verify(e1000e_device *d)
-     g_assert_cmpstr(buffer, == , "TEST");
- 
-     /* Free test data buffer */
--    guest_free(test_alloc, data);
-+    guest_free(&test_alloc, data);
- }
- 
- static void e1000e_receive_verify(e1000e_device *d)
-@@ -348,7 +348,7 @@ static void e1000e_receive_verify(e1000e_device *d)
-     g_assert_cmpint(ret, == , sizeof(test) + sizeof(len));
- 
-     /* Prepare test data buffer */
--    uint64_t data = guest_alloc(test_alloc, data_len);
-+    uint64_t data = guest_alloc(&test_alloc, data_len);
- 
-     /* Prepare RX descriptor */
-     memset(&descr, 0, sizeof(descr));
-@@ -369,7 +369,7 @@ static void e1000e_receive_verify(e1000e_device *d)
-     g_assert_cmpstr(buffer, == , "TEST");
- 
-     /* Free test data buffer */
--    guest_free(test_alloc, data);
-+    guest_free(&test_alloc, data);
- }
- 
- static void e1000e_device_clear(QPCIBus *bus, e1000e_device *d)
-@@ -392,10 +392,8 @@ static void data_test_init(e1000e_device *d)
-     qtest_start(cmdline);
-     g_free(cmdline);
- 
--    test_alloc = pc_alloc_init(global_qtest);
--    g_assert_nonnull(test_alloc);
--
--    test_bus = qpci_new_pc(global_qtest, test_alloc);
-+    pc_alloc_init(&test_alloc, global_qtest, 0);
-+    test_bus = qpci_new_pc(global_qtest, &test_alloc);
-     g_assert_nonnull(test_bus);
- 
-     e1000e_device_init(test_bus, d);
-@@ -405,7 +403,7 @@ static void data_test_clear(e1000e_device *d)
- {
-     e1000e_device_clear(test_bus, d);
-     close(test_sockets[0]);
--    pc_alloc_uninit(test_alloc);
-+    alloc_destroy(&test_alloc);
-     g_free(d->pci_dev);
-     qpci_free_pc(test_bus);
-     qtest_end();
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index 8f5adae..ef776fc 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -120,7 +120,7 @@ enum {
- #define assert_bit_clear(data, mask) g_assert_cmphex((data) & (mask), ==, 0)
- 
- static QPCIBus *pcibus = NULL;
--static QGuestAllocator *guest_malloc;
-+static QGuestAllocator guest_malloc;
- 
- static char tmp_path[] = "/tmp/qtest.XXXXXX";
- static char debug_path[] = "/tmp/qtest-blkdebug.XXXXXX";
-@@ -135,7 +135,7 @@ static void ide_test_start(const char *cmdline_fmt, ...)
-     va_end(ap);
- 
-     qtest_start(cmdline);
--    guest_malloc = pc_alloc_init(global_qtest);
-+    pc_alloc_init(&guest_malloc, global_qtest, 0);
- 
-     g_free(cmdline);
- }
-@@ -146,8 +146,7 @@ static void ide_test_quit(void)
-         qpci_free_pc(pcibus);
-         pcibus = NULL;
-     }
--    pc_alloc_uninit(guest_malloc);
--    guest_malloc = NULL;
-+    alloc_destroy(&guest_malloc);
-     qtest_end();
- }
- 
-@@ -246,7 +245,7 @@ static int send_dma_request(int cmd, uint64_t sector, int nb_sectors,
- 
-     /* Setup PRDT */
-     len = sizeof(*prdt) * prdt_entries;
--    guest_prdt = guest_alloc(guest_malloc, len);
-+    guest_prdt = guest_alloc(&guest_malloc, len);
-     memwrite(guest_prdt, prdt, len);
-     qpci_io_writel(dev, bmdma_bar, bmreg_prdt, guest_prdt);
- 
-@@ -311,7 +310,7 @@ static void test_bmdma_simple_rw(void)
-     uint8_t *buf;
-     uint8_t *cmpbuf;
-     size_t len = 512;
--    uintptr_t guest_buf = guest_alloc(guest_malloc, len);
-+    uintptr_t guest_buf = guest_alloc(&guest_malloc, len);
- 
-     PrdtEntry prdt[] = {
-         {
-@@ -381,7 +380,7 @@ static void test_bmdma_trim(void)
-     const uint64_t bad_range = trim_range_le(TEST_IMAGE_SIZE / 512 - 1, 2);
-     size_t len = 512;
-     uint8_t *buf;
--    uintptr_t guest_buf = guest_alloc(guest_malloc, len);
-+    uintptr_t guest_buf = guest_alloc(&guest_malloc, len);
- 
-     PrdtEntry prdt[] = {
-         {
-@@ -625,7 +624,7 @@ static void make_dirty(uint8_t device)
- 
-     dev = get_pci_device(&bmdma_bar, &ide_bar);
- 
--    guest_buf = guest_alloc(guest_malloc, len);
-+    guest_buf = guest_alloc(&guest_malloc, len);
-     buf = g_malloc(len);
-     memset(buf, rand() % 255 + 1, len);
-     g_assert(guest_buf);
-@@ -986,7 +985,7 @@ static void test_cdrom_dma(void)
-                    "-device ide-cd,drive=sr0,bus=ide.0", tmp_path);
-     qtest_irq_intercept_in(global_qtest, "ioapic");
- 
--    guest_buf = guest_alloc(guest_malloc, len);
-+    guest_buf = guest_alloc(&guest_malloc, len);
-     prdt[0].addr = cpu_to_le32(guest_buf);
-     prdt[0].size = cpu_to_le32(len | PRDT_EOT);
- 
-diff --git a/tests/libqos/libqos-pc.c b/tests/libqos/libqos-pc.c
-index 293f9b6..d04abc5 100644
---- a/tests/libqos/libqos-pc.c
-+++ b/tests/libqos/libqos-pc.c
-@@ -4,8 +4,7 @@
- #include "libqos/pci-pc.h"
- 
- static QOSOps qos_ops = {
--    .init_allocator = pc_alloc_init_flags,
--    .uninit_allocator = pc_alloc_uninit,
-+    .alloc_init = pc_alloc_init,
-     .qpci_new = qpci_new_pc,
-     .qpci_free = qpci_free_pc,
-     .shutdown = qtest_pc_shutdown,
-diff --git a/tests/libqos/libqos-spapr.c b/tests/libqos/libqos-spapr.c
-index 64addfe..8766d54 100644
---- a/tests/libqos/libqos-spapr.c
-+++ b/tests/libqos/libqos-spapr.c
-@@ -4,8 +4,7 @@
- #include "libqos/pci-spapr.h"
- 
- static QOSOps qos_ops = {
--    .init_allocator = spapr_alloc_init_flags,
--    .uninit_allocator = spapr_alloc_uninit,
-+    .alloc_init = spapr_alloc_init,
-     .qpci_new = qpci_new_spapr,
-     .qpci_free = qpci_free_spapr,
-     .shutdown = qtest_spapr_shutdown,
-diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-index 6c91371..636a111 100644
---- a/tests/libqos/libqos.c
-+++ b/tests/libqos/libqos.c
-@@ -24,8 +24,8 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdline_fmt, va_list ap)
-     qs->qts = qtest_init(cmdline);
-     qs->ops = ops;
-     if (ops) {
--        qs->alloc = ops->init_allocator(qs->qts, ALLOC_NO_FLAGS);
--        qs->pcibus = ops->qpci_new(qs->qts, qs->alloc);
-+        ops->alloc_init(&qs->alloc, qs->qts, ALLOC_NO_FLAGS);
-+        qs->pcibus = ops->qpci_new(qs->qts, &qs->alloc);
-     }
- 
-     g_free(cmdline);
-@@ -58,11 +58,8 @@ void qtest_common_shutdown(QOSState *qs)
-             qs->ops->qpci_free(qs->pcibus);
-             qs->pcibus = NULL;
-         }
--        if (qs->alloc && qs->ops->uninit_allocator) {
--            qs->ops->uninit_allocator(qs->alloc);
--            qs->alloc = NULL;
--        }
-     }
-+    alloc_destroy(&qs->alloc);
-     qtest_quit(qs->qts);
-     g_free(qs);
- }
-@@ -116,7 +113,7 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
- 
-     /* If we were running, we can wait for an event. */
-     if (running) {
--        migrate_allocator(from->alloc, to->alloc);
-+        migrate_allocator(&from->alloc, &to->alloc);
-         set_context(to);
-         qtest_qmp_eventwait(to->qts, "RESUME");
-         return;
-@@ -146,7 +143,7 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
-         g_assert_not_reached();
-     }
- 
--    migrate_allocator(from->alloc, to->alloc);
-+    migrate_allocator(&from->alloc, &to->alloc);
-     set_context(to);
- }
- 
-diff --git a/tests/libqos/libqos.h b/tests/libqos/libqos.h
-index 1af6035..149b0be 100644
---- a/tests/libqos/libqos.h
-+++ b/tests/libqos/libqos.h
-@@ -3,13 +3,12 @@
- 
- #include "libqtest.h"
- #include "libqos/pci.h"
--#include "libqos/malloc-pc.h"
-+#include "libqos/malloc.h"
- 
- typedef struct QOSState QOSState;
- 
- typedef struct QOSOps {
--    QGuestAllocator *(*init_allocator)(QTestState *qts, QAllocOpts);
--    void (*uninit_allocator)(QGuestAllocator *);
-+    void (*alloc_init)(QGuestAllocator *, QTestState *, QAllocOpts);
-     QPCIBus *(*qpci_new)(QTestState *qts, QGuestAllocator *alloc);
-     void (*qpci_free)(QPCIBus *bus);
-     void (*shutdown)(QOSState *);
-@@ -17,7 +16,7 @@ typedef struct QOSOps {
- 
- struct QOSState {
-     QTestState *qts;
--    QGuestAllocator *alloc;
-+    QGuestAllocator alloc;
-     QPCIBus *pcibus;
-     QOSOps *ops;
- };
-@@ -36,12 +35,12 @@ void generate_pattern(void *buffer, size_t len, size_t cycle_len);
- 
- static inline uint64_t qmalloc(QOSState *q, size_t bytes)
- {
--    return guest_alloc(q->alloc, bytes);
-+    return guest_alloc(&q->alloc, bytes);
- }
- 
- static inline void qfree(QOSState *q, uint64_t addr)
- {
--    guest_free(q->alloc, addr);
-+    guest_free(&q->alloc, addr);
- }
- 
- #endif
-diff --git a/tests/libqos/malloc-generic.c b/tests/libqos/malloc-generic.c
-index 33ce90b..766a308 100644
---- a/tests/libqos/malloc-generic.c
-+++ b/tests/libqos/malloc-generic.c
-@@ -15,25 +15,10 @@
-  * Mostly for valgrind happiness, but it does offer
-  * a chokepoint for debugging guest memory leaks, too.
-  */
--void generic_alloc_uninit(QGuestAllocator *allocator)
-+void generic_alloc_init(QGuestAllocator *s, uint64_t base_addr,
-+                        uint64_t size, uint32_t page_size)
- {
--    alloc_uninit(allocator);
--}
--
--QGuestAllocator *generic_alloc_init_flags(uint64_t base_addr, uint64_t size,
--                                        uint32_t page_size, QAllocOpts flags)
--{
--    QGuestAllocator *s;
-     uint64_t start = base_addr + (1 << 20); /* Start at 1MB */
- 
--    s = alloc_init_flags(flags, start, start + size);
--    alloc_set_page_size(s, page_size);
--
--    return s;
--}
--
--inline QGuestAllocator *generic_alloc_init(uint64_t base_addr, uint64_t size,
--                                                            uint32_t page_size)
--{
--    return generic_alloc_init_flags(base_addr, size, page_size, ALLOC_NO_FLAGS);
-+    alloc_init(s, 0, start, start + size, page_size);
- }
-diff --git a/tests/libqos/malloc-generic.h b/tests/libqos/malloc-generic.h
-index 90104ec..40ea058 100644
---- a/tests/libqos/malloc-generic.h
-+++ b/tests/libqos/malloc-generic.h
-@@ -12,10 +12,7 @@
- 
- #include "libqos/malloc.h"
- 
--QGuestAllocator *generic_alloc_init(uint64_t base_addr, uint64_t size,
--                                                            uint32_t page_size);
--QGuestAllocator *generic_alloc_init_flags(uint64_t base_addr, uint64_t size,
--                                        uint32_t page_size, QAllocOpts flags);
--void generic_alloc_uninit(QGuestAllocator *allocator);
-+void generic_alloc_init(QGuestAllocator *s, uint64_t base_addr, uint64_t size,
-+                        uint32_t page_size);
- 
- #endif
-diff --git a/tests/libqos/malloc-pc.c b/tests/libqos/malloc-pc.c
-index b83cb8f..9aff807 100644
---- a/tests/libqos/malloc-pc.c
-+++ b/tests/libqos/malloc-pc.c
-@@ -24,28 +24,14 @@
-  * Mostly for valgrind happiness, but it does offer
-  * a chokepoint for debugging guest memory leaks, too.
-  */
--void pc_alloc_uninit(QGuestAllocator *allocator)
-+void pc_alloc_init(QGuestAllocator *s, QTestState *qts, QAllocOpts flags)
- {
--    alloc_uninit(allocator);
--}
--
--QGuestAllocator *pc_alloc_init_flags(QTestState *qts, QAllocOpts flags)
--{
--    QGuestAllocator *s;
-     uint64_t ram_size;
-     QFWCFG *fw_cfg = pc_fw_cfg_init(qts);
- 
-     ram_size = qfw_cfg_get_u64(fw_cfg, FW_CFG_RAM_SIZE);
--    s = alloc_init_flags(flags, 1 << 20, MIN(ram_size, 0xE0000000));
--    alloc_set_page_size(s, PAGE_SIZE);
-+    alloc_init(s, flags, 1 << 20, MIN(ram_size, 0xE0000000), PAGE_SIZE);
- 
-     /* clean-up */
-     g_free(fw_cfg);
--
--    return s;
--}
--
--inline QGuestAllocator *pc_alloc_init(QTestState *qts)
--{
--    return pc_alloc_init_flags(qts, ALLOC_NO_FLAGS);
- }
-diff --git a/tests/libqos/malloc-pc.h b/tests/libqos/malloc-pc.h
-index 10f3da6..21e75ae 100644
---- a/tests/libqos/malloc-pc.h
-+++ b/tests/libqos/malloc-pc.h
-@@ -15,8 +15,6 @@
- 
- #include "libqos/malloc.h"
- 
--QGuestAllocator *pc_alloc_init(QTestState *qts);
--QGuestAllocator *pc_alloc_init_flags(QTestState *qts, QAllocOpts flags);
--void pc_alloc_uninit(QGuestAllocator *allocator);
-+void pc_alloc_init(QGuestAllocator *s, QTestState *qts, QAllocOpts flags);
- 
- #endif
-diff --git a/tests/libqos/malloc-spapr.c b/tests/libqos/malloc-spapr.c
-index 1c359ce..2a6b7e3 100644
---- a/tests/libqos/malloc-spapr.c
-+++ b/tests/libqos/malloc-spapr.c
-@@ -17,22 +17,7 @@
-  */
- #define SPAPR_MIN_SIZE 0x10000000
- 
--void spapr_alloc_uninit(QGuestAllocator *allocator)
-+void spapr_alloc_init(QGuestAllocator *s, QTestState *qts, QAllocOpts flags)
- {
--    alloc_uninit(allocator);
--}
--
--QGuestAllocator *spapr_alloc_init_flags(QTestState *qts, QAllocOpts flags)
--{
--    QGuestAllocator *s;
--
--    s = alloc_init_flags(flags, 1 << 20, SPAPR_MIN_SIZE);
--    alloc_set_page_size(s, PAGE_SIZE);
--
--    return s;
--}
--
--QGuestAllocator *spapr_alloc_init(void)
--{
--    return spapr_alloc_init_flags(NULL, ALLOC_NO_FLAGS);
-+    alloc_init(s, flags, 1 << 20, SPAPR_MIN_SIZE, PAGE_SIZE);
- }
-diff --git a/tests/libqos/malloc-spapr.h b/tests/libqos/malloc-spapr.h
-index 52a9346..e5fe9bf 100644
---- a/tests/libqos/malloc-spapr.h
-+++ b/tests/libqos/malloc-spapr.h
-@@ -10,8 +10,6 @@
- 
- #include "libqos/malloc.h"
- 
--QGuestAllocator *spapr_alloc_init(void);
--QGuestAllocator *spapr_alloc_init_flags(QTestState *qts, QAllocOpts flags);
--void spapr_alloc_uninit(QGuestAllocator *allocator);
-+void spapr_alloc_init(QGuestAllocator *s, QTestState *qts, QAllocOpts flags);
- 
- #endif
-diff --git a/tests/libqos/malloc.c b/tests/libqos/malloc.c
-index f7bae47..d44ae27 100644
---- a/tests/libqos/malloc.c
-+++ b/tests/libqos/malloc.c
-@@ -15,24 +15,12 @@
- #include "qemu-common.h"
- #include "qemu/host-utils.h"
- 
--typedef QTAILQ_HEAD(MemList, MemBlock) MemList;
--
- typedef struct MemBlock {
-     QTAILQ_ENTRY(MemBlock) MLIST_ENTNAME;
-     uint64_t size;
-     uint64_t addr;
- } MemBlock;
- 
--struct QGuestAllocator {
--    QAllocOpts opts;
--    uint64_t start;
--    uint64_t end;
--    uint32_t page_size;
--
--    MemList *used;
--    MemList *free;
--};
--
- #define DEFAULT_PAGE_SIZE 4096
- 
- static void mlist_delete(MemList *list, MemBlock *node)
-@@ -225,7 +213,7 @@ static void mlist_free(QGuestAllocator *s, uint64_t addr)
-  * Mostly for valgrind happiness, but it does offer
-  * a chokepoint for debugging guest memory leaks, too.
-  */
--void alloc_uninit(QGuestAllocator *allocator)
-+void alloc_destroy(QGuestAllocator *allocator)
- {
-     MemBlock *node;
-     MemBlock *tmp;
-@@ -261,7 +249,6 @@ void alloc_uninit(QGuestAllocator *allocator)
- 
-     g_free(allocator->used);
-     g_free(allocator->free);
--    g_free(allocator);
- }
- 
- uint64_t guest_alloc(QGuestAllocator *allocator, size_t size)
-@@ -297,9 +284,10 @@ void guest_free(QGuestAllocator *allocator, uint64_t addr)
-     }
- }
- 
--QGuestAllocator *alloc_init(uint64_t start, uint64_t end)
-+void alloc_init(QGuestAllocator *s, QAllocOpts opts,
-+                uint64_t start, uint64_t end,
-+                size_t page_size)
- {
--    QGuestAllocator *s = g_malloc0(sizeof(*s));
-     MemBlock *node;
- 
-     s->start = start;
-@@ -313,26 +301,7 @@ QGuestAllocator *alloc_init(uint64_t start, uint64_t end)
-     node = mlist_new(s->start, s->end - s->start);
-     QTAILQ_INSERT_HEAD(s->free, node, MLIST_ENTNAME);
- 
--    s->page_size = DEFAULT_PAGE_SIZE;
--
--    return s;
--}
--
--QGuestAllocator *alloc_init_flags(QAllocOpts opts,
--                                  uint64_t start, uint64_t end)
--{
--    QGuestAllocator *s = alloc_init(start, end);
--    s->opts = opts;
--    return s;
--}
--
--void alloc_set_page_size(QGuestAllocator *allocator, size_t page_size)
--{
--    /* Can't alter the page_size for an allocator in-use */
--    g_assert(QTAILQ_EMPTY(allocator->used));
--
--    g_assert(is_power_of_2(page_size));
--    allocator->page_size = page_size;
-+    s->page_size = page_size;
- }
- 
- void alloc_set_flags(QGuestAllocator *allocator, QAllocOpts opts)
-diff --git a/tests/libqos/malloc.h b/tests/libqos/malloc.h
-index 828fdda..4d1a2e2 100644
---- a/tests/libqos/malloc.h
-+++ b/tests/libqos/malloc.h
-@@ -23,19 +23,28 @@ typedef enum {
-     ALLOC_PARANOID    = 0x04
- } QAllocOpts;
- 
--typedef struct QGuestAllocator QGuestAllocator;
-+typedef QTAILQ_HEAD(MemList, MemBlock) MemList;
- 
--void alloc_uninit(QGuestAllocator *allocator);
-+typedef struct QGuestAllocator {
-+    QAllocOpts opts;
-+    uint64_t start;
-+    uint64_t end;
-+    uint32_t page_size;
+diff --git a/configure b/configure
+index 3126e20..cf2c3f3 100755
+--- a/configure
++++ b/configure
+@@ -7581,7 +7581,7 @@ fi
+ # tests might fail. Prefer to keep the relevant files in their own
+ # directory and symlink the directory instead.
+ DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests tests/vm"
+-DIRS="$DIRS tests/fp"
++DIRS="$DIRS tests/fp tests/qgraph"
+ DIRS="$DIRS docs docs/interop fsdev scsi"
+ DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
+ DIRS="$DIRS roms/seabios roms/vgabios"
+diff --git a/include/qemu/module.h b/include/qemu/module.h
+index 54300ab..1fcdca0 100644
+--- a/include/qemu/module.h
++++ b/include/qemu/module.h
+@@ -44,6 +44,7 @@ typedef enum {
+     MODULE_INIT_OPTS,
+     MODULE_INIT_QOM,
+     MODULE_INIT_TRACE,
++    MODULE_INIT_LIBQOS,
+     MODULE_INIT_MAX
+ } module_init_type;
+ 
+@@ -51,6 +52,7 @@ typedef enum {
+ #define opts_init(function) module_init(function, MODULE_INIT_OPTS)
+ #define type_init(function) module_init(function, MODULE_INIT_QOM)
+ #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
++#define libqos_init(function) module_init(function, MODULE_INIT_LIBQOS)
+ 
+ #define block_module_load_one(lib) module_load_one("block-", lib)
+ #define ui_module_load_one(lib) module_load_one("ui-", lib)
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 8b88cd5..4a66fda 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -668,7 +668,10 @@ tests/test-crypto-ivgen$(EXESUF): tests/test-crypto-ivgen.o $(test-crypto-obj-y)
+ tests/test-crypto-afsplit$(EXESUF): tests/test-crypto-afsplit.o $(test-crypto-obj-y)
+ tests/test-crypto-block$(EXESUF): tests/test-crypto-block.o $(test-crypto-obj-y)
+ 
+-libqos-obj-y = tests/libqos/pci.o tests/libqos/fw_cfg.o tests/libqos/malloc.o
++libqgraph-obj-y = tests/libqos/qgraph.o
 +
-+    MemList *used;
-+    MemList *free;
-+} QGuestAllocator;
- 
- /* Always returns page aligned values */
- uint64_t guest_alloc(QGuestAllocator *allocator, size_t size);
- void guest_free(QGuestAllocator *allocator, uint64_t addr);
- void migrate_allocator(QGuestAllocator *src, QGuestAllocator *dst);
- 
--QGuestAllocator *alloc_init(uint64_t start, uint64_t end);
--QGuestAllocator *alloc_init_flags(QAllocOpts flags,
--                                  uint64_t start, uint64_t end);
--void alloc_set_page_size(QGuestAllocator *allocator, size_t page_size);
- void alloc_set_flags(QGuestAllocator *allocator, QAllocOpts opts);
- 
-+void alloc_init(QGuestAllocator *alloc, QAllocOpts flags,
-+                uint64_t start, uint64_t end,
-+                size_t page_size);
-+void alloc_destroy(QGuestAllocator *allocator);
++libqos-obj-y = $(libqgraph-obj-y) tests/libqos/pci.o tests/libqos/fw_cfg.o
++libqos-obj-y += tests/libqos/malloc.o tests/libqos/malloc-generic.o
+ libqos-obj-y += tests/libqos/i2c.o tests/libqos/libqos.o
+ libqos-spapr-obj-y = $(libqos-obj-y) tests/libqos/malloc-spapr.o
+ libqos-spapr-obj-y += tests/libqos/libqos-spapr.o
+@@ -680,7 +683,13 @@ libqos-pc-obj-y += tests/libqos/ahci.o
+ libqos-omap-obj-y = $(libqos-obj-y) tests/libqos/i2c-omap.o
+ libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
+ libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
+-libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o tests/libqos/malloc-generic.o
++libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o
 +
- #endif
-diff --git a/tests/rtas-test.c b/tests/rtas-test.c
-index 009bda6..ee88867 100644
---- a/tests/rtas-test.c
-+++ b/tests/rtas-test.c
-@@ -17,7 +17,7 @@ static void test_rtas_get_time_of_day(void)
-     global_qtest = qs->qts;
++check-unit-y += tests/test-qgraph$(EXESUF)
++tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
++
++check-qtest-generic-y += tests/qos-test$(EXESUF)
++tests/qos-test$(EXESUF): tests/qos-test.o $(libqgraph-obj-y)
  
-     t1 = time(NULL);
--    ret = qrtas_get_time_of_day(qs->qts, qs->alloc, &tm, &ns);
-+    ret = qrtas_get_time_of_day(qs->qts, &qs->alloc, &tm, &ns);
-     g_assert_cmpint(ret, ==, 0);
-     t2 = mktimegm(&tm);
-     g_assert(t2 - t1 < 5); /* 5 sec max to run the test */
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 8d53482..54be25a 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -157,7 +157,7 @@ typedef struct TestServer {
-     bool test_fail;
-     int test_flags;
-     int queues;
--    QGuestAllocator *alloc;
-+    QGuestAllocator alloc;
- } TestServer;
- 
- static TestServer *test_server_new(const gchar *name);
-@@ -205,10 +205,10 @@ static void init_virtio_dev(QTestState *qts, TestServer *s, uint32_t features_ma
-     qvirtio_pci_device_enable(s->dev);
-     qvirtio_start_device(&s->dev->vdev);
- 
--    s->alloc = pc_alloc_init(qts);
-+    pc_alloc_init(&s->alloc, qts, 0);
- 
-     for (i = 0; i < s->queues * 2; i++) {
--        s->vq[i] = qvirtqueue_setup(&s->dev->vdev, s->alloc, i);
-+        s->vq[i] = qvirtqueue_setup(&s->dev->vdev, &s->alloc, i);
-     }
- 
-     features = qvirtio_get_features(&s->dev->vdev);
-@@ -223,9 +223,9 @@ static void uninit_virtio_dev(TestServer *s)
-     int i;
- 
-     for (i = 0; i < s->queues * 2; i++) {
--        qvirtqueue_cleanup(s->dev->vdev.bus, s->vq[i], s->alloc);
-+        qvirtqueue_cleanup(s->dev->vdev.bus, s->vq[i], &s->alloc);
-     }
--    pc_alloc_uninit(s->alloc);
-+    alloc_destroy(&s->alloc);
- 
-     qvirtio_pci_device_free(s->dev);
+ tests/qmp-test$(EXESUF): tests/qmp-test.o
+ tests/qmp-cmd-test$(EXESUF): tests/qmp-cmd-test.o
+diff --git a/tests/libqos/qgraph.c b/tests/libqos/qgraph.c
+new file mode 100644
+index 0000000..cc42641
+--- /dev/null
++++ b/tests/libqos/qgraph.c
+@@ -0,0 +1,756 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qemu/queue.h"
++#include "libqos/qgraph_internal.h"
++#include "libqos/qgraph.h"
++
++#define QGRAPH_PRINT_DEBUG 0
++#define QOS_ROOT ""
++typedef struct QOSStackElement QOSStackElement;
++
++/* Graph Edge.*/
++struct QOSGraphEdge {
++    QOSEdgeType type;
++    char *dest;
++    void *arg;                /* just for QEDGE_CONTAINS
++                               * and QEDGE_CONSUMED_BY */
++    char *extra_device_opts;  /* added to -device option, "," is
++                               * automatically added
++                               */
++    char *before_cmd_line;    /* added before node cmd_line */
++    char *after_cmd_line;     /* added after -device options */
++    char *edge_name;          /* used by QEDGE_CONTAINS */
++    QSLIST_ENTRY(QOSGraphEdge) edge_list;
++};
++
++typedef QSLIST_HEAD(, QOSGraphEdge) QOSGraphEdgeList;
++
++/**
++ * Stack used to keep track of the discovered path when using
++ * the DFS algorithm
++ */
++struct QOSStackElement {
++    QOSGraphNode *node;
++    QOSStackElement *parent;
++    QOSGraphEdge *parent_edge;
++    int length;
++};
++
++/* Each enty in these hash table will consist of <string, node/edge> pair. */
++static GHashTable *edge_table;
++static GHashTable *node_table;
++
++/* stack used by the DFS algorithm to store the path from machine to test */
++static QOSStackElement qos_node_stack[QOS_PATH_MAX_ELEMENT_SIZE];
++static int qos_node_tos;
++
++/**
++ * add_edge(): creates an edge of type @type
++ * from @source to @dest node, and inserts it in the
++ * edges hash table
++ *
++ * Nodes @source and @dest do not necessarily need to exist.
++ * Possibility to add also options (see #QOSGraphEdgeOptions)
++ * edge->edge_name is used as identifier for get_device relationships,
++ * so by default is equal to @dest.
++ */
++static void add_edge(const char *source, const char *dest,
++                     QOSEdgeType type, QOSGraphEdgeOptions *opts)
++{
++    char *key;
++    QOSGraphEdgeList *list = g_hash_table_lookup(edge_table, source);
++
++    if (!list) {
++        list = g_new0(QOSGraphEdgeList, 1);
++        key = g_strdup(source);
++        g_hash_table_insert(edge_table, key, list);
++    }
++
++    if (!opts) {
++        opts = &(QOSGraphEdgeOptions) { };
++    }
++
++    QOSGraphEdge *edge = g_new0(QOSGraphEdge, 1);
++    edge->type = type;
++    edge->dest = g_strdup(dest);
++    edge->edge_name = g_strdup(opts->edge_name ? : dest);
++    edge->arg = g_memdup(opts->arg, opts->size_arg);
++
++    edge->before_cmd_line =
++        opts->before_cmd_line ? g_strconcat(" ", opts->before_cmd_line, NULL) : NULL;
++    edge->extra_device_opts =
++        opts->extra_device_opts ? g_strconcat(",", opts->extra_device_opts, NULL) : NULL;
++    edge->after_cmd_line =
++        opts->after_cmd_line ? g_strconcat(" ", opts->after_cmd_line, NULL) : NULL;
++
++    QSLIST_INSERT_HEAD(list, edge, edge_list);
++}
++
++/* destroy_edges(): frees all edges inside a given @list */
++static void destroy_edges(void *list)
++{
++    QOSGraphEdge *temp;
++    QOSGraphEdgeList *elist = list;
++
++    while (!QSLIST_EMPTY(elist)) {
++        temp = QSLIST_FIRST(elist);
++        QSLIST_REMOVE_HEAD(elist, edge_list);
++        g_free(temp->dest);
++        g_free(temp->before_cmd_line);
++        g_free(temp->after_cmd_line);
++        g_free(temp->extra_device_opts);
++        g_free(temp->edge_name);
++        g_free(temp->arg);
++        g_free(temp);
++    }
++    g_free(elist);
++}
++
++/**
++ * create_node(): creates a node @name of type @type
++ * and inserts it to the nodes hash table.
++ * By default, node is not available.
++ */
++static QOSGraphNode *create_node(const char *name, QOSNodeType type)
++{
++    if (g_hash_table_lookup(node_table, name)) {
++        g_printerr("Node %s already created\n", name);
++        abort();
++    }
++
++    QOSGraphNode *node = g_new0(QOSGraphNode, 1);
++    node->type = type;
++    node->available = FALSE;
++    node->name = g_strdup(name);
++    g_hash_table_insert(node_table, node->name, node);
++    return node;
++}
++
++/**
++ * destroy_node(): frees a node @val from the nodes hash table.
++ * Note that node->name is not free'd since it will represent the
++ * hash table key
++ */
++static void destroy_node(void *val)
++{
++    QOSGraphNode *node = val;
++    g_free(node->command_line);
++    g_free(node);
++}
++
++/**
++ * destroy_string(): frees @key from the nodes hash table.
++ * Actually frees the node->name
++ */
++static void destroy_string(void *key)
++{
++    g_free(key);
++}
++
++/**
++ * search_node(): search for a node @key in the nodes hash table
++ * Returns the QOSGraphNode if found, #NULL otherwise
++ */
++static QOSGraphNode *search_node(const char *key)
++{
++    return g_hash_table_lookup(node_table, key);
++}
++
++/**
++ * get_edgelist(): returns the edge list (value) assigned to
++ * the @key in the edge hash table.
++ * This list will contain all edges with source equal to @key
++ *
++ * Returns: on success: the %QOSGraphEdgeList
++ *          otherwise: abort()
++ */
++static QOSGraphEdgeList *get_edgelist(const char *key)
++{
++    return g_hash_table_lookup(edge_table, key);
++}
++
++/**
++ * search_list_edges(): search for an edge with destination @dest
++ * in the given @edgelist.
++ *
++ * Returns: on success: the %QOSGraphEdge
++ *          otherwise: #NULL
++ */
++static QOSGraphEdge *search_list_edges(QOSGraphEdgeList *edgelist,
++                                       const char *dest)
++{
++    QOSGraphEdge *tmp, *next;
++    if (!edgelist) {
++        return NULL;
++    }
++    QSLIST_FOREACH_SAFE(tmp, edgelist, edge_list, next) {
++        if (g_strcmp0(tmp->dest, dest) == 0) {
++            break;
++        }
++    }
++    return tmp;
++}
++
++/**
++ * search_machine(): search for a machine @name in the node hash
++ * table. A machine is the child of the root node.
++ * This function forces the research in the childs of the root,
++ * to check the node is a proper machine
++ *
++ * Returns: on success: the %QOSGraphNode
++ *          otherwise: #NULL
++ */
++static QOSGraphNode *search_machine(const char *name)
++{
++    QOSGraphNode *n;
++    QOSGraphEdgeList *root_list = get_edgelist(QOS_ROOT);
++    QOSGraphEdge *e = search_list_edges(root_list, name);
++    if (!e) {
++        return NULL;
++    }
++    n = search_node(e->dest);
++    if (n->type == QNODE_MACHINE) {
++        return n;
++    }
++    return NULL;
++}
++
++/**
++ * create_interface(): checks if there is already
++ * a node @node in the node hash table, if not
++ * creates a node @node of type #QNODE_INTERFACE
++ * and inserts it. If there is one, check it's
++ * a #QNODE_INTERFACE and abort() if it's not.
++ */
++static void create_interface(const char *node)
++{
++    QOSGraphNode *interface;
++    interface = search_node(node);
++    if (!interface) {
++        create_node(node, QNODE_INTERFACE);
++    } else if (interface->type != QNODE_INTERFACE) {
++        fprintf(stderr, "Error: Node %s is not an interface\n", node);
++        abort();
++    }
++}
++
++/**
++ * build_machine_cmd_line(): builds the command line for the machine
++ * @node. The node name must be a valid qemu identifier, since it
++ * will be used to build the command line.
++ *
++ * It is also possible to pass an optional @args that will be
++ * concatenated to the command line.
++ *
++ * For machines, prepend -M to the machine name. ", @rgs" is added
++ * after the -M <machine> command.
++ */
++static void build_machine_cmd_line(QOSGraphNode *node, const char *args)
++{
++    char *machine = qos_get_machine_type(node->name);
++    if (args) {
++        node->command_line = g_strconcat("-M ", machine, ",", args, NULL);
++    } else {
++        node->command_line = g_strconcat("-M ", machine, " ", NULL);
++    }
++}
++
++/**
++ * build_driver_cmd_line(): builds the command line for the driver
++ * @node. The node name must be a valid qemu identifier, since it
++ * will be used to build the command line.
++ *
++ * Driver do not need additional command line, since it will be
++ * provided by the edge options.
++ *
++ * For drivers, prepend -device to the node name.
++ */
++static void build_driver_cmd_line(QOSGraphNode *node)
++{
++    node->command_line = g_strconcat(" -device ", node->name, NULL);
++}
++
++/* qos_print_cb(): callback prints all path found by the DFS algorithm. */
++static void qos_print_cb(QOSGraphNode *path, int length)
++{
++    #if QGRAPH_PRINT_DEBUG
++        printf("%d elements\n", length);
++
++        if (!path) {
++            return;
++        }
++
++        while (path->path_edge) {
++            printf("%s ", path->name);
++            switch (path->path_edge->type) {
++            case QEDGE_PRODUCES:
++                printf("--PRODUCES--> ");
++                break;
++            case QEDGE_CONSUMED_BY:
++                printf("--CONSUMED_BY--> ");
++                break;
++            case QEDGE_CONTAINS:
++                printf("--CONTAINS--> ");
++                break;
++            }
++            path = search_node(path->path_edge->dest);
++        }
++
++        printf("%s\n\n", path->name);
++    #endif
++}
++
++/* qos_push(): push a node @el and edge @e in the qos_node_stack */
++static void qos_push(QOSGraphNode *el, QOSStackElement *parent,
++                     QOSGraphEdge *e)
++{
++    int len = 0; /* root is not counted */
++    if (qos_node_tos == QOS_PATH_MAX_ELEMENT_SIZE) {
++        g_printerr("QOSStack: full stack, cannot push");
++        abort();
++    }
++
++    if (parent) {
++        len = parent->length + 1;
++    }
++    qos_node_stack[qos_node_tos++] = (QOSStackElement) {
++        .node = el,
++        .parent = parent,
++        .parent_edge = e,
++        .length = len,
++    };
++}
++
++/* qos_tos(): returns the top of stack, without popping */
++static QOSStackElement *qos_tos(void)
++{
++    return &qos_node_stack[qos_node_tos - 1];
++}
++
++/* qos_pop(): pops an element from the tos, setting it unvisited*/
++static QOSStackElement *qos_pop(void)
++{
++    if (qos_node_tos == 0) {
++        g_printerr("QOSStack: empty stack, cannot pop");
++        abort();
++    }
++    QOSStackElement *e = qos_tos();
++    e->node->visited = FALSE;
++    qos_node_tos--;
++    return e;
++}
++
++/**
++ * qos_reverse_path(): reverses the found path, going from
++ * test-to-machine to machine-to-test
++ */
++static QOSGraphNode *qos_reverse_path(QOSStackElement *el)
++{
++    if (!el) {
++        return NULL;
++    }
++
++    el->node->path_edge = NULL;
++
++    while (el->parent) {
++        el->parent->node->path_edge = el->parent_edge;
++        el = el->parent;
++    }
++
++    return el->node;
++}
++
++/**
++ * qos_traverse_graph(): graph-walking algorithm, using Depth First Search it
++ * starts from the root @machine and walks all possible path until it
++ * reaches a test node.
++ * At that point, it reverses the path found and invokes the @callback.
++ *
++ * Being Depth First Search, time complexity is O(|V| + |E|), while
++ * space is O(|V|). In this case, the maximum stack size is set by
++ * QOS_PATH_MAX_ELEMENT_SIZE.
++ */
++static void qos_traverse_graph(QOSGraphNode *root, QOSTestCallback callback)
++{
++    QOSGraphNode *v, *dest_node, *path;
++    QOSStackElement *s_el;
++    QOSGraphEdge *e, *next;
++    QOSGraphEdgeList *list;
++
++    qos_push(root, NULL, NULL);
++
++    while (qos_node_tos > 0) {
++        s_el = qos_tos();
++        v = s_el->node;
++        if (v->visited) {
++            qos_pop();
++            continue;
++        }
++        v->visited = TRUE;
++        list = get_edgelist(v->name);
++        if (!list) {
++            qos_pop();
++            if (v->type == QNODE_TEST) {
++                v->visited = FALSE;
++                path = qos_reverse_path(s_el);
++                callback(path, s_el->length);
++            }
++        } else {
++            QSLIST_FOREACH_SAFE(e, list, edge_list, next) {
++                dest_node = search_node(e->dest);
++
++                if (!dest_node) {
++                    fprintf(stderr, "node %s in %s -> %s does not exist\n",
++                            e->dest, v->name, e->dest);
++                    abort();
++                }
++
++                if (!dest_node->visited && dest_node->available) {
++                    qos_push(dest_node, s_el, e);
++                }
++            }
++        }
++    }
++}
++
++/* QGRAPH API*/
++
++QOSGraphNode *qos_graph_get_node(const char *key)
++{
++    return search_node(key);
++}
++
++bool qos_graph_has_node(const char *node)
++{
++    QOSGraphNode *n = search_node(node);
++    return n != NULL;
++}
++
++QOSNodeType qos_graph_get_node_type(const char *node)
++{
++    QOSGraphNode *n = search_node(node);
++    if (n) {
++        return n->type;
++    }
++    return -1;
++}
++
++bool qos_graph_get_node_availability(const char *node)
++{
++    QOSGraphNode *n = search_node(node);
++    if (n) {
++        return n->available;
++    }
++    return FALSE;
++}
++
++QOSGraphEdge *qos_graph_get_edge(const char *node, const char *dest)
++{
++    QOSGraphEdgeList *list = get_edgelist(node);
++    return search_list_edges(list, dest);
++}
++
++QOSEdgeType qos_graph_edge_get_type(QOSGraphEdge *edge)
++{
++    if (!edge) {
++        return -1;
++    }
++    return edge->type;;
++}
++
++char *qos_graph_edge_get_dest(QOSGraphEdge *edge)
++{
++    if (!edge) {
++        return NULL;
++    }
++    return edge->dest;
++}
++
++void *qos_graph_edge_get_arg(QOSGraphEdge *edge)
++{
++    if (!edge) {
++        return NULL;
++    }
++    return edge->arg;
++}
++
++char *qos_graph_edge_get_after_cmd_line(QOSGraphEdge *edge)
++{
++    if (!edge) {
++        return NULL;
++    }
++    return edge->after_cmd_line;
++}
++
++char *qos_graph_edge_get_before_cmd_line(QOSGraphEdge *edge)
++{
++    if (!edge) {
++        return NULL;
++    }
++    return edge->before_cmd_line;
++}
++
++char *qos_graph_edge_get_extra_device_opts(QOSGraphEdge *edge)
++{
++    if (!edge) {
++        return NULL;
++    }
++    return edge->extra_device_opts;
++}
++
++char *qos_graph_edge_get_name(QOSGraphEdge *edge)
++{
++    if (!edge) {
++        return NULL;
++    }
++    return edge->edge_name;
++}
++
++bool qos_graph_has_edge(const char *start, const char *dest)
++{
++    QOSGraphEdgeList *list = get_edgelist(start);
++    QOSGraphEdge *e = search_list_edges(list, dest);
++    if (e) {
++        return TRUE;
++    }
++    return FALSE;
++}
++
++QOSGraphNode *qos_graph_get_machine(const char *node)
++{
++    return search_machine(node);
++}
++
++bool qos_graph_has_machine(const char *node)
++{
++    QOSGraphNode *m = search_machine(node);
++    return m != NULL;
++}
++
++void qos_print_graph(void)
++{
++    qos_graph_foreach_test_path(qos_print_cb);
++}
++
++void qos_graph_init(void)
++{
++    if (!node_table) {
++        node_table = g_hash_table_new_full(g_str_hash, g_str_equal,
++                                           destroy_string, destroy_node);
++        create_node(QOS_ROOT, QNODE_DRIVER);
++    }
++
++    if (!edge_table) {
++        edge_table = g_hash_table_new_full(g_str_hash, g_str_equal,
++                                           destroy_string, destroy_edges);
++    }
++}
++
++void qos_graph_destroy(void)
++{
++    if (node_table) {
++        g_hash_table_destroy(node_table);
++    }
++
++    if (edge_table) {
++        g_hash_table_destroy(edge_table);
++    }
++
++    node_table = NULL;
++    edge_table = NULL;
++}
++
++void qos_node_destroy(void *key)
++{
++    g_hash_table_remove(node_table, key);
++}
++
++void qos_edge_destroy(void *key)
++{
++    g_hash_table_remove(edge_table, key);
++}
++
++void qos_add_test(const char *name, const char *interface,
++                  QOSTestFunc test_func, QOSGraphTestOptions *opts)
++{
++    QOSGraphNode *node;
++    char *test_name = g_strdup_printf("%s-tests/%s", interface, name);;
++
++    if (!opts) {
++        opts = &(QOSGraphTestOptions) { };
++    }
++    node = create_node(test_name, QNODE_TEST);
++    node->u.test.function = test_func;
++    node->u.test.arg = opts->arg;
++    assert(!opts->edge.arg);
++    assert(!opts->edge.size_arg);
++
++    node->u.test.before = opts->before;
++    node->u.test.subprocess = opts->subprocess;
++    node->available = TRUE;
++    add_edge(interface, test_name, QEDGE_CONSUMED_BY, &opts->edge);
++    g_free(test_name);
++}
++
++void qos_node_create_machine(const char *name, QOSCreateMachineFunc function)
++{
++    qos_node_create_machine_args(name, function, NULL);
++}
++
++void qos_node_create_machine_args(const char *name,
++                                  QOSCreateMachineFunc function,
++                                  const char *opts)
++{
++    QOSGraphNode *node = create_node(name, QNODE_MACHINE);
++    build_machine_cmd_line(node, opts);
++    node->u.machine.constructor = function;
++    add_edge(QOS_ROOT, name, QEDGE_CONTAINS, NULL);
++}
++
++void qos_node_create_driver(const char *name, QOSCreateDriverFunc function)
++{
++    QOSGraphNode *node = create_node(name, QNODE_DRIVER);
++    build_driver_cmd_line(node);
++    node->u.driver.constructor = function;
++}
++
++void qos_node_contains(const char *container, const char *contained,
++                       ...)
++{
++    va_list va;
++    va_start(va, contained);
++    QOSGraphEdgeOptions *opts;
++
++    do {
++        opts = va_arg(va, QOSGraphEdgeOptions *);
++        add_edge(container, contained, QEDGE_CONTAINS, opts);
++    } while (opts != NULL);
++
++    va_end(va);
++}
++
++void qos_node_produces(const char *producer, const char *interface)
++{
++    create_interface(interface);
++    add_edge(producer, interface, QEDGE_PRODUCES, NULL);
++}
++
++void qos_node_consumes(const char *consumer, const char *interface,
++                       QOSGraphEdgeOptions *opts)
++{
++    create_interface(interface);
++    add_edge(interface, consumer, QEDGE_CONSUMED_BY, opts);
++}
++
++void qos_graph_node_set_availability(const char *node, bool av)
++{
++    QOSGraphEdgeList *elist;
++    QOSGraphNode *n = search_node(node);
++    QOSGraphEdge *e, *next;
++    if (!n) {
++        return;
++    }
++    n->available = av;
++    elist = get_edgelist(node);
++    if (!elist) {
++        return;
++    }
++    QSLIST_FOREACH_SAFE(e, elist, edge_list, next) {
++        if (e->type == QEDGE_CONTAINS || e->type == QEDGE_PRODUCES) {
++            qos_graph_node_set_availability(e->dest, av);
++        }
++    }
++}
++
++void qos_graph_foreach_test_path(QOSTestCallback fn)
++{
++    QOSGraphNode *root = qos_graph_get_node(QOS_ROOT);
++    qos_traverse_graph(root, fn);
++}
++
++QOSGraphObject *qos_machine_new(QOSGraphNode *node, QTestState *qts)
++{
++    QOSGraphObject *obj;
++
++    g_assert(node->type == QNODE_MACHINE);
++    obj = node->u.machine.constructor(qts);
++    obj->free = g_free;
++    return obj;
++}
++
++QOSGraphObject *qos_driver_new(QOSGraphNode *node, QOSGraphObject *parent,
++                               QGuestAllocator *alloc, void *arg)
++{
++    QOSGraphObject *obj;
++
++    g_assert(node->type == QNODE_DRIVER);
++    obj = node->u.driver.constructor(parent, alloc, arg);
++    obj->free = g_free;
++    return obj;
++}
++
++void qos_object_destroy(QOSGraphObject *obj)
++{
++    if (!obj) {
++        return;
++    }
++    if (obj->destructor) {
++        obj->destructor(obj);
++    }
++    if (obj->free) {
++        obj->free(obj);
++    }
++}
++
++void qos_object_queue_destroy(QOSGraphObject *obj)
++{
++    g_test_queue_destroy((GDestroyNotify) qos_object_destroy, obj);
++}
++
++void qos_object_start_hw(QOSGraphObject *obj)
++{
++    if (obj->start_hw) {
++        obj->start_hw(obj);
++    }
++}
++
++char *qos_get_machine_type(char *name)
++{
++    while (*name != '\0' && *name != '/') {
++        name++;
++    }
++
++    if (!*name || !name[1]) {
++        fprintf(stderr, "Machine name has to be of the form <arch>/<machine>\n");
++        abort();
++    }
++
++    return name + 1;
++}
++
++void qos_delete_cmd_line(const char *name)
++{
++    QOSGraphNode *node = search_node(name);
++    if (node) {
++        g_free(node->command_line);
++        node->command_line = NULL;
++    }
++}
+diff --git a/tests/libqos/qgraph.h b/tests/libqos/qgraph.h
+new file mode 100644
+index 0000000..ccc30ee
+--- /dev/null
++++ b/tests/libqos/qgraph.h
+@@ -0,0 +1,575 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#ifndef QGRAPH_H
++#define QGRAPH_H
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <stdbool.h>
++#include <gmodule.h>
++#include <glib.h>
++#include "qemu/module.h"
++#include "malloc.h"
++
++/* maximum path length */
++#define QOS_PATH_MAX_ELEMENT_SIZE 50
++
++typedef struct QOSGraphObject QOSGraphObject;
++typedef struct QOSGraphNode QOSGraphNode;
++typedef struct QOSGraphEdge QOSGraphEdge;
++typedef struct QOSGraphNodeOptions QOSGraphNodeOptions;
++typedef struct QOSGraphEdgeOptions QOSGraphEdgeOptions;
++typedef struct QOSGraphTestOptions QOSGraphTestOptions;
++
++/* Constructor for drivers, machines and test */
++typedef void *(*QOSCreateDriverFunc) (void *parent, QGuestAllocator *alloc,
++                                      void *addr);
++typedef void *(*QOSCreateMachineFunc) (QTestState *qts);
++typedef void (*QOSTestFunc) (void *parent, void *arg, QGuestAllocator *alloc);
++
++/* QOSGraphObject functions */
++typedef void *(*QOSGetDriver) (void *object, const char *interface);
++typedef QOSGraphObject *(*QOSGetDevice) (void *object, const char *name);
++typedef void (*QOSDestructorFunc) (QOSGraphObject *object);
++typedef void (*QOSStartFunct) (QOSGraphObject *object);
++
++/* Test options functions */
++typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
++
++/**
++ * SECTION: qgraph.h
++ * @title: Qtest Driver Framework
++ * @short_description: interfaces to organize drivers and tests
++ *                     as nodes in a graph
++ *
++ * This Qgraph API provides all basic functions to create a graph
++ * and instantiate nodes representing machines, drivers and tests
++ * representing their relations with CONSUMES, PRODUCES, and CONTAINS
++ * edges.
++ *
++ * The idea is to have a framework where each test asks for a specific
++ * driver, and the framework takes care of allocating the proper devices
++ * required and passing the correct command line arguments to QEMU.
++ *
++ * A node can be of four types:
++ * - QNODE_MACHINE:   for example "arm/raspi2"
++ * - QNODE_DRIVER:    for example "generic-sdhci"
++ * - QNODE_INTERFACE: for example "sdhci" (interface for all "-sdhci" drivers)
++ *                     an interface is not explicitly created, it will be auto-
++ *                     matically instantiated when a node consumes or produces
++ *                     it.
++ * - QNODE_TEST:      for example "sdhci-test", consumes an interface and tests
++ *                    the functions provided
++ *
++ * Notes for the nodes:
++ * - QNODE_MACHINE: each machine struct must have a QGuestAllocator and
++ *                  implement get_driver to return the allocator passing
++ *                  "memory". The function can also return NULL if the
++ *                  allocator is not set.
++ * - QNODE_DRIVER:  driver names must be unique, and machines and nodes
++ *                  planned to be "consumed" by other nodes must match QEMU
++ *                  drivers name, otherwise they won't be discovered
++ *
++ * An edge relation between two nodes (drivers or machines) X and Y can be:
++ * - X CONSUMES Y: Y can be plugged into X
++ * - X PRODUCES Y: X provides the interface Y
++ * - X CONTAINS Y: Y is part of X component
++ *
++ * Basic framework steps are the following:
++ * - All nodes and edges are created in their respective
++ *   machine/driver/test files
++ * - The framework starts QEMU and asks for a list of available devices
++ *   and machines (note that only machines and "consumed" nodes are mapped
++ *   1:1 with QEMU devices)
++ * - The framework walks the graph starting from the available machines and
++ *   performs a Depth First Search for tests
++ * - Once a test is found, the path is walked again and all drivers are
++ *   allocated accordingly and the final interface is passed to the test
++ * - The test is executed
++ * - Unused objects are cleaned and the path discovery is continued
++ *
++ * Depending on the QEMU binary used, only some drivers/machines will be
++ * available and only test that are reached by them will be executed.
++ *
++ * <example>
++ *   <title>Creating new driver an its interface</title>
++ *   <programlisting>
++ #include "libqos/qgraph.h"
++
++ struct My_driver {
++     QOSGraphObject obj;
++     Node_produced prod;
++     Node_contained cont;
++ }
++
++ static void my_destructor(QOSGraphObject *obj)
++ {
++    g_free(obj);
++ }
++
++ static void my_get_driver(void *object, const char *interface) {
++    My_driver *dev = object;
++    if (!g_strcmp0(interface, "my_interface")) {
++        return &dev->prod;
++    }
++    abort();
++ }
++
++ static void my_get_device(void *object, const char *device) {
++    My_driver *dev = object;
++    if (!g_strcmp0(device, "my_driver_contained")) {
++        return &dev->cont;
++    }
++    abort();
++ }
++
++ static void *my_driver_constructor(void *node_consumed,
++                                    QOSGraphObject *alloc)
++ {
++    My_driver dev = g_new(My_driver, 1);
++    // get the node pointed by the produce edge
++    dev->obj.get_driver = my_get_driver;
++    // get the node pointed by the contains
++    dev->obj.get_device = my_get_device;
++    // free the object
++    dev->obj.destructor = my_destructor;
++    do_something_with_node_consumed(node_consumed);
++    // set all fields of contained device
++    init_contained_device(&dev->cont);
++    return &dev->obj;
++ }
++
++ static void register_my_driver(void)
++ {
++     qos_node_create_driver("my_driver", my_driver_constructor);
++     // contained drivers don't need a constructor,
++     // they will be init by the parent.
++     qos_node_create_driver("my_driver_contained", NULL);
++
++    // For the sake of this example, assume machine x86_64/pc contains
++    // "other_node".
++    // This relation, along with the machine and "other_node" creation,
++    // should be defined in the x86_64_pc-machine.c file.
++    // "my_driver" will then consume "other_node"
++    qos_node_contains("my_driver", "my_driver_contained");
++    qos_node_produces("my_driver", "my_interface");
++    qos_node_consumes("my_driver", "other_node");
++ }
++ *   </programlisting>
++ * </example>
++ *
++ * In the above example, all possible types of relations are created:
++ * node "my_driver" consumes, contains and produces other nodes.
++ * more specifically:
++ * x86_64/pc -->contains--> other_node <--consumes-- my_driver
++ *                                                       |
++ *                      my_driver_contained <--contains--+
++ *                                                       |
++ *                             my_interface <--produces--+
++ *
++ * or inverting the consumes edge in consumed_by:
++ *
++ * x86_64/pc -->contains--> other_node --consumed_by--> my_driver
++ *                                                           |
++ *                          my_driver_contained <--contains--+
++ *                                                           |
++ *                                 my_interface <--produces--+
++ *
++ * <example>
++ *   <title>Creating new test</title>
++ *   <programlisting>
++ * #include "libqos/qgraph.h"
++ *
++ * static void my_test_function(void *obj, void *data)
++ * {
++ *    Node_produced *interface_to_test = obj;
++ *    // test interface_to_test
++ * }
++ *
++ * static void register_my_test(void)
++ * {
++ *    qos_add_test("my_interface", "my_test", my_test_function);
++ * }
++ *
++ * libqos_init(register_my_test);
++ *
++ *   </programlisting>
++ * </example>
++ *
++ * Here a new test is created, consuming "my_interface" node
++ * and creating a valid path from a machine to a test.
++ * Final graph will be like this:
++ * x86_64/pc -->contains--> other_node <--consumes-- my_driver
++ *                                                        |
++ *                       my_driver_contained <--contains--+
++ *                                                        |
++ *        my_test --consumes--> my_interface <--produces--+
++ *
++ * or inverting the consumes edge in consumed_by:
++ *
++ * x86_64/pc -->contains--> other_node --consumed_by--> my_driver
++ *                                                           |
++ *                          my_driver_contained <--contains--+
++ *                                                           |
++ *        my_test <--consumed_by-- my_interface <--produces--+
++ *
++ * Assuming there the binary is
++ * QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
++ * a valid test path will be:
++ * "/x86_64/pc/other_node/my_driver/my_interface/my_test".
++ *
++ * Additional examples are also in libqos/test-qgraph.c
++ *
++ * Command line:
++ * Command line is built by using node names and optional arguments
++ * passed by the user when building the edges.
++ *
++ * There are three types of command line arguments:
++ * - in node      : created from the node name. For example, machines will
++ *                  have "-M <machine>" to its command line, while devices
++ *                  "-device <device>". It is automatically done by the
++ *                   framework.
++ * - after node   : added as additional argument to the node name.
++ *                  This argument is added optionally when creating edges,
++ *                  by setting the parameter @after_cmd_line and
++ *                  @extra_edge_opts in #QOSGraphEdgeOptions.
++ *                  The framework automatically adds
++ *                  a comma before @extra_edge_opts,
++ *                  because it is going to add attibutes
++ *                  after the destination node pointed by
++ *                  the edge containing these options, and automatically
++ *                  adds a space before @after_cmd_line, because it
++ *                  adds an additional device, not an attribute.
++ * - before node  : added as additional argument to the node name.
++ *                  This argument is added optionally when creating edges,
++ *                  by setting the parameter @before_cmd_line in
++ *                  #QOSGraphEdgeOptions. This attribute
++ *                  is going to add attibutes before the destination node
++ *                  pointed by the edge containing these options. It is
++ *                  helpful to commands that are not node-representable,
++ *                  such as "-fdsev" or "-netdev".
++ *
++ * While adding command line in edges is always used, not all nodes names are
++ * used in every path walk: this is because the contained or produced ones
++ * are already added by QEMU, so only nodes that "consumes" will be used to
++ * build the command line. Also, nodes that will have { "abstract" : true }
++ * as QMP attribute will loose their command line, since they are not proper
++ * devices to be added in QEMU.
++ *
++ * Example:
++ *
++ QOSGraphEdgeOptions opts = {
++     .arg = NULL,
++     .size_arg = 0,
++     .after_cmd_line = "-device other",
++     .before_cmd_line = "-netdev something",
++     .extra_edge_opts = "addr=04.0",
++ };
++ QOSGraphNode * node = qos_node_create_driver("my_node", constructor);
++ qos_node_consumes_args("my_node", "interface", &opts);
++ *
++ * Will produce the following command line:
++ * "-netdev something -device my_node,addr=04.0 -device other"
++ */
++
++/**
++ * Edge options to be passed to the contains/consumes *_args function.
++ */
++struct QOSGraphEdgeOptions {
++    void *arg;                    /*
++                                   * optional arg that will be used by
++                                   * dest edge
++                                   */
++    uint32_t size_arg;            /*
++                                   * optional arg size that will be used by
++                                   * dest edge
++                                   */
++    const char *extra_device_opts;/*
++                                   *optional additional command line for dest
++                                   * edge, used to add additional attributes
++                                   * *after* the node command line, the
++                                   * framework automatically prepends ","
++                                   * to this argument.
++                                   */
++    const char *before_cmd_line;  /*
++                                   * optional additional command line for dest
++                                   * edge, used to add additional attributes
++                                   * *before* the node command line, usually
++                                   * other non-node represented commands,
++                                   * like "-fdsev synt"
++                                   */
++    const char *after_cmd_line;   /*
++                                   * optional extra command line to be added
++                                   * after the device command. This option
++                                   * is used to add other devices
++                                   * command line that depend on current node.
++                                   * Automatically prepends " " to this
++                                   * argument
++                                   */
++    const char *edge_name;        /*
++                                   * optional edge to differentiate multiple
++                                   * devices with same node name
++                                   */
++};
++
++/**
++ * Test options to be passed to the test functions.
++ */
++struct QOSGraphTestOptions {
++    QOSGraphEdgeOptions edge;   /* edge arguments that will be used by test.
++                                 * Note that test *does not* use edge_name,
++                                 * and uses instead arg and size_arg as
++                                 * data arg for its test function.
++                                 */
++    void *arg;                  /* passed to the .before function, or to the
++                                 * test function if there is no .before
++                                 * function
++                                 */
++    QOSBeforeTest before;       /* executed before the test. Can add
++                                 * additional parameters to the command line
++                                 * and modify the argument to the test function.
++                                 */
++    bool subprocess;            /* run the test in a subprocess */
++};
++
++/**
++ * Each driver, test or machine of this framework will have a
++ * QOSGraphObject as first field.
++ *
++ * This set of functions offered by QOSGraphObject are executed
++ * in different stages of the framework:
++ * - get_driver / get_device : Once a machine-to-test path has been
++ * found, the framework traverses it again and allocates all the
++ * nodes, using the provided constructor. To satisfy their relations,
++ * i.e. for produces or contains, where a struct constructor needs
++ * an external parameter represented by the previous node,
++ * the framework will call get_device (for contains) or
++ * get_driver (for produces), depending on the edge type, passing
++ * them the name of the next node to be taken and getting from them
++ * the corresponding pointer to the actual structure of the next node to
++ * be used in the path.
++ *
++ * - start_hw: This function is executed after all the path objects
++ * have been allocated, but before the test is run. It starts the hw, setting
++ * the initial configurations (*_device_enable) and making it ready for the
++ * test.
++ *
++ * - destructor: Opposite to the node constructor, destroys the object.
++ * This function is called after the test has been executed, and performs
++ * a complete cleanup of each node allocated field. In case no constuctor
++ * is provided, no destructor will be called.
++ *
++ */
++struct QOSGraphObject {
++    /* for produces edges, returns void * */
++    QOSGetDriver get_driver;
++    /* for contains edges, returns a QOSGraphObject * */
++    QOSGetDevice get_device;
++    /* start the hw, get ready for the test */
++    QOSStartFunct start_hw;
++    /* destroy this QOSGraphObject */
++    QOSDestructorFunc destructor;
++    /* free the memory associated to the QOSGraphObject and its contained
++     * children */
++    GDestroyNotify free;
++};
++
++/**
++ * qos_graph_init(): initialize the framework, creates two hash
++ * tables: one for the nodes and another for the edges.
++ */
++void qos_graph_init(void);
++
++/**
++ * qos_graph_destroy(): deallocates all the hash tables,
++ * freeing all nodes and edges.
++ */
++void qos_graph_destroy(void);
++
++/**
++ * qos_node_destroy(): removes and frees a node from the,
++ * nodes hash table.
++ */
++void qos_node_destroy(void *key);
++
++/**
++ * qos_edge_destroy(): removes and frees an edge from the,
++ * edges hash table.
++ */
++void qos_edge_destroy(void *key);
++
++/**
++ * qos_add_test(): adds a test node @name to the nodes hash table.
++ *
++ * The test will consume a @interface node, and once the
++ * graph walking algorithm has found it, the @test_func will be
++ * executed. It also has the possibility to
++ * add an optional @opts (see %QOSGraphNodeOptions).
++ *
++ * For tests, opts->edge.arg and size_arg represent the arg to pass
++ * to @test_func
++ */
++void qos_add_test(const char *name, const char *interface,
++                  QOSTestFunc test_func,
++                  QOSGraphTestOptions *opts);
++
++/**
++ * qos_node_create_machine(): creates the machine @name and
++ * adds it to the node hash table.
++ *
++ * This node will be of type QNODE_MACHINE and have @function
++ * as constructor
++ */
++void qos_node_create_machine(const char *name, QOSCreateMachineFunc function);
++
++/**
++ * qos_node_create_machine_args(): same as qos_node_create_machine,
++ * but with the possibility to add an optional ", @opts" after -M machine
++ * command line.
++ */
++void qos_node_create_machine_args(const char *name,
++                                  QOSCreateMachineFunc function,
++                                  const char *opts);
++
++/**
++ * qos_node_create_driver(): creates the driver @name and
++ * adds it to the node hash table.
++ *
++ * This node will be of type QNODE_DRIVER and have @function
++ * as constructor
++ */
++void qos_node_create_driver(const char *name, QOSCreateDriverFunc function);
++
++/**
++ * qos_node_contains(): creates an edge of type QEDGE_CONTAINS and
++ * adds it to the edge list mapped to @container in the
++ * edge hash table.
++ *
++ * This edge will have @container as source and @contained as destination.
++ *
++ * It also has the possibility to add optional NULL-terminated
++ * @opts parameters (see %QOSGraphEdgeOptions)
++ *
++ * This function can be useful when there are multiple devices
++ * with the same node name contained in a machine/other node
++ *
++ * For example, if "arm/raspi2" contains 2 "generic-sdhci"
++ * devices, the right commands will be:
++ * qos_node_create_machine("arm/raspi2");
++ * qos_node_create_driver("generic-sdhci", constructor);
++ * //assume rest of the fields are set NULL
++ * QOSGraphEdgeOptions op1 = { .edge_name = "emmc" };
++ * QOSGraphEdgeOptions op2 = { .edge_name = "sdcard" };
++ * qos_node_contains("arm/raspi2", "generic-sdhci", &op1, &op2, NULL);
++ *
++ * Of course this also requires that the @container's get_device function
++ * should implement a case for "emmc" and "sdcard".
++ *
++ * For contains, op1.arg and op1.size_arg represent the arg to pass
++ * to @contained constructor to properly initialize it.
++ */
++void qos_node_contains(const char *container, const char *contained, ...);
++
++/**
++ * qos_node_produces(): creates an edge of type QEDGE_PRODUCES and
++ * adds it to the edge list mapped to @producer in the
++ * edge hash table.
++ *
++ * This edge will have @producer as source and @interface as destination.
++ */
++void qos_node_produces(const char *producer, const char *interface);
++
++/**
++ * qos_node_consumes():  creates an edge of type QEDGE_CONSUMED_BY and
++ * adds it to the edge list mapped to @interface in the
++ * edge hash table.
++ *
++ * This edge will have @interface as source and @consumer as destination.
++ * It also has the possibility to add an optional @opts
++ * (see %QOSGraphEdgeOptions)
++ */
++void qos_node_consumes(const char *consumer, const char *interface,
++                       QOSGraphEdgeOptions *opts);
++
++/**
++ * qos_invalidate_command_line(): invalidates current command line, so that
++ * qgraph framework cannot try to cache the current command line and
++ * forces QEMU to restart.
++ */
++void qos_invalidate_command_line(void);
++
++/**
++ * qos_get_current_command_line(): return the command line required by the
++ * machine and driver objects.  This is the same string that was passed to
++ * the test's "before" callback, if any.
++ */
++const char *qos_get_current_command_line(void);
++
++/**
++ * qos_allocate_objects():
++ * @qts: The #QTestState that will be referred to by the machine object.
++ * @alloc: Where to store the allocator for the machine object, or %NULL.
++ *
++ * Allocate driver objects for the current test
++ * path, but relative to the QTestState @qts.
++ *
++ * Returns a test object just like the one that was passed to
++ * the test function, but relative to @qts.
++ */
++void *qos_allocate_objects(QTestState *qts, QGuestAllocator **p_alloc);
++
++/**
++ * qos_object_destroy(): calls the destructor for @obj
++ */
++void qos_object_destroy(QOSGraphObject *obj);
++
++/**
++ * qos_object_queue_destroy(): queue the destructor for @obj so that it is
++ * called at the end of the test
++ */
++void qos_object_queue_destroy(QOSGraphObject *obj);
++
++/**
++ * qos_object_start_hw(): calls the start_hw function for @obj
++ */
++void qos_object_start_hw(QOSGraphObject *obj);
++
++/**
++ * qos_machine_new(): instantiate a new machine node
++ * @node: A machine node to be instantiated
++ * @qts: The #QTestState that will be referred to by the machine object.
++ *
++ * Returns a machine object.
++ */
++QOSGraphObject *qos_machine_new(QOSGraphNode *node, QTestState *qts);
++
++/**
++ * qos_machine_new(): instantiate a new driver node
++ * @node: A driver node to be instantiated
++ * @parent: A #QOSGraphObject to be consumed by the new driver node
++ * @alloc: An allocator to be used by the new driver node.
++ * @arg: The argument for the consumed-by edge to @node.
++ *
++ * Calls the constructor for the driver object.
++ */
++QOSGraphObject *qos_driver_new(QOSGraphNode *node, QOSGraphObject *parent,
++                               QGuestAllocator *alloc, void *arg);
++
++
++#endif
+diff --git a/tests/libqos/qgraph_internal.h b/tests/libqos/qgraph_internal.h
+new file mode 100644
+index 0000000..2ef748b
+--- /dev/null
++++ b/tests/libqos/qgraph_internal.h
+@@ -0,0 +1,257 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#ifndef QGRAPH_EXTRA_H
++#define QGRAPH_EXTRA_H
++
++/* This header is declaring additional helper functions defined in
++ * libqos/qgraph.c
++ * It should not be included in tests
++ */
++
++#include "libqos/qgraph.h"
++
++typedef struct QOSGraphMachine QOSGraphMachine;
++typedef enum QOSEdgeType QOSEdgeType;
++typedef enum QOSNodeType QOSNodeType;
++
++/* callback called when the walk path algorithm found a
++ * valid path
++ */
++typedef void (*QOSTestCallback) (QOSGraphNode *path, int len);
++
++/* edge types*/
++enum QOSEdgeType {
++    QEDGE_CONTAINS,
++    QEDGE_PRODUCES,
++    QEDGE_CONSUMED_BY
++};
++
++/* node types*/
++enum QOSNodeType {
++    QNODE_MACHINE,
++    QNODE_DRIVER,
++    QNODE_INTERFACE,
++    QNODE_TEST
++};
++
++/* Graph Node */
++struct QOSGraphNode {
++    QOSNodeType type;
++    bool available;     /* set by QEMU via QMP, used during graph walk */
++    bool visited;       /* used during graph walk */
++    char *name;         /* used to identify the node */
++    char *command_line; /* used to start QEMU at test execution */
++    union {
++        struct {
++            QOSCreateDriverFunc constructor;
++        } driver;
++        struct {
++            QOSCreateMachineFunc constructor;
++        } machine;
++        struct {
++            QOSTestFunc function;
++            void *arg;
++            QOSBeforeTest before;
++            bool subprocess;
++        } test;
++    } u;
++
++    /**
++     * only used when traversing the path, never rely on that except in the
++     * qos_traverse_graph callback function
++     */
++    QOSGraphEdge *path_edge;
++};
++
++/**
++ * qos_graph_get_node(): returns the node mapped to that @key.
++ * It performs an hash map search O(1)
++ *
++ * Returns: on success: the %QOSGraphNode
++ *          otherwise: #NULL
++ */
++QOSGraphNode *qos_graph_get_node(const char *key);
++
++/**
++ * qos_graph_has_node(): returns #TRUE if the node
++ * has map has a node mapped to that @key.
++ */
++bool qos_graph_has_node(const char *node);
++
++/**
++ * qos_graph_get_node_type(): returns the %QOSNodeType
++ * of the node @node.
++ * It performs an hash map search O(1)
++ * Returns: on success: the %QOSNodeType
++ *          otherwise: #-1
++ */
++QOSNodeType qos_graph_get_node_type(const char *node);
++
++/**
++ * qos_graph_get_node_availability(): returns the availability (boolean)
++ * of the node @node.
++ */
++bool qos_graph_get_node_availability(const char *node);
++
++/**
++ * qos_graph_get_edge(): returns the edge
++ * linking of the node @node with @dest.
++ *
++ * Returns: on success: the %QOSGraphEdge
++ *          otherwise: #NULL
++ */
++QOSGraphEdge *qos_graph_get_edge(const char *node, const char *dest);
++
++/**
++ * qos_graph_edge_get_type(): returns the edge type
++ * of the edge @edge.
++ *
++ * Returns: on success: the %QOSEdgeType
++ *          otherwise: #-1
++ */
++QOSEdgeType qos_graph_edge_get_type(QOSGraphEdge *edge);
++
++/**
++ * qos_graph_edge_get_dest(): returns the name of the node
++ * pointed as destination of edge @edge.
++ *
++ * Returns: on success: the destination
++ *          otherwise: #NULL
++ */
++char *qos_graph_edge_get_dest(QOSGraphEdge *edge);
++
++/**
++ * qos_graph_has_edge(): returns #TRUE if there
++ * exists an edge from @start to @dest.
++ */
++bool qos_graph_has_edge(const char *start, const char *dest);
++
++/**
++ * qos_graph_edge_get_arg(): returns the args assigned
++ * to that @edge.
++ *
++ * Returns: on success: the arg
++ *          otherwise: #NULL
++ */
++void *qos_graph_edge_get_arg(QOSGraphEdge *edge);
++
++/**
++ * qos_graph_edge_get_after_cmd_line(): returns the edge
++ * command line that will be added after all the node arguments
++ * and all the before_cmd_line arguments.
++ *
++ * Returns: on success: the char* arg
++ *          otherwise: #NULL
++ */
++char *qos_graph_edge_get_after_cmd_line(QOSGraphEdge *edge);
++
++/**
++ * qos_graph_edge_get_before_cmd_line(): returns the edge
++ * command line that will be added before the node command
++ * line argument.
++ *
++ * Returns: on success: the char* arg
++ *          otherwise: #NULL
++ */
++char *qos_graph_edge_get_before_cmd_line(QOSGraphEdge *edge);
++
++/**
++ * qos_graph_edge_get_extra_device_opts(): returns the arg
++ * command line that will be added to the node command
++ * line argument.
++ *
++ * Returns: on success: the char* arg
++ *          otherwise: #NULL
++ */
++char *qos_graph_edge_get_extra_device_opts(QOSGraphEdge *edge);
++
++/**
++ * qos_graph_edge_get_name(): returns the name
++ * assigned to the destination node (different only)
++ * if there are multiple devices with the same node name
++ * e.g. a node has two "generic-sdhci", "emmc" and "sdcard"
++ * there will be two edges with edge_name ="emmc" and "sdcard"
++ *
++ * Returns always the char* edge_name
++ */
++char *qos_graph_edge_get_name(QOSGraphEdge *edge);
++
++/**
++ * qos_graph_get_machine(): returns the machine assigned
++ * to that @node name.
++ *
++ * It performs a search only trough the list of machines
++ * (i.e. the QOS_ROOT child).
++ *
++ * Returns: on success: the %QOSGraphNode
++ *          otherwise: #NULL
++ */
++QOSGraphNode *qos_graph_get_machine(const char *node);
++
++/**
++ * qos_graph_has_machine(): returns #TRUE if the node
++ * has map has a node mapped to that @node.
++ */
++bool qos_graph_has_machine(const char *node);
++
++
++/**
++ * qos_print_graph(): walks the graph and prints
++ * all machine-to-test paths.
++ */
++void qos_print_graph(void);
++
++/**
++ * qos_graph_foreach_test_path(): executes the Depth First search
++ * algorithm and applies @fn to all discovered paths.
++ *
++ * See qos_traverse_graph() in qgraph.c for more info on
++ * how it works.
++ */
++void qos_graph_foreach_test_path(QOSTestCallback fn);
++
++/**
++ * qos_get_machine_type(): return QEMU machine type for a machine node.
++ * This function requires every machine @name to be in the form
++ * <arch>/<machine_name>, like "arm/raspi2" or "x86_64/pc".
++ *
++ * The function will validate the format and return a pointer to
++ * @machine to <machine_name>.  For example, when passed "x86_64/pc"
++ * it will return "pc".
++ *
++ * Note that this function *does not* allocate any new string.
++ */
++char *qos_get_machine_type(char *name);
++
++/**
++ * qos_delete_cmd_line(): delete the
++ * command line present in node mapped with key @name.
++ *
++ * This function is called when the QMP query returns a node with
++ * { "abstract" : true } attribute.
++ */
++void qos_delete_cmd_line(const char *name);
++
++/**
++ * qos_graph_node_set_availability(): sets the node identified
++ * by @node with availability @av.
++ */
++void qos_graph_node_set_availability(const char *node, bool av);
++
++#endif
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 7ea9413..cedf59a 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -587,6 +587,9 @@ static inline QTestState *qtest_start(const char *args)
+  */
+ static inline void qtest_end(void)
+ {
++    if (!global_qtest) {
++        return;
++    }
+     qtest_quit(global_qtest);
+     global_qtest = NULL;
  }
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index d275c74..8fd74f6 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -67,7 +67,7 @@ static QVirtIO9P *qvirtio_9p_pci_start(void)
-     qvirtio_pci_device_enable(dev);
-     qvirtio_start_device(v9p->dev);
- 
--    v9p->vq = qvirtqueue_setup(v9p->dev, v9p->qs->alloc, 0);
-+    v9p->vq = qvirtqueue_setup(v9p->dev, &v9p->qs->alloc, 0);
- 
-     qvirtio_set_driver_ok(v9p->dev);
- 
-@@ -76,7 +76,7 @@ static QVirtIO9P *qvirtio_9p_pci_start(void)
- 
- static void qvirtio_9p_pci_stop(QVirtIO9P *v9p)
- {
--    qvirtqueue_cleanup(v9p->dev->bus, v9p->vq, v9p->qs->alloc);
-+    qvirtqueue_cleanup(v9p->dev->bus, v9p->vq, &v9p->qs->alloc);
-     qvirtio_pci_device_disable(container_of(v9p->dev, QVirtioPCIDevice, vdev));
-     qvirtio_pci_device_free((QVirtioPCIDevice *)v9p->dev);
-     qvirtio_9p_stop(v9p);
-@@ -222,7 +222,7 @@ static P9Req *v9fs_req_init(QVirtIO9P *v9p, uint32_t size, uint8_t id,
- 
-     req->v9p = v9p;
-     req->t_size = total_size;
--    req->t_msg = guest_alloc(v9p->qs->alloc, req->t_size);
-+    req->t_msg = guest_alloc(&v9p->qs->alloc, req->t_size);
-     v9fs_memwrite(req, &hdr, 7);
-     req->tag = tag;
-     return req;
-@@ -232,7 +232,7 @@ static void v9fs_req_send(P9Req *req)
- {
-     QVirtIO9P *v9p = req->v9p;
- 
--    req->r_msg = guest_alloc(v9p->qs->alloc, P9_MAX_SIZE);
-+    req->r_msg = guest_alloc(&v9p->qs->alloc, P9_MAX_SIZE);
-     req->free_head = qvirtqueue_add(v9p->vq, req->t_msg, req->t_size, false,
-                                     true);
-     qvirtqueue_add(v9p->vq, req->r_msg, P9_MAX_SIZE, true, false);
-@@ -290,8 +290,8 @@ static void v9fs_req_free(P9Req *req)
- {
-     QVirtIO9P *v9p = req->v9p;
- 
--    guest_free(v9p->qs->alloc, req->t_msg);
--    guest_free(v9p->qs->alloc, req->r_msg);
-+    guest_free(&v9p->qs->alloc, req->t_msg);
-+    guest_free(&v9p->qs->alloc, req->r_msg);
-     g_free(req);
- }
- 
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index f97c158..77457f7 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -15,6 +15,7 @@
- #include "libqos/virtio.h"
- #include "libqos/virtio-pci.h"
- #include "libqos/virtio-mmio.h"
+diff --git a/tests/qos-test.c b/tests/qos-test.c
+new file mode 100644
+index 0000000..386c399
+--- /dev/null
++++ b/tests/qos-test.c
+@@ -0,0 +1,450 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include <getopt.h>
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qstring.h"
++#include "qapi/qmp/qlist.h"
 +#include "libqos/malloc.h"
- #include "libqos/malloc-generic.h"
- #include "qapi/qmp/qdict.h"
- #include "qemu/bswap.h"
-@@ -290,12 +291,12 @@ static void pci_basic(void)
-     qs = pci_test_start();
-     dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT);
- 
--    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
-+    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, &qs->alloc, 0);
- 
--    test_basic(&dev->vdev, qs->alloc, &vqpci->vq);
-+    test_basic(&dev->vdev, &qs->alloc, &vqpci->vq);
- 
-     /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-+    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, &qs->alloc);
-     qvirtio_pci_device_disable(dev);
-     qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
-@@ -329,7 +330,7 @@ static void pci_indirect(void)
-                             (1u << VIRTIO_BLK_F_SCSI));
-     qvirtio_set_features(&dev->vdev, features);
- 
--    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
-+    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, &qs->alloc, 0);
- 
-     qvirtio_set_driver_ok(&dev->vdev);
- 
-@@ -340,11 +341,11 @@ static void pci_indirect(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(&qs->alloc, &dev->vdev, &req, 512);
- 
-     g_free(req.data);
- 
--    indirect = qvring_indirect_desc_setup(&dev->vdev, qs->alloc, 2);
-+    indirect = qvring_indirect_desc_setup(&dev->vdev, &qs->alloc, 2);
-     qvring_indirect_desc_add(indirect, req_addr, 528, false);
-     qvring_indirect_desc_add(indirect, req_addr + 528, 1, true);
-     free_head = qvirtqueue_add_indirect(&vqpci->vq, indirect);
-@@ -356,7 +357,7 @@ static void pci_indirect(void)
-     g_assert_cmpint(status, ==, 0);
- 
-     g_free(indirect);
--    guest_free(qs->alloc, req_addr);
-+    guest_free(&qs->alloc, req_addr);
- 
-     /* Read request */
-     req.type = VIRTIO_BLK_T_IN;
-@@ -365,11 +366,11 @@ static void pci_indirect(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(&qs->alloc, &dev->vdev, &req, 512);
- 
-     g_free(req.data);
- 
--    indirect = qvring_indirect_desc_setup(&dev->vdev, qs->alloc, 2);
-+    indirect = qvring_indirect_desc_setup(&dev->vdev, &qs->alloc, 2);
-     qvring_indirect_desc_add(indirect, req_addr, 16, false);
-     qvring_indirect_desc_add(indirect, req_addr + 16, 513, true);
-     free_head = qvirtqueue_add_indirect(&vqpci->vq, indirect);
-@@ -386,10 +387,10 @@ static void pci_indirect(void)
-     g_free(data);
- 
-     g_free(indirect);
--    guest_free(qs->alloc, req_addr);
-+    guest_free(&qs->alloc, req_addr);
- 
-     /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-+    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, &qs->alloc);
-     qvirtio_pci_device_disable(dev);
-     qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
-@@ -444,7 +445,7 @@ static void pci_msix(void)
-     dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT);
-     qpci_msix_enable(dev->pdev);
- 
--    qvirtio_pci_set_msix_configuration_vector(dev, qs->alloc, 0);
-+    qvirtio_pci_set_msix_configuration_vector(dev, &qs->alloc, 0);
- 
-     capacity = qvirtio_config_readq(&dev->vdev, 0);
-     g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
-@@ -456,8 +457,8 @@ static void pci_msix(void)
-                             (1u << VIRTIO_BLK_F_SCSI));
-     qvirtio_set_features(&dev->vdev, features);
- 
--    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
--    qvirtqueue_pci_msix_setup(dev, vqpci, qs->alloc, 1);
-+    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, &qs->alloc, 0);
-+    qvirtqueue_pci_msix_setup(dev, vqpci, &qs->alloc, 1);
- 
-     qvirtio_set_driver_ok(&dev->vdev);
- 
-@@ -477,7 +478,7 @@ static void pci_msix(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(&qs->alloc, &dev->vdev, &req, 512);
- 
-     g_free(req.data);
- 
-@@ -492,7 +493,7 @@ static void pci_msix(void)
-     status = readb(req_addr + 528);
-     g_assert_cmpint(status, ==, 0);
- 
--    guest_free(qs->alloc, req_addr);
-+    guest_free(&qs->alloc, req_addr);
- 
-     /* Read request */
-     req.type = VIRTIO_BLK_T_IN;
-@@ -500,7 +501,7 @@ static void pci_msix(void)
-     req.sector = 0;
-     req.data = g_malloc0(512);
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(&qs->alloc, &dev->vdev, &req, 512);
- 
-     g_free(req.data);
- 
-@@ -522,10 +523,10 @@ static void pci_msix(void)
-     g_assert_cmpstr(data, ==, "TEST");
-     g_free(data);
- 
--    guest_free(qs->alloc, req_addr);
-+    guest_free(&qs->alloc, req_addr);
- 
-     /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-+    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, &qs->alloc);
-     qpci_msix_disable(dev->pdev);
-     qvirtio_pci_device_disable(dev);
-     qvirtio_pci_device_free(dev);
-@@ -552,7 +553,7 @@ static void pci_idx(void)
-     dev = virtio_blk_pci_init(qs->pcibus, PCI_SLOT);
-     qpci_msix_enable(dev->pdev);
- 
--    qvirtio_pci_set_msix_configuration_vector(dev, qs->alloc, 0);
-+    qvirtio_pci_set_msix_configuration_vector(dev, &qs->alloc, 0);
- 
-     capacity = qvirtio_config_readq(&dev->vdev, 0);
-     g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
-@@ -564,8 +565,8 @@ static void pci_idx(void)
-                             (1u << VIRTIO_BLK_F_SCSI));
-     qvirtio_set_features(&dev->vdev, features);
- 
--    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
--    qvirtqueue_pci_msix_setup(dev, vqpci, qs->alloc, 1);
-+    vqpci = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, &qs->alloc, 0);
-+    qvirtqueue_pci_msix_setup(dev, vqpci, &qs->alloc, 1);
- 
-     qvirtio_set_driver_ok(&dev->vdev);
- 
-@@ -576,7 +577,7 @@ static void pci_idx(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(&qs->alloc, &dev->vdev, &req, 512);
- 
-     g_free(req.data);
- 
-@@ -595,7 +596,7 @@ static void pci_idx(void)
-     req.data = g_malloc0(512);
-     strcpy(req.data, "TEST");
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(&qs->alloc, &dev->vdev, &req, 512);
- 
-     g_free(req.data);
- 
-@@ -613,7 +614,7 @@ static void pci_idx(void)
-                                              QVIRTIO_BLK_TIMEOUT_US);
-     g_assert_cmpint(status, ==, 0);
- 
--    guest_free(qs->alloc, req_addr);
-+    guest_free(&qs->alloc, req_addr);
- 
-     /* Read request */
-     req.type = VIRTIO_BLK_T_IN;
-@@ -621,7 +622,7 @@ static void pci_idx(void)
-     req.sector = 1;
-     req.data = g_malloc0(512);
- 
--    req_addr = virtio_blk_request(qs->alloc, &dev->vdev, &req, 512);
-+    req_addr = virtio_blk_request(&qs->alloc, &dev->vdev, &req, 512);
- 
-     g_free(req.data);
- 
-@@ -645,10 +646,10 @@ static void pci_idx(void)
-     g_assert_cmpstr(data, ==, "TEST");
-     g_free(data);
- 
--    guest_free(qs->alloc, req_addr);
-+    guest_free(&qs->alloc, req_addr);
- 
-     /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-+    qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, &qs->alloc);
-     qpci_msix_disable(dev->pdev);
-     qvirtio_pci_device_disable(dev);
-     qvirtio_pci_device_free(dev);
-@@ -708,7 +709,7 @@ static void mmio_basic(void)
- {
-     QVirtioMMIODevice *dev;
-     QVirtQueue *vq;
--    QGuestAllocator *alloc;
-+    QGuestAllocator alloc;
-     int n_size = TEST_IMAGE_SIZE / 2;
-     uint64_t capacity;
- 
-@@ -720,10 +721,10 @@ static void mmio_basic(void)
- 
-     qvirtio_start_device(&dev->vdev);
- 
--    alloc = generic_alloc_init(MMIO_RAM_ADDR, MMIO_RAM_SIZE, MMIO_PAGE_SIZE);
--    vq = qvirtqueue_setup(&dev->vdev, alloc, 0);
-+    generic_alloc_init(&alloc, MMIO_RAM_ADDR, MMIO_RAM_SIZE, MMIO_PAGE_SIZE);
-+    vq = qvirtqueue_setup(&dev->vdev, &alloc, 0);
- 
--    test_basic(&dev->vdev, alloc, vq);
-+    test_basic(&dev->vdev, &alloc, vq);
- 
-     qmp_discard_response("{ 'execute': 'block_resize', "
-                          " 'arguments': { 'device': 'drive0', "
-@@ -735,9 +736,9 @@ static void mmio_basic(void)
-     g_assert_cmpint(capacity, ==, n_size / 512);
- 
-     /* End test */
--    qvirtqueue_cleanup(dev->vdev.bus, vq, alloc);
-+    qvirtqueue_cleanup(dev->vdev.bus, vq, &alloc);
-     g_free(dev);
--    generic_alloc_uninit(alloc);
-+    alloc_destroy(&alloc);
-     test_end();
- }
- 
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index d4a32a4..653148e 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -228,16 +228,16 @@ static void pci_basic(gconstpointer data)
-                         "virtio-net-pci,netdev=hs0", sv[1]);
-     dev = virtio_net_pci_init(qs->pcibus, PCI_SLOT);
- 
--    rx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
--    tx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 1);
-+    rx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, &qs->alloc, 0);
-+    tx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, &qs->alloc, 1);
- 
-     driver_init(&dev->vdev);
--    func(&dev->vdev, qs->alloc, &rx->vq, &tx->vq, sv[0]);
-+    func(&dev->vdev, &qs->alloc, &rx->vq, &tx->vq, sv[0]);
- 
-     /* End test */
-     close(sv[0]);
--    qvirtqueue_cleanup(dev->vdev.bus, &tx->vq, qs->alloc);
--    qvirtqueue_cleanup(dev->vdev.bus, &rx->vq, qs->alloc);
-+    qvirtqueue_cleanup(dev->vdev.bus, &tx->vq, &qs->alloc);
-+    qvirtqueue_cleanup(dev->vdev.bus, &rx->vq, &qs->alloc);
-     qvirtio_pci_device_disable(dev);
-     g_free(dev->pdev);
-     g_free(dev);
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index 961925c..9298aa8 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -62,7 +62,7 @@ static void qvirtio_scsi_pci_free(QVirtIOSCSI *vs)
-     int i;
- 
-     for (i = 0; i < vs->num_queues + 2; i++) {
--        qvirtqueue_cleanup(vs->dev->bus, vs->vq[i], vs->qs->alloc);
-+        qvirtqueue_cleanup(vs->dev->bus, vs->vq[i], &vs->qs->alloc);
-     }
-     qvirtio_pci_device_disable(container_of(vs->dev, QVirtioPCIDevice, vdev));
-     qvirtio_pci_device_free((QVirtioPCIDevice *)vs->dev);
-@@ -75,7 +75,7 @@ static uint64_t qvirtio_scsi_alloc(QVirtIOSCSI *vs, size_t alloc_size,
- {
-     uint64_t addr;
- 
--    addr = guest_alloc(vs->qs->alloc, alloc_size);
-+    addr = guest_alloc(&vs->qs->alloc, alloc_size);
-     if (data) {
-         memwrite(addr, data, alloc_size);
-     }
-@@ -133,10 +133,10 @@ static uint8_t virtio_scsi_do_command(QVirtIOSCSI *vs, const uint8_t *cdb,
-         memread(resp_addr, resp_out, sizeof(*resp_out));
-     }
- 
--    guest_free(vs->qs->alloc, req_addr);
--    guest_free(vs->qs->alloc, resp_addr);
--    guest_free(vs->qs->alloc, data_in_addr);
--    guest_free(vs->qs->alloc, data_out_addr);
-+    guest_free(&vs->qs->alloc, req_addr);
-+    guest_free(&vs->qs->alloc, resp_addr);
-+    guest_free(&vs->qs->alloc, data_in_addr);
-+    guest_free(&vs->qs->alloc, data_out_addr);
-     return response;
- }
- 
-@@ -166,7 +166,7 @@ static QVirtIOSCSI *qvirtio_scsi_pci_init(int slot)
-     g_assert_cmpint(vs->num_queues, <, MAX_NUM_QUEUES);
- 
-     for (i = 0; i < vs->num_queues + 2; i++) {
--        vs->vq[i] = qvirtqueue_setup(vs->dev, vs->qs->alloc, i);
-+        vs->vq[i] = qvirtqueue_setup(vs->dev, &vs->qs->alloc, i);
-     }
- 
-     /* Clear the POWER ON OCCURRED unit attention */
++#include "libqos/qgraph.h"
++#include "libqos/qgraph_internal.h"
++
++static char *old_path;
++
++static void apply_to_node(const char *name, bool is_machine, bool is_abstract)
++{
++    char *machine_name = NULL;
++    if (is_machine) {
++        const char *arch = qtest_get_arch();
++        machine_name = g_strconcat(arch, "/", name, NULL);
++        name = machine_name;
++    }
++    qos_graph_node_set_availability(name, TRUE);
++    if (is_abstract) {
++        qos_delete_cmd_line(name);
++    }
++    g_free(machine_name);
++}
++
++/**
++ * apply_to_qlist(): using QMP queries QEMU for a list of
++ * machines and devices available, and sets the respective node
++ * as TRUE. If a node is found, also all its produced and contained
++ * child are marked available.
++ *
++ * See qos_graph_node_set_availability() for more info
++ */
++static void apply_to_qlist(QList *list, bool is_machine)
++{
++    const QListEntry *p;
++    const char *name;
++    bool abstract;
++    QDict *minfo;
++    QObject *qobj;
++    QString *qstr;
++    QBool *qbool;
++
++    for (p = qlist_first(list); p; p = qlist_next(p)) {
++        minfo = qobject_to(QDict, qlist_entry_obj(p));
++        qobj = qdict_get(minfo, "name");
++        qstr = qobject_to(QString, qobj);
++        name = qstring_get_str(qstr);
++
++        qobj = qdict_get(minfo, "abstract");
++        if (qobj) {
++            qbool = qobject_to(QBool, qobj);
++            abstract = qbool_get_bool(qbool);
++        } else {
++            abstract = false;
++        }
++
++        apply_to_node(name, is_machine, abstract);
++        qobj = qdict_get(minfo, "alias");
++        if (qobj) {
++            qstr = qobject_to(QString, qobj);
++            name = qstring_get_str(qstr);
++            apply_to_node(name, is_machine, abstract);
++        }
++    }
++}
++
++/**
++ * qos_set_machines_devices_available(): sets availability of qgraph
++ * machines and devices.
++ *
++ * This function firstly starts QEMU with "-machine none" option,
++ * and then executes the QMP protocol asking for the list of devices
++ * and machines available.
++ *
++ * for each of these items, it looks up the corresponding qgraph node,
++ * setting it as available. The list currently returns all devices that
++ * are either machines or QEDGE_CONSUMED_BY other nodes.
++ * Therefore, in order to mark all other nodes, it recursively sets
++ * all its QEDGE_CONTAINS and QEDGE_PRODUCES child as available too.
++ */
++static void qos_set_machines_devices_available(void)
++{
++    QDict *response;
++    QDict *args = qdict_new();
++    QList *list;
++
++    qtest_start("-machine none");
++    response = qmp("{ 'execute': 'query-machines' }");
++    list = qdict_get_qlist(response, "return");
++
++    apply_to_qlist(list, TRUE);
++
++    qobject_unref(response);
++
++    qdict_put_bool(args, "abstract", TRUE);
++    qdict_put_str(args, "implements", "device");
++
++    response = qmp("{'execute': 'qom-list-types',"
++                   " 'arguments': %p }", args);
++    g_assert(qdict_haskey(response, "return"));
++    list = qdict_get_qlist(response, "return");
++
++    apply_to_qlist(list, FALSE);
++
++    qtest_end();
++    qobject_unref(response);
++
++}
++
++static QGuestAllocator *get_machine_allocator(QOSGraphObject *obj)
++{
++    if (obj->get_driver) {
++        return obj->get_driver(obj, "memory");
++    } else {
++        return NULL;
++    }
++}
++
++static void restart_qemu_or_continue(char *path)
++{
++    /* compares the current command line with the
++     * one previously executed: if they are the same,
++     * don't restart QEMU, if they differ, stop previous
++     * QEMU subprocess (if active) and start over with
++     * the new command line
++     */
++    if (g_strcmp0(old_path, path)) {
++        qtest_end();
++        qos_invalidate_command_line();
++        old_path = g_strdup(path);
++        qtest_start(path);
++    } else { /* if cmd line is the same, reset the guest */
++        qobject_unref(qmp("{ 'execute': 'system_reset' }"));
++        qmp_eventwait("RESET");
++    }
++}
++
++void qos_invalidate_command_line(void)
++{
++    g_free(old_path);
++    old_path = NULL;
++}
++
++/**
++ * allocate_objects(): given an array of nodes @arg,
++ * walks the path invoking all constructors and
++ * passing the corresponding parameter in order to
++ * continue the objects allocation.
++ * Once the test is reached, return the object it consumes.
++ *
++ * Since the machine and QEDGE_CONSUMED_BY nodes allocate
++ * memory in the constructor, g_test_queue_destroy is used so
++ * that after execution they can be safely free'd.  (The test's
++ * ->before callback is also welcome to use g_test_queue_destroy).
++ *
++ * Note: as specified in walk_path() too, @arg is an array of
++ * char *, where arg[0] is a pointer to the command line
++ * string that will be used to properly start QEMU when executing
++ * the test, and the remaining elements represent the actual objects
++ * that will be allocated.
++ */
++static void *allocate_objects(QTestState *qts, char **path, QGuestAllocator **p_alloc)
++{
++    int current = 0;
++    QGuestAllocator *alloc;
++    QOSGraphObject *parent = NULL;
++    QOSGraphEdge *edge;
++    QOSGraphNode *node;
++    void *edge_arg;
++    void *obj;
++
++    node = qos_graph_get_node(path[current]);
++    g_assert(node->type == QNODE_MACHINE);
++
++    obj = qos_machine_new(node, qts);
++    qos_object_queue_destroy(obj);
++
++    alloc = get_machine_allocator(obj);
++    if (p_alloc) {
++        *p_alloc = alloc;
++    }
++
++    for (;;) {
++        if (node->type != QNODE_INTERFACE) {
++            qos_object_start_hw(obj);
++            parent = obj;
++        }
++
++        /* follow edge and get object for next node constructor */
++        current++;
++        edge = qos_graph_get_edge(path[current - 1], path[current]);
++        node = qos_graph_get_node(path[current]);
++
++        if (node->type == QNODE_TEST) {
++            g_assert(qos_graph_edge_get_type(edge) == QEDGE_CONSUMED_BY);
++            return obj;
++        }
++
++        switch (qos_graph_edge_get_type(edge)) {
++        case QEDGE_PRODUCES:
++            obj = parent->get_driver(parent, path[current]);
++            break;
++
++        case QEDGE_CONSUMED_BY:
++            edge_arg = qos_graph_edge_get_arg(edge);
++            obj = qos_driver_new(node, obj, alloc, edge_arg);
++            qos_object_queue_destroy(obj);
++            break;
++
++        case QEDGE_CONTAINS:
++            obj = parent->get_device(parent, path[current]);
++            break;
++        }
++    }
++}
++
++/* The argument to run_one_test, which is the test function that is registered
++ * with GTest, is a vector of strings.  The first item is the initial command
++ * line (before it is modified by the test's "before" function), the remaining
++ * items are node names forming the path to the test node.
++ */
++static char **current_path;
++
++const char *qos_get_current_command_line(void)
++{
++    return current_path[0];
++}
++
++void *qos_allocate_objects(QTestState *qts, QGuestAllocator **p_alloc)
++{
++    return allocate_objects(qts, current_path + 1, p_alloc);
++}
++
++/**
++ * run_one_test(): given an array of nodes @arg,
++ * walks the path invoking all constructors and
++ * passing the corresponding parameter in order to
++ * continue the objects allocation.
++ * Once the test is reached, its function is executed.
++ *
++ * Since the machine and QEDGE_CONSUMED_BY nodes allocate
++ * memory in the constructor, g_test_queue_destroy is used so
++ * that after execution they can be safely free'd.  The test's
++ * ->before callback is also welcome to use g_test_queue_destroy.
++ *
++ * Note: as specified in walk_path() too, @arg is an array of
++ * char *, where arg[0] is a pointer to the command line
++ * string that will be used to properly start QEMU when executing
++ * the test, and the remaining elements represent the actual objects
++ * that will be allocated.
++ *
++ * The order of execution is the following:
++ * 1) @before test function as defined in the given QOSGraphTestOptions
++ * 2) start QEMU
++ * 3) call all nodes constructor and get_driver/get_device depending on edge,
++ *    start the hardware (*_device_enable functions)
++ * 4) start test
++ */
++static void run_one_test(const void *arg)
++{
++    QOSGraphNode *test_node;
++    QGuestAllocator *alloc = NULL;
++    void *obj;
++    char **path = (char **) arg;
++    GString *cmd_line = g_string_new(path[0]);
++    void *test_arg;
++
++    /* Before test */
++    current_path = path;
++    test_node = qos_graph_get_node(path[(g_strv_length(path) - 1)]);
++    test_arg = test_node->u.test.arg;
++    if (test_node->u.test.before) {
++        test_arg = test_node->u.test.before(cmd_line, test_arg);
++    }
++
++    restart_qemu_or_continue(cmd_line->str);
++    g_string_free(cmd_line, TRUE);
++
++    obj = qos_allocate_objects(global_qtest, &alloc);
++    test_node->u.test.function(obj, test_arg, alloc);
++}
++
++static void subprocess_run_one_test(const void *arg)
++{
++    const gchar *path = arg;
++    g_test_trap_subprocess(path, 0, 0);
++    g_test_trap_assert_passed();
++}
++
++/*
++ * in this function, 2 path will be built:
++ * path_str, a one-string path (ex "pc/i440FX-pcihost/...")
++ * path_vec, a string-array path (ex [0] = "pc", [1] = "i440FX-pcihost").
++ *
++ * path_str will be only used to build the test name, and won't need the
++ * architecture name at beginning, since it will be added by qtest_add_func().
++ *
++ * path_vec is used to allocate all constructors of the path nodes.
++ * Each name in this array except position 0 must correspond to a valid
++ * QOSGraphNode name.
++ * Position 0 is special, initially contains just the <machine> name of
++ * the node, (ex for "x86_64/pc" it will be "pc"), used to build the test
++ * path (see below). After it will contain the command line used to start
++ * qemu with all required devices.
++ *
++ * Note that the machine node name must be with format <arch>/<machine>
++ * (ex "x86_64/pc"), because it will identify the node "x86_64/pc"
++ * and start QEMU with "-M pc". For this reason,
++ * when building path_str, path_vec
++ * initially contains the <machine> at position 0 ("pc"),
++ * and the node name at position 1 (<arch>/<machine>)
++ * ("x86_64/pc"), followed by the rest of the nodes.
++ */
++static void walk_path(QOSGraphNode *orig_path, int len)
++{
++    QOSGraphNode *path;
++    QOSGraphEdge *edge;
++
++    /* etype set to QEDGE_CONSUMED_BY so that machine can add to the command line */
++    QOSEdgeType etype = QEDGE_CONSUMED_BY;
++
++    /* twice QOS_PATH_MAX_ELEMENT_SIZE since each edge can have its arg */
++    char **path_vec = g_new0(char *, (QOS_PATH_MAX_ELEMENT_SIZE * 2));
++    int path_vec_size = 0;
++
++    char *after_cmd = NULL, *before_cmd = NULL, *after_device = NULL;
++    char *node_name = orig_path->name, *path_str;
++
++    GString *cmd_line = g_string_new("");
++    GString *cmd_line2 = g_string_new("");
++
++    path = qos_graph_get_node(node_name); /* root */
++    node_name = qos_graph_edge_get_dest(path->path_edge); /* machine name */
++
++    path_vec[path_vec_size++] = node_name;
++    path_vec[path_vec_size++] = qos_get_machine_type(node_name);
++
++    for (;;) {
++        path = qos_graph_get_node(node_name);
++        if (!path->path_edge) {
++            break;
++        }
++
++        node_name = qos_graph_edge_get_dest(path->path_edge);
++
++        /* append node command line + previous edge command line */
++        if (path->command_line && etype == QEDGE_CONSUMED_BY) {
++            g_string_append(cmd_line, path->command_line);
++            if (after_device) {
++                g_string_append(cmd_line, after_device);
++            }
++        }
++
++        path_vec[path_vec_size++] = qos_graph_edge_get_name(path->path_edge);
++        /* detect if edge has command line args */
++        after_cmd = qos_graph_edge_get_after_cmd_line(path->path_edge);
++        after_device = qos_graph_edge_get_extra_device_opts(path->path_edge);
++        before_cmd = qos_graph_edge_get_before_cmd_line(path->path_edge);
++        edge = qos_graph_get_edge(path->name, node_name);
++        etype = qos_graph_edge_get_type(edge);
++
++        if (before_cmd) {
++            g_string_append(cmd_line, before_cmd);
++        }
++        if (after_cmd) {
++            g_string_append(cmd_line2, after_cmd);
++        }
++    }
++
++    path_vec[path_vec_size++] = NULL;
++    if (after_device) {
++        g_string_append(cmd_line, after_device);
++    }
++    g_string_append(cmd_line, cmd_line2->str);
++    g_string_free(cmd_line2, TRUE);
++
++    /* here position 0 has <arch>/<machine>, position 1 has <machine>.
++     * The path must not have the <arch>, qtest_add_data_func adds it.
++     */
++    path_str = g_strjoinv("/", path_vec + 1);
++
++    /* put arch/machine in position 1 so run_one_test can do its work
++     * and add the command line at position 0.
++     */
++    path_vec[1] = path_vec[0];
++    path_vec[0] = g_string_free(cmd_line, FALSE);
++
++    if (path->u.test.subprocess) {
++        gchar *subprocess_path = g_strdup_printf("/%s/%s/subprocess",
++						 qtest_get_arch(), path_str);
++        qtest_add_data_func(path_str, subprocess_path, subprocess_run_one_test);
++        g_test_add_data_func(subprocess_path, path_vec, run_one_test);
++    } else {
++        qtest_add_data_func(path_str, path_vec, run_one_test);
++    }
++
++    g_free(path_str);
++}
++
++
++
++/**
++ * main(): heart of the qgraph framework.
++ *
++ * - Initializes the glib test framework
++ * - Creates the graph by invoking the various _init constructors
++ * - Starts QEMU to mark the available devices
++ * - Walks the graph, and each path is added to
++ *   the glib test framework (walk_path)
++ * - Runs the tests, calling allocate_object() and allocating the
++ *   machine/drivers/test objects
++ * - Cleans up everything
++ */
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++    qos_graph_init();
++    module_call_init(MODULE_INIT_QOM);
++    module_call_init(MODULE_INIT_LIBQOS);
++    qos_set_machines_devices_available();
++
++    qos_graph_foreach_test_path(walk_path);
++    g_test_run();
++    qtest_end();
++    qos_graph_destroy();
++    g_free(old_path);
++    return 0;
++}
+diff --git a/tests/test-qgraph.c b/tests/test-qgraph.c
+new file mode 100644
+index 0000000..f6a6565
+--- /dev/null
++++ b/tests/test-qgraph.c
+@@ -0,0 +1,434 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "libqos/qgraph.h"
++#include "libqos/qgraph_internal.h"
++
++#define MACHINE_PC "x86_64/pc"
++#define MACHINE_RASPI2 "arm/raspi2"
++#define I440FX "i440FX-pcihost"
++#define PCIBUS_PC "pcibus-pc"
++#define SDHCI "sdhci"
++#define PCIBUS "pci-bus"
++#define SDHCI_PCI "sdhci-pci"
++#define SDHCI_MM "generic-sdhci"
++#define REGISTER_TEST "register-test"
++
++int npath;
++
++static void *machinefunct(QTestState *qts)
++{
++    return NULL;
++}
++
++static void *driverfunct(void *obj, QGuestAllocator *machine, void *arg)
++{
++    return NULL;
++}
++
++static void testfunct(void *obj, void *arg, QGuestAllocator *alloc)
++{
++    return;
++}
++
++static void check_interface(const char *interface)
++{
++    g_assert_cmpint(qos_graph_has_machine(interface), ==, FALSE);
++    g_assert_nonnull(qos_graph_get_node(interface));
++    g_assert_cmpint(qos_graph_has_node(interface), ==, TRUE);
++    g_assert_cmpint(qos_graph_get_node_type(interface), ==, QNODE_INTERFACE);
++    qos_graph_node_set_availability(interface, TRUE);
++    g_assert_cmpint(qos_graph_get_node_availability(interface), ==, TRUE);
++}
++
++static void check_machine(const char *machine)
++{
++    qos_node_create_machine(machine, machinefunct);
++    g_assert_nonnull(qos_graph_get_machine(machine));
++    g_assert_cmpint(qos_graph_has_machine(machine), ==, TRUE);
++    g_assert_nonnull(qos_graph_get_node(machine));
++    g_assert_cmpint(qos_graph_get_node_availability(machine), ==, FALSE);
++    qos_graph_node_set_availability(machine, TRUE);
++    g_assert_cmpint(qos_graph_get_node_availability(machine), ==, TRUE);
++    g_assert_cmpint(qos_graph_has_node(machine), ==, TRUE);
++    g_assert_cmpint(qos_graph_get_node_type(machine), ==, QNODE_MACHINE);
++}
++
++static void check_contains(const char *machine, const char *driver)
++{
++    QOSGraphEdge *edge;
++    qos_node_contains(machine, driver, NULL);
++
++    edge = qos_graph_get_edge(machine, driver);
++    g_assert_nonnull(edge);
++    g_assert_cmpint(qos_graph_edge_get_type(edge), ==, QEDGE_CONTAINS);
++    g_assert_cmpint(qos_graph_has_edge(machine, driver), ==, TRUE);
++}
++
++static void check_produces(const char *machine, const char *interface)
++{
++    QOSGraphEdge *edge;
++
++    qos_node_produces(machine, interface);
++    check_interface(interface);
++    edge = qos_graph_get_edge(machine, interface);
++    g_assert_nonnull(edge);
++    g_assert_cmpint(qos_graph_edge_get_type(edge), ==,
++                    QEDGE_PRODUCES);
++    g_assert_cmpint(qos_graph_has_edge(machine, interface), ==, TRUE);
++}
++
++static void check_consumes(const char *driver, const char *interface)
++{
++    QOSGraphEdge *edge;
++
++    qos_node_consumes(driver, interface, NULL);
++    check_interface(interface);
++    edge = qos_graph_get_edge(interface, driver);
++    g_assert_nonnull(edge);
++    g_assert_cmpint(qos_graph_edge_get_type(edge), ==, QEDGE_CONSUMED_BY);
++    g_assert_cmpint(qos_graph_has_edge(interface, driver), ==, TRUE);
++}
++
++static void check_driver(const char *driver)
++{
++    qos_node_create_driver(driver, driverfunct);
++    g_assert_cmpint(qos_graph_has_machine(driver), ==, FALSE);
++    g_assert_nonnull(qos_graph_get_node(driver));
++    g_assert_cmpint(qos_graph_has_node(driver), ==, TRUE);
++    g_assert_cmpint(qos_graph_get_node_type(driver), ==, QNODE_DRIVER);
++    g_assert_cmpint(qos_graph_get_node_availability(driver), ==, FALSE);
++    qos_graph_node_set_availability(driver, TRUE);
++    g_assert_cmpint(qos_graph_get_node_availability(driver), ==, TRUE);
++}
++
++static void check_test(const char *test, const char *interface)
++{
++    QOSGraphEdge *edge;
++    const char *full_name = g_strdup_printf("%s-tests/%s", interface, test);
++
++    qos_add_test(test, interface, testfunct, NULL);
++    g_assert_cmpint(qos_graph_has_machine(test), ==, FALSE);
++    g_assert_cmpint(qos_graph_has_machine(full_name), ==, FALSE);
++    g_assert_nonnull(qos_graph_get_node(full_name));
++    g_assert_cmpint(qos_graph_has_node(full_name), ==, TRUE);
++    g_assert_cmpint(qos_graph_get_node_type(full_name), ==, QNODE_TEST);
++    edge = qos_graph_get_edge(interface, full_name);
++    g_assert_nonnull(edge);
++    g_assert_cmpint(qos_graph_edge_get_type(edge), ==,
++                    QEDGE_CONSUMED_BY);
++    g_assert_cmpint(qos_graph_has_edge(interface, full_name), ==, TRUE);
++    g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, TRUE);
++    qos_graph_node_set_availability(full_name, FALSE);
++    g_assert_cmpint(qos_graph_get_node_availability(full_name), ==, FALSE);
++}
++
++static void count_each_test(QOSGraphNode *path, int len)
++{
++    npath++;
++}
++
++static void check_leaf_discovered(int n)
++{
++    npath = 0;
++    qos_graph_foreach_test_path(count_each_test);
++    g_assert_cmpint(n, ==, npath);
++}
++
++/* G_Test functions */
++
++static void init_nop(void)
++{
++    qos_graph_init();
++    qos_graph_destroy();
++}
++
++static void test_machine(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_PC);
++    qos_graph_destroy();
++}
++
++static void test_contains(void)
++{
++    qos_graph_init();
++    check_contains(MACHINE_PC, I440FX);
++    g_assert_null(qos_graph_get_machine(MACHINE_PC));
++    g_assert_null(qos_graph_get_machine(I440FX));
++    g_assert_null(qos_graph_get_node(MACHINE_PC));
++    g_assert_null(qos_graph_get_node(I440FX));
++    qos_graph_destroy();
++}
++
++static void test_multiple_contains(void)
++{
++    qos_graph_init();
++    check_contains(MACHINE_PC, I440FX);
++    check_contains(MACHINE_PC, PCIBUS_PC);
++    qos_graph_destroy();
++}
++
++static void test_produces(void)
++{
++    qos_graph_init();
++    check_produces(MACHINE_PC, I440FX);
++    g_assert_null(qos_graph_get_machine(MACHINE_PC));
++    g_assert_null(qos_graph_get_machine(I440FX));
++    g_assert_null(qos_graph_get_node(MACHINE_PC));
++    g_assert_nonnull(qos_graph_get_node(I440FX));
++    qos_graph_destroy();
++}
++
++static void test_multiple_produces(void)
++{
++    qos_graph_init();
++    check_produces(MACHINE_PC, I440FX);
++    check_produces(MACHINE_PC, PCIBUS_PC);
++    qos_graph_destroy();
++}
++
++static void test_consumes(void)
++{
++    qos_graph_init();
++    check_consumes(I440FX, SDHCI);
++    g_assert_null(qos_graph_get_machine(I440FX));
++    g_assert_null(qos_graph_get_machine(SDHCI));
++    g_assert_null(qos_graph_get_node(I440FX));
++    g_assert_nonnull(qos_graph_get_node(SDHCI));
++    qos_graph_destroy();
++}
++
++static void test_multiple_consumes(void)
++{
++    qos_graph_init();
++    check_consumes(I440FX, SDHCI);
++    check_consumes(PCIBUS_PC, SDHCI);
++    qos_graph_destroy();
++}
++
++static void test_driver(void)
++{
++    qos_graph_init();
++    check_driver(I440FX);
++    qos_graph_destroy();
++}
++
++static void test_test(void)
++{
++    qos_graph_init();
++    check_test(REGISTER_TEST, SDHCI);
++    qos_graph_destroy();
++}
++
++static void test_machine_contains_driver(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_PC);
++    check_driver(I440FX);
++    check_contains(MACHINE_PC, I440FX);
++    qos_graph_destroy();
++}
++
++static void test_driver_contains_driver(void)
++{
++    qos_graph_init();
++    check_driver(PCIBUS_PC);
++    check_driver(I440FX);
++    check_contains(PCIBUS_PC, I440FX);
++    qos_graph_destroy();
++}
++
++static void test_machine_produces_interface(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_PC);
++    check_produces(MACHINE_PC, SDHCI);
++    qos_graph_destroy();
++}
++
++static void test_driver_produces_interface(void)
++{
++    qos_graph_init();
++    check_driver(I440FX);
++    check_produces(I440FX, SDHCI);
++    qos_graph_destroy();
++}
++
++static void test_machine_consumes_interface(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_PC);
++    check_consumes(MACHINE_PC, SDHCI);
++    qos_graph_destroy();
++}
++
++static void test_driver_consumes_interface(void)
++{
++    qos_graph_init();
++    check_driver(I440FX);
++    check_consumes(I440FX, SDHCI);
++    qos_graph_destroy();
++}
++
++static void test_test_consumes_interface(void)
++{
++    qos_graph_init();
++    check_test(REGISTER_TEST, SDHCI);
++    qos_graph_destroy();
++}
++
++static void test_full_sample(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_PC);
++    check_contains(MACHINE_PC, I440FX);
++    check_driver(I440FX);
++    check_driver(PCIBUS_PC);
++    check_contains(I440FX, PCIBUS_PC);
++    check_produces(PCIBUS_PC, PCIBUS);
++    check_driver(SDHCI_PCI);
++    qos_node_consumes(SDHCI_PCI, PCIBUS, NULL);
++    check_produces(SDHCI_PCI, SDHCI);
++    check_driver(SDHCI_MM);
++    check_produces(SDHCI_MM, SDHCI);
++    qos_add_test(REGISTER_TEST, SDHCI, testfunct, NULL);
++    check_leaf_discovered(1);
++    qos_print_graph();
++    qos_graph_destroy();
++}
++
++static void test_full_sample_raspi(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_PC);
++    check_contains(MACHINE_PC, I440FX);
++    check_driver(I440FX);
++    check_driver(PCIBUS_PC);
++    check_contains(I440FX, PCIBUS_PC);
++    check_produces(PCIBUS_PC, PCIBUS);
++    check_driver(SDHCI_PCI);
++    qos_node_consumes(SDHCI_PCI, PCIBUS, NULL);
++    check_produces(SDHCI_PCI, SDHCI);
++    check_machine(MACHINE_RASPI2);
++    check_contains(MACHINE_RASPI2, SDHCI_MM);
++    check_driver(SDHCI_MM);
++    check_produces(SDHCI_MM, SDHCI);
++    qos_add_test(REGISTER_TEST, SDHCI, testfunct, NULL);
++    qos_print_graph();
++    check_leaf_discovered(2);
++    qos_graph_destroy();
++}
++
++static void test_cycle(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_RASPI2);
++    check_driver("B");
++    check_driver("C");
++    check_driver("D");
++    check_contains(MACHINE_RASPI2, "B");
++    check_contains("B", "C");
++    check_contains("C", "D");
++    check_contains("D", MACHINE_RASPI2);
++    check_leaf_discovered(0);
++    qos_print_graph();
++    qos_graph_destroy();
++}
++
++static void test_two_test_same_interface(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_RASPI2);
++    check_produces(MACHINE_RASPI2, "B");
++    qos_add_test("C", "B", testfunct, NULL);
++    qos_add_test("D", "B", testfunct, NULL);
++    check_contains(MACHINE_RASPI2, "B");
++    check_leaf_discovered(4);
++    qos_print_graph();
++    qos_graph_destroy();
++}
++
++static void test_test_in_path(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_RASPI2);
++    check_produces(MACHINE_RASPI2, "B");
++    qos_add_test("C", "B", testfunct, NULL);
++    check_driver("D");
++    check_consumes("D", "B");
++    check_produces("D", "E");
++    qos_add_test("F", "E", testfunct, NULL);
++    check_leaf_discovered(2);
++    qos_print_graph();
++    qos_graph_destroy();
++}
++
++static void test_double_edge(void)
++{
++    qos_graph_init();
++    check_machine(MACHINE_RASPI2);
++    check_produces("B", "C");
++    qos_node_consumes("C", "B", NULL);
++    qos_add_test("D", "C", testfunct, NULL);
++    check_contains(MACHINE_RASPI2, "B");
++    qos_print_graph();
++    qos_graph_destroy();
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++    g_test_add_func("/qgraph/init_nop", init_nop);
++    g_test_add_func("/qgraph/test_machine", test_machine);
++    g_test_add_func("/qgraph/test_contains", test_contains);
++    g_test_add_func("/qgraph/test_multiple_contains", test_multiple_contains);
++    g_test_add_func("/qgraph/test_produces", test_produces);
++    g_test_add_func("/qgraph/test_multiple_produces", test_multiple_produces);
++    g_test_add_func("/qgraph/test_consumes", test_consumes);
++    g_test_add_func("/qgraph/test_multiple_consumes",
++                    test_multiple_consumes);
++    g_test_add_func("/qgraph/test_driver", test_driver);
++    g_test_add_func("/qgraph/test_test", test_test);
++    g_test_add_func("/qgraph/test_machine_contains_driver",
++                    test_machine_contains_driver);
++    g_test_add_func("/qgraph/test_driver_contains_driver",
++                    test_driver_contains_driver);
++    g_test_add_func("/qgraph/test_machine_produces_interface",
++                    test_machine_produces_interface);
++    g_test_add_func("/qgraph/test_driver_produces_interface",
++                    test_driver_produces_interface);
++    g_test_add_func("/qgraph/test_machine_consumes_interface",
++                    test_machine_consumes_interface);
++    g_test_add_func("/qgraph/test_driver_consumes_interface",
++                    test_driver_consumes_interface);
++    g_test_add_func("/qgraph/test_test_consumes_interface",
++                    test_test_consumes_interface);
++    g_test_add_func("/qgraph/test_full_sample", test_full_sample);
++    g_test_add_func("/qgraph/test_full_sample_raspi", test_full_sample_raspi);
++    g_test_add_func("/qgraph/test_cycle", test_cycle);
++    g_test_add_func("/qgraph/test_two_test_same_interface",
++                    test_two_test_same_interface);
++    g_test_add_func("/qgraph/test_test_in_path", test_test_in_path);
++    g_test_add_func("/qgraph/test_double_edge", test_double_edge);
++
++    g_test_run();
++    return 0;
++}
 -- 
 1.8.3.1
