@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33754)
+Received: from eggs.gnu.org ([209.51.188.92]:33781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjR1v-0001Xy-D9
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:32 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gjR1x-0001aW-Qm
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjR1s-0006Jy-RF
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47092)
+	(envelope-from <imammedo@redhat.com>) id 1gjR1v-0006QR-E0
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:21647)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjR1l-0006HM-4r
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:23 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjR1q-0006IQ-TB
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 10:53:29 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 15 Jan 2019 16:40:55 +0100
-Message-Id: <1547566866-129386-4-git-send-email-imammedo@redhat.com>
+Date: Tue, 15 Jan 2019 16:40:57 +0100
+Message-Id: <1547566866-129386-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
 References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 03/14] tests: acpi: rename
- acpi_parse_rsdp_table() into acpi_fetch_rsdp_table()
+Subject: [Qemu-devel] [PATCH 05/14] tests: acpi: fetch X_DSDT if pointer to
+ DSDT is 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +27,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gonglei <arei.gonglei@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-so name would reflect what the function does
+that way it would be possible to test a DSDT pointed by
+64bit X_DSDT field in FADT.
+
+PS:
+it will allow to enable testing arm/virt board, which sets
+only newer X_DSDT field.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/acpi-utils.h       | 2 +-
- tests/acpi-utils.c       | 2 +-
- tests/bios-tables-test.c | 2 +-
- tests/vmgenid-test.c     | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ tests/bios-tables-test.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index 398900c..59fb7d5 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -47,7 +47,7 @@ typedef struct {
- uint8_t acpi_calc_checksum(const uint8_t *data, int len);
- uint32_t acpi_find_rsdp_address(QTestState *qts);
- uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size);
--void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
-+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table);
- void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
-                       const uint8_t *addr_ptr, const char *sig,
-                       bool verify_checksum);
-diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index 84068a8..dce0fb7 100644
---- a/tests/acpi-utils.c
-+++ b/tests/acpi-utils.c
-@@ -51,7 +51,7 @@ uint32_t acpi_find_rsdp_address(QTestState *qts)
-     return off;
- }
- 
--void acpi_parse_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
-+void acpi_fetch_rsdp_table(QTestState *qts, uint64_t addr, uint8_t *rsdp_table)
- {
-     uint8_t revision;
- 
 diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 529bfc4..99d7bf8 100644
+index c28c5c7..0f04a0a 100644
 --- a/tests/bios-tables-test.c
 +++ b/tests/bios-tables-test.c
-@@ -89,7 +89,7 @@ static void test_acpi_rsdp_table(test_data *data)
-     uint8_t *rsdp_table = data->rsdp_table, revision;
-     uint32_t addr = data->rsdp_addr;
+@@ -140,6 +140,8 @@ static void test_acpi_fadt_table(test_data *data)
+     AcpiSdtTable table = g_array_index(data->tables, typeof(table), 0);
+     uint8_t *fadt_aml = table.aml;
+     uint32_t fadt_len = table.aml_len;
++    uint32_t val;
++    int dsdt_offset = 40 /* DSDT */;
  
--    acpi_parse_rsdp_table(data->qts, addr, rsdp_table);
-+    acpi_fetch_rsdp_table(data->qts, addr, rsdp_table);
-     revision = rsdp_table[15 /* Revision offset */];
+     g_assert(compare_signature(&table, "FACP"));
  
-     switch (revision) {
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 52cdd83..27153a0 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(QTestState *qts)
-     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
+@@ -148,8 +150,12 @@ static void test_acpi_fadt_table(test_data *data)
+                      fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
+     g_array_append_val(data->tables, table);
  
++    memcpy(&val, fadt_aml + dsdt_offset, 4);
++    if (!val) {
++        dsdt_offset = 140 /* X_DSDT */;
++    }
+     acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+-                     fadt_aml + 40 /* DSDT */, "DSDT", true);
++                     fadt_aml + dsdt_offset, "DSDT", true);
+     g_array_append_val(data->tables, table);
  
--    acpi_parse_rsdp_table(qts, rsdp_offset, rsdp_table);
-+    acpi_fetch_rsdp_table(qts, rsdp_offset, rsdp_table);
-     acpi_fetch_table(qts, &rsdt, &rsdt_len, &rsdp_table[16 /* RsdtAddress */],
-                      "RSDT", true);
- 
+     memset(fadt_aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
 -- 
 2.7.4
