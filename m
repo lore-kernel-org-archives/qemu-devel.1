@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55747)
+Received: from eggs.gnu.org ([209.51.188.92]:59840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gjUUE-00052I-Kl
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:34:59 -0500
+	(envelope-from <farosas@linux.ibm.com>) id 1gjUXK-0008Sa-1U
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gjUGU-00057M-8A
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:20:48 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:39565)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gjUGT-0004wN-V1
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:20:46 -0500
-Received: by mail-qk1-f196.google.com with SMTP id c21so2251606qkl.6
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 11:20:18 -0800 (PST)
-MIME-Version: 1.0
-References: <20190115145256.9593-1-berrange@redhat.com>
-	<20190115145256.9593-6-berrange@redhat.com>
-In-Reply-To: <20190115145256.9593-6-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Tue, 15 Jan 2019 23:20:06 +0400
-Message-ID: <CAMxuvaz79KTipyazbNo4Dj=4-o65AR4bwDApc81HbSn26x1_bw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/12] chardev: ensure
- qemu_chr_parse_compat reports missing driver error
+	(envelope-from <farosas@linux.ibm.com>) id 1gjUXE-0000AS-2a
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:05 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57438
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
+	id 1gjUXD-00009G-RY
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 14:38:03 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0FJaQ8R045072
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 14:38:03 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q1jbp57b1-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 14:38:01 -0500
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
+	Tue, 15 Jan 2019 19:38:01 -0000
+From: Fabiano Rosas <farosas@linux.ibm.com>
+Date: Tue, 15 Jan 2019 17:37:49 -0200
+In-Reply-To: <20190115193750.17234-1-farosas@linux.ibm.com>
+References: <20190115193750.17234-1-farosas@linux.ibm.com>
+Message-Id: <20190115193750.17234-3-farosas@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 2/3] target/ppc: Add GDB callbacks for SPRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +38,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Hi
+These will be used to let GDB know about PPC's Special Purpose
+Registers (SPR).
 
-On Tue, Jan 15, 2019 at 6:53 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->
-> If no valid char driver was identified the qemu_chr_parse_compat method
-> was silent, leaving callers no clue what failed.
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+They take an index based on the order the registers appear in the XML
+file sent by QEMU to GDB. This index does not match the actual
+location of the registers in the env->spr array so the
+gdb_find_spr_idx function does that conversion.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+---
+ target/ppc/translate_init.inc.c | 54 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 1 deletion(-)
 
-> ---
->  chardev/char.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/chardev/char.c b/chardev/char.c
-> index ccba36bafb..b99f3692f7 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -490,6 +490,8 @@ QemuOpts *qemu_chr_parse_compat(const char *label, co=
-nst char *filename,
->          return opts;
->      }
->
-> +    error_report("'%s' is not a valid char driver", filename);
-> +
->  fail:
->      qemu_opts_del(opts);
->      return NULL;
-> --
-> 2.20.1
->
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index ade06cc773..9c6c935204 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -9483,6 +9483,55 @@ static bool avr_need_swap(CPUPPCState *env)
+ #endif
+ }
+ 
++#if !defined(CONFIG_USER_ONLY)
++static int gdb_find_spr_idx(CPUPPCState *env, int n)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
++        ppc_spr_t *spr = &env->spr_cb[i];
++
++        if (spr->name && spr->gdb_id == n) {
++            return i;
++        }
++    }
++    return -1;
++}
++
++static int gdb_get_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
++{
++    int reg;
++    int len;
++
++    reg = gdb_find_spr_idx(env, n);
++    if (reg < 0) {
++        return 0;
++    }
++
++    len = TARGET_LONG_SIZE;
++    stn_p(mem_buf, len, env->spr[reg]);
++    ppc_maybe_bswap_register(env, mem_buf, len);
++    return len;
++}
++
++static int gdb_set_spr_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
++{
++    int reg;
++    int len;
++
++    reg = gdb_find_spr_idx(env, n);
++    if (reg < 0) {
++        return 0;
++    }
++
++    len = TARGET_LONG_SIZE;
++    ppc_maybe_bswap_register(env, mem_buf, len);
++    env->spr[reg] = ldn_p(mem_buf, len);
++
++    return len;
++}
++#endif
++
+ static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+@@ -9712,7 +9761,10 @@ static void ppc_cpu_realize(DeviceState *dev, Error **errp)
+         gdb_register_coprocessor(cs, gdb_get_vsx_reg, gdb_set_vsx_reg,
+                                  32, "power-vsx.xml", 0);
+     }
+-
++#ifndef CONFIG_USER_ONLY
++    gdb_register_coprocessor(cs, gdb_get_spr_reg, gdb_set_spr_reg,
++                             ppc_gdb_gen_spr_xml(cs), "power-spr.xml", 0);
++#endif
+     qemu_init_vcpu(cs);
+ 
+     pcc->parent_realize(dev, errp);
+-- 
+2.17.1
