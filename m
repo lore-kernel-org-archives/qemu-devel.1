@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33010)
+Received: from eggs.gnu.org ([209.51.188.92]:36696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjX6Q-0004HK-21
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:22:34 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gjX81-0005U9-UL
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:24:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjX6N-0007zC-Rg
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:22:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gjX6N-0007qH-8c
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:22:31 -0500
-References: <20190115194754.7670-1-cota@braap.org>
-	<88b83a97-aec4-3b9c-c679-e8955f05a207@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e6202f3e-690a-f7b7-b0d1-b0bc82b6a91b@redhat.com>
-Date: Tue, 15 Jan 2019 23:22:10 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1gjX80-0001AG-Rr
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:24:13 -0500
+Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:45044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gjX80-00015D-GU
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 17:24:12 -0500
+Received: by mail-pf1-x42f.google.com with SMTP id u6so1974644pfh.11
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 14:24:06 -0800 (PST)
+References: <cover.1547510220.git.alistair.francis@wdc.com>
+	<b17f45cb9053318f20ca2a5b2167afa96c1f933a.1547510220.git.alistair.francis@wdc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <62009a7b-877b-9c7d-7844-4eaa1930e9ff@linaro.org>
+Date: Wed, 16 Jan 2019 09:23:59 +1100
 MIME-Version: 1.0
-In-Reply-To: <88b83a97-aec4-3b9c-c679-e8955f05a207@linaro.org>
+In-Reply-To: <b17f45cb9053318f20ca2a5b2167afa96c1f933a.1547510220.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] cpu-exec fixes
+Subject: Re: [Qemu-devel] [PATCH v1 5/8] RISC-V: Add priv_ver to DisasContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,12 +31,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-On 15/01/19 23:00, Richard Henderson wrote:
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 1/15/19 10:58 AM, Alistair Francis wrote:
+> -static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+> +static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu)
 
-Queued, thanks.
+Why change this?  I know there is variation in the naming, but my
+preferred default mapping is CPUState *cs, RISCVCPU *cpu.
 
-Paolo
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
