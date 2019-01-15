@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36328)
+Received: from eggs.gnu.org ([209.51.188.92]:36807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gjRA1-0000S8-Ux
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:01:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1gjRCJ-0002As-If
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:04:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gjR9p-0000nE-DI
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:01:52 -0500
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:43032)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gjR9p-0000l9-2d
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:01:41 -0500
-Received: by mail-wr1-x431.google.com with SMTP id r10so3535277wrs.10
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 08:01:34 -0800 (PST)
-References: <1547467955-17245-1-git-send-email-thuth@redhat.com>
-	<30917d5b-f8cb-e799-6c3e-3202195122b4@redhat.com>
-	<871s5fp54s.fsf@linaro.org>
-	<e94b51d7-c90f-b599-fb68-ea8c2603989b@redhat.com>
-	<87zhs3nk1m.fsf@linaro.org>
-	<a0646a85-603d-99a8-c676-76e43a42e0fb@twiddle.net>
-	<87y37monyr.fsf@linaro.org>
-	<CAFEAcA8u4AdhW-MF6uMP7=B4iYVO9ZEQCtcQKpN6KWALwAfLnw@mail.gmail.com>
-	<87won6nfl1.fsf@linaro.org>
-	<6cb80b50-0352-430e-0c46-85ed69f95c88@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <6cb80b50-0352-430e-0c46-85ed69f95c88@redhat.com>
-Date: Tue, 15 Jan 2019 16:01:32 +0000
-Message-ID: <87va2poqoz.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1gjRCH-0001eX-LJ
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:04:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gjRCD-0001b5-Sw
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 11:04:11 -0500
+References: <20190111063732.10484-1-xiaoguangrong@tencent.com>
+	<20190111063732.10484-3-xiaoguangrong@tencent.com>
+	<20190115075154.GI24343@xz-x1> <20190115102404.GA2135@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2caebc3a-ccd0-d8c6-0368-4f339f326cdf@redhat.com>
+Date: Tue, 15 Jan 2019 10:03:53 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
- with Clang on s390x
+In-Reply-To: <20190115102404.GA2135@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="IMyc29XdVyJwXxfEmJ3gg0CcK8m7WTgPC"
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] migration: fix memory leak when
+ updating tls-creds and tls-hostname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,163 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, wei.w.wang@intel.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>, Markus Armbruster <armbru@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IMyc29XdVyJwXxfEmJ3gg0CcK8m7WTgPC
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Peter Xu <peterx@redhat.com>
+Cc: guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ wei.w.wang@intel.com, quintela@redhat.com, cota@braap.org,
+ Xiao Guangrong <xiaoguangrong@tencent.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <2caebc3a-ccd0-d8c6-0368-4f339f326cdf@redhat.com>
+Subject: Re: [PATCH v2 2/3] migration: fix memory leak when updating tls-creds
+ and tls-hostname
+References: <20190111063732.10484-1-xiaoguangrong@tencent.com>
+ <20190111063732.10484-3-xiaoguangrong@tencent.com>
+ <20190115075154.GI24343@xz-x1> <20190115102404.GA2135@work-vm>
+In-Reply-To: <20190115102404.GA2135@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/15/19 4:24 AM, Dr. David Alan Gilbert wrote:
+
+> I think the problem is that
+> migrate_params_check checks a MigrationParameters
+>=20
+> while the QMP command gives us a MigrateSetParameters; but we also use
+> migrate_params_check for the global check you added (8b0b29dc) which is=
+
+> against migrationParameters; so that's why migrate_params_check takes
+> a MigrationParameters.
+>=20
+> It's horrible we've got stuff duped so much.
+
+Indeed.
+
+>=20
+> However, I don't like this fix because if someone later was to add
+> a test for tls parameters to migrate_params_check, then they would be
+> confused why the hostname/creds weren't checked.
+> So while we have migrate_params_test_apply, it should cover all
+> parameters.
+>=20
+> I think a cleaner check would be to write a MigrateParameters_free
+> that free'd any strings, and call that in qmp_migrate_set_parameters
+> on both exit paths.
+
+We already have it; it's named qapi_free_MigrationParameters(),
+generated in qapi-types-migration.h.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-Thomas Huth <thuth@redhat.com> writes:
+--IMyc29XdVyJwXxfEmJ3gg0CcK8m7WTgPC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> On 2019-01-15 15:46, Alex Benn=C3=A9e wrote:
->>
->> Peter Maydell <peter.maydell@linaro.org> writes:
->>
->>> On Mon, 14 Jan 2019 at 22:48, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->>>>
->>>>
->>>> Richard Henderson <rth@twiddle.net> writes:
->>>>> But perhaps
->>>>>
->>>>>     unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
->>>>>     *r =3D n % d;
->>>>>     return n / d;
->>>>>
->>>>> will allow the compiler to do what the assembly does for some 64-bit
->>>>> hosts.
->>>>
->>>> I wonder how much cost is incurred by the jumping to the (libgcc?) div
->>>> helper? Anyone got an s390x about so we can benchmark the two
->>>> approaches?
->>>
->>> The project has an s390x system available; however it's usually
->>> running merge build tests so not so useful for benchmarking.
->>> (I can set up accounts on it but that requires me to faff about
->>> figuring out how to create new accounts :-))
->>
->> I'm happy to leave this up to those who care about s390x host
->> performance (Thomas, Cornelia?). I'm just keen to avoid the divide
->> helper getting too #ifdefy.
->
-> Ok, I just did a quick'n'dirty "benchmark" on the s390x that I've got
-> available:
+-----BEGIN PGP SIGNATURE-----
 
-Ahh I should have mentioned we already have the technology for this ;-)
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw+BGkACgkQp6FrSiUn
+Q2rangf9EQ9Dyg76gDPabR8OQn3EnpNce0s6+cD1nVGHqZGUl+ZSF2Ex+orkaAWg
+ftBgBzXFqqnoFEynweXvuGtf6/w9gb6V6yEPpxVp/qwB1lAT9TYu5j/bedYoITae
+FVy4/ippcudesUKXPC0HxXLebFu0iAfmVRZZEwI952vL0Oloqe7jFAz2awhoUJTe
+zQDFTaE2dNHt9WSb5S2mB2Ue0pTSC21iidyHXLfP2Bg04rNzs9sY+7HMx1njfQ80
+dy6gV+84zu0BsjF/6QMUzFuAa0KJavbRT9hIPZtDSxhZyMQ1HfmES6knSrOZcwb+
+DaSJ7lb2JKKsP6OHmqGYcoR2LuXkrQ==
+=1t6r
+-----END PGP SIGNATURE-----
 
-If you build the fpu/next tree on a s390x you can then run:
-
-  ./tests/fp/fp-bench f64_div
-
-with and without the CONFIG_128 path. To get an idea of the real world
-impact you can compile a foreign binary and run it on a s390x system
-with:
-
-  $QEMU ./tests/fp/fp-bench f64_div -t host
-
-And that will give you the peak performance assuming your program is
-doing nothing but f64_div operations. If the two QEMU's are basically in
-the same ballpark then it doesn't make enough difference. That said:
-
-> #include <stdio.h>
-> #include <time.h>
-> #include <stdint.h>
->
-> uint64_t udiv_qrnnd1(uint64_t *r, uint64_t n1, uint64_t n0, uint64_t d)
-> {
->     unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
->     asm("dlgr %0, %1" : "+r"(n) : "r"(d));
->     *r =3D n >> 64;
->     return n;
-> }
->
-> uint64_t udiv_qrnnd2(uint64_t *r, uint64_t n1, uint64_t n0, uint64_t d)
-> {
->     unsigned __int128 n =3D (unsigned __int128)n1 << 64 | n0;
->     *r =3D n % d;
->     return n / d;
-> }
->
-<snip>
->
-> int main()
-> {
-> 	uint64_t r =3D 0, n1 =3D 0, n0 =3D 0, d =3D 0;
-> 	uint64_t rs =3D 0, rn =3D 0;
-> 	clock_t start, end;
-> 	long i;
->
-> 	start =3D clock();
-> 	for (i=3D0; i<200000000L; i++) {
-> 		n1 +=3D 3;
-> 		n0 +=3D 987654321;
-> 		d +=3D 0x123456789;
-> 		rs +=3D udiv_qrnnd1(&r, n1, n0, d);
-> 		rn +=3D r;
-> 	}
-> 	end =3D clock();
-> 	printf("test 1: time=3D%li\t, rs=3D%li , rn =3D %li\n", (end-start)/1000=
-, rs, rn);
->
-> 	r =3D n1 =3D n0 =3D d =3D rs =3D rn =3D 0;
->
-> 	start =3D clock();
-> 	for (i=3D0; i<200000000L; i++) {
-> 		n1 +=3D 3;
-> 		n0 +=3D 987654321;
-> 		d +=3D 0x123456789;
-> 		rs +=3D udiv_qrnnd2(&r, n1, n0, d);
-> 		rn +=3D r;
-> 	}
-> 	end =3D clock();
-> 	printf("test 2: time=3D%li\t, rs=3D%li , rn =3D %li\n", (end-start)/1000=
-, rs, rn);
->
-> 	r =3D n1 =3D n0 =3D d =3D rs =3D rn =3D 0;
->
-> 	start =3D clock();
-> 	for (i=3D0; i<200000000L; i++) {
-> 		n1 +=3D 3;
-> 		n0 +=3D 987654321;
-> 		d +=3D 0x123456789;
-> 		rs +=3D udiv_qrnnd3(&r, n1, n0, d);
-> 		rn +=3D r;
-> 	}
-> 	end =3D clock();
-> 	printf("test 3: time=3D%li\t, rs=3D%li , rn =3D %li\n", (end-start)/1000=
-, rs, rn);
->
-> 	return 0;
-> }
->
-> ... and results with GCC v8.2.1 are (using -O2):
->
-> test 1: time=3D609	, rs=3D2264924160200000000 , rn =3D 6136218997527160832
-> test 2: time=3D10127	, rs=3D2264924160200000000 , rn =3D 6136218997527160=
-832
-> test 3: time=3D2350	, rs=3D2264924183048928865 , rn =3D 48428220481623110=
-89
->
-> Thus the int128 version is the slowest!
-
-I'd expect a little slow down due to the indirection into libgcc.. but
-that seems pretty high.
-
->
-> ... but at least it gives the same results as the DLGR instruction. The 6=
-4-bit
-> version gives different results - do we have a bug here?
->
-> Results with Clang v7.0.1 (using -O2, too) are these:
->
-> test 2: time=3D5035	, rs=3D2264924160200000000 , rn =3D 61362189975271608=
-32
-> test 3: time=3D1970	, rs=3D2264924183048928865 , rn =3D
-> 4842822048162311089
-
-You can run:
-
-  ./tests/fp/fp-test f64_div -l 2 -r all
-
-For a proper comprehensive test.
-
---
-Alex Benn=C3=A9e
+--IMyc29XdVyJwXxfEmJ3gg0CcK8m7WTgPC--
