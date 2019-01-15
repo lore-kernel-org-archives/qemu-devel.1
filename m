@@ -1,31 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39372)
+Received: from eggs.gnu.org ([209.51.188.92]:45013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@fromorbit.com>) id 1gjVji-0004M3-H2
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:55:04 -0500
+	(envelope-from <walling@linux.ibm.com>) id 1gjVmM-0007Zf-Hw
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:57:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@fromorbit.com>) id 1gjVXg-00012O-Et
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:42:37 -0500
-Received: from ipmail02.adl2.internode.on.net ([150.101.137.139]:46922)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@fromorbit.com>) id 1gjVXe-0000td-IB
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:42:36 -0500
-Date: Wed, 16 Jan 2019 07:42:23 +1100
-From: Dave Chinner <david@fromorbit.com>
-Message-ID: <20190115204222.GK4205@dastard>
-References: <20190109144736.17452-1-pagupta@redhat.com>
-	<1326478078.61913951.1547192704870.JavaMail.zimbra@redhat.com>
-	<20190113232902.GD4205@dastard>
-	<20190113233820.GX6310@bombadil.infradead.org>
-	<942065073.64011540.1547450140670.JavaMail.zimbra@redhat.com>
-	<20190114212501.GG4205@dastard>
-	<CAPcyv4jtPcLV-s0sKNHwwk0ug7GLBV6699dpm1h3r2xSo879dg@mail.gmail.com>
-	<20190114222132.GH4205@dastard>
-	<1684638419.64320214.1547530506805.JavaMail.zimbra@redhat.com>
+	(envelope-from <walling@linux.ibm.com>) id 1gjVmL-0004jq-Gk
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:57:46 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35548
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1gjVmL-0004hf-8u
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 15:57:45 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0FKrsWR106719
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 15:57:43 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2q1p89aj01-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 15:57:43 -0500
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Tue, 15 Jan 2019 20:57:42 -0000
+References: <20190114103110.10909-1-david@redhat.com>
+	<20190114103110.10909-2-david@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Tue, 15 Jan 2019 15:57:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1684638419.64320214.1547530506805.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] kvm "virtio pmem" device
+In-Reply-To: <20190114103110.10909-2-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <05fdc8f0-b7d2-ff3d-0c0b-699864f0f7e9@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] s390x/pci: Use hotplug_dev instead
+ of looking up the host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,112 +44,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pankaj Gupta <pagupta@redhat.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, Matthew Wilcox <willy@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, KVM list <kvm@vger.kernel.org>, Qemu Developers <qemu-devel@nongnu.org>, linux-nvdimm <linux-nvdimm@ml01.01.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, virtualization@lists.linux-foundation.org, Linux ACPI <linux-acpi@vger.kernel.org>, linux-ext4 <linux-ext4@vger.kernel.org>, linux-xfs <linux-xfs@vger.kernel.org>, Jan Kara <jack@suse.cz>, Stefan Hajnoczi <stefanha@redhat.com>, Rik van Riel <riel@surriel.com>, Nitesh Narayan Lal <nilal@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ross Zwisler <zwisler@kernel.org>, vishal l verma <vishal.l.verma@intel.com>, dave jiang <dave.jiang@intel.com>, David Hildenbrand <david@redhat.com>, jmoyer <jmoyer@redhat.com>, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, Christoph Hellwig <hch@infradead.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, lcapitulino@redhat.com, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Theodore Ts'o <tytso@mit.edu>, adilger kernel <adilger.kernel@dilger.ca>, darrick wong <darrick.wong@oracle.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Jan 15, 2019 at 12:35:06AM -0500, Pankaj Gupta wrote:
+On 1/14/19 5:31 AM, David Hildenbrand wrote:
+> We directly have it in our hands.
 > 
-> > > > On Mon, Jan 14, 2019 at 02:15:40AM -0500, Pankaj Gupta wrote:
-> > > > >
-> > > > > > > Until you have images (and hence host page cache) shared between
-> > > > > > > multiple guests. People will want to do this, because it means they
-> > > > > > > only need a single set of pages in host memory for executable
-> > > > > > > binaries rather than a set of pages per guest. Then you have
-> > > > > > > multiple guests being able to detect residency of the same set of
-> > > > > > > pages. If the guests can then, in any way, control eviction of the
-> > > > > > > pages from the host cache, then we have a guest-to-guest
-> > > > > > > information
-> > > > > > > leak channel.
-> > > > > >
-> > > > > > I don't think we should ever be considering something that would
-> > > > > > allow a
-> > > > > > guest to evict page's from the host's pagecache [1].  The guest
-> > > > > > should
-> > > > > > be able to kick its own references to the host's pagecache out of its
-> > > > > > own pagecache, but not be able to influence whether the host or
-> > > > > > another
-> > > > > > guest has a read-only mapping cached.
-> > > > > >
-> > > > > > [1] Unless the guest is allowed to modify the host's file; obviously
-> > > > > > truncation, holepunching, etc are going to evict pages from the
-> > > > > > host's
-> > > > > > page cache.
-> > > > >
-> > > > > This is so correct. Guest does not not evict host page cache pages
-> > > > > directly.
-> > > >
-> > > > They don't right now.
-> > > >
-> > > > But someone is going to end up asking for discard to work so that
-> > > > the guest can free unused space in the underlying spares image (i.e.
-> > > > make use of fstrim or mount -o discard) because they have workloads
-> > > > that have bursts of space usage and they need to trim the image
-> > > > files afterwards to keep their overall space usage under control.
-> > > >
-> > > > And then....
-> > > 
-> > > ...we reject / push back on that patch citing the above concern.
-> > 
-> > So at what point do we draw the line?
-> > 
-> > We're allowing writable DAX mappings, but as I've pointed out that
-> > means we are going to be allowing  a potential information leak via
-> > files with shared extents to be directly mapped and written to.
-> > 
-> > But we won't allow useful admin operations that allow better
-> > management of host side storage space similar to how normal image
-> > files are used by guests because it's an information leak vector?
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>   hw/s390x/s390-pci-bus.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> First of all Thank you for all the useful discussions. 
-> I am summarizing here:
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 7f911b216a..86dda831f9 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -826,9 +826,9 @@ static bool s390_pci_alloc_idx(S390pciState *s, S390PCIBusDevice *pbdev)
+>   static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                 Error **errp)
+>   {
+> +    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+>       PCIDevice *pdev = NULL;
+>       S390PCIBusDevice *pbdev = NULL;
+> -    S390pciState *s = s390_get_phb();
+>   
+>       if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+>           BusState *bus;
+> @@ -935,11 +935,11 @@ static void s390_pcihost_timer_cb(void *opaque)
+>   static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                   Error **errp)
+>   {
+> +    S390pciState *s = S390_PCI_HOST_BRIDGE(hotplug_dev);
+>       PCIDevice *pci_dev = NULL;
+>       PCIBus *bus;
+>       int32_t devfn;
+>       S390PCIBusDevice *pbdev = NULL;
+> -    S390pciState *s = s390_get_phb();
+>   
+>       if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
+>           error_setg(errp, "PCI bridge hot unplug currently not supported");
 > 
-> - We have to live with the limitation to not support fstrim and 
->   mount -o discard options with virtio-pmem as they will evict 
->   host page cache pages. We cannot allow this for virtio-pmem
->   for security reasons. These filesystem commands will just zero out 
->   unused pages currently.
 
-Not sure I follow you here - what pages are going to be zeroed and
-when will they be zeroed? If discard is not allowed, filesystems
-just don't issue such commands and the underlying device will never
-seen them.
+Looks like the macro will do the same thing as the function does? I 
+wonder if it makes sense to one day replace all function calls with the 
+macro.
 
-> - If alot of space is unused and not freed guest can request host 
->   Administrator for truncating the host backing image. 
-
-You can't use truncate to free space in a disk image file. The only
-way to do it safely in a generic, filesystem agnositic way is to
-mount the disk image (e.g. on loopback) and run fstrim on it. The
-loopback device will punches holes in the file where all the free
-space is reported by the filesystem via discard requests.
-
-Which is kinda my point - this could only be done if the guest is
-shut down, which makes it very difficult for admins to manage. 
-
->   We are also planning to support qcow2 sparse image format at 
->   host side with virtio-pmem.
-
-So you're going to be remapping a huge number of disjoint regions
-into a linear pmem mapping? ISTR discussions about similar things
-for virtio+fuse+dax that came up against "large numbers of mapped
-regions don't scale" and so it wasn't a practical solution compared
-to a just using raw sparse files....
-
-> - There is no existing solution for Qemu persistent memory 
->   emulation with write support currently. This solution provides 
->   us the paravartualized way of emulating persistent memory.
-
-Sure, but the question is why do you need to create an emulation
-that doesn't actually perform like pmem? The whole point of pmem is
-performance, and emulating pmem by mmap() of a file on spinning
-disks is going to be horrible for performance. Even on SSDs it's
-going to be orders of magnitudes slower than real pmem.
-
-So exactly what problem are you trying to solve with this driver?
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Reviewed-by: Collin Walling <walling@linux.ibm.com>
