@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46244)
+Received: from eggs.gnu.org ([209.51.188.92]:47079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjT8s-0000QJ-FG
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:08:51 -0500
+	(envelope-from <rjones@redhat.com>) id 1gjT9v-0001Du-Gr
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:09:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjT8p-0007cG-MD
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:08:50 -0500
+	(envelope-from <rjones@redhat.com>) id 1gjT9u-0008Pi-G5
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 13:09:55 -0500
+Date: Tue, 15 Jan 2019 18:09:41 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20190115180941.GI27120@redhat.com>
 References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-4-eblake@redhat.com>
-	<20190115180036.GH27120@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <64295a6d-4a71-5542-d08d-c8e6f7c1254d@redhat.com>
-Date: Tue, 15 Jan 2019 12:08:25 -0600
+	<20190112175812.27068-7-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190115180036.GH27120@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2sKW9c1LnZTHnoOoZ3ABv9TKxSFmTzPQ9"
-Subject: Re: [Qemu-devel] [PATCH v3 03/19] qemu-nbd: Sanity check partition
- bounds
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190112175812.27068-7-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 06/19] qemu-nbd: Avoid strtol open-coding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,125 +23,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
+To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2sKW9c1LnZTHnoOoZ3ABv9TKxSFmTzPQ9
-From: Eric Blake <eblake@redhat.com>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-devel@nongnu.org, nsoffer@redhat.com, jsnow@redhat.com,
- vsementsov@virtuozzo.com, qemu-block@nongnu.org
-Message-ID: <64295a6d-4a71-5542-d08d-c8e6f7c1254d@redhat.com>
-Subject: Re: [PATCH v3 03/19] qemu-nbd: Sanity check partition bounds
-References: <20190112175812.27068-1-eblake@redhat.com>
- <20190112175812.27068-4-eblake@redhat.com>
- <20190115180036.GH27120@redhat.com>
-In-Reply-To: <20190115180036.GH27120@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Sat, Jan 12, 2019 at 11:57:59AM -0600, Eric Blake wrote:
+> Our copy-and-pasted open-coding of strtol handling forgot to
+> handle overflow conditions.  Use qemu_strto*() instead.
+> 
+> In the case of --partition, since we insist on a user-supplied
+> partition to be non-zero, we can use 0 rather than -1 for our
+> initial value to distinguish when a partition is not being
+> served, for slightly more optimal code.
+> 
+> The error messages for out-of-bounds values are less specific,
+> but should not be a terrible loss in quality.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Message-Id: <20181215135324.152629-8-eblake@redhat.com>
+> 
+> ---
+> v3: rebase to use int64_t rather than off_t [Vladimir]
+> ---
+>  qemu-nbd.c | 28 +++++++++-------------------
+>  1 file changed, 9 insertions(+), 19 deletions(-)
+> 
+> diff --git a/qemu-nbd.c b/qemu-nbd.c
+> index 96c0829970c..4670b659167 100644
+> --- a/qemu-nbd.c
+> +++ b/qemu-nbd.c
+> @@ -546,9 +546,8 @@ int main(int argc, char **argv)
+>      };
+>      int ch;
+>      int opt_ind = 0;
+> -    char *end;
+>      int flags = BDRV_O_RDWR;
+> -    int partition = -1;
+> +    int partition = 0;
+>      int ret = 0;
+>      bool seen_cache = false;
+>      bool seen_discard = false;
+> @@ -660,9 +659,8 @@ int main(int argc, char **argv)
+>              port = optarg;
+>              break;
+>          case 'o':
+> -                dev_offset = strtoll (optarg, &end, 0);
+> -            if (*end) {
+> -                error_report("Invalid offset `%s'", optarg);
+> +            if (qemu_strtou64(optarg, NULL, 0, &dev_offset) < 0) {
+> +                error_report("Invalid offset '%s'", optarg);
+>                  exit(EXIT_FAILURE);
+>              }
+>              break;
+> @@ -684,13 +682,9 @@ int main(int argc, char **argv)
+>              flags &= ~BDRV_O_RDWR;
+>              break;
+>          case 'P':
+> -            partition = strtol(optarg, &end, 0);
+> -            if (*end) {
+> -                error_report("Invalid partition `%s'", optarg);
+> -                exit(EXIT_FAILURE);
+> -            }
+> -            if (partition < 1 || partition > 8) {
+> -                error_report("Invalid partition %d", partition);
+> +            if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
+> +                partition < 1 || partition > 8) {
+> +                error_report("Invalid partition '%s'", optarg);
+>                  exit(EXIT_FAILURE);
+>              }
+>              break;
+> @@ -711,15 +705,11 @@ int main(int argc, char **argv)
+>              device = optarg;
+>              break;
+>          case 'e':
+> -            shared = strtol(optarg, &end, 0);
+> -            if (*end) {
+> +            if (qemu_strtoi(optarg, NULL, 0, &shared) < 0 ||
+> +                shared < 1) {
+>                  error_report("Invalid shared device number '%s'", optarg);
+>                  exit(EXIT_FAILURE);
+>              }
+> -            if (shared < 1) {
+> -                error_report("Shared device number must be greater than 0");
+> -                exit(EXIT_FAILURE);
+> -            }
+>              break;
+>          case 'f':
+>              fmt = optarg;
+> @@ -1007,7 +997,7 @@ int main(int argc, char **argv)
+>      }
+>      fd_size -= dev_offset;
+> 
+> -    if (partition != -1) {
+> +    if (partition) {
+>          int64_t limit;
+> 
+>          if (dev_offset) {
 
-On 1/15/19 12:00 PM, Richard W.M. Jones wrote:
-> On Sat, Jan 12, 2019 at 11:57:56AM -0600, Eric Blake wrote:
->> When the user requests a partition, we were using data read
->> from the disk as disk offsets without a bounds check. We got
->> lucky that even when computed offsets are out-of-bounds,
->> blk_pread() will gracefully catch the error later (so I don't
->> think a malicious image can crash or exploit qemu-nbd, and am
->> not treating this as a security flaw), but it's better to
->> flag the problem up front than to risk permanent EIO death of
->> the block device down the road.  Also, note that the
->> partition code blindly overwrites any offset passed in by the
->> user; so make the -o/-P combo an error for less confusion.
->>
->> This can be tested with nbdkit:
->> $ echo hi > file
->> $ nbdkit -fv --filter=3Dtruncate partitioning file truncate=3D64k
->>
->> Pre-patch:
->> $ qemu-nbd -p 10810 -P 1 -f raw nbd://localhost:10809 &
->> $ qemu-io -f raw nbd://localhost:10810
->> qemu-io> r -v 0 1
->> Disconnect client, due to: Failed to send reply: reading from file fai=
-led: Input/output error
->> Connection closed
->> read failed: Input/output error
->> qemu-io> q
->> [1]+  Done                    qemu-nbd -p 10810 -P 1 -f raw nbd://loca=
-lhost:10809
->>
->> Post-patch:
->> $ qemu-nbd -p 10810 -P 1 -f raw nbd://localhost:10809
->> qemu-nbd: Discovered partition 1 at offset 1048576 size 512, but size =
-exceeds file length 65536
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->> v3: new patch
->> ---
->>  qemu-nbd.c | 18 +++++++++++++++++-
->>  1 file changed, 17 insertions(+), 1 deletion(-)
->>
->> diff --git a/qemu-nbd.c b/qemu-nbd.c
->> index 51b55f2e066..ff4adb9b3eb 100644
->> --- a/qemu-nbd.c
->> +++ b/qemu-nbd.c
->> @@ -1013,12 +1013,28 @@ int main(int argc, char **argv)
->>      fd_size -=3D dev_offset;
->>
->>      if (partition !=3D -1) {
->> -        ret =3D find_partition(blk, partition, &dev_offset, &fd_size)=
-;
->> +        off_t limit;
->=20
-> I was only vaguely following the other review comments, but off_t does
-> seem odd here.  Even though we can assume that _FILE_OFFSET_BITS=3D64
-> maybe we should just use {u,}int64_t?  Does this represent an offset
-> in a host file?  Only in the case where qemu-nbd is serving a raw
-> format file.  In other cases (say, qcow2) the partition size exists in
-> an abstract virtual space.
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
 
-Yes, later patches switch it to int64_t.  Here, it remains off_t because
-find_partition(&limit) still expects off_t.  I suppose in my later
-patches, I could use uint64_t limit in spite of keeping int64_t fd_size,
-and change the signature of find_partition() accordingly, since I've
-decoupled the MBR partition lookup (which is a 41-bit value, always
-positive) from the file size checks.
+Rich.
 
->=20
-> But it's not a big deal, so:
-
-Yeah, no need to rewrite this patch, since later patches improve the
-type anyway (whether or not I stick to int64_t or uint64_t for the
-find_partition() code).
-
->=20
-> Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
->=20
-> Rich.
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---2sKW9c1LnZTHnoOoZ3ABv9TKxSFmTzPQ9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw+IZkACgkQp6FrSiUn
-Q2qKZwf/UQq7krJLedhSfOupOWMwYcRxb8joRgrCM+jjfF5wOMzN9O4Z/sA8VfHI
-tZFKqQEwRleiXW309B7oyK/Zv2nD+ANxDGIQ311FmCM/3JQRhfz8oVJbaBOjJCb4
-ceKBlwazw3Q/2wUwBygmU1x+NFoZXsIYKcBetmmRV+BXTFtbFbrqOYXf4pYORaMp
-nvYmzBBr6TiLI5pRgjhA25p9+yv4biGW8naI8CtuTsnWVZ9khSYh752k0dzb6JUK
-ck/y11XyD+GvX4+V0ZhFsxWViVmQ6dAExeHPEODb14Fqa5tli08XzWX68PsZzmvJ
-9QFNy2kl2RujT4fNWMc5cnYiRgY2Ug==
-=n9u5
------END PGP SIGNATURE-----
-
---2sKW9c1LnZTHnoOoZ3ABv9TKxSFmTzPQ9--
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-df lists disk usage of guests without needing to install any
+software inside the virtual machine.  Supports Linux and Windows.
+http://people.redhat.com/~rjones/virt-df/
