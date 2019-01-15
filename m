@@ -1,21 +1,30 @@
 Received: from eggs.gnu.org ([209.51.188.92]:37336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPXq-0002jb-11
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:23 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gjPXy-0002jb-Q3
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPSI-0001Ro-1B
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:39 -0500
-Received: from mga05.intel.com ([192.55.52.43]:56326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gjPSH-0001A9-P5
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:37 -0500
-From: Yang Zhong <yang.zhong@intel.com>
-Date: Tue, 15 Jan 2019 22:10:54 +0800
-Message-Id: <20190115141108.934-24-yang.zhong@intel.com>
-In-Reply-To: <20190115141108.934-1-yang.zhong@intel.com>
-References: <20190115141108.934-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v2 23/37] build: convert pci.mak to Kconfig
+	(envelope-from <stefanha@gmail.com>) id 1gjPXY-0003ek-Bo
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:09 -0500
+Date: Tue, 15 Jan 2019 14:18:00 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190115141800.GB29056@stefanha-x1.localdomain>
+References: <w51pnt57slp.fsf@maestria.local.igalia.com>
+	<w51tvifqqlr.fsf@maestria.local.igalia.com>
+	<20190111132416.GI5010@dhcp-200-186.str.redhat.com>
+	<w51pnt3qo27.fsf@maestria.local.igalia.com>
+	<20190114133553.GE7038@stefanha-x1.localdomain>
+	<w51won7480o.fsf@maestria.local.igalia.com>
+	<20190114161525.GA32304@stefanha-x1.localdomain>
+	<w51zhs32ojb.fsf@maestria.local.igalia.com>
+	<20190114163117.GA521@stefanha-x1.localdomain>
+	<w51h8eb7ybn.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="IrhDeMKUP4DT/M7F"
+Content-Disposition: inline
+In-Reply-To: <w51h8eb7ybn.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] throttle-groups: fix restart
+ coroutine iothread race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,626 +33,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, yang.zhong@intel.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
 
-Instead of including the same list of devices for each target,
-set CONFIG_PCI to true, and make the devices default to present
-whenever PCI is available.
+--IrhDeMKUP4DT/M7F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Done mostly with the following script:
+On Mon, Jan 14, 2019 at 09:56:28PM +0100, Alberto Garcia wrote:
+> On Mon 14 Jan 2019 05:31:17 PM CET, Stefan Hajnoczi <stefanha@redhat.com>=
+ wrote:
+> > On Mon, Jan 14, 2019 at 05:26:48PM +0100, Alberto Garcia wrote:
+> >> On Mon 14 Jan 2019 05:15:25 PM CET, Stefan Hajnoczi wrote:
+> >> >> > I've been able to reproduce this in an iotest, please see v2 of t=
+his
+> >> >> > series.
+> >> >>=20
+> >> >> That iotest doesn't crash for me :-?
+> >> >
+> >> > Does my iotest pass for you?
+> >>=20
+> >> Yes, it does. I'm trying to figure out why because if I run the QMP
+> >> commands by hand then it does crash.
+> >
+> > I ran the iotest 20 times on my machine and it segfaulted every time
+> > (with the fix not yet applied).
+>=20
+> Yeah I can also reproduce it all the time if I run it by hand...
+>=20
+> I was debugging it and although I don't know why this is different when
+> I run it through tests/qemu-iotests/check, here's why it doesn't crash:
+>=20
+> After the ThrottleGroupMember is unregistered and its BlockBackend is
+> destroyed, the throttle_group_co_restart_queue() coroutine takes
+> control.
+>=20
+> The first thing that it does is lock tgm->throttled_reqs_lock. It turns
+> out that although this memory has been freed (it's part of the
+> BlockBackend struct) it is still accessible but contains pure
+> gargabe. 'Garbage' here means that the mutex counter contains some
+> random value !=3D 0, so the thread waits, it doesn't have a chance to
+> crash the process, and QEMU shuts down cleanly.
+>=20
+> So if my understanding is correct QEMU can be shut down when there are
+> iothreads waiting for a mutex. Is that something that we should be
+> worried about?
 
-  while read i; do
-     i=${i%=y}; i=${i#CONFIG_}
-     sed -i -e'/^config '$i'$/!b' -en \
-            -e'a\' -e'    default y\' -e'    depends on PCI' \
-          `grep -lw $i hw/*/Kconfig`
-  done < default-configs/pci.mak
+Nothing joins the iothreads in vl.c:main().
 
-followed by replacing a few "depends on" clauses with "select"
-whenever the symbol is not really related to PCI.
+The assumption is that anything using iothreads will detach from them.
+For example, the vm runstate changes during shutdown so devices can
+disable the iothread code path (and this involves draining in-flight
+requests).
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
----
- default-configs/alpha-softmmu.mak       |  2 +-
- default-configs/arm-softmmu.mak         |  2 +-
- default-configs/hppa-softmmu.mak        |  2 +-
- default-configs/i386-softmmu.mak        |  3 +-
- default-configs/mips-softmmu-common.mak |  2 +-
- default-configs/pci.mak                 | 48 -------------------------
- default-configs/ppc-softmmu.mak         |  2 +-
- default-configs/riscv32-softmmu.mak     |  3 +-
- default-configs/riscv64-softmmu.mak     |  2 +-
- default-configs/sh4-softmmu.mak         |  2 +-
- default-configs/sh4eb-softmmu.mak       |  2 +-
- default-configs/sparc64-softmmu.mak     |  2 +-
- hw/audio/Kconfig                        |  6 ++++
- hw/block/Kconfig                        |  2 ++
- hw/char/Kconfig                         |  2 ++
- hw/display/Kconfig                      | 12 ++++++-
- hw/ide/Kconfig                          |  3 ++
- hw/ipack/Kconfig                        |  2 ++
- hw/misc/Kconfig                         |  4 +++
- hw/net/Kconfig                          | 23 ++++++++++++
- hw/pci-bridge/Kconfig                   |  4 +++
- hw/pci-host/Kconfig                     |  4 +++
- hw/scsi/Kconfig                         | 11 ++++++
- hw/sd/Kconfig                           |  3 ++
- hw/usb/Kconfig                          | 10 ++++++
- hw/virtio/Kconfig                       |  3 ++
- hw/watchdog/Kconfig                     |  2 ++
- 27 files changed, 101 insertions(+), 62 deletions(-)
- delete mode 100644 default-configs/pci.mak
+My fix effectively does this by waiting for in-flight throttling restart
+coroutines.
 
-diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
-index 62afa5ec16..c71d1b7f37 100644
---- a/default-configs/alpha-softmmu.mak
-+++ b/default-configs/alpha-softmmu.mak
-@@ -1,7 +1,7 @@
- # Default configuration for alpha-softmmu
- 
--include pci.mak
- include usb.mak
-+CONFIG_PCI=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
- CONFIG_I82374=y
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 3903d1ada3..8c071f6224 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -1,7 +1,7 @@
- # Default configuration for arm-softmmu
- 
--include pci.mak
- include usb.mak
-+CONFIG_PCI=y
- CONFIG_VGA=y
- CONFIG_NAND=y
- CONFIG_ECC=y
-diff --git a/default-configs/hppa-softmmu.mak b/default-configs/hppa-softmmu.mak
-index 4badc0521e..74d34c05e9 100644
---- a/default-configs/hppa-softmmu.mak
-+++ b/default-configs/hppa-softmmu.mak
-@@ -1,5 +1,5 @@
--include pci.mak
- include usb.mak
-+CONFIG_PCI=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
- CONFIG_ISA_BUS=y
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index f71284516c..554dbd8c6b 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -1,6 +1,6 @@
- # Default configuration for i386-softmmu
- 
--include pci.mak
-+CONFIG_PCI=y
- include sound.mak
- include usb.mak
- include hyperv.mak
-@@ -52,7 +52,6 @@ CONFIG_MEM_DEVICE=y
- CONFIG_DIMM=y
- CONFIG_NVDIMM=y
- CONFIG_ACPI_NVDIMM=y
--CONFIG_PCIE_PORT=y
- CONFIG_XIO3130=y
- CONFIG_IOH3420=y
- CONFIG_I82801B11=y
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
-index 77b40ec7d1..5ef6d49e66 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -1,8 +1,8 @@
- # Common mips*-softmmu CONFIG defines
- 
--include pci.mak
- include sound.mak
- include usb.mak
-+CONFIG_PCI=y
- CONFIG_ESP=y
- CONFIG_SCSI=y
- CONFIG_VGA_ISA=y
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-deleted file mode 100644
-index 553b1905de..0000000000
---- a/default-configs/pci.mak
-+++ /dev/null
-@@ -1,48 +0,0 @@
--CONFIG_PCI=y
--CONFIG_PCIE=y
--# For now, CONFIG_IDE_CORE requires ISA, so we enable it here
--CONFIG_ISA_BUS=y
--CONFIG_VIRTIO_PCI=y
--include virtio.mak
--CONFIG_USB_UHCI=y
--CONFIG_USB_OHCI=y
--CONFIG_USB_EHCI=y
--CONFIG_USB_XHCI=y
--CONFIG_USB_XHCI_NEC=y
--CONFIG_NE2000_PCI=y
--CONFIG_EEPRO100_PCI=y
--CONFIG_PCNET_PCI=y
--CONFIG_PCNET_COMMON=y
--CONFIG_AC97=y
--CONFIG_HDA=y
--CONFIG_ES1370=y
--CONFIG_SCSI=y
--CONFIG_LSI_SCSI_PCI=y
--CONFIG_VMW_PVSCSI_SCSI_PCI=y
--CONFIG_MEGASAS_SCSI_PCI=y
--CONFIG_MPTSAS_SCSI_PCI=y
--CONFIG_RTL8139_PCI=y
--CONFIG_E1000_PCI=y
--CONFIG_E1000E_PCI=y
--CONFIG_AHCI=y
--CONFIG_ESP=y
--CONFIG_ESP_PCI=y
--CONFIG_SERIAL=y
--CONFIG_SERIAL_ISA=y
--CONFIG_SERIAL_PCI=y
--CONFIG_CAN_BUS=y
--CONFIG_CAN_SJA1000=y
--CONFIG_CAN_PCI=y
--CONFIG_IPACK=y
--CONFIG_WDT_IB6300ESB=y
--CONFIG_PCI_TESTDEV=y
--CONFIG_NVME_PCI=y
--CONFIG_SD=y
--CONFIG_SDHCI=y
--CONFIG_EDU=y
--CONFIG_VGA=y
--CONFIG_VGA_PCI=y
--CONFIG_BOCHS_DISPLAY=y
--CONFIG_IVSHMEM_DEVICE=$(CONFIG_IVSHMEM)
--CONFIG_ROCKER=y
--CONFIG_EDID=y
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 96088f47ca..301cc83279 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -1,8 +1,8 @@
- # Default configuration for ppc-softmmu
- 
--include pci.mak
- include sound.mak
- include usb.mak
-+CONFIG_PCI=y
- 
- # For embedded PPCs:
- CONFIG_PPC4XX=y
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-index af841839d1..e994a192eb 100644
---- a/default-configs/riscv32-softmmu.mak
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -1,7 +1,6 @@
- # Default configuration for riscv-softmmu
- 
--include pci.mak
--
-+CONFIG_PCI=y
- CONFIG_SERIAL=y
- CONFIG_VIRTIO_MMIO=y
- 
-diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-index af841839d1..ec81330297 100644
---- a/default-configs/riscv64-softmmu.mak
-+++ b/default-configs/riscv64-softmmu.mak
-@@ -1,6 +1,6 @@
- # Default configuration for riscv-softmmu
- 
--include pci.mak
-+CONFIG_PCI=y
- 
- CONFIG_SERIAL=y
- CONFIG_VIRTIO_MMIO=y
-diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
-index 4b65489624..57d99fa93c 100644
---- a/default-configs/sh4-softmmu.mak
-+++ b/default-configs/sh4-softmmu.mak
-@@ -1,7 +1,7 @@
- # Default configuration for sh4-softmmu
- 
--include pci.mak
- include usb.mak
-+CONFIG_PCI=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
- CONFIG_PTIMER=y
-diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
-index af71aa7f42..2e5909c381 100644
---- a/default-configs/sh4eb-softmmu.mak
-+++ b/default-configs/sh4eb-softmmu.mak
-@@ -1,7 +1,7 @@
- # Default configuration for sh4eb-softmmu
- 
--include pci.mak
- include usb.mak
-+CONFIG_PCI=y
- CONFIG_SERIAL=y
- CONFIG_SERIAL_ISA=y
- CONFIG_PTIMER=y
-diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
-index 1fae4888db..db393d9eb3 100644
---- a/default-configs/sparc64-softmmu.mak
-+++ b/default-configs/sparc64-softmmu.mak
-@@ -1,7 +1,7 @@
- # Default configuration for sparc64-softmmu
- 
--include pci.mak
- include usb.mak
-+CONFIG_PCI=y
- CONFIG_M48T59=y
- CONFIG_PTIMER=y
- CONFIG_SERIAL=y
-diff --git a/hw/audio/Kconfig b/hw/audio/Kconfig
-index 207baee6e1..af34bbcf0c 100644
---- a/hw/audio/Kconfig
-+++ b/hw/audio/Kconfig
-@@ -3,9 +3,13 @@ config SB16
- 
- config ES1370
-     bool
-+    default y
-+    depends on PCI
- 
- config AC97
-     bool
-+    default y
-+    depends on PCI
- 
- config ADLIB
-     bool
-@@ -18,6 +22,8 @@ config CS4231A
- 
- config HDA
-     bool
-+    default y
-+    depends on PCI
- 
- config PCSPK
-     bool
-diff --git a/hw/block/Kconfig b/hw/block/Kconfig
-index 9d418bce4d..3710434436 100644
---- a/hw/block/Kconfig
-+++ b/hw/block/Kconfig
-@@ -21,6 +21,8 @@ config ONENAND
- 
- config NVME_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config VIRTIO_BLK
-     bool
-diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-index 26c13243cf..1ed6f0dbce 100644
---- a/hw/char/Kconfig
-+++ b/hw/char/Kconfig
-@@ -15,6 +15,8 @@ config SERIAL_ISA
- 
- config SERIAL_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config VIRTIO_SERIAL
-     bool
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index 132aeffdbe..5e73277cc2 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -30,6 +30,9 @@ config SSD0323
- 
- config VGA_PCI
-     bool
-+    default y
-+    depends on PCI
-+    select VGA
- 
- config VGA_ISA
-     bool
-@@ -39,9 +42,15 @@ config VGA_ISA_MM
- 
- config VMWARE_VGA
-     bool
-+    default y
-+    depends on PCI
-+    select VGA
- 
- config BOCHS_DISPLAY
-     bool
-+    default y
-+    depends on PCI
-+    select VGA
- 
- config BLIZZARD
-     bool
-@@ -67,7 +76,8 @@ config VGA
- 
- config QXL
-     bool
--    depends on SPICE
-+    depends on SPICE && PCI
-+    select VGA
- 
- config VIRTIO_GPU
-     bool
-diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
-index fe27705790..3778580df2 100644
---- a/hw/ide/Kconfig
-+++ b/hw/ide/Kconfig
-@@ -7,6 +7,7 @@ config IDE_QDEV
- 
- config IDE_PCI
-     bool
-+    depends on PCI
-     select IDE_CORE
- 
- config IDE_ISA
-@@ -42,6 +43,8 @@ config MICRODRIVE
- 
- config AHCI
-     bool
-+    default y
-+    depends on PCI
-     select IDE_QDEV
- 
- config IDE_SII3112
-diff --git a/hw/ipack/Kconfig b/hw/ipack/Kconfig
-index 481e0d2e64..98bd21cf0f 100644
---- a/hw/ipack/Kconfig
-+++ b/hw/ipack/Kconfig
-@@ -1,2 +1,4 @@
- config IPACK
-     bool
-+    default y
-+    depends on PCI
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index cc8dbed24e..1ca4b2464e 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -21,9 +21,13 @@ config ISA_TESTDEV
- 
- config PCI_TESTDEV
-     bool
-+    default y
-+    depends on PCI
- 
- config EDU
-     bool
-+    default y
-+    depends on PCI
- 
- config PCA9552
-     bool
-diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-index 6b2ec971b5..5191c082e3 100644
---- a/hw/net/Kconfig
-+++ b/hw/net/Kconfig
-@@ -3,27 +3,42 @@ config DP8393X
- 
- config NE2000_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config EEPRO100_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config PCNET_PCI
-     bool
-+    default y
-+    depends on PCI
-+    select PCNET_COMMON
- 
- config PCNET_COMMON
-     bool
- 
- config E1000_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config E1000E_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config RTL8139_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config VMXNET3_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config SMC91C111
-     bool
-@@ -81,12 +96,20 @@ config ETSEC
- 
- config ROCKER
-     bool
-+    default y
-+    depends on PCI
- 
- config CAN_BUS
-     bool
- 
- config CAN_PCI
-     bool
-+    default y
-+    depends on PCI
-+    select CAN_BUS
- 
- config CAN_SJA1000
-     bool
-+    default y
-+    depends on PCI
-+    select CAN_BUS
-diff --git a/hw/pci-bridge/Kconfig b/hw/pci-bridge/Kconfig
-index bb19b7aac1..d54d878023 100644
---- a/hw/pci-bridge/Kconfig
-+++ b/hw/pci-bridge/Kconfig
-@@ -1,14 +1,18 @@
- config PCIE_PORT
-     bool
-+    default y
-+    depends on PCIE
- 
- config PXB
-     bool
- 
- config XIO3130
-     bool
-+    depends on PCIE
- 
- config IOH3420
-     bool
-+    depends on PCIE
- 
- config I82801B11
-     bool
-diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-index 359df1d239..20c3de37a3 100644
---- a/hw/pci-host/Kconfig
-+++ b/hw/pci-host/Kconfig
-@@ -24,12 +24,16 @@ config PCI_PIIX
- 
- config PCI_Q35
-     bool
-+    select PCIE
- 
- config PCI_GENERIC
-     bool
-+    select PCIE
- 
- config PCI_XILINX
-     bool
-+    select PCIE
- 
- config PCI_DESIGNWARE
-     bool
-+    select PCIE
-diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
-index eb78478ef0..812a12522b 100644
---- a/hw/scsi/Kconfig
-+++ b/hw/scsi/Kconfig
-@@ -3,21 +3,32 @@ config SCSI
- 
- config LSI_SCSI_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config MPTSAS_SCSI_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config MEGASAS_SCSI_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config VMW_PVSCSI_SCSI_PCI
-     bool
-+    default y
-+    depends on PCI
- 
- config ESP
-     bool
- 
- config ESP_PCI
-     bool
-+    default y
-+    depends on PCI
-+    select ESP
- 
- config VIRTIO_SCSI
-     bool
-diff --git a/hw/sd/Kconfig b/hw/sd/Kconfig
-index 4f43bbb352..90ac74950a 100644
---- a/hw/sd/Kconfig
-+++ b/hw/sd/Kconfig
-@@ -9,3 +9,6 @@ config SD
- 
- config SDHCI
-     bool
-+    default y
-+    depends on PCI
-+    select SD
-diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index cbf5c5d761..f23c542d27 100644
---- a/hw/usb/Kconfig
-+++ b/hw/usb/Kconfig
-@@ -3,21 +3,31 @@ config USB
- 
- config USB_UHCI
-     bool
-+    default y
-+    depends on PCI
- 
- config USB_OHCI
-     bool
-+    default y
-+    depends on PCI
- 
- config USB_EHCI
-     bool
-+    default y
-+    depends on PCI
- 
- config USB_EHCI_SYSBUS
-     bool
- 
- config USB_XHCI
-     bool
-+    default y
-+    depends on PCI
- 
- config USB_XHCI_NEC
-     bool
-+    default y
-+    depends on PCI
- 
- config USB_MUSB
-     bool
-diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
-index ebf18124fb..aabd6d4d96 100644
---- a/hw/virtio/Kconfig
-+++ b/hw/virtio/Kconfig
-@@ -6,6 +6,9 @@ config VIRTIO_RNG
- 
- config VIRTIO_PCI
-     bool
-+    default y
-+    depends on PCI
-+    select VIRTIO
- 
- config VIRTIO_MMIO
-     bool
-diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
-index cd0244f4e1..4e24bf8240 100644
---- a/hw/watchdog/Kconfig
-+++ b/hw/watchdog/Kconfig
-@@ -3,6 +3,8 @@ config CMSDK_APB_WATCHDOG
- 
- config WDT_IB6300ESB
-     bool
-+    default y
-+    depends on PCI
- 
- config WDT_IB700
-     bool
--- 
-2.17.1
+Stefan
+
+--IrhDeMKUP4DT/M7F
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcPeuYAAoJEJykq7OBq3PIv/sH/1uB5H/Fry2TeX7OfdPtcR5r
+x1zYGseI9pTjd4DvvW8M15VUt4BivofyuLVPhsmy8hNjNafEhOZnvtdEve7iZQWz
+fg7QqodMxTOywMKbvaEPsBhAexnZVSFZX+VecBU6jT+JShoEXbPtOTk8zHtj4Xrz
+IU/bSh0xH4BmGCJXBHKew+QVxHivBAfmsZMoS1OyzMwIxmy8fg6Rxbg2fsMQqofW
+novMILX+cqxzQv5T2dlOk2R2jEF5Jp0Y6alG/ZjLtIJtTj7h5F2QBL8Kn/oXEgSD
+Uz1/sWUNsGa3q/4XUtVKOpE60Yq6wZgG6g2RdLEgZaJOVj9rxNd1vqFaXxJ+f1A=
+=J6/Q
+-----END PGP SIGNATURE-----
+
+--IrhDeMKUP4DT/M7F--
