@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37462)
+Received: from eggs.gnu.org ([209.51.188.92]:37384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPYN-0002wr-GC
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:18:56 -0500
+	(envelope-from <yang.zhong@intel.com>) id 1gjPYP-0002rf-UB
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:19:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPSd-0001Zr-4G
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:13:00 -0500
-Received: from mga05.intel.com ([192.55.52.43]:56327)
+	(envelope-from <yang.zhong@intel.com>) id 1gjPSS-0001VL-Ig
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:49 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gjPSc-0001AS-Sp
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:59 -0500
+	id 1gjPSS-0001A9-8v
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:12:48 -0500
 From: Yang Zhong <yang.zhong@intel.com>
-Date: Tue, 15 Jan 2019 22:11:00 +0800
-Message-Id: <20190115141108.934-30-yang.zhong@intel.com>
+Date: Tue, 15 Jan 2019 22:10:56 +0800
+Message-Id: <20190115141108.934-26-yang.zhong@intel.com>
 In-Reply-To: <20190115141108.934-1-yang.zhong@intel.com>
 References: <20190115141108.934-1-yang.zhong@intel.com>
-Subject: [Qemu-devel] [RFC PATCH v2 29/37] i386: express dependencies with
- Kconfig
+Subject: [Qemu-devel] [RFC PATCH v2 25/37] build: convert usb.mak to Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,276 +29,250 @@ Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-This way, the default-configs file only need to specify the boards
-and any optional devices.
+Instead of including the same list of devices for each target,
+let the host controllers select CONFIG_USB and make the devices
+default to present whenever USB is available.
+
+Done with the following script:
+  while read i; do
+     i=${i%=y}; i=${i#CONFIG_}
+     sed -i -e'/^config '$i'$/!b' -en \
+            -e'a\' -e'    default y\' -e'    depends on USB' \
+          `grep -lw $i hw/*/Kconfig`
+  done < default-configs/usb.mak
+
+followed by adding "select USB" on the host controllers.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- default-configs/i386-softmmu.mak | 39 ++++----------------
- hw/acpi/Kconfig                  |  3 ++
- hw/display/Kconfig               |  1 +
- hw/i2c/Makefile.objs             |  4 +-
- hw/i386/Kconfig                  | 63 +++++++++++++++++++++++++++++---
- hw/isa/Kconfig                   |  1 +
- hw/pci-host/Kconfig              |  5 +++
- hw/tpm/Kconfig                   |  5 ++-
- 8 files changed, 80 insertions(+), 41 deletions(-)
+ default-configs/alpha-softmmu.mak       |  1 -
+ default-configs/arm-softmmu.mak         |  2 --
+ default-configs/hppa-softmmu.mak        |  1 -
+ default-configs/i386-softmmu.mak        |  1 -
+ default-configs/mips-softmmu-common.mak |  1 -
+ default-configs/ppc-softmmu.mak         |  1 -
+ default-configs/sh4-softmmu.mak         |  1 -
+ default-configs/sh4eb-softmmu.mak       |  1 -
+ default-configs/sparc64-softmmu.mak     |  1 -
+ default-configs/usb.mak                 | 11 -----------
+ hw/usb/Kconfig                          | 26 +++++++++++++++++++++++++
+ 11 files changed, 26 insertions(+), 21 deletions(-)
+ delete mode 100644 default-configs/usb.mak
 
+diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
+index c71d1b7f37..ef8c9ae5ed 100644
+--- a/default-configs/alpha-softmmu.mak
++++ b/default-configs/alpha-softmmu.mak
+@@ -1,6 +1,5 @@
+ # Default configuration for alpha-softmmu
+ 
+-include usb.mak
+ CONFIG_PCI=y
+ CONFIG_SERIAL=y
+ CONFIG_SERIAL_ISA=y
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 8c071f6224..92fc9911eb 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -1,6 +1,5 @@
+ # Default configuration for arm-softmmu
+ 
+-include usb.mak
+ CONFIG_PCI=y
+ CONFIG_VGA=y
+ CONFIG_NAND=y
+@@ -38,7 +37,6 @@ CONFIG_DS1338=y
+ CONFIG_PFLASH_CFI01=y
+ CONFIG_PFLASH_CFI02=y
+ CONFIG_MICRODRIVE=y
+-CONFIG_USB=y
+ CONFIG_USB_MUSB=y
+ CONFIG_USB_EHCI_SYSBUS=y
+ CONFIG_PLATFORM_BUS=y
+diff --git a/default-configs/hppa-softmmu.mak b/default-configs/hppa-softmmu.mak
+index 74d34c05e9..fe07c90937 100644
+--- a/default-configs/hppa-softmmu.mak
++++ b/default-configs/hppa-softmmu.mak
+@@ -1,4 +1,3 @@
+-include usb.mak
+ CONFIG_PCI=y
+ CONFIG_SERIAL=y
+ CONFIG_SERIAL_ISA=y
 diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index a66fd1ee5e..23ea6a3888 100644
+index cf49e3fae7..23dcca7a31 100644
 --- a/default-configs/i386-softmmu.mak
 +++ b/default-configs/i386-softmmu.mak
-@@ -1,10 +1,6 @@
- # Default configuration for i386-softmmu
+@@ -2,7 +2,6 @@
  
--CONFIG_PCI=y
--CONFIG_ISA=y
+ CONFIG_PCI=y
+ CONFIG_ISA=y
+-include usb.mak
  include hyperv.mak
--CONFIG_VGA_ISA=y
--CONFIG_VMWARE_VGA=y
- CONFIG_VMXNET3_PCI=y
- CONFIG_VIRTIO_VGA=y
- CONFIG_IPMI=y
-@@ -12,46 +8,25 @@ CONFIG_IPMI_LOCAL=y
- CONFIG_IPMI_EXTERN=y
- CONFIG_ISA_IPMI_KCS=y
- CONFIG_ISA_IPMI_BT=y
--CONFIG_I8254=y
--CONFIG_ACPI=y
--CONFIG_ACPI_X86=y
--CONFIG_ACPI_X86_ICH=y
--CONFIG_ACPI_MEMORY_HOTPLUG=y
--CONFIG_ACPI_CPU_HOTPLUG=y
--CONFIG_APM=y
--CONFIG_I8257=y
--CONFIG_IDE_ISA=y
--CONFIG_IDE_PIIX=y
-+
-+# Optional devices:
-+#
- CONFIG_HPET=y
- CONFIG_APPLESMC=y
--CONFIG_I8259=y
- CONFIG_PFLASH_CFI01=y
--CONFIG_MC146818RTC=y
--CONFIG_PCI_PIIX=y
--CONFIG_ISA_DEBUG=y
- CONFIG_ISA_TESTDEV=y
--CONFIG_VMPORT=y
- CONFIG_SGA=y
--CONFIG_LPC_ICH9=y
--CONFIG_PCI_Q35=y
--CONFIG_APIC=y
--CONFIG_IOAPIC=y
- CONFIG_PVPANIC=y
- CONFIG_MEM_DEVICE=y
--CONFIG_DIMM=y
- CONFIG_NVDIMM=y
- CONFIG_ACPI_NVDIMM=y
--CONFIG_XIO3130=y
--CONFIG_IOH3420=y
--CONFIG_I82801B11=y
--CONFIG_SMBIOS=y
- CONFIG_PXB=y
- CONFIG_ACPI_VMGENID=y
--CONFIG_FW_CFG_DMA=y
- CONFIG_I2C=y
- CONFIG_SEV=$(CONFIG_KVM)
--CONFIG_VTD=y
--CONFIG_AMD_IOMMU=y
--CONFIG_PAM=y
-+
-+# Boards:
-+#
-+CONFIG_ISAPC=y
- CONFIG_I440FX=y
- CONFIG_Q35=y
-diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-index 2f4871c10a..98bb3539e1 100644
---- a/hw/acpi/Kconfig
-+++ b/hw/acpi/Kconfig
-@@ -3,15 +3,18 @@ config ACPI
+ CONFIG_VGA_ISA=y
+ CONFIG_VGA_CIRRUS=y
+diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+index 03c7a08d1a..1060374d51 100644
+--- a/default-configs/mips-softmmu-common.mak
++++ b/default-configs/mips-softmmu-common.mak
+@@ -1,6 +1,5 @@
+ # Common mips*-softmmu CONFIG defines
  
- config ACPI_X86
-     bool
-+    select ACPI
+-include usb.mak
+ CONFIG_ISA=y
+ CONFIG_PCI=y
+ CONFIG_ESP=y
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index c7003e4284..37040fd17a 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -1,6 +1,5 @@
+ # Default configuration for ppc-softmmu
  
- config ACPI_X86_ICH
-     bool
-+    select ACPI_X86
+-include usb.mak
+ CONFIG_PCI=y
+ ONFIG_ISA=y
  
- config ACPI_CPU_HOTPLUG
-     bool
+diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
+index 57d99fa93c..9fc09f9d6d 100644
+--- a/default-configs/sh4-softmmu.mak
++++ b/default-configs/sh4-softmmu.mak
+@@ -1,6 +1,5 @@
+ # Default configuration for sh4-softmmu
  
- config ACPI_MEMORY_HOTPLUG
-     bool
-+    select MEM_DEVICE
+-include usb.mak
+ CONFIG_PCI=y
+ CONFIG_SERIAL=y
+ CONFIG_SERIAL_ISA=y
+diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
+index 2e5909c381..c53051d0d5 100644
+--- a/default-configs/sh4eb-softmmu.mak
++++ b/default-configs/sh4eb-softmmu.mak
+@@ -1,6 +1,5 @@
+ # Default configuration for sh4eb-softmmu
  
- config ACPI_NVDIMM
-     bool
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index a53ca4601a..3d69435982 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -82,6 +82,7 @@ config VGA
+-include usb.mak
+ CONFIG_PCI=y
+ CONFIG_SERIAL=y
+ CONFIG_SERIAL_ISA=y
+diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
+index db393d9eb3..5507346006 100644
+--- a/default-configs/sparc64-softmmu.mak
++++ b/default-configs/sparc64-softmmu.mak
+@@ -1,6 +1,5 @@
+ # Default configuration for sparc64-softmmu
  
- config QXL
+-include usb.mak
+ CONFIG_PCI=y
+ CONFIG_M48T59=y
+ CONFIG_PTIMER=y
+diff --git a/default-configs/usb.mak b/default-configs/usb.mak
+deleted file mode 100644
+index e42cfeabbe..0000000000
+--- a/default-configs/usb.mak
++++ /dev/null
+@@ -1,11 +0,0 @@
+-CONFIG_USB=y
+-CONFIG_USB_TABLET_WACOM=y
+-CONFIG_USB_STORAGE_BOT=y
+-CONFIG_USB_STORAGE_UAS=y
+-CONFIG_USB_STORAGE_MTP=y
+-CONFIG_SCSI=y
+-CONFIG_USB_SMARTCARD=y
+-CONFIG_USB_AUDIO=y
+-CONFIG_USB_SERIAL=y
+-CONFIG_USB_NETWORK=y
+-CONFIG_USB_BLUETOOTH=y
+diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+index f23c542d27..0b8f41040e 100644
+--- a/hw/usb/Kconfig
++++ b/hw/usb/Kconfig
+@@ -5,59 +5,85 @@ config USB_UHCI
      bool
-+    default y if PC
-     depends on SPICE && PCI
-     select VGA
+     default y
+     depends on PCI
++    select USB
  
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-index 37cacde978..48f7760379 100644
---- a/hw/i2c/Makefile.objs
-+++ b/hw/i2c/Makefile.objs
-@@ -1,8 +1,8 @@
- common-obj-$(CONFIG_I2C) += core.o smbus.o smbus_eeprom.o
- common-obj-$(CONFIG_DDC) += i2c-ddc.o
- common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
--common-obj-$(CONFIG_ACPI_X86) += smbus_ich9.o
--common-obj-$(CONFIG_APM) += pm_smbus.o
-+common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
-+common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
- common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
- common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
- common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index 68a9064558..b359319875 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -1,21 +1,71 @@
- config KVM
+ config USB_OHCI
      bool
+     default y
+     depends on PCI
++    select USB
  
--config I440FX
-+config PC
+ config USB_EHCI
      bool
--    select QXL if SPICE
-+    select ISA_DEBUG
-+    select I8259
-+    select I8254
-+    select PCSPK
-+    select I82374
-+    select I8257
-+    select MC146818RTC
-     select TPM_TIS if TPM
--    select XEN_I386 if XEN
-+
-+config PC_PCI
-+    bool
-+    select APIC
-+    select IOAPIC
-+    select APM
-+    select PC
-+
-+config PC_ACPI
-+    bool
-+    select ACPI_X86
-+    select ACPI_CPU_HOTPLUG
-+    select ACPI_MEMORY_HOTPLUG
-+    depends on ACPI_SMBUS
-+
-+config I440FX
-+    bool
-+    select PC_PCI
-+    select PC_ACPI
-+    select ACPI_SMBUS
-+    select PCI_PIIX
-+    select FDC
-+    select IDE_PIIX
-+    select PAM
-+    select DIMM
-+    select SMBIOS
-+    select VMPORT
-+    select VMMOUSE
-+    select FW_CFG_DMA
+     default y
+     depends on PCI
++    select USB
  
- config ISAPC
+ config USB_EHCI_SYSBUS
      bool
-     select ISA_BUS
-+    select PC
-+    select IDE_ISA
-+    select VGA_ISA
-+    # FIXME: it is in the same file as i440fx, and does not compile
-+    # if separated
-+    depends on I440FX
++    select USB
  
- config Q35
+ config USB_XHCI
      bool
--    select QXL if SPICE
--    select TPM_TIS if TPM
--    select XEN_I386 if XEN
-+    select PC_PCI
-+    select PC_ACPI
-+    select PCI_Q35
-+    select LPC_ICH9
-+    select AHCI
-+    select PAM
-+    select AMD_IOMMU
-+    select DIMM
-+    select SMBIOS
-+    select VMPORT
-+    select VMMOUSE
-+    select FW_CFG_DMA
-+    select VTD
+     default y
+     depends on PCI
++    select USB
  
- config VTD
+ config USB_XHCI_NEC
      bool
-@@ -28,3 +78,4 @@ config VMPORT
+     default y
+     depends on PCI
++    select USB
  
- config VMMOUSE
+ config USB_MUSB
      bool
-+    depends on VMPORT
-diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-index 3f451ef006..bf72e4fef2 100644
---- a/hw/isa/Kconfig
-+++ b/hw/isa/Kconfig
-@@ -25,4 +25,5 @@ config SMC37C669
- config LPC_ICH9
-     bool
-     select ISA_BUS
-+    select ACPI_SMBUS
-     select ACPI_X86_ICH
-diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-index 20c3de37a3..84670ee37c 100644
---- a/hw/pci-host/Kconfig
-+++ b/hw/pci-host/Kconfig
-@@ -21,10 +21,15 @@ config PCI_SABRE
++    select USB
  
- config PCI_PIIX
+ config TUSB6010
      bool
-+    select PCI
++    select USB_MUSB
  
- config PCI_Q35
-     bool
-     select PCIE
-+    select PCI
-+    select XIO3130
-+    select IOH3420
-+    select I82801B11
- 
- config PCI_GENERIC
-     bool
-diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
-index da4bb5b6c7..28acdb745e 100644
---- a/hw/tpm/Kconfig
-+++ b/hw/tpm/Kconfig
-@@ -3,10 +3,13 @@ config TPM
- 
- config TPM_TIS
-     bool
--    depends on TPM
-+    default y
-+    depends on TPM && PC
- 
- config TPM_CRB
+ config USB_TABLET_WACOM
      bool
 +    default y
-+    depends on TPM && PC
++    depends on USB
  
- config TPM_PASSTHROUGH
+ config USB_STORAGE_BOT
      bool
++    default y
++    depends on USB
+ 
+ config USB_STORAGE_UAS
+     bool
++    default y
++    depends on USB
+ 
+ config USB_AUDIO
+     bool
++    default y
++    depends on USB
+ 
+ config USB_SERIAL
+     bool
++    default y
++    depends on USB
+ 
+ config USB_NETWORK
+     bool
++    default y
++    depends on USB
+ 
+ config USB_BLUETOOTH
+     bool
++    default y
++    depends on USB
+ 
+ config USB_SMARTCARD
+     bool
++    default y
++    depends on USB
+ 
+ config USB_STORAGE_MTP
+     bool
++    default y
++    depends on USB
 -- 
 2.17.1
