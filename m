@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37703)
+Received: from eggs.gnu.org ([209.51.188.92]:37384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPYZ-0003Ex-ID
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:19:13 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gjPYe-0002rf-1u
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:19:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1gjPRJ-000188-PM
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:11:42 -0500
-Received: from mga05.intel.com ([192.55.52.43]:56305)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1gjPRJ-00013X-H6
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:11:37 -0500
-From: Yang Zhong <yang.zhong@intel.com>
-Date: Tue, 15 Jan 2019 22:10:35 +0800
-Message-Id: <20190115141108.934-5-yang.zhong@intel.com>
-In-Reply-To: <20190115141108.934-1-yang.zhong@intel.com>
-References: <20190115141108.934-1-yang.zhong@intel.com>
+	(envelope-from <stefanha@gmail.com>) id 1gjPP2-0000GZ-KF
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:09:17 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53408)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gjPP2-0000GA-E3
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 09:09:16 -0500
+Received: by mail-wm1-x341.google.com with SMTP id d15so3418190wmb.3
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 06:09:15 -0800 (PST)
+Date: Tue, 15 Jan 2019 14:09:12 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190115140912.GA29056@stefanha-x1.localdomain>
+References: <20181214105642.673-1-cfergeau@redhat.com>
+	<20190103105425.GF7733@stefanha-x1.localdomain>
+	<20190103141455.GP20900@natto.ory.fergeau.eu>
+	<20190104154034.GK30381@stefanha-x1.localdomain>
+	<20190114115420.GR23773@natto.ory.fergeau.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v2 04/37] hw/m68k/Makefile.objs:
- Conditionally build boards
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="SLDf9lqlvOQaIe6s"
+Content-Disposition: inline
+In-Reply-To: <20190114115420.GR23773@natto.ory.fergeau.eu>
+Subject: Re: [Qemu-devel] [PATCH v4] log: Make glib logging go through QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +33,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, thuth@redhat.com, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, yang.zhong@intel.com, =?UTF-8?q?=C3=81kos=20Kov=C3=A1cs?= <akoskovacs@gmx.com>
+To: Christophe Fergeau <cfergeau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-From: Ákos Kovács <akoskovacs@gmx.com>
 
-CONFIG_AN5206, CONFIG_MCF5206 and CONFIG_MCF5208 make
-variables created for m68k boards, and added to
-default-configs/m86k-softmmu.mak.
+--SLDf9lqlvOQaIe6s
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Ákos Kovács <akoskovacs@gmx.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- default-configs/m68k-softmmu.mak | 3 +++
- hw/m68k/Makefile.objs            | 5 +++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+On Mon, Jan 14, 2019 at 12:54:20PM +0100, Christophe Fergeau wrote:
+> On Fri, Jan 04, 2019 at 03:40:34PM +0000, Stefan Hajnoczi wrote:
+> > On Thu, Jan 03, 2019 at 03:14:55PM +0100, Christophe Fergeau wrote:
+> > > Hey,
+> > >=20
+> > > On Thu, Jan 03, 2019 at 10:54:25AM +0000, Stefan Hajnoczi wrote:
+> > > > On Fri, Dec 14, 2018 at 11:56:42AM +0100, Christophe Fergeau wrote:
+> > > > > +static void qemu_log_func(const gchar *log_domain,
+> > > > > +                          GLogLevelFlags log_level,
+> > > > > +                          const gchar *message,
+> > > > > +                          gpointer user_data)
+> > > > > +{
+> > > > > +    switch (log_level & G_LOG_LEVEL_MASK) {
+> > > > > +    case G_LOG_LEVEL_DEBUG:
+> > > > > +        /* Use same G_MESSAGES_DEBUG logic as glib to enable/dis=
+able debug
+> > > > > +         * messages
+> > > > > +         */
+> > > > > +        if (qemu_glog_domains =3D=3D NULL) {
+> > > > > +            break;
+> > > > > +        }
+> > > > > +        if (strcmp(qemu_glog_domains, "all") !=3D 0 &&
+> > > > > +          (log_domain =3D=3D NULL || !strstr(qemu_glog_domains, =
+log_domain))) {
+> > > > > +            break;
+> > > > > +        }
+> > > > > +        /* Fall through */
+> > > > > +    case G_LOG_LEVEL_INFO:
+> > > > > +        /* Fall through */
+> > > > > +    case G_LOG_LEVEL_MESSAGE:
+> > > > > +        info_report("%s: %s", log_domain, message);
+> > > >=20
+> > > > QEMU itself uses glib, so what happens if *_report() emit more log
+> > > > messages?  Can this result in an infinite loop?
+> > >=20
+> > > If *_report try to output messages through the g_log API, glib will
+> > > catch it and will abort, so not an infinite loop, but not a
+> > > desirable outcome either.
+> > >=20
+> > > Some low-level logging functions which are going to dump the message
+> > > without glib (or using g_log_default_handler()) are needed.
+> > > The timestamping/prepending of 'error:', 'warning:' to the error mess=
+age
+> > > is done right below *_report (in vreport) so this looked like a good
+> > > place for that.
+> >=20
+> > If you're confident that QEMU will never (indirectly) emit a glib log
+> > message from the *_report() code path, then I'm happy.
+>=20
+> In these codepaths, I'm confident up to
+> void monitor_vfprintf(FILE *stream, const char *fmt, va_list ap)
+> {
+>     if (cur_mon && !monitor_cur_is_qmp()) {
+>         monitor_vprintf(cur_mon, fmt, ap);
+>     } else {
+>         vfprintf(stream, fmt, ap);
+>     }
+> }
+>=20
+> From there, it was not obvious to me whether the monitor_vprintf
+> codepath can be triggered from info/warn/error_report or not. If they
+> can, I'd feel less confident that monitor_vprintf will never indirectly
+> call glib log functions.
 
-diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
-index 60f7cdfbf2..a179da9077 100644
---- a/default-configs/m68k-softmmu.mak
-+++ b/default-configs/m68k-softmmu.mak
-@@ -2,3 +2,6 @@
- 
- CONFIG_COLDFIRE=y
- CONFIG_PTIMER=y
-+CONFIG_AN5206=y
-+CONFIG_MCF5206=y
-+CONFIG_MCF5208=y
-diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
-index d1f089c08a..fa287edd0b 100644
---- a/hw/m68k/Makefile.objs
-+++ b/hw/m68k/Makefile.objs
-@@ -1,2 +1,3 @@
--obj-y += an5206.o mcf5208.o
--obj-y += mcf5206.o mcf_intc.o
-+obj-$(CONFIG_AN5206) += an5206.o
-+obj-$(CONFIG_MCF5206) += mcf5206.o
-+obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
--- 
-2.17.1
+I think we're okay because otherwise monitor_vprintf() ->
+info/warn/error_report() would already be an infinite loop today.
+
+Stefan
+
+--SLDf9lqlvOQaIe6s
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcPemIAAoJEJykq7OBq3PI0uoH/jD7qyrl00s6PMiJeMyQ+EyC
+dElvriNjz58+uw8t6rsnDlY3HjJVSk0o8frhraeW22hnBdkvG/H+OINr6Wezt8rq
+C6F9hAzHE7/6fEuyt7Va+o7cUYwLIM3BfpFWF1wv8H8TNnNQ+OgNCRgCqcKrP4xn
+j/okV6/JTQ7k+1pq5xf25VasmrmIOspcBD5gGngWZ7I1Wy9ud48IQVopkuhOPWz3
+SqGcf8SGQR4gXlGZMtOTpcdl9vx7sJhQGL8aZw/oBl88tk95Ko6vSZ1/s+b5wjFz
+3x2RL53aWBxbDr/hrOwO3yEshUaPL/pgmyecCt3mZY51WQDxFk/b+LJHDWsbFr8=
+=FFBU
+-----END PGP SIGNATURE-----
+
+--SLDf9lqlvOQaIe6s--
