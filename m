@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44146)
+Received: from eggs.gnu.org ([209.51.188.92]:46823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gjWfu-0005NF-3u
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:55:11 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gjWh9-00067t-7d
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:56:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gjWfr-0007hg-0f
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:55:09 -0500
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:32807)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gjWfq-0007gG-Q8
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:55:06 -0500
-Received: by mail-qt1-f194.google.com with SMTP id l11so4895169qtp.0
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 13:55:06 -0800 (PST)
-MIME-Version: 1.0
-References: <20190115145256.9593-1-berrange@redhat.com>
-	<20190115145256.9593-12-berrange@redhat.com>
-In-Reply-To: <20190115145256.9593-12-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 16 Jan 2019 01:54:54 +0400
-Message-ID: <CAMxuvazNKWGXGJSDWaf8NetmarhaqAKbmoF+L77kaqxrqr0cDg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <amarkovic@wavecomp.com>) id 1gjWh7-0000hM-9A
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:56:27 -0500
+Received: from mail-eopbgr780135.outbound.protection.outlook.com
+	([40.107.78.135]:10624
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gjWh5-0000dp-FM
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 16:56:25 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 15 Jan 2019 21:56:20 +0000
+Message-ID: <BN6PR2201MB125152B0D011F028EA3DCA4BC6810@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1547403692.git.noring@nocrew.org>,
+	<e1efe4eff36a4069bbf8411a09d01acd387fb49d.1547403692.git.noring@nocrew.org>
+In-Reply-To: <e1efe4eff36a4069bbf8411a09d01acd387fb49d.1547403692.git.noring@nocrew.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 11/12] chardev: disallow
- TLS/telnet/websocket with tcp_chr_wait_connected
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 8/9] tests/tcg/mips: Test R5900 multimedia
+ instruction LQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +32,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Tue, Jan 15, 2019 at 6:54 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->
-> In the previous commit
->
->     commit 1dc8a6695c731abb7461c637b2512c3670d82be4
->     Author: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->     Date:   Tue Aug 16 12:33:32 2016 +0400
->
->       char: fix waiting for TLS and telnet connection
->
-> the tcp_chr_wait_connected() method was changed to check for a non-NULL
-> 's->ioc' as a sign that there is already a connection present, as
-> opposed to checking the "connected" flag to supposedly fix handling of
-> TLS/telnet connections.
->
-> The original code would repeatedly call tcp_chr_wait_connected creating
-> many connections as 'connected' would never become true. The changed
-> code would still repeatedly call tcp_chr_wait_connected busy waiting
-> because s->ioc is set but the chardev will never see CHR_EVENT_OPENED.
-> IOW, the code is still broken with TLS/telnet, but in a different way.
->
-> Checking for a non-NULL 's->ioc' does not mean that a CHR_EVENT_OPENED
-> will be ready for a TLS/telnet connection. These protocols (and the
-> websocket protocol) all require the main loop to be running in order
-> to complete the protocol handshake before emitting CHR_EVENT_OPENED.
-> The tcp_chr_wait_connected() method is only used during early startup
-> before a main loop is running, so TLS/telnet/websock connections can
-> never complete initialization.
->
-> Making this work would require changing tcp_chr_wait_connected to run
-> a main loop. This is quite complex since we must not allow GSource's
-> that other parts of QEMU have registered to run yet. The current callers
-> of tcp_chr_wait_connected do not require use of the TLS/telnet/websocket
-> protocols, so the simplest option is to just forbid this combination
-> completely for now.
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
+> From: Fredrik Noring <noring@nocrew.org>
+> Sent: Sunday, January 13, 2019 8:08 PM
+> To: Aleksandar Markovic; Aurelien Jarno; Philippe Mathieu-Daud=E9
+> Cc: J=FCrgen Urban; Maciej W. Rozycki; qemu-devel@nongnu.org
+> Subject: [PATCH 8/9] tests/tcg/mips: Test R5900 multimedia instruction LQ
+>=20
+> Signed-off-by: Fredrik Noring <noring@nocrew.org>
 > ---
->  chardev/char-socket.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 91d775e9c5..7e98a95bbd 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -951,8 +951,20 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
->  static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
->  {
->      SocketChardev *s =3D SOCKET_CHARDEV(chr);
-> -    /* It can't wait on s->connected, since it is set asynchronously
-> -     * in TLS and telnet cases, only wait for an accepted socket */
-> +    const char *opts[] =3D { "telnet", "tn3270", "websock", "tls-creds" =
-};
-> +    bool optset[] =3D { s->is_telnet, s->is_tn3270, s->is_websock, s->tl=
-s_creds };
-> +    size_t i;
+
+The commit message is missing. I will deal with the rest of this patch once=
+ LQ
+implementation patch is accepted.
+
+>  tests/tcg/mips/mipsn32r5900/Makefile |   3 +-
+>  tests/tcg/mips/mipsn32r5900/lq.c     | 111 +++++++++++++++++++++++++++
+>  2 files changed, 113 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/tcg/mips/mipsn32r5900/lq.c
+>=20
+> diff --git a/tests/tcg/mips/mipsn32r5900/Makefile b/tests/tcg/mips/mipsn3=
+2r5900/Makefile
+> index f4887678ae..cb3ef9d26a 100644
+> --- a/tests/tcg/mips/mipsn32r5900/Makefile
+> +++ b/tests/tcg/mips/mipsn32r5900/Makefile
+> @@ -8,7 +8,8 @@ SIM_FLAGS=3D-cpu R5900
+>  CC      =3D $(CROSS)gcc
+>  CFLAGS  =3D -Wall -mabi=3Dn32 -march=3Dr5900 -static
+>=20
+> -TESTCASES =3D pcpyuld.tst
+> +TESTCASES =3D lq.tst
+> +TESTCASES +=3D pcpyuld.tst
+>=20
+>  all: $(TESTCASES)
+>=20
+> diff --git a/tests/tcg/mips/mipsn32r5900/lq.c b/tests/tcg/mips/mipsn32r59=
+00/lq.c
+> new file mode 100644
+> index 0000000000..5a16b12450
+> --- /dev/null
+> +++ b/tests/tcg/mips/mipsn32r5900/lq.c
+> @@ -0,0 +1,111 @@
+> +/*
+> + * Test LQ.
+> + */
 > +
-> +    QEMU_BUILD_BUG_ON(G_N_ELEMENTS(opts) !=3D G_N_ELEMENTS(optset));
-> +    for (i =3D 0; i < G_N_ELEMENTS(opts); i++) {
-> +        if (optset[i]) {
-> +            error_setg(errp,
-> +                       "'%s' option is incompatible with waiting for "
-> +                       "connection during early startup", opts[i]);
-
-"during early startup" ? I think you could also reach this by using
-chardev-add & netdev_add.
-
-> +            return -1;
-> +        }
+> +#include <stdio.h>
+> +#include <inttypes.h>
+> +#include <assert.h>
+> +
+> +/* 128-bit multimedia register */
+> +struct mmr { uint64_t hi, lo; } __attribute__((aligned(16)));
+> +
+> +#define LQ(base, offset) \
+> +    ({ \
+> +        uint64_t hi, lo; \
+> +    \
+> +        __asm__ __volatile__ ( \
+> +            "    pcpyld  %1, %1, %1\n" \
+> +            "    lq %1, %3(%2)\n" \
+> +            "    pcpyud  %0, %1, %1\n" \
+> +            : "=3Dr" (hi), "=3Dr" (lo) \
+> +            : "r" (base), "i" (offset)); \
+> +    \
+> +        (struct mmr) { .hi =3D hi, .lo =3D lo }; \
+> +    })
+> +
+> +static uint64_t ld_reference(const void *base, int16_t offset)
+> +{
+> +    const uint8_t *p =3D base;
+> +    uint64_t r =3D 0;
+> +    int i;
+> +
+> +    for (i =3D 0; i < 8; i++) {
+> +        r |=3D (uint64_t)p[offset + i] << (8 * i);
 > +    }
 > +
->      while (!s->ioc) {
->          if (s->is_listen) {
->              tcp_chr_accept_server_sync(chr);
+> +    return r;
+> +}
+> +
+> +static struct mmr lq_reference(const void *base, int16_t offset)
+> +{
+> +    /*
+> +     * The least significant four bits of the effective address are
+> +     * masked to zero, effectively creating an aligned address. No
+> +     * address exceptions due to alignment are possible.
+> +     */
+> +    const uint8_t *b =3D base;
+> +    const uint8_t *o =3D &b[offset];
+> +    const void *a =3D (const void*)((unsigned long)o & ~0xFUL);
+> +
+> +    return (struct mmr) {
+> +        .hi =3D ld_reference(a, 8),
+> +        .lo =3D ld_reference(a, 0)
+> +    };
+> +}
+> +
+> +static void assert_equal_mmr(struct mmr a, struct mmr b)
+> +{
+> +    assert(a.hi =3D=3D b.hi);
+> +    assert(a.lo =3D=3D b.lo);
+> +}
+> +
+> +#define VERIFY_LQ(base, offset) \
+> +    assert_equal_mmr(LQ(base, offset), lq_reference(base, offset))
+> +
+> +int main()
+> +{
+> +    static const char data[] __attribute__((aligned(16)))=3D
+> +        "0123456789abcdef"
+> +        "ghijklmnopqrstuv"
+> +        "wxyzABCDEFGHIJKL"
+> +        "MNOPQRSTUVWXYZ.,";
+> +    int i;
+> +
+> +    for (i =3D 16; i < 48; i++) {
+> +        VERIFY_LQ(&data[i], -16);
+> +        VERIFY_LQ(&data[i], -15);
+> +        VERIFY_LQ(&data[i], -14);
+> +        VERIFY_LQ(&data[i], -13);
+> +        VERIFY_LQ(&data[i], -12);
+> +        VERIFY_LQ(&data[i], -11);
+> +        VERIFY_LQ(&data[i], -10);
+> +        VERIFY_LQ(&data[i], -9);
+> +        VERIFY_LQ(&data[i], -8);
+> +        VERIFY_LQ(&data[i], -7);
+> +        VERIFY_LQ(&data[i], -6);
+> +        VERIFY_LQ(&data[i], -5);
+> +        VERIFY_LQ(&data[i], -4);
+> +        VERIFY_LQ(&data[i], -3);
+> +        VERIFY_LQ(&data[i], -2);
+> +        VERIFY_LQ(&data[i], -1);
+> +        VERIFY_LQ(&data[i],  0);
+> +        VERIFY_LQ(&data[i],  1);
+> +        VERIFY_LQ(&data[i],  2);
+> +        VERIFY_LQ(&data[i],  3);
+> +        VERIFY_LQ(&data[i],  4);
+> +        VERIFY_LQ(&data[i],  5);
+> +        VERIFY_LQ(&data[i],  6);
+> +        VERIFY_LQ(&data[i],  7);
+> +        VERIFY_LQ(&data[i],  8);
+> +        VERIFY_LQ(&data[i],  9);
+> +        VERIFY_LQ(&data[i],  10);
+> +        VERIFY_LQ(&data[i],  11);
+> +        VERIFY_LQ(&data[i],  12);
+> +        VERIFY_LQ(&data[i],  13);
+> +        VERIFY_LQ(&data[i],  14);
+> +        VERIFY_LQ(&data[i],  15);
+> +        VERIFY_LQ(&data[i],  16);
+> +    }
+> +
+> +    return 0;
+> +}
 > --
-> 2.20.1
->
+> 2.19.2
+>=20
+> =
