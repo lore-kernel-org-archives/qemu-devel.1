@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39458)
+Received: from eggs.gnu.org ([209.51.188.92]:39915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gjoOt-0004ND-8n
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:50:49 -0500
+	(envelope-from <philmd@redhat.com>) id 1gjoPn-0004p3-4q
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:51:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gjoOq-0005MV-AB
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:50:46 -0500
-Date: Wed, 16 Jan 2019 17:50:14 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190116175014.6f6eafe4.cohuck@redhat.com>
-In-Reply-To: <1547467955-17245-1-git-send-email-thuth@redhat.com>
-References: <1547467955-17245-1-git-send-email-thuth@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gjoPl-0005pT-Km
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:51:42 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:39314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gjoPl-0005mV-Cp
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:51:41 -0500
+Received: by mail-wm1-f65.google.com with SMTP id y8so2721031wmi.4
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 08:51:37 -0800 (PST)
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-5-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <844dd42f-e9ed-309a-2bd3-db2668903a42@redhat.com>
+Date: Wed, 16 Jan 2019 17:51:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
- with Clang on s390x
+In-Reply-To: <1547566866-129386-5-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 04/14] tests: acpi: make pointer to RSDP
+ 64bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Gonglei <arei.gonglei@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-On Mon, 14 Jan 2019 13:12:35 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+On 1/15/19 4:40 PM, Igor Mammedov wrote:
+> In case of UEFI RSDP doesn't have to be located in lowmem,
+> it could be placed at any address. Make sure that test won't
+> break if it is placed above the first 4Gb of address space.
+> 
+> PS:
+> While at it cleanup some local variables as we don't really
+> need them.
 
-> Clang v7.0.1 does not like the __int128 variable type for inline
-> assembly on s390x:
+Splitting as obvious patches make review quicker, but it's a matter of
+taste.
+
 > 
-> In file included from fpu/softfloat.c:97:
-> include/fpu/softfloat-macros.h:647:9: error: inline asm error:
->  This value type register class is not natively supported!
->     asm("dlgr %0, %1" : "+r"(n) : "r"(d));
->         ^
-> 
-> Disable this code part there now when compiling with Clang, so that
-> the generic code gets used instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  include/fpu/softfloat-macros.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tests/bios-tables-test.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
 > 
-> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-> index b1d772e..bd5b641 100644
-> --- a/include/fpu/softfloat-macros.h
-> +++ b/include/fpu/softfloat-macros.h
-> @@ -641,7 +641,7 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
->      uint64_t q;
->      asm("divq %4" : "=a"(q), "=d"(*r) : "0"(n0), "1"(n1), "rm"(d));
->      return q;
-> -#elif defined(__s390x__)
-> +#elif defined(__s390x__) && !defined(__clang__)
->      /* Need to use a TImode type to get an even register pair for DLGR.  */
->      unsigned __int128 n = (unsigned __int128)n1 << 64 | n0;
->      asm("dlgr %0, %1" : "+r"(n) : "r"(d));
-
-Ok, so what's the deal with this patch now? Fix compilation now,
-optimize later?
-
-If yes, should I pick it as an s390x build fix (I plan to send a pull
-request later this week), or will the fpu maintainers pick it?
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 99d7bf8..c28c5c7 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -26,7 +26,7 @@
+>  typedef struct {
+>      const char *machine;
+>      const char *variant;
+> -    uint32_t rsdp_addr;
+> +    uint64_t rsdp_addr;
+>      uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+>      GArray *tables;
+>      uint32_t smbios_ep_addr;
+> @@ -86,13 +86,11 @@ static void test_acpi_rsdp_address(test_data *data)
+>  
+>  static void test_acpi_rsdp_table(test_data *data)
+>  {
+> -    uint8_t *rsdp_table = data->rsdp_table, revision;
+> -    uint32_t addr = data->rsdp_addr;
+> +    uint8_t *rsdp_table = data->rsdp_table;
+>  
+> -    acpi_fetch_rsdp_table(data->qts, addr, rsdp_table);
+> -    revision = rsdp_table[15 /* Revision offset */];
+> +    acpi_fetch_rsdp_table(data->qts, data->rsdp_addr, rsdp_table);
+>  
+> -    switch (revision) {
+> +    switch (rsdp_table[15 /* Revision offset */]) {
+>      case 0: /* ACPI 1.0 RSDP */
+>          /* With rev 1, checksum is only for the first 20 bytes */
+>          g_assert(!acpi_calc_checksum(rsdp_table,  20));
+> 
