@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39863)
+Received: from eggs.gnu.org ([209.51.188.92]:42420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gjpKz-0002qQ-FS
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:50:50 -0500
+	(envelope-from <wexu@redhat.com>) id 1gjpOk-0005WF-6g
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:54:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gjpKw-0000WH-DI
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:50:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39294)
+	(envelope-from <wexu@redhat.com>) id 1gjpOi-0002wo-5h
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:54:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gjpKt-0000Nt-SQ
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:50:44 -0500
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Wed, 16 Jan 2019 18:49:41 +0100
-Message-Id: <20190116174941.342900-6-sgarzare@redhat.com>
-In-Reply-To: <20190116174941.342900-1-sgarzare@redhat.com>
-References: <20190116174941.342900-1-sgarzare@redhat.com>
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gjpOh-0002nI-Sg
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:54:40 -0500
+Date: Thu, 17 Jan 2019 01:46:04 +0800
+From: Wei Xu <wexu@redhat.com>
+Message-ID: <20190116174604.GA28579@wei-ubt>
+References: <1542895581-10721-1-git-send-email-wexu@redhat.com>
+	<1542895581-10721-10-git-send-email-wexu@redhat.com>
+	<d0059b46-34c0-86d9-0840-ebe20bbdd561@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 5/5] optionrom/pvh: load initrd from fw_cfg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d0059b46-34c0-86d9-0840-ebe20bbdd561@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 09/16] virtio: fill/flush/pop for packed
+ ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +29,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Liam Merwick <liam.merwick@oracle.com>, Eric Blake <eblake@redhat.com>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org, jfreimann@redhat.com, tiwei.bie@intel.com, mst@redhat.com
 
-If we found initrd through fw_cfg, we can load it and use the
-first module of hvm_start_info to pass initrd address and size
-to the kernel.
+On Fri, Nov 30, 2018 at 01:45:19PM +0100, Maxime Coquelin wrote:
+> Hi Wei,
+> 
+> On 11/22/18 3:06 PM, wexu@redhat.com wrote:
+> >+void virtqueue_flush(VirtQueue *vq, unsigned int count)
+> >+{
+> >+    if (unlikely(vq->vdev->broken)) {
+> >+        vq->inuse -= count;
+> >+        return;
+> >+    }
+> >+
+> >+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+> >+        virtqueue_packed_flush(vq, count);
+> >+    } else {
+> >+        virtqueue_split_flush(vq, count);
+> >+    }
+> >+}
+> >+
+> >  void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
+> >                      unsigned int len)
+> >  {
+> >@@ -1074,7 +1180,7 @@ static void *virtqueue_alloc_element(size_t sz, unsigned out_num, unsigned in_nu
+> >      return elem;
+> >  }
+> >-void *virtqueue_pop(VirtQueue *vq, size_t sz)
+> >+static void *virtqueue_split_pop(VirtQueue *vq, size_t sz)
+> >  {
+> >      unsigned int i, head, max;
+> >      VRingMemoryRegionCaches *caches;
+> >@@ -1089,9 +1195,6 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+> >      VRingDesc desc;
+> >      int rc;
+> >-    if (unlikely(vdev->broken)) {
+> >-        return NULL;
+> >-    }
+> >      rcu_read_lock();
+> >      if (virtio_queue_empty_rcu(vq)) {
+> >          goto done;
+> >@@ -1209,6 +1312,159 @@ err_undo_map:
+> >      goto done;
+> >  }
+> >+static void *virtqueue_packed_pop(VirtQueue *vq, size_t sz)
+> >+{
+> >+    unsigned int i, head, max;
+> >+    VRingMemoryRegionCaches *caches;
+> >+    MemoryRegionCache indirect_desc_cache = MEMORY_REGION_CACHE_INVALID;
+> >+    MemoryRegionCache *cache;
+> >+    int64_t len;
+> >+    VirtIODevice *vdev = vq->vdev;
+> >+    VirtQueueElement *elem = NULL;
+> >+    unsigned out_num, in_num, elem_entries;
+> >+    hwaddr addr[VIRTQUEUE_MAX_SIZE];
+> >+    struct iovec iov[VIRTQUEUE_MAX_SIZE];
+> >+    VRingPackedDesc desc;
+> >+    uint16_t id;
+> >+
+> >+    rcu_read_lock();
+> >+    if (virtio_queue_packed_empty_rcu(vq)) {
+> >+        goto done;
+> >+    }
+> >+
+> >+    /* When we start there are none of either input nor output. */
+> >+    out_num = in_num = elem_entries = 0;
+> >+
+> >+    max = vq->vring.num;
+> >+
+> >+    if (vq->inuse >= vq->vring.num) {
+> >+        virtio_error(vdev, "Virtqueue size exceeded");
+> >+        goto done;
+> >+    }
+> >+
+> >+    head = vq->last_avail_idx;
+> >+    i = head;
+> >+
+> >+    caches = vring_get_region_caches(vq);
+> >+    cache = &caches->desc;
+> >+
+> >+    /* Empty check has been done at the beginning, so it is an available
+> >+     * entry already, make sure all fields has been exposed by guest */
+> >+    smp_rmb();
+> >+    vring_packed_desc_read(vdev, &desc, cache, i);
+> >+
+> >+    id = desc.id;
+> >+    if (desc.flags & VRING_DESC_F_INDIRECT) {
+> >+
+> >+        if (desc.len % sizeof(VRingPackedDesc)) {
+> >+            virtio_error(vdev, "Invalid size for indirect buffer table");
+> >+            goto done;
+> >+        }
+> >+
+> >+        /* loop over the indirect descriptor table */
+> >+        len = address_space_cache_init(&indirect_desc_cache, vdev->dma_as,
+> >+                                       desc.addr, desc.len, false);
+> >+        cache = &indirect_desc_cache;
+> >+        if (len < desc.len) {
+> >+            virtio_error(vdev, "Cannot map indirect buffer");
+> >+            goto done;
+> >+        }
+> >+
+> >+        max = desc.len / sizeof(VRingPackedDesc);
+> >+        i = 0;
+> >+        vring_packed_desc_read(vdev, &desc, cache, i);
+> >+        /* Make sure we see all the fields*/
+> >+        smp_rmb();
+> >+    }
+> >+
+> >+    /* Collect all the descriptors */
+> >+    while (1) {
+> >+        bool map_ok;
+> >+
+> >+        if (desc.flags & VRING_DESC_F_WRITE) {
+> >+            map_ok = virtqueue_map_desc(vdev, &in_num, addr + out_num,
+> >+                                        iov + out_num,
+> >+                                        VIRTQUEUE_MAX_SIZE - out_num, true,
+> >+                                        desc.addr, desc.len);
+> >+        } else {
+> >+            if (in_num) {
+> >+                virtio_error(vdev, "Incorrect order for descriptors");
+> >+                goto err_undo_map;
+> >+            }
+> >+            map_ok = virtqueue_map_desc(vdev, &out_num, addr, iov,
+> >+                                        VIRTQUEUE_MAX_SIZE, false,
+> >+                                        desc.addr, desc.len);
+> >+        }
+> >+        if (!map_ok) {
+> >+            goto err_undo_map;
+> >+        }
+> >+
+> >+        /* If we've got too many, that implies a descriptor loop. */
+> >+        if (++elem_entries > max) {
+> >+            virtio_error(vdev, "Looped descriptor");
+> >+            goto err_undo_map;
+> >+        }
+> >+
+> >+        if (++i >= vq->vring.num) {
+> >+            i -= vq->vring.num;
+> >+        }
+> >+
+> >+        if (desc.flags & VRING_DESC_F_NEXT) {
+> >+            vring_packed_desc_read(vq->vdev, &desc, cache, i);
+> >+        } else {
+> >+            break;
+> >+        }
+> >+    }
+> >+
+> >+    /* Now copy what we have collected and mapped */
+> >+    elem = virtqueue_alloc_element(sz, out_num, in_num);
+> >+    elem->index = id;
+> >+    for (i = 0; i < out_num; i++) {
+> >+        elem->out_addr[i] = addr[i];
+> >+        elem->out_sg[i] = iov[i];
+> >+    }
+> >+    for (i = 0; i < in_num; i++) {
+> >+        elem->in_addr[i] = addr[head + out_num + i];
+> >+        elem->in_sg[i] = iov[out_num + i];
+> >+    }
+> >+
+> >+    vq->last_avail_idx += (cache == &indirect_desc_cache) ?
+> >+                          1 : out_num + in_num;
+> 
+> I think you cannot rely on out_num and in_num to deduce the number of
+> descriptors.
+> 
+> Indeed, in virtqueue_map_desc(), in_num and out_num can be incremented
+> by more than one for a single descriptor, when the desc buffer is not
+> contiguous in the QEMU address space.
+> 
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- pc-bios/optionrom/pvh_main.c |  21 +++++++++++++++++++--
- pc-bios/pvh.bin              | Bin 1536 -> 1536 bytes
- 2 files changed, 19 insertions(+), 2 deletions(-)
+Indeed, should replace it with 'elem_entries', thanks.
 
-diff --git a/pc-bios/optionrom/pvh_main.c b/pc-bios/optionrom/pvh_main.c
-index f355476e68..d1b8b4b96e 100644
---- a/pc-bios/optionrom/pvh_main.c
-+++ b/pc-bios/optionrom/pvh_main.c
-@@ -46,6 +46,7 @@ struct pvh_e820_table {
- struct pvh_e820_table pvh_e820 __attribute__ ((aligned));
-=20
- static struct hvm_start_info start_info;
-+static struct hvm_modlist_entry ramdisk_mod;
- static uint8_t cmdline_buffer[CMDLINE_BUFSIZE];
-=20
-=20
-@@ -71,8 +72,8 @@ extern void pvh_load_kernel(void) asm("pvh_load_kernel"=
-);
- void pvh_load_kernel(void)
- {
-     void *cmdline_addr =3D &cmdline_buffer;
--    void *kernel_entry;
--    uint32_t cmdline_size, fw_cfg_version =3D bios_cfg_version();
-+    void *kernel_entry, *initrd_addr;
-+    uint32_t cmdline_size, initrd_size, fw_cfg_version =3D bios_cfg_vers=
-ion();
-=20
-     start_info.magic =3D XEN_HVM_START_MAGIC_VALUE;
-     start_info.version =3D 1;
-@@ -110,6 +111,22 @@ void pvh_load_kernel(void)
-                         fw_cfg_version);
-     start_info.cmdline_paddr =3D (uintptr_t)cmdline_addr;
-=20
-+    /* Check if we have the initrd to load */
-+    bios_cfg_read_entry(&initrd_size, FW_CFG_INITRD_SIZE, 4, fw_cfg_vers=
-ion);
-+    if (initrd_size) {
-+        bios_cfg_read_entry(&initrd_addr, FW_CFG_INITRD_ADDR, 4,
-+                            fw_cfg_version);
-+        bios_cfg_read_entry(initrd_addr, FW_CFG_INITRD_DATA, initrd_size=
-,
-+                            fw_cfg_version);
-+
-+        ramdisk_mod.paddr =3D (uintptr_t)initrd_addr;
-+        ramdisk_mod.size =3D initrd_size;
-+
-+        /* The first module is always ramdisk. */
-+        start_info.modlist_paddr =3D (uintptr_t)&ramdisk_mod;
-+        start_info.nr_modules =3D 1;
-+    }
-+
-     bios_cfg_read_entry(&kernel_entry, FW_CFG_KERNEL_ENTRY, 4, fw_cfg_ve=
-rsion);
-=20
-     asm volatile("jmp *%1" : : "b"(&start_info), "c"(kernel_entry));
-diff --git a/pc-bios/pvh.bin b/pc-bios/pvh.bin
-index 38a41761014957d50eb55d790b6957888cbeee0a..8033080ada2db4c4613fdc3bb=
-5a69d79c7b0c0ca 100644
-GIT binary patch
-delta 735
-zcmZqRY2cYKndyM&#;Nv<`Y|dZ$5|Uh85k;#<{2MnZ2__v85kHA9sn{HZvYZIPJmb|
-zfW&duHKLQ5nUrMIfhw902-q@k@G+F$J<hrSC<y|`S(k`Tc4U&S-@w4az+ic-T<m2U
-z69Yr<HjpGxgXJ;)wosrzw?N~kpkNn;ZV#5mj{zY;3Y-^99~fR*3^J!vbP15`Eo0c1
-zzzXD<s2q1u0U8F>|Cout)f{N^UIC!Q4iTVG=3Dc}~$y9I%~ogfvxH7Wv~w?60W5Uq#G
-zb^8ECzJtWNSyZ}1R9F_z0NXGJNbcZ<DuU@10jqOS5otY88nQzGD7y<}QQCW$0*+lE
-zt3K!K289;TXpa96n~%su$Hm7U?k!Pcm;iP@C<qup_A@ZNwE6%4fA1DG5F4yu2N#e9
-zax=3D_C9<XzTprSw{MY?NLz=3DGW_Dm;r5fc6|`O#zZ102C5goB<ZffeP&asaQM#EH(uy
-zcAT|GlmilnFD)iJGRxEpyomk#|34@!c7fD%et6*v;$wse*j2kg!O{z~>V*bKQ3x<N
-zE|p|Lq(IIGO7Xnlg_tL@3*>Z=3DQ(yf415}LN%^5^G8scV%O`y;R+Qji<3DDe^<^K@j
-Z2no&!h6hlR%ga4L7i~VsEX~MR4FFIY;aUIy
-
-delta 434
-zcmZqRY2cYKnW;f!<5YV_{Sp<C<E#!M3=3D9=3DV^Nf$Px&T>>3=3D9kl8-R?(1wdj)2Z)sc
-zB#yJ@h)iZ?Qj%c@s%SnSV9UV4$549rIBNn>5(JL3rie^-WRk9*!N9`6V0pM)?4=3Dn{
-zY40|WBv6CpVg5E%pg^}k<ENlt7lm#Qmd1|(Awde97fT-)URn$?r&BZqNcNU7>~;W}
-z(J7;H+(iY*0P26n#NRp{$k;2u3Un37%Fb75@AnA;c{@QWdTUffIzN5R*&&(+mFxBa
-zirfc@b+f2+hp4bDjsV*b10;6{Ko!CC3V_t@289Gro525v%|~RS<Kklv_ij-Gs$@u;
-z0Cpb8iy$ro!^@b-51D1cMPB^<`~N@4rd^^y(asw$-h%iT_JOV01+ui)MMdDn3812v
-j<^TWx2l~|T0E*vVzWMk6|K^V@e2kM=3D|4(AIW9$F`FOZ8_
-
---=20
-2.20.1
+Wei
