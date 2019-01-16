@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:39059)
+Received: from eggs.gnu.org ([209.51.188.92]:43670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjgee-0006rC-HO
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:34:33 -0500
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gjgfo-0007bn-MA
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjgeZ-0003Ym-MY
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:34:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjgeS-0003Tx-TV
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:34:23 -0500
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-7-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <56bbd753-dc3d-fef0-0416-cb204893f722@redhat.com>
-Date: Wed, 16 Jan 2019 09:34:15 +0100
+	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gjgfm-00081d-KA
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:35:44 -0500
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:39855)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
+	id 1gjgfk-0007x9-HL
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:35:42 -0500
+Received: by mail-ot1-x331.google.com with SMTP id n8so5890958otl.6
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 00:35:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190115141108.934-7-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
+	<000601d4a8e8$a8a10170$f9e30450$@ru>
+	<CANzW0mtY6R0HtZJCoT5OTNdz9+ycrktnbMVjZ0uMAmXT69=N3g@mail.gmail.com>
+	<001301d4ad62$f3f44820$dbdcd860$@ru>
+In-Reply-To: <001301d4ad62$f3f44820$dbdcd860$@ru>
+From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Date: Wed, 16 Jan 2019 14:35:23 +0600
+Message-ID: <CANzW0mtVkiZJdYMytbDf2QwGDKTKL453zNbQDV6=xO=XvewmZg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 06/37] hw/mips/Makefile.objs: Create
- CONFIG_* for r4k, malta, mipssim boards
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce attributes for timers
+ subsystem and remove QEMU_CLOCK_VIRTUAL_EXT clock type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, =?UTF-8?B?w4Frb3MgS292w6Fjcw==?= <akoskovacs@gmx.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 2019-01-15 15:10, Yang Zhong wrote:
-> From: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
->=20
-> Add the new configs to default-configs/mips*-sofmmu.mak.
->=20
-> Signed-off-by: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  default-configs/mips-softmmu-common.mak | 4 ++++
->  default-configs/mips64el-softmmu.mak    | 1 -
->  hw/mips/Makefile.objs                   | 6 ++++--
->  3 files changed, 8 insertions(+), 3 deletions(-)
->=20
-> diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/=
-mips-softmmu-common.mak
-> index fae2347ee7..77b40ec7d1 100644
-> --- a/default-configs/mips-softmmu-common.mak
-> +++ b/default-configs/mips-softmmu-common.mak
-> @@ -36,3 +36,7 @@ CONFIG_EMPTY_SLOT=3Dy
->  CONFIG_MIPS_CPS=3Dy
->  CONFIG_MIPS_ITU=3Dy
->  CONFIG_I2C=3Dy
-> +CONFIG_R4K=3Dy
-> +CONFIG_MALTA=3Dy
-> +CONFIG_MIPSSIM=3Dy
-> +CONFIG_VT82C686=3Dy
-> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mip=
-s64el-softmmu.mak
-> index c2ae313f47..8244efb39c 100644
-> --- a/default-configs/mips64el-softmmu.mak
-> +++ b/default-configs/mips64el-softmmu.mak
-> @@ -9,7 +9,6 @@ CONFIG_FULONG=3Dy
->  CONFIG_JAZZ=3Dy
->  CONFIG_G364FB=3Dy
->  CONFIG_JAZZ_LED=3Dy
-> -CONFIG_VT82C686=3Dy
+=D1=81=D1=80, 16 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 12:15, Pavel Dovga=
+lyuk <dovgaluk@ispras.ru>:
+>
+> > From: Artem Pisarenko [mailto:artem.k.pisarenko@gmail.com]
+> > > It seems, that this approach is not always correct.
+> > > Now timerlist_deadline_ns uses all virtual timers for deadline calcul=
+ation (including
+> > external
+> > > ones).
+> > > qemu_start_warp_timer uses the deadline for setting warp timer (which=
+ should be
+> > deterministic).
+> > > Therefore warp timer may become non-deterministic and replay may beha=
+ve differently compared
+> > to
+> > > recording phase.
+> > >
+> > > We have to rollback these or improve somehow to avoid non-determinism=
+.
+> >
+> > I dont understand how this approach would even introduce
+> > non-determinism. I'm not sure about aspects of timers subsystem you
+> > mentioned, assuming that maybe we missed something when tried to
+> > optimize. But this has nothing to do with determinism as long as we
+> > treat all virtual clock timers as deterministic, regardless of
+> > EXTERNAL attribute being set or not. They are intended to be used as
+> > such by design, aren't? This attribute was introduced purely to avoid
+> > extra events in log.
+>
+> Right, but deadline calculation and icount warp events (that are written =
+into the log too)
+> depend on the active virtual timers. Therefore external ones may affect i=
+count warp
+> operation sequence.
+>
+> Pavel Dovgalyuk
+>
 
-I think that change to the CONFIG_VT82C686 is unrelated and should not
-be part of this patch. Also looking at commit
-
- dff4021730b112ca00522d4c98c24a15feeef5a0
- mips: Remove CONFIG_VT82C686 from non-Fulong configs
-
-it seems like it should stay in mips64el-softmmu.mak and not be moved to
-mips-softmmu-common.mak.
-
->  CONFIG_MIPS_BOSTON=3Dy
->  CONFIG_FITLOADER=3Dy
->  CONFIG_PCI_XILINX=3Dy
-> diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
-> index 17a311aaba..230866ae91 100644
-> --- a/hw/mips/Makefile.objs
-> +++ b/hw/mips/Makefile.objs
-> @@ -1,7 +1,9 @@
-> -obj-y +=3D mips_r4k.o mips_malta.o mips_mipssim.o
->  obj-y +=3D addr.o mips_int.o
-> +obj-y +=3D gt64xxx_pci.o
-> +obj-$(CONFIG_R4K) +=3D mips_r4k.o
-> +obj-$(CONFIG_MALTA) +=3D mips_malta.o
-> +obj-$(CONFIG_MIPSSIM) +=3D mips_mipssim.o
->  obj-$(CONFIG_JAZZ) +=3D mips_jazz.o
->  obj-$(CONFIG_FULONG) +=3D mips_fulong2e.o
-> -obj-y +=3D gt64xxx_pci.o
->  obj-$(CONFIG_MIPS_CPS) +=3D cps.o
->  obj-$(CONFIG_MIPS_BOSTON) +=3D boston.o
->=20
-
- Thomas
+Sorry, but I still don't understand the source of non-determinism.
+>From what you said I may understand that replay module actually has
+some additional non-trivial (for me) dependencies on EXTERNAL
+attribute other than one, introduced in 'timerlist_run_timers()' (i.e.
+it expects deadline calculations somewhere else to match decisions
+made in this function, or something like that). I would agree that
+these patch series might introduce some incorrect behavior. But it
+must be identical in all emulations running in same conditions,
+because deadline, warp timer and their effects are all dependent only
+on virtual timers, and, therefore, are deterministic too. Of course,
+it needs to be fixed. Did you find solution ?
