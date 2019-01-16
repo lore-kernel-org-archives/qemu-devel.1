@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47204)
+Received: from eggs.gnu.org ([209.51.188.92]:51980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjfQT-00036k-Pe
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 02:15:51 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjfuI-0008Fu-UY
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 02:46:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjfQR-00082Z-LW
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 02:15:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjfQR-0007qt-Bn
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 02:15:47 -0500
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-5-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <99cdf618-d63c-3362-9143-513cbad2febc@redhat.com>
-Date: Wed, 16 Jan 2019 08:15:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190115141108.934-5-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjfuH-0003Mn-RA
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 02:46:38 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 16 Jan 2019 07:46:19 +0000
+Message-ID: <ee754436-276c-a749-ecfb-9aa7281a31dd@virtuozzo.com>
+References: <20190112175812.27068-1-eblake@redhat.com>
+	<20190112175812.27068-4-eblake@redhat.com>
+In-Reply-To: <20190112175812.27068-4-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 04/37] hw/m68k/Makefile.objs:
- Conditionally build boards
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <851B203108CC7C4EBA622BB8E4A39966@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 03/19] qemu-nbd: Sanity check partition
+ bounds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, =?UTF-8?B?w4Frb3MgS292w6Fjcw==?= <akoskovacs@gmx.com>, pbonzini@redhat.com, ehabkost@redhat.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 2019-01-15 15:10, Yang Zhong wrote:
-> From: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
->=20
-> CONFIG_AN5206, CONFIG_MCF5206 and CONFIG_MCF5208 make
-> variables created for m68k boards, and added to
-> default-configs/m86k-softmmu.mak.
->=20
-> Signed-off-by: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  default-configs/m68k-softmmu.mak | 3 +++
->  hw/m68k/Makefile.objs            | 5 +++--
->  2 files changed, 6 insertions(+), 2 deletions(-)
->=20
-> diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-so=
-ftmmu.mak
-> index 60f7cdfbf2..a179da9077 100644
-> --- a/default-configs/m68k-softmmu.mak
-> +++ b/default-configs/m68k-softmmu.mak
-> @@ -2,3 +2,6 @@
-> =20
->  CONFIG_COLDFIRE=3Dy
->  CONFIG_PTIMER=3Dy
-> +CONFIG_AN5206=3Dy
-> +CONFIG_MCF5206=3Dy
-> +CONFIG_MCF5208=3Dy
-> diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
-> index d1f089c08a..fa287edd0b 100644
-> --- a/hw/m68k/Makefile.objs
-> +++ b/hw/m68k/Makefile.objs
-> @@ -1,2 +1,3 @@
-> -obj-y +=3D an5206.o mcf5208.o
-> -obj-y +=3D mcf5206.o mcf_intc.o
-> +obj-$(CONFIG_AN5206) +=3D an5206.o
-> +obj-$(CONFIG_MCF5206) +=3D mcf5206.o
-> +obj-$(CONFIG_MCF5208) +=3D mcf5208.o mcf_intc.o
-
-The naming of the files is a little bit unfortunate, but
-there are only two Coldfire boards: an5206 and mcf5208evb.
-mcf5206.c belongs to the an5206 board.
-So may I suggest to only use two CONFIG switches like this:
-
-obj-$(CONFIG_AN5206) +=3D an5206.o mcf5206.o
-obj-$(CONFIG_MCF5208EVB) +=3D mcf5208.o mcf_intc.o
-
-?
-
- Thanks,
-  Thomas
+MTIuMDEuMjAxOSAyMDo1NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2hlbiB0aGUgdXNlciByZXF1
+ZXN0cyBhIHBhcnRpdGlvbiwgd2Ugd2VyZSB1c2luZyBkYXRhIHJlYWQNCj4gZnJvbSB0aGUgZGlz
+ayBhcyBkaXNrIG9mZnNldHMgd2l0aG91dCBhIGJvdW5kcyBjaGVjay4gV2UgZ290DQo+IGx1Y2t5
+IHRoYXQgZXZlbiB3aGVuIGNvbXB1dGVkIG9mZnNldHMgYXJlIG91dC1vZi1ib3VuZHMsDQo+IGJs
+a19wcmVhZCgpIHdpbGwgZ3JhY2VmdWxseSBjYXRjaCB0aGUgZXJyb3IgbGF0ZXIgKHNvIEkgZG9u
+J3QNCj4gdGhpbmsgYSBtYWxpY2lvdXMgaW1hZ2UgY2FuIGNyYXNoIG9yIGV4cGxvaXQgcWVtdS1u
+YmQsIGFuZCBhbQ0KPiBub3QgdHJlYXRpbmcgdGhpcyBhcyBhIHNlY3VyaXR5IGZsYXcpLCBidXQg
+aXQncyBiZXR0ZXIgdG8NCj4gZmxhZyB0aGUgcHJvYmxlbSB1cCBmcm9udCB0aGFuIHRvIHJpc2sg
+cGVybWFuZW50IEVJTyBkZWF0aCBvZg0KPiB0aGUgYmxvY2sgZGV2aWNlIGRvd24gdGhlIHJvYWQu
+ICBBbHNvLCBub3RlIHRoYXQgdGhlDQo+IHBhcnRpdGlvbiBjb2RlIGJsaW5kbHkgb3ZlcndyaXRl
+cyBhbnkgb2Zmc2V0IHBhc3NlZCBpbiBieSB0aGUNCj4gdXNlcjsgc28gbWFrZSB0aGUgLW8vLVAg
+Y29tYm8gYW4gZXJyb3IgZm9yIGxlc3MgY29uZnVzaW9uLg0KPiANCj4gVGhpcyBjYW4gYmUgdGVz
+dGVkIHdpdGggbmJka2l0Og0KPiAkIGVjaG8gaGkgPiBmaWxlDQo+ICQgbmJka2l0IC1mdiAtLWZp
+bHRlcj10cnVuY2F0ZSBwYXJ0aXRpb25pbmcgZmlsZSB0cnVuY2F0ZT02NGsNCj4gDQo+IFByZS1w
+YXRjaDoNCj4gJCBxZW11LW5iZCAtcCAxMDgxMCAtUCAxIC1mIHJhdyBuYmQ6Ly9sb2NhbGhvc3Q6
+MTA4MDkgJg0KPiAkIHFlbXUtaW8gLWYgcmF3IG5iZDovL2xvY2FsaG9zdDoxMDgxMA0KPiBxZW11
+LWlvPiByIC12IDAgMQ0KPiBEaXNjb25uZWN0IGNsaWVudCwgZHVlIHRvOiBGYWlsZWQgdG8gc2Vu
+ZCByZXBseTogcmVhZGluZyBmcm9tIGZpbGUgZmFpbGVkOiBJbnB1dC9vdXRwdXQgZXJyb3INCj4g
+Q29ubmVjdGlvbiBjbG9zZWQNCj4gcmVhZCBmYWlsZWQ6IElucHV0L291dHB1dCBlcnJvcg0KPiBx
+ZW11LWlvPiBxDQo+IFsxXSsgIERvbmUgICAgICAgICAgICAgICAgICAgIHFlbXUtbmJkIC1wIDEw
+ODEwIC1QIDEgLWYgcmF3IG5iZDovL2xvY2FsaG9zdDoxMDgwOQ0KPiANCj4gUG9zdC1wYXRjaDoN
+Cj4gJCBxZW11LW5iZCAtcCAxMDgxMCAtUCAxIC1mIHJhdyBuYmQ6Ly9sb2NhbGhvc3Q6MTA4MDkN
+Cj4gcWVtdS1uYmQ6IERpc2NvdmVyZWQgcGFydGl0aW9uIDEgYXQgb2Zmc2V0IDEwNDg1NzYgc2l6
+ZSA1MTIsIGJ1dCBzaXplIGV4Y2VlZHMgZmlsZSBsZW5ndGggNjU1MzYNCj4gDQo+IFNpZ25lZC1v
+ZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiAtLS0NCj4gdjM6IG5ldyBw
+YXRjaA0KPiAtLS0NCj4gICBxZW11LW5iZC5jIHwgMTggKysrKysrKysrKysrKysrKystDQo+ICAg
+MSBmaWxlIGNoYW5nZWQsIDE3IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRp
+ZmYgLS1naXQgYS9xZW11LW5iZC5jIGIvcWVtdS1uYmQuYw0KPiBpbmRleCA1MWI1NWYyZTA2Ni4u
+ZmY0YWRiOWIzZWIgMTAwNjQ0DQo+IC0tLSBhL3FlbXUtbmJkLmMNCj4gKysrIGIvcWVtdS1uYmQu
+Yw0KPiBAQCAtMTAxMywxMiArMTAxMywyOCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFy
+Z3YpDQo+ICAgICAgIGZkX3NpemUgLT0gZGV2X29mZnNldDsNCg0KVGhpcyByZXVzZSBvZiBmaWxl
+LXNpemUgdmFyaWFibGUgYXMgZXhwb3J0LXNpemUgaXMgYSBzb3VyY2Ugb2YgZXJyb3JzLCBsaWtl
+IHlvdXINCmFzc2VydCBpbiB0aGUgZm9sbG93aW5nIHBhcnQuDQoNCj4gDQo+ICAgICAgIGlmIChw
+YXJ0aXRpb24gIT0gLTEpIHsNCj4gLSAgICAgICAgcmV0ID0gZmluZF9wYXJ0aXRpb24oYmxrLCBw
+YXJ0aXRpb24sICZkZXZfb2Zmc2V0LCAmZmRfc2l6ZSk7DQo+ICsgICAgICAgIG9mZl90IGxpbWl0
+Ow0KPiArDQo+ICsgICAgICAgIGlmIChkZXZfb2Zmc2V0KSB7DQo+ICsgICAgICAgICAgICBlcnJv
+cl9yZXBvcnQoIkNhbm5vdCByZXF1ZXN0IHBhcnRpdGlvbiBhbmQgb2Zmc2V0IHRvZ2V0aGVyIik7
+DQo+ICsgICAgICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQo+ICsgICAgICAgIH0NCj4gKyAg
+ICAgICAgcmV0ID0gZmluZF9wYXJ0aXRpb24oYmxrLCBwYXJ0aXRpb24sICZkZXZfb2Zmc2V0LCAm
+bGltaXQpOw0KPiAgICAgICAgICAgaWYgKHJldCA8IDApIHsNCj4gICAgICAgICAgICAgICBlcnJv
+cl9yZXBvcnQoIkNvdWxkIG5vdCBmaW5kIHBhcnRpdGlvbiAlZDogJXMiLCBwYXJ0aXRpb24sDQo+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cmVycm9yKC1yZXQpKTsNCj4gICAgICAgICAg
+ICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQo+ICAgICAgICAgICB9DQo+ICsgICAgICAgIC8qIHBh
+cnRpdGlvbiBsaW1pdHMgYXJlICgzMi1iaXQgPDwgOSk7IGNhbid0IG92ZXJmbG93IDY0IGJpdHMg
+Ki8NCj4gKyAgICAgICAgYXNzZXJ0KGRldl9vZmZzZXQgPj0gMCAmJiBkZXZfb2Zmc2V0ICsgbGlt
+aXQgPj0gZGV2X29mZnNldCk7DQo+ICsgICAgICAgIGlmIChkZXZfb2Zmc2V0ICsgbGltaXQgPiBm
+ZF9zaXplKSB7DQo+ICsgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkRpc2NvdmVyZWQgcGFydGl0
+aW9uICVkIGF0IG9mZnNldCAlbGxkIHNpemUgJWxsZCwgIg0KPiArICAgICAgICAgICAgICAgICAg
+ICAgICAgICJidXQgc2l6ZSBleGNlZWRzIGZpbGUgbGVuZ3RoICVsbGQiLCBwYXJ0aXRpb24sDQo+
+ICsgICAgICAgICAgICAgICAgICAgICAgICAgKGxvbmcgbG9uZyBpbnQpIGRldl9vZmZzZXQsIChs
+b25nIGxvbmcgaW50KSBsaW1pdCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAobG9uZyBs
+b25nIGludCkgZmRfc2l6ZSk7DQo+ICsgICAgICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQo+
+ICsgICAgICAgIH0NCj4gKyAgICAgICAgZmRfc2l6ZSA9IGxpbWl0Ow0KPiAgICAgICB9DQo+IA0K
+PiAgICAgICBleHBvcnQgPSBuYmRfZXhwb3J0X25ldyhicywgZGV2X29mZnNldCwgZmRfc2l6ZSwg
+ZXhwb3J0X25hbWUsDQo+IA0KDQpPaywgYW55d2F5LCBmaW5hbGx5IEkgdW5kZXJzdGFuZCB0aGUg
+cG9pbnQsIHRoYW5rIHlvdSBmb3IgZGV0YWlsZWQgZXhwbGFuYXRpb246DQoNClJldmlld2VkLWJ5
+OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+
+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
