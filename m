@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56996)
+Received: from eggs.gnu.org ([209.51.188.92]:50736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjgU5-00036u-TR
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:23:39 -0500
+	(envelope-from <thuth@redhat.com>) id 1gjgZ1-0004g0-65
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:28:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjgTz-0005xg-Ih
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:23:34 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 16 Jan 2019 08:23:00 +0000
-Message-ID: <205453e1-a4b3-6296-e4e9-92337ba83eb3@virtuozzo.com>
-References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-6-eblake@redhat.com>
-	<acc77355-221d-0497-4b14-6b3c1bb79c7d@virtuozzo.com>
-	<f42d51fa-1268-0abf-11b8-7661655e995d@redhat.com>
-In-Reply-To: <f42d51fa-1268-0abf-11b8-7661655e995d@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <921316E128883F46AEE70C70599939EA@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1gjgYy-0004VG-Ur
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:28:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44824)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjgYy-0004R9-F6
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 03:28:40 -0500
+References: <20190115141108.934-1-yang.zhong@intel.com>
+	<20190115141108.934-6-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f40e9e42-062d-1651-4d11-1268c1ed7b2d@redhat.com>
+Date: Wed, 16 Jan 2019 09:28:35 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 05/19] nbd/server: Favor [u]int64_t over
- off_t
+In-Reply-To: <20190115141108.934-6-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 05/37] hw/microblaze/Makefile.objs:
+ Create configs for petalogix and xilinx boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,131 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, =?UTF-8?B?w4Frb3MgS292w6Fjcw==?= <akoskovacs@gmx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-MTUuMDEuMjAxOSAxODozMywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xNS8xOSA0OjE5IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTIuMDEuMjAxOSAyMDo1
-NywgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBBbHRob3VnaCBvdXIgY29tcGlsZS10aW1lIGVudmly
-b25tZW50IGlzIHNldCB1cCBzbyB0aGF0IHdlIGFsd2F5cw0KPj4+IHN1cHBvcnQgbG9uZyBmaWxl
-cyB3aXRoIDY0LWJpdCBvZmZfdCwgd2UgaGF2ZSBubyBndWFyYW50ZWUgd2hldGhlcg0KPj4+IG9m
-Zl90IGlzIHRoZSBzYW1lIHR5cGUgYXMgaW50NjRfdC4gIFRoaXMgcmVxdWlyZXMgY2FzdHMgd2hl
-bg0KPj4+IHByaW50aW5nIHZhbHVlcywgYW5kIHByZXZlbnRzIHVzIGZyb20gZGlyZWN0bHkgdXNp
-bmcgcWVtdV9zdHJ0b2k2NCgpLg0KPj4+IExldCdzIGp1c3QgZmxpcCB0byBbdV1pbnQ2NF90IChz
-aWduZWQgZm9yIGxlbmd0aCwgYmVjYXVzZSB3ZSBoYXZlIHRvDQo+Pj4gZGV0ZWN0IGZhaWx1cmUg
-b2YgYmxrX2dldGxlbmd0aCgpDQo+Pg0KPj4gd2UgaGF2ZSBub3QsIGFmdGVyIHByZXZpb3VzIHBh
-dGNoDQo+IA0KPiBuYmQvc2VydmVyLmMgbm8gbG9uZ2VyIGhhcyB0byBjaGVjayBmb3IgYmxrX2dl
-dGxlbmd0aCgpIGZhaWx1cmVzLCBidXQNCj4gYmxvY2tkZXYtbmJkLmMgYW5kIHFlbXUtbmJkLmMg
-c3RpbGwgZG8uICBTaW5jZSB0aGUgY2FsbGVycyBoYXZlIHRvIHVzZQ0KPiBhbiBpbnQ2NF90IHR5
-cGUgZm9yIHRoZSBsZW5ndGggYXMgcGFydCBvZiB0aGVpciBlcnJvciBjaGVja2luZywgaXQncw0K
-PiBlYXNpZXIgdG8gYWNjZXB0IGFuIGludDY0X3QgbGVuZ3RoIHRvIG5iZF9leHBvcnRfbmV3KCks
-IGV2ZW4gaWYNCj4gbmJkX2V4cG9ydF9uZXcoKSBjb3VsZCBhbHNvIHVzZSBhbiB1bnNpZ25lZCB0
-eXBlLg0KPiANCj4+DQo+PiBhbmQgYmVjYXVzZSBvZmZfdCB3YXMgc2lnbmVkOw0KPj4+IHVuc2ln
-bmVkIGZvciBvZmZzZXQgYmVjYXVzZSBpdCBsZXRzIHVzIHNpbXBsaWZ5IHNvbWUgbWF0aCB3aXRo
-b3V0DQo+Pj4gaGF2aW5nIHRvIHdvcnJ5IGFib3V0IHNpZ25lZCBvdmVyZmxvdykuDQo+Pj4NCj4+
-PiBTdWdnZXN0ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZA
-dmlydHVvenpvLmNvbT4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVk
-aGF0LmNvbT4NCj4+Pg0KPj4+IC0tLQ0KPj4+IHYzOiBuZXcgcGF0Y2gNCj4+PiAtLS0NCj4+PiAg
-ICBpbmNsdWRlL2Jsb2NrL25iZC5oIHwgIDQgKystLQ0KPj4+ICAgIG5iZC9zZXJ2ZXIuYyAgICAg
-ICAgfCAxNCArKysrKysrLS0tLS0tLQ0KPj4+ICAgIHFlbXUtbmJkLmMgICAgICAgICAgfCAyNiAr
-KysrKysrKysrLS0tLS0tLS0tLS0tLS0tLQ0KPj4+ICAgIDMgZmlsZXMgY2hhbmdlZCwgMTkgaW5z
-ZXJ0aW9ucygrKSwgMjUgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS9ibG9jay9uYmQuaCBiL2luY2x1ZGUvYmxvY2svbmJkLmgNCj4+PiBpbmRleCAxOTcxYjU1Nzg5
-Ni4uMGYyNTI4MjkzNzYgMTAwNjQ0DQo+Pj4gLS0tIGEvaW5jbHVkZS9ibG9jay9uYmQuaA0KPj4+
-ICsrKyBiL2luY2x1ZGUvYmxvY2svbmJkLmgNCj4+PiBAQCAtMjk0LDggKzI5NCw4IEBAIGludCBu
-YmRfZXJybm9fdG9fc3lzdGVtX2Vycm5vKGludCBlcnIpOw0KPj4+ICAgIHR5cGVkZWYgc3RydWN0
-IE5CREV4cG9ydCBOQkRFeHBvcnQ7DQo+Pj4gICAgdHlwZWRlZiBzdHJ1Y3QgTkJEQ2xpZW50IE5C
-RENsaWVudDsNCj4+Pg0KPj4+IC1OQkRFeHBvcnQgKm5iZF9leHBvcnRfbmV3KEJsb2NrRHJpdmVy
-U3RhdGUgKmJzLCBvZmZfdCBkZXZfb2Zmc2V0LCBvZmZfdCBzaXplLA0KPj4+IC0gICAgICAgICAg
-ICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0IGNoYXIgKmRlc2NyaXB0aW9u
-LA0KPj4+ICtOQkRFeHBvcnQgKm5iZF9leHBvcnRfbmV3KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1
-aW50NjRfdCBkZXZfb2Zmc2V0LA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgIGludDY0
-X3Qgc2l6ZSwgY29uc3QgY2hhciAqbmFtZSwgY29uc3QgY2hhciAqZGVzYywNCj4+DQo+PiBpbiBw
-cmV2aW91cyBwYXRjaCB5b3UgZHJvcCB1c2Ugb2YgbmVnYXRpdmUgQHNpemUgcGFyYW1ldGVyLCBz
-byBpdCBsb29rcyBiZXR0ZXINCj4+IHRvIHVzZSB1bnNpZ25lZCBmb3Igc2l6ZSBsaWtlIGZvciBv
-ZmZzZXQNCj4gDQo+IFlvdSBjYW4ndCBoYXZlIGEgc2l6ZSBsYXJnZXIgdGhhbiAyXjYzOyBidXQg
-YW4gdW5zaWduZWQgdHlwZSBob2xkcw0KPiBuZWFybHkgMl42NC4gIEkgcHJlZmVyIGEgc2lnbmVk
-IHNpemUsIGZvciB0aGUgc2FtZSByZWFzb24gdGhhdCBvZmZfdCBpcw0KPiBzaWduZWQsIGluIHRo
-YXQgY2hlY2tpbmcgZm9yIGEgbmVnYXRpdmUgc2l6ZSBpcyBlYXNpZXIgdG8gcnVsZSBvdXQgc2l6
-ZXMNCj4gdGhhdCBhcmUgdG9vIGxhcmdlLg0KPiANCj4gDQo+Pj4NCj4+PiAgICBzdGF0aWMgaW50
-IGZpbmRfcGFydGl0aW9uKEJsb2NrQmFja2VuZCAqYmxrLCBpbnQgcGFydGl0aW9uLA0KPj4+IC0g
-ICAgICAgICAgICAgICAgICAgICAgICAgIG9mZl90ICpvZmZzZXQsIG9mZl90ICpzaXplKQ0KPj4+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90ICpvZmZzZXQsIGludDY0X3QgKnNp
-emUpDQo+Pg0KPj4gZnVuY3Rpb24gbmV2ZXIgcmV0dXJuIG5lZ2F0aXZlIEBzaXplLCBzbyB3aGF0
-IGlzIHRoZSByZWFzb24gdG8ga2VlcCBpdCBzaWduZWQ/DQo+IA0KPiBCZWNhdXNlIHRoZSBDIGNv
-bXBpbGVyIGRvZXMgTk9UIGxpa2U6DQo+IA0KPiBpbnQ2NF90IGxlbjsNCj4gZmluZF9wYXJ0aXRp
-b24oLi4uLCAmbGVuKTsNCj4gDQo+IHdpdGggYSB1aW50NjRfdCogcGFyYW1ldGVyIHR5cGUgLSB5
-b3UgSEFWRSB0byBtYXRjaCB0aGUgc2lnbmVkLW5lc3Mgb2YNCj4geW91ciBjYWxsZXIncyBwYXJh
-bWV0ZXIgd2l0aCB5b3VyIHBvaW50ZXIgdHlwZS4gU2luY2UgdGhlIGNhbGxlciBhbHJlYWR5DQo+
-IGhhcyB0byB1c2UgYSBzaWduZWQgdHlwZSAodG8gY2hlY2sgZm9yIGJsa19nZXRsZW5ndGgoKSBm
-YWlsdXJlIEFORA0KPiBiZWNhdXNlIHNpemVzIHJlYWxseSBjYW5ub3QgZXhjZWVkIDJeNjMpLCBp
-dCdzIGVhc2llciB0byBrZWVwIGl0IHNpZ25lZA0KPiBoZXJlLg0KPiANCj4+DQo+PiBBbHNvLCB0
-eXBlIGNvbnZlcnNpb24gKHVpbnQ2NF90KSBzaG91bGQgYmUgZHJvcHBlZCBmcm9tIHRoZSBmdW5j
-dGlvbiBjb2RlIEkgdGhpbmsuDQo+IA0KPiBBcmUgeW91IHRhbGtpbmcgYWJvdXQgdGhpcyBwYXJ0
-Og0KPiANCj4gICAgICAgICAgICAgICAgICBpZiAoKGV4dF9wYXJ0bnVtICsgaiArIDEpID09IHBh
-cnRpdGlvbikgew0KPiAgICAgICAgICAgICAgICAgICAgICAqb2Zmc2V0ID0gKHVpbnQ2NF90KWV4
-dFtqXS5zdGFydF9zZWN0b3JfYWJzIDw8IDk7DQo+ICAgICAgICAgICAgICAgICAgICAgICpzaXpl
-ID0gKHVpbnQ2NF90KWV4dFtqXS5uYl9zZWN0b3JzX2FicyA8PCA5Ow0KPiAgICAgICAgICAgICAg
-ICAgICAgICByZXR1cm4gMDsNCj4gICAgICAgICAgICAgICAgICB9DQo+ICAgICAgICAgICAgICB9
-DQo+ICAgICAgICAgICAgICBleHRfcGFydG51bSArPSA0Ow0KPiAgICAgICAgICB9IGVsc2UgaWYg
-KChpICsgMSkgPT0gcGFydGl0aW9uKSB7DQo+ICAgICAgICAgICAgICAqb2Zmc2V0ID0gKHVpbnQ2
-NF90KW1icltpXS5zdGFydF9zZWN0b3JfYWJzIDw8IDk7DQo+ICAgICAgICAgICAgICAqc2l6ZSA9
-ICh1aW50NjRfdCltYnJbaV0ubmJfc2VjdG9yc19hYnMgPDwgOTsNCj4gICAgICAgICAgICAgIHJl
-dHVybiAwOw0KPiANCj4gTm8gLSB0aGF0IGhhcyB0byBrZWVwIHRoZSBjYXN0LCBiZWNhdXNlIC5z
-dGFydF9zZWN0b3JfYWJzIGFuZA0KPiAubmJfc2VjdG9yc19hYnMgYXJlIHVpbnQzMl90IHZhbHVl
-cywgYnV0IHdlIHdhbnQgdG8gc2hpZnQgaW50byA2NC1iaXQNCj4gcmVzdWx0cy4gIFlvdSBuZWVk
-IHRoZSBjYXN0IHRvIGZvcmNlIHRoZSBjb3JyZWN0IGFyaXRobWV0aWMgcmF0aGVyIHRoYW4NCj4g
-dHJ1bmNhdGluZyBpbnRvIGEgMzItYml0IHZhbHVlIHRoYXQgdGhlbiBnZXRzIHdpZGVuZWQgaW50
-byA2NC1iaXQgc3RvcmFnZS4NCj4gDQo+Pj4gQEAgLTY2NSwxMCArNjY1LDYgQEAgaW50IG1haW4o
-aW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPj4+ICAgICAgICAgICAgICAgICAgICBlcnJvcl9yZXBv
-cnQoIkludmFsaWQgb2Zmc2V0IGAlcyciLCBvcHRhcmcpOw0KPj4+ICAgICAgICAgICAgICAgICAg
-ICBleGl0KEVYSVRfRkFJTFVSRSk7DQo+Pj4gICAgICAgICAgICAgICAgfQ0KPj4+IC0gICAgICAg
-ICAgICBpZiAoZGV2X29mZnNldCA8IDApIHsNCj4+PiAtICAgICAgICAgICAgICAgIGVycm9yX3Jl
-cG9ydCgiT2Zmc2V0IG11c3QgYmUgcG9zaXRpdmUgYCVzJyIsIG9wdGFyZyk7DQo+Pj4gLSAgICAg
-ICAgICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQo+Pj4gLSAgICAgICAgICAgIH0NCj4+DQo+
-PiBobSwgdGhlbiwgbWF5IGJlLCBzL3N0cnRvbGwvc3RydG91bGwgYmVmb3JlIHRoaXM/DQo+IA0K
-PiBJIGNsZWFuIHRoYXQgdXAgaW4gcGF0Y2ggNi8xOS4NCj4gDQo+Pg0KPj4+ICAgICAgICAgICAg
-ICAgIGJyZWFrOw0KPj4+ICAgICAgICAgICAgY2FzZSAnbCc6DQo+Pj4gICAgICAgICAgICAgICAg
-aWYgKHN0cnN0YXJ0KG9wdGFyZywgU05BUFNIT1RfT1BUX0JBU0UsIE5VTEwpKSB7DQo+Pj4gQEAg
-LTEwMDUsMTUgKzEwMDEsMTQgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPj4+
-ICAgICAgICB9DQo+Pj4NCj4+PiAgICAgICAgaWYgKGRldl9vZmZzZXQgPj0gZmRfc2l6ZSkgew0K
-Pj4+IC0gICAgICAgIGVycm9yX3JlcG9ydCgiT2Zmc2V0ICglbGxkKSBoYXMgdG8gYmUgc21hbGxl
-ciB0aGFuIHRoZSBpbWFnZSBzaXplICINCj4+PiAtICAgICAgICAgICAgICAgICAgICAgIiglbGxk
-KSIsDQo+Pj4gLSAgICAgICAgICAgICAgICAgICAgIChsb25nIGxvbmcgaW50KWRldl9vZmZzZXQs
-IChsb25nIGxvbmcgaW50KWZkX3NpemUpOw0KPj4+ICsgICAgICAgIGVycm9yX3JlcG9ydCgiT2Zm
-c2V0ICglIiBQUkl1NjQgIikgaGFzIHRvIGJlIHNtYWxsZXIgdGhhbiB0aGUgaW1hZ2UgIg0KPj4+
-ICsgICAgICAgICAgICAgICAgICAgICAic2l6ZSAoJSIgUFJJdTY0ICIpIiwgZGV2X29mZnNldCwg
-ZmRfc2l6ZSk7DQo+Pg0KPj4gUFJJZDY0IGZvciBmZF9zaXplDQo+IA0KPiBTdXJlLg0KDQpXaXRo
-IHRoaXMgb25lIGZpeGVkOg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KSW50ZXJlc3RpbmcsIGRlY2lkZWQgdG8g
-c2VhcmNoIGEgYml0LCBhYm91dCBkb24ndCB3ZSBoYXZlIGFuIG92ZXJmbG93LA0Kd2hlbiBhZGRp
-bmcgcmVxdWVzdC5vZmZzZXQgdG8gZXhwLmRldl9vZmZzZXQgYW5kIGZvdW5kIGluIG5iZF9jb19y
-ZWNlaXZlX3JlcXVlc3Q6DQoNCiAgICAgaWYgKHJlcXVlc3QtPmZyb20gPiBjbGllbnQtPmV4cC0+
-c2l6ZSB8fA0KICAgICAgICAgcmVxdWVzdC0+ZnJvbSArIHJlcXVlc3QtPmxlbiA+IGNsaWVudC0+
-ZXhwLT5zaXplKSB7DQoNCnNob3VsZG4ndCBpdCBiZQ0KDQogICAgIGlmIChyZXF1ZXN0LT5mcm9t
-ID4gY2xpZW50LT5leHAtPnNpemUgfHwNCiAgICAgICAgIHJlcXVlc3QtPmxlbiA+IGNsaWVudC0+
-ZXhwLT5zaXplIC0gcmVxdWVzdC0+ZnJvbSkgew0KDQp0byBhdm9pZCBvdmVyZmxvdz8NCg0KDQo+
-IA0KPiANCj4+PiBAQCAtMTAyNiwxMiArMTAyMSwxMSBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hh
-ciAqKmFyZ3YpDQo+Pj4gICAgICAgICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPj4+ICAg
-ICAgICAgICAgfQ0KPj4+ICAgICAgICAgICAgLyogcGFydGl0aW9uIGxpbWl0cyBhcmUgKDMyLWJp
-dCA8PCA5KTsgY2FuJ3Qgb3ZlcmZsb3cgNjQgYml0cyAqLw0KPj4+IC0gICAgICAgIGFzc2VydChk
-ZXZfb2Zmc2V0ID49IDAgJiYgZGV2X29mZnNldCArIGxpbWl0ID49IGRldl9vZmZzZXQpOw0KPj4+
-ICsgICAgICAgIGFzc2VydChkZXZfb2Zmc2V0ICsgbGltaXQgPj0gZGV2X29mZnNldCk7DQo+Pj4g
-ICAgICAgICAgICBpZiAoZGV2X29mZnNldCArIGxpbWl0ID4gZmRfc2l6ZSkgew0KPj4+IC0gICAg
-ICAgICAgICBlcnJvcl9yZXBvcnQoIkRpc2NvdmVyZWQgcGFydGl0aW9uICVkIGF0IG9mZnNldCAl
-bGxkIHNpemUgJWxsZCwgIg0KPj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgImJ1dCBzaXpl
-IGV4Y2VlZHMgZmlsZSBsZW5ndGggJWxsZCIsIHBhcnRpdGlvbiwNCj4+PiAtICAgICAgICAgICAg
-ICAgICAgICAgICAgIChsb25nIGxvbmcgaW50KSBkZXZfb2Zmc2V0LCAobG9uZyBsb25nIGludCkg
-bGltaXQsDQo+Pj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAobG9uZyBsb25nIGludCkgZmRf
-c2l6ZSk7DQo+Pj4gKyAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiRGlzY292ZXJlZCBwYXJ0aXRp
-b24gJWQgYXQgb2Zmc2V0ICUiIFBSSXU2NA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-IiBzaXplICUiIFBSSWQ2NCAiLCBidXQgc2l6ZSBleGNlZWRzIGZpbGUgbGVuZ3RoICUiDQo+Pj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICBQUklkNjQsIHBhcnRpdGlvbiwgZGV2X29mZnNldCwg
-bGltaXQsIGZkX3NpemUpOw0KPj4+ICAgICAgICAgICAgICAgIGV4aXQoRVhJVF9GQUlMVVJFKTsN
-Cj4+DQo+PiBobW0sIGl0IG1heSBiZSBiZXR0ZXIgdG8gcGxhY2UgdGhpcyBwYXRjaCBiZWZvcmUg
-WzAzXSwgdG8gc3F1YXNoIHRoaXMgY2h1bmsgaW50byBbMDNdDQo+IA0KPiBJIGRpZG4ndCBtaW5k
-IHRoZSBjaHVybjsgYWxzbywgSSBwcmVmZXIgcGF0Y2ggMyBmaXJzdCwgYmVjYXVzZSBpdCdzIG1v
-cmUNCj4gbGlrZWx5IHRvIGdldCBiYWNrcG9ydGVkIGFzIGEgYnVnIGZpeCB0aGFuIHRoZSByZXN0
-IG9mIHRoZSBzZXJpZXMgKGFuZA0KPiB0aGUgZWFybGllciB5b3Ugc3RpY2sgYmFja3BvcnQgY2Fu
-ZGlkYXRlcyBpbiBhIHNlcmllcywgdGhlIGVhc2llciBpdCBpcw0KPiB0byBiYWNrcG9ydCkuDQo+
-IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 2019-01-15 15:10, Yang Zhong wrote:
+> From: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
+>=20
+> CONFIG_PETALOGIX_* and CONFIG_XLNX_*  configs added to
+> default-configs/microblaze-softmmu.mak and
+> default-configs/microblazeel-softmmu.mak.
+>=20
+> Signed-off-by: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  default-configs/microblaze-softmmu.mak | 3 +++
+>  hw/microblaze/Makefile.objs            | 6 +++---
+>  2 files changed, 6 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/default-configs/microblaze-softmmu.mak b/default-configs/m=
+icroblaze-softmmu.mak
+> index 7fca8e4c99..14837cf74a 100644
+> --- a/default-configs/microblaze-softmmu.mak
+> +++ b/default-configs/microblaze-softmmu.mak
+> @@ -10,3 +10,6 @@ CONFIG_XILINX_ETHLITE=3Dy
+>  CONFIG_SSI=3Dy
+>  CONFIG_SSI_M25P80=3Dy
+>  CONFIG_XLNX_ZYNQMP=3Dy
+> +CONFIG_PETALOGIX_S3ADSP1800=3Dy
+> +CONFIG_PETALOGIX_ML605=3Dy
+> +CONFIG_XLNX_ZYNQMP_PMU=3Dy
+> diff --git a/hw/microblaze/Makefile.objs b/hw/microblaze/Makefile.objs
+> index ae9fd40de7..8595a62f6c 100644
+> --- a/hw/microblaze/Makefile.objs
+> +++ b/hw/microblaze/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -obj-y +=3D petalogix_s3adsp1800_mmu.o
+> -obj-y +=3D petalogix_ml605_mmu.o
+> -obj-y +=3D xlnx-zynqmp-pmu.o
+> +obj-$(CONFIG_PETALOGIX_S3ADSP1800) +=3D petalogix_s3adsp1800_mmu.o
+> +obj-$(CONFIG_PETALOGIX_ML605) +=3D petalogix_ml605_mmu.o
+> +obj-$(CONFIG_XLNX_ZYNQMP_PMU) +=3D xlnx-zynqmp-pmu.o
+>  obj-y +=3D boot.o
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
