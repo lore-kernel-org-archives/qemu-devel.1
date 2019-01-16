@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36237)
+Received: from eggs.gnu.org ([209.51.188.92]:36369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gjn9A-0006oo-H9
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:30:29 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gjn9L-0006sr-Cm
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gjn91-0000Mx-Il
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:30:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59052)
+	(envelope-from <ehabkost@redhat.com>) id 1gjn9J-0000gT-56
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:30:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gjn8z-0000H5-SQ
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:30:19 -0500
-Date: Wed, 16 Jan 2019 13:30:11 -0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gjn9I-0000f2-9J
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:30:36 -0500
+Date: Wed, 16 Jan 2019 13:30:27 -0200
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190116153011.GB14807@habkost.net>
-References: <20190114215225.GA16760@habkost.net>
-	<CAL1e-=iBx0Dt=S5fyLs8v-XN+2Zmx5hb7StQBJhquUmmdw6uNA@mail.gmail.com>
+Message-ID: <20190116153027.GC14807@habkost.net>
+References: <20181127135030.1671-1-i.maximets@samsung.com>
+	<CGME20181127135045eucas1p1e259cacbab5e715f7845b9beee22f882@eucas1p1.samsung.com>
+	<20181127135030.1671-2-i.maximets@samsung.com>
+	<20181211105329.GE921@redhat.com>
+	<52c43506-ef39-6d08-7db4-ad3c0f96dd1f@samsung.com>
+	<20181212064936.ubnv3yif34e7ga5j@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAL1e-=iBx0Dt=S5fyLs8v-XN+2Zmx5hb7StQBJhquUmmdw6uNA@mail.gmail.com>
-Subject: Re: [Qemu-devel] Meaning of "-smp threads" on mips_malta
+In-Reply-To: <20181212064936.ubnv3yif34e7ga5j@sirius.home.kraxel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] hostmem-memfd: disable for systems
+ wihtout sealing support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,80 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Ilya Maximets <i.maximets@samsung.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-On Tue, Jan 15, 2019 at 03:28:50AM +0100, Aleksandar Markovic wrote:
-> On Monday, January 14, 2019, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > Hi,
-> >
-> > I'm trying to refactor the SMP topology code in QEMU
-> 
-> 
-> >
-> Eduardo, I truly appreciate your interest in details of Malta
-> implementations, but before I answer your questions, could you please
-> outline the motivation and the current concept of your envisioned
-> refactoring of SMP, so that I have some picture of the whole context?
+On Wed, Dec 12, 2018 at 07:49:36AM +0100, Gerd Hoffmann wrote:
+> On Tue, Dec 11, 2018 at 02:09:11PM +0300, Ilya Maximets wrote:
+> > On 11.12.2018 13:53, Daniel P. Berrang=E9 wrote:
+> > >>
+> > >> Let's restrict memfd backend to systems with sealing support.
+> > >=20
+> > > I don't think we need todo that - sealing is optional in the QEMU c=
+ode,
+> > > we simply have it set to the wrong default when sealing is not avai=
+lable.
+> >=20
+> > That was literally what I've fixed in v1:
+> >     https://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg05483=
+.html
+> >=20
+> > but 2 people suggested me to disable memfd entirely for this case.
+> > Do you think I need to get patch from v1 back ?
+> >=20
+> > Gerd, Marc-Andr=E9, what do you think?
+>=20
+> I still think it makes sense to require sealing support.  Sealing is
+> very useful, and there are only a few kernel versions with memfd but
+> without sealing.  So finding such kernels in the wild will become more
+> rare over time.  I wouldn't worry too much about them.
 
-I don't have any concrete plans right now.  I'm trying to
-understand how existing code uses the -smp options, before
-deciding what to do.
+-object memory-backend-memfd,id=3Dmem,size=3D2M,seal=3Doff still
+works on those systems, doesn't it?  What's the rationale for
+breaking a working configuration without following the
+deprecation policy?
 
-My goal is to make features like
-  "[PATCH v1 0/5] Introduce cpu die topology and enable CPUID.1F for i386"
-easier, less intrusive, and less risky.
-
-My current impression is that things will be better if we move
-the complex PC-specific topology rules from vl.c to PC-specific
-code.  Most of the other architectures seem to have different
-assumptions and expectations about -smp/cores/threads.
-
-
-> 
-> Sincerely, Aleksandar
-> 
-> 
-> 
-> >
-> > and I found
-> > some suspicious code on mips_malta.c:
-> >
-> > static void malta_mips_config(MIPSCPU *cpu)
-> > {
-> >     CPUMIPSState *env = &cpu->env;
-> >     CPUState *cs = CPU(cpu);
-> >
-> >     env->mvp->CP0_MVPConf0 |= ((smp_cpus - 1) << CP0MVPC0_PVPE) |
-> >                          ((smp_cpus * cs->nr_threads - 1) << CP0MVPC0_PTC);
-> > }
-> >
-> >
-> > The (smp_cpus * cs->nr_threads) expression here doesn't make
-> > sense to me (because smp_cpus is already supposed to be a
-> > multiple of smp_threads), and seems to indicate that the code has
-> > some unusual assumptions about the semantics of the -smp option.
-> >
-> > So, I'd like to know: do all the examples below make sense for
-> > Malta?
-> >
-> >  -smp 1
-> >  -smp 2
-> >  -smp 2,threads=1
-> >  -smp 2,threads=2
-> >  -smp 1,threads=2 [*]
-> >  -smp 2,threads=3 [*]
-> >
-> > The generic -smp parsing code considers the last 2 entries
-> > above[*] to be invalid.  If they make sense for Malta, we need to
-> > find a way to fix that.  Replacing "-smp threads=..." with a
-> > "-cpu" or "-machine" option seems like the best alternative.
-> >
-> > --
-> > Eduardo
-> >
-> >
-
--- 
+--=20
 Eduardo
