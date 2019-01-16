@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33120)
+Received: from eggs.gnu.org ([209.51.188.92]:54142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjigE-0006ak-Rm
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:44:21 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjipu-00005c-O9
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:54:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjigD-0006wc-HY
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:44:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjigD-0006rG-0O
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:44:17 -0500
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-20-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8c5e79dd-b177-44fb-4a3d-7aa55216d13d@redhat.com>
-Date: Wed, 16 Jan 2019 11:44:13 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190115141108.934-20-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjips-00046L-Gq
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:54:18 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 16 Jan 2019 10:54:07 +0000
+Message-ID: <1c493b43-48f7-4c4d-6404-ce974c56e972@virtuozzo.com>
+References: <20190112175812.27068-1-eblake@redhat.com>
+	<20190112175812.27068-17-eblake@redhat.com>
+In-Reply-To: <20190112175812.27068-17-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 19/37] kconfig: introduce kconfig
- files
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F7D77A92DFB54540A4923E8889EBD42B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 16/19] nbd/client: Add meta contexts to
+ nbd_receive_export_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,250 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 2019-01-15 15:10, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> The Kconfig files were generated mostly with this script:
-> 
->   for i in `grep -ho CONFIG_[A-Z0-9_]* default-configs/* | sort -u`; do
->     set fnord `git grep -lw $i -- 'hw/*/Makefile.objs' `
->     shift
->     if test $# = 1; then
->       cat >> $(dirname $1)/Kconfig << EOF
-> config ${i#CONFIG_}
->     bool
-> 
-> EOF
->       git add $(dirname $1)/Kconfig
->     else
->       echo $i $*
->     fi
->   done
->   sed -i '$d' hw/*/Kconfig
->   for i in hw/*; do
->     if test -d $i && ! test -f $i/Kconfig; then
->       touch $i/Kconfig
->       git add $i/Kconfig
->     fi
->   done
-> 
-> Whenever a symbol is referenced from multiple subdirectories, the
-> script prints the list of directories that reference the symbol.
-> These symbols have to be added manually to the Kconfig files.
-> 
-> Kconfig.host and hw/Kconfig were created manually.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  Kconfig.host          | 17 ++++++++
->  hw/9pfs/Kconfig       |  2 +
->  hw/Kconfig            | 60 ++++++++++++++++++++++++++
->  hw/acpi/Kconfig       | 23 ++++++++++
->  hw/adc/Kconfig        |  2 +
->  hw/arm/Kconfig        | 98 +++++++++++++++++++++++++++++++++++++++++++
->  hw/audio/Kconfig      | 35 ++++++++++++++++
->  hw/block/Kconfig      | 29 +++++++++++++
->  hw/bt/Kconfig         |  2 +
->  hw/char/Kconfig       | 32 ++++++++++++++
->  hw/core/Kconfig       | 11 +++++
->  hw/cpu/Kconfig        |  8 ++++
->  hw/display/Kconfig    | 77 ++++++++++++++++++++++++++++++++++
->  hw/dma/Kconfig        | 20 +++++++++
->  hw/gpio/Kconfig       |  8 ++++
->  hw/hyperv/Kconfig     |  5 +++
->  hw/i2c/Kconfig        | 20 +++++++++
->  hw/i386/Kconfig       | 23 ++++++++++
->  hw/ide/Kconfig        | 35 ++++++++++++++++
->  hw/input/Kconfig      | 23 ++++++++++
->  hw/intc/Kconfig       | 47 +++++++++++++++++++++
->  hw/ipack/Kconfig      |  2 +
->  hw/ipmi/Kconfig       | 14 +++++++
->  hw/isa/Kconfig        | 23 ++++++++++
->  hw/lm32/Kconfig       |  5 +++
->  hw/m68k/Kconfig       |  8 ++++
->  hw/mem/Kconfig        |  8 ++++
->  hw/microblaze/Kconfig |  8 ++++
->  hw/mips/Kconfig       | 20 +++++++++
->  hw/misc/Kconfig       | 92 ++++++++++++++++++++++++++++++++++++++++
->  hw/misc/macio/Kconfig | 11 +++++
->  hw/net/Kconfig        | 92 ++++++++++++++++++++++++++++++++++++++++
->  hw/nios2/Kconfig      |  2 +
->  hw/nvram/Kconfig      |  8 ++++
->  hw/pci-bridge/Kconfig | 20 +++++++++
->  hw/pci-host/Kconfig   | 35 ++++++++++++++++
->  hw/pci/Kconfig        |  2 +
->  hw/pcmcia/Kconfig     |  2 +
->  hw/ppc/Kconfig        | 38 +++++++++++++++++
->  hw/riscv/Kconfig      | 14 +++++++
->  hw/scsi/Kconfig       | 26 ++++++++++++
->  hw/sd/Kconfig         | 11 +++++
->  hw/sh4/Kconfig        |  8 ++++
->  hw/smbios/Kconfig     |  2 +
->  hw/sparc/Kconfig      |  5 +++
->  hw/sparc64/Kconfig    |  5 +++
->  hw/ssi/Kconfig        | 14 +++++++
->  hw/timer/Kconfig      | 53 +++++++++++++++++++++++
->  hw/tpm/Kconfig        | 14 +++++++
->  hw/usb/Kconfig        | 53 +++++++++++++++++++++++
->  hw/vfio/Kconfig       | 11 +++++
->  hw/virtio/Kconfig     | 17 ++++++++
->  hw/watchdog/Kconfig   | 11 +++++
->  hw/xtensa/Kconfig     |  5 +++
->  54 files changed, 1216 insertions(+)
->  create mode 100644 Kconfig.host
->  create mode 100644 hw/9pfs/Kconfig
->  create mode 100644 hw/Kconfig
->  create mode 100644 hw/acpi/Kconfig
->  create mode 100644 hw/adc/Kconfig
->  create mode 100644 hw/arm/Kconfig
->  create mode 100644 hw/audio/Kconfig
->  create mode 100644 hw/block/Kconfig
->  create mode 100644 hw/bt/Kconfig
->  create mode 100644 hw/char/Kconfig
->  create mode 100644 hw/core/Kconfig
->  create mode 100644 hw/cpu/Kconfig
->  create mode 100644 hw/display/Kconfig
->  create mode 100644 hw/dma/Kconfig
->  create mode 100644 hw/gpio/Kconfig
->  create mode 100644 hw/hyperv/Kconfig
->  create mode 100644 hw/i2c/Kconfig
->  create mode 100644 hw/i386/Kconfig
->  create mode 100644 hw/ide/Kconfig
->  create mode 100644 hw/input/Kconfig
->  create mode 100644 hw/intc/Kconfig
->  create mode 100644 hw/ipack/Kconfig
->  create mode 100644 hw/ipmi/Kconfig
->  create mode 100644 hw/isa/Kconfig
->  create mode 100644 hw/lm32/Kconfig
->  create mode 100644 hw/m68k/Kconfig
->  create mode 100644 hw/mem/Kconfig
->  create mode 100644 hw/microblaze/Kconfig
->  create mode 100644 hw/mips/Kconfig
->  create mode 100644 hw/misc/Kconfig
->  create mode 100644 hw/misc/macio/Kconfig
->  create mode 100644 hw/net/Kconfig
->  create mode 100644 hw/nios2/Kconfig
->  create mode 100644 hw/nvram/Kconfig
->  create mode 100644 hw/pci-bridge/Kconfig
->  create mode 100644 hw/pci-host/Kconfig
->  create mode 100644 hw/pci/Kconfig
->  create mode 100644 hw/pcmcia/Kconfig
->  create mode 100644 hw/ppc/Kconfig
->  create mode 100644 hw/riscv/Kconfig
->  create mode 100644 hw/scsi/Kconfig
->  create mode 100644 hw/sd/Kconfig
->  create mode 100644 hw/sh4/Kconfig
->  create mode 100644 hw/smbios/Kconfig
->  create mode 100644 hw/sparc/Kconfig
->  create mode 100644 hw/sparc64/Kconfig
->  create mode 100644 hw/ssi/Kconfig
->  create mode 100644 hw/timer/Kconfig
->  create mode 100644 hw/tpm/Kconfig
->  create mode 100644 hw/usb/Kconfig
->  create mode 100644 hw/vfio/Kconfig
->  create mode 100644 hw/virtio/Kconfig
->  create mode 100644 hw/watchdog/Kconfig
->  create mode 100644 hw/xtensa/Kconfig
-> 
-> diff --git a/Kconfig.host b/Kconfig.host
-> new file mode 100644
-> index 0000000000..2136a4c3ec
-> --- /dev/null
-> +++ b/Kconfig.host
-> @@ -0,0 +1,17 @@
-> +# These are "proxy" symbols used to pass config-host.mak values
-> +# down to Kconfig.
-> +
-> +config KVM
-> +    bool
-> +
-> +config OPENGL
-> +    bool
-> +
-> +config SPICE
-> +    bool
-> +
-> +config TPM
-> +    bool
-> +
-> +config XEN
-> +    bool
-> diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
-> new file mode 100644
-> index 0000000000..a4750999d9
-> --- /dev/null
-> +++ b/hw/9pfs/Kconfig
-> @@ -0,0 +1,2 @@
-> +config VIRTIO_9P
-> +    bool
-> diff --git a/hw/Kconfig b/hw/Kconfig
-> new file mode 100644
-> index 0000000000..55743a958a
-> --- /dev/null
-> +++ b/hw/Kconfig
-> @@ -0,0 +1,60 @@
-> +# devices Kconfig
-> +source 9pfs/Kconfig
-> +source acpi/Kconfig
-> +source audio/Kconfig
-> +source block/Kconfig
-> +source bt/Kconfig
-> +source char/Kconfig
-> +source core/Kconfig
-> +source display/Kconfig
-> +source dma/Kconfig
-> +source gpio/Kconfig
-> +source i2c/Kconfig
-> +source ide/Kconfig
-> +source input/Kconfig
-> +source intc/Kconfig
-> +source ipack/Kconfig
-> +source isa/Kconfig
-> +source mem/Kconfig
-> +source misc/Kconfig
-> +source net/Kconfig
-> +source nvram/Kconfig
-> +source pci-bridge/Kconfig
-> +source pci-host/Kconfig
-> +source pci/Kconfig
-> +source scsi/Kconfig
-> +source sd/Kconfig
-> +source ssi/Kconfig
-> +source timer/Kconfig
-> +source tpm/Kconfig
-> +source usb/Kconfig
-> +source virtio/Kconfig
-> +source watchdog/Kconfig
-> +source smbios/Kconfig
-> +source ipmi/Kconfig
-> +source vfio/Kconfig
-> +source adc/Kconfig
-> +source pcmcia/Kconfig
-> +source hyperv/Kconfig
-
-Could you please sort the last 5 entries alphabetically into the list?
-
-> +# arch Kconfig
-> +source i386/Kconfig
-> +source arm/Kconfig
-> +source m68k/Kconfig
-> +source microblaze/Kconfig
-> +source mips/Kconfig
-> +source ppc/Kconfig
-> +source sh4/Kconfig
-> +source sparc/Kconfig
-> +source sparc64/Kconfig
-> +source lm32/Kconfig
-> +source xtensa/Kconfig
-> +source nios2/Kconfig
-> +source riscv/Kconfig
-
-dito, please sort last 4 entries alphabetically into the list.
-
-Apart from that, patch looks good to me.
-
- Thomas
+MTIuMDEuMjAxOSAyMDo1OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2Ugd2FudCB0byBiZSBhYmxl
+IHRvIGRldGVjdCB3aGV0aGVyIGEgZ2l2ZW4gcWVtdSBOQkQgc2VydmVyIGlzDQo+IGV4cG9zaW5n
+IHRoZSByaWdodCBleHBvcnQocykgYW5kIGRpcnR5IGJpdG1hcHMsIGF0IGxlYXN0IGZvcg0KPiBy
+ZWdyZXNzaW9uIHRlc3RpbmcuICBXZSBjb3VsZCB1c2UgJ25iZC1jbGllbnQgLWwnIGZyb20gdGhl
+IHVwc3RyZWFtDQo+IE5CRCBwcm9qZWN0IHRvIGxpc3QgZXhwb3J0cywgYnV0IGl0J3MgYW5ub3lp
+bmcgdG8gcmVseSBvbg0KPiBvdXQtb2YtdHJlZSBiaW5hcmllczsgZnVydGhlcm1vcmUsIG5iZC1j
+bGllbnQgZG9lc24ndCBuZWNlc3NhcmlseQ0KPiBrbm93IGFib3V0IGFsbCBvZiB0aGUgcWVtdSBO
+QkQgZXh0ZW5zaW9ucy4gIFRodXMsIHdlIHBsYW4gb24gYWRkaW5nDQo+IGEgbmV3IG1vZGUgdG8g
+cWVtdS1uYmQgdGhhdCBtZXJlbHkgc25pZmZzIGFsbCBwb3NzaWJsZSBpbmZvcm1hdGlvbg0KPiBm
+cm9tIHRoZSBzZXJ2ZXIgZHVyaW5nIGhhbmRzaGFrZSBwaGFzZSwgdGhlbiBkaXNjb25uZWN0cyBh
+bmQgZHVtcHMNCj4gdGhlIGluZm9ybWF0aW9uLg0KPiANCj4gVGhpcyBwYXRjaCBjb250aW51ZXMg
+dGhlIHdvcmsgb2YgdGhlIHByZXZpb3VzIHBhdGNoLCBieSBhZGRpbmcgdGhlDQo+IGFiaWxpdHkg
+dG8gdHJhY2sgdGhlIGxpc3Qgb2YgYXZhaWxhYmxlIG1ldGEgY29udGV4dHMgaW50bw0KPiBOQkRF
+eHBvcnRJbmZvLiAgSXQgYmVuZWZpdHMgZnJvbSB0aGUgcmVjZW50IHJlZmFjdG9yaW5nIHBhdGNo
+ZXMNCj4gd2l0aCBhIG5ldyBuYmRfbGlzdF9tZXRhX2NvbnRleHRzKCkgdGhhdCByZXVzZXMgbXVj
+aCBvZiB0aGUgc2FtZQ0KPiBmcmFtZXdvcmsgYXMgc2V0dGluZyBhIG1ldGEgY29udGV4dC4NCj4g
+DQo+IE5vdGU6IGEgbWFsaWNpb3VzIHNlcnZlciBjb3VsZCBleGhhdXN0IG1lbW9yeSBvZiBhIGNs
+aWVudCBieSBmZWVkaW5nDQo+IGFuIHVuZW5kaW5nIGxvb3Agb2YgY29udGV4dHM7IHBlcmhhcHMg
+d2UgY291bGQgcGxhY2UgYSBsaW1pdCBvbiBob3cNCj4gbWFueSB3ZSBhcmUgd2lsbGluZyB0byBy
+ZWNlaXZlLiBCdXQgdGhpcyBpcyBubyBkaWZmZXJlbnQgZnJvbSBvdXINCj4gZWFybGllciBhbmFs
+eXNpcyBvbiBhIHNlcnZlciBzZW5kaW5nIGFuIHVuZW5kaW5nIGxpc3Qgb2YgZXhwb3J0cywNCj4g
+YW5kIHRoZSBkZWF0aCBvZiBhIGNsaWVudCBkdWUgdG8gbWVtb3J5IGV4aGF1c3Rpb24gd2hlbiB0
+aGUgY2xpZW50DQo+IHdhcyBnb2luZyB0byBleGl0IHNvb24gYW55d2F5cyBpcyBub3QgcmVhbGx5
+IGEgZGVuaWFsIG9mIHNlcnZpY2UNCj4gYXR0YWNrLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJp
+YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IE1lc3NhZ2UtSWQ6IDwyMDE4MTIxNTEzNTMy
+NC4xNTI2MjktMjAtZWJsYWtlQHJlZGhhdC5jb20+DQo+IFJldmlld2VkLWJ5OiBSaWNoYXJkIFcu
+TS4gSm9uZXMgPHJqb25lc0ByZWRoYXQuY29tPg0KPiANCj4gLS0tDQo+IHYzOiBtZW50aW9uIHNl
+Y3VyaXR5IChub24tKWlzc3VlIGluIGNvbW1pdCBtZXNzYWdlIFtSaWNoXQ0KPiAtLS0NCj4gICBp
+bmNsdWRlL2Jsb2NrL25iZC5oIHwgIDIgKysNCj4gICBuYmQvY2xpZW50LmMgICAgICAgIHwgNDEg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0NCj4gICAyIGZpbGVzIGNo
+YW5nZWQsIDQxIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0
+IGEvaW5jbHVkZS9ibG9jay9uYmQuaCBiL2luY2x1ZGUvYmxvY2svbmJkLmgNCj4gaW5kZXggZTlh
+NDQyY2U3ZTkuLjgwZWUzY2M5OTdlIDEwMDY0NA0KPiAtLS0gYS9pbmNsdWRlL2Jsb2NrL25iZC5o
+DQo+ICsrKyBiL2luY2x1ZGUvYmxvY2svbmJkLmgNCj4gQEAgLTI4NCw2ICsyODQsOCBAQCBzdHJ1
+Y3QgTkJERXhwb3J0SW5mbyB7DQo+IA0KPiAgICAgICAvKiBTZXQgYnkgc2VydmVyIHJlc3VsdHMg
+ZHVyaW5nIG5iZF9yZWNlaXZlX2V4cG9ydF9saXN0KCkgKi8NCj4gICAgICAgY2hhciAqZGVzY3Jp
+cHRpb247DQo+ICsgICAgaW50IG5fY29udGV4dHM7DQo+ICsgICAgY2hhciAqKmNvbnRleHRzOw0K
+PiAgIH07DQo+ICAgdHlwZWRlZiBzdHJ1Y3QgTkJERXhwb3J0SW5mbyBOQkRFeHBvcnRJbmZvOw0K
+PiANCj4gZGlmZiAtLWdpdCBhL25iZC9jbGllbnQuYyBiL25iZC9jbGllbnQuYw0KPiBpbmRleCBh
+NWE3MDVhNjdmNy4uMjAwMWU2ZTgxNjAgMTAwNjQ0DQo+IC0tLSBhL25iZC9jbGllbnQuYw0KPiAr
+KysgYi9uYmQvY2xpZW50LmMNCj4gQEAgLTgxNyw2ICs4MTcsMzYgQEAgc3RhdGljIGludCBuYmRf
+bmVnb3RpYXRlX3NpbXBsZV9tZXRhX2NvbnRleHQoUUlPQ2hhbm5lbCAqaW9jLA0KPiAgICAgICBy
+ZXR1cm4gcmVjZWl2ZWQ7DQo+ICAgfQ0KPiANCj4gKy8qDQo+ICsgKiBuYmRfbGlzdF9tZXRhX2Nv
+bnRleHRzOg0KPiArICogUmVxdWVzdCB0aGUgc2VydmVyIHRvIGxpc3QgYWxsIG1ldGEgY29udGV4
+dHMgZm9yIGV4cG9ydCBAaW5mby0+bmFtZS4NCj4gKyAqIHJldHVybiAwIGlmIGxpc3QgaXMgY29t
+cGxldGUgKGV2ZW4gaWYgZW1wdHkpLA0KPiArICogICAgICAgIC0xIHdpdGggZXJycCBzZXQgZm9y
+IGFueSBvdGhlciBlcnJvcg0KDQpOb3Qgc3VyZSBhYm91dCBuZWVkIG9mICJvdGhlciIgd29yZCBp
+biB0aGlzIGNvbnRleHQuDQoNCj4gKyAqLw0KPiArc3RhdGljIGludCBuYmRfbGlzdF9tZXRhX2Nv
+bnRleHRzKFFJT0NoYW5uZWwgKmlvYywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBOQkRFeHBvcnRJbmZvICppbmZvLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIEVycm9yICoqZXJycCkNCj4gK3sNCj4gKyAgICBpbnQgcmV0Ow0KPiArDQo+ICsgICAg
+aWYgKG5iZF9zZW5kX29uZV9tZXRhX2NvbnRleHQoaW9jLCBOQkRfT1BUX0xJU1RfTUVUQV9DT05U
+RVhULA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZm8tPm5hbWUsIE5V
+TEwsIGVycnApIDwgMCkgew0KDQpIbW0sIHRoaXMgbWFkZSBtZSB0byBhZGQgb25lIG1vcmUgY29t
+bWVudCB0byBwcmV2aW91cyBwYXRjaCBhYm91dA0KbmJkX3NlbmRfb25lX21ldGFfY29udGV4dCwg
+dGhlIGl0IGRvbid0IHNlbmQgY29udGV4dCBidXQgcXVlcnkuDQoNCj4gKyAgICAgICAgcmV0dXJu
+IC0xOw0KPiArICAgIH0NCj4gKw0KPiArICAgIHdoaWxlICgxKSB7DQo+ICsgICAgICAgIGNoYXIg
+KmNvbnRleHQ7DQo+ICsNCj4gKyAgICAgICAgcmV0ID0gbmJkX3JlY2VpdmVfb25lX21ldGFfY29u
+dGV4dChpb2MsIE5CRF9PUFRfTElTVF9NRVRBX0NPTlRFWFQsDQo+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgJmNvbnRleHQsIE5VTEwsIGVycnApOw0KPiArICAg
+ICAgICBpZiAocmV0IDw9IDApIHsNCj4gKyAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ICsgICAg
+ICAgIH0NCj4gKyAgICAgICAgaW5mby0+Y29udGV4dHMgPSBnX3JlbmV3KGNoYXIgKiwgaW5mby0+
+Y29udGV4dHMsICsraW5mby0+bl9jb250ZXh0cyk7DQo+ICsgICAgICAgIGluZm8tPmNvbnRleHRz
+W2luZm8tPm5fY29udGV4dHMgLSAxXSA9IGNvbnRleHQ7DQo+ICsgICAgfQ0KDQpBIGJpdCBvZGQg
+Zm9yIG1lLCB0aGF0IGZ1bmN0aW9uIGxlYXZlcyBhbGxvY2F0ZWQgbWVtb3J5IG9uIGVycm9yIHBh
+dGgsIGJ1dCBpdCB3aWxsDQpiZSBmcmVlZCBhbnl3YXkgaW4gbmJkX2ZyZWVfZXhwb3J0X2xpc3Qs
+IHNvLCBkb24ndCBtaW5kLg0KDQo+ICt9DQo+ICsNCj4gICAvKg0KPiAgICAqIG5iZF9zdGFydF9u
+ZWdvdGlhdGU6DQo+ICAgICogU3RhcnQgdGhlIGhhbmRzaGFrZSB0byB0aGUgc2VydmVyLiAgQWZ0
+ZXIgYSBwb3NpdGl2ZSByZXR1cm4sIHRoZSBzZXJ2ZXINCj4gQEAgLTEwNjMsNyArMTA5Myw3IEBA
+IGludCBuYmRfcmVjZWl2ZV9uZWdvdGlhdGUoUUlPQ2hhbm5lbCAqaW9jLCBRQ3J5cHRvVExTQ3Jl
+ZHMgKnRsc2NyZWRzLA0KPiAgIC8qIENsZWFuIHVwIHJlc3VsdCBvZiBuYmRfcmVjZWl2ZV9leHBv
+cnRfbGlzdCAqLw0KPiAgIHZvaWQgbmJkX2ZyZWVfZXhwb3J0X2xpc3QoTkJERXhwb3J0SW5mbyAq
+aW5mbywgaW50IGNvdW50KQ0KPiAgIHsNCj4gLSAgICBpbnQgaTsNCj4gKyAgICBpbnQgaSwgajsN
+Cj4gDQo+ICAgICAgIGlmICghaW5mbykgew0KPiAgICAgICAgICAgcmV0dXJuOw0KPiBAQCAtMTA3
+Miw2ICsxMTAyLDEwIEBAIHZvaWQgbmJkX2ZyZWVfZXhwb3J0X2xpc3QoTkJERXhwb3J0SW5mbyAq
+aW5mbywgaW50IGNvdW50KQ0KPiAgICAgICBmb3IgKGkgPSAwOyBpIDwgY291bnQ7IGkrKykgew0K
+PiAgICAgICAgICAgZ19mcmVlKGluZm9baV0ubmFtZSk7DQo+ICAgICAgICAgICBnX2ZyZWUoaW5m
+b1tpXS5kZXNjcmlwdGlvbik7DQo+ICsgICAgICAgIGZvciAoaiA9IDA7IGogPCBpbmZvW2ldLm5f
+Y29udGV4dHM7IGorKykgew0KPiArICAgICAgICAgICAgZ19mcmVlKGluZm9baV0uY29udGV4dHNb
+al0pOw0KPiArICAgICAgICB9DQo+ICsgICAgICAgIGdfZnJlZShpbmZvW2ldLmNvbnRleHRzKTsN
+Cj4gICAgICAgfQ0KPiAgICAgICBnX2ZyZWUoaW5mbyk7DQo+ICAgfQ0KPiBAQCAtMTEzOSw3ICsx
+MTczLDEwIEBAIGludCBuYmRfcmVjZWl2ZV9leHBvcnRfbGlzdChRSU9DaGFubmVsICppb2MsIFFD
+cnlwdG9UTFNDcmVkcyAqdGxzY3JlZHMsDQo+ICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiAg
+ICAgICAgICAgICAgIH0NCj4gDQo+IC0gICAgICAgICAgICAvKiBUT0RPOiBHcmFiIG1ldGEgY29u
+dGV4dHMgKi8NCj4gKyAgICAgICAgICAgIGlmIChyZXN1bHQgPT0gMyAmJg0KPiArICAgICAgICAg
+ICAgICAgIG5iZF9saXN0X21ldGFfY29udGV4dHMoaW9jLCAmYXJyYXlbaV0sIGVycnApIDwgMCkg
+ew0KPiArICAgICAgICAgICAgICAgIGdvdG8gb3V0Ow0KPiArICAgICAgICAgICAgfQ0KPiAgICAg
+ICAgICAgfQ0KPiANCj4gICAgICAgICAgIC8qIFNlbmQgTkJEX09QVF9BQk9SVCBhcyBhIGNvdXJ0
+ZXN5IGJlZm9yZSBoYW5naW5nIHVwICovDQo+IA0KDQphbnl3YXksDQpSZXZpZXdlZC1ieTogVmxh
+ZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoN
+Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
