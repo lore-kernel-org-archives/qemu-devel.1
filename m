@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53223)
+Received: from eggs.gnu.org ([209.51.188.92]:54849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjjsN-00077D-LN
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:00:57 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gjjtL-0007nu-FK
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:02:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjjsM-0006lf-CN
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:00:55 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Wed, 16 Jan 2019 13:00:41 +0100
-Message-Id: <20190116120041.17095-1-philmd@redhat.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1gjjtF-0001ck-Sd
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:01:55 -0500
+Date: Wed, 16 Jan 2019 13:01:46 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <511a675b-fa61-1ef0-643f-9c568b5daaa8@linaro.org>
+Message-ID: <alpine.BSF.2.21.9999.1901161259260.16452@zero.eik.bme.hu>
+References: <20190116041916.130523-1-aik@ozlabs.ru>
+	<511a675b-fa61-1ef0-643f-9c568b5daaa8@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] xen: Fix format string
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc]  [PATCH qemu] spapr: Fix fdt warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,40 +22,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Trivial format string fix to solve:
+On Wed, 16 Jan 2019, Richard Henderson wrote:
+> On 1/16/19 3:19 PM, Alexey Kardashevskiy wrote:
+>> because TARGET_FMT_lx is defined as "%016"PRIx64.
+>>
+>> This uses simple "%lx" to suppress the warning. Since it is spapr which
+>> is always 64bit, we assume here that hwaddr is always "long".
+>
+> This file is not solely for kvm, i.e. ppc64 hosts.  Thus this
+> is a bad assumption and will fail for a 32-bit host.
+>
+> You may want to use PRIx64 and assume hwaddr == uint64_t, or
+> also include an explicit cast to uint64_t.
 
-  hw/block/xen-block.c: In function 'xen_block_realize':
-  hw/block/xen-block.c:218:53: error: format '%lu' expects argument of ty=
-pe 'long unsigned int', but argument 4 has type 'int64_t {aka long long i=
-nt}' [-Werror=3Dformat=3D]
-      xen_device_backend_printf(xendev, "sectors", "%lu",
-                                                      ^
-                                blk_getlength(conf->blk) /
-                                conf->logical_block_size);
+I don't know the context of this but there's HWADDR_PRIx as well so if you 
+want to print a hwaddr that's probably the one to use.
 
-blk_getlength() returns an int64_t.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/block/xen-block.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index be28b63442..3cf215b730 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -215,7 +215,7 @@ static void xen_block_realize(XenDevice *xendev, Erro=
-r **errp)
-=20
-     xen_device_backend_printf(xendev, "sector-size", "%u",
-                               conf->logical_block_size);
--    xen_device_backend_printf(xendev, "sectors", "%lu",
-+    xen_device_backend_printf(xendev, "sectors", "%lld",
-                               blk_getlength(conf->blk) /
-                               conf->logical_block_size);
-=20
---=20
-2.17.2
+Regards,
+BALATON Zoltan
