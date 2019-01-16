@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46406)
+Received: from eggs.gnu.org ([209.51.188.92]:46520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gjnRL-0005FR-1u
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:49:15 -0500
+	(envelope-from <mst@redhat.com>) id 1gjnSE-0005kl-6Y
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:50:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gjnRK-0006wW-1t
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:49:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42876)
+	(envelope-from <mst@redhat.com>) id 1gjnS8-00072y-4u
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:50:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gjnRJ-0006w8-SI
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:49:13 -0500
-Date: Wed, 16 Jan 2019 15:48:57 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190116154857.GC20275@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181127135030.1671-1-i.maximets@samsung.com>
-	<CGME20181127135045eucas1p1e259cacbab5e715f7845b9beee22f882@eucas1p1.samsung.com>
-	<20181127135030.1671-2-i.maximets@samsung.com>
-	<20181211105329.GE921@redhat.com>
-	<52c43506-ef39-6d08-7db4-ad3c0f96dd1f@samsung.com>
-	<20181212064936.ubnv3yif34e7ga5j@sirius.home.kraxel.org>
-	<20190116153027.GC14807@habkost.net>
-	<856c189d-937e-2471-c3c1-77e4d1e61ed6@samsung.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjnS6-00071j-RP
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:50:03 -0500
+Date: Wed, 16 Jan 2019 10:49:57 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190116104927-mutt-send-email-mst@kernel.org>
+References: <cover.1547624239.git.yi.z.zhang@linux.intel.com>
+	<b1c0ccd8b18467b6df33e90c8606b184ed866251.1547624239.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <856c189d-937e-2471-c3c1-77e4d1e61ed6@samsung.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] hostmem-memfd: disable for systems
- wihtout sealing support
+In-Reply-To: <b1c0ccd8b18467b6df33e90c8606b184ed866251.1547624239.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V9 3/6] util/mmap-alloc: switch 'shared' to
+ 'flags' parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,60 +28,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ilya Maximets <i.maximets@samsung.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-On Wed, Jan 16, 2019 at 06:46:39PM +0300, Ilya Maximets wrote:
->=20
->=20
-> On 16.01.2019 18:30, Eduardo Habkost wrote:
-> > On Wed, Dec 12, 2018 at 07:49:36AM +0100, Gerd Hoffmann wrote:
-> >> On Tue, Dec 11, 2018 at 02:09:11PM +0300, Ilya Maximets wrote:
-> >>> On 11.12.2018 13:53, Daniel P. Berrang=C3=A9 wrote:
-> >>>>>
-> >>>>> Let's restrict memfd backend to systems with sealing support.
-> >>>>
-> >>>> I don't think we need todo that - sealing is optional in the QEMU =
-code,
-> >>>> we simply have it set to the wrong default when sealing is not ava=
-ilable.
-> >>>
-> >>> That was literally what I've fixed in v1:
-> >>>     https://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg054=
-83.html
-> >>>
-> >>> but 2 people suggested me to disable memfd entirely for this case.
-> >>> Do you think I need to get patch from v1 back ?
-> >>>
-> >>> Gerd, Marc-Andr=C3=A9, what do you think?
-> >>
-> >> I still think it makes sense to require sealing support.  Sealing is
-> >> very useful, and there are only a few kernel versions with memfd but
-> >> without sealing.  So finding such kernels in the wild will become mo=
-re
-> >> rare over time.  I wouldn't worry too much about them.
-> >=20
-> > -object memory-backend-memfd,id=3Dmem,size=3D2M,seal=3Doff still
-> > works on those systems, doesn't it?  What's the rationale for
-> > breaking a working configuration without following the
-> > deprecation policy?
-> >=20
->=20
-> See the commit message.
-> '.seal' property is not registered if sealing is not supported.
-> So, there is no way to disable sealing on the system that does not supp=
-ort it.
+On Wed, Jan 16, 2019 at 04:10:45PM +0800, Zhang Yi wrote:
+> As more flag parameters besides the existing 'shared' are going to be
+> added to qemu_ram_mmap() and qemu_ram_alloc_from_{file,fd}(), let's
+> switch 'shared' to a 'flags' parameter in advance, so as to ease the
+> further additions.
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> ---
+>  exec.c                    |  7 ++++---
+>  include/qemu/mmap-alloc.h | 19 ++++++++++++++++++-
+>  util/mmap-alloc.c         |  8 +++++---
+>  util/oslib-posix.c        |  9 ++++++++-
+>  4 files changed, 35 insertions(+), 8 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index bb6170d..e92a7da 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1810,6 +1810,7 @@ static void *file_ram_alloc(RAMBlock *block,
+>                              ram_addr_t memory,
+>                              int fd,
+>                              bool truncate,
+> +                            uint32_t flags,
+>                              Error **errp)
+>  {
+>      void *area;
 
-As I pointed out a few lines up, this is simply because QEMU has a bug
-setting seal=3Dtrue as the built-in default value even when it isn't
-supported.=20
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+But given that flags is an un-annotated uint32_t does sparse
+actually do any checks?
+
+I'm lost ...
+
+> @@ -1859,8 +1860,7 @@ static void *file_ram_alloc(RAMBlock *block,
+>          perror("ftruncate");
+>      }
+>  
+> -    area = qemu_ram_mmap(fd, memory, block->mr->align,
+> -                         block->flags & RAM_SHARED);
+> +    area = qemu_ram_mmap(fd, memory, block->mr->align, flags);
+>      if (area == MAP_FAILED) {
+>          error_setg_errno(errp, errno,
+>                           "unable to map backing store for guest RAM");
+> @@ -2279,7 +2279,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>      new_block->used_length = size;
+>      new_block->max_length = size;
+>      new_block->flags = ram_flags;
+> -    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
+> +    new_block->host = file_ram_alloc(new_block, size, fd, !file_size,
+> +            ram_flags, errp);
+>      if (!new_block->host) {
+>          g_free(new_block);
+>          return NULL;
+> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+> index 50385e3..6fe6ed4 100644
+> --- a/include/qemu/mmap-alloc.h
+> +++ b/include/qemu/mmap-alloc.h
+> @@ -7,7 +7,24 @@ size_t qemu_fd_getpagesize(int fd);
+>  
+>  size_t qemu_mempath_getpagesize(const char *mem_path);
+>  
+> -void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
+> +/**
+> + * qemu_ram_mmap: mmap the specified file or device.
+> + *
+> + * Parameters:
+> + *  @fd: the file or the device to mmap
+> + *  @size: the number of bytes to be mmaped
+> + *  @align: if not zero, specify the alignment of the starting mapping address;
+> + *          otherwise, the alignment in use will be determined by QEMU.
+> + *  @flags: specifies additional properties of the mapping, which can be one or
+> + *          bit-or of following values
+> + *          - RAM_SHARED: mmap with MAP_SHARED flag
+> + *          Other bits are ignored.
+> + *
+> + * Return:
+> + *  On success, return a pointer to the mapped area.
+> + *  On failure, return MAP_FAILED.
+> + */
+> +void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags);
+>  
+>  void qemu_ram_munmap(void *ptr, size_t size);
+>  
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index fd329ec..8f0a740 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -13,6 +13,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/mmap-alloc.h"
+>  #include "qemu/host-utils.h"
+> +#include "exec/memory.h"
+>  
+>  #define HUGETLBFS_MAGIC       0x958458f6
+>  
+> @@ -75,7 +76,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+>      return getpagesize();
+>  }
+>  
+> -void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+> +void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
+>  {
+>      /*
+>       * Note: this always allocates at least one extra page of virtual address
+> @@ -92,11 +93,12 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+>       * anonymous memory is OK.
+>       */
+>      int anonfd = fd == -1 || qemu_fd_getpagesize(fd) == getpagesize() ? -1 : fd;
+> -    int flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
+> -    void *ptr = mmap(0, total, PROT_NONE, flags | MAP_PRIVATE, anonfd, 0);
+> +    int mmap_flags = anonfd == -1 ? MAP_ANONYMOUS : MAP_NORESERVE;
+> +    void *ptr = mmap(0, total, PROT_NONE, mmap_flags | MAP_PRIVATE, anonfd, 0);
+>  #else
+>      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+>  #endif
+> +    bool shared = flags & RAM_SHARED;
+>      size_t offset;
+>      void *ptr1;
+>  
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index fbd0dc8..75a0171 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -54,6 +54,7 @@
+>  #endif
+>  
+>  #include "qemu/mmap-alloc.h"
+> +#include "exec/memory.h"
+>  
+>  #ifdef CONFIG_DEBUG_STACK_USAGE
+>  #include "qemu/error-report.h"
+> @@ -203,7 +204,13 @@ void *qemu_memalign(size_t alignment, size_t size)
+>  void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
+>  {
+>      size_t align = QEMU_VMALLOC_ALIGN;
+> -    void *ptr = qemu_ram_mmap(-1, size, align, shared);
+> +    uint32_t flags = 0;
+> +    void *ptr;
+> +
+> +    if (shared) {
+> +        flags = RAM_SHARED;
+> +    }
+> +    ptr = qemu_ram_mmap(-1, size, align, flags);
+>  
+>      if (ptr == MAP_FAILED) {
+>          return NULL;
+> -- 
+> 2.7.4
