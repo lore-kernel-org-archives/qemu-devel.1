@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35340)
+Received: from eggs.gnu.org ([209.51.188.92]:35562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjjhf-0007JO-8C
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:49:52 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gjjhp-0007TO-KJ
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjjhT-0007g2-Ol
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:49:48 -0500
-References: <20190116041712.130183-1-aik@ozlabs.ru>
-	<20190116124748.7c64c90e.cohuck@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gjjhn-0008N8-KL
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:01 -0500
+References: <20190111140857.4211-1-philmd@redhat.com>
+	<20190111140857.4211-4-philmd@redhat.com>
+	<875zuqjea7.fsf@dusky.pond.sub.org>
+	<403ad2e4-3282-051c-1ff5-8a3a23899293@redhat.com>
+	<be75e72a-9f54-c9b5-4a1f-e87e28df8ba5@redhat.com>
+	<87sgxtatod.fsf@dusky.pond.sub.org>
+	<4b24723e-5a27-f25f-76c1-f2f4e94757ba@redhat.com>
+	<20190116113455.dyl6uctl4dpaqh6v@sirius.home.kraxel.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <96b377b0-7104-f123-c02d-a93364a3e119@redhat.com>
-Date: Wed, 16 Jan 2019 12:49:33 +0100
+Message-ID: <ad34caf3-5f1f-dffc-4aed-60bb90ba2e5f@redhat.com>
+Date: Wed, 16 Jan 2019 12:49:07 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190116124748.7c64c90e.cohuck@redhat.com>
+In-Reply-To: <20190116113455.dyl6uctl4dpaqh6v@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu 0/2] linux-headers: Update to v5.0-rc2
+Subject: Re: [Qemu-devel] [PATCH 03/15] hw/ssi: Remove SSIBus from
+ "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,23 +31,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 
-On 16/01/19 12:47, Cornelia Huck wrote:
-> On Wed, 16 Jan 2019 15:17:10 +1100
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On 16/01/19 12:34, Gerd Hoffmann wrote:
+>   Hi,
 > 
->> Here is the update script update and what it did to the v5.0-rc2 kernel.
->>
->> This is based on sha1
->> a0a8bff Greg Kurz "target/ppc/kvm: Drop useless include directive".
->>
->> Please comment. Thanks.
+>> typedefs.h is useful to avoid rebuilding the world too often if a type
+>> is used many times as a pointer, but rarely as a struct and rarely has
+>> functions called on its instances.
 > 
-> Hm, Paolo had already posted an update to -rc1 (including an update of
-> the script). Not sure what the status of that one is?
+> Related:  Can also be used to keep struct content private.  struct
+> QemuConsole for example is private to ui/console.c, but pointers to
+> QemuConsole are passed around alot in ui/* and hw/display/* code.
 
-It's queued in my next pull request.
+True, though as we switch more and more from pointers to embedded
+structs that does not work that much anymore.  Another way to do that is
+to split the header in include/path/to/foo.h and path/to/foo_internal.h.
 
 Paolo
