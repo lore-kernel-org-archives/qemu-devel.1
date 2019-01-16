@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47568)
+Received: from eggs.gnu.org ([209.51.188.92]:47740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpze-0003iS-AI
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:51 -0500
+	(envelope-from <wexu@redhat.com>) id 1gjpzl-0003mN-0p
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpzc-00089C-33
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50676)
+	(envelope-from <wexu@redhat.com>) id 1gjpzj-0008Ix-DS
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51802)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gjpzb-00086z-RQ
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:47 -0500
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gjpzj-0008GJ-6c
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:55 -0500
 From: wexu@redhat.com
-Date: Wed, 16 Jan 2019 13:31:19 -0500
-Message-Id: <1547663480-547-15-git-send-email-wexu@redhat.com>
+Date: Wed, 16 Jan 2019 13:31:20 -0500
+Message-Id: <1547663480-547-16-git-send-email-wexu@redhat.com>
 In-Reply-To: <1547663480-547-1-git-send-email-wexu@redhat.com>
 References: <1547663480-547-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel]  [PATCH v2 14/15] vhost: enable packed ring
+Subject: [Qemu-devel] [PATCH v2 15/15] virtio: enable packed ring via a new
+ command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +31,23 @@ From: Wei Xu <wexu@redhat.com>
 
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/net/vhost_net.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/hw/virtio/virtio.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index fb4b18f..f593086 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -53,6 +53,7 @@ static const int kernel_feature_bits[] = {
-     VIRTIO_F_VERSION_1,
-     VIRTIO_NET_F_MTU,
-     VIRTIO_F_IOMMU_PLATFORM,
-+    VIRTIO_F_RING_PACKED,
-     VHOST_INVALID_FEATURE_BIT
- };
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 9c1fa07..cb286bb 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -264,7 +264,9 @@ typedef struct VirtIORNGConf VirtIORNGConf;
+     DEFINE_PROP_BIT64("any_layout", _state, _field, \
+                       VIRTIO_F_ANY_LAYOUT, true), \
+     DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
+-                      VIRTIO_F_IOMMU_PLATFORM, false)
++                      VIRTIO_F_IOMMU_PLATFORM, false), \
++    DEFINE_PROP_BIT64("ring_packed", _state, _field, \
++                      VIRTIO_F_RING_PACKED, false)
  
+ hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
+ hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
 -- 
 1.8.3.1
