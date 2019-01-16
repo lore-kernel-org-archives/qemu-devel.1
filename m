@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56460)
+Received: from eggs.gnu.org ([209.51.188.92]:57551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjjuY-0000BZ-Lo
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:03:12 -0500
+	(envelope-from <prvs=9126ffe88=Paul.Durrant@citrix.com>)
+	id 1gjjvs-00018m-Jm
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:04:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjjuT-0005nL-0S
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:03:10 -0500
-Received: from mail-wr1-f52.google.com ([209.85.221.52]:39295)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gjjuS-0005gl-QH
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:03:04 -0500
-Received: by mail-wr1-f52.google.com with SMTP id t27so6624242wra.6
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 04:03:03 -0800 (PST)
-References: <20190116113751.17177-1-alex.kanavin@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f9b334b5-1c05-9ff2-5666-f37e5e1b1807@redhat.com>
-Date: Wed, 16 Jan 2019 13:03:01 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190116113751.17177-1-alex.kanavin@gmail.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <prvs=9126ffe88=Paul.Durrant@citrix.com>)
+	id 1gjjvZ-0008Cx-15
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:04:19 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Wed, 16 Jan 2019 12:03:42 +0000
+Message-ID: <507850720d604665987131aed1ee47b6@AMSPEX02CL03.citrite.net>
+References: <20190116120041.17095-1-philmd@redhat.com>
+In-Reply-To: <20190116120041.17095-1-philmd@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] egl-helpers.h: do not depend on X11 Window
- type, use EGLNativeWindowType
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] xen: Fix format string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Kanavin <alex.kanavin@gmail.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: =?utf-8?B?J1BoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpJw==?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>, Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>
 
-Cc'ing Gerd again.
-
-$ ./scripts/get_maintainer.pl -f include/ui/egl-helpers.h
-Gerd Hoffmann <kraxel@redhat.com> (odd fixer:Graphics)
-qemu-devel@nongnu.org (open list:All patches CC here)
-
-On 1/16/19 12:37 PM, Alexander Kanavin wrote:
-> It was assumed that mesa provides the necessary X11 includes,
-> but it is not always the case, as it can be configured without x11 support.
-> 
-> Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  include/ui/egl-helpers.h | 2 +-
->  ui/egl-helpers.c         | 4 ++--
->  ui/gtk-egl.c             | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
-> index 9db7293bdb..3fc656a7ba 100644
-> --- a/include/ui/egl-helpers.h
-> +++ b/include/ui/egl-helpers.h
-> @@ -43,7 +43,7 @@ void egl_dmabuf_release_texture(QemuDmaBuf *dmabuf);
->  
->  #endif
->  
-> -EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win);
-> +EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, EGLNativeWindowType win);
->  
->  int qemu_egl_init_dpy_x11(EGLNativeDisplayType dpy, DisplayGLMode mode);
->  int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy, DisplayGLMode mode);
-> diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
-> index 4f475142fc..5e115b3fb4 100644
-> --- a/ui/egl-helpers.c
-> +++ b/ui/egl-helpers.c
-> @@ -273,14 +273,14 @@ void egl_dmabuf_release_texture(QemuDmaBuf *dmabuf)
->  
->  /* ---------------------------------------------------------------------- */
->  
-> -EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win)
-> +EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, EGLNativeWindowType win)
->  {
->      EGLSurface esurface;
->      EGLBoolean b;
->  
->      esurface = eglCreateWindowSurface(qemu_egl_display,
->                                        qemu_egl_config,
-> -                                      (EGLNativeWindowType)win, NULL);
-> +                                      win, NULL);
->      if (esurface == EGL_NO_SURFACE) {
->          error_report("egl: eglCreateWindowSurface failed");
->          return NULL;
-> diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
-> index 5420c2362b..1f9411626a 100644
-> --- a/ui/gtk-egl.c
-> +++ b/ui/gtk-egl.c
-> @@ -54,7 +54,7 @@ void gd_egl_init(VirtualConsole *vc)
->      }
->  
->      vc->gfx.ectx = qemu_egl_init_ctx();
-> -    vc->gfx.esurface = qemu_egl_init_surface_x11(vc->gfx.ectx, x11_window);
-> +    vc->gfx.esurface = qemu_egl_init_surface_x11(vc->gfx.ectx, (EGLNativeWindowType)x11_window);
->  
->      assert(vc->gfx.esurface);
->  }
-> 
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQaGlsaXBwZSBNYXRoaWV1LURh
+dWTDqSBbbWFpbHRvOnBoaWxtZEByZWRoYXQuY29tXQ0KPiBTZW50OiAxNiBKYW51YXJ5IDIwMTkg
+MTI6MDENCj4gVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogUGF1bCBEdXJyYW50IDxQ
+YXVsLkR1cnJhbnRAY2l0cml4LmNvbT47IEFudGhvbnkgUGVyYXJkDQo+IDxhbnRob255LnBlcmFy
+ZEBjaXRyaXguY29tPjsgTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT47IHFlbXUtDQo+IGJs
+b2NrQG5vbmdudS5vcmc7IFN0ZWZhbm8gU3RhYmVsbGluaSA8c3N0YWJlbGxpbmlAa2VybmVsLm9y
+Zz47IHhlbi0NCj4gZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc7IEtldmluIFdvbGYgPGt3b2xm
+QHJlZGhhdC5jb20+OyBQaGlsaXBwZQ0KPiBNYXRoaWV1LURhdWTDqSA8cGhpbG1kQHJlZGhhdC5j
+b20+DQo+IFN1YmplY3Q6IFtQQVRDSF0geGVuOiBGaXggZm9ybWF0IHN0cmluZw0KPiANCj4gVHJp
+dmlhbCBmb3JtYXQgc3RyaW5nIGZpeCB0byBzb2x2ZToNCj4gDQo+ICAgaHcvYmxvY2sveGVuLWJs
+b2NrLmM6IEluIGZ1bmN0aW9uICd4ZW5fYmxvY2tfcmVhbGl6ZSc6DQo+ICAgaHcvYmxvY2sveGVu
+LWJsb2NrLmM6MjE4OjUzOiBlcnJvcjogZm9ybWF0ICclbHUnIGV4cGVjdHMgYXJndW1lbnQgb2YN
+Cj4gdHlwZSAnbG9uZyB1bnNpZ25lZCBpbnQnLCBidXQgYXJndW1lbnQgNCBoYXMgdHlwZSAnaW50
+NjRfdCB7YWthIGxvbmcgbG9uZw0KPiBpbnR9JyBbLVdlcnJvcj1mb3JtYXQ9XQ0KPiAgICAgICB4
+ZW5fZGV2aWNlX2JhY2tlbmRfcHJpbnRmKHhlbmRldiwgInNlY3RvcnMiLCAiJWx1IiwNCj4gICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXg0KPiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJsa19nZXRsZW5ndGgoY29uZi0+YmxrKSAv
+DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uZi0+bG9naWNhbF9ibG9ja19z
+aXplKTsNCj4gDQo+IGJsa19nZXRsZW5ndGgoKSByZXR1cm5zIGFuIGludDY0X3QuDQo+IA0KPiBT
+aWduZWQtb2ZmLWJ5OiBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSA8cGhpbG1kQHJlZGhhdC5jb20+
+DQoNClJldmlld2VkLWJ5OiBQYXVsIER1cnJhbnQgPHBhdWwuZHVycmFudEBjaXRyaXguY29tPg0K
+DQo+IC0tLQ0KPiAgaHcvYmxvY2sveGVuLWJsb2NrLmMgfCAyICstDQo+ICAxIGZpbGUgY2hhbmdl
+ZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ody9i
+bG9jay94ZW4tYmxvY2suYyBiL2h3L2Jsb2NrL3hlbi1ibG9jay5jDQo+IGluZGV4IGJlMjhiNjM0
+NDIuLjNjZjIxNWI3MzAgMTAwNjQ0DQo+IC0tLSBhL2h3L2Jsb2NrL3hlbi1ibG9jay5jDQo+ICsr
+KyBiL2h3L2Jsb2NrL3hlbi1ibG9jay5jDQo+IEBAIC0yMTUsNyArMjE1LDcgQEAgc3RhdGljIHZv
+aWQgeGVuX2Jsb2NrX3JlYWxpemUoWGVuRGV2aWNlICp4ZW5kZXYsIEVycm9yDQo+ICoqZXJycCkN
+Cj4gDQo+ICAgICAgeGVuX2RldmljZV9iYWNrZW5kX3ByaW50Zih4ZW5kZXYsICJzZWN0b3Itc2l6
+ZSIsICIldSIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb25mLT5sb2dpY2Fs
+X2Jsb2NrX3NpemUpOw0KPiAtICAgIHhlbl9kZXZpY2VfYmFja2VuZF9wcmludGYoeGVuZGV2LCAi
+c2VjdG9ycyIsICIlbHUiLA0KPiArICAgIHhlbl9kZXZpY2VfYmFja2VuZF9wcmludGYoeGVuZGV2
+LCAic2VjdG9ycyIsICIlbGxkIiwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJs
+a19nZXRsZW5ndGgoY29uZi0+YmxrKSAvDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBjb25mLT5sb2dpY2FsX2Jsb2NrX3NpemUpOw0KPiANCj4gLS0NCj4gMi4xNy4yDQoNCg==
