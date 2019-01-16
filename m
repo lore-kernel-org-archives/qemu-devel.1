@@ -1,31 +1,38 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45902)
+Received: from eggs.gnu.org ([209.51.188.92]:46230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gjqjq-0001z4-Lm
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:35 -0500
+	(envelope-from <muriloo@linux.ibm.com>) id 1gjqjw-000214-Sr
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gjqjo-00036B-Nh
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:34 -0500
-Received: from mail-eopbgr700131.outbound.protection.outlook.com
-	([40.107.70.131]:50080
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <muriloo@linux.ibm.com>) id 1gjqju-0003Hv-Po
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:40 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57144)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gjqjj-0002vI-4j
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:30 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Wed, 16 Jan 2019 19:20:08 +0000
-Message-ID: <BN6PR2201MB1251F33344A686B376174608C6820@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <cover.1547403692.git.noring@nocrew.org>
-	<781155aaf175ea20903c12e26316ea40085457bb.1547403692.git.noring@nocrew.org>
-	<BN6PR2201MB12516C7D2E235DA81812DDF0C6810@BN6PR2201MB1251.namprd22.prod.outlook.com>,
-	<20190116153654.GA2918@sx9>
-In-Reply-To: <20190116153654.GA2918@sx9>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+	id 1gjqju-0003DN-9C
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:38 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0GJEado020411
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 14:20:36 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q28yqmext-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 14:20:36 -0500
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
+	Wed, 16 Jan 2019 19:20:35 -0000
+Date: Wed, 16 Jan 2019 17:20:25 -0200
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+References: <20190116113523.9213-1-david@redhat.com>
+	<20190116113523.9213-5-david@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/9] target/mips: Require TARGET_MIPS64 for
- R5900 multimedia instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190116113523.9213-5-david@redhat.com>
+Message-Id: <20190116192025.GB27437@kermit-br-ibm-com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC 04/10] virtio-pmem: Prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,84 +41,401 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-> From: Fredrik Noring <noring@nocrew.org>
-> Sent: Wednesday, January 16, 2019 4:36 PM
-> To: Aleksandar Markovic
-> Cc: Aurelien Jarno; Philippe Mathieu-Daud=E9; J=FCrgen Urban; Maciej W. R=
-ozycki; > qemu-devel@nongnu.org
-> Subject: Re: [PATCH 1/9] target/mips: Require TARGET_MIPS64 for R5900 mul=
-timedia instructions
->=20
-> Hi Aleksandar,
->=20
-> > Sorry, I have to disagree with this.
->=20
-> It was, without a doubt, entirely clear that the o32 ABI was going to sta=
-y
-> in after this MMI patch series. In other words, this series does not impl=
-y
-> the removal of o32. This is obvious, as discussed previously, since the o=
-32
-> ABI is currently the main use case for R5900 QEMU and the reason the R590=
-0
-> was implemented for QEMU to begin with.
->=20
+Hi, David.
 
-Fredrik,
+On Wed, Jan 16, 2019 at 12:35:17PM +0100, David Hildenbrand wrote:
+> From: Pankaj Gupta <pagupta@redhat.com>
+>
+> This is the current protoype of virtio-pmem. Support will require
+> machine changes for the architectures that will support it, so it will
+> not yet be compiled.
+>
+> TODO:
+> - Use separate struct for tracking requests internally
+> - Move request/response structs to linux headers
+> - Factor out linux header sync
+> - Drop debug printfs
+>
+> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
+>   split up patches, unplug handler ]
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/virtio/Makefile.objs                     |   2 +
+>  hw/virtio/virtio-pmem.c                     | 189 ++++++++++++++++++++
+>  include/hw/virtio/virtio-pmem.h             |  54 ++++++
+>  include/standard-headers/linux/virtio_ids.h |   1 +
+>  qapi/misc.json                              |  26 ++-
+>  5 files changed, 271 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/virtio/virtio-pmem.c
+>  create mode 100644 include/hw/virtio/virtio-pmem.h
+>
+> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+> index 1b2799cfd8..5463c682f7 100644
+> --- a/hw/virtio/Makefile.objs
+> +++ b/hw/virtio/Makefile.objs
+> @@ -9,6 +9,8 @@ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+>  obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+>  obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+>
+> +obj-$(CONFIG_VIRTIO_PMEM) += virtio-pmem.o
+> +
+>  obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+>  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+>  endif
+> diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
+> new file mode 100644
+> index 0000000000..6fb78acf87
+> --- /dev/null
+> +++ b/hw/virtio/virtio-pmem.c
+> @@ -0,0 +1,189 @@
+> +/*
+> + * Virtio PMEM device
+> + *
+> + * Copyright (C) 2018 Red Hat, Inc.
+> + *
+> + * Authors:
+> + *  Pankaj Gupta <pagupta@redhat.com>
+> + *  David Hildenbrand <david@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/virtio/virtio-pmem.h"
+> +#include "hw/virtio/virtio-access.h"
+> +#include "standard-headers/linux/virtio_ids.h"
+> +#include "block/aio.h"
+> +#include "block/thread-pool.h"
+> +
+> +typedef struct VirtIOPMEMresp {
+> +    int ret;
+> +} VirtIOPMEMResp;
+> +
+> +typedef struct VirtIODeviceRequest {
+> +    VirtQueueElement elem;
+> +    int fd;
+> +    VirtIOPMEM *pmem;
+> +    VirtIOPMEMResp resp;
+> +} VirtIODeviceRequest;
+> +
+> +static int worker_cb(void *opaque)
+> +{
+> +    VirtIODeviceRequest *req = opaque;
+> +    int err = 0;
+> +
+> +    printf("\n performing flush ...");
+> +    /* flush raw backing image */
+> +    err = fsync(req->fd);
+> +    printf("\n performed flush ...:errcode::%d", err);
+> +    if (err != 0) {
+> +        err = EIO;
+> +    }
+> +    req->resp.ret = err;
+> +
+> +    return 0;
+> +}
+> +
+> +static void done_cb(void *opaque, int ret)
+> +{
+> +    VirtIODeviceRequest *req = opaque;
+> +    int len = iov_from_buf(req->elem.in_sg, req->elem.in_num, 0,
+> +                              &req->resp, sizeof(VirtIOPMEMResp));
+> +
+> +    /* Callbacks are serialized, so no need to use atomic ops. */
+> +    virtqueue_push(req->pmem->rq_vq, &req->elem, len);
+> +    virtio_notify((VirtIODevice *)req->pmem, req->pmem->rq_vq);
+> +    g_free(req);
+> +}
+> +
+> +static void virtio_pmem_flush(VirtIODevice *vdev, VirtQueue *vq)
+> +{
+> +    VirtIODeviceRequest *req;
+> +    VirtIOPMEM *pmem = VIRTIO_PMEM(vdev);
+> +    HostMemoryBackend *backend = MEMORY_BACKEND(pmem->memdev);
+> +    ThreadPool *pool = aio_get_thread_pool(qemu_get_aio_context());
+> +
+> +    req = virtqueue_pop(vq, sizeof(VirtIODeviceRequest));
+> +    if (!req) {
+> +        virtio_error(vdev, "virtio-pmem missing request data");
+> +        return;
+> +    }
+> +
+> +    if (req->elem.out_num < 1 || req->elem.in_num < 1) {
+> +        virtio_error(vdev, "virtio-pmem request not proper");
+> +        g_free(req);
+> +        return;
+> +    }
+> +    req->fd = memory_region_get_fd(&backend->mr);
+> +    req->pmem = pmem;
+> +    thread_pool_submit_aio(pool, worker_cb, req, done_cb, req);
+> +}
+> +
+> +static void virtio_pmem_get_config(VirtIODevice *vdev, uint8_t *config)
+> +{
+> +    VirtIOPMEM *pmem = VIRTIO_PMEM(vdev);
+> +    struct virtio_pmem_config *pmemcfg = (struct virtio_pmem_config *) config;
+> +
+> +    virtio_stq_p(vdev, &pmemcfg->start, pmem->start);
+> +    virtio_stq_p(vdev, &pmemcfg->size, memory_region_size(&pmem->memdev->mr));
+> +}
+> +
+> +static uint64_t virtio_pmem_get_features(VirtIODevice *vdev, uint64_t features,
+> +                                        Error **errp)
+> +{
+> +    return features;
+> +}
+> +
+> +static void virtio_pmem_realize(DeviceState *dev, Error **errp)
+> +{
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> +    VirtIOPMEM *pmem = VIRTIO_PMEM(dev);
+> +
+> +    if (!pmem->memdev) {
+> +        error_setg(errp, "virtio-pmem memdev not set");
+> +        return;
+> +    } else if (host_memory_backend_is_mapped(pmem->memdev)) {
+> +        char *path = object_get_canonical_path_component(OBJECT(pmem->memdev));
+> +        error_setg(errp, "can't use already busy memdev: %s", path);
+> +        g_free(path);
+> +        return;
+> +    }
 
-Modeling a 64-bit processor as a 32-bit one should not be a part of QEMU
-upstream.
+Perhaps splitting this if-else block could improve readability:
 
-Thanks for your efforts so far,
-Aleksandar
+    if (!pmem->memdev) {
+        error_setg(...);
+	return;
+    }
 
-> > Processor model must stay the same, and
-> > Linux ABI should not affect, for example, the number and size of proces=
-sor
-> > registers - just like it is the case in reality.
->=20
-> I thought Maciej's reply to you was quite clear on this topic?
->=20
-> > QEMU is an independent software tool - it is for example, a compiler-ag=
-nostic
-> > tool, and the only connection between a compiler and QEMU is the proces=
-sor
-> > documentation - and this is the reason they work together so well. They=
- shouldn't
-> > be "tweaked" and "integrated" to work together - both QEMU and compiler=
- should
-> > rely only on the processor specification, and should not know anything =
-about the
-> > other side.
->=20
-> The approach was to implement ABIs and instructions that are actually use=
-d,
-> and leave unused or optional instructions for later. The reverse, removin=
-g
-> ABIs in-use (o32) and focusing on unused instructions (MMIs) does not mak=
-e
-> sense, so I will obviously not do that.
->=20
-> > My advice for you is to focus on n32 at the time being.
-> >
-> > o32 can be implemented with the same 64-bit processor model, but in a m=
-uch
-> > different way that you attempted some time ago. To avoid waste of our e=
-nergy
-> > and time, I am suggesting that we finish n32, and think of o32 in futur=
-e.
->=20
-> The o32 ABI is more important than n32 now, because o32 is in-use and
-> ready with Glibc, GCC, GAS and the Linux kernel. n32 is easy to enable
-> with a three-line patch, so we can actually use both now.
->=20
-> I recommend that we implement limited support for MMIs for n32 and
-> eventually system mode, and leave it as unsupported for o32 for the time
-> being. [ Perhaps MMIs for o32 could be implemented with 96-bit registers,
-> in contrast to the 64-bit registers for n32, but having LW and LQ without
-> LD seems strange to me. ]
->=20
-> Fredrik
+    if (host_memory_backend_is_mapped(pmem->memdev)) {
+       /* do stuff */
+       return;
+    }
+
+    /* do other stuffs */
+
+> +
+> +    host_memory_backend_set_mapped(pmem->memdev, true);
+> +    virtio_init(vdev, TYPE_VIRTIO_PMEM, VIRTIO_ID_PMEM,
+> +                                          sizeof(struct virtio_pmem_config));
+
+I'm not quite sure what's the QEMU style for indenting this.  There
+are, for example, calls to warn_report() in other source files that
+are indented at the left side after the opening parenthesis.
+
+Perhaps indenting it like this is preferable?
+
+    virtio_init(vdev, TYPE_VIRTIO_PMEM, VIRTIO_ID_PMEM,
+                sizeof(struct virtio_pmem_config));
+
+> +    pmem->rq_vq = virtio_add_queue(vdev, 128, virtio_pmem_flush);
+> +}
+> +
+> +static void virtio_pmem_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> +    VirtIOPMEM *pmem = VIRTIO_PMEM(dev);
+> +
+> +    host_memory_backend_set_mapped(pmem->memdev, false);
+> +    pmem->rq_vq = virtio_add_queue(vdev, 128, virtio_pmem_flush);
+> +    virtio_cleanup(vdev);
+> +}
+> +
+> +static void virtio_pmem_fill_device_info(const VirtIOPMEM *pmem,
+> +                                         VirtioPMEMDeviceInfo *vi)
+> +{
+> +    vi->memaddr = pmem->start;
+> +    vi->size = pmem->memdev ? memory_region_size(&pmem->memdev->mr) : 0;
+> +    vi->memdev = object_get_canonical_path(OBJECT(pmem->memdev));
+> +}
+> +
+> +static MemoryRegion *virtio_pmem_get_memory_region(VirtIOPMEM *pmem,
+> +                                                   Error **errp)
+> +{
+> +    if (!pmem->memdev) {
+> +        error_setg(errp, "'%s' property must be set", VIRTIO_PMEM_MEMDEV_PROP);
+> +        return NULL;
+> +    }
+> +
+> +    return &pmem->memdev->mr;
+> +}
+> +
+> +static Property virtio_pmem_properties[] = {
+> +    DEFINE_PROP_UINT64(VIRTIO_PMEM_ADDR_PROP, VirtIOPMEM, start, 0),
+> +    DEFINE_PROP_LINK(VIRTIO_PMEM_MEMDEV_PROP, VirtIOPMEM, memdev,
+> +                     TYPE_MEMORY_BACKEND, HostMemoryBackend *),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void virtio_pmem_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
+> +    VirtIOPMEMClass *vpc = VIRTIO_PMEM_CLASS(klass);
+> +
+> +    dc->props = virtio_pmem_properties;
+> +
+> +    vdc->realize = virtio_pmem_realize;
+> +    vdc->unrealize = virtio_pmem_unrealize;
+> +    vdc->get_config = virtio_pmem_get_config;
+> +    vdc->get_features = virtio_pmem_get_features;
+> +
+> +    vpc->fill_device_info = virtio_pmem_fill_device_info;
+> +    vpc->get_memory_region = virtio_pmem_get_memory_region;
+> +}
+> +
+> +static TypeInfo virtio_pmem_info = {
+> +    .name          = TYPE_VIRTIO_PMEM,
+> +    .parent        = TYPE_VIRTIO_DEVICE,
+> +    .class_size    = sizeof(VirtIOPMEMClass),
+> +    .class_init    = virtio_pmem_class_init,
+> +    .instance_size = sizeof(VirtIOPMEM),
+> +};
+> +
+> +static void virtio_register_types(void)
+> +{
+> +    type_register_static(&virtio_pmem_info);
+> +}
+> +
+> +type_init(virtio_register_types)
+> diff --git a/include/hw/virtio/virtio-pmem.h b/include/hw/virtio/virtio-pmem.h
+> new file mode 100644
+> index 0000000000..85cee3ef39
+> --- /dev/null
+> +++ b/include/hw/virtio/virtio-pmem.h
+> @@ -0,0 +1,54 @@
+> +/*
+> + * Virtio pmem device
+
+What if "pmem" was in upper case to match the header in virtio-pmem.c?
+
+> + *
+> + * Copyright Red Hat, Inc. 2018
+
+This is slightly different from what is in virtio-pmem.c header.
+Perhaps "(C)" is missing here.
+
+> + *
+> + * Authors:
+> + *  Pankaj Gupta <pagupta@redhat.com>
+> + *  David Hildenbrand <david@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef HW_VIRTIO_PMEM_H
+> +#define HW_VIRTIO_PMEM_H
+> +
+> +#include "hw/virtio/virtio.h"
+> +#include "sysemu/hostmem.h"
+> +
+> +#define TYPE_VIRTIO_PMEM "virtio-pmem"
+> +
+> +#define VIRTIO_PMEM(obj) \
+> +        OBJECT_CHECK(VirtIOPMEM, (obj), TYPE_VIRTIO_PMEM)
+
+This indentation is slightly different from the other two macros
+below.
+
+> +#define VIRTIO_PMEM_CLASS(oc) \
+> +    OBJECT_CLASS_CHECK(VirtIOPMEMClass, (oc), TYPE_VIRTIO_PMEM)
+> +#define VIRTIO_PMEM_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(VirtIOPMEMClass, (obj), TYPE_VIRTIO_PMEM)
+> +
+> +#define VIRTIO_PMEM_ADDR_PROP "memaddr"
+> +#define VIRTIO_PMEM_MEMDEV_PROP "memdev"
+> +
+> +typedef struct VirtIOPMEM {
+> +    VirtIODevice parent_obj;
+> +
+> +    VirtQueue *rq_vq;
+> +    uint64_t start;
+> +    HostMemoryBackend *memdev;
+> +} VirtIOPMEM;
+> +
+> +typedef struct VirtIOPMEMClass {
+> +    /* private */
+> +    VirtIODevice parent;
+> +
+> +    /* public */
+> +    void (*fill_device_info)(const VirtIOPMEM *pmem, VirtioPMEMDeviceInfo *vi);
+> +    MemoryRegion *(*get_memory_region)(VirtIOPMEM *pmem, Error **errp);
+> +} VirtIOPMEMClass;
+> +
+> +struct virtio_pmem_config {
+> +    uint64_t start;
+> +    uint64_t size;
+> +};
+> +
+> +#endif
+> diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
+> index 6d5c3b2d4f..346389565a 100644
+> --- a/include/standard-headers/linux/virtio_ids.h
+> +++ b/include/standard-headers/linux/virtio_ids.h
+> @@ -43,5 +43,6 @@
+>  #define VIRTIO_ID_INPUT        18 /* virtio input */
+>  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+>  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> +#define VIRTIO_ID_PMEM         25 /* virtio pmem */
+>
+>  #endif /* _LINUX_VIRTIO_IDS_H */
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 24d20a880a..8ae709636d 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -2949,6 +2949,29 @@
+>            }
+>  }
+>
+> +##
+> +# @VirtioPMEMDeviceInfo:
+> +#
+> +# VirtioPMEM state information
+> +#
+> +# @id: device's ID
+> +#
+> +# @memaddr: physical address in memory, where device is mapped
+> +#
+> +# @size: size of memory that the device provides
+> +#
+> +# @memdev: memory backend linked with device
+> +#
+> +# Since: 3.1
+> +##
+> +{ 'struct': 'VirtioPMEMDeviceInfo',
+> +  'data': { '*id': 'str',
+> +            'memaddr': 'size',
+> +            'size': 'size',
+> +            'memdev': 'str'
+> +          }
+> +}
+> +
+>  ##
+>  # @MemoryDeviceInfo:
+>  #
+> @@ -2958,7 +2981,8 @@
+>  ##
+>  { 'union': 'MemoryDeviceInfo',
+>    'data': { 'dimm': 'PCDIMMDeviceInfo',
+> -            'nvdimm': 'PCDIMMDeviceInfo'
+> +            'nvdimm': 'PCDIMMDeviceInfo',
+> +            'virtio-pmem': 'VirtioPMEMDeviceInfo'
+>            }
+>  }
+>
+> --
+> 2.17.2
+>
+>
+
+--
+Murilo
