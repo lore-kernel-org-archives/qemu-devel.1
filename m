@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58545)
+Received: from eggs.gnu.org ([209.51.188.92]:59397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjo3N-0004ae-Hn
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:28:34 -0500
+	(envelope-from <abologna@redhat.com>) id 1gjo5R-0005X4-FX
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:30:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjo3K-00039S-BV
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:28:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:3451)
+	(envelope-from <abologna@redhat.com>) id 1gjo5P-0003xX-IM
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:30:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41106)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjo3C-000372-FY
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:28:26 -0500
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-21-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1f588c8c-7900-42ba-6b9e-c69987748d00@redhat.com>
-Date: Wed, 16 Jan 2019 17:28:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <20190115141108.934-21-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 20/37] build: switch to Kconfig
+	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gjo5P-0003tz-CL
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:30:39 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 92D26811D6
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 16:24:10 +0000 (UTC)
+Message-ID: <a85c6b3f384fc82c7d5d2debf8c7ad0eedcbb657.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Wed, 16 Jan 2019 17:24:02 +0100
+In-Reply-To: <20190116154042.GA20275@redhat.com>
+References: <cover.1547420060.git.crobinso@redhat.com>
+	<1ac81ba920b03d153f80236fea5aa81321e054fa.1547420060.git.crobinso@redhat.com>
+	<20190115165614.GL16157@redhat.com>
+	<624086124c9a2673c627203f3310fd63495e00c0.camel@redhat.com>
+	<20190116113953.GO20275@redhat.com>
+	<d3fd5d3bf9a6823b24756b4f376e20903ac1a575.camel@redhat.com>
+	<20190116124445.GS20275@redhat.com>
+	<2b4954e50ad51e7b3bdaf6b7b183254e2a1cd70d.camel@redhat.com>
+	<20190116143722.GY20275@redhat.com>
+	<20190116144543.GA14807@habkost.net>
+	<20190116154042.GA20275@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 4/6] qemu: Wire up disk
+ model=virtio-{non-}transitional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +43,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
+To: "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Cole Robinson <crobinso@redhat.com>, libvirt-list@redhat.com, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 2019-01-15 15:10, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> The make_device_config.sh script is replaced by minikconf, which
-> is modified to support the same command line as its predecessor.
-> 
-> The roots of the parsing are default-configs/*.mak, Kconfig.host and
-> hw/Kconfig.  One difference with make_device_config.sh is that all symbols
-> have to be defined in a Kconfig file, including those coming from the
-> configure script.  This is the reason for the Kconfig.host file introduced
-> in the previous patch. Whenever a file in default-configs/*.mak used
-> $(...) to refer to a config-host.mak symbol, this is replaced by a
-> Kconfig dependency.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  Kconfig.host                     |  3 ++-
->  Makefile                         | 14 +++++++++++--
->  Makefile.target                  |  7 ++++++-
->  default-configs/i386-softmmu.mak |  3 ---
->  hw/display/Kconfig               |  2 ++
->  hw/i386/Kconfig                  |  6 ++++++
->  hw/intc/Kconfig                  |  8 ++++++++
->  hw/misc/Kconfig                  |  2 ++
->  hw/tpm/Kconfig                   |  1 +
->  rules.mak                        |  2 +-
->  scripts/make_device_config.sh    | 30 ---------------------------
->  scripts/minikconf.py             | 35 +++++++++++++++++++++++++++++---
->  12 files changed, 72 insertions(+), 41 deletions(-)
->  delete mode 100644 scripts/make_device_config.sh
-> 
-> diff --git a/Kconfig.host b/Kconfig.host
-> index 2136a4c3ec..d7f503d0ca 100644
-> --- a/Kconfig.host
-> +++ b/Kconfig.host
-> @@ -1,5 +1,6 @@
->  # These are "proxy" symbols used to pass config-host.mak values
-> -# down to Kconfig.
-> +# down to Kconfig.  See also MINIKCONF_ARGS in the Makefile:
-> +# these two need to be kept in sync.
->  
->  config KVM
->      bool
-> diff --git a/Makefile b/Makefile
-> index a9ac16d94e..01e7c60a0d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -326,9 +326,19 @@ endif
->  
->  -include $(SUBDIR_DEVICES_MAK_DEP)
->  
-> -%/config-devices.mak: default-configs/%.mak $(SRC_PATH)/scripts/make_device_config.sh
-> +# This has to be kept in sync with Kconfig.host.
-> +MINIKCONF_ARGS = \
-> +    CONFIG_KVM=$(CONFIG_KVM) \
-> +    CONFIG_SPICE=$(CONFIG_SPICE) \
-> +    CONFIG_TPM=$(CONFIG_TPM) \
-> +    CONFIG_XEN=$(CONFIG_XEN) \
-> +    CONFIG_OPENGL=$(CONFIG_OPENGL)
-> +
-> +MINIKCONF = $(SHELL) $(SRC_PATH)/scripts/minikconf.sh
-> +
-> +%/config-devices.mak: default-configs/%-softmmu.mak Kconfig.host hw/Kconfig
->  	$(call quiet-command, \
-> -            $(SHELL) $(SRC_PATH)/scripts/make_device_config.sh $< $*-config-devices.mak.d $@ > $@.tmp,"GEN","$@.tmp")
-> +            $(MINIKCONF) $@ $*-config-devices.mak.d $^ $(MINIKCONF_ARGS) > $@.tmp, "  GEN   $@.tmp")
+On Wed, 2019-01-16 at 15:40 +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Jan 16, 2019 at 12:45:43PM -0200, Eduardo Habkost wrote:
+> > But I don't want to create unnecessary obstacles for libvirt, so
+> > if there's a real benefit in promising compatibility between both
+> > device types, we can still promise that on the QEMU side.
+>=20
+> I don't think there's an obstacle for libvirt, as I don't see any
+> compelling reason to avoid the new devices when we have QEMU >=3D 4.0.
 
-Looks like CONFIG_KVM now shows up in all config-devices.mak files ...
-that won't work when the target CPU does not match the host CPU, I think
-we need some additional logic here...?
+Alright, let's do it that way then.
 
- Thomas
+I still think it's important to maintain the relationship between
+old and new devices consistent going forward, because not doing so
+will certainly result in confusion for those using QEMU directly.
+
+--=20
+Andrea Bolognani / Red Hat / Virtualization
