@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36161)
+Received: from eggs.gnu.org ([209.51.188.92]:40985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjlq5-0004Ul-AD
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:06:42 -0500
+	(envelope-from <bounces@canonical.com>) id 1gjluF-0006w5-Ak
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:11:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjlq2-00023f-Ai
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:06:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46348)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjlq1-0001yB-W5
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:06:38 -0500
-From: Thomas Huth <thuth@redhat.com>
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-20-yang.zhong@intel.com>
-	<8c5e79dd-b177-44fb-4a3d-7aa55216d13d@redhat.com>
-Message-ID: <75ae9c60-de5f-3e69-f8af-94f3bc8d1db7@redhat.com>
-Date: Wed, 16 Jan 2019 15:06:33 +0100
+	(envelope-from <bounces@canonical.com>) id 1gjluE-0007D0-9z
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:10:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53234)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gjluE-00079S-3q
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:10:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gjluC-00042o-4u
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 14:10:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 23B1F2E807B
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 14:10:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <8c5e79dd-b177-44fb-4a3d-7aa55216d13d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 19/37] kconfig: introduce kconfig
- files
+Date: Wed, 16 Jan 2019 14:05:09 -0000
+From: Daniel Berrange <1811711@bugs.launchpad.net>
+Reply-To: Bug 1811711 <1811711@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154748542167.20943.17238616375041067992.malonedeb@soybean.canonical.com>
+Message-Id: <154764750951.20531.7649130112887723631.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1811711] Re: qemu-img can not convert virtualbox
+ virtual disk formats qcow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,256 +37,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
-On 2019-01-16 11:44, Thomas Huth wrote:
-> On 2019-01-15 15:10, Yang Zhong wrote:
->> From: Paolo Bonzini <pbonzini@redhat.com>
->>
->> The Kconfig files were generated mostly with this script:
->>
->>   for i in `grep -ho CONFIG_[A-Z0-9_]* default-configs/* | sort -u`; d=
-o
->>     set fnord `git grep -lw $i -- 'hw/*/Makefile.objs' `
->>     shift
->>     if test $# =3D 1; then
->>       cat >> $(dirname $1)/Kconfig << EOF
->> config ${i#CONFIG_}
->>     bool
->>
->> EOF
->>       git add $(dirname $1)/Kconfig
->>     else
->>       echo $i $*
->>     fi
->>   done
->>   sed -i '$d' hw/*/Kconfig
->>   for i in hw/*; do
->>     if test -d $i && ! test -f $i/Kconfig; then
->>       touch $i/Kconfig
->>       git add $i/Kconfig
->>     fi
->>   done
->>
->> Whenever a symbol is referenced from multiple subdirectories, the
->> script prints the list of directories that reference the symbol.
->> These symbols have to be added manually to the Kconfig files.
->>
->> Kconfig.host and hw/Kconfig were created manually.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
->> ---
->>  Kconfig.host          | 17 ++++++++
->>  hw/9pfs/Kconfig       |  2 +
->>  hw/Kconfig            | 60 ++++++++++++++++++++++++++
->>  hw/acpi/Kconfig       | 23 ++++++++++
->>  hw/adc/Kconfig        |  2 +
->>  hw/arm/Kconfig        | 98 ++++++++++++++++++++++++++++++++++++++++++=
-+
->>  hw/audio/Kconfig      | 35 ++++++++++++++++
->>  hw/block/Kconfig      | 29 +++++++++++++
->>  hw/bt/Kconfig         |  2 +
->>  hw/char/Kconfig       | 32 ++++++++++++++
->>  hw/core/Kconfig       | 11 +++++
->>  hw/cpu/Kconfig        |  8 ++++
->>  hw/display/Kconfig    | 77 ++++++++++++++++++++++++++++++++++
->>  hw/dma/Kconfig        | 20 +++++++++
->>  hw/gpio/Kconfig       |  8 ++++
->>  hw/hyperv/Kconfig     |  5 +++
->>  hw/i2c/Kconfig        | 20 +++++++++
->>  hw/i386/Kconfig       | 23 ++++++++++
->>  hw/ide/Kconfig        | 35 ++++++++++++++++
->>  hw/input/Kconfig      | 23 ++++++++++
->>  hw/intc/Kconfig       | 47 +++++++++++++++++++++
->>  hw/ipack/Kconfig      |  2 +
->>  hw/ipmi/Kconfig       | 14 +++++++
->>  hw/isa/Kconfig        | 23 ++++++++++
->>  hw/lm32/Kconfig       |  5 +++
->>  hw/m68k/Kconfig       |  8 ++++
->>  hw/mem/Kconfig        |  8 ++++
->>  hw/microblaze/Kconfig |  8 ++++
->>  hw/mips/Kconfig       | 20 +++++++++
->>  hw/misc/Kconfig       | 92 ++++++++++++++++++++++++++++++++++++++++
->>  hw/misc/macio/Kconfig | 11 +++++
->>  hw/net/Kconfig        | 92 ++++++++++++++++++++++++++++++++++++++++
->>  hw/nios2/Kconfig      |  2 +
->>  hw/nvram/Kconfig      |  8 ++++
->>  hw/pci-bridge/Kconfig | 20 +++++++++
->>  hw/pci-host/Kconfig   | 35 ++++++++++++++++
->>  hw/pci/Kconfig        |  2 +
->>  hw/pcmcia/Kconfig     |  2 +
->>  hw/ppc/Kconfig        | 38 +++++++++++++++++
->>  hw/riscv/Kconfig      | 14 +++++++
->>  hw/scsi/Kconfig       | 26 ++++++++++++
->>  hw/sd/Kconfig         | 11 +++++
->>  hw/sh4/Kconfig        |  8 ++++
->>  hw/smbios/Kconfig     |  2 +
->>  hw/sparc/Kconfig      |  5 +++
->>  hw/sparc64/Kconfig    |  5 +++
->>  hw/ssi/Kconfig        | 14 +++++++
->>  hw/timer/Kconfig      | 53 +++++++++++++++++++++++
->>  hw/tpm/Kconfig        | 14 +++++++
->>  hw/usb/Kconfig        | 53 +++++++++++++++++++++++
->>  hw/vfio/Kconfig       | 11 +++++
->>  hw/virtio/Kconfig     | 17 ++++++++
->>  hw/watchdog/Kconfig   | 11 +++++
->>  hw/xtensa/Kconfig     |  5 +++
->>  54 files changed, 1216 insertions(+)
->>  create mode 100644 Kconfig.host
->>  create mode 100644 hw/9pfs/Kconfig
->>  create mode 100644 hw/Kconfig
->>  create mode 100644 hw/acpi/Kconfig
->>  create mode 100644 hw/adc/Kconfig
->>  create mode 100644 hw/arm/Kconfig
->>  create mode 100644 hw/audio/Kconfig
->>  create mode 100644 hw/block/Kconfig
->>  create mode 100644 hw/bt/Kconfig
->>  create mode 100644 hw/char/Kconfig
->>  create mode 100644 hw/core/Kconfig
->>  create mode 100644 hw/cpu/Kconfig
->>  create mode 100644 hw/display/Kconfig
->>  create mode 100644 hw/dma/Kconfig
->>  create mode 100644 hw/gpio/Kconfig
->>  create mode 100644 hw/hyperv/Kconfig
->>  create mode 100644 hw/i2c/Kconfig
->>  create mode 100644 hw/i386/Kconfig
->>  create mode 100644 hw/ide/Kconfig
->>  create mode 100644 hw/input/Kconfig
->>  create mode 100644 hw/intc/Kconfig
->>  create mode 100644 hw/ipack/Kconfig
->>  create mode 100644 hw/ipmi/Kconfig
->>  create mode 100644 hw/isa/Kconfig
->>  create mode 100644 hw/lm32/Kconfig
->>  create mode 100644 hw/m68k/Kconfig
->>  create mode 100644 hw/mem/Kconfig
->>  create mode 100644 hw/microblaze/Kconfig
->>  create mode 100644 hw/mips/Kconfig
->>  create mode 100644 hw/misc/Kconfig
->>  create mode 100644 hw/misc/macio/Kconfig
->>  create mode 100644 hw/net/Kconfig
->>  create mode 100644 hw/nios2/Kconfig
->>  create mode 100644 hw/nvram/Kconfig
->>  create mode 100644 hw/pci-bridge/Kconfig
->>  create mode 100644 hw/pci-host/Kconfig
->>  create mode 100644 hw/pci/Kconfig
->>  create mode 100644 hw/pcmcia/Kconfig
->>  create mode 100644 hw/ppc/Kconfig
->>  create mode 100644 hw/riscv/Kconfig
->>  create mode 100644 hw/scsi/Kconfig
->>  create mode 100644 hw/sd/Kconfig
->>  create mode 100644 hw/sh4/Kconfig
->>  create mode 100644 hw/smbios/Kconfig
->>  create mode 100644 hw/sparc/Kconfig
->>  create mode 100644 hw/sparc64/Kconfig
->>  create mode 100644 hw/ssi/Kconfig
->>  create mode 100644 hw/timer/Kconfig
->>  create mode 100644 hw/tpm/Kconfig
->>  create mode 100644 hw/usb/Kconfig
->>  create mode 100644 hw/vfio/Kconfig
->>  create mode 100644 hw/virtio/Kconfig
->>  create mode 100644 hw/watchdog/Kconfig
->>  create mode 100644 hw/xtensa/Kconfig
->>
->> diff --git a/Kconfig.host b/Kconfig.host
->> new file mode 100644
->> index 0000000000..2136a4c3ec
->> --- /dev/null
->> +++ b/Kconfig.host
->> @@ -0,0 +1,17 @@
->> +# These are "proxy" symbols used to pass config-host.mak values
->> +# down to Kconfig.
->> +
->> +config KVM
->> +    bool
->> +
->> +config OPENGL
->> +    bool
->> +
->> +config SPICE
->> +    bool
->> +
->> +config TPM
->> +    bool
->> +
->> +config XEN
->> +    bool
->> diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
->> new file mode 100644
->> index 0000000000..a4750999d9
->> --- /dev/null
->> +++ b/hw/9pfs/Kconfig
->> @@ -0,0 +1,2 @@
->> +config VIRTIO_9P
->> +    bool
->> diff --git a/hw/Kconfig b/hw/Kconfig
->> new file mode 100644
->> index 0000000000..55743a958a
->> --- /dev/null
->> +++ b/hw/Kconfig
->> @@ -0,0 +1,60 @@
->> +# devices Kconfig
->> +source 9pfs/Kconfig
->> +source acpi/Kconfig
->> +source audio/Kconfig
->> +source block/Kconfig
->> +source bt/Kconfig
->> +source char/Kconfig
->> +source core/Kconfig
->> +source display/Kconfig
->> +source dma/Kconfig
->> +source gpio/Kconfig
->> +source i2c/Kconfig
->> +source ide/Kconfig
->> +source input/Kconfig
->> +source intc/Kconfig
->> +source ipack/Kconfig
->> +source isa/Kconfig
->> +source mem/Kconfig
->> +source misc/Kconfig
->> +source net/Kconfig
->> +source nvram/Kconfig
->> +source pci-bridge/Kconfig
->> +source pci-host/Kconfig
->> +source pci/Kconfig
->> +source scsi/Kconfig
->> +source sd/Kconfig
->> +source ssi/Kconfig
->> +source timer/Kconfig
->> +source tpm/Kconfig
->> +source usb/Kconfig
->> +source virtio/Kconfig
->> +source watchdog/Kconfig
->> +source smbios/Kconfig
->> +source ipmi/Kconfig
->> +source vfio/Kconfig
->> +source adc/Kconfig
->> +source pcmcia/Kconfig
->> +source hyperv/Kconfig
->=20
-> Could you please sort the last 5 entries alphabetically into the list?
->=20
->> +# arch Kconfig
->> +source i386/Kconfig
->> +source arm/Kconfig
->> +source m68k/Kconfig
->> +source microblaze/Kconfig
->> +source mips/Kconfig
->> +source ppc/Kconfig
->> +source sh4/Kconfig
->> +source sparc/Kconfig
->> +source sparc64/Kconfig
->> +source lm32/Kconfig
->> +source xtensa/Kconfig
->> +source nios2/Kconfig
->> +source riscv/Kconfig
->=20
-> dito, please sort last 4 entries alphabetically into the list.
->=20
-> Apart from that, patch looks good to me.
+This bug was related to an IRC discussion on Jan 14th but this bug
+description is not showing the problem that was raised on IRC. The IRC
+discussion showed a source image with a 9GB Windows 10 installation,
+turning into an image with only 8 MB of data present.  The images in
+this bug description don't have any data written so are not illustrating
+the data conversion issue.
 
-FWIW, looks like we still need alpha/Kconfig, cris/Kconfig,
-hppa/Kconfig, unicore32/Kconfig, tricore/Kconfig and xtensa/Kconfig ?
+-- =
 
- Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1811711
+
+Title:
+  qemu-img can not convert virtualbox virtual disk formats qcow
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello, I'm working with QEMU on macOS, and am experiencing issues
+  working with the `qemu-img` command.
+
+  Info
+  ----
+  $ sw_vers
+  ProductName:    Mac OS X
+  ProductVersion: 10.13.6
+  BuildVersion:   17G4015
+
+  VirtualBox
+  ----------
+  $ VBoxManage --version
+  6.0.0r127566
+
+  $ qemu-system-x86_64 --version
+  QEMU emulator version 3.1.50 (v3.1.0-rc2-745-g147923b1a9-dirty)
+  Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
+
+  $ qemu-img --version
+  qemu-img version 3.1.50 (v3.1.0-rc2-745-g147923b1a9-dirty)
+  Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
+
+  Steps to reproduce
+  ------------------
+
+  > Prereq VirtualBox needs to be installed to run the `VBoxManage`
+  command
+
+  $ VBoxManage createmedium disk --filename vbox-vdisk-exp.qcow --format qc=
+ow --size 5
+  0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+  Medium created. UUID: e2b36955-3791-4c0e-93d4-913669b1d9fb
+
+  $ file vbox-vdisk-exp.qcow
+  vbox-vdisk-exp.qcow: QEMU QCOW Image (v1), 5242880 bytes
+
+  $ qemu-img info vbox-vdisk-exp.qcow
+  image: vbox-vdisk-exp.qcow
+  file format: qcow
+  virtual size: 5.0M (5242880 bytes)
+  disk size: 8.0K
+  cluster_size: 4096
+
+  # Convert vbox virtualdisk to qcow2 format using `qemu-img`
+  $ qemu-img convert -f qcow vbox-vdisk-exp.qcow -O qcow2 vbox-vdisk-exp-co=
+nvert.qcow2
+
+  $ file vbox-vdisk-exp-convert.qcow2
+  vbox-vdisk-exp-convert.qcow2: QEMU QCOW Image (v3), 5242880 bytes
+
+  # Print info about qemu-img converted image from vbox created qcow image
+  $ qemu-img info vbox-vdisk-exp-convert.qcow2                             =
+                      mutts-6 | 0 < 10:53:00
+  image: vbox-vdisk-exp-convert.qcow2
+  file format: qcow2
+  virtual size: 5.0M (5242880 bytes)
+  disk size: 196K
+  cluster_size: 65536
+  Format specific information:
+      compat: 1.1
+      lazy refcounts: false
+      refcount bits: 16
+      corrupt: false
+
+  # Print info about vbox created qcow image
+  qemu-img info vbox-vdisk-exp.qcow                                        =
+                    mutts-6 | 0 < 10:53:19
+  image: vbox-vdisk-exp.qcow
+  file format: qcow
+  virtual size: 5.0M (5242880 bytes)
+  disk size: 8.0K
+  cluster_size: 4096
+
+  I've attached a zip file containing the vbox created qcow image along
+  with the image that `qemu-img` converted.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1811711/+subscriptions
