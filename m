@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49846)
+Received: from eggs.gnu.org ([209.51.188.92]:54465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjjFz-0000N3-LX
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:21:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gjjHv-0001DA-8B
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:23:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjjFy-0004NS-Gl
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:21:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47398)
+	(envelope-from <pbonzini@redhat.com>) id 1gjjHe-0003GD-H1
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:23:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37598)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjjFy-0004CV-4G
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:21:14 -0500
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-22-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <618d353e-94d2-6acc-1fa7-920983ec13f8@redhat.com>
-Date: Wed, 16 Jan 2019 12:21:01 +0100
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gjjHe-0002x3-6T
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:22:58 -0500
+References: <1547196148-12250-1-git-send-email-thuth@redhat.com>
+	<b1db55de-6741-76c7-33b1-74fc2692b82c@redhat.com>
+	<552ac2db-6568-18f8-5397-a00c4b432df9@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <37af0849-319b-9f38-547d-43b7032c045a@redhat.com>
+Date: Wed, 16 Jan 2019 12:22:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190115141108.934-22-yang.zhong@intel.com>
+In-Reply-To: <552ac2db-6568-18f8-5397-a00c4b432df9@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 21/37] ide: express dependencies
- with Kconfig
+Subject: Re: [Qemu-devel] HACKING vs. CODING_STYLE (was: Re: [PATCH]
+ HACKING: Clarify the paragraph about typedefs)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +30,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com, John Snow <jsnow@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 2019-01-15 15:10, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  default-configs/alpha-softmmu.mak |  2 --
->  default-configs/pci.mak           |  3 ---
->  hw/ide/Kconfig                    | 15 +++++++++++++++
->  3 files changed, 15 insertions(+), 5 deletions(-)
-> 
-> diff --git a/default-configs/alpha-softmmu.mak b/default-configs/alpha-softmmu.mak
-> index 4d654eaa0b..62afa5ec16 100644
-> --- a/default-configs/alpha-softmmu.mak
-> +++ b/default-configs/alpha-softmmu.mak
-> @@ -11,8 +11,6 @@ CONFIG_PARALLEL=y
->  CONFIG_FDC=y
->  CONFIG_PCKBD=y
->  CONFIG_VGA_CIRRUS=y
-> -CONFIG_IDE_CORE=y
-> -CONFIG_IDE_QDEV=y
->  CONFIG_VMWARE_VGA=y
->  CONFIG_IDE_CMD646=y
->  CONFIG_I8259=y
-> diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-> index 171bdf48bc..c1b64922b9 100644
-> --- a/default-configs/pci.mak
-> +++ b/default-configs/pci.mak
-> @@ -23,9 +23,6 @@ CONFIG_MPTSAS_SCSI_PCI=y
->  CONFIG_RTL8139_PCI=y
->  CONFIG_E1000_PCI=y
->  CONFIG_E1000E_PCI=y
-> -CONFIG_IDE_CORE=y
-> -CONFIG_IDE_QDEV=y
-> -CONFIG_IDE_PCI=y
->  CONFIG_AHCI=y
->  CONFIG_ESP=y
->  CONFIG_ESP_PCI=y
-> diff --git a/hw/ide/Kconfig b/hw/ide/Kconfig
-> index 5ec449525f..fe27705790 100644
-> --- a/hw/ide/Kconfig
-> +++ b/hw/ide/Kconfig
-> @@ -3,33 +3,48 @@ config IDE_CORE
->  
->  config IDE_QDEV
->      bool
-> +    select IDE_CORE
->  
->  config IDE_PCI
->      bool
-> +    select IDE_CORE
->  
->  config IDE_ISA
->      bool
-> +    select IDE_QDEV
->  
->  config IDE_PIIX
->      bool
-> +    select IDE_PCI
-> +    select IDE_QDEV
->  
->  config IDE_CMD646
->      bool
-> +    select IDE_PCI
-> +    select IDE_QDEV
->  
->  config IDE_MACIO
->      bool
-> +    select IDE_QDEV
->  
->  config IDE_MMIO
->      bool
-> +    select IDE_QDEV
->  
->  config IDE_VIA
->      bool
-> +    select IDE_PCI
-> +    select IDE_QDEV
->  
->  config MICRODRIVE
->      bool
-> +    select IDE_QDEV
->  
->  config AHCI
->      bool
-> +    select IDE_QDEV
->  
->  config IDE_SII3112
->      bool
-> +    select IDE_PCI
-> +    select IDE_QDEV
-> 
+On 16/01/19 11:58, Thomas Huth wrote:
+>> And, I would move it to CODING_STYLE since we are at it. :)
+> I just got some feedback in IRC already, and seems like I am not alone,
+> so let's discuss it here on the mailing list, too: What's the exact
+> difference between CODING_STYLE and HACKING? Some of the paragraphs in
+> HACKING sound rather mandatory and coding-style related, too...
+> Should we maybe merge the two files into one (e.g. called "CODING")?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I think they should be merged, yes.  It doesn't have to be done
+immediately though.
+
+Paolo
