@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38748)
+Received: from eggs.gnu.org ([209.51.188.92]:39757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjpsg-0000fV-Kg
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:25:40 -0500
+	(envelope-from <berrange@redhat.com>) id 1gjptQ-0001Da-4k
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:26:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjpse-0000re-US
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:25:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gjpse-0000o4-MM
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:25:36 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gjpsc-00030G-9n
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 18:25:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 48B2C2E8078
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 18:25:34 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1gjptL-0001jb-Cc
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:26:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47150)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gjptL-0001hs-0C
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:26:19 -0500
+Date: Wed, 16 Jan 2019 18:26:06 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190116182606.GH20275@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1547468699-17633-1-git-send-email-like.xu@linux.intel.com>
+	<1547468699-17633-3-git-send-email-like.xu@linux.intel.com>
+	<20190114205134.GB16013@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Jan 2019 18:18:03 -0000
-From: Thomas Roth <1812091@bugs.launchpad.net>
-Reply-To: Bug 1812091 <1812091@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154766268387.1937.11188043264522807203.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1812091] [NEW] ARMv8-M boots in wrong security
- mode
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190114205134.GB16013@habkost.net>
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] vl.c: add -smp,
+ dies=* command line support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,81 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Like Xu <like.xu@linux.intel.com>, drjones@redhat.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, like.xu@intel.com, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, imammedo@redhat.com, Richard Henderson <rth@twiddle.net>
 
-Public bug reported:
+On Mon, Jan 14, 2019 at 06:51:34PM -0200, Eduardo Habkost wrote:
+> On Mon, Jan 14, 2019 at 08:24:56PM +0800, Like Xu wrote:
+> > This patch updates the check rules on legeacy -smp parse from user command
+> > and it's designed to obey the same restrictions as socket/core/thread model.
+> > 
+> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> 
+> This would require the documentation for -smp to be updated.
+> qemu-options.hx still says that "cores=" is the number of cores
+> per socket.
+> 
+> Also, I'm not completely sure we should change the meaning of
+> "cores=" and smp_cores to be per-die instead of per-socket.  Most
+> machines won't have any code for tracking dies, so we probably
+> shouldn't make the extra complexity affect all machines.[1]
 
-Qemu-commit: b2f7c27f56bf1116ebb7848c75914aa7c5d6a040
+Could we not simply have a 'max-dies' property against the machine
+base class which defaults to 1. Then no existing machine types
+need any changes unless they want to opt-in to supporting
+"dies > 1".
+
+> What would be the disadvantages of a simple -machine
+> "dies-per-socket" option, specific for PC?
+
+Libvirt currently has
+
+  <cpu>
+     <topology sockets='1' cores='2' threads='1'/>
+  </cpu>
+
+To me the natural way to expand that is to use
+
+  <cpu>
+     <topology sockets='1' dies='2' cores='2' threads='1'/>
+  </cpu>
+
+but this rather implies dies-per-socket + cores-per-die
+not cores-per-socket.  Libvirt could of course convert
+its value from  cores-per-die into cores-per-socket
+before giving it to QEMU, albeit with the potential
+for confusion from people comparing the libvirt and QEMU
+level configs
+
+> Keeping core-id and smp_cores per-socket instead of per-die also
+> seems necessary to keep backwards compatibility on the interface
+> for identifying CPU hotplug slots.  Igor, what do you think?
+
+Is there really a backwards compatibility problem, given that
+no existing mgmt app will have created a VM with "dies != 1".
+IOW, if an application adds logic to support configuring a
+VM with "dies > 1" it seems fine that they should need to
+understand how this impacts the way you identify CPUs for
+hotplug.
+
+> [1] I would even argue that the rest of the -smp options belong
+>     to the machine object, and topology rules should be
+>     machine-specific, but cleaning this up will require
+>     additional work.
+
+If we ever expect to support non-homogenous CPUs then our
+modelling of topology is fatally flawed, as it doesm't allow
+us to specify  creating a VM with  1 socket containing 2
+cores and a second socket containing 4 cores. Fixing that
+might require modelling each socket, die, and core as a
+distinct set of nested QOM objects which gets real fun.
 
 
-The ARMv8-M architecture (with security extensions) contains a SAU, the Sec=
-urity Attribution Unit. After booting the mps2-an505 and immediately haltin=
-g (`-S`), I attempt to read the SAU_TYPE register, located at 0xE000EDD4, u=
-sing gdb (x 0xE000EDD4). The returned value is 0, while the expected value =
-is 8 (number of regions).
-
-On further investigation, it seems that `attrs.secure` is set to false
-(armv7m_nvic.c - nvic_readl, line 1167). Commenting out the check will
-return the correct value.
-
-As the CPU should be in 'secure' mode after reset, I think this behavior
-is wrong.
-
-Steps to reproduce:
-Example code that loads an endless loop into the beginning of secure memory=
-: https://github.com/ajblane/armv8m-hello
-
-Commandline: qemu-system-arm -machine mps2-an505 -cpu cortex-m33 \
-	                    -m 4096 \
-			    -nographic -serial mon:stdio \
-	                    -kernel $(IMAGE) -s -S
-
-Attach with arm-none-eabi-gdb, and run x 0xE000EDD4.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1812091
-
-Title:
-  ARMv8-M boots in wrong security mode
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu-commit: b2f7c27f56bf1116ebb7848c75914aa7c5d6a040
-
-  =
-
-  The ARMv8-M architecture (with security extensions) contains a SAU, the S=
-ecurity Attribution Unit. After booting the mps2-an505 and immediately halt=
-ing (`-S`), I attempt to read the SAU_TYPE register, located at 0xE000EDD4,=
- using gdb (x 0xE000EDD4). The returned value is 0, while the expected valu=
-e is 8 (number of regions).
-
-  On further investigation, it seems that `attrs.secure` is set to false
-  (armv7m_nvic.c - nvic_readl, line 1167). Commenting out the check will
-  return the correct value.
-
-  As the CPU should be in 'secure' mode after reset, I think this
-  behavior is wrong.
-
-  Steps to reproduce:
-  Example code that loads an endless loop into the beginning of secure memo=
-ry: https://github.com/ajblane/armv8m-hello
-
-  Commandline: qemu-system-arm -machine mps2-an505 -cpu cortex-m33 \
-  	                    -m 4096 \
-  			    -nographic -serial mon:stdio \
-  	                    -kernel $(IMAGE) -s -S
-
-  Attach with arm-none-eabi-gdb, and run x 0xE000EDD4.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1812091/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
