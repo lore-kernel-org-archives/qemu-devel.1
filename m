@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36444)
+Received: from eggs.gnu.org ([209.51.188.92]:42401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gjmHO-00077b-Oc
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:34:57 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gjmMW-0000HG-37
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:40:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gjmHM-0007Ap-Kw
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:34:53 -0500
-Date: Wed, 16 Jan 2019 15:34:27 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190116153427.32da5da1.cohuck@redhat.com>
-In-Reply-To: <1188d21d-3603-c291-e69b-38d341ae90f4@linux.ibm.com>
-References: <1547125207-16907-1-git-send-email-pmorel@linux.ibm.com>
-	<1547125207-16907-2-git-send-email-pmorel@linux.ibm.com>
-	<f6a5491a-1859-8e0a-7357-901d47ee8304@linux.ibm.com>
-	<20190116134011.1189b027@oc2783563651>
-	<1188d21d-3603-c291-e69b-38d341ae90f4@linux.ibm.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gjmMS-0002wZ-Ol
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:40:10 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37285)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gjmMS-0002pP-Eq
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:40:08 -0500
+Received: by mail-wr1-x444.google.com with SMTP id s12so7210779wrt.4
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 06:40:08 -0800 (PST)
+References: <20190115184229.73688-1-emaste@freefall.freebsd.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190115184229.73688-1-emaste@freefall.freebsd.org>
+Date: Wed, 16 Jan 2019 14:40:05 +0000
+Message-ID: <87bm4gzmwq.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: Set the iommu region size
- mpcifc request
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for
+ FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>, thuth@redhat.com, david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+To: qemu-devel@nongnu.org
+Cc: Ed Maste <emaste@freebsd.org>
 
-On Wed, 16 Jan 2019 15:16:44 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-> On 16/01/2019 13:40, Halil Pasic wrote:
-> > On Tue, 15 Jan 2019 10:35:42 -0500
-> > Collin Walling <walling@linux.ibm.com> wrote:
-> >   
-> >> On 1/10/19 8:00 AM, Pierre Morel wrote:  
-> >>> The size of the accessible iommu memory region in the guest
-> >>> is given to the IOMMU by the guest through the mpcifc request
-> >>> specifying the PCI Base Address and the PCI Address Limit.
-> >>>
-> >>> Let set the size of the IOMMU region to:
-> >>>       (PCI Address Limit) - (PCI Base Address) + 1.
-> >>>
-> >>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> >>> ---
-> >>>    hw/s390x/s390-pci-bus.c | 2 +-
-> >>>    1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> >>> index 69e0671..e97696a 100644
-> >>> --- a/hw/s390x/s390-pci-bus.c
-> >>> +++ b/hw/s390x/s390-pci-bus.c
-> >>> @@ -660,7 +660,7 @@ void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
-> >>>        char *name = g_strdup_printf("iommu-s390-%04x", iommu->pbdev->uid);
-> >>>        memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr),
-> >>>                                 TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&iommu->mr),
-> >>> -                             name, iommu->pal + 1);
-> >>> +                             name, iommu->pal - iommu->pba + 1);  
-> > 
-> >  From the the look of this, I would say we basically used the address
-> > denoting the end of the region as the size of the region. This smells
-> > like a bug to me, but the commit message and the title ain't clear about
-> > this, and there is no fixes tag. Because of the latter I did some digging
-> > and came to commit f7c40aa "s390x/pci: fix failures of dma
-> > map/unmap" (Yi Min Zhao, 2016-06-19) which basically did the inverse of
-> > this commit!
-> > 
-> > My initial motivation was to check if this is stable material. But now
-> > I'm very confused. I'm admittedly zPCI incompetent. Could some of the
-> > people that understand what is going on help me feel better about this
-> > patch?
-> > 
-> > Regards,
-> > Halil  
-> 
-> 
-> The patch you speak about corrected the problem described in its comment 
-> by setting the offset address of the subregion to 0, making sure 
-> VFIO_PCI works for Z but introduced a bug we did not see at that time by 
-> making the subregion too large.
-> 
-> This patch correct the bug, I can add a reference to this with:
-> fixing: commit f7c40aa1e7feb50bc4d4bc171fa811bdd9a93e51
+Ed Maste <emaste@freefall.freebsd.org> writes:
 
-The patch is already queued, but I can add
+> From: Ed Maste <emaste@freebsd.org>
+>
+> Cirrus-CI (https://cirrus-ci.org) is a hosted CI service which supports
+> several platforms, including FreeBSD.  Later on we could build for other
+> hosts in Cirrus-CI, but I'm starting with only FreeBSD as it is not
+> supported by other CI services.
+>
+> Signed-off-by: Ed Maste <emaste@freebsd.org>
+> ---
+>  .cirrus.yml     | 16 ++++++++++++++++
+>  create mode 100644 .cirrus.yml
+>
+> diff --git a/.cirrus.yml b/.cirrus.yml
+> new file mode 100644
+> index 0000000000..ff4bf75ad1
+> --- /dev/null
+> +++ b/.cirrus.yml
+> @@ -0,0 +1,16 @@
+> +freebsd_12_task:
+> +  freebsd_instance:
+> +    image: freebsd-12-0-release-amd64
+> +    cpu: 8
+> +    memory: 24G
+> +  env:
+> +    CIRRUS_CLONE_DEPTH: 1
+> +  install_script: pkg install -y
+> +    bison curl cyrus-sasl fontconfig freetype2 git glib gmake gnutls
+> +    nettle perl5 pixman pkgconf png usbredir
+> +  script:
+> +    - mkdir build
+> +    - cd build
+> +    - ../configure || { cat config.log; exit 1; }
+> +    - gmake -j8
+> +    - gmake -j8 check
 
-Fixes: f7c40aa1e7 ("s390x/pci: fix failures of dma map/unmap")
+While debugging I ended up adding V=3D1 to the two gmake invocations
+because it wasn't quite clear why it had failed last time. With that:
 
-> 
-> Regards,
-> Pierre
-> 
-> > 
-> > 
-> >   
-> >>>        iommu->enabled = true;
-> >>>        memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->iommu_mr));
-> >>>        g_free(name);
-> >>>  
-> >>
-> >> Acked-by: Collin Walling <walling@linux.ibm.com>
-> >>
-> >>  
-> >   
-> 
-> 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+Does this patch come with an offer to be maintainer for FreeBSD/Cirrus
+CI stuff? In which case it will need a new entry in MAINTAINERS. I'm
+happy to feed patches to Peter until you can get keys signed and
+generate your own pull requests.
+
+--
+Alex Benn=C3=A9e
