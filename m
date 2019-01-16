@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44096)
+Received: from eggs.gnu.org ([209.51.188.92]:44300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjceP-00051n-HO
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:18:02 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gjceT-000534-Pa
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:18:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjceL-0002dZ-MS
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:18:01 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gjceS-0002lM-8b
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:18:05 -0500
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Wed, 16 Jan 2019 15:17:10 +1100
-Message-Id: <20190116041712.130183-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu 0/2] linux-headers: Update to v5.0-rc2
+Date: Wed, 16 Jan 2019 15:17:11 +1100
+Message-Id: <20190116041712.130183-2-aik@ozlabs.ru>
+In-Reply-To: <20190116041712.130183-1-aik@ozlabs.ru>
+References: <20190116041712.130183-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu 1/2] update-linux-headers.sh: Copy new
+ headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,51 +23,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org
 
-Here is the update script update and what it did to the v5.0-rc2 kernel.
+Since Linux'es ab66dcc76d "powerpc: generate uapi header and system call
+table files" there are 2 new files: unistd_32.h and unistd_64.h. These
+files content is moved from unistd.h so now we have to copy new files
+as well, just like we already do for other architectures; this does it
+for MIPS as well.
 
-This is based on sha1
-a0a8bff Greg Kurz "target/ppc/kvm: Drop useless include directive".
+Also, v5.0-rc2 moved vhost bits around in 4b86713236e4bd
+"vhost: split structs into a separate header file", add those too.
 
-Please comment. Thanks.
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ scripts/update-linux-headers.sh | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-
-
-Alexey Kardashevskiy (2):
-  update-linux-headers.sh: Copy new headers
-  linux-headers: Update to v5.0-rc2
-
- include/standard-headers/drm/drm_fourcc.h     |   63 +
- include/standard-headers/linux/ethtool.h      |   19 +-
- .../linux/input-event-codes.h                 |   19 +
- include/standard-headers/linux/pci_regs.h     |    1 +
- .../standard-headers/linux/virtio_balloon.h   |    8 +
- include/standard-headers/linux/virtio_blk.h   |   54 +
- .../standard-headers/linux/virtio_config.h    |    3 +
- include/standard-headers/linux/virtio_gpu.h   |   18 +
- include/standard-headers/linux/virtio_ring.h  |   52 +
- linux-headers/asm-arm/unistd-common.h         |    1 +
- linux-headers/asm-arm64/unistd.h              |    1 +
- linux-headers/asm-generic/unistd.h            |   10 +-
- linux-headers/asm-mips/sgidefs.h              |    8 -
- linux-headers/asm-mips/unistd.h               | 1074 +----------------
- linux-headers/asm-mips/unistd_n32.h           |  338 ++++++
- linux-headers/asm-mips/unistd_n64.h           |  334 +++++
- linux-headers/asm-mips/unistd_o32.h           |  374 ++++++
- linux-headers/asm-powerpc/unistd.h            |  389 +-----
- linux-headers/asm-powerpc/unistd_32.h         |  381 ++++++
- linux-headers/asm-powerpc/unistd_64.h         |  372 ++++++
- linux-headers/linux/kvm.h                     |   29 +
- linux-headers/linux/vfio.h                    |   92 ++
- linux-headers/linux/vhost.h                   |  113 +-
- linux-headers/linux/vhost_types.h             |  128 ++
- scripts/update-linux-headers.sh               |   11 +-
- 25 files changed, 2302 insertions(+), 1590 deletions(-)
- create mode 100644 linux-headers/asm-mips/unistd_n32.h
- create mode 100644 linux-headers/asm-mips/unistd_n64.h
- create mode 100644 linux-headers/asm-mips/unistd_o32.h
- create mode 100644 linux-headers/asm-powerpc/unistd_32.h
- create mode 100644 linux-headers/asm-powerpc/unistd_64.h
- create mode 100644 linux-headers/linux/vhost_types.h
-
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 0a964fe..1cd8bd5 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -121,11 +121,20 @@ for arch in $ARCHLIST; do
+         cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
+         cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/standard-headers/asm-$arch"
+     fi
++    if [ $arch = powerpc ]; then
++        cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-powerpc/"
++        cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-powerpc/"
++    fi
++    if [ $arch = mips ]; then
++        cp "$tmpdir/include/asm/unistd_o32.h" "$output/linux-headers/asm-mips/"
++        cp "$tmpdir/include/asm/unistd_n32.h" "$output/linux-headers/asm-mips/"
++        cp "$tmpdir/include/asm/unistd_n64.h" "$output/linux-headers/asm-mips/"
++    fi
+ done
+ 
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+-for header in kvm.h vfio.h vfio_ccw.h vhost.h \
++for header in kvm.h vfio.h vfio_ccw.h vhost.h vhost_types.h \
+               psci.h psp-sev.h userfaultfd.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
 -- 
 2.17.1
