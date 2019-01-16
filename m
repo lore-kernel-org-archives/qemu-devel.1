@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48188)
+Received: from eggs.gnu.org ([209.51.188.92]:49162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gjhmg-0003oS-5F
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:46:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1gjhn3-00043J-RI
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:47:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gjhmb-0005Hc-ND
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:46:52 -0500
-References: <20190114103110.10909-1-david@redhat.com>
-	<20190114103110.10909-5-david@redhat.com>
-	<e897906c-9e69-16e2-9039-1e55fbac576e@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <97628b9a-7636-7cdd-1121-314c94f4008a@redhat.com>
-Date: Wed, 16 Jan 2019 10:38:05 +0100
+	(envelope-from <thuth@redhat.com>) id 1gjhmw-00063d-F5
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:47:15 -0500
+References: <20190115141108.934-1-yang.zhong@intel.com>
+	<20190115141108.934-14-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a7abd300-9898-45cd-5e3d-9a8c79374ac7@redhat.com>
+Date: Wed, 16 Jan 2019 10:46:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <e897906c-9e69-16e2-9039-1e55fbac576e@linux.ibm.com>
+In-Reply-To: <20190115141108.934-14-yang.zhong@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] s390x/pci: Ignore the unplug call
- if we already have a release_timer
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 13/37] hw/riscv/Makefile.objs:
+ Create CONFIG_* for riscv boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
 
-On 15.01.19 23:53, Collin Walling wrote:
-> On 1/14/19 5:31 AM, David Hildenbrand wrote:
->> ... otherwise two successive calls to qdev_unplug() (e.g. by an impati=
-ent
->> user) will effectively overwrite pbdev->release_timer, resulting in a
->> memory leak. We are already processing the unplug.
->>
->=20
-> Does QEMU not have a way to detect if a device is already in the proces=
-s=20
-> of being unplugged? Seems like not having that kind of protection could=
-=20
-> cause many problems.
->=20
-> Perhaps that effort would be arduous.
+On 2019-01-15 15:10, Yang Zhong wrote:
+> Add the new configs to default-configs/riscv*-sofmmu.mak.
+> 
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  default-configs/riscv32-softmmu.mak |  6 ++++++
+>  default-configs/riscv64-softmmu.mak |  6 ++++++
+>  hw/riscv/Makefile.objs              | 22 +++++++++++-----------
+>  3 files changed, 23 insertions(+), 11 deletions(-)
+> 
+> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+> index dbc9398284..af841839d1 100644
+> --- a/default-configs/riscv32-softmmu.mak
+> +++ b/default-configs/riscv32-softmmu.mak
+> @@ -11,3 +11,9 @@ CONFIG_PCI_GENERIC=y
+>  
+>  CONFIG_VGA=y
+>  CONFIG_VGA_PCI=y
+> +
+> +CONFIG_HTIF=y
+> +CONFIG_HART=y
+> +CONFIG_SIFIVE=y
+> +CONFIG_SPIKE=y
+> +CONFIG_RISCV_VIRTIO=y
+> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+> index dbc9398284..af841839d1 100644
+> --- a/default-configs/riscv64-softmmu.mak
+> +++ b/default-configs/riscv64-softmmu.mak
+> @@ -11,3 +11,9 @@ CONFIG_PCI_GENERIC=y
+>  
+>  CONFIG_VGA=y
+>  CONFIG_VGA_PCI=y
+> +
+> +CONFIG_HTIF=y
+> +CONFIG_HART=y
+> +CONFIG_SIFIVE=y
+> +CONFIG_SPIKE=y
+> +CONFIG_RISCV_VIRTIO=y
+> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
+> index 1dde01d39d..dde1b01f90 100644
+> --- a/hw/riscv/Makefile.objs
+> +++ b/hw/riscv/Makefile.objs
+> @@ -1,11 +1,11 @@
+> -obj-y += riscv_htif.o
+> -obj-y += riscv_hart.o
+> -obj-y += sifive_e.o
+> -obj-y += sifive_clint.o
+> -obj-y += sifive_prci.o
+> -obj-y += sifive_plic.o
+> -obj-y += sifive_test.o
+> -obj-y += sifive_u.o
+> -obj-y += sifive_uart.o
+> -obj-y += spike.o
+> -obj-y += virt.o
+> +obj-$(CONFIG_HTIF) += riscv_htif.o
 
-No, there is no such thing. E.g. on some architectures it might even be
-desirable to send multiple unplug requests to the guest. Say you want to
-remove a DIMM. Could be that the guest cannot remove it right now, so it
-NACKs the requests. Later you want to retry, so you send another
-requests. This means we cannot really track pending unplug requests (and
-might not even want to do so).
+riscv_htif.o seems to belong to the spike machine, so I think you don't
+need a separate config switch for that and could simply use CONFIG_SPIKE
+here.
 
-Regarding hotplug_handler_unplug(), the expectation is that once the
-function returns without an error, the device was removed (or is ready
-to be removed). So here, tracking a pending removal is not necessary.
+> +obj-$(CONFIG_HART) += riscv_hart.o
+> +obj-$(CONFIG_SIFIVE) += sifive_e.o
+> +obj-$(CONFIG_SIFIVE) += sifive_clint.o
+> +obj-$(CONFIG_SIFIVE) += sifive_prci.o
+> +obj-$(CONFIG_SIFIVE) += sifive_plic.o
+> +obj-$(CONFIG_SIFIVE) += sifive_test.o
+> +obj-$(CONFIG_SIFIVE) += sifive_u.o
 
-See patch #5 where I properly convert what we have on s390x pci to
-unplug requests.
+Looking at the output of "qemu-system-riscv64 -M help", sifive_e and
+sifive_u are two separate machines. So should we use two different
+config switches here?
 
->=20
->> If there is already a release_timer, the unplug will be performed afte=
-r
->> the timeout.
->>
->> Can be easily triggered by
->> (hmp) device_add virtio-mouse-pci,id=3Dtest
->> (hmp) stop
->> (hmp) device_del test
->> (hmp) device_del test
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>   hw/s390x/s390-pci-bus.c | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
->> index 59325cae3b..34a9cb2a80 100644
->> --- a/hw/s390x/s390-pci-bus.c
->> +++ b/hw/s390x/s390-pci-bus.c
->> @@ -972,6 +972,9 @@ static void s390_pcihost_unplug(HotplugHandler *ho=
-tplug_dev, DeviceState *dev,
->>       case ZPCI_FS_STANDBY:
->>           break;
->>       default:
->> +        if (pbdev->release_timer) {
->> +            return;
->> +        }
->>           s390_pci_generate_plug_event(HP_EVENT_DECONFIGURE_REQUEST,
->>                                        pbdev->fh, pbdev->fid);
->>           pbdev->release_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL,
->>
->=20
-> Looks good to me.
+> +obj-$(CONFIG_SIFIVE) += sifive_uart.o
+> +obj-$(CONFIG_SPIKE) += spike.o
+> +obj-$(CONFIG_RISCV_VIRTIO) += virt.o
 
-Thanks!
+The machine is only called "virt", so I'd suggest to call the config
+switch CONFIG_RISCV_VIRT only.
 
->=20
-> Reviewed-by: Collin Walling <walling@linux.ibm.com>
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+ Thomas
