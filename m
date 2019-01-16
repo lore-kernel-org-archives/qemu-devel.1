@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37809)
+Received: from eggs.gnu.org ([209.51.188.92]:44072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gjhUL-0003MO-OJ
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:27:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1gjhXZ-0004a8-JI
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gjhUJ-0008S0-H5
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:27:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39874)
+	(envelope-from <thuth@redhat.com>) id 1gjhXY-00027t-0V
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:31:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gjhUJ-0008K8-6r
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:27:55 -0500
-Date: Wed, 16 Jan 2019 09:27:41 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20190116092741.GB20275@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190115145256.9593-1-berrange@redhat.com>
-	<20190115145256.9593-2-berrange@redhat.com>
-	<a53244ea-4ff3-c5d6-73b2-9f839b6b0195@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjhXX-0001lt-GL
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:31:15 -0500
+References: <20190115141108.934-1-yang.zhong@intel.com>
+	<20190115141108.934-12-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7d5cbb41-cabf-01b1-ab45-44b4c6e78677@redhat.com>
+Date: Wed, 16 Jan 2019 10:31:03 +0100
 MIME-Version: 1.0
+In-Reply-To: <20190115141108.934-12-yang.zhong@intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a53244ea-4ff3-c5d6-73b2-9f839b6b0195@redhat.com>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 01/12] chardev: fix validation of options
- for QMP created chardevs
+Subject: Re: [Qemu-devel] [RFC PATCH v2 11/37] hw/xtensa/Makefile.objs:
+ Build xtensa_sim and xtensa_fpga conditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,117 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, =?UTF-8?B?w4Frb3MgS292w6Fjcw==?= <akoskovacs@gmx.com>, pbonzini@redhat.com, ehabkost@redhat.com, Max Filippov <jcmvbkbc@gmail.com>
 
-On Wed, Jan 16, 2019 at 06:07:41AM +0100, Thomas Huth wrote:
-> On 2019-01-15 15:52, Daniel P. Berrang=C3=A9 wrote:
-> > The TLS creds option is not valid with certain address types. The use=
-r
-> > config was only checked for errors when parsing legacy QemuOpts, thus
-> > the user could pass unsupported values via QMP.
-> >=20
-> > Pull all code for validating options out into a new method
-> > qmp_chardev_validate_socket, that is called from the main
-> > qmp_chardev_open_socket method. This adds a missing check for rejecti=
-ng
-> > TLS creds with the vsock address type.
-> >=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
-> >  chardev/char-socket.c | 92 +++++++++++++++++++++++++++++++----------=
---
-> >  1 file changed, 66 insertions(+), 26 deletions(-)
-> >=20
-> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> > index eaa8e8b68f..6669acb35f 100644
-> > --- a/chardev/char-socket.c
-> > +++ b/chardev/char-socket.c
-> > @@ -987,6 +987,65 @@ static gboolean socket_reconnect_timeout(gpointe=
-r opaque)
-> >      return false;
-> >  }
-> > =20
-> > +
+On 2019-01-15 15:10, Yang Zhong wrote:
+> From: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
 >=20
-> Please remove the additional empty line.
-
-Having two blanks lines between functions is intentional to
-give visual separation.
-
-> > +static bool qmp_chardev_validate_socket(ChardevSocket *sock,
-> > +                                        SocketAddress *addr,
-> > +                                        Error **errp)
-> > +{
-> > +    /* Validate any options which have a dependancy on address type =
-*/
+> Add the new CONFIG_* values to default-config/xtensa*-softmmu.mak.
 >=20
-> I'd maybe rather write "dependency" which is AFAIK the more common
-> spelling - but I'm not a native speaker, so feel free to ignore me here=
-.
+> Signed-off-by: =C3=81kos Kov=C3=A1cs <akoskovacs@gmx.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  default-configs/xtensa-softmmu.mak   | 3 +++
+>  default-configs/xtensaeb-softmmu.mak | 3 +++
+>  hw/xtensa/Makefile.objs              | 4 ++--
+>  3 files changed, 8 insertions(+), 2 deletions(-)
 >=20
-> > +    switch (addr->type) {
-> > +    case SOCKET_ADDRESS_TYPE_FD:
-> > +        if (sock->has_reconnect) {
-> > +            error_setg(errp,
-> > +                       "'reconnect' option is incompatible with "
-> > +                       "'fd' address type");
-> > +            return false;
-> > +        }
-> > +        if (sock->has_tls_creds &&
-> > +            !(sock->has_server && sock->server)) {
-> > +            error_setg(errp,
-> > +                       "'tls_creds' option is incompatible with "
-> > +                       "'fd' address type as client");
-> > +            return false;
-> > +        }
-> > +        break;
-> > +
-> > +    case SOCKET_ADDRESS_TYPE_UNIX:
-> > +        if (sock->has_tls_creds) {
-> > +            error_setg(errp,
-> > +                       "'tls_creds' option is incompatible with "
-> > +                       "'unix' address type");
-> > +            return false;
-> > +        }
-> > +        break;
-> > +
-> > +    case SOCKET_ADDRESS_TYPE_INET:
-> > +        break;
+> diff --git a/default-configs/xtensa-softmmu.mak b/default-configs/xtens=
+a-softmmu.mak
+> index 9d8899cde7..baf90ca162 100644
+> --- a/default-configs/xtensa-softmmu.mak
+> +++ b/default-configs/xtensa-softmmu.mak
+> @@ -3,3 +3,6 @@
+>  CONFIG_SERIAL=3Dy
+>  CONFIG_OPENCORES_ETH=3Dy
+>  CONFIG_PFLASH_CFI01=3Dy
+> +
+> +CONFIG_XTENSA_SIM=3Dy
+> +CONFIG_XTENSA_FPGA=3Dy
+> diff --git a/default-configs/xtensaeb-softmmu.mak b/default-configs/xte=
+nsaeb-softmmu.mak
+> index 9d8899cde7..baf90ca162 100644
+> --- a/default-configs/xtensaeb-softmmu.mak
+> +++ b/default-configs/xtensaeb-softmmu.mak
+> @@ -3,3 +3,6 @@
+>  CONFIG_SERIAL=3Dy
+>  CONFIG_OPENCORES_ETH=3Dy
+>  CONFIG_PFLASH_CFI01=3Dy
+> +
+> +CONFIG_XTENSA_SIM=3Dy
+> +CONFIG_XTENSA_FPGA=3Dy
+> diff --git a/hw/xtensa/Makefile.objs b/hw/xtensa/Makefile.objs
+> index cb4998d2bf..62e244fa53 100644
+> --- a/hw/xtensa/Makefile.objs
+> +++ b/hw/xtensa/Makefile.objs
+> @@ -1,4 +1,4 @@
+>  obj-y +=3D pic_cpu.o
+> -obj-y +=3D sim.o
+>  obj-y +=3D xtensa_memory.o
+> -obj-y +=3D xtfpga.o
+> +obj-$(CONFIG_XTENSA_SIM) +=3D sim.o
+> +obj-$(CONFIG_XTENSA_FPGA) +=3D xtfpga.o
 >=20
-> You could drop the empty case.
 
-I preferred to explicitly list all cases, so it is clear what
-needs to be handled here when further checks are added later.
-
->=20
-> > +    case SOCKET_ADDRESS_TYPE_VSOCK:
-> > +        if (sock->has_tls_creds) {
-> > +            error_setg(errp,
-> > +                       "'tls_creds' option is incompatible with "
-> > +                       "'vsock' address type");
-> > +            return false;
-> > +        }
-> > +
-
-Opps, missing default.
-
-> > +    default:
-> > +        break;
->=20
-> You could drop the empty default case.
-
-If that is not there, then the compiler forces the
-listing of SOCKET_ADDRESS_TYPE__MAX instead due
-to -Wswitch
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Reviewed-by: Thomas Huth <thuth@redhat.com>
