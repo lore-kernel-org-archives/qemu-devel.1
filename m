@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48213)
+Received: from eggs.gnu.org ([209.51.188.92]:48244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjnYA-0008GT-Rk
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:56:19 -0500
+	(envelope-from <eblake@redhat.com>) id 1gjnYE-0008JH-68
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:56:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjnYA-0000j5-3s
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:56:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjnY9-0000ih-LW
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:56:17 -0500
-Date: Wed, 16 Jan 2019 10:56:14 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190116105547-mutt-send-email-mst@kernel.org>
-References: <cover.1547624239.git.yi.z.zhang@linux.intel.com>
-	<5a9ab3832eacb1e4bc6649f72bcf2969074573f1.1547624239.git.yi.z.zhang@linux.intel.com>
+	(envelope-from <eblake@redhat.com>) id 1gjnYC-0000kG-5t
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:56:22 -0500
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9ebc0045-6192-b88a-f94f-4c0ed62a5b2b@redhat.com>
+Date: Wed, 16 Jan 2019 09:56:15 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5a9ab3832eacb1e4bc6649f72bcf2969074573f1.1547624239.git.yi.z.zhang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH V9 1/6] numa: Fixed the memory leak of numa
- error message
+In-Reply-To: <20180731173033.75467-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="tLq4n0owNrohVu6fIPseughJefuoxG2vD"
+Subject: Re: [Qemu-devel] [PATCH v4 02/10] block/nbd: move connection code
+ from block/nbd to block/nbd-client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Yi <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Wed, Jan 16, 2019 at 04:10:17PM +0800, Zhang Yi wrote:
-> object_get_canonical_path_component() returns a string which
-> must be freed using g_free().
-> 
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> Reviewed-by: Pankaj gupta <pagupta@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--tLq4n0owNrohVu6fIPseughJefuoxG2vD
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
+ pbonzini@redhat.com, den@openvz.org
+Message-ID: <9ebc0045-6192-b88a-f94f-4c0ed62a5b2b@redhat.com>
+Subject: Re: [PATCH v4 02/10] block/nbd: move connection code from block/nbd
+ to block/nbd-client
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+ <20180731173033.75467-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20180731173033.75467-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+On 7/31/18 12:30 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Keep all connection code in one file, to be able to implement reconnect=
 
-Pls post this separately as it's just a bugfix that
-is not a dependency of map_sync.
-
+> in further patches.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  numa.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/numa.c b/numa.c
-> index 50ec016..3875e1e 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -533,6 +533,7 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
->              error_report("memory backend %s is used multiple times. Each "
->                           "-numa option must use a different memdev value.",
->                           path);
-> +            g_free(path);
->              exit(1);
->          }
->  
-> -- 
-> 2.7.4
+>  block/nbd-client.h |  2 +-
+>  block/nbd-client.c | 37 +++++++++++++++++++++++++++++++++++--
+>  block/nbd.c        | 40 ++--------------------------------------
+>  3 files changed, 38 insertions(+), 41 deletions(-)
+>=20
+
+> @@ -1001,12 +1033,14 @@ int nbd_client_init(BlockDriverState *bs,
+>      g_free(client->info.x_dirty_bitmap);
+>      if (ret < 0) {
+>          logout("Failed to negotiate with the NBD server\n");
+> +        object_unref(OBJECT(sioc));
+>          return ret;
+>      }
+>      if (client->info.flags & NBD_FLAG_READ_ONLY &&
+>          !bdrv_is_read_only(bs)) {
+>          error_setg(errp,
+>                     "request for write access conflicts with read-only =
+export");
+> +        object_unref(OBJECT(sioc));
+>          return -EACCES;
+>      }
+
+Conflicts with changes committed in the meantime. I think I can resolve
+the conflicts, but you may want to post a v5.
+
+The patch itself looks reasonable;
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--tLq4n0owNrohVu6fIPseughJefuoxG2vD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw/VB8ACgkQp6FrSiUn
+Q2q6UggAsDDMFy0p2nxR6hL+/VEk4tKbmBWR3vnYIsioIaGXiCxqZn7jgPuLbYon
+UrB81Km8Mz0P8csChRLFPGtee06YLhv9+vOU7zfRiXDGM3OpJY3raLSF5tMKUWWm
+zcRlByh2jsVc6BDB8dl7L2Sz6LAecRRQAn1o4x5mghZcRvwxKe69eX7n9/dsQ2NH
+TO8NAilLdV5VXHEknwhDftiKfZpHHQW+owt5gEAHpIiqBFGPdChctbsUbGkqZ+Yy
+8213VJf4P0LKplz+nlRevQdv+m56E74/V1Wl/nlj9f8ejFxZ1Of1je/3W7KuzohM
+ZOpsoxUeA7Ls4grkdrkWc2IgYfn3kQ==
+=wKJo
+-----END PGP SIGNATURE-----
+
+--tLq4n0owNrohVu6fIPseughJefuoxG2vD--
