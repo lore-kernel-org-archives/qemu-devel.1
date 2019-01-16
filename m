@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57551)
+Received: from eggs.gnu.org ([209.51.188.92]:41481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=9126ffe88=Paul.Durrant@citrix.com>)
-	id 1gjjvs-00018m-Jm
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:04:33 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gjk59-00059e-PY
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:14:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=9126ffe88=Paul.Durrant@citrix.com>)
-	id 1gjjvZ-0008Cx-15
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:04:19 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Wed, 16 Jan 2019 12:03:42 +0000
-Message-ID: <507850720d604665987131aed1ee47b6@AMSPEX02CL03.citrite.net>
-References: <20190116120041.17095-1-philmd@redhat.com>
-In-Reply-To: <20190116120041.17095-1-philmd@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1gjk54-0003yp-71
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:14:07 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38667)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gjk53-0003rb-C5
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:14:02 -0500
+Received: by mail-wm1-x344.google.com with SMTP id m22so1758284wml.3
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 04:13:59 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 16 Jan 2019 12:13:50 +0000
+Message-Id: <20190116121350.23863-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] xen: Fix format string
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] hw/block/xen: use proper format string for
+ printing sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?J1BoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpJw==?= <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paul Durrant <paul.durrant@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQaGlsaXBwZSBNYXRoaWV1LURh
-dWTDqSBbbWFpbHRvOnBoaWxtZEByZWRoYXQuY29tXQ0KPiBTZW50OiAxNiBKYW51YXJ5IDIwMTkg
-MTI6MDENCj4gVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogUGF1bCBEdXJyYW50IDxQ
-YXVsLkR1cnJhbnRAY2l0cml4LmNvbT47IEFudGhvbnkgUGVyYXJkDQo+IDxhbnRob255LnBlcmFy
-ZEBjaXRyaXguY29tPjsgTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT47IHFlbXUtDQo+IGJs
-b2NrQG5vbmdudS5vcmc7IFN0ZWZhbm8gU3RhYmVsbGluaSA8c3N0YWJlbGxpbmlAa2VybmVsLm9y
-Zz47IHhlbi0NCj4gZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc7IEtldmluIFdvbGYgPGt3b2xm
-QHJlZGhhdC5jb20+OyBQaGlsaXBwZQ0KPiBNYXRoaWV1LURhdWTDqSA8cGhpbG1kQHJlZGhhdC5j
-b20+DQo+IFN1YmplY3Q6IFtQQVRDSF0geGVuOiBGaXggZm9ybWF0IHN0cmluZw0KPiANCj4gVHJp
-dmlhbCBmb3JtYXQgc3RyaW5nIGZpeCB0byBzb2x2ZToNCj4gDQo+ICAgaHcvYmxvY2sveGVuLWJs
-b2NrLmM6IEluIGZ1bmN0aW9uICd4ZW5fYmxvY2tfcmVhbGl6ZSc6DQo+ICAgaHcvYmxvY2sveGVu
-LWJsb2NrLmM6MjE4OjUzOiBlcnJvcjogZm9ybWF0ICclbHUnIGV4cGVjdHMgYXJndW1lbnQgb2YN
-Cj4gdHlwZSAnbG9uZyB1bnNpZ25lZCBpbnQnLCBidXQgYXJndW1lbnQgNCBoYXMgdHlwZSAnaW50
-NjRfdCB7YWthIGxvbmcgbG9uZw0KPiBpbnR9JyBbLVdlcnJvcj1mb3JtYXQ9XQ0KPiAgICAgICB4
-ZW5fZGV2aWNlX2JhY2tlbmRfcHJpbnRmKHhlbmRldiwgInNlY3RvcnMiLCAiJWx1IiwNCj4gICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXg0KPiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJsa19nZXRsZW5ndGgoY29uZi0+YmxrKSAv
-DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uZi0+bG9naWNhbF9ibG9ja19z
-aXplKTsNCj4gDQo+IGJsa19nZXRsZW5ndGgoKSByZXR1cm5zIGFuIGludDY0X3QuDQo+IA0KPiBT
-aWduZWQtb2ZmLWJ5OiBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSA8cGhpbG1kQHJlZGhhdC5jb20+
-DQoNClJldmlld2VkLWJ5OiBQYXVsIER1cnJhbnQgPHBhdWwuZHVycmFudEBjaXRyaXguY29tPg0K
-DQo+IC0tLQ0KPiAgaHcvYmxvY2sveGVuLWJsb2NrLmMgfCAyICstDQo+ICAxIGZpbGUgY2hhbmdl
-ZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ody9i
-bG9jay94ZW4tYmxvY2suYyBiL2h3L2Jsb2NrL3hlbi1ibG9jay5jDQo+IGluZGV4IGJlMjhiNjM0
-NDIuLjNjZjIxNWI3MzAgMTAwNjQ0DQo+IC0tLSBhL2h3L2Jsb2NrL3hlbi1ibG9jay5jDQo+ICsr
-KyBiL2h3L2Jsb2NrL3hlbi1ibG9jay5jDQo+IEBAIC0yMTUsNyArMjE1LDcgQEAgc3RhdGljIHZv
-aWQgeGVuX2Jsb2NrX3JlYWxpemUoWGVuRGV2aWNlICp4ZW5kZXYsIEVycm9yDQo+ICoqZXJycCkN
-Cj4gDQo+ICAgICAgeGVuX2RldmljZV9iYWNrZW5kX3ByaW50Zih4ZW5kZXYsICJzZWN0b3Itc2l6
-ZSIsICIldSIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb25mLT5sb2dpY2Fs
-X2Jsb2NrX3NpemUpOw0KPiAtICAgIHhlbl9kZXZpY2VfYmFja2VuZF9wcmludGYoeGVuZGV2LCAi
-c2VjdG9ycyIsICIlbHUiLA0KPiArICAgIHhlbl9kZXZpY2VfYmFja2VuZF9wcmludGYoeGVuZGV2
-LCAic2VjdG9ycyIsICIlbGxkIiwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJs
-a19nZXRsZW5ndGgoY29uZi0+YmxrKSAvDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBjb25mLT5sb2dpY2FsX2Jsb2NrX3NpemUpOw0KPiANCj4gLS0NCj4gMi4xNy4yDQoNCg==
+The %lu format string is different depending on the host architecture
+which causes builds like the debian-armhf-cross build to fail. Use the
+correct PRi64 format string.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ hw/block/xen-block.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+index be28b63442..a636487b3e 100644
+--- a/hw/block/xen-block.c
++++ b/hw/block/xen-block.c
+@@ -215,7 +215,7 @@ static void xen_block_realize(XenDevice *xendev, Error **errp)
+ 
+     xen_device_backend_printf(xendev, "sector-size", "%u",
+                               conf->logical_block_size);
+-    xen_device_backend_printf(xendev, "sectors", "%lu",
++    xen_device_backend_printf(xendev, "sectors", "%"PRIi64,
+                               blk_getlength(conf->blk) /
+                               conf->logical_block_size);
+ 
+-- 
+2.17.1
