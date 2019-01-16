@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57946)
+Received: from eggs.gnu.org ([209.51.188.92]:58072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gjZaS-0002un-33
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 20:01:45 -0500
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gjZlT-0000YB-IG
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 20:13:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gjZaJ-0004cC-2W
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 20:01:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56576)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gjZa8-0004SR-RL
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 20:01:27 -0500
-From: John Snow <jsnow@redhat.com>
-Date: Tue, 15 Jan 2019 20:01:06 -0500
-Message-Id: <20190116010106.27626-9-jsnow@redhat.com>
-In-Reply-To: <20190116010106.27626-1-jsnow@redhat.com>
-References: <20190116010106.27626-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PULL 8/8] Revert "hbitmap: Add @advance param to
- hbitmap_iter_next()"
+	(envelope-from <richardw.yang@linux.intel.com>) id 1gjZlO-0000UP-BE
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 20:13:03 -0500
+Date: Wed, 16 Jan 2019 09:12:33 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190116011233.GA10810@richard>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+References: <1888836717.9067.1547583207433.ref@mail.yahoo.com>
+	<1888836717.9067.1547583207433@mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1888836717.9067.1547583207433@mail.yahoo.com>
+Subject: Re: [Qemu-devel] Devdax backend for vnvdimm not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,181 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, peter.maydell@linaro.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kamal Kakri <kamalkakri2017@yahoo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Tue, Jan 15, 2019 at 08:13:27PM +0000, Kamal Kakri via Qemu-devel wrote:
+>Hi,
+>
+>I have a namespace (backed by real nvdimm h/w) configured in devdax mode:
+># ndctl list -N -n namespace0.0
+>[
+>  {
+>    "dev":"namespace0.0",
+>    "mode":"devdax",
+>    "map":"dev",
+>    "size":16909336576,
+>    "uuid":"e5265c0a-d902-41ce-b1d1-87a78c358aa4",
+>    "chardev":"dax0.0"
+>  }
+>]
+>
 
-This reverts commit a33fbb4f8b64226becf502a123733776ce319b24.
+Above is your host configuration, right?
 
-The functionality is unused.
+>
+>When I try to configure my vm using "virsh" with something like this:
+>    <memory model='nvdimm' access='shared'>
+>      <source>
+>        <path>/dev/dax0.0</path>
+>        <align unit='KiB'>2048</align>
+>        <pmem/>
+>      </source>
+>      <target>
+>        <size unit='KiB'>2097152</size>
+>        <node>0</node>
+>      </target>
+>      <alias name='nvdimm0'/>
+>      <address type='dimm' slot='0'/>
+>    </memory>
+>
 
-Note: in addition to automatic revert, drop second parameter in
-hbitmap_iter_next() call from hbitmap_next_dirty_area() too.
+I am not familiar with virsh, while I guess align here is the parameter passed
+to qemu.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/backup.c         |  2 +-
- block/dirty-bitmap.c   |  2 +-
- include/qemu/hbitmap.h |  5 +----
- tests/test-hbitmap.c   | 26 +++++++++++++-------------
- util/hbitmap.c         | 12 ++++--------
- 5 files changed, 20 insertions(+), 27 deletions(-)
+Hmm...  as I being told, the alignment should be 128M.
 
-diff --git a/block/backup.c b/block/backup.c
-index 9ffce5c183..435414e964 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -385,7 +385,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
-     HBitmapIter hbi;
- 
-     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
--    while ((cluster = hbitmap_iter_next(&hbi, true)) != -1) {
-+    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
-         do {
-             if (yield_and_check(job)) {
-                 return 0;
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 4d9a8af17d..00ea36f554 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -515,7 +515,7 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
- 
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
- {
--    return hbitmap_iter_next(&iter->hbi, true);
-+    return hbitmap_iter_next(&iter->hbi);
- }
- 
- /* Called within bdrv_dirty_bitmap_lock..unlock */
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 097dce31ee..4afbe6292e 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -351,14 +351,11 @@ void hbitmap_free_meta(HBitmap *hb);
- /**
-  * hbitmap_iter_next:
-  * @hbi: HBitmapIter to operate on.
-- * @advance: If true, advance the iterator.  Otherwise, the next call
-- *           of this function will return the same result (if that
-- *           position is still dirty).
-  *
-  * Return the next bit that is set in @hbi's associated HBitmap,
-  * or -1 if all remaining bits are zero.
-  */
--int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance);
-+int64_t hbitmap_iter_next(HBitmapIter *hbi);
- 
- /**
-  * hbitmap_iter_next_word:
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index 6358f35359..592d8219db 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -46,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
- 
-     i = first;
-     for (;;) {
--        next = hbitmap_iter_next(&hbi, true);
-+        next = hbitmap_iter_next(&hbi);
-         if (next < 0) {
-             next = data->size;
-         }
-@@ -435,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
-     /* Note that hbitmap_test_check has to be invoked manually in this test.  */
-     hbitmap_test_init(data, 131072 << 7, 7);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
- 
-     hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
- 
-     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
- 
-     hbitmap_test_set(data, (131072 << 7) - 8, 8);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
- 
-     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
-+    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
- }
- 
- static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
-@@ -893,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
-     for (i = 0; i < num_positions; i++) {
-         hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
-         hbitmap_iter_init(&iter, data->hb, 0);
--        next = hbitmap_iter_next(&iter, true);
-+        next = hbitmap_iter_next(&iter);
-         if (i == num_positions - 1) {
-             g_assert_cmpint(next, ==, -1);
-         } else {
-@@ -919,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
- 
-     hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
- 
--    hbitmap_iter_next(&hbi, true);
-+    hbitmap_iter_next(&hbi);
- 
-     hbitmap_reset_all(data->hb);
--    hbitmap_iter_next(&hbi, true);
-+    hbitmap_iter_next(&hbi);
- }
- 
- static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index fa356522c4..7905212a8b 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -144,7 +144,7 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
-     return cur;
- }
- 
--int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
-+int64_t hbitmap_iter_next(HBitmapIter *hbi)
- {
-     unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
-             hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
-@@ -157,12 +157,8 @@ int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
-         }
-     }
- 
--    if (advance) {
--        /* The next call will resume work from the next bit.  */
--        hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
--    } else {
--        hbi->cur[HBITMAP_LEVELS - 1] = cur;
--    }
-+    /* The next call will resume work from the next bit.  */
-+    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
-     item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
- 
-     return item << hbi->granularity;
-@@ -261,7 +257,7 @@ bool hbitmap_next_dirty_area(const HBitmap *hb, uint64_t *start,
-     end = *count > hb->orig_size - *start ? hb->orig_size : *start + *count;
- 
-     hbitmap_iter_init(&hbi, hb, *start);
--    firt_dirty_off = hbitmap_iter_next(&hbi, false);
-+    firt_dirty_off = hbitmap_iter_next(&hbi);
- 
-     if (firt_dirty_off < 0 || firt_dirty_off >= end) {
-         return false;
+>
+>I get an error while starting my vm:
+># virsh start fox22vm
+>start: domain(optdata): fox22vm
+>start: found option <domain>: fox22vm
+>start: <domain> trying as domain NAME
+>error: Failed to start domain fox22vm
+>error: internal error: qemu unexpectedly closed the monitor: ftruncate: Invalid argument
+>2019-01-15T18:00:36.587467Z qemu-kvm: -object memory-backend-file,id=memnvdimm0,prealloc=yes,mem-path=/dev/dax0.0,share=yes,size=2147483648: unable to map backing store for guest RAM: Invalid argument
+
+The error message here shows the error is caused by mmap for an invalid
+argument. Hmm... but I am not sure which one is incorrect.
+
+
+Usually I run qemu directly, here is a qemu command line which works at my
+side:
+
+qemu/x86_64-softmmu/qemu-system-x86_64 -machine pc,nvdimm \
+	-m 6G,slots=4,maxmem=128G -smp 8 --enable-kvm \
+	-drive file=/home/richard/guest/fedora29.img,format=raw -nographic \
+	-drive file=/home/richard/guest/project.img,format=raw \
+	-object memory-backend-file,id=mem1,share=on,mem-path=/dev/dax0.0,size=10G,align=128M \
+	-device nvdimm,id=nvdimm1,memdev=mem1,label-size=128k
+
+Maybe you can compare the difference between your virsh result to see the
+difference.
+
+>
+>I have tried to add "align unit" to my virsh xml but it does not seem to pass it onto qemu (as much as I can see from the qemu cmd line in the logs at /var/log/libvirt/qemu)
+>
+>
+>Can anyone pls hint as to what possibly could be the issue ? Is this alignment related or something else ?
+>
+>Here are my versions:
+># virsh --version
+>4.5.0
+>[root@fox22hv libexec]# /usr/libexec/qemu-kvm --version
+>QEMU emulator version 2.12.0 (qemu-kvm-rhev-2.12.0-18.el7_6.1)
+>Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+># uname -a
+>Linux fox22hv 4.19.0-1.el7.elrepo.x86_64 #1 SMP Mon Oct 22 10:40:32 EDT 2018 x86_64 x86_64 x86_64 GNU/Linux
+>
+>
+>
+
 -- 
-2.17.2
+Wei Yang
+Help you, Help me
