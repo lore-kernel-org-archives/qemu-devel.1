@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58196)
+Received: from eggs.gnu.org ([209.51.188.92]:58380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjul4-0004MC-Kf
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:11 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjul9-0004Qi-6q
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjul3-0003Np-CR
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:06 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45496)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjul4-0003S6-Ke
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:11 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46786)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gjukx-0003CT-V0
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:01 -0500
-Received: by mail-wr1-x443.google.com with SMTP id t6so8904123wrr.12
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:37:57 -0800 (PST)
+	id 1gjul4-0003Kf-69
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:06 -0500
+Received: by mail-wr1-x442.google.com with SMTP id l9so8888921wrt.13
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:38:03 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Thu, 17 Jan 2019 00:37:07 +0100
-Message-Id: <1735f2dd5b1825aaf294ff8f80dcd8d3c26a72c1.1547681517.git.DirtY.iCE.hu@gmail.com>
+Date: Thu, 17 Jan 2019 00:37:15 +0100
+Message-Id: <d9c124dc587e108755d4f3c68c32d88109e61192.1547681517.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 34/50] spiceaudio: port to the new audio
- backend api
+Subject: [Qemu-devel] [PATCH v3 42/50] audio: make mixeng optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,186 +33,226 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+Implementation of the previously added mixeng option.
+
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/spiceaudio.c | 112 +++++++++++++++------------------------------
- 1 file changed, 38 insertions(+), 74 deletions(-)
+ audio/audio_template.h | 46 ++++++++++++++++-----------
+ audio/audio.c          | 70 ++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 92 insertions(+), 24 deletions(-)
 
-diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index 1a777bba17..d1605d3939 100644
---- a/audio/spiceaudio.c
-+++ b/audio/spiceaudio.c
-@@ -51,7 +51,7 @@ typedef struct SpiceVoiceOut {
-     SpiceRateCtl          rate;
-     int                   active;
-     uint32_t              *frame;
--    uint32_t              *fpos;
-+    uint32_t              fpos;
-     uint32_t              fsize;
- } SpiceVoiceOut;
+diff --git a/audio/audio_template.h b/audio/audio_template.h
+index 9ec565fc48..e5a4d6fa40 100644
+--- a/audio/audio_template.h
++++ b/audio/audio_template.h
+@@ -78,26 +78,32 @@ static void glue (audio_pcm_hw_free_resources_, TYPE) (HW *hw)
  
-@@ -60,7 +60,6 @@ typedef struct SpiceVoiceIn {
-     SpiceRecordInstance   sin;
-     SpiceRateCtl          rate;
-     int                   active;
--    uint32_t              samples[LINE_IN_SAMPLES];
- } SpiceVoiceIn;
- 
- static const SpicePlaybackInterface playback_sif = {
-@@ -152,44 +151,36 @@ static void line_out_fini (HWVoiceOut *hw)
-     spice_server_remove_interface (&out->sin.base);
- }
- 
--static size_t line_out_run (HWVoiceOut *hw, size_t live)
-+static void *line_out_get_buffer(HWVoiceOut *hw, size_t *size)
+ static void glue(audio_pcm_hw_alloc_resources_, TYPE)(HW *hw)
  {
--    SpiceVoiceOut *out = container_of (hw, SpiceVoiceOut, hw);
--    size_t rpos, decr;
 -    size_t samples;
-+    SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
-+    size_t decr;
- 
--    if (!live) {
--        return 0;
-+    if (!out->frame) {
-+        spice_server_playback_get_buffer(&out->sin, &out->frame, &out->fsize);
-+        out->fpos = 0;
+-    if (!hw->pcm_ops) {
+-        /*
+-         * We should only end up here when using wavcapture hmp command (and not
+-         * the wavcapture audio backend).
+-         * It needs a lot of samples, otherwise you'll end up with "Could not
+-         * mix X bytes into a capture buffer" warnings and a garbled capture.
+-         */
+-        samples = 4096 * 4;
+-    } else if (hw->pcm_ops->glue(buffer_size_, TYPE)) {
+-        samples = hw->pcm_ops->glue(buffer_size_, TYPE)(hw);
++    if (hw->s->dev->TYPE->mixeng) {
++        size_t samples;
++        if (!hw->pcm_ops) {
++            /*
++             * We should only end up here when using wavcapture hmp command (and
++             * not the wavcapture audio backend).
++             * It needs a lot of samples, otherwise you'll end up with "Could
++             * not mix X bytes into a capture buffer" warnings and a garbled
++             * capture.
++             */
++            samples = 4096 * 4;
++        } else if (hw->pcm_ops->glue(buffer_size_, TYPE)) {
++            samples = hw->pcm_ops->glue(buffer_size_, TYPE)(hw);
++        } else {
++            samples = 1024; /* todo better default */
++        }
++
++        if (audio_bug(__func__, samples == 0)) {
++            dolog("Attempted to allocate empty buffer\n");
++        }
++
++        HWBUF = g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * samples);
++        HWBUF->size = samples;
+     } else {
+-        samples = 1024; /* todo better default */
++        HWBUF = NULL;
      }
- 
--    decr = rate_get_samples (&hw->info, &out->rate);
--    decr = MIN (live, decr);
-+    decr = rate_get_samples(&hw->info, &out->rate);
-+    decr = MIN(out->fsize - out->fpos, decr);
- 
--    samples = decr;
--    rpos = hw->rpos;
--    while (samples) {
--        int left_till_end_samples = hw->samples - rpos;
--        int len = MIN (samples, left_till_end_samples);
-+    *size = decr << hw->info.shift;
-+    return out->frame + out->fpos;
-+}
- 
--        if (!out->frame) {
--            spice_server_playback_get_buffer (&out->sin, &out->frame, &out->fsize);
--            out->fpos = out->frame;
--        }
--        if (out->frame) {
--            len = MIN (len, out->fsize);
--            hw->clip (out->fpos, hw->mix_buf + rpos, len);
--            out->fsize -= len;
--            out->fpos  += len;
--            if (out->fsize == 0) {
--                spice_server_playback_put_samples (&out->sin, out->frame);
--                out->frame = out->fpos = NULL;
--            }
--        }
--        rpos = (rpos + len) % hw->samples;
--        samples -= len;
-+static size_t line_out_put_buffer(HWVoiceOut *hw, void *buf, size_t size)
-+{
-+    SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
-+
-+    out->fpos += size >> 2;
-+    assert(buf == out->frame + out->fpos && out->fpos <= out->fsize);
-+
-+    if (out->fpos == out->fsize) { /* buffer full */
-+        spice_server_playback_put_samples(&out->sin, out->frame);
-+        out->frame = NULL;
-     }
--    hw->rpos = rpos;
--    return decr;
-+
-+    return size;
+-    if (audio_bug(__func__, samples == 0)) {
+-        dolog("Attempted to allocate empty buffer\n");
+-    }
+-
+-    HWBUF = g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * samples);
+-    HWBUF->size = samples;
  }
  
- static int line_out_ctl (HWVoiceOut *hw, int cmd, ...)
-@@ -211,9 +202,9 @@ static int line_out_ctl (HWVoiceOut *hw, int cmd, ...)
-         }
-         out->active = 0;
-         if (out->frame) {
--            memset (out->fpos, 0, out->fsize << 2);
-+            memset(out->frame + out->fpos, 0, (out->fsize - out->fpos) << 2);
-             spice_server_playback_put_samples (&out->sin, out->frame);
--            out->frame = out->fpos = NULL;
-+            out->frame = NULL;
-         }
-         spice_server_playback_stop (&out->sin);
-         break;
-@@ -275,49 +266,20 @@ static void line_in_fini (HWVoiceIn *hw)
-     spice_server_remove_interface (&in->sin.base);
- }
- 
--static size_t line_in_run(HWVoiceIn *hw)
-+static size_t line_in_read(HWVoiceIn *hw, void *buf, size_t len)
+ static void glue (audio_pcm_sw_free_resources_, TYPE) (SW *sw)
+@@ -116,6 +122,10 @@ static int glue (audio_pcm_sw_alloc_resources_, TYPE) (SW *sw)
  {
-     SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
--    size_t num_samples;
--    int ready;
--    size_t len[2];
--    uint64_t delta_samp;
--    const uint32_t *samples;
-+    uint64_t delta_samp = rate_get_samples(&hw->info, &in->rate);
-+    uint64_t to_read = MIN(len >> 2, delta_samp);
-+    size_t ready = spice_server_record_get_samples(&in->sin, buf, to_read);
+     int samples;
  
--    if (!(num_samples = hw->samples - audio_pcm_hw_get_live_in (hw))) {
--        return 0;
--    }
--
--    delta_samp = rate_get_samples (&hw->info, &in->rate);
--    num_samples = MIN (num_samples, delta_samp);
--
--    ready = spice_server_record_get_samples (&in->sin, in->samples, num_samples);
--    samples = in->samples;
-+    /* XXX: do we need this? */
-     if (ready == 0) {
--        static const uint32_t silence[LINE_IN_SAMPLES];
--        samples = silence;
--        ready = LINE_IN_SAMPLES;
-+        memset(buf, 0, to_read << 2);
-+        ready = to_read;
++    if (!sw->s->dev->TYPE->mixeng) {
++        return 0;
++    }
++
+     samples = ((int64_t) sw->HWBUF->size << 32) / sw->ratio;
+ 
+     sw->buf = audio_calloc(__func__, samples, sizeof(struct st_sample));
+diff --git a/audio/audio.c b/audio/audio.c
+index 6bbbcd3e03..db42d89dc3 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -839,32 +839,46 @@ static void audio_timer (void *opaque)
+  */
+ size_t AUD_write(SWVoiceOut *sw, void *buf, size_t size)
+ {
++    HWVoiceOut *hw;
++
+     if (!sw) {
+         /* XXX: Consider options */
+         return size;
+     }
++    hw = sw->hw;
+ 
+-    if (!sw->hw->enabled) {
++    if (!hw->enabled) {
+         dolog ("Writing to disabled voice %s\n", SW_NAME (sw));
+         return 0;
      }
  
--    num_samples = MIN (ready, num_samples);
--
--    if (hw->wpos + num_samples > hw->samples) {
--        len[0] = hw->samples - hw->wpos;
--        len[1] = num_samples - len[0];
--    } else {
--        len[0] = num_samples;
--        len[1] = 0;
--    }
--
--    hw->conv (hw->conv_buf + hw->wpos, samples, len[0]);
--
--    if (len[1]) {
--        hw->conv (hw->conv_buf, samples + len[0], len[1]);
--    }
--
--    hw->wpos = (hw->wpos + num_samples) % hw->samples;
--
--    return num_samples;
-+    return ready << 2;
+-    return audio_pcm_sw_write(sw, buf, size);
++    if (hw->s->dev->out->mixeng) {
++        return audio_pcm_sw_write(sw, buf, size);
++    } else {
++        return hw->pcm_ops->write(hw, buf, size);
++    }
  }
  
- static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
-@@ -366,12 +328,14 @@ static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
- static struct audio_pcm_ops audio_callbacks = {
-     .init_out = line_out_init,
-     .fini_out = line_out_fini,
--    .run_out  = line_out_run,
-+    .write    = audio_generic_write,
-+    .get_buffer_out = line_out_get_buffer,
-+    .put_buffer_out = line_out_put_buffer,
-     .ctl_out  = line_out_ctl,
+ size_t AUD_read(SWVoiceIn *sw, void *buf, size_t size)
+ {
++    HWVoiceIn *hw;
++
+     if (!sw) {
+         /* XXX: Consider options */
+         return size;
+     }
++    hw = sw->hw;
  
-     .init_in  = line_in_init,
-     .fini_in  = line_in_fini,
--    .run_in   = line_in_run,
-+    .read     = line_in_read,
-     .ctl_in   = line_in_ctl,
- };
+-    if (!sw->hw->enabled) {
++    if (!hw->enabled) {
+         dolog ("Reading from disabled voice %s\n", SW_NAME (sw));
+         return 0;
+     }
  
+-    return audio_pcm_sw_read(sw, buf, size);
++    if (hw->s->dev->in->mixeng) {
++        return audio_pcm_sw_read(sw, buf, size);
++    } else {
++        return hw->pcm_ops->read(hw, buf, size);
++    }
+ }
+ 
+ int AUD_get_buffer_size_out (SWVoiceOut *sw)
+@@ -1086,6 +1100,26 @@ static void audio_run_out (AudioState *s)
+     HWVoiceOut *hw = NULL;
+     SWVoiceOut *sw;
+ 
++    if (!s->dev->out->mixeng) {
++        while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
++            /* there is exactly 1 sw for each hw with no mixeng */
++            sw = hw->sw_head.lh_first;
++
++            if (hw->pending_disable) {
++                hw->enabled = 0;
++                hw->pending_disable = 0;
++                if (hw->pcm_ops->enable_out) {
++                    hw->pcm_ops->enable_out(hw, false);
++                }
++            }
++
++            if (sw->active) {
++                sw->callback.fn(sw->callback.opaque, INT_MAX);
++            }
++        }
++        return;
++    }
++
+     while ((hw = audio_pcm_hw_find_any_enabled_out(s, hw))) {
+         size_t played, live, prev_rpos, free;
+         int nb_live, cleanup_required;
+@@ -1223,6 +1257,17 @@ static void audio_run_in (AudioState *s)
+ {
+     HWVoiceIn *hw = NULL;
+ 
++    if (!s->dev->in->mixeng) {
++        while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
++            /* there is exactly 1 sw for each hw with no mixeng */
++            SWVoiceIn *sw = hw->sw_head.lh_first;
++            if (sw->active) {
++                sw->callback.fn(sw->callback.opaque, INT_MAX);
++            }
++        }
++        return;
++    }
++
+     while ((hw = audio_pcm_hw_find_any_enabled_in(s, hw))) {
+         SWVoiceIn *sw;
+         size_t captured = 0, min;
+@@ -1738,6 +1783,11 @@ CaptureVoiceOut *AUD_add_capture(
+         s = audio_init(NULL, NULL);
+     }
+ 
++    if (!s->dev->out->mixeng) {
++        dolog("Can't capture with mixeng disabled\n");
++        goto err0;
++    }
++
+     if (audio_validate_settings (as)) {
+         dolog ("Invalid settings were passed when trying to add capture\n");
+         audio_print_settings (as);
+@@ -1888,9 +1938,13 @@ static void audio_validate_per_direction_opts(
+         *has_pdo = true;
+     }
+ 
++    if (!(*pdo)->has_mixeng) {
++        (*pdo)->has_mixeng = true;
++        (*pdo)->mixeng = true;
++    }
+     if (!(*pdo)->has_fixed_settings) {
+         (*pdo)->has_fixed_settings = true;
+-        (*pdo)->fixed_settings = true;
++        (*pdo)->fixed_settings = (*pdo)->mixeng;
+     }
+     if (!(*pdo)->fixed_settings &&
+         ((*pdo)->has_frequency || (*pdo)->has_channels || (*pdo)->has_format)) {
+@@ -1898,6 +1952,10 @@ static void audio_validate_per_direction_opts(
+                    "You can't use frequency, channels or format with fixed-settings=off");
+         return;
+     }
++    if (!(*pdo)->mixeng && (*pdo)->fixed_settings) {
++        error_setg(errp, "You can't use fixed-settings without mixeng");
++        return;
++    }
+ 
+     if (!(*pdo)->has_frequency) {
+         (*pdo)->has_frequency = true;
+@@ -1909,7 +1967,7 @@ static void audio_validate_per_direction_opts(
+     }
+     if (!(*pdo)->has_voices) {
+         (*pdo)->has_voices = true;
+-        (*pdo)->voices = 1;
++        (*pdo)->voices = (*pdo)->mixeng ? 1 : INT_MAX;
+     }
+     if (!(*pdo)->has_format) {
+         (*pdo)->has_format = true;
 -- 
 2.20.1
