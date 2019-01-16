@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49249)
+Received: from eggs.gnu.org ([209.51.188.92]:36112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gjb1L-0002hE-8f
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 21:33:36 -0500
+	(envelope-from <fangying1@huawei.com>) id 1gjbG2-0006um-1j
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 21:48:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gjamA-00064G-9G
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 21:17:55 -0500
-Date: Wed, 16 Jan 2019 10:18:05 +0800
-From: Yi Zhang <yi.z.zhang@linux.intel.com>
-Message-ID: <20190116021804.GA73677@tiger-server>
-References: <1888836717.9067.1547583207433.ref@mail.yahoo.com>
-	<1888836717.9067.1547583207433@mail.yahoo.com>
-	<20190116011233.GA10810@richard>
+	(envelope-from <fangying1@huawei.com>) id 1gjbG0-0006cF-9H
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 21:48:45 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2172 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fangying1@huawei.com>)
+	id 1gjbFz-0006Ks-IN
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 21:48:44 -0500
+References: <9af4a3f8-3095-61dc-77fa-17a877e48a02@huawei.com>
+	<20190108124650.GC11492@linux.fritz.box>
+	<affb7700-a2bc-6778-99be-931bb5e65e59@huawei.com>
+	<a9f0dfb3-e3ab-a538-a4ed-cb74c6a1aa02@redhat.com>
+From: Ying Fang <fangying1@huawei.com>
+Message-ID: <2a5a8829-2d43-7d1d-a819-643ba4f79c1a@huawei.com>
+Date: Wed, 16 Jan 2019 10:48:23 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190116011233.GA10810@richard>
-Subject: Re: [Qemu-devel] Devdax backend for vnvdimm not working
+In-Reply-To: <a9f0dfb3-e3ab-a538-a4ed-cb74c6a1aa02@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] Questions on the I/O performance of emulated
+ host cdrom device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +32,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: Kamal Kakri <kamalkakri2017@yahoo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
+To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: jianjay.zhou@huawei.com, dengkai1@huawei.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, mreitz@redhat.com
 
-On 2019-01-16 at 09:12:33 +0800, Wei Yang wrote:
-> On Tue, Jan 15, 2019 at 08:13:27PM +0000, Kamal Kakri via Qemu-devel wrote:
-> >Hi,
-> >
-> >I have a namespace (backed by real nvdimm h/w) configured in devdax mode:
-> ># ndctl list -N -n namespace0.0
-> >[
-> >  {
-> >    "dev":"namespace0.0",
-> >    "mode":"devdax",
-> >    "map":"dev",
-> >    "size":16909336576,
-> >    "uuid":"e5265c0a-d902-41ce-b1d1-87a78c358aa4",
-> >    "chardev":"dax0.0"
-> >  }
-> >]
-> >
-> 
-> Above is your host configuration, right?
-> 
-> >
-> >When I try to configure my vm using "virsh" with something like this:
-> >    <memory model='nvdimm' access='shared'>
-> >      <source>
-> >        <path>/dev/dax0.0</path>
-> >        <align unit='KiB'>2048</align>
-so that will apply the align=2048K for memory-backend-file?
-> >        <pmem/>
-> >      </source>
-> >      <target>
-> >        <size unit='KiB'>2097152</size>
-> >        <node>0</node>
-> >      </target>
-> >      <alias name='nvdimm0'/>
-> >      <address type='dimm' slot='0'/>
-> >    </memory>
-> >
-> 
-> I am not familiar with virsh, while I guess align here is the parameter passed
-> to qemu.
-> 
-> Hmm...  as I being told, the alignment should be 128M.
-2MB align is OK for this case.
-> 
-> >
-> >I get an error while starting my vm:
-> ># virsh start fox22vm
-> >start: domain(optdata): fox22vm
-> >start: found option <domain>: fox22vm
-> >start: <domain> trying as domain NAME
-> >error: Failed to start domain fox22vm
-> >error: internal error: qemu unexpectedly closed the monitor: ftruncate: Invalid argument
-> >2019-01-15T18:00:36.587467Z qemu-kvm: -object memory-backend-file,id=memnvdimm0,prealloc=yes,mem-path=/dev/dax0.0,share=yes,size=2147483648: unable to map backing store for guest RAM: Invalid argument
-I didn't see the algin=2M option is applied here, which is must and minimal
-granularity of devdax backend, is anything I missed?
-> 
-> The error message here shows the error is caused by mmap for an invalid
-> argument. Hmm... but I am not sure which one is incorrect.
+
+
+On 2019/1/16 4:15, John Snow wrote:
 > 
 > 
-> Usually I run qemu directly, here is a qemu command line which works at my
-> side:
+> On 1/8/19 10:20 PM, Ying Fang wrote:
+>>
+>>
+>> On 2019/1/8 20:46, Kevin Wolf wrote:
+>>> Am 29.12.2018 um 07:33 hat Ying Fang geschrieben:
+>>>> Hi.
+>>>> Recently one of our customer complained about the I/O performance of QEMU emulated host cdrom device.
+>>>> I did some investigation on it and there was still some point I could not figure out. So I had to ask for your help.
+>>>>
+>>>> Here is the application scenario setup by our customer.
+>>>> filename.iso        /dev/sr0           /dev/cdrom
+>>>> remote client    -->  host(cdemu)      -->  Linux VM
+>>>> (1)A remote client maps an iso file to x86 host machine through network using tcp.
+>>>> (2)The cdemu daemon then load it as a local virtual cdrom disk drive.
+>>>> (3)A VM is launched with the virtual cdrom disk drive configured.
+>>>> The VM can make use of this virtual cdrom to install an OS in the iso file.
+>>>>
+>>>> The network bandwith btw the remote client and host is 100Mbps, we test I/O perf using: dd if=/dev/sr0 of=/dev/null bs=32K count=100000.
+>>>> And we have
+>>>> (1) I/O perf of host side /dev/sr0 is 11MB/s;
+>>>> (2) I/O perf of /dev/cdrom inside VM is 3.8MB/s.
+>>>>
+>>>> As we can see, I/O perf of cdrom inside the VM is about 34.5% compared with host side.
+>>>> FlameGraph is used to find out the bottleneck of this operation and we find out that too much time is occupied by calling *bdrv_is_inserted*.
+>>>> Then we dig into the code and figure out that the ioctl in *cdrom_is_inserted* takes too much time, because it triggers io_schdule_timeout in kernel.
+>>>> In the code path of emulated cdrom device, each DMA I/O request consists of several *bdrv_is_inserted*, which degrades the I/O performance by about 31% in our test.
+>>>> static bool cdrom_is_inserted(BlockDriverState *bs)
+>>>> {
+>>>>     BDRVRawState *s = bs->opaque;
+>>>>     int ret;
+>>>>
+>>>>     ret = ioctl(s->fd, CDROM_DRIVE_STATUS, CDSL_CURRENT);
+>>>>     return ret == CDS_DISC_OK;
+>>>> }
+>>>> A flamegraph svg file (cdrom.svg) is attachieved in this email to show the code timing profile we've tested.
+>>>>
+>>>> So here is my question.
+>>>> (1) Why do we regularly check the presence of a cdrom disk drive in the code path?  Can we do it asynchronously?
 > 
-> qemu/x86_64-softmmu/qemu-system-x86_64 -machine pc,nvdimm \
-> 	-m 6G,slots=4,maxmem=128G -smp 8 --enable-kvm \
-> 	-drive file=/home/richard/guest/fedora29.img,format=raw -nographic \
-> 	-drive file=/home/richard/guest/project.img,format=raw \
-> 	-object memory-backend-file,id=mem1,share=on,mem-path=/dev/dax0.0,size=10G,align=128M \
-> 	-device nvdimm,id=nvdimm1,memdev=mem1,label-size=128k
+> The ATAPI emulator needs to know if it has storage present to carry out
+> the request or to signal an error, so it checks. It might be the case
+> that the VM operator forcibly dismounted network storage without
+> awareness from the guest. (This is basically emulation of the case when
+> a user mechanically forces a CDROM tray open.)
 > 
-> Maybe you can compare the difference between your virsh result to see the
-> difference.
+> I wasn't aware this check was so slow.
+It is fast enough in most case, however it may be slow if the cdrom drive is a virtual drive mapped from remote client.
+This is showed in https://raw.githubusercontent.com/fangying/fangying.github.io/master/94E119FA-8BA1-41AB-A26A-FBDC635BCD2C.png
+The reason is ioctl(s->fd, CDROM_DRIVE_STATUS, CDSL_CURRENT) in cdrom_is_inserted takes much time in this scenario.
+
 > 
-> >
-> >I have tried to add "align unit" to my virsh xml but it does not seem to pass it onto qemu (as much as I can see from the qemu cmd line in the logs at /var/log/libvirt/qemu)
-> >
-> >
-> >Can anyone pls hint as to what possibly could be the issue ? Is this alignment related or something else ?
-yes the alignment.
-> >
-> >Here are my versions:
-> ># virsh --version
-> >4.5.0
-> >[root@fox22hv libexec]# /usr/libexec/qemu-kvm --version
-> >QEMU emulator version 2.12.0 (qemu-kvm-rhev-2.12.0-18.el7_6.1)
-> >Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-> ># uname -a
-> >Linux fox22hv 4.19.0-1.el7.elrepo.x86_64 #1 SMP Mon Oct 22 10:40:32 EDT 2018 x86_64 x86_64 x86_64 GNU/Linux
-> >
-> >
-> >
+> Maybe we can just cache blk_is_inserted -- I don't remember if it's
+> possible to eject media without awareness from the device model, but if
+> this check winds up being slow in some configurations we can cache it.
+To cache media status is a good idea here, we check blk_is_inserted instead and modify it when media status is changed.
 > 
-> -- 
-> Wei Yang
-> Help you, Help me
+> This won't help the bdrv_check_byte_request calls, though, just ones
+> from the device model, see below
+> 
+>>>> (2) Can we drop some check point in the code path to improve the performance?
+>>>> Thanks.
+>>>
+>>> I'm actually not sure why so many places check it. Just letting an I/O
+>>> request fail if the CD was removed would probably be easier.
+>>>
+>> You can see those check points as showed in the attached flamegraph file in this thread (rename it to cdrom.svg).
+>> It is called mainly in bdrv_check_byte_request and ide_atapi_cmd, and only the host_cdrom backend implements
+>> it using cdrom_is_inserted.
+>>
+> 
+> in ide_atapi_cmd, try replacing:
+> 
+> `!s->tray_open && blk_is_inserted(s->blk) && s->cdrom_changed)`
+> 
+> with
+> 
+> `!s->tray_open && s->cdrom_changed && blk_is_inserted(s->blk))`
+> 
+> which should hopefully short-circuit calls to blk_is_inserted if
+> s->cdrom_changed is false, but it doesn't do much to fix the subsequent
+> call:
+> 
+> `    if ((cmd->flags & CHECK_READY) &&
+>         (!media_present(s) || !blk_is_inserted(s->blk)))`
+> 
+> which is unfortunately going to check blk_is_inserted quite a lot
+> because the read commands are tagged CHECK_READY...
+Yes you are right.
+> 
+> 
+> As alluded to above, too, I'm not sure what I can do about
+> bdrv_check_byte_request -- what happens if the io.c helpers don't
+> actually check this? Will they fail gracefully?
+> 
+> I guess there's one way to find out.
+
+I did some test here. As we can see only cdrom bdrv implements bdrv_is_inserted,
+then I skip check presence of cdrom device.
+
+I test I/O using dd if=/dev/sr0 of=/dev/null bs=32K count=1000
+and manually disconnect the remote iso client from the host to inject error.
+
+I found it failed gracefully and send an I/O error event.
+monitor_qapi_event_emit[423]|: {"timestamp": {"seconds": 1547466098, "microseconds": 740265}, "event": "BLOCK_IO_ERROR", "data":
+{"device": "drive-ide0-0-1", "node-name": "#block369", "reason": "Input/output error", "operation": "read", "action": "report"}}
+
+diff --git a/block.c b/block.c
+index 45145c5..5371ce2 100644
+--- a/block.c
++++ b/block.c
+@@ -3479,6 +3479,11 @@ bool bdrv_is_inserted(BlockDriverState *bs)
+     if (!drv) {
+         return false;
+     }
++
++    if (bdrv_is_read_only(bs)) {
++       return true;
++    }
++
+     if (drv->bdrv_is_inserted) {
+         return drv->bdrv_is_inserted(bs);
+     }
+
+Thanks.
+> 
+>>> To try out whether that would improve performance significantly, you
+>>> could try to use the host_device backend rather than the host_cdrom
+>>> backend. That one doesn't implement .bdrv_is_inserted, so the operation
+>>> will be cheap (just return true unconditionally).
+>>>
+>> The remote client maps filename.iso to host virtual cdrom drive.
+>> We use xml like
+>>     <disk type='block' device='cdrom'>
+>>       <driver name='qemu' type='raw' cache='none' io='native'/>
+>>       <source dev='/dev/sr0'/>
+>>       <target dev='hdb' bus='ide'/>
+>>       <readonly/>
+>>       <boot order='2'/>
+>>       <address type='drive' controller='0' bus='0' target='0' unit='1'/>
+>>     </disk>
+>> to attach the virtual cdrom drive into guest and backend bdrv is host_cdrom.
+>> Sorry I do not know how to use the host_device backend here.
+>>
+>>> You will also lose eject/lock passthrough when doing so, so this is not
+>>> the final solution, but if it proves to be a lot faster, we can check
+>>> where bdrv_is_inserted() calls are actually important (if anywhere) and
+>>> hopefully remove some even for the host_cdrom case.
+>>>
+>> You mean if we do not check *cdrom_is_inserted*, we may lose eject/lock here ?
+>> I wonder we used to check the presence of the cdrom device each time it is touched
+>> though I am not familiar with this feature.
+>>
+>>> Kevin
+>>>
+>>> .
+>>>
+>>
+>>
+> 
+> 
 > 
