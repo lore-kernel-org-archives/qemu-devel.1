@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55265)
+Received: from eggs.gnu.org ([209.51.188.92]:57704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gjuhX-0002ZK-RC
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:34:28 -0500
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjukd-000402-Af
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gjuXx-00021I-Jd
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:24:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34222)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gjuXo-0001s8-3A
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:24:29 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A34B874F12
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 23:24:17 +0000 (UTC)
-Date: Wed, 16 Jan 2019 21:24:11 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190116232411.GE14807@habkost.net>
-References: <20190115165614.GL16157@redhat.com>
-	<624086124c9a2673c627203f3310fd63495e00c0.camel@redhat.com>
-	<20190116113953.GO20275@redhat.com>
-	<d3fd5d3bf9a6823b24756b4f376e20903ac1a575.camel@redhat.com>
-	<20190116124445.GS20275@redhat.com>
-	<2b4954e50ad51e7b3bdaf6b7b183254e2a1cd70d.camel@redhat.com>
-	<20190116143722.GY20275@redhat.com>
-	<20190116144543.GA14807@habkost.net>
-	<20190116154042.GA20275@redhat.com>
-	<a85c6b3f384fc82c7d5d2debf8c7ad0eedcbb657.camel@redhat.com>
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjuka-0002iv-C2
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:39 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:34406)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+	id 1gjukS-0002Xt-6I
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:31 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id y185so2236900wmd.1
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:37:26 -0800 (PST)
+From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
+	<dirty.ice.hu@gmail.com>
+Date: Thu, 17 Jan 2019 00:36:33 +0100
+Message-Id: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <a85c6b3f384fc82c7d5d2debf8c7ad0eedcbb657.camel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 4/6] qemu: Wire up disk
- model=virtio-{non-}transitional
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 00/50] Audio 5.1 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,30 +28,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Cole Robinson <crobinso@redhat.com>, libvirt-list@redhat.com, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Wed, Jan 16, 2019 at 05:24:02PM +0100, Andrea Bolognani wrote:
-> On Wed, 2019-01-16 at 15:40 +0000, Daniel P. Berrang=E9 wrote:
-> > On Wed, Jan 16, 2019 at 12:45:43PM -0200, Eduardo Habkost wrote:
-> > > But I don't want to create unnecessary obstacles for libvirt, so
-> > > if there's a real benefit in promising compatibility between both
-> > > device types, we can still promise that on the QEMU side.
-> >=20
-> > I don't think there's an obstacle for libvirt, as I don't see any
-> > compelling reason to avoid the new devices when we have QEMU >=3D 4.0=
-.
->=20
-> Alright, let's do it that way then.
->=20
-> I still think it's important to maintain the relationship between
-> old and new devices consistent going forward, because not doing so
-> will certainly result in confusion for those using QEMU directly.
+Hi,
 
-Agreed that it's a good thing to have.  I will extend the
-existing virtio_version.py test case to be more strict and try to
-catch mistakes that would break compatibility between the two
-device types in the future.
+Here's an updated version of my audio 5.1 patches. Bigger changes from the
+previous version:
 
---=20
-Eduardo
+* Removed QemuOpts, use qobject_input_visitor.  This also means I removed my two
+  OptsVisitor patches as they are no longer needed.  I haven't done the input
+  and output option merging, I think they're better this way as we can share a
+  few functions between the input and output, but it has its drawbacks too with
+  its extra nesting, so it's still up for debate.
+* Trivial qapi fixes
+* MIN/MAX: Eric Blake's patches[1] should fix the osdep.h problems eventually,
+  so I left that out of my patch series.
+
+Additionally, programmingkidx@gmail.com reported some problems with the
+coreaudio backend, but since I don't have a Mac I can't really test/debug it.
+Any help is greatly appreciated!
+
+Regards,
+Zoltan
+
+[1]: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00727.html
+
+Kővágó, Zoltán (50):
+  qapi: qapi for audio backends
+  audio: use qapi AudioFormat instead of audfmt_e
+  audio: -audiodev command line option: documentation
+  audio: -audiodev command line option basic implementation
+  alsaaudio: port to -audiodev config
+  coreaudio: port to -audiodev config
+  dsoundaudio: port to -audiodev config
+  noaudio: port to -audiodev config
+  ossaudio: port to -audiodev config
+  paaudio: port to -audiodev config
+  sdlaudio: port to -audiodev config
+  spiceaudio: port to -audiodev config
+  wavaudio: port to -audiodev config
+  audio: -audiodev command line option: cleanup
+  audio: reduce glob_audio_state usage
+  audio: basic support for multi backend audio
+  audio: add audiodev properties to frontends
+  audio: audiodev= parameters no longer optional when -audiodev present
+  paaudio: do not move stream when sink/source name is specified
+  paaudio: properly disconnect streams in fini_*
+  audio: remove audio_MIN, audio_MAX
+  audio: do not run each backend in audio_run
+  paaudio: fix playback glitches
+  audio: remove read and write pcm_ops
+  audio: use size_t where makes sense
+  audio: api for mixeng code free backends
+  alsaaudio: port to the new audio backend api
+  coreaudio: port to the new audio backend api
+  dsoundaudio: port to the new audio backend api
+  noaudio: port to the new audio backend api
+  ossaudio: port to the new audio backend api
+  paaudio: port to the new audio backend api
+  sdlaudio: port to the new audio backend api
+  spiceaudio: port to the new audio backend api
+  wavaudio: port to the new audio backend api
+  audio: remove remains of the old backend api
+  audio: unify input and output mixeng buffer management
+  audio: remove hw->samples, buffer_size_in/out pcm_ops
+  audio: common rate control code for timer based outputs
+  audio: split ctl_* functions into enable_* and volume_*
+  audio: add mixeng option (documentation)
+  audio: make mixeng optional
+  paaudio: get/put_buffer functions
+  audio: support more than two channels in volume setting
+  audio: replace shift in audio_pcm_info with bytes_per_frame
+  audio: basic support for multichannel audio
+  paaudio: channel-map option
+  usb-audio: do not count on avail bytes actually available
+  usb-audio: support more than two channels of audio
+  usbaudio: change playback counters to 64 bit
+
+ configure                        |    5 -
+ Makefile.objs                    |    6 +-
+ qapi/audio.json                  |  241 +++++
+ qapi/qapi-schema.json            |    1 +
+ audio/audio.h                    |   76 +-
+ audio/audio_int.h                |  141 +--
+ audio/audio_pt_int.h             |   22 -
+ audio/audio_template.h           |  112 ++-
+ audio/dsound_template.h          |   63 +-
+ audio/mixeng.h                   |    9 +-
+ audio/rate_template.h            |    2 +-
+ include/hw/qdev-properties.h     |    3 +
+ include/sysemu/replay.h          |    4 +-
+ ui/vnc.h                         |    2 +
+ audio/alsaaudio.c                |  771 +++++----------
+ audio/audio.c                    | 1571 +++++++++++++++---------------
+ audio/audio_legacy.c             |  548 +++++++++++
+ audio/audio_pt_int.c             |  174 ----
+ audio/audio_win_int.c            |   18 +-
+ audio/coreaudio.c                |  198 ++--
+ audio/dsoundaudio.c              |  449 +++------
+ audio/noaudio.c                  |   98 +-
+ audio/ossaudio.c                 |  608 +++++-------
+ audio/paaudio.c                  |  894 +++++++----------
+ audio/sdlaudio.c                 |  218 ++---
+ audio/spiceaudio.c               |  286 ++----
+ audio/wavaudio.c                 |  158 +--
+ audio/wavcapture.c               |    8 +-
+ hw/arm/omap2.c                   |    2 +-
+ hw/audio/ac97.c                  |   13 +-
+ hw/audio/adlib.c                 |    7 +-
+ hw/audio/cs4231a.c               |   11 +-
+ hw/audio/es1370.c                |   17 +-
+ hw/audio/gus.c                   |    9 +-
+ hw/audio/hda-codec.c             |   35 +-
+ hw/audio/lm4549.c                |    6 +-
+ hw/audio/milkymist-ac97.c        |   16 +-
+ hw/audio/pcspk.c                 |    5 +-
+ hw/audio/pl041.c                 |    1 +
+ hw/audio/sb16.c                  |   17 +-
+ hw/audio/wm8750.c                |   16 +-
+ hw/core/qdev-properties-system.c |   57 ++
+ hw/display/xlnx_dp.c             |    2 +-
+ hw/input/tsc210x.c               |    2 +-
+ hw/usb/dev-audio.c               |  464 +++++++--
+ monitor.c                        |   12 +-
+ replay/replay-audio.c            |   16 +-
+ replay/replay.c                  |    2 +-
+ ui/vnc.c                         |   41 +-
+ vl.c                             |    7 +-
+ audio/Makefile.objs              |    3 +-
+ hmp-commands.hx                  |   11 +-
+ qemu-options.hx                  |  242 ++++-
+ 53 files changed, 3985 insertions(+), 3715 deletions(-)
+ create mode 100644 qapi/audio.json
+ delete mode 100644 audio/audio_pt_int.h
+ create mode 100644 audio/audio_legacy.c
+ delete mode 100644 audio/audio_pt_int.c
+
+-- 
+2.20.1
