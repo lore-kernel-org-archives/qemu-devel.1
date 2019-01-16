@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48222)
+Received: from eggs.gnu.org ([209.51.188.92]:55069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjqQu-0004Uk-Tw
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:01:03 -0500
+	(envelope-from <jusual@mail.ru>) id 1gjqVz-00069C-9M
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:06:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjqQt-0002by-7k
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:01:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50664)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gjqQt-0002Y2-1X
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:00:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gjqQp-0007q8-Q0
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 19:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BD9312E807D
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 19:00:55 +0000 (UTC)
+	(envelope-from <jusual@mail.ru>) id 1gjqVx-0001Jz-Ct
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:06:15 -0500
+Received: from smtp52.i.mail.ru ([94.100.177.112]:59004)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1gjqVu-00016h-Nr
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:06:11 -0500
+References: <20190115143650.15725-1-jusual@mail.ru>
+	<CAKmqyKOyfP=ZT-diiFFfAieYKt98DPSxf0HyVdwYE4g+jv5w0w@mail.gmail.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <797be79d-7ffc-222a-6acd-b01ff7269a63@mail.ru>
+Date: Wed, 16 Jan 2019 22:05:58 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Jan 2019 18:52:10 -0000
-From: Thomas Roth <1812091@bugs.launchpad.net>
-Reply-To: Bug 1812091 <1812091@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154766268387.1937.11188043264522807203.malonedeb@wampee.canonical.com>
-Message-Id: <154766473052.971.16918143346418243976.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1812091] Re: ARMv8-M boots in wrong security mode
+In-Reply-To: <CAKmqyKOyfP=ZT-diiFFfAieYKt98DPSxf0HyVdwYE4g+jv5w0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix PC overwriting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>
 
-** Information type changed from Public Security to Public
+On 16.01.2019 0:51, Alistair Francis wrote:
+> On Tue, Jan 15, 2019 at 7:04 AM Julia Suvorova via Qemu-devel
+> <qemu-devel@nongnu.org> wrote:
+>>
+>> If the memory is set using a file, and PC is specified on the command
+>> line, it will be overwritten with the value 'entry'. This is not only
+>> illogical, but also incorrect, because the load_ * functions do not take
+>> into account the specifics of the ARM-M PC.
+> 
+> How does this come up?
+> I see that the value of entry will force overwrite the PC addr, but
+> doesn't force_raw fix that? Is there a common use case of loading an
+> ELF/uimage but having to manually specify a start address?
 
--- =
+generic_loader_reset() is called after arm_cpu_reset() and damages PC
+(it is wrong to call arm_cpu_set_pc() with entry to set ARM PC reset
+value). Therefore, I tried to configure PC manually and ran into this
+problem.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1812091
+By the way, I do not know the right way to fix the original issue. Try
+to replace generic_loader_reset() with the device reset function or
+change the reset order or transfer PC reset value setting to a separate
+function and associate it with cpu. What do you think about it?
 
-Title:
-  ARMv8-M boots in wrong security mode
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu-commit: b2f7c27f56bf1116ebb7848c75914aa7c5d6a040
-
-  =
-
-  The ARMv8-M architecture (with security extensions) contains a SAU, the S=
-ecurity Attribution Unit. After booting the mps2-an505 and immediately halt=
-ing (`-S`), I attempt to read the SAU_TYPE register, located at 0xE000EDD4,=
- using gdb (x 0xE000EDD4). The returned value is 0, while the expected valu=
-e is 8 (number of regions).
-
-  On further investigation, it seems that `attrs.secure` is set to false
-  (armv7m_nvic.c - nvic_readl, line 1167). Commenting out the check will
-  return the correct value.
-
-  As the CPU should be in 'secure' mode after reset, I think this
-  behavior is wrong.
-
-  Steps to reproduce:
-  Example code that loads an endless loop into the beginning of secure memo=
-ry: https://github.com/ajblane/armv8m-hello
-
-  Commandline: qemu-system-arm -machine mps2-an505 -cpu cortex-m33 \
-  	                    -m 4096 \
-  			    -nographic -serial mon:stdio \
-  	                    -kernel $(IMAGE) -s -S
-
-  Attach with arm-none-eabi-gdb, and run x 0xE000EDD4.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1812091/+subscriptions
+Best regards, Julia Suvorova.
