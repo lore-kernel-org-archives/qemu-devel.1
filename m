@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42782)
+Received: from eggs.gnu.org ([209.51.188.92]:42863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gjrj8-0006tO-Bb
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 15:23:55 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gjrj9-0006uu-Pj
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 15:23:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gjrj7-0005yI-BS
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 15:23:54 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51851)
+	(envelope-from <alex.bennee@linaro.org>) id 1gjrj8-00065w-LM
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 15:23:55 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33777)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gjrj6-0005li-DN
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 15:23:53 -0500
-Received: by mail-wm1-x343.google.com with SMTP id b11so3461048wmj.1
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 12:23:52 -0800 (PST)
+	id 1gjrj8-00061a-DK
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 15:23:54 -0500
+Received: by mail-wm1-x342.google.com with SMTP id r24so1922813wmh.0
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 12:23:54 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 16 Jan 2019 20:23:44 +0000
-Message-Id: <20190116202349.29272-3-alex.bennee@linaro.org>
+Date: Wed, 16 Jan 2019 20:23:46 +0000
+Message-Id: <20190116202349.29272-5-alex.bennee@linaro.org>
 In-Reply-To: <20190116202349.29272-1-alex.bennee@linaro.org>
 References: <20190116202349.29272-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/7] fp-bench: remove wrong exponent raise
- in fill_random
+Subject: [Qemu-devel] [PATCH v2 4/7] softfloat: fallback to __int128 maths
+ for s390x and others
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +31,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
+Cc: cohuck@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, "open list:S390" <qemu-s390x@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+Apparently some versions of clang can't handle inline assembly with
+__int128 parameters, especially on s390. Instead of hand-coding the
+s390 divide provide a generic fallback for anything that provides
+__int128 capable maths.
 
-At this point random_ops[] only contains normals, so there's
-no need to do anything to them. In fact, raising the exponent
-here can make the output !normal, which is precisely
-what the comment says we want to avoid.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>
 ---
- tests/fp/fp-bench.c | 4 ----
- 1 file changed, 4 deletions(-)
+ include/fpu/softfloat-macros.h | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/tests/fp/fp-bench.c b/tests/fp/fp-bench.c
-index 546bac9c9c..4ba5e1d2d4 100644
---- a/tests/fp/fp-bench.c
-+++ b/tests/fp/fp-bench.c
-@@ -176,8 +176,6 @@ static void fill_random(union fp *ops, int n_ops, enum precision prec,
-             if (no_neg && float32_is_neg(ops[i].f32)) {
-                 ops[i].f32 = float32_chs(ops[i].f32);
-             }
--            /* raise the exponent to limit the frequency of denormal results */
--            ops[i].f32 |= 0x40000000;
-             break;
-         case PREC_DOUBLE:
-         case PREC_FLOAT64:
-@@ -185,8 +183,6 @@ static void fill_random(union fp *ops, int n_ops, enum precision prec,
-             if (no_neg && float64_is_neg(ops[i].f64)) {
-                 ops[i].f64 = float64_chs(ops[i].f64);
-             }
--            /* raise the exponent to limit the frequency of denormal results */
--            ops[i].f64 |= LIT64(0x4000000000000000);
-             break;
-         default:
-             g_assert_not_reached();
+diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
+index b1d772e6d4..1a43609eef 100644
+--- a/include/fpu/softfloat-macros.h
++++ b/include/fpu/softfloat-macros.h
+@@ -641,12 +641,6 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
+     uint64_t q;
+     asm("divq %4" : "=a"(q), "=d"(*r) : "0"(n0), "1"(n1), "rm"(d));
+     return q;
+-#elif defined(__s390x__)
+-    /* Need to use a TImode type to get an even register pair for DLGR.  */
+-    unsigned __int128 n = (unsigned __int128)n1 << 64 | n0;
+-    asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+-    *r = n >> 64;
+-    return n;
+ #elif defined(_ARCH_PPC64) && defined(_ARCH_PWR7)
+     /* From Power ISA 2.06, programming note for divdeu.  */
+     uint64_t q1, q2, Q, r1, r2, R;
+@@ -663,6 +657,10 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
+     }
+     *r = R;
+     return Q;
++#elif defined(CONFIG_INT128)
++    unsigned __int128 n = (unsigned __int128)n1 << 64 | n0;
++    *r = n % d;
++    return n / d;
+ #else
+     uint64_t d0, d1, q0, q1, r1, r0, m;
+ 
 -- 
 2.17.1
