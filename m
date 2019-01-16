@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42807)
+Received: from eggs.gnu.org ([209.51.188.92]:55955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjiV9-0008Dh-3B
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:32:54 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjick-0005Rh-EX
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:40:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjiV7-0007iz-5A
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:32:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38818)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjiV6-0007XO-Pv
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:32:49 -0500
-Date: Wed, 16 Jan 2019 11:32:27 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190116113227.47ebdea2@redhat.com>
-In-Reply-To: <15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-11-git-send-email-imammedo@redhat.com>
-	<15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjicd-0001lO-O1
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:40:38 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 16 Jan 2019 10:40:17 +0000
+Message-ID: <126bb214-377f-a774-0a00-d24890f0adbb@virtuozzo.com>
+References: <20190112175812.27068-1-eblake@redhat.com>
+	<20190112175812.27068-11-eblake@redhat.com>
+	<e24c7f01-a203-c6ce-ac95-77cb74c590df@virtuozzo.com>
+	<c0ab928c-3efc-41fd-f16f-6a6b4e465e9a@redhat.com>
+In-Reply-To: <c0ab928c-3efc-41fd-f16f-6a6b4e465e9a@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <575A6CDFCD41534E87AC933AAB0B9BF7@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/14] tests: acpi: ignore SMBIOS tests
- when UEFI firmware is used
+Subject: Re: [Qemu-devel] [PATCH v3 10/19] nbd/client: Split out
+ nbd_send_one_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On Tue, 15 Jan 2019 21:31:54 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
-
-> On 01/15/19 16:41, Igor Mammedov wrote:
-> > once FW provides a pointer to SMBIOS entry point like it does for
-> > RSDP it should be possible to enable this one the same way.  
-> 
-> Good point, I didn't think of SMBIOS.
-> 
-> We have the following options:
-> 
-> (1) Use just one "test support" structure, and add more fields (such as
-> the SMBIOS entry point) to it, beyond the RSDP1.0/RSDP2.0. For this, we
-> should also introduce a "size" field to the table, so we don't have to
-> extend the table between firmware and QEMU in lock-step.
-> 
-> (2) Use a different table (with a different GUID) for exposing the
-> SMBIOS entry point.
-> 
-> On the firmware side, (1) would be more work now, but it would keep
-> things simpler (and better separated) in the future. (2) would be more
-> lazy ^W convenient now, but it would introduce more churn / possibly
-> some code duplication in the future.
-> 
-> In QEMU, which one would you prefer?
-I'd prefer #1 to minimize # of memory scans.
-However with size (i.e. implicit versioning) and who know what else in
-the future complexity grows up and dependency this approach causes
-between firmware and QEMU (I dislike special build instead of reusing
-shipped images).
-
-So I've dug a little bit into the history why we've chosen including
-structure into the firmware itself instead of writing EFI application
-as part of QEMU that would provide the same test structure but won't
-require special firmware build.
-If I sum it up, it was issue with distros are shipping (if they do it at all)
-only a version that matches distro's architecture and a need for cross
-compiling EFI test app.
-
-Could we revisit EFI app approach (I'd prefer it over firwmare hack if it's
-possible)? We can try to avoid dependency on gnu-efi and cross compiling on
-regular builds and ship along with efi app source code several prebuild app
-binaries (boot disk images), that one would rebuild only when efi app
-is changed, and it could be done manually (the same like special fw build
-but contained withing QEMU). As for gnu-efi, is it possible to use striped
-down gnu-efi stubs to drop external library dependency, something along of
-lines https://github.com/tqh/efi-example ?
-
-
-> Thanks,
-> Laszlo
-> 
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  tests/bios-tables-test.c | 7 +++++--
-> >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> > index d9efe59..a64d0c2 100644
-> > --- a/tests/bios-tables-test.c
-> > +++ b/tests/bios-tables-test.c
-> > @@ -562,8 +562,11 @@ static void test_acpi_one(const char *params, test_data *data)
-> >          }
-> >      }
-> >  
-> > -    test_smbios_entry_point(data);
-> > -    test_smbios_structs(data);
-> > +    /* TODO: make SMBIOS tests work with UEFI firmware */
-> > +    if (!use_uefi) {
-> > +        test_smbios_entry_point(data);
-> > +        test_smbios_structs(data);
-> > +    }
-> >  
-> >      assert(!global_qtest);
-> >      qtest_quit(data->qts);
-> >   
-> 
-> 
+MTUuMDEuMjAxOSAxODo0NCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xNS8xOSA3OjE4IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTIuMDEuMjAxOSAyMDo1
+OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBSZWZhY3RvciBuYmRfbmVnb3RpYXRlX3NpbXBsZV9t
+ZXRhX2NvbnRleHQoKSB0byBwdWxsIG91dCB0aGUNCj4+PiBjb2RlIHRoYXQgY2FuIGJlIHJldXNl
+ZCB0byBzZW5kIGEgTElTVCByZXF1ZXN0IGZvciAwIG9yIDEgcXVlcnkuDQo+Pj4gTm8gc2VtYW50
+aWMgY2hhbmdlLiAgVGhlIG9sZCBjb21tZW50IGFib3V0ICdzaXplb2YodWludDMyX3QpJw0KPj4+
+IGJlaW5nIGVxdWl2YWxlbnQgdG8gJy8qIG51bWJlciBvZiBxdWVyaWVzICovJyBpcyBubyBsb25n
+ZXINCj4+PiBuZWVkZWQsIG5vdyB0aGF0IHdlIGFyZSBjb21wdXRpbmcgJ3NpemVvZihxdWVyaWVz
+KScgaW5zdGVhZC4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUBy
+ZWRoYXQuY29tPg0KPj4+IE1lc3NhZ2UtSWQ6IDwyMDE4MTIxNTEzNTMyNC4xNTI2MjktMTQtZWJs
+YWtlQHJlZGhhdC5jb20+DQo+Pj4gUmV2aWV3ZWQtYnk6IFJpY2hhcmQgVy5NLiBKb25lcyA8cmpv
+bmVzQHJlZGhhdC5jb20+DQo+Pj4NCj4+PiAtLS0NCj4+PiB2MzogSW1wcm92ZSBjb21taXQgbWVz
+c2FnZSBbUmljaF0sIGZvcm1hdHRpbmcgdHdlYWsgW2NoZWNrcGF0Y2hdLA0KPj4+IHJlYmFzZSB0
+byBkcm9wcGVkIHBhdGNoDQo+Pj4gLS0tDQo+IA0KPj4+ICsrKyBiL25iZC9jbGllbnQuYw0KPj4+
+IEBAIC02MjksNiArNjI5LDQ5IEBAIHN0YXRpYyBRSU9DaGFubmVsICpuYmRfcmVjZWl2ZV9zdGFy
+dHRscyhRSU9DaGFubmVsICppb2MsDQo+Pj4gICAgICAgIHJldHVybiBRSU9fQ0hBTk5FTCh0aW9j
+KTsNCj4+PiAgICB9DQo+Pj4NCj4+PiArLyoNCj4+PiArICogbmJkX3NlbmRfb25lX21ldGFfY29u
+dGV4dDoNCj4+PiArICogU2VuZCAwIG9yIDEgc2V0L2xpc3QgbWV0YSBjb250ZXh0IHF1ZXJpZXMu
+DQo+Pj4gKyAqIFJldHVybiAwIG9uIHN1Y2Nlc3MsIC0xIHdpdGggZXJycCBzZXQgZm9yIGFueSBl
+cnJvcg0KPj4+ICsgKi8NCj4+PiArc3RhdGljIGludCBuYmRfc2VuZF9vbmVfbWV0YV9jb250ZXh0
+KFFJT0NoYW5uZWwgKmlvYywNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHVpbnQzMl90IG9wdCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIGNvbnN0IGNoYXIgKmV4cG9ydCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIGNvbnN0IGNoYXIgKnF1ZXJ5LA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPj4+ICt7DQo+Pj4gKyAgICBpbnQgcmV0Ow0K
+Pj4+ICsgICAgdWludDMyX3QgZXhwb3J0X2xlbiA9IHN0cmxlbihleHBvcnQpOw0KPj4+ICsgICAg
+dWludDMyX3QgcXVlcmllcyA9ICEhcXVlcnk7DQo+Pg0KPj4gbl8gb3IgbmJfIHByZWZpeCBtYXkg
+bWFrZSBpdCBtb3JlIGNsZWFyDQo+Pg0KPj4+ICsgICAgdWludDMyX3QgY29udGV4dF9sZW4gPSAw
+Ow0KPj4+ICsgICAgdWludDMyX3QgZGF0YV9sZW47DQo+Pj4gKyAgICBjaGFyICpkYXRhOw0KPj4+
+ICsgICAgY2hhciAqcDsNCj4+PiArDQo+Pj4gKyAgICBkYXRhX2xlbiA9IHNpemVvZihleHBvcnRf
+bGVuKSArIGV4cG9ydF9sZW4gKyBzaXplb2YocXVlcmllcyk7DQo+IA0KPiBbMV0NCj4gDQo+Pj4g
+KyAgICBpZiAocXVlcnkpIHsNCj4+PiArICAgICAgICBjb250ZXh0X2xlbiA9IHN0cmxlbihxdWVy
+eSk7DQo+Pg0KPj4gbG9va3MgbGlrZSBpdCB0aGVuIHNob3VsZCBiZSBxdWVyeV9sZW4NCj4gDQo+
+IFN1cmUsIGFuIGFsdGVybmF0aXZlIG5hbWUgbWF5IG1ha2UgdGhpbmdzIGVhc2llciB0byByZWFk
+IChJIHRoaW5rIHRoaXMNCj4gaXMgc29tZXdoYXQgZmFsbG91dCBmcm9tIG15IHJlYmFzZSBjaHVy
+biwgd2hlcmUgZWFybGllciB2ZXJzaW9ucyBvZiB0aGUNCj4gcGF0Y2ggc2hhcmVkIGFzIG11Y2gg
+Y29kZSB3aXRoIE5CRF9PUFRfU0VUX01FVEFfQ09OVEVYVCwgYW5kIHRoYXQgY29kZQ0KPiB1c2Vk
+IHRoZSBuYW1lICdjb250ZXh0JyByYXRoZXIgdGhhbiAncXVlcnknOyBidXQgbm93IHRoYXQgSSd2
+ZSBzcGxpdA0KPiB0aGluZ3MgdG8gYWRkIGEgbmV3IGZ1bmN0aW9uLCBpdCBkb2Vzbid0IGhhdmUg
+dG8gbWFpbnRhaW4gdGhlIG9sZCBuYW1pbmcpLg0KDQphbmQgaWYgeW91IGFyZSBnb2luZyB0byBm
+aXggaXQsIG5vdGUsIHRoYXQgZnVuY3Rpb24gbmFtZSBtYXkgYmUgZml4ZWQgdG9vLCBhcyB3ZQ0K
+ZG9uJ3Qgc2VuZCBjb250ZXh0LCB3ZSBzZW5kIHF1ZXJ5LiBFc3BlY2lhbGx5IGluIHRoZSBjYXNl
+IHdoZW4gcXVlcnk9TlVMTCwNCndlIHNlbmQgZW1wdHkgcXVlcnksIGJ1dCB3aGF0IGlzIGVtcHR5
+IGNvbnRleHQ/DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
