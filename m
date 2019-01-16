@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49169)
+Received: from eggs.gnu.org ([209.51.188.92]:50241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjnac-0001e6-LH
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:58:51 -0500
+	(envelope-from <mst@redhat.com>) id 1gjndw-0003un-9z
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:02:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjnab-0002Gb-14
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:58:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33574)
+	(envelope-from <mst@redhat.com>) id 1gjndr-0005BU-5N
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:02:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjnaa-0002Ej-Oe
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:58:48 -0500
-Date: Wed, 16 Jan 2019 10:58:44 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjndq-0005AL-SR
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:02:11 -0500
+Date: Wed, 16 Jan 2019 11:01:58 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190116104105-mutt-send-email-mst@kernel.org>
-References: <cover.1547624239.git.yi.z.zhang@linux.intel.com>
-	<64bea1ff5f80647cc4592ee94d399d647bdd9862.1547624239.git.yi.z.zhang@linux.intel.com>
+Message-ID: <20190116110052-mutt-send-email-mst@kernel.org>
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-12-git-send-email-imammedo@redhat.com>
+	<4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
+	<20190116132953.404247ec@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <64bea1ff5f80647cc4592ee94d399d647bdd9862.1547624239.git.yi.z.zhang@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH V9 4/6] util/mmap-alloc: support MAP_SYNC
- in qemu_ram_mmap()
+In-Reply-To: <20190116132953.404247ec@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 11/14] tests: acpi: add AVMF firmware blobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Yi <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-On Wed, Jan 16, 2019 at 04:10:58PM +0800, Zhang Yi wrote:
-> When a file supporting DAX is used as vNVDIMM backend, mmap it with
-> MAP_SYNC flag in addition which can ensure file system metadata
-> synced in each guest writes to the backend file, without other QEMU
-> actions (e.g., periodic fsync() by QEMU).
+On Wed, Jan 16, 2019 at 01:29:53PM +0100, Igor Mammedov wrote:
+> On Tue, 15 Jan 2019 21:47:49 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
 > 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> ---
->  include/qemu/mmap-alloc.h |  1 +
->  include/qemu/osdep.h      | 16 ++++++++++++++++
->  util/mmap-alloc.c         |  7 ++++++-
->  3 files changed, 23 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-> index 6fe6ed4..a95d91c 100644
-> --- a/include/qemu/mmap-alloc.h
-> +++ b/include/qemu/mmap-alloc.h
-> @@ -18,6 +18,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
->   *  @flags: specifies additional properties of the mapping, which can be one or
->   *          bit-or of following values
->   *          - RAM_SHARED: mmap with MAP_SHARED flag
-> + *          - RAM_PMEM: mmap with MAP_SYNC flag
->   *          Other bits are ignored.
->   *
->   * Return:
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 457d24e..27a6bfe 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -419,6 +419,22 @@ void qemu_anon_ram_free(void *ptr, size_t size);
->  #  define QEMU_VMALLOC_ALIGN getpagesize()
->  #endif
+> > On 01/15/19 16:41, Igor Mammedov wrote:
+> > > Add firmware blobs built with PcdAcpiTestSupport=TRUE,
+> > > that puts RSDP address in RAM after 1Mb aligned GUID
+> > >   AB87A6B1-2034-BDA0-71BD-375007757785
+> > > so that tests could scan and find it in RAM once firmware's
+> > > initialized ACPI tables.
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > >  Makefile              |   3 ++-
+> > >  pc-bios/avmf.img      | Bin 0 -> 2097152 bytes
+> > >  pc-bios/avmf_vars.img | Bin 0 -> 786432 bytes
+> > >  3 files changed, 2 insertions(+), 1 deletion(-)
+> > >  create mode 100644 pc-bios/avmf.img
+> > >  create mode 100644 pc-bios/avmf_vars.img  
+> > 
+> > "AVMF" is not a great name. "AAVMF" is a downstream name alright, but
+> > many dislike it in upstream use. "edk2-aarch64" or "edk2-ArmVirtQemu"
+> > would be more precise, but those are verbose. Sigh, why are names so
+> > hard. What does everyone think?
+> I'm fine with either version.
 >  
-> +/*
-> + * MAP_SHARED_VALIDATE and MAP_SYNC are introduced in Linux kernel
-> + * 4.15, so they may not be defined when compiling on older kernels.
-> + */
-> +#ifdef CONFIG_LINUX
-> +
-> +#include <asm-generic/mman.h>
+> > Also, do you have to care about the license of firmware images built
+> > from edk2 when bundling such images? Since edk2 commit 9a67ba261fe9
+> > ("ArmVirtPkg: Replace obsoleted network drivers from platform DSC/FDF.",
+> > 2018-12-14), you cannot build the ArmVirtQemu (aka AAVMF) firmware
+> > without OpenSSL. Thus, the resultant license is 2-BSDL + OpenSSL -- for
+> > now anyway.
+> > 
+> > Because, in the near future, that might change again. edk2 is in the
+> > process of moving to Apache-2.0, and OpenSSL will also move (AFAICT) to
+> > Apache-2.0 starting with release 3.0.0. (See commit 151333164ece,
+> > "Change license to the Apache License v2.0", 2018-12-06.)
+> That's another reason to look into EFI app approach (a simple one without
+> dependencies) ans let distro to provide firmware image.
 
-I suspect this is a wrong way to pull in this header.
-
-You are normally supposed to use
-       #include <linux/mman.h>
-
-but see below.
-
-
-> +
-> +#ifndef MAP_SYNC
-> +#define MAP_SYNC 0x0
-> +#endif
-
-Oh that's bad.
-
-So if you run with a new kernel but
-your installed headers are old, you get MAP_SYNC 0
-and no persistence transparently with no warning.
+That will mean supporting very old firmware with the app.
+I'm all for the EFI app approach for modularity
+but I think we should include the batteries with this toy.
 
 
-
-> +
-> +#else  /* !CONFIG_LINUX */
-> +#define MAP_SYNC              0x0
-> +#endif /* CONFIG_LINUX */
-> +
->  #ifdef CONFIG_POSIX
->  struct qemu_signalfd_siginfo {
->      uint32_t ssi_signo;   /* Signal number */
-> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> index 8f0a740..cba961c 100644
-> --- a/util/mmap-alloc.c
-> +++ b/util/mmap-alloc.c
-> @@ -99,6 +99,8 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
->      void *ptr = mmap(0, total, PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
->  #endif
->      bool shared = flags & RAM_SHARED;
-> +    bool is_pmem = flags & RAM_PMEM;
-> +    int mmap_xflags = 0;
->      size_t offset;
->      void *ptr1;
->  
-> @@ -109,12 +111,15 @@ void *qemu_ram_mmap(int fd, size_t size, size_t align, uint32_t flags)
->      assert(is_power_of_2(align));
->      /* Always align to host page size */
->      assert(align >= getpagesize());
-> +    if (shared && is_pmem) {
-> +        mmap_xflags |= MAP_SYNC;
-> +    }
->  
->      offset = QEMU_ALIGN_UP((uintptr_t)ptr, align) - (uintptr_t)ptr;
->      ptr1 = mmap(ptr + offset, size, PROT_READ | PROT_WRITE,
->                  MAP_FIXED |
->                  (fd == -1 ? MAP_ANONYMOUS : 0) |
-> -                (shared ? MAP_SHARED : MAP_PRIVATE),
-> +                (shared ? MAP_SHARED : MAP_PRIVATE) | mmap_xflags,
->                  fd, 0);
->      if (ptr1 == MAP_FAILED) {
->          munmap(ptr, total);
-> -- 
-> 2.7.4
+> > Thanks
+> > Laszlo
