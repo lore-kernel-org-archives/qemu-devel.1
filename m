@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35027)
+Received: from eggs.gnu.org ([209.51.188.92]:35432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gji2H-0000yy-2Z
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:03:02 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gji2k-00017r-3U
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gji2F-0007Vj-MJ
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:03:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gji2F-0007Q5-1O
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:02:59 -0500
-Date: Wed, 16 Jan 2019 11:02:49 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190116110249.7c194dfc@redhat.com>
-In-Reply-To: <21a83c4e-056b-f749-1b66-abaa5fe51e32@redhat.com>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-9-git-send-email-imammedo@redhat.com>
-	<21a83c4e-056b-f749-1b66-abaa5fe51e32@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gji2g-00089v-HV
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:03:28 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52184)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gji2d-0007zy-18
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:03:23 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b11so1310103wmj.1
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 02:03:20 -0800 (PST)
+References: <20190111140857.4211-1-philmd@redhat.com>
+	<20190111140857.4211-4-philmd@redhat.com>
+	<875zuqjea7.fsf@dusky.pond.sub.org>
+	<403ad2e4-3282-051c-1ff5-8a3a23899293@redhat.com>
+	<be75e72a-9f54-c9b5-4a1f-e87e28df8ba5@redhat.com>
+	<87sgxtatod.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4b24723e-5a27-f25f-76c1-f2f4e94757ba@redhat.com>
+Date: Wed, 16 Jan 2019 11:03:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/14] tests: acpi: introduce an abilty
- start tests with UEFI firmware
+In-Reply-To: <87sgxtatod.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 03/15] hw/ssi: Remove SSIBus from
+ "qemu/typedefs.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 
-On Tue, 15 Jan 2019 21:18:18 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
+On 16/01/19 09:33, Markus Armbruster wrote:
+> What problem exactly are we trying to solve here?
+> To the best of my knowledge, typedefs.h has been working just fine for
+> us, and I can't see why it shouldn't continue to work just fine.
 
-> On 01/15/19 16:41, Igor Mammedov wrote:
-> > For testcase to use UEFI firmware, one needs to provide and specify
-> > firmware and varstore blobs names in test_data { uefi_fl1, uefi_fl2) }
-> > fields respectively.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  tests/bios-tables-test.c | 36 ++++++++++++++++++++++++++----------
-> >  1 file changed, 26 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> > index 8887319..d290dd2 100644
-> > --- a/tests/bios-tables-test.c
-> > +++ b/tests/bios-tables-test.c
-> > @@ -26,6 +26,8 @@
-> >  typedef struct {
-> >      const char *machine;
-> >      const char *variant;
-> > +    const char *uefi_fl1;
-> > +    const char *uefi_fl2;
-> >      uint64_t rsdp_addr;
-> >      uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-> >      GArray *tables;
-> > @@ -519,21 +521,35 @@ static void test_smbios_structs(test_data *data)
-> >  static void test_acpi_one(const char *params, test_data *data)
-> >  {
-> >      char *args;
-> > -
-> > -    /* Disable kernel irqchip to be able to override apic irq0. */
-> > -    args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off "
-> > -                           "-net none -display none %s "
-> > -                           "-drive id=hd0,if=none,file=%s,format=raw "
-> > -                           "-device ide-hd,drive=hd0 ",
-> > -                           data->machine, "kvm:tcg",
-> > -                           params ? params : "", disk);
-> > +    bool use_uefi = data->uefi_fl1 && data->uefi_fl2;
-> > +
-> > +    if (use_uefi) {
-> > +        args = g_strdup_printf("-machine %s,accel=%s -nodefaults -nographic "
-> > +            "-drive if=pflash,format=raw,file=%s/%s,readonly "
-> > +            "-drive if=pflash,format=raw,file=%s/%s,snapshot=on %s",  
-> 
-> Today I Learned: about "snapshot=on". Thanks :) The command line looks good.
-This way one doesn't have to make images in C (which is messy), keep track of
-temporary images and clean up (which isn't reliable when test crashes).
-Makefile magic can to all of that and in a much cleaner way.
+Patches don't have to solve problems.  They can just help long-term
+maintainability, highlight code smells, etc.  Nobody is saying
+typedefs.h doesn't work.  But it's a tool, and including headers from
+headers is also a tool.  Each tool has its purpose and it is useful to
+question what are the exact purposes of the tools.
 
-> > +            data->machine, "kvm:tcg", data_dir, data->uefi_fl1, data_dir,  
-> 
-> You could open-code "kvm:tcg" in the format string at once (unless you
-> turn that into a parameter in a later patch in the series). But, I see
-> the pre-patch code passes "kvm:tcg" as an argument too.
-That was my line of reasoning as well, so I've kept it for consistence
-with original code. If someone would insist I can throw in a separate
-patch to open-code it before this one.
+typedefs.h is useful to avoid rebuilding the world too often if a type
+is used many times as a pointer, but rarely as a struct and rarely has
+functions called on its instances.  This is already a relatively rare
+case, but here we're talking about files that are included less than 20
+times; many of which also already include hw/ssi/ssi.h for their own
+business.  So we're hardly rebuilding anything more often, also because
+hw/ssi/ssi.h is not really changing fast.
 
-> > +            data->uefi_fl2, params ? params : "");
-> > +
-> > +    } else {
-> > +        /* Disable kernel irqchip to be able to override apic irq0. */
-> > +        args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off "
-> > +            "-net none -display none %s "
-> > +            "-drive id=hd0,if=none,file=%s,format=raw "
-> > +            "-device ide-hd,drive=hd0 ",
-> > +             data->machine, "kvm:tcg", params ? params : "", disk);
-> > +    }
-> >  
-> >      data->qts = qtest_init(args);
-> >  
-> > -    boot_sector_test(data->qts);
-> > +    if (use_uefi) {
-> > +        data->rsdp_addr = uefi_find_rsdp_addr(data->qts,
-> > +            0x40000000ULL, 128ULL * 1024 * 1024);  
-> 
-> I think open-coding the DRAM size is valid; after all, it depends on the
-> QEMU command line, and you control the QEMU command line above. However,
-> do we really want to open-code the DRAM base here? That's
-> board-specific. Should we pass that too through the "test_data" structure?
-I've missed this one. In addition to your suggestion, RAM size is also
-a good candidate for "test_data" structure.
+typedefs.h is also useful to avoid circular header inclusions.  Here
+hw/ssi/ssi.h is clearly a toplevel include for the SSI subsystem.  I
+agree that includes in a headers _can_ be painful, but sometimes they
+also tell you a hierarchy of what uses what.  typedefs.h doesn't;
+forward struct declarations also do, and I all but dislike using them in
+headers (Thomas, can you send v2 of the HACKING patch?).
 
-> 
-> > +    } else {
-> > +        boot_sector_test(data->qts);
-> > +        test_acpi_rsdp_address(data);
-> > +    }
-> >  
-> >      data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
-> > -    test_acpi_rsdp_address(data);
-> >      test_acpi_rsdp_table(data);
-> >      test_acpi_rxsdt_table(data);
-> >      test_acpi_fadt_table(data);
-> >   
-> 
-> Thanks,
-> Laszlo
+Therefore, typedefs.h is not particularly useful for SSIBus.  It doesn't
+hurt much, if at all, to leave it in.  On the other hand, it also
+doesn't hurt much if at all to remove it; it makes the SSI code a very
+tiny little bit more self contained.
+
+It may be that it's not particularly useful just because SSI is small;
+for example I2CBus is also in typedefs.h and it's used a lot more, maybe
+one day SSIBus will be the same.  In doubt, let's drop the patch---but I
+think it's useful to have the discussion and there are cases that are
+not controversial at all in Philippe's series.
+
+Paolo
