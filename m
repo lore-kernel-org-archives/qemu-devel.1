@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44384)
+Received: from eggs.gnu.org ([209.51.188.92]:46764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1gjl8m-0004HV-1w
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:21:56 -0500
+	(envelope-from <groug@kaod.org>) id 1gjlAf-0004yE-EJ
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:23:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1gjl8k-0001uh-UT
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:21:55 -0500
-Received: from mail-eopbgr770129.outbound.protection.outlook.com
-	([40.107.77.129]:65464
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
-	id 1gjl8k-0001lP-J4
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:21:54 -0500
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
-Date: Wed, 16 Jan 2019 13:21:35 +0000
-Message-ID: <DM5PR22MB165810CC5E11B5361EE94764D2820@DM5PR22MB1658.namprd22.prod.outlook.com>
-References: <1547643949-10776-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1547643949-10776-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
+	(envelope-from <groug@kaod.org>) id 1gjlAe-0006w3-3C
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:23:53 -0500
+Received: from 17.mo4.mail-out.ovh.net ([46.105.41.16]:59035)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gjlAd-0006lI-TS
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:23:52 -0500
+Received: from player688.ha.ovh.net (unknown [10.109.159.157])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id CE3AD1C86D7
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 14:23:47 +0100 (CET)
+Date: Wed, 16 Jan 2019 14:23:36 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190116142336.54a542a2@bahia.lan>
+In-Reply-To: <186ccbfa-0797-25bb-453c-74c9ace0e4d5@redhat.com>
+References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+	<1547194672-24169-3-git-send-email-thuth@redhat.com>
+	<7d949380-e8e5-c5bd-1fd4-e87f3106e7f2@kaod.org>
+	<186ccbfa-0797-25bb-453c-74c9ace0e4d5@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] target/mips: Amend CP0 (add
- MemoryMapID, add macros, renaming)
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] ppc: Fix duplicated typedefs to be
+ able to compile with Clang in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +33,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, pbonzini@redhat.com, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Wednesday, January 16, 2019 2:05 PM
-> To: qemu-devel@nongnu.org
-> Cc: Aleksandar Markovic; Aleksandar Rikalo; aurelien@aurel32.net
-> Subject: [PATCH 0/3] target/mips: Amend CP0 (add MemoryMapID, add macros,=
- renaming)
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> Add MemoryMapId register and add preprocessor constants for
-> fmajority of CP0 subregisters, and rename few variables.
->
-> Aleksandar Markovic (3):
->   target/mips: Add preprocessor constants for CP0 subregisters
->   target/mips: Add CP0 register MemoryMapID
->   target/mips: Rename 'rn' to 'register_name'
->
->  target/mips/cpu.h       | 115 +++++++
->  target/mips/machine.c   |   5 +-
->  target/mips/translate.c | 858 ++++++++++++++++++++++++------------------=
-------
->  3 files changed, 550 insertions(+), 428 deletions(-)
->
-> --
-> 2.7.4
+On Wed, 16 Jan 2019 12:47:36 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
+> On 2019-01-16 12:43, C=C3=A9dric Le Goater wrote:
+> > On 1/11/19 9:17 AM, Thomas Huth wrote: =20
+> >> When compiling the ppc code with clang and -std=3Dgnu99, there are a
+> >> couple of warnings/errors like this one:
+> >>
+> >>   CC      ppc64-softmmu/hw/intc/xics.o
+> >> In file included from hw/intc/xics.c:35:
+> >> include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPState'=
+ is a C11 feature
+> >>       [-Werror,-Wtypedef-redefinition]
+> >> typedef struct ICPState ICPState;
+> >>                         ^
+> >> target/ppc/cpu.h:1181:25: note: previous definition is here
+> >> typedef struct ICPState ICPState;
+> >>                         ^
+> >> Work around the problems by including the proper headers instead. =20
+> >=20
+> > Thomas,
+> >=20
+> >=20
+> > After a closer look, I think we should use 'void *' under PowerPCCPU=20
+> > as it was the case before I introduced the second interrupt presenter. =
+=20
+>=20
+> If you don't like the #includes, why not simply do anonymous struct
+> forward declarations here? I think that would be better than "void *".
+>=20
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+That's questionable. These two fields are only used by the machine code and
+the interrupt controller code.
 
+$ git grep -E '(icp|tctx)' target/ppc/
+target/ppc/cpu.h:    ICPState *icp;
+target/ppc/cpu.h:    XiveTCTX *tctx;
 
-Except PATCH 1/3 where CPO should be CP0 (zero instead O) in all defines.
+$ git grep -E 'cpu\->(icp|tctx)'=20
+hw/intc/spapr_xive_kvm.c:        kvmppc_xive_cpu_set_state(cpu->tctx, &loca=
+l_err);
+hw/intc/spapr_xive_kvm.c:        kvmppc_xive_cpu_connect(cpu->tctx, &local_=
+err);
+hw/intc/xics_kvm.c:        icp_kvm_connect(cpu->icp, &local_err);
+hw/intc/xics_kvm.c:        icp_set_kvm_state(cpu->icp, 1);
+hw/intc/xics_spapr.c:    icp_set_cppr(cpu->icp, cppr);
+hw/intc/xics_spapr.c:    uint32_t xirr =3D icp_accept(cpu->icp);
+hw/intc/xics_spapr.c:    uint32_t xirr =3D icp_accept(cpu->icp);
+hw/intc/xics_spapr.c:    icp_eoi(cpu->icp, xirr);
+hw/intc/xics_spapr.c:    uint32_t xirr =3D icp_ipoll(cpu->icp, &mfrr);
+hw/intc/xive.c:    XiveTCTX *tctx =3D cpu->tctx;
+hw/intc/xive.c:    XiveTCTX *tctx =3D cpu->tctx;
+hw/intc/xive.c:        XiveTCTX *tctx =3D cpu->tctx;
+hw/ppc/pnv.c:    cpu->icp =3D ICP(obj);
+hw/ppc/pnv.c:    return cpu ? cpu->icp : NULL;
+hw/ppc/pnv.c:        icp_pic_print_info(cpu->icp, mon);
+hw/ppc/pnv_core.c:    object_unparent(OBJECT(cpu->icp));
+hw/ppc/spapr.c:    return cpu ? cpu->icp : NULL;
+hw/ppc/spapr_cpu_core.c:    if (cpu->icp) {
+hw/ppc/spapr_cpu_core.c:        object_unparent(OBJECT(cpu->icp));
+hw/ppc/spapr_cpu_core.c:    if (cpu->tctx) {
+hw/ppc/spapr_cpu_core.c:        object_unparent(OBJECT(cpu->tctx));
+hw/ppc/spapr_irq.c:        icp_pic_print_info(cpu->icp, mon);
+hw/ppc/spapr_irq.c:    cpu->icp =3D ICP(obj);
+hw/ppc/spapr_irq.c:            icp_resend(cpu->icp);
+hw/ppc/spapr_irq.c:        xive_tctx_pic_print_info(cpu->tctx, mon);
+hw/ppc/spapr_irq.c:    cpu->tctx =3D XIVE_TCTX(obj);
+hw/ppc/spapr_irq.c:    spapr_xive_set_tctx_os_cam(cpu->tctx);
+hw/ppc/spapr_irq.c:        spapr_xive_set_tctx_os_cam(cpu->tctx);
+hw/ppc/spapr_irq.c:        spapr_xive_set_tctx_os_cam(cpu->tctx);
+
+It thus looks wrong to expose their type in target/ppc/cpu.h. I guess
+they should be hidden behind an opaque data pointer (maybe the existing
+void *machine_data ?)
+
+> > That's a bigger change reverting bits of already merged patches. I can
+> > take care of it if you prefer.  =20
+>=20
+> Could I keep the current patch in my series so that I can get the
+> patches finally merged? You could then do any clean up that you like on
+> top of it, ok?
+>=20
+> > I use a f29 for dev. Which compiler should I install ?  =20
+>=20
+> Any version of Clang with -std=3Dgnu99 should do the job here, I think.
+>=20
+>  Thomas
