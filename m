@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48223)
+Received: from eggs.gnu.org ([209.51.188.92]:50436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjmTA-0002bL-B2
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:47:05 -0500
+	(envelope-from <philmd@redhat.com>) id 1gjmUs-0003Wa-QK
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:48:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjmT8-0005sI-Vk
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:47:03 -0500
-References: <20190116113523.9213-1-david@redhat.com>
-	<20190116113523.9213-5-david@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7c7cfe1c-16c6-fe1b-0e9f-796502e75652@redhat.com>
-Date: Wed, 16 Jan 2019 08:46:53 -0600
+	(envelope-from <philmd@redhat.com>) id 1gjmUo-0001Dj-Sd
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:48:48 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:52160)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gjmUh-00017F-NQ
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:48:41 -0500
+Received: by mail-wm1-f66.google.com with SMTP id b11so2278656wmj.1
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 06:48:37 -0800 (PST)
+References: <20190114141006.1841-1-yuval.shaia@oracle.com>
+	<ad603032-6658-a1db-06fc-80ffa4dbd682@redhat.com>
+	<20190116100357.GA7260@lap1>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1bd8cdbc-290e-5b15-37e9-f9984125a315@redhat.com>
+Date: Wed, 16 Jan 2019 15:48:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190116113523.9213-5-david@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="yew53mLNKnEItfU40UPOWxQnTBMluVs7W"
-Subject: Re: [Qemu-devel] [PATCH RFC 04/10] virtio-pmem: Prototype
+In-Reply-To: <20190116100357.GA7260@lap1>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/rdma: Verify that ptr is not NULL
+ before freeing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,123 +32,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Pankaj Gupta <pagupta@redhat.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yew53mLNKnEItfU40UPOWxQnTBMluVs7W
-From: Eric Blake <eblake@redhat.com>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck
- <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Collin Walling <walling@linux.ibm.com>, Markus Armbruster
- <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org,
- Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <7c7cfe1c-16c6-fe1b-0e9f-796502e75652@redhat.com>
-Subject: Re: [PATCH RFC 04/10] virtio-pmem: Prototype
-References: <20190116113523.9213-1-david@redhat.com>
- <20190116113523.9213-5-david@redhat.com>
-In-Reply-To: <20190116113523.9213-5-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 1/16/19 11:03 AM, Yuval Shaia wrote:
+> On Mon, Jan 14, 2019 at 04:11:22PM +0100, Philippe Mathieu-Daudé wrote:
+>> Hi Yuval,
+>>
+>> On 1/14/19 3:10 PM, Yuval Shaia wrote:
+>>> Make sure objects are not NULL before calling to non-nulll-safe
+>>
+>> null
+> 
+> will fix
+> 
+>>
+>>> destructors.
+>>>
+>>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+>>> ---
+>>>  hw/rdma/rdma_backend.c | 6 ++++--
+>>>  hw/rdma/rdma_rm.c      | 7 ++++++-
+>>>  2 files changed, 10 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+>>> index b49edaacaf..3ee5172c96 100644
+>>> --- a/hw/rdma/rdma_backend.c
+>>> +++ b/hw/rdma/rdma_backend.c
+>>> @@ -1066,8 +1066,10 @@ static void mad_fini(RdmaBackendDev *backend_dev)
+>>>      pr_dbg("Stopping MAD\n");
+>>>      disable_rdmacm_mux_async(backend_dev);
+>>>      qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
+>>> -    qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
+>>> -    qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
+>>> +    if (backend_dev->recv_mads_list.list) {
+>>
+>> This is only reachable when the backend didn't success at initializing,
+>> right?
+> 
+> Yes, just to cover the case where fini() was called even when init() fails.
 
-On 1/16/19 5:35 AM, David Hildenbrand wrote:
-> From: Pankaj Gupta <pagupta@redhat.com>
->=20
-> This is the current protoype of virtio-pmem. Support will require
-> machine changes for the architectures that will support it, so it will
-> not yet be compiled.
->=20
-> TODO:
-> - Use separate struct for tracking requests internally
-> - Move request/response structs to linux headers
-> - Factor out linux header sync
-> - Drop debug printfs
->=20
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",=
+OK. Can you add a line about this in the commit description please?
 
->   split up patches, unplug handler ]
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
+With the comment updated:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> +++ b/qapi/misc.json
-> @@ -2949,6 +2949,29 @@
->            }
->  }
-> =20
-> +##
-> +# @VirtioPMEMDeviceInfo:
-> +#
-> +# VirtioPMEM state information
-> +#
-> +# @id: device's ID
-> +#
-> +# @memaddr: physical address in memory, where device is mapped
-> +#
-> +# @size: size of memory that the device provides
-> +#
-> +# @memdev: memory backend linked with device
-> +#
-> +# Since: 3.1
-
-Now 4.0
-
-> +##
-> +{ 'struct': 'VirtioPMEMDeviceInfo',
-> +  'data': { '*id': 'str',
-> +            'memaddr': 'size',
-> +            'size': 'size',
-> +            'memdev': 'str'
-> +          }
-> +}
-> +
->  ##
->  # @MemoryDeviceInfo:
->  #
-> @@ -2958,7 +2981,8 @@
->  ##
->  { 'union': 'MemoryDeviceInfo',
-
-Does this union need a documentation update that virtio-pmem was added
-in 4.0?
-
->    'data': { 'dimm': 'PCDIMMDeviceInfo',
-> -            'nvdimm': 'PCDIMMDeviceInfo'
-> +            'nvdimm': 'PCDIMMDeviceInfo',
-> +            'virtio-pmem': 'VirtioPMEMDeviceInfo'
->            }
->  }
-> =20
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---yew53mLNKnEItfU40UPOWxQnTBMluVs7W
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw/Q90ACgkQp6FrSiUn
-Q2pDrggAofH1RvgSodXgwWsunId0RUHbhIoySPgGB9+7u1R7vaSzLwO7Y5MQ+Ljd
-UqD/ay9eoGxnGKXUqcrcjikI1+7Q+Dmi0a9bD4oyR/huOpZ4I/P85g9YIi2NL7RT
-X+2WUltLX35MdCRSlyzXos0awzXwwdH4VfFw/IJW8b709egvWR3Boo2ELh80pkRN
-bLyR5RDxJm4hBrUbV/9/SOMFrLXDjt9akR95Ef+LzsIZ8/IpRsGnMtObgT2CrwI4
-xIrNDxTpQ79lzD+AESLBX3Zf23mIFay0D7yiKsHQIXt6bAE6DdIIOdA5m+NnYf0W
-CKTwUxzpdIN1Su2WjHpKapTGUqav/A==
-=+dqa
------END PGP SIGNATURE-----
-
---yew53mLNKnEItfU40UPOWxQnTBMluVs7W--
+> 
+>>
+>>> +        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
+>>> +        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
+>>> +    }
+>>>  }
+>>>  
+>>>  int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+>>> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+>>> index f5b1295890..8bf241e91f 100644
+>>> --- a/hw/rdma/rdma_rm.c
+>>> +++ b/hw/rdma/rdma_rm.c
+>>> @@ -41,6 +41,9 @@ static inline void res_tbl_init(const char *name, RdmaRmResTbl *tbl,
+>>>  
+>>>  static inline void res_tbl_free(RdmaRmResTbl *tbl)
+>>>  {
+>>> +    if (!tbl->bitmap) {
+>>> +        return;
+>>> +    }
+>>>      qemu_mutex_destroy(&tbl->lock);
+>>>      g_free(tbl->tbl);
+>>>      g_free(tbl->bitmap);
+>>> @@ -655,5 +658,7 @@ void rdma_rm_fini(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+>>>      res_tbl_free(&dev_res->cq_tbl);
+>>>      res_tbl_free(&dev_res->pd_tbl);
+>>>  
+>>> -    g_hash_table_destroy(dev_res->qp_hash);
+>>> +    if (dev_res->qp_hash) {
+>>> +        g_hash_table_destroy(dev_res->qp_hash);
+>>> +    }
+>>>  }
+>>>
