@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47204)
+Received: from eggs.gnu.org ([209.51.188.92]:47348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpzT-0003Zv-Rn
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:40 -0500
+	(envelope-from <wexu@redhat.com>) id 1gjpzY-0003f0-Vt
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpzR-0007qr-2k
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51490)
+	(envelope-from <wexu@redhat.com>) id 1gjpzX-0007zn-V1
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50264)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gjpzJ-0007ku-QK
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:31 -0500
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gjpzX-0007vs-NB
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:43 -0500
 From: wexu@redhat.com
-Date: Wed, 16 Jan 2019 13:31:15 -0500
-Message-Id: <1547663480-547-11-git-send-email-wexu@redhat.com>
+Date: Wed, 16 Jan 2019 13:31:17 -0500
+Message-Id: <1547663480-547-13-git-send-email-wexu@redhat.com>
 In-Reply-To: <1547663480-547-1-git-send-email-wexu@redhat.com>
 References: <1547663480-547-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 10/15] virtio-net: fill head desc after done
- all in a chain
+Subject: [Qemu-devel] [PATCH v2 12/15] virtio: add vhost-net migration for
+ packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +29,63 @@ Cc: jasowang@redhat.com, mst@redhat.com, jfreiman@redhat.com, maxime.coquelin@re
 
 From: Wei Xu <wexu@redhat.com>
 
-With the support of marking a descriptor used/unused in 'flags'
-field for 1.1, the current way of filling a chained descriptors
-does not work since driver side may get the wrong 'num_buffer'
-information in case of the head descriptor has been filled in
-while the subsequent ones are still in processing in device side.
-
-This patch fills the head one after done all the others one.
-
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/net/virtio-net.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ hw/virtio/virtio.c | 27 ++++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index e37fc34..39336b9 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -1198,6 +1198,8 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-     struct virtio_net_hdr_mrg_rxbuf mhdr;
-     unsigned mhdr_cnt = 0;
-     size_t offset, i, guest_offset;
-+    VirtQueueElement head;
-+    int head_len = 0;
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 722a4fd..0cb912e 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -2991,17 +2991,34 @@ hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
  
-     if (!virtio_net_can_receive(nc)) {
-         return -1;
-@@ -1275,7 +1277,13 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-         }
+ uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
+ {
+-    return vdev->vq[n].last_avail_idx;
++    uint16_t idx;
++
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        idx = vdev->vq[n].last_avail_idx;
++        idx |= ((int)vdev->vq[n].avail_wrap_counter) << 15;
++    } else {
++        idx = (int)vdev->vq[n].last_avail_idx;
++    }
++    return idx;
+ }
  
-         /* signal other side */
--        virtqueue_fill(q->rx_vq, elem, total, i++);
-+        if (i == 0) {
-+            head_len = total;
-+            head = *elem;
-+        } else {
-+            virtqueue_fill(q->rx_vq, elem, len, i);
-+        }
-+        i++;
-         g_free(elem);
-     }
+ void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint16_t idx)
+ {
+-    vdev->vq[n].last_avail_idx = idx;
+-    vdev->vq[n].shadow_avail_idx = idx;
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        vdev->vq[n].last_avail_idx = idx & 0x7fff;
++        vdev->vq[n].avail_wrap_counter = !!(idx & 0x8000);
++    } else {
++        vdev->vq[n].last_avail_idx = idx;
++        vdev->vq[n].shadow_avail_idx = idx;
++    }
+ }
  
-@@ -1286,6 +1294,7 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-                      &mhdr.num_buffers, sizeof mhdr.num_buffers);
-     }
+ void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
+ {
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        return;
++    }
++
+     rcu_read_lock();
+     if (vdev->vq[n].vring.desc) {
+         vdev->vq[n].last_avail_idx = vring_used_idx(&vdev->vq[n]);
+@@ -3012,6 +3029,10 @@ void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
  
-+    virtqueue_fill(q->rx_vq, &head, head_len, 0);
-     virtqueue_flush(q->rx_vq, i);
-     virtio_notify(vdev, q->rx_vq);
- 
+ void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
+ {
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        return;
++    }
++
+     rcu_read_lock();
+     if (vdev->vq[n].vring.desc) {
+         vdev->vq[n].used_idx = vring_used_idx(&vdev->vq[n]);
 -- 
 1.8.3.1
