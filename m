@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58319)
+Received: from eggs.gnu.org ([209.51.188.92]:58250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjul8-0004P0-1L
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjul6-0004NG-I1
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjul4-0003SR-KV
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:09 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39039)
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjul3-0003Op-JC
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:08 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34220)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gjul4-0003ND-7Y
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:06 -0500
-Received: by mail-wr1-x441.google.com with SMTP id t27so8961186wra.6
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:38:05 -0800 (PST)
+	id 1gjul1-000306-GC
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:38:05 -0500
+Received: by mail-wm1-x343.google.com with SMTP id y185so2237343wmd.1
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:37:48 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Thu, 17 Jan 2019 00:37:17 +0100
-Message-Id: <a5778e84daa6f06d99cd0fd90bc14856d8abcf15.1547681517.git.DirtY.iCE.hu@gmail.com>
+Date: Thu, 17 Jan 2019 00:36:57 +0100
+Message-Id: <75357b8d2adbf9aad6d5dd19fe6b9f9fa0964a94.1547681517.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 44/50] audio: support more than two channels
- in volume setting
+Subject: [Qemu-devel] [PATCH v3 24/50] audio: remove read and write pcm_ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,211 +33,425 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+They just called audio_pcm_sw_read/write anyway, so it makes no sense
+to have them too.  (The noaudio's read is the only exception, but it
+should work with the generic code too.)
+
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio.h      | 10 ++++++++++
- audio/audio_int.h  |  4 ++--
- audio/audio.c      | 28 ++++++++++++++++++++--------
- audio/paaudio.c    | 20 ++++++++++++--------
- audio/spiceaudio.c | 14 ++++++++------
- 5 files changed, 52 insertions(+), 24 deletions(-)
+ audio/audio_int.h   |  5 -----
+ audio/alsaaudio.c   | 12 ------------
+ audio/audio.c       |  8 ++++----
+ audio/coreaudio.c   |  6 ------
+ audio/dsoundaudio.c | 12 ------------
+ audio/noaudio.c     | 19 -------------------
+ audio/ossaudio.c    | 12 ------------
+ audio/paaudio.c     | 12 ------------
+ audio/sdlaudio.c    |  6 ------
+ audio/spiceaudio.c  | 12 ------------
+ audio/wavaudio.c    |  6 ------
+ 11 files changed, 4 insertions(+), 106 deletions(-)
 
-diff --git a/audio/audio.h b/audio/audio.h
-index 2db27bba7b..bfb7ab2197 100644
---- a/audio/audio.h
-+++ b/audio/audio.h
-@@ -123,6 +123,16 @@ uint64_t AUD_get_elapsed_usec_out (SWVoiceOut *sw, QEMUAudioTimeStamp *ts);
- void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol);
- void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol);
- 
-+#define AUDIO_MAX_CHANNELS 16
-+typedef struct Volume {
-+    bool mute;
-+    int channels;
-+    uint8_t vol[AUDIO_MAX_CHANNELS];
-+} Volume;
-+
-+void audio_set_volume_out(SWVoiceOut *sw, Volume *vol);
-+void audio_set_volume_in(SWVoiceIn *sw, Volume *vol);
-+
- SWVoiceIn *AUD_open_in (
-     QEMUSoundCard *card,
-     SWVoiceIn *sw,
 diff --git a/audio/audio_int.h b/audio/audio_int.h
-index 6fec4f159c..cef749d647 100644
+index 02ec6ea738..40b3515b4e 100644
 --- a/audio/audio_int.h
 +++ b/audio/audio_int.h
-@@ -165,7 +165,7 @@ struct audio_pcm_ops {
-      */
-     size_t (*put_buffer_out)(HWVoiceOut *hw, void *buf, size_t size);
-     void   (*enable_out)(HWVoiceOut *hw, bool enable);
--    void   (*volume_out)(HWVoiceOut *hw, struct mixeng_volume *vol);
-+    void   (*volume_out)(HWVoiceOut *hw, Volume *vol);
+@@ -149,13 +149,11 @@ struct audio_pcm_ops {
+     int  (*init_out)(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque);
+     void (*fini_out)(HWVoiceOut *hw);
+     int  (*run_out) (HWVoiceOut *hw, int live);
+-    int  (*write)   (SWVoiceOut *sw, void *buf, int size);
+     int  (*ctl_out) (HWVoiceOut *hw, int cmd, ...);
  
-     int    (*init_in) (HWVoiceIn *hw, audsettings *as, void *drv_opaque);
-     void   (*fini_in) (HWVoiceIn *hw);
-@@ -174,7 +174,7 @@ struct audio_pcm_ops {
-     void  *(*get_buffer_in)(HWVoiceIn *hw, size_t *size);
-     void   (*put_buffer_in)(HWVoiceIn *hw, void *buf, size_t size);
-     void   (*enable_in)(HWVoiceIn *hw, bool enable);
--    void   (*volume_in)(HWVoiceIn *hw, struct mixeng_volume *vol);
-+    void   (*volume_in)(HWVoiceIn *hw, Volume *vol);
+     int  (*init_in) (HWVoiceIn *hw, struct audsettings *as, void *drv_opaque);
+     void (*fini_in) (HWVoiceIn *hw);
+     int  (*run_in)  (HWVoiceIn *hw);
+-    int  (*read)    (SWVoiceIn *sw, void *buf, int size);
+     int  (*ctl_in)  (HWVoiceIn *hw, int cmd, ...);
  };
  
- void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size);
+@@ -209,11 +207,8 @@ audio_driver *audio_driver_lookup(const char *name);
+ void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as);
+ void audio_pcm_info_clear_buf (struct audio_pcm_info *info, void *buf, int len);
+ 
+-int  audio_pcm_sw_write (SWVoiceOut *sw, void *buf, int len);
+ int  audio_pcm_hw_get_live_in (HWVoiceIn *hw);
+ 
+-int  audio_pcm_sw_read (SWVoiceIn *sw, void *buf, int len);
+-
+ int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
+                            int live, int pending);
+ 
+diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
+index 9dfd5fd26f..4c6bbdbc1d 100644
+--- a/audio/alsaaudio.c
++++ b/audio/alsaaudio.c
+@@ -269,11 +269,6 @@ static int alsa_poll_in (HWVoiceIn *hw)
+     return alsa_poll_helper (alsa->handle, &alsa->pollhlp, POLLIN);
+ }
+ 
+-static int alsa_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static snd_pcm_format_t aud_to_alsafmt (AudioFormat fmt, int endianness)
+ {
+     switch (fmt) {
+@@ -995,11 +990,6 @@ static int alsa_run_in (HWVoiceIn *hw)
+     return read_samples;
+ }
+ 
+-static int alsa_read (SWVoiceIn *sw, void *buf, int size)
+-{
+-    return audio_pcm_sw_read (sw, buf, size);
+-}
+-
+ static int alsa_ctl_in (HWVoiceIn *hw, int cmd, ...)
+ {
+     ALSAVoiceIn *alsa = (ALSAVoiceIn *) hw;
+@@ -1088,13 +1078,11 @@ static struct audio_pcm_ops alsa_pcm_ops = {
+     .init_out = alsa_init_out,
+     .fini_out = alsa_fini_out,
+     .run_out  = alsa_run_out,
+-    .write    = alsa_write,
+     .ctl_out  = alsa_ctl_out,
+ 
+     .init_in  = alsa_init_in,
+     .fini_in  = alsa_fini_in,
+     .run_in   = alsa_run_in,
+-    .read     = alsa_read,
+     .ctl_in   = alsa_ctl_in,
+ };
+ 
 diff --git a/audio/audio.c b/audio/audio.c
-index db42d89dc3..a5ee0c4324 100644
+index 4d0d316ce3..f844411d59 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -1901,31 +1901,43 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
- }
- 
- void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol)
-+{
-+    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
-+    audio_set_volume_out(sw, &vol);
-+}
-+
-+void audio_set_volume_out(SWVoiceOut *sw, Volume *vol)
- {
-     if (sw) {
-         HWVoiceOut *hw = sw->hw;
- 
--        sw->vol.mute = mute;
--        sw->vol.l = nominal_volume.l * lvol / 255;
--        sw->vol.r = nominal_volume.r * rvol / 255;
-+        sw->vol.mute = vol->mute;
-+        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
-+        sw->vol.r = nominal_volume.l * vol->vol[vol->channels > 1 ? 1 : 0] / 255;
- 
-         if (hw->pcm_ops->volume_out) {
--            hw->pcm_ops->volume_out(hw, &sw->vol);
-+            hw->pcm_ops->volume_out(hw, vol);
-         }
+@@ -597,7 +597,7 @@ static int audio_pcm_sw_get_rpos_in (SWVoiceIn *sw)
      }
  }
  
- void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
-+{
-+    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
-+    audio_set_volume_in(sw, &vol);
-+}
-+
-+void audio_set_volume_in(SWVoiceIn *sw, Volume *vol)
+-int audio_pcm_sw_read (SWVoiceIn *sw, void *buf, int size)
++static int audio_pcm_sw_read(SWVoiceIn *sw, void *buf, int size)
  {
-     if (sw) {
-         HWVoiceIn *hw = sw->hw;
- 
--        sw->vol.mute = mute;
--        sw->vol.l = nominal_volume.l * lvol / 255;
--        sw->vol.r = nominal_volume.r * rvol / 255;
-+        sw->vol.mute = vol->mute;
-+        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
-+        sw->vol.r = nominal_volume.r * vol->vol[vol->channels > 1 ? 1 : 0] / 255;
- 
-         if (hw->pcm_ops->volume_in) {
--            hw->pcm_ops->volume_in(hw, &sw->vol);
-+            hw->pcm_ops->volume_in(hw, vol);
-         }
+     HWVoiceIn *hw = sw->hw;
+     int samples, live, ret = 0, swlim, isamp, osamp, rpos, total = 0;
+@@ -699,7 +699,7 @@ static int audio_pcm_hw_get_live_out (HWVoiceOut *hw, int *nb_live)
+ /*
+  * Soft voice (playback)
+  */
+-int audio_pcm_sw_write (SWVoiceOut *sw, void *buf, int size)
++static int audio_pcm_sw_write (SWVoiceOut *sw, void *buf, int size)
+ {
+     int hwsamples, samples, isamp, osamp, wpos, live, dead, left, swlim, blck;
+     int ret = 0, pos = 0, total = 0;
+@@ -857,7 +857,7 @@ int AUD_write (SWVoiceOut *sw, void *buf, int size)
+         return 0;
      }
+ 
+-    return sw->hw->pcm_ops->write(sw, buf, size);
++    return audio_pcm_sw_write(sw, buf, size);
  }
+ 
+ int AUD_read (SWVoiceIn *sw, void *buf, int size)
+@@ -872,7 +872,7 @@ int AUD_read (SWVoiceIn *sw, void *buf, int size)
+         return 0;
+     }
+ 
+-    return sw->hw->pcm_ops->read(sw, buf, size);
++    return audio_pcm_sw_read(sw, buf, size);
+ }
+ 
+ int AUD_get_buffer_size_out (SWVoiceOut *sw)
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+index b6935359ee..abbbb45d69 100644
+--- a/audio/coreaudio.c
++++ b/audio/coreaudio.c
+@@ -489,11 +489,6 @@ static OSStatus audioDeviceIOProc(
+     return 0;
+ }
+ 
+-static int coreaudio_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+                               void *drv_opaque)
+ {
+@@ -692,7 +687,6 @@ static struct audio_pcm_ops coreaudio_pcm_ops = {
+     .init_out = coreaudio_init_out,
+     .fini_out = coreaudio_fini_out,
+     .run_out  = coreaudio_run_out,
+-    .write    = coreaudio_write,
+     .ctl_out  = coreaudio_ctl_out
+ };
+ 
+diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
+index 6f074c6f94..dfcb70c81a 100644
+--- a/audio/dsoundaudio.c
++++ b/audio/dsoundaudio.c
+@@ -454,11 +454,6 @@ static int dsound_ctl_out (HWVoiceOut *hw, int cmd, ...)
+     return 0;
+ }
+ 
+-static int dsound_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int dsound_run_out (HWVoiceOut *hw, int live)
+ {
+     int err;
+@@ -645,11 +640,6 @@ static int dsound_ctl_in (HWVoiceIn *hw, int cmd, ...)
+     return 0;
+ }
+ 
+-static int dsound_read (SWVoiceIn *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_read (sw, buf, len);
+-}
+-
+ static int dsound_run_in (HWVoiceIn *hw)
+ {
+     int err;
+@@ -856,13 +846,11 @@ static struct audio_pcm_ops dsound_pcm_ops = {
+     .init_out = dsound_init_out,
+     .fini_out = dsound_fini_out,
+     .run_out  = dsound_run_out,
+-    .write    = dsound_write,
+     .ctl_out  = dsound_ctl_out,
+ 
+     .init_in  = dsound_init_in,
+     .fini_in  = dsound_fini_in,
+     .run_in   = dsound_run_in,
+-    .read     = dsound_read,
+     .ctl_in   = dsound_ctl_in
+ };
+ 
+diff --git a/audio/noaudio.c b/audio/noaudio.c
+index 823780dacb..4fe7720861 100644
+--- a/audio/noaudio.c
++++ b/audio/noaudio.c
+@@ -60,11 +60,6 @@ static int no_run_out (HWVoiceOut *hw, int live)
+     return decr;
+ }
+ 
+-static int no_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write(sw, buf, len);
+-}
+-
+ static int no_init_out(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque)
+ {
+     audio_pcm_init_info (&hw->info, as);
+@@ -117,18 +112,6 @@ static int no_run_in (HWVoiceIn *hw)
+     return samples;
+ }
+ 
+-static int no_read (SWVoiceIn *sw, void *buf, int size)
+-{
+-    /* use custom code here instead of audio_pcm_sw_read() to avoid
+-     * useless resampling/mixing */
+-    int samples = size >> sw->info.shift;
+-    int total = sw->hw->total_samples_captured - sw->total_hw_samples_acquired;
+-    int to_clear = MIN (samples, total);
+-    sw->total_hw_samples_acquired += total;
+-    audio_pcm_info_clear_buf (&sw->info, buf, to_clear);
+-    return to_clear << sw->info.shift;
+-}
+-
+ static int no_ctl_in (HWVoiceIn *hw, int cmd, ...)
+ {
+     (void) hw;
+@@ -150,13 +133,11 @@ static struct audio_pcm_ops no_pcm_ops = {
+     .init_out = no_init_out,
+     .fini_out = no_fini_out,
+     .run_out  = no_run_out,
+-    .write    = no_write,
+     .ctl_out  = no_ctl_out,
+ 
+     .init_in  = no_init_in,
+     .fini_in  = no_fini_in,
+     .run_in   = no_run_in,
+-    .read     = no_read,
+     .ctl_in   = no_ctl_in
+ };
+ 
+diff --git a/audio/ossaudio.c b/audio/ossaudio.c
+index bbcc44129d..3eee7a3970 100644
+--- a/audio/ossaudio.c
++++ b/audio/ossaudio.c
+@@ -133,11 +133,6 @@ static void oss_poll_in (HWVoiceIn *hw)
+     qemu_set_fd_handler(oss->fd, oss_helper_poll_in, NULL, hw->s);
+ }
+ 
+-static int oss_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int aud_to_ossfmt (AudioFormat fmt, int endianness)
+ {
+     switch (fmt) {
+@@ -787,11 +782,6 @@ static int oss_run_in (HWVoiceIn *hw)
+     return read_samples;
+ }
+ 
+-static int oss_read (SWVoiceIn *sw, void *buf, int size)
+-{
+-    return audio_pcm_sw_read (sw, buf, size);
+-}
+-
+ static int oss_ctl_in (HWVoiceIn *hw, int cmd, ...)
+ {
+     OSSVoiceIn *oss = (OSSVoiceIn *) hw;
+@@ -860,13 +850,11 @@ static struct audio_pcm_ops oss_pcm_ops = {
+     .init_out = oss_init_out,
+     .fini_out = oss_fini_out,
+     .run_out  = oss_run_out,
+-    .write    = oss_write,
+     .ctl_out  = oss_ctl_out,
+ 
+     .init_in  = oss_init_in,
+     .fini_in  = oss_fini_in,
+     .run_in   = oss_run_in,
+-    .read     = oss_read,
+     .ctl_in   = oss_ctl_in
+ };
+ 
 diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 01c5df278b..0d67c03b4c 100644
+index 7758d304ca..f5b924d50c 100644
 --- a/audio/paaudio.c
 +++ b/audio/paaudio.c
-@@ -537,20 +537,22 @@ static void qpa_fini_in (HWVoiceIn *hw)
-     }
+@@ -294,11 +294,6 @@ static int qpa_run_out (HWVoiceOut *hw, int live)
+     return decr;
  }
  
--static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
-+static void qpa_volume_out(HWVoiceOut *hw, Volume *vol)
+-static int qpa_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ /* capture */
+ static void *qpa_thread_in (void *arg)
  {
-     PAVoiceOut *pa = (PAVoiceOut *) hw;
-     pa_operation *op;
-     pa_cvolume v;
-     PAConnection *c = pa->g->conn;
-+    int i;
- 
- #ifdef PA_CHECK_VERSION    /* macro is present in 0.9.16+ */
-     pa_cvolume_init (&v);  /* function is present in 0.9.13+ */
- #endif
- 
--    v.channels = 2;
--    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
--    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
-+    v.channels = vol->channels;
-+    for (i = 0; i < vol->channels; ++i) {
-+        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
-+    }
- 
-     pa_threaded_mainloop_lock(c->mainloop);
- 
-@@ -577,20 +579,22 @@ static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
-     pa_threaded_mainloop_unlock(c->mainloop);
+@@ -387,11 +382,6 @@ static int qpa_run_in (HWVoiceIn *hw)
+     return incr;
  }
  
--static void qpa_volume_in(HWVoiceIn *hw, struct mixeng_volume *vol)
-+static void qpa_volume_in(HWVoiceIn *hw, Volume *vol)
+-static int qpa_read (SWVoiceIn *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_read (sw, buf, len);
+-}
+-
+ static pa_sample_format_t audfmt_to_pa (AudioFormat afmt, int endianness)
  {
-     PAVoiceIn *pa = (PAVoiceIn *) hw;
-     pa_operation *op;
-     pa_cvolume v;
-     PAConnection *c = pa->g->conn;
-+    int i;
+     int format;
+@@ -988,13 +978,11 @@ static struct audio_pcm_ops qpa_pcm_ops = {
+     .init_out = qpa_init_out,
+     .fini_out = qpa_fini_out,
+     .run_out  = qpa_run_out,
+-    .write    = qpa_write,
+     .ctl_out  = qpa_ctl_out,
  
- #ifdef PA_CHECK_VERSION
-     pa_cvolume_init (&v);
+     .init_in  = qpa_init_in,
+     .fini_in  = qpa_fini_in,
+     .run_in   = qpa_run_in,
+-    .read     = qpa_read,
+     .ctl_in   = qpa_ctl_in
+ };
+ 
+diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
+index fc61038b77..ab9166d054 100644
+--- a/audio/sdlaudio.c
++++ b/audio/sdlaudio.c
+@@ -325,11 +325,6 @@ static void sdl_callback (void *opaque, Uint8 *buf, int len)
  #endif
+ }
  
--    v.channels = 2;
--    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
--    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
-+    v.channels = vol->channels;
-+    for (i = 0; i < vol->channels; ++i) {
-+        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
-+    }
- 
-     pa_threaded_mainloop_lock(c->mainloop);
+-static int sdl_write_out (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int sdl_run_out (HWVoiceOut *hw, int live)
+ {
+     int decr;
+@@ -483,7 +478,6 @@ static struct audio_pcm_ops sdl_pcm_ops = {
+     .init_out = sdl_init_out,
+     .fini_out = sdl_fini_out,
+     .run_out  = sdl_run_out,
+-    .write    = sdl_write_out,
+     .ctl_out  = sdl_ctl_out,
+ };
  
 diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index 771ecacf27..b26d10434b 100644
+index b9160991d2..f963853ed8 100644
 --- a/audio/spiceaudio.c
 +++ b/audio/spiceaudio.c
-@@ -179,13 +179,14 @@ static void line_out_enable(HWVoiceOut *hw, bool enable)
+@@ -192,11 +192,6 @@ static int line_out_run (HWVoiceOut *hw, int live)
+     return decr;
  }
  
- #if ((SPICE_INTERFACE_PLAYBACK_MAJOR >= 1) && (SPICE_INTERFACE_PLAYBACK_MINOR >= 2))
--static void line_out_volume(HWVoiceOut *hw, struct mixeng_volume *vol)
-+static void line_out_volume(HWVoiceOut *hw, Volume *vol)
+-static int line_out_write (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ static int line_out_ctl (HWVoiceOut *hw, int cmd, ...)
  {
-     SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
-     uint16_t svol[2];
- 
--    svol[0] = vol->l / ((1ULL << 16) + 1);
--    svol[1] = vol->r / ((1ULL << 16) + 1);
-+    assert(vol->channels == 2);
-+    svol[0] = vol->vol[0] * 257;
-+    svol[1] = vol->vol[1] * 257;
-     spice_server_playback_set_volume(&out->sin, 2, svol);
-     spice_server_playback_set_mute(&out->sin, vol->mute);
- }
-@@ -266,13 +267,14 @@ static void line_in_enable(HWVoiceIn *hw, bool enable)
+     SpiceVoiceOut *out = container_of (hw, SpiceVoiceOut, hw);
+@@ -325,11 +320,6 @@ static int line_in_run (HWVoiceIn *hw)
+     return num_samples;
  }
  
- #if ((SPICE_INTERFACE_RECORD_MAJOR >= 2) && (SPICE_INTERFACE_RECORD_MINOR >= 2))
--static void line_in_volume(HWVoiceIn *hw, struct mixeng_volume *vol)
-+static void line_in_volume(HWVoiceIn *hw, Volume *vol)
+-static int line_in_read (SWVoiceIn *sw, void *buf, int size)
+-{
+-    return audio_pcm_sw_read (sw, buf, size);
+-}
+-
+ static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
  {
      SpiceVoiceIn *in = container_of (hw, SpiceVoiceIn, hw);
-     uint16_t svol[2];
+@@ -377,13 +367,11 @@ static struct audio_pcm_ops audio_callbacks = {
+     .init_out = line_out_init,
+     .fini_out = line_out_fini,
+     .run_out  = line_out_run,
+-    .write    = line_out_write,
+     .ctl_out  = line_out_ctl,
  
--    svol[0] = vol->l / ((1ULL << 16) + 1);
--    svol[1] = vol->r / ((1ULL << 16) + 1);
-+    assert(vol->channels == 2);
-+    svol[0] = vol->vol[0] * 257;
-+    svol[1] = vol->vol[1] * 257;
-     spice_server_record_set_volume(&in->sin, 2, svol);
-     spice_server_record_set_mute(&in->sin, vol->mute);
+     .init_in  = line_in_init,
+     .fini_in  = line_in_fini,
+     .run_in   = line_in_run,
+-    .read     = line_in_read,
+     .ctl_in   = line_in_ctl,
+ };
+ 
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index 723028a466..dda6993fb9 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -82,11 +82,6 @@ static int wav_run_out (HWVoiceOut *hw, int live)
+     return decr;
  }
+ 
+-static int wav_write_out (SWVoiceOut *sw, void *buf, int len)
+-{
+-    return audio_pcm_sw_write (sw, buf, len);
+-}
+-
+ /* VICE code: Store number as little endian. */
+ static void le_store (uint8_t *buf, uint32_t val, int len)
+ {
+@@ -238,7 +233,6 @@ static struct audio_pcm_ops wav_pcm_ops = {
+     .init_out = wav_init_out,
+     .fini_out = wav_fini_out,
+     .run_out  = wav_run_out,
+-    .write    = wav_write_out,
+     .ctl_out  = wav_ctl_out,
+ };
+ 
 -- 
 2.20.1
