@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35169)
+Received: from eggs.gnu.org ([209.51.188.92]:37665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gjppm-0006yp-04
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:22:38 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gjpre-0008Lf-Hh
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:24:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gjppj-0005C5-68
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:22:36 -0500
-Date: Wed, 16 Jan 2019 13:21:50 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20190116182150.GA32175@flamenco>
-References: <e94b51d7-c90f-b599-fb68-ea8c2603989b@redhat.com>
-	<87zhs3nk1m.fsf@linaro.org>
-	<a0646a85-603d-99a8-c676-76e43a42e0fb@twiddle.net>
-	<87y37monyr.fsf@linaro.org>
-	<CAFEAcA8u4AdhW-MF6uMP7=B4iYVO9ZEQCtcQKpN6KWALwAfLnw@mail.gmail.com>
-	<87won6nfl1.fsf@linaro.org>
-	<6cb80b50-0352-430e-0c46-85ed69f95c88@redhat.com>
-	<87va2poqoz.fsf@linaro.org> <20190115200527.GB7844@flamenco>
-	<479044cb-345a-0faa-795a-f67da0077198@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gjprd-00081v-Gi
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:24:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37386)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gjprb-0007sy-Cl
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:24:33 -0500
+References: <20190116173527.27741-1-anthony.perard@citrix.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dd82518e-02e8-ba40-55da-156cb1a9798f@redhat.com>
+Date: Wed, 16 Jan 2019 19:14:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <479044cb-345a-0faa-795a-f67da0077198@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] include/fpu/softfloat: Fix compilation
- with Clang on s390x
+In-Reply-To: <20190116173527.27741-1-anthony.perard@citrix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] accel: Allow to build QEMU without TCG or
+ KVM support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-On Wed, Jan 16, 2019 at 07:33:28 +0100, Thomas Huth wrote:
-> On 2019-01-15 21:05, Emilio G. Cota wrote:
-> > On Tue, Jan 15, 2019 at 16:01:32 +0000, Alex Bennée wrote:
-> >> Ahh I should have mentioned we already have the technology for this ;-)
-> >>
-> >> If you build the fpu/next tree on a s390x you can then run:
-> >>
-> >>   ./tests/fp/fp-bench f64_div
-> >>
-> >> with and without the CONFIG_128 path. To get an idea of the real world
-> >> impact you can compile a foreign binary and run it on a s390x system
-> >> with:
-> >>
-> >>   $QEMU ./tests/fp/fp-bench f64_div -t host
-> >>
-> >> And that will give you the peak performance assuming your program is
-> >> doing nothing but f64_div operations. If the two QEMU's are basically in
-> >> the same ballpark then it doesn't make enough difference. That said:
-> > 
-> > I think you mean here `tests/fp/fp-bench -o div -p double', otherwise
-> > you'll get the default op (-o add).
+On 16/01/19 18:35, Anthony PERARD wrote:
+> Instead of deny build of QEMU without a default accelerator, simply
+> report an error when the user haven't passed -accel or -machine accel=
+> and TCG and KVM isn't builtin.
 > 
-> I tried that now, too, and -o div -p double does not really seem to
-> exercise this function at all.
+> ./configure already check that at least one accelerator is available.
+> 
+> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+> ---
+>  accel/accel.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/accel/accel.c b/accel/accel.c
+> index 68b6d56323..0d5b370dfd 100644
+> --- a/accel/accel.c
+> +++ b/accel/accel.c
+> @@ -91,7 +91,9 @@ void configure_accelerator(MachineState *ms, const char *progname)
+>  #elif defined(CONFIG_KVM)
+>              accel = "kvm";
+>  #else
+> -#error "No default accelerator available"
+> +            error_report("No accelerator selected and"
+> +                         " no default accelerator available");
+> +            exit(1);
+>  #endif
+>          }
+>      }
+> 
 
-You can check what is being called then with perf record/report.
+Queued, thanks.
 
-		E.
+Paolo
