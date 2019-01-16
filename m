@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44095)
+Received: from eggs.gnu.org ([209.51.188.92]:45906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gjoZQ-0001QU-SU
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:01:44 -0500
+	(envelope-from <eblake@redhat.com>) id 1gjocc-0003Zd-L4
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:05:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gjoZO-0001Bt-Te
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:01:40 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:47617)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gjoZO-00017h-Ko
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:01:38 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 16 Jan 2019 12:01:14 -0500
-Message-Id: <20190116170114.26802-4-cota@braap.org>
-In-Reply-To: <20190116170114.26802-1-cota@braap.org>
-References: <20190116170114.26802-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v7 3/3] tcg/i386: enable dynamic TLB sizing
+	(envelope-from <eblake@redhat.com>) id 1gjoca-0002rG-PU
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:04:58 -0500
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-10-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8fff6a6e-1030-64d7-4c96-4704970b898c@redhat.com>
+Date: Wed, 16 Jan 2019 11:04:48 -0600
+MIME-Version: 1.0
+In-Reply-To: <20180731173033.75467-10-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ddjE7xD05tvWz11vqCBEhC5GH0zU6a3F7"
+Subject: Re: [Qemu-devel] [PATCH v4 09/10] block/nbd-client: nbd reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,225 +24,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-As the following experiments show, this series is a net perf gain,
-particularly for memory-heavy workloads. Experiments are run on an
-Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ddjE7xD05tvWz11vqCBEhC5GH0zU6a3F7
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
+ pbonzini@redhat.com, den@openvz.org
+Message-ID: <8fff6a6e-1030-64d7-4c96-4704970b898c@redhat.com>
+Subject: Re: [PATCH v4 09/10] block/nbd-client: nbd reconnect
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+ <20180731173033.75467-10-vsementsov@virtuozzo.com>
+In-Reply-To: <20180731173033.75467-10-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-1. System boot + shudown, debian aarch64:
+On 7/31/18 12:30 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Implement reconnect. To achieve this:
+>=20
+> 1. add new modes:
+>    connecting-wait: means, that reconnecting is in progress, and there
+>      were small number of reconnect attempts, so all requests are
+>      waiting for the connection.
+>    connecting-nowait: reconnecting is in progress, there were a lot of
+>      attempts of reconnect, all requests will return errors.
+>=20
+>    two old modes are used too:
+>    connected: normal state
+>    quit: exiting after fatal error or on close
 
-- Before (v3.1.0):
- Performance counter stats for './die.sh v3.1.0' (10 runs):
+What makes an error fatal?  Without reconnect, life is simple - if the
+server sends something we can't parse, we permanently turn the device
+into an error condition - because we have no way to get back in sync
+with the server for further commands.  Your patch allows reconnect
+attempts where the connection is down (we failed to send to the server
+or failed to receive the server's reply), but why can we not ALSO
+attempt to reconnect after a parse error?  A reconnect would let us get
+back in sync for attempting further commands.  You're right that the
+current command should probably fail in that case (if the server sent us
+garbage for a specific request, it will probably do so again on a repeat
+of that request; which is different than when we don't even know what
+the server would have sent because of a disconnect).
 
-       9019.797015      task-clock (msec)         #    0.993 CPUs utilized            ( +-  0.23% )
-    29,910,312,379      cycles                    #    3.316 GHz                      ( +-  0.14% )
-    54,699,252,014      instructions              #    1.83  insn per cycle           ( +-  0.08% )
-    10,061,951,686      branches                  # 1115.541 M/sec                    ( +-  0.08% )
-       172,966,530      branch-misses             #    1.72% of all branches          ( +-  0.07% )
+Or, put another way, we KNOW we have (corner) cases where a mis-aligned
+image can currently cause the server to return BLOCK_STATUS replies that
+aren't aligned to the advertised minimumm block size.  Attempting to
+read the last sector of an image then causes the client to see the
+misaligned reply and complain, which we are treating as fatal. But why
+not instead just fail that particular read, but still attempt a
+reconnect, in order to attempt further reads elsewhere in the image that
+do not trip up the server's misaligned reply?
 
-       9.084039051 seconds time elapsed                                          ( +-  0.23% )
+>=20
+> Possible transitions are:
+>=20
+>    * -> quit
+>    connecting-* -> connected
+>    connecting-wait -> connecting-nowait (transition is done after
+>                       reconnect-delay seconds in connecting-wait mode)
+>    connected -> connecting-wait
+>=20
+> 2. Implement reconnect in connection_co. So, in connecting-* mode,
+>     connection_co, tries to reconnect unlimited times.
+>=20
+> 3. Retry nbd queries on channel error, if we are in connecting-wait
+>     state.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/nbd-client.h |   4 +
+>  block/nbd-client.c | 304 +++++++++++++++++++++++++++++++++++++++++++--=
+--------
+>  2 files changed, 255 insertions(+), 53 deletions(-)
+>=20
 
-- After:
- Performance counter stats for './die.sh tlb-dyn-v5' (10 runs):
+> @@ -781,16 +936,21 @@ static int nbd_co_request(BlockDriverState *bs, N=
+BDRequest *request,
+>      } else {
+>          assert(request->type !=3D NBD_CMD_WRITE);
+>      }
+> -    ret =3D nbd_co_send_request(bs, request, write_qiov);
+> -    if (ret < 0) {
+> -        return ret;
+> -    }
+> =20
+> -    ret =3D nbd_co_receive_return_code(client, request->handle,
+> -                                     &request_ret, &local_err);
+> -    if (local_err) {
+> -        error_report_err(local_err);
+> -    }
+> +    do {
+> +        ret =3D nbd_co_send_request(bs, request, write_qiov);
+> +        if (ret < 0) {
+> +            continue;
+> +        }
+> +
+> +        ret =3D nbd_co_receive_return_code(client, request->handle,
+> +                                         &request_ret, &local_err);
+> +        if (local_err) {
+> +            error_report_err(local_err);
+> +            local_err =3D NULL;
 
-       8624.084842      task-clock (msec)         #    0.993 CPUs utilized            ( +-  0.23% )
-    28,556,123,404      cycles                    #    3.311 GHz                      ( +-  0.13% )
-    51,755,089,512      instructions              #    1.81  insn per cycle           ( +-  0.05% )
-     9,526,513,946      branches                  # 1104.641 M/sec                    ( +-  0.05% )
-       166,578,509      branch-misses             #    1.75% of all branches          ( +-  0.19% )
+Conflicts with the conversion to use trace points.
 
-       8.680540350 seconds time elapsed                                          ( +-  0.24% )
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-That is, a 4.4% perf increase.
 
-2. System boot + shutdown, ubuntu 18.04 x86_64:
+--ddjE7xD05tvWz11vqCBEhC5GH0zU6a3F7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-- Before (v3.1.0):
-      56100.574751      task-clock (msec)         #    1.016 CPUs utilized            ( +-  4.81% )
-   200,745,466,128      cycles                    #    3.578 GHz                      ( +-  5.24% )
-   431,949,100,608      instructions              #    2.15  insn per cycle           ( +-  5.65% )
-    77,502,383,330      branches                  # 1381.490 M/sec                    ( +-  6.18% )
-       844,681,191      branch-misses             #    1.09% of all branches          ( +-  3.82% )
+-----BEGIN PGP SIGNATURE-----
 
-      55.221556378 seconds time elapsed                                          ( +-  5.01% )
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw/ZDAACgkQp6FrSiUn
+Q2oEXgf/TJV+eH6PZbMu3V94+lmnca2lpCDf0kINn7NOFEP+t9+Ej+quDKtK95+z
+txjAqdwH0HFUAD6GkN0RJeu5qUbDcBWDsEPuwpUNh1fpMIwbsTPagk1knrcRb+BI
+6+K33F1ug6xNUMeufc9SRI6A0l+oCAQkjzqPcVG1cuCJbOI5AeN+luDtJuCF6aYi
+NMYTQDO2xr8SJMw//ZiEwXzek1mxhPNMEFXqCYojQyOrnZ7/VdRNpH1R9Dn0cI9D
+G8/SHL6zrppUjPEiVg0bF86j9LfD6ByTgO+PO0QXPO/YuygubifjeVfrN6q5J2RC
+gXXkFuvhuuryCw/d6gS+jTrqc+a0bw==
+=lsLu
+-----END PGP SIGNATURE-----
 
-- After:
-      56603.419540      task-clock (msec)         #    1.019 CPUs utilized            ( +- 10.19% )
-   202,217,930,479      cycles                    #    3.573 GHz                      ( +- 10.69% )
-   439,336,291,626      instructions              #    2.17  insn per cycle           ( +- 14.14% )
-    80,538,357,447      branches                  # 1422.853 M/sec                    ( +- 16.09% )
-       776,321,622      branch-misses             #    0.96% of all branches          ( +-  3.77% )
-
-      55.549661409 seconds time elapsed                                          ( +- 10.44% )
-
-No improvement (within noise range). Note that for this workload,
-increasing the time window too much can lead to perf degradation,
-since it flushes the TLB *very* frequently.
-
-3. x86_64 SPEC06int:
-
-           x86_64-softmmu speedup vs. v3.1.0 for SPEC06int (test set)
-            Host: Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz (Skylake)
-
-5.5 +------------------------------------------------------------------------+
-    |                   +-+                                                  |
-  5 |-+.................+-+...............................tlb-dyn-v5.......+-|
-    |                   * *                                                  |
-4.5 |-+.................*.*................................................+-|
-    |                   * *                                                  |
-  4 |-+.................*.*................................................+-|
-    |                   * *                                                  |
-3.5 |-+.................*.*................................................+-|
-    |                   * *                                                  |
-  3 |-+......+-+*.......*.*................................................+-|
-    |        *  *       * *                                                  |
-2.5 |-+......*..*.......*.*.................................+-+*...........+-|
-    |        *  *       * *                                 *  *             |
-  2 |-+......*..*.......*.*.................................*..*...........+-|
-    |        *  *       * *                                 *  *  +-+        |
-1.5 |-+......*..*.......*.*.................................*..*.*+-+.*+-+.+-|
-    |        *  * *+-+  * *  +-+       *+-+  +-+       +-+  *  * *  * *  *   |
-  1 |++++-+*+*++*+*++*++*+*++*+*+++-+*+*+-++*+-++++-++++-+++*++*+*++*+*++*+++|
-    |   *  * *  * *  *  * *  * *  *  * *  * *  *  * *  * *  *  * *  * *  *   |
-0.5 +------------------------------------------------------------------------+
-  400.perlb401.bzip403.g429445.g456.hm462.libq464.h471.omn47483.xalancbgeomean
-  png: https://imgur.com/YRF90f7
-
-That is, a 1.51x average speedup over the baseline, with a max speedup
-of 5.17x.
-
-Here's a different look at the SPEC06int results, using KVM as the baseline:
-
-             x86_64-softmmu slowdown vs. KVM for SPEC06int (test set)
-             Host: Intel(R) Xeon(R) Gold 6142 CPU @ 2.60GHz (Skylake)
-
-25 +---------------------------------------------------------------------------+
-   |                   +-+                                        +-+          |
-   |                   * *                             +-+      v3.1.0         |
-   |                   * *                             +-+  tlb-dyn-v5         |
-   |                   * *                             * *        +-+          |
-20 |-+.................*.*.............................*.+-+......*.*........+-|
-   |                   * *                             * # #      * *          |
-   |        +-+        * *                             * # #      * *          |
-   |        * *        * *                             * # #      * *          |
-15 |-+......*.*........*.*.............................*.#.#......*.+-+......+-|
-   |        * *        * *                             * # #      * #|#        |
-   |        * *        * *        +-+                  * # #      * +-+        |
-   |        * *  +-+   * *        ++-+       +-+       * # #      * # # +-+    |
-   |        * *  +-+   * *        * ##       *|   +-+  * # #      * # # +-+    |
-10 |-+......*.*..*.+-+.*.*........*.##.......++-+.*.+-+*.#.#......*.#.#.*.*..+-|
-   |        * *  * +-+ * *        * ## +-+   *# # * # #* # # +-+  * # # * *    |
-   |        * *  * # # * *  +-+   * ## * +-+ *# # * # #* # # * *  * # # *+-+   |
-   |        * *  * # # * *  * +-+ * ## * # # *# # * # #* # # * *  * # # * ##   |
- 5 |-+......*.+-+*.#.#.*.*..*.#.#.*.##.*.#.#.*#.#.*.#.#*.#.#.*.*..*.#.#.*.##.+-|
-   |        * # #* # # * +-+* # # * ## * # # *# # * # #* # # * *  * # # * ##   |
-   |        * # #* # # * # #* # # * ## * # # *# # * # #* # # * +-+* # # * ##   |
-   |   ++-+ * # #* # # * # #* # # * ## * # # *# # * # #* # # * # #* # # * ##   |
-   |+++*#+#+*+#+#*+#+#+*+#+#*+#+#+*+##+*+#+#+*#+#+*+#+#*+#+#+*+#+#*+#+#+*+##+++|
- 0 +---------------------------------------------------------------------------+
- 400.perlbe401.bzi403.gc429445.go456.h462.libqu464.h471.omne4483.xalancbmgeomean
-  png: https://imgur.com/YzAMNEV
-
-After this series, we bring down the average SPEC06int slowdown vs KVM
-from 11.47x to 7.58x.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- tcg/i386/tcg-target.h     |  2 +-
- tcg/i386/tcg-target.inc.c | 28 ++++++++++++++--------------
- 2 files changed, 15 insertions(+), 15 deletions(-)
-
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index bd7d37c7ef..bdcf613f65 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -27,7 +27,7 @@
- 
- #define TCG_TARGET_INSN_UNIT_SIZE  1
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 31
--#define TCG_TARGET_IMPLEMENTS_DYN_TLB 0
-+#define TCG_TARGET_IMPLEMENTS_DYN_TLB 1
- 
- #ifdef __x86_64__
- # define TCG_TARGET_REG_BITS  64
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 1b4e3b80e1..df8b20755c 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -329,6 +329,7 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_ARITH_GvEv	(0x03)		/* ... plus (ARITH_FOO << 3) */
- #define OPC_ANDN        (0xf2 | P_EXT38)
- #define OPC_ADD_GvEv	(OPC_ARITH_GvEv | (ARITH_ADD << 3))
-+#define OPC_AND_GvEv    (OPC_ARITH_GvEv | (ARITH_AND << 3))
- #define OPC_BLENDPS     (0x0c | P_EXT3A | P_DATA16)
- #define OPC_BSF         (0xbc | P_EXT)
- #define OPC_BSR         (0xbd | P_EXT)
-@@ -1621,7 +1622,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         }
-         if (TCG_TYPE_PTR == TCG_TYPE_I64) {
-             hrexw = P_REXW;
--            if (TARGET_PAGE_BITS + CPU_TLB_BITS > 32) {
-+            if (TARGET_PAGE_BITS + CPU_TLB_DYN_MAX_BITS > 32) {
-                 tlbtype = TCG_TYPE_I64;
-                 tlbrexw = P_REXW;
-             }
-@@ -1629,6 +1630,15 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-     }
- 
-     tcg_out_mov(s, tlbtype, r0, addrlo);
-+    tcg_out_shifti(s, SHIFT_SHR + tlbrexw, r0,
-+                   TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
-+
-+    tcg_out_modrm_offset(s, OPC_AND_GvEv + trexw, r0, TCG_AREG0,
-+                         offsetof(CPUArchState, tlb_mask[mem_index]));
-+
-+    tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r0, TCG_AREG0,
-+                         offsetof(CPUArchState, tlb_table[mem_index]));
-+
-     /* If the required alignment is at least as large as the access, simply
-        copy the address and mask.  For lesser alignments, check that we don't
-        cross pages for the complete access.  */
-@@ -1638,20 +1648,10 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         tcg_out_modrm_offset(s, OPC_LEA + trexw, r1, addrlo, s_mask - a_mask);
-     }
-     tlb_mask = (target_ulong)TARGET_PAGE_MASK | a_mask;
--
--    tcg_out_shifti(s, SHIFT_SHR + tlbrexw, r0,
--                   TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
--
-     tgen_arithi(s, ARITH_AND + trexw, r1, tlb_mask, 0);
--    tgen_arithi(s, ARITH_AND + tlbrexw, r0,
--                (CPU_TLB_SIZE - 1) << CPU_TLB_ENTRY_BITS, 0);
--
--    tcg_out_modrm_sib_offset(s, OPC_LEA + hrexw, r0, TCG_AREG0, r0, 0,
--                             offsetof(CPUArchState, tlb_table[mem_index][0])
--                             + which);
- 
-     /* cmp 0(r0), r1 */
--    tcg_out_modrm_offset(s, OPC_CMP_GvEv + trexw, r1, r0, 0);
-+    tcg_out_modrm_offset(s, OPC_CMP_GvEv + trexw, r1, r0, which);
- 
-     /* Prepare for both the fast path add of the tlb addend, and the slow
-        path function argument setup.  */
-@@ -1664,7 +1664,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
- 
-     if (TARGET_LONG_BITS > TCG_TARGET_REG_BITS) {
-         /* cmp 4(r0), addrhi */
--        tcg_out_modrm_offset(s, OPC_CMP_GvEv, addrhi, r0, 4);
-+        tcg_out_modrm_offset(s, OPC_CMP_GvEv, addrhi, r0, which + 4);
- 
-         /* jne slow_path */
-         tcg_out_opc(s, OPC_JCC_long + JCC_JNE, 0, 0, 0);
-@@ -1676,7 +1676,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
- 
-     /* add addend(r0), r1 */
-     tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r1, r0,
--                         offsetof(CPUTLBEntry, addend) - which);
-+                         offsetof(CPUTLBEntry, addend));
- }
- 
- /*
--- 
-2.17.1
+--ddjE7xD05tvWz11vqCBEhC5GH0zU6a3F7--
