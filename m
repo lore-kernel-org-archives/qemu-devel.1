@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([209.51.188.92]:37116)
+Received: from eggs.gnu.org ([209.51.188.92]:59939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjkMj-0002t3-As
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:32:18 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gjkea-00056W-UX
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:50:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjkMi-0001dx-98
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:32:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjkMi-0001ah-24
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:32:16 -0500
-Date: Wed, 16 Jan 2019 13:31:33 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190116133133.3c43531f@redhat.com>
-In-Reply-To: <20190116115217.jduhqrwbjhuibmoq@sirius.home.kraxel.org>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-11-git-send-email-imammedo@redhat.com>
-	<15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
-	<20190116113227.47ebdea2@redhat.com>
-	<314cffa2-f153-011a-9c6e-01e94c73590a@redhat.com>
-	<20190116115217.jduhqrwbjhuibmoq@sirius.home.kraxel.org>
+	(envelope-from <pasic@linux.ibm.com>) id 1gjkUp-0008AW-JG
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:40:41 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49548
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gjkUn-0007xA-D7
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:40:37 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0GCeITo084215
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 07:40:22 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2q23untxys-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 07:40:21 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 16 Jan 2019 12:40:18 -0000
+Date: Wed, 16 Jan 2019 13:40:11 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <f6a5491a-1859-8e0a-7357-901d47ee8304@linux.ibm.com>
+References: <1547125207-16907-1-git-send-email-pmorel@linux.ibm.com>
+	<1547125207-16907-2-git-send-email-pmorel@linux.ibm.com>
+	<f6a5491a-1859-8e0a-7357-901d47ee8304@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/14] tests: acpi: ignore SMBIOS tests
- when UEFI firmware is used
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <20190116134011.1189b027@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: Set the iommu region size
+ mpcifc request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +43,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1E?= =?UTF-8?B?YXVkw6k=?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
+To: Collin Walling <walling@linux.ibm.com>
+Cc: Pierre Morel <pmorel@linux.ibm.com>, thuth@redhat.com, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-On Wed, 16 Jan 2019 12:52:17 +0100
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Tue, 15 Jan 2019 10:35:42 -0500
+Collin Walling <walling@linux.ibm.com> wrote:
 
->   Hi,
-> 
-> > This approach allows the UEFI app source to live in the QEMU tree, and
-> > the affected maintainer(s) would be personally responsible for setting
-> > up their edk2 clones, and compilers. (The edk2 clone could even be a
-> > submodule of QEMU, for example at roms/edk2.) For example,
-> > "roms/Makefile" already calls an external EFIROM utility (also from
-> > edk2) in order to build the combined iPXE option ROMs.
-> > 
-> > And yes, we could turn the UEFI binaries into bootable ISO images at once.
-> > 
-> > I'll try to post some patches soon (or not so soon). I think the app's
-> > source code, and the edk2 submodule, should live under roms/, and the
-> > bootable images should live under pc-bios/.
-> > 
-> > (In fact we could use this opportunity to build & bundle OVMF itself...
-> > not sure if that's in scope for now. Gerd, what's your take?)  
-> 
-> Well, there is still the idea to move over firmware submodules and
-> prebuilt firmware blobs to a separate repo.  Expermimental repo:
-> https://git.kraxel.org/cgit/qemu-firmware/.  Not touched for more than a
-> year due to being busy with other stuff.  Oh well ...
-> 
-> (if someone feels like picking this up feel free to do so).
-> 
-> I think adding edk2 as submodule below roms/ makes sense.  Adding rules
-> to roms/Makefile to build the blobs makes sense too.  Not sure we want
-> the binaries actually copied over to pc-bios/ and commited as the uefi
-> firmware is pretty big ...
-> 
-> Not sure what a good place for the uefi app would be.  I'd tend to not
-> use roms/, that is the place for firmware submodules.  contrib/ or test/
-> maybe?
-Could be tests/data/acpi in this case
+> On 1/10/19 8:00 AM, Pierre Morel wrote:
+> > The size of the accessible iommu memory region in the guest
+> > is given to the IOMMU by the guest through the mpcifc request
+> > specifying the PCI Base Address and the PCI Address Limit.
+> >=20
+> > Let set the size of the IOMMU region to:
+> >      (PCI Address Limit) - (PCI Base Address) + 1.
+> >=20
+> > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> > ---
+> >   hw/s390x/s390-pci-bus.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> > index 69e0671..e97696a 100644
+> > --- a/hw/s390x/s390-pci-bus.c
+> > +++ b/hw/s390x/s390-pci-bus.c
+> > @@ -660,7 +660,7 @@ void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
+> >       char *name =3D g_strdup_printf("iommu-s390-%04x", iommu->pbdev->u=
+id);
+> >       memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr=
+),
+> >                                TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&i=
+ommu->mr),
+> > -                             name, iommu->pal + 1);
+> > +                             name, iommu->pal - iommu->pba + 1);
 
-> 
-> cheers,
->   Gerd
-> 
+=46rom the the look of this, I would say we basically used the address
+denoting the end of the region as the size of the region. This smells
+like a bug to me, but the commit message and the title ain't clear about
+this, and there is no fixes tag. Because of the latter I did some digging
+and came to commit f7c40aa "s390x/pci: fix failures of dma
+map/unmap" (Yi Min Zhao, 2016-06-19) which basically did the inverse of
+this commit!
+
+My initial motivation was to check if this is stable material. But now
+I'm very confused. I'm admittedly zPCI incompetent. Could some of the
+people that understand what is going on help me feel better about this
+patch?
+
+Regards,
+Halil
+
+
+
+> >       iommu->enabled =3D true;
+> >       memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->=
+iommu_mr));
+> >       g_free(name);
+> >=20
+>=20
+> Acked-by: Collin Walling <walling@linux.ibm.com>
+>=20
+>=20
