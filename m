@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47740)
+Received: from eggs.gnu.org ([209.51.188.92]:49161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpzl-0003mN-0p
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:59 -0500
+	(envelope-from <nshah@disroot.org>) id 1gjq0i-0004dv-JI
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:33:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpzj-0008Ix-DS
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51802)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gjpzj-0008GJ-6c
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:32:55 -0500
-From: wexu@redhat.com
-Date: Wed, 16 Jan 2019 13:31:20 -0500
-Message-Id: <1547663480-547-16-git-send-email-wexu@redhat.com>
-In-Reply-To: <1547663480-547-1-git-send-email-wexu@redhat.com>
-References: <1547663480-547-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 15/15] virtio: enable packed ring via a new
- command line
+	(envelope-from <nshah@disroot.org>) id 1gjq0h-0000uz-KK
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:33:56 -0500
+From: Nisarg Shah <nshah@disroot.org>
+Date: Thu, 17 Jan 2019 00:03:58 +0530
+Message-Id: <20190116183358.30287-1-nshah@disroot.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] device-crash-test: Convert to Python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +19,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wexu@redhat.com, tiwei.bie@intel.com, qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, mst@redhat.com, jfreiman@redhat.com, maxime.coquelin@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, ehabkost@redhat.com, Nisarg Shah <nshah@disroot.org>
 
-From: Wei Xu <wexu@redhat.com>
+Apply 2to3 tool to scripts/device-crash-test.
+Restrict whitelist entry stats in debug mode to be sorted only by "count"=
+, since Python 3 does
+not implicitly support comparing dictionaries.
 
-Signed-off-by: Wei Xu <wexu@redhat.com>
+Signed-off-by: Nisarg Shah <nshah@disroot.org>
 ---
- include/hw/virtio/virtio.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ scripts/device-crash-test | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 9c1fa07..cb286bb 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -264,7 +264,9 @@ typedef struct VirtIORNGConf VirtIORNGConf;
-     DEFINE_PROP_BIT64("any_layout", _state, _field, \
-                       VIRTIO_F_ANY_LAYOUT, true), \
-     DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
--                      VIRTIO_F_IOMMU_PLATFORM, false)
-+                      VIRTIO_F_IOMMU_PLATFORM, false), \
-+    DEFINE_PROP_BIT64("ring_packed", _state, _field, \
-+                      VIRTIO_F_RING_PACKED, false)
- 
- hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
- hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
--- 
-1.8.3.1
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index e93a7c0c84..ecdc9828c2 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
+@@ -23,7 +23,7 @@
+ Run QEMU with all combinations of -machine and -device types,
+ check for crashes and unexpected errors.
+ """
+-from __future__ import print_function
++
+=20
+ import sys
+ import os
+@@ -272,7 +272,7 @@ def qemuOptsEscape(s):
+=20
+ def formatTestCase(t):
+     """Format test case info as "key=3Dvalue key=3Dvalue" for prettier l=
+ogging output"""
+-    return ' '.join('%s=3D%s' % (k, v) for k, v in t.items())
++    return ' '.join('%s=3D%s' % (k, v) for k, v in list(t.items()))
+=20
+=20
+ def qomListTypeNames(vm, **kwargs):
+@@ -574,7 +574,8 @@ def main():
+         logger.info("Skipped %d test cases", skipped)
+=20
+     if args.debug:
+-        stats =3D sorted([(len(wl_stats.get(i, [])), wl) for i, wl in en=
+umerate(ERROR_WHITELIST)])
++        stats =3D sorted([(len(wl_stats.get(i, [])), wl) for i, wl in
++                         enumerate(ERROR_WHITELIST)], key=3Dlambda x: x[=
+0])
+         for count, wl in stats:
+             dbg("whitelist entry stats: %d: %r", count, wl)
+=20
+--=20
+2.19.2
