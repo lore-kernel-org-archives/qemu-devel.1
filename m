@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48811)
+Received: from eggs.gnu.org ([209.51.188.92]:50714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjlbg-0004W4-Ev
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:51:49 -0500
+	(envelope-from <berto@igalia.com>) id 1gjld8-0005JR-23
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:53:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjlbc-0003k0-Qu
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:51:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjlba-0003bu-Nf
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:51:44 -0500
-From: Thomas Huth <thuth@redhat.com>
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-25-yang.zhong@intel.com>
-	<4fe7900d-13c9-348e-3e14-89dc80251c3e@redhat.com>
-Message-ID: <310f0d5d-c2e3-c46c-1d06-4fb2df486303@redhat.com>
-Date: Wed, 16 Jan 2019 14:51:37 +0100
+	(envelope-from <berto@igalia.com>) id 1gjld7-0007JY-7h
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:53:17 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20190108170655.29766-7-vsementsov@virtuozzo.com>
+References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
+	<20190108170655.29766-7-vsementsov@virtuozzo.com>
+Date: Wed, 16 Jan 2019 14:53:13 +0100
+Message-ID: <w51sgxswvxy.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <4fe7900d-13c9-348e-3e14-89dc80251c3e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 24/37] build: convert sound.mak to
- Kconfig
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 6/9] qcow2: qcow2_co_preadv: improve
+ locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ehabkost@redhat.com, pbonzini@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-On 2019-01-16 14:48, Thomas Huth wrote:
-> On 2019-01-15 15:10, Yang Zhong wrote:
->> From: Paolo Bonzini <pbonzini@redhat.com>
->>
->> There is really nothing special in these devices; they are just
->> ISA devices.  Instead of including them for each target,
->> set CONFIG_ISA to true, and make the devices default to present
->> whenever ISA is available.  More conversion of ISA devices will
->> follow.
-> [...]
->> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
->> index 301cc83279..c7003e4284 100644
->> --- a/default-configs/ppc-softmmu.mak
->> +++ b/default-configs/ppc-softmmu.mak
->> @@ -1,8 +1,8 @@
->>  # Default configuration for ppc-softmmu
->>  
->> -include sound.mak
->>  include usb.mak
->>  CONFIG_PCI=y
->> +ONFIG_ISA=y
-> 
-> Typo: CONFIG_ISA please
+On Tue 08 Jan 2019 06:06:52 PM CET, Vladimir Sementsov-Ogievskiy wrote:
+> @@ -1891,39 +1892,38 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+>          qemu_iovec_reset(&hd_qiov);
+>          qemu_iovec_concat(&hd_qiov, qiov, bytes_done, cur_bytes);
+>  
+> +        if (ret == QCOW2_CLUSTER_ZERO_PLAIN ||
+> +            ret == QCOW2_CLUSTER_ZERO_ALLOC ||
+> +            (ret == QCOW2_CLUSTER_UNALLOCATED && !bs->backing))
+> +        {
+> +            /* No sense in releasing the lock */
+> +
+> +            qemu_iovec_memset(&hd_qiov, 0, 0, cur_bytes);
+> +
+> +            bytes -= cur_bytes;
+> +            offset += cur_bytes;
+> +            bytes_done += cur_bytes;
+> +            continue;
+> +        }
 
-Or should it even be CONFIG_ISA_BUS ? At least that's the name of the
-switch that you use in the other patches ...
+Maybe that was just me, but I got confused by the "No sense in releasing
+the lock" thinking that it referred to the memset() call.
 
- Thomas
+What you're trying to say is that it doesn't make sense to release the
+lock while you only get zero / unallocated clusters only to lock it
+again at the next iteration of the loop.
+
+I think that comment may make sense when you think about the code
+changes that you are doing, but when you read the actual resulting code
+it's fairly obvious that you don't need to touch the lock there.
+
+So I'd rather remove that comment.
+
+Else the patch looks good.
+
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
