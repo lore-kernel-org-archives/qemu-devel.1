@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53971)
+Received: from eggs.gnu.org ([209.51.188.92]:54116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gjlfx-0007N7-FZ
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:56:14 -0500
+	(envelope-from <i.maximets@samsung.com>) id 1gjlgL-0007j7-Ul
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:56:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1gjlfw-0006mz-Mb
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:56:13 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51513)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gjlfw-0006kB-9U
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:56:12 -0500
-Received: by mail-wm1-x342.google.com with SMTP id b11so2081345wmj.1
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 05:56:12 -0800 (PST)
-Date: Wed, 16 Jan 2019 13:56:09 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20190116135609.GC16898@stefanha-x1.localdomain>
-References: <20181214105642.673-1-cfergeau@redhat.com>
+	(envelope-from <i.maximets@samsung.com>) id 1gjlgK-00077A-7y
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:56:37 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:50680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1gjlgD-0006vQ-3x
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:56:32 -0500
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id
+	20190116135615euoutp01c1c20cd5995cce677ae1861d4ebd0170~6WLlieKRV0515305153euoutp01I
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 13:56:15 +0000 (GMT)
+From: Ilya Maximets <i.maximets@samsung.com>
+Message-ID: <ac5d8e2b-08b4-3e1f-4bc6-151f290f009a@samsung.com>
+Date: Wed, 16 Jan 2019 16:56:11 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6zdv2QT/q3FMhpsV"
-Content-Disposition: inline
-In-Reply-To: <20181214105642.673-1-cfergeau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4] log: Make glib logging go through QEMU
+In-Reply-To: <87d0owzt2l.fsf@linaro.org>
+Content-Language: en-GB
+Content-Type: text/plain; charset="utf-8"
+References: <20190115184229.73688-1-emaste@freefall.freebsd.org>
+	<87d0owzt2l.fsf@linaro.org>
+	<CGME20190116135613eucas1p142e90e5fdb3f7fa7c975b23e32e3b1e9@eucas1p1.samsung.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for
+ FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +35,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christophe Fergeau <cfergeau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Ed Maste <emaste@freebsd.org>
 
-
---6zdv2QT/q3FMhpsV
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Dec 14, 2018 at 11:56:42AM +0100, Christophe Fergeau wrote:
-> This commit adds a qemu_init_logging() helper which calls
-> g_log_set_default_handler() so that glib logs (g_log, g_warning, ...)
-> are handled similarly to other QEMU logs. This means they will get a
-> timestamp if timestamps are enabled, and they will go through the
-> monitor if one is configured.
-> This commit also adds a call to qemu_init_logging() to the binaries
-> installed by QEMU.
-> glib debug messages are enabled through G_MESSAGES_DEBUG similarly to
-> glib default log handler.
+On 16.01.2019 15:26, Alex Benn=C3=A9e wrote:
 >=20
-> At the moment, this change will mostly impact SPICE logging if your
-> spice version is >=3D 0.14.1. With older spice versions, this is not going
-> to work as expected, but will not have any ill effect, so this call is
-> not conditional on the SPICE version.
+> Ed Maste <emaste@freefall.freebsd.org> writes:
 >=20
-> Signed-off-by: Christophe Fergeau <cfergeau@redhat.com>
-> Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> ---
-> Changes since v3:
-> - Fixed style issue: removed 2 extra spaces before parens
->   (reported by checkpatch)
+>> From: Ed Maste <emaste@freebsd.org>
+>>
+>> Cirrus-CI (https://cirrus-ci.org) is a hosted CI service which support=
+s
+>> several platforms, including FreeBSD.  Later on we could build for oth=
+er
+>> hosts in Cirrus-CI, but I'm starting with only FreeBSD as it is not
+>> supported by other CI services.
 >=20
->  bsd-user/main.c             |  1 +
->  include/qemu/error-report.h |  2 ++
->  linux-user/main.c           |  1 +
->  qemu-img.c                  |  1 +
->  qemu-io.c                   |  1 +
->  qemu-nbd.c                  |  1 +
->  scsi/qemu-pr-helper.c       |  1 +
->  util/qemu-error.c           | 47 +++++++++++++++++++++++++++++++++++++
->  vl.c                        |  1 +
->  9 files changed, 56 insertions(+)
+> Do you know if there is anyway to eyeball the state of the tree? So far
+> I can watch the build run at:
+>=20
+>   https://cirrus-ci.com/github/stsquad/qemu
+>=20
+> but unlike Travis and Shippable there doesn't seem to be a badge I coul=
+d
+> transclude into the wiki page:
+>=20
+>   https://wiki.qemu.org/Template:CIStatus
+>=20
+> which means no one will know if the build fails. Travis also makes some
+> noise on the IRC channel although given it's stability it's debatable
+> how much longer we shall do that.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+There is a badge:
+https://cirrus-ci.org/guide/writing-tasks/#embedded-badges
 
---6zdv2QT/q3FMhpsV
-Content-Type: application/pgp-signature; name="signature.asc"
+For your case it'll be:
+https://api.cirrus-ci.com/github/stsquad/qemu.svg?branch=3Dreview/dynamic=
+-tlb-v6
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJcPzf5AAoJEJykq7OBq3PIO4IIAK7GAAzCLp+fWmFJYKetS//X
-4u6KM8XwnpTDsrD+nzpuz+M0GGXa+kcJv6ON6yaACKFJyJ9aEszd3rPr63CIAE9a
-p7e+N0Ct/t2xMkplxiSGaf5JplrSDdz2oQkZmnHnlWi8R6sEGU4QwbpvJFyKNdoM
-aAXn10w2Yi23+D9Xn1//sT3CUgzcvAC1PAFRbFohJJPLtT9AeJsp7Vr6wNeTW8Uw
-rJiQi3Uwk8nfvB5sxVwMWhUfRT2vaM1DuWDlQEwmkiRRY9eo1RpDVOedMfK3/dDC
-X2Tu13d6F5f2B6SM7KePiN0tw4HjUQghDN33HTdlRgbv2N5zXPn97nVy3eICgog=
-=twaA
------END PGP SIGNATURE-----
-
---6zdv2QT/q3FMhpsV--
+>=20
+>>
+>> Signed-off-by: Ed Maste <emaste@freebsd.org>
+>> ---
+>>  .cirrus.yml     | 16 ++++++++++++++++
+>>  create mode 100644 .cirrus.yml
+>>
+>> diff --git a/.cirrus.yml b/.cirrus.yml
+>> new file mode 100644
+>> index 0000000000..ff4bf75ad1
+>> --- /dev/null
+>> +++ b/.cirrus.yml
+>> @@ -0,0 +1,16 @@
+>> +freebsd_12_task:
+>> +  freebsd_instance:
+>> +    image: freebsd-12-0-release-amd64
+>> +    cpu: 8
+>> +    memory: 24G
+>> +  env:
+>> +    CIRRUS_CLONE_DEPTH: 1
+>> +  install_script: pkg install -y
+>> +    bison curl cyrus-sasl fontconfig freetype2 git glib gmake gnutls
+>> +    nettle perl5 pixman pkgconf png usbredir
+>> +  script:
+>> +    - mkdir build
+>> +    - cd build
+>> +    - ../configure || { cat config.log; exit 1; }
+>> +    - gmake -j8
+>> +    - gmake -j8 check
+>=20
+>=20
+> --
+> Alex Benn=C3=A9e
+>=20
