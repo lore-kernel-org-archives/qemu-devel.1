@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51479)
+Received: from eggs.gnu.org ([209.51.188.92]:59066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjkBz-0007g2-Ux
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:21:14 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gjkHf-0000sj-Pj
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:27:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gjkBt-0004W8-OU
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:21:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjkBr-0004NS-5Q
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:21:04 -0500
-Date: Wed, 16 Jan 2019 13:20:46 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190116132046.042a99ae@redhat.com>
-In-Reply-To: <b69a850b-35a4-6258-051d-573a2970e409@redhat.com>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-11-git-send-email-imammedo@redhat.com>
-	<15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
-	<20190116113227.47ebdea2@redhat.com>
-	<314cffa2-f153-011a-9c6e-01e94c73590a@redhat.com>
-	<b69a850b-35a4-6258-051d-573a2970e409@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gjkHe-0001kB-Pf
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:27:03 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:37526)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gjkHe-0001ch-Dg
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:27:02 -0500
+Received: by mail-wr1-x434.google.com with SMTP id s12so6718114wrt.4
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 04:27:00 -0800 (PST)
+References: <20190115184229.73688-1-emaste@freefall.freebsd.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20190115184229.73688-1-emaste@freefall.freebsd.org>
+Date: Wed, 16 Jan 2019 12:26:58 +0000
+Message-ID: <87d0owzt2l.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/14] tests: acpi: ignore SMBIOS tests
- when UEFI firmware is used
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for
+ FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,113 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1E?= =?UTF-8?B?YXVkw6k=?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
-
-On Wed, 16 Jan 2019 12:09:03 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
-
-> On 01/16/19 12:07, Laszlo Ersek wrote:
-> > +Gerd
-> > 
-> > On 01/16/19 11:32, Igor Mammedov wrote:  
-> >> On Tue, 15 Jan 2019 21:31:54 +0100
-> >> Laszlo Ersek <lersek@redhat.com> wrote:
-> >>  
-> >>> On 01/15/19 16:41, Igor Mammedov wrote:  
-> >>>> once FW provides a pointer to SMBIOS entry point like it does for
-> >>>> RSDP it should be possible to enable this one the same way.    
-> >>>
-> >>> Good point, I didn't think of SMBIOS.
-> >>>
-> >>> We have the following options:
-> >>>
-> >>> (1) Use just one "test support" structure, and add more fields (such as
-> >>> the SMBIOS entry point) to it, beyond the RSDP1.0/RSDP2.0. For this, we
-> >>> should also introduce a "size" field to the table, so we don't have to
-> >>> extend the table between firmware and QEMU in lock-step.
-> >>>
-> >>> (2) Use a different table (with a different GUID) for exposing the
-> >>> SMBIOS entry point.
-> >>>
-> >>> On the firmware side, (1) would be more work now, but it would keep
-> >>> things simpler (and better separated) in the future. (2) would be more
-> >>> lazy ^W convenient now, but it would introduce more churn / possibly
-> >>> some code duplication in the future.
-> >>>
-> >>> In QEMU, which one would you prefer?  
-> >> I'd prefer #1 to minimize # of memory scans.
-> >> However with size (i.e. implicit versioning) and who know what else in
-> >> the future complexity grows up and dependency this approach causes
-> >> between firmware and QEMU (I dislike special build instead of reusing
-> >> shipped images).
-> >>
-> >> So I've dug a little bit into the history why we've chosen including
-> >> structure into the firmware itself instead of writing EFI application
-> >> as part of QEMU that would provide the same test structure but won't
-> >> require special firmware build.
-> >> If I sum it up, it was issue with distros are shipping (if they do it at all)
-> >> only a version that matches distro's architecture and a need for cross
-> >> compiling EFI test app.
-> >>
-> >> Could we revisit EFI app approach (I'd prefer it over firwmare hack if it's
-> >> possible)? We can try to avoid dependency on gnu-efi and cross compiling on
-> >> regular builds and ship along with efi app source code several prebuild app
-> >> binaries (boot disk images), that one would rebuild only when efi app
-> >> is changed, and it could be done manually (the same like special fw build
-> >> but contained withing QEMU). As for gnu-efi, is it possible to use striped
-> >> down gnu-efi stubs to drop external library dependency, something along of
-> >> lines https://github.com/tqh/efi-example ?  
-> > 
-> > If it is permissible to require the affected QEMU maintainers to
-> > *manually* rebuild the UEFI binary on their workstations, whenever the
-> > source code for the UEFI app changes, then the solution is a lot easier
-> > indeed.
-I expect EFI app won't change often based on how much we've changed similar
-counterpart for BIOS version. So it probably ok, due to low load and we
-won't have to waste resources on rebuilding static thing over and over again
-on every qemu build (I'm horrified how much longer QEMU build would become
-if we would have to pull in complex dependencies to build it).
-
-> > In particular, for this approach, we don't even need gnu-efi. (Because,
-> > personally, I would strongly prefer to write the UEFI application with
-> > the edk2 framework.) For a while now, edk2 has supported "multiple
-> > workspaces":
-> > 
-> > https://github.com/tianocore/tianocore.github.io/wiki/Multiple_Workspace
-> > 
-> > and as a result, it is possible to build the necessary UEFI app from:
-> > - an edk2 checkout that the maintainer has "somewhere" on their disk,
-> > - and the UEFI app source code that is contained in a QEMU checkout that
-> > the maintainer has "somewhere else" on their disk.
-> > 
-> > This approach allows the UEFI app source to live in the QEMU tree, and
-> > the affected maintainer(s) would be personally responsible for setting
-> > up their edk2 clones, and compilers. (The edk2 clone could even be a
-> > submodule of QEMU, for example at roms/edk2.) For example,
-> > "roms/Makefile" already calls an external EFIROM utility (also from
-> > edk2) in order to build the combined iPXE option ROMs.
-> > 
-> > And yes, we could turn the UEFI binaries into bootable ISO images at once.
-> > 
-> > I'll try to post some patches soon (or not so soon). I think the app's
-> > source code, and the edk2 submodule, should live under roms/, and the
-> > bootable images should live under pc-bios/.
-> > 
-> > (In fact we could use this opportunity to build & bundle OVMF itself...
-> > not sure if that's in scope for now. Gerd, what's your take?)  
-> 
-> Oh, I should add: the UEFI app in question could be built without
-> pulling in any OpenSSL bits; OVMF itself can't be built like that (it
-> now has a hard dependency on OpenSSL). This might matter from a
-> licensing/bundling perspective.
-That's why I've suggested non EDK2 variant, as we don't need very much
-from it and its license looks BDS like and it's very simple to build
-pretty much for everyone.
-Dealing with EDK2 to rebuild EFI is rather daunting prospect
-(at least from my point of view so I'd try to avoid it if possible)
+To: qemu-devel@nongnu.org
+Cc: Ed Maste <emaste@freebsd.org>
 
 
-> 
-> Thanks,
-> Laszlo
+Ed Maste <emaste@freefall.freebsd.org> writes:
+
+> From: Ed Maste <emaste@freebsd.org>
+>
+> Cirrus-CI (https://cirrus-ci.org) is a hosted CI service which supports
+> several platforms, including FreeBSD.  Later on we could build for other
+> hosts in Cirrus-CI, but I'm starting with only FreeBSD as it is not
+> supported by other CI services.
+
+Do you know if there is anyway to eyeball the state of the tree? So far
+I can watch the build run at:
+
+  https://cirrus-ci.com/github/stsquad/qemu
+
+but unlike Travis and Shippable there doesn't seem to be a badge I could
+transclude into the wiki page:
+
+  https://wiki.qemu.org/Template:CIStatus
+
+which means no one will know if the build fails. Travis also makes some
+noise on the IRC channel although given it's stability it's debatable
+how much longer we shall do that.
+
+>
+> Signed-off-by: Ed Maste <emaste@freebsd.org>
+> ---
+>  .cirrus.yml     | 16 ++++++++++++++++
+>  create mode 100644 .cirrus.yml
+>
+> diff --git a/.cirrus.yml b/.cirrus.yml
+> new file mode 100644
+> index 0000000000..ff4bf75ad1
+> --- /dev/null
+> +++ b/.cirrus.yml
+> @@ -0,0 +1,16 @@
+> +freebsd_12_task:
+> +  freebsd_instance:
+> +    image: freebsd-12-0-release-amd64
+> +    cpu: 8
+> +    memory: 24G
+> +  env:
+> +    CIRRUS_CLONE_DEPTH: 1
+> +  install_script: pkg install -y
+> +    bison curl cyrus-sasl fontconfig freetype2 git glib gmake gnutls
+> +    nettle perl5 pixman pkgconf png usbredir
+> +  script:
+> +    - mkdir build
+> +    - cd build
+> +    - ../configure || { cat config.log; exit 1; }
+> +    - gmake -j8
+> +    - gmake -j8 check
+
+
+--
+Alex Benn=C3=A9e
