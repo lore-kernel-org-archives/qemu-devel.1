@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40784)
+Received: from eggs.gnu.org ([209.51.188.92]:42791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gjoRw-0005qW-Ju
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:53:57 -0500
+	(envelope-from <philmd@redhat.com>) id 1gjoWN-0007gC-2F
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:58:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gjoRv-0006bt-L0
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:53:56 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:41685)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gjoRv-0006ah-7B
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:53:55 -0500
-Date: Wed, 16 Jan 2019 11:53:50 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20190116165350.GA21932@flamenco>
-References: <20190114165017.27298-1-cota@braap.org>
-	<20190114165017.27298-2-cota@braap.org> <87fttszydz.fsf@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1gjoWL-0008RU-87
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:58:31 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42467)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gjoWK-0008Qr-LA
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:58:28 -0500
+Received: by mail-wr1-f67.google.com with SMTP id q18so7730907wrx.9
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 08:58:28 -0800 (PST)
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-8-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8c69f9f3-3ea1-6b29-8c5d-11a0139490dc@redhat.com>
+Date: Wed, 16 Jan 2019 17:58:25 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <1547566866-129386-8-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87fttszydz.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v6 1/3] cputlb: do not evict empty entries
- to the vtlb
+Subject: Re: [Qemu-devel] [PATCH 07/14] tests: acpi: skip FACS table if
+ board uses hw reduced ACPI profile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Gonglei <arei.gonglei@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-On Wed, Jan 16, 2019 at 10:32:08 +0000, Alex Bennée wrote:
+On 1/15/19 4:40 PM, Igor Mammedov wrote:
+> If FADT has HW_REDUCED_ACPI flag set, do not attempt to fetch
+> FACS as it's not provided by the board.
 > 
-> Emilio G. Cota <cota@braap.org> writes:
-> 
-> > Currently we evict an entry to the victim TLB when it doesn't match
-> > the current address. But it could be that there's no match because
-> > the current entry is empty (i.e. all -1's, for instance via tlb_flush).
-> > Do not evict the entry to the vtlb in that case.
-> >
-> > This change will help us keep track of the TLB's use rate, which
-> > we'll use to implement a policy for dynamic TLB sizing.
-> >
-> > Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
-> > ---
-> >  include/exec/cpu-all.h | 9 +++++++++
-> >  accel/tcg/cputlb.c     | 2 +-
-> >  2 files changed, 10 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> > index 117d2fbbca..e21140049b 100644
-> > --- a/include/exec/cpu-all.h
-> > +++ b/include/exec/cpu-all.h
-> > @@ -362,6 +362,15 @@ static inline bool tlb_hit(target_ulong tlb_addr, target_ulong addr)
-> >      return tlb_hit_page(tlb_addr, addr & TARGET_PAGE_MASK);
-> >  }
-> >
-> > +/**
-> > + * tlb_entry_is_empty - return true if the entry is not in use
-> > + * @te: pointer to CPUTLBEntry
-> > + */
-> > +static inline bool tlb_entry_is_empty(const CPUTLBEntry *te)
-> > +{
-> > +    return te->addr_read == -1 && te->addr_write == -1 && te->addr_code == -1;
-> > +}
-> > +
-> 
-> This breaks on a --disable-tcg build. I think the whole block needs to
-> be in a:
-> 
->   #if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
-> 
-> now.
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Good catch, thanks! I'll send a v7 with this fixed.
+Reviewed-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
 
-Thanks,
-
-		E.
+> ---
+>  tests/bios-tables-test.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index 0f04a0a..8887319 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -146,9 +146,13 @@ static void test_acpi_fadt_table(test_data *data)
+>      g_assert(compare_signature(&table, "FACP"));
+>  
+>      /* Since DSDT/FACS isn't in RSDT, add them to ASL test list manually */
+> -    acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+> -                     fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
+> -    g_array_append_val(data->tables, table);
+> +    memcpy(&val, fadt_aml + 112 /* Flags */, 4);
+> +    val = le32_to_cpu(val);
+> +    if (!(val & 1UL << 20 /* HW_REDUCED_ACPI */)) {
+> +        acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+> +                         fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
+> +        g_array_append_val(data->tables, table);
+> +    }
+>  
+>      memcpy(&val, fadt_aml + dsdt_offset, 4);
+>      if (!val) {
+> 
