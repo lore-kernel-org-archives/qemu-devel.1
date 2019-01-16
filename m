@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38043)
+Received: from eggs.gnu.org ([209.51.188.92]:41744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjlRE-0001EU-9N
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:41:01 -0500
+	(envelope-from <thuth@redhat.com>) id 1gjlV8-0002Rk-0e
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:45:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjlR8-0008Jb-3n
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:41:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40078)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gjlR7-0008BZ-Sy
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:40:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gjlR6-0006jR-MR
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 13:40:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A88332E807C
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 13:40:52 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1gjlV6-0002oL-Pl
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:45:01 -0500
+References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+	<1547194672-24169-3-git-send-email-thuth@redhat.com>
+	<7d949380-e8e5-c5bd-1fd4-e87f3106e7f2@kaod.org>
+	<186ccbfa-0797-25bb-453c-74c9ace0e4d5@redhat.com>
+	<20190116142336.54a542a2@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <56bbae76-7975-3aa2-3fee-922fa4d24454@redhat.com>
+Date: Wed, 16 Jan 2019 14:44:55 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190116142336.54a542a2@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Jan 2019 13:30:22 -0000
-From: Max Reitz <1811711@bugs.launchpad.net>
-Reply-To: Bug 1811711 <1811711@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154748542167.20943.17238616375041067992.malonedeb@soybean.canonical.com>
-Message-Id: <154764542282.19123.13473355929407846.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1811711] Re: qemu-img can not convert virtualbox
- virtual disk formats qcow
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] ppc: Fix duplicated typedefs to be
+ able to compile with Clang in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,103 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, pbonzini@redhat.com, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hi,
+On 2019-01-16 14:23, Greg Kurz wrote:
+> On Wed, 16 Jan 2019 12:47:36 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
+>=20
+>> On 2019-01-16 12:43, C=C3=A9dric Le Goater wrote:
+>>> On 1/11/19 9:17 AM, Thomas Huth wrote: =20
+>>>> When compiling the ppc code with clang and -std=3Dgnu99, there are a
+>>>> couple of warnings/errors like this one:
+>>>>
+>>>>   CC      ppc64-softmmu/hw/intc/xics.o
+>>>> In file included from hw/intc/xics.c:35:
+>>>> include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPStat=
+e' is a C11 feature
+>>>>       [-Werror,-Wtypedef-redefinition]
+>>>> typedef struct ICPState ICPState;
+>>>>                         ^
+>>>> target/ppc/cpu.h:1181:25: note: previous definition is here
+>>>> typedef struct ICPState ICPState;
+>>>>                         ^
+>>>> Work around the problems by including the proper headers instead. =20
+>>>
+>>> Thomas,
+>>>
+>>>
+>>> After a closer look, I think we should use 'void *' under PowerPCCPU=20
+>>> as it was the case before I introduced the second interrupt presenter=
+. =20
+>>
+>> If you don't like the #includes, why not simply do anonymous struct
+>> forward declarations here? I think that would be better than "void *".
+>>
+>=20
+> That's questionable. These two fields are only used by the machine code=
+ and
+> the interrupt controller code.
+>=20
+> $ git grep -E '(icp|tctx)' target/ppc/
+> target/ppc/cpu.h:    ICPState *icp;
+> target/ppc/cpu.h:    XiveTCTX *tctx;
+>=20
+> $ git grep -E 'cpu\->(icp|tctx)'=20
+> hw/intc/spapr_xive_kvm.c:        kvmppc_xive_cpu_set_state(cpu->tctx, &=
+local_err);
+> hw/intc/spapr_xive_kvm.c:        kvmppc_xive_cpu_connect(cpu->tctx, &lo=
+cal_err);
+> hw/intc/xics_kvm.c:        icp_kvm_connect(cpu->icp, &local_err);
+> hw/intc/xics_kvm.c:        icp_set_kvm_state(cpu->icp, 1);
+> hw/intc/xics_spapr.c:    icp_set_cppr(cpu->icp, cppr);
+> hw/intc/xics_spapr.c:    uint32_t xirr =3D icp_accept(cpu->icp);
+> hw/intc/xics_spapr.c:    uint32_t xirr =3D icp_accept(cpu->icp);
+> hw/intc/xics_spapr.c:    icp_eoi(cpu->icp, xirr);
+> hw/intc/xics_spapr.c:    uint32_t xirr =3D icp_ipoll(cpu->icp, &mfrr);
+> hw/intc/xive.c:    XiveTCTX *tctx =3D cpu->tctx;
+> hw/intc/xive.c:    XiveTCTX *tctx =3D cpu->tctx;
+> hw/intc/xive.c:        XiveTCTX *tctx =3D cpu->tctx;
+> hw/ppc/pnv.c:    cpu->icp =3D ICP(obj);
+> hw/ppc/pnv.c:    return cpu ? cpu->icp : NULL;
+> hw/ppc/pnv.c:        icp_pic_print_info(cpu->icp, mon);
+> hw/ppc/pnv_core.c:    object_unparent(OBJECT(cpu->icp));
+> hw/ppc/spapr.c:    return cpu ? cpu->icp : NULL;
+> hw/ppc/spapr_cpu_core.c:    if (cpu->icp) {
+> hw/ppc/spapr_cpu_core.c:        object_unparent(OBJECT(cpu->icp));
+> hw/ppc/spapr_cpu_core.c:    if (cpu->tctx) {
+> hw/ppc/spapr_cpu_core.c:        object_unparent(OBJECT(cpu->tctx));
+> hw/ppc/spapr_irq.c:        icp_pic_print_info(cpu->icp, mon);
+> hw/ppc/spapr_irq.c:    cpu->icp =3D ICP(obj);
+> hw/ppc/spapr_irq.c:            icp_resend(cpu->icp);
+> hw/ppc/spapr_irq.c:        xive_tctx_pic_print_info(cpu->tctx, mon);
+> hw/ppc/spapr_irq.c:    cpu->tctx =3D XIVE_TCTX(obj);
+> hw/ppc/spapr_irq.c:    spapr_xive_set_tctx_os_cam(cpu->tctx);
+> hw/ppc/spapr_irq.c:        spapr_xive_set_tctx_os_cam(cpu->tctx);
+> hw/ppc/spapr_irq.c:        spapr_xive_set_tctx_os_cam(cpu->tctx);
+>=20
+> It thus looks wrong to expose their type in target/ppc/cpu.h. I guess
+> they should be hidden behind an opaque data pointer (maybe the existing
+> void *machine_data ?)
 
-What exactly is the issue?  All of that looks rather OK to me.
+While that's maybe cleaner at a quick glance first, you still have to
+deal with the fact that it's used by two different machines (pseries and
+pnv) ... not sure whether that easily distinguishable in xive.c for examp=
+le?
 
-Max
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811711
-
-Title:
-  qemu-img can not convert virtualbox virtual disk formats qcow
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello, I'm working with QEMU on macOS, and am experiencing issues
-  working with the `qemu-img` command.
-
-  Info
-  ----
-  $ sw_vers
-  ProductName:    Mac OS X
-  ProductVersion: 10.13.6
-  BuildVersion:   17G4015
-
-  VirtualBox
-  ----------
-  $ VBoxManage --version
-  6.0.0r127566
-
-  $ qemu-system-x86_64 --version
-  QEMU emulator version 3.1.50 (v3.1.0-rc2-745-g147923b1a9-dirty)
-  Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
-
-  $ qemu-img --version
-  qemu-img version 3.1.50 (v3.1.0-rc2-745-g147923b1a9-dirty)
-  Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
-
-  Steps to reproduce
-  ------------------
-
-  > Prereq VirtualBox needs to be installed to run the `VBoxManage`
-  command
-
-  $ VBoxManage createmedium disk --filename vbox-vdisk-exp.qcow --format qc=
-ow --size 5
-  0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
-  Medium created. UUID: e2b36955-3791-4c0e-93d4-913669b1d9fb
-
-  $ file vbox-vdisk-exp.qcow
-  vbox-vdisk-exp.qcow: QEMU QCOW Image (v1), 5242880 bytes
-
-  $ qemu-img info vbox-vdisk-exp.qcow
-  image: vbox-vdisk-exp.qcow
-  file format: qcow
-  virtual size: 5.0M (5242880 bytes)
-  disk size: 8.0K
-  cluster_size: 4096
-
-  # Convert vbox virtualdisk to qcow2 format using `qemu-img`
-  $ qemu-img convert -f qcow vbox-vdisk-exp.qcow -O qcow2 vbox-vdisk-exp-co=
-nvert.qcow2
-
-  $ file vbox-vdisk-exp-convert.qcow2
-  vbox-vdisk-exp-convert.qcow2: QEMU QCOW Image (v3), 5242880 bytes
-
-  # Print info about qemu-img converted image from vbox created qcow image
-  $ qemu-img info vbox-vdisk-exp-convert.qcow2                             =
-                      mutts-6 | 0 < 10:53:00
-  image: vbox-vdisk-exp-convert.qcow2
-  file format: qcow2
-  virtual size: 5.0M (5242880 bytes)
-  disk size: 196K
-  cluster_size: 65536
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-      refcount bits: 16
-      corrupt: false
-
-  # Print info about vbox created qcow image
-  qemu-img info vbox-vdisk-exp.qcow                                        =
-                    mutts-6 | 0 < 10:53:19
-  image: vbox-vdisk-exp.qcow
-  file format: qcow
-  virtual size: 5.0M (5242880 bytes)
-  disk size: 8.0K
-  cluster_size: 4096
-
-  I've attached a zip file containing the vbox created qcow image along
-  with the image that `qemu-img` converted.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811711/+subscriptions
+ Thomas
