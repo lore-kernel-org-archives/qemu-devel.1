@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59860)
+Received: from eggs.gnu.org ([209.51.188.92]:36237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjn4T-0005dy-Ep
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:25:38 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gjn9A-0006oo-H9
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:30:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjn4S-0001AP-EF
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:25:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52882)
+	(envelope-from <ehabkost@redhat.com>) id 1gjn91-0000Mx-Il
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:30:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59052)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjn4S-0000vw-7s
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:25:36 -0500
-Date: Wed, 16 Jan 2019 10:25:10 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190116102047-mutt-send-email-mst@kernel.org>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-11-git-send-email-imammedo@redhat.com>
-	<15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
-	<20190116113227.47ebdea2@redhat.com>
-	<314cffa2-f153-011a-9c6e-01e94c73590a@redhat.com>
-	<20190116115217.jduhqrwbjhuibmoq@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gjn8z-0000H5-SQ
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:30:19 -0500
+Date: Wed, 16 Jan 2019 13:30:11 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190116153011.GB14807@habkost.net>
+References: <20190114215225.GA16760@habkost.net>
+	<CAL1e-=iBx0Dt=S5fyLs8v-XN+2Zmx5hb7StQBJhquUmmdw6uNA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190116115217.jduhqrwbjhuibmoq@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [PATCH 10/14] tests: acpi: ignore SMBIOS tests
- when UEFI firmware is used
+In-Reply-To: <CAL1e-=iBx0Dt=S5fyLs8v-XN+2Zmx5hb7StQBJhquUmmdw6uNA@mail.gmail.com>
+Subject: Re: [Qemu-devel] Meaning of "-smp threads" on mips_malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +27,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Igor Mammedov <imammedo@redhat.com>
 
-On Wed, Jan 16, 2019 at 12:52:17PM +0100, Gerd Hoffmann wrote:
->   Hi,
+On Tue, Jan 15, 2019 at 03:28:50AM +0100, Aleksandar Markovic wrote:
+> On Monday, January 14, 2019, Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> > This approach allows the UEFI app source to live in the QEMU tree, and
-> > the affected maintainer(s) would be personally responsible for setting
-> > up their edk2 clones, and compilers. (The edk2 clone could even be a
-> > submodule of QEMU, for example at roms/edk2.) For example,
-> > "roms/Makefile" already calls an external EFIROM utility (also from
-> > edk2) in order to build the combined iPXE option ROMs.
-> > 
-> > And yes, we could turn the UEFI binaries into bootable ISO images at once.
-> > 
-> > I'll try to post some patches soon (or not so soon). I think the app's
-> > source code, and the edk2 submodule, should live under roms/, and the
-> > bootable images should live under pc-bios/.
-> > 
-> > (In fact we could use this opportunity to build & bundle OVMF itself...
-> > not sure if that's in scope for now. Gerd, what's your take?)
+> > Hi,
+> >
+> > I'm trying to refactor the SMP topology code in QEMU
 > 
-> Well, there is still the idea to move over firmware submodules and
-> prebuilt firmware blobs to a separate repo.
+> 
+> >
+> Eduardo, I truly appreciate your interest in details of Malta
+> implementations, but before I answer your questions, could you please
+> outline the motivation and the current concept of your envisioned
+> refactoring of SMP, so that I have some picture of the whole context?
 
-What's the advantage of this? 99% of people want the specific firmware
-shipped with QEMU. Ony firmware developers might save a bit of disk
-space. Seems like a loss overall.
+I don't have any concrete plans right now.  I'm trying to
+understand how existing code uses the -smp options, before
+deciding what to do.
+
+My goal is to make features like
+  "[PATCH v1 0/5] Introduce cpu die topology and enable CPUID.1F for i386"
+easier, less intrusive, and less risky.
+
+My current impression is that things will be better if we move
+the complex PC-specific topology rules from vl.c to PC-specific
+code.  Most of the other architectures seem to have different
+assumptions and expectations about -smp/cores/threads.
 
 
->  Expermimental repo:
-> https://git.kraxel.org/cgit/qemu-firmware/.  Not touched for more than a
-> year due to being busy with other stuff.  Oh well ...
 > 
-> (if someone feels like picking this up feel free to do so).
+> Sincerely, Aleksandar
 > 
-> I think adding edk2 as submodule below roms/ makes sense.  Adding rules
-> to roms/Makefile to build the blobs makes sense too.  Not sure we want
-> the binaries actually copied over to pc-bios/ and commited as the uefi
-> firmware is pretty big ...
 > 
-> Not sure what a good place for the uefi app would be.  I'd tend to not
-> use roms/, that is the place for firmware submodules.  contrib/ or test/
-> maybe?
 > 
-> cheers,
->   Gerd
+> >
+> > and I found
+> > some suspicious code on mips_malta.c:
+> >
+> > static void malta_mips_config(MIPSCPU *cpu)
+> > {
+> >     CPUMIPSState *env = &cpu->env;
+> >     CPUState *cs = CPU(cpu);
+> >
+> >     env->mvp->CP0_MVPConf0 |= ((smp_cpus - 1) << CP0MVPC0_PVPE) |
+> >                          ((smp_cpus * cs->nr_threads - 1) << CP0MVPC0_PTC);
+> > }
+> >
+> >
+> > The (smp_cpus * cs->nr_threads) expression here doesn't make
+> > sense to me (because smp_cpus is already supposed to be a
+> > multiple of smp_threads), and seems to indicate that the code has
+> > some unusual assumptions about the semantics of the -smp option.
+> >
+> > So, I'd like to know: do all the examples below make sense for
+> > Malta?
+> >
+> >  -smp 1
+> >  -smp 2
+> >  -smp 2,threads=1
+> >  -smp 2,threads=2
+> >  -smp 1,threads=2 [*]
+> >  -smp 2,threads=3 [*]
+> >
+> > The generic -smp parsing code considers the last 2 entries
+> > above[*] to be invalid.  If they make sense for Malta, we need to
+> > find a way to fix that.  Replacing "-smp threads=..." with a
+> > "-cpu" or "-machine" option seems like the best alternative.
+> >
+> > --
+> > Eduardo
+> >
+> >
+
+-- 
+Eduardo
