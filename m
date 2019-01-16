@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42401)
+Received: from eggs.gnu.org ([209.51.188.92]:45296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gjmMW-0000HG-37
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:40:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1gjmPi-00015c-W1
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:43:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gjmMS-0002wZ-Ol
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:40:10 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37285)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gjmMS-0002pP-Eq
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:40:08 -0500
-Received: by mail-wr1-x444.google.com with SMTP id s12so7210779wrt.4
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 06:40:08 -0800 (PST)
-References: <20190115184229.73688-1-emaste@freefall.freebsd.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190115184229.73688-1-emaste@freefall.freebsd.org>
-Date: Wed, 16 Jan 2019 14:40:05 +0000
-Message-ID: <87bm4gzmwq.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1gjmPh-0008Gw-99
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:43:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42113)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gjmPg-0008BU-NO
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:43:29 -0500
+References: <1547196148-12250-1-git-send-email-thuth@redhat.com>
+	<b1db55de-6741-76c7-33b1-74fc2692b82c@redhat.com>
+	<552ac2db-6568-18f8-5397-a00c4b432df9@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <23057d08-76cd-0ab8-d940-974ed3d1d1a0@redhat.com>
+Date: Wed, 16 Jan 2019 08:43:21 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for
- FreeBSD
+In-Reply-To: <552ac2db-6568-18f8-5397-a00c4b432df9@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="P9jabuiEARRuHjaTMu6y6ezd2Qmn9Wobg"
+Subject: Re: [Qemu-devel] HACKING vs. CODING_STYLE (was: Re: [PATCH]
+ HACKING: Clarify the paragraph about typedefs)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ed Maste <emaste@freebsd.org>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--P9jabuiEARRuHjaTMu6y6ezd2Qmn9Wobg
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Greg Kurz
+ <groug@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <23057d08-76cd-0ab8-d940-974ed3d1d1a0@redhat.com>
+Subject: Re: HACKING vs. CODING_STYLE (was: Re: [PATCH] HACKING: Clarify the
+ paragraph about typedefs)
+References: <1547196148-12250-1-git-send-email-thuth@redhat.com>
+ <b1db55de-6741-76c7-33b1-74fc2692b82c@redhat.com>
+ <552ac2db-6568-18f8-5397-a00c4b432df9@redhat.com>
+In-Reply-To: <552ac2db-6568-18f8-5397-a00c4b432df9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 1/16/19 4:58 AM, Thomas Huth wrote:
+> On 2019-01-11 11:38, Paolo Bonzini wrote:
+> [...]
+>> And, I would move it to CODING_STYLE since we are at it. :)
+>=20
+> I just got some feedback in IRC already, and seems like I am not alone,=
+
+> so let's discuss it here on the mailing list, too: What's the exact
+> difference between CODING_STYLE and HACKING? Some of the paragraphs in
+> HACKING sound rather mandatory and coding-style related, too...
+> Should we maybe merge the two files into one (e.g. called "CODING")?
+
+Merging the files sounds reasonable to me.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-Ed Maste <emaste@freefall.freebsd.org> writes:
+--P9jabuiEARRuHjaTMu6y6ezd2Qmn9Wobg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> From: Ed Maste <emaste@freebsd.org>
->
-> Cirrus-CI (https://cirrus-ci.org) is a hosted CI service which supports
-> several platforms, including FreeBSD.  Later on we could build for other
-> hosts in Cirrus-CI, but I'm starting with only FreeBSD as it is not
-> supported by other CI services.
->
-> Signed-off-by: Ed Maste <emaste@freebsd.org>
-> ---
->  .cirrus.yml     | 16 ++++++++++++++++
->  create mode 100644 .cirrus.yml
->
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> new file mode 100644
-> index 0000000000..ff4bf75ad1
-> --- /dev/null
-> +++ b/.cirrus.yml
-> @@ -0,0 +1,16 @@
-> +freebsd_12_task:
-> +  freebsd_instance:
-> +    image: freebsd-12-0-release-amd64
-> +    cpu: 8
-> +    memory: 24G
-> +  env:
-> +    CIRRUS_CLONE_DEPTH: 1
-> +  install_script: pkg install -y
-> +    bison curl cyrus-sasl fontconfig freetype2 git glib gmake gnutls
-> +    nettle perl5 pixman pkgconf png usbredir
-> +  script:
-> +    - mkdir build
-> +    - cd build
-> +    - ../configure || { cat config.log; exit 1; }
-> +    - gmake -j8
-> +    - gmake -j8 check
+-----BEGIN PGP SIGNATURE-----
 
-While debugging I ended up adding V=3D1 to the two gmake invocations
-because it wasn't quite clear why it had failed last time. With that:
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw/QwkACgkQp6FrSiUn
+Q2rnPgf/RgRt2/oHhks2l/VVSTTYk+Yu78l9ozQfpBvycNyIqIjKd5YvOAw3+Un2
+dbo4S6Al6IVV1Grmex3EEbWIxBy/j7dIr/XV6EG0GUI/N1FB/ijxlfwrtEyHw+Jb
+E1mreesm2NY2cY7A4Xnw/TuutOkIerRYrjv9Rsjy6pSqdXmrgP0jprOySQ1YCouw
+ggkhpCrNNKFtdV5zCcKiiu6tNJ7pM8ZIyl+lmHbO7NnrY9cHfZc0u8FuXn2scRXD
+XqLiPQthhYP9IhHVUWCUVB+5tTEf4Jew6P1y6LSyWWgFX0epJ1ahtcAcTCQUoP+5
+qzKUNkwEnZzcBxscLpzys5sm2+ukLw==
+=gYNW
+-----END PGP SIGNATURE-----
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-Does this patch come with an offer to be maintainer for FreeBSD/Cirrus
-CI stuff? In which case it will need a new entry in MAINTAINERS. I'm
-happy to feed patches to Peter until you can get keys signed and
-generate your own pull requests.
-
---
-Alex Benn=C3=A9e
+--P9jabuiEARRuHjaTMu6y6ezd2Qmn9Wobg--
