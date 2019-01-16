@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51705)
+Received: from eggs.gnu.org ([209.51.188.92]:51880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gjjZM-0000uG-Pi
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:41:21 -0500
+	(envelope-from <thuth@redhat.com>) id 1gjjZW-000104-On
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:41:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gjjZL-0007dv-NY
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:41:16 -0500
-References: <20190116113523.9213-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <21b43e07-1fa1-294b-1227-02e8e9a4e434@redhat.com>
-Date: Wed, 16 Jan 2019 12:41:02 +0100
+	(envelope-from <thuth@redhat.com>) id 1gjjZV-00086w-Lf
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:41:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38642)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjjZV-0007u7-4Z
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:41:25 -0500
+References: <20190115141108.934-1-yang.zhong@intel.com>
+	<20190115141108.934-24-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8f2984fd-68e4-eb00-d384-2bcddeefa049@redhat.com>
+Date: Wed, 16 Jan 2019 12:41:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190116113523.9213-1-david@redhat.com>
+In-Reply-To: <20190115141108.934-24-yang.zhong@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 00/10] qdev: Hotplug handler chaining +
- virtio-pmem
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 23/37] build: convert pci.mak to
+ Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
 
-On 16.01.19 12:35, David Hildenbrand wrote:
-> This series implements supprt for hotplug handler chaining (proposed
-> by Igor), something that is necessary to turn selected virtio devices into
-> memory devices. Planned devices inlude virtio-mem and virtio-pmem. The
-> current prototype of virtio-pmem is included.
-> 
-> The machine hotplug handler can intercept hotplug handler calls
-> to properly prepare/teardown the memory device part of a device. Control
-> is then passed on to the actual bus hotplug handler. So the default hotplug
-> handler is effectively overwritten to make interception possible.
-> 
-> It is based on the following patches/series
-> - [PULL v2 01/49] pci/pcie: stop plug/unplug if the slot is locked
-> -- Soon upstream
-> - [PATCH v1] pc: Use hotplug_handler_(plug|unplug|unplug_request)
-> -- Queued by Paolo
-> - [PATCH v2 0/6] s390x/pci: hotplug handler fixes and reworks
-> -- Partially queued
-> 
-> Patch 1-3 are the preparations for hotplug handler chaining. The remaining
-> patches are a modified prototype of virtio-pmem.
-> 
-> I modified Pankajs work to work with this series. virtio-pmem is included
-> as it was requested during review of previous preparations to showcase a
-> real user, so we can discuss if this is good enough for us or if we have
-> to do further changes.
-> 
-> More details about virtio-pmem (including the Linux guest driver side)
-> can be found at:
->     https://lkml.org/lkml/2018/7/13/102
->     https://lkml.org/lkml/2019/1/9/756
-> 
-> Example: defining a simple virtio-pmem device (on /dev/zero for simplicity):
-> 
->     qemu-system-x86_64 \
->      -machine pc \
->      -monitor stdio \
->      -m 8G,maxmem=20G \
->      -object memory-backend-file,id=mem1,mem-path=/dev/zero,size=4G \
->      -device virtio-pmem-pci,id=vp1,memdev=mem1
-> 
-> QEMU 3.0.50 monitor - type 'help' for more information
-> (qemu) info memory-devices
-> Memory device [virtio-pmem]: "vp1"
->   memaddr: 0x240000000
->   size: 4294967296
->   memdev: /objects/mem1
-> 
-> (qemu) info memory_size_summary
-> base memory: 8589934592
-> plugged memory: 4294967296
-> 
+On 2019-01-15 15:10, Yang Zhong wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
+>=20
+> Instead of including the same list of devices for each target,
+> set CONFIG_PCI to true, and make the devices default to present
+> whenever PCI is available.
+>=20
+> Done mostly with the following script:
+>=20
+>   while read i; do
+>      i=3D${i%=3Dy}; i=3D${i#CONFIG_}
+>      sed -i -e'/^config '$i'$/!b' -en \
+>             -e'a\' -e'    default y\' -e'    depends on PCI' \
+>           `grep -lw $i hw/*/Kconfig`
+>   done < default-configs/pci.mak
+>=20
+> followed by replacing a few "depends on" clauses with "select"
+> whenever the symbol is not really related to PCI.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+[...]
+> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+> index 6b2ec971b5..5191c082e3 100644
+> --- a/hw/net/Kconfig
+> +++ b/hw/net/Kconfig
+> @@ -3,27 +3,42 @@ config DP8393X
+> =20
+>  config NE2000_PCI
+>      bool
+> +    default y
+> +    depends on PCI
+> =20
+>  config EEPRO100_PCI
+>      bool
+> +    default y
+> +    depends on PCI
+> =20
+>  config PCNET_PCI
+>      bool
+> +    default y
+> +    depends on PCI
+> +    select PCNET_COMMON
+> =20
+>  config PCNET_COMMON
+>      bool
+> =20
+>  config E1000_PCI
+>      bool
+> +    default y
+> +    depends on PCI
+> =20
+>  config E1000E_PCI
+>      bool
+> +    default y
+> +    depends on PCI
 
-The current state can be found on:
-https://github.com/davidhildenbrand/qemu.git : memory_device
+The e1000e is a PCI-e device, so maybe this should rather depend on
+"PCIE" instead?
 
--- 
+With that fixed:
 
-Thanks,
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-David / dhildenb
+
+>  config RTL8139_PCI
+>      bool
+> +    default y
+> +    depends on PCI
+> =20
+>  config VMXNET3_PCI
+>      bool
+> +    default y
+> +    depends on PCI
+[...]
+> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+> index cbf5c5d761..f23c542d27 100644
+> --- a/hw/usb/Kconfig
+> +++ b/hw/usb/Kconfig
+> @@ -3,21 +3,31 @@ config USB
+> =20
+>  config USB_UHCI
+>      bool
+> +    default y
+> +    depends on PCI
+> =20
+>  config USB_OHCI
+>      bool
+> +    default y
+> +    depends on PCI
+> =20
+>  config USB_EHCI
+>      bool
+> +    default y
+> +    depends on PCI
+
+We might need a USB_EHCI_PCI switch in the future (since there is also
+_SYSBUS which could be used without PCI), but I think that can be done
+in a later patch.
+
+>  config USB_EHCI_SYSBUS
+>      bool
+> =20
+>  config USB_XHCI
+>      bool
+> +    default y
+> +    depends on PCI
+> =20
+>  config USB_XHCI_NEC
+>      bool
+> +    default y
+> +    depends on PCI
+> =20
+>  config USB_MUSB
+>      bool
+
+ Thomas
