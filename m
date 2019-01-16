@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46216)
+Received: from eggs.gnu.org ([209.51.188.92]:46191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpyY-0002vM-6W
+	(envelope-from <wexu@redhat.com>) id 1gjpyX-0002vJ-SI
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:31:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpyW-000730-U2
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:31:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34476)
+	(envelope-from <wexu@redhat.com>) id 1gjpyX-00073K-1q
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:31:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53674)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gjpyW-0006wC-Ja
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gjpyW-0006xc-RU
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 13:31:40 -0500
 From: wexu@redhat.com
-Date: Wed, 16 Jan 2019 13:31:06 -0500
-Message-Id: <1547663480-547-2-git-send-email-wexu@redhat.com>
+Date: Wed, 16 Jan 2019 13:31:07 -0500
+Message-Id: <1547663480-547-3-git-send-email-wexu@redhat.com>
 In-Reply-To: <1547663480-547-1-git-send-email-wexu@redhat.com>
 References: <1547663480-547-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/15] virtio: introduce packed ring
- definitions
+Subject: [Qemu-devel] [PATCH v2 02/15] virtio: redefine structure & memory
+ cache for packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +29,55 @@ Cc: jasowang@redhat.com, mst@redhat.com, jfreiman@redhat.com, maxime.coquelin@re
 
 From: Wei Xu <wexu@redhat.com>
 
->From 1.1 spec.
+Redefine packed ring structure according to Qemu nomenclature,
+field data(wrap counter, etc) are introduced also.
 
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- include/standard-headers/linux/virtio_config.h | 15 +++++++++
- include/standard-headers/linux/virtio_ring.h   | 43 ++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
+ hw/virtio/virtio.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
-index 0b19436..9f450fd 100644
---- a/include/standard-headers/linux/virtio_config.h
-+++ b/include/standard-headers/linux/virtio_config.h
-@@ -75,6 +75,21 @@
-  */
- #define VIRTIO_F_IOMMU_PLATFORM		33
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 22bd1ac..827e745 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -39,6 +39,13 @@ typedef struct VRingDesc
+     uint16_t next;
+ } VRingDesc;
  
-+/* This feature indicates support for the packed virtqueue layout. */
-+#define VIRTIO_F_RING_PACKED		34
++typedef struct VRingPackedDesc {
++    uint64_t addr;
++    uint32_t len;
++    uint16_t id;
++    uint16_t flags;
++} VRingPackedDesc;
 +
-+/* Enable events */
-+#define RING_EVENT_FLAGS_ENABLE 0x0
-+/* Disable events */
-+#define RING_EVENT_FLAGS_DISABLE 0x1
-+/*
-+ *  * Enable events for a specific descriptor
-+ *   * (as specified by Descriptor Ring Change Event Offset/Wrap Counter).
-+ *    * Only valid if VIRTIO_F_RING_EVENT_IDX has been negotiated.
-+ *     */
-+#define RING_EVENT_FLAGS_DESC 0x2
-+/* The value 0x3 is reserved */
-+
- /*
-  * Does the device support Single Root I/O Virtualization?
-  */
-diff --git a/include/standard-headers/linux/virtio_ring.h b/include/standard-headers/linux/virtio_ring.h
-index d26e72b..1719c6f 100644
---- a/include/standard-headers/linux/virtio_ring.h
-+++ b/include/standard-headers/linux/virtio_ring.h
-@@ -42,6 +42,10 @@
- /* This means the buffer contains a list of buffer descriptors. */
- #define VRING_DESC_F_INDIRECT	4
+ typedef struct VRingAvail
+ {
+     uint16_t flags;
+@@ -77,6 +84,11 @@ typedef struct VRing
+     VRingMemoryRegionCaches *caches;
+ } VRing;
  
-+/* Mark a descriptor as available or used. */
-+#define VRING_DESC_F_AVAIL	(1ul << 7)
-+#define VRING_DESC_F_USED	(1ul << 15)
++typedef struct VRingPackedDescEvent {
++    uint16_t off_wrap;
++    uint16_t flags;
++} VRingPackedDescEvent ;
 +
- /* The Host uses this in used->flags to advise the Guest: don't kick me when
-  * you add a buffer.  It's unreliable, so it's simply an optimization.  Guest
-  * will still kick if it's out of buffers. */
-@@ -51,6 +55,17 @@
-  * optimization.  */
- #define VRING_AVAIL_F_NO_INTERRUPT	1
+ struct VirtQueue
+ {
+     VRing vring;
+@@ -87,7 +99,11 @@ struct VirtQueue
+     /* Last avail_idx read from VQ. */
+     uint16_t shadow_avail_idx;
  
-+/* Enable events. */
-+#define VRING_EVENT_F_ENABLE	0x0
-+/* Disable events. */
-+#define VRING_EVENT_F_DISABLE	0x1
-+/*
-+ * Enable events for a specific descriptor
-+ * (as specified by Descriptor Ring Change Event Offset/Wrap Counter).
-+ * Only valid if VIRTIO_RING_F_EVENT_IDX has been negotiated.
-+ */
-+#define VRING_EVENT_F_DESC	0x2
++    bool event_wrap_counter;
++    bool avail_wrap_counter;
 +
- /* We support indirect buffer descriptors */
- #define VIRTIO_RING_F_INDIRECT_DESC	28
+     uint16_t used_idx;
++    bool used_wrap_counter;
  
-@@ -169,4 +184,32 @@ static inline int vring_need_event(uint16_t event_idx, uint16_t new_idx, uint16_
- 	return (uint16_t)(new_idx - event_idx - 1) < (uint16_t)(new_idx - old);
- }
- 
-+struct vring_packed_desc_event {
-+	/* Descriptor Ring Change Event Offset/Wrap Counter. */
-+	__virtio16 off_wrap;
-+	/* Descriptor Ring Change Event Flags. */
-+	__virtio16 flags;
-+};
-+
-+struct vring_packed_desc {
-+	/* Buffer Address. */
-+	__virtio64 addr;
-+	/* Buffer Length. */
-+	__virtio32 len;
-+	/* Buffer ID. */
-+	__virtio16 id;
-+	/* The flags depending on descriptor type. */
-+	__virtio16 flags;
-+};
-+
-+struct vring_packed {
-+	unsigned int num;
-+
-+	struct vring_packed_desc *desc;
-+
-+	struct vring_packed_desc_event *driver;
-+
-+	struct vring_packed_desc_event *device;
-+};
-+
- #endif /* _LINUX_VIRTIO_RING_H */
+     /* Last used index value we have signalled on */
+     uint16_t signalled_used;
 -- 
 1.8.3.1
