@@ -1,23 +1,36 @@
-Received: from eggs.gnu.org ([209.51.188.92]:54142)
+Received: from eggs.gnu.org ([209.51.188.92]:60246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjipu-00005c-O9
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:54:20 -0500
+	(envelope-from <i.maximets@samsung.com>) id 1gjitI-0001De-EV
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:57:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjips-00046L-Gq
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:54:18 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 16 Jan 2019 10:54:07 +0000
-Message-ID: <1c493b43-48f7-4c4d-6404-ce974c56e972@virtuozzo.com>
-References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-17-eblake@redhat.com>
-In-Reply-To: <20190112175812.27068-17-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F7D77A92DFB54540A4923E8889EBD42B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <i.maximets@samsung.com>) id 1gjitH-0005aT-Bz
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:57:48 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:45623)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1gjitF-0004iC-9r
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:57:47 -0500
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
+	20190116105719euoutp0245be4b66a3f298fe0e6b92f0000aea74~6TvWtSocH2274622746euoutp02g
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 10:57:19 +0000 (GMT)
+From: Ilya Maximets <i.maximets@samsung.com>
+Message-ID: <51d6d83e-94ab-f0d3-df5d-41702c13a972@samsung.com>
+Date: Wed, 16 Jan 2019 13:57:07 +0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 16/19] nbd/client: Add meta contexts to
- nbd_receive_export_list()
+In-Reply-To: <20190105024350.GO4157@habkost.net>
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+References: <20181127135030.1671-1-i.maximets@samsung.com>
+	<CGME20181127135045eucas1p1e259cacbab5e715f7845b9beee22f882@eucas1p1.samsung.com>
+	<20181127135030.1671-2-i.maximets@samsung.com>
+	<20181210171845.4f132e25@Igors-MacBook-Pro.local>
+	<61558042-beba-3a2a-b3de-c39faf8cc078@samsung.com>
+	<20181211164823.6d048a83@redhat.com>
+	<20190105024350.GO4157@habkost.net>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] hostmem-memfd: disable for systems
+ wihtout sealing support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,97 +39,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MTIuMDEuMjAxOSAyMDo1OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2Ugd2FudCB0byBiZSBhYmxl
-IHRvIGRldGVjdCB3aGV0aGVyIGEgZ2l2ZW4gcWVtdSBOQkQgc2VydmVyIGlzDQo+IGV4cG9zaW5n
-IHRoZSByaWdodCBleHBvcnQocykgYW5kIGRpcnR5IGJpdG1hcHMsIGF0IGxlYXN0IGZvcg0KPiBy
-ZWdyZXNzaW9uIHRlc3RpbmcuICBXZSBjb3VsZCB1c2UgJ25iZC1jbGllbnQgLWwnIGZyb20gdGhl
-IHVwc3RyZWFtDQo+IE5CRCBwcm9qZWN0IHRvIGxpc3QgZXhwb3J0cywgYnV0IGl0J3MgYW5ub3lp
-bmcgdG8gcmVseSBvbg0KPiBvdXQtb2YtdHJlZSBiaW5hcmllczsgZnVydGhlcm1vcmUsIG5iZC1j
-bGllbnQgZG9lc24ndCBuZWNlc3NhcmlseQ0KPiBrbm93IGFib3V0IGFsbCBvZiB0aGUgcWVtdSBO
-QkQgZXh0ZW5zaW9ucy4gIFRodXMsIHdlIHBsYW4gb24gYWRkaW5nDQo+IGEgbmV3IG1vZGUgdG8g
-cWVtdS1uYmQgdGhhdCBtZXJlbHkgc25pZmZzIGFsbCBwb3NzaWJsZSBpbmZvcm1hdGlvbg0KPiBm
-cm9tIHRoZSBzZXJ2ZXIgZHVyaW5nIGhhbmRzaGFrZSBwaGFzZSwgdGhlbiBkaXNjb25uZWN0cyBh
-bmQgZHVtcHMNCj4gdGhlIGluZm9ybWF0aW9uLg0KPiANCj4gVGhpcyBwYXRjaCBjb250aW51ZXMg
-dGhlIHdvcmsgb2YgdGhlIHByZXZpb3VzIHBhdGNoLCBieSBhZGRpbmcgdGhlDQo+IGFiaWxpdHkg
-dG8gdHJhY2sgdGhlIGxpc3Qgb2YgYXZhaWxhYmxlIG1ldGEgY29udGV4dHMgaW50bw0KPiBOQkRF
-eHBvcnRJbmZvLiAgSXQgYmVuZWZpdHMgZnJvbSB0aGUgcmVjZW50IHJlZmFjdG9yaW5nIHBhdGNo
-ZXMNCj4gd2l0aCBhIG5ldyBuYmRfbGlzdF9tZXRhX2NvbnRleHRzKCkgdGhhdCByZXVzZXMgbXVj
-aCBvZiB0aGUgc2FtZQ0KPiBmcmFtZXdvcmsgYXMgc2V0dGluZyBhIG1ldGEgY29udGV4dC4NCj4g
-DQo+IE5vdGU6IGEgbWFsaWNpb3VzIHNlcnZlciBjb3VsZCBleGhhdXN0IG1lbW9yeSBvZiBhIGNs
-aWVudCBieSBmZWVkaW5nDQo+IGFuIHVuZW5kaW5nIGxvb3Agb2YgY29udGV4dHM7IHBlcmhhcHMg
-d2UgY291bGQgcGxhY2UgYSBsaW1pdCBvbiBob3cNCj4gbWFueSB3ZSBhcmUgd2lsbGluZyB0byBy
-ZWNlaXZlLiBCdXQgdGhpcyBpcyBubyBkaWZmZXJlbnQgZnJvbSBvdXINCj4gZWFybGllciBhbmFs
-eXNpcyBvbiBhIHNlcnZlciBzZW5kaW5nIGFuIHVuZW5kaW5nIGxpc3Qgb2YgZXhwb3J0cywNCj4g
-YW5kIHRoZSBkZWF0aCBvZiBhIGNsaWVudCBkdWUgdG8gbWVtb3J5IGV4aGF1c3Rpb24gd2hlbiB0
-aGUgY2xpZW50DQo+IHdhcyBnb2luZyB0byBleGl0IHNvb24gYW55d2F5cyBpcyBub3QgcmVhbGx5
-IGEgZGVuaWFsIG9mIHNlcnZpY2UNCj4gYXR0YWNrLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJp
-YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IE1lc3NhZ2UtSWQ6IDwyMDE4MTIxNTEzNTMy
-NC4xNTI2MjktMjAtZWJsYWtlQHJlZGhhdC5jb20+DQo+IFJldmlld2VkLWJ5OiBSaWNoYXJkIFcu
-TS4gSm9uZXMgPHJqb25lc0ByZWRoYXQuY29tPg0KPiANCj4gLS0tDQo+IHYzOiBtZW50aW9uIHNl
-Y3VyaXR5IChub24tKWlzc3VlIGluIGNvbW1pdCBtZXNzYWdlIFtSaWNoXQ0KPiAtLS0NCj4gICBp
-bmNsdWRlL2Jsb2NrL25iZC5oIHwgIDIgKysNCj4gICBuYmQvY2xpZW50LmMgICAgICAgIHwgNDEg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0NCj4gICAyIGZpbGVzIGNo
-YW5nZWQsIDQxIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0
-IGEvaW5jbHVkZS9ibG9jay9uYmQuaCBiL2luY2x1ZGUvYmxvY2svbmJkLmgNCj4gaW5kZXggZTlh
-NDQyY2U3ZTkuLjgwZWUzY2M5OTdlIDEwMDY0NA0KPiAtLS0gYS9pbmNsdWRlL2Jsb2NrL25iZC5o
-DQo+ICsrKyBiL2luY2x1ZGUvYmxvY2svbmJkLmgNCj4gQEAgLTI4NCw2ICsyODQsOCBAQCBzdHJ1
-Y3QgTkJERXhwb3J0SW5mbyB7DQo+IA0KPiAgICAgICAvKiBTZXQgYnkgc2VydmVyIHJlc3VsdHMg
-ZHVyaW5nIG5iZF9yZWNlaXZlX2V4cG9ydF9saXN0KCkgKi8NCj4gICAgICAgY2hhciAqZGVzY3Jp
-cHRpb247DQo+ICsgICAgaW50IG5fY29udGV4dHM7DQo+ICsgICAgY2hhciAqKmNvbnRleHRzOw0K
-PiAgIH07DQo+ICAgdHlwZWRlZiBzdHJ1Y3QgTkJERXhwb3J0SW5mbyBOQkRFeHBvcnRJbmZvOw0K
-PiANCj4gZGlmZiAtLWdpdCBhL25iZC9jbGllbnQuYyBiL25iZC9jbGllbnQuYw0KPiBpbmRleCBh
-NWE3MDVhNjdmNy4uMjAwMWU2ZTgxNjAgMTAwNjQ0DQo+IC0tLSBhL25iZC9jbGllbnQuYw0KPiAr
-KysgYi9uYmQvY2xpZW50LmMNCj4gQEAgLTgxNyw2ICs4MTcsMzYgQEAgc3RhdGljIGludCBuYmRf
-bmVnb3RpYXRlX3NpbXBsZV9tZXRhX2NvbnRleHQoUUlPQ2hhbm5lbCAqaW9jLA0KPiAgICAgICBy
-ZXR1cm4gcmVjZWl2ZWQ7DQo+ICAgfQ0KPiANCj4gKy8qDQo+ICsgKiBuYmRfbGlzdF9tZXRhX2Nv
-bnRleHRzOg0KPiArICogUmVxdWVzdCB0aGUgc2VydmVyIHRvIGxpc3QgYWxsIG1ldGEgY29udGV4
-dHMgZm9yIGV4cG9ydCBAaW5mby0+bmFtZS4NCj4gKyAqIHJldHVybiAwIGlmIGxpc3QgaXMgY29t
-cGxldGUgKGV2ZW4gaWYgZW1wdHkpLA0KPiArICogICAgICAgIC0xIHdpdGggZXJycCBzZXQgZm9y
-IGFueSBvdGhlciBlcnJvcg0KDQpOb3Qgc3VyZSBhYm91dCBuZWVkIG9mICJvdGhlciIgd29yZCBp
-biB0aGlzIGNvbnRleHQuDQoNCj4gKyAqLw0KPiArc3RhdGljIGludCBuYmRfbGlzdF9tZXRhX2Nv
-bnRleHRzKFFJT0NoYW5uZWwgKmlvYywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBOQkRFeHBvcnRJbmZvICppbmZvLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIEVycm9yICoqZXJycCkNCj4gK3sNCj4gKyAgICBpbnQgcmV0Ow0KPiArDQo+ICsgICAg
-aWYgKG5iZF9zZW5kX29uZV9tZXRhX2NvbnRleHQoaW9jLCBOQkRfT1BUX0xJU1RfTUVUQV9DT05U
-RVhULA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZm8tPm5hbWUsIE5V
-TEwsIGVycnApIDwgMCkgew0KDQpIbW0sIHRoaXMgbWFkZSBtZSB0byBhZGQgb25lIG1vcmUgY29t
-bWVudCB0byBwcmV2aW91cyBwYXRjaCBhYm91dA0KbmJkX3NlbmRfb25lX21ldGFfY29udGV4dCwg
-dGhlIGl0IGRvbid0IHNlbmQgY29udGV4dCBidXQgcXVlcnkuDQoNCj4gKyAgICAgICAgcmV0dXJu
-IC0xOw0KPiArICAgIH0NCj4gKw0KPiArICAgIHdoaWxlICgxKSB7DQo+ICsgICAgICAgIGNoYXIg
-KmNvbnRleHQ7DQo+ICsNCj4gKyAgICAgICAgcmV0ID0gbmJkX3JlY2VpdmVfb25lX21ldGFfY29u
-dGV4dChpb2MsIE5CRF9PUFRfTElTVF9NRVRBX0NPTlRFWFQsDQo+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgJmNvbnRleHQsIE5VTEwsIGVycnApOw0KPiArICAg
-ICAgICBpZiAocmV0IDw9IDApIHsNCj4gKyAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ICsgICAg
-ICAgIH0NCj4gKyAgICAgICAgaW5mby0+Y29udGV4dHMgPSBnX3JlbmV3KGNoYXIgKiwgaW5mby0+
-Y29udGV4dHMsICsraW5mby0+bl9jb250ZXh0cyk7DQo+ICsgICAgICAgIGluZm8tPmNvbnRleHRz
-W2luZm8tPm5fY29udGV4dHMgLSAxXSA9IGNvbnRleHQ7DQo+ICsgICAgfQ0KDQpBIGJpdCBvZGQg
-Zm9yIG1lLCB0aGF0IGZ1bmN0aW9uIGxlYXZlcyBhbGxvY2F0ZWQgbWVtb3J5IG9uIGVycm9yIHBh
-dGgsIGJ1dCBpdCB3aWxsDQpiZSBmcmVlZCBhbnl3YXkgaW4gbmJkX2ZyZWVfZXhwb3J0X2xpc3Qs
-IHNvLCBkb24ndCBtaW5kLg0KDQo+ICt9DQo+ICsNCj4gICAvKg0KPiAgICAqIG5iZF9zdGFydF9u
-ZWdvdGlhdGU6DQo+ICAgICogU3RhcnQgdGhlIGhhbmRzaGFrZSB0byB0aGUgc2VydmVyLiAgQWZ0
-ZXIgYSBwb3NpdGl2ZSByZXR1cm4sIHRoZSBzZXJ2ZXINCj4gQEAgLTEwNjMsNyArMTA5Myw3IEBA
-IGludCBuYmRfcmVjZWl2ZV9uZWdvdGlhdGUoUUlPQ2hhbm5lbCAqaW9jLCBRQ3J5cHRvVExTQ3Jl
-ZHMgKnRsc2NyZWRzLA0KPiAgIC8qIENsZWFuIHVwIHJlc3VsdCBvZiBuYmRfcmVjZWl2ZV9leHBv
-cnRfbGlzdCAqLw0KPiAgIHZvaWQgbmJkX2ZyZWVfZXhwb3J0X2xpc3QoTkJERXhwb3J0SW5mbyAq
-aW5mbywgaW50IGNvdW50KQ0KPiAgIHsNCj4gLSAgICBpbnQgaTsNCj4gKyAgICBpbnQgaSwgajsN
-Cj4gDQo+ICAgICAgIGlmICghaW5mbykgew0KPiAgICAgICAgICAgcmV0dXJuOw0KPiBAQCAtMTA3
-Miw2ICsxMTAyLDEwIEBAIHZvaWQgbmJkX2ZyZWVfZXhwb3J0X2xpc3QoTkJERXhwb3J0SW5mbyAq
-aW5mbywgaW50IGNvdW50KQ0KPiAgICAgICBmb3IgKGkgPSAwOyBpIDwgY291bnQ7IGkrKykgew0K
-PiAgICAgICAgICAgZ19mcmVlKGluZm9baV0ubmFtZSk7DQo+ICAgICAgICAgICBnX2ZyZWUoaW5m
-b1tpXS5kZXNjcmlwdGlvbik7DQo+ICsgICAgICAgIGZvciAoaiA9IDA7IGogPCBpbmZvW2ldLm5f
-Y29udGV4dHM7IGorKykgew0KPiArICAgICAgICAgICAgZ19mcmVlKGluZm9baV0uY29udGV4dHNb
-al0pOw0KPiArICAgICAgICB9DQo+ICsgICAgICAgIGdfZnJlZShpbmZvW2ldLmNvbnRleHRzKTsN
-Cj4gICAgICAgfQ0KPiAgICAgICBnX2ZyZWUoaW5mbyk7DQo+ICAgfQ0KPiBAQCAtMTEzOSw3ICsx
-MTczLDEwIEBAIGludCBuYmRfcmVjZWl2ZV9leHBvcnRfbGlzdChRSU9DaGFubmVsICppb2MsIFFD
-cnlwdG9UTFNDcmVkcyAqdGxzY3JlZHMsDQo+ICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiAg
-ICAgICAgICAgICAgIH0NCj4gDQo+IC0gICAgICAgICAgICAvKiBUT0RPOiBHcmFiIG1ldGEgY29u
-dGV4dHMgKi8NCj4gKyAgICAgICAgICAgIGlmIChyZXN1bHQgPT0gMyAmJg0KPiArICAgICAgICAg
-ICAgICAgIG5iZF9saXN0X21ldGFfY29udGV4dHMoaW9jLCAmYXJyYXlbaV0sIGVycnApIDwgMCkg
-ew0KPiArICAgICAgICAgICAgICAgIGdvdG8gb3V0Ow0KPiArICAgICAgICAgICAgfQ0KPiAgICAg
-ICAgICAgfQ0KPiANCj4gICAgICAgICAgIC8qIFNlbmQgTkJEX09QVF9BQk9SVCBhcyBhIGNvdXJ0
-ZXN5IGJlZm9yZSBoYW5naW5nIHVwICovDQo+IA0KDQphbnl3YXksDQpSZXZpZXdlZC1ieTogVmxh
-ZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoN
-Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+So, can we have any conclusion about this patch and the series?
+
+Best regards, Ilya Maximets.
+
+On 05.01.2019 5:43, Eduardo Habkost wrote:
+> On Tue, Dec 11, 2018 at 04:48:23PM +0100, Igor Mammedov wrote:
+>> On Tue, 11 Dec 2018 13:29:19 +0300
+>> Ilya Maximets <i.maximets@samsung.com> wrote:
+>>
+>> CCing libvirt folk for an opinion
+>>
+>>> On 10.12.2018 19:18, Igor Mammedov wrote:
+>>>> On Tue, 27 Nov 2018 16:50:27 +0300
+>>>> Ilya Maximets <i.maximets@samsung.com> wrote:
+>>>>
+>>>> s/wihtout/without/ in subj
+>>>>   
+>>>>> If seals are not supported, memfd_create() will fail.
+>>>>> Furthermore, there is no way to disable it in this case because
+>>>>> '.seal' property is not registered.
+>>>>>
+>>>>> This issue leads to vhost-user-test failures on RHEL 7.2:
+>>>>>
+>>>>>   qemu-system-x86_64: -object memory-backend-memfd,id=mem,size=2M,: \
+>>>>>                       failed to create memfd: Invalid argument
+>>>>>
+>>>>> and actually breaks the feature on such systems.
+>>>>>
+>>>>> Let's restrict memfd backend to systems with sealing support.
+>>>>>
+>> [...]
+>>>>> @@ -177,7 +175,7 @@ static const TypeInfo memfd_backend_info = {
+>>>>>  
+>>>>>  static void register_types(void)
+>>>>>  {
+>>>>> -    if (qemu_memfd_check(0)) {
+>>>>> +    if (qemu_memfd_check(MFD_ALLOW_SEALING)) {
+>>>>>          type_register_static(&memfd_backend_info);  
+>>>> that would either lead to not clear error that type doesn't exist.
+>>>> it could be better to report sensible error from memfd_backend_memory_alloc() if
+>>>> the feature is required but not supported by host   
+>>>
+>>> I'm not sure, but this could break the libvirt capability discovering.
+>>>
+>>> Current patch changes behaviour probably only for RHEL/CentOS 7.2.
+>>> All other systems are not affected. Do you think that we need to
+>>> change behaviour on all the systems?
+>> you are changing behavior anyways, so when users start getting
+>> on some of 'All other systems' start getting 'type doesn't exist'
+>> error, they won't have a clue what's wrong. In case where we are
+>> fixing broken defaults, shouldn't we at least do it the way that
+>> would inform user about misconfiguration.
+>>
+>> But I'm not insisting since memfd is fairly new, it might be fine
+>> for device to just disappear.
+> 
+> (Sorry for taking so long to reply on this series.  I couldn't
+> review the code yet.)
+> 
+> I'd like to make the QOM type hierarchy static, and not depend on
+> any runtime host capability checks.  But this is not a new
+> problem in the code, so I don't think it should block this
+> series.
+> 
