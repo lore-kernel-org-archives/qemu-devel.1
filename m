@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:40581)
+Received: from eggs.gnu.org ([209.51.188.92]:39905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjiU5-0007Ix-Lq
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:31:50 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1gjiU5-00074a-Nh
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:31:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjiFA-0003Vy-K7
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:16:27 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 16 Jan 2019 10:15:54 +0000
-Message-ID: <75e42dc3-440b-f0e8-c52f-99621235b12c@virtuozzo.com>
-References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-16-eblake@redhat.com>
-In-Reply-To: <20190112175812.27068-16-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A39021A817F82A4BAA53DDF7C005BA72@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <liam.merwick@oracle.com>) id 1gjiFL-0003gS-TZ
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:16:33 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:35282)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1gjiFH-0003Tb-4t
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:16:29 -0500
+References: <20190115100058.44712-1-sgarzare@redhat.com>
+	<20190115100058.44712-4-sgarzare@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <9737a9f4-bc26-73fd-f3ee-b394b46d861b@oracle.com>
+Date: Wed, 16 Jan 2019 10:16:04 +0000
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 15/19] nbd/client: Add
- nbd_receive_export_list()
+In-Reply-To: <20190115100058.44712-4-sgarzare@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] optionrom: add new PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,131 +29,404 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, liam.merwick@oracle.com
 
-MTIuMDEuMjAxOSAyMDo1OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gV2Ugd2FudCB0byBiZSBhYmxl
-IHRvIGRldGVjdCB3aGV0aGVyIGEgZ2l2ZW4gcWVtdSBOQkQgc2VydmVyIGlzDQo+IGV4cG9zaW5n
-IHRoZSByaWdodCBleHBvcnQocykgYW5kIGRpcnR5IGJpdG1hcHMsIGF0IGxlYXN0IGZvcg0KPiBy
-ZWdyZXNzaW9uIHRlc3RpbmcuICBXZSBjb3VsZCB1c2UgJ25iZC1jbGllbnQgLWwnIGZyb20gdGhl
-IHVwc3RyZWFtDQo+IE5CRCBwcm9qZWN0IHRvIGxpc3QgZXhwb3J0cywgYnV0IGl0J3MgYW5ub3lp
-bmcgdG8gcmVseSBvbg0KPiBvdXQtb2YtdHJlZSBiaW5hcmllczsgZnVydGhlcm1vcmUsIG5iZC1j
-bGllbnQgZG9lc24ndCBuZWNlc3NhcmlseQ0KPiBrbm93IGFib3V0IGFsbCBvZiB0aGUgcWVtdSBO
-QkQgZXh0ZW5zaW9ucy4gIFRodXMsIHdlIHBsYW4gb24gYWRkaW5nDQo+IGEgbmV3IG1vZGUgdG8g
-cWVtdS1uYmQgdGhhdCBtZXJlbHkgc25pZmZzIGFsbCBwb3NzaWJsZSBpbmZvcm1hdGlvbg0KPiBm
-cm9tIHRoZSBzZXJ2ZXIgZHVyaW5nIGhhbmRzaGFrZSBwaGFzZSwgdGhlbiBkaXNjb25uZWN0cyBh
-bmQgZHVtcHMNCj4gdGhlIGluZm9ybWF0aW9uLg0KPiANCj4gVGhpcyBwYXRjaCBhZGRzIHRoZSBs
-b3ctbGV2ZWwgY2xpZW50IGNvZGUgZm9yIGdyYWJiaW5nIHRoZSBsaXN0DQo+IG9mIGV4cG9ydHMu
-ICBJdCBiZW5lZml0cyBmcm9tIHRoZSByZWNlbnQgcmVmYWN0b3JpbmcgcGF0Y2hlcywgYXMNCj4g
-d2VsbCBhcyBhIG1pbm9yIHR3ZWFrIG9mIGNoYW5naW5nIG5iZF9vcHRfZ28oKSB0byBuYmRfb3B0
-X2luZm9fb3JfZ28oKSwNCj4gaW4gb3JkZXIgdG8gc2hhcmUgYXMgbXVjaCBjb2RlIGFzIHBvc3Np
-YmxlIHdoZW4gaXQgY29tZXMgdG8gZG9pbmcNCj4gdmFsaWRhdGlvbiBvZiBzZXJ2ZXIgcmVwbGll
-cy4gIFRoZSByZXN1bHRpbmcgaW5mb3JtYXRpb24gaXMgc3RvcmVkDQo+IGluIGFuIGFycmF5IG9m
-IE5CREV4cG9ydEluZm8gd2hpY2ggaGFzIGJlZW4gZXhwYW5kZWQgdG8gYW55DQo+IGRlc2NyaXB0
-aW9uIHN0cmluZywgYWxvbmcgd2l0aCBhIGNvbnZlbmllbmNlIGZ1bmN0aW9uIGZvciBmcmVlaW5n
-DQo+IHRoZSBsaXN0Lg0KPiANCj4gTm90ZTogYSBtYWxpY2lvdXMgc2VydmVyIGNvdWxkIGV4aGF1
-c3QgbWVtb3J5IG9mIGEgY2xpZW50IGJ5IGZlZWRpbmcNCj4gYW4gdW5lbmRpbmcgbG9vcCBvZiBl
-eHBvcnRzOyBwZXJoYXBzIHdlIHNob3VsZCBwbGFjZSBhIGxpbWl0IG9uIGhvdw0KPiBtYW55IHdl
-IGFyZSB3aWxsaW5nIHRvIHJlY2VpdmUuIEJ1dCBub3RlIHRoYXQgYSBzZXJ2ZXIgY291bGQNCj4g
-cmVhc29uYWJseSBiZSBzZXJ2aW5nIGFuIGV4cG9ydCBmb3IgZXZlcnkgZmlsZSBpbiBhIGxhcmdl
-IGRpcmVjdG9yeSwNCj4gd2hlcmUgYW4gYXJiaXRyYXJ5IGxpbWl0IGluIHRoZSBjbGllbnQgbWVh
-bnMgd2UgY2FuJ3QgbGlzdCBhbnl0aGluZw0KPiBmcm9tIHN1Y2ggYSBzZXJ2ZXI7IHRoZSBzYW1l
-IGhhcHBlbnMgaWYgd2UganVzdCBydW4gdW50aWwgdGhlIGNsaWVudA0KPiBmYWlscyB0byBtYWxs
-b2MoKSBhbmQgdGh1cyBkaWVzIGJ5IGFuIGFib3J0KCksIHdoZXJlIHRoZSBsaW1pdCBpcw0KPiBu
-byBsb25nZXIgYXJiaXRyYXJ5IGJ1dCBkZXRlcm1pbmVkIGJ5IGF2YWlsYWJsZSBtZW1vcnkuICBT
-aW5jZSB0aGUNCj4gY2xpZW50IGlzIGFscmVhZHkgcGxhbm5pbmcgb24gYmVpbmcgc2hvcnQtbGl2
-ZWQsIGl0J3MgaGFyZCB0byBjYWxsDQo+IHRoaXMgYSBkZW5pYWwgb2Ygc2VydmljZSBhdHRhY2sg
-dGhhdCB3b3VsZCBzdGFydmUgb2ZmIG90aGVyIHVzZXMsDQo+IHNvIGl0IGRvZXMgbm90IGFwcGVh
-ciB0byBiZSBhIHNlY3VyaXR5IGlzc3VlLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFr
-ZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IE1lc3NhZ2UtSWQ6IDwyMDE4MTIxNTEzNTMyNC4xNTI2
-MjktMTktZWJsYWtlQHJlZGhhdC5jb20+DQo+IFJldmlld2VkLWJ5OiBSaWNoYXJkIFcuTS4gSm9u
-ZXMgPHJqb25lc0ByZWRoYXQuY29tPg0KPiANCj4gLS0tDQo+IHYzOiBtZW50aW9uIHNlY3VyaXR5
-IChub24tKWlzc3VlIGluIGNvbW1pdCBtZXNzYWdlIFtSaWNoXSwgZm9ybWF0dGluZw0KPiB0d2Vh
-a3MNCj4gLS0tDQoNClsuLl0NCg0KPiAtLS0gYS9uYmQvY2xpZW50LmMNCj4gKysrIGIvbmJkL2Ns
-aWVudC5jDQo+IEBAIC0zMzAsMTEgKzMzMCwxNCBAQCBzdGF0aWMgaW50IG5iZF9yZWNlaXZlX2xp
-c3QoUUlPQ2hhbm5lbCAqaW9jLCBjaGFyICoqbmFtZSwgY2hhciAqKmRlc2NyaXB0aW9uLA0KPiAg
-IH0NCj4gDQo+IA0KPiAtLyogUmV0dXJucyAtMSBpZiBOQkRfT1BUX0dPIHByb3ZlcyB0aGUgZXhw
-b3J0IEBpbmZvLT5uYW1lIGNhbm5vdCBiZQ0KPiArLyoNCj4gKyAqIFJldHVybnMgLTEgaWYgTkJE
-X09QVF9HTyBwcm92ZXMgdGhlIGV4cG9ydCBAaW5mby0+bmFtZSBjYW5ub3QgYmUNCj4gICAgKiB1
-c2VkLCAwIGlmIE5CRF9PUFRfR08gaXMgdW5zdXBwb3J0ZWQgKGZhbGwgYmFjayB0byBOQkRfT1BU
-X0xJU1QgYW5kDQo+ICAgICogTkJEX09QVF9FWFBPUlRfTkFNRSBpbiB0aGF0IGNhc2UpLCBhbmQg
-PiAwIGlmIHRoZSBleHBvcnQgaXMgZ29vZCB0bw0KPiAtICogZ28gKHdpdGggdGhlIHJlc3Qgb2Yg
-QGluZm8gcG9wdWxhdGVkKS4gKi8NCj4gLXN0YXRpYyBpbnQgbmJkX29wdF9nbyhRSU9DaGFubmVs
-ICppb2MsIE5CREV4cG9ydEluZm8gKmluZm8sIEVycm9yICoqZXJycCkNCj4gKyAqIGdvICh3aXRo
-IHRoZSByZXN0IG9mIEBpbmZvIHBvcHVsYXRlZCkuDQo+ICsgKi8NCg0KRG9uJ3QgeW91IHdhbnQg
-dG8gdXBncmFkZSBhIGNvbW1lbnQgYSBsaXR0bGUgYml0LCB0byByZWZsZWN0IHN1cHBvcnQgZm9y
-IE9QVF9JTkZPPw0KDQo+ICtzdGF0aWMgaW50IG5iZF9vcHRfaW5mb19vcl9nbyhRSU9DaGFubmVs
-ICppb2MsIHVpbnQzMl90IG9wdCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE5C
-REV4cG9ydEluZm8gKmluZm8sIEVycm9yICoqZXJycCkNCj4gICB7DQo+ICAgICAgIE5CRE9wdGlv
-blJlcGx5IHJlcGx5Ow0KPiAgICAgICB1aW50MzJfdCBsZW4gPSBzdHJsZW4oaW5mby0+bmFtZSk7
-DQo+IEBAIC0zNDcsNyArMzUwLDggQEAgc3RhdGljIGludCBuYmRfb3B0X2dvKFFJT0NoYW5uZWwg
-KmlvYywgTkJERXhwb3J0SW5mbyAqaW5mbywgRXJyb3IgKiplcnJwKQ0KPiAgICAgICAgKiBmbGFn
-cyBzdGlsbCAwIGlzIGEgd2l0bmVzcyBvZiBhIGJyb2tlbiBzZXJ2ZXIuICovDQo+ICAgICAgIGlu
-Zm8tPmZsYWdzID0gMDsNCj4gDQo+IC0gICAgdHJhY2VfbmJkX29wdF9nb19zdGFydChpbmZvLT5u
-YW1lKTsNCj4gKyAgICBhc3NlcnQob3B0ID09IE5CRF9PUFRfR08gfHwgb3B0ID09IE5CRF9PUFRf
-SU5GTyk7DQo+ICsgICAgdHJhY2VfbmJkX29wdF9nb19zdGFydChuYmRfb3B0X2xvb2t1cChvcHQp
-LCBpbmZvLT5uYW1lKTsNCg0KSSdkIHByZWZlciB0byB1cGdyYWRlIHRyYWNlLXBvaW50IG5hbWUg
-dG9vLCBhcyB3ZWxsIGFzIG90aGVyIHNldmVyYWwgdHJhY2VfbmJkX29wdF9nb18qIHRyYWNlDQpw
-b2ludHMgaW4gdGhlIGZ1bmN0aW9uLg0KDQo+ICAgICAgIGJ1ZiA9IGdfbWFsbG9jKDQgKyBsZW4g
-KyAyICsgMiAqIGluZm8tPnJlcXVlc3Rfc2l6ZXMgKyAxKTsNCj4gICAgICAgc3RsX2JlX3AoYnVm
-LCBsZW4pOw0KPiAgICAgICBtZW1jcHkoYnVmICsgNCwgaW5mby0+bmFtZSwgbGVuKTsNCg0KWy4u
-XQ0KDQo+ICsvKg0KPiArICogbmJkX3JlY2VpdmVfZXhwb3J0X2xpc3Q6DQo+ICsgKiBRdWVyeSBk
-ZXRhaWxzIGFib3V0IGEgc2VydmVyJ3MgZXhwb3J0cywgdGhlbiBkaXNjb25uZWN0IHdpdGhvdXQN
-Cj4gKyAqIGdvaW5nIGludG8gdHJhbnNtaXNzaW9uIHBoYXNlLiBSZXR1cm4gYSBjb3VudCBvZiB0
-aGUgZXhwb3J0cyBsaXN0ZWQNCj4gKyAqIGluIEBpbmZvIGJ5IHRoZSBzZXJ2ZXIsIG9yIC0xIG9u
-IGVycm9yLiBDYWxsZXIgbXVzdCBmcmVlIEBpbmZvIHVzaW5nDQo+ICsgKiBuYmRfZnJlZV9leHBv
-cnRfbGlzdCgpLg0KPiArICovDQo+ICtpbnQgbmJkX3JlY2VpdmVfZXhwb3J0X2xpc3QoUUlPQ2hh
-bm5lbCAqaW9jLCBRQ3J5cHRvVExTQ3JlZHMgKnRsc2NyZWRzLA0KPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIGNvbnN0IGNoYXIgKmhvc3RuYW1lLCBOQkRFeHBvcnRJbmZvICoqaW5mbywN
-Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApDQo+ICt7DQo+ICsg
-ICAgaW50IHJlc3VsdDsNCj4gKyAgICBpbnQgY291bnQgPSAwOw0KPiArICAgIGludCBpOw0KPiAr
-ICAgIGludCByYzsNCj4gKyAgICBpbnQgcmV0ID0gLTE7DQo+ICsgICAgTkJERXhwb3J0SW5mbyAq
-YXJyYXkgPSBOVUxMOw0KPiArICAgIFFJT0NoYW5uZWwgKnNpb2MgPSBOVUxMOw0KPiArDQo+ICsg
-ICAgKmluZm8gPSBOVUxMOw0KPiArICAgIHJlc3VsdCA9IG5iZF9zdGFydF9uZWdvdGlhdGUoaW9j
-LCB0bHNjcmVkcywgaG9zdG5hbWUsICZzaW9jLCB0cnVlLCBOVUxMLA0KPiArICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgZXJycCk7DQo+ICsgICAgaWYgKHRsc2NyZWRzICYmIHNpb2Mp
-IHsNCj4gKyAgICAgICAgaW9jID0gc2lvYzsNCj4gKyAgICB9DQo+ICsNCj4gKyAgICBzd2l0Y2gg
-KHJlc3VsdCkgew0KPiArICAgIGNhc2UgMjoNCj4gKyAgICBjYXNlIDM6DQo+ICsgICAgICAgIC8q
-IG5ld3N0eWxlIC0gdXNlIE5CRF9PUFRfTElTVCB0byBwb3B1bGF0ZSBhcnJheSwgdGhlbiB0cnkN
-Cj4gKyAgICAgICAgICogTkJEX09QVF9JTkZPIG9uIGVhY2ggYXJyYXkgbWVtYmVyLiBJZiBzdHJ1
-Y3R1cmVkIHJlcGxpZXMNCj4gKyAgICAgICAgICogYXJlIGVuYWJsZWQsIGFsc28gdHJ5IE5CRF9P
-UFRfTElTVF9NRVRBX0NPTlRFWFQuICovDQo+ICsgICAgICAgIGlmIChuYmRfc2VuZF9vcHRpb25f
-cmVxdWVzdChpb2MsIE5CRF9PUFRfTElTVCwgMCwgTlVMTCwgZXJycCkgPCAwKSB7DQo+ICsgICAg
-ICAgICAgICBnb3RvIG91dDsNCj4gKyAgICAgICAgfQ0KPiArICAgICAgICB3aGlsZSAoMSkgew0K
-PiArICAgICAgICAgICAgY2hhciAqbmFtZTsNCj4gKyAgICAgICAgICAgIGNoYXIgKmRlc2M7DQo+
-ICsNCj4gKyAgICAgICAgICAgIHJjID0gbmJkX3JlY2VpdmVfbGlzdChpb2MsICZuYW1lLCAmZGVz
-YywgZXJycCk7DQo+ICsgICAgICAgICAgICBpZiAocmMgPCAwKSB7DQo+ICsgICAgICAgICAgICAg
-ICAgZ290byBvdXQ7DQo+ICsgICAgICAgICAgICB9IGVsc2UgaWYgKHJjID09IDApIHsNCj4gKyAg
-ICAgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgIGFy
-cmF5ID0gZ19yZW5ldyhOQkRFeHBvcnRJbmZvLCBhcnJheSwgKytjb3VudCk7DQo+ICsgICAgICAg
-ICAgICBtZW1zZXQoJmFycmF5W2NvdW50IC0gMV0sIDAsIHNpemVvZigqYXJyYXkpKTsNCj4gKyAg
-ICAgICAgICAgIGFycmF5W2NvdW50IC0gMV0ubmFtZSA9IG5hbWU7DQo+ICsgICAgICAgICAgICBh
-cnJheVtjb3VudCAtIDFdLmRlc2NyaXB0aW9uID0gZGVzYzsNCj4gKyAgICAgICAgICAgIGFycmF5
-W2NvdW50IC0gMV0uc3RydWN0dXJlZF9yZXBseSA9IHJlc3VsdCA9PSAzOw0KPiArICAgICAgICB9
-DQo+ICsNCj4gKyAgICAgICAgZm9yIChpID0gMDsgaSA8IGNvdW50OyBpKyspIHsNCj4gKyAgICAg
-ICAgICAgIGFycmF5W2ldLnJlcXVlc3Rfc2l6ZXMgPSB0cnVlOw0KPiArICAgICAgICAgICAgcmMg
-PSBuYmRfb3B0X2luZm9fb3JfZ28oaW9jLCBOQkRfT1BUX0lORk8sICZhcnJheVtpXSwgZXJycCk7
-DQo+ICsgICAgICAgICAgICBpZiAocmMgPCAwKSB7DQo+ICsgICAgICAgICAgICAgICAgZ290byBv
-dXQ7DQo+ICsgICAgICAgICAgICB9IGVsc2UgaWYgKHJjID09IDApIHsNCj4gKyAgICAgICAgICAg
-ICAgICAvKiBQb2ludGxlc3MgdG8gdHJ5IHJlc3Qgb2YgbG9vcC4gSWYgT1BUX0lORk8gZG9lc24n
-dCB3b3JrLA0KPiArICAgICAgICAgICAgICAgICAqIGl0J3MgdW5saWtlbHkgdGhhdCBtZXRhIGNv
-bnRleHRzIHdvcmsgZWl0aGVyICovDQo+ICsgICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAg
-ICAgICAgICB9DQo+ICsNCj4gKyAgICAgICAgICAgIC8qIFRPRE86IEdyYWIgbWV0YSBjb250ZXh0
-cyAqLw0KPiArICAgICAgICB9DQo+ICsNCj4gKyAgICAgICAgLyogU2VuZCBOQkRfT1BUX0FCT1JU
-IGFzIGEgY291cnRlc3kgYmVmb3JlIGhhbmdpbmcgdXAgKi8NCj4gKyAgICAgICAgbmJkX3NlbmRf
-b3B0X2Fib3J0KGlvYyk7DQo+ICsgICAgICAgIGJyZWFrOw0KPiArICAgIGNhc2UgMTogLyogbmV3
-c3R5bGUsIGJ1dCBsaW1pdGVkIHRvIEVYUE9SVF9OQU1FICovDQo+ICsgICAgICAgIGVycm9yX3Nl
-dGcoZXJycCwgIlNlcnZlciBkb2VzIG5vdCBzdXBwb3J0IGV4cG9ydCBsaXN0cyIpOw0KPiArICAg
-ICAgICAvKiBXZSBjYW4ndCBldmVuIHNlbmQgTkJEX09QVF9BQk9SVCwgc28gbWVyZWx5IGhhbmcg
-dXAgKi8NCg0KQnV0LCBvbiB0aGUgb3RoZXIgaGFuZCwgd2h5IG5vdCB0byBzZW5kIGl0PyBJdCB3
-aWxsIGJlIHVua25vd24gZm9yIHRoZSBzZXJ2ZXIsDQpzbywgaXQgd2lsbCBoYXZlIHRvIGNsb3Nl
-IHRoZSBjb25uZWN0aW9uIGFjY29yZGluZ2x5IHRvIHRoZSBwcm90b2NvbCwgaXNuJ3QgaXQNCmJl
-dHRlciBhIGJpdD8NCg0KPiArICAgICAgICBnb3RvIG91dDsNCj4gKyAgICBjYXNlIDA6IC8qIG9s
-ZHN0eWxlLCBwYXJzZSBsZW5ndGggYW5kIGZsYWdzICovDQo+ICsgICAgICAgIGFycmF5ID0gZ19u
-ZXcwKE5CREV4cG9ydEluZm8sIDEpOw0KPiArICAgICAgICBhcnJheS0+bmFtZSA9IGdfc3RyZHVw
-KCIiKTsNCj4gKyAgICAgICAgY291bnQgPSAxOw0KPiArDQo+ICsgICAgICAgIGlmIChuYmRfbmVn
-b3RpYXRlX2ZpbmlzaF9vbGRzdHlsZShpb2MsIGFycmF5LCBlcnJwKSA8IDApIHsNCj4gKyAgICAg
-ICAgICAgIHJldHVybiAtRUlOVkFMOw0KDQpnb3RvIG91dCwgeW91IG1lYW4uDQpBbmQgd2l0aCBh
-dCBsZWFzdCB0aGlzIG9uZSBmaXhlZDoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3Yt
-T2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KDQotLSANCkJlc3QgcmVn
-YXJkcywNClZsYWRpbWlyDQo=
+Hi Stefano,
+
+Code LGTM, just a few minor comments below
+
+On 15/01/2019 10:00, Stefano Garzarella wrote:
+> The new pvh.bin option rom can be used with SeaBIOS to boot
+> uncompressed kernel using the x86/HVM direct boot ABI.
+> 
+> pvh.S contains the entry point of the option rom. It runs
+> in real mode, loads the e820 table querying the BIOS, and
+> then it switches to 32bit protect mode and jump to the
+
+"protect" -> "protected"
+"jump" -> "jumps"
+
+> pvh_load_kernel() written in pvh_main.c.
+> pvh_load_kernel() loads the cmdline and kernel entry_point
+> using fw_cfg, then it looks for RSDP, fills the
+> hvm_start_info required by x86/HVM ABI, and finally jumps
+> to the kernel entry_point.
+> 
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>   pc-bios/optionrom/Makefile   |   5 +-
+>   pc-bios/optionrom/pvh.S      | 200 +++++++++++++++++++++++++++++++++++
+>   pc-bios/optionrom/pvh_main.c | 117 ++++++++++++++++++++
+>   3 files changed, 321 insertions(+), 1 deletion(-)
+>   create mode 100644 pc-bios/optionrom/pvh.S
+>   create mode 100644 pc-bios/optionrom/pvh_main.c
+> 
+> diff --git a/pc-bios/optionrom/Makefile b/pc-bios/optionrom/Makefile
+> index a9a9e5e7eb..92c91d9949 100644
+> --- a/pc-bios/optionrom/Makefile
+> +++ b/pc-bios/optionrom/Makefile
+> @@ -37,7 +37,7 @@ Wa = -Wa,
+>   ASFLAGS += -32
+>   QEMU_CFLAGS += $(call cc-c-option, $(QEMU_CFLAGS), $(Wa)-32)
+>   
+> -build-all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin
+> +build-all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin
+>   
+>   # suppress auto-removal of intermediate files
+>   .SECONDARY:
+> @@ -46,6 +46,9 @@ build-all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin
+>   %.o: %.S
+>   	$(call quiet-command,$(CPP) $(QEMU_INCLUDES) $(QEMU_DGFLAGS) -c -o - $< | $(AS) $(ASFLAGS) -o $@,"AS","$(TARGET_DIR)$@")
+>   
+> +%.img: %.o %_main.o
+> +	$(call quiet-command,$(LD) $(LDFLAGS_NOPIE) -m $(LD_I386_EMULATION) -T $(SRC_PATH)/pc-bios/optionrom/flat.lds -s -o $@ $?,"BUILD","$(TARGET_DIR)$@")
+> +
+>   %.img: %.o
+>   	$(call quiet-command,$(LD) $(LDFLAGS_NOPIE) -m $(LD_I386_EMULATION) -T $(SRC_PATH)/pc-bios/optionrom/flat.lds -s -o $@ $<,"BUILD","$(TARGET_DIR)$@")
+>   
+> diff --git a/pc-bios/optionrom/pvh.S b/pc-bios/optionrom/pvh.S
+> new file mode 100644
+> index 0000000000..e1d7f4a7a7
+> --- /dev/null
+> +++ b/pc-bios/optionrom/pvh.S
+> @@ -0,0 +1,200 @@
+> +/*
+> + * PVH Option ROM
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + *
+> + * Copyright Novell Inc, 2009
+> + *   Authors: Alexander Graf <agraf@suse.de>
+> + *
+> + * Copyright (c) 2019 Red Hat Inc.
+> + *   Authors: Stefano Garzarella <sgarzare@redhat.com>
+> + */
+> +
+> +#include "optionrom.h"
+> +
+> +#define BOOT_ROM_PRODUCT "PVH loader"
+> +
+> +#define GS_PROT_JUMP		0
+> +#define GS_GDT_DESC		6
+> +
+> +#ifdef OPTION_ROM_START
+> +#undef OPTION_ROM_START
+> +#endif
+> +#ifdef OPTION_ROM_END
+> +#undef OPTION_ROM_END
+> +#endif
+> +
+> +/*
+> + * Redefine OPTION_ROM_START and OPTION_ROM_END, because this rom is produced
+> + * linking multiple objects.
+> + * signrom.py will add padding.
+> + */
+> +#define OPTION_ROM_START                                \
+> +    .code16;						\
+> +    .text;						\
+> +	.global 	_start;				\
+> +    _start:;						\
+> +	.short		0xaa55;				\
+> +	.byte		3; /* desired size in 512 units */
+> +
+> +#define OPTION_ROM_END					\
+> +    _end:
+> +
+> +BOOT_ROM_START
+> +
+> +run_pvhboot:
+> +
+> +	cli
+> +	cld
+> +
+> +	mov		%cs, %eax
+> +	shl		$0x4, %eax
+> +
+> +	/* set up a long jump descriptor that is PC relative */
+> +
+> +	/* move stack memory to %gs */
+> +	mov		%ss, %ecx
+> +	shl		$0x4, %ecx
+> +	mov		%esp, %ebx
+> +	add		%ebx, %ecx
+> +	sub		$0x20, %ecx
+> +	sub		$0x30, %esp
+> +	shr		$0x4, %ecx
+> +	mov		%cx, %gs
+> +
+> +	/* now push the indirect jump descriptor there */
+> +	mov		(prot_jump), %ebx
+> +	add		%eax, %ebx
+> +	movl		%ebx, %gs:GS_PROT_JUMP
+> +	mov		$8, %bx
+> +	movw		%bx, %gs:GS_PROT_JUMP + 4
+> +
+> +	/* fix the gdt descriptor to be PC relative */
+> +	movw		(gdt_desc), %bx
+> +	movw		%bx, %gs:GS_GDT_DESC
+> +	movl		(gdt_desc+2), %ebx
+> +	add		%eax, %ebx
+> +	movl		%ebx, %gs:GS_GDT_DESC + 2
+> +
+> +	/* initialize HVM memmap table using int 0x15(e820) */
+> +
+> +	/* ES = pvh_e820 struct */
+> +	mov 		$pvh_e820, %eax
+> +	shr		$4, %eax
+> +	mov		%ax, %es
+> +
+> +	/* start storing memmap table at %es:8 (pvh_e820.table) */
+> +	mov 		$8,%edi
+> +	xor		%ebx, %ebx
+> +	jmp 		memmap_loop
+> +
+> +memmap_loop_check:
+> +	/* pvh_e820 can contains up to 128 entries */
+> +	cmp 		$128, %ebx
+> +	je 		memmap_done
+> +
+> +memmap_loop:
+> +	/* entry size (hvm_memmap_table_entry) & max buffer size (int15) */
+> +	movl		$24, %ecx
+> +	/* e820 */
+> +	movl		$0x0000e820, %eax
+> +	/* 'SMAP' magic */
+> +	movl		$0x534d4150, %edx
+> +	/* store counter value at %es:0 (pvh_e820.entries) */
+> +	movl 		%ebx, %es:0
+> +
+> +	int		$0x15
+> +	/* error or last entry already done? */
+> +	jb		memmap_err
+> +
+> +	/* %edi += entry size (hvm_memmap_table_entry) */
+> +	add		$24, %edi
+> +
+> +	/* continuation value 0 means last entry */
+> +	test		%ebx, %ebx
+> +	jnz		memmap_loop_check
+> +
+> +	/* increase pvh_e820.entries to save the last entry */
+> +	movl 		%es:0, %ebx
+> +	inc 		%ebx
+> +
+> +memmap_done:
+> +	movl 		%ebx, %es:0
+> +
+> +memmap_err:
+> +
+> +	/* load the GDT before going into protected mode */
+> +lgdt:
+> +	data32 lgdt	%gs:GS_GDT_DESC
+> +
+> +	/* get us to protected mode now */
+> +	movl		$1, %eax
+> +	movl		%eax, %cr0
+> +
+> +	/* the LJMP sets CS for us and gets us to 32-bit */
+> +ljmp:
+> +	data32 ljmp	*%gs:GS_PROT_JUMP
+> +
+> +prot_mode:
+> +.code32
+> +
+> +	/* initialize all other segments */
+> +	movl		$0x10, %eax
+> +	movl		%eax, %ss
+> +	movl		%eax, %ds
+> +	movl		%eax, %es
+> +	movl		%eax, %fs
+> +	movl		%eax, %gs
+> +
+> +	jmp pvh_load_kernel
+> +
+> +/* Variables */
+> +.align 4, 0
+> +prot_jump:	.long prot_mode
+> +		.short 8
+> +
+> +.align 4, 0
+> +gdt:
+> +	/* 0x00 */
+> +.byte	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+> +
+> +	/*
+> +	 * 0x08: code segment
+> +	 * (base=0, limit=0xfffff, type=32bit code exec/read, DPL=0, 4k)
+> +	 */
+> +.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00
+> +
+> +	/*
+> +	 * 0x10: data segment
+> +	 * (base=0, limit=0xfffff, type=32bit data read/write, DPL=0, 4k)
+> +	 */
+> +.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00
+> +
+> +	/*
+> +	 * 0x18: code segment
+> +	 * (base=0, limit=0x0ffff, type=16bit code exec/read/conf, DPL=0, 1b)
+> +	 */
+> +.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x9e, 0x00, 0x00
+> +
+> +	/*
+> +	 * 0x20: data segment
+> +	 * (base=0, limit=0x0ffff, type=16bit data read/write, DPL=0, 1b)
+> +	 */
+> +.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0x00, 0x00
+> +
+> +gdt_desc:
+> +.short	(5 * 8) - 1
+> +.long	gdt
+> +
+> +BOOT_ROM_END
+> diff --git a/pc-bios/optionrom/pvh_main.c b/pc-bios/optionrom/pvh_main.c
+> new file mode 100644
+> index 0000000000..9100952463
+> --- /dev/null
+> +++ b/pc-bios/optionrom/pvh_main.c
+> @@ -0,0 +1,117 @@
+> +/*
+> + * PVH Option ROM for fw_cfg DMA
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + *
+> + * Copyright (c) 2019 Red Hat Inc.
+> + *   Authors:
+> + *     Stefano Garzarella <sgarzare@redhat.com>
+> + */
+> +
+> +asm (".code32"); /* this code will be executed in protect mode */
+
+
+"protect" -> "protected"
+
+
+> +
+> +#include <stddef.h>
+> +#include <stdint.h>
+> +#include "optrom.h"
+> +#include "optrom_fw_cfg.h"
+> +#include "../../include/hw/xen/start_info.h"
+> +
+> +#define RSDP_SIGNATURE          0x2052545020445352LL /* "RSD PTR " */
+> +#define RSDP_AREA_ADDR          0x000E0000
+> +#define RSDP_AREA_SIZE          2048
+> +#define EBDA_BASE_ADDR          0x0000040E
+> +#define EBDA_SIZE               1024
+> +
+> +#define E820_MAXENTRIES         128
+> +#define CMDLINE_BUFSIZE         4096
+> +
+> +/* e820 table filled in pvh.S using int 0x15 */
+> +struct pvh_e820_table {
+> +    uint32_t entries;
+> +    uint32_t reserved;
+> +    struct hvm_memmap_table_entry table[E820_MAXENTRIES];
+> +};
+> +
+> +struct pvh_e820_table pvh_e820 __attribute__ ((aligned));
+> +
+> +struct hvm_start_info start_info;
+
+Can this be static?
+
+> +struct hvm_modlist_entry ramdisk_mod;
+
+Is this used?
+
+> +uint8_t cmdline_buffer[CMDLINE_BUFSIZE];
+
+Can this be static?
+
+> +
+> +
+> +/* Search RSDP signature. */
+> +static uintptr_t search_rsdp(uint32_t start_addr, uint32_t end_addr)
+> +{
+> +    uint64_t *rsdp_p;
+> +
+> +    /* RSDP signature is always on a 16 byte boundary */
+> +    for (rsdp_p = (uint64_t *)start_addr; rsdp_p < (uint64_t *)end_addr;
+> +         rsdp_p += 2) {
+> +        if (*rsdp_p == RSDP_SIGNATURE) {
+> +            return (uintptr_t)rsdp_p;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +/* Force the asm name without leading underscore, even on Win32. */
+> +extern void pvh_load_kernel(void) asm("pvh_load_kernel");
+> +
+> +void pvh_load_kernel(void)
+> +{
+> +    void *cmdline_addr = &cmdline_buffer;
+> +    void *kernel_entry;
+> +    uint32_t cmdline_size, fw_cfg_version = bios_cfg_version();
+> +
+> +    start_info.magic = XEN_HVM_START_MAGIC_VALUE;
+> +    start_info.version = 1;
+> +
+> +    /*
+> +     * pvh_e820 is filled in the pvh.S before to switch in protected mode,
+> +     * because we can use int 0x15 only in real mode.
+> +     */
+> +    start_info.memmap_entries = pvh_e820.entries;
+> +    start_info.memmap_paddr = (uintptr_t)pvh_e820.table;
+> +
+> +    /*
+> +     * Search RSDP in the main BIOS area below 1 MB.
+> +     * SeaBIOS store the RSDP in this area, so we try it first.
+> +     */
+> +    start_info.rsdp_paddr = search_rsdp(RSDP_AREA_ADDR,
+> +                                        RSDP_AREA_ADDR + RSDP_AREA_SIZE);
+> +
+> +    /* Search RSDP in the EBDA if it is not found */
+> +    if (!start_info.rsdp_paddr) {
+> +        /*
+> +         * Th EBDA address is stored at EBDA_BASE_ADDR. It contains 2 bytes
+> +         * segment pointer to EBDA, so we must convert it to a linear address.
+> +         */
+> +        uint32_t ebda_paddr = ((uint32_t)*((uint16_t *)EBDA_BASE_ADDR)) << 4;
+> +        if (ebda_paddr > 0x400) {
+> +            uint32_t *ebda = (uint32_t *)ebda_paddr;
+> +
+> +            start_info.rsdp_paddr = search_rsdp(*ebda, *ebda + EBDA_SIZE);
+> +        }
+> +    }
+> +
+> +    bios_cfg_read_entry(&cmdline_size, FW_CFG_CMDLINE_SIZE, 4, fw_cfg_version);
+> +    bios_cfg_read_entry(cmdline_addr, FW_CFG_CMDLINE_DATA, cmdline_size,
+> +                        fw_cfg_version);
+> +    start_info.cmdline_paddr = (uintptr_t)cmdline_addr;
+> +
+> +    bios_cfg_read_entry(&kernel_entry, FW_CFG_KERNEL_ENTRY, 4, fw_cfg_version);
+> +
+> +    asm volatile("jmp *%1" : : "b"(&start_info), "c"(kernel_entry));
+> +}
+> 
