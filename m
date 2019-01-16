@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:49162)
+Received: from eggs.gnu.org ([209.51.188.92]:53524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjhn3-00043J-RI
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:47:21 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gjhoN-00059q-LF
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:48:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjhmw-00063d-F5
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:47:15 -0500
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-14-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a7abd300-9898-45cd-5e3d-9a8c79374ac7@redhat.com>
-Date: Wed, 16 Jan 2019 10:46:45 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gjhny-0000OW-OY
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:48:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjhny-0000Fp-2g
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:48:14 -0500
+Date: Wed, 16 Jan 2019 10:48:04 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190116104804.2077439b@redhat.com>
+In-Reply-To: <8bbf34cf-3e6b-5204-dd78-f8d17ce2e337@redhat.com>
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-2-git-send-email-imammedo@redhat.com>
+	<8bbf34cf-3e6b-5204-dd78-f8d17ce2e337@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190115141108.934-14-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 13/37] hw/riscv/Makefile.objs:
- Create CONFIG_* for riscv boards
+Subject: Re: [Qemu-devel] [PATCH 01/14] tests: acpi: add
+ uefi_find_rsdp_addr() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +29,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 
-On 2019-01-15 15:10, Yang Zhong wrote:
-> Add the new configs to default-configs/riscv*-sofmmu.mak.
+On Tue, 15 Jan 2019 21:06:16 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
+
+> Hi Igor,
 > 
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  default-configs/riscv32-softmmu.mak |  6 ++++++
->  default-configs/riscv64-softmmu.mak |  6 ++++++
->  hw/riscv/Makefile.objs              | 22 +++++++++++-----------
->  3 files changed, 23 insertions(+), 11 deletions(-)
+> On 01/15/19 16:40, Igor Mammedov wrote:
+> > introduce UEFI specific counterpart to acpi_find_rsdp_address()
+> > that will help to find RSDP address when [OA]VMF is used as
+> > firmware. It requires a [OA]VMF built with PcdAcpiTestSupport=TRUE,
+> > to locate RSDP address within 1Mb aligned ACPI test structure, tagged
+> > with GUID AB87A6B1-2034-BDA0-71BD-375007757785
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  tests/acpi-utils.h |  1 +
+> >  tests/acpi-utils.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 44 insertions(+)  
 > 
-> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-> index dbc9398284..af841839d1 100644
-> --- a/default-configs/riscv32-softmmu.mak
-> +++ b/default-configs/riscv32-softmmu.mak
-> @@ -11,3 +11,9 @@ CONFIG_PCI_GENERIC=y
->  
->  CONFIG_VGA=y
->  CONFIG_VGA_PCI=y
-> +
-> +CONFIG_HTIF=y
-> +CONFIG_HART=y
-> +CONFIG_SIFIVE=y
-> +CONFIG_SPIKE=y
-> +CONFIG_RISCV_VIRTIO=y
-> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-> index dbc9398284..af841839d1 100644
-> --- a/default-configs/riscv64-softmmu.mak
-> +++ b/default-configs/riscv64-softmmu.mak
-> @@ -11,3 +11,9 @@ CONFIG_PCI_GENERIC=y
->  
->  CONFIG_VGA=y
->  CONFIG_VGA_PCI=y
-> +
-> +CONFIG_HTIF=y
-> +CONFIG_HART=y
-> +CONFIG_SIFIVE=y
-> +CONFIG_SPIKE=y
-> +CONFIG_RISCV_VIRTIO=y
-> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
-> index 1dde01d39d..dde1b01f90 100644
-> --- a/hw/riscv/Makefile.objs
-> +++ b/hw/riscv/Makefile.objs
-> @@ -1,11 +1,11 @@
-> -obj-y += riscv_htif.o
-> -obj-y += riscv_hart.o
-> -obj-y += sifive_e.o
-> -obj-y += sifive_clint.o
-> -obj-y += sifive_prci.o
-> -obj-y += sifive_plic.o
-> -obj-y += sifive_test.o
-> -obj-y += sifive_u.o
-> -obj-y += sifive_uart.o
-> -obj-y += spike.o
-> -obj-y += virt.o
-> +obj-$(CONFIG_HTIF) += riscv_htif.o
+> I'm not promising to review all of this patch set (Phil, feel free to
+> chime in); I'll just make some quick comments below:
+> 
+> > diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+> > index ef388bb..3b11f47 100644
+> > --- a/tests/acpi-utils.h
+> > +++ b/tests/acpi-utils.h
+> > @@ -46,6 +46,7 @@ typedef struct {
+> >  
+> >  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
+> >  uint32_t acpi_find_rsdp_address(QTestState *qts);
+> > +uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size);  
+> 
+> I think it would make sense to keep the "acpi_find_rsdp_address" prefix
+> for the new function name; maybe append "_uefi"? Because now "acpi" is
+> replaced with "uefi , plus "address" is truncated to "addr"; those don't
+> seem overly logical.
+> 
+> Anyway, up to you.
+> 
+> >  uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
+> >  void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr, uint8_t *rsdp_table);
+> >  void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+> > diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+> > index cc33b46..b9ff9df 100644
+> > --- a/tests/acpi-utils.c
+> > +++ b/tests/acpi-utils.c
+> > @@ -111,3 +111,46 @@ void acpi_fetch_table(QTestState *qts, uint8_t **aml, uint32_t *aml_len,
+> >          g_assert(!acpi_calc_checksum(*aml, *aml_len));
+> >      }
+> >  }
+> > +
+> > +#define GUID_SIZE 16
+> > +static uint8_t AcpiTestSupportGuid[GUID_SIZE] =
+> > +     { 0xb1, 0xa6, 0x87, 0xab,
+> > +       0x34, 0x20,
+> > +       0xa0, 0xbd,
+> > +       0x71, 0xbd, 0x37, 0x50, 0x07, 0x75, 0x77, 0x85 };  
+> 
+> I think this is generally good. QEMU has some utilities/helpers for
+> working with UUIDs; however, for the test infrastructure, I think this
+> should be good enough.
+> 
+> Suggestion: make the GUID "const" as well.
+> 
+> > +
+> > +typedef struct {
+> > +    uint8_t signature_guid[16];  
+> 
+> s/16/GUID_SIZE/?
+> 
+> > +    uint64_t rsdp10;
+> > +    uint64_t rsdp20;
+> > +} __attribute__((packed)) UefiTestSupport;
+> > +
+> > +/* Wait at most 600 seconds (test is slow with TCI and --enable-debug) */  
+> 
+> Do you specifically mean "Tiny Code Interpreter" here?
+it's typo, I've meant TCG. I'll fix it.
 
-riscv_htif.o seems to belong to the spike machine, so I think you don't
-need a separate config switch for that and could simply use CONFIG_SPIKE
-here.
+> > +#define TEST_DELAY (1 * G_USEC_PER_SEC / 10)
+> > +#define TEST_CYCLES MAX((600 * G_USEC_PER_SEC / TEST_DELAY), 1)
+> > +#define MB 0x100000ULL
+> > +uint64_t uefi_find_rsdp_addr(QTestState *qts, uint64_t start, uint64_t size)
+> > +{
+> > +    int i, j;
+> > +    uint8_t data[GUID_SIZE];
+> > +
+> > +    for (i = 0; i < TEST_CYCLES; ++i) {
+> > +        for (j = 0; j < size / MB; j++) {
+> > +            /* look for GUID at every 1Mb block */
+> > +            uint64_t addr = start + j * MB;
+> > +
+> > +            qtest_memread(qts, addr, data, sizeof(data));
+> > +            if (!memcmp(AcpiTestSupportGuid, data, sizeof(data))) {
+> > +                UefiTestSupport ret;
+> > +
+> > +                qtest_memread(qts, addr, &ret, sizeof(ret));
+> > +                ret.rsdp10 = le64_to_cpu(ret.rsdp10);
+> > +                ret.rsdp20 = le64_to_cpu(ret.rsdp20);
+> > +                return ret.rsdp20 ? ret.rsdp20 : ret.rsdp10;
+> > +            }
+> > +        }
+> > +        g_usleep(TEST_DELAY);
+> > +    }
+> > +    g_assert_not_reached();
+> > +    return 0;
+> > +}
+> >   
+> 
+> Apart from my hair-splitting, it looks good. If you update
+> 16-->GUID_SIZE, then you can add
+Thanks,
+I'll apply all of your suggestions for v2 respin
 
-> +obj-$(CONFIG_HART) += riscv_hart.o
-> +obj-$(CONFIG_SIFIVE) += sifive_e.o
-> +obj-$(CONFIG_SIFIVE) += sifive_clint.o
-> +obj-$(CONFIG_SIFIVE) += sifive_prci.o
-> +obj-$(CONFIG_SIFIVE) += sifive_plic.o
-> +obj-$(CONFIG_SIFIVE) += sifive_test.o
-> +obj-$(CONFIG_SIFIVE) += sifive_u.o
-
-Looking at the output of "qemu-system-riscv64 -M help", sifive_e and
-sifive_u are two separate machines. So should we use two different
-config switches here?
-
-> +obj-$(CONFIG_SIFIVE) += sifive_uart.o
-> +obj-$(CONFIG_SPIKE) += spike.o
-> +obj-$(CONFIG_RISCV_VIRTIO) += virt.o
-
-The machine is only called "virt", so I'd suggest to call the config
-switch CONFIG_RISCV_VIRT only.
-
- Thomas
+> 
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> 
+> Thanks,
+> Laszlo
+> 
