@@ -1,14 +1,30 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46349)
+Received: from eggs.gnu.org ([209.51.188.92]:48593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjcg2-0006BI-4P
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:19:45 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gjcgk-0006l6-LI
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:20:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjcfz-0004Cv-1c
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:19:40 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gjcge-0005BS-P0
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:20:21 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45060)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gjcgd-00056R-Mb
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:20:20 -0500
+Received: by mail-pf1-x443.google.com with SMTP id g62so2372040pfd.12
+	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 20:20:19 -0800 (PST)
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Wed, 16 Jan 2019 15:19:16 +1100
-Message-Id: <20190116041916.130523-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu] spapr: Fix fdt warnings
+References: <20181113083104.2692-1-aik@ozlabs.ru>
+	<20181113083104.2692-4-aik@ozlabs.ru>
+	<CAKmqyKOOp0Nv7wqL_=s6f_1hep==bicXKofnhYo_puResrjNRg@mail.gmail.com>
+	<25ef3ad6-90b6-a255-7f65-f3a88625b622@ozlabs.ru>
+Message-ID: <937f3d53-5ed1-85fe-c8de-623b69c870e4@ozlabs.ru>
+Date: Wed, 16 Jan 2019 15:20:11 +1100
+MIME-Version: 1.0
+In-Reply-To: <25ef3ad6-90b6-a255-7f65-f3a88625b622@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu RFC 3/7] pci: Move NVIDIA vendor id to
+ the rest of ids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,40 +33,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, joserz@linux.ibm.com, Alistair Popple <alistair@popple.id.au>, alex.williamson@redhat.com, sbobroff@linux.ibm.com, pjaroszynski@nvidia.com, "open list:New World" <qemu-ppc@nongnu.org>, lagarcia@br.ibm.com, oohall@gmail.com, arbab@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
 
-The FDT blob which the spapr machine renders at reset time produces
-warnings like this:
+Ping, anyone?
 
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000080000000 unit name should not have leading 0s
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000040000000 unit name should not have leading 0s
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000020000000 unit name should not have leading 0s
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000010000000 unit name should not have leading 0s
-my-181211-154309.dts: Warning (unit_address_format): Node /memory@0000000000000000 unit name should not have leading 0s
+On 14/12/2018 14:36, Alexey Kardashevskiy wrote:
+> 
+> 
+> On 21/11/2018 05:27, Alistair Francis wrote:
+>> On Tue, Nov 13, 2018 at 12:42 AM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>>
+>>> sPAPR code will use it too so move it from VFIO to the common code.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>
+>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> 
+> 
+> 
+> Aaaaaand who is taking this? I am going to repost the patchset, posting
+> this one over and over again seems redundant. Thanks,
+> 
+> 
+> 
+>>
+>> Alistair
+>>
+>>> ---
+>>>  include/hw/pci/pci_ids.h | 2 ++
+>>>  hw/vfio/pci-quirks.c     | 2 --
+>>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
+>>> index 63acc72..3ed7d10 100644
+>>> --- a/include/hw/pci/pci_ids.h
+>>> +++ b/include/hw/pci/pci_ids.h
+>>> @@ -271,4 +271,6 @@
+>>>
+>>>  #define PCI_VENDOR_ID_SYNOPSYS           0x16C3
+>>>
+>>> +#define PCI_VENDOR_ID_NVIDIA             0x10de
+>>> +
+>>>  #endif
+>>> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+>>> index eae31c7..40a1200 100644
+>>> --- a/hw/vfio/pci-quirks.c
+>>> +++ b/hw/vfio/pci-quirks.c
+>>> @@ -526,8 +526,6 @@ static void vfio_probe_ati_bar2_quirk(VFIOPCIDevice *vdev, int nr)
+>>>   * note it for future reference.
+>>>   */
+>>>
+>>> -#define PCI_VENDOR_ID_NVIDIA                    0x10de
+>>> -
+>>>  /*
+>>>   * Nvidia has several different methods to get to config space, the
+>>>   * nouveu project has several of these documented here:
+>>> --
+>>> 2.17.1
+>>>
+>>>
+> 
 
-because TARGET_FMT_lx is defined as "%016"PRIx64.
-
-This uses simple "%lx" to suppress the warning. Since it is spapr which
-is always 64bit, we assume here that hwaddr is always "long".
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- hw/ppc/spapr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 83081de..37cdadb 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -375,7 +375,7 @@ static int spapr_populate_memory_node(void *fdt, int nodeid, hwaddr start,
-     mem_reg_property[0] = cpu_to_be64(start);
-     mem_reg_property[1] = cpu_to_be64(size);
- 
--    sprintf(mem_name, "memory@" TARGET_FMT_lx, start);
-+    sprintf(mem_name, "memory@%lx", start);
-     off = fdt_add_subnode(fdt, 0, mem_name);
-     _FDT(off);
-     _FDT((fdt_setprop_string(fdt, off, "device_type", "memory")));
 -- 
-2.17.1
+Alexey
