@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57773)
+Received: from eggs.gnu.org ([209.51.188.92]:57774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjukj-00042P-7b
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjukj-00042Q-80
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjukf-0002nY-D2
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjukh-0002pL-A1
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:45 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38058)
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52847)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gjukd-0002Zc-HY
+	id 1gjukf-0002kL-7E
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:41 -0500
-Received: by mail-wr1-x444.google.com with SMTP id v13so8965029wrw.5
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:37:27 -0800 (PST)
+Received: by mail-wm1-x344.google.com with SMTP id m1so3894011wml.2
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:37:38 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Thu, 17 Jan 2019 00:36:34 +0100
-Message-Id: <0d2685bb2c3f9a7182aa99b8218f3e4bb223522d.1547681517.git.DirtY.iCE.hu@gmail.com>
+Date: Thu, 17 Jan 2019 00:36:46 +0100
+Message-Id: <1c70f5a379f55049a1d427060ac18171b621cbfc.1547681517.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 01/50] qapi: qapi for audio backends
+Subject: [Qemu-devel] [PATCH v3 13/50] wavaudio: port to -audiodev config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,308 +31,161 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-
-This patch adds structures into qapi to replace the existing
-configuration structures used by audio backends currently. This qapi
-will be the base of the -audiodev command line parameter (that replaces
-the old environment variables based config).
-
-This is not a 1:1 translation of the old options, I've tried to make
-them much more consistent (e.g. almost every backend had an option to
-specify buffer size, but the name was different for every backend, and
-some backends required usecs, while some other required frames, samples
-or bytes). Also tried to reduce the number of abbreviations used by the
-config keys.
-
-Some of the more important changes:
-* use `in` and `out` instead of `ADC` and `DAC`, as the former is more
-  user friendly imho
-* moved buffer settings into the global setting area (so it's the same
-  for all backends that support it. Backends that can't change buffer
-  size will simply ignore them). Also using usecs, as it's probably more
-  user friendly than samples or bytes.
-* try-poll is now an alsa backend specific option (as all other backends
-  currently ignore it)
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
+ audio/audio_legacy.c | 15 ++++++++++++
+ audio/wavaudio.c     | 58 +++++++-------------------------------------
+ 2 files changed, 24 insertions(+), 49 deletions(-)
 
-Notes:
-    Changes from v2:
-    * update copyright, version numbers
-    * remove #optional
-    * per-direction options are now optional (needed for qobject_object_visitor_new_str)
-    * removed unnecessary AudiodevNoOptions
-    * changed integers to unsigned
-
- Makefile.objs         |   6 +-
- qapi/audio.json       | 233 ++++++++++++++++++++++++++++++++++++++++++
- qapi/qapi-schema.json |   1 +
- 3 files changed, 237 insertions(+), 3 deletions(-)
- create mode 100644 qapi/audio.json
-
-diff --git a/Makefile.objs b/Makefile.objs
-index 456115992a..e830cdbafc 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -1,6 +1,6 @@
--QAPI_MODULES = block-core block char common crypto introspect job migration
--QAPI_MODULES += misc net rdma rocker run-state sockets tpm trace transaction
--QAPI_MODULES += ui
-+QAPI_MODULES = audio block-core block char common crypto introspect job
-+QAPI_MODULES += migration misc net rdma rocker run-state sockets tpm trace
-+QAPI_MODULES += transaction ui
+diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
+index aa6c789096..cf0fc4df90 100644
+--- a/audio/audio_legacy.c
++++ b/audio/audio_legacy.c
+@@ -293,6 +293,17 @@ static void handle_sdl(Audiodev *dev)
+                          &dev->out->has_buffer_len, dev->out);
+ }
  
- #######################################################################
- # Common libraries for tools and emulators
-diff --git a/qapi/audio.json b/qapi/audio.json
-new file mode 100644
-index 0000000000..bd6e2494bd
---- /dev/null
-+++ b/qapi/audio.json
-@@ -0,0 +1,233 @@
-+# -*- mode: python -*-
-+#
-+# Copyright (C) 2015-2019 Zoltán Kővágó <DirtY.iCE.hu@gmail.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
++/* wav */
++static void handle_wav(Audiodev *dev)
++{
++    get_int("QEMU_WAV_FREQUENCY",
++            &dev->out->frequency, &dev->out->has_frequency);
++    get_fmt("QEMU_WAV_FORMAT", &dev->out->format, &dev->out->has_format);
++    get_int("QEMU_WAV_DAC_FIXED_CHANNELS",
++            &dev->out->channels, &dev->out->has_channels);
++    get_str("QEMU_WAV_PATH", &dev->u.wav.path, &dev->u.wav.has_path);
++}
 +
-+##
-+# @AudiodevAlsaPerDirectionOptions:
-+#
-+# Options of the alsa backend that are used for both playback and recording.
-+#
-+# @dev: the name of the alsa device to use (default 'default')
-+#
-+# @try-poll: attempt to use poll mode, falling back to non polling access on
-+#            failure (default on)
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'AudiodevAlsaPerDirectionOptions',
-+  'data': {
-+    '*dev':      'str',
-+    '*try-poll': 'bool' } }
+ /* general */
+ static void handle_per_direction(
+     AudiodevPerDirectionOptions *pdo, const char *prefix)
+@@ -360,6 +371,10 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
+         handle_sdl(e->dev);
+         break;
+ 
++    case AUDIODEV_DRIVER_WAV:
++        handle_wav(e->dev);
++        break;
 +
-+##
-+# @AudiodevAlsaOptions:
-+#
-+# Options of the alsa audio backend.
-+#
-+# @alsa-in: options of the capture stream
-+#
-+# @alsa-out: options of the playback stream
-+#
-+# @threshold: set the threshold (in microseconds) when playback starts
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'AudiodevAlsaOptions',
-+  'data': {
-+    '*alsa-in':   'AudiodevAlsaPerDirectionOptions',
-+    '*alsa-out':  'AudiodevAlsaPerDirectionOptions',
-+    '*threshold': 'uint32' } }
-+
-+##
-+# @AudiodevDsoundOptions:
-+#
-+# Options of the dsound audio backend.
-+#
-+# @latency: add extra latency to playback in microseconds (default 10000)
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'AudiodevDsoundOptions',
-+  'data': {
-+    '*latency': 'uint32' } }
-+
-+##
-+# @AudiodevOssPerDirectionOptions:
-+#
-+# Options of the oss backend that are used for both playback and recording.
-+#
-+# @dev: file name of the oss device (default '/dev/dsp')
-+#
-+# @try-poll: attempt to use poll mode, falling back to non polling access on
-+#            failure (default on)
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'AudiodevOssPerDirectionOptions',
-+  'data': {
-+    '*dev':      'str',
-+    '*try-poll': 'bool' } }
-+
-+##
-+# @AudiodevOssOptions:
-+#
-+# Options of the oss audio backend.
-+#
-+# @oss-in: options of the capture stream
-+#
-+# @oss-out: options of the playback stream
-+#
-+# @try-mmap: try using memory mapped access, falling back to non
-+#            memory mapped access on failure (default off)
-+#
-+# @exclusive: open device in exclusive mode (vmix won't work) (default off)
-+#
-+# @dsp-policy: set the timing policy of the device (between 0 and 10, where
-+#              smaller number means smaller latency but higher CPU usage) or -1
-+#              to use fragment mode (option ignored on some platforms)
-+#              (default 5)
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'AudiodevOssOptions',
-+  'data': {
-+    '*oss-in':     'AudiodevOssPerDirectionOptions',
-+    '*oss-out':    'AudiodevOssPerDirectionOptions',
-+    '*try-mmap':   'bool',
-+    '*exclusive':  'bool',
-+    '*dsp-policy': 'uint32' } }
-+
-+##
-+# @AudiodevPaPerDirectionOptions:
-+#
-+# Options of the pa backend that are used for both playback and recording.
-+#
-+# @name: name of the sink/source to use
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'AudiodevPaPerDirectionOptions',
-+  'data': {
-+    '*name': 'str' } }
-+
-+##
-+# @AudiodevPaOptions:
-+#
-+# Options of the pa (PulseAudio) audio backend.
-+#
-+# @server: PulseAudio server address (default: let PulseAudio choose)
-+#
-+# @sink: name of the sink to use
-+#
-+# @source: name of the source to use
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'AudiodevPaOptions',
-+  'data': {
-+    '*server': 'str',
-+    '*sink':   'AudiodevPaPerDirectionOptions',
-+    '*source': 'AudiodevPaPerDirectionOptions' } }
-+
-+##
-+# @AudiodevWavOptions:
-+#
-+# Options of the wav audio backend.
-+#
-+# @path: name of the wav file to record (default 'qemu.wav')
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'AudiodevWavOptions',
-+  'data': {
-+    '*path': 'str' } }
-+
-+
-+##
-+# @AudioFormat:
-+#
-+# An enumeration of possible audio formats.
-+#
-+# Since: 4.0
-+##
-+{ 'enum': 'AudioFormat',
-+  'data': [ 'u8', 's8', 'u16', 's16', 'u32', 's32' ] }
-+
-+##
-+# @AudiodevDriver:
-+#
-+# An enumeration of possible audio backend drivers.
-+#
-+# Since: 4.0
-+##
-+{ 'enum': 'AudiodevDriver',
-+  'data': [ 'none', 'alsa', 'coreaudio', 'dsound', 'oss', 'pa', 'sdl', 'spice',
-+            'wav' ] }
-+
-+##
-+# @AudiodevPerDirectionOptions:
-+#
-+# General audio backend options that are used for both playback and recording.
-+#
-+# @fixed-settings: use fixed settings for host input/output. When off,
-+#                  frequency, channels and format must not be specified
-+#                  (default on)
-+#
-+# @frequency: frequency to use when using fixed settings (default 44100)
-+#
-+# @channels: number of channels when using fixed settings (default 2)
-+#
-+# @voices: number of voices to use (default 1)
-+#
-+# @format: sample format to use when using fixed settings (default s16)
-+#
-+# @buffer-len: the buffer size in microseconds
-+#
-+# @buffer-count: number of buffers
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'AudiodevPerDirectionOptions',
-+  'data': {
-+    '*fixed-settings': 'bool',
-+    '*frequency':      'uint32',
-+    '*channels':       'uint32',
-+    '*voices':         'uint32',
-+    '*format':         'AudioFormat',
-+    '*buffer-len':     'uint32',
-+    '*buffer-count':   'uint32' } }
-+
-+##
-+# @Audiodev:
-+#
-+# Options of an audio backend.
-+#
-+# @id: identifier of the backend
-+#
-+# @driver: the backend driver to use
-+#
-+# @in: options of the capture stream
-+#
-+# @out: options of the playback stream
-+#
-+# @timer-period: timer period (in microseconds, 0: use lowest possible)
-+#
-+# Since: 4.0
-+##
-+{ 'union': 'Audiodev',
-+  'base': {
-+    'id':            'str',
-+    'driver':        'AudiodevDriver',
-+    '*in':           'AudiodevPerDirectionOptions',
-+    '*out':          'AudiodevPerDirectionOptions',
-+    '*timer-period': 'uint32' },
-+  'discriminator': 'driver',
-+  'data': {
-+    'alsa':      'AudiodevAlsaOptions',
-+    'dsound':    'AudiodevDsoundOptions',
-+    'oss':       'AudiodevOssOptions',
-+    'pa':        'AudiodevPaOptions',
-+    'wav':       'AudiodevWavOptions' } }
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 3bbdfcee84..d5f9856be7 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -95,3 +95,4 @@
- { 'include': 'trace.json' }
- { 'include': 'introspect.json' }
- { 'include': 'misc.json' }
-+{ 'include': 'audio.json' }
+     default:
+         break;
+     }
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index 9eff3555b3..214e30ccd9 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -24,6 +24,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/host-utils.h"
+ #include "qemu/timer.h"
++#include "qapi/opts-visitor.h"
+ #include "audio.h"
+ 
+ #define AUDIO_CAP "wav"
+@@ -37,11 +38,6 @@ typedef struct WAVVoiceOut {
+     int total_samples;
+ } WAVVoiceOut;
+ 
+-typedef struct {
+-    struct audsettings settings;
+-    const char *wav_path;
+-} WAVConf;
+-
+ static int wav_run_out (HWVoiceOut *hw, int live)
+ {
+     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
+@@ -112,8 +108,10 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+         0x02, 0x00, 0x44, 0xac, 0x00, 0x00, 0x10, 0xb1, 0x02, 0x00, 0x04,
+         0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00
+     };
+-    WAVConf *conf = drv_opaque;
+-    struct audsettings wav_as = conf->settings;
++    Audiodev *dev = drv_opaque;
++    AudiodevWavOptions *wopts = &dev->u.wav;
++    struct audsettings wav_as = audiodev_to_audsettings(dev->out);
++    const char *wav_path = wopts->has_path ? wopts->path : "qemu.wav";
+ 
+     stereo = wav_as.nchannels == 2;
+     switch (wav_as.fmt) {
+@@ -154,10 +152,10 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
+     le_store (hdr + 28, hw->info.freq << (bits16 + stereo), 4);
+     le_store (hdr + 32, 1 << (bits16 + stereo), 2);
+ 
+-    wav->f = fopen (conf->wav_path, "wb");
++    wav->f = fopen(wav_path, "wb");
+     if (!wav->f) {
+         dolog ("Failed to open wave file `%s'\nReason: %s\n",
+-               conf->wav_path, strerror (errno));
++               wav_path, strerror(errno));
+         g_free (wav->pcm_buf);
+         wav->pcm_buf = NULL;
+         return -1;
+@@ -225,54 +223,17 @@ static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
+     return 0;
+ }
+ 
+-static WAVConf glob_conf = {
+-    .settings.freq      = 44100,
+-    .settings.nchannels = 2,
+-    .settings.fmt       = AUDIO_FORMAT_S16,
+-    .wav_path           = "qemu.wav"
+-};
+-
+ static void *wav_audio_init(Audiodev *dev)
+ {
+-    WAVConf *conf = g_malloc(sizeof(WAVConf));
+-    *conf = glob_conf;
+-    return conf;
++    assert(dev->driver == AUDIODEV_DRIVER_WAV);
++    return dev;
+ }
+ 
+ static void wav_audio_fini (void *opaque)
+ {
+     ldebug ("wav_fini");
+-    g_free(opaque);
+ }
+ 
+-static struct audio_option wav_options[] = {
+-    {
+-        .name  = "FREQUENCY",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.settings.freq,
+-        .descr = "Frequency"
+-    },
+-    {
+-        .name  = "FORMAT",
+-        .tag   = AUD_OPT_FMT,
+-        .valp  = &glob_conf.settings.fmt,
+-        .descr = "Format"
+-    },
+-    {
+-        .name  = "DAC_FIXED_CHANNELS",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.settings.nchannels,
+-        .descr = "Number of channels (1 - mono, 2 - stereo)"
+-    },
+-    {
+-        .name  = "PATH",
+-        .tag   = AUD_OPT_STR,
+-        .valp  = &glob_conf.wav_path,
+-        .descr = "Path to wave file"
+-    },
+-    { /* End of list */ }
+-};
+-
+ static struct audio_pcm_ops wav_pcm_ops = {
+     .init_out = wav_init_out,
+     .fini_out = wav_fini_out,
+@@ -284,7 +245,6 @@ static struct audio_pcm_ops wav_pcm_ops = {
+ static struct audio_driver wav_audio_driver = {
+     .name           = "wav",
+     .descr          = "WAV renderer http://wikipedia.org/wiki/WAV",
+-    .options        = wav_options,
+     .init           = wav_audio_init,
+     .fini           = wav_audio_fini,
+     .pcm_ops        = &wav_pcm_ops,
 -- 
 2.20.1
