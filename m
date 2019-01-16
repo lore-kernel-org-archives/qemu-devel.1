@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57996)
+Received: from eggs.gnu.org ([209.51.188.92]:57997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjuks-00046u-44
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjuks-00046v-4B
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjukm-00031c-Je
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjukj-0002ts-Sg
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:52 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43010)
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45494)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gjukm-0002vJ-3C
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:48 -0500
-Received: by mail-wr1-x443.google.com with SMTP id r10so8917008wrs.10
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:37:47 -0800 (PST)
+	id 1gjukj-0002hx-DH
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:45 -0500
+Received: by mail-wr1-x443.google.com with SMTP id t6so8903510wrr.12
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:37:35 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Thu, 17 Jan 2019 00:36:55 +0100
-Message-Id: <9b2249817b15dc0d3e8772e01385c9973fe9b14c.1547681517.git.DirtY.iCE.hu@gmail.com>
+Date: Thu, 17 Jan 2019 00:36:43 +0100
+Message-Id: <e6f0d2809c1c8e202583461131260f59ddd189f7.1547681517.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 22/50] audio: do not run each backend in
- audio_run
+Subject: [Qemu-devel] [PATCH v3 10/50] paaudio: port to -audiodev config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,143 +33,290 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-audio_run is called manually by alsa and oss backends when polling.
-In this case only the requesting backend should be run, not all of them.
-
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio_int.h |  2 +-
- audio/alsaaudio.c |  7 +++++--
- audio/audio.c     | 14 +++++---------
- audio/ossaudio.c  | 12 ++++++------
- 4 files changed, 17 insertions(+), 18 deletions(-)
+ audio/audio_legacy.c | 39 +++++++++++++++++++
+ audio/paaudio.c      | 90 ++++++++++++++++++++------------------------
+ 2 files changed, 79 insertions(+), 50 deletions(-)
 
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index 5ceea76eda..02ec6ea738 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -220,7 +220,7 @@ int audio_pcm_hw_clip_out (HWVoiceOut *hw, void *pcm_buf,
- int audio_bug (const char *funcname, int cond);
- void *audio_calloc (const char *funcname, int nmemb, size_t size);
+diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
+index 70b46cbcc1..d173ff042e 100644
+--- a/audio/audio_legacy.c
++++ b/audio/audio_legacy.c
+@@ -127,6 +127,16 @@ static uint32_t samples_to_usecs(uint32_t samples,
+     return frames_to_usecs(samples / channels, pdo);
+ }
  
--void audio_run (const char *msg);
-+void audio_run(AudioState *s, const char *msg);
++static void get_samples_to_usecs(const char *env, uint32_t *dst, bool *has_dst,
++                                 AudiodevPerDirectionOptions *pdo)
++{
++    const char *val = getenv(env);
++    if (val) {
++        *dst = samples_to_usecs(toui32(val), pdo);
++        *has_dst = true;
++    }
++}
++
+ static uint32_t bytes_to_usecs(uint32_t bytes, AudiodevPerDirectionOptions *pdo)
+ {
+     AudioFormat fmt = pdo->has_format ? pdo->format : AUDIO_FORMAT_S16;
+@@ -250,6 +260,31 @@ static void handle_oss(Audiodev *dev)
+     get_int("QEMU_OSS_POLICY", &oopt->dsp_policy, &oopt->has_dsp_policy);
+ }
  
- #define VOICE_ENABLE 1
- #define VOICE_DISABLE 2
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index c68bd6bf8a..9dfd5fd26f 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -38,6 +38,7 @@ struct pollhlp {
-     struct pollfd *pfds;
-     int count;
-     int mask;
-+    AudioState *s;
- };
- 
- typedef struct ALSAVoiceOut {
-@@ -198,11 +199,11 @@ static void alsa_poll_handler (void *opaque)
++/* pulseaudio */
++static void handle_pa_per_direction(
++    AudiodevPaPerDirectionOptions **ppdo, bool *has_ppdo, const char *env)
++{
++    *ppdo = g_malloc0(sizeof(AudiodevPaPerDirectionOptions));
++    *has_ppdo = true;
++
++    get_str(env, &(*ppdo)->name, &(*ppdo)->has_name);
++}
++
++static void handle_pa(Audiodev *dev)
++{
++    handle_pa_per_direction(&dev->u.pa.sink, &dev->u.pa.has_sink,
++                            "QEMU_PA_SINK");
++    handle_pa_per_direction(&dev->u.pa.source, &dev->u.pa.has_source,
++                            "QEMU_PA_SOURCE");
++
++    get_samples_to_usecs("QEMU_PA_SAMPLES", &dev->in->buffer_len,
++                         &dev->in->has_buffer_len, dev->in);
++    get_samples_to_usecs("QEMU_PA_SAMPLES", &dev->out->buffer_len,
++                         &dev->out->has_buffer_len, dev->out);
++
++    get_str("QEMU_PA_SERVER", &dev->u.pa.server, &dev->u.pa.has_server);
++}
++
+ /* general */
+ static void handle_per_direction(
+     AudiodevPerDirectionOptions *pdo, const char *prefix)
+@@ -309,6 +344,10 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
+         handle_oss(e->dev);
          break;
  
-     case SND_PCM_STATE_PREPARED:
--        audio_run ("alsa run (prepared)");
-+        audio_run(hlp->s, "alsa run (prepared)");
-         break;
- 
-     case SND_PCM_STATE_RUNNING:
--        audio_run ("alsa run (running)");
-+        audio_run (hlp->s, "alsa run (running)");
-         break;
- 
++    case AUDIODEV_DRIVER_PA:
++        handle_pa(e->dev);
++        break;
++
      default:
-@@ -756,6 +757,7 @@ static int alsa_init_out(HWVoiceOut *hw, struct audsettings *as,
-         return -1;
+         break;
      }
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index 0981f010c9..33e0e5d9be 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -2,6 +2,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "audio.h"
++#include "qapi/opts-visitor.h"
  
-+    alsa->pollhlp.s = hw->s;
-     alsa->handle = handle;
-     alsa->dev = dev;
-     return 0;
-@@ -857,6 +859,7 @@ static int alsa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-         return -1;
-     }
+ #include <pulse/pulseaudio.h>
  
-+    alsa->pollhlp.s = hw->s;
-     alsa->handle = handle;
-     alsa->dev = dev;
-     return 0;
-diff --git a/audio/audio.c b/audio/audio.c
-index 5f809d13f4..4d0d316ce3 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -838,7 +838,7 @@ static void audio_timer (void *opaque)
-     }
-     s->timer_last = now;
+@@ -10,14 +11,7 @@
+ #include "audio_pt_int.h"
  
--    audio_run("timer");
-+    audio_run(s, "timer");
-     audio_reset_timer(s);
- }
- 
-@@ -1240,15 +1240,11 @@ static void audio_run_capture (AudioState *s)
-     }
- }
- 
--void audio_run (const char *msg)
-+void audio_run(AudioState *s, const char *msg)
- {
--    AudioState *s;
+ typedef struct {
+-    int samples;
+-    char *server;
+-    char *sink;
+-    char *source;
+-} PAConf;
 -
--    QTAILQ_FOREACH(s, &audio_states, list) {
--        audio_run_out (s);
--        audio_run_in (s);
--        audio_run_capture (s);
--    }
-+    audio_run_out(s);
-+    audio_run_in(s);
-+    audio_run_capture(s);
+-typedef struct {
+-    PAConf conf;
++    Audiodev *dev;
+     pa_threaded_mainloop *mainloop;
+     pa_context *context;
+ } paaudio;
+@@ -32,6 +26,7 @@ typedef struct {
+     void *pcm_buf;
+     struct audio_pt pt;
+     paaudio *g;
++    int samples;
+ } PAVoiceOut;
  
- #ifdef DEBUG_POLL
-     {
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index b6ab3e83ef..bbcc44129d 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -109,28 +109,28 @@ static void oss_anal_close (int *fdp)
+ typedef struct {
+@@ -46,6 +41,7 @@ typedef struct {
+     const void *read_data;
+     size_t read_index, read_length;
+     paaudio *g;
++    int samples;
+ } PAVoiceIn;
  
- static void oss_helper_poll_out (void *opaque)
- {
--    (void) opaque;
--    audio_run ("oss_poll_out");
-+    AudioState *s = opaque;
-+    audio_run(s, "oss_poll_out");
+ static void qpa_audio_fini(void *opaque);
+@@ -227,7 +223,7 @@ static void *qpa_thread_out (void *arg)
+             }
+         }
+ 
+-        decr = to_mix = audio_MIN(pa->live, pa->g->conf.samples >> 5);
++        decr = to_mix = audio_MIN(pa->live, pa->samples >> 5);
+         rpos = pa->rpos;
+ 
+         if (audio_pt_unlock(&pa->pt, __func__)) {
+@@ -319,7 +315,7 @@ static void *qpa_thread_in (void *arg)
+             }
+         }
+ 
+-        incr = to_grab = audio_MIN(pa->dead, pa->g->conf.samples >> 5);
++        incr = to_grab = audio_MIN(pa->dead, pa->samples >> 5);
+         wpos = pa->wpos;
+ 
+         if (audio_pt_unlock(&pa->pt, __func__)) {
+@@ -546,6 +542,8 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
+     struct audsettings obt_as = *as;
+     PAVoiceOut *pa = (PAVoiceOut *) hw;
+     paaudio *g = pa->g = drv_opaque;
++    AudiodevPaOptions *popts = &g->dev->u.pa;
++    AudiodevPaPerDirectionOptions *ppdo = popts->sink;
+ 
+     ss.format = audfmt_to_pa (as->fmt, as->endianness);
+     ss.channels = as->nchannels;
+@@ -566,7 +564,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
+         g,
+         "qemu",
+         PA_STREAM_PLAYBACK,
+-        g->conf.sink,
++        ppdo->has_name ? ppdo->name : NULL,
+         &ss,
+         NULL,                   /* channel map */
+         &ba,                    /* buffering attributes */
+@@ -578,7 +576,8 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
+     }
+ 
+     audio_pcm_init_info (&hw->info, &obt_as);
+-    hw->samples = g->conf.samples;
++    hw->samples = pa->samples = audio_buffer_samples(g->dev->out, &obt_as,
++                                                     46440);
+     pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+     pa->rpos = hw->rpos;
+     if (!pa->pcm_buf) {
+@@ -612,6 +611,8 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+     struct audsettings obt_as = *as;
+     PAVoiceIn *pa = (PAVoiceIn *) hw;
+     paaudio *g = pa->g = drv_opaque;
++    AudiodevPaOptions *popts = &g->dev->u.pa;
++    AudiodevPaPerDirectionOptions *ppdo = popts->source;
+ 
+     ss.format = audfmt_to_pa (as->fmt, as->endianness);
+     ss.channels = as->nchannels;
+@@ -623,7 +624,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+         g,
+         "qemu",
+         PA_STREAM_RECORD,
+-        g->conf.source,
++        ppdo->has_name ? ppdo->name : NULL,
+         &ss,
+         NULL,                   /* channel map */
+         NULL,                   /* buffering attributes */
+@@ -635,7 +636,8 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+     }
+ 
+     audio_pcm_init_info (&hw->info, &obt_as);
+-    hw->samples = g->conf.samples;
++    hw->samples = pa->samples = audio_buffer_samples(g->dev->in, &obt_as,
++                                                     46440);
+     pa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
+     pa->wpos = hw->wpos;
+     if (!pa->pcm_buf) {
+@@ -808,14 +810,31 @@ static int qpa_ctl_in (HWVoiceIn *hw, int cmd, ...)
  }
  
- static void oss_helper_poll_in (void *opaque)
+ /* common */
+-static PAConf glob_conf = {
+-    .samples = 4096,
+-};
++static void qpa_init_per_direction(AudiodevPaPerDirectionOptions **ppdo,
++                                   bool *has_ppdo)
++{
++    if (!*has_ppdo) {
++        *ppdo = g_malloc0(sizeof(AudiodevPaPerDirectionOptions));
++        *has_ppdo = true;
++    }
++}
+ 
+ static void *qpa_audio_init(Audiodev *dev)
  {
--    (void) opaque;
--    audio_run ("oss_poll_in");
-+    AudioState *s = opaque;
-+    audio_run(s, "oss_poll_in");
+-    paaudio *g = g_malloc(sizeof(paaudio));
+-    g->conf = glob_conf;
++    paaudio *g;
++    AudiodevPaOptions *popts;
++    const char *server;
++
++    assert(dev->driver == AUDIODEV_DRIVER_PA);
++
++    qpa_init_per_direction(&dev->u.pa.sink, &dev->u.pa.has_sink);
++    qpa_init_per_direction(&dev->u.pa.source, &dev->u.pa.has_source);
++
++    g = g_malloc(sizeof(paaudio));
++    popts = &dev->u.pa;
++    server = popts->has_server ? popts->server : NULL;
++
++    g->dev = dev;
+     g->mainloop = NULL;
+     g->context = NULL;
+ 
+@@ -825,14 +844,14 @@ static void *qpa_audio_init(Audiodev *dev)
+     }
+ 
+     g->context = pa_context_new (pa_threaded_mainloop_get_api (g->mainloop),
+-                                 g->conf.server);
++                                 server);
+     if (!g->context) {
+         goto fail;
+     }
+ 
+     pa_context_set_state_callback (g->context, context_state_cb, g);
+ 
+-    if (pa_context_connect (g->context, g->conf.server, 0, NULL) < 0) {
++    if (pa_context_connect (g->context, server, 0, NULL) < 0) {
+         qpa_logerr (pa_context_errno (g->context),
+                     "pa_context_connect() failed\n");
+         goto fail;
+@@ -895,34 +914,6 @@ static void qpa_audio_fini (void *opaque)
+     g_free(g);
  }
  
- static void oss_poll_out (HWVoiceOut *hw)
- {
-     OSSVoiceOut *oss = (OSSVoiceOut *) hw;
- 
--    qemu_set_fd_handler (oss->fd, NULL, oss_helper_poll_out, NULL);
-+    qemu_set_fd_handler(oss->fd, NULL, oss_helper_poll_out, hw->s);
- }
- 
- static void oss_poll_in (HWVoiceIn *hw)
- {
-     OSSVoiceIn *oss = (OSSVoiceIn *) hw;
- 
--    qemu_set_fd_handler (oss->fd, oss_helper_poll_in, NULL, NULL);
-+    qemu_set_fd_handler(oss->fd, oss_helper_poll_in, NULL, hw->s);
- }
- 
- static int oss_write (SWVoiceOut *sw, void *buf, int len)
+-struct audio_option qpa_options[] = {
+-    {
+-        .name  = "SAMPLES",
+-        .tag   = AUD_OPT_INT,
+-        .valp  = &glob_conf.samples,
+-        .descr = "buffer size in samples"
+-    },
+-    {
+-        .name  = "SERVER",
+-        .tag   = AUD_OPT_STR,
+-        .valp  = &glob_conf.server,
+-        .descr = "server address"
+-    },
+-    {
+-        .name  = "SINK",
+-        .tag   = AUD_OPT_STR,
+-        .valp  = &glob_conf.sink,
+-        .descr = "sink device name"
+-    },
+-    {
+-        .name  = "SOURCE",
+-        .tag   = AUD_OPT_STR,
+-        .valp  = &glob_conf.source,
+-        .descr = "source device name"
+-    },
+-    { /* End of list */ }
+-};
+-
+ static struct audio_pcm_ops qpa_pcm_ops = {
+     .init_out = qpa_init_out,
+     .fini_out = qpa_fini_out,
+@@ -940,7 +931,6 @@ static struct audio_pcm_ops qpa_pcm_ops = {
+ static struct audio_driver pa_audio_driver = {
+     .name           = "pa",
+     .descr          = "http://www.pulseaudio.org/",
+-    .options        = qpa_options,
+     .init           = qpa_audio_init,
+     .fini           = qpa_audio_fini,
+     .pcm_ops        = &qpa_pcm_ops,
 -- 
 2.20.1
