@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42420)
+Received: from eggs.gnu.org ([209.51.188.92]:43704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpOk-0005WF-6g
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:54:44 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gjpQe-0006vf-KA
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:56:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gjpOi-0002wo-5h
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:54:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35444)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gjpOh-0002nI-Sg
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:54:40 -0500
-Date: Thu, 17 Jan 2019 01:46:04 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20190116174604.GA28579@wei-ubt>
-References: <1542895581-10721-1-git-send-email-wexu@redhat.com>
-	<1542895581-10721-10-git-send-email-wexu@redhat.com>
-	<d0059b46-34c0-86d9-0840-ebe20bbdd561@redhat.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1gjpQc-0004Kz-IC
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:56:40 -0500
+Received: from mail-eopbgr700094.outbound.protection.outlook.com
+	([40.107.70.94]:41952
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gjpQa-0004CE-IJ
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:56:38 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Wed, 16 Jan 2019 17:56:17 +0000
+Message-ID: <BN6PR2201MB1251A3C6C43C6A1274406795C6820@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20190114215225.GA16760@habkost.net>
+	<CAL1e-=iBx0Dt=S5fyLs8v-XN+2Zmx5hb7StQBJhquUmmdw6uNA@mail.gmail.com>,
+	<20190116153011.GB14807@habkost.net>
+In-Reply-To: <20190116153011.GB14807@habkost.net>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d0059b46-34c0-86d9-0840-ebe20bbdd561@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 09/16] virtio: fill/flush/pop for packed
- ring
+Subject: Re: [Qemu-devel] Meaning of "-smp threads" on mips_malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,177 +32,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, jfreimann@redhat.com, tiwei.bie@intel.com, mst@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aleksandar Rikalo <arikalo@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Igor Mammedov <imammedo@redhat.com>
 
-On Fri, Nov 30, 2018 at 01:45:19PM +0100, Maxime Coquelin wrote:
-> Hi Wei,
-> 
-> On 11/22/18 3:06 PM, wexu@redhat.com wrote:
-> >+void virtqueue_flush(VirtQueue *vq, unsigned int count)
-> >+{
-> >+    if (unlikely(vq->vdev->broken)) {
-> >+        vq->inuse -= count;
-> >+        return;
-> >+    }
-> >+
-> >+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
-> >+        virtqueue_packed_flush(vq, count);
-> >+    } else {
-> >+        virtqueue_split_flush(vq, count);
-> >+    }
-> >+}
-> >+
-> >  void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
-> >                      unsigned int len)
-> >  {
-> >@@ -1074,7 +1180,7 @@ static void *virtqueue_alloc_element(size_t sz, unsigned out_num, unsigned in_nu
-> >      return elem;
-> >  }
-> >-void *virtqueue_pop(VirtQueue *vq, size_t sz)
-> >+static void *virtqueue_split_pop(VirtQueue *vq, size_t sz)
-> >  {
-> >      unsigned int i, head, max;
-> >      VRingMemoryRegionCaches *caches;
-> >@@ -1089,9 +1195,6 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
-> >      VRingDesc desc;
-> >      int rc;
-> >-    if (unlikely(vdev->broken)) {
-> >-        return NULL;
-> >-    }
-> >      rcu_read_lock();
-> >      if (virtio_queue_empty_rcu(vq)) {
-> >          goto done;
-> >@@ -1209,6 +1312,159 @@ err_undo_map:
-> >      goto done;
-> >  }
-> >+static void *virtqueue_packed_pop(VirtQueue *vq, size_t sz)
-> >+{
-> >+    unsigned int i, head, max;
-> >+    VRingMemoryRegionCaches *caches;
-> >+    MemoryRegionCache indirect_desc_cache = MEMORY_REGION_CACHE_INVALID;
-> >+    MemoryRegionCache *cache;
-> >+    int64_t len;
-> >+    VirtIODevice *vdev = vq->vdev;
-> >+    VirtQueueElement *elem = NULL;
-> >+    unsigned out_num, in_num, elem_entries;
-> >+    hwaddr addr[VIRTQUEUE_MAX_SIZE];
-> >+    struct iovec iov[VIRTQUEUE_MAX_SIZE];
-> >+    VRingPackedDesc desc;
-> >+    uint16_t id;
-> >+
-> >+    rcu_read_lock();
-> >+    if (virtio_queue_packed_empty_rcu(vq)) {
-> >+        goto done;
-> >+    }
-> >+
-> >+    /* When we start there are none of either input nor output. */
-> >+    out_num = in_num = elem_entries = 0;
-> >+
-> >+    max = vq->vring.num;
-> >+
-> >+    if (vq->inuse >= vq->vring.num) {
-> >+        virtio_error(vdev, "Virtqueue size exceeded");
-> >+        goto done;
-> >+    }
-> >+
-> >+    head = vq->last_avail_idx;
-> >+    i = head;
-> >+
-> >+    caches = vring_get_region_caches(vq);
-> >+    cache = &caches->desc;
-> >+
-> >+    /* Empty check has been done at the beginning, so it is an available
-> >+     * entry already, make sure all fields has been exposed by guest */
-> >+    smp_rmb();
-> >+    vring_packed_desc_read(vdev, &desc, cache, i);
-> >+
-> >+    id = desc.id;
-> >+    if (desc.flags & VRING_DESC_F_INDIRECT) {
-> >+
-> >+        if (desc.len % sizeof(VRingPackedDesc)) {
-> >+            virtio_error(vdev, "Invalid size for indirect buffer table");
-> >+            goto done;
-> >+        }
-> >+
-> >+        /* loop over the indirect descriptor table */
-> >+        len = address_space_cache_init(&indirect_desc_cache, vdev->dma_as,
-> >+                                       desc.addr, desc.len, false);
-> >+        cache = &indirect_desc_cache;
-> >+        if (len < desc.len) {
-> >+            virtio_error(vdev, "Cannot map indirect buffer");
-> >+            goto done;
-> >+        }
-> >+
-> >+        max = desc.len / sizeof(VRingPackedDesc);
-> >+        i = 0;
-> >+        vring_packed_desc_read(vdev, &desc, cache, i);
-> >+        /* Make sure we see all the fields*/
-> >+        smp_rmb();
-> >+    }
-> >+
-> >+    /* Collect all the descriptors */
-> >+    while (1) {
-> >+        bool map_ok;
-> >+
-> >+        if (desc.flags & VRING_DESC_F_WRITE) {
-> >+            map_ok = virtqueue_map_desc(vdev, &in_num, addr + out_num,
-> >+                                        iov + out_num,
-> >+                                        VIRTQUEUE_MAX_SIZE - out_num, true,
-> >+                                        desc.addr, desc.len);
-> >+        } else {
-> >+            if (in_num) {
-> >+                virtio_error(vdev, "Incorrect order for descriptors");
-> >+                goto err_undo_map;
-> >+            }
-> >+            map_ok = virtqueue_map_desc(vdev, &out_num, addr, iov,
-> >+                                        VIRTQUEUE_MAX_SIZE, false,
-> >+                                        desc.addr, desc.len);
-> >+        }
-> >+        if (!map_ok) {
-> >+            goto err_undo_map;
-> >+        }
-> >+
-> >+        /* If we've got too many, that implies a descriptor loop. */
-> >+        if (++elem_entries > max) {
-> >+            virtio_error(vdev, "Looped descriptor");
-> >+            goto err_undo_map;
-> >+        }
-> >+
-> >+        if (++i >= vq->vring.num) {
-> >+            i -= vq->vring.num;
-> >+        }
-> >+
-> >+        if (desc.flags & VRING_DESC_F_NEXT) {
-> >+            vring_packed_desc_read(vq->vdev, &desc, cache, i);
-> >+        } else {
-> >+            break;
-> >+        }
-> >+    }
-> >+
-> >+    /* Now copy what we have collected and mapped */
-> >+    elem = virtqueue_alloc_element(sz, out_num, in_num);
-> >+    elem->index = id;
-> >+    for (i = 0; i < out_num; i++) {
-> >+        elem->out_addr[i] = addr[i];
-> >+        elem->out_sg[i] = iov[i];
-> >+    }
-> >+    for (i = 0; i < in_num; i++) {
-> >+        elem->in_addr[i] = addr[head + out_num + i];
-> >+        elem->in_sg[i] = iov[out_num + i];
-> >+    }
-> >+
-> >+    vq->last_avail_idx += (cache == &indirect_desc_cache) ?
-> >+                          1 : out_num + in_num;
-> 
-> I think you cannot rely on out_num and in_num to deduce the number of
-> descriptors.
-> 
-> Indeed, in virtqueue_map_desc(), in_num and out_num can be incremented
-> by more than one for a single descriptor, when the desc buffer is not
-> contiguous in the QEMU address space.
-> 
+> From: Eduardo Habkost <ehabkost@redhat.com>
+> Sent: Wednesday, January 16, 2019 4:30 PM
+> To: Aleksandar Markovic
+> Cc: qemu-devel@nongnu.org; Aleksandar Rikalo; Stefan Markovic; Aleksandar=
+ Markovic; Aurelien > Jarno; Igor Mammedov
+> Subject: Re: [Qemu-devel] Meaning of "-smp threads" on mips_malta
+>=20
+> On Tue, Jan 15, 2019 at 03:28:50AM +0100, Aleksandar Markovic wrote:
+> > On Monday, January 14, 2019, Eduardo Habkost <ehabkost@redhat.com> wrot=
+e:
+> >
+> > > Hi,
+> > >
+> > > I'm trying to refactor the SMP topology code in QEMU
+> >
+> >
+> > >
+> > Eduardo, I truly appreciate your interest in details of Malta
+> > implementations, but before I answer your questions, could you please
+> > outline the motivation and the current concept of your envisioned
+> > refactoring of SMP, so that I have some picture of the whole context?
+>=20
+> I don't have any concrete plans right now.  I'm trying to
+> understand how existing code uses the -smp options, before
+> deciding what to do.
+>=20
+> My goal is to make features like
+>   "[PATCH v1 0/5] Introduce cpu die topology and enable CPUID.1F for i386=
+"
+> easier, less intrusive, and less risky.
+>=20
+> My current impression is that things will be better if we move
+> the complex PC-specific topology rules from vl.c to PC-specific
+> code.  Most of the other architectures seem to have different
+> assumptions and expectations about -smp/cores/threads.
+>=20
 
-Indeed, should replace it with 'elem_entries', thanks.
+Eduardo, thanks for giving me this background info and details.
 
-Wei
+I completely understand your concerns, and also frustration with the
+current situation in the multi-core area of your (and many other)
+platforms. What appears to be a simple thing suddenly becomes
+a major issue - very annoying, isn't it?
+
+Your observation on different assumptions and expectations
+between targets in this area is so true.
+
+I feel this topic deserves wider discussion, and I think we need better
+possibilities and solutions for future endeavors across the board for
+all targets, not only in your or mine case.
+
+As for MIPS smp/threads combinations, they are valid, although truly
+unusual, and this is because of certain MIPS-specific features of
+so-called hardware multithreading and core virtualization, where a
+core can present itself as multiple cores - even theoretically run
+different OSs on such cores. The code snippet is very old by itself
+(almost obsolete), since MIPS architecture meanwhile evolved, so
+the code snippet is actually ripe for rewriting, but this is what we
+have now, and I am against just throwing it away. I gather the
+authors of the code did not have any better choice at the time
+of writing.
+
+Again, I am with you regarding your concerns. However, let's not
+rush, let's not jump to quick conclusions. Let me think for a while,
+try to come up with some suggestions that will make life easier
+for both of us and hopefully for majority of the community.
+
+Speak to you later, I'll be back soon, give me some time, and
+thanks for bringing this to my (and everybody else's) attention.
+
+Regards,
+Aleksandar
+
+>=20
+> >
+> > Sincerely, Aleksandar
+> >
+> >
+> >
+> > >
+> > > and I found
+> > > some suspicious code on mips_malta.c:
+> > >
+> > > static void malta_mips_config(MIPSCPU *cpu)
+> > > {
+> > >     CPUMIPSState *env =3D &cpu->env;
+> > >     CPUState *cs =3D CPU(cpu);
+> > >
+> > >     env->mvp->CP0_MVPConf0 |=3D ((smp_cpus - 1) << CP0MVPC0_PVPE) |
+> > >                          ((smp_cpus * cs->nr_threads - 1) << CP0MVPC0=
+_PTC);
+> > > }
+> > >
+> > >
+> > > The (smp_cpus * cs->nr_threads) expression here doesn't make
+> > > sense to me (because smp_cpus is already supposed to be a
+> > > multiple of smp_threads), and seems to indicate that the code has
+> > > some unusual assumptions about the semantics of the -smp option.
+> > >
+> > > So, I'd like to know: do all the examples below make sense for
+> > > Malta?
+> > >
+> > >  -smp 1
+> > >  -smp 2
+> > >  -smp 2,threads=3D1
+> > >  -smp 2,threads=3D2
+> > >  -smp 1,threads=3D2 [*]
+> > >  -smp 2,threads=3D3 [*]
+> > >
+> > > The generic -smp parsing code considers the last 2 entries
+> > > above[*] to be invalid.  If they make sense for Malta, we need to
+> > > find a way to fix that.  Replacing "-smp threads=3D..." with a
+> > > "-cpu" or "-machine" option seems like the best alternative.
+> > >
+> > > --
+> > > Eduardo
+> > >
+> > >
+>=20
+> --
+> Eduardo
+> =
