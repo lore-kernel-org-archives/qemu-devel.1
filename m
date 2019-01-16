@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53081)
+Received: from eggs.gnu.org ([209.51.188.92]:53175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjm6o-0001tQ-Jl
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:23:59 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjm6t-000212-OH
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:24:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjm6n-0001fD-QB
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:23:58 -0500
-References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-6-eblake@redhat.com>
-	<acc77355-221d-0497-4b14-6b3c1bb79c7d@virtuozzo.com>
-	<f42d51fa-1268-0abf-11b8-7661655e995d@redhat.com>
-	<205453e1-a4b3-6296-e4e9-92337ba83eb3@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <29fc3dc8-db53-e6be-6915-7626ef8f63ce@redhat.com>
-Date: Wed, 16 Jan 2019 08:23:52 -0600
-MIME-Version: 1.0
-In-Reply-To: <205453e1-a4b3-6296-e4e9-92337ba83eb3@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LEE4BIv08HxABOrB3cKYGcic0wjXamwTt"
-Subject: Re: [Qemu-devel] [PATCH v3 05/19] nbd/server: Favor [u]int64_t over
- off_t
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gjm6r-0001me-Mo
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:24:03 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 16 Jan 2019 17:23:56 +0300
+Message-Id: <20190116142356.31515-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [RFC] nbd: generalize usage of nbd_read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +17,489 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LEE4BIv08HxABOrB3cKYGcic0wjXamwTt
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com"
- <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <29fc3dc8-db53-e6be-6915-7626ef8f63ce@redhat.com>
-Subject: Re: [PATCH v3 05/19] nbd/server: Favor [u]int64_t over off_t
-References: <20190112175812.27068-1-eblake@redhat.com>
- <20190112175812.27068-6-eblake@redhat.com>
- <acc77355-221d-0497-4b14-6b3c1bb79c7d@virtuozzo.com>
- <f42d51fa-1268-0abf-11b8-7661655e995d@redhat.com>
- <205453e1-a4b3-6296-e4e9-92337ba83eb3@virtuozzo.com>
-In-Reply-To: <205453e1-a4b3-6296-e4e9-92337ba83eb3@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+We generally do very similar things around nbd_read: error_prepend,
+specifying, what we have tried to read and be_to_cpu conversion of
+integers.
 
-On 1/16/19 2:23 AM, Vladimir Sementsov-Ogievskiy wrote:
+So, it seems reasonable to move common things to helper functions,
+which:
+1. simplify code a bit
+2. generalize nbd_read error descriptions, all starting with
+   "Failed to read"
+3. make it more difficult to forget to convert things from BE
 
->=20
-> Interesting, decided to search a bit, about don't we have an overflow,
-> when adding request.offset to exp.dev_offset and found in nbd_co_receiv=
-e_request:
->=20
->      if (request->from > client->exp->size ||
->          request->from + request->len > client->exp->size) {
+Possible TODO:
+make a helper to read sized variable buffers, like
 
-uint64_t + uint32_t > uint64_t
+  uint32_t len
+  @len bytes buffer follows
 
->=20
-> shouldn't it be
->=20
->      if (request->from > client->exp->size ||
->          request->len > client->exp->size - request->from) {
->=20
-> to avoid overflow?
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-You are correct that the canonical way to check for overflow is to
-compare against subtraction, rather than do addition before compare.
-But we got lucky: even though client->exp->size is uint64_t, in practice
-it can only represent at most off_t (remember, off_t is signed), so the
-first leg of the branch proves that request->from fits in 63 bits, and
-thus the second is performing 63-bit + 32-bit which can be at most 64
-bits, and therefore does not overflow.  Still, I might rewrite it.
+Hi Eric!
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+I have an idea of several helpers around nbd_read, what do you think
+about it?
 
+It now based on your "nbd: add qemu-nbd --list", and if we like it,
+I'll fix iotests appropriately (if they fail, but I think, they should)
+and rebase onto final version of your series.
 
---LEE4BIv08HxABOrB3cKYGcic0wjXamwTt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Based-on:<20190112175812.27068-1-eblake@redhat.com>
 
------BEGIN PGP SIGNATURE-----
+ include/block/nbd.h | 33 ++++++++++++++++-
+ block/nbd-client.c  |  5 +--
+ nbd/client.c        | 89 ++++++++++++++-------------------------------
+ nbd/common.c        |  2 +-
+ nbd/server.c        | 27 +++++---------
+ 5 files changed, 71 insertions(+), 85 deletions(-)
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw/PngACgkQp6FrSiUn
-Q2oynQf/YLTFKQb1yWZBU2VuD3Yo3QtVRzxWrzl3oV2C0zQC4VgrwdmA8cWNTyt9
-DDvFqVaAJ1CGt0iCmWcGHAEdwlpU5LpYVOakPRU16LWxTcONek6rj+jXGCWl5yX1
-rZ7I7Go48La90KuvjVNcS6Kb/ZfTqreBA2jBnvr3/VJWkhYWsoLXwQLnZk5XU1hP
-bFBgfiqLnA+CwuqnMCXRum2tE/0MFCyZgFhYdi+/rD/Lk/kKZTyuvalidKgxNw6Z
-hfjSua0n1Z6PhBuoYNDnAxQTAW6wBO9M40yLHOo2NmTRRNxAhiPp8u15r3GBzzKH
-x+ZXkAwoN+EG+c1ARHuBBlHRActFSw==
-=w1H6
------END PGP SIGNATURE-----
-
---LEE4BIv08HxABOrB3cKYGcic0wjXamwTt--
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 80ee3cc997..f3d3ffc749 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -23,6 +23,7 @@
+ #include "qapi/qapi-types-block.h"
+ #include "io/channel-socket.h"
+ #include "crypto/tlscreds.h"
++#include "qapi/error.h"
+ 
+ /* Handshake phase structs - this struct is passed on the wire */
+ 
+@@ -336,11 +337,39 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+  * Reads @size bytes from @ioc. Returns 0 on success.
+  */
+ static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
+-                           Error **errp)
++                           const char *desc, Error **errp)
+ {
+-    return qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
++    int ret = qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
++
++    if (ret < 0) {
++        if (desc) {
++            error_prepend(errp, "Failed to read %s: ", desc);
++        } else {
++            error_prepend(errp, "Failed to read from socket: ");
++        }
++        return -1;
++    }
++
++    return 0;
+ }
+ 
++#define DEF_NBD_READ(bits) \
++static inline int nbd_read ## bits(QIOChannel *ioc, uint ## bits ## _t *val, \
++                                   const char *desc, Error **errp)           \
++{                                                                            \
++    if (nbd_read(ioc, val, sizeof(*val), desc, errp) < 0) {                  \
++        return -1;                                                           \
++    }                                                                        \
++    *val = be ## bits ## _to_cpu(*val);                                      \
++    return 0;                                                                \
++}
++
++DEF_NBD_READ(16)
++DEF_NBD_READ(32)
++DEF_NBD_READ(64)
++
++#undef DEF_NBD_READ
++
+ static inline bool nbd_reply_is_simple(NBDReply *reply)
+ {
+     return reply->magic == NBD_SIMPLE_REPLY_MAGIC;
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 813539676d..5c97052608 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -337,10 +337,9 @@ static int nbd_co_receive_offset_data_payload(NBDClientSession *s,
+         return -EINVAL;
+     }
+ 
+-    if (nbd_read(s->ioc, &offset, sizeof(offset), errp) < 0) {
++    if (nbd_read64(s->ioc, &offset, "OFFSET_DATA offset", errp) < 0) {
+         return -EIO;
+     }
+-    be64_to_cpus(&offset);
+ 
+     data_size = chunk->length - sizeof(offset);
+     assert(data_size);
+@@ -387,7 +386,7 @@ static coroutine_fn int nbd_co_receive_structured_payload(
+     }
+ 
+     *payload = g_new(char, len);
+-    ret = nbd_read(s->ioc, *payload, len, errp);
++    ret = nbd_read(s->ioc, *payload, len, "structured payload", errp);
+     if (ret < 0) {
+         g_free(*payload);
+         *payload = NULL;
+diff --git a/nbd/client.c b/nbd/client.c
+index 64f3e45edd..bd62efe1de 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -113,8 +113,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
+                                     NBDOptionReply *reply, Error **errp)
+ {
+     QEMU_BUILD_BUG_ON(sizeof(*reply) != 20);
+-    if (nbd_read(ioc, reply, sizeof(*reply), errp) < 0) {
+-        error_prepend(errp, "failed to read option reply: ");
++    if (nbd_read(ioc, reply, sizeof(*reply), "option reply", errp) < 0) {
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+@@ -166,10 +165,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+             goto cleanup;
+         }
+         msg = g_malloc(reply->length + 1);
+-        if (nbd_read(ioc, msg, reply->length, errp) < 0) {
+-            error_prepend(errp, "failed to read option error %" PRIu32
+-                          " (%s) message: ",
+-                          reply->type, nbd_rep_lookup(reply->type));
++        if (nbd_read(ioc, msg, reply->length, "option error", errp) < 0) {
+             goto cleanup;
+         }
+         msg[reply->length] = '\0';
+@@ -284,12 +280,10 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+-    if (nbd_read(ioc, &namelen, sizeof(namelen), errp) < 0) {
+-        error_prepend(errp, "failed to read option name length: ");
++    if (nbd_read32(ioc, &namelen, "option name length", errp) < 0) {
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+-    namelen = be32_to_cpu(namelen);
+     len -= sizeof(namelen);
+     if (len < namelen) {
+         error_setg(errp, "incorrect option name length");
+@@ -298,8 +292,7 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
+     }
+ 
+     local_name = g_malloc(namelen + 1);
+-    if (nbd_read(ioc, local_name, namelen, errp) < 0) {
+-        error_prepend(errp, "failed to read export name: ");
++    if (nbd_read(ioc, local_name, namelen, "export name", errp) < 0) {
+         nbd_send_opt_abort(ioc);
+         goto out;
+     }
+@@ -307,8 +300,7 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
+     len -= namelen;
+     if (len) {
+         local_desc = g_malloc(len + 1);
+-        if (nbd_read(ioc, local_desc, len, errp) < 0) {
+-            error_prepend(errp, "failed to read export description: ");
++        if (nbd_read(ioc, local_desc, len, "export description", errp) < 0) {
+             nbd_send_opt_abort(ioc);
+             goto out;
+         }
+@@ -330,7 +322,6 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
+     return ret;
+ }
+ 
+-
+ /*
+  * Returns -1 if NBD_OPT_GO proves the export @info->name cannot be
+  * used, 0 if NBD_OPT_GO is unsupported (fall back to NBD_OPT_LIST and
+@@ -406,13 +397,11 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
+             nbd_send_opt_abort(ioc);
+             return -1;
+         }
+-        if (nbd_read(ioc, &type, sizeof(type), errp) < 0) {
+-            error_prepend(errp, "failed to read info type: ");
++        if (nbd_read16(ioc, &type, "info type", errp) < 0) {
+             nbd_send_opt_abort(ioc);
+             return -1;
+         }
+         len -= sizeof(type);
+-        type = be16_to_cpu(type);
+         switch (type) {
+         case NBD_INFO_EXPORT:
+             if (len != sizeof(info->size) + sizeof(info->flags)) {
+@@ -421,18 +410,14 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+-                error_prepend(errp, "failed to read info size: ");
++            if (nbd_read64(ioc, &info->size, "info size", errp) < 0) {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->size = be64_to_cpu(info->size);
+-            if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
+-                error_prepend(errp, "failed to read info flags: ");
++            if (nbd_read16(ioc, &info->flags, "info flags", errp) < 0) {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->flags = be16_to_cpu(info->flags);
+             trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
+             break;
+ 
+@@ -443,27 +428,23 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            if (nbd_read(ioc, &info->min_block, sizeof(info->min_block),
+-                         errp) < 0) {
+-                error_prepend(errp, "failed to read info minimum block size: ");
++            if (nbd_read32(ioc, &info->min_block, "info minimum block size",
++                           errp) < 0) {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->min_block = be32_to_cpu(info->min_block);
+             if (!is_power_of_2(info->min_block)) {
+                 error_setg(errp, "server minimum block size %" PRIu32
+                            " is not a power of two", info->min_block);
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            if (nbd_read(ioc, &info->opt_block, sizeof(info->opt_block),
+-                         errp) < 0) {
+-                error_prepend(errp,
+-                              "failed to read info preferred block size: ");
++            if (nbd_read32(ioc, &info->opt_block, "info preferred block size",
++                           errp) < 0)
++            {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->opt_block = be32_to_cpu(info->opt_block);
+             if (!is_power_of_2(info->opt_block) ||
+                 info->opt_block < info->min_block) {
+                 error_setg(errp, "server preferred block size %" PRIu32
+@@ -471,13 +452,12 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            if (nbd_read(ioc, &info->max_block, sizeof(info->max_block),
+-                         errp) < 0) {
+-                error_prepend(errp, "failed to read info maximum block size: ");
++            if (nbd_read32(ioc, &info->max_block, "info maximum block size",
++                           errp) < 0)
++            {
+                 nbd_send_opt_abort(ioc);
+                 return -1;
+             }
+-            info->max_block = be32_to_cpu(info->max_block);
+             if (info->max_block < info->min_block) {
+                 error_setg(errp, "server maximum block size %" PRIu32
+                            " is not valid", info->max_block);
+@@ -730,14 +710,14 @@ static int nbd_receive_one_meta_context(QIOChannel *ioc,
+         return -1;
+     }
+ 
+-    if (nbd_read(ioc, &local_id, sizeof(local_id), errp) < 0) {
++    if (nbd_read32(ioc, &local_id, "context id", errp) < 0) {
+         return -1;
+     }
+     local_id = be32_to_cpu(local_id);
+ 
+     reply.length -= sizeof(local_id);
+     local_name = g_malloc(reply.length + 1);
+-    if (nbd_read(ioc, local_name, reply.length, errp) < 0) {
++    if (nbd_read(ioc, local_name, reply.length, "context name", errp) < 0) {
+         g_free(local_name);
+         return -1;
+     }
+@@ -893,11 +873,9 @@ static int nbd_start_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+         return -EINVAL;
+     }
+ 
+-    if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
+-        error_prepend(errp, "Failed to read initial magic: ");
++    if (nbd_read64(ioc, &magic, "initial magic", errp) < 0) {
+         return -EINVAL;
+     }
+-    magic = be64_to_cpu(magic);
+     trace_nbd_receive_negotiate_magic(magic);
+ 
+     if (magic != NBD_INIT_MAGIC) {
+@@ -905,11 +883,9 @@ static int nbd_start_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+         return -EINVAL;
+     }
+ 
+-    if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
+-        error_prepend(errp, "Failed to read server magic: ");
++    if (nbd_read64(ioc, &magic, "server magic", errp) < 0) {
+         return -EINVAL;
+     }
+-    magic = be64_to_cpu(magic);
+     trace_nbd_receive_negotiate_magic(magic);
+ 
+     if (magic == NBD_OPTS_MAGIC) {
+@@ -917,11 +893,9 @@ static int nbd_start_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+         uint16_t globalflags;
+         bool fixedNewStyle = false;
+ 
+-        if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) {
+-            error_prepend(errp, "Failed to read server flags: ");
++        if (nbd_read16(ioc, &globalflags, "server flags", errp) < 0) {
+             return -EINVAL;
+         }
+-        globalflags = be16_to_cpu(globalflags);
+         trace_nbd_receive_negotiate_server_flags(globalflags);
+         if (globalflags & NBD_FLAG_FIXED_NEWSTYLE) {
+             fixedNewStyle = true;
+@@ -989,17 +963,13 @@ static int nbd_negotiate_finish_oldstyle(QIOChannel *ioc, NBDExportInfo *info,
+ {
+     uint32_t oldflags;
+ 
+-    if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+-        error_prepend(errp, "Failed to read export length: ");
++    if (nbd_read64(ioc, &info->size, "export length", errp) < 0) {
+         return -EINVAL;
+     }
+-    info->size = be64_to_cpu(info->size);
+ 
+-    if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
+-        error_prepend(errp, "Failed to read export flags: ");
++    if (nbd_read32(ioc, &oldflags, "export flags", errp) < 0) {
+         return -EINVAL;
+     }
+-    oldflags = be32_to_cpu(oldflags);
+     if (oldflags & ~0xffff) {
+         error_setg(errp, "Unexpected export flags %0x" PRIx32, oldflags);
+         return -EINVAL;
+@@ -1076,17 +1046,13 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+         }
+ 
+         /* Read the response */
+-        if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
+-            error_prepend(errp, "Failed to read export length: ");
++        if (nbd_read64(ioc, &info->size, "export length", errp) < 0) {
+             return -EINVAL;
+         }
+-        info->size = be64_to_cpu(info->size);
+ 
+-        if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
+-            error_prepend(errp, "Failed to read export flags: ");
++        if (nbd_read16(ioc, &info->flags, "export flags", errp) < 0) {
+             return -EINVAL;
+         }
+-        info->flags = be16_to_cpu(info->flags);
+         break;
+     case 0: /* oldstyle, parse length and flags */
+         if (*info->name) {
+@@ -1374,7 +1340,7 @@ static int nbd_receive_simple_reply(QIOChannel *ioc, NBDSimpleReply *reply,
+     assert(reply->magic == NBD_SIMPLE_REPLY_MAGIC);
+ 
+     ret = nbd_read(ioc, (uint8_t *)reply + sizeof(reply->magic),
+-                   sizeof(*reply) - sizeof(reply->magic), errp);
++                   sizeof(*reply) - sizeof(reply->magic), "reply", errp);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -1399,7 +1365,8 @@ static int nbd_receive_structured_reply_chunk(QIOChannel *ioc,
+     assert(chunk->magic == NBD_STRUCTURED_REPLY_MAGIC);
+ 
+     ret = nbd_read(ioc, (uint8_t *)chunk + sizeof(chunk->magic),
+-                   sizeof(*chunk) - sizeof(chunk->magic), errp);
++                   sizeof(*chunk) - sizeof(chunk->magic), "structured chunk",
++                   errp);
+     if (ret < 0) {
+         return ret;
+     }
+diff --git a/nbd/common.c b/nbd/common.c
+index 41f5ed8d9f..cc8b278e54 100644
+--- a/nbd/common.c
++++ b/nbd/common.c
+@@ -31,7 +31,7 @@ int nbd_drop(QIOChannel *ioc, size_t size, Error **errp)
+     buffer = sizeof(small) >= size ? small : g_malloc(MIN(65536, size));
+     while (size > 0) {
+         ssize_t count = MIN(65536, size);
+-        ret = nbd_read(ioc, buffer, MIN(65536, size), errp);
++        ret = nbd_read(ioc, buffer, MIN(65536, size), NULL, errp);
+ 
+         if (ret < 0) {
+             goto cleanup;
+diff --git a/nbd/server.c b/nbd/server.c
+index 15357d40fd..97a38de40c 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -438,8 +438,7 @@ static int nbd_negotiate_handle_export_name(NBDClient *client,
+         error_setg(errp, "Bad length received");
+         return -EINVAL;
+     }
+-    if (nbd_read(client->ioc, name, client->optlen, errp) < 0) {
+-        error_prepend(errp, "read failed: ");
++    if (nbd_read(client->ioc, name, client->optlen, "export name", errp) < 0) {
+         return -EIO;
+     }
+     name[client->optlen] = '\0';
+@@ -1046,11 +1045,9 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+         ...           Rest of request
+     */
+ 
+-    if (nbd_read(client->ioc, &flags, sizeof(flags), errp) < 0) {
+-        error_prepend(errp, "read failed: ");
++    if (nbd_read32(client->ioc, &flags, "flags", errp) < 0) {
+         return -EIO;
+     }
+-    flags = be32_to_cpu(flags);
+     trace_nbd_negotiate_options_flags(flags);
+     if (flags & NBD_FLAG_C_FIXED_NEWSTYLE) {
+         fixedNewstyle = true;
+@@ -1070,30 +1067,23 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+         uint32_t option, length;
+         uint64_t magic;
+ 
+-        if (nbd_read(client->ioc, &magic, sizeof(magic), errp) < 0) {
+-            error_prepend(errp, "read failed: ");
++        if (nbd_read64(client->ioc, &magic, "opts magic", errp) < 0) {
+             return -EINVAL;
+         }
+-        magic = be64_to_cpu(magic);
+         trace_nbd_negotiate_options_check_magic(magic);
+         if (magic != NBD_OPTS_MAGIC) {
+             error_setg(errp, "Bad magic received");
+             return -EINVAL;
+         }
+ 
+-        if (nbd_read(client->ioc, &option,
+-                     sizeof(option), errp) < 0) {
+-            error_prepend(errp, "read failed: ");
++        if (nbd_read32(client->ioc, &option, "option", errp) < 0) {
+             return -EINVAL;
+         }
+-        option = be32_to_cpu(option);
+         client->opt = option;
+ 
+-        if (nbd_read(client->ioc, &length, sizeof(length), errp) < 0) {
+-            error_prepend(errp, "read failed: ");
++        if (nbd_read32(client->ioc, &length, "option length", errp) < 0) {
+             return -EINVAL;
+         }
+-        length = be32_to_cpu(length);
+         assert(!client->optlen);
+         client->optlen = length;
+ 
+@@ -1306,7 +1296,7 @@ static int nbd_receive_request(QIOChannel *ioc, NBDRequest *request,
+     uint32_t magic;
+     int ret;
+ 
+-    ret = nbd_read(ioc, buf, sizeof(buf), errp);
++    ret = nbd_read(ioc, buf, sizeof(buf), "request", errp);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -2110,8 +2100,9 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+         }
+     }
+     if (request->type == NBD_CMD_WRITE) {
+-        if (nbd_read(client->ioc, req->data, request->len, errp) < 0) {
+-            error_prepend(errp, "reading from socket failed: ");
++        if (nbd_read(client->ioc, req->data, request->len, "CMD_WRITE data",
++                     errp) < 0)
++        {
+             return -EIO;
+         }
+         req->complete = true;
+-- 
+2.18.0
