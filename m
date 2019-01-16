@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36464)
+Received: from eggs.gnu.org ([209.51.188.92]:40086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjjii-0008Cl-UN
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:58 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gjjkR-00015Y-Gs
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:52:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjjig-0001Hl-OB
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46156)
+	(envelope-from <kraxel@redhat.com>) id 1gjjkP-0007YP-U4
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:52:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48260)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjjig-0001AE-9M
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:54 -0500
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-27-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6ce1a208-43b5-4def-f498-4ec7f98d05ed@redhat.com>
-Date: Wed, 16 Jan 2019 12:50:42 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gjjkP-0007Kh-GI
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:52:41 -0500
+Date: Wed, 16 Jan 2019 12:52:17 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190116115217.jduhqrwbjhuibmoq@sirius.home.kraxel.org>
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-11-git-send-email-imammedo@redhat.com>
+	<15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
+	<20190116113227.47ebdea2@redhat.com>
+	<314cffa2-f153-011a-9c6e-01e94c73590a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190115141108.934-27-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 26/37] scsi: express dependencies
- with Kconfig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <314cffa2-f153-011a-9c6e-01e94c73590a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 10/14] tests: acpi: ignore SMBIOS tests
+ when UEFI firmware is used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-On 2019-01-15 15:10, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
+  Hi,
+
+> This approach allows the UEFI app source to live in the QEMU tree, and
+> the affected maintainer(s) would be personally responsible for setting
+> up their edk2 clones, and compilers. (The edk2 clone could even be a
+> submodule of QEMU, for example at roms/edk2.) For example,
+> "roms/Makefile" already calls an external EFIROM utility (also from
+> edk2) in order to build the combined iPXE option ROMs.
 > 
-> This lets you disable SCSI altogether with "CONFIG_SCSI=n".
-
-Sorry for my ignorant question, but: Can we really disable SCSI if the
-Kconfig files use "select SCSI" all over the place? I'd rather expect
-that "CONFIG_SCSI=n" only works if we only use "depends on SCSI" everywhere?
-
-I'm fine if we use select SCSI in this patch, but maybe the commit
-message should be tweaked in case you can not really disable SCSI like
-this anymore?
-
- Thomas
-
-
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> ---
->  hw/scsi/Kconfig       | 12 ++++++++++++
->  hw/scsi/Makefile.objs |  2 +-
->  hw/usb/Kconfig        |  2 ++
->  3 files changed, 15 insertions(+), 1 deletion(-)
+> And yes, we could turn the UEFI binaries into bootable ISO images at once.
 > 
-> diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
-> index 812a12522b..7a9d373382 100644
-> --- a/hw/scsi/Kconfig
-> +++ b/hw/scsi/Kconfig
-> @@ -5,24 +5,29 @@ config LSI_SCSI_PCI
->      bool
->      default y
->      depends on PCI
-> +    select SCSI
->  
->  config MPTSAS_SCSI_PCI
->      bool
->      default y
->      depends on PCI
-> +    select SCSI
->  
->  config MEGASAS_SCSI_PCI
->      bool
->      default y
->      depends on PCI
-> +    select SCSI
->  
->  config VMW_PVSCSI_SCSI_PCI
->      bool
->      default y
->      depends on PCI
-> +    select SCSI
->  
->  config ESP
->      bool
-> +    select SCSI
->  
->  config ESP_PCI
->      bool
-> @@ -30,8 +35,15 @@ config ESP_PCI
->      depends on PCI
->      select ESP
->  
-> +config SPAPR_VSCSI
-> +    bool
-> +    depends on PSERIES
-> +    select SCSI
-> +
->  config VIRTIO_SCSI
->      bool
-> +    default y
-> +    select SCSI
->  
->  config VHOST_USER_SCSI
->      bool
-> diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
-> index 45167baeaf..54b36ed8b1 100644
-> --- a/hw/scsi/Makefile.objs
-> +++ b/hw/scsi/Makefile.objs
-> @@ -6,7 +6,7 @@ common-obj-$(CONFIG_MEGASAS_SCSI_PCI) += megasas.o
->  common-obj-$(CONFIG_VMW_PVSCSI_SCSI_PCI) += vmw_pvscsi.o
->  common-obj-$(CONFIG_ESP) += esp.o
->  common-obj-$(CONFIG_ESP_PCI) += esp-pci.o
-> -obj-$(CONFIG_PSERIES) += spapr_vscsi.o
-> +obj-$(CONFIG_SPAPR_VSCSI) += spapr_vscsi.o
->  
->  ifeq ($(CONFIG_VIRTIO_SCSI),y)
->  obj-y += virtio-scsi.o virtio-scsi-dataplane.o
-> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-> index 0b8f41040e..db46c56cc8 100644
-> --- a/hw/usb/Kconfig
-> +++ b/hw/usb/Kconfig
-> @@ -52,11 +52,13 @@ config USB_STORAGE_BOT
->      bool
->      default y
->      depends on USB
-> +    select SCSI
->  
->  config USB_STORAGE_UAS
->      bool
->      default y
->      depends on USB
-> +    select SCSI
->  
->  config USB_AUDIO
->      bool
+> I'll try to post some patches soon (or not so soon). I think the app's
+> source code, and the edk2 submodule, should live under roms/, and the
+> bootable images should live under pc-bios/.
 > 
+> (In fact we could use this opportunity to build & bundle OVMF itself...
+> not sure if that's in scope for now. Gerd, what's your take?)
+
+Well, there is still the idea to move over firmware submodules and
+prebuilt firmware blobs to a separate repo.  Expermimental repo:
+https://git.kraxel.org/cgit/qemu-firmware/.  Not touched for more than a
+year due to being busy with other stuff.  Oh well ...
+
+(if someone feels like picking this up feel free to do so).
+
+I think adding edk2 as submodule below roms/ makes sense.  Adding rules
+to roms/Makefile to build the blobs makes sense too.  Not sure we want
+the binaries actually copied over to pc-bios/ and commited as the uefi
+firmware is pretty big ...
+
+Not sure what a good place for the uefi app would be.  I'd tend to not
+use roms/, that is the place for firmware submodules.  contrib/ or test/
+maybe?
+
+cheers,
+  Gerd
