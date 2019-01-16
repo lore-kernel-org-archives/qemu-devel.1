@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38909)
+Received: from eggs.gnu.org ([209.51.188.92]:54860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gji3b-0001fI-66
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:04:25 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gjiA1-00044s-85
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:11:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gji3M-0003ME-D6
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:04:15 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:40826)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gji3L-0002sn-Vx
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:04:08 -0500
-Date: Wed, 16 Jan 2019 12:03:58 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20190116100357.GA7260@lap1>
-References: <20190114141006.1841-1-yuval.shaia@oracle.com>
-	<ad603032-6658-a1db-06fc-80ffa4dbd682@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <ad603032-6658-a1db-06fc-80ffa4dbd682@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/rdma: Verify that ptr is not NULL
- before freeing
+	(envelope-from <kraxel@redhat.com>) id 1gji9y-0001lH-0u
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:10:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51402)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gji9u-0001fD-61
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:10:56 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E062BC000661
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 10:10:52 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 16 Jan 2019 11:10:49 +0100
+Message-Id: <20190116101049.8929-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] vnc: detect and optimize pageflips
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon, Jan 14, 2019 at 04:11:22PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Hi Yuval,
->=20
-> On 1/14/19 3:10 PM, Yuval Shaia wrote:
-> > Make sure objects are not NULL before calling to non-nulll-safe
->=20
-> null
+When size and format of the display surface stays the same we can just
+tag the guest display as dirty and be done with it.
 
-will fix
+There is no need need to resize the vnc server display or to touch the
+vnc client dirty bits.  On the next refresh cycle
+vnc_refresh_server_surface() will check for actual display content
+changes and update the client dirty bits as needed.
 
->=20
-> > destructors.
-> >=20
-> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > ---
-> >  hw/rdma/rdma_backend.c | 6 ++++--
-> >  hw/rdma/rdma_rm.c      | 7 ++++++-
-> >  2 files changed, 10 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> > index b49edaacaf..3ee5172c96 100644
-> > --- a/hw/rdma/rdma_backend.c
-> > +++ b/hw/rdma/rdma_backend.c
-> > @@ -1066,8 +1066,10 @@ static void mad_fini(RdmaBackendDev *backend_d=
-ev)
-> >      pr_dbg("Stopping MAD\n");
-> >      disable_rdmacm_mux_async(backend_dev);
-> >      qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
-> > -    qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
-> > -    qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
-> > +    if (backend_dev->recv_mads_list.list) {
->=20
-> This is only reachable when the backend didn't success at initializing,
-> right?
+The desktop resize and framebuffer format notifications to the vnc
+client will be skipped too.
 
-Yes, just to cover the case where fini() was called even when init() fail=
-s.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/vnc.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
->=20
-> > +        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list))=
-;
-> > +        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
-> > +    }
-> >  }
-> > =20
-> >  int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
-> > diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-> > index f5b1295890..8bf241e91f 100644
-> > --- a/hw/rdma/rdma_rm.c
-> > +++ b/hw/rdma/rdma_rm.c
-> > @@ -41,6 +41,9 @@ static inline void res_tbl_init(const char *name, R=
-dmaRmResTbl *tbl,
-> > =20
-> >  static inline void res_tbl_free(RdmaRmResTbl *tbl)
-> >  {
-> > +    if (!tbl->bitmap) {
-> > +        return;
-> > +    }
-> >      qemu_mutex_destroy(&tbl->lock);
-> >      g_free(tbl->tbl);
-> >      g_free(tbl->bitmap);
-> > @@ -655,5 +658,7 @@ void rdma_rm_fini(RdmaDeviceResources *dev_res, R=
-dmaBackendDev *backend_dev,
-> >      res_tbl_free(&dev_res->cq_tbl);
-> >      res_tbl_free(&dev_res->pd_tbl);
-> > =20
-> > -    g_hash_table_destroy(dev_res->qp_hash);
-> > +    if (dev_res->qp_hash) {
-> > +        g_hash_table_destroy(dev_res->qp_hash);
-> > +    }
-> >  }
-> >=20
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 9e4b2beb71..6002d09407 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -742,6 +742,17 @@ static void vnc_update_server_surface(VncDisplay *vd)
+                        width, height);
+ }
+ 
++static bool vnc_check_pageflip(DisplaySurface *s1,
++                               DisplaySurface *s2)
++{
++    return (s1 != NULL &&
++            s2 != NULL &&
++            surface_width(s1) == surface_width(s2) &&
++            surface_height(s1) == surface_height(s2) &&
++            surface_format(s1) == surface_format(s2));
++
++}
++
+ static void vnc_dpy_switch(DisplayChangeListener *dcl,
+                            DisplaySurface *surface)
+ {
+@@ -749,6 +760,7 @@ static void vnc_dpy_switch(DisplayChangeListener *dcl,
+         "Display output is not active.";
+     static DisplaySurface *placeholder;
+     VncDisplay *vd = container_of(dcl, VncDisplay, dcl);
++    bool pageflip = vnc_check_pageflip(vd->ds, surface);
+     VncState *vs;
+ 
+     if (surface == NULL) {
+@@ -761,14 +773,21 @@ static void vnc_dpy_switch(DisplayChangeListener *dcl,
+     vnc_abort_display_jobs(vd);
+     vd->ds = surface;
+ 
+-    /* server surface */
+-    vnc_update_server_surface(vd);
+-
+     /* guest surface */
+     qemu_pixman_image_unref(vd->guest.fb);
+     vd->guest.fb = pixman_image_ref(surface->image);
+     vd->guest.format = surface->format;
+ 
++    if (pageflip) {
++        vnc_set_area_dirty(vd->guest.dirty, vd, 0, 0,
++                           surface_width(surface),
++                           surface_height(surface));
++        return;
++    }
++
++    /* server surface */
++    vnc_update_server_surface(vd);
++
+     QTAILQ_FOREACH(vs, &vd->clients, next) {
+         vnc_colordepth(vs);
+         vnc_desktop_resize(vs);
+-- 
+2.9.3
