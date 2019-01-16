@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48593)
+Received: from eggs.gnu.org ([209.51.188.92]:49020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjcgk-0006l6-LI
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:20:27 -0500
+	(envelope-from <bounces@canonical.com>) id 1gjchA-000777-ET
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:20:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gjcge-0005BS-P0
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:20:21 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45060)
+	(envelope-from <bounces@canonical.com>) id 1gjch8-0005TZ-F7
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:20:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gjcgd-00056R-Mb
-	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:20:20 -0500
-Received: by mail-pf1-x443.google.com with SMTP id g62so2372040pfd.12
-	for <qemu-devel@nongnu.org>; Tue, 15 Jan 2019 20:20:19 -0800 (PST)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20181113083104.2692-1-aik@ozlabs.ru>
-	<20181113083104.2692-4-aik@ozlabs.ru>
-	<CAKmqyKOOp0Nv7wqL_=s6f_1hep==bicXKofnhYo_puResrjNRg@mail.gmail.com>
-	<25ef3ad6-90b6-a255-7f65-f3a88625b622@ozlabs.ru>
-Message-ID: <937f3d53-5ed1-85fe-c8de-623b69c870e4@ozlabs.ru>
-Date: Wed, 16 Jan 2019 15:20:11 +1100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gjch2-0005Hm-Sp
+	for qemu-devel@nongnu.org; Tue, 15 Jan 2019 23:20:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gjcgt-0006JU-Ag
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 04:20:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4DD682E80C7
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 04:20:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <25ef3ad6-90b6-a255-7f65-f3a88625b622@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu RFC 3/7] pci: Move NVIDIA vendor id to
- the rest of ids
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 16 Jan 2019 04:11:03 -0000
+From: WHR <msl0000023508@gmail.com>
+Reply-To: Bug 1777252 <1777252@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152916202234.7686.15264921741576357687.malonedeb@wampee.canonical.com>
+Message-Id: <154761186312.20824.123605888758239704.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777252] Re: tests/Makefile.include trying to add
+ linking library '-lutil' that break the build on Solaris
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +37,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, joserz@linux.ibm.com, Alistair Popple <alistair@popple.id.au>, alex.williamson@redhat.com, sbobroff@linux.ibm.com, pjaroszynski@nvidia.com, "open list:New World" <qemu-ppc@nongnu.org>, lagarcia@br.ibm.com, oohall@gmail.com, arbab@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-Ping, anyone?
+>>> Does something like this work for you?
 
-On 14/12/2018 14:36, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 21/11/2018 05:27, Alistair Francis wrote:
->> On Tue, Nov 13, 2018 at 12:42 AM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->>>
->>> sPAPR code will use it too so move it from VFIO to the common code.
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>
->> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> 
-> 
-> 
-> Aaaaaand who is taking this? I am going to repost the patchset, posting
-> this one over and over again seems redundant. Thanks,
-> 
-> 
-> 
->>
->> Alistair
->>
->>> ---
->>>  include/hw/pci/pci_ids.h | 2 ++
->>>  hw/vfio/pci-quirks.c     | 2 --
->>>  2 files changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
->>> index 63acc72..3ed7d10 100644
->>> --- a/include/hw/pci/pci_ids.h
->>> +++ b/include/hw/pci/pci_ids.h
->>> @@ -271,4 +271,6 @@
->>>
->>>  #define PCI_VENDOR_ID_SYNOPSYS           0x16C3
->>>
->>> +#define PCI_VENDOR_ID_NVIDIA             0x10de
->>> +
->>>  #endif
->>> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
->>> index eae31c7..40a1200 100644
->>> --- a/hw/vfio/pci-quirks.c
->>> +++ b/hw/vfio/pci-quirks.c
->>> @@ -526,8 +526,6 @@ static void vfio_probe_ati_bar2_quirk(VFIOPCIDevice *vdev, int nr)
->>>   * note it for future reference.
->>>   */
->>>
->>> -#define PCI_VENDOR_ID_NVIDIA                    0x10de
->>> -
->>>  /*
->>>   * Nvidia has several different methods to get to config space, the
->>>   * nouveu project has several of these documented here:
->>> --
->>> 2.17.1
->>>
->>>
-> 
+Yes, this fix works; but I don't think this is a clean fix, since
+libutil may also missing in other OS.
 
--- 
-Alexey
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777252
+
+Title:
+  tests/Makefile.include trying to add linking library '-lutil' that
+  break the build on Solaris
+
+Status in QEMU:
+  New
+
+Bug description:
+  Building script 'tests/Makefile.include' contains following code
+  ```
+  ifeq ($(CONFIG_POSIX),y)
+  LIBS +=3D -lutil
+  endif
+  ```
+
+  library -lutil is not available on Solaris, so the building will failed, =
+like
+  ```
+  ld: fatal: library -lutil: not found
+  make: *** [SOMEWHERE/src/qemu-2.12.0/rules.mak:121: qemu-nbd] Error 1
+  ```
+
+  Commenting those code out fixed the error.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777252/+subscriptions
