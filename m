@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45564)
+Received: from eggs.gnu.org ([209.51.188.92]:45423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gjjUz-0005UB-8R
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:36:49 -0500
+	(envelope-from <david@redhat.com>) id 1gjjUx-0005S9-Ah
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:36:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gjjUt-00007J-4X
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:36:43 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:43366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gjjUX-00083H-PG
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:36:33 -0500
-Received: by mail-ot1-f67.google.com with SMTP id a11so6624861otr.10
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 03:36:16 -0800 (PST)
-MIME-Version: 1.0
-References: <20190116041712.130183-1-aik@ozlabs.ru>
-	<20190116041712.130183-2-aik@ozlabs.ru>
-In-Reply-To: <20190116041712.130183-2-aik@ozlabs.ru>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Wed, 16 Jan 2019 12:36:04 +0100
-Message-ID: <CAGxU2F43EjW1Z5KGLehkKF1Y75rGqV0uyOEA+=na+ASPs68k1A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH qemu 1/2] update-linux-headers.sh: Copy new
- headers
+	(envelope-from <david@redhat.com>) id 1gjjUt-00007m-2z
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:36:42 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 16 Jan 2019 12:35:16 +0100
+Message-Id: <20190116113523.9213-4-david@redhat.com>
+In-Reply-To: <20190116113523.9213-1-david@redhat.com>
+References: <20190116113523.9213-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 03/10] qdev: Provide
+ qdev_get_bus_hotplug_handler()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +20,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, "open list:PowerPC" <qemu-ppc@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-On Wed, Jan 16, 2019 at 5:20 AM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->
-> Since Linux'es ab66dcc76d "powerpc: generate uapi header and system call
-> table files" there are 2 new files: unistd_32.h and unistd_64.h. These
-> files content is moved from unistd.h so now we have to copy new files
-> as well, just like we already do for other architectures; this does it
-> for MIPS as well.
->
-> Also, v5.0-rc2 moved vhost bits around in 4b86713236e4bd
-> "vhost: split structs into a separate header file", add those too.
->
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
->  scripts/update-linux-headers.sh | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
+Let's use a wrapper instead of looking it up manually. This function can
+than be reused when we explicitly want to have the bus hotplug handler
+(e.g. when the bus hotplug handler was overwritten by the machine
+hotplug handler).
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/core/qdev.c         | 10 +++++++++-
+ include/hw/qdev-core.h |  1 +
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 7ad45c0bd6..e2207d77a4 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -233,12 +233,20 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
+     return NULL;
+ }
+ 
++HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev)
++{
++    if (dev->parent_bus) {
++        return dev->parent_bus->hotplug_handler;
++    }
++    return NULL;
++}
++
+ HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
+ {
+     HotplugHandler *hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
+ 
+     if (hotplug_ctrl == NULL && dev->parent_bus) {
+-        hotplug_ctrl = dev->parent_bus->hotplug_handler;
++        hotplug_ctrl = qdev_get_bus_hotplug_handler(dev);
+     }
+     return hotplug_ctrl;
+ }
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 0632057fd6..893acc19b9 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -277,6 +277,7 @@ DeviceState *qdev_try_create(BusState *bus, const char *name);
+ void qdev_init_nofail(DeviceState *dev);
+ void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+                                  int required_for_version);
++HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
+ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
+ /**
+  * qdev_get_hotplug_handler: Get handler responsible for device wiring
+-- 
+2.17.2
