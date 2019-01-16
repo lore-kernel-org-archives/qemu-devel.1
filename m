@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59123)
+Received: from eggs.gnu.org ([209.51.188.92]:37809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjhSX-0002JK-Ir
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:26:07 -0500
+	(envelope-from <berrange@redhat.com>) id 1gjhUL-0003MO-OJ
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:27:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gjhSS-0000y1-JW
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:26:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51408)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gjhSP-0000rp-GT
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:25:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gjhSK-0002NP-8s
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 09:25:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3BE832E807D
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 09:25:52 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1gjhUJ-0008S0-H5
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:27:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39874)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gjhUJ-0008K8-6r
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 04:27:55 -0500
+Date: Wed, 16 Jan 2019 09:27:41 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190116092741.GB20275@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190115145256.9593-1-berrange@redhat.com>
+	<20190115145256.9593-2-berrange@redhat.com>
+	<a53244ea-4ff3-c5d6-73b2-9f839b6b0195@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a53244ea-4ff3-c5d6-73b2-9f839b6b0195@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Jan 2019 09:09:24 -0000
-From: Jakub Jermar <1811244@bugs.launchpad.net>
-Reply-To: Bug 1811244 <1811244@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154712887375.19548.13853640095079074628.malonedeb@soybean.canonical.com>
-Message-Id: <154762976429.32422.5886426780505922164.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1811244] Re: qemu 3.1/i386 crashes when MTTCG is
- enabled
+Subject: Re: [Qemu-devel] [PATCH 01/12] chardev: fix validation of options
+ for QMP created chardevs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,241 +31,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-** Attachment added: "Debug binary with symbols"
-   https://bugs.launchpad.net/qemu/+bug/1811244/+attachment/5229552/+files/=
-qemu-system-i386.xz
+On Wed, Jan 16, 2019 at 06:07:41AM +0100, Thomas Huth wrote:
+> On 2019-01-15 15:52, Daniel P. Berrang=C3=A9 wrote:
+> > The TLS creds option is not valid with certain address types. The use=
+r
+> > config was only checked for errors when parsing legacy QemuOpts, thus
+> > the user could pass unsupported values via QMP.
+> >=20
+> > Pull all code for validating options out into a new method
+> > qmp_chardev_validate_socket, that is called from the main
+> > qmp_chardev_open_socket method. This adds a missing check for rejecti=
+ng
+> > TLS creds with the vsock address type.
+> >=20
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  chardev/char-socket.c | 92 +++++++++++++++++++++++++++++++----------=
+--
+> >  1 file changed, 66 insertions(+), 26 deletions(-)
+> >=20
+> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > index eaa8e8b68f..6669acb35f 100644
+> > --- a/chardev/char-socket.c
+> > +++ b/chardev/char-socket.c
+> > @@ -987,6 +987,65 @@ static gboolean socket_reconnect_timeout(gpointe=
+r opaque)
+> >      return false;
+> >  }
+> > =20
+> > +
+>=20
+> Please remove the additional empty line.
 
-** Description changed:
+Having two blanks lines between functions is intentional to
+give visual separation.
 
-  When MTTCG is enabled, QEMU 3.1.0 sometimes crashes when running the
-  following command line:
-  =
+> > +static bool qmp_chardev_validate_socket(ChardevSocket *sock,
+> > +                                        SocketAddress *addr,
+> > +                                        Error **errp)
+> > +{
+> > +    /* Validate any options which have a dependancy on address type =
+*/
+>=20
+> I'd maybe rather write "dependency" which is AFAIK the more common
+> spelling - but I'm not a native speaker, so feel free to ignore me here=
+.
+>=20
+> > +    switch (addr->type) {
+> > +    case SOCKET_ADDRESS_TYPE_FD:
+> > +        if (sock->has_reconnect) {
+> > +            error_setg(errp,
+> > +                       "'reconnect' option is incompatible with "
+> > +                       "'fd' address type");
+> > +            return false;
+> > +        }
+> > +        if (sock->has_tls_creds &&
+> > +            !(sock->has_server && sock->server)) {
+> > +            error_setg(errp,
+> > +                       "'tls_creds' option is incompatible with "
+> > +                       "'fd' address type as client");
+> > +            return false;
+> > +        }
+> > +        break;
+> > +
+> > +    case SOCKET_ADDRESS_TYPE_UNIX:
+> > +        if (sock->has_tls_creds) {
+> > +            error_setg(errp,
+> > +                       "'tls_creds' option is incompatible with "
+> > +                       "'unix' address type");
+> > +            return false;
+> > +        }
+> > +        break;
+> > +
+> > +    case SOCKET_ADDRESS_TYPE_INET:
+> > +        break;
+>=20
+> You could drop the empty case.
 
-  qemu-system-i386 -kernel
-  /home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/bootstrap
-  -append bootstrap -initrd
-  "/home/jermar/work/software/l4/fiasco/.build-i386/fiasco
-  -serial_esc,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/=
-l4f/sigma0
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/moe
-  rom/ahci.cfg,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen=
-/l4f/ned
-  ,test_env.lua ,/home/jermar/Kernkonzept/software/l4/pkg/ahci-
-  driver/examples/md5sum/ahci.cfg
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/l4re
-  ,/home/jermar/Kernkonzept/software/l4/pkg/ahci-
-  driver/examples/md5sum/ahci.io
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/io
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/ahci-
-  drv ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f
-  /ahci-md5-sync" -smp 4 -accel tcg,thread=3Dmulti -device ahci,id=3Dahci0
-  -drive if=3Dnone,file=3D/home/jermar/Kernkonzept/software/l4/.build-i386/=
-pkg
-  /ahci-driver/test/examples/test_ahci.img,format=3Draw,id=3Ddrive-sata0-0-0
-  -device ide-drive,bus=3Dahci0.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 -s=
-erial
-  stdio -nographic -monitor none
-  =
+I preferred to explicitly list all cases, so it is clear what
+needs to be handled here when further checks are added later.
 
-  The host is x86_64.
-  =
+>=20
+> > +    case SOCKET_ADDRESS_TYPE_VSOCK:
+> > +        if (sock->has_tls_creds) {
+> > +            error_setg(errp,
+> > +                       "'tls_creds' option is incompatible with "
+> > +                       "'vsock' address type");
+> > +            return false;
+> > +        }
+> > +
 
-- The stack at the time of the crash (core dump and debug binary linked
-- below[1]):
-+ The stack at the time of the crash (core dump and debug binary attached
-+ to the bug):
-  =
+Opps, missing default.
 
-  Core was generated by `qemu-system-i386 -kernel /home/jermar/Kernkonzept/=
-software/l4/.build-i386/bin/x'.
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  io_writex (env=3Denv@entry=3D0x565355ca0140, iotlbentry=3Diotlbentry@=
-entry=3D0x565355ca9120, mmu_idx=3D2, val=3Dval@entry=3D0, addr=3Daddr@entry=
-=3D3938451632, retaddr=3Dretaddr@entry=3D140487132809203, recheck=3Dfalse, =
-size=3D4)
--     at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/cputlb.c:791
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/cputlb.c:791
-  791	    if (mr->global_locking && !qemu_mutex_iothread_locked()) {
-  [Current thread is 1 (Thread 0x7fc5af7fe700 (LWP 3625719))]
-  Missing separate debuginfos, use: dnf debuginfo-install SDL2-2.0.9-1.fc29=
-.x86_64 at-spi2-atk-2.30.0-1.fc29.x86_64 at-spi2-core-2.30.0-2.fc29.x86_64 =
-atk-2.30.0-1.fc29.x86_64 bzip2-libs-1.0.6-28.fc29.x86_64 cairo4
-  (gdb) bt
-  #0  0x0000565354f5f365 in io_writex
--     (env=3Denv@entry=3D0x565355ca0140, iotlbentry=3Diotlbentry@entry=3D0x=
-565355ca9120, mmu_idx=3D2, val=3Dval@entry=3D0, addr=3Daddr@entry=3D3938451=
-632, retaddr=3Dretaddr@entry=3D140487132809203, recheck=3Dfalse, size=3D4)
--     at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/cputlb.c:791
-+ =C2=A0=C2=A0=C2=A0=C2=A0(env=3Denv@entry=3D0x565355ca0140, iotlbentry=3Di=
-otlbentry@entry=3D0x565355ca9120, mmu_idx=3D2, val=3Dval@entry=3D0, addr=3D=
-addr@entry=3D3938451632, retaddr=3Dretaddr@entry=3D140487132809203, recheck=
-=3Dfalse, size=3D4)
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/cputlb.c:791
-  #1  0x0000565354f621b2 in io_writel (recheck=3D<optimized out>, retaddr=
-=3D140487132809203, addr=3D3938451632, val=3D0, index=3D0, mmu_idx=3D2, env=
-=3D0x565355ca0140)
--     at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/softmmu_template.h:310
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/softmmu_template.h:310
-  #2  0x0000565354f621b2 in helper_le_stl_mmu (env=3D0x565355ca0140, addr=
-=3D<optimized out>, val=3D0, oi=3D34, retaddr=3D140487132809203)
--     at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/softmmu_template.h:310
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/softmmu_template.h:310
-  #3  0x00007fc5b5a587f3 in code_gen_buffer ()
-  #4  0x0000565354f75fd0 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x7fc=
-5b5a5aa40 <code_gen_buffer+12266006>) at /home/jermar/software/HelenOS/hele=
-nos.git/contrib/qemu/qemu-3.1.0/accel/tcg/cpu-exec.c:171
-  #5  0x0000565354f75fd0 in cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>=
-, last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D0x7fc5b5a5aa40=
- <code_gen_buffer+12266006>)
--     at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/=
-accel/tcg/cpu-exec.c:615
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/cpu-exec.c:615
-  #6  0x0000565354f75fd0 in cpu_exec (cpu=3Dcpu@entry=3D0x565355c97e90) at =
-/home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/accel/tcg=
-/cpu-exec.c:725
-  #7  0x0000565354f33b1f in tcg_cpu_exec (cpu=3D0x565355c97e90) at /home/je=
-rmar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/cpus.c:1429
-  #8  0x0000565354f35e83 in qemu_tcg_cpu_thread_fn (arg=3D0x565355c97e90) a=
-t /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/cpus.c:=
-1733
-  #9  0x0000565354f35e83 in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x565=
-355c97e90) at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3=
-.1.0/cpus.c:1707
-  #10 0x00005653552ec5da in qemu_thread_start (args=3D<optimized out>) at u=
-til/qemu-thread-posix.c:498
-  #11 0x00007fc5b858a58e in start_thread () at /lib64/libpthread.so.0
-  #12 0x00007fc5b84b96a3 in clone () at /lib64/libc.so.6
-  =
+> > +    default:
+> > +        break;
+>=20
+> You could drop the empty default case.
 
-  Another symptom that occurs more often than this crash is that the guest
-  hangs while waiting for another CPU to complete a cross-CPU call.
-  Disabling MTTCG makes both symptoms go away.
-- =
+If that is not there, then the compiler forces the
+listing of SOCKET_ADDRESS_TYPE__MAX instead due
+to -Wswitch
 
-- [1] Core file + debug binary: http://jermar.eu/ref/qemu-mttcg-
-- core.tar.xz
 
-** Summary changed:
-
-- qemu 3.1/i386 crashes when MTTCG is enabled
-+ qemu 3.1/i386 crashes/guest hangs when MTTCG is enabled
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811244
-
-Title:
-  qemu 3.1/i386 crashes/guest hangs when MTTCG is enabled
-
-Status in QEMU:
-  New
-
-Bug description:
-  When MTTCG is enabled, QEMU 3.1.0 sometimes crashes when running the
-  following command line:
-
-  qemu-system-i386 -kernel
-  /home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/bootstrap
-  -append bootstrap -initrd
-  "/home/jermar/work/software/l4/fiasco/.build-i386/fiasco
-  -serial_esc,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/=
-l4f/sigma0
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/moe
-  rom/ahci.cfg,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen=
-/l4f/ned
-  ,test_env.lua ,/home/jermar/Kernkonzept/software/l4/pkg/ahci-
-  driver/examples/md5sum/ahci.cfg
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/l4re
-  ,/home/jermar/Kernkonzept/software/l4/pkg/ahci-
-  driver/examples/md5sum/ahci.io
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f/io
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f
-  /ahci-drv
-  ,/home/jermar/Kernkonzept/software/l4/.build-i386/bin/x86_gen/l4f
-  /ahci-md5-sync" -smp 4 -accel tcg,thread=3Dmulti -device ahci,id=3Dahci0
-  -drive
-  if=3Dnone,file=3D/home/jermar/Kernkonzept/software/l4/.build-i386/pkg
-  /ahci-driver/test/examples/test_ahci.img,format=3Draw,id=3Ddrive-sata0-0-0
-  -device ide-drive,bus=3Dahci0.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0
-  -serial stdio -nographic -monitor none
-
-  The host is x86_64.
-
-  The stack at the time of the crash (core dump and debug binary
-  attached to the bug):
-
-  Core was generated by `qemu-system-i386 -kernel /home/jermar/Kernkonzept/=
-software/l4/.build-i386/bin/x'.
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  io_writex (env=3Denv@entry=3D0x565355ca0140, iotlbentry=3Diotlbentry@=
-entry=3D0x565355ca9120, mmu_idx=3D2, val=3Dval@entry=3D0, addr=3Daddr@entry=
-=3D3938451632, retaddr=3Dretaddr@entry=3D140487132809203, recheck=3Dfalse, =
-size=3D4)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/cputlb.c:791
-  791	    if (mr->global_locking && !qemu_mutex_iothread_locked()) {
-  [Current thread is 1 (Thread 0x7fc5af7fe700 (LWP 3625719))]
-  Missing separate debuginfos, use: dnf debuginfo-install SDL2-2.0.9-1.fc29=
-.x86_64 at-spi2-atk-2.30.0-1.fc29.x86_64 at-spi2-core-2.30.0-2.fc29.x86_64 =
-atk-2.30.0-1.fc29.x86_64 bzip2-libs-1.0.6-28.fc29.x86_64 cairo4
-  (gdb) bt
-  #0  0x0000565354f5f365 in io_writex
-  =C2=A0=C2=A0=C2=A0=C2=A0(env=3Denv@entry=3D0x565355ca0140, iotlbentry=3Di=
-otlbentry@entry=3D0x565355ca9120, mmu_idx=3D2, val=3Dval@entry=3D0, addr=3D=
-addr@entry=3D3938451632, retaddr=3Dretaddr@entry=3D140487132809203, recheck=
-=3Dfalse, size=3D4)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/cputlb.c:791
-  #1  0x0000565354f621b2 in io_writel (recheck=3D<optimized out>, retaddr=
-=3D140487132809203, addr=3D3938451632, val=3D0, index=3D0, mmu_idx=3D2, env=
-=3D0x565355ca0140)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/softmmu_template.h:310
-  #2  0x0000565354f621b2 in helper_le_stl_mmu (env=3D0x565355ca0140, addr=
-=3D<optimized out>, val=3D0, oi=3D34, retaddr=3D140487132809203)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/softmmu_template.h:310
-  #3  0x00007fc5b5a587f3 in code_gen_buffer ()
-  #4  0x0000565354f75fd0 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x7fc=
-5b5a5aa40 <code_gen_buffer+12266006>) at /home/jermar/software/HelenOS/hele=
-nos.git/contrib/qemu/qemu-3.1.0/accel/tcg/cpu-exec.c:171
-  #5  0x0000565354f75fd0 in cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>=
-, last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D0x7fc5b5a5aa40=
- <code_gen_buffer+12266006>)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/jermar/software/HelenOS/helenos.git/cont=
-rib/qemu/qemu-3.1.0/accel/tcg/cpu-exec.c:615
-  #6  0x0000565354f75fd0 in cpu_exec (cpu=3Dcpu@entry=3D0x565355c97e90) at =
-/home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/accel/tcg=
-/cpu-exec.c:725
-  #7  0x0000565354f33b1f in tcg_cpu_exec (cpu=3D0x565355c97e90) at /home/je=
-rmar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/cpus.c:1429
-  #8  0x0000565354f35e83 in qemu_tcg_cpu_thread_fn (arg=3D0x565355c97e90) a=
-t /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3.1.0/cpus.c:=
-1733
-  #9  0x0000565354f35e83 in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x565=
-355c97e90) at /home/jermar/software/HelenOS/helenos.git/contrib/qemu/qemu-3=
-.1.0/cpus.c:1707
-  #10 0x00005653552ec5da in qemu_thread_start (args=3D<optimized out>) at u=
-til/qemu-thread-posix.c:498
-  #11 0x00007fc5b858a58e in start_thread () at /lib64/libpthread.so.0
-  #12 0x00007fc5b84b96a3 in clone () at /lib64/libc.so.6
-
-  Another symptom that occurs more often than this crash is that the
-  guest hangs while waiting for another CPU to complete a cross-CPU
-  call. Disabling MTTCG makes both symptoms go away.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811244/+subscriptions
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
