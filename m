@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50241)
+Received: from eggs.gnu.org ([209.51.188.92]:51479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=9126ffe88=Paul.Durrant@citrix.com>)
-	id 1gjkAd-0006nE-Dg
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:19:49 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gjkBz-0007g2-Ux
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:21:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=9126ffe88=Paul.Durrant@citrix.com>)
-	id 1gjkAa-00013f-8l
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:19:47 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Wed, 16 Jan 2019 12:19:40 +0000
-Message-ID: <0dbd67c55295400980f87a191fc5d22c@AMSPEX02CL03.citrite.net>
-References: <20190116121350.23863-1-alex.bennee@linaro.org>
-In-Reply-To: <20190116121350.23863-1-alex.bennee@linaro.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1gjkBt-0004W8-OU
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:21:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41664)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjkBr-0004NS-5Q
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:21:04 -0500
+Date: Wed, 16 Jan 2019 13:20:46 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190116132046.042a99ae@redhat.com>
+In-Reply-To: <b69a850b-35a4-6258-051d-573a2970e409@redhat.com>
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-11-git-send-email-imammedo@redhat.com>
+	<15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
+	<20190116113227.47ebdea2@redhat.com>
+	<314cffa2-f153-011a-9c6e-01e94c73590a@redhat.com>
+	<b69a850b-35a4-6258-051d-573a2970e409@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] hw/block/xen: use proper format string for
- printing sectors
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 10/14] tests: acpi: ignore SMBIOS tests
+ when UEFI firmware is used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +32,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?J0FsZXggQmVubsOpZSc=?= <alex.bennee@linaro.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin
-	Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:Block layer core" <qemu-block@nongnu.org>, =?utf-8?B?J1BoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpJw==?= <philmd@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1E?= =?UTF-8?B?YXVkw6k=?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGV4IEJlbm7DqWUgW21haWx0
-bzphbGV4LmJlbm5lZUBsaW5hcm8ub3JnXQ0KPiBTZW50OiAxNiBKYW51YXJ5IDIwMTkgMTI6MTQN
-Cj4gVG86IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZw0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUu
-b3JnOyBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+OyBTdGVmYW5vDQo+IFN0
-YWJlbGxpbmkgPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+OyBBbnRob255IFBlcmFyZA0KPiA8YW50
-aG9ueS5wZXJhcmRAY2l0cml4LmNvbT47IFBhdWwgRHVycmFudCA8UGF1bC5EdXJyYW50QGNpdHJp
-eC5jb20+OyBLZXZpbg0KPiBXb2xmIDxrd29sZkByZWRoYXQuY29tPjsgTWF4IFJlaXR6IDxtcmVp
-dHpAcmVkaGF0LmNvbT47IG9wZW4gbGlzdDpYODYNCj4gPHhlbi1kZXZlbEBsaXN0cy54ZW5wcm9q
-ZWN0Lm9yZz47IG9wZW4gbGlzdDpCbG9jayBsYXllciBjb3JlIDxxZW11LQ0KPiBibG9ja0Bub25n
-bnUub3JnPg0KPiBTdWJqZWN0OiBbUEFUQ0hdIGh3L2Jsb2NrL3hlbjogdXNlIHByb3BlciBmb3Jt
-YXQgc3RyaW5nIGZvciBwcmludGluZw0KPiBzZWN0b3JzDQo+IA0KPiBUaGUgJWx1IGZvcm1hdCBz
-dHJpbmcgaXMgZGlmZmVyZW50IGRlcGVuZGluZyBvbiB0aGUgaG9zdCBhcmNoaXRlY3R1cmUNCj4g
-d2hpY2ggY2F1c2VzIGJ1aWxkcyBsaWtlIHRoZSBkZWJpYW4tYXJtaGYtY3Jvc3MgYnVpbGQgdG8g
-ZmFpbC4gVXNlIHRoZQ0KPiBjb3JyZWN0IFBSaTY0IGZvcm1hdCBzdHJpbmcuDQo+IA0KPiBTaWdu
-ZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+DQoNClRoaXMg
-ZG9lcyB0aGUgc2FtZSB0aGluZyBhcyAieGVuOiBGaXggZm9ybWF0IHN0cmluZyIgZnJvbSBQaGls
-aXBwZSwgYnV0IHRoaXMgdmFyaWFudCBpcyBiZXR0ZXIuLi4NCg0KUmV2aWV3ZWQtYnk6IFBhdWwg
-RHVycmFudCA8cGF1bC5kdXJyYW50QGNpdHJpeC5jb20+DQoNCj4gLS0tDQo+ICBody9ibG9jay94
-ZW4tYmxvY2suYyB8IDIgKy0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBk
-ZWxldGlvbigtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2h3L2Jsb2NrL3hlbi1ibG9jay5jIGIvaHcv
-YmxvY2sveGVuLWJsb2NrLmMNCj4gaW5kZXggYmUyOGI2MzQ0Mi4uYTYzNjQ4N2IzZSAxMDA2NDQN
-Cj4gLS0tIGEvaHcvYmxvY2sveGVuLWJsb2NrLmMNCj4gKysrIGIvaHcvYmxvY2sveGVuLWJsb2Nr
-LmMNCj4gQEAgLTIxNSw3ICsyMTUsNyBAQCBzdGF0aWMgdm9pZCB4ZW5fYmxvY2tfcmVhbGl6ZShY
-ZW5EZXZpY2UgKnhlbmRldiwgRXJyb3INCj4gKiplcnJwKQ0KPiANCj4gICAgICB4ZW5fZGV2aWNl
-X2JhY2tlbmRfcHJpbnRmKHhlbmRldiwgInNlY3Rvci1zaXplIiwgIiV1IiwNCj4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIGNvbmYtPmxvZ2ljYWxfYmxvY2tfc2l6ZSk7DQo+IC0gICAg
-eGVuX2RldmljZV9iYWNrZW5kX3ByaW50Zih4ZW5kZXYsICJzZWN0b3JzIiwgIiVsdSIsDQo+ICsg
-ICAgeGVuX2RldmljZV9iYWNrZW5kX3ByaW50Zih4ZW5kZXYsICJzZWN0b3JzIiwgIiUiUFJJaTY0
-LA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYmxrX2dldGxlbmd0aChjb25mLT5i
-bGspIC8NCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbmYtPmxvZ2ljYWxfYmxv
-Y2tfc2l6ZSk7DQo+IA0KPiAtLQ0KPiAyLjE3LjENCg0K
+On Wed, 16 Jan 2019 12:09:03 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
+
+> On 01/16/19 12:07, Laszlo Ersek wrote:
+> > +Gerd
+> > 
+> > On 01/16/19 11:32, Igor Mammedov wrote:  
+> >> On Tue, 15 Jan 2019 21:31:54 +0100
+> >> Laszlo Ersek <lersek@redhat.com> wrote:
+> >>  
+> >>> On 01/15/19 16:41, Igor Mammedov wrote:  
+> >>>> once FW provides a pointer to SMBIOS entry point like it does for
+> >>>> RSDP it should be possible to enable this one the same way.    
+> >>>
+> >>> Good point, I didn't think of SMBIOS.
+> >>>
+> >>> We have the following options:
+> >>>
+> >>> (1) Use just one "test support" structure, and add more fields (such as
+> >>> the SMBIOS entry point) to it, beyond the RSDP1.0/RSDP2.0. For this, we
+> >>> should also introduce a "size" field to the table, so we don't have to
+> >>> extend the table between firmware and QEMU in lock-step.
+> >>>
+> >>> (2) Use a different table (with a different GUID) for exposing the
+> >>> SMBIOS entry point.
+> >>>
+> >>> On the firmware side, (1) would be more work now, but it would keep
+> >>> things simpler (and better separated) in the future. (2) would be more
+> >>> lazy ^W convenient now, but it would introduce more churn / possibly
+> >>> some code duplication in the future.
+> >>>
+> >>> In QEMU, which one would you prefer?  
+> >> I'd prefer #1 to minimize # of memory scans.
+> >> However with size (i.e. implicit versioning) and who know what else in
+> >> the future complexity grows up and dependency this approach causes
+> >> between firmware and QEMU (I dislike special build instead of reusing
+> >> shipped images).
+> >>
+> >> So I've dug a little bit into the history why we've chosen including
+> >> structure into the firmware itself instead of writing EFI application
+> >> as part of QEMU that would provide the same test structure but won't
+> >> require special firmware build.
+> >> If I sum it up, it was issue with distros are shipping (if they do it at all)
+> >> only a version that matches distro's architecture and a need for cross
+> >> compiling EFI test app.
+> >>
+> >> Could we revisit EFI app approach (I'd prefer it over firwmare hack if it's
+> >> possible)? We can try to avoid dependency on gnu-efi and cross compiling on
+> >> regular builds and ship along with efi app source code several prebuild app
+> >> binaries (boot disk images), that one would rebuild only when efi app
+> >> is changed, and it could be done manually (the same like special fw build
+> >> but contained withing QEMU). As for gnu-efi, is it possible to use striped
+> >> down gnu-efi stubs to drop external library dependency, something along of
+> >> lines https://github.com/tqh/efi-example ?  
+> > 
+> > If it is permissible to require the affected QEMU maintainers to
+> > *manually* rebuild the UEFI binary on their workstations, whenever the
+> > source code for the UEFI app changes, then the solution is a lot easier
+> > indeed.
+I expect EFI app won't change often based on how much we've changed similar
+counterpart for BIOS version. So it probably ok, due to low load and we
+won't have to waste resources on rebuilding static thing over and over again
+on every qemu build (I'm horrified how much longer QEMU build would become
+if we would have to pull in complex dependencies to build it).
+
+> > In particular, for this approach, we don't even need gnu-efi. (Because,
+> > personally, I would strongly prefer to write the UEFI application with
+> > the edk2 framework.) For a while now, edk2 has supported "multiple
+> > workspaces":
+> > 
+> > https://github.com/tianocore/tianocore.github.io/wiki/Multiple_Workspace
+> > 
+> > and as a result, it is possible to build the necessary UEFI app from:
+> > - an edk2 checkout that the maintainer has "somewhere" on their disk,
+> > - and the UEFI app source code that is contained in a QEMU checkout that
+> > the maintainer has "somewhere else" on their disk.
+> > 
+> > This approach allows the UEFI app source to live in the QEMU tree, and
+> > the affected maintainer(s) would be personally responsible for setting
+> > up their edk2 clones, and compilers. (The edk2 clone could even be a
+> > submodule of QEMU, for example at roms/edk2.) For example,
+> > "roms/Makefile" already calls an external EFIROM utility (also from
+> > edk2) in order to build the combined iPXE option ROMs.
+> > 
+> > And yes, we could turn the UEFI binaries into bootable ISO images at once.
+> > 
+> > I'll try to post some patches soon (or not so soon). I think the app's
+> > source code, and the edk2 submodule, should live under roms/, and the
+> > bootable images should live under pc-bios/.
+> > 
+> > (In fact we could use this opportunity to build & bundle OVMF itself...
+> > not sure if that's in scope for now. Gerd, what's your take?)  
+> 
+> Oh, I should add: the UEFI app in question could be built without
+> pulling in any OpenSSL bits; OVMF itself can't be built like that (it
+> now has a hard dependency on OpenSSL). This might matter from a
+> licensing/bundling perspective.
+That's why I've suggested non EDK2 variant, as we don't need very much
+from it and its license looks BDS like and it's very simple to build
+pretty much for everyone.
+Dealing with EDK2 to rebuild EFI is rather daunting prospect
+(at least from my point of view so I'd try to avoid it if possible)
+
+
+> 
+> Thanks,
+> Laszlo
