@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35432)
+Received: from eggs.gnu.org ([209.51.188.92]:38909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gji2k-00017r-3U
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:03:30 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gji3b-0001fI-66
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:04:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gji2g-00089v-HV
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:03:28 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52184)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gji2d-0007zy-18
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:03:23 -0500
-Received: by mail-wm1-f68.google.com with SMTP id b11so1310103wmj.1
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 02:03:20 -0800 (PST)
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-4-philmd@redhat.com>
-	<875zuqjea7.fsf@dusky.pond.sub.org>
-	<403ad2e4-3282-051c-1ff5-8a3a23899293@redhat.com>
-	<be75e72a-9f54-c9b5-4a1f-e87e28df8ba5@redhat.com>
-	<87sgxtatod.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4b24723e-5a27-f25f-76c1-f2f4e94757ba@redhat.com>
-Date: Wed, 16 Jan 2019 11:03:15 +0100
+	(envelope-from <yuval.shaia@oracle.com>) id 1gji3M-0003ME-D6
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:04:15 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:40826)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gji3L-0002sn-Vx
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:04:08 -0500
+Date: Wed, 16 Jan 2019 12:03:58 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20190116100357.GA7260@lap1>
+References: <20190114141006.1841-1-yuval.shaia@oracle.com>
+	<ad603032-6658-a1db-06fc-80ffa4dbd682@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87sgxtatod.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/15] hw/ssi: Remove SSIBus from
- "qemu/typedefs.h"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <ad603032-6658-a1db-06fc-80ffa4dbd682@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/rdma: Verify that ptr is not NULL
+ before freeing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +30,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
 
-On 16/01/19 09:33, Markus Armbruster wrote:
-> What problem exactly are we trying to solve here?
-> To the best of my knowledge, typedefs.h has been working just fine for
-> us, and I can't see why it shouldn't continue to work just fine.
+On Mon, Jan 14, 2019 at 04:11:22PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Hi Yuval,
+>=20
+> On 1/14/19 3:10 PM, Yuval Shaia wrote:
+> > Make sure objects are not NULL before calling to non-nulll-safe
+>=20
+> null
 
-Patches don't have to solve problems.  They can just help long-term
-maintainability, highlight code smells, etc.  Nobody is saying
-typedefs.h doesn't work.  But it's a tool, and including headers from
-headers is also a tool.  Each tool has its purpose and it is useful to
-question what are the exact purposes of the tools.
+will fix
 
-typedefs.h is useful to avoid rebuilding the world too often if a type
-is used many times as a pointer, but rarely as a struct and rarely has
-functions called on its instances.  This is already a relatively rare
-case, but here we're talking about files that are included less than 20
-times; many of which also already include hw/ssi/ssi.h for their own
-business.  So we're hardly rebuilding anything more often, also because
-hw/ssi/ssi.h is not really changing fast.
+>=20
+> > destructors.
+> >=20
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >  hw/rdma/rdma_backend.c | 6 ++++--
+> >  hw/rdma/rdma_rm.c      | 7 ++++++-
+> >  2 files changed, 10 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> > index b49edaacaf..3ee5172c96 100644
+> > --- a/hw/rdma/rdma_backend.c
+> > +++ b/hw/rdma/rdma_backend.c
+> > @@ -1066,8 +1066,10 @@ static void mad_fini(RdmaBackendDev *backend_d=
+ev)
+> >      pr_dbg("Stopping MAD\n");
+> >      disable_rdmacm_mux_async(backend_dev);
+> >      qemu_chr_fe_disconnect(backend_dev->rdmacm_mux.chr_be);
+> > -    qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
+> > -    qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
+> > +    if (backend_dev->recv_mads_list.list) {
+>=20
+> This is only reachable when the backend didn't success at initializing,
+> right?
 
-typedefs.h is also useful to avoid circular header inclusions.  Here
-hw/ssi/ssi.h is clearly a toplevel include for the SSI subsystem.  I
-agree that includes in a headers _can_ be painful, but sometimes they
-also tell you a hierarchy of what uses what.  typedefs.h doesn't;
-forward struct declarations also do, and I all but dislike using them in
-headers (Thomas, can you send v2 of the HACKING patch?).
+Yes, just to cover the case where fini() was called even when init() fail=
+s.
 
-Therefore, typedefs.h is not particularly useful for SSIBus.  It doesn't
-hurt much, if at all, to leave it in.  On the other hand, it also
-doesn't hurt much if at all to remove it; it makes the SSI code a very
-tiny little bit more self contained.
-
-It may be that it's not particularly useful just because SSI is small;
-for example I2CBus is also in typedefs.h and it's used a lot more, maybe
-one day SSIBus will be the same.  In doubt, let's drop the patch---but I
-think it's useful to have the discussion and there are cases that are
-not controversial at all in Philippe's series.
-
-Paolo
+>=20
+> > +        qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list))=
+;
+> > +        qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
+> > +    }
+> >  }
+> > =20
+> >  int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+> > diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> > index f5b1295890..8bf241e91f 100644
+> > --- a/hw/rdma/rdma_rm.c
+> > +++ b/hw/rdma/rdma_rm.c
+> > @@ -41,6 +41,9 @@ static inline void res_tbl_init(const char *name, R=
+dmaRmResTbl *tbl,
+> > =20
+> >  static inline void res_tbl_free(RdmaRmResTbl *tbl)
+> >  {
+> > +    if (!tbl->bitmap) {
+> > +        return;
+> > +    }
+> >      qemu_mutex_destroy(&tbl->lock);
+> >      g_free(tbl->tbl);
+> >      g_free(tbl->bitmap);
+> > @@ -655,5 +658,7 @@ void rdma_rm_fini(RdmaDeviceResources *dev_res, R=
+dmaBackendDev *backend_dev,
+> >      res_tbl_free(&dev_res->cq_tbl);
+> >      res_tbl_free(&dev_res->pd_tbl);
+> > =20
+> > -    g_hash_table_destroy(dev_res->qp_hash);
+> > +    if (dev_res->qp_hash) {
+> > +        g_hash_table_destroy(dev_res->qp_hash);
+> > +    }
+> >  }
+> >=20
