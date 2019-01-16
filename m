@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51084)
+Received: from eggs.gnu.org ([209.51.188.92]:52057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gjldl-0005eK-QX
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:53:58 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gjlee-0006FZ-U9
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:54:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gjldk-0008H7-Ji
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:53:57 -0500
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
-	<20181229122027.42245-7-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <839f19ba-2e2e-0cc7-8abd-321deaf2a47a@redhat.com>
-Date: Wed, 16 Jan 2019 14:48:22 +0100
+	(envelope-from <stefanha@gmail.com>) id 1gjlec-0001ZD-KX
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:54:51 -0500
+Date: Wed, 16 Jan 2019 13:54:44 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190116135444.GA16898@stefanha-x1.localdomain>
+References: <cover.1547475602.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20181229122027.42245-7-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2g3OsvgNRDwvRlfI5hFZhP6igqi7pNbwL"
-Subject: Re: [Qemu-devel] [PATCH v5 06/11] iotests: prepare 055 to graph
- changes during backup job
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tThc/1wpZn/ma/RB"
+Content-Disposition: inline
+In-Reply-To: <cover.1547475602.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] Acquire the AioContext during
+ _realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2g3OsvgNRDwvRlfI5hFZhP6igqi7pNbwL
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com,
- den@openvz.org, eblake@redhat.com, jsnow@redhat.com
-Message-ID: <839f19ba-2e2e-0cc7-8abd-321deaf2a47a@redhat.com>
-Subject: Re: [PATCH v5 06/11] iotests: prepare 055 to graph changes during
- backup job
-References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
- <20181229122027.42245-7-vsementsov@virtuozzo.com>
-In-Reply-To: <20181229122027.42245-7-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+
+--tThc/1wpZn/ma/RB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 29.12.18 13:20, Vladimir Sementsov-Ogievskiy wrote:
-> Backup will append fleecing-hook node above source node, so, we can't
-> resume by device name (because resume don't search recursively through
-> backing chain).
+On Mon, Jan 14, 2019 at 04:23:58PM +0200, Alberto Garcia wrote:
+> This series acquires the AioContext in the _realize() functions of
+> several devices before making use of their block backends. This fixes
+> at least a couple of crashes (in virtio-blk and scsi). The other
+> devices don't currently support iothreads so there's no crashes.
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  tests/qemu-iotests/055 | 23 +++++++++++++----------
->  1 file changed, 13 insertions(+), 10 deletions(-)
+> Berto
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+My assumption has been that drives are in the main loop AioContext until
+the device model (e.g. virtio-blk) decides to move them into the
+IOThread configured by the user.
 
+(And when the VM is stopped or the device is removed, the drive is moved
+back into the main loop AioContext by the device.)
 
---2g3OsvgNRDwvRlfI5hFZhP6igqi7pNbwL
+The x-blockdev-set-iothread command is for low-level tests so I don't
+expect users to invoke it.  So I'm not sure which real-world scenario is
+being tested here?
+
+This patch series makes virtio-blk and virtio-scsi more robust, although
+I haven't checked what happens if the drive is attached to a different
+IOThread than the device - will the switchover work?
+
+What I'm unclear about is why fdc, ide, usb-msd, and nvme should worry
+about IOThreads/AioContext in .realize() since they don't support it in
+their data path.  What happens when you submit I/O requests to devices
+configured like this?  I guess they would crash or hit assertion
+failures since they invoke blk_aio_*() APIs from outside the appropriate
+AioContext.
+
+Maybe fdc and friends should forbid this scenario:
+
+  /* Fail if @blk is attached to an IOThread */
+  static bool blk_check_main_aio_context(BlockBackend *blk, Error **errp) {
+      if (blk_get_aio_context(blk) !=3D qemu_get_aio_context()) {
+          error_setg(errp, "Device does not support iothreads");
+          return false;
+      }
+      return true;
+  }
+
+  ...in a realize() function...
+  if (!blk_check_main_aio_context(blk, errp)) {
+      return;
+  }
+
+--tThc/1wpZn/ma/RB
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw/NiYACgkQ9AfbAGHV
-z0B+ywf/bDf06vzAadC/SHWOFoHm06WVlQl84YMhm0unp3pyBr5liByBmlSrNuRP
-qhp/UMOjvqVT5wTW3Tt9RTcj4qoFwHrHZXxPth0aafDHaLYy7oP/9Mjsl5fmdLTa
-8ogHH7AVfEQQOGDqy6/dNarEhvwCUbN26Xf8AyCk8/xVjyUxzZOL5yAC6NNjNElQ
-GiDKC4L9Wv3q02zlr/Hv1nPZYHnv0nO+shZP7QtKhjJscp1HxMWg0E8Da22c8I+G
-yq4Ktnm2AhTIVbNkOTOviP5KVBluy/IC/R6ZglJxdJVlQ9AiEGrpcCmgcqHm9hFm
-AwdBL8qR8yfsjh2G+4RiJ7fcNrRk4A==
-=HIjJ
+iQEcBAEBAgAGBQJcPzejAAoJEJykq7OBq3PICLsH/j+m+/a5pZw+/C19Q3jlRbgg
+9q412py6hCAkZBBtNmMOImvzopLbqz44CHO7kAcQy/tzrNTV95zgd4FzFha/FWZu
+ZUkShBHuy490JsfC+U/Wtx9ZM1o0oLxYEy+BD+KUDSkzbltzbUdHPcV9wdH3HOS4
+5+RPkxcfPvsmcR1ZzAYJ3WKYbLWa5jRB+FvCCd2QsASn2LMY9Y0wWIFmXMqz+W/J
+fX2KXEEcNVq1WESAPa+GafDhNlH8q6H+odmo1j1ce0NQSpB1mWKj/lIIPKND9Md5
+kvwpZvt9FEFL+ApT2DhqfcKFj/2HO5J5lDourisTWtwQoKdcNSR/OJclFG4E6TU=
+=YPDh
 -----END PGP SIGNATURE-----
 
---2g3OsvgNRDwvRlfI5hFZhP6igqi7pNbwL--
+--tThc/1wpZn/ma/RB--
