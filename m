@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50714)
+Received: from eggs.gnu.org ([209.51.188.92]:51084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gjld8-0005JR-23
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:53:18 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gjldl-0005eK-QX
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:53:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gjld7-0007JY-7h
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:53:17 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20190108170655.29766-7-vsementsov@virtuozzo.com>
-References: <20190108170655.29766-1-vsementsov@virtuozzo.com>
-	<20190108170655.29766-7-vsementsov@virtuozzo.com>
-Date: Wed, 16 Jan 2019 14:53:13 +0100
-Message-ID: <w51sgxswvxy.fsf@maestria.local.igalia.com>
+	(envelope-from <mreitz@redhat.com>) id 1gjldk-0008H7-Ji
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 08:53:57 -0500
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-7-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <839f19ba-2e2e-0cc7-8abd-321deaf2a47a@redhat.com>
+Date: Wed, 16 Jan 2019 14:48:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 6/9] qcow2: qcow2_co_preadv: improve
- locking
+In-Reply-To: <20181229122027.42245-7-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2g3OsvgNRDwvRlfI5hFZhP6igqi7pNbwL"
+Subject: Re: [Qemu-devel] [PATCH v5 06/11] iotests: prepare 055 to graph
+ changes during backup job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
-On Tue 08 Jan 2019 06:06:52 PM CET, Vladimir Sementsov-Ogievskiy wrote:
-> @@ -1891,39 +1892,38 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
->          qemu_iovec_reset(&hd_qiov);
->          qemu_iovec_concat(&hd_qiov, qiov, bytes_done, cur_bytes);
->  
-> +        if (ret == QCOW2_CLUSTER_ZERO_PLAIN ||
-> +            ret == QCOW2_CLUSTER_ZERO_ALLOC ||
-> +            (ret == QCOW2_CLUSTER_UNALLOCATED && !bs->backing))
-> +        {
-> +            /* No sense in releasing the lock */
-> +
-> +            qemu_iovec_memset(&hd_qiov, 0, 0, cur_bytes);
-> +
-> +            bytes -= cur_bytes;
-> +            offset += cur_bytes;
-> +            bytes_done += cur_bytes;
-> +            continue;
-> +        }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2g3OsvgNRDwvRlfI5hFZhP6igqi7pNbwL
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com,
+ den@openvz.org, eblake@redhat.com, jsnow@redhat.com
+Message-ID: <839f19ba-2e2e-0cc7-8abd-321deaf2a47a@redhat.com>
+Subject: Re: [PATCH v5 06/11] iotests: prepare 055 to graph changes during
+ backup job
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+ <20181229122027.42245-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20181229122027.42245-7-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Maybe that was just me, but I got confused by the "No sense in releasing
-the lock" thinking that it referred to the memset() call.
+On 29.12.18 13:20, Vladimir Sementsov-Ogievskiy wrote:
+> Backup will append fleecing-hook node above source node, so, we can't
+> resume by device name (because resume don't search recursively through
+> backing chain).
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/055 | 23 +++++++++++++----------
+>  1 file changed, 13 insertions(+), 10 deletions(-)
 
-What you're trying to say is that it doesn't make sense to release the
-lock while you only get zero / unallocated clusters only to lock it
-again at the next iteration of the loop.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-I think that comment may make sense when you think about the code
-changes that you are doing, but when you read the actual resulting code
-it's fairly obvious that you don't need to touch the lock there.
 
-So I'd rather remove that comment.
+--2g3OsvgNRDwvRlfI5hFZhP6igqi7pNbwL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Else the patch looks good.
+-----BEGIN PGP SIGNATURE-----
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw/NiYACgkQ9AfbAGHV
+z0B+ywf/bDf06vzAadC/SHWOFoHm06WVlQl84YMhm0unp3pyBr5liByBmlSrNuRP
+qhp/UMOjvqVT5wTW3Tt9RTcj4qoFwHrHZXxPth0aafDHaLYy7oP/9Mjsl5fmdLTa
+8ogHH7AVfEQQOGDqy6/dNarEhvwCUbN26Xf8AyCk8/xVjyUxzZOL5yAC6NNjNElQ
+GiDKC4L9Wv3q02zlr/Hv1nPZYHnv0nO+shZP7QtKhjJscp1HxMWg0E8Da22c8I+G
+yq4Ktnm2AhTIVbNkOTOviP5KVBluy/IC/R6ZglJxdJVlQ9AiEGrpcCmgcqHm9hFm
+AwdBL8qR8yfsjh2G+4RiJ7fcNrRk4A==
+=HIjJ
+-----END PGP SIGNATURE-----
 
-Berto
+--2g3OsvgNRDwvRlfI5hFZhP6igqi7pNbwL--
