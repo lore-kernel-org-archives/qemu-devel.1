@@ -1,23 +1,45 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44801)
+Received: from eggs.gnu.org ([209.51.188.92]:44957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjnM1-0002pl-Nv
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:43:46 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gjnMd-0003CZ-8l
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:44:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gjnM0-0004ja-TF
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:43:45 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 16 Jan 2019 15:43:38 +0000
-Message-ID: <0aee5c7f-2503-a927-c4ec-48a93b883d43@virtuozzo.com>
-References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-19-eblake@redhat.com>
-In-Reply-To: <20190112175812.27068-19-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <21801EF021A8C24FA8F5344D4F603D54@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pmorel@linux.ibm.com>) id 1gjnMb-00058i-5G
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:44:23 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51462)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gjnMa-00057Z-Pv
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:44:21 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0GFiFPS074053
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 10:44:19 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q24cms8s0-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 10:44:18 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Wed, 16 Jan 2019 15:44:15 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <1547125207-16907-1-git-send-email-pmorel@linux.ibm.com>
+	<1547125207-16907-2-git-send-email-pmorel@linux.ibm.com>
+	<f6a5491a-1859-8e0a-7357-901d47ee8304@linux.ibm.com>
+	<20190116134011.1189b027@oc2783563651>
+	<1188d21d-3603-c291-e69b-38d341ae90f4@linux.ibm.com>
+	<20190116155011.478db4da@oc2783563651>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Wed, 16 Jan 2019 16:44:09 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 18/19] nbd/client: Work around 3.0 bug
- for listing meta contexts
+In-Reply-To: <20190116155011.478db4da@oc2783563651>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <364e925b-4839-a10d-7a86-6a0bf229f4de@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: Set the iommu region size
+ mpcifc request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +48,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Collin Walling <walling@linux.ibm.com>, thuth@redhat.com, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-MTIuMDEuMjAxOSAyMDo1OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gQ29tbWl0IDNkMDY4YWZmIGZv
-cmdvdCB0byBhZHZlcnRpc2UgYXZhaWxhYmxlIHFlbXU6IGNvbnRleHRzDQo+IHdoZW4gdGhlIGNs
-aWVudCByZXF1ZXN0cyBhIGxpc3Qgd2l0aCAwIHF1ZXJpZXMuIEZ1cnRoZXJtb3JlLA0KPiAzLjAg
-c2hpcHBlZCB3aXRoIGEgcWVtdS1pbWcgaGFjayBvZiB4LWRpcnR5LWJpdG1hcCAoY29tbWl0DQo+
-IDIxNmVlMzY1KSB0aGF0IF9zaWxlbnRseV8gYWN0cyBhcyB0aG91Z2ggdGhlIGVudGlyZSBpbWFn
-ZSBpcw0KPiBjbGVhbiBpZiBhIHJlcXVlc3RlZCBiaXRtYXAgaXMgbm90IHByZXNlbnQuICBCb3Ro
-IGJ1Z3MgaGF2ZQ0KPiBiZWVuIHJlY2VudGx5IGZpeGVkLCBzbyB0aGF0IGEgbW9kZXJuIHFlbXUg
-c2VydmVyIGdpdmVzIGZ1bGwNCj4gY29udGV4dCBvdXRwdXQgcmlnaHQgYXdheSwgYW5kIHRoZSBj
-bGllbnQgcmVmdXNlcyBhDQo+IGNvbm5lY3Rpb24gaWYgYSByZXF1ZXN0ZWQgeC1kaXJ0eS1iaXRt
-YXAgd2FzIG5vdCBmb3VuZC4NCj4gDQo+IFN0aWxsLCBpdCBpcyBsaWtlbHkgdGhhdCB0aGVyZSB3
-aWxsIGJlIHVzZXJzIHRoYXQgaGF2ZSB0bw0KPiB3b3JrIHdpdGggYSBtaXggb2Ygb2xkIGFuZCBu
-ZXcgcWVtdSB2ZXJzaW9ucywgZGVwZW5kaW5nIG9uDQo+IHdoaWNoIGZlYXR1cmVzIGdldCBiYWNr
-cG9ydGVkIHdoZXJlLCBhdCB3aGljaCBwb2ludCBiZWluZw0KPiBhYmxlIHRvIHJlbHkgb24gJ3Fl
-bXUtaW1nIC0tbGlzdCcgb3V0cHV0IHRvIGtub3cgZm9yIHN1cmUNCj4gd2hldGhlciBhIGdpdmVu
-IE5CRCBleHBvcnQgaGFzIHRoZSBkZXNpcmVkIGRpcnR5IGJpdG1hcCBpcw0KPiBtdWNoIG5pY2Vy
-IHRoYW4gYmxpbmRseSBjb25uZWN0aW5nIGFuZCByaXNraW5nIHRoYXQgdGhlDQo+IGVudGlyZSBp
-bWFnZSBtYXkgYXBwZWFyIGNsZWFuLiAgV2UgY2FuIG1ha2Ugb3VyIC0tbGlzdCBjb2RlDQo+IHNt
-YXJ0IGVub3VnaCB0byB3b3JrIGFyb3VuZCBidWdneSBzZXJ2ZXJzIGJ5IHRyYWNraW5nDQo+IHdo
-ZXRoZXIgd2UndmUgc2VlbiBhbnkgcWVtdTogcmVwbGllcyBpbiB0aGUgb3JpZ2luYWwgMC1xdWVy
-eQ0KPiBsaXN0OyBpZiBub3QsIHJlcGVhdCB3aXRoIGEgc2luZ2xlIHF1ZXJ5IG9uICJxZW11OiIg
-KHdoaWNoDQo+IG1heSBzdGlsbCBoYXZlIG5vIHJlcGxpZXMsIGJ1dCB0aGVuIHdlIGtub3cgZm9y
-IHN1cmUgd2UNCj4gZGlkbid0IHRyaXAgdXAgb24gdGhlIHNlcnZlciBidWcpLg0KPiANCj4gU2ln
-bmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IE1lc3NhZ2UtSWQ6
-IDwyMDE4MTIxNTEzNTMyNC4xNTI2MjktMjItZWJsYWtlQHJlZGhhdC5jb20+DQoNClJldmlld2Vk
-LWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5j
-b20+DQoNCj4gLS0tDQo+ICAgbmJkL2NsaWVudC5jIHwgMTkgKysrKysrKysrKysrKysrKysrKw0K
-PiAgIDEgZmlsZSBjaGFuZ2VkLCAxOSBpbnNlcnRpb25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEv
-bmJkL2NsaWVudC5jIGIvbmJkL2NsaWVudC5jDQo+IGluZGV4IDIwMDFlNmU4MTYwLi42NGYzZTQ1
-ZWRkNCAxMDA2NDQNCj4gLS0tIGEvbmJkL2NsaWVudC5jDQo+ICsrKyBiL25iZC9jbGllbnQuYw0K
-PiBAQCAtMjEsNiArMjEsNyBAQA0KPiAgICNpbmNsdWRlICJxYXBpL2Vycm9yLmgiDQo+ICAgI2lu
-Y2x1ZGUgInRyYWNlLmgiDQo+ICAgI2luY2x1ZGUgIm5iZC1pbnRlcm5hbC5oIg0KPiArI2luY2x1
-ZGUgInFlbXUvY3V0aWxzLmgiDQo+IA0KPiAgIC8qIERlZmluaXRpb25zIGZvciBvcGFxdWUgZGF0
-YSB0eXBlcyAqLw0KPiANCj4gQEAgLTgyOCw2ICs4MjksOCBAQCBzdGF0aWMgaW50IG5iZF9saXN0
-X21ldGFfY29udGV4dHMoUUlPQ2hhbm5lbCAqaW9jLA0KPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBFcnJvciAqKmVycnApDQo+ICAgew0KPiAgICAgICBpbnQgcmV0Ow0KPiAr
-ICAgIGludCBzZWVuX2FueSA9IGZhbHNlOw0KPiArICAgIGludCBzZWVuX3FlbXUgPSBmYWxzZTsN
-Cj4gDQo+ICAgICAgIGlmIChuYmRfc2VuZF9vbmVfbWV0YV9jb250ZXh0KGlvYywgTkJEX09QVF9M
-SVNUX01FVEFfQ09OVEVYVCwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-aW5mby0+bmFtZSwgTlVMTCwgZXJycCkgPCAwKSB7DQo+IEBAIC04MzksOSArODQyLDI1IEBAIHN0
-YXRpYyBpbnQgbmJkX2xpc3RfbWV0YV9jb250ZXh0cyhRSU9DaGFubmVsICppb2MsDQo+IA0KPiAg
-ICAgICAgICAgcmV0ID0gbmJkX3JlY2VpdmVfb25lX21ldGFfY29udGV4dChpb2MsIE5CRF9PUFRf
-TElTVF9NRVRBX0NPTlRFWFQsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICZjb250ZXh0LCBOVUxMLCBlcnJwKTsNCj4gKyAgICAgICAgaWYgKHJldCA9PSAw
-ICYmIHNlZW5fYW55ICYmICFzZWVuX3FlbXUpIHsNCj4gKyAgICAgICAgICAgIC8qDQo+ICsgICAg
-ICAgICAgICAgKiBXb3JrIGFyb3VuZCBxZW11IDMuMCBidWc6IHRoZSBzZXJ2ZXIgZm9yZ290IHRv
-IHNlbmQNCj4gKyAgICAgICAgICAgICAqICJxZW11OiIgcmVwbGllcyB0byAwIHF1ZXJpZXMuIElm
-IHdlIHNhdyBhdCBsZWFzdCBvbmUNCj4gKyAgICAgICAgICAgICAqIHJlcGx5IChwcm9iYWJseSBi
-YXNlOmFsbG9jYXRpb24pLCBidXQgbm9uZSBvZiB0aGVtIHdlcmUNCg0KaWYgd2UgYXJlIHNheWlu
-ZyBhYm91dCAzLjAsIGl0IGlzIGJhc2U6YWxsb2NhdGlvbiBmb3Igc3VyZSwgaXNuJ3QgaXQ/DQoN
-Cj4gKyAgICAgICAgICAgICAqIHFlbXU6LCB0aGVuIHJ1biBhIG1vcmUgc3BlY2lmaWMgcXVlcnkg
-dG8gbWFrZSBzdXJlLg0KPiArICAgICAgICAgICAgICovDQo+ICsgICAgICAgICAgICBzZWVuX3Fl
-bXUgPSB0cnVlOw0KPiArICAgICAgICAgICAgaWYgKG5iZF9zZW5kX29uZV9tZXRhX2NvbnRleHQo
-aW9jLCBOQkRfT1BUX0xJU1RfTUVUQV9DT05URVhULA0KPiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgaW5mby0+bmFtZSwgInFlbXU6IiwgZXJycCkgPCAwKSB7DQo+
-ICsgICAgICAgICAgICAgICAgcmV0dXJuIC0xOw0KPiArICAgICAgICAgICAgfQ0KPiArICAgICAg
-ICAgICAgY29udGludWU7DQo+ICsgICAgICAgIH0NCj4gICAgICAgICAgIGlmIChyZXQgPD0gMCkg
-ew0KPiAgICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ICAgICAgICAgICB9DQo+ICsgICAgICAg
-IHNlZW5fYW55ID0gdHJ1ZTsNCj4gKyAgICAgICAgc2Vlbl9xZW11IHw9IHN0cnN0YXJ0KGNvbnRl
-eHQsICJxZW11OiIsIE5VTEwpOw0KPiAgICAgICAgICAgaW5mby0+Y29udGV4dHMgPSBnX3JlbmV3
-KGNoYXIgKiwgaW5mby0+Y29udGV4dHMsICsraW5mby0+bl9jb250ZXh0cyk7DQo+ICAgICAgICAg
-ICBpbmZvLT5jb250ZXh0c1tpbmZvLT5uX2NvbnRleHRzIC0gMV0gPSBjb250ZXh0Ow0KPiAgICAg
-ICB9DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 16/01/2019 15:50, Halil Pasic wrote:
+> On Wed, 16 Jan 2019 15:16:44 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>=20
+>> On 16/01/2019 13:40, Halil Pasic wrote:
+>>> On Tue, 15 Jan 2019 10:35:42 -0500
+>>> Collin Walling <walling@linux.ibm.com> wrote:
+>>>
+>>>> On 1/10/19 8:00 AM, Pierre Morel wrote:
+>>>>> The size of the accessible iommu memory region in the guest
+>>>>> is given to the IOMMU by the guest through the mpcifc request
+>>>>> specifying the PCI Base Address and the PCI Address Limit.
+>>>>>
+>>>>> Let set the size of the IOMMU region to:
+>>>>>        (PCI Address Limit) - (PCI Base Address) + 1.
+>>>>>
+>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>>> ---
+>>>>>     hw/s390x/s390-pci-bus.c | 2 +-
+>>>>>     1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>>>>> index 69e0671..e97696a 100644
+>>>>> --- a/hw/s390x/s390-pci-bus.c
+>>>>> +++ b/hw/s390x/s390-pci-bus.c
+>>>>> @@ -660,7 +660,7 @@ void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
+>>>>>         char *name =3D g_strdup_printf("iommu-s390-%04x", iommu->pb=
+dev->uid);
+>>>>>         memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->io=
+mmu_mr),
+>>>>>                                  TYPE_S390_IOMMU_MEMORY_REGION, OBJ=
+ECT(&iommu->mr),
+>>>>> -                             name, iommu->pal + 1);
+>>>>> +                             name, iommu->pal - iommu->pba + 1);
+>>>
+>>>   From the the look of this, I would say we basically used the addres=
+s
+>>> denoting the end of the region as the size of the region. This smells
+>>> like a bug to me, but the commit message and the title ain't clear ab=
+out
+>>> this, and there is no fixes tag. Because of the latter I did some dig=
+ging
+>>> and came to commit f7c40aa "s390x/pci: fix failures of dma
+>>> map/unmap" (Yi Min Zhao, 2016-06-19) which basically did the inverse =
+of
+>>> this commit!
+>>>
+>>> My initial motivation was to check if this is stable material. But no=
+w
+>>> I'm very confused. I'm admittedly zPCI incompetent. Could some of the
+>>> people that understand what is going on help me feel better about thi=
+s
+>>> patch?
+>>>
+>>> Regards,
+>>> Halil
+>>
+>>
+>> The patch you speak about corrected the problem described in its comme=
+nt
+>> by setting the offset address of the subregion to 0, making sure
+>> VFIO_PCI works for Z but introduced a bug we did not see at that time =
+by
+>> making the subregion too large.
+>>
+>> This patch correct the bug, I can add a reference to this with:
+>> fixing: commit f7c40aa1e7feb50bc4d4bc171fa811bdd9a93e51
+>>
+>=20
+> @Connie, will you add the Fixes tag? Do we need a cc stable (since
+> broken since 2016-06-19)?
+>=20
+> @Pierre: So you say it's a bug.
+> What can go wrong because of this?
+> For example if we interpret pal as a size, I guess we could end up with
+> the memory region not fitting the guest memory,
+
+The memory region will be too large compared with what the guest required.
+
+> or? I'm still pretty
+> much in the dark about the implications of this bug.
+>=20
+> Regards,
+> Halil
+>=20
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
