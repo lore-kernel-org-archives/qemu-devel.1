@@ -1,28 +1,41 @@
-Received: from eggs.gnu.org ([209.51.188.92]:51181)
+Received: from eggs.gnu.org ([209.51.188.92]:52849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjmVC-0003rF-4u
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:49:10 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gjmWh-0004oE-8q
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:50:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjmVA-0002K1-Ct
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:49:10 -0500
-Date: Wed, 16 Jan 2019 09:48:52 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190116091801-mutt-send-email-mst@kernel.org>
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-4-philmd@redhat.com>
-	<875zuqjea7.fsf@dusky.pond.sub.org>
-	<403ad2e4-3282-051c-1ff5-8a3a23899293@redhat.com>
-	<be75e72a-9f54-c9b5-4a1f-e87e28df8ba5@redhat.com>
-	<87sgxtatod.fsf@dusky.pond.sub.org>
-	<4b24723e-5a27-f25f-76c1-f2f4e94757ba@redhat.com>
-	<20190116113455.dyl6uctl4dpaqh6v@sirius.home.kraxel.org>
-	<ad34caf3-5f1f-dffc-4aed-60bb90ba2e5f@redhat.com>
+	(envelope-from <pasic@linux.ibm.com>) id 1gjmWg-0005l5-5x
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:50:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42788)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gjmWf-0005UU-Qi
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 09:50:42 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	x0GEnGwt101716
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 09:50:23 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2q26gbrrd2-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 09:50:22 -0500
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 16 Jan 2019 14:50:18 -0000
+Date: Wed, 16 Jan 2019 15:50:11 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <1188d21d-3603-c291-e69b-38d341ae90f4@linux.ibm.com>
+References: <1547125207-16907-1-git-send-email-pmorel@linux.ibm.com>
+	<1547125207-16907-2-git-send-email-pmorel@linux.ibm.com>
+	<f6a5491a-1859-8e0a-7357-901d47ee8304@linux.ibm.com>
+	<20190116134011.1189b027@oc2783563651>
+	<1188d21d-3603-c291-e69b-38d341ae90f4@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad34caf3-5f1f-dffc-4aed-60bb90ba2e5f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 03/15] hw/ssi: Remove SSIBus from
- "qemu/typedefs.h"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20190116155011.478db4da@oc2783563651>
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: Set the iommu region size
+ mpcifc request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +44,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-block@nongnu.org, Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Collin Walling <walling@linux.ibm.com>, thuth@redhat.com, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 
-On Wed, Jan 16, 2019 at 12:49:07PM +0100, Paolo Bonzini wrote:
-> On 16/01/19 12:34, Gerd Hoffmann wrote:
-> >   Hi,
+On Wed, 16 Jan 2019 15:16:44 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> On 16/01/2019 13:40, Halil Pasic wrote:
+> > On Tue, 15 Jan 2019 10:35:42 -0500
+> > Collin Walling <walling@linux.ibm.com> wrote:
 > > 
-> >> typedefs.h is useful to avoid rebuilding the world too often if a type
-> >> is used many times as a pointer, but rarely as a struct and rarely has
-> >> functions called on its instances.
+> >> On 1/10/19 8:00 AM, Pierre Morel wrote:
+> >>> The size of the accessible iommu memory region in the guest
+> >>> is given to the IOMMU by the guest through the mpcifc request
+> >>> specifying the PCI Base Address and the PCI Address Limit.
+> >>>
+> >>> Let set the size of the IOMMU region to:
+> >>>       (PCI Address Limit) - (PCI Base Address) + 1.
+> >>>
+> >>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> >>> ---
+> >>>    hw/s390x/s390-pci-bus.c | 2 +-
+> >>>    1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> >>> index 69e0671..e97696a 100644
+> >>> --- a/hw/s390x/s390-pci-bus.c
+> >>> +++ b/hw/s390x/s390-pci-bus.c
+> >>> @@ -660,7 +660,7 @@ void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
+> >>>        char *name = g_strdup_printf("iommu-s390-%04x", iommu->pbdev->uid);
+> >>>        memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr),
+> >>>                                 TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&iommu->mr),
+> >>> -                             name, iommu->pal + 1);
+> >>> +                             name, iommu->pal - iommu->pba + 1);
 > > 
-> > Related:  Can also be used to keep struct content private.  struct
-> > QemuConsole for example is private to ui/console.c, but pointers to
-> > QemuConsole are passed around alot in ui/* and hw/display/* code.
+> >  From the the look of this, I would say we basically used the address
+> > denoting the end of the region as the size of the region. This smells
+> > like a bug to me, but the commit message and the title ain't clear about
+> > this, and there is no fixes tag. Because of the latter I did some digging
+> > and came to commit f7c40aa "s390x/pci: fix failures of dma
+> > map/unmap" (Yi Min Zhao, 2016-06-19) which basically did the inverse of
+> > this commit!
+> > 
+> > My initial motivation was to check if this is stable material. But now
+> > I'm very confused. I'm admittedly zPCI incompetent. Could some of the
+> > people that understand what is going on help me feel better about this
+> > patch?
+> > 
+> > Regards,
+> > Halil
 > 
-> True, though as we switch more and more from pointers to embedded
-> structs that does not work that much anymore.  Another way to do that is
-> to split the header in include/path/to/foo.h and path/to/foo_internal.h.
 > 
-> Paolo
+> The patch you speak about corrected the problem described in its comment 
+> by setting the offset address of the subregion to 0, making sure 
+> VFIO_PCI works for Z but introduced a bug we did not see at that time by 
+> making the subregion too large.
+> 
+> This patch correct the bug, I can add a reference to this with:
+> fixing: commit f7c40aa1e7feb50bc4d4bc171fa811bdd9a93e51
+> 
 
-Not sure this will help since no tool checks structure isn't
-actually used even though it's in internal.
+@Connie, will you add the Fixes tag? Do we need a cc stable (since
+broken since 2016-06-19)?
 
-If you want to go overboard it's solvable of course, e.g.
-something like this will work:
+@Pierre: So you say it's a bug. What can go wrong because of this?
+For example if we interpret pal as a size, I guess we could end up with
+the memory region not fitting the guest memory, or? I'm still pretty
+much in the dark about the implications of this bug.
 
-
-E.g. in virtio.h
-
-#ifndef VIRTIO_PRIVATE
-#define VIRTIO_PRIVATE(f) (VIRTIO_PIVATE_##f)
-#endif
-
-struct VirtioPrivate {
-	int VIRTIO_PRIVATE(bar);
-};
-
-and in virtio.c:
-
-#define VIRTIO_PRIVATE(f) (f)
-#include <virtio.h>
-
-
--- 
-MST
+Regards,
+Halil
