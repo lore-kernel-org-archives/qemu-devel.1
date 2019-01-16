@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42791)
+Received: from eggs.gnu.org ([209.51.188.92]:42960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjoWN-0007gC-2F
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:58:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1gjoWk-0007rW-CY
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:58:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gjoWL-0008RU-87
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:58:31 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42467)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gjoWK-0008Qr-LA
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:58:28 -0500
-Received: by mail-wr1-f67.google.com with SMTP id q18so7730907wrx.9
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 08:58:28 -0800 (PST)
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-8-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8c69f9f3-3ea1-6b29-8c5d-11a0139490dc@redhat.com>
-Date: Wed, 16 Jan 2019 17:58:25 +0100
+	(envelope-from <berrange@redhat.com>) id 1gjoWi-00006V-UY
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:58:54 -0500
+Date: Wed, 16 Jan 2019 16:58:37 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20190116165837.GF20275@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-7-vsementsov@virtuozzo.com>
+	<64d9a2e7-6dd9-d71b-b9bf-c476e9e218f8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1547566866-129386-8-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/14] tests: acpi: skip FACS table if
- board uses hw reduced ACPI profile
+Content-Disposition: inline
+In-Reply-To: <64d9a2e7-6dd9-d71b-b9bf-c476e9e218f8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 06/10] block/nbd-client: move from quit
+ to state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Gonglei <arei.gonglei@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 1/15/19 4:40 PM, Igor Mammedov wrote:
-> If FADT has HW_REDUCED_ACPI flag set, do not attempt to fetch
-> FACS as it's not provided by the board.
+On Wed, Jan 16, 2019 at 10:25:03AM -0600, Eric Blake wrote:
+> [adding Dan]
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> On 7/31/18 12:30 PM, Vladimir Sementsov-Ogievskiy wrote:
+> > To implement reconnect we need several states for the client:
+> > CONNECTED, QUIT and two CONNECTING states. CONNECTING states will
+> > be realized in the following patches. This patch implements CONNECTED
+> > and QUIT.
+> > 
+> > QUIT means, that we should close the connection and fail all current
+> > and further requests (like old quit = true).
+> > 
+> > CONNECTED means that connection is ok, we can send requests (like old
+> > quit = false).
+> > 
+> > For receiving loop we use a comparison of the current state with QUIT,
+> > because reconnect will be in the same loop, so it should be looping
+> > until the end.
+> > 
+> > Opposite, for requests we use a comparison of the current state with
+> > CONNECTED, as we don't want to send requests in CONNECTING states (
+> > which are unreachable now, but will be reachable after the following
+> > commits)
+> > 
+> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > ---
+> >  block/nbd-client.h |  9 ++++++++-
+> >  block/nbd-client.c | 55 ++++++++++++++++++++++++++++++++----------------------
+> >  2 files changed, 41 insertions(+), 23 deletions(-)
+> 
+> Dan just recently proposed patches to SocketChardev in general to use a
+> state machine that distinguishes between connecting and connected:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg03339.html
+> 
+> I'm wondering how much of his work is related or can be reused to get
+> restartable connections on NBD sockets?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+There's nothing really special about what I did. Vladimir looks to
+have basically done the same kind of approach, but I don't think
+there's real scope for sharing with chardevs, as each care about
+their own set of states.
 
-> ---
->  tests/bios-tables-test.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 0f04a0a..8887319 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -146,9 +146,13 @@ static void test_acpi_fadt_table(test_data *data)
->      g_assert(compare_signature(&table, "FACP"));
->  
->      /* Since DSDT/FACS isn't in RSDT, add them to ASL test list manually */
-> -    acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
-> -                     fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
-> -    g_array_append_val(data->tables, table);
-> +    memcpy(&val, fadt_aml + 112 /* Flags */, 4);
-> +    val = le32_to_cpu(val);
-> +    if (!(val & 1UL << 20 /* HW_REDUCED_ACPI */)) {
-> +        acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
-> +                         fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
-> +        g_array_append_val(data->tables, table);
-> +    }
->  
->      memcpy(&val, fadt_aml + dsdt_offset, 4);
->      if (!val) {
-> 
+> Remember, right now, the NBD code always starts in blocking mode, and
+> does single-threaded handshaking until it is ready for transmission,
+> then switches to non-blocking mode for all subsequent transmissions (so,
+> for example, servicing a read request can assume that the socket is
+> valid without further waiting).  But once we start allowing reconnects,
+> a read request will need to detect when one socket has gone down, and
+> wait for its replacement socket to come back up, in order to retry the
+> request; this retry is in a context where we are in non-blocking
+> context, but the retry must establish a new socket, and possibly convert
+> the socket into TLS mode, all before being ready to retry the read request.
+
+That makes it sound like the NBD handshake needs to be converted to
+use entirely non-blocking I/O.
+
+The TLS handshake already uses an asynchronous callback pattern and
+to deal with that NBD had to create & run a private main loop to
+complete the TLS handshake in its blocking code pattern.
+
+You could potentially push this concept up to the top level. ie
+implement the entire NBD handshake with async callbacks / non-blocking
+I/O. Then simply use a private main loop to run that in a blocking
+fashion for the initial connection. When you need to do re-connect
+you now just run the async code without the extra main loop around
+it.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
