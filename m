@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45773)
+Received: from eggs.gnu.org ([209.51.188.92]:45902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <emaste@freebsd.org>) id 1gjqja-0001qK-8y
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:19 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gjqjq-0001z4-Lm
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <emaste@freebsd.org>) id 1gjqjP-0002p5-91
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:09 -0500
-Received: from mx2.freebsd.org ([2001:1900:2254:206a::19:2]:56348)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <emaste@freebsd.org>) id 1gjqjN-0002hj-98
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:05 -0500
-Received: from mx1.freebsd.org (mx1.freebsd.org [IPv6:2610:1c1:1:606c::19:1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(Client CN "mx1.freebsd.org",
-	Issuer "Let's Encrypt Authority X3" (verified OK))
-	by mx2.freebsd.org (Postfix) with ESMTPS id 265746AA86
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 19:20:00 +0000 (UTC)
-	(envelope-from emaste@freebsd.org)
-From: Ed Maste <emaste@freefall.freebsd.org>
-Date: Wed, 16 Jan 2019 19:19:50 +0000
-Message-Id: <20190116191950.94110-1-emaste@freefall.freebsd.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1gjqjo-00036B-Nh
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:34 -0500
+Received: from mail-eopbgr700131.outbound.protection.outlook.com
+	([40.107.70.131]:50080
+	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gjqjj-0002vI-4j
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 14:20:30 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Wed, 16 Jan 2019 19:20:08 +0000
+Message-ID: <BN6PR2201MB1251F33344A686B376174608C6820@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1547403692.git.noring@nocrew.org>
+	<781155aaf175ea20903c12e26316ea40085457bb.1547403692.git.noring@nocrew.org>
+	<BN6PR2201MB12516C7D2E235DA81812DDF0C6810@BN6PR2201MB1251.namprd22.prod.outlook.com>,
+	<20190116153654.GA2918@sx9>
+In-Reply-To: <20190116153654.GA2918@sx9>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] .cirrus.yml: basic compile and test for
- FreeBSD
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 1/9] target/mips: Require TARGET_MIPS64 for
+ R5900 multimedia instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ed Maste <emaste@freebsd.org>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-From: Ed Maste <emaste@freebsd.org>
+> From: Fredrik Noring <noring@nocrew.org>
+> Sent: Wednesday, January 16, 2019 4:36 PM
+> To: Aleksandar Markovic
+> Cc: Aurelien Jarno; Philippe Mathieu-Daud=E9; J=FCrgen Urban; Maciej W. R=
+ozycki; > qemu-devel@nongnu.org
+> Subject: Re: [PATCH 1/9] target/mips: Require TARGET_MIPS64 for R5900 mul=
+timedia instructions
+>=20
+> Hi Aleksandar,
+>=20
+> > Sorry, I have to disagree with this.
+>=20
+> It was, without a doubt, entirely clear that the o32 ABI was going to sta=
+y
+> in after this MMI patch series. In other words, this series does not impl=
+y
+> the removal of o32. This is obvious, as discussed previously, since the o=
+32
+> ABI is currently the main use case for R5900 QEMU and the reason the R590=
+0
+> was implemented for QEMU to begin with.
+>=20
 
-Signed-off-by: Ed Maste <emaste@freebsd.org>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
----
- .cirrus.yml | 16 ++++++++++++++++
- MAINTAINERS |  8 ++++++++
- 2 files changed, 24 insertions(+)
- create mode 100644 .cirrus.yml
+Fredrik,
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-new file mode 100644
-index 0000000000..df39d8e573
---- /dev/null
-+++ b/.cirrus.yml
-@@ -0,0 +1,16 @@
-+freebsd_12_task:
-+  freebsd_instance:
-+    image: freebsd-12-0-release-amd64
-+    cpu: 8
-+    memory: 24G
-+  env:
-+    CIRRUS_CLONE_DEPTH: 1
-+  install_script: pkg install -y
-+    bison curl cyrus-sasl fontconfig freetype2 git glib gmake gnutls
-+    nettle perl5 pixman pkgconf png usbredir
-+  script:
-+    - mkdir build
-+    - cd build
-+    - ../configure || { cat config.log; exit 1; }
-+    - gmake -j8 V=3D1
-+    - gmake -j8 V=3D1 check
-diff --git a/MAINTAINERS b/MAINTAINERS
-index af339b86db..f9da8c9cf0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2483,6 +2483,14 @@ W: https://travis-ci.org/qemu/qemu
- W: https://app.shippable.com/github/qemu/qemu
- W: http://patchew.org/QEMU/
-=20
-+FreeBSD Hosted Continuous Integration
-+M: Ed Maste <emaste@freebsd.org>
-+M: Li-Wen Hsu <lwhsu@freebsd.org>
-+L: qemu-devel@nongnu.org
-+S: Maintained
-+F: .cirrus.yml
-+W: https://cirrus-ci.com/github/qemu/qemu
-+
- Guest Test Compilation Support
- M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
- R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
---=20
-2.20.1
+Modeling a 64-bit processor as a 32-bit one should not be a part of QEMU
+upstream.
+
+Thanks for your efforts so far,
+Aleksandar
+
+> > Processor model must stay the same, and
+> > Linux ABI should not affect, for example, the number and size of proces=
+sor
+> > registers - just like it is the case in reality.
+>=20
+> I thought Maciej's reply to you was quite clear on this topic?
+>=20
+> > QEMU is an independent software tool - it is for example, a compiler-ag=
+nostic
+> > tool, and the only connection between a compiler and QEMU is the proces=
+sor
+> > documentation - and this is the reason they work together so well. They=
+ shouldn't
+> > be "tweaked" and "integrated" to work together - both QEMU and compiler=
+ should
+> > rely only on the processor specification, and should not know anything =
+about the
+> > other side.
+>=20
+> The approach was to implement ABIs and instructions that are actually use=
+d,
+> and leave unused or optional instructions for later. The reverse, removin=
+g
+> ABIs in-use (o32) and focusing on unused instructions (MMIs) does not mak=
+e
+> sense, so I will obviously not do that.
+>=20
+> > My advice for you is to focus on n32 at the time being.
+> >
+> > o32 can be implemented with the same 64-bit processor model, but in a m=
+uch
+> > different way that you attempted some time ago. To avoid waste of our e=
+nergy
+> > and time, I am suggesting that we finish n32, and think of o32 in futur=
+e.
+>=20
+> The o32 ABI is more important than n32 now, because o32 is in-use and
+> ready with Glibc, GCC, GAS and the Linux kernel. n32 is easy to enable
+> with a three-line patch, so we can actually use both now.
+>=20
+> I recommend that we implement limited support for MMIs for n32 and
+> eventually system mode, and leave it as unsupported for o32 for the time
+> being. [ Perhaps MMIs for o32 could be implemented with 96-bit registers,
+> in contrast to the 64-bit registers for n32, but having LW and LQ without
+> LD seems strange to me. ]
+>=20
+> Fredrik
