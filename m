@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:35562)
+Received: from eggs.gnu.org ([209.51.188.92]:36464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjjhp-0007TO-KJ
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1gjjii-0008Cl-UN
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gjjhn-0008N8-KL
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:01 -0500
-References: <20190111140857.4211-1-philmd@redhat.com>
-	<20190111140857.4211-4-philmd@redhat.com>
-	<875zuqjea7.fsf@dusky.pond.sub.org>
-	<403ad2e4-3282-051c-1ff5-8a3a23899293@redhat.com>
-	<be75e72a-9f54-c9b5-4a1f-e87e28df8ba5@redhat.com>
-	<87sgxtatod.fsf@dusky.pond.sub.org>
-	<4b24723e-5a27-f25f-76c1-f2f4e94757ba@redhat.com>
-	<20190116113455.dyl6uctl4dpaqh6v@sirius.home.kraxel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ad34caf3-5f1f-dffc-4aed-60bb90ba2e5f@redhat.com>
-Date: Wed, 16 Jan 2019 12:49:07 +0100
+	(envelope-from <thuth@redhat.com>) id 1gjjig-0001Hl-OB
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjjig-0001AE-9M
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:50:54 -0500
+References: <20190115141108.934-1-yang.zhong@intel.com>
+	<20190115141108.934-27-yang.zhong@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6ce1a208-43b5-4def-f498-4ec7f98d05ed@redhat.com>
+Date: Wed, 16 Jan 2019 12:50:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190116113455.dyl6uctl4dpaqh6v@sirius.home.kraxel.org>
+In-Reply-To: <20190115141108.934-27-yang.zhong@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/15] hw/ssi: Remove SSIBus from
- "qemu/typedefs.h"
+Subject: Re: [Qemu-devel] [RFC PATCH v2 26/37] scsi: express dependencies
+ with Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +29,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
 
-On 16/01/19 12:34, Gerd Hoffmann wrote:
->   Hi,
+On 2019-01-15 15:10, Yang Zhong wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
 > 
->> typedefs.h is useful to avoid rebuilding the world too often if a type
->> is used many times as a pointer, but rarely as a struct and rarely has
->> functions called on its instances.
+> This lets you disable SCSI altogether with "CONFIG_SCSI=n".
+
+Sorry for my ignorant question, but: Can we really disable SCSI if the
+Kconfig files use "select SCSI" all over the place? I'd rather expect
+that "CONFIG_SCSI=n" only works if we only use "depends on SCSI" everywhere?
+
+I'm fine if we use select SCSI in this patch, but maybe the commit
+message should be tweaked in case you can not really disable SCSI like
+this anymore?
+
+ Thomas
+
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  hw/scsi/Kconfig       | 12 ++++++++++++
+>  hw/scsi/Makefile.objs |  2 +-
+>  hw/usb/Kconfig        |  2 ++
+>  3 files changed, 15 insertions(+), 1 deletion(-)
 > 
-> Related:  Can also be used to keep struct content private.  struct
-> QemuConsole for example is private to ui/console.c, but pointers to
-> QemuConsole are passed around alot in ui/* and hw/display/* code.
-
-True, though as we switch more and more from pointers to embedded
-structs that does not work that much anymore.  Another way to do that is
-to split the header in include/path/to/foo.h and path/to/foo_internal.h.
-
-Paolo
+> diff --git a/hw/scsi/Kconfig b/hw/scsi/Kconfig
+> index 812a12522b..7a9d373382 100644
+> --- a/hw/scsi/Kconfig
+> +++ b/hw/scsi/Kconfig
+> @@ -5,24 +5,29 @@ config LSI_SCSI_PCI
+>      bool
+>      default y
+>      depends on PCI
+> +    select SCSI
+>  
+>  config MPTSAS_SCSI_PCI
+>      bool
+>      default y
+>      depends on PCI
+> +    select SCSI
+>  
+>  config MEGASAS_SCSI_PCI
+>      bool
+>      default y
+>      depends on PCI
+> +    select SCSI
+>  
+>  config VMW_PVSCSI_SCSI_PCI
+>      bool
+>      default y
+>      depends on PCI
+> +    select SCSI
+>  
+>  config ESP
+>      bool
+> +    select SCSI
+>  
+>  config ESP_PCI
+>      bool
+> @@ -30,8 +35,15 @@ config ESP_PCI
+>      depends on PCI
+>      select ESP
+>  
+> +config SPAPR_VSCSI
+> +    bool
+> +    depends on PSERIES
+> +    select SCSI
+> +
+>  config VIRTIO_SCSI
+>      bool
+> +    default y
+> +    select SCSI
+>  
+>  config VHOST_USER_SCSI
+>      bool
+> diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
+> index 45167baeaf..54b36ed8b1 100644
+> --- a/hw/scsi/Makefile.objs
+> +++ b/hw/scsi/Makefile.objs
+> @@ -6,7 +6,7 @@ common-obj-$(CONFIG_MEGASAS_SCSI_PCI) += megasas.o
+>  common-obj-$(CONFIG_VMW_PVSCSI_SCSI_PCI) += vmw_pvscsi.o
+>  common-obj-$(CONFIG_ESP) += esp.o
+>  common-obj-$(CONFIG_ESP_PCI) += esp-pci.o
+> -obj-$(CONFIG_PSERIES) += spapr_vscsi.o
+> +obj-$(CONFIG_SPAPR_VSCSI) += spapr_vscsi.o
+>  
+>  ifeq ($(CONFIG_VIRTIO_SCSI),y)
+>  obj-y += virtio-scsi.o virtio-scsi-dataplane.o
+> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+> index 0b8f41040e..db46c56cc8 100644
+> --- a/hw/usb/Kconfig
+> +++ b/hw/usb/Kconfig
+> @@ -52,11 +52,13 @@ config USB_STORAGE_BOT
+>      bool
+>      default y
+>      depends on USB
+> +    select SCSI
+>  
+>  config USB_STORAGE_UAS
+>      bool
+>      default y
+>      depends on USB
+> +    select SCSI
+>  
+>  config USB_AUDIO
+>      bool
+> 
