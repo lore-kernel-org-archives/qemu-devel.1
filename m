@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33120)
+Received: from eggs.gnu.org ([209.51.188.92]:33279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjoAY-0007C9-GH
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:36:00 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gjoBA-0007Ti-R1
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:36:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjoAW-0005ty-Ii
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:35:58 -0500
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-	<20180731173033.75467-8-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3e91a280-95af-52e2-2673-29a1544cb9ff@redhat.com>
-Date: Wed, 16 Jan 2019 10:35:43 -0600
+	(envelope-from <mreitz@redhat.com>) id 1gjoB6-00066Z-EY
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:36:34 -0500
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+	<20181229122027.42245-10-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <82d15c5e-b1ab-35f2-f78c-d5cfe58623f7@redhat.com>
+Date: Wed, 16 Jan 2019 17:36:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180731173033.75467-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20181229122027.42245-10-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="i5MWNhDYX7FK9O8fqchjD1AegZJEXZggm"
-Subject: Re: [Qemu-devel] [PATCH v4 07/10] block/nbd-client: rename
- read_reply_co to connection_co
+	boundary="FkvecXIEWwaKmObu13z7uvKFgNOGRUjCI"
+Subject: Re: [Qemu-devel] [PATCH v5 09/11] block: add lock/unlock range
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com, den@openvz.org, eblake@redhat.com, jsnow@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---i5MWNhDYX7FK9O8fqchjD1AegZJEXZggm
-From: Eric Blake <eblake@redhat.com>
+--FkvecXIEWwaKmObu13z7uvKFgNOGRUjCI
+From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
- pbonzini@redhat.com, den@openvz.org
-Message-ID: <3e91a280-95af-52e2-2673-29a1544cb9ff@redhat.com>
-Subject: Re: [PATCH v4 07/10] block/nbd-client: rename read_reply_co to
- connection_co
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
- <20180731173033.75467-8-vsementsov@virtuozzo.com>
-In-Reply-To: <20180731173033.75467-8-vsementsov@virtuozzo.com>
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, stefanha@redhat.com, jcody@redhat.com, kwolf@redhat.com,
+ den@openvz.org, eblake@redhat.com, jsnow@redhat.com
+Message-ID: <82d15c5e-b1ab-35f2-f78c-d5cfe58623f7@redhat.com>
+Subject: Re: [PATCH v5 09/11] block: add lock/unlock range functions
+References: <20181229122027.42245-1-vsementsov@virtuozzo.com>
+ <20181229122027.42245-10-vsementsov@virtuozzo.com>
+In-Reply-To: <20181229122027.42245-10-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 7/31/18 12:30 PM, Vladimir Sementsov-Ogievskiy wrote:
-> This coroutine will serve nbd reconnects, so, rename it to be something=
-
-> more generic.
+On 29.12.18 13:20, Vladimir Sementsov-Ogievskiy wrote:
+> From: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Introduce lock/unlock range functionality, based on serialized
+> requests. This is needed to refactor backup, dropping local
+> tracked-request-like synchronization.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <etendren@gmail.com>
 > ---
->  block/nbd-client.h |  4 ++--
->  block/nbd-client.c | 24 ++++++++++++------------
->  2 files changed, 14 insertions(+), 14 deletions(-)
->=20
+>  include/block/block_int.h |  4 ++++
+>  block/io.c                | 45 ++++++++++++++++++++++++++++++++++++++-=
 
-> @@ -503,7 +503,7 @@ static coroutine_fn int nbd_co_do_receive_one_chunk=
-(
->  }
-> =20
->  /* nbd_co_receive_one_chunk
-> - * Read reply, wake up read_reply_co and set s->quit if needed.
-> + * Read reply, wake up connection_co and set s->quit if needed.
+>  2 files changed, 48 insertions(+), 1 deletion(-)
 
-Comment is stale; should have been fixed in 6/10 to mention s->state now
-that s->quit does not exist.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---i5MWNhDYX7FK9O8fqchjD1AegZJEXZggm
+--FkvecXIEWwaKmObu13z7uvKFgNOGRUjCI
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw/XV8ACgkQp6FrSiUn
-Q2okKAf+LrGxpUb+WS+k/3WOjsiP22oVaCbvB1XMRgZYNzkKWNYzuJWSP0CFaWk8
-1Ong8UGLfMhK46Wb+dJuiK56Gt0BDtA7G3E3m6e6NPwlzvVpnM3yjOXL9IdnPtsQ
-CgMmiAP4yiUyIGnkTSWuarcVokYZPxza0Y7zSQi6dLefTQHu6sVgzA4LhMXtFy4v
-rYnW3yzfmRWaLqCPnGC8NdBAal1D6m5YFgtpV2mc02udVHwM1YRa1/hh0tUkz48m
-sTQYGKVLk4kP7mz/IfIFpBMtDnwT3vNPsMmFR+bC3Ipu68FZt+ZuwDW7cNTljeXC
-NK6pTwchzd284u1YDa66XQ0KA6lkgA==
-=j9hd
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlw/XXYACgkQ9AfbAGHV
+z0C8jQgArC+yGLcpHVkmD5TtaE9qw5PBxCh3JRbueQffb/nCHoaayxG7il9MEyp9
+7L5R2OH6BmlZ0xPJEPymc6qZdPsL37RuBOKqbMZvTc/v6I9CV3Ao53B6zB+CvU9e
+eI3iqvMybgr/07su7mvwjnyo1Ga712+fg7S+N+4iZPXtJUDxxyDuy7lzpg+VjcKN
+e3vIHyv1BVQsyrwRQ/72PUJLD0u4gmHWVUrEnOu8Ufbi6AX/VqcbnskyV9gbaUs1
+m9gpJqmxr8Lt2FX+byao9xvQnZFN62nzxYQcKrTKIsxFMXZQJU7UYHuxTYqyBL5e
++c8Qk9stPU5ShDldtP8sIlZ4vCvhYQ==
+=oGg9
 -----END PGP SIGNATURE-----
 
---i5MWNhDYX7FK9O8fqchjD1AegZJEXZggm--
+--FkvecXIEWwaKmObu13z7uvKFgNOGRUjCI--
