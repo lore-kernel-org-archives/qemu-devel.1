@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45673)
+Received: from eggs.gnu.org ([209.51.188.92]:48351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gjjV1-0005UK-3U
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:36:49 -0500
+	(envelope-from <alex.kanavin@gmail.com>) id 1gjjX2-0007DL-Bg
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:38:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gjjUx-0000SD-Oe
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:36:46 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 16 Jan 2019 12:35:22 +0100
-Message-Id: <20190116113523.9213-10-david@redhat.com>
-In-Reply-To: <20190116113523.9213-1-david@redhat.com>
-References: <20190116113523.9213-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 09/10] pc: Support for PCI based memory
- devices
+	(envelope-from <alex.kanavin@gmail.com>) id 1gjjWz-0007rR-4T
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:38:50 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:37285)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.kanavin@gmail.com>)
+	id 1gjjWp-0006pZ-Bs
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:38:41 -0500
+Received: by mail-lj1-x243.google.com with SMTP id t18-v6so5165203ljd.4
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 03:38:00 -0800 (PST)
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 16 Jan 2019 12:37:51 +0100
+Message-Id: <20190116113751.17177-1-alex.kanavin@gmail.com>
+Subject: [Qemu-devel] [PATCH] egl-helpers.h: do not depend on X11 Window
+ type, use EGLNativeWindowType
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,164 +26,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Collin Walling <walling@linux.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+Cc: Alexander Kanavin <alex.kanavin@gmail.com>
 
-Override the PCI device hotplug handler to properly handle the
-memory device part from the machine hotplug handler and forward to the
-actual PCI bus hotplug handler.
+It was assumed that mesa provides the necessary X11 includes,
+but it is not always the case, as it can be configured without x11 support.
 
-As PCI hotplug has not been properly factored out into hotplug handlers,
-most magic is performed in the (un)realize functions. Also some buses don't
-have a PCI hotplug handler at all yet (not sure if they are actually used
-on x86, but just to be sure).
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
- hw/i386/pc.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 89 insertions(+), 1 deletion(-)
+ include/ui/egl-helpers.h | 2 +-
+ ui/egl-helpers.c         | 4 ++--
+ ui/gtk-egl.c             | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index fd0cb29ba9..62f83859fa 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -75,6 +75,7 @@
- #include "hw/usb.h"
- #include "hw/i386/intel_iommu.h"
- #include "hw/net/ne2000-isa.h"
-+#include "hw/mem/memory-device.h"
+diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
+index 9db7293bdb..3fc656a7ba 100644
+--- a/include/ui/egl-helpers.h
++++ b/include/ui/egl-helpers.h
+@@ -43,7 +43,7 @@ void egl_dmabuf_release_texture(QemuDmaBuf *dmabuf);
  
- /* debug PC/ISA interrupts */
- //#define DEBUG_IRQ
-@@ -2224,6 +2225,84 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-     numa_cpu_pre_plug(cpu_slot, dev, errp);
- }
+ #endif
  
-+static void pc_pci_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                            Error **errp)
-+{
-+    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-+    Error *local_err = NULL;
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-+        if (!hotplug_dev2) {
-+            /*
-+             * Without a bus hotplug handler, we cannot control the plug/unplug
-+             * order. Disallow memory devices on such buses.
-+             */
-+            error_setg(errp, "Memory devices not supported on this bus.");
-+            return;
-+        }
-+        memory_device_pre_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev),
-+                               NULL, errp);
-+    }
-+
-+    if (hotplug_dev2) {
-+        hotplug_handler_pre_plug(hotplug_dev2, dev, errp);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-+    }
-+}
-+
-+static void pc_pci_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                        Error **errp)
-+{
-+    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-+    Error *local_err = NULL;
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-+        memory_device_plug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
-+    }
-+
-+    if (hotplug_dev2) {
-+        hotplug_handler_plug(hotplug_dev2, dev, &local_err);
-+    }
-+
-+    if (local_err) {
-+        if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-+            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
-+        }
-+    }
-+    error_propagate(errp, local_err);
-+}
-+
-+static void pc_pci_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                                  Error **errp)
-+{
-+    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-+
-+    if (hotplug_dev2) {
-+        hotplug_handler_unplug_request(hotplug_dev2, dev, errp);
-+    }
-+}
-+
-+static void pc_pci_device_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                                 Error **errp)
-+{
-+    HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-+    Error *local_err = NULL;
-+
-+    if (hotplug_dev2) {
-+        hotplug_handler_unplug(hotplug_dev2, dev, &local_err);
-+    }
-+
-+    if (!local_err) {
-+        if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-+            memory_device_unplug(MEMORY_DEVICE(dev), MACHINE(hotplug_dev));
-+        }
-+    }
-+    error_propagate(errp, local_err);
-+}
-+
- static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-                                           DeviceState *dev, Error **errp)
+-EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win);
++EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, EGLNativeWindowType win);
+ 
+ int qemu_egl_init_dpy_x11(EGLNativeDisplayType dpy, DisplayGLMode mode);
+ int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy, DisplayGLMode mode);
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 4f475142fc..5e115b3fb4 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -273,14 +273,14 @@ void egl_dmabuf_release_texture(QemuDmaBuf *dmabuf)
+ 
+ /* ---------------------------------------------------------------------- */
+ 
+-EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win)
++EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, EGLNativeWindowType win)
  {
-@@ -2231,6 +2310,8 @@ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-         pc_memory_pre_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_pre_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+        pc_pci_pre_plug(hotplug_dev, dev, errp);
+     EGLSurface esurface;
+     EGLBoolean b;
+ 
+     esurface = eglCreateWindowSurface(qemu_egl_display,
+                                       qemu_egl_config,
+-                                      (EGLNativeWindowType)win, NULL);
++                                      win, NULL);
+     if (esurface == EGL_NO_SURFACE) {
+         error_report("egl: eglCreateWindowSurface failed");
+         return NULL;
+diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
+index 5420c2362b..1f9411626a 100644
+--- a/ui/gtk-egl.c
++++ b/ui/gtk-egl.c
+@@ -54,7 +54,7 @@ void gd_egl_init(VirtualConsole *vc)
      }
+ 
+     vc->gfx.ectx = qemu_egl_init_ctx();
+-    vc->gfx.esurface = qemu_egl_init_surface_x11(vc->gfx.ectx, x11_window);
++    vc->gfx.esurface = qemu_egl_init_surface_x11(vc->gfx.ectx, (EGLNativeWindowType)x11_window);
+ 
+     assert(vc->gfx.esurface);
  }
- 
-@@ -2241,6 +2322,8 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-         pc_memory_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+        pc_pci_plug(hotplug_dev, dev, errp);
-     }
- }
- 
-@@ -2251,6 +2334,8 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-         pc_memory_unplug_request(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+        pc_pci_unplug_request(hotplug_dev, dev, errp);
-     } else {
-         error_setg(errp, "acpi: device unplug request for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -2264,6 +2349,8 @@ static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-         pc_memory_unplug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_cb(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+        pc_pci_device_unplug(hotplug_dev, dev, errp);
-     } else {
-         error_setg(errp, "acpi: device unplug for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -2274,7 +2361,8 @@ static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,
-                                              DeviceState *dev)
- {
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
--        object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-+        object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
-+        object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         return HOTPLUG_HANDLER(machine);
-     }
- 
 -- 
-2.17.2
+2.17.1
