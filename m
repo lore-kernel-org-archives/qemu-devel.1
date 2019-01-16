@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45906)
+Received: from eggs.gnu.org ([209.51.188.92]:47240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjocc-0003Zd-L4
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:05:00 -0500
+	(envelope-from <mst@redhat.com>) id 1gjof4-0005ZL-07
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:07:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gjoca-0002rG-PU
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 12:04:58 -0500
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-	<20180731173033.75467-10-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8fff6a6e-1030-64d7-4c96-4704970b898c@redhat.com>
-Date: Wed, 16 Jan 2019 11:04:48 -0600
+	(envelope-from <mst@redhat.com>) id 1gjnJ0-0003dA-DO
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:40:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57752)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjnIv-0003Zn-Qu
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 10:40:34 -0500
+Date: Wed, 16 Jan 2019 10:40:23 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190116103615-mutt-send-email-mst@kernel.org>
+References: <cover.1547624239.git.yi.z.zhang@linux.intel.com>
+	<be0aba0f61ea5c583ea696db4cc621d3886893de.1547624239.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180731173033.75467-10-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ddjE7xD05tvWz11vqCBEhC5GH0zU6a3F7"
-Subject: Re: [Qemu-devel] [PATCH v4 09/10] block/nbd-client: nbd reconnect
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <be0aba0f61ea5c583ea696db4cc621d3886893de.1547624239.git.yi.z.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH V9 6/6] docs: Added MAP_SYNC documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,133 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong.eric@gmail.com, stefanha@redhat.com, pbonzini@redhat.com, pagupta@redhat.com, yu.c.zhang@linux.intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, dan.j.williams@intel.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ddjE7xD05tvWz11vqCBEhC5GH0zU6a3F7
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
- pbonzini@redhat.com, den@openvz.org
-Message-ID: <8fff6a6e-1030-64d7-4c96-4704970b898c@redhat.com>
-Subject: Re: [PATCH v4 09/10] block/nbd-client: nbd reconnect
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
- <20180731173033.75467-10-vsementsov@virtuozzo.com>
-In-Reply-To: <20180731173033.75467-10-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 7/31/18 12:30 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Implement reconnect. To achieve this:
->=20
-> 1. add new modes:
->    connecting-wait: means, that reconnecting is in progress, and there
->      were small number of reconnect attempts, so all requests are
->      waiting for the connection.
->    connecting-nowait: reconnecting is in progress, there were a lot of
->      attempts of reconnect, all requests will return errors.
->=20
->    two old modes are used too:
->    connected: normal state
->    quit: exiting after fatal error or on close
-
-What makes an error fatal?  Without reconnect, life is simple - if the
-server sends something we can't parse, we permanently turn the device
-into an error condition - because we have no way to get back in sync
-with the server for further commands.  Your patch allows reconnect
-attempts where the connection is down (we failed to send to the server
-or failed to receive the server's reply), but why can we not ALSO
-attempt to reconnect after a parse error?  A reconnect would let us get
-back in sync for attempting further commands.  You're right that the
-current command should probably fail in that case (if the server sent us
-garbage for a specific request, it will probably do so again on a repeat
-of that request; which is different than when we don't even know what
-the server would have sent because of a disconnect).
-
-Or, put another way, we KNOW we have (corner) cases where a mis-aligned
-image can currently cause the server to return BLOCK_STATUS replies that
-aren't aligned to the advertised minimumm block size.  Attempting to
-read the last sector of an image then causes the client to see the
-misaligned reply and complain, which we are treating as fatal. But why
-not instead just fail that particular read, but still attempt a
-reconnect, in order to attempt further reads elsewhere in the image that
-do not trip up the server's misaligned reply?
-
->=20
-> Possible transitions are:
->=20
->    * -> quit
->    connecting-* -> connected
->    connecting-wait -> connecting-nowait (transition is done after
->                       reconnect-delay seconds in connecting-wait mode)
->    connected -> connecting-wait
->=20
-> 2. Implement reconnect in connection_co. So, in connecting-* mode,
->     connection_co, tries to reconnect unlimited times.
->=20
-> 3. Retry nbd queries on channel error, if we are in connecting-wait
->     state.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Wed, Jan 16, 2019 at 04:11:16PM +0800, Zhang Yi wrote:
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
 > ---
->  block/nbd-client.h |   4 +
->  block/nbd-client.c | 304 +++++++++++++++++++++++++++++++++++++++++++--=
---------
->  2 files changed, 255 insertions(+), 53 deletions(-)
->=20
+>  docs/nvdimm.txt | 21 ++++++++++++++++++++-
+>  qemu-options.hx |  4 ++++
+>  2 files changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> index 5f158a6..565ba73 100644
+> --- a/docs/nvdimm.txt
+> +++ b/docs/nvdimm.txt
+> @@ -142,11 +142,30 @@ backend of vNVDIMM:
+>  Guest Data Persistence
+>  ----------------------
+>  
+> +vNVDIMM is designed and implemented to guarantee the guest data
+> +persistence on the backends even on the host crash and power
 
-> @@ -781,16 +936,21 @@ static int nbd_co_request(BlockDriverState *bs, N=
-BDRequest *request,
->      } else {
->          assert(request->type !=3D NBD_CMD_WRITE);
->      }
-> -    ret =3D nbd_co_send_request(bs, request, write_qiov);
-> -    if (ret < 0) {
-> -        return ret;
-> -    }
-> =20
-> -    ret =3D nbd_co_receive_return_code(client, request->handle,
-> -                                     &request_ret, &local_err);
-> -    if (local_err) {
-> -        error_report_err(local_err);
-> -    }
-> +    do {
-> +        ret =3D nbd_co_send_request(bs, request, write_qiov);
-> +        if (ret < 0) {
-> +            continue;
-> +        }
+in case of a host crash or a power failure
+
+(be consistent)
+
+> +failures. However, there are still some requirements and limitations
+> +as explained below.
 > +
-> +        ret =3D nbd_co_receive_return_code(client, request->handle,
-> +                                         &request_ret, &local_err);
-> +        if (local_err) {
-> +            error_report_err(local_err);
-> +            local_err =3D NULL;
+>  Though QEMU supports multiple types of vNVDIMM backends on Linux,
+> -currently the only one that can guarantee the guest write persistence
+> +if MAP_SYNC is not supported by the host kernel and the backends,
+> +the only backend that can guarantee the guest write persistence
+>  is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
+>  which all guest access do not involve any host-side kernel cache.
+>  
+> +mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
+> +systems, QEMU can mmap(2) the backend with MAP_SYNC, which can ensure
 
-Conflicts with the conversion to use trace points.
+which ensures
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> +filesystem metadata consistent
 
+consistency
 
---ddjE7xD05tvWz11vqCBEhC5GH0zU6a3F7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> even after a system crash or power
 
------BEGIN PGP SIGNATURE-----
+a power
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw/ZDAACgkQp6FrSiUn
-Q2oEXgf/TJV+eH6PZbMu3V94+lmnca2lpCDf0kINn7NOFEP+t9+Ej+quDKtK95+z
-txjAqdwH0HFUAD6GkN0RJeu5qUbDcBWDsEPuwpUNh1fpMIwbsTPagk1knrcRb+BI
-6+K33F1ug6xNUMeufc9SRI6A0l+oCAQkjzqPcVG1cuCJbOI5AeN+luDtJuCF6aYi
-NMYTQDO2xr8SJMw//ZiEwXzek1mxhPNMEFXqCYojQyOrnZ7/VdRNpH1R9Dn0cI9D
-G8/SHL6zrppUjPEiVg0bF86j9LfD6ByTgO+PO0QXPO/YuygubifjeVfrN6q5J2RC
-gXXkFuvhuuryCw/d6gS+jTrqc+a0bw==
-=lsLu
------END PGP SIGNATURE-----
+> +failure. Besides the host kernel support, enabling MAP_SYNC in QEMU
+> +also requires:
+> +
+> + - the backend is a file supporting DAX, e.g., a file on an ext4 or
+> +   xfs file system mounted with '-o dax',
+> +
+> + - 'share' option of memory-backend-file is 'on'.
 
---ddjE7xD05tvWz11vqCBEhC5GH0zU6a3F7--
+why does share need to be on?
+
+> +
+> + - 'pmem' option of memory-backend-file is 'on'
+> +
+>  When using other types of backends, it's suggested to set 'unarmed'
+>  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
+>  guest NVDIMM region mapping structure.  This unarmed flag indicates
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 08f8516..545cb8a 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4002,6 +4002,10 @@ using the SNIA NVM programming model (e.g. Intel NVDIMM).
+>  If @option{pmem} is set to 'on', QEMU will take necessary operations to
+>  guarantee the persistence of its own writes to @option{mem-path}
+>  (e.g. in vNVDIMM label emulation and live migration).
+> +Also, we will map the backend-file with MAP_SYNC flag, which can ensure
+> +the file metadata is in sync to @option{mem-path} even on the host crash
+> +and power failures. MAP_SYNC requires supports from both the host kernel
+
+requires support
+
+> +(since Linux kernel 4.15) and @option{mem-path} (only files supporting DAX).
+>  
+>  @item -object memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+>  
+> -- 
+> 2.7.4
