@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:59066)
+Received: from eggs.gnu.org ([209.51.188.92]:35034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gjkHf-0000sj-Pj
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:27:04 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gjkKa-0001wB-HX
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:30:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gjkHe-0001kB-Pf
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:27:03 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:37526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gjkHe-0001ch-Dg
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:27:02 -0500
-Received: by mail-wr1-x434.google.com with SMTP id s12so6718114wrt.4
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 04:27:00 -0800 (PST)
-References: <20190115184229.73688-1-emaste@freefall.freebsd.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190115184229.73688-1-emaste@freefall.freebsd.org>
-Date: Wed, 16 Jan 2019 12:26:58 +0000
-Message-ID: <87d0owzt2l.fsf@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1gjkKY-0004Yi-O6
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:30:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gjkKY-0004Nq-Gz
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 07:30:02 -0500
+Date: Wed, 16 Jan 2019 13:29:53 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190116132953.404247ec@redhat.com>
+In-Reply-To: <4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-12-git-send-email-imammedo@redhat.com>
+	<4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] .cirrus.yml: basic compile and test for
- FreeBSD
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 11/14] tests: acpi: add AVMF firmware blobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ed Maste <emaste@freebsd.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
+On Tue, 15 Jan 2019 21:47:49 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-Ed Maste <emaste@freefall.freebsd.org> writes:
+> On 01/15/19 16:41, Igor Mammedov wrote:
+> > Add firmware blobs built with PcdAcpiTestSupport=TRUE,
+> > that puts RSDP address in RAM after 1Mb aligned GUID
+> >   AB87A6B1-2034-BDA0-71BD-375007757785
+> > so that tests could scan and find it in RAM once firmware's
+> > initialized ACPI tables.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  Makefile              |   3 ++-
+> >  pc-bios/avmf.img      | Bin 0 -> 2097152 bytes
+> >  pc-bios/avmf_vars.img | Bin 0 -> 786432 bytes
+> >  3 files changed, 2 insertions(+), 1 deletion(-)
+> >  create mode 100644 pc-bios/avmf.img
+> >  create mode 100644 pc-bios/avmf_vars.img  
+> 
+> "AVMF" is not a great name. "AAVMF" is a downstream name alright, but
+> many dislike it in upstream use. "edk2-aarch64" or "edk2-ArmVirtQemu"
+> would be more precise, but those are verbose. Sigh, why are names so
+> hard. What does everyone think?
+I'm fine with either version.
+ 
+> Also, do you have to care about the license of firmware images built
+> from edk2 when bundling such images? Since edk2 commit 9a67ba261fe9
+> ("ArmVirtPkg: Replace obsoleted network drivers from platform DSC/FDF.",
+> 2018-12-14), you cannot build the ArmVirtQemu (aka AAVMF) firmware
+> without OpenSSL. Thus, the resultant license is 2-BSDL + OpenSSL -- for
+> now anyway.
+> 
+> Because, in the near future, that might change again. edk2 is in the
+> process of moving to Apache-2.0, and OpenSSL will also move (AFAICT) to
+> Apache-2.0 starting with release 3.0.0. (See commit 151333164ece,
+> "Change license to the Apache License v2.0", 2018-12-06.)
+That's another reason to look into EFI app approach (a simple one without
+dependencies) ans let distro to provide firmware image.
 
-> From: Ed Maste <emaste@freebsd.org>
->
-> Cirrus-CI (https://cirrus-ci.org) is a hosted CI service which supports
-> several platforms, including FreeBSD.  Later on we could build for other
-> hosts in Cirrus-CI, but I'm starting with only FreeBSD as it is not
-> supported by other CI services.
-
-Do you know if there is anyway to eyeball the state of the tree? So far
-I can watch the build run at:
-
-  https://cirrus-ci.com/github/stsquad/qemu
-
-but unlike Travis and Shippable there doesn't seem to be a badge I could
-transclude into the wiki page:
-
-  https://wiki.qemu.org/Template:CIStatus
-
-which means no one will know if the build fails. Travis also makes some
-noise on the IRC channel although given it's stability it's debatable
-how much longer we shall do that.
-
->
-> Signed-off-by: Ed Maste <emaste@freebsd.org>
-> ---
->  .cirrus.yml     | 16 ++++++++++++++++
->  create mode 100644 .cirrus.yml
->
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> new file mode 100644
-> index 0000000000..ff4bf75ad1
-> --- /dev/null
-> +++ b/.cirrus.yml
-> @@ -0,0 +1,16 @@
-> +freebsd_12_task:
-> +  freebsd_instance:
-> +    image: freebsd-12-0-release-amd64
-> +    cpu: 8
-> +    memory: 24G
-> +  env:
-> +    CIRRUS_CLONE_DEPTH: 1
-> +  install_script: pkg install -y
-> +    bison curl cyrus-sasl fontconfig freetype2 git glib gmake gnutls
-> +    nettle perl5 pixman pkgconf png usbredir
-> +  script:
-> +    - mkdir build
-> +    - cd build
-> +    - ../configure || { cat config.log; exit 1; }
-> +    - gmake -j8
-> +    - gmake -j8 check
-
-
---
-Alex Benn=C3=A9e
+> Thanks
+> Laszlo
