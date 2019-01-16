@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:48576)
+Received: from eggs.gnu.org ([209.51.188.92]:56477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gje8t-0004E5-K8
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:53:36 -0500
+	(envelope-from <peterx@redhat.com>) id 1gjeBG-0005ef-1O
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gje8r-0006IW-L6
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:53:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42390)
+	(envelope-from <peterx@redhat.com>) id 1gjeBF-00025a-35
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:56:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53186)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gje8j-0006Ay-Kb
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:53:29 -0500
-Date: Wed, 16 Jan 2019 06:53:11 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190116055311.go6kwaemxfvbgtbb@sirius.home.kraxel.org>
-References: <20190115115047.39326-1-alex.kanavin@gmail.com>
-	<bde5dc1a-2ec3-98fa-1b4c-9147ddbadd86@redhat.com>
-	<CANNYZj8RLr0ZQJjgXD065WzuYUHbi-dCN1-j_gQNq+28U9h6Qw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gjeBE-00022G-Ol
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:56:00 -0500
+Date: Wed, 16 Jan 2019 13:55:49 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20190116055549.GB29461@xz-x1>
+References: <20190111063732.10484-1-xiaoguangrong@tencent.com>
+	<20190111063732.10484-3-xiaoguangrong@tencent.com>
+	<20190115075154.GI24343@xz-x1> <20190115102404.GA2135@work-vm>
+	<2caebc3a-ccd0-d8c6-0368-4f339f326cdf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CANNYZj8RLr0ZQJjgXD065WzuYUHbi-dCN1-j_gQNq+28U9h6Qw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] egl-helpers.h: add a missing X11 include
+In-Reply-To: <2caebc3a-ccd0-d8c6-0368-4f339f326cdf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] migration: fix memory leak when
+ updating tls-creds and tls-hostname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Kanavin <alex.kanavin@gmail.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, guangrong.xiao@gmail.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, wei.w.wang@intel.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Jan 15, 2019 at 09:47:08PM +0100, Alexander Kanavin wrote:
-> On Tue, 15 Jan 2019 at 20:58, Philippe Mathieu-Daud=E9 <philmd@redhat.c=
-om> wrote:
-> > Cc'ing Gerd (the maintainer) and Marc-Andr=E9.
-> >
-> > > |  EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win=
-);
-> > > |                                                        ^~~~~~
-> > > |                                                        minor
+On Tue, Jan 15, 2019 at 10:03:53AM -0600, Eric Blake wrote:
+> On 1/15/19 4:24 AM, Dr. David Alan Gilbert wrote:
+> 
+> > I think the problem is that
+> > migrate_params_check checks a MigrationParameters
+> > 
+> > while the QMP command gives us a MigrateSetParameters; but we also use
+> > migrate_params_check for the global check you added (8b0b29dc) which is
+> > against migrationParameters; so that's why migrate_params_check takes
+> > a MigrationParameters.
+> > 
+> > It's horrible we've got stuff duped so much.
+> 
+> Indeed.
+> 
+> > 
+> > However, I don't like this fix because if someone later was to add
+> > a test for tls parameters to migrate_params_check, then they would be
+> > confused why the hostname/creds weren't checked.
+> > So while we have migrate_params_test_apply, it should cover all
+> > parameters.
+> > 
+> > I think a cleaner check would be to write a MigrateParameters_free
+> > that free'd any strings, and call that in qmp_migrate_set_parameters
+> > on both exit paths.
+> 
+> We already have it; it's named qapi_free_MigrationParameters(),
+> generated in qapi-types-migration.h.
 
-> > <epoxy/egl.h> includes <EGL/eglplatform.h> which contains:
-> >
-> >   #if defined(MESA_EGL_NO_X11_HEADERS)
-> >   typedef void            *EGLNativeDisplayType;
-> >   typedef khronos_uintptr_t EGLNativePixmapType;
-> >   typedef khronos_uintptr_t EGLNativeWindowType;
-> >   #else
-> >   /* X11 (tentative)  */
-> >   #include <X11/Xlib.h>
-> >
-> > So Window should already be declared.
->=20
-> Hello Philippe,
->=20
-> we build mesa explicitly using "--with-platforms=3D'drm surfaceless'"
-> (x11 is not in the list), which means MESA_EGL_NO_X11_HEADERS is
-> indeed defined according to [1]. We also enable opengl and gtk in
-> qemu.
+Yes this seems better.  Then IIUC patch 3 can be simplified as well
+with it.
 
-Hmm, should we use EGLNativeWindowType instead of Window then?
+I'm doing one step back and reading below thread for more context that
+I've missed:
 
-cheers,
-  Gerd
+  https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04526.html
+
+Do we have chance/plan to remove these duplication for QEMU 4.0?
+
+Thanks,
+
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
+
+
+
+
+Regards,
+
+-- 
+Peter Xu
