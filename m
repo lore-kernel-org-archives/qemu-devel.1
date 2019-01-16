@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:60656)
+Received: from eggs.gnu.org ([209.51.188.92]:37797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gje3K-000230-NH
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:47:51 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gje5J-0002pL-Fy
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:49:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gje3J-00050x-WC
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:47:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53492)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gje3J-0004uE-Q1
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:47:49 -0500
-Date: Wed, 16 Jan 2019 13:47:35 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20190116054735.GA29461@xz-x1>
-References: <20190115145256.9593-1-berrange@redhat.com>
-	<20190115145256.9593-7-berrange@redhat.com>
-	<7aa007ec-126d-2a97-aa45-91468f7f8ad4@redhat.com>
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gje5F-00087r-7M
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 00:49:50 -0500
+Date: Wed, 16 Jan 2019 13:49:31 +0800
+From: Yi Zhang <yi.z.zhang@linux.intel.com>
+Message-ID: <20190116054930.GB73677@tiger-server>
+References: <1888836717.9067.1547583207433.ref@mail.yahoo.com>
+	<1888836717.9067.1547583207433@mail.yahoo.com>
+	<2050085823.124754.1547592669568@mail.yahoo.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <7aa007ec-126d-2a97-aa45-91468f7f8ad4@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/12] chardev: remove unused 'sioc'
- variable & cleanup paths
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2050085823.124754.1547592669568@mail.yahoo.com>
+Subject: Re: [Qemu-devel] Devdax backend for vnvdimm not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +25,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Yongji Xie <elohimes@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Kamal Kakri <kamalkakri2017@yahoo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>, luyao.zhong@intel.com
 
-On Wed, Jan 16, 2019 at 06:24:49AM +0100, Thomas Huth wrote:
-> On 2019-01-15 15:52, Daniel P. Berrang=C3=A9 wrote:
-> > The 'sioc' variable in qmp_chardev_open_socket was unused since
-> >=20
-> >   commit 3e7d4d20d3a528b1ed10b1dc3d83119bfb0c5f24
-> >   Author: Peter Xu <peterx@redhat.com>
-> >   Date:   Tue Mar 6 13:33:17 2018 +0800
-> >=20
-> >     chardev: use chardev's gcontext for async connect
-> [...]
-> > -error:
-> > -    if (sioc) {
-> > -        object_unref(OBJECT(sioc));
-> > -    }
->=20
-> So who is doing the object_unref() now in case of errors? That commit
-> did not take care of it ... so it sounds like we could be leaving
-> references behind in case of errors here?
-
-IMHO it'll be done finally in qemu_chr_socket_connected() no matter
-whether it's succeeded or not:
-
-    cleanup:
-        object_unref(OBJECT(sioc));
-
-In other words, I think the old error path is not valid even before
-commit 3e7d4d20d3 because IIUC when reaching the error label the sioc
-should never be set (and if it tries to do an object_unref here it
-would be a real bug).
-
-Thanks,
-
---=20
-Peter Xu
+On 2019-01-15 at 22:51:09 +0000, Kamal Kakri via Qemu-devel wrote:
+>  My devdax device is 2MB aligned so I dont think this is alignment related.# ndctl list -X -n namespace0.0
+> [
+>   {
+>     "dev":"namespace0.0",
+>     "mode":"devdax",
+>     "map":"dev",
+>     "size":16909336576,
+>     "uuid":"e5265c0a-d902-41ce-b1d1-87a78c358aa4",
+>     "daxregion":{
+>       "id":0,
+>       "size":16909336576,
+>       "align":2097152,  ------------------------->
+>       "devices":[
+>         {
+>           "chardev":"dax0.0",
+>           "size":16909336576
+>         }
+>       ]
+>     }
+>   }
+> ]
+> 
+> 
+> I even tried to create vnvdimm of exact same size as my devdax namespace, thinking that it would not need to ftruncate in that case but I still get the same error:
+> # virsh start fox22vm
+> start: domain(optdata): fox22vm
+> start: found option <domain>: fox22vm
+> start: <domain> trying as domain NAME
+> error: Failed to start domain fox22vm
+> error: internal error: qemu unexpectedly closed the monitor: ftruncate: Invalid argument
+> 2019-01-15T21:58:52.647221Z qemu-kvm: -object memory-backend-file,id=memnvdimm0,prealloc=yes,mem-path=/dev/dax0.0,share=yes,size=16909336576: unable to map backing store for guest RAM: Invalid argument
+> 
+> 
+> Has anyone ever got devdax backed vnvdimm configured and working? 
+> If yes then pls let me know what libvirt/qemu/kernel version you have used to get it working.
+> 
+> Thanks.
+>     On Tuesday, January 15, 2019, 3:13:27 PM EST, Kamal Kakri <kamalkakri2017@yahoo.com> wrote:  
+>  
+>  Hi,
+> 
+> I have a namespace (backed by real nvdimm h/w) configured in devdax mode:
+> # ndctl list -N -n namespace0.0
+> [
+>   {
+>     "dev":"namespace0.0",
+>     "mode":"devdax",
+>     "map":"dev",
+>     "size":16909336576,
+>     "uuid":"e5265c0a-d902-41ce-b1d1-87a78c358aa4",
+>     "chardev":"dax0.0"
+>   }
+> ]
+> 
+> 
+> When I try to configure my vm using "virsh" with something like this:
+>     <memory model='nvdimm' access='shared'>
+>       <source>
+>         <path>/dev/dax0.0</path>
+>         <align unit='KiB'>2048</align>
+this should be alignsize, Add Luyao.
+>         <pmem/>
+>       </source>
+>       <target>
+>         <size unit='KiB'>2097152</size>
+>         <node>0</node>
+>       </target>
+>       <alias name='nvdimm0'/>
+>       <address type='dimm' slot='0'/>
+>     </memory>
+> 
+> 
+> I get an error while starting my vm:
+> # virsh start fox22vm
+> start: domain(optdata): fox22vm
+> start: found option <domain>: fox22vm
+> start: <domain> trying as domain NAME
+> error: Failed to start domain fox22vm
+> error: internal error: qemu unexpectedly closed the monitor: ftruncate: Invalid argument
+> 2019-01-15T18:00:36.587467Z qemu-kvm: -object memory-backend-file,id=memnvdimm0,prealloc=yes,mem-path=/dev/dax0.0,share=yes,size=2147483648: unable to map backing store for guest RAM: Invalid argument
+> 
+> I have tried to add "align unit" to my virsh xml but it does not seem to pass it onto qemu (as much as I can see from the qemu cmd line in the logs at /var/log/libvirt/qemu)
+> 
+> 
+> Can anyone pls hint as to what possibly could be the issue ? Is this alignment related or something else ?
+> 
+> Here are my versions:
+> # virsh --version
+> 4.5.0
+> [root@fox22hv libexec]# /usr/libexec/qemu-kvm --version
+> QEMU emulator version 2.12.0 (qemu-kvm-rhev-2.12.0-18.el7_6.1)
+> Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+> # uname -a
+> Linux fox22hv 4.19.0-1.el7.elrepo.x86_64 #1 SMP Mon Oct 22 10:40:32 EDT 2018 x86_64 x86_64 x86_64 GNU/Linux
+> 
+> 
+> 
+> 
+>   
