@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:50241)
+Received: from eggs.gnu.org ([209.51.188.92]:50235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjndw-0003un-9z
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:02:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1gjndv-0003uW-FP
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:02:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gjndr-0005BU-5N
+	(envelope-from <eblake@redhat.com>) id 1gjndo-00058m-Va
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:02:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gjndq-0005AL-SR
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:02:11 -0500
-Date: Wed, 16 Jan 2019 11:01:58 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190116110052-mutt-send-email-mst@kernel.org>
-References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
-	<1547566866-129386-12-git-send-email-imammedo@redhat.com>
-	<4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
-	<20190116132953.404247ec@redhat.com>
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+	<20180731173033.75467-5-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b9866680-39a7-4700-be77-0d0ce3b1f04d@redhat.com>
+Date: Wed, 16 Jan 2019 10:01:37 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190116132953.404247ec@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 11/14] tests: acpi: add AVMF firmware blobs
+In-Reply-To: <20180731173033.75467-5-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KcMVcroBH49fBNW3waXFhOQrfsrSquCrA"
+Subject: Re: [Qemu-devel] [PATCH v4 04/10] block/nbd-client: fix
+ nbd_reply_chunk_iter_receive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Wed, Jan 16, 2019 at 01:29:53PM +0100, Igor Mammedov wrote:
-> On Tue, 15 Jan 2019 21:47:49 +0100
-> Laszlo Ersek <lersek@redhat.com> wrote:
-> 
-> > On 01/15/19 16:41, Igor Mammedov wrote:
-> > > Add firmware blobs built with PcdAcpiTestSupport=TRUE,
-> > > that puts RSDP address in RAM after 1Mb aligned GUID
-> > >   AB87A6B1-2034-BDA0-71BD-375007757785
-> > > so that tests could scan and find it in RAM once firmware's
-> > > initialized ACPI tables.
-> > > 
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > >  Makefile              |   3 ++-
-> > >  pc-bios/avmf.img      | Bin 0 -> 2097152 bytes
-> > >  pc-bios/avmf_vars.img | Bin 0 -> 786432 bytes
-> > >  3 files changed, 2 insertions(+), 1 deletion(-)
-> > >  create mode 100644 pc-bios/avmf.img
-> > >  create mode 100644 pc-bios/avmf_vars.img  
-> > 
-> > "AVMF" is not a great name. "AAVMF" is a downstream name alright, but
-> > many dislike it in upstream use. "edk2-aarch64" or "edk2-ArmVirtQemu"
-> > would be more precise, but those are verbose. Sigh, why are names so
-> > hard. What does everyone think?
-> I'm fine with either version.
->  
-> > Also, do you have to care about the license of firmware images built
-> > from edk2 when bundling such images? Since edk2 commit 9a67ba261fe9
-> > ("ArmVirtPkg: Replace obsoleted network drivers from platform DSC/FDF.",
-> > 2018-12-14), you cannot build the ArmVirtQemu (aka AAVMF) firmware
-> > without OpenSSL. Thus, the resultant license is 2-BSDL + OpenSSL -- for
-> > now anyway.
-> > 
-> > Because, in the near future, that might change again. edk2 is in the
-> > process of moving to Apache-2.0, and OpenSSL will also move (AFAICT) to
-> > Apache-2.0 starting with release 3.0.0. (See commit 151333164ece,
-> > "Change license to the Apache License v2.0", 2018-12-06.)
-> That's another reason to look into EFI app approach (a simple one without
-> dependencies) ans let distro to provide firmware image.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KcMVcroBH49fBNW3waXFhOQrfsrSquCrA
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com,
+ pbonzini@redhat.com, den@openvz.org
+Message-ID: <b9866680-39a7-4700-be77-0d0ce3b1f04d@redhat.com>
+Subject: Re: [PATCH v4 04/10] block/nbd-client: fix
+ nbd_reply_chunk_iter_receive
+References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
+ <20180731173033.75467-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20180731173033.75467-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-That will mean supporting very old firmware with the app.
-I'm all for the EFI app approach for modularity
-but I think we should include the batteries with this toy.
+On 7/31/18 12:30 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Use exported report, not the variable to be reused (should not really
+> matter).
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/nbd-client.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/block/nbd-client.c b/block/nbd-client.c
+> index a1813cbfe1..263d1721f9 100644
+> --- a/block/nbd-client.c
+> +++ b/block/nbd-client.c
+> @@ -599,7 +599,7 @@ static bool nbd_reply_chunk_iter_receive(NBDClientS=
+ession *s,
+>      }
+> =20
+>      /* Do not execute the body of NBD_FOREACH_REPLY_CHUNK for simple r=
+eply. */
+> -    if (nbd_reply_is_simple(&s->reply) || s->quit) {
+> +    if (nbd_reply_is_simple(reply) || s->quit) {
+>          goto break_loop;
+>      }
+> =20
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-> > Thanks
-> > Laszlo
+--KcMVcroBH49fBNW3waXFhOQrfsrSquCrA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlw/VWEACgkQp6FrSiUn
+Q2qD7gf9Ed35FwNykFXWWph5iacO8ek/s4HrcdZOsmsucqcNMhE/Ac8yWo8RLtrn
+o/xG1qQTf1FOCE90GlP5+BQM8Y7cBhtBvMc3sVATdKcrciE8vlCKdrgFqQgEn/Z1
+p01wJpSNJZ2ML+m+jdfG/Ym7qQDWEw8dkzvdme67reYSFh0y/GiKt2miyTNRRSgI
+qDrkfusx4zdlYOxDEZBhJxMhIwYX5G9HZy6d/NNEW/v4Pe6r955hAtyJhmXYcDhp
+IJZyES/xsVVbJIio9GjYKHjpFJhm4ma9Wf0rzuZ1BKbdEq6pKWoXocr6MAveG91y
+w0ddkzHSmjYUG5mMkL31B+NAjKPuMw==
+=SKOy
+-----END PGP SIGNATURE-----
+
+--KcMVcroBH49fBNW3waXFhOQrfsrSquCrA--
