@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58004)
+Received: from eggs.gnu.org ([209.51.188.92]:57999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjuks-000470-4k
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjuks-00046x-4e
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjukk-0002uX-35
+	(envelope-from <dirty.ice.hu@gmail.com>) id 1gjukk-0002ug-2M
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:52 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40772)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35798)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
-	id 1gjukj-0002fD-I4
+	id 1gjukj-0002kz-JV
 	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:37:45 -0500
-Received: by mail-wr1-x441.google.com with SMTP id p4so8949772wrt.7
-	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:37:33 -0800 (PST)
+Received: by mail-wr1-x444.google.com with SMTP id 96so8979591wrb.2
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 15:37:39 -0800 (PST)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 	<dirty.ice.hu@gmail.com>
-Date: Thu, 17 Jan 2019 00:36:40 +0100
-Message-Id: <c6cf2a479f14bd922d8acdb072f0ca1af4edcacb.1547681517.git.DirtY.iCE.hu@gmail.com>
+Date: Thu, 17 Jan 2019 00:36:47 +0100
+Message-Id: <9b1d639f82f26aff6a87db6f195b6dc0c7b0f29e.1547681517.git.DirtY.iCE.hu@gmail.com>
 In-Reply-To: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1547681517.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 07/50] dsoundaudio: port to -audiodev config
+Subject: [Qemu-devel] [PATCH v3 14/50] audio: -audiodev command line option:
+ cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,256 +34,298 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+Remove no longer needed code.
+
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/dsound_template.h |  6 ++---
- audio/audio_legacy.c    | 39 +++++++++++++++++++++++++++
- audio/dsoundaudio.c     | 59 ++++++++++++-----------------------------
- 3 files changed, 59 insertions(+), 45 deletions(-)
+ audio/audio_int.h |  17 ----
+ audio/audio.c     | 201 +---------------------------------------------
+ 2 files changed, 4 insertions(+), 214 deletions(-)
 
-diff --git a/audio/dsound_template.h b/audio/dsound_template.h
-index b439f33f58..96181efb36 100644
---- a/audio/dsound_template.h
-+++ b/audio/dsound_template.h
-@@ -167,17 +167,18 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-     dsound *s = drv_opaque;
-     WAVEFORMATEX wfx;
-     struct audsettings obt_as;
--    DSoundConf *conf = &s->conf;
- #ifdef DSBTYPE_IN
-     const char *typ = "ADC";
-     DSoundVoiceIn *ds = (DSoundVoiceIn *) hw;
-     DSCBUFFERDESC bd;
-     DSCBCAPS bc;
-+    AudiodevPerDirectionOptions *pdo = s->dev->in;
- #else
-     const char *typ = "DAC";
-     DSoundVoiceOut *ds = (DSoundVoiceOut *) hw;
-     DSBUFFERDESC bd;
-     DSBCAPS bc;
-+    AudiodevPerDirectionOptions *pdo = s->dev->out;
- #endif
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index 353467b505..66214199f0 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -33,22 +33,6 @@
  
-     if (!s->FIELD2) {
-@@ -193,8 +194,8 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-     memset (&bd, 0, sizeof (bd));
-     bd.dwSize = sizeof (bd);
-     bd.lpwfxFormat = &wfx;
-+    bd.dwBufferBytes = audio_buffer_bytes(pdo, as, 92880);
- #ifdef DSBTYPE_IN
--    bd.dwBufferBytes = conf->bufsize_in;
-     hr = IDirectSoundCapture_CreateCaptureBuffer (
-         s->dsound_capture,
-         &bd,
-@@ -203,7 +204,6 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
-         );
- #else
-     bd.dwFlags = DSBCAPS_STICKYFOCUS | DSBCAPS_GETCURRENTPOSITION2;
--    bd.dwBufferBytes = conf->bufsize_out;
-     hr = IDirectSound_CreateSoundBuffer (
-         s->dsound,
-         &bd,
-diff --git a/audio/audio_legacy.c b/audio/audio_legacy.c
-index 955fb18241..601a68fab6 100644
---- a/audio/audio_legacy.c
-+++ b/audio/audio_legacy.c
-@@ -120,6 +120,30 @@ static void get_frames_to_usecs(const char *env, uint32_t *dst, bool *has_dst,
-     }
- }
+ struct audio_pcm_ops;
  
-+static uint32_t samples_to_usecs(uint32_t samples,
-+                                 AudiodevPerDirectionOptions *pdo)
-+{
-+    uint32_t channels = pdo->has_channels ? pdo->channels : 2;
-+    return frames_to_usecs(samples / channels, pdo);
-+}
-+
-+static uint32_t bytes_to_usecs(uint32_t bytes, AudiodevPerDirectionOptions *pdo)
-+{
-+    AudioFormat fmt = pdo->has_format ? pdo->format : AUDIO_FORMAT_S16;
-+    uint32_t bytes_per_sample = audioformat_bytes_per_sample(fmt);
-+    return samples_to_usecs(bytes / bytes_per_sample, pdo);
-+}
-+
-+static void get_bytes_to_usecs(const char *env, uint32_t *dst, bool *has_dst,
-+                               AudiodevPerDirectionOptions *pdo)
-+{
-+    const char *val = getenv(env);
-+    if (val) {
-+        *dst = bytes_to_usecs(toui32(val), pdo);
-+        *has_dst = true;
-+    }
-+}
-+
- /* backend specific functions */
- /* ALSA */
- static void handle_alsa_per_direction(
-@@ -186,6 +210,17 @@ static void handle_coreaudio(Audiodev *dev)
-             &dev->out->buffer_count, &dev->out->has_buffer_count);
- }
- 
-+/* dsound */
-+static void handle_dsound(Audiodev *dev)
-+{
-+    get_millis_to_usecs("QEMU_DSOUND_LATENCY_MILLIS",
-+                        &dev->u.dsound.latency, &dev->u.dsound.has_latency);
-+    get_bytes_to_usecs("QEMU_DSOUND_BUFSIZE_OUT", &dev->out->buffer_len,
-+                       &dev->out->has_buffer_len, dev->out);
-+    get_bytes_to_usecs("QEMU_DSOUND_BUFSIZE_IN", &dev->in->buffer_len,
-+                       &dev->in->has_buffer_len, dev->in);
-+}
-+
- /* general */
- static void handle_per_direction(
-     AudiodevPerDirectionOptions *pdo, const char *prefix)
-@@ -237,6 +272,10 @@ static AudiodevListEntry *legacy_opt(const char *drvname)
-         handle_coreaudio(e->dev);
-         break;
- 
-+    case AUDIODEV_DRIVER_DSOUND:
-+        handle_dsound(e->dev);
-+        break;
-+
-     default:
-         break;
-     }
-diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
-index 02fe777cba..a7d04b5033 100644
---- a/audio/dsoundaudio.c
-+++ b/audio/dsoundaudio.c
-@@ -32,6 +32,7 @@
- 
- #define AUDIO_CAP "dsound"
- #include "audio_int.h"
-+#include "qemu/host-utils.h"
- 
- #include <windows.h>
- #include <mmsystem.h>
-@@ -42,17 +43,11 @@
- 
- /* #define DEBUG_DSOUND */
- 
--typedef struct {
--    int bufsize_in;
--    int bufsize_out;
--    int latency_millis;
--} DSoundConf;
+-typedef enum {
+-    AUD_OPT_INT,
+-    AUD_OPT_FMT,
+-    AUD_OPT_STR,
+-    AUD_OPT_BOOL
+-} audio_option_tag_e;
 -
- typedef struct {
-     LPDIRECTSOUND dsound;
-     LPDIRECTSOUNDCAPTURE dsound_capture;
-     struct audsettings settings;
--    DSoundConf conf;
-+    Audiodev *dev;
- } dsound;
- 
- typedef struct {
-@@ -248,9 +243,9 @@ static void GCC_FMT_ATTR (3, 4) dsound_logerr2 (
-     dsound_log_hresult (hr);
- }
- 
--static DWORD millis_to_bytes (struct audio_pcm_info *info, DWORD millis)
-+static uint64_t usecs_to_bytes(struct audio_pcm_info *info, uint32_t usecs)
- {
--    return (millis * info->bytes_per_second) / 1000;
-+    return muldiv64(usecs, info->bytes_per_second, 1000000);
- }
- 
- #ifdef DEBUG_DSOUND
-@@ -478,7 +473,7 @@ static int dsound_run_out (HWVoiceOut *hw, int live)
-     LPVOID p1, p2;
-     int bufsize;
-     dsound *s = ds->s;
--    DSoundConf *conf = &s->conf;
-+    AudiodevDsoundOptions *dso = &s->dev->u.dsound;
- 
-     if (!dsb) {
-         dolog ("Attempt to run empty with playback buffer\n");
-@@ -501,14 +496,14 @@ static int dsound_run_out (HWVoiceOut *hw, int live)
-     len = live << hwshift;
- 
-     if (ds->first_time) {
--        if (conf->latency_millis) {
-+        if (dso->latency) {
-             DWORD cur_blat;
- 
-             cur_blat = audio_ring_dist (wpos, ppos, bufsize);
-             ds->first_time = 0;
-             old_pos = wpos;
-             old_pos +=
--                millis_to_bytes (&hw->info, conf->latency_millis) - cur_blat;
-+                usecs_to_bytes(&hw->info, dso->latency) - cur_blat;
-             old_pos %= bufsize;
-             old_pos &= ~hw->info.align;
-         }
-@@ -747,12 +742,6 @@ static int dsound_run_in (HWVoiceIn *hw)
-     return decr;
- }
- 
--static DSoundConf glob_conf = {
--    .bufsize_in         = 16384,
--    .bufsize_out        = 16384,
--    .latency_millis     = 10
+-struct audio_option {
+-    const char *name;
+-    audio_option_tag_e tag;
+-    void *valp;
+-    const char *descr;
+-    int *overriddenp;
+-    int overridden;
 -};
 -
- static void dsound_audio_fini (void *opaque)
- {
-     HRESULT hr;
-@@ -788,8 +777,17 @@ static void *dsound_audio_init(Audiodev *dev)
-     int err;
-     HRESULT hr;
-     dsound *s = g_malloc0(sizeof(dsound));
-+    AudiodevDsoundOptions *dso;
-+
-+    assert(dev->driver == AUDIODEV_DRIVER_DSOUND);
-+    s->dev = dev;
-+    dso = &dev->u.dsound;
-+
-+    if (!dso->has_latency) {
-+        dso->has_latency = true;
-+        dso->latency = 10000; /* 10 ms */
-+    }
- 
--    s->conf = glob_conf;
-     hr = CoInitialize (NULL);
-     if (FAILED (hr)) {
-         dsound_logerr (hr, "Could not initialize COM\n");
-@@ -854,28 +852,6 @@ static void *dsound_audio_init(Audiodev *dev)
-     return s;
+ struct audio_callback {
+     void *opaque;
+     audio_callback_fn fn;
+@@ -145,7 +129,6 @@ typedef struct audio_driver audio_driver;
+ struct audio_driver {
+     const char *name;
+     const char *descr;
+-    struct audio_option *options;
+     void *(*init) (Audiodev *);
+     void (*fini) (void *);
+     struct audio_pcm_ops *pcm_ops;
+diff --git a/audio/audio.c b/audio/audio.c
+index 159b049ceb..77bd8386d0 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -172,113 +172,6 @@ void *audio_calloc (const char *funcname, int nmemb, size_t size)
+     return g_malloc0 (len);
  }
  
--static struct audio_option dsound_options[] = {
--    {
--        .name  = "LATENCY_MILLIS",
--        .tag   = AUD_OPT_INT,
--        .valp  = &glob_conf.latency_millis,
--        .descr = "(undocumented)"
--    },
--    {
--        .name  = "BUFSIZE_OUT",
--        .tag   = AUD_OPT_INT,
--        .valp  = &glob_conf.bufsize_out,
--        .descr = "(undocumented)"
--    },
--    {
--        .name  = "BUFSIZE_IN",
--        .tag   = AUD_OPT_INT,
--        .valp  = &glob_conf.bufsize_in,
--        .descr = "(undocumented)"
--    },
--    { /* End of list */ }
--};
+-static const char *audio_audfmt_to_string (AudioFormat fmt)
+-{
+-    switch (fmt) {
+-    case AUDIO_FORMAT_U8:
+-        return "U8";
 -
- static struct audio_pcm_ops dsound_pcm_ops = {
-     .init_out = dsound_init_out,
-     .fini_out = dsound_fini_out,
-@@ -893,7 +869,6 @@ static struct audio_pcm_ops dsound_pcm_ops = {
- static struct audio_driver dsound_audio_driver = {
-     .name           = "dsound",
-     .descr          = "DirectSound http://wikipedia.org/wiki/DirectSound",
--    .options        = dsound_options,
-     .init           = dsound_audio_init,
-     .fini           = dsound_audio_fini,
-     .pcm_ops        = &dsound_pcm_ops,
+-    case AUDIO_FORMAT_U16:
+-        return "U16";
+-
+-    case AUDIO_FORMAT_S8:
+-        return "S8";
+-
+-    case AUDIO_FORMAT_S16:
+-        return "S16";
+-
+-    case AUDIO_FORMAT_U32:
+-        return "U32";
+-
+-    case AUDIO_FORMAT_S32:
+-        return "S32";
+-
+-    default:
+-        abort();
+-    }
+-
+-    dolog ("Bogus audfmt %d returning S16\n", fmt);
+-    return "S16";
+-}
+-
+-static AudioFormat audio_string_to_audfmt (const char *s, AudioFormat defval,
+-                                        int *defaultp)
+-{
+-    if (!strcasecmp (s, "u8")) {
+-        *defaultp = 0;
+-        return AUDIO_FORMAT_U8;
+-    }
+-    else if (!strcasecmp (s, "u16")) {
+-        *defaultp = 0;
+-        return AUDIO_FORMAT_U16;
+-    }
+-    else if (!strcasecmp (s, "u32")) {
+-        *defaultp = 0;
+-        return AUDIO_FORMAT_U32;
+-    }
+-    else if (!strcasecmp (s, "s8")) {
+-        *defaultp = 0;
+-        return AUDIO_FORMAT_S8;
+-    }
+-    else if (!strcasecmp (s, "s16")) {
+-        *defaultp = 0;
+-        return AUDIO_FORMAT_S16;
+-    }
+-    else if (!strcasecmp (s, "s32")) {
+-        *defaultp = 0;
+-        return AUDIO_FORMAT_S32;
+-    }
+-    else {
+-        dolog ("Bogus audio format `%s' using %s\n",
+-               s, audio_audfmt_to_string (defval));
+-        *defaultp = 1;
+-        return defval;
+-    }
+-}
+-
+-static AudioFormat audio_get_conf_fmt (const char *envname,
+-                                    AudioFormat defval,
+-                                    int *defaultp)
+-{
+-    const char *var = getenv (envname);
+-    if (!var) {
+-        *defaultp = 1;
+-        return defval;
+-    }
+-    return audio_string_to_audfmt (var, defval, defaultp);
+-}
+-
+-static int audio_get_conf_int (const char *key, int defval, int *defaultp)
+-{
+-    int val;
+-    char *strval;
+-
+-    strval = getenv (key);
+-    if (strval && !qemu_strtoi(strval, NULL, 10, &val)) {
+-        *defaultp = 0;
+-        return val;
+-    }
+-    else {
+-        *defaultp = 1;
+-        return defval;
+-    }
+-}
+-
+-static const char *audio_get_conf_str (const char *key,
+-                                       const char *defval,
+-                                       int *defaultp)
+-{
+-    const char *val = getenv (key);
+-    if (!val) {
+-        *defaultp = 1;
+-        return defval;
+-    }
+-    else {
+-        *defaultp = 0;
+-        return val;
+-    }
+-}
+-
+ void AUD_vlog (const char *cap, const char *fmt, va_list ap)
+ {
+     if (cap) {
+@@ -297,89 +190,6 @@ void AUD_log (const char *cap, const char *fmt, ...)
+     va_end (ap);
+ }
+ 
+-static void audio_process_options (const char *prefix,
+-                                   struct audio_option *opt)
+-{
+-    char *optname;
+-    const char qemu_prefix[] = "QEMU_";
+-    size_t preflen, optlen;
+-
+-    if (audio_bug(__func__, !prefix)) {
+-        dolog ("prefix = NULL\n");
+-        return;
+-    }
+-
+-    if (audio_bug(__func__, !opt)) {
+-        dolog ("opt = NULL\n");
+-        return;
+-    }
+-
+-    preflen = strlen (prefix);
+-
+-    for (; opt->name; opt++) {
+-        size_t len, i;
+-        int def;
+-
+-        if (!opt->valp) {
+-            dolog ("Option value pointer for `%s' is not set\n",
+-                   opt->name);
+-            continue;
+-        }
+-
+-        len = strlen (opt->name);
+-        /* len of opt->name + len of prefix + size of qemu_prefix
+-         * (includes trailing zero) + zero + underscore (on behalf of
+-         * sizeof) */
+-        optlen = len + preflen + sizeof (qemu_prefix) + 1;
+-        optname = g_malloc (optlen);
+-
+-        pstrcpy (optname, optlen, qemu_prefix);
+-
+-        /* copy while upper-casing, including trailing zero */
+-        for (i = 0; i <= preflen; ++i) {
+-            optname[i + sizeof (qemu_prefix) - 1] = qemu_toupper(prefix[i]);
+-        }
+-        pstrcat (optname, optlen, "_");
+-        pstrcat (optname, optlen, opt->name);
+-
+-        def = 1;
+-        switch (opt->tag) {
+-        case AUD_OPT_BOOL:
+-        case AUD_OPT_INT:
+-            {
+-                int *intp = opt->valp;
+-                *intp = audio_get_conf_int (optname, *intp, &def);
+-            }
+-            break;
+-
+-        case AUD_OPT_FMT:
+-            {
+-                AudioFormat *fmtp = opt->valp;
+-                *fmtp = audio_get_conf_fmt (optname, *fmtp, &def);
+-            }
+-            break;
+-
+-        case AUD_OPT_STR:
+-            {
+-                const char **strp = opt->valp;
+-                *strp = audio_get_conf_str (optname, *strp, &def);
+-            }
+-            break;
+-
+-        default:
+-            dolog ("Bad value tag for option `%s' - %d\n",
+-                   optname, opt->tag);
+-            break;
+-        }
+-
+-        if (!opt->overriddenp) {
+-            opt->overriddenp = &opt->overridden;
+-        }
+-        *opt->overriddenp = !def;
+-        g_free (optname);
+-    }
+-}
+-
+ static void audio_print_settings (struct audsettings *as)
+ {
+     dolog ("frequency=%d nchannels=%d fmt=", as->freq, as->nchannels);
+@@ -1092,7 +902,7 @@ void AUD_set_active_out (SWVoiceOut *sw, int on)
+             if (!hw->enabled) {
+                 hw->enabled = 1;
+                 if (s->vm_running) {
+-                    hw->pcm_ops->ctl_out(hw, VOICE_ENABLE, true /* todo */);
++                    hw->pcm_ops->ctl_out(hw, VOICE_ENABLE);
+                     audio_reset_timer (s);
+                 }
+             }
+@@ -1137,7 +947,7 @@ void AUD_set_active_in (SWVoiceIn *sw, int on)
+             if (!hw->enabled) {
+                 hw->enabled = 1;
+                 if (s->vm_running) {
+-                    hw->pcm_ops->ctl_in(hw, VOICE_ENABLE, true /* todo */);
++                    hw->pcm_ops->ctl_in(hw, VOICE_ENABLE);
+                     audio_reset_timer (s);
+                 }
+             }
+@@ -1461,9 +1271,6 @@ void audio_run (const char *msg)
+ static int audio_driver_init(AudioState *s, struct audio_driver *drv,
+                              Audiodev *dev)
+ {
+-    if (drv->options) {
+-        audio_process_options (drv->name, drv->options);
+-    }
+     s->drv_opaque = drv->init(dev);
+ 
+     if (s->drv_opaque) {
+@@ -1488,11 +1295,11 @@ static void audio_vm_change_state_handler (void *opaque, int running,
+ 
+     s->vm_running = running;
+     while ((hwo = audio_pcm_hw_find_any_enabled_out (hwo))) {
+-        hwo->pcm_ops->ctl_out(hwo, op, true /* todo */);
++        hwo->pcm_ops->ctl_out(hwo, op);
+     }
+ 
+     while ((hwi = audio_pcm_hw_find_any_enabled_in (hwi))) {
+-        hwi->pcm_ops->ctl_in(hwi, op, true /* todo */);
++        hwi->pcm_ops->ctl_in(hwi, op);
+     }
+     audio_reset_timer (s);
+ }
 -- 
 2.20.1
