@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34928)
+Received: from eggs.gnu.org ([209.51.188.92]:39792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjiub-00021H-BN
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:59:10 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gjixr-0003HL-BM
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:02:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gjiua-0002W4-As
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:59:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52560)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gjiuZ-0002Nm-CV
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 05:59:08 -0500
-References: <1547196148-12250-1-git-send-email-thuth@redhat.com>
-	<b1db55de-6741-76c7-33b1-74fc2692b82c@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <552ac2db-6568-18f8-5397-a00c4b432df9@redhat.com>
-Date: Wed, 16 Jan 2019 11:58:56 +0100
+	(envelope-from <sgarzare@redhat.com>) id 1gjixj-0002E6-Lw
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:02:26 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38601)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gjixf-00021q-Qq
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 06:02:22 -0500
+Received: by mail-wr1-f66.google.com with SMTP id v13so6411022wrw.5
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 03:02:09 -0800 (PST)
+Date: Wed, 16 Jan 2019 12:02:04 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190116110204.kx7tmg3vgz4fitkc@steredhat>
+References: <20190115100058.44712-1-sgarzare@redhat.com>
+	<20190115100058.44712-4-sgarzare@redhat.com>
+	<9737a9f4-bc26-73fd-f3ee-b394b46d861b@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <b1db55de-6741-76c7-33b1-74fc2692b82c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] HACKING vs. CODING_STYLE (was: Re: [PATCH] HACKING:
- Clarify the paragraph about typedefs)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9737a9f4-bc26-73fd-f3ee-b394b46d861b@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] optionrom: add new PVH option rom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,17 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Liam Merwick <liam.merwick@oracle.com>
+Cc: qemu-devel@nongnu.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, George Kennedy <george.kennedy@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Maran Wilson <maran.wilson@oracle.com>
 
-On 2019-01-11 11:38, Paolo Bonzini wrote:
-[...]
-> And, I would move it to CODING_STYLE since we are at it. :)
+Hi Liam,
 
-I just got some feedback in IRC already, and seems like I am not alone,
-so let's discuss it here on the mailing list, too: What's the exact
-difference between CODING_STYLE and HACKING? Some of the paragraphs in
-HACKING sound rather mandatory and coding-style related, too...
-Should we maybe merge the two files into one (e.g. called "CODING")?
+On Wed, Jan 16, 2019 at 10:16:04AM +0000, Liam Merwick wrote:
+> Hi Stefano,
+> 
+> Code LGTM, just a few minor comments below
+> 
+> On 15/01/2019 10:00, Stefano Garzarella wrote:
+> > The new pvh.bin option rom can be used with SeaBIOS to boot
+> > uncompressed kernel using the x86/HVM direct boot ABI.
+> > 
+> > pvh.S contains the entry point of the option rom. It runs
+> > in real mode, loads the e820 table querying the BIOS, and
+> > then it switches to 32bit protect mode and jump to the
+> 
+> "protect" -> "protected"
+> "jump" -> "jumps"
+> 
 
- Thomas
+Thanks!
+
+> > diff --git a/pc-bios/optionrom/pvh_main.c b/pc-bios/optionrom/pvh_main.c
+> > +
+> > +asm (".code32"); /* this code will be executed in protect mode */
+> 
+> 
+> "protect" -> "protected"
+> 
+> 
+
+Thanks!
+
+> > +
+> > +struct hvm_start_info start_info;
+> 
+> Can this be static?
+> 
+
+Yes.
+
+> > +struct hvm_modlist_entry ramdisk_mod;
+> 
+> Is this used?
+> 
+
+Thanks, I forgot to remove it. I'm using it for initrd, but of course is
+not used in this patch.
+
+> > +uint8_t cmdline_buffer[CMDLINE_BUFSIZE];
+> 
+> Can this be static?
+> 
+
+Yes.
+
+I'll include these changes in v3.
+
+Thanks,
+Stefano
+
+--
+
+Stefano Garzarella
+Red Hat
