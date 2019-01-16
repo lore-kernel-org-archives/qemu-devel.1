@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52359)
+Received: from eggs.gnu.org ([209.51.188.92]:54950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gjnmb-0007Vf-6s
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:11:14 -0500
+	(envelope-from <lersek@redhat.com>) id 1gjnsu-0000Ij-5T
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:17:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gjnmT-0004Rr-NP
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:11:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59054)
+	(envelope-from <lersek@redhat.com>) id 1gjnss-0007kD-3f
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:17:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gjnmR-0004Mr-JW
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:11:05 -0500
-Date: Wed, 16 Jan 2019 14:10:53 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190116161053.GD14807@habkost.net>
-References: <20181127135030.1671-1-i.maximets@samsung.com>
-	<CGME20181127135045eucas1p1e259cacbab5e715f7845b9beee22f882@eucas1p1.samsung.com>
-	<20181127135030.1671-2-i.maximets@samsung.com>
-	<20181211105329.GE921@redhat.com>
-	<52c43506-ef39-6d08-7db4-ad3c0f96dd1f@samsung.com>
-	<20181212064936.ubnv3yif34e7ga5j@sirius.home.kraxel.org>
-	<20190116153027.GC14807@habkost.net>
-	<856c189d-937e-2471-c3c1-77e4d1e61ed6@samsung.com>
-	<20190116154857.GC20275@redhat.com>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gjnsr-0007jQ-Re
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 11:17:42 -0500
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-11-git-send-email-imammedo@redhat.com>
+	<15698cec-79eb-7a17-cf70-3a8fcb7962a6@redhat.com>
+	<20190116113227.47ebdea2@redhat.com>
+	<314cffa2-f153-011a-9c6e-01e94c73590a@redhat.com>
+	<b69a850b-35a4-6258-051d-573a2970e409@redhat.com>
+	<20190116132046.042a99ae@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <0e39924a-064b-b4fd-dad6-57aac29e8ea7@redhat.com>
+Date: Wed, 16 Jan 2019 17:17:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190116154857.GC20275@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] hostmem-memfd: disable for systems
- wihtout sealing support
+In-Reply-To: <20190116132046.042a99ae@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 10/14] tests: acpi: ignore SMBIOS tests
+ when UEFI firmware is used
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +34,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Ilya Maximets <i.maximets@samsung.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-On Wed, Jan 16, 2019 at 03:48:57PM +0000, Daniel P. Berrang=E9 wrote:
-> On Wed, Jan 16, 2019 at 06:46:39PM +0300, Ilya Maximets wrote:
-> >=20
-> >=20
-> > On 16.01.2019 18:30, Eduardo Habkost wrote:
-> > > On Wed, Dec 12, 2018 at 07:49:36AM +0100, Gerd Hoffmann wrote:
-> > >> On Tue, Dec 11, 2018 at 02:09:11PM +0300, Ilya Maximets wrote:
-> > >>> On 11.12.2018 13:53, Daniel P. Berrang=E9 wrote:
-> > >>>>>
-> > >>>>> Let's restrict memfd backend to systems with sealing support.
-> > >>>>
-> > >>>> I don't think we need todo that - sealing is optional in the QEM=
-U code,
-> > >>>> we simply have it set to the wrong default when sealing is not a=
-vailable.
-> > >>>
-> > >>> That was literally what I've fixed in v1:
-> > >>>     https://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg0=
-5483.html
-> > >>>
-> > >>> but 2 people suggested me to disable memfd entirely for this case=
-.
-> > >>> Do you think I need to get patch from v1 back ?
-> > >>>
-> > >>> Gerd, Marc-Andr=E9, what do you think?
-> > >>
-> > >> I still think it makes sense to require sealing support.  Sealing =
-is
-> > >> very useful, and there are only a few kernel versions with memfd b=
-ut
-> > >> without sealing.  So finding such kernels in the wild will become =
-more
-> > >> rare over time.  I wouldn't worry too much about them.
-> > >=20
-> > > -object memory-backend-memfd,id=3Dmem,size=3D2M,seal=3Doff still
-> > > works on those systems, doesn't it?  What's the rationale for
-> > > breaking a working configuration without following the
-> > > deprecation policy?
-> > >=20
-> >=20
-> > See the commit message.
-> > '.seal' property is not registered if sealing is not supported.
-> > So, there is no way to disable sealing on the system that does not su=
-pport it.
->=20
-> As I pointed out a few lines up, this is simply because QEMU has a bug
-> setting seal=3Dtrue as the built-in default value even when it isn't
-> supported.=20
+On 01/16/19 13:20, Igor Mammedov wrote:
+> On Wed, 16 Jan 2019 12:09:03 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
+>> On 01/16/19 12:07, Laszlo Ersek wrote:
 
-Changing to seal=3Dfalse by default may make it work on some hosts,
-but I don't see the point of increasing our support burden just
-for a few kernel versions.  I agree with Gerd, I think it's
-simpler to keep it unsupported.
+>>> In particular, for this approach, we don't even need gnu-efi. (Because,
+>>> personally, I would strongly prefer to write the UEFI application with
+>>> the edk2 framework.) For a while now, edk2 has supported "multiple
+>>> workspaces":
+>>>
+>>> https://github.com/tianocore/tianocore.github.io/wiki/Multiple_Workspace
+>>>
+>>> and as a result, it is possible to build the necessary UEFI app from:
+>>> - an edk2 checkout that the maintainer has "somewhere" on their disk,
+>>> - and the UEFI app source code that is contained in a QEMU checkout that
+>>> the maintainer has "somewhere else" on their disk.
+>>>
+>>> This approach allows the UEFI app source to live in the QEMU tree, and
+>>> the affected maintainer(s) would be personally responsible for setting
+>>> up their edk2 clones, and compilers. (The edk2 clone could even be a
+>>> submodule of QEMU, for example at roms/edk2.) For example,
+>>> "roms/Makefile" already calls an external EFIROM utility (also from
+>>> edk2) in order to build the combined iPXE option ROMs.
+>>>
+>>> And yes, we could turn the UEFI binaries into bootable ISO images at once.
+>>>
+>>> I'll try to post some patches soon (or not so soon). I think the app's
+>>> source code, and the edk2 submodule, should live under roms/, and the
+>>> bootable images should live under pc-bios/.
+>>>
+>>> (In fact we could use this opportunity to build & bundle OVMF itself...
+>>> not sure if that's in scope for now. Gerd, what's your take?)  
 
---=20
-Eduardo
+>> Oh, I should add: the UEFI app in question could be built without
+>> pulling in any OpenSSL bits; OVMF itself can't be built like that (it
+>> now has a hard dependency on OpenSSL). This might matter from a
+>> licensing/bundling perspective.
+
+> That's why I've suggested non EDK2 variant, as we don't need very much
+> from it and its license looks BDS like and it's very simple to build
+> pretty much for everyone.
+> Dealing with EDK2 to rebuild EFI is rather daunting prospect
+> (at least from my point of view so I'd try to avoid it if possible)
+
+Writing the app against edk2 is a lot simpler for me, and I have working
+experience with cross-compiling edk2 stuff from x86_64 to aarch64 as well.
+
+OTOH I have zero experience with gnu-efi, especially when it comes to
+cross-compilation. System-level gnu-efi packages don't offer cross-built
+binaries anyway, so we can't get around a git submodule -- whether it's
+gnu-efi or edk2, we have to build from source.
+
+And once we have a git submodule, I can put all the build commands in a
+simple shell script.
+
+Regarding OpenSSL, the edk2 metafiles for the EFI app will make it
+evident that OpenSSL is not used. OpenSSL is anyway a git submodule of
+edk2, so if *that* submodule is not inited -- which you can verify --,
+then any OpenSSL references would fail to build. The resultant UEFI
+binary will be covered by the 2-clause BSDL (from core edk2) and
+whatever license we choose for the UEFI app itself (could be BSDL, could
+be GPL, as you prefer).
+
+Obviously I'm willing to take on maintenance for the EFI app and the
+build script, if that works for you.
+
+I understand the point of gnu-efi, but it's just unbearably limiting,
+relative to the goodies in edk2.
+
+Thanks,
+Laszlo
