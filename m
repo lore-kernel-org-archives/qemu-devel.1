@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:42409)
+Received: from eggs.gnu.org ([209.51.188.92]:42689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkCpP-0004NO-Hz
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:55:48 -0500
+	(envelope-from <crosa@redhat.com>) id 1gkCqd-00056w-Q7
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:57:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkCpO-0004n7-H7
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:55:47 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36226)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkCpO-0004ma-3L
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:55:46 -0500
-Received: by mail-oi1-x243.google.com with SMTP id x23so7015457oix.3
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 10:55:45 -0800 (PST)
+	(envelope-from <crosa@redhat.com>) id 1gkCqc-0005rH-Ap
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:57:03 -0500
+From: Cleber Rosa <crosa@redhat.com>
+Date: Thu, 17 Jan 2019 13:56:12 -0500
+Message-Id: <20190117185628.21862-3-crosa@redhat.com>
+In-Reply-To: <20190117185628.21862-1-crosa@redhat.com>
+References: <20190117185628.21862-1-crosa@redhat.com>
 MIME-Version: 1.0
-References: <20190117132703.17790-1-alex.bennee@linaro.org>
-	<CAFEAcA_E2Lf9Zh2WhVDddJiD5TPPyLk1RvT7_Asn4vXnao1NjQ@mail.gmail.com>
-	<20190117183002.GA21582@flamenco>
-In-Reply-To: <20190117183002.GA21582@flamenco>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 Jan 2019 18:55:33 +0000
-Message-ID: <CAFEAcA_RN-68EXsfFqkXDp5BUB4QD01KqzCAX9=7VWPYN0NAvA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/7] check-softfloat,
- fp-bench and clang compile fixes
+Subject: [Qemu-devel] [PATCH 02/18] Acceptance tests: show avocado test
+ execution by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,142 +22,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
 
-On Thu, 17 Jan 2019 at 18:30, Emilio G. Cota <cota@braap.org> wrote:
->
-> On Thu, Jan 17, 2019 at 17:37:54 +0000, Peter Maydell wrote:
-> > On Thu, 17 Jan 2019 at 13:27, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
-> > >
-> > > The following changes since commit 4b9f0b0f7c84eea2dfb0d5be3e0254bc91=
-319dbc:
-> > >
-> > >   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-requ=
-est' into staging (2019-01-15 17:24:00 +0000)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   https://github.com/stsquad/qemu.git tags/pull-fpu-next-170119-1
-> (snip)
-> >
-> > FreeBSD, OSX, x86-64 Linux clang builds:
-> (snip)
-> > PPC64, AArch64:
-> (snip)
-> > NetBSD:
-> (snip)
->
-> I have added a few commits to fix these -- diff below.
-> Note that one fix requires a small change in the testfloat
-> submodule, which I'm pulling here.
->
-> Alex, can you cherry-pick the commits in this branch?
->
->   https://github.com/cota/qemu/tree/bennee-pull
->
-> They should go in before adding fp-test to the automated build,
-> of course. I left them at the top to make it easier for
-> you to cherry-pick.
->
-> Also, since this will require a respin, you might want to fix the
-> "Makfile" typo in patch 7's title.
->
-> > S390X host:
-> > Looks like a failure running the tests, but no diagnostics about
-> > what exactly went wrong or clear "test failed" indicator:
-> >
-> > cd /home/linux1/qemu/build/all/tests/fp && ./fp-test -s -l 1
-> > i32_to_f16 i64_to_f16 i32_to_f32 i64_t
-> > o_f32 i32_to_f64 i64_to_f64 i32_to_f128 i64_to_f128 >
-> > int-to-float.out 2>  int-to-float.err
-> > /home/linux1/qemu/tests/Makefile.include:913: recipe for target
-> > 'check-softfloat-conv' failed
-> > make: *** [check-softfloat-conv] Error 1
->
-> What are the contents of "int-to-float.err"?
+The current version of the "check-acceptance" target will only show
+one line for execution of all tests.  That's probably OK if the tests
+to be run are quick enough and they're always the same.
 
-linux1@lxub05:~$ cat qemu/build/all/tests/fp/int-to-float.err
->> Testing i32_to_f16, rounding near_even
-372 tests total.
-372 tests performed.
->> Testing i64_to_f16, rounding near_even
-756 tests total.
-756 tests performed.
->> Testing i32_to_f32, rounding near_even
-372 tests total.
-372 tests performed.
->> Testing i64_to_f32, rounding near_even
-756 tests total.
-756 tests performed.
->> Testing i32_to_f64
-372 tests total.
-372 tests performed.
->> Testing i64_to_f64, rounding near_even
-756 tests total.
-756 tests performed.
->> Testing i32_to_f128
-372 tests total.
-21 tests performed; 20 errors found.
+But, there's already one test alone that takes on average ~5 seconds
+to run, we intend to adapt the list of tests to match the user's build
+environment (among other choices).
 
+Because of that, let's present the default Avocado UI by default.
+Users can always choose a different output by setting the AVOCADO_SHOW
+variable.
 
-> diff --git a/tests/fp/Makefile b/tests/fp/Makefile
-> index 5019dcdca0..5a35e7c210 100644
-> --- a/tests/fp/Makefile
-> +++ b/tests/fp/Makefile
-> @@ -65,8 +65,7 @@ QEMU_CFLAGS +=3D $(TF_OPTS)
->  TF_CFLAGS :=3D
->  TF_CFLAGS +=3D -Wno-strict-prototypes
->  TF_CFLAGS +=3D -Wno-unknown-pragmas
-> -TF_CFLAGS +=3D -Wno-discarded-qualifiers
-> -TF_CFLAGS +=3D -Wno-maybe-uninitialized
-> +TF_CFLAGS +=3D -Wno-uninitialized
->  TF_CFLAGS +=3D -Wno-missing-prototypes
->  TF_CFLAGS +=3D -Wno-return-type
->  TF_CFLAGS +=3D -Wno-unused-function
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ .travis.yml            | 2 +-
+ tests/Makefile.include | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-configure has logic to check whether it can use particular
-warning enable/disable flags. Newer gcc (and I hope clang
-but forget) will happily silently allow -Wno-random-new-thing
-even if they don't support -Wrandom-new-thing) but I'm not
-sure our minimum compiler version is yet new enough to
-be able to rely on that (indeed the warning messages suggest
-it is not).
-
-> diff --git a/tests/fp/berkeley-testfloat-3 b/tests/fp/berkeley-testfloat-=
-3
-> index ca9fa2ba05..5a59dcec19 160000
-> --- a/tests/fp/berkeley-testfloat-3
-> +++ b/tests/fp/berkeley-testfloat-3
-> @@ -1 +1 @@
-> -Subproject commit ca9fa2ba05625ba929958f163b01747e07dd39cc
-> +Subproject commit 5a59dcec19327396a011a17fd924aed4fec416b3
-> diff --git a/tests/fp/fp-test.c b/tests/fp/fp-test.c
-> index fca576309c..2a35ef601d 100644
-> --- a/tests/fp/fp-test.c
-> +++ b/tests/fp/fp-test.c
-> @@ -789,7 +789,7 @@ static int set_init_flags(const char *flags)
->      return 0;
->  }
->
-> -static uint8_t slow_clear_flags(void)
-> +static uint_fast8_t slow_clear_flags(void)
->  {
->      uint8_t prev =3D slowfloat_exceptionFlags;
->
-> @@ -797,7 +797,7 @@ static uint8_t slow_clear_flags(void)
->      return prev;
->  }
->
-> -static uint8_t qemu_clear_flags(void)
-> +static uint_fast8_t qemu_clear_flags(void)
->  {
->      uint8_t prev =3D qemu_flags_to_sf(qsf.float_exception_flags);
-
-Why are we using uint_fast8_t here anyway? We switched
-softfloat to using plain old uint8_t everywhere a while
-back.
-
-thanks
--- PMM
+diff --git a/.travis.yml b/.travis.yml
+index 93fd0164a0..844d514afa 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -188,7 +188,7 @@ matrix:
+     # Acceptance (Functional) tests
+     - env:
+         - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu"
+-        - TEST_CMD=3D"make AVOCADO_SHOW=3Dapp check-acceptance"
++        - TEST_CMD=3D"make check-acceptance"
+       addons:
+         apt:
+           packages:
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f403a6571d..c73298740d 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -956,7 +956,7 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
+ # Controls the output generated by Avocado when running tests.
+ # Any number of command separated loggers are accepted.  For more
+ # information please refer to "avocado --help".
+-AVOCADO_SHOW=3Dnone
++AVOCADO_SHOW=3Dapp
+=20
+ PYTHON3 =3D $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_inf=
+o >=3D (3, 0) else 0)')
+ ifeq ($(PYTHON3), 1)
+--=20
+2.20.1
