@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38701)
+Received: from eggs.gnu.org ([209.51.188.92]:38759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gk9fr-00015a-0z
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:33:44 -0500
+	(envelope-from <eblake@redhat.com>) id 1gk9ft-00016t-Go
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:33:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gk9fp-0005M9-Ks
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:33:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33516)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gk9fo-0004h3-7z
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:33:41 -0500
+	(envelope-from <eblake@redhat.com>) id 1gk9fs-0005TZ-Lh
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:33:45 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 17 Jan 2019 09:33:18 -0600
-Message-Id: <20190117153321.29749-1-eblake@redhat.com>
+Date: Thu, 17 Jan 2019 09:33:19 -0600
+Message-Id: <20190117153321.29749-2-eblake@redhat.com>
+In-Reply-To: <20190117153321.29749-1-eblake@redhat.com>
+References: <20190117153321.29749-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 0/3] Expand 'qemu-img info' to show
- protocol details
+Subject: [Qemu-devel] [PATCH 1/3] block: Expose protocol-specific data to
+ 'qemu-img info'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +23,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com
+Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-Posting this now to get feedback on the general idea; it would still
-need to be polished into a form I'd feel happy committing, including
-reworking 'qemu-nbd --list' to reuse the new NBD-specific QAPI type.
+'qemu-img info' is useful for showing additional information
+about an image - but sometimes the interesting information is
+specific to the protocol rather than to the format layer.  Set
+the groundwork for showing this information; further patches
+will then enable specific pieces of information.
 
-Based-on: <20190112175812.27068-1-eblake@redhat.com>
-[0/19 nbd: add qemu-nbd --list]
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ qapi/block-core.json | 6 +++++-
+ block/qapi.c         | 7 +++++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
-Examples with this applied:
-$ ./qemu-img info file
-image: file
-file format: qcow2
-virtual size: 1.0M (1048576 bytes)
-disk size: 672K
-cluster_size: 65536
-Format specific information:
-    compat: 1.1
-    lazy refcounts: false
-    refcount bits: 16
-    corrupt: false
-Protocol specific information:
-    write zero: true
-    discard zero: true
-    discard: true
-    align: 1
-$ qemu-nbd file &
-$ ./qemu-img info nbd://localhost:10809
-image: nbd://localhost:10809
-file format: raw
-virtual size: 1.0M (1048576 bytes)
-disk size: unavailable
-Protocol specific information:
-    flags:
-    active contexts:
-        [0]:
-            name: base:allocation
-            id: 0
-    unknown flags: 1260
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 91685be6c29..f28d5f5fc76 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -152,6 +152,9 @@
+ # @format-specific: structure supplying additional format-specific
+ # information (since 1.7)
+ #
++# @protocol-specific: structure supplying additional protocol-specific
++# information (since 4.0)
++#
+ # Since: 1.3
+ #
+ ##
+@@ -162,7 +165,8 @@
+            '*backing-filename': 'str', '*full-backing-filename': 'str',
+            '*backing-filename-format': 'str', '*snapshots': ['SnapshotIn=
+fo'],
+            '*backing-image': 'ImageInfo',
+-           '*format-specific': 'ImageInfoSpecific' } }
++           '*format-specific': 'ImageInfoSpecific',
++           '*protocol-specific': 'ImageInfoSpecific' } }
 
-Eric Blake (3):
-  block: Expose protocol-specific data to 'qemu-img info'
-  file: Expose some protocol-specific information
-  RFC: nbd: Expose protocol-specific information
+ ##
+ # @ImageCheck:
+diff --git a/block/qapi.c b/block/qapi.c
+index c66f949db83..a8d104ba8ce 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -284,6 +284,9 @@ void bdrv_query_image_info(BlockDriverState *bs,
+     }
+     info->format_specific     =3D bdrv_get_specific_info(bs);
+     info->has_format_specific =3D info->format_specific !=3D NULL;
++    info->protocol_specific =3D
++        bs->file ? bdrv_get_specific_info(bs->file->bs) : NULL;
++    info->has_protocol_specific =3D info->protocol_specific !=3D NULL;
 
- qapi/block-core.json | 87 +++++++++++++++++++++++++++++++++++++++++++-
- block/nbd-client.h   |  1 +
- block/file-posix.c   | 21 +++++++++++
- block/nbd-client.c   | 39 ++++++++++++++++++++
- block/nbd.c          |  3 ++
- block/qapi.c         |  7 ++++
- 6 files changed, 156 insertions(+), 2 deletions(-)
-
+     backing_filename =3D bs->backing_file;
+     if (backing_filename[0] !=3D '\0') {
+@@ -870,4 +873,8 @@ void bdrv_image_info_dump(fprintf_function func_fprin=
+tf, void *f,
+         func_fprintf(f, "Format specific information:\n");
+         bdrv_image_info_specific_dump(func_fprintf, f, info->format_spec=
+ific);
+     }
++    if (info->has_protocol_specific) {
++        func_fprintf(f, "Protocol specific information:\n");
++        bdrv_image_info_specific_dump(func_fprintf, f, info->protocol_sp=
+ecific);
++    }
+ }
 --=20
 2.20.1
