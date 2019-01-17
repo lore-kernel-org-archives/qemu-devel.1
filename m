@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57784)
+Received: from eggs.gnu.org ([209.51.188.92]:57820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gk67C-0006Op-7u
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:45:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gk67F-0006Ry-P0
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:45:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gk67B-0005lL-Iw
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:45:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gk67B-0005ks-Bm
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:45:41 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 17 Jan 2019 15:43:50 +0400
-Message-Id: <20190117114359.5164-19-marcandre.lureau@redhat.com>
-In-Reply-To: <20190117114359.5164-1-marcandre.lureau@redhat.com>
-References: <20190117114359.5164-1-marcandre.lureau@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gk67F-0005n6-4A
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:45:45 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43929)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gk67E-0005mN-MM
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:45:45 -0500
+Received: by mail-oi1-x241.google.com with SMTP id u18so5877097oie.10
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 03:45:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 18/27] slirp: replace net/eth.h inclusion with
- own defines
+References: <20190116041712.130183-1-aik@ozlabs.ru>
+	<20190116124748.7c64c90e.cohuck@redhat.com>
+	<96b377b0-7104-f123-c02d-a93364a3e119@redhat.com>
+In-Reply-To: <96b377b0-7104-f123-c02d-a93364a3e119@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 Jan 2019 11:25:31 +0000
+Message-ID: <CAFEAcA8ZQSM6-cz2ZsDGqOzwYOtKy8s0h4x6b6XzTNDJrWN+mQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH qemu 0/2] linux-headers: Update to v5.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, pbonzini@redhat.com, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- slirp/ip6.h   |  1 -
- slirp/slirp.h |  1 -
- slirp/util.h  | 10 ++++++++++
- 3 files changed, 10 insertions(+), 2 deletions(-)
+On Wed, 16 Jan 2019 at 11:54, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 16/01/19 12:47, Cornelia Huck wrote:
+> > On Wed, 16 Jan 2019 15:17:10 +1100
+> > Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >
+> >> Here is the update script update and what it did to the v5.0-rc2 kernel.
+> >>
+> >> This is based on sha1
+> >> a0a8bff Greg Kurz "target/ppc/kvm: Drop useless include directive".
+> >>
+> >> Please comment. Thanks.
+> >
+> > Hm, Paolo had already posted an update to -rc1 (including an update of
+> > the script). Not sure what the status of that one is?
+>
+> It's queued in my next pull request.
 
-diff --git a/slirp/ip6.h b/slirp/ip6.h
-index b6ba0a63927..e0a13dec1cc 100644
---- a/slirp/ip6.h
-+++ b/slirp/ip6.h
-@@ -7,7 +7,6 @@
- #define SLIRP_IP6_H
-=20
- #include <glib.h>
--#include "net/eth.h"
-=20
- #define ALLNODES_MULTICAST  { .s6_addr =3D \
-                             { 0xff, 0x02, 0x00, 0x00,\
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 5707805be22..c9f91438016 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -48,7 +48,6 @@ typedef char *caddr_t;
- #include "util.h"
-=20
- #include "qemu/queue.h"
--#include "net/eth.h"
-=20
- #include "libslirp.h"
- #include "ip.h"
-diff --git a/slirp/util.h b/slirp/util.h
-index 4664e8159ba..ef758045602 100644
---- a/slirp/util.h
-+++ b/slirp/util.h
-@@ -50,6 +50,16 @@
-=20
- #define SCALE_MS 1000000
-=20
-+#define ETH_ALEN    6
-+#define ETH_HLEN    14
-+#define ETH_P_IP                  (0x0800)      /* Internet Protocol pac=
-ket  */
-+#define ETH_P_ARP                 (0x0806)      /* Address Resolution pa=
-cket */
-+#define ETH_P_IPV6                (0x86dd)
-+#define ETH_P_VLAN                (0x8100)
-+#define ETH_P_DVLAN               (0x88a8)
-+#define ETH_P_NCSI                (0x88f8)
-+#define ETH_P_UNKNOWN             (0xffff)
-+
- #ifdef _WIN32
- int slirp_closesocket(int fd);
- int slirp_ioctlsocket(int fd, int req, void *val);
---=20
-2.20.1.98.gecbdaf0899
+Does the pullreq also have a fix for the virtio_balloon_get_config()
+bug that will manifest when the kernel headers get extra fields
+in struct virtio_balloon_config ?
+
+thanks
+-- PMM
