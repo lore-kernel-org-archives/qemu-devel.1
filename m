@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34726)
+Received: from eggs.gnu.org ([209.51.188.92]:35899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk4lV-0002do-EY
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:19:14 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gk4p2-0003wo-4b
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:22:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gk4lU-00062c-N5
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:19:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34822)
+	(envelope-from <kraxel@redhat.com>) id 1gk4p0-0001Jk-1k
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:22:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38066)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gk4lU-00061x-EZ
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:19:12 -0500
-References: <20190115141108.934-1-yang.zhong@intel.com>
-	<20190115141108.934-28-yang.zhong@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8e67c71c-cf22-5158-ed44-a9de555c6af6@redhat.com>
-Date: Thu, 17 Jan 2019 11:19:08 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gk4oy-0001HJ-2q
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 05:22:48 -0500
+Date: Thu, 17 Jan 2019 11:22:39 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190117102239.mnixjppxpuprjwau@sirius.home.kraxel.org>
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-12-git-send-email-imammedo@redhat.com>
+	<4c0d5fdb-7bf7-81ca-77c3-c387bd40ab3f@redhat.com>
+	<20190116132953.404247ec@redhat.com>
+	<20190116110052-mutt-send-email-mst@kernel.org>
+	<d594c2b8-5969-a457-6d2e-27a3fb9a3c09@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190115141108.934-28-yang.zhong@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 27/37] bluetooth: express
- dependencies with Kconfig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d594c2b8-5969-a457-6d2e-27a3fb9a3c09@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 11/14] tests: acpi: add AVMF firmware blobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, pbonzini@redhat.com, ehabkost@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Andrew Jones <drjones@redhat.com>
 
-On 2019-01-15 15:10, Yang Zhong wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/Makefile.objs | 2 +-
->  hw/usb/Kconfig   | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index 39d882af6f..b95b0c74a1 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -3,7 +3,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += acpi/
->  devices-dirs-$(CONFIG_SOFTMMU) += adc/
->  devices-dirs-$(CONFIG_SOFTMMU) += audio/
->  devices-dirs-$(CONFIG_SOFTMMU) += block/
-> -devices-dirs-$(CONFIG_SOFTMMU) += bt/
-> +devices-dirs-$(CONFIG_BLUETOOTH) += bt/
+  Hi,
 
-Note that bluetooth currently can not be disabled yet (code in vl.c
-still calls some functions in hw/bt/), so we might need to keep the bt
-folder always enabled here for now, to be able to compile boards that do
-not include the bt-hci device.
+> >>>>  create mode 100644 pc-bios/avmf.img
+> >>>>  create mode 100644 pc-bios/avmf_vars.img  
+> >>>
+> >>> "AVMF" is not a great name. "AAVMF" is a downstream name alright, but
+> >>> many dislike it in upstream use. "edk2-aarch64" or "edk2-ArmVirtQemu"
+> >>> would be more precise, but those are verbose. Sigh, why are names so
+> >>> hard. What does everyone think?
+> >> I'm fine with either version.
 
- Thomas
+How about placing them in pc-bios/efi-$arch subdirs and not renaming the
+files, i.e. that would be ...
+
+	pc-bios/efi-aarch64/QEMU_EFI.fd
+	pc-bios/efi-aarch64/QEMU_VARS.fd
+
+... for arm, and ...
+
+	pc-bios/efi-x86_64/OVMF_CODE.fd
+	pc-bios/efi-x86_64/OVMF_VARS.fd
+
+... for x86.
+
+> Could we please decide for (1) vs (2), before I put more work into (1)?
+
+I'd tend to prefer (1).
+
+cheers,
+  Gerd
