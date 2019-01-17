@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:36298)
+Received: from eggs.gnu.org ([209.51.188.92]:36819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkBCf-0000ai-N8
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:11:44 -0500
+	(envelope-from <thuth@redhat.com>) id 1gkBFA-0001d5-0K
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:14:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gkBCe-0004xo-Gh
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:11:41 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 17 Jan 2019 17:11:31 +0000
-Message-ID: <a62787bc-b6cb-5fe6-75bb-c67c6ec5db01@virtuozzo.com>
-References: <20190112175812.27068-1-eblake@redhat.com>
-	<20190112175812.27068-18-eblake@redhat.com>
-	<2124d8aa-7081-ccdd-7e13-aca823b40020@virtuozzo.com>
-	<071f88a7-a1a8-0dcc-8153-99034790168b@redhat.com>
-In-Reply-To: <071f88a7-a1a8-0dcc-8153-99034790168b@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0EA81AC68B21A04287A8293766DE7320@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 17/19] qemu-nbd: Add --list option
+	(envelope-from <thuth@redhat.com>) id 1gkBF9-0006nR-5z
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:14:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48750)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gkBF8-0006jn-S7
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:14:15 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 17 Jan 2019 18:14:08 +0100
+Message-Id: <1547745248-1750-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] configure: Add a proper check for openpty() in
+ libutil
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +22,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>, "rjones@redhat.com" <rjones@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
 
-MTcuMDEuMjAxOSAxOTo1OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMS8xNy8xOSA0OjA1IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gMTIuMDEuMjAxOSAyMDo1
-OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+PiBXZSB3YW50IHRvIGJlIGFibGUgdG8gZGV0ZWN0IHdo
-ZXRoZXIgYSBnaXZlbiBxZW11IE5CRCBzZXJ2ZXIgaXMNCj4+PiBleHBvc2luZyB0aGUgcmlnaHQg
-ZXhwb3J0KHMpIGFuZCBkaXJ0eSBiaXRtYXBzLCBhdCBsZWFzdCBmb3INCj4+PiByZWdyZXNzaW9u
-IHRlc3RpbmcuICBXZSBjb3VsZCB1c2UgJ25iZC1jbGllbnQgLWwnIGZyb20gdGhlIHVwc3RyZWFt
-DQo+Pj4gTkJEIHByb2plY3QgdG8gbGlzdCBleHBvcnRzLCBidXQgaXQncyBhbm5veWluZyB0byBy
-ZWx5IG9uDQo+Pj4gb3V0LW9mLXRyZWUgYmluYXJpZXM7IGZ1cnRoZXJtb3JlLCBuYmQtY2xpZW50
-IGRvZXNuJ3QgbmVjZXNzYXJpbHkNCj4+PiBrbm93IGFib3V0IGFsbCBvZiB0aGUgcWVtdSBOQkQg
-ZXh0ZW5zaW9ucy4gIFRodXMsIGl0IGlzIHRpbWUgdG8gYWRkDQo+Pj4gYSBuZXcgbW9kZSB0byBx
-ZW11LW5iZCB0aGF0IG1lcmVseSBzbmlmZnMgYWxsIHBvc3NpYmxlIGluZm9ybWF0aW9uDQo+Pj4g
-ZnJvbSB0aGUgc2VydmVyIGR1cmluZyBoYW5kc2hha2UgcGhhc2UsIHRoZW4gZGlzY29ubmVjdHMg
-YW5kIGR1bXBzDQo+Pj4gdGhlIGluZm9ybWF0aW9uLg0KPj4+DQo+Pj4gVGhpcyBwYXRjaCBhY3R1
-YWxseSBpbXBsZW1lbnRzIC0tbGlzdC8tTCwgd2hpbGUgcmV1c2luZyBvdGhlcg0KPj4+IG9wdGlv
-bnMgc3VjaCBhcyAtLXRscy1jcmVkcyBmb3Igbm93IGRlc2lnbmF0aW5nIGhvdyB0byBjb25uZWN0
-DQo+Pj4gYXMgdGhlIGNsaWVudCAocmF0aGVyIHRoYW4gdGhlaXIgbm9uLWxpc3QgdXNhZ2Ugb2Yg
-aG93IHRvIG9wZXJhdGUNCj4+PiBhcyB0aGUgc2VydmVyKS4NCj4+Pg0KPiANCj4+Pg0KPj4+IE5v
-dCBkb25lIGhlcmUsIGJ1dCBtYXliZSB3b3J0aCBmdXR1cmUgZXhwZXJpbWVudHM6IGNhcHR1cmUN
-Cj4+PiB0aGUgbWVhdCBvZiBOQkRFeHBvcnRJbmZvIGludG8gYSBRQVBJIHN0cnVjdCwgYW5kIHVz
-ZSB0aGUNCj4+PiBnZW5lcmF0ZWQgUUFQSSBwcmV0dHktcHJpbnRlcnMgaW5zdGVhZCBvZiBoYW5k
-LXJvbGxpbmcgb3VyDQo+Pj4gb3V0cHV0IGxvb3AuICBJdCB3b3VsZCBhbHNvIHBlcm1pdCB1cyB0
-byBhZGQgYSBKU09OIG91dHB1dA0KPj4+IG1vZGUgZm9yIG1hY2hpbmUgcGFyc2luZy4NCj4gDQo+
-IEEgc3RhcnQgb2YgdGhhdCBleHBlcmltZW50IGhhcyBub3cgYmVlbiBwb3N0ZWQ6DQo+IGh0dHBz
-Oi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE5LTAxL21zZzA0MTk2
-Lmh0bWwNCj4gDQo+IA0KPj4+ICAgIEBpdGVtIC0tdGxzLWNyZWRzPUlEDQo+Pj4gICAgRW5hYmxl
-IG1hbmRhdG9yeSBUTFMgZW5jcnlwdGlvbiBmb3IgdGhlIHNlcnZlciBieSBzZXR0aW5nIHRoZSBJ
-RA0KPj4+ICAgIG9mIHRoZSBUTFMgY3JlZGVudGlhbHMgb2JqZWN0IHByZXZpb3VzbHkgY3JlYXRl
-ZCB3aXRoIHRoZSAtLW9iamVjdA0KPj4+IC1vcHRpb24uDQo+Pj4gK29wdGlvbjsgb3IgcHJvdmlk
-ZSB0aGUgY3JlZGVudGlhbHMgbmVlZGVkIGZvciBjb25uZWN0aW5nIGFzIGEgY2xpZW50DQo+Pj4g
-K2luIGxpc3QgbW9kZS4NCj4+DQo+PiBtYXkgYmUgImxpc3QgbW9kZSAoLS1saXN0KSIsIGFzICJs
-aXN0IG1vZGUiIGlzIG5vdCBkaXJlY3RseSBkZWZpbmVkLiBPbiB0aGUgb3RoZXIgaGFuZCwNCj4+
-IGxpc3Qgb3B0aW9uIGlzIGV4dHJlbWVseSBjbG9zZSB0byB0bHMtY3JlZHMsIHNvIGl0IGlzIG9i
-dmlvdXMgYW55d2F5Lg0KPiANCj4gSSdtIHRoaW5raW5nIG9mIGFkZGluZyB0aGlzIChhbmQgc2Vl
-IGNvbnZlcnNhdGlvbiBiZWxvdyB0aGF0IG1lbnRpb25zIFsxXSk6DQo+IA0KPiBkaWZmIC0tZ2l0
-IGkvcWVtdS1uYmQudGV4aSB3L3FlbXUtbmJkLnRleGkNCj4gaW5kZXggNjVjYWViNzg3NGEuLjBk
-Mjk3ZWVkNmRiIDEwMDY0NA0KPiAtLS0gaS9xZW11LW5iZC50ZXhpDQo+ICsrKyB3L3FlbXUtbmJk
-LnRleGkNCj4gQEAgLTEwNSw3ICsxMDUsOSBAQCBTZXQgdGhlIE5CRCB2b2x1bWUgZXhwb3J0IGRl
-c2NyaXB0aW9uLCBhcyBhDQo+IGh1bWFuLXJlYWRhYmxlDQo+ICAgc3RyaW5nLg0KPiAgIEBpdGVt
-IC1MLCAtLWxpc3QNCj4gICBDb25uZWN0IGFzIGEgY2xpZW50IGFuZCBsaXN0IGFsbCBkZXRhaWxz
-IGFib3V0IHRoZSBleHBvcnRzIGV4cG9zZWQgYnkNCj4gLWEgcmVtb3RlIE5CRCBzZXJ2ZXIuDQo+
-ICthIHJlbW90ZSBOQkQgc2VydmVyLiAgVGhpcyBlbmFibGVzIGxpc3QgbW9kZSwgYW5kIGlzIGlu
-Y29tcGF0aWJsZQ0KPiArd2l0aCBvcHRpb25zIHRoYXQgY2hhbmdlIGJlaGF2aW9yIHJlbGF0ZWQg
-dG8gYSBzcGVjaWZpYyBleHBvcnQgKHN1Y2ggYXMNCj4gK0BvcHRpb257LS1leHBvcnQtbmFtZX0s
-IEBvcHRpb257LS1vZmZzZXR9LCAuLi4pLg0KPiAgIEBpdGVtIC0tdGxzLWNyZWRzPUlEDQo+ICAg
-RW5hYmxlIG1hbmRhdG9yeSBUTFMgZW5jcnlwdGlvbiBmb3IgdGhlIHNlcnZlciBieSBzZXR0aW5n
-IHRoZSBJRA0KPiAgIG9mIHRoZSBUTFMgY3JlZGVudGlhbHMgb2JqZWN0IHByZXZpb3VzbHkgY3Jl
-YXRlZCB3aXRoIHRoZSAtLW9iamVjdA0KPiANCj4gDQo+Pj4gK3N0YXRpYyBpbnQgcWVtdV9uYmRf
-Y2xpZW50X2xpc3QoU29ja2V0QWRkcmVzcyAqc2FkZHIsIFFDcnlwdG9UTFNDcmVkcyAqdGxzLA0K
-Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKmhvc3RuYW1l
-KQ0KPj4+ICt7DQo+Pj4gKyAgICBpbnQgcmV0ID0gRVhJVF9GQUlMVVJFOw0KPj4+ICsgICAgaW50
-IHJjOw0KPj4+ICsgICAgRXJyb3IgKmVyciA9IE5VTEw7DQo+Pj4gKyAgICBRSU9DaGFubmVsU29j
-a2V0ICpzaW9jOw0KPj4+ICsgICAgTkJERXhwb3J0SW5mbyAqbGlzdDsNCj4+PiArICAgIGludCBp
-LCBqOw0KPj4+ICsNCj4+PiArICAgIHNpb2MgPSBxaW9fY2hhbm5lbF9zb2NrZXRfbmV3KCk7DQo+
-Pj4gKyAgICBpZiAocWlvX2NoYW5uZWxfc29ja2V0X2Nvbm5lY3Rfc3luYyhzaW9jLCBzYWRkciwg
-JmVycikgPCAwKSB7DQo+Pj4gKyAgICAgICAgZXJyb3JfcmVwb3J0X2VycihlcnIpOw0KPj4+ICsg
-ICAgICAgIGdvdG8gb3V0Ow0KPj4NCj4+IE1heSBiZSBqdXN0IHJldHVybiBFWElUX0ZBVUlMVVJF
-IGhlcmU7DQo+PiByZW1vdmUgb3V0IGxhYmVsOw0KPj4gcy9vdXRfc29ja2V0L291dA0KPiANCj4g
-V2lsbCBkby4gUHJvYmFibHkgbGVmdG92ZXJzIGZyb20gZWFybGllciBhdHRlbXB0cyBhcyBJIGNo
-YW5nZWQgbXkNCj4gYXBwcm9hY2ggb3ZlciB0aW1lLg0KPiANCj4gDQo+Pj4gKyAgICBwcmludGYo
-ImV4cG9ydHMgYXZhaWxhYmxlOiAlZFxuIiwgcmMpOw0KPj4+ICsgICAgZm9yIChpID0gMDsgaSA8
-IHJjOyBpKyspIHsNCj4+PiArICAgICAgICBwcmludGYoIiBleHBvcnQ6ICclcydcbiIsIGxpc3Rb
-aV0ubmFtZSk7DQo+Pj4gKyAgICAgICAgaWYgKGxpc3RbaV0uZGVzY3JpcHRpb24gJiYgKmxpc3Rb
-aV0uZGVzY3JpcHRpb24pIHsNCj4+PiArICAgICAgICAgICAgcHJpbnRmKCIgIGRlc2NyaXB0aW9u
-OiAlc1xuIiwgbGlzdFtpXS5kZXNjcmlwdGlvbik7DQo+Pj4gKyAgICAgICAgfQ0KPj4+ICsgICAg
-ICAgIGlmIChsaXN0W2ldLmZsYWdzICYgTkJEX0ZMQUdfSEFTX0ZMQUdTKSB7DQo+Pg0KPj4gYWN0
-dWFsbHkgdGhpcyBpcw0KPj4NCj4+IGlmIChzZXJ2ZXIgbm90IGhhdmUgYSBidWcgb2Ygbm90IHNl
-dHRpbmcgTkJEX0ZMQUdfSEFTX0ZMQUdTKSB7DQo+IA0KPiBXaGljaCwgYXMgdGhlIGNvbW1pdCBt
-ZXNzYWdlIG1lbnRpb25zLCBpcyBmb3Igc2VydmVycyBzbyBvbGQgYW5kIHJhcmUNCj4gdGhhdCBp
-dCByZWFsbHkgZG9lc24ndCBtYXR0ZXIuDQo+IA0KPj4gICAgLi4uDQo+PiB9DQo+Pg0KPj4gV2h5
-IG5vdCB0byBwcmludCBAc2l6ZSBmb3IgZXhhbXBsZSwgaWYgQGZsYWdzIGZpZWxkIGhhcyBhIGJ1
-Zz8NCj4+DQo+PiBPciwgdGhlbiwgd2h5IHRvIHByaW50IGZsYWdzLCBpZiBAc2l6ZSBoYXMgYSBi
-dWc/DQo+IA0KPiBCZWNhdXNlIHdlIGRvbid0IGhhdmUgdG8gd29ycnkgYWJvdXQgdGhvc2Ugc2Vy
-dmVycyBiZWluZyBtYWluc3RyZWFtLg0KPiANCj4+Pg0KPj4+IC0gICAgaWYgKChhcmdjIC0gb3B0
-aW5kKSAhPSAxKSB7DQo+Pj4gKyAgICBpZiAobGlzdCkgew0KPj4+ICsgICAgICAgIGlmIChhcmdj
-ICE9IG9wdGluZCkgew0KPj4+ICsgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkxpc3QgbW9kZSBp
-cyBpbmNvbXBhdGlibGUgd2l0aCBhIGZpbGUgbmFtZSIpOw0KPj4+ICsgICAgICAgICAgICBleGl0
-KEVYSVRfRkFJTFVSRSk7DQo+Pj4gKyAgICAgICAgfQ0KPj4+ICsgICAgICAgIGlmIChleHBvcnRf
-bmFtZSB8fCBleHBvcnRfZGVzY3JpcHRpb24gfHwgZGV2X29mZnNldCB8fCBwYXJ0aXRpb24gfHwN
-Cj4+PiArICAgICAgICAgICAgZGV2aWNlIHx8IGRpc2Nvbm5lY3QgfHwgZm10IHx8IHNuX2lkX29y
-X25hbWUgfHwgYml0bWFwKSB7DQo+Pj4gKyAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiTGlzdCBt
-b2RlIGlzIGluY29tcGF0aWJsZSB3aXRoIHBlci1kZXZpY2Ugc2V0dGluZ3MiKTsNCj4+PiArICAg
-ICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPj4NCj4+IGFuZCB3aGF0IGFib3V0IGFpbywg
-ZGlzY2FyZCwgZXRjPw0KPiANCj4gSSBkb24ndCBtaW5kIGFkZGluZyBpbiBhbnkgbW9yZSBvcHRp
-b25zIHRoYXQgeW91IHRoaW5rIGFyZSB1c2VmdWwgdG8NCj4gZmxhZyB0aGUgdXNlciBvbi4gIExv
-b2tzIGxpa2UgSSBtaXNzZWQgc2Vlbl9haW8sIHNlZW5fY2FjaGUsDQo+IHNlZW5fZGlzY2FyZC4g
-IENhdGNoaW5nICctcycgaXMgaGFyZGVyLCBhcyBpdCBtZXJlbHkgc2V0cyBhIGJpdCB3aXRoaW4N
-Cj4gZmxhZ3MgcmF0aGVyIHRoYW4gYSB3aXRuZXNzIHZhcmlhYmxlLg0KPiANCj4+IEFsc28sIEkg
-dGhpbmssIGl0IHdvdWxkIGJlIGdvb2QgdG8gc3BlY2lmeSBpbiBVc2FnZQ0KPj4gKG9yIGluIG1h
-biksIHdoaWNoIG9wdGlvbnMgYXJlIGF2YWlsYWJsZSBmb3IgbGlzdCBtb2RlLg0KPiANCj4gSSB3
-b3JyeSB0aGF0IGtlZXBpbmcgYW4gZXhhY3QgbGlzdCBtYXkgYmUgYSBtYWludGVuYW5jZSBuaWdo
-dG1hcmUgKHRoZQ0KPiB0d28gYXJlIGxpa2VseSB0byBnZXQgb3V0IG9mIHN5bmMpOyBkb2VzIG15
-IHByb3Bvc2VkIHdvcmRpbmcgYWJvdmUgYXQNCj4gWzFdIHNhdGlzZnkgdGhlIHByb2JsZW0gYnkg
-YXQgbGVhc3QgbWFraW5nIHRoZSB1c2VyIGF3YXJlIHRoYXQgbm90IGFsbA0KPiBjb21iaW5hdGlv
-bnMgd2lsbCB3b3JrPw0KDQpJIGRvbid0IHJlYWxseSBjYXJlIG9mIGl0LCBjdXJyZW50IHZlcnNp
-b24gaXMgT0sgdG9vLiBPZiBjb3Vyc2UsIGFuIGFkZGl0aW9uDQpzb3VuZHMgYmV0dGVyIHRoYW4g
-bm90aGluZykNCg0KPiANCj4gQW5vdGhlciBhbHRlcm5hdGl2ZSB3b3VsZCBiZSB0byBqdXN0IHNp
-bGVudGx5IGlnbm9yZSBhbGwgcGVyLWV4cG9ydA0KPiBvcHRpb25zLCBpbnN0ZWFkIG9mIHdhcm5p
-bmcgdGhlIHVzZXIgdGhhdCB0aGV5IGFyZSBpbmNvbXBhdGlibGUuICBJDQo+IGRvbid0IGtub3cg
-aWYgdGhhdCdzIGFueSBmcmllbmRsaWVyLCBidXQgaXQgaXMgbGVzcyBjb2RlLg0KPiANCj4+DQo+
-PiBIbSwgbm90ZSwgLS1oZWxwIGhhcyBncm91cGluZyBvZiBvcHRpb25zIGFuZCBtYW4gZG9uJ3Qu
-DQo+IA0KPiBUaGF0IGNvdWxkIGJlIGEgc2VwYXJhdGUgcGF0Y2gsIGlmIGl0IGlzIGRlc2lyZWQg
-KG9yIHNxdWFzaGVkIGludG8gMi8xOSkNCj4gDQo+Pg0KPj4NCj4+IEkgZG9uJ3QgaGF2ZSBnb29k
-IHVuZGVyc3RhbmRpbmcgb2YgdGxzIHJlbGF0ZWQgdGhpbmdzLCB0aGUgcmVzdCBsb29rcyBPSywN
-Cj4+IG15IHN1Z2dlc3Rpb25zIGFyZSBvcHRpb25hbCwgc28sIGlmIHlvdSBkb24ndCB3YW50IHRv
-IGltcHJvdmUgZG9jcyBhbmQNCj4+IG9wdGlvbiBjb25mbGljdCBjaGVja2luZyBub3c6DQo+PiBS
-ZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0
-dW96em8uY29tPg0KPj4NCj4+DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
-Cg==
+On Linux (and maybe some BSDs), we require libutil for the openpty()
+function. However, this library is not available on some other systems, so
+we currently use a fragile if-statement in the configure script to check
+whether we need the library or not. Unfortunately, we also hard-coded a
+"-lutil" in the tests/Makefile.include file, so this breaks the build on
+Solaris, for example (see buglink below). To fix the issue, add the "-lutil"
+to "libs_tools" in the configure script instead, then this gets properly
+propagated to the tests, too.
+And while we're at it, also replace the fragile if-statement in the confi-
+gure script with a proper link-check for the availablity of this function.
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1777252
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ configure              | 12 ++++++++++--
+ tests/Makefile.include |  4 ----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/configure b/configure
+index 3c28bae..0f4e42a 100755
+--- a/configure
++++ b/configure
+@@ -4595,9 +4595,17 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
+   libs_qga="$libs_qga -lrt"
+ fi
+ 
+-if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
+-        "$haiku" != "yes" ; then
++# Check whether we need to link libutil for openpty()
++cat > $TMPC << EOF
++extern int openpty(int *am, int *as, char *name, void *termp, void *winp);
++int main(void) { return openpty(0, 0, 0, 0, 0); }
++EOF
++
++if ! compile_prog "" "" ; then
++  if compile_prog "" "-lutil" ; then
+     libs_softmmu="-lutil $libs_softmmu"
++    libs_tools="-lutil $libs_tools"
++  fi
+ fi
+ 
+ ##########################################
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f403a65..8f8e3b4 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -793,10 +793,6 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+ 	rm $(INITRD_WORK_DIR)/init
+ 	rmdir $(INITRD_WORK_DIR)
+ 
+-ifeq ($(CONFIG_POSIX),y)
+-LIBS += -lutil
+-endif
+-
+ # QTest rules
+ 
+ TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
+-- 
+1.8.3.1
