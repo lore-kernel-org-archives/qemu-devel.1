@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33473)
+Received: from eggs.gnu.org ([209.51.188.92]:33522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkDTY-0004GZ-Af
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:17 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkDTb-0004J9-Ei
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkDTX-0008Iz-00
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkDTZ-0008MN-Kg
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:18 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 17 Jan 2019 13:36:43 -0600
-Message-Id: <20190117193658.16413-7-eblake@redhat.com>
+Date: Thu, 17 Jan 2019 13:36:44 -0600
+Message-Id: <20190117193658.16413-8-eblake@redhat.com>
 In-Reply-To: <20190117193658.16413-1-eblake@redhat.com>
 References: <20190117193658.16413-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 06/21] nbd/server: Favor [u]int64_t over
- off_t
+Subject: [Qemu-devel] [PATCH v4 07/21] qemu-nbd: Avoid strtol open-coding
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,201 +22,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Although our compile-time environment is set up so that we always
-support long files with 64-bit off_t, we have no guarantee whether
-off_t is the same type as int64_t.  This requires casts when
-printing values, and prevents us from directly using qemu_strtoi64()
-(which will be done in the next patch). Let's just flip to uint64_t
-where possible, and stick to int64_t for detecting failure of
-blk_getlength(); we also keep the assertions added in the previous
-patch that the resulting values fit in 63 bits.  The overflow check
-in nbd_co_receive_request() was already sane (request->from is
-validated to fit in 63 bits, and request->len is 32 bits, so the
-addition can't overflow 64 bits), but rewrite it in a form easier
-to recognize as a typical overflow check.
+Our copy-and-pasted open-coding of strtol handling forgot to
+handle overflow conditions.  Use qemu_strto*() instead.
 
-Rename the variable 'description' to keep line lengths reasonable.
+In the case of --partition, since we insist on a user-supplied
+partition to be non-zero, we can use 0 rather than -1 for our
+initial value to distinguish when a partition is not being
+served, for slightly more optimal code.
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The error messages for out-of-bounds values are less specific,
+but should not be a terrible loss in quality.
+
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
 
 ---
-v4: a few more tweaks
-v3: new patch
+v3: rebase to use int64_t rather than off_t [Vladimir]
 ---
- include/block/nbd.h |  4 ++--
- nbd/server.c        | 18 +++++++++---------
- qemu-nbd.c          | 29 +++++++++++------------------
- 3 files changed, 22 insertions(+), 29 deletions(-)
+ qemu-nbd.c | 28 +++++++++-------------------
+ 1 file changed, 9 insertions(+), 19 deletions(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 1971b557896..24be9570bb4 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -294,8 +294,8 @@ int nbd_errno_to_system_errno(int err);
- typedef struct NBDExport NBDExport;
- typedef struct NBDClient NBDClient;
-
--NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
-size,
--                          const char *name, const char *description,
-+NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
-+                          uint64_t size, const char *name, const char *d=
-esc,
-                           const char *bitmap, uint16_t nbdflags,
-                           void (*close)(NBDExport *), bool writethrough,
-                           BlockBackend *on_eject_blk, Error **errp);
-diff --git a/nbd/server.c b/nbd/server.c
-index 51ee8094e02..cb0d5634fa1 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -77,8 +77,8 @@ struct NBDExport {
-     BlockBackend *blk;
-     char *name;
-     char *description;
--    off_t dev_offset;
--    off_t size;
-+    uint64_t dev_offset;
-+    uint64_t size;
-     uint16_t nbdflags;
-     QTAILQ_HEAD(, NBDClient) clients;
-     QTAILQ_ENTRY(NBDExport) next;
-@@ -1455,8 +1455,8 @@ static void nbd_eject_notifier(Notifier *n, void *d=
-ata)
-     nbd_export_close(exp);
- }
-
--NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t =
-size,
--                          const char *name, const char *description,
-+NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
-+                          uint64_t size, const char *name, const char *d=
-esc,
-                           const char *bitmap, uint16_t nbdflags,
-                           void (*close)(NBDExport *), bool writethrough,
-                           BlockBackend *on_eject_blk, Error **errp)
-@@ -1495,12 +1495,12 @@ NBDExport *nbd_export_new(BlockDriverState *bs, o=
-ff_t dev_offset, off_t size,
-     exp->refcount =3D 1;
-     QTAILQ_INIT(&exp->clients);
-     exp->blk =3D blk;
--    assert(dev_offset >=3D 0 && dev_offset <=3D INT64_MAX);
-+    assert(dev_offset <=3D INT64_MAX);
-     exp->dev_offset =3D dev_offset;
-     exp->name =3D g_strdup(name);
--    exp->description =3D g_strdup(description);
-+    exp->description =3D g_strdup(desc);
-     exp->nbdflags =3D nbdflags;
--    assert(size >=3D 0 && size <=3D INT64_MAX - dev_offset);
-+    assert(size <=3D INT64_MAX - dev_offset);
-     exp->size =3D QEMU_ALIGN_DOWN(size, BDRV_SECTOR_SIZE);
-
-     if (bitmap) {
-@@ -2130,10 +2130,10 @@ static int nbd_co_receive_request(NBDRequestData =
-*req, NBDRequest *request,
-         return -EROFS;
-     }
-     if (request->from > client->exp->size ||
--        request->from + request->len > client->exp->size) {
-+        request->len > client->exp->size - request->from) {
-         error_setg(errp, "operation past EOF; From: %" PRIu64 ", Len: %"=
- PRIu32
-                    ", Size: %" PRIu64, request->from, request->len,
--                   (uint64_t)client->exp->size);
-+                   client->exp->size);
-         return (request->type =3D=3D NBD_CMD_WRITE ||
-                 request->type =3D=3D NBD_CMD_WRITE_ZEROES) ? -ENOSPC : -=
-EINVAL;
-     }
 diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 5c90c5e55f7..598caa656b2 100644
+index 598caa656b2..efca0e44a90 100644
 --- a/qemu-nbd.c
 +++ b/qemu-nbd.c
-@@ -176,7 +176,7 @@ static void read_partition(uint8_t *p, struct partiti=
-on_record *r)
- }
-
- static int find_partition(BlockBackend *blk, int partition,
--                          off_t *offset, off_t *size)
-+                          uint64_t *offset, uint64_t *size)
- {
-     struct partition_record mbr[4];
-     uint8_t data[MBR_SIZE];
-@@ -500,14 +500,14 @@ int main(int argc, char **argv)
- {
-     BlockBackend *blk;
-     BlockDriverState *bs;
--    off_t dev_offset =3D 0;
-+    uint64_t dev_offset =3D 0;
-     uint16_t nbdflags =3D 0;
-     bool disconnect =3D false;
-     const char *bindto =3D NULL;
-     const char *port =3D NULL;
-     char *sockpath =3D NULL;
-     char *device =3D NULL;
--    off_t fd_size;
-+    int64_t fd_size;
-     QemuOpts *sn_opts =3D NULL;
-     const char *sn_id_or_name =3D NULL;
-     const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:B:";
-@@ -665,10 +665,6 @@ int main(int argc, char **argv)
-                 error_report("Invalid offset `%s'", optarg);
+@@ -546,9 +546,8 @@ int main(int argc, char **argv)
+     };
+     int ch;
+     int opt_ind =3D 0;
+-    char *end;
+     int flags =3D BDRV_O_RDWR;
+-    int partition =3D -1;
++    int partition =3D 0;
+     int ret =3D 0;
+     bool seen_cache =3D false;
+     bool seen_discard =3D false;
+@@ -660,9 +659,8 @@ int main(int argc, char **argv)
+             port =3D optarg;
+             break;
+         case 'o':
+-                dev_offset =3D strtoll (optarg, &end, 0);
+-            if (*end) {
+-                error_report("Invalid offset `%s'", optarg);
++            if (qemu_strtou64(optarg, NULL, 0, &dev_offset) < 0) {
++                error_report("Invalid offset '%s'", optarg);
                  exit(EXIT_FAILURE);
              }
--            if (dev_offset < 0) {
--                error_report("Offset must be positive `%s'", optarg);
+             break;
+@@ -684,13 +682,9 @@ int main(int argc, char **argv)
+             flags &=3D ~BDRV_O_RDWR;
+             break;
+         case 'P':
+-            partition =3D strtol(optarg, &end, 0);
+-            if (*end) {
+-                error_report("Invalid partition `%s'", optarg);
+-                exit(EXIT_FAILURE);
+-            }
+-            if (partition < 1 || partition > 8) {
+-                error_report("Invalid partition %d", partition);
++            if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
++                partition < 1 || partition > 8) {
++                error_report("Invalid partition '%s'", optarg);
+                 exit(EXIT_FAILURE);
+             }
+             break;
+@@ -711,15 +705,11 @@ int main(int argc, char **argv)
+             device =3D optarg;
+             break;
+         case 'e':
+-            shared =3D strtol(optarg, &end, 0);
+-            if (*end) {
++            if (qemu_strtoi(optarg, NULL, 0, &shared) < 0 ||
++                shared < 1) {
+                 error_report("Invalid shared device number '%s'", optarg=
+);
+                 exit(EXIT_FAILURE);
+             }
+-            if (shared < 1) {
+-                error_report("Shared device number must be greater than =
+0");
 -                exit(EXIT_FAILURE);
 -            }
              break;
-         case 'l':
-             if (strstart(optarg, SNAPSHOT_OPT_BASE, NULL)) {
-@@ -1005,15 +1001,14 @@ int main(int argc, char **argv)
-     }
-
-     if (dev_offset >=3D fd_size) {
--        error_report("Offset (%lld) has to be smaller than the image siz=
-e "
--                     "(%lld)",
--                     (long long int)dev_offset, (long long int)fd_size);
-+        error_report("Offset (%" PRIu64 ") has to be smaller than the im=
-age "
-+                     "size (%" PRId64 ")", dev_offset, fd_size);
-         exit(EXIT_FAILURE);
+         case 'f':
+             fmt =3D optarg;
+@@ -1007,7 +997,7 @@ int main(int argc, char **argv)
      }
      fd_size -=3D dev_offset;
 
-     if (partition !=3D -1) {
--        off_t limit;
-+        uint64_t limit;
+-    if (partition !=3D -1) {
++    if (partition) {
+         uint64_t limit;
 
          if (dev_offset) {
-             error_report("Cannot request partition and offset together")=
-;
-@@ -1027,15 +1022,13 @@ int main(int argc, char **argv)
-         }
-         /*
-          * MBR partition limits are (32-bit << 9); this assert lets
--         * the compiler know that we have two positive values that
--         * can't overflow 64 bits.
-+         * the compiler know that we can't overflow 64 bits.
-          */
--        assert(dev_offset >=3D 0 && dev_offset + limit >=3D dev_offset);
-+        assert(dev_offset + limit >=3D dev_offset);
-         if (dev_offset + limit > fd_size) {
--            error_report("Discovered partition %d at offset %lld size %l=
-ld, "
--                         "but size exceeds file length %lld", partition,
--                         (long long int) dev_offset, (long long int) lim=
-it,
--                         (long long int) fd_size);
-+            error_report("Discovered partition %d at offset %" PRIu64
-+                         " size %" PRIu64 ", but size exceeds file lengt=
-h %"
-+                         PRId64, partition, dev_offset, limit, fd_size);
-             exit(EXIT_FAILURE);
-         }
-         fd_size =3D limit;
 --=20
 2.20.1
