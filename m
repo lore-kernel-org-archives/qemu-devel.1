@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33069)
+Received: from eggs.gnu.org ([209.51.188.92]:33700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gkEsQ-0004uo-VL
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:07:04 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gkEuy-0006sh-2W
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:09:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gkEsO-0007N6-6C
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:07:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45344)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1gkEsL-0007Hi-D8
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:06:59 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Thu, 17 Jan 2019 22:06:31 +0100
-Message-Id: <20190117210632.18567-2-eric.auger@redhat.com>
-In-Reply-To: <20190117210632.18567-1-eric.auger@redhat.com>
-References: <20190117210632.18567-1-eric.auger@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1gkEuu-0000eo-1y
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 16:09:37 -0500
+References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
+	<20180609151758.17343-5-vsementsov@virtuozzo.com>
+	<91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <584b60bb-e5cd-6678-0988-a9ee825d0064@redhat.com>
+Date: Thu, 17 Jan 2019 16:09:20 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/2] vfio-pci: Introduce
- vfio_set_event_handler helper
+In-Reply-To: <91a97b47-abab-4508-09d5-a12ddd1a4101@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 4/6] nbd/server: implement dirty bitmap
+ export
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,384 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, alex.williamson@redhat.com
-Cc: aik@ozlabs.ru, cohuck@redhat.com
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, armbru@redhat.com, mreitz@redhat.com
 
-The code used to attach the eventfd handler for the ERR and
-REQ irq indices can be factorized into a helper. In subsequent
-patches we will extend this helper to support other irq indices.
 
-We test whether the notification is allowed outside of the helper:
-respectively check vdev->pci_aer and VFIO_FEATURE_ENABLE_REQ.
-Depending on the returned value we set vdev->pci_aer and
-vdev->req_enabled. An error handle is introduced for future usage
-although not strictly useful here.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On 1/9/19 2:21 PM, Eric Blake wrote:
+> Why are we restricting things to only export disabled bitmaps?
 
----
+Late reply, but the original thought almost surely was that we would
+only be exporting bitmaps for fleecing use, which should have a
+non-changing bitmap attached to it.
 
-v1 -> v2:
-- s/vfio_register_event_notifier/vfio_set_event_handler
-- turned into a void function
-- do the qemu_set_fd_handler(*pfd, NULL, NULL, vdev) and
-  event_notifier_cleanup on VFIO_DEVICE_SET_IRQS failure
-  as reported by Alexey
-- reset err in vfio_realize as reported by Cornelia
-- Text/comment fixes suggested by Cornelia
----
- hw/vfio/pci.c | 296 ++++++++++++++++++++++----------------------------
- 1 file changed, 132 insertions(+), 164 deletions(-)
+Just some error checking to make sure the user didn't accidentally use
+the live copy attached to the active disk image, versus the one prepared
+for this purpose.
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index c0cb1ec289..3cae4c99ef 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -105,6 +105,96 @@ static void vfio_intx_eoi(VFIODevice *vbasedev)
-     vfio_unmask_single_irqindex(vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
- }
-=20
-+/*
-+ * vfio_set_event_handler - setup/tear down eventfd
-+ * notification and handling for IRQ indices that span over
-+ * a single IRQ
-+ *
-+ * @vdev: VFIO device handle
-+ * @index: IRQ index the eventfd/handler is associated with
-+ * @enable: true means notifier chain needs to be set up
-+ * @handler: handler to attach if @enable is true
-+ * @errp: error handle
-+ */
-+static void vfio_set_event_handler(VFIOPCIDevice *vdev,
-+                                   int index,
-+                                   bool enable,
-+                                   void (*handler)(void *opaque),
-+                                   Error **errp)
-+{
-+    struct vfio_irq_info irq_info =3D { .argsz =3D sizeof(irq_info),
-+                                      .index =3D index };
-+    struct vfio_irq_set *irq_set;
-+    EventNotifier *notifier;
-+    int argsz, ret =3D 0;
-+    int32_t *pfd, fd;
-+
-+    switch (index) {
-+    case VFIO_PCI_REQ_IRQ_INDEX:
-+        notifier =3D &vdev->req_notifier;
-+        break;
-+    case VFIO_PCI_ERR_IRQ_INDEX:
-+        notifier =3D &vdev->err_notifier;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    if (ioctl(vdev->vbasedev.fd,
-+              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count=
- < 1) {
-+        error_setg_errno(errp, errno, "No irq index %d available", index=
-);
-+        return;
-+    }
-+
-+    if (enable) {
-+        ret =3D event_notifier_init(notifier, 0);
-+        if (ret) {
-+            error_setg_errno(errp, -ret,
-+                             "Unable to init event notifier for irq inde=
-x %d",
-+                             index);
-+            return;
-+        }
-+    }
-+
-+    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set =3D g_malloc0(argsz);
-+    irq_set->argsz =3D argsz;
-+    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
-+                     VFIO_IRQ_SET_ACTION_TRIGGER;
-+    irq_set->index =3D index;
-+    irq_set->start =3D 0;
-+    irq_set->count =3D 1;
-+    pfd =3D (int32_t *)&irq_set->data;
-+
-+    if (!notifier) {
-+        error_setg(errp, "Notifier not initialized for irq index %d", in=
-dex);
-+        return;
-+    }
-+
-+    fd =3D event_notifier_get_fd(notifier);
-+
-+    if (enable) {
-+        qemu_set_fd_handler(fd, handler, NULL, vdev);
-+        *pfd =3D fd;
-+    } else {
-+        *pfd =3D -1;
-+    }
-+
-+    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
-+    g_free(irq_set);
-+
-+    if (ret) {
-+        error_setg_errno(errp, -ret,
-+                         "Failed to %s eventfd signalling for index %d",
-+                         enable ? "set up" : "tear down", index);
-+    }
-+    if (ret || !enable) {
-+        qemu_set_fd_handler(fd, NULL, NULL, vdev);
-+        event_notifier_cleanup(notifier);
-+    }
-+}
-+
- static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
- {
- #ifdef CONFIG_KVM
-@@ -2621,86 +2711,6 @@ static void vfio_err_notifier_handler(void *opaque=
-)
-     vm_stop(RUN_STATE_INTERNAL_ERROR);
- }
-=20
--/*
-- * Registers error notifier for devices supporting error recovery.
-- * If we encounter a failure in this function, we report an error
-- * and continue after disabling error recovery support for the
-- * device.
-- */
--static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
--{
--    int ret;
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
--
--    if (!vdev->pci_aer) {
--        return;
--    }
--
--    if (event_notifier_init(&vdev->err_notifier, 0)) {
--        error_report("vfio: Unable to init event notifier for error dete=
-ction");
--        vdev->pci_aer =3D false;
--        return;
--    }
--
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_ERR_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D event_notifier_get_fd(&vdev->err_notifier);
--    qemu_set_fd_handler(*pfd, vfio_err_notifier_handler, NULL, vdev);
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret) {
--        error_report("vfio: Failed to set up error notification");
--        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
--        event_notifier_cleanup(&vdev->err_notifier);
--        vdev->pci_aer =3D false;
--    }
--    g_free(irq_set);
--}
--
--static void vfio_unregister_err_notifier(VFIOPCIDevice *vdev)
--{
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
--    int ret;
--
--    if (!vdev->pci_aer) {
--        return;
--    }
--
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_ERR_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D -1;
--
--    ret =3D ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
--    if (ret) {
--        error_report("vfio: Failed to de-assign error fd: %m");
--    }
--    g_free(irq_set);
--    qemu_set_fd_handler(event_notifier_get_fd(&vdev->err_notifier),
--                        NULL, NULL, vdev);
--    event_notifier_cleanup(&vdev->err_notifier);
--}
--
- static void vfio_req_notifier_handler(void *opaque)
- {
-     VFIOPCIDevice *vdev =3D opaque;
-@@ -2716,86 +2726,6 @@ static void vfio_req_notifier_handler(void *opaque=
-)
-     }
- }
-=20
--static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
--{
--    struct vfio_irq_info irq_info =3D { .argsz =3D sizeof(irq_info),
--                                      .index =3D VFIO_PCI_REQ_IRQ_INDEX =
-};
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
--
--    if (!(vdev->features & VFIO_FEATURE_ENABLE_REQ)) {
--        return;
--    }
--
--    if (ioctl(vdev->vbasedev.fd,
--              VFIO_DEVICE_GET_IRQ_INFO, &irq_info) < 0 || irq_info.count=
- < 1) {
--        return;
--    }
--
--    if (event_notifier_init(&vdev->req_notifier, 0)) {
--        error_report("vfio: Unable to init event notifier for device req=
-uest");
--        return;
--    }
--
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_REQ_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--
--    *pfd =3D event_notifier_get_fd(&vdev->req_notifier);
--    qemu_set_fd_handler(*pfd, vfio_req_notifier_handler, NULL, vdev);
--
--    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
--        error_report("vfio: Failed to set up device request notification=
-");
--        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
--        event_notifier_cleanup(&vdev->req_notifier);
--    } else {
--        vdev->req_enabled =3D true;
--    }
--
--    g_free(irq_set);
--}
--
--static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
--{
--    int argsz;
--    struct vfio_irq_set *irq_set;
--    int32_t *pfd;
--
--    if (!vdev->req_enabled) {
--        return;
--    }
--
--    argsz =3D sizeof(*irq_set) + sizeof(*pfd);
--
--    irq_set =3D g_malloc0(argsz);
--    irq_set->argsz =3D argsz;
--    irq_set->flags =3D VFIO_IRQ_SET_DATA_EVENTFD |
--                     VFIO_IRQ_SET_ACTION_TRIGGER;
--    irq_set->index =3D VFIO_PCI_REQ_IRQ_INDEX;
--    irq_set->start =3D 0;
--    irq_set->count =3D 1;
--    pfd =3D (int32_t *)&irq_set->data;
--    *pfd =3D -1;
--
--    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
--        error_report("vfio: Failed to de-assign device request fd: %m");
--    }
--    g_free(irq_set);
--    qemu_set_fd_handler(event_notifier_get_fd(&vdev->req_notifier),
--                        NULL, NULL, vdev);
--    event_notifier_cleanup(&vdev->req_notifier);
--
--    vdev->req_enabled =3D false;
--}
--
- static void vfio_realize(PCIDevice *pdev, Error **errp)
- {
-     VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
-@@ -3069,8 +2999,33 @@ static void vfio_realize(PCIDevice *pdev, Error **=
-errp)
-         goto out_teardown;
-     }
-=20
--    vfio_register_err_notifier(vdev);
--    vfio_register_req_notifier(vdev);
-+    if (vdev->pci_aer) {
-+        Error *err =3D NULL;
-+
-+        /*
-+         * Registers error notifier for devices supporting error recover=
-y.
-+         * If we encounter a failure during registration, we report an e=
-rror
-+         * and continue after disabling error recovery support for the
-+         * device.
-+         */
-+        vfio_set_event_handler(vdev, VFIO_PCI_ERR_IRQ_INDEX, true,
-+                               vfio_err_notifier_handler, &err);
-+        if (err) {
-+            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        }
-+        vdev->pci_aer =3D !err;
-+    }
-+
-+    if (vdev->features & VFIO_FEATURE_ENABLE_REQ) {
-+        Error *err =3D NULL;
-+
-+        vfio_set_event_handler(vdev, VFIO_PCI_REQ_IRQ_INDEX, true,
-+                               vfio_req_notifier_handler, &err);
-+        if (err) {
-+            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        }
-+        vdev->req_enabled =3D !err;
-+    }
-     vfio_setup_resetfn_quirk(vdev);
-=20
-     return;
-@@ -3106,9 +3061,22 @@ static void vfio_instance_finalize(Object *obj)
- static void vfio_exitfn(PCIDevice *pdev)
- {
-     VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
-+    Error *err =3D NULL;
-=20
--    vfio_unregister_req_notifier(vdev);
--    vfio_unregister_err_notifier(vdev);
-+    if (vdev->req_enabled) {
-+        vfio_set_event_handler(vdev, VFIO_PCI_REQ_IRQ_INDEX,
-+                               false, NULL, &err);
-+        if (err) {
-+            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        }
-+    }
-+    if (vdev->pci_aer) {
-+        vfio_set_event_handler(vdev, VFIO_PCI_ERR_IRQ_INDEX,
-+                                     false, NULL, &err);
-+        if (err) {
-+            warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        }
-+    }
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-     vfio_disable_interrupts(vdev);
-     if (vdev->intx.mmap_timer) {
---=20
-2.20.1
+If that's not true anymore, that's fine if the NBD server can handle the
+bits changing while it responds to requests... especially if a client
+wants to just watch the bitmap change live and query sectors every now
+and again, but it's a different use case from the one fairly targeted
+one we were pursuing at the time.
+
+--js
