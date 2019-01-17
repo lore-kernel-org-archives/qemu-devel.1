@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([209.51.188.92]:56168)
+Received: from eggs.gnu.org ([209.51.188.92]:56105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1gk94j-0004Aq-9Q
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:55:22 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1gk94f-000463-R2
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:55:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <like.xu@linux.intel.com>) id 1gk918-0005Ml-Hy
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:51:39 -0500
-Received: from mga03.intel.com ([134.134.136.65]:4016)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
-	id 1gk917-000539-9W
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:51:38 -0500
-References: <1547468699-17633-1-git-send-email-like.xu@linux.intel.com>
-	<20190117152444.16163014@redhat.com>
-From: Like Xu <like.xu@linux.intel.com>
-Message-ID: <e85f4ef5-96b1-91d2-5b0c-642568ab741d@linux.intel.com>
-Date: Thu, 17 Jan 2019 22:51:18 +0800
+	(envelope-from <liam.merwick@oracle.com>) id 1gk926-00073v-5v
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:52:38 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:52818)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1gk922-0006vx-GO
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 09:52:37 -0500
+References: <20190117090259.32713-1-sgarzare@redhat.com>
+	<20190117090259.32713-6-sgarzare@redhat.com>
+	<0bbdcb55-27d9-7098-10f4-aa7aef0a1c24@oracle.com>
+	<aa7f4f9e-90b2-c53c-9ddb-b27fd2977d2d@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <8cdb60f6-4a52-f968-d498-ee9273cb69b3@oracle.com>
+Date: Thu, 17 Jan 2019 14:52:25 +0000
 MIME-Version: 1.0
-In-Reply-To: <20190117152444.16163014@redhat.com>
+In-Reply-To: <aa7f4f9e-90b2-c53c-9ddb-b27fd2977d2d@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/5] Introduce cpu die topology and
- enable CPUID.1F for i386
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] optionrom/pvh: load initrd from
+ fw_cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +32,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, drjones@redhat.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, like.xu@intel.com, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Maran Wilson <maran.wilson@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>, George Kennedy <george.kennedy@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>
 
-On 2019/1/17 22:24, Igor Mammedov wrote:
-> On Mon, 14 Jan 2019 20:24:54 +0800
-> Like Xu <like.xu@linux.intel.com> wrote:
-> 
->> As we know, die is a rectangular piece of a semiconductor wafer. It's very common
->> that chip manufacturers put a multi-core die in one package and one die always has
->> a one-to-one relationship with one socket. Inside the die, it cotains multi-cores
->> and core contains threads topologically. We apply this socket/core/thread model to
->> the qemu -smp configurable space and save it into APIC_IDs for identification.
->>
->> The undercurrent Is surging. Multi-chip packaging technology allows for integration
->> of multi-die devices in a single package, for example Intel CLX-AP or AMD EPYC.
->> Integration can be enabled by high-performance, heterogeneous, multi-dies interconnect
->> technology, providing a more cost-effective manner. QEMU and guests may take advantages
->> of multi-dies host for such as guest placing or energy efficiency management...
->>
->> This patch series extend the CPU topology to the socket/dies/core/thread model,
->> allowing the setting of dies number per one socket on -smp qemu command. For
->> i386, it upgrades APIC_IDs generation and reversion functions with a new exposed
->> leaf called CPUID.1F, which is a preferred superset to leaf 0BH. The CPUID.1F
->> spec is on https://software.intel.com/en-us/articles/intel-sdm, 3-190 Vol 2A.
-> 
-> Looked into discussion within this mail thread, so here is my thoughts
-> on mentioned issues:
-> 
->   * I agree with Daniel on the point that "-smp cores" should change 'cores'
->     meaning to cores within die when die is used.
->   * I dislike extending smp_parse() though and adding one more global,
->     as it just adds up more mess to topology thingy QEMU has and puts
->     an additional burden on whoever comes later to make it right.
->     After talking with Eduardo, I think it's reasonable to refactor
->     smp_parse() into machine properties first before adding 'dies',
->     i.e. 'dies' and the rest of '-smp' should be implemented as machine
->     properties where 'cpu_dies' is PCMachine specific property.
->     If it ever becomes useful for other machines we can move common code up
->     hierarchy to the generic Machine object later and let machine versions take
->     care of compat issues if any (which is not possible with generic smp_parse()).
->     So I'd suggest to:
->        1: make existing cores/threads/sockets into machine properties and
->           get rid of global variables they use currently
->        2: #1 should make this trivial: add 'cpu_dies' to PCMachine and
->           an optional CpuInstanceProperties::die-id with necessary generic glue
->           where it's necessary.
->           * for 'cpu_dies', we may use 0 (default) to make old machines work as they
->             used to (i.e. not reporting dies existence) and new machines could
->             enable/require dies by default or on request. In this case it should
->             not cause any migration/hotplug issues.
-> 
-Hi Igor, thanks for your suggestions on machine properties.
-Let me try this additional (RFC) work for the expandable cpu topo model.
+
+
+On 17/01/2019 14:37, Paolo Bonzini wrote:
+> On 17/01/19 15:33, Liam Merwick wrote:
+>> #=C2=A0=C2=A0=C2=A0 pc-bios/optionrom/pvh.bin
+>> #=C2=A0=C2=A0=C2=A0 pc-bios/optionrom/pvh.img
+>> #=C2=A0=C2=A0=C2=A0 pc-bios/optionrom/pvh.raw
+>=20
+> pvh.bin should not be ignored.
+>=20
+
+That's part of what I didn't quite understand.=20
+pc-bios/optionrom/linuxboot.bin (and the other binaries in the=20
+'build-all' target in pc-bios/optionrom/Makefile) are in .gitignore.
+
+Also, should pvh.bin be added to BLOBS in Makefile like those files?
+
+Regards,
+Liam
