@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([209.51.188.92]:44681)
+Received: from eggs.gnu.org ([209.51.188.92]:45710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gkCrc-00064H-RA
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:58:24 -0500
+	(envelope-from <crosa@redhat.com>) id 1gkCs5-0006Si-5x
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:58:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gkCrL-0007Hx-FD
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:58:04 -0500
+	(envelope-from <crosa@redhat.com>) id 1gkCrR-0007Vs-7v
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:58:17 -0500
 From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 17 Jan 2019 13:56:16 -0500
-Message-Id: <20190117185628.21862-7-crosa@redhat.com>
+Date: Thu, 17 Jan 2019 13:56:23 -0500
+Message-Id: <20190117185628.21862-14-crosa@redhat.com>
 In-Reply-To: <20190117185628.21862-1-crosa@redhat.com>
 References: <20190117185628.21862-1-crosa@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 06/18] Acceptance tests: use "arch:" tag to
- filter target specific tests
+Subject: [Qemu-devel] [PATCH 13/18] Boot Linux Console Test: add a test for
+ mips64el + malta
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +24,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, qemu-s390x@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <fam@euphon.net>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Currently, the only test that contains some target architecture
-information is "boot_linux_console.py" which test contains a "x86_64"
-tag.  But that tag is not respected in the default execution, that is,
-"make check-acceptance" doesn't do anything with it.
+Similar to the x86_64 + pc test, it boots a Linux kernel on a Malta
+board and verify the serial is working.
 
-That said, even the target architecture handling currently present in
-the "avocado_qemu.Test" class, class is pretty limited.  For instance,
-by default, it chooses a target based on the host architecture.
+If mips64el is a target being built, "make check-acceptance" will
+automatically include this test by the use of the "arch:mips" tags.
 
-Because the original implementation of the tags feature in Avocado did
-not include any time of namespace or "key:val" mechanism, no tag has
-relation to another tag.  The new implementation of the tags feature
-from version 67.0 onwards, allows "key:val" tags, and because of that,
-a test can be classified with a tag in a given key.  For instance, the
-new proposed version of the "boot_linux_console.py" test, which
-downloads and attempts to run a x86_64 kernel, is now tagged as:
+Alternatively, this test can be run using:
 
-  :avocado: tags=3Darch:x86_64
+    $ avocado run -t arch:mips64el tests/acceptance
+    $ avocado run -t machine:malta tests/acceptance
 
-This means that it can be filtered (out) when no x86_64 target is
-available.  At the same time, tests that don't have a "arch:" tag,
-will not be filtered out.
-
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/Makefile.include                 | 3 +++
- tests/acceptance/boot_linux_console.py | 2 +-
- tests/requirements.txt                 | 2 +-
- 3 files changed, 5 insertions(+), 2 deletions(-)
+ .travis.yml                            |  2 +-
+ tests/acceptance/boot_linux_console.py | 39 ++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c73298740d..af00c35ff5 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -957,6 +957,7 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
- # Any number of command separated loggers are accepted.  For more
- # information please refer to "avocado --help".
- AVOCADO_SHOW=3Dapp
-+AVOCADO_TAGS=3D$(patsubst %-softmmu,-t arch:%, $(filter %-softmmu,$(TARG=
-ET_DIRS)))
+diff --git a/.travis.yml b/.travis.yml
+index 49f9016e6a..28648f7a61 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -187,7 +187,7 @@ matrix:
 =20
- PYTHON3 =3D $(shell $(PYTHON) -c 'import sys; print(1 if sys.version_inf=
-o >=3D (3, 0) else 0)')
- ifeq ($(PYTHON3), 1)
-@@ -983,6 +984,8 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
- 	$(call quiet-command, \
-             $(TESTS_VENV_DIR)/bin/python -m avocado \
-             --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_RES=
-ULTS_DIR) \
-+            --filter-by-tags-include-empty --filter-by-tags-include-empt=
-y-key \
-+            $(AVOCADO_TAGS) \
-             --failfast=3Don $(SRC_PATH)/tests/acceptance, \
-             "AVOCADO", "tests/acceptance")
-=20
+     # Acceptance (Functional) tests
+     - env:
+-        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu,mips-softmmu"
++        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu,mips-softmmu,mips64el-softmmu"
+         - TEST_CMD=3D"make check-acceptance"
+       addons:
+         apt:
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
 ot_linux_console.py
-index 98324f7591..46b20bdfe2 100644
+index 0678ec91d2..20b845fce1 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -19,7 +19,7 @@ class BootLinuxConsole(Test):
-     and the kernel command line is properly passed from QEMU to the kern=
-el
+@@ -9,8 +9,11 @@
+ # later.  See the COPYING file in the top-level directory.
 =20
-     :avocado: enable
--    :avocado: tags=3Dx86_64
-+    :avocado: tags=3Darch:x86_64
-     """
+ import logging
++import os
 =20
-     timeout =3D 60
-diff --git a/tests/requirements.txt b/tests/requirements.txt
-index 64c6e27a94..426a9e8a9a 100644
---- a/tests/requirements.txt
-+++ b/tests/requirements.txt
-@@ -1,4 +1,4 @@
- # Add Python module requirements, one per line, to be installed
- # in the tests/venv Python virtual environment. For more info,
- # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
--avocado-framework=3D=3D65.0
-+avocado-framework=3D=3D67.0
+ from avocado_qemu import Test
++from avocado.utils import process
++from avocado.utils import archive
+=20
+=20
+ class BootLinuxConsole(Test):
+@@ -80,3 +83,39 @@ class BootLinuxConsole(Test):
+         self.vm.launch()
+         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+         self.wait_for_console_pattern(console_pattern)
++
++    def test_mips64el_malta(self):
++        """
++        This test requires the ar tool to extract "data.tar.gz" from
++        the Debian package.
++
++        The kernel can be rebuilt using this Debian kernel source [1] an=
+d
++        following the instructions on [2].
++
++        [1] https://kernel-team.pages.debian.net/kernel-handbook/ch-comm=
+on-tasks.html#s-common-official
++        [2] http://snapshot.debian.org/package/linux-2.6/2.6.32-48/#linu=
+x-source-2.6.32_2.6.32-48
++
++        :avocado: tags=3Darch:mips64el
++        :avocado: tags=3Dmachine:malta
++        """
++        deb_url =3D ('http://snapshot.debian.org/archive/debian/20130217=
+T032700Z/'
++                   'pool/main/l/linux-2.6/'
++                   'linux-image-2.6.32-5-5kc-malta_2.6.32-48_mipsel.deb'=
+)
++        deb_hash =3D '1aaec92083bf22fda31e0d27fa8d9a388e5fc3d5'
++        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
++
++        cwd =3D os.getcwd()
++        os.chdir(self.workdir)
++        process.run("ar x %s data.tar.gz" % deb_path)
++        archive.extract("data.tar.gz", self.workdir)
++        os.chdir(cwd)
++        kernel_path =3D self.workdir + '/boot/vmlinux-2.6.32-5-5kc-malta=
+'
++
++        self.vm.set_machine('malta')
++        self.vm.set_console()
++        kernel_command_line =3D 'console=3DttyS0 printk.time=3D0'
++        self.vm.add_args('-kernel', kernel_path,
++                         '-append', kernel_command_line)
++        self.vm.launch()
++        console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
++        self.wait_for_console_pattern(console_pattern)
 --=20
 2.20.1
