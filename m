@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38661)
+Received: from eggs.gnu.org ([209.51.188.92]:48241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjux2-000689-Gu
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:50:29 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gjvAn-0008KH-2v
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 19:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gjuws-0002lt-IC
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:50:22 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:54556)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gjuwp-0002fo-9U
-	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 18:50:16 -0500
-Date: Thu, 17 Jan 2019 00:50:09 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20190116235009.tl4gcv53e62npecl@function>
-References: <20181226034254.17842-1-richard.henderson@linaro.org>
+	(envelope-from <aik@ozlabs.ru>) id 1gjvAh-000341-Ch
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 19:04:37 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43409)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gjvAc-0002u4-Br
+	for qemu-devel@nongnu.org; Wed, 16 Jan 2019 19:04:32 -0500
+Received: by mail-pg1-x544.google.com with SMTP id v28so3541630pgk.10
+	for <qemu-devel@nongnu.org>; Wed, 16 Jan 2019 16:04:20 -0800 (PST)
+References: <20190116041712.130183-1-aik@ozlabs.ru>
+	<20190116124748.7c64c90e.cohuck@redhat.com>
+	<96b377b0-7104-f123-c02d-a93364a3e119@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <656ebcc1-da4a-2c98-2cd9-1db08b488616@ozlabs.ru>
+Date: Thu, 17 Jan 2019 11:04:13 +1100
 MIME-Version: 1.0
+In-Reply-To: <96b377b0-7104-f123-c02d-a93364a3e119@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181226034254.17842-1-richard.henderson@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: Use lduw_be_p in slirp_input
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu 0/2] linux-headers: Update to v5.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org, jan.kiszka@siemens.com
-
-Hello,
-
-Richard Henderson, le mer. 26 d=C3=A9c. 2018 14:42:54 +1100, a ecrit:
-> The pointer may be unaligned, so we must use our routines for that.
-> At the same time, we might as well use the big-endian version
-> instead of ntohs.
->=20
-> This fixes sparc64 host SIGBUS during pxe boot.
-
-I'm not at ease with applying this, when Marc-Andr=C3=A9 is trying to mak=
-e
-slirp an external library...  I'd rather apply the change below, could
-somebody review it?
-
-Samuel
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
-slirp: Avoid unaligned 16bit memory access
 
-pkt parameter may be unaligned, so we must access it byte-wise.
+On 16/01/2019 22:49, Paolo Bonzini wrote:
+> On 16/01/19 12:47, Cornelia Huck wrote:
+>> On Wed, 16 Jan 2019 15:17:10 +1100
+>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>
+>>> Here is the update script update and what it did to the v5.0-rc2 kernel.
+>>>
+>>> This is based on sha1
+>>> a0a8bff Greg Kurz "target/ppc/kvm: Drop useless include directive".
+>>>
+>>> Please comment. Thanks.
+>>
+>> Hm, Paolo had already posted an update to -rc1 (including an update of
+>> the script). Not sure what the status of that one is?
+> 
+> It's queued in my next pull request.
 
-This fixes sparc64 host SIGBUS during pxe boot.
+Is this in any publicly available git tree?
 
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index ab2fc4eb8b..0e41d5aedf 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -851,7 +851,7 @@ void slirp_input(Slirp *slirp, const uint8_t *pkt, in=
-t pkt_len)
-     if (pkt_len < ETH_HLEN)
-         return;
-=20
--    proto =3D ntohs(*(uint16_t *)(pkt + 12));
-+    proto =3D (((uint16_t) pkt[12]) << 8) + pkt[13];
-     switch(proto) {
-     case ETH_P_ARP:
-         arp_input(slirp, pkt, pkt_len);
+-- 
+Alexey
