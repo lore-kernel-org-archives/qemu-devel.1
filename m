@@ -1,38 +1,32 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47974)
+Received: from eggs.gnu.org ([209.51.188.92]:49641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gk2Ur-0002EX-Df
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:53:54 -0500
+	(envelope-from <groug@kaod.org>) id 1gk2a5-0006c9-Pp
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:59:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gk2Ul-0005Ty-PH
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:53:50 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55752
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gk2Ui-0005PM-5B
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:53:45 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	x0H7rdol049118
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 02:53:41 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2q2mjxtn6j-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 02:53:40 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <clg@kaod.org>;
-	Thu, 17 Jan 2019 07:53:38 -0000
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 17 Jan 2019 08:53:26 +0100
-In-Reply-To: <20190117075327.22194-1-clg@kaod.org>
-References: <20190117075327.22194-1-clg@kaod.org>
+	(envelope-from <groug@kaod.org>) id 1gk2a3-0003UN-Tg
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:59:17 -0500
+Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:33920)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gk2a3-0003Mj-M7
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 02:59:15 -0500
+Received: from player698.ha.ovh.net (unknown [10.109.159.222])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id DA1983ADFD
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 08:59:06 +0100 (CET)
+Date: Thu, 17 Jan 2019 08:58:54 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20190117085854.76229ec2@bahia.lan>
+In-Reply-To: <0a108f6c-8c9b-1b1e-463d-c3af171c2f19@redhat.com>
+References: <1547194672-24169-1-git-send-email-thuth@redhat.com>
+	<1547194672-24169-3-git-send-email-thuth@redhat.com>
+	<7d949380-e8e5-c5bd-1fd4-e87f3106e7f2@kaod.org>
+	<186ccbfa-0797-25bb-453c-74c9ace0e4d5@redhat.com>
+	<35b8b6d4-953a-d5ef-ceb5-5fa4a93c6c0e@kaod.org>
+	<0a108f6c-8c9b-1b1e-463d-c3af171c2f19@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20190117075327.22194-4-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/4] spapr: move the interrupt presenters under
- machine_data
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5 2/3] ppc: Fix duplicated
+ typedefs to be able to compile with Clang in gnu99 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,254 +35,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, "Daniel P.
+	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Next step is to remove them from under the PowerPCCPU
+On Thu, 17 Jan 2019 08:01:25 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/spapr_cpu_core.h |  2 ++
- hw/intc/spapr_xive.c            |  3 ++-
- hw/intc/xics_spapr.c            | 11 ++++++-----
- hw/ppc/spapr.c                  |  2 +-
- hw/ppc/spapr_cpu_core.c         |  8 ++++----
- hw/ppc/spapr_irq.c              | 17 ++++++++++-------
- 6 files changed, 25 insertions(+), 18 deletions(-)
+> On 2019-01-16 14:29, C=C3=A9dric Le Goater wrote:
+> > On 1/16/19 12:47 PM, Thomas Huth wrote: =20
+> >> On 2019-01-16 12:43, C=C3=A9dric Le Goater wrote: =20
+> >>> On 1/11/19 9:17 AM, Thomas Huth wrote: =20
+> >>>> When compiling the ppc code with clang and -std=3Dgnu99, there are a
+> >>>> couple of warnings/errors like this one:
+> >>>>
+> >>>>   CC      ppc64-softmmu/hw/intc/xics.o
+> >>>> In file included from hw/intc/xics.c:35:
+> >>>> include/hw/ppc/xics.h:43:25: error: redefinition of typedef 'ICPStat=
+e' is a C11 feature
+> >>>>       [-Werror,-Wtypedef-redefinition]
+> >>>> typedef struct ICPState ICPState;
+> >>>>                         ^
+> >>>> target/ppc/cpu.h:1181:25: note: previous definition is here
+> >>>> typedef struct ICPState ICPState;
+> >>>>                         ^
+> >>>> Work around the problems by including the proper headers instead. =20
+> >>>
+> >>> Thomas,
+> >>>
+> >>>
+> >>> After a closer look, I think we should use 'void *' under PowerPCCPU=
+=20
+> >>> as it was the case before I introduced the second interrupt presenter=
+. =20
+> >>
+> >> If you don't like the #includes, why not simply do anonymous struct
+> >> forward declarations here? I think that would be better than "void *".=
+ =20
+> >=20
+> > yes.
+> >   =20
+> >>> That's a bigger change reverting bits of already merged patches. I can
+> >>> take care of it if you prefer.  =20
+> >>
+> >> Could I keep the current patch in my series so that I can get the
+> >> patches finally merged? You could then do any clean up that you like on
+> >> top of it, ok? =20
+> >=20
+> > OK.=20
+> >=20
+> > See below the patch I would propose. Compiled tested with clang -std=3D=
+gnu99. =20
+> [...]
+> > @@ -1204,8 +1199,8 @@ struct PowerPCCPU {
+> >      int32_t node_id; /* NUMA node this CPU belongs to */
+> >      PPCHash64Options *hash64_opts;
+> >  #ifndef CONFIG_USER_ONLY
+> > -    ICPState *icp;
+> > -    XiveTCTX *tctx;
+> > +    struct ICPState *icp;
+> > +    struct XiveTCTX *tctx;
+> >  #endif =20
+>=20
+> That's pretty much what I had in an earlier version of my patch:
+>=20
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg01810.html
+>=20
+> But Greg did not like it:
+>=20
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg01893.html
+>=20
 
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
-ore.h
-index 9e2821e4b31f..d64f86bc284e 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -46,6 +46,8 @@ typedef struct sPAPRCPUState {
-     uint64_t vpa_addr;
-     uint64_t slb_shadow_addr, slb_shadow_size;
-     uint64_t dtl_addr, dtl_size;
-+    struct ICPState *icp;
-+    struct XiveTCTX *tctx;
- } sPAPRCPUState;
-=20
- static inline sPAPRCPUState *spapr_cpu_state(PowerPCCPU *cpu)
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 136d872f16bc..a0f5ff929447 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -16,6 +16,7 @@
- #include "monitor/monitor.h"
- #include "hw/ppc/fdt.h"
- #include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_cpu_core.h"
- #include "hw/ppc/spapr_xive.h"
- #include "hw/ppc/xive.h"
- #include "hw/ppc/xive_regs.h"
-@@ -394,7 +395,7 @@ static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr=
-, CPUState *cs)
- {
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
--    return cpu->tctx;
-+    return spapr_cpu_state(cpu)->tctx;
- }
-=20
- static const VMStateDescription vmstate_spapr_xive_end =3D {
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index de6cc15b6474..e2d8b3818336 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -31,6 +31,7 @@
- #include "trace.h"
- #include "qemu/timer.h"
- #include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_cpu_core.h"
- #include "hw/ppc/xics.h"
- #include "hw/ppc/xics_spapr.h"
- #include "hw/ppc/fdt.h"
-@@ -45,7 +46,7 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
- {
-     target_ulong cppr =3D args[0];
-=20
--    icp_set_cppr(cpu->icp, cppr);
-+    icp_set_cppr(spapr_cpu_state(cpu)->icp, cppr);
-     return H_SUCCESS;
- }
-=20
-@@ -66,7 +67,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachine=
-State *spapr,
- static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                            target_ulong opcode, target_ulong *args)
- {
--    uint32_t xirr =3D icp_accept(cpu->icp);
-+    uint32_t xirr =3D icp_accept(spapr_cpu_state(cpu)->icp);
-=20
-     args[0] =3D xirr;
-     return H_SUCCESS;
-@@ -75,7 +76,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
- static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                              target_ulong opcode, target_ulong *args)
- {
--    uint32_t xirr =3D icp_accept(cpu->icp);
-+    uint32_t xirr =3D icp_accept(spapr_cpu_state(cpu)->icp);
-=20
-     args[0] =3D xirr;
-     args[1] =3D cpu_get_host_ticks();
-@@ -87,7 +88,7 @@ static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachine=
-State *spapr,
- {
-     target_ulong xirr =3D args[0];
-=20
--    icp_eoi(cpu->icp, xirr);
-+    icp_eoi(spapr_cpu_state(cpu)->icp, xirr);
-     return H_SUCCESS;
- }
-=20
-@@ -95,7 +96,7 @@ static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
-                             target_ulong opcode, target_ulong *args)
- {
-     uint32_t mfrr;
--    uint32_t xirr =3D icp_ipoll(cpu->icp, &mfrr);
-+    uint32_t xirr =3D icp_ipoll(spapr_cpu_state(cpu)->icp, &mfrr);
-=20
-     args[0] =3D xirr;
-     args[1] =3D mfrr;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 83081defde4e..181f994c87a7 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3896,7 +3896,7 @@ static ICPState *spapr_icp_get(XICSFabric *xi, int =
-vcpu_id)
- {
-     PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
-=20
--    return cpu ? cpu->icp : NULL;
-+    return cpu ? spapr_cpu_state(cpu)->icp : NULL;
- }
-=20
- static void spapr_pic_print_info(InterruptStatsProvider *obj,
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 0405306d1e59..ef6cbb9c2943 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -194,11 +194,11 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, s=
-PAPRCPUCore *sc)
-         vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_=
-data);
-     }
-     qemu_unregister_reset(spapr_cpu_reset, cpu);
--    if (cpu->icp) {
--        object_unparent(OBJECT(cpu->icp));
-+    if (spapr_cpu_state(cpu)->icp) {
-+        object_unparent(OBJECT(spapr_cpu_state(cpu)->icp));
-     }
--    if (cpu->tctx) {
--        object_unparent(OBJECT(cpu->tctx));
-+    if (spapr_cpu_state(cpu)->tctx) {
-+        object_unparent(OBJECT(spapr_cpu_state(cpu)->tctx));
-     }
-     cpu_remove_sync(CPU(cpu));
-     object_unparent(OBJECT(cpu));
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 1da7a32348fc..2d7a7c163876 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -12,6 +12,7 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_cpu_core.h"
- #include "hw/ppc/spapr_xive.h"
- #include "hw/ppc/xics.h"
- #include "hw/ppc/xics_spapr.h"
-@@ -185,7 +186,7 @@ static void spapr_irq_print_info_xics(sPAPRMachineSta=
-te *spapr, Monitor *mon)
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
--        icp_pic_print_info(cpu->icp, mon);
-+        icp_pic_print_info(spapr_cpu_state(cpu)->icp, mon);
-     }
-=20
-     ics_pic_print_info(spapr->ics, mon);
-@@ -196,6 +197,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMachi=
-neState *spapr,
- {
-     Error *local_err =3D NULL;
-     Object *obj;
-+    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-=20
-     obj =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(spapr),
-                      &local_err);
-@@ -204,7 +206,7 @@ static void spapr_irq_cpu_intc_create_xics(sPAPRMachi=
-neState *spapr,
-         return;
-     }
-=20
--    cpu->icp =3D ICP(obj);
-+    spapr_cpu->icp =3D ICP(obj);
- }
-=20
- static int spapr_irq_post_load_xics(sPAPRMachineState *spapr, int versio=
-n_id)
-@@ -213,7 +215,7 @@ static int spapr_irq_post_load_xics(sPAPRMachineState=
- *spapr, int version_id)
-         CPUState *cs;
-         CPU_FOREACH(cs) {
-             PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--            icp_resend(cpu->icp);
-+            icp_resend(spapr_cpu_state(cpu)->icp);
-         }
-     }
-     return 0;
-@@ -334,7 +336,7 @@ static void spapr_irq_print_info_xive(sPAPRMachineSta=
-te *spapr,
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
--        xive_tctx_pic_print_info(cpu->tctx, mon);
-+        xive_tctx_pic_print_info(spapr_cpu_state(cpu)->tctx, mon);
-     }
-=20
-     spapr_xive_pic_print_info(spapr->xive, mon);
-@@ -345,6 +347,7 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRMachi=
-neState *spapr,
- {
-     Error *local_err =3D NULL;
-     Object *obj;
-+    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-=20
-     obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(spapr->xive), &loc=
-al_err);
-     if (local_err) {
-@@ -352,13 +355,13 @@ static void spapr_irq_cpu_intc_create_xive(sPAPRMac=
-hineState *spapr,
-         return;
-     }
-=20
--    cpu->tctx =3D XIVE_TCTX(obj);
-+    spapr_cpu->tctx =3D XIVE_TCTX(obj);
-=20
-     /*
-      * (TCG) Early setting the OS CAM line for hotplugged CPUs as they
-      * don't beneficiate from the reset of the XIVE IRQ backend
-      */
--    spapr_xive_set_tctx_os_cam(cpu->tctx);
-+    spapr_xive_set_tctx_os_cam(spapr_cpu->tctx);
- }
-=20
- static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int versio=
-n_id)
-@@ -374,7 +377,7 @@ static void spapr_irq_reset_xive(sPAPRMachineState *s=
-papr, Error **errp)
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
-         /* (TCG) Set the OS CAM line of the thread interrupt context. */
--        spapr_xive_set_tctx_os_cam(cpu->tctx);
-+        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
-     }
-=20
-     /* Activate the XIVE MMIOs */
---=20
-2.20.1
+Yeah I didn't but the #includes bring even more troubles so I won't object
+if we go for struct :) For the long term, I still think that icp and tctx
+should be hidden behind void *machine_data in a per-machine struct.
+
+>  Thomas
