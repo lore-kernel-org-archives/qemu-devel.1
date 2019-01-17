@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:38968)
+Received: from eggs.gnu.org ([209.51.188.92]:39003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gk9gl-0001q2-4u
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:34:39 -0500
+	(envelope-from <berto@igalia.com>) id 1gk9gn-0001s4-9a
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:34:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gk9gh-0007bo-KV
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:34:37 -0500
+	(envelope-from <berto@igalia.com>) id 1gk9gh-0007bk-Kj
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:34:41 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 17 Jan 2019 17:33:54 +0200
-Message-Id: <d18240fa21ee7a765c33c958ee5d4605b59d452a.1547739122.git.berto@igalia.com>
+Date: Thu, 17 Jan 2019 17:33:58 +0200
+Message-Id: <6ec504767392cb91591542c416f0c2ae52f847f8.1547739122.git.berto@igalia.com>
 In-Reply-To: <cover.1547739122.git.berto@igalia.com>
 References: <cover.1547739122.git.berto@igalia.com>
 In-Reply-To: <cover.1547739122.git.berto@igalia.com>
 References: <cover.1547739122.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 03/13] block: Freeze the backing chain for the
- duration of the mirror job
+Subject: [Qemu-devel] [PATCH 07/13] block: Allow omitting the 'backing'
+ option in certain cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +25,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
+Of all options of type BlockdevRef used to specify children in
+BlockdevOptions, 'backing' is the only one that is optional.
+
+For "x-blockdev-reopen" we want that if an option is omitted then it
+must be reset to its default value. The default value of 'backing'
+means that QEMU opens the backing file specified in the image
+metadata, but this is not something that we want to support for the
+reopen operation.
+
+Because of this the 'backing' option has to be specified during
+reopen, pointing to the existing backing file if we want to keep it,
+or pointing to a different one (or NULL) if we want to replace it (to
+be implemented in a subsequent patch).
+
+In order to simplify things a bit and not to require that the user
+passes the 'backing' option to every single block device even when
+it's clearly not necessary, this patch allows omitting this option if
+the block device being reopened doesn't have a backing file attached
+_and_ no default backing file is specified in the image metadata.
+
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/mirror.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ block.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 22bef9f7e9..afbc30da61 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -630,6 +630,10 @@ static int mirror_exit_common(Job *job)
-     }
-     s->prepared = true;
+diff --git a/block.c b/block.c
+index fd51f1cd35..897c8b85cd 100644
+--- a/block.c
++++ b/block.c
+@@ -3336,7 +3336,13 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
  
-+    if (bdrv_chain_contains(src, target_bs)) {
-+        bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
-+    }
-+
-     bdrv_release_dirty_bitmap(src, s->dirty_bitmap);
+     drv_prepared = true;
  
-     /* Make sure that the source BDS doesn't go away during bdrv_replace_node,
-@@ -1641,6 +1645,10 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-                 goto fail;
-             }
-         }
-+
-+        if (bdrv_freeze_backing_chain(mirror_top_bs, target, errp) < 0) {
-+            goto fail;
-+        }
-     }
- 
-     QTAILQ_INIT(&s->ops_in_flight);
+-    if (reopen_state->backing_missing) {
++    /*
++     * We must provide the 'backing' option if the BDS has a backing
++     * file or if the image file has a backing file name as part of
++     * its metadata. Otherwise the 'backing' option can be omitted.
++     */
++    if (reopen_state->backing_missing &&
++        (backing_bs(reopen_state->bs) || reopen_state->bs->backing_file[0])) {
+         error_setg(errp, "backing is missing for '%s'",
+                    reopen_state->bs->node_name);
+         ret = -EINVAL;
 -- 
 2.11.0
