@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:34030)
+Received: from eggs.gnu.org ([209.51.188.92]:34024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkDUL-0004zx-VK
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:38:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkDUK-0004zS-Te
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:38:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkDUB-0000K0-L0
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:38:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkDU8-0000J8-He
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:57 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 17 Jan 2019 13:36:56 -0600
-Message-Id: <20190117193658.16413-20-eblake@redhat.com>
+Date: Thu, 17 Jan 2019 13:36:49 -0600
+Message-Id: <20190117193658.16413-13-eblake@redhat.com>
 In-Reply-To: <20190117193658.16413-1-eblake@redhat.com>
 References: <20190117193658.16413-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 19/21] qemu-nbd: Add --list option
+Subject: [Qemu-devel] [PATCH v4 12/21] nbd/client: Split out
+ nbd_receive_one_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,452 +25,247 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-We want to be able to detect whether a given qemu NBD server is
-exposing the right export(s) and dirty bitmaps, at least for
-regression testing.  We could use 'nbd-client -l' from the upstream
-NBD project to list exports, but it's annoying to rely on
-out-of-tree binaries; furthermore, nbd-client doesn't necessarily
-know about all of the qemu NBD extensions.  Thus, it is time to add
-a new mode to qemu-nbd that merely sniffs all possible information
-from the server during handshake phase, then disconnects and dumps
-the information.
-
-This patch actually implements --list/-L, while reusing other
-options such as --tls-creds for now designating how to connect
-as the client (rather than their non-list usage of how to operate
-as the server).
-
-I debated about adding this functionality to something akin to
-'qemu-img info' - but that tool does not readily lend itself
-to connecting to an arbitrary NBD server without also tying to
-a specific export (I may, however, still add ImageInfoSpecificNBD
-for reporting the bitmaps available when connecting to a single
-export).  And, while it may feel a bit odd that normally
-qemu-nbd is a server but 'qemu-nbd -L' is a client, we are not
-really making the qemu-nbd binary that much larger, because
-'qemu-nbd -c' has to operate as both server and client
-simultaneously across two threads when feeding the kernel module
-for /dev/nbdN access.
-
-Sample output:
-$ qemu-nbd -L
-exports available: 1
- export: ''
-  size:  65536
-  flags: 0x4ed ( flush fua trim zeroes df cache )
-  min block: 512
-  opt block: 4096
-  max block: 33554432
-  available meta contexts: 1
-   base:allocation
-
-Note that the output only lists sizes if the server sent
-NBD_FLAG_HAS_FLAGS, because a newstyle server does not give
-the size otherwise.  It has the side effect that for really
-old servers that did not send any flags, the size is not
-output even though it was available.  However, I'm not too
-concerned about that - oldstyle servers are (rightfully)
-getting less common to encounter (qemu 3.0 was the last
-version where we even serve it), and most existing servers
-that still even offer oldstyle negotiation (such as nbdkit)
-still send flags (since that was added to the NBD protocol
-in 2007 to permit read-only connections).
-
-Not done here, but maybe worth future experiments: capture
-the meat of NBDExportInfo into a QAPI struct, and use the
-generated QAPI pretty-printers instead of hand-rolling our
-output loop.  It would also permit us to add a JSON output
-mode for machine parsing.
+Extract portions of nbd_negotiate_simple_meta_context() to
+a new function nbd_receive_one_meta_context() that copies the
+pattern of nbd_receive_list() for performing the argument
+validation of one reply.  The error message when the server
+replies with more than one context changes slightly, but
+that shouldn't happen in the common case.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 ---
-v4: a few more per-device options marked incompatible with --list,
-doc tweaks [Vladimir]
-v3: comment tweak [Rich], rebase to earlier changes
+v4: s/&name/NULL/ on error path [Vladimir]
+v3: rebase, without changing into a loop
 ---
- qemu-nbd.texi |  29 ++++++++--
- qemu-nbd.c    | 155 +++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 167 insertions(+), 17 deletions(-)
+ nbd/client.c     | 147 +++++++++++++++++++++++++++++------------------
+ nbd/trace-events |   2 +-
+ 2 files changed, 91 insertions(+), 58 deletions(-)
 
-diff --git a/qemu-nbd.texi b/qemu-nbd.texi
-index 3f22559beb4..0d297eed6db 100644
---- a/qemu-nbd.texi
-+++ b/qemu-nbd.texi
-@@ -2,6 +2,8 @@
- @c man begin SYNOPSIS
- @command{qemu-nbd} [OPTION]... @var{filename}
-
-+@command{qemu-nbd} @option{-L} [OPTION]...
-+
- @command{qemu-nbd} @option{-d} @var{dev}
- @c man end
- @end example
-@@ -14,6 +16,8 @@ Other uses:
- @itemize
- @item
- Bind a /dev/nbdX block device to a QEMU server (on Linux).
-+@item
-+As a client to query exports of a remote NBD server.
- @end itemize
-
- @c man end
-@@ -31,13 +35,15 @@ See the @code{qemu(1)} manual page for full details o=
-f the properties
- supported. The common object types that it makes sense to define are the
- @code{secret} object, which is used to supply passwords and/or encryptio=
-n
- keys, and the @code{tls-creds} object, which is used to supply TLS
--credentials for the qemu-nbd server.
-+credentials for the qemu-nbd server or client.
- @item -p, --port=3D@var{port}
--The TCP port to listen on (default @samp{10809}).
-+The TCP port to listen on as a server, or connect to as a client
-+(default @samp{10809}).
- @item -o, --offset=3D@var{offset}
- The offset into the image.
- @item -b, --bind=3D@var{iface}
--The interface to bind to (default @samp{0.0.0.0}).
-+The interface to bind to as a server, or connect to as a client
-+(default @samp{0.0.0.0}).
- @item -k, --socket=3D@var{path}
- Use a unix socket with path @var{path}.
- @item --image-opts
-@@ -97,10 +103,16 @@ Set the NBD volume export name (default of a zero-le=
-ngth string).
- @item -D, --description=3D@var{description}
- Set the NBD volume export description, as a human-readable
- string.
-+@item -L, --list
-+Connect as a client and list all details about the exports exposed by
-+a remote NBD server.  This enables list mode, and is incompatible
-+with options that change behavior related to a specific export (such as
-+@option{--export-name}, @option{--offset}, ...).
- @item --tls-creds=3DID
- Enable mandatory TLS encryption for the server by setting the ID
- of the TLS credentials object previously created with the --object
--option.
-+option; or provide the credentials needed for connecting as a client
-+in list mode.
- @item --fork
- Fork off the server process and exit the parent once the server is runni=
-ng.
- @item -v, --verbose
-@@ -159,6 +171,15 @@ qemu-nbd -c /dev/nbd0 -f qcow2 file.qcow2
- qemu-nbd -d /dev/nbd0
- @end example
-
-+Query a remote server to see details about what export(s) it is
-+serving on port 10809, and authenticating via PSK:
-+
-+@example
-+qemu-nbd \
-+  --object tls-creds-psk,id=3Dtls0,dir=3D/tmp/keys,username=3Deblake,end=
-point=3Dclient \
-+  --tls-creds tls0 -L -b remote.example.com
-+@end example
-+
- @c man end
-
- @ignore
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 3c538700eae..1f7b2a03f5d 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -76,7 +76,8 @@ static void usage(const char *name)
- {
-     (printf) (
- "Usage: %s [OPTIONS] FILE\n"
--"QEMU Disk Network Block Device Server\n"
-+"  or:  %s -L [OPTIONS]\n"
-+"QEMU Disk Network Block Device Utility\n"
- "\n"
- "  -h, --help                display this help and exit\n"
- "  -V, --version             output version information and exit\n"
-@@ -98,6 +99,7 @@ static void usage(const char *name)
- "  -B, --bitmap=3DNAME         expose a persistent dirty bitmap\n"
- "\n"
- "General purpose options:\n"
-+"  -L, --list                list exports available from another NBD ser=
-ver\n"
- "  --object type,id=3DID,...   define an object such as 'secret' for pro=
-viding\n"
- "                            passwords and/or encryption keys\n"
- "  --tls-creds=3DID            use id of an earlier --object to provide =
-TLS\n"
-@@ -131,7 +133,7 @@ static void usage(const char *name)
- "      --image-opts          treat FILE as a full set of image options\n=
-"
- "\n"
- QEMU_HELP_BOTTOM "\n"
--    , name, NBD_DEFAULT_PORT, "DEVICE");
-+    , name, name, NBD_DEFAULT_PORT, "DEVICE");
+diff --git a/nbd/client.c b/nbd/client.c
+index 96da68ee18a..c7bb7081553 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -669,7 +669,86 @@ static int nbd_send_meta_query(QIOChannel *ioc, uint=
+32_t opt,
+     return ret;
  }
 
- static void version(const char *name)
-@@ -243,6 +245,91 @@ static void termsig_handler(int signum)
- }
-
-
-+static int qemu_nbd_client_list(SocketAddress *saddr, QCryptoTLSCreds *t=
-ls,
-+                                const char *hostname)
+-/* nbd_negotiate_simple_meta_context:
++/*
++ * nbd_receive_one_meta_context:
++ * Called in a loop to receive and trace one set/list meta context reply=
+.
++ * Pass non-NULL @name or @id to collect results back to the caller, whi=
+ch
++ * must eventually call g_free().
++ * return 1 if name is set and iteration must continue,
++ *        0 if iteration is complete (including if option is unsupported=
+),
++ *        -1 with errp set for any error
++ */
++static int nbd_receive_one_meta_context(QIOChannel *ioc,
++                                        uint32_t opt,
++                                        char **name,
++                                        uint32_t *id,
++                                        Error **errp)
 +{
-+    int ret =3D EXIT_FAILURE;
-+    int rc;
-+    Error *err =3D NULL;
-+    QIOChannelSocket *sioc;
-+    NBDExportInfo *list;
-+    int i, j;
++    int ret;
++    NBDOptionReply reply;
++    char *local_name =3D NULL;
++    uint32_t local_id;
 +
-+    sioc =3D qio_channel_socket_new();
-+    if (qio_channel_socket_connect_sync(sioc, saddr, &err) < 0) {
-+        error_report_err(err);
-+        return EXIT_FAILURE;
++    if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
++        return -1;
 +    }
-+    rc =3D nbd_receive_export_list(QIO_CHANNEL(sioc), tls, hostname, &li=
-st,
-+                                 &err);
-+    if (rc < 0) {
-+        if (err) {
-+            error_report_err(err);
-+        }
-+        goto out;
-+    }
-+    printf("exports available: %d\n", rc);
-+    for (i =3D 0; i < rc; i++) {
-+        printf(" export: '%s'\n", list[i].name);
-+        if (list[i].description && *list[i].description) {
-+            printf("  description: %s\n", list[i].description);
-+        }
-+        if (list[i].flags & NBD_FLAG_HAS_FLAGS) {
-+            printf("  size:  %" PRIu64 "\n", list[i].size);
-+            printf("  flags: 0x%x (", list[i].flags);
-+            if (list[i].flags & NBD_FLAG_READ_ONLY) {
-+                printf(" readonly");
-+            }
-+            if (list[i].flags & NBD_FLAG_SEND_FLUSH) {
-+                printf(" flush");
-+            }
-+            if (list[i].flags & NBD_FLAG_SEND_FUA) {
-+                printf(" fua");
-+            }
-+            if (list[i].flags & NBD_FLAG_ROTATIONAL) {
-+                printf(" rotational");
-+            }
-+            if (list[i].flags & NBD_FLAG_SEND_TRIM) {
-+                printf(" trim");
-+            }
-+            if (list[i].flags & NBD_FLAG_SEND_WRITE_ZEROES) {
-+                printf(" zeroes");
-+            }
-+            if (list[i].flags & NBD_FLAG_SEND_DF) {
-+                printf(" df");
-+            }
-+            if (list[i].flags & NBD_FLAG_CAN_MULTI_CONN) {
-+                printf(" multi");
-+            }
-+            if (list[i].flags & NBD_FLAG_SEND_RESIZE) {
-+                printf(" resize");
-+            }
-+            if (list[i].flags & NBD_FLAG_SEND_CACHE) {
-+                printf(" cache");
-+            }
-+            printf(" )\n");
-+        }
-+        if (list[i].min_block) {
-+            printf("  min block: %u\n", list[i].min_block);
-+            printf("  opt block: %u\n", list[i].opt_block);
-+            printf("  max block: %u\n", list[i].max_block);
-+        }
-+        if (list[i].n_contexts) {
-+            printf("  available meta contexts: %d\n", list[i].n_contexts=
-);
-+            for (j =3D 0; j < list[i].n_contexts; j++) {
-+                printf("   %s\n", list[i].contexts[j]);
-+            }
-+        }
-+    }
-+    nbd_free_export_list(list, rc);
 +
-+    ret =3D EXIT_SUCCESS;
-+ out:
-+    object_unref(OBJECT(sioc));
-+    return ret;
++    ret =3D nbd_handle_reply_err(ioc, &reply, errp);
++    if (ret <=3D 0) {
++        return ret;
++    }
++
++    if (reply.type =3D=3D NBD_REP_ACK) {
++        if (reply.length !=3D 0) {
++            error_setg(errp, "Unexpected length to ACK response");
++            nbd_send_opt_abort(ioc);
++            return -1;
++        }
++        return 0;
++    } else if (reply.type !=3D NBD_REP_META_CONTEXT) {
++        error_setg(errp, "Unexpected reply type %u (%s), expected %u (%s=
+)",
++                   reply.type, nbd_rep_lookup(reply.type),
++                   NBD_REP_META_CONTEXT, nbd_rep_lookup(NBD_REP_META_CON=
+TEXT));
++        nbd_send_opt_abort(ioc);
++        return -1;
++    }
++
++    if (reply.length <=3D sizeof(local_id) ||
++        reply.length > NBD_MAX_BUFFER_SIZE) {
++        error_setg(errp, "Failed to negotiate meta context, server "
++                   "answered with unexpected length %" PRIu32,
++                   reply.length);
++        nbd_send_opt_abort(ioc);
++        return -1;
++    }
++
++    if (nbd_read(ioc, &local_id, sizeof(local_id), errp) < 0) {
++        return -1;
++    }
++    local_id =3D be32_to_cpu(local_id);
++
++    reply.length -=3D sizeof(local_id);
++    local_name =3D g_malloc(reply.length + 1);
++    if (nbd_read(ioc, local_name, reply.length, errp) < 0) {
++        g_free(local_name);
++        return -1;
++    }
++    local_name[reply.length] =3D '\0';
++    trace_nbd_opt_meta_reply(nbd_opt_lookup(opt), local_name, local_id);
++
++    if (name) {
++        *name =3D local_name;
++    } else {
++        g_free(local_name);
++    }
++    if (id) {
++        *id =3D local_id;
++    }
++    return 1;
 +}
 +
-+
- #if HAVE_NBD_DEVICE
- static void *show_parts(void *arg)
- {
-@@ -425,7 +512,8 @@ static QemuOptsList qemu_object_opts =3D {
++/*
++ * nbd_negotiate_simple_meta_context:
+  * Request the server to set the meta context for export @info->name
+  * using @info->x_dirty_bitmap with a fallback to "base:allocation",
+  * setting @info->context_id to the resulting id. Fail if the server
+@@ -690,50 +769,21 @@ static int nbd_negotiate_simple_meta_context(QIOCha=
+nnel *ioc,
+      * function should lose the term _simple.
+      */
+     int ret;
+-    NBDOptionReply reply;
+     const char *context =3D info->x_dirty_bitmap ?: "base:allocation";
+     bool received =3D false;
++    char *name =3D NULL;
 
-
-
--static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, Error **errp)
-+static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, bool list,
-+                                          Error **errp)
- {
-     Object *obj;
-     QCryptoTLSCreds *creds;
-@@ -445,10 +533,18 @@ static QCryptoTLSCreds *nbd_get_tls_creds(const cha=
-r *id, Error **errp)
-         return NULL;
+     if (nbd_send_meta_query(ioc, NBD_OPT_SET_META_CONTEXT,
+                             info->name, context, errp) < 0) {
+         return -1;
      }
 
--    if (creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_SERVER) {
--        error_setg(errp,
--                   "Expecting TLS credentials with a server endpoint");
--        return NULL;
-+    if (list) {
-+        if (creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_CLIENT) {
-+            error_setg(errp,
-+                       "Expecting TLS credentials with a client endpoint=
-");
-+            return NULL;
-+        }
-+    } else {
-+        if (creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_SERVER) {
-+            error_setg(errp,
-+                       "Expecting TLS credentials with a server endpoint=
-");
-+            return NULL;
-+        }
+-    if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
+-                                 errp) < 0)
+-    {
++    ret =3D nbd_receive_one_meta_context(ioc, NBD_OPT_SET_META_CONTEXT,
++                                       &name, &info->context_id, errp);
++    if (ret < 0) {
+         return -1;
      }
-     object_ref(obj);
-     return creds;
-@@ -471,7 +567,8 @@ static void setup_address_and_port(const char **addre=
-ss, const char **port)
- static const char *socket_activation_validate_opts(const char *device,
-                                                    const char *sockpath,
-                                                    const char *address,
--                                                   const char *port)
-+                                                   const char *port,
-+                                                   bool list)
- {
-     if (device !=3D NULL) {
-         return "NBD device can't be set when using socket activation";
-@@ -489,6 +586,10 @@ static const char *socket_activation_validate_opts(c=
-onst char *device,
-         return "TCP port number can't be set when using socket activatio=
-n";
-     }
+-
+-    ret =3D nbd_handle_reply_err(ioc, &reply, errp);
+-    if (ret <=3D 0) {
+-        return ret;
+-    }
+-
+-    if (reply.type =3D=3D NBD_REP_META_CONTEXT) {
+-        char *name;
+-
+-        if (reply.length !=3D sizeof(info->context_id) + strlen(context)=
+) {
+-            error_setg(errp, "Failed to negotiate meta context '%s', ser=
+ver "
+-                       "answered with unexpected length %" PRIu32, conte=
+xt,
+-                       reply.length);
+-            nbd_send_opt_abort(ioc);
+-            return -1;
+-        }
+-
+-        if (nbd_read(ioc, &info->context_id, sizeof(info->context_id),
+-                     errp) < 0) {
+-            return -1;
+-        }
+-        info->context_id =3D be32_to_cpu(info->context_id);
+-
+-        reply.length -=3D sizeof(info->context_id);
+-        name =3D g_malloc(reply.length + 1);
+-        if (nbd_read(ioc, name, reply.length, errp) < 0) {
+-            g_free(name);
+-            return -1;
+-        }
+-        name[reply.length] =3D '\0';
++    if (ret =3D=3D 1) {
+         if (strcmp(context, name)) {
+             error_setg(errp, "Failed to negotiate meta context '%s', ser=
+ver "
+                        "answered with different context '%s'", context,
+@@ -743,36 +793,19 @@ static int nbd_negotiate_simple_meta_context(QIOCha=
+nnel *ioc,
+             return -1;
+         }
+         g_free(name);
+-
+-        trace_nbd_opt_meta_reply(context, info->context_id);
+         received =3D true;
 
-+    if (list) {
-+        return "List mode is incompatible with socket activation";
-+    }
-+
-     return NULL;
+-        /* receive NBD_REP_ACK */
+-        if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &rep=
+ly,
+-                                     errp) < 0)
+-        {
++        ret =3D nbd_receive_one_meta_context(ioc, NBD_OPT_SET_META_CONTE=
+XT,
++                                           NULL, NULL, errp);
++        if (ret < 0) {
+             return -1;
+         }
+-
+-        ret =3D nbd_handle_reply_err(ioc, &reply, errp);
+-        if (ret <=3D 0) {
+-            return ret;
+-        }
+     }
+-
+-    if (reply.type !=3D NBD_REP_ACK) {
+-        error_setg(errp, "Unexpected reply type %u (%s), expected %u (%s=
+)",
+-                   reply.type, nbd_rep_lookup(reply.type),
+-                   NBD_REP_ACK, nbd_rep_lookup(NBD_REP_ACK));
++    if (ret !=3D 0) {
++        error_setg(errp, "Server answered with more than one context");
+         nbd_send_opt_abort(ioc);
+         return -1;
+     }
+-    if (reply.length) {
+-        error_setg(errp, "Unexpected length to ACK response");
+-        nbd_send_opt_abort(ioc);
+-        return -1;
+-    }
+-
+     return received;
  }
 
-@@ -512,7 +613,7 @@ int main(int argc, char **argv)
-     int64_t fd_size;
-     QemuOpts *sn_opts =3D NULL;
-     const char *sn_id_or_name =3D NULL;
--    const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:B:";
-+    const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:B:L";
-     struct option lopt[] =3D {
-         { "help", no_argument, NULL, 'h' },
-         { "version", no_argument, NULL, 'V' },
-@@ -525,6 +626,7 @@ int main(int argc, char **argv)
-         { "bitmap", required_argument, NULL, 'B' },
-         { "connect", required_argument, NULL, 'c' },
-         { "disconnect", no_argument, NULL, 'd' },
-+        { "list", no_argument, NULL, 'L' },
-         { "snapshot", no_argument, NULL, 's' },
-         { "load-snapshot", required_argument, NULL, 'l' },
-         { "nocache", no_argument, NULL, 'n' },
-@@ -559,7 +661,7 @@ int main(int argc, char **argv)
-     Error *local_err =3D NULL;
-     BlockdevDetectZeroesOptions detect_zeroes =3D BLOCKDEV_DETECT_ZEROES=
-_OPTIONS_OFF;
-     QDict *options =3D NULL;
--    const char *export_name =3D ""; /* Default export name */
-+    const char *export_name =3D NULL; /* defaults to "" later for server=
- mode */
-     const char *export_description =3D NULL;
-     const char *bitmap =3D NULL;
-     const char *tlscredsid =3D NULL;
-@@ -567,6 +669,7 @@ int main(int argc, char **argv)
-     bool writethrough =3D true;
-     char *trace_file =3D NULL;
-     bool fork_process =3D false;
-+    bool list =3D false;
-     int old_stderr =3D -1;
-     unsigned socket_activation;
-
-@@ -760,13 +863,33 @@ int main(int argc, char **argv)
-         case QEMU_NBD_OPT_FORK:
-             fork_process =3D true;
-             break;
-+        case 'L':
-+            list =3D true;
-+            break;
-         }
-     }
-
--    if ((argc - optind) !=3D 1) {
-+    if (list) {
-+        if (argc !=3D optind) {
-+            error_report("List mode is incompatible with a file name");
-+            exit(EXIT_FAILURE);
-+        }
-+        if (export_name || export_description || dev_offset || partition=
- ||
-+            device || disconnect || fmt || sn_id_or_name || bitmap ||
-+            seen_aio || seen_discard || seen_cache) {
-+            error_report("List mode is incompatible with per-device sett=
-ings");
-+            exit(EXIT_FAILURE);
-+        }
-+        if (fork_process) {
-+            error_report("List mode is incompatible with forking");
-+            exit(EXIT_FAILURE);
-+        }
-+    } else if ((argc - optind) !=3D 1) {
-         error_report("Invalid number of arguments");
-         error_printf("Try `%s --help' for more information.\n", argv[0])=
-;
-         exit(EXIT_FAILURE);
-+    } else if (!export_name) {
-+        export_name =3D "";
-     }
-
-     qemu_opts_foreach(&qemu_object_opts,
-@@ -785,7 +908,8 @@ int main(int argc, char **argv)
-     } else {
-         /* Using socket activation - check user didn't use -p etc. */
-         const char *err_msg =3D socket_activation_validate_opts(device, =
-sockpath,
--                                                              bindto, po=
-rt);
-+                                                              bindto, po=
-rt,
-+                                                              list);
-         if (err_msg !=3D NULL) {
-             error_report("%s", err_msg);
-             exit(EXIT_FAILURE);
-@@ -808,7 +932,7 @@ int main(int argc, char **argv)
-             error_report("TLS is not supported with a host device");
-             exit(EXIT_FAILURE);
-         }
--        tlscreds =3D nbd_get_tls_creds(tlscredsid, &local_err);
-+        tlscreds =3D nbd_get_tls_creds(tlscredsid, list, &local_err);
-         if (local_err) {
-             error_report("Failed to get TLS creds %s",
-                          error_get_pretty(local_err));
-@@ -816,6 +940,11 @@ int main(int argc, char **argv)
-         }
-     }
-
-+    if (list) {
-+        saddr =3D nbd_build_socket_address(sockpath, bindto, port);
-+        return qemu_nbd_client_list(saddr, tlscreds, bindto);
-+    }
-+
- #if !HAVE_NBD_DEVICE
-     if (disconnect || device) {
-         error_report("Kernel /dev/nbdN support not available");
+diff --git a/nbd/trace-events b/nbd/trace-events
+index 59521e47a3d..b4802c1570e 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -13,7 +13,7 @@ nbd_receive_query_exports_success(const char *wantname)=
+ "Found desired export na
+ nbd_receive_starttls_new_client(void) "Setting up TLS"
+ nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
+ nbd_opt_meta_request(const char *optname, const char *context, const cha=
+r *export) "Requesting %s %s for export %s"
+-nbd_opt_meta_reply(const char *context, uint32_t id) "Received mapping o=
+f context %s to id %" PRIu32
++nbd_opt_meta_reply(const char *optname, const char *context, uint32_t id=
+) "Received %s mapping of %s to id %" PRIu32
+ nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving n=
+egotiation tlscreds=3D%p hostname=3D%s"
+ nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
+ nbd_receive_negotiate_server_flags(uint32_t globalflags) "Global flags a=
+re 0x%" PRIx32
 --=20
 2.20.1
