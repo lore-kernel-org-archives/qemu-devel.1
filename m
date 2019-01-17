@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58487)
+Received: from eggs.gnu.org ([209.51.188.92]:59487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gk7mx-0000JF-JN
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:33:05 -0500
+	(envelope-from <philmd@redhat.com>) id 1gk7nB-0001PM-OX
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:33:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1gk7aI-0002Kq-Cb
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:19:51 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33695)
+	(envelope-from <philmd@redhat.com>) id 1gk7Wy-0006hy-RR
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:16:30 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40469)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1gk7aI-0002H7-7u
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:19:50 -0500
-Received: by mail-ot1-x343.google.com with SMTP id i20so11108027otl.0
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 05:19:49 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gk7Wy-0006bK-J8
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:16:24 -0500
+Received: by mail-wm1-f65.google.com with SMTP id f188so1004538wmf.5
+	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 05:16:19 -0800 (PST)
+References: <20181226034254.17842-1-richard.henderson@linaro.org>
+	<20190116235009.tl4gcv53e62npecl@function>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d79f1118-38ed-16fc-0233-0c41570d6d8c@redhat.com>
+Date: Thu, 17 Jan 2019 14:16:16 +0100
 MIME-Version: 1.0
-References: <cover.1539860473.git.artem.k.pisarenko@gmail.com>
-	<000601d4a8e8$a8a10170$f9e30450$@ru>
-	<CANzW0mtY6R0HtZJCoT5OTNdz9+ycrktnbMVjZ0uMAmXT69=N3g@mail.gmail.com>
-	<001301d4ad62$f3f44820$dbdcd860$@ru>
-	<CANzW0mtVkiZJdYMytbDf2QwGDKTKL453zNbQDV6=xO=XvewmZg@mail.gmail.com>
-	<000601d4ae38$35431f60$9fc95e20$@ru>
-In-Reply-To: <000601d4ae38$35431f60$9fc95e20$@ru>
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Thu, 17 Jan 2019 19:19:37 +0600
-Message-ID: <CANzW0mv0C6Kytf8jrOC-ec7MU6Q9BAi8rcDksVPxPT94NisjQg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce attributes for timers
- subsystem and remove QEMU_CLOCK_VIRTUAL_EXT clock type
+In-Reply-To: <20190116235009.tl4gcv53e62npecl@function>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] slirp: Use lduw_be_p in slirp_input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
+To: Samuel Thibault <samuel.thibault@gnu.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: jan.kiszka@siemens.com, qemu-devel@nongnu.org
 
-> The source is the external timers, that depend on "outer world", e.g., slirp.
-> These timers are not recorded/replayed, but may affect the icount warping
-> (which should remain deterministic).
+On 1/17/19 12:50 AM, Samuel Thibault wrote:
+> Hello,
+> 
+> Richard Henderson, le mer. 26 déc. 2018 14:42:54 +1100, a ecrit:
+>> The pointer may be unaligned, so we must use our routines for that.
+>> At the same time, we might as well use the big-endian version
+>> instead of ntohs.
+>>
+>> This fixes sparc64 host SIGBUS during pxe boot.
+> 
+> I'm not at ease with applying this, when Marc-André is trying to make
+> slirp an external library...  I'd rather apply the change below, could
+> somebody review it?
+> 
+> Samuel
+> 
+> 
+> slirp: Avoid unaligned 16bit memory access
+> 
+> pkt parameter may be unaligned, so we must access it byte-wise.
+> 
+> This fixes sparc64 host SIGBUS during pxe boot.
+> 
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> 
+> diff --git a/slirp/slirp.c b/slirp/slirp.c
+> index ab2fc4eb8b..0e41d5aedf 100644
+> --- a/slirp/slirp.c
+> +++ b/slirp/slirp.c
+> @@ -851,7 +851,7 @@ void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
+>      if (pkt_len < ETH_HLEN)
+>          return;
+>  
+> -    proto = ntohs(*(uint16_t *)(pkt + 12));
+> +    proto = (((uint16_t) pkt[12]) << 8) + pkt[13];
+>      switch(proto) {
+>      case ETH_P_ARP:
+>          arp_input(slirp, pkt, pkt_len);
 
-I thought we agreed earlier in this discussion that external timers
-are deterministic by design, because they are subset of virtual clock
-timers. Regarding slirp module, although it interfaces "outer world"
-(except when 'restrict' option is on), it still uses IPv6 timer
-deterministically. You may check it yourself. Otherwise it shouldn't
-use timer of 'virtual clock' type for this purpose and this needs to
-be fixed.
-So I still don't understand. And I'm not asking you to explain. I'm
-just hinting you that your fix may finally happen to be incorrect in
-case if it based on wrong assertion I'm talking about.
+What about using memcpy?
 
-> Please check the new version of the series.
+-- >8 --
+@@ -846,12 +846,13 @@ static void arp_input(Slirp *slirp, const uint8_t
+*pkt, int pkt_len)
+ void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
+ {
+     struct mbuf *m;
+-    int proto;
++    uint16_t proto;
 
-Sorry, I'm too busy right now for deep analysis. I've just tried to
-briefly understand issue you pointed and provide minimal feedback in
-order to prevent possible wrong decisions. I'll return to this work
-later.
+     if (pkt_len < ETH_HLEN)
+         return;
+
+-    proto = ntohs(*(uint16_t *)(pkt + 12));
++    memcpy(&proto, pkt + 12, sizeof(proto)); /* Avoid unaligned 16bit
+access */
++    proto = ntohs(proto);
+     switch(proto) {
+     case ETH_P_ARP:
+         arp_input(slirp, pkt, pkt_len);
+---
