@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:53172)
+Received: from eggs.gnu.org ([209.51.188.92]:53170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkCBe-00088Y-8B
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:14:43 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkCBd-00088R-7r
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:14:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkCBZ-0004aa-P5
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkCBZ-0004b1-Re
 	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:14:39 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51733 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:51731 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gkCBV-000412-Vh
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:14:35 -0500
+	id 1gkCBX-00040k-RL
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:14:37 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 17 Jan 2019 19:13:00 +0100
-Message-Id: <1547748785-14030-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 17 Jan 2019 19:12:58 +0100
+Message-Id: <1547748785-14030-6-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1547748785-14030-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1547748785-14030-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 07/12] target/mips: Update ITU to utilize SAARI
+Subject: [Qemu-devel] [PULL 05/12] target/mips: Provide R/W access to SAARI
  and SAAR CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,194 +30,267 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Update ITU to utilize SAARI and SAAR CP0 registers.
+Provide R/W access to SAARI and SAAR CP0 registers.
 
 Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- hw/mips/cps.c              |  8 ++++++++
- hw/misc/mips_itu.c         | 28 ++++++++++++++++++++++------
- include/hw/misc/mips_itu.h |  4 ++++
- target/mips/cpu.h          |  5 +++++
- target/mips/op_helper.c    | 14 ++++++++++++++
- 5 files changed, 53 insertions(+), 6 deletions(-)
+ target/mips/cpu.h       |  1 +
+ target/mips/helper.h    |  6 +++++
+ target/mips/internal.h  |  1 +
+ target/mips/op_helper.c | 50 +++++++++++++++++++++++++++++++++++++
+ target/mips/translate.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++---
+ 5 files changed, 120 insertions(+), 4 deletions(-)
 
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 4285d19..fc97f59 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -69,6 +69,7 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-     Error *err = NULL;
-     target_ulong gcr_base;
-     bool itu_present = false;
-+    bool saar_present = false;
- 
-     for (i = 0; i < s->num_vp; i++) {
-         cpu = MIPS_CPU(cpu_create(s->cpu_type));
-@@ -82,12 +83,14 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-             itu_present = true;
-             /* Attach ITC Tag to the VP */
-             env->itc_tag = mips_itu_get_tag_region(&s->itu);
-+            env->itu = &s->itu;
-         }
-         qemu_register_reset(main_cpu_reset, cpu);
-     }
- 
-     cpu = MIPS_CPU(first_cpu);
-     env = &cpu->env;
-+    saar_present = (bool)env->saarp;
- 
-     /* Inter-Thread Communication Unit */
-     if (itu_present) {
-@@ -96,6 +99,11 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
- 
-         object_property_set_int(OBJECT(&s->itu), 16, "num-fifo", &err);
-         object_property_set_int(OBJECT(&s->itu), 16, "num-semaphores", &err);
-+        object_property_set_bool(OBJECT(&s->itu), saar_present, "saar-present",
-+                                 &err);
-+        if (saar_present) {
-+            qdev_prop_set_ptr(DEVICE(&s->itu), "saar", (void *)&env->CP0_SAAR);
-+        }
-         object_property_set_bool(OBJECT(&s->itu), true, "realized", &err);
-         if (err != NULL) {
-             error_propagate(errp, err);
-diff --git a/hw/misc/mips_itu.c b/hw/misc/mips_itu.c
-index 4801958..5c49bdd 100644
---- a/hw/misc/mips_itu.c
-+++ b/hw/misc/mips_itu.c
-@@ -84,7 +84,7 @@ static uint64_t itc_tag_read(void *opaque, hwaddr addr, unsigned size)
-     return tag->ITCAddressMap[index];
- }
- 
--static void itc_reconfigure(MIPSITUState *tag)
-+void itc_reconfigure(MIPSITUState *tag)
- {
-     uint64_t *am = &tag->ITCAddressMap[0];
-     MemoryRegion *mr = &tag->storage_io;
-@@ -92,6 +92,12 @@ static void itc_reconfigure(MIPSITUState *tag)
-     uint64_t size = (1 * KiB) + (am[1] & ITC_AM1_ADDR_MASK_MASK);
-     bool is_enabled = (am[0] & ITC_AM0_EN_MASK) != 0;
- 
-+    if (tag->saar_present) {
-+        address = ((*(uint64_t *) tag->saar) & 0xFFFFFFFFE000ULL) << 4;
-+        size = 1 << ((*(uint64_t *) tag->saar >> 1) & 0x1f);
-+        is_enabled = *(uint64_t *) tag->saar & 1;
-+    }
-+
-     memory_region_transaction_begin();
-     if (!(size & (size - 1))) {
-         memory_region_set_size(mr, size);
-@@ -150,7 +156,12 @@ static inline ITCView get_itc_view(hwaddr addr)
- static inline int get_cell_stride_shift(const MIPSITUState *s)
- {
-     /* Minimum interval (for EntryGain = 0) is 128 B */
--    return 7 + (s->ITCAddressMap[1] & ITC_AM1_ENTRY_GRAIN_MASK);
-+    if (s->saar_present) {
-+        return 7 + ((s->icr0 >> ITC_ICR0_BLK_GRAIN) &
-+                    ITC_ICR0_BLK_GRAIN_MASK);
-+    } else {
-+        return 7 + (s->ITCAddressMap[1] & ITC_AM1_ENTRY_GRAIN_MASK);
-+    }
- }
- 
- static inline ITCStorageCell *get_cell(MIPSITUState *s,
-@@ -499,10 +510,15 @@ static void mips_itu_reset(DeviceState *dev)
- {
-     MIPSITUState *s = MIPS_ITU(dev);
- 
--    s->ITCAddressMap[0] = 0;
--    s->ITCAddressMap[1] =
--        ((ITC_STORAGE_ADDRSPACE_SZ - 1) & ITC_AM1_ADDR_MASK_MASK) |
--        (get_num_cells(s) << ITC_AM1_NUMENTRIES_OFS);
-+    if (s->saar_present) {
-+        *(uint64_t *) s->saar = 0x11 << 1;
-+        s->icr0 = get_num_cells(s) << ITC_ICR0_CELL_NUM;
-+    } else {
-+        s->ITCAddressMap[0] = 0;
-+        s->ITCAddressMap[1] =
-+            ((ITC_STORAGE_ADDRSPACE_SZ - 1) & ITC_AM1_ADDR_MASK_MASK) |
-+            (get_num_cells(s) << ITC_AM1_NUMENTRIES_OFS);
-+    }
-     itc_reconfigure(s);
- 
-     itc_reset_cells(s);
-diff --git a/include/hw/misc/mips_itu.h b/include/hw/misc/mips_itu.h
-index 45a0c51..c44e767 100644
---- a/include/hw/misc/mips_itu.h
-+++ b/include/hw/misc/mips_itu.h
-@@ -70,6 +70,10 @@ typedef struct MIPSITUState {
-     /* ITU Control Register */
-     uint64_t icr0;
- 
-+    /* SAAR */
-+    bool saar_present;
-+    void *saar;
-+
- } MIPSITUState;
- 
- /* Get ITC Configuration Tag memory region. */
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 185702d..48e86d1 100644
+index 1c2c682..185702d 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -326,6 +326,7 @@ struct TCState {
+@@ -901,6 +901,7 @@ struct CPUMIPSState {
+     uint32_t CP0_Status_rw_bitmask; /* Read/write bits in CP0_Status */
+     uint32_t CP0_TCStatus_rw_bitmask; /* Read/write bits in CP0_TCStatus */
+     uint64_t insn_flags; /* Supported instruction set */
++    int saarp;
  
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index c23e4e5..8872c46 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -65,6 +65,8 @@ DEF_HELPER_1(mftc0_tcschedule, tl, env)
+ DEF_HELPER_1(mfc0_tcschefback, tl, env)
+ DEF_HELPER_1(mftc0_tcschefback, tl, env)
+ DEF_HELPER_1(mfc0_count, tl, env)
++DEF_HELPER_1(mfc0_saar, tl, env)
++DEF_HELPER_1(mfhc0_saar, tl, env)
+ DEF_HELPER_1(mftc0_entryhi, tl, env)
+ DEF_HELPER_1(mftc0_status, tl, env)
+ DEF_HELPER_1(mftc0_cause, tl, env)
+@@ -87,6 +89,7 @@ DEF_HELPER_1(dmfc0_tcschefback, tl, env)
+ DEF_HELPER_1(dmfc0_lladdr, tl, env)
+ DEF_HELPER_1(dmfc0_maar, tl, env)
+ DEF_HELPER_2(dmfc0_watchlo, tl, env, i32)
++DEF_HELPER_1(dmfc0_saar, tl, env)
+ #endif /* TARGET_MIPS64 */
+ 
+ DEF_HELPER_2(mtc0_index, void, env, tl)
+@@ -131,6 +134,9 @@ DEF_HELPER_2(mtc0_srsconf4, void, env, tl)
+ DEF_HELPER_2(mtc0_hwrena, void, env, tl)
+ DEF_HELPER_2(mtc0_pwctl, void, env, tl)
+ DEF_HELPER_2(mtc0_count, void, env, tl)
++DEF_HELPER_2(mtc0_saari, void, env, tl)
++DEF_HELPER_2(mtc0_saar, void, env, tl)
++DEF_HELPER_2(mthc0_saar, void, env, tl)
+ DEF_HELPER_2(mtc0_entryhi, void, env, tl)
+ DEF_HELPER_2(mttc0_entryhi, void, env, tl)
+ DEF_HELPER_2(mtc0_compare, void, env, tl)
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index 8b1b245..8f6fc91 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -61,6 +61,7 @@ struct mips_def_t {
+     target_ulong CP0_EBaseWG_rw_bitmask;
+     uint64_t insn_flags;
+     enum mips_mmu_types mmu_type;
++    int32_t SAARP;
  };
  
-+struct MIPSITUState;
- typedef struct CPUMIPSState CPUMIPSState;
- struct CPUMIPSState {
-     TCState active_tc;
-@@ -917,6 +918,7 @@ struct CPUMIPSState {
-     const mips_def_t *cpu_model;
-     void *irq[8];
-     QEMUTimer *timer; /* Internal timer */
-+    struct MIPSITUState *itu;
-     MemoryRegion *itc_tag; /* ITC Configuration Tags */
-     target_ulong exception_base; /* ExceptionBase input to the core */
- };
-@@ -1059,6 +1061,9 @@ void cpu_set_exception_base(int vp_index, target_ulong address);
- /* mips_int.c */
- void cpu_mips_soft_irq(CPUMIPSState *env, int irq, int level);
- 
-+/* mips_itu.c */
-+void itc_reconfigure(struct MIPSITUState *tag);
-+
- /* helper.c */
- target_ulong exception_resume_pc (CPUMIPSState *env);
- 
+ extern const struct mips_def_t mips_defs[];
 diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 409c136..aebad24 100644
+index d1f1d1a..409c136 100644
 --- a/target/mips/op_helper.c
 +++ b/target/mips/op_helper.c
-@@ -1635,6 +1635,13 @@ void helper_mtc0_saar(CPUMIPSState *env, target_ulong arg1)
-     uint32_t target = env->CP0_SAARI & 0x3f;
-     if (target < 2) {
-         env->CP0_SAAR[target] = arg1 & 0x00000ffffffff03fULL;
-+        switch (target) {
-+        case 0:
-+            if (env->itu) {
-+                itc_reconfigure(env->itu);
-+            }
-+            break;
-+        }
-     }
+@@ -938,6 +938,22 @@ target_ulong helper_mfc0_count(CPUMIPSState *env)
+     return count;
  }
  
-@@ -1645,6 +1652,13 @@ void helper_mthc0_saar(CPUMIPSState *env, target_ulong arg1)
-         env->CP0_SAAR[target] =
-             (((uint64_t) arg1 << 32) & 0x00000fff00000000ULL) |
-             (env->CP0_SAAR[target] & 0x00000000ffffffffULL);
-+        switch (target) {
-+        case 0:
-+            if (env->itu) {
-+                itc_reconfigure(env->itu);
-+            }
-+            break;
-+        }
-     }
++target_ulong helper_mfc0_saar(CPUMIPSState *env)
++{
++    if ((env->CP0_SAARI & 0x3f) < 2) {
++        return (int32_t) env->CP0_SAAR[env->CP0_SAARI & 0x3f];
++    }
++    return 0;
++}
++
++target_ulong helper_mfhc0_saar(CPUMIPSState *env)
++{
++    if ((env->CP0_SAARI & 0x3f) < 2) {
++        return env->CP0_SAAR[env->CP0_SAARI & 0x3f] >> 32;
++    }
++    return 0;
++}
++
+ target_ulong helper_mftc0_entryhi(CPUMIPSState *env)
+ {
+     int other_tc = env->CP0_VPEControl & (0xff << CP0VPECo_TargTC);
+@@ -1059,6 +1075,14 @@ target_ulong helper_dmfc0_watchlo(CPUMIPSState *env, uint32_t sel)
+ {
+     return env->CP0_WatchLo[sel];
+ }
++
++target_ulong helper_dmfc0_saar(CPUMIPSState *env)
++{
++    if ((env->CP0_SAARI & 0x3f) < 2) {
++        return env->CP0_SAAR[env->CP0_SAARI & 0x3f];
++    }
++    return 0;
++}
+ #endif /* TARGET_MIPS64 */
+ 
+ void helper_mtc0_index(CPUMIPSState *env, target_ulong arg1)
+@@ -1598,6 +1622,32 @@ void helper_mtc0_count(CPUMIPSState *env, target_ulong arg1)
+     qemu_mutex_unlock_iothread();
  }
  
++void helper_mtc0_saari(CPUMIPSState *env, target_ulong arg1)
++{
++    uint32_t target = arg1 & 0x3f;
++    if (target <= 1) {
++        env->CP0_SAARI = target;
++    }
++}
++
++void helper_mtc0_saar(CPUMIPSState *env, target_ulong arg1)
++{
++    uint32_t target = env->CP0_SAARI & 0x3f;
++    if (target < 2) {
++        env->CP0_SAAR[target] = arg1 & 0x00000ffffffff03fULL;
++    }
++}
++
++void helper_mthc0_saar(CPUMIPSState *env, target_ulong arg1)
++{
++    uint32_t target = env->CP0_SAARI & 0x3f;
++    if (target < 2) {
++        env->CP0_SAAR[target] =
++            (((uint64_t) arg1 << 32) & 0x00000fff00000000ULL) |
++            (env->CP0_SAAR[target] & 0x00000000ffffffffULL);
++    }
++}
++
+ void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
+ {
+     target_ulong old, val, mask;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 827d0f7..00cbbf7 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -2537,6 +2537,7 @@ typedef struct DisasContext {
+     bool mrp;
+     bool nan2008;
+     bool abs2008;
++    bool saar;
+ } DisasContext;
+ 
+ #define DISAS_STOP       DISAS_TARGET_0
+@@ -6592,6 +6593,17 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             goto cp0_unimplemented;
+         }
+         break;
++    case CPO_REGISTER_09:
++        switch (sel) {
++        case 7:
++            CP0_CHECK(ctx->saar);
++            gen_helper_mfhc0_saar(arg, cpu_env);
++            rn = "SAAR";
++            break;
++        default:
++            goto cp0_unimplemented;
++        }
++        break;
+     case CPO_REGISTER_17:
+         switch (sel) {
+         case 0:
+@@ -6662,6 +6674,16 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             goto cp0_unimplemented;
+         }
+         break;
++    case CPO_REGISTER_09:
++        switch (sel) {
++        case 7:
++            CP0_CHECK(ctx->saar);
++            gen_helper_mthc0_saar(cpu_env, arg);
++            rn = "SAAR";
++            break;
++        default:
++            goto cp0_unimplemented;
++        }
+     case CPO_REGISTER_17:
+         switch (sel) {
+         case 0:
+@@ -7048,7 +7070,16 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             ctx->base.is_jmp = DISAS_EXIT;
+             rn = "Count";
+             break;
+-        /* 6,7 are implementation dependent */
++        case 6:
++            CP0_CHECK(ctx->saar);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SAARI));
++            rn = "SAARI";
++            break;
++        case 7:
++            CP0_CHECK(ctx->saar);
++            gen_helper_mfc0_saar(arg, cpu_env);
++            rn = "SAAR";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -7753,7 +7784,16 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_helper_mtc0_count(cpu_env, arg);
+             rn = "Count";
+             break;
+-        /* 6,7 are implementation dependent */
++        case 6:
++            CP0_CHECK(ctx->saar);
++            gen_helper_mtc0_saari(cpu_env, arg);
++            rn = "SAARI";
++            break;
++        case 7:
++            CP0_CHECK(ctx->saar);
++            gen_helper_mtc0_saar(cpu_env, arg);
++            rn = "SAAR";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -8498,7 +8538,16 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             ctx->base.is_jmp = DISAS_EXIT;
+             rn = "Count";
+             break;
+-        /* 6,7 are implementation dependent */
++        case 6:
++            CP0_CHECK(ctx->saar);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_SAARI));
++            rn = "SAARI";
++            break;
++        case 7:
++            CP0_CHECK(ctx->saar);
++            gen_helper_dmfc0_saar(arg, cpu_env);
++            rn = "SAAR";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -9186,7 +9235,16 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_helper_mtc0_count(cpu_env, arg);
+             rn = "Count";
+             break;
+-        /* 6,7 are implementation dependent */
++        case 6:
++            CP0_CHECK(ctx->saar);
++            gen_helper_mtc0_saari(cpu_env, arg);
++            rn = "SAARI";
++            break;
++        case 7:
++            CP0_CHECK(ctx->saar);
++            gen_helper_mtc0_saar(cpu_env, arg);
++            rn = "SAAR";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
 -- 
 2.7.4
