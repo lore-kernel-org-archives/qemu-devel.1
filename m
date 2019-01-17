@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:46358)
+Received: from eggs.gnu.org ([209.51.188.92]:47252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkBks-0002ZN-J8
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:47:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkBoW-0004tb-LL
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkBkr-0004Ps-KP
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:47:02 -0500
-References: <20190117153321.29749-1-eblake@redhat.com>
-	<20190117153321.29749-2-eblake@redhat.com>
-	<20190117163939.GB6761@localhost.localdomain>
+	(envelope-from <eblake@redhat.com>) id 1gkBoW-0002WR-0s
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:50:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gkBoV-0002VF-OZ
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 12:50:47 -0500
+References: <20190117114359.5164-1-marcandre.lureau@redhat.com>
+	<20190117114359.5164-5-marcandre.lureau@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <e800129e-724e-edeb-1706-f17b6cf16153@redhat.com>
-Date: Thu, 17 Jan 2019 11:46:49 -0600
+Message-ID: <50bd9e34-6d50-c991-e42e-69b36f9fab4f@redhat.com>
+Date: Thu, 17 Jan 2019 11:50:41 -0600
 MIME-Version: 1.0
-In-Reply-To: <20190117163939.GB6761@localhost.localdomain>
+In-Reply-To: <20190117114359.5164-5-marcandre.lureau@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="6j2vmKwqeuGLjSWJrUxHm4u6wmjAu63Hr"
-Subject: Re: [Qemu-devel] [PATCH 1/3] block: Expose protocol-specific data
- to 'qemu-img info'
+	boundary="j7qYSBAxVk1F2aR16CJZB056cpVajLpTz"
+Subject: Re: [Qemu-devel] [PATCH 04/27] net/slirp: fix leaks on forwaring
+ rule registration error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6j2vmKwqeuGLjSWJrUxHm4u6wmjAu63Hr
+--j7qYSBAxVk1F2aR16CJZB056cpVajLpTz
 From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>,
- vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>
-Message-ID: <e800129e-724e-edeb-1706-f17b6cf16153@redhat.com>
-Subject: Re: [PATCH 1/3] block: Expose protocol-specific data to 'qemu-img
- info'
-References: <20190117153321.29749-1-eblake@redhat.com>
- <20190117153321.29749-2-eblake@redhat.com>
- <20190117163939.GB6761@localhost.localdomain>
-In-Reply-To: <20190117163939.GB6761@localhost.localdomain>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka
+ <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>,
+ Zhang Chen <zhangckid@gmail.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>, pbonzini@redhat.com
+Message-ID: <50bd9e34-6d50-c991-e42e-69b36f9fab4f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/27] net/slirp: fix leaks on forwaring rule
+ registration error
+References: <20190117114359.5164-1-marcandre.lureau@redhat.com>
+ <20190117114359.5164-5-marcandre.lureau@redhat.com>
+In-Reply-To: <20190117114359.5164-5-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 1/17/19 10:39 AM, Kevin Wolf wrote:
-> Am 17.01.2019 um 16:33 hat Eric Blake geschrieben:
->> 'qemu-img info' is useful for showing additional information
->> about an image - but sometimes the interesting information is
->> specific to the protocol rather than to the format layer.  Set
->> the groundwork for showing this information; further patches
->> will then enable specific pieces of information.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
+On 1/17/19 5:43 AM, Marc-Andr=C3=A9 Lureau wrote:
+
+In the subject: s/forwaring/forwarding/
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  net/slirp.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >=20
-> Isn't this making invalid assumptions about the structure of the block
-> graph? Who says that I don't have a quorum node below the format layer
-> with five different protocol layer children? Some of which may have
-> filter nodes on top?
+> diff --git a/net/slirp.c b/net/slirp.c
+> index 750105a466e..0b15f427f5c 100644
+> --- a/net/slirp.c
+> +++ b/net/slirp.c
+> @@ -807,6 +807,7 @@ static int slirp_guestfwd(SlirpState *s, const char=
+ *config_str, Error **errp)
+>          qemu_chr_fe_init(&fwd->hd, chr, &err);
+>          if (err) {
+>              error_propagate(errp, err);
+> +            object_unparent(OBJECT(chr));
+>              g_free(fwd);
+>              return -1;
+>          }
+> @@ -815,6 +816,7 @@ static int slirp_guestfwd(SlirpState *s, const char=
+ *config_str, Error **errp)
+>                                 &server, port) < 0) {
+>              error_setg(errp, "Conflicting/invalid host:port in guest "=
 
-Does quorum have bs->file?  If not, then this field is not populated for
-quorum, so it doesn't make invalid assumptions.
-
-You do have a point about bs->file pointing to filters being an
-interesting case, though.  Max had a series proposal back in August that
-tries to do smarter role-based descent through the graph rather than
-just hard-coding assumptions based on bs->file:
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg01644.html
-
-Maybe we need to get that in place first, at which point it then becomes
-easier to reason about what related BDS information to visit in addition
-to the format layer.
+>                         "forwarding rule '%s'", config_str);
+> +            qemu_chr_fe_deinit(&fwd->hd, true);
+>              g_free(fwd);
+>              return -1;
+>          }
+>=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -82,21 +90,21 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---6j2vmKwqeuGLjSWJrUxHm4u6wmjAu63Hr
+--j7qYSBAxVk1F2aR16CJZB056cpVajLpTz
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxAv4kACgkQp6FrSiUn
-Q2rnhAgAgGc7f9l8+Pxg0BPrKJSHpn5my3yb4EG+LOYZG5k51jPxSse6bJqw4wME
-+SVo+gARiApgy1lGPeQa8lw1mKNScir5wuO5hnjohTzhst8ZFRiOSVWUBnITpE/x
-aowD/+a4lSfYMAVvpIPnSkAesC/uMLULDwrORgYi+hkOkHGyoKYpK9Tn0lJlMGXV
-AfydGKNF9knhr+uxoWkH8ut7ViUap1Oqa07DY8BSa64sgrLOmBpIqwhgyoyXUPUp
-VrrxbHFIJkt6ajefvVpb9c9cv3uL5wQEb+0Sad/vuCRLrixmRfTS5GT9yQYoWITH
-uubEnL0j+Tnfd8nrx0mTqQX8NjZJ1Q==
-=9x7l
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlxAwHEACgkQp6FrSiUn
+Q2qocQf+IM40ZVirg8xSJzNd2mnZ4rvIE3HAA5LVx95sTjUbgWET7neSk33PZWrQ
+kxR65W19NVKFcW2T+Rj2GQeI6yocCu1DiOLbAwqjzuq7N9J44ftdCSfD2e8g6iHK
+vb+/kUxAQqwACxh4J9HUMPWwHLfa0qMJ3qpzD0EREDyFxbH/C2DAPC4OqQ0FW4CY
+OebHlKztd3puxABNMP3cdTKamhyfzMpWweNxEfqI/vR3pNJX9kVlJbDOfrcAqTyH
+DJqSyU6NmHiM3IblRxZTHsQv+Zs5+IAtbK7O6AMG+CUEyxvvtuwKDATLeq+JVOe0
+WG3Ph+IhW/B8CGdB3zjh1HImH4MT2A==
+=POot
 -----END PGP SIGNATURE-----
 
---6j2vmKwqeuGLjSWJrUxHm4u6wmjAu63Hr--
+--j7qYSBAxVk1F2aR16CJZB056cpVajLpTz--
