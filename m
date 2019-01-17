@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([209.51.188.92]:55724)
+Received: from eggs.gnu.org ([209.51.188.92]:57255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gkAZW-0002O2-4y
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:31:14 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gkAfn-0004WV-2Q
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:37:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gkAZV-00027S-28
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:31:14 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39633)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gkAZU-00025b-RA
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:31:13 -0500
-Received: by mail-wr1-x443.google.com with SMTP id t27so11725883wra.6
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 08:31:12 -0800 (PST)
-References: <20190116170114.26802-1-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20190116170114.26802-1-cota@braap.org>
-Date: Thu, 17 Jan 2019 16:31:09 +0000
-Message-ID: <8736prz1o2.fsf@linaro.org>
+	(envelope-from <cohuck@redhat.com>) id 1gkAfm-0008TH-AJ
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:37:43 -0500
+Date: Thu, 17 Jan 2019 17:37:33 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190117173733.47e6e0d5.cohuck@redhat.com>
+In-Reply-To: <1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
+References: <1546969050-8884-1-git-send-email-pmorel@linux.ibm.com>
+	<1546969050-8884-2-git-send-email-pmorel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] Dynamic TLB sizing
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7] s390x/pci: add common function
+ measurement block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: walling@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, pasic@linux.ibm.com, thuth@redhat.com
 
+On Tue,  8 Jan 2019 18:37:30 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-Emilio G. Cota <cota@braap.org> writes:
+> From: Yi Min Zhao <zyimin@linux.ibm.com>
+> 
+> Common function measurement block is used to report zPCI internal
+> counters of successful pcilg/stg/stb and rpcit instructions to
+> a memory location provided by the program.
+> 
+> This patch introduces a new ZpciFmb structure and schedules a timer
+> callback to copy the zPCI measures to the FMB in the guest memory
+> at an interval time set to 4s.
+> 
+> An error while attemping to update the FMB, would generate an error
+> event to the guest.
+> 
+> The pcilg/stg/stb and rpcit interception handlers increase the
+> related counter on a successful call.
+> The guest shall pass a null FMBA (FMB address) in the FIB (Function
+> Information Block) when it issues a Modify PCI Function Control
+> instruction to switch off FMB and stop the corresponding timer.
+> 
+> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c  |   4 +-
+>  hw/s390x/s390-pci-bus.h  |  29 +++++++++++
+>  hw/s390x/s390-pci-inst.c | 133 +++++++++++++++++++++++++++++++++++++++++++++--
+>  hw/s390x/s390-pci-inst.h |   1 +
+>  4 files changed, 163 insertions(+), 4 deletions(-)
 
-> v6: https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02998.html
->
-> Changes since v6:
->
-> - Define TCG_TARGET_IMPLEMENTS_DYN_TLB for tcg/riscv (patch 2).
->
-> - Fix --disable-tcg breakage (reported by Alex) by moving
->   tlb_entry_is_empty to cputlb.c, since the function's only caller
->   is in that file (patch 1).
->
-> You can fetch this series from:
->   https://github.com/cota/qemu/tree/tlb-dyn-v7
->
-
-Well so far this has proved to be stable whilst I've been stressing it
-out so have a:
-
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-I'm currently benchmarking on my build workload but it's taking a while
-to run.
-
---
-Alex Benn=C3=A9e
+Thanks, applied.
