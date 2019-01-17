@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([209.51.188.92]:33914)
+Received: from eggs.gnu.org ([209.51.188.92]:33975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkDU6-0004j2-4z
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkDU7-0004me-RD
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gkDU1-0000FF-RA
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1gkDU2-0000Fx-Iz
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 14:37:50 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 17 Jan 2019 13:36:48 -0600
-Message-Id: <20190117193658.16413-12-eblake@redhat.com>
+Date: Thu, 17 Jan 2019 13:36:57 -0600
+Message-Id: <20190117193658.16413-21-eblake@redhat.com>
 In-Reply-To: <20190117193658.16413-1-eblake@redhat.com>
 References: <20190117193658.16413-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 11/21] nbd/client: Split out
- nbd_send_meta_query()
+Subject: [Qemu-devel] [PATCH v4 20/21] nbd/client: Work around 3.0 bug for
+ listing meta contexts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,141 +25,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: nsoffer@redhat.com, rjones@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Refactor nbd_negotiate_simple_meta_context() to pull out the
-code that can be reused to send a LIST request for 0 or 1 query.
-No semantic change.  The old comment about 'sizeof(uint32_t)'
-being equivalent to '/* number of queries */' is no longer
-needed, now that we are computing 'sizeof(queries)' instead.
+Commit 3d068aff forgot to advertise available qemu: contexts
+when the client requests a list with 0 queries. Furthermore,
+3.0 shipped with a qemu-img hack of x-dirty-bitmap (commit
+216ee365) that _silently_ acts as though the entire image is
+clean if a requested bitmap is not present.  Both bugs have
+been recently fixed, so that a modern qemu server gives full
+context output right away, and the client refuses a
+connection if a requested x-dirty-bitmap was not found.
+
+Still, it is likely that there will be users that have to
+work with a mix of old and new qemu versions, depending on
+which features get backported where, at which point being
+able to rely on 'qemu-img --list' output to know for sure
+whether a given NBD export has the desired dirty bitmap is
+much nicer than blindly connecting and risking that the
+entire image may appear clean.  We can make our --list code
+smart enough to work around buggy servers by tracking
+whether we've seen any qemu: replies in the original 0-query
+list; if not, repeat with a single query on "qemu:" (which
+may still have no replies, but then we know for sure we
+didn't trip up on the server bug).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20181215135324.152629-14-eblake@redhat.com>
-Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 ---
-v4: retitle, more s/context/query/ changes [Vladimir]
-v3: Improve commit message [Rich], formatting tweak [checkpatch],
-rebase to dropped patch
+v4: minor rebase
 ---
- nbd/client.c     | 64 +++++++++++++++++++++++++++++++++---------------
- nbd/trace-events |  2 +-
- 2 files changed, 45 insertions(+), 21 deletions(-)
+ nbd/client.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/nbd/client.c b/nbd/client.c
-index 77993890f04..96da68ee18a 100644
+index 798b82f205a..8a083c2f42c 100644
 --- a/nbd/client.c
 +++ b/nbd/client.c
-@@ -629,6 +629,46 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *=
-ioc,
-     return QIO_CHANNEL(tioc);
- }
+@@ -21,6 +21,7 @@
+ #include "qapi/error.h"
+ #include "trace.h"
+ #include "nbd-internal.h"
++#include "qemu/cutils.h"
 
-+/*
-+ * nbd_send_meta_query:
-+ * Send 0 or 1 set/list meta context queries.
-+ * Return 0 on success, -1 with errp set for any error
-+ */
-+static int nbd_send_meta_query(QIOChannel *ioc, uint32_t opt,
-+                               const char *export, const char *query,
-+                               Error **errp)
-+{
-+    int ret;
-+    uint32_t export_len =3D strlen(export);
-+    uint32_t queries =3D !!query;
-+    uint32_t query_len =3D 0;
-+    uint32_t data_len;
-+    char *data;
-+    char *p;
-+
-+    data_len =3D sizeof(export_len) + export_len + sizeof(queries);
-+    if (query) {
-+        query_len =3D strlen(query);
-+        data_len +=3D sizeof(query_len) + query_len;
-+    } else {
-+        assert(opt =3D=3D NBD_OPT_LIST_META_CONTEXT);
-+    }
-+    p =3D data =3D g_malloc(data_len);
-+
-+    trace_nbd_opt_meta_request(nbd_opt_lookup(opt), query ?: "(all)", ex=
-port);
-+    stl_be_p(p, export_len);
-+    memcpy(p +=3D sizeof(export_len), export, export_len);
-+    stl_be_p(p +=3D export_len, queries);
-+    if (query) {
-+        stl_be_p(p +=3D sizeof(queries), query_len);
-+        memcpy(p +=3D sizeof(query_len), query, query_len);
-+    }
-+
-+    ret =3D nbd_send_option_request(ioc, opt, data_len, data, errp);
-+    g_free(data);
-+    return ret;
-+}
-+
- /* nbd_negotiate_simple_meta_context:
-  * Request the server to set the meta context for export @info->name
-  * using @info->x_dirty_bitmap with a fallback to "base:allocation",
-@@ -653,26 +693,10 @@ static int nbd_negotiate_simple_meta_context(QIOCha=
-nnel *ioc,
-     NBDOptionReply reply;
-     const char *context =3D info->x_dirty_bitmap ?: "base:allocation";
-     bool received =3D false;
--    uint32_t export_len =3D strlen(info->name);
--    uint32_t context_len =3D strlen(context);
--    uint32_t data_len =3D sizeof(export_len) + export_len +
--                        sizeof(uint32_t) + /* number of queries */
--                        sizeof(context_len) + context_len;
--    char *data =3D g_malloc(data_len);
--    char *p =3D data;
+ /* Definitions for opaque data types */
 
--    trace_nbd_opt_meta_request(context, info->name);
--    stl_be_p(p, export_len);
--    memcpy(p +=3D sizeof(export_len), info->name, export_len);
--    stl_be_p(p +=3D export_len, 1);
--    stl_be_p(p +=3D sizeof(uint32_t), context_len);
--    memcpy(p +=3D sizeof(context_len), context, context_len);
--
--    ret =3D nbd_send_option_request(ioc, NBD_OPT_SET_META_CONTEXT, data_=
-len, data,
--                                  errp);
--    g_free(data);
--    if (ret < 0) {
--        return ret;
-+    if (nbd_send_meta_query(ioc, NBD_OPT_SET_META_CONTEXT,
-+                            info->name, context, errp) < 0) {
-+        return -1;
+@@ -828,6 +829,8 @@ static int nbd_list_meta_contexts(QIOChannel *ioc,
+                                   Error **errp)
+ {
+     int ret;
++    int seen_any =3D false;
++    int seen_qemu =3D false;
+
+     if (nbd_send_meta_query(ioc, NBD_OPT_LIST_META_CONTEXT,
+                             info->name, NULL, errp) < 0) {
+@@ -839,9 +842,25 @@ static int nbd_list_meta_contexts(QIOChannel *ioc,
+
+         ret =3D nbd_receive_one_meta_context(ioc, NBD_OPT_LIST_META_CONT=
+EXT,
+                                            &context, NULL, errp);
++        if (ret =3D=3D 0 && seen_any && !seen_qemu) {
++            /*
++             * Work around qemu 3.0 bug: the server forgot to send
++             * "qemu:" replies to 0 queries. If we saw at least one
++             * reply (probably base:allocation), but none of them were
++             * qemu:, then run a more specific query to make sure.
++             */
++            seen_qemu =3D true;
++            if (nbd_send_meta_query(ioc, NBD_OPT_LIST_META_CONTEXT,
++                                    info->name, "qemu:", errp) < 0) {
++                return -1;
++            }
++            continue;
++        }
+         if (ret <=3D 0) {
+             return ret;
+         }
++        seen_any =3D true;
++        seen_qemu |=3D strstart(context, "qemu:", NULL);
+         info->contexts =3D g_renew(char *, info->contexts, ++info->n_con=
+texts);
+         info->contexts[info->n_contexts - 1] =3D context;
      }
-
-     if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
-@@ -689,7 +713,7 @@ static int nbd_negotiate_simple_meta_context(QIOChann=
-el *ioc,
-     if (reply.type =3D=3D NBD_REP_META_CONTEXT) {
-         char *name;
-
--        if (reply.length !=3D sizeof(info->context_id) + context_len) {
-+        if (reply.length !=3D sizeof(info->context_id) + strlen(context)=
-) {
-             error_setg(errp, "Failed to negotiate meta context '%s', ser=
-ver "
-                        "answered with unexpected length %" PRIu32, conte=
-xt,
-                        reply.length);
-diff --git a/nbd/trace-events b/nbd/trace-events
-index c3966d2b653..59521e47a3d 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -12,7 +12,7 @@ nbd_receive_query_exports_start(const char *wantname) "=
-Querying export list for
- nbd_receive_query_exports_success(const char *wantname) "Found desired e=
-xport name '%s'"
- nbd_receive_starttls_new_client(void) "Setting up TLS"
- nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
--nbd_opt_meta_request(const char *context, const char *export) "Requestin=
-g to set meta context %s for export %s"
-+nbd_opt_meta_request(const char *optname, const char *context, const cha=
-r *export) "Requesting %s %s for export %s"
- nbd_opt_meta_reply(const char *context, uint32_t id) "Received mapping o=
-f context %s to id %" PRIu32
- nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving n=
-egotiation tlscreds=3D%p hostname=3D%s"
- nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
 --=20
 2.20.1
