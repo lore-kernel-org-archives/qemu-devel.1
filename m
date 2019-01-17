@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58242)
+Received: from eggs.gnu.org ([209.51.188.92]:58995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gk7mn-0008Vn-9X
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:32:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1gk7mv-0000o9-VE
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:32:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gk7dM-00060M-Cz
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:23:01 -0500
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:24954)
+	(envelope-from <armbru@redhat.com>) id 1gk7b2-0003Tt-6e
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:20:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46244)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gk7dM-0005yY-47
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:23:00 -0500
-Date: Thu, 17 Jan 2019 14:22:57 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20190117132257.uoksqpl6cuu6zilt@function>
-References: <20181226034254.17842-1-richard.henderson@linaro.org>
-	<20190116235009.tl4gcv53e62npecl@function>
-	<d79f1118-38ed-16fc-0233-0c41570d6d8c@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gk7b1-0003Qz-HX
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:20:35 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190117073649.5399.97670.stgit@pasha-VirtualBox>
+	<20190117073753.5399.4488.stgit@pasha-VirtualBox>
+Date: Thu, 17 Jan 2019 14:20:30 +0100
+In-Reply-To: <20190117073753.5399.4488.stgit@pasha-VirtualBox> (Pavel
+	Dovgalyuk's message of "Thu, 17 Jan 2019 10:37:53 +0300")
+Message-ID: <87y37j2zfl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d79f1118-38ed-16fc-0233-0c41570d6d8c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] slirp: Use lduw_be_p in slirp_input
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v10 11/24] replay: introduce info hmp/qmp
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, jan.kiszka@siemens.com, qemu-devel@nongnu.org
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-Philippe Mathieu-Daudé, le jeu. 17 janv. 2019 14:16:16 +0100, a ecrit:
-> On 1/17/19 12:50 AM, Samuel Thibault wrote:
-> > Hello,
-> > 
-> > Richard Henderson, le mer. 26 déc. 2018 14:42:54 +1100, a ecrit:
-> >> The pointer may be unaligned, so we must use our routines for that.
-> >> At the same time, we might as well use the big-endian version
-> >> instead of ntohs.
-> >>
-> >> This fixes sparc64 host SIGBUS during pxe boot.
-> > 
-> > I'm not at ease with applying this, when Marc-André is trying to make
-> > slirp an external library...  I'd rather apply the change below, could
-> > somebody review it?
-> > 
-> > Samuel
-> > 
-> > 
-> > slirp: Avoid unaligned 16bit memory access
-> > 
-> > pkt parameter may be unaligned, so we must access it byte-wise.
-> > 
-> > This fixes sparc64 host SIGBUS during pxe boot.
-> > 
-> > Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> > 
-> > diff --git a/slirp/slirp.c b/slirp/slirp.c
-> > index ab2fc4eb8b..0e41d5aedf 100644
-> > --- a/slirp/slirp.c
-> > +++ b/slirp/slirp.c
-> > @@ -851,7 +851,7 @@ void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
-> >      if (pkt_len < ETH_HLEN)
-> >          return;
-> >  
-> > -    proto = ntohs(*(uint16_t *)(pkt + 12));
-> > +    proto = (((uint16_t) pkt[12]) << 8) + pkt[13];
-> >      switch(proto) {
-> >      case ETH_P_ARP:
-> >          arp_input(slirp, pkt, pkt_len);
-> 
-> What about using memcpy?
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
 
-Well, it looks to me even more confusing than doing the shifts :)
+> This patch introduces 'info replay' monitor command and
+> corresponding qmp request.
+> These commands request the current record/replay mode, replay log file
+> name, and the instruction count (number of recorded/replayed
+> instructions).  The instruction count can be used with the
+> replay_seek/replay_break commands added in the next two patches.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+[...]
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 6d45c29..d70e584 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -28,7 +28,8 @@
+>  #
+>  # @icount: Current instruction count. Appears when execution record/replay
+>  #          is enabled. Used for "time-traveling" to match the moment
+> -#          in the recorded execution with the snapshots. (since 4.0)
+> +#          in the recorded execution with the snapshots. This counter may
+> +#          be obtained through @query-replay command (since 4.0)
+>  #
+>  # Since: 1.3
+>  #
+> diff --git a/qapi/replay.json b/qapi/replay.json
+> index 9e13551..ef2fb4b 100644
+> --- a/qapi/replay.json
+> +++ b/qapi/replay.json
+> @@ -24,3 +24,42 @@
+>  ##
+>  { 'enum': 'ReplayMode',
+>    'data': [ 'none', 'record', 'play' ] }
+> +
+> +##
+> +# @ReplayInfo:
+> +#
+> +# Record/replay information.
+> +#
+> +# @mode: current mode.
+> +#
+> +# @filename: name of the record/replay log file.
+> +#            It is present only in record or replay modes, when the log
+> +#            is recorded or replayed.
+> +#
+> +# @icount: current number of executed instructions.
+> +#
+> +# Since: 4.0
+> +#
+> +##
+> +{ 'struct': 'ReplayInfo',
+> +  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'icount': 'int' } }
+> +
+> +##
+> +# @query-replay:
+> +#
+> +# Retrieves the record/replay information.
 
-> -- >8 --
-> @@ -846,12 +846,13 @@ static void arp_input(Slirp *slirp, const uint8_t
-> *pkt, int pkt_len)
->  void slirp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
->  {
->      struct mbuf *m;
-> -    int proto;
-> +    uint16_t proto;
-> 
->      if (pkt_len < ETH_HLEN)
->          return;
-> 
-> -    proto = ntohs(*(uint16_t *)(pkt + 12));
-> +    memcpy(&proto, pkt + 12, sizeof(proto)); /* Avoid unaligned 16bit
-> access */
-> +    proto = ntohs(proto);
->      switch(proto) {
->      case ETH_P_ARP:
->          arp_input(slirp, pkt, pkt_len);
-> ---
-> 
+Imperative mood: Retrieve the record/replay information.
+
+> +# It includes current instruction count which may be used for replay-break and
+> +# replay-seek commands.
+
+Please wrap comment lines around column 70.
+
+> +#
+> +# Returns: record/replay information.
+> +#
+> +# Since: 4.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "query-replay" }
+> +# <- { "return": { "mode": "play", "filename": "log.rr", "icount": 220414 } }
+> +#
+> +##
+> +{ 'command': 'query-replay',
+> +  'returns': 'ReplayInfo' }
+
+Preferably with these minor touch-ups, QAPI schema part
+Acked-by: Markus Armbruster <armbru@redhat.com>
+
+[...]
