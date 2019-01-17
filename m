@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:45986)
+Received: from eggs.gnu.org ([209.51.188.92]:56028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sean.j.christopherson@intel.com>) id 1gkA1G-0002aL-En
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:55:51 -0500
+	(envelope-from <sean.j.christopherson@intel.com>) id 1gkAaY-0002s0-AG
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:32:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sean.j.christopherson@intel.com>) id 1gkA1F-0004SW-E7
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:55:50 -0500
-Received: from mga09.intel.com ([134.134.136.24]:48628)
+	(envelope-from <sean.j.christopherson@intel.com>) id 1gkAaW-0003Jd-55
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:32:18 -0500
+Received: from mga12.intel.com ([192.55.52.136]:33429)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sean.j.christopherson@intel.com>)
-	id 1gkA1F-0004H1-3X
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:55:49 -0500
-Date: Thu, 17 Jan 2019 07:55:42 -0800
+	id 1gkAaS-0003Cj-PE
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 11:32:14 -0500
+Date: Thu, 17 Jan 2019 08:32:08 -0800
 From: Sean Christopherson <sean.j.christopherson@intel.com>
-Message-ID: <20190117155542.GB22169@linux.intel.com>
+Message-ID: <20190117163208.GD22169@linux.intel.com>
 References: <1547733331-16140-1-git-send-email-ann.zhuangyanying@huawei.com>
-	<1547733331-16140-3-git-send-email-ann.zhuangyanying@huawei.com>
+	<1547733331-16140-5-git-send-email-ann.zhuangyanying@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1547733331-16140-3-git-send-email-ann.zhuangyanying@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] KVM: MMU: introduce
- possible_writable_spte_bitmap
+In-Reply-To: <1547733331-16140-5-git-send-email-ann.zhuangyanying@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] KVM: MMU: fast cleanup D bit based on
+ fast write protect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,168 +32,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Zhuangyanying <ann.zhuangyanying@huawei.com>
 Cc: xiaoguangrong@tencent.com, pbonzini@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, wangxinxin.wang@huawei.com, liu.jinsong@huawei.com
 
-On Thu, Jan 17, 2019 at 01:55:29PM +0000, Zhuangyanying wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+On Thu, Jan 17, 2019 at 01:55:31PM +0000, Zhuangyanying wrote:
+> From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
 > 
-> It is used to track possible writable sptes on the shadow page on
-> which the bit is set to 1 for the sptes that are already writable
-> or can be locklessly updated to writable on the fast_page_fault
-> path, also a counter for the number of possible writable sptes is
-> introduced to speed up bitmap walking
+> When live-migration with large-memory guests, vcpu may hang for a long
+> time while starting migration, such as 9s for 2T
+> (linux-5.0.0-rc2+qemu-3.1.0).
+> The reason is memory_global_dirty_log_start() taking too long, and the
+> vcpu is waiting for BQL. The page-by-page D bit clearup is the main time
+> consumption. I think that the idea of "KVM: MMU: fast write protect" by
+> xiaoguangrong, especially the function kvm_mmu_write_protect_all_pages(),
+> is very helpful. After a little modifcation, on his patch, can solve
+> this problem, 9s to 0.5s.
 > 
-> Later patch will benefit good performance by using this bitmap and
-> counter to fast figure out writable sptes and write protect them
+> At the beginning of live migration, write protection is only applied to the
+> top-level SPTE. Then the write from vm trigger the EPT violation, with
+> for_each_shadow_entry write protection is performed at dirct_map.
+> Finally the Dirty bit of the target page(at level 1 page table) is
+> cleared, and the dirty page tracking is started. Of coure, the page where
+> GPA is located is marked dirty when mmu_set_spte.
+> A similar implementation on xen, just emt instead of write protection.
 > 
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  6 ++++-
->  arch/x86/kvm/mmu.c              | 53 ++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 57 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/mmu.c     | 8 +++++---
+>  arch/x86/kvm/vmx/vmx.c | 3 +--
+>  2 files changed, 6 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 4660ce9..5c30aa0 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -128,6 +128,7 @@ static inline gfn_t gfn_to_index(gfn_t gfn, gfn_t base_gfn, int level)
->  #define KVM_MIN_ALLOC_MMU_PAGES 64
->  #define KVM_MMU_HASH_SHIFT 12
->  #define KVM_NUM_MMU_PAGES (1 << KVM_MMU_HASH_SHIFT)
-> +#define KVM_MMU_SP_ENTRY_NR 512
->  #define KVM_MIN_FREE_MMU_PAGES 5
->  #define KVM_REFILL_PAGES 25
->  #define KVM_MAX_CPUID_ENTRIES 80
-> @@ -331,12 +332,15 @@ struct kvm_mmu_page {
->  	gfn_t *gfns;
->  	int root_count;          /* Currently serving as active root */
->  	unsigned int unsync_children;
-> +	unsigned int possiable_writable_sptes;
-
-s/possiable/possible
-
->  	struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
->  
->  	/* The page is obsolete if mmu_valid_gen != kvm->arch.mmu_valid_gen.  */
->  	unsigned long mmu_valid_gen;
->  
-> -	DECLARE_BITMAP(unsync_child_bitmap, 512);
-> +	DECLARE_BITMAP(unsync_child_bitmap, KVM_MMU_SP_ENTRY_NR);
-> +
-> +	DECLARE_BITMAP(possible_writable_spte_bitmap, KVM_MMU_SP_ENTRY_NR);
->  
->  #ifdef CONFIG_X86_32
->  	/*
 > diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index eeb3bac..9daab00 100644
+> index 047b897..a18bcc0 100644
 > --- a/arch/x86/kvm/mmu.c
 > +++ b/arch/x86/kvm/mmu.c
-> @@ -718,6 +718,49 @@ static bool is_dirty_spte(u64 spte)
->  	return dirty_mask ? spte & dirty_mask : spte & PT_WRITABLE_MASK;
->  }
+> @@ -3257,7 +3257,10 @@ static bool mmu_load_shadow_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  			break;
 >  
-> +static bool is_possible_writable_spte(u64 spte)
-> +{
-> +	if (!is_shadow_present_pte(spte))
-> +		return false;
-> +
-> +	if (is_writable_pte(spte))
-> +		return true;
-> +
-> +	if (spte_can_locklessly_be_made_writable(spte))
-> +		return true;
-> +
-> +	/*
-> +	 * although is_access_track_spte() sptes can be updated out of
-> +	 * mmu-lock, we need not take them into account as access_track
-> +	 * drops writable bit for them
-> +	 */
-> +	return false;
-> +}
-> +
-> +static void
-> +mmu_log_possible_writable_spte(u64 *sptep, u64 old_spte, u64 new_spte)
-> +{
-> +	struct kvm_mmu_page *sp = page_header(__pa(sptep));
-> +	bool old_state, new_state;
-> +
-> +	old_state = is_possible_writable_spte(old_spte);
-> +	new_state = is_possible_writable_spte(new_spte);
-> +
-> +	if (old_state == new_state)
-> +		return;
-> +
-> +	/* a possible writable spte is dropped */
-> +	if (old_state) {
-> +		sp->possiable_writable_sptes--;
-> +		__clear_bit(sptep - sp->spt, sp->possible_writable_spte_bitmap);
-> +		return;
-> +	}
-> +
-> +	/* a new possible writable spte is set */
-> +	sp->possiable_writable_sptes++;
-> +	__set_bit(sptep - sp->spt, sp->possible_writable_spte_bitmap);
-> +}
-> +
->  /* Rules for using mmu_spte_set:
->   * Set the sptep from nonpresent to present.
->   * Note: the sptep being assigned *must* be either not present
-> @@ -728,6 +771,7 @@ static void mmu_spte_set(u64 *sptep, u64 new_spte)
+>  		if (is_last_spte(spte, sp->role.level)) {
+> -			flush |= spte_write_protect(sptep, false);
+> +			if (sp->role.level == PT_PAGE_TABLE_LEVEL)
+> +				flush |= spte_clear_dirty(sptep);
+> +			else
+> +				flush |= spte_write_protect(sptep, false);
+>  			continue;
+>  		}
+>  
+> @@ -6114,7 +6117,6 @@ void kvm_mmu_write_protect_all_pages(struct kvm *kvm, bool write_protect)
 >  {
->  	WARN_ON(is_shadow_present_pte(*sptep));
->  	__set_spte(sptep, new_spte);
-> +	mmu_log_possible_writable_spte(sptep, 0ull, new_spte);
->  }
+>  	u64 wp_all_indicator, kvm_wp_all_gen;
 >  
->  /*
-> @@ -746,6 +790,7 @@ static void mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
->  	}
+> -	mutex_lock(&kvm->slots_lock);
+>  	wp_all_indicator = get_write_protect_all_indicator(kvm);
+>  	kvm_wp_all_gen = get_write_protect_all_gen(wp_all_indicator);
 >  
->  	__update_clear_spte_fast(sptep, new_spte);
-> +	mmu_log_possible_writable_spte(sptep, old_spte, new_spte);
+> @@ -6134,8 +6136,8 @@ void kvm_mmu_write_protect_all_pages(struct kvm *kvm, bool write_protect)
+>  	 */
+>  	if (write_protect)
+>  		kvm_reload_remote_mmus(kvm);
+> -	mutex_unlock(&kvm->slots_lock);
 
-Hmm, maybe it's just me, but I find the "track vs. no_track" terminology
-quite confusing, e.g. the "no_track" functions are now logging sptes.
-Track and log aren't exact synonyms, but they're pretty closed.
+Why is the lock removed?  And why was it added in the first place?
+
+>  }
+> +EXPORT_SYMBOL_GPL(kvm_mmu_write_protect_all_pages);
+>  
+>  static unsigned long
+>  mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index f6915f1..5236a07 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7180,8 +7180,7 @@ static void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu)
+>  static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+>  				     struct kvm_memory_slot *slot)
+>  {
+> -	kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+> -	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);
+> +	kvm_mmu_write_protect_all_pages(kvm, true);
+
+What's the purpose of having @write_protect if
+kvm_mmu_write_protect_all_pages() is only ever called to enable
+protection?  If there's no known scenario where write protection is
+explicitly disabled then there's no need for WP_ALL_ENABLE_MASK, i.e. a
+non-zero generation would indicate write protection is enabled.  That'd
+simplify the code and clean up the atomic usage.
 
 >  }
 >  
->  /*
-> @@ -771,6 +816,7 @@ static u64 mmu_spte_update_track(u64 *sptep, u64 new_spte)
->  
->  	WARN_ON(spte_to_pfn(old_spte) != spte_to_pfn(new_spte));
->  
-> +	mmu_log_possible_writable_spte(sptep, old_spte, new_spte);
->  	return old_spte;
->  }
->  
-> @@ -836,6 +882,8 @@ static int mmu_spte_clear_track_bits(u64 *sptep)
->  	else
->  		old_spte = __update_clear_spte_slow(sptep, 0ull);
->  
-> +	mmu_log_possible_writable_spte(sptep, old_spte, 0ull);
-> +
->  	if (!is_shadow_present_pte(old_spte))
->  		return 0;
->  
-> @@ -864,7 +912,10 @@ static int mmu_spte_clear_track_bits(u64 *sptep)
->   */
->  static void mmu_spte_clear_no_track(u64 *sptep)
->  {
-> +	u64 old_spte = *sptep;
-> +
->  	__update_clear_spte_fast(sptep, 0ull);
-> +	mmu_log_possible_writable_spte(sptep, old_spte, 0ull);
->  }
->  
->  static u64 mmu_spte_get_lockless(u64 *sptep)
-> @@ -2159,7 +2210,7 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
->  {
->  	int i, ret, nr_unsync_leaf = 0;
->  
-> -	for_each_set_bit(i, sp->unsync_child_bitmap, 512) {
-> +	for_each_set_bit(i, sp->unsync_child_bitmap, KVM_MMU_SP_ENTRY_NR) {
->  		struct kvm_mmu_page *child;
->  		u64 ent = sp->spt[i];
->  
+>  static void vmx_slot_disable_log_dirty(struct kvm *kvm,
 > -- 
 > 1.8.3.1
 > 
