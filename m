@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([209.51.188.92]:58320)
+Received: from eggs.gnu.org ([209.51.188.92]:59017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gk9B0-0000ky-42
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:01:52 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gk9C5-0001Vp-Ua
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:03:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gk9Au-0003We-Ff
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:01:50 -0500
-Received: from mail-eopbgr790103.outbound.protection.outlook.com
-	([40.107.79.103]:14256
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
-	id 1gk9Au-0003UW-5g
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:01:44 -0500
-From: Stefan Markovic <smarkovic@wavecomp.com>
-Date: Thu, 17 Jan 2019 15:01:42 +0000
-Message-ID: <7b3030f6-c9c2-d001-75f8-4c2832883363@wavecomp.com>
-References: <1546533252-26601-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1546533252-26601-7-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1546533252-26601-7-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E11C36E3E46753498934B6690114D090@namprd22.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1gk9By-0005Bu-AB
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:02:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36930)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gk9By-000597-3L
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 10:02:50 -0500
+Date: Thu, 17 Jan 2019 16:02:37 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190117160237.26c85e69@redhat.com>
+In-Reply-To: <2dd66229-b11e-4081-8934-bec2c5a16364@redhat.com>
+References: <1547566866-129386-1-git-send-email-imammedo@redhat.com>
+	<1547566866-129386-6-git-send-email-imammedo@redhat.com>
+	<2dd66229-b11e-4081-8934-bec2c5a16364@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 6/8] target/mips: Add field and R/W access
- to ITU control register ICR0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 05/14] tests: acpi: fetch X_DSDT if pointer
+ to DSDT is 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrew Jones <drjones@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>, Laszlo Ersek <lersek@redhat.com>
 
-DQpPbiAzLjEuMTkuIDE3OjM0LCBBbGVrc2FuZGFyIE1hcmtvdmljIHdyb3RlOg0KPiBGcm9tOiBZ
-b25nYm9rIEtpbSA8eW9uZ2Jvay5raW1AbWlwcy5jb20+DQo+DQo+IEFkZCBmaWVsZCBhbmQgUi9X
-IGFjY2VzcyB0byBJVFUgY29udHJvbCByZWdpc3RlciBJQ1IwLg0KPg0KPiBTaWduZWQtb2ZmLWJ5
-OiBZb25nYm9rIEtpbSA8eW9uZ2Jvay5raW1AbWlwcy5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IEFs
-ZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+IC0tLQ0KPiAgIGh3
-L21pc2MvbWlwc19pdHUuYyAgICAgICAgIHwgMjIgKysrKysrKysrKysrKysrKysrKysrLQ0KPiAg
-IGluY2x1ZGUvaHcvbWlzYy9taXBzX2l0dS5oIHwgIDQgKysrKw0KPiAgIDIgZmlsZXMgY2hhbmdl
-ZCwgMjUgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KDQoNClJldmlld2VkLWJ5OiBTdGVm
-YW4gTWFya292aWMgPHNtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQoNCg0KPiBkaWZmIC0tZ2l0IGEv
-aHcvbWlzYy9taXBzX2l0dS5jIGIvaHcvbWlzYy9taXBzX2l0dS5jDQo+IGluZGV4IDQzYmJlYzQu
-LjQ4MDE5NTggMTAwNjQ0DQo+IC0tLSBhL2h3L21pc2MvbWlwc19pdHUuYw0KPiArKysgYi9ody9t
-aXNjL21pcHNfaXR1LmMNCj4gQEAgLTU1LDkgKzU1LDE3IEBAIHR5cGVkZWYgZW51bSBJVENWaWV3
-IHsNCj4gICAgICAgSVRDVklFV19FRl9TWU5DID0gMiwNCj4gICAgICAgSVRDVklFV19FRl9UUlkg
-ID0gMywNCj4gICAgICAgSVRDVklFV19QVl9TWU5DID0gNCwNCj4gLSAgICBJVENWSUVXX1BWX1RS
-WSAgPSA1DQo+ICsgICAgSVRDVklFV19QVl9UUlkgID0gNSwNCj4gKyAgICBJVENWSUVXX1BWX0lD
-UjAgPSAxNSwNCj4gICB9IElUQ1ZpZXc7DQo+ICAgDQo+ICsjZGVmaW5lIElUQ19JQ1IwX0NFTExf
-TlVNICAgICAgICAxNg0KPiArI2RlZmluZSBJVENfSUNSMF9CTEtfR1JBSU4gICAgICAgOA0KPiAr
-I2RlZmluZSBJVENfSUNSMF9CTEtfR1JBSU5fTUFTSyAgMHg3DQo+ICsjZGVmaW5lIElUQ19JQ1Iw
-X0VSUl9BWEkgICAgICAgICAyDQo+ICsjZGVmaW5lIElUQ19JQ1IwX0VSUl9QQVJJVFkgICAgICAx
-DQo+ICsjZGVmaW5lIElUQ19JQ1IwX0VSUl9FWEVDICAgICAgICAwDQo+ICsNCj4gICBNZW1vcnlS
-ZWdpb24gKm1pcHNfaXR1X2dldF90YWdfcmVnaW9uKE1JUFNJVFVTdGF0ZSAqaXR1KQ0KPiAgIHsN
-Cj4gICAgICAgcmV0dXJuICZpdHUtPnRhZ19pbzsNCj4gQEAgLTM4Miw2ICszOTAsOSBAQCBzdGF0
-aWMgdWludDY0X3QgaXRjX3N0b3JhZ2VfcmVhZCh2b2lkICpvcGFxdWUsIGh3YWRkciBhZGRyLCB1
-bnNpZ25lZCBzaXplKQ0KPiAgICAgICBjYXNlIElUQ1ZJRVdfUFZfVFJZOg0KPiAgICAgICAgICAg
-cmV0ID0gdmlld19wdl90cnlfcmVhZChjZWxsKTsNCj4gICAgICAgICAgIGJyZWFrOw0KPiArICAg
-IGNhc2UgSVRDVklFV19QVl9JQ1IwOg0KPiArICAgICAgICByZXQgPSBzLT5pY3IwOw0KPiArICAg
-ICAgICBicmVhazsNCj4gICAgICAgZGVmYXVsdDoNCj4gICAgICAgICAgIHFlbXVfbG9nX21hc2so
-TE9HX0dVRVNUX0VSUk9SLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAiaXRjX3N0b3JhZ2Vf
-cmVhZDogQmFkIElUQyBWaWV3ICVkXG4iLCAoaW50KXZpZXcpOw0KPiBAQCAtNDE3LDYgKzQyOCwx
-NSBAQCBzdGF0aWMgdm9pZCBpdGNfc3RvcmFnZV93cml0ZSh2b2lkICpvcGFxdWUsIGh3YWRkciBh
-ZGRyLCB1aW50NjRfdCBkYXRhLA0KPiAgICAgICBjYXNlIElUQ1ZJRVdfUFZfVFJZOg0KPiAgICAg
-ICAgICAgdmlld19wdl90cnlfd3JpdGUoY2VsbCk7DQo+ICAgICAgICAgICBicmVhazsNCj4gKyAg
-ICBjYXNlIElUQ1ZJRVdfUFZfSUNSMDoNCj4gKyAgICAgICAgaWYgKGRhdGEgJiAweDcpIHsNCj4g
-KyAgICAgICAgICAgIC8qIGNsZWFyIEVSUk9SIGJpdHMgKi8NCj4gKyAgICAgICAgICAgIHMtPmlj
-cjAgJj0gfihkYXRhICYgMHg3KTsNCj4gKyAgICAgICAgfQ0KPiArICAgICAgICAvKiBzZXQgQkxL
-X0dSQUlOICovDQo+ICsgICAgICAgIHMtPmljcjAgJj0gfjB4NzAwOw0KPiArICAgICAgICBzLT5p
-Y3IwIHw9IGRhdGEgJiAweDcwMDsNCj4gKyAgICAgICAgYnJlYWs7DQo+ICAgICAgIGRlZmF1bHQ6
-DQo+ICAgICAgICAgICBxZW11X2xvZ19tYXNrKExPR19HVUVTVF9FUlJPUiwNCj4gICAgICAgICAg
-ICAgICAgICAgICAgICAgIml0Y19zdG9yYWdlX3dyaXRlOiBCYWQgSVRDIFZpZXcgJWRcbiIsIChp
-bnQpdmlldyk7DQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2h3L21pc2MvbWlwc19pdHUuaCBiL2lu
-Y2x1ZGUvaHcvbWlzYy9taXBzX2l0dS5oDQo+IGluZGV4IDAzMGViNGEuLjQ1YTBjNTEgMTAwNjQ0
-DQo+IC0tLSBhL2luY2x1ZGUvaHcvbWlzYy9taXBzX2l0dS5oDQo+ICsrKyBiL2luY2x1ZGUvaHcv
-bWlzYy9taXBzX2l0dS5oDQo+IEBAIC02Niw2ICs2NiwxMCBAQCB0eXBlZGVmIHN0cnVjdCBNSVBT
-SVRVU3RhdGUgew0KPiAgICAgICAvKiBJVEMgQ29uZmlndXJhdGlvbiBUYWdzICovDQo+ICAgICAg
-IHVpbnQ2NF90IElUQ0FkZHJlc3NNYXBbSVRDX0FERFJFU1NNQVBfTlVNXTsNCj4gICAgICAgTWVt
-b3J5UmVnaW9uIHRhZ19pbzsNCj4gKw0KPiArICAgIC8qIElUVSBDb250cm9sIFJlZ2lzdGVyICov
-DQo+ICsgICAgdWludDY0X3QgaWNyMDsNCj4gKw0KPiAgIH0gTUlQU0lUVVN0YXRlOw0KPiAgIA0K
-PiAgIC8qIEdldCBJVEMgQ29uZmlndXJhdGlvbiBUYWcgbWVtb3J5IHJlZ2lvbi4gKi8NCg==
+On Thu, 17 Jan 2019 15:02:57 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+
+> On 1/15/19 4:40 PM, Igor Mammedov wrote:
+> > that way it would be possible to test a DSDT pointed by
+> > 64bit X_DSDT field in FADT.
+> >=20
+> > PS:
+> > it will allow to enable testing arm/virt board, which sets
+> > only newer X_DSDT field.
+> >=20
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  tests/bios-tables-test.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> > index c28c5c7..0f04a0a 100644
+> > --- a/tests/bios-tables-test.c
+> > +++ b/tests/bios-tables-test.c
+> > @@ -140,6 +140,8 @@ static void test_acpi_fadt_table(test_data *data)
+> >      AcpiSdtTable table =3D g_array_index(data->tables, typeof(table), =
+0);
+> >      uint8_t *fadt_aml =3D table.aml;
+> >      uint32_t fadt_len =3D table.aml_len;
+> > +    uint32_t val;
+> > +    int dsdt_offset =3D 40 /* DSDT */;
+> > =20
+> >      g_assert(compare_signature(&table, "FACP"));
+> > =20
+> > @@ -148,8 +150,12 @@ static void test_acpi_fadt_table(test_data *data)
+> >                       fadt_aml + 36 /* FIRMWARE_CTRL */, "FACS", false);
+> >      g_array_append_val(data->tables, table);
+> > =20
+> > +    memcpy(&val, fadt_aml + dsdt_offset, 4); =20
+>=20
+> Maybe in case someone extend this test, add:
+>=20
+>        val =3D le32_to_cpu(val);
+I've skipped this conversion intentionally as we only care about
+0 vs non 0. If we would care about concrete value then le32_to_cpu()
+would be must have. I can put le32_to_cpu() there if you prefer
+as it doesn't hurt and documents that value is in LE.
+
+> Regardless:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+> > +    if (!val) {
+> > +        dsdt_offset =3D 140 /* X_DSDT */;
+> > +    }
+> >      acpi_fetch_table(data->qts, &table.aml, &table.aml_len,
+> > -                     fadt_aml + 40 /* DSDT */, "DSDT", true);
+> > +                     fadt_aml + dsdt_offset, "DSDT", true);
+> >      g_array_append_val(data->tables, table);
+> > =20
+> >      memset(fadt_aml + 36, 0, 4); /* sanitize FIRMWARE_CTRL ptr */
+> >  =20
+>=20
