@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([209.51.188.92]:52782)
+Received: from eggs.gnu.org ([209.51.188.92]:53099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkCAf-0007E3-7u
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:13:42 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkCBU-00082l-8h
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:14:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gkCAd-00033R-UL
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:13:41 -0500
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:36434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gkCAd-0002mc-C2
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:13:39 -0500
-Received: by mail-ot1-x332.google.com with SMTP id k98so11987099otk.3
-	for <qemu-devel@nongnu.org>; Thu, 17 Jan 2019 10:13:30 -0800 (PST)
-MIME-Version: 1.0
-References: <20190107163117.16269-1-peter.maydell@linaro.org>
-	<20190107163117.16269-7-peter.maydell@linaro.org>
-In-Reply-To: <20190107163117.16269-7-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 Jan 2019 18:13:16 +0000
-Message-ID: <CAFEAcA9-rLt5H_+qci8tMZ5p67i56VYfow5ZJZyKUjrYftr3gw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 06/37] gdbstub: add multiprocess support to
- 'H' and 'T' packets
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gkCBH-00041G-9j
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:14:24 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:50150 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gkCBG-0002Si-VJ
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 13:14:19 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Thu, 17 Jan 2019 19:12:55 +0100
+Message-Id: <1547748785-14030-3-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1547748785-14030-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1547748785-14030-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL 02/12] target/mips: Add preprocessor constants
+ for 32 major CP0 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Luc Michel <luc.michel@greensocs.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-On Mon, 7 Jan 2019 at 16:31, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> From: Luc Michel <luc.michel@greensocs.com>
->
-> Add a couple of helper functions to cope with GDB threads and processes.
->
-> The gdb_get_process() function looks for a process given a pid.
->
-> The gdb_get_cpu() function returns the CPU corresponding to the (pid,
-> tid) pair given as parameters.
->
-> The read_thread_id() function parses the thread-id sent by the peer.
-> This function supports the multiprocess extension thread-id syntax.  The
-> return value specifies if the parsing failed, or if a special case was
-> encountered (all processes or all threads).
->
-> Use them in 'H' and 'T' packets handling to support the multiprocess
-> extension.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-> +static CPUState *gdb_get_cpu(const GDBState *s, uint32_t pid, uint32_t tid)
-> +{
-> +    GDBProcess *process;
-> +    CPUState *cpu;
-> +
-> +    if (!tid) {
-> +        /* 0 means any thread, we take the first one */
-> +        tid = 1;
-> +    }
-> +
-> +    cpu = find_cpu(tid);
-> +
-> +    if (cpu == NULL) {
-> +        return NULL;
-> +    }
-> +
-> +    process = gdb_get_cpu_process(s, cpu);
-> +
-> +    if (process->pid != pid) {
-> +        return NULL;
-> +    }
-> +
-> +    if (!process->attached) {
-> +        return NULL;
-> +    }
-> +
-> +    return cpu;
-> +}
+Add preprocessor constants for 32 major CP0 registers.
 
-I'm finding that (with my out-of-tree board model) gdb
-asks for "process 0 thread 0", which should mean "anything you
-like", so we end up calling gdb_get_cpu(s, 0, 0). Then we
-find a CPU via its TID, and of course it has some specific
-PID in process->pid which is not zero, so we fail the
-"process->pid != pid" test and return NULL here incorrectly.
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/cpu.h | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-Should that check be
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -736,7 +736,8 @@ static CPUState *gdb_get_cpu(const GDBState *s,
-uint32_t pid, uint32_t tid)
-
-     process = gdb_get_cpu_process(s, cpu);
-
--    if (process->pid != pid) {
-+    /* pid == 0 means any process, so this one is fine */
-+    if (pid != 0 && process->pid != pid) {
-         return NULL;
-     }
-
-?
-
-thanks
--- PMM
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 6c2a7e4..b095422 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -233,6 +233,38 @@ typedef struct mips_def_t mips_def_t;
+  * 7   TagLo             TagHi                               KScratch<n>
+  *
+  */
++#define CPO_REGISTER_00     0
++#define CPO_REGISTER_01     1
++#define CPO_REGISTER_02     2
++#define CPO_REGISTER_03     3
++#define CPO_REGISTER_04     4
++#define CPO_REGISTER_05     5
++#define CPO_REGISTER_06     6
++#define CPO_REGISTER_07     7
++#define CPO_REGISTER_08     8
++#define CPO_REGISTER_09     9
++#define CPO_REGISTER_10    10
++#define CPO_REGISTER_11    11
++#define CPO_REGISTER_12    12
++#define CPO_REGISTER_13    13
++#define CPO_REGISTER_14    14
++#define CPO_REGISTER_15    15
++#define CPO_REGISTER_16    16
++#define CPO_REGISTER_17    17
++#define CPO_REGISTER_18    18
++#define CPO_REGISTER_19    19
++#define CPO_REGISTER_20    20
++#define CPO_REGISTER_21    21
++#define CPO_REGISTER_22    22
++#define CPO_REGISTER_23    23
++#define CPO_REGISTER_24    24
++#define CPO_REGISTER_25    25
++#define CPO_REGISTER_26    26
++#define CPO_REGISTER_27    27
++#define CPO_REGISTER_28    28
++#define CPO_REGISTER_29    29
++#define CPO_REGISTER_30    30
++#define CPO_REGISTER_31    31
+ 
+ 
+ typedef struct TCState TCState;
+-- 
+2.7.4
