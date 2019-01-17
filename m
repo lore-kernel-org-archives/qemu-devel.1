@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:57135)
+Received: from eggs.gnu.org ([209.51.188.92]:57172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66G-0005SB-8i
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:45 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66H-0005Tn-Tx
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66D-0004Sn-S7
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55142)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gk66F-0004Up-9E
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39456)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gk66D-0004Ii-GK
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:41 -0500
+	id 1gk66F-0004Q5-04
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 06:44:43 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 17 Jan 2019 15:43:37 +0400
-Message-Id: <20190117114359.5164-6-marcandre.lureau@redhat.com>
+Date: Thu, 17 Jan 2019 15:43:38 +0400
+Message-Id: <20190117114359.5164-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20190117114359.5164-1-marcandre.lureau@redhat.com>
 References: <20190117114359.5164-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 05/27] slirp: add callbacks for timer
+Subject: [Qemu-devel] [PATCH 06/27] slirp: replace trace functions with
+ DEBUG calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,142 +31,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, pbonzini@redhat.com, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>
 
+Remove a dependency on QEMU. Use the existing logging facilities.
+Set SLIRP_DEBUG=3Dtftp to get tftp log.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/libslirp.h | 14 +++++++++++---
- slirp/slirp.h    |  2 +-
- net/slirp.c      | 21 +++++++++++++++++++++
- slirp/ip6_icmp.c | 16 +++++++---------
- 4 files changed, 40 insertions(+), 13 deletions(-)
+ slirp/debug.h      | 13 ++++++++++---
+ slirp/slirp.c      |  1 +
+ slirp/tftp.c       |  7 ++++---
+ Makefile.objs      |  1 -
+ slirp/trace-events |  5 -----
+ 5 files changed, 15 insertions(+), 12 deletions(-)
+ delete mode 100644 slirp/trace-events
 
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index ea019828e8d..3e75dadfa31 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -6,19 +6,27 @@
- typedef struct Slirp Slirp;
+diff --git a/slirp/debug.h b/slirp/debug.h
+index 269d97d8073..f6a048450dd 100644
+--- a/slirp/debug.h
++++ b/slirp/debug.h
+@@ -8,9 +8,10 @@
+ #ifndef DEBUG_H_
+ #define DEBUG_H_
 =20
- typedef int (*SlirpWriteCb)(const void *buf, size_t len, void *opaque);
-+typedef void (*SlirpTimerCb)(void *opaque);
+-#define DBG_CALL 0x1
+-#define DBG_MISC 0x2
+-#define DBG_ERROR 0x4
++#define DBG_CALL (1 << 0)
++#define DBG_MISC (1 << 1)
++#define DBG_ERROR (1 << 2)
++#define DBG_TFTP (1 << 3)
 =20
- /*
-  * Callbacks from slirp
-- *
-- * The opaque parameter comes from the opaque parameter given to slirp_i=
-nit().
-  */
- typedef struct SlirpCb {
--    /* Send an ethernet frame to the guest network.  */
-+    /*
-+     * Send an ethernet frame to the guest network. The opaque parameter
-+     * is the one given to slirp_init().
-+     */
-     void (*output)(void *opaque, const uint8_t *pkt, int pkt_len);
-     /* Print a message for an error due to guest misbehavior.  */
-     void (*guest_error)(const char *msg);
-     /* Return the virtual clock value in nanoseconds */
-     int64_t (*clock_get_ns)(void);
-+    /* Create a new timer with the given callback and opaque data */
-+    void *(*timer_new)(SlirpTimerCb cb, void *opaque);
-+    /* Remove and free a timer */
-+    void (*timer_free)(void *timer);
-+    /* Modify a timer to expire at @expire_time */
-+    void (*timer_mod)(void *timer, int64_t expire_time);
- } SlirpCb;
+ extern int slirp_debug;
 =20
+@@ -38,4 +39,10 @@ extern int slirp_debug;
+     }                                           \
+ } while (0)
 =20
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 9aa245715dd..17056f4b836 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -193,7 +193,7 @@ struct Slirp {
-     NdpTable ndp_table;
-=20
-     GRand *grand;
--    QEMUTimer *ra_timer;
-+    void *ra_timer;
-=20
-     const SlirpCb *cb;
-     void *opaque;
-diff --git a/net/slirp.c b/net/slirp.c
-index 0b15f427f5c..c24a779425b 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -168,10 +168,31 @@ static int64_t net_slirp_clock_get_ns(void)
-     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
- }
-=20
-+static void *net_slirp_timer_new(SlirpTimerCb cb, void *opaque)
-+{
-+    return timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
-+                          SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
-+                          cb, opaque);
-+}
++#define DEBUG_TFTP(fmt, ...) do {               \
++    if (slirp_debug & DBG_TFTP) {               \
++        g_debug(fmt, ##__VA_ARGS__);            \
++    }                                           \
++} while (0)
 +
-+static void net_slirp_timer_free(void *timer)
-+{
-+    timer_del(timer);
-+    timer_free(timer);
-+}
-+
-+static void net_slirp_timer_mod(void *timer, int64_t expire_timer)
-+{
-+    timer_mod(timer, expire_timer);
-+}
-+
- static const SlirpCb slirp_cb =3D {
-     .output =3D net_slirp_output,
-     .guest_error =3D net_slirp_guest_error,
-     .clock_get_ns =3D net_slirp_clock_get_ns,
-+    .timer_new =3D net_slirp_timer_new,
-+    .timer_free =3D net_slirp_timer_free,
-+    .timer_mod =3D net_slirp_timer_mod,
- };
+ #endif /* DEBUG_H_ */
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 7b23722d5db..dd72829017f 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -270,6 +270,7 @@ static void slirp_init_once(void)
+             { "call", DBG_CALL },
+             { "misc", DBG_MISC },
+             { "error", DBG_ERROR },
++            { "tftp", DBG_TFTP },
+         };
+         slirp_debug =3D g_parse_debug_string(debug, keys, G_N_ELEMENTS(k=
+eys));
+     }
+diff --git a/slirp/tftp.c b/slirp/tftp.c
+index a9ba1480db4..6fb381ef337 100644
+--- a/slirp/tftp.c
++++ b/slirp/tftp.c
+@@ -26,7 +26,6 @@
+ #include "slirp.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+-#include "trace.h"
 =20
- static int net_slirp_init(NetClientState *peer, const char *model,
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index 5261baae271..e72c57a81dc 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -16,8 +16,9 @@
- static void ra_timer_handler(void *opaque)
+ static inline int tftp_session_in_use(struct tftp_session *spt)
  {
-     Slirp *slirp =3D opaque;
--    timer_mod(slirp->ra_timer,
--              slirp->cb->clock_get_ns() / SCALE_MS + NDP_Interval);
+@@ -205,7 +204,8 @@ static void tftp_send_error(struct tftp_session *spt,
+   struct mbuf *m;
+   struct tftp_t *tp;
+=20
+-  trace_slirp_tftp_error(msg);
++  DEBUG_TFTP("tftp error msg: %s", msg);
 +
-+    slirp->cb->timer_mod(slirp->ra_timer,
-+                         slirp->cb->clock_get_ns() / SCALE_MS + NDP_Inte=
-rval);
-     ndp_send_ra(slirp);
- }
+   m =3D m_get(spt->slirp);
 =20
-@@ -27,11 +28,9 @@ void icmp6_init(Slirp *slirp)
-         return;
+   if (!m) {
+@@ -325,7 +325,8 @@ static void tftp_handle_rrq(Slirp *slirp, struct sock=
+addr_storage *srcsas,
+       break;
      }
+   }
+-  trace_slirp_tftp_rrq(req_fname);
++
++  DEBUG_TFTP("tftp rrq file: %s", req_fname);
 =20
--    slirp->ra_timer =3D timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
--                                     SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
--                                     ra_timer_handler, slirp);
--    timer_mod(slirp->ra_timer,
--              slirp->cb->clock_get_ns() / SCALE_MS + NDP_Interval);
-+    slirp->ra_timer =3D slirp->cb->timer_new(ra_timer_handler, slirp);
-+    slirp->cb->timer_mod(slirp->ra_timer,
-+                         slirp->cb->clock_get_ns() / SCALE_MS + NDP_Inte=
-rval);
- }
-=20
- void icmp6_cleanup(Slirp *slirp)
-@@ -40,8 +39,7 @@ void icmp6_cleanup(Slirp *slirp)
-         return;
-     }
-=20
--    timer_del(slirp->ra_timer);
--    timer_free(slirp->ra_timer);
-+    slirp->cb->timer_free(slirp->ra_timer);
- }
-=20
- static void icmp6_send_echoreply(struct mbuf *m, Slirp *slirp, struct ip=
-6 *ip,
+   /* check mode */
+   if ((pktlen - k) < 6) {
+diff --git a/Makefile.objs b/Makefile.objs
+index 67a054b08af..b7aae33367f 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -192,7 +192,6 @@ trace-events-subdirs +=3D net
+ trace-events-subdirs +=3D qapi
+ trace-events-subdirs +=3D qom
+ trace-events-subdirs +=3D scsi
+-trace-events-subdirs +=3D slirp
+ trace-events-subdirs +=3D target/arm
+ trace-events-subdirs +=3D target/i386
+ trace-events-subdirs +=3D target/mips
+diff --git a/slirp/trace-events b/slirp/trace-events
+deleted file mode 100644
+index ff8f656e8c5..00000000000
+--- a/slirp/trace-events
++++ /dev/null
+@@ -1,5 +0,0 @@
+-# See docs/devel/tracing.txt for syntax documentation.
+-
+-# slirp/tftp.c
+-slirp_tftp_rrq(const char *file) "file: %s"
+-slirp_tftp_error(const char *file) "msg: %s"
 --=20
 2.20.1.98.gecbdaf0899
