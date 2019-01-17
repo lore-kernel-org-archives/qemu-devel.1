@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([209.51.188.92]:47776)
+Received: from eggs.gnu.org ([209.51.188.92]:58242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gk7F2-00039I-Au
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:57:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1gk7lB-0008Vn-05
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1gk7F1-0006mn-5d
-	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 07:57:52 -0500
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Date: Thu, 17 Jan 2019 12:57:45 +0000
-Message-ID: <83610386-bc64-6691-9af8-e98eb0a68342@virtuozzo.com>
-References: <20181205122326.26625-1-dplotnikov@virtuozzo.com>
-	<20181207122647.GE5119@linux.fritz.box>
-	<bb51b8f9-a3a4-90e6-2f69-57e90ccd623a@virtuozzo.com>
-	<20181212122457.GB5415@linux.fritz.box>
-	<d0d2cab4-2157-1f9f-3bc9-a70f28a211b0@virtuozzo.com>
-	<20181213122039.GC5427@linux.fritz.box>
-	<f2fcbcc2-5e0f-053d-f4c7-fe0f5f6092f0@virtuozzo.com>
-	<2ee882bf-00cc-addf-d866-c5c916a00774@virtuozzo.com>
-	<9d97e822-7c9b-c095-6a27-a74facf21e47@virtuozzo.com>
-	<ccb5e146-a601-81d6-28ca-8717adbdb701@virtuozzo.com>
-In-Reply-To: <ccb5e146-a601-81d6-28ca-8717adbdb701@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F491E1391CB31844B645DE13AD4E3205@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1gk7kV-0007GA-5N
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:30:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46178)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gk7kU-00076e-P4
+	for qemu-devel@nongnu.org; Thu, 17 Jan 2019 08:30:23 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20190117073649.5399.97670.stgit@pasha-VirtualBox>
+	<20190117073804.5399.15509.stgit@pasha-VirtualBox>
+Date: Thu, 17 Jan 2019 14:30:10 +0100
+In-Reply-To: <20190117073804.5399.15509.stgit@pasha-VirtualBox> (Pavel
+	Dovgalyuk's message of "Thu, 17 Jan 2019 10:38:04 +0300")
+Message-ID: <87k1j32yzh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: [Qemu-devel] PING: [PATCH] blk: postpone request execution on a
- context protected with "drained section"
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v10 13/24] replay: implement replay-seek
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,108 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "keith.busch@intel.com" <keith.busch@intel.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>, "famz@redhat.com" <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com, quintela@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 
-S2V2aW4sDQoNCmNvdWxkIHlvdSBwbGVhc2UgdGFrZSBhIGxvb2sgYXQgbXkgbGFzdCBjb21tZW50
-cz8NCg0KVGhhbmtzIQ0KDQpEZW5pcw0KDQpPbiAxNS4wMS4yMDE5IDEwOjIyLCBEZW5pcyBQbG90
-bmlrb3Ygd3JvdGU6DQo+IHBpbmcgcGluZyBwaW5nIHBpbmchISEhDQo+IA0KPiBPbiAwOS4wMS4y
-MDE5IDExOjE4LCBEZW5pcyBQbG90bmlrb3Ygd3JvdGU6DQo+PiBwaW5nIHBpbmchISENCj4+DQo+
-PiBPbiAxOC4xMi4yMDE4IDExOjUzLCBEZW5pcyBQbG90bmlrb3Ygd3JvdGU6DQo+Pj4gcGluZyBw
-aW5nDQo+Pj4NCj4+PiBPbiAxNC4xMi4yMDE4IDE0OjU0LCBEZW5pcyBQbG90bmlrb3Ygd3JvdGU6
-DQo+Pj4+DQo+Pj4+DQo+Pj4+IE9uIDEzLjEyLjIwMTggMTU6MjAsIEtldmluIFdvbGYgd3JvdGU6
-DQo+Pj4+PiBBbSAxMy4xMi4yMDE4IHVtIDEyOjA3IGhhdCBEZW5pcyBQbG90bmlrb3YgZ2VzY2hy
-aWViZW46DQo+Pj4+Pj4gT24gMTIuMTIuMjAxOCAxNToyNCwgS2V2aW4gV29sZiB3cm90ZToNCj4+
-Pj4+Pj4gQW0gMTEuMTIuMjAxOCB1bSAxNzo1NSBoYXQgRGVuaXMgUGxvdG5pa292IGdlc2Nocmll
-YmVuOg0KPj4+Pj4+Pj4+IFdoeSBpbnZvbHZlIHRoZSBBaW9Db250ZXh0IGF0IGFsbD8gVGhpcyBj
-b3VsZCBhbGwgYmUga2VwdCBhdCB0aGUNCj4+Pj4+Pj4+PiBCbG9ja0JhY2tlbmQgbGV2ZWwgd2l0
-aG91dCBleHRlbmRpbmcgdGhlIGxheWVyaW5nIHZpb2xhdGlvbiB0aGF0DQo+Pj4+Pj4+Pj4gYWlv
-X2Rpc2FibGVfZXh0ZXJuYWwoKSBpcy4NCj4+Pj4+Pj4+Pg0KPj4+Pj4+Pj4+IEJsb2NrQmFja2Vu
-ZHMgZ2V0IG5vdGlmaWVkIHdoZW4gdGhlaXIgcm9vdCBub2RlIGlzIGRyYWluZWQsIHNvIA0KPj4+
-Pj4+Pj4+IGhvb2tpbmcNCj4+Pj4+Pj4+PiB0aGluZ3MgdXAgdGhlcmUgc2hvdWxkIGJlIGFzIGVh
-c3ksIGlmIG5vdCBldmVuIGVhc2llciB0aGFuIGluDQo+Pj4+Pj4+Pj4gQWlvQ29udGV4dC4NCj4+
-Pj4+Pj4+DQo+Pj4+Pj4+PiBKdXN0IHdhbnQgdG8gbWFrZSBzdXJlIHRoYXQgSSB1bmRlcnN0b29k
-IGNvcnJlY3RseSB3aGF0IHlvdSANCj4+Pj4+Pj4+IG1lYW50IGJ5DQo+Pj4+Pj4+PiAiQmxvY2tC
-YWNrZW5kcyBnZXQgbm90aWZpZWQiLiBEaWQgeW91IG1lYW4gdGhhdCBiZHJ2X2RyYWluX2VuZCAN
-Cj4+Pj4+Pj4+IGNhbGxzDQo+Pj4+Pj4+PiBjaGlsZCdzIHJvbGUgY2FsbGJhY2sgYmxrX3Jvb3Rf
-ZHJhaW5lZF9lbmQgYnkgY2FsbGluZw0KPj4+Pj4+Pj4gYmRydl9wYXJlbnRfZHJhaW5lZF9lbmQ/
-DQo+Pj4+Pj4+DQo+Pj4+Pj4+IFllcywgYmxrX3Jvb3RfZHJhaW5lZF9iZWdpbi9lbmQgY2FsbHMg
-YXJlIGFsbCB5b3UgbmVlZC4gDQo+Pj4+Pj4+IFNwZWNpZmljYWxseSwNCj4+Pj4+Pj4gdGhlaXIg
-YWRqdXN0bWVudHMgdG8gYmxrLT5xdWllc2NlX2NvdW50ZXIgdGhhdCBhcmUgYWxyZWFkeSB0aGVy
-ZSwgDQo+Pj4+Pj4+IGFuZCBpbg0KPj4+Pj4+PiB0aGUgJ2lmICgtLWJsay0+cXVpZXNjZV9jb3Vu
-dGVyID09IDApJyBibG9jayBvZiANCj4+Pj4+Pj4gYmxrX3Jvb3RfZHJhaW5lZF9lbmQoKQ0KPj4+
-Pj4+PiB3ZSBjYW4gcmVzdW1lIHRoZSBxdWV1ZWQgcmVxdWVzdHMuDQo+Pj4+Pj4gU291bmRzIGl0
-IHNob3VsZCBiZSBzbywgYnV0IGl0IGRvZXNuJ3Qgd29yayB0aGF0IHdheSBhbmQgdGhhdCdzIHdo
-eToNCj4+Pj4+PiB3aGVuIGRvaW5nIG1pcnJvciB3ZSBtYXkgcmVzdW1lIHBvc3Rwb25lZCBjb3Jv
-dXRpbmVzIHRvbyBlYXJseSANCj4+Pj4+PiB3aGVuIHRoZQ0KPj4+Pj4+IHVuZGVybHlpbmcgYnMg
-aXMgcHJvdGVjdGVkIGZyb20gd3JpdGluZyBhdCBhbmQgdGh1cyB3ZSBlbmNvdW50ZXIgdGhlDQo+
-Pj4+Pj4gYXNzZXJ0IG9uIGEgd3JpdGUgcmVxdWVzdCBleGVjdXRpb24gYXQgYmRydl9jb193cml0
-ZV9yZXFfcHJlcGFyZSB3aGVuDQo+Pj4+Pj4gcmVzdW1pbmcgdGhlIHBvc3Rwb25lZCBjb3JvdXRp
-bmVzLg0KPj4+Pj4+DQo+Pj4+Pj4gVGhlIHRoaW5nIGlzIHRoYXQgdGhlIGJzIGlzIHByb3RlY3Rl
-ZCBmb3Igd3JpdGluZyBiZWZvcmUgZXhlY3V0aW9uIG9mDQo+Pj4+Pj4gYmRydl9yZXBsYWNlX25v
-ZGUgYXQgbWlycm9yX2V4aXRfY29tbW9uIGFuZCBiZHJ2X3JlcGxhY2Vfbm9kZSBjYWxscw0KPj4+
-Pj4+IGJkcnZfcmVwbGFjZV9jaGlsZF9ub3Blcm0gd2hpY2gsIGluIHR1cm4sIGNhbGxzIA0KPj4+
-Pj4+IGNoaWxkLT5yb2xlLT5kcmFpbmVkX2VuZA0KPj4+Pj4+IHdoZXJlIG9uZSBvZiB0aGUgY2Fs
-bGJhY2tzIGlzIGJsa19yb290X2RyYWluZWRfZW5kIHdoaWNoIGNoZWNrDQo+Pj4+Pj4gaWYoLS1i
-bGstPnF1aWVzY2VfY291bnRlciA9PSAwKSBhbmQgcnVucyB0aGUgcG9zdHBvbmVkIHJlcXVlc3Rz
-DQo+Pj4+Pj4gKGNvcm91dGluZXMpIGlmIHRoZSBjb3VuZGl0aW9uIGlzIHRydWUuDQo+Pj4+Pg0K
-Pj4+Pj4gSG0sIHNvIHNvbWV0aGluZyBpcyBtZXNzZWQgdXAgd2l0aCB0aGUgZHJhaW4gc2VjdGlv
-bnMgaW4gdGhlIG1pcnJvcg0KPj4+Pj4gZHJpdmVyLiBXZSBoYXZlOg0KPj4+Pj4NCj4+Pj4+IMKg
-wqDCoMKgIGJkcnZfZHJhaW5lZF9iZWdpbih0YXJnZXRfYnMpOw0KPj4+Pj4gwqDCoMKgwqAgYmRy
-dl9yZXBsYWNlX25vZGUodG9fcmVwbGFjZSwgdGFyZ2V0X2JzLCAmbG9jYWxfZXJyKTsNCj4+Pj4+
-IMKgwqDCoMKgIGJkcnZfZHJhaW5lZF9lbmQodGFyZ2V0X2JzKTsNCj4+Pj4+DQo+Pj4+PiBPYnZp
-b3VzbHksIHRoZSBpbnRlbnRpb24gd2FzIHRvIGtlZXAgdGhlIEJsb2NrQmFja2VuZCBkcmFpbmVk
-IGR1cmluZw0KPj4+Pj4gYmRydl9yZXBsYWNlX25vZGUoKS4gU28gaG93IGNvdWxkIGJsay0+cXVp
-ZXNjZV9jb3VudGVyIGV2ZXIgZ2V0IHRvIDANCj4+Pj4+IGluc2lkZSBiZHJ2X3JlcGxhY2Vfbm9k
-ZSgpIHdoZW4gdGFyZ2V0X2JzIGlzIGRyYWluZWQ/DQo+Pj4+Pg0KPj4+Pj4gTG9va2luZyBhdCBi
-ZHJ2X3JlcGxhY2VfY2hpbGRfbm9wZXJtKCksIGl0IHNlZW1zIHRoYXQgdGhlIGZ1bmN0aW9uIGhh
-cw0KPj4+Pj4gYSBidWc6IEV2ZW4gaWYgb2xkX2JzIGFuZCBuZXdfYnMgYXJlIGJvdGggZHJhaW5l
-ZCwgdGhlIHF1aWVzY2VfY291bnRlcg0KPj4+Pj4gZm9yIHRoZSBwYXJlbnQgcmVhY2hlcyAwIGZv
-ciBhIG1vbWVudCBiZWNhdXNlIHdlIGNhbGwgLmRyYWluZWRfZW5kIGZvcg0KPj4+Pj4gdGhlIG9s
-ZCBjaGlsZCBmaXJzdCBhbmQgLmRyYWluZWRfYmVnaW4gZm9yIHRoZSBuZXcgb25lIGxhdGVyLg0K
-Pj4+Pj4NCj4+Pj4+IFNvIGl0IHNlZW1zIHRoZSBmaXggd291bGQgYmUgdG8gcmV2ZXJzZSB0aGUg
-b3JkZXIgYW5kIGZpcnN0IGNhbGwNCj4+Pj4+IC5kcmFpbmVkX2JlZ2luIGZvciB0aGUgbmV3IGNo
-aWxkIGFuZCB0aGVuIC5kcmFpbmVkX2VuZCBmb3IgdGhlIG9sZA0KPj4+Pj4gY2hpbGQuIFNvdW5k
-cyBsaWtlIGEgZ29vZCBuZXcgdGVzdGNhc2UgZm9yIHRlc3RzL3Rlc3QtYmRydi1kcmFpbi5jLCAN
-Cj4+Pj4+IHRvby4NCj4+Pj4gWWVzLCBpdCdzIHRydWUsIGJ1dCBpdCdzIG5vdCBlbm91Z2guLi4N
-Cj4+Pj4gSW4gbWlycm9yX2V4aXRfY29tbW9uKCkgd2UgYWN0aXZlbHkgbWFuaXB1bGF0ZSB3aXRo
-IGJsb2NrIGRyaXZlciANCj4+Pj4gc3RhdGVzLg0KPj4+PiBXaGVuIHdlIHJlcGxhY2VkIGEgbm9k
-ZSBpbiB0aGUgc25pcHBldCB5b3Ugc2hvd2VkIHdlIGNhbid0IGFsbG93IHRoZSANCj4+Pj4gcG9z
-dHBvbmVkIGNvcm91dGluZXMgdG8gcnVuIGJlY2F1c2UgdGhlIGJsb2NrIHRyZWUgaXNuJ3QgcmVh
-ZHkgdG8gDQo+Pj4+IHJlY2VpdmUgdGhlIHJlcXVlc3RzIHlldC4NCj4+Pj4gVG8gYmUgcmVhZHks
-IHdlIG5lZWQgdG8gaW5zZXJ0IGEgcHJvcGVyIGJsb2NrIGRyaXZlciBzdGF0ZSB0byB0aGUgDQo+
-Pj4+IGJsb2NrIGJhY2tlbmQgd2hpY2ggaXMgZG9uZSBoZXJlDQo+Pj4+DQo+Pj4+IMKgwqDCoMKg
-IGJsa19yZW1vdmVfYnMoYmpvYi0+YmxrKTsNCj4+Pj4gwqDCoMKgwqAgYmxrX3NldF9wZXJtKGJq
-b2ItPmJsaywgMCwgQkxLX1BFUk1fQUxMLCAmZXJyb3JfYWJvcnQpOw0KPj4+PiDCoMKgwqDCoCBi
-bGtfaW5zZXJ0X2JzKGJqb2ItPmJsaywgbWlycm9yX3RvcF9icywgJmVycm9yX2Fib3J0KTsgPDwg
-PDwgPDwgPDwNCj4+Pj4NCj4+Pj4gwqDCoMKgwqAgYnNfb3BhcXVlLT5qb2IgPSBOVUxMOw0KPj4+
-Pg0KPj4+PiDCoMKgwqDCoCBiZHJ2X2RyYWluZWRfZW5kKHNyYyk7DQo+Pj4+DQo+Pj4+IElmIHRo
-ZSB0cmVlIGlzbid0IHJlYWR5IGFuZCB3ZSByZXN1bWUgdGhlIGNvcm91dGluZXMsIHdlJ2xsIGVu
-ZCB1cCANCj4+Pj4gd2l0aCB0aGUgcmVxdWVzdCBsYW5kZWQgaW4gYSB3cm9uZyBibG9jayBkcml2
-ZXIgc3RhdGUuDQo+Pj4+DQo+Pj4+IFNvLCB3ZSBleHBsaWNpdGx5IHNob3VsZCBzdG9wIGFsbCBh
-Y3Rpdml0aWVzIG9uIGFsbCB0aGUgZHJpdmVyIHN0YXRlcw0KPj4+PiBhbmQgaXRzIHBhcmVudHMg
-YW5kIGFsbG93IHRoZSBhY3Rpdml0aWVzIHdoZW4gZXZlcnl0aGluZyBpcyByZWFkeSB0byANCj4+
-Pj4gZ28uDQo+Pj4+DQo+Pj4+IFdoeSBleHBsaWNpdGx5LCBiZWNhdXNlIHRoZSBibG9jayBkcml2
-ZXIgc3RhdGVzIG1heSBiZWxvbmcgdG8gDQo+Pj4+IGRpZmZlcmVudCBibG9jayBiYWNrZW5kcyBh
-dCB0aGUgbW9tZW50IG9mIHRoZSBtYW5pcHVsYXRpb24gYmVnaW5uaW5nLg0KPj4+Pg0KPj4+PiBT
-bywgaXQgc2VlbXMgd2UgbmVlZCB0byBkaXNhYmxlIGFsbCB0aGVpciBjb250ZXh0cyB1bnRpbCB0
-aGUgDQo+Pj4+IG1hbmlwdWxhdGlvbiBlbmRzLg0KPj4+Pg0KPj4+PiBQbGVhc2UsIGNvcnJlY3Qg
-bWUgaWYgSSdtIHdyb25nLg0KPj4+Pg0KPj4+Pj4NCj4+Pj4+PiBJbiBzZWVtcyB0aGF0IGlmIHRo
-ZSBleHRlcm5hbCByZXF1ZXN0cyBkaXNhYmxlZCBvbiB0aGUgY29udGV4dCB3ZSANCj4+Pj4+PiBj
-YW4ndA0KPj4+Pj4+IHJlbHkgb24gYW55dGhpbmcgb3Igc2hvdWxkIGNoZWNrIHdoZXJlIHRoZSB1
-bmRlcmx5aW5nIGJzIGFuZCBpdHMNCj4+Pj4+PiB1bmRlcmx5aW5nIG5vZGVzIGFyZSByZWFkeSB0
-byByZWNlaXZlIHJlcXVlc3RzIHdoaWNoIHNvdW5kcyBxdWl0ZQ0KPj4+Pj4+IGNvbXBsaWNhdGVk
-Lg0KPj4+Pj4+IFBsZWFzZSBjb3JyZWN0IG1lIGlmIHN0aWxsIGRvbid0IHVuZGVyc3RhbmQgc29t
-ZXRoaW5nIGluIHRoYXQgDQo+Pj4+Pj4gcm91dGluZS4NCj4+Pj4+DQo+Pj4+PiBJIHRoaW5rIHRo
-ZSByZWFzb24gd2h5IHJleWxpbmcgb24gYWlvX2Rpc2FibGVfZXh0ZXJuYWwoKSB3b3JrcyBpcyAN
-Cj4+Pj4+IHNpbXBseQ0KPj4+Pj4gYmVjYXVzZSBzcmMgaXMgYWxzbyBkcmFpbmVkLCB3aGljaCBr
-ZWVwcyBleHRlcm5hbCBldmVudHMgaW4gdGhlDQo+Pj4+PiBBaW9Db250ZXh0IGRpc2FibGVkIGRl
-c3BpdGUgdGhlIGJ1ZyBpbiBkcmFpbmluZyB0aGUgdGFyZ2V0IG5vZGUuDQo+Pj4+Pg0KPj4+Pj4g
-VGhlIGJ1ZyB3b3VsZCBiZWNvbWUgYXBwYXJlbnQgZXZlbiB3aXRoIGFpb19kaXNhYmxlX2V4dGVy
-bmFsKCkgaWYgd2UNCj4+Pj4+IGRpZG4ndCBkcmFpbiBzcmMsIG9yIGV2ZW4gaWYgd2UganVzdCBz
-dXBwb3J0ZWQgc3JjIGFuZCB0YXJnZXQgYmVpbmcgaW4NCj4+Pj4+IGRpZmZlcmVudCBBaW9Db250
-ZXh0cy4NCj4+Pj4NCj4+Pj4gV2h5IGRvbid0IHdlIGRpc2FibGUgYWxsIHRob3NlIGNvbnRleHRz
-IGludm9sdmVkIHVudGlsIHRoZSBlbmQgb2YgDQo+Pj4+IHRoZSBibG9jayBkZXZpY2UgdHJlZSBy
-ZWNvbnN0cnVjdGlvbj8NCj4+Pj4NCj4+Pj4gVGhhbmtzIQ0KPj4+Pg0KPj4+PiBEZW5pcw0KPj4+
-Pj4NCj4+Pj4+IEtldmluDQo+Pj4+Pg0KPj4+Pg0KPj4+DQo+Pg0KPiANCg0KLS0gDQpCZXN0LA0K
-RGVuaXMNCg==
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+
+> This patch adds hmp/qmp commands replay_seek/replay-seek that proceed
+> the execution to the specified instruction count.
+> The command automatically loads nearest snapshot and replays the execution
+> to find the desired instruction count.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>
+> --
+>
+> v2:
+>  - renamed replay_seek qmp command into replay-seek
+>    (suggested by Eric Blake)
+> v7:
+>  - small fixes related to Markus Armbruster's review
+> v9:
+>  - changed 'step' parameter name to 'icount'
+>  - moved json stuff to replay.json and updated the description
+>    (suggested by Markus Armbruster)
+> v10:
+>  - updated the descriptions
+> ---
+>  hmp-commands.hx           |   19 +++++++++
+>  hmp.h                     |    1 
+>  qapi/replay.json          |   20 ++++++++++
+>  replay/replay-debugging.c |   92 +++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 132 insertions(+)
+>
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index d529f24..57ec43c 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1924,6 +1924,25 @@ The command is ignored when there are no replay breakpoints.
+>  ETEXI
+>  
+>      {
+> +        .name       = "replay_seek",
+> +        .args_type  = "icount:i",
+> +        .params     = "icount",
+> +        .help       = "replay execution to the specified instruction count",
+> +        .cmd        = hmp_replay_seek,
+> +    },
+> +
+> +STEXI
+> +@item replay_seek @var{icount}
+> +@findex replay_seek
+> +Automatically proceeds to the instruction count @var{icount}, when
+> +replaying the execution. The command automatically loads nearest
+> +snapshot and replays the execution to find the desired instruction.
+> +When there is no preceding snapshot or the execution is not replayed,
+> +then the command is ignored and error message is displayed.
+
+Sounds like roundabout way to say "then the command fails".  If that's
+correct, then let's phrase it that way.
+
+> +icount for the reference may be observed with 'info replay' command.
+> +ETEXI
+> +
+> +    {
+>          .name       = "info",
+>          .args_type  = "item:s?",
+>          .params     = "[subcommand]",
+> diff --git a/hmp.h b/hmp.h
+> index c9b9b4f..d6e1d7e 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -151,5 +151,6 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict);
+>  void hmp_info_replay(Monitor *mon, const QDict *qdict);
+>  void hmp_replay_break(Monitor *mon, const QDict *qdict);
+>  void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
+> +void hmp_replay_seek(Monitor *mon, const QDict *qdict);
+>  
+>  #endif
+> diff --git a/qapi/replay.json b/qapi/replay.json
+> index cb94991..0b5afce 100644
+> --- a/qapi/replay.json
+> +++ b/qapi/replay.json
+> @@ -99,3 +99,23 @@
+>  #
+>  ##
+>  { 'command': 'replay-delete-break' }
+> +
+> +##
+> +# @replay-seek:
+> +#
+> +# Automatically proceeds to the instruction count @icount, when
+> +# replaying the execution. The command automatically loads nearest
+> +# snapshot and replays the execution to find the desired instruction.
+> +# When there is no preceding snapshot or the execution is not replayed,
+> +# then the command is ignored and error is returned.
+> +# icount for the reference may be obtained with @query-replay command.
+
+My comment on hmp-commands.hx applies.
+
+> +#
+> +# @icount: target instruction count
+> +#
+> +# Since: 4.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "replay-seek", "data": { "icount": 220414 } }
+> +##
+> +{ 'command': 'replay-seek', 'data': { 'icount': 'int' } }
+
+[...]
+
+QAPI schema part
+Acked-by: Markus Armbruster <armbru@redhat.com>
+
+Please consider my comment suggestions regardless.
